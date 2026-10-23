@@ -6,11 +6,12 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
 import { cards } from "../../../catalog/schema";
-import { BackButton, BodyText, Screen, ScreenTitle } from "../../chrome";
+import { BodyText, Eyebrow, NavBar, Screen, ScreenTitle } from "../../chrome";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { imageLayoutSize, ringsdbImageUrl, shownCardImage } from "../../images/policy";
 import { InspectCardImage } from "../../images/picture";
+import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
@@ -64,6 +65,15 @@ function Zoomable({ children, width, height }: { children: ReactNode; width: num
   );
 }
 
+// The picture is the hero of this screen: centered, lifted off the night by a gold halo.
+const halo = {
+  shadowColor: palette.gold,
+  shadowOpacity: 0.25,
+  shadowRadius: 40,
+  shadowOffset: { width: 0, height: 0 },
+  elevation: 12,
+};
+
 export default function CardScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ code: string }>();
@@ -87,11 +97,12 @@ export default function CardScreen() {
   });
   const remotePreview = !source && row?.imagesrc ? ringsdbImageUrl(row.imagesrc) : null;
   const previewSource = source ?? (remotePreview ? { uri: remotePreview } : null);
+  const maxWidth = Math.max(0, Math.min(windowWidth - 96, 300));
   const pixels =
     resolved.kind === "file" || resolved.kind === "asset"
-      ? imageLayoutSize(resolved.width, resolved.height, Math.max(0, windowWidth - 48))
+      ? imageLayoutSize(resolved.width, resolved.height, maxWidth)
       : remotePreview
-        ? imageLayoutSize(423, 600, Math.max(0, windowWidth - 48))
+        ? imageLayoutSize(423, 600, maxWidth)
         : null;
 
   useEffect(() => {
@@ -102,37 +113,39 @@ export default function CardScreen() {
   if (!code) throw new Error("Missing route code");
 
   return (
-    <Screen>
-      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-4">
-        {row ? (
-          <>
-            <ScreenTitle>{row.name ?? row.code}</ScreenTitle>
-            {row.name ? <Text className="mt-2 text-label text-muted">{row.code}</Text> : null}
-          </>
-        ) : (
-          <>
-            <ScreenTitle>Card</ScreenTitle>
-            <BodyText className="mt-6">{`Card ${code} is not in the catalog.`}</BodyText>
-          </>
-        )}
-        {row?.errata ? (
-          <>
-            <Text className="mt-6 text-label text-heading">Errata</Text>
-            <BodyText className="mt-2">{row.errata}</BodyText>
-          </>
-        ) : null}
+    <Screen scene="plain">
+      <NavBar
+        backTestID="back"
+        onBack={() => router.back()}
+        right={row?.name ? <Text className="text-label text-faint">{row.code}</Text> : undefined}
+      />
+      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-8 pt-4">
         {previewSource && pixels ? (
-          <View
-            className="mt-4 self-center overflow-hidden"
-            style={{ width: pixels.width, height: pixels.height }}
-          >
-            <Zoomable width={pixels.width} height={pixels.height}>
-              <InspectCardImage code={code} source={previewSource} width={pixels.width} height={pixels.height} />
-            </Zoomable>
+          <View className="self-center rounded-card" style={[{ width: pixels.width, height: pixels.height }, halo]}>
+            <View className="overflow-hidden rounded-card" style={{ width: pixels.width, height: pixels.height }}>
+              <Zoomable width={pixels.width} height={pixels.height}>
+                <InspectCardImage code={code} source={previewSource} width={pixels.width} height={pixels.height} />
+              </Zoomable>
+            </View>
+          </View>
+        ) : null}
+        <View className="mt-8 items-center">
+          {row ? (
+            <ScreenTitle size="title">{row.name ?? row.code}</ScreenTitle>
+          ) : (
+            <>
+              <ScreenTitle>Card</ScreenTitle>
+              <BodyText className="mt-6 text-center">{`Card ${code} is not in the catalog.`}</BodyText>
+            </>
+          )}
+        </View>
+        {row?.errata ? (
+          <View className="mt-8 border-t border-hairline pt-5">
+            <Eyebrow>Errata</Eyebrow>
+            <BodyText className="mt-2">{row.errata}</BodyText>
           </View>
         ) : null}
       </ScrollView>
-      <BackButton testID="back" onPress={() => router.back()} />
     </Screen>
   );
 }

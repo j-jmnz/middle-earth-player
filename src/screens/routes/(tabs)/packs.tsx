@@ -22,7 +22,9 @@ export default function PackList() {
 
   return (
     <Screen>
-      <ScreenTitle>Packs</ScreenTitle>
+      <View className="pt-6">
+        <ScreenTitle>Packs</ScreenTitle>
+      </View>
       {rows.length === 0 ? (
         <BodyText tone="muted" className="mt-6">
           No packs are in the catalog.

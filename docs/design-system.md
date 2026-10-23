@@ -1,75 +1,104 @@
-# Design system
+# Design system — Night
 
-Visual authority for chrome. Product rules stay in [brief.md](brief.md). Structure stays in [architecture.md](architecture.md). Later screen phases use these tokens. They do not invent a palette, a type scale, or a second styling system.
+Visual authority for chrome. Product rules stay in [brief.md](brief.md). Structure stays in [architecture.md](architecture.md). Every screen phase uses these tokens and components. Do not invent a palette, a type scale, a radius, or a second styling system.
 
-The look comes from the materials on the source shelf, sampled for color only. Player cards in `.cache/sources/ringsdb/`: hero `141001`, ally `141006`, events `141010` and `141011`, attachments `141013` and `141014`. Scenario scans in `.cache/sources/reading/a-shadow-of-the-past/`: an enemy, a location, a treachery, an objective, and a quest stage. The Fellowship booklet and the Learn to Play, covers and a few interior pages, including the spheres page. No card text and no booklet prose is copied here.
+This replaces the earlier Parchment system. Where `docs/phases/phase-17-design-system.md` says "system face only", "no downloaded font", or "light only", this file supersedes it. The one embedded typeface and the dark theme are deliberate decisions. The reference mockups are `Fellowship Companion v2.dc.html` in the design project.
 
-One theme. Both OS schemes map onto it. `userInterfaceStyle` is `light`. `global.css` sets `color-scheme: light`. NativeWind `colorScheme` is set to `light` when the root layout loads, and again if the OS scheme changes. There is no dark variant.
+## Direction
+
+A game, not a form. The phone is a lamp-lit table at night: deep blue-black, warm gold light, parchment where something is written down.
+
+- **Night** is the page. Every screen sits on a scene backdrop that gives depth: a gradient sky, a soft glow, sometimes a mountain ridge.
+- **Gold is the Ring.** Gold marks one thing per screen: the current node, the primary button, the selected choice. If two things are gold, one of them is wrong.
+- **Parchment is what gets recorded or decided.** The splash, the campaign log, and every choice sheet on the table are paper with ink.
+- **Card art does the illustrating.** Hero tiles, deck covers, and the inspect screen use the real cached card pictures. Do not draw characters, scenery, or icons in SVG or Skia beyond the backdrop scenes and the ring.
+- **Few words.** A label says what something is, in plain words: no codes, no JSON-ish labels, no ALL CAPS tables. The collector code shows only on the card screen and as row detail in a pack.
 
 ## Performance
 
-Feel outranks decoration.
+Feel outranks decoration. These are exit conditions.
 
-- A list is a FlashList. A row is one pressable, one text node, and at most one image decoded at 32×44. No blur, no shadow, and no gradient on a row. The name still shows when the file is missing.
-- Press feedback is an immediate fill. Nothing animates on the scroll path.
-- This phase adds no motion. Later sheets and phase changes use Reanimated, and they snap when the OS asks for reduced motion. The animation does not gate the rule.
-- The first screen paints from SQLite. It does not wait on a font, an image download, or a catalog count. Type is the system face. No downloaded font, no icon font, no new package.
-- The table is one Skia canvas. Card pictures stay on that canvas. Chrome text and buttons are React Native. `src/play` cannot import `src/screens`. The canvas clear color is the `table` token below, copied into play when the table is built.
+- A list is a FlashList. A row is one pressable, text, and at most one image decoded at 32×44. No blur, no shadow, and no gradient on a row. The name still shows when the file is missing.
+- The backdrop is one static Skia canvas per screen (`backdrop.native.tsx`), drawn once per window size, behind the content. It never sits inside a list row or scrolls. The web build draws the same scene in CSS (`backdrop.tsx`).
+- Press feedback is an immediate fill in the same frame. Nothing animates on the scroll path. Sheets and phase changes use Reanimated and snap under reduced motion.
+- The first screen paints from SQLite. Marcellus is embedded at build time by the `expo-font` config plugin, so there is no runtime font load and no wait. No icon font. No other new package.
+- The table is one Skia canvas. Card pictures stay on that canvas. Chrome text and buttons are React Native. `src/play` cannot import `src/screens`. The canvas uses the `felt` and `feltLight` tokens, copied into play when the table is built.
 
 ## Color
 
-Values live in `src/screens/palette.js`. `tailwind.config.js` maps them to utilities. A screen uses the utility or `palette`. It does not write a new hex. `app.json` splash and adaptive-icon backgrounds are `paper`.
+Values live in `src/screens/palette.js`. `tailwind.config.js` maps them to utilities. A screen uses the utility or `palette`. It does not write a new hex. The only other hex values are the backdrop scene stops in `src/screens/backdrop-scenes.ts`. One theme: `userInterfaceStyle` is `dark`, NativeWind `colorScheme` is `dark`, and both OS schemes map onto Night.
 
-Contrast is WCAG against the surface the text sits on. Body text uses a pair at or above 4.5:1. A color that misses that ratio is a mark, next to a word in `ink` or `paper`.
+| Token | Hex | Use |
+| --- | --- | --- |
+| night | `#0A0B0E` | Page, tab bar, stack background |
+| dusk | `#14171D` | Top of plain backdrops |
+| raised | `#16181D` | Panels, segmented track, disabled primary |
+| pressed | `#1E2026` | Pressed fill on night |
+| hairline | `#24262B` | Row rules, panel borders |
+| bone | `#F1EADB` | Titles, body, primary text on night |
+| muted | `#A39C8E` | Secondary sentences, inactive tabs, neighbor steps |
+| faint | `#8A857C` | Locked rows, meta such as the collector code |
+| danger | `#E39A80` | Refusals and validator errors, always with a sentence |
+| gold | `#D9B86C` | The Ring: current, primary fill, selected, eyebrows |
+| goldHigh | `#EBD08E` | 1 pt top highlight on the primary pill |
+| goldDeep | `#B8924A` | Pressed primary |
+| goldLine | `#5E5032` | Border of the current panel |
+| onGold | `#1A140A` | Text on gold |
+| paper | `#F2EBDB` | Splash, log sheet, choice sheets, adaptive icon |
+| paperPressed | `#E5DBC4` | Pressed fill on paper |
+| paperEdge | `#D6C9AB` | Sheet vignette edge |
+| ink | `#221E17` | Text on paper, filled button on a sheet |
+| inkMuted | `#6E6250` | Secondary text on paper |
+| inkLabel | `#7A5C22` | Eyebrows and text buttons on paper |
+| inkLine | `#CFC3A6` | Rules and the grabber on paper |
+| felt / feltLight | `#121613` / `#1F2620` | Table canvas ground and its lit center |
+| threat | `#B9483A` | Damage token, enemy mark |
+| treachery, quest, location, objective | | Encounter marks, as before |
+| leadership, tactics, spirit, lore, fellowship | | Sphere pips sampled from the printed icons |
 
-| Token | Hex | Use | On `paper` | On `table` |
-| --- | --- | --- | --- | --- |
-| paper | `#F3EBD6` | Page, sheets, phase rail, splash | — | 14.1, so this is the text color on the canvas |
-| pressed | `#E6DFC9` | Pressed fill | ink 11.0, muted 5.7 | — |
-| ink | `#2C291B` | Body, titles, primary labels | 12.3 | 1.2, do not put ink on the canvas |
-| muted | `#5C5346` | Secondary sentences, inactive tabs, neighboring steps | 6.4 | — |
-| heading | `#6E241C` | Short labels such as Errata | 9.1 | — |
-| line | `#7A6C3E` | Hairline borders and rules | 4.4, not text | — |
-| table | `#241C18` | Canvas ground, filled primary button | paper text 14.1 | — |
-| threat | `#6B302C` | Threat number, enemy mark | 8.5 | mark only |
-| treachery | `#3A221C` | Treachery mark | 12.4, mark with the word | mark only |
-| quest | `#8F877E` | Quest mark | 3.0, mark only | mark only |
-| location | `#7A5840` | Location mark | 5.4, mark with the word | mark only |
-| objective | `#A68448` | Objective mark | 2.9, mark only | mark only |
-| leadership | `#B06098` | Sphere pip | 3.6, mark only | mark only |
-| tactics | `#E03848` | Sphere pip | 3.7, mark only | mark only |
-| spirit | `#54A8C0` | Sphere pip | 2.3, mark only | mark only |
-| lore | `#62B02A` | Sphere pip | 2.3, mark only | mark only |
-| fellowship | `#7A5C38` | Sphere pip | 5.2, mark with the word | mark only |
-
-Ratios are WCAG, rounded to one decimal. Body text uses ink, muted, or heading on `paper` or `pressed`, or `paper` on `table`. Each of those pairs is at or above 4.5:1.
-
-Neutral has no pip color. The word Neutral is enough. Sphere and encounter marks are an 8 point square or disc (`bg-leadership`, `bg-threat`, and the rest) beside the word in `ink` on paper, or beside the word in `paper` on the canvas. Color is never the only signal for locked, current, completed, refused, or failed.
-
-`paper` is the booklet page. The page's lightest field measures near `#F1ECD8`, and the token is `#F3EBD6`. `ink` is the booklet's body brown. `heading` is the booklet's dark red. `line` is the gold rule on that page. `threat` is the enemy's dark red field. `treachery` is the near-black field of a treachery frame. `quest` is the stone of the quest banner. `location` is the brown frame beside a location text box. `objective` is the gold of the objective text box. `table` is the near-black outer edge of a card. Sphere pips are the printed icons: leadership from attachment `141013`, tactics from attachment `141014`, lore from event `141011`, spirit from event `141010`, fellowship from the metal ring on hero `141001`.
+Contrast pairs, WCAG, all at or above 4.5:1 for body text: bone on night 16.9, muted on night 7.2, faint on night 5.3, faint on raised 4.8, danger on night 8.8, gold on night 10.5, onGold on gold 9.8, ink on paper 14.9, inkMuted on paper 5.0, inkLabel on paper 5.2. Sphere and encounter colors are marks beside a word, never the only signal.
 
 ## Type
 
-One scale, shared by every screen. System face. Four sizes. Do not add a fifth.
+Two faces: **Marcellus** (display, `font-display`) for names and moments, and the **system face** for everything you read in a sentence. Five sizes. Do not add a sixth.
 
-| Name | Class | Size / line | Weight | Use |
+| Name | Class | Size / line | Face | Use |
 | --- | --- | --- | --- | --- |
-| display | `text-display` | 36 / 44 | semibold | Screen title, one line or a short wrap |
-| title | `text-title` | 28 / 36 | semibold | Sheet title, choice name |
-| body | `text-body` | 24 / 32 | regular | Rows, sheet text, errors, card text |
-| label | `text-label` | 18 / 24 | regular, semibold when current | Tabs, step names, meta such as the collector code |
+| display | `text-display` | 34 / 40 | Marcellus | Screen title, outcome word (Victory) |
+| title | `text-title` | 24 / 30 | Marcellus | Campaign and scenario names, sheet titles, card name |
+| body | `text-body` | 17 / 24 | System | Rows, sentences, errors, buttons |
+| label | `text-label` | 13 / 18 | System | Meta, tabs, neighbor steps, counts |
+| eyebrow | `text-eyebrow` | 12 / 16, tracking 2.4 | Marcellus, uppercase | One short tag above a title: Current, Scenario 1, Combat |
 
-A long sentence is body, not display. The screen title is the only display text on that screen.
+The primary button label is Marcellus body size, uppercase, widest tracking. Numbers the player watches (threat, life, progress) are Marcellus. Card text is never typeset: on the table it is the picture.
 
 ## Spacing, radius, border
 
-The same scale as the type: the 4-point steps already in Tailwind. Do not invent a second scale. The steps this chrome uses are 8 (`mt-2`), 12 (`ml-3` beside a row image), 16 (`mt-4`), 24 (`px-6`, `mt-6`), and 44 (`min-h-11`).
+Tailwind's 4-point steps. Page inset `px-6` (24), top `pt-safe`, controls at the bottom `pb-safe`. Gap under a title 16 to 24. Panels pad 20 (`p-5`). Minimum target 44 (`min-h-11`); rows, tabs, and the primary are 56 (`min-h-14`).
 
-- Page inset: `px-6` (24). Top inset: `pt-safe`. Bottom inset on a control that sits at the home indicator: `pb-safe`.
-- Gap under a title before a list: `mt-4` (16). Gap before a following paragraph: `mt-6` (24).
-- Minimum target: `min-h-11` (44). The phase rail, choice buttons, back, close, and tabs clear the notch, the status bar, and the home indicator.
-- Radius: `rounded-control` (8) on a filled button. `rounded-sheet` (12) on a sheet. Rows are square.
-- Border: `border` (1) and `border-line`. A sphere or encounter mark may use `border-2`.
+| Radius | Class | Use |
+| --- | --- | --- |
+| 12 | `rounded-tile` | Hero and choice tiles, pressed fill on text buttons |
+| 20 | `rounded-card` | Panels, deck covers, card picture on inspect |
+| 28 | `rounded-t-sheet` | Paper sheets |
+| pill | `rounded-pill` | Primary button, segmented control, chips, tokens |
+
+Borders are 1 pt `border-hairline` on night. The current panel uses `border-goldLine`. The selected choice tile uses a 1.5 pt gold border.
+
+## Backdrops
+
+`<Screen scene="…">` draws one scene behind the content. Scenes are data in `backdrop-scenes.ts`: base gradient, up to two glows, up to two ridges, an optional ring.
+
+| Scene | Where | Feel |
+| --- | --- | --- |
+| dusk | Campaign list, Start Fellowship | Mountains at dusk, warm light past the ridge. Cards sit below the light. |
+| ember | Campaign path | Lamplight left, cold blue low right |
+| vale | Briefing | Green vale in afternoon light |
+| victory | Resolution (won) | The Ring, lit, behind the outcome word |
+| felt | Table chrome | Green-black felt, vignette |
+| plain | Decks, card, packs, log, errors | Quiet night, one cold light top-left |
+
+A lost resolution uses `plain`. Do not add a scene for one screen; reuse one of these.
 
 ## Components
 
@@ -77,114 +106,96 @@ Shared pieces live in `src/screens/chrome.tsx`. They are views and text. They do
 
 | Piece | What the player sees |
 | --- | --- |
-| `Screen` | Paper page, inset, top safe area |
-| `ScreenTitle` | Display, ink, header |
-| `BodyText` | Body, ink or muted |
-| `ListRow` | Body ink, 44 point row, pressed fill. No image, no shadow |
-| `BackButton` | The word Back, semibold, pinned to the bottom safe area |
-| `TextButton` | Semibold body ink, 44 point target, pressed fill. The label is the action |
-| `PaperTabBar` | Three text tabs. Current is semibold ink. The others are muted. Pressed fill. No icons |
+| `Screen` | Night page, scene backdrop, 24 inset, top safe area |
+| `NavBar` | Labeled `‹ Back` top-left (muted), one optional text action or meta label top-right |
+| `ScreenTitle` | Marcellus, bone. `display` or `title` size. One per screen |
+| `Eyebrow` | Marcellus caps tag in gold (or inkLabel on paper) |
+| `BodyText`, `Label` | System face; tone bone, muted, faint, or danger |
+| `ListRow` | Flat 56 pt row on a hairline, optional 32×44 picture, optional detail line, chevron |
+| `TextButton` | Medium-weight body text, 44 pt target, pressed fill. Bone, gold, or ink on paper |
+| `PrimaryButton` | Gold pill, Marcellus caps label. On paper it is an ink pill. Disabled is a raised pill with faint text |
+| `Panel` | Raised rounded card on a hairline. `current` swaps to the gold edge |
+| `RingMark` | The Ring: current (gold ring), done (gold disc), locked (hairline ring) |
+| `Segmented` | Two or three words in a pill track. Selected is a gold pill, semibold |
+| `SphereMark` | 8 pt disc beside the sphere word. Neutral has none |
+| `PaperSheet` | Parchment sheet, grabber, eyebrow repeating the step, Marcellus title |
+| `AppTabBar` | Text tabs on night. Current is semibold bone with a gold dot above |
+| `BackButton` | Bottom-pinned Back for screens without a NavBar (debug only) |
 
-Filled primary, for a later screen that commits something. One per screen. Paper text on `bg-table`, `min-h-11`, `rounded-control`, `font-semibold text-body`. Pressed state darkens in the same frame. Disabled is `bg-pressed` and `text-muted`, and the sentence above it says why. A second filled button on the same sheet is wrong. Other actions are text buttons: semibold body ink, `min-h-11`, pressed fill.
+One `PrimaryButton` per screen or sheet. Other actions are `TextButton`s. Back, Close, and Undo are labeled buttons, never gestures alone. Back lives in the `NavBar`; Close on the booklet reader sits at the bottom in thumb reach.
 
-Back, Close, and Undo are those text buttons. They are labeled. They are not swipes.
+## Card pictures
 
-## App mark
+The cached RingsDB picture is the illustration everywhere it appears.
 
-The splash and the home-screen icon are a single ink ring on `paper`. They are not card art and not a booklet illustration. The splash background is `paper`, so the first frame matches the first screen. The ring is bundled. Startup does not decode a card.
+- **Inspect:** full card, max 300 pt wide, centered, `rounded-card`, gold halo shadow (inspect only). Pinch to zoom. Name in Marcellus below, collector code top-right.
+- **Hero tile** (briefing, deck editor header, defend sheet): the card picture cropped to the art, `contentFit="cover"` with the focus near the top, a night gradient over the bottom third, the hero's short name in Marcellus.
+- **Deck cover:** the three hero pictures side by side, cropped to art, fading into night, deck name on top.
+- **Row thumb:** 32×44, `rounded`, raised fill while the file is missing.
+- Encounter cards have no RingsDB picture. On the table they use the bundled scans; elsewhere they are text.
 
 ## Screens
 
-### Campaign list — built
+### Splash — built
+Paper (`#F2EBDB`) with one ink ring. Same as the adaptive icon background. No card art.
 
-`src/screens/routes/(tabs)/index.tsx`. Title Campaigns. Campaign names in body ink. No saves: "No playthrough exists" in muted. The list does not read `cards`.
+### Campaign list — built (rows: phase 10)
+`(tabs)/index.tsx`, scene `dusk`. Title Campaigns in Marcellus at the top. The scene's light fills the upper third; cards sit below it. The open playthrough is a `Panel current`: eyebrow Current (only when more than one save), the campaign name in title size, seat count in muted, and a six-dot progress line (gold disc done, gold ring current, hairline locked). Other saves are plain panels. Locked campaigns are two tiles side by side, faint, name plus "6 scenarios · Locked", not pressable. No save: "No playthrough exists" in muted, then the Start block: the Fellowship name, two seat tiles (True solo: one ring; Two-handed: two overlapping rings), "Chosen once for this campaign", and the primary START FELLOWSHIP. Booklet is a text button top-right.
 
-Phase 10 adds the real rows. A locked campaign shows the name, the scenario count, and the word Locked, in muted, and it is not pressable. The open playthrough is one row: name, seat count, and the word Current if it is not the only row. That row is the primary. When nothing is open, one filled button reads Start Fellowship. Empty, locked, and current stay readable without color.
+### Campaign path — phase 10
+Scene `ember`, NavBar Back + Booklet. Campaign name centered in title size. The six scenarios hang on one vertical line: completed nodes are gold discs with the name and chosen boon and burden (muted) to the left; the current node is a large glowing ring with its name and the primary BEGIN under it; locked nodes are small hairline rings with faint names, alternating sides. The line is gold up to the current node. Pool and Log sit in one panel at the bottom: "Pool" label, names, and Log as a gold text button.
 
-### Packs — built
+### Log — phase 10
+Scene `plain`, NavBar Back + Booklet. One parchment sheet fills the screen: title Campaign Log, then label/value rows on ink rules (Heroes, Fallen, Threat, Boons, Burdens, Scenarios as six dots, Score). Notes are Marcellus ink, the only free text. SAVE NOTES (gold pill) appears below the sheet only after the text changes.
 
-`src/screens/routes/(tabs)/packs.tsx`. Title stays put. Names are `ListRow`s on a FlashList. The title is outside the list. No packs: "No packs are in the catalog." in muted. The list queries the open catalog, so it has no second wait. A failed open is the database screen.
+### Briefing — phase 10
+Scene `vale`, NavBar Back + Booklet. Eyebrow Scenario N, scenario name in display over the sky. Stages as one line of names with `›`. `Segmented` Easy / Normal with the encounter card count beside it. Special rules as small gold-ring tags with the rule name. The deck name, then four hero tiles (three heroes and the Ring-bearer). A missing Ring-bearer is a dashed gold tile labeled Ring-bearer, and the validator sentence in danger below names the card and the rule. "Dealing starts the scenario" in muted, then DEAL. DEAL is disabled and the error stays visible until the loadout is legal.
 
-### Pack cards — built
+### Table — phase 11
+Canvas ground is `felt` with a lit center. Pinned quest stage at the top: small stage art, name in Marcellus, a thin gold progress bar, count. Zones are canvas regions without boxed labels; cards are pictures with real drop shadows on the canvas. Tokens: resources are gold coins, damage red coins, progress bone coins, all 20 pt circles with a number. Exhausted cards rotate 90° and dim. The engaged enemy carries a face-down shadow card showing a gold ring on the card back. The hand fans at the bottom of the canvas; the playable card lifts with a gold edge.
 
-`src/screens/routes/pack/[code].tsx`. Title is the pack name. Rows open a card. A row is the name plus at most one 32×44 picture when a file exists. No cards: "This pack has no cards." Unknown pack: title Pack, and the body names the code, "Pack {code} is not in the catalog." Back is `pack-back`.
+The rail is not a full strip: it shows the previous step, the current step in Marcellus caps gold with a soft glow, and the next step, all in one centered line above the bottom bar. Bottom bar: threat in a ring (Marcellus number, label Threat), and PASS as the primary. Life, when declared, sits beside threat the same way. Booklet and Undo are text buttons at the top.
+
+Choice sheets are `PaperSheet`s over the rail. The eyebrow repeats the step (Combat), the title states the moment (Black Rider attacks), a muted line gives the engine's numbers. Choices are hero tiles in a row; the selected tile has the ink border. One ink primary names the action (DEFEND WITH SAM), the alternative is an inkLabel text button (Leave undefended). Hide shows Passed or Failed in Marcellus with the engine's numbers.
+
+### Resolution — phase 11
+Won: scene `victory`. VICTORY in display caps with a gold text glow, scenario name muted. Each choice group has a centered eyebrow (Choose a burden, Choose a boon) and two tiles side by side; selected has the gold border and semibold name. A muted sentence names what will be written, then CONFIRM. Lost: scene `plain`, "Defeat" in display, "The scenario was lost. Nothing is written to the log." and one text button Back to path.
+
+### Decks — placeholder built (editor: phase 6)
+Scene `plain`, title Decks, Import and New as text buttons. Each deck is a cover (three hero pictures, fading into night) with the name in title size and the heroes' short names in muted. Starters are smaller covers two across. The starter note is one muted sentence. Card pool is a row at the bottom.
+
+### Deck editor — phase 6
+Hero pictures fill the top third and fade into night, with each hero's name in Marcellus and sphere word below (Saga only in gold for a Fellowship hero). Deck name in title size and the count against 50 (danger when short). A refusal is a danger sentence naming the card and the rule. Card rows are `ListRow`s with a 28×38 thumb and the count. SAVE is the primary, disabled while a refusal is on screen.
+
+### Card pool and filter — phase 6
+`ListRow`s with the 32×44 picture, name, and "Type · Sphere · Cost" detail. Search field is a raised pill. Filter is a `PaperSheet` with chip groups (sphere chips carry the pip), rows for pack, trait, cost, and two switches. APPLY is the ink primary. No matches: "No cards match." in muted.
 
 ### Card — built
+Scene `plain`. See Card pictures. Missing card: title Card and "Card {code} is not in the catalog." Errata: gold eyebrow Errata and the errata in body.
 
-`src/screens/routes/card/[code].tsx`. The name is the title. The collector code is a muted label under it, and it stays on screen (`141001` for the Maestro flow). A missing card uses the title Card and a body sentence that names the code: "Card {code} is not in the catalog." Errata is a heading label plus the errata in body ink. Back is `back`.
+### Packs and pack cards — built
+Scene `plain`. Packs: title and `ListRow`s. Pack cards: NavBar `‹ Packs` (testID `pack-back`), pack name, rows with thumb and collector code detail. Unknown pack and empty pack sentences as before.
 
-The picture sits under the title, at most the page width, with `expo-image` at that size. Text still shows while the file is missing. A list does not decode the native card. The table does not move its picture here.
-
-### Decks — placeholder built
-
-`src/screens/routes/(tabs)/decks.tsx`. Title Decks. "The deck editor is not in this build."
-
-Phase 6 replaces the sentence with the editor. It uses these tokens.
-
-- Hero slots: three rows. Empty slot says Empty. A saga hero shows the words Saga only, not a color.
-- The count against 50, the copy limit, and the sphere word sit in body or label. The sphere pip is a mark beside the word.
-- Filters are one sheet, opened by a text button labeled Filter. The sheet has one filled button, Apply. Search is a field above the list. The list is a FlashList. A row is the card name, the type word, the sphere word, the cost, and at most one 32×44 picture. No sticky headers if the pinned FlashList is 2.0.2. This install is newer, and the row still stays flat.
-- Save is the one filled primary. A refusal names the card and the rule in body ink. It does not save. The button does not commit until the sentence is on screen.
-- Import is a text button, not a second primary.
-
-### Debug — dev
-
-`src/screens/routes/debug.tsx`. A paper screen on the stack. It uses the existing type scale and no new color. A text button labeled Debug on the campaign list, in thumb reach, opens it. It is not a tab. Remove the button and the route before phase 11.
+### Booklet — phase 10
+The PDF page fills the screen on night. Close is a centered text button at the bottom in thumb reach. Missing file: a dashed gold outline of a book with a ring, the book name in title size, "This booklet is not on this phone. Scenarios still play without it.", and ADD BOOKLET.
 
 ### Database — built
+Scene `plain`. Title Database, the failure in body. No retry.
 
-`src/screens/database-error.tsx`. Title Database. The message names the failure. Test id `database-error`. No retry control, because this screen has no retry.
-
-### Tabs and splash — built
-
-Campaigns, Packs, Decks. `packs-tab` stays on Packs. Splash background `#F3EBD6`.
-
-### Campaign path — not built
-
-Phase 10. A vertical list of the six scenarios, not a map. Each row is the scenario name plus one word: Locked, Current, or Completed. Locked is muted and not pressable. Current is semibold and is the primary (Begin). Completed adds the chosen reward in body ink under the name. The pool sits under the path as names, not a second card grid. Log is one text button. Booklet is one text button. One filled action at a time.
-
-### Log — not built
-
-Phase 10. Display title is the campaign name. Sections use the label size and `text-heading`: Heroes, Fallen heroes, Threat, Boons, Burdens, Scenarios, Score, Notes. Values are body ink. A permanent boon names the hero it is stuck to. Score stays 0 until a cited formula exists. Notes are the only free text. Save notes appears as the filled primary only after the text changes, and it says Save notes. Otherwise Back is the text button.
-
-### Briefing — not built
-
-Phase 10. Title is the scenario name. Stages in order, body. Encounter sets and counts, body. Easy and Normal are two text choices with the selected word semibold and the word Easy or Normal. The unselected one is muted. Deck picker is a row per saved deck. No saved decks: "No deck is saved." in muted. The Ring-bearer slot is a row, labeled Ring-bearer. A validator error names the card and the rule in body ink. Deal is the filled primary. It is disabled, and the error stays visible, until the loadout is legal. The button label is Deal, and the sentence above it says that dealing starts the scenario.
-
-### Table — not built
-
-Phase 11. Do not build a React Native view per card.
-
-- Canvas clear color is `table` (`#241C18`). Cards are pictures at on-screen size. Text on a card is the picture.
-- The phase rail is a paper bar at the bottom, above the home indicator. The current step is semibold body ink and is fully visible. Neighboring steps are label muted and may truncate. The current step never scrolls away. The rail does not show every step at unreadably small type.
-- Threat sits on that bar: the word Threat in label muted, the number in `text-threat`. Life, when the script declares it, is the word Life plus the number in ink. Neither number is typed by the player.
-- Zones the player needs (staging, engaged, play area, hand, active location, pinned quest) are regions of the canvas. Their names, when shown, are paper text. A quest, location, enemy, or treachery mark uses the token and the word.
-- A choice opens a paper sheet (`rounded-sheet`) over the rail. The sheet repeats the current step name so the player still knows where they are. The consequence is a body sentence. One filled primary. Other legal choices are text buttons. Hide and trigger sheets use the same sheet. A failed test says Failed and shows the numbers the engine computed. Passed says Passed. Shadow cards stay face down until that attack. No stepper, dial, or phase scrubber.
-- A tap shows the pressed fill in the same frame. A drag stays on the UI thread. Reduced motion snaps the sheet.
-
-### Resolution — not built
-
-Phase 11. Title is the outcome in words. A loss has no reward screen: the sentence says the scenario was lost, and one text button returns to the path. A win lists the script's choices. Each option is a row. The selected row is semibold. Confirm is the one filled primary, and the sentence above it names what will be written to the log. The choice is not committed by the row tap alone.
-
-### Booklet — not built
-
-Phase 10. Full-screen reader. The PDF page is the PDF. Chrome around it is paper. Close is a text button in the bottom safe area and returns to the screen that opened it. A missing file names the book: the title is the book name, the body says it is not on this phone, and the filled primary is Add booklet. Turning a page does not animate when reduced motion is on. The reader is not a Skia surface and not a WebView.
-
-### Card pool — not built
-
-Phase 6, beside the deck editor. Same row and filter sheet as the deck list. No matches: "No cards match." in muted. Opening a row pushes the card screen. The pool writes nothing.
+### Debug — dev
+Night page, existing components. Removed before phase 11.
 
 ## States
 
 | State | Treatment |
 | --- | --- |
-| Empty | A muted body sentence that says what is missing. The title stays. |
-| Loading | The splash is the startup wait. A later wait shows the title and the word Loading in body ink. No spinner package. |
-| Error | Body ink. The sentence names the card, the book, or the failed open. Not a generic failure. |
-| Locked | The word Locked, muted, not pressable. |
-| Current | Semibold ink, and the word Current when the row is not obvious. |
-| Completed | The word Completed, plus the reward name. |
-| Refused | Body ink naming the card and the rule. The save does not happen. |
-| Failed test | The word Failed, plus the engine's numbers. Threat color may mark the row. The word is required. |
+| Empty | A muted sentence that says what is missing. The title stays. |
+| Loading | The splash is the startup wait. A later wait shows the title and the word Loading in muted. No spinner package. |
+| Error | Danger sentence naming the card, the book, or the failed open. |
+| Locked | Faint text, hairline ring, the word Locked. Not pressable. |
+| Current | Gold ring or gold edge, plus the word Current when it is not obvious. |
+| Completed | Gold disc, the word Completed or the reward names. |
+| Refused | Danger sentence naming the card and the rule. Save does not happen. |
+| Failed test | The word Failed in Marcellus plus the engine's numbers. |
 
-An irreversible control (Deal, Confirm, a resolution choice) shows the consequence in body text before it commits.
+An irreversible control (Deal, Confirm, a resolution choice) shows the consequence in a sentence directly above it.

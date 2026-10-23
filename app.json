@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "middleearthlcg",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "ios": {
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.middleearth.lcg"
@@ -14,7 +14,7 @@
     "android": {
       "package": "com.middleearth.lcg",
       "adaptiveIcon": {
-        "backgroundColor": "#F3EBD6",
+        "backgroundColor": "#F2EBDB",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -40,9 +40,15 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F3EBD6",
+          "backgroundColor": "#F2EBDB",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": ["./assets/fonts/Marcellus-Regular.ttf"]
         }
       ],
       "expo-sqlite",

@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { View } from "react-native";
 
 import { cards, packs } from "../../../catalog/schema";
-import { BackButton, BodyText, ListRow, Screen, ScreenTitle } from "../../chrome";
+import { BodyText, ListRow, NavBar, Screen, ScreenTitle } from "../../chrome";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { ringsdbImageUrl, shownCardImage } from "../../images/policy";
@@ -45,12 +45,11 @@ function PackCardRow({ item, onPress }: { item: PackCard; onPress: () => void })
     <ListRow
       testID={`card-${item.code}`}
       label={item.name}
+      detail={item.code}
       leading={
-        preview ? (
-          <View style={{ width: 32, height: 44 }}>
-            <RowCardImage code={item.code} source={preview} />
-          </View>
-        ) : undefined
+        <View className="overflow-hidden rounded bg-raised" style={{ width: 32, height: 44 }}>
+          {preview ? <RowCardImage code={item.code} source={preview} /> : null}
+        </View>
       }
       onPress={onPress}
     />
@@ -84,19 +83,16 @@ export default function PackCards() {
 
   return (
     <Screen>
-      <ScreenTitle>{pack?.name ?? "Pack"}</ScreenTitle>
+      <NavBar backTestID="pack-back" backLabel="Packs" onBack={() => router.back()} />
+      <View className="pt-2">
+        <ScreenTitle>{pack?.name ?? "Pack"}</ScreenTitle>
+      </View>
       {!pack ? (
-        <>
-          <BodyText className="mt-6">{`Pack ${code} is not in the catalog.`}</BodyText>
-          <View className="flex-1" />
-        </>
+        <BodyText className="mt-6">{`Pack ${code} is not in the catalog.`}</BodyText>
       ) : rows.length === 0 ? (
-        <>
-          <BodyText tone="muted" className="mt-6">
-            This pack has no cards.
-          </BodyText>
-          <View className="flex-1" />
-        </>
+        <BodyText tone="muted" className="mt-6">
+          This pack has no cards.
+        </BodyText>
       ) : (
         <View className="mt-4 flex-1">
           <FlashList
@@ -116,7 +112,6 @@ export default function PackCards() {
           />
         </View>
       )}
-      <BackButton testID="pack-back" onPress={() => router.back()} />
     </Screen>
   );
 }

@@ -15,8 +15,9 @@ import { palette } from "../palette.js";
 
 void SplashScreen.preventAutoHideAsync();
 
+// One theme. Both OS schemes map onto Night.
 function applyColorScheme() {
-  colorScheme.set("light");
+  colorScheme.set("dark");
 }
 
 function reportSplashHideFailure(error: unknown): void {
@@ -92,7 +93,7 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: palette.paper },
+            contentStyle: { backgroundColor: palette.night },
           }}
         />
       </DatabaseProvider>

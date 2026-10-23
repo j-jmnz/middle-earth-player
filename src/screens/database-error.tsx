@@ -1,11 +1,14 @@
 import { Component, type ReactNode } from "react";
+import { View } from "react-native";
 
 import { BodyText, Screen, ScreenTitle } from "./chrome";
 
 export function DatabaseError({ message }: { message: string }) {
   return (
     <Screen>
-      <ScreenTitle>Database</ScreenTitle>
+      <View className="pt-6">
+        <ScreenTitle>Database</ScreenTitle>
+      </View>
       <BodyText testID="database-error" className="mt-6">
         {message}
       </BodyText>

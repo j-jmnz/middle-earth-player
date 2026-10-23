@@ -9,15 +9,22 @@ module.exports = {
   theme: {
     extend: {
       colors: palette,
+      fontFamily: {
+        // Embedded at build time by the expo-font config plugin (app.json). No runtime load.
+        display: ["Marcellus-Regular", "Marcellus", "serif"],
+      },
       fontSize: {
-        display: ["36px", { lineHeight: "44px" }],
-        title: ["28px", { lineHeight: "36px" }],
-        body: ["24px", { lineHeight: "32px" }],
-        label: ["18px", { lineHeight: "24px" }],
+        display: ["34px", { lineHeight: "40px" }],
+        title: ["24px", { lineHeight: "30px" }],
+        body: ["17px", { lineHeight: "24px" }],
+        label: ["13px", { lineHeight: "18px" }],
+        eyebrow: ["12px", { lineHeight: "16px", letterSpacing: "2.4px" }],
       },
       borderRadius: {
-        control: "8px",
-        sheet: "12px",
+        tile: "12px",
+        card: "20px",
+        sheet: "28px",
+        pill: "999px",
       },
     },
   },
