@@ -13,7 +13,12 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["src/rules/**/*.test.ts", "src/campaign/**/*.test.ts"],
+    include: [
+      "src/rules/**/*.test.ts",
+      "src/campaign/**/*.test.ts",
+      "src/catalog/**/*.test.ts",
+      "scripts/**/*.test.ts",
+    ],
     passWithNoTests: true,
   },
 });
