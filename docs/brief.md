@@ -81,14 +81,14 @@ Pin these. Do not swap them for a lookalike.
 | Validation at the catalog boundary | Zod |
 | Images and files | `expo-file-system`, `expo-image` |
 | Screen state | Zustand. The only writer of game state is the reducer in `src/rules` |
-| Tests | Vitest, in Node, on `src/rules` and `src/campaign`. Maestro flows in `.maestro/` against a built app. The physical phone still judges fling and drag. Card ability text stays out of Maestro. |
+| Tests | Vitest, in Node, on `src/rules` and `src/campaign`. Maestro flows in `.maestro/` are written with the phase that names them and run with `maestro test` after the last phase. The physical phone still judges fling and drag. Card ability text stays out of Maestro. |
 | Device builds | EAS Build. Android APK/AAB. iOS IPA |
 
 Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, and `expo-file-system` with `pnpm expo install`. Worklets is the Reanimated 4 peer. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries.
 
 Do not add TanStack Query, Redux, a Phoenix client, or a server framework.
 
-The rules engine is the pure TypeScript reducer in `src/rules`, called in-process by the screen. Vitest imports that same module. Maestro drives the built app and asserts the phase rail, sheets, and saves. It does not replace those unit tests, and it does not judge a drag. Do not wrap it in HTTP, a localhost server on the phone, a second package, or a remote API. The UI already cannot apply damage or resources. Moving the reducer off the device would not add a rule the module cannot express, and it would break the airplane-mode exit check.
+The rules engine is the pure TypeScript reducer in `src/rules`, called in-process by the screen. Vitest imports that same module. Maestro drives the built app and asserts the phase rail, sheets, and saves. It does not replace those unit tests, and it does not judge a drag. Those flows wait until the last phase. An earlier phase is not open because `maestro test` has not been run. Do not wrap it in HTTP, a localhost server on the phone, a second package, or a remote API. The UI already cannot apply damage or resources. Moving the reducer off the device would not add a rule the module cannot express, and it would break the airplane-mode exit check.
 
 A server is the right shape for a second human who must not see hidden cards, or for many clients sharing one live table. This product has neither. Cross-device save sync, if it is ever wanted, copies `user.db` rows. It still does not run the round. DragnCards needed Phoenix because each room was a multiplayer process. That is the architecture this app rejected.
 

@@ -1,7 +1,7 @@
 ---
 name: ux
+model: grok-4.7[context=256k,reasoning_effort=high,fast=false]
 description: Reviews the current screens for phone UX and visual design. Use when the user asks for a UX or UI review, and after a phase that changes src/screens or src/play. Read-only.
-model: inherit
 readonly: true
 ---
 

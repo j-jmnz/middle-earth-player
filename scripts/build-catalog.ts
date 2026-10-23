@@ -412,10 +412,19 @@ function readCatalogVersion(versionPath: string): number | null {
 }
 
 function writeCatalogVersion(versionPath: string, version: number): void {
-  const source = `export const CATALOG_VERSION = ${version};\n`;
-  if (existsSync(versionPath) && readFileSync(versionPath, "utf8") === source) return;
-  mkdirSync(path.dirname(versionPath), { recursive: true });
-  writeFileSync(versionPath, source);
+  const declaration = `export const CATALOG_VERSION = ${version};`;
+  if (!existsSync(versionPath)) {
+    mkdirSync(path.dirname(versionPath), { recursive: true });
+    writeFileSync(versionPath, `${declaration}\n`);
+    return;
+  }
+
+  const current = readFileSync(versionPath, "utf8");
+  if (!/export const CATALOG_VERSION = \d+;/.test(current)) {
+    throw new Error(`Could not read CATALOG_VERSION from ${versionPath}`);
+  }
+  const next = current.replace(/export const CATALOG_VERSION = \d+;/, declaration);
+  if (next !== current) writeFileSync(versionPath, next);
 }
 
 function nextVersion(previous: CatalogSnapshot | null, packRows: Row[], cardRows: Row[], versionPath: string): number {

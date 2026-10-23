@@ -30,7 +30,11 @@
       [
         "expo-router",
         {
-          "root": "./src/screens"
+          "root": "./src/screens/routes",
+          "headers": {
+            "Cross-Origin-Embedder-Policy": "credentialless",
+            "Cross-Origin-Opener-Policy": "same-origin"
+          }
         }
       ],
       [

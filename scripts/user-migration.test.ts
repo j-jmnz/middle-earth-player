@@ -1,0 +1,53 @@
+import { DatabaseSync } from "node:sqlite";
+import { describe, expect, it } from "vitest";
+
+import migrations from "../drizzle/migrations.ts";
+import { CATALOG_VERSION } from "../src/catalog/version.ts";
+import { writeAppliedCatalogVersion } from "../src/screens/applied-catalog-version.ts";
+
+// Same key as drizzle-orm/expo-sqlite/migrator: journal idx 0 is `m0000`.
+function migrationSql(entry: { idx: number; tag: string }): string {
+  const key = `m${entry.idx.toString().padStart(4, "0")}`;
+  const sql = migrations.migrations[key as keyof typeof migrations.migrations];
+  if (typeof sql !== "string" || sql.trim().length === 0) {
+    throw new Error(`Missing migration: ${entry.tag}`);
+  }
+  return sql;
+}
+
+describe("user migration", () => {
+  it("keeps a deck row when the applied catalog version is stored", () => {
+    const database = new DatabaseSync(":memory:");
+    for (const entry of migrations.journal.entries) {
+      const sql = migrationSql(entry);
+      expect(sql.toLowerCase()).not.toContain("booklet");
+      for (const statement of sql.split("--> statement-breakpoint")) {
+        const trimmed = statement.trim();
+        if (trimmed.length === 0) continue;
+        database.exec(trimmed);
+      }
+    }
+
+    database.exec(
+      `INSERT INTO decks (id, name, heroes, cards) VALUES ('deck-1', 'Fellowship', '["141001"]', '[{"code":"141001","count":1}]')`,
+    );
+    writeAppliedCatalogVersion((statement) => {
+      database.exec(statement);
+    }, CATALOG_VERSION);
+
+    const deck = database.prepare("SELECT id, name, heroes, cards FROM decks WHERE id = ?").get("deck-1") as
+      | { id: string; name: string; heroes: string; cards: string }
+      | undefined;
+    const stored = database
+      .prepare("SELECT applied_catalog_version FROM meta WHERE id = 1")
+      .get() as { applied_catalog_version: number } | undefined;
+
+    expect(deck).toEqual({
+      id: "deck-1",
+      name: "Fellowship",
+      heroes: '["141001"]',
+      cards: '[{"code":"141001","count":1}]',
+    });
+    expect(stored?.applied_catalog_version).toBe(CATALOG_VERSION);
+  });
+});

@@ -21,8 +21,8 @@ The campaign list reads `campaigns` and `saves`. It does not query `cards`. Star
 
 ## E2E
 
-`.maestro/open-card.yaml` opens a pack and a card by a known RingsDB code, then relaunches and asserts that same code. Do not assert ability text. Card text stays out of git. The catalog is inside the build, so the flow does not need a network.
+`.maestro/open-card.yaml` opens a pack and a card by a known RingsDB code, then relaunches and asserts that same code. Do not assert ability text. Card text stays out of git. The catalog is inside the build, so the flow does not need a network. The flow is written in this phase. `maestro test` runs after the last phase.
 
 ## Exit
 
-Airplane mode, kill the app, relaunch. The pack list and the card by code are still there. A catalog version bump does not delete `user.db`. The Maestro flow passes and names the RingsDB code. The campaign list query does not read `cards`.
+Airplane mode, kill the app, relaunch. The pack list and the card by code are still there. A catalog version bump does not delete `user.db`. `.maestro/open-card.yaml` names the RingsDB code. Maestro runs after the last phase, not as this exit. The campaign list query does not read `cards`.

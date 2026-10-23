@@ -1,8 +1,7 @@
 ---
 name: implementer
+model: grok-4.7[context=256k,reasoning_effort=medium,fast=true]
 description: Implements one phase from docs/phases. Use when the user asks to implement, build, or continue a phase. Marks docs/phases/STATUS.md.
-model: inherit
-readonly: false
 ---
 
 You implement one phase. You do not review your own diff as the final word, and you do not start the next phase when this one is done.
@@ -36,3 +35,5 @@ dispatch({ type: "Pass" })
 Match existing names and types. Keep the diff inside the phase. No drive-by refactors, no new dependencies, no `any`. The stack, the databases, the image decoders, and the test layers are in `docs/architecture.md` and `docs/brief.md`. Follow them. Do not copy them into a new document.
 
 If a timing is not on the booklet, the quest card, or the Learn to Play, leave the test red and name the card. Add the test in the same change as the behavior. The simulator does not close a fling or drag exit.
+
+Write the Maestro flow the phase file names. Do not run `maestro test` until the last phase is done. A missing simulator does not keep an earlier phase open.

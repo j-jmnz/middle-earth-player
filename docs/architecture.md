@@ -94,6 +94,8 @@ flowchart TD
 | `src/play` | Skia table, phase rail, sheets, gesture-to-intent mapping | `src/rules`, `src/catalog` |
 | `src/screens` | Expo Router routes, SQLite, image cache, deck editor, booklet reader | `src/play`, `src/campaign`, `src/catalog` |
 
+The Expo Router root is `src/screens/routes`. Every file in that directory is a page. SQLite, the database provider, and tests stay in `src/screens`, outside that root.
+
 `src/rules` and `src/campaign` do not import `react-native`, `expo-*`, `src/play`, or `src/screens`. `src/play` imports `src/rules` and `src/catalog` only. Production code in `src/rules`, `src/campaign`, `src/play`, and `src/screens` does not import `src/effects`. The build script and tests may. A flat-config import rule fails the build on those edges. `eslint-plugin-import` v2 is the wrong tool for that config. Vitest imports the same reducer the screen calls and passes the effect list in.
 
 Widget flags and resolution options are on reducer state. `src/screens` keeps the campaign import.
@@ -255,7 +257,7 @@ Three layers. They do not stand in for each other.
 
 Vitest runs in Node on `src/rules` and `src/campaign`. No React renderer. A scenario is not playable until a test loads its quest deck, encounter deck, burden deck when it has one, and the seeded starter decks, and every printed ability on those cards has an effect id. A player card outside that set does not fail the test.
 
-Maestro flows live in `.maestro/`. Each flow taps and asserts by testID and visible text. Card ability text stays out of those assertions. Assert a RingsDB code. The phase rail and the sheets are those nodes. A booklet flow asserts the empty state and the close control by testID. A smoke file, if a flow needs one, is a one-page PDF written for the test, not a page of MEC109. A flow that needs a deal uses the e2e seed. A flow that needs a finished scenario opens a save fixture parked on that choice, then asserts the log and the next path node. It does not play fifty rounds of unscripted draws. Local `maestro test` against a debug build is the developer loop. `.eas/workflows/e2e.yml` runs the same flows as an EAS `maestro` job on pull request. That job is alpha. A local failure still fails the phase. The simulator does not stand in for the fling or the drag.
+Maestro flows live in `.maestro/`. Each flow taps and asserts by testID and visible text. Card ability text stays out of those assertions. Assert a RingsDB code. The phase rail and the sheets are those nodes. A booklet flow asserts the empty state and the close control by testID. A smoke file, if a flow needs one, is a one-page PDF written for the test, not a page of MEC109. A flow that needs a deal uses the e2e seed. A flow that needs a finished scenario opens a save fixture parked on that choice, then asserts the log and the next path node. It does not play fifty rounds of unscripted draws. Flows are written in the phase that names them. `maestro test` runs once, after the last phase, against a debug build. It is not an earlier phase's exit, and a missing simulator does not keep that phase open. `.eas/workflows/e2e.yml` runs the same flows as an EAS `maestro` job on pull request. That job is alpha. The simulator does not stand in for the fling or the drag.
 
 ## Performance
 

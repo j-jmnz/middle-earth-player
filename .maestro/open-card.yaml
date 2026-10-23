@@ -1,0 +1,33 @@
+appId: com.middleearth.lcg
+---
+- launchApp
+- tapOn:
+    id: packs-tab
+- scrollUntilVisible:
+    element:
+      id: pack-TBR
+    direction: DOWN
+    timeout: 40000
+    speed: 70
+    visibilityPercentage: 100
+- tapOn:
+    id: pack-TBR
+- tapOn:
+    id: card-141001
+- assertVisible: "141001"
+- stopApp
+- launchApp
+- tapOn:
+    id: packs-tab
+- scrollUntilVisible:
+    element:
+      id: pack-TBR
+    direction: DOWN
+    timeout: 40000
+    speed: 70
+    visibilityPercentage: 100
+- tapOn:
+    id: pack-TBR
+- tapOn:
+    id: card-141001
+- assertVisible: "141001"

@@ -45,7 +45,8 @@
     "web": "expo start --web",
     "lint": "eslint .",
     "test": "vitest run",
-    "catalog:build": "node --experimental-strip-types scripts/build-catalog.ts"
+    "catalog:build": "node --experimental-strip-types scripts/build-catalog.ts",
+    "eas-build-post-install": "pnpm catalog:build"
   },
   "private": true,
   "packageManager": "pnpm@10.34.1"

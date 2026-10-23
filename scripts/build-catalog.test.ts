@@ -274,6 +274,24 @@ describe("buildCatalog", () => {
     expect(readFileSync(dirs.versionPath, "utf8")).toBe("export const CATALOG_VERSION = 2;\n");
   });
 
+  it("keeps the exports beside CATALOG_VERSION when the number changes", async () => {
+    const dirs = workspace();
+    const tail =
+      "\nexport function shouldReplaceCatalog(bundled: number, applied: number | null): boolean {\n  return applied === null || bundled > applied;\n}\n";
+    mkdirSync(path.dirname(dirs.versionPath), { recursive: true });
+    writeFileSync(dirs.versionPath, `export const CATALOG_VERSION = 1;${tail}`);
+
+    await buildCatalog(options(dirs, stubFetch(fixture(), [])));
+    expect(readFileSync(dirs.versionPath, "utf8")).toBe(`export const CATALOG_VERSION = 1;${tail}`);
+
+    const nextCache = path.join(path.dirname(dirs.cacheDir), "cache-next");
+    await buildCatalog({
+      ...options(dirs, stubFetch(fixture("Renamed Synthetic Hero"), [])),
+      cacheDir: nextCache,
+    });
+    expect(readFileSync(dirs.versionPath, "utf8")).toBe(`export const CATALOG_VERSION = 2;${tail}`);
+  });
+
   it("throws when reprint files disagree on type_name and writes no database", async () => {
     const dirs = workspace();
     const card = heroCard({ code: "60001" });
