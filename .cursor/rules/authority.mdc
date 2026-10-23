@@ -1,0 +1,12 @@
+---
+description: Authority order for every session
+alwaysApply: true
+---
+
+# Authority
+
+The MEC109 booklet and the quest card win on a rule. The core-set Learn to Play wins on the ordinary round. `docs/brief.md` wins on product shape. `docs/architecture.md` wins on how the code is split.
+
+A rule change updates `docs/brief.md` in the same change. Do not port DragnCards. Do not commit `catalog.db`, RingsDB dumps, card text, or image files.
+
+Implementing a phase is `/implementer`. Reviewing a diff is `/reviewer`. Reviewing screens is `/ux`. Phase status is `docs/phases/STATUS.md`.
