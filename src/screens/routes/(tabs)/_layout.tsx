@@ -11,7 +11,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen name="index" options={{ title: "Campaigns" }} />
       <Tabs.Screen name="packs" options={{ title: "Packs", tabBarButtonTestID: "packs-tab" }} />
-      <Tabs.Screen name="decks" options={{ title: "Decks" }} />
+      <Tabs.Screen name="decks" options={{ title: "Decks", tabBarButtonTestID: "decks-tab" }} />
     </Tabs>
   );
 }

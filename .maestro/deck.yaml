@@ -1,0 +1,249 @@
+appId: com.middleearth.lcg
+---
+- launchApp
+- tapOn:
+    id: decks-tab
+- extendedWaitUntil:
+    visible: "Stealth and Steadfastness"
+    timeout: 15000
+- assertVisible: "Wisdom and Wizardry"
+- assertVisible:
+    id: starter-note
+- assertVisible: "When both decks are used together, replace the three copies of Gandalf in Stealth and Steadfastness with three copies of Elrond."
+- tapOn:
+    id: card-pool
+- tapOn:
+    id: pool-search
+- inputText: "Unexpected Courage"
+- assertVisible:
+    id: card-01057
+- tapOn:
+    id: card-01057
+- assertVisible: "01057"
+- tapOn:
+    id: back
+- tapOn:
+    id: pool-back
+- tapOn:
+    id: deck-stealth-and-steadfastness
+- assertVisible:
+    id: deck-editor
+- scrollUntilVisible:
+    element:
+      id: count-inc-01073
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-01073
+- assertVisible:
+    id: deck-error
+- assertVisible: "Gandalf"
+- assertVisible: "At most three copies."
+- assertVisible:
+    id: deck-save
+    enabled: false
+- stopApp
+- launchApp
+- tapOn:
+    id: decks-tab
+- extendedWaitUntil:
+    visible:
+      id: deck-stealth-and-steadfastness
+    timeout: 15000
+- tapOn:
+    id: deck-stealth-and-steadfastness
+- scrollUntilVisible:
+    element:
+      id: count-01073
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- assertVisible:
+    id: count-01073
+    text: "3"
+- tapOn:
+    id: hero-remove-141004
+- scrollUntilVisible:
+    element:
+      id: count-dec-01059
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- repeat:
+    times: 3
+    commands:
+      - tapOn:
+          id: count-dec-01059
+- scrollUntilVisible:
+    element:
+      id: count-dec-01060
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- repeat:
+    times: 2
+    commands:
+      - tapOn:
+          id: count-dec-01060
+- scrollUntilVisible:
+    element:
+      id: count-dec-01062
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- repeat:
+    times: 2
+    commands:
+      - tapOn:
+          id: count-dec-01062
+- scrollUntilVisible:
+    element:
+      id: count-dec-141016
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- repeat:
+    times: 3
+    commands:
+      - tapOn:
+          id: count-dec-141016
+- scrollUntilVisible:
+    element:
+      id: count-inc-142004
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-142004
+- scrollUntilVisible:
+    element:
+      id: count-inc-01014
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-01014
+- scrollUntilVisible:
+    element:
+      id: count-inc-01028
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-01028
+- scrollUntilVisible:
+    element:
+      id: count-inc-01031
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-01031
+- scrollUntilVisible:
+    element:
+      id: count-inc-01026
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-01026
+- scrollUntilVisible:
+    element:
+      id: count-inc-01027
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-01027
+- scrollUntilVisible:
+    element:
+      id: count-inc-01042
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-01042
+- scrollUntilVisible:
+    element:
+      id: count-inc-141009
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-141009
+- scrollUntilVisible:
+    element:
+      id: count-inc-01020
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-01020
+- scrollUntilVisible:
+    element:
+      id: count-inc-01021
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: count-inc-01021
+- tapOn:
+    id: deck-add
+- tapOn:
+    id: pool-search
+- inputText: "Frodo"
+- scrollUntilVisible:
+    element:
+      id: add-141001
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- tapOn:
+    id: add-141001
+- tapOn:
+    id: pool-back
+- assertVisible:
+    id: saga-only-141001
+- tapOn:
+    id: deck-save
+- stopApp
+- launchApp
+- tapOn:
+    id: decks-tab
+- extendedWaitUntil:
+    visible:
+      id: deck-stealth-and-steadfastness
+    timeout: 15000
+- tapOn:
+    id: deck-stealth-and-steadfastness
+- assertVisible:
+    id: saga-only-141001
+- assertVisible: "Frodo Baggins"
+- scrollUntilVisible:
+    element:
+      id: deck-card-01073
+    direction: DOWN
+    timeout: 40000
+    speed: 40
+    visibilityPercentage: 100
+- assertVisible: "Gandalf"
+- assertVisible:
+    id: deck-card-01073

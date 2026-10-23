@@ -5,10 +5,11 @@ import type { Tabs } from "expo-router";
 import { Backdrop } from "./backdrop";
 import type { SceneName } from "./backdrop-scenes";
 import { palette } from "./palette.js";
+import type { MarkedSphere } from "./sphere-mark";
 
 type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
 
-const pressedNight = { backgroundColor: palette.pressed };
+export const pressedNight = { backgroundColor: palette.pressed };
 const pressedPaper = { backgroundColor: palette.paperPressed };
 
 /** Night page with a scene backdrop. Content is inset 24 and starts under the status bar. */
@@ -284,8 +285,10 @@ const sphereClass = {
   fellowship: "bg-fellowship",
 } as const;
 
+export { markedSphere, sphereWord, type MarkedSphere } from "./sphere-mark";
+
 /** 8 point disc beside the sphere word. Neutral has no mark. Color is never the only signal. */
-export function SphereMark({ sphere }: { sphere: keyof typeof sphereClass | "neutral" }) {
+export function SphereMark({ sphere }: { sphere: MarkedSphere }) {
   if (sphere === "neutral") return null;
   return <View className={`h-2 w-2 rounded-pill ${sphereClass[sphere]}`} />;
 }

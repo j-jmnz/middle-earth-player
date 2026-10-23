@@ -15,8 +15,8 @@ Save rules, enforced on every save:
 
 - Exactly three heroes.
 - At least 50 other cards.
-- At most three copies, and never more than `deck_limit`. Unique cards once inside that deck.
-- A non-neutral card's sphere matches one of the heroes.
+- At most three copies, and never more than `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check.
+- A non-neutral card's sphere must match one of the heroes. A fellowship sphere card may be saved with no fellowship hero. Saga rules still run on the briefing loadout, not on this save.
 - A restriction record is enforced when that record exists. If the printed limit has no record yet, the card still saves and carries the inactive-text mark.
 
 Do not apply Fellowship rules here. A Fellowship hero shows a saga-only badge and still saves. Contract decks that need a different hero count or copy limit are a known limit of this phase. Do not build that exception.

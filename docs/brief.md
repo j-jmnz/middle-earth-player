@@ -343,8 +343,8 @@ Universal rules, enforced on every save:
 
 - Exactly three heroes.
 - At least 50 other cards.
-- At most three copies, and never more than the card's `deck_limit`. Unique cards once inside that deck. Official contract decks that change the hero count or the copy limit are a known limit of this proof of concept. Do not invent that support here.
-- A non-neutral card's sphere must match one of the heroes.
+- At most three copies, and never more than the card's `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check. Official contract decks that change the hero count or the copy limit are a known limit of this proof of concept. Do not invent that support here.
+- A non-neutral card's sphere must match one of the heroes. A fellowship sphere card may be saved with no fellowship hero. Saga rules still run on the briefing loadout, not on this save.
 - A restriction record on a card (trait, sphere, campaign) is enforced when that record exists. If the printed deckbuilding limit has no record yet, the card can still be saved and carries the inactive-text mark. Do not invent a restriction, and do not ask the player to enforce it at the table.
 
 Fellowship rules run on the briefing loadout, not on the saved deck. MEC109 says Frodo is the only Ring-bearer in this box. The player chooses that hero. Do not insert a Frodo they did not choose.

@@ -1,4 +1,4 @@
-import "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../../global.css";
 
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +10,7 @@ import { colorScheme } from "nativewind";
 import { DatabaseBoundary, DatabaseError } from "../database-error";
 import { DatabaseProvider } from "../databases";
 import { startImageDownloads } from "../images/queue";
+import { completeStarterInsert, insertStarterDecks } from "../starter-decks";
 import { openDatabases, type AppDatabases } from "../open-databases";
 import { palette } from "../palette.js";
 
@@ -84,19 +85,37 @@ export default function RootLayout() {
     };
   }, [databases]);
 
-  if (failure) return <DatabaseError message={failure} />;
-  if (!databases) return null;
+  useEffect(() => {
+    if (!databases) return;
+    let cancelled = false;
+    const frame = requestAnimationFrame(() => {
+      if (cancelled) return;
+      completeStarterInsert(() => {
+        insertStarterDecks(databases.user);
+      });
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
+  }, [databases]);
 
   return (
-    <DatabaseBoundary>
-      <DatabaseProvider databases={databases}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: palette.night },
-          }}
-        />
-      </DatabaseProvider>
-    </DatabaseBoundary>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.night }}>
+      {failure ? (
+        <DatabaseError message={failure} />
+      ) : databases ? (
+        <DatabaseBoundary>
+          <DatabaseProvider databases={databases}>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: palette.night },
+              }}
+            />
+          </DatabaseProvider>
+        </DatabaseBoundary>
+      ) : null}
+    </GestureHandlerRootView>
   );
 }

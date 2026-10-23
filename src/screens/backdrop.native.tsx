@@ -6,12 +6,11 @@ import { palette } from "./palette.js";
 import { scenes, type Ridge, type SceneName } from "./backdrop-scenes";
 
 function ridgePath(ridge: Ridge, width: number, height: number) {
-  const path = Skia.Path.Make();
-  path.moveTo(0, ridge.bottom * height);
-  for (const [x, y] of ridge.points) path.lineTo(x * width, y * height);
-  path.lineTo(width, ridge.bottom * height);
-  path.close();
-  return path;
+  const floor = ridge.bottom * height;
+  return Skia.Path.Polygon(
+    [vec(0, floor), ...ridge.points.map(([x, y]) => vec(x * width, y * height)), vec(width, floor)],
+    true,
+  );
 }
 
 /** One static Skia canvas behind the screen. Drawn once per size. Never inside a list row. */

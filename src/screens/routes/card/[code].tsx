@@ -5,8 +5,9 @@ import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
-import { cards } from "../../../catalog/schema";
-import { BodyText, Eyebrow, NavBar, Screen, ScreenTitle } from "../../chrome";
+import { activeCardCodes } from "../../../catalog/active-text";
+import { cards, effects } from "../../../catalog/schema";
+import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, SphereMark, markedSphere, sphereWord } from "../../chrome";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { imageLayoutSize, ringsdbImageUrl, shownCardImage } from "../../images/policy";
@@ -15,6 +16,81 @@ import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
+
+function CardFacts({
+  row,
+  inactive,
+}: {
+  row: {
+    typeCode: string;
+    typeName: string;
+    sphereCode: string | null;
+    sphereName: string | null;
+    cost: string | null;
+    threat: number | null;
+    willpower: number | null;
+    attack: number | null;
+    defense: number | null;
+    health: number | null;
+    traits: string | null;
+    text: string | null;
+  };
+  inactive: boolean;
+}) {
+  const sphere = sphereWord(row.sphereName);
+  const mark = markedSphere(row.sphereCode);
+  const cost = costOrThreat(row);
+  return (
+    <View className="mt-6">
+      <Stat label="Type" value={row.typeName} />
+      <View className="mt-3">
+        <Label>Sphere</Label>
+        <View className="mt-1 flex-row items-center gap-2">
+          {mark ? <SphereMark sphere={mark} /> : null}
+          <BodyText>{sphere}</BodyText>
+        </View>
+      </View>
+      {cost ? <Stat label={cost.label} value={cost.value} /> : null}
+      {row.willpower != null ? <Stat label="Willpower" value={String(row.willpower)} /> : null}
+      {row.attack != null ? <Stat label="Attack" value={String(row.attack)} /> : null}
+      {row.defense != null ? <Stat label="Defense" value={String(row.defense)} /> : null}
+      {row.health != null ? <Stat label="Health" value={String(row.health)} /> : null}
+      {row.traits ? <Stat label="Traits" value={row.traits} /> : null}
+      <View className="mt-3">
+        {row.text ? <BodyText>{row.text}</BodyText> : null}
+        {inactive ? (
+          <View testID="card-inactive" className={row.text ? "mt-2" : undefined}>
+            <Label tone="muted">Inactive</Label>
+          </View>
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <View className="mt-3">
+      <Label>{label}</Label>
+      <BodyText>{value}</BodyText>
+    </View>
+  );
+}
+
+function costOrThreat(row: {
+  typeCode: string;
+  cost: string | null;
+  threat: number | null;
+}): { label: "Cost" | "Threat"; value: string } | null {
+  if (row.typeCode === "hero") {
+    if (row.threat != null) return { label: "Threat", value: String(row.threat) };
+    if (row.cost) return { label: "Cost", value: row.cost };
+    return null;
+  }
+  if (row.cost && row.cost.length > 0) return { label: "Cost", value: row.cost };
+  if (row.threat != null) return { label: "Threat", value: String(row.threat) };
+  return null;
+}
 
 function clampPan(value: number, size: number, nextScale: number): number {
   "worklet";
@@ -83,11 +159,32 @@ export default function CardScreen() {
   const row = useMemo(() => {
     if (!code) return undefined;
     return catalog
-      .select({ code: cards.code, name: cards.name, errata: cards.errata, imagesrc: cards.imagesrc })
+      .select({
+        code: cards.code,
+        name: cards.name,
+        typeCode: cards.typeCode,
+        typeName: cards.typeName,
+        sphereCode: cards.sphereCode,
+        sphereName: cards.sphereName,
+        cost: cards.cost,
+        threat: cards.threat,
+        willpower: cards.willpower,
+        attack: cards.attack,
+        defense: cards.defense,
+        health: cards.health,
+        traits: cards.traits,
+        text: cards.text,
+        errata: cards.errata,
+        imagesrc: cards.imagesrc,
+      })
       .from(cards)
       .where(eq(cards.code, code))
       .get();
   }, [catalog, code]);
+  const active = useMemo(
+    () => activeCardCodes(catalog.select({ record: effects.record }).from(effects).all().map((entry) => entry.record)),
+    [catalog],
+  );
   const cached = useCachedImage(code ?? "");
   const bundled = code ? (scanAssets[code] ?? null) : null;
   const { resolved, source } = shownCardImage({
@@ -139,6 +236,7 @@ export default function CardScreen() {
             </>
           )}
         </View>
+        {row ? <CardFacts row={row} inactive={!active.has(row.code)} /> : null}
         {row?.errata ? (
           <View className="mt-8 border-t border-hairline pt-5">
             <Eyebrow>Errata</Eyebrow>
