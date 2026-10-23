@@ -6,15 +6,15 @@ The app is one Expo binary. The reducer runs in that process. There is no accoun
 
 ## Stack
 
-Pin Expo SDK 57 at 57.0.17 or later. The new architecture stays on. One package, no monorepo. SDK 58 is out of these phases.
+Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm is the package manager. SDK 59 is out of these phases.
 
 | Job | Library | Lives in |
 | --- | --- | --- |
-| Shell, routing, device builds | Expo SDK 57, Expo Router, EAS Build | `src/screens` |
+| Shell, routing, device builds | Expo SDK 58, Expo Router, EAS Build | `src/screens` |
 | Chrome layout | NativeWind 4.2.7, Tailwind 3 | screens other than the table |
-| Table | `@shopify/react-native-skia`, the SDK 57 `expo install` version | `src/play` |
+| Table | `@shopify/react-native-skia`, the SDK 58 `pnpm expo install` version | `src/play` |
 | Gestures and motion | `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets` | `src/play` |
-| Lists | `@shopify/flash-list`, the SDK 57 `expo install` version | pool, deck editor, any list past one screen |
+| Lists | `@shopify/flash-list`, the SDK 58 `pnpm expo install` version | pool, deck editor, any list past one screen |
 | Catalog schema | one schema from `drizzle-orm/sqlite-core` | `src/catalog` |
 | Catalog build | `better-sqlite3` opens that schema | `scripts/build-catalog.ts` only |
 | Device database | `expo-sqlite` opens the same catalog tables, read-only | screens, opened at the root |
@@ -25,7 +25,7 @@ Pin Expo SDK 57 at 57.0.17 or later. The new architecture stays on. One package,
 | Engine tests | Vitest | `src/rules`, `src/campaign` |
 | End-to-end | Maestro, flows in `.maestro/` | a built app, locally and in an EAS Workflow |
 
-Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, and `expo-file-system` with `npx expo install`. Worklets is the Reanimated 4 peer. NativeWind 5 is out. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries. The table decodes cached files. It does not call Skia's `makeImageFromView`. If FlashList 2.0.2 is still the bundle pin, the pool does not use sticky headers.
+Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, and `expo-file-system` with `pnpm expo install`. Worklets is the Reanimated 4 peer. NativeWind 5 is out. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries. The table decodes cached files. It does not call Skia's `makeImageFromView`. If FlashList 2.0.2 is still the bundle pin, the pool does not use sticky headers.
 
 The catalog is one `drizzle-orm/sqlite-core` schema. The script opens it with `better-sqlite3`. The phone opens those tables with `expo-sqlite`, read-only. `user.db` is a separate schema. Its migrations stay in `drizzle/`.
 
@@ -204,7 +204,7 @@ Two files, two handles, both reachable from screens.
 
 RingsDB `imagesrc` is the asset. The build sniffs magic bytes because the URL often ends in `.png` while the body is a JPEG. About 430×600 is the native size of a normal card. The inspect screen may decode the cached file at that size.
 
-Download with `File.createDownloadTask` from `expo-file-system`. On SDK 57, `FileSystem.createDownloadResumable` throws. Persist `DownloadPauseState` so a kill mid-file can resume. Cap concurrency and retry a 503. Keep the bytes in the document directory so iOS cannot purge them under the airplane-mode exit. A cache-directory file would not survive that exit. `expo-file-system` does not expose backup exclusion, so one local function sets `isExcludedFromBackup` on the image directory and does nothing else. About 420 MB of player-card art, plus quest and encounter art, must not enter an iCloud backup. Booklet files are not part of that directory.
+Download with `File.createDownloadTask` from `expo-file-system`. The legacy `FileSystem.createDownloadResumable` throws. Persist `DownloadPauseState` so a kill mid-file can resume. Cap concurrency and retry a 503. Keep the bytes in the document directory so iOS cannot purge them under the airplane-mode exit. A cache-directory file would not survive that exit. `expo-file-system` does not expose backup exclusion, so one local function sets `isExcludedFromBackup` on the image directory and does nothing else. About 420 MB of player-card art, plus quest and encounter art, must not enter an iCloud backup. Booklet files are not part of that directory.
 
 `expo-image` decodes list rows and the inspect screen, at the size on screen for a row. The table is one Skia canvas. Skia decodes the same cached file at the card's on-screen size and releases images that leave the table. Nothing decodes the whole cache. Prefetch covers the hand, staging, and the next screen. Startup does not wait on a download, and text is enough while a file is missing.
 
@@ -227,7 +227,7 @@ Expo Router. The app opens on the campaign list.
 | Deck | catalog, `decks` | `decks` |
 | Booklet | one `booklets` row and the file under `booklets/` | last page |
 
-The campaign list, the path, the briefing, the log, and the table each open the booklet route and close back to that same screen. The reader is an in-app native view, full screen, with the close control in thumb reach. It is not a Skia surface and not a WebView. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 57 release when the campaign shell starts. That phase adds `expo-dev-client` and verifies one Expo PDF module against SDK 57. If that module does not build, a local view is allowed: PDFKit on iOS, `PdfRenderer` on Android. It renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. A missing file does not block a scenario. Opening from a scenario starts on `bookletPage` when that index is set, and otherwise on the saved last page.
+The campaign list, the path, the briefing, the log, and the table each open the booklet route and close back to that same screen. The reader is an in-app native view, full screen, with the close control in thumb reach. It is not a Skia surface and not a WebView. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 58 release when the campaign shell starts. That phase adds `expo-dev-client` and verifies one Expo PDF module against SDK 58. If that module does not build, a local view is allowed: PDFKit on iOS, `PdfRenderer` on Android. It renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. A missing file does not block a scenario. Opening from a scenario starts on `bookletPage` when that index is set, and otherwise on the saved last page.
 
 NativeWind 4.2.7 styles the chrome. The table does not use it for cards. Tap targets are at least 44 points. The phase rail, the choice buttons, and the booklet close control sit in thumb reach. Reduced motion snaps the same transitions. A new gesture cancels the animation in progress.
 

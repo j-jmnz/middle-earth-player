@@ -9,7 +9,7 @@ When you start a phase, set it to `active` and leave a one-line note. When its e
 | Phase | Work | Status | Note |
 | --- | --- | --- | --- |
 | 0 | Correct the brief | completed | 2026-10-23. Brief matches the booklet on the items in the phase file. Gandalf's Delay draw timing stays unresolved until the quest card is cited. |
-| 1 | Tooling shell | not started | |
+| 1 | Tooling shell | completed | 2026-10-23. Expo shell opens on an empty campaign list. Import boundaries, Vitest, and the Maestro flow are in place. |
 | 2 | Catalog build | not started | |
 | 3 | Phone databases | not started | |
 | 4 | Scenario 1 fixture | not started | |

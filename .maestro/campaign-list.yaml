@@ -1,0 +1,6 @@
+appId: com.middleearth.lcg
+---
+- launchApp
+- assertVisible:
+    id: campaign-list
+- assertVisible: "Campaigns"

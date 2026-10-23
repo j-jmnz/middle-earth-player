@@ -35,7 +35,7 @@ The campaign list reads `campaigns` and `saves`. It does not query `cards`.
 
 ## Booklets
 
-Add `expo-dev-client`. Verify one Expo PDF module against SDK 57. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 57 release. If that module does not build, use PDFKit on iOS and `PdfRenderer` on Android. The view renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. It is not a Skia surface and not a WebView.
+Add `expo-dev-client`. Verify one Expo PDF module against SDK 58. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 58 release. If that module does not build, use PDFKit on iOS and `PdfRenderer` on Android. The view renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. It is not a Skia surface and not a WebView.
 
 The player can open a stored booklet from the campaign list, the path, the briefing, and the log, then close it and return to that same screen. The reader is full screen. The close control sits in thumb reach and has a testID. The engine does not read the PDF. Do not parse it. Do not commit it. Do not fetch the Asmodee CDN. A missing file does not block a scenario. The control offers to add the booklet and names which book is absent.
 

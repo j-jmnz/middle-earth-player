@@ -70,9 +70,9 @@ Pin these. Do not swap them for a lookalike.
 
 | Job | Use |
 | --- | --- |
-| App | Expo SDK 57.0.17 or later, TypeScript, the React Native new architecture, Expo Router. SDK 58 is out of these phases. |
-| Table | `@shopify/react-native-skia`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets`. The Skia version is the one `npx expo install` selects for SDK 57. The table decodes cached files. It does not call `makeImageFromView`. |
-| Lists | `@shopify/flash-list`, the SDK 57 `expo install` version. The card pool, the deck editor, and any list that can grow past one screen. Not `FlatList`, and not a map of card views. If FlashList 2.0.2 is still the bundle pin, the pool does not use sticky headers. |
+| App | Expo SDK 58, TypeScript, the React Native new architecture, Expo Router. pnpm is the package manager. SDK 59 is out of these phases. |
+| Table | `@shopify/react-native-skia`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets`. The Skia version is the one `pnpm expo install` selects for SDK 58. The table decodes cached files. It does not call `makeImageFromView`. |
+| Lists | `@shopify/flash-list`, the SDK 58 `pnpm expo install` version. The card pool, the deck editor, and any list that can grow past one screen. Not `FlatList`, and not a map of card views. If FlashList 2.0.2 is still the bundle pin, the pool does not use sticky headers. |
 | Chrome screens | NativeWind 4.2.7 and Tailwind 3. NativeWind 5 is out. No MUI, Emotion, styled-components, or a second styling system |
 | Catalog schema | One schema from `drizzle-orm/sqlite-core` in `src/catalog` |
 | Database on device | `expo-sqlite`. The phone opens the catalog tables read-only. |
@@ -84,7 +84,7 @@ Pin these. Do not swap them for a lookalike.
 | Tests | Vitest, in Node, on `src/rules` and `src/campaign`. Maestro flows in `.maestro/` against a built app. The physical phone still judges fling and drag. Card ability text stays out of Maestro. |
 | Device builds | EAS Build. Android APK/AAB. iOS IPA |
 
-Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, and `expo-file-system` with `npx expo install`. Worklets is the Reanimated 4 peer. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries.
+Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, and `expo-file-system` with `pnpm expo install`. Worklets is the Reanimated 4 peer. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries.
 
 Do not add TanStack Query, Redux, a Phoenix client, or a server framework.
 

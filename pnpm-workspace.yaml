@@ -1,0 +1,4 @@
+# Settings only. This repo is one package.
+nodeLinker: hoisted
+onlyBuiltDependencies:
+  - unrs-resolver

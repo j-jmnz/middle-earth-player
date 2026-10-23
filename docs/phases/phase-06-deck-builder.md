@@ -23,7 +23,7 @@ Do not apply Fellowship rules here. A Fellowship hero shows a saga-only badge an
 
 Import accepts a RingsDB decklist id or a `ringsdb.com` URL, via `GET /api/public/decklist/{id}.json`. Cards missing from the official pool are reported by name and dropped. The result is an ordinary saved deck.
 
-Lists use `@shopify/flash-list`, the version `npx expo install` selected. Not `FlatList`, and not a map of card views. If that pin is FlashList 2.0.2, do not use sticky headers. Load card rows when this screen opens, then filter in memory. Row images are decoded at row size. The campaign list still does not query `cards`.
+Lists use `@shopify/flash-list`, the version `pnpm expo install` selected. Not `FlatList`, and not a map of card views. If that pin is FlashList 2.0.2, do not use sticky headers. Load card rows when this screen opens, then filter in memory. Row images are decoded at row size. The campaign list still does not query `cards`.
 
 ## Seeds
 

@@ -9,9 +9,9 @@ An Expo app that opens on an empty campaign list, with the test and lint boundar
 
 ## Pin
 
-Expo SDK 57, package version 57.0.17 or later. TypeScript. React Native new architecture on. Expo Router. SDK 58 is out of these phases.
+Expo SDK 58. TypeScript. React Native new architecture on. Expo Router. pnpm is the package manager. SDK 59 is out of these phases.
 
-Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, and `expo-file-system` with `npx expo install`. Worklets is the Reanimated 4 peer. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries. NativeWind 4.2.7 and Tailwind 3 for chrome screens. NativeWind 5 is out. Vitest. Maestro for end-to-end flows.
+Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, and `expo-file-system` with `pnpm expo install`. Worklets is the Reanimated 4 peer. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries. NativeWind 4.2.7 and Tailwind 3 for chrome screens. NativeWind 5 is out. Vitest. Maestro for end-to-end flows.
 
 Lint uses a flat-config import rule. `eslint-plugin-import` v2 is the wrong tool for that config.
 

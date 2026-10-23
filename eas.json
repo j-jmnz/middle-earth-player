@@ -1,0 +1,13 @@
+{
+  "build": {
+    "e2e-test": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true
+      }
+    }
+  }
+}

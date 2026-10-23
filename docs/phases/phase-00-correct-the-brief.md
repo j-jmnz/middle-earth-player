@@ -55,7 +55,7 @@ Exactly three heroes, at least 50 other cards, and at most three copies are the 
 
 The coverage job builds `catalog.db` before Vitest. The database stays gitignored.
 
-Pin Expo SDK 57 at 57.0.17 or later. Do not move to SDK 58 in these phases.
+Pin Expo SDK 58. pnpm is the package manager. Do not move to SDK 59 in these phases.
 
 Remove the step 4 debug resolution button before the table phase is done. Say that in the build order.
 
