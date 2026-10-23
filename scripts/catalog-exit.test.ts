@@ -1,10 +1,12 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 
+import { scenarioDefinitionSchema } from "../src/catalog/boundary.ts";
+import { fixtureCards, normalCopiesByCode, parseScenarioFixture } from "../src/catalog/scenario-fixture.ts";
 import { buildCatalog } from "./build-catalog.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -50,7 +52,45 @@ describe("built catalog", () => {
       expect(delay?.errata_present).toBe(1);
 
       expect(database.prepare("select count(*) as n from effects").get()?.n).toBe(0);
-      expect(database.prepare("select count(*) as n from scenarios").get()?.n).toBe(0);
+      expect(database.prepare("select count(*) as n from scenarios").get()?.n).toBe(1);
+      const scenario = database.prepare("select id, definition from scenarios").get();
+      expect(scenario?.id).toBe("a-shadow-of-the-past");
+      const definition = scenarioDefinitionSchema.parse(JSON.parse(String(scenario?.definition)));
+      expect(definition.id).toBe("a-shadow-of-the-past");
+      expect(definition.setup).toEqual([]);
+      expect(definition.resolution).toEqual([]);
+
+      const fixture = parseScenarioFixture(
+        JSON.parse(readFileSync(path.join(root, "fixtures", "a-shadow-of-the-past.json"), "utf8")) as unknown,
+      );
+      const copies = normalCopiesByCode(fixture);
+      for (const code of new Set(fixtureCards(fixture).map((card) => card.code))) {
+        const row = database.prepare("select quantity from cards where code = ?").get(code);
+        expect(row?.quantity).toBe(copies.get(code));
+      }
+
+      const sagaRing = database
+        .prepare(
+          `select name, type_code, type_name, traits, deck_legal, campaign_id
+           from cards where code = ?`,
+        )
+        .get("141085");
+      expect(sagaRing?.name).toBe("The One Ring");
+      expect(sagaRing?.type_code).toBe("objective");
+      expect(sagaRing?.type_name).toBe("Objective");
+      expect(sagaRing?.traits).toBe("Artifact. Item. Ring.");
+      expect(sagaRing?.deck_legal).toBe(0);
+      expect(sagaRing?.campaign_id).toBe("fellowship-of-the-ring");
+
+      const eastRing = database.prepare("select name, type_code, deck_legal, campaign_id from cards where code = ?").get("21001");
+      expect(eastRing?.name).toBe("The One Ring");
+      expect(eastRing?.type_code).toBe("attachment");
+      expect(eastRing?.deck_legal).toBe(1);
+      expect(eastRing?.campaign_id).toBeNull();
+      expect(database.prepare("select name from cards where code = ?").get("141017")?.name).toBe("Mr. Underhill");
+      expect(database.prepare("select name from cards where code = ?").get("141077")?.name).toBe("Gildor Inglorion");
+      expect(database.prepare("select name from cards where code = ?").get("141078")?.name).toBe("Gandalf's Delay");
+      expect(database.prepare("select name from cards where code = ?").get("141079")?.name).toBe("The Ring Draws Them");
       expect(database.prepare("select name from campaigns where id = ?").get("fellowship-of-the-ring")?.name).toBe(
         "Fellowship of the Ring",
       );

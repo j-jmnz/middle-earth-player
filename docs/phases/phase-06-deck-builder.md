@@ -1,11 +1,11 @@
 # Phase 6 — Deck builder
 
-Depends on: phase 5
+Depends on: phases 5 and 17
 Blocks: phase 10
 
 ## Goal
 
-A root deck builder that saves any official deck-legal card, seeds the two printed starters, and stays smooth on a phone.
+A root deck builder that saves any official deck-legal card, seeds the two printed starters, and stays smooth on a phone. Chrome uses the tokens in `docs/design-system.md`. Do not invent a palette or a type scale.
 
 ## Builder
 

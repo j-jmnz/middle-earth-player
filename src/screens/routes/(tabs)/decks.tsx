@@ -1,12 +1,12 @@
-import { Text, View } from "react-native";
+import { BodyText, Screen, ScreenTitle } from "../../chrome";
 
 export default function Decks() {
   return (
-    <View testID="decks" collapsable={false} className="flex-1 bg-white px-6 pt-safe dark:bg-black">
-      <Text className="text-4xl font-semibold text-black dark:text-white">Decks</Text>
-      <Text className="mt-6 text-2xl leading-8 text-neutral-800 dark:text-neutral-200">
+    <Screen testID="decks">
+      <ScreenTitle>Decks</ScreenTitle>
+      <BodyText tone="muted" className="mt-6">
         The deck editor is not in this build.
-      </Text>
-    </View>
+      </BodyText>
+    </Screen>
   );
 }

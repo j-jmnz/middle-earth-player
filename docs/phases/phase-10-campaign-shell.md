@@ -6,7 +6,7 @@ Can run beside: phase 9
 
 ## Goal
 
-The campaign list, the Fellowship path, the briefing, and the log. Scenario 1 can be won or lost through the reducer. The table does not exist yet.
+The campaign list, the Fellowship path, the briefing, and the log. Scenario 1 can be won or lost through the reducer. The table does not exist yet. Chrome uses the tokens in `docs/design-system.md`. Do not invent a palette or a type scale.
 
 ## Screens
 

@@ -2,7 +2,7 @@
 
 Depends on: phase 2
 Blocks: phase 8
-Can run beside: phases 3 and 7
+Can run beside: phases 3, 7, and 17
 
 ## Goal
 

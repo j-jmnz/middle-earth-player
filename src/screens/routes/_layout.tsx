@@ -2,19 +2,21 @@ import "react-native-gesture-handler";
 import "../../../global.css";
 
 import { useEffect, useRef, useState } from "react";
-import { Appearance, type ColorSchemeName } from "react-native";
+import { Appearance, Platform } from "react-native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { colorScheme } from "nativewind";
 
 import { DatabaseBoundary, DatabaseError } from "../database-error";
 import { DatabaseProvider } from "../databases";
+import { startImageDownloads } from "../images/queue";
 import { openDatabases, type AppDatabases } from "../open-databases";
+import { palette } from "../palette.js";
 
 void SplashScreen.preventAutoHideAsync();
 
-function applyColorScheme(scheme: ColorSchemeName | null) {
-  colorScheme.set(scheme === "dark" ? "dark" : "light");
+function applyColorScheme() {
+  colorScheme.set("light");
 }
 
 function reportSplashHideFailure(error: unknown): void {
@@ -28,9 +30,9 @@ export default function RootLayout() {
   const splashHidden = useRef(false);
 
   useEffect(() => {
-    applyColorScheme(Appearance.getColorScheme());
-    const subscription = Appearance.addChangeListener(({ colorScheme: scheme }) => {
-      applyColorScheme(scheme);
+    applyColorScheme();
+    const subscription = Appearance.addChangeListener(() => {
+      applyColorScheme();
     });
     return () => subscription.remove();
   }, []);
@@ -63,13 +65,36 @@ export default function RootLayout() {
     SplashScreen.hideAsync().catch(reportSplashHideFailure);
   }, [databases, failure]);
 
+  useEffect(() => {
+    if (!databases || Platform.OS === "web") return;
+    let cancelled = false;
+    const frame = requestAnimationFrame(() => {
+      if (cancelled) return;
+      try {
+        startImageDownloads(databases.user);
+      } catch (error: unknown) {
+        const reason = error instanceof Error ? error : new Error("Image downloads did not start");
+        console.warn(reason.message);
+      }
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
+  }, [databases]);
+
   if (failure) return <DatabaseError message={failure} />;
   if (!databases) return null;
 
   return (
     <DatabaseBoundary>
       <DatabaseProvider databases={databases}>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: palette.paper },
+          }}
+        />
       </DatabaseProvider>
     </DatabaseBoundary>
   );

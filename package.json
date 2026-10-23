@@ -14,6 +14,7 @@
     "expo-router": "~58.0.25",
     "expo-splash-screen": "~58.0.11",
     "expo-sqlite": "~58.0.13",
+    "image-backup-exclusion": "file:./modules/image-backup-exclusion",
     "nativewind": "4.2.7",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -46,7 +47,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "catalog:build": "node --experimental-strip-types scripts/build-catalog.ts",
-    "eas-build-post-install": "pnpm catalog:build"
+    "eas-build-post-install": "pnpm catalog:build && node --experimental-strip-types scripts/pack-scans.ts"
   },
   "private": true,
   "packageManager": "pnpm@10.34.1"

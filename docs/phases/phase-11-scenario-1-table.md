@@ -5,7 +5,7 @@ Blocks: phase 12
 
 ## Goal
 
-A person can play A Shadow of the Past on a phone. The reducer remains the only writer of threat, damage, resources, progress, and log fields.
+A person can play A Shadow of the Past on a phone. The reducer remains the only writer of threat, damage, resources, progress, and log fields. Table chrome uses the tokens in `docs/design-system.md`. Do not invent a palette or a type scale. Card pictures stay on the Skia canvas.
 
 ## Table
 

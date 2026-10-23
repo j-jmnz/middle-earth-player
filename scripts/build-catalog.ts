@@ -12,7 +12,9 @@ import {
   type RingsDbPack,
 } from "../src/catalog/boundary.ts";
 import { deckLegal } from "../src/catalog/deck-legal.ts";
-import { campaigns, cards, catalogTables, meta, packs } from "../src/catalog/schema.ts";
+import { campaigns, cards, catalogTables, meta, packs, scenarios } from "../src/catalog/schema.ts";
+import { LOCAL_CARDS } from "./local-cards.ts";
+import { joinScenarioFixtures } from "./join-scenario-fixtures.ts";
 
 const PACKS_URL = "https://ringsdb.com/api/public/packs/";
 const ALEP_PREFIX = "ALeP -";
@@ -54,6 +56,7 @@ type CardCopy = {
 type CatalogSnapshot = {
   packs: string;
   cards: string;
+  scenarios: string;
 };
 
 export type BuildCatalogOptions = {
@@ -61,6 +64,8 @@ export type BuildCatalogOptions = {
   cacheDir?: string;
   dbPath?: string;
   versionPath?: string;
+  fixturesDir?: string;
+  localCards?: readonly RingsDbCard[];
 };
 
 export type BuildCatalogResult = {
@@ -343,7 +348,10 @@ function insertRows(db: SqliteDatabase, table: SQLiteTable, rows: Row[]): void {
   }
 }
 
-function writeDatabase(filePath: string, built: { campaigns: Row[]; packs: Row[]; cards: Row[]; meta: Row[] }): void {
+function writeDatabase(
+  filePath: string,
+  built: { campaigns: Row[]; packs: Row[]; cards: Row[]; scenarios: Row[]; meta: Row[] },
+): void {
   mkdirSync(path.dirname(filePath), { recursive: true });
   const db = new Database(filePath);
   try {
@@ -356,6 +364,7 @@ function writeDatabase(filePath: string, built: { campaigns: Row[]; packs: Row[]
       insertRows(db, campaigns, built.campaigns);
       insertRows(db, packs, built.packs);
       insertRows(db, cards, built.cards);
+      insertRows(db, scenarios, built.scenarios);
       insertRows(db, meta, built.meta);
     });
     insertAll();
@@ -392,6 +401,7 @@ function snapshotCatalog(dbPath: string): CatalogSnapshot | null {
     return {
       packs: canonicalRows(readRows(db, packs), "code", []),
       cards: canonicalRows(readRows(db, cards), "code", ["pack_codes"]),
+      scenarios: canonicalRows(readRows(db, scenarios), "id", ["definition"]),
     };
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
@@ -427,12 +437,19 @@ function writeCatalogVersion(versionPath: string, version: number): void {
   if (next !== current) writeFileSync(versionPath, next);
 }
 
-function nextVersion(previous: CatalogSnapshot | null, packRows: Row[], cardRows: Row[], versionPath: string): number {
+function nextVersion(
+  previous: CatalogSnapshot | null,
+  packRows: Row[],
+  cardRows: Row[],
+  scenarioRows: Row[],
+  versionPath: string,
+): number {
   const current = readCatalogVersion(versionPath);
-  if (!previous) return 1;
+  if (!previous) return current ?? 1;
   const matches =
     previous.packs === canonicalRows(packRows, "code", []) &&
-    previous.cards === canonicalRows(cardRows, "code", ["pack_codes"]);
+    previous.cards === canonicalRows(cardRows, "code", ["pack_codes"]) &&
+    previous.scenarios === canonicalRows(scenarioRows, "id", ["definition"]);
   if (matches) return current ?? 1;
   return (current ?? 0) + 1;
 }
@@ -451,6 +468,8 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
   const cacheDir = options.cacheDir ?? path.join(root, ".cache", "ringsdb");
   const dbPath = options.dbPath ?? path.join(root, "assets", "catalog.db");
   const versionPath = options.versionPath ?? path.join(root, "src", "catalog", "version.ts");
+  const fixturesDir = options.fixturesDir ?? path.join(root, "fixtures");
+  const localCards = options.localCards ?? LOCAL_CARDS;
 
   const manifest = readManifest(cacheDir);
   const packPayload = await loadPayload(fetchImpl, cacheDir, manifest, packsCacheKey(), PACKS_URL);
@@ -464,6 +483,20 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
     if (packCards.length === 0) continue;
     included.push(pack);
     for (const card of packCards) mergeCopy(groups, pack, card);
+  }
+
+  const cardsByCode = new Map<string, RingsDbCard>();
+  for (const copies of groups.values()) {
+    const card = copies[0]?.card;
+    if (card) cardsByCode.set(card.code, card);
+  }
+  const joined = joinScenarioFixtures(fixturesDir, localCards, cardsByCode);
+  for (const card of joined.addedCards) {
+    const pack = included.find((item) => item.code === card.pack_code);
+    if (!pack) {
+      throw new Error(`Scenario card ${card.code} has no pack ${card.pack_code}`);
+    }
+    mergeCopy(groups, pack, card);
   }
 
   const packRows = [...included]
@@ -493,8 +526,15 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
     }),
   ];
 
+  const scenarioRows = joined.definitions.map((definition) =>
+    rowFrom(scenarios, {
+      id: definition.id,
+      definition: JSON.stringify(definition),
+    }),
+  );
+
   const previous = snapshotCatalog(dbPath);
-  const version = nextVersion(previous, packRows, cardRows, versionPath);
+  const version = nextVersion(previous, packRows, cardRows, scenarioRows, versionPath);
   // Write the version before replacing the database. A crash in between can skip
   // a number on the next run. A matching catalog still leaves the constant unchanged.
   writeCatalogVersion(versionPath, version);
@@ -505,6 +545,7 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
       campaigns: campaignRows,
       packs: packRows,
       cards: cardRows,
+      scenarios: scenarioRows,
       meta: metaRows,
     });
     mkdirSync(path.dirname(dbPath), { recursive: true });

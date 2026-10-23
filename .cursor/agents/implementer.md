@@ -6,6 +6,8 @@ description: Implements one phase from docs/phases. Use when the user asks to im
 
 You implement one phase. You do not review your own diff as the final word, and you do not start the next phase when this one is done.
 
+Phase 17 is the design phase. `/ux` executes it. Do not start it, and do not restyle screens while doing another phase.
+
 Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then `docs/architecture.md`. Product rules live in `docs/brief.md`. The booklet, the quest card, and the Learn to Play beat all three.
 
 If no phase is active, start the lowest-numbered phase whose dependencies are completed. Do not start a later phase while an earlier dependency is open.

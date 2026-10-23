@@ -1,9 +1,10 @@
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { View } from "react-native";
 
 import { packs } from "../../../catalog/schema";
+import { BodyText, ListRow, Screen, ScreenTitle } from "../../chrome";
 import { useDatabases } from "../../databases";
 
 export default function PackList() {
@@ -20,29 +21,30 @@ export default function PackList() {
   );
 
   return (
-    <View className="flex-1 bg-white px-6 pt-safe dark:bg-black">
-      <Text className="text-4xl font-semibold text-black dark:text-white">Packs</Text>
-      <FlashList
-        data={rows}
-        keyExtractor={(item) => item.code}
-        style={{ flex: 1 }}
-        renderItem={({ item }) => (
-          <Pressable
-            testID={`pack-${item.code}`}
-            collapsable={false}
-            accessibilityRole="button"
-            onPress={() => {
-              router.push({ pathname: "/pack/[code]", params: { code: item.code } });
-            }}
-            style={{ minHeight: 44 }}
-            className="justify-center"
-          >
-            <Text className="text-2xl leading-8 text-neutral-800 dark:text-neutral-200">
-              {item.name}
-            </Text>
-          </Pressable>
-        )}
-      />
-    </View>
+    <Screen>
+      <ScreenTitle>Packs</ScreenTitle>
+      {rows.length === 0 ? (
+        <BodyText tone="muted" className="mt-6">
+          No packs are in the catalog.
+        </BodyText>
+      ) : (
+        <View className="mt-4 flex-1">
+          <FlashList
+            data={rows}
+            keyExtractor={(item) => item.code}
+            style={{ flex: 1 }}
+            renderItem={({ item }) => (
+              <ListRow
+                testID={`pack-${item.code}`}
+                label={item.name}
+                onPress={() => {
+                  router.push({ pathname: "/pack/[code]", params: { code: item.code } });
+                }}
+              />
+            )}
+          />
+        </View>
+      )}
+    </Screen>
   );
 }

@@ -228,10 +228,13 @@ Expo Router. The app opens on the campaign list.
 | Card pool | card rows loaded when the screen opens, then filtered in memory; `image_files` | nothing |
 | Deck | catalog, `decks` | `decks` |
 | Booklet | one `booklets` row and the file under `booklets/` | last page |
+| Debug | the open catalog, the open user database, and the image queue | nothing |
+
+The debug route reads the open databases and the image queue and is not a player screen.
 
 The campaign list, the path, the briefing, the log, and the table each open the booklet route and close back to that same screen. The reader is an in-app native view, full screen, with the close control in thumb reach. It is not a Skia surface and not a WebView. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 58 release when the campaign shell starts. That phase adds `expo-dev-client` and verifies one Expo PDF module against SDK 58. If that module does not build, a local view is allowed: PDFKit on iOS, `PdfRenderer` on Android. It renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. A missing file does not block a scenario. Opening from a scenario starts on `bookletPage` when that index is set, and otherwise on the saved last page.
 
-NativeWind 4.2.7 styles the chrome. The table does not use it for cards. Tap targets are at least 44 points. The phase rail, the choice buttons, and the booklet close control sit in thumb reach. Reduced motion snaps the same transitions. A new gesture cancels the animation in progress.
+NativeWind 4.2.7 styles the chrome. Tokens and screen specs live in [design-system.md](design-system.md). The table does not use NativeWind for cards. Tap targets are at least 44 points. The phase rail, the choice buttons, and the booklet close control sit in thumb reach. Reduced motion snaps the same transitions. A new gesture cancels the animation in progress.
 
 The phase rail, threat, life, and the choice sheets are React Native text and buttons with stable testIDs. Card pictures stay on the Skia canvas. A tap on a table card opens the inspect route. The picture stays on the canvas. The inspect screen is the React Native view. Those ids are how Maestro finds a control. A card drawn only on the canvas is not a view Maestro can address.
 

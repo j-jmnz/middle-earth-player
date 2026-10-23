@@ -5,6 +5,7 @@ import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { scenarioDefinitionSchema } from "../src/catalog/boundary.ts";
 import { buildCatalog, type BuildCatalogOptions } from "./build-catalog.ts";
 
 const databases: DatabaseSync[] = [];
@@ -20,12 +21,15 @@ function openDb(dbPath: string): DatabaseSync {
   return database;
 }
 
-function workspace(): { cacheDir: string; dbPath: string; versionPath: string } {
+function workspace(): { cacheDir: string; dbPath: string; versionPath: string; fixturesDir: string } {
   const root = mkdtempSync(path.join(tmpdir(), "catalog-build-"));
+  const fixturesDir = path.join(root, "fixtures");
+  mkdirSync(fixturesDir);
   return {
     cacheDir: path.join(root, "cache"),
     dbPath: path.join(root, "catalog.db"),
     versionPath: path.join(root, "version.ts"),
+    fixturesDir,
   };
 }
 
@@ -177,10 +181,10 @@ function stubFetch(source: { packs: unknown[]; cards: Record<string, unknown[]> 
 }
 
 function options(
-  dirs: { cacheDir: string; dbPath: string; versionPath: string },
+  dirs: { cacheDir: string; dbPath: string; versionPath: string; fixturesDir: string },
   fetchImpl: typeof fetch,
 ): BuildCatalogOptions {
-  return { fetch: fetchImpl, ...dirs };
+  return { fetch: fetchImpl, localCards: [], ...dirs };
 }
 
 function codes(dbPath: string): string[] {
@@ -409,5 +413,144 @@ describe("buildCatalog", () => {
     expect(caught.message).toContain("Card 40001");
     expect(caught.message).toContain("type_code");
     expect(caught.message).not.toContain("SENTINEL_TEXT");
+  });
+
+  it("keeps a committed catalog version on a clean build", async () => {
+    const dirs = workspace();
+    mkdirSync(path.dirname(dirs.versionPath), { recursive: true });
+    writeFileSync(dirs.versionPath, "export const CATALOG_VERSION = 2;\n");
+
+    const result = await buildCatalog(options(dirs, stubFetch(fixture(), [])));
+
+    expect(result.version).toBe(2);
+    expect(readFileSync(dirs.versionPath, "utf8")).toBe("export const CATALOG_VERSION = 2;\n");
+    expect(existsSync(dirs.dbPath)).toBe(true);
+  });
+
+  it("throws when a fixture code has no card and no local record, and writes no database", async () => {
+    const dirs = workspace();
+    writeFileSync(
+      path.join(dirs.fixturesDir, "gap.json"),
+      JSON.stringify({
+        id: "gap-scenario",
+        stages: ["999001"],
+        sets: [],
+        cards: [{ code: "999001", easy: 1, normal: 1, pile: "quest" }],
+      }),
+    );
+
+    const caught = await buildCatalog(options(dirs, stubFetch(fixture(), []))).then(
+      () => null,
+      (error: unknown) => error,
+    );
+    expect(caught).toBeInstanceOf(Error);
+    if (!(caught instanceof Error)) return;
+    expect(caught.message).toContain("gap-scenario");
+    expect(caught.message).toContain("999001");
+    expect(existsSync(dirs.dbPath)).toBe(false);
+  });
+
+  it("throws when a joined fixture card is a nightmare card", async () => {
+    const dirs = workspace();
+    const source = fixture();
+    source.cards.A = [
+      ...source.cards.A,
+      {
+        code: "999008",
+        name: "Synthetic Nightmare",
+        pack_code: "A",
+        type_code: "nightmare",
+        type_name: "Nightmare",
+        position: 8,
+        is_unique: false,
+        quantity: 1,
+        has_errata: false,
+        text: "NIGHTMARE_TEXT",
+      },
+    ];
+    writeFileSync(
+      path.join(dirs.fixturesDir, "night.json"),
+      JSON.stringify({
+        id: "night-scenario",
+        stages: ["20001"],
+        sets: [{ name: "Hunted", cards: [{ code: "999008", easy: 1, normal: 1, pile: "encounter" }] }],
+        cards: [{ code: "20001", easy: 1, normal: 1, pile: "quest" }],
+      }),
+    );
+
+    const caught = await buildCatalog(options(dirs, stubFetch(source, []))).then(
+      () => null,
+      (error: unknown) => error,
+    );
+    expect(caught).toBeInstanceOf(Error);
+    if (!(caught instanceof Error)) return;
+    expect(caught.message).toContain("night-scenario");
+    expect(caught.message).toContain("999008");
+    expect(caught.message).not.toContain("NIGHTMARE_TEXT");
+    expect(existsSync(dirs.dbPath)).toBe(false);
+  });
+
+  it("inserts a local record for a missing fixture code", async () => {
+    const dirs = workspace();
+    const localCard = {
+      code: "999003",
+      name: "Local Ford",
+      pack_code: "TBR",
+      type_code: "location",
+      type_name: "Location",
+      position: 90,
+      traits: "River.",
+      is_unique: true,
+      quantity: 2,
+      threat: 1,
+      quest: 4,
+      has_errata: false,
+    };
+    const unnamed = {
+      code: "999085",
+      name: "The One Ring",
+      pack_code: "TBR",
+      type_code: "objective",
+      type_name: "Objective",
+      position: 85,
+      traits: "Artifact. Item. Ring.",
+      is_unique: true,
+      quantity: 1,
+      has_errata: false,
+    };
+    writeFileSync(
+      path.join(dirs.fixturesDir, "local.json"),
+      JSON.stringify({
+        id: "local-scenario",
+        stages: ["20001"],
+        sets: [{ name: "Hunted", cards: [{ code: "999003", easy: 1, normal: 2, pile: "encounter" }] }],
+        cards: [{ code: "20001", easy: 1, normal: 1, pile: "quest" }],
+      }),
+    );
+
+    await buildCatalog({ ...options(dirs, stubFetch(fixture(), [])), localCards: [localCard, unnamed] });
+    const database = openDb(dirs.dbPath);
+    const card = database.prepare("select name, quantity, deck_legal, campaign_id from cards where code = ?").get("999003");
+    expect(card?.name).toBe("Local Ford");
+    expect(card?.quantity).toBe(2);
+    expect(card?.deck_legal).toBe(0);
+    expect(card?.campaign_id).toBe("fellowship-of-the-ring");
+
+    const ring = database
+      .prepare("select name, type_code, traits, deck_legal, campaign_id from cards where code = ?")
+      .get("999085");
+    expect(ring?.name).toBe("The One Ring");
+    expect(ring?.type_code).toBe("objective");
+    expect(ring?.traits).toBe("Artifact. Item. Ring.");
+    expect(ring?.deck_legal).toBe(0);
+    expect(ring?.campaign_id).toBe("fellowship-of-the-ring");
+
+    const scenario = database.prepare("select definition from scenarios where id = ?").get("local-scenario");
+    const definition = scenarioDefinitionSchema.parse(JSON.parse(String(scenario?.definition)));
+    expect(definition.encounterSets).toEqual([{ code: "Hunted", count: 2 }]);
+    expect(definition.stages).toEqual([{ code: "20001" }]);
+    expect(definition.setup).toEqual([]);
+    expect(definition.widgets.hide).toBe(true);
+    expect(database.prepare("select count(*) as n from effects").get()?.n).toBe(0);
   });
 });

@@ -467,6 +467,8 @@ The phone plays with no network once a card's image is cached. Text is enough wh
 
 ## Screens
 
+Chrome follows [design-system.md](design-system.md). Phase 17 writes that file from the card art, the scenario scans, and the booklets. Later screen phases use its tokens. They do not invent a second palette, a second type scale, or a second styling system. Decoration that stalls a list or a drag does not ship. The performance rules above still win.
+
 | Route | Behavior |
 | --- | --- |
 | Campaign list | Root. Reads campaigns and saves. It does not scan `cards`. Fellowship is playable. Later campaigns may show as locked, with name and scenario count. Locking does not hide cards. Opens a stored booklet and returns here on close. |

@@ -1,17 +1,15 @@
 import { Component, type ReactNode } from "react";
-import { Text, View } from "react-native";
+
+import { BodyText, Screen, ScreenTitle } from "./chrome";
 
 export function DatabaseError({ message }: { message: string }) {
   return (
-    <View collapsable={false} className="flex-1 bg-white px-6 pt-safe dark:bg-black">
-      <Text className="text-4xl font-semibold text-black dark:text-white">Database</Text>
-      <Text
-        testID="database-error"
-        className="mt-6 text-2xl leading-8 text-neutral-800 dark:text-neutral-200"
-      >
+    <Screen>
+      <ScreenTitle>Database</ScreenTitle>
+      <BodyText testID="database-error" className="mt-6">
         {message}
-      </Text>
-    </View>
+      </BodyText>
+    </Screen>
   );
 }
 

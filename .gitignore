@@ -46,6 +46,7 @@ example
 /android
 
 # generated data and local caches
+.cache/
 assets/catalog.db
 agent-tools/
 
