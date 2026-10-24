@@ -121,6 +121,37 @@ describe("hide", () => {
     expect(hideTests(done.steps)).toMatchObject([{ willpower: 2, threat: 4, success: false }]);
   });
 
+  it("reveals from an action effect while a window is already open", () => {
+    const scout: Effect = {
+      id: "sam:action:2",
+      cardCode: "sam",
+      timing: "action",
+      instructions: [{ verb: "RevealStaging" }],
+    };
+    const { state, ctx } = table({ deck: ["d1"], cards: [filler("d1", 1)], effects: [scout] });
+    const sam = byCode(state, "sam")[0] ?? "";
+    const result = expectOk(reduce(state, { type: "Trigger", cardId: sam, effectId: "sam:action:2" }, ctx));
+    expect(result.state.staging).toHaveLength(1);
+    expect(result.state.window).toEqual({ kind: "pass" });
+  });
+
+  it("fails an action-effect reveal that opens a Hide window", () => {
+    const scout: Effect = {
+      id: "sam:action:2",
+      cardCode: "sam",
+      timing: "action",
+      instructions: [{ verb: "RevealStaging" }],
+    };
+    const { state, ctx } = table({
+      deck: ["hider", "d1"],
+      cards: [rider("hider", {}, 1), filler("d1", 0)],
+      effects: [scout],
+    });
+    const sam = byCode(state, "sam")[0] ?? "";
+    const result = reduce(state, { type: "Trigger", cardId: sam, effectId: "sam:action:2" }, ctx);
+    expect(result.ok).toBe(false);
+  });
+
   it("lets a seat commit nobody", () => {
     const { state, ctx } = table({ deck: ["hider", "d1"], cards: [rider("hider", {}, 1), filler("d1", 0)] });
     const opened = begin(state, ctx);

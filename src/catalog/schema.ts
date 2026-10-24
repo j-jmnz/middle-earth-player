@@ -1,5 +1,7 @@
 import { integer, sqliteTable, text, type SQLiteTable } from "drizzle-orm/sqlite-core";
 
+import type { PrintedKeywords } from "./boundary.ts";
+
 export const packs = sqliteTable("packs", {
   code: text("code").primaryKey(),
   name: text("name").notNull(),
@@ -35,6 +37,9 @@ export const cards = sqliteTable("cards", {
   health: integer("health"),
   quest: integer("quest"),
   victory: integer("victory"),
+  engagementCost: integer("engagement_cost"),
+  // Null until the card's keywords have been read. An empty object means none.
+  keywords: text("keywords", { mode: "json" }).$type<PrintedKeywords>(),
   text: text("text"),
   hasErrata: integer("has_errata", { mode: "boolean" }).notNull(),
   errata: text("errata"),

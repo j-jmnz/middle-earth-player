@@ -34,13 +34,17 @@ export function startReveal(state: ScenarioState, seat: number, ctx: ReduceConte
 // window inside it fails the intent.
 export function revealNow(state: ScenarioState, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const base = state.stack.length;
-  let next = startReveal(state, seat, ctx, steps);
-  for (let guard = 0; guard < 400 && next.stack.length > base; guard += 1) {
+  // The window the effect was triggered from stays aside while the reveal resolves, so only a
+  // window opened by the reveal itself fails the intent.
+  const entryWindow = state.window;
+  let next = startReveal({ ...state, window: null }, seat, ctx, steps);
+  for (let guard = 0; guard < 400; guard += 1) {
     if (next.lost || next.failure) return next;
     if (next.window) return { ...next, failure: "A reveal inside an effect cannot wait for a player" };
+    if (next.stack.length <= base) return { ...next, window: entryWindow };
     next = advanceFrame(next, ctx, steps);
   }
-  return next;
+  throw new Error("Reveal inside an effect exceeded its step limit");
 }
 
 export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

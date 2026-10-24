@@ -8,12 +8,13 @@ import { getTableConfig, type SQLiteTable } from "drizzle-orm/sqlite-core";
 import {
   parseRingsDbCards,
   parseRingsDbPacks,
+  type PrintedKeywords,
   type RingsDbCard,
   type RingsDbPack,
 } from "../src/catalog/boundary.ts";
 import { deckLegal } from "../src/catalog/deck-legal.ts";
 import { campaigns, cards, catalogTables, meta, packs, scenarios } from "../src/catalog/schema.ts";
-import { LOCAL_CARDS } from "./local-cards.ts";
+import { KEYWORD_OVERRIDES, LOCAL_CARDS } from "./local-cards.ts";
 import { joinScenarioFixtures } from "./join-scenario-fixtures.ts";
 
 const PACKS_URL = "https://ringsdb.com/api/public/packs/";
@@ -66,6 +67,7 @@ export type BuildCatalogOptions = {
   versionPath?: string;
   fixturesDir?: string;
   localCards?: readonly RingsDbCard[];
+  keywordOverrides?: Readonly<Record<string, PrintedKeywords>>;
 };
 
 export type BuildCatalogResult = {
@@ -235,7 +237,7 @@ function rowFrom(table: SQLiteTable, values: Record<string, SqlValue>): Row {
   return row;
 }
 
-function cardRow(copies: CardCopy[]): Row {
+function cardRow(copies: CardCopy[], overrides: Readonly<Record<string, PrintedKeywords>>): Row {
   const ordered = [...copies].sort((left, right) => comparePacks(left.pack, right.pack));
   const primary = ordered[0];
   if (!primary) {
@@ -244,6 +246,7 @@ function cardRow(copies: CardCopy[]): Row {
   const card = primary.card;
   const packCodes = ordered.map((copy) => copy.pack.code);
   // When has_errata is set, the payload text is the errata line. There is no second field.
+  const keywords = card.keywords ?? overrides[card.code] ?? null;
   const errata = card.has_errata ? nullableText(card.text) : null;
   return rowFrom(cards, {
     code: card.code,
@@ -267,6 +270,8 @@ function cardRow(copies: CardCopy[]): Row {
     health: nullableInt(card.health),
     quest: nullableInt(card.quest),
     victory: nullableInt(card.victory),
+    engagement_cost: nullableInt(card.engagement_cost),
+    keywords: keywords ? JSON.stringify(keywords) : null,
     text: nullableText(card.text),
     has_errata: bit(card.has_errata),
     errata,
@@ -400,11 +405,13 @@ function snapshotCatalog(dbPath: string): CatalogSnapshot | null {
   try {
     return {
       packs: canonicalRows(readRows(db, packs), "code", []),
-      cards: canonicalRows(readRows(db, cards), "code", ["pack_codes"]),
+      cards: canonicalRows(readRows(db, cards), "code", ["pack_codes", "keywords"]),
       scenarios: canonicalRows(readRows(db, scenarios), "id", ["definition"]),
     };
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
+    // A database from before a column was added differs from any new build, so the version moves.
+    if (/no such column/.test(reason)) return { packs: "", cards: "", scenarios: "" };
     throw new Error(`Could not read existing catalog at ${dbPath}: ${reason}`, { cause: error });
   } finally {
     db.close();
@@ -448,7 +455,7 @@ function nextVersion(
   if (!previous) return current ?? 1;
   const matches =
     previous.packs === canonicalRows(packRows, "code", []) &&
-    previous.cards === canonicalRows(cardRows, "code", ["pack_codes"]) &&
+    previous.cards === canonicalRows(cardRows, "code", ["pack_codes", "keywords"]) &&
     previous.scenarios === canonicalRows(scenarioRows, "id", ["definition"]);
   if (matches) return current ?? 1;
   return (current ?? 0) + 1;
@@ -470,6 +477,7 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
   const versionPath = options.versionPath ?? path.join(root, "src", "catalog", "version.ts");
   const fixturesDir = options.fixturesDir ?? path.join(root, "fixtures");
   const localCards = options.localCards ?? LOCAL_CARDS;
+  const keywordOverrides = options.keywordOverrides ?? KEYWORD_OVERRIDES;
 
   const manifest = readManifest(cacheDir);
   const packPayload = await loadPayload(fetchImpl, cacheDir, manifest, packsCacheKey(), PACKS_URL);
@@ -510,7 +518,7 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
         available: availableFlag(pack.available),
       }),
     );
-  const cardRows = [...groups.values()].map((copies) => cardRow(copies)).sort((left, right) => {
+  const cardRows = [...groups.values()].map((copies) => cardRow(copies, keywordOverrides)).sort((left, right) => {
     return String(left.code).localeCompare(String(right.code));
   });
   const metaRows = included.map((pack) =>

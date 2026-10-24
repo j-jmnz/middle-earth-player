@@ -4,6 +4,7 @@ import type { EngineStep } from "./intents.ts";
 import { addModifier, placeDamage, playerCardEffectCanChoose, raiseThreat } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { revealNow } from "./frames.ts";
+import { runSetupVerb } from "./setup-verbs.ts";
 import { engageEnemy, stagingEnemies, stagingLocations, travelTo } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
@@ -110,6 +111,11 @@ export function runInstruction(
       return focus.sourceId
         ? updateCard(state, focus.sourceId, { committed: true, exhausted: true })
         : state;
+    case "AddToStaging":
+    case "MakeActiveLocation":
+    case "SetAside":
+    case "AttachToRingBearer":
+      return runSetupVerb(state, instruction, ctx);
     default:
       return { ...state, failure: `Unimplemented instruction ${instruction.verb}` };
   }

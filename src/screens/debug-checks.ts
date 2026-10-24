@@ -119,13 +119,8 @@ function scenarioSentences(input: DebugCheckInput): string[] {
   const problems = definitionProblems(input.fixture.id, parsed.data, expected);
   if (problems.length === 0) sentences.push(`Scenario ${input.fixture.id} matches the fixture.`);
   sentences.push(...problems);
-  if (
-    parsed.data.setup.length === 0 &&
-    parsed.data.resolution.length === 0 &&
-    expected.setup.length === 0 &&
-    expected.resolution.length === 0
-  ) {
-    sentences.push("Setup and resolution are empty.");
+  if (problems.length === 0) {
+    sentences.push(`Setup has ${parsed.data.setup.length} instructions and resolution has ${parsed.data.resolution.length} options.`);
   }
   return sentences;
 }
@@ -143,9 +138,7 @@ function definitionProblems(id: string, actual: ScenarioDefinition, expected: Sc
     problems.push(`Scenario ${id} widgets do not match the fixture.`);
   }
   if (JSON.stringify(actual.setup) !== JSON.stringify(expected.setup)) {
-    problems.push(
-      actual.setup.length > 0 ? `Scenario ${id} setup is not empty.` : `Scenario ${id} setup does not match the fixture.`,
-    );
+    problems.push(`Scenario ${id} setup does not match the fixture.`);
   }
   if (JSON.stringify(actual.resolution) !== JSON.stringify(expected.resolution)) {
     problems.push(

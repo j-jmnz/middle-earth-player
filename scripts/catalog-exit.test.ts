@@ -57,7 +57,7 @@ describe("built catalog", () => {
       expect(scenario?.id).toBe("a-shadow-of-the-past");
       const definition = scenarioDefinitionSchema.parse(JSON.parse(String(scenario?.definition)));
       expect(definition.id).toBe("a-shadow-of-the-past");
-      expect(definition.setup).toEqual([]);
+      expect(definition.setup).toHaveLength(5);
       expect(definition.resolution).toEqual([]);
 
       const fixture = parseScenarioFixture(

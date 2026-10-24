@@ -1,6 +1,6 @@
 import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
-import { isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
+import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { expireModifiers, livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, runEffects, type ReduceContext } from "./interpret.ts";
@@ -35,7 +35,7 @@ export function characters(state: ScenarioState, seat: number, cards: Cards): st
     const instance = state.cards[id];
     if (!instance) continue;
     const printed = printedOf(cards, instance.code);
-    if (printed.type === "ally") ids.push(id);
+    if (isAllyLike(printed)) ids.push(id);
   }
   return ids;
 }

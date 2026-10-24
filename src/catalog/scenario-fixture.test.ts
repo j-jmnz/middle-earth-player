@@ -54,7 +54,7 @@ describe("a-shadow-of-the-past fixture", () => {
     expect(fixtureCodes.has("141085")).toBe(false);
   });
 
-  it("derives the booklet sets and leaves setup empty", () => {
+  it("derives the booklet sets and the quest-card setup", () => {
     const definition = scenarioDefinitionSchema.parse(scenarioDefinition(fixture));
     expect(definition.encounterSets).toEqual([
       { code: "A Shadow of the Past", count: 29 },
@@ -69,7 +69,13 @@ describe("a-shadow-of-the-past fixture", () => {
       secondActiveLocation: false,
       perSeatStaging: false,
     });
-    expect(definition.setup).toEqual([]);
+    expect(definition.setup).toEqual([
+      { verb: "SetAside", code: "141035" },
+      { verb: "AddToStaging", code: "141039" },
+      { verb: "AddToStaging", code: "141078" },
+      { verb: "MakeActiveLocation", code: "141031" },
+      { verb: "AttachToRingBearer", code: "141017" },
+    ]);
     expect(definition.resolution).toEqual([]);
     expect(definition.bookletPage).toBeUndefined();
     expect(definition.stages.map((stage) => stage.code)).toEqual(["141022", "141023", "141024"]);

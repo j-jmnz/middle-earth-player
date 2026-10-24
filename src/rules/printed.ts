@@ -1,4 +1,4 @@
-export type Sphere = "leadership" | "tactics" | "spirit" | "lore" | "neutral";
+export type Sphere = "leadership" | "tactics" | "spirit" | "lore" | "neutral" | "fellowship" | "baggins";
 
 export type CardType =
   | "hero"
@@ -9,7 +9,8 @@ export type CardType =
   | "location"
   | "treachery"
   | "quest"
-  | "objective";
+  | "objective"
+  | "treasure";
 
 export type Keywords = {
   surge: boolean;
@@ -30,6 +31,7 @@ export type PrintedCard = {
   code: string;
   name: string;
   type: CardType;
+  traits: readonly string[];
   sphere: Sphere | null;
   cost: number | null;
   threat: number | null;
@@ -65,6 +67,7 @@ export function definePrinted(
     Pick<PrintedCard, "code" | "name" | "type"> & { keywords?: Partial<Keywords> },
 ): PrintedCard {
   return {
+    traits: [],
     sphere: null,
     cost: null,
     threat: null,
@@ -92,6 +95,11 @@ export function spherePays(pool: Sphere | null, cost: Sphere | null): boolean {
   if (pool == null) return false;
   if (cost == null || cost === "neutral") return true;
   return pool === cost;
+}
+
+// A campaign card with printed combat stats (Gildor Inglorion) acts as an ally once a player controls it.
+export function isAllyLike(printed: PrintedCard): boolean {
+  return printed.type === "ally" || (printed.type === "treasure" && printed.health != null);
 }
 
 export function isCharacterType(type: CardType): boolean {

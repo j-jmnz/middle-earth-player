@@ -3,6 +3,23 @@ import { z } from "zod";
 const optionalString = z.string().nullish();
 const optionalInt = z.number().int().nullish();
 
+// Printed keywords and rule flags for one card. An absent field means the card does not have it.
+export const printedKeywordsSchema = z.strictObject({
+  hide: z.number().int().positive().optional(),
+  surge: z.boolean().optional(),
+  doomed: z.number().int().positive().optional(),
+  peril: z.boolean().optional(),
+  archery: z.number().int().positive().optional(),
+  toughness: z.number().int().positive().optional(),
+  indestructible: z.boolean().optional(),
+  immune: z.boolean().optional(),
+  permanent: z.boolean().optional(),
+  sentinel: z.boolean().optional(),
+  ranged: z.boolean().optional(),
+  // The game is lost when this card leaves play (a printed rule, not a keyword).
+  leavesPlayLoses: z.boolean().optional(),
+});
+
 export const ringsDbPackSchema = z
   .object({
     name: z.string(),
@@ -38,6 +55,9 @@ export const ringsDbCardSchema = z
     victory: optionalInt,
     has_errata: z.boolean(),
     imagesrc: optionalString,
+    // Not in the RingsDB payload. Local records and the build overrides carry them.
+    engagement_cost: optionalInt,
+    keywords: printedKeywordsSchema.nullish(),
   })
   .strip();
 
@@ -58,6 +78,9 @@ const modifyStatSchema = z.strictObject({
   amount: z.number().int(),
   until: modifierUntilSchema,
 });
+
+const codeVerb = <const Verb extends string>(verb: Verb) =>
+  z.strictObject({ verb: z.literal(verb), code: z.string().min(1) });
 
 export const instructionSchema = z.discriminatedUnion("verb", [
   verbSchema("Draw"),
@@ -80,6 +103,10 @@ export const instructionSchema = z.discriminatedUnion("verb", [
   verbSchema("AdvanceStep"),
   verbSchema("ResolveEffect"),
   modifyStatSchema,
+  codeVerb("AddToStaging"),
+  codeVerb("MakeActiveLocation"),
+  codeVerb("SetAside"),
+  codeVerb("AttachToRingBearer"),
 ]);
 
 export const conditionSchema = z.never();
@@ -144,6 +171,7 @@ export const scenarioDefinitionSchema = z.strictObject({
 
 export type RingsDbPack = z.infer<typeof ringsDbPackSchema>;
 export type RingsDbCard = z.infer<typeof ringsDbCardSchema>;
+export type PrintedKeywords = z.infer<typeof printedKeywordsSchema>;
 export type Cost = z.infer<typeof costSchema>;
 export type Instruction = z.infer<typeof instructionSchema>;
 export type Condition = z.infer<typeof conditionSchema>;

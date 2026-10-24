@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { scenarioDefinitionSchema, type ScenarioDefinition } from "./boundary.ts";
+import { scenarioDefinitionSchema, type Instruction, type ScenarioDefinition } from "./boundary.ts";
 
 const piles = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached"] as const;
 
@@ -109,6 +109,35 @@ const widgets = {
   perSeatStaging: false,
 } as const;
 
+const SETUP_VERB = {
+  setAside: "SetAside",
+  staging: "AddToStaging",
+  activeLocation: "MakeActiveLocation",
+  attached: "AttachToRingBearer",
+} as const;
+
+// Quest-card setup order: set aside, add to staging, make a location active, then attach.
+// Each copy is one instruction. The encounter and quest piles are dealt by the scenario script.
+export function setupInstructions(fixture: ScenarioFixture): Instruction[] {
+  const listed = fixtureCards(fixture);
+  const instructions: Instruction[] = [];
+  for (const pile of ["setAside", "staging", "activeLocation", "attached"] as const) {
+    for (const card of listed) {
+      if (card.pile !== pile) continue;
+      for (let copy = 0; copy < card.normal; copy += 1) {
+        instructions.push({ verb: SETUP_VERB[pile], code: card.code });
+      }
+    }
+  }
+  return instructions;
+}
+
+export function encounterCodes(fixture: ScenarioFixture): string[] {
+  return fixtureCards(fixture)
+    .filter((card) => card.pile === "encounter")
+    .flatMap((card) => Array.from({ length: card.normal }, () => card.code));
+}
+
 export function scenarioDefinition(fixture: ScenarioFixture): ScenarioDefinition {
   return scenarioDefinitionSchema.parse({
     id: fixture.id,
@@ -118,7 +147,7 @@ export function scenarioDefinition(fixture: ScenarioFixture): ScenarioDefinition
     })),
     stages: fixture.stages.map((code) => ({ code })),
     widgets,
-    setup: [],
+    setup: setupInstructions(fixture),
     resolution: [],
   });
 }

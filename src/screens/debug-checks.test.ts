@@ -62,7 +62,7 @@ describe("debugSentences", () => {
       "The Black Riders has 5 cards.",
       "Stages are 141022, 141023, 141024.",
       "Scenario a-shadow-of-the-past matches the fixture.",
-      "Setup and resolution are empty.",
+      "Setup has 5 instructions and resolution has 0 options.",
       "1 image file.",
       "1 image in memory.",
       "0 pause entries.",
@@ -100,8 +100,8 @@ describe("debugSentences", () => {
 
     const baked = scenarioDefinition(fixture);
     const setup = debugSentences(base({ bakedDefinition: { ...baked, setup: [{ verb: "Draw" }] } }));
-    expect(setup).toContain("Scenario a-shadow-of-the-past setup is not empty.");
-    expect(setup).not.toContain("Setup and resolution are empty.");
+    expect(setup).toContain("Scenario a-shadow-of-the-past setup does not match the fixture.");
+    expect(setup).not.toContain("Setup has 5 instructions and resolution has 0 options.");
 
     const shifted = {
       ...baked,
