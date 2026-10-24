@@ -1,0 +1,24 @@
+{
+  "name": "middle-earth-lcg",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "hostRequirements": {
+    "cpus": 4
+  },
+  "containerEnv": {
+    "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
+  },
+  "onCreateCommand": "sudo corepack enable pnpm && pnpm install --frozen-lockfile",
+  "postCreateCommand": "pnpm catalog:build || echo 'catalog:build failed; run it again before pnpm web' >&2",
+  "forwardPorts": [8081],
+  "portsAttributes": {
+    "8081": {
+      "label": "Metro",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "vitest.explorer"]
+    }
+  }
+}

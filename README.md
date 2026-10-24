@@ -16,6 +16,14 @@ The phone is the product. The Mac browser is the fast loop for screens.
 
 These checks stay on a physical phone: pool fling, table drag, kill-and-relaunch, and airplane mode. SQLite in the browser is browser storage. Image files and the booklet reader stay on the phone. The Skia table has no drag sign-off in Chrome.
 
+### Codespaces
+
+From an iPad or any browser, open the repo on GitHub, then Code → Codespaces → Create codespace. `.devcontainer/devcontainer.json` installs Node 22 and pnpm, runs `pnpm install`, and builds the catalog. Wait for that to finish in the terminal before the first run.
+
+`pnpm web` serves the app on port 8081. Open the forwarded address from the Ports tab in Safari. The same browser limits apply as on the Mac.
+
+For Expo Go, run `pnpm start -- --tunnel` and accept the `@expo/ngrok` install. The phone cannot reach the codespace's LAN address.
+
 ### Android phone
 
 `package.json` does not depend on `expo-dev-client` until the booklet reader. Open the screen in Expo Go:
