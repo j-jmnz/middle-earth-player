@@ -8,7 +8,7 @@ import { playOut } from "../../scripts/auto-player.ts";
 import { campaign, scenario, loadWorld, type World } from "../../scripts/past-scene.ts";
 
 import { validateLoadout, type LoadoutSeat } from "./loadout.ts";
-import { applyResolution, EMPTY_LOG } from "./resolution.ts";
+import { applyResolution, emptyLog } from "./log.ts";
 import { buildStart } from "./start.ts";
 
 // A whole A Shadow of the Past on fixed seeds. The Ring-bearer is the saga hero; the three other heroes
@@ -46,6 +46,7 @@ function play(seed: number): { state: ScenarioState; intents: number } {
     seed,
     threatModifier: 0,
     seats: [loadout],
+    effects: EFFECTS,
   });
   const kept = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx)).state;
   const out = playOut(kept, ctx, POLICY);
@@ -69,7 +70,7 @@ describe("a whole game of A Shadow of the Past", () => {
     expect(state.stageCleared).toBe(true);
     expect(state.window).toBeNull();
     expect(state.stack).toEqual([]);
-    expect(state.resolutionChoices).toHaveLength(2);
+    expect(state.resolutionLog.earned.map((item) => item.code)).toEqual(["141078", "141077"]);
     expect(state.cards[state.questStage ?? ""]?.code).toBe(world.definition.stages.at(-1)?.code);
     const ring = Object.values(state.cards).find((card) => card.code === "141085");
     expect(ring?.zone).toBe("play");
@@ -78,9 +79,9 @@ describe("a whole game of A Shadow of the Past", () => {
 
   it("records the chosen cards once, and a second win does not grant them again", () => {
     const { state } = play(WIN_SEED);
-    const log = applyResolution(EMPTY_LOG, state.scenarioId, state, cards);
-    expect(log.scenarios[state.scenarioId]?.rewards).toEqual(state.resolutionChoices);
-    expect([...log.pool, ...log.attached].sort()).toEqual([...state.resolutionChoices].sort());
+    const log = applyResolution(emptyLog(1), state.scenarioId, state, cards);
+    expect(log.campaignPool.map((card) => card.code)).toEqual(["141078", "141077"]);
+    expect(log.completed).toEqual([state.scenarioId]);
     const second = play(OTHER_WIN_SEED).state;
     expect(second.stageCleared).toBe(true);
     expect(applyResolution(log, second.scenarioId, second, cards)).toBe(log);
@@ -91,7 +92,8 @@ describe("a whole game of A Shadow of the Past", () => {
     expect(state.lost).toBe(true);
     expect(state.lossReason).toBe("The One Ring left play");
     expect(state.window).toBeNull();
-    expect(state.resolutionChoices).toEqual([]);
-    expect(applyResolution(EMPTY_LOG, state.scenarioId, state, cards)).toBe(EMPTY_LOG);
+    expect(state.resolutionLog.earned).toEqual([]);
+    const empty = emptyLog(1);
+    expect(applyResolution(empty, state.scenarioId, state, cards)).toBe(empty);
   });
 });

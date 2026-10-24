@@ -33,6 +33,26 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"141077:forced:1","cardCode":"141077","lines":["141077:A:2"],"timing":"forced","trigger":"endOfRound","cancel":{"cost":1,"sphere":"fellowship"},"instructions":[{"verb":"Discard","target":{"kind":"self"}}]},
   // 141079 The Ring Draws Them
   {"id":"141079:whenRevealed:1","cardCode":"141079","lines":["141079:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Delay","until":"endOfPhase","uncancelable":{"kind":"exhausted","code":"141085","is":true},"instructions":[{"verb":"EngageAll","who":"firstPlayer"}]}]},
+
+  // Campaign cards: the Setup on the front and the Resolution on the back (Learn to Play p29, Rules Reference Appendix III).
+  // 141030 A Shadow of the Past
+  {"id":"141030:campaignSetup:1","cardCode":"141030","lines":["141030:A:2"],"timing":"campaignSetup","instructions":[{"verb":"AttachToRingBearer","code":"141017"},{"verb":"AddToStaging","code":"141078"},{"verb":"ShuffleIntoEncounterDeck","code":"141077"},{"verb":"ShuffleIntoEncounterDeck","code":"141079"}]},
+  {"id":"141030:resolution:1","cardCode":"141030","lines":["141030:B:1"],"timing":"resolution","instructions":[{"verb":"ChooseCards","codes":["141078","141079"],"who":"firstPlayer","to":"pool"},{"verb":"ChooseCards","codes":["141077","141017"],"who":"firstPlayer","to":"pool"}]},
+  // 141044 A Knife in the Dark
+  {"id":"141044:resolution:1","cardCode":"141044","lines":["141044:B:1"],"timing":"resolution","instructions":[{"verb":"ChooseCards","codes":["141018","141019","141020","141021"],"who":"eachSeat","to":"hero","optional":true}]},
+  // 141056 Flight to the Ford (its front Response line is the scenario 3 engine half, phase 13)
+  {"id":"141056:resolution:1","cardCode":"141056","lines":["141056:B:1"],"timing":"resolution","instructions":[{"verb":"EarnAllBurdens"}]},
+  // 142019 The Ring Goes South
+  {"id":"142019:campaignSetup:1","cardCode":"142019","lines":["142019:A:2"],"timing":"campaignSetup","instructions":[{"verb":"WaiveThreatPenalty"},{"verb":"ChooseCards","codes":["142011","142012","142013","142014"],"who":"eachSeat","to":"hand","leftover":"firstPlayerDeck"}]},
+  {"id":"142019:resolution:1","cardCode":"142019","lines":["142019:B:1"],"timing":"resolution","instructions":[{"verb":"Earn","codes":["142084"],"when":{"kind":"attachedToHero","code":"142084","is":true}}]},
+  // 142039 Journey in the Dark
+  {"id":"142039:campaignSetup:1","cardCode":"142039","lines":["142039:A:2"],"timing":"campaignSetup","instructions":[{"verb":"ShuffleIntoEncounterDeck","code":"142086"},{"verb":"ShuffleIntoEncounterDeck","code":"142085"},{"verb":"AddToStaging","code":"142088"},{"verb":"AddToStaging","code":"142087"}]},
+  {"id":"142039:resolution:1","cardCode":"142039","lines":["142039:B:1"],"timing":"resolution","instructions":[{"verb":"Earn","codes":["142086","142085","142088","142087"],"when":{"kind":"inPlay","code":"142044","is":true}},{"verb":"ChooseCards","codes":["142086","142085"],"who":"firstPlayer","to":"pool","when":{"kind":"inPlay","code":"142044","is":false}},{"verb":"ChooseCards","codes":["142088","142087"],"who":"firstPlayer","to":"pool","when":{"kind":"inPlay","code":"142044","is":false}}]},
+  // 142060 Breaking of the Fellowship
+  {"id":"142060:campaignSetup:1","cardCode":"142060","lines":["142060:A:2"],"timing":"campaignSetup","instructions":[{"verb":"ChooseCards","codes":["142015","142016","142017","142018"],"who":"eachSeat","to":"hero"},{"verb":"ShuffleIntoEncounterDeck","code":"142089"},{"verb":"ShuffleIntoEncounterDeck","code":"142090"}]},
+  {"id":"142060:resolution:1","cardCode":"142060","lines":["142060:B:1"],"timing":"resolution","instructions":[{"verb":"MarkFallen","attached":"142083"}]},
+  {"id":"142060:resolution:2","cardCode":"142060","lines":["142060:B:2"],"timing":"resolution","instructions":[{"verb":"ChooseCards","codes":["142089","142090"],"who":"firstPlayer","to":"pool"}]},
+  {"id":"142060:resolution:3","cardCode":"142060","lines":["142060:B:3"],"timing":"resolution","instructions":[{"verb":"NameCaptives","except":["Ring-bearer","Aragorn"]}]},
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

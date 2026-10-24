@@ -2,39 +2,24 @@
   "id": "fellowship-of-the-ring",
   "name": "Fellowship of the Ring",
   "scenarios": [
-    "a-shadow-of-the-past"
+    "a-shadow-of-the-past",
+    "a-knife-in-the-dark",
+    "flight-to-the-ford",
+    "the-ring-goes-south",
+    "journey-in-the-dark",
+    "breaking-of-the-fellowship"
   ],
+  "campaignCards": {
+    "a-shadow-of-the-past": "141030",
+    "a-knife-in-the-dark": "141044",
+    "flight-to-the-ford": "141056",
+    "the-ring-goes-south": "142019",
+    "journey-in-the-dark": "142039",
+    "breaking-of-the-fellowship": "142060"
+  },
   "prelude": [
     {
       "code": "141085"
     }
-  ],
-  "authored": {
-    "resolution": {
-      "a-shadow-of-the-past": [
-        {
-          "id": "gandalfs-delay-or-the-ring-draws-them",
-          "choices": [
-            {
-              "code": "141078"
-            },
-            {
-              "code": "141079"
-            }
-          ]
-        },
-        {
-          "id": "gildor-or-mr-underhill",
-          "choices": [
-            {
-              "code": "141077"
-            },
-            {
-              "code": "141017"
-            }
-          ]
-        }
-      ]
-    }
-  }
+  ]
 }

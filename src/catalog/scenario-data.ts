@@ -1,10 +1,11 @@
 import { z } from "zod";
 
-import { scenarioDefinitionSchema, type Instruction, type ScenarioDefinition } from "./boundary.ts";
+import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioDefinition } from "./boundary.ts";
 
 // A scenario as data/scenarios/<id>.json stores it: which cards go to which pile, in Normal and Easy
 // counts. The sync adapters and the quest cards' Setup text both agree on it before the build writes it.
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached"] as const;
+// `burden` is the burden deck (Flight to the Ford): a zone beside the quest deck, not part of the encounter deck.
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z
@@ -13,6 +14,8 @@ const placementSchema = z
     normal: z.number().int().positive(),
     easy: z.number().int().nonnegative(),
     pile: z.enum(PILES),
+    // Staging only: this many copies per player in the game ("1 Fell Rider per player"); `normal` is the box's total.
+    perPlayer: z.number().int().positive().optional(),
   })
   .refine((card) => card.easy <= card.normal, { message: "easy exceeds normal" });
 
@@ -25,6 +28,14 @@ export const scenarioDataSchema = z
     // The booklet's encounter sets, in booklet order, with the Normal count of cards each contributes.
     encounterSets: z.array(z.strictObject({ name: z.string().min(1), count: z.number().int().nonnegative() })),
     cards: z.array(placementSchema),
+    // The campaign card printed for this scenario. Its Setup and Resolution records belong to the scenario.
+    campaignCard: z.string().min(1),
+    // Cards the campaign card's Setup places or shuffles in. They are not in `cards`; the records deal them.
+    campaignPlaced: z.array(z.string().min(1)),
+    // The Ring-bearer's starting life, when a Setup line sets it.
+    life: z.number().int().positive().optional(),
+    // Table pieces the cards call for, read from their printed text by the build.
+    widgets: z.strictObject({ hide: z.boolean(), secondActiveLocation: z.boolean(), perSeatStaging: z.boolean() }),
     source: z.strictObject({ dragnNormal: z.string(), dragnEasy: z.string().nullable(), hobSlug: z.string() }),
   })
   .superRefine((data, context) => {
@@ -42,19 +53,14 @@ export const scenarioDataSchema = z
 export type ScenarioData = z.infer<typeof scenarioDataSchema>;
 export type Placement = z.infer<typeof placementSchema>;
 
-// One reward group. The player picks one choice per group, in order. The campaign file authors them by code.
 export const campaignDataSchema = z.strictObject({
   id: z.string().min(1),
   name: z.string().min(1),
   scenarios: z.array(z.string().min(1)),
+  // The campaign card of each scenario, by scenario id. Its Setup and Resolution lines are effect records.
+  campaignCards: z.record(z.string(), z.string().min(1)),
   // Cards every scenario starts with, attached to the Ring-bearer. From the sources' player-1 play area.
   prelude: z.array(z.strictObject({ code: z.string().min(1) })),
-  authored: z.strictObject({
-    resolution: z.record(
-      z.string(),
-      z.array(z.strictObject({ id: z.string().min(1), choices: z.array(z.strictObject({ code: z.string().min(1) })).min(1) })),
-    ),
-  }),
 });
 export type CampaignData = z.infer<typeof campaignDataSchema>;
 
@@ -94,7 +100,8 @@ const SETUP_VERB = {
 } as const;
 
 // Order of the quest card's setup steps: set aside, add to staging, make a location active, then attach.
-// Each copy is one instruction. The encounter and quest piles are dealt by buildStart.
+// Each copy is one instruction; a per-player card is one per seat, which the engine counts. The encounter, quest
+// and burden piles are dealt by buildStart.
 export function setupInstructions(data: ScenarioData): Instruction[] {
   const instructions: Instruction[] = [];
   for (const pile of ["setAside", "staging", "activeLocation", "attached"] as const) {
@@ -106,21 +113,32 @@ export function setupInstructions(data: ScenarioData): Instruction[] {
   return instructions;
 }
 
-const widgets = {
-  hide: true,
-  lifeTracker: false,
-  burdenDeck: false,
-  secondActiveLocation: false,
-  perSeatStaging: false,
-} as const;
+export function burdenCodes(data: ScenarioData): string[] {
+  return data.cards.filter((card) => card.pile === "burden").flatMap((card) => Array.from({ length: card.normal }, () => card.code));
+}
 
-export function scenarioDefinition(data: ScenarioData, campaign: CampaignData): ScenarioDefinition {
+// The records of one timing on a card, in line order, flattened to their instructions.
+export function recordInstructions(effects: readonly Effect[], code: string, timing: Effect["timing"]): Instruction[] {
+  return effects.filter((effect) => effect.cardCode === code && effect.timing === timing).flatMap((effect) => effect.instructions);
+}
+
+export function scenarioDefinition(data: ScenarioData, _campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
+  const burden = burdenCodes(data);
   return scenarioDefinitionSchema.parse({
     id: data.id,
     encounterSets: data.encounterSets.map((set) => ({ code: set.name, count: set.count })),
     stages: data.stages.map((code) => ({ code })),
-    widgets,
+    widgets: {
+      hide: data.widgets.hide,
+      lifeTracker: data.life != null,
+      burdenDeck: burden.length > 0,
+      secondActiveLocation: data.widgets.secondActiveLocation,
+      perSeatStaging: data.widgets.perSeatStaging,
+    },
     setup: setupInstructions(data),
-    resolution: campaign.authored.resolution[data.id] ?? [],
+    resolution: recordInstructions(effects, data.campaignCard, "resolution"),
+    ...(burden.length > 0 ? { burdenDeck: burden } : {}),
+    ...(data.life != null ? { life: data.life } : {}),
+    campaignCard: data.campaignCard,
   });
 }

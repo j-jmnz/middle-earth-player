@@ -27,7 +27,7 @@ describe("golden: a whole game of A Shadow of the Past", () => {
     const loadout = { heroes: [RING_BEARER, "scout", "q1", "q2"], deck: Array.from({ length: 30 }, () => "filler") };
     const out: unknown[] = [];
     for (const seed of [1, 2, 9]) {
-      const start = buildStart({ campaign, scenario, seatCount: 1, seed, threatModifier: 0, seats: [loadout] });
+      const start = buildStart({ campaign, scenario, seatCount: 1, seed, threatModifier: 0, seats: [loadout], effects: EFFECTS });
       const kept = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx)).state;
       const run = playOut(kept, ctx, { scout: "scout", prefer: "141035", protect: RING_BEARER });
       out.push({ seed, intents: run.intents, state: run.state });

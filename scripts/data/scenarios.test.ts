@@ -18,11 +18,14 @@ describe("scenario data", () => {
     expect(numbers).toEqual([...numbers].sort((a, b) => a - b));
   });
 
-  it("offers rewards that the scenario deals", () => {
+  it("builds all six scenarios, each with its campaign card", () => {
     const campaign = loadCampaign();
-    for (const [id, groups] of Object.entries(campaign.authored.resolution)) {
-      const dealt = new Set(loadScenario(id).cards.map((card) => card.code));
-      for (const group of groups) for (const choice of group.choices) expect(dealt.has(choice.code), `${id} ${group.id} ${choice.code}`).toBe(true);
+    expect(campaign.scenarios).toEqual(["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship"]);
+    for (const id of campaign.scenarios) {
+      const scenario = loadScenario(id);
+      expect(campaign.campaignCards[id], id).toBe(scenario.campaignCard);
+      expect(byCode.get(scenario.campaignCard)?.type, id).toBe("campaign");
+      expect(byCode.get(scenario.campaignCard)?.name, id).toBe(scenario.name);
     }
   });
 });

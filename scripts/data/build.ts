@@ -41,15 +41,6 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   mkdirSync(dir, { recursive: true });
   for (const file of readdirSync(dir)) rmSync(path.join(dir, file));
   for (const [pack, list] of [...byPack].sort(([a], [b]) => a.localeCompare(b))) writeFileSync(path.join(dir, `${pack}.json`), renderCardFile(list));
-  const existing = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "fellowship-of-the-ring.json"), "utf8")) as unknown;
-  const built = buildScenarios(raw, cards, overrides, existing);
-  const scenarioDir = path.join(outDir, "scenarios");
-  const campaignDir = path.join(outDir, "campaigns");
-  mkdirSync(scenarioDir, { recursive: true });
-  mkdirSync(campaignDir, { recursive: true });
-  for (const file of readdirSync(scenarioDir)) rmSync(path.join(scenarioDir, file));
-  for (const scenario of built.scenarios) writeFileSync(path.join(scenarioDir, `${scenario.id}.json`), `${JSON.stringify(scenario, null, 2)}\n`);
-  writeFileSync(path.join(campaignDir, "fellowship-of-the-ring.json"), `${JSON.stringify(built.campaign, null, 2)}\n`);
   // Rule text: re-extracted only when a cached PDF's sha256 differs from the committed markdown.
   const sources = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string; sha256: string }[] }> };
   const pinned = new Map((sources.sources.rules?.files ?? []).map((file) => [file.path, file.sha256]));
@@ -59,6 +50,14 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   const steps = buildSteps(readFileSync(path.join(DATA_DIR, "raw", "dragncards", "steps.json"), "utf8"), entries);
   writeFileSync(path.join(outDir, "rules", "steps.json"), `[\n${steps.map((step) => `  ${JSON.stringify(step)}`).join(",\n")}\n]\n`);
   console.log(`rules: ${entries.length} entries, ${steps.length} framework steps`);
+  const built = buildScenarios(raw, cards, overrides, entries);
+  const scenarioDir = path.join(outDir, "scenarios");
+  const campaignDir = path.join(outDir, "campaigns");
+  mkdirSync(scenarioDir, { recursive: true });
+  mkdirSync(campaignDir, { recursive: true });
+  for (const file of readdirSync(scenarioDir)) rmSync(path.join(scenarioDir, file));
+  for (const scenario of built.scenarios) writeFileSync(path.join(scenarioDir, `${scenario.id}.json`), `${JSON.stringify(scenario, null, 2)}\n`);
+  writeFileSync(path.join(campaignDir, "fellowship-of-the-ring.json"), `${JSON.stringify(built.campaign, null, 2)}\n`);
   const effectsDir = process.env.EFFECTS_OUT ?? path.join(ROOT, "src", "effects", "generated");
   mkdirSync(effectsDir, { recursive: true });
   const generated = generateEffects(cards, built.scenarios, built.campaign, ledger);

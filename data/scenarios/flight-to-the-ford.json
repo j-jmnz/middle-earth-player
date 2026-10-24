@@ -1,0 +1,199 @@
+{
+  "id": "flight-to-the-ford",
+  "name": "Flight to the Ford",
+  "number": 3,
+  "stages": [
+    "141028",
+    "141029"
+  ],
+  "encounterSets": [
+    {
+      "name": "Flight to the Ford",
+      "count": 17
+    },
+    {
+      "name": "Hunted",
+      "count": 6
+    },
+    {
+      "name": "The Black Riders",
+      "count": 5
+    },
+    {
+      "name": "The Nazgûl",
+      "count": 10
+    }
+  ],
+  "cards": [
+    {
+      "code": "141060",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "141061",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "141062",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "141064",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "141065",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "141066",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "141067",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "141072",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "141073",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "141074",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "141075",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "141069",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "141070",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "141071",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "141028",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "141029",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "141058",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "141063",
+      "normal": 4,
+      "easy": 4,
+      "pile": "staging",
+      "perPlayer": 1
+    },
+    {
+      "code": "141059",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "141068",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "141057",
+      "normal": 1,
+      "easy": 1,
+      "pile": "attached"
+    },
+    {
+      "code": "141080",
+      "normal": 1,
+      "easy": 1,
+      "pile": "burden"
+    },
+    {
+      "code": "141081",
+      "normal": 1,
+      "easy": 1,
+      "pile": "burden"
+    },
+    {
+      "code": "141082",
+      "normal": 1,
+      "easy": 1,
+      "pile": "burden"
+    },
+    {
+      "code": "141083",
+      "normal": 1,
+      "easy": 1,
+      "pile": "burden"
+    },
+    {
+      "code": "141084",
+      "normal": 1,
+      "easy": 1,
+      "pile": "burden"
+    }
+  ],
+  "campaignCard": "141056",
+  "campaignPlaced": [],
+  "life": 15,
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0C.03",
+    "dragnEasy": "E0C.03",
+    "hobSlug": "Flight-to-the-Ford"
+  }
+}

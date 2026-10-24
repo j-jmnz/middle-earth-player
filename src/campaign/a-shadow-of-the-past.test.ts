@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../catalog/boundary.ts";
+import { EFFECTS } from "../effects/index.ts";
 import { scenarioCards } from "../catalog/scenario-data.ts";
 import { characters } from "../rules/combat.ts";
 import { byCode, expectOk, hero } from "../rules/fixture.ts";
@@ -23,7 +24,7 @@ const DECK = Array.from({ length: 12 }, (_, index) => `deck${index}`);
 let cards: Map<string, PrintedCard>;
 
 beforeAll(async () => {
-  const codes = [...new Set([...scenarioCards(scenario).map((card) => card.code), RING_BEARER, "141085"])];
+  const codes = [...new Set([...scenarioCards(scenario).map((card) => card.code), ...scenario.campaignPlaced, RING_BEARER, "141085"])];
   cards = new Map(await loadPrinted(codes));
   cards.set(SIDE_HERO, hero(SIDE_HERO, "spirit", 8, 1));
   for (const code of DECK) {
@@ -39,6 +40,8 @@ function begin(seed: number, effects: readonly Effect[] = []) {
     seed,
     threatModifier: 0,
     seats: [{ heroes: [RING_BEARER, SIDE_HERO], deck: DECK }],
+    // The campaign card deals Mr. Underhill, Gandalf's Delay, Gildor and The Ring Draws Them.
+    effects: EFFECTS,
   });
   const ctx: ReduceContext = { effects, cards };
   const started = startScenario(start, ctx);
@@ -60,6 +63,7 @@ describe("A Shadow of the Past setup", () => {
     const first = begin(5).started;
     const again = begin(5).started;
     const other = begin(6).started;
+    // 40 cards of the box plus Gildor Inglorion and The Ring Draws Them, which the campaign card shuffles in.
     expect(first.encounterDeck).toHaveLength(42);
     expect(codesOf(first, first.encounterDeck)).toEqual(codesOf(again, again.encounterDeck));
     expect(codesOf(first, first.encounterDeck)).not.toEqual(codesOf(other, other.encounterDeck));
@@ -73,14 +77,15 @@ describe("A Shadow of the Past setup", () => {
     const { state, steps } = setUp(5);
     expect(state.cards[state.activeLocation ?? ""]?.code).toBe("141031");
     expect(codesOf(state, state.setAside)).toEqual(["141035"]);
-    expect(codesOf(state, state.staging)).toEqual(["141039", "141078"]);
+    // The campaign card's Setup stages Gandalf's Delay first, then the quest card adds the Black Rider.
+    expect(codesOf(state, state.staging)).toEqual(["141078", "141039"]);
     expect(steps.some((step) => step.kind === "reveal" || step.kind === "push")).toBe(false);
     expect(state.stack).toEqual([]);
     expect(state.encounterDeck).toHaveLength(42);
     const bearer = byCode(state, RING_BEARER)[0] ?? "";
     const underhill = byCode(state, "141017")[0] ?? "";
     expect(state.cards[underhill]?.host).toBe(bearer);
-    // The script attaches The One Ring first, then the quest card's setup attaches Mr. Underhill.
+    // The script attaches The One Ring first, then the campaign card's setup attaches Mr. Underhill.
     const ring = byCode(state, "141085")[0] ?? "";
     expect(state.cards[ring]).toMatchObject({ zone: "play", controller: 0, host: bearer });
     expect(state.cards[bearer]?.attachments).toEqual([ring, underhill]);
@@ -100,7 +105,7 @@ describe("A Shadow of the Past setup", () => {
     expect(codesOf(started, started.seats[0]?.hand ?? [])).not.toContain("deck0");
     // Encounter Setup ran before the quest instructions.
     expect(steps.filter((step) => step.kind === "push").map((step) => step.frame)).toEqual(["setup"]);
-    expect(codesOf(state, state.staging)).toEqual(["141037", "141039", "141078"]);
+    expect(codesOf(state, state.staging)).toEqual(["141037", "141078", "141039"]);
     expect(codesOf(state, state.setAside)).toEqual(["deck0", "141036", "141032", "141035"]);
   });
 

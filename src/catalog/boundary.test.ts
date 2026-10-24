@@ -6,7 +6,6 @@ import {
   effectSchema,
   instructionSchema,
   parseRingsDbCard,
-  resolutionOptionSchema,
   ringsDbCardSchema,
   scenarioDefinitionSchema,
 } from "./boundary.ts";
@@ -53,7 +52,7 @@ const scenario = {
     perSeatStaging: false,
   },
   setup: [{ verb: "RevealStaging" }],
-  resolution: [{ id: "choice", choices: [{ code: "141078" }] }],
+  resolution: [{ verb: "Earn", codes: ["141078"] }],
 };
 
 function minimalCard(overrides: Record<string, unknown> = {}): Record<string, unknown> {
@@ -130,10 +129,15 @@ describe("catalog boundary", () => {
     expect(effectSchema.safeParse({ ...effect, note: "extra" }).success).toBe(false);
   });
 
-  it("accepts a scenario definition and a strict resolution option", () => {
+  it("accepts a scenario definition, its resolution records, and the campaign verbs", () => {
     expect(scenarioDefinitionSchema.parse(scenario)).toEqual(scenario);
     expect(scenarioDefinitionSchema.parse({ ...scenario, bookletPage: 4 }).bookletPage).toBe(4);
-    expect(resolutionOptionSchema.safeParse({ id: "choice", label: "extra" }).success).toBe(false);
+    const pick = { verb: "ChooseCards", codes: ["a", "b"], who: "firstPlayer", to: "pool" };
+    expect(scenarioDefinitionSchema.parse({ ...scenario, resolution: [pick] }).resolution).toEqual([pick]);
+    expect(instructionSchema.safeParse({ ...pick, to: "elsewhere" }).success).toBe(false);
+    expect(instructionSchema.safeParse({ ...pick, codes: [] }).success).toBe(false);
+    expect(instructionSchema.safeParse({ verb: "Earn", codes: ["a"], when: { kind: "inPlay", code: "a", is: true } }).success).toBe(true);
+    expect(instructionSchema.safeParse({ verb: "Earn", codes: ["a"], when: { kind: "attachedToHero", code: "a" } }).success).toBe(false);
   });
 
   it("strips unknown card keys and keeps a string cost", () => {

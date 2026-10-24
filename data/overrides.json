@@ -87,15 +87,72 @@
       },
       "reason": "Hall of Beorn lists Grievous Wound under Breaking of the Fellowship. The scan prints the Moria icon of Journey in the Dark, and the campaign cards (142020, 142039) deal it with that scenario.",
       "source": "scan 142088.A, data/printed/fellowship-of-the-ring.json"
+    },
+    {
+      "match": {
+        "code": "142075"
+      },
+      "set": {
+        "name": "The Argonath"
+      },
+      "reason": "Hall of Beorn and DragnCards spell it 'The Argonauth'. The scan, the quest card 142061 and the rulebook print 'The Argonath'.",
+      "source": "scan 142075.A, 142061.A Setup line"
+    },
+    {
+      "match": {
+        "code": "141064"
+      },
+      "set": {
+        "name": "Stricken Dumb"
+      },
+      "reason": "Hall of Beorn spells it 'Striken Dumb' (its own image path 403s; the corrected 'Stricken-Dumb.jpg' resolves). The card is Stricken Dumb.",
+      "source": "scan 141064.A (Stricken-Dumb.jpg)"
     }
   ],
   "scenarioPiles": [
     {
       "scenario": "a-shadow-of-the-past",
       "code": "141017",
+      "pile": "campaign",
+      "reason": "DragnCards lists Mr. Underhill in the staging area. The campaign card A Shadow of the Past (141030) prints 'Setup: Attach Mr. Underhill to the Ring-bearer.', and his own Setup line says the same. The campaign record deals him.",
+      "source": "scan 141030.A; Mr. Underhill (MEC109 #44) Setup"
+    },
+    {
+      "scenario": "the-ring-goes-south",
+      "code": "142029",
+      "pile": "setAside",
+      "reason": "DragnCards makes Redhorn Pass the active location at the start. Stage 1A prints 'Set Lust for the Ring, Redhorn Pass, Doors of Durin and Watcher in the Water aside, out of play.'; stage 2A makes it active.",
+      "source": "scan 142020.A; scan 142021.A"
+    },
+    {
+      "scenario": "the-ring-goes-south",
+      "code": "142084",
+      "pile": "setAside",
+      "reason": "DragnCards stages Lust for the Ring. Stage 1A prints that it is set aside, out of play; stage 1B shuffles it into the encounter deck.",
+      "source": "scan 142020.A; scan 142020.B"
+    },
+    {
+      "scenario": "flight-to-the-ford",
+      "code": "141057",
       "pile": "attached",
-      "reason": "DragnCards lists Mr. Underhill in the staging area. His own Setup text attaches him to the Ring-bearer.",
-      "source": "dragncards preBuiltDecks Q0C.01; Mr. Underhill (MEC109 #44) Setup"
+      "reason": "DragnCards stages An Evil Wound. Stage 1A prints 'Attach An Evil Wound to the Ring-bearer.'",
+      "source": "scan 141028.A"
+    }
+  ],
+  "scenarioEasy": [
+    {
+      "scenario": "a-knife-in-the-dark",
+      "code": "141069",
+      "easy": 2,
+      "reason": "The DragnCards Easy deck keeps all 4 Ringwraith. Hall of Beorn gives 2 in both its scenario list and its card record. The gold Easy mark is printed on individual copies, so one scan cannot show it; the two agreeing Hall of Beorn fields win over the single DragnCards load list. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/A-Knife-in-the-Dark; hallofbeorn.com/Export/EncounterCards (Ringwraith EasyModeQuantity 2)"
+    },
+    {
+      "scenario": "flight-to-the-ford",
+      "code": "141074",
+      "easy": 1,
+      "reason": "The DragnCards Easy deck keeps 3 Black Steed. Hall of Beorn gives 1 in both its scenario list and its card record. The gold Easy mark is printed on individual copies, so one scan cannot show it; the two agreeing Hall of Beorn fields win. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/Flight-to-the-Ford; hallofbeorn.com/Export/EncounterCards (Black Steed EasyModeQuantity 1)"
     }
   ]
 }

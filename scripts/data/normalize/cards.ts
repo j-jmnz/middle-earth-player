@@ -36,7 +36,7 @@ const overridesSchema = z.object({
   cards: z.array(
     z.object({
       match: z.object({ code: z.string().optional(), name: z.string().optional(), set: z.string().optional(), number: z.number().optional() }),
-      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
+      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), name: z.string().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
       reason: z.string().min(1),
       source: z.string().min(1),
     }),
@@ -47,11 +47,15 @@ const overridesSchema = z.object({
       z.object({
         scenario: z.string().min(1),
         code: z.string().min(1),
-        pile: z.enum(["encounter", "staging", "activeLocation", "setAside", "attached"]),
+        pile: z.enum(["encounter", "staging", "activeLocation", "setAside", "attached", "burden", "campaign"]),
         reason: z.string().min(1),
         source: z.string().min(1),
       }),
     )
+    .default([]),
+  // A printed Easy count the sources disagree on. `easy` is the count of copies that stay in an Easy deck.
+  scenarioEasy: z
+    .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
 });
 export type Overrides = z.infer<typeof overridesSchema>;
@@ -403,7 +407,8 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   for (const card of byCode.values()) {
     const set = overrideFor(overrides, report, { code: card.code, name: card.name });
     const withKeywords = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
-    const next = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
+    const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
+    const next = set?.name ? { ...withBurden, name: set.name } : withBurden;
     cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));

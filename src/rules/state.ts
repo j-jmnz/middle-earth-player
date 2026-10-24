@@ -37,6 +37,7 @@ export type ZoneName =
   | "questStage"
   | "encounterDeck"
   | "encounterDiscard"
+  | "burdenDeck"
   | "victory"
   | "setAside"
   | "removed"
@@ -123,8 +124,16 @@ export type Window =
   | { kind: "choose"; seat: number; options: readonly string[] }
   | { kind: "cancelOffer"; seat: number }
   | { kind: "response"; seat: number }
-  // The scenario is won: the player picks one choice of reward group `group`.
-  | { kind: "resolution"; group: number };
+  // The scenario is won: a player answers the choice that Resolution instruction `step` opens.
+  | { kind: "resolution"; step: number; seat: number };
+
+// What a won scenario writes for the campaign: cards earned (and where each went), heroes that fell, captives.
+export type Earned = { code: string; to: "pool" | "hand" | "hero"; seat: number | null; hero: string | null; step: number };
+export type ResolutionLog = {
+  earned: readonly Earned[];
+  fallen: readonly string[];
+  captives: readonly { seat: number; hero: string }[];
+};
 
 export type UndoLog = {
   phase: Phase;
@@ -145,6 +154,9 @@ export type ScenarioState = {
   questStage: string | null;
   encounterDeck: readonly string[];
   encounterDiscard: readonly string[];
+  // Present only when the scenario makes a burden deck (Flight to the Ford) or sets the Ring-bearer's life.
+  burdenDeck?: readonly string[];
+  life?: number;
   victory: readonly string[];
   setAside: readonly string[];
   removed: readonly string[];
@@ -185,8 +197,10 @@ export type ScenarioState = {
   setup: readonly Instruction[];
   widgets: ScenarioDefinition["widgets"];
   resolution: ScenarioDefinition["resolution"];
-  // The code picked in each reward group so far, in group order.
-  resolutionChoices: readonly string[];
+  // The next Resolution instruction to run, the seat it is asking, and what the resolution has recorded so far.
+  resolutionAt: number;
+  resolutionSeat: number;
+  resolutionLog: ResolutionLog;
   engagement: { ordinal: number; engagedThisPass: boolean } | null;
   resolvedAttacks: readonly string[];
   pendingAttack: PendingAttack | null;
@@ -259,6 +273,8 @@ export function blankScenario(input: {
     questStage: null,
     encounterDeck: [],
     encounterDiscard: [],
+    ...(input.definition.burdenDeck ? { burdenDeck: [] } : {}),
+    ...(input.definition.life != null ? { life: input.definition.life } : {}),
     victory: [],
     setAside: [],
     removed: [],
@@ -295,7 +311,9 @@ export function blankScenario(input: {
     setup: input.definition.setup,
     widgets: input.definition.widgets,
     resolution: input.definition.resolution,
-    resolutionChoices: [],
+    resolutionAt: 0,
+    resolutionSeat: 0,
+    resolutionLog: { earned: [], fallen: [], captives: [] },
     engagement: null,
     resolvedAttacks: [],
     pendingAttack: null,

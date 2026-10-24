@@ -10,7 +10,7 @@
   "encounterSets": [
     {
       "name": "A Shadow of the Past",
-      "count": 29
+      "count": 26
     },
     {
       "name": "Hunted",
@@ -123,18 +123,6 @@
       "pile": "encounter"
     },
     {
-      "code": "141077",
-      "normal": 1,
-      "easy": 1,
-      "pile": "encounter"
-    },
-    {
-      "code": "141079",
-      "normal": 1,
-      "easy": 1,
-      "pile": "encounter"
-    },
-    {
       "code": "141022",
       "normal": 1,
       "easy": 1,
@@ -159,12 +147,6 @@
       "pile": "staging"
     },
     {
-      "code": "141078",
-      "normal": 1,
-      "easy": 1,
-      "pile": "staging"
-    },
-    {
       "code": "141031",
       "normal": 1,
       "easy": 1,
@@ -175,14 +157,20 @@
       "normal": 1,
       "easy": 1,
       "pile": "setAside"
-    },
-    {
-      "code": "141017",
-      "normal": 1,
-      "easy": 1,
-      "pile": "attached"
     }
   ],
+  "campaignCard": "141030",
+  "campaignPlaced": [
+    "141017",
+    "141077",
+    "141078",
+    "141079"
+  ],
+  "widgets": {
+    "hide": true,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
   "source": {
     "dragnNormal": "Q0C.01",
     "dragnEasy": "E0C.01",

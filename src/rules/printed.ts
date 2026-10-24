@@ -47,6 +47,10 @@ export type PrintedCard = {
   engagementCost: number | null;
   keywords: Keywords;
   leavesPlayLoses: boolean;
+  // A boon or burden (Campaign Mode), its burden set, and the deck it joins when it is in the campaign pool.
+  campaignKind: "boon" | "burden" | null;
+  burdenSet: string | null;
+  backType: "player" | "encounter" | null;
 };
 
 const EMPTY_KEYWORDS: Keywords = {
@@ -82,6 +86,9 @@ export function definePrinted(
     isUnique: false,
     engagementCost: null,
     leavesPlayLoses: false,
+    campaignKind: null,
+    burdenSet: null,
+    backType: null,
     ...card,
     keywords: { ...EMPTY_KEYWORDS, ...card.keywords },
   };
@@ -143,6 +150,9 @@ export function printedFromCard(card: Card): PrintedCard {
     isUnique: card.isUnique,
     engagementCost: card.engagementCost,
     leavesPlayLoses: keywords.leavesPlayLoses === true,
+    campaignKind: card.campaignKind,
+    burdenSet: card.burdenSet,
+    backType: card.backType,
     keywords: {
       surge: keywords.surge === true,
       hide: keywords.hide ?? null,

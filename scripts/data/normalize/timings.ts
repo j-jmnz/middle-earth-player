@@ -9,11 +9,13 @@ const LABELS: ReadonlyMap<string, string> = new Map([
   ["shadow", "shadow"],
   ["travel", "travel"],
   ["quest resolution", "questResolution"],
+  // Campaign cards only: the line on the back of the card.
+  ["resolution", "resolution"],
 ]);
 
 const LABEL = /^(?:(?:Valour|Planning|Quest|Travel|Encounter|Combat|Refresh|Resource)\s+)?([A-Z][A-Za-z ]+?):\s/;
 
-export function timingLabels(text: string | null, keywordsOnly: (line: string) => boolean): string[] {
+export function timingLabels(text: string | null, keywordsOnly: (line: string) => boolean, campaign = false): string[] {
   if (!text) return [];
   const out: string[] = [];
   for (const raw of text.split("\n")) {
@@ -21,7 +23,7 @@ export function timingLabels(text: string | null, keywordsOnly: (line: string) =
     if (line === "" || keywordsOnly(line)) continue;
     const match = LABEL.exec(line);
     const label = match?.[1] ? LABELS.get(match[1].toLowerCase()) : undefined;
-    out.push(label ?? "constant");
+    out.push(campaign && label === "setup" ? "campaignSetup" : (label ?? "constant"));
   }
   return out;
 }
@@ -29,13 +31,14 @@ export function timingLabels(text: string | null, keywordsOnly: (line: string) =
 // The timings a record may have when it implements this printed line. A labelled line ("Forced: ...") is that
 // timing, and so is any label quoted inside it (a condition attachment's parenthetical). A line with no label
 // is a constant ability, or an effect that triggers on a condition, or text that rides on the card's own timing.
-const UNLABELLED = ["constant", "triggered", "forced", "whenRevealed", "questResolution", "setup"];
+const UNLABELLED = ["constant", "triggered", "forced", "whenRevealed", "questResolution", "setup", "resolution"];
 
 export function lineTimings(line: string): Set<string> {
   const allowed = new Set<string>();
   const lead = LABEL.exec(line.trim());
   const label = lead?.[1] ? LABELS.get(lead[1].toLowerCase()) : undefined;
   if (label) allowed.add(label);
+  if (label === "setup") allowed.add("campaignSetup");
   for (const match of line.matchAll(/(?:^|[("'\s])([A-Z][A-Za-z ]+?):\s/g)) {
     const inner = match[1] ? LABELS.get(match[1].toLowerCase()) : undefined;
     if (inner) allowed.add(inner);

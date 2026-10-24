@@ -33,7 +33,7 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
     if (current.stageCleared && !current.window && !current.failure) {
-      const asking = openResolution(current);
+      const asking = openResolution(current, ctx);
       if (asking !== current) {
         current = asking;
         continue;
@@ -72,7 +72,7 @@ export function applyIntent(
     case "Choose":
       return applyChoice(state, intent.optionId);
     case "ChooseResolution":
-      return applyResolution(state, intent.optionId);
+      return applyResolution(state, intent.optionId, ctx);
     case "Travel":
       return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":

@@ -24,14 +24,15 @@ describe("setup records", () => {
   }
 
   it("mirror the instructions the definition and the script already run", () => {
-    const run = [...world.definition.setup, { verb: "ShuffleEncounterDeck" }];
+    const start = buildStart({ campaign, scenario, seatCount: 1, seed: 5, threatModifier: 0, seats: [{ heroes: [FRODO, SAM], deck: [] }], effects: EFFECTS });
+    const run = start.definition.setup;
     for (const code of SETUP_CODES) {
       const record = EFFECTS.find((effect) => effect.cardCode === code && effect.timing === "setup");
       expect(record, code).toBeDefined();
       expect(isSubsequence(record?.instructions ?? [], run), code).toBe(true);
     }
     // The campaign script, not the definition, runs the 141085 Setup record.
-    expect(world.definition.setup.some((instruction) => "code" in instruction && instruction.code === RING)).toBe(false);
+    expect(start.definition.setup.filter((instruction) => "code" in instruction && instruction.code === RING)).toHaveLength(1);
   });
 
   it("never place a card a second time", () => {
@@ -40,6 +41,7 @@ describe("setup records", () => {
       seed: 5,
       threatModifier: 0,
       seats: [{ heroes: [FRODO, SAM], deck: [] }],
+      effects: EFFECTS,
     });
     const ctx: ReduceContext = { effects: EFFECTS, cards: world.cards };
     const started = startScenario(start, ctx);
@@ -62,6 +64,7 @@ describe("Gandalf's Delay", () => {
       seats: seats === 1
         ? [{ heroes: [FRODO, SAM], deck: STARTER }]
         : [{ heroes: [FRODO, SAM], deck: STARTER }, { heroes: [MERRY], deck: STARTER }],
+      effects: EFFECTS,
     });
     const ctx: ReduceContext = { effects: EFFECTS, cards: world.cards };
     return { started: startScenario(start, ctx), ctx };

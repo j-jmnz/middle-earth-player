@@ -54,7 +54,7 @@ export function applyPrinted(cards: readonly Card[], ledger: Ledger): { cards: C
       text: front.text,
       shadowText: front.shadow,
       back,
-      timings: [...timingLabels(front.text, isKeywordLine), ...timingLabels(backText, isKeywordLine), ...(front.shadow ? ["shadow"] : [])],
+      timings: [...timingLabels(front.text, isKeywordLine, card.type === "campaign"), ...timingLabels(backText, isKeywordLine, card.type === "campaign"), ...(front.shadow ? ["shadow"] : [])],
     };
   });
   return { cards: out, differences };

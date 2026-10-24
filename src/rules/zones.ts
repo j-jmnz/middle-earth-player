@@ -5,7 +5,7 @@ import { inPlay, updateCard, withSeat } from "./state.ts";
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
   | { zone: "seatQuest"; seat: number }
-  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "victory" | "setAside" | "removed" | "questDeck" }
+  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" }
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage" }
   | { zone: "shadow"; enemyId: string }
   | { zone: "attached" };
@@ -66,6 +66,8 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       return { ...state, encounterDeck: without(state.encounterDeck, id) };
     case "encounterDiscard":
       return { ...state, encounterDiscard: without(state.encounterDiscard, id) };
+    case "burdenDeck":
+      return { ...state, burdenDeck: without(state.burdenDeck ?? [], id) };
     case "victory":
       return { ...state, victory: without(state.victory, id) };
     case "setAside":
@@ -131,6 +133,8 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
       return { ...stamped, encounterDeck: append(stamped.encounterDeck, id) };
     case "encounterDiscard":
       return { ...stamped, encounterDiscard: append(stamped.encounterDiscard, id) };
+    case "burdenDeck":
+      return { ...stamped, burdenDeck: append(stamped.burdenDeck ?? [], id) };
     case "victory":
       return { ...stamped, victory: append(stamped.victory, id) };
     case "setAside":

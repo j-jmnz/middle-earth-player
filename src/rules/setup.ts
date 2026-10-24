@@ -8,11 +8,15 @@ import { shuffleIds } from "./seed.ts";
 import { handSetup, searchSetup } from "./setup-search.ts";
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
 import { cloneGame } from "./undo.ts";
-import { moveCard, spawn } from "./zones.ts";
+import { attachTo, moveCard, spawn } from "./zones.ts";
 
 export type StartSeat = {
   heroes: readonly string[];
   deck: readonly string[];
+  // Campaign Setup Checklist step 5 and the campaign card's Setup: boons and burdens attached to a hero at the start
+  // (`host` is the hero's code), and cards a campaign card adds to the seat's hand before the opening hand is drawn.
+  attachments?: readonly { host: string; code: string }[];
+  hand?: readonly string[];
 };
 
 export type StartScenario = {
@@ -23,6 +27,8 @@ export type StartScenario = {
   seats: readonly StartSeat[];
   encounterDeck: readonly string[];
   questDeck: readonly string[];
+  // The burden deck of the scenario, when it has one. It is shuffled into a deck beside the quest deck.
+  burdenDeck?: readonly string[];
 };
 
 export function startScenario(input: StartScenario, ctx: ReduceContext): ScenarioState {
@@ -39,6 +45,11 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = spawn(state, code, { zone: "encounterDeck" }).state;
   }
   state = shuffleZone(state, "encounter");
+  if (input.burdenDeck && input.burdenDeck.length > 0) {
+    for (const code of input.burdenDeck) state = spawn(state, code, { zone: "burdenDeck" }).state;
+    const shuffled = shuffleIds(state.burdenDeck ?? [], state.seed, state.seedCursor);
+    state = { ...state, burdenDeck: shuffled.ids, seedCursor: shuffled.cursor };
+  }
   for (let index = 0; index < input.seatCount; index += 1) {
     const seat = input.seats[index];
     if (!seat) throw new Error(`Missing seat ${index}`);
@@ -47,6 +58,13 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
       state = spawn(state, code, { zone: "heroes", seat: index }).state;
       threat += printedOf(ctx.cards, code).threat ?? 0;
     }
+    for (const attached of seat.attachments ?? []) {
+      const host = Object.values(state.cards).find((card) => card.code === attached.host && card.controller === index && card.zone === "heroes");
+      if (!host) throw new Error(`Seat ${index} has no hero ${attached.host} to attach ${attached.code} to`);
+      const spawned = spawn(state, attached.code, { zone: "play", seat: index });
+      state = attachTo(spawned.state, spawned.id, host.id);
+    }
+    for (const code of seat.hand ?? []) state = spawn(state, code, { zone: "hand", seat: index }).state;
     for (const code of seat.deck) state = spawn(state, code, { zone: "deck", seat: index }).state;
     state = withThreat(state, index, threat);
     state = shuffleZone(state, index);

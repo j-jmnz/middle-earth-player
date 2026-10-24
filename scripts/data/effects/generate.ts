@@ -27,6 +27,7 @@ const LABEL_TIMING: ReadonlyMap<string, string> = new Map([
   ["shadow", "shadow"],
   ["travel", "travel"],
   ["quest resolution", "questResolution"],
+  ["resolution", "resolution"],
 ]);
 
 function normalize(line: string): string {
@@ -96,7 +97,7 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
         continue;
       }
       const label = /^([A-Z][A-Za-z ]+?):\s/.exec(line)?.[1]?.toLowerCase();
-      const timing = (label ? LABEL_TIMING.get(label) : undefined) ?? null;
+      const timing = ((label === "setup" && card.type === "campaign" ? "campaignSetup" : label ? LABEL_TIMING.get(label) : undefined)) ?? null;
       // A labelled line that no template reads keeps its number, so the authored record that replaces it lines up.
       if (timing) next(timing);
       unmatched.push({ ...segment, timing });

@@ -25,8 +25,8 @@ export const RIDER = "141039";
 export type World = { definition: ScenarioDefinition; cards: Map<string, PrintedCard> };
 
 export async function loadWorld(): Promise<World> {
-  const definition = scenarioDefinition(scenario, campaign);
-  const codes = [...new Set([...scenarioCards(scenario).map((card) => card.code), FRODO, SAM, MERRY, RING])];
+  const definition = scenarioDefinition(scenario, campaign, EFFECTS);
+  const codes = [...new Set([...scenarioCards(scenario).map((card) => card.code), ...scenario.campaignPlaced, FRODO, SAM, MERRY, RING])];
   const cards = new Map(await loadPrinted(codes));
   for (const [code, threat] of [["f0", 0], ["f3", 3]] as const) {
     cards.set(code, definePrinted({ code, name: code, type: "enemy", threat, engagementCost: 50, attack: 1, defense: 1, health: 3 }));

@@ -89,12 +89,6 @@ export const ringsDbCardSchema = z
   })
   .strip();
 
-// One reward group. The player picks one choice per group, in order. Codes come from the catalog build,
-// which looks the fixture's card names up; nothing in src names a reward code.
-export const resolutionOptionSchema = z.strictObject({
-  id: z.string().min(1),
-  choices: z.array(z.strictObject({ code: z.string().min(1) })).min(1),
-});
 
 const encounterSetSchema = z.strictObject({
   code: z.string(),
@@ -119,14 +113,20 @@ export const scenarioDefinitionSchema = z.strictObject({
   stages: z.array(stageSchema),
   widgets: widgetsSchema,
   setup: z.array(instructionSchema),
-  resolution: z.array(resolutionOptionSchema),
+  // The campaign card's Resolution records, in line order. The reducer asks the players for each choice they open.
+  resolution: z.array(instructionSchema),
+  // Cards of the burden deck (Flight to the Ford), in booklet order, and the Ring-bearer's starting life. Absent
+  // when the scenario has neither; the widget flags are derived from them.
+  burdenDeck: z.array(z.string().min(1)).optional(),
+  life: z.number().int().positive().optional(),
+  // The campaign card whose Setup and Resolution records belong to this scenario.
+  campaignCard: z.string().min(1).optional(),
   bookletPage: z.number().int().optional(),
 });
 
 export type RingsDbPack = z.infer<typeof ringsDbPackSchema>;
 export type RingsDbCard = z.infer<typeof ringsDbCardSchema>;
 export type PrintedKeywords = z.infer<typeof printedKeywordsSchema>;
-export type ResolutionOption = z.infer<typeof resolutionOptionSchema>;
 export type ScenarioDefinition = z.infer<typeof scenarioDefinitionSchema>;
 
 function issuePaths(error: z.ZodError): string {

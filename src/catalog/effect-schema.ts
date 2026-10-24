@@ -71,6 +71,10 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
+  // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
+  z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
+  // A card with this code is attached to a hero (`is`) or is not.
+  z.strictObject({ kind: z.literal("attachedToHero"), code: z.string().min(1), is: z.boolean() }),
 ]);
 
 export const targetSchema = z.discriminatedUnion("kind", [
@@ -215,6 +219,30 @@ const simpleVerbs = [
   z.strictObject({ verb: z.literal("TransferHost"), who: whoSchema, ...when }),
   // The players win the scenario. The resolution choices follow.
   verb("WinGame"),
+  // Setup: a card from the box joins the encounter deck. The deck is shuffled by the Setup step that says so.
+  codeVerb("ShuffleIntoEncounterDeck"),
+  // Campaign setup: the voluntary hero change costs no threat penalty on this scenario's card.
+  verb("WaiveThreatPenalty"),
+  // Campaign setup and resolution: players pick from a list of boons or burdens. `to` says where the pick goes:
+  // `pool` earns it, `hand` earns it and puts it in the chooser's hand, `hero` earns it and attaches it to a hero
+  // the chooser controls. `optional` lets a player pick nothing. `leftover` says where unchosen cards go.
+  z.strictObject({
+    verb: z.literal("ChooseCards"),
+    codes: z.array(z.string().min(1)).min(1),
+    who: z.enum(["firstPlayer", "eachSeat"]),
+    to: z.enum(["pool", "hand", "hero"]),
+    optional: z.boolean().optional(),
+    leftover: z.enum(["firstPlayerDeck"]).optional(),
+    ...when,
+  }),
+  // Resolution: these cards are earned, with no choice.
+  z.strictObject({ verb: z.literal("Earn"), codes: z.array(z.string().min(1)).min(1), ...when }),
+  // Resolution: every burden in play, in the encounter deck and in the encounter discard pile is earned.
+  verb("EarnAllBurdens"),
+  // Resolution: the hero this card is attached to joins the fallen heroes.
+  z.strictObject({ verb: z.literal("MarkFallen"), attached: z.string().min(1), ...when }),
+  // Resolution: each player names a hero they control as a captive, other than these traits or codes.
+  z.strictObject({ verb: z.literal("NameCaptives"), except: z.array(z.string().min(1)), ...when }),
 ] as const;
 
 const simpleInstructionSchema = z.discriminatedUnion("verb", simpleVerbs);
@@ -265,6 +293,9 @@ export const timingSchema = z.enum([
   "shadow",
   "constant",
   "questResolution",
+  // The Setup and the Resolution printed on a campaign card (front and back).
+  "campaignSetup",
+  "resolution",
   "travel",
   "engagement",
   "beginningOfPhase",

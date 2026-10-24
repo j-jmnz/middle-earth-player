@@ -5,7 +5,7 @@ import { updateCard, type ScenarioState } from "../rules/state.ts";
 import { openResolution, resolutionResult } from "../rules/resolution.ts";
 import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Run, type Table } from "../../scripts/test-scene.ts";
 
-import { applyResolution, EMPTY_LOG } from "./resolution.ts";
+import { applyResolution, emptyLog } from "./log.ts";
 
 let base: Awaited<ReturnType<typeof sceneCards>>;
 
@@ -22,18 +22,21 @@ function winningQuest(): { run: Run; table: Table } {
   return { run: send(run, { type: "Pass" }, table.ctx), table };
 }
 
-function choicesOf(state: ScenarioState, group: number): string[] {
-  return state.resolution[group]?.choices.map((choice) => choice.code) ?? [];
+const FIRST = ["141078", "141079"];
+const SECOND = ["141077", "141017"];
+
+function optionsOf(state: ScenarioState, ctx: Table["ctx"]): string[] {
+  return legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
 }
 
 describe("win detection from stage 3", () => {
-  it("the location leaves play explored, its questResolution record wins, and the first reward group opens", () => {
+  it("the location leaves play explored, its questResolution record wins, and the first resolution choice opens", () => {
     const { run, table } = winningQuest();
     expect(run.state.cards[idsOf(table, "141035")]?.zone).toBe("encounterDiscard");
     expect(run.state.stageCleared).toBe(true);
     expect(run.state.lost).toBe(false);
     expect(run.state.stack).toEqual([]);
-    expect(run.state.window).toEqual({ kind: "resolution", group: 0 });
+    expect(run.state.window).toEqual({ kind: "resolution", step: 0, seat: 0 });
   });
 
   it("a quest phase that leaves the location short wins nothing", () => {
@@ -47,37 +50,35 @@ describe("win detection from stage 3", () => {
 
 describe("a win with frames still pending", () => {
   it("drops the pending frames when the resolution window opens, and keeps the win", () => {
-    const { run } = winningQuest();
+    const { run, table } = winningQuest();
     const frame = { id: "f99", frame: "reveal" as const, cardId: null, seat: 0, peril: false, step: 0, data: { kind: "none" as const } };
-    const pending: ScenarioState = { ...run.state, window: null, stack: [frame], resolutionChoices: [] };
-    const opened = openResolution(pending);
+    const pending: ScenarioState = { ...run.state, window: null, stack: [frame], resolutionAt: 0 };
+    const opened = openResolution(pending, table.ctx);
     expect(opened.stack).toEqual([]);
     expect(opened.stageCleared).toBe(true);
     expect(opened.lost).toBe(false);
-    expect(opened.window).toEqual({ kind: "resolution", group: 0 });
+    expect(opened.window).toEqual({ kind: "resolution", step: 0, seat: 0 });
   });
 });
 
+// The records on 141030's back: choose Gandalf's Delay or The Ring Draws Them, then Gildor Inglorion or Mr. Underhill.
 describe("resolution window", () => {
-  it("offers the codes of one group at a time, in order, and refuses anything else", () => {
+  it("asks the first player one choice at a time, in the card's order, and refuses anything else", () => {
     const { run, table } = winningQuest();
-    const first = choicesOf(run.state, 0);
-    const second = choicesOf(run.state, 1);
-    expect(first).toHaveLength(2);
-    expect(second).toHaveLength(2);
-    expect(legalIntents(run.state, table.ctx)).toEqual(first.map((optionId) => ({ type: "ChooseResolution", optionId })));
-    const wrongGroup = reduce(run.state, { type: "ChooseResolution", optionId: second[0] ?? "" }, table.ctx);
-    expect(wrongGroup.ok).toBe(false);
-    if (!wrongGroup.ok) expect(wrongGroup.reason).toBe("That is not a choice in this group");
+    expect(run.state.resolution.map((instruction) => instruction.verb)).toEqual(["ChooseCards", "ChooseCards"]);
+    expect(optionsOf(run.state, table.ctx)).toEqual(FIRST);
+    const wrong = reduce(run.state, { type: "ChooseResolution", optionId: SECOND[0] ?? "" }, table.ctx);
+    expect(wrong.ok).toBe(false);
+    if (!wrong.ok) expect(wrong.reason).toBe("That is not a choice here");
     expect(reduce(run.state, { type: "Pass" }, table.ctx).ok).toBe(false);
 
-    let next = send(run, { type: "ChooseResolution", optionId: first[1] ?? "" }, table.ctx);
-    expect(next.state.window).toEqual({ kind: "resolution", group: 1 });
+    let next = send(run, { type: "ChooseResolution", optionId: FIRST[1] ?? "" }, table.ctx);
+    expect(next.state.window).toEqual({ kind: "resolution", step: 1, seat: 0 });
     expect(resolutionResult(next.state)).toBeNull();
-    next = send(next, { type: "ChooseResolution", optionId: second[0] ?? "" }, table.ctx);
+    next = send(next, { type: "ChooseResolution", optionId: SECOND[0] ?? "" }, table.ctx);
     expect(next.state.window).toBeNull();
     expect(legalIntents(next.state, table.ctx)).toEqual([]);
-    expect(resolutionResult(next.state)).toEqual([first[1], second[0]]);
+    expect(resolutionResult(next.state)?.earned.map((item) => item.code)).toEqual([FIRST[1], SECOND[0]]);
   });
 
   it("cannot be answered with a number or twice", () => {
@@ -90,38 +91,46 @@ describe("resolution window", () => {
 describe("campaign log", () => {
   function won(): { state: ScenarioState; table: Table } {
     const { run, table } = winningQuest();
-    const first = choicesOf(run.state, 0);
-    const second = choicesOf(run.state, 1);
-    const picked = send(send(run, { type: "ChooseResolution", optionId: first[0] ?? "" }, table.ctx), { type: "ChooseResolution", optionId: second[1] ?? "" }, table.ctx);
+    const picked = send(send(run, { type: "ChooseResolution", optionId: FIRST[0] ?? "" }, table.ctx), { type: "ChooseResolution", optionId: SECOND[1] ?? "" }, table.ctx);
     return { state: picked.state, table };
   }
 
-  it("records each chosen card once, a Permanent card as attached, and not the cards left on the table", () => {
+  it("records each chosen card once, a Permanent card on the Ring-bearer, and not the cards left on the table", () => {
     const { state, table } = won();
-    const [kept, joined] = [choicesOf(state, 0)[0] ?? "", choicesOf(state, 1)[1] ?? ""];
-    const log = applyResolution(EMPTY_LOG, state.scenarioId, state, table.ctx.cards);
-    expect(log.scenarios[state.scenarioId]?.rewards).toEqual([kept, joined]);
-    const permanent = [kept, joined].filter((code) => table.ctx.cards.get(code)?.keywords.permanent);
-    expect(log.attached).toEqual(permanent);
-    expect(log.pool).toEqual([kept, joined].filter((code) => !permanent.includes(code)));
-    for (const code of [...choicesOf(state, 0), ...choicesOf(state, 1)].filter((code) => code !== kept && code !== joined)) {
-      expect([...log.pool, ...log.attached]).not.toContain(code);
-    }
+    const log = applyResolution(emptyLog(1), state.scenarioId, state, table.ctx.cards);
+    expect(log.completed).toEqual([state.scenarioId]);
+    expect(log.campaignPool).toEqual([
+      { code: "141078", back: "encounter", burdenSet: "A Shadow of the Past", attachedTo: null, seat: 0 },
+      { code: "141017", back: "player", burdenSet: null, attachedTo: FRODO, seat: 0 },
+    ]);
+    expect(log.campaignPool.map((card) => card.code)).not.toContain("141079");
+    expect(log.campaignPool.map((card) => card.code)).not.toContain("141077");
+  });
+
+  it("scores the win by the Learn to Play formula", () => {
+    const { state, table } = won();
+    const log = applyResolution(emptyLog(1), state.scenarioId, state, table.ctx.cards);
+    const record = log.scenarios[state.scenarioId];
+    expect(record?.rounds).toBe(state.round);
+    const damage = state.seats[0]?.heroes.reduce((sum, id) => sum + (state.cards[id]?.damage ?? 0), 0) ?? 0;
+    expect(record?.score).toBe((state.seats[0]?.threat ?? 0) + damage + 10 * state.round - (record?.victoryPoints ?? 0));
+    expect(log.score).toBe(record?.score);
   });
 
   it("does not grant the reward a second time", () => {
     const { state, table } = won();
-    const once = applyResolution(EMPTY_LOG, state.scenarioId, state, table.ctx.cards);
+    const once = applyResolution(emptyLog(1), state.scenarioId, state, table.ctx.cards);
     const again = applyResolution(once, state.scenarioId, state, table.ctx.cards);
     expect(again).toBe(once);
   });
 
   it("writes nothing for a loss, or while a choice is still open", () => {
     const { run, table } = winningQuest();
-    expect(applyResolution(EMPTY_LOG, run.state.scenarioId, run.state, table.ctx.cards)).toBe(EMPTY_LOG);
+    const empty = emptyLog(1);
+    expect(applyResolution(empty, run.state.scenarioId, run.state, table.ctx.cards)).toBe(empty);
     const { state } = won();
     const lost = { ...state, lost: true, lossReason: "test" };
-    expect(applyResolution(EMPTY_LOG, state.scenarioId, lost, table.ctx.cards)).toBe(EMPTY_LOG);
-    expect(applyResolution(EMPTY_LOG, "other-scenario", state, table.ctx.cards)).toBe(EMPTY_LOG);
+    expect(applyResolution(empty, state.scenarioId, lost, table.ctx.cards)).toBe(empty);
+    expect(applyResolution(empty, "other-scenario", state, table.ctx.cards)).toBe(empty);
   });
 });

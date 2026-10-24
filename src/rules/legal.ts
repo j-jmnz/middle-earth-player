@@ -47,7 +47,7 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
     case "response":
       return [{ type: "Pass" }, ...triggerIntents(state, ctx)];
     case "resolution":
-      return resolutionIntents(state);
+      return resolutionIntents(state, ctx);
     case "travel":
       return travelIntents(state, ctx);
     case "optionalEngage":
@@ -124,7 +124,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
     case "Choose":
       return optionReason(state, intent);
     case "ChooseResolution":
-      return resolutionReason(state, intent);
+      return resolutionReason(state, intent, ctx);
     case "Travel":
       return travelReason(state, intent, ctx);
     case "DeclineTravel":

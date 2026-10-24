@@ -48,6 +48,15 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return state.pendingAttack != null && (state.pendingAttack.defenderId == null || state.pendingAttack.undefended === true);
     case "searchable":
       return searchable(state, condition, ctx).length > 0;
+    case "inPlay":
+      return Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone)) === condition.is;
+    case "attachedToHero":
+      return (
+        Object.values(state.cards).some((card) => {
+          const host = card.host ? state.cards[card.host] : undefined;
+          return card.code === condition.code && card.zone === "attached" && host != null && printedOf(ctx.cards, host.code).type === "hero";
+        }) === condition.is
+      );
   }
 }
 

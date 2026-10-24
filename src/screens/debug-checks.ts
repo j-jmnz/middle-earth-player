@@ -1,3 +1,4 @@
+import { EFFECTS } from "../effects";
 import {
   normalEncounterSize,
   scenarioCards,
@@ -100,12 +101,12 @@ function heroSentences(hero: DebugCheckInput["hero"]): string[] {
 }
 
 function scenarioSentences(input: DebugCheckInput): string[] {
-  const definition = scenarioDefinition(input.scenario, input.campaign);
+  const definition = scenarioDefinition(input.scenario, input.campaign, EFFECTS);
   return [
     `Normal encounter size is ${normalEncounterSize(input.scenario)}.`,
     ...definition.encounterSets.map((set) => `${set.code} has ${set.count} cards.`),
     `Stages are ${listCodes(definition.stages.map((stage) => stage.code))}.`,
-    `Setup instructions: ${definition.setup.length}. Resolution options: ${definition.resolution.length}.`,
+    `Setup instructions: ${definition.setup.length}. Resolution instructions: ${definition.resolution.length}.`,
   ];
 }
 

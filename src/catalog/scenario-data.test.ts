@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
+import { EFFECTS } from "../effects/index.ts";
 import { scenarioDefinitionSchema } from "./boundary.ts";
 import { normalCopiesByCode, normalEncounterSize, scenarioCards, scenarioDefinition } from "./scenario-data.ts";
 
@@ -10,7 +11,8 @@ describe("a-shadow-of-the-past scenario data", () => {
   const campaign = loadCampaign();
 
   it("counts the Normal encounter deck from the cards", () => {
-    expect(normalEncounterSize(scenario)).toBe(42);
+    // 40 cards from the box. Gildor Inglorion and The Ring Draws Them are shuffled in by the campaign card's Setup.
+    expect(normalEncounterSize(scenario)).toBe(40);
   });
 
   it("keeps the quest stages in printed order", () => {
@@ -40,7 +42,7 @@ describe("a-shadow-of-the-past scenario data", () => {
   it("derives the booklet sets, the quest-card setup and the rewards", () => {
     const definition = scenarioDefinitionSchema.parse(scenarioDefinition(scenario, campaign));
     expect(definition.encounterSets).toEqual([
-      { code: "A Shadow of the Past", count: 29 },
+      { code: "A Shadow of the Past", count: 26 },
       { code: "Hunted", count: 6 },
       { code: "The Ring", count: 3 },
       { code: "The Black Riders", count: 5 },
@@ -49,14 +51,11 @@ describe("a-shadow-of-the-past scenario data", () => {
     expect(definition.setup).toEqual([
       { verb: "SetAside", code: "141035" },
       { verb: "AddToStaging", code: "141039" },
-      { verb: "AddToStaging", code: "141078" },
       { verb: "MakeActiveLocation", code: "141031" },
-      { verb: "AttachToRingBearer", code: "141017" },
     ]);
-    expect(definition.resolution).toEqual([
-      { id: "gandalfs-delay-or-the-ring-draws-them", choices: [{ code: "141078" }, { code: "141079" }] },
-      { id: "gildor-or-mr-underhill", choices: [{ code: "141077" }, { code: "141017" }] },
-    ]);
+    expect(scenario.campaignPlaced).toEqual(["141017", "141077", "141078", "141079"]);
+    const records = scenarioDefinitionSchema.parse(scenarioDefinition(scenario, campaign, EFFECTS));
+    expect(records.resolution.map((instruction) => instruction.verb)).toEqual(["ChooseCards", "ChooseCards"]);
     expect(definition.stages.map((stage) => stage.code)).toEqual(["141022", "141023", "141024"]);
   });
 

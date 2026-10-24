@@ -1,3 +1,4 @@
+import { EFFECTS } from "../src/effects/index.ts";
 import { scenarioDefinition } from "../src/catalog/scenario-data.ts";
 import type { ScenarioDefinition } from "../src/catalog/boundary.ts";
 import { printedFromCard, type PrintedCard } from "../src/rules/printed.ts";
@@ -18,5 +19,5 @@ export async function loadPrinted(codes: readonly string[]): Promise<ReadonlyMap
 }
 
 export async function loadDefinition(id: string): Promise<ScenarioDefinition> {
-  return scenarioDefinition(loadScenario(id), loadCampaign());
+  return scenarioDefinition(loadScenario(id), loadCampaign(), EFFECTS);
 }
