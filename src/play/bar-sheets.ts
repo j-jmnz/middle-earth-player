@@ -6,7 +6,7 @@ import { legalTargets } from "../rules/reduce.ts";
 import type { PayRequest, Share } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
 import type { DistributePurpose, DistributeSheet, MultiSheet, SheetNames, TriggerSheet } from "./sheet-types.ts";
-import { option, step, triggerOptions } from "./sheets.ts";
+import { option, statOf, step, triggerOptions } from "./sheets.ts";
 
 export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, pendingCommit: readonly string[]): MultiSheet {
   return {
@@ -16,7 +16,7 @@ export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: Shee
     title: "Commit to the quest",
     note: "Committed characters exhaust and add their willpower against the threat in staging.",
     verb: "Commit",
-    options: legalTargets(game, { type: "Commit" }, ctx).map((id) => option(game, names, id)),
+    options: legalTargets(game, { type: "Commit" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
     build: { kind: "Commit" },
     allowEmpty: false,
     preselected: pendingCommit,

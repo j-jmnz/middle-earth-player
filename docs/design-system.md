@@ -11,17 +11,17 @@ A game, not a form. The phone is a lamp-lit table at night: deep blue-black, war
 - **Night** is the page. Every screen sits on a scene backdrop that gives depth: a gradient sky, a soft glow, sometimes a mountain ridge.
 - **Gold is the Ring.** Gold marks one thing per screen: the current node, the primary button, the selected choice. If two things are gold, one of them is wrong.
 - **Parchment is what gets recorded or decided.** The splash, the campaign log, and every choice sheet on the table are paper with ink.
-- **Card art does the illustrating.** Hero tiles, deck covers, and the inspect screen use the real cached card pictures. Do not draw characters, scenery, or icons in SVG or Skia beyond the backdrop scenes and the ring.
+- **Card art does the illustrating.** Hero tiles, deck covers, and the inspect screen use the real cached card pictures. Do not draw characters or scenery in SVG or Skia beyond the backdrop scenes and the ring. The game's own printed icons are the exception: see Icons.
 - **Few words.** A label says what something is, in plain words: no codes, no JSON-ish labels, no ALL CAPS tables. The collector code shows only on the card screen and as row detail in a pack.
 
 ## Performance
 
 Feel outranks decoration. These are exit conditions.
 
-- A list is a FlashList. A row is one pressable, text, and at most one image decoded at 32×44. No blur, no shadow, and no gradient on a row. The name still shows when the file is missing.
+- A list is a FlashList. A row is one pressable, text, at most one image decoded at 32×44, and small game icons (see Icons). No blur, no shadow, and no gradient on a row. The name still shows when the file is missing.
 - The backdrop is one static Skia canvas per screen (`backdrop.native.tsx`), drawn once per window size, behind the content. It never sits inside a list row or scrolls. The web build draws the same scene in CSS (`backdrop.tsx`).
 - Press feedback is an immediate fill in the same frame. Nothing animates on the scroll path. Sheets and phase changes use Reanimated and snap under reduced motion.
-- The first screen paints from SQLite. Marcellus is embedded at build time by the `expo-font` config plugin, so there is no runtime font load and no wait. No icon font. No other new package.
+- The first screen paints from SQLite. Marcellus is embedded at build time by the `expo-font` config plugin, so there is no runtime font load and no wait. No icon font is loaded at runtime: the game icons are committed SVG and PNG files (see Icons). No other new package.
 - The table is one Skia canvas. Card pictures stay on that canvas. Chrome text and buttons are React Native. `src/play` cannot import `src/screens`. The canvas uses the `felt` and `feltLight` tokens, copied into play when the table is built.
 
 ## Color
@@ -54,7 +54,7 @@ Values live in `src/screens/palette.js`. `tailwind.config.js` maps them to utili
 | felt / feltLight | `#121613` / `#1F2620` | Table canvas ground and its lit center |
 | threat | `#B9483A` | Damage token, enemy mark |
 | treachery, quest, location, objective | | Encounter marks, as before |
-| leadership, tactics, spirit, lore, fellowship | | Sphere pips sampled from the printed icons |
+| leadership, tactics, spirit, lore, fellowship | | Sphere icon tints sampled from the printed icons (Baggins uses fellowship, Neutral uses faint) |
 
 Contrast pairs, WCAG, all at or above 4.5:1 for body text: bone on night 16.9, muted on night 7.2, faint on night 5.3, faint on raised 4.8, danger on night 8.8, gold on night 10.5, onGold on gold 9.8, ink on paper 14.9, inkMuted on paper 5.0, inkLabel on paper 5.2. Sphere and encounter colors are marks beside a word, never the only signal.
 
@@ -117,11 +117,26 @@ Shared pieces live in `src/screens/chrome.tsx`. They are views and text. They do
 | `Panel` | Raised rounded card on a hairline. `current` swaps to the gold edge |
 | `RingMark` | The Ring: current (gold ring), done (gold disc), locked (hairline ring) |
 | `Segmented` | Two or three words in a pill track. Selected is a gold pill, semibold |
-| `SphereMark` | 8 pt disc beside the sphere word. Neutral has none |
+| `SphereMark` | The sphere's printed icon (14 pt by default) beside the sphere word, tinted with its sphere token |
 | `PaperSheet` | Parchment sheet, grabber, eyebrow repeating the step, Marcellus title |
 | `AppTabBar` | Text tabs on night. Current is semibold bone with a gold dot above |
 
 One `PrimaryButton` per screen or sheet. Other actions are `TextButton`s. Back, Close, and Undo are labeled buttons, never gestures alone. Back lives in the `NavBar`; it goes to the screen below, and to the screen the page belongs to (path from briefing and log, the list from path) when nothing is below. Option lists use bone `TextButton`s; gold marks the one action or a link such as Booklet and Log. Close on the booklet reader sits at the bottom in thumb reach.
+
+## Icons
+
+The game's printed icons, added on the user's request in phase 11. They come from online sources first and must be high resolution (vector, or a raster at least 256 px on its short side); the booklets and the card scans were the fallbacks. `pnpm data:sync icons` fetches the sources into `data/raw/icons` (pinned by sha256 in `data/sources.json`); `pnpm data:build` cuts them out offline into `assets/icons` and writes `src/play/icons/generated.ts` (each icon's source and size) and `src/play/icons/files.generated.ts` (the asset requires); `pnpm data:check` covers both.
+
+| Icons | Source | Format |
+| --- | --- | --- |
+| willpower, attack, defense, hit points, threat, shadow, unique, cost; Leadership, Tactics, Spirit, Lore, Fellowship, Baggins, Neutral; hero, ally, attachment, event, treasure, player side quest, contract; the One Ring | RingsDB icon font `ringsdb.svg` (glyphs named in the font or through `app.css` `.icon-*:before`) | Vector, one SVG per glyph, flipped from the font's y-up units |
+| quest points, engagement cost | DragnCards token art (`dragncards-lotrlcg` S3 `tokens/`) | PNG, 256×256 |
+
+No source clears the bar for the resource, progress and damage tokens (DragnCards' are 146 px, the Learn to Play's token photos 154 to 170 px with a printed number, and the card scans show none), so those stay the drawn coins below and a coin dot in the log. Encounter card types (enemy, location, treachery, objective, quest) print no type icon and stay words. There is no travel token in this box: progress on a location is the progress coin, and Travel stays a word on the rail.
+
+Tinting: a one-colour vector takes a token (bone or muted on night, ink or inkLabel on paper); a sphere icon takes its sphere token. The PNG token art keeps its printed colours. An icon always sits beside its word or carries an accessibility label (an icon and a number read as "Willpower 2"), so the words Maestro asserts stay on screen. In React Native the icon is `GameIcon` (expo-image, SVG or PNG, `tintColor`); on the table canvas it is a Skia path from the same glyph.
+
+Where: the card screen (type, unique, sphere, cost or threat, willpower, attack, defense, hit points, engagement cost, quest points), pool rows, deck editor rows and sphere chips (`SphereMark`), the pool filter's Cost, hero tiles and the briefing (`SphereMark`), the threat rings, the quest band's quest points, the choice sheets (willpower on a quest or Hide commit and in the Hide numbers, attack in a defense header, defense on each defender and on an attacked enemy, attack on each attacker, engagement cost on optional engagement, threat and quest points on travel, hit points left on archery), the log sheet's threat and Hide lines, the campaign log's Threat Modifiers, and the sphere icon on a table card drawn as its name while its file is missing.
 
 ## Card pictures
 
@@ -151,7 +166,7 @@ Scene `plain`, NavBar Back + Booklet. One parchment sheet fills the screen: titl
 Scene `vale`, NavBar Back + Booklet. Eyebrow Scenario N, scenario name in display over the sky. Stages as one line of names with `›`. The deck list is a radio list: the selected deck shows a filled ring and the word Selected as well as the gold name, so the mark does not rest on color, and the options are bone text buttons, not gold. `Segmented` Easy / Normal with the encounter card count beside it. Special rules as small gold-ring tags with the rule name. Booklet opens on the scenario's setup page when the campaign file records one. The deck name, then four hero tiles (three heroes and the Ring-bearer). A missing Ring-bearer is a dashed gold tile labeled Ring-bearer, and the validator sentence in danger below names the card and the rule. "Dealing starts the scenario" in muted, then DEAL. DEAL is disabled and the error stays visible until the loadout is legal.
 
 ### Table — phase 11
-Canvas ground is `felt` with a lit center. Pinned quest stage at the top: small stage art, name in Marcellus, a thin gold progress bar, count. Zones are canvas regions without boxed labels; cards are pictures with real drop shadows on the canvas. Tokens: resources are gold coins, damage red coins, progress bone coins, all 20 pt circles with a number. Exhausted cards rotate 90° and dim. The engaged enemy carries a face-down shadow card showing a gold ring on the card back. The hand fans at the bottom of the canvas; the playable card lifts with a gold edge.
+Canvas ground is `felt` with a lit center. Pinned quest stage at the top: small stage art, name in Marcellus, a thin gold progress bar, count. Zones are canvas regions without boxed labels; cards are pictures with real drop shadows on the canvas. Tokens: resources are gold coins, damage red coins, progress bone coins, all 20 pt circles with a number (no high-resolution token art exists; see Icons). Exhausted cards rotate 90° and dim. The engaged enemy carries a face-down shadow card showing a gold ring on the card back. The hand fans at the bottom of the canvas; the playable card lifts with a gold edge.
 
 The rail is not a full strip: it shows the previous step, the current step in Marcellus caps gold with a soft glow, and the next step, all in one centered line above the bottom bar. Bottom bar: threat in a ring (Marcellus number, label Threat), and PASS as the primary. Life, when declared, sits beside threat the same way. Booklet and Undo are text buttons at the top.
 

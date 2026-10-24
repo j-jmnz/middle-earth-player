@@ -11,7 +11,7 @@ import {
   type DeckSaveRefusal,
 } from "../../../catalog/deck-save";
 import { cards } from "../../../catalog/schema";
-import { BodyText, Label, ListRow, NavBar, PrimaryButton, Screen, TextButton, pressedNight } from "../../chrome";
+import { BodyText, Label, ListRow, NavBar, PrimaryButton, Screen, SphereMark, TextButton, markedSphere, pressedNight, sphereWord } from "../../chrome";
 import {
   changeDraftCount,
   getDeckDraft,
@@ -43,6 +43,8 @@ type EditorRow = {
   name: string;
   imagesrc: string | null;
   deckLimit: number | null;
+  sphereCode: string | null;
+  sphereName: string | null;
 };
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
@@ -83,6 +85,8 @@ function EditorRowView({ item }: { item: EditorRow }) {
     <ListRow
       testID={`deck-card-${item.code}`}
       label={item.name}
+      detail={sphereWord(item.sphereName)}
+      detailIcons={markedSphere(item.sphereCode) ? <SphereMark sphere={markedSphere(item.sphereCode) ?? "neutral"} size={12} /> : null}
       leading={<CardThumb code={item.code} imagesrc={item.imagesrc} width={thumb.width} height={thumb.height} />}
       onPress={() => {
         router.push({ pathname: "/card/[code]", params: { code: item.code } });
@@ -185,6 +189,8 @@ export default function DeckEditor() {
       name: face?.name ?? card.code,
       imagesrc: face?.imagesrc ?? null,
       deckLimit: face?.deckLimit ?? null,
+      sphereCode: face?.sphereCode ?? null,
+      sphereName: face?.sphereName ?? null,
     };
   });
   const total = draft.cards.reduce((sum, card) => sum + card.count, 0);

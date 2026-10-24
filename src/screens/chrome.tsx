@@ -5,6 +5,8 @@ import type { Tabs } from "expo-router";
 import { Backdrop } from "./backdrop";
 import type { SceneName } from "./backdrop-scenes";
 import { palette } from "./palette.js";
+import { GameIcon } from "../play/game-icon";
+import { SPHERE_TINT } from "../play/icon-map";
 import type { MarkedSphere } from "./sphere-mark";
 
 type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
@@ -129,9 +131,12 @@ export function ListRow({
   testID,
   leading,
   trailing,
+  detailIcons,
 }: {
   label: string;
   detail?: string;
+  // Small game icons before the detail line (a sphere, a cost). The detail stays words.
+  detailIcons?: ReactNode;
   onPress: () => void;
   testID: string;
   leading?: ReactNode;
@@ -149,7 +154,12 @@ export function ListRow({
       {leading ? <View className="mr-3">{leading}</View> : null}
       <View className="flex-1">
         <Text className="text-body text-bone">{label}</Text>
-        {detail ? <Text className="mt-0.5 text-label text-muted">{detail}</Text> : null}
+        {detail ? (
+          <View className="mt-0.5 flex-row items-center gap-1.5">
+            {detailIcons}
+            <Text className="shrink text-label text-muted">{detail}</Text>
+          </View>
+        ) : null}
       </View>
       {trailing ?? <Text className="text-body text-faint">›</Text>}
     </Pressable>
@@ -295,20 +305,11 @@ export function Segmented<T extends string>({
   );
 }
 
-const sphereClass = {
-  leadership: "bg-leadership",
-  tactics: "bg-tactics",
-  spirit: "bg-spirit",
-  lore: "bg-lore",
-  fellowship: "bg-fellowship",
-} as const;
-
 export { markedSphere, sphereWord, type MarkedSphere } from "./sphere-mark";
 
-/** 8 point disc beside the sphere word. Neutral has no mark. Color is never the only signal. */
-export function SphereMark({ sphere }: { sphere: MarkedSphere }) {
-  if (sphere === "neutral") return null;
-  return <View className={`h-2 w-2 rounded-pill ${sphereClass[sphere]}`} />;
+/** The sphere's printed icon beside the sphere word, tinted with the sphere token. Color is never the only signal. */
+export function SphereMark({ sphere, size = 14 }: { sphere: MarkedSphere; size?: number }) {
+  return <GameIcon name={sphere} size={size} tint={SPHERE_TINT[sphere] ?? "faint"} />;
 }
 
 /** Parchment sheet over the rail or a list. Repeats the step in an eyebrow. */

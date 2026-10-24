@@ -8,7 +8,9 @@ import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanima
 import { activeCardCodes, textInactive } from "../../../catalog/active-text";
 import { cards } from "../../../catalog/schema";
 import { EFFECTS } from "../../../effects";
-import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, SphereMark, markedSphere, sphereWord } from "../../chrome";
+import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, sphereWord } from "../../chrome";
+import { GameIcon } from "../../../play/game-icon";
+import { SPHERE_TINT, sphereIcon, typeIcon, type IconName } from "../../../play/icon-map";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { imageLayoutSize, ringsdbImageUrl, shownCardImage } from "../../images/policy";
@@ -34,29 +36,36 @@ function CardFacts({
     attack: number | null;
     defense: number | null;
     health: number | null;
+    questPoints: number | null;
+    engagementCost: number | null;
+    isUnique: boolean;
     traits: string | null;
     text: string | null;
   };
   inactive: boolean;
 }) {
   const sphere = sphereWord(row.sphereName);
-  const mark = markedSphere(row.sphereCode);
+  const sphereMark = sphereIcon(row.sphereCode);
+  const type = typeIcon(row.typeCode);
   const cost = costOrThreat(row);
   return (
     <View className="mt-6">
-      <Stat label="Type" value={row.typeName} />
+      <Stat label="Type" value={row.typeName} icon={type} />
+      {row.isUnique ? <Stat label="Unique" value="Unique" icon="unique" /> : null}
       <View className="mt-3">
         <Label>Sphere</Label>
         <View className="mt-1 flex-row items-center gap-2">
-          {mark ? <SphereMark sphere={mark} /> : null}
+          {sphereMark ? <GameIcon name={sphereMark} size={20} tint={SPHERE_TINT[row.sphereCode ?? ""] ?? "faint"} /> : null}
           <BodyText>{sphere}</BodyText>
         </View>
       </View>
-      {cost ? <Stat label={cost.label} value={cost.value} /> : null}
-      {row.willpower != null ? <Stat label="Willpower" value={String(row.willpower)} /> : null}
-      {row.attack != null ? <Stat label="Attack" value={String(row.attack)} /> : null}
-      {row.defense != null ? <Stat label="Defense" value={String(row.defense)} /> : null}
-      {row.health != null ? <Stat label="Health" value={String(row.health)} /> : null}
+      {cost ? <Stat label={cost.label} value={cost.value} icon={cost.label === "Cost" ? "cost" : "threat"} /> : null}
+      {row.willpower != null ? <Stat label="Willpower" value={String(row.willpower)} icon="willpower" /> : null}
+      {row.attack != null ? <Stat label="Attack" value={String(row.attack)} icon="attack" /> : null}
+      {row.defense != null ? <Stat label="Defense" value={String(row.defense)} icon="defense" /> : null}
+      {row.health != null ? <Stat label="Hit points" value={String(row.health)} icon="hitPoints" /> : null}
+      {row.engagementCost != null ? <Stat label="Engagement cost" value={String(row.engagementCost)} icon="engagementCost" /> : null}
+      {row.questPoints != null ? <Stat label="Quest points" value={String(row.questPoints)} icon="questPoints" /> : null}
       {row.traits ? <Stat label="Traits" value={row.traits} /> : null}
       <View className="mt-3">
         {row.text ? <BodyText>{row.text}</BodyText> : null}
@@ -70,11 +79,15 @@ function CardFacts({
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+// A stat with the game's icon beside its value. The label stays as a word.
+function Stat({ label, value, icon }: { label: string; value: string; icon?: IconName | null }) {
   return (
     <View className="mt-3">
       <Label>{label}</Label>
-      <BodyText>{value}</BodyText>
+      <View className="mt-0.5 flex-row items-center gap-2">
+        {icon ? <GameIcon name={icon} size={20} tint="bone" /> : null}
+        <BodyText>{value}</BodyText>
+      </View>
     </View>
   );
 }
@@ -174,6 +187,9 @@ export default function CardScreen() {
         attack: cards.attack,
         defense: cards.defense,
         health: cards.health,
+        questPoints: cards.quest,
+        engagementCost: cards.engagementCost,
+        isUnique: cards.isUnique,
         traits: cards.traits,
         text: cards.text,
         errata: cards.errata,

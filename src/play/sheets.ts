@@ -7,16 +7,26 @@
 import type { Effect } from "../catalog/boundary.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import { hideWillpower } from "../rules/hide.ts";
+import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import type { Frame } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
-import { TIMING_WORDS, type Alternative, type HideNumbers, type MultiSheet, type Sheet, type SheetNames, type SheetOption, type TriggerOption } from "./sheet-types.ts";
+import { TIMING_WORDS, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type Sheet, type SheetNames, type SheetOption, type TriggerOption } from "./sheet-types.ts";
 
 export function step(game: ScenarioState): string {
   return STEP_WORDS[game.mode] ?? game.phase;
+}
+
+type StatName = "willpower" | "attack" | "defense" | "threat";
+const STAT_WORDS: Record<StatName, string> = { willpower: "Willpower", attack: "Attack", defense: "Defense", threat: "Threat" };
+
+/** One of a card's stats as the engine reads it now (modifiers applied), for a sheet tile or header. */
+export function statOf(game: ScenarioState, ctx: ReduceContext, id: string, stat: StatName): SheetStat[] {
+  const card = game.cards[id];
+  return card ? [{ icon: stat, value: modifiedStat(game, card, stat, ctx.cards), word: STAT_WORDS[stat] }] : [];
 }
 
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
@@ -110,7 +120,8 @@ function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNam
     title: `Attack ${names.card(enemyId)}`,
     note: `Defense ${defense}. Choose the characters that attack it.`,
     verb: "Attack",
-    options: characters.map((id) => option(game, names, id)),
+    stats: statOf(game, ctx, enemyId, "defense"),
+    options: characters.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "attack") })),
     build: { kind: "attack", enemyId },
     allowEmpty: false,
     preselected: [],
@@ -156,7 +167,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         title: source ? `${names.card(source)}: Hide ${hide?.x ?? ""}`.trim() : `Hide ${hide?.x ?? ""}`.trim(),
         note: "Commit characters to the Hide test. Their willpower is compared with the threat of the cards discarded.",
         verb: "Commit",
-        options: legalTargets(game, { type: "CommitHide" }, ctx).map((id) => option(game, names, id)),
+        options: legalTargets(game, { type: "CommitHide" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
         build: { kind: "CommitHide" },
         allowEmpty: true,
         preselected: [],
@@ -235,7 +246,12 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         title: targets.length > 0 ? "Travel to a location" : "No location to travel to",
         note: targets.length > 0 ? "The location becomes active and leaves staging." : null,
         verb: "Travel to",
-        options: targets.map((id) => ({ ...option(game, names, id), intent: { type: "Travel", locationId: id } })),
+        options: targets.map((id) => {
+          const location = game.cards[id];
+          const points = location ? questPointsOf(game, location, ctx.cards) : null;
+          const stats: SheetStat[] = [...statOf(game, ctx, id, "threat"), ...(points == null ? [] : [{ icon: "questPoints" as const, value: points, word: "Quest points" }])];
+          return { ...option(game, names, id), stats, intent: { type: "Travel", locationId: id } };
+        }),
         primary: null,
         alternative: { label: targets.length > 0 ? "Do not travel" : "Continue", intent: { type: "DeclineTravel" } },
       };
@@ -249,7 +265,11 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         title: game.seatCount > 1 ? `Player ${game.activeSeat + 1}: optional engagement` : "Optional engagement",
         note: "You may engage one enemy in staging.",
         verb: "Engage",
-        options: targets.map((id) => ({ ...option(game, names, id), intent: { type: "Engage", enemyId: id } })),
+        options: targets.map((id) => {
+          const enemy = game.cards[id];
+          const cost = enemy ? engagementCostOf(game, enemy, ctx.cards) : null;
+          return { ...option(game, names, id), stats: cost == null ? [] : [{ icon: "engagementCost" as const, value: cost, word: "Engagement cost" }], intent: { type: "Engage", enemyId: id } };
+        }),
         primary: null,
         alternative: { label: "Do not engage", intent: { type: "DeclineEngage" } },
       };
@@ -278,12 +298,13 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         key: `defense:${numbers?.enemyId ?? ""}:${game.pendingAttack?.undefended ? "u" : "d"}`,
         step: "Combat",
         title,
+        stats: numbers ? statOf(game, ctx, numbers.enemyId, "attack") : [],
         note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : `${note} Choose a defender, or leave it undefended.`,
         verb: "Defend with",
         options: defenders.map((id) => {
           const defender = game.cards[id];
           const defense = defender ? modifiedStat(game, defender, "defense", ctx.cards) : 0;
-          return { ...option(game, names, id), label: `${names.card(id)} · defense ${defense}`, intent: { type: "DeclareDefender", defenderId: id } };
+          return { ...option(game, names, id), stats: [{ icon: "defense" as const, value: defense, word: "Defense" }], intent: { type: "DeclareDefender", defenderId: id } };
         }),
         primary: null,
         alternative: leave,
@@ -302,7 +323,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         options: recipients.map((id) => {
           const card = game.cards[id];
           const health = card ? modifiedStat(game, card, "hitPoints", ctx.cards) - card.damage : 0;
-          return { ...option(game, names, id), label: `${names.card(id)} · ${health} hit points left`, max: window.total };
+          return { ...option(game, names, id), stats: [{ icon: "hitPoints" as const, value: health, word: "Hit points left" }], max: window.total };
         }),
         purpose: { kind: "archery" },
       };
@@ -333,7 +354,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         title: "Attack an enemy",
         note: "Choose the enemy, then the characters that attack it.",
         verb: "Attack",
-        options: [...enemies].map((id) => ({ ...option(game, names, id), next: attackersSheet(game, ctx, names, id) })),
+        options: [...enemies].map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "defense"), next: attackersSheet(game, ctx, names, id) })),
         primary: null,
         alternative: { label: "No attack", intent: { type: "DeclineAttack" } },
       };

@@ -65,7 +65,7 @@ flowchart LR
 
 Three Node entry points exist, and none of them runs on the phone.
 
-- `pnpm data:sync` is the only command that uses the network. It refreshes `data/raw/`, `.cache/pdf/` and `.cache/scans/` and records every pin in `data/sources.json`. Card text comes from the printed-text ledger `data/printed/`, read from the scans; rule text from the curated spans in `data/rules/index.json`. `pnpm data:build` turns the raw snapshots into `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules` and `src/effects/generated`, offline and deterministically. `pnpm data:check` rebuilds into a temporary directory and fails on any difference.
+- `pnpm data:sync` is the only command that uses the network. It refreshes `data/raw/` (the game icon sources under `data/raw/icons` included), `.cache/pdf/` and `.cache/scans/` and records every pin in `data/sources.json`. Card text comes from the printed-text ledger `data/printed/`, read from the scans; rule text from the curated spans in `data/rules/index.json`. `pnpm data:build` turns the raw snapshots into `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules`, `src/effects/generated`, and the game icons (`assets/icons`, `src/play/icons`), offline and deterministically. `pnpm data:check` rebuilds into a temporary directory and fails on any difference.
 - `scripts/build-catalog.ts` reads `data/` offline. It writes `assets/catalog.db` and the `CATALOG_VERSION` constant. EAS Build consumes that file.
 - The Expo app runs on the device. It reads the bundled catalog, reads and writes `user.db`, and calls the reducer in process. After the images for a session are cached, airplane mode is a supported state.
 
@@ -252,7 +252,7 @@ The first screen paints from SQLite. It does not scan the image directory, query
 
 `scripts/build-catalog.ts` reads `data/cards` and `data/raw/ringsdb/packs.json` and writes `catalog.db` and the `CATALOG_VERSION` constant (a hash of the rows). It does not fetch, and it does not write effects or scenarios: the app imports those from `src/effects` and `data/`. Identifiers are RingsDB codes. A card without a RingsDB row takes the code Hall of Beorn gives its Black Riders or Road Darkens printing, and `data/overrides.json` carries the two that have none.
 
-`assets/catalog.db`, `.cache/`, card images and booklet PDFs are gitignored. `data/` is committed, raw snapshots included, so no session starts without card text, scenario piles or rules text.
+`assets/catalog.db`, `.cache/`, card images and booklet PDFs are gitignored. The game icons in `assets/icons` are small app assets built from `data/raw/icons` and are committed (`docs/design-system.md`, Icons). `data/` is committed, raw snapshots included, so no session starts without card text, scenario piles or rules text.
 
 ## Tests
 

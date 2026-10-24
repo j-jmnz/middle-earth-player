@@ -3,6 +3,7 @@
 import type { Effect } from "../catalog/boundary.ts";
 import type { PlayerIntent } from "../rules/reduce.ts";
 
+import type { IconName } from "./icon-map.ts";
 import type { PayRequest } from "./pay.ts";
 
 export type SheetNames = {
@@ -12,7 +13,10 @@ export type SheetNames = {
   line: (lineId: string) => string | null;
 };
 
-export type SheetOption = { id: string; label: string; code: string | null };
+// A number the engine computed, shown with the game's icon beside it (willpower on a commit, defense on a defender).
+export type SheetStat = { icon: IconName; value: number; word: string };
+
+export type SheetOption = { id: string; label: string; code: string | null; stats?: readonly SheetStat[] };
 
 export type PickOption = SheetOption & ({ intent: PlayerIntent } | { next: Sheet });
 
@@ -20,6 +24,8 @@ export type Alternative = { label: string; intent: PlayerIntent } | { label: str
 
 export type PickSheet = {
   kind: "pick";
+  // The engine's numbers for the moment, with their icons (the attack in a defense).
+  stats?: readonly SheetStat[];
   key: string;
   step: string;
   title: string;
@@ -36,6 +42,7 @@ export type MultiBuild = { kind: "Commit" } | { kind: "CommitHide" } | { kind: "
 
 export type MultiSheet = {
   kind: "multi";
+  stats?: readonly SheetStat[];
   key: string;
   step: string;
   title: string;

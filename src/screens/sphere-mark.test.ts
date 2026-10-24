@@ -10,7 +10,9 @@ describe("sphere marks", () => {
     expect(markedSphere("lore")).toBe("lore");
     expect(markedSphere("fellowship")).toBe("fellowship");
     expect(markedSphere("neutral")).toBe("neutral");
-    expect(markedSphere("baggins")).toBeNull();
+    // Baggins prints its own sphere icon (the RingsDB glyph), so it has a mark too.
+    expect(markedSphere("baggins")).toBe("baggins");
+    expect(markedSphere("unknown")).toBeNull();
     expect(markedSphere(null)).toBeNull();
     expect(sphereWord("Lore")).toBe("Lore");
     expect(sphereWord("")).toBe("Neutral");

@@ -2,7 +2,7 @@
 // it draws. A drag, a card lift and the return run on the UI thread with Gesture Handler and Reanimated; JavaScript hears
 // about a drag only when a card is picked up (to compute that card's drop targets) and when the finger lifts (to ask the
 // reducer). A new gesture cancels the return in progress; reduced motion snaps it.
-import { Canvas, Circle, Group, Image, matchFont, Rect, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
+import { Canvas, Circle, Group, Image, matchFont, Path, Rect, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 import { useCallback, useEffect, useMemo } from "react";
 import { Platform } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -10,6 +10,8 @@ import { cancelAnimation, useDerivedValue, useReducedMotion, useSharedValue, wit
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
+import { SPHERE_TINT, sphereIcon, type IconName } from "./icon-map.ts";
+import { ICONS } from "./icons/generated.ts";
 import { hitDrop, hitSlot, tableLayout, type CardSlot, type DropRect, type LayoutViews } from "./layout.ts";
 import { TABLE_ZONES, shownSeat, zoneSelector, type ZoneId } from "./selectors.ts";
 import { dropRects } from "./selection.ts";
@@ -43,6 +45,20 @@ function useViews(store: TableCanvasProps["store"], seat: number): LayoutViews {
   );
 }
 
+// A game icon on the canvas: the vector glyph from ./icons/generated.ts, drawn as a Skia path, flipped from the font's
+// y-up units into the box (x, y, size) and filled with one token colour.
+function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: number; y: number; size: number; color: string }) {
+  const icon = ICONS[name];
+  if (icon.kind !== "vector") return null;
+  const [vx, vy, vw, vh] = icon.viewBox;
+  const scale = size / Math.max(vw, vh);
+  return (
+    <Group transform={[{ translateX: x - vx * scale }, { translateY: y - vy * scale }, { scaleX: scale }, { scaleY: -scale }]}>
+      <Path path={icon.d} color={color} />
+    </Group>
+  );
+}
+
 function Coin({ x, y, color, text, textColor, font }: { x: number; y: number; color: string; text: string; textColor: string; font: SkFont }) {
   const width = font.getTextWidth(text);
   return (
@@ -58,6 +74,7 @@ function CardFace({
   slot,
   image,
   name,
+  sphere,
   font,
   inactive,
   edge,
@@ -66,6 +83,7 @@ function CardFace({
   slot: CardSlot;
   image: SkImage | null;
   name: string;
+  sphere: IconName | null;
   font: SkFont;
   inactive: boolean;
   edge: string | null;
@@ -95,6 +113,7 @@ function CardFace({
           <Group clip={{ x: x + 3, y: y + 3, width: w - 6, height: h - 6 }}>
             <Text x={x + 5} y={y + 16} text={name} font={font} color={t.bone} />
           </Group>
+          {sphere ? <CanvasIcon name={sphere} x={x + w - 18} y={y + h - 18} size={14} color={t[SPHERE_TINT[sphere] ?? "faint"]} /> : null}
           {inactive ? <Rect x={x} y={y + h * 0.55} width={w} height={h * 0.45} color={veil} /> : null}
         </Group>
       )}
@@ -106,7 +125,7 @@ function CardFace({
   );
 }
 
-export function TableCanvas({ store, width, height, picture, pictureRevision, nameOf, inactive, onInspect, onDrop }: TableCanvasProps) {
+export function TableCanvas({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, onInspect, onDrop }: TableCanvasProps) {
   const seat = useStore(store, (state) => shownSeat(state.game));
   const views = useViews(store, seat);
   const selected = useStore(store, (state) => state.selected);
@@ -240,6 +259,7 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
             slot={slot}
             image={images.get(slot.code) ?? null}
             name={nameOf(slot.code)}
+            sphere={sphereIcon(sphereOf(slot.code))}
             font={font}
             inactive={!slot.faceDown && inactive(slot.code)}
             edge={edgeOf(slot)}
@@ -248,7 +268,7 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
         ))}
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-            <CardFace slot={{ ...lifted, tilt: 0 }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} font={font} inactive={inactive(lifted.code)} edge={t.gold} dim={false} />
+            <CardFace slot={{ ...lifted, tilt: 0 }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} font={font} inactive={inactive(lifted.code)} edge={t.gold} dim={false} />
           </Group>
         ) : null}
       </Canvas>

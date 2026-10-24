@@ -6,12 +6,14 @@ import { useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeIn, ReduceMotion, SlideInDown } from "react-native-reanimated";
 
+import { GameIcon, IconValue } from "./game-icon.tsx";
+import type { IconName } from "./icon-map.ts";
 import type { LogLine } from "./log.ts";
 import { firstShares, shareOf, shareSum, sharesReady, tapShare, type Share } from "./pay.ts";
 import type { Rail } from "./rail.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { distributeIntent, multiIntent, paySheet } from "./bar-sheets.ts";
-import type { DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet } from "./sheet-types.ts";
+import type { DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, SheetStat, TriggerOption, TriggerSheet } from "./sheet-types.ts";
 import type { PlayerIntent, ScenarioState } from "./store.ts";
 import { tableTokens as t } from "./tokens.ts";
 
@@ -48,7 +50,7 @@ export function threatLine(threats: readonly SeatThreat[], life: number | null):
 }
 
 /** A threat number in a ring, Marcellus, with its label. The reducer is the only writer of the number. */
-export function ThreatRing({ threat, label, testID }: { threat: SeatThreat; label: string; testID?: string }) {
+export function ThreatRing({ threat, label, testID, icon = "threat" }: { threat: SeatThreat; label: string; testID?: string; icon?: IconName | null }) {
   const id = testID ?? `threat-${threat.seat}`;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
@@ -57,7 +59,10 @@ export function ThreatRing({ threat, label, testID }: { threat: SeatThreat; labe
           {String(threat.threat)}
         </Text>
       </View>
-      <Text className="mt-0.5 text-label text-muted">{label}</Text>
+      <View className="mt-0.5 flex-row items-center gap-1">
+        {icon ? <GameIcon name={icon} size={12} tint="muted" /> : null}
+        <Text className="text-label text-muted">{label}</Text>
+      </View>
     </View>
   );
 }
@@ -129,14 +134,40 @@ export function ChromePrimary({ label, onPress, testID, disabled = false, surfac
   );
 }
 
-function Tile({ label, selected, onPress, testID, detail }: { label: string; selected: boolean; onPress: () => void; testID: string; detail?: string | null }) {
+/** The engine's numbers with the game's icons beside them, ink on paper. Each reads as "Willpower 2" to a screen reader. */
+function Stats({ stats, testID }: { stats: readonly SheetStat[]; testID?: string }) {
+  if (stats.length === 0) return null;
+  return (
+    <View testID={testID} className="flex-row flex-wrap items-center gap-3">
+      {stats.map((stat) => (
+        <IconValue key={stat.word} name={stat.icon} value={String(stat.value)} word={stat.word} tint="ink" textClass="font-display text-body text-ink" />
+      ))}
+    </View>
+  );
+}
+
+function Tile({
+  label,
+  selected,
+  onPress,
+  testID,
+  detail,
+  stats = [],
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+  testID: string;
+  detail?: string | null;
+  stats?: readonly SheetStat[];
+}) {
   return (
     <Pressable
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      accessibilityLabel={detail ? `${label}. ${detail}` : label}
+      accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), detail ?? ""].filter((part) => part.length > 0).join(". ")}
       onPress={onPress}
       className="mb-2 min-h-14 justify-center rounded-tile px-4 py-2"
       style={({ pressed }) => ({
@@ -145,7 +176,10 @@ function Tile({ label, selected, onPress, testID, detail }: { label: string; sel
         backgroundColor: pressed ? t.paperPressed : "transparent",
       })}
     >
-      <Text className={`text-body text-ink ${selected ? "font-semibold" : ""}`}>{label}</Text>
+      <View className="flex-row items-center justify-between gap-2">
+        <Text className={`shrink text-body text-ink ${selected ? "font-semibold" : ""}`}>{label}</Text>
+        <Stats stats={stats} />
+      </View>
       {detail ? <Text className="mt-0.5 text-label text-inkMuted">{detail}</Text> : null}
     </Pressable>
   );
@@ -174,10 +208,12 @@ function Paper({
   children,
   actions,
   onCollapse,
+  stats = [],
 }: {
   step: string;
   title: string;
   note: string | null;
+  stats?: readonly SheetStat[];
   threat: string;
   refusal: string | null;
   children?: ReactNode;
@@ -194,6 +230,11 @@ function Paper({
         <Text testID="sheet-title" accessibilityRole="header" className="mt-1 text-center font-display text-title text-ink">
           {title}
         </Text>
+        {stats.length > 0 ? (
+          <View className="mt-1">
+            <Stats stats={stats} testID="sheet-stats" />
+          </View>
+        ) : null}
         {note ? (
           <Text testID="sheet-note" className="mt-1 text-center text-body text-inkMuted">
             {note}
@@ -237,8 +278,8 @@ type SheetProps = {
   onCollapse: () => void;
 };
 
-function paperProps(props: SheetProps, sheet: { step: string; title: string; note: string | null }) {
-  return { step: sheet.step, title: sheet.title, note: sheet.note, threat: props.threat, refusal: props.refusal, onCollapse: props.onCollapse };
+function paperProps(props: SheetProps, sheet: { step: string; title: string; note: string | null; stats?: readonly SheetStat[] }) {
+  return { step: sheet.step, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [], threat: props.threat, refusal: props.refusal, onCollapse: props.onCollapse };
 }
 
 function PickView(props: SheetProps & { sheet: PickSheet }) {
@@ -269,7 +310,7 @@ function PickView(props: SheetProps & { sheet: PickSheet }) {
   return (
     <Paper {...paperProps(props, sheet)} actions={actions}>
       {sheet.options.length > 0
-        ? sheet.options.map((item) => <Tile key={item.id} label={item.label} selected={item.id === chosen} testID={`sheet-option-${item.id}`} onPress={() => setChosen(item.id)} />)
+        ? sheet.options.map((item) => <Tile key={item.id} label={item.label} stats={item.stats} selected={item.id === chosen} testID={`sheet-option-${item.id}`} onPress={() => setChosen(item.id)} />)
         : null}
     </Paper>
   );
@@ -297,7 +338,7 @@ function MultiView(props: SheetProps & { sheet: MultiSheet }) {
   return (
     <Paper {...paperProps(props, sheet)} actions={actions}>
       {sheet.options.map((item) => (
-        <Tile key={item.id} label={item.label} selected={chosen.includes(item.id)} testID={`sheet-option-${item.id}`} onPress={() => toggle(item.id)} />
+        <Tile key={item.id} label={item.label} stats={item.stats} selected={chosen.includes(item.id)} testID={`sheet-option-${item.id}`} onPress={() => toggle(item.id)} />
       ))}
     </Paper>
   );
@@ -324,6 +365,7 @@ function DistributeView(props: SheetProps & { sheet: DistributeSheet }) {
         <Tile
           key={item.id}
           label={`${item.label} · ${shareOf(shares, item.id)}`}
+          stats={item.stats}
           selected={shareOf(shares, item.id) > 0}
           testID={`sheet-option-${item.id}`}
           onPress={() => setShares((current) => tapShare(current, item.id, item.max, sheet.exact ? sheet.total : null))}
@@ -362,8 +404,8 @@ function TriggerView(props: SheetProps & { sheet: TriggerSheet }) {
       {sheet.hide ? (
         <View testID="hide-numbers" className="mb-3 flex-row justify-around">
           <Text className="font-display text-title text-ink">{`Hide ${sheet.hide.x}`}</Text>
-          <Text className="font-display text-title text-ink">{`Willpower ${sheet.hide.willpower}`}</Text>
-          <Text className="font-display text-title text-ink">{`Threat ${sheet.hide.threat}`}</Text>
+          <IconValue name="willpower" value={String(sheet.hide.willpower)} word="Willpower" tint="ink" size={22} textClass="font-display text-title text-ink" />
+          <IconValue name="threat" value={String(sheet.hide.threat)} word="Threat" tint="ink" size={22} textClass="font-display text-title text-ink" />
         </View>
       ) : null}
       {sheet.sourceId ? (
@@ -413,6 +455,14 @@ export function SheetTab({ title, threat, onOpen }: { title: string; threat: str
   );
 }
 
+// A log line's mark: the game icon for threat and willpower, a token coin for damage, progress and resources.
+function LogMarkView({ mark }: { mark: LogLine["mark"] }) {
+  if (mark === "threat" || mark === "willpower") return <GameIcon name={mark} size={16} tint="ink" />;
+  if (!mark) return <View style={{ width: 16 }} />;
+  const color = mark === "damage" ? t.threat : mark === "resource" ? t.gold : t.paperPressed;
+  return <View accessible={false} style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: color, borderWidth: 1, borderColor: t.inkLine }} />;
+}
+
 /** This round's engine steps and their causes, on paper. Text only: it is how a player checks a number against its source. */
 export function LogPanel({ round, lines, onClose }: { round: number; lines: readonly LogLine[]; onClose: () => void }) {
   return (
@@ -426,7 +476,10 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
         {lines.length === 0 ? <Text className="text-center text-body text-inkMuted">Nothing has happened this round yet.</Text> : null}
         {lines.map((line) => (
           <View key={line.key} testID={`log-line-${line.key}`} className="border-b py-2" style={{ borderColor: t.inkLine }}>
-            <Text className="text-body text-ink">{line.text}</Text>
+            <View className="flex-row items-center gap-2">
+              <LogMarkView mark={line.mark} />
+              <Text className="shrink text-body text-ink">{line.text}</Text>
+            </View>
             {line.cause ? <Text className="mt-0.5 text-label text-inkMuted">{line.cause}</Text> : null}
           </View>
         ))}

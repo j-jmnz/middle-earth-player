@@ -59,6 +59,6 @@ describe("log lines", () => {
       ],
       names,
     );
-    expect(lines).toEqual([{ key: "1", text: "Player 1 threat +2", cause: `Rule: ${ruleTitle("rr.step-3-4")}` }]);
+    expect(lines).toEqual([{ key: "1", text: "Player 1 threat +2", cause: `Rule: ${ruleTitle("rr.step-3-4")}`, mark: "threat" }]);
   });
 });

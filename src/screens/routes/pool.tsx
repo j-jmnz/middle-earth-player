@@ -49,6 +49,8 @@ import {
   type PoolCard,
   type PoolFilter,
 } from "../pool-filter";
+import { GameIcon } from "../../play/game-icon";
+import type { IconName } from "../../play/icon-map";
 import { goBack } from "../go-back";
 
 type PoolRowCard = PoolCard & {
@@ -97,19 +99,28 @@ function Chip({
   );
 }
 
-function OptionRow({ label, detail, onPress }: { label: string; detail: string; onPress: () => void }) {
+function OptionRow({ label, detail, onPress, icon }: { label: string; detail: string; onPress: () => void; icon?: IconName }) {
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
       className="min-h-14 flex-row items-center justify-between border-b border-inkLine"
     >
-      <Text className="text-body text-ink">{label}</Text>
+      <View className="flex-row items-center gap-2">
+        {icon ? <GameIcon name={icon} size={16} tint="ink" /> : null}
+        <Text className="text-body text-ink">{label}</Text>
+      </View>
       <Text className="ml-3 shrink text-label text-inkMuted" numberOfLines={1}>
         {detail}
       </Text>
     </Pressable>
   );
+}
+
+// The sphere's printed icon before the row's words ("Ally · Spirit · 2").
+function RowIcons({ sphere }: { sphere: string | null }) {
+  const mark = markedSphere(sphere);
+  return mark ? <SphereMark sphere={mark} size={12} /> : null;
 }
 
 function PoolCardRow({
@@ -127,6 +138,7 @@ function PoolCardRow({
       testID={`card-${item.code}`}
       label={item.name}
       detail={poolDetail(item)}
+      detailIcons={<RowIcons sphere={item.sphereCode} />}
       leading={<CardThumb code={item.code} imagesrc={item.imagesrc} width={thumb.width} height={thumb.height} />}
       onPress={() => {
         router.push({ pathname: "/card/[code]", params: { code: item.code } });
@@ -420,7 +432,7 @@ function FilterBody({
       </View>
       <OptionRow label="Pack or cycle" detail={packDetail(filter, groups)} onPress={() => onChoose("pack")} />
       <OptionRow label="Trait" detail={filter.trait ?? "Any"} onPress={() => onChoose("trait")} />
-      <OptionRow label="Cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
+      <OptionRow label="Cost" icon="cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
       <View className="min-h-14 flex-row items-center justify-between border-b border-inkLine">
         <Text className="text-body text-ink">Unique</Text>
         <Switch
@@ -490,7 +502,7 @@ function CostChooser({
       <TextButton testID="pool-chooser-back" label="Back" tone="ink" onPress={onBack} />
       <OptionRow label="Any" detail="" onPress={() => pick({ ...filter, cost: null })} />
       {costs.map((cost) => (
-        <OptionRow key={cost} label={cost} detail="" onPress={() => pick({ ...filter, cost })} />
+        <OptionRow key={cost} label={cost} icon="cost" detail="" onPress={() => pick({ ...filter, cost })} />
       ))}
     </View>
   );

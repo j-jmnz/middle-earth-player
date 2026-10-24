@@ -13,11 +13,16 @@ import { goBack } from "../../go-back";
 import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
 import { useSave } from "../../use-save";
+import { GameIcon } from "../../../play/game-icon";
+import type { IconName } from "../../../play/icon-map";
 
-function Row({ label, value, testID }: { label: string; value: string; testID: string }) {
+function Row({ label, value, testID, icon }: { label: string; value: string; testID: string; icon?: IconName }) {
   return (
     <View className="border-b border-inkLine py-3">
-      <Text className="text-label text-inkLabel">{label}</Text>
+      <View className="flex-row items-center gap-1">
+        {icon ? <GameIcon name={icon} size={13} tint="inkLabel" /> : null}
+        <Text className="text-label text-inkLabel">{label}</Text>
+      </View>
       <Text testID={testID} className="mt-0.5 text-body text-ink">
         {value}
       </Text>
@@ -90,7 +95,7 @@ export default function Log() {
           </Text>
           <Row label="Heroes" value={bySeat(log.heroesBySeat)} testID="log-heroes" />
           <Row label="Fallen Heroes" value={bySeat(log.fallenHeroesBySeat)} testID="log-fallen" />
-          <Row label="Threat Modifiers" value={log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" />
+          <Row label="Threat Modifiers" value={log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" icon="threat" />
           <Row label="Boons" value={pool("boon")} testID="log-boons" />
           <Row label="Burdens" value={pool("burden")} testID="log-burdens" />
           <Row

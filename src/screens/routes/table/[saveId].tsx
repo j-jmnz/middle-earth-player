@@ -72,6 +72,7 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   }, [store, session, seat, hand, staging, selected, won]);
 
   const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
+  const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
   const names: SheetNames = useMemo(
     () => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine }),
     [nameOf, store],
@@ -167,6 +168,7 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
             picture={picture}
             pictureRevision={images.revision}
             nameOf={nameOf}
+            sphereOf={sphereOf}
             inactive={inactive}
             onInspect={onInspect}
             onDrop={onDrop}
@@ -209,7 +211,7 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
             {threats.map((threat) => (
               <ThreatRing key={threat.seat} threat={threat} label={threats.length > 1 ? `Player ${threat.seat + 1}` : "Threat"} />
             ))}
-            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" /> : null}
+            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} /> : null}
           </View>
           <View className="flex-1 items-end gap-1 pl-3">
             <View className="flex-row">

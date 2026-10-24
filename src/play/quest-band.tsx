@@ -3,6 +3,8 @@
 import { Text, View } from "react-native";
 
 import { questPointsOf } from "../rules/quest.ts";
+
+import { GameIcon } from "./game-icon.tsx";
 import type { ReduceContext, ScenarioState } from "./store.ts";
 import { tableTokens as t } from "./tokens.ts";
 
@@ -24,7 +26,10 @@ export function QuestBand({ game, ctx, nameOf }: { game: ScenarioState; ctx: Red
           <View className="mt-1 h-1 rounded-pill" style={{ backgroundColor: t.hairline }}>
             <View className="h-1 rounded-pill" style={{ width: `${Math.round(fraction * 100)}%`, backgroundColor: t.gold }} />
           </View>
-          <Text testID="quest-progress" className="mt-1 font-display text-label text-muted">{`${stage.progress} / ${points} progress`}</Text>
+          <View className="mt-1 flex-row items-center gap-1">
+            <GameIcon name="questPoints" size={14} />
+            <Text testID="quest-progress" className="font-display text-label text-muted">{`${stage.progress} / ${points} progress`}</Text>
+          </View>
         </>
       ) : (
         <Text testID="quest-progress" className="mt-1 text-label text-muted">

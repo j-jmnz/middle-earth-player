@@ -14,7 +14,28 @@ export type LogNames = {
   line: (lineId: string) => string | null;
 };
 
-export type LogLine = { key: string; text: string; cause: string | null };
+// The mark beside a log line: a game icon (threat, willpower), or a token coin for damage, progress and a resource (no
+// high-resolution source of those tokens exists; docs/design-system.md, Icons).
+export type LogMark = "threat" | "willpower" | "damage" | "progress" | "resource" | null;
+
+export type LogLine = { key: string; text: string; cause: string | null; mark: LogMark };
+
+function markOf(step: EngineStep): LogMark {
+  switch (step.kind) {
+    case "threat":
+      return "threat";
+    case "hideTest":
+      return "willpower";
+    case "damage":
+      return "damage";
+    case "progress":
+      return "progress";
+    case "gainResource":
+      return "resource";
+    default:
+      return null;
+  }
+}
 
 function player(seat: number): string {
   return `Player ${seat + 1}`;
@@ -77,7 +98,7 @@ export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine
   steps.forEach((step, index) => {
     const text = words(step, names);
     if (!text) return;
-    lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null });
+    lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step) });
   });
   return lines;
 }

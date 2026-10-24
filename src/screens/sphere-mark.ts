@@ -1,4 +1,4 @@
-export type MarkedSphere = "leadership" | "tactics" | "spirit" | "lore" | "fellowship" | "neutral";
+export type MarkedSphere = "leadership" | "tactics" | "spirit" | "lore" | "fellowship" | "baggins" | "neutral";
 
 export function markedSphere(sphere: string | null): MarkedSphere | null {
   if (
@@ -7,6 +7,7 @@ export function markedSphere(sphere: string | null): MarkedSphere | null {
     sphere === "spirit" ||
     sphere === "lore" ||
     sphere === "fellowship" ||
+    sphere === "baggins" ||
     sphere === "neutral"
   ) {
     return sphere;
