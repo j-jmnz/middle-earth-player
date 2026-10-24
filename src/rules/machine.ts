@@ -29,7 +29,7 @@ import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
 import { crossBoundary } from "./triggers.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
-import { discardShadows } from "./shadow.ts";
+import { discardShadows, resolveAttack } from "./shadow.ts";
 import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -113,6 +113,8 @@ export function applyIntent(
 
 function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
+  // The Responses to a shadow effect are done: the attack goes on.
+  if (state.pendingAttack?.shadowOffered && !state.pendingAttack.shadowResolved) return resolveAttack(state, ctx, steps);
   switch (state.mode) {
     case "afterOpening":
       return finishSetup(state, ctx, steps);

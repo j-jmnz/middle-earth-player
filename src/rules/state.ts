@@ -126,6 +126,8 @@ export type Window =
   | { kind: "choose"; seat: number; options: readonly string[] }
   | { kind: "cancelOffer"; seat: number }
   | { kind: "response"; seat: number }
+  // A card shown to a player (the top of the encounter deck). The player closes it with a pass.
+  | { kind: "look"; seat: number; cardIds: readonly string[] }
   // The scenario is won: a player answers the choice that Resolution instruction `step` opens.
   | { kind: "resolution"; step: number; seat: number };
 

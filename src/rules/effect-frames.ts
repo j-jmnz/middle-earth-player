@@ -14,7 +14,8 @@ import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
-import { livingSeats, updateCard } from "./state.ts";
+import { livingSeats, updateCard, withSeat } from "./state.ts";
+import { offerResponses } from "./responses.ts";
 import { holdsNow, seatFor, shuffleEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
@@ -96,7 +97,18 @@ export function pushCardEffects(
 export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const data = frame.data;
   if (data.kind !== "effect") throw new Error(`Frame ${frame.frame} lost its effect data`);
-  if (frame.step === 0) return beginEffect(state, frame, data, ctx);
+  if (frame.step === 0) {
+    if (data.canceled) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
+    // The "when revealed" effects of a card are about to resolve: a Response may cancel them first (rr.cancel).
+    if (frame.frame === "whenRevealed" && frame.cardId && !data.interrupted) {
+      const offered = offerResponses(state, { trigger: "whenRevealedPending", seat: frame.seat, subject: frame.cardId }, ctx, steps);
+      if (offered.stack.length === state.stack.length) return beginEffect(state, frame, data, ctx);
+      // Remember that the offer was made, so the frame begins when the Responses are done.
+      const stack = offered.stack.map((entry) => (entry.id === frame.id && entry.data.kind === "effect" ? { ...entry, data: { ...entry.data, interrupted: true } } : entry));
+      return { ...offered, stack };
+    }
+    return beginEffect(state, frame, data, ctx);
+  }
   const [item, ...rest] = data.queue;
   if (data.canceled || !item) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
   const advanced = patchTop(state, { data: { ...data, queue: rest } });
@@ -160,6 +172,8 @@ function runItemNow(
       return targeted(state, item, frame, ctx, steps);
     case "Pick":
       return pick(state, item, frame, ctx);
+    case "ArrangeTop":
+      return arrangeTop(state, item);
     default:
       return runInstruction(state, instruction, { seat: item.seat, sourceId: frame.cardId }, ctx, steps);
   }
@@ -248,7 +262,31 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
     if (options.length > 1) return askTarget(state, item, options);
     chosen = options[0] ?? "";
   }
-  return patchTop(state, { data: { ...data, picked: [...(data.picked ?? []), chosen] } });
+  // A look at the top of a deck: the cards seen are put back by ArrangeTop.
+  const looked = instruction.pick.top != null ? { looked: (state.seats[item.seat]?.deck ?? []).slice(0, instruction.pick.top) } : {};
+  return patchTop(state, { data: { ...data, ...looked, picked: [...(data.picked ?? []), chosen] } });
+}
+
+// Puts the cards a Pick looked at, those still in the deck, back on top in the order the actor chooses: the card for the
+// top position first, then the next, until one choice is left.
+function arrangeTop(state: ScenarioState, item: QueueItem): ScenarioState {
+  const data = topFrame(state)?.data;
+  const seat = state.seats[item.seat];
+  if (data?.kind !== "effect" || !seat) return state;
+  const offset = item.offset ?? 0;
+  const count = (data.looked ?? []).filter((id) => seat.deck.includes(id)).length;
+  const rest = seat.deck.slice(offset, count);
+  if (rest.length <= 1 || distinctByCode(state, rest).length <= 1) return state;
+  if (!item.chosen) return askTarget(state, { ...item, offset }, distinctByCode(state, rest));
+  const from = seat.deck.indexOf(item.chosen);
+  if (from < offset) return state;
+  const deck = [...seat.deck];
+  [deck[offset], deck[from]] = [deck[from] ?? "", deck[offset] ?? ""];
+  const arranged = withSeat(state, item.seat, { ...seat, deck });
+  if (rest.length <= 2) return arranged;
+  const next = topFrame(arranged)?.data;
+  if (next?.kind !== "effect") return arranged;
+  return patchTop(arranged, { data: { ...next, queue: [{ ...item, chosen: null, offset: offset + 1 }, ...next.queue] } });
 }
 
 // Different copies of one card are the same choice. Only different cards make the player pick.

@@ -1,6 +1,7 @@
 // Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects (data/rules/entries.json).
 import type { PickSpec } from "../catalog/boundary.ts";
 
+import { attachmentHostIds } from "./attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -23,10 +24,15 @@ export function pickCandidates(
 ): string[] {
   const seats = spec.control === "you" ? [seat] : livingSeats(state);
   if (spec.type === "player") return seats.filter((index) => !state.seats[index]?.eliminated).map((index) => `seat:${index}`);
+  if (spec.hostForPicked) {
+    const code = state.cards[picked.at(-1) ?? ""]?.code;
+    return code ? attachmentHostIds(state, seat, code, ctx) : [];
+  }
   const raw: string[] = [];
   const from = spec.from ?? "play";
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
   else if (from === "discard") for (const index of seats) raw.push(...(state.seats[index]?.discard ?? []));
+  else if (from === "deck") for (const index of seats) raw.push(...(state.seats[index]?.deck ?? []).slice(0, spec.top ?? Number.MAX_SAFE_INTEGER));
   else if (spec.type === "enemy") {
     for (const index of seats) raw.push(...(state.seats[index]?.engaged ?? []));
     if (spec.staging) raw.push(...state.staging);
@@ -43,6 +49,8 @@ export function pickCandidates(
     if (spec.type !== "card" && !(spec.type === "character" ? printed.type === "hero" || printed.type === "ally" : printed.type === spec.type)) return false;
     if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
     if (spec.sphere && printed.sphere !== spec.sphere) return false;
+    if (spec.cardType && printed.type !== spec.cardType) return false;
+    if (spec.maxCost != null && (printed.cost == null || printed.cost > spec.maxCost)) return false;
     if (spec.cost != null && (from === "play" || printed.cost !== spec.cost)) return false;
     if (spec.state === "ready" && instance.exhausted) return false;
     if (spec.state === "exhausted" && !instance.exhausted) return false;

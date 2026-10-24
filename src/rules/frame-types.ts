@@ -39,7 +39,8 @@ export type FrameName =
 export type HideResult = { success: boolean; willpower: number; threat: number };
 
 // One instruction still to run, with the seat it runs for. `chosen` is the card a player picked for it.
-export type QueueItem = { instruction: Instruction; seat: number; chosen: string | null; cause?: Cause };
+// `offset` is where ArrangeTop has got to in the deck.
+export type QueueItem = { instruction: Instruction; seat: number; chosen: string | null; cause?: Cause; offset?: number };
 
 export type EffectWait =
   | { kind: "branch"; item: QueueItem }
@@ -70,6 +71,10 @@ export type EffectData = {
   picked?: readonly string[];
   // An event played from the hand: when the effect is done the card goes to its owner's discard pile.
   finish?: "discardSource";
+  // Set when the "when revealed" Responses (a cancel) have been offered for this frame.
+  interrupted?: boolean;
+  // The cards a Pick looked at in a deck: the ones still there are put back by ArrangeTop.
+  looked?: readonly string[];
   // The seat the event that offered this Response happened to.
   eventSeat?: number | null;
 };
@@ -143,6 +148,9 @@ export type PendingAttack = {
   // A shadow effect made the attack count as undefended.
   undefended?: boolean;
   shadowResolved?: boolean;
+  // The Responses to the shadow effect have been offered, and a Response canceled it.
+  shadowOffered?: boolean;
+  shadowCanceled?: boolean;
   // Instructions to run, with the attacker as the source, when the attack ends.
   after?: readonly Instruction[];
   afterCause?: Cause;

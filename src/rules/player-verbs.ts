@@ -2,15 +2,18 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
 import { characters, strikeEnemy } from "./combat.ts";
+import { enforceRestricted } from "./attach.ts";
 import { placeProgress } from "./effect-verbs.ts";
+import { queueEvent } from "./queue.ts";
+import { shuffleIds } from "./seed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { lowerThreat, placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
-import { livingSeats, updateCard } from "./state.ts";
+import { livingSeats, updateCard, withSeat } from "./state.ts";
 import { topFrame } from "./windows.ts";
-import { moveCard } from "./zones.ts";
+import { attachTo, moveCard } from "./zones.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
 export type PlayerFocus = { seat: number; sourceId: string | null };
@@ -97,6 +100,34 @@ export function runPlayerVerb(
       if (!source || seat == null) return state;
       return moveCard(state, source.id, { zone: "play", seat });
     }
+    case "CancelEffect":
+      return cancelAnswered(state);
+    case "LookAtEncounterTop": {
+      const top = state.encounterDeck[0];
+      return top ? { ...state, window: { kind: "look", seat: focus.seat, cardIds: [top] }, activeSeat: focus.seat, passed: [] } : state;
+    }
+    case "ShuffleDeck": {
+      const seat = state.seats[focus.seat];
+      if (!seat) return state;
+      const shuffled = shuffleIds(seat.deck, state.seed, state.seedCursor);
+      return { ...withSeat(state, focus.seat, { ...seat, deck: shuffled.ids }), seedCursor: shuffled.cursor };
+    }
+    case "MovePicked": {
+      const id = lastPicked(state);
+      if (!state.cards[id]) return state;
+      if (instruction.to === "hand") return moveCard(state, id, { zone: "hand", seat: focus.seat });
+      const entered = updateCard(moveCard(state, id, { zone: "play", seat: focus.seat }), id, { exhausted: false });
+      return queueEvent(entered, { trigger: "enteredPlay", seat: focus.seat, cardId: id });
+    }
+    case "AttachPicked": {
+      const list = pickedList(state);
+      const attachment = list.at(-2) ?? "";
+      const host = list.at(-1) ?? "";
+      if (!state.cards[attachment] || !state.cards[host]) return state;
+      const placed = updateCard(moveCard(state, attachment, { zone: "play", seat: focus.seat }), attachment, { exhausted: false });
+      const attached = queueEvent(attachTo(placed, attachment, host), { trigger: "enteredPlay", seat: focus.seat, cardId: attachment });
+      return enforceRestricted(attached, host, ctx, steps);
+    }
     case "AttackEnemy": {
       const list = pickedList(state);
       const attackerId = list.at(-2) ?? "";
@@ -108,4 +139,23 @@ export function runPlayerVerb(
     default:
       return null;
   }
+}
+
+// A Response to "the when revealed effects are about to resolve" or "the shadow effect has just triggered" cancels it. The
+// frame under the response frame is the effect; the shadow effect is the pending attack's.
+function cancelAnswered(state: ScenarioState): ScenarioState {
+  for (let index = state.stack.length - 1; index >= 0; index -= 1) {
+    const frame = state.stack[index];
+    if (frame?.data.kind !== "responses") continue;
+    const trigger = frame.data.event.trigger;
+    if (trigger === "shadowPending") {
+      return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, shadowCanceled: true } } : state;
+    }
+    if (trigger !== "whenRevealedPending") continue;
+    const target = state.stack[index - 1];
+    if (target?.data.kind !== "effect") return state;
+    const stack = state.stack.map((entry, at) => (at === index - 1 && entry.data.kind === "effect" ? { ...entry, data: { ...entry.data, canceled: true } } : entry));
+    return { ...state, stack };
+  }
+  return state;
 }

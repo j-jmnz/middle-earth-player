@@ -9,6 +9,7 @@ import { expireModifiers, updateCard } from "./state.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 import { effectCause, inCause, ruleCause } from "./cause.ts";
+import { offerResponses } from "./responses.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -42,14 +43,28 @@ export function discardShadows(state: ScenarioState): ScenarioState {
   return next;
 }
 
+function hasShadowEffect(state: ScenarioState, enemyId: string, ctx: ReduceContext): boolean {
+  const shadow = state.cards[state.cards[enemyId]?.shadowId ?? ""];
+  return shadow != null && ctx.effects.some((effect) => effect.cardCode === shadow.code && effect.timing === "shadow");
+}
+
 // Runs once the defender is declared or the hero is named. The shadow resolves first, then damage.
 export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   const begun = next.pendingAttack;
   if (!begun) return state;
   if (!begun.shadowResolved) {
-    next = { ...next, pendingAttack: { ...begun, shadowResolved: true } };
-    next = resolveShadow(next, begun.enemyId, begun.seat, ctx, steps);
+    // The shadow effect has just triggered: a Response may cancel it first (Hasty Stroke). The attack waits for the
+    // Responses, and settle comes back here when they are done.
+    if (!begun.shadowOffered && hasShadowEffect(next, begun.enemyId, ctx)) {
+      const offered = offerResponses({ ...next, pendingAttack: { ...begun, shadowOffered: true } }, { trigger: "shadowPending", seat: begun.seat }, ctx, steps);
+      // The defense window is over: the defender is declared. Settle runs the Responses, then the attack goes on.
+      if (offered.stack.length > next.stack.length) return { ...offered, window: null };
+      next = offered;
+    }
+    const current = next.pendingAttack ?? begun;
+    next = { ...next, pendingAttack: { ...current, shadowResolved: true } };
+    if (!current.shadowCanceled) next = resolveShadow(next, begun.enemyId, begun.seat, ctx, steps);
     if (next.lost || next.failure) return next;
   }
   const attack = next.pendingAttack;

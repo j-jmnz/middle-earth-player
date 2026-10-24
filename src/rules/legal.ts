@@ -45,6 +45,8 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
       return triggerIntents(state, ctx);
     case "response":
       return [{ type: "Pass" }, ...triggerIntents(state, ctx)];
+    case "look":
+      return [{ type: "Pass" }];
     case "resolution":
       return resolutionIntents(state, ctx);
     case "travel":
@@ -109,6 +111,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       return state.window?.kind === "pass" ||
         state.window?.kind === "frameAction" ||
         state.window?.kind === "cancelOffer" ||
+        state.window?.kind === "look" ||
         state.window?.kind === "response"
         ? null
         : "That intent is not legal in this window";

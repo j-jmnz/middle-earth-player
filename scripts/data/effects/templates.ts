@@ -558,4 +558,51 @@ export const TEMPLATES: readonly Template[] = [
       },
     ],
   },
+  // Cancel, look at, and search.
+  {
+    id: "response-cancel-when-revealed",
+    pattern: /^Response: Cancel the "when revealed" effects of a card that was just revealed from the encounter deck\.$/,
+    build: () => [{ timing: "response", trigger: "whenRevealedPending", instructions: [{ verb: "CancelEffect" }] }],
+  },
+  {
+    id: "response-cancel-shadow-effect",
+    pattern: /^Response: Cancel a shadow effect just triggered during combat\.$/,
+    build: () => [{ timing: "response", trigger: "shadowPending", instructions: [{ verb: "CancelEffect" }] }],
+  },
+  {
+    id: "action-exhaust-look-at-encounter-top",
+    pattern: /^Action: Exhaust \{self\} to look at the top card of the encounter deck\.$/,
+    build: () => [{ timing: "action", cost: { kind: "exhaustSelf" }, instructions: [{ verb: "LookAtEncounterTop" }] }],
+  },
+  {
+    id: "response-played-search-top-attachment-into-play",
+    pattern: /^Response: After you play \{self\} from your hand, search the top (\d+) cards of your deck for an attachment of cost (\d+) or less and put it into play\. Put the remaining cards back in any order\.$/,
+    build: (match) => [
+      {
+        timing: "response",
+        trigger: "played",
+        instructions: [
+          { verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: count(match[1]), cardType: "attachment", maxCost: count(match[2]) } },
+          { verb: "Pick", pick: { type: "character", control: "any", hostForPicked: true } },
+          { verb: "AttachPicked" },
+          { verb: "ArrangeTop" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "response-enters-play-search-deck-for-trait-attachment",
+    pattern: /^Response: After \{self\} enters play, search your deck for an? (\w+) attachment and add it to your hand\. Shuffle your deck\.$/,
+    build: (match) => [
+      {
+        timing: "response",
+        trigger: "enteredPlay",
+        instructions: [
+          { verb: "Pick", pick: { type: "card", control: "you", from: "deck", cardType: "attachment", trait: match[1] ?? "" } },
+          { verb: "MovePicked", to: "hand" },
+          { verb: "ShuffleDeck" },
+        ],
+      },
+    ],
+  },
 ];

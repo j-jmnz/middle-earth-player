@@ -54,6 +54,10 @@ export const triggerSchema = z.enum([
   "committed",
   "damaged",
   "allyLeftPlay",
+  // A Response here can cancel what is about to happen: the "when revealed" effects of the card just revealed, the
+  // shadow effect of the card just turned up in an attack (rr.cancel).
+  "whenRevealedPending",
+  "shadowPending",
 ]);
 
 const whoSchema = z.enum(["actor", "firstPlayer"]);
@@ -69,7 +73,14 @@ export const pickSchema = z.strictObject({
   staging: z.boolean().optional(),
   // A card of this sphere of influence, for a card picked from the hand or a discard pile.
   sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral"]).optional(),
-  from: z.enum(["play", "hand", "discard"]).optional(),
+  from: z.enum(["play", "hand", "discard", "deck"]).optional(),
+  // From the deck: only its top cards are looked at. The cards still in the deck are the ones ArrangeTop puts back in order.
+  top: z.number().int().positive().optional(),
+  // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
+  cardType: z.enum(["ally", "attachment", "event"]).optional(),
+  maxCost: z.number().int().min(0).optional(),
+  // The candidates are the cards the last picked attachment may be attached to.
+  hostForPicked: z.boolean().optional(),
   trait: z.string().min(1).optional(),
   state: z.enum(["ready", "exhausted"]).optional(),
   different: z.boolean().optional(),
@@ -214,6 +225,18 @@ const simpleVerbs = [
   z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: z.number().int().positive(), target: z.enum(["picked", "eachStagingLocation"]), ...when }),
   // Puts the source ally under another player's control.
   z.strictObject({ verb: z.literal("GiveControl"), ...when }),
+  // Cancels what the Response it is played in answers: the "when revealed" effects about to resolve, or the shadow effect.
+  verb("CancelEffect"),
+  // Shows the actor the top card of the encounter deck. The window closes with a pass.
+  verb("LookAtEncounterTop"),
+  // Shuffles the actor's deck.
+  verb("ShuffleDeck"),
+  // Moves the last picked card to the actor's hand, or puts it into play under the actor's control.
+  z.strictObject({ verb: z.literal("MovePicked"), to: z.enum(["hand", "play"]), ...when }),
+  // Attaches the card picked before the last pick (an attachment) to the last picked card.
+  verb("AttachPicked"),
+  // The actor puts the cards a Pick looked at, those still in the deck, back on top in an order they choose.
+  verb("ArrangeTop"),
   // The last picked character (the one before it) attacks the last picked enemy. The attacker is already exhausted.
   z.strictObject({ verb: z.literal("AttackEnemy"), ...when }),
   verb("Commit"),
