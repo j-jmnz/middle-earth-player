@@ -8,25 +8,27 @@ import { useStore } from "zustand";
 import { QuestBand } from "../../../play/quest-band";
 import { railFor } from "../../../play/rail";
 import { prefetchCodes, resolutionCodes } from "../../../play/prefetch";
-import { shownSeat, threatSelector, zoneSelector } from "../../../play/selectors";
+import { inspectTargets, shownSeat, threatSelector, zoneSelector } from "../../../play/selectors";
 import { dropOutcome, targetFromKey } from "../../../play/selection";
-import { actionsSheet, commitSheet, paySheet, sheetFor, type Sheet, type SheetNames } from "../../../play/sheets";
+import { actionsSheet, commitSheet, paySheet } from "../../../play/bar-sheets";
+import type { Sheet, SheetNames } from "../../../play/sheet-types";
+import { sheetFor } from "../../../play/sheets";
 import type { PlayerIntent, ScenarioState, TableStore } from "../../../play/store";
 import { TableCanvas } from "../../../play/table-canvas";
 import type { PictureSource } from "../../../play/table-canvas-types";
-import { ChromeButton, ChromePrimary, LogPanel, PhaseRail, SheetTab, SheetView, ThreatRing } from "../../../play/table-chrome";
+import { CardListPanel, ChromeButton, ChromePrimary, LogPanel, PhaseRail, SheetTab, SheetView, ThreatRing, threatLine } from "../../../play/table-chrome";
 import { BodyText, NavBar, Screen } from "../../chrome";
 import { bookletParams } from "../../campaign-data";
+import { inactiveCodes } from "../../../catalog/active-text";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { enqueueImageDownloads } from "../../images/queue";
 import { scanAssets } from "../../images/scan-map";
 import { cachedImage, useImageSnapshot } from "../../images/store";
 import { routeCode } from "../../route-code";
-import { inactiveCodes } from "../../../play/inactive";
 import { ledgerLine, ruleTitle } from "../../../play/ledger";
 import { logLines, type LogNames } from "../../../play/log";
-import { openTable, sessionStore, type TableSession } from "../../table-session";
+import { sessionStore, useTableSession, type TableSession } from "../../table-session";
 
 function picture(code: string): PictureSource | null {
   const cached = cachedImage(code);
@@ -75,7 +77,7 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
     [nameOf, store],
   );
   // Unique text with no effect record is inactive: the canvas veils it, and no control applies it.
-  const inactiveSet = useMemo(() => inactiveCodes(new Map([...session.facts].map(([code, facts]) => [code, facts.text])), session.ctx.effects), [session]);
+  const inactiveSet = useMemo(() => inactiveCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const), session.ctx.effects), [session]);
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
   const rail = useMemo(() => railFor(game), [game]);
   const logNames: LogNames = useMemo(
@@ -93,20 +95,30 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   const sheet = overlay && overlay.game === game ? overlay.sheet : windowSheet;
   const showSheet = sheet != null && collapsed !== sheet.key;
 
+  // The overlay (a pay or attackers sheet) closes only when the reducer accepts, so a refusal keeps the player's choices.
   const dispatch = useCallback(
     (intent: PlayerIntent) => {
-      setOverlay(null);
-      store.getState().dispatch(intent);
+      if (store.getState().dispatch(intent)) setOverlay(null);
     },
     [store],
   );
   const openSheet = useCallback((next: Sheet) => setOverlay({ sheet: next, game: store.getState().game }), [store]);
-  const onInspect = useCallback(
+  const openCard = useCallback(
     (cardId: string) => {
       const code = store.getState().game.cards[cardId]?.code;
       if (code) router.push({ pathname: "/card/[code]", params: { code } });
     },
     [router, store],
+  );
+  // A tap on a card with attachments lists them, so each is a full-size target (they only peek out under the host).
+  const [inspectList, setInspectList] = useState<readonly string[] | null>(null);
+  const onInspect = useCallback(
+    (cardId: string) => {
+      const targets = inspectTargets(store.getState().game, cardId);
+      if (targets.length > 1) setInspectList(targets);
+      else openCard(cardId);
+    },
+    [store, openCard],
   );
   const onDrop = useCallback(
     (cardId: string, key: string) => {
@@ -130,6 +142,7 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   const hasActions = game.window?.kind === "pass" && legal.some((intent) => intent.type === "Trigger");
   const committing = canCommit && pending.length > 0;
   const showLife = game.widgets.lifeTracker && game.life != null;
+  const threatText = threatLine(threats, showLife ? (game.life ?? 0) : null);
 
   return (
     <Screen testID="table" scene="felt" inset={false}>
@@ -161,30 +174,42 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
         ) : null}
         <QuestBand game={game} ctx={session.ctx} nameOf={nameOf} />
       </View>
-      {refusal ? (
+      {refusal && (!sheet || !showSheet) ? (
         <Text testID="table-refusal" className="px-6 text-body text-danger">
           {refusal}
         </Text>
       ) : null}
       <PhaseRail rail={rail} />
+      {inspectList ? (
+        <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
+          <CardListPanel
+            cards={inspectList.map((id) => ({ id, label: names.card(id) }))}
+            onOpen={(id) => {
+              setInspectList(null);
+              openCard(id);
+            }}
+            onClose={() => setInspectList(null)}
+          />
+        </View>
+      ) : null}
       {logOpen ? (
         <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
           <LogPanel round={game.round} lines={lines} onClose={() => setLogOpen(false)} />
         </View>
       ) : null}
-      {sheet && showSheet && !logOpen ? (
+      {sheet && showSheet && !logOpen && !inspectList ? (
         <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
-          <SheetView sheet={sheet} game={game} names={names} onIntent={dispatch} onNext={openSheet} onOutcome={onOutcome} onInspect={onInspect} onCollapse={() => setCollapsed(sheet.key)} />
+          <SheetView sheet={sheet} game={game} names={names} threat={threatText} refusal={refusal} onIntent={dispatch} onNext={openSheet} onOutcome={onOutcome} onInspect={onInspect} onCollapse={() => setCollapsed(sheet.key)} />
         </View>
       ) : null}
-      {sheet && !showSheet ? <SheetTab title={sheet.title} onOpen={() => setCollapsed(null)} /> : null}
+      {sheet && !showSheet ? <SheetTab title={sheet.title} threat={threatText} onOpen={() => setCollapsed(null)} /> : null}
       {!sheet ? (
         <View className="flex-row items-end justify-between px-4 pb-safe pt-2">
           <View className="flex-row gap-3">
             {threats.map((threat) => (
               <ThreatRing key={threat.seat} threat={threat} label={threats.length > 1 ? `Player ${threat.seat + 1}` : "Threat"} />
             ))}
-            {showLife ? <ThreatRing threat={{ seat: 9, threat: game.life ?? 0, eliminated: false }} label="Life" /> : null}
+            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" /> : null}
           </View>
           <View className="flex-1 items-end gap-1 pl-3">
             <View className="flex-row">
@@ -194,7 +219,14 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
             {committing ? (
               <ChromePrimary label={`Commit ${pending.length}`} testID="table-commit" onPress={() => dispatch({ type: "Commit", cardIds: [...pending] })} />
             ) : (
-              <ChromePrimary label="Pass" testID="table-pass" disabled={!canPass} onPress={() => dispatch({ type: "Pass" })} />
+              <>
+                <ChromePrimary label="Pass" testID="table-pass" disabled={!canPass} onPress={() => dispatch({ type: "Pass" })} />
+                {!canPass ? (
+                  <Text testID="table-pass-why" className="text-label text-muted">
+                    The engine is resolving; nothing can be passed yet.
+                  </Text>
+                ) : null}
+              </>
             )}
           </View>
         </View>
@@ -207,9 +239,9 @@ export default function TableScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string }>();
   const saveId = routeCode(params.saveId);
-  const { catalog, user } = useDatabases();
+  const { user } = useDatabases();
   // Opened once per save: the store holds the game from here on, and each accepted intent is written to user.db.
-  const session = useMemo(() => (saveId ? openTable(catalog, user, saveId) : null), [catalog, user, saveId]);
+  const session = useTableSession(saveId);
   const store = useMemo(() => (session?.ok ? sessionStore(session, user).store : null), [session, user]);
 
   if (!saveId || !session || !session.ok || !store) {

@@ -1,14 +1,17 @@
-// The seed of a deal. A production build deals a random one. The e2e-test build (eas.json) sets EXPO_PUBLIC_E2E_SEED, so a
-// Maestro flow deals the same game every run. Expo inlines EXPO_PUBLIC_ variables at build time; a build without the
-// variable ignores this.
-export function dealSeed(random: () => number = Math.random): number {
+// The e2e-test build (eas.json) sets EXPO_PUBLIC_E2E_SEED; Expo inlines EXPO_PUBLIC_ variables at build time. With it, a deal
+// uses that fixed seed so a Maestro flow deals the same game every run, and the fixture route writes fixture saves. Every
+// build ships the fixture route; without the variable it is inert and writes nothing.
+function e2eSeed(): number | null {
   const fixed = Number(process.env.EXPO_PUBLIC_E2E_SEED);
-  if (Number.isInteger(fixed) && fixed > 0) return fixed;
-  return 1 + Math.floor(random() * 0x7fffffff);
+  return Number.isInteger(fixed) && fixed > 0 ? fixed : null;
 }
 
-/** True in the e2e-test build only (the same variable as the deal seed). A production build has no fixture route. */
+/** The seed of a deal: the e2e seed in the e2e-test build, otherwise a random one. */
+export function dealSeed(random: () => number = Math.random): number {
+  return e2eSeed() ?? 1 + Math.floor(random() * 0x7fffffff);
+}
+
+/** True in the e2e-test build only. The fixture route ships in every build and writes a save only when this holds. */
 export function e2eBuild(): boolean {
-  const fixed = Number(process.env.EXPO_PUBLIC_E2E_SEED);
-  return Number.isInteger(fixed) && fixed > 0;
+  return e2eSeed() != null;
 }

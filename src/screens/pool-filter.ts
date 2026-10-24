@@ -83,7 +83,8 @@ export function filterPool<T extends PoolCard>(
   search: string,
   filter: PoolFilter,
   groups: readonly CycleGroup[],
-  activeCodes: ReadonlySet<string>,
+  // Codes whose unique text is inactive (textInactive in src/catalog/active-text.ts).
+  inactiveCodes: ReadonlySet<string>,
 ): T[] {
   const query = search.trim().toLowerCase();
   return cards.filter((card) => {
@@ -94,7 +95,7 @@ export function filterPool<T extends PoolCard>(
     if (filter.trait && !traitTokens(card.traits).includes(filter.trait)) return false;
     if (filter.cost && shownCost(card) !== filter.cost) return false;
     if (filter.unique && !card.isUnique) return false;
-    if (filter.activeText && !activeCodes.has(card.code)) return false;
+    if (filter.activeText && inactiveCodes.has(card.code)) return false;
     return true;
   });
 }

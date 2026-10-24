@@ -113,7 +113,7 @@ Shared pieces live in `src/screens/chrome.tsx`. They are views and text. They do
 | `BodyText`, `Label` | System face; tone bone, muted, faint, or danger |
 | `ListRow` | Flat 56 pt row on a hairline, optional 32×44 picture, optional detail line, chevron |
 | `TextButton` | Medium-weight body text, 44 pt target, pressed fill. Bone, gold, or ink on paper |
-| `PrimaryButton` | Gold pill, Marcellus caps label. On paper it is an ink pill. Disabled is a raised pill with faint text |
+| `PrimaryButton` | Gold pill, Marcellus caps label. On paper it is an ink pill. Disabled on night is a raised pill with faint text; disabled on paper is a transparent pill with a 1 pt `inkLine` outline and `inkMuted` text. A disabled primary has one sentence near it saying what it waits for |
 | `Panel` | Raised rounded card on a hairline. `current` swaps to the gold edge |
 | `RingMark` | The Ring: current (gold ring), done (gold disc), locked (hairline ring) |
 | `Segmented` | Two or three words in a pill track. Selected is a gold pill, semibold |
@@ -155,7 +155,7 @@ Canvas ground is `felt` with a lit center. Pinned quest stage at the top: small 
 
 The rail is not a full strip: it shows the previous step, the current step in Marcellus caps gold with a soft glow, and the next step, all in one centered line above the bottom bar. Bottom bar: threat in a ring (Marcellus number, label Threat), and PASS as the primary. Life, when declared, sits beside threat the same way. Booklet and Undo are text buttons at the top.
 
-Choice sheets are `PaperSheet`s over the rail. The eyebrow repeats the step (Combat), the title states the moment (Black Rider attacks), a muted line gives the engine's numbers. Choices are hero tiles in a row; the selected tile has the ink border. One ink primary names the action (DEFEND WITH SAM), the alternative is an inkLabel text button (Leave undefended). Hide shows Passed or Failed in Marcellus with the engine's numbers. A sheet folds to one paper bar (Look at the table) so the cards under it can be read and inspected, and comes back with one tap. In phase 11 the choice tiles are names on paper; the hero art on them waits for the design pass.
+Choice sheets are `PaperSheet`s over the rail. The eyebrow repeats the step (Combat), the title states the moment (Black Rider attacks), a muted line gives the engine's numbers. Choices are hero tiles in a row; the selected tile has the ink border. One ink primary names the action (DEFEND WITH SAM), the alternative is an inkLabel text button (Leave undefended). Hide shows Passed or Failed in Marcellus with the engine's numbers. Only the tiles scroll: the reducer's refusal (danger), the primary and the alternative stay pinned at the bottom of the sheet, and the seats' threat stays in a Marcellus inkLabel line under the title, open or folded. A tap on a card with attachments opens a paper list of the card and each attachment, each a full-size target for the card screen. A sheet folds to one paper bar (Look at the table) so the cards under it can be read and inspected, and comes back with one tap. In phase 11 the choice tiles are names on paper; the hero art on them waits for the design pass.
 
 Log, beside Booklet at the top, opens a paper sheet of this round's engine steps, each with its cause in inkMuted under it (the rule title, or the card and its printed line). It is text, not a control. Undo is not on the table yet.
 

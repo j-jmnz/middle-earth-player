@@ -1,4 +1,4 @@
-// Rules: rr.resource-match, rr.resources, mec109.archery (data/rules/entries.json).
+// Rules: rr.resource-match, rr.resources, rr.cancel, mec109.archery (data/rules/entries.json).
 //
 // Choosing which pools pay a cost, and how a fixed total is split (archery). The engine computed the total; the player
 // only names where it comes from or goes, one token at a time, and the sheet confirms only when the shares sum to it.
@@ -10,6 +10,7 @@ import type { ReduceContext } from "../rules/interpret.ts";
 import { heroPays } from "../rules/payments.ts";
 import { printedOf, type Sphere } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
+import { topFrame } from "../rules/windows.ts";
 
 export type Share = { id: string; amount: number };
 
@@ -104,4 +105,15 @@ export function sharesReady(shares: readonly Share[], total: number, exact: bool
 
 export function toPayments(shares: readonly Share[]): Payment[] {
   return shares.filter((share) => share.amount > 0).map((share) => ({ heroId: share.id, amount: share.amount }));
+}
+
+/**
+ * The pay request for a paid cancel (rr.cancel): the first player pays the amount the effect record names, from the heroes
+ * that may pay its sphere, granted icons included. The same check the reducer makes (validatePayments, seat firstPlayer).
+ */
+export function cancelRequest(state: ScenarioState, ctx: ReduceContext, cardId: string): PayRequest | null {
+  const data = topFrame(state)?.data;
+  if (data?.kind !== "effect" || !data.cancel) return null;
+  const seat = state.firstPlayer;
+  return { seat, cardId, total: data.cancel.amount, exact: true, pools: poolsFor(state, ctx, seat, data.cancel.sphere) };
 }

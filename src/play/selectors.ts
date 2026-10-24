@@ -97,3 +97,17 @@ export function shownSeat(game: ScenarioState): number {
   const seat = game.activeSeat;
   return seat >= 0 && seat < game.seatCount ? seat : 0;
 }
+
+/**
+ * What a tap on a table card can inspect: the card, then each card attached to it and its shadow card once it is face up.
+ * Attachments peek out only a strip from under their host, so a tap on the host lists them, each a full-size target.
+ */
+export function inspectTargets(game: ScenarioState, cardId: string): readonly string[] {
+  const card = game.cards[cardId];
+  if (!card) return [];
+  const host = card.host && game.cards[card.host] ? game.cards[card.host] : card;
+  if (!host) return [cardId];
+  const shadow = host.shadowId ? game.cards[host.shadowId] : undefined;
+  const under = [...host.attachments, ...(shadow && shadow.face !== "down" ? [shadow.id] : [])].filter((id) => game.cards[id]?.face !== "down");
+  return [host.id, ...under];
+}

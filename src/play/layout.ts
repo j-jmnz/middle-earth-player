@@ -49,6 +49,15 @@ export function cardSize(width: number, height: number): { w: number; h: number 
   return { w, h: Math.round(w * ASPECT) };
 }
 
+export const MIN_TARGET = 44;
+
+/** The size of a hand card: the table's card, narrowed so `count` cards overlap by no more than leaves 44 pt of each. */
+export function handCardSize(card: { w: number; h: number }, width: number, count: number): { w: number; h: number } {
+  if (count <= 1) return card;
+  const w = Math.max(36, Math.min(card.w, Math.floor(width - MIN_TARGET * (count - 1))));
+  return w === card.w ? card : { w, h: Math.round(w * ASPECT) };
+}
+
 function slotOf(card: CardInstance, zone: ZoneId, kind: SlotKind, rect: Rect, landscape = false, tilt = 0): CardSlot {
   return {
     ...rect,
@@ -124,11 +133,13 @@ export function tableLayout(width: number, height: number, views: LayoutViews): 
 
   // The hand fans: a slight turn from the middle out, overlapping when it is long.
   const handEntries = views.hand.entries;
-  const xs = rowXs(handEntries.length, hand.x, hand.w, card.w);
+  // Each hand card keeps at least a 44 pt strip to touch: a long hand narrows its cards before the strip gets thinner.
+  const handCard = handCardSize(card, hand.w, handEntries.length);
+  const xs = rowXs(handEntries.length, hand.x, hand.w, handCard.w);
   const middle = (handEntries.length - 1) / 2;
   handEntries.forEach((entry, index) => {
     const offset = index - middle;
-    slots.push(slotOf(entry.card, "hand", "card", { x: xs[index] ?? hand.x, y: handY + Math.abs(offset) * 3, w: card.w, h: card.h }, false, offset * 0.04));
+    slots.push(slotOf(entry.card, "hand", "card", { x: xs[index] ?? hand.x, y: handY + Math.abs(offset) * 3, w: handCard.w, h: handCard.h }, false, offset * 0.04));
   });
 
   return { width, height, card, zones: { questStage: stage, staging, activeLocation, secondActiveLocation, engaged, play, hand }, slots };

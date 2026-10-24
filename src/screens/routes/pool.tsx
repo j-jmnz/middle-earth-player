@@ -14,7 +14,7 @@ import {
   View,
 } from "react-native";
 
-import { activeCardCodes } from "../../catalog/active-text";
+import { inactiveCodes as inactiveTextCodes } from "../../catalog/active-text";
 import { formatDeckRefusal, traitTokens } from "../../catalog/deck-save";
 import { cards, packs } from "../../catalog/schema";
 import { EFFECTS } from "../../effects";
@@ -203,7 +203,13 @@ export default function CardPool() {
       .orderBy(packs.cyclePosition, packs.position)
       .all(),
   );
-  const [activeCodes] = useState(() => activeCardCodes(EFFECTS));
+  // The same inactive-text check as the card screen and the table: unique text with no effect record.
+  const [inactiveCodes] = useState(() =>
+    inactiveTextCodes(
+      catalog.select({ code: cards.code, text: cards.text }).from(cards).where(eq(cards.deckLegal, true)).all().map((row) => [row.code, row.text] as const),
+      EFFECTS,
+    ),
+  );
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);
   const [search, setSearch] = useState("");
   const [applied, setApplied] = useState<PoolFilter>(emptyPoolFilter);
@@ -227,8 +233,8 @@ export default function CardPool() {
     };
   }, []);
   const visible = useMemo(
-    () => filterPool(rows, search, applied, groups, activeCodes),
-    [rows, search, applied, groups, activeCodes],
+    () => filterPool(rows, search, applied, groups, inactiveCodes),
+    [rows, search, applied, groups, inactiveCodes],
   );
   const spheres = useMemo(() => sphereChoices(rows), [rows]);
   const types = useMemo(() => typeChoices(rows), [rows]);

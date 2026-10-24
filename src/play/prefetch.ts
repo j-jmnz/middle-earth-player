@@ -1,6 +1,7 @@
-// Which card pictures the table asks the image queue for first: the hand, staging, and the screen the player is about to
-// open (the resolution's cards once the scenario is won, the card the player picked up or a sheet names). Never the whole
-// cache (docs/architecture.md, Images). Text is drawn while a file is still downloading.
+// Which card pictures the table asks the image queue for first: the shown seat's hand, the face-up staging cards, and the
+// codes of the screen the player is about to open, which the caller passes (the table passes the resolution's cards once
+// the scenario is won and the card the player picked up). Never the whole cache (docs/architecture.md, Images). Text is
+// drawn while a file is still downloading.
 import type { ScenarioState } from "../rules/state.ts";
 
 function faceUp(game: ScenarioState, ids: readonly string[]): string[] {

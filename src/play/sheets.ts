@@ -6,121 +6,20 @@
 // number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../catalog/boundary.ts";
 import { modifiedStat } from "../rules/keywords.ts";
-import { printedOf } from "../rules/printed.ts";
+import { hideWillpower } from "../rules/hide.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import type { Frame } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
-import { triggerRequest, type PayRequest, type Share } from "./pay.ts";
+import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
+import { TIMING_WORDS, type Alternative, type HideNumbers, type MultiSheet, type Sheet, type SheetNames, type SheetOption, type TriggerOption } from "./sheet-types.ts";
 
-export type SheetNames = {
-  // A card instance by id, as the player reads it.
-  card: (cardId: string) => string;
-  // The printed line a ledger line id names, or null when the ledger has none.
-  line: (lineId: string) => string | null;
-};
-
-export type SheetOption = { id: string; label: string; code: string | null };
-
-export type PickOption = SheetOption & ({ intent: PlayerIntent } | { next: Sheet });
-
-export type Alternative = { label: string; intent: PlayerIntent } | { label: string; next: Sheet };
-
-export type PickSheet = {
-  kind: "pick";
-  key: string;
-  step: string;
-  title: string;
-  note: string | null;
-  // The action the primary button names with the chosen option ("Defend with" Sam).
-  verb: string;
-  options: readonly PickOption[];
-  // The one filled action when the sheet has no options to choose among (Keep, Done).
-  primary: { label: string; intent: PlayerIntent } | null;
-  alternative: Alternative | null;
-};
-
-export type MultiBuild = { kind: "Commit" } | { kind: "CommitHide" } | { kind: "attack"; enemyId: string };
-
-export type MultiSheet = {
-  kind: "multi";
-  key: string;
-  step: string;
-  title: string;
-  note: string | null;
-  verb: string;
-  options: readonly SheetOption[];
-  build: MultiBuild;
-  allowEmpty: boolean;
-  preselected: readonly string[];
-  alternative: Alternative | null;
-};
-
-export type DistributePurpose =
-  | { kind: "archery" }
-  | { kind: "play"; cardId: string; hostId: string | null }
-  | { kind: "trigger"; cardId: string; effectId: string };
-
-export type DistributeSheet = {
-  kind: "distribute";
-  key: string;
-  step: string;
-  title: string;
-  note: string;
-  total: number;
-  exact: boolean;
-  options: readonly (SheetOption & { max: number })[];
-  purpose: DistributePurpose;
-};
-
-export type TriggerOption = SheetOption & { effectId: string; cardId: string; timing: string; text: string | null; pay: PayRequest | null };
-
-export type HideNumbers = { x: number; threat: number; willpower: number; committed: readonly string[] };
-
-export type TriggerSheet = {
-  kind: "trigger";
-  key: string;
-  step: string;
-  title: string;
-  // The card the moment is about, so the sheet can name it and the inspect route can open it.
-  sourceId: string | null;
-  timing: string;
-  note: string | null;
-  hide: HideNumbers | null;
-  options: readonly TriggerOption[];
-  // The pass button's word, or null when the window cannot be passed.
-  pass: string | null;
-};
-
-export type OutcomeSheet = { kind: "outcome"; key: string; result: "won" | "lost"; title: string; note: string };
-
-export type Sheet = PickSheet | MultiSheet | DistributeSheet | TriggerSheet | OutcomeSheet;
-
-export const TIMING_WORDS: Readonly<Record<Effect["timing"], string>> = {
-  setup: "Setup",
-  forced: "Forced",
-  triggered: "Forced",
-  whenRevealed: "When revealed",
-  response: "Response",
-  action: "Action",
-  shadow: "Shadow",
-  constant: "Constant",
-  questResolution: "Quest resolution",
-  campaignSetup: "Setup",
-  resolution: "Resolution",
-  travel: "Travel",
-  engagement: "Engagement",
-  beginningOfPhase: "Beginning of phase",
-  endOfPhase: "End of phase",
-  endOfRound: "End of round",
-};
-
-function step(game: ScenarioState): string {
+export function step(game: ScenarioState): string {
   return STEP_WORDS[game.mode] ?? game.phase;
 }
 
-function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
+export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
   if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
   const card = game.cards[id];
   if (card) return { id, label: names.card(id), code: card.code };
@@ -137,7 +36,7 @@ function lineOf(effect: Effect | undefined, names: SheetNames): string | null {
   return id ? names.line(id) : null;
 }
 
-function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): TriggerOption[] {
+export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): TriggerOption[] {
   const options: TriggerOption[] = [];
   for (const intent of legal) {
     if (intent.type !== "Trigger") continue;
@@ -158,31 +57,13 @@ function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: readonly
   return options;
 }
 
-// A paid cancel: the first player pays the amount the effect record names from heroes of its sphere (rr.cancel).
-function cancelRequest(game: ScenarioState, ctx: ReduceContext, cardId: string): PayRequest | null {
-  const data = topFrame(game)?.data;
-  if (data?.kind !== "effect" || !data.cancel) return null;
-  const sphere = data.cancel.sphere;
-  const seat = game.firstPlayer;
-  const pools = (game.seats[seat]?.heroes ?? []).flatMap((heroId) => {
-    const hero = game.cards[heroId];
-    if (!hero || hero.resources <= 0) return [];
-    const heroSphere = printedOf(ctx.cards, hero.code).sphere;
-    return sphere == null || sphere === "neutral" || heroSphere === sphere ? [{ heroId, max: hero.resources }] : [];
-  });
-  return { seat, cardId, total: data.cancel.amount, exact: true, pools };
-}
-
 function hideNumbers(game: ScenarioState, ctx: ReduceContext, frame: Frame | undefined): HideNumbers | null {
   for (let index = game.stack.length - 1; index >= 0; index -= 1) {
-    const data = game.stack[index]?.data;
-    if (data?.kind !== "hide") continue;
-    let willpower = 0;
-    for (const id of data.committedIds) {
-      const instance = game.cards[id];
-      if (instance) willpower += modifiedStat(game, instance, "willpower", ctx.cards);
-    }
-    return { x: data.x, threat: data.threat, willpower, committed: data.committedIds };
+    const hide = game.stack[index];
+    const data = hide?.data;
+    if (!hide || data?.kind !== "hide") continue;
+    // The engine's own total: committed characters in play plus what the seat and the table hold for the test.
+    return { x: data.x, threat: data.threat, willpower: hideWillpower(game, hide.seat, data.committedIds, ctx), committed: data.committedIds };
   }
   return frame?.data.kind === "hide" ? { x: frame.data.x, threat: frame.data.threat, willpower: 0, committed: [] } : null;
 }
@@ -463,77 +344,3 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
 }
 
 /** The quest commit the bar sends: the characters dragged to the quest stage, or every legal one picked on the sheet. */
-export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, pendingCommit: readonly string[]): MultiSheet {
-  return {
-    kind: "multi",
-    key: `commit:${game.round}`,
-    step: "Quest",
-    title: "Commit to the quest",
-    note: "Committed characters exhaust and add their willpower against the threat in staging.",
-    verb: "Commit",
-    options: legalTargets(game, { type: "Commit" }, ctx).map((id) => option(game, names, id)),
-    build: { kind: "Commit" },
-    allowEmpty: false,
-    preselected: pendingCommit,
-    alternative: null,
-  };
-}
-
-/** The Actions the seat can use in an ordinary action window, as a trigger sheet the bar opens. */
-export function actionsSheet(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): TriggerSheet {
-  return {
-    kind: "trigger",
-    key: `actions:${game.round}:${game.mode}`,
-    step: step(game),
-    title: "Actions",
-    sourceId: null,
-    timing: "Action",
-    note: "Only the Actions the rules allow now are listed.",
-    hide: null,
-    options: triggerOptions(game, ctx, legal, names),
-    pass: null,
-  };
-}
-
-/** The intent a multi-choice sheet sends for the chosen ids. */
-export function multiIntent(sheet: MultiSheet, ids: readonly string[]): PlayerIntent {
-  switch (sheet.build.kind) {
-    case "Commit":
-      return { type: "Commit", cardIds: [...ids] };
-    case "CommitHide":
-      return { type: "CommitHide", cardIds: [...ids] };
-    case "attack":
-      return { type: "DeclareAttackers", enemyId: sheet.build.enemyId, attackerIds: [...ids] };
-  }
-}
-
-/** The pay sheet for a card or an effect whose cost takes resources. */
-export function paySheet(game: ScenarioState, names: SheetNames, request: PayRequest, purpose: DistributePurpose): DistributeSheet {
-  const source = names.card(request.cardId);
-  return {
-    kind: "distribute",
-    key: `pay:${request.cardId}:${purpose.kind}`,
-    step: STEP_WORDS[game.mode],
-    title: request.exact ? `Pay ${request.total} for ${source}` : `Pay for ${source}`,
-    note: request.exact ? "Tap a hero to take one resource from its pool." : "X is what you pay. Tap a hero to take one resource from its pool.",
-    total: request.total,
-    exact: request.exact,
-    options: request.pools.map((pool) => ({ ...option(game, names, pool.heroId), max: pool.max })),
-    purpose,
-  };
-}
-
-/** The intent a distribute sheet sends for the chosen shares. */
-export function distributeIntent(sheet: DistributeSheet, shares: readonly Share[]): PlayerIntent {
-  const given = shares.filter((share) => share.amount > 0);
-  switch (sheet.purpose.kind) {
-    case "archery":
-      return { type: "Distribute", assignments: given.map((share) => ({ cardId: share.id, amount: share.amount })) };
-    case "play": {
-      const payments = given.map((share) => ({ heroId: share.id, amount: share.amount }));
-      return sheet.purpose.hostId ? { type: "PlayCard", cardId: sheet.purpose.cardId, payments, hostId: sheet.purpose.hostId } : { type: "PlayCard", cardId: sheet.purpose.cardId, payments };
-    }
-    case "trigger":
-      return { type: "Trigger", cardId: sheet.purpose.cardId, effectId: sheet.purpose.effectId, payments: given.map((share) => ({ heroId: share.id, amount: share.amount })) };
-  }
-}

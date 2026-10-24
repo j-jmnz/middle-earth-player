@@ -12,7 +12,10 @@ import { cards } from "../catalog/schema";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
 import { createTableStore, nextRoundSteps, type EngineStep, type ReduceContext, type ScenarioState, type TableStore } from "../play/store";
+import { useEffect, useMemo } from "react";
+
 import { campaignOf, scenarioOf } from "./campaign-data";
+import { useDatabases } from "./databases";
 import { readSaveChecked, writeSave } from "./campaign-store";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
@@ -21,7 +24,7 @@ export type CardFacts = { imagesrc: string | null; text: string | null };
 
 export type TableSession =
   | { ok: true; save: Save; world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; facts: ReadonlyMap<string, CardFacts> }
-  | { ok: false; reason: "missing" | "none" | "dropped"; save: Save | null };
+  | { ok: false; reason: "missing" | "none" | "dropped"; save: Save | null; write: Save | null };
 
 /** The codes the open scenario can show: the log's cards, the Ring-bearer and every card of each dealt deck. */
 export function loadoutCodes(save: Save): string[] {
@@ -37,18 +40,20 @@ function factsOf<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map<string, 
   return new Map(rows.map((row) => [row.code, { imagesrc: row.imagesrc, text: row.text }]));
 }
 
+/**
+ * Reads and replays the open scenario. It writes nothing: when the open scenario has to be dropped, the save to write is
+ * returned as `write`, and useTableSession writes it in an effect, never during a render.
+ */
 export function openTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): TableSession {
   const read = readSaveChecked(user, saveId);
-  if (!read) return { ok: false, reason: "missing", save: null };
-  let save = read.save;
-  if (read.unreadable) writeSave(user, save);
-  if (!save.active || !save.loadout) return { ok: false, reason: read.unreadable ? "dropped" : "none", save };
+  if (!read) return { ok: false, reason: "missing", save: null, write: null };
+  const save = read.save;
+  if (!save.active || !save.loadout) return { ok: false, reason: read.unreadable ? "dropped" : "none", save, write: read.unreadable ? save : null };
   const campaign = campaignOf(save.campaignId);
   const scenario = scenarioOf(save.loadout.scenarioId);
   if (!campaign || !scenario || staleReason(save.active, CATALOG_VERSION)) {
-    save = drop(save);
-    writeSave(user, save);
-    return { ok: false, reason: "dropped", save };
+    const dropped = drop(save);
+    return { ok: false, reason: "dropped", save: dropped, write: dropped };
   }
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, loadoutCodes(save));
   let roundSteps: readonly EngineStep[] = [];
@@ -57,11 +62,20 @@ export function openTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser
   });
   if (!resumed.ok) {
     // The reducer refused a stored intent, or the start no longer builds: drop the open scenario and keep the log.
-    save = drop(save);
-    writeSave(user, save);
-    return { ok: false, reason: "dropped", save };
+    const dropped = drop(save);
+    return { ok: false, reason: "dropped", save: dropped, write: dropped };
   }
   return { ok: true, save, world, ctx: contextOf(world), game: resumed.state, roundSteps, facts: factsOf(catalog, world.cards.keys()) };
+}
+
+/** The open scenario of a save, opened once per save id. A drop it decided on is written after the render. */
+export function useTableSession(saveId: string | null): TableSession | null {
+  const { catalog, user } = useDatabases();
+  const session = useMemo(() => (saveId ? openTable(catalog, user, saveId) : null), [catalog, user, saveId]);
+  useEffect(() => {
+    if (session && !session.ok && session.write) writeSave(user, session.write);
+  }, [session, user]);
+  return session;
 }
 
 export type SessionStore = { store: TableStore; save: () => Save };

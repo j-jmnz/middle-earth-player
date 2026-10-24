@@ -7,8 +7,8 @@ import { withThreat } from "../rules/state.ts";
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
-import { cardSize, hitSlot, tableLayout } from "./layout.ts";
-import { threatSelector, zoneSelector, type ZoneId } from "./selectors.ts";
+import { cardSize, handCardSize, hitSlot, tableLayout } from "./layout.ts";
+import { inspectTargets, threatSelector, zoneSelector, type ZoneId } from "./selectors.ts";
 import { draggableIds, dropOutcome, dropRects, dropTargets, targetFromKey, targetKey } from "./selection.ts";
 import { createTableStore, nextRoundSteps } from "./store.ts";
 
@@ -172,5 +172,24 @@ describe("layout", () => {
     if (!slot) return;
     expect(layout.slots[hitSlot(layout.slots, slot.x + 2, slot.y + 2)]?.code).toBe(RING_BEARER);
     expect(hitSlot(layout.slots, -10, -10)).toBe(-1);
+  });
+});
+
+describe("touch targets", () => {
+  it("keeps a 44 pt strip of each of eight hand cards on a 390 pt phone", () => {
+    const card = cardSize(390, 600);
+    const width = 390 - 24;
+    const hand = handCardSize(card, width, 8);
+    const step = (width - hand.w) / 7;
+    expect(step).toBeGreaterThanOrEqual(44);
+    expect(hand.w).toBeGreaterThanOrEqual(44);
+  });
+
+  it("a tap on a host lists the host and each card attached to it", () => {
+    const frodo = kept.seats[0].heroes.find((id) => kept.cards[id]?.code === RING_BEARER) ?? "";
+    const attached = kept.cards[frodo]?.attachments ?? [];
+    expect(attached.length).toBeGreaterThan(0);
+    expect(inspectTargets(kept, frodo)).toEqual([frodo, ...attached]);
+    expect(inspectTargets(kept, attached[0] ?? "")).toEqual([frodo, ...attached]);
   });
 });

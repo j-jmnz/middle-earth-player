@@ -111,6 +111,20 @@ function allies(state: ScenarioState, seat: number, ctx: ReduceContext): number 
   }).length;
 }
 
+// The willpower a Hide test measures: the committed characters still in play, plus what the seat or the table holds for
+// the test (a stage that adds 1 per ally, a location). The table's Hide sheet shows this same number.
+export function hideWillpower(state: ScenarioState, seat: number, committedIds: readonly string[], ctx: ReduceContext): number {
+  let willpower = 0;
+  let committed = 0;
+  for (const id of committedIds) {
+    const instance = state.cards[id];
+    if (!instance || !inPlay(instance.zone)) continue;
+    willpower += modifiedStat(state, instance, "willpower", ctx.cards);
+    committed += 1;
+  }
+  return willpower + heldStat(state, seat, "hideWillpower", { committed, ally: allies(state, seat, ctx) });
+}
+
 function measure(
   state: ScenarioState,
   frame: Frame,
@@ -118,15 +132,7 @@ function measure(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  let willpower = 0;
-  let committed = 0;
-  for (const id of data.committedIds) {
-    const instance = state.cards[id];
-    if (!instance || !inPlay(instance.zone)) continue;
-    willpower += modifiedStat(state, instance, "willpower", ctx.cards);
-    committed += 1;
-  }
-  willpower += heldStat(state, frame.seat, "hideWillpower", { committed, ally: allies(state, frame.seat, ctx) });
+  const willpower = hideWillpower(state, frame.seat, data.committedIds, ctx);
   const result: HideResult = { success: willpower >= data.threat, willpower, threat: data.threat };
   steps.push({
     kind: "hideTest",

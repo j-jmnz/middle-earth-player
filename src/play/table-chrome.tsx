@@ -7,10 +7,11 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeIn, ReduceMotion, SlideInDown } from "react-native-reanimated";
 
 import type { LogLine } from "./log.ts";
-import { firstShares, shareOf, sharesReady, tapShare, type Share } from "./pay.ts";
+import { firstShares, shareOf, shareSum, sharesReady, tapShare, type Share } from "./pay.ts";
 import type { Rail } from "./rail.ts";
 import type { SeatThreat } from "./selectors.ts";
-import { distributeIntent, multiIntent, paySheet, type DistributeSheet, type MultiSheet, type PickSheet, type Sheet, type SheetNames, type TriggerOption, type TriggerSheet } from "./sheets.ts";
+import { distributeIntent, multiIntent, paySheet } from "./bar-sheets.ts";
+import type { DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet } from "./sheet-types.ts";
 import type { PlayerIntent, ScenarioState } from "./store.ts";
 import { tableTokens as t } from "./tokens.ts";
 
@@ -40,12 +41,19 @@ export function PhaseRail({ rail }: { rail: Rail }) {
   );
 }
 
+/** The seats' threat in one line, for a sheet's header: "Threat 28", or "Player 1 28 · Player 2 31". */
+export function threatLine(threats: readonly SeatThreat[], life: number | null): string {
+  const seats = threats.length > 1 ? threats.map((row) => `Player ${row.seat + 1} ${row.threat}`).join(" · ") : `Threat ${threats[0]?.threat ?? 0}`;
+  return life != null ? `${seats} · Life ${life}` : seats;
+}
+
 /** A threat number in a ring, Marcellus, with its label. The reducer is the only writer of the number. */
-export function ThreatRing({ threat, label }: { threat: SeatThreat; label: string }) {
+export function ThreatRing({ threat, label, testID }: { threat: SeatThreat; label: string; testID?: string }) {
+  const id = testID ?? `threat-${threat.seat}`;
   return (
-    <View testID={`threat-${threat.seat}`} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
+    <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
-        <Text testID={`threat-${threat.seat}-value`} className="font-display text-title text-bone">
+        <Text testID={`${id}-value`} className="font-display text-title text-bone">
           {String(threat.threat)}
         </Text>
       </View>
@@ -88,10 +96,16 @@ export function ChromeButton({
   );
 }
 
-/** The one filled action: a gold pill on night, an ink pill on paper. Disabled is a raised pill with faint text. */
+/**
+ * The one filled action: a gold pill on night, an ink pill on paper. Disabled on night is a raised pill with faint text;
+ * disabled on paper is an inkLine outline with inkMuted text (docs/design-system.md). A disabled action has a sentence
+ * near it saying why.
+ */
 export function ChromePrimary({ label, onPress, testID, disabled = false, surface = "night" }: { label: string; onPress: () => void; testID: string; disabled?: boolean; surface?: "night" | "paper" }) {
-  const fill = surface === "paper" ? t.ink : t.gold;
-  const pressedFill = surface === "paper" ? t.ink : t.goldDeep;
+  const paper = surface === "paper";
+  const fill = paper ? t.ink : t.gold;
+  const pressedFill = paper ? t.ink : t.goldDeep;
+  const text = disabled ? (paper ? "text-inkMuted" : "text-faint") : paper ? "text-paper" : "text-onGold";
   return (
     <Pressable
       testID={testID}
@@ -102,9 +116,15 @@ export function ChromePrimary({ label, onPress, testID, disabled = false, surfac
       disabled={disabled}
       onPress={onPress}
       className="min-h-14 items-center justify-center rounded-pill px-6"
-      style={({ pressed }) => ({ backgroundColor: disabled ? t.raised : pressed ? pressedFill : fill, opacity: pressed && surface === "paper" ? 0.85 : 1 })}
+      style={({ pressed }) =>
+        disabled
+          ? paper
+            ? { backgroundColor: "transparent", borderWidth: 1, borderColor: t.inkLine }
+            : { backgroundColor: t.raised }
+          : { backgroundColor: pressed ? pressedFill : fill, opacity: pressed && paper ? 0.85 : 1 }
+      }
     >
-      <Text className={`font-display text-body uppercase tracking-widest ${disabled ? "text-faint" : surface === "paper" ? "text-paper" : "text-onGold"}`}>{label}</Text>
+      <Text className={`font-display text-body uppercase tracking-widest ${text}`}>{label}</Text>
     </Pressable>
   );
 }
@@ -131,10 +151,41 @@ function Tile({ label, selected, onPress, testID, detail }: { label: string; sel
   );
 }
 
-/** Parchment over the rail: grabber, the step in an eyebrow, the moment as a title, the engine's numbers in a muted line. */
-function Paper({ step, title, note, children, onCollapse }: { step: string; title: string; note: string | null; children: ReactNode; onCollapse: () => void }) {
+/** One sentence under a disabled action saying what it waits for. */
+function Why({ children }: { children: string }) {
   return (
-    <Animated.View entering={rise} testID="sheet" className="rounded-t-sheet bg-paper px-6 pb-safe pt-3" style={{ maxHeight: "72%" }}>
+    <Text testID="sheet-why" className="mt-1 text-center text-label text-inkMuted">
+      {children}
+    </Text>
+  );
+}
+
+/**
+ * Parchment over the rail: grabber, the step in an eyebrow, the moment as a title, the engine's numbers in a muted line,
+ * and the seats' threat, which stays in sight while a sheet is up. Only the tiles scroll; the reducer's refusal, the primary
+ * and the alternative stay pinned at the bottom, in thumb reach.
+ */
+function Paper({
+  step,
+  title,
+  note,
+  threat,
+  refusal,
+  children,
+  actions,
+  onCollapse,
+}: {
+  step: string;
+  title: string;
+  note: string | null;
+  threat: string;
+  refusal: string | null;
+  children?: ReactNode;
+  actions: ReactNode;
+  onCollapse: () => void;
+}) {
+  return (
+    <Animated.View entering={rise} testID="sheet" className="rounded-t-sheet bg-paper px-6 pb-safe pt-3" style={{ maxHeight: "78%" }}>
       <View className="mb-2 h-1 w-10 self-center rounded-pill bg-inkLine" />
       <View className="items-center">
         <Text testID="sheet-step" className="font-display text-eyebrow uppercase text-inkLabel">
@@ -148,12 +199,25 @@ function Paper({ step, title, note, children, onCollapse }: { step: string; titl
             {note}
           </Text>
         ) : null}
+        <Text testID="sheet-threat" className="mt-1 font-display text-label text-inkLabel">
+          {threat}
+        </Text>
       </View>
-      <ScrollView className="mt-4" contentContainerClassName="pb-2" style={{ flexGrow: 0 }}>
-        {children}
-      </ScrollView>
-      <View className="items-center">
-        <ChromeButton label="Look at the table" testID="sheet-collapse" tone="ink" onPress={onCollapse} />
+      {children ? (
+        <ScrollView className="mt-3" contentContainerClassName="pb-1" style={{ flexShrink: 1 }}>
+          {children}
+        </ScrollView>
+      ) : null}
+      <View className="mt-2 gap-1">
+        {refusal ? (
+          <Text testID="sheet-refusal" className="text-center text-body text-danger">
+            {refusal}
+          </Text>
+        ) : null}
+        {actions}
+        <View className="items-center">
+          <ChromeButton label="Look at the table" testID="sheet-collapse" tone="ink" onPress={onCollapse} />
+        </View>
       </View>
     </Animated.View>
   );
@@ -162,6 +226,10 @@ function Paper({ step, title, note, children, onCollapse }: { step: string; titl
 type SheetProps = {
   game: ScenarioState;
   names: SheetNames;
+  // The seats' threat in words, kept in sight while the sheet is up.
+  threat: string;
+  // Why the reducer refused the last intent, shown above the primary so no sheet hides it.
+  refusal: string | null;
   onIntent: (intent: PlayerIntent) => void;
   onNext: (sheet: Sheet) => void;
   onOutcome: () => void;
@@ -169,7 +237,12 @@ type SheetProps = {
   onCollapse: () => void;
 };
 
-function PickView({ sheet, onIntent, onNext, onCollapse }: SheetProps & { sheet: PickSheet }) {
+function paperProps(props: SheetProps, sheet: { step: string; title: string; note: string | null }) {
+  return { step: sheet.step, title: sheet.title, note: sheet.note, threat: props.threat, refusal: props.refusal, onCollapse: props.onCollapse };
+}
+
+function PickView(props: SheetProps & { sheet: PickSheet }) {
+  const { sheet, onIntent, onNext } = props;
   const [chosen, setChosen] = useState<string | null>(null);
   const picked = sheet.options.find((item) => item.id === chosen) ?? null;
   const confirm = () => {
@@ -178,64 +251,75 @@ function PickView({ sheet, onIntent, onNext, onCollapse }: SheetProps & { sheet:
     else onNext(picked.next);
   };
   const alternative = sheet.alternative;
-  return (
-    <Paper step={sheet.step} title={sheet.title} note={sheet.note} onCollapse={onCollapse}>
-      {sheet.options.map((item) => (
-        <Tile key={item.id} label={item.label} selected={item.id === chosen} testID={`sheet-option-${item.id}`} onPress={() => setChosen(item.id)} />
-      ))}
-      <View className="mt-2 gap-1">
-        {sheet.primary ? (
-          <ChromePrimary label={sheet.primary.label} testID="sheet-primary" surface="paper" onPress={() => sheet.primary && onIntent(sheet.primary.intent)} />
-        ) : sheet.options.length > 0 ? (
+  const actions = (
+    <>
+      {sheet.primary ? (
+        <ChromePrimary label={sheet.primary.label} testID="sheet-primary" surface="paper" onPress={() => sheet.primary && onIntent(sheet.primary.intent)} />
+      ) : sheet.options.length > 0 ? (
+        <>
           <ChromePrimary label={picked ? `${sheet.verb} ${picked.label.split(" · ")[0]}` : sheet.verb} testID="sheet-primary" surface="paper" disabled={!picked} onPress={confirm} />
-        ) : null}
-        {alternative ? (
-          <ChromeButton
-            label={alternative.label}
-            testID="sheet-alternative"
-            tone="ink"
-            onPress={() => ("intent" in alternative ? onIntent(alternative.intent) : onNext(alternative.next))}
-          />
-        ) : null}
-      </View>
+          {!picked ? <Why>Choose one above.</Why> : null}
+        </>
+      ) : null}
+      {alternative ? (
+        <ChromeButton label={alternative.label} testID="sheet-alternative" tone="ink" onPress={() => ("intent" in alternative ? onIntent(alternative.intent) : onNext(alternative.next))} />
+      ) : null}
+    </>
+  );
+  return (
+    <Paper {...paperProps(props, sheet)} actions={actions}>
+      {sheet.options.length > 0
+        ? sheet.options.map((item) => <Tile key={item.id} label={item.label} selected={item.id === chosen} testID={`sheet-option-${item.id}`} onPress={() => setChosen(item.id)} />)
+        : null}
     </Paper>
   );
 }
 
-function MultiView({ sheet, onIntent, onCollapse }: SheetProps & { sheet: MultiSheet }) {
+function MultiView(props: SheetProps & { sheet: MultiSheet }) {
+  const { sheet, onIntent } = props;
   const [chosen, setChosen] = useState<readonly string[]>(sheet.preselected.filter((id) => sheet.options.some((item) => item.id === id)));
   const toggle = (id: string) => setChosen((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
   const alternative = sheet.alternative;
   const ready = sheet.allowEmpty || chosen.length > 0;
+  const actions = (
+    <>
+      <ChromePrimary
+        label={chosen.length === 0 && sheet.allowEmpty ? `${sheet.verb} no one` : `${sheet.verb} ${chosen.length}`}
+        testID="sheet-primary"
+        surface="paper"
+        disabled={!ready}
+        onPress={() => onIntent(multiIntent(sheet, chosen))}
+      />
+      {!ready ? <Why>{sheet.options.length === 0 ? "No character can be chosen." : "Choose at least one above."}</Why> : null}
+      {alternative && "intent" in alternative ? <ChromeButton label={alternative.label} testID="sheet-alternative" tone="ink" onPress={() => onIntent(alternative.intent)} /> : null}
+    </>
+  );
   return (
-    <Paper step={sheet.step} title={sheet.title} note={sheet.note} onCollapse={onCollapse}>
-      {sheet.options.length === 0 ? <Text className="mb-2 text-center text-body text-inkMuted">No character can be chosen.</Text> : null}
+    <Paper {...paperProps(props, sheet)} actions={actions}>
       {sheet.options.map((item) => (
         <Tile key={item.id} label={item.label} selected={chosen.includes(item.id)} testID={`sheet-option-${item.id}`} onPress={() => toggle(item.id)} />
       ))}
-      <View className="mt-2 gap-1">
-        <ChromePrimary
-          label={chosen.length === 0 && sheet.allowEmpty ? `${sheet.verb} no one` : `${sheet.verb} ${chosen.length}`}
-          testID="sheet-primary"
-          surface="paper"
-          disabled={!ready}
-          onPress={() => onIntent(multiIntent(sheet, chosen))}
-        />
-        {alternative && "intent" in alternative ? <ChromeButton label={alternative.label} testID="sheet-alternative" tone="ink" onPress={() => onIntent(alternative.intent)} /> : null}
-      </View>
     </Paper>
   );
 }
 
-function DistributeView({ sheet, onIntent, onCollapse }: SheetProps & { sheet: DistributeSheet }) {
+function DistributeView(props: SheetProps & { sheet: DistributeSheet }) {
+  const { sheet, onIntent } = props;
   const [shares, setShares] = useState<readonly Share[]>(() =>
     sheet.purpose.kind === "archery" ? [] : firstShares({ seat: 0, cardId: "", total: sheet.total, exact: sheet.exact, pools: sheet.options.map((item) => ({ heroId: item.id, max: item.max })) }),
   );
-  const given = shares.reduce((sum, share) => sum + share.amount, 0);
+  const given = shareSum(shares);
   const ready = sharesReady(shares, sheet.total, sheet.exact);
+  const note = sheet.exact ? `${sheet.note} ${given} of ${sheet.total}.` : `${sheet.note} ${given} paid.`;
+  const actions = (
+    <>
+      <ChromePrimary label="Confirm" testID="sheet-primary" surface="paper" disabled={!ready} onPress={() => onIntent(distributeIntent(sheet, shares))} />
+      {!ready ? <Why>{sheet.options.length === 0 ? "Nothing can pay this." : `Assign all ${sheet.total} first.`}</Why> : null}
+      <ChromeButton label="Clear" testID="sheet-alternative" tone="ink" onPress={() => setShares([])} />
+    </>
+  );
   return (
-    <Paper step={sheet.step} title={sheet.title} note={sheet.exact ? `${sheet.note} ${given} of ${sheet.total}.` : `${sheet.note} ${given} paid.`} onCollapse={onCollapse}>
-      {sheet.options.length === 0 ? <Text className="mb-2 text-center text-body text-inkMuted">Nothing can pay this.</Text> : null}
+    <Paper {...paperProps(props, { ...sheet, note })} actions={actions}>
       {sheet.options.map((item) => (
         <Tile
           key={item.id}
@@ -245,15 +329,12 @@ function DistributeView({ sheet, onIntent, onCollapse }: SheetProps & { sheet: D
           onPress={() => setShares((current) => tapShare(current, item.id, item.max, sheet.exact ? sheet.total : null))}
         />
       ))}
-      <View className="mt-2 gap-1">
-        <ChromePrimary label="Confirm" testID="sheet-primary" surface="paper" disabled={!ready} onPress={() => onIntent(distributeIntent(sheet, shares))} />
-        <ChromeButton label="Clear" testID="sheet-alternative" tone="ink" onPress={() => setShares([])} />
-      </View>
     </Paper>
   );
 }
 
-function TriggerView({ sheet, game, names, onIntent, onNext, onInspect, onCollapse }: SheetProps & { sheet: TriggerSheet }) {
+function TriggerView(props: SheetProps & { sheet: TriggerSheet }) {
+  const { sheet, game, names, onIntent, onNext, onInspect } = props;
   const [chosen, setChosen] = useState<string | null>(null);
   const picked: TriggerOption | null = sheet.options.find((item) => item.id === chosen) ?? null;
   const use = () => {
@@ -261,8 +342,23 @@ function TriggerView({ sheet, game, names, onIntent, onNext, onInspect, onCollap
     if (picked.pay) onNext(paySheet(game, names, picked.pay, { kind: "trigger", cardId: picked.cardId, effectId: picked.effectId }));
     else onIntent({ type: "Trigger", cardId: picked.cardId, effectId: picked.effectId });
   };
+  const actions = (
+    <>
+      {sheet.options.length > 0 ? (
+        <>
+          <ChromePrimary label={picked ? `Use ${picked.label}` : "Use"} testID="sheet-primary" surface="paper" disabled={!picked} onPress={use} />
+          {!picked ? <Why>Choose one above, or pass.</Why> : null}
+        </>
+      ) : null}
+      {sheet.pass ? <ChromeButton label={sheet.pass} testID="sheet-pass" tone="ink" onPress={() => onIntent({ type: "Pass" })} /> : null}
+    </>
+  );
   return (
-    <Paper step={sheet.step} title={sheet.title} note={sheet.note} onCollapse={onCollapse}>
+    <Paper {...paperProps(props, sheet)} actions={actions}>
+      {/* The timing the moment answers, shown whether or not anything can be used. */}
+      <Text testID="sheet-timing" className="mb-2 text-center font-display text-eyebrow uppercase text-inkLabel">
+        {sheet.timing}
+      </Text>
       {sheet.hide ? (
         <View testID="hide-numbers" className="mb-3 flex-row justify-around">
           <Text className="font-display text-title text-ink">{`Hide ${sheet.hide.x}`}</Text>
@@ -275,23 +371,10 @@ function TriggerView({ sheet, game, names, onIntent, onNext, onInspect, onCollap
           <ChromeButton label="Inspect the card" testID="sheet-inspect" tone="ink" onPress={() => sheet.sourceId && onInspect(sheet.sourceId)} />
         </View>
       ) : null}
-      {sheet.options.length === 0 && sheet.pass ? <Text className="mb-2 text-center text-body text-inkMuted">Nothing can be used now.</Text> : null}
+      {sheet.options.length === 0 ? <Text className="mb-2 text-center text-body text-inkMuted">Nothing can be used now.</Text> : null}
       {sheet.options.map((item) => (
-        <Tile
-          key={item.id}
-          label={`${item.label} · ${item.timing}`}
-          detail={item.text}
-          selected={item.id === chosen}
-          testID={`sheet-trigger-${item.cardId}`}
-          onPress={() => setChosen(item.id)}
-        />
+        <Tile key={item.id} label={`${item.label} · ${item.timing}`} detail={item.text} selected={item.id === chosen} testID={`sheet-trigger-${item.cardId}`} onPress={() => setChosen(item.id)} />
       ))}
-      <View className="mt-2 gap-1">
-        {sheet.options.length > 0 ? (
-          <ChromePrimary label={picked ? `Use ${picked.label}` : "Use"} testID="sheet-primary" surface="paper" disabled={!picked} onPress={use} />
-        ) : null}
-        {sheet.pass ? <ChromeButton label={sheet.pass} testID="sheet-pass" tone="ink" onPress={() => onIntent({ type: "Pass" })} /> : null}
-      </View>
     </Paper>
   );
 }
@@ -310,17 +393,21 @@ export function SheetView(props: SheetProps & { sheet: Sheet }) {
       return <TriggerView key={sheet.key} {...props} sheet={sheet} />;
     case "outcome":
       return (
-        <Paper step={sheet.result === "won" ? "Resolution" : "Scenario"} title={sheet.title} note={sheet.note} onCollapse={props.onCollapse}>
-          <ChromePrimary label={sheet.result === "won" ? "Choose rewards" : "Continue"} testID="sheet-outcome" surface="paper" onPress={props.onOutcome} />
-        </Paper>
+        <Paper
+          {...paperProps(props, { step: sheet.result === "won" ? "Resolution" : "Scenario", title: sheet.title, note: sheet.note })}
+          actions={<ChromePrimary label={sheet.result === "won" ? "Choose rewards" : "Continue"} testID="sheet-outcome" surface="paper" onPress={props.onOutcome} />}
+        />
       );
   }
 }
 
-/** The collapsed sheet: one bar that brings the choice back. */
-export function SheetTab({ title, onOpen }: { title: string; onOpen: () => void }) {
+/** The collapsed sheet: one bar that brings the choice back, with the seats' threat still in sight. */
+export function SheetTab({ title, threat, onOpen }: { title: string; threat: string; onOpen: () => void }) {
   return (
-    <View className="rounded-t-sheet bg-paper px-6 pb-safe pt-2">
+    <View className="flex-row items-center justify-between rounded-t-sheet bg-paper px-6 pb-safe pt-2">
+      <Text testID="sheet-tab-threat" className="font-display text-label text-inkLabel">
+        {threat}
+      </Text>
       <ChromeButton label={`Choose: ${title}`} testID="sheet-expand" tone="ink" onPress={onOpen} />
     </View>
   );
@@ -346,6 +433,26 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
       </ScrollView>
       <View className="items-center pt-2">
         <ChromeButton label="Close" testID="log-close" tone="ink" onPress={onClose} />
+      </View>
+    </Animated.View>
+  );
+}
+
+/** A card and what is attached to it, each a full-size target that opens the card screen. */
+export function CardListPanel({ cards, onOpen, onClose }: { cards: readonly { id: string; label: string }[]; onOpen: (cardId: string) => void; onClose: () => void }) {
+  return (
+    <Animated.View entering={rise} testID="card-list" className="rounded-t-sheet bg-paper px-6 pb-safe pt-3" style={{ maxHeight: "70%" }}>
+      <View className="mb-2 h-1 w-10 self-center rounded-pill bg-inkLine" />
+      <Text accessibilityRole="header" className="text-center font-display text-title text-ink">
+        Inspect
+      </Text>
+      <ScrollView className="mt-3" style={{ flexShrink: 1 }}>
+        {cards.map((card) => (
+          <Tile key={card.id} label={card.label} selected={false} testID={`card-list-${card.id}`} onPress={() => onOpen(card.id)} />
+        ))}
+      </ScrollView>
+      <View className="items-center pt-1">
+        <ChromeButton label="Close" testID="card-list-close" tone="ink" onPress={onClose} />
       </View>
     </Animated.View>
   );

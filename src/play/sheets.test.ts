@@ -8,7 +8,9 @@ import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../sc
 import { railFor, STEP_WORDS } from "./rail.ts";
 import { firstShares, playRequest, sharesReady, tapShare } from "./pay.ts";
 import { dropTargets } from "./selection.ts";
-import { actionsSheet, commitSheet, distributeIntent, multiIntent, paySheet, sheetFor, type Sheet, type SheetNames } from "./sheets.ts";
+import { actionsSheet, commitSheet, distributeIntent, multiIntent, paySheet } from "./bar-sheets.ts";
+import type { Sheet, SheetNames } from "./sheet-types.ts";
+import { sheetFor } from "./sheets.ts";
 
 // Rules: rr.framework-steps, mec109.hide-tests, rr.step-6-4-3 (data/rules/entries.json). Every choice a sheet offers is an
 // intent the reducer accepts, in every window two starter decks meet in whole games of A Shadow of the Past; the rail names

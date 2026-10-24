@@ -69,7 +69,7 @@ describe("filterPool", () => {
       filterPool(rows, "", { ...emptyPoolFilter, unique: true }, groups, new Set()).map((row) => row.code),
     ).toEqual(["01073"]);
     expect(
-      filterPool(rows, "", { ...emptyPoolFilter, activeText: true }, groups, new Set(["01057"])).map((row) => row.code),
+      filterPool(rows, "", { ...emptyPoolFilter, activeText: true }, groups, new Set(["01073", "141002", "04101", "priced"])).map((row) => row.code),
     ).toEqual(["01057"]);
   });
 

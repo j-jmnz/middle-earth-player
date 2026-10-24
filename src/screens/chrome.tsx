@@ -216,10 +216,10 @@ export function PrimaryButton({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      className={`min-h-14 items-center justify-center rounded-pill px-8 ${disabled ? "bg-raised" : filled}`}
+      className={`min-h-14 items-center justify-center rounded-pill px-8 ${disabled ? (surface === "paper" ? "border border-inkLine" : "bg-raised") : filled}`}
       style={({ pressed }) => (pressed && !disabled ? { backgroundColor: surface === "paper" ? palette.ink : palette.goldDeep } : undefined)}
     >
-      <Text className={`font-display text-body uppercase tracking-widest ${disabled ? "text-faint" : text}`}>{label}</Text>
+      <Text className={`font-display text-body uppercase tracking-widest ${disabled ? (surface === "paper" ? "text-inkMuted" : "text-faint") : text}`}>{label}</Text>
     </Pressable>
   );
 }

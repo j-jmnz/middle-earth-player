@@ -18,6 +18,14 @@ import { useTableImages } from "./table-images.native.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 const RADIUS = 6;
+
+// Translucent night, from the token, so the palette drift test covers the canvas's veils too.
+function withAlpha(hex: string, alpha: number): string {
+  const value = Number.parseInt(hex.slice(1), 16);
+  return `rgba(${(value >> 16) & 255},${(value >> 8) & 255},${value & 255},${alpha})`;
+}
+const veil = withAlpha(t.night, 0.62);
+const shadowColor = withAlpha(t.night, 0.5);
 const COIN = 10;
 
 function useViews(store: TableCanvasProps["store"], seat: number): LayoutViews {
@@ -69,7 +77,7 @@ function CardFace({
   const transform = slot.exhausted ? [{ rotate: Math.PI / 2 }] : slot.tilt !== 0 ? [{ rotate: slot.tilt }] : [];
   return (
     <Group transform={transform} origin={vec(cx, cy)} opacity={dim ? 0.35 : slot.exhausted ? 0.7 : 1}>
-      <RoundedRect x={x + 1} y={y + 2} width={w} height={h} r={RADIUS} color="rgba(0,0,0,0.45)" />
+      <RoundedRect x={x + 1} y={y + 2} width={w} height={h} r={RADIUS} color={shadowColor} />
       {slot.faceDown ? (
         <Group>
           <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={t.raised} />
@@ -79,7 +87,7 @@ function CardFace({
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
           {/* Unique text with no effect record is inactive: the text box is veiled, and no control applies it. */}
-          {inactive ? <Rect x={x} y={y + h * 0.55} width={w} height={h * 0.45} color="rgba(10,11,14,0.62)" /> : null}
+          {inactive ? <Rect x={x} y={y + h * 0.55} width={w} height={h * 0.45} color={veil} /> : null}
         </Group>
       ) : (
         <Group>
@@ -87,7 +95,7 @@ function CardFace({
           <Group clip={{ x: x + 3, y: y + 3, width: w - 6, height: h - 6 }}>
             <Text x={x + 5} y={y + 16} text={name} font={font} color={t.bone} />
           </Group>
-          {inactive ? <Rect x={x} y={y + h * 0.55} width={w} height={h * 0.45} color="rgba(10,11,14,0.62)" /> : null}
+          {inactive ? <Rect x={x} y={y + h * 0.55} width={w} height={h * 0.45} color={veil} /> : null}
         </Group>
       )}
       {edge ? <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={edge} style="stroke" strokeWidth={2} /> : null}
@@ -142,8 +150,10 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
       .onBegin(() => {
         cancelAnimation(dx);
         cancelAnimation(dy);
+        cancelAnimation(lift);
         dx.set(0);
         dy.set(0);
+        lift.set(1);
         if (dragging.get() >= 0) scheduleOnRN(select, null);
         dragging.set(-1);
       })
@@ -189,9 +199,10 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
         // Dropped on nothing: the card goes back, and nothing is asked.
         dx.set(withTiming(0, { duration: 160 }));
         dy.set(
-          withTiming(0, { duration: 160 }, (finished) => {
+          // Finished or cut short by a new touch, the lifted card is put down.
+          withTiming(0, { duration: 160 }, () => {
             dragging.set(-1);
-            if (finished) scheduleOnRN(select, null);
+            scheduleOnRN(select, null);
           }),
         );
       });

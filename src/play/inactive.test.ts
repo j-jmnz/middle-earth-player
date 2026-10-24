@@ -10,9 +10,9 @@ import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 
-import { hasUniqueText, inactiveCodes } from "./inactive.ts";
+import { hasUniqueText, inactiveCodes } from "../catalog/active-text.ts";
 import { firstShares, playRequest } from "./pay.ts";
-import { distributeIntent, paySheet } from "./sheets.ts";
+import { distributeIntent, paySheet } from "./bar-sheets.ts";
 
 // Rules: rr.sentinel, mec109.hide-x (data/rules/entries.json). A player card outside the two starter decks (Gondorian
 // Spearman, 01029, a Tactics ally with Sentinel and a Response) is paid for and played with its printed cost and keeps its

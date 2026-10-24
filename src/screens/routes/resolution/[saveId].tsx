@@ -16,7 +16,7 @@ import { goBack } from "../../go-back";
 import { CardThumb } from "../../images/picture";
 import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
-import { openTable, sessionStore, type SessionStore, type TableSession } from "../../table-session";
+import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../table-session";
 
 function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; selected: boolean; imagesrc: string | null; onPress: () => void }) {
   const label = tile.hero ? `${tile.name} on ${tile.hero}` : tile.name;
@@ -172,8 +172,8 @@ export default function ResolutionScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string }>();
   const saveId = routeCode(params.saveId);
-  const { catalog, user } = useDatabases();
-  const session = useMemo(() => (saveId ? openTable(catalog, user, saveId) : null), [catalog, user, saveId]);
+  const { user } = useDatabases();
+  const session = useTableSession(saveId);
   const opened = useMemo(() => (session?.ok ? sessionStore(session, user) : null), [session, user]);
   if (!saveId || !session?.ok || !opened) {
     return (
