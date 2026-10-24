@@ -1,5 +1,7 @@
-import { isStatCondition, type ModifierStat } from "../catalog/boundary.ts";
+// Rules: rr.constant-ability, rr.modifiers, rr.in-play-and-out-of-play (data/rules/entries.json).
+import { isStatCondition, type Instruction, type ModifierStat } from "../catalog/boundary.ts";
 
+import { characters } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import { constantInstructions } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -21,7 +23,12 @@ function hobbitHeroes(state: ScenarioState, source: CardInstance, ctx: ReduceCon
   return (state.seats[seat]?.heroes ?? []).filter((id) => hasTrait(state, id, "Hobbit", ctx)).length;
 }
 
-function holders(state: ScenarioState, source: CardInstance, target: string | undefined, ctx: ReduceContext): string[] {
+function holders(state: ScenarioState, source: CardInstance, target: string | undefined, ctx: ReduceContext, trait?: string): string[] {
+  const found = holdersOf(state, source, target, ctx);
+  return trait == null ? found : found.filter((id) => hasTrait(state, id, trait, ctx));
+}
+
+function holdersOf(state: ScenarioState, source: CardInstance, target: string | undefined, ctx: ReduceContext): string[] {
   switch (target) {
     case "heroes":
       return cardsInPlay(state).filter((instance) => printedOf(ctx.cards, instance.code).type === "hero").map((instance) => instance.id);
@@ -37,6 +44,11 @@ function holders(state: ScenarioState, source: CardInstance, target: string | un
       return ["table"];
     case "engagedSeat":
       return source.zone === "engaged" && source.controller != null ? [`seat:${source.controller}`] : [];
+    // "characters that player controls" for the player the source is engaged with (141050:A:2).
+    case "engagedSeatCharacters":
+      return source.zone === "engaged" && source.controller != null ? characters(state, source.controller, ctx.cards) : [];
+    case "allies":
+      return cardsInPlay(state).filter((instance) => printedOf(ctx.cards, instance.code).type === "ally").map((instance) => instance.id);
     case "eachSeat":
       return livingSeats(state).map((seat) => `seat:${seat}`);
     default:
@@ -44,20 +56,34 @@ function holders(state: ScenarioState, source: CardInstance, target: string | un
   }
 }
 
+// A constant set ("Reduce attached hero's Willpower, Attack, and Defense to 0", 141055:A:2) is a set modifier (rr.modifiers).
+function setRecord(state: ScenarioState, source: CardInstance, effectId: string, instruction: Extract<Instruction, { verb: "SetStat" }>, ctx: ReduceContext): Modifier[] {
+  return holders(state, source, instruction.target, ctx).map((holder) => ({
+    instanceId: holder,
+    sourceId: source.id,
+    stat: instruction.stat,
+    amount: instruction.value,
+    until: "whileSourceInPlay",
+    origin: effectId,
+    set: true,
+  }));
+}
+
 function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
   const found: Modifier[] = [];
   for (const { source, effect, instruction } of constantInstructions(state, ctx)) {
+    if (instruction.verb === "SetStat") found.push(...setRecord(state, source, effect.id, instruction, ctx));
     if (instruction.verb !== "ModifyStat") continue;
     // "for each Hobbit hero you control" is counted here, each time the records are rebuilt.
     const amount = instruction.per === "hobbitHero" ? instruction.amount * hobbitHeroes(state, source, ctx) : instruction.amount;
     if (amount === 0) continue;
-    for (const holder of holders(state, source, instruction.target, ctx)) {
+    for (const holder of holders(state, source, instruction.target, ctx, instruction.trait)) {
       found.push({
         instanceId: holder,
         sourceId: source.id,
         stat: instruction.stat,
         amount,
-        until: "whileSourceInPlay",
+        until: source.zone === "victory" ? "whileSourceInVictory" : "whileSourceInPlay",
         origin: effect.id,
         ...(instruction.per === "committed" || instruction.per === "ally" ? { per: instruction.per } : {}),
         ...(isStatCondition(instruction.when) ? { when: instruction.when } : {}),

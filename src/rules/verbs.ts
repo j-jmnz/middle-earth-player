@@ -7,9 +7,9 @@ import { hasTrait, holds } from "./conditions.ts";
 import { scheduleDelayed } from "./delayed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { destroyCard, eliminateEmpties, raiseThreat } from "./keywords.ts";
+import { destroyCard, eliminateEmpties, modifiedStat, placeDamage, raiseThreat } from "./keywords.ts";
 import { lastPicked, otherSeat } from "./player-verbs.ts";
-import { printedOf } from "./printed.ts";
+import { isPlayerType, printedOf } from "./printed.ts";
 import { engageEnemy, placeQuestProgress, stagingEnemies } from "./quest.ts";
 import { restricted } from "./restrictions.ts";
 import { queueEvent } from "./queue.ts";
@@ -68,6 +68,8 @@ export function runExtraVerb(
     }
     case "DiscardRandomFromHand":
       return discardRandom(state, focus.seat, instruction.amount ?? 1);
+    case "DamageAll":
+      return damageAllies(state, instruction, focus, ctx, steps);
     case "RemoveFromQuest": {
       const id = lastPicked(state);
       return state.cards[id]?.committed ? updateCard(state, id, { committed: false }) : state;
@@ -181,6 +183,29 @@ function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceCon
     steps.push({ kind: "engage", seat, enemyId: id });
     next = queueEvent(next, { trigger: "engaged", seat, subject: id });
   }
+  return next;
+}
+
+// Damage on each ally in play, those with willpower at most `maxWillpower` when it is named (141071:A:1). Willpower is read
+// once for all of them, before any damage is placed. A player card's effect is a player card effect (immunity applies).
+function damageAllies(
+  state: ScenarioState,
+  instruction: Extract<Instruction, { verb: "DamageAll" }>,
+  focus: VerbFocus,
+  ctx: ReduceContext,
+  steps: EngineStep[],
+): ScenarioState {
+  const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+  const kind = source && isPlayerType(printedOf(ctx.cards, source.code)) ? "player" : "framework";
+  const targets = livingSeats(state)
+    .flatMap((seat) => characters(state, seat, ctx.cards))
+    .filter((id) => {
+      const card = state.cards[id];
+      if (!card || printedOf(ctx.cards, card.code).type !== instruction.type) return false;
+      return instruction.maxWillpower == null || modifiedStat(state, card, "willpower", ctx.cards) <= instruction.maxWillpower;
+    });
+  let next = state;
+  for (const id of targets) next = placeDamage(next, id, instruction.amount, ctx.cards, steps, kind, currentCause(steps, UNATTRIBUTED));
   return next;
 }
 

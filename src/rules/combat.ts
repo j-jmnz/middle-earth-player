@@ -217,7 +217,7 @@ export function strikeEnemy(
   steps.push({ kind: "attack", side: "player", seat, enemyId });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
-  const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "framework", ruleCause("rr.step-6-8-3"));
+  const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   // Each attacker hears that the attack destroyed the enemy ("After Merry participates in an attack that destroys an enemy").
   if (damaged.cards[enemyId]?.zone === "engaged") return damaged;
   return attackerIds.reduce((current, attackerId) => queueEvent(current, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, participants: attackerIds }), damaged);

@@ -25,7 +25,7 @@ import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
 import { doRefresh } from "./refresh.ts";
-import { engagementStep, engageEnemy, stagingEnemies } from "./quest.ts";
+import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
 import { crossBoundary } from "./triggers.ts";
@@ -179,7 +179,8 @@ function grant(state: ScenarioState, steps: EngineStep[]): ScenarioState {
 }
 
 function openOptional(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  if (stagingEnemies(state, ctx.cards).length === 0) {
+  // No enemy a player could optionally engage (rr.optional-engagement): the step has nothing to offer.
+  if (optionalEnemies(state, ctx.cards).length === 0) {
     return { ...withMode(state, "engagement"), window: null, engagement: { ordinal: 0, engagedThisPass: false } };
   }
   const seated = state.mode === "optionalEngage" ? state : withMode(state, "optionalEngage");

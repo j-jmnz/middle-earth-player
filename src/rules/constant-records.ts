@@ -7,15 +7,22 @@ import { inPlay } from "./state.ts";
 
 export type ConstantInstruction = { source: CardInstance; effect: Effect; instruction: Instruction };
 
+// An effect whose condition is "while this card is in the victory display" works from there (141046:A:2): an ability that
+// refers to an out-of-play area is active in it (rr.in-play-and-out-of-play).
+function fromVictory(effect: Effect): boolean {
+  return effect.condition?.kind === "sourceIn" && effect.condition.zone === "victory";
+}
+
 // Every instruction of a constant effect whose card is in play and whose effect and instruction
 // conditions hold, oldest card in play first. A stat condition (read when the stat is read) is left on the instruction. Restrictions and modifier records both read this.
 export function* constantInstructions(state: ScenarioState, ctx: ReduceContext): Generator<ConstantInstruction> {
   const sources = Object.values(state.cards)
-    .filter((instance) => inPlay(instance.zone))
+    .filter((instance) => inPlay(instance.zone) || instance.zone === "victory")
     .sort((left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }));
   for (const source of sources) {
     for (const effect of ctx.effects) {
       if (effect.timing !== "constant" || effect.cardCode !== source.code) continue;
+      if ((source.zone === "victory") !== fromVictory(effect)) continue;
       const scope = { actor: source.controller ?? state.firstPlayer, sourceId: source.id, returned: 0 };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       for (const instruction of effect.instructions) {

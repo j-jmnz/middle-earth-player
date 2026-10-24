@@ -1,11 +1,11 @@
-// Rules: rr.quest-advancement, rr.step-3-4 (data/rules/entries.json).
+// Rules: rr.quest-advancement, rr.step-3-4, rr.engagement-check, rr.optional-engagement (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
 import { printedOf } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
-import { livingSeats, updateCard, withMode } from "./state.ts";
+import { flagged, livingSeats, updateCard, withMode } from "./state.ts";
 import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
 
@@ -199,6 +199,12 @@ export function stagingLocations(state: ScenarioState, cards: Cards): string[] {
   });
 }
 
+// The enemies in the staging area a player may optionally engage: not one that cannot be engaged at all (141048:A:1) or
+// cannot be optionally engaged (141051:A:1, 141052:A:1).
+export function optionalEnemies(state: ScenarioState, cards: Cards): string[] {
+  return stagingEnemies(state, cards).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged"));
+}
+
 export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
   return state.staging.filter((id) => {
     const instance = state.cards[id];
@@ -209,6 +215,8 @@ export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
 export function engageEnemy(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
   const instance = state.cards[enemyId];
   if (!instance || instance.zone !== "staging") return state;
+  // "Enemies cannot ... be engaged" (141048:A:1).
+  if (flagged(state, enemyId, "cannotBeEngaged")) return state;
   if (state.seats[seat]?.eliminated) return state;
   const moved = moveCard(state, enemyId, { zone: "engaged", seat });
   steps.push({ kind: "engage", seat, enemyId });
@@ -221,7 +229,7 @@ export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Car
   const found: { id: string; cost: number }[] = [];
   for (const id of stagingEnemies(state, cards)) {
     const instance = state.cards[id];
-    if (!instance) continue;
+    if (!instance || flagged(state, id, "cannotBeEngaged")) continue;
     const cost = engagementCostOf(state, instance, cards);
     if (cost == null || cost > threat) continue;
     found.push({ id, cost });

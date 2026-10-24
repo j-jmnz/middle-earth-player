@@ -1,4 +1,4 @@
-// Rules: rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x (data/rules/entries.json).
+// Rules: rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x, rr.modifiers, rr.lasting-effects, rr.damage (data/rules/entries.json).
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
@@ -6,10 +6,11 @@ import type { EngineStep } from "./intents.ts";
 import { isCharacterType, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
-import { livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
+import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 
-export type DamageSource = "framework" | "player";
+// `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
+export type DamageSource = "framework" | "player" | "combat";
 
 type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | "engagementCost";
 
@@ -29,7 +30,17 @@ function printedStat(printed: PrintedCard, stat: ModifierStat): number {
   }
 }
 
+// The stats of a card. A value below 0 is treated as 0 (rr.modifiers).
+const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "defense", "threat", "questPoints", "engagementCost", "hitPoints"]);
+
+// Whether a modifier is held by this card: by its id, or by the class "allies" (an encounter card's lasting effect on each
+// ally, which also holds for allies that enter play later, rr.lasting-effects).
+function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
+  return modifier.instanceId === instance.id || (modifier.instanceId === "allies" && printed.type === "ally" && inPlay(instance.zone));
+}
+
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
+// A set modifier overrides every other one, the most recent set winning (rr.modifiers).
 export function modifiedStat(
   state: ScenarioState,
   instance: CardInstance,
@@ -39,13 +50,16 @@ export function modifiedStat(
 ): number {
   const printed = printedOf(cards, instance.code);
   let total = printedStat(printed, stat);
+  let set: number | null = null;
   for (const modifier of state.modifiers) {
-    if (modifier.instanceId !== instance.id || modifier.stat !== stat) continue;
+    if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
-    total += modifier.amount;
+    if (modifier.set) set = modifier.amount;
+    else total += modifier.amount;
   }
-  return total;
+  const value = set ?? total;
+  return CARD_STATS.has(stat) ? Math.max(0, value) : value;
 }
 
 // The enemy in this attack costs more to engage than the threat of the holder's controller. "Your threat" in "defending
@@ -132,6 +146,8 @@ export function placeDamage(
   if (!instance) return state;
   const printed = printedOf(cards, instance.code);
   if (source === "player" && !playerCardEffectCanChoose(printed)) return state;
+  // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.
+  if (flagged(state, id, "cannotTakeDamage") || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
   const dealt = placedAmount(printed, amount);
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });

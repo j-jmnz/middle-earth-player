@@ -21,6 +21,8 @@ export type Modifier = {
   seat?: number;
   // A condition read each time the stat is read (see isStatCondition).
   when?: Condition;
+  // The stat is set to `amount`, overriding every modifier that is not a set (rr.modifiers).
+  set?: boolean;
 };
 
 export type FrameName =

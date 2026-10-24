@@ -3,7 +3,9 @@ import { z } from "zod";
 // Effect records are data. The vocabulary here (verbs, conditions, triggers, timings) is owned by the
 // catalog, and the reducer reads it. Amounts in authored records are fine; a player intent never supplies one.
 
-export const modifierUntilSchema = z.enum(["endOfPhase", "endOfRound", "endOfAttack", "whileSourceInPlay"]);
+// `whileSourceInVictory`: a constant that works from the victory display ("While Weathertop is in the victory display",
+// 141046:A:2). The engine writes it; a record names `whileSourceInPlay`.
+export const modifierUntilSchema = z.enum(["endOfPhase", "endOfRound", "endOfAttack", "whileSourceInPlay", "whileSourceInVictory"]);
 
 // Stats on a card, plus Hide numbers held by a seat or the table, and a flag that bars an enemy's attack.
 export const modifierStatSchema = z.enum([
@@ -19,6 +21,12 @@ export const modifierStatSchema = z.enum([
   "cannotAttack",
   // Hit points: the printed health plus modifiers. A character with damage at or above it is destroyed.
   "hitPoints",
+  // Flags, like cannotAttack: the holder takes no damage at all (141048:A:1), no damage but combat damage (141070:A:2),
+  // cannot be engaged by any means (141048:A:1), or cannot be optionally engaged (141051:A:1, 141052:A:1).
+  "cannotTakeDamage",
+  "cannotTakeNonCombatDamage",
+  "cannotBeEngaged",
+  "cannotBeOptionallyEngaged",
 ]);
 
 export const phaseNameSchema = z.enum([
@@ -137,7 +145,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
-  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play"]) }),
+  // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2).
+  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory"]) }),
   // A card with this code is in the victory display (`is`) or is not.
   z.strictObject({ kind: z.literal("inVictory"), code: z.string().min(1), is: z.boolean() }),
   // Some location other than the source is in the staging area or is the active location.
@@ -231,7 +240,14 @@ const modifyStatSchema = z.strictObject({
   // held by the table or a seat is read through `per`.
   // `picked` is the card the last Pick chose, `pickedPlayerCharacters` every character the picked player controls, `ownHeroes`
   // every hero the actor controls: all fixed when the effect resolves.
-  target: z.enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes"]).optional(),
+  // `defender` is the character defending the attack in progress (141052:A:2). `allies` is every ally in play: from an
+  // encounter card's lasting effect it also holds for allies that enter play later (rr.lasting-effects, 141071:A:1).
+  // `engagedSeatCharacters` is every character of the player the source is engaged with (141050:A:2).
+  target: z
+    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters"])
+    .optional(),
+  // Only holders with this trait ("Spy enemies get +1 Threat", 141047:A:1).
+  trait: z.string().min(1).optional(),
   // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has.
   per: z.enum(["committed", "ally", "hobbitHero", "x"]).optional(),
   ...when,
@@ -387,11 +403,31 @@ const simpleVerbs = [
   // The actor picks an enemy engaged with them. It cannot attack them until the end of the round. With `any` the enemy may be
   // engaged with any player and cannot attack that player until `until` (the end of the phase by default).
   z.strictObject({ verb: z.literal("BarAttack"), scope: z.enum(["own", "any"]).optional(), until: z.enum(["endOfPhase", "endOfRound"]).optional(), ...when }),
-  // Constants: a rule the engine checks while the source is in play.
+  // Constants: a rule the engine checks while the source is in play. `defend`: characters with willpower at most
+  // `maxWillpower` cannot defend the source's attacks (141068:A:3).
   z.strictObject({
     verb: z.literal("Restrict"),
-    what: z.enum(["advance", "travel", "attach", "heroLimit"]),
+    what: z.enum(["advance", "travel", "attach", "heroLimit", "defend"]),
     exceptTrait: z.string().min(1).optional(),
+    maxWillpower: z.number().int().min(0).optional(),
+    ...when,
+  }),
+  // Constant: the holder's stat is set to `value`, overriding every other modifier (rr.modifiers; "Reduce attached hero's
+  // Willpower, Attack, and Defense to 0", 141055:A:2).
+  z.strictObject({
+    verb: z.literal("SetStat"),
+    stat: z.enum(["willpower", "attack", "defense", "threat"]),
+    value: z.number().int().min(0),
+    target: z.enum(["self", "host"]).optional(),
+    ...when,
+  }),
+  // Deals damage to each ally in play, only those with willpower at most `maxWillpower` when it is named (a value below 0
+  // counts as 0, rr.modifiers) ("Deal 2 damage to each ally with 0 Willpower", 141071:A:1).
+  z.strictObject({
+    verb: z.literal("DamageAll"),
+    amount: z.number().int().positive(),
+    type: z.literal("ally"),
+    maxWillpower: z.number().int().min(0).optional(),
     ...when,
   }),
   // Constants on an attachment. Where it may be attached: `host` names the card, and `limitPerHost` allows one copy
