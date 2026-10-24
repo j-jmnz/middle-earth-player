@@ -1,4 +1,5 @@
 // Rules: rr.refresh-phase, rr.step-7-3 (data/rules/entries.json).
+import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { raiseThreat } from "./keywords.ts";
@@ -12,7 +13,7 @@ export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: Engin
     if (!inPlay(instance.zone) || (!instance.exhausted && !instance.committed)) continue;
     next = updateCard(next, instance.id, { exhausted: false, committed: false });
   }
-  for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps);
+  for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
   return withMode(passToken(next, ctx, steps), "endRound");
 }
 

@@ -1,6 +1,7 @@
 // Rules: mec109.setting-up-the-game, rr.setup, rr.mulligan (data/rules/entries.json).
 import type { ScenarioDefinition } from "../catalog/boundary.ts";
 
+import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
@@ -113,7 +114,7 @@ export function mulliganSeat(state: ScenarioState, seat: number, steps: EngineSt
   if (!seatState) return next;
   const shuffled = shuffleIds(seatState.deck, next.seed, next.seedCursor);
   next = { ...withSeat(next, seat, { ...seatState, deck: shuffled.ids }), seedCursor: shuffled.cursor };
-  return drawOpeningHand(next, seat, steps);
+  return drawOpeningHand(next, seat, steps, ruleCause("rr.mulligan"));
 }
 
 export function finishMulliganChoice(state: ScenarioState, took: boolean): ScenarioState {

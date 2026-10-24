@@ -125,8 +125,8 @@ describe("combat", () => {
     const hit = expectOk(reduce(opened.state, { type: "Undefended" }, ctx));
     const popAt = hit.steps.findIndex((step) => step.kind === "pop");
     expect(hit.steps.filter((step) => step.kind === "damage")).toEqual([
-      { kind: "damage", targetId: ids.orc, amount: 1 },
-      { kind: "damage", targetId: ids.aragorn, amount: 2 },
+      expect.objectContaining({ kind: "damage", targetId: ids.orc, amount: 1 }),
+      expect.objectContaining({ kind: "damage", targetId: ids.aragorn, amount: 2 }),
     ]);
     expect(popAt).toBeGreaterThan(hit.steps.findIndex((step) => step.kind === "damage"));
     expect(popAt).toBeLessThan(hit.steps.findIndex((step) => step.kind === "damage" && step.targetId === ids.aragorn));
@@ -160,7 +160,7 @@ describe("combat", () => {
       expect(answered.state.pendingAttack).toBeNull();
       expect(answered.state.window?.kind).not.toBe("defense");
       expect(answered.steps.filter((step) => step.kind === "damage")).toEqual([
-        { kind: "damage", targetId: ids.orc, amount: 1 },
+        expect.objectContaining({ kind: "damage", targetId: ids.orc, amount: 1 }),
       ]);
       const again = reduce(answered.state, { type: "Undefended" }, ctx);
       expect(again.ok).toBe(false);

@@ -1,6 +1,7 @@
 // Rules: rr.travel, rr.active-location, rr.step-4-2 (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
+import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -42,6 +43,7 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
       peril: false,
       effectId: first.id,
       instructions: [...effects.flatMap((effect) => effect.instructions), TRAVEL_HERE],
+      causes: effects.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
       cancel: null,
       blockCancel: null,
     },

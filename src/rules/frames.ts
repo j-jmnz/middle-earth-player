@@ -1,4 +1,5 @@
 import { effectStep, pushCardEffects } from "./effect-frames.ts";
+import { currentCause, ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hideStep, pushHide } from "./hide.ts";
@@ -83,11 +84,11 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     case 0: {
       let next = moveCard(state, id, { zone: "staging" });
       next = updateCard(next, id, { face: "up", controller: seat });
-      steps.push({ kind: "reveal", seat, cardId: id });
+      steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
       if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
         for (let index = 0; index < next.seatCount; index += 1) {
-          next = raiseThreat(next, index, printed.keywords.doomed, steps);
+          next = raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x"));
         }
       }
       return patchTop(next, { step: 1 });

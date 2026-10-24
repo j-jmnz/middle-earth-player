@@ -11,6 +11,7 @@ import { engageEnemy, stagingEnemies } from "./quest.ts";
 import { shuffleIds } from "./seed.ts";
 import { updateCard, type ScenarioState } from "./state.ts";
 import { attachTo, moveCard } from "./zones.ts";
+import { currentCause, UNATTRIBUTED } from "./cause.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
@@ -70,7 +71,7 @@ export function runExtraVerb(
     case "GainSurge":
       return markSurge(state, focus.sourceId);
     case "Delay":
-      return scheduleDelayed(state, instruction, focus, ctx);
+      return scheduleDelayed(state, instruction, focus, ctx, currentCause(steps, UNATTRIBUTED));
     case "ConsiderUndefended":
     case "AfterAttack":
     case "EngageNextPlayer":
@@ -103,7 +104,7 @@ export function raiseFor(
   steps: EngineStep[],
 ): ScenarioState {
   const seat = seatFor(state, instruction.who, focus.seat);
-  return raiseThreat(state, seat, instruction.amount ?? 1, steps);
+  return raiseThreat(state, seat, instruction.amount ?? 1, steps, currentCause(steps, UNATTRIBUTED));
 }
 
 function discardTarget(

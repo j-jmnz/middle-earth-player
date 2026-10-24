@@ -40,7 +40,7 @@ describe("141024 response on hideSucceeded", () => {
     const hill = idsOf(table, "141036");
     next = send(next, { type: "Choose", optionId: hill }, table.ctx);
     expect(next.state.cards[hill]?.progress).toBe(2);
-    expect(next.steps).toContainEqual({ kind: "progress", targetId: hill, amount: 2 });
+    expect(next.steps).toContainEqual(expect.objectContaining({ kind: "progress", targetId: hill, amount: 2 }));
     expect(next.state.cards[idsOf(table, "141037")]?.progress).toBe(0);
     expect(next.state.stack).toEqual([]);
   });
@@ -51,7 +51,7 @@ describe("141024 response on hideSucceeded", () => {
     const hill = idsOf(table, "141036");
     const next = send(run, { type: "Trigger", cardId: quest, effectId: "141024:response:1" }, table.ctx);
     // 3 quest points: 3 are placed, and the location is explored.
-    expect(next.steps).toContainEqual({ kind: "progress", targetId: hill, amount: 3 });
+    expect(next.steps).toContainEqual(expect.objectContaining({ kind: "progress", targetId: hill, amount: 3 }));
     expect(next.state.cards[hill]?.zone).toBe("encounterDiscard");
   });
 

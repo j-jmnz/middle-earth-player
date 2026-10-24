@@ -1,5 +1,5 @@
 import { expectOk } from "../src/rules/fixture.ts";
-import type { LegalIntent, PlayerIntent } from "../src/rules/intents.ts";
+import type { EngineStep, LegalIntent, PlayerIntent } from "../src/rules/intents.ts";
 import { legalIntents, legalTargets, reduce, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
 
 // Test helper. A fixed policy that answers every window from the legal intents the reducer offers, so a
@@ -73,18 +73,21 @@ export function nextIntent(state: ScenarioState, ctx: ReduceContext, options: Po
   }
 }
 
-export type Played = { state: ScenarioState; intents: PlayerIntent[]; rounds: number };
+export type Played = { state: ScenarioState; intents: PlayerIntent[]; rounds: number; steps: EngineStep[] };
 
 // Plays until the scenario is lost, or won and every reward group is answered.
 export function playOut(start: ScenarioState, ctx: ReduceContext, options: PolicyOptions, limit = 4000): Played {
   let state = start;
   const intents: PlayerIntent[] = [];
+  const steps: EngineStep[] = [];
   for (let turn = 0; turn < limit; turn += 1) {
     if (state.lost) break;
     if (state.stageCleared && state.window == null) break;
     const intent = nextIntent(state, ctx, options);
-    state = expectOk(reduce(state, intent, ctx)).state;
+    const result = expectOk(reduce(state, intent, ctx));
+    state = result.state;
+    steps.push(...result.steps);
     intents.push(intent);
   }
-  return { state, intents, rounds: state.round };
+  return { state, intents, rounds: state.round, steps };
 }

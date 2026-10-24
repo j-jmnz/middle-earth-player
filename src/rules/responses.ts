@@ -1,5 +1,6 @@
 // Rules: rr.response (data/rules/entries.json).
 import { holds } from "./conditions.ts";
+import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -103,6 +104,7 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
       instructions: effect.instructions,
       cancel: null,
       blockCancel: null,
+      cause: effectCause(effect),
     },
     steps,
   );

@@ -28,7 +28,7 @@ export function openBranch(state: ScenarioState, item: QueueItem, returned: numb
   const legal = instruction.options.filter((option) => !option.requires || holds(state, option.requires, scope, ctx));
   if (legal.length === 0) return state;
   const only = legal[0];
-  if (legal.length === 1 && only) return runBranch(state, only.instructions, seat);
+  if (legal.length === 1 && only) return runBranch(state, only.instructions, seat, item.cause);
   return ask(state, { kind: "branch", item: { ...item, seat } }, seat, legal.map((option) => option.id));
 }
 
@@ -36,10 +36,10 @@ export function askTarget(state: ScenarioState, item: QueueItem, options: readon
   return ask(state, { kind: "target", item }, item.seat, options);
 }
 
-function runBranch(state: ScenarioState, instructions: readonly QueueItem["instruction"][], seat: number): ScenarioState {
+function runBranch(state: ScenarioState, instructions: readonly QueueItem["instruction"][], seat: number, cause: QueueItem["cause"]): ScenarioState {
   const data = effectData(state);
   if (!data) return state;
-  const branch = instructions.map((instruction): QueueItem => ({ instruction, seat, chosen: null }));
+  const branch = instructions.map((instruction): QueueItem => ({ instruction, seat, chosen: null, ...(cause ? { cause } : {}) }));
   return patchTop(state, { data: { ...data, queue: [...branch, ...data.queue] } });
 }
 
@@ -66,5 +66,5 @@ export function applyChoice(state: ScenarioState, optionId: string): ScenarioSta
   const instruction = wait.item.instruction;
   if (instruction.verb !== "Choose") return closed;
   const option = instruction.options.find((entry) => entry.id === optionId);
-  return option ? runBranch(closed, option.instructions, wait.item.seat) : closed;
+  return option ? runBranch(closed, option.instructions, wait.item.seat, wait.item.cause) : closed;
 }

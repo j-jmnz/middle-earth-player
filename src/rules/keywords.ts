@@ -1,6 +1,7 @@
 // Rules: rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x (data/rules/entries.json).
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
+import type { Cause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
@@ -63,12 +64,13 @@ export function raiseThreat(
   seat: number,
   amount: number,
   steps: EngineStep[],
+  cause: Cause,
 ): ScenarioState {
   if (amount <= 0) return state;
   const current = state.seats[seat];
   if (!current || current.eliminated) return state;
   const raised = withThreat(state, seat, current.threat + amount);
-  steps.push({ kind: "threat", seat, amount });
+  steps.push({ kind: "threat", seat, amount, cause });
   return eliminateEmpties(raised, steps);
 }
 
@@ -83,6 +85,7 @@ export function placeDamage(
   cards: ReadonlyMap<string, PrintedCard>,
   steps: EngineStep[],
   source: DamageSource,
+  cause: Cause,
 ): ScenarioState {
   const instance = state.cards[id];
   if (!instance) return state;
@@ -90,7 +93,7 @@ export function placeDamage(
   if (source === "player" && !playerCardEffectCanChoose(printed)) return state;
   const dealt = placedAmount(printed, amount);
   const damage = instance.damage + dealt;
-  steps.push({ kind: "damage", targetId: id, amount: dealt });
+  steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
   let next = updateCard(state, id, { damage });
   if (printed.type === "enemy" && printed.keywords.indestructible) return next;
   if (printed.health != null && damage >= printed.health) next = destroyCard(next, id, cards, steps);

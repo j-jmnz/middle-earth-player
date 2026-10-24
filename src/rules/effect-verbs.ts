@@ -10,6 +10,7 @@ import { questPointsOf } from "./quest.ts";
 import { offerResponses } from "./responses.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats, updateCard } from "./state.ts";
+import { currentCause, UNATTRIBUTED } from "./cause.ts";
 
 export type TargetVerb = Extract<Instruction, { verb: "ReadyHero" | "BarAttack" | "PlaceProgressOnLocation" }>;
 
@@ -28,7 +29,7 @@ export function drawVerb(
   const trait = instruction.perHero;
   const count = trait == null ? 1 : (state.seats[seat]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length;
   let next = state;
-  for (let draw = 0; draw < count; draw += 1) next = drawOne(next, seat, steps);
+  for (let draw = 0; draw < count; draw += 1) next = drawOne(next, seat, steps, UNATTRIBUTED);
   return next;
 }
 
@@ -78,7 +79,7 @@ function placeProgress(state: ScenarioState, id: string, amount: number, ctx: Re
   const points = questPointsOf(state, location, ctx.cards);
   const placed = points == null ? amount : Math.min(amount, Math.max(0, points - location.progress));
   if (placed <= 0) return state;
-  steps.push({ kind: "progress", targetId: id, amount: placed });
+  steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED) });
   const next = updateCard(state, id, { progress: location.progress + placed });
   if (points == null || location.progress + placed < points) return next;
   const explored = destroyCard(next, id, ctx.cards, steps);

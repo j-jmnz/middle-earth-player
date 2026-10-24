@@ -1,4 +1,5 @@
 // Rules: rr.quest-advancement, rr.step-3-4 (data/rules/entries.json).
+import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
@@ -57,7 +58,7 @@ export function resolveQuest(
   let next = state;
   if (willpower < threat) {
     // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.
-    for (const seat of livingSeats(state)) next = raiseThreat(next, seat, threat - willpower, steps);
+    for (const seat of livingSeats(state)) next = raiseThreat(next, seat, threat - willpower, steps, ruleCause("rr.step-3-4"));
   } else if (willpower > threat) {
     next = placeQuestProgress(next, willpower - threat, cards, steps, canAdvance);
   }
@@ -92,7 +93,7 @@ function placeQuestProgress(
         const placed = Math.min(remaining, need);
         if (placed > 0) {
           next = updateCard(next, locationId, { progress: location.progress + placed });
-          steps.push({ kind: "progress", targetId: locationId, amount: placed });
+          steps.push({ kind: "progress", targetId: locationId, amount: placed, cause: ruleCause("rr.step-3-4") });
           remaining -= placed;
         }
         const updated = next.cards[locationId];
@@ -109,13 +110,13 @@ function placeQuestProgress(
       const points = questPointsOf(next, stage, cards);
       if (points == null) {
         next = updateCard(next, stageId, { progress: stage.progress + remaining });
-        steps.push({ kind: "progress", targetId: stageId, amount: remaining });
+        steps.push({ kind: "progress", targetId: stageId, amount: remaining, cause: ruleCause("rr.step-3-4") });
       } else {
         const need = Math.max(0, points - stage.progress);
         const placed = Math.min(remaining, need);
         if (placed > 0) {
           next = updateCard(next, stageId, { progress: stage.progress + placed });
-          steps.push({ kind: "progress", targetId: stageId, amount: placed });
+          steps.push({ kind: "progress", targetId: stageId, amount: placed, cause: ruleCause("rr.step-3-4") });
         }
         const updated = next.cards[stageId];
         if (updated && updated.progress >= points && canAdvance(next)) {
@@ -148,7 +149,7 @@ function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], o
     if (points == null) {
       if (carried > 0) {
         next = updateCard(next, nextId, { face: "B", progress: before + carried });
-        steps.push({ kind: "progress", targetId: nextId, amount: carried });
+        steps.push({ kind: "progress", targetId: nextId, amount: carried, cause: ruleCause("rr.step-3-4") });
       } else {
         next = updateCard(next, nextId, { face: "B" });
       }
@@ -158,7 +159,7 @@ function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], o
     const need = Math.max(0, points - before);
     const placed = Math.min(carried, need);
     next = updateCard(next, nextId, { face: "B", progress: before + placed });
-    if (placed > 0) steps.push({ kind: "progress", targetId: nextId, amount: placed });
+    if (placed > 0) steps.push({ kind: "progress", targetId: nextId, amount: placed, cause: ruleCause("rr.step-3-4") });
     steps.push({ kind: "advance", cardId: nextId });
     const updated = next.cards[nextId];
     if (!updated || updated.progress < points || !canAdvance(next)) return next;

@@ -2,6 +2,7 @@ import type { Effect } from "../catalog/boundary.ts";
 
 import { applyCancel, cancelIntents, cancelReason } from "./cancel.ts";
 import { holds } from "./conditions.ts";
+import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -77,6 +78,7 @@ export function applyTrigger(
       instructions: effect.instructions,
       cancel: null,
       blockCancel: null,
+      cause: effectCause(effect),
       resume: { window: state.window, seat },
     },
     steps,

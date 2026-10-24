@@ -4,6 +4,7 @@ import type { Effect } from "../catalog/boundary.ts";
 import { holds } from "./conditions.ts";
 import { syncConstants } from "./constants.ts";
 import { pushDue } from "./delayed.ts";
+import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -47,6 +48,7 @@ function pushFound(state: ScenarioState, found: readonly Found[], event: GameEve
         actor: event.seat ?? state.firstPlayer,
         peril: state.perilSeat != null,
         effectId: effect.id,
+        cause: effectCause(effect),
         instructions: effect.instructions,
         cancel: effect.cancel
           ? { amount: effect.cancel.cost, sphere: effect.cancel.sphere ?? null, unless: effect.cancel.unless ?? null }

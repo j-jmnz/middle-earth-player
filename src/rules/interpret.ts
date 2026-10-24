@@ -1,5 +1,6 @@
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 
+import { currentCause, effectCause, inCause, ruleCause, UNATTRIBUTED, type Cause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import { placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
@@ -59,8 +60,9 @@ export function runEffect(
   steps: EngineStep[],
 ): ScenarioState {
   let next = state;
+  const cause = effectCause(effect);
   for (const instruction of effect.instructions) {
-    next = runInstruction(next, instruction, { seat, sourceId }, ctx, steps);
+    next = inCause(steps, cause, () => runInstruction(next, instruction, { seat, sourceId }, ctx, steps));
     if (next.lost || next.failure) return next;
   }
   return next;
@@ -78,7 +80,7 @@ export function runInstruction(
     case "Draw":
       return drawVerb(state, instruction, focus.seat, ctx, steps);
     case "GainResources":
-      return gainSeatResources(state, focus.seat, steps);
+      return gainSeatResources(state, focus.seat, steps, UNATTRIBUTED);
     case "RevealStaging":
       return revealNow(state, focus.seat, ctx, steps);
     case "RaiseThreat":
@@ -125,30 +127,31 @@ export function runInstruction(
   }
 }
 
-export function drawOpeningHand(state: ScenarioState, seat: number, steps: EngineStep[]): ScenarioState {
+// Setup (rr.setup step 5) and a mulligan (rr.mulligan) draw the opening hand.
+export function drawOpeningHand(state: ScenarioState, seat: number, steps: EngineStep[], cause: Cause = ruleCause("rr.setup")): ScenarioState {
   let next = state;
   const count = Math.max(0, 6 - state.openingHandReduction);
-  for (let draw = 0; draw < count; draw += 1) next = drawOne(next, seat, steps);
+  for (let draw = 0; draw < count; draw += 1) next = drawOne(next, seat, steps, cause);
   return next;
 }
 
-export function drawOne(state: ScenarioState, seat: number, steps: EngineStep[]): ScenarioState {
+export function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {
   if (state.seats[seat]?.eliminated) return state;
   const id = state.seats[seat]?.deck[0];
   if (!id) return state;
   const next = moveCard(state, id, { zone: "hand", seat });
-  steps.push({ kind: "draw", seat, cardId: id });
+  steps.push({ kind: "draw", seat, cardId: id, cause: currentCause(steps, fallback) });
   return next;
 }
 
-export function gainSeatResources(state: ScenarioState, seat: number, steps: EngineStep[]): ScenarioState {
+export function gainSeatResources(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {
   const heroes = state.seats[seat]?.heroes ?? [];
   let next = state;
   for (const heroId of heroes) {
     const hero = next.cards[heroId];
     if (!hero) continue;
     next = updateCard(next, heroId, { resources: hero.resources + 1 });
-    steps.push({ kind: "gainResource", seat, heroId });
+    steps.push({ kind: "gainResource", seat, heroId, cause: currentCause(steps, fallback) });
   }
   return next;
 }
@@ -158,7 +161,7 @@ function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: 
   if (!id || !state.cards[id]) return state;
   const instance = state.cards[id];
   if (!instance) return state;
-  steps.push({ kind: "progress", targetId: id, amount: 1 });
+  steps.push({ kind: "progress", targetId: id, amount: 1, cause: currentCause(steps, UNATTRIBUTED) });
   return updateCard(state, id, { progress: instance.progress + 1 });
 }
 
@@ -181,7 +184,7 @@ function dealInstructionDamage(
   const playerEffect = printed != null && isPlayerType(printed);
   let next = state;
   for (const id of damageTargets(state, ctx, focus.sourceId, playerEffect)) {
-    next = placeDamage(next, id, 1, ctx.cards, steps, playerEffect ? "player" : "framework");
+    next = placeDamage(next, id, 1, ctx.cards, steps, playerEffect ? "player" : "framework", currentCause(steps, UNATTRIBUTED));
   }
   return next;
 }

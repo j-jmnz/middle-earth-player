@@ -1,14 +1,16 @@
+import type { Cause } from "./cause.ts";
+
 export type EngineStep =
   | { kind: "push"; frame: string; cardId: string | null; peril: boolean }
   | { kind: "pop"; frame: string; cardId: string | null; peril: boolean }
-  | { kind: "draw"; seat: number; cardId: string }
-  | { kind: "gainResource"; seat: number; heroId: string }
-  | { kind: "damage"; targetId: string; amount: number }
-  | { kind: "threat"; seat: number; amount: number }
-  | { kind: "progress"; targetId: string; amount: number }
+  | { kind: "draw"; seat: number; cardId: string; cause: Cause }
+  | { kind: "gainResource"; seat: number; heroId: string; cause: Cause }
+  | { kind: "damage"; targetId: string; amount: number; cause: Cause }
+  | { kind: "threat"; seat: number; amount: number; cause: Cause }
+  | { kind: "progress"; targetId: string; amount: number; cause: Cause }
   | { kind: "destroy"; targetId: string }
   | { kind: "eliminate"; seat: number }
-  | { kind: "reveal"; seat: number; cardId: string }
+  | { kind: "reveal"; seat: number; cardId: string; cause: Cause }
   | { kind: "engage"; seat: number; enemyId: string }
   | { kind: "commit"; cardId: string }
   | { kind: "hideCommit"; cardId: string }

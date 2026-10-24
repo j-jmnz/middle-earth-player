@@ -13,6 +13,7 @@ import {
   nextEnemyGroup,
 } from "./combat.ts";
 import { applyChoice } from "./choices.ts";
+import { ruleCause } from "./cause.ts";
 import { advanceFrame, stagingStep } from "./frames.ts";
 import { commitHide, pruneRoundRecords } from "./hide.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
@@ -154,8 +155,8 @@ function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
 
 function grant(state: ScenarioState, steps: EngineStep[]): ScenarioState {
   let next = state;
-  for (const seat of livingSeats(next)) next = gainSeatResources(next, seat, steps);
-  for (const seat of livingSeats(next)) next = drawOne(next, seat, steps);
+  for (const seat of livingSeats(next)) next = gainSeatResources(next, seat, steps, ruleCause("rr.step-1-2"));
+  for (const seat of livingSeats(next)) next = drawOne(next, seat, steps, ruleCause("rr.step-1-3"));
   return openPass(withMode(next, "resourceActions"));
 }
 

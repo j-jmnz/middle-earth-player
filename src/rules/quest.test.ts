@@ -127,8 +127,8 @@ describe("quest resolution", () => {
     expect(resolved.state.seats[0]?.threat).toBe(14);
     expect(resolved.state.seats[1]?.threat).toBe(24);
     expect(resolved.steps.filter((step) => step.kind === "threat")).toEqual([
-      { kind: "threat", seat: 0, amount: 4 },
-      { kind: "threat", seat: 1, amount: 4 },
+      expect.objectContaining({ kind: "threat", seat: 0, amount: 4 }),
+      expect.objectContaining({ kind: "threat", seat: 1, amount: 4 }),
     ]);
   });
 

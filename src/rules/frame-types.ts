@@ -1,3 +1,4 @@
+import type { Cause } from "./cause.ts";
 import type { Condition, Instruction, ModifierStat, ModifierUntil, Trigger } from "../catalog/boundary.ts";
 
 import type { Sphere } from "./printed.ts";
@@ -36,7 +37,7 @@ export type FrameName =
 export type HideResult = { success: boolean; willpower: number; threat: number };
 
 // One instruction still to run, with the seat it runs for. `chosen` is the card a player picked for it.
-export type QueueItem = { instruction: Instruction; seat: number; chosen: string | null };
+export type QueueItem = { instruction: Instruction; seat: number; chosen: string | null; cause?: Cause };
 
 export type EffectWait =
   | { kind: "branch"; item: QueueItem }
@@ -108,6 +109,7 @@ export type DelayedEffect = {
   phase: string;
   instructions: readonly Instruction[];
   uncancelable: Condition | null;
+  cause?: Cause;
 };
 
 // One use of an effect with a limit. A oncePerPhase use is spent in the round and phase it was made.
@@ -129,4 +131,5 @@ export type PendingAttack = {
   shadowResolved?: boolean;
   // Instructions to run, with the attacker as the source, when the attack ends.
   after?: readonly Instruction[];
+  afterCause?: Cause;
 };

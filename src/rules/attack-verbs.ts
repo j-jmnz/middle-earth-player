@@ -6,6 +6,7 @@ import type { ScenarioState } from "./state.ts";
 import { livingSeats } from "./state.ts";
 import type { VerbFocus } from "./verbs.ts";
 import { moveCard } from "./zones.ts";
+import { currentCause, UNATTRIBUTED } from "./cause.ts";
 
 // Verbs that read or change the enemy attack in progress.
 export function runAttackVerb(state: ScenarioState, instruction: Instruction, focus: VerbFocus, steps: EngineStep[]): ScenarioState {
@@ -14,7 +15,7 @@ export function runAttackVerb(state: ScenarioState, instruction: Instruction, fo
     case "ConsiderUndefended":
       return attack ? { ...state, pendingAttack: { ...attack, undefended: true } } : state;
     case "AfterAttack":
-      return attack ? { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), ...instruction.instructions] } } : state;
+      return attack ? { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), ...instruction.instructions], afterCause: currentCause(steps, UNATTRIBUTED) } } : state;
     case "EngageNextPlayer": {
       const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
       if (!focus.sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;

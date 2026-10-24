@@ -1,6 +1,7 @@
 // Rules: rr.delayed-effects (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
+import type { Cause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -15,6 +16,7 @@ export function scheduleDelayed(
   instruction: DelayInstruction,
   focus: VerbFocus,
   _ctx: ReduceContext,
+  cause: Cause,
 ): ScenarioState {
   const entry = {
     id: `d${state.delayed.length}:${state.round}`,
@@ -24,6 +26,7 @@ export function scheduleDelayed(
     phase: state.phase,
     instructions: instruction.instructions,
     uncancelable: instruction.uncancelable ?? null,
+    cause,
   };
   return { ...state, delayed: [...state.delayed, entry] };
 }
@@ -58,6 +61,7 @@ export function pushDue(
         instructions: entry.instructions,
         cancel: null,
         blockCancel: entry.uncancelable,
+        ...(entry.cause ? { cause: entry.cause } : {}),
       },
       steps,
     );

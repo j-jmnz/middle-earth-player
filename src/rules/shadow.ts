@@ -8,6 +8,7 @@ import type { ScenarioState } from "./state.ts";
 import { expireModifiers, updateCard } from "./state.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
+import { effectCause, inCause, ruleCause } from "./cause.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -22,7 +23,7 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
       if (effect.cardCode !== shadow.code || effect.timing !== "shadow") continue;
       for (const instruction of effect.instructions) {
         if (!holdsNow(next, instruction, { actor: seat, sourceId: shadowId, returned: 0 }, ctx)) continue;
-        next = runInstruction(next, instruction, { seat, sourceId: shadowId }, ctx, steps);
+        next = inCause(steps, effectCause(effect), () => runInstruction(next, instruction, { seat, sourceId: shadowId }, ctx, steps));
         if (next.lost || next.failure) return next;
       }
     }
@@ -57,12 +58,12 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   if (attack.defenderId != null && !attack.undefended) {
     const defender = next.cards[attack.defenderId];
     const raw = defender ? Math.max(0, modifiedStat(next, enemy, "attack", ctx.cards) - modifiedStat(next, defender, "defense", ctx.cards)) : 0;
-    const damaged = defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "framework") : next;
+    const damaged = defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "framework", ruleCause("rr.step-6-4-3")) : next;
     return damaged.lost ? damaged : finishAttack(damaged, ctx, steps);
   }
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
-  const hit = placeDamage(next, attack.heroId, modifiedStat(next, enemy, "attack", ctx.cards), ctx.cards, steps, "framework");
+  const hit = placeDamage(next, attack.heroId, modifiedStat(next, enemy, "attack", ctx.cards), ctx.cards, steps, "framework", ruleCause("rr.step-6-4-3"));
   return hit.lost ? hit : finishAttack(hit, ctx, steps);
 }
 
@@ -88,6 +89,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       instructions: after,
       cancel: null,
       blockCancel: null,
+      ...(attack.afterCause ? { cause: attack.afterCause } : {}),
     },
     steps,
   );

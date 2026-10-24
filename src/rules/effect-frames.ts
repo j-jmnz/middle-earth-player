@@ -1,6 +1,7 @@
 import type { Condition, Effect, Instruction } from "../catalog/boundary.ts";
 
 import { beginEffect } from "./cancel.ts";
+import { effectCause, inCause, type Cause } from "./cause.ts";
 import { beginEnemyAttack } from "./combat.ts";
 import { askTarget, openBranch } from "./choices.ts";
 import { hasTrait, holds, searchable } from "./conditions.ts";
@@ -28,6 +29,10 @@ export type EffectSpec = {
   blockCancel: Condition | null;
   // The window to open again when the frame pops.
   resume?: EffectData["resume"];
+  // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
+  // records share a frame.
+  cause?: Cause;
+  causes?: readonly (Cause | undefined)[];
 };
 
 // A frame that can stop for a player. Its instructions wait in data, so settle resumes it.
@@ -36,7 +41,10 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     kind: "effect",
     effectId: spec.effectId,
     actor: spec.actor,
-    queue: spec.instructions.map((instruction): QueueItem => ({ instruction, seat: spec.actor, chosen: null })),
+    queue: spec.instructions.map((instruction, at): QueueItem => {
+      const cause = spec.causes?.[at] ?? spec.cause;
+      return { instruction, seat: spec.actor, chosen: null, ...(cause ? { cause } : {}) };
+    }),
     returned: 0,
     canceled: false,
     cancel: spec.cancel,
@@ -72,6 +80,7 @@ export function pushCardEffects(
       peril,
       effectId: first.id,
       instructions: running.flatMap((effect) => effect.instructions),
+      causes: running.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
       cancel: null,
       blockCancel: null,
     },
@@ -105,11 +114,23 @@ function runItem(
 ): ScenarioState {
   const instruction = item.instruction;
   if (!holdsNow(state, instruction, { actor: item.seat, sourceId: frame.cardId, returned }, ctx)) return state;
+  return inCause(steps, item.cause, () => runItemNow(state, item, frame, returned, ctx, steps));
+}
+
+function runItemNow(
+  state: ScenarioState,
+  item: QueueItem,
+  frame: Frame,
+  returned: number,
+  ctx: ReduceContext,
+  steps: EngineStep[],
+): ScenarioState {
+  const instruction = item.instruction;
   switch (instruction.verb) {
     case "Choose":
       return openBranch(state, item, returned, ctx);
     case "ForEachPlayer":
-      return expandPlayers(state, instruction);
+      return expandPlayers(state, instruction, item.cause);
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
@@ -131,13 +152,14 @@ function runItem(
 function expandPlayers(
   state: ScenarioState,
   instruction: Extract<Instruction, { verb: "ForEachPlayer" }>,
+  cause: Cause | undefined,
 ): ScenarioState {
   const data = topFrame(state)?.data;
   if (data?.kind !== "effect") return state;
   const seats = livingSeats(state);
   const ordered = instruction.order === "lastFirst" ? [...seats].reverse() : seats;
   const expanded = ordered.flatMap((seat) =>
-    instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat, chosen: null })),
+    instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat, chosen: null, ...(cause ? { cause } : {}) })),
   );
   return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
 }

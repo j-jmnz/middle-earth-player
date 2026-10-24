@@ -8,6 +8,7 @@ import { livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, type ReduceContext } from "./interpret.ts";
 import { resolveAttack } from "./shadow.ts";
 import { inPlay } from "./zones.ts";
+import { ruleCause } from "./cause.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -182,7 +183,7 @@ export function applyPlayerAttack(
   steps.push({ kind: "attack", side: "player", seat, enemyId });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
-  return placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "framework");
+  return placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "framework", ruleCause("rr.step-6-8-3"));
 }
 
 export function assignArchery(
@@ -194,7 +195,7 @@ export function assignArchery(
   let next = state;
   for (const assignment of assignments) {
     if (assignment.amount <= 0) continue;
-    next = placeDamage(next, assignment.cardId, assignment.amount, ctx.cards, steps, "framework");
+    next = placeDamage(next, assignment.cardId, assignment.amount, ctx.cards, steps, "framework", ruleCause("mec109.archery"));
   }
   return { ...next, window: null };
 }
