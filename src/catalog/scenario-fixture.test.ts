@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { LOCAL_CARDS } from "../../scripts/local-cards.ts";
+import { loadCards } from "../../scripts/data/load-cards.ts";
 import { scenarioDefinitionSchema } from "./boundary.ts";
 import {
   fixtureCards,
@@ -40,9 +40,9 @@ describe("a-shadow-of-the-past fixture", () => {
     }
   });
 
-  it("matches printed quantity for fixture codes that have a local record", () => {
+  it("matches printed quantity for fixture codes that data/cards prints", () => {
     const copies = normalCopiesByCode(fixture);
-    const localByCode = new Map(LOCAL_CARDS.map((card) => [card.code, card]));
+    const localByCode = new Map(loadCards().map((card) => [card.code, card]));
     const fixtureCodes = new Set(fixtureCards(fixture).map((card) => card.code));
     expect(fixtureCodes.size).toBeGreaterThan(0);
     for (const code of fixtureCodes) {

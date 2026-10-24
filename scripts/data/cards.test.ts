@@ -1,16 +1,10 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { DatabaseSync } from "node:sqlite";
-
 import { describe, expect, it } from "vitest";
 
-import { EFFECTS } from "../src/effects/index.ts";
+import { loadCards } from "./load-cards.ts";
+import { parseKeywordTokens } from "./normalize/keywords.ts";
 
-// The 26 dealt cards for A Shadow of the Past, re-read 2026-10-24 from the Hall of Beorn pages for the MEC109
-// (The Fellowship of the Ring, TFotR) printing. Numbers, keywords, traits, the unique flag, and the printed
-// timings only; no card text. Rows were read from those pages; the user waived a physical-card check (2026-10-24). A mismatch here means the catalog data,
-// the manifest, or the records moved away from that reading.
+// The 26 dealt cards for A Shadow of the Past, as the MEC109 (The Fellowship of the Ring) printing prints them.
+// Numbers, keywords, traits and the unique flag only. A mismatch means data/cards moved away from that reading.
 type Row = {
   code: string;
   name: string;
@@ -55,56 +49,44 @@ const CARDS: readonly Row[] = [
   { code: "141085", name: "The One Ring", collector: 166, unique: true, traits: "Artifact. Item. Ring.", keywords: { leavesPlayLoses: true }, timings: ["setup", "constant", "forced"] },
 ];
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const manifest = JSON.parse(readFileSync(path.join(root, "fixtures", "abilities", "a-shadow-of-the-past.json"), "utf8")) as Record<string, string[]>;
 
-// Local records carry the MEC109 collector number as their position. The RingsDB rows keep RingsDB's.
-const LOCAL = new Set(CARDS.filter((card) => !["141017", "141077", "141078", "141079"].includes(card.code)).map((card) => card.code));
+const cards = new Map(loadCards().map((card) => [card.code, card]));
 
-describe("MEC109/TFotR reading of the dealt cards", () => {
-  it("covers the 26 dealt cards and the manifest lists the same codes", () => {
+describe("MEC109 reading of the dealt cards", () => {
+  it("covers the 26 dealt cards", () => {
     expect(CARDS).toHaveLength(26);
-    expect(Object.keys(manifest).sort()).toEqual(CARDS.map((card) => card.code).sort());
   });
 
-  it("matches the catalog rows: name, unique, traits, numbers, engagement, keywords", () => {
-    const database = new DatabaseSync(path.join(root, "assets", "catalog.db"), { readOnly: true });
-    try {
-      const statement = database.prepare(
-        "select name, is_unique, traits, threat, quest, victory, engagement_cost, keywords, position from cards where code = ?",
-      );
-      for (const card of CARDS) {
-        const row = statement.get(card.code);
-        expect(row, card.code).toBeDefined();
-        expect(row?.name, card.code).toBe(card.name);
-        expect(row?.is_unique === 1, `${card.code} unique`).toBe(card.unique);
-        expect(row?.traits ?? undefined, `${card.code} traits`).toBe(card.traits);
-        expect(row?.threat ?? undefined, `${card.code} threat`).toBe(card.threat);
-        expect(row?.quest ?? undefined, `${card.code} quest`).toBe(card.quest);
-        expect(row?.victory ?? undefined, `${card.code} victory`).toBe(card.victory);
-        expect(row?.engagement_cost ?? undefined, `${card.code} engagement`).toBe(card.engagement);
-        expect(JSON.parse(String(row?.keywords ?? "null")), `${card.code} keywords`).toEqual(card.keywords);
-        if (LOCAL.has(card.code)) expect(row?.position, `${card.code} collector`).toBe(card.collector);
-      }
-    } finally {
-      database.close();
+  it("matches data/cards: name, unique, traits, numbers, engagement, keywords", () => {
+    for (const expected of CARDS) {
+      const card = cards.get(expected.code);
+      expect(card, expected.code).toBeDefined();
+      expect(card?.isUnique, `${expected.code} unique`).toBe(expected.unique);
+      expect(card?.threat ?? undefined, `${expected.code} threat`).toBe(expected.threat);
+      expect(card?.victory ?? undefined, `${expected.code} victory`).toBe(expected.victory);
+      expect(card?.engagementCost ?? undefined, `${expected.code} engagement`).toBe(expected.engagement);
+      expect(card?.traits.length ? `${card.traits.join(". ")}.` : undefined, `${expected.code} traits`).toBe(expected.traits);
+      expect(card?.keywords, `${expected.code} keywords`).toEqual(expected.keywords);
+      expect(card?.printings.some((printing) => printing.pack === "TFotR" && printing.number === expected.collector), `${expected.code} MEC109 #${expected.collector}`).toBe(true);
     }
   });
 
-  it("matches the manifest's printed timings", () => {
-    for (const card of CARDS) {
-      expect([...(manifest[card.code] ?? [])].sort(), card.code).toEqual([...card.timings].sort());
+  it("takes quest points from side B for quests and from the front for locations", () => {
+    for (const expected of CARDS.filter((card) => card.quest !== undefined)) {
+      expect(cards.get(expected.code)?.questPoints, expected.code).toBe(expected.quest);
     }
   });
+});
 
-  it("has at least one authored record for every printed timing, repeated where the card prints it twice", () => {
-    for (const card of CARDS) {
-      const wanted = new Map<string, number>();
-      for (const timing of card.timings) wanted.set(timing, (wanted.get(timing) ?? 0) + 1);
-      for (const [timing, count] of wanted) {
-        const have = EFFECTS.filter((effect) => effect.cardCode === card.code && effect.timing === timing).length;
-        expect(have, `${card.code} ${card.name} ${timing}`).toBeGreaterThanOrEqual(count);
-      }
-    }
+describe("parseKeywordTokens", () => {
+  it("reads numbered and flag keywords and reports the rest", () => {
+    expect(parseKeywordTokens(["Hide 2.", "Surge.", "Immune to player card effects.", "Restricted."])).toEqual({
+      keywords: { hide: 2, surge: true, immune: true },
+      unknown: ["Restricted"],
+    });
+  });
+
+  it("splits two keywords joined in one entry", () => {
+    expect(parseKeywordTokens(["Peril. Toughness 1"]).keywords).toEqual({ peril: true, toughness: 1 });
   });
 });

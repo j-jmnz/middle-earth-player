@@ -1,3 +1,5 @@
+import type { Card } from "../catalog/card-facts.ts";
+
 export type Sphere = "leadership" | "tactics" | "spirit" | "lore" | "neutral" | "fellowship" | "baggins";
 
 export type CardType =
@@ -108,4 +110,51 @@ export function isCharacterType(printed: PrintedCard): boolean {
 
 export function isPlayerType(printed: PrintedCard): boolean {
   return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event";
+}
+
+const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure"];
+const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"];
+
+// The engine-facing subset of a data/cards record. A type or sphere the engine does not know fails loudly.
+export function printedFromCard(card: Card): PrintedCard {
+  const type = CARD_TYPES.find((candidate) => candidate === card.type);
+  if (!type) throw new Error(`Card ${card.code} ${card.name} has unsupported type ${card.type}`);
+  let sphere: Sphere | null = null;
+  if (card.sphere != null) {
+    sphere = SPHERES.find((candidate) => candidate === card.sphere) ?? null;
+    if (!sphere) throw new Error(`Card ${card.code} ${card.name} has unsupported sphere ${card.sphere}`);
+  }
+  const keywords = card.keywords ?? {};
+  return definePrinted({
+    code: card.code,
+    name: card.name,
+    type,
+    traits: card.traits,
+    sphere,
+    // A variable cost prints as "X" and is not a number.
+    cost: card.cost != null && /^\d+$/.test(card.cost) ? Number(card.cost) : null,
+    threat: card.threat,
+    willpower: card.willpower,
+    attack: card.attack,
+    defense: card.defense,
+    health: card.health,
+    questPoints: card.questPoints,
+    victory: card.victory,
+    isUnique: card.isUnique,
+    engagementCost: card.engagementCost,
+    leavesPlayLoses: keywords.leavesPlayLoses === true,
+    keywords: {
+      surge: keywords.surge === true,
+      hide: keywords.hide ?? null,
+      doomed: keywords.doomed ?? null,
+      peril: keywords.peril === true,
+      archery: keywords.archery ?? null,
+      immuneToPlayerCardEffects: keywords.immune === true,
+      indestructible: keywords.indestructible === true,
+      toughness: keywords.toughness ?? null,
+      permanent: keywords.permanent === true,
+      sentinel: keywords.sentinel === true,
+      ranged: keywords.ranged === true,
+    },
+  });
 }

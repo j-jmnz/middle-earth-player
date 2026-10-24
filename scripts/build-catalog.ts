@@ -1,69 +1,32 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, renameSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import Database from "better-sqlite3";
 import { getTableConfig, type SQLiteTable } from "drizzle-orm/sqlite-core";
 
-import {
-  parseRingsDbCards,
-  parseRingsDbPacks,
-  type Effect,
-  type PrintedKeywords,
-  type RingsDbCard,
-  type RingsDbPack,
-} from "../src/catalog/boundary.ts";
-import { deckLegal } from "../src/catalog/deck-legal.ts";
+import { parseRingsDbPacks, type Effect, type RingsDbPack } from "../src/catalog/boundary.ts";
+import type { Card } from "../src/catalog/card-facts.ts";
 import { EFFECTS } from "../src/effects/index.ts";
 import { campaigns, cards, catalogTables, effects as effectsTable, meta, packs, scenarios } from "../src/catalog/schema.ts";
 import { nextVersion, quoteIdent, snapshotCatalog, writeCatalogVersion, type Row, type SqlValue } from "./catalog-snapshot.ts";
-import { validateEffects } from "./validate-effects.ts";
-import { KEYWORD_OVERRIDES, LOCAL_CARDS } from "./local-cards.ts";
+import { loadCards } from "./data/load-cards.ts";
+import { DATA_DIR } from "./data/paths.ts";
 import { joinScenarioFixtures } from "./join-scenario-fixtures.ts";
+import { validateEffects } from "./validate-effects.ts";
 
-const PACKS_URL = "https://ringsdb.com/api/public/packs/";
-const ALEP_PREFIX = "ALeP -";
 const FELLOWSHIP_CAMPAIGN_ID = "fellowship-of-the-ring";
 const FELLOWSHIP_PACK_CODES = new Set(["TBR", "TRD"]);
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-const RULE_FIELDS = [
-  "name",
-  "text",
-  "cost",
-  "deck_limit",
-  "type_code",
-  "type_name",
-  "sphere_code",
-  "traits",
-  "is_unique",
-  "has_errata",
-  "threat",
-  "willpower",
-  "attack",
-  "defense",
-  "health",
-  "quest",
-  "victory",
-] as const;
-
-type RuleField = (typeof RULE_FIELDS)[number];
-type Manifest = Record<string, string>;
 type SqliteDatabase = InstanceType<typeof Database>;
 
-type CardCopy = {
-  pack: RingsDbPack;
-  card: RingsDbCard;
-};
-
+// Offline: data/cards and data/raw/ringsdb/packs.json in, assets/catalog.db out.
 export type BuildCatalogOptions = {
-  fetch?: typeof fetch;
-  cacheDir?: string;
+  dataDir?: string;
   dbPath?: string;
   versionPath?: string;
   fixturesDir?: string;
-  localCards?: readonly RingsDbCard[];
-  keywordOverrides?: Readonly<Record<string, PrintedKeywords>>;
+  cards?: readonly Card[];
   effects?: readonly Effect[];
 };
 
@@ -75,90 +38,6 @@ export type BuildCatalogResult = {
 
 function repoRoot(): string {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-}
-
-function packsCacheKey(): string {
-  return "packs.json";
-}
-
-function cardsCacheKey(packCode: string): string {
-  return `cards/${packCode}.json`;
-}
-
-function cardUrl(packCode: string): string {
-  return `https://ringsdb.com/api/public/cards/${encodeURIComponent(packCode)}.json`;
-}
-
-function utcDay(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function manifestPath(cacheDir: string): string {
-  return path.join(cacheDir, "manifest.json");
-}
-
-function readManifest(cacheDir: string): Manifest {
-  const filePath = manifestPath(cacheDir);
-  if (!existsSync(filePath)) return {};
-  const parsed: unknown = JSON.parse(readFileSync(filePath, "utf8"));
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error("Cache manifest is not an object");
-  }
-  const manifest: Manifest = {};
-  for (const [key, value] of Object.entries(parsed)) {
-    if (typeof value !== "string") {
-      throw new Error(`Cache manifest date for ${key} is not a string`);
-    }
-    manifest[key] = value;
-  }
-  return manifest;
-}
-
-function writeManifest(cacheDir: string, manifest: Manifest): void {
-  const sorted: Manifest = {};
-  for (const key of Object.keys(manifest).sort()) {
-    const value = manifest[key];
-    if (value !== undefined) sorted[key] = value;
-  }
-  mkdirSync(cacheDir, { recursive: true });
-  writeFileSync(manifestPath(cacheDir), `${JSON.stringify(sorted, null, 2)}\n`);
-}
-
-async function loadPayload(
-  fetchImpl: typeof fetch,
-  cacheDir: string,
-  manifest: Manifest,
-  key: string,
-  url: string,
-): Promise<unknown> {
-  const filePath = path.join(cacheDir, key);
-  if (existsSync(filePath)) {
-    if (!manifest[key]) {
-      throw new Error(`Cache file ${key} has no fetched_at in the manifest`);
-    }
-    try {
-      return JSON.parse(readFileSync(filePath, "utf8")) as unknown;
-    } catch {
-      throw new Error(`Cache file ${key} is not valid JSON`);
-    }
-  }
-
-  const response = await fetchImpl(url);
-  if (!response.ok) {
-    throw new Error(`GET ${url} failed with status ${response.status}`);
-  }
-  const body = await response.text();
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(body) as unknown;
-  } catch {
-    throw new Error(`GET ${url} returned invalid JSON`);
-  }
-  mkdirSync(path.dirname(filePath), { recursive: true });
-  writeFileSync(filePath, body);
-  manifest[key] = utcDay();
-  writeManifest(cacheDir, manifest);
-  return parsed;
 }
 
 function comparePacks(left: RingsDbPack, right: RingsDbPack): number {
@@ -173,37 +52,6 @@ function comparePacks(left: RingsDbPack, right: RingsDbPack): number {
   return 0;
 }
 
-function ruleValue(card: RingsDbCard, field: RuleField): string | number | boolean | null {
-  const value = card[field];
-  if (value === undefined || value === null) return null;
-  return value;
-}
-
-function assertRulesMatch(code: string, left: RingsDbCard, right: RingsDbCard): void {
-  for (const field of RULE_FIELDS) {
-    if (ruleValue(left, field) !== ruleValue(right, field)) {
-      throw new Error(`Card ${code}: pack files disagree on ${field}`);
-    }
-  }
-}
-
-function deckLegalBit(card: RingsDbCard): number {
-  try {
-    return deckLegal(card.type_code, card.type_name) ? 1 : 0;
-  } catch (error) {
-    const reason = error instanceof Error ? error.message : String(error);
-    throw new Error(`Card ${card.code}: ${reason}`, { cause: error });
-  }
-}
-
-function nullableText(value: string | null | undefined): string | null {
-  return value ?? null;
-}
-
-function nullableInt(value: number | null | undefined): number | null {
-  return value ?? null;
-}
-
 function bit(value: boolean): number {
   return value ? 1 : 0;
 }
@@ -211,10 +59,6 @@ function bit(value: boolean): number {
 // RingsDB `available` is a release date. The column stores whether that date is present.
 function availableFlag(releaseDate: string): number {
   return releaseDate.trim() === "" ? 0 : 1;
-}
-
-function campaignIdFor(packCodes: string[]): string | null {
-  return packCodes.some((code) => FELLOWSHIP_PACK_CODES.has(code)) ? FELLOWSHIP_CAMPAIGN_ID : null;
 }
 
 function rowFrom(table: SQLiteTable, values: Record<string, SqlValue>): Row {
@@ -230,61 +74,46 @@ function rowFrom(table: SQLiteTable, values: Record<string, SqlValue>): Row {
   return row;
 }
 
-function cardRow(copies: CardCopy[], overrides: Readonly<Record<string, PrintedKeywords>>): Row {
-  const ordered = [...copies].sort((left, right) => comparePacks(left.pack, right.pack));
-  const primary = ordered[0];
-  if (!primary) {
-    throw new Error("Cannot build a card row from no printings");
-  }
-  const card = primary.card;
-  const packCodes = ordered.map((copy) => copy.pack.code);
-  // When has_errata is set, the payload text is the errata line. There is no second field.
-  const keywords = card.keywords ?? overrides[card.code] ?? null;
-  const errata = card.has_errata ? nullableText(card.text) : null;
+function capitalize(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+function cardRow(card: Card, knownPacks: ReadonlySet<string>): Row {
+  const primary = card.printings[0];
+  if (!primary) throw new Error(`Card ${card.code} has no printing`);
+  // Printings from packs the pack list does not know (the MEC109 box) are not catalog packs.
+  const packCodes = card.printings.map((printing) => printing.pack).filter((pack) => knownPacks.has(pack));
   return rowFrom(cards, {
     code: card.code,
     name: card.name,
-    pack_code: primary.pack.code,
+    pack_code: primary.pack,
     pack_codes: JSON.stringify(packCodes),
-    type_code: card.type_code,
-    type_name: card.type_name,
-    sphere_code: nullableText(card.sphere_code),
-    sphere_name: nullableText(card.sphere_name),
-    position: card.position,
-    traits: nullableText(card.traits),
-    is_unique: bit(card.is_unique),
-    cost: nullableText(card.cost),
-    deck_limit: nullableInt(card.deck_limit),
+    type_code: card.type,
+    type_name: card.typeName,
+    sphere_code: card.sphere,
+    sphere_name: card.sphere ? capitalize(card.sphere) : null,
+    position: primary.number,
+    traits: card.traits.length > 0 ? `${card.traits.join(". ")}.` : null,
+    is_unique: bit(card.isUnique),
+    cost: card.cost,
+    deck_limit: card.deckLimit,
     quantity: card.quantity,
-    threat: nullableInt(card.threat),
-    willpower: nullableInt(card.willpower),
-    attack: nullableInt(card.attack),
-    defense: nullableInt(card.defense),
-    health: nullableInt(card.health),
-    quest: nullableInt(card.quest),
-    victory: nullableInt(card.victory),
-    engagement_cost: nullableInt(card.engagement_cost),
-    keywords: keywords ? JSON.stringify(keywords) : null,
-    text: nullableText(card.text),
-    has_errata: bit(card.has_errata),
-    errata,
-    imagesrc: nullableText(card.imagesrc),
-    deck_legal: deckLegalBit(card),
-    campaign_id: campaignIdFor(packCodes),
+    threat: card.threat,
+    willpower: card.willpower,
+    attack: card.attack,
+    defense: card.defense,
+    health: card.health,
+    quest: card.questPoints,
+    victory: card.victory,
+    engagement_cost: card.engagementCost,
+    keywords: card.keywords ? JSON.stringify(card.keywords) : null,
+    text: card.text,
+    has_errata: bit(card.hasErrata),
+    errata: card.errata,
+    imagesrc: card.imagesrc,
+    deck_legal: bit(card.deckLegal),
+    campaign_id: packCodes.some((code) => FELLOWSHIP_PACK_CODES.has(code)) ? FELLOWSHIP_CAMPAIGN_ID : null,
   });
-}
-
-function mergeCopy(groups: Map<string, CardCopy[]>, pack: RingsDbPack, card: RingsDbCard): void {
-  const copies = groups.get(card.code) ?? [];
-  const samePack = copies.find((copy) => copy.pack.code === pack.code);
-  if (samePack) {
-    assertRulesMatch(card.code, samePack.card, card);
-    return;
-  }
-  const first = copies[0];
-  if (first) assertRulesMatch(card.code, first.card, card);
-  copies.push({ pack, card });
-  groups.set(card.code, copies);
 }
 
 function createTableStatement(table: SQLiteTable): string {
@@ -372,52 +201,29 @@ function writeDatabase(
   }
 }
 
-function fetchedAtFor(manifest: Manifest, packCode: string): string {
-  const fetchedAt = manifest[cardsCacheKey(packCode)];
-  if (!fetchedAt || !DATE_PATTERN.test(fetchedAt)) {
-    throw new Error(`Pack ${packCode} is missing a fetched_at date`);
-  }
-  return fetchedAt;
+function fetchedDay(dataDir: string): string {
+  const sources = JSON.parse(readFileSync(path.join(dataDir, "sources.json"), "utf8")) as { sources: Record<string, { fetchedAt: string }> };
+  const fetchedAt = sources.sources.ringsdb?.fetchedAt;
+  if (!fetchedAt) throw new Error("data/sources.json has no ringsdb fetchedAt. Run pnpm data:sync.");
+  return fetchedAt.slice(0, 10);
 }
 
-export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<BuildCatalogResult> {
-  const fetchImpl = options.fetch ?? globalThis.fetch;
+export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogResult {
   const root = repoRoot();
-  const cacheDir = options.cacheDir ?? path.join(root, ".cache", "ringsdb");
+  const dataDir = options.dataDir ?? DATA_DIR;
   const dbPath = options.dbPath ?? path.join(root, "assets", "catalog.db");
   const versionPath = options.versionPath ?? path.join(root, "src", "catalog", "version.ts");
   const fixturesDir = options.fixturesDir ?? path.join(root, "fixtures");
-  const localCards = options.localCards ?? LOCAL_CARDS;
-  const keywordOverrides = options.keywordOverrides ?? KEYWORD_OVERRIDES;
   const effectRecords = validateEffects(options.effects ?? EFFECTS);
+  const allCards = options.cards ?? loadCards(dataDir);
 
-  const manifest = readManifest(cacheDir);
-  const packPayload = await loadPayload(fetchImpl, cacheDir, manifest, packsCacheKey(), PACKS_URL);
-  const officialPacks = parseRingsDbPacks(packPayload).filter((pack) => !pack.name.startsWith(ALEP_PREFIX));
+  const allPacks = parseRingsDbPacks(JSON.parse(readFileSync(path.join(dataDir, "raw", "ringsdb", "packs.json"), "utf8")) as unknown);
+  const used = new Set(allCards.flatMap((card) => card.printings.map((printing) => printing.pack)));
+  const included = allPacks.filter((pack) => used.has(pack.code));
+  const knownPacks = new Set(included.map((pack) => pack.code));
 
-  const included: RingsDbPack[] = [];
-  const groups = new Map<string, CardCopy[]>();
-  for (const pack of officialPacks) {
-    const payload = await loadPayload(fetchImpl, cacheDir, manifest, cardsCacheKey(pack.code), cardUrl(pack.code));
-    const packCards = parseRingsDbCards(payload, pack.code);
-    if (packCards.length === 0) continue;
-    included.push(pack);
-    for (const card of packCards) mergeCopy(groups, pack, card);
-  }
-
-  const cardsByCode = new Map<string, RingsDbCard>();
-  for (const copies of groups.values()) {
-    const card = copies[0]?.card;
-    if (card) cardsByCode.set(card.code, card);
-  }
-  const joined = joinScenarioFixtures(fixturesDir, localCards, cardsByCode);
-  for (const card of joined.addedCards) {
-    const pack = included.find((item) => item.code === card.pack_code);
-    if (!pack) {
-      throw new Error(`Scenario card ${card.code} has no pack ${card.pack_code}`);
-    }
-    mergeCopy(groups, pack, card);
-  }
+  const cardsByCode = new Map(allCards.map((card) => [card.code, card]));
+  const definitions = joinScenarioFixtures(fixturesDir, cardsByCode);
 
   const packRows = [...included]
     .sort(comparePacks)
@@ -430,30 +236,13 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
         available: availableFlag(pack.available),
       }),
     );
-  const cardRows = [...groups.values()].map((copies) => cardRow(copies, keywordOverrides)).sort((left, right) => {
-    return String(left.code).localeCompare(String(right.code));
-  });
-  const metaRows = included.map((pack) =>
-    rowFrom(meta, {
-      pack_code: pack.code,
-      fetched_at: fetchedAtFor(manifest, pack.code),
-    }),
-  );
-  const campaignRows = [
-    rowFrom(campaigns, {
-      id: FELLOWSHIP_CAMPAIGN_ID,
-      name: "Fellowship of the Ring",
-    }),
-  ];
-
-  const scenarioRows = joined.definitions.map((definition) =>
-    rowFrom(scenarios, {
-      id: definition.id,
-      definition: JSON.stringify(definition),
-    }),
-  );
-
+  const cardRows = allCards.map((card) => cardRow(card, knownPacks)).sort((left, right) => String(left.code).localeCompare(String(right.code)));
+  const day = fetchedDay(dataDir);
+  const metaRows = included.map((pack) => rowFrom(meta, { pack_code: pack.code, fetched_at: day }));
+  const campaignRows = [rowFrom(campaigns, { id: FELLOWSHIP_CAMPAIGN_ID, name: "Fellowship of the Ring" })];
+  const scenarioRows = definitions.map((definition) => rowFrom(scenarios, { id: definition.id, definition: JSON.stringify(definition) }));
   const effectRows = effectRecords.map((effect) => rowFrom(effectsTable, { id: effect.id, record: JSON.stringify(effect) }));
+
   const previous = snapshotCatalog(dbPath);
   const version = nextVersion(previous, packRows, cardRows, effectRows, scenarioRows, versionPath);
   // Write the version before replacing the database. A crash in between can skip
@@ -477,11 +266,7 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
     throw error;
   }
 
-  return {
-    version,
-    packCount: packRows.length,
-    cardCount: cardRows.length,
-  };
+  return { version, packCount: packRows.length, cardCount: cardRows.length };
 }
 
 function isMainModule(): boolean {
@@ -491,13 +276,11 @@ function isMainModule(): boolean {
 }
 
 if (isMainModule()) {
-  void Promise.resolve()
-    .then(() => buildCatalog())
-    .then((result) => {
-      console.log(`catalog ${result.version}: ${result.packCount} packs, ${result.cardCount} cards`);
-    })
-    .catch((error: unknown) => {
-      console.error(error instanceof Error ? error.message : String(error));
-      process.exitCode = 1;
-    });
+  try {
+    const result = buildCatalog();
+    console.log(`catalog ${result.version}: ${result.packCount} packs, ${result.cardCount} cards`);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  }
 }

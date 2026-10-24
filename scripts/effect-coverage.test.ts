@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { DatabaseSync } from "node:sqlite";
 
 import { describe, expect, it } from "vitest";
 
+import { loadCards } from "./data/load-cards.ts";
 import { parseScenarioFixture, fixtureCards } from "../src/catalog/scenario-fixture.ts";
 import { EFFECTS } from "../src/effects/index.ts";
 
@@ -24,16 +24,6 @@ const LATER: Readonly<Record<string, string>> = {};
 
 // A timing whose record is held back on purpose. The case fails with this message until a citation exists.
 const HELD: Readonly<Record<string, string>> = {};
-
-const LABELS: Readonly<Record<string, string>> = {
-  Setup: "setup",
-  Forced: "forced",
-  "When Revealed": "whenRevealed",
-  Response: "response",
-  Action: "action",
-  Shadow: "shadow",
-  Travel: "travel",
-};
 
 type Case = { code: string; timing: string; nth: number; name: string };
 
@@ -59,25 +49,18 @@ describe("effect coverage manifest", () => {
     }
   });
 
-  it("lists every bold timing label on a card that has catalog text", () => {
-    const database = new DatabaseSync(path.join(root, "assets", "catalog.db"), { readOnly: true });
-    try {
-      const statement = database.prepare("select text from cards where code = ?");
-      let checked = 0;
-      for (const [code, timings] of Object.entries(manifest)) {
-        const row = statement.get(code);
-        const text = typeof row?.text === "string" ? row.text : "";
-        const labels = [...text.matchAll(/<b>([^<]+?)<\/b>/g)].map((match) => LABELS[(match[1] ?? "").replace(/:$/, "").trim()]);
-        for (const label of labels) {
-          expect(label, `${code} has a bold label that the check does not know`).toBeDefined();
-          checked += 1;
-          expect(timings, `${code} should list ${label}`).toContain(label);
-        }
+  it("lists every labelled timing that data/cards derives from a card's text", () => {
+    const byCode = new Map(loadCards().map((card) => [card.code, card]));
+    let checked = 0;
+    for (const [code, timings] of Object.entries(manifest)) {
+      const card = byCode.get(code);
+      expect(card, `${code} is in data/cards`).toBeDefined();
+      for (const label of (card?.timings ?? []).filter((timing) => timing !== "constant")) {
+        checked += 1;
+        expect(timings, `${code} should list ${label}`).toContain(label);
       }
-      expect(checked).toBeGreaterThan(0);
-    } finally {
-      database.close();
     }
+    expect(checked).toBeGreaterThan(0);
   });
 });
 

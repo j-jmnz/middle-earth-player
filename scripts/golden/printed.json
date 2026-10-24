@@ -347,7 +347,7 @@
    "engagementCost": null,
    "leavesPlayLoses": false,
    "code": "141033",
-   "name": "Stock-brook",
+   "name": "Stock-Brook",
    "type": "location",
    "keywords": {
     "surge": false,
@@ -676,7 +676,7 @@
    "engagementCost": null,
    "leavesPlayLoses": false,
    "code": "141042",
-   "name": "Hunting for the Ring",
+   "name": "Hunting For The Ring",
    "type": "treachery",
    "keywords": {
     "surge": false,

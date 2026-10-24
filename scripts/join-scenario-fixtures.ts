@@ -1,7 +1,8 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-import type { RingsDbCard, ScenarioDefinition } from "../src/catalog/boundary.ts";
+import type { ScenarioDefinition } from "../src/catalog/boundary.ts";
+import type { Card } from "../src/catalog/card-facts.ts";
 import { fixtureCards, parseScenarioFixture, scenarioDefinition, type ScenarioFixture } from "../src/catalog/scenario-fixture.ts";
 
 export function loadScenarioFixtures(fixturesDir: string): ScenarioFixture[] {
@@ -13,16 +14,10 @@ export function loadScenarioFixtures(fixturesDir: string): ScenarioFixture[] {
 }
 
 // A reward name must match exactly one card the fixture deals. The build fails on none or on several.
-function codeForName(
-  fixture: ScenarioFixture,
-  name: string,
-  cardsByCode: ReadonlyMap<string, RingsDbCard>,
-  localByCode: ReadonlyMap<string, RingsDbCard>,
-): string {
+function codeForName(fixture: ScenarioFixture, name: string, cardsByCode: ReadonlyMap<string, Card>): string {
   const matches = new Set<string>();
   for (const { code } of fixtureCards(fixture)) {
-    const card = cardsByCode.get(code) ?? localByCode.get(code);
-    if (card?.name === name) matches.add(code);
+    if (cardsByCode.get(code)?.name === name) matches.add(code);
   }
   const [only, ...rest] = [...matches];
   if (only === undefined) throw new Error(`Scenario ${fixture.id} resolution names "${name}", which is not a dealt card`);
@@ -30,49 +25,15 @@ function codeForName(
   return only;
 }
 
-export function joinScenarioFixtures(
-  fixturesDir: string,
-  localCards: readonly RingsDbCard[],
-  cardsByCode: ReadonlyMap<string, RingsDbCard>,
-): { addedCards: RingsDbCard[]; definitions: ScenarioDefinition[] } {
-  const localByCode = new Map(localCards.map((card) => [card.code, card]));
-  const addedCards: RingsDbCard[] = [];
-  const addedCodes = new Set<string>();
+export function joinScenarioFixtures(fixturesDir: string, cardsByCode: ReadonlyMap<string, Card>): ScenarioDefinition[] {
   const definitions: ScenarioDefinition[] = [];
-
   for (const fixture of loadScenarioFixtures(fixturesDir)) {
     for (const code of new Set(fixtureCards(fixture).map((card) => card.code))) {
-      const official = cardsByCode.get(code);
-      const card = official ?? localByCode.get(code);
-      if (!card) {
-        throw new Error(`Scenario ${fixture.id} is missing card ${code}`);
-      }
-      if (card.type_code === "nightmare") {
-        throw new Error(`Scenario ${fixture.id} card ${code} is a nightmare card`);
-      }
-      if (!official && !addedCodes.has(code)) {
-        addedCodes.add(code);
-        addedCards.push(card);
-      }
+      const card = cardsByCode.get(code);
+      if (!card) throw new Error(`Scenario ${fixture.id} is missing card ${code}`);
+      if (card.type === "nightmare") throw new Error(`Scenario ${fixture.id} card ${code} is a nightmare card`);
     }
-    definitions.push(scenarioDefinition(fixture, (name) => codeForName(fixture, name, cardsByCode, localByCode)));
+    definitions.push(scenarioDefinition(fixture, (name) => codeForName(fixture, name, cardsByCode)));
   }
-
-  for (const local of localCards) {
-    if (addedCodes.has(local.code)) continue;
-    const official = cardsByCode.get(local.code);
-    if (official) {
-      if (official.name !== local.name) {
-        throw new Error(`Local card ${local.code} already belongs to a different card`);
-      }
-      continue;
-    }
-    if (local.type_code === "nightmare") {
-      throw new Error(`Local card ${local.code} is a nightmare card`);
-    }
-    addedCodes.add(local.code);
-    addedCards.push(local);
-  }
-
-  return { addedCards, definitions };
+  return definitions;
 }

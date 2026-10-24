@@ -19,10 +19,10 @@ function newest(target: string): number {
 
 export function catalogInputs(base: string): string[] {
   return [
-    path.join(base, ".cache", "ringsdb", "manifest.json"),
+    path.join(base, "data", "cards"),
+    path.join(base, "data", "sources.json"),
     path.join(base, "src", "effects"),
     path.join(base, "fixtures"),
-    path.join(base, "scripts", "local-cards.ts"),
     path.join(base, "scripts", "build-catalog.ts"),
     path.join(base, "scripts", "catalog-snapshot.ts"),
     path.join(base, "scripts", "validate-effects.ts"),
@@ -47,11 +47,12 @@ if (isMainModule()) {
   if (!catalogIsStale(dbPath, catalogInputs(root))) {
     console.log("catalog.db is current");
   } else {
-    void buildCatalog()
-      .then((result) => console.log(`catalog ${result.version}: ${result.packCount} packs, ${result.cardCount} cards`))
-      .catch((error: unknown) => {
-        console.error(error instanceof Error ? error.message : String(error));
-        process.exitCode = 1;
-      });
+    try {
+      const result = buildCatalog();
+      console.log(`catalog ${result.version}: ${result.packCount} packs, ${result.cardCount} cards`);
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error));
+      process.exitCode = 1;
+    }
   }
 }
