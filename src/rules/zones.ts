@@ -157,6 +157,14 @@ export function moveCard(state: ScenarioState, id: string, dest: Destination): S
   return attach(next, id, dest);
 }
 
+// Links an attachment to its host. The card keeps its zone and controller.
+export function attachTo(state: ScenarioState, id: string, hostId: string): ScenarioState {
+  const host = state.cards[hostId];
+  if (!host || !state.cards[id]) return state;
+  const linked = updateCard(state, id, { host: hostId });
+  return updateCard(linked, hostId, { attachments: append(host.attachments, id) });
+}
+
 export function spawn(
   state: ScenarioState,
   code: string,

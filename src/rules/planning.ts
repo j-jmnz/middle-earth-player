@@ -6,7 +6,7 @@ import { printedOf, spherePays, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 import { runEffects } from "./interpret.ts";
-import { moveCard } from "./zones.ts";
+import { attachTo, moveCard } from "./zones.ts";
 
 export function playCard(
   state: ScenarioState,
@@ -31,9 +31,7 @@ export function playCard(
   next = moveCard(next, intent.cardId, { zone: "play", seat });
   next = updateCard(next, intent.cardId, { exhausted: false });
   if (printed.type === "attachment" && intent.hostId) {
-    const host = next.cards[intent.hostId];
-    next = updateCard(next, intent.cardId, { host: intent.hostId });
-    if (host) next = updateCard(next, intent.hostId, { attachments: [...host.attachments, intent.cardId] });
+    next = attachTo(next, intent.cardId, intent.hostId);
   }
   return next;
 }

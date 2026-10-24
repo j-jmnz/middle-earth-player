@@ -251,8 +251,7 @@ const treacheries: RingsDbCard[] = [
   printed({ code: "141076", keywords: { surge: true }, name: "Lure of the Ring", type_code: "treachery", type_name: "Treachery", position: 76, quantity: 3 }),
 ];
 
-// The One Ring, MEC109 objective card 85, read 2026-10-23. Unique. No printed combat numbers.
-// Rule flag: the players lose when it leaves play. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
+// The One Ring, MEC109 objective card 85. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
 // Not part of the encounter deck. The A Shadow in the East attachment 21001 is a different card.
 const theOneRing: RingsDbCard = printed({
   code: "141085",

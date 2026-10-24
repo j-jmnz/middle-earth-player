@@ -4,21 +4,21 @@ import { fileURLToPath } from "node:url";
 
 import { DatabaseSync } from "node:sqlite";
 
-import { scenarioDefinitionSchema, type ScenarioDefinition } from "../catalog/boundary.ts";
-import { parseKeywords, type CatalogCardRow } from "../catalog/card-row.ts";
-import { printedFromRow } from "../rules/catalog-row.ts";
-import type { PrintedCard } from "../rules/printed.ts";
+import { scenarioDefinitionSchema, type ScenarioDefinition } from "../src/catalog/boundary.ts";
+import { parseKeywords, type CatalogCardRow } from "../src/catalog/card-row.ts";
+import { printedFromRow } from "../src/rules/catalog-row.ts";
+import type { PrintedCard } from "../src/rules/printed.ts";
 
-// Test-only. Reads the built assets/catalog.db, and builds it first when the file is missing.
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+// Test helper. Reads the built assets/catalog.db. It lives under scripts/, outside the app bundle,
+// and never builds the catalog: run pnpm catalog:build (CI runs ensure-catalog first).
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dbPath = path.join(root, "assets", "catalog.db");
 
 type RawRow = Record<string, string | number | bigint | Uint8Array | null>;
 
-async function openCatalog(): Promise<DatabaseSync> {
+function openCatalog(): DatabaseSync {
   if (!existsSync(dbPath)) {
-    const { buildCatalog } = await import("../../scripts/build-catalog.ts");
-    await buildCatalog();
+    throw new Error(`assets/catalog.db is missing. Run pnpm catalog:build, then run the tests again.`);
   }
   return new DatabaseSync(dbPath, { readOnly: true });
 }
@@ -53,7 +53,7 @@ function toRow(raw: RawRow): CatalogCardRow {
 }
 
 export async function loadPrinted(codes: readonly string[]): Promise<ReadonlyMap<string, PrintedCard>> {
-  const database = await openCatalog();
+  const database = openCatalog();
   try {
     const statement = database.prepare("select * from cards where code = ?");
     const cards = new Map<string, PrintedCard>();
@@ -69,7 +69,7 @@ export async function loadPrinted(codes: readonly string[]): Promise<ReadonlyMap
 }
 
 export async function loadDefinition(id: string): Promise<ScenarioDefinition> {
-  const database = await openCatalog();
+  const database = openCatalog();
   try {
     const raw = database.prepare("select definition from scenarios where id = ?").get(id);
     if (!raw) throw new Error(`Catalog has no scenario ${id}`);

@@ -13,7 +13,7 @@ import { reduce, startScenario, type ReduceContext, type ScenarioState } from ".
 import { moveCard } from "../rules/zones.ts";
 
 import { scriptFor } from "./registry.ts";
-import { loadDefinition, loadPrinted } from "./test-catalog.ts";
+import { loadDefinition, loadPrinted } from "../../scripts/test-catalog.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const fixture: ScenarioFixture = parseScenarioFixture(

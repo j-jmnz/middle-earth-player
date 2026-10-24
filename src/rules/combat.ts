@@ -111,7 +111,7 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   if (!instance || instance.exhausted) return false;
   if (instance.zone !== "heroes" && instance.zone !== "play") return false;
   const printed = printedOf(cards, instance.code);
-  if (!isCharacterType(printed.type)) return false;
+  if (!isCharacterType(printed)) return false;
   if (instance.controller === attackedSeat) return true;
   return printed.keywords.sentinel;
 }
@@ -179,7 +179,7 @@ export function canAttack(
   if (!attacker || !enemy || attacker.exhausted || attacker.controller !== seat) return false;
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
-  if (!isCharacterType(printed.type)) return false;
+  if (!isCharacterType(printed)) return false;
   if (enemy.zone !== "engaged") return false;
   if (enemy.controller === seat) return true;
   return printed.keywords.ranged;

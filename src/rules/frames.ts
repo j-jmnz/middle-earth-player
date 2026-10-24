@@ -40,6 +40,8 @@ export function revealNow(state: ScenarioState, seat: number, ctx: ReduceContext
   let next = startReveal({ ...state, window: null }, seat, ctx, steps);
   for (let guard = 0; guard < 400; guard += 1) {
     if (next.lost || next.failure) return next;
+    // A failure makes reduce reject the intent and return the pre-intent state, so the window
+    // the reveal opened is discarded with the rest of this result and the entry window is not restored.
     if (next.window) return { ...next, failure: "A reveal inside an effect cannot wait for a player" };
     if (next.stack.length <= base) return { ...next, window: entryWindow };
     next = advanceFrame(next, ctx, steps);

@@ -110,7 +110,7 @@ export function defeatedDestination(
   if ((printed.type === "enemy" || printed.type === "location") && printed.victory != null) {
     return { zone: "victory" };
   }
-  if (isPlayerType(printed.type) && instance.controller != null) {
+  if (isPlayerType(printed) && instance.controller != null) {
     return { zone: "discard", seat: instance.controller };
   }
   if (printed.type === "quest") return { zone: "setAside" };

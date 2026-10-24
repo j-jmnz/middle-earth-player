@@ -207,7 +207,7 @@ function dealInstructionDamage(
 ): ScenarioState {
   const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
   const printed = source ? printedOf(ctx.cards, source.code) : undefined;
-  const playerEffect = printed != null && isPlayerType(printed.type);
+  const playerEffect = printed != null && isPlayerType(printed);
   let next = state;
   for (const id of damageTargets(state, ctx, focus.sourceId, playerEffect)) {
     next = placeDamage(next, id, 1, ctx.cards, steps, playerEffect ? "player" : "framework");

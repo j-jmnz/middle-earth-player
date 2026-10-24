@@ -411,7 +411,7 @@ function snapshotCatalog(dbPath: string): CatalogSnapshot | null {
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
     // A database from before a column was added differs from any new build, so the version moves.
-    if (/no such column/.test(reason)) return { packs: "", cards: "", scenarios: "" };
+    if (/no such column: (engagement_cost|keywords)/.test(reason)) return { packs: "", cards: "", scenarios: "" };
     throw new Error(`Could not read existing catalog at ${dbPath}: ${reason}`, { cause: error });
   } finally {
     db.close();

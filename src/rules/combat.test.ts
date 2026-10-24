@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../catalog/boundary.ts";
 
+import { canAttack, canDefend } from "./combat.ts";
 import { cardMap, expectOk, fixtureDefinition, hero } from "./fixture.ts";
 import { definePrinted } from "./printed.ts";
 import { legalIntents, legalTargets, reduce } from "./reduce.ts";
@@ -398,5 +399,20 @@ describe("combat", () => {
       attackerIds: [heroSpawn.id],
     }, { effects: [], cards }));
     expect(once.state.cards[enemySpawn.id]?.damage).toBe(3);
+  });
+
+  it("lets a treasure with printed combat stats defend and attack as a character", () => {
+    const gildor = definePrinted({ code: "elf", name: "Elf Lord", type: "treasure", attack: 2, defense: 2, health: 4 });
+    const relic = definePrinted({ code: "relic", name: "Relic", type: "treasure" });
+    const cards = cardMap([gildor, relic, enemy("orc")]);
+    let state = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const elf = spawn(state, "elf", { zone: "play", seat: 0 });
+    const prop = spawn(elf.state, "relic", { zone: "play", seat: 0 });
+    const orc = spawn(prop.state, "orc", { zone: "engaged", seat: 0 });
+    state = orc.state;
+    expect(canDefend(state, 0, elf.id, cards)).toBe(true);
+    expect(canAttack(state, 0, elf.id, orc.id, cards)).toBe(true);
+    expect(canDefend(state, 0, prop.id, cards)).toBe(false);
+    expect(canAttack(state, 0, prop.id, orc.id, cards)).toBe(false);
   });
 });

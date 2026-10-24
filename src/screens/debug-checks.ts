@@ -120,7 +120,7 @@ function scenarioSentences(input: DebugCheckInput): string[] {
   if (problems.length === 0) sentences.push(`Scenario ${input.fixture.id} matches the fixture.`);
   sentences.push(...problems);
   if (problems.length === 0) {
-    sentences.push(`Setup has ${parsed.data.setup.length} instructions and resolution has ${parsed.data.resolution.length} options.`);
+    sentences.push(`Setup instructions: ${parsed.data.setup.length}. Resolution options: ${parsed.data.resolution.length}.`);
   }
   return sentences;
 }

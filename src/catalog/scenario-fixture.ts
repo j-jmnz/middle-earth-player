@@ -116,7 +116,9 @@ const SETUP_VERB = {
   attached: "AttachToRingBearer",
 } as const;
 
-// Quest-card setup order: set aside, add to staging, make a location active, then attach.
+// Order of the quest card's setup steps: set aside, add to staging, make a location active, then attach.
+// Source: MEC109 quest card 1A (Three is Company, 141022), setup side. Read via Hall of Beorn 2026-10-24.
+// Confirm on the card.
 // Each copy is one instruction. The encounter and quest piles are dealt by the scenario script.
 export function setupInstructions(fixture: ScenarioFixture): Instruction[] {
   const listed = fixtureCards(fixture);

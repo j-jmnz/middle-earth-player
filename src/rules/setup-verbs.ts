@@ -2,8 +2,8 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
-import { updateCard, type ScenarioState } from "./state.ts";
-import { spawn } from "./zones.ts";
+import type { ScenarioState } from "./state.ts";
+import { attachTo, spawn } from "./zones.ts";
 
 export type SetupInstruction = Extract<
   Instruction,
@@ -26,7 +26,7 @@ export function runSetupVerb(state: ScenarioState, instruction: SetupInstruction
 }
 
 // The first player's hero is searched first, then the other seats in order.
-export function ringBearer(state: ScenarioState, ctx: ReduceContext): string | null {
+function ringBearer(state: ScenarioState, ctx: ReduceContext): string | null {
   const order = [state.firstPlayer, ...state.seats.map((_, index) => index).filter((index) => index !== state.firstPlayer)];
   for (const seatIndex of order) {
     for (const id of state.seats[seatIndex]?.heroes ?? []) {
@@ -44,6 +44,5 @@ function attachToRingBearer(state: ScenarioState, code: string, ctx: ReduceConte
     return { ...state, failure: `No Ring-bearer hero to attach ${code} to` };
   }
   const spawned = spawn(state, code, { zone: "play", seat: host.controller });
-  const attached = updateCard(spawned.state, spawned.id, { host: hostId });
-  return updateCard(attached, hostId, { attachments: [...host.attachments, spawned.id] });
+  return attachTo(spawned.state, spawned.id, hostId);
 }

@@ -16,7 +16,7 @@ export const printedKeywordsSchema = z.strictObject({
   permanent: z.boolean().optional(),
   sentinel: z.boolean().optional(),
   ranged: z.boolean().optional(),
-  // The game is lost when this card leaves play (a printed rule, not a keyword).
+  // Leaving play ends the game (flag).
   leavesPlayLoses: z.boolean().optional(),
 });
 

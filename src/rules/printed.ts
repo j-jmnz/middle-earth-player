@@ -102,10 +102,10 @@ export function isAllyLike(printed: PrintedCard): boolean {
   return printed.type === "ally" || (printed.type === "treasure" && printed.health != null);
 }
 
-export function isCharacterType(type: CardType): boolean {
-  return type === "hero" || type === "ally";
+export function isCharacterType(printed: PrintedCard): boolean {
+  return printed.type === "hero" || isAllyLike(printed);
 }
 
-export function isPlayerType(type: CardType): boolean {
-  return type === "hero" || type === "ally" || type === "attachment" || type === "event";
+export function isPlayerType(printed: PrintedCard): boolean {
+  return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event";
 }

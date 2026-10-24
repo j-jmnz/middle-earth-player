@@ -34,6 +34,17 @@ describe("boundaries", () => {
     }
   });
 
+  it("keeps node modules and scripts out of the rules and campaign modules that ship", () => {
+    for (const directory of ["src/rules", "src/campaign"]) {
+      for (const file of sourceFiles(join(process.cwd(), directory))) {
+        if (file.endsWith(".test.ts")) continue;
+        const text = readFileSync(file, "utf8");
+        expect(text, file).not.toMatch(/from ["']node:/);
+        expect(text, file).not.toMatch(/scripts\//);
+      }
+    }
+  });
+
   it("adds no table component under src/play", () => {
     const names = readdirSync(join(process.cwd(), "src/play")).filter((name) => name.endsWith(".ts") || name.endsWith(".tsx"));
     expect(names).toEqual([]);

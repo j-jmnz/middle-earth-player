@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { cardMap, fixtureDefinition, hero } from "./fixture.ts";
-import { placeDamage, raiseThreat } from "./keywords.ts";
+import { defeatedDestination, placeDamage, raiseThreat } from "./keywords.ts";
 import { definePrinted } from "./printed.ts";
 import { blankScenario, updateCard } from "./state.ts";
 import { spawn } from "./zones.ts";
@@ -80,5 +80,21 @@ describe("keywords", () => {
     const eliminated = raiseThreat(threatened, 0, 50, []);
     expect(eliminated.seats[0].eliminated).toBe(true);
     expect(eliminated.lost).toBe(true);
+  });
+
+  it("sends a defeated treasure with printed health to its controller's discard", () => {
+    const elf = definePrinted({ code: "elf", name: "Elf Lord", type: "treasure", attack: 2, defense: 2, health: 3 });
+    const relic = definePrinted({ code: "relic", name: "Relic", type: "treasure" });
+    const cards = cardMap([elf, relic]);
+    let state = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const spawned = spawn(state, "elf", { zone: "play", seat: 0 });
+    state = spawned.state;
+    const instance = state.cards[spawned.id];
+    if (!instance) throw new Error("missing card");
+    expect(defeatedDestination(instance, elf)).toEqual({ zone: "discard", seat: 0 });
+    expect(defeatedDestination(instance, relic)).toEqual({ zone: "encounterDiscard" });
+    const fallen = placeDamage(state, spawned.id, 3, cards, [], "framework");
+    expect(fallen.cards[spawned.id]?.zone).toBe("discard");
+    expect(fallen.seats[0]?.discard).toContain(spawned.id);
   });
 });
