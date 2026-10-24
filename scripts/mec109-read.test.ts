@@ -9,7 +9,7 @@ import { EFFECTS } from "../src/effects/index.ts";
 
 // The 26 dealt cards for A Shadow of the Past, re-read 2026-10-24 from the Hall of Beorn pages for the MEC109
 // (The Fellowship of the Ring, TFotR) printing. Numbers, keywords, traits, the unique flag, and the printed
-// timings only; no card text. Confirm each row on the physical card. A mismatch here means the catalog data,
+// timings only; no card text. Rows were read from those pages; the user waived a physical-card check (2026-10-24). A mismatch here means the catalog data,
 // the manifest, or the records moved away from that reading.
 type Row = {
   code: string;

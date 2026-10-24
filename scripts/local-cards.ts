@@ -29,7 +29,7 @@ function printed(
 
 // Printed numbers, keywords, engagement cost, traits, and the unique flag were re-read 2026-10-24 from the
 // Hall of Beorn pages for the MEC109 (The Fellowship of the Ring, TFotR) printing, a dev-time aid. Each value
-// is for the user to confirm on the physical card. A keywords object of {} means the card was read and
+// was read from those pages; the user waived a physical-card check (2026-10-24). A keywords object of {} means the card was read and
 // prints none. Unprinted numbers stay null. Ability text is not stored.
 // `position` is the MEC109 collector number from those pages. The RingsDB-derived rows (141017, 141077,
 // 141078, 141079) keep their RingsDB position; their MEC109 numbers are in the comment on KEYWORD_OVERRIDES.
