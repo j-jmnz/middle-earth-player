@@ -21,6 +21,11 @@ export const tableTokens = {
   felt: "#121613",
   feltLight: "#1F2620",
   threat: "#B9483A",
+  leadership: "#B06098",
+  tactics: "#E03848",
+  lore: "#62B02A",
+  spirit: "#54A8C0",
+  fellowship: "#C9A961",
 } as const;
 
 export type TableToken = keyof typeof tableTokens;

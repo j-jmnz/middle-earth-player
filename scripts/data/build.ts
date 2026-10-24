@@ -3,6 +3,7 @@ import path from "node:path";
 
 import type { Card } from "../../src/catalog/card-facts.ts";
 import { DATA_DIR, ROOT } from "./paths.ts";
+import { buildIcons } from "./icons.ts";
 import { buildCards, parseOverrides } from "./normalize/cards.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
 import { generateEffects, renderGenerated } from "./effects/generate.ts";
@@ -78,6 +79,8 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   mkdirSync(effectsDir, { recursive: true });
   const generated = generateEffects(cards, built.scenarios, built.campaign, ledger);
   writeFileSync(path.join(effectsDir, "fellowship-of-the-ring.ts"), renderGenerated(generated.effects, built.campaign.id));
+  const icons = buildIcons(process.env.ICONS_OUT ?? path.join(ROOT, "assets", "icons"), process.env.ICON_MODULES_OUT ?? path.join(ROOT, "src", "play", "icons"));
+  console.log(`icons: ${icons.length} (${icons.filter((icon) => icon.kind === "vector").length} vector, ${icons.filter((icon) => icon.kind === "raster").length} raster)`);
   console.log(`effects: ${generated.effects.length} generated, ${generated.unmatched.length} lines without a template`);
   console.log(`templates: ${Object.entries(generated.usage).map(([id, lines]) => `${id} x${lines}`).join(", ")}`);
   console.log(`scenarios: ${built.scenarios.map((scenario) => scenario.id).join(", ") || "none"}`);

@@ -5,18 +5,20 @@ import { DATA_DIR } from "./paths.ts";
 import { syncDragnCards } from "./sources/dragncards.ts";
 import type { SourceRecord } from "./sources/fetch.ts";
 import { syncHallOfBeorn } from "./sources/hallofbeorn.ts";
+import { syncIcons } from "./sources/icons.ts";
 import { syncRingsDb } from "./sources/ringsdb.ts";
 import { syncRules } from "./sources/rules.ts";
 import { syncScans } from "./sources/scans.ts";
 
 // The only network command. Refreshes data/raw and .cache/pdf, then records every pin in data/sources.json.
-// Usage: node --experimental-strip-types scripts/data/sync.ts [ringsdb|hallofbeorn|dragncards|rules|scans]...
+// Usage: node --experimental-strip-types scripts/data/sync.ts [ringsdb|hallofbeorn|dragncards|rules|scans|icons]...
 const ADAPTERS: Record<string, () => Promise<SourceRecord>> = {
   ringsdb: syncRingsDb,
   hallofbeorn: syncHallOfBeorn,
   dragncards: syncDragnCards,
   rules: syncRules,
   scans: syncScans,
+  icons: syncIcons,
 };
 
 async function main(): Promise<void> {

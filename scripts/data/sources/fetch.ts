@@ -40,3 +40,11 @@ export function writeRaw(relative: string, url: string, body: string): SourceFil
 export function combinedPin(files: readonly SourceFile[]): string {
   return sha256([...files].sort((a, b) => a.path.localeCompare(b.path)).map((file) => `${file.path} ${file.sha256}`).join("\n"));
 }
+
+// Writes binary bytes verbatim under data/raw/<relative> (an image) and returns its record.
+export function writeRawBytes(relative: string, url: string, body: Uint8Array): SourceFile {
+  const file = path.join(RAW_DIR, relative);
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, body);
+  return { path: `raw/${relative}`, url, sha256: sha256(body), bytes: body.byteLength };
+}
