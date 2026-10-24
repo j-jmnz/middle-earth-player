@@ -231,7 +231,7 @@ Setup, in this order:
 3. Quest. Commit, then staging, then resolution. Saga staging reveals one encounter card per seat, in seat order, and resolves it before the next seat. For true solo that is one reveal. "You" on an encounter card means the seat who revealed it. Surge: that same seat reveals another encounter card before the next seat. Doomed X raises every seat's threat. Peril: the other seats cannot act or trigger responses while that card's staging resolves.
 4. Travel.
 5. Encounter. Each seat may optionally engage one enemy. Seats then repeat engagement checks in order until no enemy still in staging has an engagement cost at or below that seat's threat.
-6. Combat. Deal a shadow card face down to each engaged enemy. Reveal a shadow when that enemy attacks: after the defender is declared, or the attack is undefended, and before damage. Resolve every enemy attack in seat order, then resolve every player attack in seat order.
+6. Combat. Deal a shadow card face down to each engaged enemy. Reveal a shadow when that enemy attacks: after the defender is declared, or the attack is undefended, and before damage. (Unverified: confirm on the Learn to Play combat section.) Resolve every enemy attack in seat order, then resolve every player attack in seat order.
 7. Refresh. Ready exhausted cards. Raise each seat's threat by 1. Pass the first-player token.
 
 Threat 50 eliminates that seat. A seat with no heroes in play is eliminated. If no seat remains, the players lose. The One Ring leaving play loses the game. Quest points met advances or flips the stage as the script says. Re-read this round against the Learn to Play before freezing it. Where that book disagrees, the book wins.

@@ -1,10 +1,9 @@
 import type { Instruction } from "../catalog/boundary.ts";
 
-import { holds } from "./conditions.ts";
+import { constantInstructions } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
-import { inPlay } from "./state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
 export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string };
@@ -13,18 +12,9 @@ export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrai
 // each record names the card it came from, so a caller can tell whose rule it is.
 export function restricted(state: ScenarioState, ctx: ReduceContext, what: Restrict["what"]): Restriction[] {
   const found: Restriction[] = [];
-  for (const source of Object.values(state.cards)) {
-    if (!inPlay(source.zone)) continue;
-    for (const effect of ctx.effects) {
-      if (effect.timing !== "constant" || effect.cardCode !== source.code) continue;
-      const scope = { actor: source.controller ?? state.firstPlayer, sourceId: source.id, returned: 0 };
-      if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
-      for (const instruction of effect.instructions) {
-        if (instruction.verb !== "Restrict" || instruction.what !== what) continue;
-        if (instruction.when && !holds(state, instruction.when, scope, ctx)) continue;
-        found.push({ sourceId: source.id, what, ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}) });
-      }
-    }
+  for (const { source, instruction } of constantInstructions(state, ctx)) {
+    if (instruction.verb !== "Restrict" || instruction.what !== what) continue;
+    found.push({ sourceId: source.id, what, ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}) });
   }
   return found;
 }

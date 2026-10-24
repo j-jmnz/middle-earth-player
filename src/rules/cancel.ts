@@ -1,6 +1,7 @@
 import { holds } from "./conditions.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { validatePayments } from "./payments.ts";
 import { printedOf, spherePays } from "./printed.ts";
 import type { CancelOffer, EffectData, Frame, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
@@ -42,22 +43,7 @@ export function cancelReason(state: ScenarioState, intent: TriggerIntent, ctx: R
   const data = top?.data;
   if (state.window?.kind !== "cancelOffer" || data?.kind !== "effect" || !data.cancel) return "That intent is not legal in this window";
   if (intent.cardId !== top?.cardId || intent.effectId !== data.effectId) return "That effect cannot be triggered";
-  const spent = new Map<string, number>();
-  let sum = 0;
-  for (const payment of intent.payments ?? []) {
-    const hero = state.cards[payment.heroId];
-    if (!Number.isInteger(payment.amount) || payment.amount < 0) return "That payment is not a cost";
-    if (!hero || hero.zone !== "heroes" || hero.controller !== state.firstPlayer) return "That hero cannot pay";
-    if (!spherePays(printedOf(ctx.cards, hero.code).sphere, data.cancel.sphere)) return "Wrong sphere";
-    // One hero can appear twice in the list, so what it owes is the sum of its payments.
-    const owed = (spent.get(payment.heroId) ?? 0) + payment.amount;
-    if (hero.resources < owed) return "That hero does not have those resources";
-    spent.set(payment.heroId, owed);
-    sum += payment.amount;
-  }
-  if (sum > data.cancel.amount) return "Overpay";
-  if (sum < data.cancel.amount) return "Underpay";
-  return null;
+  return validatePayments(state, intent.payments ?? [], { seat: state.firstPlayer, sphere: data.cancel.sphere, amount: data.cancel.amount }, ctx);
 }
 
 export function applyCancel(state: ScenarioState, intent: TriggerIntent, steps: EngineStep[]): ScenarioState {

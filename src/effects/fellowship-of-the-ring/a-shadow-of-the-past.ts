@@ -86,7 +86,7 @@ export const A_SHADOW_OF_THE_PAST_EFFECTS: readonly Effect[] = [
     timing: "whenRevealed",
     instructions: [{ verb: "ReturnToStaging", target: { kind: "activeLocation" } }, { verb: "Travel", to: "self" }],
   },
-  // 141038 The Marish. hideFailed fires for a failure by any seat (Hall of Beorn names any player). Confirm the scope on the card.
+  // 141038 The Marish. hideFailed scope: any seat. Read via Hall of Beorn 2026-10-24. Confirm on the card.
   {
     id: "141038:forced:1",
     cardCode: "141038",
@@ -168,7 +168,7 @@ export const A_SHADOW_OF_THE_PAST_EFFECTS: readonly Effect[] = [
       },
     ],
   },
-  // 141043 Have You Seen Baggins? The attached card carries its own Forced effect. hideFailed scope is any seat, as for 141038. Confirm on the card.
+  // 141043 Have You Seen Baggins? The attached card carries its own Forced record. hideFailed scope: any seat, as for 141038. Confirm on the card.
   {
     id: "141043:whenRevealed:1",
     cardCode: "141043",

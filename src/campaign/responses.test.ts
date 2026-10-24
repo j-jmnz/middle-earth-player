@@ -25,10 +25,10 @@ function succeedHide(scene: Scene): { run: Run; table: Table } {
   return { run, table };
 }
 
-describe("141024 Escape to Buckland Response", () => {
+describe("141024 response on hideSucceeded", () => {
   const scene: Scene = { stage: "141024", staging: ["141036", "141037"] };
 
-  it("offered after a successful Hide test; 2 progress per player on a chosen location", () => {
+  it("response offered after hideSucceeded; PlaceProgressOnLocation perPlayer 2 lands on the chosen location", () => {
     const { run, table } = succeedHide(scene);
     expect(run.state.window).toEqual({ kind: "response", seat: 0 });
     const quest = idsOf(table, "141024");
@@ -45,7 +45,7 @@ describe("141024 Escape to Buckland Response", () => {
     expect(next.state.stack).toEqual([]);
   });
 
-  it("4 progress with two players; a full location is explored", () => {
+  it("progress scales with the seat count; a location that fills is explored", () => {
     const { run, table } = succeedHide({ ...scene, seats: 2, staging: ["141036"] });
     const quest = idsOf(table, "141024");
     const hill = idsOf(table, "141036");
@@ -63,7 +63,7 @@ describe("141024 Escape to Buckland Response", () => {
     expect(next.state.stack).toEqual([]);
   });
 
-  it("not offered after a failed Hide test", () => {
+  it("no response offered after hideFailed", () => {
     const table = buildTable(base, { ...scene, deck: [RIDER, "f3", "f3", "f3"] });
     let run = send(begin(table.state), { type: "Pass" }, table.ctx);
     run = send(run, { type: "CommitHide", cardIds: [] }, table.ctx);
@@ -72,7 +72,7 @@ describe("141024 Escape to Buckland Response", () => {
     expect(run.state.window?.kind).not.toBe("response");
   });
 
-  it("not offered to a seat that Peril locks out", () => {
+  it("no response offered to a seat that Peril locks out", () => {
     // Seat 1 reveals the card with Hide, and succeeds. The first player is seat 0.
     function seatOneTests(hideCard: string) {
       const table = buildTable(base, { ...scene, staging: ["141036"], seats: 2, deck: ["f0", hideCard, "f0", "f0", "f0", "f0"] });
@@ -95,7 +95,7 @@ describe("141024 Escape to Buckland Response", () => {
   });
 });
 
-describe("141031 Bag End Response", () => {
+describe("141031 response on leftPlay", () => {
   const scene: Scene = { stage: "141022", active: "141031", playerDeck: [], deck: ["f0", "f0", "f0"] };
 
   function explore(extra: Partial<Scene> = {}): { run: Run; table: Table } {
@@ -110,7 +110,7 @@ describe("141031 Bag End Response", () => {
     return { run, table };
   }
 
-  it("offered when explored; draws once per Hobbit hero", () => {
+  it("response offered once the location reaches the victory display; Draw perHero Hobbit", () => {
     const { run, table } = explore();
     const bagEnd = idsOf(table, "141031");
     expect(run.state.cards[bagEnd]?.zone).toBe("victory");
@@ -123,7 +123,7 @@ describe("141031 Bag End Response", () => {
     expect(drawn.state.window?.kind).not.toBe("response");
   });
 
-  it("two players: first player draws first", () => {
+  it("ForEachPlayer firstFirst draws in seat order across two seats", () => {
     const { run, table } = explore({ seats: 2 });
     const bagEnd = idsOf(table, "141031");
     const drawn = send(run, { type: "Trigger", cardId: bagEnd, effectId: "141031:response:1" }, table.ctx);
@@ -132,7 +132,7 @@ describe("141031 Bag End Response", () => {
     expect(MERRY).toBe("141003");
   });
 
-  it("a pass draws nothing", () => {
+  it("a pass runs no instruction", () => {
     const { run, table } = explore();
     const passed = send(run, { type: "Pass" }, table.ctx);
     expect(passed.steps.some((step) => step.kind === "draw")).toBe(false);
@@ -140,7 +140,7 @@ describe("141031 Bag End Response", () => {
   });
 });
 
-describe("141034 Bamfurlong Response", () => {
+describe("141034 response on traveled", () => {
   const scene: Scene = { start: "travel", staging: ["141034", "f3"], engaged: [{ code: RIDER, seat: 0 }] };
 
   function traveled(extra: Partial<Scene> = {}): { run: Run; table: Table } {
@@ -150,7 +150,7 @@ describe("141034 Bamfurlong Response", () => {
     return { run, table };
   }
 
-  it("offered after travel; readies a hero on a yes", () => {
+  it("response offered after traveled; the ready option runs ReadyHero", () => {
     const { run, table } = traveled();
     const location = idsOf(table, "141034");
     expect(run.state.window).toEqual({ kind: "response", seat: 0 });
@@ -161,14 +161,14 @@ describe("141034 Bamfurlong Response", () => {
     expect(next.state.stack).toEqual([]);
   });
 
-  it("a skip readies nothing", () => {
+  it("the skip option runs nothing", () => {
     const { run, table } = traveled();
     let next = send(run, { type: "Trigger", cardId: idsOf(table, "141034"), effectId: "141034:response:1" }, table.ctx);
     next = send(next, { type: "Choose", optionId: "skip" }, table.ctx);
     expect(next.state.cards[idsOf(table, SAM)]?.exhausted).toBe(true);
   });
 
-  it("asks which hero when several are exhausted", () => {
+  it("ReadyHero asks for a target when several heroes are exhausted", () => {
     const table = buildTable(base, scene);
     let state = updateCard(table.state, idsOf(table, SAM), { exhausted: true });
     state = updateCard(state, idsOf(table, FRODO), { exhausted: true });
@@ -181,7 +181,7 @@ describe("141034 Bamfurlong Response", () => {
     expect(run.state.cards[idsOf(table, SAM)]?.exhausted).toBe(true);
   });
 
-  it("a seat with no Nazgul engaged gets no choice", () => {
+  it("the ready option is gated by hasEngaged, so a seat with none gets no choice", () => {
     const { run, table } = traveled({ engaged: [] });
     const next = send(run, { type: "Trigger", cardId: idsOf(table, "141034"), effectId: "141034:response:1" }, table.ctx);
     expect(next.state.cards[idsOf(table, SAM)]?.exhausted).toBe(true);
@@ -189,7 +189,7 @@ describe("141034 Bamfurlong Response", () => {
   });
 });
 
-describe("141017 Mr. Underhill Action", () => {
+describe("141017 action", () => {
   const scene: Scene = {
     start: "planning",
     attached: [{ code: "141017", host: FRODO }],
@@ -197,7 +197,7 @@ describe("141017 Mr. Underhill Action", () => {
     deck: ["f0", "f0", "f0", "f0", "f0", "f0"],
   };
 
-  it("offered only while an enemy is engaged with the player", () => {
+  it("action offered only while the hasEngaged condition holds", () => {
     const table = buildTable(base, scene);
     const underhill = idsOf(table, "141017");
     const run = begin(table.state);
@@ -206,7 +206,7 @@ describe("141017 Mr. Underhill Action", () => {
     expect(triggers(begin(alone.state), alone)).toEqual([]);
   });
 
-  it("cost moves the card to the victory display; bars the chosen enemy until the end of the round", () => {
+  it("addSelfToVictory cost paid to victory, then barAttack applied with an endOfRound modifier", () => {
     const table = buildTable(base, scene);
     const underhill = idsOf(table, "141017");
     const rider = idsOf(table, RIDER);
@@ -221,7 +221,7 @@ describe("141017 Mr. Underhill Action", () => {
     expect(triggers(used, table)).toEqual([]);
   });
 
-  it("a barred enemy makes no attack in the Combat phase", () => {
+  it("an enemy with barAttack applied makes no attack in the Combat phase", () => {
     const table = buildTable(base, { ...scene, deck: ["f0", "f0", "card", "card", "card", "card"] });
     const underhill = idsOf(table, "141017");
     let run = send(begin(table.state), { type: "Trigger", cardId: underhill, effectId: "141017:action:1" }, table.ctx);

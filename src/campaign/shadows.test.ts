@@ -90,26 +90,26 @@ describe("shadow cards stay face down until the attack is answered", () => {
   });
 });
 
-describe.each(["141036", "141038"])("%s attack bonus", (shadow) => {
-  it("base bonus", () => {
+describe.each(["141036", "141038"])("%s shadow ModifyStat attack", (shadow) => {
+  it("the base modifier applies", () => {
     const run = attackWindow({ shadow });
     expect(damageOf(send(run, { type: "Undefended" }).state, run.ids.hero0)).toBe(6);
   });
 
-  it("larger bonus after a failed Hide test this round", () => {
+  it("the second modifier applies under hideFailed scope round", () => {
     const run = attackWindow({ shadow, hideFailed: true });
     expect(damageOf(send(run, { type: "Undefended" }).state, run.ids.hero0)).toBe(7);
   });
 
-  it("no larger bonus for a Hide failure in an earlier round", () => {
+  it("hideFailed scope round ignores a failure from an earlier round", () => {
     const run = attackWindow({ shadow, hideFailed: true });
     const stale = { ...run.state, round: run.state.round + 1 };
     expect(damageOf(send({ ...run, state: stale }, { type: "Undefended" }).state, run.ids.hero0)).toBe(6);
   });
 });
 
-describe("141076 Lure of the Ring", () => {
-  it("bonus depends on The One Ring being exhausted", () => {
+describe("141076 shadow", () => {
+  it("the second modifier reads the exhausted condition on 141085", () => {
     const ready = attackWindow({ shadow: "141076", ring: "ready" });
     expect(damageOf(send(ready, { type: "Undefended" }).state, ready.ids.hero0)).toBe(6);
     const tired = attackWindow({ shadow: "141076", ring: "exhausted" });
@@ -117,15 +117,15 @@ describe("141076 Lure of the Ring", () => {
   });
 });
 
-describe("141040 Evil Crow", () => {
-  it("no failed Hide test: the defended attack stands", () => {
+describe("141040 shadow ConsiderUndefended", () => {
+  it("without hideFailed the defended attack stands", () => {
     const run = attackWindow({ shadow: "141040", heroes: ["tank", "pip"] });
     const done = send(run, { type: "DeclareDefender", defenderId: run.ids.hero0 ?? "" });
     expect(damageOf(done.state, run.ids.hero0)).toBe(2);
     expect(damageOf(done.state, run.ids.hero1)).toBe(0);
   });
 
-  it("failed Hide test: the defended attack becomes undefended and the player names the hero", () => {
+  it("under hideFailed the defended attack becomes undefended and the player names the hero", () => {
     const run = attackWindow({ shadow: "141040", heroes: ["tank", "pip"], hideFailed: true });
     const defended = send(run, { type: "DeclareDefender", defenderId: run.ids.hero0 ?? "" });
     expect(defended.state.cards[run.ids.hero0 ?? ""]).toMatchObject({ exhausted: true, damage: 0 });
@@ -143,7 +143,7 @@ describe("141040 Evil Crow", () => {
     expect(done.steps.filter((step) => step.kind === "push" && step.frame === "shadow")).toHaveLength(1);
   });
 
-  it("an attack that was already undefended stays on the chosen hero", () => {
+  it("an attack that was already undefended keeps the chosen hero", () => {
     const run = attackWindow({ shadow: "141040", heroes: ["tank", "pip"], hideFailed: true });
     const done = send(run, { type: "Undefended", heroId: run.ids.hero1 });
     expect(damageOf(done.state, run.ids.hero1)).toBe(5);
@@ -155,7 +155,7 @@ describe.each([
   ["141041", "Crawling Towards Him"],
   ["141075", "Rode Like a Gale"],
 ])("%s %s", (shadow) => {
-  it("attacker returns to staging after the attack", () => {
+  it("AfterAttack ReturnToStaging moves the attacker once the attack resolves", () => {
     const run = attackWindow({ shadow });
     const done = send(run, { type: "Undefended" });
     expect(damageOf(done.state, run.ids.hero0)).toBe(5);
@@ -166,8 +166,8 @@ describe.each([
   });
 });
 
-describe("141073 Piercing Cry", () => {
-  it("one more attack, with no new shadow card", () => {
+describe("141073 shadow AfterAttack ImmediateAttack", () => {
+  it("the attack repeats with no new shadow card", () => {
     const run = attackWindow({ shadow: "141073" });
     const first = send(run, { type: "Undefended" });
     expect(damageOf(first.state, run.ids.hero0)).toBe(5);
@@ -183,8 +183,8 @@ describe("141073 Piercing Cry", () => {
   });
 });
 
-describe("141072 Pathless Country", () => {
-  it("engages the next player and attacks again; alone, the same player", () => {
+describe("141072 shadow AfterAttack EngageNextPlayer", () => {
+  it("the enemy is engaged to the next seat and attacks again; with one seat, the same seat", () => {
     const run = attackWindow({ shadow: "141072" });
     const first = send(run, { type: "Undefended" });
     expect(first.state.window).toEqual({ kind: "defense", enemyId: run.ids.rider, seat: 0 });
@@ -193,7 +193,7 @@ describe("141072 Pathless Country", () => {
     expect(damageOf(second.state, run.ids.hero0)).toBe(10);
   });
 
-  it("two players: seat 1 answers the extra attack", () => {
+  it("with two seats, seat 1 answers the repeated attack", () => {
     const run = attackWindow({ shadow: "141072", seats: 2 });
     const first = send(run, { type: "Undefended" });
     expect(first.state.cards[run.ids.rider ?? ""]).toMatchObject({ zone: "engaged", controller: 1 });

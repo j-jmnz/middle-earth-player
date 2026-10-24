@@ -3,6 +3,7 @@ import type { Effect } from "../catalog/boundary.ts";
 import type { EngineStep, Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard } from "./keywords.ts";
+import { validatePayments } from "./payments.ts";
 import { printedOf, spherePays, type Sphere } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { inPlay, updateCard } from "./state.ts";
@@ -75,23 +76,7 @@ export function usageReason(
     if (payments.length > 0) return "That effect has no resource cost";
     return usable(state, effect, sourceId, seat, ctx) ? null : "That cost cannot be paid";
   }
-  const sphere = costSphere(effect, source, ctx);
-  const spent = new Map<string, number>();
-  let sum = 0;
-  for (const payment of payments) {
-    if (!Number.isInteger(payment.amount) || payment.amount < 0) return "That payment is not a cost";
-    sum += payment.amount;
-    spent.set(payment.heroId, (spent.get(payment.heroId) ?? 0) + payment.amount);
-  }
-  for (const [heroId, amount] of spent) {
-    const hero = state.cards[heroId];
-    if (!hero || hero.zone !== "heroes" || hero.controller !== seat) return "That hero cannot pay";
-    if (!spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) return "Wrong sphere";
-    if (hero.resources < amount) return "That hero does not have those resources";
-  }
-  if (sum > cost.amount) return "Overpay";
-  if (sum < cost.amount) return "Underpay";
-  return null;
+  return validatePayments(state, payments, { seat, sphere: costSphere(effect, source, ctx), amount: cost.amount }, ctx);
 }
 
 // Pays the cost and records the use. Call it only after usageReason accepted the use.

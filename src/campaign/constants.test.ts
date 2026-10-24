@@ -35,27 +35,27 @@ function hideTest(scene: Scene, commit: (table: Table) => string[] = () => []) {
 }
 
 describe("Hide numbers from constant effects", () => {
-  it("141032 Woody End: constant changes Hide X by -1, active location only", () => {
+  it("141032 constant: hideValue -1 while the source is the active location", () => {
     expect(hideTest({}).step.discardedIds).toHaveLength(2);
     expect(hideTest({ active: "141032" }).step.discardedIds).toHaveLength(1);
     // In the staging area it does nothing.
     expect(hideTest({ staging: ["141032"] }).step.discardedIds).toHaveLength(2);
   });
 
-  it("141040 Evil Crow: constant changes Hide X for its engaged seat only", () => {
+  it("141040 constant: hideValue +1 for the engaged seat while the source is engaged", () => {
     expect(hideTest({ engaged: [{ code: "141040", seat: 0 }] }).step.discardedIds).toHaveLength(3);
     expect(hideTest({ seats: 2, engaged: [{ code: "141040", seat: 1 }] }).step.discardedIds).toHaveLength(2);
     expect(hideTest({ staging: ["141040"] }).step.discardedIds).toHaveLength(2);
   });
 
-  it("141037 Stock Road: constant changes discarded threat, staging area only", () => {
+  it("141037 constant: hideThreat +2 while the source is in staging", () => {
     const plain = hideTest({});
     const road = hideTest({ staging: ["141037"] });
     expect(road.step.threat).toBe(plain.step.threat + 2);
     expect(hideTest({ active: "141037" }).step.threat).toBe(plain.step.threat);
   });
 
-  it("141036 Green Hill Country: constant changes committed willpower, active location only", () => {
+  it("141036 constant: hideWillpower per committed character while the source is the active location", () => {
     const both = (table: Table) => [idsOf(table, FRODO), idsOf(table, SAM)];
     const plain = hideTest({}, both);
     expect(plain.step.willpower).toBe(5);
@@ -63,7 +63,7 @@ describe("Hide numbers from constant effects", () => {
     expect(hideTest({ staging: ["141036"] }, both).step.willpower).toBe(5);
   });
 
-  it("141023: constant changes Hide willpower per ally of the testing seat", () => {
+  it("141023 constant: hideWillpower per ally of the testing seat", () => {
     const frodo = (table: Table) => [idsOf(table, FRODO)];
     const stage = { stage: "141023" };
     expect(hideTest(stage, frodo).step.willpower).toBe(2);
@@ -82,7 +82,7 @@ describe("Hide numbers from constant effects", () => {
 });
 
 describe("stats from constant effects", () => {
-  it("141072 Pathless Country: constant changes quest points, staging area only", () => {
+  it("141072 constant: questPoints +4 while the source is in staging", () => {
     const table = synced({ staging: ["141072"] });
     const id = idsOf(table, "141072");
     expect(modifiedStat(table.state, table.state.cards[id]!, "questPoints", table.ctx.cards)).toBe(7);
@@ -90,7 +90,7 @@ describe("stats from constant effects", () => {
     expect(modifiedStat(traveled, traveled.cards[id]!, "questPoints", table.ctx.cards)).toBe(3);
   });
 
-  it("141074 Black Steed: constant changes the engagement cost of its host", () => {
+  it("141074 constant: engagementCost -10 on the host, read by qualifyingEnemies", () => {
     const base0 = buildTable(base, { staging: [RIDER, "141074"], start: "encounter" });
     const rider = idsOf(base0, RIDER);
     const steed = idsOf(base0, "141074");
@@ -107,7 +107,7 @@ describe("stats from constant effects", () => {
 });
 
 describe("rules from constant effects", () => {
-  it("141039 Black Rider: attach restriction with a Morgul exception", () => {
+  it("141039 constant: Restrict attach with an exceptTrait", () => {
     const table = buildTable(base, { engaged: [{ code: RIDER, seat: 0 }] });
     const rider = idsOf(table, RIDER);
     expect(restricted(table.state, table.ctx, "attach")).toEqual([{ sourceId: rider, what: "attach", exceptTrait: "Morgul" }]);
@@ -117,14 +117,14 @@ describe("rules from constant effects", () => {
     expect(attachBlocked(other.state, other.ctx, idsOf(other, "141040"), "plain")).toBe(false);
   });
 
-  it("141085 The One Ring: hero limit exemption for its host", () => {
+  it("141085 constant: Restrict heroLimit exempts the host", () => {
     const table = buildTable(base, {});
     expect(heroLimitExempt(table.state, table.ctx, idsOf(table, FRODO))).toBe(true);
     expect(heroLimitExempt(table.state, table.ctx, idsOf(table, SAM))).toBe(false);
     expect(heroLimitExempt(buildTable(base, { ring: "none" }).state, table.ctx, idsOf(table, FRODO))).toBe(false);
   });
 
-  it("141022: advance restriction, lifted when Bag End is in the victory display", () => {
+  it("141022 constant: advance restriction lifted when the victory display holds the location", () => {
     const table = buildTable(base, { stage: "141022", progress: 0 });
     const stage = idsOf(table, "141022");
     const full = updateCard(updateCard(table.state, idsOf(table, SAM), { committed: true }), stage, { progress: 0 });
@@ -141,7 +141,7 @@ describe("rules from constant effects", () => {
     expect(moved.cards[moved.questStage ?? ""]?.code).toBe("141023");
   });
 
-  it("141022: a full quest phase leaves the stage in place while the restriction holds", () => {
+  it("141022 constant: a full quest phase leaves the stage in place while the advance restriction holds", () => {
     const table = buildTable(base, { stage: "141022", deck: ["f0", "f0", "f0"] });
     const stage = idsOf(table, "141022");
     let run = send(begin(table.state), { type: "Commit", cardIds: [idsOf(table, SAM)] }, table.ctx);
@@ -151,7 +151,7 @@ describe("rules from constant effects", () => {
     expect(run.state.mode).toBe("travel");
   });
 
-  it("141035 Bucklebury Ferry: travel restriction while another location is in play", () => {
+  it("141035 constant: Restrict travel while otherLocationInPlay holds", () => {
     const table = buildTable(base, { start: "travel", staging: ["141035", "141034"] });
     const ferry = idsOf(table, "141035");
     const road = idsOf(table, "141034");
@@ -162,7 +162,7 @@ describe("rules from constant effects", () => {
     expect(send(begin(table.state), { type: "Travel", locationId: road }, table.ctx).state.activeLocation).toBe(road);
   });
 
-  it("141035 Bucklebury Ferry: the restriction counts other locations only", () => {
+  it("141035 constant: otherLocationInPlay does not count the source", () => {
     const table = buildTable(base, { start: "travel", staging: ["141035"] });
     expect(legalTargets(table.state, { type: "Travel" }, table.ctx)).toEqual([idsOf(table, "141035")]);
     expect(legalIntents(table.state, table.ctx).map((intent) => intent.type)).toEqual(["Travel", "DeclineTravel"]);
@@ -170,7 +170,7 @@ describe("rules from constant effects", () => {
 });
 
 describe("Travel effects", () => {
-  it("141035 Bucklebury Ferry: travel effect is a Hide 3 test, then the travel", () => {
+  it("141035 travel: HideTest x3 resolves, then the travel happens", () => {
     const table = buildTable(base, { start: "travel", staging: ["141035", "f3"], deck: ["f3", "f3", "f3", "f0"] });
     const ferry = idsOf(table, "141035");
     let run = send(begin(table.state), { type: "Travel", locationId: ferry }, table.ctx);
@@ -184,7 +184,7 @@ describe("Travel effects", () => {
     expect(run.state.stack).toEqual([]);
   });
 
-  it("141037 Stock Road: travel effect is a Hide 1 test; a failure does not stop the travel", () => {
+  it("141037 travel: HideTest x1; a hideFailed result does not stop the travel", () => {
     const table = buildTable(base, { start: "travel", staging: ["141037", "f3"], deck: ["f3", "f3"] });
     const road = idsOf(table, "141037");
     let run = send(begin(table.state), { type: "Travel", locationId: road }, table.ctx);

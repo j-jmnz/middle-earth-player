@@ -8,7 +8,7 @@ import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
 import { offerResponses } from "./responses.ts";
 import type { ScenarioState } from "./state.ts";
-import { updateCard } from "./state.ts";
+import { livingSeats, updateCard } from "./state.ts";
 
 export type TargetVerb = Extract<Instruction, { verb: "ReadyHero" | "BarAttack" | "PlaceProgressOnLocation" }>;
 
@@ -66,7 +66,7 @@ export function applyTargetVerb(
         ? { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId, stat: "cannotAttack", amount: 1, until: "endOfRound", seat }] }
         : state;
     case "PlaceProgressOnLocation":
-      return placeProgress(state, id, instruction.perPlayer * state.seatCount, ctx, steps);
+      return placeProgress(state, id, instruction.perPlayer * livingSeats(state).length, ctx, steps);
   }
 }
 

@@ -1,9 +1,9 @@
 import type { ModifierStat } from "../catalog/boundary.ts";
 
-import { holds } from "./conditions.ts";
+import { constantInstructions } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
-import { inPlay, livingSeats, modifierActive } from "./state.ts";
+import { livingSeats, modifierActive } from "./state.ts";
 
 // A constant effect is a rule that holds while its source is in play. The engine turns each ModifyStat
 // instruction of one into records on the modifier list, so modifiedStat stays the only reader. The
@@ -26,29 +26,18 @@ function holders(state: ScenarioState, source: CardInstance, target: string | un
 
 function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
   const found: Modifier[] = [];
-  const sources = Object.values(state.cards)
-    .filter((instance) => inPlay(instance.zone))
-    .sort((left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }));
-  for (const source of sources) {
-    for (const effect of ctx.effects) {
-      if (effect.timing !== "constant" || effect.cardCode !== source.code) continue;
-      const scope = { actor: source.controller ?? state.firstPlayer, sourceId: source.id, returned: 0 };
-      if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
-      for (const instruction of effect.instructions) {
-        if (instruction.verb !== "ModifyStat") continue;
-        if (instruction.when && !holds(state, instruction.when, scope, ctx)) continue;
-        for (const holder of holders(state, source, instruction.target)) {
-          found.push({
-            instanceId: holder,
-            sourceId: source.id,
-            stat: instruction.stat,
-            amount: instruction.amount,
-            until: "whileSourceInPlay",
-            origin: effect.id,
-            ...(instruction.per ? { per: instruction.per } : {}),
-          });
-        }
-      }
+  for (const { source, effect, instruction } of constantInstructions(state, ctx)) {
+    if (instruction.verb !== "ModifyStat") continue;
+    for (const holder of holders(state, source, instruction.target)) {
+      found.push({
+        instanceId: holder,
+        sourceId: source.id,
+        stat: instruction.stat,
+        amount: instruction.amount,
+        until: "whileSourceInPlay",
+        origin: effect.id,
+        ...(instruction.per ? { per: instruction.per } : {}),
+      });
     }
   }
   return found;
