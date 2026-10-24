@@ -78,7 +78,8 @@ const STRONG_QUESTERS = new Set([RING_BEARER, "q1", "q2", "q4", "q5"]);
 // the reducer listed.
 
 export function knifeIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>): PlayerIntent {
-  if (state.mode === "questCommit" && state.window?.kind === "pass" && !Object.values(state.cards).some((card) => card.committed)) {
+  // Each seat commits its own questers once (a policy, not a rule): another seat's committed card does not count.
+  if (state.mode === "questCommit" && state.window?.kind === "pass" && !Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat)) {
     const ids = legalTargets(state, { type: "Commit" }, ctx);
     if (ids.some((id) => STRONG_HEROES.includes(state.cards[id]?.code ?? ""))) {
       const questers = ids.filter((id) => STRONG_QUESTERS.has(state.cards[id]?.code ?? ""));

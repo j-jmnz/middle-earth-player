@@ -103,7 +103,8 @@ export function nextIntent(state: ScenarioState, ctx: ReduceContext, options: Po
         const play = playable(state, ctx);
         if (play) return play;
       }
-      const quested = Object.values(state.cards).some((card) => card.committed);
+      // Each seat commits once, its own characters: a card committed by another seat does not count (a policy, not a rule).
+      const quested = Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat);
       if (state.mode === "questCommit" && !quested && has(intents, "Commit")) {
         const ids = legalTargets(state, { type: "Commit" }, ctx).filter((id) => !scoutIds.has(id));
         if (ids.length > 0) return { type: "Commit", cardIds: ids };

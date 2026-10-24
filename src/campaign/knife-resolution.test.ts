@@ -33,9 +33,9 @@ const nameOf = (code: string) => ctx.cards.get(code)?.name ?? code;
 
 describe("141044's Resolution on the resolution screen", () => {
   it("two-handed: the first player chooses first, may decline, then the other seat chooses a boon on a named hero", () => {
-    // Two-handed seed 6 (the strong loadout) wins with the first-player token on the second seat, so the Resolution starts
-    // there. (Seed 10 did until out-of-play Ringwraiths could come from the encounter discard pile; it now ends with the token on the first seat.)
-    let state = atResolution(2, 6);
+    // Two-handed seed 2 (the strong loadout) wins with the first-player token on the second seat, so the Resolution starts
+    // there. The seed moves when the policy or a rule moves where the token ends (seed 10, then seed 6, did before).
+    let state = atResolution(2, 2);
     expect(state.firstPlayer).toBe(1);
     const first = resolutionView(state, world);
     expect(first.kind).toBe("choosing");
