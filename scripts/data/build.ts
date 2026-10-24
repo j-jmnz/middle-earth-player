@@ -55,7 +55,6 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   writeFileSync(path.join(effectsDir, "fellowship-of-the-ring.ts"), renderGenerated(generated.effects, built.campaign.id));
   console.log(`effects: ${generated.effects.length} generated, ${generated.unmatched.length} lines without a template`);
   console.log(`scenarios: ${built.scenarios.map((scenario) => scenario.id).join(", ") || "none"}`);
-  for (const note of built.notes) console.log(`note: ${note}`);
   if (built.problems.length > 0) {
     const perScenario = new Map<string, number>();
     for (const problem of built.problems) perScenario.set(problem.split(":")[0] ?? problem, (perScenario.get(problem.split(":")[0] ?? problem) ?? 0) + 1);

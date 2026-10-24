@@ -33,20 +33,18 @@ export type ScenarioResult = {
   scenarios: ScenarioData[];
   campaign: CampaignData;
   problems: string[];
-  notes: string[];
 };
 
 function slug(label: string): string {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function lowerHeroes(cards: ReadonlyMap<string, Card>, code: string): boolean {
+function isHero(cards: ReadonlyMap<string, Card>, code: string): boolean {
   return cards.get(code)?.type === "hero";
 }
 
 export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: Overrides, existingCampaign: unknown): ScenarioResult {
   const problems: string[] = [];
-  const notes: string[] = [];
   const decks = (parseJsonc(raw.dragnRaw.preBuiltDecks) as { preBuiltDecks: Record<string, Deck> }).preBuiltDecks;
   const byCode = new Map(cards.map((card) => [card.code, card]));
   const byGuid = new Map<string, Card>();
@@ -97,7 +95,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         }
         if (card.type === "campaign") continue;
         if (line.loadGroupId === PLAYER_GROUP) {
-          if (!lowerHeroes(byCode, card.code)) player.push(card.code);
+          if (!isHero(byCode, card.code)) player.push(card.code);
           continue;
         }
         let pile = GROUP_PILE[line.loadGroupId];
@@ -193,7 +191,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       problems.push(...local);
       continue;
     }
-    if (id === scenarios[0]?.id || scenarios.length === 0) prelude = normal.player.map((code) => ({ code }));
+    if (scenarios.length === 0) prelude = normal.player.map((code) => ({ code }));
     scenarios.push(
       parseScenarioData({
         id,
@@ -218,5 +216,5 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     for (const group of groups) for (const choice of group.choices) if (!codes.has(choice.code)) problems.push(`${scenarioId} resolution ${group.id}: ${choice.code} is not one of the scenario's cards`);
   }
   const campaign: CampaignData = { id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarios: scenarios.map((scenario) => scenario.id), prelude, authored };
-  return { scenarios, campaign, problems, notes };
+  return { scenarios, campaign, problems };
 }
