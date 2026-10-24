@@ -2,8 +2,8 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
-import type { ScenarioState } from "./state.ts";
-import { attachTo, spawn } from "./zones.ts";
+import { updateCard, type ScenarioState } from "./state.ts";
+import { attachTo, moveCard, spawn, type Destination } from "./zones.ts";
 
 export type SetupInstruction = Extract<
   Instruction,
@@ -11,17 +11,22 @@ export type SetupInstruction = Extract<
 >;
 
 // Quest-card setup puts out-of-deck cards where the booklet says. None of these reveals a card:
-// no Hide test, no When Revealed, no surge.
-export function runSetupVerb(state: ScenarioState, instruction: SetupInstruction, ctx: ReduceContext): ScenarioState {
+// no Hide test, no When Revealed, no surge. A card's own Setup line, run for the copy the Setup search found in a deck
+// (mec109.setup: "Add Gandalf's Delay to the staging area" on a pool card shuffled into the encounter deck), places that
+// copy: `sourceId` is the found card, set aside while its Setup resolves, and no second copy is made.
+export function runSetupVerb(state: ScenarioState, instruction: SetupInstruction, ctx: ReduceContext, sourceId: string | null = null): ScenarioState {
+  const found = sourceId ? state.cards[sourceId] : undefined;
+  const own = found != null && found.zone === "setAside" && found.code === instruction.code ? found.id : null;
+  const place = (dest: Destination, face?: "down"): ScenarioState => (own ? updateCard(moveCard(state, own, dest), own, { face: "up" }) : spawn(state, instruction.code, dest, face).state);
   switch (instruction.verb) {
     case "AddToStaging":
-      return spawn(state, instruction.code, { zone: "staging" }).state;
+      return place({ zone: "staging" });
     case "MakeActiveLocation":
-      return spawn(state, instruction.code, { zone: "activeLocation" }).state;
+      return place({ zone: "activeLocation" });
     case "SetAside":
-      return spawn(state, instruction.code, { zone: "setAside" }, "down").state;
+      return own ? state : spawn(state, instruction.code, { zone: "setAside" }, "down").state;
     case "AttachToRingBearer":
-      return attachToRingBearer(state, instruction.code, ctx);
+      return attachToRingBearer(state, instruction.code, ctx, own);
   }
 }
 
@@ -37,12 +42,13 @@ function ringBearer(state: ScenarioState, ctx: ReduceContext): string | null {
   return null;
 }
 
-function attachToRingBearer(state: ScenarioState, code: string, ctx: ReduceContext): ScenarioState {
+function attachToRingBearer(state: ScenarioState, code: string, ctx: ReduceContext, own: string | null): ScenarioState {
   const hostId = ringBearer(state, ctx);
   const host = hostId ? state.cards[hostId] : undefined;
   if (!hostId || !host || host.controller == null) {
     return { ...state, failure: `No Ring-bearer hero to attach ${code} to` };
   }
+  if (own) return attachTo(moveCard(state, own, { zone: "play", seat: host.controller }), own, hostId);
   const spawned = spawn(state, code, { zone: "play", seat: host.controller });
   return attachTo(spawned.state, spawned.id, hostId);
 }

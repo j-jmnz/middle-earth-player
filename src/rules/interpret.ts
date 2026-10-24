@@ -125,7 +125,7 @@ export function runInstruction(
     case "MakeActiveLocation":
     case "SetAside":
     case "AttachToRingBearer":
-      return runSetupVerb(state, instruction, ctx);
+      return runSetupVerb(state, instruction, ctx, focus.sourceId);
     default:
       return runExtraVerb(state, instruction, focus, ctx, steps);
   }

@@ -334,6 +334,7 @@ Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury
 ### A Knife in the Dark
 
 - Weathertop's Travel cost (141046:A:3, "The first player must exhaust The One Ring to travel here") can be paid only while The One Ring is in play and ready. "If the players cannot pay the Travel cost, then they cannot travel to that location" (`rr.travel`): while it is exhausted or gone, Weathertop is not a travel target and a Travel intent naming it is refused with a reason. A Hide test on a Travel line (141035, 141037) is not such a cost.
+- Scenario 1's earned cards reach this scenario through the Campaign Setup Checklist (`rr.campaign-setup-checklist`): an encounter-backed card (Gandalf's Delay, The Ring Draws Them, Gildor Inglorion) is shuffled into the encounter deck in step 8, and Mr. Underhill, Permanent and player-backed, goes on his recorded hero in step 5. Gandalf's Delay's own Setup line (141078:A:1) is then found in the encounter deck by the Setup search (`mec109.setup`) and puts that copy in the staging area; no second copy is made.
 
 ### Hide tests
 
