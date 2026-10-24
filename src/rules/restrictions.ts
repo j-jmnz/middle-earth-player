@@ -1,11 +1,11 @@
-// Rules: rr.constant-ability, rr.step-6-4-1 (data/rules/entries.json).
+// Rules: rr.constant-ability, rr.step-6-4-1, rr.travel (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { constantInstructions } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
-import type { ScenarioState } from "./state.ts";
+import { inPlay, type ScenarioState } from "./state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
 export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string; maxWillpower?: number };
@@ -28,6 +28,22 @@ export function restricted(state: ScenarioState, ctx: ReduceContext, what: Restr
 
 export function travelBlocked(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   return restricted(state, ctx, "travel").some((rule) => rule.sourceId === locationId);
+}
+
+// "If the players cannot pay the Travel cost, then they cannot travel to that location." (rr.travel). A Travel cost that
+// exhausts a named card (Weathertop, 141046:A:3: "The first player must exhaust The One Ring to travel here") can be paid
+// only while a ready copy of that card is in play. A Hide test on a Travel line is not a cost the players can fail to pay.
+export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
+  const code = state.cards[locationId]?.code;
+  if (code == null) return false;
+  return ctx.effects
+    .filter((effect) => effect.cardCode === code && effect.timing === "travel")
+    .flatMap((effect) => effect.instructions)
+    .some((instruction) => {
+      if (instruction.verb !== "Exhaust" || instruction.target?.kind !== "byCode") return false;
+      const named = instruction.target.code;
+      return !Object.values(state.cards).some((card) => card.code === named && inPlay(card.zone) && !card.exhausted);
+    });
 }
 
 export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: string, attachmentCode: string): boolean {

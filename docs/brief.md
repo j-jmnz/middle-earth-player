@@ -331,6 +331,10 @@ The score of a won scenario is computed from the final state when the log is wri
 
 Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury Ferry: after it leaves play explored, the players win.
 
+### A Knife in the Dark
+
+- Weathertop's Travel cost (141046:A:3, "The first player must exhaust The One Ring to travel here") can be paid only while The One Ring is in play and ready. "If the players cannot pay the Travel cost, then they cannot travel to that location" (`rr.travel`): while it is exhausted or gone, Weathertop is not a travel target and a Travel intent naming it is refused with a reason. A Hide test on a Travel line (141035, 141037) is not such a cost.
+
 ### Hide tests
 
 The rule is `mec109.hide-x` and `mec109.hide-tests`, with the worked example (Hide 3, 2 willpower committed, discarded threat 2 + 2 + 0, an action raises willpower to 4, the test succeeds) as the fixture. The engine runs it as a frame: the revealing seat tests before that card's When Revealed or Forced effect, an action window opens after the discarded threat is known, then the frame pops and the rest of the revealed card resolves. A treachery adds 0 threat. This is not a token the player tracks by hand.

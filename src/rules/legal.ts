@@ -18,7 +18,7 @@ import { printedOf } from "./printed.ts";
 import { attachmentTargets, playReason, playWindowReason } from "./planning.ts";
 import { resolutionIntents, resolutionReason } from "./resolution.ts";
 import { optionalEnemies, stagingLocations } from "./quest.ts";
-import { defenseBlocked, travelBlocked } from "./restrictions.ts";
+import { defenseBlocked, travelBlocked, travelCostUnpayable } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
 
 const NUMBER = "The engine computes that number";
@@ -172,7 +172,7 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
 }
 
 function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {
-  return stagingLocations(state, ctx.cards).filter((id) => !travelBlocked(state, ctx, id));
+  return stagingLocations(state, ctx.cards).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
 }
 
 function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
@@ -211,6 +211,7 @@ function travelReason(
   if (state.activeLocation) return "An active location is already in play";
   if (!stagingLocations(state, ctx.cards).includes(intent.locationId)) return "That location is not in staging";
   if (travelBlocked(state, ctx, intent.locationId)) return "Players cannot travel to that location now";
+  if (travelCostUnpayable(state, ctx, intent.locationId)) return "The players cannot pay that location's Travel cost";
   return null;
 }
 
