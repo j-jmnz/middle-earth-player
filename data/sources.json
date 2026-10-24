@@ -1,0 +1,768 @@
+{
+  "sources": {
+    "dragncards": {
+      "id": "dragncards",
+      "site": "https://github.com/seastan/dragncards-lotrlcg-plugin",
+      "pin": {
+        "kind": "git",
+        "value": "629db897de0c5a82a72610ff76e22dc01f59a4ac"
+      },
+      "fetchedAt": "2026-10-24T10:12:51.542Z",
+      "files": [
+        {
+          "path": "raw/dragncards/cardDb.tsv",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/tsvs/cardDb.tsv",
+          "sha256": "c817857b6ff41ad5887a1c2cfb44ff806581143165b53062b155167c9248eabc",
+          "bytes": 2170956
+        },
+        {
+          "path": "raw/dragncards/preBuiltDecks.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/preBuiltDecks.json",
+          "sha256": "5b5a1dce21059d809baf80f35f0447c10f8435ff347951b1493d407d0e72a952",
+          "bytes": 1089907
+        },
+        {
+          "path": "raw/dragncards/steps.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/steps.json",
+          "sha256": "fe096d97bb4760c79a3b7efa8efe1c4cd88362a5c23a5e5c80203d93118ed651",
+          "bytes": 2019
+        },
+        {
+          "path": "raw/dragncards/phases.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/phases.json",
+          "sha256": "e5e34d7a8036378138c51277bddf290247a96e0b8d6a353184d2a39ee16e872d",
+          "bytes": 997
+        },
+        {
+          "path": "raw/dragncards/imageUrlPrefix.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/imageUrlPrefix.json",
+          "sha256": "5ec27ef601ab7de6419fe1b1792bf1b8a4f3eda7d96b4fa85f0c587db65fcdf9",
+          "bytes": 604
+        },
+        {
+          "path": "raw/dragncards/playerCards.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/playerCards.json",
+          "sha256": "afadc8db166efb595209124cc23e80a6aafdfaf223dc8189eb86482c73634f36",
+          "bytes": 140946
+        },
+        {
+          "path": "raw/dragncards/encounterCards.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/encounterCards.json",
+          "sha256": "d80a33e52f61380e5de53166d0db09648e403d75f3e76a0e073d38050bc7b945",
+          "bytes": 2300
+        }
+      ]
+    },
+    "hallofbeorn": {
+      "id": "hallofbeorn",
+      "site": "https://hallofbeorn.com",
+      "pin": {
+        "kind": "sha256",
+        "value": "3e73aa8d4c54f5b72ec3e45b16ddee1b65224991cf61e7b73ac5d5b259b39e86"
+      },
+      "fetchedAt": "2026-10-24T10:19:07.732Z",
+      "files": [
+        {
+          "path": "raw/hallofbeorn/EncounterCards.json",
+          "url": "https://hallofbeorn.com/Export/EncounterCards",
+          "sha256": "5a7cdb60131e36aeee645989b0e43c2bc05b3d98610d50d6735a51650dce91de",
+          "bytes": 4023475
+        },
+        {
+          "path": "raw/hallofbeorn/QuestCards.json",
+          "url": "https://hallofbeorn.com/Export/QuestCards",
+          "sha256": "3fe7855410f297e503f671f53eed63d3a93ae7d6be8e00394e72bf5801e7be7a",
+          "bytes": 1442277
+        },
+        {
+          "path": "raw/hallofbeorn/PlayerCards.json",
+          "url": "https://hallofbeorn.com/Export/PlayerCards",
+          "sha256": "afe1b5bd46fa6a274b85d1165f9937192d1bf2f3c2589d92007d600616902d29",
+          "bytes": 1893692
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios",
+          "sha256": "31ba1b37c59d16e4089c3711ab9fbedd101cb1c496b644e04a9bc43cbce10297",
+          "bytes": 28335
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/A-Shadow-of-the-Past.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/A-Shadow-of-the-Past",
+          "sha256": "029820e656925a7b96ae24faf25795fff1e829863610ebaf1b1c9ef0ada09fba",
+          "bytes": 13616
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/A-Knife-in-the-Dark.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/A-Knife-in-the-Dark",
+          "sha256": "ac216f14ff5adec268460087016abd10ee4c80bb29fa12d4c52353f367cc0f34",
+          "bytes": 13397
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Flight-to-the-Ford.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Flight-to-the-Ford",
+          "sha256": "a52c4e1d73341caa72da826349f0bf35b48058f892a156b0e6aa0d7eb455e619",
+          "bytes": 12117
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Ring-Goes-South.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Ring-Goes-South",
+          "sha256": "f0b10df08055a965795c399c7959ce8ad3d2471a353a33c20061f648866f2d7b",
+          "bytes": 13853
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Journey-in-the-Dark.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Journey-in-the-Dark",
+          "sha256": "48b2bfc7d021bd9c0cede63f6b8da5f3c623bd6f7a2b09108c77b11498957980",
+          "bytes": 12326
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Breaking-of-the-Fellowship.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Breaking-of-the-Fellowship",
+          "sha256": "5d494d99831bd35a148ab17cfb7cbaa9e19c49dff6ec5afd998a507a60884cbd",
+          "bytes": 22872
+        }
+      ]
+    },
+    "ringsdb": {
+      "id": "ringsdb",
+      "site": "https://ringsdb.com",
+      "pin": {
+        "kind": "sha256",
+        "value": "8d738cd020ee519fcd2aeaac9fe01fc88ca8b8c39ddbf57d48ce3d979a03947f"
+      },
+      "fetchedAt": "2026-10-24T10:19:16.655Z",
+      "files": [
+        {
+          "path": "raw/ringsdb/packs.json",
+          "url": "https://ringsdb.com/api/public/packs/",
+          "sha256": "bea5e2778feaab161f9844ab35720d51fdcc4874ecb696a25b6ca96a33f88832",
+          "bytes": 19796
+        },
+        {
+          "path": "raw/ringsdb/cards/Core.json",
+          "url": "https://ringsdb.com/api/public/cards/Core.json",
+          "sha256": "66b2ba817ef40d01352921be118f32a894065a95588cf5f34b877c4cbe26117d",
+          "bytes": 98306
+        },
+        {
+          "path": "raw/ringsdb/cards/TDoM.json",
+          "url": "https://ringsdb.com/api/public/cards/TDoM.json",
+          "sha256": "c77692442cfce06495c87fb8d4807b4257b473de69b23ba9bbe91de15fee610f",
+          "bytes": 8755
+        },
+        {
+          "path": "raw/ringsdb/cards/HfG.json",
+          "url": "https://ringsdb.com/api/public/cards/HfG.json",
+          "sha256": "8ea85a269ec7a5d7c65e99accf286f72b2826a4defa56299f6125ca579f98de1",
+          "bytes": 10195
+        },
+        {
+          "path": "raw/ringsdb/cards/CatC.json",
+          "url": "https://ringsdb.com/api/public/cards/CatC.json",
+          "sha256": "a08bdf99effbe7a6e52a00cff3ccdf5b16336f81278321ec8d9c2638a41a39f4",
+          "bytes": 10429
+        },
+        {
+          "path": "raw/ringsdb/cards/JtR.json",
+          "url": "https://ringsdb.com/api/public/cards/JtR.json",
+          "sha256": "34ad3ac12fabe033905353faaa1e651bd27930d41fa7515ed82a5a824170f86d",
+          "bytes": 11433
+        },
+        {
+          "path": "raw/ringsdb/cards/TMaO.json",
+          "url": "https://ringsdb.com/api/public/cards/TMaO.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/HoEM.json",
+          "url": "https://ringsdb.com/api/public/cards/HoEM.json",
+          "sha256": "88efc30709e5081879e3ce20b1f742194904eb086b1c5c86399fb374dc034e92",
+          "bytes": 11045
+        },
+        {
+          "path": "raw/ringsdb/cards/TDM.json",
+          "url": "https://ringsdb.com/api/public/cards/TDM.json",
+          "sha256": "f1ab703645927dbb3fd501de8e4aeee0ce77fe6dc3977a1668f60d0b4ba500a6",
+          "bytes": 10502
+        },
+        {
+          "path": "raw/ringsdb/cards/RtM.json",
+          "url": "https://ringsdb.com/api/public/cards/RtM.json",
+          "sha256": "a3d509d8a5feada3d1bb8071238c0cc86b306a5751646ddcc5cd28734051aed0",
+          "bytes": 11232
+        },
+        {
+          "path": "raw/ringsdb/cards/KD.json",
+          "url": "https://ringsdb.com/api/public/cards/KD.json",
+          "sha256": "f5f6417db5420d656e359fb406f3bfaa0dcccfcd7494c54a417ffa5517a6428a",
+          "bytes": 14680
+        },
+        {
+          "path": "raw/ringsdb/cards/TRG.json",
+          "url": "https://ringsdb.com/api/public/cards/TRG.json",
+          "sha256": "28e8b618c1200342ef3ca95ed736b8674044a5243f5a60d5169584de5327a43e",
+          "bytes": 9777
+        },
+        {
+          "path": "raw/ringsdb/cards/RtR.json",
+          "url": "https://ringsdb.com/api/public/cards/RtR.json",
+          "sha256": "b8ba9a11d3bc41e1102e6920bd5169adc3264562358acb17397e3b5839a3e877",
+          "bytes": 10032
+        },
+        {
+          "path": "raw/ringsdb/cards/WitW.json",
+          "url": "https://ringsdb.com/api/public/cards/WitW.json",
+          "sha256": "185625f7e0e3a04470796e9840654b69578aa809a0cc7197730225fb5ea23733",
+          "bytes": 10884
+        },
+        {
+          "path": "raw/ringsdb/cards/TLD.json",
+          "url": "https://ringsdb.com/api/public/cards/TLD.json",
+          "sha256": "095b839f3436f63a6097c3ba7a90fe6f5f073284feef6c9013867932e17a19ea",
+          "bytes": 10054
+        },
+        {
+          "path": "raw/ringsdb/cards/FoS.json",
+          "url": "https://ringsdb.com/api/public/cards/FoS.json",
+          "sha256": "94f3011588e0cac5e58a66aab04580122d1bd6403b5f209a54f92885d2900b1c",
+          "bytes": 11923
+        },
+        {
+          "path": "raw/ringsdb/cards/SaF.json",
+          "url": "https://ringsdb.com/api/public/cards/SaF.json",
+          "sha256": "0fb173d9fd27eb4a7d8ce874eac6ee067e31efee4459d4f09d7560fefdaa7546",
+          "bytes": 11279
+        },
+        {
+          "path": "raw/ringsdb/cards/OHaUH.json",
+          "url": "https://ringsdb.com/api/public/cards/OHaUH.json",
+          "sha256": "af21ab478b133d5fd678562bcdaaffe97deec95af74519595a85b19fe28156c9",
+          "bytes": 25987
+        },
+        {
+          "path": "raw/ringsdb/cards/TBoLT.json",
+          "url": "https://ringsdb.com/api/public/cards/TBoLT.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/HoN.json",
+          "url": "https://ringsdb.com/api/public/cards/HoN.json",
+          "sha256": "0235dd8905adb05fead22381c0b7fb1842e4842c9f1a09f0739372575300ee50",
+          "bytes": 20709
+        },
+        {
+          "path": "raw/ringsdb/cards/OtD.json",
+          "url": "https://ringsdb.com/api/public/cards/OtD.json",
+          "sha256": "2ac0d6b84e7c0afc796f70c738d1eb9d19ac404668fdf8d73e6546cc607e5341",
+          "bytes": 25480
+        },
+        {
+          "path": "raw/ringsdb/cards/TSF.json",
+          "url": "https://ringsdb.com/api/public/cards/TSF.json",
+          "sha256": "4dc5124d993b37496343f064d32c539585b4d59816e998bea2b6dee29da5f7e9",
+          "bytes": 10305
+        },
+        {
+          "path": "raw/ringsdb/cards/TDF.json",
+          "url": "https://ringsdb.com/api/public/cards/TDF.json",
+          "sha256": "03b40baaa71fd777a5c44bb25b9ab7ec8d677c4091e4a1f1b80b86714b0380cf",
+          "bytes": 10426
+        },
+        {
+          "path": "raw/ringsdb/cards/EaAD.json",
+          "url": "https://ringsdb.com/api/public/cards/EaAD.json",
+          "sha256": "80ef0015a12990cbf3f050104bcd098a27489d12a03254e2c19662c1a9aa74e7",
+          "bytes": 10850
+        },
+        {
+          "path": "raw/ringsdb/cards/AoO.json",
+          "url": "https://ringsdb.com/api/public/cards/AoO.json",
+          "sha256": "253d852a08ac37607450941fb7a3e4241e1817c0932fd3f9c75b8adf551dfbc0",
+          "bytes": 10536
+        },
+        {
+          "path": "raw/ringsdb/cards/TBR.json",
+          "url": "https://ringsdb.com/api/public/cards/TBR.json",
+          "sha256": "7c9c523d121e02887be2c88e5214fa47a9dbe1642151e4faf41c8fd9cb0ec190",
+          "bytes": 30625
+        },
+        {
+          "path": "raw/ringsdb/cards/BoG.json",
+          "url": "https://ringsdb.com/api/public/cards/BoG.json",
+          "sha256": "02e017bd035ebf936015b4ecee813f13785dbe000d80e394d0547f5dea5615b5",
+          "bytes": 10795
+        },
+        {
+          "path": "raw/ringsdb/cards/TSoE.json",
+          "url": "https://ringsdb.com/api/public/cards/TSoE.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/TMV.json",
+          "url": "https://ringsdb.com/api/public/cards/TMV.json",
+          "sha256": "775cfc67bdc63e9658c8319a760845e9cc520fc7e1b2ed60596fc22feb823b7d",
+          "bytes": 11854
+        },
+        {
+          "path": "raw/ringsdb/cards/VoI.json",
+          "url": "https://ringsdb.com/api/public/cards/VoI.json",
+          "sha256": "4aa53ffb79a5d46dba2cd0ce800ed8f44fa5160a240b1f49fde8cf58e2a5e855",
+          "bytes": 16483
+        },
+        {
+          "path": "raw/ringsdb/cards/TDT.json",
+          "url": "https://ringsdb.com/api/public/cards/TDT.json",
+          "sha256": "0d3d7daf0006e00594ad245680f7052f59bb2793ce2ed49a5440fb14629a5d44",
+          "bytes": 11954
+        },
+        {
+          "path": "raw/ringsdb/cards/TTT.json",
+          "url": "https://ringsdb.com/api/public/cards/TTT.json",
+          "sha256": "896c5470eee99d328fda41a72b976cf8c266ab9ea90c0904a0d4ecce6be01217",
+          "bytes": 11356
+        },
+        {
+          "path": "raw/ringsdb/cards/TiT.json",
+          "url": "https://ringsdb.com/api/public/cards/TiT.json",
+          "sha256": "b2c54af0218b70bed84f502a06fecd2207ef6af476d798a59e58ed810d1968dc",
+          "bytes": 13578
+        },
+        {
+          "path": "raw/ringsdb/cards/TRD.json",
+          "url": "https://ringsdb.com/api/public/cards/TRD.json",
+          "sha256": "302675546c1449d7a236b926027206ce72143f4a0d7a0d9b204c123fd9aa8743",
+          "bytes": 26878
+        },
+        {
+          "path": "raw/ringsdb/cards/NiE.json",
+          "url": "https://ringsdb.com/api/public/cards/NiE.json",
+          "sha256": "94c4993bbbf3c98cf8234a701cb562fa013e7c9b3523ae3f36798192210dfa3d",
+          "bytes": 11793
+        },
+        {
+          "path": "raw/ringsdb/cards/TOF.json",
+          "url": "https://ringsdb.com/api/public/cards/TOF.json",
+          "sha256": "17e590a0a2739cb4dd730bbacd41e8cc99f657bc547a7f4eb01f7b778568ff25",
+          "bytes": 1146
+        },
+        {
+          "path": "raw/ringsdb/cards/CS.json",
+          "url": "https://ringsdb.com/api/public/cards/CS.json",
+          "sha256": "180236fe8468c720efcae7c9189e70f3ca47b7bc0b9c649f78ee0890b13565a2",
+          "bytes": 12835
+        },
+        {
+          "path": "raw/ringsdb/cards/TAC.json",
+          "url": "https://ringsdb.com/api/public/cards/TAC.json",
+          "sha256": "b09844c4facfed7eec1f4d7cca1c4b1a814ed348941895187efcbc879b9d60dd",
+          "bytes": 10757
+        },
+        {
+          "path": "raw/ringsdb/cards/FotBd.json",
+          "url": "https://ringsdb.com/api/public/cards/FotBd.json",
+          "sha256": "e80574b77acab43d6bf176cb182d45da1d3e2e21f2f02b4fae7091b60d62bbc4",
+          "bytes": 1164
+        },
+        {
+          "path": "raw/ringsdb/cards/TLR.json",
+          "url": "https://ringsdb.com/api/public/cards/TLR.json",
+          "sha256": "957fe3542c5bfd08f1e6801eed36bcade5bb31e4b1d8e7df06dddcd348894119",
+          "bytes": 16230
+        },
+        {
+          "path": "raw/ringsdb/cards/ToS.json",
+          "url": "https://ringsdb.com/api/public/cards/ToS.json",
+          "sha256": "211fb7de47d0d2aa992382145aa2efe2bc59b8521e4972fd15e0822b1b950539",
+          "bytes": 23969
+        },
+        {
+          "path": "raw/ringsdb/cards/WoE.json",
+          "url": "https://ringsdb.com/api/public/cards/WoE.json",
+          "sha256": "507beb7e1f7ee915f19b1f9071c461e16b0c665be1b08ef06b0f82a63e725d34",
+          "bytes": 10772
+        },
+        {
+          "path": "raw/ringsdb/cards/EfMG.json",
+          "url": "https://ringsdb.com/api/public/cards/EfMG.json",
+          "sha256": "f9fb54b6f7d00ae4b2c83209d255175ae86749d6a90810a22164c011bd0ddf5d",
+          "bytes": 10438
+        },
+        {
+          "path": "raw/ringsdb/cards/AtE.json",
+          "url": "https://ringsdb.com/api/public/cards/AtE.json",
+          "sha256": "0302d1709fa4d2ea917383be32d2d4f3feefc83675611e771565ebd060479038",
+          "bytes": 10375
+        },
+        {
+          "path": "raw/ringsdb/cards/ToR.json",
+          "url": "https://ringsdb.com/api/public/cards/ToR.json",
+          "sha256": "4e9d080cc01c395b2c8d01871f2fa62941f26b1c81158e35e63b2c415464fbbf",
+          "bytes": 10831
+        },
+        {
+          "path": "raw/ringsdb/cards/BoCD.json",
+          "url": "https://ringsdb.com/api/public/cards/BoCD.json",
+          "sha256": "5faf67785a3a600e8d8d0ca0b7dc4d85e5c472404a2031d425443ac4e11798bd",
+          "bytes": 11309
+        },
+        {
+          "path": "raw/ringsdb/cards/LoS.json",
+          "url": "https://ringsdb.com/api/public/cards/LoS.json",
+          "sha256": "1df2c9b54bf40cc7ff0b7ea18b393ef286b330bfb48774a807400249f64c540a",
+          "bytes": 17521
+        },
+        {
+          "path": "raw/ringsdb/cards/TDR.json",
+          "url": "https://ringsdb.com/api/public/cards/TDR.json",
+          "sha256": "ba8ed463e6ccd9da7c495ba0404e2816634f46a7a4cad40795bb20d47e4d5466",
+          "bytes": 10959
+        },
+        {
+          "path": "raw/ringsdb/cards/AACE.json",
+          "url": "https://ringsdb.com/api/public/cards/AACE.json",
+          "sha256": "d99f24272b476d1fea818fbc746ea6078726397db6266449a105824b2eded65b",
+          "bytes": 31432
+        },
+        {
+          "path": "raw/ringsdb/cards/TGH.json",
+          "url": "https://ringsdb.com/api/public/cards/TGH.json",
+          "sha256": "07c168aaed5365fe8a952091dfa3f03d423b41168a260ddf9e598f2a3aec6aad",
+          "bytes": 15982
+        },
+        {
+          "path": "raw/ringsdb/cards/TRoB.json",
+          "url": "https://ringsdb.com/api/public/cards/TRoB.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/MatPP.json",
+          "url": "https://ringsdb.com/api/public/cards/MatPP.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/FotS.json",
+          "url": "https://ringsdb.com/api/public/cards/FotS.json",
+          "sha256": "3773bb0ea18ec35aee5a5b5ddea72901d70481fb98a9f71b639b73ed36f57bdc",
+          "bytes": 12147
+        },
+        {
+          "path": "raw/ringsdb/cards/TitD.json",
+          "url": "https://ringsdb.com/api/public/cards/TitD.json",
+          "sha256": "02784f20258de5d1071cab3d39fde08452621fc9f13cf7d9fc5b30a9081d2c99",
+          "bytes": 9558
+        },
+        {
+          "path": "raw/ringsdb/cards/TotD.json",
+          "url": "https://ringsdb.com/api/public/cards/TotD.json",
+          "sha256": "62f9541735bc8561248e586418cb9e9bc60635e3b77ea3832f8847ae51082411",
+          "bytes": 10583
+        },
+        {
+          "path": "raw/ringsdb/cards/FotW.json",
+          "url": "https://ringsdb.com/api/public/cards/FotW.json",
+          "sha256": "1986522bca94615e3f1145c97b04d802ca54c759e0e45e2002ca34b9976e9882",
+          "bytes": 19558
+        },
+        {
+          "path": "raw/ringsdb/cards/DR.json",
+          "url": "https://ringsdb.com/api/public/cards/DR.json",
+          "sha256": "f14182047153c838fb0c2dec2e609bfc9c284afbdca54f943901dcd729a45490",
+          "bytes": 10869
+        },
+        {
+          "path": "raw/ringsdb/cards/SoCH.json",
+          "url": "https://ringsdb.com/api/public/cards/SoCH.json",
+          "sha256": "171417369ffb44746b16efd552953683bfe6298200899ec08bc8ef5d01f8682b",
+          "bytes": 11988
+        },
+        {
+          "path": "raw/ringsdb/cards/CoC.json",
+          "url": "https://ringsdb.com/api/public/cards/CoC.json",
+          "sha256": "38735a4de310ce437320efb1a84ccd90ae3dc3fb7762524ac34a985197cec7f0",
+          "bytes": 9547
+        },
+        {
+          "path": "raw/ringsdb/cards/TSoH.json",
+          "url": "https://ringsdb.com/api/public/cards/TSoH.json",
+          "sha256": "f867cbba07707aadd8f008e0388c9276a74bdc5d1d6e63a8f74f3eab4424dae1",
+          "bytes": 14109
+        },
+        {
+          "path": "raw/ringsdb/cards/M.json",
+          "url": "https://ringsdb.com/api/public/cards/M.json",
+          "sha256": "d0b83c1dd9aebccb34925eba266d80a137b93c49c9a9ee49124c453a1f6ab9f1",
+          "bytes": 11085
+        },
+        {
+          "path": "raw/ringsdb/cards/TSoA.json",
+          "url": "https://ringsdb.com/api/public/cards/TSoA.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/RAH.json",
+          "url": "https://ringsdb.com/api/public/cards/RAH.json",
+          "sha256": "b22de343862a9d4c8a142e1ad11a1ad08c0d297d71b84cc973425a3893fac7be",
+          "bytes": 10428
+        },
+        {
+          "path": "raw/ringsdb/cards/BtS.json",
+          "url": "https://ringsdb.com/api/public/cards/BtS.json",
+          "sha256": "71d2ebb4a08c002db4c84ebb3351d5d1a6ddc9028478d296771259cdcf40f527",
+          "bytes": 11252
+        },
+        {
+          "path": "raw/ringsdb/cards/Starter.json",
+          "url": "https://ringsdb.com/api/public/cards/Starter.json",
+          "sha256": "41d27b06634f0e03b071cb84571ea2686f413de7c8f3119b51a93762e7dd024d",
+          "bytes": 94121
+        },
+        {
+          "path": "raw/ringsdb/cards/TBS.json",
+          "url": "https://ringsdb.com/api/public/cards/TBS.json",
+          "sha256": "d4d9eb0b90afc00c3fbe34c87a4421d6e73de9d92dc2e5966fe985e8c32d5e23",
+          "bytes": 9878
+        },
+        {
+          "path": "raw/ringsdb/cards/MoF.json",
+          "url": "https://ringsdb.com/api/public/cards/MoF.json",
+          "sha256": "1e5ae91b969dffa4f54f17aa7cadc4353cb37ffb8da1a5b2e46ad1fe2551fa60",
+          "bytes": 15420
+        },
+        {
+          "path": "raw/ringsdb/cards/DoCG.json",
+          "url": "https://ringsdb.com/api/public/cards/DoCG.json",
+          "sha256": "b14183bb15b4baf70c4d275b30598b7070c4c0b7614ba542db5ebfe9960aa585",
+          "bytes": 10899
+        },
+        {
+          "path": "raw/ringsdb/cards/CoP.json",
+          "url": "https://ringsdb.com/api/public/cards/CoP.json",
+          "sha256": "39bc5e89c3f057f6f5eea17748dad1baf28b9824692abeb1720e0b0b54886fe2",
+          "bytes": 10878
+        },
+        {
+          "path": "raw/ringsdb/cards/AoDG.json",
+          "url": "https://ringsdb.com/api/public/cards/AoDG.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/TWoR.json",
+          "url": "https://ringsdb.com/api/public/cards/TWoR.json",
+          "sha256": "cd88338f79bb9602de3b9f9095d0baa20a66c8bad65d94c1696ae598b08d7282",
+          "bytes": 15811
+        },
+        {
+          "path": "raw/ringsdb/cards/TWH.json",
+          "url": "https://ringsdb.com/api/public/cards/TWH.json",
+          "sha256": "3ff74b657d455976a6d9d48975dc2278b4e3a0a25182740c508279ab82b044b1",
+          "bytes": 10473
+        },
+        {
+          "path": "raw/ringsdb/cards/RAR.json",
+          "url": "https://ringsdb.com/api/public/cards/RAR.json",
+          "sha256": "0290a1dfaf69169ce96aa648093820510ea68e6c099de269b36c5c9edea3870f",
+          "bytes": 10152
+        },
+        {
+          "path": "raw/ringsdb/cards/FitN.json",
+          "url": "https://ringsdb.com/api/public/cards/FitN.json",
+          "sha256": "9eb29d39e7e2b45800880b14f5dcefc9afafa2a68f46048d40f686e6a05ac2fd",
+          "bytes": 10222
+        },
+        {
+          "path": "raw/ringsdb/cards/TGoF.json",
+          "url": "https://ringsdb.com/api/public/cards/TGoF.json",
+          "sha256": "b3d187f19095f54c7f988841ade2abcaa1f89e8d8a6ec55e52c6e00c66b65f99",
+          "bytes": 9513
+        },
+        {
+          "path": "raw/ringsdb/cards/MG.json",
+          "url": "https://ringsdb.com/api/public/cards/MG.json",
+          "sha256": "e20df9a7b8997ab7ecf9d6d78535766f90b26235d7b43b1523ccfb89d81f2758",
+          "bytes": 10076
+        },
+        {
+          "path": "raw/ringsdb/cards/TFoW.json",
+          "url": "https://ringsdb.com/api/public/cards/TFoW.json",
+          "sha256": "914f6786301fd73c9c22d148b58157ccab9e400970ba339a12543a78c968ac27",
+          "bytes": 10357
+        },
+        {
+          "path": "raw/ringsdb/cards/TWQ.json",
+          "url": "https://ringsdb.com/api/public/cards/TWQ.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/TWR.json",
+          "url": "https://ringsdb.com/api/public/cards/TWR.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/ASitE.json",
+          "url": "https://ringsdb.com/api/public/cards/ASitE.json",
+          "sha256": "0f3606c6ecc3de79f775b86058d875bcecb2603b822916e36f6db15da869d5a7",
+          "bytes": 15652
+        },
+        {
+          "path": "raw/ringsdb/cards/WaR.json",
+          "url": "https://ringsdb.com/api/public/cards/WaR.json",
+          "sha256": "50387dd8a49b269732a6dd52ad8a2a12dc2c8d35f8d3b3bb0cea995a6d851547",
+          "bytes": 12457
+        },
+        {
+          "path": "raw/ringsdb/cards/TCoU.json",
+          "url": "https://ringsdb.com/api/public/cards/TCoU.json",
+          "sha256": "a39f1dab7ae332514bca4edd8788038a121f8c41db36e719dd7aec1c244fe212",
+          "bytes": 13347
+        },
+        {
+          "path": "raw/ringsdb/cards/CotW.json",
+          "url": "https://ringsdb.com/api/public/cards/CotW.json",
+          "sha256": "e11ccd86517644c03fe8ed198baffb1b7496f134f1f06db6ccdfbe191f06cb5d",
+          "bytes": 12218
+        },
+        {
+          "path": "raw/ringsdb/cards/UtAM.json",
+          "url": "https://ringsdb.com/api/public/cards/UtAM.json",
+          "sha256": "06b49feec89d30c46ad4fb3df5ecd057f6b79c557aaf9e646f16f9c43b18476d",
+          "bytes": 11858
+        },
+        {
+          "path": "raw/ringsdb/cards/TMoM.json",
+          "url": "https://ringsdb.com/api/public/cards/TMoM.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/EfKD.json",
+          "url": "https://ringsdb.com/api/public/cards/EfKD.json",
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "bytes": 2
+        },
+        {
+          "path": "raw/ringsdb/cards/MotKA.json",
+          "url": "https://ringsdb.com/api/public/cards/MotKA.json",
+          "sha256": "8a6475bc7b437b077f0b8ad9f6e8070177fa6145db1a750c4dd148506737f6d8",
+          "bytes": 90146
+        },
+        {
+          "path": "raw/ringsdb/cards/TLoS.json",
+          "url": "https://ringsdb.com/api/public/cards/TLoS.json",
+          "sha256": "858cf44791a4b10bdeb9f51747e87f0085f66e64f23ce8968bf55dd0b99b10cd",
+          "bytes": 11777
+        },
+        {
+          "path": "raw/ringsdb/cards/TFoN.json",
+          "url": "https://ringsdb.com/api/public/cards/TFoN.json",
+          "sha256": "f348ff7702db715f55c2f9c288379137ea2d1b890622ca2c957ca07cce0f26ce",
+          "bytes": 11782
+        },
+        {
+          "path": "raw/ringsdb/cards/THftD.json",
+          "url": "https://ringsdb.com/api/public/cards/THftD.json",
+          "sha256": "746c7008f56b288b6bc26f1155c17fac02527e0ff1b702bc884da91874061ebc",
+          "bytes": 1516
+        },
+        {
+          "path": "raw/ringsdb/cards/RevCore.json",
+          "url": "https://ringsdb.com/api/public/cards/RevCore.json",
+          "sha256": "d8d5a7b292348737a79610375c9e734210c63e931060ccef92213a2a42d00230",
+          "bytes": 104825
+        },
+        {
+          "path": "raw/ringsdb/cards/DoD.json",
+          "url": "https://ringsdb.com/api/public/cards/DoD.json",
+          "sha256": "3b65125ad80d9f88c3173a82f17c5dd9640516752ffedf61c80a78f2591940a0",
+          "bytes": 42111
+        },
+        {
+          "path": "raw/ringsdb/cards/EoL.json",
+          "url": "https://ringsdb.com/api/public/cards/EoL.json",
+          "sha256": "692f40c56c1eb7eb17075835e091b8aa27e913ca8a5508036f705abf8d9d9bec",
+          "bytes": 45516
+        },
+        {
+          "path": "raw/ringsdb/cards/DoG.json",
+          "url": "https://ringsdb.com/api/public/cards/DoG.json",
+          "sha256": "800d8bf6d46e25417ba3ea63b98c9532eedb1649f0db29a7f609c903456dacf5",
+          "bytes": 46632
+        },
+        {
+          "path": "raw/ringsdb/cards/RoR.json",
+          "url": "https://ringsdb.com/api/public/cards/RoR.json",
+          "sha256": "22a8847c3ef8ca78f65f29c891f959650c7b58248d7340a7e494fafebff78d22",
+          "bytes": 44249
+        },
+        {
+          "path": "raw/ringsdb/cards/DCCE.json",
+          "url": "https://ringsdb.com/api/public/cards/DCCE.json",
+          "sha256": "ba88f085b7357c27de4af20651f7634febe599828d8e001202773172d8e05764",
+          "bytes": 35948
+        },
+        {
+          "path": "raw/ringsdb/cards/EMCE.json",
+          "url": "https://ringsdb.com/api/public/cards/EMCE.json",
+          "sha256": "837973802b3f858421f3269830f88f7ddb538fe1dd14356698472f4fd37ba7bf",
+          "bytes": 27267
+        }
+      ]
+    },
+    "rules": {
+      "id": "rules",
+      "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
+      "pin": {
+        "kind": "sha256",
+        "value": "b254b637a09fc65c66e0e622f619ea99afc73a0f18cfa19a5c05f0b4f2d0ff23"
+      },
+      "fetchedAt": "2026-10-24T10:12:56.203Z",
+      "files": [
+        {
+          "path": "pdf/mec109_rulebook-compressed.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec109_rulebook-compressed.pdf",
+          "sha256": "90a24ea4fca6284b24ba0f0ec087adc5f380e57ce7a7d81d7379b07ab86b3818",
+          "bytes": 10748841
+        },
+        {
+          "path": "pdf/mec101_learn_to_play_eng_v11-compressed.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec101_learn_to_play_eng_v11-compressed.pdf",
+          "sha256": "2621b03e7fa71bca21b096b3c94be29b14be8de54af413a73f884ec662e21090",
+          "bytes": 14694446
+        },
+        {
+          "path": "pdf/mec101_rules_reference.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC101.pdf",
+          "sha256": "ef604fe7a639dfcb59e1b63538c77cb39bfbbda512ba0e9d2756ade92ef084ee",
+          "bytes": 11650645
+        },
+        {
+          "path": "pdf/lotr_faq_19.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/lotr_faq_19.pdf",
+          "sha256": "a82b0e7e1fe27d942eaeae9426e6821ccc8157dad9a424e70d2f5bafa604e7d9",
+          "bytes": 14383996
+        },
+        {
+          "path": "pdf/campaign-log.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/campaign-log.pdf",
+          "sha256": "997a37cb210896af10ede4a26df83ce02b91e570fd019aede171be648a9cf48b",
+          "bytes": 1410793
+        },
+        {
+          "path": "pdf/lotr_easy_mode.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/lotr_easy_mode.pdf",
+          "sha256": "52fd5fde07ee01398f46399fa6afd6dd77f2b0987150756b4d0944fe288d1a9f",
+          "bytes": 3090516
+        }
+      ]
+    }
+  }
+}
