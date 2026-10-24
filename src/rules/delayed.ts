@@ -3,6 +3,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
+import { lastPicked } from "./player-verbs.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { ScenarioState } from "./state.ts";
@@ -27,6 +28,7 @@ export function scheduleDelayed(
     instructions: instruction.instructions,
     uncancelable: instruction.uncancelable ?? null,
     cause,
+    ...(instruction.subject === "picked" && lastPicked(state) ? { subjectId: lastPicked(state) } : {}),
   };
   return { ...state, delayed: [...state.delayed, entry] };
 }
@@ -61,6 +63,7 @@ export function pushDue(
         instructions: entry.instructions,
         cancel: null,
         blockCancel: entry.uncancelable,
+        ...(entry.subjectId ? { picked: [entry.subjectId] } : {}),
         ...(entry.cause ? { cause: entry.cause } : {}),
       },
       steps,

@@ -33,6 +33,10 @@ export type EffectSpec = {
   resume?: EffectData["resume"];
   finish?: EffectData["finish"];
   eventSeat?: number | null;
+  // The X an event was played for.
+  x?: number;
+  // A delayed effect starts with the card it was made for already picked.
+  picked?: readonly string[];
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
   cause?: Cause;
@@ -58,6 +62,8 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     resume: spec.resume ?? null,
     ...(spec.finish ? { finish: spec.finish } : {}),
     ...(spec.eventSeat != null ? { eventSeat: spec.eventSeat } : {}),
+    ...(spec.x != null ? { x: spec.x } : {}),
+    ...(spec.picked ? { picked: spec.picked } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
 }
@@ -112,7 +118,18 @@ export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContex
   const [item, ...rest] = data.queue;
   if (data.canceled || !item) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
   const advanced = patchTop(state, { data: { ...data, queue: rest } });
-  return runItem(advanced, item, frame, data.returned, ctx, steps);
+  return finishWhenDone(runItem(advanced, item, frame, data.returned, ctx, steps), frame.id);
+}
+
+// An event goes to the discard pile as soon as its last instruction has run, before the Responses to what it did are
+// offered, unless the effect is still waiting for a choice.
+function finishWhenDone(state: ScenarioState, frameId: string): ScenarioState {
+  const top = topFrame(state);
+  if (!top || top.id !== frameId || top.data.kind !== "effect") return state;
+  const data = top.data;
+  if (data.finish !== "discardSource" || data.queue.length > 0 || data.wait || state.window) return state;
+  const { finish: _done, ...rest } = data;
+  return patchTop(finishEvent(state, top, data), { data: rest });
 }
 
 // An event played from the hand is discarded once its effect is done, canceled or not (rr.cancel).
@@ -255,15 +272,17 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
   const instruction = item.instruction;
   const data = topFrame(state)?.data;
   if (instruction.verb !== "Pick" || data?.kind !== "effect") return state;
-  const found = pickCandidates(state, instruction.pick, item.seat, data.picked ?? [], frame.cardId, ctx);
+  // The actor chooses, unless the card says the first player does.
+  const chooser = instruction.pick.who === "firstPlayer" ? state.firstPlayer : item.seat;
+  const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x);
   const options = (instruction.pick.from ?? "play") === "play" ? found : distinctByCode(state, found);
   let chosen = item.chosen;
   if (!chosen) {
-    if (options.length > 1) return askTarget(state, item, options);
+    if (options.length > 1) return askTarget(state, { ...item, seat: chooser }, options);
     chosen = options[0] ?? "";
   }
   // A look at the top of a deck: the cards seen are put back by ArrangeTop.
-  const looked = instruction.pick.top != null ? { looked: (state.seats[item.seat]?.deck ?? []).slice(0, instruction.pick.top) } : {};
+  const looked = instruction.pick.top != null ? { looked: (state.seats[chooser]?.deck ?? []).slice(0, instruction.pick.top) } : {};
   return patchTop(state, { data: { ...data, ...looked, picked: [...(data.picked ?? []), chosen] } });
 }
 

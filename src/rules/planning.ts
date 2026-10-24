@@ -33,7 +33,10 @@ export function playCard(
   if (!instance) return next;
   const printed = printedOf(ctx.cards, instance.code);
   const seat = state.activeSeat;
-  if (printed.type === "event") return playEvent(next, intent.cardId, seat, ctx, steps);
+  if (printed.type === "event") {
+    const x = printed.costX ? intent.payments.reduce((sum, payment) => sum + payment.amount, 0) : undefined;
+    return playEvent(next, intent.cardId, seat, ctx, steps, x);
+  }
   next = moveCard(next, intent.cardId, { zone: "play", seat });
   next = updateCard(next, intent.cardId, { exhausted: false });
   if (printed.type === "attachment" && intent.hostId) {
@@ -59,7 +62,7 @@ function runningActions(state: ScenarioState, cardId: string, seat: number, ctx:
 
 // The event's Action effects resolve in a frame of their own, so a choice can stop them. The card stays in the hand while
 // they resolve (it cannot be a target of its own effect) and goes to the discard pile after, whatever happened to the effect.
-function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, steps: EngineStep[], x?: number): ScenarioState {
   const running = runningActions(state, cardId, seat, ctx);
   const first = running[0];
   if (!first) return moveCard(state, cardId, { zone: "discard", seat });
@@ -76,6 +79,7 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
       cancel: null,
       blockCancel: null,
       finish: "discardSource",
+      ...(x != null ? { x } : {}),
       ...(state.window ? { resume: { window: state.window, seat } } : {}),
     },
     steps,
@@ -150,7 +154,7 @@ function paymentReason(
   payments: readonly { heroId: string; amount: number }[],
   ctx: ReduceContext,
 ): string | null {
-  if (printed.cost == null || cost == null) return "That card has no printed cost";
+  if (!printed.costX && (printed.cost == null || cost == null)) return "That card has no printed cost";
   let sum = 0;
   const spent = new Map<string, number>();
   for (const payment of payments) {
@@ -164,6 +168,9 @@ function paymentReason(
     if (!heroPays(state, heroId, printed.sphere, ctx)) return "Wrong sphere";
     if (hero.resources < amount) return "That hero does not have those resources";
   }
+  // X is whatever the player pays.
+  if (printed.costX) return null;
+  if (cost == null) return "That card has no printed cost";
   if (sum > cost) return "Overpay";
   if (sum < cost) return "Underpay";
   return null;

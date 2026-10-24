@@ -11,7 +11,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { lowerThreat, placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
-import { livingSeats, updateCard, withSeat } from "./state.ts";
+import { inPlay, livingSeats, updateCard, withSeat } from "./state.ts";
 import { topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 
@@ -98,7 +98,7 @@ export function runPlayerVerb(
       const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
       const seat = otherSeat(state, focus.seat);
       if (!source || seat == null) return state;
-      return moveCard(state, source.id, { zone: "play", seat });
+      return updateCard(moveCard(state, source.id, { zone: "play", seat }), source.id, { owner: source.owner ?? source.controller ?? focus.seat });
     }
     case "CancelEffect":
       return cancelAnswered(state);
@@ -114,10 +114,32 @@ export function runPlayerVerb(
     }
     case "MovePicked": {
       const id = lastPicked(state);
-      if (!state.cards[id]) return state;
-      if (instruction.to === "hand") return moveCard(state, id, { zone: "hand", seat: focus.seat });
-      const entered = updateCard(moveCard(state, id, { zone: "play", seat: focus.seat }), id, { exhausted: false });
-      return queueEvent(entered, { trigger: "enteredPlay", seat: focus.seat, cardId: id });
+      const card = state.cards[id];
+      if (!card) return state;
+      // A card out of a deck or a discard pile goes to its own player's hand.
+      if (instruction.to === "hand") return moveCard(state, id, { zone: "hand", seat: card.controller ?? focus.seat });
+      const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
+      // An ally taken from another player's discard pile is put into play under the new controller and stays its owner's card.
+      const owner = card.controller != null && card.controller !== seat && card.owner == null ? { owner: card.controller } : {};
+      const entered = updateCard(moveCard(state, id, { zone: "play", seat }), id, { exhausted: false, ...owner });
+      return queueEvent(entered, { trigger: "enteredPlay", seat, cardId: id });
+    }
+    case "ReturnToHand": {
+      const id = lastPicked(state);
+      const card = state.cards[id];
+      if (!card || !inPlay(card.zone) || card.controller == null) return state;
+      const returned = moveCard(state, id, { zone: "hand", seat: card.owner ?? card.controller });
+      return queueEvent(returned, { trigger: "allyLeftPlay", seat: card.controller, subject: id });
+    }
+    case "ShuffleSelfIntoDeck": {
+      const card = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+      if (!card || card.controller == null) return state;
+      const seat = card.owner ?? card.controller;
+      const moved = moveCard(state, card.id, { zone: "deck", seat });
+      const pile = moved.seats[seat];
+      if (!pile) return moved;
+      const shuffled = shuffleIds(pile.deck, moved.seed, moved.seedCursor);
+      return { ...withSeat(moved, seat, { ...pile, deck: shuffled.ids }), seedCursor: shuffled.cursor };
     }
     case "AttachPicked": {
       const list = pickedList(state);

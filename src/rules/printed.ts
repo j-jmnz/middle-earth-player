@@ -37,6 +37,8 @@ export type PrintedCard = {
   traits: readonly string[];
   sphere: Sphere | null;
   cost: number | null;
+  // The card prints X for its cost: the player pays any amount, and the card's effect reads it (Stand and Fight).
+  costX: boolean;
   threat: number | null;
   willpower: number | null;
   attack: number | null;
@@ -78,6 +80,7 @@ export function definePrinted(
     traits: [],
     sphere: null,
     cost: null,
+    costX: false,
     threat: null,
     willpower: null,
     attack: null,
@@ -142,6 +145,7 @@ export function printedFromCard(card: Card): PrintedCard {
     sphere,
     // A variable cost prints as "X" and is not a number.
     cost: card.cost != null && /^\d+$/.test(card.cost) ? Number(card.cost) : null,
+    costX: card.cost === "X",
     threat: card.threat,
     willpower: card.willpower,
     attack: card.attack,

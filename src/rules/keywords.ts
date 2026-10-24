@@ -181,7 +181,7 @@ export function defeatedDestination(
     return { zone: "victory" };
   }
   if (isPlayerType(printed) && instance.controller != null) {
-    return { zone: "discard", seat: instance.controller };
+    return { zone: "discard", seat: instance.owner ?? instance.controller };
   }
   if (printed.type === "quest") return { zone: "setAside" };
   return { zone: "encounterDiscard" };
@@ -223,7 +223,12 @@ export function destroyCard(
   if (!instance) return state;
   const printed = printedOf(cards, instance.code);
   if (printed.keywords.permanent && heroHostInPlay(state, instance)) return state;
-  let next = releaseAttachments(state, id, cards, steps);
+  // The cards attached to a location that leaves play hear about it (Elf-stone), once they are discarded with it.
+  let next = state;
+  if (printed.type === "location") {
+    for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id });
+  }
+  next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
   next = moveCard(next, id, defeatedDestination(latest, printed));
   steps.push({ kind: "destroy", targetId: id });

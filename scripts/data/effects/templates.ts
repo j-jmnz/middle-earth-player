@@ -605,4 +605,91 @@ export const TEMPLATES: readonly Template[] = [
       },
     ],
   },
+  // Temporary play, play from a discard pile, and delayed triggers.
+  {
+    id: "action-put-ally-into-play-then-return",
+    pattern: /^Action: Put 1 ally card into play from your hand\. At the end of the phase, if that ally is still in play, return it to your hand\.$/,
+    build: () => [
+      {
+        timing: "action",
+        instructions: [
+          { verb: "Pick", pick: { type: "ally", control: "you", from: "hand", intoPlay: true } },
+          { verb: "MovePicked", to: "play" },
+          { verb: "Delay", until: "endOfPhase", subject: "picked", instructions: [{ verb: "ReturnToHand" }] },
+        ],
+      },
+    ],
+  },
+  {
+    id: "action-self-attack-then-shuffle-into-deck",
+    pattern: /^Action: \{self\} gains \+(\d+) Attack until the end of the phase\. At the end of the phase in which you trigger this effect, shuffle \{self\} back into your deck\.$/,
+    build: (match) => [
+      {
+        timing: "action",
+        instructions: [
+          { verb: "ModifyStat", stat: "attack", amount: count(match[1]), until: "endOfPhase", target: "self" },
+          { verb: "Delay", until: "endOfPhase", instructions: [{ verb: "ShuffleSelfIntoDeck" }] },
+        ],
+      },
+    ],
+  },
+  {
+    id: "action-ally-of-cost-x-from-any-discard-into-play",
+    pattern: /^Action: Choose an ally with a printed cost of X in any player's discard pile\. Put that ally into play under your control\.(?: \(The chosen ally can belong to any sphere of influence\.\))?$/,
+    build: () => [
+      {
+        timing: "action",
+        instructions: [{ verb: "Pick", pick: { type: "ally", control: "any", from: "discard", costIsX: true, intoPlay: true } }, { verb: "MovePicked", to: "play" }],
+      },
+    ],
+  },
+  {
+    id: "action-return-sphere-card-from-discard",
+    pattern: /^Action: Return 1 (Spirit|Leadership|Tactics|Lore) card from your discard pile to your hand\.$/,
+    build: (match) => {
+      const sphere = SPHERES[match[1] ?? ""];
+      return sphere
+        ? [{ timing: "action", instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "discard", sphere } }, { verb: "MovePicked", to: "hand" }] }]
+        : null;
+    },
+  },
+  {
+    id: "response-played-return-topmost-attachment",
+    pattern: /^Response: After you play \{self\}, return the topmost attachment in any player's discard pile to his hand\.$/,
+    build: () => [
+      {
+        timing: "response",
+        trigger: "played",
+        instructions: [{ verb: "Pick", pick: { type: "card", control: "any", from: "discard", cardType: "attachment", topmost: true } }, { verb: "MovePicked", to: "hand" }],
+      },
+    ],
+  },
+  {
+    id: "attach-to-active-location-quest-points",
+    pattern: /^Attach to the active location\. Attached location gets \+(\d+) quest points?\.$/,
+    build: (match) => [
+      {
+        timing: "constant",
+        instructions: [
+          { verb: "AttachesTo", host: { kind: "activeLocation" } },
+          { verb: "ModifyStat", stat: "questPoints", amount: count(match[1]), until: "whileSourceInPlay", target: "host" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "response-attached-location-explored-first-player-ally",
+    pattern: /^Response: After attached location leaves play as an explored location, the first player puts 1 ally into play from his hand\.$/,
+    build: () => [
+      {
+        timing: "response",
+        trigger: "hostLeftPlay",
+        condition: { kind: "subjectExplored" },
+        instructions: [
+          { verb: "Pick", pick: { type: "ally", control: "you", from: "hand", intoPlay: true, who: "firstPlayer" } },
+          { verb: "MovePicked", to: "play", who: "firstPlayer" },
+        ],
+      },
+    ],
+  },
 ];

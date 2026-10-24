@@ -61,6 +61,9 @@ export type CardInstance = {
   shadowId: string | null;
   face: CardFace;
   controller: number | null;
+  // The seat whose card it is, when another seat has taken control of it (Wandering Took, Stand and Fight). A discarded
+  // card goes to its owner's discard pile.
+  owner?: number;
   // Order in which the card entered play. Forced effects resolve oldest first.
   enteredPlay: number;
 };

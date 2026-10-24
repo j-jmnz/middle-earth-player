@@ -77,6 +77,8 @@ export type EffectData = {
   looked?: readonly string[];
   // The seat the event that offered this Response happened to.
   eventSeat?: number | null;
+  // The X an event was played for (Stand and Fight).
+  x?: number;
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
@@ -129,6 +131,8 @@ export type DelayedEffect = {
   instructions: readonly Instruction[];
   uncancelable: Condition | null;
   cause?: Cause;
+  // The card the delayed instructions act on as the picked card.
+  subjectId?: string;
 };
 
 // One use of an effect with a limit. A oncePerPhase use is spent in the round and phase it was made.

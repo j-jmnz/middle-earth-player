@@ -58,6 +58,8 @@ export const triggerSchema = z.enum([
   // shadow effect of the card just turned up in an attack (rr.cancel).
   "whenRevealedPending",
   "shadowPending",
+  // Heard by every card that was attached to a location that left play (the event's subject).
+  "hostLeftPlay",
 ]);
 
 const whoSchema = z.enum(["actor", "firstPlayer"]);
@@ -81,6 +83,14 @@ export const pickSchema = z.strictObject({
   maxCost: z.number().int().min(0).optional(),
   // The candidates are the cards the last picked attachment may be attached to.
   hostForPicked: z.boolean().optional(),
+  // The card is going to be put into play: a unique card already in play cannot be chosen.
+  intoPlay: z.boolean().optional(),
+  // The printed cost must be the X the event was played for (Stand and Fight).
+  costIsX: z.boolean().optional(),
+  // Only the topmost card of each discard pile that matches (Erebor Hammersmith).
+  topmost: z.boolean().optional(),
+  // Who chooses. The actor, unless the card says the first player does.
+  who: z.enum(["actor", "firstPlayer"]).optional(),
   trait: z.string().min(1).optional(),
   state: z.enum(["ready", "exhausted"]).optional(),
   different: z.boolean().optional(),
@@ -115,6 +125,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
+  // The card the event is about (a location that left play) had enough progress to be explored.
+  z.strictObject({ kind: z.literal("subjectExplored") }),
   // Another player is still in the game.
   z.strictObject({ kind: z.literal("otherPlayer") }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
@@ -232,7 +244,12 @@ const simpleVerbs = [
   // Shuffles the actor's deck.
   verb("ShuffleDeck"),
   // Moves the last picked card to the actor's hand, or puts it into play under the actor's control.
-  z.strictObject({ verb: z.literal("MovePicked"), to: z.enum(["hand", "play"]), ...when }),
+  // A card goes to its own controller's hand (a card out of a discard pile or a deck is its player's), or into play under `who`.
+  z.strictObject({ verb: z.literal("MovePicked"), to: z.enum(["hand", "play"]), who: z.enum(["actor", "firstPlayer"]).optional(), ...when }),
+  // The picked card goes back to its controller's hand if it is still in play.
+  verb("ReturnToHand"),
+  // The source goes back into its controller's deck, which is shuffled.
+  verb("ShuffleSelfIntoDeck"),
   // Attaches the card picked before the last pick (an attachment) to the last picked card.
   verb("AttachPicked"),
   // The actor puts the cards a Pick looked at, those still in the deck, back on top in an order they choose.
@@ -387,6 +404,8 @@ const delaySchema = z.strictObject({
   verb: z.literal("Delay"),
   until: z.enum(["endOfPhase", "endOfRound"]),
   uncancelable: conditionSchema.optional(),
+  // The delayed instructions act on the card the last Pick chose (Sneak Attack's ally).
+  subject: z.literal("picked").optional(),
   instructions: z.array(simpleInstructionSchema),
 });
 

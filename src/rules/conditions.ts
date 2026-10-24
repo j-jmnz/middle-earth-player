@@ -1,7 +1,7 @@
 import type { Condition } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
-import { versusHighEngagement } from "./keywords.ts";
+import { modifiedStat, versusHighEngagement } from "./keywords.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
@@ -9,7 +9,7 @@ import { inPlay, livingSeats } from "./state.ts";
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
 // `holderId` is the card a stat is read for, and `against` the enemy it attacks.
-export type Scope = { actor: number; sourceId: string | null; returned: number; phase?: string; holderId?: string; against?: string };
+export type Scope = { actor: number; sourceId: string | null; returned: number; phase?: string; holderId?: string; against?: string; subject?: string };
 
 export function holds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean {
   switch (condition.kind) {
@@ -60,6 +60,11 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
       const host = source?.host ? state.cards[source.host] : undefined;
       return host != null && printedOf(ctx.cards, host.code).name === condition.name;
+    }
+    case "subjectExplored": {
+      const subject = scope.subject ? state.cards[scope.subject] : undefined;
+      const points = subject ? printedOf(ctx.cards, subject.code).questPoints : null;
+      return subject != null && points != null && subject.progress >= modifiedStat(state, subject, "questPoints", ctx.cards);
     }
     case "otherPlayer":
       return livingSeats(state).some((seat) => seat !== scope.actor);
