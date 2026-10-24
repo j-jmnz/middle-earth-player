@@ -186,23 +186,6 @@ export function TextButton({
   );
 }
 
-/** Bottom-pinned labeled Back. Used where a screen has no top bar (debug). */
-export function BackButton({
-  label = "Back",
-  onPress,
-  testID,
-}: {
-  label?: string;
-  onPress: () => void;
-  testID: string;
-}) {
-  return (
-    <View className="pb-safe">
-      <TextButton label={label} onPress={onPress} testID={testID} />
-    </View>
-  );
-}
-
 /**
  * The one filled action on a screen. Gold pill, display-face caps label.
  * Disabled is a dim pill; the sentence above it says why.

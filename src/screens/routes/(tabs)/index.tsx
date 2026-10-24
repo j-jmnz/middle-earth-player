@@ -147,9 +147,6 @@ export default function CampaignList() {
           )}
         </View>
       </ScrollView>
-      <View className="items-start pb-safe">
-        <TextButton label="Debug" testID="debug" tone="gold" onPress={() => router.push("/debug")} />
-      </View>
     </Screen>
   );
 }

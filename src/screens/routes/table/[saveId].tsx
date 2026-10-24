@@ -5,20 +5,17 @@ import { useCallback, useMemo, useState } from "react";
 import { Text, View, type LayoutChangeEvent } from "react-native";
 import { useStore } from "zustand";
 
-import { record } from "../../../campaign/session";
-import type { Save } from "../../../campaign/save";
 import { QuestBand } from "../../../play/quest-band";
 import { railFor } from "../../../play/rail";
 import { threatSelector } from "../../../play/selectors";
 import { dropOutcome, targetFromKey } from "../../../play/selection";
 import { actionsSheet, commitSheet, paySheet, sheetFor, type Sheet, type SheetNames } from "../../../play/sheets";
-import { createTableStore, type PlayerIntent, type ScenarioState, type TableStore } from "../../../play/store";
+import type { PlayerIntent, ScenarioState, TableStore } from "../../../play/store";
 import { TableCanvas } from "../../../play/table-canvas";
 import type { PictureSource } from "../../../play/table-canvas-types";
 import { ChromeButton, ChromePrimary, LogPanel, PhaseRail, SheetTab, SheetView, ThreatRing } from "../../../play/table-chrome";
 import { BodyText, NavBar, Screen } from "../../chrome";
 import { bookletParams } from "../../campaign-data";
-import { writeSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { scanAssets } from "../../images/scan-map";
@@ -26,28 +23,13 @@ import { cachedImage, useImageSnapshot } from "../../images/store";
 import { routeCode } from "../../route-code";
 import { ledgerLine, ruleTitle } from "../../../play/ledger";
 import { logLines, type LogNames } from "../../../play/log";
-import { openTable, type TableSession } from "../../table-session";
+import { openTable, sessionStore, type TableSession } from "../../table-session";
 
 function picture(code: string): PictureSource | null {
   const cached = cachedImage(code);
   if (cached) return { uri: cached.uri };
   const bundled = scanAssets[code];
   return bundled ? bundled.moduleId : null;
-}
-
-// The store for an opened session. Each intent the reducer accepts is appended to the save and written at once, so a kill
-// and relaunch replays the same game.
-function storeFor<TRun>(session: Extract<TableSession, { ok: true }>, user: Parameters<typeof writeSave<TRun>>[0]): TableStore {
-  let saved: Save = session.save;
-  return createTableStore({
-    ctx: session.ctx,
-    game: session.game,
-    roundSteps: session.roundSteps,
-    onCommit: (intent) => {
-      saved = record(saved, intent);
-      writeSave(user, saved);
-    },
-  });
 }
 
 function Table({ session, store, saveId }: { session: Extract<TableSession, { ok: true }>; store: TableStore; saveId: string }) {
@@ -205,7 +187,7 @@ export default function TableScreen() {
   const { catalog, user } = useDatabases();
   // Opened once per save: the store holds the game from here on, and each accepted intent is written to user.db.
   const session = useMemo(() => (saveId ? openTable(catalog, user, saveId) : null), [catalog, user, saveId]);
-  const store = useMemo(() => (session?.ok ? storeFor(session, user) : null), [session, user]);
+  const store = useMemo(() => (session?.ok ? sessionStore(session, user).store : null), [session, user]);
 
   if (!saveId || !session || !session.ok || !store) {
     const sentence =

@@ -120,7 +120,6 @@ Shared pieces live in `src/screens/chrome.tsx`. They are views and text. They do
 | `SphereMark` | 8 pt disc beside the sphere word. Neutral has none |
 | `PaperSheet` | Parchment sheet, grabber, eyebrow repeating the step, Marcellus title |
 | `AppTabBar` | Text tabs on night. Current is semibold bone with a gold dot above |
-| `BackButton` | Bottom-pinned Back for screens without a NavBar (debug only) |
 
 One `PrimaryButton` per screen or sheet. Other actions are `TextButton`s. Back, Close, and Undo are labeled buttons, never gestures alone. Back lives in the `NavBar`; it goes to the screen below, and to the screen the page belongs to (path from briefing and log, the list from path) when nothing is below. Option lists use bone `TextButton`s; gold marks the one action or a link such as Booklet and Log. Close on the booklet reader sits at the bottom in thumb reach.
 
@@ -156,10 +155,12 @@ Canvas ground is `felt` with a lit center. Pinned quest stage at the top: small 
 
 The rail is not a full strip: it shows the previous step, the current step in Marcellus caps gold with a soft glow, and the next step, all in one centered line above the bottom bar. Bottom bar: threat in a ring (Marcellus number, label Threat), and PASS as the primary. Life, when declared, sits beside threat the same way. Booklet and Undo are text buttons at the top.
 
-Choice sheets are `PaperSheet`s over the rail. The eyebrow repeats the step (Combat), the title states the moment (Black Rider attacks), a muted line gives the engine's numbers. Choices are hero tiles in a row; the selected tile has the ink border. One ink primary names the action (DEFEND WITH SAM), the alternative is an inkLabel text button (Leave undefended). Hide shows Passed or Failed in Marcellus with the engine's numbers.
+Choice sheets are `PaperSheet`s over the rail. The eyebrow repeats the step (Combat), the title states the moment (Black Rider attacks), a muted line gives the engine's numbers. Choices are hero tiles in a row; the selected tile has the ink border. One ink primary names the action (DEFEND WITH SAM), the alternative is an inkLabel text button (Leave undefended). Hide shows Passed or Failed in Marcellus with the engine's numbers. A sheet folds to one paper bar (Look at the table) so the cards under it can be read and inspected, and comes back with one tap. In phase 11 the choice tiles are names on paper; the hero art on them waits for the design pass.
+
+Log, beside Booklet at the top, opens a paper sheet of this round's engine steps, each with its cause in inkMuted under it (the rule title, or the card and its printed line). It is text, not a control. Undo is not on the table yet.
 
 ### Resolution — phase 11
-Won: scene `victory`. VICTORY in display caps with a gold text glow, scenario name muted. Each choice group has a centered eyebrow (Choose a burden, Choose a boon) and two tiles side by side; selected has the gold border and semibold name. A muted sentence names what will be written, then CONFIRM. Lost: scene `plain`, "Defeat" in display, "The scenario was lost. Nothing is written to the log." and one text button Back to path. Until phase 11 the dev control has the same words: each Victory choice names what it records, and playing runs in chunks so the screen stays responsive.
+Won: scene `victory`. VICTORY in display caps with a gold text glow, scenario name muted. Each choice group has a centered eyebrow (Choose a burden, Choose a boon) and two tiles side by side; selected has the gold border and semibold name. A muted sentence names what will be written, then CONFIRM. Lost: scene `plain`, "Defeat" in display, "The scenario was lost. Nothing is written to the log." and one text button Back to path.
 
 ### Decks — placeholder built (editor: phase 6)
 Scene `plain`, title Decks, Import and New as text buttons. Each deck is a cover (three hero pictures, fading into night) with the name in title size and the heroes' short names in muted. Starters are smaller covers two across. The starter note is one muted sentence. Card pool is a row at the bottom.
@@ -181,9 +182,6 @@ The PDF page fills the screen on night. Close is a centered text button at the b
 
 ### Database — built
 Scene `plain`. Title Database, the failure in body. No retry.
-
-### Debug — dev
-Night page, existing components. Removed before phase 11. The Debug text button at the foot of the campaign list opens it and goes with it; phase 11 owns the removal, so both stay until then.
 
 ## States
 

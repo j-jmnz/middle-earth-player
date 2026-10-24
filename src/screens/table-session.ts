@@ -6,12 +6,12 @@ import { inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import type { Save } from "../campaign/save";
-import { contextOf, drop, resume, staleReason } from "../campaign/session";
+import { contextOf, drop, record, resume, staleReason } from "../campaign/session";
 import { logCodes, loadWorld, type World } from "../campaign/world";
 import { cards } from "../catalog/schema";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
-import { nextRoundSteps, type EngineStep, type ReduceContext, type ScenarioState } from "../play/store";
+import { createTableStore, nextRoundSteps, type EngineStep, type ReduceContext, type ScenarioState, type TableStore } from "../play/store";
 import { campaignOf, scenarioOf } from "./campaign-data";
 import { readSaveChecked, writeSave } from "./campaign-store";
 
@@ -62,4 +62,24 @@ export function openTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser
     return { ok: false, reason: "dropped", save };
   }
   return { ok: true, save, world, ctx: contextOf(world), game: resumed.state, roundSteps, facts: factsOf(catalog, world.cards.keys()) };
+}
+
+export type SessionStore = { store: TableStore; save: () => Save };
+
+/**
+ * The table store for an opened session. Each intent the reducer accepts is appended to the save and written at once, so a
+ * kill and relaunch replays the same game. `save` is the save as last written.
+ */
+export function sessionStore<TRun>(session: Extract<TableSession, { ok: true }>, user: Db<TRun>): SessionStore {
+  let saved: Save = session.save;
+  const store = createTableStore({
+    ctx: session.ctx,
+    game: session.game,
+    roundSteps: session.roundSteps,
+    onCommit: (intent) => {
+      saved = record(saved, intent);
+      writeSave(user, saved);
+    },
+  });
+  return { store, save: () => saved };
 }

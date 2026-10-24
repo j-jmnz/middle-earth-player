@@ -233,15 +233,12 @@ Expo Router. The app opens on the campaign list.
 | Campaign path | save, pool | nothing until a scenario ends |
 | Log | save | notes |
 | Briefing | save, deck, catalog, scenario definition | the loadout, then the opening `ScenarioState` from the reducer |
-| Table | game slice, image cache, effect rows from `catalog.db` | intents. Pass those rows into the reducer. |
-| Resolution | the script's options | the chosen resolution intent |
+| Table | game slice (a Zustand store of the reducer result, rebuilt by replaying the save once on open), image cache, `EFFECTS` from `src/effects` | each accepted intent, appended to `saves.activeScenario` |
+| Resolution | the campaign card's Resolution options the reducer lists, one group and one seat at a time | each chosen `ChooseResolution` intent, then the log on Confirm; a loss drops the open scenario and writes no log field |
 | Card | one cached file, catalog text | nothing |
 | Card pool | card rows loaded when the screen opens, then filtered in memory; `image_files` | nothing |
 | Deck | catalog, `decks` | `decks` |
 | Booklet | one `booklets` row and the file under `booklets/`; the import, the file copy and the reader view are in `src/screens/booklets/` | last page |
-| Debug | the open catalog, the open user database, and the image queue | nothing |
-
-The debug route reads the open databases and the image queue and is not a player screen.
 
 The campaign list, the path, the briefing, the log, and the table each open the booklet route and close back to that same screen. The reader is an in-app native view, full screen, with the close control in thumb reach. It is not a Skia surface and not a WebView. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 58 release when the campaign shell starts. That phase adds `expo-dev-client` and verifies one Expo PDF module against SDK 58. If that module does not build, a local view is allowed: PDFKit on iOS, `PdfRenderer` on Android. Phase 10 found no SDK 58 release (its README stops at SDK 56), so the reader is the local `modules/booklet-pdf`. It renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. A missing file does not block a scenario. Opening from a scenario starts on its `bookletPages` entry when one exists, and otherwise on the saved last page.
 
