@@ -1,7 +1,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
-// Encounter set The Black Riders (MEC109 encounter cards 74-75, codes 141074-141075).
-// Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the cards.
+// Encounter set The Black Riders (MEC109 #173-174, codes 141074-141075).
+// MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the cards.
 
 export const THE_BLACK_RIDERS_EFFECTS: readonly Effect[] = [
   // 141074 Black Steed, constant.

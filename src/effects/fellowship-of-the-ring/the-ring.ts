@@ -1,7 +1,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
-// Encounter set The Ring (MEC109 encounter card 76, code 141076).
-// Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
+// Encounter set The Ring (MEC109 #175, code 141076).
+// MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
 
 export const THE_RING_EFFECTS: readonly Effect[] = [
   // 141076 Lure of the Ring. 141085 is The One Ring.

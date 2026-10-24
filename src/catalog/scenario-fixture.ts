@@ -124,7 +124,7 @@ const SETUP_VERB = {
 } as const;
 
 // Order of the quest card's setup steps: set aside, add to staging, make a location active, then attach.
-// Source: MEC109 quest card 1A (Three is Company, 141022), setup side. Read via Hall of Beorn 2026-10-24.
+// Source: MEC109 #28 (Three is Company, 141022), setup side. TFotR printing read via Hall of Beorn 2026-10-24.
 // Confirm on the card.
 // Each copy is one instruction. The encounter and quest piles are dealt by the scenario script.
 export function setupInstructions(fixture: ScenarioFixture): Instruction[] {

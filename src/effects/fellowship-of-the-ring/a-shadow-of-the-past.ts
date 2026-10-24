@@ -1,7 +1,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
-// Encounter set A Shadow of the Past (MEC109 encounter cards 31-43, codes 141031-141043).
-// Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the cards.
+// Encounter set A Shadow of the Past (MEC109 #31-43, codes 141031-141043).
+// MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the cards.
 // Shadow instructions run for the defending seat. Their modifiers end with the attack.
 const ATTACK_PLUS_ONE: Effect["instructions"] = [
   { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker" },
@@ -54,7 +54,7 @@ export const A_SHADOW_OF_THE_PAST_EFFECTS: readonly Effect[] = [
     ],
   },
   // 141035 Bucklebury Ferry. The win record runs after the location leaves play explored.
-  // Win condition read via Hall of Beorn 2026-10-24 (TBR printing). Confirm on the card.
+  // Win condition: MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
   { id: "141035:questResolution:1", cardCode: "141035", timing: "questResolution", instructions: [{ verb: "WinGame" }] },
   {
     id: "141035:constant:1",

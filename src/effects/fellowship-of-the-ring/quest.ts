@@ -1,7 +1,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
-// Quest cards for A Shadow of the Past (MEC109 quest cards 22-24, codes 141022-141024).
-// Read via Hall of Beorn 2026-10-24, TBR printing (quest cards 28-30 there). Confirm on the cards.
+// Quest cards for A Shadow of the Past (MEC109 #28-30, codes 141022-141024).
+// MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the cards.
 //
 // A Setup record for a card the definition puts out describes the instructions that the scenario
 // definition already runs (see scenario-fixture.ts). searchSetup only runs a Setup record for a card it

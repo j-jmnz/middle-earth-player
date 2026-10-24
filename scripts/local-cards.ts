@@ -27,40 +27,39 @@ function printed(
   };
 }
 
-// Printed numbers read 2026-10-23 from the MEC109 card scans. Collector number is the card's own.
-// Unprinted numbers stay null. Ability text is not stored.
-//
-// Keywords and engagement cost were read 2026-10-24 through Hall of Beorn, a dev-time aid. Hall of Beorn
-// lists only the 2013 TBR printing of these cards, not the MEC109 printing. Each value is for the user to
-// confirm on the physical card. A keywords object of {} means the card was read and prints none. Null means
-// the card was not read.
+// Printed numbers, keywords, engagement cost, traits, and the unique flag were re-read 2026-10-24 from the
+// Hall of Beorn pages for the MEC109 (The Fellowship of the Ring, TFotR) printing, a dev-time aid. Each value
+// is for the user to confirm on the physical card. A keywords object of {} means the card was read and
+// prints none. Unprinted numbers stay null. Ability text is not stored.
+// `position` is the MEC109 collector number from those pages. The RingsDB-derived rows (141017, 141077,
+// 141078, 141079) keep their RingsDB position; their MEC109 numbers are in the comment on KEYWORD_OVERRIDES.
 
-// Three is Company, MEC109 quest card 22. Side B quest points 1. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// A Shortcut to Mushrooms, MEC109 quest card 23. Side B quest points 14. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Escape to Buckland, MEC109 quest card 24. Side B quest-point circle is a dash. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
+// Three is Company, MEC109 #28 (quest 1). Side B quest points 1. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// A Shortcut to Mushrooms, MEC109 #29 (quest 2). Side B quest points 14. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Escape to Buckland, MEC109 #30 (quest 3). Side B quest-point circle is a dash. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
 const quests: RingsDbCard[] = [
-  printed({ code: "141022", keywords: {}, name: "Three is Company", type_code: "quest", type_name: "Quest", position: 22, quantity: 1, quest: 1 }),
+  printed({ code: "141022", keywords: {}, name: "Three is Company", type_code: "quest", type_name: "Quest", position: 28, quantity: 1, quest: 1 }),
   printed({
     code: "141023",
     keywords: {},
     name: "A Shortcut to Mushrooms",
     type_code: "quest",
     type_name: "Quest",
-    position: 23,
+    position: 29,
     quantity: 1,
     quest: 14,
   }),
-  printed({ code: "141024", keywords: {}, name: "Escape to Buckland", type_code: "quest", type_name: "Quest", position: 24, quantity: 1 }),
+  printed({ code: "141024", keywords: {}, name: "Escape to Buckland", type_code: "quest", type_name: "Quest", position: 30, quantity: 1 }),
 ];
 
-// Bag End, encounter card 31. Unique. Threat 0, quest points 3, victory 1. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Woody End, encounter card 32. Unique. Threat 1, quest points 1, victory 1. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Stock-brook, encounter card 33. Unique. Threat 1, quest points 5, victory 1. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Bamfurlong, encounter card 34. Unique. Threat 2, quest points 2, victory 1. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Bucklebury Ferry, encounter card 35. Unique. Threat 3, quest points 9. Immune to player card effects. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Green Hill Country, encounter card 36. Threat 2, quest points 3. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Stock Road, encounter card 37. Threat 3, quest points 3. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// The Marish, encounter card 38. Threat 3, quest points 4. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
+// Bag End, MEC109 #31. Unique. Threat 0, quest points 3, victory 1. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Woody End, MEC109 #32. Unique. Threat 1, quest points 1, victory 1. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Stock-brook, MEC109 #33. Unique. Threat 1, quest points 5, victory 1. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Bamfurlong, MEC109 #34. Unique. Threat 2, quest points 2, victory 1. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Bucklebury Ferry, MEC109 #35. Unique. Threat 3, quest points 9. Immune to player card effects. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Green Hill Country, MEC109 #36. Threat 2, quest points 3. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Stock Road, MEC109 #37. Threat 3, quest points 3. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// The Marish, MEC109 #38. Threat 3, quest points 4. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
 const locations: RingsDbCard[] = [
   printed({
     code: "141031",
@@ -167,14 +166,14 @@ const locations: RingsDbCard[] = [
     threat: 3,
     quest: 4,
   }),
-  // Pathless Country, encounter card 72. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
+  // Pathless Country, MEC109 #171. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
   printed({
     code: "141072",
     keywords: {},
     name: "Pathless Country",
     type_code: "location",
     type_name: "Location",
-    position: 72,
+    position: 171,
     traits: "Forest.",
     quantity: 3,
     threat: 2,
@@ -182,8 +181,8 @@ const locations: RingsDbCard[] = [
   }),
 ];
 
-// Black Rider, encounter card 39. Threat 4, attack 5, defense 4, hit points 6. Engagement 35, Hide 2. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Evil Crow, encounter card 40. Threat 2, attack 0, defense 1, hit points 2. Engagement 25, no keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
+// Black Rider, MEC109 #39. Threat 4, attack 5, defense 4, hit points 6. Engagement 35, Hide 2. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Evil Crow, MEC109 #40. Threat 2, attack 0, defense 1, hit points 2. Engagement 25, no keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
 const enemies: RingsDbCard[] = [
   printed({
     code: "141039",
@@ -217,13 +216,13 @@ const enemies: RingsDbCard[] = [
   }),
 ];
 
-// Crawling Towards Him, encounter card 41. Peril, Hide 2. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Hunting for the Ring, encounter card 42. Doomed 2. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Have You Seen Baggins?, encounter card 43. Peril, Surge. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Piercing Cry, encounter card 73. Peril. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Black Steed, encounter card 74. Surge. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Rode Like a Gale, encounter card 75. No keywords. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
-// Lure of the Ring, encounter card 76. Surge. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
+// Crawling Towards Him, MEC109 #41. Peril, Hide 2. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Hunting for the Ring, MEC109 #42. Doomed 2. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Have You Seen Baggins?, MEC109 #43. Peril, Surge. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Piercing Cry, MEC109 #172. Peril. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Black Steed, MEC109 #173. Surge. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Rode Like a Gale, MEC109 #174. No keywords. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+// Lure of the Ring, MEC109 #175. Surge. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
 const treacheries: RingsDbCard[] = [
   printed({ code: "141041", keywords: { peril: true, hide: 2 }, name: "Crawling Towards Him", type_code: "treachery", type_name: "Treachery", position: 41, quantity: 3 }),
   printed({ code: "141042", keywords: { doomed: 2 }, name: "Hunting for the Ring", type_code: "treachery", type_name: "Treachery", position: 42, quantity: 3 }),
@@ -236,22 +235,22 @@ const treacheries: RingsDbCard[] = [
     position: 43,
     quantity: 2,
   }),
-  printed({ code: "141073", keywords: { peril: true }, name: "Piercing Cry", type_code: "treachery", type_name: "Treachery", position: 73, quantity: 3 }),
+  printed({ code: "141073", keywords: { peril: true }, name: "Piercing Cry", type_code: "treachery", type_name: "Treachery", position: 172, quantity: 3 }),
   printed({
     code: "141074",
     keywords: { surge: true },
     name: "Black Steed",
     type_code: "treachery",
     type_name: "Treachery",
-    position: 74,
+    position: 173,
     traits: "Morgul.",
     quantity: 3,
   }),
-  printed({ code: "141075", keywords: {}, name: "Rode Like a Gale", type_code: "treachery", type_name: "Treachery", position: 75, quantity: 2 }),
-  printed({ code: "141076", keywords: { surge: true }, name: "Lure of the Ring", type_code: "treachery", type_name: "Treachery", position: 76, quantity: 3 }),
+  printed({ code: "141075", keywords: {}, name: "Rode Like a Gale", type_code: "treachery", type_name: "Treachery", position: 174, quantity: 2 }),
+  printed({ code: "141076", keywords: { surge: true }, name: "Lure of the Ring", type_code: "treachery", type_name: "Treachery", position: 175, quantity: 3 }),
 ];
 
-// The One Ring, MEC109 objective card 85. Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the card.
+// The One Ring, MEC109 #166 (objective). MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
 // Not part of the encounter deck. The A Shadow in the East attachment 21001 is a different card.
 const theOneRing: RingsDbCard = printed({
   code: "141085",
@@ -259,7 +258,7 @@ const theOneRing: RingsDbCard = printed({
   name: "The One Ring",
   type_code: "objective",
   type_name: "Objective",
-  position: 85,
+  position: 166,
   traits: "Artifact. Item. Ring.",
   is_unique: true,
   quantity: 1,
@@ -268,11 +267,14 @@ const theOneRing: RingsDbCard = printed({
 export const LOCAL_CARDS: readonly RingsDbCard[] = [...quests, ...locations, ...enemies, ...treacheries, theOneRing];
 
 // Keywords for dealt cards that come from RingsDB, which carries no keyword field. Read 2026-10-24 through
-// Hall of Beorn (TBR printing). Confirm on the card. Nothing here is parsed from card text.
-// 141017 Mr. Underhill: Permanent.
-// 141077 Gildor Inglorion: no keywords.
-// 141078 Gandalf's Delay: no keywords.
-// 141079 The Ring Draws Them: Surge.
+// Hall of Beorn (MEC109/TFotR printing). Confirm on the card. Nothing here is parsed from card text.
+// 141017 Mr. Underhill, MEC109 #44 (attachment, boon): Permanent.
+// 141077 Gildor Inglorion, MEC109 #45 (objective ally, boon): no keywords.
+// 141078 Gandalf's Delay, MEC109 #46 (objective, burden): no keywords.
+// 141079 The Ring Draws Them, MEC109 #47 (treachery, burden): Surge.
+// The RingsDB rows type these four cards "treasure" (Campaign); the printed types are the ones above. The
+// type_code stays as RingsDB has it. A revealed treachery or treasure stays in staging either way (user
+// decision), so nothing branches on it.
 export const KEYWORD_OVERRIDES: Readonly<Record<string, PrintedKeywords>> = {
   "141017": { permanent: true },
   "141077": {},

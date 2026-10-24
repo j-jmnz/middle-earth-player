@@ -1,8 +1,10 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
 // Campaign cards that come from RingsDB, dealt by A Shadow of the Past (codes 141017, 141077-141079) and
-// The One Ring (141085, a local record). Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the cards.
-// 141077 cancel cost sphere: RingsDB and Hall of Beorn disagree. Sphere source conflict, confirm on the card.
+// The One Ring (141085, a local record). Mr. Underhill is MEC109 #44, Gildor Inglorion #45, Gandalf's Delay #46,
+// The Ring Draws Them #47, The One Ring #166. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the cards.
+// 141077 cancel cost sphere: the TFotR page shows the Fellowship sphere icon (the record's value); RingsDB's
+// sphere differs. Sphere source conflict, confirm on the card.
 //
 // Setup records for 141017, 141078, and 141085 describe placement that the definition (141017, 141078)
 // or the campaign script (141085) already runs. They never place a card a second time: see quest.ts.

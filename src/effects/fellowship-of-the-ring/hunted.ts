@@ -1,7 +1,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
-// Encounter set Hunted (MEC109 encounter cards 72-73, codes 141072-141073).
-// Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the cards.
+// Encounter set Hunted (MEC109 #171-172, codes 141072-141073).
+// MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the cards.
 
 const NAZGUL = "Nazgûl";
 

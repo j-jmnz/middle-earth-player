@@ -287,7 +287,7 @@ Each chosen card is added to the campaign pool and recorded on the log. Look up 
 
 The fixture names each reward group by card name. The catalog build resolves a name to the code of the one dealt card with that name, and fails when none or several match. The scenario definition holds the codes. After a win the reducer opens one resolution window per group, in order, and `ChooseResolution` carries a code from that group. A scenario that is lost writes nothing. A scenario already on the log is not granted again. A chosen Permanent card is recorded as attached, not as a pool card.
 
-Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury Ferry: after it leaves play explored, the players win. Read via Hall of Beorn 2026-10-24 (TBR printing). Confirm on the card.
+Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury Ferry: after it leaves play explored, the players win. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
 
 ### Hide tests
 
@@ -408,7 +408,7 @@ An Action or Response may name a `cost` (exhaust or discard the card, add it to 
 
 The Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog`. `src/effects` holds the authored records. The interpreter takes the effect list as an argument and does not import `src/effects`. Vitest passes the TypeScript records. The phone loads rows from `catalog.db` and passes those. The build script is the only production writer of that table.
 
-Gandalf's Delay has two Setup sentences: it goes to staging, and each player draws one fewer card in their starting hand. The second is the `ReduceOpeningHand` instruction. It is cited to MEC109 #46 as read via Hall of Beorn's TFotR printing on 2026-10-24 (user-accepted), and still awaits confirmation on the physical card. The engine applies it with player Setup, before the opening hand, so the opening hand and a mulligan redraw both draw 6 minus the reduction.
+Gandalf's Delay has two Setup sentences: it goes to staging, and each player draws one fewer card in their starting hand. The second is the `ReduceOpeningHand` instruction. It is cited to MEC109 #46 as read via Hall of Beorn's TFotR printing on 2026-10-24 (user-accepted), and still awaits confirmation on the physical card. RingsDB's errata row for 141078 describes a different starting-hand rule than the MEC109 printing; the MEC109 printing wins (user decision), and the errata text is not stored in git. The engine applies it with player Setup, before the opening hand, so the opening hand and a mulligan redraw both draw 6 minus the reduction.
 
 3. **Player cards with no effect row.** The card can be paid for, played, quested, defended, and attacked with using printed numbers and implemented keywords. Its unique sentence is inactive: it is shown, it is not offered, and there is no sheet on which the player applies it. The mark is the absence of the row. When the row exists, the ability becomes a normal legal intent or a normal engine step.
 
