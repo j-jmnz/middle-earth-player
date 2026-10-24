@@ -67,6 +67,7 @@ export function pickCandidates(
     if (spec.type !== "card" && !(spec.type === "character" ? printed.type === "hero" || printed.type === "ally" : printed.type === spec.type)) return false;
     if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
     if (spec.sphere && printed.sphere !== spec.sphere) return false;
+    if (spec.exceptSphere && printed.sphere === spec.exceptSphere) return false;
     if (spec.cardType && printed.type !== spec.cardType) return false;
     if (spec.committed && !instance.committed) return false;
     if (spec.participating && !(participants ?? []).includes(id)) return false;

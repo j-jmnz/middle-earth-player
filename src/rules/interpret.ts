@@ -87,7 +87,7 @@ export function runInstruction(
     case "RevealStaging":
       return revealNow(state, focus.seat, ctx, steps);
     case "RaiseThreat":
-      return raiseFor(state, instruction, focus, steps);
+      return raiseFor(state, instruction, focus, ctx, steps);
     case "PlaceProgress":
       return placeOneProgress(state, focus.sourceId, steps);
     case "DealDamage":

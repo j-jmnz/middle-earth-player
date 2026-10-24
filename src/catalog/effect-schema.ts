@@ -108,6 +108,8 @@ export const pickSchema = z.strictObject({
   state: z.enum(["ready", "exhausted"]).optional(),
   different: z.boolean().optional(),
   attackableByPicked: z.boolean().optional(),
+  // A card of any sphere but this one ("non-Fellowship hero", 141051:A:2).
+  exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
   // A character that could attack some enemy engaged with a player, whether or not it is exhausted yet.
   canAttack: z.boolean().optional(),
   // An ally in a discard pile or the hand whose printed cost is X (Stand and Fight): the amount the effect names.
@@ -160,6 +162,13 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("hostNamed"), name: z.string().min(1) }),
   // The actor controls a hero or ally in play with this code.
   z.strictObject({ kind: z.literal("controls"), code: z.string().min(1) }),
+  // A copy of this card is set aside, out of play (a quest card's Setup put it there: 141025:A:1, "shuffle 1 out of play
+  // Ringwraith into the encounter deck" on 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2).
+  z.strictObject({ kind: z.literal("setAside"), code: z.string().min(1) }),
+  // The current quest card has progress on it (141026:B:2: removing progress is an effect that changes the game, rr.effects).
+  z.strictObject({ kind: z.literal("questProgress") }),
+  // An enemy (with this trait, if one is named) is in play (`is`) or none is (141027:B:1).
+  z.strictObject({ kind: z.literal("enemyInPlay"), trait: z.string().min(1).optional(), is: z.boolean() }),
 ]);
 
 // The conditions a stat modifier carries and checks each time the stat is read.
@@ -221,7 +230,12 @@ const modifyStatSchema = z.strictObject({
   ...when,
 });
 
-const searchSelector = { code: z.string().min(1).optional(), trait: z.string().min(1).optional() };
+// A card in the encounter deck or discard pile: by code, by trait, and by printed type ("each Nazgûl enemy", 141027:A:1).
+const searchSelector = {
+  code: z.string().min(1).optional(),
+  trait: z.string().min(1).optional(),
+  type: z.enum(["enemy", "location", "treachery"]).optional(),
+};
 
 const simpleVerbs = [
   // Draws `amount` cards (one by default), or that many for each Hobbit hero. `who`: the actor, the picked player, or the
@@ -278,10 +292,19 @@ const simpleVerbs = [
   verb("Commit"),
   verb("RevealStaging"),
   verb("PlaceProgress"),
+  // Raises a threat dial by `amount` (1 by default). `eachSeat` raises every living seat's. With `perCommitted` the amount
+  // counts once for each such card the seat has committed to the quest ("1 for each non-Fellowship hero he committed to the
+  // quest", 141051:A:2).
   z.strictObject({
     verb: z.literal("RaiseThreat"),
     amount: z.number().int().positive().optional(),
-    who: z.enum(["actor", "firstPlayer", "otherPlayer"]).optional(),
+    who: z.enum(["actor", "firstPlayer", "otherPlayer", "eachSeat"]).optional(),
+    perCommitted: z
+      .strictObject({
+        type: z.literal("hero"),
+        exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
+      })
+      .optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("Travel"), to: z.literal("self").optional(), ...when }),
@@ -299,6 +322,16 @@ const simpleVerbs = [
   codeVerb("AttachToRingBearer"),
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal.
   codeVerb("AddSetAsideToStaging"),
+  // During play: one set-aside copy of the card joins the encounter deck, which is shuffled ("shuffle 1 out of play
+  // Ringwraith into the encounter deck", 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2). Nothing happens with no copy left.
+  codeVerb("ShuffleSetAsideIntoEncounterDeck"),
+  // Removes progress from the current quest card, `perPlayer` for each player in the game. It stops at 0 (141026:B:2).
+  z.strictObject({ verb: z.literal("RemoveQuestProgress"), perPlayer: z.number().int().positive(), ...when }),
+  // Places progress on the current quest, `perPlayer` for each player in the game. The active location takes it first
+  // (rr.active-location), and a full quest card advances (rr.quest-advancement) unless something forbids it (141026:B:1).
+  z.strictObject({ verb: z.literal("PlaceQuestProgress"), perPlayer: z.number().int().positive(), ...when }),
+  // The last picked character is removed from the quest: it stays exhausted and its willpower no longer counts (141054:A:2).
+  verb("RemoveFromQuest"),
   verb("ShuffleEncounterDeck"),
   // Setup: each player draws this many fewer cards in the starting hand (and in a mulligan redraw).
   z.strictObject({ verb: z.literal("ReduceOpeningHand"), amount: z.number().int().positive(), ...when }),
@@ -306,11 +339,13 @@ const simpleVerbs = [
   z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, ...when }),
   // Finds a card in the encounter deck or discard pile and reveals it.
   z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, ...when }),
-  // Finds a card in the encounter deck or discard pile and puts it out without revealing it.
+  // Finds a card in the encounter deck or discard pile and puts it out without revealing it. With `each`, every card that
+  // matches goes ("add each Nazgûl enemy found to the staging area", 141027:A:1) and nobody chooses.
   z.strictObject({
     verb: z.literal("SearchMove"),
     ...searchSelector,
     to: z.enum(["staging", "engagedFirstPlayer"]),
+    each: z.boolean().optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("ReturnToStaging"), target: targetSchema, ...when }),

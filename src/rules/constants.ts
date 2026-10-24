@@ -75,6 +75,18 @@ export function syncConstants(state: ScenarioState, ctx: ReduceContext): Scenari
   return { ...state, modifiers: [...state.modifiers.filter((modifier) => modifier.origin == null), ...desired] };
 }
 
+// A constant victory condition ("If there are no Nazgûl enemies in play, the players win the game", 141027:B:1) ends the
+// game as soon as it is met (rr.winning-the-game). It is read once no effect is resolving, so a stage whose When Revealed
+// puts the enemies out is not won before they arrive. An open window closes: the resolution asks next.
+export function constantWin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  if (state.stageCleared || state.lost || state.failure || state.stack.length > 0) return state;
+  if (!ctx.effects.some((effect) => effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === "WinGame"))) return state;
+  for (const { instruction } of constantInstructions(state, ctx)) {
+    if (instruction.verb === "WinGame") return { ...state, stageCleared: true, window: null, pendingAttack: null };
+  }
+  return state;
+}
+
 export type HoldCounts = { committed: number; ally: number };
 
 // A Hide number held by the table or by one seat. `per` modifiers count once for each committed character or ally.

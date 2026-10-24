@@ -323,6 +323,8 @@ function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] 
 
 function picksOne(instruction: Instruction): boolean {
   if (instruction.verb === "ReturnToStaging") return instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose";
+  // "Add each Nazgûl enemy found": every match goes, and nobody chooses.
+  if (instruction.verb === "SearchMove") return instruction.each !== true;
   return true;
 }
 
@@ -367,9 +369,12 @@ function applyTargeted(
       return updateCard(attached, sourceId, { face: "up" });
     }
     case "SearchMove": {
-      if (!first) return state;
-      if (instruction.to === "staging") return moveCard(state, first, { zone: "staging" });
-      return moveCard(state, first, { zone: "engaged", seat: state.firstPlayer });
+      let next = state;
+      for (const id of instruction.each ? ids : ids.slice(0, 1)) {
+        next = instruction.to === "staging" ? moveCard(next, id, { zone: "staging" }) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
+        if (instruction.each) next = updateCard(next, id, { face: "up" });
+      }
+      return next;
     }
     case "SearchReveal":
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first) : state;

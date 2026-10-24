@@ -28,6 +28,7 @@ import { engagementStep, engageEnemy, stagingEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
 import { crossBoundary } from "./triggers.ts";
+import { constantWin } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
 import { discardShadows, resolveAttack } from "./shadow.ts";
 import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
@@ -35,6 +36,7 @@ import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.t
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
+    current = constantWin(current, ctx);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {

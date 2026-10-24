@@ -1,4 +1,4 @@
-// Rules: rr.quest-cards-quest-deck (data/rules/entries.json).
+// Rules: rr.quest-cards-quest-deck, rr.quest-advancement (data/rules/entries.json).
 import { pushCardEffects } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import { runQuestResolution } from "./explore.ts";
@@ -18,7 +18,13 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const resolved = resolveQuest(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
-  let next: ScenarioState = { ...resolved, questResolved: true };
+  return afterProgress({ ...resolved, questResolved: true }, before, ctx, steps);
+}
+
+// After progress was placed on the quest (from `steps[before]` on): each stage the quest advanced to has its When Revealed
+// effects pushed as frames, and a location the progress explored has its Responses offered first.
+export function afterProgress(state: ScenarioState, before: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  let next = state;
   const advanced = steps.slice(before).flatMap((step) => (step.kind === "advance" ? [step.cardId] : []));
   // A location the progress explored has left play. Responses to that are offered before the stage's own effects.
   const explored = steps.slice(before).flatMap((step) => (step.kind === "destroy" && isLocation(next, step.targetId, ctx) ? [step.targetId] : []));

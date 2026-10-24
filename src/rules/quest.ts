@@ -75,7 +75,9 @@ function advanceReady(state: ScenarioState, cards: Cards, steps: EngineStep[], c
   return advanceStage(state, cards, steps, 0, canAdvance);
 }
 
-function placeQuestProgress(
+// Progress on the quest goes on the active location first, up to its quest points, and the rest on the current quest card
+// (rr.active-location). A full quest card advances when `canAdvance` allows it (rr.quest-advancement).
+export function placeQuestProgress(
   state: ScenarioState,
   amount: number,
   cards: Cards,

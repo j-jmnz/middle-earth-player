@@ -92,6 +92,19 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return Object.values(state.cards).some(
         (card) => card.code === condition.code && card.controller === scope.actor && (card.zone === "heroes" || card.zone === "play"),
       );
+    case "setAside":
+      return state.setAside.some((id) => state.cards[id]?.code === condition.code);
+    case "questProgress": {
+      const stage = state.questStage ? state.cards[state.questStage] : undefined;
+      return stage != null && stage.progress > 0;
+    }
+    case "enemyInPlay": {
+      const trait = condition.trait;
+      const found = Object.values(state.cards).some(
+        (card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && (trait == null || hasTrait(state, card.id, trait, ctx)),
+      );
+      return found === condition.is;
+    }
     case "attachedToHero":
       return (
         Object.values(state.cards).some((card) => {
@@ -144,10 +157,10 @@ export function grantedIcons(state: ScenarioState, id: string, ctx: ReduceContex
   return grants(state, id, ctx).flatMap((grant) => (grant.sphere ? [grant.sphere] : []));
 }
 
-// Cards in the encounter deck, then the discard pile, that match a code or trait.
+// Cards in the encounter deck, then the discard pile, that match a code, a trait and a printed type.
 export function searchable(
   state: ScenarioState,
-  selector: { code?: string; trait?: string },
+  selector: { code?: string; trait?: string; type?: string },
   ctx: ReduceContext,
   zones: readonly ("encounterDeck" | "encounterDiscard")[] = ["encounterDeck", "encounterDiscard"],
 ): string[] {
@@ -159,6 +172,7 @@ export function searchable(
       const printed = printedOf(ctx.cards, instance.code);
       if (selector.code != null && printed.code !== selector.code) continue;
       if (selector.trait != null && !printed.traits.includes(selector.trait)) continue;
+      if (selector.type != null && printed.type !== selector.type) continue;
       found.push(id);
     }
   }

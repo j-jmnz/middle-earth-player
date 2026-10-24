@@ -1,3 +1,4 @@
+// Rules: rr.in-play-and-out-of-play, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { runAttackVerb } from "./attack-verbs.ts";
@@ -8,9 +9,12 @@ import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, eliminateEmpties, raiseThreat } from "./keywords.ts";
 import { lastPicked, otherSeat } from "./player-verbs.ts";
-import { engageEnemy, stagingEnemies } from "./quest.ts";
+import { printedOf } from "./printed.ts";
+import { engageEnemy, placeQuestProgress, stagingEnemies } from "./quest.ts";
+import { restricted } from "./restrictions.ts";
 import { shuffleIds } from "./seed.ts";
-import { updateCard, type ScenarioState } from "./state.ts";
+import { afterProgress } from "./stage-reveal.ts";
+import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
 
@@ -42,6 +46,22 @@ export function runExtraVerb(
     case "AddSetAsideToStaging": {
       const id = state.setAside.find((candidate) => state.cards[candidate]?.code === instruction.code);
       return id ? updateCard(moveCard(state, id, { zone: "staging" }), id, { face: "up" }) : state;
+    }
+    case "ShuffleSetAsideIntoEncounterDeck": {
+      // "Out of play" here is the set-aside pile the quest card's Setup made (141025:A:1).
+      const id = state.setAside.find((candidate) => state.cards[candidate]?.code === instruction.code);
+      return id ? shuffleEncounterDeck(updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down" })) : state;
+    }
+    case "RemoveQuestProgress":
+      return removeQuestProgress(state, instruction.perPlayer * livingSeats(state).length, steps);
+    case "PlaceQuestProgress": {
+      const before = steps.length;
+      const placed = placeQuestProgress(state, instruction.perPlayer * livingSeats(state).length, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
+      return afterProgress(placed, before, ctx, steps);
+    }
+    case "RemoveFromQuest": {
+      const id = lastPicked(state);
+      return state.cards[id]?.committed ? updateCard(state, id, { committed: false }) : state;
     }
     case "EngageAll": {
       const seat = seatFor(state, instruction.who, focus.seat);
@@ -113,10 +133,35 @@ export function raiseFor(
   state: ScenarioState,
   instruction: Extract<Instruction, { verb: "RaiseThreat" }>,
   focus: VerbFocus,
+  ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  const seat = seatFor(state, instruction.who, focus.seat);
-  return raiseThreat(state, seat, instruction.amount ?? 1, steps, currentCause(steps, UNATTRIBUTED));
+  const seats = instruction.who === "eachSeat" ? livingSeats(state) : [seatFor(state, instruction.who, focus.seat)];
+  let next = state;
+  for (const seat of seats) {
+    const count = instruction.perCommitted ? committedHeroes(next, seat, instruction.perCommitted.exceptSphere, ctx) : 1;
+    next = raiseThreat(next, seat, (instruction.amount ?? 1) * count, steps, currentCause(steps, UNATTRIBUTED));
+  }
+  return next;
+}
+
+// The heroes a seat has committed to the quest, leaving out those of one sphere ("each non-Fellowship hero he committed").
+function committedHeroes(state: ScenarioState, seat: number, exceptSphere: string | undefined, ctx: ReduceContext): number {
+  return (state.seats[seat]?.heroes ?? []).filter((id) => {
+    const hero = state.cards[id];
+    return hero?.committed === true && (exceptSphere == null || printedOf(ctx.cards, hero.code).sphere !== exceptSphere);
+  }).length;
+}
+
+// Progress comes off the current quest card and stops at 0. The step records what was removed, as a negative amount.
+function removeQuestProgress(state: ScenarioState, amount: number, steps: EngineStep[]): ScenarioState {
+  const id = state.questStage;
+  const stage = id ? state.cards[id] : undefined;
+  if (!id || !stage) return state;
+  const removed = Math.min(amount, stage.progress);
+  if (removed <= 0) return state;
+  steps.push({ kind: "progress", targetId: id, amount: -removed, cause: currentCause(steps, UNATTRIBUTED) });
+  return updateCard(state, id, { progress: stage.progress - removed });
 }
 
 function discardTarget(
