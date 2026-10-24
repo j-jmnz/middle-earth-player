@@ -14,7 +14,7 @@ import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, 
 import type { Frame } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
-import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";
+import { branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
 import { TIMING_WORDS, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type PickOption, type Sheet, type SheetNames, type SheetOption, type TriggerOption, type Unavailable } from "./sheet-types.ts";
@@ -245,7 +245,12 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         ...base,
         note: [`${asked.prompt}${who}`, line].filter((part) => part != null).join(" "),
         verb: asked.verb,
-        options: window.options.map((id): PickOption => ({ ...option(game, names, id), intent: { type: "Choose", optionId: id } })),
+        options: window.options.map((id): PickOption => {
+          const base = option(game, names, id);
+          // Copies of one card in different zones are told apart by where each one is.
+          const label = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck" ? outOfPlayLabel(game, id, words) : base.label;
+          return { ...base, label, intent: { type: "Choose", optionId: id } };
+        }),
       };
     }
     case "cancelOffer":

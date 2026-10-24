@@ -117,6 +117,11 @@ export type PickWords = { verb: string; prompt: string };
 
 /** What a Pick asks for, from the instruction that uses the picked card: the verb for the button and a prompt sentence. */
 export function pickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null): PickWords {
+  // Out-of-play copies in different zones (rr.in-play-and-out-of-play, rr.first-player): which one joins the encounter deck.
+  if (pick.verb === "ShuffleOutOfPlayIntoEncounterDeck") {
+    const name = names.code(pick.code);
+    return { verb: "Shuffle in", prompt: `Choose which out-of-play ${name} is shuffled into the encounter deck. Any other copy stays where it is.` };
+  }
   if (pick.verb !== "Pick") return { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);
@@ -131,5 +136,23 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Place", prompt: `Choose ${one} to place facedown under ${sourceId ? names.card(sourceId) : "the location"}.` };
     default:
       return { verb: "Choose", prompt: `Choose ${one}.` };
+  }
+}
+
+/** Where an out-of-play card is, for an option that names one copy among several: "Ringwraith set aside". */
+export function outOfPlayLabel(game: ScenarioState, cardId: string, names: ChoiceNames): string {
+  const card = game.cards[cardId];
+  const name = card ? names.code(card.code) : cardId;
+  switch (card?.zone) {
+    case "setAside":
+      return `${name} set aside`;
+    case "encounterDiscard":
+      return `${name} from the encounter discard pile`;
+    case "victory":
+      return `${name} from the victory display`;
+    case "under":
+      return `${name} under ${card.host ? names.card(card.host) : "a location"}`;
+    default:
+      return name;
   }
 }
