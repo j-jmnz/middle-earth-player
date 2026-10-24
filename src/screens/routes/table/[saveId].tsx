@@ -1,13 +1,14 @@
 // The table for the open scenario of a save. The canvas is src/play; this screen opens the session, keeps each accepted
 // intent in user.db, and hands the canvas the pictures in the image cache. The reducer is the only writer of the game.
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, View, type LayoutChangeEvent } from "react-native";
 import { useStore } from "zustand";
 
 import { QuestBand } from "../../../play/quest-band";
 import { railFor } from "../../../play/rail";
-import { threatSelector } from "../../../play/selectors";
+import { prefetchCodes, resolutionCodes } from "../../../play/prefetch";
+import { shownSeat, threatSelector, zoneSelector } from "../../../play/selectors";
 import { dropOutcome, targetFromKey } from "../../../play/selection";
 import { actionsSheet, commitSheet, paySheet, sheetFor, type Sheet, type SheetNames } from "../../../play/sheets";
 import type { PlayerIntent, ScenarioState, TableStore } from "../../../play/store";
@@ -18,6 +19,7 @@ import { BodyText, NavBar, Screen } from "../../chrome";
 import { bookletParams } from "../../campaign-data";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
+import { enqueueImageDownloads } from "../../images/queue";
 import { scanAssets } from "../../images/scan-map";
 import { cachedImage, useImageSnapshot } from "../../images/store";
 import { routeCode } from "../../route-code";
@@ -48,6 +50,24 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   const [collapsed, setCollapsed] = useState<string | null>(null);
   const [logOpen, setLogOpen] = useState(false);
   const roundSteps = useStore(store, (state) => state.roundSteps);
+
+  // Prefetch the hand, staging and the screen about to open; never the whole cache. The canvas draws names until a file lands.
+  const seat = useStore(store, (state) => shownSeat(state.game));
+  const handOf = useMemo(() => zoneSelector("hand", seat), [seat]);
+  const stagingOf = useMemo(() => zoneSelector("staging", seat), [seat]);
+  const hand = useStore(store, (state) => handOf(state.game));
+  const staging = useStore(store, (state) => stagingOf(state.game));
+  const selected = useStore(store, (state) => state.selected);
+  const won = game.stageCleared;
+  useEffect(() => {
+    const current = store.getState().game;
+    const next = [...resolutionCodes(current), ...(selected ? [current.cards[selected]?.code ?? ""] : [])];
+    const jobs = prefetchCodes(current, seat, next).flatMap((code) => {
+      const imagesrc = session.facts.get(code)?.imagesrc;
+      return imagesrc ? [{ code, imagesrc, first: true }] : [];
+    });
+    if (jobs.length > 0) enqueueImageDownloads(jobs);
+  }, [store, session, seat, hand, staging, selected, won]);
 
   const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
   const names: SheetNames = useMemo(
