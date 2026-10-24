@@ -13,6 +13,7 @@ export type CardType =
 
 export type Keywords = {
   surge: boolean;
+  hide: number | null;
   doomed: number | null;
   peril: boolean;
   archery: number | null;
@@ -46,6 +47,7 @@ export type PrintedCard = {
 
 const EMPTY_KEYWORDS: Keywords = {
   surge: false,
+  hide: null,
   doomed: null,
   peril: false,
   archery: null,
@@ -59,7 +61,8 @@ const EMPTY_KEYWORDS: Keywords = {
 };
 
 export function definePrinted(
-  card: Partial<PrintedCard> & Pick<PrintedCard, "code" | "name" | "type">,
+  card: Partial<Omit<PrintedCard, "keywords">> &
+    Pick<PrintedCard, "code" | "name" | "type"> & { keywords?: Partial<Keywords> },
 ): PrintedCard {
   return {
     sphere: null,

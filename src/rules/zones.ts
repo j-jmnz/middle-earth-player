@@ -187,16 +187,4 @@ export function spawn(
   return { state: attach(recorded, id, dest), id };
 }
 
-export function inPlay(zone: ZoneName): boolean {
-  return (
-    zone === "heroes" ||
-    zone === "play" ||
-    zone === "engaged" ||
-    zone === "staging" ||
-    zone === "seatStaging" ||
-    zone === "activeLocation" ||
-    zone === "secondActiveLocation" ||
-    zone === "questStage" ||
-    zone === "seatQuest"
-  );
-}
+export { inPlay } from "./state.ts";

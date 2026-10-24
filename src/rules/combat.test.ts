@@ -8,7 +8,7 @@ import { legalIntents, legalTargets, reduce } from "./reduce.ts";
 import { blankScenario, updateCard, withThreat, type ScenarioState } from "./state.ts";
 import { moveCard, spawn } from "./zones.ts";
 
-function enemy(code: string, patch: Parameters<typeof definePrinted>[0] = { code, name: code, type: "enemy" }) {
+function enemy(code: string, patch: Partial<Parameters<typeof definePrinted>[0]> = {}) {
   return definePrinted({
     attack: 0,
     defense: 0,

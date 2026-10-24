@@ -1,11 +1,12 @@
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 
 import type { EngineStep } from "./intents.ts";
-import { placeDamage, playerCardEffectCanChoose, raiseThreat } from "./keywords.ts";
+import { addModifier, placeDamage, playerCardEffectCanChoose, raiseThreat } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
+import { revealNow } from "./frames.ts";
 import { engageEnemy, stagingEnemies, stagingLocations, travelTo } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
-import { livingSeats, updateCard } from "./state.ts";
+import { updateCard } from "./state.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 
@@ -21,60 +22,6 @@ export function addToStaging(state: ScenarioState, id: string): ScenarioState {
   if (!instance) return state;
   const moved = moveCard(state, id, { zone: "staging" });
   return updateCard(moved, id, { face: "up" });
-}
-
-export function revealEncounter(
-  state: ScenarioState,
-  seat: number,
-  ctx: ReduceContext,
-  steps: EngineStep[],
-): ScenarioState {
-  const id = state.encounterDeck[0];
-  if (!id) return state;
-  let next = moveCard(state, id, { zone: "staging" });
-  next = updateCard(next, id, { face: "up", controller: seat });
-  steps.push({ kind: "reveal", seat, cardId: id });
-  const printed = printedOf(ctx.cards, next.cards[id]?.code ?? "");
-  if (printed.keywords.peril) next = { ...next, perilSeat: seat };
-  if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
-    for (let index = 0; index < next.seatCount; index += 1) {
-      next = raiseThreat(next, index, printed.keywords.doomed, steps);
-    }
-  }
-  next = runRevealed(next, id, seat, printed.keywords.peril, ctx, steps);
-  const revealing = next.seats[seat];
-  if (printed.keywords.surge && !next.lost && !next.failure && revealing && !revealing.eliminated) {
-    next = revealEncounter(next, seat, ctx, steps);
-  }
-  if (printed.keywords.peril) next = { ...next, perilSeat: null };
-  return next;
-}
-
-function runRevealed(
-  state: ScenarioState,
-  id: string,
-  seat: number,
-  peril: boolean,
-  ctx: ReduceContext,
-  steps: EngineStep[],
-): ScenarioState {
-  const code = state.cards[id]?.code;
-  if (!code) return state;
-  const matching = ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
-  if (!matching) return state;
-  return withFrame(state, "whenRevealed", id, peril, (framed) => {
-    return runEffects(framed, id, ["whenRevealed"], seat, ctx, steps);
-  }, steps);
-}
-
-export function stageAll(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
-  for (const seat of livingSeats(state)) {
-    if (next.lost || next.failure) return next;
-    if (next.seats[seat]?.eliminated) continue;
-    next = revealEncounter(next, seat, ctx, steps);
-  }
-  return next;
 }
 
 export function runEffects(
@@ -98,7 +45,7 @@ export function runEffects(
   return next;
 }
 
-function runEffect(
+export function runEffect(
   state: ScenarioState,
   effect: Effect,
   sourceId: string,
@@ -128,7 +75,7 @@ export function runInstruction(
     case "GainResources":
       return gainSeatResources(state, focus.seat, steps);
     case "RevealStaging":
-      return revealEncounter(state, focus.seat, ctx, steps);
+      return revealNow(state, focus.seat, ctx, steps);
     case "RaiseThreat":
       return raiseThreat(state, focus.seat, 1, steps);
     case "PlaceProgress":
@@ -151,6 +98,10 @@ export function runInstruction(
       return focus.sourceId ? dealOneShadow(state, focus.sourceId) : state;
     case "ResolveEffect":
       return withFrame(state, "ResolveEffect", focus.sourceId, false, (framed) => framed, steps);
+    case "ModifyStat":
+      return focus.sourceId
+        ? addModifier(state, focus.sourceId, instruction.stat, instruction.amount, instruction.until)
+        : state;
     case "Exhaust":
       return focus.sourceId ? updateCard(state, focus.sourceId, { exhausted: true }) : state;
     case "Ready":

@@ -2,7 +2,7 @@ import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
 import { isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
-import { livingSeats, updateCard } from "./state.ts";
+import { expireModifiers, livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, runEffects, type ReduceContext } from "./interpret.ts";
 import { withFrame } from "./windows.ts";
 import { inPlay, moveCard } from "./zones.ts";
@@ -155,14 +155,15 @@ export function applyUndefended(
 }
 
 function finishAttack(state: ScenarioState, enemyId: string): ScenarioState {
-  if (state.resolvedAttacks.includes(enemyId)) {
-    return { ...state, pendingAttack: null, window: null };
+  const done = expireModifiers(state, ["endOfAttack"]);
+  if (done.resolvedAttacks.includes(enemyId)) {
+    return { ...done, pendingAttack: null, window: null };
   }
   return {
-    ...state,
+    ...done,
     pendingAttack: null,
     window: null,
-    resolvedAttacks: [...state.resolvedAttacks, enemyId],
+    resolvedAttacks: [...done.resolvedAttacks, enemyId],
   };
 }
 

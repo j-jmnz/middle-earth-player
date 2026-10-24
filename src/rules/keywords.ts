@@ -1,7 +1,9 @@
+import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
+
 import type { EngineStep } from "./intents.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
-import { livingSeats, updateCard, withSeat, withThreat } from "./state.ts";
+import { livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 
 export type DamageSource = "framework" | "player";
@@ -9,15 +11,27 @@ export type DamageSource = "framework" | "player";
 export function modifiedStat(
   state: ScenarioState,
   instance: CardInstance,
-  stat: "willpower" | "attack" | "defense",
+  stat: ModifierStat,
   cards: ReadonlyMap<string, PrintedCard>,
 ): number {
   const printed = printedOf(cards, instance.code);
   let total = printed[stat] ?? 0;
   for (const modifier of state.modifiers) {
-    if (modifier.instanceId === instance.id && modifier.stat === stat) total += modifier.amount;
+    if (modifier.instanceId !== instance.id || modifier.stat !== stat) continue;
+    if (modifierActive(state, modifier)) total += modifier.amount;
   }
   return total;
+}
+
+export function addModifier(
+  state: ScenarioState,
+  sourceId: string,
+  stat: ModifierStat,
+  amount: number,
+  until: ModifierUntil,
+): ScenarioState {
+  if (!state.cards[sourceId]) return state;
+  return { ...state, modifiers: [...state.modifiers, { instanceId: sourceId, sourceId, stat, amount, until }] };
 }
 
 export function placedAmount(printed: PrintedCard, amount: number): number {

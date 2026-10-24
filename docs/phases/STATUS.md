@@ -18,7 +18,7 @@ Maestro flows are written in the phase that names them. `maestro test` runs afte
 | 5 | Image cache | completed | 2026-10-23. Download queue, scan packer, and pack/card images are in the tree. The airplane-mode resume was not run on a phone. |
 | 6 | Deck builder | completed | Phone check is still open: nobody has flung the full pool and typed in the filter on a physical phone. The simulator does not close that exit. Review blocks on split copies, the dropped-card sentence, the cost filter, a failed starter insert, shared sphere marks, extra heroes, add-button feedback, the name field, reduced motion, and chooser lists were fixed. |
 | 7 | Round engine | completed | Review blocks on eliminated seats, staging archery, an attack after the attacker leaves play, and progress above quest points are fixed and waiting for review. Allies still enter play ready. Engagement still takes the lowest cost. A shortfall still raises only the first player. This phase does not close the phase 6 phone fling. |
-| 8 | Scenario 1 effects | not started | |
+| 8 | Scenario 1 effects | active | Batch 1 (window and Hide frame) in progress. No card encoded from Hall of Beorn yet (0 awaiting confirmation). Gandalf's Delay 141078 stays red until the quest card or Learn to Play pages 28-30 is cited. |
 | 9 | Starter effects | not started | |
 | 10 | Campaign shell | not started | |
 | 11 | Scenario 1 table | not started | |

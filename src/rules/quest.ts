@@ -13,7 +13,7 @@ export function stagingThreat(state: ScenarioState, cards: Cards): number {
   for (const id of state.staging) {
     const instance = state.cards[id];
     if (!instance) continue;
-    total += printedOf(cards, instance.code).threat ?? 0;
+    total += modifiedStat(state, instance, "threat", cards);
   }
   return total;
 }

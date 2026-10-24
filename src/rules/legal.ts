@@ -1,3 +1,4 @@
+import { triggerIntents, triggerReason } from "./actions.ts";
 import {
   archeryRecipients,
   canAttack,
@@ -8,6 +9,7 @@ import {
   heroIds,
   legalAttackEnemies,
 } from "./combat.ts";
+import { hideCommitReason, hideCommitters } from "./hide.ts";
 import type { LegalIntent, PlayerIntent, Selection } from "./intents.ts";
 import { suppliesNumber } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -31,6 +33,10 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
         : [{ type: "Keep" }, { type: "Mulligan" }];
     case "pass":
       return passIntents(state, ctx);
+    case "frameAction":
+      return [{ type: "Pass" }, ...triggerIntents(state, ctx)];
+    case "hideCommit":
+      return [{ type: "CommitHide" }];
     case "travel":
       return travelIntents(state, ctx);
     case "optionalEngage":
@@ -54,6 +60,8 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
       return attachmentTargets(state, state.cards[selection.cardId]?.code, ctx);
     case "Commit":
       return committers(state, state.activeSeat, ctx);
+    case "CommitHide":
+      return state.window?.kind === "hideCommit" ? hideCommitters(state, state.window.seat, ctx.cards) : [];
     case "Travel":
       return state.activeLocation ? [] : stagingLocations(state, ctx.cards);
     case "Engage":
@@ -85,11 +93,17 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       if (state.window?.kind !== "mulligan") return "Mulligan is closed";
       return state.mulliganSeats.includes(state.activeSeat) ? "A second mulligan is not allowed" : null;
     case "Pass":
-      return state.window?.kind === "pass" ? null : "That intent is not legal in this window";
+      return state.window?.kind === "pass" || state.window?.kind === "frameAction"
+        ? null
+        : "That intent is not legal in this window";
     case "PlayCard":
       return playReason(state, intent, ctx);
     case "Commit":
       return commitReason(state, intent, ctx);
+    case "CommitHide":
+      return hideCommitReason(state, intent, ctx);
+    case "Trigger":
+      return triggerReason(state, intent, ctx);
     case "Travel":
       return travelReason(state, intent, ctx);
     case "DeclineTravel":
@@ -128,6 +142,7 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
     }
   }
   if (state.mode === "questCommit") intents.push({ type: "Commit" });
+  intents.push(...triggerIntents(state, ctx));
   return intents;
 }
 

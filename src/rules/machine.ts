@@ -1,3 +1,4 @@
+import { applyTrigger } from "./actions.ts";
 import {
   applyDefense,
   applyPlayerAttack,
@@ -11,18 +12,16 @@ import {
   heroIds,
   nextEnemyGroup,
 } from "./combat.ts";
+import { advanceFrame, stagingStep } from "./frames.ts";
+import { commitHide } from "./hide.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
-import {
-  drawOne,
-  gainSeatResources,
-  stageAll,
-  type ReduceContext,
-} from "./interpret.ts";
+import { drawOne, gainSeatResources, type ReduceContext } from "./interpret.ts";
 import { raiseThreat } from "./keywords.ts";
+import { applyPass, modeAfterPass } from "./pass.ts";
 import { playCard } from "./planning.ts";
 import { engagementStep, engageEnemy, resolveQuest, stagingEnemies, travelTo } from "./quest.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
-import { livingSeats, updateCard, withMode, type ModeName, type ScenarioState } from "./state.ts";
+import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
 import { inPlay } from "./zones.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -53,6 +52,10 @@ export function applyIntent(
       return playCard(state, intent, ctx, steps);
     case "Commit":
       return commit(state, intent.cardIds, steps);
+    case "CommitHide":
+      return commitHide(state, intent.cardIds, steps);
+    case "Trigger":
+      return applyTrigger(state, intent, ctx, steps);
     case "Travel": {
       const traveled = travelTo(state, intent.locationId, ctx.cards);
       return traveled ? { ...withMode(traveled, "optionalEngage"), window: null } : state;
@@ -84,6 +87,7 @@ export function applyIntent(
 }
 
 function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
   switch (state.mode) {
     case "afterOpening":
       return finishSetup(state, ctx, steps);
@@ -96,7 +100,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "questCommit":
       return openPass(state);
     case "staging":
-      return withMode(stageAll(state, ctx, steps), "resolution");
+      return stagingStep(state, ctx, steps);
     case "resolution":
       return afterResolution(resolveQuest(state, ctx.cards, steps));
     case "travel": {
@@ -231,30 +235,6 @@ function openPass(state: ScenarioState): ScenarioState {
 function hasTiming(state: ScenarioState, ctx: ReduceContext, timing: ReduceContext["effects"][number]["timing"]): boolean {
   if (ctx.effects.length === 0) return false;
   return ctx.effects.some((effect) => effect.timing === timing);
-}
-
-function applyPass(state: ScenarioState): ScenarioState {
-  const passed = state.passed.includes(state.activeSeat) ? state.passed : [...state.passed, state.activeSeat];
-  const nextSeat = livingSeats(state).find((seat) => !passed.includes(seat));
-  if (nextSeat == null) return { ...withMode(state, modeAfterPass(state.mode)), window: null };
-  return { ...state, passed, activeSeat: nextSeat };
-}
-
-function modeAfterPass(mode: ModeName): ModeName {
-  switch (mode) {
-    case "beginRound":
-      return "resourceGrant";
-    case "resourceActions":
-      return "planning";
-    case "planning":
-      return "questCommit";
-    case "questCommit":
-      return "staging";
-    case "endRound":
-      return "beginRound";
-    default:
-      return mode;
-  }
 }
 
 function finishOptional(state: ScenarioState, seat: number): ScenarioState {

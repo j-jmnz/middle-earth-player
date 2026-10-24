@@ -1,4 +1,4 @@
-import type { Instruction, ScenarioDefinition } from "../catalog/boundary.ts";
+import type { Instruction, ModifierStat, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
 
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 
@@ -95,15 +95,52 @@ export type Window =
   | { kind: "chooseEnemy"; reason: "engagement" | "attack"; seat: number; options: readonly string[] }
   | { kind: "defense"; enemyId: string; seat: number }
   | { kind: "archery"; total: number }
-  | { kind: "playerAttack" };
+  | { kind: "playerAttack" }
+  | { kind: "hideCommit"; seat: number }
+  | { kind: "frameAction" };
 
 export type Modifier = {
   instanceId: string;
-  stat: "willpower" | "attack" | "defense";
+  sourceId: string;
+  stat: ModifierStat;
   amount: number;
+  until: ModifierUntil;
 };
 
-export type Frame = { frame: string; cardId: string | null };
+export type FrameName =
+  | "reveal"
+  | "hide"
+  | "whenRevealed"
+  | "forced"
+  | "shadow"
+  | "response"
+  | "setup"
+  | "ResolveEffect";
+
+export type HideResult = { success: boolean; willpower: number; threat: number };
+
+export type FrameData =
+  | { kind: "none" }
+  | { kind: "reveal"; hide: HideResult | null }
+  | {
+      kind: "hide";
+      x: number;
+      committedIds: readonly string[];
+      discardedIds: readonly string[];
+      threat: number;
+      result: HideResult | null;
+    };
+
+// Plain data, never a closure, so structuredClone and the undo replay keep working.
+export type Frame = {
+  id: string;
+  frame: FrameName;
+  cardId: string | null;
+  seat: number;
+  peril: boolean;
+  step: number;
+  data: FrameData;
+};
 
 export type UndoLog = {
   phase: Phase;
@@ -147,6 +184,8 @@ export type ScenarioState = {
   perilSeat: number | null;
   modifiers: readonly Modifier[];
   stack: readonly Frame[];
+  frameSeq: number;
+  revealCursor: { seats: readonly number[]; index: number } | null;
   stages: readonly { code: string }[];
   setup: readonly Instruction[];
   widgets: ScenarioDefinition["widgets"];
@@ -246,6 +285,8 @@ export function blankScenario(input: {
     perilSeat: null,
     modifiers: [],
     stack: [],
+    frameSeq: 0,
+    revealCursor: null,
     stages: input.definition.stages,
     setup: input.definition.setup,
     widgets: input.definition.widgets,
@@ -273,7 +314,37 @@ export function withThreat(state: ScenarioState, index: number, threat: number):
 export function withMode(state: ScenarioState, mode: ModeName): ScenarioState {
   const phase = phaseOf(mode);
   if (state.mode === mode && state.phase === phase) return state;
-  return { ...state, mode, phase, passed: [] };
+  const changed: ScenarioState = { ...state, mode, phase, passed: [] };
+  const expiring: ModifierUntil[] = [];
+  if (state.phase !== phase) expiring.push("endOfPhase");
+  if (mode === "beginRound" && state.mode !== "beginRound") expiring.push("endOfRound");
+  return expiring.length === 0 ? changed : expireModifiers(changed, expiring);
+}
+
+export function inPlay(zone: ZoneName): boolean {
+  return (
+    zone === "heroes" ||
+    zone === "play" ||
+    zone === "engaged" ||
+    zone === "staging" ||
+    zone === "seatStaging" ||
+    zone === "activeLocation" ||
+    zone === "secondActiveLocation" ||
+    zone === "questStage" ||
+    zone === "seatQuest"
+  );
+}
+
+export function modifierActive(state: ScenarioState, modifier: Modifier): boolean {
+  if (modifier.until !== "whileSourceInPlay") return true;
+  const source = state.cards[modifier.sourceId];
+  return source != null && inPlay(source.zone);
+}
+
+// Drops modifiers that end at one of these boundaries, and any that outlived their source.
+export function expireModifiers(state: ScenarioState, untils: readonly ModifierUntil[]): ScenarioState {
+  const kept = state.modifiers.filter((modifier) => !untils.includes(modifier.until) && modifierActive(state, modifier));
+  return kept.length === state.modifiers.length ? state : { ...state, modifiers: kept };
 }
 
 export function updateCard(

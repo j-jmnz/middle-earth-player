@@ -47,6 +47,18 @@ function verbSchema<const Verb extends string>(verb: Verb) {
 
 export const costSchema = verbSchema("PayCost");
 
+export const modifierUntilSchema = z.enum(["endOfPhase", "endOfRound", "endOfAttack", "whileSourceInPlay"]);
+
+export const modifierStatSchema = z.enum(["willpower", "attack", "defense", "threat"]);
+
+// Authored amounts are fine. A player intent never supplies one.
+const modifyStatSchema = z.strictObject({
+  verb: z.literal("ModifyStat"),
+  stat: modifierStatSchema,
+  amount: z.number().int(),
+  until: modifierUntilSchema,
+});
+
 export const instructionSchema = z.discriminatedUnion("verb", [
   verbSchema("Draw"),
   verbSchema("GainResources"),
@@ -67,6 +79,7 @@ export const instructionSchema = z.discriminatedUnion("verb", [
   verbSchema("Attack"),
   verbSchema("AdvanceStep"),
   verbSchema("ResolveEffect"),
+  modifyStatSchema,
 ]);
 
 export const conditionSchema = z.never();
@@ -88,6 +101,7 @@ const timings = [
 ] as const;
 
 export const effectSchema = z.strictObject({
+  id: z.string().optional(),
   cardCode: z.string(),
   timing: z.enum(timings),
   trigger: z.string().optional(),
@@ -133,6 +147,8 @@ export type RingsDbCard = z.infer<typeof ringsDbCardSchema>;
 export type Cost = z.infer<typeof costSchema>;
 export type Instruction = z.infer<typeof instructionSchema>;
 export type Condition = z.infer<typeof conditionSchema>;
+export type ModifierUntil = z.infer<typeof modifierUntilSchema>;
+export type ModifierStat = z.infer<typeof modifierStatSchema>;
 export type Effect = z.infer<typeof effectSchema>;
 export type ResolutionOption = z.infer<typeof resolutionOptionSchema>;
 export type ScenarioDefinition = z.infer<typeof scenarioDefinitionSchema>;

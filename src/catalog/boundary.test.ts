@@ -74,6 +74,12 @@ describe("catalog boundary", () => {
     expect(instructionSchema.parse({ verb })).toEqual({ verb });
   });
 
+  it("accepts an authored ModifyStat and rejects one without a duration", () => {
+    const modify = { verb: "ModifyStat", stat: "willpower", amount: 2, until: "endOfPhase" };
+    expect(instructionSchema.parse(modify)).toEqual(modify);
+    expect(instructionSchema.safeParse({ verb: "ModifyStat", stat: "willpower", amount: 2 }).success).toBe(false);
+  });
+
   it("rejects an amount on an instruction", () => {
     expect(instructionSchema.safeParse({ verb: "Draw", amount: 1 }).success).toBe(false);
   });

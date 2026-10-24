@@ -11,6 +11,8 @@ export type EngineStep =
   | { kind: "reveal"; seat: number; cardId: string }
   | { kind: "engage"; seat: number; enemyId: string }
   | { kind: "commit"; cardId: string }
+  | { kind: "hideCommit"; cardId: string }
+  | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   | { kind: "advance"; cardId: string }
   | { kind: "attack"; side: "enemy" | "player"; seat: number; enemyId: string };
 
@@ -22,6 +24,7 @@ export type PlayerIntent =
   | { type: "Pass" }
   | { type: "PlayCard"; cardId: string; payments: readonly Payment[]; hostId?: string }
   | { type: "Commit"; cardIds: readonly string[] }
+  | { type: "CommitHide"; cardIds: readonly string[] }
   | { type: "Travel"; locationId: string }
   | { type: "DeclineTravel" }
   | { type: "Engage"; enemyId: string }
@@ -32,7 +35,7 @@ export type PlayerIntent =
   | { type: "DeclareAttackers"; enemyId: string; attackerIds: readonly string[] }
   | { type: "DeclineAttack" }
   | { type: "Distribute"; assignments: readonly { cardId: string; amount: number }[] }
-  | { type: "Trigger"; cardId: string; effectIndex: number }
+  | { type: "Trigger"; cardId: string; effectId: string }
   | { type: "ChooseResolution"; optionId: string }
   | { type: "Draw"; amount?: number }
   | { type: "GainResources"; amount?: number }
@@ -47,6 +50,7 @@ export type LegalIntent =
   | { type: "Pass" }
   | { type: "PlayCard"; cardId: string }
   | { type: "Commit" }
+  | { type: "CommitHide" }
   | { type: "Travel" }
   | { type: "DeclineTravel" }
   | { type: "Engage" }
@@ -57,11 +61,12 @@ export type LegalIntent =
   | { type: "DeclareAttackers" }
   | { type: "DeclineAttack" }
   | { type: "Distribute"; total: number }
-  | { type: "Trigger"; cardId: string; effectIndex: number };
+  | { type: "Trigger"; cardId: string; effectId: string };
 
 export type Selection =
   | { type: "PlayCard"; cardId: string }
   | { type: "Commit" }
+  | { type: "CommitHide" }
   | { type: "Travel" }
   | { type: "Engage" }
   | { type: "ChooseEnemy" }

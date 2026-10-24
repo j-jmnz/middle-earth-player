@@ -125,7 +125,7 @@ describe("setup and resources", () => {
     const drawn = reduce(kept.state, { type: "Draw", amount: 1 }, ctx);
     expect(drawn.ok).toBe(false);
     if (!drawn.ok) expect(drawn.state).toBe(kept.state);
-    expect(legalIntents(kept.state, ctx).some((intent) => intent.type === "Draw" || intent.type === "GainResources")).toBe(
+    expect(legalIntents(kept.state, ctx).some((intent) => (intent.type as string) === "Draw" || (intent.type as string) === "GainResources")).toBe(
       false,
     );
   });
