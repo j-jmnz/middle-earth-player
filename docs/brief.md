@@ -155,9 +155,9 @@ type CampaignLog = {
 };
 ```
 
-The paper sheet also has these labels: Heroes, Fallen Heroes, Threat Modifiers, Boons, Burdens, Scenarios Completed, Score, Notes, Campaign Total. Notes are the only free text. The Learn to Play states the score of a won scenario: the final threat of each player, plus the threat cost of each destroyed hero, plus the damage on each surviving hero, plus 10 per completed round, minus the victory points earned. Lower is better. The engine computes it on a win (phase 8d). The campaign total is the sum.
+The paper sheet also has these labels: Heroes, Fallen Heroes, Threat Modifiers, Boons, Burdens, Scenarios Completed, Score, Notes, Campaign Total. Notes are the only free text. The Learn to Play states the score of a won scenario: the final threat of each player, plus the threat cost of each destroyed hero, plus the damage on each surviving hero, plus 10 per completed round, minus the victory points earned (`ltp.scoring`, `rr.scoring`). Lower is better. The Rules Reference words the second term as the threat penalty on defeated heroes; the Learn to Play, which the log sheet follows, says their threat cost, and this file uses that. The engine computes it on a win (phase 8d). The campaign total is the sum.
 
-Campaign play follows the Learn to Play and Rules Reference campaign rules, which phase 8d encodes. Each scenario starts with the Campaign Setup Checklist: heroes from the log, fallen heroes replaced, +1 threat penalty per voluntary hero change unless a campaign card waives it, the penalty applied, Permanent cards attached, Setup boons and burdens put into play, player-backed pool cards shuffled into decks, and encounter-backed pool cards shuffled into the encounter deck. Each scenario's campaign card prints its Setup on the front and its Resolution on the back. Those lines are effect records like any other. A burden belongs to a burden set, not an encounter set. Later campaign cards remove burdens by burden set.
+Campaign play follows the Learn to Play and Rules Reference campaign rules (`rr.campaign-mode`, `ltp.campaign-mode`, `rr.campaign-cards`, `rr.campaign-pool`, `ltp.campaign-pool`), which phase 8d encodes. Each scenario starts with the Campaign Setup Checklist (`rr.campaign-setup-checklist`, `ltp.campaign-setup-checklist`; eight steps): heroes from the log, fallen heroes replaced, +1 threat penalty per voluntary hero change unless a campaign card waives it, the penalty applied, Permanent cards attached, Setup boons and burdens put into play, player-backed pool cards shuffled into decks, and encounter-backed pool cards shuffled into the encounter deck. Each scenario's campaign card prints its Setup on the front and its Resolution on the back. Those lines are effect records like any other. A burden belongs to a burden set, not an encounter set. Later campaign cards remove burdens by burden set.
 
 The log shows the six Fellowship rows. Later saga rows are added from each later booklet, in that booklet's order. This file does not set that order. The next box must not invent a second log type. Fellowship's six, in order, are fixed:
 
@@ -222,7 +222,7 @@ The round, its steps and its keywords are the rules in `data/rules/entries.json`
 
 | Part of the round | Rule ids |
 | --- | --- |
-| Setup: decks, heroes, starting threat | `ltp.start-the-first-game`, `rr.initial-threat-level`, `mec109.setting-up-the-game` |
+| Setup: decks, heroes, starting threat | `rr.setup`, `rr.initial-threat-level`, `mec109.setting-up-the-game` |
 | Player Setup, opening hand, mulligan | `mec109.setup`, `rr.mulligan` |
 | Encounter Setup, quest card Setup | `mec109.setup`, `rr.step-0-0` |
 | Resource, Planning | `rr.step-1-1`, `rr.planning-phase` |
@@ -249,11 +249,11 @@ These live in `src/rules`, not in a card file. Each names its rule ids in its mo
 | Keyword | Rule ids |
 | --- | --- |
 | Surge, doomed, peril | `rr.surge`, `rr.doomed-x`, `mec109.peril` |
-| Archery X | none yet. `ltp.attack-strength` holds a stat label, not this rule; phase 8c adds the span |
-| Immune to player card effects | `rr.immune`, `mec109.indestructible` |
-| Indestructible, toughness X | `mec109.indestructible`; toughness has no span yet (phase 8c) |
-| Permanent | `ltp.permanent`, `rr.campaign-setup-checklist` (truncated after step 1 today; phase 8c fixes the span) |
-| Victory | `ltp.victory-x` |
+| Archery X | `mec109.archery` |
+| Immune to player card effects | `rr.immune`, `mec109.immune-to-player-card-effects` |
+| Indestructible, toughness X | `mec109.indestructible`, `mec109.toughness` |
+| Permanent | `mec109.permanent`, `ltp.permanent`, `rr.campaign-pool`, `rr.campaign-setup-checklist` (steps 2, 5 and 6) |
+| Victory | `rr.victory`, `ltp.victory-x`, `ltp.victory-display` |
 | Sentinel, ranged | `rr.sentinel`, `rr.ranged` |
 | Hide X | `mec109.hide-x`, `mec109.hide-tests` |
 | Restricted | `rr.restricted` (phase 9) |
@@ -309,11 +309,11 @@ The rule is `mec109.hide-x` and `mec109.hide-tests`, with the worked example (Hi
 
 ### Flight to the Ford burden deck and life
 
-Burden deck: the five burden cards numbered 81–85, shuffled, set beside the quest deck. When a burden is discarded, it goes to the encounter discard pile.
+Burden deck (`mec109.burden-deck`): the five burden cards numbered 81–85, shuffled, set beside the quest deck. When a burden is discarded, it goes to the encounter discard pile.
 
 The campaign card (141056) settles the win: each burden card in play, in the encounter deck, and in the discard pile is added to the campaign pool. The booklet's line omits "in play"; the card wins. Burdens still in the burden deck are not earned.
 
-Life tracker: starts at 15, displayed as its own number, not as a second threat dial that the refresh step increments. Reducing life lowers that number. Healing a character does not raise it. Life 0 loses the game.
+Life tracker (`mec109.ringbearers-life`): starts at 15, displayed as its own number, not as a second threat dial that the refresh step increments. Reducing life lowers that number. Healing a character does not raise it. Life 0 loses the game.
 
 ### Breaking of the Fellowship, stage 2B
 

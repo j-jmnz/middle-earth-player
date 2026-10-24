@@ -1,12 +1,21 @@
 # learn-to-play
 
 sha256: 2621b03e7fa71bca21b096b3c94be29b14be8de54af413a73f884ec662e21090
+columns: bd6c8512ac9543979054e3153fd13139b37443c3b842347d49ea4df7f5b20f49
 
-## p1 {#learn-to-play-p1}
+## p1
 
-Learn to Play
+### p1 c1
 
-## p2 {#learn-to-play-p2}
+Learn t
+
+### p1 c2
+
+to Play
+
+## p2
+
+### p2 c1
 
 Introduction
 “You have done well to come,” said Elrond. “You will
@@ -54,6 +63,8 @@ using only the contents of this core set.
 
 2
 
+### p2 c2
+
 The Living Card Game
 The Lord of the Rings: The Card Game is a
 Living Card Game®, and the enjoyment and
@@ -76,7 +87,9 @@ core scenarios and create a cohesive campaign
 experience. For more details on Campaign
 Mode, see page 28.
 
-## p3 {#learn-to-play-p3}
+## p3
+
+### p3 c1
 
 Components
 8
@@ -85,188 +98,23 @@ Components
 
 1
 
-48
-
 ‰ Hor
 
 n of g
 
+ondor
+
 Ck
+
+1
 
 snEAk ATTA
 
 1
+3
 
-2
-
-“And the desp
-, ‘undang
-win
-Lorderate
-Denethor
-Ring
-unlike
-til youiswshi
-in the hear
-d tha
-the
-other
-men:
-p of
-t hornhe sees far.”
-andland, and
-sta
-nd
-Fello
-dire
-–Beregond,
-–The
-for some final
-Thee Return
-the in,
-more of aga
-need is on onc
-King
-Bor
-you.’ –Th on the border omir,’ said
-s of
-e Fellow
-ship of theyour
-Ring
-
-Illus. Winona
-
-EvEnTHEro
-ATTACH
-mE
-
-nT
-
-10
-
-0 FFG
-
-42
-
-5
-
-e
-
-1B
-
-Flies and spiders
-
-Dúnedain. Noble. Ranger.
-
-83
-
-FFG
-
-110
-
-PASSAGE THROUGH MIRKWOOD
-
-84 Encounter Cards
-
-188 Player Cards
-
-‰ ArAgorn
-Sentinel.
-
-eneMY
-obJeCt
-iv
-
-Illus. Nicho
-FFG
-las ©2010
-CloisterMiddle-earth Enterprises ©2010
-Illus. Alexandr Shaldin
-©2010 Midd
-le-earth
-Enterprise
-s ©2010
-
-23
-
-©2010 FFG
-Illus. Mark
-Illus. Tiziano
-Enterprises
-Baracchi Middle-©2010
-earth Middle-earth
-Enterprises ©2010 FFG
-Winters
-©2010
-©2010 Midd
-le-earth
-Enterprises
-©201
-
-Nelson
-
-4/14
-
-goblin Sniper
-
-Guarded.
-15/15
-Item.
-Orc.
-Restrict
-Goblin.
-ed.
-Action: phase, players
-cannot
-Raise yo
-During the encounter
-objectiv
-are other
-ur thrif
-Goblin
-eatthere
-e whenSniper
-optionally engage
-by
-claim
-area.it is free of enc2 to claim this
-ed, attach
-staging
-enemies in the
-ou
-(Counts
-Sh
-as an att adow Key to nters. When
-Shadow Sniper
-ach thent.staginga area
-hero at
-you con
-Key to is inme
-Forced: If Goblin
-If detach
-trol.
-the sta
-1
-deals
-ed, ret
-each
-phase,
-gingplayer
-combat
-therce
-urn
-the end ofFo
-area.)
-d:
-they control.
-character
-end
-suffers toAt1the
-point of damage
-1 damage of each rou
-nd, attach
-.
-ed hero
+3
+‰ dEnETHor
 
 your
 Item.
@@ -324,71 +172,114 @@ tocour
 thewbottom
 oyed, ad
 ‘Slo
-oftimid
-hero’s.
+hegrow
 thehobb
 of
 deck.
-most
+mostoftimid
 anduld
-d1
+d
+it ro’s. pool.
 st sho
 There is a seed
+
+12
+
+1
 you
 fatte
-make it grow pool.
+make
 to to
 ond
 erbe
-t of the Elr
+t of the
+“And
+, ‘undang
+theElr
+win
+Lord
+Denethor
+Ring
+erate
+unlike
+til youiswshi
+in the hear
+d tha
+the
+other
+men:
+desp
+p of
+t hornhe sees far.”
+andlan
+sta
+d, and
+nd
+Fello
+dire
+–Beregond,
+–The
+for some final
+Thee Return
+the in,
+more of aga
+need is on onc
+King
+Bor
+you.’ –Th on the border omir,’ said
+s of
+e Fellow
+ship of theyour
+Ring
 
 2
-
-LDUR
-
-0
-
 3
-
-‰ dEnETHor
-
-3
-
-KeY
-
-DOL GU
-
 2
 
-3
-12
+Illus. Winona
 
-E FROM
+EvEnTHEro
+ATTACH
+mE
 
-2
+23
 
-1
+©2010 FFG
+Illus. Mark
+Illus. Tiziano
+Enterprises
+Baracchi Middle-©2010
+earth Middle-earth
+Enterprises ©2010 FFG
+Winters
+©2010
+©2010 Midd
+le-earth
+Enterprises
+©201
 
-2
+Nelson
 
-SHadow
+nT
 
-ESCAP
+10
 
-ondor
+0 FFG
 
-8
+42
+
+5
+
+188 Player Cards
+
+‰ ArAgorn
+Sentinel.
+
+Dúnedain. Noble. Ranger.
 
 Response: After Aragorn commits to a quest,
 spend 1 resource from his resource pool to
 ready him.
-
-The nastiest things they saw were the cobwebs: dark dense cobwebs
-with threads extraordinarily thick, often stretched from tree to tree, or
-tangled in the lower branches on either side of them. There were none
-stretched across the path, but whether because some magic kept it
-clear, or for what other reason they could not guess. –The Hobbit
-
 “I am Aragorn son of Arathorn; and if by life or death
 I can save you, I will.” –The Fellowship of
 the Ring
@@ -400,21 +291,9 @@ Illus. John Stanko
 
 1
 
-Illus. Ben Zweifel
-
 12 Hero Cards
 
-©2010 Middle-earth Enterprises ©2010 FFG
-
-119
-
-10 Quest Cards
-
 66 Damage Tokens
-
-57 Resource Tokens
-66 Progress Tokens
-
 First Player Token
 r
 
@@ -506,8 +385,6 @@ th Enterprises
 Illus. Maga
 Illus.
 
-4 Threat Dials
-
 ive
 
 FFG
@@ -515,9 +392,6 @@ FFG
 138
 
 16 Boon and Burden Cards
-
-Dial Assembly
-
 passage
 of through mirkwood
 ns 1 copy
@@ -589,9 +463,147 @@ CAMPAIGN
 
 3 Campaign Cards
 
+### p3 c2
+
+48
+
+SHadow
+
+ESCAP
+E FR
+
+OM DO
+
+2
+
+KeY
+
+L GULDU
+
+R
+
+2
+0
+
+2
+
+4/14
+
+goblin Sniper
+
+Guarded.
+15/15
+Item.
+Orc.
+Restrict
+Goblin.
+ed.
+Action: phase, players
+cannot
+Raise yo
+During the encounter
+objectiv
+are other
+ur thrif
+Goblin
+eatthere
+e whenSniper
+optionally engage
+by
+claim
+area.it is free of enc2 to claim this
+ed, attach
+staging
+enemies in the
+ou
+(Counts
+Sh
+as an att adow Key to nters. When
+Shadow Sniper
+ach thent.staginga area
+hero at
+you con
+Key to is inme
+Forced: If Goblin
+If detach
+trol.
+the sta
+1
+deals
+ed, ret
+each
+phase,
+gingplayer
+combat
+therce
+urn
+the end ofFo
+area.)
+d:
+they control.
+character
+end
+suffers toAt1the
+point of damage
+1 damage of each rou
+nd, attach
+.
+ed hero
+
+eneMY
+obJeCt
+ive
+
+1B
+
+Illus. Nicho
+FFG
+las ©2010
+CloisterMiddle-earth Enterprises ©2010
+Illus. Alexandr Shaldin
+©2010 Midd
+le-earth
+Enterprise
+s ©2010
+
+Flies and spiders
+
+83
+
+FFG
+
+110
+
+PASSAGE THROUGH MIRKWOOD
+
+84 Encounter Cards
+8
+The nastiest things they saw were the cobwebs: dark dense cobwebs
+with threads extraordinarily thick, often stretched from tree to tree, or
+tangled in the lower branches on either side of them. There were none
+stretched across the path, but whether because some magic kept it
+clear, or for what other reason they could not guess. –The Hobbit
+
+Illus. Ben Zweifel
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+119
+
+10 Quest Cards
+
+57 Resource Tokens
+66 Progress Tokens
+
+4 Threat Dials
+
+Dial Assembly
+
 3
 
-## p4 {#learn-to-play-p4}
+## p4
+
+### p4 c1
 
 Key Concepts
 This section introduces a number of foundational
@@ -612,7 +624,10 @@ play area.
 3
 2
 
+5
 ‰ ArAgorn
+
+Sentinel.
 
 Dúnedain.
 
@@ -659,6 +674,40 @@ player draws cards from this deck and spends their
 hero’s resources to play those cards, each of which can
 aid the heroes on their adventure.
 
+Threat Dial
+Each player has a threat dial which represents the risk
+their heroes endure during the scenario. Game effects
+can cause a player’s threat to increase or decrease.
+When this happens, the player adjusts their dial
+accordingly. The number displayed on a player’s threat
+dial is sometimes referred to as that player’s threat.
+
+Threat Dial
+
+Winning the Game:
+Completing Quests
+The quest deck tracks the players’ progress toward
+the completion of their adventure. During the game,
+players place progress tokens onto quest cards in an
+attempt to advance to the next stage of the quest. If
+any number of players survive and advance through
+all stages of the quest, all players win the game!
+
+4
+
+### p4 c2
+
+Losing the Game:
+Player Elimination
+Middle-earth is a dangerous place, and it is possible
+for a player to succumb to the danger and be
+eliminated from the game. A player is eliminated from
+the game if that player’s threat dial reaches 50 or if all
+of that player’s heroes are destroyed. If all players are
+eliminated from the game before completing the last
+stage of the quest, the players have lost the game.
+
+Ready and Exhausted
 Each player card in play exists in one of two states:
 ready or exhausted. A ready card indicates that
 the card is available to be used. All cards enter play
@@ -669,14 +718,9 @@ is restored when the card once again becomes ready.
 Players ready all of their exhausted cards during the
 refresh phase, which is described later.
 9
-
-Threat Dial
-
 4
 1
-
 1
-
 1
 
 7
@@ -686,6 +730,8 @@ Exhausted
 9
 
 4
+
+1
 
 ‰ Éowyn
 
@@ -712,12 +758,7 @@ of kings. –The Two Towers
 
 HEro
 
-The quest deck tracks the players’ progress toward
-the completion of their adventure. During the game,
-players place progress tokens onto quest cards in an
-attempt to advance to the next stage of the quest. If
-any number of players survive and advance through
-all stages of the quest, all players win the game!
+©2010 Middle-earth Enterprises ©2010 FFG
 
 ‰ Éowyn
 Noble. Rohan.
@@ -726,63 +767,82 @@ Action: Discard 1 card from your hand to give
 Éowyn +1 Ò until the end of the phase. This effect
 may be triggered by each player once each round.
 
-©2010 Middle-earth Enterprises ©2010 FFG
-
-Winning the Game:
-Completing Quests
-
-3
-
 Slender and tall she was in her white robe girt with silver;
 but strong she seemed and stern as steel, a daughter
 of kings. –The Two Towers
 
-Threat Dial
-
-1
 Illus. Gabrielle Portal
 
-Each player has a threat dial which represents the risk
-their heroes endure during the scenario. Game effects
-can cause a player’s threat to increase or decrease.
-When this happens, the player adjusts their dial
-accordingly. The number displayed on a player’s threat
-dial is sometimes referred to as that player’s threat.
+3
 
-4
+## p5
 
-Middle-earth is a dangerous place, and it is possible
-for a player to succumb to the danger and be
-eliminated from the game. A player is eliminated from
-the game if that player’s threat dial reaches 50 or if all
-of that player’s heroes are destroyed. If all players are
-eliminated from the game before completing the last
-stage of the quest, the players have lost the game.
+### p5 c1
 
-Ready and Exhausted
+Creating Decks and Scenarios f
 
-5
-Sentinel.
+When playing The Lord of the Rings: The Card Game for
+core set’s four starter decks and play the “Passage Throug
 
-Losing the Game:
-Player Elimination
+To construct the decks for the first game, players gather th
 
-## p5 {#learn-to-play-p5}
-
-Creating Decks and Scenarios for the First Game
-When playing The Lord of the Rings: The Card Game for the first time, we recommend that players use one of the
-core set’s four starter decks and play the “Passage Through Mirkwood” scenario.
-To construct the decks for the first game, players gather the cards described below.
-For future games, players may continue to play with these starter decks, or they may customize their own decks as
-described in the “Deckbuilding” section on page 26 of this book.
+For future games, players may continue to play with these
+described in the “Deckbuilding” section on page 26 of thi
 
 Player Starter Decks
-
-Intro Scenario
-
 The Lord of the Rings: The Card Game core set
 contains the following four starter decks:
 
+Leadership Deck Ì
+The Leadership deck is an all-purpose deck with tools
+for a wide range of situations. This deck also contains a
+number of cards that can be used to assist and support the
+other players in the game.
+Heroes: Aragorn, Théodred, Glóin
+Cards: All copies of cards numbered 13–27 and two
+copies of card 73 (card numbers can be found in the
+lower-right corner of each card).
+
+Tactics Deck Ï
+The Tactics deck is all about combat, and is wellsuited for both attacking and defending. The deck uses
+weapons and armor to bolster heroes so they can go
+toe-to-toe with the enemies of Middle-earth.
+Heroes: Gimli, Legolas, Thalin
+Cards: All copies of cards numbered 28–42 and two
+copies of card 73.
+
+Spirit Deck Ê
+The Spirit deck focuses on its characters’ willpower
+and their ability to successfully explore locations and
+make progress on their quest. It is also well-suited for
+resisting the various threats of the encounter deck.
+Heroes: Éowyn, Eleanor, Dúnhere
+Cards: All copies of cards numbered 43–57 and two
+copies of card 73.
+
+Lore Deck Î
+The Lore deck is good at keeping its characters alive,
+and providing the player a variety of options for
+each situation with powerful card draw effects. This
+deck rewards players who anticipate threats and are
+prepared to meet those threats when they emerge.
+Heroes: Denethor, Glorfindel, Beravor
+Cards: All copies of cards numbered 58–72 and two
+copies of card 73.
+
+### p5 c2
+
+for the First Game
+
+r the first time, we recommend that players use one of the
+gh Mirkwood” scenario.
+
+he cards described below.
+
+e starter decks, or they may customize their own decks as
+is book.
+
+Intro Scenario
 “Passage Through Mirkwood” is the game’s
 introductory scenario. To set up this intro scenario,
 take the quest cards “Flies and Spiders” (119), “A Fork
@@ -791,56 +851,16 @@ other “A Chosen Path” (122) and arrange them as a
 four-card deck with the Stage A sides placed faceup as
 shown below.
 
-Leadership Deck Ì
-The Leadership deck is an all-purpose deck with tools
-for a wide range of situations. This deck also contains a
-number of cards that can be used to assist and support the
-other players in the game.
-
 1a
-
-Heroes: Aragorn, Théodred, Glóin
-Cards: All copies of cards numbered 13–27 and two
-copies of card 73 (card numbers can be found in the
-lower-right corner of each card).
-
 3a
-
-Tactics Deck Ï
-The Tactics deck is all about combat, and is wellsuited for both attacking and defending. The deck uses
-weapons and armor to bolster heroes so they can go
-toe-to-toe with the enemies of Middle-earth.
 
 2a aC
 
 3a
 
-Lore Deck Î
-The Lore deck is good at keeping its characters alive,
-and providing the player a variety of options for
-each situation with powerful card draw effects. This
-deck rewards players who anticipate threats and are
-prepared to meet those threats when they emerge.
-
-1
-
-PASSAGE
-
-THROUGH
-
-MIRKWOOD
-
-You are traveling through Mirkwood Forest, carrying an urgent message
-from King Thranduil to the Lady Galadriel of Lórien. As you move along the
-dark trail, the spiders gather around you...
-
-Heroes: Gimli, Legolas, Thalin
-Cards: All copies of cards numbered 28–42 and two
-copies of card 73.
-
-Heroes: Éowyn, Eleanor, Dúnhere
-Cards: All copies of cards numbered 43–57 and two
-copies of card 73.
+Flies and spiders
+Stage Indicator
+PASSAGE THROUGH MIRKWOOD
 
 path
 Chhosen
@@ -854,6 +874,14 @@ MIRKGE
 PASSA
 PASSAGE THROUGH MIRKWOOD d spiders
 THROUGH
+
+PASSAGE
+
+1
+
+PASSAGE
+THROUGH
+MIRKWOOD
 
 ...
 forest...
@@ -966,27 +994,15 @@ the
 Middle-ea
 ©201
 
+You are traveling through Mirkwood Forest, carrying an urgent message
+from King Thranduil to the Lady Galadriel of Lórien. As you move along the
+dark trail, the spiders gather around you...
 Setup: Search the encounter deck for 1 copy of the Forest Spider and 1 copy
 of the Old Forest Road, and add them to the staging area. Then, shuffle the
 encounter deck.
 
 n Boissonnet
-
-The Spirit deck focuses on its characters’ willpower
-and their ability to successfully explore locations and
-make progress on their quest. It is also well-suited for
-resisting the various threats of the encounter deck.
-
-PASSAGE THROUGH MIRKWOOD
-
-PASSAGE
-
 Illus. Yoan
-
-Spirit Deck Ê
-
-Flies and spiders
-Stage Indicator
 
 s Zweifel
 ©2010
@@ -1076,35 +1092,37 @@ Illus. Ben Zweifel
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-119
-
-Heroes: Denethor, Glorfindel, Beravor
-Cards: All copies of cards numbered 58–72 and two
-copies of card 73.
 These are the set icons for the
 “Passage Through Mirkwood”
 scenario.
 
+119
+
 5
 
-## p6 {#learn-to-play-p6}
+## p6
+
+### p6 c1
 
 Game Setup
-To set up a game of The Lord of the Rings: The Card Game, perform the following steps in order. For the first
+
+To set up a game of The Lord of the Rings: The Card Gam
 game, use the decks and scenario described on page 5.
 
 1
 
-Shuffle Decks: Shuffle the encounter deck and each
-player deck separately. Do not shuffle the hero cards
-into the player decks, and do not shuffle the quest cards
+Shuffle Decks: Shuffle the encounter deck an
+player deck separately. Do not shuffle the her
+into the player decks, and do not shuffle the q
 into the encounter deck.
-
-Hero & Quest Cards
 
 Encounter & Player Decks
 
 2
+
+5
+
+6
 
 Place Heroes and Set Starting Threat:
 Each player places their heroes in
@@ -1113,20 +1131,32 @@ threat cost of each of their own heroes,
 and sets their threat dial to that value,
 referred to as a player’s “Starting Threat”.
 
+Draw Starting Hand: Each player draws si
+from the top of their deck. If a player does n
+keep this starting hand, that player may shuf
+cards back into their deck and draw another
+cards. A player must keep the second set of s
+as a starting hand.
+
+### p6 c2
+
+me, perform the following steps in order. For the first
+
+nd each
+ro cards
+quest cards
+
+Hero & Quest Cards
+
 3
 
 4
 
-5
-
-6
-
-Draw Starting Hand: Each player draws six cards
-from the top of their deck. If a player does not wish to
-keep this starting hand, that player may shuffle the six
-cards back into their deck and draw another set of six
-cards. A player must keep the second set of six cards
-as a starting hand.
+ix cards
+not wish to
+ffle the six
+set of six
+six cards
 
 Create Token Bank: Place the
 damage, progress, and resource
@@ -1140,22 +1170,21 @@ If players cannot decide who should
 be the first player, determine a first
 player randomly.
 
-## p7 {#learn-to-play-p7}
+## p7
+
+### p7 c1
 
 6
 
-Place Quest Cards: Place the quest cards for the scenario near the encounter deck.
-The quest cards are arranged as described in the “Intro Scenario” section, with the
-stage “1A” side on top and each subsequent card beneath it increasing in sequence.
-
-The Quests are stacked in ascending numerical order
-with the lowest numbered card on the top.
+Place Quest Cards: Place the quest cards
+The quest cards are arranged as described
+stage “1A” side on top and each subsequen
 
 7
 
-Perform Scenario Setup Instructions: Perform the “Setup” instructions
-presented on the stage “1A” quest card. Then, flip the card to the stage “1B”
-side. The game is now ready to begin.
+Perform Scenario Setup
+presented on the stage “1A
+side. The game is now rea
 1a
 
 Flies and spiders
@@ -1173,18 +1202,63 @@ Illus. Ben Zweifel
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-After performing the “Setup” instructions,
-flip the top card to its Stage 1B side.
+Suggested
+great ForeSt web
 
-Suggested Play Area
+20
 
-The players must find and defeat Ungoliant’s Spawn to win this game.
+2
+
+1
+
+2
+
+3
+
+5/12
+
+1/12
+
+King Spider
+
+Forest.
+
+Travel: Each player must exhaust 1 hero they
+control to travel here.
+
+Creature. Spider.
+
+When Revealed: Each player must choose and
+exhaust 1 character they control.
+
+As he drew nearer, he saw that it was made with spiderwebs one behind and over and tangled with another.
+–The Hobbit
+
+3B
+
+PASSAGE THROUGH MIRKWOOD
+
+0
+The shadows grow darker, and you realize that a foul presence is
+aiming to draw you from the path. You must defeat it to pass this way.
+When Revealed: Each player must search the encounter deck and
+discard pile for 1 Spider card of their choice, and add it to the
+staging area.
 
 Shadow: Defending player must choose and
 exhaust 1 character they control. (2 characters
 instead if this attack is undefended.)
 
 Illus. Ben Zweifel
+
+121
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+eneMY
+77
+
+©2010 Middle-earth Enterprises ©2010 FFG
 
 Illus. John Wigley
 
@@ -1232,18 +1306,20 @@ character currently committed to a quest. Deal 2
 damage to that character.
 Shadow: Attacking enemy gets +1 Û.
 (+3 Û instead if this attack is undefended.)
+eneMY
 
 eneMY
+89
+
+11
+
+Illus. David Lecossu
 
 8
 
 ©2012 Middle-earth Enterprises ©2012 FFG
 
-1
-
 3
-
-2
 
 1
 
@@ -1258,9 +1334,6 @@ eneMY
 3
 ‰ gimli
 Dwarf. Noble. Warrior.
-
-“Men need many words before deeds. My axe is restless in
-my hands.” –The Two Towers
 
 Noble. Noldor. Warrior.
 
@@ -1286,8 +1359,8 @@ HEro
 
 Gondor. Noble. Steward.
 
-Gimli gets +1 Û for each damage token on
-him.
+“Men need many words before deeds. My axe is restless in
+my hands.” –The Two Towers
 
 HEro
 4
@@ -1296,6 +1369,52 @@ HEro
 
 5
 ‰ dEnETHor
+
+Gimli gets +1 Û for each damage token on
+him.
+
+3
+
+12
+
+1
+
+2
+
+5
+
+91
+
+Allies
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+2
+
+Illus. Tony Foti
+
+"don't leave the path!"
+
+The players must find and defeat Ungoliant’s Spawn to win this game.
+
+loCation
+Illus. Jason Ward
+
+Illus. Anna Christenson
+
+Heroes
+
+Quest
+
+2
+3
+
+Engaged
+Enemies
+
+Staging Area
+
+(One player,
 
 Illus. Tiziano Baracchi
 
@@ -1321,6 +1440,37 @@ HEro
 
 Illus. Katherine Dinger
 
+©2010 Middle-earth Enterprises ©2010 FFG
+
+11
+
+Ally
+Illus. Magali Villeneuve
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+58
+
+### p7 c2
+
+for the scenario near the encounter deck.
+in the “Intro Scenario” section, with the
+nt card beneath it increasing in sequence.
+
+The Quests are stacked in ascending numerical order
+with the lowest numbered card on the top.
+
+p Instructions: Perform the “Setup” instructions
+A” quest card. Then, flip the card to the stage “1B”
+ady to begin.
+
+After performing the “Setup” instructions,
+flip the top card to its Stage 1B side.
+
+d Play Area
+
+13/14
+
 Forest.
 
 While Enchanted Stream is the active
@@ -1332,89 +1482,17 @@ and a great drowsiness and forgetfulness.”
 –Beorn, The Hobbit
 
 loCation
-Illus. Ben Zweifel
-
 ©2010 Middle-earth Enterprises ©2010 FFG
 
 95
 
-3
+1
+fEinT
 
-12
-
-2
-
-5
-
-91
-
-Allies
-
-11
-
-Illus. David Lecossu
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-11
+Discard
 
 Deck
 
-89
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-13/14
-
-First Player
-Toekn
-
-77
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-eneMY
-
-Illus. Tony Foti
-
-121
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-eneMY
-
-loCation
-Illus. Jason Ward
-
-Encounter Discard
-
-The shadows grow darker, and you realize that a foul presence is
-aiming to draw you from the path. You must defeat it to pass this way.
-When Revealed: Each player must search the encounter deck and
-discard pile for 1 Spider card of their choice, and add it to the
-staging area.
-
-2
-
-1
-
-Combat Action: Choose an enemy engaged
-with a player. That enemy cannot attack that
-player this phase.
-A few brave men were strung before them to make a feint
-of resistance, and many there fell before the rest drew
-back and fled to either side. –The Hobbit
-
-Ally
-Illus. Magali Villeneuve
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-58
-
-20
-2
-3
 1
 
 3
@@ -1438,30 +1516,18 @@ Illus. John Wigley
 
 Token Bank
 
-Creature. Spider.
+Illus. Ben Zweifel
 
-When Revealed: Each player must choose and
-exhaust 1 character they control.
-
-As he drew nearer, he saw that it was made with spiderwebs one behind and over and tangled with another.
-–The Hobbit
-
-0
-
-enCHanted StreaM
-
+20
 2
+3
 
-fEinT
-
-King Spider
-
-Forest.
-
-Travel: Each player must exhaust 1 hero they
-control to travel here.
-
-PASSAGE THROUGH MIRKWOOD
+Combat Action: Choose an enemy engaged
+with a player. That enemy cannot attack that
+player this phase.
+A few brave men were strung before them to make a feint
+of resistance, and many there fell before the rest drew
+back and fled to either side. –The Hobbit
 
 EvEnT
 Illus. Lius Lasahido
@@ -1470,57 +1536,32 @@ Illus. Lius Lasahido
 
 Threat Dial
 
-1/12
-
-"don't leave the path!"
-
-Discard
-
-3
-
-5/12
-
-Illus. Anna Christenson
-
-Heroes
-
-Quest
-
-1
-
 2
 
-3B
+Encounter Discard
 
 Encounter Deck
 
-20
+enCHanted StreaM
+
 2
-3
+
+First Player
+Toekn
 
 Active Location
 
-great ForeSt web
-
-2
-
-Engaged
-Enemies
-
-Staging Area
-
-(One player, mid-game)
+r, mid-game)
 
 34
 
 77
 
-## p8 {#learn-to-play-p8}
+## p8
+
+### p8 c1
 
 Playing the Game
-
-Step Two: Draw Cards
-
 The Lord of the Rings: The Card Game is played over
 a series of rounds. Each round consists of seven phases
 that players resolve in the following order: Resource,
@@ -1528,18 +1569,7 @@ Planning, Quest, Travel, Encounter, Combat, and
 Refresh. After all seven phases have resolved, a new
 game round begins, starting with the resource phase.
 
-Each player draws one card from the top of their deck
-and adds it to their hand of cards. (There is no hand
-limit.) A player’s deck consists of allies, attachments, and
-events that can aid the heroes during the game.
-
 Phase 1: Resource
-
-The planning phase represents the mustering of the
-heroes before the next leg of their journey—preparing
-them with the items and allies they need for a
-successful quest.
-
 The resource phase represents the heroes gathering
 supplies, finding allies, and obtaining information,
 which are represented in the game by resource tokens
@@ -1548,9 +1578,100 @@ overcome the machinations of the Dark Lord.
 To resolve the resource phase, players perform the
 following steps in order:
 1. Gain Resources
+2. Draw Cards
+Each step of the resource phase is resolved by all
+players simultaneously. After performing the steps of
+the resource phase, proceed to the planning phase.
+
+Step One: Gain Resources
+For each hero a player has in play, that player takes
+one resource token from the token bank and places it
+in that hero’s resource pool. Each hero has a resource
+pool next to it that contains that hero’s resource
+tokens. Players spend tokens from their heroes’
+resource pools to play cards from their hands, which
+is described later.
+
+Token Bank
+
+12
+
+9
+
+2
+
+1
+
+3
+
+3
+
+2
+
+1
+
+5
+
+4
+
+‰ ArAgorn
+Sentinel.
+
+‰ lEgolAs
+
+Dúnedain. Noble. Ranger.
+Ranged.
+
+Response: After Aragorn commits to a quest,
+spend 1 resource from his resource pool to
+ready him.
+“I am Aragorn son of Arathorn; and if by life or death
+I can save you, I will.” –The Fellowship of
+the Ring
+
+“I can walk this path, but others have not this skill.”
+–The Fellowship of the Ring
+
+HEro
+Illus. John Stanko
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+1
+
+Aragorn’s
+Resource Pool
+8
+
+Noble. Silvan. Warrior.
+
+Response: After Legolas participates in an
+attack that destroys an enemy, place 2 progress
+tokens on the current quest.
+
+HEro
+Illus. Magali Villeneuve
+
+©2010 Middle Earth Enterprises ©2010 FFG
+
+5
+
+Legolas’s
+Resource Pool
+
+### p8 c2
+
+Step Two: Draw Cards
+Each player draws one card from the top of their deck
+and adds it to their hand of cards. (There is no hand
+limit.) A player’s deck consists of allies, attachments, and
+events that can aid the heroes during the game.
 
 Phase 2: Planning
-
+The planning phase represents the mustering of the
+heroes before the next leg of their journey—preparing
+them with the items and allies they need for a
+successful quest.
 During this phase, players can play ally and
 attachment cards from their hands. Ally cards represent
 friends, followers, and companions ofBthe heroes,
@@ -1570,11 +1691,6 @@ ondolin
 
 1
 
-2. Draw Cards
-Each step of the resource phase is resolved by all
-players simultaneously. After performing the steps of
-the resource phase, proceed to the planning phase.
-
 1
 snowBourn sCouT
 
@@ -1591,17 +1707,6 @@ that location.
 horsemen, many horsemen, and the glint of morning on the
 tips of their spears was like the twinkle of minute stars
 beyond the edge of mortal sight. –The Two Towers
-
-Step One: Gain Resources
-For each hero a player has in play, that player takes
-one resource token from the token bank and places it
-in that hero’s resource pool. Each hero has a resource
-pool next to it that contains that hero’s resource
-tokens. Players spend tokens from their heroes’
-resource pools to play cards from their hands, which
-is described later.
-
-Token Bank
 
 Attached hero gets +1 Û when attacking an Orc.
 Response: After attached hero attacks and destroys
@@ -1636,62 +1741,17 @@ area. After each player has had an opportunity to play
 cards, proceed to the quest phase.
 
 Paying Costs
-3
-
-2
-
 1
-
-5
-
-4
-
-‰ ArAgorn
-
-‰ lEgolAs
-
-Dúnedain. Noble. Ranger.
-Ranged.
-
-Response: After Aragorn commits to a quest,
-spend 1 resource from his resource pool to
-ready him.
-
-Response: After Legolas participates in an
-attack that destroys an enemy, place 2 progress
-tokens on the current quest.
-
-“I am Aragorn son of Arathorn; and if by life or death
-I can save you, I will.” –The Fellowship of
-the Ring
-
-“I can walk this path, but others have not this skill.”
-–The Fellowship of the Ring
-
-HEro
-Illus. John Stanko
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-Noble. Silvan. Warrior.
-
-1
-
-Aragorn’s
-Resource Pool
-
-HEro
-Illus. Magali Villeneuve
-
-©2010 Middle Earth Enterprises ©2010 FFG
-
-5
-
-Legolas’s
-Resource Pool
+QuiCk sTrikE
 
 1
 Cost
+QuiCk sTrikE
+
+To pay a card’s cost, a player must
+spend a number of resources equal
+to that cost, which is presented in
+the upper-left corner of the card.
 
 Action: Exhaust a character you control to
 immediately declare it as an attacker (and
@@ -1738,33 +1798,13 @@ enough, may need to strike no more.”
 
 Illus. Sara Biddle
 
-8
-
-1
-QuiCk sTrikE
-
-3
-
-Sentinel.
-
-To pay a card’s cost, a player must
-spend a number of resources equal
-to that cost, which is presented in
-the upper-left corner of the card.
-
-9
-1
-
-QuiCk sTrikE
-
-12
-2
-
 ©2010 Middle-earth Enterprises ©2010 FFG
 
 35
 
-## p9 {#learn-to-play-p9}
+## p9
+
+### p9 c1
 
 A player can spend resources from multiple heroes’
 resource pools to pay for a single card if there is a
@@ -1789,6 +1829,10 @@ the attachment.
 
 2
 
+‰ sTEwArd of gondor
+
+2
+
 12
 2
 3
@@ -1796,6 +1840,10 @@ the attachment.
 Gondor. Title.
 
 Gondor. Title.
+
+5
+
+Attach to a hero.
 
 Attach to a hero.
 
@@ -1826,60 +1874,29 @@ ATTACHmEnT
 ready him.
 
 ATTACHmEnT
-26
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
 Illus. Empty Room Studios
 
-©2010 Middle-earth Enterprises ©2010 FFG
-
 26
 
-“I am Aragorn son of Arathorn; and if by life or death
+©2010 Middle-earth Enterprises ©2010 FFG
+
+26 or death
+Middle-earth
+Enterprises
+©2010 FFG and if by life
+“I am©2010
+Aragorn
+son
+of Arathorn;
 I can save you, I will.” –The Fellowship of
 the Ring
+
+Illus. Empty Room Studios
 
 HEro
 Illus. John Stanko
 
 2
-
-Leadership Ì: The leadership
-sphere emphasizes a hero’s
-charisma and influence, particularly
-a hero’s potential to lead, inspire,
-and command both allies and
-other heroes.
-
-5
-
-Attach to a hero.
-
-Illus. Empty Room Studios
-
-Most player cards in Lord of the Rings: The
-Card Game are from one of the four spheres
-of influence. A card’s sphere indicates
-which resources a player can spend to pay
-for that card. Each sphere is represented by
-an icon that is presented on the right side
-of ally, attachment, and event cards and the
-lower-left corner of hero cards. Each sphere
-has a distinct identity and play style and is
-represented by an icon and color.
-
-Lore Î: The lore sphere
-emphasizes the potential of a
-hero’s mind, particularly that
-hero’s wisdom, experience, and
-specialized knowledge.
-
-‰ sTEwArd of gondor
-
-2
-
-Spheres of Influence
 
 1
 
@@ -1903,17 +1920,6 @@ Gondor. Title.
 Attach to a hero.
 
 ‰ sTEwArd of gondor
-
-Spirit Ê: The spirit sphere
-emphasizes the strength of a
-hero’s will, particularly that hero’s
-determination, resilience, courage,
-loyalty, and heart.
-Tactics Ï: The tactics sphere
-emphasizes a hero’s martial
-prowess, particularly that
-hero’s combat effectiveness and
-tactical mastery.
 
 Gondor. Title.
 
@@ -1958,13 +1964,50 @@ Illus. Empty Room Studios
 
 26
 
+### p9 c2
+
+Spheres of Influence
+Most player cards in Lord of the Rings: The
+Card Game are from one of the four spheres
+of influence. A card’s sphere indicates
+which resources a player can spend to pay
+for that card. Each sphere is represented by
+an icon that is presented on the right side
+of ally, attachment, and event cards and the
+lower-left corner of hero cards. Each sphere
+has a distinct identity and play style and is
+represented by an icon and color.
+Leadership Ì: The leadership
+sphere emphasizes a hero’s
+charisma and influence, particularly
+a hero’s potential to lead, inspire,
+and command both allies and
+other heroes.
+Lore Î: The lore sphere
+emphasizes the potential of a
+hero’s mind, particularly that
+hero’s wisdom, experience, and
+specialized knowledge.
+Spirit Ê: The spirit sphere
+emphasizes the strength of a
+hero’s will, particularly that hero’s
+determination, resilience, courage,
+loyalty, and heart.
+Tactics Ï: The tactics sphere
+emphasizes a hero’s martial
+prowess, particularly that
+hero’s combat effectiveness and
+tactical mastery.
+
 9
 
-## p10 {#learn-to-play-p10}
+## p10
+
+### p10 c1
 
 9
 
-Example: Paying for Cards
+Example: Pay
 
 2
 
@@ -1986,57 +2029,29 @@ Example: Paying for Cards
 
 1
 
-1
-
-2
-
 4 4
+
+3
 
 ‰g
 
+‰ glóin
+lóin
+
+‰
+
 Dwarf. Noble.
+
+No
 
 Dwarf. Noble.
 
 Response: After Glóin suffers damage, add 1
 resource to his resource pool for each point of
 
-‰ ElEAnor
-
-Noble. Rohan.
-
-Gondor. Noble.
-
-Response: Exhaust Eleanor to cancel the “when
-revealed” effects of a treachery card just revealed
-by the encounter deck. Then, discard that card, and
-replace it with the next card from the encounter deck.
-
-Slender and tall she was in her white robe girt with silver;
-but strong she seemed and stern as steel, a daughter
-of kings. –The Two Towers
-
-“Gondor wanes, you say. But Gondor stands, and
-even the end of its strength is still very strong.”
-–Boromir, The Fellowship of the Ring
-
-HEro
-
-HEro
-
-His beard, very long and forked, was white, nearly as white
-as the snow-white cloth of his garments.
-–The Fellowship of the Ring
-3
-
-©2010 Middle Earth Enterprises ©2010 FFG
-
-3
-‰ Éowyn
-
-Action: Discard 1 card from your hand to give
-Éowyn +1 Ò until the end of the phase. This effect
-may be triggered by each player once each round.
+Action: Discard 1 ca
+Éowyn +1 Ò until th
+may be triggered by
 
 he just suffered.
 Response:damage
@@ -2050,18 +2065,20 @@ his resource
 of the Ringfor each point of
 damage he just suffered.
 
-Illus. Gabrielle Portal
+Slender and tall she was
+but strong she seemed a
+of kings. –The Two T
 
 HEro
-7
 
-©2010 Middle-earth Enterprises ©2010 FFG
+His beard, very long and forked, was white, nearly as white
+as the snow-white cloth of his garments.
+–The Fellowship of the Ring
+Illus. Tom Garden
 
-Illus. Magali Villeneuve
+Illus. Gabrielle Portal
 
-©2010 Middle-earth Enterprises ©2010 FFG
-
-8
+©2010 Mid
 
 HEro
 
@@ -2069,16 +2086,9 @@ Resource 4
 Icon
 Illus. Tom Garden
 
-1
-
 3
 
-‰ glóin
-lóin
-
-Illus. Tom Garden
-
-7
+©2010 Middle Earth Enterprises ©2010 FFG
 
 3
 
@@ -2094,101 +2104,19 @@ Illus. Tom Garden
 1
 
 2
-
-9
-4
-
-2
-
-1
-
-1
-
-1
-
-1
-
-2
-
-4
-
 2
 2
 
 3
 3
 
-9
-2
-
-3
-‰ Éowyn
-Noble. Rohan.
-
-His beard, very long and forked, was white, nearly as white
-as the snow-white cloth of his garments.
-–The Fellowship of the Ring
+norTHErn TrACkEr
 
 n
 
 Dúnedain.
 Ranger.
 orTHErn
-
-©2010 Middle Earth Enterprises ©2010 FFG
-
-‰ ElEAnor
-
-Action: Discard 1 card from your hand to give
-Éowyn +1 Ò until the end of the phase. This effect
-may be triggered by each player once each round.
-Slender and tall she was in her white robe girt with silver;
-but strong she seemed and stern as steel, a daughter
-of kings. –The Two Towers
-
-HEro
-
-norTHErn TrACkEr
-
-3
-
-‰ glóin
-Dwarf. Noble.
-
-Response: After Glóin suffers damage, add 1
-resource to his resource pool for each point of
-damage he just suffered.
-
-Illus. Tom Garden
-
-7
-1
-
-Gondor. Noble.
-
-Response: Exhaust Eleanor to cancel the “when
-revealed” effects of a treachery card just revealed
-by the encounter deck. Then, discard that card, and
-replace it with the next card from the encounter deck.
-“Gondor wanes, you say. But Gondor stands, and
-even the end of its strength is still very strong.”
-–Boromir, The Fellowship of the Ring
-
-HEro
-3
-
-Illus. Gabrielle Portal
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-HEro
-7
-
-Illus. Magali Villeneuve
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-8
 
 TrACkEr
 
@@ -2226,6 +2154,158 @@ there be in quiet lands, or in the homes of simple men at
 night, if the Dúnedain were asleep, or were all gone into
 the grave?” –Aragorn, The Fellowship of the Ring
 
+Ally
+Illus. Kristina Gehrmann
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+45
+
+1. Glóin has a leadership resource icon and three res
+Eleanor each have a spirit resource icon and two r
+
+2. Tom wants to play Northern Tracker from his han
+can pay its cost only with resources from characte
+3. Tom spends two resource tokens from Éowyn’s
+Eleanor’s resource pool, returning those tokens
+faceup in his play area.
+
+10
+
+### p10 c2
+
+ying for Cards
+7
+1
+1
+2
+
+3
+
+‰ Éowyn
+
+‰ ElEAnor
+
+oble. Rohan.
+
+Gondor. Noble.
+
+ard from your hand to give
+he end of the phase. This effect
+each player once each round.
+
+Response: Exhaust Eleanor to cancel the “when
+revealed” effects of a treachery card just revealed
+by the encounter deck. Then, discard that card, and
+replace it with the next card from the encounter deck.
+
+s in her white robe girt with silver;
+and stern as steel, a daughter
+Towers
+
+“Gondor wanes, you say. But Gondor stands, and
+even the end of its strength is still very strong.”
+–Boromir, The Fellowship of the Ring
+
+HEro
+
+HEro
+7
+
+ddle-earth Enterprises ©2010 FFG
+
+3
+
+Illus. Magali Villeneuve
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+9
+
+9
+
+2
+
+4
+
+2
+
+1
+
+1
+
+1
+
+1
+
+2
+
+4
+
+3
+
+3
+
+‰ glóin
+
+‰ Éowyn
+Noble. Rohan.
+
+His beard, very long and forked, was white, nearly as white
+as the snow-white cloth of his garments.
+–The Fellowship of the Ring
+
+©2010 Middle Earth Enterprises ©2010 FFG
+
+‰ ElEAnor
+
+Action: Discard 1 card from your hand to give
+Éowyn +1 Ò until the end of the phase. This effect
+may be triggered by each player once each round.
+Slender and tall she was in her white robe girt with silver;
+but strong she seemed and stern as steel, a daughter
+of kings. –The Two Towers
+
+HEro
+Illus. Tom Garden
+
+7
+1
+
+Dwarf. Noble.
+
+Response: After Glóin suffers damage, add 1
+resource to his resource pool for each point of
+damage he just suffered.
+
+Gondor. Noble.
+
+Response: Exhaust Eleanor to cancel the “when
+revealed” effects of a treachery card just revealed
+by the encounter deck. Then, discard that card, and
+replace it with the next card from the encounter deck.
+“Gondor wanes, you say. But Gondor stands, and
+even the end of its strength is still very strong.”
+–Boromir, The Fellowship of the Ring
+
+HEro
+3
+
+Illus. Gabrielle Portal
+
+8
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+HEro
+7
+
+Illus. Magali Villeneuve
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+8
+
 4
 1
 2
@@ -2238,14 +2318,6 @@ Dúnedain. Ranger.
 Response: After Northern Tracker commits to a
 quest, place 1 progress token on each location in
 the staging area.
-
-Ally
-Illus. Kristina Gehrmann
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-45
-
 “What roads would any dare to tread, what safety would
 there be in quiet lands, or in the homes of simple men at
 night, if the Dúnedain were asleep, or were all gone into
@@ -2261,23 +2333,109 @@ Illus. Kristina Gehrmann
 To Token
 Bank
 
-1. Glóin has a leadership resource icon and three resource tokens in his resource pool. Éowyn and
-Eleanor each have a spirit resource icon and two resource tokens in their resource pools.
-2. Tom wants to play Northern Tracker from his hand. Northern Tracker has a spirit sphere icon so he
-can pay its cost only with resources from characters that have the spirit icon.
-3. Tom spends two resource tokens from Éowyn’s resource pool and two resource tokens from
-Eleanor’s resource pool, returning those tokens to the token bank. He places Northern Tracker
-faceup in his play area.
+source tokens in his resource pool. Éowyn and
+resource tokens in their resource pools.
 
-10
+nd. Northern Tracker has a spirit sphere icon so he
+ers that have the spirit icon.
+resource pool and two resource tokens from
+to the token bank. He places Northern Tracker
 
-## p11 {#learn-to-play-p11}
+## p11
+
+### p11 c1
 
 Phase 3: Quest
 The quest phase provides the heroes with an
 opportunity to make progress on their journey. During
 this phase, the players can commit characters to
 advance their quest.
+To resolve the quest phase, players perform the
+following steps in order:
+1. Commit Characters
+2. Staging
+3. Quest Resolution
+Each step is described below. After the players have
+performed the steps of the quest phase, proceed to the
+travel phase.
+
+Step One: Commit Characters
+Starting with the first player and proceeding
+clockwise, each player has an opportunity to commit
+any number of their characters to the current quest.
+Each hero and each ally is a character.
+To commit a character to the quest, a player must
+exhaust that character (if a character is already
+exhausted, it cannot be commited).
+
+Step Two: Staging
+After each player has had the opportunity to commit
+characters to the quest, each player reveals a card from
+the encounter deck; this is called staging, and it is
+used to populate the play area with new locations,
+enemies, and20
+objectives. This step occurs every round,
+even if the players did not commit any characters to
+the quest.
+
+2
+
+Reveal the encounter cards one at a time. If a card’s
+3 Revealed” effect, resolve that effect
+text has a “When
+by following its instructions before revealing the
+next card. 1
+20
+
+3
+
+2
+3
+
+1
+When a “King Spider” is
+revealed, each player must
+King Spider
+exhaust a character.
+3
+
+1/12
+
+Creature. Spider. K
+
+ing Spider
+
+1/12
+
+Creature. Spider.
+
+When Revealed: Each player must choose and
+exhaust 1 character they control.
+
+When Revealed: Each player must choose and
+exhaust 1 character they control.
+Shadow: Defending player must choose and
+exhaust 1 character they control. (2 characters
+instead if this attack is undefended.)
+eneMY
+
+Shadow: Defending player must choose and
+exhaust 1 character they control. (2 characters
+instead if this attack is undefended.)
+Illus. John Wigley
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+74
+
+eneMY
+Illus. John Wigley
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+74
+
+### p11 c2
 
 When an enemy, location, or objective card is revealed
 during this step, it is placed in the staging area,
@@ -2285,8 +2443,9 @@ which is a play area in the center of the table, near the
 quest deck.
 great ForeSt web
 
-To resolve the quest phase, players perform the
-following steps in order:
+20
+
+2
 
 2
 
@@ -2298,12 +2457,6 @@ following steps in order:
 PASSAGE THROUGH MIRKWOOD
 
 1
-
-2
-
-1. Commit Characters
-
-20
 
 2
 
@@ -2343,8 +2496,6 @@ Shadow: Defending player must choose and
 exhaust 1 character they control. (2 characters
 instead if this attack is undefended.)
 
-2. Staging
-
 Illus. Ben Zweifel
 
 77
@@ -2357,43 +2508,24 @@ Illus. John Wigley
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
+©2010 Middle-earth Enterprises ©2010 FFG
+
+121
+
+Quest
+Deck
+
+eneMY
+
+loCation
+Illus. Jason Ward
+
 Staging Area
 
-3. Quest Resolution
-Each step is described below. After the players have
-performed the steps of the quest phase, proceed to the
-travel phase.
-
-Step One: Commit Characters
-Starting with the first player and proceeding
-clockwise, each player has an opportunity to commit
-any number of their characters to the current quest.
-Each hero and each ally is a character.
-To commit a character to the quest, a player must
-exhaust that character (if a character is already
-exhausted, it cannot be commited).
-
-Step Two: Staging
-After each player has had the opportunity to commit
-characters to the quest, each player reveals a card from
-the encounter deck; this is called staging, and it is
-used to populate the play area with new locations,
-enemies, and20
-objectives. This step occurs every round,
-even if the players did not commit any characters to
-the quest.
-
-2
-
-Reveal the encounter cards one at a time. If a card’s
-3 Revealed” effect, resolve that effect
-text has a “When
-by following its instructions before revealing the
-next card. 1
-20
-
-3
-
+When a treachery card is revealed, resolve the
+text on the card, and then place it in the encounter
+deck discard pile, unless the card specifically
+states otherwise.
 If there are no cards in the encounter deck during this
 phase, shuffle the encounter deck discard pile to create
 a new encounter deck.
@@ -2442,43 +2574,9 @@ the Ring
 HEro
 Illus. John Stanko
 
-2
-3
-
-1/12
-
-Creature. Spider. K
-
-ing Spider
-
-121
-
-When a treachery card is revealed, resolve the
-text on the card, and then place it in the encounter
-deck discard pile, unless the card specifically
-states otherwise.
-
 ©2010 Middle-earth Enterprises ©2010 FFG
 
 ‰ ArAgorn
-
-1
-When a “King Spider” is
-revealed, each player must
-King Spider
-exhaust a character.
-3
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-Quest
-Deck
-
-eneMY
-
-loCation
-Illus. Jason Ward
-
 Sentinel.
 
 1
@@ -2488,65 +2586,194 @@ Dúnedain. Noble. Ranger.
 Response: After Aragorn commits to a quest,
 spend 1 resource from his resource pool to
 ready him.
-
-1/12
-
 “I am Aragorn son of Arathorn; and if by life or death
 I can save you, I will.” –The Fellowship of
 the Ring
 
-Creature. Spider.
-
-When Revealed: Each player must choose and
-exhaust 1 character they control.
-
-When Revealed: Each player must choose and
-exhaust 1 character they control.
-
 HEro
-
-Shadow: Defending player must choose and
-exhaust 1 character they control. (2 characters
-instead if this attack is undefended.)
-
 Illus. John Stanko
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
 1
 
-eneMY
-
-Shadow: Defending player must choose and
-exhaust 1 character they control. (2 characters
-instead if this attack is undefended.)
-Illus. John Wigley
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-74
-
-eneMY
-Illus. John Wigley
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-74
-
 11
 
-## p12 {#learn-to-play-p12}
+## p12
 
-1B
+### p12 c1
+
 Each enemy and location has a threat strength that is
 used to impede a character’s quest progress.
 
 20
+
+great ForeSt web
+great ForeSt web
+
+20
+
 2
 3
 1
 
 2
+
+2
+3
+1
+
+3
+King Spider
+
+2
+
+1/12
+
+When Revealed: Each player must choose and
+exhaust 1 character they control.
+
+As he drew nearer, he saw that it was made with spiderwebs one behind and over and tangled with another.
+–The Hobbit
+
+Shadow: Defending player must choose and
+exhaust 1 character they control. (2 characters
+instead if this attack is undefended.)
+eneMY
+Illus. John Wigley
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+5/12
+
+Forest.
+
+Travel: Each player must exhaust 1 hero they
+control to travel here.
+
+Creature. Spider.
+
+3
+
+2
+
+74
+
+King Spider
+
+1/12
+
+2
+
+loCation
+Illus. Jason Ward
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+77
+
+The “King Spider” and the “Great Forest Web”
+Creature.
+Spider.
+each
+have a threat strength of “2.” Forest.
+
+Travel: Each player must exhaust 1 hero t
+control to travel here.
+
+When Revealed: Each player must choose and
+exhaust 1 character they control.
+
+he drew nearer, he saw that it was made with spid
+To resolve the quest, compare As
+the
+total
+webs
+one
+behind willpower
+and over and tangledof
+withall
+another.
+–The Hobbit
+Shadow:
+Defending
+player
+must
+choose
+and
+characters
+committed
+to
+the
+quest
+to
+the
+total
+threat
+in
+exhaust 1 character they control. (2 characters
+insteadstaging
+if this attackarea:
+is undefended.)
+the
+
+eneMY
+• Successful:
+The total willpower is greater
+than the
+loCation
+total threat.
+
+Illus. John Wigley
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+74
+
+Illus. Jason Ward
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+• Unsuccessful: The total willpower is less than the
+total threat.
+• Neither: The total willpower is equal to the
+total threat.
+The quest resolution determines if players gain
+progress tokens or increase their threat. If the quest
+resolution is neither successful nor unsuccessful,
+nothing happens.
+
+Successful Quest
+If the quest is successful, a number of progress tokens
+equal to the difference between the total willpower and
+the total threat are placed on the current quest card.
+Each quest card has number of quest points. When
+the number of progress tokens on the quest card is
+equal to or greater than the number of quest points,
+the players complete that stage of the quest, which is
+described later.
+Sometimes there is an active location, which
+is a location card that is placed near the revealed
+quest card instead of in the staging area. A location
+becomes active when a player travels to it, which is
+described later.
+If there is an active location, any game effect or ability
+that places progress tokens on the current quest places
+progress on the active location instead, up to the value of
+the location’s quest points.
+
+12
+
+### p12 c2
+
+OUGH MIRKWOOD
+
+Quest
+Points
+
+1B
+
+8
 
 Flies and spiders
 PASSAGE THROUGH MIRKWOOD
@@ -2581,86 +2808,9 @@ placed
 on nquest
 theycards.
 could not guess. –The Hobbit
-
-1
-
 Illus. Ben Zweifel
 
-3
-King Spider
-
-2
-
-1/12
-
-As he drew nearer, he saw that it was made with spiderwebs one behind and over and tangled with another.
-–The Hobbit
-
-Shadow: Defending player must choose and
-exhaust 1 character they control. (2 characters
-instead if this attack is undefended.)
-eneMY
-©2010 Middle-earth Enterprises ©2010 FFG
-
-5/12
-
-Forest.
-
-Travel: Each player must exhaust 1 hero they
-control to travel here.
-
-When Revealed: Each player must choose and
-exhaust 1 character they control.
-
-Illus. John Wigley
-
-1B
-
-2
-
-3
-
-Creature. Spider.
-
-3
-
-D
-
-8
-
-great ForeSt web
-
-2
-
-PASSAGE THROUGH MIRKWOO
-
-Quest
-Points
-
-great ForeSt web
-20
-
-Flies and spiders
-
-74
-
-King Spider
-
-1/12
-
-2
-
-Illus. Jason Ward
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-77
-
-The “King Spider” and the “Great Forest Web”
-Creature.
-Spider.
-each
-have a threat strength of “2.” Forest.
+©2010 Middle-earth Enterprises ©2010
 
 FFG
 
@@ -2673,10 +2823,6 @@ additional progress tokens on the current quest card as
 normal.
 Illus. Ben Zweifel
 
-loCation
-
-©2010 Middle-earth Enterprises ©2010
-
 ©2010 Middle-earth Enterprises ©2010
 
 FFG
@@ -2685,110 +2831,39 @@ FFG
 
 5/12
 
-Travel: Each player must exhaust 1 hero they
-control to travel here.
+they
 
-When Revealed: Each player must choose and
-exhaust 1 character they control.
+der.
 
 Unsuccessful Quest
-
-he drew nearer, he saw that it was made with spiderTo resolve the quest, compare As
-the
-total
-webs
-one
-behind willpower
-and over and tangledof
-withall
-another.
-–The Hobbit
-Shadow:
-Defending
-player
-must
-choose
-and
 When a quest is unsuccessful, increase each player’s
-characters
-committed
-to
-the
-quest
-to
-the
-total
-threat
-in
-exhaust 1 character they control. (2 characters
 threat dial by to the difference between the total threat
-insteadstaging
-if this attackarea:
-is undefended.)
-the
 and the total willpower. If a player’s threat dial reaches
-eneMY
-• Successful: The total willpower is greater
-than the
-loCation
 50, that player is immediately eliminated from the
-total threat.
 game, which is described on page 20.
-• Unsuccessful: The total willpower is less than the
-total threat.
-
-Illus. John Wigley
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-74
-
-Illus. Jason Ward
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-• Neither: The total willpower is equal to the
-total threat.
-The quest resolution determines if players gain
-progress tokens or increase their threat. If the quest
-resolution is neither successful nor unsuccessful,
-nothing happens.
-
-Successful Quest
-If the quest is successful, a number of progress tokens
-equal to the difference between the total willpower and
-the total threat are placed on the current quest card.
-Each quest card has number of quest points. When
-the number of progress tokens on the quest card is
-equal to or greater than the number of quest points,
-the players complete that stage of the quest, which is
-described later.
-Sometimes there is an active location, which
-is a location card that is placed near the revealed
-quest card instead of in the staging area. A location
-becomes active when a player travels to it, which is
-described later.
-If there is an active location, any game effect or ability
-that places progress tokens on the current quest places
-progress on the active location instead, up to the value of
-the location’s quest points.
-
-12
-
 77
 
-## p13 {#learn-to-play-p13}
+## p13
 
-Example: Resolving a Quest
+### p13 c1
+
+Example: Reso
 Toms Character
 
-2
+‰ ArAgorn
+
+HEro
+7
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+Illus. John Stanko
+
+40
+
+5
 
 1
-
-1
-
-0
 
 3
 
@@ -2799,68 +2874,29 @@ Toms Character
 0
 
 1
+
+3
+HuMMerHornS
 
 3/12
 
 5/10
 
 eneMY
-Illus. Nikolay Stoyanov
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-anduin passage
-JOURNEY ALONG THE ANDUIN
-
-16
 
 3
 
-As your enemies harass the raft, it is difficult to maintain balance and
-effectively fight them off.
+M
 
-7/9
-
-Marshland.
-
-Reveal 1 additional card from the encounter deck each quest phase. Do not
-make engagement checks during the encounter phase. (Each player may still
-optionally engage 1 enemy each encounter phase.)
-
-“On a time they took a boat and went down to the
-Gladden Fields, where there were great beds of iris and
-flowering reeds.” –Gandalf, The Fellowship of the Ring
-
-Illus. Ben Zweifel
-
-loCation
-97
-
-Illus. Ben Zweifel
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-Quest
-Deck
-
-Victory 3.
-
-eneMY
-75
-
-13
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-2b
-
-Forced: While Gladden Fields is the active
-location, each player must raise their threat by
-an additional point during the refresh phase.
+Forced: While G
+location, each pla
+an additional poin
 
 Goblin. Orc.
+
+“On a time they took
+Gladden Fields, wher
+flowering reeds.” –Ga
 
 Shadow: Attacking enemy gets +1 Û. (If this
 attack is undefended, also raise your threat
@@ -2870,89 +2906,30 @@ Shadow: Deal 1 damage to each character the
 defending player controls. (2 damage instead if
 this attack is undefended.)
 Victory 5.
-
-Illus. Leonardo Borazio
-
-gladden FieldS
-
-eaSt bigHt patrol
-
-Creature. Insect.
-
-Ally
-1
-
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-3
+gla
 
-2
+eaSt bigHt patrol
 
 Forced: After Hummerhorns engages you, deal 5
 damage to a single hero you control.
 
+1
+
 ©2010 Middle-earth Enterprises ©2010 FFG
-
-Gondor. Warrior.
-
-13
-
-5
-
-1
-
-HuMMerHornS
-
-guArd of THE CiTAdEl
-
-Gondor. Warrior.
-
-1
-
-Illus. John Stanko
-
-40
 
 3
 
 2
 
-Ally
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-“But the Lords of Minas Tirith still fight on, defying our
-enemies, keeping the passage of the River from Argonath to
-the Sea.” –Elrond, The Fellowship of the Ring
-
-Illus. Leonardo Borazio
-
-12
-
-2
-
-2
-
-3
-
-‰ ArAgorn
-
-guArd of THE CiTAdEl
-
-“But the Lords of Minas Tirith still fight on, defying our
-enemies, keeping the passage of the River from Argonath to
-the Sea.” –Elrond, The Fellowship of the Ring
-
-HEro
-7
-
-©2010 Middle-earth Enterprises ©2010 FFG
+Creature. Insect.
 
 Illus. David Lecossu
 
-2
+Dúnedain. Noble. Ranger.
 
-3
+1
 
 “I am Aragorn son of Arathorn; and if by life or death
 I can save you, I will.” –The Fellowship of
@@ -2962,8 +2939,11 @@ HEro
 
 2
 
-1
-0
+5
+
+‰ ArAgorn
+
+Dúnedain. Noble. Ranger.
 
 Response: After Aragorn commits to a quest,
 spend 1 resource from his resource pool to
@@ -2975,13 +2955,7 @@ of kings. –The Two Towers
 
 Illus. Gabrielle Portal
 
-Dúnedain. Noble. Ranger.
-
-‰ ArAgorn
-
-Dúnedain. Noble. Ranger.
-
-5
+Sentinel.
 
 Sentinel.
 
@@ -2999,15 +2973,17 @@ may be triggered by each player once each round.
 
 Noble. Rohan.
 
-Sentinel.
+Response: After Aragorn commits to a quest,
+spend 1 resource from his resource pool to
+ready him.
 
 9
 
 2
 
-Response: After Aragorn commits to a quest,
-spend 1 resource from his resource pool to
-ready him.
+“I am Aragorn son of Arathorn; and if by life or death
+I can save you, I will.” –The Fellowship of
+the Ring
 
 1
 
@@ -3037,13 +3013,6 @@ Slender and tall she was in her white robe girt with silver;
 but strong she seemed and stern as steel, a daughter
 of kings. –The Two Towers
 
-1
-
-“I am Aragorn son of Arathorn; and if by life or death
-I can save you, I will.” –The Fellowship of
-the Ring
-
-2
 1
 
 Illus. John Stanko
@@ -3062,40 +3031,36 @@ Illus. Gabrielle Portal
 
 1
 
-Rosies Characters
+Ro
 
-114
+eneMY
+75
+
+Illus. Nikolay Stoyanov
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+97
+
+Illus. Ben Zweifel
+
+©2010 M
 
 Staging Area
 
-127
+1. Tom exhausts Éowyn to commit her to the quest. R
+Citadel to commit them to the quest. A Gladden Fi
 
-Encounter
-Deck
-
-1. Tom exhausts Éowyn to commit her to the quest. Rosie exhausts both Aragorn and the Guard of the
-Citadel to commit them to the quest. A Gladden Fields location card is already in the staging area.
-2. The players each reveal one card from the encounter deck, and add any revealed enemies and locations
+2. The players each reveal one card from the encount
 to the staging area.
-3. The players add the total committed Ò and compare it to the total $ in the staging area. The result is
-7 Ò and 7 $. Tom uses Éowyn’s card ability to increase the players’ Ò to eight, which allows them to
+
+3. The players add the total committed Ò and compa
+7 Ò and 7 $. Tom uses Éowyn’s card ability to in
 place one progress token on the current quest card.
 
 Phase 4: Travel
 The travel phase represents the heroes’ exploration and
 navigation across the lands of Middle-earth.
-
-When players travel to a location in the staging area, that location becomes
-the active location.
-great ForeSt web
-
-2
-
-3B
-
-3
-1
-
 The staging area frequently contains one or more location
 cards. During this phase, the players can choose to travel
 to one of those locations.
@@ -3110,11 +3075,143 @@ indicates a cost that players must pay to travel to that
 location. If the players cannot pay the travel cost, they
 cannot travel to that location.
 
+### p13 c2
+
+olving a Quest
+
+osies Characters
+2
+2
+
+1
+
+1
+
+0
+
+Gondor. Warrior.
+
+Gondor. Warrior.
+
+3
+
+guArd of THE CiTAdEl
+
+guArd of THE CiTAdEl
+
+2
+
+2
+
+Ally
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+0
+
+“But the Lords of Minas Tirith still fight on, defying our
+enemies, keeping the passage of the River from Argonath to
+the Sea.” –Elrond, The Fellowship of the Ring
+
+1
+
+12
+
+2
+
+2
+
+3
+
+Illus. Leonardo Borazio
+
+1
+
+13
+
+“But the Lords of Minas Tirith still fight on, defying our
+enemies, keeping the passage of the River from Argonath to
+the Sea.” –Elrond, The Fellowship of the Ring
+
+Ally
+Illus. Leonardo Borazio
+
+13
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+adden FieldS
+
+2b
+
+anduin passage
+JOURNEY ALONG THE ANDUIN
+
+16
+As your enemies harass the raft, it is difficult to maintain balance and
+effectively fight them off.
+
+7/9
+
+Marshland.
+
+Reveal 1 additional card from the encounter deck each quest phase. Do not
+make engagement checks during the encounter phase. (Each player may still
+optionally engage 1 enemy each encounter phase.)
+
+Gladden Fields is the active
+ayer must raise their threat by
+nt during the refresh phase.
+
+a boat and went down to the
+re there were great beds of iris and
+andalf, The Fellowship of the Ring
+
+Illus. Ben Zweifel
+
+loCation
+
+Middle-earth Enterprises ©2010 FFG
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+Quest
+Deck
+
+Victory 3.
+
+114
+
+127
+
+Encounter
+Deck
+
+Rosie exhausts both Aragorn and the Guard of the
+ields location card is already in the staging area.
+
+ter deck, and add any revealed enemies and locations
+
+are it to the total $ in the staging area. The result is
+ncrease the players’ Ò to eight, which allows them to
+.
+
+When players travel to a location in the staging area, that location becomes
+the active location.
+great ForeSt web
+
 great ForeSt web
 
 20
 
 2
+
+2
+
+3B
+
+3
+1
 
 2
 
@@ -3196,9 +3293,9 @@ Illus. John Wigley
 loCation
 74
 
-Illus. Jason Ward
-
 Staging Area
+
+Illus. Jason Ward
 
 Quest
 Deck
@@ -3247,14 +3344,10 @@ Illus. Jason Ward
 77
 
 13
-loCation
-Illus. Jason Ward
 
-©2010 Middle-earth Enterprises ©2010 FFG
+## p14
 
-77
-
-## p14 {#learn-to-play-p14}
+### p14 c1
 
 Traveling to Locations
 Location cards that are in the staging area
@@ -3296,6 +3389,8 @@ area and places it in their play area, facing off against
 their characters.
 
 14
+
+### p14 c2
 
 Step Two: Engagement Checks
 After each player has had an opportunity to engage
@@ -3399,27 +3494,16 @@ remaining in the staging area or until the enemies
 remaining in the staging area cannot engage any of
 the players.
 
-## p15 {#learn-to-play-p15}
+## p15
 
-Example: Making Engagement Checks
+### p15 c1
+
+Example: Making E
 Tom
-
-Rosie
 20
-
-32
-
 2
-
 3
-
-3
-
-5
-
 1
-
-2
 
 3
 
@@ -3427,146 +3511,21 @@ Rosie
 
 King Spider
 
-ungoliant'S Spawn
-
-4/12
+1
 
 Creature. Spider.
 
 When Revealed: Each player must choose and
 exhaust 1 character they control.
-
-When Revealed: Each character currently committed
-to a quest gets –1 Ò until the end of the phase.
-
 Shadow: Defending player must choose and
 exhaust 1 character they control. (2 characters
 instead if this attack is undefended.)
-
-Shadow: Raise defending player’s threat by 4. (Raise
-defending player’s threat by 8 instead if this attack is
-undefended.)
-
 eneMY
-
-eneMY
-76
-
-eneMY
-
-©2010 Middle-earth Enterprises ©2010 FFG
-Illus. Andrew Olson
-
-Shadow: Raise defending player’s threat by 4. (Raise
-defending player’s threat by 8 instead if this attack is
-undefended.)
-
-Forced: If Goblin Sniper is in the staging area at
-the end of the combat phase, each player deals 1
-point of damage to 1 character they control.
-
-Forced: After Forest Spider engages a player, it
-gets +1 Û until the end of the round.
-
-Shadow: Defending player must choose and
-discard 1 attachment they control.
-
-eneMY
-
-eneMY
-
-Staging Area
-
-4
-
-96
-
-96
-
-eneMY
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-Illus. Marco Caradonna
-
-Illus. Marco Caradonna
-
-83
-
-1/10
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-ForeSt Spider
-
-5
-
-Shadow: Defending player must choose and
-discard 1 attachment they control.
-
-9
-
-1/10
-
-Creature. Spider.
-
-During the encounter phase, players cannot
-optionally engage Goblin Sniper if there are other
-enemies in the staging area.
-
-Illus. Alexandr Shaldin
-
-4
-
-ForeSt Spider
-
-2
-
-Goblin. Orc.
-
-4
-
-5
-
-3
-
-4/14
-
-1
-
-goblin Sniper
-
-3
-
-1/12
+Illus. John Wigley
 
 74
 
-2
-
-2
-
-1
-
-2
-
-2
-
-32
-
-2
-0
-
-25
-
-King Spider
-
-25
-2
-
-ungoliant'S Spawn
+©2010 Middle-earth Enterprises ©2010 FFG
 
 20
 
@@ -3577,6 +3536,7 @@ ungoliant'S Spawn
 3
 
 3
+King Spider
 
 Creature. Spider.
 
@@ -3595,88 +3555,206 @@ Illus. John Wigley
 
 48
 2
+2
+0
+
+1/12
+
+74
+
+2
+goblin Sniper
+
+3
+
+4/14
+
+Goblin. Orc.
+During the encounter phase, players cannot
+optionally engage Goblin Sniper if there are other
+enemies in the staging area.
+Forced: If Goblin Sniper is in the staging area at
+the end of the combat phase, each player deals 1
+point of damage to 1 character they control.
+eneMY
+Illus. Alexandr Shaldin
+
+5
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+83
+
+Stagin
+
+1. The first player, Tom, makes the first engagement
+cost (20) that is equal to or lower than Tom’s thre
+
+2. Rosie makes the next engagement check. Ungolia
+that is equal to or lower than Rosie’s threat of 35,
+
+3. Tom makes the next engagement check. His threa
+remaining in the staging area, so neither of those
+
+4. Rosie makes the next engagement check. The For
+is equal to or lower than Rosie’s threat of 35, so t
+
+5. Tom, and then Rosie, each make another engagem
+is higher than each player’s threat, so it remains i
+have made successive engagement checks withou
+Checks” step is now complete.
+
+### p15 c2
+
+Engagement Checks
+Rosie
+32
+3
+5
+2
+
+9
+ungoliant'S Spawn
+
+4/12
+
+Creature. Spider.
 
 When Revealed: Each character currently committed
 to a quest gets –1 Ò until the end of the phase.
+Shadow: Raise defending player’s threat by 4. (Raise
+defending player’s threat by 8 instead if this attack is
+undefended.)
+
+2
+
+eneMY
+
+9
+4
+
+76
+
+eneMY
+
+©2010 Middle-earth Enterprises ©2010 FFG
+Illus. Andrew Olson
+
+2
+1
+
+Shadow: Raise defending player’s threat by 4. (Raise
+defending player’s threat by 8 instead if this attack is
+undefended.)
+
+5
+2
+
+Shadow: Defending player must choose and
+discard 1 attachment they control.
+
+32
+ForeSt Spider
+
+3
+
+4
+
+25
+
+1
+
+2
+
+2
+
+When Revealed: Each character currently committed
+to a quest gets –1 Ò until the end of the phase.
+
+4/12
+
+ungoliant'S Spawn
+
+25
+2
+
+Forced: After Forest Spider engages a player, it
+gets +1 Û until the end of the round.
 
 76
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-4/12
+Creature. Spider.
 
 Illus. Andrew Olson
+
+1/10
+
+Creature. Spider.
 
 Forced: After Forest Spider engages a player, it
 gets +1 Û until the end of the round.
 
-74
+Shadow: Defending player must choose and
+discard 1 attachment they control.
+eneMY
+
+©2010 Middle-earth Enterprises ©2010 FFG
+Illus. Marco Caradonna
+
+eneMY
+
+4
+
+Creature. Spider.
+
+ng Area
+
+96
+
+96
+
+1/10
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-Creature. Spider.
+ForeSt Spider
 
-Illus. John Wigley
+Illus. Marco Caradonna
 
-2
+t check. The King Spider has the highest engagement
+eat of 24, so the King Spider engages Tom.
 
-Creature. Spider.
+ant’s Spawn has the highest engagement cost (32)
+, so Ungoliant’s Spawn engages Rosie.
 
-1
+at is lower than the engagement cost of the enemies
+enemies engage Tom.
 
-Creature. Spider.
+rest Spider has the highest engagement cost (25) that
+the Forest Spider engages Rosie.
 
-9
-
-1. The first player, Tom, makes the first engagement check. The King Spider has the highest engagement
-cost (20) that is equal to or lower than Tom’s threat of 24, so the King Spider engages Tom.
-2. Rosie makes the next engagement check. Ungoliant’s Spawn has the highest engagement cost (32)
-that is equal to or lower than Rosie’s threat of 35, so Ungoliant’s Spawn engages Rosie.
-3. Tom makes the next engagement check. His threat is lower than the engagement cost of the enemies
-remaining in the staging area, so neither of those enemies engage Tom.
-4. Rosie makes the next engagement check. The Forest Spider has the highest engagement cost (25) that
-is equal to or lower than Rosie’s threat of 35, so the Forest Spider engages Rosie.
-5. Tom, and then Rosie, each make another engagement check. The engagement cost of Goblin Sniper
-is higher than each player’s threat, so it remains in the staging area at this time. Since all players
-have made successive engagement checks without being engaged by any enemies, the “Engagement
-Checks” step is now complete.
+ment check. The engagement cost of Goblin Sniper
+in the staging area at this time. Since all players
+ut being engaged by any enemies, the “Engagement
 
 15
 
-## p16 {#learn-to-play-p16}
+## p16
+
+### p16 c1
 
 Phase 6: Combat
-
-Step Two: Resolve Enemy Attacks
-
 The combat phase represents the battles and struggles
 between the heroes of Middle-earth and the enemies
 who seek to hinder or harm them during their quest.
 During this phase, engaged enemies attack and
 potentially gain unpredictable tactics through shadow
 cards. Then, players can attack enemies.
-
-After shadow cards have been dealt to each engaged
-enemy, resolve enemy attacks. Starting with the first
-player and continuing clockwise, each player performs
-the following steps in order for each enemy they are
-engaged with. The player performing the steps is
-referred to as the active player.
-
 To resolve the combat phase, perform the following
 steps in order:
-
-a. Choose An Enemy: The active player chooses one
-engaged enemy in their own play area that has not
-attacked yet this round.
-
 1. Deal Shadow Cards
-
-b. Declare Defender: The active player may choose
-one of their ready characters as a defender.
-Exhaust that character. The active player may also
-choose not to declare any defenders.
-
 2. Resolve Enemy Attacks
 3. Resolve Player Attacks
 Each step is described below. After performing
@@ -3718,38 +3796,18 @@ King Spider
 
 3
 
-c. Resolve Shadow Effect: The active player flips
-the chosen enemy’s shadow card faceup and
-resolves any shadow effects on that card (indicated
-by text after the word “Shadow:” on the bottom
-half of the card). Any non-shadow effects on the
-shadow card are ignored.
-d. Determine Damage: If the defender’s defense
-strength is equal to or greater than the chosen
-20defender suffers
-enemy’s attack strength, the
-no damage.
-2
-
-Attack Strength
-12
-Defense Strength
-2
-
-Attack Strength 3
-Defense Strength 2
-
-5
-
 1
 Creature.
 Spider.
 
+When Revealed: Each
+3 player must choose and
+Shadow
+exhaust 1 character they control.
 Effect
+King Spider
 
 1/12
-
-pider
 
 Creature. Spider.
 
@@ -3782,6 +3840,48 @@ discarded. At the end of the combat phase, all shadow
 cards that were dealt this round are discarded.
 
 16
+
+### p16 c2
+
+Step Two: Resolve Enemy Attacks
+After shadow cards have been dealt to each engaged
+enemy, resolve enemy attacks. Starting with the first
+player and continuing clockwise, each player performs
+the following steps in order for each enemy they are
+engaged with. The player performing the steps is
+referred to as the active player.
+a. Choose An Enemy: The active player chooses one
+engaged enemy in their own play area that has not
+attacked yet this round.
+b. Declare Defender: The active player may choose
+one of their ready characters as a defender.
+Exhaust that character. The active player may also
+choose not to declare any defenders.
+c. Resolve Shadow Effect: The active player flips
+the chosen enemy’s shadow card faceup and
+resolves any shadow effects on that card (indicated
+by text after the word “Shadow:” on the bottom
+half of the card). Any non-shadow effects on the
+shadow card are ignored.
+d. Determine Damage: If the defender’s defense
+strength is equal to or greater than the chosen
+20defender suffers
+enemy’s attack strength, the
+no damage.
+2
+
+Attack Strength
+12
+Defense Strength
+2
+
+Attack Strength 3
+Defense Strength 2
+
+5
+
+20
+2
 
 3
 
@@ -3858,17 +3958,6 @@ attack
 is undefended.)
 Illus. John Stanko
 
-When Revealed: Each
-3 player must choose and
-Shadow
-exhaust 1 character they control.
-K
-S
-ing
-
-20
-2
-
 ©2010 Middle-earth Enterprises ©2010 FFG
 
 1
@@ -3941,7 +4030,9 @@ undefended attacks.
 74
 74
 
-## p17 {#learn-to-play-p17}
+## p17
+
+### p17 c1
 
 Step Three: Resolve Player Attacks
 After each enemy that is engaged with a player has
@@ -3990,196 +4081,72 @@ proceed to the next game round beginning with the
 resource phase. Continue to play rounds in this manner
 until the game reaches a conclusion.
 
+### p17 c2
+
 17
 
-## p18 {#learn-to-play-p18}
+## p18
 
-Example: Defending against Enemy Attacks
+### p18 c1
+
+Example: Defending a
 
 1
 32
-
-25
-
 3
-
-2
-
 5
-
 2
-
-2
-
-1
 
 9
-
-4
 
 4/12
 
 ungoliant'S Spawn
-
 Creature. Spider.
 
 When Revealed: Each character currently committed
 to a quest gets –1 Ò until the end of the phase.
-
-Forced: After Forest Spider engages a player, it
-gets +1 Û until the end of the round.
-
 Shadow: Raise defending player’s threat by 4. (Raise
 defending player’s threat by 8 instead if this attack is
 undefended.)
 
-Shadow: Defending player must choose and
-discard 1 attachment they control.
-
 eneMY
-
-eneMY
-Illus. Marco Caradonna
-
-aM
-e
-r
-
-St
-d
-te
-an
+Illus. Andrew Olson
 
 2
 
-3
-
-G
-
-95
-G
-
-eife
-
-5
-
-Zw
-
-96
-
-Ben
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-l
-
-W
-lo hil
-
-FF
-
-97
-
-eneMY
-Illus. Marco Caradonna
-
-s.
-
 76
 
-Shadow: Defending player must choose and
-discard 1 attachment they control.
-
-Illu
-
-eneMY
-
-Forced: After Forest Spider engages a player, it
-gets +1 Û until the end of the round.
-
-“ cat e E
-io n
-w Th
-n c
-n hi er
-an or b ch c e is , pl han
-ay te
-d at ro on
-a he ss e
-gr i es st ers d S Fo
-ea n; t re
-t d fo he am ca trea res
-ro r I pa th nn m t.
-w
-t
-ot i
-–B sin hav h. T ere,
-s
-eo es e h ha I k dra th
-rn s a ea t y no
-w ea
-, T nd rd ou w
-he fo th s , b car ctiv
-ds e
-H rge at hou lac
-ob tf it ld k
-.
-bi ul ca n an
-©20
-lo
-t ne rr ei d
-10
-i
-M
-s
-Ca
-s.” es the stro
-id
-dle
-en r d ng
--ear
-ti
-ch rin
-th
-En
-an k
-o
-terp
-o
-n
-t
-m
-rise
-en f,
-s©
-t
-20
-10
-
-Shadow: Raise defending player’s threat by 4. (Raise
-defending player’s threat by 8 instead if this attack is
-undefended.)
-
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-Creature. Spider.
+32
+3
+5/1
+
+1
+
+3
 
 FF
 
 When Revealed: Each character currently committed
 to a quest gets –1 Ò until the end of the phase.
+Shadow: Raise defending player’s threat by 4. (Raise
+defending player’s threat by 8 instead if this attack is
+undefended.)
 
-1/10
+eneMY
+Illus. Andrew Olson
 
-ForeSt Spider
+76
 
-e
+©2010 Middle-earth Enterprises ©2010 FFG
+
+G
 
 Creature. Spider.
 
-Illus. Andrew Olson
-
-4
+97
 
 aS
 
@@ -4189,11 +4156,7 @@ aS
 
 ungoliant'S Spawn
 
-2
-
-1
-
-3
+e
 
 9
 
@@ -4258,58 +4221,13 @@ t
 
 2
 
-13
-
-/1
-
-4
-
-1
-
-5/1
-
-2
-
 0
 
 5
 
 5
 
-25
-2
-
-H
-
-4
-
-32
 3
-
-96
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-nC
-
-76
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-e
-
-Illus. Andrew Olson
-
-2
-
-1/10
-
-ForeSt Spider
-
-Creature. Spider.
-
-12
-
 3
 
 1
@@ -4339,6 +4257,198 @@ along the skirts of the mountains, many days ago.”
 
 Illus. A.M. Sartor
 
+1. Rosie is engaged with two enemies, the Forest Spi
+the combat phase, one card from the encounter dec
+shadow card.
+
+2. Rosie decides to resolve the attack made by Ungol
+declaring it as a defender against this attack.
+
+3. To resolve the attack, Rosie flips the attacker’s sha
+Patrol, which gives the attacking enemy +1 Û. Ro
+against the Silverlode Archer’s defense (0 Ú), and
+Since the Silverlode Archer only has one hit point,
+
+4. Rosie resolves the attack made by the Forest Spide
+
+5. To resolve the attack, Rosie first flips the attacker’s
+Enchanted Stream, which has no shadow effect. Th
+was undefended, Rosie must place all the damage
+tokens on Aragorn, who survives the attack with th
+
+18
+
+### p18 c2
+
+against Enemy Attacks
+
+25
+2
+2
+1
+
+4
+
+1/10
+
+ForeSt Spider
+Creature. Spider.
+
+Forced: After Forest Spider engages a player, it
+gets +1 Û until the end of the round.
+
+Shadow: Defending player must choose and
+discard 1 attachment they control.
+eneMY
+Illus. Marco Caradonna
+
+an
+te
+
+d
+
+St
+
+r
+
+e
+
+aM
+
+25
+
+e
+
+nC
+
+H
+
+2
+2
+
+13
+
+/1
+
+4
+
+1
+
+95
+
+l
+eife
+
+5
+
+Zw
+
+96
+
+Ben
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+s.
+
+eneMY
+Illus. Marco Caradonna
+
+10
+
+W
+lo hil
+c e
+
+Shadow: Defending player must choose and
+discard 1 attachment they control.
+
+G
+
+2
+
+Forced: After Forest Spider engages a player, it
+gets +1 Û until the end of the round.
+
+FF
+
+1/10
+
+ForeSt Spider
+Creature. Spider.
+
+Illu
+
+4
+
+at E
+“
+io n
+w Th
+n c
+n hi er
+an or b ch c e is , pl han
+ay te
+d at ro on
+a he ss e
+gr i es st ers d S Fo
+ea n; t re
+t d fo he am ca trea res
+ro r I pa th nn m t.
+w
+t
+ot i
+–B sin hav h. T ere,
+s
+eo es e h ha I k dra th
+rn s a ea t y no
+w ea
+, T nd rd ou w
+he fo th s , b car ctiv
+ds e
+H rge at hou lac
+ob tf it ld k
+.
+bi ul ca n an
+©20
+l
+n
+t
+10
+o
+es rrie eith d st
+M
+Ca
+s.” s e ro
+id
+dle
+en r d ng
+-ear
+ti
+ch rin
+th
+En
+a
+o
+nt k o
+terp
+n
+m f,
+rise
+en
+s©
+t
+20
+
+2
+
+4
+
+96
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+12
 2
 3
 2
@@ -4363,26 +4473,28 @@ Illus. John Stanko
 
 1
 
-1. Rosie is engaged with two enemies, the Forest Spider and Ungoliant’s Spawn. At the beginning of
-the combat phase, one card from the encounter deck is dealt face down to each engaged enemy, as a
-shadow card.
-2. Rosie decides to resolve the attack made by Ungoliant’s Spawn first. She exhausts the Silverlode Archer,
-declaring it as a defender against this attack.
-3. To resolve the attack, Rosie flips the attacker’s shadow card faceup. The shadow card is the East Bight
-Patrol, which gives the attacking enemy +1 Û. Rosie compares the enemy's total attack strength (6 Û)
-against the Silverlode Archer’s defense (0 Ú), and places six damage tokens on the defending character.
-Since the Silverlode Archer only has one hit point, it is destroyed and discarded from play.
-4. Rosie resolves the attack made by the Forest Spider. She declares this attack “undefended.”
-5. To resolve the attack, Rosie first flips the attacker’s shadow card faceup. The shadow card is the
-Enchanted Stream, which has no shadow effect. The Forest Spider's attack is 2 Û. Since this attack
-was undefended, Rosie must place all the damage on a single hero she controls. She places two damage
-tokens on Aragorn, who survives the attack with three hit points remaining.
+ider and Ungoliant’s Spawn. At the beginning of
+ck is dealt face down to each engaged enemy, as a
 
-18
+liant’s Spawn first. She exhausts the Silverlode Archer,
 
-## p19 {#learn-to-play-p19}
+adow card faceup. The shadow card is the East Bight
+osie compares the enemy's total attack strength (6 Û)
+places six damage tokens on the defending character.
+, it is destroyed and discarded from play.
 
-Example: Attacking Enemies
+er. She declares this attack “undefended.”
+
+’s shadow card faceup. The shadow card is the
+he Forest Spider's attack is 2 Û. Since this attack
+on a single hero she controls. She places two damage
+hree hit points remaining.
+
+## p19
+
+### p19 c1
+
+Example: Attac
 
 1
 3
@@ -4401,82 +4513,7 @@ Example: Attacking Enemies
 2
 0
 
-1
-
-9
-
-“I can walk this path, but others have not this skill.”
-–The Fellowship of the Ring
-
-5
-
-29
-
-Response: After Legolas participates in an
-attack that destroys an enemy, place 2 progress
-tokens on the current quest.
-
-More than a thousand were there mustered. Their
-spears were like a springing wood. –The Two Towers
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-1
-
-‰ lEgolAs
-
-Ranged.
-
-Response: After Gondorian Spearman is
-declared as a defender, deal 1 damage to the
-attacking enemy.
-
-Illus. Winona Nelson
-
-3
-
-4
-
-Noble. Silvan. Warrior.
-
-‰ lEgolAs
-
-Noble. Silvan. Warrior.
-
-Ally
-
-2
-
-HEro
-
-©2010 Middle Earth Enterprises ©2010 FFG
-
-4
-
-Ranged.
-
-1
-
-Response: After Legolas participates in an
-attack that destroys an enemy, place 2 progress
-tokens on the current quest.
-
-3
-
-“I can walk this path, but others have not this skill.”
-–The Fellowship of the Ring
-
-Illus. Magali Villeneuve
-
-2
-
-1
-
-0
-
-1
-
-1
+Sentinel.
 
 Gondor. Warrior.
 
@@ -4490,14 +4527,14 @@ gondoriAn spEArmAn
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-Sentinel.
+Ally
 
 gondoriAn spEArmAn
 
 HEro
 Illus. Katherine Dinger
 
-Ally
+©2010 Middle-earth Enterprises ©2010 FFG
 
 11
 
@@ -4507,24 +4544,19 @@ Ally
 one of the mighty of the firstborn.”
 –Gandalf, The Fellowship of the Ring
 
-©2010 Middle-earth Enterprises ©2010 FFG
-
-Action: Pay 1 resource from Glorfindel’s pool
-to heal 1 damage on any character. (Limit once
-per round.)
-
 Response: After Gondorian Spearman is
 declared as a defender, deal 1 damage to the
 attacking enemy.
 
 1
 
+Action: Pay 1 resource from Glorfindel’s pool
+to heal 1 damage on any character. (Limit once
+per round.)
+
 More than a thousand were there mustered. Their
 spears were like a springing wood. –The Two Towers
 
-1
-
-9
 1
 
 Illus. Winona Nelson
@@ -4559,21 +4591,24 @@ Illus. Katherine Dinger
 
 3
 
-HEro
 29
 
-Illus. Magali Villeneuve
+Response: After Gondorian Spearman is
+declared as a defender, deal 1 damage to th
+attacking enemy.
+More than a thousand were there mustered. Their
+spears were like a springing wood. –The Two Towers
 
-©2010 Middle Earth Enterprises ©2010 FFG
+Ally
+Illus. Winona Nelson
 
-5
+2
+
+©2010 Middle-earth Enterprises ©2010 FFG
 
 10
 2
 2
-
-4
-
 0
 
 3
@@ -4581,34 +4616,125 @@ dol guldur orCS
 
 1/14
 
-35
-2
-3
-1
-
 Dol Guldur. Orc.
 
 When Revealed: The first player chooses 1
 character currently committed to a quest. Deal 2
 damage to that character.
-
-5
-
 Shadow: Attacking enemy gets +1 Û.
 (+3 Û instead if this attack is undefended.)
-
-dol guldur beaStMaSter
-
 eneMY
 Illus. Anna Christenson
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
+89
+
+Tom is engaged with two enemies, the Dol Guldur Be
+
+1. Tom declares an attack against the Dol Guldur Or
+
+2. Tom takes Glorfindel’s attack (3 Û) and subtract
+difference is three, Tom places three damage toke
+This enemy started with three hit points, so it is d
+
+3. Tom declares an attack against the Dol Guldur Be
+Gondorian Spearman (1 Û) as attackers.
+
+4. Tom takes his combined attack (4 Û) and subtrac
+Since the difference is three, Tom places three dam
+Beastmaster. This enemy started with five hit poin
+remaining. The damage tokens stay on the enemy
+
+### p19 c2
+
+cking Enemies
+
+9
+1
+1
+
+1
+
+9
+
+3
+
+‰ lEgolAs
+
+Noble. Silvan. Warrior.
+
+‰ lEgolAs
+
+4
+
+Ranged.
+
+HEro
+
+©2010 Middle Earth Enterprises ©2010 FFG
+
+4
+
+“I can walk this path, but others have not this skill.”
+–The Fellowship of the Ring
+
+1
+
+Response: After Legolas participates in an
+attack that destroys an enemy, place 2 progress
+tokens on the current quest.
+
+Illus. Magali Villeneuve
+
+2
+
+1
+
+0
+
+1
+
+1
+
+3
+
+Noble. Silvan. Warrior.
+
+Ranged.
+
+Response: After Legolas participates in an
+attack that destroys an enemy, place 2 progress
+tokens on the current quest.
+5
+
+he
+
+“I can walk this path, but others have not this skill.”
+–The Fellowship of the Ring
+
+HEro
+29
+
+Illus. Magali Villeneuve
+
+4
+
+©2010 Middle Earth Enterprises ©2010 FFG
+
+5
+
+35
+2
+3
+1
+
+5
+dol guldur beaStMaSter
+
 5/14
 
 Dol Guldur. Orc.
-
-89
 
 Forced: When Dol Guldur Beastmaster attacks,
 deal it 1 additional shadow card.
@@ -4620,35 +4746,33 @@ Illus. David Lecossu
 
 91
 
-Tom is engaged with two enemies, the Dol Guldur Beastmaster and the Dol Guldur Orcs.
-1. Tom declares an attack against the Dol Guldur Orcs, and exhausts Glorfindel as an attacker.
-2. Tom takes Glorfindel’s attack (3 Û) and subtracts the Dol Guldur Orcs’ defense (0 Ú). Since the
-difference is three, Tom places three damage tokens from the token bank on the Dol Guldur Orcs.
-This enemy started with three hit points, so it is destroyed and discarded from play.
-3. Tom declares an attack against the Dol Guldur Beastmaster and exhausts both Legolas (3 Û) and the
-Gondorian Spearman (1 Û) as attackers.
-4. Tom takes his combined attack (4 Û) and subtracts the Dol Guldur Beastmaster’s defense (1 Ú).
-Since the difference is three, Tom places three damage tokens from the token bank on the Dol Guldur
-Beastmaster. This enemy started with five hit points, so it survives the attack with two hit points
-remaining. The damage tokens stay on the enemy to indicate how many remaining hit points it has.
+eastmaster and the Dol Guldur Orcs.
+
+rcs, and exhausts Glorfindel as an attacker.
+
+ts the Dol Guldur Orcs’ defense (0 Ú). Since the
+ens from the token bank on the Dol Guldur Orcs.
+destroyed and discarded from play.
+
+eastmaster and exhausts both Legolas (3 Û) and the
+
+cts the Dol Guldur Beastmaster’s defense (1 Ú).
+mage tokens from the token bank on the Dol Guldur
+nts, so it survives the attack with two hit points
+y to indicate how many remaining hit points it has.
 
 19
 
-## p20 {#learn-to-play-p20}
+## p20
+
+### p20 c1
 
 Concluding the Game
-
-Additional Rules
-
 If at least one player completes the final quest card of
 a scenario, the game ends and all players win. If all
 players are eliminated from the game before all quest
 cards have been completed, the game ends and all
 players lose.
-
-This section contains additional rules that players need
-to know to play their first game of Lord of the Rings:
-The Card Game.
 
 Quest Advancement
 and Winning the Game
@@ -4683,6 +4807,13 @@ revealing one fewer encounter card during future quest
 phases for each player that was eliminated.
 
 20
+
+### p20 c2
+
+Additional Rules
+This section contains additional rules that players need
+to know to play their first game of Lord of the Rings:
+The Card Game.
 
 Hit Points and Damage
 
@@ -4832,19 +4963,23 @@ Illus. John Stanko
 
 1
 
-## p21 {#learn-to-play-p21}
+## p21
+
+### p21 c1
 
 Card Abilities
-
-Responses
-
 The text on cards contains many types of card abilities.
 12
 2
 3
 2
 
+5
 ‰ ArAgorn
+
+Card
+Ability
+
 Sentinel.
 
 Dúnedain. Noble. Ranger.
@@ -4871,13 +5006,122 @@ constant abilities, and forced effects.
 
 Actions
 
+An action 4is an optional ability presented on cards
+that players can trigger during specific times of
+the game. 1
+
 1
+
+3
 
 Action
 Ability
 
 9
 4
+1
+1
+
+‰
+3 Éowyn
+
+‰É
+Noble. Rohan.
+Noble. Rohan.
+owyn
+
+1 cardyour
+from yourhand
+hand to give
+Action: Discard 1Action:
+cardDiscard
+from
+to give
+Éowyn +1 Ò until the end of the phase. This effect
+be triggered
+player
+once each round.
+Éowyn +1 Ò untilmaythe
+end byofeachthe
+phase.
+This effect
+Slender and tall she was in her white robe girt with silver;
+but strong
+she seemed
+and stern asonce
+steel, a daughter
+may be triggered by
+each
+player
+each round.
+of kings. –The Two Towers
+
+Slender and tall she was in her white robe girt with silver;
+but strong she seemed and stern asHEro
+steel, a daughter
+of kings. –The Two Towers
+Illus. Gabrielle Portal
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+7
+
+To trigger an action on a hero,
+ally, or attachment card,
+HEro
+that card must
+be
+in
+play.
+Generally,
+players are7 allowed
+Gabrielle Portal
+to trigger actions between phases and between the
+defined steps of each phase. Appendix I of the Rules
+Reference provides players with a comprehensive round
+sequence that indicates the specific times during which
+they can resolve actions.
+Illus.
+
+©2010 Middle-earth Enterprises ©2010 FFG
+
+Some action abilities are preceded by a specific game
+phase, such as “Quest Action” or “Combat Action.”
+Such an ability indicates that a player can only trigger
+that action during the specified phase.
+
+### p21 c2
+
+12
+
+Responses
+
+A response is an optional 2
+ability presented on cards
+that can be triggered immediately after a specific event
+3 For example, each time
+has occurred during the game.
+a player commits the “Aragorn”
+2
+hero card to a quest, that player
+12
+can trigger that card’s response
+2
+ability, spending one resource
+3
+from that hero’s resource pool to
+2
+ready that card.
+‰ ArAgorn
+To trigger a response
+5
+
+5
+
+present on a hero,
+ally, or attachment
+card, that card must
+be in play.
 
 Response
 AbilityDúnedain. Noble. Ranger.
@@ -4886,7 +5130,7 @@ Sentinel.
 
 Sentinel.
 
-1
+Dúnedain. Noble. Ranger.
 
 Response: After Aragorn commits to a quest,
 Response: After Aragorn
@@ -4922,6 +5166,7 @@ John Stanko
 Keywords are found at the top
 of a card’s text box. The
 rules for each of the keywords are as follows:
+Illus.
 
 1
 
@@ -4933,125 +5178,9 @@ revealed (during the staging step of the quest phase or
 during setup), each player must increase their threat by
 the specified value after the word “Doomed”.
 
+Ranged
 A character that has the “Ranged” keyword can attack
 enemies that are engaged with other players.
-
-‰
-3 Éowyn
-
-‰É
-Noble. Rohan.
-Noble. Rohan.
-owyn
-
-Slender and tall she was in her white robe girt with silver;
-but strong she seemed and stern asHEro
-steel, a daughter
-of kings. –The Two Towers
-Illus. Gabrielle Portal
-
-Dúnedain. Noble. Ranger.
-
-Ranged
-
-1
-
-1 cardyour
-from yourhand
-hand to give
-Action: Discard 1Action:
-cardDiscard
-from
-to give
-Éowyn +1 Ò until the end of the phase. This effect
-be triggered
-player
-once each round.
-Éowyn +1 Ò untilmaythe
-end byofeachthe
-phase.
-This effect
-Slender and tall she was in her white robe girt with silver;
-but strong
-she seemed
-and stern asonce
-steel, a daughter
-may be triggered by
-each
-player
-each round.
-of kings. –The Two Towers
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-7
-
-To trigger an action on a hero,
-ally, or attachment card,
-HEro
-that card must
-be
-in
-play.
-Generally,
-players are7 allowed
-Gabrielle Portal
-to trigger actions between phases and between the
-defined steps of each phase. Appendix I of the Rules
-Reference provides players with a comprehensive round
-sequence that indicates the specific times during which
-they can resolve actions.
-Illus.
-
-present on a hero,
-ally, or attachment
-card, that card must
-be in play.
-
-Illus.
-
-An action 4is an optional ability presented on cards
-that players can trigger during specific times of
-the game. 1
-
-3
-
-A response is an optional 2
-ability presented on cards
-that can be triggered immediately after a specific event
-3 For example, each time
-has occurred during the game.
-a player commits the “Aragorn”
-2
-hero card to a quest, that player
-12
-can trigger that card’s response
-2
-ability, spending one resource
-3
-from that hero’s resource pool to
-2
-ready that card.
-‰ ArAgorn
-To trigger a response
-5
-
-5
-
-5
-
-Card
-Ability
-
-12
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-Some action abilities are preceded by a specific game
-phase, such as “Quest Action” or “Combat Action.”
-Such an ability indicates that a player can only trigger
-that action during the specified phase.
-
 While another player is resolving player attacks, any
 player can declare a character with the “Ranged”
 keyword that they control as an attacker, but the
@@ -5072,29 +5201,17 @@ player or encounter card effects for any reason.
 
 21
 
-## p22 {#learn-to-play-p22}
+## p22
 
-40
+### p22 c1
 
 Restricted
-
-Forced Effects
-
 The “Restricted” keyword appears on some attachment
 cards. A character can only have a maximum of two
 attachments that have the “Restricted” keyword.
 If a character ever has three attachments with the
 “Restricted” keyword, immediately discard one of
 the attachments.
-
-A forced effect
-is a mandatory effect that triggers
-1
-when a specific event occurs (such as an enemy
-2
-engaging a player,
-or getting a shadow card without a
-shadow effect).
 
 Sentinel
 
@@ -5111,22 +5228,53 @@ the attack.
 
 5
 
+12
+2
+3
 2
 
+‰5ArAgorn
+
+KeywordDúnedain. Noble. Ranger.
 ‰ ArAgorn
+
+Sentinel.
+
+Sentinel.
 
 Dúnedain. Noble. Ranger.
 
+Response: After Aragorn commits to a quest,
+
+spend 1 resource from his resource pool to
+Response: After Aragorn
+ready him. commits to a quest,
+“I am Aragorn son of Arathorn; and if by life or death
+spend 1 resource from
+his
+resource
+poolof to
+I can
+save you,
+I will.” –The Fellowship
+the Ring
+ready him.
 HEro
 
 “I am Aragorn son of Arathorn; and if by life or death
 I can save you, I will.” –The Fellowship of
 the Ring
+Illus. John Stanko
+
 ©2010 Middle-earth Enterprises ©2010 FFG
 
 1
 
 HEro
+
+Surge
+Illus. John Stanko
+
 ©2010 Middle-earth Enterprises ©2010 FFG
 
 1
@@ -5148,6 +5296,31 @@ affect scoring, see “Scoring” on page 31.
 
 22
 
+### p22 c2
+
+40
+
+Forced Effects
+A forced effect
+is a mandatory effect that triggers
+1
+when a specific event occurs (such as an enemy
+2
+engaging a player,
+or getting a shadow card without a
+shadow effect).
+
+0
+
+40
+1
+
+3
+
+Forced
+Effect
+
+2
 0
 
 HuMMerHornS
@@ -5176,46 +5349,17 @@ Shadow: Deal 1 damage to each character the
 defending player controls. (2 damage instead if
 this attack is undefended.)
 Victory 5.
+eneMY
+Shadow: Deal 1 damage to each
+character the
+defending player controls. (2 damage instead if
+this attack is undefended.)
+Victory 5.
+Illus. David Lecossu
+
 ©2010 Middle-earth Enterprises ©2010 FFG
 
 75
-
-©2010 Middle-earth Enterprises ©2010 FFG
-
-“When Revealed,” “Shadow,” and “Travel” effects,
-which were described earlier in this document, are
-versions of forced effects that are resolved during
-common game occurrences, such as when cards
-are revealed.
-
-Response: After Aragorn commits to a quest,
-spend 1 resource from his resource pool to
-ready him.
-
-Response: After Aragorn commits to a quest,
-“I am Aragorn son of Arathorn; and if by life or death
-spend 1 resource from
-his
-resource
-poolof to
-I can
-save you,
-I will.” –The Fellowship
-the Ring
-ready him.
-
-Illus. John Stanko
-
-Forced
-Effect
-
-Illus. David Lecossu
-
-‰5ArAgorn
-
-Surge
-
-3
 
 Since forced effects are mandatory,
 it is important
@@ -5225,35 +5369,15 @@ for players to be aware of the game occurrences
 trigger any forced effects that are in play. Players must
 resolve a forced effect each time the triggering game
 occurrence specified by the effect occurs.
-
-2
-
-Illus. John Stanko
-
-1
-2
-
 Illus. David Lecossu
 
-3
+©2010 Middle-earth Enterprises ©2010 FFG
 
-Sentinel.
-
-40
-
-eneMY
-Shadow: Deal 1 damage to each
-character the
-defending player controls. (2 damage instead if
-this attack is undefended.)
-Victory 5.
-
-12
-
-KeywordDúnedain. Noble. Ranger.
-Sentinel.
-
-0
+“When Revealed,” “Shadow,” and “Travel” effects,
+which were described earlier in this document, are
+versions of forced effects that are resolved during
+common game occurrences, such as when cards
+are revealed.
 
 Constant Abilities
 A constant ability is a mandatory ability that
@@ -5268,25 +5392,14 @@ remember that if the “Enchanted Stream” location card
 is the active location, they cannot draw cards from
 their deck.
 
-## p23 {#learn-to-play-p23}
+## p23
+
+### p23 c1
 
 12
 
 Traits
-
-Unique Cards
-
 Traits appear in a bold, italicized typeface at the top of
-
-Some cards represent specific, formally named
-characters, locations, and items from the Middle-earth
-setting. Such cards are known as unique cards and
-are identified by a ‰ icon that precedes the card’s
-title. A player cannot play a card that shares a title
-with a unique card that is already in play. A player can,
-however, play a card that shares a title with a unique
-card that was removed from play and is in a discard
-pile.
 
 2 a card’s text box. Traits have no inherent effects, but
 3 other card effects may refer to a card’s traits.
@@ -5317,8 +5430,6 @@ Response: After Aragorn commits to a quest,
 spend 1 resource from his resource pool to
 ready him.
 
-Neutral Cards
-
 ‰ ArAgorn
 Sentinel.
 
@@ -5337,11 +5448,6 @@ Illus. John Stanko
 1
 
 ©2010 Middle-earth Enterprises ©2010 FFG
-
-Neutral cards are cards that do not belong to any
-sphere of influence. To play a neutral card, a player
-must spend resources equal to its cost, but a resource
-match is not required.
 
 “I am Aragorn son of Arathorn; and if by life or death
 I can save you, I will.” –The Fellowship of
@@ -5374,6 +5480,36 @@ Illus. Mike Nash
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
+67
+
+To play an event card, a player spends resources equal
+to the card’s cost from their heroes’ resource pools.
+Like playing an ally or attachment card, the player
+must have a resource match when paying for an
+event card.
+After playing an event card, the player resolves the
+action or response on the card immediately. Then,
+place the card in that player’s discard pile.
+
+### p23 c2
+
+Unique Cards
+Some cards represent specific, formally named
+characters, locations, and items from the Middle-earth
+setting. Such cards are known as unique cards and
+are identified by a ‰ icon that precedes the card’s
+title. A player cannot play a card that shares a title
+with a unique card that is already in play. A player can,
+however, play a card that shares a title with a unique
+card that was removed from play and is in a discard
+pile.
+
+Neutral Cards
+Neutral cards are cards that do not belong to any
+sphere of influence. To play a neutral card, a player
+must spend resources equal to its cost, but a resource
+match is not required.
+
 Start the First Game
 This completes all the rules necessary to play
 a first game of The Lord of the Rings: The
@@ -5388,35 +5524,16 @@ After playing the first game, read the
 this book to discover how to construct original
 decks and explore the game’s other scenarios.
 
-67
-
-To play an event card, a player spends resources equal
-to the card’s cost from their heroes’ resource pools.
-Like playing an ally or attachment card, the player
-must have a resource match when paying for an
-event card.
-After playing an event card, the player resolves the
-action or response on the card immediately. Then,
-place the card in that player’s discard pile.
-
 23
 
-## p24 {#learn-to-play-p24}
+## p24
+
+### p24 c1
 
 Advanced Rules
-
-Guarded
-
 This section contains advanced rules that players will
 need to know to construct their own decks and play the
 game’s remaining scenarios.
-
-The “Guarded” keyword appears on some objective
-cards. After an objective that has the “Guarded”
-keyword is revealed and placed in the staging area,
-reveal the next card from the encounter deck and attach
-it to that objective. A player cannot claim an objective
-card if there are encounter cards attached to it.
 
 Objective Cards
 Objective cards are a type of encounter card that
@@ -5617,6 +5734,15 @@ FFG
 
 110
 
+### p24 c2
+
+Guarded
+The “Guarded” keyword appears on some objective
+cards. After an objective that has the “Guarded”
+keyword is revealed and placed in the staging area,
+reveal the next card from the encounter deck and attach
+it to that objective. A player cannot claim an objective
+card if there are encounter cards attached to it.
 Players resolve encounter cards that are attached to
 objective cards in the following way:
 • Enemy Card: The enemy card remains attached to
@@ -5635,18 +5761,14 @@ use the next card of the encounter deck to fulfill
 the original keyword effect, and then resolve the
 guarded keyword on the second card.
 
-## p25 {#learn-to-play-p25}
+## p25
+
+### p25 c1
 
 Scenario Overview
 There are three scenarios included in this core set.
 Each is introduced in this section, along with a list of
 encounter sets for that scenario’s encounter deck.
-
-The Escape from Dol Guldur encounter deck is built
-with all the cards from the following encounter sets:
-Escape from Dol Guldur, Spiders of Mirkwood, and
-Dol Guldur Orcs. These sets are indicated by the
-following icons:
 
 Passage Through Mirkwood
 Difficulty level = 1
@@ -5664,18 +5786,6 @@ sets: Passage Through Mirkwood, Spiders of
 Mirkwood, and Dol Guldur Orcs. These sets are
 indicated by the following icons:
 
-Modes of Difficulty
-The Lord of the Rings: The Card Game is intended
-for both casual and veteran game players. To
-accommodate different play styles, two modes of
-difficulty are available: easy and standard. These
-modes provide players with a simple way to adjust the
-difficulty of the game, creating the type of challenge
-they desire. In addition to the modes of difficulty,
-players can add scoring to either of these modes,
-allowing players to further adjust the game’s difficulty.
-
-Easy Mode
 Journey Down the Anduin
 Difficulty level = 4
 Having survived the dangers of Mirkwood Forest,
@@ -5688,6 +5798,35 @@ sets: Journey Down the Anduin, Sauron’s Reach, Dol
 Guldur Orcs, and Wilderlands. These sets are indicated
 by the following icons:
 
+Escape from Dol Guldur
+Difficulty level = 7
+While exploring in the vicinity of Dol Guldur at Lady
+Galadriel’s request, one of the heroes’ companions
+is captured by the Necromancer’s forces, and is now
+awaiting interrogation in a dungeon beneath the hill.
+Knowing their friend’s time is short, the heroes decide
+to attempt a desperate rescue.
+
+### p25 c2
+
+The Escape from Dol Guldur encounter deck is built
+with all the cards from the following encounter sets:
+Escape from Dol Guldur, Spiders of Mirkwood, and
+Dol Guldur Orcs. These sets are indicated by the
+following icons:
+
+Modes of Difficulty
+The Lord of the Rings: The Card Game is intended
+for both casual and veteran game players. To
+accommodate different play styles, two modes of
+difficulty are available: easy and standard. These
+modes provide players with a simple way to adjust the
+difficulty of the game, creating the type of challenge
+they desire. In addition to the modes of difficulty,
+players can add scoring to either of these modes,
+allowing players to further adjust the game’s difficulty.
+
+Easy Mode
 Easy mode is ideal for new players and for players
 who prefer the narrative and cooperative aspects of the
 game with less challenge. To play a scenario in easy
@@ -5715,8 +5854,6 @@ Standard Mode
 Forced: After Chieftain Ufthak attacks, place 1
 resource token on him.
 
-Escape from Dol Guldur
-
 To play a scenario in standard mode,
 simply
 follow the
@@ -5730,32 +5867,31 @@ Illus. Mathias Kollros
 
 90
 
-Difficulty level = 7
-While exploring in the vicinity of Dol Guldur at Lady
-Galadriel’s request, one of the heroes’ companions
-is captured by the Necromancer’s forces, and is now
-awaiting interrogation in a dungeon beneath the hill.
-Knowing their friend’s time is short, the heroes decide
-to attempt a desperate rescue.
-
 25
 
-## p26 {#learn-to-play-p26}
+## p26
+
+### p26 c1
 
 Deckbuilding
-Much of the depth and fun of The Lord of the Rings: The Card Game comes when players conceive and
-construct their own decks, using the cards of this core set and those found in additional The Lord of the
+
+Much of the depth and fun of The Lord of the Rings: T
+construct their own decks, using the cards of this core
 Rings: The Card Game products.
-When constructing a deck, players must obey the following rules:
+
+When constructing a deck, players must obey the followin
 • A deck must contain a minimum of 50 cards.
-• A deck cannot include more than three copies of any card that have the same title.
-Within these guidelines, any combination of allies, attachments, and events can be included in a deck.
-Each player begins the game with three hero cards. When playing a multi-player game, remember that no two
-players may select the same hero, and that unique allies cannot enter play if a hero card with the same name is
-already in play. Therefore, players should confer prior to the start of each game to ensure that their decks will
+
+• A deck cannot include more than three copies of any c
+
+Within these guidelines, any combination of allies, attach
+
+Each player begins the game with three hero cards. When
+players may select the same hero, and that unique allies c
+already in play. Therefore, players should confer prior to t
 not conflict.
 
-Deckbuilding Tips and Considerations
+Deckbuilding Tips
 When building a deck, it is important for a
 player to consider how a player intends to
 pay for the cards included in the deck. It may
@@ -5784,6 +5920,22 @@ card pool grows with additional products,
 
 26
 
+### p26 c2
+
+The Card Game comes when players conceive and
+set and those found in additional The Lord of the
+
+ng rules:
+
+card that have the same title.
+
+hments, and events can be included in a deck.
+
+n playing a multi-player game, remember that no two
+cannot enter play if a hero card with the same name is
+the start of each game to ensure that their decks will
+
+and Considerations
 each of the four basic starter decks in this
 core set can be developed into fully playable
 standard decks.
@@ -5806,16 +5958,21 @@ to use Dwarf cards from all three spheres
 to take advantage of Dwarf synergies and
 card interactions.
 
-## p27 {#learn-to-play-p27}
+## p27
+
+### p27 c1
 
 Decklists
-To help players start exploring the exciting possibilities of deckbuilding, this page includes two dualsphere decklists for you to try. We recommend that you use the starter decks on page 5 for your first
-game. Once you have learned how to play, we encourage you to play a game with these dual-sphere
+
+To help players start exploring the exciting possibilit
+sphere decklists for you to try. We recommend that y
+game. Once you have learned how to play, we encou
 decks.
-These two decks have been built to complement each other and will work well for 1–2 players. For a
-single-player game, we recommend the Leadership & Spirit deck. This deck excels at putting allies into
-play and contributing lots of willpower to the quest. When playing a 2-player game, the Lore & Tactics
-deck should be used to provide additional card draw and handle most of the combat.
+
+These two decks have been built to complement each
+single-player game, we recommend the Leadership &
+play and contributing lots of willpower to the quest. W
+deck should be used to provide additional card draw
 
 Leadership & Spirit Deck
 Heroes
@@ -5841,11 +5998,23 @@ Valiant Sacrifice x3
 A Test of Will x3
 Dwarven Tomb x2
 Stand and Fight x2
-The Galadhrim’s Greeting x2
+The Galadhrim’s Greeting
 Attachments
 Celebrian’s Stone x3
 Steward of Gondor x3
 Unexpected Courage x3
+
+### p27 c2
+
+ties of deckbuilding, this page includes two dualyou use the starter decks on page 5 for your first
+urage you to play a game with these dual-sphere
+
+h other and will work well for 1–2 players. For a
+& Spirit deck. This deck excels at putting allies into
+When playing a 2-player game, the Lore & Tactics
+and handle most of the combat.
+
+g x2
 
 Lore & Tactics Deck
 Heroes
@@ -5876,7 +6045,9 @@ Blade of Gondolin x3
 
 27
 
-## p28 {#learn-to-play-p28}
+## p28
+
+### p28 c1
 
 Campaign Mode
 Campaign mode is an exciting alternative way to play
@@ -5904,7 +6075,6 @@ FantasyFlightGames.com.
 TM
 
 G
-
 CAMPAIGN LO
 Player 1
 
@@ -5935,46 +6105,7 @@ Pool
 Boons
 
 Threat Penalty
-
-When setting up a subsequent scenario in Campaign
-Mode, the players refer to the Campaign Log to make
-sure they are using all of the correct cards.
-
-The Fellowship of Heroes
-While playing Campaign Mode, players record the
-names of their heroes in the Campaign Log at the
-beginning of the first scenario. If a hero is in a player’s
-discard pile at the end of the game, that hero’s name
-is added to the list of Fallen Heroes in the Campaign
-Log. A hero whose name appears on the list of Fallen
-Heroes cannot be used by any player while playing
-future scenarios in that campaign.
-While playing Campaign Mode, players may change
-the cards in their decks between games, but they
-must use the same heroes for each scenario with two
-exceptions:
-• If a hero is in its controller’s discard pile at the end
-of a scenario, that hero’s name is added to the list of
-Fallen Heroes and its controller may choose a new
-hero when setting up the next game. The new hero
-is recorded in the Campaign Log and each player
-receives a permanent +1 starting threat penalty for
-the rest of the campaign.
-• If a player wishes to trade a hero they control for a
-hero with a different name between scenarios, that
-player may replace 1 hero they control with a new
-hero when setting up the next game. The new hero
-is recorded in the Campaign Log and each player
-receives a permanent +1 starting threat penalty for
-the rest of the campaign.
-
 Fallen Heroes
-
-If a player is required to replace a fallen hero but there
-are no heroes remaining in the players’ collection of
-available heroes, that player instead takes a permanent
-+1 threat penalty, but removes that hero from the list
-of Fallen Heroes and continues to play with the hero.
 
 Notes
 
@@ -6016,22 +6147,53 @@ to FFG
 
 28
 
-## p29 {#learn-to-play-p29}
+### p28 c2
+
+When setting up a subsequent scenario in Campaign
+Mode, the players refer to the Campaign Log to make
+sure they are using all of the correct cards.
+
+The Fellowship of Heroes
+While playing Campaign Mode, players record the
+names of their heroes in the Campaign Log at the
+beginning of the first scenario. If a hero is in a player’s
+discard pile at the end of the game, that hero’s name
+is added to the list of Fallen Heroes in the Campaign
+Log. A hero whose name appears on the list of Fallen
+Heroes cannot be used by any player while playing
+future scenarios in that campaign.
+While playing Campaign Mode, players may change
+the cards in their decks between games, but they
+must use the same heroes for each scenario with two
+exceptions:
+• If a hero is in its controller’s discard pile at the end
+of a scenario, that hero’s name is added to the list of
+Fallen Heroes and its controller may choose a new
+hero when setting up the next game. The new hero
+is recorded in the Campaign Log and each player
+receives a permanent +1 starting threat penalty for
+the rest of the campaign.
+• If a player wishes to trade a hero they control for a
+hero with a different name between scenarios, that
+player may replace 1 hero they control with a new
+hero when setting up the next game. The new hero
+is recorded in the Campaign Log and each player
+receives a permanent +1 starting threat penalty for
+the rest of the campaign.
+If a player is required to replace a fallen hero but there
+are no heroes remaining in the players’ collection of
+available heroes, that player instead takes a permanent
++1 threat penalty, but removes that hero from the list
+of Fallen Heroes and continues to play with the hero.
+
+## p29
+
+### p29 c1
 
 Additional Card Types
-
-The Campaign Pool
-
 There are three additional card types that are used
 only in Campaign Mode: campaign cards, boons, and
 burdens. These card types are described below.
-
-The list of boons and burdens that players earn as they
-play through a campaign is called the Campaign Pool.
-After defeating a scenario and recording its results
-in the Campaign Log, list all boons and/or burdens
-earned in the Campaign Pool section of the log.
-
 Campaign Cards
 The campaign card is a card type that serves to place
 a scenario within the larger campaign. While setting
@@ -6042,14 +6204,6 @@ defeating a scenario, follow any resolution instructions
 found on the back side of the Campaign Card,
 updating the Campaign Log accordingly.
 Boons
-
-While setting up future scenarios in the campaign, the
-boon and burden cards listed in the Campaign Pool are
-added to the game in the following manner:
-• Boons with a player card back may be added to a
-player’s deck. These cards do not count against a
-deck’s minimum.
-
 Boons are player cards (and occasionally encounter
 cards) that must be earned by playing through a
 scenario in Campaign Mode. These cards represent
@@ -6058,11 +6212,6 @@ outcomes throughout the course of a campaign.
 Players are not permitted to include these cards in
 a deck or game until after they are earned, unless a
 scenario directs them otherwise.
-
-• Burdens with a player card back must be added to
-a player’s deck. These cards do not count against a
-deck’s minimum.
-
 Burdens
 Burdens are encounter cards (and occasionally player
 cards) that can be earned while playing through a
@@ -6078,30 +6227,7 @@ Response: After the first objective is
 claimed, flip Mendor face-up and place
 1 damage token on him.
 
-When the players earn a boon or burden card, they
-enter that card’s title in the Campaign Pool. If a card
-has the Permanent keyword, the players record which
-hero it is attached to in the notes section of the log.
-
-• If a boon or burden with the Permanent keyword
-was recorded as being attached to a specific hero,
-that card must be attached to the specified hero at
-the start of the game.
-• If a boon or burden card has an encounter card
-back, that card must shuffled into the encounter
-deck when setting up the game.
-If a hero is added to the list of Fallen Heroes, all
-boons and burdens with the Permanent keyword that
-had been attached to that hero are removed from the
-Campaign Pool.
-
-‰Mendor
-
-SCarred
-
-PASSAGE THROUGH MIRKWOOD
-
-JOURNEY ALONG THE ANDUIN
+PA
 
 1
 
@@ -6126,6 +6252,101 @@ adventure with you, friends,” says Mendor. “If you ever
 need my aid again, I would be glad to journey with you
 once more.”
 
+2) If Mendor is not in play,
+shadows
+mirkwood
+do notoF
+adjust
+- part 3
+the
+Campaign Pool for your next campaign.
+You are playing Campaign Mode.
+
+Sadly, you bear Mendor’s
+Setup:
+body Put
+back Mendor
+to Galadriel
+into
+to play. Attach Appointed
+prepare for his passingby
+into
+the West.
+Fate
+to
+
+a hero of the first player’s choice.
+Forced: When a hero would be randomly
+selected to be a “prisoner”, the “prisoner” from
+the Campaign Log is selected instead. Each
+card attached to that hero is turned facedown
+until that hero is “rescued.” Mendor is captured
+as well. Place Mendor facedown next to the
+prisoner (this does not cause him to leave play).
+Flip this card over.
+
+Your guide, Mendor, has also been taken by the enemy!
+
+CAMPAIGN
+Illus. Ben Zweifel
+
+© 2021 Middle-earth Enterprises © 2021 FFG
+
+131
+
+Campaign Cards
+
+The first pla
+Response: A
+ready Mend
+1 card.
+If Mendor l
+the game.
+
+O
+Illus. Cris Griffin
+
+### p29 c2
+
+The Campaign Pool
+The list of boons and burdens that players earn as they
+play through a campaign is called the Campaign Pool.
+After defeating a scenario and recording its results
+in the Campaign Log, list all boons and/or burdens
+earned in the Campaign Pool section of the log.
+When the players earn a boon or burden card, they
+enter that card’s title in the Campaign Pool. If a card
+has the Permanent keyword, the players record which
+hero it is attached to in the notes section of the log.
+While setting up future scenarios in the campaign, the
+boon and burden cards listed in the Campaign Pool are
+added to the game in the following manner:
+• Boons with a player card back may be added to a
+player’s deck. These cards do not count against a
+deck’s minimum.
+• Burdens with a player card back must be added to
+a player’s deck. These cards do not count against a
+deck’s minimum.
+• If a boon or burden with the Permanent keyword
+was recorded as being attached to a specific hero,
+that card must be attached to the specified hero at
+the start of the game.
+• If a boon or burden card has an encounter card
+back, that card must shuffled into the encounter
+deck when setting up the game.
+If a hero is added to the list of Fallen Heroes, all
+boons and burdens with the Permanent keyword that
+had been attached to that hero are removed from the
+Campaign Pool.
+
+‰Mendor
+
+SCarred
+
+ASSAGE THROUGH MIRKWOOD
+
+JOURNEY ALONG THE ANDUIN
+
 0
 
 vAlor
@@ -6139,59 +6360,26 @@ BOON
 
 Silvan. Scout.
 
-2) If Mendor is not in play,
-shadows
-mirkwood
-do notoF
-adjust
-- part 3
-the
-Campaign Pool for your next campaign.
-You are playing Campaign Mode.
-Sadly, you bear Mendor’s
-Setup:
-body Put
-back Mendor
-to Galadriel
-into
-to play. Attach Appointed
-prepare for his passingby
-into
-the West.
-Fate
-to a hero of the first player’s choice.
-Forced: When a hero would be randomly
-selected to be a “prisoner”, the “prisoner” from
-the Campaign Log is selected instead. Each
-card attached to that hero is turned facedown
-until that hero is “rescued.” Mendor is captured
-as well. Place Mendor facedown next to the
-prisoner (this does not cause him to leave play).
-Flip this card over.
+Setup: Attach to a hero (as recorded in the
+Campaign Log). Limit 1 per hero.
 
-The first player gains control of Mendor.
-Response: After a quest card is defeated,
-ready Mendor. Then, each player draws
-1 card.
+ayer gains control of Mendor.
+After a quest card is defeated,
+dor. Then, each player draws
 BOON
-If Mendor leaves play, remove him from
+
+leaves play, remove him from
 Condition.
-the game.
 Setup: Attach to a hero (as recorded in the
 Campaign Log). Limit 1 per hero.
 Response: After attached hero is declared as
 OBJECTIVE-ALLY
 an attacker, exhaust Valor to heal 1 damage
-Illus. Cris Griffin
 © 2021 Middle-earth Enterprises © 2021 FFG
 135
 from attached hero and deal
 1 damage to the
 defending enemy.
-
-Your guide, Mendor, has also been taken by the enemy!
-
-© 2021 Middle-earth Enterprises © 2021 FFG
 
 5
 
@@ -6216,20 +6404,9 @@ engaged with you.
 eneMY
 
 ATTACHmEnT
-
-CAMPAIGN
-Illus. Ben Zweifel
-
-Setup: Attach to a hero (as recorded in the
-Campaign Log). Limit 1 per hero.
-
 Illus. Chris Rhan
 
 ©2021 Middle-earth Enterprises ©2021 FFG
-
-131
-
-Campaign Cards
 
 Boons
 
@@ -6244,9 +6421,9 @@ Illus. Andrew Ryan
 Burdens
 29
 
-## p30 {#learn-to-play-p30}
+## p30
 
-Expert Campaign Mode
+### p30 c1
 
 Campaign Setup Checklist
 When setting up a game for a campaign, use
@@ -6288,6 +6465,9 @@ Campaign Pool into the encounter deck.
 
 30
 
+### p30 c2
+
+Expert Campaign Mode
 Expert Campaign Mode is an alternative version of
 Campaign Mode for players who crave a tougher
 challenge. Players do not reset the hit points of their
@@ -6310,7 +6490,9 @@ campaigns, unless explicitly stated by a card ability
 (such as the Resolution effect on the Campaign Card
 for Escape from Dol Guldur).
 
-## p31 {#learn-to-play-p31}
+## p31
+
+### p31 c1
 
 Scoring
 Players who enjoy playing through the same scenario
@@ -6372,61 +6554,80 @@ Illus. Mathias Kollros
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
+90
+
 Victory
 Points
 
-90
+### p31 c2
 
 31
 
-## p32 {#learn-to-play-p32}
+## p32
 
-TM
+### p32 c1
 
-CAMPAIGN LOG
+CAMPAIG
 Player 1
 
 Player 2
 
+Heroes
+
+Her
+
+Fallen Heroes
+
+No
+
+32
+
+Players may photocopy this page for the
+
+### p32 c2
+
+TM
+
+GN LOG
 Player 3
 
 Player 4
 
-Heroes
+roes
 
-Heroes
+otes
 
-Fallen Heroes
+eir own personal use. TM lic. SZC to FFG
 
 Threat Penalty
 
-Notes
+## p33
 
-32
-
-Players may photocopy this page for their own personal use. TM lic. SZC to FFG
-
-## p33 {#learn-to-play-p33}
+### p33 c1
 
 Scenarios Completed
 Scenario Name
 
-Campaign Pool
 Score
 
+Campaign Total:
+
+Players may photocopy this page for th
+
+### p33 c2
+
+Campaign Pool
 Boons
 
 Burdens
 
-Campaign Total:
-
-Players may photocopy this page for their own personal use. TM lic. SZC to FFG
+heir own personal use. TM lic. SZC to FFG
 
 33
 
-## p34 {#learn-to-play-p34}
+## p34
 
-Number of Players
+### p34 c1
 
 Scenario Name
 Player
@@ -6441,34 +6642,14 @@ Hero
 Damage Tokens
 on Remaining
 Heroes
-
-Notes
-
-Player
-Subtotal
-
-Number of Rounds: (tally)
-Combined
-Player Subtotals
-Victory Points
-Earned
-
-Number of Players
-
-Scenario Name
-Final Threat
-
-Score
-
-10 Points per
-Round
 
 TM
 
+Scenario Name
 Player
 Name
 
-Final Group
+Final Threat
 
 Threat Cost
 of Each Dead
@@ -6477,34 +6658,14 @@ Hero
 Damage Tokens
 on Remaining
 Heroes
-
-Notes
-
-Player
-Subtotal
-
-Number of Rounds: (tally)
-Combined
-Player Subtotals
-Victory Points
-Earned
-
-Number of Players
-
-Scenario Name
-Final Threat
-
-Score
-
-10 Points per
-Round
 
 TM
 
+Scenario Name
 Player
 Name
 
-Final Group
+Final Threat
 
 Threat Cost
 of Each Dead
@@ -6514,22 +6675,72 @@ Damage Tokens
 on Remaining
 Heroes
 
-Notes
-
-Player
-Subtotal
-
-Number of Rounds: (tally)
-Combined
-Player Subtotals
-Victory Points
-Earned
 TM
 
 34
 
-Players may photocopy this page for their own personal use. TM lic. SZC to FFG
+Players may photocopy this page for the
 
+### p34 c2
+
+Number of Players
+Notes
+
+Player
+Subtotal
+
+Number of Rounds: (tally)
+Combined
+Player Subtotals
+Victory Points
+Earned
+
+Final Group
+
+Score
+
+10 Points per
+Round
+
+M
+
+Number of Players
+Notes
+
+Player
+Subtotal
+
+Number of Rounds: (tally)
+Combined
+Player Subtotals
+Victory Points
+Earned
+
+Final Group
+
+Score
+
+10 Points per
+Round
+
+M
+
+Number of Players
+Notes
+
+Player
+Subtotal
+
+Number of Rounds: (tally)
+
+M
+
+eir own personal use. TM lic. SZC to FFG
+
+Combined
+Player Subtotals
+Victory Points
+Earned
 10 Points per
 Round
 
@@ -6537,66 +6748,26 @@ Final Group
 
 Score
 
-## p35 {#learn-to-play-p35}
+## p35
 
-Credits
+### p35 c1
+
+Cred
 Original Game Credits:
-
-Revised Edition Credits:
-
 Game Design & Development: Nate French
-
-Additional Development: Caleb Grace with Ian Martin
-and Jeremy Zwirn
-
 Producer: Mike David
-
-Producer: Jason Walden
-
 Editing: Kevin Tomczyk
-
-Editing: Adam Baker
-
 Proofreading: Patricia Meredith and Mark Pollard
 Graphic Design: Kevin Childress
-
-Proofreading: Mark Pollard and Stephen Redman
-with Lori Redman
-
 Additional Graphic Design: Brian Schomburg, Andrew
 Navaro, and Michael Silsby
-
-Card Game Manager: Jim Cartwright
-Graphic Design: Nathan Carnahan
-
 Cover Art: Daryl Mandryk
-
-Graphic Design Coordinator: Joseph D. Olson
-
 Art Direction: Zoë Robinson
-
-Graphic Design Manager: Christopher Hosch
-
 Art Administration: Kyle Hough
-
-Cover Art: Anders Finér
-
 Creative Content Development: Jason Walden
-
-Art Direction: Deborah Garcia
-
 FFG Lead Game Designer: Corey Konieczka
-
-Managing Art Director: Tony Bradt
-
 FFG Lead Game Producer: Michael Hurley
-
-Quality Assurance Specialist: Zach Tewalthomas
-
 Production Manager: Eric Knight
-
-Licensing Coordinator: Zach Holmes
-
 Publisher: Christian T. Petersen
 Special thanks to Joe Mandragona, Rebecca Hanson, Fredrica
 Drotos, and Sam Benson at Middle-earth Enterprises for
@@ -6611,6 +6782,42 @@ John Goodenough, Jason Walden, Adam Sadler, and Brady
 Sadler. And to everyone who demoed an early version of the
 game at GenCon 2010. Thank you, thank you, thank you.
 
+TM
+
+TM/® & © 2021 Fantasy Flight Games. Middle-earth, The Lord of the Rings, and the characters, ev
+Company d/b/a Middle-earth Enterprises and are used, under license, by Fantasy Flight Gam
+reserved to their respective owners. Fantasy Flight Games, 1995 West County Road B2, Rosev
+UK:
+Asmodee United Kingdom
+Unit 6 Waterbrook Road
+Alton Hampshire, GU34 2UD
+United Kingdom
+
+EU:
+Asmodee Nord
+Valseholmen 1
+2650 Hvidovre
+Danemark
+
+### p35 c2
+
+dits
+Revised Edition Credits:
+Additional Development: Caleb Grace with Ian Martin
+and Jeremy Zwirn
+Producer: Jason Walden
+Editing: Adam Baker
+Proofreading: Mark Pollard and Stephen Redman
+with Lori Redman
+Card Game Manager: Jim Cartwright
+Graphic Design: Nathan Carnahan
+Graphic Design Coordinator: Joseph D. Olson
+Graphic Design Manager: Christopher Hosch
+Cover Art: Anders Finér
+Art Direction: Deborah Garcia
+Managing Art Director: Tony Bradt
+Quality Assurance Specialist: Zach Tewalthomas
+Licensing Coordinator: Zach Holmes
 Licensing Manager: Sherry Anisi
 Production Management: Justin Anger
 and Tim Najmolhoda
@@ -6625,22 +6832,13 @@ and Michael Joyce
 
 ®
 
-TM
+vents, items and places therein, are trademarks or registered trademarks of The Saul Zaentz
+mes. Gamegenic and the Gamegenic logo are TM & © Gamegenic GmbH, Germany. All rights
+ville, Minnesota, 55113, USA, 651-639-1905. Actual components may vary from those shown.
 
-TM/® & © 2021 Fantasy Flight Games. Middle-earth, The Lord of the Rings, and the characters, events, items and places therein, are trademarks or registered trademarks of The Saul Zaentz
-Company d/b/a Middle-earth Enterprises and are used, under license, by Fantasy Flight Games. Gamegenic and the Gamegenic logo are TM & © Gamegenic GmbH, Germany. All rights
-reserved to their respective owners. Fantasy Flight Games, 1995 West County Road B2, Roseville, Minnesota, 55113, USA, 651-639-1905. Actual components may vary from those shown.
-UK:
-Asmodee United Kingdom
-Unit 6 Waterbrook Road
-Alton Hampshire, GU34 2UD
-United Kingdom
+dics
 
-EU:
-Asmodee Nordics
-Valseholmen 1
-2650 Hvidovre
-Danemark
+e
 
 Asmodee The Netherlands,
 Vossenbeemd 51
@@ -6649,23 +6847,19 @@ The Netherlands
 
 35
 
-## p36 {#learn-to-play-p36}
+## p36
+
+### p36 c1
 
 Quick Reference
-
-Keywords
-
 This page contains an easy-to-reference overview of
 the game’s basic concepts and turn structure.
-
-For complete rules on a keyword, see the Rules Reference.
 
 Round Overview
 Each game round consists of the following
 seven phases:
 1.
 
-Resource Phase
 a.
 
 Gain Resources
@@ -6705,6 +6899,10 @@ Encounter Phase
 
 7.
 
+36
+
+Resource Phase
+
 a.
 
 Optional Engagement
@@ -6739,6 +6937,10 @@ c.
 
 Pass First Player
 
+### p36 c2
+
+Keywords
+For complete rules on a keyword, see the Rules Reference.
 Doomed X: If an encounter card with the “Doomed”
 keyword is revealed, each player must increase their
 threat by the specified “X” value.
@@ -6778,9 +6980,6 @@ Threat Strength
 $
 
 Spheres of Influence
-
-36
-
 Leadership
 
 Ì

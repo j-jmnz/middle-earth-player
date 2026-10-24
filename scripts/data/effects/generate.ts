@@ -3,9 +3,10 @@ import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { parseKeywordTokens } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
+import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
 import { TEMPLATES, type TemplateContext } from "./templates.ts";
 
-export type Segment = { card: Card; index: number; side: "front" | "back" | "shadow"; line: string };
+export type Segment = { card: Card; index: number; side: "front" | "back" | "shadow"; line: string; lineId: string };
 
 export type Unmatched = Segment & { timing: string | null };
 
@@ -44,24 +45,31 @@ export function stripKeywords(line: string): string {
   return sentences.slice(at).join(" ");
 }
 
-export function segmentsOf(card: Card): Segment[] {
-  const sides: [Segment["side"], string | null][] = [
-    ["front", card.text],
-    ["back", card.back?.text ?? null],
-    ["shadow", card.shadowText],
-  ];
+// The printed lines of a card, front first, then side B, then the shadow effect: the order the effect records are
+// numbered in. A card with no ledger entry falls back to its source text, numbered the same way, so a draft can be
+// written for it; the coverage test refuses a dealt card in that state.
+export function segmentsOf(card: Card, ledger: Ledger): Segment[] {
+  const front = ledger.byKey.get(keyOf(card.code, "A"));
+  const back = ledger.byKey.get(keyOf(card.code, "B"));
+  const rows: { side: Segment["side"]; line: string; id: string }[] = [];
+  const frontLines = front ? front.lines : (card.text ?? "").split("\n").concat((card.shadowText ?? "").split("\n"));
+  const shadowRows: typeof rows = [];
+  frontLines.forEach((raw, at) => {
+    const row = { side: /^Shadow:/.test(raw) ? ("shadow" as const) : ("front" as const), line: normalize(raw), id: lineId(card.code, "A", at + 1) };
+    (row.side === "shadow" ? shadowRows : rows).push(row);
+  });
+  const backLines = back ? back.lines : (card.back?.text ?? "").split("\n");
+  backLines.forEach((raw, at) => rows.push({ side: "back", line: normalize(raw), id: lineId(card.code, "B", at + 1) }));
+  rows.push(...shadowRows);
   const out: Segment[] = [];
-  for (const [side, text] of sides) {
-    for (const raw of (text ?? "").split("\n")) {
-      const line = normalize(raw);
-      if (line === "" || stripKeywords(line) === "") continue;
-      out.push({ card, index: out.length, side, line });
-    }
+  for (const row of rows) {
+    if (row.line === "" || stripKeywords(row.line) === "") continue;
+    out.push({ card, index: out.length, side: row.side, line: row.line, lineId: row.id });
   }
   return out;
 }
 
-export function generateEffects(cards: readonly Card[], scenarios: readonly ScenarioData[], campaign: CampaignData): Generated {
+export function generateEffects(cards: readonly Card[], scenarios: readonly ScenarioData[], campaign: CampaignData, ledger: Ledger): Generated {
   const wanted = new Set<string>(campaign.prelude.map((card) => card.code));
   for (const scenario of scenarios) {
     for (const card of scenario.cards) wanted.add(card.code);
@@ -87,7 +95,7 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       return value;
     };
     const context: TemplateContext = { card, codeOf, setAside };
-    for (const segment of segmentsOf(card)) {
+    for (const segment of segmentsOf(card, ledger)) {
       const line = stripKeywords(segment.line).replaceAll(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "{self}");
       let drafts = null;
       for (const template of TEMPLATES) {
@@ -100,7 +108,7 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
         }
       }
       if (drafts) {
-        for (const draft of drafts) effects.push({ id: `${card.code}:${draft.timing}:${next(draft.timing)}`, cardCode: card.code, ...draft });
+        for (const draft of drafts) effects.push({ id: `${card.code}:${draft.timing}:${next(draft.timing)}`, cardCode: card.code, lines: [segment.lineId], ...draft });
         continue;
       }
       const label = /^([A-Z][A-Za-z ]+?):\s/.exec(line)?.[1]?.toLowerCase();

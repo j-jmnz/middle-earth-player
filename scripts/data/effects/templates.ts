@@ -168,7 +168,7 @@ export const TEMPLATES: readonly Template[] = [
   },
   {
     id: "cannot-travel-while-other-location",
-    pattern: /^While there is at least 1 other location in play, players cannot travel here\.$/,
+    pattern: /^While there is at least 1 other location in play, the players cannot travel here\.$/,
     build: () => [{ timing: "constant", condition: { kind: "otherLocationInPlay" }, instructions: [{ verb: "Restrict", what: "travel" }] }],
   },
   {
@@ -226,7 +226,7 @@ export const TEMPLATES: readonly Template[] = [
   },
   {
     id: "shadow-undefended-if-hide-failed",
-    pattern: /^Shadow: If you have failed a Hide test this round, this attack is considered undefended$/,
+    pattern: /^Shadow: If you have failed a Hide test this round, this attack is considered undefended\.$/,
     build: () => [{ timing: "shadow", instructions: [{ verb: "ConsiderUndefended", when: { kind: "hideFailed", scope: "round" } }] }],
   },
 ];

@@ -6,11 +6,13 @@ The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The R
 
 `data/` is committed and is the only thing tests and agents read for cards, scenarios and rules text. Sources are listed in `data/sources.json`.
 
-- `pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules]` is the only command that uses the network. It refreshes `data/raw/` and `.cache/pdf/`.
+- `pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules|scans]` is the only command that uses the network. It refreshes `data/raw/`, `.cache/pdf/` and `.cache/scans/` (card scans, never committed; the ledger pins each by sha256).
+- `data/printed/<campaign>.json` is the printed-text ledger: the lines on each card side, read from its scan. The build uses it in place of Hall of Beorn text. An effect record names the ledger lines it implements (`lines`).
+- `data/rules/index.json` is the hand-checked list of rule spans (exact `from` and `to` quotes per page column); `data/rules/columns.json` holds the per-document column boxes. `data/rules/entries.json` is built from them.
 - `pnpm data:build` is offline and deterministic: raw to `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules`, and `src/effects/generated`. `pnpm data:build -- --verbose` lists the scenarios whose cross-checks failed.
 - `pnpm data:check` rebuilds into a temporary directory and fails on any difference. CI runs it.
 - `pnpm data:query "<sql>"` queries tables `cards`, `scenario_cards` and `rules` in memory. Rules text is `select id, title, text from rules where ...`.
-- `pnpm effects:draft <scenario-id>` writes `.agent/drafts/<code>.md` for each printed line with no effect record. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
+- `pnpm effects:draft <scenario-id>` writes `.agent/drafts/<code>.md` for each printed ledger line no effect record owns. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
 
 ## Commands
 

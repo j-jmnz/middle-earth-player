@@ -1,0 +1,1808 @@
+{
+ "campaign": "fellowship-of-the-ring",
+ "conventions": [
+  "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+  "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Hide 2.) stay.",
+  "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes are straight.",
+  "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+  "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
+ ],
+ "entries": [
+  {
+   "code": "01002",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Théodred.jpg",
+    "sha256": "d782f9d8d0d552e368218f1743366838e5d966a6b8aeb0dbc3bd72a41bbfa4e4"
+   },
+   "lines": [
+    "Response: After Théodred commits to a quest, choose a hero committed to that quest. Add 1 resource to that hero's resource pool."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01007",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Éowyn.jpg",
+    "sha256": "b02918bd3a592af418c922682722b7939ed68fe6e010432482e7a9214ef0a99f"
+   },
+   "lines": [
+    "Action: Discard 1 card from your hand to give Éowyn +1 Willpower until the end of the phase. This effect may be triggered by each player once each round."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01014",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Faramir.jpg",
+    "sha256": "f2828886b5066e11af9dd567c382535ed8b30bd0107ba42352c868cc9f01645b"
+   },
+   "lines": [
+    "Action: Exhaust Faramir to choose a player. Each character controlled by that player gets +1 Willpower until the end of the phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01016",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Snowbourn-Scout.jpg",
+    "sha256": "e414e5915a88a52afeeb242d033d751038c1e6faccba352e3ec077ba1b31d396"
+   },
+   "lines": [
+    "Response: After Snowbourn Scout enters play, choose a location. Place 1 progress token on that location."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01020",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Ever-Vigilant.jpg",
+    "sha256": "45d2bd4557849174716a392d661df34478b6259e0a4c4dd5d023ad0b8c0348d7"
+   },
+   "lines": [
+    "Action: Choose and ready 1 ally card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01021",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Common-Cause.jpg",
+    "sha256": "780e110a64b09ebb45976a5319a0316fb36dc05c4ba73cc5c7c568e57de1500e"
+   },
+   "lines": [
+    "Action: Exhaust 1 hero you control to choose and ready a different hero."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01023",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Sneak-Attack.jpg",
+    "sha256": "abbaa9b0d74be592898f1be2405706850cbbe4afdd1394a98eeb4d79ef8371eb"
+   },
+   "lines": [
+    "Action: Put 1 ally card into play from your hand. At the end of the phase, if that ally is still in play, return it to your hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01024",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Valiant-Sacrifice.jpg",
+    "sha256": "20851e1c05c91d8cc8ca2ba7a4db73da0e90ac03a5ffc01175861ca3d4617c8e"
+   },
+   "lines": [
+    "Response: After an ally card leaves play, that card's controller draws 2 cards."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01025",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Grim-Resolve.jpg",
+    "sha256": "9b81ed03c7ebc42b9f1901972b1d9378cc2c4b9d157d78bd3057ee5119d0da0d"
+   },
+   "lines": [
+    "Action: Ready all character cards in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01026",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Steward-of-Gondor.jpg",
+    "sha256": "6aeb2cda36d07c4987a4ed4dd9c9512473348074a363712d1ecf728595694d5e"
+   },
+   "lines": [
+    "Attach to a hero.",
+    "Attached hero gains the Gondor trait.",
+    "Action: Exhaust Steward of Gondor to add 2 resources to attached hero's resource pool."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01027",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Celebrían's-Stone.jpg",
+    "sha256": "6c627a576d252fbdfbe06224e4be019c616e64f094d444f67827bd0715860e9d"
+   },
+   "lines": [
+    "Attach to a hero. Restricted.",
+    "Attached hero gains +2 Willpower.",
+    "If attached hero is Aragorn, he also gains a Spirit resource icon."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01028",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Veteran-Axehand.jpg",
+    "sha256": "b23d25b5e679071b25edbc99230c2cbde7c270f7c773015c726a51d1e18cd09e"
+   },
+   "lines": [],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01031",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Beorn.jpg",
+    "sha256": "0b0cbadd2977b65363c6b3a814c5afb81eb8fbbdd819c1759dead6e993f2315d"
+   },
+   "lines": [
+    "Action: Beorn gains +5 Attack until the end of the phase. At the end of the phase in which you trigger this effect, shuffle Beorn back into your deck. (Limit once per round.)"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01034",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Feint.jpg",
+    "sha256": "c40ae6082d9a50e50d3a5200ac5b594e2b49a0c54994a416c50ca31c39ea3a13"
+   },
+   "lines": [
+    "Combat Action: Choose an enemy engaged with a player. That enemy cannot attack that player this phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01035",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Quick-Strike.jpg",
+    "sha256": "e69eb2f1edcaff7293379ec7135a2ef0cb569c5b77b978220ac8e6d8d00434d1"
+   },
+   "lines": [
+    "Action: Exhaust a character you control to immediately declare it as an attacker (and resolve its attack) against any eligible enemy target."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01042",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Horn-of-Gondor.jpg",
+    "sha256": "eafd187baa3adc4704b2371b3c58af32ae14735d230851624d41f8303e609927"
+   },
+   "lines": [
+    "Attach to a hero. Restricted.",
+    "Response: After a character is destroyed, add 1 resource to attached hero's pool."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01043",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Wandering-Took.jpg",
+    "sha256": "e1accfb2a34b6f96c4507e48db676f8d87fc6f23e373e23692e21f6c3ddf362c"
+   },
+   "lines": [
+    "Action: Reduce your threat by 3 to give control of Wandering Took to another player. Raise that player's threat by 3. (Limit once per round)"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01045",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Northern-Tracker.jpg",
+    "sha256": "baff7e1319ba8747b6d981cb9c4196dc048f5a9b80b04d62070c3c12b4d7f6c1"
+   },
+   "lines": [
+    "Response: After Northern Tracker commits to a quest, place 1 progress token on each location in the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01046",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/The-Galadhrim's-Greeting.jpg",
+    "sha256": "4ad6188fecc5c28b5a33c327fd7c721eb3be5e2d4985016a685fa15cc72f8a52"
+   },
+   "lines": [
+    "Action: Reduce 1 player's threat by 6, or reduce each player's threat by 2."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01048",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Hasty-Stroke.jpg",
+    "sha256": "ea7e266612f16e3abeb8aa595be298924a48ed8edaab1e626b7d7eb498782820"
+   },
+   "lines": [
+    "Response: Cancel a shadow effect just triggered during combat."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01050",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/A-Test-of-Will.jpg",
+    "sha256": "6e5c944d1941d99546481030f0972083b81134b2351b34392fbe3342a6a60507"
+   },
+   "lines": [
+    "Response: Cancel the \"when revealed\" effects of a card that was just revealed from the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01051",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Stand-and-Fight.jpg",
+    "sha256": "1a4f9db99f0e8c31a9d30ed8afd2e0ab8e471c8a279b38dd0a1a684dee3b861c"
+   },
+   "lines": [
+    "Action: Choose an ally with a printed cost of X in any player's discard pile. Put that ally into play under your control. (The chosen ally can belong to any sphere of influence.)"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01053",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Dwarven-Tomb.jpg",
+    "sha256": "ffa377649eda85e9adee8ee1f5f68ba63953b27597b4501b1bb7bc8d88d6b0b1"
+   },
+   "lines": [
+    "Action: Return 1 Spirit card from your discard pile to your hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01057",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Unexpected-Courage.jpg",
+    "sha256": "1dbd61b80e24e6465f312dde466222d535f7b85441347cc183b88ec45b4f34d8"
+   },
+   "lines": [
+    "Attach to a hero.",
+    "Action: Exhaust Unexpected Courage to ready attached hero."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01059",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Erebor-Hammersmith.jpg",
+    "sha256": "b826fc31834de7848dffc340ceace55a72f42d896afc37311fd13dcc9a45f1bd"
+   },
+   "lines": [
+    "Response: After you play Erebor Hammersmith, return the topmost attachment in any player's discard pile to his hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01060",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Henamarth-Riversong.jpg",
+    "sha256": "28659baf69076281040fba1bc0914a671cfacf0cfcdd5a1fb8c2f426a77f45d2"
+   },
+   "lines": [
+    "Action: Exhaust Henamarth Riversong to look at the top card of the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01062",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gléowine.jpg",
+    "sha256": "ca7bb6c6f3f97e299012797c02b7e00d74ef9d4bf6f2f004d58b8ea35a26c473"
+   },
+   "lines": [
+    "Action: Exhaust Gléowine to choose a player. That player draws 1 card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "01073",
+   "side": "A",
+   "printing": "RevCore",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gandalf.jpg",
+    "sha256": "f658e30508315ee2159e1ccd976a130b4e4f0038458fb50df418711ad0509c07"
+   },
+   "lines": [
+    "At the end of the round, discard Gandalf from play.",
+    "Response: After Gandalf enters play, (choose 1): draw 3 cards, deal 4 damage to 1 enemy in play, or reduce your threat by 5."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141002",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Sam-Gamgee.jpg",
+    "sha256": "7104001474226d66753a0c839f193549e5615c80c6b0d4ef74cdf218480569f9"
+   },
+   "lines": [
+    "Response: After you engage an enemy with a higher engagement cost than your threat, ready Sam Gamgee. He gets +1 Willpower, +1 Attack, and +1 Defense until the end of the round."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141003",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Merry.jpg",
+    "sha256": "1ca6c8398203848b01001f13e4a6c1b9b40fe6f1f6a17b1a4dc91f91ca4e2e4f"
+   },
+   "lines": [
+    "Merry gets +1 Attack for each Hobbit hero you control.",
+    "Response: After Merry participates in an attack that destroys an enemy, ready another character that participated in that attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141004",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pippin.jpg",
+    "sha256": "165561b7e6dfe2c2fbf39e59d0ada666d73e7187a90fc73ed3bdfb26033eddaf"
+   },
+   "lines": [
+    "Each enemy in play gets +1 engagement cost for each Hobbit hero you control.",
+    "Response: After you engage an enemy with an engagement cost higher than your threat, draw a card."
+   ],
+   "inert": [],
+   "misprints": [
+    {
+     "line": 2,
+     "printed": "Response: After you engage an enemy with a engagement cost higher than your threat, draw a card."
+    }
+   ],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141006",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bill-the-Pony.jpg",
+    "sha256": "62d5eb60e8f9cdefed8bb726a0a24ec709c881578e988bd50d67fddc338d91dd"
+   },
+   "lines": [
+    "Lower the cost to play Bill the Pony by 2 if you control Sam Gamgee. Cannot have attachments.",
+    "Each Hobbit character gets +1 hit point."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141009",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Halfling-Determination.jpg",
+    "sha256": "645556a940fe58fd4b09395961c4402a84203ac5114a1f9df9b4db983947923b"
+   },
+   "lines": [
+    "Action: Choose a Hobbit character. That character gets +2 Willpower, +2 Attack, and +2 Defense until the end of the phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141012",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Frodo's-Intuition.jpg",
+    "sha256": "a517caf991c370dc1cae19efe14e2b6efe2f32fbeb9a4eb0889f052f7deec321"
+   },
+   "lines": [
+    "Action: Each hero you control gets +1 Willpower until the end of the round. Draw 1 card for each Hobbit hero you control."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141013",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Hobbit-Cloak.jpg",
+    "sha256": "4b7870d63b1f6d139252d2861bcf00816bfc76d2d54d9157f7a58b8a85c0145d"
+   },
+   "lines": [
+    "Attach to a Hobbit hero. Limit 1 per hero.",
+    "Attached hero gets +2 Defense while defending against an attack made by an enemy with an engagement cost higher than your threat."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141014",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Dagger-of-Westernesse.jpg",
+    "sha256": "3f122ea9c223750b88486ccfaf563950c93e2f54d73874d870d7264f0dce1d07"
+   },
+   "lines": [
+    "Attach to a hero. Restricted.",
+    "Attached hero gets +1 Attack (+2 Attack instead if attacking an enemy with an engagement cost higher than your threat)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141016",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Elf-stone.jpg",
+    "sha256": "d49b018d9ad9886026deb4d3605b9bcaaeebd5d381bef884dded47ac87d8829e"
+   },
+   "lines": [
+    "Attach to the active location. Attached location gets +1 quest point.",
+    "Response: After attached location leaves play as an explored location, the first player puts 1 ally into play from his hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141017",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Mr-Underhill.jpg",
+    "sha256": "df0018f55d78004afe89e692f9eeef072f9266a99c3d0e5a6c269ac4ab4c6a1f"
+   },
+   "lines": [
+    "Permanent.",
+    "Setup: Attach to the Ring-bearer.",
+    "Action: Add Mr. Underhill to the victory display to choose an enemy engaged with you. Until the end of the round, that enemy cannot attack you."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141022",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Three-is-Company-1A.jpg",
+    "sha256": "cc43243f008518d7bef2ef0daa5e4d0a67dd962b7d5ec9c9abc729d54bc47932"
+   },
+   "lines": [
+    "Setup: Set Bucklebury Ferry aside, out of play. Add 1 Black Rider to the staging area and make Bag End the active location. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141022",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Three-is-Company-1B.jpg",
+    "sha256": "36fdffbfa11b2ff8e1033176be8d4cfdb31fa05645cc8a5cea153882de6da752"
+   },
+   "lines": [
+    "When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)",
+    "The players cannot advance unless Bag End is in the victory display."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141023",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/A-Shortcut-to-Mushrooms-2A.jpg",
+    "sha256": "1cf1280a78342e2409b03fc7cbc36a4851a7c4c987f877afa0079e98c9855b36"
+   },
+   "lines": [],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null,
+   "notes": "Side A prints only flavor text."
+  },
+  {
+   "code": "141023",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/A-Shortcut-to-Mushrooms-2B.jpg",
+    "sha256": "9c2b51d69f90f024dfffcc47659c95888857afc8702b06ecc132681e1a62003b"
+   },
+   "lines": [
+    "When Revealed: The first player searches the encounter deck and discard pile for a Black Rider, reveals it (cannot be canceled), and adds it to the staging area. Shuffle the encounter deck.",
+    "When a player makes a Hide test, add 1 to the total Threat for each ally that player controls.",
+    "When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141024",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Escape-to-Buckland-3A.jpg",
+    "sha256": "e6651af86a88996f740953082b2ec73902d1b433f42cf3fc3b705659e00b7d4c"
+   },
+   "lines": [
+    "When Revealed: Add Bucklebury Ferry to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141024",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Escape-to-Buckland-3B.jpg",
+    "sha256": "d13a15b569d4c8de407c7ea2b6d1d3917f7a4dd33d8c4c207db9799203bba8ee"
+   },
+   "lines": [
+    "When Revealed: The first player searches the encounter deck and discard pile for a Black Rider, reveals it (cannot be canceled), and adds it to the staging area. Shuffle the encounter deck.",
+    "When a player fails a Hide test, each Nazgûl enemy in the staging area engages that player. (Trigger Forced effects after resolving this effect.)",
+    "Response: After a player makes a successful Hide test, place X progress on a non-unique location in play. X is twice the number of players in the game."
+   ],
+   "inert": [],
+   "misprints": [
+    {
+     "line": 1,
+     "printed": "Shuffle the encouter deck."
+    }
+   ],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141025",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Trouble-in-Bree-1A.jpg",
+    "sha256": "e335f31f93e939c9f74178525f46a7fa3c4d033d8f3cc143b29d1a7c18aba1e8"
+   },
+   "lines": [
+    "Setup: Set all copies of Ringwraith, The Witch-king, Midgewater, and Weathertop aside, out of play. Add The Prancing Pony and Bill Ferny to the staging area. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141025",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Trouble-in-Bree-1B.jpg",
+    "sha256": "5bf034812f876decd5a10b8606d27600ba33c2d873dd154f29376d2a5c89796e"
+   },
+   "lines": [
+    "The players cannot advance while The Prancing Pony is in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141026",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Into-the-Wild-2A.jpg",
+    "sha256": "88a1d373782a7cb882dae6915ba6c0629f30ea97c87158fdf6ef19a82020fdf1"
+   },
+   "lines": [],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null,
+   "notes": "Side A prints only flavor text."
+  },
+  {
+   "code": "141026",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Into-the-Wild-2B.jpg",
+    "sha256": "2bdea2b81a869e060d39ff18b06843f9a43c1b90c794269ac36573bd2f803be1"
+   },
+   "lines": [
+    "When Revealed: Add Midgewater to the staging area. Each player places 1 progress on the current quest.",
+    "Forced: At the end of the round, either remove X progress from the current quest or shuffle 1 out of play Ringwraith into the encounter deck. X is the number of players in the game.",
+    "The players cannot advance while Midgewater is in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141029",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Race-to-Rivendell-2A.jpg",
+    "sha256": "e11af3629100af0d0aac29f7dedd47bf679886ba4d0ff6b3750b94ce6ee37df4"
+   },
+   "lines": [],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null,
+   "notes": "Side A prints only flavor text."
+  },
+  {
+   "code": "141029",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Race-to-Rivendell-2B.jpg",
+    "sha256": "903a10da64836096e7c9114b166c90a91ba8ee2507b9a11adb1a1fef4fc8fc6a"
+   },
+   "lines": [
+    "When Revealed: Add Ford of Bruinen and The Witch-king to the staging area.",
+    "While at least 1 Nazgûl enemy is in play, Race to Rivendell gets +15 quest points.",
+    "Forced: At the end of the round, reduce the Ring-bearer's life by 1.",
+    "If the players defeat this stage, they have won the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null,
+   "notes": "Hall of Beorn prints the +15 quest points line twice and has no Forced line; the card prints each once."
+  },
+  {
+   "code": "141030",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/A-Shadow-of-the-Past-SetupA.jpg",
+    "sha256": "8b2ece58db6abc5b16a1d00978854ddfb1155a1d2e53f0058a35fde09864f676"
+   },
+   "lines": [
+    "You are playing Campaign Mode.",
+    "Setup: Attach Mr. Underhill to the Ring-bearer. Add Gandalf's Delay to the staging area. Shuffle Gildor Inglorion and The Ring Draws Them into the encounter deck."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Campaign Mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141030",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/A-Shadow-of-the-Past-SetupB.jpg",
+    "sha256": "92c61572c9422e2f1f71c7312d94763847362f0ad68fb0dc98c6c8ca926275c8"
+   },
+   "lines": [
+    "Resolution: Choose Gandalf's Delay or The Ring Draws Them and add it to the Campaign Pool. Then, choose Gildor Inglorion or Mr. Underhill and add it to the Campaign Pool. The chosen cards have been earned by the players."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141031",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bag-End.jpg",
+    "sha256": "fec494e10c301d849945ff6926bcb5135f94e3359e03a5350c4310e2396ff185"
+   },
+   "lines": [
+    "Response: After Bag End leaves play, each player draws 1 card for each Hobbit hero he controls."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141032",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Woody-End.jpg",
+    "sha256": "170f783f37715d2084e1589e013c4456068697cf786f5c3d187f682d2f0b70e7"
+   },
+   "lines": [
+    "While Woody End is the active location, reduce each Hide X value by 1."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141033",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/2b38254c-e992-4fb5-89e8-e7f636658ce0.jpg",
+    "sha256": "f198844d9c0d8ad63ebababbb04e0ac1225f79293241292da04c3544f14e0ac9"
+   },
+   "lines": [
+    "When Revealed: Immediately travel to Stock-brook. If another location is currently active, return it to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141034",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bamfurlong.jpg",
+    "sha256": "dc1c0ab635a64ae77862b4cf1219a57e10c3d21d5445e5ef1b884ebf3e47e56f"
+   },
+   "lines": [
+    "Response: After the players travel to Bamfurlong, each player engaged with a Nazgûl enemy may ready a hero he controls."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141035",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/53ac8ba6-0487-4b1f-91e9-cf7ca9e7c1d0.jpg",
+    "sha256": "86d36921b6e7b925ff3d0cc3f3992741d10910608ebebac2f14dd34cebd52f86"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "While there is at least 1 other location in play, the players cannot travel here.",
+    "Travel: The first player must make a Hide 3 test to travel here.",
+    "After Bucklebury Ferry leaves play as an explored location, the players win the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141036",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Green-Hill-Country.jpg",
+    "sha256": "4d92a097fd60c9c421ab4ac67d7cbe3f6964fb3a0de77cf8e99ce9c1cc9de793"
+   },
+   "lines": [
+    "While Green Hill Country is the active location, characters get +1 Willpower while committed to Hide tests.",
+    "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you have failed a Hide test this round)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141037",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stock-Road.jpg",
+    "sha256": "5ffabf7223b63b9f1e46377a08d41a67a85925bf9d071050a768bb2d8bbb4d6f"
+   },
+   "lines": [
+    "While Stock Road is in the staging area, add 2 to the total Threat of the discarded cards when a player resolves a Hide test.",
+    "Travel: The first player must make a Hide 1 test to travel here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141038",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Marish.jpg",
+    "sha256": "bc311b405e0097518a44eddece11e2da610bba9fee83a3f72c1f9259af9f33d8"
+   },
+   "lines": [
+    "Forced: After a player fails a Hide test, shuffle a Nazgûl enemy from the discard pile into the encounter deck, if able.",
+    "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player failed a Hide test this round)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141039",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Black-Rider.jpg",
+    "sha256": "99cde9e30c7dd6e8e9968b094ec6a357b7fa8f4204e4b73bd67c4700bfe4ea36"
+   },
+   "lines": [
+    "Hide 2. Cannot have non-Morgul attachments.",
+    "Forced: After engaged player fails a Hide test, Black Rider makes an immediate attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141040",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Evil-Crow.jpg",
+    "sha256": "d6c1be9392421daff4dd94bc6067aae9bcdefc1c30cdf4c373c10b10959f9451"
+   },
+   "lines": [
+    "While Evil Crow is engaged with a player, that player adds 1 to the Hide value for each Hide test he makes.",
+    "Shadow: If you have failed a Hide test this round, this attack is considered undefended."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141041",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Crawling-Towards-Him.jpg",
+    "sha256": "a1a6a816ceb1c962470f4c4f41a077be10772814e7293293ab3df426b2d38bb7"
+   },
+   "lines": [
+    "Peril. Hide 2.",
+    "When Revealed: If you have failed a Hide test this phase, remove each character you control from the quest.",
+    "Shadow: Return attacking enemy to the staging area after this attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141042",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/a46578d6-303e-4f35-9a11-8b9f807427ba.jpg",
+    "sha256": "8987bd580c23fe1d261edcbdbab6a91c5b61bb2cba6644af6d41946527def23a"
+   },
+   "lines": [
+    "Doomed 2.",
+    "When Revealed: Starting with the last player, each player must either return a Nazgûl enemy engaged with him to the staging area or make a Hide 2 test."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141043",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Have-You-Seen-Baggins.jpg",
+    "sha256": "ee7b2cf1cdf5494c45599b8baa4b877a0589c58ebcc158e58e6abf0f60c6d9b1"
+   },
+   "lines": [
+    "Peril. Surge.",
+    "When Revealed: Attach to a hero. (Counts as a Condition attachment with the text: \"Limit 1 per hero. Forced: After a player fails a Hide test, discard attached hero.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141044",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/A-Knife-in-the-Dark-SetupA.jpg",
+    "sha256": "9e272bfe8d463d3b2653daf1f4f39f45464cff7d643d6f0f7918d1218c2ac832"
+   },
+   "lines": [
+    "You are playing Campaign Mode."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Campaign Mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141044",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/A-Knife-in-the-Dark-SetupB.jpg",
+    "sha256": "29b06c81553056320ce38f10bde24b11b5681dc48a37b3dbb2920d1a5dacf4fe"
+   },
+   "lines": [
+    "Resolution: Starting with the first player, each player may choose one of the following boon cards and attach it to a hero he controls: Tireless Ranger, Skilled Healer, Valiant Warrior, Noble Hero. The chosen cards have been earned by the players."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141056",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Flight-to-the-Ford-SetupA.jpg",
+    "sha256": "9af815e95f3721f33af548fa874a32896236922492f7171e41dcf584fe708ae8"
+   },
+   "lines": [
+    "You are playing Campaign Mode.",
+    "Response: After an enemy is declared as an attacker, shuffle the top card of the burden deck into the encounter deck to cancel that attack. (Any player may trigger this ability.)"
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Campaign Mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141056",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Flight-to-the-Ford-SetupB.jpg",
+    "sha256": "8a7c68b4f20cc2077246df99a809661b8153b50526244612eb50354ed3bfac56"
+   },
+   "lines": [
+    "Resolution: Add each burden card in play, in the encounter deck, and in the discard pile to the Campaign Pool. The added cards have been earned by the players."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141072",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pathless-Country.jpg",
+    "sha256": "758d4d415079683d5ea26a4e9b7b2096a7554843179bc5afefaad28fde6dd418"
+   },
+   "lines": [
+    "Pathless Country gets +4 quest points while in the staging area.",
+    "Shadow: After this attack, the attacking enemy engages the next player then makes an immediate attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141073",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Piercing-Cry.jpg",
+    "sha256": "9f3fa66f66eb34519e3cf4b1989917b650eef43a23401650ed02402459eb0194"
+   },
+   "lines": [
+    "Peril.",
+    "When Revealed: Search the encounter deck and discard pile for a Nazgûl enemy. Either add it to the staging area or put it into play engaged with the first player. Shuffle the encounter deck.",
+    "Shadow: Attacking enemy makes an additional attack after this one."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141074",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Black-Steed.jpg",
+    "sha256": "81d7e4590d83e9932d7109bf6986caf53071f5e1f5bfde2724acccb283b23877"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: Attach to a Nazgûl enemy in play, if able. (Counts as a Mount attachment with the text: \"Limit 1 per enemy. Attached enemy gets -10 engagement cost and gains: 'Forced: At the end of the refresh phase, return attached enemy to the staging area.'\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141075",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Rode-Like-a-Gale.jpg",
+    "sha256": "9e71cb2558895bc99ae8d5e017bd1694c3a5029f6a9dad6548148fc91a0e7df5"
+   },
+   "lines": [
+    "When Revealed: Return each engaged Nazgûl enemy to the staging area. If no enemies were returned to the staging area by this effect, Rode Like a Gale gains surge.",
+    "Shadow: Return attacking enemy to the staging area after this attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141076",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Lure-of-the-Ring.jpg",
+    "sha256": "048235407035e31c1a7235734061c1ea10454d388353b20f1abc83a2c2a9d975"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: The first player must either exhaust The One Ring or raise his threat by 3.",
+    "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if The One Ring is exhausted)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141077",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Gildor-Inglorion.jpg",
+    "sha256": "24778d241e6322811153679818dd32daae458b3491fc2006ee77d88ab2f2d311"
+   },
+   "lines": [
+    "The first player gains control of Gildor Inglorion.",
+    "Forced: At the end of the round, discard Gildor Inglorion. The first player may spend 1 Fellowship resource to cancel this effect."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141078",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Gandalf's-Delay.jpg",
+    "sha256": "45f4b223bb51a44cd3083a97831f54968acb31e023a4c00369d56846d7c18ec0"
+   },
+   "lines": [
+    "Setup: Add Gandalf's Delay to the staging area.",
+    "Each player draws 1 less card in his starting hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": "sources",
+   "basis": [
+    "Scan: the Black Riders printing (c) 2013, which Hall of Beorn also serves as its MEC109 #46 image (byte-identical sha256) and DragnCards serves as an independent file; all three read 'Each player draws 1 less card in his starting hand.'",
+    "Hall of Beorn MEC109 #46 and DragnCards cardDb text agree with the scan.",
+    "RingsDB (has_errata) prints 'Skip the draw cards step during the first round of the game.' No FAQ, rulebook or Learn to Play text in data/rules mentions Gandalf's Delay, so nothing official supports the RingsDB wording.",
+    "Decision: the printed text. Matches the earlier user decision recorded in docs/brief.md (the MEC109 printing wins)."
+   ]
+  },
+  {
+   "code": "141079",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ring-Draws-Them.jpg",
+    "sha256": "3e9963a1957d3527ab6acec6bad8c40418d3f960a8d57580684fb77159993190"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: At the end of the phase, each enemy in the staging area engages the first player. If The One Ring is exhausted, this effect cannot be canceled."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "141080",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Weight-of-the-Ring.jpg",
+    "sha256": "7052360e81afc3ad24a51153c57244396e5d476d6872ae4eef51e750458d8f24"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: Attach to the Ring-bearer. (Counts as a Condition attachment with the text: \"Forced: At the beginning of each quest phase, either exhaust The One Ring or reveal an additional encounter card this phase.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": "sources",
+   "basis": [
+    "Scan: the 2013 or 2014 printing, served byte-identically as Hall of Beorn's MEC109 image; DragnCards serves it as a separate file. The scan prints the Shadow line.",
+    "RingsDB text, Hall of Beorn's MEC109 transcription (its Shadow field) and DragnCards cardDb agree with the scan on every word except Hall of Beorn's typo 'reveal and additional'.",
+    "Decision: the scan reading."
+   ]
+  },
+  {
+   "code": "141081",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Fear-of-Discovery.jpg",
+    "sha256": "8ed0a2579c6303ed0ca058e63da10c95a25b67d91624528ee877164594214ec3"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: The first player must either exhaust the Ring-bearer or reveal an additional encounter card.",
+    "Shadow: Defending player raises his threat by 3."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": "sources",
+   "basis": [
+    "Scan: the 2013 or 2014 printing, served byte-identically as Hall of Beorn's MEC109 image; DragnCards serves it as a separate file. The scan prints the Shadow line.",
+    "RingsDB text, Hall of Beorn's MEC109 transcription (its Shadow field) and DragnCards cardDb agree with the scan on every word except Hall of Beorn's typo 'reveal and additional'.",
+    "Decision: the scan reading."
+   ]
+  },
+  {
+   "code": "141082",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Eaten-Alive.jpg",
+    "sha256": "e60d73da003a1e527338681aacaa159a371bc8536df7de3c4104c3e5e6bb42f8"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: The first player must deal X damage divided among heroes he controls where X is the number of players in the game.",
+    "Shadow: Deal 1 damage to defending character."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": "sources",
+   "basis": [
+    "Scan: the 2013 or 2014 printing, served byte-identically as Hall of Beorn's MEC109 image; DragnCards serves it as a separate file. The scan prints the Shadow line.",
+    "RingsDB text, Hall of Beorn's MEC109 transcription (its Shadow field) and DragnCards cardDb agree with the scan on every word except Hall of Beorn's typo 'reveal and additional'.",
+    "Decision: the scan reading."
+   ]
+  },
+  {
+   "code": "141083",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Panicked.jpg",
+    "sha256": "1610ef7cdf38a3fd5c7e7d5beccb0cc59fd4d12766e7c651f6f93839b9d15e2e"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: The first player raises his threat by 3 and passes the first player token to the next player.",
+    "Shadow: Defending player exhausts a character he controls."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": "sources",
+   "basis": [
+    "Scan: the 2013 or 2014 printing, served byte-identically as Hall of Beorn's MEC109 image; DragnCards serves it as a separate file. The scan prints the Shadow line.",
+    "RingsDB text, Hall of Beorn's MEC109 transcription (its Shadow field) and DragnCards cardDb agree with the scan on every word except Hall of Beorn's typo 'reveal and additional'.",
+    "Decision: the scan reading."
+   ]
+  },
+  {
+   "code": "141084",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Overcome-by-Terror.jpg",
+    "sha256": "cdf605e172d2c4ca3a01b210a426cf4bf2680bb77d7d66f7c9eeb5e8c285a0be"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: The first player must exhaust The One Ring. If The One Ring is already exhausted, the first player must discard 2 cards at random from his hand.",
+    "Shadow: Defending player discards 1 card at random from his hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": "sources",
+   "basis": [
+    "Scan: the 2013 or 2014 printing, served byte-identically as Hall of Beorn's MEC109 image; DragnCards serves it as a separate file. The scan prints the Shadow line.",
+    "RingsDB text, Hall of Beorn's MEC109 transcription (its Shadow field) and DragnCards cardDb agree with the scan on every word except Hall of Beorn's typo 'reveal and additional'.",
+    "Decision: the scan reading."
+   ]
+  },
+  {
+   "code": "141085",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-One-Ring.jpg",
+    "sha256": "95df6d41c248b0e483a74b7f765554a2bc5cd0930c804a59cf1820f568197474"
+   },
+   "lines": [
+    "Setup: The first player claims The One Ring and attaches it to the Ring-bearer.",
+    "Attached hero does not count against the hero limit. The first player gains control of attached hero.",
+    "If The One Ring leaves play, the players lose the game."
+   ],
+   "inert": [
+    {
+     "line": 3,
+     "reason": "Implemented as the leavesPlayLoses keyword on the card (data/overrides.json), which the engine reads."
+    }
+   ],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null,
+   "notes": "Hall of Beorn serves this MEC109 scan with a 2014 copyright line. The 2013 Black Riders card prints only the last sentence; the printed text below is the one the scan carries, and it matches Hall of Beorn's MEC109 transcription."
+  },
+  {
+   "code": "142002",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Gandalf.jpg",
+    "sha256": "46c483a71b94e442c8950118f3d0ab287f4b67bffa62c66fac87b13c1ba19dc2"
+   },
+   "lines": [
+    "Play with the top card of your deck faceup. Once per phase, you may play the top card of your deck as if it was in your hand. When playing a card this way, Gandalf is considered to have the printed Leadership, Lore, Tactics, and Spirit icons."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142003",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Galadriel.jpg",
+    "sha256": "387ceef4d25952f203a6a3b1c0dcb3197ddfef0e05cf3f621edf074df43ad877"
+   },
+   "lines": [
+    "At the end of the round, discard Galadriel from play.",
+    "Response: After you play Galadriel from your hand, search the top 5 cards of your deck for an attachment of cost 3 or less and put it into play. Put the remaining cards back in any order."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142004",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Boromir.jpg",
+    "sha256": "ce62d6da0cb1001fd8ebcc93a0cc43a2793f5118ab7c31592710d1fecec5d775"
+   },
+   "lines": [
+    "Boromir gets +2 Defense while defending against an enemy with an engagement cost higher than your threat.",
+    "Response: After Boromir takes any amount of damage, ready him."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142006",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bilbo-Baggins.jpg",
+    "sha256": "cf23218e3e197aa3e4e8a0a8af6983f93ac991f48f3cf072121e28952ca29448"
+   },
+   "lines": [
+    "Response: After Bilbo Baggins enters play, search your deck for a Pipe attachment and add it to your hand. Shuffle your deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142007",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Flame-of-Anor.jpg",
+    "sha256": "3356f9e5e4e23299db471afa3c528eb593fb35f85493519c99ca06dd9a7a784d"
+   },
+   "lines": [
+    "Action: Add Flame of Anor to the victory display and discard the top card of your deck to ready an Istari character you control. That character gets +X Attack until the end of the phase where X is the discarded card's cost."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142008",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Gandalf's-Staff.jpg",
+    "sha256": "c449dc54a61c54c407732136cbd91761547227793082e29325e19028b6c1775f"
+   },
+   "lines": [
+    "Attach to Gandalf. Restricted.",
+    "Action: Exhaust Gandalf's Staff to (choose one): choose a player to draw 1 card, add 1 resource to a hero's resource pool, or discard a shadow card from a non-unique enemy."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142009",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Wizard-Pipe.jpg",
+    "sha256": "e3f00ea0614448603832ca487c5aa8b0e86fab6268b0ec6ada63e61102e38a6d"
+   },
+   "lines": [
+    "Attach to an Istari character. Limit 1 per character.",
+    "Action: Exhaust Wizard Pipe to exchange a card in your hand with the top card of your deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142010",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Fellowship-of-the-Ring-Attachment.jpg",
+    "sha256": "85b663ca295a99355ea6ea968cf1d0e56ce21cb0891a69917fa338eb758aa42e"
+   },
+   "lines": [
+    "Attach to the Ring-bearer.",
+    "Each hero gets +1 Willpower.",
+    "Forced: After a character is destroyed, discard Fellowship of the Ring."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142015",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Phial-of-Galadriel.jpg",
+    "sha256": "a002a69f8b2d1c27f7081984aebe9edb05d4ca01dc27c8b018c03a21eba6e4be"
+   },
+   "lines": [
+    "Setup: Attach to a hero in play.",
+    "Action: Add Phial of Galadriel to the victory display and remove it from the campaign pool, to give each enemy engaged with you -4 Attack until the end of the round."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": "sources",
+   "basis": [
+    "Scan: Setup and Action are two separate labelled lines. A second DragnCards file, RingsDB and DragnCards cardDb text agree.",
+    "Hall of Beorn's MEC109 transcription drops the 'Action:' label and merges the two lines; that is a transcription error.",
+    "Decision: the scan reading."
+   ]
+  },
+  {
+   "code": "142019",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ring-Goes-South-SetupA.jpg",
+    "sha256": "310a8ae4e0f15a044d6b987bbbddda309e77f55c85de30042b1e9b40aa891496"
+   },
+   "lines": [
+    "You are playing Campaign Mode.",
+    "Setup: Each player may change hero cards he controls without incurring the +1 threat penalty. The players have earned the boon cards: Sting, Mithril Shirt, Glamdring, and Andúril. Each player chooses one and adds it to his hand. If any of those boon cards remain unchosen, shuffle them into the first player's deck."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Campaign Mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142019",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ring-Goes-South-SetupB.jpg",
+    "sha256": "7ca43734844621db1a052cf55959988555b827bb6a3e8cb751b9cdf2671372ad"
+   },
+   "lines": [
+    "Resolution: If Lust for the Ring is attached to a hero, the players have earned that burden."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142039",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Journey-in-the-Dark-SetupA.jpg",
+    "sha256": "42986952470e521596b99e99f49297e3c4b91b7e5b8240cac702ca2f2be299af"
+   },
+   "lines": [
+    "You are playing Campaign Mode.",
+    "Setup: Shuffle the burden treachery cards Pursued by the Enemy and Shadow of Fear, into the encounter deck. Add the burden objective cards Grievous Wound and Overcome by Grief to the staging area."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Campaign Mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142039",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Journey-in-the-Dark-SetupB.jpg",
+    "sha256": "814584a038968b5691da0196004979a64ec107bab3776899708405a9b5ceb7ee"
+   },
+   "lines": [
+    "Resolution: The first player must choose one of the burden treachery cards (Pursued by the Enemy or Shadow of Fear), and one of the burden objective cards (Grievous Wound or Overcome by Grief) to add to the Campaign Pool. If The Balrog is still in play, the first player must choose all 4 burden cards instead. The chosen burdens have been earned by the players."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142060",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Breaking-of-the-Fellowship-SetupA.jpg",
+    "sha256": "d1110fb2c1ef619d6be9ce744d7302f248de81aad8307f635ab331a9ee25747b"
+   },
+   "lines": [
+    "You are playing Campaign Mode.",
+    "Setup: Starting with the first player, each player chooses 1 of the following boon cards: Phial of Galadriel, Three Golden Hairs, Lórien Rope, or Leaf-wrapped Lembas, and attaches it to a hero he controls. The chosen boon cards have been earned by the players. Shuffle Followed by Night and Ill Fate into the encounter deck."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "Reminder that Campaign Mode is in use. No game effect."
+    }
+   ],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142060",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Breaking-of-the-Fellowship-SetupB.jpg",
+    "sha256": "7379c703d881a21596e964304f62e0aab3281b91fd7799eb4edd6bb05771e8a4"
+   },
+   "lines": [
+    "Resolution: If Fallen into Evil is attached to a hero, add that hero to the list of Fallen Heroes in the Campaign Log.",
+    "The first player chooses either Followed by Night or Ill Fate to be added to the campaign pool. The chosen burden card has been earned by the players.",
+    "Each player chooses 1 hero he controls (other than the Ring-bearer or Aragorn) to be taken captive. Record the name of each \"captive\" in the Notes section of the Campaign Log."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142062",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Company-Divided-2A.jpg",
+    "sha256": "a4024b61fb9fda4e46c9a450c4571cb83a2ad17db1363803b272caa5eb528329"
+   },
+   "lines": [
+    "When Revealed: Remove the Ring-bearer, and each card attached to it, from the game (treat The One Ring's text as blank while resolving this effect). Reduce each enemy's engagement cost to 0 until the end of the encounter phase. Skip the travel phase this round."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142062",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Company-Divided-2B.jpg",
+    "sha256": "768f742b10f10324d6bed80e6b1ae01004595cbec0f042c00e808ca805edfcff"
+   },
+   "lines": [
+    "Forced: At the end of the refresh phase, shuffle Seat of Seeing and Frodo's Choice into the encounter discard pile. Then, place the encounter discard pile on the bottom of the encounter deck. Starting with the first player, each player creates his own staging area and advances to a different stage 3A of his choice. In player order, each player moves 1 encounter card from this staging area to his. When there are no encounter cards left at this stage, discard it."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": null
+  },
+  {
+   "code": "142085",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Shadow-of-Fear.jpg",
+    "sha256": "a549c1005bb3037257c4f1ba2a6cf6bbc95deea59e3035e86311d29788d49ee8"
+   },
+   "lines": [
+    "Doomed 1. Surge.",
+    "When Revealed: Treat the printed text box of each character in play as blank (except for Traits) until the end of the round.",
+    "Shadow: Defending character does not count its Defense."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": "sources",
+   "basis": [
+    "Scan: the 2013 or 2014 printing, served byte-identically as Hall of Beorn's MEC109 image; DragnCards serves it as a separate file. The scan prints the Shadow line.",
+    "RingsDB text, Hall of Beorn's MEC109 transcription (its Shadow field) and DragnCards cardDb agree with the scan on every word except Hall of Beorn's typo 'reveal and additional'.",
+    "Decision: the scan reading."
+   ]
+  },
+  {
+   "code": "142086",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pursued-by-the-Enemy-Treachery.jpg",
+    "sha256": "8d7a22a860b82ef8ace26e5373605a009410af4ab6caa44aaf84b3dc44588024"
+   },
+   "lines": [
+    "Doomed 1. Surge.",
+    "When Revealed: Each enemy engaged with a player, and not in the staging area, makes an immediate attack.",
+    "Shadow: Attacking enemy makes an additional attack after this one."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "agent",
+   "confirmedBy": "sources",
+   "basis": [
+    "Scan: the 2013 or 2014 printing, served byte-identically as Hall of Beorn's MEC109 image; DragnCards serves it as a separate file. The scan prints the Shadow line.",
+    "RingsDB text, Hall of Beorn's MEC109 transcription (its Shadow field) and DragnCards cardDb agree with the scan on every word except Hall of Beorn's typo 'reveal and additional'.",
+    "Decision: the scan reading."
+   ]
+  }
+ ]
+}

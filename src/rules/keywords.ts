@@ -1,4 +1,4 @@
-// Rules: rr.surge, rr.doomed-x, rr.immune, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible (data/rules/entries.json).
+// Rules: rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x (data/rules/entries.json).
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { EngineStep } from "./intents.ts";

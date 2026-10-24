@@ -6,10 +6,12 @@ import { DATA_DIR, ROOT } from "./paths.ts";
 import { buildCards, parseOverrides } from "./normalize/cards.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
 import { generateEffects, renderGenerated } from "./effects/generate.ts";
+import { applyPrinted } from "./normalize/printed.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
-import { extractAll } from "./rules/extract.ts";
+import { loadLedger, verifyScans } from "./printed/ledger.ts";
+import { extractAll, parseColumns } from "./rules/extract.ts";
 import { buildSteps } from "./rules/steps.ts";
-import { splitEntries } from "./rules/split.ts";
+import { buildEntries, indexSchema } from "./rules/spans.ts";
 
 // Offline and deterministic: data/raw -> data/cards. The same input writes the same bytes.
 // DATA_OUT overrides the output directory so data:check can build into a temporary one.
@@ -24,7 +26,15 @@ export function renderCardFile(cards: readonly Card[]): string {
 export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   const overrides = parseOverrides(JSON.parse(readFileSync(path.join(DATA_DIR, "overrides.json"), "utf8")));
   const raw = loadRaw();
-  const { cards, report } = buildCards(raw, overrides);
+  const sourceCards = buildCards(raw, overrides);
+  const report = sourceCards.report;
+  const ledger = loadLedger();
+  const scanProblems = verifyScans(ledger);
+  if (scanProblems.length > 0) throw new Error(`printed-text ledger: ${scanProblems.join("; ")}`);
+  const printed = applyPrinted(sourceCards.cards, ledger);
+  const cards = printed.cards;
+  console.log(`printed: ${ledger.entries.length} ledger entries; ${printed.differences.length} differ from the source text`);
+  for (const difference of printed.differences) console.log(`  ${difference.key}: ledger ${JSON.stringify(difference.ledger)} | source ${JSON.stringify(difference.source)}`);
   const byPack = new Map<string, Card[]>();
   for (const card of cards) byPack.set(cardsFile(card), [...(byPack.get(cardsFile(card)) ?? []), card]);
   const dir = path.join(outDir, "cards");
@@ -43,15 +53,15 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   // Rule text: re-extracted only when a cached PDF's sha256 differs from the committed markdown.
   const sources = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string; sha256: string }[] }> };
   const pinned = new Map((sources.sources.rules?.files ?? []).map((file) => [file.path, file.sha256]));
-  const docs = extractAll(outDir, pinned);
-  const entries = splitEntries(docs);
+  const docs = extractAll(outDir, pinned, parseColumns(readFileSync(path.join(DATA_DIR, "rules", "columns.json"), "utf8")));
+  const entries = buildEntries(indexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "rules", "index.json"), "utf8"))), docs);
   writeFileSync(path.join(outDir, "rules", "entries.json"), `[\n${entries.map((entry) => `  ${JSON.stringify(entry)}`).join(",\n")}\n]\n`);
   const steps = buildSteps(readFileSync(path.join(DATA_DIR, "raw", "dragncards", "steps.json"), "utf8"), entries);
   writeFileSync(path.join(outDir, "rules", "steps.json"), `[\n${steps.map((step) => `  ${JSON.stringify(step)}`).join(",\n")}\n]\n`);
   console.log(`rules: ${entries.length} entries, ${steps.length} framework steps`);
   const effectsDir = process.env.EFFECTS_OUT ?? path.join(ROOT, "src", "effects", "generated");
   mkdirSync(effectsDir, { recursive: true });
-  const generated = generateEffects(cards, built.scenarios, built.campaign);
+  const generated = generateEffects(cards, built.scenarios, built.campaign, ledger);
   writeFileSync(path.join(effectsDir, "fellowship-of-the-ring.ts"), renderGenerated(generated.effects, built.campaign.id));
   console.log(`effects: ${generated.effects.length} generated, ${generated.unmatched.length} lines without a template`);
   console.log(`scenarios: ${built.scenarios.map((scenario) => scenario.id).join(", ") || "none"}`);

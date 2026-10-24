@@ -1,0 +1,70 @@
+import type { Card } from "../../../src/catalog/card-facts.ts";
+import { parseKeywordTokens } from "./keywords.ts";
+import { timingLabels } from "./timings.ts";
+import type { Ledger, LedgerEntry } from "../printed/ledger.ts";
+import { keyOf } from "../printed/ledger.ts";
+
+// Every sentence of the line is a keyword the parser reads.
+export function isKeywordLine(line: string): boolean {
+  const sentences = line.split(/(?<=\.)\s+/).map((part) => part.trim());
+  return sentences.every((sentence) => {
+    const parsed = parseKeywordTokens([sentence]);
+    return parsed.unknown.length === 0 && Object.keys(parsed.keywords).length > 0;
+  });
+}
+
+const SHADOW = /^Shadow:/;
+
+export function splitFront(entry: LedgerEntry): { text: string | null; shadow: string | null } {
+  const body = entry.lines.filter((line) => !SHADOW.test(line));
+  const shadow = entry.lines.filter((line) => SHADOW.test(line));
+  return { text: body.length > 0 ? body.join("\n") : null, shadow: shadow.length > 0 ? shadow.join("\n") : null };
+}
+
+// Loose comparison: the ledger writes icons as words and RingsDB writes them as [icon] tokens and HTML.
+function loose(text: string | null | undefined): string[] {
+  return (text ?? "")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\[(\w+)\]/g, "$1")
+    .replaceAll("`", "'")
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .split(/\r?\n/)
+    .map((line) => line.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim())
+    .filter((line) => line !== "");
+}
+
+export type Difference = { key: string; ledger: string[]; source: string[] };
+
+// Cards whose text came from Hall of Beorn take the ledger text. The core-set cards of the starter lists keep
+// RingsDB's marked-up text (the card screen renders it); their ledger entries are still compared.
+export function applyPrinted(cards: readonly Card[], ledger: Ledger): { cards: Card[]; differences: Difference[] } {
+  const differences: Difference[] = [];
+  const out = cards.map((card) => {
+    const a = ledger.byKey.get(keyOf(card.code, "A"));
+    const b = ledger.byKey.get(keyOf(card.code, "B"));
+    if (!a && !b) return card;
+    const front = a ? splitFront(a) : { text: card.text, shadow: card.shadowText };
+    const sourceFront = [card.text, card.shadowText].filter((part): part is string => !!part).join("\n");
+    const sourceBack = card.back?.text ?? null;
+    const compare = (key: string, ledgerLines: readonly string[], source: string | null) => {
+      const left = ledgerLines.flatMap((line) => loose(line));
+      const right = loose(source);
+      if (left.join(" ") === right.join(" ")) return;
+      differences.push({ key, ledger: left.filter((line) => !right.includes(line)), source: right.filter((line) => !left.includes(line)) });
+    };
+    if (a) compare(keyOf(card.code, "A"), a.lines, sourceFront);
+    if (b) compare(keyOf(card.code, "B"), b.lines, sourceBack);
+    if (!card.printings.some((printing) => printing.pack === "TFotR")) return card;
+    const backText = b ? (b.lines.length > 0 ? b.lines.join("\n") : null) : (card.back?.text ?? null);
+    const back = b || card.back ? { name: card.back?.name ?? null, text: backText, questPoints: card.back?.questPoints ?? null, stage: card.back?.stage ?? null } : null;
+    return {
+      ...card,
+      text: front.text,
+      shadowText: front.shadow,
+      back,
+      timings: [...timingLabels(front.text, isKeywordLine), ...timingLabels(backText, isKeywordLine), ...(front.shadow ? ["shadow"] : [])],
+    };
+  });
+  return { cards: out, differences };
+}

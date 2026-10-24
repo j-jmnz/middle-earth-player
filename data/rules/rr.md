@@ -1,31 +1,27 @@
 # rr
 
 sha256: ef604fe7a639dfcb59e1b63538c77cb39bfbbda512ba0e9d2756ade92ef084ee
+columns: bd6c8512ac9543979054e3153fd13139b37443c3b842347d49ea4df7f5b20f49
 
-## p1 {#rr-p1}
+## p1
 
-Rules Reference
+### p1 c1
 
-## p2 {#rr-p2}
+Rules Re
+
+### p1 c2
+
+eference
+
+## p2
+
+### p2 c1
 
 Using this Document
-
-Glossary
-
 “I must go to this lords’ council and learn what I can.
 But the Enemy has the move, and he is about to open
 his full game.”
-
-The following is an alphabetical list of entries for game
-rules, terms, and situations that may occur during play.
-
 —Gandalf, The Return of the King
-
-An ability is the special game text that a card
-contributes to the game. Card abilities fall into one of
-the following types: action, forced, keyword, constant
-ability, response, or when revealed ability.
-
 This document is intended as the definitive source for
 rules information, but does not teach players how to
 play the game. Players should first read the Learn to
@@ -66,8 +62,19 @@ conflict in the manner that the players perceive to be
 the worst possible resolution with regards to winning
 the scenario.
 
-Ability, Card Ability
+2
 
+### p2 c2
+
+Glossary
+The following is an alphabetical list of entries for game
+rules, terms, and situations that may occur during play.
+
+Ability, Card Ability
+An ability is the special game text that a card
+contributes to the game. Card abilities fall into one of
+the following types: action, forced, keyword, constant
+ability, response, or when revealed ability.
 ◊ The initiation of an action or response ability is
 optional. The word “may” also incorporates a
 player option into the resolution of an ability. The
@@ -107,25 +114,16 @@ ability.”
 See also: Action, Effects, Response, Forced,
 Keywords, Constant Ability
 
-2
+## p3
 
-## p3 {#rr-p3}
+### p3 c1
 
 Action, Action Ability
-
-Active Player
-
 Some abilities are labeled by the word “Action”
 followed by ability text. These abilities can only be
 initiated by a player during an action window. For
 details on when action windows occur during each
 round, see Appendix I on page 20.
-
-The phrase “active player” is used to refer to a player
-who is obligated to perform (or granted the option to
-perform) a specific game function during a framework
-step or special action window.
-
 Some action abilities have a phase name as a precursor
 to the word “Action.” Such abilities are still considered
 action abilities, with the restriction that they can
@@ -166,6 +164,16 @@ multiple progress on the quest (and the progress
 is instead being placed on the active location), the
 remaining progress created by the effect is placed
 on the current quest.
+
+See also: Explored, Travel
+
+### p3 c2
+
+Active Player
+The phrase “active player” is used to refer to a player
+who is obligated to perform (or granted the option to
+perform) a specific game function during a framework
+step or special action window.
 
 After
 The word “after” refers to a game occurrence that
@@ -210,11 +218,11 @@ independently of the card to which it is attached.
 
 See also: “Cannot have attachments,” Appendix II
 
-See also: Explored, Travel
-
 3
 
-## p4 {#rr-p4}
+## p4
+
+### p4 c1
 
 Attack Strength
 Each character and enemy has an attack strength. This
@@ -270,6 +278,8 @@ any costs have still been paid.
 is still considered to have been played, and it is still
 placed in its owner’s discard pile.
 
+### p4 c2
+
 ◊ If the effects of a treachery card are canceled, the
 card is still considered to have been revealed, and it
 is still placed in the encounter discard pile.
@@ -320,7 +330,9 @@ Character cards are divided into 2 types: heroes and
 allies. Any ability that refers to a “character” refers to
 both types.
 
-## p5 {#rr-p5}
+## p5
+
+### p5 c1
 
 Some abilities, however, may refer only to a particular
 type, or may exclude a type, based on the ability text.
@@ -361,6 +373,19 @@ any time the specified condition is met.
 are in play, each instance affects the game
 state independently.
 
+See also: Ability, Card Ability, Effects
+
+Control
+See: Ownership and Control
+
+Copy (of a card)
+A copy of a card is defined by title: any other card that
+shares the same title is considered a copy, regardless of
+card type, text, artwork, or any other characteristic(s) of
+the card(s).
+
+### p5 c2
+
 Cost
 A card’s resource cost is the numerical value that must
 be paid to play the card.
@@ -397,42 +422,21 @@ on it as it has hit points, it is destroyed.
 The following process is used to deal damage:
 1. Determine the amount of damage to deal
 (including modifiers).
-
-See also: Ability, Card Ability, Effects
-
 2. Assign the damage to the target (character or
 enemy).
-
-Control
-
 3. Place the damage on the target (character or
 enemy).
 
-See: Ownership and Control
-
 See also: Destroy, Hit points, Running out of Tokens
-
-Copy (of a card)
-A copy of a card is defined by title: any other card that
-shares the same title is considered a copy, regardless of
-card type, text, artwork, or any other characteristic(s) of
-the card(s).
 
 5
 
-## p6 {#rr-p6}
+## p6
+
+### p6 c1
 
 Deckbuilding
-
-Destroy
-
 To build a custom player deck:
-
-When a hero or ally is destroyed, it is placed faceup
-on top of its owner’s discard pile. When an enemy is
-destroyed, it is placed faceup on top of the encounter
-discard pile.
-
 ◊ A player must choose 1 to 3 hero cards.
 ◊ A player’s deck must contain a minimum of 50
 player cards.
@@ -481,6 +485,13 @@ See also: Ability, Effects, Triggered Ability
 
 6
 
+### p6 c2
+
+Destroy
+When a hero or ally is destroyed, it is placed faceup
+on top of its owner’s discard pile. When an enemy is
+destroyed, it is placed faceup on top of the encounter
+discard pile.
 Placing a hero, ally, or enemy in the discard pile
 as the result of being destroyed is not the same as
 “discarding” that card.
@@ -523,7 +534,9 @@ There is no maximum hand size.
 
 See also: Running out of cards
 
-## p7 {#rr-p7}
+## p7
+
+### p7 c1
 
 Effects
 A card effect is any effect that arises from the
@@ -572,6 +585,8 @@ and minions that attempt to capture, destroy, or mislead
 the heroes as they pursue their quest.
 ◊ After an enemy card is revealed, it is added to the
 staging area.
+
+### p7 c2
 
 ◊ Enemy cards remain in play until they are defeated
 or removed from play by a card ability.
@@ -626,7 +641,9 @@ that player’s discard pile.
 
 7
 
-## p8 {#rr-p8}
+## p8
+
+### p8 c1
 
 ◊ Event cards engage the game state at the time they
 are played and resolve. If an event card creates a
@@ -682,6 +699,8 @@ that player becomes the first player for the next round.
 
 8
 
+### p8 c2
+
 If the first player is eliminated, the first player token
 immediately passes clockwise to the next player.
 The players as a group are encouraged to work
@@ -727,7 +746,9 @@ time its trigger occurs in order to resolve its effect.
 
 See also: Triggered Ability
 
-## p9 {#rr-p9}
+## p9
+
+### p9 c1
 
 Framework Effects and
 Framework Steps
@@ -775,6 +796,10 @@ defeated or as the result of a card effect.
 explored or as the result of a card effect.
 ◊ Treachery: The treachery’s effects resolve, or
 are canceled.
+
+See also: Objective
+
+### p9 c2
 
 Hero Cards
 Hero cards represent the main characters a player
@@ -824,11 +849,11 @@ aside, and cards removed from the game.
 target, cards that are in play, unless the ability text
 specifically refers to an out-of-play area.
 
-See also: Objective
-
 9
 
-## p10 {#rr-p10}
+## p10
+
+### p10 c1
 
 ◊ Card abilities can only be initiated or affect the
 game from an in-play area unless they specifically
@@ -866,6 +891,10 @@ condition of a response ability true, that ability may be
 initiated when that triggering condition becomes true.
 
 See also: Cost, Planning Phase
+
+10
+
+### p10 c2
 
 In Player Order
 If players are instructed to perform a sequence “in
@@ -909,9 +938,6 @@ ability that created it, for a duration specified by the
 effect. The effect continues to affect the game state
 for the specified duration whether or not the card
 that created the lasting effect is or remains in play.
-
-10
-
 ◊ If a lasting effect generated by a player card affects
 in-play cards (or a specified set of cards), it is only
 applied to cards that are in play (or that meet the
@@ -921,7 +947,9 @@ change status to meet the criteria of the specified
 set) after a lasting effect’s establishment are not
 subsequently affected by that lasting effect.
 
-## p11 {#rr-p11}
+## p11
+
+### p11 c1
 
 ◊ If a lasting effect generated by an encounter card
 or quest card affects in-play cards (or a specified
@@ -934,20 +962,11 @@ are subsequently affected by that lasting effect
 the same as cards that are in-play at the time of
 its establishment. This aids the encounter deck’s
 ability to create effective card combinations.
-
-May
-
 ◊ A lasting effect expires as soon as the timing point
 specified by its duration is reached. This means
 that an “until the end of the round” lasting effect
 expires just before an “at the end of the round”
 ability or delayed effect may initiate.
-
-Any time a new modifier is applied (or removed),
-the entire quantity is recalculated from the start,
-considering the unmodified base value and all
-active modifiers.
-
 ◊ A lasting effect that expires at the end of a
 specified time period can only be initiated during
 that time period.
@@ -978,6 +997,9 @@ active location.
 
 See also: Active Location, Explored, Travel
 
+### p11 c2
+
+May
 The word “may” indicates that a specified player has
 the option to do that which follows. If no player is
 specified, the option is granted to the controller of the
@@ -987,7 +1009,10 @@ Modifiers
 The game state constantly checks and (if necessary)
 updates the count of any variable quantity that is
 being modified.
-
+Any time a new modifier is applied (or removed),
+the entire quantity is recalculated from the start,
+considering the unmodified base value and all
+active modifiers.
 ◊ The calculation of a value treats all modifiers as
 being applied simultaneously. However, while
 performing the calculation, all additive and
@@ -1021,7 +1046,9 @@ must keep this second hand.
 
 11
 
-## p12 {#rr-p12}
+## p12
+
+### p12 c1
 
 Multiple Defenders
 Some card abilities allow players to declare multiple
@@ -1072,6 +1099,8 @@ enemy during the optional engagement step.
 
 12
 
+### p12 c2
+
 ◊ An enemy’s engagement cost has no bearing on
 optional engagements.
 
@@ -1121,27 +1150,18 @@ Play and Put into Play
 Playing a card involves paying the card’s resource cost
 and placing the card in the play area. This causes the
 
-## p13 {#rr-p13}
+## p13
+
+### p13 c1
 
 card to enter play (or, in the case of an event card, to
 resolve its ability and be placed in the discard pile).
 Cards are played from a player’s hand.
-
-in their owners’ discard piles. Any enemies engaged
-with that player are returned to the staging area,
-retaining any damage tokens that are on them.
-
 Some abilities cause cards to be put into play. This
 bypasses the need to pay the card’s cost, as well as
 any restrictions or prohibitions regarding the potential
 of playing that card. A card that is put into play enters
 play in its controller’s play area.
-
-◊ When a player is eliminated, the remaining players
-continue to play the game, revealing one less
-encounter card during the quest phase now that
-there is one less player in the game.
-
 ◊ A card that is put into play is not considered to
 have been played.
 ◊ In order to play a card, its cost (after modifiers)
@@ -1184,6 +1204,15 @@ card effect forces their elimination.
 ◊ When a player is eliminated, that player’s hand, all
 of the cards they control, and their deck are placed
 
+### p13 c2
+
+in their owners’ discard piles. Any enemies engaged
+with that player are returned to the staging area,
+retaining any damage tokens that are on them.
+◊ When a player is eliminated, the remaining players
+continue to play the game, revealing one less
+encounter card during the quest phase now that
+there is one less player in the game.
 ◊ If all players are eliminated, the game ends in a loss
 for the players.
 
@@ -1228,7 +1257,9 @@ See also: Appendix II
 
 13
 
-## p14 {#rr-p14}
+## p14
+
+### p14 c1
 
 Quest Phase
 The steps of this phase and how to resolve the quest are
@@ -1257,6 +1288,35 @@ Refresh Phase
 The steps of this phase are described in timing entries
 7.1–7.5 on page 25.
 
+Removed from Game
+“Removed from the game” is an out-of-play state.
+A card that has been removed from the game is set
+aside and has no further interaction with the game in
+any manner for the duration of its removal. If there is
+no specified duration, a card that has been removed
+from the game is considered removed until the end of
+the game.
+
+Replacement Effects
+A replacement effect is an effect that replaces the
+handling of one resolution with a different means of
+handling that resolution. Most replacement effects are
+response abilities in the format of “when triggering
+condition would happen, do [replacement effect]
+instead.” After all responses to the original triggering
+condition have resolved and it is time to resolve the
+triggering condition itself, the replacement effect
+resolves instead.
+
+14
+
+### p14 c2
+
+◊ If multiple replacement effects are initiated against
+the same triggering condition, the most recent
+replacement effect is the one that is used for the
+resolution of the triggering condition.
+
 Resources
 Resources are the game’s currency and are used to pay
 for cards and card abilities.
@@ -1280,38 +1340,9 @@ that card.
 ◊ Neutral cards do not require a resource match
 to play.
 
-Removed from Game
-
 See also: Sphere of Influence
 
-“Removed from the game” is an out-of-play state.
-A card that has been removed from the game is set
-aside and has no further interaction with the game in
-any manner for the duration of its removal. If there is
-no specified duration, a card that has been removed
-from the game is considered removed until the end of
-the game.
-
 Resource Phase
-
-Replacement Effects
-A replacement effect is an effect that replaces the
-handling of one resolution with a different means of
-handling that resolution. Most replacement effects are
-response abilities in the format of “when triggering
-condition would happen, do [replacement effect]
-instead.” After all responses to the original triggering
-condition have resolved and it is time to resolve the
-triggering condition itself, the replacement effect
-resolves instead.
-
-14
-
-◊ If multiple replacement effects are initiated against
-the same triggering condition, the most recent
-replacement effect is the one that is used for the
-resolution of the triggering condition.
-
 The steps of this phase and how to collect resources are
 described in timing entries 1.1–1.4 on page 22.
 
@@ -1332,27 +1363,19 @@ after its triggering condition has occurred and
 has been resolved. The first player always has
 the first opportunity to use an ability in response
 
-## p15 {#rr-p15}
+## p15
+
+### p15 c1
 
 to a given triggering condition, followed by the
 next player, and so forth. Response opportunities
 for that triggering condition alternate between
 players in this manner until all players have
 passed consecutively.
-
-players to play the same scenario multiple times with
-different hero and deck combinations, evaluating their
-effectiveness in each game.
-
 ◊ Once the opportunity to react to a triggering
 condition has been passed by all players, further
 responses to that specific triggering condition
 cannot be used.
-
-1. Add together three undesirable elements: the
-final threat level of each player, the threat penalty
-on all defeated heroes, and the number of damage
-tokens on all surviving heroes.
 
 See also: Priority of Simultaneous Resolution, Timing
 and Ability Resolution
@@ -1391,10 +1414,21 @@ track the current game state.
 See also: Damage, Resources
 
 Scoring
+Scoring is a useful tool in evaluating the performance
+of a deck or a party over time, or in comparing one
+deck or group of decks to another. This enables
 
+### p15 c2
+
+players to play the same scenario multiple times with
+different hero and deck combinations, evaluating their
+effectiveness in each game.
 If the players win the game, use this process to
 determine their group’s score for the game.
-
+1. Add together three undesirable elements: the
+final threat level of each player, the threat penalty
+on all defeated heroes, and the number of damage
+tokens on all surviving heroes.
 2. Add 10 for each completed round of the game.
 3. Subtract any victory points that have
 been collected.
@@ -1430,26 +1464,14 @@ The defending sentinel character must exhaust and
 meet any other requirements necessary to defend
 the attack.
 
-Scoring is a useful tool in evaluating the performance
-of a deck or a party over time, or in comparing one
-deck or group of decks to another. This enables
-
 15
 
-## p16 {#rr-p16}
+## p16
+
+### p16 c1
 
 Setup
-
-Shadow Effects
-
 Setup occurs before the game begins.
-
-Some encounter cards have a secondary effect known
-as a shadow effect. These effects are offset from a
-card’s non-shadow text by the “shadow bar” graphic.
-They are also denoted by the bold italic “Shadow:”
-trigger on the card.
-
 Card effects triggered during Setup are fully resolved.
 In order to set up the game, follow these 7 steps:
 1. Shuffle Decks – Shuffle all player decks and
@@ -1489,6 +1511,14 @@ starting with the first game round.
 
 16
 
+### p16 c2
+
+Shadow Effects
+Some encounter cards have a secondary effect known
+as a shadow effect. These effects are offset from a
+card’s non-shadow text by the “shadow bar” graphic.
+They are also denoted by the bold italic “Shadow:”
+trigger on the card.
 ◊ Shadow effects only resolve when dealt as a
 shadow card during an enemy attack.
 
@@ -1517,26 +1547,15 @@ Tactics
 
 Ï
 
-## p17 {#rr-p17}
+## p17
+
+### p17 c1
 
 Staging
-
-Switch
-
 Staging is the term used to describe the process of
 revealing an encounter card from the encounter deck,
 resolving its effects, and placing that card.
-
-Some effects use the word “switch.” In order to resolve
-such an effect, switched items must exist on each side
-of the switch.
-
 The staging of each encounter card follows these steps:
-
-◊ When switching values, a value of “0” may be
-switched, but a null entry for the pertinent value
-field cannot be switched.
-
 1. Reveal the encounter card by turning it faceup
 so that its game text is visible.
 2. Resolve any keywords and/or when revealed
@@ -1572,6 +1591,16 @@ reveal 1 additional encounter card for each separate
 instance.
 Resolve the surge keyword immediately after resolving
 the staging of the encounter card.
+
+### p17 c2
+
+Switch
+Some effects use the word “switch.” In order to resolve
+such an effect, switched items must exist on each side
+of the switch.
+◊ When switching values, a value of “0” may be
+switched, but a null entry for the pertinent value
+field cannot be switched.
 
 Table Talk
 Players are permitted and encouraged to talk to one
@@ -1610,18 +1639,13 @@ immediately eliminated from the game.
 
 17
 
-## p18 {#rr-p18}
+## p18
+
+### p18 c1
 
 Timing of Ability Resolution
-
-Travel Phase
-
 When multiple triggered abilities share the same
 trigger, they are resolved in the following order:
-
-The steps of this phase and how to travel to locations
-are described in timing entries 4.1–4.3 on page 23.
-
 1. Constant abilities
 2. Forced abilities
 3. Response abilities
@@ -1647,6 +1671,30 @@ an effect.
 ◊ If an ability’s cost is not paid, its effect cannot
 be resolved.
 
+See also: Cost
+
+Traits
+Most cards have one or more traits listed at the top of
+the text box and printed in Bold Italics.
+◊ Traits have no inherent effects on the game.
+Instead, some card abilities reference cards that
+possess or lack specific traits.
+
+Travel
+Some locations have a bold Travel cost. In order to
+travel to such a location, its Travel cost must first be
+paid.
+If the players cannot pay the Travel cost, then they
+cannot travel to that location.
+
+18
+
+### p18 c2
+
+Travel Phase
+The steps of this phase and how to travel to locations
+are described in timing entries 4.1–4.3 on page 23.
+
 Treachery Cards
 Treachery cards represent traps, curses, maneuvers,
 pitfalls, and other surprises the players might confront
@@ -1671,27 +1719,9 @@ response abilities are optional.
 triggered automatically by the game at the ability’s
 appropriate timing point.
 
-See also: Cost
-
 See also: Triggering Condition
 
-Traits
-
 Triggering Condition
-
-Most cards have one or more traits listed at the top of
-the text box and printed in Bold Italics.
-◊ Traits have no inherent effects on the game.
-Instead, some card abilities reference cards that
-possess or lack specific traits.
-
-Travel
-Some locations have a bold Travel cost. In order to
-travel to such a location, its Travel cost must first be
-paid.
-If the players cannot pay the Travel cost, then they
-cannot travel to that location.
-
 A triggering condition is specific occurrence that takes
 place in the game. On card abilities, the triggering
 condition is the element of the ability that references
@@ -1709,19 +1739,12 @@ by the occurrence may be used in any order.
 
 See also: After, Response, When
 
-18
+## p19
 
-## p19 {#rr-p19}
+### p19 c1
 
 Type, Types
-
-Winning the Game
-
 See: Card Types
-
-If at least one player survives through the completion
-of the final stage of the scenario, the game ends in a
-victory for the players.
 
 Unique Cards
 The ‰ symbol before a card’s title indicates the card
@@ -1737,21 +1760,6 @@ must discard the version they control.
 See also: Ownership and Control
 
 Victory
-
-◊ Some card abilities can introduce additional
-victory conditions to the game. Such a condition
-immediately ends the game if it is met.
-
-See also: Player Elimination
-
-The letter “X”
-Unless specified by a card ability or granted player
-choice, the letter X is always equal to 0.
-◊ For costs involving the letter X, the value of X
-is defined by card ability or player choice, after
-which the amount paid may be modified by effects
-without altering the functional value of X.
-
 Victory is a keyword ability. When an enemy or
 location with the victory keyword is defeated or
 explored, it is placed in the victory display instead of
@@ -1781,9 +1789,31 @@ successfully questing while it is committed to a quest.
 
 See also: Quest Phase
 
+### p19 c2
+
+Winning the Game
+If at least one player survives through the completion
+of the final stage of the scenario, the game ends in a
+victory for the players.
+◊ Some card abilities can introduce additional
+victory conditions to the game. Such a condition
+immediately ends the game if it is met.
+
+See also: Player Elimination
+
+The letter “X”
+Unless specified by a card ability or granted player
+choice, the letter X is always equal to 0.
+◊ For costs involving the letter X, the value of X
+is defined by card ability or player choice, after
+which the amount paid may be modified by effects
+without altering the functional value of X.
+
 19
 
-## p20 {#rr-p20}
+## p20
+
+### p20 c1
 
 Appendix I:
 Timing and Gameplay
@@ -1828,6 +1858,8 @@ action opportunity.
 
 20
 
+### p20 c2
+
 0.0 Round Begins
 I. RESOURCE PHASE
 1.1 Resource phase begins
@@ -1845,7 +1877,9 @@ II. PLANNING PHASE
 active player (loop back to 2.2, or proceed to 2.4)
 2.4 Planning phase ends
 
-## p21 {#rr-p21}
+## p21
+
+### p21 c1
 
 3.1 Quest phase begins
 
@@ -1860,6 +1894,23 @@ ACTION WINDOW
 
 ACTION WINDOW
 3.5 Quest phase ends
+
+4.1 Travel phase begins
+4.2 Travel opportunity
+
+ACTION WINDOW
+4.3 Travel phase ends
+
+5.1 Encounter phase begins
+5.2 Optional engagement
+
+ACTION WINDOW
+5.3 Engagement checks
+
+ACTION WINDOW
+5.4 Encounter phase ends
+
+### p21 c2
 
 6.1 Combat phase begins
 
@@ -1879,52 +1930,27 @@ attacks, proceed to 6.6.
 (go to Player Attack Resolution). Repeat this step
 until all of that player’s eligible attacks have been
 made
-
-4.1 Travel phase begins
-4.2 Travel opportunity
-
 6.9 Next player becomes active player
 (return to 6.8a). If all players have resolved player
 attacks, proceed to 6.10.
-
-ACTION WINDOW
-
 6.10 “Player Attacks” end.
-
-4.3 Travel phase ends
-
 6.11 Combat phase ends. Discard all shadow cards.
 
-5.1 Encounter phase begins
-
 7.1 Refresh phase begins
-
-5.2 Optional engagement
-
 7.2 Ready all cards
-
-ACTION WINDOW
-
 7.3 Raise threat
-
-5.3 Engagement checks
-
 7.4 Pass first player token
 
 ACTION WINDOW
-
-ACTION WINDOW
-
-5.4 Encounter phase ends
-
 7.5 Refresh phase ends
 
 0.1 Round ends
 21
 
-## p22 {#rr-p22}
+## p22
 
-Framework Details
+### p22 c1
+
 6.4b Enemy attack initiates
 (active player chooses enemy)
 
@@ -1942,6 +1968,26 @@ ACTION WINDOW
 enemy attacks to resolve, return to 6.4).
 Otherwise, proceed to 6.5.
 
+6.8b Player attack initiates (active player declares
+target of attack and attacker(s))
+6.8.1 Ranged option
+
+ACTION WINDOW
+6.8.2 Determine attack STR
+
+ACTION WINDOW
+6.8.3 Determine combat damage
+
+ACTION WINDOW
+6.8.4 Player attack ends. If active player has more
+player attacks to resolve, return to 6.8. Otherwise,
+proceed to 6.9.
+
+22
+
+### p22 c2
+
+Framework Details
 Each of the following entries corresponds to the
 framework step of the same number on the Round
 Sequence Timing Chart.
@@ -1965,22 +2011,6 @@ point at which a lasting effect or constant ability begins
 or expires.
 
 1.2 Gain resources
-
-6.8b Player attack initiates (active player declares
-target of attack and attacker(s))
-6.8.1 Ranged option
-
-ACTION WINDOW
-6.8.2 Determine attack STR
-
-ACTION WINDOW
-6.8.3 Determine combat damage
-
-ACTION WINDOW
-6.8.4 Player attack ends. If active player has more
-player attacks to resolve, return to 6.8. Otherwise,
-proceed to 6.9.
-
 Each player simultaneously adds 1 resource to each of
 their heroes’ resource pools.
 
@@ -2006,9 +2036,9 @@ player (in addition to triggering standard action
 abilities) is permitted to play ally and attachment cards
 from their hand.
 
-22
+## p23
 
-## p23 {#rr-p23}
+### p23 c1
 
 To play a card from hand, a player must pay the card’s
 resource cost by spending resource tokens from the
@@ -2058,6 +2088,8 @@ Compare the combined willpower strength (Ò) of
 all committed characters against the combined threat
 strength ($) of all cards in the staging area.
 
+### p23 c2
+
 If the Ò is higher, the players have successfully
 quested, and they make progress on the quest. A
 number of progress tokens equal to the amount by
@@ -2106,20 +2138,14 @@ This step formalizes the end of the travel phase.
 
 23
 
-## p24 {#rr-p24}
+## p24
+
+### p24 c1
 
 V. Encounter Phase
-
-VI. Combat Phase
-
 5.1 Encounter phase begins
-
-6.1 Combat phase begins
-
 This step formalizes the beginning of the
 encounter phase.
-
-This step formalizes the beginning of the combat phase.
 
 5.2 Optional engagement
 Each player (in player order) has one option to engage
@@ -2155,6 +2181,14 @@ considered to have engaged the enemy.
 
 5.4 Encounter phase ends
 This step formalizes the end of the encounter phase.
+
+24
+
+### p24 c2
+
+VI. Combat Phase
+6.1 Combat phase begins
+This step formalizes the beginning of the combat phase.
 
 6.2 Deal shadow cards
 Deal one card from the encounter deck, facedown,
@@ -2203,30 +2237,17 @@ attacks” process. In the steps that follow, each player
 will have opportunities to declare attacks with their
 ready characters against enemies.
 
-24
+## p25
 
-## p25 {#rr-p25}
+### p25 c1
 
 6.8a Active player declares next attack
-
-Enemy Attack Resolution
-
 The active player (starting with the first player) may
 declare an attack against one of their enemies.
-
-6.4b Enemy attack initiates
-
 Use the “Player Attack Resolution” flowchart to
 resolve a player’s attack.
-
-The active player chooses which attack (among the
-enemies to they are engaged that has not yet attacked
-this round) to resolve.
-
 If the active player is unable to or chooses not to
 declare an attack, proceed to 6.9.
-
-6.4.1 Declare defender
 
 6.9 Next player becomes active player
 The next player (in player order) becomes the active
@@ -2239,30 +2260,10 @@ This step formalizes the end of the “player attacks”
 process.
 
 6.11 Combat phase ends
-
-The active player may choose one ready character
-they control to declare as a defender for this attack. A
-character must exhaust to be declared as a defender.
-The active player may instead decide to let the
-attack go undefended by declaring no defenders for
-that attack.
-Unless a card ability specifies otherwise, a player can
-only declare defenders against enemies with whom
-they are engaged.
-
-6.4.2 Resolve shadow effect
-
 This step formalizes the end of the combat phase.
 Discard all shadow cards from all enemies at this time.
 
-The active player flips the attacking enemy’s shadow
-card faceup and resolves any shadow effect the card
-might have.
-
 VII. Refresh Phase
-
-6.4.3 Determine combat damage
-
 7.1 Refresh phase begins
 This step formalizes the beginning of the refresh phase.
 
@@ -2283,7 +2284,37 @@ This step formalizes the end of the combat phase.
 0.1 Round ends
 This step formalizes the end of a game round. Proceed
 to step 0.0 of the next game round.
+The end of a round is an important game milestone
+that may be referenced in card text, either as a point
+at which an ability may or must resolve, or as a point
+at which a lasting effect or constant ability begins
+or expires.
 
+### p25 c2
+
+Enemy Attack Resolution
+6.4b Enemy attack initiates
+The active player chooses which attack (among the
+enemies to they are engaged that has not yet attacked
+this round) to resolve.
+
+6.4.1 Declare defender
+The active player may choose one ready character
+they control to declare as a defender for this attack. A
+character must exhaust to be declared as a defender.
+The active player may instead decide to let the
+attack go undefended by declaring no defenders for
+that attack.
+Unless a card ability specifies otherwise, a player can
+only declare defenders against enemies with whom
+they are engaged.
+
+6.4.2 Resolve shadow effect
+The active player flips the attacking enemy’s shadow
+card faceup and resolves any shadow effect the card
+might have.
+
+6.4.3 Determine combat damage
 Combat damage is determined by subtracting the
 defense strength (Ú) of the defending character from
 the attack strength (Û) of the attacking enemy. The
@@ -2304,15 +2335,11 @@ other characters.
 This step formalizes the end of the enemy’s attack.
 Return to step 6.4a in the main flowchart.
 
-The end of a round is an important game milestone
-that may be referenced in card text, either as a point
-at which an ability may or must resolve, or as a point
-at which a lasting effect or constant ability begins
-or expires.
-
 25
 
-## p26 {#rr-p26}
+## p26
+
+### p26 c1
 
 Player Attack Resolution
 6.8b Player attack initiates
@@ -2349,13 +2376,32 @@ Return to step 6.8a in the main flowchart.
 
 26
 
-## p27 {#rr-p27}
+### p26 c2
+
+
+
+## p27
+
+### p27 c1
 
 Appendix II: Card Anatomy
 This section presents a detailed anatomy of each
 card type.
 
 Player Deck Anatomy Key
+
+Event
+
+2
+1
+
+4
+11
+12
+
+13
+
+### p27 c2
 
 3
 5
@@ -2394,23 +2440,11 @@ Ally
 12
 Attachment
 
-Event
-
 2
 1
-
-2
-1
-
-4
 
 4
 10
-
-11
-12
-
-13
 
 12
 
@@ -2418,9 +2452,28 @@ Event
 13
 27
 
-## p28 {#rr-p28}
+## p28
+
+### p28 c1
 
 Encounter Deck Anatomy Key
+
+1
+14
+
+Objective
+
+9
+
+8
+10
+
+12
+28
+
+13
+
+### p28 c2
 
 2
 3
@@ -2455,24 +2508,13 @@ Location
 6
 12
 
-14
-
-9
-
-Treachery
-
-8
+13
 
 1
-
-10
-12
 
 Under the Shadow
 
-1
-
-Objective
+Treachery
 
 8
 6/15
@@ -2481,18 +2523,12 @@ When Revealed: Until the end of the phase, raise
 the total $ in the staging area by X, where X is the
 number of players in the game.
 
-13
-
 12
 
 Shadow: Defending player raises their threat by the
 number of enemies with which they are engaged.
 
 Illus. Igor Kieryluk
-
-28
-
-13
 
 TREACHERY
 ©2021 Middle-earth Enterprises ©2021 FFG
@@ -2504,9 +2540,13 @@ TREACHERY
 11
 13
 
-## p29 {#rr-p29}
+## p29
+
+### p29 c1
 
 Quest Deck Anatomy Key
+
+### p29 c2
 
 3
 
@@ -2538,7 +2578,9 @@ Quest Side B
 
 29
 
-## p30 {#rr-p30}
+## p30
+
+### p30 c1
 
 Appendix III:
 Campaign Mode
@@ -2552,16 +2594,7 @@ the current scenario. If the players lose a scenario, there
 is no penalty, but they must play it again and defeat it
 before they can advance to the next scenario.
 
-If a player is required to replace a fallen hero but there
-are no heroes remaining in the players’ collection of
-available heroes, that player instead takes a permanent
-+1 threat penalty, but removes that hero from the list of
-Fallen Heroes and continues to play with the hero.
-
 Campaign Log
-
-Additional Card Types
-
 During a campaign, the results of each scenario can
 affect the outcome of the next one, and the decisions
 made in each adventure may influence future scenarios.
@@ -2597,6 +2630,8 @@ penalty for the rest of the campaign.
 
 30
 
+### p30 c2
+
 ◊ If a player wishes to trade a hero they control for a
 hero with a different name between scenarios, that
 player may replace 1 hero they control with a new
@@ -2604,7 +2639,13 @@ hero when setting up the next game. The new hero
 is recorded in the Campaign Log and each player
 receives a permanent +1 starting threat penalty for
 the rest of the campaign.
+If a player is required to replace a fallen hero but there
+are no heroes remaining in the players’ collection of
+available heroes, that player instead takes a permanent
++1 threat penalty, but removes that hero from the list of
+Fallen Heroes and continues to play with the hero.
 
+Additional Card Types
 There are three additional card types that are used
 only in Campaign Mode: campaign cards, boons, and
 burdens. These card types are described below.
@@ -2637,7 +2678,9 @@ burdens do not belong to an encounter set, they are
 not included in an encounter deck until the players are
 instructed to include them.
 
-## p31 {#rr-p31}
+## p31
+
+### p31 c1
 
 Campaign Pool
 The list of boons and burdens that players earn as they
@@ -2671,6 +2714,21 @@ had been attached to that hero are removed from the
 Campaign Pool.
 
 Expert Campaign Mode
+Expert Campaign Mode is an alternative version of
+Campaign Mode for players who crave a tougher
+challenge. Players do not reset the hit points of their
+heroes in between scenarios of an expert campaign. At
+the end of each scenario, record the number of damage
+tokens on each hero in the “Notes” section of the
+Campaign Log. Then, when setting up the next scenario
+of the campaign, place a number of damage tokens
+on each hero control equal to the number listed in the
+Notes section of the Campaign Log. Each player may
+choose instead to heal this starting damage from a hero
+they control at a cost of a permanent +1 penalty to their
+starting threat for each hero healed in this way.
+
+### p31 c2
 
 Campaign Setup Checklist
 When setting up a game for a campaign, use this list to
@@ -2704,68 +2762,73 @@ appropriate player decks.
 encounter cards listed in the Campaign Pool into
 the encounter deck.
 
-Expert Campaign Mode is an alternative version of
-Campaign Mode for players who crave a tougher
-challenge. Players do not reset the hit points of their
-heroes in between scenarios of an expert campaign. At
-the end of each scenario, record the number of damage
-tokens on each hero in the “Notes” section of the
-Campaign Log. Then, when setting up the next scenario
-of the campaign, place a number of damage tokens
-on each hero control equal to the number listed in the
-Notes section of the Campaign Log. Each player may
-choose instead to heal this starting damage from a hero
-they control at a cost of a permanent +1 penalty to their
-starting threat for each hero healed in this way.
-
 31
 
-## p32 {#rr-p32}
+## p32
 
-TM
+### p32 c1
 
-CAMPAIGN LOG
+CAMPAIG
 Player 1
 
 Player 2
 
+Heroes
+
+Her
+
+Fallen Heroes
+
+No
+
+32
+
+Players may photocopy this pa
+
+### p32 c2
+
+TM
+
+GN LOG
 Player 3
 
 Player 4
 
-Heroes
+roes
 
-Heroes
+otes
 
-Fallen Heroes
+age for their own personal use.
 
 Threat Penalty
 
-Notes
+## p33
 
-32
-
-Players may photocopy this page for their own personal use.
-
-## p33 {#rr-p33}
+### p33 c1
 
 Scenarios Completed
 Scenario Name
 
-Campaign Pool
 Score
 
+Campaign Total:
+
+Players may photocopy this p
+
+### p33 c2
+
+page for their own personal use.
+
+Campaign Pool
 Boons
 
 Burdens
 
-Campaign Total:
-
-Players may photocopy this page for their own personal use.
-
 33
 
-## p34 {#rr-p34}
+## p34
+
+### p34 c1
 
 Index
 A
@@ -2779,29 +2842,13 @@ Attachment Cards 3
 Attack Strength 4
 Attacks Outside the Combat Phase 4
 
-F
-First Player / First Player Token 8
-Forced 8
-Framework Effects and Framework Steps 9
-
 B
-
-G
-
 Base Value 4
 Boon Cards 30
 Blank 4
 Burden Cards 30
 
-Gains 9
-Golden Rules 2
-Grim Rule 2
-Guarded 9
-
 C
-
-H
-
 Campaign Cards 30
 Campaign Mode 30
 Cancel 4
@@ -2818,15 +2865,7 @@ Copy (of a card) 5
 Cost 5
 Current Quest 5
 
-Hero Cards 9
-Hit Points 9
-
 D
-
-Lasting Effects 10
-Limits 11
-Location Cards 11
-
 Damage 5
 Deckbuilding 6
 Defending Player 6
@@ -2843,6 +2882,8 @@ Encounter Deck 7
 
 34
 
+### p34 c2
+
 Encounter Phase 7
 Enemy Cards 7
 Engaged 7
@@ -2851,6 +2892,21 @@ Enters Play 7
 Event Cards 7
 Exhausted 8
 Explored 8
+
+F
+First Player / First Player Token 8
+Forced 8
+Framework Effects and Framework Steps 9
+
+G
+Gains 9
+Golden Rules 2
+Grim Rule 2
+Guarded 9
+
+H
+Hero Cards 9
+Hit Points 9
 
 I
 Immune 9
@@ -2864,6 +2920,9 @@ K
 Keywords 10
 
 L
+Lasting Effects 10
+Limits 11
+Location Cards 11
 
 M
 May 11
@@ -2872,26 +2931,13 @@ Move 11
 Mulligan Draw 11
 Multiple Defenders 11
 
-## p35 {#rr-p35}
+## p35
+
+### p35 c1
 
 N
-
-S
-
 Neutral Cards 12
 Next Player 12
-
-Scoring 15
-Search 15
-Self-referential Abilities 15
-Sentinel 15
-Setup 16
-Shadow Effects 16
-Spheres of Influence 16
-Staging 17
-Staging Area 17
-Surge 17
-Switch 17
 
 O
 Objective Cards 12
@@ -2910,33 +2956,13 @@ Printed 13
 Priority of Simultaneous Resolution 13
 Put into Play 13
 
-T
-
+Q
 Qualifiers 13
 Quest Advancement 13
 Quest Cards / Quest Deck 13
 Quest Phase 13
 
-Table Talk 17
-Then 17
-Threat / Threat Dial 17
-Threat Elimination Level 17
-Timing of Ability Resolution 18
-To 18
-Traits 18
-Travel 18
-Travel Phase 18
-Treachery Cards 18
-Triggered Ability 18
-Triggering Condition 18
-Type, Types 19
-
 R
-
-V
-
-Q
-
 Ranged 14
 Ready 14
 Refresh Phase 14
@@ -2951,6 +2977,52 @@ Reveal 15
 Running out of Cards 15
 Running out of Tokens 15
 
+TM/® & © 2021 Fantasy Flight Games. Middle-earth, The Lord of the Rings, and the characters, ev
+Company d/b/a Middle-earth Enterprises and are used, under license, by Fantasy Flight Gam
+reserved to their respective owners. Fantasy Flight Games, 1995 West County Road B2, Rosev
+UK:
+Asmodee United Kingdom
+Unit 6 Waterbrook Road
+Alton Hampshire, GU34 2UD
+United Kingdom
+
+EU:
+Asmodee Nord
+Valseholmen 1
+2650 Hvidovre
+Danemark
+
+### p35 c2
+
+S
+Scoring 15
+Search 15
+Self-referential Abilities 15
+Sentinel 15
+Setup 16
+Shadow Effects 16
+Spheres of Influence 16
+Staging 17
+Staging Area 17
+Surge 17
+Switch 17
+
+T
+Table Talk 17
+Then 17
+Threat / Threat Dial 17
+Threat Elimination Level 17
+Timing of Ability Resolution 18
+To 18
+Traits 18
+Travel 18
+Travel Phase 18
+Treachery Cards 18
+Triggered Ability 18
+Triggering Condition 18
+Type, Types 19
+
+V
 Victory 19
 
 W
@@ -2960,20 +3032,13 @@ Winning the Game 19
 X
 The letter “X” 19
 
-TM/® & © 2021 Fantasy Flight Games. Middle-earth, The Lord of the Rings, and the characters, events, items and places therein, are trademarks or registered trademarks of The Saul Zaentz
-Company d/b/a Middle-earth Enterprises and are used, under license, by Fantasy Flight Games. Gamegenic and the Gamegenic logo are TM & © Gamegenic GmbH, Germany. All rights
-reserved to their respective owners. Fantasy Flight Games, 1995 West County Road B2, Roseville, Minnesota, 55113, USA, 651-639-1905. Actual components may vary from those shown.
-UK:
-Asmodee United Kingdom
-Unit 6 Waterbrook Road
-Alton Hampshire, GU34 2UD
-United Kingdom
+vents, items and places therein, are trademarks or registered trademarks of The Saul Zaentz
+mes. Gamegenic and the Gamegenic logo are TM & © Gamegenic GmbH, Germany. All rights
+ville, Minnesota, 55113, USA, 651-639-1905. Actual components may vary from those shown.
 
-EU:
-Asmodee Nordics
-Valseholmen 1
-2650 Hvidovre
-Danemark
+dics
+
+e
 
 Asmodee The Netherlands,
 Vossenbeemd 51
@@ -2982,6 +3047,12 @@ The Netherlands
 
 35
 
-## p36 {#rr-p36}
+## p36
+
+### p36 c1
+
+
+
+### p36 c2
 
 

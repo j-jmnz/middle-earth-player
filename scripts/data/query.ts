@@ -5,7 +5,7 @@ import { DatabaseSync } from "node:sqlite";
 import { loadCards } from "./load-cards.ts";
 import { DATA_DIR } from "./paths.ts";
 import { loadScenarios } from "./load-scenarios.ts";
-import type { RuleEntry } from "./rules/split.ts";
+import type { RuleEntry } from "./rules/spans.ts";
 
 // Loads data/cards, data/scenarios and data/rules/entries.json into an in-memory database and prints the rows
 // of one query. There is no database file: the JSON stays canonical and diffable.

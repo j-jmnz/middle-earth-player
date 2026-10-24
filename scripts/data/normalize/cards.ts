@@ -84,7 +84,7 @@ function splitTraits(traits: readonly string[] | string | null | undefined): str
 }
 
 function sideText(lines: readonly string[]): string | null {
-  const text = lines.map((line) => line.trim()).filter((line) => line !== "").join("\n");
+  const text = lines.map((line) => line.trim()).filter((line) => line !== "").join("\n").replaceAll("`", "'");
   return text === "" ? null : text;
 }
 
@@ -143,7 +143,7 @@ function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts
       ...(card.Front.Shadow?.trim() ? ["shadow"] : []),
     ],
     text,
-    shadowText: card.Front.Shadow?.trim() || null,
+    shadowText: card.Front.Shadow?.trim().replaceAll("`", "'") || null,
     back: back
       ? { name: null, text: sideText(back.Text), questPoints: num(back.Stats.QuestPoints), stage: back.Stats.StageNumber ?? null }
       : null,

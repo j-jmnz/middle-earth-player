@@ -1,8 +1,11 @@
 # easy-mode
 
 sha256: 52fd5fde07ee01398f46399fa6afd6dd77f2b0987150756b4d0944fe288d1a9f
+columns: c1aefc7f1627f9be17c4444e0431c13391fab824360650200a0fa12eab694c93
 
-## p1 {#easy-mode-p1}
+## p1
+
+### p1 c1
 
 Easy Mode
 Easy Mode is an alternative mode of play, ideal for new
@@ -48,7 +51,9 @@ the Carrock, and begins playing!
 
 1
 
-## p2 {#easy-mode-p2}
+## p2
+
+### p2 c1
 
 Lord of the Rings
 Core Set
@@ -208,7 +213,9 @@ Shadow and Flame
 2x Counter-Spell
 2x Leaping Flame
 
-## p3 {#easy-mode-p3}
+## p3
+
+### p3 c1
 
 Heirs of N menor
 Streets of Gondor

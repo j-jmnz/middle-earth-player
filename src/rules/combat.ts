@@ -1,4 +1,4 @@
-// Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase (data/rules/entries.json).
+// Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, mec109.archery (data/rules/entries.json).
 import { attackBarred } from "./constants.ts";
 import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";

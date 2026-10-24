@@ -7,8 +7,9 @@ import { EFFECTS } from "../../../src/effects/index.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { loadCards } from "../load-cards.ts";
 import { loadCampaign, loadScenario } from "../load-scenarios.ts";
+import { loadLedger } from "../printed/ledger.ts";
 import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
-import type { RuleEntry } from "../rules/split.ts";
+import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, type Unmatched } from "./generate.ts";
 
 // Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id>
@@ -43,6 +44,7 @@ function main(): void {
   const scenario = loadScenario(scenarioId);
   const campaign = loadCampaign();
   const cards = loadCards();
+  const ledger = loadLedger();
   const byCode = new Map(cards.map((card) => [card.code, card]));
   const entries = JSON.parse(readFileSync(path.join(DATA_DIR, "rules", "entries.json"), "utf8")) as RuleEntry[];
   const vocab = vocabulary();
@@ -52,10 +54,10 @@ function main(): void {
     for (const [guid, rules] of Object.entries(parsed.automation?.cards ?? {})) automation.set(guid, rules);
   }
 
-  const generated = generateEffects(cards, [scenario], campaign);
+  const generated = generateEffects(cards, [scenario], campaign, ledger);
   const dealt = new Set(scenario.cards.map((card) => card.code));
   const all = process.argv.includes("--all");
-  const open: Unmatched[] = generated.unmatched.filter((line) => dealt.has(line.card.code) && (all || !EFFECTS.some((effect) => effect.cardCode === line.card.code && (line.timing === null || effect.timing === line.timing))));
+  const open: Unmatched[] = generated.unmatched.filter((line) => dealt.has(line.card.code) && (all || !EFFECTS.some((effect) => effect.lines?.includes(line.lineId))));
   const byCard = new Map<string, Unmatched[]>();
   for (const line of open) byCard.set(line.card.code, [...(byCard.get(line.card.code) ?? []), line]);
 
@@ -67,10 +69,10 @@ function main(): void {
     const sections: string[] = [
       `# ${code} ${card.name}`,
       ``,
-      `Scenario: ${scenarioId}. Write the records into src/effects/authored/fellowship-of-the-ring.ts, then run \`pnpm vitest run scripts/effect-coverage.test.ts\` and the scenario tests.`,
+      `Scenario: ${scenarioId}. Write the records into src/effects/authored/fellowship-of-the-ring.ts, each with \`lines\` naming the line ids above, then run \`pnpm vitest run scripts/effect-coverage.test.ts\` and the scenario tests.`,
       ``,
       `## Lines without a record`,
-      ...lines.map((line) => `- (${line.side}${line.timing ? `, ${line.timing}` : ""}) ${line.line}`),
+      ...lines.map((line) => `- ${line.lineId} (${line.side}${line.timing ? `, ${line.timing}` : ""}) ${line.line}`),
       ``,
       `## Text of every printing`,
       ...card.printings.map((printing) => `- ${printing.pack} #${printing.number} (${printing.hobSlug ?? "RingsDB"})`),
@@ -99,7 +101,7 @@ function main(): void {
     const near = EFFECTS.filter((effect) => effect.cardCode !== code)
       .map((effect) => {
         const other = byCode.get(effect.cardCode);
-        const text = other ? segmentsOf(other).map((segment) => segment.line).join(" ") : "";
+        const text = other ? segmentsOf(other, ledger).map((segment) => segment.line).join(" ") : "";
         return { effect, text, score: similarity(lineText, text) };
       })
       .sort((a, b) => b.score - a.score)

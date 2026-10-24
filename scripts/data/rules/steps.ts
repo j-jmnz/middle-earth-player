@@ -1,6 +1,6 @@
 import { parse as parseJsonc } from "jsonc-parser";
 
-import type { RuleEntry } from "./split.ts";
+import type { RuleEntry } from "./spans.ts";
 
 export type FrameworkStep = { id: string; phase: string; label: string; entries: string[] };
 
