@@ -1,4 +1,3 @@
-import { scenarioDefinitionSchema, type ScenarioDefinition } from "../catalog/boundary";
 import {
   normalEncounterSize,
   scenarioCards,
@@ -40,8 +39,6 @@ export type DebugCheckInput = {
   };
   scenario: ScenarioData;
   campaign: CampaignData;
-  scenarioPresent: boolean;
-  bakedDefinition: unknown;
   presentCardCodes: readonly string[];
   imageFileCount: number;
   snapshotCount: number;
@@ -103,53 +100,13 @@ function heroSentences(hero: DebugCheckInput["hero"]): string[] {
 }
 
 function scenarioSentences(input: DebugCheckInput): string[] {
-  const expected = scenarioDefinition(input.scenario, input.campaign);
-  const sentences = [
+  const definition = scenarioDefinition(input.scenario, input.campaign);
+  return [
     `Normal encounter size is ${normalEncounterSize(input.scenario)}.`,
-    ...expected.encounterSets.map((set) => `${set.code} has ${set.count} cards.`),
-    `Stages are ${listCodes(expected.stages.map((stage) => stage.code))}.`,
+    ...definition.encounterSets.map((set) => `${set.code} has ${set.count} cards.`),
+    `Stages are ${listCodes(definition.stages.map((stage) => stage.code))}.`,
+    `Setup instructions: ${definition.setup.length}. Resolution options: ${definition.resolution.length}.`,
   ];
-  if (!input.scenarioPresent) {
-    sentences.push(`Scenario ${input.scenario.id} is missing.`);
-    return sentences;
-  }
-  const parsed = scenarioDefinitionSchema.safeParse(input.bakedDefinition);
-  if (!parsed.success) {
-    sentences.push(`Scenario ${input.scenario.id} is not a definition.`);
-    return sentences;
-  }
-  const problems = definitionProblems(input.scenario.id, parsed.data, expected);
-  if (problems.length === 0) sentences.push(`Scenario ${input.scenario.id} matches the scenario data.`);
-  sentences.push(...problems);
-  if (problems.length === 0) {
-    sentences.push(`Setup instructions: ${parsed.data.setup.length}. Resolution options: ${parsed.data.resolution.length}.`);
-  }
-  return sentences;
-}
-
-function definitionProblems(id: string, actual: ScenarioDefinition, expected: ScenarioDefinition): string[] {
-  const problems: string[] = [];
-  if (actual.id !== expected.id) problems.push(`Scenario ${id} is stored as ${actual.id}.`);
-  if (JSON.stringify(actual.encounterSets) !== JSON.stringify(expected.encounterSets)) {
-    problems.push(`Scenario ${id} encounter sets are ${encounterList(actual.encounterSets)}.`);
-  }
-  const actualStages = listCodes(actual.stages.map((stage) => stage.code));
-  const expectedStages = listCodes(expected.stages.map((stage) => stage.code));
-  if (actualStages !== expectedStages) problems.push(`Scenario ${id} stages are ${actualStages}.`);
-  if (JSON.stringify(actual.widgets) !== JSON.stringify(expected.widgets)) {
-    problems.push(`Scenario ${id} widgets do not match the scenario data.`);
-  }
-  if (JSON.stringify(actual.setup) !== JSON.stringify(expected.setup)) {
-    problems.push(`Scenario ${id} setup does not match the scenario data.`);
-  }
-  const shape = (resolution: ScenarioDefinition["resolution"]) => JSON.stringify(resolution.map((group) => [group.id, group.choices.length]));
-  if (shape(actual.resolution) !== shape(expected.resolution)) {
-    problems.push(`Scenario ${id} resolution does not match the scenario data.`);
-  }
-  if ((actual.bookletPage ?? null) !== (expected.bookletPage ?? null)) {
-    problems.push(`Scenario ${id} booklet page does not match the scenario data.`);
-  }
-  return problems;
 }
 
 function absentCardSentences(scenario: ScenarioData, presentCardCodes: readonly string[]): string[] {
@@ -187,6 +144,3 @@ function listCodes(codes: readonly string[]): string {
   return codes.join(", ");
 }
 
-function encounterList(sets: readonly { code: string; count: number }[]): string {
-  return sets.map((set) => `${set.code} ${set.count}`).join(", ");
-}

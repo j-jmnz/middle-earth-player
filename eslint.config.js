@@ -47,8 +47,11 @@ const packageBan = {
   ],
 };
 
+// src/campaign, src/play and src/screens import src/effects directly. src/rules receives effects as an argument,
+// so only tests and scripts (allowEffects) may reach into it from there.
 function zones(allowEffects) {
   const effects = allowEffects ? ["./effects"] : [];
+  const app = ["./effects"];
 
   return [
     {
@@ -60,20 +63,20 @@ function zones(allowEffects) {
     {
       target: "./src/campaign",
       from: "./src",
-      except: ["./catalog", "./rules", "./campaign", ...effects],
-      message: "src/campaign may import only src/catalog and src/rules.",
+      except: ["./catalog", "./rules", "./campaign", ...app],
+      message: "src/campaign may import only src/catalog, src/rules and src/effects.",
     },
     {
       target: "./src/play",
       from: "./src",
-      except: ["./rules", "./catalog", "./play", ...effects],
-      message: "src/play may import only src/rules and src/catalog from src/.",
+      except: ["./rules", "./catalog", "./play", ...app],
+      message: "src/play may import only src/rules, src/catalog and src/effects from src/.",
     },
     {
       target: "./src/screens",
       from: "./src",
-      except: ["./play", "./campaign", "./catalog", "./screens", ...effects],
-      message: "src/screens may import only src/play, src/campaign, and src/catalog.",
+      except: ["./play", "./campaign", "./catalog", "./screens", ...app],
+      message: "src/screens may import only src/play, src/campaign, src/catalog and src/effects.",
     },
     {
       target: "./src/effects",

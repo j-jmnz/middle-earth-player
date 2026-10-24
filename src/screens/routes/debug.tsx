@@ -4,7 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { ScrollView, View } from "react-native";
 
 import { CATALOG_VERSION } from "../../catalog/version";
-import { cards, campaigns, packs, scenarios } from "../../catalog/schema";
+import { cards, campaigns, packs } from "../../catalog/schema";
 import campaignJson from "../../../data/campaigns/fellowship-of-the-ring.json";
 import shadowScenarioJson from "../../../data/scenarios/a-shadow-of-the-past.json";
 import { campaignDataSchema, parseScenarioData, scenarioCards } from "../../catalog/scenario-data";
@@ -98,21 +98,6 @@ function readDebugView(
           .where(inArray(cards.code, fixtureCodes))
           .all()
           .map((card) => card.code);
-  const scenario = catalog
-    .select({ definition: scenarios.definition })
-    .from(scenarios)
-    .where(eq(scenarios.id, shadowScenario.id))
-    .get();
-  let scenarioPresent = false;
-  let bakedDefinition: unknown = null;
-  if (scenario) {
-    scenarioPresent = true;
-    try {
-      bakedDefinition = JSON.parse(scenario.definition);
-    } catch {
-      bakedDefinition = null;
-    }
-  }
   const storedImages = user
     .select({
       code: imageFiles.code,
@@ -170,8 +155,6 @@ function readDebugView(
       },
       scenario: shadowScenario,
       campaign: fellowshipCampaign,
-      scenarioPresent,
-      bakedDefinition,
       presentCardCodes,
       imageFileCount,
       snapshotCount,

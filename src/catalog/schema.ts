@@ -48,19 +48,9 @@ export const cards = sqliteTable("cards", {
   campaignId: text("campaign_id").references(() => campaigns.id),
 });
 
-export const effects = sqliteTable("effects", {
-  id: text("id").primaryKey(),
-  record: text("record").notNull(),
-});
-
-export const scenarios = sqliteTable("scenarios", {
-  id: text("id").primaryKey(),
-  definition: text("definition").notNull(),
-});
-
 export const meta = sqliteTable("meta", {
   packCode: text("pack_code").primaryKey(),
   fetchedAt: text("fetched_at").notNull(),
 });
 
-export const catalogTables: SQLiteTable[] = [packs, campaigns, cards, effects, scenarios, meta];
+export const catalogTables: SQLiteTable[] = [packs, campaigns, cards, meta];

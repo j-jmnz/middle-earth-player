@@ -5,28 +5,31 @@ import { fileURLToPath } from "node:url";
 import Database from "better-sqlite3";
 import { getTableConfig, type SQLiteTable } from "drizzle-orm/sqlite-core";
 
-import { parseRingsDbPacks, type Effect, type RingsDbPack } from "../src/catalog/boundary.ts";
+import { parseRingsDbPacks, type RingsDbPack } from "../src/catalog/boundary.ts";
 import type { Card } from "../src/catalog/card-facts.ts";
-import { EFFECTS } from "../src/effects/index.ts";
-import { campaigns, cards, catalogTables, effects as effectsTable, meta, packs, scenarios } from "../src/catalog/schema.ts";
-import { nextVersion, quoteIdent, snapshotCatalog, writeCatalogVersion, type Row, type SqlValue } from "./catalog-snapshot.ts";
+import { campaigns, cards, catalogTables, meta, packs } from "../src/catalog/schema.ts";
+import { contentVersion, writeCatalogVersion } from "./catalog-version.ts";
 import { loadCards } from "./data/load-cards.ts";
 import { DATA_DIR } from "./data/paths.ts";
-import { loadScenarioDefinitions } from "./data/load-scenarios.ts";
-import { validateEffects } from "./validate-effects.ts";
 
 const FELLOWSHIP_CAMPAIGN_ID = "fellowship-of-the-ring";
 const FELLOWSHIP_PACK_CODES = new Set(["TBR", "TRD"]);
 
 type SqliteDatabase = InstanceType<typeof Database>;
+type SqlValue = string | number | bigint | Buffer | null;
+type Row = Record<string, SqlValue>;
 
-// Offline: data/cards and data/raw/ringsdb/packs.json in, assets/catalog.db out.
+function quoteIdent(identifier: string): string {
+  return `"${identifier.replaceAll('"', '""')}"`;
+}
+
+// Offline: data/cards and data/raw/ringsdb/packs.json in, assets/catalog.db out. Scenarios and effect records
+// are not in the database: the app imports them from data/ and src/effects.
 export type BuildCatalogOptions = {
   dataDir?: string;
   dbPath?: string;
   versionPath?: string;
   cards?: readonly Card[];
-  effects?: readonly Effect[];
 };
 
 export type BuildCatalogResult = {
@@ -176,7 +179,7 @@ function insertRows(db: SqliteDatabase, table: SQLiteTable, rows: Row[]): void {
 
 function writeDatabase(
   filePath: string,
-  built: { campaigns: Row[]; packs: Row[]; cards: Row[]; effects: Row[]; scenarios: Row[]; meta: Row[] },
+  built: { campaigns: Row[]; packs: Row[]; cards: Row[]; meta: Row[] },
 ): void {
   mkdirSync(path.dirname(filePath), { recursive: true });
   const db = new Database(filePath);
@@ -190,8 +193,6 @@ function writeDatabase(
       insertRows(db, campaigns, built.campaigns);
       insertRows(db, packs, built.packs);
       insertRows(db, cards, built.cards);
-      insertRows(db, effectsTable, built.effects);
-      insertRows(db, scenarios, built.scenarios);
       insertRows(db, meta, built.meta);
     });
     insertAll();
@@ -212,7 +213,6 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
   const dataDir = options.dataDir ?? DATA_DIR;
   const dbPath = options.dbPath ?? path.join(root, "assets", "catalog.db");
   const versionPath = options.versionPath ?? path.join(root, "src", "catalog", "version.ts");
-  const effectRecords = validateEffects(options.effects ?? EFFECTS);
   const allCards = options.cards ?? loadCards(dataDir);
 
   const allPacks = parseRingsDbPacks(JSON.parse(readFileSync(path.join(dataDir, "raw", "ringsdb", "packs.json"), "utf8")) as unknown);
@@ -220,8 +220,6 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
   const included = allPacks.filter((pack) => used.has(pack.code));
   const knownPacks = new Set(included.map((pack) => pack.code));
 
-  const cardsByCode = new Map(allCards.map((card) => [card.code, card]));
-  const definitions = loadScenarioDefinitions(dataDir, cardsByCode);
 
   const packRows = [...included]
     .sort(comparePacks)
@@ -238,13 +236,9 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
   const day = fetchedDay(dataDir);
   const metaRows = included.map((pack) => rowFrom(meta, { pack_code: pack.code, fetched_at: day }));
   const campaignRows = [rowFrom(campaigns, { id: FELLOWSHIP_CAMPAIGN_ID, name: "Fellowship of the Ring" })];
-  const scenarioRows = definitions.map((definition) => rowFrom(scenarios, { id: definition.id, definition: JSON.stringify(definition) }));
-  const effectRows = effectRecords.map((effect) => rowFrom(effectsTable, { id: effect.id, record: JSON.stringify(effect) }));
 
-  const previous = snapshotCatalog(dbPath);
-  const version = nextVersion(previous, packRows, cardRows, effectRows, scenarioRows, versionPath);
-  // Write the version before replacing the database. A crash in between can skip
-  // a number on the next run. A matching catalog still leaves the constant unchanged.
+  const version = contentVersion([packRows, cardRows, campaignRows]);
+  // The version is written before the database is replaced. A crash in between leaves a number the next run rewrites.
   writeCatalogVersion(versionPath, version);
   const temporaryPath = path.join(path.dirname(dbPath), `.${path.basename(dbPath)}.building`);
   rmSync(temporaryPath, { force: true });
@@ -253,8 +247,6 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
       campaigns: campaignRows,
       packs: packRows,
       cards: cardRows,
-      effects: effectRows,
-      scenarios: scenarioRows,
       meta: metaRows,
     });
     mkdirSync(path.dirname(dbPath), { recursive: true });

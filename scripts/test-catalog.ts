@@ -1,26 +1,11 @@
-import { existsSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-import { DatabaseSync } from "node:sqlite";
-
-import { scenarioDefinitionSchema, type ScenarioDefinition } from "../src/catalog/boundary.ts";
+import { scenarioDefinition } from "../src/catalog/scenario-data.ts";
+import type { ScenarioDefinition } from "../src/catalog/boundary.ts";
 import { printedFromCard, type PrintedCard } from "../src/rules/printed.ts";
 
 import { loadCards } from "./data/load-cards.ts";
+import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 
-// Test helper. Cards come from data/cards; scenario definitions still come from the built assets/catalog.db. It lives under scripts/, outside the app bundle,
-// and never builds the catalog: run pnpm catalog:build (CI runs ensure-catalog first).
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const dbPath = path.join(root, "assets", "catalog.db");
-
-function openCatalog(): DatabaseSync {
-  if (!existsSync(dbPath)) {
-    throw new Error(`assets/catalog.db is missing. Run pnpm catalog:build, then run the tests again.`);
-  }
-  return new DatabaseSync(dbPath, { readOnly: true });
-}
-
+// Test helper. Reads data/cards and data/scenarios. No network and no built database.
 export async function loadPrinted(codes: readonly string[]): Promise<ReadonlyMap<string, PrintedCard>> {
   const byCode = new Map(loadCards().map((card) => [card.code, card]));
   const cards = new Map<string, PrintedCard>();
@@ -33,12 +18,5 @@ export async function loadPrinted(codes: readonly string[]): Promise<ReadonlyMap
 }
 
 export async function loadDefinition(id: string): Promise<ScenarioDefinition> {
-  const database = openCatalog();
-  try {
-    const raw = database.prepare("select definition from scenarios where id = ?").get(id);
-    if (!raw) throw new Error(`Catalog has no scenario ${id}`);
-    return scenarioDefinitionSchema.parse(JSON.parse(String(raw.definition)));
-  } finally {
-    database.close();
-  }
+  return scenarioDefinition(loadScenario(id), loadCampaign());
 }

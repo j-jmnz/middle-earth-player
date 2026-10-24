@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { scenarioCards, scenarioDefinition } from "../catalog/scenario-data.ts";
+import { scenarioCards } from "../catalog/scenario-data.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { debugSentences, type DebugCheckInput, type DebugImageSample } from "./debug-checks.ts";
 
@@ -30,8 +30,6 @@ function base(overrides: Partial<DebugCheckInput> = {}): DebugCheckInput {
     hero: { present: true, deckLegal: true, imagesrc: "/bundles/cards/141001.png" },
     scenario,
     campaign,
-    scenarioPresent: true,
-    bakedDefinition: scenarioDefinition(scenario, campaign),
     presentCardCodes: [...new Set(scenarioCards(scenario).map((card) => card.code))],
     imageFileCount: 1,
     snapshotCount: 1,
@@ -59,7 +57,6 @@ describe("debugSentences", () => {
       "The Ring has 3 cards.",
       "The Black Riders has 5 cards.",
       "Stages are 141022, 141023, 141024.",
-      "Scenario a-shadow-of-the-past matches the scenario data.",
       "Setup instructions: 5. Resolution options: 2.",
       "1 image file.",
       "1 image in memory.",
@@ -90,27 +87,7 @@ describe("debugSentences", () => {
     expect(illegal).not.toContain("Hero 141001 is present, deck-legal, and has an imagesrc.");
   });
 
-  it("names a scenario row that is missing, invalid, or different from the scenario data", () => {
-    expect(debugSentences(base({ scenarioPresent: false }))).toContain("Scenario a-shadow-of-the-past is missing.");
-    expect(debugSentences(base({ bakedDefinition: { id: "nope" } }))).toContain(
-      "Scenario a-shadow-of-the-past is not a definition.",
-    );
-
-    const baked = scenarioDefinition(scenario, campaign);
-    const setup = debugSentences(base({ bakedDefinition: { ...baked, setup: [{ verb: "Draw" }] } }));
-    expect(setup).toContain("Scenario a-shadow-of-the-past setup does not match the scenario data.");
-    expect(setup).not.toContain("Setup instructions: 5. Resolution options: 0.");
-
-    const shifted = {
-      ...baked,
-      encounterSets: baked.encounterSets.map((set, index) => (index === 0 ? { ...set, count: set.count + 1 } : set)),
-    };
-    const counts = debugSentences(base({ bakedDefinition: shifted }));
-    expect(counts).toContain("A Shadow of the Past has 29 cards.");
-    expect(counts).toContain(
-      "Scenario a-shadow-of-the-past encounter sets are A Shadow of the Past 30, Hunted 6, The Ring 3, The Black Riders 5.",
-    );
-
+  it("names a scenario card that is absent from cards", () => {
     const present = base().presentCardCodes.filter((code) => code !== "141031");
     expect(debugSentences(base({ presentCardCodes: present }))).toContain("Scenario code 141031 is absent from cards.");
   });

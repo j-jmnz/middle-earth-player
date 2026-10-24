@@ -11,8 +11,7 @@ cd "$CLAUDE_PROJECT_DIR"
 corepack enable >/dev/null 2>&1 || true
 pnpm install --frozen-lockfile
 
-# scripts/catalog-exit.test.ts reads assets/catalog.db. Build it now so the
-# first test run does not fetch RingsDB. A RingsDB outage does not block the session.
+# scripts/catalog-exit.test.ts reads assets/catalog.db. The build is offline: it reads data/ and needs no network.
 if [ ! -f assets/catalog.db ]; then
   pnpm catalog:build || echo "catalog:build failed; scripts/catalog-exit.test.ts will retry it" >&2
 fi

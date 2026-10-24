@@ -16,6 +16,8 @@ export type RawData = {
   dragn: Map<string, Record<string, string>>;
   // The DragnCards JSON-with-comments files as fetched; the scenario builder parses them.
   dragnRaw: { preBuiltDecks: string };
+  // Where DragnCards keeps card pictures, for example https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/.
+  dragnImagePrefix: string;
 };
 
 function readDragnCards(): Map<string, Record<string, string>> {
@@ -48,5 +50,5 @@ export function loadRaw(): RawData {
   const scenarios = readdirSync(path.join(RAW_DIR, "hallofbeorn", "Scenarios"))
     .sort()
     .map((file) => hobScenarioSchema.parse(readJson("hallofbeorn", "Scenarios", file)));
-  return { packs: packs.filter((pack) => ringsdb.has(pack.code)), ringsdb, hob, scenarios, dragn: readDragnCards(), dragnRaw: { preBuiltDecks: readFileSync(path.join(RAW_DIR, "dragncards", "preBuiltDecks.json"), "utf8") } };
+  return { packs: packs.filter((pack) => ringsdb.has(pack.code)), ringsdb, hob, scenarios, dragn: readDragnCards(), dragnImagePrefix: (readJson("dragncards", "imageUrlPrefix.json") as { imageUrlPrefix: { English: string } }).imageUrlPrefix.English, dragnRaw: { preBuiltDecks: readFileSync(path.join(RAW_DIR, "dragncards", "preBuiltDecks.json"), "utf8") } };
 }

@@ -155,8 +155,9 @@ function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts
   };
 }
 
-function printingOf(pack: string, card: HobCard): Printing {
-  const imageUrls = [card.Front.ImagePath, card.Back?.ImagePath].filter((url): url is string => typeof url === "string" && url !== "");
+// DragnCards' scan is listed first, Hall of Beorn's after it: both are full card art, which RingsDB lacks for encounter cards.
+function printingOf(pack: string, card: HobCard, dragnImage: string | null): Printing {
+  const imageUrls = [dragnImage, card.Front.ImagePath, card.Back?.ImagePath].filter((url): url is string => typeof url === "string" && url !== "");
   return {
     pack,
     number: card.Number,
@@ -294,14 +295,19 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   const pairs = pairTwins(tfotr, twins);
   const claimed = new Set<HobCard>();
 
+  const dragnImageOf = (card: HobCard): string | null => {
+    const file = raw.dragn.get(card.OctgnGuid ?? "")?.imageUrl;
+    return file ? `${raw.dragnImagePrefix}${file}` : null;
+  };
+
   const merge = (code: string, twin: HobCard | undefined, source: HobCard): Card => {
     const facts = hobFacts(source, raw.dragn.get(twin?.OctgnGuid || source.OctgnGuid || ""), report);
     const existing = byCode.get(code);
     const type = TYPE_BY_HOB[source.CardType] ?? (twin ? TYPE_BY_HOB[twin.CardType] : undefined);
     if (!existing && !type) throw new Error(`Card ${code} ${source.Title}: unknown Hall of Beorn type ${source.CardType}`);
     const printings: Printing[] = [];
-    if (twin) printings.push(printingOf(TWIN_SETS.get(twin.CardSet) ?? twin.CardSet, twin));
-    if (source !== twin) printings.push(printingOf("TFotR", source));
+    if (twin) printings.push(printingOf(TWIN_SETS.get(twin.CardSet) ?? twin.CardSet, twin, dragnImageOf(twin)));
+    if (source !== twin) printings.push(printingOf("TFotR", source, null));
     const known = existing?.printings.filter((p) => !printings.some((q) => q.pack === p.pack)) ?? [];
     const card: Card = existing
       ? {
