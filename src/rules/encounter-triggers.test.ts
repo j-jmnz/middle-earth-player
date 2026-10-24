@@ -29,11 +29,12 @@ const stage = definePrinted({ code: "stage", name: "Stage", type: "quest", quest
 const ring = definePrinted({ code: "ring", name: "The One Ring", type: "objective" });
 const sword = definePrinted({ code: "sword", name: "Sword", type: "attachment" });
 const shield = definePrinted({ code: "shield", name: "Shield", type: "attachment" });
+const boon = definePrinted({ code: "boon", name: "Valiant Warrior", type: "attachment", keywords: { permanent: true } });
 const ward = definePrinted({ code: "ward", name: "Ward", type: "ally", willpower: 1, attack: 0, defense: 0, health: 1 });
 const aragorn = hero("aragorn", "leadership");
 const sam = hero("sam", "lore");
 
-const cards = cardMap([wraith, orc, ferny, pony, marsh, mist, boost, back, stage, ring, sword, shield, ward, aragorn, sam]);
+const cards = cardMap([wraith, orc, ferny, pony, marsh, mist, boost, back, stage, ring, sword, shield, boon, ward, aragorn, sam]);
 
 function record(id: string, cardCode: string, line: string, timing: Effect["timing"], instructions: Instruction[], extra: Partial<Effect> = {}): Effect {
   return { id, cardCode, lines: [line], timing, instructions, ...extra };
@@ -226,12 +227,13 @@ describe("shadow verbs", () => {
       const a = spawn(state, "sword", { zone: "play", seat: 0 });
       const b = spawn(a.state, "shield", { zone: "play", seat: 0 });
       const r = spawn(b.state, "ring", { zone: "play", seat: 0 });
+      const p = spawn(r.state, "boon", { zone: "play", seat: 0 });
       swordId = a.id;
       shieldId = b.id;
-      return attachTo(attachTo(attachTo(r.state, a.id, host), b.id, host), r.id, host);
+      return attachTo(attachTo(attachTo(attachTo(p.state, a.id, host), b.id, host), r.id, host), p.id, host);
     });
     const choosing = expectOk(reduce(asked, { type: "DeclareDefender", defenderId: defender }, ctx));
-    // The One Ring is an objective, not an attachment: it is not offered.
+    // The One Ring is an objective, not an attachment, and a Permanent boon on a hero cannot be discarded: neither is offered.
     expect(choosing.state.window).toEqual({ kind: "choose", seat: 0, options: [swordId, shieldId] });
     expect(choosing.steps.some((step) => step.kind === "damage")).toBe(false);
     expect(legalIntents(choosing.state, ctx)).toEqual([{ type: "Choose", optionId: swordId }, { type: "Choose", optionId: shieldId }]);

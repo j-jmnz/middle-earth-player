@@ -1,4 +1,4 @@
-// Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects (data/rules/entries.json).
+// Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects, mec109.permanent (data/rules/entries.json).
 import type { PickSpec } from "../catalog/boundary.ts";
 
 import { attachmentHostIds } from "./attach.ts";
@@ -55,9 +55,13 @@ export function pickCandidates(
   }
   else if (from === "deck") for (const index of seats) raw.push(...(state.seats[index]?.deck ?? []).slice(0, spec.top ?? Number.MAX_SAFE_INTEGER));
   else if (spec.type === "attachment") {
-    // Attachments in play that the chooser (or any player) controls, on any host.
+    // Attachments in play that the chooser (or any player) controls, on any host. The pick is for a discard (141071:A:2):
+    // a Permanent card on a hero cannot be discarded (mec109.permanent), so it is not offered.
     for (const instance of Object.values(state.cards)) {
-      if (instance.host != null && instance.controller != null && seats.includes(instance.controller) && (instance.zone === "play" || instance.zone === "attached")) raw.push(instance.id);
+      if (instance.host == null || instance.controller == null || !seats.includes(instance.controller)) continue;
+      if (instance.zone !== "play" && instance.zone !== "attached") continue;
+      if (printedOf(ctx.cards, instance.code).keywords.permanent && state.cards[instance.host]?.zone === "heroes") continue;
+      raw.push(instance.id);
     }
   } else if (spec.type === "enemy") {
     for (const index of seats) raw.push(...(state.seats[index]?.engaged ?? []));
