@@ -1,17 +1,8 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
-import { parseKeywordTokens } from "./keywords.ts";
+import { isKeywordLine } from "./keywords.ts";
 import { timingLabels } from "./timings.ts";
 import type { Ledger, LedgerEntry } from "../printed/ledger.ts";
 import { keyOf } from "../printed/ledger.ts";
-
-// Every sentence of the line is a keyword the parser reads.
-export function isKeywordLine(line: string): boolean {
-  const sentences = line.split(/(?<=\.)\s+/).map((part) => part.trim());
-  return sentences.every((sentence) => {
-    const parsed = parseKeywordTokens([sentence]);
-    return parsed.unknown.length === 0 && Object.keys(parsed.keywords).length > 0;
-  });
-}
 
 const SHADOW = /^Shadow:/;
 

@@ -1,7 +1,7 @@
 import type { Effect } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
-import { parseKeywordTokens } from "../normalize/keywords.ts";
+import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
 import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
 import { TEMPLATES, type TemplateContext } from "./templates.ts";
@@ -30,19 +30,6 @@ const LABEL_TIMING: ReadonlyMap<string, string> = new Map([
 
 function normalize(line: string): string {
   return line.replaceAll("`", "'").trim();
-}
-
-function isKeywordSentence(sentence: string): boolean {
-  const parsed = parseKeywordTokens([sentence]);
-  return parsed.unknown.length === 0 && Object.keys(parsed.keywords).length > 0;
-}
-
-// Leading keyword sentences ("Hide 2. Cannot have ...") are not part of the ability. A line that is only keywords is not one.
-export function stripKeywords(line: string): string {
-  const sentences = line.split(/(?<=\.)\s+/);
-  let at = 0;
-  while (at < sentences.length && isKeywordSentence(sentences[at] ?? "")) at += 1;
-  return sentences.slice(at).join(" ");
 }
 
 // The printed lines of a card, front first, then side B, then the shadow effect: the order the effect records are

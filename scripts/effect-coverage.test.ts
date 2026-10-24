@@ -4,7 +4,7 @@ import { AUTHORED_EFFECTS, AUTHORED_REPLACES, EFFECTS, GENERATED_EFFECTS } from 
 
 import { loadCards } from "./data/load-cards.ts";
 import { generateEffects } from "./data/effects/generate.ts";
-import { isKeywordLine } from "./data/normalize/printed.ts";
+import { isKeywordLine } from "./data/normalize/keywords.ts";
 import { keyOf, lineId, loadLedger } from "./data/printed/ledger.ts";
 import { loadCampaign, loadScenarios } from "./data/load-scenarios.ts";
 

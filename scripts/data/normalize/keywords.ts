@@ -42,3 +42,21 @@ export function parseKeywordTokens(tokens: readonly string[]): KeywordResult {
   }
   return { keywords: keywords as PrintedKeywords, unknown };
 }
+
+function isKeywordSentence(sentence: string): boolean {
+  const parsed = parseKeywordTokens([sentence]);
+  return parsed.unknown.length === 0 && Object.keys(parsed.keywords).length > 0;
+}
+
+// Leading keyword sentences ("Hide 2. Cannot have ...") are not part of the ability.
+export function stripKeywords(line: string): string {
+  const sentences = line.split(/(?<=\.)\s+/);
+  let at = 0;
+  while (at < sentences.length && isKeywordSentence(sentences[at] ?? "")) at += 1;
+  return sentences.slice(at).join(" ");
+}
+
+// A line that is only keywords the parser reads is not an ability: the keyword owns it.
+export function isKeywordLine(line: string): boolean {
+  return line.trim() !== "" && stripKeywords(line.trim()) === "";
+}
