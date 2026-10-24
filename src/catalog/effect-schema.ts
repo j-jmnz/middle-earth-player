@@ -60,9 +60,13 @@ export const triggerSchema = z.enum([
   "shadowPending",
   // Heard by every card that was attached to a location that left play (the event's subject).
   "hostLeftPlay",
+  // An enemy was engaged with a player (subject), and a player's attack destroyed an enemy (heard by each attacker).
+  "engaged",
+  "attackDestroyed",
 ]);
 
 const whoSchema = z.enum(["actor", "firstPlayer"]);
+
 
 // The cards or players a Pick offers. `control` is whose cards: yours, or any player's. `from` is the zone group: in play (the
 // default), the hand, or the discard pile. `state` keeps only ready or only exhausted cards. `different` leaves out cards this
@@ -91,6 +95,15 @@ export const pickSchema = z.strictObject({
   topmost: z.boolean().optional(),
   // Who chooses. The actor, unless the card says the first player does.
   who: z.enum(["actor", "firstPlayer"]).optional(),
+  // Not the source card itself: "another character". The source is never offered from a hand, a discard pile or a deck.
+  other: z.boolean().optional(),
+  // A character committed to the quest.
+  committed: z.boolean().optional(),
+  // A character that took part in the attack the Response answers (not the card itself).
+  participating: z.boolean().optional(),
+  // A non-unique card; an enemy with a shadow card dealt to it.
+  nonUnique: z.boolean().optional(),
+  hasShadow: z.boolean().optional(),
   trait: z.string().min(1).optional(),
   state: z.enum(["ready", "exhausted"]).optional(),
   different: z.boolean().optional(),
@@ -125,6 +138,12 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
+  // Some card matches this pick (for the actor now): a choice that could be made.
+  z.strictObject({ kind: z.literal("canPick"), pick: pickSchema }),
+  // The actor has a card in hand.
+  z.strictObject({ kind: z.literal("handHasCard") }),
+  // The event is about the actor engaging an enemy whose engagement cost is higher than the actor's threat.
+  z.strictObject({ kind: z.literal("engagedAboveThreat") }),
   // The card the event is about (a location that left play) had enough progress to be explored.
   z.strictObject({ kind: z.literal("subjectExplored") }),
   // Another player is still in the game.
@@ -198,7 +217,7 @@ const modifyStatSchema = z.strictObject({
   // every hero the actor controls: all fixed when the effect resolves.
   target: z.enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes"]).optional(),
   // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has.
-  per: z.enum(["committed", "ally", "hobbitHero"]).optional(),
+  per: z.enum(["committed", "ally", "hobbitHero", "x"]).optional(),
   ...when,
 });
 
@@ -351,7 +370,20 @@ const simpleVerbs = [
   // Engine use (Restricted): the source card's controller moves one of its restricted attachments to its owner's discard pile.
   verb("DiscardRestricted"),
   // Adds resources to the pool of the hero the source card is attached to.
-  z.strictObject({ verb: z.literal("AddResources"), amount: z.number().int().positive(), ...when }),
+  z.strictObject({ verb: z.literal("AddResources"), amount: z.number().int().positive(), to: z.enum(["host", "picked"]).optional(), ...when }),
+  // The picked card goes to its owner's discard pile.
+  verb("DiscardPicked"),
+  // The top card of the actor's deck is discarded. Its printed cost is the effect's X.
+  verb("DiscardTopOfDeck"),
+  // The source card (an event being played) is added to the victory display instead of the discard pile.
+  verb("AddSourceToVictory"),
+  // The picked card of the hand and the top card of the deck change places.
+  verb("ExchangeWithDeckTop"),
+  // The shadow card dealt to the picked enemy is discarded.
+  verb("DiscardShadow"),
+  // Constant on a hero: once per phase the actor may play the top card of their deck as if it were in their hand, and the
+  // hero counts as having these resource icons while it pays for that card. The top card of the deck is faceup.
+  z.strictObject({ verb: z.literal("PlayFromDeckTop"), icons: z.array(z.enum(["leadership", "tactics", "spirit", "lore"])).min(1), ...when }),
   // The source enemy leaves the player it is engaged with and engages the next player.
   verb("EngageNextPlayer"),
   // The host of the source card, its resource pool, and every card attached to it pass to a seat.
@@ -461,7 +493,8 @@ export const effectSchema = z.strictObject({
   lines: z.array(z.string().min(1)).min(1),
   timing: timingSchema,
   trigger: triggerSchema.optional(),
-  limit: z.enum(["oncePerPhase", "oncePerRound"]).optional(),
+  // `oncePerRoundEachPlayer`: each player may use it once a round, and any player may.
+  limit: z.enum(["oncePerPhase", "oncePerRound", "oncePerRoundEachPlayer"]).optional(),
   cost: costSchema.optional(),
   cancel: cancelSchema.optional(),
   condition: conditionSchema.optional(),

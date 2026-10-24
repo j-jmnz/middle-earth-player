@@ -2,6 +2,7 @@ import type { Condition } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
+import { pickCandidates } from "./pick.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
@@ -9,7 +10,17 @@ import { inPlay, livingSeats } from "./state.ts";
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
 // `holderId` is the card a stat is read for, and `against` the enemy it attacks.
-export type Scope = { actor: number; sourceId: string | null; returned: number; phase?: string; holderId?: string; against?: string; subject?: string };
+export type Scope = {
+  actor: number;
+  sourceId: string | null;
+  returned: number;
+  phase?: string;
+  holderId?: string;
+  against?: string;
+  subject?: string;
+  // The seat the event a Response answers happened to.
+  eventSeat?: number | null;
+};
 
 export function holds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean {
   switch (condition.kind) {
@@ -65,6 +76,15 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       const subject = scope.subject ? state.cards[scope.subject] : undefined;
       const points = subject ? printedOf(ctx.cards, subject.code).questPoints : null;
       return subject != null && points != null && subject.progress >= modifiedStat(state, subject, "questPoints", ctx.cards);
+    }
+    case "canPick":
+      return pickCandidates(state, condition.pick, scope.actor, [], scope.sourceId, ctx).length > 0;
+    case "handHasCard":
+      return (state.seats[scope.actor]?.hand ?? []).some((id) => id !== scope.sourceId);
+    case "engagedAboveThreat": {
+      const enemy = scope.subject ? state.cards[scope.subject] : undefined;
+      if (!enemy || scope.eventSeat !== scope.actor || enemy.controller !== scope.actor || printedOf(ctx.cards, enemy.code).engagementCost == null) return false;
+      return modifiedStat(state, enemy, "engagementCost", ctx.cards) > (state.seats[scope.actor]?.threat ?? 0);
     }
     case "otherPlayer":
       return livingSeats(state).some((seat) => seat !== scope.actor);

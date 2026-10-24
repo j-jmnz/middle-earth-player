@@ -3,6 +3,7 @@ import type { Effect } from "../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
 import { effectCause } from "./cause.ts";
+import { deckPlayHero, markDeckPlay, playableFromDeck } from "./deck-play.ts";
 import { holds } from "./conditions.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
@@ -29,10 +30,17 @@ export function playCard(
     if (!hero) continue;
     next = updateCard(next, payment.heroId, { resources: hero.resources - payment.amount });
   }
-  const instance = next.cards[intent.cardId];
+  let instance = next.cards[intent.cardId];
   if (!instance) return next;
   const printed = printedOf(ctx.cards, instance.code);
   const seat = state.activeSeat;
+  // The top card of the deck, played as if it were in the hand: the permission is used up, and the card leaves the deck.
+  if (instance.zone === "deck") {
+    const permission = deckPlayHero(next, seat, ctx);
+    if (permission) next = markDeckPlay(next, permission);
+    next = moveCard(next, intent.cardId, { zone: "hand", seat });
+    instance = next.cards[intent.cardId] ?? instance;
+  }
   if (printed.type === "event") {
     const x = printed.costX ? intent.payments.reduce((sum, payment) => sum + payment.amount, 0) : undefined;
     return playEvent(next, intent.cardId, seat, ctx, steps, x);
@@ -106,7 +114,8 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
 export function playWindowReason(state: ScenarioState, cardId: string, ctx: ReduceContext): string | null {
   if (state.window?.kind !== "pass") return "That intent is not legal in this window";
   const instance = state.cards[cardId];
-  if (!instance || instance.zone !== "hand" || instance.controller !== state.activeSeat) return "That card is not in hand";
+  const fromDeck = instance?.zone === "deck" && playableFromDeck(state, cardId, state.activeSeat, ctx);
+  if (!instance || (instance.zone !== "hand" && !fromDeck) || instance.controller !== state.activeSeat) return "That card is not in hand";
   const printed = printedOf(ctx.cards, instance.code);
   if (printed.type !== "ally" && printed.type !== "attachment" && printed.type !== "event") return "That card cannot be played";
   // Events are Actions: any action window. Allies and attachments are played in the planning phase only.
@@ -136,7 +145,7 @@ export function playReason(
       return "That host is illegal";
     }
   }
-  return paymentReason(state, state.activeSeat, printed, playCost(state, intent.cardId, state.activeSeat, ctx), intent.payments, ctx);
+  return paymentReason(state, state.activeSeat, intent.cardId, printed, playCost(state, intent.cardId, state.activeSeat, ctx), intent.payments, ctx);
 }
 
 export function attachmentTargets(state: ScenarioState, code: string | undefined, ctx: ReduceContext): readonly string[] {
@@ -149,6 +158,7 @@ export function attachmentTargets(state: ScenarioState, code: string | undefined
 function paymentReason(
   state: ScenarioState,
   seat: number,
+  cardId: string,
   printed: PrintedCard,
   cost: number | null,
   payments: readonly { heroId: string; amount: number }[],
@@ -165,7 +175,7 @@ function paymentReason(
   for (const [heroId, amount] of spent) {
     const hero = state.cards[heroId];
     if (!hero || hero.zone !== "heroes" || hero.controller !== seat) return "That hero cannot pay";
-    if (!heroPays(state, heroId, printed.sphere, ctx)) return "Wrong sphere";
+    if (!heroPays(state, heroId, printed.sphere, ctx, cardId)) return "Wrong sphere";
     if (hero.resources < amount) return "That hero does not have those resources";
   }
   // X is whatever the player pays.

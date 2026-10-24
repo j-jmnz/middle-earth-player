@@ -5,11 +5,11 @@ import type { ScenarioState } from "./state.ts";
 import { fireForced } from "./triggers.ts";
 import { pushFrame } from "./windows.ts";
 
-// Whether an event may be announced now: no window is open, or an action window is, which the announcement closes and then
-// gives back.
+// Whether an event may be announced now: no window is open, or one that only waits for the player's next step is (an action
+// window, the next attack, the optional engagement, the travel choice), which the announcement closes and then gives back.
 export function canAnnounce(state: ScenarioState): boolean {
   const kind = state.window?.kind;
-  return kind === undefined || kind === "pass" || kind === "frameAction";
+  return kind === undefined || kind === "pass" || kind === "frameAction" || kind === "playerAttack" || kind === "optionalEngage" || kind === "travel";
 }
 
 // Announces the oldest queued event (queue.ts): Responses are offered once the Forced effects have resolved, so the

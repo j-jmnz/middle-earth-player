@@ -69,7 +69,9 @@ describe("141024 response on hideSucceeded", () => {
     run = send(run, { type: "CommitHide", cardIds: [] }, table.ctx);
     run = send(run, { type: "Pass" }, table.ctx);
     expect(run.steps.some((step) => step.kind === "hideTest" && !step.success)).toBe(true);
-    expect(run.state.window?.kind).not.toBe("response");
+    // The failed test engages the Rider, and Sam Gamgee's own Response to that is offered: the quest card's is not.
+    const offered = legalIntents(run.state, table.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));
+    expect(offered).not.toContain("141024:response:1");
   });
 
   it("no response offered to a seat that Peril locks out", () => {

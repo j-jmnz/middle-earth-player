@@ -23,6 +23,8 @@ export function pickCandidates(
   ctx: ReduceContext,
   // The X an event was played for, for a pick that asks for a printed cost of X.
   x?: number,
+  // The characters that took part in the attack the Response answers.
+  participants?: readonly string[],
 ): string[] {
   const asking = spec.who === "firstPlayer" ? state.firstPlayer : seat;
   const seats = spec.control === "you" ? [asking] : livingSeats(state);
@@ -59,13 +61,17 @@ export function pickCandidates(
   }
   return raw.filter((id) => {
     const instance = state.cards[id];
-    if (!instance || id === sourceId || picked.includes(id)) return false;
+    if (!instance || (id === sourceId && (from !== "play" || spec.other)) || picked.includes(id)) return false;
     const printed = printedOf(ctx.cards, instance.code);
     if (!playerCardEffectCanChoose(printed)) return false;
     if (spec.type !== "card" && !(spec.type === "character" ? printed.type === "hero" || printed.type === "ally" : printed.type === spec.type)) return false;
     if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
     if (spec.sphere && printed.sphere !== spec.sphere) return false;
     if (spec.cardType && printed.type !== spec.cardType) return false;
+    if (spec.committed && !instance.committed) return false;
+    if (spec.participating && !(participants ?? []).includes(id)) return false;
+    if (spec.nonUnique && printed.isUnique) return false;
+    if (spec.hasShadow && !instance.shadowId) return false;
     if (spec.intoPlay && uniqueBlocked(state, printed, ctx.cards)) return false;
     if (spec.costIsX && x != null && printed.cost !== x) return false;
     if (spec.maxCost != null && (printed.cost == null || printed.cost > spec.maxCost)) return false;

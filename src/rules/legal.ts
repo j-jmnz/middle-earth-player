@@ -161,7 +161,9 @@ function mandatory(state: ScenarioState): boolean {
 function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   const intents: LegalIntent[] = [{ type: "Pass" }];
   // Events are Actions and may be played in any action window; allies and attachments in the planning phase.
-  for (const cardId of state.seats[state.activeSeat]?.hand ?? []) {
+  // The top card of the deck too, when a hero lets the seat play it (Gandalf).
+  const top = state.seats[state.activeSeat]?.deck[0];
+  for (const cardId of [...(state.seats[state.activeSeat]?.hand ?? []), ...(top ? [top] : [])]) {
     if (playWindowReason(state, cardId, ctx) === null) intents.push({ type: "PlayCard", cardId });
   }
   if (state.mode === "questCommit") intents.push({ type: "Commit" });

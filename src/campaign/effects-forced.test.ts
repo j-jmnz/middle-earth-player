@@ -23,7 +23,10 @@ function make(layout: Layout = {}) {
 
 describe("hideFailed triggered and forced events", () => {
   it("141022 triggered resolves before the 141039 forced, then play goes on", () => {
-    const { state, ctx } = make({ deck: [RIDER, "f3", "f3", "f0"] });
+    const made = make({ deck: [RIDER, "f3", "f3", "f0"] });
+    // Sam Gamgee's Response to an engagement (141002:response:1) is not what this test is about.
+    const ctx = { ...made.ctx, effects: made.ctx.effects.filter((effect) => effect.id !== "141002:response:1") };
+    const { state } = made;
     let run = reveal(state, ctx);
     expect(run.state.window).toEqual({ kind: "hideCommit", seat: 0 });
     run = send(run, { type: "CommitHide", cardIds: [] }, ctx);

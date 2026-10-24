@@ -12,7 +12,8 @@ import { lowerThreat, placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats, updateCard, withSeat } from "./state.ts";
-import { topFrame } from "./windows.ts";
+import { printedOf } from "./printed.ts";
+import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
@@ -99,6 +100,38 @@ export function runPlayerVerb(
       const seat = otherSeat(state, focus.seat);
       if (!source || seat == null) return state;
       return updateCard(moveCard(state, source.id, { zone: "play", seat }), source.id, { owner: source.owner ?? source.controller ?? focus.seat });
+    }
+    case "DiscardPicked": {
+      const id = lastPicked(state);
+      const card = state.cards[id];
+      const seat = card?.owner ?? card?.controller;
+      return card && seat != null ? moveCard(state, id, { zone: "discard", seat }) : state;
+    }
+    case "DiscardTopOfDeck": {
+      const top = state.seats[focus.seat]?.deck[0];
+      const card = top ? state.cards[top] : undefined;
+      if (!top || !card) return state;
+      const discarded = moveCard(state, top, { zone: "discard", seat: focus.seat });
+      const data = topFrame(discarded)?.data;
+      // The discarded card's printed cost is the effect's X.
+      return data?.kind === "effect" ? patchTop(discarded, { data: { ...data, x: printedOf(ctx.cards, card.code).cost ?? 0 } }) : discarded;
+    }
+    case "AddSourceToVictory":
+      return focus.sourceId && state.cards[focus.sourceId] ? moveCard(state, focus.sourceId, { zone: "victory" }) : state;
+    case "ExchangeWithDeckTop": {
+      const handId = lastPicked(state);
+      const seat = state.seats[focus.seat];
+      const top = seat?.deck[0];
+      if (!seat || !top || !state.cards[handId]) return state;
+      const swapped = moveCard(moveCard(state, top, { zone: "hand", seat: focus.seat }), handId, { zone: "deck", seat: focus.seat });
+      const pile = swapped.seats[focus.seat];
+      if (!pile) return swapped;
+      // The card from the hand goes on top of the deck, not under it.
+      return withSeat(swapped, focus.seat, { ...pile, deck: [handId, ...pile.deck.filter((id) => id !== handId)] });
+    }
+    case "DiscardShadow": {
+      const enemy = state.cards[lastPicked(state)];
+      return enemy?.shadowId ? moveCard(state, enemy.shadowId, { zone: "encounterDiscard" }) : state;
     }
     case "CancelEffect":
       return cancelAnswered(state);

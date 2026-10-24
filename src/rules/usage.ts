@@ -18,14 +18,17 @@ export function controllerSeat(state: ScenarioState, source: CardInstance): numb
   return source.controller ?? state.firstPlayer;
 }
 
-function limitSpent(state: ScenarioState, effect: Effect, sourceId: string): boolean {
+// A limit counts the uses of this record on this card in this round, in this phase for a phase limit, by this player for a
+// per-player limit (rr.limits).
+function limitSpent(state: ScenarioState, effect: Effect, sourceId: string, seat: number): boolean {
   if (!effect.limit) return false;
   return state.uses.some(
     (use) =>
       use.effectId === effect.id &&
       use.sourceId === sourceId &&
       use.round === state.round &&
-      (effect.limit === "oncePerRound" || use.phase === state.phase),
+      (effect.limit !== "oncePerPhase" || use.phase === state.phase) &&
+      (effect.limit !== "oncePerRoundEachPlayer" || use.seat === seat),
   );
 }
 
@@ -47,7 +50,7 @@ function costSphere(effect: Effect, source: CardInstance, ctx: ReduceContext): S
 // True when the cost could be paid and the limit is not spent. Used to decide what to offer.
 export function usable(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext): boolean {
   const source = state.cards[sourceId];
-  if (!source || limitSpent(state, effect, sourceId)) return false;
+  if (!source || limitSpent(state, effect, sourceId, seat)) return false;
   const cost = effect.cost;
   if (!cost) return true;
   switch (cost.kind) {
@@ -76,7 +79,7 @@ export function usageReason(
 ): string | null {
   const source = state.cards[sourceId];
   if (!source) return "That effect cannot be triggered";
-  if (limitSpent(state, effect, sourceId)) return "That effect has already been used";
+  if (limitSpent(state, effect, sourceId, seat)) return "That effect has already been used";
   const cost = effect.cost;
   if (cost?.kind === "playEvent") {
     const price = playCost(state, sourceId, seat, ctx);
@@ -98,6 +101,7 @@ export function payUsage(
   payments: readonly Payment[],
   ctx: ReduceContext,
   steps: EngineStep[],
+  seat = 0,
 ): ScenarioState {
   let next = state;
   const source = next.cards[sourceId];
@@ -122,7 +126,8 @@ export function payUsage(
       break;
   }
   if (!effect.limit || !source) return next;
-  return { ...next, uses: [...next.uses, { effectId: effect.id, sourceId, round: next.round, phase: next.phase }] };
+  const use = { effectId: effect.id, sourceId, round: next.round, phase: next.phase, ...(effect.limit === "oncePerRoundEachPlayer" ? { seat } : {}) };
+  return { ...next, uses: [...next.uses, use] };
 }
 
 // Uses from earlier rounds can never block anything again.

@@ -33,6 +33,7 @@ export type EffectSpec = {
   resume?: EffectData["resume"];
   finish?: EffectData["finish"];
   eventSeat?: number | null;
+  participants?: readonly string[];
   // The X an event was played for.
   x?: number;
   // A delayed effect starts with the card it was made for already picked.
@@ -63,6 +64,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.finish ? { finish: spec.finish } : {}),
     ...(spec.eventSeat != null ? { eventSeat: spec.eventSeat } : {}),
     ...(spec.x != null ? { x: spec.x } : {}),
+    ...(spec.participants ? { participants: spec.participants } : {}),
     ...(spec.picked ? { picked: spec.picked } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
@@ -274,7 +276,7 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
   if (instruction.verb !== "Pick" || data?.kind !== "effect") return state;
   // The actor chooses, unless the card says the first player does.
   const chooser = instruction.pick.who === "firstPlayer" ? state.firstPlayer : item.seat;
-  const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x);
+  const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants);
   const options = (instruction.pick.from ?? "play") === "play" ? found : distinctByCode(state, found);
   let chosen = item.chosen;
   if (!chosen) {

@@ -6,6 +6,7 @@ import type { PrintedCard } from "./printed.ts";
 import { printedOf } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { livingSeats, updateCard, withMode } from "./state.ts";
+import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -209,7 +210,8 @@ export function engageEnemy(state: ScenarioState, seat: number, enemyId: string,
   if (state.seats[seat]?.eliminated) return state;
   const moved = moveCard(state, enemyId, { zone: "engaged", seat });
   steps.push({ kind: "engage", seat, enemyId });
-  return moved;
+  // Responses hear that the player engaged the enemy ("After you engage an enemy with a higher engagement cost ...").
+  return queueEvent(moved, { trigger: "engaged", seat, subject: enemyId });
 }
 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {

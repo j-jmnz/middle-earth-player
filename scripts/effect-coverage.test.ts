@@ -23,15 +23,8 @@ const byCode = new Map(cards.map((card) => [card.code, card]));
 // built (data/scenarios, with their campaign cards) and not yet playable: phases 12 to 16 write their records. The
 // campaign cards' Setup and Resolution lines are owned for all six, which is the 8d exit.
 const PLAYABLE = ["a-shadow-of-the-past"];
-// Phase 9: both starter decks are fully automated once their batches are in. A line still listed here is waiting for its batch.
-const STARTER_PENDING: Readonly<Record<string, string>> = Object.fromEntries(
-  Object.entries({
-    5: "01002:A:1 01007:A:1 141002:A:1 141003:A:2 141004:A:2 142002:A:1 142008:A:2 142009:A:2 142007:A:1",
-  }).flatMap(([batch, ids]) => ids.split(" ").map((id) => [id, `phase 9 batch ${batch}`] as const)),
-);
 const PENDING_LINES: Readonly<Record<string, string>> = {
   "141056:A:2": "Flight to the Ford (phase 13): the cancel response needs the attacker-declared trigger.",
-  ...STARTER_PENDING,
 };
 const campaignCards = new Set(Object.values(campaign.campaignCards));
 const dealt = new Set([...dealtCodes(campaign, scenarios.filter((scenario) => PLAYABLE.includes(scenario.id))), ...campaignCards, ...starterCodes(campaign)]);

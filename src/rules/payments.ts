@@ -1,16 +1,19 @@
 // Rules: rr.resource-match, rr.resources (data/rules/entries.json).
 import { grantedIcons } from "./conditions.ts";
+import { deckPlayIcons } from "./deck-play.ts";
 import type { Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf, spherePays, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 
 // A hero pays a sphere with its own icon or one an attachment gives it (Celebrían's Stone gives Aragorn a Spirit icon).
-export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | null, ctx: ReduceContext): boolean {
+// `forCard` is the card being played: the top card of a deck is paid for by the hero that lets it be played (Gandalf).
+export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | null, ctx: ReduceContext, forCard?: string): boolean {
   const hero = state.cards[heroId];
   if (!hero) return false;
   if (spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) return true;
-  return grantedIcons(state, heroId, ctx).some((icon) => spherePays(icon, sphere));
+  if (grantedIcons(state, heroId, ctx).some((icon) => spherePays(icon, sphere))) return true;
+  return forCard != null && deckPlayIcons(state, heroId, forCard, ctx).some((icon) => spherePays(icon, sphere));
 }
 
 // Checks an offered resource payment against a cost: whole numbers, heroes the seat controls, the sphere

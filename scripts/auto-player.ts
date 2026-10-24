@@ -32,7 +32,7 @@ export function paymentsFor(state: ScenarioState, ctx: ReduceContext, seat: numb
   for (const heroId of state.seats[seat]?.heroes ?? []) {
     if (left === 0) break;
     const hero = state.cards[heroId];
-    if (!hero || hero.resources === 0 || !heroPays(state, heroId, sphere, ctx)) continue;
+    if (!hero || hero.resources === 0 || !heroPays(state, heroId, sphere, ctx, cardId)) continue;
     const amount = Math.min(left, hero.resources);
     out.push({ heroId, amount });
     left -= amount;

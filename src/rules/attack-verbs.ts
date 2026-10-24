@@ -4,6 +4,7 @@ import { characters } from "./combat.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { lastPicked, seatOf } from "./player-verbs.ts";
+import { topFrame } from "./windows.ts";
 import { addModifier } from "./keywords.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats } from "./state.ts";
@@ -64,7 +65,10 @@ export function modifyStat(
     default:
       targets = [sourceId];
   }
+  // "+X Attack, where X is the discarded card's cost": X is read from the frame once.
+  const data = topFrame(state)?.data;
+  const amount = instruction.per === "x" ? instruction.amount * (data?.kind === "effect" ? (data.x ?? 0) : 0) : instruction.amount;
   let next = state;
-  for (const id of targets) next = addModifier(next, id, sourceId, instruction.stat, instruction.amount, instruction.until);
+  for (const id of targets) next = addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);
   return next;
 }

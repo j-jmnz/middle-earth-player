@@ -12,7 +12,7 @@ The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The R
 - `pnpm data:build` is offline and deterministic: raw to `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules`, and `src/effects/generated`. `pnpm data:build -- --verbose` lists the scenarios whose cross-checks failed.
 - `pnpm data:check` rebuilds into a temporary directory and fails on any difference. CI runs it.
 - `pnpm data:query "<sql>"` queries tables `cards`, `scenario_cards` and `rules` in memory. Rules text is `select id, title, text from rules where ...`.
-- `pnpm effects:draft <scenario-id>` writes `.agent/drafts/<code>.md` for each printed ledger line no effect record owns. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
+- `pnpm effects:draft <scenario-id | starter-deck-id>` writes `.agent/drafts/<code>.md` for each printed ledger line no effect record owns. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
 
 ## Commands
 

@@ -16,15 +16,16 @@ function inTriggerWindow(state: ScenarioState): boolean {
   return state.window?.kind === "pass" || state.window?.kind === "frameAction";
 }
 
-// An Action on a card the active seat controls in play, whose condition holds.
+// An Action on a card the active seat controls in play (or, for a per-player limit, any card), whose condition holds.
 function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, effectId: string): Effect | undefined {
   const instance = state.cards[cardId];
-  if (!instance || instance.controller !== state.activeSeat) return undefined;
+  if (!instance) return undefined;
   if (instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached") return undefined;
   const effect = ctx.effects.find(
     (entry) => entry.id === effectId && entry.cardCode === instance.code && entry.timing === "action",
   );
-  if (!effect) return undefined;
+  // Only the card's controller uses its Action, unless every player may use it once a round (Éowyn).
+  if (!effect || (instance.controller !== state.activeSeat && effect.limit !== "oncePerRoundEachPlayer")) return undefined;
   const scope = { actor: state.activeSeat, sourceId: cardId, returned: 0 };
   return !effect.condition || holds(state, effect.condition, scope, ctx) ? effect : undefined;
 }
@@ -66,7 +67,7 @@ export function applyTrigger(
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);
   if (!effect || !state.window) return state;
   const seat = state.activeSeat;
-  const paid = payUsage(state, effect, intent.cardId, intent.payments ?? [], ctx, steps);
+  const paid = payUsage(state, effect, intent.cardId, intent.payments ?? [], ctx, steps, seat);
   return pushEffectFrame(
     { ...paid, window: null },
     {

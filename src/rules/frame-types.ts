@@ -77,8 +77,10 @@ export type EffectData = {
   looked?: readonly string[];
   // The seat the event that offered this Response happened to.
   eventSeat?: number | null;
-  // The X an event was played for (Stand and Fight).
+  // The X an event was played for (Stand and Fight), or the cost of the card an effect discarded (Flame of Anor).
   x?: number;
+  // The characters that took part in the attack a Response answers.
+  participants?: readonly string[];
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
@@ -97,7 +99,7 @@ export type HideData = {
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string };
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; participants?: readonly string[] };
 
 // A Response a player may use after an event. It is offered once and may be passed.
 export type ResponseOffer = { cardId: string; effectId: string; seat: number };
@@ -136,7 +138,7 @@ export type DelayedEffect = {
 };
 
 // One use of an effect with a limit. A oncePerPhase use is spent in the round and phase it was made.
-export type UsedEffect = { effectId: string; sourceId: string; round: number; phase: string };
+export type UsedEffect = { effectId: string; sourceId: string; round: number; phase: string; seat?: number };
 
 export type HideFailure = { seat: number; round: number; phase: string };
 

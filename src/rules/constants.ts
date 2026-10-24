@@ -59,7 +59,7 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
         amount,
         until: "whileSourceInPlay",
         origin: effect.id,
-        ...(instruction.per && instruction.per !== "hobbitHero" ? { per: instruction.per } : {}),
+        ...(instruction.per === "committed" || instruction.per === "ally" ? { per: instruction.per } : {}),
         ...(isStatCondition(instruction.when) ? { when: instruction.when } : {}),
       });
     }

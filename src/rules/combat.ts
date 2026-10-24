@@ -6,6 +6,7 @@ import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "./prin
 import type { ScenarioState } from "./state.ts";
 import { livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, type ReduceContext } from "./interpret.ts";
+import { queueEvent } from "./queue.ts";
 import { resolveAttack } from "./shadow.ts";
 import { inPlay } from "./zones.ts";
 import { ruleCause } from "./cause.ts";
@@ -202,7 +203,10 @@ export function strikeEnemy(
   steps.push({ kind: "attack", side: "player", seat, enemyId });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
-  return placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "framework", ruleCause("rr.step-6-8-3"));
+  const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "framework", ruleCause("rr.step-6-8-3"));
+  // Each attacker hears that the attack destroyed the enemy ("After Merry participates in an attack that destroys an enemy").
+  if (damaged.cards[enemyId]?.zone === "engaged") return damaged;
+  return attackerIds.reduce((current, attackerId) => queueEvent(current, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, participants: attackerIds }), damaged);
 }
 
 export function assignArchery(

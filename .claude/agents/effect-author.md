@@ -1,6 +1,6 @@
 ---
 name: effect-author
-description: Writes effect records for card lines no template reads. Use after `pnpm effects:draft <scenario>` has written bundles under .agent/drafts.
+description: Writes effect records for card lines no template reads. Use after `pnpm effects:draft <scenario or starter deck id>` has written bundles under .agent/drafts.
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 

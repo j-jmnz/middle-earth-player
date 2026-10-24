@@ -7,7 +7,7 @@ import { scheduleDelayed } from "./delayed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, eliminateEmpties, raiseThreat } from "./keywords.ts";
-import { otherSeat } from "./player-verbs.ts";
+import { lastPicked, otherSeat } from "./player-verbs.ts";
 import { engageEnemy, stagingEnemies } from "./quest.ts";
 import { shuffleIds } from "./seed.ts";
 import { updateCard, type ScenarioState } from "./state.ts";
@@ -75,7 +75,7 @@ export function runExtraVerb(
       return markSurge(state, focus.sourceId);
     case "AddResources": {
       const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-      const hero = source?.host ? state.cards[source.host] : undefined;
+      const hero = instruction.to === "picked" ? state.cards[lastPicked(state)] : source?.host ? state.cards[source.host] : undefined;
       if (!hero || hero.controller == null) return state;
       for (let added = 0; added < instruction.amount; added += 1) {
         steps.push({ kind: "gainResource", seat: hero.controller, heroId: hero.id, cause: currentCause(steps, UNATTRIBUTED) });
