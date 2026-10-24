@@ -10,7 +10,8 @@ import { cards } from "../../../../catalog/schema";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { BodyText, Eyebrow, Label, NavBar, PrimaryButton, Screen, Segmented, TextButton } from "../../../chrome";
+import { BodyText, Eyebrow, Label, NavBar, PrimaryButton, Screen, Segmented, TextButton, pressedNight } from "../../../chrome";
+import { FELLOWSHIP_ID } from "../../../../campaign/save";
 import { campaignOf, scenarioOf } from "../../../campaign-data";
 import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
@@ -18,7 +19,7 @@ import { dealSeed } from "../../../e2e";
 import { EmptyHeroSlot, HeroTile, type HeroFace } from "../../../hero-tile";
 import { palette } from "../../../palette.js";
 import { routeCode } from "../../../route-code";
-import { starterSeedStatus, subscribeStarterSeed } from "../../../starter-decks";
+import { starterSeedReason, starterSeedStatus, subscribeStarterSeed } from "../../../starter-decks";
 import { decks } from "../../../user-schema";
 import { useSave } from "../../../use-save";
 
@@ -36,7 +37,7 @@ export default function Briefing() {
   const saveId = routeCode(params.saveId);
   const scenarioId = routeCode(params.scenarioId);
   const { catalog, user } = useDatabases();
-  const { save } = useSave(saveId ?? undefined);
+  const { save, loaded } = useSave(saveId ?? undefined);
 
   const [difficulty, setDifficulty] = useState<Difficulty>("Normal");
   const [picked, setPicked] = useState<readonly (string | null)[]>([null, null]);
@@ -49,6 +50,7 @@ export default function Briefing() {
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
   // The starter decks are inserted just after launch; read the list again when that finishes.
   const seeded = useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending");
+  const seedReason = useSyncExternalStore(subscribeStarterSeed, starterSeedReason, () => null);
   const savedDecks = useMemo<SavedDeck[]>(
     () => (seeded === "pending" ? [] : user.select({ id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards }).from(decks).all()),
     [user, seeded],
@@ -92,7 +94,15 @@ export default function Briefing() {
   const result = useMemo(() => (input ? briefing(input) : null), [input]);
   const facts = useMemo(() => (world ? scenarioFacts(world, difficulty) : null), [world, difficulty]);
 
-  const back = <NavBar onBack={() => router.back()} backTestID="briefing-back" right={<TextButton label="Booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? "fellowship-of-the-ring" } })} />} />;
+  const back = <NavBar onBack={() => router.back()} backTestID="briefing-back" right={<TextButton label="Booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? FELLOWSHIP_ID } })} />} />;
+  if (!loaded) {
+    return (
+      <Screen testID="briefing" scene="vale">
+        {back}
+        <BodyText tone="muted">Loading</BodyText>
+      </Screen>
+    );
+  }
   if (!save || !campaign || !scenario || !world || !input || !result || !facts) {
     return (
       <Screen testID="briefing" scene="vale">
@@ -178,10 +188,21 @@ export default function Briefing() {
         {seats.map((seat, index) => (
           <View key={index} className="mt-6">
             <Eyebrow tone="muted">{seatCount === 1 ? "Deck" : `Seat ${index + 1}`}</Eyebrow>
-            {savedDecks.length === 0 ? (
+            {seeded === "pending" ? (
               <BodyText tone="muted" className="mt-2">
-                No saved deck. Save one in Decks first.
+                Loading
               </BodyText>
+            ) : savedDecks.length === 0 ? (
+              <View className="mt-2 gap-2">
+                <BodyText tone={seeded === "missing" ? "danger" : "muted"} testID="briefing-no-deck">
+                  {seeded === "missing" ? "The starter decks are missing. Save a deck in Decks first." : "No saved deck. Save one in Decks first."}
+                </BodyText>
+                {seeded === "missing" && seedReason ? (
+                  <BodyText tone="danger" testID="briefing-starter-reason">
+                    {seedReason}
+                  </BodyText>
+                ) : null}
+              </View>
             ) : (
               <View className="mt-2">
                 {savedDecks.map((deck) => {
@@ -197,6 +218,7 @@ export default function Briefing() {
                       disabled={fallen.length > 0}
                       onPress={() => pick(index, deck.id)}
                       className="min-h-14 justify-center border-b border-hairline py-2"
+                      style={({ pressed }) => (pressed ? pressedNight : undefined)}
                     >
                       <Text className={selected ? "text-body font-semibold text-gold" : fallen.length > 0 ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
                       <Text className="text-label text-muted">{fallen.length > 0 ? `${heroNames(fallen)} fell and cannot be picked` : heroNames(deck.heroes)}</Text>
@@ -258,35 +280,28 @@ export default function Briefing() {
             The campaign card waives the hero-change penalty.
           </Label>
         ) : null}
-
-        <View className="mt-6 gap-1">
-          {result.problems.map((problem, index) => (
-            <BodyText key={`${index}-${problem.message}`} tone="danger" testID={`briefing-error-${index}`}>
-              {problem.message}
-            </BodyText>
-          ))}
-          {dealError ? (
-            <BodyText tone="danger" testID="briefing-deal-error">
-              {dealError}
-            </BodyText>
-          ) : null}
-        </View>
+      </ScrollView>
+      <View testID="briefing-deal-bar" className="gap-2 pb-safe pt-3">
+        {result.problems.map((problem, index) => (
+          <BodyText key={`${index}-${problem.message}`} tone="danger" testID={`briefing-error-${index}`}>
+            {problem.message}
+          </BodyText>
+        ))}
+        {dealError ? (
+          <BodyText tone="danger" testID="briefing-deal-error">
+            {dealError}
+          </BodyText>
+        ) : null}
         {result.penaltyAdded > 0 && !accepted ? (
           <View className="items-start">
             <TextButton label={`Accept +${result.penaltyAdded} threat for the campaign`} testID="accept-penalty" tone="gold" onPress={() => setAccepted(true)} />
           </View>
         ) : null}
-        {save.loadout ? (
-          <Label tone="muted" className="mt-2">
-            A scenario is already open. Dealing again drops it.
-          </Label>
-        ) : null}
-
-        <View className="mt-6 gap-3">
-          <Label tone="muted">Dealing starts the scenario</Label>
-          <PrimaryButton label="Deal" testID="deal" disabled={!result.dealable} onPress={onDeal} />
-        </View>
-      </ScrollView>
+        <BodyText tone="muted" testID="briefing-deal-note">
+          {save.loadout ? "A scenario is already open. Dealing again drops it." : "Dealing starts the scenario."}
+        </BodyText>
+        <PrimaryButton label="Deal" testID="deal" disabled={!result.dealable} onPress={onDeal} />
+      </View>
     </Screen>
   );
 }

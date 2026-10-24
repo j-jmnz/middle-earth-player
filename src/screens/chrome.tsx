@@ -234,10 +234,24 @@ export function PrimaryButton({
   );
 }
 
-/** Raised panel. `current` gets the gold edge: the one thing the player should look at. */
-export function Panel({ children, current = false, className }: { children: ReactNode; current?: boolean; className?: string }) {
+/** Raised panel. `current` gets the gold edge: the one thing the player should look at. `pressed` is the pressed fill. */
+export function Panel({
+  children,
+  current = false,
+  pressed = false,
+  className,
+}: {
+  children: ReactNode;
+  current?: boolean;
+  pressed?: boolean;
+  className?: string;
+}) {
   const edge = current ? "border-goldLine" : "border-hairline";
-  return <View className={`rounded-card border bg-raised p-5 ${edge}${className ? ` ${className}` : ""}`}>{children}</View>;
+  return (
+    <View className={`rounded-card border bg-raised p-5 ${edge}${className ? ` ${className}` : ""}`} style={pressed ? pressedNight : undefined}>
+      {children}
+    </View>
+  );
 }
 
 /** The Ring. Current node, app mark, completion. Never decorative filler. */

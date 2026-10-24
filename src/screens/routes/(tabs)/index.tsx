@@ -83,7 +83,7 @@ export default function CampaignList() {
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6">
         <View className="-mx-2 flex-row items-center justify-end">
           <TextButton label="Learn to Play" testID="booklet-open-learn-to-play" tone="gold" onPress={() => openBooklet("learn-to-play")} />
-          <TextButton label="Booklet" testID="booklet-open" tone="gold" onPress={() => openBooklet(FELLOWSHIP_ID)} />
+          <TextButton label="Fellowship booklet" testID="booklet-open" tone="gold" onPress={() => openBooklet(FELLOWSHIP_ID)} />
         </View>
         <ScreenTitle>Campaigns</ScreenTitle>
         {/* The scene's light sits above the cards. */}
@@ -98,12 +98,14 @@ export default function CampaignList() {
                 accessibilityRole="button"
                 onPress={() => router.push({ pathname: "/path/[saveId]", params: { saveId: save.id } })}
               >
-                <Panel current={index === 0}>
-                  {saves.length > 1 && index === 0 ? <Eyebrow>Current</Eyebrow> : null}
-                  <Text className="mt-1 font-display text-title text-bone">{nameOf(save.campaignId)}</Text>
-                  <Label>{save.seatCount === 1 ? "True solo" : "Two-handed"}</Label>
-                  <ProgressLine done={done} total={fellowship?.scenarios.length ?? 6} />
-                </Panel>
+                {({ pressed }) => (
+                  <Panel current={index === 0} pressed={pressed}>
+                    {saves.length > 1 && index === 0 ? <Eyebrow>Current</Eyebrow> : null}
+                    <Text className="mt-1 font-display text-title text-bone">{nameOf(save.campaignId)}</Text>
+                    <Label>{save.seatCount === 1 ? "True solo" : "Two-handed"}</Label>
+                    <ProgressLine done={done} total={fellowship?.scenarios.length ?? 6} />
+                  </Panel>
+                )}
               </Pressable>
             );
           })}

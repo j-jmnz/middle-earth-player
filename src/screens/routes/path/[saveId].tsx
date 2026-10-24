@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { campaignPath, type PathNode } from "../../../campaign/path";
-import { BodyText, Label, NavBar, Panel, PrimaryButton, RingMark, Screen, TextButton } from "../../chrome";
+import { BodyText, Label, NavBar, Panel, PrimaryButton, RingMark, Screen, TextButton, pressedNight } from "../../chrome";
 import { campaignOf, scenarioNames } from "../../campaign-data";
 import { cardNames } from "../../card-names";
 import { useDatabases } from "../../databases";
@@ -55,13 +55,16 @@ function Node({
       </View>
       <View className="flex-1 justify-center pl-4">
         {!left ? text : null}
-        {node.status === "current" && action ? (
+        {action ? (
           <View className="pb-3">
-            <PrimaryButton label={action.label} testID="begin" onPress={action.onPress} />
+            <PrimaryButton label={action.label} testID={node.status === "current" ? "begin" : `resume-${node.id}`} onPress={action.onPress} />
           </View>
         ) : null}
         {node.status === "completed" && onOpen ? (
-          <Pressable testID={`replay-${node.id}`} collapsable={false} accessibilityRole="button" onPress={onOpen} className="min-h-11 justify-center">
+          <Pressable testID={`replay-${node.id}`} collapsable={false} accessibilityRole="button" onPress={onOpen}
+            className="min-h-11 justify-center rounded-tile px-2"
+            style={({ pressed }) => (pressed ? pressedNight : undefined)}
+          >
             <Text className="text-label text-gold">Replay</Text>
           </Pressable>
         ) : null}
@@ -130,11 +133,11 @@ export default function CampaignPath() {
             last={index === nodes.length - 1}
             rewardText={node.reward.map(name).join(" · ")}
             action={
-              node.status === "current"
-                ? resuming === node.id
-                  ? { label: "Resume", onPress: () => router.push({ pathname: "/scenario/[saveId]", params: { saveId: save.id } }) }
-                  : { label: "Begin", onPress: () => router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: node.id } }) }
-                : null
+              resuming === node.id && node.status !== "locked"
+                ? { label: "Resume", onPress: () => router.push({ pathname: "/scenario/[saveId]", params: { saveId: save.id } }) }
+                : node.status === "current"
+                  ? { label: "Begin", onPress: () => router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: node.id } }) }
+                  : null
             }
             onOpen={node.status === "completed" ? () => router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: node.id } }) : null}
           />

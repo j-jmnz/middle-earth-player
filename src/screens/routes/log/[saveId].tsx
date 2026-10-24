@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 
+import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { cards } from "../../../catalog/schema";
 import { inArray } from "drizzle-orm";
@@ -49,7 +50,14 @@ export default function Log() {
   const printed = useMemo(() => printedMap(rows), [rows]);
   const nameOf = (code: string) => rows.find((row) => row.code === code)?.name ?? code;
 
-  const back = <NavBar onBack={() => router.back()} backTestID="log-back" right={<TextButton label="Booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? "fellowship-of-the-ring" } })} />} />;
+  const changed = save !== null && edited !== null && edited !== save.log.notes;
+  // Typed notes are written when the field loses focus and when the player goes back, never dropped silently.
+  function saveNotes(): void {
+    if (!save || edited === null || edited === save.log.notes) return;
+    update({ ...save, log: { ...save.log, notes: edited } });
+    setEdited(null);
+  }
+  const back = <NavBar onBack={() => { saveNotes(); router.back(); }} backTestID="log-back" right={<TextButton label="Booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? FELLOWSHIP_ID } })} />} />;
   if (!loaded) return <Screen testID="log" scene="plain">{back}<BodyText tone="muted">Loading</BodyText></Screen>;
   const campaign = save ? campaignOf(save.campaignId) : null;
   if (!save || !campaign) {
@@ -70,12 +78,11 @@ export default function Log() {
   };
   const names = scenarioNames(campaign);
   const notes = edited ?? log.notes;
-  const changed = edited !== null && edited !== log.notes;
 
   return (
     <Screen testID="log" scene="plain">
       {back}
-      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-4" keyboardShouldPersistTaps="handled">
+      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-safe" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
         <View className="mt-3 rounded-card bg-paper px-5 py-4">
           <Text accessibilityRole="header" className="font-display text-title text-ink">
             Campaign Log
@@ -110,6 +117,7 @@ export default function Log() {
               multiline
               value={notes}
               onChangeText={setEdited}
+              onBlur={saveNotes}
               placeholder="Write a note"
               placeholderTextColor={palette.inkMuted}
               className="mt-1 min-h-24 font-display text-body text-ink"
@@ -122,10 +130,7 @@ export default function Log() {
             <PrimaryButton
               label="Save notes"
               testID="log-save-notes"
-              onPress={() => {
-                update({ ...save, log: { ...log, notes } });
-                setEdited(null);
-              }}
+              onPress={saveNotes}
             />
           </View>
         ) : null}
