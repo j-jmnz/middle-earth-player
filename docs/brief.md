@@ -221,8 +221,8 @@ Name the steps in the phase rail in words. Beginning and end of round are real s
 Setup, in this order:
 
 1. Shuffle the decks. Place heroes. Starting threat is the sum of the dealt heroes' threat costs, plus the campaign log's threat modifier.
-2. Search out player cards with Setup and resolve them before the opening hand. A Setup sentence that changes the starting hand, such as the one on Gandalf's Delay, also counts here, even though the quest card's Setup is what puts that card out: the booklet (p3) puts player Setup before the starting hand, and a sentence about the hand cannot apply to a hand already drawn.
-3. Draw 6, less any reduction from step 2 (Gandalf's Delay: 5). One mulligan: shuffle the hand back and draw the same number. No second mulligan.
+2. Search out player cards with Setup and resolve them before the opening hand. A Setup record that changes the starting hand, such as `ReduceOpeningHand` on 141078, also runs here, even though the quest card's Setup is what puts that card out. This placement is a user-accepted reading: booklet p3 orders player Setup before the hand and encounter Setup before the quest card's Setup, and says nothing about encounter Setup against the hand.
+3. Draw 6, less any `ReduceOpeningHand` total from step 2 (141078 contributes 1, so 5). One mulligan: shuffle the hand back and draw the same number. No second mulligan.
 4. Search out encounter cards with Setup and resolve them before the quest card's Setup. The booklet orders this step only before the quest card's Setup, not before the hand.
 5. Run the quest card's Setup, then flip to side B. That includes the active location, set-aside, The One Ring, and whatever that card prints. The setup Black Rider in scenario 1 is added to staging and does not take a Hide test.
 
@@ -408,7 +408,7 @@ An Action or Response may name a `cost` (exhaust or discard the card, add it to 
 
 The Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog`. `src/effects` holds the authored records. The interpreter takes the effect list as an argument and does not import `src/effects`. Vitest passes the TypeScript records. The phone loads rows from `catalog.db` and passes those. The build script is the only production writer of that table.
 
-Gandalf's Delay has two Setup sentences: it goes to staging, and each player draws one fewer card in their starting hand. The second is the `ReduceOpeningHand` instruction. It is cited to MEC109 #46 as read via Hall of Beorn's TFotR printing on 2026-10-24 (user-accepted), and still awaits confirmation on the physical card. RingsDB's errata row for 141078 describes a different starting-hand rule than the MEC109 printing; the MEC109 printing wins (user decision), and the errata text is not stored in git. The engine applies it with player Setup, before the opening hand, so the opening hand and a mulligan redraw both draw 6 minus the reduction.
+Gandalf's Delay (141078) has two Setup records: the placement in staging, and `ReduceOpeningHand` amount 1. It is cited to MEC109 #46 as read via Hall of Beorn's TFotR printing on 2026-10-24 (user-accepted), and still awaits confirmation on the physical card. RingsDB's row for 141078 differs from the MEC109 printing on the starting-hand rule; the MEC109 printing wins (user decision), and the RingsDB wording is not stored in git. The engine applies it with player Setup, before the opening hand, so the opening hand and a mulligan redraw both draw 6 minus the reduction.
 
 3. **Player cards with no effect row.** The card can be paid for, played, quested, defended, and attacked with using printed numbers and implemented keywords. Its unique sentence is inactive: it is shown, it is not offered, and there is no sheet on which the player applies it. The mark is the absence of the row. When the row exists, the ability becomes a normal legal intent or a normal engine step.
 
