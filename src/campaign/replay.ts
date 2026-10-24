@@ -3,6 +3,8 @@ import { reduce } from "../rules/reduce.ts";
 import { startScenario, type StartScenario } from "../rules/setup.ts";
 import { ENGINE_VERSION } from "../rules/version.ts";
 
+export { ENGINE_VERSION };
+
 // The open scenario of a save. It is the seed and the intents sent so far, not the table. Loading replays them
 // through the reducer from the start the log and the decks produce, so the state is never stored and cannot drift
 // from the rules. brief: Save.

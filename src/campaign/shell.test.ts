@@ -5,9 +5,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { encounterCodes } from "../catalog/scenario-data.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";
-import { reduce, type PlayerIntent } from "../rules/reduce.ts";
+import type { PlayerIntent, ScenarioState } from "../rules/reduce.ts";
 import { ENGINE_VERSION } from "../rules/version.ts";
-import { nextIntent, playOut } from "../../scripts/auto-player.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 
@@ -15,8 +14,8 @@ import { briefing, scenarioFacts, startFor, type BriefingInput, type BriefingSea
 import { emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { newSave, parseActive, parseLog, parseLoadout, type Save, type StoredLoadout } from "./save.ts";
-import { boostedContext } from "./dev.ts";
-import { contextOf, deal, drop, finish, record, resume } from "./session.ts";
+import { devChoices, devChoose, devPlay, devResume, devSettled } from "./dev.ts";
+import { deal, drop, finish, record, resume } from "./session.ts";
 import { loadWorld, type World } from "./world.ts";
 
 // The campaign shell, end to end, in Node: the briefing refuses and deals, a deal survives a relaunch, a win unlocks the
@@ -168,22 +167,23 @@ function dealt(world: World = past, save: Save = newSave("save-1", campaign.id, 
   return result.save;
 }
 
-// Plays the open scenario the way the dev control does and returns the save with every intent recorded.
-function boosted(): World {
-  return { ...past, cards: boostedContext(past, [SAM, MERRY, PIPPIN]).cards };
-}
-
-function played(save: Save): { save: Save; won: boolean } {
-  const world = boosted();
-  const ctx = contextOf(world);
-  const resumed = resume(save, world, CATALOG_VERSION);
-  if (!resumed.ok) throw new Error(`resume ${resumed.reason}`);
-  const kept = reduce(resumed.state, { type: "Keep" }, ctx);
-  if (!kept.ok) throw new Error(kept.reason);
-  let next = record(save, { type: "Keep" });
-  const out = playOut(kept.state, ctx, { scout: PIPPIN, prefer: "141035", protect: FRODO, play: true, act: true });
-  for (const intent of out.intents) next = record(next, intent);
-  return { save: next, won: !out.state.lost };
+// Plays the open scenario the way the dev control does, answers the first option of each Resolution group, and returns the save.
+function played(save: Save, outcome: "win" | "loss" = "win"): { save: Save; state: ScenarioState; chosen: string[] } {
+  const run = devPlay(save, past, CATALOG_VERSION, outcome);
+  if (!run.ok) throw new Error(run.reason);
+  let { save: next, state } = run;
+  const chosen: string[] = [];
+  while (devSettled(state) === "choosing") {
+    const options = devChoices(state, past, next);
+    const option = options[0];
+    if (!option) throw new Error("A Resolution window offered nothing");
+    chosen.push(option.optionId);
+    const answered = devChoose(next, past, state, option.optionId);
+    if (!answered.ok) throw new Error(answered.reason);
+    next = answered.save;
+    state = answered.state;
+  }
+  return { save: next, state, chosen };
 }
 
 describe("a save across a relaunch", () => {
@@ -218,17 +218,17 @@ describe("a save across a relaunch", () => {
 
 describe("a win and a loss", () => {
   it("a win records the chosen cards, unlocks scenario 2, and scenario 2's briefing deals the earned burden into the encounter deck", () => {
-    const { save, won } = played(dealt());
-    expect(won).toBe(true);
-    const resumed = resume(save, boosted(), CATALOG_VERSION);
-    if (!resumed.ok) throw new Error(resumed.reason);
-    const finished = finish(save, boosted(), resumed.state);
+    const { save, state } = played(dealt());
+    expect(devSettled(state)).toBe("won");
+    const finished = finish(save, past, state);
     expect(finished.active).toBeNull();
     expect(finished.loadout).toBeNull();
     expect(finished.log.completed).toEqual(["a-shadow-of-the-past"]);
     expect(finished.log.earned["a-shadow-of-the-past"]).toHaveLength(2);
     expect(finished.log.campaignPool.map((card) => card.code).sort()).toEqual([...(finished.log.earned["a-shadow-of-the-past"] ?? [])].sort());
     expect(finished.log.scenarios["a-shadow-of-the-past"]?.rounds).toBeGreaterThan(0);
+    // The log keeps the player's heroes, not the dev context's.
+    expect(finished.log.heroesBySeat).toEqual([[FRODO, SAM, MERRY, PIPPIN]]);
 
     const names = Object.fromEntries(campaign.scenarios.map((id) => [id, id]));
     const path = campaignPath(campaign, names, finished.log);
@@ -236,45 +236,41 @@ describe("a win and a loss", () => {
     expect(path[0]?.reward).toEqual(finished.log.earned["a-shadow-of-the-past"]);
 
     const knife = worldOf("a-knife-in-the-dark", deck.concat(finished.log.campaignPool.map((card) => card.code)));
-    const plan = briefing({ world: knife, log: finished.log, seatCount: 1, seats: [seat([SAM, MERRY, PIPPIN])], ringBearer: FRODO, difficulty: "Normal", choices: [] });
+    const input: BriefingInput = { world: knife, log: finished.log, seatCount: 1, seats: [seat([SAM, MERRY, PIPPIN])], ringBearer: FRODO, difficulty: "Normal", choices: [] };
+    const plan = briefing(input);
+    expect(plan.problems).toEqual([]);
     const encounterBound = finished.log.campaignPool.filter((card) => card.back === "encounter" && card.attachedTo == null);
     expect(encounterBound.length).toBeGreaterThan(0);
     expect(plan.steps.find((step) => step.n === 8)?.did.length).toBe(encounterBound.length);
-    const start = startFor({ world: knife, log: finished.log, seatCount: 1, seats: [seat([SAM, MERRY, PIPPIN])], ringBearer: FRODO, difficulty: "Normal" }, SEED);
-    for (const card of encounterBound) expect(start.encounterDeck).toContain(card.code);
+    for (const card of encounterBound) expect(startFor(input, SEED).encounterDeck).toContain(card.code);
+  });
+
+  it("a relaunch in the middle of the Resolution replays to the same choices", () => {
+    const run = devPlay(dealt(), past, CATALOG_VERSION, "win");
+    if (!run.ok) throw new Error(run.reason);
+    expect(devSettled(run.state)).toBe("choosing");
+    const stored = JSON.parse(JSON.stringify(run.save)) as Save;
+    const again = devResume({ ...stored, log: parseLog(stored.log), active: parseActive(stored.active), loadout: parseLoadout(stored.loadout) }, past, CATALOG_VERSION);
+    if (!again.ok) throw new Error(again.reason);
+    expect(devChoices(again.state, past, again.save)).toEqual(devChoices(run.state, past, run.save));
+    expect(devChoices(again.state, past, again.save).length).toBeGreaterThan(0);
   });
 
   it("a second win of the same scenario does not grant the reward again", () => {
-    const { save } = played(dealt());
-    const resumed = resume(save, boosted(), CATALOG_VERSION);
-    if (!resumed.ok) throw new Error(resumed.reason);
-    const won = finish(save, boosted(), resumed.state);
-    const again = dealt(past, won);
-    const replayed = played(again);
-    const state = resume(replayed.save, boosted(), CATALOG_VERSION);
-    if (!state.ok) throw new Error(state.reason);
-    const twice = finish(replayed.save, boosted(), state.state);
+    const first = played(dealt());
+    const won = finish(first.save, past, first.state);
+    const replayed = played(dealt(past, won));
+    const twice = finish(replayed.save, past, replayed.state);
     expect(twice.log).toEqual(won.log);
+    expect(twice.active).toBeNull();
   });
 
   it("a loss writes nothing and leaves scenario 2 locked", () => {
     const save = dealt();
-    const ctx = contextOf(past);
-    const resumed = resume(save, past, CATALOG_VERSION);
-    if (!resumed.ok) throw new Error(resumed.reason);
-    const kept = reduce(resumed.state, { type: "Keep" }, ctx);
-    if (!kept.ok) throw new Error(kept.reason);
-    // The player never quests: threat climbs until the scenario is lost.
-    let state = { state: kept.state };
-    const memory = new Set<string>();
-    for (let turn = 0; turn < 4000 && !state.state.lost; turn += 1) {
-      const chosen = nextIntent(state.state, ctx, { scout: PIPPIN, prefer: "141035", protect: FRODO }, memory);
-      const next = reduce(state.state, chosen.type === "Commit" ? { type: "Pass" } : chosen, ctx);
-      if (!next.ok) throw new Error(next.reason);
-      state = next;
-    }
-    expect(state.state.lost).toBe(true);
-    const finished = finish(save, past, state.state);
+    const { save: lostSave, state } = played(save, "loss");
+    expect(state.lost).toBe(true);
+    expect(devSettled(state)).toBe("lost");
+    const finished = finish(lostSave, past, state);
     expect(finished.log).toEqual(save.log);
     expect(finished.active).toBeNull();
     const path = campaignPath(campaign, {}, finished.log);

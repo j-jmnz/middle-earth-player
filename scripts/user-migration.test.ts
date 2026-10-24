@@ -20,7 +20,6 @@ describe("user migration", () => {
     const database = new DatabaseSync(":memory:");
     for (const entry of migrations.journal.entries) {
       const sql = migrationSql(entry);
-      expect(sql.toLowerCase()).not.toContain("booklet");
       for (const statement of sql.split("--> statement-breakpoint")) {
         const trimmed = statement.trim();
         if (trimmed.length === 0) continue;
@@ -49,5 +48,23 @@ describe("user migration", () => {
       cards: '[{"code":"141001","count":1}]',
     });
     expect(stored?.applied_catalog_version).toBe(CATALOG_VERSION);
+  });
+
+  it("adds the booklets table and the save loadout without touching a save row", () => {
+    const database = new DatabaseSync(":memory:");
+    const [first, ...rest] = migrations.journal.entries;
+    if (!first) throw new Error("No migrations");
+    for (const statement of migrationSql(first).split("--> statement-breakpoint")) if (statement.trim()) database.exec(statement.trim());
+    database.exec(`INSERT INTO saves (id, campaign_id, seat_count, log, pool) VALUES ('save-1', 'fellowship-of-the-ring', 1, '{}', '[]')`);
+    for (const entry of rest) {
+      for (const statement of migrationSql(entry).split("--> statement-breakpoint")) if (statement.trim()) database.exec(statement.trim());
+    }
+    const save = database.prepare("SELECT id, loadout FROM saves WHERE id = 'save-1'").get();
+    expect(save).toEqual({ id: "save-1", loadout: null });
+    database.exec(
+      `INSERT INTO booklets (id, path, original_filename, byte_size, sha256, page_count) VALUES ('learn-to-play', 'booklets/learn-to-play.pdf', 'ltp.pdf', 10, 'abc', 4)`,
+    );
+    const booklet = database.prepare("SELECT page_count, last_page FROM booklets WHERE id = 'learn-to-play'").get();
+    expect(booklet).toEqual({ page_count: 4, last_page: 1 });
   });
 });

@@ -1,0 +1,88 @@
+import { eq } from "drizzle-orm";
+import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+
+import { parseActive, parseLoadout, parseLog, parseSeatCount, newSave, type Save } from "../campaign/save";
+import { booklets, saves, type StoredJson } from "./user-schema";
+
+// user.db `saves` and `booklets`, read and written whole. The screens call these; the rules stay in src/campaign.
+type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
+
+// The stored JSON is plain data. The campaign types are readonly views of it.
+function stored(value: unknown): StoredJson {
+  return JSON.parse(JSON.stringify(value)) as StoredJson;
+}
+
+function fromRow(row: typeof saves.$inferSelect): Save {
+  // A log that does not parse is a failure the player must see. The open scenario is only a cache of the intents: when
+  // it does not parse it is dropped and the log stays.
+  const log = parseLog(row.log);
+  let active = null;
+  let loadout = null;
+  try {
+    active = parseActive(row.activeScenario);
+    loadout = parseLoadout(row.loadout);
+  } catch {
+    active = null;
+    loadout = null;
+  }
+  if (!active || !loadout) {
+    active = null;
+    loadout = null;
+  }
+  return { id: row.id, campaignId: row.campaignId, seatCount: parseSeatCount(row.seatCount), log, active, loadout };
+}
+
+export function listSaves<TRun>(user: UserDb<TRun>): Save[] {
+  return user.select().from(saves).all().map(fromRow);
+}
+
+export function readSave<TRun>(user: UserDb<TRun>, id: string): Save | null {
+  const row = user.select().from(saves).where(eq(saves.id, id)).get();
+  return row ? fromRow(row) : null;
+}
+
+export function writeSave<TRun>(user: UserDb<TRun>, save: Save): void {
+  const values = {
+    id: save.id,
+    campaignId: save.campaignId,
+    seatCount: save.seatCount,
+    log: stored(save.log),
+    // The pool is the log's pool; the column is kept for the sheet's reader and written from the same value.
+    pool: stored(save.log.campaignPool),
+    activeScenario: save.active ? stored(save.active) : null,
+    loadout: save.loadout ? stored(save.loadout) : null,
+  };
+  user
+    .insert(saves)
+    .values(values)
+    .onConflictDoUpdate({ target: saves.id, set: values })
+    .run();
+}
+
+let created = 0;
+
+// A new playthrough. The seat count is chosen here and never changes.
+export function createSave<TRun>(user: UserDb<TRun>, campaignId: string, seatCount: 1 | 2, now: number = Date.now()): Save {
+  created += 1;
+  const save = newSave(`save-${now.toString(36)}${created > 1 ? `-${created}` : ""}`, campaignId, seatCount);
+  writeSave(user, save);
+  return save;
+}
+
+export type BookletRow = typeof booklets.$inferSelect;
+
+export function readBooklet<TRun>(user: UserDb<TRun>, id: string): BookletRow | null {
+  return user.select().from(booklets).where(eq(booklets.id, id)).get() ?? null;
+}
+
+export function writeBooklet<TRun>(user: UserDb<TRun>, row: BookletRow): void {
+  user
+    .insert(booklets)
+    .values(row)
+    .onConflictDoUpdate({ target: booklets.id, set: row })
+    .run();
+}
+
+export function writeLastPage<TRun>(user: UserDb<TRun>, id: string, page: number): void {
+  user.update(booklets).set({ lastPage: Math.max(1, Math.floor(page)) }).where(eq(booklets.id, id)).run();
+}

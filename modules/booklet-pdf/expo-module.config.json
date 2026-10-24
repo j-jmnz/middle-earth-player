@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["BookletPdfModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.bookletpdf.BookletPdfModule"]
+  }
+}
