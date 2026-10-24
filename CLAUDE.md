@@ -14,6 +14,8 @@ The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The R
 - `pnpm data:query "<sql>"` queries tables `cards`, `scenario_cards` and `rules` in memory. Rules text is `select id, title, text from rules where ...`.
 - `pnpm effects:draft <scenario-id | starter-deck-id>` writes `.agent/drafts/<code>.md` for each printed ledger line no effect record owns. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
 
+**Sources are online.** Any resource a task needs (rules PDFs, booklets, card scans, card text) comes from an online source, fetched through `pnpm data:sync` and recorded in `data/sources.json`. Query the PDF when a rule or card line is in question; do not ask for a physical card, do not rely on memory, and do not paste a PDF into the repo. (User instruction, 2026-10-24.)
+
 ## Commands
 
 - `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
