@@ -7,6 +7,7 @@ import { cardMap, expectOk, fixtureDefinition, hero } from "./fixture.ts";
 import { definePrinted } from "./printed.ts";
 import { legalIntents, legalTargets, reduce } from "./reduce.ts";
 import { blankScenario, updateCard, withThreat, type ScenarioState } from "./state.ts";
+import { discardShadows } from "./shadow.ts";
 import { moveCard, spawn } from "./zones.ts";
 
 function enemy(code: string, patch: Partial<Parameters<typeof definePrinted>[0]> = {}) {
@@ -413,5 +414,42 @@ describe("combat", () => {
     expect(canAttack(state, 0, elf.id, orc.id, cards)).toBe(true);
     expect(canDefend(state, 0, prop.id, cards)).toBe(false);
     expect(canAttack(state, 0, prop.id, orc.id, cards)).toBe(false);
+  });
+});
+
+describe("unused shadow cards", () => {
+  function dealt() {
+    const { state, ids, cards } = engageWindow({
+      seatCount: 1,
+      enemies: [{ code: "orc", seat: 0 }],
+      shadows: ["shade"],
+      heroes: [{ code: "aragorn", seat: 0 }],
+    });
+    const opened = expectOk(reduce(state, { type: "DeclineEngage" }, { effects: [], cards }));
+    const shadowId = ids.shade ?? "";
+    expect(opened.state.cards[shadowId]?.zone).toBe("shadow");
+    return { state: opened.state, orcId: ids.orc ?? "", shadowId };
+  }
+
+  it("go to the encounter discard when their enemy leaves play", () => {
+    const { state, orcId, shadowId } = dealt();
+    const gone = moveCard(state, orcId, { zone: "encounterDiscard" });
+    expect(gone.cards[shadowId]?.zone).toBe("encounterDiscard");
+    expect(gone.encounterDiscard).toContain(shadowId);
+    expect(gone.cards[orcId]?.shadowId).toBeNull();
+  });
+
+  it("stay with an enemy that only moves between staging and engagement", () => {
+    const { state, orcId, shadowId } = dealt();
+    const back = moveCard(state, orcId, { zone: "staging" });
+    expect(back.cards[shadowId]?.zone).toBe("shadow");
+    expect(back.cards[orcId]?.shadowId).toBe(shadowId);
+  });
+
+  it("are all discarded at the end of the combat phase", () => {
+    const { state, shadowId } = dealt();
+    const ended = discardShadows(state);
+    expect(ended.cards[shadowId]?.zone).toBe("encounterDiscard");
+    expect(Object.values(ended.cards).some((card) => card.zone === "shadow")).toBe(false);
   });
 });

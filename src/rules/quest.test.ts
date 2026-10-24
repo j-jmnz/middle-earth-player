@@ -97,7 +97,55 @@ describe("quest resolution", () => {
     expect(resolved.state.victory.map((id) => resolved.state.cards[id]?.code)).toEqual(["road"]);
   });
 
-  it("raises the first player's threat by the shortfall", () => {
+  function twoSeatShortfall(threats: readonly [number, number], eliminated = false) {
+    const wolf = definePrinted({ code: "wolf", name: "Wolf", type: "enemy", threat: 4, engagementCost: 50 });
+    const cards = cardMap([hero("aragorn", "leadership", 10, 1), hero("gimli", "leadership", 9, 1), wolf, stageCard("stage-1", 10)]);
+    let state = blankScenario({ seatCount: 2, seed: 3, definition: fixtureDefinition(["stage-1"]) });
+    state = spawn(state, "aragorn", { zone: "heroes", seat: 0 }).state;
+    state = spawn(state, "gimli", { zone: "heroes", seat: 1 }).state;
+    state = spawn(state, "stage-1", { zone: "questStage" }, "B").state;
+    state = spawn(state, "wolf", { zone: "staging" }).state;
+    state = {
+      ...state,
+      seats: [
+        { ...state.seats[0], threat: threats[0] },
+        { ...state.seats[1], threat: threats[1], eliminated },
+      ],
+      phase: "Quest",
+      mode: "questCommit",
+      window: { kind: "pass" },
+      activeSeat: 0,
+      firstPlayer: 0,
+    };
+    return { state, ctx: { effects: [], cards } };
+  }
+
+  it("raises every player's threat by the shortfall", () => {
+    const { state, ctx } = twoSeatShortfall([10, 20]);
+    const first = expectOk(reduce(state, { type: "Pass" }, ctx));
+    const resolved = expectOk(reduce(first.state, { type: "Pass" }, ctx));
+    expect(resolved.state.seats[0]?.threat).toBe(14);
+    expect(resolved.state.seats[1]?.threat).toBe(24);
+    expect(resolved.steps.filter((step) => step.kind === "threat")).toEqual([
+      { kind: "threat", seat: 0, amount: 4 },
+      { kind: "threat", seat: 1, amount: 4 },
+    ]);
+  });
+
+  it("lets the shortfall eliminate a seat that reaches 50 without raising an eliminated seat", () => {
+    const near = twoSeatShortfall([10, 47]);
+    const passed = expectOk(reduce(near.state, { type: "Pass" }, near.ctx));
+    const resolved = expectOk(reduce(passed.state, { type: "Pass" }, near.ctx));
+    expect(resolved.state.seats[0]?.threat).toBe(14);
+    expect(resolved.state.seats[1]?.eliminated).toBe(true);
+
+    const out = twoSeatShortfall([10, 30], true);
+    const after = expectOk(reduce(out.state, { type: "Pass" }, out.ctx));
+    expect(after.state.seats[0]?.threat).toBe(14);
+    expect(after.state.seats[1]?.threat).toBe(30);
+  });
+
+  it("raises the lone player's threat by the shortfall", () => {
     const { state, cards } = atCommit({
       willpower: 1,
       threat: 10,

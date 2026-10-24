@@ -163,7 +163,13 @@ export function moveCard(state: ScenarioState, id: string, dest: Destination): S
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if (leavingPlay && current.host) next = unhost(next, id);
-  return stampEntry(attach(next, id, dest), id, current.zone);
+  const moved = stampEntry(attach(next, id, dest), id, current.zone);
+  // An enemy that leaves play takes its dealt shadow card to the encounter discard (Learn to Play p16).
+  // Staging and engaged are the zones an enemy is in play.
+  if (current.shadowId && dest.zone !== "engaged" && dest.zone !== "staging") {
+    return moveCard(moved, current.shadowId, { zone: "encounterDiscard" });
+  }
+  return moved;
 }
 
 // Links an attachment to its host. The card keeps its zone and controller.

@@ -55,8 +55,8 @@ export function resolveQuest(
   const threat = stagingThreat(state, cards);
   let next = state;
   if (willpower < threat) {
-    const seat = next.seats[next.firstPlayer];
-    if (seat && !seat.eliminated) next = raiseThreat(next, next.firstPlayer, threat - willpower, steps);
+    // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.
+    for (const seat of livingSeats(state)) next = raiseThreat(next, seat, threat - willpower, steps);
   } else if (willpower > threat) {
     next = placeQuestProgress(next, willpower - threat, cards, steps, canAdvance);
   }
@@ -220,7 +220,8 @@ export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Car
     if (cost == null || cost > threat) continue;
     found.push({ id, cost });
   }
-  found.sort((left, right) => left.cost - right.cost || left.id.localeCompare(right.id));
+  // Highest cost first: the check engages the enemy with the highest cost at or below threat (Learn to Play p14).
+  found.sort((left, right) => right.cost - left.cost || left.id.localeCompare(right.id));
   return found.map((entry) => entry.id);
 }
 
@@ -237,13 +238,13 @@ export function engagementStep(state: ScenarioState, cards: Cards, steps: Engine
   if (options.length === 0) {
     return { ...state, engagement: { ...cursor, ordinal: cursor.ordinal + 1 } };
   }
-  const lowestId = options[0];
-  if (!lowestId) return state;
-  const lowest = state.cards[lowestId];
-  const lowestCost = lowest ? engagementCostOf(state, lowest, cards) : null;
+  const highestId = options[0];
+  if (!highestId) return state;
+  const highest = state.cards[highestId];
+  const highestCost = highest ? engagementCostOf(state, highest, cards) : null;
   const tied = options.filter((id) => {
     const instance = state.cards[id];
-    return instance != null && engagementCostOf(state, instance, cards) === lowestCost;
+    return instance != null && engagementCostOf(state, instance, cards) === highestCost;
   });
   if (tied.length > 1) {
     return {
@@ -253,7 +254,7 @@ export function engagementStep(state: ScenarioState, cards: Cards, steps: Engine
       window: { kind: "chooseEnemy", reason: "engagement", seat, options: tied },
     };
   }
-  const engaged = engageEnemy(state, seat, lowestId, steps);
+  const engaged = engageEnemy(state, seat, highestId, steps);
   return {
     ...engaged,
     engagement: { ordinal: cursor.ordinal + 1, engagedThisPass: true },

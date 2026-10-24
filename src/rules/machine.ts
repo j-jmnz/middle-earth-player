@@ -26,6 +26,7 @@ import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
 import { crossBoundary } from "./triggers.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
+import { discardShadows } from "./shadow.ts";
 import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -195,7 +196,7 @@ function openPlayer(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const seat = livingSeats(state).find(
     (index) => !state.passed.includes(index) && hasLegalAttack(state, index, ctx.cards),
   );
-  if (seat == null) return withMode(state, "refresh");
+  if (seat == null) return withMode(discardShadows(state), "refresh");
   return { ...state, window: { kind: "playerAttack" }, activeSeat: seat };
 }
 

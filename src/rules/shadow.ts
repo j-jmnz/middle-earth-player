@@ -31,6 +31,15 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
   return moveCard(resolved, shadowId, { zone: "encounterDiscard" });
 }
 
+// End of the combat phase: every shadow card still dealt is discarded unused (Learn to Play p16).
+export function discardShadows(state: ScenarioState): ScenarioState {
+  let next = state;
+  for (const instance of Object.values(state.cards)) {
+    if (instance.zone === "shadow") next = moveCard(next, instance.id, { zone: "encounterDiscard" });
+  }
+  return next;
+}
+
 // Runs once the defender is declared or the hero is named. The shadow resolves first, then damage.
 export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
