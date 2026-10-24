@@ -8,6 +8,7 @@ import { startScenario } from "../rules/setup.ts";
 import { ENGINE_VERSION } from "../rules/version.ts";
 import { playOut } from "../../scripts/auto-player.ts";
 import { campaign, loadWorld, scenario } from "../../scripts/past-scene.ts";
+import { playStarter, starterWorld } from "../../scripts/starter-game.ts";
 
 import { buildStart } from "./start.ts";
 import { beginActive, recordIntent, replay } from "./replay.ts";
@@ -38,6 +39,16 @@ describe("saves.activeScenario replay", () => {
     const replayed = replay(JSON.parse(JSON.stringify(active)), start, HASH, ctx);
     expect(replayed.ok).toBe(true);
     if (replayed.ok) expect(replayed.state).toEqual(played.state);
+  });
+
+  it.each(campaign.starterDecks.map((deck) => deck.id))("replays a starter-deck game (%s) to the same final state", async (deckId) => {
+    const { ctx } = await starterWorld(deckId);
+    const { start, run } = playStarter(deckId, 1, ctx);
+    let active = beginActive(start, HASH);
+    for (const intent of [{ type: "Keep" } as const, ...run.intents]) active = recordIntent(active, intent);
+    const replayed = replay(JSON.parse(JSON.stringify(active)), start, HASH, ctx);
+    expect(replayed.ok).toBe(true);
+    if (replayed.ok) expect(replayed.state).toEqual(run.state);
   });
 
   it("drops a save from another engine version, another data hash, another seed, or a refused intent", async () => {

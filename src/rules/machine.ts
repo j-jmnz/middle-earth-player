@@ -14,6 +14,7 @@ import {
 } from "./combat.ts";
 import { applyChoice } from "./choices.ts";
 import { ruleCause } from "./cause.ts";
+import { drainEvents } from "./events.ts";
 import { advanceFrame, stagingStep } from "./frames.ts";
 import { commitHide, pruneRoundRecords } from "./hide.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
@@ -41,6 +42,10 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
       }
     }
     if (current.lost || current.stageCleared || current.failure || current.window) return current;
+    if (current.pendingEvents?.length) {
+      current = drainEvents(current, ctx, steps);
+      continue;
+    }
     const crossed = crossBoundary(current, ctx, steps);
     const next = handoffEliminated(crossed !== current ? crossed : automatic(current, ctx, steps));
     if (next === current) return current;

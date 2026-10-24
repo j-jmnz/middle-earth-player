@@ -8,6 +8,7 @@ export {
   costSchema,
   effectSchema,
   instructionSchema,
+  isStatCondition,
   modifierStatSchema,
   modifierUntilSchema,
   phaseNameSchema,
@@ -44,6 +45,7 @@ export const printedKeywordsSchema = z.strictObject({
   permanent: z.boolean().optional(),
   sentinel: z.boolean().optional(),
   ranged: z.boolean().optional(),
+  restricted: z.boolean().optional(),
   // Leaving play ends the game (flag).
   leavesPlayLoses: z.boolean().optional(),
 });

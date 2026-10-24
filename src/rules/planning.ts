@@ -1,9 +1,11 @@
 // Rules: rr.planning-phase (data/rules/entries.json).
-import { characters } from "./combat.ts";
+import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
-import { printedOf, spherePays, type PrintedCard } from "./printed.ts";
+import { heroPays } from "./payments.ts";
+import { printedOf, type PrintedCard } from "./printed.ts";
+import { attachBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 import { runEffects } from "./interpret.ts";
@@ -33,6 +35,7 @@ export function playCard(
   next = updateCard(next, intent.cardId, { exhausted: false });
   if (printed.type === "attachment" && intent.hostId) {
     next = attachTo(next, intent.cardId, intent.hostId);
+    return enforceRestricted(next, intent.hostId, ctx, steps);
   }
   return next;
 }
@@ -53,31 +56,33 @@ export function playReason(
   if (printed.type === "attachment") {
     if (!intent.hostId) return "Choose a host";
     const host = state.cards[intent.hostId];
-    if (!host || !attachmentHosts(state, state.activeSeat, ctx).includes(intent.hostId)) {
+    if (!host || !attachmentHostIds(state, state.activeSeat, instance.code, ctx).includes(intent.hostId)) {
       if (host && !playerCardEffectCanChoose(printedOf(ctx.cards, host.code))) {
         return "Immune to player card effects";
       }
+      if (host && attachBlocked(state, ctx, host.id, instance.code)) return "That card cannot have that attachment";
       return "That host is illegal";
     }
   }
-  return paymentReason(state, state.activeSeat, printed, intent.payments, ctx);
+  return paymentReason(state, state.activeSeat, printed, playCost(state, intent.cardId, state.activeSeat, ctx), intent.payments, ctx);
 }
 
 export function attachmentTargets(state: ScenarioState, code: string | undefined, ctx: ReduceContext): readonly string[] {
   if (!code) return [];
   const printed = ctx.cards.get(code);
   if (!printed || printed.type !== "attachment") return [];
-  return attachmentHosts(state, state.activeSeat, ctx);
+  return attachmentHostIds(state, state.activeSeat, code, ctx);
 }
 
 function paymentReason(
   state: ScenarioState,
   seat: number,
   printed: PrintedCard,
+  cost: number | null,
   payments: readonly { heroId: string; amount: number }[],
   ctx: ReduceContext,
 ): string | null {
-  if (printed.cost == null) return "That card has no printed cost";
+  if (printed.cost == null || cost == null) return "That card has no printed cost";
   let sum = 0;
   const spent = new Map<string, number>();
   for (const payment of payments) {
@@ -88,18 +93,10 @@ function paymentReason(
   for (const [heroId, amount] of spent) {
     const hero = state.cards[heroId];
     if (!hero || hero.zone !== "heroes" || hero.controller !== seat) return "That hero cannot pay";
-    const heroPrinted = printedOf(ctx.cards, hero.code);
-    if (!spherePays(heroPrinted.sphere, printed.sphere)) return "Wrong sphere";
+    if (!heroPays(state, heroId, printed.sphere, ctx)) return "Wrong sphere";
     if (hero.resources < amount) return "That hero does not have those resources";
   }
-  if (sum > printed.cost) return "Overpay";
-  if (sum < printed.cost) return "Underpay";
+  if (sum > cost) return "Overpay";
+  if (sum < cost) return "Underpay";
   return null;
-}
-
-function attachmentHosts(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
-  return characters(state, seat, ctx.cards).filter((id) => {
-    const instance = state.cards[id];
-    return instance != null && playerCardEffectCanChoose(printedOf(ctx.cards, instance.code));
-  });
 }

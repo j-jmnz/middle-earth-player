@@ -30,6 +30,11 @@ export function dealtCodes(campaign: CampaignData, scenarios: readonly ScenarioD
   return codes;
 }
 
+// Every card of both starter decklists.
+export function starterCodes(campaign: CampaignData): Set<string> {
+  return new Set(campaign.starterDecks.flatMap((deck) => deck.rows.map((row) => row.code)));
+}
+
 // Every card a scenario deals must be a card in data/cards.
 export function loadScenarioDefinitions(dataDir: string, cardsByCode: ReadonlyMap<string, Card>, effects: readonly Effect[] = []): ScenarioDefinition[] {
   const campaign = loadCampaign(undefined, dataDir);

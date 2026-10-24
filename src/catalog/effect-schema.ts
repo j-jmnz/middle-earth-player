@@ -17,6 +17,8 @@ export const modifierStatSchema = z.enum([
   "hideThreat",
   "hideWillpower",
   "cannotAttack",
+  // Hit points: the printed health plus modifiers. A character with damage at or above it is destroyed.
+  "hitPoints",
 ]);
 
 export const phaseNameSchema = z.enum([
@@ -43,6 +45,8 @@ export const triggerSchema = z.enum([
   "hideSucceeded",
   "traveled",
   "leftPlay",
+  // A hero or ally was destroyed by damage (not discarded, not returned to hand).
+  "characterDestroyed",
 ]);
 
 const whoSchema = z.enum(["actor", "firstPlayer"]);
@@ -75,7 +79,20 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // A card with this code is attached to a hero (`is`) or is not.
   z.strictObject({ kind: z.literal("attachedToHero"), code: z.string().min(1), is: z.boolean() }),
+  // Read while a stat is read, not when a constant effect is synced. `defending`: the holder is the declared defender
+  // and the attacking enemy's engagement cost is higher than its controller's threat. `attacking`: the holder is
+  // attacking an enemy whose engagement cost is higher than the holder's controller's threat.
+  z.strictObject({ kind: z.literal("versusHighEngagement"), role: z.enum(["defending", "attacking"]) }),
+  // The source card is attached to a card with this name.
+  z.strictObject({ kind: z.literal("hostNamed"), name: z.string().min(1) }),
+  // The actor controls a hero or ally in play with this code.
+  z.strictObject({ kind: z.literal("controls"), code: z.string().min(1) }),
 ]);
+
+// The conditions a stat modifier carries and checks each time the stat is read.
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" }> {
+  return condition?.kind === "versusHighEngagement";
+}
 
 export const targetSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("self") }),
@@ -119,9 +136,11 @@ const modifyStatSchema = z.strictObject({
   // Whose stat changes. The default is the source card. `attacker` is the enemy in the attack in progress.
   // `host` is the card the source is attached to. `table` is every seat. `engagedSeat` is the seat the
   // source is engaged with. `eachSeat` is one holder per living seat.
-  target: z.enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat"]).optional(),
-  // Multiplies the amount by this count when the stat is read.
-  per: z.enum(["committed", "ally"]).optional(),
+  // `heroes`, `hobbitCharacters` and `enemies` are every such card in play, for a constant effect. A Hide number
+  // held by the table or a seat is read through `per`.
+  target: z.enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies"]).optional(),
+  // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has.
+  per: z.enum(["committed", "ally", "hobbitHero"]).optional(),
   ...when,
 });
 
@@ -213,6 +232,27 @@ const simpleVerbs = [
     exceptTrait: z.string().min(1).optional(),
     ...when,
   }),
+  // Constants on an attachment. Where it may be attached: `host` names the card, and `limitPerHost` allows one copy
+  // of the attachment on each (Limit 1 per hero). A card with no such record may go on any character.
+  z.strictObject({
+    verb: z.literal("AttachesTo"),
+    host: z.strictObject({
+      kind: z.enum(["hero", "character", "activeLocation", "ringBearer"]),
+      trait: z.string().min(1).optional(),
+      name: z.string().min(1).optional(),
+    }),
+    limitPerHost: z.boolean().optional(),
+    ...when,
+  }),
+  // Constant on a card in hand: it costs this much less to play while `when` holds.
+  z.strictObject({ verb: z.literal("ReduceCost"), amount: z.number().int().positive(), ...when }),
+  // Constants on an attachment: the attached card gains this trait, or this resource icon.
+  z.strictObject({ verb: z.literal("GrantTrait"), trait: z.string().min(1), ...when }),
+  z.strictObject({ verb: z.literal("GrantIcon"), sphere: z.enum(["leadership", "tactics", "spirit", "lore"]), ...when }),
+  // Engine use (Restricted): the source card's controller moves one of its restricted attachments to its owner's discard pile.
+  verb("DiscardRestricted"),
+  // Adds resources to the pool of the hero the source card is attached to.
+  z.strictObject({ verb: z.literal("AddResources"), amount: z.number().int().positive(), ...when }),
   // The source enemy leaves the player it is engaged with and engages the next player.
   verb("EngageNextPlayer"),
   // The host of the source card, its resource pool, and every card attached to it pass to a seat.

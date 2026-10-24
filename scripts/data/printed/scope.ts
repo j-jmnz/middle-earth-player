@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaign, loadScenarios } from "../load-scenarios.ts";
-import { RAW_DIR, ROOT } from "../paths.ts";
+import { RAW_DIR } from "../paths.ts";
 
 // The cards whose printed text the ledger holds in this phase: everything A Shadow of the Past deals, The One
 // Ring, the six campaign cards, and both starter lists. Phase 8d adds the cards of scenarios 2 to 6.
@@ -27,11 +27,9 @@ const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
 
 const CAMPAIGN_CARDS = ["141030", "141044", "141056", "142019", "142039", "142060"];
 
-// src/screens/starter-decks.ts imports the Drizzle schema, which Node cannot load without a bundler. The two
-// lists are literal rows there (`code: "01002" }`), so the codes are read from the text.
+// The codes of both starter lists, from the campaign file (data/starter-decks.json).
 export function starterCodes(): string[] {
-  const source = readFileSync(path.join(ROOT, "src", "screens", "starter-decks.ts"), "utf8");
-  return [...new Set([...source.matchAll(/code: "(\w+)" \}/g)].map((match) => match[1] ?? ""))].sort();
+  return [...new Set(loadCampaign().starterDecks.flatMap((deck) => deck.rows.map((row) => row.code)))].sort();
 }
 
 // Every card Hall of Beorn lists for one of the six scenarios (Normal or Easy), the quest cards, and the box's

@@ -1,5 +1,7 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import campaignJson from "../../data/campaigns/fellowship-of-the-ring.json";
+import { campaignDataSchema } from "../catalog/scenario-data";
 import { decks } from "./user-schema";
 
 export const STEALTH_ID = "stealth-and-steadfastness";
@@ -36,67 +38,16 @@ export type StarterDeck = {
   cards: { code: string; count: number }[];
 };
 
+const STARTER_DECKS = campaignDataSchema.parse(campaignJson).starterDecks;
+
 /**
- * Printed lists. Codes were resolved against assets/catalog.db.
+ * The printed lists, from data/campaigns/fellowship-of-the-ring.json (data/starter-decks.json, checked against the
+ * MEC109 span each deck names). Codes were resolved against assets/catalog.db.
  * Dwarven Tomb's booklet collector is 63. The only catalog row is 01053 at position 53.
  */
-export const starterPrints: readonly StarterPrint[] = [
-  { deckId: STEALTH_ID, name: "Sam Gamgee", collector: 3, typeCode: "hero", count: 1, code: "141002" },
-  { deckId: STEALTH_ID, name: "Merry", collector: 4, typeCode: "hero", count: 1, code: "141003" },
-  { deckId: STEALTH_ID, name: "Pippin", collector: 6, typeCode: "hero", count: 1, code: "141004" },
-  { deckId: STEALTH_ID, name: "Bill the Pony", collector: 8, typeCode: "ally", count: 3, code: "141006" },
-  { deckId: STEALTH_ID, name: "Boromir", collector: 11, typeCode: "ally", count: 2, code: "142004" },
-  { deckId: STEALTH_ID, name: "Faramir", collector: 14, typeCode: "ally", count: 2, code: "01014" },
-  { deckId: STEALTH_ID, name: "Veteran Axehand", collector: 28, typeCode: "ally", count: 2, code: "01028" },
-  { deckId: STEALTH_ID, name: "Beorn", collector: 31, typeCode: "ally", count: 2, code: "01031" },
-  { deckId: STEALTH_ID, name: "Erebor Hammersmith", collector: 59, typeCode: "ally", count: 3, code: "01059" },
-  { deckId: STEALTH_ID, name: "Henamarth Riversong", collector: 60, typeCode: "ally", count: 2, code: "01060" },
-  { deckId: STEALTH_ID, name: "Gléowine", collector: 62, typeCode: "ally", count: 2, code: "01062" },
-  { deckId: STEALTH_ID, name: "Gandalf", collector: 73, typeCode: "ally", count: 3, code: "01073" },
-  { deckId: STEALTH_ID, name: "Hobbit Cloak", collector: 10, typeCode: "attachment", count: 3, code: "141013" },
-  { deckId: STEALTH_ID, name: "Dagger of Westernesse", collector: 13, typeCode: "attachment", count: 3, code: "141014" },
-  { deckId: STEALTH_ID, name: "Elf-stone", collector: 20, typeCode: "attachment", count: 3, code: "141016" },
-  { deckId: STEALTH_ID, name: "Steward of Gondor", collector: 26, typeCode: "attachment", count: 1, code: "01026" },
-  { deckId: STEALTH_ID, name: "Celebrían's Stone", collector: 27, typeCode: "attachment", count: 1, code: "01027" },
-  { deckId: STEALTH_ID, name: "Horn of Gondor", collector: 42, typeCode: "attachment", count: 1, code: "01042" },
-  { deckId: STEALTH_ID, name: "Halfling Determination", collector: 14, typeCode: "event", count: 2, code: "141009" },
-  { deckId: STEALTH_ID, name: "Frodo's Intuition", collector: 26, typeCode: "event", count: 3, code: "141012" },
-  { deckId: STEALTH_ID, name: "Ever Vigilant", collector: 20, typeCode: "event", count: 2, code: "01020" },
-  { deckId: STEALTH_ID, name: "Common Cause", collector: 21, typeCode: "event", count: 2, code: "01021" },
-  { deckId: STEALTH_ID, name: "Sneak Attack", collector: 23, typeCode: "event", count: 3, code: "01023" },
-  { deckId: STEALTH_ID, name: "Feint", collector: 34, typeCode: "event", count: 3, code: "01034" },
-  { deckId: STEALTH_ID, name: "Quick Strike", collector: 35, typeCode: "event", count: 2, code: "01035" },
-  { deckId: WISDOM_ID, name: "Gandalf", collector: 7, typeCode: "hero", count: 1, code: "142002" },
-  { deckId: WISDOM_ID, name: "Théodred", collector: 2, typeCode: "hero", count: 1, code: "01002" },
-  { deckId: WISDOM_ID, name: "Éowyn", collector: 7, typeCode: "hero", count: 1, code: "01007" },
-  { deckId: WISDOM_ID, name: "Galadriel", collector: 9, typeCode: "ally", count: 3, code: "142003" },
-  { deckId: WISDOM_ID, name: "Bilbo Baggins", collector: 15, typeCode: "ally", count: 3, code: "142006" },
-  { deckId: WISDOM_ID, name: "Faramir", collector: 14, typeCode: "ally", count: 1, code: "01014" },
-  { deckId: WISDOM_ID, name: "Snowbourn Scout", collector: 16, typeCode: "ally", count: 3, code: "01016" },
-  { deckId: WISDOM_ID, name: "Wandering Took", collector: 43, typeCode: "ally", count: 3, code: "01043" },
-  { deckId: WISDOM_ID, name: "Northern Tracker", collector: 45, typeCode: "ally", count: 3, code: "01045" },
-  { deckId: WISDOM_ID, name: "Gandalf's Staff", collector: 22, typeCode: "attachment", count: 3, code: "142008" },
-  { deckId: WISDOM_ID, name: "Wizard Pipe", collector: 23, typeCode: "attachment", count: 3, code: "142009" },
-  { deckId: WISDOM_ID, name: "Fellowship of the Ring", collector: 25, typeCode: "attachment", count: 2, code: "142010" },
-  { deckId: WISDOM_ID, name: "Steward of Gondor", collector: 26, typeCode: "attachment", count: 2, code: "01026" },
-  { deckId: WISDOM_ID, name: "Celebrían's Stone", collector: 27, typeCode: "attachment", count: 1, code: "01027" },
-  { deckId: WISDOM_ID, name: "Unexpected Courage", collector: 57, typeCode: "attachment", count: 3, code: "01057" },
-  { deckId: WISDOM_ID, name: "Flame of Anor", collector: 24, typeCode: "event", count: 3, code: "142007" },
-  { deckId: WISDOM_ID, name: "Ever Vigilant", collector: 20, typeCode: "event", count: 1, code: "01020" },
-  { deckId: WISDOM_ID, name: "Common Cause", collector: 21, typeCode: "event", count: 1, code: "01021" },
-  { deckId: WISDOM_ID, name: "Valiant Sacrifice", collector: 24, typeCode: "event", count: 2, code: "01024" },
-  { deckId: WISDOM_ID, name: "Grim Resolve", collector: 25, typeCode: "event", count: 1, code: "01025" },
-  { deckId: WISDOM_ID, name: "The Galadhrim's Greeting", collector: 46, typeCode: "event", count: 1, code: "01046" },
-  { deckId: WISDOM_ID, name: "Hasty Stroke", collector: 48, typeCode: "event", count: 3, code: "01048" },
-  { deckId: WISDOM_ID, name: "A Test of Will", collector: 50, typeCode: "event", count: 3, code: "01050" },
-  { deckId: WISDOM_ID, name: "Stand and Fight", collector: 51, typeCode: "event", count: 3, code: "01051" },
-  { deckId: WISDOM_ID, name: "Dwarven Tomb", collector: 63, typeCode: "event", count: 2, code: "01053" },
-];
-
-const STARTER_NAMES: Record<string, string> = {
-  [STEALTH_ID]: "Stealth and Steadfastness",
-  [WISDOM_ID]: "Wisdom and Wizardry",
-};
+export const starterPrints: readonly StarterPrint[] = STARTER_DECKS.flatMap((deck) =>
+  deck.rows.map((row) => ({ deckId: deck.id, name: row.name, collector: row.collector, typeCode: row.type, count: row.count, code: row.code })),
+);
 
 function packHits(card: StarterCandidate, packs: ReadonlySet<string>): boolean {
   if (packs.has(card.packCode)) return true;
@@ -140,7 +91,7 @@ export function resolveStarterCode(
 
 export function starterDeck(id: string): StarterDeck {
   const rows = starterPrints.filter((row) => row.deckId === id);
-  const name = STARTER_NAMES[id];
+  const name = STARTER_DECKS.find((deck) => deck.id === id)?.name;
   if (!name) throw new Error(`Unknown starter ${id}`);
   return {
     id,

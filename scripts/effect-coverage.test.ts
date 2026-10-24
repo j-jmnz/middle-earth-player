@@ -7,7 +7,7 @@ import { generateEffects } from "./data/effects/generate.ts";
 import { lineTimings } from "./data/normalize/timings.ts";
 import { isKeywordLine } from "./data/normalize/keywords.ts";
 import { keyOf, lineId, loadLedger } from "./data/printed/ledger.ts";
-import { dealtCodes, loadCampaign, loadScenarios } from "./data/load-scenarios.ts";
+import { dealtCodes, loadCampaign, loadScenarios, starterCodes } from "./data/load-scenarios.ts";
 
 // Every printed line of a card the Fellowship scenarios deal is owned: by an effect record that names it in
 // `lines`, by a keyword the engine reads (a line that is only keywords), or by an `inert` entry in the printed-text
@@ -23,11 +23,21 @@ const byCode = new Map(cards.map((card) => [card.code, card]));
 // built (data/scenarios, with their campaign cards) and not yet playable: phases 12 to 16 write their records. The
 // campaign cards' Setup and Resolution lines are owned for all six, which is the 8d exit.
 const PLAYABLE = ["a-shadow-of-the-past"];
+// Phase 9: both starter decks are fully automated once their batches are in. A line still listed here is waiting for its batch.
+const STARTER_PENDING: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries({
+    2: "01014:A:1 01020:A:1 01021:A:1 01024:A:1 01025:A:1 01026:A:3 01034:A:1 01035:A:1 01043:A:1 01046:A:1 01062:A:1 141009:A:1 141012:A:1 142004:A:2 01073:A:2 01016:A:1 01045:A:1",
+    3: "01048:A:1 01050:A:1 01060:A:1 142003:A:2 142006:A:1",
+    4: "01023:A:1 01051:A:1 01053:A:1 141016:A:1 141016:A:2 01059:A:1 01057:A:2 01031:A:1 01073:A:1 142003:A:1",
+    5: "01002:A:1 01007:A:1 141002:A:1 141003:A:2 141004:A:2 142002:A:1 142008:A:2 142009:A:2 142007:A:1",
+  }).flatMap(([batch, ids]) => ids.split(" ").map((id) => [id, `phase 9 batch ${batch}`] as const)),
+);
 const PENDING_LINES: Readonly<Record<string, string>> = {
   "141056:A:2": "Flight to the Ford (phase 13): the cancel response needs the attacker-declared trigger.",
+  ...STARTER_PENDING,
 };
 const campaignCards = new Set(Object.values(campaign.campaignCards));
-const dealt = new Set([...dealtCodes(campaign, scenarios.filter((scenario) => PLAYABLE.includes(scenario.id))), ...campaignCards]);
+const dealt = new Set([...dealtCodes(campaign, scenarios.filter((scenario) => PLAYABLE.includes(scenario.id))), ...campaignCards, ...starterCodes(campaign)]);
 const unplayable = scenarios.filter((scenario) => !PLAYABLE.includes(scenario.id));
 
 describe("effect coverage", () => {

@@ -9,6 +9,7 @@ import { type Cause } from "../rules/cause.ts";
 import { playOut } from "../../scripts/auto-player.ts";
 import { causeProblems, NUMBER_STEPS, verified } from "../../scripts/cause-check.ts";
 import { campaign, loadWorld, reveal, scenario, send, table } from "../../scripts/past-scene.ts";
+import { playStarter, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 
 import { buildStart } from "./start.ts";
 
@@ -32,6 +33,21 @@ beforeAll(async () => {
     const kept = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx));
     steps.push(...kept.steps, ...playOut(kept.state, ctx, { scout: "scout", prefer: "141035", protect: RING_BEARER }).steps);
   }
+});
+
+describe("engine step causes in the starter-deck goldens", () => {
+  it("name a verified rule or a ledger line on every number-changing step of both starter decks", async () => {
+    const all: EngineStep[] = [];
+    for (const deck of campaign.starterDecks) {
+      const { ctx } = await starterWorld(deck.id);
+      for (const seed of STARTER_SEEDS) {
+        const game = playStarter(deck.id, seed, ctx);
+        all.push(...game.run.steps);
+      }
+    }
+    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
+    expect(causeProblems(all)).toEqual([]);
+  });
 });
 
 describe("engine step causes", () => {

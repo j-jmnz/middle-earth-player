@@ -12,8 +12,8 @@ import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
 import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, type Unmatched } from "./generate.ts";
 
-// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id>
-// Writes .agent/drafts/<code>.md for every card in the scenario that has a printed line no record covers yet.
+// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id>
+// Writes .agent/drafts/<code>.md for every card in the scenario, or in the starter deck, that has a printed line no record covers yet.
 // With --all it also drafts the lines that authored records already cover, to review or redo them.
 
 function vocabulary(): { verbs: string[]; conditions: string[]; targets: string[]; triggers: string[] } {
@@ -40,9 +40,10 @@ function similarity(left: string, right: string): number {
 
 function main(): void {
   const scenarioId = process.argv[2];
-  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id>");
-  const scenario = loadScenario(scenarioId);
+  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id>");
   const campaign = loadCampaign();
+  const deck = campaign.starterDecks.find((entry) => entry.id === scenarioId);
+  const scenario = deck ? null : loadScenario(scenarioId);
   const cards = loadCards();
   const ledger = loadLedger();
   const byCode = new Map(cards.map((card) => [card.code, card]));
@@ -54,8 +55,8 @@ function main(): void {
     for (const [guid, rules] of Object.entries(parsed.automation?.cards ?? {})) automation.set(guid, rules);
   }
 
-  const generated = generateEffects(cards, [scenario], campaign, ledger);
-  const dealt = new Set(scenario.cards.map((card) => card.code));
+  const generated = generateEffects(cards, scenario ? [scenario] : [], campaign, ledger);
+  const dealt = new Set(deck ? deck.rows.map((row) => row.code) : (scenario?.cards ?? []).map((card) => card.code));
   const all = process.argv.includes("--all");
   const open: Unmatched[] = generated.unmatched.filter((line) => dealt.has(line.card.code) && (all || !EFFECTS.some((effect) => effect.lines.includes(line.lineId))));
   const byCard = new Map<string, Unmatched[]>();

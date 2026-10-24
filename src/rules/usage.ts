@@ -4,8 +4,8 @@ import type { Effect } from "../catalog/boundary.ts";
 import type { EngineStep, Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard } from "./keywords.ts";
-import { validatePayments } from "./payments.ts";
-import { printedOf, spherePays, type Sphere } from "./printed.ts";
+import { heroPays, validatePayments } from "./payments.ts";
+import { printedOf, type Sphere } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { inPlay, updateCard } from "./state.ts";
 import { moveCard } from "./zones.ts";
@@ -33,7 +33,7 @@ function pool(state: ScenarioState, seat: number, sphere: Sphere | null, ctx: Re
   let total = 0;
   for (const id of state.seats[seat]?.heroes ?? []) {
     const hero = state.cards[id];
-    if (hero && spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) total += hero.resources;
+    if (hero && heroPays(state, id, sphere, ctx)) total += hero.resources;
   }
   return total;
 }

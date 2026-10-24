@@ -3,7 +3,8 @@ import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
-import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
+import { isCharacterType, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
+import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
@@ -21,24 +22,54 @@ function printedStat(printed: PrintedCard, stat: ModifierStat): number {
     case "questPoints":
     case "engagementCost":
       return printed[stat satisfies CardStat] ?? 0;
+    case "hitPoints":
+      return printed.health ?? 0;
     default:
       return 0;
   }
 }
 
+// `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
 export function modifiedStat(
   state: ScenarioState,
   instance: CardInstance,
   stat: ModifierStat,
   cards: ReadonlyMap<string, PrintedCard>,
+  against?: string,
 ): number {
   const printed = printedOf(cards, instance.code);
   let total = printedStat(printed, stat);
   for (const modifier of state.modifiers) {
     if (modifier.instanceId !== instance.id || modifier.stat !== stat) continue;
-    if (modifierActive(state, modifier)) total += modifier.amount;
+    if (!modifierActive(state, modifier)) continue;
+    if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
+    total += modifier.amount;
   }
   return total;
+}
+
+// The enemy in this attack costs more to engage than the threat of the holder's controller. "Your threat" in "defending
+// against an enemy with an engagement cost higher than your threat" is the threat of the player who controls the card.
+export function versusHighEngagement(
+  state: ScenarioState,
+  role: "defending" | "attacking",
+  holder: CardInstance,
+  cards: ReadonlyMap<string, PrintedCard>,
+  against?: string,
+): boolean {
+  if (holder.controller == null) return false;
+  const threat = state.seats[holder.controller]?.threat ?? 0;
+  let enemyId: string | undefined;
+  if (role === "defending") {
+    const attack = state.pendingAttack;
+    if (!attack || attack.defenderId !== holder.id || attack.undefended) return false;
+    enemyId = attack.enemyId;
+  } else {
+    enemyId = against;
+  }
+  const enemy = enemyId ? state.cards[enemyId] : undefined;
+  if (!enemy || printedOf(cards, enemy.code).engagementCost == null) return false;
+  return modifiedStat(state, enemy, "engagementCost", cards) > threat;
 }
 
 export function addModifier(
@@ -96,7 +127,11 @@ export function placeDamage(
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
   let next = updateCard(state, id, { damage });
   if (printed.type === "enemy" && printed.keywords.indestructible) return next;
-  if (printed.health != null && damage >= printed.health) next = destroyCard(next, id, cards, steps);
+  if (printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards)) {
+    next = destroyCard(next, id, cards, steps);
+    // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy).
+    if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
+  }
   return next;
 }
 

@@ -1,16 +1,36 @@
-import type { ModifierStat } from "../catalog/boundary.ts";
+import { isStatCondition, type ModifierStat } from "../catalog/boundary.ts";
 
+import { hasTrait } from "./conditions.ts";
 import { constantInstructions } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { isCharacterType, printedOf } from "./printed.ts";
 import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
-import { livingSeats, modifierActive } from "./state.ts";
+import { inPlay, livingSeats, modifierActive } from "./state.ts";
 
 // A constant effect is a rule that holds while its source is in play. The engine turns each ModifyStat
 // instruction of one into records on the modifier list, so modifiedStat stays the only reader. The
 // records are rebuilt from the effect list, so they follow the source and its conditions.
 
-function holders(state: ScenarioState, source: CardInstance, target: string | undefined): string[] {
+function cardsInPlay(state: ScenarioState): CardInstance[] {
+  return Object.values(state.cards).filter((instance) => inPlay(instance.zone));
+}
+
+// Hobbit heroes the source's controller has.
+function hobbitHeroes(state: ScenarioState, source: CardInstance, ctx: ReduceContext): number {
+  const seat = source.controller ?? state.firstPlayer;
+  return (state.seats[seat]?.heroes ?? []).filter((id) => hasTrait(state, id, "Hobbit", ctx)).length;
+}
+
+function holders(state: ScenarioState, source: CardInstance, target: string | undefined, ctx: ReduceContext): string[] {
   switch (target) {
+    case "heroes":
+      return cardsInPlay(state).filter((instance) => printedOf(ctx.cards, instance.code).type === "hero").map((instance) => instance.id);
+    case "hobbitCharacters":
+      return cardsInPlay(state)
+        .filter((instance) => (instance.zone === "heroes" || instance.zone === "play") && isCharacterType(printedOf(ctx.cards, instance.code)) && hasTrait(state, instance.id, "Hobbit", ctx))
+        .map((instance) => instance.id);
+    case "enemies":
+      return cardsInPlay(state).filter((instance) => printedOf(ctx.cards, instance.code).type === "enemy").map((instance) => instance.id);
     case "host":
       return source.host ? [source.host] : [];
     case "table":
@@ -28,15 +48,19 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
   const found: Modifier[] = [];
   for (const { source, effect, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb !== "ModifyStat") continue;
-    for (const holder of holders(state, source, instruction.target)) {
+    // "for each Hobbit hero you control" is counted here, each time the records are rebuilt.
+    const amount = instruction.per === "hobbitHero" ? instruction.amount * hobbitHeroes(state, source, ctx) : instruction.amount;
+    if (amount === 0) continue;
+    for (const holder of holders(state, source, instruction.target, ctx)) {
       found.push({
         instanceId: holder,
         sourceId: source.id,
         stat: instruction.stat,
-        amount: instruction.amount,
+        amount,
         until: "whileSourceInPlay",
         origin: effect.id,
-        ...(instruction.per ? { per: instruction.per } : {}),
+        ...(instruction.per && instruction.per !== "hobbitHero" ? { per: instruction.per } : {}),
+        ...(isStatCondition(instruction.when) ? { when: instruction.when } : {}),
       });
     }
   }

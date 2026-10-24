@@ -2,8 +2,7 @@
 import { holds } from "./conditions.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { validatePayments } from "./payments.ts";
-import { printedOf, spherePays } from "./printed.ts";
+import { heroPays, validatePayments } from "./payments.ts";
 import type { CancelOffer, EffectData, Frame, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 import { patchTop, topFrame } from "./windows.ts";
@@ -14,7 +13,7 @@ type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 function payers(state: ScenarioState, offer: CancelOffer, ctx: ReduceContext): string[] {
   return (state.seats[state.firstPlayer]?.heroes ?? []).filter((id) => {
     const hero = state.cards[id];
-    return hero != null && hero.resources > 0 && spherePays(printedOf(ctx.cards, hero.code).sphere, offer.sphere);
+    return hero != null && hero.resources > 0 && heroPays(state, id, offer.sphere, ctx);
   });
 }
 

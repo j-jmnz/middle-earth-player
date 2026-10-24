@@ -21,5 +21,371 @@
     {
       "code": "141085"
     }
+  ],
+  "starterDecks": [
+    {
+      "id": "stealth-and-steadfastness",
+      "name": "Stealth and Steadfastness",
+      "span": "mec109.starter-stealth",
+      "rows": [
+        {
+          "name": "Sam Gamgee",
+          "collector": 3,
+          "type": "hero",
+          "count": 1,
+          "code": "141002"
+        },
+        {
+          "name": "Merry",
+          "collector": 4,
+          "type": "hero",
+          "count": 1,
+          "code": "141003"
+        },
+        {
+          "name": "Pippin",
+          "collector": 6,
+          "type": "hero",
+          "count": 1,
+          "code": "141004"
+        },
+        {
+          "name": "Bill the Pony",
+          "collector": 8,
+          "type": "ally",
+          "count": 3,
+          "code": "141006"
+        },
+        {
+          "name": "Boromir",
+          "collector": 11,
+          "type": "ally",
+          "count": 2,
+          "code": "142004"
+        },
+        {
+          "name": "Faramir",
+          "collector": 14,
+          "type": "ally",
+          "count": 2,
+          "code": "01014"
+        },
+        {
+          "name": "Veteran Axehand",
+          "collector": 28,
+          "type": "ally",
+          "count": 2,
+          "code": "01028"
+        },
+        {
+          "name": "Beorn",
+          "collector": 31,
+          "type": "ally",
+          "count": 2,
+          "code": "01031"
+        },
+        {
+          "name": "Erebor Hammersmith",
+          "collector": 59,
+          "type": "ally",
+          "count": 3,
+          "code": "01059"
+        },
+        {
+          "name": "Henamarth Riversong",
+          "collector": 60,
+          "type": "ally",
+          "count": 2,
+          "code": "01060"
+        },
+        {
+          "name": "Gléowine",
+          "collector": 62,
+          "type": "ally",
+          "count": 2,
+          "code": "01062"
+        },
+        {
+          "name": "Gandalf",
+          "collector": 73,
+          "type": "ally",
+          "count": 3,
+          "code": "01073"
+        },
+        {
+          "name": "Hobbit Cloak",
+          "collector": 10,
+          "type": "attachment",
+          "count": 3,
+          "code": "141013"
+        },
+        {
+          "name": "Dagger of Westernesse",
+          "collector": 13,
+          "type": "attachment",
+          "count": 3,
+          "code": "141014"
+        },
+        {
+          "name": "Elf-stone",
+          "collector": 20,
+          "type": "attachment",
+          "count": 3,
+          "code": "141016"
+        },
+        {
+          "name": "Steward of Gondor",
+          "collector": 26,
+          "type": "attachment",
+          "count": 1,
+          "code": "01026"
+        },
+        {
+          "name": "Celebrían's Stone",
+          "collector": 27,
+          "type": "attachment",
+          "count": 1,
+          "code": "01027"
+        },
+        {
+          "name": "Horn of Gondor",
+          "collector": 42,
+          "type": "attachment",
+          "count": 1,
+          "code": "01042"
+        },
+        {
+          "name": "Halfling Determination",
+          "collector": 14,
+          "type": "event",
+          "count": 2,
+          "code": "141009"
+        },
+        {
+          "name": "Frodo's Intuition",
+          "collector": 26,
+          "type": "event",
+          "count": 3,
+          "code": "141012"
+        },
+        {
+          "name": "Ever Vigilant",
+          "collector": 20,
+          "type": "event",
+          "count": 2,
+          "code": "01020"
+        },
+        {
+          "name": "Common Cause",
+          "collector": 21,
+          "type": "event",
+          "count": 2,
+          "code": "01021"
+        },
+        {
+          "name": "Sneak Attack",
+          "collector": 23,
+          "type": "event",
+          "count": 3,
+          "code": "01023"
+        },
+        {
+          "name": "Feint",
+          "collector": 34,
+          "type": "event",
+          "count": 3,
+          "code": "01034"
+        },
+        {
+          "name": "Quick Strike",
+          "collector": 35,
+          "type": "event",
+          "count": 2,
+          "code": "01035"
+        }
+      ]
+    },
+    {
+      "id": "wisdom-and-wizardry",
+      "name": "Wisdom and Wizardry",
+      "span": "mec109.starter-wisdom",
+      "rows": [
+        {
+          "name": "Gandalf",
+          "collector": 7,
+          "type": "hero",
+          "count": 1,
+          "code": "142002"
+        },
+        {
+          "name": "Théodred",
+          "collector": 2,
+          "type": "hero",
+          "count": 1,
+          "code": "01002"
+        },
+        {
+          "name": "Éowyn",
+          "collector": 7,
+          "type": "hero",
+          "count": 1,
+          "code": "01007"
+        },
+        {
+          "name": "Galadriel",
+          "collector": 9,
+          "type": "ally",
+          "count": 3,
+          "code": "142003"
+        },
+        {
+          "name": "Bilbo Baggins",
+          "collector": 15,
+          "type": "ally",
+          "count": 3,
+          "code": "142006"
+        },
+        {
+          "name": "Faramir",
+          "collector": 14,
+          "type": "ally",
+          "count": 1,
+          "code": "01014"
+        },
+        {
+          "name": "Snowbourn Scout",
+          "collector": 16,
+          "type": "ally",
+          "count": 3,
+          "code": "01016"
+        },
+        {
+          "name": "Wandering Took",
+          "collector": 43,
+          "type": "ally",
+          "count": 3,
+          "code": "01043"
+        },
+        {
+          "name": "Northern Tracker",
+          "collector": 45,
+          "type": "ally",
+          "count": 3,
+          "code": "01045"
+        },
+        {
+          "name": "Gandalf's Staff",
+          "collector": 22,
+          "type": "attachment",
+          "count": 3,
+          "code": "142008"
+        },
+        {
+          "name": "Wizard Pipe",
+          "collector": 23,
+          "type": "attachment",
+          "count": 3,
+          "code": "142009"
+        },
+        {
+          "name": "Fellowship of the Ring",
+          "collector": 25,
+          "type": "attachment",
+          "count": 2,
+          "code": "142010"
+        },
+        {
+          "name": "Steward of Gondor",
+          "collector": 26,
+          "type": "attachment",
+          "count": 2,
+          "code": "01026"
+        },
+        {
+          "name": "Celebrían's Stone",
+          "collector": 27,
+          "type": "attachment",
+          "count": 1,
+          "code": "01027"
+        },
+        {
+          "name": "Unexpected Courage",
+          "collector": 57,
+          "type": "attachment",
+          "count": 3,
+          "code": "01057"
+        },
+        {
+          "name": "Flame of Anor",
+          "collector": 24,
+          "type": "event",
+          "count": 3,
+          "code": "142007"
+        },
+        {
+          "name": "Ever Vigilant",
+          "collector": 20,
+          "type": "event",
+          "count": 1,
+          "code": "01020"
+        },
+        {
+          "name": "Common Cause",
+          "collector": 21,
+          "type": "event",
+          "count": 1,
+          "code": "01021"
+        },
+        {
+          "name": "Valiant Sacrifice",
+          "collector": 24,
+          "type": "event",
+          "count": 2,
+          "code": "01024"
+        },
+        {
+          "name": "Grim Resolve",
+          "collector": 25,
+          "type": "event",
+          "count": 1,
+          "code": "01025"
+        },
+        {
+          "name": "The Galadhrim's Greeting",
+          "collector": 46,
+          "type": "event",
+          "count": 1,
+          "code": "01046"
+        },
+        {
+          "name": "Hasty Stroke",
+          "collector": 48,
+          "type": "event",
+          "count": 3,
+          "code": "01048"
+        },
+        {
+          "name": "A Test of Will",
+          "collector": 50,
+          "type": "event",
+          "count": 3,
+          "code": "01050"
+        },
+        {
+          "name": "Stand and Fight",
+          "collector": 51,
+          "type": "event",
+          "count": 3,
+          "code": "01051"
+        },
+        {
+          "name": "Dwarven Tomb",
+          "collector": 63,
+          "type": "event",
+          "count": 2,
+          "code": "01053"
+        }
+      ]
+    }
   ]
 }

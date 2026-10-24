@@ -9,6 +9,7 @@ const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   permanent: "permanent",
   sentinel: "sentinel",
   ranged: "ranged",
+  restricted: "restricted",
   "immune to player card effects": "immune",
 };
 

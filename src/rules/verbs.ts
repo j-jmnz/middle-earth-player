@@ -70,6 +70,15 @@ export function runExtraVerb(
       return { ...state, stageCleared: true };
     case "GainSurge":
       return markSurge(state, focus.sourceId);
+    case "AddResources": {
+      const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+      const hero = source?.host ? state.cards[source.host] : undefined;
+      if (!hero || hero.controller == null) return state;
+      for (let added = 0; added < instruction.amount; added += 1) {
+        steps.push({ kind: "gainResource", seat: hero.controller, heroId: hero.id, cause: currentCause(steps, UNATTRIBUTED) });
+      }
+      return updateCard(state, hero.id, { resources: hero.resources + instruction.amount });
+    }
     case "Delay":
       return scheduleDelayed(state, instruction, focus, ctx, currentCause(steps, UNATTRIBUTED));
     case "ConsiderUndefended":

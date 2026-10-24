@@ -8,6 +8,7 @@ import { loadRaw } from "./normalize/load-raw.ts";
 import { generateEffects, renderGenerated } from "./effects/generate.ts";
 import { applyPrinted } from "./normalize/printed.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
+import { loadStarterDecks } from "./starter-decks.ts";
 import { loadLedger, verifyScans } from "./printed/ledger.ts";
 import { extractAll, parseColumns } from "./rules/extract.ts";
 import { buildSteps } from "./rules/steps.ts";
@@ -50,7 +51,9 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   const steps = buildSteps(readFileSync(path.join(DATA_DIR, "raw", "dragncards", "steps.json"), "utf8"), entries);
   writeFileSync(path.join(outDir, "rules", "steps.json"), `[\n${steps.map((step) => `  ${JSON.stringify(step)}`).join(",\n")}\n]\n`);
   console.log(`rules: ${entries.length} entries, ${steps.length} framework steps`);
-  const built = buildScenarios(raw, cards, overrides, entries);
+  const buildResult = buildScenarios(raw, cards, overrides, entries);
+  // The starter decklists are a hand-checked input (data/starter-decks.json), pinned to the MEC109 span that prints them.
+  const built = { ...buildResult, campaign: { ...buildResult.campaign, starterDecks: loadStarterDecks(cards, entries) } };
   const scenarioDir = path.join(outDir, "scenarios");
   const campaignDir = path.join(outDir, "campaigns");
   mkdirSync(scenarioDir, { recursive: true });
@@ -63,6 +66,7 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   const generated = generateEffects(cards, built.scenarios, built.campaign, ledger);
   writeFileSync(path.join(effectsDir, "fellowship-of-the-ring.ts"), renderGenerated(generated.effects, built.campaign.id));
   console.log(`effects: ${generated.effects.length} generated, ${generated.unmatched.length} lines without a template`);
+  console.log(`templates: ${Object.entries(generated.usage).map(([id, lines]) => `${id} x${lines}`).join(", ")}`);
   console.log(`scenarios: ${built.scenarios.map((scenario) => scenario.id).join(", ") || "none"}`);
   if (built.problems.length > 0) {
     const perScenario = new Map<string, number>();

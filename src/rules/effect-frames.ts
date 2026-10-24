@@ -11,7 +11,7 @@ import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
-import { attachBlocked } from "./restrictions.ts";
+import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
 import { livingSeats, updateCard } from "./state.ts";
 import { holdsNow, seatFor, shuffleEncounterDeck } from "./verbs.ts";
@@ -143,6 +143,7 @@ function runItemNow(
     case "SearchMove":
     case "SearchReveal":
     case "ShuffleIntoDeck":
+    case "DiscardRestricted":
       return targeted(state, item, frame, ctx, steps);
     default:
       return runInstruction(state, instruction, { seat: item.seat, sourceId: frame.cardId }, ctx, steps);
@@ -209,6 +210,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       return searchable(state, instruction, ctx);
     case "ShuffleIntoDeck":
       return searchable(state, instruction, ctx, ["encounterDiscard"]);
+    case "DiscardRestricted":
+      return sourceId ? restrictedAttachments(state, sourceId, ctx) : [];
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -283,6 +286,10 @@ function applyTargeted(
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first) : state;
     case "ShuffleIntoDeck":
       return first ? shuffleEncounterDeck(moveCard(state, first, { zone: "encounterDeck" })) : state;
+    case "DiscardRestricted": {
+      const owner = first ? state.cards[first]?.controller : null;
+      return first && owner != null ? moveCard(state, first, { zone: "discard", seat: owner }) : state;
+    }
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":

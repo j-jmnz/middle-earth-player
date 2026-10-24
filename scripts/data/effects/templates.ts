@@ -42,6 +42,31 @@ function conditionOf(text: string, context: TemplateContext): Condition | null {
 
 const ATTACK = (amount: number, extra?: { when: Condition }): Instruction => ({ verb: "ModifyStat", stat: "attack", amount, until: "endOfAttack", target: "attacker", ...extra });
 
+const STATS: Readonly<Record<string, "willpower" | "attack" | "defense" | "threat">> = { Willpower: "willpower", Attack: "attack", Defense: "defense", Threat: "threat" };
+const SPHERES: Readonly<Record<string, "leadership" | "tactics" | "spirit" | "lore">> = { Leadership: "leadership", Tactics: "tactics", Spirit: "spirit", Lore: "lore" };
+const OWN = { kind: "sourceIn", zone: "play" } as const;
+const STAT = (stat: "willpower" | "attack" | "defense" | "threat", amount: number, target: "host" | "self" | "heroes", extra?: { when?: Condition; per?: "hobbitHero" }): Instruction => ({
+  verb: "ModifyStat",
+  stat,
+  amount,
+  until: "whileSourceInPlay",
+  target,
+  ...extra,
+});
+const HIGH_COST = "an? enemy with an engagement cost higher than your threat";
+
+// "a Hobbit hero", "an Istari character", "the Ring-bearer", "the active location", "Gandalf".
+function attachHost(text: string): Extract<Instruction, { verb: "AttachesTo" }>["host"] | null {
+  const bare = text.replace(/^(?:an?|the) /, "");
+  if (bare === "hero" || bare === "character") return { kind: bare };
+  if (bare === "Ring-bearer") return { kind: "ringBearer" };
+  if (bare === "active location") return { kind: "activeLocation" };
+  const typed = /^(\w+) (hero|character)$/.exec(bare);
+  if (typed?.[1] && typed[2]) return { kind: typed[2] as "hero" | "character", trait: typed[1] };
+  if (/^[A-Z][\w']*$/.test(bare) && text === bare) return { kind: "character", name: bare };
+  return null;
+}
+
 export const TEMPLATES: readonly Template[] = [
   {
     id: "quest-setup",
@@ -228,5 +253,108 @@ export const TEMPLATES: readonly Template[] = [
     id: "shadow-undefended-if-hide-failed",
     pattern: /^Shadow: If you have failed a Hide test this round, this attack is considered undefended\.$/,
     build: () => [{ timing: "shadow", instructions: [{ verb: "ConsiderUndefended", when: { kind: "hideFailed", scope: "round" } }] }],
+  },
+  // Player cards. An attachment names where it goes; Restricted is a keyword the engine reads from the card.
+  {
+    id: "attach-to",
+    pattern: /^Attach to (.+?)\.(?: Limit 1 per (?:hero|character)\.)?(?: Restricted\.)?$/,
+    build: (match) => {
+      const host = attachHost(match[1] ?? "");
+      if (!host) return null;
+      return [{ timing: "constant", instructions: [{ verb: "AttachesTo", host, ...(/Limit 1 per/.test(match[0]) ? { limitPerHost: true } : {}) }] }];
+    },
+  },
+  {
+    id: "attached-gets-stat",
+    pattern: /^Attached (?:hero|character) (?:gets|gains) \+(\d+) (Willpower|Attack|Defense|Threat)\.$/,
+    build: (match) => [{ timing: "constant", instructions: [STAT(STATS[match[2] ?? ""] ?? "attack", count(match[1]), "host")] }],
+  },
+  {
+    id: "attached-defense-vs-high-engagement",
+    pattern: /^Attached hero gets \+(\d+) Defense while defending against an attack made by an enemy with an engagement cost higher than your threat\.$/,
+    build: (match) => [
+      { timing: "constant", instructions: [STAT("defense", count(match[1]), "host", { when: { kind: "versusHighEngagement", role: "defending" } })] },
+    ],
+  },
+  {
+    id: "attached-attack-bonus-vs-high-engagement",
+    pattern: /^Attached hero gets \+(\d+) Attack \(\+(\d+) Attack instead if attacking an enemy with an engagement cost higher than your threat\)\.$/,
+    build: (match) => [
+      {
+        timing: "constant",
+        instructions: [STAT("attack", count(match[1]), "host"), STAT("attack", count(match[2]) - count(match[1]), "host", { when: { kind: "versusHighEngagement", role: "attacking" } })],
+      },
+    ],
+  },
+  {
+    id: "self-stat-per-hobbit-hero",
+    pattern: /^\{self\} gets \+(\d+) (Willpower|Attack|Defense) for each Hobbit hero you control\.$/,
+    build: (match) => [{ timing: "constant", condition: OWN, instructions: [STAT(STATS[match[2] ?? ""] ?? "attack", count(match[1]), "self", { per: "hobbitHero" })] }],
+  },
+  {
+    id: "enemies-engagement-per-hobbit-hero",
+    pattern: /^Each enemy in play gets \+(\d+) engagement cost for each Hobbit hero you control\.$/,
+    build: (match) => [
+      {
+        timing: "constant",
+        condition: OWN,
+        instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: count(match[1]), until: "whileSourceInPlay", target: "enemies", per: "hobbitHero" }],
+      },
+    ],
+  },
+  {
+    id: "self-defense-vs-high-engagement",
+    pattern: new RegExp(`^\\{self\\} gets \\+(\\d+) Defense while defending against ${HIGH_COST}\\.$`),
+    build: (match) => [
+      { timing: "constant", condition: OWN, instructions: [STAT("defense", count(match[1]), "self", { when: { kind: "versusHighEngagement", role: "defending" } })] },
+    ],
+  },
+  {
+    id: "each-hero-gets-stat",
+    pattern: /^Each hero gets \+(\d+) (Willpower|Attack|Defense)\.$/,
+    build: (match) => [{ timing: "constant", condition: OWN, instructions: [STAT(STATS[match[2] ?? ""] ?? "willpower", count(match[1]), "heroes")] }],
+  },
+  {
+    id: "hobbit-characters-hit-points",
+    pattern: /^Each Hobbit character gets \+(\d+) hit points?\.$/,
+    build: (match) => [
+      {
+        timing: "constant",
+        condition: OWN,
+        instructions: [{ verb: "ModifyStat", stat: "hitPoints", amount: count(match[1]), until: "whileSourceInPlay", target: "hobbitCharacters" }],
+      },
+    ],
+  },
+  {
+    id: "lower-cost-if-control-cannot-have-attachments",
+    pattern: /^Lower the cost to play \{self\} by (\d+) if you control (.+?)\. Cannot have attachments\.$/,
+    build: (match, context) => {
+      const code = context.codeOf(match[2] ?? "");
+      if (!code) return null;
+      return [{ timing: "constant", instructions: [{ verb: "ReduceCost", amount: count(match[1]), when: { kind: "controls", code } }, { verb: "Restrict", what: "attach" }] }];
+    },
+  },
+  {
+    id: "attached-gains-trait",
+    pattern: /^Attached hero gains the (\w+) trait\.$/,
+    build: (match) => [{ timing: "constant", instructions: [{ verb: "GrantTrait", trait: match[1] ?? "" }] }],
+  },
+  {
+    id: "attached-named-gains-icon",
+    pattern: /^If attached hero is (\w+), he also gains an? (Leadership|Tactics|Spirit|Lore) resource icon\.$/,
+    build: (match) => {
+      const sphere = SPHERES[match[2] ?? ""];
+      return sphere ? [{ timing: "constant", instructions: [{ verb: "GrantIcon", sphere, when: { kind: "hostNamed", name: match[1] ?? "" } }] }] : null;
+    },
+  },
+  {
+    id: "response-character-destroyed-add-resource-to-attached",
+    pattern: /^Response: After a character is destroyed, add (\d+|an?|one) resources? to attached hero's (?:resource )?pool\.$/,
+    build: (match) => [{ timing: "response", trigger: "characterDestroyed", instructions: [{ verb: "AddResources", amount: count(match[1]) }] }],
+  },
+  {
+    id: "forced-character-destroyed-discard-self",
+    pattern: /^Forced: After a character is destroyed, discard \{self\}\.$/,
+    build: () => [{ timing: "forced", trigger: "characterDestroyed", instructions: [{ verb: "Discard", target: { kind: "self" } }] }],
   },
 ];

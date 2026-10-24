@@ -53,6 +53,25 @@ export const scenarioDataSchema = z
 export type ScenarioData = z.infer<typeof scenarioDataSchema>;
 export type Placement = z.infer<typeof placementSchema>;
 
+// One printed row of a starter decklist: the card's name as the booklet prints it, its collector number, its type,
+// how many copies, and the catalog code chosen for it.
+export const starterRowSchema = z.strictObject({
+  name: z.string().min(1),
+  collector: z.number().int().positive(),
+  type: z.enum(["hero", "ally", "attachment", "event"]),
+  count: z.number().int().positive(),
+  code: z.string().min(1),
+});
+// `span` is the rule span of the MEC109 booklet that prints the list (data/rules/index.json).
+export const starterDeckSchema = z.strictObject({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  span: z.string().min(1),
+  rows: z.array(starterRowSchema).min(1),
+});
+export type StarterRow = z.infer<typeof starterRowSchema>;
+export type StarterDeckData = z.infer<typeof starterDeckSchema>;
+
 export const campaignDataSchema = z.strictObject({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -61,6 +80,8 @@ export const campaignDataSchema = z.strictObject({
   campaignCards: z.record(z.string(), z.string().min(1)),
   // Cards every scenario starts with, attached to the Ring-bearer. From the sources' player-1 play area.
   prelude: z.array(z.strictObject({ code: z.string().min(1) })),
+  // The two starter decks the booklet prints (data/starter-decks.json). The seed script reads them.
+  starterDecks: z.array(starterDeckSchema),
 });
 export type CampaignData = z.infer<typeof campaignDataSchema>;
 

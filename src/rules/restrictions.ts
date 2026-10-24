@@ -34,3 +34,13 @@ export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: 
 export function heroLimitExempt(state: ScenarioState, ctx: ReduceContext, heroId: string): boolean {
   return restricted(state, ctx, "heroLimit").some((rule) => state.cards[rule.sourceId]?.host === heroId);
 }
+
+// Attachments of the card that carry the Restricted keyword.
+export function restrictedAttachments(state: ScenarioState, hostId: string, ctx: ReduceContext): string[] {
+  const host = state.cards[hostId];
+  if (!host) return [];
+  return host.attachments.filter((id) => {
+    const attachment = state.cards[id];
+    return attachment != null && printedOf(ctx.cards, attachment.code).keywords.restricted;
+  });
+}

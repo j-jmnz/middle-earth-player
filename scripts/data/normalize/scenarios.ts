@@ -336,6 +336,6 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     );
   }
 
-  const campaign: CampaignData = { id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarios: scenarios.map((scenario) => scenario.id), campaignCards, prelude };
+  const campaign: CampaignData = { id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarios: scenarios.map((scenario) => scenario.id), campaignCards, prelude, starterDecks: [] };
   return { scenarios, campaign, problems };
 }

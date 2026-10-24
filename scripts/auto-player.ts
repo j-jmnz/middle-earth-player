@@ -1,4 +1,7 @@
+import { playCost } from "../src/rules/attach.ts";
 import { expectOk } from "../src/rules/fixture.ts";
+import { heroPays } from "../src/rules/payments.ts";
+import { printedOf } from "../src/rules/printed.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "../src/rules/intents.ts";
 import { legalIntents, legalTargets, reduce, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
 
@@ -12,7 +15,41 @@ export type PolicyOptions = {
   prefer: string;
   // A hero the policy never puts in the way of an attack (the Ring-bearer).
   protect: string;
+  // Plays the first card in hand it can pay for, in the planning pass window, before it passes. A card with no legal host is skipped.
+  play?: boolean;
 };
+
+// Resources the seat can pay for a card of this sphere, taken from its heroes in order, or null when it cannot pay.
+function payments(state: ScenarioState, ctx: ReduceContext, seat: number, cardId: string, cost: number): { heroId: string; amount: number }[] | null {
+  const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
+  const out: { heroId: string; amount: number }[] = [];
+  let left = cost;
+  for (const heroId of state.seats[seat]?.heroes ?? []) {
+    if (left === 0) break;
+    const hero = state.cards[heroId];
+    if (!hero || hero.resources === 0 || !heroPays(state, heroId, sphere, ctx)) continue;
+    const amount = Math.min(left, hero.resources);
+    out.push({ heroId, amount });
+    left -= amount;
+  }
+  return left === 0 ? out : null;
+}
+
+function playable(state: ScenarioState, ctx: ReduceContext): PlayerIntent | null {
+  const seat = state.activeSeat;
+  for (const intent of legalIntents(state, ctx)) {
+    if (intent.type !== "PlayCard") continue;
+    const cost = playCost(state, intent.cardId, seat, ctx);
+    if (cost == null) continue;
+    const paid = payments(state, ctx, seat, intent.cardId, cost);
+    if (!paid) continue;
+    const printed = printedOf(ctx.cards, state.cards[intent.cardId]?.code ?? "");
+    if (printed.type !== "attachment") return { type: "PlayCard", cardId: intent.cardId, payments: paid };
+    const host = legalTargets(state, { type: "PlayCard", cardId: intent.cardId }, ctx)[0];
+    if (host) return { type: "PlayCard", cardId: intent.cardId, payments: paid, hostId: host };
+  }
+  return null;
+}
 
 function has(intents: readonly LegalIntent[], type: LegalIntent["type"]): boolean {
   return intents.some((intent) => intent.type === type);
@@ -26,6 +63,10 @@ export function nextIntent(state: ScenarioState, ctx: ReduceContext, options: Po
     case "mulligan":
       return { type: "Keep" };
     case "pass": {
+      if (options.play && state.mode === "planning") {
+        const play = playable(state, ctx);
+        if (play) return play;
+      }
       const quested = Object.values(state.cards).some((card) => card.committed);
       if (state.mode === "questCommit" && !quested && has(intents, "Commit")) {
         const ids = legalTargets(state, { type: "Commit" }, ctx).filter((id) => !scoutIds.has(id));

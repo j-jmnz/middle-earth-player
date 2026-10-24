@@ -3,7 +3,7 @@ import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
-import { dealtCodes } from "../load-scenarios.ts";
+import { dealtCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
 import { TEMPLATES, type TemplateContext } from "./templates.ts";
 
@@ -59,7 +59,7 @@ export function segmentsOf(card: Card, ledger: Ledger): Segment[] {
 }
 
 export function generateEffects(cards: readonly Card[], scenarios: readonly ScenarioData[], campaign: CampaignData, ledger: Ledger): Generated {
-  const wanted = dealtCodes(campaign, scenarios);
+  const wanted = new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign)]);
   const scope = cards.filter((card) => wanted.has(card.code)).sort((a, b) => a.code.localeCompare(b.code));
   const setAside = new Set(scenarios.flatMap((scenario) => scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code)));
   const codeOf = (name: string): string | null => {

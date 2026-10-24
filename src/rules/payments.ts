@@ -1,8 +1,17 @@
 // Rules: rr.resource-match, rr.resources (data/rules/entries.json).
+import { grantedIcons } from "./conditions.ts";
 import type { Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf, spherePays, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
+
+// A hero pays a sphere with its own icon or one an attachment gives it (Celebrían's Stone gives Aragorn a Spirit icon).
+export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | null, ctx: ReduceContext): boolean {
+  const hero = state.cards[heroId];
+  if (!hero) return false;
+  if (spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) return true;
+  return grantedIcons(state, heroId, ctx).some((icon) => spherePays(icon, sphere));
+}
 
 // Checks an offered resource payment against a cost: whole numbers, heroes the seat controls, the sphere
 // that may pay, what each hero holds (one hero can appear twice, so its payments are summed), and the
@@ -23,7 +32,7 @@ export function validatePayments(
   for (const [heroId, amount] of spent) {
     const hero = state.cards[heroId];
     if (!hero || hero.zone !== "heroes" || hero.controller !== cost.seat) return "That hero cannot pay";
-    if (!spherePays(printedOf(ctx.cards, hero.code).sphere, cost.sphere)) return "Wrong sphere";
+    if (!heroPays(state, heroId, cost.sphere, ctx)) return "Wrong sphere";
     if (hero.resources < amount) return "That hero does not have those resources";
   }
   if (sum > cost.amount) return "Overpay";

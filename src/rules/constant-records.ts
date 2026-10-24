@@ -1,4 +1,4 @@
-import type { Effect, Instruction } from "../catalog/boundary.ts";
+import { isStatCondition, type Effect, type Instruction } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -8,7 +8,7 @@ import { inPlay } from "./state.ts";
 export type ConstantInstruction = { source: CardInstance; effect: Effect; instruction: Instruction };
 
 // Every instruction of a constant effect whose card is in play and whose effect and instruction
-// conditions hold, oldest card in play first. Restrictions and modifier records both read this.
+// conditions hold, oldest card in play first. A stat condition (read when the stat is read) is left on the instruction. Restrictions and modifier records both read this.
 export function* constantInstructions(state: ScenarioState, ctx: ReduceContext): Generator<ConstantInstruction> {
   const sources = Object.values(state.cards)
     .filter((instance) => inPlay(instance.zone))
@@ -19,7 +19,7 @@ export function* constantInstructions(state: ScenarioState, ctx: ReduceContext):
       const scope = { actor: source.controller ?? state.firstPlayer, sourceId: source.id, returned: 0 };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       for (const instruction of effect.instructions) {
-        if ("when" in instruction && instruction.when && !holds(state, instruction.when, scope, ctx)) continue;
+        if ("when" in instruction && instruction.when && !isStatCondition(instruction.when) && !holds(state, instruction.when, scope, ctx)) continue;
         yield { source, effect, instruction };
       }
     }

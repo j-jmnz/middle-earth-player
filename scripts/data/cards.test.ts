@@ -80,9 +80,9 @@ describe("MEC109 reading of the dealt cards", () => {
 
 describe("parseKeywordTokens", () => {
   it("reads numbered and flag keywords and reports the rest", () => {
-    expect(parseKeywordTokens(["Hide 2.", "Surge.", "Immune to player card effects.", "Restricted."])).toEqual({
-      keywords: { hide: 2, surge: true, immune: true },
-      unknown: ["Restricted"],
+    expect(parseKeywordTokens(["Hide 2.", "Surge.", "Immune to player card effects.", "Restricted.", "Battle."])).toEqual({
+      keywords: { hide: 2, surge: true, immune: true, restricted: true },
+      unknown: ["Battle"],
     });
   });
 

@@ -1,6 +1,6 @@
 import type { Instruction, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
 
-import type { DelayedEffect, Frame, HideFailure, Modifier, PendingAttack, UsedEffect } from "./frame-types.ts";
+import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAttack, UsedEffect } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 
 export type {
@@ -204,6 +204,8 @@ export type ScenarioState = {
   engagement: { ordinal: number; engagedThisPass: boolean } | null;
   resolvedAttacks: readonly string[];
   pendingAttack: PendingAttack | null;
+  // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
+  pendingEvents?: readonly GameEvent[];
   undo: UndoLog;
 };
 

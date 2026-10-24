@@ -1,13 +1,15 @@
 import type { Condition } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
-import { printedOf } from "./printed.ts";
+import { versusHighEngagement } from "./keywords.ts";
+import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay } from "./state.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
-export type Scope = { actor: number; sourceId: string | null; returned: number; phase?: string };
+// `holderId` is the card a stat is read for, and `against` the enemy it attacks.
+export type Scope = { actor: number; sourceId: string | null; returned: number; phase?: string; holderId?: string; against?: string };
 
 export function holds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean {
   switch (condition.kind) {
@@ -50,6 +52,19 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return searchable(state, condition, ctx).length > 0;
     case "inPlay":
       return Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone)) === condition.is;
+    case "versusHighEngagement": {
+      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+      return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);
+    }
+    case "hostNamed": {
+      const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
+      const host = source?.host ? state.cards[source.host] : undefined;
+      return host != null && printedOf(ctx.cards, host.code).name === condition.name;
+    }
+    case "controls":
+      return Object.values(state.cards).some(
+        (card) => card.code === condition.code && card.controller === scope.actor && (card.zone === "heroes" || card.zone === "play"),
+      );
     case "attachedToHero":
       return (
         Object.values(state.cards).some((card) => {
@@ -68,7 +83,38 @@ function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLo
 
 export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
-  return instance != null && printedOf(ctx.cards, instance.code).traits.includes(trait);
+  return instance != null && (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait));
+}
+
+// What the constant records of a card's attachments give it: the Gondor trait from Steward of Gondor, a resource icon
+// from Celebrían's Stone. Read where the trait or the icon is asked about.
+function grants(state: ScenarioState, id: string, ctx: ReduceContext): { trait?: string; sphere?: Sphere }[] {
+  const instance = state.cards[id];
+  if (!instance || instance.attachments.length === 0) return [];
+  const found: { trait?: string; sphere?: Sphere }[] = [];
+  for (const attachmentId of instance.attachments) {
+    const attachment = state.cards[attachmentId];
+    if (!attachment) continue;
+    for (const effect of ctx.effects) {
+      if (effect.cardCode !== attachment.code || effect.timing !== "constant") continue;
+      const scope = { actor: attachment.controller ?? state.firstPlayer, sourceId: attachment.id, returned: 0 };
+      if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
+      for (const instruction of effect.instructions) {
+        if (instruction.verb !== "GrantTrait" && instruction.verb !== "GrantIcon") continue;
+        if (instruction.when && !holds(state, instruction.when, scope, ctx)) continue;
+        found.push(instruction.verb === "GrantTrait" ? { trait: instruction.trait } : { sphere: instruction.sphere });
+      }
+    }
+  }
+  return found;
+}
+
+export function grantedTraits(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
+  return grants(state, id, ctx).flatMap((grant) => (grant.trait ? [grant.trait] : []));
+}
+
+export function grantedIcons(state: ScenarioState, id: string, ctx: ReduceContext): Sphere[] {
+  return grants(state, id, ctx).flatMap((grant) => (grant.sphere ? [grant.sphere] : []));
 }
 
 // Cards in the encounter deck, then the discard pile, that match a code or trait.

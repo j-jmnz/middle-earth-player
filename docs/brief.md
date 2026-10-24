@@ -273,10 +273,11 @@ These live in `src/rules`, not in a card file. Each names its rule ids in its mo
 | Victory | `rr.victory`, `ltp.victory-x`, `ltp.victory-display` |
 | Sentinel, ranged | `rr.sentinel`, `rr.ranged` |
 | Hide X | `mec109.hide-x`, `mec109.hide-tests` |
-| Restricted | `rr.restricted` (phase 9) |
+| Restricted | `rr.restricted` |
 
 Decisions this file owns:
 
+- Restricted: a character cannot have more than 2 attachments that carry the keyword. When a third is attached, the character's controller chooses one of them and it moves at once to its owner's discard pile (`rr.restricted`). The keyword is read from the card; the "Attach to ..." sentence is a constant `AttachesTo` record.
 - Archery X: the engine totals X across every archery card at the start of combat and the player distributes that total across legal characters; the first seat decides disputes; defense does not block it.
 - Indestructible and toughness X are defined here for enemies only. Extend them to another card type only when a card prints the keyword there, and cite that card.
 - A Permanent boon or burden is attached to one hero when earned and recorded on the log; it cannot be discarded while that hero is in play, and it leaves the game with the hero.
@@ -346,7 +347,7 @@ If a seat is eliminated while stages are separate, that stage and the encounter 
 
 ### Seeded decks
 
-On first launch, insert two saved decks that match the printed starter lists. They are ordinary `user.db` decks. The parenthetical numbers below are collector numbers inside a product, not RingsDB codes, and the same number is used in the core set and in this box. Resolve each row by card name against the core set plus MEC109. Prefer the Revised Core code when the booklet's core-set card has a revised printing. Write the chosen code next to the row in the seed script.
+On first launch, insert two saved decks that match the printed starter lists. They are ordinary `user.db` decks. The parenthetical numbers below are collector numbers inside a product, not RingsDB codes, and the same number is used in the core set and in this box. Resolve each row by card name against the core set plus MEC109. Prefer the Revised Core code when the booklet's core-set card has a revised printing. The lists are data: `data/starter-decks.json` holds each row with the code chosen for it and the MEC109 span (`mec109.starter-stealth`, `mec109.starter-wisdom`) that prints the list, `pnpm data:build` copies them into `data/campaigns/fellowship-of-the-ring.json` as `starterDecks`, and the seed script reads that file. A test checks each row's name, collector number and count, and each section total, against the span.
 
 These decks can be built from this expansion and the core set. Counts were checked against the booklet extract: each list is 3 heroes and 50 other cards.
 
