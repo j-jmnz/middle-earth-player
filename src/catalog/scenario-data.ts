@@ -78,6 +78,9 @@ export const campaignDataSchema = z.strictObject({
   scenarios: z.array(z.string().min(1)),
   // The campaign card of each scenario, by scenario id. Its Setup and Resolution lines are effect records.
   campaignCards: z.record(z.string(), z.string().min(1)),
+  // The page of the MEC109 booklet where a scenario's setup is printed, by scenario id. Only scenarios whose page is
+  // recorded in data/rules/index.json have one; the reader opens on it, otherwise on the saved last page.
+  bookletPages: z.record(z.string(), z.number().int().positive()).optional(),
   // Cards every scenario starts with, attached to the Ring-bearer. From the sources' player-1 play area.
   prelude: z.array(z.strictObject({ code: z.string().min(1) })),
   // The two starter decks the booklet prints (data/starter-decks.json). The seed script reads them.

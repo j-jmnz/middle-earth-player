@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { campaignOf, scenarioNames, scenarioOf } from "./campaign-data";
+import entries from "../../data/rules/entries.json";
+import { bookletPageOf, bookletParams, campaignOf, scenarioNames, scenarioOf } from "./campaign-data";
 import { dealSeed } from "./e2e";
 
 describe("campaign data on the phone", () => {
@@ -18,6 +19,25 @@ describe("campaign data on the phone", () => {
     for (const id of campaign.scenarios) expect(scenarioOf(id)?.id).toBe(id);
     expect(scenarioNames(campaign)["a-knife-in-the-dark"]).toBe("A Knife in the Dark");
     expect(campaignOf("another-campaign")).toBeNull();
+  });
+});
+
+describe("booklet pages", () => {
+  it("records the page of each scenario's setup span in the MEC109 booklet, and nothing else", () => {
+    const campaign = campaignOf("fellowship-of-the-ring");
+    if (!campaign) throw new Error("The Fellowship campaign is not registered");
+    for (const id of campaign.scenarios) {
+      const span = entries.find((entry) => entry.id === `mec109.setup-${id}`);
+      expect(span, id).toBeDefined();
+      expect(bookletPageOf("fellowship-of-the-ring", id), id).toBe(span?.page);
+      expect(bookletParams("fellowship-of-the-ring", id)).toEqual({ id: "fellowship-of-the-ring", page: String(span?.page) });
+    }
+    expect(Object.keys(campaign.bookletPages ?? {}).sort()).toEqual([...campaign.scenarios].sort());
+  });
+
+  it("passes no page when the scenario has none", () => {
+    expect(bookletPageOf("fellowship-of-the-ring", "not-a-scenario")).toBeNull();
+    expect(bookletParams("fellowship-of-the-ring", null)).toEqual({ id: "fellowship-of-the-ring" });
   });
 });
 

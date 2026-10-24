@@ -23,7 +23,8 @@ export function bookletPath(id: string): string {
 
 /**
  * The page to open on. A scenario's recorded page index wins when it exists, and otherwise the saved last page. The page
- * is clamped into the book. The registry records no page numbers yet, so a scenario passes none.
+ * is clamped into the book. The registry (data/campaigns, bookletPages) records a page for a scenario whose setup span is
+ * in data/rules/index.json; a scenario without one passes none.
  */
 export function startPage(scenarioPage: number | null | undefined, lastPage: number, pageCount: number): number {
   const wanted = scenarioPage != null && scenarioPage >= 1 ? scenarioPage : lastPage;

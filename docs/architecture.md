@@ -188,7 +188,7 @@ type ScenarioDefinition = {
 };
 ```
 
-`bookletPage` is an optional index on the scenario. It is not prose. Leave it unset until a page number is taken from the booklet. Do not copy headings or narrative into this type. The second active-location slot is the shared scenario slot the widget flag opens. It is not a field on the seat.
+`bookletPages` is an optional map in the campaign file (`data/campaigns`), scenario id to the MEC109 page its setup is printed on. It is an index, not prose. `pnpm data:build` fills it from the page of the scenario's `mec109.setup-<id>` span in `data/rules/index.json`, which was read from the booklet PDF; a scenario with no such span has no entry. Do not copy headings or narrative into this type. The second active-location slot is the shared scenario slot the widget flag opens. It is not a field on the seat.
 
 `data/scenarios/<id>.json` is generated: stages, booklet sets, and for every card its pile (encounter, quest, staging, active location, set aside, attached) with Normal and Easy counts. `data:build` fails to write a scenario unless Hall of Beorn's per-scenario counts and the quest card's Setup text agree with the DragnCards load list; a mismatch is resolved with a row in `data/overrides.json`. `scenarioDefinition(data, campaign)` derives the `ScenarioDefinition`, including `setup` from the piles in the quest card's order (set aside, staging, active location, attach). Which widget a scenario turns on is in the brief.
 
@@ -200,7 +200,7 @@ Two files, two handles, both reachable from screens.
 
 | File | Contents | Replacement |
 | --- | --- | --- |
-| `catalog.db` | `packs`, `cards`, `campaigns`, `meta` | New asset when `CATALOG_VERSION` differs from the applied one. Not migrated in place. |
+| `catalog.db` | `packs`, `cards`, `campaigns` (id, name, scenario count, playable; from `data/campaigns/index.json`), `meta` | New asset when `CATALOG_VERSION` differs from the applied one. Not migrated in place. |
 | `user.db` | `decks`, `saves`, `image_files`, `booklets`, `meta` | SQL migrations in `drizzle/`, run on open. Never replaced by a catalog update. |
 
 `catalog.db` is a Metro asset. `CATALOG_VERSION` is a hash of the catalog rows, so any change moves it. `forceOverwrite` is true when the bundled version differs from `user.db` `meta.appliedCatalogVersion`. First launch has no applied version, so the copy runs. `cards.deck_legal` is set at build time. `cards.campaign_id` is set only for rows a campaign owns. Errata text is what the app stores and shows when RingsDB sets `has_errata`.
@@ -243,7 +243,7 @@ Expo Router. The app opens on the campaign list.
 
 The debug route reads the open databases and the image queue and is not a player screen.
 
-The campaign list, the path, the briefing, the log, and the table each open the booklet route and close back to that same screen. The reader is an in-app native view, full screen, with the close control in thumb reach. It is not a Skia surface and not a WebView. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 58 release when the campaign shell starts. That phase adds `expo-dev-client` and verifies one Expo PDF module against SDK 58. If that module does not build, a local view is allowed: PDFKit on iOS, `PdfRenderer` on Android. Phase 10 found no SDK 58 release (its README stops at SDK 56), so the reader is the local `modules/booklet-pdf`. It renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. A missing file does not block a scenario. Opening from a scenario starts on `bookletPage` when that index is set, and otherwise on the saved last page.
+The campaign list, the path, the briefing, the log, and the table each open the booklet route and close back to that same screen. The reader is an in-app native view, full screen, with the close control in thumb reach. It is not a Skia surface and not a WebView. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 58 release when the campaign shell starts. That phase adds `expo-dev-client` and verifies one Expo PDF module against SDK 58. If that module does not build, a local view is allowed: PDFKit on iOS, `PdfRenderer` on Android. Phase 10 found no SDK 58 release (its README stops at SDK 56), so the reader is the local `modules/booklet-pdf`. It renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. A missing file does not block a scenario. Opening from a scenario starts on its `bookletPages` entry when one exists, and otherwise on the saved last page.
 
 NativeWind 4.2.7 styles the chrome. Tokens and screen specs live in [design-system.md](design-system.md). The table does not use NativeWind for cards. Tap targets are at least 44 points. The phase rail, the choice buttons, and the booklet close control sit in thumb reach. Reduced motion snaps the same transitions. A new gesture cancels the animation in progress.
 

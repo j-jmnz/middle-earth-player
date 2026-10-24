@@ -26,6 +26,18 @@ export function scenarioOf(id: string): ScenarioData | null {
   return SCENARIOS[id] ?? null;
 }
 
+/** The booklet page where a scenario's setup is printed, when the campaign registry records one. */
+export function bookletPageOf(campaignId: string, scenarioId: string | null | undefined): number | null {
+  const page = scenarioId ? campaignOf(campaignId)?.bookletPages?.[scenarioId] : undefined;
+  return page ?? null;
+}
+
+/** The router params that open the campaign booklet, on the scenario's page when one is recorded. */
+export function bookletParams(campaignId: string, scenarioId?: string | null): { id: string; page?: string } {
+  const page = bookletPageOf(campaignId, scenarioId);
+  return page == null ? { id: campaignId } : { id: campaignId, page: String(page) };
+}
+
 /** Scenario names by id, for the path and the log. */
 export function scenarioNames(campaign: CampaignData): Record<string, string> {
   return Object.fromEntries(campaign.scenarios.map((id) => [id, SCENARIOS[id]?.name ?? id]));

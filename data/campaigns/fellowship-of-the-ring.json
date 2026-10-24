@@ -387,5 +387,13 @@
         }
       ]
     }
-  ]
+  ],
+  "bookletPages": {
+    "a-shadow-of-the-past": 4,
+    "a-knife-in-the-dark": 5,
+    "flight-to-the-ford": 5,
+    "the-ring-goes-south": 6,
+    "journey-in-the-dark": 7,
+    "breaking-of-the-fellowship": 8
+  }
 }

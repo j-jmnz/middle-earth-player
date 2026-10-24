@@ -25,6 +25,13 @@ export function renderCardFile(cards: readonly Card[]): string {
   return `[\n${cards.map((card) => `  ${JSON.stringify(card)}`).join(",\n")}\n]\n`;
 }
 
+// The MEC109 page each scenario's setup span sits on (mec109.setup-<scenario id> in data/rules/index.json, checked against
+// the booklet's text). A scenario with no such span has no page.
+export function bookletPages(entries: readonly { id: string; page: number }[], scenarios: readonly string[]): Record<string, number> {
+  const pages = new Map(entries.map((entry) => [entry.id, entry.page]));
+  return Object.fromEntries(scenarios.flatMap((id) => (pages.has(`mec109.setup-${id}`) ? [[id, pages.get(`mec109.setup-${id}`) ?? 0]] : [])));
+}
+
 export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   const overrides = parseOverrides(JSON.parse(readFileSync(path.join(DATA_DIR, "overrides.json"), "utf8")));
   const raw = loadRaw();
@@ -54,7 +61,10 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   console.log(`rules: ${entries.length} entries, ${steps.length} framework steps`);
   const buildResult = buildScenarios(raw, cards, overrides, entries);
   // The starter decklists are a hand-checked input (data/starter-decks.json), pinned to the MEC109 span that prints them.
-  const built = { ...buildResult, campaign: { ...buildResult.campaign, starterDecks: loadStarterDecks(cards, entries) } };
+  const built = {
+    ...buildResult,
+    campaign: { ...buildResult.campaign, bookletPages: bookletPages(entries, buildResult.campaign.scenarios), starterDecks: loadStarterDecks(cards, entries) },
+  };
   const scenarioDir = path.join(outDir, "scenarios");
   const campaignDir = path.join(outDir, "campaigns");
   mkdirSync(scenarioDir, { recursive: true });
