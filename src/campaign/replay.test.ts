@@ -1,0 +1,52 @@
+import { describe, expect, it } from "vitest";
+
+import { EFFECTS } from "../effects/index.ts";
+import { expectOk } from "../rules/fixture.ts";
+import { definePrinted } from "../rules/printed.ts";
+import { reduce } from "../rules/reduce.ts";
+import { startScenario } from "../rules/setup.ts";
+import { ENGINE_VERSION } from "../rules/version.ts";
+import { playOut } from "../../scripts/auto-player.ts";
+import { campaign, loadWorld, scenario } from "../../scripts/past-scene.ts";
+
+import { buildStart } from "./start.ts";
+import { beginActive, recordIntent, replay } from "./replay.ts";
+
+const RING_BEARER = "141001";
+const HASH = 7;
+
+async function game(seed: number) {
+  const world = await loadWorld();
+  const cards = new Map(world.cards);
+  for (const code of ["scout", "q1", "q2"]) {
+    cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: code === "scout" ? 12 : 8, attack: 1, defense: 2, health: 100 }));
+  }
+  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
+  const ctx = { effects: EFFECTS, cards };
+  const loadout = { heroes: [RING_BEARER, "scout", "q1", "q2"], deck: Array.from({ length: 30 }, () => "filler") };
+  const start = buildStart({ campaign, scenario, seatCount: 1, seed, threatModifier: 0, seats: [loadout], effects: EFFECTS });
+  return { start, ctx };
+}
+
+describe("saves.activeScenario replay", () => {
+  it.each([1, 2, 9])("replays the golden game of seed %i to the same final state", async (seed) => {
+    const { start, ctx } = await game(seed);
+    const kept = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx)).state;
+    const played = playOut(kept, ctx, { scout: "scout", prefer: "141035", protect: RING_BEARER });
+    let active = beginActive(start, HASH);
+    for (const intent of [{ type: "Keep" } as const, ...played.intents]) active = recordIntent(active, intent);
+    const replayed = replay(JSON.parse(JSON.stringify(active)), start, HASH, ctx);
+    expect(replayed.ok).toBe(true);
+    if (replayed.ok) expect(replayed.state).toEqual(played.state);
+  });
+
+  it("drops a save from another engine version, another data hash, another seed, or a refused intent", async () => {
+    const { start, ctx } = await game(1);
+    const active = recordIntent(beginActive(start, HASH), { type: "Keep" });
+    expect(replay(active, start, HASH, ctx).ok).toBe(true);
+    expect(replay({ ...active, engineVersion: ENGINE_VERSION + 1 }, start, HASH, ctx)).toEqual({ ok: false, reason: "engineVersion" });
+    expect(replay(active, start, HASH + 1, ctx)).toEqual({ ok: false, reason: "dataHash" });
+    expect(replay({ ...active, seed: 2 }, start, HASH, ctx)).toEqual({ ok: false, reason: "seed" });
+    expect(replay(recordIntent(active, { type: "Keep" }), start, HASH, ctx)).toEqual({ ok: false, reason: "intent" });
+  });
+});

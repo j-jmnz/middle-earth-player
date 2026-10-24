@@ -139,19 +139,36 @@ type Save = {
   campaignId: string;            // "fellowship-of-the-ring"
   seatCount: 1 | 2;              // chosen once, at the start of the save
   log: CampaignLog;
-  pool: PoolCard[];              // earned, not attached
-  activeScenario: ScenarioState | null;
+  activeScenario: ActiveScenario | null;
+};
+
+// The open scenario is not stored as a table. Loading rebuilds the start from the log and the decks, then replays
+// the intents through the reducer (src/campaign/replay.ts).
+type ActiveScenario = {
+  engineVersion: number;         // ENGINE_VERSION in src/rules/version.ts
+  dataHash: number;              // the catalog version the intents were played against
+  seed: number;
+  intents: PlayerIntent[];       // every intent sent, Keep included, in order
 };
 
 type CampaignLog = {
   heroesBySeat: string[][];      // RingsDB codes, length seatCount
   fallenHeroesBySeat: string[][];
-  threatModifier: number;
-  boons: { code: string; attachedTo: string | null; permanent: boolean }[];
-  burdens: { code: string; attachedTo: string | null }[];
+  threatPenalty: number;         // permanent, one number for every player
+  campaignPool: PoolCard[];      // earned boons and burdens, attached or not
+  captives: { seat: number; hero: string }[];
   completed: string[];           // scenario ids
-  score: number;
+  scenarios: Record<string, { rounds: number; victoryPoints: number; score: number }>;
+  score: number;                 // the sum of the scenario scores, computed, never typed
   notes: string;
+};
+
+type PoolCard = {
+  code: string;
+  back: "player" | "encounter";  // which deck it joins (Campaign Setup Checklist steps 7 and 8)
+  burdenSet: string | null;      // a burden belongs to a burden set; later cards remove burdens by set
+  attachedTo: string | null;     // a hero code, for a Permanent card or one a Resolution attaches
+  seat: number | null;
 };
 ```
 
@@ -299,7 +316,9 @@ This is a transaction, not a notes field. On a win the player chooses one of:
 
 Each chosen card is added to the campaign pool and recorded on the log.
 
-The choice is printed on the back of the campaign card 141030. Until phase 8d, `data/campaigns/fellowship-of-the-ring.json` authors each reward group by card code in its `authored.resolution` block; phase 8d replaces that block with resolution records owned by the card's lines, and the other five campaign cards need more than one pick per group (per-seat choices, attaching to a hero, conditions on the final state, captives). `data:build` fails when a code is not one of the scenario's cards. The scenario definition holds the codes. After a win the reducer opens one resolution window per group, in order, and `ChooseResolution` carries a code from that group. A scenario that is lost writes nothing. A scenario already on the log is not granted again. A chosen Permanent card is recorded as attached, not as a pool card.
+The choice is printed on the back of the campaign card 141030. Each campaign card's Setup and Resolution lines are effect records owned by the card's ledger lines, with timings `campaignSetup` and `resolution`. A Resolution record is a list of `ChooseCards` groups plus `Earn`, `EarnAllBurdens`, `MarkFallen` and `NameCaptives`. One choice is asked per group, per player in seat order when the card says so; a chosen card goes to the pool, into a hand or onto a hero, and an `inPlay` or `attachedToHero` condition reads the final state. `ChooseResolution` carries an option id (a code, or `code>heroInstanceId`, or `skip`), never a typed number. A scenario that is lost writes nothing. A scenario already on the log is not granted again. A chosen Permanent card is recorded as attached, not as a pool card.
+
+The score of a won scenario is computed from the final state when the log is written (`src/campaign/score.ts`). The round the game ended in counts as a completed round: the game ends inside it and the log has no other round to put it under.
 
 Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury Ferry: after it leaves play explored, the players win.
 
@@ -471,7 +490,7 @@ Open `catalog.db` and `user.db` as two handles, both reachable from screens. Do 
 
 `catalog.db` is a Metro asset. `forceOverwrite` defaults to false. Pass true only when the bundled `CATALOG_VERSION` is greater than the version stored in `user.db`. `scripts/build-catalog.ts` writes that constant when it writes the database. On first launch the applied version is absent, so the copy runs.
 
-`user.db` tables: `decks`, `saves`, `image_files`, `booklets`, `meta` (applied catalog version). Drizzle migrations for these are committed and run on open. `saves.activeScenario` carries a schema version. When the engine version differs, drop the in-progress scenario and keep the log, the decks, and the image index. Do not migrate a half-played game during this box.
+`user.db` tables: `decks`, `saves`, `image_files`, `booklets`, `meta` (applied catalog version). Drizzle migrations for these are committed and run on open. `saves.activeScenario` is `{ engineVersion, dataHash, seed, intents }`, replayed through the reducer on load. When the engine version or the data hash differs, or the reducer refuses an intent, drop the in-progress scenario and keep the log, the decks, and the image index. Do not migrate a half-played game during this box.
 
 `booklets` is one row per book: id, path, original filename, byte size, sha256, page count, and last page. One file per book lives in the document directory under `booklets/`. Those bytes stay eligible for backup. A catalog update does not delete the row or the file. The picker cache is not the store. Copy the picked file into `booklets/` before recording the row. The ids for this box are `fellowship-of-the-ring` (MEC109) and `learn-to-play` (the core-set book). A later campaign adds its own id. Gitignore the PDFs.
 

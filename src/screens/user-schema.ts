@@ -27,7 +27,8 @@ export const saves = sqliteTable("saves", {
   seatCount: integer("seat_count").notNull(),
   log: text("log", { mode: "json" }).$type<StoredJson>().notNull(),
   pool: text("pool", { mode: "json" }).$type<StoredJson>().notNull(),
-  activeScenario: text("active_scenario"),
+  // { engineVersion, dataHash, seed, intents }, replayed through the reducer on load (src/campaign/replay.ts).
+  activeScenario: text("active_scenario", { mode: "json" }).$type<StoredJson | null>(),
 });
 
 export const imageFiles = sqliteTable("image_files", {
