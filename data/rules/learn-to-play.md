@@ -1,7 +1,7 @@
 # learn-to-play
 
 sha256: 2621b03e7fa71bca21b096b3c94be29b14be8de54af413a73f884ec662e21090
-columns: bd6c8512ac9543979054e3153fd13139b37443c3b842347d49ea4df7f5b20f49
+columns: 7eb59e79fd7a3caeb2f41d89be5b8bf9c2c3aabb0244bd2bebef4a313ce5218e
 
 ## p1
 
@@ -98,7 +98,7 @@ Components
 
 1
 
-‰ Hor
+[unique] Hor
 
 n of g
 
@@ -114,7 +114,7 @@ snEAk ATTA
 3
 
 3
-‰ dEnETHor
+[unique] dEnETHor
 
 your
 Item.
@@ -272,7 +272,7 @@ nT
 
 188 Player Cards
 
-‰ ArAgorn
+[unique] ArAgorn
 Sentinel.
 
 Dúnedain. Noble. Ranger.
@@ -625,7 +625,7 @@ play area.
 2
 
 5
-‰ ArAgorn
+[unique] ArAgorn
 
 Sentinel.
 
@@ -733,7 +733,7 @@ Exhausted
 
 1
 
-‰ Éowyn
+[unique] Éowyn
 
 Noble. Rohan.
 
@@ -749,7 +749,7 @@ HEro
 Illus. Gabrielle Portal
 
 Action: Discard 1 card from your hand to give
-Éowyn +1 Ò until the end of the phase. This effect
+Éowyn +1 [willpower] until the end of the phase. This effect
 may be triggered by each player once each round.
 
 Slender and tall she was in her white robe girt with silver;
@@ -760,11 +760,11 @@ HEro
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-‰ Éowyn
+[unique] Éowyn
 Noble. Rohan.
 
 Action: Discard 1 card from your hand to give
-Éowyn +1 Ò until the end of the phase. This effect
+Éowyn +1 [willpower] until the end of the phase. This effect
 may be triggered by each player once each round.
 
 Slender and tall she was in her white robe girt with silver;
@@ -1304,8 +1304,8 @@ deal it 1 additional shadow card.
 When Revealed: The first player chooses 1
 character currently committed to a quest. Deal 2
 damage to that character.
-Shadow: Attacking enemy gets +1 Û.
-(+3 Û instead if this attack is undefended.)
+Shadow: Attacking enemy gets +1 [attack].
+(+3 [attack] instead if this attack is undefended.)
 eneMY
 
 eneMY
@@ -1332,7 +1332,7 @@ Illus. David Lecossu
 1
 
 3
-‰ gimli
+[unique] gimli
 Dwarf. Noble. Warrior.
 
 Noble. Noldor. Warrior.
@@ -1355,7 +1355,7 @@ one of the mighty of the firstborn.”
 HEro
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-‰ glorfindEl
+[unique] glorfindEl
 
 Gondor. Noble. Steward.
 
@@ -1368,9 +1368,9 @@ HEro
 1
 
 5
-‰ dEnETHor
+[unique] dEnETHor
 
-Gimli gets +1 Û for each damage token on
+Gimli gets +1 [attack] for each damage token on
 him.
 
 3
@@ -1614,10 +1614,10 @@ Token Bank
 
 4
 
-‰ ArAgorn
+[unique] ArAgorn
 Sentinel.
 
-‰ lEgolAs
+[unique] lEgolAs
 
 Dúnedain. Noble. Ranger.
 Ranged.
@@ -1708,7 +1708,7 @@ horsemen, many horsemen, and the glint of morning on the
 tips of their spears was like the twinkle of minute stars
 beyond the edge of mortal sight. –The Two Towers
 
-Attached hero gets +1 Û when attacking an Orc.
+Attached hero gets +1 [attack] when attacking an Orc.
 Response: After attached hero attacks and destroys
 an enemy, place 1 progress token on the current
 quest.
@@ -1825,11 +1825,11 @@ When a player plays an attachment card, attach it
 to another card that is already in play by placing it in
 a position so that the in-play card slightly overlaps
 the attachment.
-‰ sTEwArd of gondor
+[unique] sTEwArd of gondor
 
 2
 
-‰ sTEwArd of gondor
+[unique] sTEwArd of gondor
 
 2
 
@@ -1854,7 +1854,7 @@ Attached hero gains the Gondor trait.
 Action: Exhaust Steward of Gondor to add 2
 resources to attached hero’s resource pool.
 
-Action: Exhaust Steward ‰
+Action: Exhaust Steward [unique]
 of Gondor
 to add 2
 ArAgorn
@@ -1902,7 +1902,7 @@ Illus. John Stanko
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-‰ sTEwArd
+[unique] sTEwArd
 of g
 ondor
 The “Steward
@@ -1919,7 +1919,7 @@ Gondor. Title.
 
 Attach to a hero.
 
-‰ sTEwArd of gondor
+[unique] sTEwArd of gondor
 
 Gondor. Title.
 
@@ -2033,12 +2033,12 @@ Example: Pay
 
 3
 
-‰g
+[unique]g
 
-‰ glóin
+[unique] glóin
 lóin
 
-‰
+[unique]
 
 Dwarf. Noble.
 
@@ -2050,7 +2050,7 @@ Response: After Glóin suffers damage, add 1
 resource to his resource pool for each point of
 
 Action: Discard 1 ca
-Éowyn +1 Ò until th
+Éowyn +1 [willpower] until th
 may be triggered by
 
 he just suffered.
@@ -2182,9 +2182,9 @@ ying for Cards
 
 3
 
-‰ Éowyn
+[unique] Éowyn
 
-‰ ElEAnor
+[unique] ElEAnor
 
 oble. Rohan.
 
@@ -2246,9 +2246,9 @@ Illus. Magali Villeneuve
 
 3
 
-‰ glóin
+[unique] glóin
 
-‰ Éowyn
+[unique] Éowyn
 Noble. Rohan.
 
 His beard, very long and forked, was white, nearly as white
@@ -2257,10 +2257,10 @@ as the snow-white cloth of his garments.
 
 ©2010 Middle Earth Enterprises ©2010 FFG
 
-‰ ElEAnor
+[unique] ElEAnor
 
 Action: Discard 1 card from your hand to give
-Éowyn +1 Ò until the end of the phase. This effect
+Éowyn +1 [willpower] until the end of the phase. This effect
 may be triggered by each player once each round.
 Slender and tall she was in her white robe girt with silver;
 but strong she seemed and stern as steel, a daughter
@@ -2557,7 +2557,7 @@ willpower
 of “2.”
 
 5
-‰ ArAgorn
+[unique] ArAgorn
 Sentinel.
 
 5
@@ -2576,7 +2576,7 @@ Illus. John Stanko
 
 ©2010 Middle-earth Enterprises ©2010 FFG
 
-‰ ArAgorn
+[unique] ArAgorn
 Sentinel.
 
 1
@@ -2850,7 +2850,7 @@ game, which is described on page 20.
 Example: Reso
 Toms Character
 
-‰ ArAgorn
+[unique] ArAgorn
 
 HEro
 7
@@ -2898,7 +2898,7 @@ Goblin. Orc.
 Gladden Fields, wher
 flowering reeds.” –Ga
 
-Shadow: Attacking enemy gets +1 Û. (If this
+Shadow: Attacking enemy gets +1 [attack]. (If this
 attack is undefended, also raise your threat
 by 3.)
 
@@ -2941,7 +2941,7 @@ HEro
 
 5
 
-‰ ArAgorn
+[unique] ArAgorn
 
 Dúnedain. Noble. Ranger.
 
@@ -2964,7 +2964,7 @@ HEro
 7
 
 Action: Discard 1 card from your hand to give
-Éowyn +1 Ò until the end of the phase. This effect
+Éowyn +1 [willpower] until the end of the phase. This effect
 may be triggered by each player once each round.
 
 ©2010 Middle-earth Enterprises ©2010 FFG
@@ -2993,11 +2993,11 @@ the Ring
 
 3
 
-‰ Éowyn
+[unique] Éowyn
 
 Noble. Rohan.
 
-‰ Éowyn
+[unique] Éowyn
 
 3
 
@@ -3021,7 +3021,7 @@ Illus. John Stanko
 2
 
 Action: Discard 1 card from your hand to give
-Éowyn +1 Ò until the end of the phase. This effect
+Éowyn +1 [willpower] until the end of the phase. This effect
 may be triggered by each player once each round.
 
 9
@@ -3054,8 +3054,8 @@ Citadel to commit them to the quest. A Gladden Fi
 2. The players each reveal one card from the encount
 to the staging area.
 
-3. The players add the total committed Ò and compa
-7 Ò and 7 $. Tom uses Éowyn’s card ability to in
+3. The players add the total committed [willpower] and compa
+7 [willpower] and 7 [threat]. Tom uses Éowyn’s card ability to in
 place one progress token on the current quest card.
 
 Phase 4: Travel
@@ -3192,8 +3192,8 @@ ields location card is already in the staging area.
 
 ter deck, and add any revealed enemies and locations
 
-are it to the total $ in the staging area. The result is
-ncrease the players’ Ò to eight, which allows them to
+are it to the total [threat] in the staging area. The result is
+ncrease the players’ [willpower] to eight, which allows them to
 .
 
 When players travel to a location in the staging area, that location becomes
@@ -3621,7 +3621,7 @@ ungoliant'S Spawn
 Creature. Spider.
 
 When Revealed: Each character currently committed
-to a quest gets –1 Ò until the end of the phase.
+to a quest gets –1 [willpower] until the end of the phase.
 Shadow: Raise defending player’s threat by 4. (Raise
 defending player’s threat by 8 instead if this attack is
 undefended.)
@@ -3669,7 +3669,7 @@ ForeSt Spider
 2
 
 When Revealed: Each character currently committed
-to a quest gets –1 Ò until the end of the phase.
+to a quest gets –1 [willpower] until the end of the phase.
 
 4/12
 
@@ -3679,7 +3679,7 @@ ungoliant'S Spawn
 2
 
 Forced: After Forest Spider engages a player, it
-gets +1 Û until the end of the round.
+gets +1 [attack] until the end of the round.
 
 76
 
@@ -3694,7 +3694,7 @@ Illus. Andrew Olson
 Creature. Spider.
 
 Forced: After Forest Spider engages a player, it
-gets +1 Û until the end of the round.
+gets +1 [attack] until the end of the round.
 
 Shadow: Defending player must choose and
 discard 1 attachment they control.
@@ -3930,7 +3930,7 @@ King Spider
 Creature. Spider.
 
 When Revealed: Each player must choose and
-‰ ArAgorn
+[unique] ArAgorn
 exhaust 1Dúnedain.
 character
 they control.
@@ -3948,7 +3948,7 @@ I can save you, I will.” –The Fellowship of
 exhaust
 1 character they control. (2 characters
 the Ring
-‰
+[unique]
 rAgorn
 HEro
 instead
@@ -4105,7 +4105,7 @@ ungoliant'S Spawn
 Creature. Spider.
 
 When Revealed: Each character currently committed
-to a quest gets –1 Ò until the end of the phase.
+to a quest gets –1 [willpower] until the end of the phase.
 Shadow: Raise defending player’s threat by 4. (Raise
 defending player’s threat by 8 instead if this attack is
 undefended.)
@@ -4130,7 +4130,7 @@ Illus. Andrew Olson
 FF
 
 When Revealed: Each character currently committed
-to a quest gets –1 Ò until the end of the phase.
+to a quest gets –1 [willpower] until the end of the phase.
 Shadow: Raise defending player’s threat by 4. (Raise
 defending player’s threat by 8 instead if this attack is
 undefended.)
@@ -4203,7 +4203,7 @@ dle
 e
 y
 -ear
-ou Û
+ou [attack]
 MY
 th
 En
@@ -4265,8 +4265,8 @@ shadow card.
 declaring it as a defender against this attack.
 
 3. To resolve the attack, Rosie flips the attacker’s sha
-Patrol, which gives the attacking enemy +1 Û. Ro
-against the Silverlode Archer’s defense (0 Ú), and
+Patrol, which gives the attacking enemy +1 [attack]. Ro
+against the Silverlode Archer’s defense (0 [defense]), and
 Since the Silverlode Archer only has one hit point,
 
 4. Rosie resolves the attack made by the Forest Spide
@@ -4295,7 +4295,7 @@ ForeSt Spider
 Creature. Spider.
 
 Forced: After Forest Spider engages a player, it
-gets +1 Û until the end of the round.
+gets +1 [attack] until the end of the round.
 
 Shadow: Defending player must choose and
 discard 1 attachment they control.
@@ -4368,7 +4368,7 @@ G
 2
 
 Forced: After Forest Spider engages a player, it
-gets +1 Û until the end of the round.
+gets +1 [attack] until the end of the round.
 
 FF
 
@@ -4454,7 +4454,7 @@ t
 2
 
 5
-‰ ArAgorn
+[unique] ArAgorn
 Sentinel.
 
 Dúnedain. Noble. Ranger.
@@ -4479,14 +4479,14 @@ ck is dealt face down to each engaged enemy, as a
 liant’s Spawn first. She exhausts the Silverlode Archer,
 
 adow card faceup. The shadow card is the East Bight
-osie compares the enemy's total attack strength (6 Û)
+osie compares the enemy's total attack strength (6 [attack])
 places six damage tokens on the defending character.
 , it is destroyed and discarded from play.
 
 er. She declares this attack “undefended.”
 
 ’s shadow card faceup. The shadow card is the
-he Forest Spider's attack is 2 Û. Since this attack
+he Forest Spider's attack is 2 [attack]. Since this attack
 on a single hero she controls. She places two damage
 hree hit points remaining.
 
@@ -4561,13 +4561,13 @@ spears were like a springing wood. –The Two Towers
 
 Illus. Winona Nelson
 
-‰ glorfindEl
+[unique] glorfindEl
 
 Noble. Noldor. Warrior.
 
 5
 
-‰ glorfindEl
+[unique] glorfindEl
 
 Noble. Noldor. Warrior.
 
@@ -4621,8 +4621,8 @@ Dol Guldur. Orc.
 When Revealed: The first player chooses 1
 character currently committed to a quest. Deal 2
 damage to that character.
-Shadow: Attacking enemy gets +1 Û.
-(+3 Û instead if this attack is undefended.)
+Shadow: Attacking enemy gets +1 [attack].
+(+3 [attack] instead if this attack is undefended.)
 eneMY
 Illus. Anna Christenson
 
@@ -4634,14 +4634,14 @@ Tom is engaged with two enemies, the Dol Guldur Be
 
 1. Tom declares an attack against the Dol Guldur Or
 
-2. Tom takes Glorfindel’s attack (3 Û) and subtract
+2. Tom takes Glorfindel’s attack (3 [attack]) and subtract
 difference is three, Tom places three damage toke
 This enemy started with three hit points, so it is d
 
 3. Tom declares an attack against the Dol Guldur Be
-Gondorian Spearman (1 Û) as attackers.
+Gondorian Spearman (1 [attack]) as attackers.
 
-4. Tom takes his combined attack (4 Û) and subtrac
+4. Tom takes his combined attack (4 [attack]) and subtrac
 Since the difference is three, Tom places three dam
 Beastmaster. This enemy started with five hit poin
 remaining. The damage tokens stay on the enemy
@@ -4660,11 +4660,11 @@ cking Enemies
 
 3
 
-‰ lEgolAs
+[unique] lEgolAs
 
 Noble. Silvan. Warrior.
 
-‰ lEgolAs
+[unique] lEgolAs
 
 4
 
@@ -4750,13 +4750,13 @@ eastmaster and the Dol Guldur Orcs.
 
 rcs, and exhausts Glorfindel as an attacker.
 
-ts the Dol Guldur Orcs’ defense (0 Ú). Since the
+ts the Dol Guldur Orcs’ defense (0 [defense]). Since the
 ens from the token bank on the Dol Guldur Orcs.
 destroyed and discarded from play.
 
-eastmaster and exhausts both Legolas (3 Û) and the
+eastmaster and exhausts both Legolas (3 [attack]) and the
 
-cts the Dol Guldur Beastmaster’s defense (1 Ú).
+cts the Dol Guldur Beastmaster’s defense (1 [defense]).
 mage tokens from the token bank on the Dol Guldur
 nts, so it survives the attack with two hit points
 y to indicate how many remaining hit points it has.
@@ -4898,12 +4898,12 @@ Shadow: Defending player must choose and
 exhaust 1 character they control. (2 characters
 instead
 5 if this attack is undefended.)
-‰ ArAgorn
+[unique] ArAgorn
 
 eneMY
 
 Noble. Ranger.
-‰Dúnedain.
+[unique]Dúnedain.
 ArAgorn
 
 Illus.
@@ -4975,7 +4975,7 @@ The text on cards contains many types of card abilities.
 2
 
 5
-‰ ArAgorn
+[unique] ArAgorn
 
 Card
 Ability
@@ -5022,10 +5022,10 @@ Ability
 1
 1
 
-‰
+[unique]
 3 Éowyn
 
-‰É
+[unique]É
 Noble. Rohan.
 Noble. Rohan.
 owyn
@@ -5037,11 +5037,11 @@ Action: Discard 1Action:
 cardDiscard
 from
 to give
-Éowyn +1 Ò until the end of the phase. This effect
+Éowyn +1 [willpower] until the end of the phase. This effect
 be triggered
 player
 once each round.
-Éowyn +1 Ò untilmaythe
+Éowyn +1 [willpower] untilmaythe
 end byofeachthe
 phase.
 This effect
@@ -5112,7 +5112,7 @@ ability, spending one resource
 from that hero’s resource pool to
 2
 ready that card.
-‰ ArAgorn
+[unique] ArAgorn
 To trigger a response
 5
 
@@ -5126,7 +5126,7 @@ be in play.
 Response
 AbilityDúnedain. Noble. Ranger.
 Sentinel.
-‰ ArAgorn
+[unique] ArAgorn
 
 Sentinel.
 
@@ -5233,10 +5233,10 @@ the attack.
 3
 2
 
-‰5ArAgorn
+[unique]5ArAgorn
 
 KeywordDúnedain. Noble. Ranger.
-‰ ArAgorn
+[unique] ArAgorn
 
 Sentinel.
 
@@ -5415,7 +5415,7 @@ Traits appear in a bold, italicized typeface at the top of
 
 5
 
-‰
+[unique]
 ArAgorn
 Traits
 Sentinel.
@@ -5430,7 +5430,7 @@ Response: After Aragorn commits to a quest,
 spend 1 resource from his resource pool to
 ready him.
 
-‰ ArAgorn
+[unique] ArAgorn
 Sentinel.
 
 Dúnedain. Noble. Ranger.
@@ -5497,7 +5497,7 @@ Unique Cards
 Some cards represent specific, formally named
 characters, locations, and items from the Middle-earth
 setting. Such cards are known as unique cards and
-are identified by a ‰ icon that precedes the card’s
+are identified by a [unique] icon that precedes the card’s
 title. A player cannot play a card that shares a title
 with a unique card that is already in play. A player can,
 however, play a card that shares a title with a unique
@@ -5847,7 +5847,7 @@ CHieFtain uFtHaK
 
 Dol Guldur. Orc.
 
-Chieftain Ufthak gets +2 Û for each resource
+Chieftain Ufthak gets +2 [attack] for each resource
 token on him.
 
 Standard Mode
@@ -6339,7 +6339,7 @@ boons and burdens with the Permanent keyword that
 had been attached to that hero are removed from the
 Campaign Pool.
 
-‰Mendor
+[unique]Mendor
 
 SCarred
 
@@ -6544,7 +6544,7 @@ CHieFtain uFtHaK
 
 Dol Guldur. Orc.
 
-Chieftain Ufthak gets +2 Û for each resource
+Chieftain Ufthak gets +2 [attack] for each resource
 token on him.
 Forced: After Chieftain Ufthak attacks, place 1
 resource token on him.
@@ -6965,19 +6965,19 @@ Character & Enemy
 Statistics
 Willpower
 
-Ò
+[willpower]
 
 Attack Strength
 
-Û
+[attack]
 
 Defense Strength
 
-Ú
+[defense]
 
 Threat Strength
 
-$
+[threat]
 
 Spheres of Influence
 Leadership

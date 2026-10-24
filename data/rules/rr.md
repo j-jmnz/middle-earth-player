@@ -1,7 +1,7 @@
 # rr
 
 sha256: ef604fe7a639dfcb59e1b63538c77cb39bfbbda512ba0e9d2756ade92ef084ee
-columns: bd6c8512ac9543979054e3153fd13139b37443c3b842347d49ea4df7f5b20f49
+columns: 7eb59e79fd7a3caeb2f41d89be5b8bf9c2c3aabb0244bd2bebef4a313ce5218e
 
 ## p1
 
@@ -228,7 +228,7 @@ Attack Strength
 Each character and enemy has an attack strength. This
 value is the amount of damage that character or enemy
 deals when it attacks.
-◊ Attack strength is denoted by the Û symbol.
+◊ Attack strength is denoted by the [attack] symbol.
 
 See also: Combat Phase
 
@@ -464,7 +464,7 @@ value is the amount of damage a character reduces an
 attack by when it defends, or the amount of damage
 an enemy reduces an attack by when that enemy
 is attacked.
-◊ Defense strength is denoted by the Ú symbol.
+◊ Defense strength is denoted by the [defense] symbol.
 
 See also: Combat Phase
 
@@ -1747,7 +1747,7 @@ Type, Types
 See: Card Types
 
 Unique Cards
-The ‰ symbol before a card’s title indicates the card
+The [unique] symbol before a card’s title indicates the card
 is “unique.” The players as a group may have only one
 copy of each unique card, by title, in play.
 ◊ A player cannot play or put into play a unique card
@@ -1785,7 +1785,7 @@ Willpower Strength
 Each character has a willpower strength. This value
 indicates the contribution the character makes toward
 successfully questing while it is committed to a quest.
-◊ Willpower strength is denoted by the Ò symbol.
+◊ Willpower strength is denoted by the [willpower] symbol.
 
 See also: Quest Phase
 
@@ -2084,26 +2084,26 @@ phase, the encounter discard pile is shuffled and reset
 back into the encounter deck.
 
 3.4 Quest resolution
-Compare the combined willpower strength (Ò) of
+Compare the combined willpower strength ([willpower]) of
 all committed characters against the combined threat
-strength ($) of all cards in the staging area.
+strength ([threat]) of all cards in the staging area.
 
 ### p23 c2
 
-If the Ò is higher, the players have successfully
+If the [willpower] is higher, the players have successfully
 quested, and they make progress on the quest. A
 number of progress tokens equal to the amount by
-which their Ò overcame the $ are placed on the
+which their [willpower] overcame the [threat] are placed on the
 current quest card. Note: If there is an active location,
 progress tokens are placed on that location until it is
 explored, and the remainder are then placed on the
 current quest.
-If the $ is higher, the players have unsuccessfully
+If the [threat] is higher, the players have unsuccessfully
 quested and they are driven back by the encounter
 deck. Each player must raise their threat dial by the
-amount by which the $ was higher than the combined
-Ò of all committed characters.
-If the combined committed Ò score is equal to the $
+amount by which the [threat] was higher than the combined
+[willpower] of all committed characters.
+If the combined committed [willpower] score is equal to the [threat]
 score in the staging area, the players have not quested
 successfully or unsuccessfully: no progress tokens are
 placed, and the players do not increase their dials.
@@ -2316,16 +2316,16 @@ might have.
 
 6.4.3 Determine combat damage
 Combat damage is determined by subtracting the
-defense strength (Ú) of the defending character from
-the attack strength (Û) of the attacking enemy. The
+defense strength ([defense]) of the defending character from
+the attack strength ([attack]) of the attacking enemy. The
 remaining value is the amount of damage that must
 immediately be dealt to the defending character. If the
-Ú is equal to or higher than the Û, no damage is dealt.
+[defense] is equal to or higher than the [attack], no damage is dealt.
 If an attack is undefended, all damage from the attack
 must be assigned to a single hero controlled by the
 active player. If a defending character leaves play or is
 removed from combat before damage is assigned, the
-attack is considered undefended. A character’s Ú does
+attack is considered undefended. A character’s [defense] does
 not absorb damage from undefended attacks.
 If a character is destroyed by an attack, additional
 damage from the attack is not dealt to other
@@ -2356,15 +2356,15 @@ Any number of ranged characters controlled by other
 players may exhaust to be declared as attackers.
 
 6.8.2 Determine attack strength
-Add up the total Û of all characters that are
+Add up the total [attack] of all characters that are
 currently attacking.
 
 6.8.3 Determine combat damage
-This is done by subtracting the target enemy’s Ú
-from the combined Û of all the attacking characters.
+This is done by subtracting the target enemy’s [defense]
+from the combined [attack] of all the attacking characters.
 The remaining value is the amount of damage that is
 immediately dealt to the target enemy being attacked.
-If the Ú is equal to or higher than the Û, no damage
+If the [defense] is equal to or higher than the [attack], no damage
 is dealt.
 
 6.8.4 Player attack ends
@@ -2520,7 +2520,7 @@ Treachery
 6/15
 
 When Revealed: Until the end of the phase, raise
-the total $ in the staging area by X, where X is the
+the total [threat] in the staging area by X, where X is the
 number of players in the game.
 
 12

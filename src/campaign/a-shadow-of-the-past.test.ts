@@ -90,8 +90,8 @@ describe("A Shadow of the Past setup", () => {
 
   it("runs player Setup, the opening hand, encounter Setup, then quest Setup", () => {
     const effects: Effect[] = [
-      { id: "deck0:setup:1", cardCode: "deck0", timing: "setup", instructions: [{ verb: "SetAside", code: "141036" }] },
-      { id: "141032:setup:1", cardCode: "141032", timing: "setup", instructions: [{ verb: "AddToStaging", code: "141037" }] },
+      { id: "deck0:setup:1", cardCode: "deck0", lines: ["fixture:A:1"], timing: "setup", instructions: [{ verb: "SetAside", code: "141036" }] },
+      { id: "141032:setup:1", cardCode: "141032", lines: ["fixture:A:1"], timing: "setup", instructions: [{ verb: "AddToStaging", code: "141037" }] },
     ];
     const { started, state, steps } = setUp(5, effects);
     // Player Setup took deck0 out before the hand was drawn.

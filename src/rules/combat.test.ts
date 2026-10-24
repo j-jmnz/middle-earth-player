@@ -70,7 +70,7 @@ function engageWindow(input: {
 describe("combat", () => {
   it("resolves a nested shadow frame before damage is placed", () => {
     const effect: Effect = {
-      id: "shade:shadow:1", cardCode: "shade",
+      id: "shade:shadow:1", cardCode: "shade", lines: ["fixture:A:1"],
       timing: "shadow",
       instructions: [{ verb: "ResolveEffect" }],
     };
@@ -102,8 +102,8 @@ describe("combat", () => {
 
   it("runs a shadow effect and not When Revealed, then pops before attack damage", () => {
     const effects: Effect[] = [
-      { id: "shade:whenRevealed:2", cardCode: "shade", timing: "whenRevealed", instructions: [{ verb: "DealDamage" }] },
-      { id: "shade:shadow:3", cardCode: "shade", timing: "shadow", instructions: [{ verb: "DealDamage" }] },
+      { id: "shade:whenRevealed:2", cardCode: "shade", lines: ["fixture:A:1"], timing: "whenRevealed", instructions: [{ verb: "DealDamage" }] },
+      { id: "shade:shadow:3", cardCode: "shade", lines: ["fixture:A:1"], timing: "shadow", instructions: [{ verb: "DealDamage" }] },
     ];
     const { state, ids } = engageWindow({
       seatCount: 1,
@@ -137,7 +137,7 @@ describe("combat", () => {
   });
 
   it("places no attack damage after a shadow effect destroys the attacker", () => {
-    const effects: Effect[] = [{ id: "shade:shadow:4", cardCode: "shade", timing: "shadow", instructions: [{ verb: "DealDamage" }] }];
+    const effects: Effect[] = [{ id: "shade:shadow:4", cardCode: "shade", lines: ["fixture:A:1"], timing: "shadow", instructions: [{ verb: "DealDamage" }] }];
     function attacked(victory: number | null) {
       const { state, ids } = engageWindow({
         seatCount: 1,

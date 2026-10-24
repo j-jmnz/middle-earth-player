@@ -28,7 +28,7 @@ function frames(steps: readonly EngineStep[]): string[] {
 }
 
 function raise(id: string, cardCode: string, timing: Effect["timing"], amount: number, extra: Partial<Effect> = {}): Effect {
-  return { id, cardCode, timing, instructions: [{ verb: "RaiseThreat", amount }], ...extra };
+  return { id, cardCode, lines: ["fixture:A:1"], timing, instructions: [{ verb: "RaiseThreat", amount }], ...extra };
 }
 
 describe("forced effects", () => {
@@ -150,7 +150,7 @@ describe("each player", () => {
   const ask = (order: "lastFirst" | "firstFirst") => {
     const effect: Effect = {
       id: "pick:whenRevealed:1",
-      cardCode: "pick",
+      cardCode: "pick", lines: ["fixture:A:1"],
       timing: "whenRevealed",
       instructions: [
         {
@@ -249,7 +249,7 @@ describe("cancel offers", () => {
   const ring = definePrinted({ code: "ring", name: "Ring", type: "objective" });
   const gildorLike = (extra: Partial<Effect> = {}): Effect => ({
     id: "elf:forced:1",
-    cardCode: "elf",
+    cardCode: "elf", lines: ["fixture:A:1"],
     timing: "forced",
     trigger: "endOfPhase",
     cancel: { cost: 1, sphere: "fellowship", ...extra.cancel },
@@ -323,7 +323,7 @@ describe("choices", () => {
   const card = definePrinted({ code: "pick", name: "Pick", type: "treachery" });
   const effect: Effect = {
     id: "pick:whenRevealed:1",
-    cardCode: "pick",
+    cardCode: "pick", lines: ["fixture:A:1"],
     timing: "whenRevealed",
     instructions: [
       {
@@ -388,7 +388,7 @@ describe("immediate attacks", () => {
     });
     const effect: Effect = {
       id: "orc:forced:1",
-      cardCode: "orc",
+      cardCode: "orc", lines: ["fixture:A:1"],
       timing: "forced",
       trigger: "hideFailed",
       condition: { kind: "engagedWithActor" },

@@ -13,7 +13,7 @@ import { spawn } from "./zones.ts";
 
 const BOOST: Effect = {
   id: "sam:action:1",
-  cardCode: "sam",
+  cardCode: "sam", lines: ["fixture:A:1"],
   timing: "action",
   instructions: [{ verb: "ModifyStat", stat: "willpower", amount: 2, until: "endOfPhase" }],
 };
@@ -124,7 +124,7 @@ describe("hide", () => {
   it("reveals from an action effect while a window is already open", () => {
     const scout: Effect = {
       id: "sam:action:2",
-      cardCode: "sam",
+      cardCode: "sam", lines: ["fixture:A:1"],
       timing: "action",
       instructions: [{ verb: "RevealStaging" }],
     };
@@ -138,7 +138,7 @@ describe("hide", () => {
   it("fails an action-effect reveal that opens a Hide window", () => {
     const scout: Effect = {
       id: "sam:action:2",
-      cardCode: "sam",
+      cardCode: "sam", lines: ["fixture:A:1"],
       timing: "action",
       instructions: [{ verb: "RevealStaging" }],
     };
@@ -177,7 +177,7 @@ describe("hide", () => {
 
   it("runs Hide before the card's When Revealed", () => {
     const effects: Effect[] = [
-      { id: "hider:whenRevealed:1", cardCode: "hider", timing: "whenRevealed", instructions: [{ verb: "RaiseThreat" }] },
+      { id: "hider:whenRevealed:1", cardCode: "hider", lines: ["fixture:A:1"], timing: "whenRevealed", instructions: [{ verb: "RaiseThreat" }] },
     ];
     const { state, ctx } = table({ deck: ["hider", "d1"], cards: [rider("hider", {}, 1), filler("d1", 0)], effects });
     const opened = begin(state, ctx);
@@ -271,7 +271,7 @@ describe("hide", () => {
 
   it("discards without revealing, so discarded cards run no When Revealed", () => {
     const effects: Effect[] = [
-      { id: "d1:whenRevealed:2", cardCode: "d1", timing: "whenRevealed", instructions: [{ verb: "RaiseThreat" }] },
+      { id: "d1:whenRevealed:2", cardCode: "d1", lines: ["fixture:A:1"], timing: "whenRevealed", instructions: [{ verb: "RaiseThreat" }] },
     ];
     const { state, ctx } = table({ deck: ["hider", "d1"], cards: [rider("hider", {}, 1), filler("d1", 1)], effects });
     const opened = begin(state, ctx);

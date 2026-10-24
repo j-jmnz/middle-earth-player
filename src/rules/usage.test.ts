@@ -16,7 +16,7 @@ const gadget = definePrinted({ code: "gadget", name: "Gadget", type: "attachment
 const cards = cardMap([hero("lead", "leadership"), hero("tact", "tactics"), gadget]);
 
 function action(extra: Partial<Effect> = {}): Effect {
-  return { id: "gadget:action:1", cardCode: "gadget", timing: "action", instructions: [{ verb: "RaiseThreat", amount: 1 }], ...extra };
+  return { id: "gadget:action:1", cardCode: "gadget", lines: ["fixture:A:1"], timing: "action", instructions: [{ verb: "RaiseThreat", amount: 1 }], ...extra };
 }
 
 function table(effects: readonly Effect[], resources = { lead: 0, tact: 0 }) {
@@ -140,7 +140,7 @@ describe("limits", () => {
 describe("Responses", () => {
   const response = (id: string, extra: Partial<Effect> = {}): Effect => ({
     id,
-    cardCode: "gadget",
+    cardCode: "gadget", lines: ["fixture:A:1"],
     timing: "response",
     trigger: "hideSucceeded",
     instructions: [{ verb: "RaiseThreat", amount: 1 }],

@@ -16,7 +16,8 @@ export const ledgerEntrySchema = z.strictObject({
   scan: z.strictObject({ url: z.string().url(), sha256: z.string().regex(/^[0-9a-f]{64}$/) }),
   lines: z.array(z.string().min(1)),
   // Lines that need no effect record.
-  inert: z.array(z.strictObject({ line: z.number().int().positive(), reason: z.string().min(1) })),
+  // `keyword` names a card keyword (card.keywords) that owns the line; the coverage test checks the card has it.
+  inert: z.array(z.strictObject({ line: z.number().int().positive(), reason: z.string().min(1), keyword: z.string().optional() })),
   // Typos on the card itself. `lines` holds the corrected reading, this the printed wording of that line.
   misprints: z.array(z.strictObject({ line: z.number().int().positive(), printed: z.string().min(1) })),
   readBy: z.string().min(1),

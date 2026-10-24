@@ -33,3 +33,14 @@ export function loadScenarioDefinitions(dataDir: string, cardsByCode: ReadonlyMa
     return scenarioDefinition(scenario, campaign);
   });
 }
+
+// Every card the campaign deals: the prelude, each scenario's piles, and the rewards its resolution offers.
+export function dealtCodes(dataDir = DATA_DIR): Set<string> {
+  const campaign = loadCampaign(undefined, dataDir);
+  const codes = new Set<string>(campaign.prelude.map((card) => card.code));
+  for (const scenario of loadScenarios(dataDir)) {
+    for (const card of scenario.cards) codes.add(card.code);
+    for (const group of campaign.authored.resolution[scenario.id] ?? []) for (const choice of group.choices) codes.add(choice.code);
+  }
+  return codes;
+}

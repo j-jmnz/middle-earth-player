@@ -36,6 +36,7 @@ const INSTRUCTION_VERBS = [
 const effect = {
   id: "10001:action:1",
   cardCode: "10001",
+  lines: ["10001:A:1"],
   timing: "action",
   instructions: [{ verb: "Draw" }],
 } as const;

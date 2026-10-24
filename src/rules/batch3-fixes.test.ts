@@ -17,7 +17,7 @@ describe("cancel payments", () => {
   const elf = definePrinted({ code: "elf", name: "Elf", type: "treasure", attack: 1, defense: 1, health: 3 });
   const effect: Effect = {
     id: "elf:forced:1",
-    cardCode: "elf",
+    cardCode: "elf", lines: ["fixture:A:1"],
     timing: "forced",
     trigger: "endOfPhase",
     cancel: { cost: 2, sphere: "fellowship" },
@@ -66,7 +66,7 @@ describe("revealed events", () => {
   it("only reach the card that was revealed", () => {
     const raise = (code: string, amount: number): Effect => ({
       id: `${code}:forced:1`,
-      cardCode: code,
+      cardCode: code, lines: ["fixture:A:1"],
       timing: "forced",
       trigger: "revealed",
       instructions: [{ verb: "RaiseThreat", amount }],

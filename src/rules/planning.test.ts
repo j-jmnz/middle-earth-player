@@ -139,7 +139,7 @@ describe("planning costs", () => {
     const orc = spawn(built.state, "orc", { zone: "engaged", seat: 0 });
     const warg = spawn(orc.state, "warg", { zone: "engaged", seat: 0 });
     const played = expectOk(reduce(warg.state, { type: "PlayCard", cardId: built.cardId, payments: [] }, {
-      effects: [{ id: "bolt:action:1", cardCode: "bolt", timing: "action", instructions: [{ verb: "DealDamage" }] }],
+      effects: [{ id: "bolt:action:1", cardCode: "bolt", lines: ["fixture:A:1"], timing: "action", instructions: [{ verb: "DealDamage" }] }],
       cards: local,
     }));
     expect(played.state.cards[orc.id]?.damage).toBe(0);
@@ -191,7 +191,7 @@ describe("planning costs", () => {
     const bolt = definePrinted({ code: "bolt", name: "Bolt", type: "event", sphere: "neutral", cost: 0 });
     const second = definePrinted({ code: "second", name: "Second", type: "ally", sphere: "leadership", cost: 0 });
     const cards = cardMap([hero("aragorn", "leadership"), hero("gimli", "tactics"), bolt, second]);
-    const effects = [{ id: "bolt:action:2", cardCode: "bolt", timing: "action" as const, instructions: [{ verb: "RaiseThreat" as const }] }];
+    const effects = [{ id: "bolt:action:2", cardCode: "bolt", lines: ["fixture:A:1"], timing: "action" as const, instructions: [{ verb: "RaiseThreat" as const }] }];
     let state = blankScenario({ seatCount: 2, seed: 9, definition: fixtureDefinition(["stage"]) });
     state = spawn(state, "aragorn", { zone: "heroes", seat: 0 }).state;
     state = spawn(state, "gimli", { zone: "heroes", seat: 1 }).state;
@@ -227,7 +227,7 @@ describe("planning costs", () => {
     const bolt = definePrinted({ code: "bolt", name: "Bolt", type: "event", sphere: "neutral", cost: 0 });
     const second = definePrinted({ code: "second", name: "Second", type: "ally", sphere: "leadership", cost: 0 });
     const cards = cardMap([leadership, bolt, second]);
-    const effects = [{ id: "bolt:action:3", cardCode: "bolt", timing: "action" as const, instructions: [{ verb: "RaiseThreat" as const }] }];
+    const effects = [{ id: "bolt:action:3", cardCode: "bolt", lines: ["fixture:A:1"], timing: "action" as const, instructions: [{ verb: "RaiseThreat" as const }] }];
     const built = planning("bolt", 0);
     const allyCard = spawn(built.state, "second", { zone: "hand", seat: 0 });
     const threatened = withThreat(allyCard.state, 0, 49);

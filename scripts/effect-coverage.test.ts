@@ -4,9 +4,10 @@ import { AUTHORED_EFFECTS, AUTHORED_REPLACES, EFFECTS, GENERATED_EFFECTS } from 
 
 import { loadCards } from "./data/load-cards.ts";
 import { generateEffects } from "./data/effects/generate.ts";
+import { lineTimings } from "./data/normalize/timings.ts";
 import { isKeywordLine } from "./data/normalize/keywords.ts";
 import { keyOf, lineId, loadLedger } from "./data/printed/ledger.ts";
-import { loadCampaign, loadScenarios } from "./data/load-scenarios.ts";
+import { dealtCodes, loadCampaign, loadScenarios } from "./data/load-scenarios.ts";
 
 // Every printed line of a card the Fellowship scenarios deal is owned: by an effect record that names it in
 // `lines`, by a keyword the engine reads (a line that is only keywords), or by an `inert` entry in the printed-text
@@ -18,11 +19,7 @@ const campaign = loadCampaign();
 const ledger = loadLedger();
 const byCode = new Map(cards.map((card) => [card.code, card]));
 
-const dealt = new Set<string>(campaign.prelude.map((card) => card.code));
-for (const scenario of scenarios) {
-  for (const card of scenario.cards) dealt.add(card.code);
-  for (const group of campaign.authored.resolution[scenario.id] ?? []) for (const choice of group.choices) dealt.add(choice.code);
-}
+const dealt = dealtCodes();
 
 describe("effect coverage", () => {
   for (const code of [...dealt].sort()) {
@@ -48,7 +45,19 @@ describe("effect coverage", () => {
         const [code, side, n] = id.split(":");
         const entry = ledger.byKey.get(keyOf(code ?? "", side ?? ""));
         expect(code, `${effect.id} claims ${id}, a line of another card`).toBe(effect.cardCode);
-        expect(entry?.lines[Number(n) - 1], `${effect.id} claims ${id}, which is not in the ledger`).toBeDefined();
+        const line = entry?.lines[Number(n) - 1];
+        expect(line, `${effect.id} claims ${id}, which is not in the ledger`).toBeDefined();
+        // A ledger edit that shifts line numbers moves a record onto a line with another label.
+        expect(lineTimings(line ?? ""), `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
+      }
+    }
+  });
+
+  it("backs each keyword-owned inert line with a keyword on its card", () => {
+    for (const entry of ledger.entries) {
+      for (const mark of entry.inert.filter((item) => item.keyword)) {
+        const keywords = (byCode.get(entry.code)?.keywords ?? {}) as Record<string, unknown>;
+        expect(keywords[mark.keyword ?? ""], `${entry.code}.${entry.side} line ${mark.line} names ${mark.keyword}`).toBeTruthy();
       }
     }
   });

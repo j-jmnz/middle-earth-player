@@ -211,7 +211,7 @@ describe("the undefended condition", () => {
   it("is true for an undefended attack and false once a defender is declared", () => {
     const effect = {
       id: "141036:shadow:99",
-      cardCode: "141036",
+      cardCode: "141036", lines: ["fixture:A:1"],
       timing: "shadow" as const,
       instructions: [
         { verb: "ModifyStat" as const, stat: "attack" as const, amount: 2, until: "endOfAttack" as const, target: "attacker" as const, when: { kind: "undefended" as const } },

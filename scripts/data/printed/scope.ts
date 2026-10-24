@@ -1,9 +1,8 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-import type { Card } from "../../../src/catalog/card-facts.ts";
 import { loadCards } from "../load-cards.ts";
-import { loadCampaign, loadScenarios } from "../load-scenarios.ts";
+import { dealtCodes } from "../load-scenarios.ts";
 import { RAW_DIR, ROOT } from "../paths.ts";
 
 // The cards whose printed text the ledger holds in this phase: everything A Shadow of the Past deals, The One
@@ -29,15 +28,7 @@ export function starterCodes(): string[] {
 }
 
 export function scopeCodes(): string[] {
-  const codes = new Set<string>([...CAMPAIGN_CARDS, ...MEC109_CHANGED, ...KNOWN_ERRORS]);
-  const campaign = loadCampaign();
-  for (const card of campaign.prelude) codes.add(card.code);
-  for (const scenario of loadScenarios()) {
-    for (const card of scenario.cards) codes.add(card.code);
-    for (const group of campaign.authored.resolution[scenario.id] ?? []) for (const choice of group.choices) codes.add(choice.code);
-  }
-  for (const code of starterCodes()) codes.add(code);
-  return [...codes].sort();
+  return [...new Set<string>([...CAMPAIGN_CARDS, ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(), ...starterCodes()])].sort();
 }
 
 type HobImages = { CardSet: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };
@@ -71,7 +62,7 @@ export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget
   const dragn = dragnImages();
   const out: ScanTarget[] = [];
   for (const code of codes) {
-    const card = cards.get(code) as Card | undefined;
+    const card = cards.get(code);
     if (!card) throw new Error(`Scan scope names ${code}, which is not in data/cards`);
     const mec = card.printings.find((printing) => printing.pack === "TFotR" && printing.imageUrls);
     const sources: { printing: string; urls: string[] }[] = [];

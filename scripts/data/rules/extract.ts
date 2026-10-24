@@ -21,8 +21,13 @@ export function boxesFor(columns: DocColumns, page: number): Box[] {
 }
 
 export function hashColumns(columns: DocColumns): string {
-  return sha256(JSON.stringify(columns));
+  return sha256(JSON.stringify({ columns, glyphs: ICON_GLYPHS }));
 }
+
+// The books print stat icons as font glyphs that pdftotext emits as stray letters: Ú is the defense icon and so on.
+// They are written as [icon] tokens so a span never holds a letter that is really a picture. The map is part of the
+// extraction hash, so changing it re-extracts every document.
+export const ICON_GLYPHS: Readonly<Record<string, string>> = { "Ú": "[defense]", "Û": "[attack]", "Ò": "[willpower]", $: "[threat]", "‰": "[unique]" };
 
 function pageCount(file: string): number {
   const info = execFileSync("pdfinfo", [file], { encoding: "utf8" });
@@ -32,7 +37,7 @@ function pageCount(file: string): number {
 }
 
 function clean(text: string): string {
-  return text.replaceAll("\f", "").replace(/[ \t]+$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
+  return text.replace(/[ÚÛÒ$‰]/g, (glyph) => ICON_GLYPHS[glyph] ?? glyph).replaceAll("\f", "").replace(/[ \t]+$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
 }
 
 export function extractPdf(doc: string, file: string, columns: DocColumns): ExtractedDoc {

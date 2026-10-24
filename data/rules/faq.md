@@ -1,7 +1,7 @@
 # faq
 
 sha256: a82b0e7e1fe27d942eaeae9426e6821ccc8157dad9a424e70d2f5bafa604e7d9
-columns: bd6c8512ac9543979054e3153fd13139b37443c3b842347d49ea4df7f5b20f49
+columns: 7eb59e79fd7a3caeb2f41d89be5b8bf9c2c3aabb0244bd2bebef4a313ce5218e
 
 ## p1
 
@@ -109,7 +109,7 @@ CORE 43
 Protector of Lorien
 CORE 70
 Should read: “Action: Discard a card from your hand
-to give attached hero +1 Ú or +1 Ò until the end of the
+to give attached hero +1 [defense] or +1 [willpower] until the end of the
 phase. Limit 3 times per phase.”
 Dol Guldur Beastmster
 CORE 91
@@ -175,7 +175,7 @@ D 76
 Should read: “(Limit 3 times per game for the group.)”
 Erebor Battle Master
 D 79
-Should read: “Erebor Battle Master gets +1 Û for each
+Should read: “Erebor Battle Master gets +1 [attack] for each
 other Dwarf ally you control.”
 Out of Sight
 D 81
@@ -1359,7 +1359,7 @@ unresolved shadow card in play. (Do not resolve the
 effects on these shadow cards)
 Q: If a location is revealed after Treacherous Fog
 (CORE 118) was revealed during the same quest phase,
-does the revealed location get +1 $ from the “When
+does the revealed location get +1 [threat] from the “When
 Revealed” effect on Treacherous Fog?
 A: Yes. The “When Revealed” effect on Treacherous
 Fog creates a lasting effect until the end of the phase
@@ -1506,9 +1506,9 @@ engagement cost than my threat, will the second part of
 Sam Gamgee’s (TBR 2) ability trigger more than once,
 even if I cannot ready him more than once?
 A: Yes. Because it does not use the word “then”,
-Sam’s bonus to Ò, Û and Ú is not dependent on
+Sam’s bonus to [willpower], [attack] and [defense] is not dependent on
 him readying. His readying effect and his bonus
-to Ò, Û and Ú are two different effects that both
+to [willpower], [attack] and [defense] are two different effects that both
 have the trigger of engaging an enemy with a higher
 engagement cost than your threat.
 Q: If an enemy is put into play directly engaged with

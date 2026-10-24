@@ -48,12 +48,19 @@ describe("rule spans", () => {
     }
   });
 
-  it("find both quotes verbatim, in order, on their page and column", () => {
+  it("open at their from-quote and close at the first to-quote after it, with no icon artifacts", () => {
     for (const span of index) {
-      const text = extractSpan(span, docs.get(span.doc) as ExtractedDoc);
-      const flat = text.replace(/\s+/g, " ");
-      expect(flat.startsWith(span.from.replace(/\s+/g, " ")), `${span.id} opens with its from-quote`).toBe(true);
-      expect(flat.endsWith(span.to.replace(/\s+/g, " ")), `${span.id} closes with its to-quote`).toBe(true);
+      const flat = extractSpan(span, docs.get(span.doc) as ExtractedDoc).replace(/\s+/g, " ");
+      const from = span.from.replace(/\s+/g, " ");
+      const to = span.to.replace(/\s+/g, " ");
+      expect(flat.startsWith(from), `${span.id} opens with its from-quote`).toBe(true);
+      // The span stops at the first place the to-quote can close it: nothing earlier, past the from-quote, ends the same way.
+      // (A span that runs into later columns closes in its last column, so only single-column spans are measured here.)
+      if (!span.through) {
+        const early = flat.indexOf(to, Math.max(0, from.length - to.length));
+        expect(early + to.length, `${span.id} closes at the first to-quote after its from-quote`).toBe(flat.length);
+      }
+      expect(flat, `${span.id} holds a stray icon glyph`).not.toMatch(/[ÚÛÒ$‰]/);
     }
   });
 
@@ -122,7 +129,7 @@ describe("rules store", () => {
 
   it("holds the rule each of the formerly wrong ids named", () => {
     const text = (id: string) => (byId.get(id)?.text ?? "").replace(/\s+/g, " ");
-    expect(text("mec109.archery")).toContain("Ú does not block archery damage.");
+    expect(text("mec109.archery")).toContain("[defense] does not block archery damage.");
     expect(text("mec109.toughness")).toContain("reduces the amount of damage it takes by X");
     expect(text("rr.scoring")).toContain("Add 10 for each completed round");
     expect(text("rr.scoring")).toContain("Subtract any victory points");

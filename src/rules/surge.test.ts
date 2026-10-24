@@ -143,7 +143,7 @@ describe("surge", () => {
       activeSeat: 0,
     };
     const resolved = expectOk(reduce(state, { type: "Pass" }, {
-      effects: [{ id: "sting:whenRevealed:1", cardCode: "sting", timing: "whenRevealed", instructions: [{ verb: "DealDamage" }] }],
+      effects: [{ id: "sting:whenRevealed:1", cardCode: "sting", lines: ["fixture:A:1"], timing: "whenRevealed", instructions: [{ verb: "DealDamage" }] }],
       cards,
     }));
     expect(resolved.state.cards[orc.id]?.damage).toBe(1);

@@ -252,7 +252,7 @@ These live in `src/rules`, not in a card file. Each names its rule ids in its mo
 | Archery X | `mec109.archery` |
 | Immune to player card effects | `rr.immune`, `mec109.immune-to-player-card-effects` |
 | Indestructible, toughness X | `mec109.indestructible`, `mec109.toughness` |
-| Permanent | `mec109.permanent`, `ltp.permanent`, `rr.campaign-pool`, `rr.campaign-setup-checklist` (steps 2, 5 and 6) |
+| Permanent | `mec109.permanent`, `ltp.permanent`, `rr.campaign-pool`, `rr.campaign-setup-checklist` (steps 2 and 5) |
 | Victory | `rr.victory`, `ltp.victory-x`, `ltp.victory-display` |
 | Sentinel, ranged | `rr.sentinel`, `rr.ranged` |
 | Hide X | `mec109.hide-x`, `mec109.hide-tests` |
