@@ -99,9 +99,9 @@ export function spherePays(pool: Sphere | null, cost: Sphere | null): boolean {
   return pool === cost;
 }
 
-// A campaign card with printed combat stats (Gildor Inglorion) acts as an ally once a player controls it.
+// An objective ally with printed combat stats (Gildor Inglorion) acts as an ally once a player controls it.
 export function isAllyLike(printed: PrintedCard): boolean {
-  return printed.type === "ally" || (printed.type === "treasure" && printed.health != null);
+  return printed.type === "ally" || ((printed.type === "objective" || printed.type === "treasure") && printed.health != null);
 }
 
 export function isCharacterType(printed: PrintedCard): boolean {

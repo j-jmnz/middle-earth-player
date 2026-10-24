@@ -124,7 +124,7 @@ describe("catalog rows", () => {
     expect(cards.get("141035")?.keywords.immuneToPlayerCardEffects).toBe(true);
     expect(cards.get("141017")?.keywords.permanent).toBe(true);
     expect(cards.get("141079")?.keywords.surge).toBe(true);
-    expect(cards.get("141077")).toMatchObject({ type: "treasure", willpower: 3, attack: 2, defense: 3, health: 3 });
+    expect(cards.get("141077")).toMatchObject({ type: "objective", willpower: 3, attack: 2, defense: 3, health: 3 });
     expect(cards.get(RING_BEARER)).toMatchObject({ type: "hero", sphere: "fellowship" });
     expect(cards.get(RING_BEARER)?.traits).toContain("Ring-bearer");
     const ring = cards.get("141085");

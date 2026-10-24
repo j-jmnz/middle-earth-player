@@ -41,6 +41,13 @@ export const cardSchema = z.strictObject({
   timings: z.array(z.string()),
   text: z.string().nullable(),
   shadowText: z.string().nullable(),
+  // A boon or burden card (Campaign Mode), from the card's type bar. A burden belongs to a burden set, which is
+  // printed where an encounter set icon would be; later campaign cards remove burdens by burden set.
+  campaignKind: z.enum(["boon", "burden"]).nullable(),
+  burdenSet: z.string().nullable(),
+  // Which deck the card goes back to when it joins the campaign pool: a player card to a player deck, an
+  // encounter card to the encounter deck. Null for quest, campaign and nightmare cards.
+  backType: z.enum(["player", "encounter"]).nullable(),
   hasErrata: z.boolean(),
   // RingsDB prints the errata line in place of the text. Null when the card has none.
   errata: z.string().nullable(),

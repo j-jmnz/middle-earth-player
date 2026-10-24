@@ -88,7 +88,7 @@ function sideText(lines: readonly string[]): string | null {
   return text === "" ? null : text;
 }
 
-type HobFacts = Pick<Card, "traits" | "threat" | "willpower" | "attack" | "defense" | "health" | "questPoints" | "victory" | "engagementCost" | "cost" | "stage" | "keywords" | "timings" | "text" | "shadowText" | "back" | "isUnique" | "quantity" | "easyQuantity" | "encounterSet" | "hasErrata">;
+type HobFacts = Pick<Card, "traits" | "threat" | "willpower" | "attack" | "defense" | "health" | "questPoints" | "victory" | "engagementCost" | "cost" | "stage" | "keywords" | "timings" | "campaignKind" | "burdenSet" | "text" | "shadowText" | "back" | "isUnique" | "quantity" | "easyQuantity" | "encounterSet" | "hasErrata">;
 
 type DragnRow = Record<string, string> | undefined;
 
@@ -116,6 +116,26 @@ function keywordOnly(card: HobCard): (line: string) => boolean {
     const parts = line.split(/(?<=\.)\s+/).map((part) => part.trim().toLowerCase());
     return parts.every((part) => tokens.has(part));
   };
+}
+
+const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event"]);
+const ENCOUNTER_TYPES = new Set(["enemy", "location", "treachery", "objective"]);
+
+// The type bar says Boon or Burden. A burden's burden set is printed where an encounter set icon would be, and
+// Hall of Beorn lists it as the card's encounter set.
+function campaignFacts(card: HobCard): { campaignKind: "boon" | "burden" | null; burdenSet: string | null } {
+  const kind = card.CardSubType === "Boon" ? "boon" : card.CardSubType === "Burden" ? "burden" : null;
+  return { campaignKind: kind, burdenSet: kind === "burden" ? (card.EncounterInfo?.EncounterSet ?? null) : null };
+}
+
+// RingsDB types every boon and burden "treasure" and gives it the type name Campaign. The type bar prints the real
+// type (Attachment, Treachery, Objective Ally), which is what the card does in play.
+function realType(card: HobCard): { type: string; typeName: string } | null {
+  return card.CardSubType === "Boon" || card.CardSubType === "Burden" ? (TYPE_BY_HOB[card.CardType] ?? null) : null;
+}
+
+function backTypeOf(type: string): "player" | "encounter" | null {
+  return PLAYER_TYPES.has(type) ? "player" : ENCOUNTER_TYPES.has(type) ? "encounter" : null;
 }
 
 function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts {
@@ -152,6 +172,7 @@ function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts
     easyQuantity: card.EncounterInfo?.EasyModeQuantity ?? null,
     encounterSet: card.EncounterInfo?.EncounterSet ?? null,
     hasErrata: card.HasErrata,
+    ...campaignFacts(card),
   };
 }
 
@@ -167,7 +188,7 @@ function printingOf(pack: string, card: HobCard, dragnImage: string | null): Pri
   };
 }
 
-function ringsDbCardFacts(card: RingsDbCard): Omit<Card, "printings" | "keywords" | "timings" | "back" | "stage" | "easyQuantity" | "encounterSet" | "shadowText"> {
+function ringsDbCardFacts(card: RingsDbCard): Omit<Card, "printings" | "campaignKind" | "burdenSet" | "backType" | "keywords" | "timings" | "back" | "stage" | "easyQuantity" | "encounterSet" | "shadowText"> {
   return {
     code: card.code,
     name: card.name,
@@ -269,10 +290,16 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const hob = hobByCode.get(code)?.[0];
     const facts = hob ? hobFacts(hob, raw.dragn.get(hob.OctgnGuid ?? ""), report) : null;
     const base = ringsDbCardFacts(primary.card);
+    const real = hob ? realType(hob) : null;
     byCode.set(code, {
       ...base,
+      ...(real ?? {}),
+      deckLegal: real ? false : base.deckLegal,
       // Hall of Beorn carries keywords and timings for every card it can match by code. Elsewhere they stay unread.
       victory: base.victory,
+      campaignKind: facts?.campaignKind ?? null,
+      burdenSet: facts?.burdenSet ?? null,
+      backType: null,
       keywords: facts?.keywords ?? null,
       timings: facts?.timings ?? [],
       back: facts?.back ?? null,
@@ -314,6 +341,8 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
           ...existing,
           name: source.Title,
           ...facts,
+          ...(realType(source) ?? {}),
+          backType: existing.backType,
           // RingsDB's errata line stays with the code; Hall of Beorn does not track it.
           hasErrata: existing.hasErrata,
           sphere: source.Sphere ? source.Sphere.toLowerCase() : existing.sphere,
@@ -336,9 +365,10 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
           sphere: source.Sphere ? source.Sphere.toLowerCase() : null,
           deckLimit: null,
           ...facts,
+          backType: null,
           errata: null,
           imagesrc: null,
-          deckLegal: deckLegal(type?.type ?? "", type?.typeName ?? ""),
+          deckLegal: realType(source) ? false : deckLegal(type?.type ?? "", type?.typeName ?? ""),
           printings: [...printings, ...known],
         };
     return card;
@@ -373,7 +403,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   for (const card of byCode.values()) {
     const set = overrideFor(overrides, report, { code: card.code, name: card.name });
     const next = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
-    cards.push(cardSchema.parse(next));
+    cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));
   return { cards, report };

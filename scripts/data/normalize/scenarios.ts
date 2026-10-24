@@ -129,7 +129,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const first = hob.QuestCards[0];
     const setNames = [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name);
     // Campaign cards (boons, burdens, the Ring) are dealt by the campaign and are not part of a booklet set.
-    const isCampaign = (code: string) => byCode.get(code)?.typeName === "Campaign";
+    const isCampaign = (code: string) => byCode.get(code)?.typeName === "Campaign" || byCode.get(code)?.campaignKind != null;
     const encounterSets = setNames.map((name) => ({
       name,
       count: placed

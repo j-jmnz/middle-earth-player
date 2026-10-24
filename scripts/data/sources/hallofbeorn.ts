@@ -22,6 +22,7 @@ export const hobCardSchema = z.object({
   Slug: z.string(),
   IsUnique: z.boolean(),
   CardType: z.string(),
+  CardSubType: z.string().nullable().optional(),
   Sphere: z.string().nullable(),
   Front: sideSchema,
   Back: sideSchema.nullable(),
