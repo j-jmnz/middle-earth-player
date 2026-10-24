@@ -1,30 +1,43 @@
 # Phase 12 — A Knife in the Dark
 
-Depends on: phase 11
+Engine half depends on: phases 8d and 9. It can run beside phases 10 and 11.
+Phone half depends on: phase 11
 Blocks: phase 13
 
 ## Goal
 
-`a-knife-in-the-dark` is playable on the phone. One scenario in this change. Do not start phase 13 until this coverage test is green.
+`a-knife-in-the-dark` is playable on the phone. One scenario in this change. Do not start phase 13's engine half until this scenario's coverage is green.
 
-## Scenario
+## Scenario procedure
 
-Booklet difficulty 7. Encounter sets: A Knife in the Dark, Hunted, The Ring, The Nazgûl.
+This procedure is the same for phases 12 to 16. Each phase file names only what its own cards add.
 
-The shared saga setup still runs: the first seat's chosen Ring-bearer, The One Ring, one Fellowship hero in play, no second Frodo. Do not ask the player to remember the booklet.
+1. `data/scenarios/<id>.json` already exists (phase 8d). Re-read its cross-check report with `pnpm data:build -- --verbose`. Every card it deals has a ledger entry (phase 8c). A scan the agent cannot read is a question for the user, not a guess.
+2. `pnpm effects:draft <id>`, then the `effect-author` agent, until ownership coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution.
+3. Reuse the keyword framework and the verbs. A new verb is engine work in `src/rules/interpret.ts`, cites a ledger line or a rule span, and gets its own test.
+4. A zone or widget exists only when a setup record or a card line creates it. Cite the line in `docs/brief.md`.
+5. Add a golden: an auto-player game on fixed seeds, true solo and two-handed, through a win and through a loss. The phase 8d cause test covers it.
+6. The campaign test from phase 8d continues: the previous scenario's earned pool cards reach this scenario through the Campaign Setup Checklist.
 
-Card-by-card setup is printed on the quest cards. Read those cards and the booklet together. Hall of Beorn is a reading aid. The quest card wins. `pnpm data:build` writes `data/scenarios/<id>.json` when Hall of Beorn's counts and the quest card's Setup text agree with the DragnCards load list; read the cross-check report (`pnpm data:build -- --verbose`), resolve what it flags with a row in `data/overrides.json`, and add the scenario's `resolution` groups to the campaign file. Then `pnpm effects:draft <id>` and the `effect-author` agent. Assert the Normal deck size. The build fails if a code is missing from the catalog. Assert the Normal deck size you counted.
+**Engine half exit:** coverage and the goldens are green in Node. A win runs this campaign card's resolution and unlocks the next scenario. A loss writes nothing.
 
-Author the effect records this scenario adds. Reuse the keyword framework. A dealt card with a printed ability and no effect id fails coverage. The scenario stays unplayable until that test is green.
+**Phone half exit:** a person can win and lose the scenario on the phone. The log matches the engine. No control types damage, resources, threat, progress, or life.
 
-No new widget. Hide, the life tracker, the burden deck, a second active location, and per-seat staging stay hidden unless this scenario's own cards declare them. If a quest card does declare one, implement that declaration here and cite the card in `docs/brief.md`.
+## Cards
 
-The path marks this node current only after scenario 1 is won. A loss writes nothing. A win runs this scenario's own resolution, then unlocks `flight-to-the-ford`. Replaying does not grant the reward again unless the script says so.
+- Campaign card 141044. Front: "You are playing Campaign Mode." Back: starting with the first player, each player may choose one of Tireless Ranger (141018), Skilled Healer (141019), Valiant Warrior (141020) and Noble Hero (141021) and attach it to a hero they control. All four are Permanent, with `Setup: Attach to a hero.` The resolution choice is per seat, may be declined, and records the hero on the log.
+- Stage 1A (141025) Setup: set all copies of Ringwraith, The Witch-king, Midgewater and Weathertop aside, out of play. Add The Prancing Pony and Bill Ferny to the staging area. 1B: the players cannot advance while The Prancing Pony is in play (the source misspells it).
+- Stage 2B (141026): Forced at the end of the round, either remove X progress (X is the number of players) or shuffle 1 out-of-play Ringwraith into the encounter deck. That is a first-player choice between two instructions.
+- Stage 3B (141027): if there are no Nazgûl enemies in play, the players win.
+- Sources disagree on the Ringwraith Easy count (4 against 2). Settle it from the printed Easy marks and record the override.
+- Booklet difficulty 7. Encounter sets: A Knife in the Dark, Hunted, The Ring, The Nazgûl. The earned scenario 1 burden is shuffled in by the checklist.
+
+The saga setup still runs: the first seat's chosen Ring-bearer, The One Ring, one Fellowship hero in play, no second Frodo.
 
 ## E2E
 
-`.maestro/a-knife-in-the-dark.yaml`, tagged `scenario`, opens a seeded save parked on this scenario's resolution, chooses a legal option, relaunches, and finds `flight-to-the-ford` unlocked. A loss flow leaves the log unchanged.
+`.maestro/a-knife-in-the-dark.yaml`, tagged `scenario`, opens a seeded save parked on this scenario's resolution, gives one seat a boon on a named hero, relaunches, and finds the boon on that hero in the log with `flight-to-the-ford` unlocked. A loss flow leaves the log unchanged.
 
 ## Exit
 
-Coverage is green for this scenario's dealt cards. A person can win and lose it on the phone. The log matches the script. The table does not gain a control that types a number.
+Both halves above. The table gains no widget for this scenario.

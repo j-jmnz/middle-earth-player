@@ -13,7 +13,7 @@ A person can play A Shadow of the Past on a phone. The reducer remains the only 
 
 A drag, a card lift, and a sheet run on the UI thread. The reducer runs when the gesture ends or a choice is committed. `legalIntents` is computed when the window changes, not per pixel. It does not build the cross product of every card and every target up front. Compute targets for the card the player selected. Drop targets are zone ids that function returned. A drop does not move a card until the reducer accepts it.
 
-Load effect rows from `catalog.db` in the screen and pass that list into the reducer. Do not import `src/effects`.
+The screen imports `EFFECTS` from `src/effects` and passes the list into the reducer. There is no effects table in `catalog.db` since phase 8b. `src/rules` still receives the list as an argument.
 
 A Zustand subscriber reads the slice it draws. Reducer updates keep the same object references for zones that did not change. A threat change updates the threat overlay and does not replace the hand slice. Skia images that leave the table are released. Do not use Drizzle `useLiveQuery` for scenario state.
 
@@ -25,7 +25,9 @@ A trigger shows the card, the timing, and the legal choices. Shadow cards stay f
 
 Tap targets are at least 44 points. The phase rail and the choice buttons sit where a thumb reaches. Card text on the table is the picture. Text in sheets is large enough to read at arm's length. A tap shows a pressed state in the same frame. Phase changes animate, and the animation does not gate the rule. A new gesture cancels the animation in progress. Reduced motion snaps.
 
-The resolution screen shows the script's choice buttons. A loss has no reward screen. Delete the phase 10 dev-only resolution control. The phase rail, threat, and choice sheets are React Native text and buttons with testIDs. Card pictures stay on the canvas. Maestro reads the text. It does not address a card that exists only as pixels, and it does not judge the drag.
+The resolution screen shows the choices the campaign card's resolution records open, one seat at a time when the card says each player chooses. A loss has no reward screen. Delete the phase 10 dev-only resolution control. The phase rail, threat, and choice sheets are React Native text and buttons with testIDs. Card pictures stay on the canvas. Maestro reads the text. It does not address a card that exists only as pixels, and it does not judge the drag.
+
+A log sheet lists this round's engine steps with their cause from phase 8d: the rule title or the card and line. It is text and testIDs, not a control. It is how a player checks a number against its source.
 
 Prefetch the hand, staging, and the screen the player is about to open. Do not prefetch the whole cache. Text is enough while a file is still downloading.
 

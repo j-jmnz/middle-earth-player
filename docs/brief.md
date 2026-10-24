@@ -4,7 +4,7 @@ This is the source of truth for the app. Read it before writing code. It records
 
 Authority, in order:
 
-1. The MEC109 booklet and the quest cards win on a rule; the core-set Learn to Play wins on the ordinary round; the Rules Reference wins on definitions. Their text is in `data/rules/` and split into rule ids in `data/rules/entries.json` (`pnpm data:query "select id, title from rules where text like '%surge%'"`). Code and tests name the rule ids they implement. When a rule changes, change the code, the test, and this file in the same commit.
+1. The MEC109 booklet, the quest cards and the campaign cards win on a rule; the core-set Learn to Play wins on the ordinary round and on campaign play; the Rules Reference wins on definitions. A card's text is what is printed on it. From phase 8c that is the ledger in `data/printed/`, read from a pinned scan; Hall of Beorn and DragnCards text is a candidate the build checks against it (`docs/plans/authoritative-data.md`). Their text is in `data/rules/` and split into rule ids in `data/rules/entries.json` (`pnpm data:query "select id, title from rules where text like '%surge%'"`). Code and tests name the rule ids they implement. When a rule changes, change the code, the test, and this file in the same commit.
 2. This file, for product shape, stack, and the build order. Structure is in [architecture.md](architecture.md).
 3. `data/` for cards, scenarios and rules text. Where it came from is in `data/sources.json`; where a source was wrong is in `data/overrides.json`, each with a reason.
 
@@ -155,7 +155,9 @@ type CampaignLog = {
 };
 ```
 
-The paper sheet also has these labels: Heroes, Fallen Heroes, Threat Modifiers, Boons, Burdens, Scenarios Completed, Score, Notes, Campaign Total. Notes are the only free text. Do not invent a scoring formula. If a quest card or the Learn to Play states one, encode that and cite the page in this file. Until then, leave score at 0.
+The paper sheet also has these labels: Heroes, Fallen Heroes, Threat Modifiers, Boons, Burdens, Scenarios Completed, Score, Notes, Campaign Total. Notes are the only free text. The Learn to Play states the score of a won scenario: the final threat of each player, plus the threat cost of each destroyed hero, plus the damage on each surviving hero, plus 10 per completed round, minus the victory points earned. Lower is better. The engine computes it on a win (phase 8d). The campaign total is the sum.
+
+Campaign play follows the Learn to Play and Rules Reference campaign rules, which phase 8d encodes. Each scenario starts with the Campaign Setup Checklist: heroes from the log, fallen heroes replaced, +1 threat penalty per voluntary hero change unless a campaign card waives it, the penalty applied, Permanent cards attached, Setup boons and burdens put into play, player-backed pool cards shuffled into decks, and encounter-backed pool cards shuffled into the encounter deck. Each scenario's campaign card prints its Setup on the front and its Resolution on the back. Those lines are effect records like any other. A burden belongs to a burden set, not an encounter set. Later campaign cards remove burdens by burden set.
 
 The log shows the six Fellowship rows. Later saga rows are added from each later booklet, in that booklet's order. This file does not set that order. The next box must not invent a second log type. Fellowship's six, in order, are fixed:
 
@@ -247,13 +249,14 @@ These live in `src/rules`, not in a card file. Each names its rule ids in its mo
 | Keyword | Rule ids |
 | --- | --- |
 | Surge, doomed, peril | `rr.surge`, `rr.doomed-x`, `mec109.peril` |
-| Archery X | `rr.ranged`, `ltp.attack-strength` |
+| Archery X | none yet. `ltp.attack-strength` holds a stat label, not this rule; phase 8c adds the span |
 | Immune to player card effects | `rr.immune`, `mec109.indestructible` |
-| Indestructible, toughness X | `mec109.indestructible` |
-| Permanent | `ltp.permanent`, `rr.campaign-setup-checklist` |
+| Indestructible, toughness X | `mec109.indestructible`; toughness has no span yet (phase 8c) |
+| Permanent | `ltp.permanent`, `rr.campaign-setup-checklist` (truncated after step 1 today; phase 8c fixes the span) |
 | Victory | `ltp.victory-x` |
 | Sentinel, ranged | `rr.sentinel`, `rr.ranged` |
 | Hide X | `mec109.hide-x`, `mec109.hide-tests` |
+| Restricted | `rr.restricted` (phase 9) |
 
 Decisions this file owns:
 
@@ -280,10 +283,10 @@ Every scenario in the box starts the same way. The engine does it. Do not ask th
 | --- | --- | --- | --- |
 | 1 | `a-shadow-of-the-past` | 6 | Sets: A Shadow of the Past, Hunted, The Ring, The Black Riders. Hide X. Stage titles used by Hall of Beorn: Three is Company, A Shortcut to Mushrooms, Escape to Buckland. Confirm the titles on the quest cards. |
 | 2 | `a-knife-in-the-dark` | 7 | Sets: A Knife in the Dark, Hunted, The Ring, The Nazgûl. |
-| 3 | `flight-to-the-ford` | 5 | Sets: Flight to the Ford, Hunted, The Black Riders, The Nazgûl. Not The Ring. Burden deck and life tracker, below. |
-| 4 | `the-ring-goes-south` | 6 | Set: The Ring Goes South only. Stage 4 can have two active locations. Doors of Durin is immune to player card effects. The Ring-bearer can be placed facedown under Watcher in the Water. |
+| 3 | `flight-to-the-ford` | 5 | Sets: Flight to the Ford, Hunted, The Black Riders, The Nazgûl. Not The Ring. Burden deck and life tracker, below. The campaign card adds a response any player may trigger. |
+| 4 | `the-ring-goes-south` | 6 | Set: The Ring Goes South only. The campaign card waives the hero-change penalty and grants Sting, Mithril Shirt, Glamdring and Andúril. Stage 4 can have two active locations. Doors of Durin is immune to player card effects. The Ring-bearer can be placed facedown under Watcher in the Water. |
 | 5 | `journey-in-the-dark` | 8 | Set: Journey in the Dark only. |
-| 6 | `breaking-of-the-fellowship` | 7 | Set: Breaking of the Fellowship only. From stage 2B, separate staging. True solo is one area. Do not delete the rule for solo. |
+| 6 | `breaking-of-the-fellowship` | 7 | Set: Breaking of the Fellowship only. Stage 2A removes the Ring-bearer from the game. From stage 2B, separate staging, each seat on a different stage 3A. True solo is one area. Do not delete the rule for solo. |
 
 The booklet's scenario chapters name the encounter sets. They do not list every card. Card-by-card setup (Bag End, the Black Rider, Bucklebury Ferry, and the rest) is printed on the quest cards. Hall of Beorn is a reading aid for those lines. The quest card wins if Hall of Beorn disagrees. The runtime never fetches Hall of Beorn.
 
@@ -296,7 +299,7 @@ This is a transaction, not a notes field. On a win the player chooses one of:
 
 Each chosen card is added to the campaign pool and recorded on the log.
 
-`data/campaigns/fellowship-of-the-ring.json` authors each reward group by card code in its `authored.resolution` block. `data:build` fails when a code is not one of the scenario's cards. The scenario definition holds the codes. After a win the reducer opens one resolution window per group, in order, and `ChooseResolution` carries a code from that group. A scenario that is lost writes nothing. A scenario already on the log is not granted again. A chosen Permanent card is recorded as attached, not as a pool card.
+The choice is printed on the back of the campaign card 141030. Until phase 8d, `data/campaigns/fellowship-of-the-ring.json` authors each reward group by card code in its `authored.resolution` block; phase 8d replaces that block with resolution records owned by the card's lines, and the other five campaign cards need more than one pick per group (per-seat choices, attaching to a hero, conditions on the final state, captives). `data:build` fails when a code is not one of the scenario's cards. The scenario definition holds the codes. After a win the reducer opens one resolution window per group, in order, and `ChooseResolution` carries a code from that group. A scenario that is lost writes nothing. A scenario already on the log is not granted again. A chosen Permanent card is recorded as attached, not as a pool card.
 
 Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury Ferry: after it leaves play explored, the players win.
 
@@ -308,13 +311,13 @@ The rule is `mec109.hide-x` and `mec109.hide-tests`, with the worked example (Hi
 
 Burden deck: the five burden cards numbered 81–85, shuffled, set beside the quest deck. When a burden is discarded, it goes to the encounter discard pile.
 
-The booklet's win line says that after the scenario is defeated, all burden cards in the encounter deck and the discard pile are added to the campaign pool. It does not say "also sweep whatever is still in the burden deck." Encode the sentence you can point at. Re-read the quest card before deciding the burden deck's leftovers. Do not silently add a sweep the card does not print.
+The campaign card (141056) settles the win: each burden card in play, in the encounter deck, and in the discard pile is added to the campaign pool. The booklet's line omits "in play"; the card wins. Burdens still in the burden deck are not earned.
 
 Life tracker: starts at 15, displayed as its own number, not as a second threat dial that the refresh step increments. Reducing life lowers that number. Healing a character does not raise it. Life 0 loses the game.
 
 ### Breaking of the Fellowship, stage 2B
 
-Each seat sets a staging area in front of itself and places its quest stage 3 there. Phases still resolve in seat order, starting with the first seat.
+Stage 2A removes the Ring-bearer and its attachments from the game, with The One Ring's text blank while that resolves. At the end of the refresh phase on stage 2B, each seat, starting with the first, creates its own staging area and advances to a different stage 3A of its choice (142063 to 142066), then the seats move the shared encounter cards to their own areas one at a time in player order. Phases still resolve in seat order, starting with the first seat.
 
 After a seat commits to its own stage, it reveals its encounter card, then compares its own committed willpower with the threat in its own staging area. Progress goes on its stage, or its own threat rises by the difference. Another seat does not raise threat for that failure.
 
@@ -427,7 +430,7 @@ Forced effects in the current window run in timestamp order. Responses are offer
 
 ### Coverage test
 
-`scripts/effect-coverage.test.ts` reads the printed lines from `data/cards` and the dealt cards from `data/scenarios`, with no database. A campaign is not marked playable unless that test finds an effect record for every printed line on its quest deck, encounter deck, burden deck, and the seeded starter decks, and for every Setup, Forced, When Revealed, Response, Action, Travel and shadow label by timing. `pnpm effects:draft <scenario>` writes a bundle under `.agent/drafts` for each line no template reads; the `effect-author` agent turns a bundle into authored records. A player deck that contains other official cards does not fail this test. In play, each of those other cards keeps its printed numbers and implemented keywords, and its unique text stays inactive.
+`scripts/effect-coverage.test.ts` reads the printed lines from `data/cards` and the dealt cards from `data/scenarios`, with no database. From phase 8c it checks line ownership against the ledger: every printed line is owned by a record, an implemented keyword, or an `inert` ledger entry with a reason. A campaign is not marked playable unless that test finds an effect record for every printed line on its quest deck, encounter deck, burden deck, and the seeded starter decks, and for every Setup, Forced, When Revealed, Response, Action, Travel and shadow label by timing. `pnpm effects:draft <scenario>` writes a bundle under `.agent/drafts` for each line no template reads; the `effect-author` agent turns a bundle into authored records. A player deck that contains other official cards does not fail this test. In play, each of those other cards keeps its printed numbers and implemented keywords, and its unique text stays inactive.
 
 Author effects in scenario order. Scenario 1 and both starter decks are the first playable slice. Scenarios 2 through 6 reuse the keyword framework.
 
@@ -559,7 +562,7 @@ Exit: `vitest` green in Node. No table component exists yet.
 
 ### 6. Scenarios 2 through 6
 
-One scenario per slice. Each slice adds the script, the required effects, the special widget (life tracker, burden deck, second active location, per-seat staging), and extends the coverage test.
+One scenario per slice. Each slice adds the required effects, the zone or widget its cards create (life tracker, burden deck, second active location, per-seat staging), and extends the coverage test. Each slice has an engine half, proven in Node with goldens, and a phone half. The engine half can run before the table exists; the phone half needs it. Phases 8c and 8d come first: they make the printed cards and the campaign cards the input for every scenario (`docs/plans/authoritative-data.md`).
 
 ### 7. The next campaign
 

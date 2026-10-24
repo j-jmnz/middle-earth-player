@@ -1,30 +1,27 @@
 # Phase 15 — Journey in the Dark
 
-Depends on: phase 14
+Engine half depends on: phase 14's engine half
+Phone half depends on: phase 14
 Blocks: phase 16
 
 ## Goal
 
-`journey-in-the-dark` is playable. No new framework widget unless the quest card prints one.
+`journey-in-the-dark` is playable. No new widget unless a card creates one. Follow the scenario procedure in phase 12.
 
-## Scenario
+## Cards
 
-Booklet difficulty 8. Encounter set: Journey in the Dark only.
-
-`pnpm data:build` writes `data/scenarios/<id>.json` when Hall of Beorn's counts and the quest card's Setup text agree with the DragnCards load list; read the cross-check report (`pnpm data:build -- --verbose`), resolve what it flags with a row in `data/overrides.json`, and add the scenario's `resolution` groups to the campaign file. Then `pnpm effects:draft <id>` and the `effect-author` agent. Assert the Normal deck size. The quest card wins.
-
-Author effect records for abilities this scenario adds. Reuse surge, doomed, peril, archery, immune, indestructible, toughness, setup, victory, sentinel, and ranged from `src/rules`. A dealt card with a printed ability and no effect id fails coverage.
-
-If a quest card declares a second active location, a burden deck, the life tracker, Hide, or per-seat staging, implement that declaration and cite the card in `docs/brief.md`. Do not add the widget because a later scenario needs it.
-
-Saga setup still applies: chosen Ring-bearer, The One Ring, one Fellowship hero, no second Frodo.
-
-The path unlocks this node only after The Ring Goes South is won. A loss writes nothing and stays on this scenario. A win runs this scenario's resolution, then unlocks `breaking-of-the-fellowship`. A replay does not grant the reward again unless the script says so.
+- Campaign card 142039 front, Setup: shuffle the burden treacheries Pursued by the Enemy and Shadow of Fear into the encounter deck. Add the burden objectives Grievous Wound (142088) and Overcome by Grief to the staging area. This is why 8b found these burdens counted by Hall of Beorn and absent from the load list. `data/cards` types Shadow of Fear (142085) and Overcome by Grief (142087) as `treasure` in the Breaking of the Fellowship set. Phase 8d's `campaignKind` and `burdenSet` fix that.
+- Campaign card back: the first player chooses one burden treachery (Pursued by the Enemy or Shadow of Fear) and one burden objective (Grievous Wound or Overcome by Grief). If The Balrog (142044) is still in play, all four are earned instead. The condition is read from the final state.
+- Stage 1A (142040) Setup: set The Balrog, The Great Bridge and Chamber of Mazarbul aside, out of play. Add Doom, Doom, Doom (142043) to the staging area with 10 damage on it. Each player adds 1 different location to the staging area. That is a per-seat search with a distinctness rule.
+- 1B, Forced: after a player optionally engages an enemy, remove 1 damage from Doom, Doom, Doom.
+- 2B (142041): if no enemies are in staging at the beginning of the quest phase, the first player reveals an additional card. The players cannot advance unless there are X resource tokens on this stage (X is the number of players times 3). Forced: after an enemy is defeated, place 1 resource token on this stage. Resource tokens on a quest card are a new token holder. Model them on the card instance, not as a seat pool.
+- 3A (142042): each player reveals 1 card and removes 1 damage from Doom, Doom, Doom. 3B: at most 5 progress on this stage each round. The players cannot defeat it while The Great Bridge is in play. Defeating it wins.
+- Booklet difficulty 8. Encounter set: Journey in the Dark only.
 
 ## E2E
 
-`.maestro/journey-in-the-dark.yaml` opens a seeded save parked on this scenario's resolution. A win unlocks `breaking-of-the-fellowship`. A loss leaves the log unchanged.
+`.maestro/journey-in-the-dark.yaml` opens a seeded save parked on this scenario's resolution. With The Balrog in play it asserts all four burdens are recorded. Without it, it asserts one choice per pair. A win unlocks `breaking-of-the-fellowship`. A loss leaves the log unchanged.
 
 ## Exit
 
-Coverage is green for this scenario's dealt cards. A person can win and lose it on the phone. The log matches the script. No control types damage, resources, threat, or progress.
+The procedure's two halves. The resolution follows the Balrog condition. No control types damage, resources, threat, or progress.

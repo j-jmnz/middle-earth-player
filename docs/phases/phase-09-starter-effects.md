@@ -1,29 +1,43 @@
 # Phase 9 — Starter effects
 
-Depends on: phase 8
+Depends on: phase 8c
 Blocks: phase 11
-Can run beside: phase 10
+Can run beside: phases 8d and 10
 
 ## Goal
 
-Both seeded starter decks are fully automated. A printed ability on a card in either list has an effect id. No table yet.
+Both seeded starter decks are fully automated. Every printed line on a card in either list is owned by an effect record, an implemented keyword, or an `inert` ledger entry. No table yet.
 
-The seeds are Stealth and Steadfastness (Sam, Merry, Pippin) and Wisdom and Wizardry (Gandalf, Théodred, Éowyn), as resolved to RingsDB codes in phase 6.
+The seeds are Stealth and Steadfastness (Sam, Merry, Pippin) and Wisdom and Wizardry (Gandalf, Théodred, Éowyn).
 
-## How to author
+## Starter lists are data
 
-Work in mechanism batches. Each batch is green before the next starts. Ask `/reviewer` to review that batch before the next starts. The phase stays `active` until the last batch. Reuse verbs added in phase 8. Add a verb when a card in these lists needs one. Keep a single interpreter. Pass the records into the reducer. Do not import `src/effects` from `src/rules`.
+Move the two lists out of `src/screens/starter-decks.ts` into `data/campaigns/fellowship-of-the-ring.json` as `starterDecks`, with the code chosen for each row and the MEC109 span that prints the list. A test checks each row's name and count against that span. The seed script reads the file. The Gandalf-to-Elrond note stays a note.
 
-1. Static modifiers and keyword-only cards. Hobbit Cloak, Dagger of Westernesse, Celebrían's Stone, Horn of Gondor, and any list card whose text is only a printed number change.
-2. Simple actions and responses. Ever Vigilant, Common Cause, Quick Strike, Feint, Valiant Sacrifice, Halfling Determination, and the resource or ready effects that fit the same shape.
+## Keywords
+
+Implement `Restricted` once in `src/rules`, citing its span: a character with a third restricted attachment discards one to its owner's discard pile. Sting, Glamdring, Andúril and the starter attachments need it. Ranged and sentinel already exist.
+
+## Templates first
+
+Add player-card sentence templates to `scripts/data/effects/templates.ts` before authoring. They match whole ledger lines only. Candidates: "Attached hero/character gets +N [stat]", "Response: After …, ready …", "Action: Exhaust … to …", "Planning/Quest/Combat Action:" (an action limited to a phase), "Limit once per round/phase", and "Play only …". `pnpm data:build` reports how many lines each template took.
+
+Then run `pnpm effects:draft` for the starter decks (extend it to take a deck id as well as a scenario id) and the `effect-author` agent on what is left.
+
+## Batches
+
+Each batch is green and reviewed by `/reviewer` before the next. Reuse the phase 8 verbs. Add a verb only when a line in these lists needs it, with one interpreter. Pass the records into the reducer. `src/rules` does not import `src/effects`.
+
+1. Static modifiers, keyword-only cards, and Restricted. Hobbit Cloak, Dagger of Westernesse, Celebrían's Stone, Horn of Gondor, and any card whose lines are only a stat change.
+2. Simple actions and responses. Ever Vigilant, Common Cause, Quick Strike, Feint, Valiant Sacrifice, Halfling Determination, and resource or ready effects of the same shape.
 3. Cancel, look-at, and search. A Test of Will, Hasty Stroke, Henamarth Riversong, Frodo's Intuition, Galadriel, and the Gandalf ally's look.
 4. Temporary play, play from discard, and delayed triggers. Sneak Attack, Stand and Fight, Dwarven Tomb, Elf-stone, Erebor Hammersmith, Unexpected Courage.
-5. The remaining hero and attachment sentences. Sam, Merry, Pippin, Gandalf, Théodred, Éowyn, Bilbo, Gandalf's Staff, Wizard Pipe, Fellowship of the Ring, Flame of Anor, Steward of Gondor, Grim Resolve, The Galadhrim's Greeting, Northern Tracker, and whatever the batches above did not cover.
+5. The remaining hero and attachment lines. Sam, Merry, Pippin, Gandalf, Théodred, Éowyn, Bilbo, Gandalf's Staff, Wizard Pipe, Fellowship of the Ring, Flame of Anor, Steward of Gondor, Grim Resolve, The Galadhrim's Greeting, Northern Tracker, and whatever the batches above did not cover.
 
-If you cannot point at the booklet, the card, or the Learn to Play for a timing, do not write the effect. Leave coverage red and name the card.
+If no rule span or ledger line fixes a timing, do not write the record. Leave the line unowned and name the card in STATUS.
 
-A player card that is in neither starter and not dealt by the scenario stays inactive. Printed cost and combat numbers, plus implemented keywords, still work. The unique sentence is shown, not offered, and there is no sheet on which the player applies it.
+A player card in neither starter and not dealt by a scenario keeps its printed numbers and implemented keywords. Its unowned lines are inactive: shown, not offered, and no sheet applies them.
 
 ## Exit
 
-The coverage test loads the scenario 1 decks and both starter decks, and every listed ability has an effect id. A deck that also contains some other official card does not fail the test. `vitest` is green. No table component exists.
+Ownership coverage is green for scenario 1 and both starter decks. A deck that also holds other official cards does not fail. Each batch adds an auto-player game on fixed seeds with that starter deck to the goldens, and the cause test from phase 8d covers it once 8d is done. `vitest` is green. No table component exists.
