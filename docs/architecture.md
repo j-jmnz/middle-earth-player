@@ -22,6 +22,9 @@ Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm i
 | Catalog boundary | Zod | `src/catalog` |
 | Files and list images | `expo-file-system`, `expo-image` | image cache, lists, inspect, booklets |
 | Screen state | Zustand | subscribers of reducer output |
+| Local PDF reader | `modules/booklet-pdf`, a local Expo module: PDFKit on iOS, `PdfRenderer` on Android | `src/screens/booklets` |
+| Booklet import | `expo-document-picker` | `src/screens/booklets` |
+| Dev build | `expo-dev-client` (the local module is not in Expo Go) | device builds |
 | Engine tests | Vitest | `src/rules`, `src/campaign` |
 | End-to-end | Maestro, flows in `.maestro/` | a built app, locally and in an EAS Workflow |
 
@@ -99,6 +102,7 @@ flowchart TD
 | `src/rules` | Round, zones, keywords, window stack, modifier list, effect interpreter, reducer | `src/catalog` |
 | `src/campaign` | Save and log types, saga validators, `buildStart`, resolution | `src/catalog`, `src/rules`, `src/effects` |
 | `src/play` | Skia table, phase rail, sheets, gesture-to-intent mapping | `src/rules`, `src/catalog`, `src/effects` |
+| `modules/booklet-pdf` | Native view and `pageCount` for one local PDF (Swift on iOS, Kotlin on Android); `index.ts` is the JS side and reports `bookletPdfAvailable()` | `expo-modules-core` only |
 | `src/screens` | Expo Router routes, SQLite, image cache, deck editor, booklet reader | `src/play`, `src/campaign`, `src/catalog`, `src/effects` |
 
 The Expo Router root is `src/screens/routes`. Every file in that directory is a page. SQLite, the database provider, and tests stay in `src/screens`, outside that root.
@@ -234,7 +238,7 @@ Expo Router. The app opens on the campaign list.
 | Card | one cached file, catalog text | nothing |
 | Card pool | card rows loaded when the screen opens, then filtered in memory; `image_files` | nothing |
 | Deck | catalog, `decks` | `decks` |
-| Booklet | one `booklets` row and the file under `booklets/` | last page |
+| Booklet | one `booklets` row and the file under `booklets/`; the import, the file copy and the reader view are in `src/screens/booklets/` | last page |
 | Debug | the open catalog, the open user database, and the image queue | nothing |
 
 The debug route reads the open databases and the image queue and is not a player screen.

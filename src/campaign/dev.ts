@@ -1,4 +1,5 @@
-// DEV ONLY. Delete in phase 11, when the real table and resolution screen exist.
+// DEV ONLY, and not rules-faithful: `boostedContext` rewrites the printed willpower, defense and health of the dealt
+// heroes, so a result it produces is a shell check, not a game played by the printed cards. Delete in phase 11, when the real table and resolution screen exist.
 //
 // While the table is absent, the dev control plays the open scenario with a fixed policy that answers every window from
 // the intents the reducer lists (it never types a number), then submits the Resolution choices through the same reducer.
