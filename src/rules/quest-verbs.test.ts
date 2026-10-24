@@ -57,7 +57,7 @@ function run(state: ScenarioState, effect: Effect, sourceId: string, ctx: Reduce
 }
 
 describe("an out-of-play card shuffled into the encounter deck (141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2)", () => {
-  const shuffle = record("stage:forced:1", "stage", "141026:B:2", "forced", [{ verb: "ShuffleSetAsideIntoEncounterDeck", code: "wraith" }]);
+  const shuffle = record("stage:forced:1", "stage", "141026:B:2", "forced", [{ verb: "ShuffleOutOfPlayIntoEncounterDeck", code: "wraith" }]);
   const ctx = { effects: [shuffle], cards };
 
   it("moves one set-aside copy into the encounter deck and shuffles it, and does nothing with no copy left", () => {
@@ -77,15 +77,47 @@ describe("an out-of-play card shuffled into the encounter deck (141026:B:2, 1410
     expect(thrice.encounterDeck).toHaveLength(5);
   });
 
-  it("reads whether a copy is still set aside, so a Choose option can require it", () => {
+  it("reads whether a copy is out of play, so a Choose option can require it (rr.in-play-and-out-of-play, rr.removed-from-game)", () => {
     const { state: base } = table(1);
     const scope = { actor: 0, sourceId: null, returned: 0 };
-    expect(holds(base, { kind: "setAside", code: "wraith" }, scope, ctx)).toBe(false);
-    const aside = spawn(base, "wraith", { zone: "setAside" }, "down").state;
-    expect(holds(aside, { kind: "setAside", code: "wraith" }, scope, ctx)).toBe(true);
-    // A copy in the encounter discard pile is not the set-aside pile the Setup made.
-    const discarded = spawn(base, "wraith", { zone: "encounterDiscard" }).state;
-    expect(holds(discarded, { kind: "setAside", code: "wraith" }, scope, ctx)).toBe(false);
+    const out = (state: ScenarioState): boolean => holds(state, { kind: "outOfPlay", code: "wraith" }, scope, ctx);
+    expect(out(base)).toBe(false);
+    // Out of play, by the Rules Reference's list: set aside, the encounter discard pile, the victory display.
+    for (const zone of ["setAside", "encounterDiscard", "victory"] as const) expect(out(spawn(base, "wraith", { zone }, "down").state), zone).toBe(true);
+    // Not the encounter deck the copy would be shuffled into, not one removed from the game, not one in play.
+    for (const zone of ["encounterDeck", "removed", "staging"] as const) expect(out(spawn(base, "wraith", { zone }).state), zone).toBe(false);
+  });
+
+  it("takes a copy from the encounter discard pile when none is set aside", () => {
+    const { state: base, stageId } = table(1);
+    const discarded = spawn(base, "wraith", { zone: "encounterDiscard" });
+    const state = spawn(discarded.state, "orc", { zone: "encounterDeck" }).state;
+    const done = run(state, shuffle, stageId, ctx, []);
+    expect(done.window).toBeNull();
+    expect(done.encounterDiscard).toEqual([]);
+    expect(done.cards[discarded.id]).toMatchObject({ zone: "encounterDeck", face: "down" });
+  });
+
+  it("takes a copy from under a location: it is out of play by that card's text (141049:A:1)", () => {
+    const { state: base, stageId } = table(1);
+    const location = spawn(base, "marsh", { zone: "staging" });
+    const placed = spawn(location.state, "wraith", { zone: "under", locationId: location.id }, "down");
+    const done = run(placed.state, shuffle, stageId, ctx, []);
+    expect(done.cards[placed.id]).toMatchObject({ zone: "encounterDeck", host: null });
+  });
+
+  it("asks the first player which copy when copies are out of play in different zones (rr.first-player)", () => {
+    const { state: base, stageId } = table(2);
+    const aside = spawn(base, "wraith", { zone: "setAside" }, "down");
+    const second = spawn(aside.state, "wraith", { zone: "setAside" }, "down");
+    const discarded = spawn(second.state, "wraith", { zone: "encounterDiscard" });
+    // The effect is the second seat's; the first player (seat 1 here) picks the copy. Two set-aside copies are one choice.
+    const state = { ...discarded.state, firstPlayer: 1 };
+    const asked = settle(pushCardEffects(state, "forced", stageId, 0, false, [shuffle], ctx, []), ctx, []);
+    expect(asked.window).toEqual({ kind: "choose", seat: 1, options: [aside.id, discarded.id] });
+    const chosen = expectOk(reduce({ ...asked, activeSeat: 1 }, { type: "Choose", optionId: discarded.id }, ctx));
+    expect(chosen.state.cards[discarded.id]?.zone).toBe("encounterDeck");
+    expect(chosen.state.setAside).toEqual([aside.id, second.id]);
   });
 });
 
@@ -96,7 +128,7 @@ describe("the first player chooses between two instructions at the end of the ro
       who: "firstPlayer",
       options: [
         { id: "progress", requires: { kind: "questProgress" }, instructions: [{ verb: "RemoveQuestProgress", perPlayer: 1 }] },
-        { id: "wraith", requires: { kind: "setAside", code: "wraith" }, instructions: [{ verb: "ShuffleSetAsideIntoEncounterDeck", code: "wraith" }] },
+        { id: "wraith", requires: { kind: "outOfPlay", code: "wraith" }, instructions: [{ verb: "ShuffleOutOfPlayIntoEncounterDeck", code: "wraith" }] },
       ],
     },
   ], { trigger: "endOfRound" });

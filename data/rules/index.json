@@ -41,6 +41,7 @@
   {"id": "rr.quest-cards-quest-deck", "doc": "rr", "page": 13, "column": 2, "from": "Quest Cards / Quest Deck Each quest card represents", "to": "also: Appendix II", "title": "Quest Cards / Quest Deck", "terms": ["quest cards", "quest deck"]},
   {"id": "rr.ranged", "doc": "rr", "page": 14, "column": 1, "from": "Ranged Ranged is a keyword ability", "to": "make the attack.", "title": "Ranged", "terms": ["ranged"]},
   {"id": "rr.refresh-phase", "doc": "rr", "page": 14, "column": 1, "from": "Refresh Phase The steps of this phase are described", "to": "on page 25.", "title": "Refresh Phase", "terms": ["refresh phase"]},
+  {"id": "rr.removed-from-game", "doc": "rr", "page": 14, "column": 1, "from": "Removed from Game “Removed from the game” is an out-of-play state.", "to": "until the end of the game.", "title": "Removed from Game", "terms": ["removed from the game"]},
   {"id": "rr.resources", "doc": "rr", "page": 14, "column": 2, "from": "Resources Resources are the game’s currency", "to": "out of Tokens", "title": "Resources", "terms": ["resources"]},
   {"id": "rr.resource-match", "doc": "rr", "page": 14, "column": 2, "from": "Resource Match In order for a player to play a card", "to": "Sphere of Influence", "title": "Resource Match", "terms": ["resource match"]},
   {"id": "rr.response", "doc": "rr", "page": 14, "column": 2, "from": "Response Response abilities are labeled by the word “Response”", "to": "and Ability Resolution", "through": {"page": 15, "column": 1}, "title": "Response", "terms": ["response"]},

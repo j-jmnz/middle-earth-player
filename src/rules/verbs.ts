@@ -3,7 +3,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import { runAttackVerb } from "./attack-verbs.ts";
 import { characters } from "./combat.ts";
-import { hasTrait, holds } from "./conditions.ts";
+import { hasTrait, holds, outOfPlayCopies } from "./conditions.ts";
 import { scheduleDelayed } from "./delayed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -48,9 +48,10 @@ export function runExtraVerb(
       const id = state.setAside.find((candidate) => state.cards[candidate]?.code === instruction.code);
       return id ? updateCard(moveCard(state, id, { zone: "staging" }), id, { face: "up" }) : state;
     }
-    case "ShuffleSetAsideIntoEncounterDeck": {
-      // "Out of play" here is the set-aside pile the quest card's Setup made (141025:A:1).
-      const id = state.setAside.find((candidate) => state.cards[candidate]?.code === instruction.code);
+    case "ShuffleOutOfPlayIntoEncounterDeck": {
+      // Outside an effect frame nobody can be asked, so the first out-of-play copy goes (effect-frames.ts asks the first
+      // player when copies are in different zones, rr.first-player).
+      const id = outOfPlayCopies(state, instruction.code)[0];
       return id ? shuffleEncounterDeck(updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down" })) : state;
     }
     case "RemoveQuestProgress":

@@ -92,8 +92,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return Object.values(state.cards).some(
         (card) => card.code === condition.code && card.controller === scope.actor && (card.zone === "heroes" || card.zone === "play"),
       );
-    case "setAside":
-      return state.setAside.some((id) => state.cards[id]?.code === condition.code);
+    case "outOfPlay":
+      return outOfPlayCopies(state, condition.code).length > 0;
     case "questProgress": {
       const stage = state.questStage ? state.cards[state.questStage] : undefined;
       return stage != null && stage.progress > 0;
@@ -158,6 +158,17 @@ export function grantedIcons(state: ScenarioState, id: string, ctx: ReduceContex
 }
 
 // Cards in the encounter deck, then the discard pile, that match a code, a trait and a printed type.
+// The out-of-play copies of a card that "shuffle 1 out of play Ringwraith into the encounter deck" (141026:B:2, 141051:A:2,
+// 141053:A:1, 141054:A:2) can take. "Out of play" is the Rules Reference's list (rr.in-play-and-out-of-play): of the zones an
+// encounter card can be in, cards set aside, the encounter discard pile and the victory display; a card under Weather Hills
+// is out of play by that card's text (141049:A:1). Not the encounter deck itself, which the copy is shuffled into, and not a
+// card removed from the game, which "has no further interaction with the game in any manner" (rr.removed-from-game). An
+// encounter card is never in a player's hand, deck or discard pile.
+export function outOfPlayCopies(state: ScenarioState, code: string): string[] {
+  const under = Object.values(state.cards).filter((card) => card.zone === "under").map((card) => card.id);
+  return [...state.setAside, ...state.encounterDiscard, ...state.victory, ...under].filter((id) => state.cards[id]?.code === code);
+}
+
 export function searchable(
   state: ScenarioState,
   selector: { code?: string; trait?: string; type?: string },

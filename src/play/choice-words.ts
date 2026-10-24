@@ -37,7 +37,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     }
     case "PlaceQuestProgress":
       return `place ${instruction.perPlayer * livingSeats(game).length} progress on the quest`;
-    case "ShuffleSetAsideIntoEncounterDeck":
+    case "ShuffleOutOfPlayIntoEncounterDeck":
       return `shuffle an out-of-play ${names.code(instruction.code)} into the encounter deck`;
     case "GainSurge":
       return "reveal an additional encounter card";

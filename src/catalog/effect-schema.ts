@@ -178,9 +178,10 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("hostNamed"), name: z.string().min(1) }),
   // The actor controls a hero or ally in play with this code.
   z.strictObject({ kind: z.literal("controls"), code: z.string().min(1) }),
-  // A copy of this card is set aside, out of play (a quest card's Setup put it there: 141025:A:1, "shuffle 1 out of play
-  // Ringwraith into the encounter deck" on 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2).
-  z.strictObject({ kind: z.literal("setAside"), code: z.string().min(1) }),
+  // A copy of this card is out of play where an effect can take it from ("shuffle 1 out of play Ringwraith into the encounter
+  // deck" on 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2): set aside, in the encounter discard pile or the victory display
+  // (rr.in-play-and-out-of-play), or under a location (141049:A:1). See outOfPlayCopies in src/rules/conditions.ts.
+  z.strictObject({ kind: z.literal("outOfPlay"), code: z.string().min(1) }),
   // The current quest card has progress on it (141026:B:2: removing progress is an effect that changes the game, rr.effects).
   z.strictObject({ kind: z.literal("questProgress") }),
   // An enemy (with this trait, if one is named) is in play (`is`) or none is (141027:B:1).
@@ -347,9 +348,11 @@ const simpleVerbs = [
   codeVerb("AttachToRingBearer"),
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal.
   codeVerb("AddSetAsideToStaging"),
-  // During play: one set-aside copy of the card joins the encounter deck, which is shuffled ("shuffle 1 out of play
-  // Ringwraith into the encounter deck", 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2). Nothing happens with no copy left.
-  codeVerb("ShuffleSetAsideIntoEncounterDeck"),
+  // During play: one out-of-play copy of the card (the `outOfPlay` condition's zones) joins the encounter deck, which is
+  // shuffled ("shuffle 1 out of play Ringwraith into the encounter deck", 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2).
+  // When copies are out of play in more than one zone, the first player chooses which (rr.first-player). Nothing happens
+  // with no copy left.
+  codeVerb("ShuffleOutOfPlayIntoEncounterDeck"),
   // Removes progress from the current quest card, `perPlayer` for each player in the game. It stops at 0 (141026:B:2).
   z.strictObject({ verb: z.literal("RemoveQuestProgress"), perPlayer: z.number().int().positive(), ...when }),
   // Places progress on the current quest, `perPlayer` for each player in the game. The active location takes it first

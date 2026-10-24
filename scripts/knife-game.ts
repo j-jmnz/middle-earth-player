@@ -134,15 +134,16 @@ export function playKnife(seatCount: 1 | 2, seed: number, difficulty: Difficulty
 // The wins use the strong loadout. The auto-player lost every starter-deck game it played in phase 12 (Easy and Normal,
 // seeds 1 to 12, true solo and two-handed), and the seeded beam search below (searchKnifeWin, Easy) found no win either:
 // true solo seeds 1 to 4 and two-handed seed 1 at width 12 and 10 tries a round, after earlier runs at widths 4 to 16 on
-// seeds 1 to 3; the best lines died on stage 2 with threat near 50. Two-handed seed 10 ends with the first-player token
-// on the second seat, so its Resolution starts there.
+// seeds 1 to 3; the best lines died on stage 2 with threat near 50. Two-handed seed 1 lost until an out-of-play Ringwraith
+// could come from the encounter discard pile (rr.in-play-and-out-of-play); on the same seed and policy it now wins, so it is
+// labeled won and the two-handed losses are the starter-deck game.
 export type KnifeGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: KnifeDecks; outcome: "won" | "lost" };
 
 export const KNIFE_GOLDENS: readonly KnifeGolden[] = [
   { name: "true solo, strong, won", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, strong, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost" },
   { name: "two-handed, strong, won", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed, strong, lost", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost" },
+  { name: "two-handed, strong, seed 1, won", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, starter decks, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "starter", outcome: "lost" },
   { name: "two-handed, starter decks, lost", seatCount: 2, seed: 1, difficulty: "Normal", decks: "starter", outcome: "lost" },
 ];
