@@ -1,12 +1,13 @@
 // The end of a scenario. Won: the choices the campaign card's Resolution records open, one group (and, when the card says
-// each player chooses, one seat) at a time; each choice is sent to the reducer, and Confirm writes the log. Lost: Defeat and
+// each player chooses, one seat, starting with the first player) at a time; each choice is sent to the reducer, and Confirm
+// writes the log. A choice the card lets a seat pass has a visible decline ("No boon") beside the tiles. Lost: Defeat and
 // nothing written (docs/design-system.md, Resolution).
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useStore } from "zustand";
 
-import { choiceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
+import { choiceSentence, declineSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
 import { BodyText, Eyebrow, NavBar, PrimaryButton, Screen, TextButton } from "../../chrome";
 import { campaignOf, scenarioOf } from "../../campaign-data";
@@ -28,8 +29,11 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       accessibilityState={{ selected }}
       accessibilityLabel={selected ? `${label}, selected` : label}
       onPress={onPress}
-      className="min-h-14 flex-1 items-center rounded-tile p-3"
+      className="min-h-14 items-center rounded-tile p-3"
       style={({ pressed }) => ({
+        // Two tiles a row: a boon offered on each hero makes a longer list than one row holds.
+        flexBasis: "46%",
+        flexGrow: 1,
         borderWidth: selected ? 1.5 : 1,
         borderColor: selected ? palette.gold : palette.hairline,
         backgroundColor: pressed ? palette.pressed : palette.raised,
@@ -98,6 +102,8 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const nextId = at >= 0 ? campaign?.scenarios[at + 1] : undefined;
   const nextName = !done && nextId ? (scenarioOf(nextId)?.name ?? null) : null;
   const picked = view.kind === "choosing" ? (view.tiles.find((tile) => tile.optionId === chosen) ?? null) : null;
+  const declined = view.kind === "choosing" && view.decline != null && chosen === view.decline.optionId;
+  const answer = picked?.optionId ?? (declined && view.kind === "choosing" ? (view.decline?.optionId ?? null) : null);
 
   return (
     <Screen testID="resolution" scene="victory">
@@ -129,6 +135,17 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                 <Tile key={tile.optionId} tile={tile} selected={tile.optionId === chosen} imagesrc={tile.code ? (session.facts.get(tile.code)?.imagesrc ?? null) : null} onPress={() => setChosen(tile.optionId)} />
               ))}
             </View>
+            {view.decline ? (
+              <View className="mt-3 items-center">
+                <TextButton
+                  label={view.decline.label}
+                  testID="resolution-decline"
+                  accessibilityLabel={declined ? `${view.decline.label}, selected` : view.decline.label}
+                  onPress={() => setChosen(view.decline?.optionId ?? null)}
+                />
+                {declined ? <Text className="text-label text-gold">Selected</Text> : null}
+              </View>
+            ) : null}
           </View>
         ) : null}
       </ScrollView>
@@ -141,15 +158,15 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
         {view.kind === "choosing" ? (
           <>
             <BodyText tone="muted" className="mb-3 text-center" testID="resolution-consequence">
-              {picked ? choiceSentence(view, picked) : "Choose one. It is written to the campaign log when you confirm."}
+              {picked ? choiceSentence(view, picked) : declined ? declineSentence(view) : view.decline ? `Choose one, or ${view.decline.label.toLowerCase()}. It is written to the campaign log when you confirm.` : "Choose one. It is written to the campaign log when you confirm."}
             </BodyText>
             <PrimaryButton
               label="Confirm"
               testID="resolution-confirm"
-              disabled={!picked}
+              disabled={answer == null}
               onPress={() => {
-                if (!picked) return;
-                if (opened.store.getState().dispatch({ type: "ChooseResolution", optionId: picked.optionId })) setChosen(null);
+                if (answer == null) return;
+                if (opened.store.getState().dispatch({ type: "ChooseResolution", optionId: answer })) setChosen(null);
               }}
             />
           </>

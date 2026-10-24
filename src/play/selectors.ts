@@ -3,12 +3,14 @@
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
 import type { CardInstance, ScenarioState } from "../rules/state.ts";
+import { shadowCards } from "../rules/zones.ts";
 
 export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActiveLocation" | "engaged" | "play" | "hand";
 
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
-// One card on the table and the cards attached to it, in the order they were attached, then its shadow card if it has one.
+// One card on the table and the cards attached to it, in the order they were attached, then each shadow card dealt to it
+// (the first one first; a Ringwraith can carry an additional one, 141069:A:2).
 export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[] };
 export type ZoneView = { zone: ZoneId; seat: number; entries: readonly ZoneEntry[] };
 
@@ -56,9 +58,11 @@ function entriesOf(game: ScenarioState, ids: readonly string[]): ZoneEntry[] {
       const attachment = game.cards[attachmentId];
       if (attachment) attached.push(attachment);
     }
-    // An engaged enemy's shadow card travels with it, so turning the shadow card up changes this zone's view.
-    const shadow = card.shadowId ? game.cards[card.shadowId] : undefined;
-    if (shadow) attached.push(shadow);
+    // An engaged enemy's shadow cards travel with it, so turning one up changes this zone's view.
+    for (const shadowId of shadowCards(card)) {
+      const shadow = game.cards[shadowId];
+      if (shadow) attached.push(shadow);
+    }
     entries.push({ card, attached });
   }
   return entries;
@@ -99,7 +103,7 @@ export function shownSeat(game: ScenarioState): number {
 }
 
 /**
- * What a tap on a table card can inspect: the card, then each card attached to it and its shadow card once it is face up.
+ * What a tap on a table card can inspect: the card, then each card attached to it and each of its shadow cards once face up.
  * Attachments peek out only a strip from under their host, so a tap on the host lists them, each a full-size target.
  */
 export function inspectTargets(game: ScenarioState, cardId: string): readonly string[] {
@@ -107,7 +111,6 @@ export function inspectTargets(game: ScenarioState, cardId: string): readonly st
   if (!card) return [];
   const host = card.host && game.cards[card.host] ? game.cards[card.host] : card;
   if (!host) return [cardId];
-  const shadow = host.shadowId ? game.cards[host.shadowId] : undefined;
-  const under = [...host.attachments, ...(shadow && shadow.face !== "down" ? [shadow.id] : [])].filter((id) => game.cards[id]?.face !== "down");
+  const under = [...host.attachments, ...shadowCards(host)].filter((id) => game.cards[id] != null && game.cards[id]?.face !== "down");
   return [host.id, ...under];
 }

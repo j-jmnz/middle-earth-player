@@ -98,7 +98,7 @@ function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, card:
 
 /**
  * The table for one seat: the pinned quest stage at the top, then staging, the active location beside the engaged enemies
- * (each carrying its shadow card), the play area, and the hand fanned at the bottom.
+ * (each carrying every shadow card dealt to it, face down until its attack), the play area, and the hand fanned at the bottom.
  */
 export function tableLayout(width: number, height: number, views: LayoutViews): TableLayout {
   const card = cardSize(width, height);
@@ -127,7 +127,7 @@ export function tableLayout(width: number, height: number, views: LayoutViews): 
   placeRow(views.staging.entries, "staging", staging, card, slots);
   placeRow(views.activeLocation.entries, "activeLocation", activeLocation, card, slots);
   placeRow(views.secondActiveLocation.entries, "secondActiveLocation", secondActiveLocation, card, slots);
-  // An engaged enemy's shadow card sits under it, face down until its attack.
+  // An engaged enemy's shadow cards sit under it, each peeking out, face down until its attack.
   placeRow(views.engaged.entries, "engaged", engaged, card, slots, true);
   placeRow(views.play.entries, "play", play, card, slots);
 

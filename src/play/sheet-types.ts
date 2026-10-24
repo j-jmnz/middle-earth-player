@@ -20,6 +20,9 @@ export type SheetOption = { id: string; label: string; code: string | null; stat
 
 export type PickOption = SheetOption & ({ intent: PlayerIntent } | { next: Sheet });
 
+// An option the rules do not allow now, shown with the reducer's reason so the player sees why it is missing.
+export type Unavailable = { id: string; label: string; code: string | null; reason: string };
+
 export type Alternative = { label: string; intent: PlayerIntent } | { label: string; next: Sheet };
 
 export type PickSheet = {
@@ -32,7 +35,11 @@ export type PickSheet = {
   note: string | null;
   // The action the primary button names with the chosen option ("Defend with" Sam).
   verb: string;
+  // A fixed primary label when an option is a whole sentence (a branch of a Choose), in place of verb and option.
+  confirm?: string;
   options: readonly PickOption[];
+  // Options the rules refuse now, with the reason (Weathertop's unpayable Travel cost).
+  unavailable?: readonly Unavailable[];
   // The one filled action when the sheet has no options to choose among (Keep, Done).
   primary: { label: string; intent: PlayerIntent } | null;
   alternative: Alternative | null;

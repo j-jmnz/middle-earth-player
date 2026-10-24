@@ -292,13 +292,14 @@ function PickView(props: SheetProps & { sheet: PickSheet }) {
     else onNext(picked.next);
   };
   const alternative = sheet.alternative;
+  const unavailable = sheet.unavailable ?? [];
   const actions = (
     <>
       {sheet.primary ? (
         <ChromePrimary label={sheet.primary.label} testID="sheet-primary" surface="paper" onPress={() => sheet.primary && onIntent(sheet.primary.intent)} />
       ) : sheet.options.length > 0 ? (
         <>
-          <ChromePrimary label={picked ? `${sheet.verb} ${picked.label.split(" · ")[0]}` : sheet.verb} testID="sheet-primary" surface="paper" disabled={!picked} onPress={confirm} />
+          <ChromePrimary label={sheet.confirm ?? (picked ? `${sheet.verb} ${picked.label.split(" · ")[0]}` : sheet.verb)} testID="sheet-primary" surface="paper" disabled={!picked} onPress={confirm} />
           {!picked ? <Why>Choose one above.</Why> : null}
         </>
       ) : null}
@@ -309,9 +310,20 @@ function PickView(props: SheetProps & { sheet: PickSheet }) {
   );
   return (
     <Paper {...paperProps(props, sheet)} actions={actions}>
-      {sheet.options.length > 0
-        ? sheet.options.map((item) => <Tile key={item.id} label={item.label} stats={item.stats} selected={item.id === chosen} testID={`sheet-option-${item.id}`} onPress={() => setChosen(item.id)} />)
-        : null}
+      {sheet.options.length > 0 || unavailable.length > 0 ? (
+        <>
+          {sheet.options.map((item) => (
+            <Tile key={item.id} label={item.label} stats={item.stats} selected={item.id === chosen} testID={`sheet-option-${item.id}`} onPress={() => setChosen(item.id)} />
+          ))}
+          {/* What the rules refuse now, and why (Weathertop's Travel cost): text, not a choice. */}
+          {unavailable.map((item) => (
+            <View key={item.id} testID={`sheet-unavailable-${item.id}`} accessible accessibilityLabel={`${item.label}. ${item.reason}`} className="mb-2 rounded-tile px-4 py-2" style={{ borderWidth: 1, borderColor: t.inkLine, borderStyle: "dashed" }}>
+              <Text className="text-body text-inkMuted">{item.label}</Text>
+              <Text className="mt-0.5 text-label text-inkMuted">{item.reason}</Text>
+            </View>
+          ))}
+        </>
+      ) : null}
     </Paper>
   );
 }

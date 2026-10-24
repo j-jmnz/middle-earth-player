@@ -80,7 +80,9 @@ export default function Log() {
   const bySeat = (lists: readonly (readonly string[])[]) => (lists.every((list) => list.length === 0) ? "None" : seats.map((seat) => `${save.seatCount > 1 ? `Seat ${seat + 1}: ` : ""}${(lists[seat] ?? []).map(nameOf).join(", ") || "None"}`).join("\n"));
   const pool = (kind: "boon" | "burden") => {
     const picked = log.campaignPool.filter((card) => printed.get(card.code)?.campaignKind === kind);
-    return picked.length === 0 ? "None" : picked.map((card) => (card.attachedTo ? `${nameOf(card.code)} on ${nameOf(card.attachedTo)}` : nameOf(card.code))).join("\n");
+    // A boon stuck to a hero names that hero, and in two-handed play the seat that took it (141044:B:1).
+    const seatOf = (card: (typeof picked)[number]) => (save.seatCount > 1 && card.attachedTo && card.seat != null ? `Seat ${card.seat + 1}: ` : "");
+    return picked.length === 0 ? "None" : picked.map((card) => `${seatOf(card)}${card.attachedTo ? `${nameOf(card.code)} on ${nameOf(card.attachedTo)}` : nameOf(card.code)}`).join("\n");
   };
   const names = scenarioNames(campaign);
   const notes = edited ?? log.notes;
