@@ -56,7 +56,12 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   console.log(`effects: ${generated.effects.length} generated, ${generated.unmatched.length} lines without a template`);
   console.log(`scenarios: ${built.scenarios.map((scenario) => scenario.id).join(", ") || "none"}`);
   for (const note of built.notes) console.log(`note: ${note}`);
-  if (built.problems.length > 0) console.log(`unbuilt scenarios, problems:\n  ${built.problems.join("\n  ")}`);
+  if (built.problems.length > 0) {
+    const perScenario = new Map<string, number>();
+    for (const problem of built.problems) perScenario.set(problem.split(":")[0] ?? problem, (perScenario.get(problem.split(":")[0] ?? problem) ?? 0) + 1);
+    console.log(`unbuilt scenarios (cross-checks failed; run with --verbose for each): ${[...perScenario].map(([name, count]) => `${name} ${count}`).join(", ")}`);
+    if (process.argv.includes("--verbose")) console.log(`  ${built.problems.join("\n  ")}`);
+  }
   console.log(`cards: ${cards.length} in ${byPack.size} packs`);
   if (report.twinless.length > 0) console.log(`twinless without override: ${report.twinless.join(", ")}`);
   const unknown = Object.entries(report.unknownKeywords).sort(([a], [b]) => a.localeCompare(b));

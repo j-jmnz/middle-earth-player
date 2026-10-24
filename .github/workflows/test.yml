@@ -15,7 +15,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm catalog:build
+      - run: pnpm data:check
       - run: pnpm lint
       - run: pnpm exec tsc --noEmit
       - run: pnpm test

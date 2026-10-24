@@ -1,18 +1,16 @@
-import { existsSync, mkdtempSync } from "node:fs";
+import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 
 import { normalCopiesByCode, scenarioCards } from "../src/catalog/scenario-data.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
-import { buildCatalog } from "./build-catalog.ts";
 import { loadScenario } from "./data/load-scenarios.ts";
+import { buildCatalog } from "./build-catalog.ts";
+import { temporaryCatalog } from "./temp-catalog.ts";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const dbPath = path.join(root, "assets", "catalog.db");
 
 describe("built catalog", () => {
   it("is the catalog src/catalog/version.ts says it is", () => {
@@ -22,7 +20,7 @@ describe("built catalog", () => {
   });
 
   it("reads the Fellowship hero and campaign rows from the built database", async () => {
-    if (!existsSync(dbPath)) buildCatalog();
+    const dbPath = temporaryCatalog();
 
     const database = new DatabaseSync(dbPath, { readOnly: true });
     try {
