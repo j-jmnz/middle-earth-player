@@ -34,6 +34,7 @@ const INSTRUCTION_VERBS = [
 ] as const;
 
 const effect = {
+  id: "10001:action:1",
   cardCode: "10001",
   timing: "action",
   instructions: [{ verb: "Draw" }],
@@ -90,11 +91,36 @@ describe("catalog boundary", () => {
     expect(costSchema.safeParse({ verb: "Draw" }).success).toBe(false);
   });
 
-  it("accepts an effect and rejects a present condition", () => {
+  it("accepts an effect and rejects an unknown condition", () => {
     expect(effectSchema.parse(effect)).toEqual(effect);
+    const known = { kind: "hideFailed", scope: "phase" };
+    expect(effectSchema.parse({ ...effect, condition: known }).condition).toEqual(known);
     expect(effectSchema.safeParse({ ...effect, condition: { kind: "ready" } }).success).toBe(false);
     expect(effectSchema.safeParse({ ...effect, condition: null }).success).toBe(false);
     expect(conditionSchema.safeParse("ready").success).toBe(false);
+  });
+
+  it("requires an effect id and a trigger from the event list", () => {
+    const { id: _id, ...unnamed } = effect;
+    expect(effectSchema.safeParse(unnamed).success).toBe(false);
+    expect(effectSchema.safeParse({ ...effect, id: "" }).success).toBe(false);
+    expect(effectSchema.parse({ ...effect, timing: "forced", trigger: "hideFailed" }).trigger).toBe("hideFailed");
+    expect(effectSchema.safeParse({ ...effect, timing: "forced", trigger: "whenever" }).success).toBe(false);
+  });
+
+  it("accepts nested instructions one level down and rejects deeper nesting", () => {
+    const choose = {
+      verb: "Choose",
+      who: "firstPlayer",
+      options: [{ id: "a", instructions: [{ verb: "RaiseThreat", amount: 3, who: "firstPlayer" }] }],
+    };
+    expect(instructionSchema.parse(choose)).toEqual(choose);
+    const each = { verb: "ForEachPlayer", order: "lastFirst", instructions: [choose] };
+    expect(instructionSchema.parse(each)).toEqual(each);
+    const delay = { verb: "Delay", until: "endOfPhase", instructions: [{ verb: "EngageAll", who: "firstPlayer" }] };
+    expect(instructionSchema.parse(delay)).toEqual(delay);
+    expect(instructionSchema.safeParse({ verb: "Delay", until: "endOfPhase", instructions: [delay] }).success).toBe(false);
+    expect(instructionSchema.safeParse({ verb: "RaiseThreat", amount: 0 }).success).toBe(false);
   });
 
   it("rejects extra effect fields", () => {

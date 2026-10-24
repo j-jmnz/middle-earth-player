@@ -1,3 +1,4 @@
+import { declineCancel } from "./cancel.ts";
 import { livingSeats, withMode, type ModeName, type ScenarioState } from "./state.ts";
 
 // Seats that may act in the open window. Peril limits a frame's action window to the revealing seat.
@@ -17,6 +18,7 @@ export function openFrameActions(state: ScenarioState): ScenarioState {
 }
 
 export function applyPass(state: ScenarioState): ScenarioState {
+  if (state.window?.kind === "cancelOffer") return declineCancel(state);
   const passed = state.passed.includes(state.activeSeat) ? state.passed : [...state.passed, state.activeSeat];
   const nextSeat = actingSeats(state).find((seat) => !passed.includes(seat));
   if (nextSeat != null) return { ...state, passed, activeSeat: nextSeat };

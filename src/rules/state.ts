@@ -1,6 +1,22 @@
-import type { Instruction, ModifierStat, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
+import type { Instruction, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
 
+import type { DelayedEffect, Frame, HideFailure, Modifier } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
+
+export type {
+  DelayedEffect,
+  EffectData,
+  CancelOffer,
+  Frame,
+  FrameData,
+  FrameName,
+  GameEvent,
+  HideData,
+  HideFailure,
+  HideResult,
+  Modifier,
+  QueueItem,
+} from "./frame-types.ts";
 
 export type ZoneName =
   | "deck"
@@ -21,7 +37,8 @@ export type ZoneName =
   | "victory"
   | "setAside"
   | "removed"
-  | "shadow";
+  | "shadow"
+  | "attached";
 
 export type CardFace = "up" | "down" | "A" | "B";
 
@@ -39,6 +56,8 @@ export type CardInstance = {
   shadowId: string | null;
   face: CardFace;
   controller: number | null;
+  // Order in which the card entered play. Forced effects resolve oldest first.
+  enteredPlay: number;
 };
 
 export type Seat = {
@@ -97,50 +116,9 @@ export type Window =
   | { kind: "archery"; total: number }
   | { kind: "playerAttack" }
   | { kind: "hideCommit"; seat: number }
-  | { kind: "frameAction" };
-
-export type Modifier = {
-  instanceId: string;
-  sourceId: string;
-  stat: ModifierStat;
-  amount: number;
-  until: ModifierUntil;
-};
-
-export type FrameName =
-  | "reveal"
-  | "hide"
-  | "whenRevealed"
-  | "forced"
-  | "shadow"
-  | "response"
-  | "setup"
-  | "ResolveEffect";
-
-export type HideResult = { success: boolean; willpower: number; threat: number };
-
-export type FrameData =
-  | { kind: "none" }
-  | { kind: "reveal"; hide: HideResult | null }
-  | {
-      kind: "hide";
-      x: number;
-      committedIds: readonly string[];
-      discardedIds: readonly string[];
-      threat: number;
-      result: HideResult | null;
-    };
-
-// Plain data, never a closure, so structuredClone and the undo replay keep working.
-export type Frame = {
-  id: string;
-  frame: FrameName;
-  cardId: string | null;
-  seat: number;
-  peril: boolean;
-  step: number;
-  data: FrameData;
-};
+  | { kind: "frameAction" }
+  | { kind: "choose"; seat: number; options: readonly string[] }
+  | { kind: "cancelOffer"; seat: number };
 
 export type UndoLog = {
   phase: Phase;
@@ -185,14 +163,22 @@ export type ScenarioState = {
   modifiers: readonly Modifier[];
   stack: readonly Frame[];
   frameSeq: number;
+  // The phase the end-of-phase machinery last saw.
+  boundaryPhase: Phase;
+  clock: number;
+  hideFailures: readonly HideFailure[];
+  delayed: readonly DelayedEffect[];
   revealCursor: { seats: readonly number[]; index: number } | null;
+  // True between the two passes that resolve the quest.
+  questResolved: boolean;
   stages: readonly { code: string }[];
   setup: readonly Instruction[];
   widgets: ScenarioDefinition["widgets"];
   resolution: readonly { id: string }[];
   engagement: { ordinal: number; engagedThisPass: boolean } | null;
   resolvedAttacks: readonly string[];
-  pendingAttack: { enemyId: string; seat: number } | null;
+  // `immediate` marks an attack an effect started. It does not use up the enemy's attack for the phase.
+  pendingAttack: { enemyId: string; seat: number; immediate?: boolean } | null;
   undo: UndoLog;
 };
 
@@ -286,7 +272,12 @@ export function blankScenario(input: {
     modifiers: [],
     stack: [],
     frameSeq: 0,
+    boundaryPhase: "Setup",
+    clock: 0,
+    hideFailures: [],
+    delayed: [],
     revealCursor: null,
+    questResolved: false,
     stages: input.definition.stages,
     setup: input.definition.setup,
     widgets: input.definition.widgets,
@@ -331,7 +322,8 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "activeLocation" ||
     zone === "secondActiveLocation" ||
     zone === "questStage" ||
-    zone === "seatQuest"
+    zone === "seatQuest" ||
+    zone === "attached"
   );
 }
 

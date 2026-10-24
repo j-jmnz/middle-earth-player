@@ -4,7 +4,7 @@ import { cardMap, expectOk, fixtureDefinition, hero } from "./fixture.ts";
 import { definePrinted } from "./printed.ts";
 import { reduce } from "./reduce.ts";
 import { blankScenario, withThreat } from "./state.ts";
-import { spawn } from "./zones.ts";
+import { moveCard, spawn } from "./zones.ts";
 
 describe("zone identity", () => {
   it("keeps the hand array when threat changes", () => {
@@ -27,5 +27,24 @@ describe("zone identity", () => {
     expect(resolved.state.seats[0].threat).toBe(12);
     expect(resolved.state.seats[0].hand).toBe(handBefore);
     expect(resolved.state.secondActiveLocation).toBeNull();
+  });
+});
+
+describe("entry order", () => {
+  it("stamps a card when it enters play, once, and not when it moves between play zones", () => {
+    let state = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const deckCard = spawn(state, "a", { zone: "encounterDeck" });
+    const other = spawn(deckCard.state, "b", { zone: "encounterDeck" });
+    state = other.state;
+    expect(state.cards[deckCard.id]?.enteredPlay).toBe(0);
+    state = moveCard(state, other.id, { zone: "staging" });
+    state = moveCard(state, deckCard.id, { zone: "staging" });
+    expect(state.cards[other.id]?.enteredPlay).toBe(1);
+    expect(state.cards[deckCard.id]?.enteredPlay).toBe(2);
+    state = moveCard(state, other.id, { zone: "engaged", seat: 0 });
+    expect(state.cards[other.id]?.enteredPlay).toBe(1);
+    state = moveCard(state, other.id, { zone: "encounterDiscard" });
+    state = moveCard(state, other.id, { zone: "staging" });
+    expect(state.cards[other.id]?.enteredPlay).toBe(3);
   });
 });

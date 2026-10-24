@@ -1,10 +1,12 @@
+import { effectStep, pushCardEffects } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
-import { runEffects, type ReduceContext } from "./interpret.ts";
+import type { ReduceContext } from "./interpret.ts";
 import { hideStep, pushHide } from "./hide.ts";
 import { raiseThreat } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
 import { livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "./state.ts";
-import { patchTop, popFrame, pushFrame, topFrame, withFrame } from "./windows.ts";
+import { eventStep, fireForced } from "./triggers.ts";
+import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
@@ -18,16 +20,25 @@ export function advanceFrame(state: ScenarioState, ctx: ReduceContext, steps: En
     case "hide":
       return hideStep(state, frame, ctx, steps);
     default:
+      if (frame.data.kind === "effect") return effectStep(state, frame, ctx, steps);
+      if (frame.data.kind === "event") return eventStep(state, frame, ctx, steps);
       throw new Error(`Frame ${frame.frame} cannot resume`);
   }
 }
 
-export function startReveal(state: ScenarioState, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = state.encounterDeck[0];
+// Reveals the top card of the encounter deck, or the card an effect found.
+export function startReveal(
+  state: ScenarioState,
+  seat: number,
+  ctx: ReduceContext,
+  steps: EngineStep[],
+  cardId?: string,
+): ScenarioState {
+  const id = cardId ?? state.encounterDeck[0];
   const instance = id ? state.cards[id] : undefined;
   if (!id || !instance) return state;
   const peril = printedOf(ctx.cards, instance.code).keywords.peril;
-  return pushFrame(state, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null } }, steps);
+  return pushFrame(state, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false } }, steps);
 }
 
 // A reveal started by an effect instruction. It cannot wait for a player, so a Hide test or any other
@@ -86,10 +97,13 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     }
     case 2:
       return runRevealed(patchTop(state, { step: 3 }), id, seat, frame.peril, ctx, steps);
-    case 3: {
-      const next = patchTop(state, { step: 4 });
+    case 3:
+      return fireForced(patchTop(state, { step: 4 }), { trigger: "revealed", seat }, ctx, steps);
+    case 4: {
+      const next = patchTop(state, { step: 5 });
       const revealing = next.seats[seat];
-      if (!printed.keywords.surge || !revealing || revealing.eliminated) return next;
+      const surge = printed.keywords.surge || (frame.data.kind === "reveal" && frame.data.surge);
+      if (!surge || !revealing || revealing.eliminated) return next;
       return startReveal(next, seat, ctx, steps);
     }
     default:
@@ -107,9 +121,6 @@ function runRevealed(
 ): ScenarioState {
   const code = state.cards[id]?.code;
   if (!code) return state;
-  const matching = ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
-  if (!matching) return state;
-  return withFrame(state, "whenRevealed", id, peril, (framed) => {
-    return runEffects(framed, id, ["whenRevealed"], seat, ctx, steps);
-  }, steps);
+  const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+  return pushCardEffects(state, "whenRevealed", id, seat, peril, effects, ctx, steps);
 }

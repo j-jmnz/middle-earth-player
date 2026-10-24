@@ -2,7 +2,7 @@ import type { ScenarioDefinition } from "../catalog/boundary.ts";
 
 import { definePrinted, type PrintedCard } from "./printed.ts";
 import type { ReduceResult } from "./reduce.ts";
-import type { ScenarioState } from "./state.ts";
+import { blankScenario, type ScenarioState } from "./state.ts";
 
 export function fixtureDefinition(stages: readonly string[]): ScenarioDefinition {
   return {
@@ -52,4 +52,10 @@ export function byCode(state: ScenarioState, code: string): string[] {
   return Object.values(state.cards)
     .filter((card) => card.code === code)
     .map((card) => card.id);
+}
+
+// A state that no mode step moves, for tests that fire an event or a boundary directly.
+export function idleScenario(seatCount: 1 | 2, phase: ScenarioState["phase"] = "Quest"): ScenarioState {
+  const blank = blankScenario({ seatCount, seed: 3, definition: fixtureDefinition(["stage"]) });
+  return { ...blank, mode: "stopped", phase, boundaryPhase: phase };
 }

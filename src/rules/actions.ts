@@ -1,5 +1,6 @@
 import type { Effect } from "../catalog/boundary.ts";
 
+import { applyCancel, cancelIntents, cancelReason } from "./cancel.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import { runEffect, type ReduceContext } from "./interpret.ts";
 import type { ScenarioState } from "./state.ts";
@@ -22,6 +23,7 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
 
 // Every action effect on a card the active seat controls in play.
 export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
+  if (state.window?.kind === "cancelOffer") return cancelIntents(state);
   if (!inTriggerWindow(state)) return [];
   const intents: LegalIntent[] = [];
   for (const instance of Object.values(state.cards)) {
@@ -34,6 +36,7 @@ export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalI
 }
 
 export function triggerReason(state: ScenarioState, intent: TriggerIntent, ctx: ReduceContext): string | null {
+  if (state.window?.kind === "cancelOffer") return cancelReason(state, intent, ctx);
   if (!inTriggerWindow(state)) return "That intent is not legal in this window";
   if (!actionEffect(state, ctx, intent.cardId, intent.effectId)) return "That effect cannot be triggered";
   return null;
@@ -46,6 +49,7 @@ export function applyTrigger(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
+  if (state.window?.kind === "cancelOffer") return applyCancel(state, intent, steps);
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);
   if (!effect) return state;
   const seat = state.activeSeat;

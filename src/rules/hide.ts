@@ -4,16 +4,21 @@ import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
 import { openFrameActions } from "./pass.ts";
 import { printedOf, type PrintedCard } from "./printed.ts";
-import type { Frame, FrameData, HideResult, ScenarioState } from "./state.ts";
+import type { Frame, HideData, HideResult, ScenarioState } from "./state.ts";
 import { inPlay, updateCard } from "./state.ts";
+import { fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 
-type HideData = Extract<FrameData, { kind: "hide" }>;
-
-export function pushHide(state: ScenarioState, reveal: Frame, x: number, steps: EngineStep[]): ScenarioState {
+// `parent` names the card and seat the test belongs to. A reveal frame also receives the result.
+export function pushHide(
+  state: ScenarioState,
+  parent: { cardId: string | null; seat: number; peril: boolean },
+  x: number,
+  steps: EngineStep[],
+): ScenarioState {
   const data: HideData = { kind: "hide", x, committedIds: [], discardedIds: [], threat: 0, result: null };
-  return pushFrame(state, { frame: "hide", cardId: reveal.cardId, seat: reveal.seat, peril: reveal.peril, data }, steps);
+  return pushFrame(state, { frame: "hide", cardId: parent.cardId, seat: parent.seat, peril: parent.peril, data }, steps);
 }
 
 // Ready characters the seat controls.
@@ -61,6 +66,8 @@ export function hideStep(state: ScenarioState, frame: Frame, ctx: ReduceContext,
       return discardTop(state, data, ctx);
     case 2:
       return measure(state, frame, data, ctx, steps);
+    case 3:
+      return afterTest(state, frame, data, ctx, steps);
     default:
       return finish(state, data, steps);
   }
@@ -113,6 +120,15 @@ function measure(
     success: result.success,
   });
   return patchTop(state, { step: 3, data: { ...data, result } });
+}
+
+// A failed test is recorded and announced. Forced effects on it resolve before the Hide frame pops.
+function afterTest(state: ScenarioState, frame: Frame, data: HideData, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const advanced = patchTop(state, { step: 4 });
+  if (!data.result || data.result.success) return advanced;
+  const failure = { seat: frame.seat, round: advanced.round, phase: advanced.phase };
+  const recorded = { ...advanced, hideFailures: [...advanced.hideFailures, failure] };
+  return fireForced(recorded, { trigger: "hideFailed", seat: frame.seat }, ctx, steps);
 }
 
 // The committed characters stay exhausted. The result waits on the reveal frame for the card's own effects.

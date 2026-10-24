@@ -1,5 +1,33 @@
 import { z } from "zod";
 
+import { instructionSchema } from "./effect-schema.ts";
+
+export {
+  cancelSchema,
+  conditionSchema,
+  costSchema,
+  effectSchema,
+  instructionSchema,
+  modifierStatSchema,
+  modifierUntilSchema,
+  phaseNameSchema,
+  targetSchema,
+  timingSchema,
+  triggerSchema,
+} from "./effect-schema.ts";
+export type {
+  Condition,
+  Cost,
+  Effect,
+  Instruction,
+  ModifierStat,
+  ModifierUntil,
+  SimpleInstruction,
+  Target,
+  Timing,
+  Trigger,
+} from "./effect-schema.ts";
+
 const optionalString = z.string().nullish();
 const optionalInt = z.number().int().nullish();
 
@@ -61,83 +89,6 @@ export const ringsDbCardSchema = z
   })
   .strip();
 
-function verbSchema<const Verb extends string>(verb: Verb) {
-  return z.strictObject({ verb: z.literal(verb) });
-}
-
-export const costSchema = verbSchema("PayCost");
-
-export const modifierUntilSchema = z.enum(["endOfPhase", "endOfRound", "endOfAttack", "whileSourceInPlay"]);
-
-export const modifierStatSchema = z.enum(["willpower", "attack", "defense", "threat"]);
-
-// Authored amounts are fine. A player intent never supplies one.
-const modifyStatSchema = z.strictObject({
-  verb: z.literal("ModifyStat"),
-  stat: modifierStatSchema,
-  amount: z.number().int(),
-  until: modifierUntilSchema,
-});
-
-const codeVerb = <const Verb extends string>(verb: Verb) =>
-  z.strictObject({ verb: z.literal(verb), code: z.string().min(1) });
-
-export const instructionSchema = z.discriminatedUnion("verb", [
-  verbSchema("Draw"),
-  verbSchema("GainResources"),
-  costSchema,
-  verbSchema("PlayAlly"),
-  verbSchema("Attach"),
-  verbSchema("Exhaust"),
-  verbSchema("Ready"),
-  verbSchema("Commit"),
-  verbSchema("RevealStaging"),
-  verbSchema("PlaceProgress"),
-  verbSchema("RaiseThreat"),
-  verbSchema("Travel"),
-  verbSchema("Engage"),
-  verbSchema("DealShadow"),
-  verbSchema("DeclareDefender"),
-  verbSchema("DealDamage"),
-  verbSchema("Attack"),
-  verbSchema("AdvanceStep"),
-  verbSchema("ResolveEffect"),
-  modifyStatSchema,
-  codeVerb("AddToStaging"),
-  codeVerb("MakeActiveLocation"),
-  codeVerb("SetAside"),
-  codeVerb("AttachToRingBearer"),
-]);
-
-export const conditionSchema = z.never();
-
-const timings = [
-  "setup",
-  "forced",
-  "whenRevealed",
-  "response",
-  "action",
-  "shadow",
-  "constant",
-  "questResolution",
-  "travel",
-  "engagement",
-  "beginningOfPhase",
-  "endOfPhase",
-  "endOfRound",
-] as const;
-
-export const effectSchema = z.strictObject({
-  id: z.string().optional(),
-  cardCode: z.string(),
-  timing: z.enum(timings),
-  trigger: z.string().optional(),
-  limit: z.enum(["oncePerPhase", "oncePerRound"]).optional(),
-  cost: costSchema.optional(),
-  condition: conditionSchema.optional(),
-  instructions: z.array(instructionSchema),
-});
-
 export const resolutionOptionSchema = z.strictObject({
   id: z.string(),
 });
@@ -172,12 +123,6 @@ export const scenarioDefinitionSchema = z.strictObject({
 export type RingsDbPack = z.infer<typeof ringsDbPackSchema>;
 export type RingsDbCard = z.infer<typeof ringsDbCardSchema>;
 export type PrintedKeywords = z.infer<typeof printedKeywordsSchema>;
-export type Cost = z.infer<typeof costSchema>;
-export type Instruction = z.infer<typeof instructionSchema>;
-export type Condition = z.infer<typeof conditionSchema>;
-export type ModifierUntil = z.infer<typeof modifierUntilSchema>;
-export type ModifierStat = z.infer<typeof modifierStatSchema>;
-export type Effect = z.infer<typeof effectSchema>;
 export type ResolutionOption = z.infer<typeof resolutionOptionSchema>;
 export type ScenarioDefinition = z.infer<typeof scenarioDefinitionSchema>;
 

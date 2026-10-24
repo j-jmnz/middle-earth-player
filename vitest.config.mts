@@ -30,6 +30,7 @@ export default defineConfig({
     include: [
       "src/rules/**/*.test.ts",
       "src/campaign/**/*.test.ts",
+      "src/effects/**/*.test.ts",
       "src/catalog/**/*.test.ts",
       "src/screens/**/*.test.ts",
       "scripts/**/*.test.ts",

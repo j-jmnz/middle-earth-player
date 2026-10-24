@@ -1,12 +1,13 @@
 import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
-import { updateCard, withSeat } from "./state.ts";
+import { inPlay, updateCard, withSeat } from "./state.ts";
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
   | { zone: "seatQuest"; seat: number }
   | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "victory" | "setAside" | "removed" | "questDeck" }
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage" }
-  | { zone: "shadow"; enemyId: string };
+  | { zone: "shadow"; enemyId: string }
+  | { zone: "attached" };
 
 type SeatList = "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "staging";
 
@@ -148,13 +149,21 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   }
 }
 
+// Stamps the order in which a card entered play, so Forced effects can resolve oldest first.
+function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioState {
+  const now = state.cards[id];
+  if (!now || inPlay(from) || !inPlay(now.zone)) return state;
+  const clock = state.clock + 1;
+  return updateCard({ ...state, clock }, id, { enteredPlay: clock });
+}
+
 export function moveCard(state: ScenarioState, id: string, dest: Destination): ScenarioState {
   const current = state.cards[id];
   if (!current) return state;
-  const leavingPlay = current.zone === "play" || current.zone === "heroes";
+  const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if (leavingPlay && current.host) next = unhost(next, id);
-  return attach(next, id, dest);
+  return stampEntry(attach(next, id, dest), id, current.zone);
 }
 
 // Links an attachment to its host. The card keeps its zone and controller.
@@ -186,13 +195,14 @@ export function spawn(
     shadowId: null,
     face,
     controller: null,
+    enteredPlay: 0,
   };
   const recorded: ScenarioState = {
     ...state,
     nextId: state.nextId + 1,
     cards: { ...state.cards, [id]: instance },
   };
-  return { state: attach(recorded, id, dest), id };
+  return { state: stampEntry(attach(recorded, id, dest), id, "removed"), id };
 }
 
 export { inPlay } from "./state.ts";

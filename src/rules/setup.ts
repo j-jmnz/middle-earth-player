@@ -1,9 +1,10 @@
 import type { ScenarioDefinition } from "../catalog/boundary.ts";
 
 import type { EngineStep } from "./intents.ts";
-import { drawOpeningHand, runInstruction, searchSetup, type ReduceContext } from "./interpret.ts";
+import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
+import { searchSetup } from "./setup-search.ts";
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
 import { cloneGame } from "./undo.ts";
 import { moveCard, spawn } from "./zones.ts";

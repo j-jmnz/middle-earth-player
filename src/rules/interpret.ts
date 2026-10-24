@@ -1,13 +1,14 @@
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 
 import type { EngineStep } from "./intents.ts";
-import { addModifier, placeDamage, playerCardEffectCanChoose, raiseThreat } from "./keywords.ts";
+import { addModifier, placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { revealNow } from "./frames.ts";
 import { runSetupVerb } from "./setup-verbs.ts";
 import { engageEnemy, stagingEnemies, stagingLocations, travelTo } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
-import { updateCard } from "./state.ts";
+import { inPlay, updateCard } from "./state.ts";
+import { raiseFor, runExtraVerb } from "./verbs.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 
@@ -78,13 +79,13 @@ export function runInstruction(
     case "RevealStaging":
       return revealNow(state, focus.seat, ctx, steps);
     case "RaiseThreat":
-      return raiseThreat(state, focus.seat, 1, steps);
+      return raiseFor(state, instruction, focus, steps);
     case "PlaceProgress":
       return placeOneProgress(state, focus.sourceId, steps);
     case "DealDamage":
       return dealInstructionDamage(state, focus, ctx, steps);
     case "Travel": {
-      const locationId = stagingLocations(state, ctx.cards)[0];
+      const locationId = instruction.to === "self" ? focus.sourceId : stagingLocations(state, ctx.cards)[0];
       if (!locationId) return state;
       const traveled = travelTo(state, locationId, ctx.cards);
       if (!traveled) return { ...state, failure: "Travel was refused" };
@@ -103,8 +104,11 @@ export function runInstruction(
       return focus.sourceId
         ? addModifier(state, focus.sourceId, instruction.stat, instruction.amount, instruction.until)
         : state;
-    case "Exhaust":
-      return focus.sourceId ? updateCard(state, focus.sourceId, { exhausted: true }) : state;
+    case "Exhaust": {
+      const code = instruction.target?.code;
+      const id = code ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id : focus.sourceId;
+      return id ? updateCard(state, id, { exhausted: true }) : state;
+    }
     case "Ready":
       return focus.sourceId ? updateCard(state, focus.sourceId, { exhausted: false }) : state;
     case "Commit":
@@ -117,7 +121,7 @@ export function runInstruction(
     case "AttachToRingBearer":
       return runSetupVerb(state, instruction, ctx);
     default:
-      return { ...state, failure: `Unimplemented instruction ${instruction.verb}` };
+      return runExtraVerb(state, instruction, focus, ctx, steps);
   }
 }
 
@@ -165,40 +169,6 @@ export function dealOneShadow(state: ScenarioState, enemyId: string): ScenarioSt
   return updateCard(moved, top, { face: "down" });
 }
 
-export function searchSetup(
-  state: ScenarioState,
-  kind: "player" | "encounter",
-  ctx: ReduceContext,
-  steps: EngineStep[],
-): ScenarioState {
-  const effects = ctx.effects.filter((effect) => effect.timing === "setup");
-  if (effects.length === 0) return state;
-  let next = state;
-  for (const effect of effects) {
-    const found = setupIds(next, effect.cardCode, kind);
-    for (const foundId of found) {
-      const seat = next.cards[foundId]?.controller ?? next.firstPlayer;
-      next = moveCard(next, foundId, { zone: "setAside" });
-      next = runEffectBody(next, effect, foundId, seat, ctx, steps);
-      if (next.failure || next.lost) return next;
-    }
-  }
-  return next;
-}
-
-function runEffectBody(
-  state: ScenarioState,
-  effect: Effect,
-  sourceId: string,
-  seat: number,
-  ctx: ReduceContext,
-  steps: EngineStep[],
-): ScenarioState {
-  return withFrame(state, "setup", sourceId, false, (framed) => {
-    return runEffect(framed, effect, sourceId, seat, ctx, steps);
-  }, steps);
-}
-
 function dealInstructionDamage(
   state: ScenarioState,
   focus: Focus,
@@ -235,19 +205,6 @@ function damageTargets(
     if (printed.type !== "enemy") continue;
     if (playerEffect && !playerCardEffectCanChoose(printed)) continue;
     ids.push(id);
-  }
-  return ids;
-}
-
-function setupIds(state: ScenarioState, code: string, kind: "player" | "encounter"): string[] {
-  if (kind === "encounter") {
-    return state.encounterDeck.filter((id) => state.cards[id]?.code === code);
-  }
-  const ids: string[] = [];
-  for (let seat = 0; seat < state.seatCount; seat += 1) {
-    for (const id of state.seats[seat]?.deck ?? []) {
-      if (state.cards[id]?.code === code) ids.push(id);
-    }
   }
   return ids;
 }

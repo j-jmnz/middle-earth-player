@@ -9,6 +9,7 @@ import {
   heroIds,
   legalAttackEnemies,
 } from "./combat.ts";
+import { optionIntents, optionReason } from "./choices.ts";
 import { hideCommitReason, hideCommitters } from "./hide.ts";
 import type { LegalIntent, PlayerIntent, Selection } from "./intents.ts";
 import { suppliesNumber } from "./intents.ts";
@@ -37,6 +38,10 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
       return [{ type: "Pass" }, ...triggerIntents(state, ctx)];
     case "hideCommit":
       return [{ type: "CommitHide" }];
+    case "choose":
+      return optionIntents(state);
+    case "cancelOffer":
+      return triggerIntents(state, ctx);
     case "travel":
       return travelIntents(state, ctx);
     case "optionalEngage":
@@ -85,7 +90,9 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
   if (suppliesNumber(intent)) return NUMBER;
   if (state.lost) return "The game is lost";
   if (state.seats[state.activeSeat]?.eliminated) return "That seat is eliminated";
-  if (state.perilSeat != null && state.activeSeat !== state.perilSeat) return "Peril: other seats cannot act";
+  if (state.perilSeat != null && state.activeSeat !== state.perilSeat && !mandatory(state)) {
+    return "Peril: other seats cannot act";
+  }
   switch (intent.type) {
     case "Keep":
       return state.window?.kind === "mulligan" ? null : "Mulligan is closed";
@@ -93,7 +100,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       if (state.window?.kind !== "mulligan") return "Mulligan is closed";
       return state.mulliganSeats.includes(state.activeSeat) ? "A second mulligan is not allowed" : null;
     case "Pass":
-      return state.window?.kind === "pass" || state.window?.kind === "frameAction"
+      return state.window?.kind === "pass" || state.window?.kind === "frameAction" || state.window?.kind === "cancelOffer"
         ? null
         : "That intent is not legal in this window";
     case "PlayCard":
@@ -104,6 +111,8 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       return hideCommitReason(state, intent, ctx);
     case "Trigger":
       return triggerReason(state, intent, ctx);
+    case "Choose":
+      return optionReason(state, intent);
     case "Travel":
       return travelReason(state, intent, ctx);
     case "DeclineTravel":
@@ -127,6 +136,12 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
     default:
       return "That intent is not legal in this window";
   }
+}
+
+// A decision the rules force on a seat is not an action Peril can take away.
+function mandatory(state: ScenarioState): boolean {
+  const kind = state.window?.kind;
+  return kind === "choose" || kind === "cancelOffer" || kind === "defense";
 }
 
 function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {

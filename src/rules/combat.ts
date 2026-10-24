@@ -156,7 +156,7 @@ export function applyUndefended(
 
 function finishAttack(state: ScenarioState, enemyId: string): ScenarioState {
   const done = expireModifiers(state, ["endOfAttack"]);
-  if (done.resolvedAttacks.includes(enemyId)) {
+  if (state.pendingAttack?.immediate || done.resolvedAttacks.includes(enemyId)) {
     return { ...done, pendingAttack: null, window: null };
   }
   return {

@@ -177,7 +177,7 @@ describe("hide", () => {
 
   it("runs Hide before the card's When Revealed", () => {
     const effects: Effect[] = [
-      { cardCode: "hider", timing: "whenRevealed", instructions: [{ verb: "RaiseThreat" }] },
+      { id: "hider:whenRevealed:1", cardCode: "hider", timing: "whenRevealed", instructions: [{ verb: "RaiseThreat" }] },
     ];
     const { state, ctx } = table({ deck: ["hider", "d1"], cards: [rider("hider", {}, 1), filler("d1", 0)], effects });
     const opened = begin(state, ctx);
@@ -271,7 +271,7 @@ describe("hide", () => {
 
   it("discards without revealing, so discarded cards run no When Revealed", () => {
     const effects: Effect[] = [
-      { cardCode: "d1", timing: "whenRevealed", instructions: [{ verb: "RaiseThreat" }] },
+      { id: "d1:whenRevealed:2", cardCode: "d1", timing: "whenRevealed", instructions: [{ verb: "RaiseThreat" }] },
     ];
     const { state, ctx } = table({ deck: ["hider", "d1"], cards: [rider("hider", {}, 1), filler("d1", 1)], effects });
     const opened = begin(state, ctx);

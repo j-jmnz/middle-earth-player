@@ -370,10 +370,12 @@ Filters on the pool screen: name, sphere, type, pack or cycle, trait, cost, uniq
 
 ```ts
 type Effect = {
+  id: string; // "<code>:<timing>:<n>", unique
   cardCode: string;
   timing:
     | "setup"
     | "forced"
+    | "triggered"
     | "whenRevealed"
     | "response"
     | "action"
@@ -385,13 +387,16 @@ type Effect = {
     | "beginningOfPhase"
     | "endOfPhase"
     | "endOfRound";
-  trigger?: string;
+  trigger?: "revealed" | "hideFailed" | "endOfPhase" | "endOfRound" | "firstPlayerTokenPassed";
   limit?: "oncePerPhase" | "oncePerRound";
   cost?: Cost;
+  cancel?: { cost: number; sphere?: Sphere; unless?: Condition }; // the first player may pay to cancel it
   condition?: Condition;
   instructions: Instruction[];
 };
 ```
+
+`forced` and `triggered` effects name the engine event they answer in `trigger`. A `triggered` effect is mandatory and not printed as Forced. It resolves before the Forced effects on the same event, and those are collected after it resolves. Forced effects then resolve oldest card in play first, each in its own frame. A setup record for a card that the scenario definition or the campaign script already puts out describes that placement. It never places the card a second time.
 
 `constant` is a while-in-play modifier. It appends a record to the modifier list. A response names the event it answers in `trigger`. Instructions are engine verbs. The verb list grows when a dealt card or a starter card needs a verb. That growth stays inside this interpreter. There is no second language. Scenario 1 needs static modifiers, a response trigger, cancel, and delayed instructions.
 

@@ -14,7 +14,8 @@ export type EngineStep =
   | { kind: "hideCommit"; cardId: string }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   | { kind: "advance"; cardId: string }
-  | { kind: "attack"; side: "enemy" | "player"; seat: number; enemyId: string };
+  | { kind: "attack"; side: "enemy" | "player"; seat: number; enemyId: string }
+  | { kind: "cancel"; cardId: string };
 
 export type Payment = { heroId: string; amount: number };
 
@@ -35,7 +36,8 @@ export type PlayerIntent =
   | { type: "DeclareAttackers"; enemyId: string; attackerIds: readonly string[] }
   | { type: "DeclineAttack" }
   | { type: "Distribute"; assignments: readonly { cardId: string; amount: number }[] }
-  | { type: "Trigger"; cardId: string; effectId: string }
+  | { type: "Trigger"; cardId: string; effectId: string; payments?: readonly Payment[] }
+  | { type: "Choose"; optionId: string }
   | { type: "ChooseResolution"; optionId: string }
   | { type: "Draw"; amount?: number }
   | { type: "GainResources"; amount?: number }
@@ -61,7 +63,8 @@ export type LegalIntent =
   | { type: "DeclareAttackers" }
   | { type: "DeclineAttack" }
   | { type: "Distribute"; total: number }
-  | { type: "Trigger"; cardId: string; effectId: string };
+  | { type: "Trigger"; cardId: string; effectId: string }
+  | { type: "Choose"; optionId: string };
 
 export type Selection =
   | { type: "PlayCard"; cardId: string }
