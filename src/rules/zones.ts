@@ -8,7 +8,8 @@ export type Destination =
   | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" }
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage" }
   | { zone: "shadow"; enemyId: string }
-  | { zone: "attached" };
+  | { zone: "attached" }
+  | { zone: "under"; locationId: string };
 
 type SeatList = "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "staging";
 
@@ -82,6 +83,8 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       return state.activeLocation === id ? { ...state, activeLocation: null } : state;
     case "secondActiveLocation":
       return state.secondActiveLocation === id ? { ...state, secondActiveLocation: null } : state;
+    case "under":
+      return updateCard(state, id, { host: null });
     case "shadow": {
       const enemy = current.host ? state.cards[current.host] : undefined;
       if (!enemy) return state;
@@ -100,6 +103,14 @@ function withExtraShadows(state: ScenarioState, enemy: CardInstance, ids: readon
   const { extraShadowIds: _old, ...rest } = current;
   const next: CardInstance = ids.length > 0 ? { ...rest, extraShadowIds: ids } : rest;
   return { ...state, cards: { ...state.cards, [enemy.id]: next } };
+}
+
+// The cards facedown under a location (141049:A:1), in the order they were placed.
+export function cardsUnder(state: ScenarioState, locationId: string): string[] {
+  return Object.values(state.cards)
+    .filter((card) => card.zone === "under" && card.host === locationId)
+    .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true }))
+    .map((card) => card.id);
 }
 
 // Every shadow card dealt to the enemy, the first one first.
@@ -134,6 +145,10 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
     if (!seat) return state;
     const seated = withSeat(state, dest.seat, { ...seat, questStage: id });
     return updateCard(seated, id, { zone: "seatQuest", controller: dest.seat });
+  }
+  // Under a location: out of play, facedown, controlled by nobody, and not one of the location's attachments (141049:A:1).
+  if (dest.zone === "under") {
+    return updateCard(state, id, { zone: "under", host: dest.locationId, controller: null, face: "down", exhausted: false, committed: false });
   }
   if (dest.zone === "shadow") {
     const enemy = state.cards[dest.enemyId];

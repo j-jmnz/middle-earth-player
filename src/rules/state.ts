@@ -43,7 +43,9 @@ export type ZoneName =
   | "setAside"
   | "removed"
   | "shadow"
-  | "attached";
+  | "attached"
+  // Facedown under a location, out of play (141049:A:1). The card's host is the location.
+  | "under";
 
 export type CardFace = "up" | "down" | "A" | "B";
 

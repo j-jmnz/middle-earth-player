@@ -16,7 +16,7 @@ import { queueEvent } from "./queue.ts";
 import { nextUint, shuffleIds } from "./seed.ts";
 import { afterProgress } from "./stage-reveal.ts";
 import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
-import { attachTo, moveCard } from "./zones.ts";
+import { attachTo, cardsUnder, moveCard } from "./zones.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
@@ -68,6 +68,16 @@ export function runExtraVerb(
     }
     case "DiscardRandomFromHand":
       return discardRandom(state, focus.seat, instruction.amount ?? 1);
+    case "PlaceUnderSelf": {
+      const id = lastPicked(state);
+      if (!focus.sourceId || !state.cards[id] || !state.cards[focus.sourceId]) return state;
+      return moveCard(state, id, { zone: "under", locationId: focus.sourceId });
+    }
+    case "ReturnUnderToStaging": {
+      let next = state;
+      for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: "up" });
+      return next;
+    }
     case "DamageAll":
       return damageAllies(state, instruction, focus, ctx, steps);
     case "RemoveFromQuest": {
