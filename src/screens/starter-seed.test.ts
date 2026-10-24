@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { completeStarterInsert, starterSeedStatus } from "./starter-decks.ts";
+import { completeStarterInsert, starterSeedReason, starterSeedStatus } from "./starter-decks.ts";
 
 describe("starter seed", () => {
   it("does not mark the starters ready when the insert throws", () => {
@@ -10,8 +10,10 @@ describe("starter seed", () => {
       throw new Error("insert failed");
     });
     expect(starterSeedStatus()).toBe("missing");
+    expect(starterSeedReason()).toBe("insert failed");
     completeStarterInsert(() => undefined);
     expect(starterSeedStatus()).toBe("ready");
+    expect(starterSeedReason()).toBeNull();
     warn.mockRestore();
   });
 });

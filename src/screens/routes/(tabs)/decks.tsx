@@ -13,6 +13,7 @@ import {
   STARTER_NOTE,
   STEALTH_ID,
   WISDOM_ID,
+  starterSeedReason,
   starterSeedStatus,
   subscribeStarterSeed,
   type StarterSeed,
@@ -32,10 +33,15 @@ function useSeedStatus(): StarterSeed {
   return useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending");
 }
 
+function useSeedReason(): string | null {
+  return useSyncExternalStore(subscribeStarterSeed, starterSeedReason, () => null);
+}
+
 export default function Decks() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const seed = useSeedStatus();
+  const seedReason = useSeedReason();
   const { catalog, user } = useDatabases();
   const [seen, setSeen] = useState(0);
   useFocusEffect(
@@ -121,9 +127,16 @@ export default function Decks() {
         ) : (
           <>
             {seed === "missing" ? (
-              <BodyText tone="muted" className="mt-6">
-                The starter decks are missing.
-              </BodyText>
+              <View className="mt-6 gap-2">
+                <BodyText tone="danger" testID="starter-missing">
+                  The starter decks are missing.
+                </BodyText>
+                {seedReason ? (
+                  <BodyText tone="danger" testID="starter-missing-reason">
+                    {seedReason}
+                  </BodyText>
+                ) : null}
+              </View>
             ) : (
               <View className="mt-4">
                 <View className="flex-row gap-3">

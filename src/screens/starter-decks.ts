@@ -111,6 +111,7 @@ export function startersToInsert(existingIds: readonly string[]): StarterDeck[] 
 export type StarterSeed = "pending" | "ready" | "missing";
 
 let seedStatus: StarterSeed = "pending";
+let seedReason: string | null = null;
 const seedListeners = new Set<() => void>();
 
 function publishSeed(next: StarterSeed): void {
@@ -123,6 +124,11 @@ export function starterSeedStatus(): StarterSeed {
   return seedStatus;
 }
 
+/** Why the starters are missing: the thrown message, which names the card and its collector number. Null otherwise. */
+export function starterSeedReason(): string | null {
+  return seedReason;
+}
+
 export function subscribeStarterSeed(listener: () => void): () => void {
   seedListeners.add(listener);
   return () => {
@@ -131,10 +137,12 @@ export function subscribeStarterSeed(listener: () => void): () => void {
 }
 
 export function markStarterSeedReady(): void {
+  seedReason = null;
   publishSeed("ready");
 }
 
-export function markStarterSeedMissing(): void {
+export function markStarterSeedMissing(reason: string | null = null): void {
+  seedReason = reason;
   publishSeed("missing");
 }
 
@@ -145,7 +153,7 @@ export function completeStarterInsert(run: () => void): void {
   } catch (error: unknown) {
     const reason = error instanceof Error ? error : new Error("Starter decks were not inserted");
     console.warn(reason.message);
-    markStarterSeedMissing();
+    markStarterSeedMissing(reason.message);
     return;
   }
   markStarterSeedReady();
