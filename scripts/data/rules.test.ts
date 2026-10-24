@@ -88,7 +88,7 @@ describe("rules store", () => {
   it("knows every rule id that src, docs and the tests name", () => {
     const found = new Set<string>();
     const scan = (file: string): void => {
-      for (const match of readFileSync(file, "utf8").matchAll(/\b((?:rr|ltp|mec109|faq)\.[a-z0-9][a-z0-9-]*[a-z0-9])\b/g)) found.add(match[1] ?? "");
+      for (const match of readFileSync(file, "utf8").matchAll(/\b((?:rr|ltp|mec109|faq|easy-mode)\.[a-z0-9][a-z0-9-]*[a-z0-9])\b/g)) found.add(match[1] ?? "");
     };
     for (const file of listFiles(path.join(ROOT, "src"), ".ts")) scan(file);
     // The plan and the 8c phase file name the old wrong ids on purpose, as findings.

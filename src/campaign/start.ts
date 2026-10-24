@@ -9,7 +9,8 @@ export type StartInput = {
   seed: number;
   threatModifier: number;
   seats: readonly StartSeat[];
-  // The encounter deck size the booklet prints for the difficulty. Normal when absent.
+  // The encounter deck size the booklet prints for the difficulty, and on Easy one resource on each hero in Setup step 2
+  // (easy-mode.easy-mode). Normal when absent.
   difficulty?: Difficulty;
   // The effect records. The campaign card's Setup and Resolution records are read from them.
   effects?: readonly Effect[];
@@ -48,5 +49,6 @@ export function buildStart(input: StartInput): StartScenario {
     encounterDeck: [...encounterCodes(input.scenario, input.difficulty), ...shuffledIn, ...(input.poolEncounterCards ?? [])],
     questDeck: input.scenario.stages,
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
+    ...(input.difficulty ? { difficulty: input.difficulty } : {}),
   };
 }

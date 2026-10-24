@@ -217,6 +217,7 @@ Legal player intents are a closed set. The UI asks `legalIntents(state)` and ren
 Everything else is an engine step. The UI cannot dispatch it, and no control on the table types it in.
 
 - Setup, staging, shadow cards, refresh, threat 50, and "The One Ring left play" run because the framework reached them.
+- Easy mode (`ltp.easy-mode`, `easy-mode.easy-mode`): the encounter deck holds the Easy counts, and each hero starts with one resource in its pool, added in Setup step 2, "Place Heroes and Set Initial Threat Levels" (`rr.setup`). The Learn to Play says only "during setup"; the Easy Mode sheet names step 2; they agree. Normal adds nothing.
 - Each hero gains one resource of its own sphere in the resource phase. Saga Frodo's resource is that same gain. His pool may then pay Fellowship and neutral costs. Seats draw one card in seat order. No other gain or draw happens unless an effect instruction says so.
 - Paying a cost removes exactly the printed cost. The chosen pools must sum to that cost, and each pool must be allowed to pay that card's sphere. Overpay, underpay, a wrong sphere, and spending outside a payment are rejected.
 - Quest resolution compares committed willpower with staging threat. The active location is not in staging and does not add threat. Progress that would go on the quest goes on the active location first. Overflow goes on the quest. Progress beyond the current stage's quest points does not carry over: the next stage starts with none, so one quest resolution advances one stage at most (`rr.quest-advancement`). A shortfall raises the threat of every player still in the game by the difference (Learn to Play p12-13); an eliminated seat is not raised. Breaking of the Fellowship stage 2B may override this. The core round does not.
@@ -242,7 +243,7 @@ The round, its steps and its keywords are the rules in `data/rules/entries.json`
 
 | Part of the round | Rule ids |
 | --- | --- |
-| Setup: decks, heroes, starting threat | `rr.setup`, `rr.initial-threat-level`, `mec109.setting-up-the-game` |
+| Setup: decks, heroes, starting threat, Easy mode | `rr.setup`, `rr.initial-threat-level`, `mec109.setting-up-the-game`, `ltp.easy-mode`, `easy-mode.easy-mode` |
 | Player Setup, opening hand, mulligan | `mec109.setup`, `rr.mulligan` |
 | Encounter Setup, quest card Setup | `mec109.setup`, `rr.step-0-0` |
 | Resource, Planning | `rr.step-1-1`, `rr.planning-phase` |

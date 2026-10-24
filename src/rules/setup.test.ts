@@ -7,7 +7,7 @@ import { spawn } from "./zones.ts";
 
 const deckCodes = codes("d", 10);
 
-function opening() {
+function opening(difficulty?: "Easy" | "Normal") {
   const cards = cardMap([
     hero("aragorn", "leadership", 8, 2),
     hero("legolas", "tactics", 9, 1),
@@ -27,6 +27,7 @@ function opening() {
       ],
       encounterDeck: [],
       questDeck: ["stage"],
+      ...(difficulty ? { difficulty } : {}),
     },
     { effects: [], cards },
   );
@@ -53,6 +54,23 @@ function soloOpening() {
   );
   return { started, cards };
 }
+
+describe("Easy mode (easy-mode.easy-mode, ltp.easy-mode)", () => {
+  it("adds one resource to each hero's resource pool in Setup step 2, before the first resource phase", () => {
+    const easy = opening("Easy").started;
+    const heroes = [...(easy.seats[0]?.heroes ?? []), ...(easy.seats[1]?.heroes ?? [])];
+    expect(heroes).toHaveLength(3);
+    for (const id of heroes) expect(easy.cards[id]?.resources, id).toBe(1);
+    // Threat is still the heroes' threat cost plus the modifier: step 2 sets it, Easy does not change it.
+    expect(easy.seats.map((seat) => seat.threat)).toEqual(opening().started.seats.map((seat) => seat.threat));
+  });
+
+  it("adds nothing on Normal", () => {
+    for (const started of [opening("Normal").started, opening().started]) {
+      for (const seat of started.seats) for (const id of seat.heroes) expect(started.cards[id]?.resources).toBe(0);
+    }
+  });
+});
 
 describe("setup and resources", () => {
   it("redraws six cards on one mulligan and rejects a second", () => {

@@ -144,7 +144,7 @@
       "scenario": "a-knife-in-the-dark",
       "code": "141069",
       "easy": 2,
-      "reason": "Easy mode removes each encounter card with a gold border around its encounter set icon (ltp.easy-mode, Learn to Play p25 c2). The pinned scan scans/141069.A.jpg (sha256 c90559759d78bcecceea3394cd291f90169bd3107b774f0e641913763baba0c6) shows copy 2/11 with a silver border, so at least one Ringwraith stays in Easy. It cannot decide between 2 and 4: the gold mark is printed per copy and the sync pins one scan per code and side. Hall of Beorn gives 2 (scenario list and card record); the DragnCards Easy deck keeps all 4. The user chose Hall of Beorn's 2 on 2026-10-24. Normal mode is unaffected.",
+      "reason": "Easy mode removes each encounter card with a gold border around its encounter set icon (easy-mode.easy-mode, Easy Mode p1: \"remove any card with the “difficulty” indicator around its encounter set icon (a gold border)\"; ltp.easy-mode step 2 says the same). The pinned scan scans/141069.A.jpg (sha256 c90559759d78bcecceea3394cd291f90169bd3107b774f0e641913763baba0c6) shows copy 2/11 with a silver border, so at least one Ringwraith stays in Easy. It cannot decide between 2 and 4: the gold mark is printed per copy and the sync pins one scan per code and side. Hall of Beorn gives 2 (scenario list and card record); the DragnCards Easy deck keeps all 4. The user chose Hall of Beorn's 2 on 2026-10-24. Normal mode is unaffected.",
       "source": "hallofbeorn.com/Export/Scenarios/A-Knife-in-the-Dark; hallofbeorn.com/Export/EncounterCards (Ringwraith EasyModeQuantity 2)"
     },
     {
