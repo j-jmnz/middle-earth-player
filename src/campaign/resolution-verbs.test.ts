@@ -10,6 +10,7 @@ import type { ScenarioState } from "../rules/state.ts";
 import { attachTo, moveCard, spawn } from "../rules/zones.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { first, loadWorld, send, start, table, type World } from "../../scripts/past-scene.ts";
+import { applyResolution as writeLog, emptyLog } from "./log.ts";
 
 
 // The resolution verbs the cards use, run against the real records of the campaign cards (142019, 142039, 142060,
@@ -150,6 +151,41 @@ describe("ChooseCards for each seat (141044 Resolution, to a hero)", () => {
     const { state, ctx } = won("141044", 2);
     expect(reduce(state, { type: "ChooseResolution", optionId: `141018>${first(state, MERRY)}` }, ctx).ok).toBe(false);
     expect(reduce(state, { type: "ChooseResolution", optionId: `141085>${first(state, FRODO)}` }, ctx).ok).toBe(false);
+  });
+});
+
+// 141044:B:1: "Starting with the first player, each player may choose one of the following boon cards and attach it to a
+// hero he controls: Tireless Ranger, Skilled Healer, Valiant Warrior, Noble Hero." The box holds one copy of each boon
+// (quantity 1 in data/cards), so a boon one seat took is not offered to the next.
+describe("141044 Resolution, per seat from the first player", () => {
+  it("starts with the first player when the token has passed to the second seat", () => {
+    const { state, ctx } = won("141044", 2, (s) => ({ ...s, firstPlayer: 1 }));
+    expect(state.window).toEqual({ kind: "resolution", step: 0, seat: 1 });
+    const merry = first(state, MERRY);
+    expect(options(state, ctx)).toEqual([...["141018", "141019", "141020", "141021"].map((code) => `${code}>${merry}`), "skip"]);
+    const next = send(start(state), { type: "ChooseResolution", optionId: `141021>${merry}` }, ctx);
+    expect(next.state.window).toEqual({ kind: "resolution", step: 0, seat: 0 });
+    expect(options(next.state, ctx).some((id) => id.startsWith("141021>"))).toBe(false);
+  });
+
+  it("lets both seats decline, and then earns nothing", () => {
+    const { state, ctx } = won("141044", 2);
+    const done = send(send(start(state), { type: "ChooseResolution", optionId: "skip" }, ctx), { type: "ChooseResolution", optionId: "skip" }, ctx);
+    expect(resolutionResult(done.state)?.earned).toEqual([]);
+    expect(writeLog(emptyLog(2), done.state.scenarioId, done.state, cards).campaignPool).toEqual([]);
+  });
+
+  it("writes each chosen boon to the log as attached to the hero the option named, with its seat, not as a loose pool card", () => {
+    const { state, ctx } = won("141044", 2);
+    const sam = first(state, SAM);
+    const merry = first(state, MERRY);
+    const done = send(send(start(state), { type: "ChooseResolution", optionId: `141019>${sam}` }, ctx), { type: "ChooseResolution", optionId: `141020>${merry}` }, ctx);
+    const log = writeLog(emptyLog(2), done.state.scenarioId, done.state, cards);
+    expect(log.campaignPool).toEqual([
+      { code: "141019", back: "player", burdenSet: null, attachedTo: SAM, seat: 0 },
+      { code: "141020", back: "player", burdenSet: null, attachedTo: MERRY, seat: 1 },
+    ]);
+    expect(log.earned[done.state.scenarioId]).toEqual(["141019", "141020"]);
   });
 });
 
