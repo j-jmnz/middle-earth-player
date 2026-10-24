@@ -33,6 +33,7 @@ export default defineConfig({
       "src/effects/**/*.test.ts",
       "src/catalog/**/*.test.ts",
       "src/screens/**/*.test.ts",
+      "src/play/**/*.test.ts",
       "scripts/**/*.test.ts",
     ],
     passWithNoTests: true,

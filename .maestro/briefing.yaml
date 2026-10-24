@@ -49,5 +49,5 @@ appId: com.middleearth.lcg
     id: deal
 - extendedWaitUntil:
     visible:
-      id: scenario-dev
+      id: table
     timeout: 15000

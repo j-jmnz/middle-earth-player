@@ -8,7 +8,7 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 
 import { briefing, checklistPlan, startFor, type Briefing, type BriefingInput, type BriefingSeat } from "./briefing.ts";
 import { applyResolution } from "./log.ts";
-import { beginActive, recordIntent, replay, type ActiveScenario } from "./replay.ts";
+import { beginActive, recordIntent, replay, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import type { Save, StoredLoadout } from "./save.ts";
 import type { World } from "./world.ts";
 
@@ -53,7 +53,7 @@ export type Resumed = { ok: true; state: ScenarioState } | { ok: false; reason: 
 
 // Replays the open scenario. A save from another engine version or data hash is not rebuilt at all. The caller drops the
 // scenario on any failure and keeps the log, the decks and the image index.
-export function resume(save: Save, world: World, dataHash: number): Resumed {
+export function resume(save: Save, world: World, dataHash: number, observe?: ReplayObserver): Resumed {
   const { active, loadout } = save;
   if (!active || !loadout) return { ok: false, reason: "none" };
   const stale = staleReason(active, dataHash);
@@ -64,7 +64,7 @@ export function resume(save: Save, world: World, dataHash: number): Resumed {
   } catch {
     return { ok: false, reason: "loadout" };
   }
-  const replayed = replay(active, start, dataHash, contextOf(world));
+  const replayed = replay(active, start, dataHash, contextOf(world), observe);
   return replayed.ok ? { ok: true, state: replayed.state } : { ok: false, reason: replayed.reason };
 }
 

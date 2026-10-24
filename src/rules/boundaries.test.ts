@@ -45,8 +45,9 @@ describe("boundaries", () => {
     }
   });
 
-  it("adds no table component under src/play", () => {
-    const names = readdirSync(join(process.cwd(), "src/play")).filter((name) => name.endsWith(".ts") || name.endsWith(".tsx"));
-    expect(names).toEqual([]);
+  // Phase 11 built the table. It sends intents and draws the reducer's state; it never reaches the screens or the campaign.
+  it("keeps the table off src/screens and src/campaign", () => {
+    const offenders = sourceFiles(join(process.cwd(), "src/play")).filter((path) => /from\s+["'][./]*\/(screens|campaign)\//.test(readFileSync(path, "utf8")));
+    expect(offenders).toEqual([]);
   });
 });

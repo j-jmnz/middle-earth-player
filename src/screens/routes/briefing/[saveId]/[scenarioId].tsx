@@ -147,7 +147,7 @@ export default function Briefing() {
         return;
       }
       writeSave(user, dealt.save);
-      router.replace({ pathname: "/scenario/[saveId]", params: { saveId: save.id } });
+      router.replace({ pathname: "/table/[saveId]", params: { saveId: save.id } });
     } catch (error: unknown) {
       setDealError(error instanceof Error ? error.message : "The scenario could not be dealt.");
     }

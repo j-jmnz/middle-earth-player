@@ -149,7 +149,7 @@ export default function CampaignPath() {
             rewardText={node.reward.map(name).join(" · ")}
             action={
               resuming === node.id && node.status !== "locked"
-                ? { label: "Resume", onPress: () => router.push({ pathname: "/scenario/[saveId]", params: { saveId: save.id } }) }
+                ? { label: "Resume", onPress: () => router.push({ pathname: "/table/[saveId]", params: { saveId: save.id } }) }
                 : node.status === "current"
                   ? { label: "Begin", hint: resuming ? "A scenario is open. Dealing this one drops it." : undefined, onPress: () => router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: node.id } }) }
                   : null
