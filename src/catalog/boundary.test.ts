@@ -85,10 +85,12 @@ describe("catalog boundary", () => {
     expect(instructionSchema.safeParse({ verb: "Draw", amount: 1 }).success).toBe(false);
   });
 
-  it("accepts a strict pay-cost object", () => {
-    expect(costSchema.parse({ verb: "PayCost" })).toEqual({ verb: "PayCost" });
-    expect(costSchema.safeParse({ verb: "PayCost", amount: 1 }).success).toBe(false);
-    expect(costSchema.safeParse({ verb: "Draw" }).success).toBe(false);
+  it("accepts a strict cost with a kind", () => {
+    expect(costSchema.parse({ kind: "exhaustSelf" })).toEqual({ kind: "exhaustSelf" });
+    expect(costSchema.parse({ kind: "resources", amount: 2 })).toEqual({ kind: "resources", amount: 2 });
+    expect(costSchema.safeParse({ kind: "resources", amount: 0 }).success).toBe(false);
+    expect(costSchema.safeParse({ kind: "exhaustSelf", amount: 1 }).success).toBe(false);
+    expect(costSchema.safeParse({ verb: "PayCost" }).success).toBe(false);
   });
 
   it("accepts an effect and rejects an unknown condition", () => {

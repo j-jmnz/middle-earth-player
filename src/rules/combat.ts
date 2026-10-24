@@ -1,3 +1,4 @@
+import { attackBarred } from "./constants.ts";
 import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
@@ -52,7 +53,9 @@ export function dealShadows(state: ScenarioState, _steps: EngineStep[]): Scenari
 
 export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: string[] } | null {
   for (const seat of livingSeats(state)) {
-    const enemies = (state.seats[seat]?.engaged ?? []).filter((id) => !state.resolvedAttacks.includes(id));
+    const enemies = (state.seats[seat]?.engaged ?? []).filter(
+      (id) => !state.resolvedAttacks.includes(id) && !attackBarred(state, id, seat),
+    );
     if (enemies.length > 0) return { seat, enemies };
   }
   return null;
@@ -67,7 +70,7 @@ export function beginEnemyAttack(
   steps: EngineStep[],
 ): ScenarioState {
   const attacker = state.cards[enemyId];
-  if (!attacker || attacker.zone !== "engaged") return state;
+  if (!attacker || attacker.zone !== "engaged" || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
   return {
     ...state,

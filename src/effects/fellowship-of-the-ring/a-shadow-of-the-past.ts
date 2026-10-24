@@ -2,8 +2,6 @@ import type { Effect } from "../../catalog/boundary.ts";
 
 // Encounter set A Shadow of the Past (MEC109 encounter cards 31-43, codes 141031-141043).
 // Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the cards.
-// Constant, travel, and response timings are not authored here.
-
 // Shadow instructions run for the defending seat. Their modifiers end with the attack.
 const ATTACK_PLUS_ONE: Effect["instructions"] = [
   { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker" },
@@ -14,8 +12,73 @@ const ATTACK_PLUS_ONE_MORE_IF_HIDE_FAILED: Effect["instructions"] = [
 ];
 
 export const A_SHADOW_OF_THE_PAST_EFFECTS: readonly Effect[] = [
+  // 141031 Bag End.
+  {
+    id: "141031:response:1",
+    cardCode: "141031",
+    timing: "response",
+    trigger: "leftPlay",
+    instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Draw", perHero: "Hobbit" }] }],
+  },
+  // 141032 Woody End.
+  {
+    id: "141032:constant:1",
+    cardCode: "141032",
+    timing: "constant",
+    condition: { kind: "sourceIn", zone: "activeLocation" },
+    instructions: [{ verb: "ModifyStat", stat: "hideValue", amount: -1, until: "whileSourceInPlay", target: "table" }],
+  },
   // 141036 Green Hill Country, shadow.
   { id: "141036:shadow:1", cardCode: "141036", timing: "shadow", instructions: ATTACK_PLUS_ONE_MORE_IF_HIDE_FAILED },
+  // 141034 Bamfurlong.
+  {
+    id: "141034:response:1",
+    cardCode: "141034",
+    timing: "response",
+    trigger: "traveled",
+    instructions: [
+      {
+        verb: "ForEachPlayer",
+        order: "firstFirst",
+        instructions: [
+          {
+            verb: "Choose",
+            who: "actor",
+            options: [
+              { id: "ready", requires: { kind: "hasEngaged", trait: "Nazgûl" }, instructions: [{ verb: "ReadyHero" }] },
+              { id: "skip", instructions: [] },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  // 141035 Bucklebury Ferry. The questResolution timing belongs to batch 5.
+  {
+    id: "141035:constant:1",
+    cardCode: "141035",
+    timing: "constant",
+    condition: { kind: "otherLocationInPlay" },
+    instructions: [{ verb: "Restrict", what: "travel" }],
+  },
+  { id: "141035:travel:1", cardCode: "141035", timing: "travel", instructions: [{ verb: "HideTest", x: 3 }] },
+  // 141036 Green Hill Country.
+  {
+    id: "141036:constant:1",
+    cardCode: "141036",
+    timing: "constant",
+    condition: { kind: "sourceIn", zone: "activeLocation" },
+    instructions: [{ verb: "ModifyStat", stat: "hideWillpower", amount: 1, until: "whileSourceInPlay", target: "table", per: "committed" }],
+  },
+  // 141037 Stock Road.
+  {
+    id: "141037:constant:1",
+    cardCode: "141037",
+    timing: "constant",
+    condition: { kind: "sourceIn", zone: "staging" },
+    instructions: [{ verb: "ModifyStat", stat: "hideThreat", amount: 2, until: "whileSourceInPlay", target: "table" }],
+  },
+  { id: "141037:travel:1", cardCode: "141037", timing: "travel", instructions: [{ verb: "HideTest", x: 1 }] },
   // 141033 Stock-brook.
   {
     id: "141033:whenRevealed:1",
@@ -39,6 +102,22 @@ export const A_SHADOW_OF_THE_PAST_EFFECTS: readonly Effect[] = [
     cardCode: "141040",
     timing: "shadow",
     instructions: [{ verb: "ConsiderUndefended", when: { kind: "hideFailed", scope: "round" } }],
+  },
+  // 141039 Black Rider, constant.
+  {
+    id: "141039:constant:1",
+    cardCode: "141039",
+    timing: "constant",
+    condition: { kind: "sourceIn", zone: "play" },
+    instructions: [{ verb: "Restrict", what: "attach", exceptTrait: "Morgul" }],
+  },
+  // 141040 Evil Crow, constant.
+  {
+    id: "141040:constant:1",
+    cardCode: "141040",
+    timing: "constant",
+    condition: { kind: "sourceIn", zone: "engaged" },
+    instructions: [{ verb: "ModifyStat", stat: "hideValue", amount: 1, until: "whileSourceInPlay", target: "engagedSeat" }],
   },
   // 141039 Black Rider.
   {

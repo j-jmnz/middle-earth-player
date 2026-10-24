@@ -19,6 +19,29 @@ const FIND_BLACK_RIDER: Effect["instructions"] = [
 ];
 
 export const QUEST_EFFECTS: readonly Effect[] = [
+  // 141022 Three is Company, side B.
+  {
+    id: "141022:constant:1",
+    cardCode: "141022",
+    timing: "constant",
+    condition: { kind: "inVictory", code: "141031", is: false },
+    instructions: [{ verb: "Restrict", what: "advance" }],
+  },
+  // 141023 A Shortcut to Mushrooms, side B.
+  {
+    id: "141023:constant:1",
+    cardCode: "141023",
+    timing: "constant",
+    instructions: [{ verb: "ModifyStat", stat: "hideWillpower", amount: 1, until: "whileSourceInPlay", target: "eachSeat", per: "ally" }],
+  },
+  // 141024 Escape to Buckland, side B.
+  {
+    id: "141024:response:1",
+    cardCode: "141024",
+    timing: "response",
+    trigger: "hideSucceeded",
+    instructions: [{ verb: "PlaceProgressOnLocation", perPlayer: 2 }],
+  },
   // 141022 Three is Company, side A.
   {
     id: "141022:setup:1",

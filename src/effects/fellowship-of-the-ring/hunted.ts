@@ -6,6 +6,14 @@ import type { Effect } from "../../catalog/boundary.ts";
 const NAZGUL = "Nazgûl";
 
 export const HUNTED_EFFECTS: readonly Effect[] = [
+  // 141072 Pathless Country, constant.
+  {
+    id: "141072:constant:1",
+    cardCode: "141072",
+    timing: "constant",
+    condition: { kind: "sourceIn", zone: "staging" },
+    instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: 4, until: "whileSourceInPlay" }],
+  },
   // 141072 Pathless Country, shadow.
   {
     id: "141072:shadow:1",

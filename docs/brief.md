@@ -387,7 +387,7 @@ type Effect = {
     | "beginningOfPhase"
     | "endOfPhase"
     | "endOfRound";
-  trigger?: "revealed" | "hideFailed" | "endOfPhase" | "endOfRound" | "firstPlayerTokenPassed";
+  trigger?: "revealed" | "hideFailed" | "hideSucceeded" | "traveled" | "leftPlay" | "endOfPhase" | "endOfRound" | "firstPlayerTokenPassed";
   limit?: "oncePerPhase" | "oncePerRound";
   cost?: Cost;
   cancel?: { cost: number; sphere?: Sphere; unless?: Condition }; // the first player may pay to cancel it
@@ -398,7 +398,9 @@ type Effect = {
 
 `forced` and `triggered` effects name the engine event they answer in `trigger`. A `triggered` effect is mandatory and not printed as Forced. It resolves before the Forced effects on the same event, and those are collected after it resolves. Forced effects then resolve oldest card in play first, each in its own frame. A setup record for a card that the scenario definition or the campaign script already puts out describes that placement. It never places the card a second time.
 
-`constant` is a while-in-play modifier. It appends a record to the modifier list. A response names the event it answers in `trigger`. Instructions are engine verbs. The verb list grows when a dealt card or a starter card needs a verb. That growth stays inside this interpreter. There is no second language. Scenario 1 needs static modifiers, a response trigger, cancel, and delayed instructions.
+`constant` is a while-in-play modifier. It appends a record to the modifier list. The engine rebuilds those records from the effect list after every intent, so they follow the source card and its condition. Hide numbers (the X, the discarded threat, the committed willpower) are held by the table or by a seat in the same list. A constant that forbids something (`Restrict`: advance, travel, attach, hero limit) is checked where the thing happens. A response names the event it answers in `trigger`.
+
+An Action or Response may name a `cost` (exhaust or discard the card, add it to the victory display, or pay resources from the heroes the player names) and a `limit`. The cost is paid when the effect is triggered, and the use is recorded for the limit. A Response window offers each Response a seat may use after an event; a pass gives up all of that seat's offers for it. Peril limits who is offered. Instructions are engine verbs. The verb list grows when a dealt card or a starter card needs a verb. That growth stays inside this interpreter. There is no second language. Scenario 1 needs static modifiers, a response trigger, cancel, and delayed instructions.
 
 The Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog`. `src/effects` holds the authored records. The interpreter takes the effect list as an argument and does not import `src/effects`. Vitest passes the TypeScript records. The phone loads rows from `catalog.db` and passes those. The build script is the only production writer of that table.
 

@@ -1,6 +1,6 @@
 import type { Instruction, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
 
-import type { DelayedEffect, Frame, HideFailure, Modifier, PendingAttack } from "./frame-types.ts";
+import type { DelayedEffect, Frame, HideFailure, Modifier, PendingAttack, UsedEffect } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 
 export type {
@@ -16,6 +16,8 @@ export type {
   HideResult,
   Modifier,
   PendingAttack,
+  ResponseOffer,
+  UsedEffect,
   QueueItem,
 } from "./frame-types.ts";
 
@@ -119,7 +121,8 @@ export type Window =
   | { kind: "hideCommit"; seat: number }
   | { kind: "frameAction" }
   | { kind: "choose"; seat: number; options: readonly string[] }
-  | { kind: "cancelOffer"; seat: number };
+  | { kind: "cancelOffer"; seat: number }
+  | { kind: "response"; seat: number };
 
 export type UndoLog = {
   phase: Phase;
@@ -169,6 +172,8 @@ export type ScenarioState = {
   clock: number;
   hideFailures: readonly HideFailure[];
   delayed: readonly DelayedEffect[];
+  // Effects with a limit that have been used.
+  uses: readonly UsedEffect[];
   revealCursor: { seats: readonly number[]; index: number } | null;
   // True between the two passes that resolve the quest.
   questResolved: boolean;
@@ -276,6 +281,7 @@ export function blankScenario(input: {
     clock: 0,
     hideFailures: [],
     delayed: [],
+    uses: [],
     revealCursor: null,
     questResolved: false,
     stages: input.definition.stages,

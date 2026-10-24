@@ -10,6 +10,23 @@ import type { Effect } from "../../catalog/boundary.ts";
 const RING = "141085";
 
 export const CAMPAIGN_EFFECTS: readonly Effect[] = [
+  // 141017 Mr. Underhill, action.
+  {
+    id: "141017:action:1",
+    cardCode: "141017",
+    timing: "action",
+    cost: { kind: "addSelfToVictory" },
+    condition: { kind: "hasEngaged" },
+    instructions: [{ verb: "BarAttack" }],
+  },
+  // 141085 The One Ring, constant.
+  {
+    id: "141085:constant:1",
+    cardCode: RING,
+    timing: "constant",
+    condition: { kind: "sourceIn", zone: "play" },
+    instructions: [{ verb: "Restrict", what: "heroLimit" }],
+  },
   // 141017 Mr. Underhill.
   { id: "141017:setup:1", cardCode: "141017", timing: "setup", instructions: [{ verb: "AttachToRingBearer", code: "141017" }] },
   // 141077 Gildor Inglorion. Control record: timing label unconfirmed, confirm on the card.

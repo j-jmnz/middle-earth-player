@@ -1,6 +1,7 @@
 import type { Effect } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
+import { syncConstants } from "./constants.ts";
 import { pushDue } from "./delayed.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
@@ -83,6 +84,9 @@ export function eventStep(state: ScenarioState, frame: Frame, ctx: ReduceContext
 // effects and its delayed effects. They resolve in this order: Forced at the end of the phase,
 // Forced at the end of the round, delayed at the end of the phase, delayed at the end of the round.
 export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // Constant effects follow the cards in play, so they are brought up to date before anything else runs.
+  const synced = syncConstants(state, ctx);
+  if (synced !== state) return synced;
   if (state.phase === state.boundaryPhase) return state;
   const ended = state.boundaryPhase;
   let next: ScenarioState = { ...state, boundaryPhase: state.phase };

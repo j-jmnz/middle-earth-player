@@ -3,6 +3,7 @@ import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hideStep, pushHide } from "./hide.ts";
 import { raiseThreat } from "./keywords.ts";
+import { responseStep } from "./responses.ts";
 import { printedOf } from "./printed.ts";
 import { livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "./state.ts";
 import { eventStep, fireForced } from "./triggers.ts";
@@ -19,6 +20,8 @@ export function advanceFrame(state: ScenarioState, ctx: ReduceContext, steps: En
       return revealStep(state, frame, ctx, steps);
     case "hide":
       return hideStep(state, frame, ctx, steps);
+    case "response":
+      return responseStep(state, ctx, steps);
     default:
       if (frame.data.kind === "effect") return effectStep(state, frame, ctx, steps);
       if (frame.data.kind === "event") return eventStep(state, frame, ctx, steps);

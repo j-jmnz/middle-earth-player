@@ -1,6 +1,7 @@
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { rejectionReason } from "./legal.ts";
+import { syncConstants } from "./constants.ts";
 import { applyIntent, settle } from "./machine.ts";
 import type { ScenarioState } from "./state.ts";
 import { bindReduce, noteHistory } from "./undo.ts";
@@ -13,7 +14,7 @@ export function reduce(state: ScenarioState, intent: PlayerIntent, ctx: ReduceCo
   const reason = rejectionReason(state, intent, ctx);
   if (reason) return { ok: false, reason, state };
   const steps: EngineStep[] = [];
-  const settled = settle(applyIntent(state, intent, ctx, steps), ctx, steps);
+  const settled = syncConstants(settle(applyIntent(state, intent, ctx, steps), ctx, steps), ctx);
   if (settled.failure) return { ok: false, reason: settled.failure, state };
   return { ok: true, state: noteHistory(state, settled, intent, steps), steps };
 }

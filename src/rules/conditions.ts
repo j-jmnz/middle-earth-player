@@ -18,8 +18,20 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
           failure.round === state.round &&
           (condition.scope === "round" || failure.phase === state.phase),
       );
-    case "hasEngaged":
-      return (state.seats[scope.actor]?.engaged ?? []).some((id) => hasTrait(state, id, condition.trait, ctx));
+    case "hasEngaged": {
+      const trait = condition.trait;
+      return (state.seats[scope.actor]?.engaged ?? []).some((id) => trait == null || hasTrait(state, id, trait, ctx));
+    }
+    case "sourceIn":
+      return sourceIn(state, scope.sourceId, condition.zone);
+    case "inVictory":
+      return state.victory.some((id) => state.cards[id]?.code === condition.code) === condition.is;
+    case "otherLocationInPlay":
+      return [...state.staging, state.activeLocation, state.secondActiveLocation].some(
+        (id) => id != null && id !== scope.sourceId && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location",
+      );
+    case "heroExhausted":
+      return (state.seats[scope.actor]?.heroes ?? []).some((id) => state.cards[id]?.exhausted === true);
     case "exhausted": {
       const found = Object.values(state.cards).find((card) => card.code === condition.code && inPlay(card.zone));
       return found != null && found.exhausted === condition.is;
@@ -37,6 +49,12 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
     case "searchable":
       return searchable(state, condition, ctx).length > 0;
   }
+}
+
+function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play"): boolean {
+  const source = sourceId ? state.cards[sourceId] : undefined;
+  if (!source) return false;
+  return zone === "play" ? inPlay(source.zone) : source.zone === zone;
 }
 
 export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: ReduceContext): boolean {

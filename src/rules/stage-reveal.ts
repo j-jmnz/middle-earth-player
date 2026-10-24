@@ -1,7 +1,10 @@
 import { pushCardEffects } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { printedOf } from "./printed.ts";
 import { resolveQuest } from "./quest.ts";
+import { offerResponses } from "./responses.ts";
+import { restricted } from "./restrictions.ts";
 import { withMode, type ScenarioState } from "./state.ts";
 
 // Resolving the quest is two passes. The first adds progress, and each stage the quest advanced to has
@@ -10,18 +13,28 @@ import { withMode, type ScenarioState } from "./state.ts";
 export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.questResolved) return finish({ ...state, questResolved: false });
   const before = steps.length;
-  const resolved = resolveQuest(state, ctx.cards, steps);
+  const resolved = resolveQuest(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
   let next: ScenarioState = { ...resolved, questResolved: true };
   const advanced = steps.slice(before).flatMap((step) => (step.kind === "advance" ? [step.cardId] : []));
+  // A location the progress explored has left play. Responses to that are offered before the stage's own effects.
+  const explored = steps.slice(before).flatMap((step) => (step.kind === "destroy" && isLocation(next, step.targetId, ctx) ? [step.targetId] : []));
   // The first stage reached resolves first, so it is pushed last.
   for (const cardId of [...advanced].reverse()) {
     const code = next.cards[cardId]?.code;
     const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
     next = pushCardEffects(next, "whenRevealed", cardId, next.firstPlayer, false, effects, ctx, steps);
   }
+  for (const cardId of [...explored].reverse()) {
+    next = offerResponses(next, { trigger: "leftPlay", seat: null, cardId }, ctx, steps);
+  }
   return next;
+}
+
+function isLocation(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const instance = state.cards[id];
+  return instance != null && printedOf(ctx.cards, instance.code).type === "location";
 }
 
 function finish(state: ScenarioState): ScenarioState {

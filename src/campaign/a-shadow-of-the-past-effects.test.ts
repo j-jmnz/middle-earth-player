@@ -55,6 +55,7 @@ type Layout = {
   discard?: readonly string[];
   staging?: readonly string[];
   setAside?: readonly string[];
+  victory?: readonly string[];
   engaged?: readonly { code: string; seat: number }[];
   active?: string;
   ring?: "ready" | "exhausted" | "none";
@@ -86,6 +87,7 @@ function table(layout: Layout = {}): { state: ScenarioState; ctx: ReduceContext 
   for (const code of layout.discard ?? []) state = spawn(state, code, { zone: "encounterDiscard" }).state;
   for (const code of layout.staging ?? []) state = spawn(state, code, { zone: "staging" }).state;
   for (const code of layout.setAside ?? []) state = spawn(state, code, { zone: "setAside" }).state;
+  for (const code of layout.victory ?? []) state = spawn(state, code, { zone: "victory" }).state;
   for (const row of layout.engaged ?? []) state = spawn(state, row.code, { zone: "engaged", seat: row.seat }).state;
   if (layout.active) state = spawn(state, layout.active, { zone: "activeLocation" }).state;
   state = { ...state, phase: "Quest", boundaryPhase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0 };
@@ -470,7 +472,7 @@ describe("141079 The Ring Draws Them", () => {
 
 describe("quest stages", () => {
   it("141023 When Revealed runs when the quest advances, with a Hide test inside it", () => {
-    const { state, ctx } = table({ progress: 0, deck: ["f0", "f0", "f0", RIDER, "f0", "f0", "f0"], stage: "141022" });
+    const { state, ctx } = table({ progress: 0, deck: ["f0", "f0", "f0", RIDER, "f0", "f0", "f0"], stage: "141022", victory: ["141031"] });
     const sam = first(state, SAM);
     let run = send(start(state), { type: "Commit", cardIds: [sam] }, ctx);
     const cursor = run.state.seedCursor;
@@ -501,6 +503,9 @@ describe("quest stages", () => {
     run = send(run, { type: "CommitHide", cardIds: [frodo] }, ctx);
     run = send(run, { type: "Pass" }, ctx);
     expect(codesOf(run.state, run.state.staging)).toContain(RIDER);
+    // The successful Hide test offers 141024's Response. Passing it lets the phase finish.
+    expect(run.state.window).toEqual({ kind: "response", seat: 0 });
+    run = send(run, { type: "Pass" }, ctx);
     expect(run.state.mode).toBe("travel");
   });
 });

@@ -20,9 +20,9 @@ describe("authored effects", () => {
     }
   });
 
-  it("name a trigger on every Forced and triggered effect, and on no other", () => {
+  it("name a trigger on every Forced, triggered, and Response effect, and on no other", () => {
     for (const effect of EFFECTS) {
-      const triggered = effect.timing === "forced" || effect.timing === "triggered";
+      const triggered = effect.timing === "forced" || effect.timing === "triggered" || effect.timing === "response";
       expect(effect.trigger != null, effect.id).toBe(triggered);
     }
   });

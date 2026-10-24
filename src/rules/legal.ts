@@ -17,6 +17,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { attachmentTargets, playReason } from "./planning.ts";
 import { stagingEnemies, stagingLocations } from "./quest.ts";
+import { travelBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
 import { uniqueBlocked } from "./keywords.ts";
 
@@ -42,6 +43,8 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
       return optionIntents(state);
     case "cancelOffer":
       return triggerIntents(state, ctx);
+    case "response":
+      return [{ type: "Pass" }, ...triggerIntents(state, ctx)];
     case "travel":
       return travelIntents(state, ctx);
     case "optionalEngage":
@@ -68,7 +71,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "CommitHide":
       return state.window?.kind === "hideCommit" ? hideCommitters(state, state.window.seat, ctx.cards) : [];
     case "Travel":
-      return state.activeLocation ? [] : stagingLocations(state, ctx.cards);
+      return state.activeLocation ? [] : travelTargets(state, ctx);
     case "Engage":
       return stagingEnemies(state, ctx.cards);
     case "ChooseEnemy":
@@ -101,7 +104,10 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       if (state.window?.kind !== "mulligan") return "Mulligan is closed";
       return state.mulliganSeats.includes(state.activeSeat) ? "A second mulligan is not allowed" : null;
     case "Pass":
-      return state.window?.kind === "pass" || state.window?.kind === "frameAction" || state.window?.kind === "cancelOffer"
+      return state.window?.kind === "pass" ||
+        state.window?.kind === "frameAction" ||
+        state.window?.kind === "cancelOffer" ||
+        state.window?.kind === "response"
         ? null
         : "That intent is not legal in this window";
     case "PlayCard":
@@ -162,9 +168,13 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   return intents;
 }
 
+function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {
+  return stagingLocations(state, ctx.cards).filter((id) => !travelBlocked(state, ctx, id));
+}
+
 function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   const intents: LegalIntent[] = [{ type: "DeclineTravel" }];
-  if (!state.activeLocation && stagingLocations(state, ctx.cards).length > 0) intents.unshift({ type: "Travel" });
+  if (!state.activeLocation && travelTargets(state, ctx).length > 0) intents.unshift({ type: "Travel" });
   return intents;
 }
 
@@ -197,6 +207,7 @@ function travelReason(
   if (state.window?.kind !== "travel") return "That intent is not legal in this window";
   if (state.activeLocation) return "An active location is already in play";
   if (!stagingLocations(state, ctx.cards).includes(intent.locationId)) return "That location is not in staging";
+  if (travelBlocked(state, ctx, intent.locationId)) return "Players cannot travel to that location now";
   return null;
 }
 

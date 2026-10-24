@@ -4,11 +4,13 @@ import { beginEffect } from "./cancel.ts";
 import { beginEnemyAttack } from "./combat.ts";
 import { askTarget, openBranch } from "./choices.ts";
 import { hasTrait, holds, searchable } from "./conditions.ts";
+import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
+import { attachBlocked } from "./restrictions.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
 import { livingSeats, updateCard } from "./state.ts";
 import { holdsNow, seatFor, shuffleEncounterDeck } from "./verbs.ts";
@@ -24,6 +26,8 @@ export type EffectSpec = {
   instructions: readonly Instruction[];
   cancel: CancelOffer | null;
   blockCancel: Condition | null;
+  // The window to open again when the frame pops.
+  resume?: EffectData["resume"];
 };
 
 // A frame that can stop for a player. Its instructions wait in data, so settle resumes it.
@@ -39,6 +43,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     blockCancel: spec.blockCancel,
     uncancelable: false,
     wait: null,
+    resume: spec.resume ?? null,
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
 }
@@ -79,9 +84,15 @@ export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContex
   if (data.kind !== "effect") throw new Error(`Frame ${frame.frame} lost its effect data`);
   if (frame.step === 0) return beginEffect(state, frame, data, ctx);
   const [item, ...rest] = data.queue;
-  if (data.canceled || !item) return popFrame(state, steps);
+  if (data.canceled || !item) return reopen(popFrame(state, steps), data);
   const advanced = patchTop(state, { data: { ...data, queue: rest } });
   return runItem(advanced, item, frame, data.returned, ctx, steps);
+}
+
+// An Action used in a window gives that window back once its frame is done.
+function reopen(state: ScenarioState, data: EffectData): ScenarioState {
+  if (!data.resume) return state;
+  return { ...state, window: data.resume.window, activeSeat: data.resume.seat, passed: [] };
 }
 
 function runItem(
@@ -103,6 +114,9 @@ function runItem(
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
       return immediateAttack(state, frame.cardId, ctx, steps);
+    case "ReadyHero":
+    case "BarAttack":
+    case "PlaceProgressOnLocation":
     case "ReturnToStaging":
     case "AttachSelf":
     case "SearchMove":
@@ -159,7 +173,9 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     }
     case "AttachSelf": {
       const code = sourceId ? state.cards[sourceId]?.code : undefined;
-      const free = (id: string): boolean => !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code);
+      const free = (id: string): boolean =>
+        !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) &&
+        (code == null || !attachBlocked(state, ctx, id, code));
       if (instruction.to.kind === "hero") return (state.seats[item.seat]?.heroes ?? []).filter(free);
       const trait = instruction.to.trait;
       return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])]
@@ -171,6 +187,10 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       return searchable(state, instruction, ctx);
     case "ShuffleIntoDeck":
       return searchable(state, instruction, ctx, ["encounterDiscard"]);
+    case "ReadyHero":
+    case "BarAttack":
+    case "PlaceProgressOnLocation":
+      return targetCandidates(state, instruction, item.seat, ctx);
     default:
       return [];
   }
@@ -241,6 +261,10 @@ function applyTargeted(
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first) : state;
     case "ShuffleIntoDeck":
       return first ? shuffleEncounterDeck(moveCard(state, first, { zone: "encounterDeck" })) : state;
+    case "ReadyHero":
+    case "BarAttack":
+    case "PlaceProgressOnLocation":
+      return applyTargetVerb(state, instruction, first, sourceId, item.seat, ctx, steps);
     default:
       return state;
   }

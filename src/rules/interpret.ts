@@ -4,9 +4,11 @@ import type { EngineStep } from "./intents.ts";
 import { placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { modifyStat } from "./attack-verbs.ts";
+import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "./frames.ts";
 import { runSetupVerb } from "./setup-verbs.ts";
-import { engageEnemy, stagingEnemies, stagingLocations, travelTo } from "./quest.ts";
+import { engageEnemy, stagingEnemies, stagingLocations } from "./quest.ts";
+import { travelNow } from "./travel.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, updateCard } from "./state.ts";
 import { raiseFor, runExtraVerb } from "./verbs.ts";
@@ -74,7 +76,7 @@ export function runInstruction(
   if (state.failure) return state;
   switch (instruction.verb) {
     case "Draw":
-      return drawOne(state, focus.seat, steps);
+      return drawVerb(state, instruction, focus.seat, ctx, steps);
     case "GainResources":
       return gainSeatResources(state, focus.seat, steps);
     case "RevealStaging":
@@ -88,9 +90,8 @@ export function runInstruction(
     case "Travel": {
       const locationId = instruction.to === "self" ? focus.sourceId : stagingLocations(state, ctx.cards)[0];
       if (!locationId) return state;
-      const traveled = travelTo(state, locationId, ctx.cards);
-      if (!traveled) return { ...state, failure: "Travel was refused" };
-      return traveled;
+      const traveled = travelNow(state, locationId, ctx, steps);
+      return traveled ?? { ...state, failure: "Travel was refused" };
     }
     case "Engage": {
       const enemyId = stagingEnemies(state, ctx.cards)[0];

@@ -1,15 +1,23 @@
 import type { Condition, Instruction, ModifierStat, ModifierUntil, Trigger } from "../catalog/boundary.ts";
 
 import type { Sphere } from "./printed.ts";
+import type { Window } from "./state.ts";
 
 // Plain data only, never a closure, so structuredClone and the undo replay keep working.
 
+// `instanceId` names the holder: a card instance id, "table" (every seat), or "seat:<n>".
 export type Modifier = {
   instanceId: string;
   sourceId: string;
   stat: ModifierStat;
   amount: number;
   until: ModifierUntil;
+  // A constant effect put this modifier here. The engine rebuilds these from the effect list.
+  origin?: string;
+  // The amount counts once for each of these when the stat is read.
+  per?: "committed" | "ally";
+  // The modifier only applies to this seat (an enemy that cannot attack one player).
+  seat?: number;
 };
 
 export type FrameName =
@@ -20,6 +28,7 @@ export type FrameName =
   | "shadow"
   | "response"
   | "setup"
+  | "travel"
   | "delayed"
   | "event"
   | "ResolveEffect";
@@ -52,6 +61,8 @@ export type EffectData = {
   // Set when the effect starts: true if the effect could not be canceled.
   uncancelable: boolean;
   wait: EffectWait | null;
+  // The window to open again when the effect is done (an Action used in a pass window).
+  resume?: { window: Window; seat: number } | null;
 };
 
 export type HideData = {
@@ -67,8 +78,12 @@ export type HideData = {
 // `cardId` limits the event to one card: only that card's effects hear it.
 export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string };
 
+// A Response a player may use after an event. It is offered once and may be passed.
+export type ResponseOffer = { cardId: string; effectId: string; seat: number };
+
 export type FrameData =
   | { kind: "event"; event: GameEvent }
+  | { kind: "responses"; event: GameEvent; offers: readonly ResponseOffer[] }
   | { kind: "none" }
   | { kind: "reveal"; hide: HideResult | null; surge: boolean }
   | HideData
@@ -94,6 +109,9 @@ export type DelayedEffect = {
   instructions: readonly Instruction[];
   uncancelable: Condition | null;
 };
+
+// One use of an effect with a limit. A oncePerPhase use is spent in the round and phase it was made.
+export type UsedEffect = { effectId: string; sourceId: string; round: number; phase: string };
 
 export type HideFailure = { seat: number; round: number; phase: string };
 

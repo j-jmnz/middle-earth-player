@@ -19,13 +19,9 @@ const manifest = readJson("fixtures", "abilities", "a-shadow-of-the-past.json") 
 const fixture = parseScenarioFixture(readJson("fixtures", "a-shadow-of-the-past.json"));
 
 // Timings that this batch of phase 8 authors. The rest are listed as todo until a batch takes them.
-const AUTHORED = new Set(["setup", "forced", "triggered", "whenRevealed", "shadow"]);
+const AUTHORED = new Set(["setup", "forced", "triggered", "whenRevealed", "shadow", "response", "action", "constant", "travel"]);
 const LATER: Readonly<Record<string, string>> = {
   questResolution: "batch 5",
-  response: "no batch in the plan yet",
-  action: "no batch in the plan yet",
-  constant: "no batch in the plan yet",
-  travel: "no batch in the plan yet",
 };
 
 // A timing whose record is held back on purpose. The case fails with this message until a citation exists.

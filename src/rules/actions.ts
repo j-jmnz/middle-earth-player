@@ -1,10 +1,13 @@
 import type { Effect } from "../catalog/boundary.ts";
 
 import { applyCancel, cancelIntents, cancelReason } from "./cancel.ts";
+import { holds } from "./conditions.ts";
+import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
-import { runEffect, type ReduceContext } from "./interpret.ts";
+import type { ReduceContext } from "./interpret.ts";
+import { applyResponse, responseIntents, responseReason } from "./responses.ts";
 import type { ScenarioState } from "./state.ts";
-import { withFrame } from "./windows.ts";
+import { payUsage, usable, usageReason } from "./usage.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 
@@ -12,24 +15,29 @@ function inTriggerWindow(state: ScenarioState): boolean {
   return state.window?.kind === "pass" || state.window?.kind === "frameAction";
 }
 
+// An Action on a card the active seat controls in play, whose condition holds.
 function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, effectId: string): Effect | undefined {
   const instance = state.cards[cardId];
   if (!instance || instance.controller !== state.activeSeat) return undefined;
-  if (instance.zone !== "heroes" && instance.zone !== "play") return undefined;
-  return ctx.effects.find(
-    (effect) => effect.id === effectId && effect.cardCode === instance.code && effect.timing === "action",
+  if (instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached") return undefined;
+  const effect = ctx.effects.find(
+    (entry) => entry.id === effectId && entry.cardCode === instance.code && entry.timing === "action",
   );
+  if (!effect) return undefined;
+  const scope = { actor: state.activeSeat, sourceId: cardId, returned: 0 };
+  return !effect.condition || holds(state, effect.condition, scope, ctx) ? effect : undefined;
 }
 
-// Every action effect on a card the active seat controls in play.
+// Every Action the active seat can use now: its condition holds, its limit is unspent, its cost can be paid.
 export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   if (state.window?.kind === "cancelOffer") return cancelIntents(state);
+  if (state.window?.kind === "response") return responseIntents(state);
   if (!inTriggerWindow(state)) return [];
   const intents: LegalIntent[] = [];
   for (const instance of Object.values(state.cards)) {
     for (const effect of ctx.effects) {
-      if (effect.id == null || actionEffect(state, ctx, instance.id, effect.id) !== effect) continue;
-      intents.push({ type: "Trigger", cardId: instance.id, effectId: effect.id });
+      if (actionEffect(state, ctx, instance.id, effect.id) !== effect) continue;
+      if (usable(state, effect, instance.id, state.activeSeat, ctx)) intents.push({ type: "Trigger", cardId: instance.id, effectId: effect.id });
     }
   }
   return intents;
@@ -37,12 +45,15 @@ export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalI
 
 export function triggerReason(state: ScenarioState, intent: TriggerIntent, ctx: ReduceContext): string | null {
   if (state.window?.kind === "cancelOffer") return cancelReason(state, intent, ctx);
+  if (state.window?.kind === "response") return responseReason(state, intent, ctx);
   if (!inTriggerWindow(state)) return "That intent is not legal in this window";
-  if (!actionEffect(state, ctx, intent.cardId, intent.effectId)) return "That effect cannot be triggered";
-  return null;
+  const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);
+  if (!effect) return "That effect cannot be triggered";
+  return usageReason(state, effect, intent.cardId, state.activeSeat, intent.payments ?? [], ctx);
 }
 
-// The effect resolves in its own frame. Everyone may pass again afterward.
+// The cost is paid, then the effect resolves in its own frame. The window it was used in opens again
+// when the frame pops, so everyone may pass again afterward.
 export function applyTrigger(
   state: ScenarioState,
   intent: TriggerIntent,
@@ -50,11 +61,24 @@ export function applyTrigger(
   steps: EngineStep[],
 ): ScenarioState {
   if (state.window?.kind === "cancelOffer") return applyCancel(state, intent, steps);
+  if (state.window?.kind === "response") return applyResponse(state, intent, ctx, steps);
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);
-  if (!effect) return state;
+  if (!effect || !state.window) return state;
   const seat = state.activeSeat;
-  const resolved = withFrame(state, "ResolveEffect", intent.cardId, state.perilSeat != null, (framed) => {
-    return runEffect(framed, effect, intent.cardId, seat, ctx, steps);
-  }, steps);
-  return { ...resolved, passed: [] };
+  const paid = payUsage(state, effect, intent.cardId, intent.payments ?? [], ctx, steps);
+  return pushEffectFrame(
+    { ...paid, window: null },
+    {
+      frame: "ResolveEffect",
+      sourceId: intent.cardId,
+      actor: seat,
+      peril: state.perilSeat != null,
+      effectId: effect.id,
+      instructions: effect.instructions,
+      cancel: null,
+      blockCancel: null,
+      resume: { window: state.window, seat },
+    },
+    steps,
+  );
 }

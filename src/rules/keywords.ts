@@ -8,6 +8,22 @@ import { inPlay, moveCard, type Destination } from "./zones.ts";
 
 export type DamageSource = "framework" | "player";
 
+type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | "engagementCost";
+
+function printedStat(printed: PrintedCard, stat: ModifierStat): number {
+  switch (stat) {
+    case "willpower":
+    case "attack":
+    case "defense":
+    case "threat":
+    case "questPoints":
+    case "engagementCost":
+      return printed[stat satisfies CardStat] ?? 0;
+    default:
+      return 0;
+  }
+}
+
 export function modifiedStat(
   state: ScenarioState,
   instance: CardInstance,
@@ -15,7 +31,7 @@ export function modifiedStat(
   cards: ReadonlyMap<string, PrintedCard>,
 ): number {
   const printed = printedOf(cards, instance.code);
-  let total = printed[stat] ?? 0;
+  let total = printedStat(printed, stat);
   for (const modifier of state.modifiers) {
     if (modifier.instanceId !== instance.id || modifier.stat !== stat) continue;
     if (modifierActive(state, modifier)) total += modifier.amount;

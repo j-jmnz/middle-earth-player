@@ -14,13 +14,14 @@ import {
 } from "./combat.ts";
 import { applyChoice } from "./choices.ts";
 import { advanceFrame, stagingStep } from "./frames.ts";
-import { commitHide, pruneHideFailures } from "./hide.ts";
+import { commitHide, pruneRoundRecords } from "./hide.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import { drawOne, gainSeatResources, type ReduceContext } from "./interpret.ts";
 import { applyPass, modeAfterPass } from "./pass.ts";
 import { playCard } from "./planning.ts";
 import { doRefresh } from "./refresh.ts";
-import { engagementStep, engageEnemy, stagingEnemies, travelTo } from "./quest.ts";
+import { engagementStep, engageEnemy, stagingEnemies } from "./quest.ts";
+import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
 import { crossBoundary } from "./triggers.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
@@ -61,10 +62,8 @@ export function applyIntent(
       return applyTrigger(state, intent, ctx, steps);
     case "Choose":
       return applyChoice(state, intent.optionId);
-    case "Travel": {
-      const traveled = travelTo(state, intent.locationId, ctx.cards);
-      return traveled ? { ...withMode(traveled, "optionalEngage"), window: null } : state;
-    }
+    case "Travel":
+      return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":
       return { ...withMode(state, "optionalEngage"), window: null };
     case "Engage":
@@ -137,7 +136,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
 }
 
 function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  const bumped = pruneHideFailures({ ...state, round: state.round + 1 });
+  const bumped = pruneRoundRecords({ ...state, round: state.round + 1 });
   if (hasTiming(bumped, ctx, "beginningOfPhase")) return openPass(bumped);
   return withMode(bumped, "resourceGrant");
 }

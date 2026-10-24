@@ -5,7 +5,19 @@ import { z } from "zod";
 
 export const modifierUntilSchema = z.enum(["endOfPhase", "endOfRound", "endOfAttack", "whileSourceInPlay"]);
 
-export const modifierStatSchema = z.enum(["willpower", "attack", "defense", "threat"]);
+// Stats on a card, plus Hide numbers held by a seat or the table, and a flag that bars an enemy's attack.
+export const modifierStatSchema = z.enum([
+  "willpower",
+  "attack",
+  "defense",
+  "threat",
+  "questPoints",
+  "engagementCost",
+  "hideValue",
+  "hideThreat",
+  "hideWillpower",
+  "cannotAttack",
+]);
 
 export const phaseNameSchema = z.enum([
   "Setup",
@@ -28,6 +40,9 @@ export const triggerSchema = z.enum([
   "endOfPhase",
   "endOfRound",
   "firstPlayerTokenPassed",
+  "hideSucceeded",
+  "traveled",
+  "leftPlay",
 ]);
 
 const whoSchema = z.enum(["actor", "firstPlayer"]);
@@ -35,8 +50,8 @@ const whoSchema = z.enum(["actor", "firstPlayer"]);
 export const conditionSchema = z.discriminatedUnion("kind", [
   // The actor failed a Hide test in the current phase or round.
   z.strictObject({ kind: z.literal("hideFailed"), scope: z.enum(["phase", "round"]) }),
-  // The actor has an enemy with this trait engaged with them.
-  z.strictObject({ kind: z.literal("hasEngaged"), trait: z.string().min(1) }),
+  // The actor has an enemy engaged with them, with this trait if one is named.
+  z.strictObject({ kind: z.literal("hasEngaged"), trait: z.string().min(1).optional() }),
   // A card with this code is in play and its exhausted state is `is`.
   z.strictObject({ kind: z.literal("exhausted"), code: z.string().min(1), is: z.boolean() }),
   // The source is an enemy engaged with the actor.
@@ -45,6 +60,14 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("noneReturned") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
+  // Where the source card is now. `play` means any zone the source's controller plays from.
+  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play"]) }),
+  // A card with this code is in the victory display (`is`) or is not.
+  z.strictObject({ kind: z.literal("inVictory"), code: z.string().min(1), is: z.boolean() }),
+  // Some location other than the source is in the staging area or is the active location.
+  z.strictObject({ kind: z.literal("otherLocationInPlay") }),
+  // The actor controls a hero that is exhausted.
+  z.strictObject({ kind: z.literal("heroExhausted") }),
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
@@ -72,7 +95,17 @@ function codeVerb<const Verb extends string>(name: Verb) {
   return z.strictObject({ verb: z.literal(name), code: z.string().min(1), ...when });
 }
 
-export const costSchema = z.strictObject({ verb: z.literal("PayCost") });
+// What a player pays to use an Action or Response. Resources come from the payments on the Trigger intent.
+export const costSchema = z.discriminatedUnion("kind", [
+  z.strictObject({ kind: z.literal("exhaustSelf") }),
+  z.strictObject({ kind: z.literal("addSelfToVictory") }),
+  z.strictObject({ kind: z.literal("discardSelf") }),
+  z.strictObject({
+    kind: z.literal("resources"),
+    amount: z.number().int().positive(),
+    sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
+  }),
+]);
 
 const modifyStatSchema = z.strictObject({
   verb: z.literal("ModifyStat"),
@@ -80,16 +113,20 @@ const modifyStatSchema = z.strictObject({
   amount: z.number().int(),
   until: modifierUntilSchema,
   // Whose stat changes. The default is the source card. `attacker` is the enemy in the attack in progress.
-  target: z.enum(["self", "attacker"]).optional(),
+  // `host` is the card the source is attached to. `table` is every seat. `engagedSeat` is the seat the
+  // source is engaged with. `eachSeat` is one holder per living seat.
+  target: z.enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat"]).optional(),
+  // Multiplies the amount by this count when the stat is read.
+  per: z.enum(["committed", "ally"]).optional(),
   ...when,
 });
 
 const searchSelector = { code: z.string().min(1).optional(), trait: z.string().min(1).optional() };
 
 const simpleVerbs = [
-  verb("Draw"),
+  z.strictObject({ verb: z.literal("Draw"), perHero: z.string().min(1).optional(), ...when }),
   verb("GainResources"),
-  costSchema,
+  verb("PayCost"),
   verb("PlayAlly"),
   verb("Attach"),
   z.strictObject({
@@ -157,6 +194,19 @@ const simpleVerbs = [
   verb("ImmediateAttack"),
   // The attack in progress counts as undefended, even if a defender was declared.
   verb("ConsiderUndefended"),
+  // The actor readies one hero they control.
+  verb("ReadyHero"),
+  // Places progress on a non-unique location in play: `perPlayer` for each player in the game.
+  z.strictObject({ verb: z.literal("PlaceProgressOnLocation"), perPlayer: z.number().int().positive(), ...when }),
+  // The actor picks an enemy engaged with them. It cannot attack them until the end of the round.
+  verb("BarAttack"),
+  // Constants: a rule the engine checks while the source is in play.
+  z.strictObject({
+    verb: z.literal("Restrict"),
+    what: z.enum(["advance", "travel", "attach", "heroLimit"]),
+    exceptTrait: z.string().min(1).optional(),
+    ...when,
+  }),
   // The source enemy leaves the player it is engaged with and engages the next player.
   verb("EngageNextPlayer"),
 ] as const;
