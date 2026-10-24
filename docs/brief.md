@@ -158,6 +158,7 @@ type CampaignLog = {
   campaignPool: PoolCard[];      // earned boons and burdens, attached or not
   captives: { seat: number; hero: string }[];
   completed: string[];           // scenario ids
+  earned: Record<string, string[]>; // the codes each won scenario's Resolution recorded; the path shows them on a completed node
   scenarios: Record<string, { rounds: number; victoryPoints: number; score: number }>;
   score: number;                 // the sum of the scenario scores, computed, never typed
   notes: string;

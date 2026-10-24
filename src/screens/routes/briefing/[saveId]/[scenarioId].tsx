@@ -193,11 +193,12 @@ export default function Briefing() {
                       testID={`deck-pick-${index}-${deck.id}`}
                       collapsable={false}
                       accessibilityRole="radio"
-                      accessibilityState={{ selected }}
+                      accessibilityState={{ selected, disabled: fallen.length > 0 }}
+                      disabled={fallen.length > 0}
                       onPress={() => pick(index, deck.id)}
                       className="min-h-14 justify-center border-b border-hairline py-2"
                     >
-                      <Text className={selected ? "text-body font-semibold text-gold" : "text-body text-bone"}>{deck.name}</Text>
+                      <Text className={selected ? "text-body font-semibold text-gold" : fallen.length > 0 ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
                       <Text className="text-label text-muted">{fallen.length > 0 ? `${heroNames(fallen)} fell and cannot be picked` : heroNames(deck.heroes)}</Text>
                     </Pressable>
                   );
