@@ -95,6 +95,6 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED) });
   const next = updateCard(state, id, { progress: location.progress + placed });
   if (points == null || location.progress + placed < points) return next;
-  const explored = destroyCard(next, id, ctx.cards, steps);
+  const explored = destroyCard(next, id, ctx.cards, steps, true);
   return offerResponses(runQuestResolution(explored, id, ctx, steps), { trigger: "leftPlay", seat: null, cardId: id }, ctx, steps);
 }

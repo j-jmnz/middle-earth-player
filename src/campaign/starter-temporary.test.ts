@@ -215,4 +215,18 @@ describe("Elf-stone (141016)", () => {
     expect(gone.window?.kind).not.toBe("response");
     expect(gone.cards[idsOf(tab, AXEHAND)]?.zone).toBe("hand");
   });
+
+  it("is not offered when the location leaves play with its printed points met but not the stone's extra one (rr.explored)", () => {
+    const tab = scene();
+    const location = idsOf(tab, BAMFURLONG);
+    const run = play(tab, begin(tab.state), "141016", { hostId: location });
+    const printed = tab.ctx.cards.get(BAMFURLONG)?.questPoints ?? 0;
+    // Short of the Elf-stone's total, then removed by an effect: once the stone is discarded the location would look full.
+    const short = settle(placeProgress(syncConstants(run.state, tab.ctx), location, printed, tab.ctx, []), tab.ctx, []);
+    expect(short.cards[location]?.zone).toBe("activeLocation");
+    const gone = settle(destroyCard(short, location, tab.ctx.cards, []), tab.ctx, []);
+    expect(gone.cards[location]?.zone).not.toBe("activeLocation");
+    expect(gone.window?.kind).not.toBe("response");
+    expect(gone.cards[idsOf(tab, AXEHAND)]?.zone).toBe("hand");
+  });
 });

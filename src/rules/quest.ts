@@ -99,7 +99,7 @@ function placeQuestProgress(
         }
         const updated = next.cards[locationId];
         if (updated && updated.progress >= points) {
-          next = destroyCard(next, locationId, cards, steps);
+          next = destroyCard(next, locationId, cards, steps, true);
         }
       }
     }

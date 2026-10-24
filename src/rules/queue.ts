@@ -1,3 +1,4 @@
+// Rules: rr.timing-of-ability-resolution, rr.triggering-condition (data/rules/entries.json).
 import type { GameEvent } from "./frame-types.ts";
 import type { ScenarioState } from "./state.ts";
 

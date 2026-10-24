@@ -31,7 +31,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
       if (effect.timing !== "response" || effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;
       // Only an event used from the hand has a Response there.
       if (inHand !== (effect.cost?.kind === "playEvent")) continue;
-      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.subject ? { subject: event.subject } : {}) };
+      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.subject ? { subject: event.subject } : {}), ...(event.explored ? { explored: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       if (!usable(state, effect, instance.id, seat, ctx)) continue;
       offers.push({ cardId: instance.id, effectId: effect.id, seat });

@@ -1,3 +1,4 @@
+// Rules: rr.timing-of-ability-resolution, rr.forced, rr.response, rr.triggering-condition (data/rules/entries.json).
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { offerResponses } from "./responses.ts";

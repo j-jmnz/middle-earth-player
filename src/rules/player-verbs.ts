@@ -1,3 +1,4 @@
+// Rules: rr.exhausted, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.damage, rr.explored, rr.cancel, rr.shadow-effects, rr.restricted, rr.initiating-abilities-playing-cards (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "./cause.ts";

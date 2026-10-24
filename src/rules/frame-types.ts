@@ -99,7 +99,7 @@ export type HideData = {
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; participants?: readonly string[] };
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; participants?: readonly string[]; explored?: boolean };
 
 // A Response a player may use after an event. It is offered once and may be passed.
 export type ResponseOffer = { cardId: string; effectId: string; seat: number };

@@ -18,6 +18,7 @@ export type Scope = {
   holderId?: string;
   against?: string;
   subject?: string;
+  explored?: boolean;
   // The seat the event a Response answers happened to.
   eventSeat?: number | null;
 };
@@ -73,9 +74,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return host != null && printedOf(ctx.cards, host.code).name === condition.name;
     }
     case "subjectExplored": {
-      const subject = scope.subject ? state.cards[scope.subject] : undefined;
-      const points = subject ? printedOf(ctx.cards, subject.code).questPoints : null;
-      return subject != null && points != null && subject.progress >= modifiedStat(state, subject, "questPoints", ctx.cards);
+      // Decided when the location left play (destroyCard), while its attachments still gave their quest points.
+      return scope.explored === true;
     }
     case "canPick":
       return pickCandidates(state, condition.pick, scope.actor, [], scope.sourceId, ctx).length > 0;

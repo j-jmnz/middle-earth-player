@@ -218,15 +218,17 @@ export function destroyCard(
   id: string,
   cards: ReadonlyMap<string, PrintedCard>,
   steps: EngineStep[],
+  explored = false,
 ): ScenarioState {
   const instance = state.cards[id];
   if (!instance) return state;
   const printed = printedOf(cards, instance.code);
   if (printed.keywords.permanent && heroHostInPlay(state, instance)) return state;
-  // The cards attached to a location that leaves play hear about it (Elf-stone), once they are discarded with it.
+  // The cards attached to a location that leaves play hear about it (Elf-stone). Whether the location was explored is
+  // decided here, while the attachments still count (rr.explored): an Elf-stone's extra quest point is gone once it is discarded.
   let next = state;
   if (printed.type === "location") {
-    for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id });
+    for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
   }
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;

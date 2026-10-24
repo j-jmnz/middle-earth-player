@@ -1,3 +1,4 @@
+// Rules: rr.campaign-cards, rr.boons, rr.burdens (data/rules/entries.json).
 import { traitTokens } from "../catalog/deck-save.ts";
 import type { cards } from "../catalog/schema.ts";
 import { printedFromCard, type PrintedCard } from "../rules/printed.ts";
@@ -38,15 +39,31 @@ export function printedFromRow(row: CatalogRow): PrintedCard {
   });
 }
 
-// Every card of a list of rows, keyed by code. A row whose type the engine does not know (a nightmare card) is left out.
+// The row the engine cannot print (a nightmare card), with why. Undefined when it prints.
+export function unprintable(row: CatalogRow): string | undefined {
+  try {
+    printedFromRow(row);
+    return undefined;
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
+}
+
+// The campaign card is read as effect records (campaignSetup, resolution), never dealt as an engine card, so a scenario's
+// code list names it and the map leaves it out on purpose. Every other row must print.
+const NOT_AN_ENGINE_CARD: ReadonlySet<string> = new Set(["campaign"]);
+
+// Every card of a list of rows, keyed by code. The briefing, the log and a deal name only cards the engine prints, so a row
+// it cannot print is a data fault: it throws, naming every such code, instead of leaving the card out of the map.
 export function printedMap(rows: readonly CatalogRow[]): Map<string, PrintedCard> {
   const map = new Map<string, PrintedCard>();
+  const faults: string[] = [];
   for (const row of rows) {
-    try {
-      map.set(row.code, printedFromRow(row));
-    } catch {
-      // The briefing and the log never deal a card the engine cannot print.
-    }
+    if (NOT_AN_ENGINE_CARD.has(row.typeCode)) continue;
+    const why = unprintable(row);
+    if (why) faults.push(`${row.code} ${row.name}: ${why}`);
+    else map.set(row.code, printedFromRow(row));
   }
+  if (faults.length > 0) throw new Error(`Cards the engine cannot print: ${faults.join("; ")}`);
   return map;
 }
