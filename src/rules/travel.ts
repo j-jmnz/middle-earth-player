@@ -10,17 +10,20 @@ import { offerResponses } from "./responses.ts";
 import { travelBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
 import { withMode } from "./state.ts";
+import { fireForced } from "./triggers.ts";
 
 const TRAVEL_HERE: Instruction = { verb: "Travel", to: "self" };
 
 // The players move to the location: it becomes the active location, the Travel phase ends, and
-// Responses to the travel are offered. Null if the location cannot be traveled to.
+// Responses to the travel are offered. Forced effects on the location "after it becomes the active location" (141048:A:2)
+// resolve first, so their frames go on top. Null if the location cannot be traveled to.
 export function travelNow(state: ScenarioState, locationId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   if (travelBlocked(state, ctx, locationId)) return null;
   const traveled = travelTo(state, locationId, ctx.cards);
   if (!traveled) return null;
   const moved = traveled.mode === "travel" ? withMode(traveled, "optionalEngage") : traveled;
-  return offerResponses(moved, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
+  const offered = offerResponses(moved, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
+  return fireForced(offered, { trigger: "becameActive", seat: null, cardId: locationId }, ctx, steps);
 }
 
 // The Travel intent. A location with a Travel effect makes the first player resolve it first, in a

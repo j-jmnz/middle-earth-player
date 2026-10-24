@@ -160,4 +160,11 @@ export type PendingAttack = {
   // Instructions to run, with the attacker as the source, when the attack ends.
   after?: readonly Instruction[];
   afterCause?: Cause;
+  // Forced effects "when this enemy attacks" (141069:A:2) are resolving: the defense window opens once they are done.
+  defenseWaits?: boolean;
+  // The additional shadow card (141069:A:2) whose cancel Responses were offered last.
+  extraOffered?: string;
+  // A shadow card whose effect asks a player (a Pick or a Choose, 141071:A:2) is resolving in its own frame. The attack
+  // goes on when it pops.
+  shadowFrame?: string;
 };

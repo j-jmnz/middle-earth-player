@@ -104,7 +104,8 @@ export function runInstruction(
       return engageEnemy(state, focus.seat, enemyId, steps);
     }
     case "DealShadow":
-      return focus.sourceId ? dealOneShadow(state, focus.sourceId) : state;
+      if (!focus.sourceId) return state;
+      return instruction.additional ? dealAdditionalShadow(state, focus.sourceId) : dealOneShadow(state, focus.sourceId);
     case "ResolveEffect":
       return withFrame(state, "ResolveEffect", focus.sourceId, false, (framed) => framed, steps);
     case "ModifyStat":
@@ -172,6 +173,16 @@ export function dealOneShadow(state: ScenarioState, enemyId: string): ScenarioSt
   const enemy = state.cards[enemyId];
   const top = state.encounterDeck[0];
   if (!enemy || enemy.shadowId || !top) return state;
+  const moved = moveCard(state, top, { zone: "shadow", enemyId });
+  return updateCard(moved, top, { face: "down" });
+}
+
+// One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
+// encounter deck deals nothing (rr.step-6-2).
+export function dealAdditionalShadow(state: ScenarioState, enemyId: string): ScenarioState {
+  const enemy = state.cards[enemyId];
+  const top = state.encounterDeck[0];
+  if (!enemy || !top) return state;
   const moved = moveCard(state, top, { zone: "shadow", enemyId });
   return updateCard(moved, top, { face: "down" });
 }

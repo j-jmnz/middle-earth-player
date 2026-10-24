@@ -63,6 +63,12 @@ export const triggerSchema = z.enum([
   // An enemy was engaged with a player (subject), and a player's attack destroyed an enemy (heard by each attacker).
   "engaged",
   "attackDestroyed",
+  // The staging step of the quest phase begins, before the first card is revealed (141051:A:2, rr.step-3-3).
+  "stagingStepBegins",
+  // Heard by the location itself: it became the active location (141048:A:2, rr.active-location).
+  "becameActive",
+  // Heard by the enemy itself: it attacks, before the defender is declared (141069:A:2, rr.step-6-4b).
+  "attacks",
 ]);
 
 const whoSchema = z.enum(["actor", "firstPlayer"]);
@@ -73,7 +79,8 @@ const whoSchema = z.enum(["actor", "firstPlayer"]);
 // effect has already picked. `attackableByPicked` keeps the enemies the last picked character could attack. `type: player` picks a
 // seat that is still in the game.
 export const pickSchema = z.strictObject({
-  type: z.enum(["hero", "ally", "character", "enemy", "location", "player", "card"]),
+  // `attachment`: a card of the attachment type in play that the chooser controls (141071:A:2).
+  type: z.enum(["hero", "ally", "character", "enemy", "location", "player", "card", "attachment"]),
   control: z.enum(["you", "any"]),
   // An enemy in the staging area counts too (an enemy "in play"), not only one engaged with a player.
   staging: z.boolean().optional(),
@@ -309,7 +316,9 @@ const simpleVerbs = [
   }),
   z.strictObject({ verb: z.literal("Travel"), to: z.literal("self").optional(), ...when }),
   verb("Engage"),
-  verb("DealShadow"),
+  // Deals the source enemy a shadow card. `additional`: one more, beside the one it has ("deal it an additional shadow card",
+  // 141069:A:2); every shadow card dealt to an attacking enemy resolves (rr.step-6-4-2).
+  z.strictObject({ verb: z.literal("DealShadow"), additional: z.boolean().optional(), ...when }),
   verb("DeclareDefender"),
   verb("DealDamage"),
   verb("Attack"),
@@ -425,6 +434,13 @@ const simpleVerbs = [
   z.strictObject({ verb: z.literal("TransferHost"), who: whoSchema, ...when }),
   // The players win the scenario. The resolution choices follow.
   verb("WinGame"),
+  // Discards cards from the top of the encounter deck until `perPlayer` enemies for each player in the game have been
+  // discarded, or the deck is empty, and puts each of those enemies into play engaged with the first player (141045:A:2).
+  z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), ...when }),
+  // The source card (a shadow card) is shuffled into the encounter deck instead of being discarded (141069:A:3).
+  verb("ShuffleSelfIntoEncounterDeck"),
+  // The actor discards cards at random from their hand, `amount` (1 by default). The seed picks them (141047:A:2).
+  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: z.number().int().positive().optional(), ...when }),
   // Setup: a card from the box joins the encounter deck. The deck is shuffled by the Setup step that says so.
   codeVerb("ShuffleIntoEncounterDeck"),
   // Campaign setup: the voluntary hero change costs no threat penalty on this scenario's card.

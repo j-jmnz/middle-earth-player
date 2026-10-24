@@ -59,6 +59,9 @@ export type CardInstance = {
   attachments: readonly string[];
   committed: boolean;
   shadowId: string | null;
+  // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent
+  // when there are none.
+  extraShadowIds?: readonly string[];
   face: CardFace;
   controller: number | null;
   // The seat whose card it is, when another seat has taken control of it (Wandering Took, Stand and Fight). A discarded

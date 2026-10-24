@@ -11,6 +11,7 @@ import {
   hasLegalAttack,
   heroIds,
   nextEnemyGroup,
+  openDefense,
 } from "./combat.ts";
 import { applyChoice } from "./choices.ts";
 import { ruleCause } from "./cause.ts";
@@ -30,7 +31,7 @@ import { resolutionStep } from "./stage-reveal.ts";
 import { crossBoundary } from "./triggers.ts";
 import { constantWin } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
-import { discardShadows, resolveAttack } from "./shadow.ts";
+import { attackResumes, discardShadows, resolveAttack } from "./shadow.ts";
 import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -115,8 +116,10 @@ export function applyIntent(
 
 function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
-  // The Responses to a shadow effect are done: the attack goes on.
-  if (state.pendingAttack?.shadowOffered && !state.pendingAttack.shadowResolved) return resolveAttack(state, ctx, steps);
+  // The Forced effects of an attack's start are done: the defender is declared (141069:A:2).
+  if (state.pendingAttack?.defenseWaits) return openDefense(state);
+  // The Responses to a shadow effect, or a shadow effect that asked a player, are done: the attack goes on.
+  if (attackResumes(state)) return resolveAttack(state, ctx, steps);
   switch (state.mode) {
     case "afterOpening":
       return finishSetup(state, ctx, steps);

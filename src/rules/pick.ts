@@ -6,14 +6,14 @@ import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
-import { printedOf } from "./printed.ts";
+import { isPlayerType, printedOf } from "./printed.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats } from "./state.ts";
 
 // A Pick names cards or players a player may choose for the instructions after it. The seat is the one making the choice.
-// Cards that are immune to player card effects cannot be chosen (mec109.immune-to-player-card-effects). A pick is a
-// player card effect: only player cards carry the verb.
+// Cards that are immune to player card effects cannot be chosen by a player card's Pick (mec109.immune-to-player-card-effects).
+// An encounter card's Pick (141049:A:1, 141054:A:2, 141071:A:2) is not a player card effect.
 export function pickCandidates(
   state: ScenarioState,
   spec: PickSpec,
@@ -35,6 +35,9 @@ export function pickCandidates(
   }
   const raw: string[] = [];
   const from = spec.from ?? "play";
+  // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
+  const source = sourceId ? state.cards[sourceId] : undefined;
+  const playerEffect = source == null || isPlayerType(printedOf(ctx.cards, source.code));
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
   else if (from === "discard") {
     for (const index of seats) {
@@ -51,7 +54,12 @@ export function pickCandidates(
     }
   }
   else if (from === "deck") for (const index of seats) raw.push(...(state.seats[index]?.deck ?? []).slice(0, spec.top ?? Number.MAX_SAFE_INTEGER));
-  else if (spec.type === "enemy") {
+  else if (spec.type === "attachment") {
+    // Attachments in play that the chooser (or any player) controls, on any host.
+    for (const instance of Object.values(state.cards)) {
+      if (instance.host != null && instance.controller != null && seats.includes(instance.controller) && (instance.zone === "play" || instance.zone === "attached")) raw.push(instance.id);
+    }
+  } else if (spec.type === "enemy") {
     for (const index of seats) raw.push(...(state.seats[index]?.engaged ?? []));
     if (spec.staging) raw.push(...state.staging);
   } else if (spec.type === "location") {
@@ -63,7 +71,7 @@ export function pickCandidates(
     const instance = state.cards[id];
     if (!instance || (id === sourceId && (from !== "play" || spec.other)) || picked.includes(id)) return false;
     const printed = printedOf(ctx.cards, instance.code);
-    if (!playerCardEffectCanChoose(printed)) return false;
+    if (playerEffect && !playerCardEffectCanChoose(printed)) return false;
     if (spec.type !== "card" && !(spec.type === "character" ? printed.type === "hero" || printed.type === "ally" : printed.type === spec.type)) return false;
     if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
     if (spec.sphere && printed.sphere !== spec.sphere) return false;

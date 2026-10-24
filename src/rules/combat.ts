@@ -1,4 +1,4 @@
-// Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, mec109.archery (data/rules/entries.json).
+// Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, mec109.archery, rr.step-6-4b (data/rules/entries.json).
 import { attackBarred } from "./constants.ts";
 import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
@@ -10,6 +10,7 @@ import { queueEvent } from "./queue.ts";
 import { resolveAttack } from "./shadow.ts";
 import { inPlay } from "./zones.ts";
 import { ruleCause } from "./cause.ts";
+import { fireForced } from "./triggers.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -65,22 +66,35 @@ export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: s
 }
 
 // The shadow card is not turned up yet: it resolves once the defender is declared or the attack is undefended.
+// Forced effects "when this enemy attacks" (141069:A:2) resolve as the attack begins (rr.step-6-4b), before the defender is
+// declared: the defense window waits for their frames.
 export function beginEnemyAttack(
   state: ScenarioState,
   seat: number,
   enemyId: string,
-  _ctx: ReduceContext,
+  ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
   const attacker = state.cards[enemyId];
   if (!attacker || attacker.zone !== "engaged" || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
-  return {
-    ...state,
-    pendingAttack: { enemyId, seat },
-    window: { kind: "defense", enemyId, seat },
-    activeSeat: seat,
-  };
+  const declared: ScenarioState = { ...state, pendingAttack: { enemyId, seat }, activeSeat: seat };
+  const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
+  if (fired.stack.length > declared.stack.length && fired.pendingAttack) {
+    return { ...fired, pendingAttack: { ...fired.pendingAttack, defenseWaits: true } };
+  }
+  return { ...declared, window: { kind: "defense", enemyId, seat } };
+}
+
+// The Forced effects of the attack's start are done: the defender is declared now.
+export function openDefense(state: ScenarioState): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack?.defenseWaits) return state;
+  const { defenseWaits: _done, ...rest } = attack;
+  const enemy = state.cards[attack.enemyId];
+  // The enemy left play while they resolved: the attack is over.
+  if (enemy?.zone !== "engaged") return { ...state, pendingAttack: null };
+  return { ...state, pendingAttack: rest, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
 }
 
 export function defenderIds(state: ScenarioState, attackedSeat: number, cards: Cards): string[] {

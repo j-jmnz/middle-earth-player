@@ -12,7 +12,8 @@ import { lastPicked, otherSeat } from "./player-verbs.ts";
 import { printedOf } from "./printed.ts";
 import { engageEnemy, placeQuestProgress, stagingEnemies } from "./quest.ts";
 import { restricted } from "./restrictions.ts";
-import { shuffleIds } from "./seed.ts";
+import { queueEvent } from "./queue.ts";
+import { nextUint, shuffleIds } from "./seed.ts";
 import { afterProgress } from "./stage-reveal.ts";
 import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
 import { attachTo, moveCard } from "./zones.ts";
@@ -59,6 +60,14 @@ export function runExtraVerb(
       const placed = placeQuestProgress(state, instruction.perPlayer * livingSeats(state).length, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
       return afterProgress(placed, before, ctx, steps);
     }
+    case "DiscardUntilEnemies":
+      return discardUntilEnemies(state, instruction.perPlayer * livingSeats(state).length, ctx, steps);
+    case "ShuffleSelfIntoEncounterDeck": {
+      if (!focus.sourceId || !state.cards[focus.sourceId]) return state;
+      return shuffleEncounterDeck(updateCard(moveCard(state, focus.sourceId, { zone: "encounterDeck" }), focus.sourceId, { face: "down" }));
+    }
+    case "DiscardRandomFromHand":
+      return discardRandom(state, focus.seat, instruction.amount ?? 1);
     case "RemoveFromQuest": {
       const id = lastPicked(state);
       return state.cards[id]?.committed ? updateCard(state, id, { committed: false }) : state;
@@ -151,6 +160,43 @@ function committedHeroes(state: ScenarioState, seat: number, exceptSphere: strin
     const hero = state.cards[id];
     return hero?.committed === true && (exceptSphere == null || printedOf(ctx.cards, hero.code).sphere !== exceptSphere);
   }).length;
+}
+
+// Cards come off the top of the encounter deck into its discard pile until `count` enemies are among them, or the deck is
+// empty (rr.effects: as many as there are). Each of those enemies is then put into play engaged with the first player
+// (141045:A:2): it has engaged that player (rr.engaged).
+function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  const enemies: string[] = [];
+  while (enemies.length < count) {
+    const top = next.encounterDeck[0];
+    if (!top) break;
+    next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up" });
+    if (printedOf(ctx.cards, next.cards[top]?.code ?? "").type === "enemy") enemies.push(top);
+  }
+  const seat = next.firstPlayer;
+  if (next.seats[seat]?.eliminated) return next;
+  for (const id of enemies) {
+    next = moveCard(next, id, { zone: "engaged", seat });
+    steps.push({ kind: "engage", seat, enemyId: id });
+    next = queueEvent(next, { trigger: "engaged", seat, subject: id });
+  }
+  return next;
+}
+
+// The seat discards cards from its hand chosen by the seed, one roll each.
+function discardRandom(state: ScenarioState, seat: number, amount: number): ScenarioState {
+  let next = state;
+  for (let count = 0; count < amount; count += 1) {
+    const hand = next.seats[seat]?.hand ?? [];
+    if (hand.length === 0) break;
+    const id = hand[nextUint(next.seed, next.seedCursor) % hand.length];
+    next = { ...next, seedCursor: next.seedCursor + 1 };
+    const card = id ? next.cards[id] : undefined;
+    if (!id || !card) break;
+    next = moveCard(next, id, { zone: "discard", seat: card.owner ?? seat });
+  }
+  return next;
 }
 
 // Progress comes off the current quest card and stops at 0. The step records what was removed, as a negative amount.

@@ -7,7 +7,7 @@ import { drawOne, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
-import { offerResponses } from "./responses.ts";
+import { announceLeftPlay } from "./stage-reveal.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats, updateCard } from "./state.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
@@ -96,5 +96,5 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   const next = updateCard(state, id, { progress: location.progress + placed });
   if (points == null || location.progress + placed < points) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);
-  return offerResponses(runQuestResolution(explored, id, ctx, steps), { trigger: "leftPlay", seat: null, cardId: id }, ctx, steps);
+  return announceLeftPlay(runQuestResolution(explored, id, ctx, steps), id, ctx, steps);
 }

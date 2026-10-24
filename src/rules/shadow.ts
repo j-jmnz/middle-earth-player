@@ -1,4 +1,6 @@
-// Rules: rr.step-6-2 (data/rules/entries.json).
+// Rules: rr.step-6-2, rr.step-6-4-2, rr.shadow-effects, rr.cancel (data/rules/entries.json).
+import type { Effect } from "../catalog/boundary.ts";
+
 import { pushEffectFrame } from "./effect-frames.ts";
 import { holdsNow } from "./verbs.ts";
 import type { EngineStep } from "./intents.ts";
@@ -15,9 +17,39 @@ import { offerResponses } from "./responses.ts";
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
 function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const shadowId = state.cards[enemyId]?.shadowId;
-  const shadow = shadowId ? state.cards[shadowId] : undefined;
-  if (!shadowId || !shadow) return state;
+  return shadowId ? resolveShadowCard(state, shadowId, seat, ctx, steps) : state;
+}
+
+// A shadow effect that asks a player (Pick, Choose: "Discard a non-objective attachment you control", 141071:A:2).
+function asks(effects: readonly Effect[]): boolean {
+  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose"));
+}
+
+function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const shadow = state.cards[shadowId];
+  if (!shadow) return state;
   const turned = updateCard(state, shadowId, { face: "up" });
+  const effects = ctx.effects.filter((effect) => effect.cardCode === shadow.code && effect.timing === "shadow");
+  // An effect that waits for a player runs in a frame settle advances; the attack goes on when it pops (afterShadowFrame).
+  if (asks(effects) && turned.pendingAttack) {
+    const framed = pushEffectFrame(
+      // The defense window is over: the defender is declared.
+      { ...turned, window: null, pendingAttack: { ...turned.pendingAttack, shadowFrame: shadowId } },
+      {
+        frame: "shadow",
+        sourceId: shadowId,
+        actor: seat,
+        peril: false,
+        effectId: effects[0]?.id ?? `${shadowId}:shadow`,
+        instructions: effects.flatMap((effect) => effect.instructions),
+        causes: effects.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
+        cancel: null,
+        blockCancel: null,
+      },
+      steps,
+    );
+    return framed;
+  }
   const resolved = withFrame(turned, "shadow", shadowId, false, (framed) => {
     let next = framed;
     for (const effect of ctx.effects) {
@@ -30,8 +62,14 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
     }
     return next;
   }, steps);
-  if (!resolved.cards[shadowId]) return resolved;
-  return moveCard(resolved, shadowId, { zone: "encounterDiscard" });
+  return discardResolvedShadow(resolved, shadowId);
+}
+
+// A resolved shadow card is discarded, unless its effect put it somewhere else ("Shuffle this card into the encounter deck",
+// 141069:A:3).
+function discardResolvedShadow(state: ScenarioState, shadowId: string): ScenarioState {
+  if (state.cards[shadowId]?.zone !== "shadow") return state;
+  return moveCard(state, shadowId, { zone: "encounterDiscard" });
 }
 
 // End of the combat phase: every shadow card still dealt is discarded unused (Learn to Play p16).
@@ -44,8 +82,44 @@ export function discardShadows(state: ScenarioState): ScenarioState {
 }
 
 function hasShadowEffect(state: ScenarioState, enemyId: string, ctx: ReduceContext): boolean {
-  const shadow = state.cards[state.cards[enemyId]?.shadowId ?? ""];
+  return cardHasShadowEffect(state, state.cards[enemyId]?.shadowId ?? "", ctx);
+}
+
+function cardHasShadowEffect(state: ScenarioState, shadowId: string, ctx: ReduceContext): boolean {
+  const shadow = state.cards[shadowId];
   return shadow != null && ctx.effects.some((effect) => effect.cardCode === shadow.code && effect.timing === "shadow");
+}
+
+// The attack waits for settle: a shadow frame, or the cancel Responses offered for a shadow card, are still open.
+export function attackResumes(state: ScenarioState): boolean {
+  const attack = state.pendingAttack;
+  if (!attack || state.stack.length > 0 || state.window) return false;
+  if (attack.shadowFrame != null) return true;
+  if (attack.shadowOffered && !attack.shadowResolved) return true;
+  return attack.extraOffered != null && state.cards[attack.enemyId]?.extraShadowIds?.[0] === attack.extraOffered;
+}
+
+// The additional shadow cards (141069:A:2) resolve after the first, in the order dealt, each after its own cancel offer
+// (rr.cancel). A resolved card leaves the enemy, so the next one is always first. Returns the state and whether the attack
+// now waits for settle.
+function resolveExtraShadows(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): { state: ScenarioState; waits: boolean } {
+  let next = state;
+  for (let guard = 0; guard < 20; guard += 1) {
+    const attack = next.pendingAttack;
+    const shadowId = attack ? next.cards[attack.enemyId]?.extraShadowIds?.[0] : undefined;
+    if (!attack || shadowId == null) return { state: next, waits: false };
+    if (attack.extraOffered !== shadowId && cardHasShadowEffect(next, shadowId, ctx)) {
+      const marked: ScenarioState = { ...next, pendingAttack: { ...attack, extraOffered: shadowId, shadowCanceled: false } };
+      const offered = offerResponses(marked, { trigger: "shadowPending", seat: attack.seat }, ctx, steps);
+      if (offered.stack.length > marked.stack.length) return { state: { ...offered, window: null }, waits: true };
+      next = offered;
+    }
+    const current = next.pendingAttack ?? attack;
+    const canceled = current.extraOffered === shadowId && current.shadowCanceled === true;
+    next = canceled ? discardResolvedShadow(next, shadowId) : resolveShadowCard(next, shadowId, attack.seat, ctx, steps);
+    if (next.lost || next.failure || next.pendingAttack?.shadowFrame != null) return { state: next, waits: true };
+  }
+  return { state: next, waits: false };
 }
 
 // Runs once the defender is declared or the hero is named. The shadow resolves first, then damage.
@@ -65,7 +139,17 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     const current = next.pendingAttack ?? begun;
     next = { ...next, pendingAttack: { ...current, shadowResolved: true } };
     if (!current.shadowCanceled) next = resolveShadow(next, begun.enemyId, begun.seat, ctx, steps);
-    if (next.lost || next.failure) return next;
+    if (next.lost || next.failure || next.pendingAttack?.shadowFrame != null) return next;
+  }
+  // A shadow frame that asked a player has popped: its card is discarded and the attack goes on.
+  if (next.pendingAttack?.shadowFrame != null) {
+    const { shadowFrame, ...rest } = next.pendingAttack;
+    next = discardResolvedShadow({ ...next, pendingAttack: rest }, shadowFrame);
+  }
+  if ((next.cards[begun.enemyId]?.extraShadowIds?.length ?? 0) > 0) {
+    const extra = resolveExtraShadows(next, ctx, steps);
+    if (extra.waits) return extra.state;
+    next = extra.state;
   }
   const attack = next.pendingAttack;
   const enemy = attack ? next.cards[attack.enemyId] : undefined;

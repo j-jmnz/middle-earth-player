@@ -1,3 +1,4 @@
+// Rules: rr.step-3-3, rr.staging, rr.surge, mec109.saga-staging-rules (data/rules/entries.json).
 import { effectStep, pushCardEffects } from "./effect-frames.ts";
 import { currentCause, ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
@@ -69,7 +70,13 @@ export function revealNow(state: ScenarioState, seat: number, ctx: ReduceContext
 }
 
 export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const cursor = state.revealCursor ?? { seats: livingSeats(state), index: 0 };
+  // The staging step begins: Forced effects "at the beginning of the staging step" (141051:A:2) resolve before the first
+  // card is revealed (rr.step-3-3). The cursor is set first, so the step begins once.
+  if (state.revealCursor == null) {
+    const begun: ScenarioState = { ...state, revealCursor: { seats: livingSeats(state), index: 0 } };
+    return fireForced(begun, { trigger: "stagingStepBegins", seat: null }, ctx, steps);
+  }
+  const cursor = state.revealCursor;
   const seat = cursor.seats[cursor.index];
   if (seat == null || state.lost || state.failure) {
     return { ...withMode(state, "resolution"), revealCursor: null };
