@@ -34,6 +34,14 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     build: (_match, { card }) => [{ timing: "setup", instructions: [{ verb: "AttachToRingBearer", code: card.code }] }],
   },
   {
+    // A boon earned onto a hero (141018-141021). The Campaign Setup Checklist step 5 puts a Permanent card on its recorded
+    // hero before the decks are set (rr.campaign-setup-checklist, mec109.permanent), so the Setup search never finds it in a
+    // deck and this record never places it a second time; it runs only for a copy that is in a deck at setup.
+    id: "setup-attach-to-a-hero",
+    pattern: /^Setup: Attach to a hero\.$/,
+    build: () => [{ timing: "setup", instructions: [{ verb: "AttachSelf", to: { kind: "hero" } }] }],
+  },
+  {
     id: "setup-first-player-claims",
     pattern: /^Setup: The first player claims \{self\} and attaches it to the Ring-bearer\.$/,
     build: (_match, { card }) => [{ timing: "setup", instructions: [{ verb: "AttachToRingBearer", code: card.code }] }],
@@ -54,6 +62,14 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     build: (match, context) => {
       const code = context.codeOf(match[1] ?? "");
       return code ? [{ timing: "constant", condition: { kind: "inVictory", code, is: false }, instructions: [{ verb: "Restrict", what: "advance" }] }] : null;
+    },
+  },
+  {
+    id: "cannot-advance-while-in-play",
+    pattern: /^The players cannot advance while (.+?) is in play\.$/,
+    build: (match, context) => {
+      const code = context.codeOf(match[1] ?? "");
+      return code ? [{ timing: "constant", condition: { kind: "inPlay", code, is: true }, instructions: [{ verb: "Restrict", what: "advance" }] }] : null;
     },
   },
   {

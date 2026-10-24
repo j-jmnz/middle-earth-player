@@ -6,8 +6,8 @@ import { parse as parseJsonc } from "jsonc-parser";
 import { EFFECTS } from "../../../src/effects/index.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { loadCards } from "../load-cards.ts";
-import { loadCampaign, loadScenario } from "../load-scenarios.ts";
-import { loadLedger } from "../printed/ledger.ts";
+import { dealtCodes, loadCampaign, loadScenario } from "../load-scenarios.ts";
+import { keyOf, loadLedger } from "../printed/ledger.ts";
 import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
 import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, type Unmatched } from "./generate.ts";
@@ -46,9 +46,15 @@ function main(): void {
   }
 
   const generated = generateEffects(cards, scenario ? [scenario] : [], campaign, ledger);
-  const dealt = new Set(deck ? deck.rows.map((row) => row.code) : (scenario?.cards ?? []).map((card) => card.code));
+  // Every card the scenario deals: its piles, its campaign card, the cards that card places (campaignPlaced) and the prelude.
+  const dealt = deck ? new Set(deck.rows.map((row) => row.code)) : dealtCodes(campaign, scenario ? [scenario] : []);
   const all = process.argv.includes("--all");
-  const open: Unmatched[] = generated.unmatched.filter((line) => dealt.has(line.card.code) && (all || !EFFECTS.some((effect) => effect.lines.includes(line.lineId))));
+  // A line the ledger marks inert (a reminder, a keyword the engine reads) is owned and needs no record.
+  const inert = (lineId: string): boolean => {
+    const [code = "", side = "", n] = lineId.split(":");
+    return ledger.byKey.get(keyOf(code, side))?.inert.some((mark) => mark.line === Number(n)) ?? false;
+  };
+  const open: Unmatched[] = generated.unmatched.filter((line) => dealt.has(line.card.code) && (all || (!inert(line.lineId) && !EFFECTS.some((effect) => effect.lines.includes(line.lineId)))));
   const byCard = new Map<string, Unmatched[]>();
   for (const line of open) byCard.set(line.card.code, [...(byCard.get(line.card.code) ?? []), line]);
 

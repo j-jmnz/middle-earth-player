@@ -89,6 +89,23 @@ export const PLAYER_TEMPLATES: readonly Template[] = [
     build: (match) => [{ timing: "constant", instructions: [{ verb: "GrantTrait", trait: match[1] ?? "" }] }],
   },
   {
+    // The four A Knife in the Dark boons (141018-141021): one stat and one trait for the hero the card is attached to.
+    id: "attached-gets-stat-and-gains-trait",
+    pattern: /^Attached hero gets \+(\d+) (Willpower|Attack|Defense|hit points?) and gains the (\w+) trait\.$/,
+    build: (match) => {
+      const stat = /^hit point/.test(match[2] ?? "") ? "hitPoints" : (STATS[match[2] ?? ""] ?? "willpower");
+      return [
+        {
+          timing: "constant",
+          instructions: [
+            { verb: "ModifyStat", stat, amount: count(match[1]), until: "whileSourceInPlay", target: "host" },
+            { verb: "GrantTrait", trait: match[3] ?? "" },
+          ],
+        },
+      ];
+    },
+  },
+  {
     id: "attached-named-gains-icon",
     pattern: /^If attached hero is (\w+), he also gains an? (Leadership|Tactics|Spirit|Lore) resource icon\.$/,
     build: (match) => {
