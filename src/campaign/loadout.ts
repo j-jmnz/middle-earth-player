@@ -15,8 +15,6 @@ export type LoadoutRule =
 
 export type LoadoutError = { rule: LoadoutRule; code: string; card: string; message: string };
 
-// "Frodo Baggins" is the one name the saga forbids a second version of. Every box prints its own Frodo.
-const FRODO = "Frodo Baggins";
 const MOST_HEROES = 3;
 
 function isFellowship(card: PrintedCard): boolean {
@@ -58,9 +56,17 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
   const fellowship = heroCards.flat().filter((card): card is PrintedCard => card != null && isFellowship(card));
   for (const card of fellowship.slice(1)) fail("twoFellowshipHeroes", card, "only one Fellowship-sphere hero may start the scenario");
 
-  // No other version of Frodo, in a hero slot or in a deck.
-  const frodos = [...heroCards.flat(), ...deckCards.flat()].filter((card): card is PrintedCard => card != null && card.name === FRODO);
-  for (const card of frodos.slice(1)) fail("secondFrodo", card, "a second Frodo Baggins cannot be a starting hero or in the deck");
+  // No other version of the seat-0 Ring-bearer, in a hero slot or in a deck. The name comes from the chosen card.
+  const ringBearer = first.find((card): card is PrintedCard => card != null && isRingBearer(card));
+  if (ringBearer) {
+    const everyCard = [...heroCards.flat(), ...deckCards.flat()];
+    const chosen = everyCard.indexOf(ringBearer);
+    everyCard.forEach((card, index) => {
+      if (card != null && index !== chosen && card.name === ringBearer.name) {
+        fail("secondFrodo", card, `a second ${ringBearer.name} cannot be a starting hero or in the deck`);
+      }
+    });
+  }
 
   // The One Ring is granted by setup. It is never a deck card, so it never counts toward the deck minimum.
   for (const card of [...heroCards.flat(), ...deckCards.flat()]) {
@@ -75,4 +81,3 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
   });
   return errors;
 }
-

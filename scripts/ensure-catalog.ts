@@ -23,6 +23,11 @@ export function catalogInputs(base: string): string[] {
     path.join(base, "src", "effects"),
     path.join(base, "fixtures"),
     path.join(base, "scripts", "local-cards.ts"),
+    path.join(base, "scripts", "build-catalog.ts"),
+    path.join(base, "scripts", "catalog-snapshot.ts"),
+    path.join(base, "scripts", "validate-effects.ts"),
+    path.join(base, "src", "catalog", "schema.ts"),
+    path.join(base, "src", "catalog", "effect-schema.ts"),
   ];
 }
 

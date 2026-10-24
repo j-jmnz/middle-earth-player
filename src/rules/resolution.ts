@@ -5,6 +5,9 @@ import { livingSeats, type ScenarioState } from "./state.ts";
 // definition, which the catalog build filled in. This file never names one.
 
 // Opens the next group's window once the scenario is won. Returns the same state when nothing is left to ask.
+// Dropping the frame stack is safe: a frame only continues a reveal, hide, response, or effect of the round
+// that just ended, and the scenario is won, so nothing it could still do (a surge reveal, a forced trigger,
+// more damage) can change the outcome. Frames are not carried into the resolution window or past it.
 export function openResolution(state: ScenarioState): ScenarioState {
   if (!state.stageCleared || state.lost || state.window) return state;
   const group = state.resolutionChoices.length;

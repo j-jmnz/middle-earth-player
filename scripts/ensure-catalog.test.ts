@@ -12,8 +12,10 @@ function touch(file: string, seconds: number): void {
   utimesSync(file, seconds, seconds);
 }
 
+const EXTRA = ["scripts/local-cards.ts", "scripts/build-catalog.ts", "scripts/catalog-snapshot.ts", "scripts/validate-effects.ts", "src/catalog/schema.ts", "src/catalog/effect-schema.ts"];
+
 describe("ensure-catalog", () => {
-  it("is stale when the database is missing, or older than a payload, an effect file, a fixture, or the local cards", () => {
+  it("is stale when the database is missing, or older than a payload, an effect file, a fixture, the local cards, the build script, or a schema", () => {
     const base = mkdtempSync(path.join(tmpdir(), "ensure-catalog-"));
     const db = path.join(base, "assets", "catalog.db");
     const inputs = catalogInputs(base);
@@ -23,13 +25,13 @@ describe("ensure-catalog", () => {
     touch(path.join(base, ".cache", "ringsdb", "manifest.json"), 1000);
     touch(path.join(base, "src", "effects", "set", "a.ts"), 1000);
     touch(path.join(base, "fixtures", "f.json"), 1000);
-    touch(path.join(base, "scripts", "local-cards.ts"), 1000);
+    for (const file of EXTRA) touch(path.join(base, file), 1000);
     expect(catalogIsStale(db, inputs)).toBe(false);
     for (const changed of [
       path.join(base, ".cache", "ringsdb", "manifest.json"),
       path.join(base, "src", "effects", "set", "a.ts"),
       path.join(base, "fixtures", "f.json"),
-      path.join(base, "scripts", "local-cards.ts"),
+      ...EXTRA.map((file) => path.join(base, file)),
     ]) {
       touch(changed, 3000);
       expect(catalogIsStale(db, inputs), changed).toBe(true);

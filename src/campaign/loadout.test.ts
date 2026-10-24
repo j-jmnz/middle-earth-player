@@ -63,6 +63,18 @@ describe("Fellowship loadout", () => {
     expect(deck[0]?.message).toContain("Frodo Baggins (142001)");
   });
 
+  it("takes the name from the chosen Ring-bearer, not from a literal", () => {
+    const bearer = definePrinted({ code: "rb", name: "Other Bearer", type: "hero", sphere: "fellowship", traits: ["Ring-bearer"], threat: 8, willpower: 1, attack: 1, defense: 1, health: 3 });
+    const twin = definePrinted({ code: "rb2", name: "Other Bearer", type: "ally", sphere: "lore", cost: 1 });
+    const named = new Map(cards).set("rb", bearer).set("rb2", twin).set("fb", definePrinted({ code: "fb", name: "Frodo Baggins", type: "ally", sphere: "lore", cost: 1 }));
+    // Another card called Frodo Baggins is fine when the Ring-bearer is someone else.
+    expect(validateLoadout([seat(["rb", "h1"], [...DECK, "fb"])], named)).toEqual([]);
+    const errors = validateLoadout([seat(["rb", "h1"], [...DECK, "rb2"])], named);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatchObject({ rule: "secondFrodo", code: "rb2", card: "Other Bearer" });
+    expect(errors[0]?.message).toContain("Other Bearer (rb2)");
+  });
+
   it("refuses a fourth hero unless the extra hero is the Ring-bearer", () => {
     const errors = validateLoadout([seat([SAGA_FRODO, "h1", "h2", "h3", "h4"])], cards);
     expect(errors).toHaveLength(1);

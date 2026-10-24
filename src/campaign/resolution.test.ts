@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { legalIntents, reduce } from "../rules/reduce.ts";
 import { updateCard, type ScenarioState } from "../rules/state.ts";
-import { resolutionResult } from "../rules/resolution.ts";
+import { openResolution, resolutionResult } from "../rules/resolution.ts";
 import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Run, type Table } from "../../scripts/test-scene.ts";
 
 import { applyResolution, EMPTY_LOG } from "./resolution.ts";
@@ -42,6 +42,19 @@ describe("win detection from stage 3", () => {
     run = send(run, { type: "Pass" }, table.ctx);
     expect(run.state.stageCleared).toBe(false);
     expect(run.state.window?.kind).not.toBe("resolution");
+  });
+});
+
+describe("a win with frames still pending", () => {
+  it("drops the pending frames when the resolution window opens, and keeps the win", () => {
+    const { run } = winningQuest();
+    const frame = { id: "f99", frame: "reveal" as const, cardId: null, seat: 0, peril: false, step: 0, data: { kind: "none" as const } };
+    const pending: ScenarioState = { ...run.state, window: null, stack: [frame], resolutionChoices: [] };
+    const opened = openResolution(pending);
+    expect(opened.stack).toEqual([]);
+    expect(opened.stageCleared).toBe(true);
+    expect(opened.lost).toBe(false);
+    expect(opened.window).toEqual({ kind: "resolution", group: 0 });
   });
 });
 
