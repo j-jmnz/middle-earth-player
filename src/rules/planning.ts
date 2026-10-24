@@ -98,7 +98,11 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
 // an effect has nothing to choose (rr.initiating-abilities-playing-cards, step 1: check play restrictions).
 function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): string | null {
   const records = actionRecords(ctx, state.cards[cardId]?.code ?? "");
-  if (records.length === 0) return null;
+  if (records.length === 0) {
+    // An event whose only records are Responses is played from its Response window, never as an ordinary play.
+    const code = state.cards[cardId]?.code ?? "";
+    return ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "response") ? "That card cannot be played" : null;
+  }
   const running = runningActions(state, cardId, seat, ctx);
   if (running.length === 0) return "That card cannot be played now";
   for (const effect of running) {

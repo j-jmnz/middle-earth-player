@@ -38,6 +38,16 @@ function choices(run: Run, tab: Table): string[] {
   return legalIntents(run.state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
 }
 
+describe("Response-only events", () => {
+  it("are never offered as ordinary plays", () => {
+    const tab = table({ heroes: [{ code: EOWYN, seat: 0 }], deck: ["f0"], hand: [{ code: "01050", seat: 0 }, { code: "01048", seat: 0 }] });
+    const run = begin(tab.state);
+    const played = legalIntents(run.state, tab.ctx).filter((intent) => intent.type === "PlayCard");
+    expect(played.map((intent) => intent.cardId)).not.toContain(idsOf(tab, "01050"));
+    expect(played.map((intent) => intent.cardId)).not.toContain(idsOf(tab, "01048"));
+  });
+});
+
 describe("A Test of Will (01050:A:1)", () => {
   // The first encounter card is Lure of the Ring: "When Revealed: The first player must either exhaust The One Ring or raise
   // his threat by 3." With no Ring in play the choice is the threat.
