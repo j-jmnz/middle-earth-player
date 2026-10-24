@@ -72,11 +72,12 @@ function advanceReady(state: ScenarioState, cards: Cards, steps: EngineStep[], c
   if (!stage || state.stageCleared) return state;
   const points = questPointsOf(state, stage, cards);
   if (points == null || stage.progress < points || !canAdvance(state)) return state;
-  return advanceStage(state, cards, steps, 0, canAdvance);
+  return advanceStage(state, cards, steps, canAdvance);
 }
 
 // Progress on the quest goes on the active location first, up to its quest points, and the rest on the current quest card
-// (rr.active-location). A full quest card advances when `canAdvance` allows it (rr.quest-advancement).
+// (rr.active-location). A full quest card advances when `canAdvance` allows it (rr.quest-advancement); progress beyond its
+// quest points is lost: "Additional progress tokens earned against the quest do not carry over to the next stage."
 export function placeQuestProgress(
   state: ScenarioState,
   amount: number,
@@ -123,7 +124,7 @@ export function placeQuestProgress(
         }
         const updated = next.cards[stageId];
         if (updated && updated.progress >= points && canAdvance(next)) {
-          next = advanceStage(next, cards, steps, remaining - placed, canAdvance);
+          next = advanceStage(next, cards, steps, canAdvance);
         }
       }
     }
@@ -131,9 +132,10 @@ export function placeQuestProgress(
   return next;
 }
 
-function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], overflow: number, canAdvance: Gate): ScenarioState {
+// The next stage arrives with no progress on it (rr.quest-advancement), side B up. A stage that prints no quest points
+// (141024, 141027) is won some other way, so the quest stops there. One with 0 quest points would be met at once.
+function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
   let next = state;
-  let carried = overflow;
   const guard = next.stages.length + 1;
   for (let hop = 0; hop < guard; hop += 1) {
     const currentId = next.questStage;
@@ -146,27 +148,11 @@ function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], o
     if (!nextId) return clearStage(next);
     next = moveCard(next, currentId, { zone: "setAside" });
     next = moveCard(next, nextId, { zone: "questStage" });
+    next = updateCard(next, nextId, { face: "B" });
+    steps.push({ kind: "advance", cardId: nextId });
     const arrived = next.cards[nextId];
     const points = arrived ? questPointsOf(next, arrived, cards) : null;
-    const before = arrived?.progress ?? 0;
-    if (points == null) {
-      if (carried > 0) {
-        next = updateCard(next, nextId, { face: "B", progress: before + carried });
-        steps.push({ kind: "progress", targetId: nextId, amount: carried, cause: ruleCause("rr.step-3-4") });
-      } else {
-        next = updateCard(next, nextId, { face: "B" });
-      }
-      steps.push({ kind: "advance", cardId: nextId });
-      return next;
-    }
-    const need = Math.max(0, points - before);
-    const placed = Math.min(carried, need);
-    next = updateCard(next, nextId, { face: "B", progress: before + placed });
-    if (placed > 0) steps.push({ kind: "progress", targetId: nextId, amount: placed, cause: ruleCause("rr.step-3-4") });
-    steps.push({ kind: "advance", cardId: nextId });
-    const updated = next.cards[nextId];
-    if (!updated || updated.progress < points || !canAdvance(next)) return next;
-    carried -= placed;
+    if (points == null || (arrived?.progress ?? 0) < points || !canAdvance(next)) return next;
   }
   return { ...next, stageCleared: true };
 }
