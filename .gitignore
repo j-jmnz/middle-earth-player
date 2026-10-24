@@ -50,8 +50,9 @@ example
 assets/catalog.db
 agent-tools/
 
-# RingsDB payloads
+# RingsDB payloads outside data/; data/raw/ringsdb is the committed snapshot data:build reads
 **/ringsdb/**
+!data/raw/ringsdb/**
 
 # booklet PDFs
 *.pdf
