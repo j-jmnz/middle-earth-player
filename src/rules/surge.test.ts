@@ -85,7 +85,9 @@ describe("surge", () => {
     const revealed = expectOk(reduce(first.state, { type: "Pass" }, ctx));
     expect(revealed.state.seats[1]?.eliminated).toBe(true);
     expect(revealed.state.lost).toBe(false);
-    expect(revealed.state.staging).toEqual([doom.id]);
+    // The resolved treachery is in the encounter discard pile (ltp.revealed-treachery).
+    expect(revealed.state.staging).toEqual([]);
+    expect(revealed.state.encounterDiscard).toEqual([doom.id]);
     expect(revealed.state.encounterDeck).toEqual([second.id]);
   });
 

@@ -60,8 +60,9 @@ describe("A Test of Will (01050:A:1)", () => {
     const event = idsOf(tab, "01050");
     expect(legalIntents(run.state, tab.ctx)).toContainEqual({ type: "Trigger", cardId: event, effectId: "01050:response:1" });
     run = send(run, { type: "Trigger", cardId: event, effectId: "01050:response:1", payments: payFor(run.state, tab.ctx, event) }, tab.ctx);
-    // The card was still revealed, but its effect never asked the first player anything.
-    expect(run.state.cards[idsOf(tab, LURE)]?.zone).toBe("staging");
+    // The card was still revealed, but its effect never asked the first player anything. A canceled treachery is still
+    // resolved, so it goes to the encounter discard pile (ltp.revealed-treachery, rr.cancel).
+    expect(run.state.cards[idsOf(tab, LURE)]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[event]?.zone).toBe("discard");
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.steps.some((step) => step.kind === "threat")).toBe(false);

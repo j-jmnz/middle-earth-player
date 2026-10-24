@@ -1,4 +1,5 @@
-// Rules: rr.step-3-3, rr.staging, rr.surge, mec109.saga-staging-rules (data/rules/entries.json).
+// Rules: rr.step-3-3, rr.staging, rr.surge, rr.treachery-cards, ltp.revealed-treachery, mec109.saga-staging-rules
+// (data/rules/entries.json).
 import { effectStep, pushCardEffects } from "./effect-frames.ts";
 import { currentCause, ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
@@ -115,7 +116,11 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     case 3:
       return fireForced(patchTop(state, { step: 4 }), { trigger: "revealed", seat, cardId: id }, ctx, steps);
     case 4: {
-      const next = patchTop(state, { step: 5 });
+      // A revealed treachery is resolved, then placed in the encounter discard pile unless its text says otherwise
+      // (ltp.revealed-treachery, rr.treachery-cards, rr.step-3-3). A treachery whose text attached it (a Condition) has
+      // left the staging area and stays where its text put it. A canceled treachery is discarded too (rr.cancel). Surge resolves after the staging of the card (rr.surge).
+      const resolved = printed.type === "treachery" && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
+      const next = patchTop(resolved, { step: 5 });
       const revealing = next.seats[seat];
       const surge = printed.keywords.surge || (frame.data.kind === "reveal" && frame.data.surge);
       if (!surge || !revealing || revealing.eliminated) return next;

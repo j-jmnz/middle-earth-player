@@ -222,6 +222,7 @@ Everything else is an engine step. The UI cannot dispatch it, and no control on 
 - Quest resolution compares committed willpower with staging threat. The active location is not in staging and does not add threat. Progress that would go on the quest goes on the active location first. Overflow goes on the quest. Progress beyond the current stage's quest points does not carry over: the next stage starts with none, so one quest resolution advances one stage at most (`rr.quest-advancement`). A shortfall raises the threat of every player still in the game by the difference (Learn to Play p12-13); an eliminated seat is not raised. Breaking of the Fellowship stage 2B may override this. The core round does not.
 - A defended attack places `max(0, attack − defense)` damage after modifiers. An undefended attack places the attack value. Willpower and damage read a modifier list. A `constant` effect appends a record to that list. Toughness X, on an enemy, then reduces what is placed. An indestructible enemy is not destroyed. A character at damage equal to its hit points is destroyed. The player does not enter the result. Adding a card to a zone does not reveal it. Hide, surge, and When Revealed run on a reveal.
 - Forced, When Revealed, Setup, shadow, surge, doomed, and Hide run on their timing. The player does not confirm that they happened.
+- A revealed treachery is resolved, then placed in the encounter discard pile unless its text says otherwise (`ltp.revealed-treachery`: "resolve the text on the card, and then place it in the encounter deck discard pile, unless the card specifically states otherwise"; `rr.treachery-cards`, `rr.step-3-3`). A canceled treachery goes there too (`rr.cancel`: "it is still placed in the encounter discard pile"). A treachery whose text attached it (a Condition, Weapon or Mount: 141043, 141055, 141070, 141074, 141080) stays attached; one whose "if able" attach found no host is discarded. Its surge resolves after that (`rr.surge`, "immediately after resolving the staging of the encounter card"). Enemies, locations and objectives stay in staging (`rr.step-3-3`). No encounter card in this box is a treasure: RingsDB types the boons and burdens `treasure`, and the build gives each its printed type (a burden treachery is a treachery), so no treasure rule applies.
 
 An intent outside the current window, with an illegal target, or with a number the rule did not ask for, is rejected with a reason. The table has no damage stepper, resource stepper, threat dial, or phase scrubber. Drop targets are zone ids the legality function returned. There is no freeform x/y table, and a drop does not move a card until the reducer accepts it.
 
@@ -245,7 +246,7 @@ The round, its steps and its keywords are the rules in `data/rules/entries.json`
 | Player Setup, opening hand, mulligan | `mec109.setup`, `rr.mulligan` |
 | Encounter Setup, quest card Setup | `mec109.setup`, `rr.step-0-0` |
 | Resource, Planning | `rr.step-1-1`, `rr.planning-phase` |
-| Quest, saga staging | `mec109.saga-staging-rules`, `rr.step-3-4`, `rr.quest-advancement` |
+| Quest, saga staging | `mec109.saga-staging-rules`, `rr.step-3-3`, `ltp.revealed-treachery`, `rr.treachery-cards`, `rr.step-3-4`, `rr.quest-advancement` |
 | Travel | `rr.travel`, `rr.step-4-2` |
 | Encounter: optional engagement, engagement checks | `rr.optional-engagement`, `rr.engagement-check` |
 | Combat: shadow cards, attacks | `rr.combat-phase`, `rr.step-6-2` |
@@ -259,7 +260,6 @@ Decisions this file owns, because the sources are silent or the user chose:
 - An engagement check engages the enemy in staging with the highest engagement cost at or below the seat's threat. The first player chooses among ties.
 - A shadow card is discarded when its enemy leaves play, and every unused one at the end of combat.
 - A quest shortfall raises the threat of every seat still in the game. An eliminated seat is not raised. Breaking of the Fellowship stage 2B may override this. The core round does not.
-- A revealed treachery or treasure stays in staging.
 
 ### Keywords implemented once
 

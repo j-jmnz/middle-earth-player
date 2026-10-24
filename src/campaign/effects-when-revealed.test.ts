@@ -98,11 +98,11 @@ describe("whenRevealed on locations and treacheries", () => {
     expect(run.state.cards[steed]).toMatchObject({ zone: "attached", host: rider });
   });
 
-  it("141074 whenRevealed: AttachSelf finds no enemy with the trait and stays in staging", () => {
+  it("141074 whenRevealed: AttachSelf finds no enemy with the trait, so the treachery is discarded (ltp.revealed-treachery)", () => {
     const { state, ctx } = make({ deck: ["141074", "f0"] });
     const run = reveal(state, ctx);
     const steed = first(run.state, "141074");
-    expect(run.state.cards[steed]?.zone).toBe("staging");
+    expect(run.state.cards[steed]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[steed]?.host).toBeNull();
   });
 
@@ -116,7 +116,31 @@ describe("whenRevealed on locations and treacheries", () => {
     const without = make({ deck: ["141075", "f0"] });
     const surged = reveal(without.state, without.ctx);
     expect(surged.state.encounterDeck).toHaveLength(0);
-    expect(codesOf(surged.state, surged.state.staging)).toEqual(["141075", "f0"]);
+    // The resolved treachery goes to the encounter discard pile before its surge reveals the next card (ltp.revealed-treachery, rr.surge).
+    expect(codesOf(surged.state, surged.state.staging)).toEqual(["f0"]);
+    expect(codesOf(surged.state, surged.state.encounterDiscard)).toEqual(["141075"]);
+  });
+});
+
+describe("a revealed treachery is discarded after it resolves (ltp.revealed-treachery, rr.treachery-cards, rr.step-3-3)", () => {
+  it("141076 Lure of the Ring goes to the encounter discard pile once its effect has resolved, before its surge", () => {
+    const { state, ctx } = make({ deck: ["141076", "f0"], ring: "none" });
+    const run = reveal(state, ctx);
+    const lure = first(run.state, "141076");
+    expect(run.state.cards[lure]?.zone).toBe("encounterDiscard");
+    expect(run.state.encounterDiscard).toEqual([lure]);
+    // Surge revealed the next card, which is a staging card and stays.
+    expect(codesOf(run.state, run.state.staging)).toEqual(["f0"]);
+  });
+
+  it("a treachery whose text attaches it (141043, a Condition) stays where its text put it", () => {
+    const { state, ctx } = make({ deck: ["141043", "f0"] });
+    const opened = reveal(state, ctx);
+    const sam = first(opened.state, SAM);
+    const attached = send(opened, { type: "Choose", optionId: sam }, ctx);
+    const card = first(attached.state, "141043");
+    expect(attached.state.cards[card]).toMatchObject({ zone: "attached", host: sam });
+    expect(attached.state.encounterDiscard).toEqual([]);
   });
 });
 

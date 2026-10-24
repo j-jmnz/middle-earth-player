@@ -279,7 +279,9 @@ describe("quest resolution", () => {
     const resolved = expectOk(reduce(first.state, { type: "Pass" }, ctx));
     expect(resolved.state.seats[1]?.eliminated).toBe(true);
     expect(resolved.state.cards[resolved.state.questStage ?? ""]?.progress ?? 0).toBe(0);
-    expect(resolved.state.seats[0]?.threat).toBe(12);
+    // Doomed 1 raises seat 0 to 11. The treachery was discarded after it resolved (ltp.revealed-treachery), so it adds no
+    // threat to the staging area, and seat 1's 5 willpower no longer counts: no progress and no shortfall.
+    expect(resolved.state.seats[0]?.threat).toBe(11);
   });
 
   it("does not let a seat eliminated during staging travel", () => {
