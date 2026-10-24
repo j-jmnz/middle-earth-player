@@ -8,6 +8,7 @@ import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } fro
 import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
 import { attachTo, spawn } from "../src/rules/zones.ts";
 
+import { causeProblems } from "./cause-check.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 import { loadPrinted } from "./test-catalog.ts";
 
@@ -85,6 +86,9 @@ export type Run = { state: ScenarioState; steps: EngineStep[] };
 
 export function send(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
   const result = expectOk(reduce(run.state, intent, ctx));
+  // Every card-effect test goes through here, so an effect that moves a number without naming its cause fails it.
+  const problems = causeProblems(result.steps);
+  if (problems.length > 0) throw new Error(`Steps without a verified cause after ${intent.type}: ${problems.join("; ")}`);
   return { state: result.state, steps: [...run.steps, ...result.steps] };
 }
 

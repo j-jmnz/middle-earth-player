@@ -73,7 +73,7 @@ export function applyIntent(
     case "Choose":
       return applyChoice(state, intent.optionId);
     case "ChooseResolution":
-      return applyResolution(state, intent.optionId, ctx);
+      return applyResolution(state, intent.optionId);
     case "Travel":
       return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":

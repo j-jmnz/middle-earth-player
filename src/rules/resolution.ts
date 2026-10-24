@@ -6,7 +6,7 @@ import { holds } from "./conditions.ts";
 import type { LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
-import { livingSeats, type Earned, type ResolutionLog, type ScenarioState } from "./state.ts";
+import { inPlay, livingSeats, type Earned, type ResolutionLog, type ScenarioState } from "./state.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
 // one seat at a time, first player first; the rest settle on their own from the final state (Lust for the Ring
@@ -41,10 +41,10 @@ function earn(state: ScenarioState, entries: readonly Earned[]): ResolutionLog {
   return { ...state.resolutionLog, earned: [...state.resolutionLog.earned, ...entries.filter((item) => !have.has(item.code))] };
 }
 
+// Every burden in play or still in the encounter deck or discard pile: the cards the players could meet again.
 function burdensEverywhere(state: ScenarioState, ctx: ReduceContext): string[] {
-  const zones = new Set(["encounterDeck", "encounterDiscard"]);
   return Object.values(state.cards)
-    .filter((card) => (zones.has(card.zone) || card.zone === "attached" || card.zone === "staging" || card.zone === "engaged" || card.zone === "play" || card.zone === "activeLocation") && printedOf(ctx.cards, card.code).campaignKind === "burden")
+    .filter((card) => (inPlay(card.zone) || card.zone === "encounterDeck" || card.zone === "encounterDiscard") && printedOf(ctx.cards, card.code).campaignKind === "burden")
     .map((card) => card.code);
 }
 
@@ -144,7 +144,7 @@ export function resolutionReason(state: ScenarioState, intent: Extract<PlayerInt
   return resolutionOptions(state, found.instruction, found.seat, ctx).includes(intent.optionId) ? null : "That is not a choice here";
 }
 
-export function applyResolution(state: ScenarioState, optionId: string, ctx: ReduceContext): ScenarioState {
+export function applyResolution(state: ScenarioState, optionId: string): ScenarioState {
   const found = asking(state);
   if (!found || state.window?.kind !== "resolution") return state;
   const { instruction, seat } = found;
@@ -158,7 +158,6 @@ export function applyResolution(state: ScenarioState, optionId: string, ctx: Red
     const hero = heroId ? state.cards[heroId] : undefined;
     log = { ...log, earned: [...log.earned, { code, to: instruction.to, seat, hero: hero?.code ?? null, step }] };
   }
-  void ctx;
   const seats = seatsFor(state, instruction);
   const more = state.resolutionSeat + 1 < seats.length;
   return { ...state, resolutionLog: log, resolutionSeat: more ? state.resolutionSeat + 1 : 0, resolutionAt: more ? state.resolutionAt : state.resolutionAt + 1, window: null };

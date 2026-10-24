@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
@@ -7,9 +5,9 @@ import { expectOk } from "../rules/fixture.ts";
 import type { EngineStep } from "../rules/intents.ts";
 import { definePrinted } from "../rules/printed.ts";
 import { reduce, startScenario } from "../rules/reduce.ts";
-import { UNATTRIBUTED, type Cause } from "../rules/cause.ts";
+import { type Cause } from "../rules/cause.ts";
 import { playOut } from "../../scripts/auto-player.ts";
-import { keyOf, loadLedger } from "../../scripts/data/printed/ledger.ts";
+import { causeProblems, NUMBER_STEPS, verified } from "../../scripts/cause-check.ts";
 import { campaign, loadWorld, reveal, scenario, send, table } from "../../scripts/past-scene.ts";
 
 import { buildStart } from "./start.ts";
@@ -18,22 +16,6 @@ import { buildStart } from "./start.ts";
 // resource, draw and reveal step is checked: its cause is a rule span in data/rules, or an effect record with one of
 // its printed ledger lines. A step with no cause, or the fallback a path uses when it forgot to pass one, fails.
 const RING_BEARER = "141001";
-const NUMBER_STEPS = new Set(["threat", "damage", "progress", "gainResource", "draw", "reveal"]);
-const ruleIds = new Set((JSON.parse(readFileSync(new URL("../../data/rules/entries.json", import.meta.url), "utf8")) as { id: string }[]).map((entry) => entry.id));
-const ledger = loadLedger();
-
-function verified(cause: Cause | undefined): string | null {
-  if (!cause) return "has no cause";
-  if ("rule" in cause) {
-    if (cause.rule === UNATTRIBUTED.rule) return "has the unattributed cause";
-    return ruleIds.has(cause.rule) ? null : `names ${cause.rule}, which is not a rule span`;
-  }
-  const effect = EFFECTS.find((candidate) => candidate.id === cause.effect);
-  if (!effect) return `names ${cause.effect}, which is not an effect record`;
-  if (!effect.lines.includes(cause.line)) return `names line ${cause.line}, which ${cause.effect} does not implement`;
-  const [code, side, n] = cause.line.split(":");
-  return ledger.byKey.get(keyOf(code ?? "", side ?? ""))?.lines[Number(n) - 1] ? null : `names line ${cause.line}, which is not in the ledger`;
-}
 
 let steps: EngineStep[] = [];
 
@@ -56,11 +38,7 @@ describe("engine step causes", () => {
   it("name a verified rule or a ledger line on every number-changing step of the goldens", () => {
     const numbered = steps.filter((step) => NUMBER_STEPS.has(step.kind));
     expect(numbered.length).toBeGreaterThan(100);
-    const problems = numbered.flatMap((step) => {
-      const why = verified((step as { cause?: Cause }).cause);
-      return why ? [`${step.kind} ${why}`] : [];
-    });
-    expect([...new Set(problems)]).toEqual([]);
+    expect(causeProblems(steps)).toEqual([]);
   });
 
   it("cover each kind of number, from rules and from effect records", () => {
@@ -80,6 +58,6 @@ describe("engine step causes", () => {
     expect(threat).toMatchObject({ kind: "threat", cause: { effect: "141076:whenRevealed:1", line: "141076:A:2" } });
     expect(verified((threat as { cause?: Cause }).cause)).toBeNull();
     // 141023 raises Hide willpower, not a number step; a Response that places progress names its record too.
-    expect(raised.steps.filter((step) => NUMBER_STEPS.has(step.kind)).flatMap((step) => verified((step as { cause?: Cause }).cause) ?? [])).toEqual([]);
+    expect(causeProblems(raised.steps)).toEqual([]);
   });
 });

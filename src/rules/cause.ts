@@ -17,6 +17,11 @@ export function effectCause(effect: Effect): Cause {
 // pass its cause is found rather than hidden.
 export const UNATTRIBUTED: { rule: string } = { rule: "rr.effects" };
 
+// Hidden state, on purpose: the stack lives in a WeakMap keyed by the step list of one reduce call, not in
+// ScenarioState, so it is never saved, replayed or compared by the goldens, and it is gone when the list is. It
+// replaces passing a cause through every verb signature; the cause test fails on any step that still lacks one.
+// A record names its first line only (`line`): naming all of them would change the stored cause of every step, and so
+// the goldens, for no rule that reads it.
 // The effect that is running right now. Effect runners push their cause around the verbs they run; a step pushed
 // while one is active takes it, and any other step takes the rule its framework code names.
 const active = new WeakMap<object, Cause[]>();

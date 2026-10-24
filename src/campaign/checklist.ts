@@ -12,6 +12,9 @@ import type { CampaignLog, PoolCard } from "./log.ts";
 // choices (Sting and the other boons, the Lórien gifts) come in as option ids, in the order the card asks them.
 
 export type ChecklistStep = { n: number; rule: "rr.campaign-setup-checklist"; text: string; did: string[] };
+// The seat while the checklist fills it in; StartSeat is the read-only shape it hands to the start.
+type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[] };
+
 export type Need = { seat: number; options: readonly string[] };
 
 export type ChecklistInput = {
@@ -37,6 +40,51 @@ const TEXT: Readonly<Record<number, string>> = {
   7: "Set player decks.",
   8: "Set encounter deck.",
 };
+
+type Choosing = Extract<Instruction, { verb: "ChooseCards" }>;
+
+// Step 6: the choices the campaign card's Setup opens, answered in order, one seat at a time. The cards they earn
+// join the pool, a hand or a hero.
+function campaignChoices(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], name: (code: string) => string): { did: string[]; errors: string[]; needs: Need | null } {
+  const answers = [...(input.choices ?? [])];
+  const did: string[] = [];
+  const errors: string[] = [];
+  let needs: Need | null = null;
+  const order = seats.map((_, index) => index);
+  for (const instruction of campaignSetup.filter((item): item is Choosing => item.verb === "ChooseCards")) {
+    const taken: string[] = [];
+    for (const seat of instruction.who === "firstPlayer" ? order.slice(0, 1) : order) {
+      const remaining = instruction.codes.filter((code) => !taken.includes(code));
+      const options = instruction.to === "hero" ? remaining.flatMap((code) => (seats[seat]?.heroes ?? []).map((hero) => `${code}>${hero}`)) : remaining;
+      const legal = instruction.optional ? [...options, "skip"] : options;
+      const answer = answers.shift();
+      if (answer == null) {
+        needs ??= { seat, options: legal };
+        continue;
+      }
+      if (!legal.includes(answer)) {
+        errors.push(`Seat ${seat + 1}: ${answer} is not one of ${legal.join(", ")}`);
+        continue;
+      }
+      if (answer === "skip") continue;
+      const [code = "", host] = answer.split(">");
+      taken.push(code);
+      const printed = printedOf(input.cards, code);
+      const hero = host ?? null;
+      if (instruction.to === "hero" && hero) seats[seat]?.attachments.push({ host: hero, code });
+      if (instruction.to === "hand") seats[seat]?.hand.push(code);
+      pool.push({ code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo: hero, seat });
+      did.push(`Seat ${seat + 1} takes ${name(code)}${hero ? ` onto ${name(hero)}` : instruction.to === "hand" ? " into hand" : ""}.`);
+    }
+    if (instruction.leftover === "firstPlayerDeck") {
+      for (const code of instruction.codes.filter((item) => !taken.includes(item))) {
+        seats[0]?.deck.push(code);
+        did.push(`${name(code)} was not chosen: it is shuffled into the first player's deck.`);
+      }
+    }
+  }
+  return { did, errors, needs };
+}
 
 export function checklist(input: ChecklistInput): ChecklistPlan {
   const { log, scenario, cards } = input;
@@ -79,7 +127,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   note(3, changed === 0 ? ["No hero was changed."] : waived ? [`${changed} hero change(s) cost nothing: the campaign card waives the +1 penalty.`] : [`${changed} hero change(s) add ${changed} to the threat penalty.`]);
   note(4, [`Each player's starting threat is the combined threat cost of their heroes plus ${threatPenalty}.`]);
 
-  const seats: StartSeat[] = input.seats.map((seat, index) => ({ heroes: [...(heroesBySeat[index] ?? [])], deck: [...seat.deck], attachments: [] as { host: string; code: string }[], hand: [] as string[] }));
+  const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(heroesBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [] }));
   const pool: PoolCard[] = [...log.campaignPool];
 
   // 5: Permanent boons and burdens go on their recorded hero.
@@ -91,54 +139,19 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
       errors.push(`${name(card.code)} is attached to ${name(card.attachedTo)}, who is not one of the heroes starting`);
       continue;
     }
-    (seats[seat]?.attachments as { host: string; code: string }[]).push({ host: card.attachedTo, code: card.code });
+    seats[seat]?.attachments.push({ host: card.attachedTo, code: card.code });
     did5.push(`${name(card.code)} goes on ${name(card.attachedTo)}.`);
   }
   note(5, did5.length > 0 ? did5 : ["No Permanent card is in the pool."]);
 
-  // The campaign card's own Setup: the choices it opens, answered in order. They come before the cards of the pool
-  // are shuffled in, so the cards they earn join the same decks.
-  const answers = [...(input.choices ?? [])];
-  const did6: string[] = [];
-  let needs: Need | null = null;
-  const order = Array.from({ length: seatCount }, (_, index) => index);
-  const choosers = campaignSetup.filter((instruction): instruction is Extract<Instruction, { verb: "ChooseCards" }> => instruction.verb === "ChooseCards");
-  for (const instruction of choosers) {
-    const taken: string[] = [];
-    for (const seat of instruction.who === "firstPlayer" ? order.slice(0, 1) : order) {
-      const remaining = instruction.codes.filter((code) => !taken.includes(code));
-      const options = instruction.to === "hero" ? remaining.flatMap((code) => (seats[seat]?.heroes ?? []).map((hero) => `${code}>${hero}`)) : remaining;
-      const legal = instruction.optional ? [...options, "skip"] : options;
-      const answer = answers.shift();
-      if (answer == null) {
-        needs ??= { seat, options: legal };
-        continue;
-      }
-      if (!legal.includes(answer)) {
-        errors.push(`Seat ${seat + 1}: ${answer} is not one of ${legal.join(", ")}`);
-        continue;
-      }
-      if (answer === "skip") continue;
-      const [code = "", host] = answer.split(">");
-      taken.push(code);
-      const printed = printedOf(cards, code);
-      const hero = host ?? null;
-      if (instruction.to === "hero" && hero) (seats[seat]?.attachments as { host: string; code: string }[]).push({ host: hero, code });
-      if (instruction.to === "hand") (seats[seat]?.hand as string[]).push(code);
-      pool.push({ code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo: hero, seat });
-      did6.push(`Seat ${seat + 1} takes ${name(code)}${hero ? ` onto ${name(hero)}` : instruction.to === "hand" ? " into hand" : ""}.`);
-    }
-    if (instruction.leftover === "firstPlayerDeck") {
-      for (const code of instruction.codes.filter((item) => !taken.includes(item))) {
-        (seats[0]?.deck as string[]).push(code);
-        did6.push(`${name(code)} was not chosen: it is shuffled into the first player's deck.`);
-      }
-    }
-  }
-  if (needs) return { ok: false, errors, needs };
-  // Cards with their own Setup are found in the deck they are shuffled into (mec109.setup).
-  const withSetup = pool.filter((card) => input.effects.some((effect) => effect.cardCode === card.code && effect.timing === "setup"));
-  for (const card of withSetup) did6.push(`${name(card.code)} has a Setup line: the Setup search finds it in its deck.`);
+  // The campaign card's own Setup choices come before the pool is shuffled in, so the cards they earn join the same decks.
+  const six = campaignChoices(campaignSetup, input, seats, pool, name);
+  if (six.needs) return { ok: false, errors, needs: six.needs };
+  errors.push(...six.errors);
+  // A Permanent card already went on its hero in step 5 (it is not in a deck); the others with a Setup line are found
+  // in the deck they are shuffled into (mec109.setup).
+  const withSetup = pool.filter((card) => card.attachedTo == null && input.effects.some((effect) => effect.cardCode === card.code && effect.timing === "setup"));
+  const did6 = [...six.did, ...withSetup.map((card) => `${name(card.code)} has a Setup line: the Setup search finds it in its deck.`)];
   note(6, did6.length > 0 ? did6 : ["No boon or burden has a Setup keyword."]);
 
   // 7 and 8: what is left in the pool joins the decks it is backed for.
@@ -150,7 +163,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     if (seats.some((seat) => seat.hand?.includes(card.code))) continue;
     if (card.back === "player") {
       const seat = Math.min(card.seat ?? 0, seatCount - 1);
-      (seats[seat]?.deck as string[]).push(card.code);
+      seats[seat]?.deck.push(card.code);
       did7.push(`${name(card.code)} is shuffled into seat ${seat + 1}'s deck.`);
     } else {
       poolEncounterCards.push(card.code);
