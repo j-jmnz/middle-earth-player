@@ -3,7 +3,7 @@
 // about a drag only when a card is picked up (to compute that card's drop targets) and when the finger lifts (to ask the
 // reducer). A new gesture cancels the return in progress; reduced motion snaps it.
 import { Canvas, Circle, Group, Image, matchFont, Rect, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Platform } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { cancelAnimation, useDerivedValue, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
@@ -130,66 +130,79 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
     drops.set(dropRects(layout, targets));
   }, [layout, targets, drops]);
 
-  const select = (cardId: string | null) => store.getState().select(cardId);
+  const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
   const lifted = selected ? layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null : null;
   const liftTransform = useDerivedValue(() => [{ translateX: dx.get() }, { translateY: dy.get() }, { scale: lift.get() }]);
 
-  const pan = Gesture.Pan()
-    .minDistance(6)
-    .onBegin((event) => {
-      cancelAnimation(dx);
-      cancelAnimation(dy);
-      dx.set(0);
-      dy.set(0);
-      const index = hitSlot(slots.get(), event.x, event.y);
-      const slot = slots.get()[index];
-      if (index < 0 || !slot || !lifts.get()[index]) {
-        dragging.set(-1);
-        return;
-      }
-      dragging.set(index);
-      lift.set(reduceMotion ? 1.08 : withTiming(1.08, { duration: 90 }));
-      scheduleOnRN(select, slot.id);
-    })
-    .onUpdate((event) => {
-      if (dragging.get() < 0) return;
-      dx.set(event.translationX);
-      dy.set(event.translationY);
-    })
-    .onEnd((event) => {
-      const slot = slots.get()[dragging.get()];
-      if (dragging.get() < 0 || !slot) return;
-      const target = hitDrop(drops.get(), event.x, event.y);
-      lift.set(1);
-      if (target !== "") {
-        // The reducer decides; the card is drawn where the next state puts it, or back in place when it refuses.
-        scheduleOnRN(onDrop, slot.id, target);
+  // Built once per set of callbacks, not on every render. The worklets read the shared values, never React state.
+  const gesture = useMemo(() => {
+    const pan = Gesture.Pan()
+      .minDistance(6)
+      // A new touch cancels a return still in progress: the card snaps home.
+      .onBegin(() => {
+        cancelAnimation(dx);
+        cancelAnimation(dy);
         dx.set(0);
         dy.set(0);
+        if (dragging.get() >= 0) scheduleOnRN(select, null);
         dragging.set(-1);
-        return;
-      }
-      if (reduceMotion) {
-        dx.set(0);
-        dy.set(0);
-        dragging.set(-1);
-        scheduleOnRN(select, null);
-        return;
-      }
-      // Dropped on nothing: the card goes back, and nothing is asked.
-      dx.set(withTiming(0, { duration: 160 }));
-      dy.set(
-        withTiming(0, { duration: 160 }, (finished) => {
+      })
+      // The drag starts once the finger has moved; a tap never lifts a card. The card is the one under the first touch.
+      .onStart((event) => {
+        const index = hitSlot(slots.get(), event.x - event.translationX, event.y - event.translationY);
+        const slot = slots.get()[index];
+        if (index < 0 || !slot || !lifts.get()[index]) {
           dragging.set(-1);
-          if (finished) scheduleOnRN(select, null);
-        }),
-      );
+          return;
+        }
+        dragging.set(index);
+        dx.set(event.translationX);
+        dy.set(event.translationY);
+        lift.set(reduceMotion ? 1.08 : withTiming(1.08, { duration: 90 }));
+        scheduleOnRN(select, slot.id);
+      })
+      .onUpdate((event) => {
+        if (dragging.get() < 0) return;
+        dx.set(event.translationX);
+        dy.set(event.translationY);
+      })
+      .onEnd((event) => {
+        const slot = slots.get()[dragging.get()];
+        if (dragging.get() < 0 || !slot) return;
+        const target = hitDrop(drops.get(), event.x, event.y);
+        lift.set(1);
+        if (target !== "") {
+          // The reducer decides; the card is drawn where the next state puts it, or back in place when it refuses.
+          scheduleOnRN(onDrop, slot.id, target);
+          dx.set(0);
+          dy.set(0);
+          dragging.set(-1);
+          return;
+        }
+        if (reduceMotion) {
+          dx.set(0);
+          dy.set(0);
+          dragging.set(-1);
+          scheduleOnRN(select, null);
+          return;
+        }
+        // Dropped on nothing: the card goes back, and nothing is asked.
+        dx.set(withTiming(0, { duration: 160 }));
+        dy.set(
+          withTiming(0, { duration: 160 }, (finished) => {
+            dragging.set(-1);
+            if (finished) scheduleOnRN(select, null);
+          }),
+        );
+      });
+
+    const tap = Gesture.Tap().onEnd((event) => {
+      const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
+      if (slot && !slot.faceDown) scheduleOnRN(onInspect, slot.id);
     });
 
-  const tap = Gesture.Tap().onEnd((event) => {
-    const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
-    if (slot && !slot.faceDown) scheduleOnRN(onInspect, slot.id);
-  });
+    return Gesture.Race(pan, tap);
+  }, [slots, lifts, drops, dragging, dx, dy, lift, reduceMotion, select, onDrop, onInspect]);
 
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
@@ -203,7 +216,7 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
   };
 
   return (
-    <GestureDetector gesture={Gesture.Race(pan, tap)}>
+    <GestureDetector gesture={gesture}>
       <Canvas style={{ width, height }}>
         <Rect x={0} y={0} width={width} height={height} color={t.felt} />
         <Circle cx={width / 2} cy={height * 0.42} r={Math.max(width, height) * 0.55} color={t.feltLight} opacity={0.55} />
