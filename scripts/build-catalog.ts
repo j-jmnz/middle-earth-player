@@ -6,14 +6,17 @@ import Database from "better-sqlite3";
 import { getTableConfig, type SQLiteTable } from "drizzle-orm/sqlite-core";
 
 import {
+  effectSchema,
   parseRingsDbCards,
   parseRingsDbPacks,
+  type Effect,
   type PrintedKeywords,
   type RingsDbCard,
   type RingsDbPack,
 } from "../src/catalog/boundary.ts";
 import { deckLegal } from "../src/catalog/deck-legal.ts";
-import { campaigns, cards, catalogTables, meta, packs, scenarios } from "../src/catalog/schema.ts";
+import { EFFECTS } from "../src/effects/index.ts";
+import { campaigns, cards, catalogTables, effects as effectsTable, meta, packs, scenarios } from "../src/catalog/schema.ts";
 import { KEYWORD_OVERRIDES, LOCAL_CARDS } from "./local-cards.ts";
 import { joinScenarioFixtures } from "./join-scenario-fixtures.ts";
 
@@ -57,6 +60,7 @@ type CardCopy = {
 type CatalogSnapshot = {
   packs: string;
   cards: string;
+  effects: string;
   scenarios: string;
 };
 
@@ -68,6 +72,7 @@ export type BuildCatalogOptions = {
   fixturesDir?: string;
   localCards?: readonly RingsDbCard[];
   keywordOverrides?: Readonly<Record<string, PrintedKeywords>>;
+  effects?: readonly Effect[];
 };
 
 export type BuildCatalogResult = {
@@ -355,7 +360,7 @@ function insertRows(db: SqliteDatabase, table: SQLiteTable, rows: Row[]): void {
 
 function writeDatabase(
   filePath: string,
-  built: { campaigns: Row[]; packs: Row[]; cards: Row[]; scenarios: Row[]; meta: Row[] },
+  built: { campaigns: Row[]; packs: Row[]; cards: Row[]; effects: Row[]; scenarios: Row[]; meta: Row[] },
 ): void {
   mkdirSync(path.dirname(filePath), { recursive: true });
   const db = new Database(filePath);
@@ -369,6 +374,7 @@ function writeDatabase(
       insertRows(db, campaigns, built.campaigns);
       insertRows(db, packs, built.packs);
       insertRows(db, cards, built.cards);
+      insertRows(db, effectsTable, built.effects);
       insertRows(db, scenarios, built.scenarios);
       insertRows(db, meta, built.meta);
     });
@@ -406,12 +412,13 @@ function snapshotCatalog(dbPath: string): CatalogSnapshot | null {
     return {
       packs: canonicalRows(readRows(db, packs), "code", []),
       cards: canonicalRows(readRows(db, cards), "code", ["pack_codes", "keywords"]),
+      effects: canonicalRows(readRows(db, effectsTable), "id", ["record"]),
       scenarios: canonicalRows(readRows(db, scenarios), "id", ["definition"]),
     };
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
     // A database from before a column was added differs from any new build, so the version moves.
-    if (/no such column: (engagement_cost|keywords)/.test(reason)) return { packs: "", cards: "", scenarios: "" };
+    if (/no such column: (engagement_cost|keywords)/.test(reason)) return { packs: "", cards: "", effects: "", scenarios: "" };
     throw new Error(`Could not read existing catalog at ${dbPath}: ${reason}`, { cause: error });
   } finally {
     db.close();
@@ -448,6 +455,7 @@ function nextVersion(
   previous: CatalogSnapshot | null,
   packRows: Row[],
   cardRows: Row[],
+  effectRows: Row[],
   scenarioRows: Row[],
   versionPath: string,
 ): number {
@@ -456,6 +464,7 @@ function nextVersion(
   const matches =
     previous.packs === canonicalRows(packRows, "code", []) &&
     previous.cards === canonicalRows(cardRows, "code", ["pack_codes", "keywords"]) &&
+    previous.effects === canonicalRows(effectRows, "id", ["record"]) &&
     previous.scenarios === canonicalRows(scenarioRows, "id", ["definition"]);
   if (matches) return current ?? 1;
   return (current ?? 0) + 1;
@@ -469,6 +478,22 @@ function fetchedAtFor(manifest: Manifest, packCode: string): string {
   return fetchedAt;
 }
 
+// The build is the only production writer of the effects table. A record that fails the schema, or an id
+// used twice, stops the build.
+function validateEffects(records: readonly Effect[]): Effect[] {
+  const seen = new Set<string>();
+  return records.map((record) => {
+    const parsed = effectSchema.safeParse(record);
+    if (!parsed.success) {
+      const id = typeof record?.id === "string" ? record.id : "(missing id)";
+      throw new Error(`Effect ${id}: invalid at ${parsed.error.issues.map((issue) => issue.path.join(".") || "(root)").join(", ")}`);
+    }
+    if (seen.has(parsed.data.id)) throw new Error(`Effect id ${parsed.data.id} is used twice`);
+    seen.add(parsed.data.id);
+    return parsed.data;
+  });
+}
+
 export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<BuildCatalogResult> {
   const fetchImpl = options.fetch ?? globalThis.fetch;
   const root = repoRoot();
@@ -478,6 +503,7 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
   const fixturesDir = options.fixturesDir ?? path.join(root, "fixtures");
   const localCards = options.localCards ?? LOCAL_CARDS;
   const keywordOverrides = options.keywordOverrides ?? KEYWORD_OVERRIDES;
+  const effectRecords = validateEffects(options.effects ?? EFFECTS);
 
   const manifest = readManifest(cacheDir);
   const packPayload = await loadPayload(fetchImpl, cacheDir, manifest, packsCacheKey(), PACKS_URL);
@@ -541,8 +567,9 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
     }),
   );
 
+  const effectRows = effectRecords.map((effect) => rowFrom(effectsTable, { id: effect.id, record: JSON.stringify(effect) }));
   const previous = snapshotCatalog(dbPath);
-  const version = nextVersion(previous, packRows, cardRows, scenarioRows, versionPath);
+  const version = nextVersion(previous, packRows, cardRows, effectRows, scenarioRows, versionPath);
   // Write the version before replacing the database. A crash in between can skip
   // a number on the next run. A matching catalog still leaves the constant unchanged.
   writeCatalogVersion(versionPath, version);
@@ -553,6 +580,7 @@ export async function buildCatalog(options: BuildCatalogOptions = {}): Promise<B
       campaigns: campaignRows,
       packs: packRows,
       cards: cardRows,
+      effects: effectRows,
       scenarios: scenarioRows,
       meta: metaRows,
     });

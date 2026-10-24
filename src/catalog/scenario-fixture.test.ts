@@ -55,7 +55,7 @@ describe("a-shadow-of-the-past fixture", () => {
   });
 
   it("derives the booklet sets and the quest-card setup", () => {
-    const definition = scenarioDefinitionSchema.parse(scenarioDefinition(fixture));
+    const definition = scenarioDefinitionSchema.parse(scenarioDefinition(fixture, (name) => `code:${name}`));
     expect(definition.encounterSets).toEqual([
       { code: "A Shadow of the Past", count: 29 },
       { code: "Hunted", count: 6 },
@@ -76,7 +76,10 @@ describe("a-shadow-of-the-past fixture", () => {
       { verb: "MakeActiveLocation", code: "141031" },
       { verb: "AttachToRingBearer", code: "141017" },
     ]);
-    expect(definition.resolution).toEqual([]);
+    expect(definition.resolution).toEqual([
+      { id: "gandalfs-delay-or-the-ring-draws-them", choices: [{ code: "code:Gandalf's Delay" }, { code: "code:The Ring Draws Them" }] },
+      { id: "gildor-or-mr-underhill", choices: [{ code: "code:Gildor Inglorion" }, { code: "code:Mr. Underhill" }] },
+    ]);
     expect(definition.bookletPage).toBeUndefined();
     expect(definition.stages.map((stage) => stage.code)).toEqual(["141022", "141023", "141024"]);
   });

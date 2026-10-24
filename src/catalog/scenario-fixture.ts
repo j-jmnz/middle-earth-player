@@ -18,12 +18,19 @@ const fixtureSetSchema = z.strictObject({
   cards: z.array(fixtureCardSchema),
 });
 
+// A reward group names its choices by card name. The catalog build resolves each name to a code.
+const fixtureResolutionSchema = z.strictObject({
+  id: z.string().min(1),
+  choices: z.array(z.strictObject({ name: z.string().min(1) })).min(1),
+});
+
 export const scenarioFixtureSchema = z
   .strictObject({
     id: z.string().min(1),
     stages: z.array(z.string().min(1)).min(1),
     sets: z.array(fixtureSetSchema),
     cards: z.array(fixtureCardSchema),
+    resolution: z.array(fixtureResolutionSchema).default([]),
   })
   .superRefine((fixture, context) => {
     const cards = listedCards(fixture);
@@ -140,7 +147,9 @@ export function encounterCodes(fixture: ScenarioFixture): string[] {
     .flatMap((card) => Array.from({ length: card.normal }, () => card.code));
 }
 
-export function scenarioDefinition(fixture: ScenarioFixture): ScenarioDefinition {
+export type CodeByName = (name: string) => string;
+
+export function scenarioDefinition(fixture: ScenarioFixture, codeByName: CodeByName): ScenarioDefinition {
   return scenarioDefinitionSchema.parse({
     id: fixture.id,
     encounterSets: fixture.sets.map((set) => ({
@@ -150,6 +159,9 @@ export function scenarioDefinition(fixture: ScenarioFixture): ScenarioDefinition
     stages: fixture.stages.map((code) => ({ code })),
     widgets,
     setup: setupInstructions(fixture),
-    resolution: [],
+    resolution: fixture.resolution.map((group) => ({
+      id: group.id,
+      choices: group.choices.map((choice) => ({ code: codeByName(choice.name) })),
+    })),
   });
 }

@@ -18,11 +18,9 @@ function readJson(...parts: string[]): unknown {
 const manifest = readJson("fixtures", "abilities", "a-shadow-of-the-past.json") as Record<string, string[]>;
 const fixture = parseScenarioFixture(readJson("fixtures", "a-shadow-of-the-past.json"));
 
-// Timings that this batch of phase 8 authors. The rest are listed as todo until a batch takes them.
-const AUTHORED = new Set(["setup", "forced", "triggered", "whenRevealed", "shadow", "response", "action", "constant", "travel"]);
-const LATER: Readonly<Record<string, string>> = {
-  questResolution: "batch 5",
-};
+// Timings that phase 8 authors. A timing in LATER is listed as todo until it is authored.
+const AUTHORED = new Set(["setup", "forced", "triggered", "whenRevealed", "shadow", "response", "action", "constant", "travel", "questResolution"]);
+const LATER: Readonly<Record<string, string>> = {};
 
 // A timing whose record is held back on purpose. The case fails with this message until a citation exists.
 const HELD: Readonly<Record<string, string>> = {

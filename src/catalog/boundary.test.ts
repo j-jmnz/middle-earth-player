@@ -52,7 +52,7 @@ const scenario = {
     perSeatStaging: false,
   },
   setup: [{ verb: "RevealStaging" }],
-  resolution: [{ id: "choice" }],
+  resolution: [{ id: "choice", choices: [{ code: "141078" }] }],
 };
 
 function minimalCard(overrides: Record<string, unknown> = {}): Record<string, unknown> {

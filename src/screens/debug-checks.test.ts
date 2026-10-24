@@ -33,7 +33,7 @@ function base(overrides: Partial<DebugCheckInput> = {}): DebugCheckInput {
     hero: { present: true, deckLegal: true, imagesrc: "/bundles/cards/141001.png" },
     fixture,
     scenarioPresent: true,
-    bakedDefinition: scenarioDefinition(fixture),
+    bakedDefinition: scenarioDefinition(fixture, (name) => name),
     presentCardCodes: [...new Set(fixtureCards(fixture).map((card) => card.code))],
     imageFileCount: 1,
     snapshotCount: 1,
@@ -62,7 +62,7 @@ describe("debugSentences", () => {
       "The Black Riders has 5 cards.",
       "Stages are 141022, 141023, 141024.",
       "Scenario a-shadow-of-the-past matches the fixture.",
-      "Setup instructions: 5. Resolution options: 0.",
+      "Setup instructions: 5. Resolution options: 2.",
       "1 image file.",
       "1 image in memory.",
       "0 pause entries.",
@@ -98,7 +98,7 @@ describe("debugSentences", () => {
       "Scenario a-shadow-of-the-past is not a definition.",
     );
 
-    const baked = scenarioDefinition(fixture);
+    const baked = scenarioDefinition(fixture, (name) => name);
     const setup = debugSentences(base({ bakedDefinition: { ...baked, setup: [{ verb: "Draw" }] } }));
     expect(setup).toContain("Scenario a-shadow-of-the-past setup does not match the fixture.");
     expect(setup).not.toContain("Setup instructions: 5. Resolution options: 0.");

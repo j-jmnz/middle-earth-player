@@ -64,7 +64,8 @@ export type LegalIntent =
   | { type: "DeclineAttack" }
   | { type: "Distribute"; total: number }
   | { type: "Trigger"; cardId: string; effectId: string }
-  | { type: "Choose"; optionId: string };
+  | { type: "Choose"; optionId: string }
+  | { type: "ChooseResolution"; optionId: string };
 
 export type Selection =
   | { type: "PlayCard"; cardId: string }

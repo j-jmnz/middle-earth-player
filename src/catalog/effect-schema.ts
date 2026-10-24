@@ -209,6 +209,10 @@ const simpleVerbs = [
   }),
   // The source enemy leaves the player it is engaged with and engages the next player.
   verb("EngageNextPlayer"),
+  // The host of the source card, its resource pool, and every card attached to it pass to a seat.
+  z.strictObject({ verb: z.literal("TransferHost"), who: whoSchema, ...when }),
+  // The players win the scenario. The resolution choices follow.
+  verb("WinGame"),
 ] as const;
 
 const simpleInstructionSchema = z.discriminatedUnion("verb", simpleVerbs);

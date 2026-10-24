@@ -27,6 +27,14 @@ export const CAMPAIGN_EFFECTS: readonly Effect[] = [
     condition: { kind: "sourceIn", zone: "play" },
     instructions: [{ verb: "Restrict", what: "heroLimit" }],
   },
+  // 141085 The One Ring, forced. Two-handed play only: the token only passes with two seats.
+  {
+    id: "141085:forced:1",
+    cardCode: RING,
+    timing: "forced",
+    trigger: "firstPlayerTokenPassed",
+    instructions: [{ verb: "TransferHost", who: "firstPlayer" }],
+  },
   // 141017 Mr. Underhill.
   { id: "141017:setup:1", cardCode: "141017", timing: "setup", instructions: [{ verb: "AttachToRingBearer", code: "141017" }] },
   // 141077 Gildor Inglorion. Control record: timing label unconfirmed, confirm on the card.

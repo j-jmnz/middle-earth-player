@@ -12,6 +12,24 @@ export function loadScenarioFixtures(fixturesDir: string): ScenarioFixture[] {
     .map((name) => parseScenarioFixture(JSON.parse(readFileSync(path.join(fixturesDir, name), "utf8")) as unknown));
 }
 
+// A reward name must match exactly one card the fixture deals. The build fails on none or on several.
+function codeForName(
+  fixture: ScenarioFixture,
+  name: string,
+  cardsByCode: ReadonlyMap<string, RingsDbCard>,
+  localByCode: ReadonlyMap<string, RingsDbCard>,
+): string {
+  const matches = new Set<string>();
+  for (const { code } of fixtureCards(fixture)) {
+    const card = cardsByCode.get(code) ?? localByCode.get(code);
+    if (card?.name === name) matches.add(code);
+  }
+  const [only, ...rest] = [...matches];
+  if (only === undefined) throw new Error(`Scenario ${fixture.id} resolution names "${name}", which is not a dealt card`);
+  if (rest.length > 0) throw new Error(`Scenario ${fixture.id} resolution name "${name}" is ambiguous: ${[only, ...rest].join(", ")}`);
+  return only;
+}
+
 export function joinScenarioFixtures(
   fixturesDir: string,
   localCards: readonly RingsDbCard[],
@@ -37,7 +55,7 @@ export function joinScenarioFixtures(
         addedCards.push(card);
       }
     }
-    definitions.push(scenarioDefinition(fixture));
+    definitions.push(scenarioDefinition(fixture, (name) => codeForName(fixture, name, cardsByCode, localByCode)));
   }
 
   for (const local of localCards) {

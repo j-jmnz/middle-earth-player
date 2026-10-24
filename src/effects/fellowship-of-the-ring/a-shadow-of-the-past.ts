@@ -53,7 +53,9 @@ export const A_SHADOW_OF_THE_PAST_EFFECTS: readonly Effect[] = [
       },
     ],
   },
-  // 141035 Bucklebury Ferry. The questResolution timing belongs to batch 5.
+  // 141035 Bucklebury Ferry. The win record runs after the location leaves play explored.
+  // Win condition read via Hall of Beorn 2026-10-24 (TBR printing). Confirm on the card.
+  { id: "141035:questResolution:1", cardCode: "141035", timing: "questResolution", instructions: [{ verb: "WinGame" }] },
   {
     id: "141035:constant:1",
     cardCode: "141035",

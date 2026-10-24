@@ -1,6 +1,7 @@
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { hasTrait } from "./conditions.ts";
+import { runQuestResolution } from "./explore.ts";
 import type { EngineStep } from "./intents.ts";
 import { drawOne, type ReduceContext } from "./interpret.ts";
 import { destroyCard } from "./keywords.ts";
@@ -81,5 +82,5 @@ function placeProgress(state: ScenarioState, id: string, amount: number, ctx: Re
   const next = updateCard(state, id, { progress: location.progress + placed });
   if (points == null || location.progress + placed < points) return next;
   const explored = destroyCard(next, id, ctx.cards, steps);
-  return offerResponses(explored, { trigger: "leftPlay", seat: null, cardId: id }, ctx, steps);
+  return offerResponses(runQuestResolution(explored, id, ctx, steps), { trigger: "leftPlay", seat: null, cardId: id }, ctx, steps);
 }

@@ -184,7 +184,7 @@ function options(
   dirs: { cacheDir: string; dbPath: string; versionPath: string; fixturesDir: string },
   fetchImpl: typeof fetch,
 ): BuildCatalogOptions {
-  return { fetch: fetchImpl, localCards: [], ...dirs };
+  return { fetch: fetchImpl, localCards: [], effects: [], ...dirs };
 }
 
 function codes(dbPath: string): string[] {
@@ -276,6 +276,24 @@ describe("buildCatalog", () => {
     });
     expect(second.version).toBe(2);
     expect(readFileSync(dirs.versionPath, "utf8")).toBe("export const CATALOG_VERSION = 2;\n");
+  });
+
+  it("writes effect rows, moves the version when a record changes, and refuses a repeated id", async () => {
+    const dirs = workspace();
+    const record = { id: "x:constant:1", cardCode: "x", timing: "constant" as const, instructions: [{ verb: "Restrict" as const, what: "travel" as const }] };
+    const first = await buildCatalog({ ...options(dirs, stubFetch(fixture(), [])), effects: [record] });
+    expect(first.version).toBe(1);
+    const rows = openDb(dirs.dbPath).prepare("select id, record from effects").all();
+    expect(rows.map((row) => row.id)).toEqual(["x:constant:1"]);
+    expect(JSON.parse(String(rows[0]?.record))).toEqual(record);
+
+    const same = await buildCatalog({ ...options(dirs, stubFetch(fixture(), [])), effects: [record] });
+    expect(same.version).toBe(1);
+    const edited = { ...record, instructions: [{ verb: "Restrict" as const, what: "advance" as const }] };
+    const changed = await buildCatalog({ ...options(dirs, stubFetch(fixture(), [])), effects: [edited] });
+    expect(changed.version).toBe(2);
+
+    await expect(buildCatalog({ ...options(dirs, stubFetch(fixture(), [])), effects: [edited, edited] })).rejects.toThrow("x:constant:1 is used twice");
   });
 
   it("keeps the exports beside CATALOG_VERSION when the number changes", async () => {

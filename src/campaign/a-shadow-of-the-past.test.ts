@@ -86,7 +86,10 @@ describe("A Shadow of the Past setup", () => {
     const bearer = byCode(state, RING_BEARER)[0] ?? "";
     const underhill = byCode(state, "141017")[0] ?? "";
     expect(state.cards[underhill]?.host).toBe(bearer);
-    expect(state.cards[bearer]?.attachments).toEqual([underhill]);
+    // The script attaches The One Ring first, then the quest card's setup attaches Mr. Underhill.
+    const ring = byCode(state, "141085")[0] ?? "";
+    expect(state.cards[ring]).toMatchObject({ zone: "play", controller: 0, host: bearer });
+    expect(state.cards[bearer]?.attachments).toEqual([ring, underhill]);
     expect(state.cards[state.questStage ?? ""]?.face).toBe("B");
     expect(state.mode).not.toBe("mulligan");
   });

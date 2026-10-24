@@ -16,6 +16,7 @@ import { suppliesNumber } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { attachmentTargets, playReason } from "./planning.ts";
+import { resolutionIntents, resolutionReason } from "./resolution.ts";
 import { stagingEnemies, stagingLocations } from "./quest.ts";
 import { travelBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
@@ -24,7 +25,7 @@ import { uniqueBlocked } from "./keywords.ts";
 const NUMBER = "The engine computes that number";
 
 export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
-  if (state.lost || state.stageCleared) return [];
+  if (state.lost || (state.stageCleared && state.window?.kind !== "resolution")) return [];
   if (state.seats[state.activeSeat]?.eliminated) return [];
   const window = state.window;
   if (!window) return [];
@@ -45,6 +46,8 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
       return triggerIntents(state, ctx);
     case "response":
       return [{ type: "Pass" }, ...triggerIntents(state, ctx)];
+    case "resolution":
+      return resolutionIntents(state);
     case "travel":
       return travelIntents(state, ctx);
     case "optionalEngage":
@@ -120,6 +123,8 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       return triggerReason(state, intent, ctx);
     case "Choose":
       return optionReason(state, intent);
+    case "ChooseResolution":
+      return resolutionReason(state, intent);
     case "Travel":
       return travelReason(state, intent, ctx);
     case "DeclineTravel":

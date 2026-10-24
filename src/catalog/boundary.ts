@@ -89,8 +89,11 @@ export const ringsDbCardSchema = z
   })
   .strip();
 
+// One reward group. The player picks one choice per group, in order. Codes come from the catalog build,
+// which looks the fixture's card names up; nothing in src names a reward code.
 export const resolutionOptionSchema = z.strictObject({
-  id: z.string(),
+  id: z.string().min(1),
+  choices: z.array(z.strictObject({ code: z.string().min(1) })).min(1),
 });
 
 const encounterSetSchema = z.strictObject({

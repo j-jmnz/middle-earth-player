@@ -1,5 +1,6 @@
 import { pushCardEffects } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
+import { runQuestResolution } from "./explore.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { resolveQuest } from "./quest.ts";
@@ -27,6 +28,7 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
     next = pushCardEffects(next, "whenRevealed", cardId, next.firstPlayer, false, effects, ctx, steps);
   }
   for (const cardId of [...explored].reverse()) {
+    next = runQuestResolution(next, cardId, ctx, steps);
     next = offerResponses(next, { trigger: "leftPlay", seat: null, cardId }, ctx, steps);
   }
   return next;

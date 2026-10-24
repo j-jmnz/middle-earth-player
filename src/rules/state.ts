@@ -122,7 +122,9 @@ export type Window =
   | { kind: "frameAction" }
   | { kind: "choose"; seat: number; options: readonly string[] }
   | { kind: "cancelOffer"; seat: number }
-  | { kind: "response"; seat: number };
+  | { kind: "response"; seat: number }
+  // The scenario is won: the player picks one choice of reward group `group`.
+  | { kind: "resolution"; group: number };
 
 export type UndoLog = {
   phase: Phase;
@@ -180,7 +182,9 @@ export type ScenarioState = {
   stages: readonly { code: string }[];
   setup: readonly Instruction[];
   widgets: ScenarioDefinition["widgets"];
-  resolution: readonly { id: string }[];
+  resolution: ScenarioDefinition["resolution"];
+  // The code picked in each reward group so far, in group order.
+  resolutionChoices: readonly string[];
   engagement: { ordinal: number; engagedThisPass: boolean } | null;
   resolvedAttacks: readonly string[];
   pendingAttack: PendingAttack | null;
@@ -288,6 +292,7 @@ export function blankScenario(input: {
     setup: input.definition.setup,
     widgets: input.definition.widgets,
     resolution: input.definition.resolution,
+    resolutionChoices: [],
     engagement: null,
     resolvedAttacks: [],
     pendingAttack: null,

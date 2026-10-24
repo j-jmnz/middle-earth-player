@@ -285,6 +285,10 @@ This is a transaction, not a notes field. On a win the player chooses one of:
 
 Each chosen card is added to the campaign pool and recorded on the log. Look up the current RingsDB codes while building the catalog. In the TBR pack fetched for this brief they were campaign-type cards in the 1410xx range (`141077` Gildor Inglorion, `141078` Gandalf's Delay, `141079` The Ring Draws Them). Confirm against the live payload, including Mr. Underhill, which was not pinned here. Do not hardcode a code you have not just read from the catalog build.
 
+The fixture names each reward group by card name. The catalog build resolves a name to the code of the one dealt card with that name, and fails when none or several match. The scenario definition holds the codes. After a win the reducer opens one resolution window per group, in order, and `ChooseResolution` carries a code from that group. A scenario that is lost writes nothing. A scenario already on the log is not granted again. A chosen Permanent card is recorded as attached, not as a pool card.
+
+Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury Ferry: after it leaves play explored, the players win. Read via Hall of Beorn 2026-10-24 (TBR printing). Confirm on the card.
+
 ### Hide tests
 
 When an encounter card with Hide X is revealed, the revealing seat makes a Hide test before that card's When Revealed or Forced effect.

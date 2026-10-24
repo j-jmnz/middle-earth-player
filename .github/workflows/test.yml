@@ -1,0 +1,28 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Restore the RingsDB payload cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/ringsdb
+          key: ringsdb-${{ github.run_id }}
+          restore-keys: ringsdb-
+      # Builds assets/catalog.db when it is missing or older than the payloads, effects, fixtures, or local cards.
+      - run: node --experimental-strip-types scripts/ensure-catalog.ts
+      - run: pnpm lint
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm test

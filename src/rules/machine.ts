@@ -18,6 +18,7 @@ import { commitHide, pruneRoundRecords } from "./hide.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import { drawOne, gainSeatResources, type ReduceContext } from "./interpret.ts";
 import { applyPass, modeAfterPass } from "./pass.ts";
+import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
 import { doRefresh } from "./refresh.ts";
 import { engagementStep, engageEnemy, stagingEnemies } from "./quest.ts";
@@ -30,6 +31,13 @@ import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.t
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
+    if (current.stageCleared && !current.window && !current.failure) {
+      const asking = openResolution(current);
+      if (asking !== current) {
+        current = asking;
+        continue;
+      }
+    }
     if (current.lost || current.stageCleared || current.failure || current.window) return current;
     const crossed = crossBoundary(current, ctx, steps);
     const next = handoffEliminated(crossed !== current ? crossed : automatic(current, ctx, steps));
@@ -62,6 +70,8 @@ export function applyIntent(
       return applyTrigger(state, intent, ctx, steps);
     case "Choose":
       return applyChoice(state, intent.optionId);
+    case "ChooseResolution":
+      return applyResolution(state, intent.optionId);
     case "Travel":
       return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":
@@ -127,7 +137,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "playerAttacks":
       return openPlayer(state, ctx);
     case "refresh":
-      return doRefresh(state, steps);
+      return doRefresh(state, ctx, steps);
     case "endRound":
       return hasTiming(state, ctx, "endOfRound") ? openPass(state) : withMode(state, "beginRound");
     default:

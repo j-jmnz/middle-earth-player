@@ -101,7 +101,7 @@ function heroSentences(hero: DebugCheckInput["hero"]): string[] {
 }
 
 function scenarioSentences(input: DebugCheckInput): string[] {
-  const expected = scenarioDefinition(input.fixture);
+  const expected = scenarioDefinition(input.fixture, (name) => name);
   const sentences = [
     `Normal encounter size is ${normalEncounterSize(input.fixture)}.`,
     ...expected.encounterSets.map((set) => `${set.code} has ${set.count} cards.`),
@@ -140,12 +140,10 @@ function definitionProblems(id: string, actual: ScenarioDefinition, expected: Sc
   if (JSON.stringify(actual.setup) !== JSON.stringify(expected.setup)) {
     problems.push(`Scenario ${id} setup does not match the fixture.`);
   }
-  if (JSON.stringify(actual.resolution) !== JSON.stringify(expected.resolution)) {
-    problems.push(
-      actual.resolution.length > 0
-        ? `Scenario ${id} resolution is not empty.`
-        : `Scenario ${id} resolution does not match the fixture.`,
-    );
+  // The fixture names rewards; the catalog build turned the names into codes. Compare the shape only.
+  const shape = (resolution: ScenarioDefinition["resolution"]) => JSON.stringify(resolution.map((group) => [group.id, group.choices.length]));
+  if (shape(actual.resolution) !== shape(expected.resolution)) {
+    problems.push(`Scenario ${id} resolution does not match the fixture.`);
   }
   if ((actual.bookletPage ?? null) !== (expected.bookletPage ?? null)) {
     problems.push(`Scenario ${id} booklet page does not match the fixture.`);

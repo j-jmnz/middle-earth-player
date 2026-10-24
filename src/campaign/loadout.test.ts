@@ -1,0 +1,94 @@
+import { beforeAll, describe, expect, it } from "vitest";
+
+import { definePrinted, type PrintedCard } from "../rules/printed.ts";
+import { loadPrinted } from "../../scripts/test-catalog.ts";
+
+import { validateLoadout, type LoadoutSeat } from "./loadout.ts";
+
+const SAGA_FRODO = "141001";
+const OTHER_SAGA_FRODO = "142001";
+const SPIRIT_FRODO = "02025";
+const FELLOWSHIP_ARAGORN = "143001";
+const RING = "141085";
+
+let cards: Map<string, PrintedCard>;
+
+beforeAll(async () => {
+  cards = new Map(await loadPrinted([SAGA_FRODO, OTHER_SAGA_FRODO, SPIRIT_FRODO, FELLOWSHIP_ARAGORN, RING]));
+  for (const code of ["h1", "h2", "h3", "h4"]) {
+    cards.set(code, definePrinted({ code, name: `Hero ${code}`, type: "hero", sphere: "tactics", threat: 8, willpower: 1, attack: 1, defense: 1, health: 3 }));
+  }
+  cards.set("c1", definePrinted({ code: "c1", name: "Card", type: "event", sphere: "neutral", cost: 0 }));
+});
+
+const DECK = ["c1", "c1", "c1"];
+const seat = (heroes: string[], deck: string[] = DECK): LoadoutSeat => ({ heroes, deck });
+
+describe("Fellowship loadout", () => {
+  it("accepts the Ring-bearer with two or three other heroes", () => {
+    expect(validateLoadout([seat([SAGA_FRODO, "h1", "h2"])], cards)).toEqual([]);
+    expect(validateLoadout([seat([SAGA_FRODO, "h1", "h2", "h3"])], cards)).toEqual([]);
+    expect(validateLoadout([seat(["h1", SAGA_FRODO, "h2", "h3"])], cards)).toEqual([]);
+  });
+
+  it("refuses a first seat with no Ring-bearer", () => {
+    const errors = validateLoadout([seat(["h1", "h2", "h3"])], cards);
+    expect(errors.map((error) => error.rule)).toEqual(["noRingBearer"]);
+    expect(errors[0]?.message).toContain("Hero h1");
+    // A Fellowship hero without the trait is not a Ring-bearer.
+    expect(validateLoadout([seat([FELLOWSHIP_ARAGORN, "h1"])], cards).map((error) => error.rule)).toEqual(["noRingBearer"]);
+  });
+
+  it("refuses two Fellowship-sphere heroes and names the second", () => {
+    const errors = validateLoadout([seat([SAGA_FRODO, FELLOWSHIP_ARAGORN, "h1"])], cards);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatchObject({ rule: "twoFellowshipHeroes", code: FELLOWSHIP_ARAGORN, card: "Aragorn" });
+    expect(errors[0]?.message).toContain("Aragorn (143001)");
+    const across = validateLoadout([seat([SAGA_FRODO, "h1"]), seat([FELLOWSHIP_ARAGORN, "h2"])], cards);
+    expect(across.map((error) => error.rule)).toEqual(["twoFellowshipHeroes"]);
+  });
+
+  it("refuses a second Ring-bearer even in the other seat", () => {
+    const errors = validateLoadout([seat([SAGA_FRODO, "h1"]), seat([OTHER_SAGA_FRODO, "h2"])], cards);
+    expect(errors.map((error) => error.rule).sort()).toEqual(["secondFrodo", "twoFellowshipHeroes"]);
+  });
+
+  it("refuses another version of Frodo as a hero or in a deck, naming the card", () => {
+    const hero = validateLoadout([seat([SAGA_FRODO, SPIRIT_FRODO, "h1"])], cards);
+    expect(hero).toHaveLength(1);
+    expect(hero[0]).toMatchObject({ rule: "secondFrodo", code: SPIRIT_FRODO });
+    const deck = validateLoadout([seat([SAGA_FRODO, "h1"], [...DECK, OTHER_SAGA_FRODO])], cards);
+    expect(deck).toHaveLength(1);
+    expect(deck[0]).toMatchObject({ rule: "secondFrodo", code: OTHER_SAGA_FRODO });
+    expect(deck[0]?.message).toContain("Frodo Baggins (142001)");
+  });
+
+  it("refuses a fourth hero unless the extra hero is the Ring-bearer", () => {
+    const errors = validateLoadout([seat([SAGA_FRODO, "h1", "h2", "h3", "h4"])], cards);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatchObject({ rule: "tooManyHeroes", code: "h4" });
+    // The second seat has no Ring-bearer, so three is its limit.
+    const second = validateLoadout([seat([SAGA_FRODO, "h1"]), seat(["h1", "h2", "h3", "h4"])], cards);
+    expect(second.map((error) => error.rule)).toEqual(["tooManyHeroes"]);
+  });
+
+  it("refuses The One Ring in a deck and never inserts one", () => {
+    const errors = validateLoadout([seat([SAGA_FRODO, "h1"], [...DECK, RING])], cards);
+    expect(errors.map((error) => error.rule)).toEqual(["ringInDeck"]);
+    expect(errors[0]?.message).toContain("The One Ring (141085)");
+    const loadout = [seat([SAGA_FRODO, "h1"])];
+    validateLoadout(loadout, cards);
+    expect(loadout[0]?.heroes).toEqual([SAGA_FRODO, "h1"]);
+    expect(loadout[0]?.deck).toEqual(DECK);
+  });
+
+  it("does not reject two decks that share some other unique card", () => {
+    const shared = definePrinted({ code: "u1", name: "Unique", type: "ally", sphere: "lore", cost: 1, isUnique: true });
+    const withShared = new Map(cards).set("u1", shared);
+    expect(validateLoadout([seat([SAGA_FRODO, "h1"], [...DECK, "u1"]), seat(["h2"], [...DECK, "u1"])], withShared)).toEqual([]);
+  });
+
+  it("names a card the catalog does not know", () => {
+    expect(validateLoadout([seat([SAGA_FRODO, "nope"])], cards)[0]).toMatchObject({ rule: "unknownCard", code: "nope" });
+  });
+});

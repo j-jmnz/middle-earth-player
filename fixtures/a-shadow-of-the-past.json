@@ -48,5 +48,12 @@
     { "code": "141077", "easy": 1, "normal": 1, "pile": "encounter" },
     { "code": "141078", "easy": 1, "normal": 1, "pile": "staging" },
     { "code": "141079", "easy": 1, "normal": 1, "pile": "encounter" }
+  ],
+  "resolution": [
+    {
+      "id": "gandalfs-delay-or-the-ring-draws-them",
+      "choices": [{ "name": "Gandalf's Delay" }, { "name": "The Ring Draws Them" }]
+    },
+    { "id": "gildor-or-mr-underhill", "choices": [{ "name": "Gildor Inglorion" }, { "name": "Mr. Underhill" }] }
   ]
 }
