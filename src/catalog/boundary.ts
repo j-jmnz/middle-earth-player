@@ -22,6 +22,7 @@ export type {
   Effect,
   Instruction,
   ModifierStat,
+  PickSpec,
   ModifierUntil,
   SimpleInstruction,
   Target,

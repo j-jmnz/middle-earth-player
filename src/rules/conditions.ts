@@ -4,7 +4,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { versusHighEngagement } from "./keywords.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
-import { inPlay } from "./state.ts";
+import { inPlay, livingSeats } from "./state.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -61,6 +61,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       const host = source?.host ? state.cards[source.host] : undefined;
       return host != null && printedOf(ctx.cards, host.code).name === condition.name;
     }
+    case "otherPlayer":
+      return livingSeats(state).some((seat) => seat !== scope.actor);
     case "controls":
       return Object.values(state.cards).some(
         (card) => card.code === condition.code && card.controller === scope.actor && (card.zone === "heroes" || card.zone === "play"),

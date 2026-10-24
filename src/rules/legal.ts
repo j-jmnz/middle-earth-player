@@ -15,12 +15,11 @@ import type { LegalIntent, PlayerIntent, Selection } from "./intents.ts";
 import { suppliesNumber } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
-import { attachmentTargets, playReason } from "./planning.ts";
+import { attachmentTargets, playReason, playWindowReason } from "./planning.ts";
 import { resolutionIntents, resolutionReason } from "./resolution.ts";
 import { stagingEnemies, stagingLocations } from "./quest.ts";
 import { travelBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
-import { uniqueBlocked } from "./keywords.ts";
 
 const NUMBER = "The engine computes that number";
 
@@ -158,15 +157,9 @@ function mandatory(state: ScenarioState): boolean {
 
 function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   const intents: LegalIntent[] = [{ type: "Pass" }];
-  if (state.mode === "planning") {
-    for (const cardId of state.seats[state.activeSeat]?.hand ?? []) {
-      const instance = state.cards[cardId];
-      if (!instance) continue;
-      const printed = printedOf(ctx.cards, instance.code);
-      if (printed.type !== "ally" && printed.type !== "attachment" && printed.type !== "event") continue;
-      if (uniqueBlocked(state, printed, ctx.cards)) continue;
-      intents.push({ type: "PlayCard", cardId });
-    }
+  // Events are Actions and may be played in any action window; allies and attachments in the planning phase.
+  for (const cardId of state.seats[state.activeSeat]?.hand ?? []) {
+    if (playWindowReason(state, cardId, ctx) === null) intents.push({ type: "PlayCard", cardId });
   }
   if (state.mode === "questCommit") intents.push({ type: "Commit" });
   intents.push(...triggerIntents(state, ctx));

@@ -10,6 +10,7 @@ import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
+import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
@@ -29,6 +30,8 @@ export type EffectSpec = {
   blockCancel: Condition | null;
   // The window to open again when the frame pops.
   resume?: EffectData["resume"];
+  finish?: EffectData["finish"];
+  eventSeat?: number | null;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
   cause?: Cause;
@@ -52,6 +55,8 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     uncancelable: false,
     wait: null,
     resume: spec.resume ?? null,
+    ...(spec.finish ? { finish: spec.finish } : {}),
+    ...(spec.eventSeat != null ? { eventSeat: spec.eventSeat } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
 }
@@ -93,9 +98,17 @@ export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContex
   if (data.kind !== "effect") throw new Error(`Frame ${frame.frame} lost its effect data`);
   if (frame.step === 0) return beginEffect(state, frame, data, ctx);
   const [item, ...rest] = data.queue;
-  if (data.canceled || !item) return reopen(popFrame(state, steps), data);
+  if (data.canceled || !item) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
   const advanced = patchTop(state, { data: { ...data, queue: rest } });
   return runItem(advanced, item, frame, data.returned, ctx, steps);
+}
+
+// An event played from the hand is discarded once its effect is done, canceled or not (rr.cancel).
+function finishEvent(state: ScenarioState, frame: Frame, data: EffectData): ScenarioState {
+  const id = frame.cardId;
+  const instance = id ? state.cards[id] : undefined;
+  if (data.finish !== "discardSource" || !id || !instance || instance.zone !== "hand" || instance.controller == null) return state;
+  return moveCard(state, id, { zone: "discard", seat: instance.controller });
 }
 
 // An Action used in a window gives that window back once its frame is done.
@@ -145,6 +158,8 @@ function runItemNow(
     case "ShuffleIntoDeck":
     case "DiscardRestricted":
       return targeted(state, item, frame, ctx, steps);
+    case "Pick":
+      return pick(state, item, frame, ctx);
     default:
       return runInstruction(state, instruction, { seat: item.seat, sourceId: frame.cardId }, ctx, steps);
   }
@@ -219,6 +234,21 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     default:
       return [];
   }
+}
+
+// A Pick records its choice on the frame: nothing to choose records "", one candidate is taken, several ask the player.
+function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceContext): ScenarioState {
+  const instruction = item.instruction;
+  const data = topFrame(state)?.data;
+  if (instruction.verb !== "Pick" || data?.kind !== "effect") return state;
+  const found = pickCandidates(state, instruction.pick, item.seat, data.picked ?? [], frame.cardId, ctx);
+  const options = (instruction.pick.from ?? "play") === "play" ? found : distinctByCode(state, found);
+  let chosen = item.chosen;
+  if (!chosen) {
+    if (options.length > 1) return askTarget(state, item, options);
+    chosen = options[0] ?? "";
+  }
+  return patchTop(state, { data: { ...data, picked: [...(data.picked ?? []), chosen] } });
 }
 
 // Different copies of one card are the same choice. Only different cards make the player pick.

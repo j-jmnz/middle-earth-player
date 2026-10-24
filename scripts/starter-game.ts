@@ -45,5 +45,5 @@ export function playStarter(deckId: string, seed: number, ctx: ReduceContext): S
   const start = starterStart(deckId, seed);
   const kept = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx)).state;
   const loadout = starterLoadout(deckId);
-  return { start, kept, run: playOut(kept, ctx, { scout: loadout.heroes[2] ?? "", prefer: "141035", protect: RING_BEARER, play: true }) };
+  return { start, kept, run: playOut(kept, ctx, { scout: loadout.heroes[2] ?? "", prefer: "141035", protect: RING_BEARER, play: true, act: true }) };
 }

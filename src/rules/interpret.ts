@@ -5,6 +5,7 @@ import type { EngineStep } from "./intents.ts";
 import { placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { modifyStat } from "./attack-verbs.ts";
+import { runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "./frames.ts";
 import { runSetupVerb } from "./setup-verbs.ts";
@@ -76,6 +77,8 @@ export function runInstruction(
   steps: EngineStep[],
 ): ScenarioState {
   if (state.failure) return state;
+  const player = runPlayerVerb(state, instruction, focus, ctx, steps);
+  if (player) return player;
   switch (instruction.verb) {
     case "Draw":
       return drawVerb(state, instruction, focus.seat, ctx, steps);
@@ -105,9 +108,9 @@ export function runInstruction(
     case "ResolveEffect":
       return withFrame(state, "ResolveEffect", focus.sourceId, false, (framed) => framed, steps);
     case "ModifyStat":
-      return modifyStat(state, instruction, focus.sourceId);
+      return modifyStat(state, instruction, focus, ctx);
     case "Exhaust": {
-      const code = instruction.target?.code;
+      const code = instruction.target?.kind === "byCode" ? instruction.target.code : undefined;
       const id = code ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id : focus.sourceId;
       return id ? updateCard(state, id, { exhausted: true }) : state;
     }

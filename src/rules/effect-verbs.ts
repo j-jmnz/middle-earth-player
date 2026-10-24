@@ -4,13 +4,15 @@ import { hasTrait } from "./conditions.ts";
 import { runQuestResolution } from "./explore.ts";
 import type { EngineStep } from "./intents.ts";
 import { drawOne, type ReduceContext } from "./interpret.ts";
-import { destroyCard } from "./keywords.ts";
+import { destroyCard, playerCardEffectCanChoose } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
 import { offerResponses } from "./responses.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats, updateCard } from "./state.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
+import { lastPicked, seatOf } from "./player-verbs.ts";
+import { topFrame } from "./windows.ts";
 
 export type TargetVerb = Extract<Instruction, { verb: "ReadyHero" | "BarAttack" | "PlaceProgressOnLocation" }>;
 
@@ -26,10 +28,14 @@ export function drawVerb(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
+  const data = topFrame(state)?.data;
+  const target =
+    instruction.who === "picked" ? seatOf(lastPicked(state)) : instruction.who === "eventSeat" ? (data?.kind === "effect" ? (data.eventSeat ?? null) : null) : seat;
+  if (target == null) return state;
   const trait = instruction.perHero;
-  const count = trait == null ? 1 : (state.seats[seat]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length;
+  const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * (instruction.amount ?? 1);
   let next = state;
-  for (let draw = 0; draw < count; draw += 1) next = drawOne(next, seat, steps, UNATTRIBUTED);
+  for (let draw = 0; draw < count; draw += 1) next = drawOne(next, target, steps, UNATTRIBUTED);
   return next;
 }
 
@@ -38,8 +44,13 @@ export function targetCandidates(state: ScenarioState, instruction: TargetVerb, 
   switch (instruction.verb) {
     case "ReadyHero":
       return (state.seats[seat]?.heroes ?? []).filter((id) => state.cards[id]?.exhausted === true);
-    case "BarAttack":
-      return (state.seats[seat]?.engaged ?? []).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy");
+    case "BarAttack": {
+      const seats = instruction.scope === "any" ? livingSeats(state) : [seat];
+      return seats
+        .flatMap((index) => state.seats[index]?.engaged ?? [])
+        .filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy")
+        .filter((id) => instruction.scope !== "any" || playerCardEffectCanChoose(printedOf(ctx.cards, state.cards[id]?.code ?? "")));
+    }
     case "PlaceProgressOnLocation": {
       const open = [...(state.activeLocation ? [state.activeLocation] : []), ...state.staging];
       return open.filter((id) => {
@@ -63,17 +74,19 @@ export function applyTargetVerb(
   switch (instruction.verb) {
     case "ReadyHero":
       return updateCard(state, id, { exhausted: false });
-    case "BarAttack":
+    case "BarAttack": {
+      const barred = instruction.scope === "any" ? (state.cards[id]?.controller ?? seat) : seat;
       return sourceId
-        ? { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId, stat: "cannotAttack", amount: 1, until: "endOfRound", seat }] }
+        ? { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId, stat: "cannotAttack", amount: 1, until: instruction.until ?? "endOfRound", seat: barred }] }
         : state;
+    }
     case "PlaceProgressOnLocation":
       return placeProgress(state, id, instruction.perPlayer * livingSeats(state).length, ctx, steps);
   }
 }
 
 // Progress on a location in play. A location that is full is explored and leaves play.
-function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const location = state.cards[id];
   if (!location) return state;
   const points = questPointsOf(state, location, ctx.cards);

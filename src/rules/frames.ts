@@ -16,6 +16,10 @@ import { moveCard } from "./zones.ts";
 export function advanceFrame(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const frame = topFrame(state);
   if (!frame) return state;
+  // The action window that was open when an event was announced comes back.
+  if (frame.data.kind === "resume") {
+    return { ...popFrame(state, steps), window: frame.data.window, activeSeat: frame.data.seat, passed: frame.data.passed };
+  }
   switch (frame.frame) {
     case "reveal":
       return revealStep(state, frame, ctx, steps);

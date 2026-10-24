@@ -17,6 +17,7 @@ export type {
   Modifier,
   PendingAttack,
   ResponseOffer,
+  ResumeData,
   UsedEffect,
   QueueItem,
 } from "./frame-types.ts";
@@ -104,6 +105,7 @@ export type ModeName =
   | "optionalEngage"
   | "engagement"
   | "combatStart"
+  | "combatActions"
   | "enemyAttacks"
   | "playerAttacks"
   | "refresh"
@@ -248,6 +250,7 @@ export function phaseOf(mode: ModeName): Phase {
     case "engagement":
       return "Encounter";
     case "combatStart":
+    case "combatActions":
     case "enemyAttacks":
     case "playerAttacks":
       return "Combat";

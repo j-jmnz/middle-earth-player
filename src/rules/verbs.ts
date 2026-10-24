@@ -7,6 +7,7 @@ import { scheduleDelayed } from "./delayed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, eliminateEmpties, raiseThreat } from "./keywords.ts";
+import { otherSeat } from "./player-verbs.ts";
 import { engageEnemy, stagingEnemies } from "./quest.ts";
 import { shuffleIds } from "./seed.ts";
 import { updateCard, type ScenarioState } from "./state.ts";
@@ -15,7 +16,9 @@ import { currentCause, UNATTRIBUTED } from "./cause.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
-export function seatFor(state: ScenarioState, who: "actor" | "firstPlayer" | undefined, actor: number): number {
+// "otherPlayer" is the next seat in the game after the actor; with no other player it is the actor.
+export function seatFor(state: ScenarioState, who: "actor" | "firstPlayer" | "otherPlayer" | undefined, actor: number): number {
+  if (who === "otherPlayer") return otherSeat(state, actor) ?? actor;
   return who === "firstPlayer" ? state.firstPlayer : actor;
 }
 

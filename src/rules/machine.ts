@@ -14,10 +14,11 @@ import {
 } from "./combat.ts";
 import { applyChoice } from "./choices.ts";
 import { ruleCause } from "./cause.ts";
-import { drainEvents } from "./events.ts";
+import { canAnnounce, drainEvents } from "./events.ts";
 import { advanceFrame, stagingStep } from "./frames.ts";
 import { commitHide, pruneRoundRecords } from "./hide.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
+import { queueEvent } from "./queue.ts";
 import { drawOne, gainSeatResources, type ReduceContext } from "./interpret.ts";
 import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
@@ -41,11 +42,14 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
         continue;
       }
     }
-    if (current.lost || current.stageCleared || current.failure || current.window) return current;
-    if (current.pendingEvents?.length) {
-      current = drainEvents(current, ctx, steps);
-      continue;
+    if (current.pendingEvents?.length && !current.lost && !current.stageCleared && !current.failure && canAnnounce(current)) {
+      const announced = drainEvents(current, ctx, steps);
+      if (announced !== current) {
+        current = announced;
+        continue;
+      }
     }
+    if (current.lost || current.stageCleared || current.failure || current.window) return current;
     const crossed = crossBoundary(current, ctx, steps);
     const next = handoffEliminated(crossed !== current ? crossed : automatic(current, ctx, steps));
     if (next === current) return current;
@@ -139,6 +143,8 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       return engagementStep(state, ctx.cards, steps);
     case "combatStart":
       return startCombat(state, ctx, steps);
+    case "combatActions":
+      return hasCombatAction(state, ctx) ? openPass(state) : withMode(state, "enemyAttacks");
     case "enemyAttacks":
       return enemyStep(state, ctx, steps);
     case "playerAttacks":
@@ -176,11 +182,22 @@ function openOptional(state: ScenarioState, ctx: ReduceContext): ScenarioState {
 function startCombat(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const dealt = dealShadows(state, steps);
   const total = archeryTotal(dealt, ctx.cards);
-  const next = { ...withMode(dealt, "enemyAttacks"), resolvedAttacks: [], pendingAttack: null };
+  const next = { ...withMode(dealt, "combatActions"), resolvedAttacks: [], pendingAttack: null };
   if (total > 0 && archeryRecipients(next, ctx.cards).length > 0) {
     return { ...next, window: { kind: "archery", total }, activeSeat: livingSeats(next)[0] ?? next.firstPlayer };
   }
   return next;
+}
+
+// The action window after the shadow cards are dealt (rr.framework-steps, 6.2) opens when a player holds a Combat Action:
+// an event in the hand or a card in play whose Action is limited to the Combat phase (Feint). Any other Action can be
+// used in the windows before it, so a table that holds none skips a window nobody could use.
+function hasCombatAction(state: ScenarioState, ctx: ReduceContext): boolean {
+  const codes = new Set(ctx.effects.filter((effect) => effect.timing === "action" && effect.condition?.kind === "phase" && effect.condition.is === "Combat").map((effect) => effect.cardCode));
+  if (codes.size === 0) return false;
+  return livingSeats(state).some((seat) =>
+    Object.values(state.cards).some((instance) => instance.controller === seat && codes.has(instance.code) && (instance.zone === "hand" || instance.zone === "heroes" || instance.zone === "play")),
+  );
 }
 
 function enemyStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -266,6 +283,7 @@ function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineS
   for (const id of cardIds) {
     next = updateCard(next, id, { committed: true, exhausted: true });
     steps.push({ kind: "commit", cardId: id });
+    next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id });
   }
   return next;
 }

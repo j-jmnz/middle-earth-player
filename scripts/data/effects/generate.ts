@@ -1,11 +1,11 @@
-import type { Effect } from "../../../src/catalog/boundary.ts";
+import type { Condition, Effect } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
 import { dealtCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
-import { TEMPLATES, type TemplateContext } from "./templates.ts";
+import { TEMPLATES, type Draft, type TemplateContext } from "./templates.ts";
 
 export type Segment = { card: Card; index: number; side: "front" | "back" | "shadow"; line: string; lineId: string };
 
@@ -29,6 +29,36 @@ const LABEL_TIMING: ReadonlyMap<string, string> = new Map([
   ["quest resolution", "questResolution"],
   ["resolution", "resolution"],
 ]);
+
+const PHASES = ["Resource", "Planning", "Quest", "Travel", "Encounter", "Combat", "Refresh"] as const;
+
+// "Combat Action: ..." is an Action that can only be used in that phase's action windows (rr.action). "(Limit once per round.)"
+// ends a line whose ability may be used once a round or a phase (rr.limits). Both are lifted off the line so one template reads
+// the sentence whether or not the card carries them.
+function wrapped(line: string): { line: string; condition: Condition | null; limit: "oncePerRound" | "oncePerPhase" | null } {
+  let rest = line;
+  let condition: Condition | null = null;
+  const phase = new RegExp(`^(${PHASES.join("|")}) Action: `).exec(rest);
+  if (phase?.[1]) {
+    condition = { kind: "phase", is: phase[1] as (typeof PHASES)[number] };
+    rest = `Action: ${rest.slice(phase[0].length)}`;
+  }
+  let limit: "oncePerRound" | "oncePerPhase" | null = null;
+  const limited = /\s*\(Limit once per (round|phase)\.?\)\s*$/.exec(rest);
+  if (limited) {
+    limit = limited[1] === "round" ? "oncePerRound" : "oncePerPhase";
+    rest = rest.slice(0, limited.index);
+  }
+  return { line: rest, condition, limit };
+}
+
+// The phase and the limit go on the record of the Action they were printed on. A record that already has its own condition
+// is not one a wrapper can be added to: the line is left to be authored.
+function withWrapper(drafts: Draft[], condition: Condition | null, limit: "oncePerRound" | "oncePerPhase" | null): Draft[] | null {
+  if (drafts.some((draft) => draft.timing !== "action")) return null;
+  if (condition && drafts.some((draft) => draft.condition)) return null;
+  return drafts.map((draft) => ({ ...draft, ...(condition ? { condition } : {}), ...(limit ? { limit } : {}) }));
+}
 
 function normalize(line: string): string {
   return line.replaceAll("`", "'").trim();
@@ -81,13 +111,16 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
     };
     const context: TemplateContext = { card, codeOf, setAside };
     for (const segment of segmentsOf(card, ledger)) {
-      const line = stripKeywords(segment.line).replaceAll(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "{self}");
+      const named = stripKeywords(segment.line).replaceAll(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "{self}");
+      const { line, condition, limit } = wrapped(named);
       let drafts = null;
       for (const template of TEMPLATES) {
         const match = template.pattern.exec(line);
         if (!match) continue;
         drafts = template.build(match, context);
+        if (drafts && (condition || limit)) drafts = withWrapper(drafts, condition, limit);
         if (drafts) {
+          drafts = drafts.map((draft) => (card.type === "event" && draft.timing === "response" && !draft.cost ? { ...draft, cost: { kind: "playEvent" as const } } : draft));
           usage[template.id] = (usage[template.id] ?? 0) + 1;
           break;
         }

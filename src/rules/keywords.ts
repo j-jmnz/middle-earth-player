@@ -105,6 +105,16 @@ export function raiseThreat(
   return eliminateEmpties(raised, steps);
 }
 
+// Lowers a threat dial. A dial stops at 0, and the step records what it actually dropped.
+export function lowerThreat(state: ScenarioState, seat: number, amount: number, steps: EngineStep[], cause: Cause): ScenarioState {
+  const current = state.seats[seat];
+  if (!current || current.eliminated) return state;
+  const dropped = Math.min(amount, current.threat);
+  if (dropped <= 0) return state;
+  steps.push({ kind: "threat", seat, amount: -dropped, cause });
+  return withThreat(state, seat, current.threat - dropped);
+}
+
 export function playerCardEffectCanChoose(printed: PrintedCard): boolean {
   return !printed.keywords.immuneToPlayerCardEffects;
 }
@@ -126,11 +136,15 @@ export function placeDamage(
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
   let next = updateCard(state, id, { damage });
+  const hurt = dealt > 0 && inPlay(instance.zone);
   if (printed.type === "enemy" && printed.keywords.indestructible) return next;
   if (printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards)) {
     next = destroyCard(next, id, cards, steps);
     // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy).
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
+  } else if (hurt) {
+    // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
+    next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id });
   }
   return next;
 }
@@ -213,6 +227,7 @@ export function destroyCard(
   const latest = next.cards[id] ?? instance;
   next = moveCard(next, id, defeatedDestination(latest, printed));
   steps.push({ kind: "destroy", targetId: id });
+  if (printed.type === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
   return eliminateEmpties(next, steps);
 }

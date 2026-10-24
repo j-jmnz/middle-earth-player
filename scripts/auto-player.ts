@@ -17,10 +17,15 @@ export type PolicyOptions = {
   protect: string;
   // Plays the first card in hand it can pay for, in the planning pass window, before it passes. A card with no legal host is skipped.
   play?: boolean;
+  // Uses each Action it can once per round and answers each Response offered to it, when it can pay.
+  act?: boolean;
 };
 
+// What the policy has done this round, so an Action with no limit is not used over and over.
+type Memory = Set<string>;
+
 // Resources the seat can pay for a card of this sphere, taken from its heroes in order, or null when it cannot pay.
-function payments(state: ScenarioState, ctx: ReduceContext, seat: number, cardId: string, cost: number): { heroId: string; amount: number }[] | null {
+export function paymentsFor(state: ScenarioState, ctx: ReduceContext, seat: number, cardId: string, cost: number): { heroId: string; amount: number }[] | null {
   const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
   const out: { heroId: string; amount: number }[] = [];
   let left = cost;
@@ -41,7 +46,7 @@ function playable(state: ScenarioState, ctx: ReduceContext): PlayerIntent | null
     if (intent.type !== "PlayCard") continue;
     const cost = playCost(state, intent.cardId, seat, ctx);
     if (cost == null) continue;
-    const paid = payments(state, ctx, seat, intent.cardId, cost);
+    const paid = paymentsFor(state, ctx, seat, intent.cardId, cost);
     if (!paid) continue;
     const printed = printedOf(ctx.cards, state.cards[intent.cardId]?.code ?? "");
     if (printed.type !== "attachment") return { type: "PlayCard", cardId: intent.cardId, payments: paid };
@@ -55,14 +60,45 @@ function has(intents: readonly LegalIntent[], type: LegalIntent["type"]): boolea
   return intents.some((intent) => intent.type === type);
 }
 
-export function nextIntent(state: ScenarioState, ctx: ReduceContext, options: PolicyOptions): PlayerIntent {
+function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory): PlayerIntent | null {
+  for (const intent of legalIntents(state, ctx)) {
+    if (intent.type !== "Trigger") continue;
+    const key = `${state.round}:${intent.cardId}:${intent.effectId}`;
+    if (memory.has(key)) continue;
+    const effect = ctx.effects.find((entry) => entry.id === intent.effectId);
+    const source = state.cards[intent.cardId];
+    if (!effect || !source) continue;
+    const seat = state.activeSeat;
+    let paid: { heroId: string; amount: number }[] | null = [];
+    if (effect.cost?.kind === "playEvent") {
+      const cost = playCost(state, intent.cardId, seat, ctx);
+      paid = cost == null ? null : paymentsFor(state, ctx, seat, intent.cardId, cost);
+    } else if (effect.cost?.kind === "resources") {
+      paid = paymentsFor(state, ctx, seat, intent.cardId, effect.cost.amount);
+    }
+    if (!paid) continue;
+    memory.add(key);
+    return paid.length > 0 ? { type: "Trigger", cardId: intent.cardId, effectId: intent.effectId, payments: paid } : { type: "Trigger", cardId: intent.cardId, effectId: intent.effectId };
+  }
+  return null;
+}
+
+export function nextIntent(state: ScenarioState, ctx: ReduceContext, options: PolicyOptions, memory: Memory = new Set()): PlayerIntent {
   const intents = legalIntents(state, ctx);
   const window = state.window;
   const scoutIds = new Set(Object.values(state.cards).filter((card) => card.code === options.scout).map((card) => card.id));
   switch (window?.kind) {
     case "mulligan":
       return { type: "Keep" };
+    case "response": {
+      const answer = options.act ? triggerFor(state, ctx, memory) : null;
+      return answer ?? { type: "Pass" };
+    }
     case "pass": {
+      if (options.act) {
+        const action = triggerFor(state, ctx, memory);
+        if (action) return action;
+      }
       if (options.play && state.mode === "planning") {
         const play = playable(state, ctx);
         if (play) return play;
@@ -121,10 +157,11 @@ export function playOut(start: ScenarioState, ctx: ReduceContext, options: Polic
   let state = start;
   const intents: PlayerIntent[] = [];
   const steps: EngineStep[] = [];
+  const memory: Memory = new Set();
   for (let turn = 0; turn < limit; turn += 1) {
     if (state.lost) break;
     if (state.stageCleared && state.window == null) break;
-    const intent = nextIntent(state, ctx, options);
+    const intent = nextIntent(state, ctx, options, memory);
     const result = expectOk(reduce(state, intent, ctx));
     state = result.state;
     steps.push(...result.steps);

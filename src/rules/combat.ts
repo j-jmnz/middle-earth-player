@@ -132,10 +132,12 @@ export function canAttack(
   attackerId: string,
   enemyId: string,
   cards: Cards,
+  // An attack an effect declares after the attacker was exhausted to pay for it.
+  exhaustedOk = false,
 ): boolean {
   const attacker = state.cards[attackerId];
   const enemy = state.cards[enemyId];
-  if (!attacker || !enemy || attacker.exhausted || attacker.controller !== seat) return false;
+  if (!attacker || !enemy || (attacker.exhausted && !exhaustedOk) || attacker.controller !== seat) return false;
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed)) return false;
@@ -144,11 +146,11 @@ export function canAttack(
   return printed.keywords.ranged;
 }
 
-export function legalAttackEnemies(state: ScenarioState, seat: number, attackerId: string, cards: Cards): string[] {
+export function legalAttackEnemies(state: ScenarioState, seat: number, attackerId: string, cards: Cards, exhaustedOk = false): string[] {
   const ids: string[] = [];
   for (let index = 0; index < state.seatCount; index += 1) {
     for (const enemyId of state.seats[index]?.engaged ?? []) {
-      if (canAttack(state, seat, attackerId, enemyId, cards)) ids.push(enemyId);
+      if (canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk)) ids.push(enemyId);
     }
   }
   return ids;
@@ -172,12 +174,29 @@ export function applyPlayerAttack(
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
   let next = state;
+  for (const attackerId of attackerIds) {
+    if (next.cards[attackerId]) next = updateCard(next, attackerId, { exhausted: true });
+  }
+  return strikeEnemy(next, seat, enemyId, attackerIds, ctx, steps);
+}
+
+// The attackers' strength against the enemy's defense, as combat damage. The attackers are already exhausted: a player
+// attack exhausts them when it is declared, and Quick Strike when it is paid for.
+export function strikeEnemy(
+  state: ScenarioState,
+  seat: number,
+  enemyId: string,
+  attackerIds: readonly string[],
+  ctx: ReduceContext,
+  steps: EngineStep[],
+): ScenarioState {
+  const enemy = state.cards[enemyId];
+  if (!enemy) return state;
+  const next = state;
   let attack = 0;
   for (const attackerId of attackerIds) {
     const attacker = next.cards[attackerId];
-    if (!attacker) continue;
-    attack += modifiedStat(next, attacker, "attack", ctx.cards);
-    next = updateCard(next, attackerId, { exhausted: true });
+    if (attacker) attack += modifiedStat(next, attacker, "attack", ctx.cards, enemyId);
   }
   const defense = modifiedStat(next, enemy, "defense", ctx.cards);
   steps.push({ kind: "attack", side: "player", seat, enemyId });

@@ -82,7 +82,7 @@ describe("catalog boundary", () => {
   });
 
   it("rejects an amount on an instruction", () => {
-    expect(instructionSchema.safeParse({ verb: "Draw", amount: 1 }).success).toBe(false);
+    expect(instructionSchema.safeParse({ verb: "PayCost", amount: 1 }).success).toBe(false);
   });
 
   it("accepts a strict cost with a kind", () => {

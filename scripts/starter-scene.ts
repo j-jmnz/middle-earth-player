@@ -1,8 +1,11 @@
 import type { ScenarioDefinition } from "../src/catalog/boundary.ts";
 import { loadCampaign } from "./data/load-scenarios.ts";
 import { type PrintedCard, definePrinted } from "../src/rules/printed.ts";
+import { playCost } from "../src/rules/attach.ts";
 import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
+import { updateCard } from "../src/rules/state.ts";
 
+import { paymentsFor } from "./auto-player.ts";
 import { sceneCards } from "./test-scene.ts";
 import { loadPrinted } from "./test-catalog.ts";
 
@@ -26,4 +29,20 @@ export async function starterBase(): Promise<{ definition: ScenarioDefinition; c
 export function refusal(state: ScenarioState, intent: PlayerIntent, ctx: ReduceContext): string | null {
   const result = reduce(state, intent, ctx);
   return result.ok ? null : result.reason;
+}
+
+// Resources enough to play a card, taken from the heroes that can pay for it.
+export function payFor(state: ScenarioState, ctx: ReduceContext, cardId: string, seat = 0): { heroId: string; amount: number }[] {
+  const cost = playCost(state, cardId, seat, ctx);
+  if (cost == null) throw new Error(`${cardId} has no cost`);
+  const paid = paymentsFor(state, ctx, seat, cardId, cost);
+  if (!paid) throw new Error(`Seat ${seat} cannot pay ${cost} for ${cardId}`);
+  return paid;
+}
+
+// Every hero of the seat holds this many resources.
+export function fund(state: ScenarioState, seat: number, resources: number): ScenarioState {
+  let next = state;
+  for (const id of state.seats[seat]?.heroes ?? []) next = updateCard(next, id, { resources });
+  return next;
 }

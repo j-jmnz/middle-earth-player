@@ -171,7 +171,10 @@ describe("static stat modifiers (141013:A:2, 141014:A:2, 01027:A:2, 142004:A:1, 
     const axehand = idsOf(tab, "01028");
     const steps: Parameters<typeof placeDamage>[4] = [];
     const hit = placeDamage(settled, axehand, 9, tab.ctx.cards, steps, "framework", ruleCause("rr.damage"));
-    expect(hit.pendingEvents).toEqual([{ trigger: "characterDestroyed", seat: 0, subject: axehand }]);
+    expect(hit.pendingEvents).toEqual([
+      { trigger: "allyLeftPlay", seat: 0, subject: axehand },
+      { trigger: "characterDestroyed", seat: 0, subject: axehand },
+    ]);
     const after = send(begin(hit), { type: "Pass" }, tab.ctx).state;
     const fellowship = idsOf(tab, FELLOWSHIP);
     expect(after.cards[fellowship]?.zone).toBe("discard");

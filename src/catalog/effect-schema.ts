@@ -47,9 +47,38 @@ export const triggerSchema = z.enum([
   "leftPlay",
   // A hero or ally was destroyed by damage (not discarded, not returned to hand).
   "characterDestroyed",
+  // Heard by the card itself: it was played from the hand, it entered play (played or put into play), it was committed to
+  // the quest, it took damage. `allyLeftPlay` is heard by every card: an ally card left play.
+  "played",
+  "enteredPlay",
+  "committed",
+  "damaged",
+  "allyLeftPlay",
 ]);
 
 const whoSchema = z.enum(["actor", "firstPlayer"]);
+
+// The cards or players a Pick offers. `control` is whose cards: yours, or any player's. `from` is the zone group: in play (the
+// default), the hand, or the discard pile. `state` keeps only ready or only exhausted cards. `different` leaves out cards this
+// effect has already picked. `attackableByPicked` keeps the enemies the last picked character could attack. `type: player` picks a
+// seat that is still in the game.
+export const pickSchema = z.strictObject({
+  type: z.enum(["hero", "ally", "character", "enemy", "location", "player", "card"]),
+  control: z.enum(["you", "any"]),
+  // An enemy in the staging area counts too (an enemy "in play"), not only one engaged with a player.
+  staging: z.boolean().optional(),
+  // A card of this sphere of influence, for a card picked from the hand or a discard pile.
+  sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral"]).optional(),
+  from: z.enum(["play", "hand", "discard"]).optional(),
+  trait: z.string().min(1).optional(),
+  state: z.enum(["ready", "exhausted"]).optional(),
+  different: z.boolean().optional(),
+  attackableByPicked: z.boolean().optional(),
+  // A character that could attack some enemy engaged with a player, whether or not it is exhausted yet.
+  canAttack: z.boolean().optional(),
+  // An ally in a discard pile or the hand whose printed cost is X (Stand and Fight): the amount the effect names.
+  cost: z.number().int().min(0).optional(),
+});
 
 export const conditionSchema = z.discriminatedUnion("kind", [
   // The actor failed a Hide test in the current phase or round.
@@ -75,6 +104,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
+  // Another player is still in the game.
+  z.strictObject({ kind: z.literal("otherPlayer") }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // A card with this code is attached to a hero (`is`) or is not.
@@ -126,6 +157,8 @@ export const costSchema = z.discriminatedUnion("kind", [
     amount: z.number().int().positive(),
     sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
   }),
+  // An event used from the hand: its printed cost is paid, and the card is discarded when the effect is done.
+  z.strictObject({ kind: z.literal("playEvent") }),
 ]);
 
 const modifyStatSchema = z.strictObject({
@@ -138,7 +171,9 @@ const modifyStatSchema = z.strictObject({
   // source is engaged with. `eachSeat` is one holder per living seat.
   // `heroes`, `hobbitCharacters` and `enemies` are every such card in play, for a constant effect. A Hide number
   // held by the table or a seat is read through `per`.
-  target: z.enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies"]).optional(),
+  // `picked` is the card the last Pick chose, `pickedPlayerCharacters` every character the picked player controls, `ownHeroes`
+  // every hero the actor controls: all fixed when the effect resolves.
+  target: z.enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes"]).optional(),
   // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has.
   per: z.enum(["committed", "ally", "hobbitHero"]).optional(),
   ...when,
@@ -147,24 +182,47 @@ const modifyStatSchema = z.strictObject({
 const searchSelector = { code: z.string().min(1).optional(), trait: z.string().min(1).optional() };
 
 const simpleVerbs = [
-  z.strictObject({ verb: z.literal("Draw"), perHero: z.string().min(1).optional(), ...when }),
+  // Draws `amount` cards (one by default), or that many for each Hobbit hero. `who`: the actor, the picked player, or the
+  // seat the event is about.
+  z.strictObject({
+    verb: z.literal("Draw"),
+    perHero: z.string().min(1).optional(),
+    amount: z.number().int().positive().optional(),
+    who: z.enum(["actor", "picked", "eventSeat"]).optional(),
+    ...when,
+  }),
   verb("GainResources"),
   verb("PayCost"),
   verb("PlayAlly"),
   verb("Attach"),
   z.strictObject({
     verb: z.literal("Exhaust"),
-    target: z.strictObject({ kind: z.literal("byCode"), code: z.string().min(1) }).optional(),
+    target: z
+      .discriminatedUnion("kind", [z.strictObject({ kind: z.literal("byCode"), code: z.string().min(1) }), z.strictObject({ kind: z.literal("picked") })])
+      .optional(),
     ...when,
   }),
-  verb("Ready"),
+  // Readies the source (the default), the card it is attached to, the picked card, or every character in play.
+  z.strictObject({ verb: z.literal("Ready"), target: z.enum(["self", "host", "picked", "allCharacters"]).optional(), ...when }),
+  // Chooses a card or a player for the instructions that follow (target "picked"). A choice of one is made without asking.
+  z.strictObject({ verb: z.literal("Pick"), pick: pickSchema, ...when }),
+  // Lowers a threat dial. It stops at 0.
+  z.strictObject({ verb: z.literal("LowerThreat"), amount: z.number().int().positive(), who: z.enum(["actor", "picked", "eachSeat"]), ...when }),
+  // Places damage on the picked card as a player card effect (toughness and immunity apply).
+  z.strictObject({ verb: z.literal("DamageCard"), amount: z.number().int().positive(), ...when }),
+  // Places progress tokens on the picked location, or on every location in the staging area. A full location is explored.
+  z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: z.number().int().positive(), target: z.enum(["picked", "eachStagingLocation"]), ...when }),
+  // Puts the source ally under another player's control.
+  z.strictObject({ verb: z.literal("GiveControl"), ...when }),
+  // The last picked character (the one before it) attacks the last picked enemy. The attacker is already exhausted.
+  z.strictObject({ verb: z.literal("AttackEnemy"), ...when }),
   verb("Commit"),
   verb("RevealStaging"),
   verb("PlaceProgress"),
   z.strictObject({
     verb: z.literal("RaiseThreat"),
     amount: z.number().int().positive().optional(),
-    who: whoSchema.optional(),
+    who: z.enum(["actor", "firstPlayer", "otherPlayer"]).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("Travel"), to: z.literal("self").optional(), ...when }),
@@ -223,8 +281,9 @@ const simpleVerbs = [
   verb("ReadyHero"),
   // Places progress on a non-unique location in play: `perPlayer` for each player in the game.
   z.strictObject({ verb: z.literal("PlaceProgressOnLocation"), perPlayer: z.number().int().positive(), ...when }),
-  // The actor picks an enemy engaged with them. It cannot attack them until the end of the round.
-  verb("BarAttack"),
+  // The actor picks an enemy engaged with them. It cannot attack them until the end of the round. With `any` the enemy may be
+  // engaged with any player and cannot attack that player until `until` (the end of the phase by default).
+  z.strictObject({ verb: z.literal("BarAttack"), scope: z.enum(["own", "any"]).optional(), until: z.enum(["endOfPhase", "endOfRound"]).optional(), ...when }),
   // Constants: a rule the engine checks while the source is in play.
   z.strictObject({
     verb: z.literal("Restrict"),
@@ -370,6 +429,7 @@ export const effectSchema = z.strictObject({
 export type Instruction = z.infer<typeof instructionSchema>;
 export type SimpleInstruction = z.infer<typeof simpleInstructionSchema>;
 export type Condition = z.infer<typeof conditionSchema>;
+export type PickSpec = z.infer<typeof pickSchema>;
 export type Target = z.infer<typeof targetSchema>;
 export type Trigger = z.infer<typeof triggerSchema>;
 export type Timing = z.infer<typeof timingSchema>;

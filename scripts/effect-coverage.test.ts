@@ -26,9 +26,8 @@ const PLAYABLE = ["a-shadow-of-the-past"];
 // Phase 9: both starter decks are fully automated once their batches are in. A line still listed here is waiting for its batch.
 const STARTER_PENDING: Readonly<Record<string, string>> = Object.fromEntries(
   Object.entries({
-    2: "01014:A:1 01020:A:1 01021:A:1 01024:A:1 01025:A:1 01026:A:3 01034:A:1 01035:A:1 01043:A:1 01046:A:1 01062:A:1 141009:A:1 141012:A:1 142004:A:2 01073:A:2 01016:A:1 01045:A:1",
     3: "01048:A:1 01050:A:1 01060:A:1 142003:A:2 142006:A:1",
-    4: "01023:A:1 01051:A:1 01053:A:1 141016:A:1 141016:A:2 01059:A:1 01057:A:2 01031:A:1 01073:A:1 142003:A:1",
+    4: "01023:A:1 01051:A:1 01053:A:1 141016:A:1 141016:A:2 01059:A:1 01031:A:1",
     5: "01002:A:1 01007:A:1 141002:A:1 141003:A:2 141004:A:2 142002:A:1 142008:A:2 142009:A:2 142007:A:1",
   }).flatMap(([batch, ids]) => ids.split(" ").map((id) => [id, `phase 9 batch ${batch}`] as const)),
 );

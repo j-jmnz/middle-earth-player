@@ -66,7 +66,17 @@ export type EffectData = {
   wait: EffectWait | null;
   // The window to open again when the effect is done (an Action used in a pass window).
   resume?: { window: Window; seat: number } | null;
+  // The cards and players (as "seat:N") the Pick instructions chose so far, oldest first. "" is a pick with nothing to choose.
+  picked?: readonly string[];
+  // An event played from the hand: when the effect is done the card goes to its owner's discard pile.
+  finish?: "discardSource";
+  // The seat the event that offered this Response happened to.
+  eventSeat?: number | null;
 };
+
+// A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
+// window was open.
+export type ResumeData = { kind: "resume"; window: Window; seat: number; passed: readonly number[] };
 
 export type HideData = {
   kind: "hide";
@@ -86,6 +96,7 @@ export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string;
 export type ResponseOffer = { cardId: string; effectId: string; seat: number };
 
 export type FrameData =
+  | ResumeData
   | { kind: "event"; event: GameEvent }
   | { kind: "responses"; event: GameEvent; offers: readonly ResponseOffer[] }
   | { kind: "none" }

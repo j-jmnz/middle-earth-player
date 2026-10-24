@@ -1,6 +1,7 @@
 // Rules: rr.limits (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
 
+import { playCost } from "./attach.ts";
 import type { EngineStep, Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard } from "./keywords.ts";
@@ -57,6 +58,10 @@ export function usable(state: ScenarioState, effect: Effect, sourceId: string, s
       return inPlay(source.zone);
     case "resources":
       return pool(state, seat, costSphere(effect, source, ctx), ctx) >= cost.amount;
+    case "playEvent": {
+      const price = playCost(state, sourceId, seat, ctx);
+      return price != null && pool(state, seat, printedOf(ctx.cards, source.code).sphere, ctx) >= price;
+    }
   }
 }
 
@@ -73,6 +78,11 @@ export function usageReason(
   if (!source) return "That effect cannot be triggered";
   if (limitSpent(state, effect, sourceId)) return "That effect has already been used";
   const cost = effect.cost;
+  if (cost?.kind === "playEvent") {
+    const price = playCost(state, sourceId, seat, ctx);
+    if (price == null) return "That card has no printed cost";
+    return validatePayments(state, payments, { seat, sphere: printedOf(ctx.cards, source.code).sphere, amount: price }, ctx);
+  }
   if (cost?.kind !== "resources") {
     if (payments.length > 0) return "That effect has no resource cost";
     return usable(state, effect, sourceId, seat, ctx) ? null : "That cost cannot be paid";
@@ -102,6 +112,7 @@ export function payUsage(
       next = destroyCard(next, sourceId, ctx.cards, steps);
       break;
     case "resources":
+    case "playEvent":
       for (const payment of payments) {
         const hero = next.cards[payment.heroId];
         if (hero) next = updateCard(next, payment.heroId, { resources: hero.resources - payment.amount });

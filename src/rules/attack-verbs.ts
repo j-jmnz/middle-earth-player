@@ -1,6 +1,9 @@
 import type { Instruction } from "../catalog/boundary.ts";
 
+import { characters } from "./combat.ts";
 import type { EngineStep } from "./intents.ts";
+import type { ReduceContext } from "./interpret.ts";
+import { lastPicked, seatOf } from "./player-verbs.ts";
 import { addModifier } from "./keywords.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats } from "./state.ts";
@@ -31,13 +34,37 @@ export function runAttackVerb(state: ScenarioState, instruction: Instruction, fo
   }
 }
 
-// A stat change goes on the source card, or on the attacker while an enemy attack is in progress.
+// A stat change goes on the source card, on the attacker while an enemy attack is in progress, or on the cards a Pick
+// chose or the seat it names. A lasting effect from a player card holds for the cards in play when it resolves
+// (rr.lasting-effects), so each card gets its own record.
 export function modifyStat(
   state: ScenarioState,
   instruction: Extract<Instruction, { verb: "ModifyStat" }>,
-  sourceId: string | null,
+  focus: VerbFocus,
+  ctx: ReduceContext,
 ): ScenarioState {
-  const target = instruction.target === "attacker" ? state.pendingAttack?.enemyId : sourceId;
-  if (!target || !sourceId) return state;
-  return addModifier(state, target, sourceId, instruction.stat, instruction.amount, instruction.until);
+  const sourceId = focus.sourceId;
+  if (!sourceId) return state;
+  let targets: string[];
+  switch (instruction.target) {
+    case "attacker":
+      targets = state.pendingAttack ? [state.pendingAttack.enemyId] : [];
+      break;
+    case "picked":
+      targets = [lastPicked(state)];
+      break;
+    case "pickedPlayerCharacters": {
+      const seat = seatOf(lastPicked(state));
+      targets = seat == null ? [] : characters(state, seat, ctx.cards);
+      break;
+    }
+    case "ownHeroes":
+      targets = [...(state.seats[focus.seat]?.heroes ?? [])];
+      break;
+    default:
+      targets = [sourceId];
+  }
+  let next = state;
+  for (const id of targets) next = addModifier(next, id, sourceId, instruction.stat, instruction.amount, instruction.until);
+  return next;
 }

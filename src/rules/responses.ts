@@ -21,12 +21,16 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
   );
   for (const instance of cards) {
     // An event about one card is heard by that card even after it has left play.
-    if (event.cardId != null ? instance.id !== event.cardId : !inPlay(instance.zone)) continue;
+    // An event card in the hand hears every event; a card in play hears the events about itself or about the table.
+    const inHand = instance.zone === "hand";
+    if (event.cardId != null ? instance.id !== event.cardId : !(inPlay(instance.zone) || inHand)) continue;
     const seat = controllerSeat(state, instance);
     // Peril: the other seats cannot trigger Responses while the card resolves.
     if (!order.includes(seat) || (state.perilSeat != null && seat !== state.perilSeat)) continue;
     for (const effect of ctx.effects) {
       if (effect.timing !== "response" || effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;
+      // Only an event used from the hand has a Response there.
+      if (inHand !== (effect.cost?.kind === "playEvent")) continue;
       const scope = { actor: seat, sourceId: instance.id, returned: 0 };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       if (!usable(state, effect, instance.id, seat, ctx)) continue;
@@ -105,6 +109,8 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
       cancel: null,
       blockCancel: null,
       cause: effectCause(effect),
+      eventSeat: frame.data.event.seat,
+      ...(effect.cost?.kind === "playEvent" ? { finish: "discardSource" as const } : {}),
     },
     steps,
   );

@@ -18,7 +18,8 @@ describe("golden: A Shadow of the Past with a starter deck", () => {
       for (const seed of STARTER_SEEDS) {
         const { run } = playStarter(deck.id, seed, ctx);
         expect(run.state.failure).toBeNull();
-        expect(run.state.stack).toEqual([]);
+        // A lost game can end inside an effect.
+        if (!run.state.lost) expect(run.state.stack).toEqual([]);
         out.push({ seed, intents: run.intents, state: run.state });
       }
       const file = new URL(`./golden/starter-${deck.id}.json`, import.meta.url).pathname;

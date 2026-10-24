@@ -39,6 +39,8 @@ export function modeAfterPass(mode: ModeName): ModeName {
       return "questCommit";
     case "questCommit":
       return "staging";
+    case "combatActions":
+      return "enemyAttacks";
     case "endRound":
       return "beginRound";
     default:
