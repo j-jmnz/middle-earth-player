@@ -1,5 +1,5 @@
 import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, encounterCodes, recordInstructions, scenarioDefinition, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, encounterCodes, recordInstructions, scenarioDefinition, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { StartScenario, StartSeat } from "../rules/setup.ts";
 
 export type StartInput = {
@@ -9,6 +9,8 @@ export type StartInput = {
   seed: number;
   threatModifier: number;
   seats: readonly StartSeat[];
+  // The encounter deck size the booklet prints for the difficulty. Normal when absent.
+  difficulty?: Difficulty;
   // The effect records. The campaign card's Setup and Resolution records are read from them.
   effects?: readonly Effect[];
   // Cards the campaign pool shuffles into the encounter deck (Campaign Setup Checklist step 8).
@@ -43,7 +45,7 @@ export function buildStart(input: StartInput): StartScenario {
       ],
     },
     seats: input.seats,
-    encounterDeck: [...encounterCodes(input.scenario), ...shuffledIn, ...(input.poolEncounterCards ?? [])],
+    encounterDeck: [...encounterCodes(input.scenario, input.difficulty), ...shuffledIn, ...(input.poolEncounterCards ?? [])],
     questDeck: input.scenario.stages,
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
   };

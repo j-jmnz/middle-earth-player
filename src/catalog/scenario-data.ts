@@ -109,8 +109,13 @@ export function normalCopiesByCode(data: ScenarioData): Map<string, number> {
   return totals;
 }
 
-export function encounterCodes(data: ScenarioData): string[] {
-  return data.cards.filter((card) => card.pile === "encounter").flatMap((card) => Array.from({ length: card.normal }, () => card.code));
+export type Difficulty = "Easy" | "Normal";
+
+// The encounter deck at a difficulty. Easy drops the cards the booklet marks (the `easy` count of each placement).
+export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Normal"): string[] {
+  return data.cards
+    .filter((card) => card.pile === "encounter")
+    .flatMap((card) => Array.from({ length: difficulty === "Easy" ? card.easy : card.normal }, () => card.code));
 }
 
 const SETUP_VERB = {

@@ -38,6 +38,12 @@ export const cards = sqliteTable("cards", {
   quest: integer("quest"),
   victory: integer("victory"),
   engagementCost: integer("engagement_cost"),
+  // The encounter set a card belongs to, and the campaign-card facts the engine reads (boon or burden, its burden set,
+  // and the deck it joins when it is in the campaign pool).
+  encounterSet: text("encounter_set"),
+  campaignKind: text("campaign_kind"),
+  burdenSet: text("burden_set"),
+  backType: text("back_type"),
   // Null until the card's keywords have been read. An empty object means none.
   keywords: text("keywords", { mode: "json" }).$type<PrintedKeywords>(),
   text: text("text"),

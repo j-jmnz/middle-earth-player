@@ -19,6 +19,8 @@ export type CampaignLog = {
   // The heroes the players named as captives in the Notes, by seat.
   captives: readonly { seat: number; hero: string }[];
   completed: readonly string[];
+  // The codes each won scenario's Resolution recorded, by scenario id: what the path shows on a completed node.
+  earned: Readonly<Record<string, readonly string[]>>;
   scenarios: Readonly<Record<string, ScenarioScore>>;
   // The campaign total: the sum of the scenario scores. Lower is better.
   score: number;
@@ -27,7 +29,7 @@ export type CampaignLog = {
 
 export function emptyLog(seatCount: number): CampaignLog {
   const seats = Array.from({ length: seatCount }, () => [] as readonly string[]);
-  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], scenarios: {}, score: 0, notes: "" };
+  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "" };
 }
 
 function ringBearerOf(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): string | null {
@@ -73,6 +75,7 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     campaignPool: pool,
     captives: [...log.captives, ...result.captives],
     completed: [...log.completed, scenarioId],
+    earned: { ...log.earned, [scenarioId]: result.earned.map((item) => item.code) },
     scenarios,
     score: Object.values(scenarios).reduce((sum, item) => sum + item.score, 0),
     notes: log.notes,

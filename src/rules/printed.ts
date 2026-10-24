@@ -1,5 +1,12 @@
 import type { Card } from "../catalog/card-facts.ts";
 
+// The part of a data/cards record the engine reads. A catalog row maps onto it (src/campaign/cards.ts).
+export type PrintedSource = Pick<
+  Card,
+  | "code" | "name" | "type" | "traits" | "sphere" | "cost" | "threat" | "willpower" | "attack" | "defense" | "health"
+  | "questPoints" | "victory" | "isUnique" | "engagementCost" | "keywords" | "campaignKind" | "burdenSet" | "backType"
+>;
+
 export type Sphere = "leadership" | "tactics" | "spirit" | "lore" | "neutral" | "fellowship" | "baggins";
 
 export type CardType =
@@ -128,7 +135,7 @@ const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", 
 const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"];
 
 // The engine-facing subset of a data/cards record. A type or sphere the engine does not know fails loudly.
-export function printedFromCard(card: Card): PrintedCard {
+export function printedFromCard(card: PrintedSource): PrintedCard {
   const type = CARD_TYPES.find((candidate) => candidate === card.type);
   if (!type) throw new Error(`Card ${card.code} ${card.name} has unsupported type ${card.type}`);
   let sphere: Sphere | null = null;
