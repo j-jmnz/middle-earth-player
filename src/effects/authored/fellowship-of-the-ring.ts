@@ -34,6 +34,63 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 141079 The Ring Draws Them
   {"id":"141079:whenRevealed:1","cardCode":"141079","lines":["141079:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Delay","until":"endOfPhase","uncancelable":{"kind":"exhausted","code":"141085","is":true},"instructions":[{"verb":"EngageAll","who":"firstPlayer"}]}]},
 
+  // A Knife in the Dark (scenario 2). "Out of play" Ringwraiths are the copies the stage 1 Setup set aside (setAside condition).
+  // 141025 Trouble in Bree. The Setup record describes what the scenario's piles already place (setAside, staging) and the
+  // shuffle buildStart appends; the definition runs those, not this record, so nothing is placed twice. Its SetAside order is the
+  // piles' order (Weathertop, Midgewater, The Witch-king, Ringwraith), so the record stays a subsequence of what runs.
+  {"id":"141025:setup:1","cardCode":"141025","lines":["141025:A:1"],"timing":"setup","instructions":[{"verb":"SetAside","code":"141046"},{"verb":"SetAside","code":"141048"},{"verb":"SetAside","code":"141068"},{"verb":"SetAside","code":"141069"},{"verb":"AddToStaging","code":"141045"},{"verb":"AddToStaging","code":"141051"},{"verb":"ShuffleEncounterDeck"}]},
+  {"id":"141025:constant:1","cardCode":"141025","lines":["141025:B:1"],"timing":"constant","condition":{"kind":"inPlay","code":"141045","is":true},"instructions":[{"verb":"Restrict","what":"advance"}]},
+  // 141026 Into the Wild
+  {"id":"141026:whenRevealed:1","cardCode":"141026","lines":["141026:B:1"],"timing":"whenRevealed","instructions":[{"verb":"AddSetAsideToStaging","code":"141048"},{"verb":"PlaceQuestProgress","perPlayer":1}]},
+  {"id":"141026:forced:1","cardCode":"141026","lines":["141026:B:2"],"timing":"forced","trigger":"endOfRound","instructions":[{"verb":"Choose","who":"firstPlayer","options":[{"id":"progress","requires":{"kind":"questProgress"},"instructions":[{"verb":"RemoveQuestProgress","perPlayer":1}]},{"id":"ringwraith","requires":{"kind":"setAside","code":"141069"},"instructions":[{"verb":"ShuffleSetAsideIntoEncounterDeck","code":"141069"}]}]}]},
+  {"id":"141026:constant:1","cardCode":"141026","lines":["141026:B:3"],"timing":"constant","condition":{"kind":"inPlay","code":"141048","is":true},"instructions":[{"verb":"Restrict","what":"advance"}]},
+  // 141027 The Ringwraiths Attack. Set-aside Ringwraiths stay set aside: the search reads the encounter deck and discard pile.
+  {"id":"141027:whenRevealed:1","cardCode":"141027","lines":["141027:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AddSetAsideToStaging","code":"141046"},{"verb":"AddSetAsideToStaging","code":"141068"},{"verb":"SearchMove","trait":"Nazgûl","type":"enemy","to":"staging","each":true},{"verb":"ShuffleEncounterDeck"}]},
+  {"id":"141027:constant:1","cardCode":"141027","lines":["141027:B:1"],"timing":"constant","condition":{"kind":"enemyInPlay","trait":"Nazgûl","is":false},"instructions":[{"verb":"WinGame"}]},
+  // 141045 The Prancing Pony
+  {"id":"141045:response:1","cardCode":"141045","lines":["141045:A:1"],"timing":"response","trigger":"traveled","instructions":[{"verb":"Pick","pick":{"type":"ally","control":"you","from":"hand","intoPlay":true,"who":"firstPlayer"}},{"verb":"MovePicked","to":"play","who":"firstPlayer"}]},
+  {"id":"141045:forced:1","cardCode":"141045","lines":["141045:A:2"],"timing":"forced","trigger":"leftPlay","instructions":[{"verb":"DiscardUntilEnemies","perPlayer":1}]},
+  // 141046 Weathertop (line 1 is the immune keyword)
+  {"id":"141046:constant:1","cardCode":"141046","lines":["141046:A:2"],"timing":"constant","condition":{"kind":"sourceIn","zone":"victory"},"instructions":[{"verb":"ModifyStat","stat":"threat","amount":-1,"until":"whileSourceInPlay","target":"enemies"}]},
+  {"id":"141046:travel:1","cardCode":"141046","lines":["141046:A:3"],"timing":"travel","instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":"141085"}}]},
+  // 141047 Chetwood
+  {"id":"141047:constant:1","cardCode":"141047","lines":["141047:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"staging"},"instructions":[{"verb":"ModifyStat","stat":"threat","amount":1,"until":"whileSourceInPlay","target":"enemies","trait":"Spy"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"enemies","trait":"Spy"}]},
+  {"id":"141047:shadow:1","cardCode":"141047","lines":["141047:A:2"],"timing":"shadow","instructions":[{"verb":"DiscardRandomFromHand"}]},
+  // 141048 Midgewater
+  {"id":"141048:constant:1","cardCode":"141048","lines":["141048:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"activeLocation"},"instructions":[{"verb":"ModifyStat","stat":"cannotAttack","amount":1,"until":"whileSourceInPlay","target":"enemies"},{"verb":"ModifyStat","stat":"cannotTakeDamage","amount":1,"until":"whileSourceInPlay","target":"enemies"},{"verb":"ModifyStat","stat":"cannotBeEngaged","amount":1,"until":"whileSourceInPlay","target":"enemies"}]},
+  {"id":"141048:forced:1","cardCode":"141048","lines":["141048:A:2"],"timing":"forced","trigger":"becameActive","instructions":[{"verb":"ReturnToStaging","target":{"kind":"engagedEnemies","who":"each","pick":"all"}}]},
+  // 141049 Weather Hills
+  {"id":"141049:response:1","cardCode":"141049","lines":["141049:A:1"],"timing":"response","trigger":"traveled","instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true}},{"verb":"PlaceUnderSelf"}]},
+  {"id":"141049:forced:1","cardCode":"141049","lines":["141049:A:2"],"timing":"forced","trigger":"leftPlay","instructions":[{"verb":"ReturnUnderToStaging"}]},
+  // 141050 Rider of Mordor (line 1 is the generated 141050:constant:1)
+  {"id":"141050:constant:2","cardCode":"141050","lines":["141050:A:2"],"timing":"constant","condition":{"kind":"sourceIn","zone":"engaged"},"instructions":[{"verb":"ModifyStat","stat":"willpower","amount":-1,"until":"whileSourceInPlay","target":"engagedSeatCharacters"}]},
+  {"id":"141050:constant:3","cardCode":"141050","lines":["141050:A:3"],"timing":"constant","condition":{"kind":"exhausted","code":"141085","is":true},"instructions":[{"verb":"ModifyStat","stat":"engagementCost","amount":-10,"until":"whileSourceInPlay"}]},
+  // 141051 Bill Ferny. The first player makes the players' choice on an encounter card.
+  {"id":"141051:constant:1","cardCode":"141051","lines":["141051:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotBeOptionallyEngaged","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"141051:forced:1","cardCode":"141051","lines":["141051:A:2"],"timing":"forced","trigger":"stagingStepBegins","instructions":[{"verb":"Choose","who":"firstPlayer","options":[{"id":"ringwraith","requires":{"kind":"setAside","code":"141069"},"instructions":[{"verb":"ShuffleSetAsideIntoEncounterDeck","code":"141069"}]},{"id":"threat","requires":{"kind":"canPick","pick":{"type":"hero","control":"any","committed":true,"exceptSphere":"fellowship"}},"instructions":[{"verb":"RaiseThreat","who":"eachSeat","perCommitted":{"type":"hero","exceptSphere":"fellowship"}}]}]}]},
+  // 141052 Shady Bree-Lander
+  {"id":"141052:constant:1","cardCode":"141052","lines":["141052:A:1"],"timing":"constant","condition":{"kind":"exhausted","code":"141085","is":true},"instructions":[{"verb":"ModifyStat","stat":"cannotBeOptionallyEngaged","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"141052:shadow:1","cardCode":"141052","lines":["141052:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"defense","amount":-1,"until":"endOfAttack","target":"defender"},{"verb":"ModifyStat","stat":"defense","amount":-1,"until":"endOfAttack","target":"defender","when":{"kind":"exhausted","code":"141085","is":true}}]},
+  // 141053 Squint-Eyed Southerner. "Reveal an additional encounter card" is surge (rr.surge).
+  {"id":"141053:whenRevealed:1","cardCode":"141053","lines":["141053:A:1"],"timing":"whenRevealed","instructions":[{"verb":"Choose","who":"actor","options":[{"id":"ringwraith","requires":{"kind":"setAside","code":"141069"},"instructions":[{"verb":"ShuffleSetAsideIntoEncounterDeck","code":"141069"}]},{"id":"reveal","instructions":[{"verb":"GainSurge"}]}]}]},
+  // 141054 Unwanted Attention (line 1 is Peril, line 3 the generated shadow record)
+  {"id":"141054:whenRevealed:1","cardCode":"141054","lines":["141054:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Choose","who":"actor","options":[{"id":"heroes","requires":{"kind":"canPick","pick":{"type":"hero","control":"you","committed":true}},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you","committed":true}},{"verb":"RemoveFromQuest"},{"verb":"Pick","pick":{"type":"hero","control":"you","committed":true}},{"verb":"RemoveFromQuest"}]},{"id":"ringwraith","requires":{"kind":"setAside","code":"141069"},"instructions":[{"verb":"ShuffleSetAsideIntoEncounterDeck","code":"141069"}]}]}]},
+  // 141055 Black Breath. AttachSelf offers only heroes without a copy attached (Limit 1 per hero).
+  {"id":"141055:whenRevealed:1","cardCode":"141055","lines":["141055:A:2"],"timing":"whenRevealed","instructions":[{"verb":"AttachSelf","to":{"kind":"hero"}}]},
+  {"id":"141055:constant:1","cardCode":"141055","lines":["141055:A:2"],"timing":"constant","instructions":[{"verb":"SetStat","stat":"willpower","value":0,"target":"host"},{"verb":"SetStat","stat":"attack","value":0,"target":"host"},{"verb":"SetStat","stat":"defense","value":0,"target":"host"}]},
+  // 141068 The Witch-king (line 1 is the immune keyword)
+  {"id":"141068:constant:1","cardCode":"141068","lines":["141068:A:2"],"timing":"constant","condition":{"kind":"exhausted","code":"141085","is":true},"instructions":[{"verb":"ModifyStat","stat":"engagementCost","amount":-30,"until":"whileSourceInPlay"}]},
+  {"id":"141068:constant:2","cardCode":"141068","lines":["141068:A:3"],"timing":"constant","instructions":[{"verb":"Restrict","what":"defend","maxWillpower":1}]},
+  // 141069 Ringwraith (line 1 is the generated 141069:constant:1)
+  {"id":"141069:forced:1","cardCode":"141069","lines":["141069:A:2"],"timing":"forced","trigger":"attacks","condition":{"kind":"exhausted","code":"141085","is":true},"instructions":[{"verb":"DealShadow","additional":true}]},
+  {"id":"141069:shadow:1","cardCode":"141069","lines":["141069:A:3"],"timing":"shadow","instructions":[{"verb":"ShuffleSelfIntoEncounterDeck"}]},
+  // 141070 Pale Blade (line 1 is Surge). AttachSelf offers only enemies without a copy attached (Limit 1 per enemy).
+  {"id":"141070:whenRevealed:1","cardCode":"141070","lines":["141070:A:2"],"timing":"whenRevealed","instructions":[{"verb":"AttachSelf","to":{"kind":"enemy","trait":"Nazgûl"}}]},
+  {"id":"141070:constant:1","cardCode":"141070","lines":["141070:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"cannotTakeNonCombatDamage","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  // 141071 Power In Their Terror. An encounter card's lasting effect also holds for allies that enter play later (rr.lasting-effects).
+  {"id":"141071:whenRevealed:1","cardCode":"141071","lines":["141071:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":-1,"until":"endOfRound","target":"allies"},{"verb":"DamageAll","amount":2,"type":"ally","maxWillpower":0}]},
+  {"id":"141071:shadow:1","cardCode":"141071","lines":["141071:A:2"],"timing":"shadow","instructions":[{"verb":"Pick","pick":{"type":"attachment","control":"you"}},{"verb":"DiscardPicked"}]},
+
   // Campaign cards: the Setup on the front and the Resolution on the back (Learn to Play p29, Rules Reference Appendix III).
   // 141030 A Shadow of the Past
   {"id":"141030:campaignSetup:1","cardCode":"141030","lines":["141030:A:2"],"timing":"campaignSetup","instructions":[{"verb":"AttachToRingBearer","code":"141017"},{"verb":"AddToStaging","code":"141078"},{"verb":"ShuffleIntoEncounterDeck","code":"141077"},{"verb":"ShuffleIntoEncounterDeck","code":"141079"}]},
