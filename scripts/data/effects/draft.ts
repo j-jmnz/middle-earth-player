@@ -11,21 +11,11 @@ import { loadLedger } from "../printed/ledger.ts";
 import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
 import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, type Unmatched } from "./generate.ts";
+import { vocabulary } from "./vocabulary.ts";
 
 // Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id>
 // Writes .agent/drafts/<code>.md for every card in the scenario, or in the starter deck, that has a printed line no record covers yet.
 // With --all it also drafts the lines that authored records already cover, to review or redo them.
-
-function vocabulary(): { verbs: string[]; conditions: string[]; targets: string[]; triggers: string[] } {
-  const source = readFileSync(path.join(ROOT, "src", "catalog", "effect-schema.ts"), "utf8");
-  const found = (pattern: RegExp) => [...new Set([...source.matchAll(pattern)].map((match) => match[1] ?? ""))].sort();
-  return {
-    verbs: found(/verb: z\.literal\("(\w+)"\)/g),
-    conditions: found(/kind: z\.literal\("(\w+)"\)/g),
-    targets: found(/target: z\.literal\("(\w+)"\)/g),
-    triggers: [...(/const triggerSchema = z\.enum\(\[([^\]]+)\]/.exec(source)?.[1] ?? "").matchAll(/"(\w+)"/g)].map((match) => match[1] ?? ""),
-  };
-}
 
 function words(text: string): Set<string> {
   return new Set(text.toLowerCase().match(/[a-z]{4,}/g) ?? []);
@@ -95,6 +85,11 @@ function main(): void {
       `Verbs: ${vocab.verbs.join(", ")}`,
       `Conditions: ${vocab.conditions.join(", ")}`,
       `Triggers: ${vocab.triggers.join(", ")}`,
+      `Timings: ${vocab.timings.join(", ")}`,
+      `Costs: ${vocab.costs.join(", ")}`,
+      `ModifyStat stats: ${vocab.stats.join(", ")}`,
+      `ModifyStat targets: ${vocab.statTargets.join(", ")}`,
+      `ModifyStat durations: ${vocab.durations.join(", ")}`,
       ``,
       `## The three most similar existing records`,
     );
