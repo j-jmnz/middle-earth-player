@@ -127,7 +127,8 @@ export function runInstruction(
 
 export function drawOpeningHand(state: ScenarioState, seat: number, steps: EngineStep[]): ScenarioState {
   let next = state;
-  for (let draw = 0; draw < 6; draw += 1) next = drawOne(next, seat, steps);
+  const count = Math.max(0, 6 - state.openingHandReduction);
+  for (let draw = 0; draw < count; draw += 1) next = drawOne(next, seat, steps);
   return next;
 }
 

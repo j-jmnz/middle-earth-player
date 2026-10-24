@@ -4,7 +4,7 @@ import type { EngineStep } from "./intents.ts";
 import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
-import { searchSetup } from "./setup-search.ts";
+import { handSetup, searchSetup } from "./setup-search.ts";
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
 import { cloneGame } from "./undo.ts";
 import { moveCard, spawn } from "./zones.ts";
@@ -52,6 +52,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   }
   const quiet: EngineStep[] = [];
   state = searchSetup(state, "player", ctx, quiet);
+  state = handSetup(state, ctx, quiet);
   for (const seat of livingSeats(state)) state = drawOpeningHand(state, seat, quiet);
   state = {
     ...withMode(state, "mulligan"),

@@ -160,6 +160,8 @@ const simpleVerbs = [
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal.
   codeVerb("AddSetAsideToStaging"),
   verb("ShuffleEncounterDeck"),
+  // Setup: each player draws this many fewer cards in the starting hand (and in a mulligan redraw).
+  z.strictObject({ verb: z.literal("ReduceOpeningHand"), amount: z.number().int().positive(), ...when }),
   // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles.
   z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, ...when }),
   // Finds a card in the encounter deck or discard pile and reveals it.

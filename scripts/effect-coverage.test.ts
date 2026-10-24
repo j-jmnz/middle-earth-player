@@ -23,9 +23,7 @@ const AUTHORED = new Set(["setup", "forced", "triggered", "whenRevealed", "shado
 const LATER: Readonly<Record<string, string>> = {};
 
 // A timing whose record is held back on purpose. The case fails with this message until a citation exists.
-const HELD: Readonly<Record<string, string>> = {
-  "141078 setup #2": "141078 Gandalf's Delay: its second Setup sentence stays unauthored until the quest card or Learn to Play pages 28-30 is cited",
-};
+const HELD: Readonly<Record<string, string>> = {};
 
 const LABELS: Readonly<Record<string, string>> = {
   Setup: "setup",

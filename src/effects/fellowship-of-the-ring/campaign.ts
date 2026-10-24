@@ -47,8 +47,10 @@ export const CAMPAIGN_EFFECTS: readonly Effect[] = [
     cancel: { cost: 1, sphere: "fellowship" },
     instructions: [{ verb: "Discard", target: { kind: "self" } }],
   },
-  // 141078 Gandalf's Delay. Its second printed sentence is not authored: see the coverage test.
+  // 141078 Gandalf's Delay. MEC109 #46 (Gandalf's Delay). Read via Hall of Beorn TFotR printing, 2026-10-24. Confirm on the card.
+  // The second Setup record lowers every opening hand by one. The engine applies it before the hand is drawn.
   { id: "141078:setup:1", cardCode: "141078", timing: "setup", instructions: [{ verb: "AddToStaging", code: "141078" }] },
+  { id: "141078:setup:2", cardCode: "141078", timing: "setup", instructions: [{ verb: "ReduceOpeningHand", amount: 1 }] },
   // 141079 The Ring Draws Them.
   {
     id: "141079:whenRevealed:1",

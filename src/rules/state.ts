@@ -160,6 +160,8 @@ export type ScenarioState = {
   window: Window | null;
   passed: readonly number[];
   mulliganTaken: boolean;
+  // Cards each player does not draw in the starting hand (a Setup effect). The opening hand and a mulligan draw 6 minus this.
+  openingHandReduction: number;
   mulliganSeats: readonly number[];
   lost: boolean;
   lossReason: string | null;
@@ -272,6 +274,7 @@ export function blankScenario(input: {
     window: null,
     passed: [],
     mulliganTaken: false,
+    openingHandReduction: 0,
     mulliganSeats: [],
     lost: false,
     lossReason: null,

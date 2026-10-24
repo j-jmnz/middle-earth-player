@@ -61,6 +61,8 @@ export function runExtraVerb(
       const seat = seatFor(state, instruction.who, focus.seat);
       return updateCard(moveCard(state, focus.sourceId, { zone: "play", seat }), focus.sourceId, { face: "up", exhausted: false });
     }
+    case "ReduceOpeningHand":
+      return { ...state, openingHandReduction: state.openingHandReduction + instruction.amount };
     case "TransferHost":
       return transferHost(state, focus, seatFor(state, instruction.who, focus.seat), steps);
     case "WinGame":

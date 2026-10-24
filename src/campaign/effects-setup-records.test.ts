@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { byCode, expectOk } from "../rules/fixture.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
-import { codesOf, fixture, FRODO, loadWorld, RING, SAM, type World } from "../../scripts/past-scene.ts";
+import { codesOf, fixture, FRODO, loadWorld, MERRY, RING, SAM, type World } from "../../scripts/past-scene.ts";
 import { scriptFor } from "./registry.ts";
 
 let world: World;
@@ -55,11 +55,41 @@ describe("setup records", () => {
 });
 
 describe("Gandalf's Delay", () => {
-  it("141078 Gandalf's Delay: second setup record needs a cited source", () => {
+  const STARTER = Array.from({ length: 14 }, () => "f0");
+  function begin(seed: number, seats: 1 | 2 = 1) {
+    const start = scriptFor("a-shadow-of-the-past").start({
+      fixture,
+      definition: world.definition,
+      seatCount: seats,
+      seed,
+      threatModifier: 0,
+      seats: seats === 1
+        ? [{ heroes: [FRODO, SAM], deck: STARTER }]
+        : [{ heroes: [FRODO, SAM], deck: STARTER }, { heroes: [MERRY], deck: STARTER }],
+    });
+    const ctx: ReduceContext = { effects: EFFECTS, cards: world.cards };
+    return { started: startScenario(start, ctx), ctx };
+  }
+
+  it("has two setup records, the second lowering the starting hand", () => {
     const records = EFFECTS.filter((effect) => effect.cardCode === "141078" && effect.timing === "setup");
-    expect(
-      records.length,
-      "141078 Gandalf's Delay: cite the quest card or Learn to Play pages 28-30, then author its second Setup sentence",
-    ).toBeGreaterThanOrEqual(2);
+    expect(records).toHaveLength(2);
+    expect(records[1]?.instructions).toEqual([{ verb: "ReduceOpeningHand", amount: 1 }]);
+  });
+
+  it("deals every seat a starting hand of five on a fixed seed", () => {
+    for (const seats of [1, 2] as const) {
+      const { started } = begin(11, seats);
+      expect(started.openingHandReduction).toBe(1);
+      for (let seat = 0; seat < seats; seat += 1) expect(started.seats[seat]?.hand, `seat ${seat}`).toHaveLength(5);
+    }
+  });
+
+  it("redraws five on a mulligan and still stages the card once", () => {
+    const { started, ctx } = begin(11);
+    const mulled = expectOk(reduce(started, { type: "Mulligan" }, ctx)).state;
+    expect(mulled.seats[0]?.hand.slice(0, 5)).toHaveLength(5);
+    expect(codesOf(mulled, mulled.staging)).toContain("141078");
+    expect(byCode(mulled, "141078")).toHaveLength(1);
   });
 });

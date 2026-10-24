@@ -17,7 +17,7 @@ Forced effects in the current window run in timestamp order. Responses are offer
 
 Hide, when a card with Hide X is revealed: the revealing seat may exhaust characters it controls to commit them. Discard the top X cards of the encounter deck. Sum committed willpower. Sum the threat of the discarded cards. A treachery adds 0. Then an action window. Then success if willpower is greater than or equal to threat. Then uncommit. The booklet fixture: Hide 3, 2 willpower committed, discarded threat 2 + 2 + 0, an action raises willpower to 4, the test succeeds. Also assert a scripted failure. Hide runs before When Revealed or Forced on that card.
 
-Apply Gandalf's Delay's "draw 1 less" at the timing phase 0 recorded from the quest card and Learn to Play pages 28–30. If that reading is still missing, leave the test red and name the card.
+Gandalf's Delay's "draw 1 less" is the second Setup record (`ReduceOpeningHand`). It applies with player Setup, before the opening hand. See the brief's core round.
 
 Campaign-dealt cards cannot be inactive. That includes encounter cards, quest cards, boons, burdens, and The One Ring. A missing effect id fails coverage, and the scenario stays unplayable. A player card outside the dealt set and outside the later starter gate does not fail this test.
 
@@ -43,4 +43,4 @@ Keep this one phase. Each batch is green before the next starts. Ask `/reviewer`
 
 ## Exit
 
-`vitest` is green, apart from a Gandalf's Delay test that is still red because the quest card and Learn to Play pages 28–30 are not yet cited. Coverage fails if a dealt card has a printed ability and no effect id. The round-trip test matches effect ids in `catalog.db` to the TypeScript records. The CI job builds `catalog.db` when the cached file is missing or older than the payloads, before that test. No table component exists.
+`vitest` is green. Coverage fails if a dealt card has a printed ability and no effect id. The round-trip test matches effect ids in `catalog.db` to the TypeScript records. The CI job builds `catalog.db` when the cached file is missing or older than the payloads, before that test. No table component exists.
