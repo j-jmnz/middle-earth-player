@@ -1,0 +1,255 @@
+import {
+  archeryRecipients,
+  canAttack,
+  canDefend,
+  characters,
+  defenderIds,
+  hasLegalAttack,
+  heroIds,
+  legalAttackEnemies,
+} from "./combat.ts";
+import type { LegalIntent, PlayerIntent, Selection } from "./intents.ts";
+import { suppliesNumber } from "./intents.ts";
+import type { ReduceContext } from "./interpret.ts";
+import { printedOf } from "./printed.ts";
+import { attachmentTargets, playReason } from "./planning.ts";
+import { stagingEnemies, stagingLocations } from "./quest.ts";
+import type { ScenarioState } from "./state.ts";
+import { uniqueBlocked } from "./keywords.ts";
+
+const NUMBER = "The engine computes that number";
+
+export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
+  if (state.lost || state.stageCleared) return [];
+  if (state.seats[state.activeSeat]?.eliminated) return [];
+  const window = state.window;
+  if (!window) return [];
+  switch (window.kind) {
+    case "mulligan":
+      return state.mulliganSeats.includes(state.activeSeat)
+        ? [{ type: "Keep" }]
+        : [{ type: "Keep" }, { type: "Mulligan" }];
+    case "pass":
+      return passIntents(state, ctx);
+    case "travel":
+      return travelIntents(state, ctx);
+    case "optionalEngage":
+      return [{ type: "Engage" }, { type: "DeclineEngage" }];
+    case "chooseEnemy":
+      return [{ type: "ChooseEnemy" }];
+    case "defense":
+      return [{ type: "DeclareDefender" }, { type: "Undefended" }];
+    case "archery":
+      return [{ type: "Distribute", total: window.total }];
+    case "playerAttack":
+      return hasLegalAttack(state, state.activeSeat, ctx.cards)
+        ? [{ type: "DeclareAttackers" }, { type: "DeclineAttack" }]
+        : [{ type: "DeclineAttack" }];
+  }
+}
+
+export function legalTargets(state: ScenarioState, selection: Selection, ctx: ReduceContext): readonly string[] {
+  switch (selection.type) {
+    case "PlayCard":
+      return attachmentTargets(state, state.cards[selection.cardId]?.code, ctx);
+    case "Commit":
+      return committers(state, state.activeSeat, ctx);
+    case "Travel":
+      return state.activeLocation ? [] : stagingLocations(state, ctx.cards);
+    case "Engage":
+      return stagingEnemies(state, ctx.cards);
+    case "ChooseEnemy":
+      return state.window?.kind === "chooseEnemy" ? state.window.options : [];
+    case "DeclareDefender": {
+      const seat = state.pendingAttack?.seat ?? state.activeSeat;
+      return defenderIds(state, seat, ctx.cards);
+    }
+    case "Undefended":
+      return heroIds(state, state.pendingAttack?.seat ?? state.activeSeat);
+    case "DeclareAttackers":
+      return legalAttackEnemies(state, state.activeSeat, selection.cardId, ctx.cards);
+    case "Distribute":
+      return archeryRecipients(state, ctx.cards);
+  }
+}
+
+export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx: ReduceContext): string | null {
+  if (suppliesNumber(intent)) return NUMBER;
+  if (state.lost) return "The game is lost";
+  if (state.seats[state.activeSeat]?.eliminated) return "That seat is eliminated";
+  if (state.perilSeat != null && state.activeSeat !== state.perilSeat) return "Peril: other seats cannot act";
+  switch (intent.type) {
+    case "Keep":
+      return state.window?.kind === "mulligan" ? null : "Mulligan is closed";
+    case "Mulligan":
+      if (state.window?.kind !== "mulligan") return "Mulligan is closed";
+      return state.mulliganSeats.includes(state.activeSeat) ? "A second mulligan is not allowed" : null;
+    case "Pass":
+      return state.window?.kind === "pass" ? null : "That intent is not legal in this window";
+    case "PlayCard":
+      return playReason(state, intent, ctx);
+    case "Commit":
+      return commitReason(state, intent, ctx);
+    case "Travel":
+      return travelReason(state, intent, ctx);
+    case "DeclineTravel":
+      return state.window?.kind === "travel" ? null : "That intent is not legal in this window";
+    case "Engage":
+      return engageReason(state, intent, ctx);
+    case "DeclineEngage":
+      return state.window?.kind === "optionalEngage" ? null : "That intent is not legal in this window";
+    case "ChooseEnemy":
+      return choiceReason(state, intent);
+    case "DeclareDefender":
+      return defenderReason(state, intent, ctx);
+    case "Undefended":
+      return undefendedReason(state, intent);
+    case "DeclareAttackers":
+      return attackReason(state, intent, ctx);
+    case "DeclineAttack":
+      return state.window?.kind === "playerAttack" ? null : "That intent is not legal in this window";
+    case "Distribute":
+      return distributeReason(state, intent, ctx);
+    default:
+      return "That intent is not legal in this window";
+  }
+}
+
+function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
+  const intents: LegalIntent[] = [{ type: "Pass" }];
+  if (state.mode === "planning") {
+    for (const cardId of state.seats[state.activeSeat]?.hand ?? []) {
+      const instance = state.cards[cardId];
+      if (!instance) continue;
+      const printed = printedOf(ctx.cards, instance.code);
+      if (printed.type !== "ally" && printed.type !== "attachment" && printed.type !== "event") continue;
+      if (uniqueBlocked(state, printed, ctx.cards)) continue;
+      intents.push({ type: "PlayCard", cardId });
+    }
+  }
+  if (state.mode === "questCommit") intents.push({ type: "Commit" });
+  return intents;
+}
+
+function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
+  const intents: LegalIntent[] = [{ type: "DeclineTravel" }];
+  if (!state.activeLocation && stagingLocations(state, ctx.cards).length > 0) intents.unshift({ type: "Travel" });
+  return intents;
+}
+
+function committers(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
+  return characters(state, seat, ctx.cards).filter((id) => {
+    const instance = state.cards[id];
+    return instance != null && !instance.exhausted && !instance.committed;
+  });
+}
+
+function commitReason(
+  state: ScenarioState,
+  intent: Extract<PlayerIntent, { type: "Commit" }>,
+  ctx: ReduceContext,
+): string | null {
+  if (state.window?.kind !== "pass" || state.mode !== "questCommit") return "That intent is not legal in this window";
+  if (intent.cardIds.length === 0) return "Commit at least one character";
+  const legal = new Set(committers(state, state.activeSeat, ctx));
+  for (const id of intent.cardIds) {
+    if (!legal.has(id)) return "That character cannot commit";
+  }
+  return null;
+}
+
+function travelReason(
+  state: ScenarioState,
+  intent: Extract<PlayerIntent, { type: "Travel" }>,
+  ctx: ReduceContext,
+): string | null {
+  if (state.window?.kind !== "travel") return "That intent is not legal in this window";
+  if (state.activeLocation) return "An active location is already in play";
+  if (!stagingLocations(state, ctx.cards).includes(intent.locationId)) return "That location is not in staging";
+  return null;
+}
+
+function engageReason(
+  state: ScenarioState,
+  intent: Extract<PlayerIntent, { type: "Engage" }>,
+  ctx: ReduceContext,
+): string | null {
+  if (state.window?.kind !== "optionalEngage") return "That intent is not legal in this window";
+  if (!stagingEnemies(state, ctx.cards).includes(intent.enemyId)) return "That enemy is not in staging";
+  return null;
+}
+
+function choiceReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "ChooseEnemy" }>): string | null {
+  if (state.window?.kind !== "chooseEnemy") return "That intent is not legal in this window";
+  if (!state.window.options.includes(intent.enemyId)) return "That enemy is not a legal choice";
+  return null;
+}
+
+function defenderReason(
+  state: ScenarioState,
+  intent: Extract<PlayerIntent, { type: "DeclareDefender" }>,
+  ctx: ReduceContext,
+): string | null {
+  if (state.window?.kind !== "defense" || !state.pendingAttack) return "That intent is not legal in this window";
+  const defender = state.cards[intent.defenderId];
+  if (!defender) return "That character cannot defend";
+  if (defender.controller !== state.pendingAttack.seat) {
+    const printed = printedOf(ctx.cards, defender.code);
+    if (!printed.keywords.sentinel) return "Sentinel is required to defend for another seat";
+  }
+  if (!canDefend(state, state.pendingAttack.seat, intent.defenderId, ctx.cards)) return "That character cannot defend";
+  return null;
+}
+
+function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "Undefended" }>): string | null {
+  if (state.window?.kind !== "defense" || !state.pendingAttack) return "That intent is not legal in this window";
+  const heroes = heroIds(state, state.pendingAttack.seat);
+  if (heroes.length === 0) return "No hero can take the attack";
+  if (heroes.length === 1) {
+    const only = heroes[0];
+    if (intent.heroId != null && intent.heroId !== only) return "Choose a hero";
+    return null;
+  }
+  if (intent.heroId == null || !heroes.includes(intent.heroId)) return "Choose a hero";
+  return null;
+}
+
+function attackReason(
+  state: ScenarioState,
+  intent: Extract<PlayerIntent, { type: "DeclareAttackers" }>,
+  ctx: ReduceContext,
+): string | null {
+  if (state.window?.kind !== "playerAttack") return "That intent is not legal in this window";
+  if (intent.attackerIds.length === 0) return "Declare at least one attacker";
+  const enemy = state.cards[intent.enemyId];
+  if (!enemy || enemy.zone !== "engaged") return "That enemy cannot be attacked";
+  const seen = new Set<string>();
+  for (const attackerId of intent.attackerIds) {
+    if (seen.has(attackerId)) return "That character cannot attack twice";
+    seen.add(attackerId);
+    if (!canAttack(state, state.activeSeat, attackerId, intent.enemyId, ctx.cards)) {
+      if (enemy.controller !== state.activeSeat) return "Ranged is required to attack an enemy engaged with another seat";
+      return "That attack is illegal";
+    }
+  }
+  return null;
+}
+
+function distributeReason(
+  state: ScenarioState,
+  intent: Extract<PlayerIntent, { type: "Distribute" }>,
+  ctx: ReduceContext,
+): string | null {
+  if (state.window?.kind !== "archery") return "That intent is not legal in this window";
+  const legal = new Set(archeryRecipients(state, ctx.cards));
+  const seen = new Set<string>();
+  let sum = 0;
+  for (const assignment of intent.assignments) {
+    if (!Number.isInteger(assignment.amount) || assignment.amount < 0) return "That assignment is not a share of the total";
+    if (seen.has(assignment.cardId) || !legal.has(assignment.cardId)) return "That character cannot take archery damage";
+    seen.add(assignment.cardId);
+    sum += assignment.amount;
+  }
+  if (sum !== state.window.total) return "Those amounts must sum to the total";
+  return null;
+}

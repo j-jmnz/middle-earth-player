@@ -16,8 +16,8 @@ Maestro flows are written in the phase that names them. `maestro test` runs afte
 | 3 | Phone databases | completed | 2026-10-23. Catalog and user databases open on the phone. A splash-screen hide failure leaves the pack list up. The open-card Maestro flow is written and runs with the suite after the last phase. |
 | 4 | Scenario 1 fixture | completed | 2026-10-23. The A Shadow of the Past fixture joins to catalog rows. The Normal encounter deck is 42. Reviewer reported no blocks. |
 | 5 | Image cache | completed | 2026-10-23. Download queue, scan packer, and pack/card images are in the tree. The airplane-mode resume was not run on a phone. |
-| 6 | Deck builder | active | Phone check is still open: nobody has flung the full pool and typed in the filter on a physical phone. The simulator does not close that exit. Review blocks on split copies, the dropped-card sentence, the cost filter, a failed starter insert, shared sphere marks, extra heroes, add-button feedback, the name field, reduced motion, and chooser lists were fixed. |
-| 7 | Round engine | not started | |
+| 6 | Deck builder | completed | Phone check is still open: nobody has flung the full pool and typed in the filter on a physical phone. The simulator does not close that exit. Review blocks on split copies, the dropped-card sentence, the cost filter, a failed starter insert, shared sphere marks, extra heroes, add-button feedback, the name field, reduced motion, and chooser lists were fixed. |
+| 7 | Round engine | completed | Review blocks on eliminated seats, staging archery, an attack after the attacker leaves play, and progress above quest points are fixed and waiting for review. Allies still enter play ready. Engagement still takes the lowest cost. A shortfall still raises only the first player. This phase does not close the phase 6 phone fling. |
 | 8 | Scenario 1 effects | not started | |
 | 9 | Starter effects | not started | |
 | 10 | Campaign shell | not started | |
