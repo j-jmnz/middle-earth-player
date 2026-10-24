@@ -1,0 +1,120 @@
+appId: com.middleearth.lcg
+---
+# Phase 10. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json).
+# Uses the dev-only resolution control (src/screens/routes/scenario). Phase 11 deletes it and moves this flow onto the
+# real resolution screen.
+- launchApp:
+    clearState: true
+- tapOn:
+    id: start-fellowship
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+# A loss writes nothing and leaves scenario 2 locked.
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: deck-pick-0-stealth-and-steadfastness
+    timeout: 15000
+- tapOn:
+    id: deck-pick-0-stealth-and-steadfastness
+- tapOn:
+    id: ringbearer-141001
+- tapOn:
+    id: deal
+- extendedWaitUntil:
+    visible:
+      id: dev-play-loss
+    timeout: 15000
+- tapOn:
+    id: dev-play-loss
+- extendedWaitUntil:
+    visible:
+      id: dev-finish
+    timeout: 60000
+- assertVisible: "Defeat"
+- tapOn:
+    id: dev-finish
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-a-knife-in-the-dark-status
+    text: "Locked"
+# A win unlocks scenario 2 and records the chosen cards.
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: deck-pick-0-stealth-and-steadfastness
+    timeout: 15000
+- tapOn:
+    id: deck-pick-0-stealth-and-steadfastness
+- tapOn:
+    id: ringbearer-141001
+- tapOn:
+    id: deal
+- extendedWaitUntil:
+    visible:
+      id: dev-play-win
+    timeout: 15000
+- tapOn:
+    id: dev-play-win
+- extendedWaitUntil:
+    visible:
+      id: dev-choice-141078
+    timeout: 60000
+- tapOn:
+    id: dev-choice-141078
+- extendedWaitUntil:
+    visible:
+      id: dev-choice-141077
+    timeout: 15000
+- tapOn:
+    id: dev-choice-141077
+- extendedWaitUntil:
+    visible:
+      id: dev-confirm
+    timeout: 15000
+- tapOn:
+    id: dev-confirm
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-a-knife-in-the-dark-status
+    text: "Current"
+- assertVisible:
+    id: pool
+    text: ".*Gandalf's Delay.*"
+# Kill and relaunch: the log and the chosen cards are still in user.db.
+- stopApp
+- launchApp
+- tapOn:
+    id: "save-.*"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-a-knife-in-the-dark-status
+    text: "Current"
+- assertVisible:
+    id: pool
+    text: ".*Gandalf's Delay.*"
+# The briefing for scenario 2 deals the earned burden into the encounter deck.
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: deck-pick-0-stealth-and-steadfastness
+    timeout: 15000
+- tapOn:
+    id: deck-pick-0-stealth-and-steadfastness
+- assertVisible:
+    id: briefing-checklist
+- assertVisible: ".*Gandalf's Delay is shuffled into the encounter deck.*"

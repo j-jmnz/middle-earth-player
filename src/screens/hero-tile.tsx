@@ -96,13 +96,13 @@ export function HeroTile({
   );
 }
 
-export function EmptyHeroSlot({ height }: { height: number }) {
+export function EmptyHeroSlot({ height, label = "Hero" }: { height: number; label?: string }) {
   return (
     <View
       className="flex-1 items-center justify-center rounded-tile"
       style={{ height, borderWidth: 1, borderStyle: "dashed", borderColor: palette.gold }}
     >
-      <Text className="font-display text-body text-muted">Hero</Text>
+      <Text className="font-display text-body text-muted">{label}</Text>
     </View>
   );
 }

@@ -8,7 +8,7 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 
 import { briefing, checklistPlan, startFor, type Briefing, type BriefingInput, type BriefingSeat } from "./briefing.ts";
 import { applyResolution } from "./log.ts";
-import { beginActive, recordIntent, replay } from "./replay.ts";
+import { beginActive, recordIntent, replay, type ActiveScenario } from "./replay.ts";
 import type { Save, StoredLoadout } from "./save.ts";
 import type { World } from "./world.ts";
 
@@ -42,6 +42,13 @@ export function deal(save: Save, world: World, loadout: StoredLoadout, seed: num
   return { ok: true, save: { ...save, loadout, active: beginActive(start, dataHash) } };
 }
 
+// An open scenario played on another engine version or against other data is not replayed. This needs no start.
+export function staleReason(active: ActiveScenario, dataHash: number): "engineVersion" | "dataHash" | null {
+  if (active.engineVersion !== ENGINE_VERSION) return "engineVersion";
+  if (active.dataHash !== dataHash) return "dataHash";
+  return null;
+}
+
 export type Resumed = { ok: true; state: ScenarioState } | { ok: false; reason: "none" | "engineVersion" | "dataHash" | "seed" | "intent" | "loadout" };
 
 // Replays the open scenario. A save from another engine version or data hash is not rebuilt at all. The caller drops the
@@ -49,8 +56,8 @@ export type Resumed = { ok: true; state: ScenarioState } | { ok: false; reason: 
 export function resume(save: Save, world: World, dataHash: number): Resumed {
   const { active, loadout } = save;
   if (!active || !loadout) return { ok: false, reason: "none" };
-  if (active.engineVersion !== ENGINE_VERSION) return { ok: false, reason: "engineVersion" };
-  if (active.dataHash !== dataHash) return { ok: false, reason: "dataHash" };
+  const stale = staleReason(active, dataHash);
+  if (stale) return { ok: false, reason: stale };
   let start;
   try {
     start = startFor(inputOf(save, world, loadout), active.seed);

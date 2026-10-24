@@ -102,9 +102,23 @@ export function BodyText({
   );
 }
 
-export function Label({ children, tone = "muted", className }: { children: string; tone?: keyof typeof toneClass; className?: string }) {
+export function Label({
+  children,
+  tone = "muted",
+  className,
+  testID,
+}: {
+  children: string;
+  tone?: keyof typeof toneClass;
+  className?: string;
+  testID?: string;
+}) {
   const base = `text-label ${toneClass[tone]}`;
-  return <Text className={className ? `${base} ${className}` : base}>{children}</Text>;
+  return (
+    <Text testID={testID} className={className ? `${base} ${className}` : base}>
+      {children}
+    </Text>
+  );
 }
 
 /** Flat row on a hairline. Text, at most one 32×44 picture, a pressed fill. No shadow, no gradient. */
