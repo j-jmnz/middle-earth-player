@@ -6,3 +6,9 @@ export function dealSeed(random: () => number = Math.random): number {
   if (Number.isInteger(fixed) && fixed > 0) return fixed;
   return 1 + Math.floor(random() * 0x7fffffff);
 }
+
+/** True in the e2e-test build only (the same variable as the deal seed). A production build has no fixture route. */
+export function e2eBuild(): boolean {
+  const fixed = Number(process.env.EXPO_PUBLIC_E2E_SEED);
+  return Number.isInteger(fixed) && fixed > 0;
+}

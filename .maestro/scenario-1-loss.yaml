@@ -1,0 +1,66 @@
+appId: com.middleearth.lcg
+---
+# Phase 11. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The
+# fixture is a real solo game of Stealth and Steadfastness parked on its loss (src/campaign/fixtures). A loss has no reward
+# screen and writes nothing to the log.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/lost"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- assertVisible:
+    id: rail-current
+    text: "Defeat"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 15000
+- assertVisible:
+    id: resolution-outcome
+    text: "Defeat"
+- assertVisible: "The scenario was lost. Nothing is written to the log."
+- assertNotVisible:
+    id: resolution-confirm
+- tapOn:
+    id: resolution-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+# The log is unchanged: scenario 1 is still current, scenario 2 locked, nothing earned.
+- assertVisible:
+    id: node-a-shadow-of-the-past-status
+    text: "Current"
+- assertVisible:
+    id: node-a-knife-in-the-dark-status
+    text: "Locked"
+- assertVisible:
+    id: pool
+    text: "Nothing earned yet."
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertVisible:
+    id: log-boons
+    text: "None"
+- assertVisible:
+    id: log-burdens
+    text: "None"
+- assertVisible:
+    id: log-score
+    text: "0"
+- assertVisible:
+    id: log-scenario-a-shadow-of-the-past

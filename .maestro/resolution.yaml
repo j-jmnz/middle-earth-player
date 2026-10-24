@@ -1,42 +1,12 @@
 appId: com.middleearth.lcg
 ---
-# Phase 10. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json).
-# Uses the dev-only resolution control (src/screens/routes/scenario). Phase 11 deletes it and moves this flow onto the
-# real resolution screen.
+# Phase 10, moved onto the real resolution screen in phase 11 (the dev-only control is deleted). Written in a cloud session:
+# it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json), which opens the fixture route: a real
+# two-handed game of both starter decks parked on the first Resolution choice (src/campaign/fixtures). The loss is
+# .maestro/scenario-1-loss.yaml.
 - launchApp:
     clearState: true
-- tapOn:
-    id: start-fellowship
-- extendedWaitUntil:
-    visible:
-      id: campaign-path
-    timeout: 15000
-# A loss writes nothing and leaves scenario 2 locked.
-- tapOn:
-    id: begin
-- extendedWaitUntil:
-    visible:
-      id: deck-pick-0-stealth-and-steadfastness
-    timeout: 15000
-- tapOn:
-    id: deck-pick-0-stealth-and-steadfastness
-- tapOn:
-    id: ringbearer-141001
-- tapOn:
-    id: deal
-- extendedWaitUntil:
-    visible:
-      id: dev-play-loss
-    timeout: 15000
-- tapOn:
-    id: dev-play-loss
-- extendedWaitUntil:
-    visible:
-      id: dev-finish
-    timeout: 60000
-- assertVisible: "Defeat"
-- tapOn:
-    id: dev-finish
+- openLink: "middleearthlcg://e2e/won"
 - extendedWaitUntil:
     visible:
       id: campaign-path
@@ -44,43 +14,44 @@ appId: com.middleearth.lcg
 - assertVisible:
     id: node-a-knife-in-the-dark-status
     text: "Locked"
-# A win unlocks scenario 2 and records the chosen cards.
 - tapOn:
     id: begin
 - extendedWaitUntil:
     visible:
-      id: deck-pick-0-stealth-and-steadfastness
-    timeout: 15000
+      id: sheet-outcome
+    timeout: 30000
 - tapOn:
-    id: deck-pick-0-stealth-and-steadfastness
-- tapOn:
-    id: ringbearer-141001
-- tapOn:
-    id: deal
+    id: sheet-outcome
 - extendedWaitUntil:
     visible:
-      id: dev-play-win
-    timeout: 15000
+      id: resolution-choice-141078
+    timeout: 30000
+# Confirm is disabled until a choice is made; the sentence above it names what will be written.
+- assertVisible:
+    id: resolution-confirm
+    enabled: false
 - tapOn:
-    id: dev-play-win
+    id: resolution-choice-141078
+- assertVisible:
+    id: resolution-consequence
+    text: "Gandalf's Delay is added to the campaign pool."
+- tapOn:
+    id: resolution-confirm
 - extendedWaitUntil:
     visible:
-      id: dev-choice-141078
-    timeout: 60000
-- tapOn:
-    id: dev-choice-141078
-- extendedWaitUntil:
-    visible:
-      id: dev-choice-141077
+      id: resolution-choice-141077
     timeout: 15000
 - tapOn:
-    id: dev-choice-141077
+    id: resolution-choice-141077
+- tapOn:
+    id: resolution-confirm
 - extendedWaitUntil:
     visible:
-      id: dev-confirm
+      id: resolution-consequence
+      text: "Confirming records .* and unlocks A Knife in the Dark."
     timeout: 15000
 - tapOn:
-    id: dev-confirm
+    id: resolution-confirm
 - extendedWaitUntil:
     visible:
       id: campaign-path
