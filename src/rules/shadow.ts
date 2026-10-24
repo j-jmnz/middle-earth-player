@@ -1,3 +1,4 @@
+// Rules: rr.step-6-2 (data/rules/entries.json).
 import { pushEffectFrame } from "./effect-frames.ts";
 import { holdsNow } from "./verbs.ts";
 import type { EngineStep } from "./intents.ts";

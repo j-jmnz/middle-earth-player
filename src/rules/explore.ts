@@ -1,3 +1,4 @@
+// Rules: rr.explored (data/rules/entries.json).
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pushCardEffects } from "./effect-frames.ts";

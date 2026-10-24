@@ -1,3 +1,4 @@
+// Rules: rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display (data/rules/entries.json).
 import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
 import { inPlay, updateCard, withSeat } from "./state.ts";
 

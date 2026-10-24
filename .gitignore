@@ -64,3 +64,6 @@ agent-tools/
 !assets/images/*.png
 !assets/images/**/*.png
 !assets/expo.icon/**/*.png
+
+# agent drafts
+.agent/

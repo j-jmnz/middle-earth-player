@@ -11,11 +11,8 @@ describe("shouldReplaceCatalog", () => {
     expect(shouldReplaceCatalog(1, 1)).toBe(false);
   });
 
-  it("replaces when the bundled version is greater", () => {
+  it("replaces when the bundled version differs, newer or older", () => {
     expect(shouldReplaceCatalog(2, 1)).toBe(true);
-  });
-
-  it("leaves an older bundle in place", () => {
-    expect(shouldReplaceCatalog(1, 2)).toBe(false);
+    expect(shouldReplaceCatalog(1, 2)).toBe(true);
   });
 });

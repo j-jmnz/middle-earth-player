@@ -1,3 +1,4 @@
+// Rules: rr.cancel (data/rules/entries.json).
 import { holds } from "./conditions.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";

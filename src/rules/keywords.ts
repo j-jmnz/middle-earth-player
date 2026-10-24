@@ -1,3 +1,4 @@
+// Rules: rr.surge, rr.doomed-x, rr.immune, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible (data/rules/entries.json).
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { EngineStep } from "./intents.ts";

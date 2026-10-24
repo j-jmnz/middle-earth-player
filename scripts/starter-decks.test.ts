@@ -1,7 +1,4 @@
-import { existsSync } from "node:fs";
-import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
@@ -12,10 +9,8 @@ import {
   startersToInsert,
   type StarterCandidate,
 } from "../src/screens/starter-decks.ts";
-import { buildCatalog } from "./build-catalog.ts";
+import { temporaryCatalog } from "./temp-catalog.ts";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const dbPath = path.join(root, "assets", "catalog.db");
 
 function candidate(row: {
   code: string;
@@ -58,7 +53,7 @@ describe("resolveStarterCode", () => {
 
 describe("starter decks", () => {
   it("matches the catalog and saves", async () => {
-    if (!existsSync(dbPath)) await buildCatalog();
+    const dbPath = temporaryCatalog();
     const database = new DatabaseSync(dbPath, { readOnly: true });
     try {
       const inserted = startersToInsert([]);

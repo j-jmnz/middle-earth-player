@@ -66,7 +66,7 @@ Do not demand a shared abstraction for two lines that happen to look similar and
 
 Judge the diff against the module table in `docs/architecture.md`. A new top-level folder, or a file outside those homes, is a block.
 
-Flag a rule implemented in `src/play` or `src/screens`. Flag a React component under `src/rules`. Flag an import the architecture forbids. Flag card text, RingsDB dumps, `catalog.db`, or image bytes committed to the repo.
+Flag a rule implemented in `src/play` or `src/screens`. Flag a React component under `src/rules`. Flag an import the architecture forbids. Flag `catalog.db`, card scans, PDFs, or image bytes committed to the repo. Flag a hand edit to a generated file (`data/cards`, `data/scenarios`, `data/rules`, `src/effects/generated`): the fix belongs in the adapter, the normalizer, a template or `data/overrides.json`. Flag a rule implemented without naming its rule id from `data/rules/entries.json`.
 
 ## Coding practices
 

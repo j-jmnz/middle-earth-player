@@ -6,7 +6,8 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
 import { activeCardCodes } from "../../../catalog/active-text";
-import { cards, effects } from "../../../catalog/schema";
+import { cards } from "../../../catalog/schema";
+import { EFFECTS } from "../../../effects";
 import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, SphereMark, markedSphere, sphereWord } from "../../chrome";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
@@ -181,10 +182,7 @@ export default function CardScreen() {
       .where(eq(cards.code, code))
       .get();
   }, [catalog, code]);
-  const active = useMemo(
-    () => activeCardCodes(catalog.select({ record: effects.record }).from(effects).all().map((entry) => entry.record)),
-    [catalog],
-  );
+  const active = useMemo(() => activeCardCodes(EFFECTS), []);
   const cached = useCachedImage(code ?? "");
   const bundled = code ? (scanAssets[code] ?? null) : null;
   const { resolved, source } = shownCardImage({

@@ -1,0 +1,51 @@
+{
+  "cards": [
+    {
+      "match": {
+        "name": "Stricken Dumb",
+        "set": "The Fellowship of the Ring",
+        "number": 77
+      },
+      "set": {
+        "code": "140077",
+        "pack": "TRD"
+      },
+      "reason": "No Black Riders or Road Darkens twin exists, so no source assigns a code. 14 is the Fellowship cycle, 0 is the MEC109 box.",
+      "source": "hallofbeorn.com/Export/EncounterCards"
+    },
+    {
+      "match": {
+        "name": "The Argonath",
+        "set": "The Fellowship of the Ring",
+        "number": 151
+      },
+      "set": {
+        "code": "140151",
+        "pack": "TRD"
+      },
+      "reason": "No Black Riders or Road Darkens twin exists, so no source assigns a code. 14 is the Fellowship cycle, 0 is the MEC109 box.",
+      "source": "hallofbeorn.com/Export/EncounterCards"
+    },
+    {
+      "match": {
+        "code": "141085"
+      },
+      "set": {
+        "keywords": {
+          "leavesPlayLoses": true
+        }
+      },
+      "reason": "Losing the Ring ends the game. Hall of Beorn prints this as card text, not as a keyword.",
+      "source": "MEC109 rulebook, The One Ring"
+    }
+  ],
+  "scenarioPiles": [
+    {
+      "scenario": "a-shadow-of-the-past",
+      "code": "141017",
+      "pile": "attached",
+      "reason": "DragnCards lists Mr. Underhill in the staging area. His own Setup text attaches him to the Ring-bearer.",
+      "source": "dragncards preBuiltDecks Q0C.01; Mr. Underhill (MEC109 #44) Setup"
+    }
+  ]
+}

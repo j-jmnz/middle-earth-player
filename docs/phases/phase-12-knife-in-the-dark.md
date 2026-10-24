@@ -13,7 +13,7 @@ Booklet difficulty 7. Encounter sets: A Knife in the Dark, Hunted, The Ring, The
 
 The shared saga setup still runs: the first seat's chosen Ring-bearer, The One Ring, one Fellowship hero in play, no second Frodo. Do not ask the player to remember the booklet.
 
-Card-by-card setup is printed on the quest cards. Read those cards and the booklet together. Hall of Beorn is a reading aid. The quest card wins. Freeze a fixture of codes and counts. No card text in the fixture. The build fails if a code is missing from the catalog. Assert the Normal deck size you counted.
+Card-by-card setup is printed on the quest cards. Read those cards and the booklet together. Hall of Beorn is a reading aid. The quest card wins. `pnpm data:build` writes `data/scenarios/<id>.json` when Hall of Beorn's counts and the quest card's Setup text agree with the DragnCards load list; read the cross-check report (`pnpm data:build -- --verbose`), resolve what it flags with a row in `data/overrides.json`, and add the scenario's `resolution` groups to the campaign file. Then `pnpm effects:draft <id>` and the `effect-author` agent. Assert the Normal deck size. The build fails if a code is missing from the catalog. Assert the Normal deck size you counted.
 
 Author the effect records this scenario adds. Reuse the keyword framework. A dealt card with a printed ability and no effect id fails coverage. The scenario stays unplayable until that test is green.
 

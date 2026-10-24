@@ -1,18 +1,15 @@
 import type { Effect } from "../catalog/boundary.ts";
 
-import { A_SHADOW_OF_THE_PAST_EFFECTS } from "./fellowship-of-the-ring/a-shadow-of-the-past.ts";
-import { CAMPAIGN_EFFECTS } from "./fellowship-of-the-ring/campaign.ts";
-import { HUNTED_EFFECTS } from "./fellowship-of-the-ring/hunted.ts";
-import { QUEST_EFFECTS } from "./fellowship-of-the-ring/quest.ts";
-import { THE_BLACK_RIDERS_EFFECTS } from "./fellowship-of-the-ring/the-black-riders.ts";
-import { THE_RING_EFFECTS } from "./fellowship-of-the-ring/the-ring.ts";
+import { AUTHORED_EFFECTS, AUTHORED_REPLACES } from "./authored/fellowship-of-the-ring.ts";
+import { GENERATED_EFFECTS } from "./generated/fellowship-of-the-ring.ts";
 
-// Authored effect records. Tests and scripts import this. Production code never does.
-export const EFFECTS: readonly Effect[] = [
-  ...QUEST_EFFECTS,
-  ...A_SHADOW_OF_THE_PAST_EFFECTS,
-  ...HUNTED_EFFECTS,
-  ...THE_RING_EFFECTS,
-  ...THE_BLACK_RIDERS_EFFECTS,
-  ...CAMPAIGN_EFFECTS,
-];
+// Generated records (pnpm data:build) plus authored records. An authored record with the id of a generated
+// one replaces it, so a wrong template can be overridden without editing the template.
+export function mergeEffects(generated: readonly Effect[], authored: readonly Effect[]): Effect[] {
+  const replaced = new Set(authored.map((effect) => effect.id));
+  return [...generated.filter((effect) => !replaced.has(effect.id)), ...authored];
+}
+
+export const EFFECTS: readonly Effect[] = mergeEffects(GENERATED_EFFECTS, AUTHORED_EFFECTS);
+
+export { AUTHORED_REPLACES, AUTHORED_EFFECTS, GENERATED_EFFECTS };

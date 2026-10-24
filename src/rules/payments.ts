@@ -1,3 +1,4 @@
+// Rules: rr.resource-match, rr.resources (data/rules/entries.json).
 import type { Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf, spherePays, type Sphere } from "./printed.ts";

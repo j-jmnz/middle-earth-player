@@ -1,3 +1,4 @@
+// Rules: rr.forced, rr.triggered-ability (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";

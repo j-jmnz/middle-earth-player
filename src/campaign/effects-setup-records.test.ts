@@ -3,8 +3,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { byCode, expectOk } from "../rules/fixture.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
-import { codesOf, fixture, FRODO, loadWorld, MERRY, RING, SAM, type World } from "../../scripts/past-scene.ts";
-import { scriptFor } from "./registry.ts";
+import { campaign, codesOf, FRODO, loadWorld, MERRY, RING, SAM, scenario, type World } from "../../scripts/past-scene.ts";
+import { buildStart } from "./start.ts";
 
 let world: World;
 
@@ -35,9 +35,7 @@ describe("setup records", () => {
   });
 
   it("never place a card a second time", () => {
-    const start = scriptFor("a-shadow-of-the-past").start({
-      fixture,
-      definition: world.definition,
+    const start = buildStart({ campaign, scenario,
       seatCount: 1,
       seed: 5,
       threatModifier: 0,
@@ -57,9 +55,7 @@ describe("setup records", () => {
 describe("Gandalf's Delay", () => {
   const STARTER = Array.from({ length: 14 }, () => "f0");
   function begin(seed: number, seats: 1 | 2 = 1) {
-    const start = scriptFor("a-shadow-of-the-past").start({
-      fixture,
-      definition: world.definition,
+    const start = buildStart({ campaign, scenario,
       seatCount: seats,
       seed,
       threatModifier: 0,

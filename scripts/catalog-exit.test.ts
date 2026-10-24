@@ -1,21 +1,26 @@
-import { existsSync, readFileSync } from "node:fs";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 
-import { scenarioDefinitionSchema } from "../src/catalog/boundary.ts";
-import { EFFECTS } from "../src/effects/index.ts";
-import { fixtureCards, normalCopiesByCode, parseScenarioFixture } from "../src/catalog/scenario-fixture.ts";
+import { normalCopiesByCode, scenarioCards } from "../src/catalog/scenario-data.ts";
+import { CATALOG_VERSION } from "../src/catalog/version.ts";
+import { loadScenario } from "./data/load-scenarios.ts";
 import { buildCatalog } from "./build-catalog.ts";
+import { temporaryCatalog } from "./temp-catalog.ts";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const dbPath = path.join(root, "assets", "catalog.db");
 
 describe("built catalog", () => {
+  it("is the catalog src/catalog/version.ts says it is", () => {
+    const scratch = mkdtempSync(path.join(tmpdir(), "catalog-version-"));
+    const built = buildCatalog({ dbPath: path.join(scratch, "catalog.db"), versionPath: path.join(scratch, "version.ts") });
+    expect(built.version, "Run pnpm catalog:build and commit src/catalog/version.ts").toBe(CATALOG_VERSION);
+  });
+
   it("reads the Fellowship hero and campaign rows from the built database", async () => {
-    if (!existsSync(dbPath)) await buildCatalog();
+    const dbPath = temporaryCatalog();
 
     const database = new DatabaseSync(dbPath, { readOnly: true });
     try {
@@ -52,27 +57,9 @@ describe("built catalog", () => {
       expect(delay?.has_errata).toBe(1);
       expect(delay?.errata_present).toBe(1);
 
-      expect(database.prepare("select count(*) as n from effects").get()?.n).toBe(EFFECTS.length);
-      expect(database.prepare("select count(*) as n from scenarios").get()?.n).toBe(1);
-      const scenario = database.prepare("select id, definition from scenarios").get();
-      expect(scenario?.id).toBe("a-shadow-of-the-past");
-      const definition = scenarioDefinitionSchema.parse(JSON.parse(String(scenario?.definition)));
-      expect(definition.id).toBe("a-shadow-of-the-past");
-      expect(definition.setup).toHaveLength(5);
-      // The build turned the fixture's reward names into the codes of the dealt cards.
-      const named = definition.resolution.map((group) =>
-        group.choices.map((choice) => String(database.prepare("select name from cards where code = ?").get(choice.code)?.name)),
-      );
-      expect(named).toEqual([
-        ["Gandalf's Delay", "The Ring Draws Them"],
-        ["Gildor Inglorion", "Mr. Underhill"],
-      ]);
-
-      const fixture = parseScenarioFixture(
-        JSON.parse(readFileSync(path.join(root, "fixtures", "a-shadow-of-the-past.json"), "utf8")) as unknown,
-      );
-      const copies = normalCopiesByCode(fixture);
-      for (const code of new Set(fixtureCards(fixture).map((card) => card.code))) {
+      const dealt = loadScenario("a-shadow-of-the-past");
+      const copies = normalCopiesByCode(dealt);
+      for (const code of new Set(scenarioCards(dealt).map((card) => card.code))) {
         const row = database.prepare("select quantity from cards where code = ?").get(code);
         expect(row?.quantity).toBe(copies.get(code));
       }

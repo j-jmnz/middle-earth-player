@@ -11,7 +11,7 @@ Blocks: phase 14
 
 Booklet difficulty 5. Encounter sets: Flight to the Ford, Hunted, The Black Riders, The Nazgûl. Not The Ring.
 
-Freeze a codes-and-counts fixture from the quest cards and the booklet. Assert the Normal deck size. Author the new effect records. Coverage stays red until every dealt ability has an effect id.
+`pnpm data:build` writes `data/scenarios/<id>.json` when Hall of Beorn's counts and the quest card's Setup text agree with the DragnCards load list; read the cross-check report (`pnpm data:build -- --verbose`), resolve what it flags with a row in `data/overrides.json`, and add the scenario's `resolution` groups to the campaign file. Then `pnpm effects:draft <id>` and the `effect-author` agent. Assert the Normal deck size. Author the new effect records. Coverage stays red until every dealt ability has an effect id.
 
 ## Burden deck
 

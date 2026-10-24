@@ -1,0 +1,380 @@
+import { z } from "zod";
+
+import type { PrintedKeywords, RingsDbCard, RingsDbPack } from "../../../src/catalog/boundary.ts";
+import { cardSchema, type Card, type Printing } from "../../../src/catalog/card-facts.ts";
+import { deckLegal } from "../../../src/catalog/deck-legal.ts";
+import type { HobCard } from "../sources/hallofbeorn.ts";
+import { parseKeywordTokens } from "./keywords.ts";
+import type { RawData } from "./load-raw.ts";
+import { timingLabels } from "./timings.ts";
+
+const TFOTR = "The Fellowship of the Ring";
+// Hall of Beorn card sets whose twin codes are RingsDB codes. Order is campaign order.
+const TWIN_SETS: ReadonlyMap<string, string> = new Map([
+  ["The Black Riders", "TBR"],
+  ["The Road Darkens", "TRD"],
+]);
+// Sets Hall of Beorn numbers from 00001 with no RingsDB code of their own.
+const UNCODED_SETS = new Set([TFOTR, "The Two Towers", "The Return of the King"]);
+
+const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> = {
+  Hero: { type: "hero", typeName: "Hero" },
+  Ally: { type: "ally", typeName: "Ally" },
+  Attachment: { type: "attachment", typeName: "Attachment" },
+  Event: { type: "event", typeName: "Event" },
+  Enemy: { type: "enemy", typeName: "Enemy" },
+  Location: { type: "location", typeName: "Location" },
+  Treachery: { type: "treachery", typeName: "Treachery" },
+  Quest: { type: "quest", typeName: "Quest" },
+  Objective: { type: "objective", typeName: "Objective" },
+  Objective_Ally: { type: "objective", typeName: "Objective Ally" },
+  Campaign: { type: "campaign", typeName: "Campaign" },
+  Nightmare_Setup: { type: "nightmare", typeName: "Nightmare" },
+};
+
+const overridesSchema = z.object({
+  cards: z.array(
+    z.object({
+      match: z.object({ code: z.string().optional(), name: z.string().optional(), set: z.string().optional(), number: z.number().optional() }),
+      set: z.object({ code: z.string().optional(), pack: z.string().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
+      reason: z.string().min(1),
+      source: z.string().min(1),
+    }),
+  ),
+  // A scenario's pile for one card, where the sources put it somewhere its own Setup text does not.
+  scenarioPiles: z
+    .array(
+      z.object({
+        scenario: z.string().min(1),
+        code: z.string().min(1),
+        pile: z.enum(["encounter", "staging", "activeLocation", "setAside", "attached"]),
+        reason: z.string().min(1),
+        source: z.string().min(1),
+      }),
+    )
+    .default([]),
+});
+export type Overrides = z.infer<typeof overridesSchema>;
+export function parseOverrides(raw: unknown): Overrides {
+  return overridesSchema.parse(raw);
+}
+
+export type BuildReport = {
+  unknownKeywords: Record<string, number>;
+  twinless: string[];
+  overridesUsed: string[];
+};
+
+const RULE_FIELDS = ["name", "text", "cost", "deck_limit", "type_code", "type_name", "sphere_code", "traits", "is_unique", "has_errata", "threat", "willpower", "attack", "defense", "health", "quest", "victory"] as const;
+
+function comparePacks(left: RingsDbPack, right: RingsDbPack): number {
+  if (left.cycle_position !== right.cycle_position) return left.cycle_position - right.cycle_position;
+  if (left.position !== right.position) return left.position - right.position;
+  return left.code.localeCompare(right.code);
+}
+
+function num(value: string | null | undefined): number | null {
+  if (value == null || !/^\d+$/.test(value)) return null;
+  return Number(value);
+}
+
+function splitTraits(traits: readonly string[] | string | null | undefined): string[] {
+  const list = typeof traits === "string" ? traits.split(".") : (traits ?? []).flatMap((trait) => trait.split("."));
+  return list.map((trait) => trait.trim()).filter((trait) => trait !== "");
+}
+
+function sideText(lines: readonly string[]): string | null {
+  const text = lines.map((line) => line.trim()).filter((line) => line !== "").join("\n");
+  return text === "" ? null : text;
+}
+
+type HobFacts = Pick<Card, "traits" | "threat" | "willpower" | "attack" | "defense" | "health" | "questPoints" | "victory" | "engagementCost" | "cost" | "stage" | "keywords" | "timings" | "text" | "shadowText" | "back" | "isUnique" | "quantity" | "easyQuantity" | "encounterSet" | "hasErrata">;
+
+type DragnRow = Record<string, string> | undefined;
+
+// Hall of Beorn's keyword list can miss one that the card text and DragnCards carry (Bucklebury Ferry's
+// Immune, Bag End's Victory 1). The two sources are merged; DragnCards' free-text keywords field is only
+// read for sentences that parse as keywords.
+function keywordsOf(card: HobCard, dragn: DragnRow, report: BuildReport): { keywords: PrintedKeywords; victory: number | null } {
+  let victory: number | null = num(dragn?.victoryPoints);
+  const tokens = card.Front.Keywords.filter((token) => {
+    const match = /^Victory (\d+)\.?$/i.exec(token.trim());
+    if (match?.[1]) victory = Number(match[1]);
+    return !match;
+  });
+  const parsed = parseKeywordTokens(tokens);
+  const fromDragn = parseKeywordTokens((dragn?.keywords ?? "").split(/(?<=\.)\s+/).filter((sentence) => parseKeywordTokens([sentence]).unknown.length === 0));
+  Object.assign(parsed.keywords, fromDragn.keywords);
+  for (const token of parsed.unknown) report.unknownKeywords[token] = (report.unknownKeywords[token] ?? 0) + 1;
+  return { keywords: parsed.keywords, victory };
+}
+
+// Every line that is only keywords is not an ability.
+function keywordOnly(card: HobCard): (line: string) => boolean {
+  const tokens = new Set(card.Front.Keywords.map((token) => token.trim().toLowerCase()));
+  return (line) => {
+    const parts = line.split(/(?<=\.)\s+/).map((part) => part.trim().toLowerCase());
+    return parts.every((part) => tokens.has(part));
+  };
+}
+
+function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts {
+  const stats = card.Front.Stats;
+  const { keywords, victory } = keywordsOf(card, dragn, report);
+  const text = sideText(card.Front.Text);
+  const back = card.Back;
+  return {
+    traits: splitTraits(card.Front.Traits),
+    threat: num(stats.Threat) ?? num(stats.ThreatCost),
+    willpower: num(stats.Willpower),
+    attack: num(stats.Attack),
+    defense: num(stats.Defense),
+    health: num(stats.HitPoints),
+    questPoints: num(stats.QuestPoints) ?? num(back?.Stats.QuestPoints),
+    victory,
+    engagementCost: num(stats.EngagementCost),
+    cost: stats.ResourceCost ?? null,
+    stage: stats.StageNumber ?? null,
+    keywords,
+    // Front lines, then side B, then the shadow effect: the order the effect records are numbered in.
+    timings: [
+      ...timingLabels(text, keywordOnly(card)),
+      ...(card.Back ? timingLabels(sideText(card.Back.Text), keywordOnly(card)) : []),
+      ...(card.Front.Shadow?.trim() ? ["shadow"] : []),
+    ],
+    text,
+    shadowText: card.Front.Shadow?.trim() || null,
+    back: back
+      ? { name: null, text: sideText(back.Text), questPoints: num(back.Stats.QuestPoints), stage: back.Stats.StageNumber ?? null }
+      : null,
+    isUnique: card.IsUnique,
+    quantity: card.Quantity,
+    easyQuantity: card.EncounterInfo?.EasyModeQuantity ?? null,
+    encounterSet: card.EncounterInfo?.EncounterSet ?? null,
+    hasErrata: card.HasErrata,
+  };
+}
+
+// DragnCards' scan is listed first, Hall of Beorn's after it: both are full card art, which RingsDB lacks for encounter cards.
+function printingOf(pack: string, card: HobCard, dragnImage: string | null): Printing {
+  const imageUrls = [dragnImage, card.Front.ImagePath, card.Back?.ImagePath].filter((url): url is string => typeof url === "string" && url !== "");
+  return {
+    pack,
+    number: card.Number,
+    hobSlug: card.Slug,
+    ...(card.OctgnGuid ? { octgnGuid: card.OctgnGuid } : {}),
+    ...(imageUrls.length > 0 ? { imageUrls } : {}),
+  };
+}
+
+function ringsDbCardFacts(card: RingsDbCard): Omit<Card, "printings" | "keywords" | "timings" | "back" | "stage" | "easyQuantity" | "encounterSet" | "shadowText"> {
+  return {
+    code: card.code,
+    name: card.name,
+    type: card.type_code,
+    typeName: card.type_name,
+    sphere: card.sphere_code ?? null,
+    traits: splitTraits(card.traits),
+    isUnique: card.is_unique,
+    cost: card.cost ?? null,
+    deckLimit: card.deck_limit ?? null,
+    threat: card.threat ?? null,
+    willpower: card.willpower ?? null,
+    attack: card.attack ?? null,
+    defense: card.defense ?? null,
+    health: card.health ?? null,
+    questPoints: card.quest ?? null,
+    victory: card.victory ?? null,
+    engagementCost: card.engagement_cost ?? null,
+    quantity: card.quantity,
+    text: card.text ?? null,
+    hasErrata: card.has_errata,
+    errata: card.has_errata ? (card.text ?? null) : null,
+    imagesrc: card.imagesrc ?? null,
+    deckLegal: deckLegal(card.type_code, card.type_name),
+  };
+}
+
+function assertRulesMatch(code: string, left: RingsDbCard, right: RingsDbCard): void {
+  for (const field of RULE_FIELDS) {
+    if ((left[field] ?? null) !== (right[field] ?? null)) throw new Error(`Card ${code}: pack files disagree on ${field}`);
+  }
+}
+
+function twinKey(card: HobCard): string {
+  return `${card.Title}\u0000${card.CardType}`;
+}
+
+// A TFotR card and its Black Riders or Road Darkens twin share a title and type. Several of each (Frodo,
+// Pursued by the Enemy) pair up in campaign order, then collector number.
+function pairTwins(tfotr: readonly HobCard[], twins: readonly HobCard[]): Map<HobCard, HobCard> {
+  const setOrder = [...TWIN_SETS.keys()];
+  const order = (a: HobCard, b: HobCard) => setOrder.indexOf(a.CardSet) - setOrder.indexOf(b.CardSet) || a.Number - b.Number;
+  const groups = new Map<string, { tfotr: HobCard[]; twins: HobCard[] }>();
+  for (const [list, side] of [[tfotr, "tfotr"], [twins, "twins"]] as const) {
+    for (const card of list) {
+      const group = groups.get(twinKey(card)) ?? { tfotr: [], twins: [] };
+      group[side].push(card);
+      groups.set(twinKey(card), group);
+    }
+  }
+  const pairs = new Map<HobCard, HobCard>();
+  for (const group of groups.values()) {
+    group.tfotr.sort((a, b) => a.Number - b.Number);
+    group.twins.sort(order);
+    group.tfotr.forEach((card, index) => {
+      const twin = group.twins[index];
+      if (twin) pairs.set(card, twin);
+    });
+  }
+  return pairs;
+}
+
+function overrideFor(overrides: Overrides, report: BuildReport, probe: { code?: string; name: string; set?: string; number?: number }) {
+  const hit = overrides.cards.find(({ match }) =>
+    (match.code === undefined || match.code === probe.code) &&
+    (match.name === undefined || match.name === probe.name) &&
+    (match.set === undefined || match.set === probe.set) &&
+    (match.number === undefined || match.number === probe.number),
+  );
+  if (hit) report.overridesUsed.push(`${probe.code ?? probe.name}: ${hit.reason}`);
+  return hit?.set;
+}
+
+export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[]; report: BuildReport } {
+  const report: BuildReport = { unknownKeywords: {}, twinless: [], overridesUsed: [] };
+
+  const hobByCode = new Map<string, HobCard[]>();
+  for (const card of raw.hob) {
+    if (UNCODED_SETS.has(card.CardSet) || !card.RingsDbCardId) continue;
+    hobByCode.set(card.RingsDbCardId, [...(hobByCode.get(card.RingsDbCardId) ?? []), card]);
+  }
+
+  // RingsDB cards, merged across the packs that reprint them.
+  const copies = new Map<string, { pack: RingsDbPack; card: RingsDbCard }[]>();
+  for (const pack of [...raw.packs].sort(comparePacks)) {
+    for (const card of raw.ringsdb.get(pack.code) ?? []) {
+      const list = copies.get(card.code) ?? [];
+      const first = list[0];
+      if (first) assertRulesMatch(card.code, first.card, card);
+      if (!list.some((copy) => copy.pack.code === pack.code)) list.push({ pack, card });
+      copies.set(card.code, list);
+    }
+  }
+
+  const byCode = new Map<string, Card>();
+  for (const [code, list] of copies) {
+    const primary = list[0];
+    if (!primary) continue;
+    const hob = hobByCode.get(code)?.[0];
+    const facts = hob ? hobFacts(hob, raw.dragn.get(hob.OctgnGuid ?? ""), report) : null;
+    const base = ringsDbCardFacts(primary.card);
+    byCode.set(code, {
+      ...base,
+      // Hall of Beorn carries keywords and timings for every card it can match by code. Elsewhere they stay unread.
+      victory: base.victory,
+      keywords: facts?.keywords ?? null,
+      timings: facts?.timings ?? [],
+      back: facts?.back ?? null,
+      stage: facts?.stage ?? null,
+      easyQuantity: facts?.easyQuantity ?? null,
+      encounterSet: facts?.encounterSet ?? null,
+      shadowText: facts?.shadowText ?? null,
+      printings: list.map(({ pack, card }) => ({
+        pack: pack.code,
+        number: card.position,
+        ...(hob && pack.code === primary.pack.code && hob.OctgnGuid ? { octgnGuid: hob.OctgnGuid } : {}),
+        ...(hob && pack.code === primary.pack.code ? { hobSlug: hob.Slug } : {}),
+      })),
+    });
+  }
+
+  // Fellowship cards: the TFotR printing wins over the twin it was paired with.
+  const tfotr = raw.hob.filter((card) => card.CardSet === TFOTR);
+  const twins = raw.hob.filter((card) => TWIN_SETS.has(card.CardSet));
+  const pairs = pairTwins(tfotr, twins);
+  const claimed = new Set<HobCard>();
+
+  const dragnImageOf = (card: HobCard): string | null => {
+    const file = raw.dragn.get(card.OctgnGuid ?? "")?.imageUrl;
+    return file ? `${raw.dragnImagePrefix}${file}` : null;
+  };
+
+  const merge = (code: string, twin: HobCard | undefined, source: HobCard): Card => {
+    const facts = hobFacts(source, raw.dragn.get(twin?.OctgnGuid || source.OctgnGuid || ""), report);
+    const existing = byCode.get(code);
+    const type = TYPE_BY_HOB[source.CardType] ?? (twin ? TYPE_BY_HOB[twin.CardType] : undefined);
+    if (!existing && !type) throw new Error(`Card ${code} ${source.Title}: unknown Hall of Beorn type ${source.CardType}`);
+    const printings: Printing[] = [];
+    if (twin) printings.push(printingOf(TWIN_SETS.get(twin.CardSet) ?? twin.CardSet, twin, dragnImageOf(twin)));
+    if (source !== twin) printings.push(printingOf("TFotR", source, null));
+    const known = existing?.printings.filter((p) => !printings.some((q) => q.pack === p.pack)) ?? [];
+    const card: Card = existing
+      ? {
+          ...existing,
+          name: source.Title,
+          ...facts,
+          // RingsDB's errata line stays with the code; Hall of Beorn does not track it.
+          hasErrata: existing.hasErrata,
+          sphere: source.Sphere ? source.Sphere.toLowerCase() : existing.sphere,
+          cost: facts.cost ?? existing.cost,
+          threat: facts.threat ?? existing.threat,
+          willpower: facts.willpower ?? existing.willpower,
+          attack: facts.attack ?? existing.attack,
+          defense: facts.defense ?? existing.defense,
+          health: facts.health ?? existing.health,
+          questPoints: facts.questPoints ?? existing.questPoints,
+          victory: facts.victory ?? existing.victory,
+          engagementCost: facts.engagementCost ?? existing.engagementCost,
+          printings: [...(existing.printings.length > 0 ? existing.printings : []), ...printings.filter((p) => !existing.printings.some((q) => q.pack === p.pack))],
+        }
+      : {
+          code,
+          name: source.Title,
+          type: type?.type ?? "",
+          typeName: type?.typeName ?? "",
+          sphere: source.Sphere ? source.Sphere.toLowerCase() : null,
+          deckLimit: null,
+          ...facts,
+          errata: null,
+          imagesrc: null,
+          deckLegal: deckLegal(type?.type ?? "", type?.typeName ?? ""),
+          printings: [...printings, ...known],
+        };
+    return card;
+  };
+
+  for (const source of tfotr) {
+    const twin = pairs.get(source);
+    if (twin) claimed.add(twin);
+    let code = twin?.RingsDbCardId ?? "";
+    let packOverride: string | undefined;
+    if (!twin) {
+      const set = overrideFor(overrides, report, { name: source.Title, set: source.CardSet, number: source.Number });
+      if (!set?.code) {
+        report.twinless.push(`${source.Title} (#${source.Number})`);
+        continue;
+      }
+      code = set.code;
+      packOverride = set.pack;
+    }
+    const merged = merge(code, twin, source);
+    if (packOverride) merged.printings = [{ ...(merged.printings[0] ?? { pack: packOverride, number: source.Number }), pack: packOverride }];
+    byCode.set(code, merged);
+  }
+  // Twin printings with no TFotR card of their own (the later scenarios) come from Hall of Beorn alone.
+  for (const twin of twins) {
+    const code = twin.RingsDbCardId;
+    if (claimed.has(twin) || !code || byCode.has(code)) continue;
+    byCode.set(code, merge(code, twin, twin));
+  }
+
+  const cards: Card[] = [];
+  for (const card of byCode.values()) {
+    const set = overrideFor(overrides, report, { code: card.code, name: card.name });
+    const next = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
+    cards.push(cardSchema.parse(next));
+  }
+  cards.sort((left, right) => left.code.localeCompare(right.code));
+  return { cards, report };
+}

@@ -2,9 +2,9 @@
 
 A personal, offline app for The Lord of the Rings: The Card Game. Official campaigns are the product. The proof of concept is the 2022 Fellowship of the Ring Saga Expansion (MEC109), with the full official player-card pool available for decks from the first install.
 
-`pnpm test` runs Vitest and `pnpm lint` checks import boundaries. `maestro test .maestro` runs after the last phase, against a debug build, not as an earlier phase's exit. How to open the app on this Mac and on an Android phone is in [Run it locally](#run-it-locally). Decisions, the stack, the data rules, and the build order are in [docs/brief.md](docs/brief.md). Structure is in [docs/architecture.md](docs/architecture.md). What is in progress is in [docs/phases/STATUS.md](docs/phases/STATUS.md). `/implementer` builds a phase, `/reviewer` reviews the diff, and `/ux` reviews the screens. The app applies the rules, keywords, phases, effects, and the resulting numbers. The player only chooses among legal options. Do not reopen the product shape, and do not port DragnCards.
+`pnpm test` runs Vitest and `pnpm lint` checks import boundaries. `maestro test .maestro` runs after the last phase, against a debug build, not as an earlier phase's exit. How to open the app on this Mac and on an Android phone is in [Run it locally](#run-it-locally). Decisions, the stack, the data rules, and the build order are in [docs/brief.md](docs/brief.md). Structure is in [docs/architecture.md](docs/architecture.md). What is in progress is in [docs/phases/STATUS.md](docs/phases/STATUS.md). `/implementer` builds a phase, `/reviewer` reviews the diff, and `/ux` reviews the screens. The app applies the rules, keywords, phases, effects, and the resulting numbers. The player only chooses among legal options. Do not reopen the product shape.
 
-Do not commit `catalog.db`, RingsDB dumps, or card text. The catalog is generated in the release job and shipped inside the binary.
+Do not commit `catalog.db`. `data/` holds the cards, scenarios and rules text, fetched by `pnpm data:sync` and built offline by `pnpm data:build`; see [CLAUDE.md](CLAUDE.md) for the commands. The catalog is generated from `data/` and shipped inside the binary.
 
 ## Run it locally
 

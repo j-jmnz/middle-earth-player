@@ -1,3 +1,4 @@
+// Rules: rr.delayed-effects (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { pushEffectFrame } from "./effect-frames.ts";

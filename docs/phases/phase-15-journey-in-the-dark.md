@@ -11,7 +11,7 @@ Blocks: phase 16
 
 Booklet difficulty 8. Encounter set: Journey in the Dark only.
 
-Read the quest cards and the booklet together. Freeze a codes-and-counts fixture. The build fails on a missing code. Assert the Normal deck size you counted. Hall of Beorn is a reading aid. The quest card wins.
+`pnpm data:build` writes `data/scenarios/<id>.json` when Hall of Beorn's counts and the quest card's Setup text agree with the DragnCards load list; read the cross-check report (`pnpm data:build -- --verbose`), resolve what it flags with a row in `data/overrides.json`, and add the scenario's `resolution` groups to the campaign file. Then `pnpm effects:draft <id>` and the `effect-author` agent. Assert the Normal deck size. The quest card wins.
 
 Author effect records for abilities this scenario adds. Reuse surge, doomed, peril, archery, immune, indestructible, toughness, setup, victory, sentinel, and ranged from `src/rules`. A dealt card with a printed ability and no effect id fails coverage.
 

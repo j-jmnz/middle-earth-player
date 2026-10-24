@@ -38,10 +38,13 @@ Android ships an APK or AAB. iOS ships an IPA. A physical iPhone needs Apple sig
 ```mermaid
 flowchart LR
   subgraph dev [Build machine]
-    RingsDB[RingsDB JSON]
+    Sources[RingsDB, Hall of Beorn, DragnCards, rule PDFs]
+    Sync[pnpm data:sync]
+    Data[(data/ and src/effects/generated)]
     Script[scripts/build-catalog.ts]
     Catalog[(catalog.db)]
-    RingsDB --> Script --> Catalog
+    Sources --> Sync --> Data
+    Data --> Script --> Catalog
   end
   subgraph phone [Phone process]
     Screens[src/screens]
@@ -57,9 +60,10 @@ flowchart LR
   Catalog --> phone
 ```
 
-Two Node entry points exist, and they do not call each other at runtime.
+Three Node entry points exist, and none of them runs on the phone.
 
-- `scripts/build-catalog.ts` runs on a machine with network. It writes `assets/catalog.db` and the `CATALOG_VERSION` constant. Vitest and EAS Build consume that file. The phone never runs this script.
+- `pnpm data:sync` is the only command that uses the network. It refreshes `data/raw/` and `.cache/pdf/` and records every pin in `data/sources.json`. `pnpm data:build` turns the raw snapshots into `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules` and `src/effects/generated`, offline and deterministically. `pnpm data:check` rebuilds into a temporary directory and fails on any difference.
+- `scripts/build-catalog.ts` reads `data/` offline. It writes `assets/catalog.db` and the `CATALOG_VERSION` constant. EAS Build consumes that file.
 - The Expo app runs on the device. It reads the bundled catalog, reads and writes `user.db`, and calls the reducer in process. After the images for a session are cached, airplane mode is a supported state.
 
 A second human who must not see hidden cards, or several clients sharing one live table, would need a host. This product has neither. A future copy of `user.db` rows onto another device would still not run the round.
@@ -80,27 +84,30 @@ flowchart TD
   campaign --> rules
   play --> rules
   play --> catalog
+  play --> effects
+  campaign --> effects
   screens --> play
   screens --> campaign
   screens --> catalog
+  screens --> effects
 ```
 
 | Path | Owns | May import |
 | --- | --- | --- |
 | `src/catalog` | Zod schemas for cards, packs, `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition`; the universal deck-legal check; the catalog Drizzle schema | nothing in `src/` |
-| `src/effects` | Authored effect records, grouped by set | `src/catalog` |
+| `src/effects` | `generated/` (written by `data:build` from sentence templates) and `authored/` (the rest); `EFFECTS` is both, an authored id replacing a generated one | `src/catalog` |
 | `src/rules` | Round, zones, keywords, window stack, modifier list, effect interpreter, reducer | `src/catalog` |
-| `src/campaign` | Campaign registry, save and log types, saga validators, scenario scripts, resolution | `src/catalog`, `src/rules` |
-| `src/play` | Skia table, phase rail, sheets, gesture-to-intent mapping | `src/rules`, `src/catalog` |
-| `src/screens` | Expo Router routes, SQLite, image cache, deck editor, booklet reader | `src/play`, `src/campaign`, `src/catalog` |
+| `src/campaign` | Save and log types, saga validators, `buildStart`, resolution | `src/catalog`, `src/rules`, `src/effects` |
+| `src/play` | Skia table, phase rail, sheets, gesture-to-intent mapping | `src/rules`, `src/catalog`, `src/effects` |
+| `src/screens` | Expo Router routes, SQLite, image cache, deck editor, booklet reader | `src/play`, `src/campaign`, `src/catalog`, `src/effects` |
 
 The Expo Router root is `src/screens/routes`. Every file in that directory is a page. SQLite, the database provider, and tests stay in `src/screens`, outside that root.
 
-`src/rules` and `src/campaign` do not import `react-native`, `expo-*`, `src/play`, or `src/screens`. `src/play` imports `src/rules` and `src/catalog` only. Production code in `src/rules`, `src/campaign`, `src/play`, and `src/screens` does not import `src/effects`. The build script and tests may. A flat-config import rule fails the build on those edges. `eslint-plugin-import` v2 is the wrong tool for that config. Vitest imports the same reducer the screen calls and passes the effect list in.
+`src/rules` and `src/campaign` do not import `react-native`, `expo-*`, `src/play`, or `src/screens`. `src/play` imports `src/rules`, `src/catalog` and `src/effects`. `src/rules` does not import `src/effects`: it receives the effect list as an argument. Tests and scripts may import it. A flat-config import rule fails the build on those edges. `eslint-plugin-import` v2 is the wrong tool for that config. Vitest imports the same reducer the screen calls and passes the effect list in.
 
 Widget flags and resolution options are on reducer state. `src/screens` keeps the campaign import.
 
-The core round and the deck builder do not mention Fellowship by name. A scenario is a `ScenarioDefinition` the campaign registry supplies. The next box is a folder plus `register()` plus a catalog rebuild.
+The core round and the deck builder do not mention Fellowship by name. A scenario is `data/scenarios/<id>.json` and a `ScenarioDefinition` derived from it; `buildStart` turns a campaign and a scenario into the engine's start. The next box is more `data:sync` output, its `resolution` groups in the campaign file, and effects drafted from `pnpm effects:draft`.
 
 `src/play` sends player intents. It does not assign threat, damage, resources, progress, or log fields.
 
@@ -151,9 +158,9 @@ The window stack is part of game state. A nested frame pops before the parent co
 
 ## Effects
 
-The effect record shape, and which sentences may stay inactive, are in the brief. Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog` from the catalog phase on, including while the `effects` and `scenarios` tables are still empty. `src/effects` holds the authored records and imports only `src/catalog`.
+The effect record shape, and which sentences may stay inactive, are in the brief. Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog`. `src/effects/generated/` is written by `data:build`: `scripts/data/effects/templates.ts` holds ordered sentence patterns, and a template writes a record only when its pattern matches a whole line of card text. `src/effects/authored/` holds the records for the lines no template reads, and an authored id replaces a generated one when `AUTHORED_REPLACES` lists it. `pnpm effects:draft <scenario>` writes `.agent/drafts/<code>.md` for the lines that still lack a record.
 
-The interpreter takes the effect list as an argument. It does not import `src/effects`. Vitest passes the TypeScript records. The phone loads rows from `catalog.db` and passes those. The build script is the only production writer of that table. A round-trip test asserts the database ids equal the TypeScript ids.
+The interpreter takes the effect list as an argument. It does not import `src/effects`. The screens, `src/campaign` and `src/play` import `EFFECTS` and pass it in. There is no effects table in `catalog.db`. New verbs are added to `effect-schema.ts` and `src/rules/interpret.ts` by hand: that is engine work, not data.
 
 ## Scenario definition
 
@@ -179,7 +186,7 @@ type ScenarioDefinition = {
 
 `bookletPage` is an optional index on the scenario. It is not prose. Leave it unset until a page number is taken from the booklet. Do not copy headings or narrative into this type. The second active-location slot is the shared scenario slot the widget flag opens. It is not a field on the seat.
 
-Fixtures in `fixtures/` are codes and counts. They contain no card text. The build joins the codes to RingsDB rows. Which widget a scenario turns on is in the brief.
+`data/scenarios/<id>.json` is generated: stages, booklet sets, and for every card its pile (encounter, quest, staging, active location, set aside, attached) with Normal and Easy counts. `data:build` fails to write a scenario unless Hall of Beorn's per-scenario counts and the quest card's Setup text agree with the DragnCards load list; a mismatch is resolved with a row in `data/overrides.json`. `scenarioDefinition(data, campaign)` derives the `ScenarioDefinition`, including `setup` from the piles in the quest card's order (set aside, staging, active location, attach). Which widget a scenario turns on is in the brief.
 
 The save, the log, the pool, the loadout, and win and loss are specified in the brief. `src/campaign` applies that specification. The reducer does not switch on Fellowship scenario ids.
 
@@ -189,10 +196,10 @@ Two files, two handles, both reachable from screens.
 
 | File | Contents | Replacement |
 | --- | --- | --- |
-| `catalog.db` | `packs`, `cards`, `effects`, `scenarios`, `campaigns`, `meta` | New asset when `CATALOG_VERSION` increases. Not migrated in place. |
+| `catalog.db` | `packs`, `cards`, `campaigns`, `meta` | New asset when `CATALOG_VERSION` differs from the applied one. Not migrated in place. |
 | `user.db` | `decks`, `saves`, `image_files`, `booklets`, `meta` | SQL migrations in `drizzle/`, run on open. Never replaced by a catalog update. |
 
-`catalog.db` is a Metro asset. `forceOverwrite` is true only when the bundled version is greater than `user.db` `meta.appliedCatalogVersion`. First launch has no applied version, so the copy runs. `cards.deck_legal` is set at build time. `cards.campaign_id` is set only for rows a campaign owns. Errata text is what the app stores and shows when RingsDB sets `has_errata`.
+`catalog.db` is a Metro asset. `CATALOG_VERSION` is a hash of the catalog rows, so any change moves it. `forceOverwrite` is true when the bundled version differs from `user.db` `meta.appliedCatalogVersion`. First launch has no applied version, so the copy runs. `cards.deck_legal` is set at build time. `cards.campaign_id` is set only for rows a campaign owns. Errata text is what the app stores and shows when RingsDB sets `has_errata`.
 
 `useSQLiteContext` returns the nearest `SQLiteProvider`. Nesting the two providers and reading through that single hook leaves `catalog.db` unreachable, and the suspense helper keeps one module-level database and closes the previous file. Open each file with its own handle and pass both down.
 
@@ -242,11 +249,9 @@ The first screen paints from SQLite. It does not scan the image directory, query
 
 ## Catalog build
 
-`scripts/build-catalog.ts` fetches RingsDB packs and per-pack card files, drops names that start with `ALeP - `, validates with Zod, and writes `catalog.db`. Identifiers are RingsDB codes. The script is the only production writer of the `effects` table. It copies `src/effects` into that table and writes scenario rows from the checked fixtures plus the joined card rows. Payloads are cached in a gitignored directory. A re-run with that cache present does not refetch. CI fetches on a miss.
+`scripts/build-catalog.ts` reads `data/cards` and `data/raw/ringsdb/packs.json` and writes `catalog.db` and the `CATALOG_VERSION` constant (a hash of the rows). It does not fetch, and it does not write effects or scenarios: the app imports those from `src/effects` and `data/`. Identifiers are RingsDB codes. A card without a RingsDB row takes the code Hall of Beorn gives its Black Riders or Road Darkens printing, and `data/overrides.json` carries the two that have none.
 
-Payloads, `assets/catalog.db`, card images, and booklet PDFs are gitignored. The release job builds the database and ships it inside the binary. The coverage job builds `catalog.db` when the cached file is missing or older than the payloads, before Vitest, because the test has to see printed abilities that are not in git.
-
-The One Ring has a named source if a live payload still has no row. The build fails when a fixture code is missing. It does not invent stats.
+`assets/catalog.db`, `.cache/`, card images and booklet PDFs are gitignored. `data/` is committed, raw snapshots included, so no session starts without card text, scenario piles or rules text.
 
 ## Tests
 
@@ -258,7 +263,7 @@ Three layers. They do not stand in for each other.
 | Maestro | The built app: navigation, a refused briefing, a deck save, a resolution choice writing the log | Combat math, or that a drag stayed on the UI thread |
 | A physical phone | Pool fling, table drag, airplane mode after a kill, a catalog bump leaving `user.db` in place | The suite above |
 
-Vitest runs in Node on `src/rules` and `src/campaign`. No React renderer. A scenario is not playable until a test loads its quest deck, encounter deck, burden deck when it has one, and the seeded starter decks, and every printed ability on those cards has an effect id. A player card outside that set does not fail the test.
+Vitest runs in Node on `src/rules` and `src/campaign`. No React renderer, no network, no prebuilt database: tests that need `catalog.db` build one into a temporary directory from `data/`. A scenario is not playable until a test reads its quest deck, encounter deck, burden deck when it has one, and the seeded starter decks from `data/`, and every printed ability on those cards has an effect record. A player card outside that set does not fail the test. `src/campaign/full-game.test.ts` plays a whole scenario on fixed seeds and pins its step log. `scripts/data/*.test.ts` pin the card normalizer, the scenario cross-checks and the rules store, including that every rule id named in `src/rules` or the brief exists. CI runs `pnpm data:check`, `pnpm lint`, `tsc` and `pnpm test`.
 
 Maestro flows live in `.maestro/`. Each flow taps and asserts by testID and visible text. Card ability text stays out of those assertions. Assert a RingsDB code. The phase rail and the sheets are those nodes. A booklet flow asserts the empty state and the close control by testID. A smoke file, if a flow needs one, is a one-page PDF written for the test, not a page of MEC109. A flow that needs a deal uses the e2e seed. A flow that needs a finished scenario opens a save fixture parked on that choice, then asserts the log and the next path node. It does not play fifty rounds of unscripted draws. Flows are written in the phase that names them. `maestro test` runs once, after the last phase, against a debug build. It is not an earlier phase's exit, and a missing simulator does not keep that phase open. `.eas/workflows/e2e.yml` runs the same flows as an EAS `maestro` job on pull request. That job is alpha. The simulator does not stand in for the fling or the drag.
 

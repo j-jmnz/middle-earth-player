@@ -1,3 +1,4 @@
+// Rules: rr.quest-cards-quest-deck (data/rules/entries.json).
 import { pushCardEffects } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import { runQuestResolution } from "./explore.ts";

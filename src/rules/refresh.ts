@@ -1,3 +1,4 @@
+// Rules: rr.refresh-phase, rr.step-7-3 (data/rules/entries.json).
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { raiseThreat } from "./keywords.ts";

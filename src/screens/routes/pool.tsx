@@ -16,7 +16,8 @@ import {
 
 import { activeCardCodes } from "../../catalog/active-text";
 import { formatDeckRefusal, traitTokens } from "../../catalog/deck-save";
-import { cards, effects, packs } from "../../catalog/schema";
+import { cards, packs } from "../../catalog/schema";
+import { EFFECTS } from "../../effects";
 import {
   BodyText,
   ListRow,
@@ -201,15 +202,7 @@ export default function CardPool() {
       .orderBy(packs.cyclePosition, packs.position)
       .all(),
   );
-  const [activeCodes] = useState(() =>
-    activeCardCodes(
-      catalog
-        .select({ record: effects.record })
-        .from(effects)
-        .all()
-        .map((row) => row.record),
-    ),
-  );
+  const [activeCodes] = useState(() => activeCardCodes(EFFECTS));
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);
   const [search, setSearch] = useState("");
   const [applied, setApplied] = useState<PoolFilter>(emptyPoolFilter);

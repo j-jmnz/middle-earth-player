@@ -1,10 +1,10 @@
-import { scenarioDefinitionSchema, type ScenarioDefinition } from "../catalog/boundary";
 import {
-  fixtureCards,
   normalEncounterSize,
+  scenarioCards,
   scenarioDefinition,
-  type ScenarioFixture,
-} from "../catalog/scenario-fixture";
+  type CampaignData,
+  type ScenarioData,
+} from "../catalog/scenario-data";
 
 export const DEBUG_HERO_CODE = "141001";
 export const DEBUG_CAMPAIGN_ID = "fellowship-of-the-ring";
@@ -37,9 +37,8 @@ export type DebugCheckInput = {
     deckLegal: boolean;
     imagesrc: string | null;
   };
-  fixture: ScenarioFixture;
-  scenarioPresent: boolean;
-  bakedDefinition: unknown;
+  scenario: ScenarioData;
+  campaign: CampaignData;
   presentCardCodes: readonly string[];
   imageFileCount: number;
   snapshotCount: number;
@@ -59,7 +58,7 @@ export function debugSentences(input: DebugCheckInput): readonly string[] {
   sentences.push(countSentence(input.saveCount, "save"));
   sentences.push(...heroSentences(input.hero));
   sentences.push(...scenarioSentences(input));
-  sentences.push(...absentCardSentences(input.fixture, input.presentCardCodes));
+  sentences.push(...absentCardSentences(input.scenario, input.presentCardCodes));
   sentences.push(countSentence(input.imageFileCount, "image file"));
   sentences.push(countSentence(input.snapshotCount, "image in memory", "images in memory"));
   sentences.push(countSentence(input.pauseEntryCount, "pause entry", "pause entries"));
@@ -101,62 +100,21 @@ function heroSentences(hero: DebugCheckInput["hero"]): string[] {
 }
 
 function scenarioSentences(input: DebugCheckInput): string[] {
-  const expected = scenarioDefinition(input.fixture, (name) => name);
-  const sentences = [
-    `Normal encounter size is ${normalEncounterSize(input.fixture)}.`,
-    ...expected.encounterSets.map((set) => `${set.code} has ${set.count} cards.`),
-    `Stages are ${listCodes(expected.stages.map((stage) => stage.code))}.`,
+  const definition = scenarioDefinition(input.scenario, input.campaign);
+  return [
+    `Normal encounter size is ${normalEncounterSize(input.scenario)}.`,
+    ...definition.encounterSets.map((set) => `${set.code} has ${set.count} cards.`),
+    `Stages are ${listCodes(definition.stages.map((stage) => stage.code))}.`,
+    `Setup instructions: ${definition.setup.length}. Resolution options: ${definition.resolution.length}.`,
   ];
-  if (!input.scenarioPresent) {
-    sentences.push(`Scenario ${input.fixture.id} is missing.`);
-    return sentences;
-  }
-  const parsed = scenarioDefinitionSchema.safeParse(input.bakedDefinition);
-  if (!parsed.success) {
-    sentences.push(`Scenario ${input.fixture.id} is not a definition.`);
-    return sentences;
-  }
-  const problems = definitionProblems(input.fixture.id, parsed.data, expected);
-  if (problems.length === 0) sentences.push(`Scenario ${input.fixture.id} matches the fixture.`);
-  sentences.push(...problems);
-  if (problems.length === 0) {
-    sentences.push(`Setup instructions: ${parsed.data.setup.length}. Resolution options: ${parsed.data.resolution.length}.`);
-  }
-  return sentences;
 }
 
-function definitionProblems(id: string, actual: ScenarioDefinition, expected: ScenarioDefinition): string[] {
-  const problems: string[] = [];
-  if (actual.id !== expected.id) problems.push(`Scenario ${id} is stored as ${actual.id}.`);
-  if (JSON.stringify(actual.encounterSets) !== JSON.stringify(expected.encounterSets)) {
-    problems.push(`Scenario ${id} encounter sets are ${encounterList(actual.encounterSets)}.`);
-  }
-  const actualStages = listCodes(actual.stages.map((stage) => stage.code));
-  const expectedStages = listCodes(expected.stages.map((stage) => stage.code));
-  if (actualStages !== expectedStages) problems.push(`Scenario ${id} stages are ${actualStages}.`);
-  if (JSON.stringify(actual.widgets) !== JSON.stringify(expected.widgets)) {
-    problems.push(`Scenario ${id} widgets do not match the fixture.`);
-  }
-  if (JSON.stringify(actual.setup) !== JSON.stringify(expected.setup)) {
-    problems.push(`Scenario ${id} setup does not match the fixture.`);
-  }
-  // The fixture names rewards; the catalog build turned the names into codes. Compare the shape only.
-  const shape = (resolution: ScenarioDefinition["resolution"]) => JSON.stringify(resolution.map((group) => [group.id, group.choices.length]));
-  if (shape(actual.resolution) !== shape(expected.resolution)) {
-    problems.push(`Scenario ${id} resolution does not match the fixture.`);
-  }
-  if ((actual.bookletPage ?? null) !== (expected.bookletPage ?? null)) {
-    problems.push(`Scenario ${id} booklet page does not match the fixture.`);
-  }
-  return problems;
-}
-
-function absentCardSentences(fixture: ScenarioFixture, presentCardCodes: readonly string[]): string[] {
+function absentCardSentences(scenario: ScenarioData, presentCardCodes: readonly string[]): string[] {
   const present = new Set(presentCardCodes);
-  const missing = [...new Set(fixtureCards(fixture).map((card) => card.code))]
+  const missing = [...new Set(scenarioCards(scenario).map((card) => card.code))]
     .filter((code) => !present.has(code))
     .sort();
-  return missing.map((code) => `Fixture code ${code} is absent from cards.`);
+  return missing.map((code) => `Scenario code ${code} is absent from cards.`);
 }
 
 function imageSampleSentence(sample: DebugImageSample): string {
@@ -186,6 +144,3 @@ function listCodes(codes: readonly string[]): string {
   return codes.join(", ");
 }
 
-function encounterList(sets: readonly { code: string; count: number }[]): string {
-  return sets.map((set) => `${set.code} ${set.count}`).join(", ");
-}

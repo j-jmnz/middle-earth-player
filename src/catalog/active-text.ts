@@ -1,22 +1,6 @@
-/** Card codes named by effect rows. An empty list means every sentence is inactive. */
-export function activeCardCodes(records: readonly string[]): ReadonlySet<string> {
-  const codes = new Set<string>();
-  for (const record of records) {
-    const code = cardCodeFromEffectRecord(record);
-    if (code) codes.add(code);
-  }
-  return codes;
-}
+import type { Effect } from "./effect-schema.ts";
 
-export function cardCodeFromEffectRecord(record: string): string | null {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(record);
-  } catch {
-    return null;
-  }
-  if (typeof parsed !== "object" || parsed === null || !("cardCode" in parsed)) return null;
-  const code = parsed.cardCode;
-  if (typeof code !== "string" || code.length === 0) return null;
-  return code;
+/** Card codes that have effect records. An empty list means every sentence is inactive. */
+export function activeCardCodes(records: readonly Pick<Effect, "cardCode">[]): ReadonlySet<string> {
+  return new Set(records.map((record) => record.cardCode).filter((code) => code.length > 0));
 }

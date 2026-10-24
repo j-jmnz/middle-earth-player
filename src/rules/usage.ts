@@ -1,3 +1,4 @@
+// Rules: rr.limits (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
 
 import type { EngineStep, Payment } from "./intents.ts";

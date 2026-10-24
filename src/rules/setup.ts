@@ -1,3 +1,4 @@
+// Rules: mec109.setting-up-the-game, rr.mulligan (data/rules/entries.json).
 import type { ScenarioDefinition } from "../catalog/boundary.ts";
 
 import type { EngineStep } from "./intents.ts";

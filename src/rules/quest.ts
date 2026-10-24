@@ -1,3 +1,4 @@
+// Rules: rr.quest-advancement, rr.step-3-4 (data/rules/entries.json).
 import type { EngineStep } from "./intents.ts";
 import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
