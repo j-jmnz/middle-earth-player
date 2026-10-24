@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeIn, ReduceMotion, SlideInDown } from "react-native-reanimated";
 
+import type { LogLine } from "./log.ts";
 import { firstShares, shareOf, sharesReady, tapShare, type Share } from "./pay.ts";
 import type { Rail } from "./rail.ts";
 import type { SeatThreat } from "./selectors.ts";
@@ -322,5 +323,30 @@ export function SheetTab({ title, onOpen }: { title: string; onOpen: () => void 
     <View className="rounded-t-sheet bg-paper px-6 pb-safe pt-2">
       <ChromeButton label={`Choose: ${title}`} testID="sheet-expand" tone="ink" onPress={onOpen} />
     </View>
+  );
+}
+
+/** This round's engine steps and their causes, on paper. Text only: it is how a player checks a number against its source. */
+export function LogPanel({ round, lines, onClose }: { round: number; lines: readonly LogLine[]; onClose: () => void }) {
+  return (
+    <Animated.View entering={rise} testID="log-sheet" className="rounded-t-sheet bg-paper px-6 pb-safe pt-3" style={{ maxHeight: "80%" }}>
+      <View className="mb-2 h-1 w-10 self-center rounded-pill bg-inkLine" />
+      <View className="items-center">
+        <Text className="font-display text-eyebrow uppercase text-inkLabel">Log</Text>
+        <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">{`Round ${round}`}</Text>
+      </View>
+      <ScrollView className="mt-3" style={{ flexGrow: 0 }}>
+        {lines.length === 0 ? <Text className="text-center text-body text-inkMuted">Nothing has happened this round yet.</Text> : null}
+        {lines.map((line) => (
+          <View key={line.key} testID={`log-line-${line.key}`} className="border-b py-2" style={{ borderColor: t.inkLine }}>
+            <Text className="text-body text-ink">{line.text}</Text>
+            {line.cause ? <Text className="mt-0.5 text-label text-inkMuted">{line.cause}</Text> : null}
+          </View>
+        ))}
+      </ScrollView>
+      <View className="items-center pt-2">
+        <ChromeButton label="Close" testID="log-close" tone="ink" onPress={onClose} />
+      </View>
+    </Animated.View>
   );
 }

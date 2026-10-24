@@ -15,7 +15,7 @@ import { actionsSheet, commitSheet, paySheet, sheetFor, type Sheet, type SheetNa
 import { createTableStore, type PlayerIntent, type ScenarioState, type TableStore } from "../../../play/store";
 import { TableCanvas } from "../../../play/table-canvas";
 import type { PictureSource } from "../../../play/table-canvas-types";
-import { ChromeButton, ChromePrimary, PhaseRail, SheetTab, SheetView, ThreatRing } from "../../../play/table-chrome";
+import { ChromeButton, ChromePrimary, LogPanel, PhaseRail, SheetTab, SheetView, ThreatRing } from "../../../play/table-chrome";
 import { BodyText, NavBar, Screen } from "../../chrome";
 import { bookletParams } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
@@ -24,7 +24,8 @@ import { goBack } from "../../go-back";
 import { scanAssets } from "../../images/scan-map";
 import { cachedImage, useImageSnapshot } from "../../images/store";
 import { routeCode } from "../../route-code";
-import { ledgerLine } from "../../ledger";
+import { ledgerLine, ruleTitle } from "../../../play/ledger";
+import { logLines, type LogNames } from "../../../play/log";
 import { openTable, type TableSession } from "../../table-session";
 
 function picture(code: string): PictureSource | null {
@@ -62,6 +63,8 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   // A sheet opened from the bar or from another sheet (a pay sheet, the attackers of an attack). Gone when the game moves.
   const [overlay, setOverlay] = useState<{ sheet: Sheet; game: ScenarioState } | null>(null);
   const [collapsed, setCollapsed] = useState<string | null>(null);
+  const [logOpen, setLogOpen] = useState(false);
+  const roundSteps = useStore(store, (state) => state.roundSteps);
 
   const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
   const names: SheetNames = useMemo(
@@ -70,6 +73,17 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   );
   const inactive = useCallback(() => false, []);
   const rail = useMemo(() => railFor(game), [game]);
+  const logNames: LogNames = useMemo(
+    () => ({
+      card: names.card,
+      code: nameOf,
+      effectCard: (effectId: string) => session.ctx.effects.find((effect) => effect.id === effectId)?.cardCode ?? null,
+      rule: ruleTitle,
+      line: ledgerLine,
+    }),
+    [names, nameOf, session],
+  );
+  const lines = useMemo(() => (logOpen ? logLines(roundSteps, logNames) : []), [logOpen, roundSteps, logNames]);
   const windowSheet = useMemo(() => sheetFor(game, session.ctx, legal, names), [game, session, legal, names]);
   const sheet = overlay && overlay.game === game ? overlay.sheet : windowSheet;
   const showSheet = sheet != null && collapsed !== sheet.key;
@@ -117,6 +131,7 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
       <View className="flex-row items-center justify-between px-4">
         <ChromeButton label="‹ Path" testID="table-back" accessibilityLabel="Back to the path" onPress={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} />
         <Text testID="table-round" className="text-label text-muted">{`Round ${game.round}`}</Text>
+        <ChromeButton label="Log" testID="log-open" tone="gold" accessibilityLabel="This round's log" onPress={() => setLogOpen(true)} />
         <ChromeButton
           label="Booklet"
           testID="booklet-open"
@@ -147,7 +162,12 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
         </Text>
       ) : null}
       <PhaseRail rail={rail} />
-      {sheet && showSheet ? (
+      {logOpen ? (
+        <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
+          <LogPanel round={game.round} lines={lines} onClose={() => setLogOpen(false)} />
+        </View>
+      ) : null}
+      {sheet && showSheet && !logOpen ? (
         <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
           <SheetView sheet={sheet} game={game} names={names} onIntent={dispatch} onNext={openSheet} onOutcome={onOutcome} onInspect={onInspect} onCollapse={() => setCollapsed(sheet.key)} />
         </View>
