@@ -1,6 +1,6 @@
 import { bookletPdfAvailable } from "booklet-pdf";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Text, View } from "react-native";
 
 import { BodyText, PrimaryButton, RingMark, Screen, TextButton } from "../../chrome";
@@ -30,6 +30,8 @@ export default function Booklet() {
   const [row, setRow] = useState<BookletRow | null>(() => (id ? readBooklet(user, id) : null));
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // The first event a reader sends can be its starting position, not the player turning a page.
+  const firstEvent = useRef(true);
 
   const close = () => {
     if (router.canGoBack()) router.back();
@@ -61,7 +63,12 @@ export default function Booklet() {
             page={first}
             style={{ flex: 1 }}
             onPageChange={(event) => {
-              writeLastPage(user, id, event.nativeEvent.page);
+              const { page } = event.nativeEvent;
+              if (firstEvent.current) {
+                firstEvent.current = false;
+                if (page !== first) return;
+              }
+              if (page >= 1) writeLastPage(user, id, page);
             }}
           />
         </View>
@@ -70,7 +77,7 @@ export default function Booklet() {
     );
   }
 
-  const missing = row && uri ? "This build cannot show PDFs." : "This booklet is not on this phone. Scenarios still play without it.";
+  const missing = !bookletPdfAvailable() ? "This build cannot show PDFs." : "This booklet is not on this phone. Scenarios still play without it.";
 
   async function add(): Promise<void> {
     if (!id || busy) return;

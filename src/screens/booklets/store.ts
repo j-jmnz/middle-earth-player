@@ -7,10 +7,6 @@ export function bookletUri(_row: BookletRow): string | null {
   return null;
 }
 
-export function bookletFileExists(_row: BookletRow): boolean {
-  return false;
-}
-
 export async function importBooklet(_user: unknown, _id: string): Promise<ImportResult> {
   return { ok: false, reason: "unavailable", message: "Booklets can be stored on a phone, not in the browser." };
 }

@@ -18,10 +18,6 @@ export function bookletUri(row: BookletRow): string | null {
   return file.exists ? file.uri : null;
 }
 
-export function bookletFileExists(row: BookletRow): boolean {
-  return fileOf(row).exists;
-}
-
 function booksDirectory(): Directory {
   const directory = new Directory(Paths.document, BOOKLET_DIRECTORY);
   if (!directory.exists) directory.create({ intermediates: true, idempotent: true });
@@ -55,23 +51,35 @@ export async function importBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>
       return { ok: false, reason: "notPdf", message: "That file is not a PDF this phone can open." };
     }
 
+    // The stored book stays where it is until the new file has its digest and the row is written. The old book moves
+    // aside under a temp name and comes back if anything after the swap fails.
     const finalFile = new File(directory, `${id}.pdf`);
-    if (finalFile.exists) finalFile.delete();
-    partial.rename(`${id}.pdf`);
-    // The renamed file is the stored book now; the cleanup below must not touch it.
-    partial = null;
-    const sha256 = await finalFile.digest("SHA-256");
-    const row: BookletRow = {
-      id,
-      path: bookletPath(id),
-      originalFilename: asset.name,
-      byteSize: finalFile.size ?? asset.size ?? 0,
-      sha256,
-      pageCount,
-      lastPage: 1,
-    };
-    writeBooklet(user, row);
-    return { ok: true, row };
+    const aside = new File(directory, `${id}.previous`);
+    if (aside.exists) aside.delete();
+    const hadPrevious = finalFile.exists;
+    if (hadPrevious) finalFile.rename(`${id}.previous`);
+    try {
+      partial.rename(`${id}.pdf`);
+      // The renamed file is the stored book now; the cleanup below must not touch it.
+      partial = null;
+      const sha256 = await finalFile.digest("SHA-256");
+      const row: BookletRow = {
+        id,
+        path: bookletPath(id),
+        originalFilename: asset.name,
+        byteSize: finalFile.size ?? asset.size ?? 0,
+        sha256,
+        pageCount,
+        lastPage: 1,
+      };
+      writeBooklet(user, row);
+      if (aside.exists) aside.delete();
+      return { ok: true, row };
+    } catch (error: unknown) {
+      if (finalFile.exists) finalFile.delete();
+      if (hadPrevious && aside.exists) aside.rename(`${id}.pdf`);
+      throw error;
+    }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "The booklet could not be stored.";
     return { ok: false, reason: "failed", message };

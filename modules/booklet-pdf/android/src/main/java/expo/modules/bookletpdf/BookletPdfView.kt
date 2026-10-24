@@ -22,7 +22,6 @@ import java.util.concurrent.Executors
 // every render runs on one background thread. It reports the first page that is showing.
 class BookletPdfView(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
   private val onPageChange by EventDispatcher()
-  private val renderThread = Executors.newSingleThreadExecutor()
   private val main = Handler(Looper.getMainLooper())
   private val manager = LinearLayoutManager(context)
   private val list = RecyclerView(context)
@@ -33,6 +32,11 @@ class BookletPdfView(context: Context, appContext: AppContext) : ExpoView(contex
   private var loadedUri: String? = null
   private var wantedPage = 1
   private var reported = 0
+  // False until the list is at the wanted page; scroll events before that are the layout settling, not the reader.
+  private var settled = false
+  // Height over width of the first page: the placeholder height of a page that is not drawn yet.
+  private var aspect = 0f
+  private var renderThread = Executors.newSingleThreadExecutor()
 
   init {
     list.layoutManager = manager
@@ -49,17 +53,38 @@ class BookletPdfView(context: Context, appContext: AppContext) : ExpoView(contex
   fun load(uri: String) {
     if (loadedUri == uri) return
     loadedUri = uri
+    open(uri)
+  }
+
+  // Opens the file on a fresh render thread. Detaching shuts the thread down, so attaching again calls this too.
+  private fun open(uri: String) {
+    settled = false
     closeRenderer()
-    val path = Uri.parse(uri).path ?: return
-    try {
-      val opened = ParcelFileDescriptor.open(File(path), ParcelFileDescriptor.MODE_READ_ONLY)
-      descriptor = opened
-      renderer = PdfRenderer(opened)
-    } catch (error: Exception) {
-      closeRenderer()
+    if (renderThread.isShutdown) renderThread = Executors.newSingleThreadExecutor()
+    aspect = 0f
+    val path = Uri.parse(uri).path
+    if (path != null) {
+      try {
+        val opened = ParcelFileDescriptor.open(File(path), ParcelFileDescriptor.MODE_READ_ONLY)
+        descriptor = opened
+        val opening = PdfRenderer(opened)
+        renderer = opening
+        // No render is queued yet, so opening page 0 here does not meet the render thread. Pages are about the same shape.
+        if (opening.pageCount > 0) {
+          opening.openPage(0).use { first -> if (first.width > 0) aspect = first.height.toFloat() / first.width }
+        }
+      } catch (error: Exception) {
+        closeRenderer()
+      }
     }
     adapter.notifyDataSetChanged()
     show(wantedPage)
+  }
+
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    val uri = loadedUri
+    if (uri != null && renderer == null) open(uri)
   }
 
   fun show(page: Int) {
@@ -69,13 +94,20 @@ class BookletPdfView(context: Context, appContext: AppContext) : ExpoView(contex
     val index = minOf(wantedPage, count) - 1
     if (manager.findFirstVisibleItemPosition() != index) {
       manager.scrollToPositionWithOffset(index, 0)
+    } else {
+      settled = true
     }
   }
 
   private fun report() {
     val count = renderer?.pageCount ?: 0
     val position = manager.findFirstVisibleItemPosition()
-    if (count == 0 || position < 0 || position + 1 == reported) return
+    if (count == 0 || position < 0) return
+    if (!settled) {
+      if (position + 1 != minOf(wantedPage, count)) return
+      settled = true
+    }
+    if (position + 1 == reported) return
     reported = position + 1
     wantedPage = reported
     onPageChange(mapOf("page" to reported, "pageCount" to count))
@@ -117,6 +149,11 @@ class BookletPdfView(context: Context, appContext: AppContext) : ExpoView(contex
       val width = if (list.width > 0) list.width else resources.displayMetrics.widthPixels
       holder.image.setImageDrawable(null)
       holder.image.tag = position
+      // A placeholder of the page shape keeps the list height and the scroll position steady while pages render.
+      if (aspect > 0f) {
+        holder.image.layoutParams.height = (width * aspect).toInt()
+        holder.image.requestLayout()
+      }
       val current = renderer ?: return
       renderThread.execute {
         val bitmap = try {
@@ -133,7 +170,10 @@ class BookletPdfView(context: Context, appContext: AppContext) : ExpoView(contex
           null
         }
         main.post {
-          if (bitmap != null && holder.image.tag == position) holder.image.setImageBitmap(bitmap)
+          if (bitmap != null && holder.image.tag == position) {
+            holder.image.layoutParams.height = bitmap.height
+            holder.image.setImageBitmap(bitmap)
+          }
         }
       }
     }

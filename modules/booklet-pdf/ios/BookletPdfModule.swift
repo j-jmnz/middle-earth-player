@@ -36,6 +36,9 @@ class BookletPdfView: ExpoView {
   private let pdfView = PDFView()
   private var loadedUri: String?
   private var wantedPage = 1
+  // False until the document is showing the wanted page. PDFKit posts PDFViewPageChanged for the first page when the
+  // document is assigned; that event is not the reader's position and must not overwrite wantedPage or the saved page.
+  private var settled = false
 
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
@@ -59,11 +62,14 @@ class BookletPdfView: ExpoView {
 
   override func layoutSubviews() {
     pdfView.frame = bounds
+    // go(to:) can be a no-op while the view has no size; ask again once it has one.
+    if !settled { show(wantedPage) }
   }
 
   func load(_ uri: String) {
     if loadedUri == uri { return }
     loadedUri = uri
+    settled = false
     guard let url = URL(string: uri), let document = PDFDocument(url: url) else {
       pdfView.document = nil
       return
@@ -80,11 +86,14 @@ class BookletPdfView: ExpoView {
     if pdfView.currentPage != target {
       pdfView.go(to: target)
     }
+    settled = pdfView.currentPage == target
   }
 
   @objc private func pageChanged() {
     guard let document = pdfView.document, let current = pdfView.currentPage else { return }
     let page = document.index(for: current) + 1
+    // Until the wanted page has been shown, events are PDFKit settling in (page 1 on assignment), not the reader.
+    if !settled { return }
     wantedPage = page
     onPageChange(["page": page, "pageCount": document.pageCount])
   }
