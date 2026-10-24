@@ -1,12 +1,11 @@
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { characters } from "./combat.ts";
-import { holds } from "./conditions.ts";
+import { hasTrait, holds } from "./conditions.ts";
 import { scheduleDelayed } from "./delayed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, raiseThreat } from "./keywords.ts";
-import { printedOf } from "./printed.ts";
 import { engageEnemy, stagingEnemies } from "./quest.ts";
 import { shuffleIds } from "./seed.ts";
 import { updateCard, type ScenarioState } from "./state.ts";
@@ -43,7 +42,7 @@ export function runExtraVerb(
       const seat = seatFor(state, instruction.who, focus.seat);
       let next = state;
       for (const id of stagingEnemies(state, ctx.cards)) {
-        if (instruction.trait && !printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(instruction.trait)) continue;
+        if (instruction.trait && !hasTrait(state, id, instruction.trait, ctx)) continue;
         next = engageEnemy(next, seat, id, steps);
       }
       return next;

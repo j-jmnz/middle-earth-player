@@ -42,14 +42,17 @@ export function cancelReason(state: ScenarioState, intent: TriggerIntent, ctx: R
   const data = top?.data;
   if (state.window?.kind !== "cancelOffer" || data?.kind !== "effect" || !data.cancel) return "That intent is not legal in this window";
   if (intent.cardId !== top?.cardId || intent.effectId !== data.effectId) return "That effect cannot be triggered";
-  const payments = intent.payments ?? [];
+  const spent = new Map<string, number>();
   let sum = 0;
-  for (const payment of payments) {
+  for (const payment of intent.payments ?? []) {
     const hero = state.cards[payment.heroId];
     if (!Number.isInteger(payment.amount) || payment.amount < 0) return "That payment is not a cost";
     if (!hero || hero.zone !== "heroes" || hero.controller !== state.firstPlayer) return "That hero cannot pay";
     if (!spherePays(printedOf(ctx.cards, hero.code).sphere, data.cancel.sphere)) return "Wrong sphere";
-    if (hero.resources < payment.amount) return "That hero does not have those resources";
+    // One hero can appear twice in the list, so what it owes is the sum of its payments.
+    const owed = (spent.get(payment.heroId) ?? 0) + payment.amount;
+    if (hero.resources < owed) return "That hero does not have those resources";
+    spent.set(payment.heroId, owed);
     sum += payment.amount;
   }
   if (sum > data.cancel.amount) return "Overpay";

@@ -3,7 +3,7 @@ import type { Condition, Effect, Instruction } from "../catalog/boundary.ts";
 import { beginEffect } from "./cancel.ts";
 import { beginEnemyAttack } from "./combat.ts";
 import { askTarget, openBranch } from "./choices.ts";
-import { holds, searchable } from "./conditions.ts";
+import { hasTrait, holds, searchable } from "./conditions.ts";
 import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
@@ -155,7 +155,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       return seats
         .flatMap((seat) => state.seats[seat]?.engaged ?? [])
         .filter((id) => hasEnemyType(state, id, ctx))
-        .filter((id) => !target.trait || printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(target.trait));
+        .filter((id) => !target.trait || hasTrait(state, id, target.trait, ctx));
     }
     case "AttachSelf": {
       const code = sourceId ? state.cards[sourceId]?.code : undefined;
@@ -163,7 +163,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       if (instruction.to.kind === "hero") return (state.seats[item.seat]?.heroes ?? []).filter(free);
       const trait = instruction.to.trait;
       return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])]
-        .filter((id) => hasEnemyType(state, id, ctx) && printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(trait))
+        .filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx))
         .filter(free);
     }
     case "SearchMove":

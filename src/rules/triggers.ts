@@ -16,6 +16,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
   const actor = event.seat ?? state.firstPlayer;
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone)) continue;
+    if (event.cardId != null && instance.id !== event.cardId) continue;
     for (const effect of ctx.effects) {
       if (effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;
       if (effect.timing !== timing) continue;

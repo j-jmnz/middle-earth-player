@@ -138,3 +138,9 @@ function finish(state: ScenarioState, data: HideData, steps: EngineStep[]): Scen
   if (parent?.data.kind !== "reveal") return popped;
   return patchTop(popped, { data: { ...parent.data, hide: data.result } });
 }
+
+// A Hide failure only matters during its own round, so older ones go when the round advances.
+export function pruneHideFailures(state: ScenarioState): ScenarioState {
+  const kept = state.hideFailures.filter((failure) => failure.round === state.round);
+  return kept.length === state.hideFailures.length ? state : { ...state, hideFailures: kept };
+}

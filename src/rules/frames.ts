@@ -98,7 +98,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     case 2:
       return runRevealed(patchTop(state, { step: 3 }), id, seat, frame.peril, ctx, steps);
     case 3:
-      return fireForced(patchTop(state, { step: 4 }), { trigger: "revealed", seat }, ctx, steps);
+      return fireForced(patchTop(state, { step: 4 }), { trigger: "revealed", seat, cardId: id }, ctx, steps);
     case 4: {
       const next = patchTop(state, { step: 5 });
       const revealing = next.seats[seat];

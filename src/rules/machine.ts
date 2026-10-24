@@ -14,7 +14,7 @@ import {
 } from "./combat.ts";
 import { applyChoice } from "./choices.ts";
 import { advanceFrame, stagingStep } from "./frames.ts";
-import { commitHide } from "./hide.ts";
+import { commitHide, pruneHideFailures } from "./hide.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import { drawOne, gainSeatResources, type ReduceContext } from "./interpret.ts";
 import { applyPass, modeAfterPass } from "./pass.ts";
@@ -137,7 +137,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
 }
 
 function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  const bumped = { ...state, round: state.round + 1 };
+  const bumped = pruneHideFailures({ ...state, round: state.round + 1 });
   if (hasTiming(bumped, ctx, "beginningOfPhase")) return openPass(bumped);
   return withMode(bumped, "resourceGrant");
 }

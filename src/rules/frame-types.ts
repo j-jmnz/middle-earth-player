@@ -64,7 +64,8 @@ export type HideData = {
 };
 
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string };
+// `cardId` limits the event to one card: only that card's effects hear it.
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string };
 
 export type FrameData =
   | { kind: "event"; event: GameEvent }
