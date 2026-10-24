@@ -6,6 +6,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
 import { activeCardCodes } from "../../../catalog/active-text";
+import { hasUniqueText } from "../../../play/inactive";
 import { cards } from "../../../catalog/schema";
 import { EFFECTS } from "../../../effects";
 import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, SphereMark, markedSphere, sphereWord } from "../../chrome";
@@ -235,7 +236,7 @@ export default function CardScreen() {
             </>
           )}
         </View>
-        {row ? <CardFacts row={row} inactive={!active.has(row.code)} /> : null}
+        {row ? <CardFacts row={row} inactive={!active.has(row.code) && hasUniqueText(row.text)} /> : null}
         {row?.errata ? (
           <View className="mt-8 border-t border-hairline pt-5">
             <Eyebrow>Errata</Eyebrow>

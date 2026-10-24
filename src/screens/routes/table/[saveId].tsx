@@ -21,6 +21,7 @@ import { goBack } from "../../go-back";
 import { scanAssets } from "../../images/scan-map";
 import { cachedImage, useImageSnapshot } from "../../images/store";
 import { routeCode } from "../../route-code";
+import { inactiveCodes } from "../../../play/inactive";
 import { ledgerLine, ruleTitle } from "../../../play/ledger";
 import { logLines, type LogNames } from "../../../play/log";
 import { openTable, sessionStore, type TableSession } from "../../table-session";
@@ -53,7 +54,9 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
     () => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine }),
     [nameOf, store],
   );
-  const inactive = useCallback(() => false, []);
+  // Unique text with no effect record is inactive: the canvas veils it, and no control applies it.
+  const inactiveSet = useMemo(() => inactiveCodes(new Map([...session.facts].map(([code, facts]) => [code, facts.text])), session.ctx.effects), [session]);
+  const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
   const rail = useMemo(() => railFor(game), [game]);
   const logNames: LogNames = useMemo(
     () => ({
