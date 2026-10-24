@@ -154,5 +154,27 @@
       "reason": "The DragnCards Easy deck keeps 3 Black Steed. Hall of Beorn gives 1 in both its scenario list and its card record. The gold Easy mark is printed on individual copies, so one scan cannot show it; the two agreeing Hall of Beorn fields win. Normal mode is unaffected.",
       "source": "hallofbeorn.com/Export/Scenarios/Flight-to-the-Ford; hallofbeorn.com/Export/EncounterCards (Black Steed EasyModeQuantity 1)"
     }
+  ],
+  "campaigns": [
+    {
+      "id": "the-two-towers",
+      "name": "The Two Towers",
+      "products": [
+        "The Treason of Saruman",
+        "The Land of Shadow"
+      ],
+      "reason": "No source names a campaign. Hall of Beorn numbers the Saga scenarios 1-18 in book order and groups them by pack: The Black Riders and The Road Darkens are 1-6 (the Fellowship campaign built here), The Treason of Saruman 7-9 and The Land of Shadow 10-12 follow it. The pairing of the packs into one campaign and the campaign's name (the title of the book its scenarios follow) are the saga's published structure, recorded here because no fetched source states them; the scenario count is Hall of Beorn's listing.",
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 41"
+    },
+    {
+      "id": "the-return-of-the-king",
+      "name": "The Return of the King",
+      "products": [
+        "The Flame of the West",
+        "The Mountain of Fire"
+      ],
+      "reason": "No source names a campaign. Hall of Beorn numbers the Saga scenarios 1-18 in book order: The Flame of the West 13-15 and The Mountain of Fire 16-18 follow the Two Towers scenarios. The pairing of the packs into one campaign and the campaign's name (the title of the book its scenarios follow) are the saga's published structure, recorded here because no fetched source states them; the scenario count is Hall of Beorn's listing.",
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 41"
+    }
   ]
 }

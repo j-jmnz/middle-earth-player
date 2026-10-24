@@ -7,6 +7,7 @@ import { getTableConfig, type SQLiteTable } from "drizzle-orm/sqlite-core";
 
 import { parseRingsDbPacks, type RingsDbPack } from "../src/catalog/boundary.ts";
 import type { Card } from "../src/catalog/card-facts.ts";
+import { campaignIndexSchema } from "../src/catalog/scenario-data.ts";
 import { campaigns, cards, catalogTables, meta, packs } from "../src/catalog/schema.ts";
 import { contentVersion, writeCatalogVersion } from "./catalog-version.ts";
 import { loadCards } from "./data/load-cards.ts";
@@ -239,7 +240,9 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
   const cardRows = allCards.map((card) => cardRow(card, knownPacks)).sort((left, right) => String(left.code).localeCompare(String(right.code)));
   const day = fetchedDay(dataDir);
   const metaRows = included.map((pack) => rowFrom(meta, { pack_code: pack.code, fetched_at: day }));
-  const campaignRows = [rowFrom(campaigns, { id: FELLOWSHIP_CAMPAIGN_ID, name: "Fellowship of the Ring" })];
+  const campaignRows = campaignIndexSchema
+    .parse(JSON.parse(readFileSync(path.join(dataDir, "campaigns", "index.json"), "utf8")) as unknown)
+    .map((entry) => rowFrom(campaigns, { id: entry.id, name: entry.name, scenario_count: entry.scenarioCount, playable: bit(entry.playable) }));
 
   const version = contentVersion([packRows, cardRows, campaignRows]);
   // The version is written before the database is replaced. A crash in between leaves a number the next run rewrites.

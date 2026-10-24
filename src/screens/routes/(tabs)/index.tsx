@@ -6,7 +6,7 @@ import { campaignPath } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
 import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { BodyText, Eyebrow, Label, Panel, PrimaryButton, RingMark, Screen, ScreenTitle, TextButton } from "../../chrome";
-import { campaignListQueries } from "../../campaign-list";
+import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf } from "../../campaign-data";
 import { createSave, listSaves } from "../../campaign-store";
 import { useDatabases } from "../../databases";
@@ -56,6 +56,7 @@ export default function CampaignList() {
   const [starting, setStarting] = useState(false);
   const [seats, setSeats] = useState<Seats>(1);
   const campaigns = campaignListQueries(catalog, user).campaigns.all();
+  const locked = lockedTiles(campaigns);
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
 
   useFocusEffect(
@@ -110,6 +111,23 @@ export default function CampaignList() {
             );
           })}
           {saves.length === 0 ? <BodyText tone="muted">No playthrough exists</BodyText> : null}
+          {locked.length > 0 ? (
+            <View className="flex-row gap-3" testID="locked-campaigns">
+              {locked.map((tile) => (
+                <View
+                  key={tile.id}
+                  testID={`locked-${tile.id}`}
+                  accessible
+                  accessibilityLabel={`${tile.name}, ${tile.caption}`}
+                  className="flex-1 gap-2 rounded-tile border border-hairline px-3 py-3"
+                >
+                  <RingMark size={12} state="locked" />
+                  <Text className="font-display text-body text-faint">{tile.name}</Text>
+                  <Text className="text-label text-faint">{tile.caption}</Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
           {showStart ? (
             <Panel>
               <Text className="font-display text-title text-bone">{nameOf(FELLOWSHIP_ID)}</Text>

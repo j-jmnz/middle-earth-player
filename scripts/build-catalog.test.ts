@@ -36,6 +36,8 @@ function workspace(): Workspace {
   mkdirSync(path.join(dataDir, "raw", "ringsdb"), { recursive: true });
 
   writeFileSync(path.join(dataDir, "raw", "ringsdb", "packs.json"), JSON.stringify(PACKS));
+  mkdirSync(path.join(dataDir, "campaigns"), { recursive: true });
+  writeFileSync(path.join(dataDir, "campaigns", "index.json"), JSON.stringify([{ id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarioCount: 6, playable: true }]));
   writeFileSync(path.join(dataDir, "sources.json"), JSON.stringify({ sources: { ringsdb: { fetchedAt: "2026-10-24T10:00:00.000Z" } } }));
   return { dataDir, dbPath: path.join(root, "catalog.db"), versionPath: path.join(root, "version.ts") };
 }

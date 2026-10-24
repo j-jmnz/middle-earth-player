@@ -57,6 +57,11 @@ const overridesSchema = z.object({
   scenarioEasy: z
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
+  // A campaign no scenario file is built for yet. The sources group its scenarios under packs; the override names the
+  // campaign and the packs (Hall of Beorn products), because no source names a campaign.
+  campaigns: z
+    .array(z.object({ id: z.string().min(1), name: z.string().min(1), products: z.array(z.string().min(1)).min(1), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
 });
 export type Overrides = z.infer<typeof overridesSchema>;
 export function parseOverrides(raw: unknown): Overrides {

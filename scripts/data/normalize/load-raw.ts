@@ -5,13 +5,15 @@ import { z } from "zod";
 
 import { parseRingsDbCards, parseRingsDbPacks, type RingsDbCard, type RingsDbPack } from "../../../src/catalog/boundary.ts";
 import { RAW_DIR } from "../paths.ts";
-import { hobCardSchema, hobScenarioSchema, type HobCard } from "../sources/hallofbeorn.ts";
+import { hobCardSchema, hobScenarioIndexSchema, hobScenarioSchema, type HobCard } from "../sources/hallofbeorn.ts";
 
 export type RawData = {
   packs: RingsDbPack[];
   ringsdb: Map<string, RingsDbCard[]>;
   hob: HobCard[];
   scenarios: z.infer<typeof hobScenarioSchema>[];
+  // Hall of Beorn's list of every scenario with its product and number (Scenarios.json).
+  scenarioIndex: z.infer<typeof hobScenarioIndexSchema>;
   // DragnCards cardDb rows by databaseId, which equals Hall of Beorn's OctgnGuid for the Black Riders and Road Darkens printings.
   dragn: Map<string, Record<string, string>>;
   // The DragnCards JSON-with-comments files as fetched; the scenario builder parses them.
@@ -50,5 +52,5 @@ export function loadRaw(): RawData {
   const scenarios = readdirSync(path.join(RAW_DIR, "hallofbeorn", "Scenarios"))
     .sort()
     .map((file) => hobScenarioSchema.parse(readJson("hallofbeorn", "Scenarios", file)));
-  return { packs: packs.filter((pack) => ringsdb.has(pack.code)), ringsdb, hob, scenarios, dragn: readDragnCards(), dragnImagePrefix: (readJson("dragncards", "imageUrlPrefix.json") as { imageUrlPrefix: { English: string } }).imageUrlPrefix.English, dragnRaw: { preBuiltDecks: readFileSync(path.join(RAW_DIR, "dragncards", "preBuiltDecks.json"), "utf8") } };
+  return { packs: packs.filter((pack) => ringsdb.has(pack.code)), ringsdb, hob, scenarios, scenarioIndex: hobScenarioIndexSchema.parse(readJson("hallofbeorn", "Scenarios.json")), dragn: readDragnCards(), dragnImagePrefix: (readJson("dragncards", "imageUrlPrefix.json") as { imageUrlPrefix: { English: string } }).imageUrlPrefix.English, dragnRaw: { preBuiltDecks: readFileSync(path.join(RAW_DIR, "dragncards", "preBuiltDecks.json"), "utf8") } };
 }

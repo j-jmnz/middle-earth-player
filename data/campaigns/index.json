@@ -1,0 +1,20 @@
+[
+  {
+    "id": "fellowship-of-the-ring",
+    "name": "Fellowship of the Ring",
+    "scenarioCount": 6,
+    "playable": true
+  },
+  {
+    "id": "the-two-towers",
+    "name": "The Two Towers",
+    "scenarioCount": 6,
+    "playable": false
+  },
+  {
+    "id": "the-return-of-the-king",
+    "name": "The Return of the King",
+    "scenarioCount": 6,
+    "playable": false
+  }
+]

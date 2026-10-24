@@ -13,6 +13,9 @@ export const packs = sqliteTable("packs", {
 export const campaigns = sqliteTable("campaigns", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  scenarioCount: integer("scenario_count").notNull(),
+  // False for a campaign the list shows locked: no scenario of it is built.
+  playable: integer("playable", { mode: "boolean" }).notNull(),
 });
 
 export const cards = sqliteTable("cards", {

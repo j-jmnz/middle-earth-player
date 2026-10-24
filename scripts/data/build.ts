@@ -7,6 +7,7 @@ import { buildCards, parseOverrides } from "./normalize/cards.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
 import { generateEffects, renderGenerated } from "./effects/generate.ts";
 import { applyPrinted } from "./normalize/printed.ts";
+import { buildCampaignIndex } from "./normalize/campaigns.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
 import { loadStarterDecks } from "./starter-decks.ts";
 import { loadLedger, verifyScans } from "./printed/ledger.ts";
@@ -61,6 +62,8 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   for (const file of readdirSync(scenarioDir)) rmSync(path.join(scenarioDir, file));
   for (const scenario of built.scenarios) writeFileSync(path.join(scenarioDir, `${scenario.id}.json`), `${JSON.stringify(scenario, null, 2)}\n`);
   writeFileSync(path.join(campaignDir, "fellowship-of-the-ring.json"), `${JSON.stringify(built.campaign, null, 2)}\n`);
+  const campaignIndex = buildCampaignIndex(raw, overrides, built.campaign);
+  writeFileSync(path.join(campaignDir, "index.json"), `${JSON.stringify(campaignIndex, null, 2)}\n`);
   const effectsDir = process.env.EFFECTS_OUT ?? path.join(ROOT, "src", "effects", "generated");
   mkdirSync(effectsDir, { recursive: true });
   const generated = generateEffects(cards, built.scenarios, built.campaign, ledger);

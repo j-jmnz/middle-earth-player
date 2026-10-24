@@ -85,6 +85,18 @@ export const campaignDataSchema = z.strictObject({
 });
 export type CampaignData = z.infer<typeof campaignDataSchema>;
 
+// data/campaigns/index.json: every campaign the list may name. A campaign without scenario files is listed locked, with
+// the name and scenario count the sources give (scripts/data/normalize/campaigns.ts).
+export const campaignIndexSchema = z.array(
+  z.strictObject({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    scenarioCount: z.number().int().positive(),
+    playable: z.boolean(),
+  }),
+);
+export type CampaignIndexEntry = z.infer<typeof campaignIndexSchema>[number];
+
 export function parseScenarioData(raw: unknown): ScenarioData {
   const parsed = scenarioDataSchema.safeParse(raw);
   if (!parsed.success) {
