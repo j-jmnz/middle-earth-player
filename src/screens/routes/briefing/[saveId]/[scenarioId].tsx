@@ -10,9 +10,10 @@ import { cards } from "../../../../catalog/schema";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { BodyText, Eyebrow, Label, NavBar, PrimaryButton, Screen, Segmented, TextButton, pressedNight } from "../../../chrome";
+import { BodyText, Eyebrow, Label, NavBar, PrimaryButton, RingMark, Screen, Segmented, TextButton, pressedNight } from "../../../chrome";
 import { FELLOWSHIP_ID } from "../../../../campaign/save";
-import { campaignOf, scenarioOf } from "../../../campaign-data";
+import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
+import { goBack } from "../../../go-back";
 import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
@@ -94,7 +95,13 @@ export default function Briefing() {
   const result = useMemo(() => (input ? briefing(input) : null), [input]);
   const facts = useMemo(() => (world ? scenarioFacts(world, difficulty) : null), [world, difficulty]);
 
-  const back = <NavBar onBack={() => router.back()} backTestID="briefing-back" right={<TextButton label="Booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? FELLOWSHIP_ID } })} />} />;
+  const back = (
+    <NavBar
+      onBack={() => goBack(router, saveId ? { pathname: "/path/[saveId]", params: { saveId } } : "/")}
+      backTestID="briefing-back"
+      right={<TextButton label="Booklet" accessibilityLabel="Open the booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save?.campaignId ?? FELLOWSHIP_ID, scenarioId) })} />}
+    />
+  );
   if (!loaded) {
     return (
       <Screen testID="briefing" scene="vale">
@@ -217,11 +224,16 @@ export default function Briefing() {
                       accessibilityState={{ selected, disabled: fallen.length > 0 }}
                       disabled={fallen.length > 0}
                       onPress={() => pick(index, deck.id)}
-                      className="min-h-14 justify-center border-b border-hairline py-2"
+                      className="min-h-14 flex-row items-center gap-3 border-b border-hairline py-2"
                       style={({ pressed }) => (pressed ? pressedNight : undefined)}
                     >
-                      <Text className={selected ? "text-body font-semibold text-gold" : fallen.length > 0 ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
-                      <Text className="text-label text-muted">{fallen.length > 0 ? `${heroNames(fallen)} fell and cannot be picked` : heroNames(deck.heroes)}</Text>
+                      {/* The selected deck is a filled ring and the others an empty one, so the mark does not rest on color. */}
+                      <RingMark size={14} state={selected ? "done" : "locked"} />
+                      <View className="flex-1">
+                        <Text className={selected ? "text-body font-semibold text-gold" : fallen.length > 0 ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
+                        <Text className="text-label text-muted">{fallen.length > 0 ? `${heroNames(fallen)} fell and cannot be picked` : heroNames(deck.heroes)}</Text>
+                      </View>
+                      {selected ? <Text className="text-label text-gold">Selected</Text> : null}
                     </Pressable>
                   );
                 })}
@@ -246,7 +258,7 @@ export default function Briefing() {
             {seat.deckId && index === 0 && result.needsRingBearer && !ringBearer ? (
               <View className="mt-2">
                 {candidates.map((candidate) => (
-                  <TextButton key={candidate.code} label={`Choose ${candidate.name} as Ring-bearer`} testID={`ringbearer-${candidate.code}`} tone="gold" onPress={() => setRingBearer(candidate.code)} />
+                  <TextButton key={candidate.code} label={`Choose ${candidate.name} as Ring-bearer`} testID={`ringbearer-${candidate.code}`} onPress={() => setRingBearer(candidate.code)} />
                 ))}
               </View>
             ) : null}
@@ -260,7 +272,7 @@ export default function Briefing() {
             {result.needs.options.map((option) => {
               const [code = "", host] = option.split(">");
               const label = option === "skip" ? "Skip" : host ? `${nameOf(code)} on ${nameOf(host)}` : nameOf(code);
-              return <TextButton key={option} label={label} testID={`choice-${option}`} tone="gold" onPress={() => setChoices((current) => [...current, option])} />;
+              return <TextButton key={option} label={label} testID={`choice-${option}`} onPress={() => setChoices((current) => [...current, option])} />;
             })}
           </View>
         ) : null}

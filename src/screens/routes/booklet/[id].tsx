@@ -1,4 +1,4 @@
-import { bookletPdfAvailable } from "booklet-pdf";
+import { bookletPdfAvailable, bookletPdfUnavailableReason } from "booklet-pdf";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { Text, View } from "react-native";
@@ -17,7 +17,7 @@ import { routeCode } from "../../route-code";
 function CloseBar({ onClose }: { onClose: () => void }) {
   return (
     <View className="items-center pb-safe pt-1">
-      <TextButton label="Close" testID="booklet-close" onPress={onClose} />
+      <TextButton label="Close" accessibilityLabel="Close the booklet" testID="booklet-close" onPress={onClose} />
     </View>
   );
 }
@@ -77,7 +77,8 @@ export default function Booklet() {
     );
   }
 
-  const missing = !bookletPdfAvailable() ? "This build cannot show PDFs." : "This booklet is not on this phone. Scenarios still play without it.";
+  const reason = bookletPdfAvailable() ? null : bookletPdfUnavailableReason();
+  const missing = reason ? `This build cannot show PDFs. ${reason}` : "This booklet is not on this phone. Scenarios still play without it.";
 
   async function add(): Promise<void> {
     if (!id || busy) return;
@@ -106,7 +107,7 @@ export default function Booklet() {
             {message}
           </BodyText>
         ) : null}
-        <PrimaryButton label={busy ? "Adding" : "Add booklet"} testID="booklet-add" disabled={busy || !bookletPdfAvailable()} onPress={() => void add()} />
+        <PrimaryButton label={busy ? "Adding" : "Add booklet"} accessibilityLabel={busy ? "Adding the booklet" : "Add the booklet from your files"} testID="booklet-add" disabled={busy || !bookletPdfAvailable()} onPress={() => void add()} />
       </View>
       <CloseBar onClose={close} />
     </Screen>

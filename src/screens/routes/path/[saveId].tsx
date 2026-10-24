@@ -4,12 +4,13 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { campaignPath, type PathNode } from "../../../campaign/path";
 import { BodyText, Label, NavBar, Panel, PrimaryButton, RingMark, Screen, TextButton, pressedNight } from "../../chrome";
-import { campaignOf, scenarioNames } from "../../campaign-data";
+import { bookletParams, campaignOf, scenarioNames } from "../../campaign-data";
 import { cardNames } from "../../card-names";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
-import { useSave } from "../../use-save";
+import { goBack } from "../../go-back";
+import { droppedSentence, useSave } from "../../use-save";
 
 const STATUS_WORD = { completed: "Completed", current: "Current", locked: "Locked" } as const;
 
@@ -27,12 +28,16 @@ function Node({
   currentIndex: number;
   last: boolean;
   rewardText: string;
-  action: { label: string; onPress: () => void } | null;
+  action: { label: string; onPress: () => void; hint?: string } | null;
   onOpen: (() => void) | null;
 }) {
   const lineColor = index < currentIndex ? palette.gold : palette.hairline;
   const text = (
-    <View className={node.status === "current" ? "py-4" : "py-3"}>
+    <View
+      className={node.status === "current" ? "py-4" : "py-3"}
+      accessible
+      accessibilityLabel={`${node.name}, ${STATUS_WORD[node.status]}${rewardText ? `, ${rewardText}` : ""}`}
+    >
       <Text testID={`node-${node.id}-status`} className={node.status === "current" ? "text-label text-gold" : "text-label text-faint"}>
         {STATUS_WORD[node.status]}
       </Text>
@@ -58,11 +63,21 @@ function Node({
         {action ? (
           <View className="pb-3">
             <PrimaryButton label={action.label} testID={node.status === "current" ? "begin" : `resume-${node.id}`} onPress={action.onPress} />
+            {action.hint ? (
+              <Text testID={`hint-${node.id}`} className="mt-1 text-label text-muted">
+                {action.hint}
+              </Text>
+            ) : null}
           </View>
         ) : null}
         {node.status === "completed" && onOpen ? (
-          <Pressable testID={`replay-${node.id}`} collapsable={false} accessibilityRole="button" onPress={onOpen}
-            className="min-h-11 justify-center rounded-tile px-2"
+          <Pressable
+            testID={`replay-${node.id}`}
+            collapsable={false}
+            accessibilityRole="button"
+            accessibilityLabel={`Replay ${node.name}`}
+            onPress={onOpen}
+            className="min-h-11 min-w-11 items-start justify-center self-start rounded-tile px-2"
             style={({ pressed }) => (pressed ? pressedNight : undefined)}
           >
             <Text className="text-label text-gold">Replay</Text>
@@ -79,7 +94,7 @@ export default function CampaignPath() {
   const saveId = routeCode(params.saveId);
   const { catalog } = useDatabases();
   const { save, loaded, dropped } = useSave(saveId ?? undefined);
-  const notice = dropped ? "The scenario in progress was dropped because the rules or the card data changed. Your log and decks are kept." : null;
+  const notice = dropped ? droppedSentence(dropped) : null;
 
   const campaign = save ? campaignOf(save.campaignId) : null;
   const nodes = useMemo(() => (save && campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : []), [save, campaign]);
@@ -88,11 +103,11 @@ export default function CampaignPath() {
     return cardNames(catalog, [...save.log.campaignPool.map((card) => card.code), ...save.log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...Object.values(save.log.earned).flat()]);
   }, [catalog, save]);
 
-  if (!loaded) return <Screen scene="ember" testID="campaign-path"><NavBar onBack={() => router.back()} backTestID="path-back" /><BodyText tone="muted">Loading</BodyText></Screen>;
+  if (!loaded) return <Screen scene="ember" testID="campaign-path"><NavBar onBack={() => goBack(router, "/")} backTestID="path-back" /><BodyText tone="muted">Loading</BodyText></Screen>;
   if (!save || !campaign) {
     return (
       <Screen scene="ember" testID="campaign-path">
-        <NavBar onBack={() => router.back()} backTestID="path-back" />
+        <NavBar onBack={() => goBack(router, "/")} backTestID="path-back" />
         <BodyText tone="danger">That playthrough is not on this phone.</BodyText>
       </Screen>
     );
@@ -109,9 +124,9 @@ export default function CampaignPath() {
   return (
     <Screen scene="ember" testID="campaign-path">
       <NavBar
-        onBack={() => router.back()}
+        onBack={() => goBack(router, "/")}
         backTestID="path-back"
-        right={<TextButton label="Booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save.campaignId } })} />}
+        right={<TextButton label="Booklet" accessibilityLabel="Open the booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId, nodes[currentIndex]?.id) })} />}
       />
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-4">
         <Text accessibilityRole="header" className="mb-4 mt-2 text-center font-display text-title text-bone">
@@ -136,7 +151,7 @@ export default function CampaignPath() {
               resuming === node.id && node.status !== "locked"
                 ? { label: "Resume", onPress: () => router.push({ pathname: "/scenario/[saveId]", params: { saveId: save.id } }) }
                 : node.status === "current"
-                  ? { label: "Begin", onPress: () => router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: node.id } }) }
+                  ? { label: "Begin", hint: resuming ? "A scenario is open. Dealing this one drops it." : undefined, onPress: () => router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: node.id } }) }
                   : null
             }
             onOpen={node.status === "completed" ? () => router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: node.id } }) : null}
@@ -146,9 +161,12 @@ export default function CampaignPath() {
       <View className="pb-safe pt-2">
         <Panel>
           <Label>Pool</Label>
-          <Text testID="pool" className="mt-1 text-body text-bone">
-            {poolText}
-          </Text>
+          {/* A long pool scrolls inside the panel; it never pushes Log off the screen. */}
+          <ScrollView className="mt-1 max-h-24" nestedScrollEnabled>
+            <Text testID="pool" className="text-body text-bone">
+              {poolText}
+            </Text>
+          </ScrollView>
           <View className="mt-2 items-start">
             <TextButton label="Log" testID="log-open" tone="gold" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
           </View>

@@ -122,7 +122,7 @@ Shared pieces live in `src/screens/chrome.tsx`. They are views and text. They do
 | `AppTabBar` | Text tabs on night. Current is semibold bone with a gold dot above |
 | `BackButton` | Bottom-pinned Back for screens without a NavBar (debug only) |
 
-One `PrimaryButton` per screen or sheet. Other actions are `TextButton`s. Back, Close, and Undo are labeled buttons, never gestures alone. Back lives in the `NavBar`; Close on the booklet reader sits at the bottom in thumb reach.
+One `PrimaryButton` per screen or sheet. Other actions are `TextButton`s. Back, Close, and Undo are labeled buttons, never gestures alone. Back lives in the `NavBar`; it goes to the screen below, and to the screen the page belongs to (path from briefing and log, the list from path) when nothing is below. Option lists use bone `TextButton`s; gold marks the one action or a link such as Booklet and Log. Close on the booklet reader sits at the bottom in thumb reach.
 
 ## Card pictures
 
@@ -140,16 +140,16 @@ The cached RingsDB picture is the illustration everywhere it appears.
 Paper (`#F2EBDB`) with one ink ring. Same as the adaptive icon background. No card art.
 
 ### Campaign list — built (rows: phase 10)
-`(tabs)/index.tsx`, scene `dusk`. Title Campaigns in Marcellus at the top. The scene's light fills the upper third; cards sit below it. The open playthrough is a `Panel current`: eyebrow Current (only when more than one save), the campaign name in title size, seat count in muted, and a six-dot progress line (gold disc done, gold ring current, hairline locked). Other saves are plain panels. Locked campaigns are two tiles side by side, faint, name plus "6 scenarios · Locked", not pressable. No save: "No playthrough exists" in muted, then the Start block: the Fellowship name, two seat tiles (True solo: one ring; Two-handed: two overlapping rings), "Chosen once for this campaign", and the primary START FELLOWSHIP. Booklet is a text button top-right.
+`(tabs)/index.tsx`, scene `dusk`. Title Campaigns in Marcellus at the top. The scene's light fills the upper third; cards sit below it. The open playthrough is a `Panel current`: eyebrow Current (only when more than one save), the campaign name in title size, seat count in muted, and a six-dot progress line (gold disc done, gold ring current, hairline locked). Other saves are plain panels. Locked campaigns are tiles side by side, faint, name plus "6 scenarios · Locked" (the count from the `campaigns` table, which `data/campaigns/index.json` fills), not pressable and read as one label by a screen reader. The list reads only `campaigns` and `saves`. No save: "No playthrough exists" in muted, then the Start block: the Fellowship name, two seat tiles (True solo: one ring; Two-handed: two overlapping rings), "Chosen once for this campaign", and the primary START FELLOWSHIP. Booklet is a text button top-right.
 
 ### Campaign path — phase 10
 Scene `ember`, NavBar Back + Booklet. Campaign name centered in title size. The six scenarios hang on one vertical line: completed nodes are gold discs with the name and chosen boon and burden (muted) to the left; the current node is a large glowing ring with its name and the primary BEGIN under it; locked nodes are small hairline rings with faint names, alternating sides. The line is gold up to the current node. Pool and Log sit in one panel at the bottom: "Pool" label, names, and Log as a gold text button.
 
 ### Log — phase 10
-Scene `plain`, NavBar Back + Booklet. One parchment sheet fills the screen: title Campaign Log, then label/value rows on ink rules (Heroes, Fallen, Threat, Boons, Burdens, Scenarios as six dots, Score). Notes are Marcellus ink, the only free text. SAVE NOTES (gold pill) appears below the sheet only after the text changes.
+Scene `plain`, NavBar Back + Booklet. One parchment sheet fills the screen: title Campaign Log, then label/value rows on ink rules (Heroes, Fallen Heroes, Threat Modifiers, Boons, Burdens, Captives), a Scenarios Completed block with one row per scenario (the name, then "rounds · score", or Not completed in muted), and Campaign Total. Notes are Marcellus ink, the only free text. SAVE NOTES (gold pill) appears below the sheet only after the text changes.
 
 ### Briefing — phase 10
-Scene `vale`, NavBar Back + Booklet. Eyebrow Scenario N, scenario name in display over the sky. Stages as one line of names with `›`. `Segmented` Easy / Normal with the encounter card count beside it. Special rules as small gold-ring tags with the rule name. The deck name, then four hero tiles (three heroes and the Ring-bearer). A missing Ring-bearer is a dashed gold tile labeled Ring-bearer, and the validator sentence in danger below names the card and the rule. "Dealing starts the scenario" in muted, then DEAL. DEAL is disabled and the error stays visible until the loadout is legal.
+Scene `vale`, NavBar Back + Booklet. Eyebrow Scenario N, scenario name in display over the sky. Stages as one line of names with `›`. The deck list is a radio list: the selected deck shows a filled ring and the word Selected as well as the gold name, so the mark does not rest on color, and the options are bone text buttons, not gold. `Segmented` Easy / Normal with the encounter card count beside it. Special rules as small gold-ring tags with the rule name. Booklet opens on the scenario's setup page when the campaign file records one. The deck name, then four hero tiles (three heroes and the Ring-bearer). A missing Ring-bearer is a dashed gold tile labeled Ring-bearer, and the validator sentence in danger below names the card and the rule. "Dealing starts the scenario" in muted, then DEAL. DEAL is disabled and the error stays visible until the loadout is legal.
 
 ### Table — phase 11
 Canvas ground is `felt` with a lit center. Pinned quest stage at the top: small stage art, name in Marcellus, a thin gold progress bar, count. Zones are canvas regions without boxed labels; cards are pictures with real drop shadows on the canvas. Tokens: resources are gold coins, damage red coins, progress bone coins, all 20 pt circles with a number. Exhausted cards rotate 90° and dim. The engaged enemy carries a face-down shadow card showing a gold ring on the card back. The hand fans at the bottom of the canvas; the playable card lifts with a gold edge.
@@ -159,7 +159,7 @@ The rail is not a full strip: it shows the previous step, the current step in Ma
 Choice sheets are `PaperSheet`s over the rail. The eyebrow repeats the step (Combat), the title states the moment (Black Rider attacks), a muted line gives the engine's numbers. Choices are hero tiles in a row; the selected tile has the ink border. One ink primary names the action (DEFEND WITH SAM), the alternative is an inkLabel text button (Leave undefended). Hide shows Passed or Failed in Marcellus with the engine's numbers.
 
 ### Resolution — phase 11
-Won: scene `victory`. VICTORY in display caps with a gold text glow, scenario name muted. Each choice group has a centered eyebrow (Choose a burden, Choose a boon) and two tiles side by side; selected has the gold border and semibold name. A muted sentence names what will be written, then CONFIRM. Lost: scene `plain`, "Defeat" in display, "The scenario was lost. Nothing is written to the log." and one text button Back to path.
+Won: scene `victory`. VICTORY in display caps with a gold text glow, scenario name muted. Each choice group has a centered eyebrow (Choose a burden, Choose a boon) and two tiles side by side; selected has the gold border and semibold name. A muted sentence names what will be written, then CONFIRM. Lost: scene `plain`, "Defeat" in display, "The scenario was lost. Nothing is written to the log." and one text button Back to path. Until phase 11 the dev control has the same words: each Victory choice names what it records, and playing runs in chunks so the screen stays responsive.
 
 ### Decks — placeholder built (editor: phase 6)
 Scene `plain`, title Decks, Import and New as text buttons. Each deck is a cover (three hero pictures, fading into night) with the name in title size and the heroes' short names in muted. Starters are smaller covers two across. The starter note is one muted sentence. Card pool is a row at the bottom.
@@ -183,7 +183,7 @@ The PDF page fills the screen on night. Close is a centered text button at the b
 Scene `plain`. Title Database, the failure in body. No retry.
 
 ### Debug — dev
-Night page, existing components. Removed before phase 11.
+Night page, existing components. Removed before phase 11. The Debug text button at the foot of the campaign list opens it and goes with it; phase 11 owns the removal, so both stay until then.
 
 ## States
 

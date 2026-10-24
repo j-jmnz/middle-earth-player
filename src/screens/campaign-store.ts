@@ -12,7 +12,10 @@ function stored(value: unknown): StoredJson {
   return JSON.parse(JSON.stringify(value)) as StoredJson;
 }
 
-function fromRow(row: typeof saves.$inferSelect): Save {
+// A save as read, and whether an open scenario was stored but did not read, so the player is told it is gone.
+export type ReadSave = { save: Save; unreadable: boolean };
+
+function parseRow(row: typeof saves.$inferSelect): ReadSave {
   // A log that does not parse is a failure the player must see. The open scenario is only a cache of the intents: when
   // it does not parse it is dropped and the log stays.
   const log = parseLog(row.log);
@@ -25,20 +28,26 @@ function fromRow(row: typeof saves.$inferSelect): Save {
     active = null;
     loadout = null;
   }
+  const stored = row.activeScenario != null || row.loadout != null;
+  const unreadable = stored && (!active || !loadout);
   if (!active || !loadout) {
     active = null;
     loadout = null;
   }
-  return { id: row.id, campaignId: row.campaignId, seatCount: parseSeatCount(row.seatCount), log, active, loadout };
+  return { save: { id: row.id, campaignId: row.campaignId, seatCount: parseSeatCount(row.seatCount), log, active, loadout }, unreadable };
 }
 
 export function listSaves<TRun>(user: UserDb<TRun>): Save[] {
-  return user.select().from(saves).all().map(fromRow);
+  return user.select().from(saves).all().map((row) => parseRow(row).save);
 }
 
 export function readSave<TRun>(user: UserDb<TRun>, id: string): Save | null {
+  return readSaveChecked(user, id)?.save ?? null;
+}
+
+export function readSaveChecked<TRun>(user: UserDb<TRun>, id: string): ReadSave | null {
   const row = user.select().from(saves).where(eq(saves.id, id)).get();
-  return row ? fromRow(row) : null;
+  return row ? parseRow(row) : null;
 }
 
 export function writeSave<TRun>(user: UserDb<TRun>, save: Save): void {

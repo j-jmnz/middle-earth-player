@@ -7,7 +7,7 @@ import { emptyLog } from "../campaign/log";
 import { newSave } from "../campaign/save";
 import { ENGINE_VERSION } from "../campaign/replay";
 import { drop } from "../campaign/session";
-import { createSave, listSaves, readBooklet, readSave, writeBooklet, writeLastPage, writeSave } from "./campaign-store";
+import { createSave, listSaves, readBooklet, readSave, readSaveChecked, writeBooklet, writeLastPage, writeSave } from "./campaign-store";
 import { saves } from "./user-schema";
 
 function openUser() {
@@ -54,6 +54,14 @@ describe("campaign store", () => {
     const read = readSave(user, "save-b");
     expect(read?.active).toBeNull();
     expect(read?.log.notes).toBe("kept");
+    // The player is told: the read says the stored scenario did not read.
+    expect(readSaveChecked(user, "save-b")?.unreadable).toBe(true);
+  });
+
+  it("does not report a save with no open scenario as unreadable", () => {
+    const user = openUser();
+    writeSave(user, newSave("save-c", "fellowship-of-the-ring", 1));
+    expect(readSaveChecked(user, "save-c")?.unreadable).toBe(false);
   });
 
   it("a dropped scenario written back leaves the log, and no deck or image row is touched", () => {

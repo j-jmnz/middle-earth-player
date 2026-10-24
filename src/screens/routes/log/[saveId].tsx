@@ -9,6 +9,7 @@ import { inArray } from "drizzle-orm";
 import { BodyText, NavBar, PrimaryButton, Screen, TextButton } from "../../chrome";
 import { campaignOf, scenarioNames } from "../../campaign-data";
 import { useDatabases } from "../../databases";
+import { goBack } from "../../go-back";
 import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
 import { useSave } from "../../use-save";
@@ -57,7 +58,7 @@ export default function Log() {
     update({ ...save, log: { ...save.log, notes: edited } });
     setEdited(null);
   }
-  const back = <NavBar onBack={() => { saveNotes(); router.back(); }} backTestID="log-back" right={<TextButton label="Booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? FELLOWSHIP_ID } })} />} />;
+  const back = <NavBar onBack={() => { saveNotes(); goBack(router, save ? { pathname: "/path/[saveId]", params: { saveId: save.id } } : "/"); }} backTestID="log-back" right={<TextButton label="Booklet" accessibilityLabel="Open the booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? FELLOWSHIP_ID } })} />} />;
   if (!loaded) return <Screen testID="log" scene="plain">{back}<BodyText tone="muted">Loading</BodyText></Screen>;
   const campaign = save ? campaignOf(save.campaignId) : null;
   if (!save || !campaign) {

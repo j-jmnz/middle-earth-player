@@ -161,11 +161,14 @@ export function TextButton({
   onPress,
   testID,
   tone = "bone",
+  accessibilityLabel,
 }: {
   label: string;
   onPress: () => void;
   testID: string;
   tone?: "bone" | "gold" | "ink";
+  // What a screen reader says when the visible word is not enough alone ("Booklet" opens the campaign book).
+  accessibilityLabel?: string;
 }) {
   const color = tone === "gold" ? "text-gold" : tone === "ink" ? "text-inkLabel" : "text-bone";
   return (
@@ -173,6 +176,7 @@ export function TextButton({
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       className="min-h-11 items-center justify-center rounded-tile px-3"
       style={({ pressed }) => (pressed ? (tone === "ink" ? pressedPaper : pressedNight) : undefined)}
@@ -209,12 +213,14 @@ export function PrimaryButton({
   testID,
   disabled = false,
   surface = "night",
+  accessibilityLabel,
 }: {
   label: string;
   onPress: () => void;
   testID: string;
   disabled?: boolean;
   surface?: "night" | "paper";
+  accessibilityLabel?: string;
 }) {
   const filled = surface === "paper" ? "bg-ink" : "border-t border-goldHigh bg-gold";
   const text = surface === "paper" ? "text-paper" : "text-onGold";
@@ -223,6 +229,7 @@ export function PrimaryButton({
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}

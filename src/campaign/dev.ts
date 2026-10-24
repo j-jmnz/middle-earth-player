@@ -100,26 +100,38 @@ export function devResume(save: Save, world: World, dataHash: number): DevState 
 
 const LIMIT = 4000;
 
+export type DevStep = { ok: true; save: Save; state: ScenarioState; done: boolean } | { ok: false; reason: "refused" };
+
+// Plays at most `turns` intents from `state`, written to `save` as they are accepted. `done` is true when the scenario is
+// lost, or won and a Resolution choice is waiting or settled, or when the whole-game limit is reached. The screen calls
+// this in chunks and yields between them, so a long game does not freeze the UI.
+export function devStep(save: Save, world: World, state: ScenarioState, outcome: DevOutcome, turns: number, played = 0): DevStep {
+  const ctx = boostedContext(world, heroesOf(save));
+  const heroes = heroesOf(save);
+  const hold: Hold = { scout: heroes.find((code) => code !== save.loadout?.ringBearer) ?? "", protect: save.loadout?.ringBearer ?? "" };
+  let current = state;
+  let written = save;
+  for (let turn = 0; turn < turns; turn += 1) {
+    if (played + turn >= LIMIT || current.lost || (current.stageCleared && current.window?.kind !== "resolution") || current.window?.kind === "resolution") {
+      return { ok: true, save: written, state: current, done: true };
+    }
+    const intent = next(current, ctx, outcome, hold);
+    const result = reduce(current, intent, ctx);
+    if (!result.ok) return { ok: false, reason: "refused" };
+    current = result.state;
+    written = record(written, intent);
+  }
+  const finished = current.lost || current.window?.kind === "resolution" || current.stageCleared || played + turns >= LIMIT;
+  return { ok: true, save: written, state: current, done: finished };
+}
+
 // Plays until the scenario is lost, or won and a Resolution choice is waiting, or won and settled. Every intent is
 // written to the save, so a relaunch replays the same game.
 export function devPlay(save: Save, world: World, dataHash: number, outcome: DevOutcome): DevState {
   const opened = devResume(save, world, dataHash);
   if (!opened.ok) return opened;
-  const ctx = boostedContext(world, heroesOf(save));
-  const heroes = heroesOf(save);
-  const hold: Hold = { scout: heroes.find((code) => code !== save.loadout?.ringBearer) ?? "", protect: save.loadout?.ringBearer ?? "" };
-  let { state } = opened;
-  let written = save;
-  for (let turn = 0; turn < LIMIT; turn += 1) {
-    if (state.lost || (state.stageCleared && state.window?.kind !== "resolution")) break;
-    if (state.window?.kind === "resolution") break;
-    const intent = next(state, ctx, outcome, hold);
-    const result = reduce(state, intent, ctx);
-    if (!result.ok) return { ok: false, reason: "refused" };
-    state = result.state;
-    written = record(written, intent);
-  }
-  return { ok: true, save: written, state };
+  const run = devStep(save, world, opened.state, outcome, LIMIT);
+  return run.ok ? { ok: true, save: run.save, state: run.state } : { ok: false, reason: "refused" };
 }
 
 export type DevChoice = { optionId: string; label: string };
@@ -131,7 +143,13 @@ export function devChoices(state: ScenarioState, world: World, save: Save): DevC
   return legalIntents(state, ctx).flatMap((intent) => {
     if (intent.type !== "ChooseResolution") return [];
     const [code = "", host] = intent.optionId.split(">");
-    const label = intent.optionId === "skip" ? "Skip" : host ? `${name(code)} on ${name(state.cards[host]?.code ?? host)}` : name(code);
+    const kind = world.cards.get(code)?.campaignKind;
+    const label =
+      intent.optionId === "skip"
+        ? "Skip: record nothing"
+        : host
+          ? `${name(code)} on ${name(state.cards[host]?.code ?? host)}: record ${kind ?? "it"}`
+          : `${name(code)}: record ${kind ?? "it"}`;
     return [{ optionId: intent.optionId, label }];
   });
 }

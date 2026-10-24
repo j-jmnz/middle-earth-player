@@ -21,10 +21,16 @@ type BookletPdfModule = {
   pageCount(uri: string): Promise<number>;
 };
 
+// Why the module could not be loaded, kept so the reader can say it. Null while it loads or when it is available.
+let unavailable: string | null = null;
+
 function nativeModule(): BookletPdfModule | null {
   try {
-    return requireOptionalNativeModule<BookletPdfModule>("BookletPdf");
-  } catch {
+    const found = requireOptionalNativeModule<BookletPdfModule>("BookletPdf");
+    unavailable = found ? null : "The BookletPdf native module is not part of this build (Expo Go, web, or a build made before it was added).";
+    return found;
+  } catch (error) {
+    unavailable = `The BookletPdf native module failed to load: ${error instanceof Error ? error.message : String(error)}`;
     return null;
   }
 }
@@ -32,6 +38,12 @@ function nativeModule(): BookletPdfModule | null {
 /** False in a build without the module (Expo Go, web). The reader then says so instead of failing. */
 export function bookletPdfAvailable(): boolean {
   return nativeModule() != null;
+}
+
+/** Why PDFs cannot be shown in this build, or null when they can. */
+export function bookletPdfUnavailableReason(): string | null {
+  nativeModule();
+  return unavailable;
 }
 
 /** The page count of a local PDF, read by the platform's own PDF API. Rejects when the file is not a PDF. */

@@ -14,7 +14,7 @@ import { briefing, scenarioFacts, startFor, type BriefingInput, type BriefingSea
 import { emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { newSave, parseActive, parseLog, parseLoadout, type Save, type StoredLoadout } from "./save.ts";
-import { devChoices, devChoose, devPlay, devResume, devSettled } from "./dev.ts";
+import { devChoices, devChoose, devPlay, devResume, devSettled, devStep } from "./dev.ts";
 import { deal, drop, finish, record, resume } from "./session.ts";
 import { loadWorld, type World } from "./world.ts";
 
@@ -254,6 +254,27 @@ describe("a win and a loss", () => {
     if (!again.ok) throw new Error(again.reason);
     expect(devChoices(again.state, past, again.save)).toEqual(devChoices(run.state, past, run.save));
     expect(devChoices(again.state, past, again.save).length).toBeGreaterThan(0);
+  });
+
+  it("playing in chunks writes the same intents as playing at once, so the screen can yield between chunks", () => {
+    const whole = devPlay(dealt(), past, CATALOG_VERSION, "win");
+    if (!whole.ok) throw new Error(whole.reason);
+    const opened = devResume(dealt(), past, CATALOG_VERSION);
+    if (!opened.ok) throw new Error(opened.reason);
+    let current = { save: opened.save, state: opened.state };
+    let turns = 0;
+    let chunks = 0;
+    for (;;) {
+      const run = devStep(current.save, past, current.state, "win", 40, turns);
+      if (!run.ok) throw new Error(run.reason);
+      current = run;
+      turns += 40;
+      chunks += 1;
+      if (run.done) break;
+    }
+    expect(chunks).toBeGreaterThan(1);
+    expect(current.save.active?.intents).toEqual(whole.save.active?.intents);
+    expect(devSettled(current.state)).toBe("choosing");
   });
 
   it("a second win of the same scenario does not grant the reward again", () => {

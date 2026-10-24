@@ -5,7 +5,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 
-import { devChoices, devChoose, devPlay, devResume, devSettled, type DevOutcome } from "../../../campaign/dev";
+import { devChoices, devChoose, devResume, devSettled, devStep, type DevOutcome } from "../../../campaign/dev";
 import { drop, finish } from "../../../campaign/session";
 import { logCodes, loadWorld } from "../../../campaign/world";
 import { CATALOG_VERSION } from "../../../catalog/version";
@@ -13,8 +13,12 @@ import { EFFECTS } from "../../../effects";
 import { BodyText, Eyebrow, Label, NavBar, PrimaryButton, Screen, TextButton } from "../../chrome";
 import { campaignOf, scenarioOf } from "../../campaign-data";
 import { useDatabases } from "../../databases";
+import { goBack } from "../../go-back";
 import { routeCode } from "../../route-code";
 import { useSave } from "../../use-save";
+
+// Intents played before the screen yields.
+const CHUNK = 150;
 
 export default function ScenarioDev() {
   const router = useRouter();
@@ -23,6 +27,7 @@ export default function ScenarioDev() {
   const { catalog } = useDatabases();
   const { save, loaded, update } = useSave(saveId ?? undefined);
   const [failure, setFailure] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
 
   const campaign = save ? campaignOf(save.campaignId) : null;
   const scenario = save?.loadout ? scenarioOf(save.loadout.scenarioId) : null;
@@ -37,7 +42,7 @@ export default function ScenarioDev() {
   const toPath = () => {
     if (save) router.replace({ pathname: "/path/[saveId]", params: { saveId: save.id } });
   };
-  const header = <NavBar onBack={() => (save ? toPath() : router.back())} backTestID="scenario-back" backLabel="Path" />;
+  const header = <NavBar onBack={() => (save ? toPath() : goBack(router, "/"))} backTestID="scenario-back" backLabel="Path" />;
 
   if (!loaded) {
     return (
@@ -80,15 +85,29 @@ export default function ScenarioDev() {
   const settled = devSettled(state);
   const name = (code: string) => world.cards.get(code)?.name ?? code;
 
-  function play(outcome: DevOutcome): void {
-    if (!save || !world) return;
-    const run = devPlay(save, world, CATALOG_VERSION, outcome);
-    if (!run.ok) {
-      setFailure("The reducer refused an intent the policy chose.");
-      return;
-    }
+  // Plays in chunks and yields to the UI between them, so a long game does not freeze the screen.
+  async function play(outcome: DevOutcome): Promise<void> {
+    if (!save || !world || playing) return;
+    setPlaying(true);
     setFailure(null);
-    update(run.save);
+    try {
+      let current = { save, state };
+      let turns = 0;
+      for (;;) {
+        const run = devStep(current.save, world, current.state, outcome, CHUNK, turns);
+        if (!run.ok) {
+          setFailure("The reducer refused an intent the policy chose.");
+          return;
+        }
+        turns += CHUNK;
+        current = run;
+        if (run.done) break;
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      }
+      update(current.save);
+    } finally {
+      setPlaying(false);
+    }
   }
 
   function choose(optionId: string): void {
@@ -130,8 +149,8 @@ export default function ScenarioDev() {
 
         {settled === "playing" ? (
           <View className="mt-6 gap-3">
-            <PrimaryButton label="Play to a win" testID="dev-play-win" onPress={() => play("win")} />
-            <TextButton label="Play to a loss" testID="dev-play-loss" tone="gold" onPress={() => play("loss")} />
+            <PrimaryButton label={playing ? "Playing" : "Play to a win"} testID="dev-play-win" disabled={playing} onPress={() => void play("win")} />
+            <TextButton label="Play to a loss" testID="dev-play-loss" onPress={() => void play("loss")} />
           </View>
         ) : null}
 
@@ -141,7 +160,9 @@ export default function ScenarioDev() {
               Defeat
             </Text>
             <BodyText tone="muted">The scenario was lost. Nothing is written to the log.</BodyText>
-            <PrimaryButton label="Back to path" testID="dev-finish" onPress={end} />
+            <View className="items-start">
+              <TextButton label="Back to path" testID="dev-finish" onPress={end} />
+            </View>
           </View>
         ) : null}
 
@@ -151,8 +172,11 @@ export default function ScenarioDev() {
               Victory
             </Text>
             <Eyebrow tone="muted">Choose</Eyebrow>
+            <BodyText tone="muted" testID="dev-choice-note">
+              Each choice is written to the campaign log when you confirm. Skip writes nothing for that group.
+            </BodyText>
             {devChoices(state, world, save).map((choice) => (
-              <TextButton key={choice.optionId} label={choice.label} testID={`dev-choice-${choice.optionId}`} tone="gold" onPress={() => choose(choice.optionId)} />
+              <TextButton key={choice.optionId} label={choice.label} testID={`dev-choice-${choice.optionId}`} onPress={() => choose(choice.optionId)} />
             ))}
           </View>
         ) : null}
