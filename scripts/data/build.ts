@@ -2,9 +2,10 @@ import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "nod
 import path from "node:path";
 
 import type { Card } from "../../src/catalog/card-facts.ts";
-import { DATA_DIR } from "./paths.ts";
+import { DATA_DIR, ROOT } from "./paths.ts";
 import { buildCards, parseOverrides } from "./normalize/cards.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
+import { generateEffects, renderGenerated } from "./effects/generate.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
 import { extractAll } from "./rules/extract.ts";
 import { buildSteps } from "./rules/steps.ts";
@@ -48,6 +49,11 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   const steps = buildSteps(readFileSync(path.join(DATA_DIR, "raw", "dragncards", "steps.json"), "utf8"), entries);
   writeFileSync(path.join(outDir, "rules", "steps.json"), `[\n${steps.map((step) => `  ${JSON.stringify(step)}`).join(",\n")}\n]\n`);
   console.log(`rules: ${entries.length} entries, ${steps.length} framework steps`);
+  const effectsDir = process.env.EFFECTS_OUT ?? path.join(ROOT, "src", "effects", "generated");
+  mkdirSync(effectsDir, { recursive: true });
+  const generated = generateEffects(cards, built.scenarios, built.campaign);
+  writeFileSync(path.join(effectsDir, "fellowship-of-the-ring.ts"), renderGenerated(generated.effects, built.campaign.id));
+  console.log(`effects: ${generated.effects.length} generated, ${generated.unmatched.length} lines without a template`);
   console.log(`scenarios: ${built.scenarios.map((scenario) => scenario.id).join(", ") || "none"}`);
   for (const note of built.notes) console.log(`note: ${note}`);
   if (built.problems.length > 0) console.log(`unbuilt scenarios, problems:\n  ${built.problems.join("\n  ")}`);

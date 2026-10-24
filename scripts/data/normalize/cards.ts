@@ -136,7 +136,12 @@ function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts
     cost: stats.ResourceCost ?? null,
     stage: stats.StageNumber ?? null,
     keywords,
-    timings: [...timingLabels(text, keywordOnly(card)), ...(card.Front.Shadow?.trim() ? ["shadow"] : [])],
+    // Front lines, then side B, then the shadow effect: the order the effect records are numbered in.
+    timings: [
+      ...timingLabels(text, keywordOnly(card)),
+      ...(card.Back ? timingLabels(sideText(card.Back.Text), keywordOnly(card)) : []),
+      ...(card.Front.Shadow?.trim() ? ["shadow"] : []),
+    ],
     text,
     shadowText: card.Front.Shadow?.trim() || null,
     back: back

@@ -1,81 +1,65 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { describe, expect, it } from "vitest";
 
+import { AUTHORED_EFFECTS, AUTHORED_REPLACES, EFFECTS, GENERATED_EFFECTS } from "../src/effects/index.ts";
+
 import { loadCards } from "./data/load-cards.ts";
-import { loadScenario } from "./data/load-scenarios.ts";
-import { scenarioCards } from "../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../src/effects/index.ts";
+import { generateEffects, segmentsOf } from "./data/effects/generate.ts";
+import { loadCampaign, loadScenarios } from "./data/load-scenarios.ts";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+// Every printed ability on a card the Fellowship scenarios deal needs an effect record. The cards come from
+// data/cards and the scenario data; the records are the generated ones plus the authored ones. A card's
+// labelled lines (Setup, Forced, When Revealed, Response, Action, Travel, Shadow) need a record of that timing,
+// and the number of records is at least the number of lines. A line no template reads is listed by
+// `pnpm effects:draft` for an agent to author.
+const cards = loadCards();
+const scenarios = loadScenarios();
+const campaign = loadCampaign();
+const byCode = new Map(cards.map((card) => [card.code, card]));
 
-function readJson(...parts: string[]): unknown {
-  return JSON.parse(readFileSync(path.join(root, ...parts), "utf8")) as unknown;
+const dealt = new Set<string>(campaign.prelude.map((card) => card.code));
+for (const scenario of scenarios) {
+  for (const card of scenario.cards) dealt.add(card.code);
+  for (const group of campaign.authored.resolution[scenario.id] ?? []) for (const choice of group.choices) dealt.add(choice.code);
 }
 
-// Codes and timing labels only. A repeated label means the card prints that timing more than once.
-const manifest = readJson("fixtures", "abilities", "a-shadow-of-the-past.json") as Record<string, string[]>;
-const scenario = loadScenario("a-shadow-of-the-past");
-
-// Timings that phase 8 authors. A timing in LATER is listed as todo until it is authored.
-const AUTHORED = new Set(["setup", "forced", "triggered", "whenRevealed", "shadow", "response", "action", "constant", "travel", "questResolution"]);
-const LATER: Readonly<Record<string, string>> = {};
-
-// A timing whose record is held back on purpose. The case fails with this message until a citation exists.
-const HELD: Readonly<Record<string, string>> = {};
-
-type Case = { code: string; timing: string; nth: number; name: string };
-
-const cases: Case[] = Object.entries(manifest).flatMap(([code, timings]) => {
-  const seen = new Map<string, number>();
-  return timings.map((timing): Case => {
-    const nth = (seen.get(timing) ?? 0) + 1;
-    seen.set(timing, nth);
-    return { code, timing, nth, name: `${code} ${timing} #${nth}` };
-  });
-});
-
-describe("effect coverage manifest", () => {
-  it("lists exactly the dealt codes and The One Ring", () => {
-    const dealt = new Set([...scenarioCards(scenario).map((card) => card.code), "141085"]);
-    expect(Object.keys(manifest).sort()).toEqual([...dealt].sort());
-  });
-
-  it("uses only timings an effect record can have", () => {
-    const known = new Set([...AUTHORED, ...Object.keys(LATER)]);
-    for (const [code, timings] of Object.entries(manifest)) {
-      for (const timing of timings) expect(known.has(timing), `${code} ${timing}`).toBe(true);
-    }
-  });
-
-  it("lists every labelled timing that data/cards derives from a card's text", () => {
-    const byCode = new Map(loadCards().map((card) => [card.code, card]));
-    let checked = 0;
-    for (const [code, timings] of Object.entries(manifest)) {
-      const card = byCode.get(code);
-      expect(card, `${code} is in data/cards`).toBeDefined();
-      for (const label of (card?.timings ?? []).filter((timing) => timing !== "constant")) {
-        checked += 1;
-        expect(timings, `${code} should list ${label}`).toContain(label);
-      }
-    }
-    expect(checked).toBeGreaterThan(0);
-  });
-});
+const LABELLED = new Set(["setup", "forced", "whenRevealed", "response", "action", "travel", "shadow", "questResolution"]);
 
 describe("effect coverage", () => {
-  for (const entry of cases) {
-    if (!AUTHORED.has(entry.timing)) {
-      it.todo(`${entry.name} (${LATER[entry.timing] ?? "unknown"})`);
-      continue;
-    }
-    it(entry.name, () => {
-      const held = HELD[entry.name];
-      if (held) expect.fail(held);
-      const records = EFFECTS.filter((effect) => effect.cardCode === entry.code && effect.timing === entry.timing);
-      expect(records.length, `${entry.name} has no effect record`).toBeGreaterThanOrEqual(entry.nth);
+  for (const code of [...dealt].sort()) {
+    const card = byCode.get(code);
+    it(`${code} ${card?.name ?? "(not in data/cards)"}`, () => {
+      expect(card, `${code} is in data/cards`).toBeDefined();
+      const records = EFFECTS.filter((effect) => effect.cardCode === code);
+      const wanted = new Map<string, number>();
+      for (const timing of card?.timings ?? []) if (LABELLED.has(timing)) wanted.set(timing, (wanted.get(timing) ?? 0) + 1);
+      for (const [timing, count] of wanted) {
+        const have = records.filter((effect) => effect.timing === timing).length;
+        expect(have, `${code} prints ${count} ${timing}`).toBeGreaterThanOrEqual(count);
+      }
+      expect(records.length, `${code} has a record for each printed line`).toBeGreaterThanOrEqual(card ? segmentsOf(card).length : 0);
     });
   }
+});
+
+describe("generated and authored records", () => {
+  const regenerated = generateEffects(cards, scenarios, campaign);
+
+  it("match what the templates write today", () => {
+    expect(GENERATED_EFFECTS).toEqual(regenerated.effects);
+  });
+
+  it("replace each other only where AUTHORED_REPLACES says so", () => {
+    const generatedIds = new Set(GENERATED_EFFECTS.map((effect) => effect.id));
+    const overlapping = AUTHORED_EFFECTS.filter((effect) => generatedIds.has(effect.id)).map((effect) => effect.id);
+    expect([...overlapping].sort()).toEqual([...AUTHORED_REPLACES].sort());
+    expect(new Set(EFFECTS.map((effect) => effect.id)).size).toBe(EFFECTS.length);
+  });
+
+  it("leave only authored records for the lines no template reads", () => {
+    expect(regenerated.effects.length).toBeGreaterThan(30);
+    for (const line of regenerated.unmatched) {
+      const have = EFFECTS.filter((effect) => effect.cardCode === line.card.code).length;
+      expect(have, `${line.card.code} ${line.line}`).toBeGreaterThan(0);
+    }
+  });
 });

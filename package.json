@@ -51,7 +51,8 @@
     "catalog:build": "node --experimental-strip-types scripts/build-catalog.ts",
     "eas-build-post-install": "pnpm catalog:build && node --experimental-strip-types scripts/pack-scans.ts",
     "data:sync": "node --experimental-strip-types scripts/data/sync.ts",
-    "data:build": "node --experimental-strip-types scripts/data/build.ts"
+    "data:build": "node --experimental-strip-types scripts/data/build.ts",
+    "effects:draft": "node --experimental-strip-types scripts/data/effects/draft.ts"
   },
   "private": true,
   "packageManager": "pnpm@10.34.1"
