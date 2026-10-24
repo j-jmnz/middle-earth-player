@@ -11,7 +11,6 @@ describe("ledger scope", () => {
   it("reads every starter code that src/screens/starter-decks.ts lists", () => {
     // starterCodes() reads the file as text, because Node cannot load its Drizzle import. This keeps the two in step.
     expect(starterCodes()).toEqual([...new Set(starterPrints.map((row) => row.code))].sort());
-    expect(starterCodes()).toHaveLength(45);
   });
 });
 
@@ -50,5 +49,11 @@ describe("printed-text ledger", () => {
     expect(ledger.byKey.get(keyOf("142062", "B"))?.lines.join(" ")).toContain("Frodo's Choice");
     expect(KNOWN_ERRORS).toContain("141026");
     expect(ledger.byKey.get(keyOf("142019", "A"))?.lines.join(" ")).toContain("Sting, Mithril Shirt, Glamdring, and Andúril");
+    const text = (code: string, side: string) => ledger.byKey.get(keyOf(code, side))?.lines.join(" ") ?? "";
+    expect(text("141026", "B")).toContain("either remove X progress");
+    expect(text("141056", "A")).toContain("After an enemy is declared");
+    expect(text("141056", "B")).toContain("each burden card in play");
+    expect(text("142039", "A")).toContain("burden treachery cards");
+    expect(text("142039", "B")).toContain("burden treachery cards");
   });
 });

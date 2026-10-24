@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { loadCards } from "../load-cards.ts";
-import { dealtCodes } from "../load-scenarios.ts";
+import { dealtCodes, loadCampaign, loadScenarios } from "../load-scenarios.ts";
 import { RAW_DIR, ROOT } from "../paths.ts";
 
 // The cards whose printed text the ledger holds in this phase: everything A Shadow of the Past deals, The One
@@ -28,7 +28,7 @@ export function starterCodes(): string[] {
 }
 
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...CAMPAIGN_CARDS, ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(), ...starterCodes()])].sort();
+  return [...new Set<string>([...CAMPAIGN_CARDS, ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaign(), loadScenarios()), ...starterCodes()])].sort();
 }
 
 type HobImages = { CardSet: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };

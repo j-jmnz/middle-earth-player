@@ -24,8 +24,7 @@ export function loadScenarioDefinitions(dataDir: string, cardsByCode: ReadonlyMa
   const campaign = loadCampaign(undefined, dataDir);
   return campaign.scenarios.map((id) => {
     const scenario = loadScenario(id, dataDir);
-    const codes = [...scenario.cards.map((card) => card.code), ...(campaign.authored.resolution[id] ?? []).flatMap((group) => group.choices.map((choice) => choice.code))];
-    for (const code of new Set(codes)) {
+    for (const code of dealtCodes(campaign, [scenario])) {
       const card = cardsByCode.get(code);
       if (!card) throw new Error(`Scenario ${id} is missing card ${code}`);
       if (card.type === "nightmare") throw new Error(`Scenario ${id} card ${code} is a nightmare card`);
@@ -35,10 +34,9 @@ export function loadScenarioDefinitions(dataDir: string, cardsByCode: ReadonlyMa
 }
 
 // Every card the campaign deals: the prelude, each scenario's piles, and the rewards its resolution offers.
-export function dealtCodes(dataDir = DATA_DIR): Set<string> {
-  const campaign = loadCampaign(undefined, dataDir);
+export function dealtCodes(campaign: CampaignData, scenarios: readonly ScenarioData[]): Set<string> {
   const codes = new Set<string>(campaign.prelude.map((card) => card.code));
-  for (const scenario of loadScenarios(dataDir)) {
+  for (const scenario of scenarios) {
     for (const card of scenario.cards) codes.add(card.code);
     for (const group of campaign.authored.resolution[scenario.id] ?? []) for (const choice of group.choices) codes.add(choice.code);
   }

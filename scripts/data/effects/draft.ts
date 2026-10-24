@@ -57,7 +57,7 @@ function main(): void {
   const generated = generateEffects(cards, [scenario], campaign, ledger);
   const dealt = new Set(scenario.cards.map((card) => card.code));
   const all = process.argv.includes("--all");
-  const open: Unmatched[] = generated.unmatched.filter((line) => dealt.has(line.card.code) && (all || !EFFECTS.some((effect) => effect.lines?.includes(line.lineId))));
+  const open: Unmatched[] = generated.unmatched.filter((line) => dealt.has(line.card.code) && (all || !EFFECTS.some((effect) => effect.lines.includes(line.lineId))));
   const byCard = new Map<string, Unmatched[]>();
   for (const line of open) byCard.set(line.card.code, [...(byCard.get(line.card.code) ?? []), line]);
 

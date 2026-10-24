@@ -19,7 +19,7 @@ const campaign = loadCampaign();
 const ledger = loadLedger();
 const byCode = new Map(cards.map((card) => [card.code, card]));
 
-const dealt = dealtCodes();
+const dealt = dealtCodes(campaign, scenarios);
 
 describe("effect coverage", () => {
   for (const code of [...dealt].sort()) {
@@ -31,7 +31,7 @@ describe("effect coverage", () => {
       for (const entry of entries) {
         entry.lines.forEach((line, at) => {
           const id = lineId(code, entry.side, at + 1);
-          const owned = EFFECTS.some((effect) => effect.lines?.includes(id)) || isKeywordLine(line) || entry.inert.some((mark) => mark.line === at + 1);
+          const owned = EFFECTS.some((effect) => effect.lines.includes(id)) || isKeywordLine(line) || entry.inert.some((mark) => mark.line === at + 1);
           expect(owned, `${id} is owned: ${line}`).toBe(true);
         });
       }
@@ -40,8 +40,8 @@ describe("effect coverage", () => {
 
   it("has a record that names a line of its own card, for every shipped record", () => {
     for (const effect of EFFECTS) {
-      expect(effect.lines?.length ?? 0, `${effect.id} names a line`).toBeGreaterThan(0);
-      for (const id of effect.lines ?? []) {
+      expect(effect.lines.length, `${effect.id} names a line`).toBeGreaterThan(0);
+      for (const id of effect.lines) {
         const [code, side, n] = id.split(":");
         const entry = ledger.byKey.get(keyOf(code ?? "", side ?? ""));
         expect(code, `${effect.id} claims ${id}, a line of another card`).toBe(effect.cardCode);
@@ -66,7 +66,7 @@ describe("effect coverage", () => {
     for (const entry of ledger.entries) {
       for (const mark of entry.inert) {
         const id = lineId(entry.code, entry.side, mark.line);
-        expect(EFFECTS.some((effect) => effect.lines?.includes(id)), `${id} is inert and implemented`).toBe(false);
+        expect(EFFECTS.some((effect) => effect.lines.includes(id)), `${id} is inert and implemented`).toBe(false);
       }
     }
   });
@@ -91,7 +91,7 @@ describe("generated and authored records", () => {
     for (const line of regenerated.unmatched) {
       const [code, side, n] = line.lineId.split(":");
       const inert = ledger.byKey.get(keyOf(code ?? "", side ?? ""))?.inert.some((mark) => mark.line === Number(n)) ?? false;
-      expect(inert || EFFECTS.some((effect) => effect.lines?.includes(line.lineId)), `${line.lineId} ${line.line}`).toBe(true);
+      expect(inert || EFFECTS.some((effect) => effect.lines.includes(line.lineId)), `${line.lineId} ${line.line}`).toBe(true);
     }
   });
 });
