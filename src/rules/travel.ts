@@ -1,3 +1,4 @@
+// Rules: rr.travel, rr.active-location, rr.step-4-2 (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { pushEffectFrame } from "./effect-frames.ts";

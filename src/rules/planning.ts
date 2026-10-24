@@ -1,3 +1,4 @@
+// Rules: rr.planning-phase (data/rules/entries.json).
 import { characters } from "./combat.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";

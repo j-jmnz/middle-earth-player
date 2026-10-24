@@ -1,3 +1,4 @@
+// Rules: rr.response (data/rules/entries.json).
 import { holds } from "./conditions.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";

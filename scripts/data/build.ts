@@ -6,6 +6,9 @@ import { DATA_DIR } from "./paths.ts";
 import { buildCards, parseOverrides } from "./normalize/cards.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
+import { extractAll } from "./rules/extract.ts";
+import { buildSteps } from "./rules/steps.ts";
+import { splitEntries } from "./rules/split.ts";
 
 // Offline and deterministic: data/raw -> data/cards. The same input writes the same bytes.
 // DATA_OUT overrides the output directory so data:check can build into a temporary one.
@@ -36,6 +39,15 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   for (const file of readdirSync(scenarioDir)) rmSync(path.join(scenarioDir, file));
   for (const scenario of built.scenarios) writeFileSync(path.join(scenarioDir, `${scenario.id}.json`), `${JSON.stringify(scenario, null, 2)}\n`);
   writeFileSync(path.join(campaignDir, "fellowship-of-the-ring.json"), `${JSON.stringify(built.campaign, null, 2)}\n`);
+  // Rule text: re-extracted only when a cached PDF's sha256 differs from the committed markdown.
+  const sources = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string; sha256: string }[] }> };
+  const pinned = new Map((sources.sources.rules?.files ?? []).map((file) => [file.path, file.sha256]));
+  const docs = extractAll(outDir, pinned);
+  const entries = splitEntries(docs);
+  writeFileSync(path.join(outDir, "rules", "entries.json"), `[\n${entries.map((entry) => `  ${JSON.stringify(entry)}`).join(",\n")}\n]\n`);
+  const steps = buildSteps(readFileSync(path.join(DATA_DIR, "raw", "dragncards", "steps.json"), "utf8"), entries);
+  writeFileSync(path.join(outDir, "rules", "steps.json"), `[\n${steps.map((step) => `  ${JSON.stringify(step)}`).join(",\n")}\n]\n`);
+  console.log(`rules: ${entries.length} entries, ${steps.length} framework steps`);
   console.log(`scenarios: ${built.scenarios.map((scenario) => scenario.id).join(", ") || "none"}`);
   for (const note of built.notes) console.log(`note: ${note}`);
   if (built.problems.length > 0) console.log(`unbuilt scenarios, problems:\n  ${built.problems.join("\n  ")}`);

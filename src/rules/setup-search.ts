@@ -1,3 +1,4 @@
+// Rules: mec109.setup (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
 
 import type { EngineStep } from "./intents.ts";

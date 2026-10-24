@@ -1,3 +1,4 @@
+// Rules: mec109.hide-x, mec109.hide-tests (data/rules/entries.json).
 import { characters } from "./combat.ts";
 import { heldStat, NO_COUNTS } from "./constants.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
