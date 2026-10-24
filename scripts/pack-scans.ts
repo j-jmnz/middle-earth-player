@@ -219,7 +219,7 @@ if (isDirectRun()) {
   const root = repoRoot();
   packScans({
     root,
-    fixturesDir: path.join(root, "fixtures"),
+    fixturesDir: path.join(root, "data", "scenarios"),
     catalogDb: path.join(root, "assets/catalog.db"),
     readingDir: path.join(root, ".cache/sources/reading"),
     scansDir: path.join(root, "assets/scans"),

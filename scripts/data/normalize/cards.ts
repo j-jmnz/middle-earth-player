@@ -41,6 +41,18 @@ const overridesSchema = z.object({
       source: z.string().min(1),
     }),
   ),
+  // A scenario's pile for one card, where the sources put it somewhere its own Setup text does not.
+  scenarioPiles: z
+    .array(
+      z.object({
+        scenario: z.string().min(1),
+        code: z.string().min(1),
+        pile: z.enum(["encounter", "staging", "activeLocation", "setAside", "attached"]),
+        reason: z.string().min(1),
+        source: z.string().min(1),
+      }),
+    )
+    .default([]),
 });
 export type Overrides = z.infer<typeof overridesSchema>;
 export function parseOverrides(raw: unknown): Overrides {

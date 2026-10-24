@@ -4,7 +4,7 @@ import type { Effect } from "../../catalog/boundary.ts";
 // MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the cards.
 //
 // A Setup record for a card the definition puts out describes the instructions that the scenario
-// definition already runs (see scenario-fixture.ts). searchSetup only runs a Setup record for a card it
+// definition already runs (see scenario-data.ts). searchSetup only runs a Setup record for a card it
 // finds in a deck, so these records never place a card a second time. A test keeps them in step.
 
 const NAZGUL_ENGAGE: Omit<Effect, "id" | "cardCode"> = {

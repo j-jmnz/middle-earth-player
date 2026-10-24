@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { loadCards } from "./data/load-cards.ts";
-import { parseScenarioFixture, fixtureCards } from "../src/catalog/scenario-fixture.ts";
+import { loadScenario } from "./data/load-scenarios.ts";
+import { scenarioCards } from "../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../src/effects/index.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -16,7 +17,7 @@ function readJson(...parts: string[]): unknown {
 
 // Codes and timing labels only. A repeated label means the card prints that timing more than once.
 const manifest = readJson("fixtures", "abilities", "a-shadow-of-the-past.json") as Record<string, string[]>;
-const fixture = parseScenarioFixture(readJson("fixtures", "a-shadow-of-the-past.json"));
+const scenario = loadScenario("a-shadow-of-the-past");
 
 // Timings that phase 8 authors. A timing in LATER is listed as todo until it is authored.
 const AUTHORED = new Set(["setup", "forced", "triggered", "whenRevealed", "shadow", "response", "action", "constant", "travel", "questResolution"]);
@@ -38,7 +39,7 @@ const cases: Case[] = Object.entries(manifest).flatMap(([code, timings]) => {
 
 describe("effect coverage manifest", () => {
   it("lists exactly the dealt codes and The One Ring", () => {
-    const dealt = new Set([...fixtureCards(fixture).map((card) => card.code), "141085"]);
+    const dealt = new Set([...scenarioCards(scenario).map((card) => card.code), "141085"]);
     expect(Object.keys(manifest).sort()).toEqual([...dealt].sort());
   });
 

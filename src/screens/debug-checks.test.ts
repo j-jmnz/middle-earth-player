@@ -4,15 +4,12 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { fixtureCards, parseScenarioFixture, scenarioDefinition } from "../catalog/scenario-fixture.ts";
+import { scenarioCards, scenarioDefinition } from "../catalog/scenario-data.ts";
+import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { debugSentences, type DebugCheckInput, type DebugImageSample } from "./debug-checks.ts";
 
-const fixturePath = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../fixtures/a-shadow-of-the-past.json",
-);
-
-const fixture = parseScenarioFixture(JSON.parse(readFileSync(fixturePath, "utf8")) as unknown);
+const scenario = loadScenario("a-shadow-of-the-past");
+const campaign = loadCampaign();
 
 const samples: DebugImageSample[] = [
   { code: "141001", imagesrc: "/bundles/cards/141001.png", width: 423, height: 600, mediaType: "image/jpeg" },
@@ -31,10 +28,11 @@ function base(overrides: Partial<DebugCheckInput> = {}): DebugCheckInput {
     deckCount: 0,
     saveCount: 0,
     hero: { present: true, deckLegal: true, imagesrc: "/bundles/cards/141001.png" },
-    fixture,
+    scenario,
+    campaign,
     scenarioPresent: true,
-    bakedDefinition: scenarioDefinition(fixture, (name) => name),
-    presentCardCodes: [...new Set(fixtureCards(fixture).map((card) => card.code))],
+    bakedDefinition: scenarioDefinition(scenario, campaign),
+    presentCardCodes: [...new Set(scenarioCards(scenario).map((card) => card.code))],
     imageFileCount: 1,
     snapshotCount: 1,
     pauseEntryCount: 0,
@@ -61,7 +59,7 @@ describe("debugSentences", () => {
       "The Ring has 3 cards.",
       "The Black Riders has 5 cards.",
       "Stages are 141022, 141023, 141024.",
-      "Scenario a-shadow-of-the-past matches the fixture.",
+      "Scenario a-shadow-of-the-past matches the scenario data.",
       "Setup instructions: 5. Resolution options: 2.",
       "1 image file.",
       "1 image in memory.",
@@ -92,15 +90,15 @@ describe("debugSentences", () => {
     expect(illegal).not.toContain("Hero 141001 is present, deck-legal, and has an imagesrc.");
   });
 
-  it("names a scenario row that is missing, invalid, or different from the fixture", () => {
+  it("names a scenario row that is missing, invalid, or different from the scenario data", () => {
     expect(debugSentences(base({ scenarioPresent: false }))).toContain("Scenario a-shadow-of-the-past is missing.");
     expect(debugSentences(base({ bakedDefinition: { id: "nope" } }))).toContain(
       "Scenario a-shadow-of-the-past is not a definition.",
     );
 
-    const baked = scenarioDefinition(fixture, (name) => name);
+    const baked = scenarioDefinition(scenario, campaign);
     const setup = debugSentences(base({ bakedDefinition: { ...baked, setup: [{ verb: "Draw" }] } }));
-    expect(setup).toContain("Scenario a-shadow-of-the-past setup does not match the fixture.");
+    expect(setup).toContain("Scenario a-shadow-of-the-past setup does not match the scenario data.");
     expect(setup).not.toContain("Setup instructions: 5. Resolution options: 0.");
 
     const shifted = {
@@ -114,7 +112,7 @@ describe("debugSentences", () => {
     );
 
     const present = base().presentCardCodes.filter((code) => code !== "141031");
-    expect(debugSentences(base({ presentCardCodes: present }))).toContain("Fixture code 141031 is absent from cards.");
+    expect(debugSentences(base({ presentCardCodes: present }))).toContain("Scenario code 141031 is absent from cards.");
   });
 
   it("names an image that is missing, unpacked, or failed", () => {

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -7,15 +7,16 @@ import { describe, expect, it } from "vitest";
 
 import { scenarioDefinitionSchema } from "../src/catalog/boundary.ts";
 import { EFFECTS } from "../src/effects/index.ts";
-import { fixtureCards, normalCopiesByCode, parseScenarioFixture } from "../src/catalog/scenario-fixture.ts";
+import { normalCopiesByCode, scenarioCards } from "../src/catalog/scenario-data.ts";
 import { buildCatalog } from "./build-catalog.ts";
+import { loadScenario } from "./data/load-scenarios.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dbPath = path.join(root, "assets", "catalog.db");
 
 describe("built catalog", () => {
   it("reads the Fellowship hero and campaign rows from the built database", async () => {
-    if (!existsSync(dbPath)) await buildCatalog();
+    if (!existsSync(dbPath)) buildCatalog();
 
     const database = new DatabaseSync(dbPath, { readOnly: true });
     try {
@@ -68,11 +69,9 @@ describe("built catalog", () => {
         ["Gildor Inglorion", "Mr. Underhill"],
       ]);
 
-      const fixture = parseScenarioFixture(
-        JSON.parse(readFileSync(path.join(root, "fixtures", "a-shadow-of-the-past.json"), "utf8")) as unknown,
-      );
-      const copies = normalCopiesByCode(fixture);
-      for (const code of new Set(fixtureCards(fixture).map((card) => card.code))) {
+      const dealt = loadScenario("a-shadow-of-the-past");
+      const copies = normalCopiesByCode(dealt);
+      for (const code of new Set(scenarioCards(dealt).map((card) => card.code))) {
         const row = database.prepare("select quantity from cards where code = ?").get(code);
         expect(row?.quantity).toBe(copies.get(code));
       }

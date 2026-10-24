@@ -5,11 +5,11 @@ import { expectOk } from "../rules/fixture.ts";
 import { definePrinted, type PrintedCard } from "../rules/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import { playOut } from "../../scripts/auto-player.ts";
-import { fixture, loadWorld, type World } from "../../scripts/past-scene.ts";
+import { campaign, scenario, loadWorld, type World } from "../../scripts/past-scene.ts";
 
 import { validateLoadout, type LoadoutSeat } from "./loadout.ts";
 import { applyResolution, EMPTY_LOG } from "./resolution.ts";
-import { scriptFor } from "./registry.ts";
+import { buildStart } from "./start.ts";
 
 // A whole A Shadow of the Past on fixed seeds. The Ring-bearer is the saga hero; the three other heroes
 // and the deck are in-memory cards with big numbers, so the outcome depends on the engine and the seed
@@ -41,9 +41,7 @@ beforeAll(async () => {
 });
 
 function play(seed: number): { state: ScenarioState; intents: number } {
-  const start = scriptFor("a-shadow-of-the-past").start({
-    fixture,
-    definition: world.definition,
+  const start = buildStart({ campaign, scenario,
     seatCount: 1,
     seed,
     threatModifier: 0,

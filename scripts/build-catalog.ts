@@ -12,7 +12,7 @@ import { campaigns, cards, catalogTables, effects as effectsTable, meta, packs, 
 import { nextVersion, quoteIdent, snapshotCatalog, writeCatalogVersion, type Row, type SqlValue } from "./catalog-snapshot.ts";
 import { loadCards } from "./data/load-cards.ts";
 import { DATA_DIR } from "./data/paths.ts";
-import { joinScenarioFixtures } from "./join-scenario-fixtures.ts";
+import { loadScenarioDefinitions } from "./data/load-scenarios.ts";
 import { validateEffects } from "./validate-effects.ts";
 
 const FELLOWSHIP_CAMPAIGN_ID = "fellowship-of-the-ring";
@@ -25,7 +25,6 @@ export type BuildCatalogOptions = {
   dataDir?: string;
   dbPath?: string;
   versionPath?: string;
-  fixturesDir?: string;
   cards?: readonly Card[];
   effects?: readonly Effect[];
 };
@@ -213,7 +212,6 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
   const dataDir = options.dataDir ?? DATA_DIR;
   const dbPath = options.dbPath ?? path.join(root, "assets", "catalog.db");
   const versionPath = options.versionPath ?? path.join(root, "src", "catalog", "version.ts");
-  const fixturesDir = options.fixturesDir ?? path.join(root, "fixtures");
   const effectRecords = validateEffects(options.effects ?? EFFECTS);
   const allCards = options.cards ?? loadCards(dataDir);
 
@@ -223,7 +221,7 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
   const knownPacks = new Set(included.map((pack) => pack.code));
 
   const cardsByCode = new Map(allCards.map((card) => [card.code, card]));
-  const definitions = joinScenarioFixtures(fixturesDir, cardsByCode);
+  const definitions = loadScenarioDefinitions(dataDir, cardsByCode);
 
   const packRows = [...included]
     .sort(comparePacks)

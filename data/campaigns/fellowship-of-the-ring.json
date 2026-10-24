@@ -1,0 +1,40 @@
+{
+  "id": "fellowship-of-the-ring",
+  "name": "Fellowship of the Ring",
+  "scenarios": [
+    "a-shadow-of-the-past"
+  ],
+  "prelude": [
+    {
+      "code": "141085"
+    }
+  ],
+  "authored": {
+    "resolution": {
+      "a-shadow-of-the-past": [
+        {
+          "id": "gandalfs-delay-or-the-ring-draws-them",
+          "choices": [
+            {
+              "code": "141078"
+            },
+            {
+              "code": "141079"
+            }
+          ]
+        },
+        {
+          "id": "gildor-or-mr-underhill",
+          "choices": [
+            {
+              "code": "141077"
+            },
+            {
+              "code": "141017"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -5,8 +5,9 @@ import { ScrollView, View } from "react-native";
 
 import { CATALOG_VERSION } from "../../catalog/version";
 import { cards, campaigns, packs, scenarios } from "../../catalog/schema";
-import shadowFixtureJson from "../../../fixtures/a-shadow-of-the-past.json";
-import { fixtureCards, parseScenarioFixture } from "../../catalog/scenario-fixture";
+import campaignJson from "../../../data/campaigns/fellowship-of-the-ring.json";
+import shadowScenarioJson from "../../../data/scenarios/a-shadow-of-the-past.json";
+import { campaignDataSchema, parseScenarioData, scenarioCards } from "../../catalog/scenario-data";
 import { BackButton, BodyText, ListRow, Screen, ScreenTitle, TextButton } from "../chrome";
 import {
   DEBUG_CAMPAIGN_ID,
@@ -24,7 +25,8 @@ import { useImageSnapshot } from "../images/store";
 import type { AppDatabases } from "../open-databases";
 import { decks, imageFiles, meta, saves } from "../user-schema";
 
-const shadowFixture = parseScenarioFixture(shadowFixtureJson);
+const shadowScenario = parseScenarioData(shadowScenarioJson);
+const fellowshipCampaign = campaignDataSchema.parse(campaignJson);
 
 type DebugView = {
   sentences: readonly string[];
@@ -86,7 +88,7 @@ function readDebugView(
     .where(inArray(cards.code, [...DEBUG_SAMPLE_CODES]))
     .all();
   const hero = sampleCards.find((card) => card.code === DEBUG_HERO_CODE);
-  const fixtureCodes = [...new Set(fixtureCards(shadowFixture).map((card) => card.code))];
+  const fixtureCodes = [...new Set(scenarioCards(shadowScenario).map((card) => card.code))];
   const presentCardCodes =
     fixtureCodes.length === 0
       ? []
@@ -99,7 +101,7 @@ function readDebugView(
   const scenario = catalog
     .select({ definition: scenarios.definition })
     .from(scenarios)
-    .where(eq(scenarios.id, shadowFixture.id))
+    .where(eq(scenarios.id, shadowScenario.id))
     .get();
   let scenarioPresent = false;
   let bakedDefinition: unknown = null;
@@ -166,7 +168,8 @@ function readDebugView(
         deckLegal: hero?.deckLegal ?? false,
         imagesrc: usableImagesrc(hero?.imagesrc),
       },
-      fixture: shadowFixture,
+      scenario: shadowScenario,
+      campaign: fellowshipCampaign,
       scenarioPresent,
       bakedDefinition,
       presentCardCodes,

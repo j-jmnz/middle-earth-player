@@ -22,7 +22,7 @@ function openDb(dbPath: string): DatabaseSync {
   return database;
 }
 
-type Workspace = { dataDir: string; dbPath: string; versionPath: string; fixturesDir: string };
+type Workspace = { dataDir: string; dbPath: string; versionPath: string };
 
 const PACKS = [
   { name: "Primary", code: "A", position: 4, cycle_position: 1, available: "2020-01-01" },
@@ -34,12 +34,13 @@ const PACKS = [
 function workspace(): Workspace {
   const root = mkdtempSync(path.join(tmpdir(), "catalog-build-"));
   const dataDir = path.join(root, "data");
-  const fixturesDir = path.join(root, "fixtures");
   mkdirSync(path.join(dataDir, "raw", "ringsdb"), { recursive: true });
-  mkdirSync(fixturesDir);
+  mkdirSync(path.join(dataDir, "scenarios"));
+  mkdirSync(path.join(dataDir, "campaigns"));
+  writeFileSync(path.join(dataDir, "campaigns", "fellowship-of-the-ring.json"), JSON.stringify({ id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarios: [], prelude: [], authored: { resolution: {} } }));
   writeFileSync(path.join(dataDir, "raw", "ringsdb", "packs.json"), JSON.stringify(PACKS));
   writeFileSync(path.join(dataDir, "sources.json"), JSON.stringify({ sources: { ringsdb: { fetchedAt: "2026-10-24T10:00:00.000Z" } } }));
-  return { dataDir, dbPath: path.join(root, "catalog.db"), versionPath: path.join(root, "version.ts"), fixturesDir };
+  return { dataDir, dbPath: path.join(root, "catalog.db"), versionPath: path.join(root, "version.ts") };
 }
 
 function card(overrides: Partial<Card> = {}): Card {
@@ -170,28 +171,36 @@ describe("buildCatalog", () => {
     expect(existsSync(dirs.dbPath)).toBe(true);
   });
 
-  it("throws when a fixture code has no card, and writes no database", () => {
+  function addScenario(dirs: Workspace, scenario: Record<string, unknown>): void {
+    const file = path.join(dirs.dataDir, "campaigns", "fellowship-of-the-ring.json");
+    const campaign = JSON.parse(readFileSync(file, "utf8")) as { scenarios: string[] };
+    campaign.scenarios.push(String(scenario.id));
+    writeFileSync(file, JSON.stringify({ ...campaign, name: "Fellowship of the Ring", prelude: [], authored: { resolution: {} } }));
+    writeFileSync(path.join(dirs.dataDir, "scenarios", `${String(scenario.id)}.json`), JSON.stringify(scenario));
+  }
+
+  const scenarioBase = { name: "Scenario", number: 1, source: { dragnNormal: "Q0C.99", dragnEasy: null, hobSlug: "x" } };
+
+  it("throws when a scenario card has no card in data/cards, and writes no database", () => {
     const dirs = workspace();
-    writeFileSync(
-      path.join(dirs.fixturesDir, "gap.json"),
-      JSON.stringify({ id: "gap-scenario", stages: ["999001"], sets: [], cards: [{ code: "999001", easy: 1, normal: 1, pile: "quest" }] }),
-    );
+    addScenario(dirs, { ...scenarioBase, id: "gap-scenario", stages: ["999001"], encounterSets: [], cards: [{ code: "999001", easy: 1, normal: 1, pile: "quest" }] });
     expect(() => buildCatalog(options(dirs))).toThrow(/gap-scenario.*999001/);
     expect(existsSync(dirs.dbPath)).toBe(false);
   });
 
-  it("throws when a fixture card is a nightmare card, without quoting its text", () => {
+  it("throws when a scenario card is a nightmare card, without quoting its text", () => {
     const dirs = workspace();
     const nightmare = card({ code: "999008", name: "Synthetic Nightmare", type: "nightmare", typeName: "Nightmare", deckLegal: false, text: "NIGHTMARE_TEXT", printings: [{ pack: "A", number: 8 }] });
-    writeFileSync(
-      path.join(dirs.fixturesDir, "night.json"),
-      JSON.stringify({
-        id: "night-scenario",
-        stages: ["20001"],
-        sets: [{ name: "Hunted", cards: [{ code: "999008", easy: 1, normal: 1, pile: "encounter" }] }],
-        cards: [{ code: "20001", easy: 1, normal: 1, pile: "quest" }],
-      }),
-    );
+    addScenario(dirs, {
+      ...scenarioBase,
+      id: "night-scenario",
+      stages: ["20001"],
+      encounterSets: [],
+      cards: [
+        { code: "20001", easy: 1, normal: 1, pile: "quest" },
+        { code: "999008", easy: 1, normal: 1, pile: "encounter" },
+      ],
+    });
     let message = "";
     try {
       buildCatalog(options(dirs, { cards: [...CARDS, nightmare] }));
@@ -204,21 +213,21 @@ describe("buildCatalog", () => {
     expect(existsSync(dirs.dbPath)).toBe(false);
   });
 
-  it("joins a fixture to the cards it deals", () => {
+  it("builds a scenario definition from the scenario data", () => {
     const dirs = workspace();
     const ford = card({ code: "999003", name: "Local Ford", type: "location", typeName: "Location", sphere: null, deckLegal: false, quantity: 2, printings: [{ pack: "TBR", number: 90 }] });
-    writeFileSync(
-      path.join(dirs.fixturesDir, "local.json"),
-      JSON.stringify({
-        id: "local-scenario",
-        stages: ["20001"],
-        sets: [{ name: "Hunted", cards: [{ code: "999003", easy: 1, normal: 2, pile: "encounter" }] }],
-        cards: [{ code: "20001", easy: 1, normal: 1, pile: "quest" }],
-      }),
-    );
+    addScenario(dirs, {
+      ...scenarioBase,
+      id: "local-scenario",
+      stages: ["20001"],
+      encounterSets: [{ name: "Hunted", count: 2 }],
+      cards: [
+        { code: "20001", easy: 1, normal: 1, pile: "quest" },
+        { code: "999003", easy: 1, normal: 2, pile: "encounter" },
+      ],
+    });
     buildCatalog(options(dirs, { cards: [...CARDS, ford] }));
-    const database = openDb(dirs.dbPath);
-    const scenario = database.prepare("select definition from scenarios where id = ?").get("local-scenario");
+    const scenario = openDb(dirs.dbPath).prepare("select definition from scenarios where id = ?").get("local-scenario");
     const definition = scenarioDefinitionSchema.parse(JSON.parse(String(scenario?.definition)));
     expect(definition.encounterSets).toEqual([{ code: "Hunted", count: 2 }]);
     expect(definition.stages).toEqual([{ code: "20001" }]);

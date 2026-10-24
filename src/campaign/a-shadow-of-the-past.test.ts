@@ -1,35 +1,29 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
-import { fixtureCards, parseScenarioFixture, type ScenarioFixture } from "../catalog/scenario-fixture.ts";
+import type { Effect } from "../catalog/boundary.ts";
+import { scenarioCards } from "../catalog/scenario-data.ts";
 import { characters } from "../rules/combat.ts";
 import { byCode, expectOk, hero } from "../rules/fixture.ts";
 import { definePrinted, type PrintedCard } from "../rules/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import { moveCard } from "../rules/zones.ts";
 
-import { scriptFor } from "./registry.ts";
-import { loadDefinition, loadPrinted } from "../../scripts/test-catalog.ts";
+import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
+import { loadPrinted } from "../../scripts/test-catalog.ts";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
-const fixture: ScenarioFixture = parseScenarioFixture(
-  JSON.parse(readFileSync(path.join(root, "fixtures", "a-shadow-of-the-past.json"), "utf8")) as unknown,
-);
+import { buildStart } from "./start.ts";
+
+const scenario = loadScenario("a-shadow-of-the-past");
+const campaign = loadCampaign();
 
 const RING_BEARER = "141001";
 const SIDE_HERO = "side-hero";
 const DECK = Array.from({ length: 12 }, (_, index) => `deck${index}`);
 
-let definition: ScenarioDefinition;
 let cards: Map<string, PrintedCard>;
 
 beforeAll(async () => {
-  definition = await loadDefinition("a-shadow-of-the-past");
-  const codes = [...new Set([...fixtureCards(fixture).map((card) => card.code), RING_BEARER, "141085"])];
+  const codes = [...new Set([...scenarioCards(scenario).map((card) => card.code), RING_BEARER, "141085"])];
   cards = new Map(await loadPrinted(codes));
   cards.set(SIDE_HERO, hero(SIDE_HERO, "spirit", 8, 1));
   for (const code of DECK) {
@@ -38,9 +32,9 @@ beforeAll(async () => {
 });
 
 function begin(seed: number, effects: readonly Effect[] = []) {
-  const start = scriptFor("a-shadow-of-the-past").start({
-    fixture,
-    definition,
+  const start = buildStart({
+    campaign,
+    scenario,
     seatCount: 1,
     seed,
     threatModifier: 0,

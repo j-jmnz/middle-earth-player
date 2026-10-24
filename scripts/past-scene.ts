@@ -1,10 +1,6 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { EFFECTS } from "../src/effects/index.ts";
-import { scenarioDefinitionSchema, type ScenarioDefinition } from "../src/catalog/boundary.ts";
-import { fixtureCards, parseScenarioFixture, type ScenarioFixture } from "../src/catalog/scenario-fixture.ts";
+import type { ScenarioDefinition } from "../src/catalog/boundary.ts";
+import { scenarioCards, scenarioDefinition, type CampaignData, type ScenarioData } from "../src/catalog/scenario-data.ts";
 import { byCode, expectOk } from "../src/rules/fixture.ts";
 import type { EngineStep } from "../src/rules/intents.ts";
 import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
@@ -12,14 +8,13 @@ import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } fro
 import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
 import { attachTo, spawn } from "../src/rules/zones.ts";
 
-import { loadDefinition, loadPrinted } from "./test-catalog.ts";
+import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
+import { loadPrinted } from "./test-catalog.ts";
 
 // Shared scene for the A Shadow of the Past effect tests, split by timing. Test-only.
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-export const fixture: ScenarioFixture = parseScenarioFixture(
-  JSON.parse(readFileSync(path.join(root, "fixtures", "a-shadow-of-the-past.json"), "utf8")) as unknown,
-);
+export const scenario: ScenarioData = loadScenario("a-shadow-of-the-past");
+export const campaign: CampaignData = loadCampaign();
 
 export const FRODO = "141001";
 export const SAM = "141002";
@@ -30,8 +25,8 @@ export const RIDER = "141039";
 export type World = { definition: ScenarioDefinition; cards: Map<string, PrintedCard> };
 
 export async function loadWorld(): Promise<World> {
-  const definition = scenarioDefinitionSchema.parse(await loadDefinition("a-shadow-of-the-past"));
-  const codes = [...new Set([...fixtureCards(fixture).map((card) => card.code), FRODO, SAM, MERRY, RING])];
+  const definition = scenarioDefinition(scenario, campaign);
+  const codes = [...new Set([...scenarioCards(scenario).map((card) => card.code), FRODO, SAM, MERRY, RING])];
   const cards = new Map(await loadPrinted(codes));
   for (const [code, threat] of [["f0", 0], ["f3", 3]] as const) {
     cards.set(code, definePrinted({ code, name: code, type: "enemy", threat, engagementCost: 50, attack: 1, defense: 1, health: 3 }));
@@ -58,9 +53,9 @@ export function table(world: World, layout: Layout = {}): { state: ScenarioState
   const seats = layout.seats ?? 1;
   const stage = layout.stage ?? "141022";
   let state = blankScenario({ seatCount: seats, seed: 3, definition: world.definition });
-  for (const code of fixture.stages) {
+  for (const code of scenario.stages) {
     const placed =
-      code === stage ? { zone: "questStage" as const } : fixture.stages.indexOf(code) > fixture.stages.indexOf(stage) ? { zone: "questDeck" as const } : { zone: "setAside" as const };
+      code === stage ? { zone: "questStage" as const } : scenario.stages.indexOf(code) > scenario.stages.indexOf(stage) ? { zone: "questDeck" as const } : { zone: "setAside" as const };
     const spawned = spawn(state, code, placed, placed.zone === "questStage" ? "B" : "A");
     state = code === stage ? updateCard(spawned.state, spawned.id, { progress: layout.progress ?? 0 }) : spawned.state;
   }

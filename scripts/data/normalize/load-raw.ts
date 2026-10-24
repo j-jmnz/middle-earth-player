@@ -14,6 +14,8 @@ export type RawData = {
   scenarios: z.infer<typeof hobScenarioSchema>[];
   // DragnCards cardDb rows by databaseId, which equals Hall of Beorn's OctgnGuid for the Black Riders and Road Darkens printings.
   dragn: Map<string, Record<string, string>>;
+  // The DragnCards JSON-with-comments files as fetched; the scenario builder parses them.
+  dragnRaw: { preBuiltDecks: string };
 };
 
 function readDragnCards(): Map<string, Record<string, string>> {
@@ -46,5 +48,5 @@ export function loadRaw(): RawData {
   const scenarios = readdirSync(path.join(RAW_DIR, "hallofbeorn", "Scenarios"))
     .sort()
     .map((file) => hobScenarioSchema.parse(readJson("hallofbeorn", "Scenarios", file)));
-  return { packs: packs.filter((pack) => ringsdb.has(pack.code)), ringsdb, hob, scenarios, dragn: readDragnCards() };
+  return { packs: packs.filter((pack) => ringsdb.has(pack.code)), ringsdb, hob, scenarios, dragn: readDragnCards(), dragnRaw: { preBuiltDecks: readFileSync(path.join(RAW_DIR, "dragncards", "preBuiltDecks.json"), "utf8") } };
 }

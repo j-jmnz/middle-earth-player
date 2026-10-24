@@ -4,9 +4,9 @@ import { EFFECTS } from "../src/effects/index.ts";
 import { expectOk } from "../src/rules/fixture.ts";
 import { definePrinted } from "../src/rules/printed.ts";
 import { reduce, startScenario } from "../src/rules/reduce.ts";
-import { scriptFor } from "../src/campaign/registry.ts";
+import { buildStart } from "../src/campaign/start.ts";
 import { playOut } from "./auto-player.ts";
-import { fixture, loadWorld } from "./past-scene.ts";
+import { campaign, scenario, loadWorld } from "./past-scene.ts";
 
 // Temporary scaffolding for the data-store refactor (docs/plans/data-store-refactor.md, step 0).
 const RING_BEARER = "141001";
@@ -31,7 +31,7 @@ describe("refactor golden", () => {
     const loadout = { heroes: [RING_BEARER, "scout", "q1", "q2"], deck: Array.from({ length: 30 }, () => "filler") };
     const out: unknown[] = [];
     for (const seed of [1, 2, 9]) {
-      const start = scriptFor("a-shadow-of-the-past").start({ fixture, definition: world.definition, seatCount: 1, seed, threatModifier: 0, seats: [loadout] });
+      const start = buildStart({ campaign, scenario, seatCount: 1, seed, threatModifier: 0, seats: [loadout] });
       const kept = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx)).state;
       const run = playOut(kept, ctx, { scout: "scout", prefer: "141035", protect: RING_BEARER });
       out.push({ seed, intents: run.intents, state: run.state });
