@@ -17,6 +17,7 @@ import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
+import { goBack } from "../../go-back";
 
 function CardFacts({
   row,
@@ -211,7 +212,7 @@ export default function CardScreen() {
     <Screen scene="plain">
       <NavBar
         backTestID="back"
-        onBack={() => router.back()}
+        onBack={() => goBack(router, "/packs")}
         right={row?.name ? <Text className="text-label text-faint">{row.code}</Text> : undefined}
       />
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-8 pt-4">

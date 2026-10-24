@@ -28,6 +28,7 @@ import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
 import { EmptyHeroSlot, HeroTile, type HeroFace } from "../../hero-tile";
 import { decks } from "../../user-schema";
+import { goBack } from "../../go-back";
 
 type Face = HeroFace & {
   typeCode: string;
@@ -204,7 +205,7 @@ export default function DeckEditor() {
     } else {
       user.update(decks).set({ name, heroes, cards: nextCards }).where(eq(decks.id, current.id)).run();
     }
-    router.back();
+    goBack(router, "/decks");
   }
 
   if (!id) throw new Error("Missing route code");
@@ -212,7 +213,7 @@ export default function DeckEditor() {
   return (
     <Screen testID="deck-editor" scene="plain">
       <View className="min-h-0 flex-1">
-        <NavBar backLabel="Decks" backTestID="deck-back" onBack={() => router.back()} />
+        <NavBar backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} />
         <View className={heroes.length > 3 ? "mt-2 flex-row flex-wrap justify-between" : "mt-2 flex-row gap-2"}>
           {heroes.map((hero) => (
             <View

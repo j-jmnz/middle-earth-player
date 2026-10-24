@@ -49,6 +49,7 @@ import {
   type PoolCard,
   type PoolFilter,
 } from "../pool-filter";
+import { goBack } from "../go-back";
 
 type PoolRowCard = PoolCard & {
   typeName: string;
@@ -255,7 +256,7 @@ export default function CardPool() {
   return (
     <Screen scene="plain">
       <View className="min-h-0 flex-1">
-        <NavBar backLabel="Decks" backTestID="pool-back" onBack={() => router.back()} />
+        <NavBar backLabel="Decks" backTestID="pool-back" onBack={() => goBack(router, "/decks")} />
         <View className="mt-3 flex-row items-center gap-2">
           <TextInput
             testID="pool-search"

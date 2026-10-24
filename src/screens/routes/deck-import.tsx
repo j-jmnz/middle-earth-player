@@ -19,6 +19,7 @@ import {
 import { useDatabases } from "../databases";
 import { palette } from "../palette.js";
 import { decks } from "../user-schema";
+import { goBack } from "../go-back";
 
 const FETCH_FAILURE = "RingsDB did not respond.";
 
@@ -139,7 +140,7 @@ export default function DeckImportScreen() {
         setSavedNote(importSavedSentence(names));
         return;
       }
-      router.back();
+      goBack(router, "/decks");
     } finally {
       setBusy(false);
     }
@@ -147,7 +148,7 @@ export default function DeckImportScreen() {
 
   return (
     <Screen scene="plain">
-      <NavBar backLabel="Decks" backTestID="deck-import-back" onBack={() => router.back()} />
+      <NavBar backLabel="Decks" backTestID="deck-import-back" onBack={() => goBack(router, "/decks")} />
       <View className="mt-6">
         <TextInput
           testID="deck-import-input"

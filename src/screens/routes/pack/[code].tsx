@@ -13,6 +13,7 @@ import { RowCardImage } from "../../images/picture";
 import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
+import { goBack } from "../../go-back";
 
 type PackCard = {
   code: string;
@@ -83,7 +84,7 @@ export default function PackCards() {
 
   return (
     <Screen>
-      <NavBar backTestID="pack-back" backLabel="Packs" onBack={() => router.back()} />
+      <NavBar backTestID="pack-back" backLabel="Packs" onBack={() => goBack(router, "/packs")} />
       <View className="pt-2">
         <ScreenTitle>{pack?.name ?? "Pack"}</ScreenTitle>
       </View>

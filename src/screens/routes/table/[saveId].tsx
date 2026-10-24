@@ -17,6 +17,7 @@ import { TableCanvas } from "../../../play/table-canvas";
 import type { PictureSource } from "../../../play/table-canvas-types";
 import { ChromeButton, ChromePrimary, PhaseRail, SheetTab, SheetView, ThreatRing } from "../../../play/table-chrome";
 import { BodyText, NavBar, Screen } from "../../chrome";
+import { bookletParams } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
@@ -116,6 +117,13 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
       <View className="flex-row items-center justify-between px-4">
         <ChromeButton label="‹ Path" testID="table-back" accessibilityLabel="Back to the path" onPress={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} />
         <Text testID="table-round" className="text-label text-muted">{`Round ${game.round}`}</Text>
+        <ChromeButton
+          label="Booklet"
+          testID="booklet-open"
+          tone="gold"
+          accessibilityLabel="Open the booklet"
+          onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(session.save.campaignId, session.save.loadout?.scenarioId) })}
+        />
       </View>
       <View className="min-h-0 flex-1" onLayout={onLayout}>
         {size ? (
