@@ -37,6 +37,56 @@
       },
       "reason": "Losing the Ring ends the game. Hall of Beorn prints this as card text, not as a keyword.",
       "source": "MEC109 rulebook, The One Ring"
+    },
+    {
+      "match": {
+        "code": "142084"
+      },
+      "set": {
+        "burdenSet": "The Ring Goes South"
+      },
+      "reason": "Hall of Beorn lists Lust for the Ring under Breaking of the Fellowship. The scan prints the wolf icon of The Ring Goes South, and the campaign cards (142020, 142039) deal it with that scenario.",
+      "source": "scan 142084.A, data/printed/fellowship-of-the-ring.json"
+    },
+    {
+      "match": {
+        "code": "142085"
+      },
+      "set": {
+        "burdenSet": "Journey in the Dark"
+      },
+      "reason": "Hall of Beorn lists Shadow of Fear under Breaking of the Fellowship. The scan prints the Moria icon of Journey in the Dark, and the campaign cards (142020, 142039) deal it with that scenario.",
+      "source": "scan 142085.A, data/printed/fellowship-of-the-ring.json"
+    },
+    {
+      "match": {
+        "code": "142086"
+      },
+      "set": {
+        "burdenSet": "Journey in the Dark"
+      },
+      "reason": "Hall of Beorn lists Pursued by the Enemy under Breaking of the Fellowship. The scan prints the Moria icon of Journey in the Dark, and the campaign cards (142020, 142039) deal it with that scenario.",
+      "source": "scan 142086.A, data/printed/fellowship-of-the-ring.json"
+    },
+    {
+      "match": {
+        "code": "142087"
+      },
+      "set": {
+        "burdenSet": "Journey in the Dark"
+      },
+      "reason": "Hall of Beorn lists Overcome by Grief under Breaking of the Fellowship. The scan prints the Moria icon of Journey in the Dark, and the campaign cards (142020, 142039) deal it with that scenario.",
+      "source": "scan 142087.A, data/printed/fellowship-of-the-ring.json"
+    },
+    {
+      "match": {
+        "code": "142088"
+      },
+      "set": {
+        "burdenSet": "Journey in the Dark"
+      },
+      "reason": "Hall of Beorn lists Grievous Wound under Breaking of the Fellowship. The scan prints the Moria icon of Journey in the Dark, and the campaign cards (142020, 142039) deal it with that scenario.",
+      "source": "scan 142088.A, data/printed/fellowship-of-the-ring.json"
     }
   ],
   "scenarioPiles": [

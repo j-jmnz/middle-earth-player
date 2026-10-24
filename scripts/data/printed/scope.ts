@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { loadCards } from "../load-cards.ts";
@@ -18,6 +18,13 @@ export const MEC109_CHANGED = ["141078", "141080", "141081", "141082", "141083",
 // to scenarios 2 to 6; phase 8d ledgers the rest of those scenarios.
 export const KNOWN_ERRORS = ["141025", "141026", "141029", "142062"];
 
+// Hall of Beorn's own image path for these has a typo ("Striken-Dumb.jpg", "The-Argonauth.jpg") that 403s. The corrected
+// spelling exists.
+const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
+  "142075": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Argonath.jpg"],
+  "141064": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stricken-Dumb.jpg"],
+};
+
 const CAMPAIGN_CARDS = ["141030", "141044", "141056", "142019", "142039", "142060"];
 
 // src/screens/starter-decks.ts imports the Drizzle schema, which Node cannot load without a bundler. The two
@@ -27,8 +34,26 @@ export function starterCodes(): string[] {
   return [...new Set([...source.matchAll(/code: "(\w+)" \}/g)].map((match) => match[1] ?? ""))].sort();
 }
 
+// Every card Hall of Beorn lists for one of the six scenarios (Normal or Easy), the quest cards, and the box's
+// 28 boons and burdens. Phase 8d ledgers all of them.
+function boxCodes(): string[] {
+  const cards = loadCards();
+  const bySlug = new Map(cards.flatMap((card) => card.printings.flatMap((printing) => (printing.hobSlug ? [[printing.hobSlug, card.code] as const] : []))));
+  const codes = new Set<string>();
+  const dir = path.join(RAW_DIR, "hallofbeorn", "Scenarios");
+  for (const name of readdirSync(dir).sort()) {
+    const scenario = JSON.parse(readFileSync(path.join(dir, name), "utf8")) as { QuestCards: { Slug: string }[]; ScenarioCards: { Slug: string; EncounterSet: string | null }[] };
+    for (const entry of [...scenario.QuestCards, ...scenario.ScenarioCards.filter((card) => !/Nightmare$/.test(card.EncounterSet ?? ""))]) {
+      const code = bySlug.get(entry.Slug);
+      if (code) codes.add(code);
+    }
+  }
+  for (const card of cards) if (card.campaignKind && card.printings.some((printing) => printing.pack === "TFotR")) codes.add(card.code);
+  return [...codes];
+}
+
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...CAMPAIGN_CARDS, ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaign(), loadScenarios()), ...starterCodes()])].sort();
+  return [...new Set<string>([...CAMPAIGN_CARDS, ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaign(), loadScenarios()), ...boxCodes(), ...starterCodes()])].sort();
 }
 
 type HobImages = { CardSet: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };
@@ -87,7 +112,7 @@ export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget
     if (!front) throw new Error(`No Hall of Beorn scan for ${code}`);
     const guid = card.printings.map((printing) => printing.octgnGuid).find((value) => value !== undefined);
     const fromDragn = guid ? dragn.get(guid) : undefined;
-    out.push({ code, side: "A", printing: first.printing, urls: [front, ...sources.slice(1).flatMap((source) => source.urls.slice(0, 1)), ...(fromDragn ? [fromDragn] : [])] });
+    out.push({ code, side: "A", printing: first.printing, urls: [...(SCAN_URL_FIXES[code] ?? []), front, ...sources.slice(1).flatMap((source) => source.urls.slice(0, 1)), ...(fromDragn ? [fromDragn] : [])] });
     if (back) out.push({ code, side: "B", printing: first.printing, urls: [back] });
   }
   return out;

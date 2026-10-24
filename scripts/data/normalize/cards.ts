@@ -36,7 +36,7 @@ const overridesSchema = z.object({
   cards: z.array(
     z.object({
       match: z.object({ code: z.string().optional(), name: z.string().optional(), set: z.string().optional(), number: z.number().optional() }),
-      set: z.object({ code: z.string().optional(), pack: z.string().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
+      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
       reason: z.string().min(1),
       source: z.string().min(1),
     }),
@@ -402,7 +402,8 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   const cards: Card[] = [];
   for (const card of byCode.values()) {
     const set = overrideFor(overrides, report, { code: card.code, name: card.name });
-    const next = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
+    const withKeywords = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
+    const next = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
     cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));

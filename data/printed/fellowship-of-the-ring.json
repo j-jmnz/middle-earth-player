@@ -635,6 +635,78 @@
    "confirmedBy": null
   },
   {
+   "code": "141018",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Tireless-Ranger.jpg",
+    "sha256": "4a7ea8b9d000d932992655018d3dcc7e3438c4bb7746e7f22ae77c7b7b68c084"
+   },
+   "lines": [
+    "Permanent.",
+    "Setup: Attach to a hero.",
+    "Attached hero gets +1 Defense and gains the Ranger trait."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141019",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Skilled-Healer.jpg",
+    "sha256": "9f8163ecca2c5fa4998175aab44fec6736b7b334783cbbc246628c29f330c6f3"
+   },
+   "lines": [
+    "Permanent.",
+    "Setup: Attach to a hero.",
+    "Attached hero gets +2 hit points and gains the Healer trait."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141020",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Valiant-Warrior.jpg",
+    "sha256": "27e0d17b6c241bcd4a41be245ee7c14d17195dd12ae36cc8d6388aefafbc5e26"
+   },
+   "lines": [
+    "Permanent.",
+    "Setup: Attach to a hero.",
+    "Attached hero gets +1 Attack and gains the Warrior trait."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141021",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Noble-Hero.jpg",
+    "sha256": "0af989cef05c679ba28ac6d642e3c975d0e31cf3d163c4c2748c02ea5debc159"
+   },
+   "lines": [
+    "Permanent.",
+    "Setup: Attach to a hero.",
+    "Attached hero gets +1 Willpower and gains the Noble trait."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
    "code": "141022",
    "side": "A",
    "printing": "TBR",
@@ -798,6 +870,71 @@
     "When Revealed: Add Midgewater to the staging area. Each player places 1 progress on the current quest.",
     "Forced: At the end of the round, either remove X progress from the current quest or shuffle 1 out of play Ringwraith into the encounter deck. X is the number of players in the game.",
     "The players cannot advance while Midgewater is in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141027",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ringwraiths-Attack-3A.jpg",
+    "sha256": "fd0bd2c2f463294f3979f2aadda03a60cbe5e3ff2ee07b08c08a746f8bfdfc6b"
+   },
+   "lines": [
+    "When Revealed: Add Weathertop and The Witch-king to the staging area. Search the encounter deck and discard pile and add each Nazgûl enemy found to the staging area. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141027",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ringwraiths-Attack-3B.jpg",
+    "sha256": "15a18c16ab29c75ac7cee45eeb4b93169056a20b50b7dd27a0be0d5fb503bed9"
+   },
+   "lines": [
+    "If there are no Nazgûl enemies in play, the players win the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141028",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pursued-by-the-Enemy-1A.jpg",
+    "sha256": "0a03aba7deb77dc16d7ac75cac421f215af37f8e0599d8906626d192fb2376b4"
+   },
+   "lines": [
+    "Setup: Shuffle each burden card from the Flight to the Ford burden set into a Burden deck. Attach An Evil Wound to the Ring-bearer. Set Ford of Bruinen and The Witch-king aside, out of play. Add The Last Bridge and 1 Fell Rider per player to the staging area. Set the Ring-bearer's life at 15. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141028",
+   "side": "B",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pursued-by-the-Enemy-1B.jpg",
+    "sha256": "395d5b779e2c4c693700dfc8a66ca5623e38e3751fa84287fc1ba8c94cf0ba17"
+   },
+   "lines": [
+    "The players cannot advance unless The Last Bridge is in the victory display.",
+    "Forced: At the end of the round, reduce the Ring-bearer's life by 1."
    ],
    "inert": [],
    "misprints": [],
@@ -1135,6 +1272,195 @@
    "confirmedBy": null
   },
   {
+   "code": "141045",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Prancing-Pony.jpg",
+    "sha256": "89d4041d6ed0d5d32063f24dab05409afdbf392917ca902aab36478ff0c8450a"
+   },
+   "lines": [
+    "Response: After the players travel here, the first player puts 1 ally into play from his hand.",
+    "Forced: After The Prancing Pony leaves play, discard cards from the top of the encounter deck until X enemies have been discarded. X is the number of players in the game. Put each enemy discarded by this effect into play engaged with the first player."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141046",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Weathertop.jpg",
+    "sha256": "8a5f06ed1e326501d73c2a5064ab71c9d998a3a74a175d5b5f4e1cd769e525b4"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "While Weathertop is in the victory display, each enemy in play gets -1 Threat.",
+    "Travel: The first player must exhaust The One Ring to travel here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141047",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Chetwood.jpg",
+    "sha256": "493971d02130cb4bef695b482ed7d564340614ca6814ceebcd9ff6827ed471a5"
+   },
+   "lines": [
+    "While Chetwood is in the staging area, Spy enemies get +1 Threat and +1 Attack.",
+    "Shadow: Defending player discards 1 random card from his hand."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141048",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Midgewater.jpg",
+    "sha256": "afaa37cca98aba202ae2610720a10f24623cf2c657c5b6c7970324e06c8ce57d"
+   },
+   "lines": [
+    "While Midgewater is the active location, enemies cannot attack, take damage, or be engaged.",
+    "Forced: After Midgewater becomes the active location, return each engaged enemy in play to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141049",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Weather-Hills.jpg",
+    "sha256": "df4a60a43ad378b67947a09161946fa03134ff49fda9e51611ca8cd85faff4bd"
+   },
+   "lines": [
+    "Response: After the players travel here, place 1 non-unique enemy in play facedown under this location. While an enemy is under this location, it is out of play.",
+    "Forced: After this location leaves play, return each enemy under it to the staging area face-up."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141050",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Rider-of-Mordor.jpg",
+    "sha256": "09b3bfcd685690bf63a4e22a20ac4fc0df6cdc3aa85a6323ade052778fea081a"
+   },
+   "lines": [
+    "Cannot have non-Morgul attachments.",
+    "While Rider of Mordor is engaged with a player, characters that player controls get -1 Willpower.",
+    "While The One Ring is exhausted, Rider of Mordor gets -10 engagement cost."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141051",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bill-Ferny.jpg",
+    "sha256": "ea292cea4aa8ca8a481cc08663bb41b17edf148de58b59d7adb5e426ef746289"
+   },
+   "lines": [
+    "Players cannot optionally engage Bill Ferny.",
+    "Forced: At the beginning of the staging step, either shuffle 1 out of play Ringwraith into the encounter deck or each player raises his threat by 1 for each non-Fellowship hero he committed to the quest."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141052",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/0e1451ba-5fa6-4a13-869b-d23d9ecef15e.jpg",
+    "sha256": "4e81aa72ebc8c300ee105a3f5f8cdf2d1826a5e5c8bb5fbc3e926e53462ca541"
+   },
+   "lines": [
+    "While The One Ring is exhausted, Shady Bree-lander gains: \"Cannot be optionally engaged.\"",
+    "Shadow: Defending character gets -1 Defense (-2 Defense instead if The One Ring is exhausted)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141053",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/795579db-249d-4c9d-850f-6f39bc96c063.jpg",
+    "sha256": "f7e7c523e4a94cd2347f55a5dfdeb0d9e9a9b6db09ea8590024b9e9c759aba86"
+   },
+   "lines": [
+    "When Revealed: You must either shuffle an out of play Ringwraith into the encounter deck or reveal an additional encounter card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141054",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Unwanted-Attention.jpg",
+    "sha256": "0d1a694bbbae2729fd87485488e3e32451d192582f672b2742c66650ea65b58d"
+   },
+   "lines": [
+    "Peril.",
+    "When Revealed: You must either remove 2 heroes you control from the quest or shuffle an out of play Ringwraith into the encounter deck.",
+    "Shadow: Return attacking enemy to the staging area after this attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141055",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Black-Breath.jpg",
+    "sha256": "7f071432f268967755243de0cb1074b06de14012be1443565d581e1276587804"
+   },
+   "lines": [
+    "Peril.",
+    "When Revealed: Attach to a hero you control. (Counts as a Condition attachment with the text: \"Limit 1 per hero. Reduce attached hero's Willpower, Attack, and Defense to 0.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
    "code": "141056",
    "side": "A",
    "printing": "TBR",
@@ -1166,6 +1492,264 @@
    },
    "lines": [
     "Resolution: Add each burden card in play, in the encounter deck, and in the discard pile to the Campaign Pool. The added cards have been earned by the players."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141057",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/An-Evil-Wound.jpg",
+    "sha256": "00b9651c3c788b1e3ec4c7c008367556ba8ab43681bf2fa9e548b039a273c111"
+   },
+   "lines": [
+    "Attach to the Ring-bearer. Attached hero cannot be healed.",
+    "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead.",
+    "If the Ring-bearer's life reaches zero, the players lose the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141058",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Last-Bridge.jpg",
+    "sha256": "d21e18208f455d028165ae8c8d441d373b4f4e6bc25cf1bbf3d627391c752c4a"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "X is the number of players in the game.",
+    "Travel: The first player must reveal the top card of the burden deck and resolve that card as if it were just revealed from the encounter deck to travel here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141059",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/3cd4bb66-1621-4534-aa25-421d0d8b7189.jpg",
+    "sha256": "025f192cecbb97218e8cc01e1f96c5b694c0d03d4deb3b7fb05ae9417fa6925e"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "Response: After Ford of Bruinen leaves play as an explored location, all engaged enemies are discarded.",
+    "Travel: The first player must reveal the top card of the encounter deck to travel here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141060",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Troll's-Camp.jpg",
+    "sha256": "94003421275b310ad1ea2e888d31be5497e3e89a2753f3ea6bd02df093fa0ceb"
+   },
+   "lines": [
+    "While The Troll's Camp is the active location, each hero gets +1 Willpower, +1 Attack and +1 Defense."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141061",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ettenmoors.jpg",
+    "sha256": "5d2df5ed9e94942c20c2a60567331454d8a87ef9c0564aa330e53613503c21b0"
+   },
+   "lines": [
+    "While Ettenmoors is the active location, do not deal Nazgûl enemies a shadow card during the combat phase.",
+    "Forced: After any amount of progress is placed on Ettenmoors, reduce the Ring-bearer's life by 1."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141062",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Old-Road.jpg",
+    "sha256": "27be0717f89847ecae1a5a477ccc0e1e4e6c982584f3b1a2a4ccf54839fecf3d"
+   },
+   "lines": [
+    "Action: Place the top card of the burden deck on top of the encounter deck to place 4 progress on The Old Road. (Use this action only if you are playing campaign mode.)"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141063",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Fell-Rider.jpg",
+    "sha256": "578d6c96838361448fe9c241b1e5533a52a4897bccbf8ef4c19768ce220da836"
+   },
+   "lines": [
+    "Cannot have non-Morgul attachments.",
+    "While Fell Rider is in the staging area, it gains: \"Forced: At the beginning of the encounter phase, the first player must either reduce the Ring-bearer's life by 1 or engage Fell Rider.\""
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141064",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stricken-Dumb.jpg",
+    "sha256": "e9bfc32d4358330ca561b1166976b923173fe2aa7f1277858382087f83e06307"
+   },
+   "lines": [
+    "Peril.",
+    "When Revealed: You must either shuffle the top card of the burden deck into the encounter deck and reveal an additional encounter card, or raise each player's threat by 3 and immediately end the quest phase (do not resolve the quest)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141065",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Enemy-is-Upon-Us.jpg",
+    "sha256": "eec4842da32fed26b956032083d2ee5b1fa2f5069cd8f4d64f8cb78fcc653b0b"
+   },
+   "lines": [
+    "When Revealed: Each engaged enemy makes an immediate attack. If no attack is made this way, The Enemy is Upon Us! gains surge.",
+    "Shadow: If this attack destroys a character, remove all progress from the current quest."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141066",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pain-Assailed-Him.jpg",
+    "sha256": "85ff4d91ef95fe038eef885a072b2712a9c7230f2f90dc44d70c569be14f8f4b"
+   },
+   "lines": [
+    "When Revealed: Reduce the Ring-bearer's life by 1. Then, reduce the Ring-bearer's Willpower, Attack, and Defense to 0 until the end of the round.",
+    "Shadow: If this attack destroys a character, reduce the Ring-bearer's life by 1."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141067",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Nine-are-Abroad.jpg",
+    "sha256": "d2a41c5fad39fe18df22edacab8c3c27ad8966b662d6a016772b670b2bb32e78"
+   },
+   "lines": [
+    "When Revealed: Treat the text box of each character in play as blank (except for Traits) until the end of the round. If there is a Nazgûl enemy in the staging area, The Nine are Abroad gains surge.",
+    "Shadow: Return attacking enemy to the staging area after this attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141068",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Witch-king.jpg",
+    "sha256": "8a31c4c8e866133afb1af87ca9d2a3751faedb5985b31781fa867a4ecb66374a"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "The Witch-king gets -30 engagement cost while The One Ring is exhausted.",
+    "Characters with 1 Willpower or less cannot defend attacks made by The Witch-king."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141069",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ringwraith.jpg",
+    "sha256": "c90559759d78bcecceea3394cd291f90169bd3107b774f0e641913763baba0c6"
+   },
+   "lines": [
+    "Cannot have non-Morgul attachments.",
+    "Forced: When Ringwraith attacks, deal it an additional shadow card if The One Ring is exhausted.",
+    "Shadow: Shuffle this card into the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141070",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pale-Blade.jpg",
+    "sha256": "61147589b685699d1c8982216b44fb06312657278ceb6498f8509b442d8c5af1"
+   },
+   "lines": [
+    "Surge.",
+    "When Revealed: Attach to a Nazgûl enemy in play, if able. (Counts as a Weapon attachment with the text: \"Limit 1 per enemy. Attached enemy gets +1 Attack and cannot take non-combat damage.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "141071",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/4765cbea-5ae8-4e39-a811-a67f1f6ca2a0.jpg",
+    "sha256": "c166a372f64761b7878a6d2b32aba777f243ba23ca63dc3b99299c77e2337328"
+   },
+   "lines": [
+    "When Revealed: Each ally gets -1 Willpower until the end of the round. Deal 2 damage to each ally with 0 Willpower.",
+    "Shadow: Discard a non-objective attachment you control."
    ],
    "inert": [],
    "misprints": [],
@@ -1590,6 +2174,77 @@
    "confirmedBy": null
   },
   {
+   "code": "142011",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Sting.jpg",
+    "sha256": "a947ea824d1ff37f1d41632e645a278886883b5d0d31615e3a1265c39c4f0041"
+   },
+   "lines": [
+    "Attach to a Hobbit hero. Restricted.",
+    "Attached hero gets +1 Willpower, +1 Attack, and +1 Defense.",
+    "Response: After attached hero exhausts to defend an attack, discard the top card of the encounter deck. Deal damage to the attacking enemy equal to the discarded card's Threat."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142012",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Mithril-Shirt.jpg",
+    "sha256": "8a305478fb4815efd1cc19c846536aad7942028f1e8e62616b1d1bb9e240f6b5"
+   },
+   "lines": [
+    "Attach to the Ring-bearer.",
+    "Attached hero gets +1 Defense and +1 hit point."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142013",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Glamdring.jpg",
+    "sha256": "963e8f5f09d9cba8b99bbca3647e2ccd678815144500363ce9766c4b2449b9ca"
+   },
+   "lines": [
+    "Attach to a Warrior hero or Gandalf. Restricted.",
+    "Attached character gets +2 Attack.",
+    "Response: After attached character destroys an Orc enemy, draw 1 card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142014",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Andúril.jpg",
+    "sha256": "477939df5b6e26bc7ffbbfed684004e1c1e110d229964cfd2218d0dcf44b19cf"
+   },
+   "lines": [
+    "Attach to a Noble hero or Aragorn. Restricted.",
+    "Attached hero gets +1 Willpower, +1 Attack, and +1 Defense.",
+    "Response: After an attack in which the attached hero defended resolves, exhaust Andúril to target the enemy that just attacked. Declare attached hero as an attacker against that enemy (and resolve the attack)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
    "code": "142015",
    "side": "A",
    "printing": "TRD",
@@ -1610,6 +2265,57 @@
     "Hall of Beorn's MEC109 transcription drops the 'Action:' label and merges the two lines; that is a transcription error.",
     "Decision: the scan reading."
    ]
+  },
+  {
+   "code": "142016",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Three-Golden-Hairs.jpg",
+    "sha256": "b788bf1ab770e6bcefe010ef6067d1bed4f83ffa9de37a8eb00549e4cefa6628"
+   },
+   "lines": [
+    "Setup: Attach to a hero in play.",
+    "Action: Add Three Golden Hairs to the victory display and remove it from the campaign pool, to lower each player's threat by 3. Then, each player draws 3 cards."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142017",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Lórien-Rope.jpg",
+    "sha256": "ba45ad42ab75da8635419b27c6b8220bfeb3dc6def895c8e6544e80ef9a40577"
+   },
+   "lines": [
+    "Setup: Attach to a hero in play.",
+    "Action: Add Lórien Rope to the victory display, and remove it from the campaign pool to give each location in the staging area -2 Threat until the end of the phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142018",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Leaf-wrapped-Lembas.jpg",
+    "sha256": "b6909336f05967dfc56d3f469a0c574b31fd79f2d092dd54b7c69f441ffdea24"
+   },
+   "lines": [
+    "Setup: Attach to a hero in play.",
+    "Action: Add Leaf-wrapped Lembas to the victory display and remove it from the campaign pool, to ready all heroes in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
   },
   {
    "code": "142019",
@@ -1650,6 +2356,397 @@
    "confirmedBy": null
   },
   {
+   "code": "142020",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Council-of-Elrond-1A.jpg",
+    "sha256": "5a1f98b3ed70b034bb1fe0572218ba57f86e9e505ee1ca663cfc7e86357c7f1d"
+   },
+   "lines": [
+    "Setup: Set Lust for the Ring, Redhorn Pass, Doors of Durin and Watcher in the Water aside, out of play. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142020",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Council-of-Elrond-1B.jpg",
+    "sha256": "ec0bd973b908cc67d24ef9a02f411f5db5781b06f90c7ccd327951034ac63398"
+   },
+   "lines": [
+    "Forced: At the end of the planning phase, each player places the top card of his deck faceup in front of him, in player order, until there are a total of 4 faceup cards between the players. The first player chooses 1 faceup card to be played for 0 cost, 1 to add to its owner's hand, 1 to discard, and 1 to shuffle into its owner's deck. Then, either shuffle Lust for the Ring into the encounter deck, or raise each player's threat by 5. Advance to stage 2."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142021",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Nine-Walkers-2A.jpg",
+    "sha256": "626571918ac37ac97fdd67b81c38c93f24433a78608e24ee40fd488107218495"
+   },
+   "lines": [
+    "When Revealed: Make Redhorn Pass the active location. The first player reveals cards from the encounter deck until there is at least X Threat in the staging area. X is twice the number of players in the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142021",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Nine-Walkers-2B.jpg",
+    "sha256": "c3ff4d7d42ed45bf9996ffaf6c90cffd7ef506b3e399977eeed033e5e8c4884a"
+   },
+   "lines": [
+    "During the travel phase, the players must travel to a location, if able.",
+    "Forced: After an enemy engages a player, place 1 damage on the active location, if able."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142022",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Hunt-is-Up-3A.jpg",
+    "sha256": "79ae538c225fa4d7310ea1046e69ea61681b8ffeffaf69b34b8869193a0367d2"
+   },
+   "lines": [
+    "When Revealed: Each player searches the encounter deck and discard pile for an enemy and adds it to the staging area. One of those enemies must be Great Warg Chief, if able. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142022",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Hunt-is-Up-3B.jpg",
+    "sha256": "86740cbc871390cbfd7de5c17342c496edcb289b309e9373d596c48014cf2edd"
+   },
+   "lines": [
+    "During the travel phase, the players must travel to a location, if able.",
+    "Forced: After a location enters play, place 1 damage on it.",
+    "Forced: After an enemy engages a player, place 1 damage on the active location, if able."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142023",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Gates-of-Moria-4A.jpg",
+    "sha256": "94c019b88007ec52d2919f4b174c6e2e9018353dced27dc43d0ab0df1f59f8a9"
+   },
+   "lines": [
+    "When Revealed: Make Doors of Durin the active location. Add Watcher in the Water to the staging area. Discard all tokens from the Ring-bearer and place it (and each card attached to it) facedown under Watcher in the Water."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142023",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Gates-of-Moria-4B.jpg",
+    "sha256": "48694b2f137e7d94d384bfd4754134833f0d72ca73622ff39c9f4a9900f91c8c"
+   },
+   "lines": [
+    "There can be 2 active locations. During the travel phase, the players must travel to a location, if able.",
+    "Forced: After an enemy engages a player, place 1 damage on each active location.",
+    "If Doors of Durin is explored, the players win the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142024",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Watcher-in-the-Water.jpg",
+    "sha256": "618025e8a87d76cafee25da5cad04781b36571f12607f01ba57f1169aedb61f6"
+   },
+   "lines": [
+    "Indestructible. Immune to player card effects.",
+    "Cannot leave the staging area but is considered to be engaged with each player.",
+    "Forced: After placing the 6th damage here, the first player takes control of the Ring-bearer, exhausted with 1 damage on it."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142025",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Great-Warg-Chief.jpg",
+    "sha256": "c482779e723873ce5e6a597d66ba89913dd648aa944d0cb4e560128ff6551787"
+   },
+   "lines": [
+    "Cannot have attachments.",
+    "Forced: After Great Warg Chief engages you, discard cards from the encounter deck until a Warg enemy is discarded. Put that enemy into play engaged with you."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142026",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Hound-of-Sauron.jpg",
+    "sha256": "b310e845a18a5656534f1c3828287d66d7d91fb994913292519c2ddeae6057e8"
+   },
+   "lines": [
+    "Surge.",
+    "Hound of Sauron gets -5 engagement cost for each enemy in the staging area.",
+    "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it was engaged this round)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142027",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Howling-Warg.jpg",
+    "sha256": "cf29a4d3564818cda682899f5c45607a6da5afb7b5ac85aa790a00ced4ebca3d"
+   },
+   "lines": [
+    "Forced: When Howling Warg attacks, place 1 damage on an active location.",
+    "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 damage on an active location."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142028",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Crebain-from-Dunland.jpg",
+    "sha256": "11c32b7359ab5e95d8b62f50d901dc10c61a5e785abb42b526abccafff9af6ed"
+   },
+   "lines": [
+    "Peril.",
+    "When Revealed: Either exhaust a hero you control, or engage Crebain from Dunland.",
+    "Forced: After Crebain from Dunland engages a player, reveal the top card of the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142029",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Redhorn-Pass.jpg",
+    "sha256": "3ae2925e6f268df39e2a66a996894e191fe7cf1e8e265d2b6ded1c7d5d398941"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "Forced: When Redhorn Pass is explored, each player assigns X damage among characters he controls. X is the number of damage here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142030",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Doors-of-Durin.jpg",
+    "sha256": "9cd093b7f7a075a62c874244cedede92518c2c0fd8bd2ac09d80617be59bedbe"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "Progress must be placed on each other active location before it can be placed here. Progress cannot be placed here unless the first player controls the Ring-bearer.",
+    "If there are 9 damage tokens here, the players lose the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142031",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Tree-crowned-Hill.jpg",
+    "sha256": "eb2aac7d1686e424483a602042a3c0791c5c2d9726ad8e61a3f99aff6b638c14"
+   },
+   "lines": [
+    "While Tree-crowned Hill is the active location, each enemy gets -1 Threat.",
+    "Forced: When Tree-crowned Hill is explored, the players, as a group, exhaust X characters in play. X is the number of damage here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142032",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Hills-of-Hollin.jpg",
+    "sha256": "b4b546e7997004df5857fe29bca8db0d435a7b80cf46bc2e249f48eaef3eb59b"
+   },
+   "lines": [
+    "While Hills of Hollin is the active location, each enemy in the staging area gets +5 engagement cost.",
+    "Forced: When Hills of Hollin is explored, each player raises his threat by 1 for each damage here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142033",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Redhorn-Foothills.jpg",
+    "sha256": "beea4f89e7bbaad213c8dec9c169437653fef283c83793516c1fb255b3637b08"
+   },
+   "lines": [
+    "While Redhorn Foothills is the active location, it gains: \"Forced: After an enemy is added to the staging area, it gets -5 engagement cost until the end of the round.\"",
+    "Forced: When Redhorn Foothills is explored, each player must discard X cards from his hand at random. X is the number of damage here."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142034",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Eregion.jpg",
+    "sha256": "f45e12acd828bb11a575fee904cea42a5fe0efa89c2b741feb8d78ae7867dac8"
+   },
+   "lines": [
+    "Forced: When Eregion is explored, the players, as a group, must discard X allies from play. X is the number of damage here.",
+    "Shadow: Defending player discards a non-objective attachment he controls."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142035",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Regiments-of-Crows.jpg",
+    "sha256": "355d773d4afb9cc6a063732f2232f1c497cf6abf58cf4a324ed2853c2b996d62"
+   },
+   "lines": [
+    "When Revealed: Place 3 damage on each active location.",
+    "Shadow: Undefended damage from this attack must be assigned to the active location."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142036",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Snowdrifts.jpg",
+    "sha256": "aa4abfaec2357c01a4bf7be7665306258b5526b6cec68496248dba8f503405bf"
+   },
+   "lines": [
+    "When Revealed: Attach to the active location. (Counts as a Condition attachment with the text, \"Limit 1 per location. No more than 3 progress can be placed on attached location each round.\") If Snowdrifts is not attached to the active location, it gains surge."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142037",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bitter-Cold.jpg",
+    "sha256": "bcea50bfced4ab06d63f04aad3327f2632273d0391c8cf7bc05d45c6df0cdb7f"
+   },
+   "lines": [
+    "When Revealed: Each player must choose: either discard each ally he controls, or raise his threat by 1 for each ally he controls.",
+    "Shadow: Attacking enemy makes an additional attack after this one."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142038",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Storm-of-Howls.jpg",
+    "sha256": "2d4a0e580c7de9ee688ac7d9ec4b2e39e45d16686041642a81d14ee348318069"
+   },
+   "lines": [
+    "Peril.",
+    "When Revealed: Either the Warg enemy in the staging area with the highest engagement cost attacks you, or each Warg enemy gets -20 engagement cost until the end of the round. If no Warg enemy is in the staging area, Storm of Howls gains surge."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
    "code": "142039",
    "side": "A",
    "printing": "TRD",
@@ -1681,6 +2778,402 @@
    },
    "lines": [
     "Resolution: The first player must choose one of the burden treachery cards (Pursued by the Enemy or Shadow of Fear), and one of the burden objective cards (Grievous Wound or Overcome by Grief) to add to the Campaign Pool. If The Balrog is still in play, the first player must choose all 4 burden cards instead. The chosen burdens have been earned by the players."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142040",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Long-Dark-of-Moria-1A.jpg",
+    "sha256": "23153c681f4ec508a616e690c1ce656686416d9664fb9fd50eefd572d49c8839"
+   },
+   "lines": [
+    "Setup: Set The Balrog, The Great Bridge, and Chamber of Mazarbul aside out of play. Add Doom, Doom, Doom to the staging area and place 10 damage tokens on it. Each player adds 1 different location to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142040",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Long-Dark-of-Moria-1B.jpg",
+    "sha256": "085b7b7515b54c189fd9a61f70f64dd25c658599dc91c074c367e311f80c2569"
+   },
+   "lines": [
+    "Forced: After a player optionally engages an enemy, remove 1 damage token from Doom, Doom, Doom."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142041",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Drums-in-the-Deep-2A.jpg",
+    "sha256": "ad486a1aa62dc0d23cec9df9098f790eebc47328672dd5af8daf05514df83250"
+   },
+   "lines": [
+    "When Revealed: Add Chamber of Mazarbul to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142041",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Drums-in-the-Deep-2B.jpg",
+    "sha256": "79b164e43b8545761dda3c93efd5a2edc30cf6453c09a02d7d50f90f155afc36"
+   },
+   "lines": [
+    "If there are no enemies in the staging area at the beginning of the quest phase, the first player reveals an additional encounter card during the staging step.",
+    "The players cannot advance unless there are X resource tokens on this stage. X is the number of players times 3.",
+    "Forced: After an enemy is defeated, place 1 resource token on this stage."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142042",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Bridge-of-Khazad-dûm-3A.jpg",
+    "sha256": "d06b4325abefa0e4d4cd9f7e3b5e241d1694ce63e2db29acdcfc856f4c3a524c"
+   },
+   "lines": [
+    "When Revealed: Add The Great Bridge to the staging area. Each player reveals 1 encounter card and removes 1 damage token from Doom, Doom, Doom."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142042",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Bridge-of-Khazad-dûm-3B.jpg",
+    "sha256": "118f29cb764102da8588af77f86630d3b4f2ef04f3174339932ec5801accaa65"
+   },
+   "lines": [
+    "No more than 5 progress can be placed on this stage each round.",
+    "The players cannot defeat this stage while The Great Bridge is in play.",
+    "If the players defeat this stage, they win the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142043",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Doom-Doom-Doom.jpg",
+    "sha256": "d0c6b3819ece960ce3b5f71d6b3a6901cb4f42608b51f1963fac26d4382cd768"
+   },
+   "lines": [
+    "Forced: At the end of the quest phase, remove 1 damage token from Doom, Doom, Doom. Then, if there are no damage tokens here, add The Balrog to the staging area.",
+    "Forced: At the end of the quest phase, The Balrog makes an attack if it is in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142044",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Balrog.jpg",
+    "sha256": "63b7fb0adc4c9fd4c5859c933543dbeae8d0507ab94ca2cdf728e94578e5d762"
+   },
+   "lines": [
+    "Indestructible. Cannot be optionally engaged. The Balrog and shadow cards dealt to The Balrog are immune to player card effects.",
+    "While in the staging area, The Balrog is considered to be engaged with the first player and only the first player can declare attackers against The Balrog."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142045",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Orc-chieftain.jpg",
+    "sha256": "0660542fbe98b04f9c21b7bbb7bfeb0edb3b52c36c9e8e2447f05826a6be1fc7"
+   },
+   "lines": [
+    "Cannot have attachments. Allies cannot defend against Orc-chieftain.",
+    "Forced: At the beginning of the encounter phase, Orc-chieftain engages the first player."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142046",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Great-Cave-troll.jpg",
+    "sha256": "0a2d09df028ba441b6c9d62a13ada9eb550b6c224b009aff36f67d9caaad1973"
+   },
+   "lines": [
+    "Cannot have attachments.",
+    "For each point of excess combat damage dealt by Great Cave-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) remove 1 progress from the current quest."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142047",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-from-Mordor.jpg",
+    "sha256": "9ce4502cd767b94363c3f0291d4a8ec865e1c1cd8ca9c660e0be8a1ad20fc5e9"
+   },
+   "lines": [
+    "When Revealed: Uruk from Mordor makes an attack against the first player.",
+    "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, attacking enemy makes an additional attack."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142048",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Moria-Orc.jpg",
+    "sha256": "5c6ec65978f2b690a78747d603308de5fd04b2bfc0e9766edc6de12213a23828"
+   },
+   "lines": [
+    "When Revealed: Either remove 1 damage from Doom, Doom, Doom, or reveal an additional encounter card.",
+    "Shadow: The defending player raises his threat by 1 for each enemy engaged with him."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142049",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Moria-Archer.jpg",
+    "sha256": "9668dc71a4b089f009fea603d79a14dcd439a2778e35588f02f7879de583bd00"
+   },
+   "lines": [
+    "Peril. Archery 2.",
+    "X is the number of players in the game.",
+    "When Revealed: Assign X damage among characters you control."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142050",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Great-Bridge.jpg",
+    "sha256": "f8ddc29f865417fc20fd3bd61b3df4c983587d0ca105b5d1c3a2b6e976a55e88"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "Response: When The Great Bridge is explored, discard a hero from play to deal X damage to The Balrog. X is that hero's threat cost. Then, The Balrog loses all keywords for the remainder of the game. Any player may trigger this response."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142051",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Chamber-of-Mazarbul.jpg",
+    "sha256": "8aa0d765fc685c1af7411df0ccd3caf509a9ed4ba45e25877e6d28d6cb66628e"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "The players cannot advance to the next stage.",
+    "Travel: Each player searches the encounter deck and discard pile for a different enemy and adds it to the staging area to travel here. One of those enemies must be Orc-chieftain, if able."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142052",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Mines-of-Moria.jpg",
+    "sha256": "6bee52e52d2b51e5f5a175896d0b652a9a5f6de85c01375da2b991fba0552657"
+   },
+   "lines": [
+    "While Mines of Moria is in the staging area, progress must be placed on Mines of Moria before it can be placed on the current quest.",
+    "Shadow: Defending player discards a non-objective attachment he controls (2 non-objective attachments instead if his threat is 35 or higher)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142053",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Many-pillared-Hall.jpg",
+    "sha256": "23dea31862ae4898de07778737074a5185d52c18aaf7e13bc21419d0d34d75c4"
+   },
+   "lines": [
+    "Many-pillared Hall gets +1 Threat for each Many-pillared Hall in play.",
+    "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player's threat is 35 or higher)."
+   ],
+   "inert": [],
+   "misprints": [
+    {
+     "line": 1,
+     "printed": "Many-pillard Hall gets +1 Threat for each Many-pillared Hall in play."
+    }
+   ],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142054",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Darkened-Stairway.jpg",
+    "sha256": "859d00ed8b8bb84b35f8cbd35e0cb19b39b7a59bf66dd464681726fc76bb7c9a"
+   },
+   "lines": [
+    "Forced: After Darkened Stairway is explored, discard the top card of the encounter deck. If the discarded card is a location, add it to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142055",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ancient-Guardroom.jpg",
+    "sha256": "b674ce2a4c570b74f8137cf3bd4928bb271c1136a6821f78e6f18c8411bccdc8"
+   },
+   "lines": [
+    "While Ancient Guardroom is the active location, each enemy in play gets -1 Attack.",
+    "Travel: Discard the top card of the encounter deck to travel here. Each player raises his threat by X, where X is the discarded card's Threat."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142056",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/They-Are-Coming.jpg",
+    "sha256": "1f2b067f9698f9a8b8430515f4b39795466909d97d1a50589e040987c22c1246"
+   },
+   "lines": [
+    "Doomed 2.",
+    "When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top of the encounter deck until X enemies are discarded. X is the number of players in the game. Add each enemy discarded this way to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142057",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/We-Cannot-Get-Out.jpg",
+    "sha256": "b28f3a02e4568384ec98732b97b3914e86c3ffcdb811043837d9041e53eb1988"
+   },
+   "lines": [
+    "When Revealed: Each player assigns X damage among characters he controls. X is the number of exhausted characters he controls.",
+    "Shadow: Assign X damage among characters you control. X is the number of enemies engaged with you."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142058",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Deep-Fissure.jpg",
+    "sha256": "1a02829ee5e002b0687b312e0d300dc14da88d4247d154ce62e178619d26934c"
+   },
+   "lines": [
+    "Peril.",
+    "When Revealed: Remove a character you control from the quest and discard the top card of the encounter deck. If that character's printed Willpower is less than the discarded card's Threat, discard that character."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142059",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Fool-of-a-Took.jpg",
+    "sha256": "865ed18869c8a4adea09595dd693be1920b75280bfa5c13f720077edd15f4d5f"
+   },
+   "lines": [
+    "Doomed 1.",
+    "When Revealed: Remove 1 damage token from Doom, Doom, Doom, or The Balrog makes an attack, if able.",
+    "Shadow: If this attack destroys a character, reveal 1 card from the encounter deck."
    ],
    "inert": [],
    "misprints": [],
@@ -1728,6 +3221,39 @@
    "confirmedBy": null
   },
   {
+   "code": "142061",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Great-River-1A.jpg",
+    "sha256": "482965b4a0367a87d42dd062224a037b053ed4442b21f8f6296d8263b2d14334"
+   },
+   "lines": [
+    "Setup: Set Frodo's Choice, Seat of Seeing, and Parth Galen aside, out of play. Add The Argonath and Sarn Gebir to the staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142061",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Great-River-1B.jpg",
+    "sha256": "5500f0b1b722b7cefcae1cf7d0ec47eb9df65cb00e3b174802793350a79cd3a7"
+   },
+   "lines": [
+    "Enemies get +2 Defense and cannot be engaged. Skip the encounter phase.",
+    "The players cannot advance while The Argonath is in play."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
    "code": "142062",
    "side": "A",
    "printing": "TRD",
@@ -1753,6 +3279,468 @@
    },
    "lines": [
     "Forced: At the end of the refresh phase, shuffle Seat of Seeing and Frodo's Choice into the encounter discard pile. Then, place the encounter discard pile on the bottom of the encounter deck. Starting with the first player, each player creates his own staging area and advances to a different stage 3A of his choice. In player order, each player moves 1 encounter card from this staging area to his. When there are no encounter cards left at this stage, discard it."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142063",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Searching-the-Woods-3A.jpg",
+    "sha256": "31dd7435b2c24b7d265e5da528cee927d69250adfc68c762d5db3ad24b8e26f8"
+   },
+   "lines": [
+    "Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142063",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Searching-the-Woods-3B.jpg",
+    "sha256": "857b69ca70602814d26ed4d3d96bc30f660dc81f2aec127d13e0211d740e93a2"
+   },
+   "lines": [
+    "If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.",
+    "Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.",
+    "Response: After you quest successfully, discard a non-unique location in any staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142064",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Guard-the-Hobbits-3A.jpg",
+    "sha256": "7f1330bca8d37a37ca71935a9de65deda796a81c01d6d97542e18f5dec5bbe06"
+   },
+   "lines": [
+    "Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142064",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Guard-the-Hobbits-3B.jpg",
+    "sha256": "b9f1fd3e6c4077b47b430ded0dd0d46311ee35875244f3e52260c2257cb4ee5e"
+   },
+   "lines": [
+    "If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.",
+    "Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.",
+    "Response: After you quest successfully, choose a player. Ready each of that player's heroes."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142065",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Seat-of-Amon-Hen-3A.jpg",
+    "sha256": "ff528696f1498125f5b76f4edd5620bf67544a1c011ec5272b9d051f558cc7c0"
+   },
+   "lines": [
+    "Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142065",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Seat-of-Amon-Hen-3B.jpg",
+    "sha256": "8a9b10f4bab7277a0b91ab48d8a6916a3ea81c9ff10ae744507304b8c31b985d"
+   },
+   "lines": [
+    "If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.",
+    "Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.",
+    "Response: After you quest successfully, choose a player. That player draws 2 cards and lowers his threat by 2."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142066",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Orc-Hunting-3A.jpg",
+    "sha256": "7e0f74c48a320a6e2edd42c57f18e941ffbf7e1002e52bf02ed63becb7386479"
+   },
+   "lines": [
+    "Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142066",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Orc-Hunting-3B.jpg",
+    "sha256": "1ac40954c37d364db494e69d6b396b7985061070954aba431714abc1e78d0175"
+   },
+   "lines": [
+    "If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.",
+    "Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.",
+    "Response: After you quest successfully, discard an enemy engaged with a player."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142067",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ring-bearer-Sets-Out-4A.jpg",
+    "sha256": "a4c653ecbb12a6fa22815b17541538fd8613441ae824d304cc6236bb48f504b3"
+   },
+   "lines": [
+    "When Revealed: Add Parth Galen to the staging area. If it is your quest phase, end the phase (do not resolve the quest)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142067",
+   "side": "B",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ring-bearer-Sets-Out-4B.jpg",
+    "sha256": "14323a72995ef5212aafd52ecd96ff7bf8f0bf1735802ab4781208fbd625aa68"
+   },
+   "lines": [
+    "During the quest phase, reveal 1 additional encounter card for each player in the game.",
+    "Response: After an enemy is revealed at this stage, raise your threat by X to engage that enemy. X is that enemy's Threat. Each player (at any stage) may trigger this ability once per round.",
+    "When this stage is defeated, the players win the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142068",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Frodo's-Choice.jpg",
+    "sha256": "553cd794f36ae6deea31d4f3172ab3d26dee54d7c7b96beb326e0ea3334dea6b"
+   },
+   "lines": [
+    "If Frodo's Choice is discarded, reveal it instead.",
+    "When Revealed: Take control of the first player token and the Ring-bearer (and each card attached to it). Attach to the Ring-bearer. For the rest of the game, you cannot lose control of the first player token."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142069",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-hai-Captain.jpg",
+    "sha256": "a434c6bd30c1e252c803623d2eb62457ff88d2168f25db82b9d9390763749cda"
+   },
+   "lines": [
+    "Toughness 2. Cannot have attachments.",
+    "Allies with fewer printed hit points than Uruk-hai Captain cannot defend against Uruk-hai Captain.",
+    "Shadow: Attacking enemy makes an additional attack after this one."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142070",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-hai-Archer.jpg",
+    "sha256": "e5bc51a35ded1e6e3f49f2363c74d3e53fdb5eb54a7359145c5fa25490bd4a6f"
+   },
+   "lines": [
+    "Peril. Toughness 1. Archery X.",
+    "X is the number of players at this stage.",
+    "When Revealed: Discard an ally you control."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142071",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-hai-Tracker.jpg",
+    "sha256": "36fd93d47e06c38683988fdf9a184983e6c24c7478f27395426b7f1959411cfc"
+   },
+   "lines": [
+    "Surge. Toughness 1. Archery 1.",
+    "Uruk-hai Tracker gets +2 Attack against characters with 2 or fewer printed hit points.",
+    "Shadow: Discard a non-objective attachment you control."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142072",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-hai-Hunter.jpg",
+    "sha256": "ffdee4a22e9abec74f23dc40cffc9fb25b564945bc41ab91e935d7687c2b99c6"
+   },
+   "lines": [
+    "Peril. Toughness 1.",
+    "When Revealed: Either choose a player to reveal an encounter card, or Uruk-hai Hunter makes an immediate attack against you."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142073",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Parth-Galen.jpg",
+    "sha256": "384a0a5f89a59b8533081dce1eebfbdf4664c336aea6cf5344a36039560debf6"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "Travel: Search the encounter deck and discard pile for an enemy and add it to the staging area to travel here. Shuffle the encounter deck.",
+    "While Parth Galen is in play, the players cannot win the game."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142074",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Seat-of-Seeing.jpg",
+    "sha256": "a525bcc0392ef95af3e6e1dad7d4834005fa2f89e6b6a1b38f41011d12dccecb"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "Response: When Seat of Seeing is explored, choose a burden card in play, in the encounter deck, or in the discard pile, and remove it from the game. Shuffle the encounter deck. (If you are playing campaign mode, remove that card from the campaign pool.)"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142075",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Argonath.jpg",
+    "sha256": "6268566546a1a60a832c2ca8e386d613fdca8b57e2c2e3b9c8cca1f0126a8874"
+   },
+   "lines": [
+    "Immune to player card effects. X is the number of players in the game.",
+    "The players cannot travel here while Sarn Gebir is in play. While The Argonath is the active location, skip the combat phase."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142076",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Sarn-Gebir.jpg",
+    "sha256": "ac2d7cb2254c3c6765234569fa991eaa75796630d49a03dfcd866952cb4c0941"
+   },
+   "lines": [
+    "Immune to player card effects.",
+    "Forced: When Sarn Gebir is explored, deal 1 damage to each exhausted character."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142077",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/River-Anduin.jpg",
+    "sha256": "3f558f2b34cb250a430ee7e06173689f35b92c2e6b00601384db842eed50d18c"
+   },
+   "lines": [
+    "While River Anduin is in the staging area it gains: \"Forced: At the end of the travel phase, each player at this stage raises his threat by 1. Then, River Anduin moves to the staging area to the left, if able.\""
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142078",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Wooded-Shoreline.jpg",
+    "sha256": "5f1a03aa6dd99e5ecb0f8ab6ba309254d8cd863409c3ec7c21c1898f061c0a26"
+   },
+   "lines": [
+    "While Wooded Shoreline is in the staging area, it gains archery 2.",
+    "Travel: Search the encounter deck and discard pile for an enemy and add it to this staging area to travel here. Shuffle the encounter deck."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142079",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Slopes-of-Amon-Hen.jpg",
+    "sha256": "12ac825f2227e0bf8c0c8b48584b2590bcf45c030a789952dd0a0ebf99953ca2"
+   },
+   "lines": [
+    "Travel: A player at this staging area must engage an enemy in any staging area to travel here.",
+    "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has fewer printed hit points than the attacking enemy)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142080",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Growing-Threat.jpg",
+    "sha256": "40ff1f18cf84383eca4ba8a4f77d2c7a174b3b9ef0c79c69ceb15ae61982e83d"
+   },
+   "lines": [
+    "Peril.",
+    "When Revealed: Either move 1 enemy engaged with you to the first player's staging area, or Growing Threat gains doomed 2 and surge.",
+    "Shadow: After this attack, move attacking enemy to the first player's staging area."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142081",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Orcs-of-the-White-Hand.jpg",
+    "sha256": "fed3b23be1b00536b4938143e80b720d2bdc637c3599ca7fcb3c8d759e835490"
+   },
+   "lines": [
+    "When Revealed: Remove all damage from each enemy at this stage. Each enemy at this stage gets +1 Threat, +1 Attack, and +1 Defense until the end of the round.",
+    "Shadow: If the defending character has fewer printed hit points than the attacking enemy, this attack is considered undefended."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142082",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Black-Feathered-Arrows.jpg",
+    "sha256": "9389b602331550a3c0e32f59bb27963facc43dd05b689d25ee8abbd0b16ad6e7"
+   },
+   "lines": [
+    "When Revealed: Until the end of the round, add 1 to the archery total at this stage for each ally currently at this stage.",
+    "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has fewer printed hit points than the attacking enemy)."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142083",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Fallen-Into-Evil.jpg",
+    "sha256": "e0e942fea5d4d8e5a18e493e029a7bc848f225e5e7bd5ef550be58701f99ec24"
+   },
+   "lines": [
+    "When Revealed: Attach to a non-Fellowship hero and move it to the first player's staging area. (Counts as a Condition attachment with the text: \"Attached hero loses the hero card type and gains the enemy card type with Threat equal to its Willpower and engagement cost equal to its threat cost. If Fallen into Evil is discarded, return attached hero to its owner's control.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142084",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Lust-for-the-Ring.jpg",
+    "sha256": "3029ecc9c462aec6eafbf497269c585aab33cf84cb79b0d8ec263aec1ddbbb1c"
+   },
+   "lines": [
+    "Peril. Surge.",
+    "When Revealed: Attach to a non-Fellowship hero in play. Counts as a Condition attachment with the text: \"Forced: After The One Ring exhausts, raise each player's threat by 1 and reduce attached hero's Willpower to 0 until the end of the round.\""
    ],
    "inert": [],
    "misprints": [],
@@ -1804,6 +3792,74 @@
     "RingsDB text, Hall of Beorn's MEC109 transcription (its Shadow field) and DragnCards cardDb agree with the scan on every word except Hall of Beorn's typo 'reveal and additional'.",
     "Decision: the scan reading."
    ]
+  },
+  {
+   "code": "142087",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Overcome-by-Grief.jpg",
+    "sha256": "a6b700350ff3d68829843e5725bcc9a028b48052c513375092c5a62569ac978d"
+   },
+   "lines": [
+    "Setup: Add Overcome by Grief to the staging area.",
+    "Forced: After a character is destroyed, if Overcome by Grief is unattached, attach to a hero. (Counts as a Condition attachment with the text: \"Forced: After a character you control is destroyed, exhaust attached hero. Until the end of the round, attached hero cannot ready.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142088",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Grievous-Wound.jpg",
+    "sha256": "d281d941f9b307516a23242ee668a14f2364e06d5532cdf07e0692df59fd110b"
+   },
+   "lines": [
+    "Setup: Add Grievous Wound to the staging area.",
+    "Forced: After a hero takes damage, if Grievous Wound is unattached, attach to that hero. (Counts as a Condition attachment with the text: \"Forced: After attached hero exhausts, deal 1 damage to it.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142089",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Followed-by-Night.jpg",
+    "sha256": "7f781377672c9f9d8b106ad0fc8fbaad85f529bd6877be8564bab9a64e6c93dd"
+   },
+   "lines": [
+    "Peril. Surge.",
+    "When Revealed: Put the topmost enemy of the encounter deck discard pile into play engaged with you."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
+  },
+  {
+   "code": "142090",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ill-Fate.jpg",
+    "sha256": "02ef6f2f027d0866e40ac4bf6404197a87906e8ab6e6724722ef1042d1b30529"
+   },
+   "lines": [
+    "Peril. Surge.",
+    "When Revealed: Attach to a hero you control. (Counts as a Condition attachment with the text: \"Forced: After a character you control is destroyed, raise your threat by 2.\")"
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
+   "confirmedBy": null
   }
  ]
 }

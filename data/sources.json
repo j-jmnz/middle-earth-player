@@ -769,9 +769,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "3b68a562e1967015e15c11ae30d6f0222bd06bf604c87310accddfb8d8a5485a"
+        "value": "7b462d5333a45afbcca5a13d81287f306f74e130009575926a75c981536bcb47"
       },
-      "fetchedAt": "2026-10-24T11:42:12.478Z",
+      "fetchedAt": "2026-10-24T12:29:40.045Z",
       "files": [
         {
           "path": "scans/01002.A.jpg",
@@ -1002,6 +1002,30 @@
           "bytes": 151182
         },
         {
+          "path": "scans/141018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Tireless-Ranger.jpg",
+          "sha256": "4a7ea8b9d000d932992655018d3dcc7e3438c4bb7746e7f22ae77c7b7b68c084",
+          "bytes": 148150
+        },
+        {
+          "path": "scans/141019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Skilled-Healer.jpg",
+          "sha256": "9f8163ecca2c5fa4998175aab44fec6736b7b334783cbbc246628c29f330c6f3",
+          "bytes": 144390
+        },
+        {
+          "path": "scans/141020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Valiant-Warrior.jpg",
+          "sha256": "27e0d17b6c241bcd4a41be245ee7c14d17195dd12ae36cc8d6388aefafbc5e26",
+          "bytes": 155372
+        },
+        {
+          "path": "scans/141021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Noble-Hero.jpg",
+          "sha256": "0af989cef05c679ba28ac6d642e3c975d0e31cf3d163c4c2748c02ea5debc159",
+          "bytes": 146349
+        },
+        {
           "path": "scans/141022.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Three-is-Company-1A.jpg",
           "sha256": "cc43243f008518d7bef2ef0daa5e4d0a67dd962b7d5ec9c9abc729d54bc47932",
@@ -1060,6 +1084,30 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Into-the-Wild-2B.jpg",
           "sha256": "2bdea2b81a869e060d39ff18b06843f9a43c1b90c794269ac36573bd2f803be1",
           "bytes": 185003
+        },
+        {
+          "path": "scans/141027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ringwraiths-Attack-3A.jpg",
+          "sha256": "fd0bd2c2f463294f3979f2aadda03a60cbe5e3ff2ee07b08c08a746f8bfdfc6b",
+          "bytes": 190516
+        },
+        {
+          "path": "scans/141027.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ringwraiths-Attack-3B.jpg",
+          "sha256": "15a18c16ab29c75ac7cee45eeb4b93169056a20b50b7dd27a0be0d5fb503bed9",
+          "bytes": 199310
+        },
+        {
+          "path": "scans/141028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pursued-by-the-Enemy-1A.jpg",
+          "sha256": "0a03aba7deb77dc16d7ac75cac421f215af37f8e0599d8906626d192fb2376b4",
+          "bytes": 204842
+        },
+        {
+          "path": "scans/141028.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pursued-by-the-Enemy-1B.jpg",
+          "sha256": "395d5b779e2c4c693700dfc8a66ca5623e38e3751fa84287fc1ba8c94cf0ba17",
+          "bytes": 203676
         },
         {
           "path": "scans/141029.A.jpg",
@@ -1176,6 +1224,72 @@
           "bytes": 522984
         },
         {
+          "path": "scans/141045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Prancing-Pony.jpg",
+          "sha256": "89d4041d6ed0d5d32063f24dab05409afdbf392917ca902aab36478ff0c8450a",
+          "bytes": 149826
+        },
+        {
+          "path": "scans/141046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Weathertop.jpg",
+          "sha256": "8a5f06ed1e326501d73c2a5064ab71c9d998a3a74a175d5b5f4e1cd769e525b4",
+          "bytes": 150800
+        },
+        {
+          "path": "scans/141047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Chetwood.jpg",
+          "sha256": "493971d02130cb4bef695b482ed7d564340614ca6814ceebcd9ff6827ed471a5",
+          "bytes": 144490
+        },
+        {
+          "path": "scans/141048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Midgewater.jpg",
+          "sha256": "afaa37cca98aba202ae2610720a10f24623cf2c657c5b6c7970324e06c8ce57d",
+          "bytes": 145795
+        },
+        {
+          "path": "scans/141049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Weather-Hills.jpg",
+          "sha256": "df4a60a43ad378b67947a09161946fa03134ff49fda9e51611ca8cd85faff4bd",
+          "bytes": 140510
+        },
+        {
+          "path": "scans/141050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Rider-of-Mordor.jpg",
+          "sha256": "09b3bfcd685690bf63a4e22a20ac4fc0df6cdc3aa85a6323ade052778fea081a",
+          "bytes": 138253
+        },
+        {
+          "path": "scans/141051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bill-Ferny.jpg",
+          "sha256": "ea292cea4aa8ca8a481cc08663bb41b17edf148de58b59d7adb5e426ef746289",
+          "bytes": 139774
+        },
+        {
+          "path": "scans/141052.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/0e1451ba-5fa6-4a13-869b-d23d9ecef15e.jpg",
+          "sha256": "4e81aa72ebc8c300ee105a3f5f8cdf2d1826a5e5c8bb5fbc3e926e53462ca541",
+          "bytes": 149737
+        },
+        {
+          "path": "scans/141053.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/795579db-249d-4c9d-850f-6f39bc96c063.jpg",
+          "sha256": "f7e7c523e4a94cd2347f55a5dfdeb0d9e9a9b6db09ea8590024b9e9c759aba86",
+          "bytes": 156371
+        },
+        {
+          "path": "scans/141054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Unwanted-Attention.jpg",
+          "sha256": "0d1a694bbbae2729fd87485488e3e32451d192582f672b2742c66650ea65b58d",
+          "bytes": 142343
+        },
+        {
+          "path": "scans/141055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Black-Breath.jpg",
+          "sha256": "7f071432f268967755243de0cb1074b06de14012be1443565d581e1276587804",
+          "bytes": 140872
+        },
+        {
           "path": "scans/141056.A.png",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Flight-to-the-Ford-SetupA.jpg",
           "sha256": "9af815e95f3721f33af548fa874a32896236922492f7171e41dcf584fe708ae8",
@@ -1186,6 +1300,96 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Flight-to-the-Ford-SetupB.jpg",
           "sha256": "8a7c68b4f20cc2077246df99a809661b8153b50526244612eb50354ed3bfac56",
           "bytes": 503120
+        },
+        {
+          "path": "scans/141057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/An-Evil-Wound.jpg",
+          "sha256": "00b9651c3c788b1e3ec4c7c008367556ba8ab43681bf2fa9e548b039a273c111",
+          "bytes": 133743
+        },
+        {
+          "path": "scans/141058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Last-Bridge.jpg",
+          "sha256": "d21e18208f455d028165ae8c8d441d373b4f4e6bc25cf1bbf3d627391c752c4a",
+          "bytes": 138471
+        },
+        {
+          "path": "scans/141059.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/3cd4bb66-1621-4534-aa25-421d0d8b7189.jpg",
+          "sha256": "025f192cecbb97218e8cc01e1f96c5b694c0d03d4deb3b7fb05ae9417fa6925e",
+          "bytes": 143328
+        },
+        {
+          "path": "scans/141060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Troll's-Camp.jpg",
+          "sha256": "94003421275b310ad1ea2e888d31be5497e3e89a2753f3ea6bd02df093fa0ceb",
+          "bytes": 142747
+        },
+        {
+          "path": "scans/141061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ettenmoors.jpg",
+          "sha256": "5d2df5ed9e94942c20c2a60567331454d8a87ef9c0564aa330e53613503c21b0",
+          "bytes": 145726
+        },
+        {
+          "path": "scans/141062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Old-Road.jpg",
+          "sha256": "27be0717f89847ecae1a5a477ccc0e1e4e6c982584f3b1a2a4ccf54839fecf3d",
+          "bytes": 153027
+        },
+        {
+          "path": "scans/141063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Fell-Rider.jpg",
+          "sha256": "578d6c96838361448fe9c241b1e5533a52a4897bccbf8ef4c19768ce220da836",
+          "bytes": 151961
+        },
+        {
+          "path": "scans/141064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stricken-Dumb.jpg",
+          "sha256": "e9bfc32d4358330ca561b1166976b923173fe2aa7f1277858382087f83e06307",
+          "bytes": 139852
+        },
+        {
+          "path": "scans/141065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Enemy-is-Upon-Us.jpg",
+          "sha256": "eec4842da32fed26b956032083d2ee5b1fa2f5069cd8f4d64f8cb78fcc653b0b",
+          "bytes": 149945
+        },
+        {
+          "path": "scans/141066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pain-Assailed-Him.jpg",
+          "sha256": "85ff4d91ef95fe038eef885a072b2712a9c7230f2f90dc44d70c569be14f8f4b",
+          "bytes": 139877
+        },
+        {
+          "path": "scans/141067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Nine-are-Abroad.jpg",
+          "sha256": "d2a41c5fad39fe18df22edacab8c3c27ad8966b662d6a016772b670b2bb32e78",
+          "bytes": 143609
+        },
+        {
+          "path": "scans/141068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Witch-king.jpg",
+          "sha256": "8a31c4c8e866133afb1af87ca9d2a3751faedb5985b31781fa867a4ecb66374a",
+          "bytes": 140982
+        },
+        {
+          "path": "scans/141069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ringwraith.jpg",
+          "sha256": "c90559759d78bcecceea3394cd291f90169bd3107b774f0e641913763baba0c6",
+          "bytes": 133686
+        },
+        {
+          "path": "scans/141070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pale-Blade.jpg",
+          "sha256": "61147589b685699d1c8982216b44fb06312657278ceb6498f8509b442d8c5af1",
+          "bytes": 146609
+        },
+        {
+          "path": "scans/141071.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/4765cbea-5ae8-4e39-a811-a67f1f6ca2a0.jpg",
+          "sha256": "c166a372f64761b7878a6d2b32aba777f243ba23ca63dc3b99299c77e2337328",
+          "bytes": 140942
         },
         {
           "path": "scans/141072.A.jpg",
@@ -1320,10 +1524,52 @@
           "bytes": 162512
         },
         {
+          "path": "scans/142011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Sting.jpg",
+          "sha256": "a947ea824d1ff37f1d41632e645a278886883b5d0d31615e3a1265c39c4f0041",
+          "bytes": 157341
+        },
+        {
+          "path": "scans/142012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Mithril-Shirt.jpg",
+          "sha256": "8a305478fb4815efd1cc19c846536aad7942028f1e8e62616b1d1bb9e240f6b5",
+          "bytes": 142916
+        },
+        {
+          "path": "scans/142013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Glamdring.jpg",
+          "sha256": "963e8f5f09d9cba8b99bbca3647e2ccd678815144500363ce9766c4b2449b9ca",
+          "bytes": 154554
+        },
+        {
+          "path": "scans/142014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Andúril.jpg",
+          "sha256": "477939df5b6e26bc7ffbbfed684004e1c1e110d229964cfd2218d0dcf44b19cf",
+          "bytes": 163190
+        },
+        {
           "path": "scans/142015.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Phial-of-Galadriel.jpg",
           "sha256": "a002a69f8b2d1c27f7081984aebe9edb05d4ca01dc27c8b018c03a21eba6e4be",
           "bytes": 152261
+        },
+        {
+          "path": "scans/142016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Three-Golden-Hairs.jpg",
+          "sha256": "b788bf1ab770e6bcefe010ef6067d1bed4f83ffa9de37a8eb00549e4cefa6628",
+          "bytes": 145513
+        },
+        {
+          "path": "scans/142017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Lórien-Rope.jpg",
+          "sha256": "ba45ad42ab75da8635419b27c6b8220bfeb3dc6def895c8e6544e80ef9a40577",
+          "bytes": 161325
+        },
+        {
+          "path": "scans/142018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Leaf-wrapped-Lembas.jpg",
+          "sha256": "b6909336f05967dfc56d3f469a0c574b31fd79f2d092dd54b7c69f441ffdea24",
+          "bytes": 163027
         },
         {
           "path": "scans/142019.A.jpg",
@@ -1338,6 +1584,144 @@
           "bytes": 122108
         },
         {
+          "path": "scans/142020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Council-of-Elrond-1A.jpg",
+          "sha256": "5a1f98b3ed70b034bb1fe0572218ba57f86e9e505ee1ca663cfc7e86357c7f1d",
+          "bytes": 209722
+        },
+        {
+          "path": "scans/142020.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Council-of-Elrond-1B.jpg",
+          "sha256": "ec0bd973b908cc67d24ef9a02f411f5db5781b06f90c7ccd327951034ac63398",
+          "bytes": 209722
+        },
+        {
+          "path": "scans/142021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Nine-Walkers-2A.jpg",
+          "sha256": "626571918ac37ac97fdd67b81c38c93f24433a78608e24ee40fd488107218495",
+          "bytes": 192426
+        },
+        {
+          "path": "scans/142021.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Nine-Walkers-2B.jpg",
+          "sha256": "c3ff4d7d42ed45bf9996ffaf6c90cffd7ef506b3e399977eeed033e5e8c4884a",
+          "bytes": 178136
+        },
+        {
+          "path": "scans/142022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Hunt-is-Up-3A.jpg",
+          "sha256": "79ae538c225fa4d7310ea1046e69ea61681b8ffeffaf69b34b8869193a0367d2",
+          "bytes": 189259
+        },
+        {
+          "path": "scans/142022.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Hunt-is-Up-3B.jpg",
+          "sha256": "86740cbc871390cbfd7de5c17342c496edcb289b309e9373d596c48014cf2edd",
+          "bytes": 175264
+        },
+        {
+          "path": "scans/142023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Gates-of-Moria-4A.jpg",
+          "sha256": "94c019b88007ec52d2919f4b174c6e2e9018353dced27dc43d0ab0df1f59f8a9",
+          "bytes": 195134
+        },
+        {
+          "path": "scans/142023.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Gates-of-Moria-4B.jpg",
+          "sha256": "48694b2f137e7d94d384bfd4754134833f0d72ca73622ff39c9f4a9900f91c8c",
+          "bytes": 184081
+        },
+        {
+          "path": "scans/142024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Watcher-in-the-Water.jpg",
+          "sha256": "618025e8a87d76cafee25da5cad04781b36571f12607f01ba57f1169aedb61f6",
+          "bytes": 149726
+        },
+        {
+          "path": "scans/142025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Great-Warg-Chief.jpg",
+          "sha256": "c482779e723873ce5e6a597d66ba89913dd648aa944d0cb4e560128ff6551787",
+          "bytes": 148289
+        },
+        {
+          "path": "scans/142026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Hound-of-Sauron.jpg",
+          "sha256": "b310e845a18a5656534f1c3828287d66d7d91fb994913292519c2ddeae6057e8",
+          "bytes": 149293
+        },
+        {
+          "path": "scans/142027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Howling-Warg.jpg",
+          "sha256": "cf29a4d3564818cda682899f5c45607a6da5afb7b5ac85aa790a00ced4ebca3d",
+          "bytes": 141991
+        },
+        {
+          "path": "scans/142028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Crebain-from-Dunland.jpg",
+          "sha256": "11c32b7359ab5e95d8b62f50d901dc10c61a5e785abb42b526abccafff9af6ed",
+          "bytes": 139461
+        },
+        {
+          "path": "scans/142029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Redhorn-Pass.jpg",
+          "sha256": "3ae2925e6f268df39e2a66a996894e191fe7cf1e8e265d2b6ded1c7d5d398941",
+          "bytes": 146616
+        },
+        {
+          "path": "scans/142030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Doors-of-Durin.jpg",
+          "sha256": "9cd093b7f7a075a62c874244cedede92518c2c0fd8bd2ac09d80617be59bedbe",
+          "bytes": 146727
+        },
+        {
+          "path": "scans/142031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Tree-crowned-Hill.jpg",
+          "sha256": "eb2aac7d1686e424483a602042a3c0791c5c2d9726ad8e61a3f99aff6b638c14",
+          "bytes": 147915
+        },
+        {
+          "path": "scans/142032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Hills-of-Hollin.jpg",
+          "sha256": "b4b546e7997004df5857fe29bca8db0d435a7b80cf46bc2e249f48eaef3eb59b",
+          "bytes": 139322
+        },
+        {
+          "path": "scans/142033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Redhorn-Foothills.jpg",
+          "sha256": "beea4f89e7bbaad213c8dec9c169437653fef283c83793516c1fb255b3637b08",
+          "bytes": 154547
+        },
+        {
+          "path": "scans/142034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Eregion.jpg",
+          "sha256": "f45e12acd828bb11a575fee904cea42a5fe0efa89c2b741feb8d78ae7867dac8",
+          "bytes": 144140
+        },
+        {
+          "path": "scans/142035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Regiments-of-Crows.jpg",
+          "sha256": "355d773d4afb9cc6a063732f2232f1c497cf6abf58cf4a324ed2853c2b996d62",
+          "bytes": 149747
+        },
+        {
+          "path": "scans/142036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Snowdrifts.jpg",
+          "sha256": "aa4abfaec2357c01a4bf7be7665306258b5526b6cec68496248dba8f503405bf",
+          "bytes": 105319
+        },
+        {
+          "path": "scans/142037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bitter-Cold.jpg",
+          "sha256": "bcea50bfced4ab06d63f04aad3327f2632273d0391c8cf7bc05d45c6df0cdb7f",
+          "bytes": 144613
+        },
+        {
+          "path": "scans/142038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Storm-of-Howls.jpg",
+          "sha256": "2d4a0e580c7de9ee688ac7d9ec4b2e39e45d16686041642a81d14ee348318069",
+          "bytes": 148252
+        },
+        {
           "path": "scans/142039.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Journey-in-the-Dark-SetupA.jpg",
           "sha256": "42986952470e521596b99e99f49297e3c4b91b7e5b8240cac702ca2f2be299af",
@@ -1348,6 +1732,144 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Journey-in-the-Dark-SetupB.jpg",
           "sha256": "814584a038968b5691da0196004979a64ec107bab3776899708405a9b5ceb7ee",
           "bytes": 127257
+        },
+        {
+          "path": "scans/142040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Long-Dark-of-Moria-1A.jpg",
+          "sha256": "23153c681f4ec508a616e690c1ce656686416d9664fb9fd50eefd572d49c8839",
+          "bytes": 186363
+        },
+        {
+          "path": "scans/142040.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Long-Dark-of-Moria-1B.jpg",
+          "sha256": "085b7b7515b54c189fd9a61f70f64dd25c658599dc91c074c367e311f80c2569",
+          "bytes": 169975
+        },
+        {
+          "path": "scans/142041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Drums-in-the-Deep-2A.jpg",
+          "sha256": "ad486a1aa62dc0d23cec9df9098f790eebc47328672dd5af8daf05514df83250",
+          "bytes": 185854
+        },
+        {
+          "path": "scans/142041.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Drums-in-the-Deep-2B.jpg",
+          "sha256": "79b164e43b8545761dda3c93efd5a2edc30cf6453c09a02d7d50f90f155afc36",
+          "bytes": 183847
+        },
+        {
+          "path": "scans/142042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Bridge-of-Khazad-dûm-3A.jpg",
+          "sha256": "d06b4325abefa0e4d4cd9f7e3b5e241d1694ce63e2db29acdcfc856f4c3a524c",
+          "bytes": 185793
+        },
+        {
+          "path": "scans/142042.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Bridge-of-Khazad-dûm-3B.jpg",
+          "sha256": "118f29cb764102da8588af77f86630d3b4f2ef04f3174339932ec5801accaa65",
+          "bytes": 179705
+        },
+        {
+          "path": "scans/142043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Doom-Doom-Doom.jpg",
+          "sha256": "d0c6b3819ece960ce3b5f71d6b3a6901cb4f42608b51f1963fac26d4382cd768",
+          "bytes": 134004
+        },
+        {
+          "path": "scans/142044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Balrog.jpg",
+          "sha256": "63b7fb0adc4c9fd4c5859c933543dbeae8d0507ab94ca2cdf728e94578e5d762",
+          "bytes": 166216
+        },
+        {
+          "path": "scans/142045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Orc-chieftain.jpg",
+          "sha256": "0660542fbe98b04f9c21b7bbb7bfeb0edb3b52c36c9e8e2447f05826a6be1fc7",
+          "bytes": 148800
+        },
+        {
+          "path": "scans/142046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Great-Cave-troll.jpg",
+          "sha256": "0a2d09df028ba441b6c9d62a13ada9eb550b6c224b009aff36f67d9caaad1973",
+          "bytes": 153103
+        },
+        {
+          "path": "scans/142047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-from-Mordor.jpg",
+          "sha256": "9ce4502cd767b94363c3f0291d4a8ec865e1c1cd8ca9c660e0be8a1ad20fc5e9",
+          "bytes": 150378
+        },
+        {
+          "path": "scans/142048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Moria-Orc.jpg",
+          "sha256": "5c6ec65978f2b690a78747d603308de5fd04b2bfc0e9766edc6de12213a23828",
+          "bytes": 151851
+        },
+        {
+          "path": "scans/142049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Moria-Archer.jpg",
+          "sha256": "9668dc71a4b089f009fea603d79a14dcd439a2778e35588f02f7879de583bd00",
+          "bytes": 141948
+        },
+        {
+          "path": "scans/142050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Great-Bridge.jpg",
+          "sha256": "f8ddc29f865417fc20fd3bd61b3df4c983587d0ca105b5d1c3a2b6e976a55e88",
+          "bytes": 139882
+        },
+        {
+          "path": "scans/142051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Chamber-of-Mazarbul.jpg",
+          "sha256": "8aa0d765fc685c1af7411df0ccd3caf509a9ed4ba45e25877e6d28d6cb66628e",
+          "bytes": 142859
+        },
+        {
+          "path": "scans/142052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Mines-of-Moria.jpg",
+          "sha256": "6bee52e52d2b51e5f5a175896d0b652a9a5f6de85c01375da2b991fba0552657",
+          "bytes": 153597
+        },
+        {
+          "path": "scans/142053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Many-pillared-Hall.jpg",
+          "sha256": "23dea31862ae4898de07778737074a5185d52c18aaf7e13bc21419d0d34d75c4",
+          "bytes": 142642
+        },
+        {
+          "path": "scans/142054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Darkened-Stairway.jpg",
+          "sha256": "859d00ed8b8bb84b35f8cbd35e0cb19b39b7a59bf66dd464681726fc76bb7c9a",
+          "bytes": 157418
+        },
+        {
+          "path": "scans/142055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ancient-Guardroom.jpg",
+          "sha256": "b674ce2a4c570b74f8137cf3bd4928bb271c1136a6821f78e6f18c8411bccdc8",
+          "bytes": 140590
+        },
+        {
+          "path": "scans/142056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/They-Are-Coming.jpg",
+          "sha256": "1f2b067f9698f9a8b8430515f4b39795466909d97d1a50589e040987c22c1246",
+          "bytes": 145628
+        },
+        {
+          "path": "scans/142057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/We-Cannot-Get-Out.jpg",
+          "sha256": "b28f3a02e4568384ec98732b97b3914e86c3ffcdb811043837d9041e53eb1988",
+          "bytes": 144749
+        },
+        {
+          "path": "scans/142058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Deep-Fissure.jpg",
+          "sha256": "1a02829ee5e002b0687b312e0d300dc14da88d4247d154ce62e178619d26934c",
+          "bytes": 134396
+        },
+        {
+          "path": "scans/142059.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Fool-of-a-Took.jpg",
+          "sha256": "865ed18869c8a4adea09595dd693be1920b75280bfa5c13f720077edd15f4d5f",
+          "bytes": 148058
         },
         {
           "path": "scans/142060.A.jpg",
@@ -1362,6 +1884,18 @@
           "bytes": 134443
         },
         {
+          "path": "scans/142061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Great-River-1A.jpg",
+          "sha256": "482965b4a0367a87d42dd062224a037b053ed4442b21f8f6296d8263b2d14334",
+          "bytes": 186344
+        },
+        {
+          "path": "scans/142061.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Great-River-1B.jpg",
+          "sha256": "5500f0b1b722b7cefcae1cf7d0ec47eb9df65cb00e3b174802793350a79cd3a7",
+          "bytes": 191257
+        },
+        {
           "path": "scans/142062.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Company-Divided-2A.jpg",
           "sha256": "a4024b61fb9fda4e46c9a450c4571cb83a2ad17db1363803b272caa5eb528329",
@@ -1374,6 +1908,168 @@
           "bytes": 200455
         },
         {
+          "path": "scans/142063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Searching-the-Woods-3A.jpg",
+          "sha256": "31dd7435b2c24b7d265e5da528cee927d69250adfc68c762d5db3ad24b8e26f8",
+          "bytes": 195409
+        },
+        {
+          "path": "scans/142063.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Searching-the-Woods-3B.jpg",
+          "sha256": "857b69ca70602814d26ed4d3d96bc30f660dc81f2aec127d13e0211d740e93a2",
+          "bytes": 190787
+        },
+        {
+          "path": "scans/142064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Guard-the-Hobbits-3A.jpg",
+          "sha256": "7f1330bca8d37a37ca71935a9de65deda796a81c01d6d97542e18f5dec5bbe06",
+          "bytes": 177750
+        },
+        {
+          "path": "scans/142064.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Guard-the-Hobbits-3B.jpg",
+          "sha256": "b9f1fd3e6c4077b47b430ded0dd0d46311ee35875244f3e52260c2257cb4ee5e",
+          "bytes": 169125
+        },
+        {
+          "path": "scans/142065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Seat-of-Amon-Hen-3A.jpg",
+          "sha256": "ff528696f1498125f5b76f4edd5620bf67544a1c011ec5272b9d051f558cc7c0",
+          "bytes": 177705
+        },
+        {
+          "path": "scans/142065.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Seat-of-Amon-Hen-3B.jpg",
+          "sha256": "8a9b10f4bab7277a0b91ab48d8a6916a3ea81c9ff10ae744507304b8c31b985d",
+          "bytes": 173508
+        },
+        {
+          "path": "scans/142066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Orc-Hunting-3A.jpg",
+          "sha256": "7e0f74c48a320a6e2edd42c57f18e941ffbf7e1002e52bf02ed63becb7386479",
+          "bytes": 202388
+        },
+        {
+          "path": "scans/142066.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Orc-Hunting-3B.jpg",
+          "sha256": "1ac40954c37d364db494e69d6b396b7985061070954aba431714abc1e78d0175",
+          "bytes": 199976
+        },
+        {
+          "path": "scans/142067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ring-bearer-Sets-Out-4A.jpg",
+          "sha256": "a4c653ecbb12a6fa22815b17541538fd8613441ae824d304cc6236bb48f504b3",
+          "bytes": 198054
+        },
+        {
+          "path": "scans/142067.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Ring-bearer-Sets-Out-4B.jpg",
+          "sha256": "14323a72995ef5212aafd52ecd96ff7bf8f0bf1735802ab4781208fbd625aa68",
+          "bytes": 191931
+        },
+        {
+          "path": "scans/142068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Frodo's-Choice.jpg",
+          "sha256": "553cd794f36ae6deea31d4f3172ab3d26dee54d7c7b96beb326e0ea3334dea6b",
+          "bytes": 133597
+        },
+        {
+          "path": "scans/142069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-hai-Captain.jpg",
+          "sha256": "a434c6bd30c1e252c803623d2eb62457ff88d2168f25db82b9d9390763749cda",
+          "bytes": 151635
+        },
+        {
+          "path": "scans/142070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-hai-Archer.jpg",
+          "sha256": "e5bc51a35ded1e6e3f49f2363c74d3e53fdb5eb54a7359145c5fa25490bd4a6f",
+          "bytes": 142322
+        },
+        {
+          "path": "scans/142071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-hai-Tracker.jpg",
+          "sha256": "36fd93d47e06c38683988fdf9a184983e6c24c7478f27395426b7f1959411cfc",
+          "bytes": 149950
+        },
+        {
+          "path": "scans/142072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Uruk-hai-Hunter.jpg",
+          "sha256": "ffdee4a22e9abec74f23dc40cffc9fb25b564945bc41ab91e935d7687c2b99c6",
+          "bytes": 148929
+        },
+        {
+          "path": "scans/142073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Parth-Galen.jpg",
+          "sha256": "384a0a5f89a59b8533081dce1eebfbdf4664c336aea6cf5344a36039560debf6",
+          "bytes": 152637
+        },
+        {
+          "path": "scans/142074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Seat-of-Seeing.jpg",
+          "sha256": "a525bcc0392ef95af3e6e1dad7d4834005fa2f89e6b6a1b38f41011d12dccecb",
+          "bytes": 154394
+        },
+        {
+          "path": "scans/142075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Argonath.jpg",
+          "sha256": "6268566546a1a60a832c2ca8e386d613fdca8b57e2c2e3b9c8cca1f0126a8874",
+          "bytes": 147396
+        },
+        {
+          "path": "scans/142076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Sarn-Gebir.jpg",
+          "sha256": "ac2d7cb2254c3c6765234569fa991eaa75796630d49a03dfcd866952cb4c0941",
+          "bytes": 148836
+        },
+        {
+          "path": "scans/142077.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/River-Anduin.jpg",
+          "sha256": "3f558f2b34cb250a430ee7e06173689f35b92c2e6b00601384db842eed50d18c",
+          "bytes": 144137
+        },
+        {
+          "path": "scans/142078.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Wooded-Shoreline.jpg",
+          "sha256": "5f1a03aa6dd99e5ecb0f8ab6ba309254d8cd863409c3ec7c21c1898f061c0a26",
+          "bytes": 149756
+        },
+        {
+          "path": "scans/142079.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Slopes-of-Amon-Hen.jpg",
+          "sha256": "12ac825f2227e0bf8c0c8b48584b2590bcf45c030a789952dd0a0ebf99953ca2",
+          "bytes": 149243
+        },
+        {
+          "path": "scans/142080.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Growing-Threat.jpg",
+          "sha256": "40ff1f18cf84383eca4ba8a4f77d2c7a174b3b9ef0c79c69ceb15ae61982e83d",
+          "bytes": 144638
+        },
+        {
+          "path": "scans/142081.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Orcs-of-the-White-Hand.jpg",
+          "sha256": "fed3b23be1b00536b4938143e80b720d2bdc637c3599ca7fcb3c8d759e835490",
+          "bytes": 162412
+        },
+        {
+          "path": "scans/142082.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Black-Feathered-Arrows.jpg",
+          "sha256": "9389b602331550a3c0e32f59bb27963facc43dd05b689d25ee8abbd0b16ad6e7",
+          "bytes": 150851
+        },
+        {
+          "path": "scans/142083.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Fallen-Into-Evil.jpg",
+          "sha256": "e0e942fea5d4d8e5a18e493e029a7bc848f225e5e7bd5ef550be58701f99ec24",
+          "bytes": 157809
+        },
+        {
+          "path": "scans/142084.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Lust-for-the-Ring.jpg",
+          "sha256": "3029ecc9c462aec6eafbf497269c585aab33cf84cb79b0d8ec263aec1ddbbb1c",
+          "bytes": 151672
+        },
+        {
           "path": "scans/142085.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Shadow-of-Fear.jpg",
           "sha256": "a549c1005bb3037257c4f1ba2a6cf6bbc95deea59e3035e86311d29788d49ee8",
@@ -1384,6 +2080,30 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Pursued-by-the-Enemy-Treachery.jpg",
           "sha256": "8d7a22a860b82ef8ace26e5373605a009410af4ab6caa44aaf84b3dc44588024",
           "bytes": 153189
+        },
+        {
+          "path": "scans/142087.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Overcome-by-Grief.jpg",
+          "sha256": "a6b700350ff3d68829843e5725bcc9a028b48052c513375092c5a62569ac978d",
+          "bytes": 156942
+        },
+        {
+          "path": "scans/142088.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Grievous-Wound.jpg",
+          "sha256": "d281d941f9b307516a23242ee668a14f2364e06d5532cdf07e0692df59fd110b",
+          "bytes": 150751
+        },
+        {
+          "path": "scans/142089.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Followed-by-Night.jpg",
+          "sha256": "7f781377672c9f9d8b106ad0fc8fbaad85f529bd6877be8564bab9a64e6c93dd",
+          "bytes": 141182
+        },
+        {
+          "path": "scans/142090.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ill-Fate.jpg",
+          "sha256": "02ef6f2f027d0866e40ac4bf6404197a87906e8ab6e6724722ef1042d1b30529",
+          "bytes": 157869
         }
       ]
     }
