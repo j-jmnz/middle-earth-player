@@ -2,7 +2,7 @@
 // it draws. A drag, a card lift and the return run on the UI thread with Gesture Handler and Reanimated; JavaScript hears
 // about a drag only when a card is picked up (to compute that card's drop targets) and when the finger lifts (to ask the
 // reducer). A new gesture cancels the return in progress; reduced motion snaps it.
-import { Canvas, Circle, Group, Image, matchFont, Path, Rect, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
+import { Canvas, Circle, Group, Image, matchFont, Path, useFont, Rect, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 import { useCallback, useEffect, useMemo } from "react";
 import { Platform } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -17,9 +17,13 @@ import { TABLE_ZONES, shownSeat, zoneSelector, type ZoneId } from "./selectors.t
 import { dropRects } from "./selection.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { useTableImages } from "./table-images.native.ts";
+import { wrapName } from "./wrap.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 const RADIUS = 6;
+const LINE = 15;
+const INACTIVE = "Inactive";
+const MARCELLUS = require("../../assets/fonts/Marcellus-Regular.ttf") as number;
 
 // Translucent night, from the token, so the palette drift test covers the canvas's veils too.
 function withAlpha(hex: string, alpha: number): string {
@@ -59,6 +63,18 @@ function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: number; y:
   );
 }
 
+// The veil over unique text with no effect record, with the word that says what it means.
+function Veil({ x, y, w, h, font }: { x: number; y: number; w: number; h: number; font: SkFont }) {
+  const top = y + h * 0.55;
+  const width = font.getTextWidth(INACTIVE);
+  return (
+    <Group>
+      <Rect x={x} y={top} width={w} height={h * 0.45} color={veil} />
+      <Text x={x + Math.max(3, (w - width) / 2)} y={top + 15} text={INACTIVE} font={font} color={t.bone} />
+    </Group>
+  );
+}
+
 function Coin({ x, y, color, text, textColor, font }: { x: number; y: number; color: string; text: string; textColor: string; font: SkFont }) {
   const width = font.getTextWidth(text);
   return (
@@ -76,6 +92,7 @@ function CardFace({
   name,
   sphere,
   font,
+  numbers,
   inactive,
   edge,
   dim,
@@ -85,6 +102,8 @@ function CardFace({
   name: string;
   sphere: IconName | null;
   font: SkFont;
+  // Marcellus, for the numbers on the coins.
+  numbers: SkFont;
   inactive: boolean;
   edge: string | null;
   dim: boolean;
@@ -105,22 +124,24 @@ function CardFace({
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
           {/* Unique text with no effect record is inactive: the text box is veiled, and no control applies it. */}
-          {inactive ? <Rect x={x} y={y + h * 0.55} width={w} height={h * 0.45} color={veil} /> : null}
+          {inactive ? <Veil x={x} y={y} w={w} h={h} font={font} /> : null}
         </Group>
       ) : (
         <Group>
           <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={t.raised} />
           <Group clip={{ x: x + 3, y: y + 3, width: w - 6, height: h - 6 }}>
-            <Text x={x + 5} y={y + 16} text={name} font={font} color={t.bone} />
+            {wrapName(name, w - 10, (text) => font.getTextWidth(text)).map((line, index) => (
+              <Text key={index} x={x + 5} y={y + 17 + index * LINE} text={line} font={font} color={t.bone} />
+            ))}
           </Group>
           {sphere ? <CanvasIcon name={sphere} x={x + w - 18} y={y + h - 18} size={14} color={t[SPHERE_TINT[sphere] ?? "faint"]} /> : null}
-          {inactive ? <Rect x={x} y={y + h * 0.55} width={w} height={h * 0.45} color={veil} /> : null}
+          {inactive ? <Veil x={x} y={y} w={w} h={h} font={font} /> : null}
         </Group>
       )}
       {edge ? <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={edge} style="stroke" strokeWidth={2} /> : null}
-      {slot.resources > 0 ? <Coin x={x + COIN + 2} y={y + h - COIN - 2} color={t.gold} text={String(slot.resources)} textColor={t.onGold} font={font} /> : null}
-      {slot.damage > 0 ? <Coin x={x + w - COIN - 2} y={y + COIN + 2} color={t.threat} text={String(slot.damage)} textColor={t.bone} font={font} /> : null}
-      {slot.progress > 0 ? <Coin x={x + w - COIN - 2} y={y + h - COIN - 2} color={t.bone} text={String(slot.progress)} textColor={t.ink} font={font} /> : null}
+      {slot.resources > 0 ? <Coin x={x + COIN + 2} y={y + h - COIN - 2} color={t.gold} text={String(slot.resources)} textColor={t.onGold} font={numbers} /> : null}
+      {slot.damage > 0 ? <Coin x={x + w - COIN - 2} y={y + COIN + 2} color={t.threat} text={String(slot.damage)} textColor={t.bone} font={numbers} /> : null}
+      {slot.progress > 0 ? <Coin x={x + w - COIN - 2} y={y + h - COIN - 2} color={t.bone} text={String(slot.progress)} textColor={t.ink} font={numbers} /> : null}
     </Group>
   );
 }
@@ -137,7 +158,11 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
   const layout = useMemo(() => tableLayout(width, height, views), [width, height, views]);
   const codes = useMemo(() => [...new Set(layout.slots.filter((slot) => !slot.faceDown).map((slot) => slot.code))], [layout]);
   const images = useTableImages(codes, picture, layout.card, pictureRevision);
-  const font = useMemo(() => matchFont({ fontFamily: Platform.select({ ios: "Helvetica", default: "sans-serif" }), fontSize: 11 }), []);
+  // Names and the Inactive word in the system face at 12 pt; coin numbers in the embedded Marcellus (the system face stands
+  // in for the moment the font file takes to load).
+  const font = useMemo(() => matchFont({ fontFamily: Platform.select({ ios: "Helvetica", default: "sans-serif" }), fontSize: 12 }), []);
+  const marcellus = useFont(MARCELLUS, 12);
+  const numbers = marcellus ?? font;
 
   // What the worklets read: the slots, which of them can be picked up, and the selected card's drop rectangles.
   const slots = useSharedValue<readonly CardSlot[]>(layout.slots);
@@ -261,6 +286,7 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
             name={nameOf(slot.code)}
             sphere={sphereIcon(sphereOf(slot.code))}
             font={font}
+            numbers={numbers}
             inactive={!slot.faceDown && inactive(slot.code)}
             edge={edgeOf(slot)}
             dim={lifted?.id === slot.id && slot.kind === "card"}
@@ -268,7 +294,7 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
         ))}
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-            <CardFace slot={{ ...lifted, tilt: 0 }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} font={font} inactive={inactive(lifted.code)} edge={t.gold} dim={false} />
+            <CardFace slot={{ ...lifted, tilt: 0 }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} font={font} numbers={numbers} inactive={inactive(lifted.code)} edge={t.gold} dim={false} />
           </Group>
         ) : null}
       </Canvas>

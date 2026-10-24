@@ -35,7 +35,7 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, onInspect }: Pick<TableC
             style={({ pressed }) => (pressed ? { backgroundColor: t.hairline } : undefined)}
           >
             <Text className={card.face === "down" ? "text-label text-faint" : "text-label text-bone"}>
-              {card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · text inactive" : ""}`}
+              {card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Inactive" : ""}`}
             </Text>
           </Pressable>
         ))}

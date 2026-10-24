@@ -30,7 +30,7 @@ export function PhaseRail({ rail }: { rail: Rail }) {
       <Animated.View key={rail.current} entering={fade} className="mx-3">
         <Text
           testID="rail-current"
-          className="font-display text-eyebrow uppercase text-gold"
+          className="font-display text-body uppercase text-gold"
           style={{ textShadowColor: t.gold, textShadowRadius: 8, textShadowOffset: { width: 0, height: 0 } }}
         >
           {rail.current}

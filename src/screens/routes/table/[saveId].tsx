@@ -2,9 +2,10 @@
 // intent in user.db, and hands the canvas the pictures in the image cache. The reducer is the only writer of the game.
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Text, View, type LayoutChangeEvent } from "react-native";
+import { BackHandler, Text, View, type LayoutChangeEvent } from "react-native";
 import { useStore } from "zustand";
 
+import { backStep } from "../../../play/back";
 import { QuestBand } from "../../../play/quest-band";
 import { railFor } from "../../../play/rail";
 import { prefetchCodes, resolutionCodes } from "../../../play/prefetch";
@@ -133,6 +134,19 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
     [store, session, dispatch, openSheet, names],
   );
   const onOutcome = useCallback(() => router.replace({ pathname: "/resolution/[saveId]", params: { saveId } }), [router, saveId]);
+  // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      const step = backStep({ logOpen, inspectOpen: inspectList != null, sheetOpen: sheet != null && showSheet });
+      if (step === "closeLog") setLogOpen(false);
+      else if (step === "closeInspect") setInspectList(null);
+      else if (step === "foldSheet" && sheet) setCollapsed(sheet.key);
+      else goBack(router, { pathname: "/path/[saveId]", params: { saveId } });
+      return true;
+    });
+    return () => subscription.remove();
+  }, [logOpen, inspectList, sheet, showSheet, router, saveId]);
+
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
     setSize((current) => (current && current.width === width && current.height === height ? current : { width, height }));

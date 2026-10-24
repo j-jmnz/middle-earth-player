@@ -51,6 +51,9 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const view = useMemo(() => resolutionView(game, session.world), [game, session]);
   const scenario = scenarioOf(game.scenarioId);
   const toPath = () => router.replace({ pathname: "/path/[saveId]", params: { saveId } });
+  // Back is a labelled control, never a gesture alone. Each choice is already saved, so leaving loses nothing; the
+  // resolution waits on the path (Resume).
+  const back = <NavBar onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backTestID="resolution-path" backLabel="Path" />;
 
   // A loss writes nothing to the log: the open scenario is dropped and the scenario stays current.
   const close = () => {
@@ -61,6 +64,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   if (view.kind === "lost") {
     return (
       <Screen testID="resolution" scene="plain">
+        {back}
         <View className="flex-1 justify-center">
           <Text testID="resolution-outcome" accessibilityRole="header" className="font-display text-display text-bone">
             Defeat
@@ -97,7 +101,8 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
 
   return (
     <Screen testID="resolution" scene="victory">
-      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6 pt-10">
+      {back}
+      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6 pt-4">
         <Text
           testID="resolution-outcome"
           accessibilityRole="header"
