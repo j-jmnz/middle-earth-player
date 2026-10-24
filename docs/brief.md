@@ -4,11 +4,11 @@ This is the source of truth for the app. Read it before writing code. It records
 
 Authority, in order:
 
-1. The MEC109 booklet, and the quest cards, when a sentence here disagrees with them. Update this file in the same commit as the code change.
+1. The MEC109 booklet and the quest cards win on a rule; the core-set Learn to Play wins on the ordinary round; the Rules Reference wins on definitions. Their text is in `data/rules/` and split into rule ids in `data/rules/entries.json` (`pnpm data:query "select id, title from rules where text like '%surge%'"`). Code and tests name the rule ids they implement. When a rule changes, change the code, the test, and this file in the same commit.
 2. This file, for product shape, stack, and the build order. Structure is in [architecture.md](architecture.md).
-3. The core-set Learn to Play, for the ordinary round (setup, mulligan, phases). The booklet tells you to use pages 28–30 of that book for full campaign mode. Do not invent a shorter round.
+3. `data/` for cards, scenarios and rules text. Where it came from is in `data/sources.json`; where a source was wrong is in `data/overrides.json`, each with a reason.
 
-Do not reopen the product shape unless a decision below is impossible. Do not port DragnCards.
+Do not reopen the product shape unless a decision below is impossible.
 
 Performance is a product requirement. A hitch under a finger is a failed step, the same as a wrong threat number. The section Performance and feel is binding on every screen.
 
@@ -32,14 +32,13 @@ This brief assumes a personal, unpublished app. A public store listing is a diff
 
 Do not do any of these.
 
-- Do not fork, vendor, or call `github.com/seastan/dragncards`, `dragncards-lotrlcg-plugin`, or the DragnCards S3 buckets (`dragncards-lotrlcg`, `dragncards-core`, `dragncards-shared`).
-- Do not port DragnLang, Phoenix channels, GenServers, plugin JSON, or the generic pile engine.
+- Do not port DragnLang, Phoenix channels, GenServers, or the generic pile engine. The DragnCards plugin's data (card database, scenario load lists, framework steps, automation snippets) is a source for `data/`, fetched by `pnpm data:sync`; the app never calls it at runtime.
 - Do not build a rules language for other card games.
 - Do not add accounts, auth, Patreon, image hosting, or a backend.
 - Do not restrict the deck builder to cards that have automated effects, or to cards printed in the Fellowship box.
 - Do not include ALeP, playtest, or Nightmare cards. Easy and Normal counts only.
-- Do not commit card text, card scans, RingsDB response dumps, booklet PDFs, or `catalog.db` if this repo is public. Generate the database in the release job. The phone receives it inside the binary. The player supplies each booklet PDF once. The app does not fetch it and does not ship it.
-- Do not paste the MEC109 narrative prose into the app or into git. Encode procedures. Short original labels are fine ("Hide test", "Ring-bearer's life").
+- Do not commit card scans, booklet PDFs, or `catalog.db`. `data/` holds card text, rules text and raw source snapshots on purpose, so every session has them. The card text, art and rules belong to FFG/Asmodee; if this repo is ever made public, that is a legal exposure to revisit first. The phone receives `catalog.db` inside the binary. The player supplies each booklet PDF once for the reader. The app does not fetch it and does not ship it.
+- Do not paste the MEC109 narrative prose into screens. Encode procedures. Short original labels are fine ("Hide test", "Ring-bearer's life").
 - Do not ship a WebView of any existing card-table site.
 - Do not build a collection tracker, an encounter-card deck editor, or a second game.
 
@@ -48,16 +47,16 @@ Do not do any of these.
 | Decision | Why |
 | --- | --- |
 | Expo app, one package, no monorepo | One person, one binary. A second package adds a build graph with nothing to share yet. |
-| Rules and campaign code cannot import React Native | The game has to be tested in Node. A flat-config ESLint import rule fails the build if `src/rules` or `src/campaign` imports `react-native`, `expo-*`, or anything under `src/play` or `src/screens`. `eslint-plugin-import` v2 is the wrong tool for that config. The same rule fails an `src/effects` import from `src/rules`, `src/campaign`, `src/play`, or `src/screens`. |
+| Rules and campaign code cannot import React Native | The game has to be tested in Node. A flat-config ESLint import rule fails the build if `src/rules` or `src/campaign` imports `react-native`, `expo-*`, or anything under `src/play` or `src/screens`. `eslint-plugin-import` v2 is the wrong tool for that config. The same rule fails an `src/effects` import from `src/rules`; `src/campaign`, `src/play` and `src/screens` import `src/effects` directly, and `src/rules` receives the records as an argument. |
 | Campaign registry, not a Fellowship-named core | The next box is a folder plus a catalog rebuild. The core round and the deck builder do not mention Fellowship by name. |
 | Full official player pool from the first install | Deckbuilding is not gated on campaign progress or on effect coverage. |
 | Two SQLite files | `catalog.db` is reference data baked into the binary and replaceable. `user.db` is decks and saves and is never replaced by a catalog update. |
 | The engine plays the game | Rules, keywords, phases, effects, damage, resources, threat, and progress are applied by the app. The player only chooses among options the current rules allow. |
 | That engine stays inside the app | One device, one player, airplane mode. A rules API adds a host and a network hop. It does not make the math more correct. |
-| Effects are authored records, not parsed English | A parser will mistime Forced and Response. A sentence with no effect record is inactive. It is not handed to the player to resolve. |
+| Effects are records, not parsed English | A template writes a record only when it matches a whole sentence; an agent drafts the rest from a bundle. A partial parse would mistime Forced and Response. A sentence with no effect record is inactive. It is not handed to the player to resolve. |
 | Campaign-dealt cards are fully automated before the scenario is playable | Quests, encounters, boons, burdens, and The One Ring have no inactive-text path. |
 | The full player pool is still deck-legal | Printed cost and combat numbers, plus implemented keywords, work without a unique-text record. The unique sentence stays inactive until an effect exists. |
-| Card images are the RingsDB previews | About 430×600, one file per code, cached on the phone. A 300 dpi scan is not publicly hosted, so it is not the asset. The files stay out of the APK. |
+| Card images are the RingsDB previews, and the DragnCards or Hall of Beorn scan where RingsDB has none | About 430×600, one file per code, cached on the phone. Encounter and quest art has no RingsDB file; `data/cards` lists its other URLs in each printing's `imageUrls`. A 300 dpi scan is not publicly hosted, so it is not the asset. The files stay out of the APK. |
 | Feel outranks the next feature | Drag, scroll, and taps stay smooth on a phone. A correct rule that stalls the frame does not ship. |
 | Identifiers are RingsDB codes (`141001`), never DragnCards UUIDs | That is the public catalog. |
 | Errata wins | When RingsDB sets `has_errata`, store and display the errata text. |
@@ -115,14 +114,15 @@ Profile the pool fling and the table drag on a physical phone before closing ste
 ```
 src/rules/        pure TS. Core round, windows, keywords, effect interpreter.
 src/campaign/     pure TS. Registry, log, pool, saga validators, resolution.
-src/effects/      authored effect records, grouped by set. Data, not UI.
-src/catalog/      Zod schemas, including Effect, Instruction, Condition, Cost, and ScenarioDefinition. One drizzle-orm/sqlite-core catalog schema.
+src/effects/      generated/ (written by data:build from sentence templates) and authored/ (records for the rest). Data, not UI.
+src/catalog/      Zod schemas, including Card, Effect, Instruction, Condition, Cost, ScenarioData and ScenarioDefinition. One drizzle-orm/sqlite-core catalog schema.
 src/play/         Skia table, phase rail, Hide sheet, life tracker, choice sheet.
 src/screens/      Expo Router. Campaigns, briefing, table, resolution, log, pool, decks.
-scripts/build-catalog.ts
+data/             committed. sources.json, raw/ (verbatim snapshots), cards/, scenarios/, campaigns/, rules/, overrides.json.
+scripts/data/     sync (network), build, check, query, effect templates and drafts.
+scripts/build-catalog.ts   data/ -> assets/catalog.db, offline
 assets/catalog.db          generated, gitignored
 drizzle/                   user.db SQL migrations, committed
-fixtures/                  checked-in codes and counts for scenario decks. No card text.
 ```
 
 `src/rules` and `src/campaign` have zero React imports. `src/play` sends player intents. It does not assign threat, damage, resources, progress, or log fields.
@@ -216,40 +216,51 @@ These are the verbs inside the reducer and inside effect instructions. They are 
 
 ### Core round
 
-Name the steps in the phase rail in words. Beginning and end of round are real steps so a response has somewhere to attach.
+The round, its steps and its keywords are the rules in `data/rules/entries.json`. The phase rail names the framework steps in words, using the ids in `data/rules/steps.json` (DragnCards' step ids joined to the Rules Reference entries). Beginning and end of round are real steps so a response has somewhere to attach.
 
-Setup, in this order:
+| Part of the round | Rule ids |
+| --- | --- |
+| Setup: decks, heroes, starting threat | `ltp.start-the-first-game`, `rr.initial-threat-level`, `mec109.setting-up-the-game` |
+| Player Setup, opening hand, mulligan | `mec109.setup`, `rr.mulligan` |
+| Encounter Setup, quest card Setup | `mec109.setup`, `rr.step-0-0` |
+| Resource, Planning | `rr.step-1-1`, `rr.planning-phase` |
+| Quest, saga staging | `mec109.saga-staging-rules`, `rr.step-3-4`, `rr.quest-advancement` |
+| Travel | `rr.travel`, `rr.step-4-2` |
+| Encounter: optional engagement, engagement checks | `rr.optional-engagement`, `rr.engagement-check` |
+| Combat: shadow cards, attacks | `rr.combat-phase`, `rr.step-6-2` |
+| Refresh | `rr.refresh-phase`, `rr.step-7-3` |
+| Threat elimination, losing | `rr.threat-elimination-level`, `rr.player-elimination` |
 
-1. Shuffle the decks. Place heroes. Starting threat is the sum of the dealt heroes' threat costs, plus the campaign log's threat modifier.
-2. Search out player cards with Setup and resolve them before the opening hand. A Setup record that changes the starting hand, such as `ReduceOpeningHand` on 141078, also runs here, even though the quest card's Setup is what puts that card out. This placement is a user-accepted reading: booklet p3 orders player Setup before the hand and encounter Setup before the quest card's Setup, and says nothing about encounter Setup against the hand.
-3. Draw 6, less any `ReduceOpeningHand` total from step 2 (141078 contributes 1, so 5). One mulligan: shuffle the hand back and draw the same number. No second mulligan.
-4. Search out encounter cards with Setup and resolve them before the quest card's Setup. The booklet orders this step only before the quest card's Setup, not before the hand.
-5. Run the quest card's Setup, then flip to side B. That includes the active location, set-aside, The One Ring, and whatever that card prints. The setup Black Rider in scenario 1 is added to staging and does not take a Hide test.
+Decisions this file owns, because the sources are silent or the user chose:
 
-1. Resource. Each hero gains one resource of its sphere. The first seat draws one card, then each later seat draws one. Player actions.
-2. Planning. Play allies, attachments, and events.
-3. Quest. Commit, then staging, then resolution. Saga staging reveals one encounter card per seat, in seat order, and resolves it before the next seat. For true solo that is one reveal. "You" on an encounter card means the seat who revealed it. Surge: that same seat reveals another encounter card before the next seat. Doomed X raises every seat's threat. Peril: the other seats cannot act or trigger responses while that card's staging resolves.
-4. Travel.
-5. Encounter. Each seat may optionally engage one enemy. Seats then repeat engagement checks in order. A check engages the enemy in staging with the highest engagement cost that is equal to or lower than that seat's threat (Learn to Play p14); the first player chooses among enemies tied at that cost. The loop ends when no enemy still in staging has an engagement cost at or below any seat's threat.
-6. Combat. Deal a shadow card face down to each engaged enemy. Reveal a shadow when that enemy attacks: after the defender is declared, or the attack is undefended, and before damage. (Learn to Play p16, step c.) A shadow card is discarded when its enemy leaves play, and every shadow card not yet used is discarded at the end of the combat phase. Resolve every enemy attack in seat order, then resolve every player attack in seat order.
-7. Refresh. Ready exhausted cards. Raise each seat's threat by 1. Pass the first-player token.
-
-Threat 50 eliminates that seat. A seat with no heroes in play is eliminated. If no seat remains, the players lose. The One Ring leaving play loses the game. Quest points met advances or flips the stage as the script says. Re-read this round against the Learn to Play before freezing it. Where that book disagrees, the book wins.
+- A `ReduceOpeningHand` Setup record (141078 Gandalf's Delay) runs with player Setup, before the opening hand, so the hand and a mulligan redraw are 6 minus the reduction. The booklet orders player Setup before the hand and encounter Setup before the quest card's Setup, and says nothing about encounter Setup against the hand. User-accepted reading.
+- Saga staging reveals one encounter card per seat, in seat order. "You" on an encounter card is the seat that revealed it. Surge: the same seat reveals another card. Doomed X raises every seat's threat. Peril: the other seats cannot act or trigger responses while that card's staging resolves.
+- An engagement check engages the enemy in staging with the highest engagement cost at or below the seat's threat. The first player chooses among ties.
+- A shadow card is discarded when its enemy leaves play, and every unused one at the end of combat.
+- A quest shortfall raises the threat of every seat still in the game. An eliminated seat is not raised. Breaking of the Fellowship stage 2B may override this. The core round does not.
+- A revealed treachery or treasure stays in staging.
 
 ### Keywords implemented once
 
-These live in `src/rules`, not in a card file.
+These live in `src/rules`, not in a card file. Each names its rule ids in its module header.
 
-- **Surge, doomed, peril.** See staging above.
-- **Archery X.** At the start of combat the engine totals X across every archery card in play. The player distributes that total across legal characters. The first seat decides disputes. The amounts must sum to the total. Defense does not block it.
-- **Immune to player card effects.** Player cards do not affect it and cannot choose it as a target. On The Ring Goes South stage 4, an effect that targets "the active location" can target only the active location that is not Doors of Durin.
-- **Indestructible.** MEC109 defines this for an enemy. Damage does not destroy that enemy, including at full hit points. Do not extend it to other card types unless a card in this box prints the keyword there. Cite that card.
-- **Toughness X.** MEC109 defines this for an enemy. Each time that enemy is assigned damage, it takes X less.
-- **Permanent.** A boon or burden with this keyword is attached to one hero when it is earned, and that hero is recorded on the log. It is not left in the pool. It cannot be discarded while that hero is in play. If the hero leaves play, the attachment is removed from the game.
-- **Setup.** See core round.
-- **Victory.** Standard victory-display rules from the Learn to Play.
-- **Sentinel, ranged.** Standard combat range from the Learn to Play.
-- **Hide X.** A framework frame the scenario script requests. See below. Not a one-off in a card file.
+| Keyword | Rule ids |
+| --- | --- |
+| Surge, doomed, peril | `rr.surge`, `rr.doomed-x`, `mec109.peril` |
+| Archery X | `rr.ranged`, `ltp.attack-strength` |
+| Immune to player card effects | `rr.immune`, `mec109.indestructible` |
+| Indestructible, toughness X | `mec109.indestructible` |
+| Permanent | `ltp.permanent`, `rr.campaign-setup-checklist` |
+| Victory | `ltp.victory-x` |
+| Sentinel, ranged | `rr.sentinel`, `rr.ranged` |
+| Hide X | `mec109.hide-x`, `mec109.hide-tests` |
+
+Decisions this file owns:
+
+- Archery X: the engine totals X across every archery card at the start of combat and the player distributes that total across legal characters; the first seat decides disputes; defense does not block it.
+- Indestructible and toughness X are defined here for enemies only. Extend them to another card type only when a card prints the keyword there, and cite that card.
+- A Permanent boon or burden is attached to one hero when earned and recorded on the log; it cannot be discarded while that hero is in play, and it leaves the game with the hero.
+- On The Ring Goes South stage 4, an effect that targets "the active location" can target only the active location that is not Doors of Durin (immune to player card effects).
 
 ## Fellowship of the Ring
 
@@ -283,19 +294,15 @@ This is a transaction, not a notes field. On a win the player chooses one of:
 - `Gandalf's Delay` or `The Ring Draws Them`, then
 - `Gildor Inglorion` or `Mr. Underhill`.
 
-Each chosen card is added to the campaign pool and recorded on the log. Look up the current RingsDB codes while building the catalog. In the TBR pack fetched for this brief they were campaign-type cards in the 1410xx range (`141077` Gildor Inglorion, `141078` Gandalf's Delay, `141079` The Ring Draws Them). Confirm against the live payload, including Mr. Underhill, which was not pinned here. Do not hardcode a code you have not just read from the catalog build.
+Each chosen card is added to the campaign pool and recorded on the log.
 
-The fixture names each reward group by card name. The catalog build resolves a name to the code of the one dealt card with that name, and fails when none or several match. The scenario definition holds the codes. After a win the reducer opens one resolution window per group, in order, and `ChooseResolution` carries a code from that group. A scenario that is lost writes nothing. A scenario already on the log is not granted again. A chosen Permanent card is recorded as attached, not as a pool card.
+`data/campaigns/fellowship-of-the-ring.json` authors each reward group by card code in its `authored.resolution` block. `data:build` fails when a code is not one of the scenario's cards. The scenario definition holds the codes. After a win the reducer opens one resolution window per group, in order, and `ChooseResolution` carries a code from that group. A scenario that is lost writes nothing. A scenario already on the log is not granted again. A chosen Permanent card is recorded as attached, not as a pool card.
 
-Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury Ferry: after it leaves play explored, the players win. MEC109/TFotR printing read via Hall of Beorn 2026-10-24. Confirm on the card.
+Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury Ferry: after it leaves play explored, the players win.
 
 ### Hide tests
 
-When an encounter card with Hide X is revealed, the revealing seat makes a Hide test before that card's When Revealed or Forced effect.
-
-The seat may exhaust any number of characters it controls to commit them. Discard the top X cards of the encounter deck. Sum committed willpower. Sum the threat of the discarded cards. A treachery adds 0. After that total is known, an action window opens. Then the test succeeds if willpower is greater than or equal to threat, and fails otherwise. Characters are then uncommitted. The frame pops, and the rest of the revealed card resolves.
-
-This is not a token the player tracks by hand. The Tristan example in the booklet is the fixture: Hide 3, 2 willpower committed, discarded threat 2 + 2 + 0, an action raises willpower to 4, the test succeeds.
+The rule is `mec109.hide-x` and `mec109.hide-tests`, with the worked example (Hide 3, 2 willpower committed, discarded threat 2 + 2 + 0, an action raises willpower to 4, the test succeeds) as the fixture. The engine runs it as a frame: the revealing seat tests before that card's When Revealed or Forced effect, an action window opens after the discarded threat is known, then the frame pops and the rest of the revealed card resolves. A treachery adds 0 threat. This is not a token the player tracks by hand.
 
 ### Flight to the Ford burden deck and life
 
@@ -406,9 +413,9 @@ type Effect = {
 
 An Action or Response may name a `cost` (exhaust or discard the card, add it to the victory display, or pay resources from the heroes the player names) and a `limit`. The cost is paid when the effect is triggered, and the use is recorded for the limit. A Response window offers each Response a seat may use after an event; a pass gives up all of that seat's offers for it. Peril limits who is offered. Instructions are engine verbs. The verb list grows when a dealt card or a starter card needs a verb. That growth stays inside this interpreter. There is no second language. Scenario 1 needs static modifiers, a response trigger, cancel, and delayed instructions.
 
-The Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog`. `src/effects` holds the authored records. The interpreter takes the effect list as an argument and does not import `src/effects`. Vitest passes the TypeScript records. The phone loads rows from `catalog.db` and passes those. The build script is the only production writer of that table.
+The Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog`. `src/effects` exports the generated records plus the authored ones, an authored id replacing a generated one. The interpreter takes the effect list as an argument and does not import `src/effects`; `src/campaign`, `src/play` and `src/screens` import it and pass it in. There is no effects table in `catalog.db`.
 
-Gandalf's Delay (141078) has two Setup records: the placement in staging, and `ReduceOpeningHand` amount 1. It is cited to MEC109 #46 as read via Hall of Beorn's TFotR printing on 2026-10-24 (user-accepted). The user waived a physical-card check on 2026-10-24. RingsDB's row for 141078 differs from the MEC109 printing on the starting-hand rule; the MEC109 printing wins (user decision), and the RingsDB wording is not stored in git. The engine applies it with player Setup, before the opening hand, so the opening hand and a mulligan redraw both draw 6 minus the reduction.
+Gandalf's Delay (141078) has two Setup records: the placement in staging, and `ReduceOpeningHand` amount 1. It is cited to MEC109 #46 (user-accepted). RingsDB's row for 141078 differs from the MEC109 printing on the starting-hand rule; the MEC109 printing wins (user decision). The engine applies it with player Setup, before the opening hand, so the opening hand and a mulligan redraw both draw 6 minus the reduction.
 
 3. **Player cards with no effect row.** The card can be paid for, played, quested, defended, and attacked with using printed numbers and implemented keywords. Its unique sentence is inactive: it is shown, it is not offered, and there is no sheet on which the player applies it. The mark is the absence of the row. When the row exists, the ability becomes a normal legal intent or a normal engine step.
 
@@ -420,27 +427,26 @@ Forced effects in the current window run in timestamp order. Responses are offer
 
 ### Coverage test
 
-The coverage job builds `catalog.db` before Vitest. The database stays gitignored. A campaign is not marked playable unless that test loads its quest deck, encounter deck, burden deck, and the seeded starter decks, and every Setup, Forced, When Revealed, Response, Action, and shadow on those cards has an effect id. A player deck that contains other official cards does not fail this test. In play, each of those other cards keeps its printed numbers and implemented keywords, and its unique text stays inactive.
+`scripts/effect-coverage.test.ts` reads the printed lines from `data/cards` and the dealt cards from `data/scenarios`, with no database. A campaign is not marked playable unless that test finds an effect record for every printed line on its quest deck, encounter deck, burden deck, and the seeded starter decks, and for every Setup, Forced, When Revealed, Response, Action, Travel and shadow label by timing. `pnpm effects:draft <scenario>` writes a bundle under `.agent/drafts` for each line no template reads; the `effect-author` agent turns a bundle into authored records. A player deck that contains other official cards does not fail this test. In play, each of those other cards keeps its printed numbers and implemented keywords, and its unique text stays inactive.
 
 Author effects in scenario order. Scenario 1 and both starter decks are the first playable slice. Scenarios 2 through 6 reuse the keyword framework.
 
 ## Data sources
 
-| Need | Source | Notes |
-| --- | --- | --- |
-| Packs | `GET https://ringsdb.com/api/public/packs/` | Drop names that start with `ALeP - `. |
-| Cards | `GET https://ringsdb.com/api/public/cards/{pack}.json` | One file per pack. TBR is 29 records and mixes heroes with campaign-type cards. |
-| Card images | `https://ringsdb.com` + `imagesrc` | The hosted file is the asset. See Card images. Sniff the bytes. The `.png` name is often a JPEG. |
-| One decklist | `GET https://ringsdb.com/api/public/decklist/{id}.json` | Import only. |
-| Encounter composition | Hall of Beorn scenario pages, e.g. `https://hallofbeorn.com/LotR/Scenarios/A-Shadow-of-the-Past`, checked against the quest cards and the booklet | HTML. `ScenarioDetails` returns difficulty statistics, not the card list. There is no RingsDB `/api/public/scenarios/` index. Do not block on a numeric scenario id. |
-| Procedures | MEC109 booklet and the core-set Learn to Play, supplied by the player as PDFs | The app does not fetch the Asmodee CDN, does not ship either file in the APK or IPA, and does not commit it. The campaign-log footer allows photocopying for personal use. Encode procedures. The reader is for the person holding the phone. |
-| Ordinary round | Core-set Learn to Play | The booklet points at pages 28–30 for campaign mode. |
+`data/sources.json` lists every source with its URL, its pin (a sha256, or a git commit for the DragnCards plugin) and when it was fetched. `pnpm data:sync` is the only command that uses the network; it refreshes `data/raw/` (verbatim snapshots) and `.cache/pdf/` (the rule PDFs, not committed), and `pnpm data:build` turns them into `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules` and `src/effects/generated` without it. `pnpm data:check` fails when a fresh build differs from what is committed.
 
-RingsDB states that the texts are copyrighted by Fantasy Flight Games and that the API is for tools that complement the game. The release script may fetch them to build `catalog.db`. Do not commit the payload. Do not point image URLs at DragnCards.
+| Need | Source |
+| --- | --- |
+| Packs, player cards, codes, errata, RingsDB images | RingsDB public API |
+| Every card as typed JSON, the MEC109 printing, Normal, Easy and Nightmare counts per scenario | Hall of Beorn export |
+| Card database, scenario load lists by pile, framework steps, automation snippets, card art | DragnCards LOTR plugin |
+| Procedures and definitions | MEC109 booklet, core-set Learn to Play, Rules Reference, FAQ, Easy mode, campaign log (PDFs, extracted per page) |
 
-Hall of Beorn's headings and the booklet's encounter-set list do not always match. The scenario script is the reconciliation, done by hand. A test asserts the built Normal deck size against the count you verified. Do not generate the script from the HTML at runtime.
+Sources disagree. The build cross-checks them (Hall of Beorn counts against the DragnCards load lists, piles against the quest card's Setup text) and a scenario that fails a check is not written. Each resolved disagreement is a row in `data/overrides.json` with its reason and source.
 
-Prefer `has_errata` text. Record the RingsDB pack `code` and the fetch date in a `meta` row inside `catalog.db`.
+RingsDB states that the texts are copyrighted by Fantasy Flight Games and that the API is for tools that complement the game.
+
+Prefer `has_errata` text. `data/sources.json` records the fetch date; `catalog.db` carries it in a `meta` row.
 
 Snapshot the card codes a scenario actually dealt into the save at scenario start, so a later catalog rebuild cannot rewrite a game in progress.
 
@@ -450,7 +456,7 @@ The asset is the file RingsDB already hosts at `imagesrc`. On 23 Oct 2026 that w
 
 `GET /api/public/cards/` that day returned 1,107 official rows after dropping pack names that start with `ALeP`. 1,039 of them had an `imagesrc`. A content-length pass got 1,014 of those files, summing to 416.5 MB. The other 25 answered 503. Filling those from the median of their type puts the official player-card image set at about 420 MB. The median file was 152 KB. Allies, attachments, events, and heroes sit near 150 KB. Treasure rows sit near 550 KB and are why the mean is higher. Quest and encounter images are not in that 420 MB. They use the same kind of file and the same cache, and they are extra storage once their URLs are known.
 
-Download with `File.createDownloadTask` from `expo-file-system` into the document directory. Persist `DownloadPauseState` so a kill mid-file can resume. Cap concurrency and retry a 503. `user.db` `image_files` stores code, path, width, height, byte size, media type, and sha256. SQLite does not store the bytes. A catalog update deletes a file only when that code's hash changed. One local function sets `isExcludedFromBackup` on the image directory and does nothing else. About 420 MB of player-card art, plus quest and encounter art, must not enter an iCloud backup. Do not commit the files, and do not hotlink DragnCards.
+Download with `File.createDownloadTask` from `expo-file-system` into the document directory. Persist `DownloadPauseState` so a kill mid-file can resume. Cap concurrency and retry a 503. `user.db` `image_files` stores code, path, width, height, byte size, media type, and sha256. SQLite does not store the bytes. A catalog update deletes a file only when that code's hash changed. One local function sets `isExcludedFromBackup` on the image directory and does nothing else. About 420 MB of player-card art, plus quest and encounter art, must not enter an iCloud backup. Do not commit the files.
 
 Keep the files out of the APK. A JPEG does not shrink inside the zip, so packing the player-card set in would add about 420 MB and put the package near half a gigabyte. The APK is the Expo binary, Skia, and `catalog.db`. `catalog.db` is a few megabytes. The native shell has not been built. A release APK for one ABI, with Expo and Skia, is expected around 50–80 MB. Treat that range as an estimate until a build exists.
 
@@ -500,7 +506,7 @@ Do these in order. Do not start the Skia table before step 3 is green. Do not st
 ### 1. Catalog script and a phone that can open it
 
 - `scripts/build-catalog.ts` writes `assets/catalog.db` from RingsDB for every non-ALeP pack, with `deck_legal` set from the type list above.
-- Fellowship encounter and quest rows for scenario 1 are loaded from the hand-checked fixture, not from a live HTML parse.
+- Fellowship encounter and quest rows for scenario 1 are loaded from `data/scenarios`, not from a live HTML parse.
 - The app opens on a device, `SQLiteProvider` copies the file, and a screen lists packs and a card by code.
 - `user.db` migrates beside it.
 - The ESLint import boundary is on in this step.
@@ -524,7 +530,7 @@ Its own change, after step 1, before the table. Not polish on the catalog script
 
 Vitest fixtures, no React. Two-handed seats exist in the state even if every assertion is true solo.
 
-- Setup builds the Normal encounter deck from the checked counts and runs the quest card's setup. Lines to re-read on the quest card before freezing the fixture, currently taken from Hall of Beorn: attach Mr. Underhill to the Ring-bearer; add Gandalf's Delay to staging; shuffle Gildor Inglorion and The Ring Draws Them into the encounter deck; set Bucklebury Ferry aside; one Black Rider in staging; Bag End is the active location. Assert the built Normal deck size.
+- Setup builds the Normal encounter deck from `data/scenarios` and runs the quest card's setup: attach Mr. Underhill to the Ring-bearer; add Gandalf's Delay to staging; shuffle Gildor Inglorion and The Ring Draws Them into the encounter deck; set Bucklebury Ferry aside; one Black Rider in staging; Bag End is the active location. `data:build` already checks those piles against the quest card's Setup text. Assert the built Normal deck size.
 - A scripted Hide 3 fails, and the booklet's success line (2 willpower, discarded threat 4, an action raises willpower to 4) passes. The action window is after the threat total is known. Hide runs before When Revealed on that card.
 - Staging reveals one card for one seat. Surge reveals another for that same seat. Both are engine steps. A player intent cannot reveal an extra card.
 - Quest resolution places progress on the active location first, and raises every living player's threat by the computed difference when staging threat is higher. An intent that supplies its own progress or threat number is rejected.
@@ -563,19 +569,19 @@ A new folder, `register()`, encounter rows, scripts, effects. Bump the catalog v
 
 Work down the build order. Stop at the end of a step whose exit check is green. Do not scaffold later steps "so the structure is ready."
 
-- Treat a missing source as a failing test, not as a guess. If you cannot point at the booklet, the quest card, or the Learn to Play for an effect's timing, do not write the effect. Leave the coverage test red and name the card.
-- Freeze scenario 1's deck list as a checked-in JSON fixture of codes and counts. Produce it while looking at the quest cards and the booklet together.
-- Confirm every RingsDB code at catalog-build time. Codes in this file are from one TBR fetch. They are hints.
-- Put `CATALOG_VERSION` in source next to the asset, written by the build script, and store the applied version in `user.db`.
-- Gitignore `assets/catalog.db`, RingsDB payload caches, card images, booklet PDFs, and `agent-tools/`. Research extracts of the booklet are not source. The app does not fetch a booklet and does not parse one into rules.
+- Treat a missing source as a failing test, not as a guess. If you cannot point at a rule id or the quest card for an effect's timing, do not write the effect. Leave the coverage test red and name the card.
+- Scenario decks are `data/scenarios/*.json`, generated and cross-checked. Do not hand-edit them; fix the source or add an override with a reason.
+- Codes come from `data/cards`. Query it with `pnpm data:query`.
+- `CATALOG_VERSION` is a hash of the catalog rows, written to `src/catalog/version.ts` by `pnpm catalog:build` and checked by a test. The phone stores the applied version in `user.db` and replaces the catalog when the two differ.
+- Gitignore `assets/catalog.db`, `.cache/`, card images, booklet PDFs, and `.agent/`. The app does not fetch a booklet and does not parse one into rules.
 - Add the ESLint boundary in step 1, before the first component imports the reducer.
 - Keep the phase rail as text steps the engine advances. Widgets for The One Ring, Hide, the life tracker, the burden deck, and the second active location are declared by the scenario script. The life number and the threat number change only through engine steps.
 - Do not add a manual resolver, a "I dealt 3 damage" control, or a resource plus button. If a test can pass only by letting the UI write a token field, the test is wrong.
 - When a rule in this file and the booklet disagree, change this file. Do not leave both wordings alive.
 - Do not implement the Skia table, the image library, or scenarios 2–6 in the same change as the catalog script. The image library is a required data set, not a later polish pass.
-- The app is not a DragnCards client. If a DragnCards file seems to already solve a rule, ignore it and encode the booklet.
+- The app is not a DragnCards client. DragnCards data is a source and its automation snippets are reference for effect drafts. Where it seems to solve a rule, encode the booklet's rule and cite the rule id.
 - Do not add a backend because the engine is authoritative. Authority means the reducer is the only writer. It does not mean the reducer moves to a server.
-- Ship the RingsDB image as the card art. Do not block the build on a 300 dpi scan, and do not put the image bytes in the APK.
+- Ship the RingsDB image as the card art, and the DragnCards or Hall of Beorn scan where RingsDB has none. Do not block the build on a 300 dpi scan, and do not put the image bytes in the APK.
 - Do not defer frame rate. If the pool or the drag hitches, stop and fix it before the next scenario. Do not add a second animation library, a view per card, or a startup task that blocks the first paint.
 
 ## Definition of done for the proof of concept

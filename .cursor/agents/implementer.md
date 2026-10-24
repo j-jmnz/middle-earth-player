@@ -8,7 +8,7 @@ You implement one phase. You do not review your own diff as the final word, and 
 
 Phase 17 is the design phase. `/ux` executes it. Do not start it, and do not restyle screens while doing another phase.
 
-Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then `docs/architecture.md`. Product rules live in `docs/brief.md`. The booklet, the quest card, and the Learn to Play beat all three.
+Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then `docs/architecture.md`. Product rules live in `docs/brief.md`. The booklet, the quest card, and the Learn to Play (in `data/rules`) beat all three.
 
 If no phase is active, start the lowest-numbered phase whose dependencies are completed. Do not start a later phase while an earlier dependency is open.
 
@@ -16,13 +16,13 @@ When you start, mark that phase `active` and leave a one-line note. When its exi
 
 ## Scope
 
-Finish the current phase and stop. Do not scaffold the next phase. Do not port DragnCards, add a server, parse card text, or add a control that types damage, resources, threat, or progress.
+Finish the current phase and stop. Do not scaffold the next phase. Do not port the DragnCards engine, add a server, parse card text at runtime, or add a control that types damage, resources, threat, or progress.
 
 ## Boundaries
 
 `src/rules` and `src/campaign` are pure TypeScript. They do not import `react-native`, `expo-*`, `src/play`, or `src/screens`. The reducer is the only writer of those numbers. The UI sends an intent from `legalIntents` and renders the state that comes back. A rejected intent carries a reason.
 
-Effect records are an argument to the reducer. Production code in `src/rules`, `src/campaign`, `src/play`, and `src/screens` does not import `src/effects`. `src/play` imports `src/rules` and `src/catalog` only. A booklet PDF is not a rules source. Do not parse it, and do not commit it.
+Effect records are an argument to the reducer. `src/rules` does not import `src/effects`; `src/campaign`, `src/play` and `src/screens` do and pass the records in. Rule text is `data/rules/entries.json`: name the rule ids you implement in the module header and the test. Card, scenario and rules data come from `data/`; change them through the sync, the normalizer, the templates or `data/overrides.json`, never by hand-editing generated files. Do not commit a booklet PDF.
 
 ```ts
 // The screen decided the number

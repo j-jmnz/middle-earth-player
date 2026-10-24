@@ -2,16 +2,26 @@
 
 The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
 
+## Data
+
+`data/` is committed and is the only thing tests and agents read for cards, scenarios and rules text. Sources are listed in `data/sources.json`.
+
+- `pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules]` is the only command that uses the network. It refreshes `data/raw/` and `.cache/pdf/`.
+- `pnpm data:build` is offline and deterministic: raw to `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules`, and `src/effects/generated`. `pnpm data:build -- --verbose` lists the scenarios whose cross-checks failed.
+- `pnpm data:check` rebuilds into a temporary directory and fails on any difference. CI runs it.
+- `pnpm data:query "<sql>"` queries tables `cards`, `scenario_cards` and `rules` in memory. Rules text is `select id, title, text from rules where ...`.
+- `pnpm effects:draft <scenario-id>` writes `.agent/drafts/<code>.md` for each printed line with no effect record. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
+
 ## Commands
 
-- `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file.
+- `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
 - `pnpm lint` checks import boundaries.
-- `pnpm catalog:build` writes `assets/catalog.db` from RingsDB. Do not commit it.
+- `pnpm catalog:build` writes `assets/catalog.db` and `src/catalog/version.ts` from `data/`. Do not commit `catalog.db`. Commit `version.ts` when it changes; a test checks it.
 
 ## Agents
 
-`implementer`, `reviewer`, and `ux` in `.claude/agents` wrap the files in `.cursor/agents`. Edit the Cursor file to change an agent's behavior. After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed.
+`implementer`, `reviewer`, and `ux` in `.claude/agents` wrap the files in `.cursor/agents`. Edit the Cursor file to change an agent's behavior. After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. `effect-author` is a Claude agent only.
 
 ## Cloud sessions
 
-`.claude/hooks/session-start.sh` installs dependencies and builds the catalog. A cloud session has no phone, simulator, or Maestro. Phone checks in a phase exit stay open. Say so in `docs/phases/STATUS.md` instead of marking them done.
+`.claude/hooks/session-start.sh` installs dependencies. A cloud session has no phone, simulator, or Maestro. Phone checks in a phase exit stay open. Say so in `docs/phases/STATUS.md` instead of marking them done.

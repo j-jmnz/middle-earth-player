@@ -40,7 +40,7 @@ describe("rules store", () => {
     expect(steps.find((step) => step.id === "6.E")?.entries.length).toBeGreaterThan(1);
   });
 
-  it("knows every rule id that src/rules names", () => {
+  it("knows every rule id that src/rules and docs/brief.md name", () => {
     const known = new Set(entries.map((entry) => entry.id));
     const found = new Set<string>();
     const walk = (dir: string): void => {
@@ -51,6 +51,7 @@ describe("rules store", () => {
       }
     };
     walk(path.join(ROOT, "src", "rules"));
+    for (const match of readFileSync(path.join(ROOT, "docs", "brief.md"), "utf8").matchAll(/`((?:rr|ltp|mec109|faq)\.[a-z0-9][a-z0-9-]*)`/g)) found.add(match[1] ?? "");
     expect(found.size).toBeGreaterThan(10);
     for (const id of found) expect(known.has(id), id).toBe(true);
   });
