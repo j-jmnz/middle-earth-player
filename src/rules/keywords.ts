@@ -25,13 +25,14 @@ export function modifiedStat(
 
 export function addModifier(
   state: ScenarioState,
+  instanceId: string,
   sourceId: string,
   stat: ModifierStat,
   amount: number,
   until: ModifierUntil,
 ): ScenarioState {
-  if (!state.cards[sourceId]) return state;
-  return { ...state, modifiers: [...state.modifiers, { instanceId: sourceId, sourceId, stat, amount, until }] };
+  if (!state.cards[instanceId]) return state;
+  return { ...state, modifiers: [...state.modifiers, { instanceId, sourceId, stat, amount, until }] };
 }
 
 export function placedAmount(printed: PrintedCard, amount: number): number {

@@ -2,9 +2,20 @@ import type { Effect } from "../../catalog/boundary.ts";
 
 // Encounter set A Shadow of the Past (MEC109 encounter cards 31-43, codes 141031-141043).
 // Read via Hall of Beorn 2026-10-24, TBR printing. Confirm on the cards.
-// Constant, travel, response, and shadow timings are not authored here.
+// Constant, travel, and response timings are not authored here.
+
+// Shadow instructions run for the defending seat. Their modifiers end with the attack.
+const ATTACK_PLUS_ONE: Effect["instructions"] = [
+  { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker" },
+];
+const ATTACK_PLUS_ONE_MORE_IF_HIDE_FAILED: Effect["instructions"] = [
+  ...ATTACK_PLUS_ONE,
+  { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker", when: { kind: "hideFailed", scope: "round" } },
+];
 
 export const A_SHADOW_OF_THE_PAST_EFFECTS: readonly Effect[] = [
+  // 141036 Green Hill Country, shadow.
+  { id: "141036:shadow:1", cardCode: "141036", timing: "shadow", instructions: ATTACK_PLUS_ONE_MORE_IF_HIDE_FAILED },
   // 141033 Stock-brook.
   {
     id: "141033:whenRevealed:1",
@@ -19,6 +30,15 @@ export const A_SHADOW_OF_THE_PAST_EFFECTS: readonly Effect[] = [
     timing: "forced",
     trigger: "hideFailed",
     instructions: [{ verb: "ShuffleIntoDeck", trait: "Nazgûl" }],
+  },
+  // 141038 The Marish, shadow.
+  { id: "141038:shadow:1", cardCode: "141038", timing: "shadow", instructions: ATTACK_PLUS_ONE_MORE_IF_HIDE_FAILED },
+  // 141040 Evil Crow, shadow.
+  {
+    id: "141040:shadow:1",
+    cardCode: "141040",
+    timing: "shadow",
+    instructions: [{ verb: "ConsiderUndefended", when: { kind: "hideFailed", scope: "round" } }],
   },
   // 141039 Black Rider.
   {
@@ -36,6 +56,8 @@ export const A_SHADOW_OF_THE_PAST_EFFECTS: readonly Effect[] = [
     timing: "whenRevealed",
     instructions: [{ verb: "UncommitAll", who: "actor", when: { kind: "hideFailed", scope: "phase" } }],
   },
+  // 141041 Crawling Towards Him, shadow.
+  { id: "141041:shadow:1", cardCode: "141041", timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] }] },
   // 141042 Hunting for the Ring.
   {
     id: "141042:whenRevealed:1",

@@ -24,4 +24,14 @@ export const THE_RING_EFFECTS: readonly Effect[] = [
       },
     ],
   },
+  // 141076 Lure of the Ring, shadow.
+  {
+    id: "141076:shadow:1",
+    cardCode: "141076",
+    timing: "shadow",
+    instructions: [
+      { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker" },
+      { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker", when: { kind: "exhausted", code: "141085", is: true } },
+    ],
+  },
 ];

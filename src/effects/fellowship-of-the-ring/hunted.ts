@@ -6,6 +6,13 @@ import type { Effect } from "../../catalog/boundary.ts";
 const NAZGUL = "Nazgûl";
 
 export const HUNTED_EFFECTS: readonly Effect[] = [
+  // 141072 Pathless Country, shadow.
+  {
+    id: "141072:shadow:1",
+    cardCode: "141072",
+    timing: "shadow",
+    instructions: [{ verb: "AfterAttack", instructions: [{ verb: "EngageNextPlayer" }, { verb: "ImmediateAttack" }] }],
+  },
   // 141073 Piercing Cry.
   {
     id: "141073:whenRevealed:1",
@@ -31,4 +38,6 @@ export const HUNTED_EFFECTS: readonly Effect[] = [
       { verb: "ShuffleEncounterDeck" },
     ],
   },
+  // 141073 Piercing Cry, shadow.
+  { id: "141073:shadow:1", cardCode: "141073", timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack" }] }] },
 ];

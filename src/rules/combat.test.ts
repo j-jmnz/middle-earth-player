@@ -82,19 +82,21 @@ describe("combat", () => {
     const orc = enemy("orc", { code: "orc", name: "Orc", type: "enemy", attack: 2, health: 8 });
     const ctx = { effects: [effect], cards: cardMap([orc, hero("aragorn", "leadership", 10, 1), definePrinted({ code: "shade", name: "Shade", type: "treachery" })]) };
     const opened = expectOk(reduce(state, { type: "DeclineEngage" }, ctx));
-    const frames = opened.steps.filter((step) => step.kind === "push" || step.kind === "pop");
+    // The shadow card stays face down until the defender is declared or the attack is undefended.
+    expect(opened.steps.some((step) => step.kind === "push")).toBe(false);
+    expect(opened.state.window?.kind).toBe("defense");
+    const hit = expectOk(reduce(opened.state, { type: "Undefended" }, ctx));
+    const frames = hit.steps.filter((step) => step.kind === "push" || step.kind === "pop");
     expect(frames.map((step) => `${step.kind}:${step.kind === "push" || step.kind === "pop" ? step.frame : ""}`)).toEqual([
       "push:shadow",
       "push:ResolveEffect",
       "pop:ResolveEffect",
       "pop:shadow",
     ]);
-    expect(opened.steps.some((step) => step.kind === "damage")).toBe(false);
-    expect(opened.state.stack).toEqual([]);
-    const hit = expectOk(reduce(opened.state, { type: "Undefended" }, ctx));
-    expect(hit.steps.some((step) => step.kind === "push")).toBe(false);
+    expect(hit.state.stack).toEqual([]);
     expect(hit.state.cards[ids.aragorn ?? ""]?.damage).toBe(2);
-    expect(hit.steps.some((step) => step.kind === "damage")).toBe(true);
+    const popAt = hit.steps.findIndex((step) => step.kind === "pop" && step.frame === "shadow");
+    expect(hit.steps.findIndex((step) => step.kind === "damage")).toBeGreaterThan(popAt);
   });
 
   it("runs a shadow effect and not When Revealed, then pops before attack damage", () => {
@@ -118,25 +120,22 @@ describe("combat", () => {
       ]),
     };
     const opened = expectOk(reduce(state, { type: "DeclineEngage" }, ctx));
-    const popAt = opened.steps.findIndex((step) => step.kind === "pop");
-    const attackAt = opened.steps.findIndex((step) => step.kind === "attack");
-    expect(opened.steps.filter((step) => step.kind === "damage")).toEqual([
-      { kind: "damage", targetId: ids.orc, amount: 1 },
-    ]);
-    expect(popAt).toBeGreaterThan(opened.steps.findIndex((step) => step.kind === "damage"));
-    expect(attackAt).toBeGreaterThan(popAt);
-    expect(opened.steps.some((step) => step.kind === "push" && step.frame === "whenRevealed")).toBe(false);
-    expect(opened.state.cards[ids.orc ?? ""]?.damage).toBe(1);
-    expect(opened.state.cards[ids.aragorn ?? ""]?.damage).toBe(0);
-    expect(opened.state.stack).toEqual([]);
+    expect(opened.steps.some((step) => step.kind === "damage")).toBe(false);
     const hit = expectOk(reduce(opened.state, { type: "Undefended" }, ctx));
-    expect(hit.steps.some((step) => step.kind === "push" || step.kind === "pop")).toBe(false);
-    expect(hit.steps.some((step) => step.kind === "damage")).toBe(true);
+    const popAt = hit.steps.findIndex((step) => step.kind === "pop");
+    expect(hit.steps.filter((step) => step.kind === "damage")).toEqual([
+      { kind: "damage", targetId: ids.orc, amount: 1 },
+      { kind: "damage", targetId: ids.aragorn, amount: 2 },
+    ]);
+    expect(popAt).toBeGreaterThan(hit.steps.findIndex((step) => step.kind === "damage"));
+    expect(popAt).toBeLessThan(hit.steps.findIndex((step) => step.kind === "damage" && step.targetId === ids.aragorn));
+    expect(hit.steps.some((step) => step.kind === "push" && step.frame === "whenRevealed")).toBe(false);
     expect(hit.state.cards[ids.aragorn ?? ""]?.damage).toBe(2);
     expect(hit.state.cards[ids.orc ?? ""]?.damage).toBe(1);
+    expect(hit.state.stack).toEqual([]);
   });
 
-  it("does not defend or place attack damage after a shadow effect destroys the attacker", () => {
+  it("places no attack damage after a shadow effect destroys the attacker", () => {
     const effects: Effect[] = [{ id: "shade:shadow:4", cardCode: "shade", timing: "shadow", instructions: [{ verb: "DealDamage" }] }];
     function attacked(victory: number | null) {
       const { state, ids } = engageWindow({
@@ -154,17 +153,17 @@ describe("combat", () => {
         ]),
       };
       const opened = expectOk(reduce(state, { type: "DeclineEngage" }, ctx));
-      expect(opened.state.cards[ids.orc ?? ""]?.zone).toBe(victory == null ? "encounterDiscard" : "victory");
-      expect(opened.state.cards[ids.aragorn ?? ""]?.damage).toBe(0);
-      expect(opened.state.pendingAttack).toBeNull();
-      expect(opened.state.window?.kind).not.toBe("defense");
-      expect(opened.steps.filter((step) => step.kind === "damage")).toEqual([
+      const answered = expectOk(reduce(opened.state, { type: "Undefended" }, ctx));
+      expect(answered.state.cards[ids.orc ?? ""]?.zone).toBe(victory == null ? "encounterDiscard" : "victory");
+      expect(answered.state.cards[ids.aragorn ?? ""]?.damage).toBe(0);
+      expect(answered.state.pendingAttack).toBeNull();
+      expect(answered.state.window?.kind).not.toBe("defense");
+      expect(answered.steps.filter((step) => step.kind === "damage")).toEqual([
         { kind: "damage", targetId: ids.orc, amount: 1 },
       ]);
-      expect(opened.steps.some((step) => step.kind === "attack")).toBe(false);
-      const hit = reduce(opened.state, { type: "Undefended" }, ctx);
-      expect(hit.ok).toBe(false);
-      if (!hit.ok) expect(hit.state.cards[ids.aragorn ?? ""]?.damage).toBe(0);
+      const again = reduce(answered.state, { type: "Undefended" }, ctx);
+      expect(again.ok).toBe(false);
+      if (!again.ok) expect(again.state.cards[ids.aragorn ?? ""]?.damage).toBe(0);
     }
     attacked(null);
     attacked(3);

@@ -49,7 +49,7 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
     case "chooseEnemy":
       return [{ type: "ChooseEnemy" }];
     case "defense":
-      return [{ type: "DeclareDefender" }, { type: "Undefended" }];
+      return state.pendingAttack?.undefended ? [{ type: "Undefended" }] : [{ type: "DeclareDefender" }, { type: "Undefended" }];
     case "archery":
       return [{ type: "Distribute", total: window.total }];
     case "playerAttack":
@@ -75,6 +75,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
       return state.window?.kind === "chooseEnemy" ? state.window.options : [];
     case "DeclareDefender": {
       const seat = state.pendingAttack?.seat ?? state.activeSeat;
+      if (state.pendingAttack?.undefended) return [];
       return defenderIds(state, seat, ctx.cards);
     }
     case "Undefended":
@@ -221,6 +222,7 @@ function defenderReason(
   ctx: ReduceContext,
 ): string | null {
   if (state.window?.kind !== "defense" || !state.pendingAttack) return "That intent is not legal in this window";
+  if (state.pendingAttack.undefended) return "This attack is considered undefended";
   const defender = state.cards[intent.defenderId];
   if (!defender) return "That character cannot defend";
   if (defender.controller !== state.pendingAttack.seat) {

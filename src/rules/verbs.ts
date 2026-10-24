@@ -1,5 +1,6 @@
 import type { Instruction } from "../catalog/boundary.ts";
 
+import { runAttackVerb } from "./attack-verbs.ts";
 import { characters } from "./combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
 import { scheduleDelayed } from "./delayed.ts";
@@ -64,6 +65,10 @@ export function runExtraVerb(
       return markSurge(state, focus.sourceId);
     case "Delay":
       return scheduleDelayed(state, instruction, focus, ctx);
+    case "ConsiderUndefended":
+    case "AfterAttack":
+    case "EngageNextPlayer":
+      return runAttackVerb(state, instruction, focus, steps);
     default:
       return { ...state, failure: `Unimplemented instruction ${instruction.verb}` };
   }

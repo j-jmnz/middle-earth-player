@@ -96,3 +96,19 @@ export type DelayedEffect = {
 };
 
 export type HideFailure = { seat: number; round: number; phase: string };
+
+// The enemy attack in progress. `defenderId` and `heroId` stay empty until the player answers.
+export type PendingAttack = {
+  enemyId: string;
+  seat: number;
+  // An attack an effect started. It does not use up the enemy's attack for the phase.
+  immediate?: boolean;
+  defenderId?: string;
+  // The hero an undefended attack lands on.
+  heroId?: string;
+  // A shadow effect made the attack count as undefended.
+  undefended?: boolean;
+  shadowResolved?: boolean;
+  // Instructions to run, with the attacker as the source, when the attack ends.
+  after?: readonly Instruction[];
+};

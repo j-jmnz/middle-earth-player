@@ -32,6 +32,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return scope.returned === 0;
     case "phase":
       return (scope.phase ?? state.phase) === condition.is;
+    case "undefended":
+      return state.pendingAttack != null && (state.pendingAttack.defenderId == null || state.pendingAttack.undefended === true);
     case "searchable":
       return searchable(state, condition, ctx).length > 0;
   }

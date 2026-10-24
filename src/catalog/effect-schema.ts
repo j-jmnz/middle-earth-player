@@ -45,6 +45,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("noneReturned") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
+  // The attack in progress has no defender (declared or considered).
+  z.strictObject({ kind: z.literal("undefended") }),
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
 ]);
 
@@ -77,6 +79,8 @@ const modifyStatSchema = z.strictObject({
   stat: modifierStatSchema,
   amount: z.number().int(),
   until: modifierUntilSchema,
+  // Whose stat changes. The default is the source card. `attacker` is the enemy in the attack in progress.
+  target: z.enum(["self", "attacker"]).optional(),
   ...when,
 });
 
@@ -151,6 +155,10 @@ const simpleVerbs = [
   verb("GainSurge"),
   z.strictObject({ verb: z.literal("HideTest"), x: z.number().int().positive(), ...when }),
   verb("ImmediateAttack"),
+  // The attack in progress counts as undefended, even if a defender was declared.
+  verb("ConsiderUndefended"),
+  // The source enemy leaves the player it is engaged with and engages the next player.
+  verb("EngageNextPlayer"),
 ] as const;
 
 const simpleInstructionSchema = z.discriminatedUnion("verb", simpleVerbs);
@@ -176,13 +184,19 @@ const delaySchema = z.strictObject({
   instructions: z.array(simpleInstructionSchema),
 });
 
+// Instructions that run, with the attacking enemy as the source, once the attack in progress ends.
+const afterAttackSchema = z.strictObject({
+  verb: z.literal("AfterAttack"),
+  instructions: z.array(simpleInstructionSchema),
+});
+
 const forEachPlayerSchema = z.strictObject({
   verb: z.literal("ForEachPlayer"),
   order: z.enum(["lastFirst", "firstFirst"]),
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema])),
 });
 
-export const instructionSchema = z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, delaySchema, forEachPlayerSchema]);
+export const instructionSchema = z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, delaySchema, afterAttackSchema, forEachPlayerSchema]);
 
 export const timingSchema = z.enum([
   "setup",

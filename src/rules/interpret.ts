@@ -1,8 +1,9 @@
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 
 import type { EngineStep } from "./intents.ts";
-import { addModifier, placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
+import { placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
+import { modifyStat } from "./attack-verbs.ts";
 import { revealNow } from "./frames.ts";
 import { runSetupVerb } from "./setup-verbs.ts";
 import { engageEnemy, stagingEnemies, stagingLocations, travelTo } from "./quest.ts";
@@ -101,9 +102,7 @@ export function runInstruction(
     case "ResolveEffect":
       return withFrame(state, "ResolveEffect", focus.sourceId, false, (framed) => framed, steps);
     case "ModifyStat":
-      return focus.sourceId
-        ? addModifier(state, focus.sourceId, instruction.stat, instruction.amount, instruction.until)
-        : state;
+      return modifyStat(state, instruction, focus.sourceId);
     case "Exhaust": {
       const code = instruction.target?.code;
       const id = code ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id : focus.sourceId;

@@ -2,10 +2,10 @@ import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
-import { expireModifiers, livingSeats, updateCard } from "./state.ts";
-import { dealOneShadow, runEffects, type ReduceContext } from "./interpret.ts";
-import { withFrame } from "./windows.ts";
-import { inPlay, moveCard } from "./zones.ts";
+import { livingSeats, updateCard } from "./state.ts";
+import { dealOneShadow, type ReduceContext } from "./interpret.ts";
+import { resolveAttack } from "./shadow.ts";
+import { inPlay } from "./zones.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -58,41 +58,23 @@ export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: s
   return null;
 }
 
+// The shadow card is not turned up yet: it resolves once the defender is declared or the attack is undefended.
 export function beginEnemyAttack(
   state: ScenarioState,
   seat: number,
   enemyId: string,
-  ctx: ReduceContext,
+  _ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  let next = resolveShadow(state, enemyId, seat, ctx, steps);
-  if (next.lost) return next;
-  const attacker = next.cards[enemyId];
-  if (!attacker || attacker.zone !== "engaged") return next;
+  const attacker = state.cards[enemyId];
+  if (!attacker || attacker.zone !== "engaged") return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
   return {
-    ...next,
+    ...state,
     pendingAttack: { enemyId, seat },
     window: { kind: "defense", enemyId, seat },
     activeSeat: seat,
   };
-}
-
-function resolveShadow(
-  state: ScenarioState,
-  enemyId: string,
-  seat: number,
-  ctx: ReduceContext,
-  steps: EngineStep[],
-): ScenarioState {
-  const shadowId = state.cards[enemyId]?.shadowId;
-  if (!shadowId) return state;
-  let next = updateCard(state, shadowId, { face: "up" });
-  next = withFrame(next, "shadow", shadowId, false, (framed) => {
-    return runEffects(framed, shadowId, ["shadow"], seat, ctx, steps);
-  }, steps);
-  if (!next.cards[shadowId]) return next;
-  return moveCard(next, shadowId, { zone: "encounterDiscard" });
 }
 
 export function defenderIds(state: ScenarioState, attackedSeat: number, cards: Cards): string[] {
@@ -123,19 +105,9 @@ export function applyDefense(
   steps: EngineStep[],
 ): ScenarioState {
   const attack = state.pendingAttack;
-  if (!attack) return state;
-  const enemy = state.cards[attack.enemyId];
-  const defender = state.cards[defenderId];
-  if (!enemy || !defender) return state;
+  if (!attack || !state.cards[attack.enemyId] || !state.cards[defenderId]) return state;
   const exhausted = updateCard(state, defenderId, { exhausted: true });
-  const raw = Math.max(
-    0,
-    modifiedStat(exhausted, enemy, "attack", ctx.cards) - modifiedStat(exhausted, defender, "defense", ctx.cards),
-  );
-  let next = placeDamage(exhausted, defenderId, raw, ctx.cards, steps, "framework");
-  next = finishAttack(next, attack.enemyId);
-  if (next.lost) return next;
-  return next;
+  return resolveAttack({ ...exhausted, pendingAttack: { ...attack, defenderId } }, ctx, steps);
 }
 
 export function applyUndefended(
@@ -145,26 +117,8 @@ export function applyUndefended(
   steps: EngineStep[],
 ): ScenarioState {
   const attack = state.pendingAttack;
-  if (!attack) return state;
-  const enemy = state.cards[attack.enemyId];
-  if (!enemy) return state;
-  const amount = modifiedStat(state, enemy, "attack", ctx.cards);
-  let next = placeDamage(state, heroId, amount, ctx.cards, steps, "framework");
-  next = finishAttack(next, attack.enemyId);
-  return next;
-}
-
-function finishAttack(state: ScenarioState, enemyId: string): ScenarioState {
-  const done = expireModifiers(state, ["endOfAttack"]);
-  if (state.pendingAttack?.immediate || done.resolvedAttacks.includes(enemyId)) {
-    return { ...done, pendingAttack: null, window: null };
-  }
-  return {
-    ...done,
-    pendingAttack: null,
-    window: null,
-    resolvedAttacks: [...done.resolvedAttacks, enemyId],
-  };
+  if (!attack || !state.cards[attack.enemyId]) return state;
+  return resolveAttack({ ...state, pendingAttack: { ...attack, heroId } }, ctx, steps);
 }
 
 export function canAttack(

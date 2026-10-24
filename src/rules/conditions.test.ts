@@ -56,4 +56,13 @@ describe("conditions", () => {
     expect(holds(state, { kind: "engagedWithActor" }, { ...scope, sourceId: engaged.id, actor: 1 }, ctx)).toBe(true);
     expect(holds(state, { kind: "engagedWithActor" }, { ...scope, sourceId: engaged.id }, ctx)).toBe(false);
   });
+
+  it("reads whether the attack in progress has a defender", () => {
+    const state = idleScenario(1);
+    const attack = { enemyId: "e1", seat: 0 };
+    expect(holds(state, { kind: "undefended" }, scope, ctx)).toBe(false);
+    expect(holds({ ...state, pendingAttack: attack }, { kind: "undefended" }, scope, ctx)).toBe(true);
+    expect(holds({ ...state, pendingAttack: { ...attack, defenderId: "h1" } }, { kind: "undefended" }, scope, ctx)).toBe(false);
+    expect(holds({ ...state, pendingAttack: { ...attack, defenderId: "h1", undefended: true } }, { kind: "undefended" }, scope, ctx)).toBe(true);
+  });
 });

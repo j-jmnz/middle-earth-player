@@ -1,6 +1,6 @@
 import type { Instruction, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
 
-import type { DelayedEffect, Frame, HideFailure, Modifier } from "./frame-types.ts";
+import type { DelayedEffect, Frame, HideFailure, Modifier, PendingAttack } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 
 export type {
@@ -15,6 +15,7 @@ export type {
   HideFailure,
   HideResult,
   Modifier,
+  PendingAttack,
   QueueItem,
 } from "./frame-types.ts";
 
@@ -177,8 +178,7 @@ export type ScenarioState = {
   resolution: readonly { id: string }[];
   engagement: { ordinal: number; engagedThisPass: boolean } | null;
   resolvedAttacks: readonly string[];
-  // `immediate` marks an attack an effect started. It does not use up the enemy's attack for the phase.
-  pendingAttack: { enemyId: string; seat: number; immediate?: boolean } | null;
+  pendingAttack: PendingAttack | null;
   undo: UndoLog;
 };
 

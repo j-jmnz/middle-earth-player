@@ -29,4 +29,6 @@ export const THE_BLACK_RIDERS_EFFECTS: readonly Effect[] = [
       { verb: "GainSurge", when: { kind: "noneReturned" } },
     ],
   },
+  // 141075 Rode Like a Gale, shadow.
+  { id: "141075:shadow:1", cardCode: "141075", timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] }] },
 ];
