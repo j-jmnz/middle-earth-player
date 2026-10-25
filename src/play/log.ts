@@ -16,7 +16,7 @@ export type LogNames = {
 
 // The mark beside a log line: a game icon (threat, willpower), or a token coin for damage, progress and a resource (no
 // high-resolution source of those tokens exists; docs/design-system.md, Icons).
-export type LogMark = "threat" | "willpower" | "damage" | "progress" | "resource" | null;
+export type LogMark = "threat" | "willpower" | "attack" | "damage" | "progress" | "resource" | null;
 
 export type LogLine = { key: string; text: string; cause: string | null; mark: LogMark };
 
@@ -25,7 +25,10 @@ function markOf(step: EngineStep): LogMark {
     case "threat":
       return "threat";
     case "hideTest":
+    case "quest":
       return "willpower";
+    case "strike":
+      return "attack";
     case "damage":
       return "damage";
     case "progress":
@@ -84,6 +87,10 @@ function words(step: EngineStep, names: LogNames): string | null {
       return `${names.card(step.cardId)} commits to the Hide test`;
     case "hideTest":
       return `Hide test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against threat ${step.threat}`;
+    case "quest":
+      return `Quest: willpower ${step.willpower} against threat ${step.threat}`;
+    case "strike":
+      return step.undefended ? `Attack ${step.attack}, undefended, on ${names.card(step.targetId)}` : `Attack ${step.attack} against defense ${step.defense} on ${names.card(step.targetId)}`;
     case "advance":
       return `The quest advances to ${names.card(step.cardId)}`;
     case "attack":

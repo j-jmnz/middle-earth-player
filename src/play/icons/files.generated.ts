@@ -29,4 +29,7 @@ export const ICON_FILES: Record<IconName, number> = {
   "oneRing": require("../../../assets/icons/oneRing.svg") as number,
   "questPoints": require("../../../assets/icons/questPoints.png") as number,
   "engagementCost": require("../../../assets/icons/engagementCost.png") as number,
+  "resource": require("../../../assets/icons/resource.png") as number,
+  "damage": require("../../../assets/icons/damage.png") as number,
+  "progress": require("../../../assets/icons/progress.png") as number,
 };

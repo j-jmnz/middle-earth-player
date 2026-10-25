@@ -1,8 +1,8 @@
 // The game's icons, from the highest-resolution sources found (docs/design-system.md, Icons):
 // - RingsDB's icon font, an SVG font: vector glyphs for willpower, attack, defense, hit points, threat, shadow, unique, cost,
 //   the seven spheres and the player card types. app.css names the unnamed glyphs through its `.icon-*:before` codepoints.
-// - DragnCards' token PNGs for quest points and engagement cost, 256 px (the resource, progress and damage tokens there
-//   are 146 px, under the 256 px bar, and are not taken).
+// - DragnCards' token PNGs: quest points and engagement cost (256 px), and the resource, damage and progress tokens
+//   (146 px), which the table draws on cards at 32 pt or less (user request, 2026-10-25: the real token art, not drawn coins).
 // Every file is kept verbatim under data/raw/icons and pinned by sha256; `pnpm data:build` cuts the icons out offline.
 import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, writeRaw, writeRawBytes, type SourceFile, type SourceRecord } from "./fetch.ts";
@@ -10,7 +10,7 @@ import { combinedPin, fetchBytes, writeRaw, writeRawBytes, type SourceFile, type
 export const RINGSDB_FONT_URL = "https://ringsdb.com/bundles/app/fonts/ringsdb.svg?h6hjpma";
 export const RINGSDB_CSS_URL = "https://ringsdb.com/css/app.css";
 const DRAGNCARDS_TOKENS = "https://dragncards-lotrlcg.s3.amazonaws.com/tokens";
-export const DRAGNCARDS_TOKEN_FILES = ["questPoints", "engagementCost"] as const;
+export const DRAGNCARDS_TOKEN_FILES = ["questPoints", "engagementCost", "resource", "damage", "progress"] as const;
 
 export async function syncIcons(log: Log = createLog("icons")): Promise<SourceRecord> {
   const files: SourceFile[] = [];

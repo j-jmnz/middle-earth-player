@@ -1,24 +1,31 @@
-// The table for the open scenario of a save. The canvas is src/play; this screen opens the session, keeps each accepted
-// intent in user.db, and hands the canvas the pictures in the image cache. The reducer is the only writer of the game.
+// The table for the open scenario of a save, always in landscape (the route's stack option, routes/_layout.tsx). The canvas,
+// the dock and the panels are src/play; this screen opens the session, keeps each accepted intent in user.db, hands the
+// canvas the pictures in the image cache, and lays the pieces out. The reducer is the only writer of the game; how a tap
+// becomes an intent is src/play/use-table-choice.ts.
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BackHandler, Text, View, type LayoutChangeEvent } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { BackHandler, Text, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
 import { backStep } from "../../../play/back";
+import { slotNumbers } from "../../../play/card-effects";
+import { CardPreview } from "../../../play/card-preview";
+import { logLines, type LogNames } from "../../../play/log";
+import { prefetchCodes, resolutionCodes } from "../../../play/prefetch";
 import { QuestBand } from "../../../play/quest-band";
 import { railFor } from "../../../play/rail";
-import { prefetchCodes, resolutionCodes } from "../../../play/prefetch";
-import { inspectTargets, shownSeat, threatSelector, zoneSelector } from "../../../play/selectors";
-import { dropOutcome, targetFromKey } from "../../../play/selection";
-import { actionsSheet, commitSheet, paySheet, sheetSendsPass } from "../../../play/bar-sheets";
-import { CardPreview } from "../../../play/card-preview";
-import type { Sheet, SheetNames } from "../../../play/sheet-types";
-import { isStepWindow, sheetFor } from "../../../play/sheets";
-import type { PlayerIntent, ScenarioState, TableStore } from "../../../play/store";
+import { PILE_WORDS, shownSeat, threatSelector, type PileId } from "../../../play/selectors";
+import type { SheetNames } from "../../../play/sheet-types";
+import type { TableStore } from "../../../play/store";
 import { TableCanvas } from "../../../play/table-canvas";
-import type { PictureSource } from "../../../play/table-canvas-types";
-import { CardListPanel, ChromeButton, ChromePrimary, LogPanel, PhaseRail, SheetTab, SheetView, ThreatRing, threatLine } from "../../../play/table-chrome";
+import type { PictureSource, SlotInfo } from "../../../play/table-canvas-types";
+import { ChromeButton, PhaseRail, ThreatRing, threatLine } from "../../../play/table-chrome";
+import { MomentBanner, TableDock } from "../../../play/table-dock";
+import { LogPanel, PileList, SidePanel } from "../../../play/table-panel";
+import { previewCards } from "../../../play/table-preview";
+import { useTableChoice } from "../../../play/use-table-choice";
+import { ledgerLine, ruleTitle } from "../../../play/ledger";
 import { BodyText, NavBar, Screen } from "../../chrome";
 import { bookletParams } from "../../campaign-data";
 import { inactiveCodes } from "../../../catalog/active-text";
@@ -28,9 +35,11 @@ import { enqueueImageDownloads } from "../../images/queue";
 import { scanAssets } from "../../images/scan-map";
 import { cachedImage, useImageSnapshot } from "../../images/store";
 import { routeCode } from "../../route-code";
-import { ledgerLine, ruleTitle } from "../../../play/ledger";
-import { logLines, type LogNames } from "../../../play/log";
 import { sessionStore, useTableSession, type TableSession } from "../../table-session";
+
+const TOP_BAR = 44;
+// Under this height a panel covers the top bar too, so its options have room.
+const SHORT = 400;
 
 function picture(code: string): PictureSource | null {
   const cached = cachedImage(code);
@@ -41,28 +50,26 @@ function picture(code: string): PictureSource | null {
 
 function Table({ session, store, saveId }: { session: Extract<TableSession, { ok: true }>; store: TableStore; saveId: string }) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const screen = useWindowDimensions();
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   const images = useImageSnapshot();
   const game = useStore(store, (state) => state.game);
-  const legal = useStore(store, (state) => state.legal);
   const refusal = useStore(store, (state) => state.refusal);
-  const pending = useStore(store, (state) => state.pendingCommit);
   const threatOf = useMemo(() => threatSelector(), []);
   const threats = useStore(store, (state) => threatOf(state.game));
-  // A sheet opened from the bar or from another sheet (a pay sheet, the attackers of an attack). Gone when the game moves.
-  const [overlay, setOverlay] = useState<{ sheet: Sheet; game: ScenarioState } | null>(null);
-  const [collapsed, setCollapsed] = useState<string | null>(null);
-  const [logOpen, setLogOpen] = useState(false);
   const roundSteps = useStore(store, (state) => state.roundSteps);
+  const selected = useStore(store, (state) => state.selected);
+  const seat = shownSeat(game);
+  const ctx = session.ctx;
+
+  const [logOpen, setLogOpen] = useState(false);
+  const [pile, setPile] = useState<PileId | null>(null);
+  // The card shown large, and cards listed with it that are not on the table (the Look window's).
+  const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
 
   // Prefetch the hand, staging and the screen about to open; never the whole cache. The canvas draws names until a file lands.
-  const seat = useStore(store, (state) => shownSeat(state.game));
-  const handOf = useMemo(() => zoneSelector("hand", seat), [seat]);
-  const stagingOf = useMemo(() => zoneSelector("staging", seat), [seat]);
-  const hand = useStore(store, (state) => handOf(state.game));
-  const staging = useStore(store, (state) => stagingOf(state.game));
-  const selected = useStore(store, (state) => state.selected);
-  const won = game.stageCleared;
+  const hand = game.seats[seat]?.hand;
   useEffect(() => {
     const current = store.getState().game;
     const next = [...resolutionCodes(current), ...(selected ? [current.cards[selected]?.code ?? ""] : [])];
@@ -71,96 +78,30 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
       return imagesrc ? [{ code, imagesrc, first: true }] : [];
     });
     if (jobs.length > 0) enqueueImageDownloads(jobs);
-  }, [store, session, seat, hand, staging, selected, won]);
+  }, [store, session, seat, hand, game.staging, selected, game.stageCleared]);
 
   const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
   const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
-  const names: SheetNames = useMemo(
-    () => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine }),
-    [nameOf, store],
-  );
+  const names: SheetNames = useMemo(() => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine }), [nameOf, store]);
   // Unique text with no effect record is inactive: the canvas veils it, and no control applies it.
-  const inactiveSet = useMemo(() => inactiveCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const), session.ctx.effects), [session]);
+  const inactiveSet = useMemo(() => inactiveCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const), ctx.effects), [session, ctx]);
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
+  // Read from the latest state: the canvas draws again when the cards, the effects in play or the attack change.
+  const info = useCallback((cardId: string): SlotInfo => slotNumbers(store.getState().game, ctx, cardId), [store, ctx]);
   const rail = useMemo(() => railFor(game), [game]);
   const logNames: LogNames = useMemo(
-    () => ({
-      card: names.card,
-      code: nameOf,
-      effectCard: (effectId: string) => session.ctx.effects.find((effect) => effect.id === effectId)?.cardCode ?? null,
-      rule: ruleTitle,
-      line: ledgerLine,
-    }),
-    [names, nameOf, session],
+    () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => ctx.effects.find((effect) => effect.id === effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
+    [names, nameOf, ctx],
   );
   const lines = useMemo(() => (logOpen ? logLines(roundSteps, logNames) : []), [logOpen, roundSteps, logNames]);
-  const windowSheet = useMemo(() => sheetFor(game, session.ctx, legal, names), [game, session, legal, names]);
-  const sheet = overlay && overlay.game === game ? overlay.sheet : windowSheet;
-  const showSheet = sheet != null && collapsed !== sheet.key;
 
-  // The overlay (a pay or attackers sheet) closes only when the reducer accepts, so a refusal keeps the player's choices.
-  const dispatch = useCallback(
-    (intent: PlayerIntent) => {
-      if (store.getState().dispatch(intent)) setOverlay(null);
-    },
-    [store],
-  );
-  // Pass on the sheet (and its collapsed tab) whenever the rules allow it and the sheet has no Pass of its own: an Actions,
-  // Quest with or pay sheet opened from the bar covers the bar's Pass.
-  const passLegal = legal.some((intent) => intent.type === "Pass");
-  const sheetPass = useMemo(() => (sheet && passLegal && !sheetSendsPass(sheet) ? () => dispatch({ type: "Pass" }) : null), [sheet, passLegal, dispatch]);
-  const openSheet = useCallback((next: Sheet) => setOverlay({ sheet: next, game: store.getState().game }), [store]);
-  const openCard = useCallback(
-    (cardId: string) => {
-      const code = store.getState().game.cards[cardId]?.code;
-      if (code) router.push({ pathname: "/card/[code]", params: { code } });
-    },
-    [router, store],
-  );
-  // A tap on a card with attachments lists them, so each is a full-size target (they only peek out under the host).
-  const [inspectList, setInspectList] = useState<readonly string[] | null>(null);
-  const onInspect = useCallback(
-    (cardId: string) => {
-      const targets = inspectTargets(store.getState().game, cardId);
-      if (targets.length > 1) setInspectList(targets);
-      else openCard(cardId);
-    },
-    [store, openCard],
-  );
-  // The open sheet may take a tap on a card on the table first (a hero to pay from); otherwise the tap inspects the card.
-  const tapClaim = useRef<((cardId: string) => boolean) | null>(null);
-  const claimTaps = useCallback((handler: (cardId: string) => boolean) => {
-    tapClaim.current = handler;
-    return () => {
-      if (tapClaim.current === handler) tapClaim.current = null;
-    };
-  }, []);
-  const onCanvasTap = useCallback(
-    (cardId: string) => {
-      if (tapClaim.current?.(cardId)) return;
-      onInspect(cardId);
-    },
-    [onInspect],
-  );
-  // A long press shows the card large over the table.
-  const [preview, setPreview] = useState<string | null>(null);
-  // Read on each render, not memoized: a scan that lands while the preview is up (the image snapshot moves) replaces the name.
-  const previewCode = preview ? game.cards[preview]?.code : undefined;
-  const previewCard = previewCode
-    ? { code: previewCode, name: nameOf(previewCode), source: picture(previewCode), landscape: session.world.cards.get(previewCode)?.type === "quest", text: session.facts.get(previewCode)?.text ?? null }
-    : null;
-  const onDrop = useCallback(
-    (cardId: string, key: string) => {
-      const { game: now, legal: listed, select, toggleCommit } = store.getState();
-      const outcome = dropOutcome(now, session.ctx, listed, cardId, targetFromKey(key));
-      select(null);
-      if (outcome.kind === "intent") dispatch(outcome.intent);
-      else if (outcome.kind === "commit") toggleCommit(cardId);
-      else if (outcome.kind === "pay") openSheet(paySheet(now, names, outcome.request, { kind: "play", cardId, hostId: outcome.hostId }));
-    },
-    [store, session, dispatch, openSheet, names],
-  );
   const onOutcome = useCallback(() => router.replace({ pathname: "/resolution/[saveId]", params: { saveId } }), [router, saveId]);
+  const onPile = useCallback((id: string) => {
+    if (id === "discard" || id === "encounterDiscard") setPile(id);
+  }, []);
+  const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
+  const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
+
   // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
@@ -168,137 +109,154 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
         setPreview(null);
         return true;
       }
-      const step = backStep({ logOpen, inspectOpen: inspectList != null, sheetOpen: sheet != null && showSheet });
+      const step = backStep({ logOpen, pileOpen: pile != null, overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen });
       if (step === "closeLog") setLogOpen(false);
-      else if (step === "closeInspect") setInspectList(null);
-      else if (step === "foldSheet" && sheet) setCollapsed(sheet.key);
+      else if (step === "closePile") setPile(null);
+      else if (step === "closeOverlay") choice.closeOverlay();
+      else if (step === "foldPanel") choice.fold();
       else goBack(router, { pathname: "/path/[saveId]", params: { saveId } });
       return true;
     });
     return () => subscription.remove();
-  }, [preview, logOpen, inspectList, sheet, showSheet, router, saveId]);
+  }, [preview, logOpen, pile, choice, router, saveId]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
     setSize((current) => (current && current.width === width && current.height === height ? current : { width, height }));
   };
 
-  const actionWindow = game.window?.kind === "pass" || isStepWindow(game);
-  const canPass = legal.some((intent) => intent.type === "Pass") && actionWindow;
-  const canCommit = legal.some((intent) => intent.type === "Commit");
-  const hasActions = actionWindow && legal.some((intent) => intent.type === "Trigger");
-  const committing = canCommit && pending.length > 0;
   const showLife = game.widgets.lifeTracker && game.life != null;
   const threatText = threatLine(threats, showLife ? (game.life ?? 0) : null);
+  const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
+  const panelWidth = Math.round(Math.min(480, Math.max(320, screen.width * 0.46)));
+  // A panel slides in from the right, under the top bar; on a short phone it covers the top bar too.
+  const panelTop = screen.height < SHORT ? 0 : insets.top + TOP_BAR;
+  const panelStyle = { position: "absolute" as const, top: panelTop, bottom: 0, right: 0, width: panelWidth + insets.right };
+  const narrow = screen.width - insets.left - insets.right < 760;
+  const previewed = preview
+    ? previewCards(
+        game,
+        ctx,
+        preview.id,
+        (code) => ({ name: nameOf(code), source: picture(code), landscape: session.world.cards.get(code)?.type === "quest", text: session.facts.get(code)?.text ?? null }),
+        names.card,
+        preview.extra,
+      )
+    : null;
+  const shown = previewed?.cards[previewed.start];
 
   return (
     <Screen testID="table" scene="felt" inset={false}>
-      <View className="flex-row items-center justify-between px-4">
-        <ChromeButton label="‹ Path" testID="table-back" accessibilityLabel="Back to the path" onPress={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} />
-        <Text testID="table-round" className="text-label text-muted">{`Round ${game.round}`}</Text>
-        <ChromeButton label="Log" testID="log-open" tone="gold" accessibilityLabel="This round's log" onPress={() => setLogOpen(true)} />
-        <ChromeButton
-          label="Booklet"
-          testID="booklet-open"
-          tone="gold"
-          accessibilityLabel="Open the booklet"
-          onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(session.save.campaignId, session.save.loadout?.scenarioId) })}
-        />
-      </View>
-      <View className="min-h-0 flex-1" onLayout={onLayout}>
-        {size ? (
-          <TableCanvas
-            store={store}
-            width={size.width}
-            height={size.height}
-            picture={picture}
-            pictureRevision={images.revision}
-            nameOf={nameOf}
-            sphereOf={sphereOf}
-            inactive={inactive}
-            onInspect={onCanvasTap}
-            onPreview={setPreview}
-            onDrop={onDrop}
+      <View className="flex-1" style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
+        <View className="flex-row items-center px-2" style={{ minHeight: TOP_BAR }}>
+          <ChromeButton label="‹ Path" testID="table-back" accessibilityLabel="Back to the path" onPress={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} />
+          <View className="flex-row">
+            {threats.map((threat) => (
+              <ThreatRing
+                key={threat.seat}
+                threat={threat}
+                label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
+                accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
+                active={threats.length > 1 && threat.seat === seat}
+                compact
+              />
+            ))}
+            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} compact /> : null}
+          </View>
+          <PhaseRail rail={rail} narrow={narrow} />
+          {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}
+          <ChromeButton label="Log" testID="log-open" tone="gold" accessibilityLabel="This round's log" onPress={() => setLogOpen(true)} />
+          <ChromeButton
+            label="Booklet"
+            testID="booklet-open"
+            tone="gold"
+            accessibilityLabel="Open the booklet"
+            onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(session.save.campaignId, session.save.loadout?.scenarioId) })}
           />
-        ) : null}
-        <QuestBand game={game} ctx={session.ctx} nameOf={nameOf} />
+        </View>
+        <View className="min-h-0 flex-1 flex-row">
+          <View className="min-h-0 flex-1" onLayout={onLayout}>
+            {size ? (
+              <TableCanvas
+                store={store}
+                width={size.width}
+                height={size.height}
+                picture={picture}
+                pictureRevision={images.revision}
+                nameOf={nameOf}
+                sphereOf={sphereOf}
+                inactive={inactive}
+                info={info}
+                highlight={choice.highlight}
+                raised={choice.raised}
+                fight={choice.fight}
+                bottomInset={insets.bottom}
+                onTap={choice.onTap}
+                onPreview={onPreview}
+                onDrop={choice.onDrop}
+              />
+            ) : null}
+            {choice.banner ? <MomentBanner moment={choice.banner} /> : null}
+          </View>
+          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8) }}>
+            {/* The quest card on the table already shows its progress: the band gives way while the dock shows numbers. */}
+            {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} />}
+            <TableDock
+              step={choice.header.step}
+              title={choice.header.title}
+              note={choice.header.note}
+              picked={choice.picked}
+              unavailable={choice.unavailable}
+              readout={choice.readout}
+              refusal={refusal}
+              dock={choice.dock}
+              onButton={choice.onButton}
+              extras={choice.extras}
+              resetKey={choice.resetKey}
+            />
+          </View>
+        </View>
       </View>
-      {refusal && (!sheet || !showSheet) ? (
-        <Text testID="table-refusal" className="px-6 text-body text-danger">
-          {refusal}
-        </Text>
+      {choice.panelOpen ? (
+        <View style={panelStyle}>
+          <SidePanel
+            sheet={choice.sheet}
+            game={game}
+            choice={choice.choice}
+            dock={choice.dock}
+            readout={choice.readout}
+            threat={threatText}
+            refusal={refusal}
+            resetKey={choice.resetKey}
+            onTile={choice.onTile}
+            onButton={choice.onButton}
+            onFold={choice.fold}
+            onRead={(cardId) => onPreview(cardId)}
+          />
+        </View>
       ) : null}
-      <PhaseRail rail={rail} />
-      {inspectList ? (
-        <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
-          <CardListPanel
-            cards={inspectList.map((id) => ({ id, label: names.card(id) }))}
-            onOpen={(id) => {
-              setInspectList(null);
-              openCard(id);
-            }}
-            onClose={() => setInspectList(null)}
+      {pile ? (
+        <View style={panelStyle}>
+          <PileList
+            title={PILE_WORDS[pile]}
+            cards={[...(pile === "discard" ? (game.seats[seat]?.discard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
+            onRead={(cardId) => onPreview(cardId)}
+            onClose={() => setPile(null)}
           />
         </View>
       ) : null}
       {logOpen ? (
-        <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
+        <View style={panelStyle}>
           <LogPanel round={game.round} lines={lines} onClose={() => setLogOpen(false)} />
         </View>
       ) : null}
-      {sheet && showSheet && !logOpen && !inspectList ? (
-        <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
-          <SheetView
-            sheet={sheet}
-            game={game}
-            names={names}
-            threat={threatText}
-            refusal={refusal}
-            onIntent={dispatch}
-            onNext={openSheet}
-            onOutcome={onOutcome}
-            onInspect={onInspect}
-            onCollapse={() => setCollapsed(sheet.key)}
-            onPass={sheetPass}
-            claimTaps={claimTaps}
-          />
-        </View>
-      ) : null}
-      {sheet && !showSheet ? <SheetTab title={sheet.title} threat={threatText} onOpen={() => setCollapsed(null)} onPass={sheetPass} /> : null}
-      {!sheet ? (
-        <View className="flex-row items-end justify-between px-4 pb-safe pt-2">
-          <View className="flex-row gap-3">
-            {threats.map((threat) => (
-              <ThreatRing key={threat.seat} threat={threat} label={threats.length > 1 ? `Player ${threat.seat + 1}` : "Threat"} />
-            ))}
-            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} /> : null}
-          </View>
-          <View className="flex-1 items-end gap-1 pl-3">
-            <View className="flex-row">
-              {canCommit ? <ChromeButton label="Quest with" testID="table-commit-sheet" tone="gold" onPress={() => openSheet(commitSheet(game, session.ctx, names, pending))} /> : null}
-              {hasActions ? <ChromeButton label="Actions" testID="table-actions" tone="gold" onPress={() => openSheet(actionsSheet(game, session.ctx, legal, names))} /> : null}
-            </View>
-            {committing ? (
-              <ChromePrimary label={`Commit ${pending.length}`} testID="table-commit" onPress={() => dispatch({ type: "Commit", cardIds: [...pending] })} />
-            ) : (
-              <>
-                <ChromePrimary label="Pass" testID="table-pass" disabled={!canPass} onPress={() => dispatch({ type: "Pass" })} />
-                {!canPass ? (
-                  <Text testID="table-pass-why" className="text-label text-muted">
-                    The engine is resolving; nothing can be passed yet.
-                  </Text>
-                ) : null}
-              </>
-            )}
-          </View>
-        </View>
-      ) : null}
-      {previewCard && preview ? (
+      {preview && previewed && shown ? (
         <CardPreview
-          key={preview}
-          card={previewCard}
+          key={preview.id}
+          card={shown}
+          related={previewed.cards.filter((_, index) => index !== previewed.start)}
           onClose={() => setPreview(null)}
-          onDetails={() => openCard(preview)}
+          onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })}
         />
       ) : null}
     </Screen>

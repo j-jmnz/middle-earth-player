@@ -137,7 +137,7 @@ function measure(
   steps: EngineStep[],
 ): ScenarioState {
   const willpower = hideWillpower(state, frame.seat, data.committedIds, ctx);
-  const result: HideResult = { success: willpower >= data.threat, willpower, threat: data.threat };
+  const result: HideResult = { success: hidePassed(willpower, data.threat), willpower, threat: data.threat };
   steps.push({
     kind: "hideTest",
     cardId: frame.cardId ?? "",
@@ -176,4 +176,9 @@ function pruneHideFailures(state: ScenarioState): ScenarioState {
 // Records that only matter during one round: Hide failures and uses of limited effects.
 export function pruneRoundRecords(state: ScenarioState): ScenarioState {
   return pruneUses(pruneHideFailures(state));
+}
+
+// A Hide test passes when the committed willpower is at least the threat of the cards discarded (mec109.hide-tests).
+export function hidePassed(willpower: number, threat: number): boolean {
+  return willpower >= threat;
 }
