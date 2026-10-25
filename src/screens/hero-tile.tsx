@@ -169,9 +169,40 @@ type DeckSummary = {
   onPress: () => void;
   onLongPress?: () => void;
   testID: string;
-  // The row of actions under the deck while the list is managed.
+  // The row of actions under the deck while the list is managed, or Open in Decks in the briefing.
   children?: ReactNode;
+  // Set in the briefing's picker: the deck is a radio, gold-edged with the word Selected when picked, dimmed when it
+  // cannot be picked (the status line says why).
+  selected?: boolean;
+  disabled?: boolean;
 };
+
+// The press props of a deck in the list (a button) or in the briefing's picker (a radio).
+function pressProps({ name, heroes, detail, status, onPress, onLongPress, testID, selected, disabled }: DeckSummary) {
+  const picker = selected !== undefined;
+  return {
+    testID,
+    collapsable: false,
+    accessibilityRole: picker ? ("radio" as const) : ("button" as const),
+    accessibilityState: picker ? { selected, disabled: disabled ?? false } : undefined,
+    accessibilityLabel: `${name}, ${heroNames(heroes)}, ${detail}, ${status.text}`,
+    accessibilityHint: picker ? undefined : "Opens the deck",
+    disabled: disabled ?? false,
+    onPress,
+    onLongPress,
+    delayLongPress: 350,
+  };
+}
+
+function SelectedMark({ selected }: { selected: boolean | undefined }) {
+  if (selected === undefined) return null;
+  return (
+    <View className="flex-row items-center gap-1.5">
+      <RingMark size={14} state={selected ? "done" : "locked"} />
+      {selected ? <Text className="text-label font-semibold text-gold">Selected</Text> : null}
+    </View>
+  );
+}
 
 function heroNames(heroes: readonly HeroFace[]): string {
   return heroes.length > 0 ? heroes.map((hero) => hero.name).join(", ") : "No heroes yet";
@@ -195,21 +226,12 @@ function StatusLine({ testID, detail, status }: { testID: string; detail: string
  * A saved deck in the deck list's Cards view: the hero pictures side by side with no words on them, then a solid strip
  * with the deck's name, its heroes, the counts and whether it is ready to play.
  */
-export function DeckCover({ name, heroes, detail, status, height, onPress, onLongPress, testID, children }: DeckSummary & { height: number }) {
+export function DeckCover(props: DeckSummary & { height: number }) {
+  const { name, heroes, detail, status, height, testID, children, selected, disabled } = props;
   return (
-    <View className="overflow-hidden rounded-card border border-hairline bg-raised">
-      <Pressable
-        testID={testID}
-        collapsable={false}
-        accessibilityRole="button"
-        accessibilityLabel={`${name}, ${heroNames(heroes)}, ${detail}, ${status.text}`}
-        accessibilityHint="Opens the deck"
-        onPress={onPress}
-        onLongPress={onLongPress}
-        delayLongPress={350}
-        style={({ pressed }) => (pressed ? pressedNight : undefined)}
-      >
-        <View className="flex-row" style={{ height }}>
+    <View className={`overflow-hidden rounded-card bg-raised ${selected ? "border-2 border-gold" : "border border-hairline"}`}>
+      <Pressable {...pressProps(props)} style={({ pressed }) => (pressed && !disabled ? pressedNight : undefined)}>
+        <View className="flex-row" style={{ height, opacity: disabled ? 0.45 : 1 }}>
           {heroes.length > 0 ? (
             heroes.map((hero) => <HeroTile key={hero.code} hero={hero} height={height} flush bare />)
           ) : (
@@ -219,9 +241,14 @@ export function DeckCover({ name, heroes, detail, status, height, onPress, onLon
           )}
         </View>
         <View className="border-t border-goldLine px-4 pb-3 pt-2">
-          <Text className="font-display text-title text-bone" numberOfLines={2}>
-            {name}
-          </Text>
+          <View className="flex-row items-start justify-between gap-2">
+            <Text className={`shrink font-display text-title ${disabled ? "text-faint" : selected ? "text-gold" : "text-bone"}`} numberOfLines={2}>
+              {name}
+            </Text>
+            <View className="pt-2">
+              <SelectedMark selected={selected} />
+            </View>
+          </View>
           <Text className="text-label text-bone" numberOfLines={1}>
             {heroNames(heroes)}
           </Text>
@@ -236,22 +263,16 @@ export function DeckCover({ name, heroes, detail, status, height, onPress, onLon
 const rowThumb = { width: 30, height: 42 };
 
 /** A saved deck in the deck list's List view: the heroes as small pictures, the name, the counts and the readiness. */
-export function DeckRow({ name, heroes, detail, status, onPress, onLongPress, testID, children }: DeckSummary) {
+export function DeckRow(props: DeckSummary) {
+  const { name, heroes, detail, status, testID, children, selected, disabled } = props;
   return (
     <View className="border-b border-hairline">
       <Pressable
-        testID={testID}
-        collapsable={false}
-        accessibilityRole="button"
-        accessibilityLabel={`${name}, ${heroNames(heroes)}, ${detail}, ${status.text}`}
-        accessibilityHint="Opens the deck"
-        onPress={onPress}
-        onLongPress={onLongPress}
-        delayLongPress={350}
+        {...pressProps(props)}
         className="min-h-16 flex-row items-center gap-3 py-2"
-        style={({ pressed }) => (pressed ? pressedNight : undefined)}
+        style={({ pressed }) => (pressed && !disabled ? pressedNight : undefined)}
       >
-        <View className="flex-row" style={{ width: rowThumb.width * 3 - 16 }}>
+        <View className="flex-row" style={{ width: rowThumb.width * 3 - 16, opacity: disabled ? 0.45 : 1 }}>
           {heroes.length > 0 ? (
             heroes.slice(0, 3).map((hero, at) => (
               <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 }} className="overflow-hidden rounded-sm border border-night">
@@ -265,12 +286,12 @@ export function DeckRow({ name, heroes, detail, status, onPress, onLongPress, te
           )}
         </View>
         <View className="flex-1">
-          <Text className="font-display text-body text-bone" numberOfLines={1}>
+          <Text className={`font-display text-body ${disabled ? "text-faint" : selected ? "text-gold" : "text-bone"}`} numberOfLines={1}>
             {name}
           </Text>
           <StatusLine testID={testID} detail={detail} status={status} />
         </View>
-        <Text className="text-body text-faint">›</Text>
+        {selected === undefined ? <Text className="text-body text-faint">›</Text> : <SelectedMark selected={selected} />}
       </Pressable>
       {children}
     </View>

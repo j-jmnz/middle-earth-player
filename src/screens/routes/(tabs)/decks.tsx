@@ -1,25 +1,16 @@
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { AccessibilityInfo, View } from "react-native";
 
-import { BodyText, Screen, ScreenTitle, Segmented, SphereMark, TextButton, markedSphere, sphereWord } from "../../chrome";
+import { BodyText, Screen, ScreenTitle, TextButton } from "../../chrome";
 import { editSavedDeck, startNewDeck } from "../../deck-draft";
 import { copyDeckName, deckCountLine, deckReadiness, newDeckName } from "../../deck-status";
 import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, resetStarterDeck, type SavedDeck } from "../../deck-store";
 import { useDatabases } from "../../databases";
-import {
-  deckListFiltered,
-  deckListSpheres,
-  emptyDeckListFilter,
-  filterDecks,
-  setDeckListView,
-  useDeckListView,
-  type DeckListFilter,
-  type DeckListStatus,
-} from "../../deck-list";
+import { deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck-list";
+import { DeckListBar } from "../../deck-list-bar";
 import { DeckCover, DeckRow, heroFace, type HeroFace } from "../../hero-tile";
-import { palette } from "../../palette.js";
 import {
   starterSeedReason,
   starterSeedStatus,
@@ -36,12 +27,6 @@ type Row =
   | { kind: "starter-missing"; key: string };
 
 const COVER_HEIGHT = 144;
-const VIEWS = ["Cards", "List"] as const;
-const STATUSES: { key: DeckListStatus; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "ready", label: "Ready" },
-  { key: "unready", label: "Not ready" },
-];
 
 function useSeedStatus(): StarterSeed {
   return useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending");
@@ -59,23 +44,6 @@ function listRows(shown: readonly SavedDeck[], total: number, seed: StarterSeed)
   else if (shown.length === 0) rows.push({ kind: "no-match", key: "no-match" });
   for (const deck of shown) rows.push({ kind: "deck", key: deck.id, deck, starter: isStarterDeck(deck.id) });
   return rows;
-}
-
-// A filter chip on night: raised pill, gold when on. A sphere chip carries the sphere's icon.
-function FilterChip({ label, selected, onPress, sphere, testID }: { label: string; selected: boolean; onPress: () => void; sphere?: string; testID: string }) {
-  const mark = sphere ? markedSphere(sphere) : null;
-  return (
-    <Pressable
-      testID={testID}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      className={`min-h-11 flex-row items-center gap-1.5 rounded-pill px-4 ${selected ? "bg-gold" : "bg-raised"}`}
-    >
-      {mark ? <SphereMark sphere={mark} size={12} /> : null}
-      <Text className={selected ? "text-body font-semibold text-onGold" : "text-body text-muted"}>{label}</Text>
-    </Pressable>
-  );
 }
 
 // What waits on a second tap in Manage: a delete, or putting a starter back to its printed list.
@@ -280,48 +248,7 @@ export default function Decks() {
   }
 
   const filters =
-    saved.length > 0 ? (
-      <View className="mt-2">
-        <View className="flex-row items-center gap-2">
-          <TextInput
-            testID="decks-search"
-            value={filter.query}
-            onChangeText={(query) => setFilter({ ...filter, query })}
-            placeholder="Search"
-            placeholderTextColor={palette.faint}
-            autoCorrect={false}
-            autoCapitalize="none"
-            accessibilityLabel="Search decks or heroes"
-            className="min-h-11 min-w-0 flex-1 rounded-pill bg-raised px-4 text-body text-bone"
-          />
-          <Segmented options={VIEWS} value={view} onChange={setDeckListView} testIDPrefix="decks-view" />
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-2 px-6">
-          {STATUSES.map((status) => (
-            <FilterChip
-              key={status.key}
-              testID={`decks-status-${status.key}`}
-              label={status.label}
-              selected={filter.status === status.key}
-              onPress={() => setFilter({ ...filter, status: status.key })}
-            />
-          ))}
-          {spheres.map((sphere) => (
-            <FilterChip
-              key={sphere.code}
-              testID={`decks-sphere-${sphere.code}`}
-              label={sphereWord(sphere.name)}
-              sphere={sphere.code}
-              selected={filter.sphere === sphere.code}
-              onPress={() => setFilter({ ...filter, sphere: filter.sphere === sphere.code ? null : sphere.code })}
-            />
-          ))}
-        </ScrollView>
-        {deckListFiltered(filter) ? (
-          <Text testID="decks-count" className="mt-2 text-label text-muted">{`${shown.length} of ${saved.length} decks`}</Text>
-        ) : null}
-      </View>
-    ) : null;
+    saved.length > 0 ? <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={saved.length} /> : null;
 
   const header = (
     <View className="pt-6">
