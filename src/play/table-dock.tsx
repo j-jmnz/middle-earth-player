@@ -107,31 +107,50 @@ export function TableDock({
 const enter = FadeInUp.duration(200).reduceMotion(ReduceMotion.System);
 const leave = FadeOut.duration(200).reduceMotion(ReduceMotion.System);
 
+const BANNER_WIDTH = 440;
+
 /**
- * What the last intent did, over the top of the table for a few seconds. Taps go through it to the cards under it; the log
- * keeps every step.
+ * What the last intent did, centered at the top of the screen for a few seconds, over the table and any open panel. `top` is
+ * where it hangs (under the top bar); `width` is the screen's, so it never runs off a narrow phone. Taps go through it to
+ * the cards under it; the log keeps every step.
  */
-export function MomentBanner({ moment }: { moment: Moment }) {
-  const edge = moment.tone === "good" ? t.gold : moment.tone === "bad" ? t.threat : t.hairline;
+export function MomentBanner({ moment, top, width }: { moment: Moment; top: number; width: number }) {
+  const edge = moment.tone === "good" ? t.gold : moment.tone === "bad" ? t.threat : t.goldLine;
   return (
-    <Animated.View entering={enter} exiting={leave} pointerEvents="none" style={{ position: "absolute", top: 6, left: 0, right: 0, alignItems: "center" }}>
+    <Animated.View entering={enter} exiting={leave} pointerEvents="none" style={{ position: "absolute", top, left: 0, right: 0, alignItems: "center" }}>
       <View
         testID="moment"
         accessible
         accessibilityLiveRegion="polite"
         accessibilityLabel={`${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`}
-        className="rounded-card px-4 py-2"
-        style={{ backgroundColor: t.night, borderWidth: 1.5, borderColor: edge, maxWidth: 380, opacity: 0.94 }}
+        className="overflow-hidden rounded-card"
+        style={{
+          backgroundColor: t.night,
+          borderWidth: 1,
+          borderColor: edge,
+          minWidth: Math.min(260, width - 32),
+          maxWidth: Math.min(BANNER_WIDTH, width - 32),
+          opacity: 0.96,
+          shadowColor: t.night,
+          shadowOpacity: 0.5,
+          shadowRadius: 12,
+          shadowOffset: { width: 0, height: 4 },
+          elevation: 8,
+        }}
       >
-        <Text testID="moment-title" className="text-center font-display text-body text-bone">
-          {moment.title}
-        </Text>
-        {moment.lines.map((line, index) => (
-          <View key={index} className="mt-0.5 flex-row items-center gap-2">
-            <LineMark mark={line.mark} tint="bone" size={14} />
-            <Text className="shrink text-label text-bone">{line.text}</Text>
-          </View>
-        ))}
+        {/* The tone, as a band along the top: gold for a success, threat red for a failure or an engagement. */}
+        <View style={{ height: 3, backgroundColor: edge }} />
+        <View className="items-center px-4 pb-2 pt-1.5">
+          <Text testID="moment-title" className="text-center font-display text-body text-bone">
+            {moment.title}
+          </Text>
+          {moment.lines.map((line, index) => (
+            <View key={index} className="mt-0.5 flex-row items-center gap-2">
+              <LineMark mark={line.mark} tint="bone" size={14} />
+              <Text className="shrink text-label text-bone">{line.text}</Text>
+            </View>
+          ))}
+        </View>
       </View>
     </Animated.View>
   );
