@@ -20,6 +20,7 @@ The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The R
 
 - `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
 - `pnpm lint` checks import boundaries.
+- `node --experimental-strip-types scripts/e2e-fixtures.ts` rewrites the Maestro save fixtures (`src/campaign/fixtures/`) when `fixtures.test.ts` says a fixture no longer reaches its moment. `--won` also searches for scenario 1's won game, which is open (`docs/phases/STATUS.md`).
 - `pnpm catalog:build` writes `assets/catalog.db` and `src/catalog/version.ts` from `data/`. Do not commit `catalog.db`. Commit `version.ts` when it changes; a test checks it.
 
 ## Agents

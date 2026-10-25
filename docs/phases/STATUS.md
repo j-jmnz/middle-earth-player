@@ -33,3 +33,12 @@ Maestro flows are written in the phase that names them. `maestro test` runs afte
 | 15 | Journey in the Dark | not started | Engine half and phone half; the engine half can run beside 10 and 11. |
 | 16 | Breaking of the Fellowship | not started | Engine half and phone half; the engine half can run beside 10 and 11. |
 | 17 | Design system | completed | 2026-10-23. Parchment chrome from the card frames and booklets, applied to the screens that exist. Reviewer has not reported. |
+
+## Rules audit and the main merge, 2026-10-25
+
+A cloud session checked `data/rules`, the engine, the card records, the fixtures and the docs against the authorities (`.cursor/rules/authority.mdc`) and fixed what disagreed; `docs/brief.md` carries each rule with its span. User decisions in that session: every Rules Reference action window opens, Responses are offered as soon as their trigger resolves, and deckbuilding follows the Rules Reference (one to three heroes, no sphere match on save; phase 6 is amended). It was merged with main's phase 12 work; ENGINE_VERSION is 5. Green offline: `pnpm test`, `pnpm lint`, `tsc`, `pnpm data:check`. `/reviewer` and `/ux` have not run on it. Phone checks: none ran (cloud session).
+
+- **Open, user-accepted:** scenario 1's `won` fixture and the `knife-lost` fixture dealt from its log are not committed. Main's won game kept a seat with no heroes in the game (fixed: `rr.player-elimination`); with that fixed, a seeded beam search found no legal win of the two starter decks in about two hours. `.maestro/scenario-1.yaml` and `.maestro/a-knife-in-the-dark-loss.yaml` cannot run until they are; the tests that replay them are skipped (`hasFixture`). `scripts/e2e-fixtures.ts --won` searches again. The `lost` fixture is regenerated.
+- **Golden seeds moved:** A Knife in the Dark's true solo win is seed 54, and the 141044 Resolution tests use two-handed seed 8; two-handed seed 1 still wins after a seat is eliminated, so only living seats choose a boon.
+- **Open rules items:** the order of simultaneous effects is fixed, not the first player's choice (FAQ 1.02); Frodo Baggins 142001 is ledgered but has no effect record; Panicked (141083, not yet dealt by any playable scenario) must fire `firstPlayerTokenPassed` when it passes the token, so The One Ring's control change (141085:A:2) follows it. Journey in the Dark's Setup (142040:A: 10 damage on Doom, Doom, Doom, one different location per player) is not built; phase 15 plans it.
+

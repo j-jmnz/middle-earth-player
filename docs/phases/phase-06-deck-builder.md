@@ -11,12 +11,12 @@ A root deck builder that saves any official deck-legal card, seeds the two print
 
 Route beside the campaign list. Filters: name, sphere, type, pack or cycle, trait, cost, unique, and whether unique text is active. Opening a card shows stats, text, and the errata line. An inactive sentence is labeled inactive. This screen writes no campaign.
 
-Save rules, enforced on every save:
+Save rules, enforced on every save, are the Rules Reference's (`rr.deckbuilding`; user decision 2026-10-25, which replaced this phase's original three-hero and sphere-match rules; `docs/brief.md`, Deckbuilding):
 
-- Exactly three heroes.
+- One to three heroes, no two with the same title.
 - At least 50 other cards.
-- At most three copies, and never more than `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check.
-- A non-neutral card's sphere must match one of the heroes. A fellowship sphere card may be saved with no fellowship hero. Saga rules still run on the briefing loadout, not on this save.
+- At most three copies of a title, across its printings, and never more than `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check.
+- A card's sphere does not have to match a hero to save. Playing it needs a hero of that sphere (`rr.resource-match`), which the table checks. Saga rules still run on the briefing loadout, not on this save.
 - A restriction record is enforced when that record exists. If the printed limit has no record yet, the card still saves and carries the inactive-text mark.
 
 Do not apply Fellowship rules here. A Fellowship hero shows a saga-only badge and still saves. Contract decks that need a different hero count or copy limit are a known limit of this phase. Do not build that exception.

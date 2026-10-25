@@ -22,16 +22,16 @@ Reducer updates keep the same object references for zones that did not change. A
 
 ## Round
 
-Name the steps in words. Beginning and end of round are real steps.
+Name the steps in words. Beginning and end of round are real steps. Every action window the Rules Reference's framework names opens between its steps, and inside each attack (`rr.framework-steps`, `rr.attack-resolution-chart`; user decision 2026-10-25); a window no seat could act in is skipped, and a window closes when every seat passes in a row (`rr.action-windows`). A Response is offered as soon as its trigger resolves (`rr.response`; user decision 2026-10-25).
 
 Setup order is the one recorded in phase 0: player Setup before the opening hand, encounter Setup before the quest card's Setup, then the quest script.
 
 1. Resource. Each hero gains one resource of its own sphere. Seats draw one card in seat order. Player actions.
-2. Planning. Play allies, attachments, and events.
+2. Planning. Play allies, attachments, and events, each player in turn from the first player, each in a window of their own (`rr.step-2-2`, `rr.step-2-3`).
 3. Quest. Commit, then staging, then resolution. Saga staging reveals one encounter card per seat and resolves it before the next seat. Surge reveals another for that same seat. Doomed X raises every seat's threat. Peril: the other seats cannot act or trigger responses while that card's staging resolves.
 4. Travel.
 5. Encounter. Optional engagement, then repeated engagement checks until none qualify.
-6. Combat. Deal a shadow card face down to each engaged enemy. Reveal a shadow when that enemy attacks. Resolve every enemy attack in seat order, then resolve every player attack in seat order.
+6. Combat. Archery first (`mec109.archery`). Deal a shadow card face down to each engaged enemy, each seat's highest engagement cost first (`rr.step-6-2`). Reveal a shadow when that enemy attacks; it stays with the enemy until the enemy leaves play or the phase ends (`ltp.shadow-discard`). Resolve every enemy attack in seat order, then every player attack in seat order: one declared attack per enemy per seat, and a ranged character may join another seat's attack (`faq.limitations-on-attacks`, `rr.ranged`).
 7. Refresh. Ready exhausted cards. Raise each seat's threat by 1. Pass the first-player token.
 
 Quest resolution uses staging threat only. Progress goes on the active location first. An undefended attack places the attack value. A defended attack places `max(0, attack − defense)` after the modifier list. Toughness X then reduces what is placed, for enemies. Indestructible enemies are not destroyed. A character at damage equal to its hit points is destroyed.

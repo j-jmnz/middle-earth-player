@@ -2,6 +2,8 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
+# OPEN (2026-10-25): its fixture is not committed: it is dealt from the log of scenario 1's won fixture, which is open. No legal win of the two starter decks has been found on this engine, so
+# the e2e route opens nothing for it (docs/phases/STATUS.md). Run scripts/e2e-fixtures.ts --won when one is found.
 # Phase 12. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json), which
 # opens the fixture route. The fixture is a real two-handed Easy game of A Knife in the Dark (seed 1) parked on its loss,
 # dealt from the log scenario 1's won fixture writes with Gandalf's Delay and Gildor Inglorion (src/campaign/fixtures).

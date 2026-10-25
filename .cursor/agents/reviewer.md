@@ -33,6 +33,7 @@ Trace the change against the phase exit and the rule it claims to implement. Rep
 - A catalog update replaces `user.db`, or a screen can read only one of the two database handles.
 - An empty `catch`, a default value, or a missing branch turns a failure into a success. A save, a migration, or an image write can fail and the UI continues.
 - The new test asserts the buggy result, or the phase exit has no test for the branch you can break.
+- A change that moves a replayed game leaves `ENGINE_VERSION` where it was, or a golden or fixture changes its outcome with no note saying why.
 
 ## Repetition
 

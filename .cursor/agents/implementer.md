@@ -8,7 +8,7 @@ You implement one phase. You do not review your own diff as the final word, and 
 
 Phase 17 is the design phase. `/ux` executes it. Do not start it, and do not restyle screens while doing another phase.
 
-Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then `docs/architecture.md`. Product rules live in `docs/brief.md`. The booklet, the quest card, and the Learn to Play (in `data/rules`) beat all three.
+Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then `docs/architecture.md`. Product rules live in `docs/brief.md`. The booklet, the quest card, the Learn to Play, the Rules Reference and the FAQ (in `data/rules`, in the order `.cursor/rules/authority.mdc` gives) beat all three.
 
 If no phase is active, start the lowest-numbered phase whose dependencies are completed. Do not start a later phase while an earlier dependency is open.
 
@@ -36,6 +36,8 @@ dispatch({ type: "Pass" })
 
 Match existing names and types. Keep the diff inside the phase. No drive-by refactors, no new dependencies, no `any`. The stack, the databases, the image decoders, and the test layers are in `docs/architecture.md` and `docs/brief.md`. Follow them. Do not copy them into a new document.
 
-If a timing is not on the booklet, the quest card, or the Learn to Play, leave the test red and name the card. Add the test in the same change as the behavior. The simulator does not close a fling or drag exit.
+If a timing is not on the booklet, the quest card, the Learn to Play, the Rules Reference or the FAQ, leave the test red and name the card. Add the test in the same change as the behavior. The simulator does not close a fling or drag exit.
+
+A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/version.ts`) and regenerates the goldens it moves; when `src/campaign/fixtures.test.ts` fails, run `scripts/e2e-fixtures.ts` again. A golden or fixture outcome that changes is named in the phase note, not relabeled silently.
 
 Write the Maestro flow the phase file names. Do not run `maestro test` until the last phase is done. A missing simulator does not keep an earlier phase open.
