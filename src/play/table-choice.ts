@@ -262,7 +262,7 @@ export function dockFor(sheet: Sheet, choice: Choice, table: TapContext, options
       break;
     }
     case "outcome":
-      primary = { label: sheet.result === "won" ? "Choose rewards" : "Continue", action: { kind: "outcome" }, arm: false, testID: "sheet-outcome" };
+      primary = { label: sheet.action, action: { kind: "outcome" }, arm: false, testID: "sheet-outcome" };
       break;
   }
   if (options.passLegal && !sheetSendsPass(sheet) && !options.overlay) secondary.push(PASS("Pass", "sheet-pass-window", "Tap again to pass"));
@@ -310,7 +310,7 @@ export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; tit
     case "window":
       return { step: `${seat}${sheet.step}`, title: sheet.title, note: sheet.note, stats: [] };
     case "outcome":
-      return { step: sheet.result === "won" ? "Resolution" : "Scenario", title: sheet.title, note: sheet.note, stats: [] };
+      return { step: sheet.step, title: sheet.title, note: sheet.note, stats: [] };
   }
 }
 

@@ -11,12 +11,11 @@ import { campaignOf } from "../../campaign-data";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
+import { KeepOrDelete } from "../../keep-or-delete";
+import { seatWord } from "../../seats";
 
 type Seats = 1 | 2;
 
-function seatWord(seats: Seats): string {
-  return seats === 1 ? "True solo" : "Two-handed";
-}
 
 function SeatTile({ seats, selected, onPress }: { seats: Seats; selected: boolean; onPress: () => void }) {
   const label = seatWord(seats);
@@ -73,44 +72,6 @@ function SaveSummary({ line, eyebrow, archived = false }: { line: SaveLine; eyeb
 }
 
 const DELETE_SENTENCE = "Delete this playthrough? Its log, pool and any open scenario are gone for good. Your decks stay.";
-
-// Under a save in Manage or in Archived: one action that keeps it (Archive, or Restore) and Delete. A delete is asked twice,
-// in place: the panel says what is lost and offers Delete for good beside Keep.
-function SaveActions({
-  id,
-  line,
-  keep,
-  confirming,
-  onAskDelete,
-  onDelete,
-  onKeep,
-}: {
-  id: string;
-  line: SaveLine;
-  keep: { label: "Archive" | "Restore"; onPress: () => void };
-  confirming: boolean;
-  onAskDelete: () => void;
-  onDelete: () => void;
-  onKeep: () => void;
-}) {
-  if (confirming) {
-    return (
-      <View className="mt-3 gap-1" testID={`delete-confirm-${id}`}>
-        <BodyText tone="danger">{DELETE_SENTENCE}</BodyText>
-        <View className="-mx-3 flex-row">
-          <TextButton label="Delete for good" testID={`delete-yes-${id}`} tone="danger" accessibilityLabel={`Delete ${describe(line)}, for good`} onPress={onDelete} />
-          <TextButton label="Keep" testID={`delete-no-${id}`} accessibilityLabel={`Keep ${describe(line)}`} onPress={onKeep} />
-        </View>
-      </View>
-    );
-  }
-  return (
-    <View className="-mx-3 mt-2 flex-row">
-      <TextButton label={keep.label} testID={`${keep.label.toLowerCase()}-${id}`} tone="gold" accessibilityLabel={`${keep.label} ${describe(line)}`} onPress={keep.onPress} />
-      <TextButton label="Delete" testID={`delete-${id}`} tone="danger" accessibilityLabel={`Delete ${describe(line)}`} onPress={onAskDelete} />
-    </View>
-  );
-}
 
 export default function CampaignList() {
   const router = useRouter();
@@ -204,9 +165,10 @@ export default function CampaignList() {
 
   const showStart = !managing && (saves.length === 0 || starting);
   const actions = (save: Save, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
-    <SaveActions
+    <KeepOrDelete
       id={save.id}
-      line={lineOf(save)}
+      described={describe(lineOf(save))}
+      sentence={DELETE_SENTENCE}
       keep={keep}
       confirming={deleting === save.id}
       onAskDelete={() => askDelete(save.id)}
