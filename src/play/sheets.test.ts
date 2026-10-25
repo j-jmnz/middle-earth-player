@@ -42,7 +42,7 @@ describe("choice sheets", () => {
           // An action window answered from the bar: an ordinary one, or one between two framework steps.
           expect(state.window?.kind === "pass" || isStepWindow(state), state.window?.kind).toBe(true);
           if (state.mode === "questCommit" && legal.some((intent) => intent.type === "Commit")) {
-            for (const intent of intentsOf(state, commitSheet(state, ctx, names, []))) expect(accepted(state, intent)).toBe(true);
+            for (const intent of intentsOf(state, commitSheet(state, ctx, names))) expect(accepted(state, intent)).toBe(true);
           }
           for (const intent of intentsOf(state, actionsSheet(state, ctx, legal, names))) expect(accepted(state, intent)).toBe(true);
         }

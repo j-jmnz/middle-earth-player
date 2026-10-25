@@ -4,13 +4,13 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import {
+  cardImageUrl,
   commitImageRecord,
   createDownloadPump,
   displaySource,
   imageLayoutSize,
   resolveCardImage,
   retryDelayMs,
-  ringsdbImageUrl,
   shouldReplaceImage,
   planForegroundDownloads,
   requeuePausedDownload,
@@ -64,7 +64,7 @@ const stored: ImageRecord = {
 
 describe("image policy", () => {
   it("stores a .png URL whose bytes are JPEG as JPEG, with the SOF size", () => {
-    const url = ringsdbImageUrl("/bundles/cards/141001.png");
+    const url = cardImageUrl("/bundles/cards/141001.png");
     expect(url).toBe("https://ringsdb.com/bundles/cards/141001.png");
     const storedFile = storedFileName("141001", jpeg(423, 600));
     expect(storedFile).toEqual({
@@ -83,10 +83,39 @@ describe("image policy", () => {
       width: 429,
       height: 600,
     });
-    expect(ringsdbImageUrl("bundles/cards/141001.png")).toBeNull();
-    expect(ringsdbImageUrl("/../secret.png")).toBeNull();
-    expect(ringsdbImageUrl("https://dragncards.com/a.png")).toBeNull();
-    expect(ringsdbImageUrl("//dragncards.com/a.png")).toBeNull();
+    expect(cardImageUrl("bundles/cards/141001.png")).toBeNull();
+    expect(cardImageUrl("/../secret.png")).toBeNull();
+    expect(cardImageUrl("https://dragncards.com/a.png")).toBeNull();
+    expect(cardImageUrl("//dragncards.com/a.png")).toBeNull();
+  });
+
+  it("downloads a scan from Hall of Beorn or DragnCards where RingsDB has no picture, and no other host", () => {
+    expect(cardImageUrl("https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bag-End.jpg")).toBe(
+      "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bag-End.jpg",
+    );
+    expect(cardImageUrl("https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Théodred.jpg")).toBe(
+      "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Th%C3%A9odred.jpg",
+    );
+    expect(cardImageUrl("https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/2b38254c-e992-4fb5-89e8-e7f636658ce0.jpg")).toBe(
+      "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/2b38254c-e992-4fb5-89e8-e7f636658ce0.jpg",
+    );
+    expect(cardImageUrl("http://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/a.jpg")).toBeNull();
+    expect(cardImageUrl("https://s3.amazonaws.com/another-bucket/a.jpg")).toBeNull();
+    expect(cardImageUrl("https://s3.amazonaws.com/hallofbeorn-resources/../another-bucket/a.jpg")).toBeNull();
+    expect(cardImageUrl("https://s3.amazonaws.com/hallofbeorn-resources/a.jpg?x=1")).toBeNull();
+    expect(cardImageUrl("https://user@s3.amazonaws.com/hallofbeorn-resources/a.jpg")).toBeNull();
+    expect(cardImageUrl("https://s3.amazonaws.com.evil.example/hallofbeorn-resources/a.jpg")).toBeNull();
+
+    const scan = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bag-End.jpg";
+    expect(resolveCardImage({ cached: null, imagesrc: scan, bundled: null })).toEqual({ kind: "text", download: true });
+    // A release build that bundled the scan shows it and does not download it.
+    expect(resolveCardImage({ cached: null, imagesrc: scan, bundled: { moduleId: 7, width: 400, height: 560 } })).toEqual({
+      kind: "asset",
+      moduleId: 7,
+      width: 400,
+      height: 560,
+      download: false,
+    });
   });
 
   it("retries a 503 three times and does not retry a 404", async () => {

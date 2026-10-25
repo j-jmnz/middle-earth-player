@@ -22,7 +22,7 @@ export function useListPreview() {
   );
   const close = useCallback(() => setCard(null), []);
   const overlay = card ? (
-    <CardPreview key={card.code} card={card} onClose={close} onDetails={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })} />
+    <CardPreview key={card.code} card={card} onClose={close} onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })} />
   ) : null;
   return { open, overlay };
 }

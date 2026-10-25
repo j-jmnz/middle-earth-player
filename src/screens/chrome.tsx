@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Tabs } from "expo-router";
 
 import { Backdrop } from "./backdrop";
@@ -15,7 +16,10 @@ type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>
 export const pressedNight = { backgroundColor: palette.pressed };
 const pressedPaper = { backgroundColor: palette.paperPressed };
 
-/** Night page with a scene backdrop. Content is inset 24 and starts under the status bar. */
+/**
+ * Night page with a scene backdrop. Content is inset 24 and starts under the status bar; in landscape (the card and booklet
+ * screens can turn with the phone) it is inset past the side safe areas too.
+ */
 export function Screen({
   children,
   testID,
@@ -27,10 +31,13 @@ export function Screen({
   scene?: SceneName;
   inset?: boolean;
 }) {
+  const insets = useSafeAreaInsets();
   return (
     <View testID={testID} collapsable={false} className="flex-1 bg-night">
       <Backdrop scene={scene} />
-      <View className={inset ? "flex-1 px-6 pt-safe" : "flex-1 pt-safe"}>{children}</View>
+      <View className="flex-1 pt-safe" style={inset ? { paddingLeft: 24 + insets.left, paddingRight: 24 + insets.right } : undefined}>
+        {children}
+      </View>
     </View>
   );
 }
@@ -179,6 +186,7 @@ export function TextButton({
   tone = "bone",
   accessibilityLabel,
   selected,
+  expanded,
 }: {
   label: string;
   onPress: () => void;
@@ -189,6 +197,8 @@ export function TextButton({
   accessibilityLabel?: string;
   // Set for a text option in a radio group (the No boon decline): the button is a radio with this selected state.
   selected?: boolean;
+  // Set for a button that shows and hides a group (Archived · n): a screen reader hears whether it is open.
+  expanded?: boolean;
 }) {
   const color = tone === "gold" ? "text-gold" : tone === "ink" ? "text-inkLabel" : tone === "danger" ? "text-danger" : "text-bone";
   return (
@@ -196,7 +206,7 @@ export function TextButton({
       testID={testID}
       collapsable={false}
       accessibilityRole={selected == null ? "button" : "radio"}
-      {...(selected == null ? {} : { accessibilityState: { selected } })}
+      {...(selected == null && expanded == null ? {} : { accessibilityState: selected == null ? { expanded } : { selected } })}
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       className="min-h-11 items-center justify-center rounded-tile px-3"
@@ -245,21 +255,26 @@ export function PrimaryButton({
   );
 }
 
-/** Raised panel. `current` gets the gold edge: the one thing the player should look at. `pressed` is the pressed fill. */
+/**
+ * Raised panel. `current` gets the gold edge: the one thing the player should look at. `pressed` is the pressed fill.
+ * `unfilled` is a hairline outline with no fill, for a thing put away (an archived playthrough).
+ */
 export function Panel({
   children,
   current = false,
   pressed = false,
+  unfilled = false,
   className,
 }: {
   children: ReactNode;
   current?: boolean;
   pressed?: boolean;
+  unfilled?: boolean;
   className?: string;
 }) {
   const edge = current ? "border-goldLine" : "border-hairline";
   return (
-    <View className={`rounded-card border bg-raised p-5 ${edge}${className ? ` ${className}` : ""}`} style={pressed ? pressedNight : undefined}>
+    <View className={`rounded-card border p-5 ${unfilled ? "" : "bg-raised "}${edge}${className ? ` ${className}` : ""}`} style={pressed ? pressedNight : undefined}>
       {children}
     </View>
   );

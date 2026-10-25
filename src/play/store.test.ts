@@ -4,11 +4,12 @@ import { expectOk } from "../rules/fixture.ts";
 import { printedOf } from "../rules/printed.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import { withThreat } from "../rules/state.ts";
+import { moveCard } from "../rules/zones.ts";
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
-import { cardSize, handCardSize, hitSlot, tableLayout } from "./layout.ts";
-import { inspectTargets, threatSelector, zoneSelector, type ZoneId } from "./selectors.ts";
+import { cardSize, HAND_SHOW, handCardSize, hitSlot, tableLayout } from "./layout.ts";
+import { inspectTargets, onTableFor, pileSelector, PILES, threatSelector, zoneSelector, type PileId, type PileView, type ZoneId } from "./selectors.ts";
 import { draggableIds, dropOutcome, dropRects, dropTargets, targetFromKey, targetKey } from "./selection.ts";
 import { createTableStore, nextRoundSteps } from "./store.ts";
 
@@ -35,6 +36,14 @@ function views(game: ScenarioState) {
   const zones: ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
   return Object.fromEntries(zones.map((zone) => [zone, zoneSelector(zone, 0)(game)])) as Record<ZoneId, ReturnType<ReturnType<typeof zoneSelector>>>;
 }
+
+function piles(game: ScenarioState): Record<PileId, PileView> {
+  return Object.fromEntries(PILES.map((pile) => [pile, pileSelector(pile, 0)(game)])) as Record<PileId, PileView>;
+}
+
+// A landscape phone's table: the canvas beside the command column, under the top bar.
+const WIDE = 560;
+const TALL = 330;
 
 describe("reducer references", () => {
   it("an intent that only commits characters keeps the hand, staging and decks as the same objects", () => {
@@ -74,9 +83,25 @@ describe("zone selectors", () => {
     expect(play(hurt)).not.toBe(before.play);
   });
 
-  it("the play view lists heroes with the cards attached to them", () => {
-    const frodo = views(kept).play.entries.find((entry) => entry.card.code === RING_BEARER);
+  it("the play view lists heroes with the cards attached to them, and each attachment once, under its host", () => {
+    const play = views(kept).play.entries;
+    const frodo = play.find((entry) => entry.card.code === RING_BEARER);
     expect(frodo?.attached.map((card) => card.code)).toContain("141085");
+    // The One Ring is in the seat's play list and on Frodo: it is drawn on Frodo only.
+    expect(play.some((entry) => entry.card.code === "141085")).toBe(false);
+    const layout = tableLayout(WIDE, TALL, views(kept), piles(kept));
+    expect(layout.slots.filter((slot) => slot.code === "141085").map((slot) => slot.kind)).toEqual(["attachment"]);
+  });
+
+  it("a pile view keeps its object until its list changes, and shows the top of a discard pile", () => {
+    const discard = pileSelector("discard", 0);
+    const first = discard(kept);
+    expect(discard(withThreat(kept, 0, 40))).toBe(first);
+    const cardId = kept.seats[0].hand[0] ?? "";
+    const discarded = { ...kept, seats: [{ ...kept.seats[0], discard: [...kept.seats[0].discard, cardId] }, kept.seats[1]] as const };
+    expect(discard(discarded).top?.id).toBe(cardId);
+    expect(pileSelector("deck", 0)(kept).top).toBeNull();
+    expect(pileSelector("deck", 0)(kept).ids.length).toBe(kept.seats[0].deck.length);
   });
 });
 
@@ -121,7 +146,7 @@ describe("table store", () => {
 });
 
 describe("drops", () => {
-  it("a drop on a target the card did not list moves nothing; on its target it maps to the intent or a pay sheet", () => {
+  it("a drop on a target the card did not list moves nothing; on its target it picks the card to play, never plays it", () => {
     const planning = advance(kept, (state) => state.mode === "planning" && legalIntents(state, ctx).some((intent) => intent.type === "PlayCard"));
     const legal = legalIntents(planning, ctx);
     const play = legal.find((intent) => intent.type === "PlayCard");
@@ -130,7 +155,7 @@ describe("drops", () => {
     const target = dropTargets(planning, ctx, legal, cardId)[0] ?? null;
     const outcome = dropOutcome(planning, ctx, legal, cardId, target);
     const printed = printedOf(ctx.cards, planning.cards[cardId]?.code ?? "");
-    expect(outcome.kind).toBe((printed.cost ?? 0) > 0 ? "pay" : "intent");
+    expect(outcome).toEqual({ kind: "play", cardId, hostId: printed.type === "attachment" && target?.kind === "card" ? target.cardId : null });
   });
 
   it("a character dropped on the quest stage joins the commit being built, not the quest", () => {
@@ -139,17 +164,14 @@ describe("drops", () => {
     const heroId = legalTargets(commit, { type: "Commit" }, ctx)[0] ?? "";
     expect(draggableIds(commit, ctx, legal)).toContain(heroId);
     expect(dropOutcome(commit, ctx, legal, heroId, { kind: "zone", zone: "questStage" })).toEqual({ kind: "commit", cardId: heroId });
-    const store = createTableStore({ ctx, game: commit });
-    store.getState().toggleCommit(heroId);
-    expect(store.getState().pendingCommit).toEqual([heroId]);
-    expect(store.getState().game.cards[heroId]?.committed).toBe(false);
+    expect(commit.cards[heroId]?.committed).toBe(false);
   });
 
   it("a target survives its string form, and the rectangles put card targets first", () => {
     const key = targetKey({ kind: "zone", zone: "play" });
     expect(targetFromKey(key)).toEqual({ kind: "zone", zone: "play" });
     expect(targetFromKey("zone:nowhere")).toBeNull();
-    const layout = tableLayout(390, 600, views(kept));
+    const layout = tableLayout(WIDE, TALL, views(kept), piles(kept));
     const heroId = kept.seats[0].heroes[0] ?? "";
     const rects = dropRects(layout, [{ kind: "zone", zone: "play" }, { kind: "card", cardId: heroId }]);
     expect(rects.map((rect) => rect.target)).toEqual([`card:${heroId}`, "zone:play"]);
@@ -157,15 +179,53 @@ describe("drops", () => {
 });
 
 describe("layout", () => {
-  it("fits five cards across a phone and keeps every slot inside the canvas width", () => {
-    const size = cardSize(390, 600);
-    expect(size.w * 5).toBeLessThanOrEqual(390);
-    const layout = tableLayout(390, 600, views(kept));
-    for (const slot of layout.slots) expect(slot.x + slot.w).toBeLessThanOrEqual(390);
+  it("fits the left column and six cards across a landscape table, and keeps every slot inside the canvas width", () => {
+    for (const [width, height] of [[WIDE, TALL], [470, 316], [640, 380]] as const) {
+      const size = cardSize(width, height);
+      expect(size.w * 7.5).toBeLessThanOrEqual(width);
+      const layout = tableLayout(width, height, views(kept), piles(kept));
+      for (const slot of layout.slots) expect(slot.x + slot.w, `${slot.code} at ${width}`).toBeLessThanOrEqual(width);
+      // Staging, the engagement area and the play area are stacked above the hand's strip.
+      expect(layout.zones.engaged.y).toBeGreaterThanOrEqual(layout.zones.staging.y + layout.zones.staging.h);
+      expect(layout.zones.play.y).toBeGreaterThanOrEqual(layout.zones.engaged.y + layout.zones.engaged.h);
+      // Each hand card shows at least a 44 pt target above the bottom edge, its fan drop included.
+      expect(height - layout.zones.hand.y).toBe(Math.max(52, Math.round(size.h * HAND_SHOW)));
+      for (const slot of layout.slots.filter((candidate) => candidate.zone === "hand")) expect(height - slot.y).toBeGreaterThanOrEqual(44);
+      // Laid out above a bottom inset, the hand leaves that zone clear.
+      const inset = tableLayout(width, height, views(kept), piles(kept), { bottomInset: 21 });
+      for (const slot of inset.slots.filter((candidate) => candidate.zone === "hand")) expect(height - 21 - slot.y).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  it("draws the four piles with their counts, and a raised hand card whole", () => {
+    const layout = tableLayout(WIDE, TALL, views(kept), piles(kept));
+    const counts = Object.fromEntries(layout.slots.filter((slot) => slot.kind === "pile").map((slot) => [slot.zone, slot.count]));
+    expect(counts).toEqual({ deck: kept.seats[0].deck.length, discard: 0, encounterDeck: kept.encounterDeck.length, encounterDiscard: kept.encounterDiscard.length });
+    const handId = kept.seats[0].hand[0] ?? "";
+    const raised = tableLayout(WIDE, TALL, views(kept), piles(kept), { raised: handId }).slots.find((slot) => slot.id === handId);
+    expect(raised && raised.y + raised.h).toBeLessThanOrEqual(TALL);
+  });
+
+  it("puts a declared defender beside the enemy it defends against, and out of the play area", () => {
+    // An enemy engaged with the seat and attacking it, with a hero declared as its defender.
+    const enemyId = kept.encounterDeck.find((id) => printedOf(ctx.cards, kept.cards[id]?.code ?? "").type === "enemy") ?? "";
+    const defenderId = kept.seats[0].heroes[1] ?? "";
+    const engaged = moveCard(kept, enemyId, { zone: "engaged", seat: 0 });
+    const declared: ScenarioState = { ...engaged, pendingAttack: { enemyId, seat: 0, defenderId } };
+    const layout = tableLayout(WIDE, TALL, views(declared), piles(declared));
+    const slot = layout.slots.find((candidate) => candidate.id === defenderId && candidate.kind === "card");
+    const enemy = layout.slots.find((candidate) => candidate.id === enemyId);
+    expect(slot?.zone).toBe("engaged");
+    expect(enemy && slot && slot.x).toBeGreaterThan(enemy?.x ?? 0);
+    expect(layout.marks).toEqual([expect.objectContaining({ enemyId, kind: "defense" })]);
+    expect(views(declared).play.entries.some((entry) => entry.card.id === defenderId)).toBe(false);
+    expect(onTableFor(declared, 0)(defenderId)).toBe(true);
+    // Once the attack is over, the defender is back in the play area.
+    expect(views(engaged).play.entries.some((entry) => entry.card.id === defenderId)).toBe(true);
   });
 
   it("finds the topmost card under a finger", () => {
-    const layout = tableLayout(390, 600, views(kept));
+    const layout = tableLayout(WIDE, TALL, views(kept), piles(kept));
     const frodo = layout.slots.findIndex((slot) => slot.code === RING_BEARER);
     const slot = layout.slots[frodo];
     expect(slot).toBeDefined();
@@ -176,20 +236,45 @@ describe("layout", () => {
 });
 
 describe("touch targets", () => {
-  it("keeps a 44 pt strip of each of eight hand cards on a 390 pt phone", () => {
-    const card = cardSize(390, 600);
-    const width = 390 - 24;
+  it("keeps a 44 pt strip of each of eight hand cards across a landscape table", () => {
+    const card = cardSize(WIDE, TALL);
+    const width = WIDE - 16;
     const hand = handCardSize(card, width, 8);
     const step = (width - hand.w) / 7;
     expect(step).toBeGreaterThanOrEqual(44);
     expect(hand.w).toBeGreaterThanOrEqual(44);
   });
 
-  it("a tap on a host lists the host and each card attached to it", () => {
+  it("a long press on a host lists the host and each card attached to it", () => {
     const frodo = kept.seats[0].heroes.find((id) => kept.cards[id]?.code === RING_BEARER) ?? "";
     const attached = kept.cards[frodo]?.attachments ?? [];
     expect(attached.length).toBeGreaterThan(0);
     expect(inspectTargets(kept, frodo)).toEqual([frodo, ...attached]);
     expect(inspectTargets(kept, attached[0] ?? "")).toEqual([frodo, ...attached]);
+  });
+});
+
+describe("motion", () => {
+  it("a drawn card comes off the deck, a card that stays put does not move, a discarded card goes to the discard pile", async () => {
+    const { motionsBetween, still } = await import("./motion.ts");
+    const before = tableLayout(WIDE, TALL, views(kept), piles(kept));
+    const [first = "", ...rest] = kept.seats[0].hand;
+    const drawn = kept.seats[0].deck[0] ?? "";
+    // The first hand card is discarded and the top of the deck drawn.
+    const seat = { ...kept.seats[0], hand: [...rest, drawn], deck: kept.seats[0].deck.slice(1), discard: [first] };
+    const cards = { ...kept.cards, [first]: { ...kept.cards[first]!, zone: "discard" as const }, [drawn]: { ...kept.cards[drawn]!, zone: "hand" as const } };
+    const after: ScenarioState = { ...kept, seats: [seat, kept.seats[1]], cards };
+    const next = tableLayout(WIDE, TALL, views(after), piles(after));
+    const { motions, ghosts } = motionsBetween(before, next, (id) => after.cards[id]?.zone ?? null);
+    const deck = next.piles.deck;
+    const slot = next.slots.find((candidate) => candidate.id === drawn);
+    const motion = motions.get(drawn);
+    expect(slot && motion && slot.x + slot.w / 2 + motion.dx).toBeCloseTo(deck.x + deck.w / 2);
+    const hero = kept.seats[0].heroes[0] ?? "";
+    expect(still(motions.get(hero) ?? { dx: 1, dy: 0, scale: 1, fromRot: 0, toRot: 0, fromOpacity: 1 })).toBe(true);
+    const ghost = ghosts.find((candidate) => candidate.slot.id === first);
+    expect(ghost && ghost.slot.x + ghost.slot.w / 2 + ghost.dx).toBeCloseTo(next.piles.discard.x + next.piles.discard.w / 2);
+    // The first draw of a table moves nothing.
+    expect([...motionsBetween(null, next, () => null).motions.values()].every(still)).toBe(true);
   });
 });

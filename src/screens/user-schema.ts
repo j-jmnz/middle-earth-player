@@ -34,6 +34,9 @@ export const saves = sqliteTable("saves", {
   // When the player put the playthrough away (ms since the epoch). An archived save leaves the campaign list's open
   // playthroughs and keeps its log and its open scenario; restoring clears it.
   archivedAt: integer("archived_at"),
+  // When the save was last written (ms since the epoch): a deal, an intent, a resolution, the notes. The campaign list puts
+  // the one written last first, as Current. Archive and Restore do not write it. Rows from before 0003 read null.
+  updatedAt: integer("updated_at"),
 });
 
 // One row per standalone game: one deal of one scenario, outside any campaign (src/campaign/standalone.ts). No log and no

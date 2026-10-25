@@ -36,14 +36,17 @@ async function storeBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: st
     const directory = booksDirectory();
     partial = new File(directory, `${id}.partial`);
     if (partial.exists) partial.delete();
-    source.copy(partial);
+    // copy() is asynchronous in this expo-file-system: without the await, the reader opened a file still being written.
+    await source.copy(partial);
 
     let pageCount: number;
     try {
       pageCount = await pdfPageCount(partial.uri);
-    } catch {
+    } catch (error: unknown) {
       partial.delete();
-      return { ok: false, reason: "notPdf", message: "That file is not a PDF this phone can open." };
+      // The native reason (the exception, the size, the first bytes) is kept so a report says why.
+      const detail = error instanceof Error ? ` ${error.message}` : "";
+      return { ok: false, reason: "notPdf", message: `That file is not a PDF this phone can open.${detail}` };
     }
 
     // The stored book stays where it is until the new file has its digest and the row is written. The old book moves
@@ -107,18 +110,29 @@ export function installBundledBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRu
 async function installFromAsset<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: string): Promise<ImportResult> {
   const bundled = bundledBooklets[id];
   if (!bundled) return { ok: false, reason: "unavailable", message: "This build does not carry that booklet." };
+  const asset = Asset.fromModule(bundled.moduleId);
   let resolved: File | null = null;
   try {
-    const asset = await Asset.fromModule(bundled.moduleId).downloadAsync();
+    await asset.downloadAsync();
     if (!asset.localUri) return { ok: false, reason: "failed", message: "The bundled booklet could not be read." };
     resolved = new File(asset.localUri);
-    return await storeBooklet(user, id, resolved, bundled.filename, null);
+    // The bytes must be the pinned PDF before the platform reader sees them; a short or changed copy says so here.
+    const size = resolved.size ?? 0;
+    if (size !== bundled.bytes) return { ok: false, reason: "failed", message: `The bundled booklet came out ${size} bytes, not ${bundled.bytes}.` };
+    const digest = (await resolved.digest("SHA-256")).toLowerCase();
+    if (digest !== bundled.sha256) return { ok: false, reason: "failed", message: `The bundled booklet does not match its pin (sha256 ${digest}).` };
+    return await storeBooklet(user, id, resolved, bundled.filename, size);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "The bundled booklet could not be stored.";
     return { ok: false, reason: "failed", message };
   } finally {
     // Android resolves the asset to a copy in the cache; the stored book is the only copy kept. iOS reads it in place.
-    if (resolved?.exists && resolved.uri.startsWith(Paths.cache.uri)) resolved.delete();
+    // The Asset object still believes the copy is there, so it is told otherwise and a retry resolves it again.
+    if (resolved?.exists && resolved.uri.startsWith(Paths.cache.uri)) {
+      resolved.delete();
+      asset.downloaded = false;
+      asset.localUri = null;
+    }
   }
 }
 

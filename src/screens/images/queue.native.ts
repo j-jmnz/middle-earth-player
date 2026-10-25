@@ -10,13 +10,13 @@ import {
   DOWNLOAD_CONCURRENCY,
   IMAGE_DIRECTORY,
   PAUSE_STATE_FILE,
+  cardImageUrl,
   commitImageRecord,
   createDownloadPump,
   isRemoteImageUri,
   pauseEntriesWithout,
   planForegroundDownloads,
   requeuePausedDownload,
-  ringsdbImageUrl,
   shouldResumeFromEntry,
   sniffImage,
   withDownloadRetry,
@@ -25,6 +25,7 @@ import {
   type ImageQueueStatus,
   type ImageRecord,
 } from "./policy";
+import { scanAssets } from "./scan-map";
 import { cachedImage, publishCachedImage } from "./store";
 
 type UserDatabase = AppDatabases["user"];
@@ -119,8 +120,9 @@ export function enqueueImageDownloads(jobs: readonly ImageDownloadRequest[]): vo
   const front: { code: string; url: string }[] = [];
   const back: { code: string; url: string }[] = [];
   for (const job of jobs) {
-    if (queued.has(job.code) || cachedImage(job.code)) continue;
-    const url = ringsdbImageUrl(job.imagesrc);
+    // A scan the release build bundled (scripts/pack-scans.ts) is not downloaded again.
+    if (queued.has(job.code) || cachedImage(job.code) || scanAssets[job.code]) continue;
+    const url = cardImageUrl(job.imagesrc);
     if (!url) continue;
     queued.add(job.code);
     const item = { code: job.code, url };

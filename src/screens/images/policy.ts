@@ -45,9 +45,34 @@ export type ImageQueueStatus = {
   pauseEntries: number;
 };
 
-export function ringsdbImageUrl(imagesrc: string): string | null {
-  if (!imagesrc.startsWith("/") || imagesrc.startsWith("//")) return null;
+// Where RingsDB has no picture (quest and encounter cards), the catalog's `imagesrc` is the full URL of the
+// Hall of Beorn or DragnCards scan instead of a RingsDB path (docs/brief.md, Card images).
+const SCAN_HOSTS: readonly { hostname: string; pathPrefix: string }[] = [
+  { hostname: "s3.amazonaws.com", pathPrefix: "/hallofbeorn-resources/" },
+  { hostname: "dragncards-lotrlcg.s3.amazonaws.com", pathPrefix: "/cards/" },
+];
+
+export function isRingsdbImagePath(imagesrc: string): boolean {
+  return imagesrc.startsWith("/") && !imagesrc.startsWith("//");
+}
+
+export function cardImageUrl(imagesrc: string): string | null {
   if (imagesrc.includes("..") || imagesrc.includes("\\")) return null;
+  if (isRingsdbImagePath(imagesrc)) return ringsdbImageUrl(imagesrc);
+  if (!imagesrc.startsWith("https://")) return null;
+  let url: URL;
+  try {
+    url = new URL(imagesrc);
+  } catch {
+    return null;
+  }
+  if (url.username !== "" || url.password !== "" || url.port !== "" || url.search !== "" || url.hash !== "") return null;
+  if (url.pathname.includes("..")) return null;
+  const allowed = SCAN_HOSTS.some((host) => url.hostname === host.hostname && url.pathname.startsWith(host.pathPrefix));
+  return allowed ? url.toString() : null;
+}
+
+function ringsdbImageUrl(imagesrc: string): string | null {
   let url: URL;
   try {
     url = new URL(imagesrc, RINGSDB_ORIGIN);
@@ -227,11 +252,8 @@ export function resolveCardImage(input: {
   if (input.cached) {
     return { kind: "file", ...input.cached, download: false };
   }
-  if (input.imagesrc == null || input.imagesrc.length === 0) {
-    if (input.bundled) return { kind: "asset", ...input.bundled, download: false };
-    return { kind: "text", download: false };
-  }
-  if (ringsdbImageUrl(input.imagesrc) == null) return { kind: "text", download: false };
+  if (input.bundled) return { kind: "asset", ...input.bundled, download: false };
+  if (input.imagesrc == null || cardImageUrl(input.imagesrc) == null) return { kind: "text", download: false };
   return { kind: "text", download: true };
 }
 

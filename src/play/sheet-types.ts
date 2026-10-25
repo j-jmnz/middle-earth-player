@@ -43,6 +43,10 @@ export type PickSheet = {
   // The one filled action when the sheet has no options to choose among (Keep, Done).
   primary: { label: string; intent: PlayerIntent } | null;
   alternative: Alternative | null;
+  // The primary confirms a card the player already picked on the table (Play Gandalf), so it needs no second tap.
+  selectionMade?: boolean;
+  // Cards the moment is about that the player may want to read first (the top of the encounter deck under Look).
+  about?: readonly string[];
 };
 
 export type MultiBuild = { kind: "Commit" } | { kind: "CommitHide" } | { kind: "attack"; enemyId: string };
@@ -96,13 +100,37 @@ export type TriggerSheet = {
   options: readonly TriggerOption[];
   // The pass button's word, or null when the window cannot be passed.
   pass: string | null;
+  // The ability already picked: the player tapped a card that has only this one.
+  preselect?: string;
 };
 
 // `step` is the eyebrow (Resolution only when a campaign card has one); `action` labels the button that leaves the table
 // for the outcome screen.
 export type OutcomeSheet = { kind: "outcome"; key: string; result: "won" | "lost"; step: string; title: string; note: string; action: string };
 
-export type Sheet = PickSheet | MultiSheet | DistributeSheet | TriggerSheet | OutcomeSheet;
+/**
+ * An ordinary action window, answered on the table: the cards that can be played or used now glow, the quest commit is built
+ * by tapping characters, and Pass closes the window.
+ */
+export type WindowSheet = {
+  kind: "window";
+  key: string;
+  step: string;
+  title: string;
+  note: string | null;
+  // The quest commit in the commit window: a tap on a character puts it in or takes it out.
+  commit: MultiSheet | null;
+  // Cards the player can play now, from the hand or the top of the deck.
+  plays: readonly string[];
+  // The Actions the rules allow now.
+  triggers: readonly TriggerOption[];
+  // The pass button's word, what passing does, and what the armed button says before the second tap.
+  pass: string;
+  passNote: string;
+  armed: string;
+};
+
+export type Sheet = PickSheet | MultiSheet | DistributeSheet | TriggerSheet | OutcomeSheet | WindowSheet;
 
 export const TIMING_WORDS: Readonly<Record<Effect["timing"], string>> = {
   setup: "Setup",

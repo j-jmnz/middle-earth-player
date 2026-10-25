@@ -27,7 +27,7 @@ function stage(cached: Record<string, Uint8Array>) {
   const sourcesPath = path.join(root, "sources.json");
   writeFileSync(sourcesPath, JSON.stringify({ sources: { rules: { id: "rules", files } } }));
   for (const [file, bytes] of Object.entries(cached)) writeFileSync(path.join(pdfCacheDir, file), bytes);
-  return { sourcesPath, pdfCacheDir, bookletsDir: path.join(root, "booklets"), mapPath: path.join(root, "bundled-map.ts") };
+  return { sourcesPath, pdfCacheDir, outDir: path.join(root, "booklets") };
 }
 
 describe("pack booklets", () => {
@@ -54,9 +54,9 @@ describe("pack booklets", () => {
     );
     expect(packed.map((book) => book.filename)).toEqual(["fellowship-of-the-ring.pdf", "learn-to-play.pdf"]);
     expect(fetched).toEqual([`https://example.test/${ltp}`]);
-    expect(readFileSync(path.join(staged.bookletsDir, "learn-to-play.pdf"))).toEqual(Buffer.from(body(ltp)));
-    const map = readFileSync(staged.mapPath, "utf8");
-    expect(map).toContain(`"fellowship-of-the-ring": { moduleId: require("../../../assets/booklets/fellowship-of-the-ring.pdf") as number, filename: "${mec109}" },`);
+    expect(readFileSync(path.join(staged.outDir, "learn-to-play.pdf"))).toEqual(Buffer.from(body(ltp)));
+    const map = readFileSync(path.join(staged.outDir, "bundled-map.ts"), "utf8");
+    expect(map).toContain(`"fellowship-of-the-ring": { moduleId: require("./fellowship-of-the-ring.pdf") as number, filename: "${mec109}", bytes: ${body(mec109).length}, sha256: "${sha256(body(mec109))}" },`);
   });
 
   it("fails when the fetched bytes do not match the pin", async () => {

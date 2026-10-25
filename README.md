@@ -39,7 +39,7 @@ The scripts log to stderr through `scripts/log.ts`: each line has the time since
 
 CI (`.github/workflows/test.yml`) runs `data:check`, `lint`, `tsc`, and `test` on every push and pull request. [CLAUDE.md](CLAUDE.md) has the data commands in more detail.
 
-Do not commit `catalog.db`, card scans, or PDFs. The catalog is generated from `data/` and shipped inside the binary. The two booklet PDFs ship in the binary too: `eas-build-post-install` runs `pnpm booklets:pack`, which copies the pinned PDFs into `assets/booklets/` and fills `src/screens/booklets/bundled-map.ts`. For a local `pnpm android` build, run `pnpm booklets:pack` first, and do not commit the filled map.
+Do not commit `catalog.db`, card scans, or PDFs. The catalog is generated from `data/` and shipped inside the binary. The two booklet PDFs ship in the binary too. `pnpm booklets:pack` copies the pinned PDFs and a map that requires them into `.cache/booklets/`, and Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules`, `pnpm android` and the EAS `eas-build-post-install` hook run it. A development-client APK takes its JavaScript and assets from your local Metro, so pack on the machine that runs `pnpm start`; the books show after a Metro restart (`--clear` if it cached the stub).
 
 ## Documents
 

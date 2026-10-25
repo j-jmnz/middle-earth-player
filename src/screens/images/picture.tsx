@@ -1,7 +1,7 @@
 import { Image, type ImageContentPosition } from "expo-image";
 import { View } from "react-native";
 
-import { ringsdbImageUrl, shownCardImage } from "./policy";
+import { cardImageUrl, shownCardImage } from "./policy";
 import { scanAssets } from "./scan-map";
 import { useCachedImage } from "./store";
 
@@ -16,7 +16,7 @@ export function useCardPreview(code: string, imagesrc: string | null): { uri: st
   });
   if (source) return source;
   if (!imagesrc) return null;
-  const remote = ringsdbImageUrl(imagesrc);
+  const remote = cardImageUrl(imagesrc);
   return remote ? { uri: remote } : null;
 }
 

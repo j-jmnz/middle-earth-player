@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { duration, runScript, type Log } from "../log.ts";
+import { packBookletsHere } from "../pack-booklets.ts";
 import { DATA_DIR } from "./paths.ts";
 import { syncDragnCards } from "./sources/dragncards.ts";
 import { recordChanges, type SourceRecord } from "./sources/fetch.ts";
@@ -70,4 +71,6 @@ void runScript("data:sync", async (log) => {
   mkdirSync(DATA_DIR, { recursive: true });
   writeFileSync(file, `${JSON.stringify({ sources: sorted }, null, 2)}\n`);
   log.info(`wrote ${path.relative(process.cwd(), file)}; run pnpm data:build next`);
+  // The booklet PDFs the app bundles come from the rules just fetched (.cache/booklets, read by metro.config.js).
+  if (ids.includes("rules")) await packBookletsHere(log.child("booklets"));
 });

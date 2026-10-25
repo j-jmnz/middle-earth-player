@@ -1,5 +1,5 @@
 // Offline: cuts the game's icons out of the snapshots `pnpm data:sync icons` keeps under data/raw/icons, and writes
-// assets/icons (one standalone SVG per vector glyph, the 256 px PNG tokens copied as they are) and two modules under
+// assets/icons (one standalone SVG per vector glyph, the PNG tokens copied as they are) and two modules under
 // src/play/icons: `generated.ts` (each icon's source, size and, for a vector, its path for the Skia canvas) and
 // `files.generated.ts` (the asset requires for expo-image and Skia images). Deterministic: the same snapshots write the
 // same bytes. docs/design-system.md, Icons, lists them.
@@ -36,10 +36,15 @@ export const VECTOR_ICONS: readonly { name: string; glyph?: string; css?: string
   { name: "oneRing", css: "onering" },
 ];
 
-// The 256 px token PNGs, by the app's name and the file under data/raw/icons/dragncards.
-export const RASTER_ICONS: readonly { name: string; file: string }[] = [
-  { name: "questPoints", file: "questPoints" },
-  { name: "engagementCost", file: "engagementCost" },
+// The token PNGs, by the app's name and the file under data/raw/icons/dragncards, each with the short side it must have.
+// An icon in chrome needs 256 px. A token the table puts on a card is drawn at 32 pt or less, so three times that (96 px)
+// is enough; DragnCards' resource, damage and progress tokens are 146 px (user request, 2026-10-25).
+export const RASTER_ICONS: readonly { name: string; file: string; bar: number }[] = [
+  { name: "questPoints", file: "questPoints", bar: 256 },
+  { name: "engagementCost", file: "engagementCost", bar: 256 },
+  { name: "resource", file: "resource", bar: 96 },
+  { name: "damage", file: "damage", bar: 96 },
+  { name: "progress", file: "progress", bar: 96 },
 ];
 
 const FONT_URL = "https://ringsdb.com/bundles/app/fonts/ringsdb.svg?h6hjpma";
@@ -175,7 +180,7 @@ export function iconRecords(rawDir: string = RAW_DIR): IconRecord[] {
   }
   for (const icon of RASTER_ICONS) {
     const size = pngSize(readFileSync(path.join(rawDir, "icons", "dragncards", `${icon.file}.png`)));
-    if (Math.min(size.width, size.height) < 256) throw new Error(`${icon.name} is ${size.width}x${size.height}, under the 256 px bar`);
+    if (Math.min(size.width, size.height) < icon.bar) throw new Error(`${icon.name} is ${size.width}x${size.height}, under its ${icon.bar} px bar`);
     records.push({ name: icon.name, kind: "raster", source: `${TOKEN_URL}/${icon.file}.png`, ...size });
   }
   return records;

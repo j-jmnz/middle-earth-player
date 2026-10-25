@@ -8,7 +8,7 @@ import { cards, packs } from "../../../catalog/schema";
 import { BodyText, ListRow, NavBar, Screen, ScreenTitle } from "../../chrome";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
-import { ringsdbImageUrl, shownCardImage } from "../../images/policy";
+import { cardImageUrl, shownCardImage } from "../../images/policy";
 import { RowCardImage } from "../../images/picture";
 import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
@@ -42,7 +42,7 @@ function PackCardRow({ item, onPress, onPreview }: { item: PackCard; onPress: ()
     imagesrc: item.imagesrc,
     bundled: scanAssets[item.code] ?? null,
   });
-  const remote = !source && item.imagesrc ? ringsdbImageUrl(item.imagesrc) : null;
+  const remote = !source && item.imagesrc ? cardImageUrl(item.imagesrc) : null;
   const preview = source ?? (remote ? { uri: remote } : null);
   return (
     <ListRow

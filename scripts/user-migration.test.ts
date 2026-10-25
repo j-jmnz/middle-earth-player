@@ -50,7 +50,14 @@ describe("user migration", () => {
     expect(stored?.applied_catalog_version).toBe(CATALOG_VERSION);
   });
 
-  it("adds the booklets table, the save loadout, the archive mark and the standalone games without touching a save row", () => {
+  it("dates each journal entry after the one before, or the phone's migrator skips it", () => {
+    // drizzle-orm's migrator applies an entry only when its `when` is later than the last one user.db recorded.
+    const whens = migrations.journal.entries.map((entry) => entry.when);
+    for (let index = 1; index < whens.length; index += 1) expect(whens[index]).toBeGreaterThan(whens[index - 1]!);
+    expect(migrations.journal.entries.map((entry) => entry.idx)).toEqual(migrations.journal.entries.map((_, index) => index));
+  });
+
+  it("adds the booklets table, the save loadout, the archive mark, the write time and the standalone games without touching a save row", () => {
     const database = new DatabaseSync(":memory:");
     const [first, ...rest] = migrations.journal.entries;
     if (!first) throw new Error("No migrations");
@@ -59,8 +66,8 @@ describe("user migration", () => {
     for (const entry of rest) {
       for (const statement of migrationSql(entry).split("--> statement-breakpoint")) if (statement.trim()) database.exec(statement.trim());
     }
-    const save = database.prepare("SELECT id, loadout, archived_at FROM saves WHERE id = 'save-1'").get();
-    expect(save).toEqual({ id: "save-1", loadout: null, archived_at: null });
+    const save = database.prepare("SELECT id, loadout, archived_at, updated_at FROM saves WHERE id = 'save-1'").get();
+    expect(save).toEqual({ id: "save-1", loadout: null, archived_at: null, updated_at: null });
     database.exec(
       `INSERT INTO booklets (id, path, original_filename, byte_size, sha256, page_count) VALUES ('learn-to-play', 'booklets/learn-to-play.pdf', 'ltp.pdf', 10, 'abc', 4)`,
     );

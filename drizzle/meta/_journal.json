@@ -27,7 +27,14 @@
       "idx": 3,
       "version": "6",
       "when": 1761465600000,
-      "tag": "0003_standalone_games",
+      "tag": "0003_save_updated_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1761552000000,
+      "tag": "0004_standalone_games",
       "breakpoints": true
     }
   ]
