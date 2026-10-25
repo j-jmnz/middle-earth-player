@@ -4,15 +4,15 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { ICONS } from "../../src/play/icons/generated.ts";
+import { CARD_BACKS as BACK_RECORDS, ICONS } from "../../src/play/icons/generated.ts";
 import { SPHERE_TINT, sphereIcon, typeIcon } from "../../src/play/icon-map.ts";
 import { tableTokens } from "../../src/play/tokens.ts";
-import { buildIcons, flippedViewBox, iconRecords, parseIconCss, RASTER_ICONS, VECTOR_ICONS } from "./icons.ts";
+import { buildIcons, CARD_BACKS, cardBackRecords, flippedViewBox, iconRecords, parseIconCss, RASTER_ICONS, VECTOR_ICONS } from "./icons.ts";
 import { ROOT } from "./paths.ts";
 
-// The game icons (docs/design-system.md, Icons): every icon the app names is a committed file, each clears the
-// resolution bar (vector, or a raster at its bar: 256 px in chrome, 96 px for a token drawn on a card), and data:build
-// writes the same bytes every time.
+// The game icons and the printed card backs (docs/design-system.md, Icons): every icon and back the app names is a committed
+// file, each clears the resolution bar (vector, or a raster at its bar: 256 px in chrome, 96 px for a token drawn on a card,
+// a card scan's 600 px for a back), and data:build writes the same bytes every time.
 const ASSETS = path.join(ROOT, "assets", "icons");
 
 function files(dir: string): Map<string, Buffer> {
@@ -24,7 +24,8 @@ describe("icons", () => {
     const names = Object.keys(ICONS).sort();
     expect(names).toEqual([...VECTOR_ICONS.map((icon) => icon.name), ...RASTER_ICONS.map((icon) => icon.name)].sort());
     const committed = readdirSync(ASSETS).sort();
-    expect(committed).toEqual(names.map((name) => `${name}.${ICONS[name as keyof typeof ICONS].kind === "vector" ? "svg" : "png"}`).sort());
+    const backs = Object.keys(BACK_RECORDS).map((name) => `${name}Back.jpg`);
+    expect(committed).toEqual([...names.map((name) => `${name}.${ICONS[name as keyof typeof ICONS].kind === "vector" ? "svg" : "png"}`), ...backs].sort());
     const requires = readFileSync(path.join(ROOT, "src", "play", "icons", "files.generated.ts"), "utf8").matchAll(/require\("([^"]+)"\)/g);
     for (const match of requires) expect(existsSync(path.resolve(ROOT, "src", "play", "icons", match[1] ?? "")), match[1]).toBe(true);
   });
@@ -41,6 +42,17 @@ describe("icons", () => {
         expect(bar).toBeGreaterThanOrEqual(96);
         expect(Math.min(icon.width, icon.height)).toBeGreaterThanOrEqual(bar);
       }
+    }
+  });
+
+  it("keep the player and encounter backs at a card scan's size, each with its source", () => {
+    expect(Object.keys(BACK_RECORDS).sort()).toEqual(CARD_BACKS.map((back) => back.name).sort());
+    for (const back of cardBackRecords()) {
+      expect(back.source).toMatch(/^https:\/\/dragncards-lotrlcg\.s3\.amazonaws\.com\/cardbacks\//);
+      expect(Math.max(back.width, back.height)).toBeGreaterThanOrEqual(600);
+      // Upright, like a card.
+      expect(back.height).toBeGreaterThan(back.width);
+      expect(BACK_RECORDS[back.name]).toEqual(back);
     }
   });
 

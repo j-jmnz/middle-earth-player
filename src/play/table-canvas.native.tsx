@@ -14,9 +14,9 @@ import { cancelAnimation, Easing, useDerivedValue, useReducedMotion, useSharedVa
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
-import { AttackerMark, Badges, CardBody, CombatMarkView, Glow, Leaving, Marks, Moving, Pile, RADIUS, Tokens, withAlpha, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, Badges, CardBody, CombatMarkView, Glow, Leaving, Marks, Moving, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
-import { ICON_FILES } from "./icons/files.generated.ts";
+import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
 import { motionsBetween, type Ghost, type Motion } from "./motion.ts";
 import { PILES, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
@@ -107,6 +107,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     questPoints: useImage(ICON_FILES.questPoints),
     engagementCost: useImage(ICON_FILES.engagementCost),
   };
+  const backs: BackImages = { player: useImage(CARD_BACK_FILES.player), encounter: useImage(CARD_BACK_FILES.encounter) };
   // Names and small words in the system face; numbers in the embedded Marcellus (the system face stands in for the moment
   // the font file takes to load).
   const names = useMemo(() => matchFont({ fontFamily: Platform.select({ ios: "Helvetica", default: "sans-serif" }), fontSize: 11 }), []);
@@ -228,14 +229,14 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const drawBody = (slot: CardSlot, dim: boolean) => {
     const image = images.get(slot.code) ?? null;
     // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
-    if (slot.kind === "pile" || slot.zone === "deck") return <Pile slot={slot.zone === "deck" ? { ...slot, faceDown: false } : slot} image={image} fonts={fonts} label />;
+    if (slot.kind === "pile" || slot.zone === "deck") return <Pile slot={slot.zone === "deck" ? { ...slot, faceDown: false } : slot} image={image} fonts={fonts} label backs={backs} />;
     const encounterBack = slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck";
     const picked = (highlight.picked.get(slot.id) ?? 0) > 0;
     const glows = slot.kind === "card" && (picked || highlight.tappable.has(slot.id) || targetIds.has(slot.id));
     return (
       <Group opacity={dim ? 0.35 : 1}>
         {glows ? <Glow slot={slot} picked={picked} /> : null}
-        <CardBody slot={slot} image={image} name={nameOf(slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} inactive={!slot.faceDown && inactive(slot.code)} encounterBack={encounterBack} />
+        <CardBody slot={slot} image={image} name={nameOf(slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} inactive={!slot.faceDown && inactive(slot.code)} encounterBack={encounterBack} backs={backs} />
       </Group>
     );
   };
@@ -293,7 +294,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         ))}
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} inactive={inactive(lifted.code)} encounterBack={false} />
+            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} inactive={inactive(lifted.code)} encounterBack={false} backs={backs} />
             <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2} />
           </Group>
         ) : null}

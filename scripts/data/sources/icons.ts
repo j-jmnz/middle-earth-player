@@ -3,6 +3,9 @@
 //   the seven spheres and the player card types. app.css names the unnamed glyphs through its `.icon-*:before` codepoints.
 // - DragnCards' token PNGs: quest points and engagement cost (256 px), and the resource, damage and progress tokens
 //   (146 px), which the table draws on cards at 32 pt or less (user request, 2026-10-25: the real token art, not drawn coins).
+// - DragnCards' card backs, the ones its plugin names in jsons/cardBacks.json: the player back (the One Ring) and the
+//   encounter back (the Eye), 429x600 JPEGs, which the table draws on the decks and on face-down cards (user request,
+//   2026-10-25: the printed backs, not drawn ones).
 // Every file is kept verbatim under data/raw/icons and pinned by sha256; `pnpm data:build` cuts the icons out offline.
 import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, writeRaw, writeRawBytes, type SourceFile, type SourceRecord } from "./fetch.ts";
@@ -11,6 +14,8 @@ export const RINGSDB_FONT_URL = "https://ringsdb.com/bundles/app/fonts/ringsdb.s
 export const RINGSDB_CSS_URL = "https://ringsdb.com/css/app.css";
 const DRAGNCARDS_TOKENS = "https://dragncards-lotrlcg.s3.amazonaws.com/tokens";
 export const DRAGNCARDS_TOKEN_FILES = ["questPoints", "engagementCost", "resource", "damage", "progress"] as const;
+export const DRAGNCARDS_CARDBACKS = "https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks";
+export const DRAGNCARDS_CARDBACK_FILES = ["player", "encounter"] as const;
 
 export async function syncIcons(log: Log = createLog("icons")): Promise<SourceRecord> {
   const files: SourceFile[] = [];
@@ -24,6 +29,10 @@ export async function syncIcons(log: Log = createLog("icons")): Promise<SourceRe
   for (const name of DRAGNCARDS_TOKEN_FILES) {
     const url = `${DRAGNCARDS_TOKENS}/${name}.png`;
     keep(writeRawBytes(`icons/dragncards/${name}.png`, url, await fetchBytes(url, undefined, log)));
+  }
+  for (const name of DRAGNCARDS_CARDBACK_FILES) {
+    const url = `${DRAGNCARDS_CARDBACKS}/${name}.jpg`;
+    keep(writeRawBytes(`icons/dragncards/cardbacks/${name}.jpg`, url, await fetchBytes(url, undefined, log)));
   }
   return { id: "icons", site: "https://ringsdb.com and https://dragncards-lotrlcg.s3.amazonaws.com", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
 }
