@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { BOOKLETS, type BookletId } from "../src/screens/booklets/books.ts";
 import { BOOKLET_CACHE_DIR, DATA_DIR, PDF_CACHE_DIR } from "./data/paths.ts";
 import { fetchBytes, sha256, type SourceRecord } from "./data/sources/fetch.ts";
-import { bytes, runScript, type Log } from "./log.ts";
+import { bytes, describeError, runScript, type Log } from "./log.ts";
 
 // The PDF each book is bundled from: a file of the `rules` source in data/sources.json, pinned by sha256 there.
 export const BOOKLET_SOURCES: Record<BookletId, string> = {
@@ -84,8 +84,14 @@ function isDirectRun(): boolean {
   return entry ? path.resolve(entry) === fileURLToPath(import.meta.url) : false;
 }
 
+// --optional (pnpm start): a failed pack is a warning, so Metro still starts offline; the books are then not bundled.
 if (isDirectRun()) {
   void runScript("pack-booklets", async (log) => {
-    await packBookletsHere(log);
+    try {
+      await packBookletsHere(log);
+    } catch (error) {
+      if (!process.argv.includes("--optional")) throw error;
+      log.warn(`booklets not packed, so this bundle carries none: ${describeError(error)}`);
+    }
   });
 }
