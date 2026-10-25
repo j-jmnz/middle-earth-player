@@ -2,21 +2,21 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
 
-import { campaignPath } from "../../../campaign/path";
+import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
 import { FELLOWSHIP_ID } from "../../../campaign/save";
-import { BodyText, Eyebrow, Label, Panel, PrimaryButton, RingMark, Screen, ScreenTitle, TextButton } from "../../chrome";
+import { Label, Panel, PrimaryButton, RingMark, Screen, ScreenTitle, TextButton } from "../../chrome";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
-import { campaignOf } from "../../campaign-data";
+import { campaignOf, scenarioNames } from "../../campaign-data";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
+import { KeepOrDelete } from "../../keep-or-delete";
+import { ContinuePanel, DELETE_SENTENCE, SaveSummary, describe, type SaveLine } from "../../save-panels";
+import { nextStepHref, pathHref } from "../../scenario-links";
+import { seatWord } from "../../seats";
 
 type Seats = 1 | 2;
-
-function seatWord(seats: Seats): string {
-  return seats === 1 ? "True solo" : "Two-handed";
-}
 
 function SeatTile({ seats, selected, onPress }: { seats: Seats; selected: boolean; onPress: () => void }) {
   const label = seatWord(seats);
@@ -43,75 +43,6 @@ function SeatTile({ seats, selected, onPress }: { seats: Seats; selected: boolea
   );
 }
 
-function ProgressLine({ done, total }: { done: number; total: number }) {
-  return (
-    <View className="mt-3 flex-row items-center gap-2">
-      {Array.from({ length: total }, (_, index) => (
-        <RingMark key={index} size={12} state={index < done ? "done" : index === done ? "current" : "locked"} />
-      ))}
-    </View>
-  );
-}
-
-// One save as the list words it: campaign, seats and progress. Two playthroughs of one campaign differ only here, so every
-// control on a save names it with this line.
-type SaveLine = { name: string; seats: string; done: number; total: number };
-
-function describe(line: SaveLine): string {
-  return `${line.name}, ${line.seats}, ${line.done} of ${line.total} completed`;
-}
-
-function SaveSummary({ line, eyebrow, archived = false }: { line: SaveLine; eyebrow: boolean; archived?: boolean }) {
-  return (
-    <>
-      {eyebrow ? <Eyebrow>Current</Eyebrow> : null}
-      <Text className={`mt-1 font-display text-title ${archived ? "text-muted" : "text-bone"}`}>{line.name}</Text>
-      <Label>{`${line.seats} · ${line.done} of ${line.total} completed`}</Label>
-      <ProgressLine done={line.done} total={line.total} />
-    </>
-  );
-}
-
-const DELETE_SENTENCE = "Delete this playthrough? Its log, pool and any open scenario are gone for good. Your decks stay.";
-
-// Under a save in Manage or in Archived: one action that keeps it (Archive, or Restore) and Delete. A delete is asked twice,
-// in place: the panel says what is lost and offers Delete for good beside Keep.
-function SaveActions({
-  id,
-  line,
-  keep,
-  confirming,
-  onAskDelete,
-  onDelete,
-  onKeep,
-}: {
-  id: string;
-  line: SaveLine;
-  keep: { label: "Archive" | "Restore"; onPress: () => void };
-  confirming: boolean;
-  onAskDelete: () => void;
-  onDelete: () => void;
-  onKeep: () => void;
-}) {
-  if (confirming) {
-    return (
-      <View className="mt-3 gap-1" testID={`delete-confirm-${id}`}>
-        <BodyText tone="danger">{DELETE_SENTENCE}</BodyText>
-        <View className="-mx-3 flex-row">
-          <TextButton label="Delete for good" testID={`delete-yes-${id}`} tone="danger" accessibilityLabel={`Delete ${describe(line)}, for good`} onPress={onDelete} />
-          <TextButton label="Keep" testID={`delete-no-${id}`} accessibilityLabel={`Keep ${describe(line)}`} onPress={onKeep} />
-        </View>
-      </View>
-    );
-  }
-  return (
-    <View className="-mx-3 mt-2 flex-row">
-      <TextButton label={keep.label} testID={`${keep.label.toLowerCase()}-${id}`} tone="gold" accessibilityLabel={`${keep.label} ${describe(line)}`} onPress={keep.onPress} />
-      <TextButton label="Delete" testID={`delete-${id}`} tone="danger" accessibilityLabel={`Delete ${describe(line)}`} onPress={onAskDelete} />
-    </View>
-  );
-}
-
 export default function CampaignList() {
   const router = useRouter();
   const { catalog, user } = useDatabases();
@@ -129,12 +60,17 @@ export default function CampaignList() {
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
   const fellowship = campaignOf(FELLOWSHIP_ID);
   const total = fellowship?.scenarios.length ?? 6;
-  const lineOf = (save: Save): SaveLine => ({
-    name: nameOf(save.campaignId),
-    seats: seatWord(save.seatCount),
-    done: fellowship ? campaignPath(fellowship, {}, save.log).filter((node) => node.status === "completed").length : 0,
-    total,
-  });
+  const names = fellowship ? scenarioNames(fellowship) : {};
+  const lineOf = (save: Save): SaveLine => {
+    const path = fellowship ? campaignPath(fellowship, names, save.log) : [];
+    return {
+      name: nameOf(save.campaignId),
+      seats: seatWord(save.seatCount),
+      done: path.filter((node) => node.status === "completed").length,
+      total,
+      next: nextStep(path, save.loadout?.scenarioId),
+    };
+  };
 
   const refresh = useCallback(() => {
     const open = listSaves(user);
@@ -156,15 +92,15 @@ export default function CampaignList() {
     }, [refresh]),
   );
 
-  function openBooklet(id: string): void {
-    router.push({ pathname: "/booklet/[id]", params: { id } });
+  function openPath(save: Save): void {
+    router.push(pathHref(save.id));
   }
 
   function start(): void {
     const save = createSave(user, FELLOWSHIP_ID, seats);
     refresh();
     setStarting(false);
-    router.push({ pathname: "/path/[saveId]", params: { saveId: save.id } });
+    openPath(save);
   }
 
   // The button a screen reader was on goes away with each of these, so each says what happened.
@@ -204,9 +140,10 @@ export default function CampaignList() {
 
   const showStart = !managing && (saves.length === 0 || starting);
   const actions = (save: Save, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
-    <SaveActions
+    <KeepOrDelete
       id={save.id}
-      line={lineOf(save)}
+      described={describe(lineOf(save))}
+      sentence={DELETE_SENTENCE}
       keep={keep}
       confirming={deleting === save.id}
       onAskDelete={() => askDelete(save.id)}
@@ -218,11 +155,9 @@ export default function CampaignList() {
   return (
     <Screen testID="campaign-list" scene="dusk">
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6">
-        <View className="-mx-2 flex-row items-center justify-end">
-          <TextButton label="Learn to Play" testID="booklet-open-learn-to-play" tone="gold" onPress={() => openBooklet("learn-to-play")} />
-          <TextButton label="Fellowship booklet" testID="booklet-open" tone="gold" onPress={() => openBooklet(FELLOWSHIP_ID)} />
+        <View className="pt-6">
+          <ScreenTitle>Campaigns</ScreenTitle>
         </View>
-        <ScreenTitle>Campaigns</ScreenTitle>
         {/* The scene's light sits above the cards. */}
         <View className="mt-40 gap-3">
           {saves.map((save, index) => {
@@ -237,23 +172,38 @@ export default function CampaignList() {
                 </View>
               );
             }
+            if (index === 0) {
+              const line = lineOf(save);
+              return (
+                <ContinuePanel
+                  key={save.id}
+                  id={save.id}
+                  line={line}
+                  eyebrow={eyebrow}
+                  primary={!showStart}
+                  onNext={() => router.push(nextStepHref(save.id, line.next))}
+                  onPath={() => openPath(save)}
+                  onLog={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })}
+                />
+              );
+            }
             return (
               <Pressable
                 key={save.id}
                 testID={`save-${save.id}`}
                 collapsable={false}
                 accessibilityRole="button"
-                onPress={() => router.push({ pathname: "/path/[saveId]", params: { saveId: save.id } })}
+                accessibilityLabel={`Open ${describe(lineOf(save))}`}
+                onPress={() => openPath(save)}
               >
                 {({ pressed }) => (
-                  <Panel current={index === 0} pressed={pressed}>
-                    <SaveSummary line={lineOf(save)} eyebrow={eyebrow} />
+                  <Panel pressed={pressed}>
+                    <SaveSummary line={lineOf(save)} eyebrow={false} />
                   </Panel>
                 )}
               </Pressable>
             );
           })}
-          {saves.length === 0 && archived.length === 0 ? <BodyText tone="muted">No playthrough exists</BodyText> : null}
           {showStart ? (
             <Panel>
               <Text className="font-display text-title text-bone">{nameOf(FELLOWSHIP_ID)}</Text>

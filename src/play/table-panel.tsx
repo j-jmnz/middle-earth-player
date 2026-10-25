@@ -4,7 +4,7 @@
 // dock's: one that sends with nothing picked asks for a second tap.
 import { ScrollView, Text, View } from "react-native";
 
-import { DockButtons } from "./dock-buttons.tsx";
+import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
 import type { LogLine } from "./log.ts";
 import type { Readout } from "./readout.ts";
 import { ChromeButton, SheetFrame, Stats, Tile } from "./sheet-paper.tsx";
@@ -50,6 +50,7 @@ export function SidePanel({
   onButton,
   onFold,
   onRead,
+  undo = null,
 }: {
   sheet: Sheet;
   game: ScenarioState;
@@ -67,6 +68,8 @@ export function SidePanel({
   onFold: () => void;
   // Shows a card large, for a tile or the card the moment is about.
   onRead: ((cardId: string) => void) | null;
+  // The dock's Undo, at the panel's foot too: on a short phone the panel covers the top bar.
+  undo?: DockExtra | null;
 }) {
   const head = headerOf(sheet, game);
   const marks = marked(sheet, choice);
@@ -131,7 +134,7 @@ export function SidePanel({
           {refusal}
         </Text>
       ) : null}
-      <DockButtons key={resetKey} dock={dock} surface="paper" onButton={onButton} extras={[{ label: "Look at the table", testID: "sheet-collapse", onPress: onFold }]} />
+      <DockButtons key={resetKey} dock={dock} surface="paper" onButton={onButton} extras={[...(undo ? [undo] : []), { label: "Look at the table", testID: "sheet-collapse", onPress: onFold }]} />
     </SheetFrame>
   );
 }

@@ -3,9 +3,10 @@ import { useRouter } from "expo-router";
 import { useMemo } from "react";
 import { View } from "react-native";
 
-import { packs } from "../../../catalog/schema";
-import { BodyText, ListRow, Screen, ScreenTitle } from "../../chrome";
-import { useDatabases } from "../../databases";
+import { packs } from "../../catalog/schema";
+import { BodyText, ListRow, NavBar, Screen, ScreenTitle } from "../chrome";
+import { useDatabases } from "../databases";
+import { goBack } from "../go-back";
 
 export default function PackList() {
   const router = useRouter();
@@ -22,7 +23,8 @@ export default function PackList() {
 
   return (
     <Screen>
-      <View className="pt-6">
+      <NavBar backLabel="Cards" backTestID="packs-back" onBack={() => goBack(router, "/cards")} />
+      <View className="pt-2">
         <ScreenTitle>Packs</ScreenTitle>
       </View>
       {rows.length === 0 ? (

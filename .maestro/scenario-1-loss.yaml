@@ -10,8 +10,14 @@ appId: com.middleearth.lcg
     visible:
       id: campaign-path
     timeout: 15000
+# The campaign list's Continue panel resumes the open scenario on the table.
 - tapOn:
-    id: begin
+    id: path-back
+- assertVisible:
+    id: continue-next
+    text: "On the table: A Shadow of the Past"
+- tapOn:
+    id: continue
 - extendedWaitUntil:
     visible:
       id: table

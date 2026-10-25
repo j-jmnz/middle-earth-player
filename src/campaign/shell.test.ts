@@ -16,7 +16,7 @@ import { campaignPath } from "./path.ts";
 import { newSave, parseActive, parseLog, parseLoadout, type Save, type StoredLoadout } from "./save.ts";
 import { fixtureSave, hasFixture, type FixtureName } from "./fixtures.ts";
 import { resolutionView } from "./resolution-view.ts";
-import { contextOf, deal, drop, finish, record, resume } from "./session.ts";
+import { contextOf, deal, drop, finish, record, resume, unrecord } from "./session.ts";
 import { logCodes, loadWorld, type World } from "./world.ts";
 
 // The campaign shell, end to end, in Node: the briefing refuses and deals, a deal survives a relaunch, a win unlocks the
@@ -234,6 +234,21 @@ describe("a save across a relaunch", () => {
 
   it("drops the open scenario when the data hash differs", () => {
     expect(resume(dealt(), past, CATALOG_VERSION + 1)).toEqual({ ok: false, reason: "dataHash" });
+  });
+
+  it("takes back the last intent: the save then replays to the state before it", () => {
+    const first = dealt();
+    const before = resume(first, past, CATALOG_VERSION);
+    const kept = record(first, { type: "Keep" });
+    const after = resume(kept, past, CATALOG_VERSION);
+    const back = unrecord(kept);
+    const again = resume(back, past, CATALOG_VERSION);
+    expect(before.ok && after.ok && again.ok).toBe(true);
+    expect(back.active?.intents).toEqual(first.active?.intents);
+    if (before.ok && after.ok && again.ok) {
+      expect(JSON.stringify(after.state)).not.toBe(JSON.stringify(before.state));
+      expect(JSON.stringify(again.state)).toBe(JSON.stringify(before.state));
+    }
   });
 
   it("drops it when the reducer refuses a stored intent", () => {

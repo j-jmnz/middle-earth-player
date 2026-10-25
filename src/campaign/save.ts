@@ -53,11 +53,16 @@ export type StoredLoadout = {
   acceptPenalty: boolean;
 };
 
-export const storedLoadoutSchema = z.strictObject({
+// What any deal keeps, campaign or standalone: the scenario, the difficulty, each seat's deck and the Ring-bearer slot.
+export const dealtLoadoutSchema = z.strictObject({
   scenarioId: z.string(),
   difficulty: z.enum(["Easy", "Normal"]),
   seats: z.array(z.strictObject({ deckId: z.string().nullable(), heroes: z.array(z.string()), deck: z.array(z.string()) })),
   ringBearer: z.string().nullable(),
+});
+
+// A campaign deal adds the answers to the campaign card's Setup choices and the accepted penalty.
+export const storedLoadoutSchema = dealtLoadoutSchema.extend({
   choices: z.array(z.string()),
   acceptPenalty: z.boolean(),
 });

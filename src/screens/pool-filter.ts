@@ -100,6 +100,19 @@ export function filterPool<T extends PoolCard>(
   });
 }
 
+// An alternate printing's tag ("(MotK) Aragorn", the Messenger of the King heroes) does not sort; the name does.
+function nameKey(name: string): string {
+  return name.replace(/^\([^)]*\)\s*/, "");
+}
+
+/** The pool in name order, a printing's leading tag ignored (the untagged printing first), then by code. */
+export function sortPool<T extends { code: string; name: string }>(cards: readonly T[]): T[] {
+  const tagged = (name: string) => (nameKey(name) === name ? 0 : 1);
+  return [...cards].sort(
+    (left, right) => nameKey(left.name).localeCompare(nameKey(right.name)) || tagged(left.name) - tagged(right.name) || left.code.localeCompare(right.code),
+  );
+}
+
 /** The number printed in the row: cost, or threat when the card has no cost. */
 export function shownCost(card: { cost: string | null; threat: number | null }): string {
   if (card.cost && card.cost.length > 0) return card.cost;

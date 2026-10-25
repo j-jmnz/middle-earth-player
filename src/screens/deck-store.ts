@@ -40,7 +40,7 @@ export function newDeckId(now: number = Date.now(), random: () => number = Math.
 
 const columns = { id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards, updatedAt: decks.updatedAt };
 
-/** Every saved deck, the one saved last first; rows never saved since 0004 (the starters) follow in the order they were made. */
+/** Every saved deck, the one saved last first; rows never saved since 0005 (the starters) follow in the order they were made. */
 export function listDecks<TRun>(user: Db<TRun>): SavedDeck[] {
   return user.select(columns).from(decks).orderBy(desc(decks.updatedAt), asc(sql`rowid`)).all();
 }

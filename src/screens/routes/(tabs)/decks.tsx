@@ -272,7 +272,6 @@ export default function Decks() {
         <View className="-mx-3 mt-2 flex-row flex-wrap items-center">
           <TextButton testID="deck-new" label="New deck" tone="gold" onPress={newDeck} />
           <TextButton testID="deck-import" label="Import" onPress={() => router.push("/deck-import")} />
-          <TextButton testID="card-pool" label="Card pool" onPress={() => router.push("/pool")} />
         </View>
       ) : null}
       {filters}

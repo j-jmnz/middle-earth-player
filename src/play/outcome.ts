@@ -4,7 +4,7 @@
 // threat, then the threat raised or the progress placed and the stage it advanced to), each attack's numbers and damage,
 // travel, the cards revealed and the enemies that engaged. Every number is one the engine put in a step. The log keeps
 // the whole round; the banner keeps what changed the table.
-import type { EngineStep } from "../rules/intents.ts";
+import type { EngineStep, PlayerIntent } from "../rules/intents.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
 import type { LogMark } from "./log.ts";
@@ -133,4 +133,54 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   const kept = lines.slice(0, MOST);
   if (lines.length > MOST) kept.push({ text: `And ${lines.length - MOST} more in the log`, mark: null });
   return { title: lead.title || "This turn", tone: lead.tone, lines: kept };
+}
+
+function listed(ids: readonly string[], card: (cardId: string) => string): string {
+  return ids.map((id) => card(id)).join(", ");
+}
+
+/** The player's choice in words, for the banner after Undo ("Frodo Baggins committed to the quest"). */
+export function intentWords(intent: PlayerIntent, card: (cardId: string) => string): string {
+  switch (intent.type) {
+    case "Pass":
+      return "Passed";
+    case "PlayCard":
+      return intent.hostId ? `Played ${card(intent.cardId)} on ${card(intent.hostId)}` : `Played ${card(intent.cardId)}`;
+    case "Commit":
+      return `${listed(intent.cardIds, card)} committed to the quest`;
+    case "CommitHide":
+      return `${listed(intent.cardIds, card)} committed to the Hide test`;
+    case "Travel":
+      return `Traveled to ${card(intent.locationId)}`;
+    case "DeclineTravel":
+      return "Did not travel";
+    case "Engage":
+      return `Engaged ${card(intent.enemyId)}`;
+    case "DeclineEngage":
+      return "Did not engage";
+    case "ChooseEnemy":
+      return `Chose ${card(intent.enemyId)}`;
+    case "DeclareDefender":
+      return `${card(intent.defenderId)} defended`;
+    case "Undefended":
+      return intent.heroId ? `Left the attack undefended on ${card(intent.heroId)}` : "Left the attack undefended";
+    case "DeclareAttackers":
+      return `${listed(intent.attackerIds, card)} attacked ${card(intent.enemyId)}`;
+    case "DeclineAttack":
+      return "Did not attack";
+    case "Trigger":
+      return `Used ${card(intent.cardId)}`;
+    case "Distribute":
+      return "Assigned the damage";
+    case "Keep":
+      return "Kept the hand";
+    default:
+      return "Your last choice";
+  }
+}
+
+/** The banner after Undo: "Taken back", the choice in words, and what it had done when that said anything. */
+export function takenBack(choice: string, undone: Moment | null): Moment {
+  const lines: MomentLine[] = [{ text: choice, mark: null }, ...(undone ? [{ text: undone.title, mark: null }, ...undone.lines] : [])];
+  return { title: "Taken back", tone: "plain", lines: lines.slice(0, MOST) };
 }

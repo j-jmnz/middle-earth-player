@@ -34,7 +34,14 @@
       "idx": 4,
       "version": "6",
       "when": 1761552000000,
-      "tag": "0004_deck_updated_at",
+      "tag": "0004_standalone_games",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1761638400000,
+      "tag": "0005_deck_updated_at",
       "breakpoints": true
     }
   ]

@@ -8,7 +8,7 @@ import { booklets, saves, type StoredJson } from "./user-schema";
 type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
 // The stored JSON is plain data. The campaign types are readonly views of it.
-function stored(value: unknown): StoredJson {
+export function stored(value: unknown): StoredJson {
   return JSON.parse(JSON.stringify(value)) as StoredJson;
 }
 

@@ -10,7 +10,7 @@ import type { StartScenario } from "../rules/setup.ts";
 import { checklist, type ChecklistPlan, type ChecklistStep, type Need } from "./checklist.ts";
 import { validateLoadout, type LoadoutSeat } from "./loadout.ts";
 import type { CampaignLog } from "./log.ts";
-import { buildStart } from "./start.ts";
+import { buildStart, type PlayMode } from "./start.ts";
 import type { World } from "./world.ts";
 
 export type BriefingSeat = { deckId: string | null; heroes: readonly string[]; deck: readonly string[] };
@@ -30,6 +30,9 @@ export type BriefingInput = {
 };
 
 export type Problem = { rule: string; message: string };
+
+// The part of a briefing both modes read: the decks, the seat count and the Ring-bearer slot.
+export type LoadoutInput = Pick<BriefingInput, "world" | "seatCount" | "seats" | "ringBearer">;
 
 export type Briefing = {
   problems: Problem[];
@@ -54,7 +57,7 @@ export function deckHasRingBearer(world: World, seat: BriefingSeat | undefined):
 
 // The loadout the saga rules and the checklist read: the saved deck's heroes, and the slot's hero in front when the
 // deck brings no Ring-bearer. A fallen hero is not special-cased here: step 2 of the checklist names it.
-export function loadoutOf(input: BriefingInput): LoadoutSeat[] {
+export function loadoutOf(input: LoadoutInput): LoadoutSeat[] {
   return input.seats.slice(0, input.seatCount).map((seat, index) => {
     const slot = index === 0 && input.ringBearer && !deckHasRingBearer(input.world, seat) ? [input.ringBearer] : [];
     return { heroes: [...slot, ...seat.heroes], deck: seat.deck };
@@ -78,11 +81,13 @@ function deckCounts(deck: readonly string[]): { code: string; count: number }[] 
   return [...counts].map(([code, count]) => ({ code, count }));
 }
 
-function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSeat[] } {
+// What a loadout must satisfy before any deal, campaign or standalone: a saved deck per seat with one to three heroes
+// (rr.deckbuilding), no fallen hero (the campaign's list; none in a standalone game), and the saga rules on the
+// loadout (validateLoadout).
+export function loadoutProblems(input: LoadoutInput, fallen: readonly string[]): { problems: Problem[]; loadout: LoadoutSeat[] } {
   const problems: Problem[] = [];
   const { world } = input;
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
-  // The hero count (1 to 3, rr.deckbuilding) runs on the saved deck.
   input.seats.slice(0, input.seatCount).forEach((seat, index) => {
     const label = input.seatCount === 1 ? "The deck" : `Seat ${index + 1}'s deck`;
     if (seat.deckId == null) problems.push({ rule: "Choose a deck", message: `Choose a saved deck for seat ${index + 1}.` });
@@ -93,8 +98,7 @@ function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSea
       if (refusal) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(refusal)}` });
     }
     for (const code of seat.heroes) {
-      const fell = (input.log.fallenHeroesBySeat.flat()).includes(code);
-      if (fell) problems.push({ rule: "A fallen hero cannot start", message: `${nameOf(code)} is a fallen hero and cannot start.` });
+      if (fallen.includes(code)) problems.push({ rule: "A fallen hero cannot start", message: `${nameOf(code)} is a fallen hero and cannot start.` });
     }
   });
   const loadout = loadoutOf(input);
@@ -102,6 +106,10 @@ function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSea
     for (const error of validateLoadout(loadout, world.cards)) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
   }
   return { problems, loadout };
+}
+
+function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSeat[] } {
+  return loadoutProblems(input, input.log.fallenHeroesBySeat.flat());
 }
 
 export function briefing(input: BriefingInput): Briefing {
@@ -163,8 +171,9 @@ export type ScenarioFacts = {
 };
 
 // What the briefing says about the scenario itself: the stages in order, the encounter sets with the cards each
-// contributes at the difficulty, and the special rules the scenario's data declares, by name.
-export function scenarioFacts(world: World, difficulty: Difficulty): ScenarioFacts {
+// contributes at the difficulty, and the special rules the scenario's data declares, by name. A standalone game has no
+// campaign card, so its rules are not named there.
+export function scenarioFacts(world: World, difficulty: Difficulty, mode: PlayMode = "campaign"): ScenarioFacts {
   const { scenario } = world;
   const encounter = scenario.cards.filter((card) => card.pile === "encounter");
   const countOf = (card: (typeof encounter)[number]) => (difficulty === "Easy" ? card.easy : card.normal);
@@ -180,7 +189,7 @@ export function scenarioFacts(world: World, difficulty: Difficulty): ScenarioFac
   if (scenario.cards.some((card) => card.pile === "burden")) rules.push("Burden deck");
   if (scenario.widgets.secondActiveLocation) rules.push("Second active location");
   if (scenario.widgets.perSeatStaging) rules.push("Separate staging areas");
-  if (recordInstructions(world.effects, scenario.campaignCard, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty")) rules.push("No hero-change penalty");
+  if (mode === "campaign" && recordInstructions(world.effects, scenario.campaignCard, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty")) rules.push("No hero-change penalty");
   return {
     number: scenario.number,
     name: scenario.name,

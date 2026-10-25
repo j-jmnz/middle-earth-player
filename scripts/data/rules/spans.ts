@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import type { ExtractedDoc } from "./extract.ts";
+import type { RuleEntry } from "../../../src/catalog/rule-entry.ts";
 
 // data/rules/index.json is curated by hand: each rule id is a span of one document, bounded by two exact quotes.
 // `from` opens the span and `to` closes it, both read from the extracted text of one page column. A span that runs
@@ -20,15 +21,8 @@ export const spanSchema = z.strictObject({
 export type Span = z.infer<typeof spanSchema>;
 export const indexSchema = z.array(spanSchema);
 
-export type RuleEntry = {
-  id: string;
-  doc: string;
-  page: number;
-  column: number;
-  title: string;
-  text: string;
-  terms: string[];
-};
+// The built span's shape is the app's (src/catalog/rule-entry.ts), so the build and the phone read one type.
+export type { RuleEntry };
 
 type Hit = { start: number; end: number };
 

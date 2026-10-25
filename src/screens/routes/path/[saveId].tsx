@@ -2,13 +2,14 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
-import { campaignPath, type PathNode } from "../../../campaign/path";
+import { campaignPath, openNode, type PathNode } from "../../../campaign/path";
 import { BodyText, Label, NavBar, Panel, PrimaryButton, RingMark, Screen, TextButton, pressedNight } from "../../chrome";
 import { bookletParams, campaignOf, scenarioNames } from "../../campaign-data";
 import { cardNames } from "../../card-names";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
+import { briefingHref, tableHref } from "../../scenario-links";
 import { goBack } from "../../go-back";
 import { droppedSentence, useSave } from "../../use-save";
 
@@ -114,7 +115,8 @@ export default function CampaignPath() {
   }
 
   const currentIndex = nodes.findIndex((node) => node.status === "current");
-  const resuming = save.loadout?.scenarioId;
+  // The same open scenario the campaign list's Continue resumes (nextStep).
+  const open = openNode(nodes, save.loadout?.scenarioId);
   const name = (code: string) => names.get(code) ?? code;
   const poolText =
     save.log.campaignPool.length === 0
@@ -148,13 +150,13 @@ export default function CampaignPath() {
             last={index === nodes.length - 1}
             rewardText={node.reward.map(name).join(" · ")}
             action={
-              resuming === node.id && node.status !== "locked"
-                ? { label: "Resume", onPress: () => router.push({ pathname: "/table/[saveId]", params: { saveId: save.id } }) }
+              open?.id === node.id
+                ? { label: "Resume", onPress: () => router.push(tableHref(save.id)) }
                 : node.status === "current"
-                  ? { label: "Begin", hint: resuming ? "A scenario is open. Dealing this one drops it." : undefined, onPress: () => router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: node.id } }) }
+                  ? { label: "Begin", hint: open ? "A scenario is open. Dealing this one drops it." : undefined, onPress: () => router.push(briefingHref(save.id, node.id)) }
                   : null
             }
-            onOpen={node.status === "completed" ? () => router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: node.id } }) : null}
+            onOpen={node.status === "completed" ? () => router.push(briefingHref(save.id, node.id)) : null}
           />
         ))}
       </ScrollView>

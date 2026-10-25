@@ -60,8 +60,9 @@ appId: com.middleearth.lcg
 # Kill and relaunch: the choices are on the log and A Knife in the Dark is unlocked.
 - stopApp
 - launchApp
+# The last playthrough opens on the list's Continue panel; Path opens its path.
 - tapOn:
-    id: "save-.*"
+    id: continue-path
 - extendedWaitUntil:
     visible:
       id: campaign-path

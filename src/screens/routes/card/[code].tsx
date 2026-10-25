@@ -255,7 +255,7 @@ export default function CardScreen() {
     <Screen scene="plain">
       <NavBar
         backTestID="back"
-        onBack={() => goBack(router, "/packs")}
+        onBack={() => goBack(router, "/cards")}
         right={row?.name ? <Text className="text-label text-faint">{row.code}</Text> : undefined}
       />
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-8 pt-4">

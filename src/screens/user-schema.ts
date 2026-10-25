@@ -20,7 +20,7 @@ export const decks = sqliteTable("decks", {
   heroes: text("heroes", { mode: "json" }).$type<string[]>().notNull(),
   cards: text("cards", { mode: "json" }).$type<DeckCard[]>().notNull(),
   // When the player last saved the deck (ms since the epoch). The deck list puts the one saved last first. Starter rows
-  // and rows from before 0004 read null and follow.
+  // and rows from before 0005 read null and follow.
   updatedAt: integer("updated_at"),
 });
 
@@ -40,6 +40,23 @@ export const saves = sqliteTable("saves", {
   // When the save was last written (ms since the epoch): a deal, an intent, a resolution, the notes. The campaign list puts
   // the one written last first, as Current. Archive and Restore do not write it. Rows from before 0003 read null.
   updatedAt: integer("updated_at"),
+});
+
+// One row per standalone game: one deal of one scenario, outside any campaign (src/campaign/standalone.ts). No log and no
+// pool: `loadout` is what was dealt, `activeScenario` the open game's seed and intents, `result` how it ended.
+export const standaloneGames = sqliteTable("standalone_games", {
+  id: text("id").primaryKey(),
+  // The box the scenario is from ("fellowship-of-the-ring").
+  campaignId: text("campaign_id").notNull(),
+  scenarioId: text("scenario_id").notNull(),
+  seatCount: integer("seat_count").notNull(),
+  loadout: text("loadout", { mode: "json" }).$type<StoredJson>().notNull(),
+  activeScenario: text("active_scenario", { mode: "json" }).$type<StoredJson | null>(),
+  result: text("result", { mode: "json" }).$type<StoredJson | null>(),
+  // When it was dealt (ms since the epoch); the list shows the newest first.
+  createdAt: integer("created_at").notNull(),
+  // When the player put it away. An archived game keeps everything and comes back as it was on restore.
+  archivedAt: integer("archived_at"),
 });
 
 // One row per stored booklet PDF. `path` is relative to the document directory (booklets/<id>.pdf), so the row survives

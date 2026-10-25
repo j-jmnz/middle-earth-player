@@ -3,6 +3,8 @@
 import printed from "../../data/printed/fellowship-of-the-ring.json";
 import rules from "../../data/rules/entries.json";
 
+import { parseRuleEntries } from "../catalog/rule-entry.ts";
+
 type LedgerEntry = { code: string; side: string; lines: string[] };
 
 let lines: Map<string, string> | null = null;
@@ -21,6 +23,6 @@ export function ledgerLine(id: string): string | null {
 
 /** The title of a rule span id, or null when data/rules has no such span. */
 export function ruleTitle(id: string): string | null {
-  if (!titles) titles = new Map((rules as { id: string; title: string }[]).map((entry) => [entry.id, entry.title]));
+  if (!titles) titles = new Map(parseRuleEntries(rules).map((entry) => [entry.id, entry.title]));
   return titles.get(id) ?? null;
 }

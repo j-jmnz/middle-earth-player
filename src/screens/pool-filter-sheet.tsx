@@ -1,23 +1,47 @@
 import { FlashList } from "@shopify/flash-list";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AccessibilityInfo, Modal, Pressable, ScrollView, Switch, Text, useWindowDimensions, View } from "react-native";
 
-import { PaperSheet, PrimaryButton, SphereMark, TextButton, markedSphere } from "./chrome";
+import { traitTokens } from "../catalog/deck-save";
+import { GameIcon } from "../play/game-icon";
+import type { IconName } from "../play/icon-map";
+import { PaperSheet, PrimaryButton, SphereMark, TextButton, markedSphere, sphereWord } from "./chrome";
 import { palette } from "./palette.js";
 import {
+  costOptions,
   filterSheetAnimation,
   packChooserRows,
   traitChooserRows,
   type CycleGroup,
+  type PoolCard,
   type PoolFilter,
 } from "./pool-filter";
-import { GameIcon } from "../play/game-icon";
-import type { IconName } from "../play/icon-map";
 
-// The card pool's Filter sheet: sphere chips, pack or cycle, trait, cost and two switches, edited as a draft and applied
-// at once. The type is the pool's chip row, not a field here.
+type FilterRow = PoolCard & { typeName: string; sphereName: string | null };
 
-function useReduceMotion(): boolean {
+type Chooser = "pack" | "trait" | "cost" | null;
+
+// The pool's filter as a paper sheet over the list: sphere chips, then pack, trait and cost choosers and the two
+// switches. It edits `filter` (the draft); Apply hands it back, Close and the scrim drop it.
+export function PoolFilterSheet({
+  open,
+  rows,
+  groups,
+  filter,
+  onChange,
+  onDismiss,
+  onApply,
+}: {
+  open: boolean;
+  rows: readonly FilterRow[];
+  groups: CycleGroup[];
+  filter: PoolFilter;
+  onChange: (next: PoolFilter) => void;
+  onDismiss: () => void;
+  onApply: () => void;
+}) {
+  const { height } = useWindowDimensions();
+  const [chooser, setChooser] = useState<Chooser>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
   useEffect(() => {
     let current = true;
@@ -34,52 +58,18 @@ function useReduceMotion(): boolean {
       subscription.remove();
     };
   }, []);
-  return reduceMotion;
-}
-
-export function PoolFilterSheet({
-  open,
-  applied,
-  groups,
-  spheres,
-  traits,
-  costs,
-  onApply,
-  onClose,
-}: {
-  open: boolean;
-  applied: PoolFilter;
-  groups: CycleGroup[];
-  spheres: { code: string; name: string }[];
-  traits: string[];
-  costs: string[];
-  onApply: (next: PoolFilter) => void;
-  onClose: () => void;
-}) {
-  const { height } = useWindowDimensions();
-  const reduceMotion = useReduceMotion();
-  const [draftFilter, setDraftFilter] = useState<PoolFilter>(applied);
-  const [chooser, setChooser] = useState<"pack" | "trait" | "cost" | null>(null);
-
-  // Each opening starts from the filter in use, on the sheet's first page (set while rendering, as React advises for
-  // state that follows a prop).
-  const [shown, setShown] = useState(open);
-  if (open !== shown) {
-    setShown(open);
-    if (open) {
-      setDraftFilter(applied);
-      setChooser(null);
-    }
-  }
+  const spheres = useMemo(() => sphereChoices(rows), [rows]);
+  const traits = useMemo(() => traitChoices(rows), [rows]);
+  const costs = useMemo(() => costOptions(rows), [rows]);
 
   function dismiss(): void {
     setChooser(null);
-    onClose();
+    onDismiss();
   }
 
   function apply(): void {
     setChooser(null);
-    onApply(draftFilter);
+    onApply();
   }
 
   return (
@@ -97,7 +87,7 @@ export function PoolFilterSheet({
               listHeight={height * 0.62}
               onBack={() => setChooser(null)}
               onPick={(row) => {
-                setDraftFilter({ ...draftFilter, pack: row.pack });
+                onChange({ ...filter, pack: row.pack });
                 setChooser(null);
               }}
             />
@@ -107,7 +97,7 @@ export function PoolFilterSheet({
               listHeight={height * 0.62}
               onBack={() => setChooser(null)}
               onPick={(row) => {
-                setDraftFilter({ ...draftFilter, trait: row.key === "any" ? null : row.label });
+                onChange({ ...filter, trait: row.key === "any" ? null : row.label });
                 setChooser(null);
               }}
             />
@@ -115,17 +105,17 @@ export function PoolFilterSheet({
             <ScrollView style={{ maxHeight: height * 0.62 }} keyboardShouldPersistTaps="handled">
               {chooser === null ? (
                 <FilterBody
-                  filter={draftFilter}
+                  filter={filter}
                   spheres={spheres}
                   groups={groups}
-                  onChange={setDraftFilter}
+                  onChange={onChange}
                   onChoose={setChooser}
                 />
               ) : (
                 <CostChooser
-                  filter={draftFilter}
+                  filter={filter}
                   costs={costs}
-                  onChange={setDraftFilter}
+                  onChange={onChange}
                   onBack={() => setChooser(null)}
                 />
               )}
@@ -312,4 +302,40 @@ function packDetail(filter: PoolFilter, groups: readonly CycleGroup[]): string {
     if (pack) return pack.name;
   }
   return selected.code;
+}
+
+function sphereChoices(rows: readonly FilterRow[]): { code: string; name: string }[] {
+  const order = ["leadership", "tactics", "spirit", "lore", "fellowship", "baggins", "neutral"];
+  const byCode = new Map<string, string>();
+  for (const row of rows) {
+    if (!row.sphereCode || byCode.has(row.sphereCode)) continue;
+    byCode.set(row.sphereCode, sphereWord(row.sphereName));
+  }
+  const known = order.filter((code) => byCode.has(code)).map((code) => ({ code, name: byCode.get(code) ?? code }));
+  const rest = [...byCode.entries()]
+    .filter(([code]) => !order.includes(code))
+    .map(([code, name]) => ({ code, name }));
+  return [...known, ...rest];
+}
+
+/** The pool's card types in the game's order: the type chips over the list (the sheet leaves the type to them). */
+export function typeChoices(rows: readonly { typeCode: string; typeName: string }[]): { code: string; name: string }[] {
+  const order = ["hero", "ally", "attachment", "event", "contract", "player-side-quest"];
+  const byCode = new Map<string, string>();
+  for (const row of rows) {
+    if (!byCode.has(row.typeCode)) byCode.set(row.typeCode, row.typeName);
+  }
+  const known = order.filter((code) => byCode.has(code)).map((code) => ({ code, name: byCode.get(code) ?? code }));
+  const rest = [...byCode.entries()]
+    .filter(([code]) => !order.includes(code))
+    .map(([code, name]) => ({ code, name }));
+  return [...known, ...rest];
+}
+
+function traitChoices(rows: readonly FilterRow[]): string[] {
+  const tokens = new Set<string>();
+  for (const row of rows) {
+    for (const token of traitTokens(row.traits)) tokens.add(token);
+  }
+  return [...tokens].sort((left, right) => left.localeCompare(right));
 }

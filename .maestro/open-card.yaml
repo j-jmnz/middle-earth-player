@@ -2,7 +2,9 @@ appId: com.middleearth.lcg
 ---
 - launchApp
 - tapOn:
-    id: packs-tab
+    id: cards-tab
+- tapOn:
+    id: packs-open
 - scrollUntilVisible:
     element:
       id: pack-TBR
@@ -18,7 +20,9 @@ appId: com.middleearth.lcg
 - stopApp
 - launchApp
 - tapOn:
-    id: packs-tab
+    id: cards-tab
+- tapOn:
+    id: packs-open
 - scrollUntilVisible:
     element:
       id: pack-TBR
