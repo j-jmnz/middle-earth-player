@@ -7,7 +7,7 @@ describe("GLOSSARY", () => {
     const docs = new Set(GLOSSARY.map((entry) => entry.doc));
     expect([...docs].sort()).toEqual(["easy-mode", "faq", "learn-to-play", "mec109", "rr"]);
     expect(GLOSSARY.some((entry) => /^(decklist\.|mec109\.(starter-|setup-|stage-))/.test(entry.id))).toBe(false);
-    expect(glossaryEntry("mec109.hide-tests")?.source).toBe("Fellowship campaign book · page 4");
+    expect(glossaryEntry("mec109.hide-tests")?.source).toBe("Fellowship of the Ring campaign book · page 4");
   });
 
   it("sorts by title without entry numbers, step numbers or quote marks", () => {
@@ -49,6 +49,10 @@ describe("paragraphs", () => {
 });
 
 describe("seeAlso", () => {
+  it("shows a quoted name without its quote marks and comma", () => {
+    expect(seeAlso(glossaryEntry("rr.attachment-cards")!, GLOSSARY).map((link) => link.name)).toContain("Cannot have attachments");
+  });
+
   it("links each name to an entry of the same book, and keeps a name with none", () => {
     const links = seeAlso(glossaryEntry("rr.action")!, GLOSSARY);
     expect(links.map((link) => [link.name, link.entry?.id ?? null])).toEqual([

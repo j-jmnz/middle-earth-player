@@ -42,8 +42,13 @@ export function currentNode(path: readonly PathNode[]): PathNode | null {
 // The open scenario is the one the stored loadout dealt; like the path, a locked node is never resumed.
 export type NextStep = { kind: "resume" | "begin"; node: PathNode } | { kind: "finished" };
 
+/** The node of the open scenario, when the loadout names one the path has reached. */
+export function openNode(path: readonly PathNode[], openScenarioId: string | null | undefined): PathNode | null {
+  return (openScenarioId && path.find((node) => node.id === openScenarioId && node.status !== "locked")) || null;
+}
+
 export function nextStep(path: readonly PathNode[], openScenarioId: string | null | undefined): NextStep {
-  const open = openScenarioId ? path.find((node) => node.id === openScenarioId && node.status !== "locked") : undefined;
+  const open = openNode(path, openScenarioId);
   if (open) return { kind: "resume", node: open };
   const current = currentNode(path);
   return current ? { kind: "begin", node: current } : { kind: "finished" };
