@@ -4,6 +4,7 @@ import path from "node:path";
 import { parse as parseJsonc } from "jsonc-parser";
 
 import { EFFECTS } from "../../../src/effects/index.ts";
+import { runScript, type Log } from "../../log.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaign, loadScenario } from "../load-scenarios.ts";
@@ -28,12 +29,13 @@ function similarity(left: string, right: string): number {
   return shared / Math.max(1, a.size + b.size - shared);
 }
 
-function main(): void {
-  const scenarioId = process.argv[2];
+function main(log: Log): void {
+  const scenarioId = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
   if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id>");
   const campaign = loadCampaign();
   const deck = campaign.starterDecks.find((entry) => entry.id === scenarioId);
   const scenario = deck ? null : loadScenario(scenarioId);
+  log.info(deck ? `starter deck ${deck.id}: ${deck.rows.length} rows` : `scenario ${scenarioId}`);
   const cards = loadCards();
   const ledger = loadLedger();
   const byCode = new Map(cards.map((card) => [card.code, card]));
@@ -110,8 +112,9 @@ function main(): void {
       .slice(0, 3);
     for (const item of near) sections.push(`Card ${item.effect.cardCode}: ${item.text.slice(0, 300)}`, "```json", JSON.stringify(item.effect), "```", ``);
     writeFileSync(path.join(out, `${code}.md`), `${sections.join("\n")}\n`);
+    log.debug(`${code}.md: ${lines.length} line${lines.length === 1 ? "" : "s"} (${lines.map((line) => line.lineId).join(", ")})`);
   }
-  console.log(`${byCard.size} drafts in .agent/drafts for ${scenarioId}; ${Object.values(generated.usage).reduce((sum, n) => sum + n, 0)} lines came from templates`);
+  log.info(`${byCard.size} drafts (${open.length} lines) in .agent/drafts for ${scenarioId}; ${Object.values(generated.usage).reduce((sum, n) => sum + n, 0)} lines came from templates`);
 }
 
-main();
+void runScript("effects:draft", main);

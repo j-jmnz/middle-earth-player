@@ -17,6 +17,8 @@ export type TableCanvasProps = {
   inactive: (code: string) => boolean;
   // A tap on a card. The picture stays on the canvas; the screen opens the inspect route.
   onInspect: (cardId: string) => void;
+  // A long press on a face-up card: the screen shows it large over the table.
+  onPreview: (cardId: string) => void;
   // A drag ended on one of the selected card's drop targets (a key from targetKey). The screen asks the reducer.
   onDrop: (cardId: string, target: string) => void;
 };

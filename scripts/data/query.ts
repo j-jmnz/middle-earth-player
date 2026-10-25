@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
+import { duration, runScript } from "../log.ts";
 import { loadCards } from "./load-cards.ts";
 import { DATA_DIR } from "./paths.ts";
 import { loadScenarios } from "./load-scenarios.ts";
@@ -35,13 +36,24 @@ export function openDataDatabase(dataDir = DATA_DIR): DatabaseSync {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(import.meta.filename)) {
-  const sql = process.argv.slice(2).join(" ").trim();
-  if (sql === "") {
-    console.error('Usage: pnpm data:query "select code, name from cards where encounterSet = \'Hunted\'"\nTables: cards, scenario_cards, rules');
-    process.exitCode = 1;
-  } else {
-    const rows = openDataDatabase().prepare(sql).all();
+  // Rows go to stdout, one JSON object a line; the log (row count, timings, errors) goes to stderr.
+  void runScript("data:query", (log) => {
+    const sql = process.argv
+      .slice(2)
+      .filter((arg) => arg !== "--" && arg !== "--verbose" && arg !== "--quiet")
+      .join(" ")
+      .trim();
+    if (sql === "") throw new Error('Usage: pnpm data:query "select code, name from cards where encounterSet = \'Hunted\'"\nTables: cards, scenario_cards, rules');
+    const begin = performance.now();
+    const db = openDataDatabase();
+    log.debug(`loaded data/ into memory in ${duration(performance.now() - begin)}; sql: ${sql}`);
+    let rows: unknown[];
+    try {
+      rows = db.prepare(sql).all();
+    } catch (error) {
+      throw new Error(`The query did not run: ${sql}`, { cause: error });
+    }
     for (const row of rows) console.log(JSON.stringify(row));
-    console.error(`${rows.length} row${rows.length === 1 ? "" : "s"}`);
-  }
+    log.info(`${rows.length} row${rows.length === 1 ? "" : "s"}`);
+  }, { done: false });
 }

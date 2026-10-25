@@ -5,7 +5,7 @@
 // and snap under reduced motion. Nothing here holds a number the engine did not compute.
 import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
-import Animated, { FadeIn, ReduceMotion, SlideInDown } from "react-native-reanimated";
+import Animated, { FadeIn, ReduceMotion } from "react-native-reanimated";
 
 import { GameIcon, IconValue } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
@@ -17,12 +17,11 @@ import { distributeIntent, multiIntent, paySheet } from "./bar-sheets.ts";
 import type { DistributeSheet, MultiSheet, Sheet, TriggerOption, TriggerSheet } from "./sheet-types.ts";
 import { tableTokens as t } from "./tokens.ts";
 import { PickView } from "./pick-sheet-view.tsx";
-import { ChromeButton, ChromePrimary, Paper, paperProps, Tile, Why, type SheetProps } from "./sheet-paper.tsx";
+import { ChromeButton, ChromePrimary, Paper, paperProps, SheetFrame, Tile, useTableTaps, Why, type SheetProps } from "./sheet-paper.tsx";
 
 export { ChromeButton, ChromePrimary };
 
 const fade = FadeIn.duration(180).reduceMotion(ReduceMotion.System);
-const rise = SlideInDown.duration(220).reduceMotion(ReduceMotion.System);
 
 /** Previous step, the current step in gold caps, the next step: one centered line above the bar. Text, not a control. */
 export function PhaseRail({ rail }: { rail: Rail }) {
@@ -75,6 +74,12 @@ function MultiView(props: SheetProps & { sheet: MultiSheet }) {
   const { sheet, onIntent } = props;
   const [chosen, setChosen] = useState<readonly string[]>(sheet.preselected.filter((id) => sheet.options.some((item) => item.id === id)));
   const toggle = (id: string) => setChosen((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
+  // A tap on one of the characters on the table chooses it, as its tile does.
+  useTableTaps(props.claimTaps, (cardId) => {
+    if (!sheet.options.some((item) => item.id === cardId)) return false;
+    toggle(cardId);
+    return true;
+  });
   const alternative = sheet.alternative;
   const ready = sheet.allowEmpty || chosen.length > 0;
   const actions = (
@@ -104,6 +109,14 @@ function DistributeView(props: SheetProps & { sheet: DistributeSheet }) {
   const [shares, setShares] = useState<readonly Share[]>(() =>
     sheet.purpose.kind === "archery" ? [] : firstShares({ seat: 0, cardId: "", total: sheet.total, exact: sheet.exact, pools: sheet.options.map((item) => ({ heroId: item.id, max: item.max })) }),
   );
+  const take = (id: string, max: number) => setShares((current) => tapShare(current, id, max, sheet.exact ? sheet.total : null));
+  // "Tap a hero to take one resource from its pool": a tap on the hero on the table counts as a tap on its tile.
+  useTableTaps(props.claimTaps, (cardId) => {
+    const item = sheet.options.find((option) => option.id === cardId);
+    if (!item) return false;
+    take(item.id, item.max);
+    return true;
+  });
   const given = shareSum(shares);
   const ready = sharesReady(shares, sheet.total, sheet.exact);
   const note = sheet.exact ? `${sheet.note} ${given} of ${sheet.total}.` : `${sheet.note} ${given} paid.`;
@@ -123,7 +136,7 @@ function DistributeView(props: SheetProps & { sheet: DistributeSheet }) {
           stats={item.stats}
           selected={shareOf(shares, item.id) > 0}
           testID={`sheet-option-${item.id}`}
-          onPress={() => setShares((current) => tapShare(current, item.id, item.max, sheet.exact ? sheet.total : null))}
+          onPress={() => take(item.id, item.max)}
         />
       ))}
     </Paper>
@@ -198,15 +211,20 @@ export function SheetView(props: SheetProps & { sheet: Sheet }) {
   }
 }
 
-/** The collapsed sheet: one bar that brings the choice back, with the seats' threat still in sight. */
-export function SheetTab({ title, threat, onOpen }: { title: string; threat: string; onOpen: () => void }) {
+/** The collapsed sheet: one bar that brings the choice back, with the seats' threat still in sight, and Pass when allowed. */
+export function SheetTab({ title, threat, onOpen, onPass = null }: { title: string; threat: string; onOpen: () => void; onPass?: (() => void) | null }) {
   return (
-    <View className="flex-row items-center justify-between rounded-t-sheet bg-paper px-6 pb-safe pt-2">
-      <Text testID="sheet-tab-threat" className="font-display text-label text-inkLabel">
-        {threat}
-      </Text>
-      <ChromeButton label={`Choose: ${title}`} testID="sheet-expand" tone="ink" onPress={onOpen} />
-    </View>
+    <SheetFrame animated={false} paddingTop={8}>
+      <View className="flex-row items-center justify-between gap-2">
+        <Text testID="sheet-tab-threat" className="font-display text-label text-inkLabel">
+          {threat}
+        </Text>
+        <View className="shrink flex-row items-center">
+          {onPass ? <ChromeButton label="Pass" testID="sheet-tab-pass" tone="ink" onPress={onPass} /> : null}
+          <ChromeButton label={`Choose: ${title}`} testID="sheet-expand" tone="ink" onPress={onOpen} />
+        </View>
+      </View>
+    </SheetFrame>
   );
 }
 
@@ -221,7 +239,7 @@ function LogMarkView({ mark }: { mark: LogLine["mark"] }) {
 /** This round's engine steps and their causes, on paper. Text only: it is how a player checks a number against its source. */
 export function LogPanel({ round, lines, onClose }: { round: number; lines: readonly LogLine[]; onClose: () => void }) {
   return (
-    <Animated.View entering={rise} testID="log-sheet" className="rounded-t-sheet bg-paper px-6 pb-safe pt-3" style={{ maxHeight: "80%" }}>
+    <SheetFrame testID="log-sheet" maxHeight="80%">
       <View className="mb-2 h-1 w-10 self-center rounded-pill bg-inkLine" />
       <View className="items-center">
         <Text className="font-display text-eyebrow uppercase text-inkLabel">Log</Text>
@@ -242,14 +260,14 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
       <View className="items-center pt-2">
         <ChromeButton label="Close" testID="log-close" tone="ink" onPress={onClose} />
       </View>
-    </Animated.View>
+    </SheetFrame>
   );
 }
 
 /** A card and what is attached to it, each a full-size target that opens the card screen. */
 export function CardListPanel({ cards, onOpen, onClose }: { cards: readonly { id: string; label: string }[]; onOpen: (cardId: string) => void; onClose: () => void }) {
   return (
-    <Animated.View entering={rise} testID="card-list" className="rounded-t-sheet bg-paper px-6 pb-safe pt-3" style={{ maxHeight: "70%" }}>
+    <SheetFrame testID="card-list" maxHeight="70%">
       <View className="mb-2 h-1 w-10 self-center rounded-pill bg-inkLine" />
       <Text accessibilityRole="header" className="text-center font-display text-title text-ink">
         Inspect
@@ -262,6 +280,6 @@ export function CardListPanel({ cards, onOpen, onClose }: { cards: readonly { id
       <View className="items-center pt-1">
         <ChromeButton label="Close" testID="card-list-close" tone="ink" onPress={onClose} />
       </View>
-    </Animated.View>
+    </SheetFrame>
   );
 }

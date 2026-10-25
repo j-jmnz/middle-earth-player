@@ -34,7 +34,9 @@ import {
 import { addDraftCard, draftCopyCount, useDeckDraft } from "../deck-draft";
 import { useDatabases } from "../databases";
 import { enqueueImageDownloads } from "../images/queue";
-import { CardThumb } from "../images/picture";
+import { CardThumb, useCardPreview } from "../images/picture";
+import { useListPreview } from "../list-preview";
+import type { PictureSource } from "../../play/table-canvas-types";
 import { palette } from "../palette.js";
 import {
   costOptions,
@@ -127,12 +129,15 @@ function PoolCardRow({
   item,
   adding,
   count,
+  onPreview,
 }: {
   item: PoolRowCard;
   adding: boolean;
   count: number;
+  onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
   const router = useRouter();
+  const picture = useCardPreview(item.code, item.imagesrc);
   return (
     <ListRow
       testID={`card-${item.code}`}
@@ -143,6 +148,7 @@ function PoolCardRow({
       onPress={() => {
         router.push({ pathname: "/card/[code]", params: { code: item.code } });
       }}
+      onLongPress={() => onPreview(item.code, item.name, picture)}
       trailing={
         adding ? (
           <View className="flex-row items-center">
@@ -179,6 +185,7 @@ export default function CardPool() {
   const draft = useDeckDraft();
   const { height } = useWindowDimensions();
   const { catalog } = useDatabases();
+  const preview = useListPreview();
   const [rows] = useState(() =>
     catalog
       .select({
@@ -314,6 +321,7 @@ export default function CardPool() {
                   item={item}
                   adding={adding}
                   count={draftCopyCount(draft, item.code, item.typeCode)}
+                  onPreview={preview.open}
                 />
               ) : null
             }
@@ -380,6 +388,7 @@ export default function CardPool() {
           </PaperSheet>
         </View>
       </Modal>
+      {preview.overlay}
     </Screen>
   );
 }

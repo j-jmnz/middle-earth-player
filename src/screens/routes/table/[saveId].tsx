@@ -1,7 +1,7 @@
 // The table for the open scenario of a save. The canvas is src/play; this screen opens the session, keeps each accepted
 // intent in user.db, and hands the canvas the pictures in the image cache. The reducer is the only writer of the game.
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BackHandler, Text, View, type LayoutChangeEvent } from "react-native";
 import { useStore } from "zustand";
 
@@ -11,7 +11,8 @@ import { railFor } from "../../../play/rail";
 import { prefetchCodes, resolutionCodes } from "../../../play/prefetch";
 import { inspectTargets, shownSeat, threatSelector, zoneSelector } from "../../../play/selectors";
 import { dropOutcome, targetFromKey } from "../../../play/selection";
-import { actionsSheet, commitSheet, paySheet } from "../../../play/bar-sheets";
+import { actionsSheet, commitSheet, paySheet, sheetSendsPass } from "../../../play/bar-sheets";
+import { CardPreview } from "../../../play/card-preview";
 import type { Sheet, SheetNames } from "../../../play/sheet-types";
 import { isStepWindow, sheetFor } from "../../../play/sheets";
 import type { PlayerIntent, ScenarioState, TableStore } from "../../../play/store";
@@ -104,6 +105,10 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
     },
     [store],
   );
+  // Pass on the sheet (and its collapsed tab) whenever the rules allow it and the sheet has no Pass of its own: an Actions,
+  // Quest with or pay sheet opened from the bar covers the bar's Pass.
+  const passLegal = legal.some((intent) => intent.type === "Pass");
+  const sheetPass = useMemo(() => (sheet && passLegal && !sheetSendsPass(sheet) ? () => dispatch({ type: "Pass" }) : null), [sheet, passLegal, dispatch]);
   const openSheet = useCallback((next: Sheet) => setOverlay({ sheet: next, game: store.getState().game }), [store]);
   const openCard = useCallback(
     (cardId: string) => {
@@ -122,6 +127,28 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
     },
     [store, openCard],
   );
+  // The open sheet may take a tap on a card on the table first (a hero to pay from); otherwise the tap inspects the card.
+  const tapClaim = useRef<((cardId: string) => boolean) | null>(null);
+  const claimTaps = useCallback((handler: (cardId: string) => boolean) => {
+    tapClaim.current = handler;
+    return () => {
+      if (tapClaim.current === handler) tapClaim.current = null;
+    };
+  }, []);
+  const onCanvasTap = useCallback(
+    (cardId: string) => {
+      if (tapClaim.current?.(cardId)) return;
+      onInspect(cardId);
+    },
+    [onInspect],
+  );
+  // A long press shows the card large over the table.
+  const [preview, setPreview] = useState<string | null>(null);
+  // Read on each render, not memoized: a scan that lands while the preview is up (the image snapshot moves) replaces the name.
+  const previewCode = preview ? game.cards[preview]?.code : undefined;
+  const previewCard = previewCode
+    ? { code: previewCode, name: nameOf(previewCode), source: picture(previewCode), landscape: session.world.cards.get(previewCode)?.type === "quest", text: session.facts.get(previewCode)?.text ?? null }
+    : null;
   const onDrop = useCallback(
     (cardId: string, key: string) => {
       const { game: now, legal: listed, select, toggleCommit } = store.getState();
@@ -137,6 +164,10 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (preview) {
+        setPreview(null);
+        return true;
+      }
       const step = backStep({ logOpen, inspectOpen: inspectList != null, sheetOpen: sheet != null && showSheet });
       if (step === "closeLog") setLogOpen(false);
       else if (step === "closeInspect") setInspectList(null);
@@ -145,7 +176,7 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
       return true;
     });
     return () => subscription.remove();
-  }, [logOpen, inspectList, sheet, showSheet, router, saveId]);
+  }, [preview, logOpen, inspectList, sheet, showSheet, router, saveId]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -185,7 +216,8 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
             nameOf={nameOf}
             sphereOf={sphereOf}
             inactive={inactive}
-            onInspect={onInspect}
+            onInspect={onCanvasTap}
+            onPreview={setPreview}
             onDrop={onDrop}
           />
         ) : null}
@@ -216,10 +248,23 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
       ) : null}
       {sheet && showSheet && !logOpen && !inspectList ? (
         <View style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
-          <SheetView sheet={sheet} game={game} names={names} threat={threatText} refusal={refusal} onIntent={dispatch} onNext={openSheet} onOutcome={onOutcome} onInspect={onInspect} onCollapse={() => setCollapsed(sheet.key)} />
+          <SheetView
+            sheet={sheet}
+            game={game}
+            names={names}
+            threat={threatText}
+            refusal={refusal}
+            onIntent={dispatch}
+            onNext={openSheet}
+            onOutcome={onOutcome}
+            onInspect={onInspect}
+            onCollapse={() => setCollapsed(sheet.key)}
+            onPass={sheetPass}
+            claimTaps={claimTaps}
+          />
         </View>
       ) : null}
-      {sheet && !showSheet ? <SheetTab title={sheet.title} threat={threatText} onOpen={() => setCollapsed(null)} /> : null}
+      {sheet && !showSheet ? <SheetTab title={sheet.title} threat={threatText} onOpen={() => setCollapsed(null)} onPass={sheetPass} /> : null}
       {!sheet ? (
         <View className="flex-row items-end justify-between px-4 pb-safe pt-2">
           <View className="flex-row gap-3">
@@ -247,6 +292,14 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
             )}
           </View>
         </View>
+      ) : null}
+      {previewCard && preview ? (
+        <CardPreview
+          key={preview}
+          card={previewCard}
+          onClose={() => setPreview(null)}
+          onDetails={() => openCard(preview)}
+        />
       ) : null}
     </Screen>
   );

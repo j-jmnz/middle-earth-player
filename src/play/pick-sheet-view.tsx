@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Text, View } from "react-native";
 
-import { ChromeButton, ChromePrimary, Paper, paperProps, Tile, Why, type SheetProps } from "./sheet-paper.tsx";
+import { ChromeButton, ChromePrimary, Paper, paperProps, Tile, useTableTaps, Why, type SheetProps } from "./sheet-paper.tsx";
 import type { PickSheet } from "./sheet-types.ts";
 import { tableTokens as t } from "./tokens.ts";
 
@@ -11,6 +11,12 @@ export function PickView(props: SheetProps & { sheet: PickSheet }) {
   const { sheet, onIntent, onNext } = props;
   const [chosen, setChosen] = useState<string | null>(null);
   const picked = sheet.options.find((item) => item.id === chosen) ?? null;
+  // A tap on one of the choices on the table (a defender, a location to travel to) picks it, as its tile does.
+  useTableTaps(props.claimTaps, (cardId) => {
+    if (!sheet.options.some((item) => item.id === cardId)) return false;
+    setChosen(cardId);
+    return true;
+  });
   const confirm = () => {
     if (!picked) return;
     if ("intent" in picked) onIntent(picked.intent);

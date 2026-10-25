@@ -14,6 +14,9 @@ import { fileURLToPath } from "node:url";
 import Database from "better-sqlite3";
 
 import { sniffImage } from "../src/screens/images/policy.ts";
+import { bytes, createLog, runScript } from "./log.ts";
+
+const log = createLog("pack-scans");
 
 const SIDE_SUFFIXES = ["-1a", "-1b", "-2a", "-2b", "-3a", "-3b", "-setupa", "-setupb"] as const;
 const A_SIDES = ["-1a", "-2a", "-3a", "-setupa"] as const;
@@ -80,6 +83,7 @@ export type PackScansOptions = {
 
 export function packScans(options: PackScansOptions): PackedScan[] {
   const codes = fixtureCodes(options.fixturesDir);
+  log.info(`${codes.length} card codes in the scenario fixtures`);
   const database = new Database(options.catalogDb, { readonly: true });
   try {
     mkdirSync(options.scansDir, { recursive: true });
@@ -90,7 +94,10 @@ export function packScans(options: PackScansOptions): PackedScan[] {
         | { name: string; imagesrc: string | null }
         | undefined;
       if (!card) throw new Error(`Fixture code ${code} is not in the catalog`);
-      if (card.imagesrc) continue;
+      if (card.imagesrc) {
+        log.debug(`${code} ${card.name}: RingsDB has a picture, not bundled`);
+        continue;
+      }
       const match = matchShelfScan(card.name, listReadingFiles(options.readingDir));
       if (!match) {
         missing.push({ code, name: card.name });
@@ -99,16 +106,19 @@ export function packScans(options: PackScansOptions): PackedScan[] {
       packed.push(copyScan(code, match, options.scansDir));
     }
     if (missing.length > 0) {
+      log.info(`${missing.length} card${missing.length === 1 ? "" : "s"} not on the shelf yet (${missing.map((card) => card.code).join(", ")}): fetching the scenario shelf`);
       const fetchShelf = options.fetchShelf ?? (() => fetchScenarioShelf(options.root));
       fetchShelf();
       const files = listReadingFiles(options.readingDir);
       for (const card of missing) {
         const match = matchShelfScan(card.name, files);
-        if (!match) throw new Error(`No shelf file for ${card.code} (${card.name}) and no imagesrc`);
+        if (!match) throw new Error(`No shelf file for ${card.code} (${card.name}) under ${options.readingDir} (${files.length} files) and no imagesrc`);
         packed.push(copyScan(card.code, match, options.scansDir));
       }
     }
     writeScanMap(options.mapPath, packed);
+    const total = packed.reduce((sum, scan) => sum + statSync(path.join(options.scansDir, scan.filename)).size, 0);
+    log.info(`bundled ${packed.length} scan${packed.length === 1 ? "" : "s"} (${bytes(total)}) into ${path.relative(options.root, options.scansDir) || options.scansDir}; map ${path.relative(options.root, options.mapPath) || options.mapPath}`);
     return packed;
   } finally {
     database.close();
@@ -121,6 +131,7 @@ function copyScan(code: string, source: string, scansDir: string): PackedScan {
   if (!media) throw new Error(`Shelf file for ${code} is not a JPEG or PNG`);
   const filename = `${code}.${media.extension}`;
   copyFileSync(source, path.join(scansDir, filename));
+  log.debug(`${code}: ${path.basename(source)} -> ${filename} (${media.width}x${media.height})`);
   return { code, filename, width: media.width, height: media.height };
 }
 
@@ -216,13 +227,15 @@ function isDirectRun(): boolean {
 }
 
 if (isDirectRun()) {
-  const root = repoRoot();
-  packScans({
-    root,
-    fixturesDir: path.join(root, "data", "scenarios"),
-    catalogDb: path.join(root, "assets/catalog.db"),
-    readingDir: path.join(root, ".cache/sources/reading"),
-    scansDir: path.join(root, "assets/scans"),
-    mapPath: path.join(root, "src/screens/images/scan-map.ts"),
+  void runScript("pack-scans", () => {
+    const root = repoRoot();
+    packScans({
+      root,
+      fixturesDir: path.join(root, "data", "scenarios"),
+      catalogDb: path.join(root, "assets/catalog.db"),
+      readingDir: path.join(root, ".cache/sources/reading"),
+      scansDir: path.join(root, "assets/scans"),
+      mapPath: path.join(root, "src/screens/images/scan-map.ts"),
+    });
   });
 }

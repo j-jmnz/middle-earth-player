@@ -146,7 +146,7 @@ function CardFace({
   );
 }
 
-export function TableCanvas({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, onInspect, onDrop }: TableCanvasProps) {
+export function TableCanvas({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, onInspect, onPreview, onDrop }: TableCanvasProps) {
   const seat = useStore(store, (state) => shownSeat(state.game));
   const views = useViews(store, seat);
   const selected = useStore(store, (state) => state.selected);
@@ -256,8 +256,16 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
       if (slot && !slot.faceDown) scheduleOnRN(onInspect, slot.id);
     });
 
-    return Gesture.Race(pan, tap);
-  }, [slots, lifts, drops, dragging, dx, dy, lift, reduceMotion, select, onDrop, onInspect]);
+    // Held still past the press delay, a face-up card opens large. A drag (the finger moves first) or a tap wins otherwise.
+    const hold = Gesture.LongPress()
+      .minDuration(350)
+      .onStart((event) => {
+        const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
+        if (slot && !slot.faceDown) scheduleOnRN(onPreview, slot.id);
+      });
+
+    return Gesture.Race(pan, hold, tap);
+  }, [slots, lifts, drops, dragging, dx, dy, lift, reduceMotion, select, onDrop, onInspect, onPreview]);
 
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);

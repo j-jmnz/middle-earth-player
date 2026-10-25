@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { bytes, createLog, duration, type Log } from "../../log.ts";
 import { RAW_DIR } from "../paths.ts";
 
 // One fetched file: where it came from and the hash of the bytes we kept.
@@ -19,14 +20,53 @@ export function sha256(body: string | Uint8Array): string {
   return createHash("sha256").update(body).digest("hex");
 }
 
-export async function fetchBytes(url: string, timeoutMs = 120_000): Promise<Uint8Array> {
-  const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-  if (!response.ok) throw new Error(`GET ${url} failed with status ${response.status}`);
-  return new Uint8Array(await response.arrayBuffer());
+const fetchLog = createLog("fetch");
+
+// A response that came back with an error status: its message is already the whole story.
+class HttpError extends Error {}
+
+/**
+ * GETs one URL. Each request is logged at debug with its status, size and time; a failure names the URL, the status or
+ * the timeout, and keeps the network error as its cause (describeError prints it).
+ */
+export async function fetchBytes(url: string, timeoutMs = 120_000, log: Log = fetchLog): Promise<Uint8Array> {
+  const begin = performance.now();
+  const took = () => duration(performance.now() - begin);
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+    if (!response.ok) throw new HttpError(`GET ${url} answered ${response.status}${response.statusText ? ` ${response.statusText}` : ""} after ${took()}`);
+    const body = new Uint8Array(await response.arrayBuffer());
+    log.debug(`GET ${url} ${response.status}, ${bytes(body.byteLength)} in ${took()}`);
+    return body;
+  } catch (error) {
+    if (error instanceof HttpError) throw error;
+    if (error instanceof Error && error.name === "TimeoutError") throw new Error(`GET ${url} timed out after ${duration(timeoutMs)}`, { cause: error });
+    throw new Error(`GET ${url} failed after ${took()}`, { cause: error });
+  }
 }
 
-export async function fetchText(url: string, timeoutMs = 120_000): Promise<string> {
-  return new TextDecoder().decode(await fetchBytes(url, timeoutMs));
+export async function fetchText(url: string, timeoutMs = 120_000, log: Log = fetchLog): Promise<string> {
+  return new TextDecoder().decode(await fetchBytes(url, timeoutMs, log));
+}
+
+/** How a fresh record differs from the one data/sources.json held: files added, removed and changed, and the pin. */
+export function recordChanges(previous: SourceRecord | undefined, next: SourceRecord): string {
+  const total = next.files.reduce((sum, file) => sum + file.bytes, 0);
+  const head = `${next.files.length} file${next.files.length === 1 ? "" : "s"}, ${bytes(total)}`;
+  if (!previous) return `${head}; first sync`;
+  if (previous.pin.value === next.pin.value) return `${head}; pin unchanged`;
+  const before = new Map(previous.files.map((file) => [file.path, file.sha256]));
+  const after = new Map(next.files.map((file) => [file.path, file.sha256]));
+  const added = [...after.keys()].filter((name) => !before.has(name));
+  const removed = [...before.keys()].filter((name) => !after.has(name));
+  const changed = [...after].filter(([name, hash]) => before.has(name) && before.get(name) !== hash).map(([name]) => name);
+  const list = (names: string[]) => (names.length <= 3 ? names.join(", ") : `${names.slice(0, 3).join(", ")} and ${names.length - 3} more`);
+  const parts = [
+    added.length > 0 ? `${added.length} added (${list(added)})` : null,
+    removed.length > 0 ? `${removed.length} removed (${list(removed)})` : null,
+    changed.length > 0 ? `${changed.length} changed (${list(changed)})` : null,
+  ].filter((part) => part != null);
+  return `${head}; pin ${previous.pin.value.slice(0, 12)} -> ${next.pin.value.slice(0, 12)}${parts.length > 0 ? `: ${parts.join(", ")}` : ""}`;
 }
 
 // Writes the payload verbatim under data/raw/<relative> and returns its record.

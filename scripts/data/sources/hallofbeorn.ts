@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchText, writeRaw, type SourceFile, type SourceRecord } from "./fetch.ts";
 
 const BASE = "https://hallofbeorn.com/Export";
@@ -65,24 +66,37 @@ export const hobScenarioSchema = z.object({
   ),
 });
 
-async function snapshot(relative: string, endpoint: string, files: SourceFile[]): Promise<string> {
+async function snapshot(relative: string, endpoint: string, files: SourceFile[], log: Log): Promise<string> {
   const url = `${BASE}/${endpoint}`;
-  const body = await fetchText(url, TIMEOUT_MS);
+  const body = await fetchText(url, TIMEOUT_MS, log);
   files.push(writeRaw(`hallofbeorn/${relative}`, url, body));
   return body;
 }
 
-export async function syncHallOfBeorn(): Promise<SourceRecord> {
+// Parses a snapshot against its schema; a mismatch names the file and the first few paths that did not fit.
+function checked<T>(schema: z.ZodType<T>, body: string, what: string): T {
+  const result = schema.safeParse(JSON.parse(body));
+  if (result.success) return result.data;
+  const issues = result.error.issues.slice(0, 5).map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`);
+  throw new Error(`Hall of Beorn ${what} no longer matches the schema (${result.error.issues.length} issue${result.error.issues.length === 1 ? "" : "s"}):\n  ${issues.join("\n  ")}`);
+}
+
+export async function syncHallOfBeorn(log: Log = createLog("hallofbeorn")): Promise<SourceRecord> {
   const files: SourceFile[] = [];
   for (const kind of ["EncounterCards", "QuestCards", "PlayerCards"]) {
-    const body = await snapshot(`${kind}.json`, kind, files);
-    z.array(hobCardSchema).parse(JSON.parse(body));
+    const body = await snapshot(`${kind}.json`, kind, files, log);
+    const cards = checked(z.array(hobCardSchema), body, kind);
+    log.info(`${kind}: ${cards.length} cards, ${bytes(body.length)}`);
   }
-  const indexBody = await snapshot("Scenarios.json", "Scenarios", files);
-  const index = hobScenarioIndexSchema.parse(JSON.parse(indexBody));
-  for (const entry of index.filter((item) => FELLOWSHIP_PRODUCTS.has(item.Product))) {
-    const body = await snapshot(`Scenarios/${entry.Slug}.json`, `Scenarios/${entry.Slug}`, files);
-    hobScenarioSchema.parse(JSON.parse(body));
+  const indexBody = await snapshot("Scenarios.json", "Scenarios", files, log);
+  const index = checked(hobScenarioIndexSchema, indexBody, "Scenarios");
+  const wanted = index.filter((item) => FELLOWSHIP_PRODUCTS.has(item.Product));
+  log.info(`Scenarios: ${index.length} listed, ${wanted.length} from ${[...FELLOWSHIP_PRODUCTS].join(" and ")}`);
+  const tick = log.progress(wanted.length, "scenario");
+  for (const entry of wanted) {
+    const body = await snapshot(`Scenarios/${entry.Slug}.json`, `Scenarios/${entry.Slug}`, files, log);
+    const scenario = checked(hobScenarioSchema, body, `scenario ${entry.Slug}`);
+    tick(`${entry.Title}: ${scenario.ScenarioCards.length} card rows`);
   }
   return { id: "hallofbeorn", site: "https://hallofbeorn.com", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
 }

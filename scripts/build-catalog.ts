@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, renameSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,11 +10,13 @@ import type { Card } from "../src/catalog/card-facts.ts";
 import { campaignIndexSchema } from "../src/catalog/scenario-data.ts";
 import { campaigns, cards, catalogTables, meta, packs } from "../src/catalog/schema.ts";
 import { contentVersion, writeCatalogVersion } from "./catalog-version.ts";
+import { bytes, createLog, runScript } from "./log.ts";
 import { loadCards } from "./data/load-cards.ts";
 import { DATA_DIR } from "./data/paths.ts";
 
 const FELLOWSHIP_CAMPAIGN_ID = "fellowship-of-the-ring";
 const FELLOWSHIP_PACK_CODES = new Set(["TBR", "TRD"]);
+const log = createLog("catalog:build");
 
 type SqliteDatabase = InstanceType<typeof Database>;
 type SqlValue = string | number | bigint | Buffer | null;
@@ -218,12 +220,15 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
   const dataDir = options.dataDir ?? DATA_DIR;
   const dbPath = options.dbPath ?? path.join(root, "assets", "catalog.db");
   const versionPath = options.versionPath ?? path.join(root, "src", "catalog", "version.ts");
-  const allCards = options.cards ?? loadCards(dataDir);
+  const allCards = options.cards ?? log.step("read data/cards", () => loadCards(dataDir));
 
   const allPacks = parseRingsDbPacks(JSON.parse(readFileSync(path.join(dataDir, "raw", "ringsdb", "packs.json"), "utf8")) as unknown);
   const used = new Set(allCards.flatMap((card) => card.printings.map((printing) => printing.pack)));
   const included = allPacks.filter((pack) => used.has(pack.code));
   const knownPacks = new Set(included.map((pack) => pack.code));
+  log.info(`${allCards.length} cards; ${included.length} of RingsDB's ${allPacks.length} packs carry them`);
+  const unlisted = [...used].filter((pack) => !knownPacks.has(pack)).sort();
+  if (unlisted.length > 0) log.debug(`printings in packs RingsDB does not list (kept on the card, not as catalog packs): ${unlisted.join(", ")}`);
 
 
   const packRows = [...included]
@@ -245,8 +250,14 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
     .map((entry) => rowFrom(campaigns, { id: entry.id, name: entry.name, scenario_count: entry.scenarioCount, playable: bit(entry.playable) }));
 
   const version = contentVersion([packRows, cardRows, campaignRows]);
+  const before = existsSync(versionPath) ? /CATALOG_VERSION = (\d+);/.exec(readFileSync(versionPath, "utf8"))?.[1] : undefined;
   // The version is written before the database is replaced. A crash in between leaves a number the next run rewrites.
   writeCatalogVersion(versionPath, version);
+  // A path under the repository reads relative to it; a temporary build (tests, fixtures) keeps its full path.
+  const shown = (file: string) => (path.relative(root, file).startsWith("..") ? file : path.relative(root, file));
+  if (before === String(version)) log.info(`version ${version}, unchanged`);
+  else if (options.versionPath) log.info(`version ${before ?? "none"} -> ${version} in ${shown(versionPath)}`);
+  else log.info(`version ${before ?? "none"} -> ${version}: commit ${shown(versionPath)}`);
   const temporaryPath = path.join(path.dirname(dbPath), `.${path.basename(dbPath)}.building`);
   rmSync(temporaryPath, { force: true });
   try {
@@ -258,6 +269,7 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
     });
     mkdirSync(path.dirname(dbPath), { recursive: true });
     renameSync(temporaryPath, dbPath);
+    log.info(`wrote ${shown(dbPath)} (${bytes(statSync(dbPath).size)}): ${packRows.length} packs, ${cardRows.length} cards, ${campaignRows.length} campaigns, ${metaRows.length} meta rows`);
   } catch (error) {
     rmSync(temporaryPath, { force: true });
     throw error;
@@ -272,12 +284,4 @@ function isMainModule(): boolean {
   return path.resolve(entry) === fileURLToPath(import.meta.url);
 }
 
-if (isMainModule()) {
-  try {
-    const result = buildCatalog();
-    console.log(`catalog ${result.version}: ${result.packCount} packs, ${result.cardCount} cards`);
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exitCode = 1;
-  }
-}
+if (isMainModule()) void runScript("catalog:build", () => void buildCatalog());

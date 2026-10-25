@@ -9,6 +9,8 @@ import { activeCardCodes, textInactive } from "../../../catalog/active-text";
 import { cards } from "../../../catalog/schema";
 import { EFFECTS } from "../../../effects";
 import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, sphereWord } from "../../chrome";
+import { CardTextView } from "../../../play/card-text-view";
+import { traitLine } from "../../../play/card-text";
 import { GameIcon } from "../../../play/game-icon";
 import { SPHERE_TINT, sphereIcon, typeIcon, type IconName } from "../../../play/icon-map";
 import { useDatabases } from "../../databases";
@@ -21,73 +23,98 @@ import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
 import { goBack } from "../../go-back";
 
-function CardFacts({
-  row,
-  inactive,
-}: {
-  row: {
-    typeCode: string;
-    typeName: string;
-    sphereCode: string | null;
-    sphereName: string | null;
-    cost: string | null;
-    threat: number | null;
-    willpower: number | null;
-    attack: number | null;
-    defense: number | null;
-    health: number | null;
-    questPoints: number | null;
-    engagementCost: number | null;
-    isUnique: boolean;
-    traits: string | null;
-    text: string | null;
-  };
-  inactive: boolean;
-}) {
-  const sphere = sphereWord(row.sphereName);
+type FactsRow = {
+  typeCode: string;
+  typeName: string;
+  sphereCode: string | null;
+  sphereName: string | null;
+  cost: string | null;
+  threat: number | null;
+  willpower: number | null;
+  attack: number | null;
+  defense: number | null;
+  health: number | null;
+  questPoints: number | null;
+  engagementCost: number | null;
+  isUnique: boolean;
+  traits: string | null;
+  text: string | null;
+};
+
+// Type and sphere in one centered line under the name, each with its printed icon; then the traits as printed, the numbers
+// as a row of tiles (icon and value, the word under them), and the text on a raised panel: one paragraph per ability, the
+// timing words bold, the icons inline, flavor italic and muted.
+function CardFacts({ row, inactive }: { row: FactsRow; inactive: boolean }) {
   const sphereMark = sphereIcon(row.sphereCode);
   const type = typeIcon(row.typeCode);
+  // Player cards always name a sphere (Neutral when the catalog has none); encounter cards print none.
+  const sphere = row.sphereName || type ? sphereWord(row.sphereName) : null;
+  const traits = traitLine(row.traits);
   const cost = costOrThreat(row);
+  const stats: { label: string; value: string; icon: IconName }[] = [
+    ...(cost ? [{ label: cost.label, value: cost.value, icon: cost.label === "Cost" ? ("cost" as const) : ("threat" as const) }] : []),
+    ...(row.willpower != null ? [{ label: "Willpower", value: String(row.willpower), icon: "willpower" as const }] : []),
+    ...(row.attack != null ? [{ label: "Attack", value: String(row.attack), icon: "attack" as const }] : []),
+    ...(row.defense != null ? [{ label: "Defense", value: String(row.defense), icon: "defense" as const }] : []),
+    ...(row.health != null ? [{ label: "Hit points", value: String(row.health), icon: "hitPoints" as const }] : []),
+    ...(row.engagementCost != null ? [{ label: "Engagement cost", value: String(row.engagementCost), icon: "engagementCost" as const }] : []),
+    ...(row.questPoints != null ? [{ label: "Quest points", value: String(row.questPoints), icon: "questPoints" as const }] : []),
+  ];
   return (
-    <View className="mt-6">
-      <Stat label="Type" value={row.typeName} icon={type} />
-      {row.isUnique ? <Stat label="Unique" value="Unique" icon="unique" /> : null}
-      <View className="mt-3">
-        <Label>Sphere</Label>
-        <View className="mt-1 flex-row items-center gap-2">
-          {sphereMark ? <GameIcon name={sphereMark} size={20} tint={SPHERE_TINT[row.sphereCode ?? ""] ?? "faint"} /> : null}
-          <BodyText>{sphere}</BodyText>
+    <View>
+      <View testID="card-kind" className="mt-2 flex-row flex-wrap items-center justify-center gap-x-3 gap-y-1">
+        <View className="flex-row items-center gap-1.5">
+          {type ? <GameIcon name={type} size={16} tint="muted" /> : null}
+          <Text className="text-body text-muted">{row.typeName}</Text>
         </View>
-      </View>
-      {cost ? <Stat label={cost.label} value={cost.value} icon={cost.label === "Cost" ? "cost" : "threat"} /> : null}
-      {row.willpower != null ? <Stat label="Willpower" value={String(row.willpower)} icon="willpower" /> : null}
-      {row.attack != null ? <Stat label="Attack" value={String(row.attack)} icon="attack" /> : null}
-      {row.defense != null ? <Stat label="Defense" value={String(row.defense)} icon="defense" /> : null}
-      {row.health != null ? <Stat label="Hit points" value={String(row.health)} icon="hitPoints" /> : null}
-      {row.engagementCost != null ? <Stat label="Engagement cost" value={String(row.engagementCost)} icon="engagementCost" /> : null}
-      {row.questPoints != null ? <Stat label="Quest points" value={String(row.questPoints)} icon="questPoints" /> : null}
-      {row.traits ? <Stat label="Traits" value={row.traits} /> : null}
-      <View className="mt-3">
-        {row.text ? <BodyText>{row.text}</BodyText> : null}
-        {inactive ? (
-          <View testID="card-inactive" className={row.text ? "mt-2" : undefined}>
-            <Label tone="muted">Inactive</Label>
+        {sphere ? (
+          <View className="flex-row items-center gap-1.5">
+            {sphereMark ? <GameIcon name={sphereMark} size={16} tint={SPHERE_TINT[row.sphereCode ?? ""] ?? "faint"} /> : null}
+            <Text className="text-body text-muted">{sphere}</Text>
+          </View>
+        ) : null}
+        {row.isUnique ? (
+          <View className="flex-row items-center gap-1.5">
+            <GameIcon name="unique" size={16} tint="gold" />
+            <Text className="text-body text-muted">Unique</Text>
           </View>
         ) : null}
       </View>
+      {traits ? (
+        <Text testID="card-traits" className="mt-2 text-center text-body font-semibold italic text-gold">
+          {traits}
+        </Text>
+      ) : null}
+      {stats.length > 0 ? (
+        <View testID="card-stats" className="mt-6 flex-row flex-wrap justify-center gap-2">
+          {stats.map((stat) => (
+            <Stat key={stat.label} {...stat} />
+          ))}
+        </View>
+      ) : null}
+      {row.text || inactive ? (
+        <View className="mt-6 rounded-card border border-hairline bg-raised px-5 py-4">
+          <CardTextView text={row.text} testID="card-text" />
+          {inactive ? (
+            <View testID="card-inactive" className={row.text ? "mt-3 border-t border-hairline pt-3" : undefined}>
+              <Label tone="muted">Inactive: no effect record reads this text yet.</Label>
+            </View>
+          ) : null}
+        </View>
+      ) : null}
     </View>
   );
 }
 
-// A stat with the game's icon beside its value. The label stays as a word.
-function Stat({ label, value, icon }: { label: string; value: string; icon?: IconName | null }) {
+// A number with the game's icon beside it, the word under them. The word stays on screen and in the label.
+function Stat({ label, value, icon }: { label: string; value: string; icon: IconName }) {
   return (
-    <View className="mt-3">
-      <Label>{label}</Label>
-      <View className="mt-0.5 flex-row items-center gap-2">
-        {icon ? <GameIcon name={icon} size={20} tint="bone" /> : null}
-        <BodyText>{value}</BodyText>
+    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-20 items-center rounded-tile border border-hairline bg-raised px-3 py-2">
+      <View className="flex-row items-center gap-1.5">
+        <GameIcon name={icon} size={18} tint="bone" />
+        <Text className="font-display text-title text-bone">{value}</Text>
       </View>
+      <Text className="mt-0.5 text-label text-muted">{label}</Text>
     </View>
   );
 }
@@ -241,7 +268,7 @@ export default function CardScreen() {
             </View>
           </View>
         ) : null}
-        <View className="mt-8 items-center">
+        <View className="mt-6 items-center">
           {row ? (
             <ScreenTitle size="title">{row.name ?? row.code}</ScreenTitle>
           ) : (
@@ -253,9 +280,11 @@ export default function CardScreen() {
         </View>
         {row ? <CardFacts row={row} inactive={textInactive(row.code, row.text, active)} /> : null}
         {row?.errata ? (
-          <View className="mt-8 border-t border-hairline pt-5">
+          <View className="mt-6 rounded-card border border-goldLine px-5 py-4">
             <Eyebrow>Errata</Eyebrow>
-            <BodyText className="mt-2">{row.errata}</BodyText>
+            <View className="mt-2">
+              <CardTextView text={row.errata} />
+            </View>
           </View>
         ) : null}
         <View className="pb-safe" />
