@@ -1,4 +1,4 @@
-# Solo LOTR LCG — decisions and implementer brief
+# Middle Earth LCG — decisions and implementer brief
 
 This is the source of truth for the app. Read it before writing code. It records what was decided and how to build it.
 

@@ -1,4 +1,4 @@
-# Solo LOTR LCG
+# Middle Earth LCG
 
 A personal, offline app for The Lord of the Rings: The Card Game. Official campaigns are the product. The proof of concept is the 2022 Fellowship of the Ring Saga Expansion (MEC109), with the full official player-card pool available for decks from the first install.
 
