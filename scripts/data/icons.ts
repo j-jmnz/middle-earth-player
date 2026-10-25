@@ -1,12 +1,14 @@
 // Offline: cuts the game's icons out of the snapshots `pnpm data:sync icons` keeps under data/raw/icons, and writes
-// assets/icons (one standalone SVG per vector glyph, the PNG tokens copied as they are) and two modules under
-// src/play/icons: `generated.ts` (each icon's source, size and, for a vector, its path for the Skia canvas) and
-// `files.generated.ts` (the asset requires for expo-image and Skia images). Deterministic: the same snapshots write the
-// same bytes. docs/design-system.md, Icons, lists them.
+// assets/icons (one standalone SVG per vector glyph, the PNG tokens and the JPEG card backs copied as they are) and two
+// modules under src/play/icons: `generated.ts` (each icon's and card back's source, size and, for a vector, its path for the
+// Skia canvas) and `files.generated.ts` (the asset requires for expo-image and Skia images). Deterministic: the same
+// snapshots write the same bytes. docs/design-system.md, Icons, lists them.
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { sniffImage } from "../../src/screens/images/policy.ts";
 import { RAW_DIR } from "./paths.ts";
+import { DRAGNCARDS_CARDBACK_FILES, DRAGNCARDS_CARDBACKS, type CardBackName } from "./sources/icons.ts";
 
 // The RingsDB font glyphs the app uses, by the app's name. A glyph is found by its name in the font, or by the codepoint
 // app.css gives the `.icon-<css>:before` rule.
@@ -47,12 +49,23 @@ export const RASTER_ICONS: readonly { name: string; file: string; bar: number }[
   { name: "progress", file: "progress", bar: 96 },
 ];
 
+// The printed card backs, by side (sources/icons.ts), are drawn at a card's size on the table, so their bar is a card
+// scan's: 600 px on the long side (docs/brief.md, Card images).
+export const CARD_BACK_BAR = 600;
+
+/** The asset file of a card back under assets/icons. */
+export function backAsset(name: CardBackName): string {
+  return `${name}Back.jpg`;
+}
+
 const FONT_URL = "https://ringsdb.com/bundles/app/fonts/ringsdb.svg?h6hjpma";
 const TOKEN_URL = "https://dragncards-lotrlcg.s3.amazonaws.com/tokens";
 
 export type IconRecord =
   | { name: string; kind: "vector"; source: string; glyph: string; viewBox: readonly [number, number, number, number]; d: string }
   | { name: string; kind: "raster"; source: string; width: number; height: number };
+
+export type CardBackRecord = { name: CardBackName; source: string; width: number; height: number };
 
 type Glyph = { name: string; unicode: string; d: string };
 
@@ -167,6 +180,19 @@ function pngSize(bytes: Buffer): { width: number; height: number } {
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
 
+function backFile(rawDir: string, name: string): string {
+  return path.join(rawDir, "icons", "dragncards", "cardbacks", `${name}.jpg`);
+}
+
+export function cardBackRecords(rawDir: string = RAW_DIR): CardBackRecord[] {
+  return DRAGNCARDS_CARDBACK_FILES.map((name) => {
+    const media = sniffImage(readFileSync(backFile(rawDir, name)));
+    if (media?.mediaType !== "image/jpeg") throw new Error(`The ${name} back is not a JPEG`);
+    if (Math.max(media.width, media.height) < CARD_BACK_BAR) throw new Error(`The ${name} back is ${media.width}x${media.height}, under its ${CARD_BACK_BAR} px bar`);
+    return { name, source: `${DRAGNCARDS_CARDBACKS}/${name}.jpg`, width: media.width, height: media.height };
+  });
+}
+
 export function iconRecords(rawDir: string = RAW_DIR): IconRecord[] {
   const font = readFileSync(path.join(rawDir, "icons", "ringsdb.svg"), "utf8");
   const css = parseIconCss(readFileSync(path.join(rawDir, "icons", "ringsdb-app.css"), "utf8"));
@@ -186,8 +212,9 @@ export function iconRecords(rawDir: string = RAW_DIR): IconRecord[] {
   return records;
 }
 
-function renderData(records: readonly IconRecord[]): string {
+function renderData(records: readonly IconRecord[], backs: readonly CardBackRecord[]): string {
   const lines = records.map((record) => `  ${JSON.stringify(record.name)}: ${JSON.stringify(record)},`);
+  const backLines = backs.map((back) => `  ${JSON.stringify(back.name)}: ${JSON.stringify(back)},`);
   return `// Written by pnpm data:build (scripts/data/icons.ts). Do not edit.
 // Each game icon the app draws: its source, and its size (a vector's viewBox in font units, a raster's pixels).
 export type IconRecord =
@@ -199,18 +226,31 @@ ${lines.join("\n")}
 } as const satisfies Record<string, IconRecord>;
 
 export type IconName = keyof typeof ICONS;
+
+// The printed card backs, by side: the player back on the player's deck and cards, the encounter back on the encounter
+// deck, shadow cards and face-down encounter cards.
+export const CARD_BACKS = {
+${backLines.join("\n")}
+} as const satisfies Record<string, { name: string; source: string; width: number; height: number }>;
+
+export type CardBackName = keyof typeof CARD_BACKS;
 `;
 }
 
-function renderFiles(records: readonly IconRecord[]): string {
+function renderFiles(records: readonly IconRecord[], backs: readonly CardBackRecord[]): string {
   const lines = records.map((record) => `  ${JSON.stringify(record.name)}: require("../../../assets/icons/${record.name}.${record.kind === "vector" ? "svg" : "png"}") as number,`);
+  const backLines = backs.map((back) => `  ${JSON.stringify(back.name)}: require("../../../assets/icons/${backAsset(back.name)}") as number,`);
   return `// Written by pnpm data:build (scripts/data/icons.ts). Do not edit.
 // The asset of each icon, for expo-image (SVG and PNG) and Skia images. Imported by components only: Node tests read
 // ./generated.ts.
-import type { IconName } from "./generated";
+import type { CardBackName, IconName } from "./generated";
 
 export const ICON_FILES: Record<IconName, number> = {
 ${lines.join("\n")}
+};
+
+export const CARD_BACK_FILES: Record<CardBackName, number> = {
+${backLines.join("\n")}
 };
 `;
 }
@@ -218,6 +258,7 @@ ${lines.join("\n")}
 /** Writes assets/icons and the two icon modules. `assetsDir` and `modulesDir` let data:check build into a scratch dir. */
 export function buildIcons(assetsDir: string, modulesDir: string, rawDir: string = RAW_DIR): IconRecord[] {
   const records = iconRecords(rawDir);
+  const backs = cardBackRecords(rawDir);
   rmSync(assetsDir, { recursive: true, force: true });
   mkdirSync(assetsDir, { recursive: true });
   mkdirSync(modulesDir, { recursive: true });
@@ -225,7 +266,8 @@ export function buildIcons(assetsDir: string, modulesDir: string, rawDir: string
     if (record.kind === "vector") writeFileSync(path.join(assetsDir, `${record.name}.svg`), svgFile(record));
     else copyFileSync(path.join(rawDir, "icons", "dragncards", `${RASTER_ICONS.find((icon) => icon.name === record.name)?.file ?? record.name}.png`), path.join(assetsDir, `${record.name}.png`));
   }
-  writeFileSync(path.join(modulesDir, "generated.ts"), renderData(records));
-  writeFileSync(path.join(modulesDir, "files.generated.ts"), renderFiles(records));
+  for (const back of backs) copyFileSync(backFile(rawDir, back.name), path.join(assetsDir, backAsset(back.name)));
+  writeFileSync(path.join(modulesDir, "generated.ts"), renderData(records, backs));
+  writeFileSync(path.join(modulesDir, "files.generated.ts"), renderFiles(records, backs));
   return records;
 }

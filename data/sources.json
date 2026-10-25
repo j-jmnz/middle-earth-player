@@ -129,9 +129,9 @@
       "site": "https://ringsdb.com and https://dragncards-lotrlcg.s3.amazonaws.com",
       "pin": {
         "kind": "sha256",
-        "value": "d4fce8e7d7e5a2fd7dee94a64c94d15a22832d3dcb090091903bfef4f280724a"
+        "value": "703dcfb24198b173922f4863103a73ac6179b14e46deb8b02023af117653429c"
       },
-      "fetchedAt": "2026-10-25T18:53:02.424Z",
+      "fetchedAt": "2026-10-25T22:29:48.327Z",
       "files": [
         {
           "path": "raw/icons/ringsdb.svg",
@@ -174,6 +174,18 @@
           "url": "https://dragncards-lotrlcg.s3.amazonaws.com/tokens/progress.png",
           "sha256": "be50c278c81d7207170c5ae1eeb530053d5eaef8e4291138221391e4284a062a",
           "bytes": 47790
+        },
+        {
+          "path": "raw/icons/dragncards/cardbacks/player.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks/player.jpg",
+          "sha256": "bcdbe7ab9a7639a0e751e912bdaa22967ce9c1c6006199d3b4e77e14e003fa4d",
+          "bytes": 143012
+        },
+        {
+          "path": "raw/icons/dragncards/cardbacks/encounter.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks/encounter.jpg",
+          "sha256": "264316b5ba0d63d81aaaf8c90dfdae2c9f60c37cff017356047dfd8256bc519d",
+          "bytes": 133469
         }
       ]
     },

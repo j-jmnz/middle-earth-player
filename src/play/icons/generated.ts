@@ -36,3 +36,12 @@ export const ICONS = {
 } as const satisfies Record<string, IconRecord>;
 
 export type IconName = keyof typeof ICONS;
+
+// The printed card backs, by side: the player back on the player's deck and cards, the encounter back on the encounter
+// deck, shadow cards and face-down encounter cards.
+export const CARD_BACKS = {
+  "player": {"name":"player","source":"https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks/player.jpg","width":429,"height":600},
+  "encounter": {"name":"encounter","source":"https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks/encounter.jpg","width":429,"height":600},
+} as const satisfies Record<string, { name: string; source: string; width: number; height: number }>;
+
+export type CardBackName = keyof typeof CARD_BACKS;

@@ -1,7 +1,7 @@
 // Written by pnpm data:build (scripts/data/icons.ts). Do not edit.
 // The asset of each icon, for expo-image (SVG and PNG) and Skia images. Imported by components only: Node tests read
 // ./generated.ts.
-import type { IconName } from "./generated";
+import type { CardBackName, IconName } from "./generated";
 
 export const ICON_FILES: Record<IconName, number> = {
   "willpower": require("../../../assets/icons/willpower.svg") as number,
@@ -32,4 +32,9 @@ export const ICON_FILES: Record<IconName, number> = {
   "resource": require("../../../assets/icons/resource.png") as number,
   "damage": require("../../../assets/icons/damage.png") as number,
   "progress": require("../../../assets/icons/progress.png") as number,
+};
+
+export const CARD_BACK_FILES: Record<CardBackName, number> = {
+  "player": require("../../../assets/icons/playerBack.jpg") as number,
+  "encounter": require("../../../assets/icons/encounterBack.jpg") as number,
 };
