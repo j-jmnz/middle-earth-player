@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { desc, eq, isNotNull, isNull } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { parseActive, parseLoadout, parseLog, parseSeatCount, newSave, type Save } from "../campaign/save";
@@ -37,8 +37,14 @@ function parseRow(row: typeof saves.$inferSelect): ReadSave {
   return { save: { id: row.id, campaignId: row.campaignId, seatCount: parseSeatCount(row.seatCount), log, active, loadout }, unreadable };
 }
 
+// The open playthroughs, the ones the campaign list shows first. An archived save is listed by listArchivedSaves.
 export function listSaves<TRun>(user: UserDb<TRun>): Save[] {
-  return user.select().from(saves).all().map((row) => parseRow(row).save);
+  return user.select().from(saves).where(isNull(saves.archivedAt)).all().map((row) => parseRow(row).save);
+}
+
+// The archived playthroughs, the last one put away first.
+export function listArchivedSaves<TRun>(user: UserDb<TRun>): Save[] {
+  return user.select().from(saves).where(isNotNull(saves.archivedAt)).orderBy(desc(saves.archivedAt)).all().map((row) => parseRow(row).save);
 }
 
 export function readSave<TRun>(user: UserDb<TRun>, id: string): Save | null {
@@ -66,6 +72,20 @@ export function writeSave<TRun>(user: UserDb<TRun>, save: Save): void {
     .values(values)
     .onConflictDoUpdate({ target: saves.id, set: values })
     .run();
+}
+
+// Archiving keeps the whole row: the log, the open scenario and the loadout come back as they were on restore.
+export function archiveSave<TRun>(user: UserDb<TRun>, id: string, now: number = Date.now()): void {
+  user.update(saves).set({ archivedAt: now }).where(eq(saves.id, id)).run();
+}
+
+export function restoreSave<TRun>(user: UserDb<TRun>, id: string): void {
+  user.update(saves).set({ archivedAt: null }).where(eq(saves.id, id)).run();
+}
+
+// Deleting removes the playthrough for good: its log, its open scenario and its loadout. Decks are not part of a save.
+export function deleteSave<TRun>(user: UserDb<TRun>, id: string): void {
+  user.delete(saves).where(eq(saves.id, id)).run();
 }
 
 let created = 0;

@@ -50,7 +50,7 @@ describe("user migration", () => {
     expect(stored?.applied_catalog_version).toBe(CATALOG_VERSION);
   });
 
-  it("adds the booklets table and the save loadout without touching a save row", () => {
+  it("adds the booklets table, the save loadout and the archive mark without touching a save row", () => {
     const database = new DatabaseSync(":memory:");
     const [first, ...rest] = migrations.journal.entries;
     if (!first) throw new Error("No migrations");
@@ -59,8 +59,8 @@ describe("user migration", () => {
     for (const entry of rest) {
       for (const statement of migrationSql(entry).split("--> statement-breakpoint")) if (statement.trim()) database.exec(statement.trim());
     }
-    const save = database.prepare("SELECT id, loadout FROM saves WHERE id = 'save-1'").get();
-    expect(save).toEqual({ id: "save-1", loadout: null });
+    const save = database.prepare("SELECT id, loadout, archived_at FROM saves WHERE id = 'save-1'").get();
+    expect(save).toEqual({ id: "save-1", loadout: null, archived_at: null });
     database.exec(
       `INSERT INTO booklets (id, path, original_filename, byte_size, sha256, page_count) VALUES ('learn-to-play', 'booklets/learn-to-play.pdf', 'ltp.pdf', 10, 'abc', 4)`,
     );
