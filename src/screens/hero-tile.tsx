@@ -3,7 +3,7 @@ import { Pressable, Text, View } from "react-native";
 
 import { markedSphere, pressedNight, RingMark, sphereWord, SphereMark } from "./chrome";
 import { enqueueImageDownloads } from "./images/queue";
-import { CoverCardImage, useCardPreview } from "./images/picture";
+import { CardThumb, CoverCardImage, useCardPreview } from "./images/picture";
 import type { PictureSource } from "../play/table-canvas-types";
 import { palette } from "./palette.js";
 
@@ -28,6 +28,7 @@ export function HeroTile({
   onLongPress,
   flush = false,
   dense = false,
+  bare = false,
 }: {
   hero: HeroFace;
   height: number;
@@ -37,6 +38,8 @@ export function HeroTile({
   onLongPress?: (source: PictureSource | null) => void;
   flush?: boolean;
   dense?: boolean;
+  // The picture alone, with no name band: the deck list's covers, where the deck's own name is the only text.
+  bare?: boolean;
 }) {
   const [width, setWidth] = useState(0);
   const preview = useCardPreview(hero.code, hero.imagesrc);
@@ -59,27 +62,31 @@ export function HeroTile({
       {preview && width > 0 ? (
         <CoverCardImage code={hero.code} source={preview} width={width} height={height} />
       ) : null}
-      {/* The night band holds the name first; it grows past a third of the tile rather than lose the name. */}
-      <View
-        pointerEvents="none"
-        className="justify-end px-2 pb-2 pt-1"
-        style={{ position: "absolute", left: 0, right: 0, bottom: 0, minHeight: height / 3, backgroundColor: palette.night }}
-      >
-        <Text className={dense ? "font-display text-label text-bone" : "font-display text-body text-bone"} numberOfLines={dense ? 1 : 2}>
-          {hero.name}
-        </Text>
-        <View className="mt-0.5 flex-row flex-wrap items-center gap-x-1">
-          {mark ? <SphereMark sphere={mark} /> : null}
-          <Text className="text-label text-bone" numberOfLines={1}>
-            {sphere}
-          </Text>
-          {hero.sphereCode === "fellowship" ? (
-            <Text testID={`saga-only-${hero.code}`} className="text-label text-gold" numberOfLines={1}>
-              Saga only
+      {bare ? null : (
+        <>
+          {/* The night band holds the name first; it grows past a third of the tile rather than lose the name. */}
+          <View
+            pointerEvents="none"
+            className="justify-end px-2 pb-2 pt-1"
+            style={{ position: "absolute", left: 0, right: 0, bottom: 0, minHeight: height / 3, backgroundColor: palette.night }}
+          >
+            <Text className={dense ? "font-display text-label text-bone" : "font-display text-body text-bone"} numberOfLines={dense ? 1 : 2}>
+              {hero.name}
             </Text>
-          ) : null}
-        </View>
-      </View>
+            <View className="mt-0.5 flex-row flex-wrap items-center gap-x-1">
+              {mark ? <SphereMark sphere={mark} /> : null}
+              <Text className="text-label text-bone" numberOfLines={1}>
+                {sphere}
+              </Text>
+              {hero.sphereCode === "fellowship" ? (
+                <Text testID={`saga-only-${hero.code}`} className="text-label text-gold" numberOfLines={1}>
+                  Saga only
+                </Text>
+              ) : null}
+            </View>
+          </View>
+        </>
+      )}
       {onPress ? (
         <Pressable
           testID={`hero-${hero.code}`}
@@ -134,7 +141,7 @@ export function EmptyHeroSlot({
         accessibilityRole="button"
         accessibilityLabel={`Add ${label.toLowerCase()}`}
         onPress={onPress}
-        className="flex-1 overflow-hidden rounded-tile"
+        className="w-full overflow-hidden rounded-tile"
         style={frame}
       >
         {({ pressed }) => (
@@ -147,44 +154,55 @@ export function EmptyHeroSlot({
     );
   }
   return (
-    <View testID={testID} className="flex-1 items-center justify-center rounded-tile" style={frame}>
+    <View testID={testID} className="w-full items-center justify-center rounded-tile" style={frame}>
       <Text className="font-display text-body text-muted">{label}</Text>
     </View>
   );
 }
 
-/**
- * A saved deck in the deck list: the hero pictures side by side, fading into night, then the name, the counts and
- * whether it is ready to play. `children` is the row of actions under it while the list is managed.
- */
-export function DeckCover({
-  name,
-  heroes,
-  detail,
-  status,
-  height,
-  onPress,
-  onLongPress,
-  testID,
-  children,
-}: {
+type DeckSummary = {
   name: string;
   heroes: readonly HeroFace[];
+  // "3 heroes · 47 of 50 cards".
   detail: string;
   status: { ready: boolean; text: string };
-  height: number;
   onPress: () => void;
   onLongPress?: () => void;
   testID: string;
+  // The row of actions under the deck while the list is managed.
   children?: ReactNode;
-}) {
+};
+
+function heroNames(heroes: readonly HeroFace[]): string {
+  return heroes.length > 0 ? heroes.map((hero) => hero.name).join(", ") : "No heroes yet";
+}
+
+function StatusLine({ testID, detail, status }: { testID: string; detail: string; status: DeckSummary["status"] }) {
+  return (
+    <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
+      <Text className="text-label text-muted">{detail}</Text>
+      <View className="flex-row items-center gap-1.5">
+        <RingMark size={10} state={status.ready ? "done" : "locked"} />
+        <Text testID={`${testID}-status`} className={`text-label ${status.ready ? "text-gold" : "text-danger"}`}>
+          {status.text}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+/**
+ * A saved deck in the deck list's Cards view: the hero pictures side by side with no words on them, then a solid strip
+ * with the deck's name, its heroes, the counts and whether it is ready to play.
+ */
+export function DeckCover({ name, heroes, detail, status, height, onPress, onLongPress, testID, children }: DeckSummary & { height: number }) {
   return (
     <View className="overflow-hidden rounded-card border border-hairline bg-raised">
       <Pressable
         testID={testID}
         collapsable={false}
         accessibilityRole="button"
-        accessibilityLabel={`${name}, ${detail}, ${status.text}`}
+        accessibilityLabel={`${name}, ${heroNames(heroes)}, ${detail}, ${status.text}`}
         accessibilityHint="Opens the deck"
         onPress={onPress}
         onLongPress={onLongPress}
@@ -193,29 +211,68 @@ export function DeckCover({
       >
         <View className="flex-row" style={{ height }}>
           {heroes.length > 0 ? (
-            heroes.map((hero) => <HeroTile key={hero.code} hero={hero} height={height} flush dense />)
+            heroes.map((hero) => <HeroTile key={hero.code} hero={hero} height={height} flush bare />)
           ) : (
             <View className="flex-1 items-center justify-center bg-dusk">
               <Text className="text-label text-faint">No heroes yet</Text>
             </View>
           )}
         </View>
-        <View className="px-4 pb-3 pt-2">
+        <View className="border-t border-goldLine px-4 pb-3 pt-2">
           <Text className="font-display text-title text-bone" numberOfLines={2}>
             {name}
           </Text>
-          <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
-            <Text className="text-label text-muted">{detail}</Text>
-            <View className="flex-row items-center gap-1.5">
-              <RingMark size={10} state={status.ready ? "done" : "locked"} />
-              <Text testID={`${testID}-status`} className={`text-label ${status.ready ? "text-gold" : "text-danger"}`}>
-                {status.text}
-              </Text>
-            </View>
-          </View>
+          <Text className="text-label text-bone" numberOfLines={1}>
+            {heroNames(heroes)}
+          </Text>
+          <StatusLine testID={testID} detail={detail} status={status} />
         </View>
       </Pressable>
       {children ? <View className="border-t border-hairline px-1">{children}</View> : null}
+    </View>
+  );
+}
+
+const rowThumb = { width: 30, height: 42 };
+
+/** A saved deck in the deck list's List view: the heroes as small pictures, the name, the counts and the readiness. */
+export function DeckRow({ name, heroes, detail, status, onPress, onLongPress, testID, children }: DeckSummary) {
+  return (
+    <View className="border-b border-hairline">
+      <Pressable
+        testID={testID}
+        collapsable={false}
+        accessibilityRole="button"
+        accessibilityLabel={`${name}, ${heroNames(heroes)}, ${detail}, ${status.text}`}
+        accessibilityHint="Opens the deck"
+        onPress={onPress}
+        onLongPress={onLongPress}
+        delayLongPress={350}
+        className="min-h-16 flex-row items-center gap-3 py-2"
+        style={({ pressed }) => (pressed ? pressedNight : undefined)}
+      >
+        <View className="flex-row" style={{ width: rowThumb.width * 3 - 16 }}>
+          {heroes.length > 0 ? (
+            heroes.slice(0, 3).map((hero, at) => (
+              <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 }} className="overflow-hidden rounded-sm border border-night">
+                <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={rowThumb.width} height={rowThumb.height} />
+              </View>
+            ))
+          ) : (
+            <View className="items-center justify-center rounded-sm bg-dusk" style={rowThumb}>
+              <Text className="text-label text-faint">—</Text>
+            </View>
+          )}
+        </View>
+        <View className="flex-1">
+          <Text className="font-display text-body text-bone" numberOfLines={1}>
+            {name}
+          </Text>
+          <StatusLine testID={testID} detail={detail} status={status} />
+        </View>
+        <Text className="text-body text-faint">›</Text>
+      </Pressable>
+      {children}
     </View>
   );
 }

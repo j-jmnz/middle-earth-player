@@ -35,7 +35,8 @@ import {
   type TitleLookup,
 } from "../../deck-draft";
 import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, savedDeckName, startingThreat, type DeckSectionRow } from "../../deck-status";
-import { deckFaces, listDecks, readDeck, writeDeck } from "../../deck-store";
+import { deckFaces, isStarterDeck, listDecks, readDeck, writeDeck } from "../../deck-store";
+import { STARTER_NOTE } from "../../starter-decks";
 import { CountStepper } from "../../count-stepper";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
@@ -60,7 +61,10 @@ type EditorCard = {
   sphereName: string | null;
 };
 
-type EditorRow = DeckSectionRow<EditorCard>;
+// The editor's list: Heroes first (its heading, then the hero pictures and empty slots), then the card subsections.
+type EditorRow = DeckSectionRow<EditorCard> | { kind: "heroes"; key: string };
+
+const TYPE_NOUN: Readonly<Record<string, string>> = { hero: "heroes", ally: "allies", attachment: "attachments", event: "events" };
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
 const thumb = { width: 28, height: 38 };
@@ -138,7 +142,7 @@ export default function DeckEditor() {
   const faces = useMemo(() => deckFaces(catalog, codeKey.length === 0 ? [] : codeKey.split("\0")), [catalog, codeKey]);
   const lookup = useCallback<TitleLookup>((code) => faces.get(code), [faces]);
 
-  const rows = deckSections<EditorCard>(
+  const sections = deckSections<EditorCard>(
     draft.cards.map((card) => {
       const face = faces.get(card.code);
       return {
@@ -153,6 +157,11 @@ export default function DeckEditor() {
       };
     }),
   );
+  const rows: EditorRow[] = [
+    { kind: "type", key: "type-hero", type: "hero", title: "Heroes", count: draft.heroes.length },
+    { kind: "heroes", key: "heroes" },
+    ...sections,
+  ];
   const readiness = deckReadiness(draft, faces);
   const threat = startingThreat(draft.heroes, faces);
   const heroes: HeroFace[] = draft.heroes.map((code) => heroFace(faces, code));
@@ -160,8 +169,9 @@ export default function DeckEditor() {
   const baseTile = Math.max(120, Math.min(Math.round(height / 4), 200));
   const tileHeight = heroes.length > 3 ? Math.max(96, Math.round(baseTile * 0.6)) : baseTile;
 
-  function addHero(): void {
-    router.push({ pathname: "/pool", params: { adding: "1", type: "hero" } });
+  // The pool, adding to this deck, on one type: an empty hero slot opens it on heroes, a subsection's Add on its type.
+  function addOfType(type: string): void {
+    router.push({ pathname: "/pool", params: { adding: "1", type } });
   }
 
   // Writes the deck as it stands, ready to play or not, and says so.
@@ -190,9 +200,8 @@ export default function DeckEditor() {
 
   if (!id) throw new Error("Missing route code");
 
-  const header = (
-    <View>
-      <View className={heroes.length > 3 ? "mt-2 flex-row flex-wrap justify-between" : "mt-2 flex-row gap-2"}>
+  const heroStrip = (
+      <View className={heroes.length > 3 ? "mt-1 flex-row flex-wrap justify-between" : "mt-1 flex-row gap-2"}>
         {heroes.map((hero) => (
           <View key={hero.code} style={heroes.length > 3 ? { width: "48%", height: tileHeight, marginBottom: 8 } : { flex: 1 }}>
             <HeroTile
@@ -206,10 +215,14 @@ export default function DeckEditor() {
         ))}
         {Array.from({ length: emptySlots }, (_, index) => (
           <View key={`empty-${index}`} className="flex-1">
-            <EmptyHeroSlot height={tileHeight} testID={index === 0 ? "deck-add-hero" : `deck-add-hero-${index}`} onPress={addHero} />
+            <EmptyHeroSlot height={tileHeight} testID={index === 0 ? "deck-add-hero" : `deck-add-hero-${index}`} onPress={() => addOfType("hero")} />
           </View>
         ))}
       </View>
+  );
+
+  const header = (
+    <View>
       <TextInput
         testID="deck-name"
         value={draft.name}
@@ -219,7 +232,7 @@ export default function DeckEditor() {
         accessibilityLabel="Deck name"
         selectTextOnFocus
         returnKeyType="done"
-        className="mt-4 border-b border-hairline pb-1 font-display text-title text-bone"
+        className="mt-2 border-b border-hairline pb-1 font-display text-title text-bone"
         style={{ minHeight: 44 }}
       />
       <Label testID="deck-count" className="mt-2">
@@ -236,8 +249,55 @@ export default function DeckEditor() {
           {draft.droppedNote}
         </BodyText>
       ) : null}
+      {isStarterDeck(draft.id) ? (
+        <Label testID="starter-note" className="mt-2">
+          {STARTER_NOTE}
+        </Label>
+      ) : null}
     </View>
   );
+
+  function renderRow({ item }: { item: EditorRow }) {
+    if (item.kind === "heroes") return heroStrip;
+    if (item.kind === "type") {
+      // Heroes add through their empty slots, so only the card subsections carry Add.
+      const heroSection = item.type === "hero";
+      return (
+        <View accessibilityRole="header" className="min-h-11 flex-row items-center justify-between pt-4">
+          <View className="flex-row items-baseline gap-2">
+            <Eyebrow tone="muted">{item.title}</Eyebrow>
+            <Label testID={`deck-section-count-${item.type}`}>{heroSection ? `${item.count} of 3` : String(item.count)}</Label>
+          </View>
+          {!heroSection && TYPE_NOUN[item.type] ? (
+            <View className="-mr-3">
+              <TextButton
+                testID={`deck-add-${item.type}`}
+                label="Add"
+                tone="gold"
+                accessibilityLabel={`Add ${TYPE_NOUN[item.type]}`}
+                onPress={() => addOfType(item.type)}
+              />
+            </View>
+          ) : null}
+        </View>
+      );
+    }
+    if (item.kind === "empty") {
+      return (
+        <Text testID={`deck-empty-${item.type}`} className="border-b border-hairline pb-3 text-label text-faint">
+          {`No ${TYPE_NOUN[item.type] ?? item.title.toLowerCase()} yet.`}
+        </Text>
+      );
+    }
+    return (
+      <EditorCardRow
+        card={item.card}
+        full={draftAddRefused(draft, { code: item.card.code, name: item.card.name, typeCode: item.card.typeCode ?? "", deckLimit: item.card.deckLimit }, lookup)}
+        lookup={lookup}
+        onPreview={preview.open}
+      />
+    );
+  }
 
   return (
     <Screen testID="deck-editor" scene="plain">
@@ -260,26 +320,8 @@ export default function DeckEditor() {
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             ListHeaderComponent={header}
-            ListEmptyComponent={
-              <BodyText testID="deck-empty" tone="muted" className="mt-6">
-                No cards yet. Tap Add cards to pick allies, attachments and events from the full player pool.
-              </BodyText>
-            }
             ListFooterComponent={<View className="h-6" />}
-            renderItem={({ item }) =>
-              item.kind === "type" ? (
-                <View accessibilityRole="header" className="pb-1 pt-5">
-                  <Eyebrow tone="muted">{`${item.title} · ${item.count}`}</Eyebrow>
-                </View>
-              ) : (
-                <EditorCardRow
-                  card={item.card}
-                  full={draftAddRefused(draft, { code: item.card.code, name: item.card.name, typeCode: item.card.typeCode ?? "", deckLimit: item.card.deckLimit }, lookup)}
-                  lookup={lookup}
-                  onPreview={preview.open}
-                />
-              )
-            }
+            renderItem={renderRow}
           />
         </View>
         <ToastView />

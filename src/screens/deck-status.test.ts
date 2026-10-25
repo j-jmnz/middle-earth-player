@@ -54,7 +54,7 @@ describe("deckSections", () => {
       { code: "t1", count: 1, name: "Steward of Gondor", typeCode: "attachment" },
       { code: "x1", count: 1, name: "x1", typeCode: null },
     ]);
-    expect(rows.map((row) => (row.kind === "type" ? `${row.title} · ${row.count}` : row.card.name))).toEqual([
+    expect(rows.map((row) => (row.kind === "type" ? `${row.title} · ${row.count}` : row.kind === "card" ? row.card.name : "empty"))).toEqual([
       "Allies · 4",
       "Faramir",
       "Gandalf",
@@ -64,6 +64,18 @@ describe("deckSections", () => {
       "Test of Will",
       "Other cards · 1",
       "x1",
+    ]);
+  });
+
+  it("always heads allies, attachments and events, with an empty row for a type the deck lacks", () => {
+    const rows = deckSections([{ code: "e1", count: 2, name: "Test of Will", typeCode: "event" }]);
+    expect(rows.map((row) => (row.kind === "card" ? row.card.name : `${row.kind} ${row.title}`))).toEqual([
+      "type Allies",
+      "empty Allies",
+      "type Attachments",
+      "empty Attachments",
+      "type Events",
+      "Test of Will",
     ]);
   });
 });

@@ -82,14 +82,22 @@ const TYPE_TITLE: Readonly<Record<string, string>> = {
 };
 
 export type DeckSectionRow<TCard> =
-  | { kind: "type"; key: string; title: string; count: number }
-  | { kind: "card"; key: string; card: TCard };
+  | { kind: "type"; key: string; type: string; title: string; count: number }
+  | { kind: "card"; key: string; card: TCard }
+  | { kind: "empty"; key: string; type: string; title: string };
 
-/** The deck's cards under one heading per type (Allies · 18), each group by name. A card the catalog lacks goes last. */
+// The groups every deck shows, empty or not: the deck editor's subsections after Heroes.
+const ALWAYS_SHOWN = ["ally", "attachment", "event"];
+
+/**
+ * The deck's cards under one heading per type (Allies · 18), each group by name. Allies, attachments and events always
+ * have a heading, with an empty row when the deck has none; another type shows when the deck holds one. A card the
+ * catalog lacks goes last.
+ */
 export function deckSections<TCard extends { code: string; count: number; name: string; typeCode: string | null }>(
   cards: readonly TCard[],
 ): DeckSectionRow<TCard>[] {
-  const groups = new Map<string, TCard[]>();
+  const groups = new Map<string, TCard[]>(ALWAYS_SHOWN.map((type) => [type, []]));
   for (const card of cards) {
     const type = card.typeCode ?? "other";
     const group = groups.get(type) ?? [];
@@ -103,7 +111,9 @@ export function deckSections<TCard extends { code: string; count: number; name: 
   const rows: DeckSectionRow<TCard>[] = [];
   for (const type of [...groups.keys()].sort((left, right) => rank(left) - rank(right) || left.localeCompare(right))) {
     const group = (groups.get(type) ?? []).sort((left, right) => left.name.localeCompare(right.name) || left.code.localeCompare(right.code));
-    rows.push({ kind: "type", key: `type-${type}`, title: TYPE_TITLE[type] ?? "Other cards", count: deckCardCount(group) });
+    const title = TYPE_TITLE[type] ?? "Other cards";
+    rows.push({ kind: "type", key: `type-${type}`, type, title, count: deckCardCount(group) });
+    if (group.length === 0) rows.push({ kind: "empty", key: `empty-${type}`, type, title });
     for (const card of group) rows.push({ kind: "card", key: card.code, card });
   }
   return rows;

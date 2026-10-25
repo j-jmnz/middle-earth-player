@@ -1,16 +1,26 @@
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import { AccessibilityInfo, View } from "react-native";
+import { AccessibilityInfo, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
-import { BodyText, Eyebrow, Screen, ScreenTitle, TextButton } from "../../chrome";
+import { BodyText, Screen, ScreenTitle, Segmented, SphereMark, TextButton, markedSphere, sphereWord } from "../../chrome";
 import { editSavedDeck, startNewDeck } from "../../deck-draft";
 import { copyDeckName, deckCountLine, deckReadiness, newDeckName } from "../../deck-status";
 import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, resetStarterDeck, type SavedDeck } from "../../deck-store";
 import { useDatabases } from "../../databases";
-import { DeckCover, heroFace, type HeroFace } from "../../hero-tile";
 import {
-  STARTER_NOTE,
+  deckListFiltered,
+  deckListSpheres,
+  emptyDeckListFilter,
+  filterDecks,
+  setDeckListView,
+  useDeckListView,
+  type DeckListFilter,
+  type DeckListStatus,
+} from "../../deck-list";
+import { DeckCover, DeckRow, heroFace, type HeroFace } from "../../hero-tile";
+import { palette } from "../../palette.js";
+import {
   starterSeedReason,
   starterSeedStatus,
   subscribeStarterSeed,
@@ -20,13 +30,18 @@ import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
 
 type Row =
-  | { kind: "section"; key: string; title: string }
   | { kind: "deck"; key: string; deck: SavedDeck; starter: boolean }
   | { kind: "empty"; key: string }
-  | { kind: "starter-note"; key: string }
+  | { kind: "no-match"; key: string }
   | { kind: "starter-missing"; key: string };
 
 const COVER_HEIGHT = 144;
+const VIEWS = ["Cards", "List"] as const;
+const STATUSES: { key: DeckListStatus; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "ready", label: "Ready" },
+  { key: "unready", label: "Not ready" },
+];
 
 function useSeedStatus(): StarterSeed {
   return useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending");
@@ -36,18 +51,31 @@ function useSeedReason(): string | null {
   return useSyncExternalStore(subscribeStarterSeed, starterSeedReason, () => null);
 }
 
-// The list in reading order: the player's own decks, the one saved last first, then the two starter decks and their note.
-function listRows(saved: readonly SavedDeck[], seed: StarterSeed): Row[] {
-  const own = saved.filter((deck) => !isStarterDeck(deck.id));
-  const starters = saved.filter((deck) => isStarterDeck(deck.id));
-  const rows: Row[] = [{ kind: "section", key: "section-own", title: own.length > 0 ? `Your decks · ${own.length}` : "Your decks" }];
-  if (own.length === 0) rows.push({ kind: "empty", key: "empty" });
-  for (const deck of own) rows.push({ kind: "deck", key: deck.id, deck, starter: false });
-  rows.push({ kind: "section", key: "section-starter", title: "Starter decks" });
+// One list, the deck saved last first; the starters are ordinary rows and follow the decks the player has saved.
+function listRows(shown: readonly SavedDeck[], total: number, seed: StarterSeed): Row[] {
+  const rows: Row[] = [];
   if (seed === "missing") rows.push({ kind: "starter-missing", key: "starter-missing" });
-  for (const deck of starters) rows.push({ kind: "deck", key: deck.id, deck, starter: true });
-  if (seed === "ready") rows.push({ kind: "starter-note", key: "starter-note" });
+  if (total === 0) rows.push({ kind: "empty", key: "empty" });
+  else if (shown.length === 0) rows.push({ kind: "no-match", key: "no-match" });
+  for (const deck of shown) rows.push({ kind: "deck", key: deck.id, deck, starter: isStarterDeck(deck.id) });
   return rows;
+}
+
+// A filter chip on night: raised pill, gold when on. A sphere chip carries the sphere's icon.
+function FilterChip({ label, selected, onPress, sphere, testID }: { label: string; selected: boolean; onPress: () => void; sphere?: string; testID: string }) {
+  const mark = sphere ? markedSphere(sphere) : null;
+  return (
+    <Pressable
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      className={`min-h-11 flex-row items-center gap-1.5 rounded-pill px-4 ${selected ? "bg-gold" : "bg-raised"}`}
+    >
+      {mark ? <SphereMark sphere={mark} size={12} /> : null}
+      <Text className={selected ? "text-body font-semibold text-onGold" : "text-body text-muted"}>{label}</Text>
+    </Pressable>
+  );
 }
 
 // What waits on a second tap in Manage: a delete, or putting a starter back to its printed list.
@@ -115,6 +143,8 @@ export default function Decks() {
   // Manage shows Duplicate and Delete (Reset on a starter) under each deck. It ends when the list loses focus.
   const [managing, setManaging] = useState(false);
   const [asking, setAsking] = useState<Asking>(null);
+  const [filter, setFilter] = useState<DeckListFilter>(emptyDeckListFilter);
+  const view = useDeckListView();
 
   const refresh = useCallback(() => {
     setSaved(seed === "pending" ? [] : listDecks(user));
@@ -132,7 +162,10 @@ export default function Decks() {
   );
 
   const faces = useMemo(() => deckFaces(catalog, saved.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)])), [catalog, saved]);
-  const rows = useMemo(() => listRows(saved, seed), [saved, seed]);
+  const readiness = useMemo(() => new Map(saved.map((deck) => [deck.id, deckReadiness(deck, faces)])), [saved, faces]);
+  const spheres = useMemo(() => deckListSpheres(saved, faces), [saved, faces]);
+  const shown = useMemo(() => filterDecks(saved, filter, faces, (deck) => readiness.get(deck.id)?.ready ?? false), [saved, filter, faces, readiness]);
+  const rows = useMemo(() => listRows(shown, saved.length, seed), [shown, saved.length, seed]);
 
   function facesFor(deck: SavedDeck): HeroFace[] {
     return deck.heroes.map((code) => heroFace(faces, code));
@@ -178,30 +211,28 @@ export default function Decks() {
   }
 
   function renderRow({ item }: { item: Row }) {
-    if (item.kind === "section") {
-      return (
-        <View accessibilityRole="header" className="pb-2 pt-6">
-          <Eyebrow tone="muted">{item.title}</Eyebrow>
-        </View>
-      );
-    }
     if (item.kind === "empty") {
       return (
-        <BodyText testID="decks-empty" tone="muted">
-          No decks of your own yet. Tap New deck to build one, or Import one from RingsDB or a pre-built list.
+        <BodyText testID="decks-empty" tone="muted" className="mt-4">
+          No decks yet. Tap New deck to build one, or Import one from RingsDB or a pre-built list.
         </BodyText>
       );
     }
-    if (item.kind === "starter-note") {
+    if (item.kind === "no-match") {
       return (
-        <BodyText testID="starter-note" tone="muted" className="mt-1">
-          {STARTER_NOTE}
-        </BodyText>
+        <View className="mt-4 items-start">
+          <BodyText testID="decks-no-match" tone="muted">
+            No decks match.
+          </BodyText>
+          <View className="-mx-3">
+            <TextButton testID="decks-clear-filter" label="Clear filter" tone="gold" onPress={() => setFilter(emptyDeckListFilter)} />
+          </View>
+        </View>
       );
     }
     if (item.kind === "starter-missing") {
       return (
-        <View className="gap-2">
+        <View className="mb-3 gap-2">
           <BodyText tone="danger" testID="starter-missing">
             The starter decks are missing.
           </BodyText>
@@ -214,37 +245,83 @@ export default function Decks() {
       );
     }
     const { deck, starter } = item;
+    const summary = {
+      testID: `deck-${deck.id}`,
+      name: deck.name,
+      heroes: facesFor(deck),
+      detail: deckCountLine(deck),
+      status: readiness.get(deck.id) ?? { ready: false, text: "" },
+      onPress: () => openDeck(deck),
+      onLongPress: () => {
+        setManaging(true);
+        setAsking(null);
+      },
+    };
+    const actions = managing ? (
+      <DeckActions
+        deck={deck}
+        starter={starter}
+        asking={asking}
+        onAsk={(action) => ask(deck.id, action)}
+        onCancel={() => setAsking(null)}
+        onDuplicate={() => duplicate(deck)}
+        onDelete={() => remove(deck)}
+        onReset={() => reset(deck)}
+      />
+    ) : null;
+    if (view === "List") return <DeckRow {...summary}>{actions}</DeckRow>;
     return (
       <View className="pb-3">
-        <DeckCover
-          testID={`deck-${deck.id}`}
-          name={deck.name}
-          heroes={facesFor(deck)}
-          detail={deckCountLine(deck)}
-          status={deckReadiness(deck, faces)}
-          height={COVER_HEIGHT}
-          onPress={() => openDeck(deck)}
-          onLongPress={() => {
-            setManaging(true);
-            setAsking(null);
-          }}
-        >
-          {managing ? (
-            <DeckActions
-              deck={deck}
-              starter={starter}
-              asking={asking}
-              onAsk={(action) => ask(deck.id, action)}
-              onCancel={() => setAsking(null)}
-              onDuplicate={() => duplicate(deck)}
-              onDelete={() => remove(deck)}
-              onReset={() => reset(deck)}
-            />
-          ) : null}
+        <DeckCover {...summary} height={COVER_HEIGHT}>
+          {actions}
         </DeckCover>
       </View>
     );
   }
+
+  const filters =
+    saved.length > 0 ? (
+      <View className="mt-2">
+        <View className="flex-row items-center gap-2">
+          <TextInput
+            testID="decks-search"
+            value={filter.query}
+            onChangeText={(query) => setFilter({ ...filter, query })}
+            placeholder="Search"
+            placeholderTextColor={palette.faint}
+            autoCorrect={false}
+            autoCapitalize="none"
+            accessibilityLabel="Search decks or heroes"
+            className="min-h-11 min-w-0 flex-1 rounded-pill bg-raised px-4 text-body text-bone"
+          />
+          <Segmented options={VIEWS} value={view} onChange={setDeckListView} testIDPrefix="decks-view" />
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-2 px-6">
+          {STATUSES.map((status) => (
+            <FilterChip
+              key={status.key}
+              testID={`decks-status-${status.key}`}
+              label={status.label}
+              selected={filter.status === status.key}
+              onPress={() => setFilter({ ...filter, status: status.key })}
+            />
+          ))}
+          {spheres.map((sphere) => (
+            <FilterChip
+              key={sphere.code}
+              testID={`decks-sphere-${sphere.code}`}
+              label={sphereWord(sphere.name)}
+              sphere={sphere.code}
+              selected={filter.sphere === sphere.code}
+              onPress={() => setFilter({ ...filter, sphere: filter.sphere === sphere.code ? null : sphere.code })}
+            />
+          ))}
+        </ScrollView>
+        {deckListFiltered(filter) ? (
+          <Text testID="decks-count" className="mt-2 text-label text-muted">{`${shown.length} of ${saved.length} decks`}</Text>
+        ) : null}
+      </View>
+    ) : null;
 
   const header = (
     <View className="pt-6">
@@ -271,6 +348,7 @@ export default function Decks() {
           <TextButton testID="card-pool" label="Card pool" onPress={() => router.push("/pool")} />
         </View>
       ) : null}
+      {filters}
     </View>
   );
 
@@ -288,8 +366,11 @@ export default function Decks() {
             keyExtractor={(item) => item.key}
             getItemType={(item) => item.kind}
             renderItem={renderRow}
-            extraData={{ managing, asking, faces }}
-            ListFooterComponent={<View className="h-20" />}
+            extraData={{ managing, asking, readiness, view }}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            ListHeaderComponent={<View className="h-3" />}
+            ListFooterComponent={<View className="h-6" />}
             style={{ flex: 1 }}
           />
         </View>

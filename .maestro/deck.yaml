@@ -10,17 +10,13 @@ appId: com.middleearth.lcg
 - assertVisible:
     id: deck-stealth-and-steadfastness-status
     text: "Ready to play"
-- scrollUntilVisible:
-    element:
-      id: starter-note
-    direction: DOWN
-    timeout: 15000
-- assertVisible: "When both decks are used together, replace the three copies of Gandalf in Stealth and Steadfastness with three copies of Elrond."
-- scrollUntilVisible:
-    element:
-      id: card-pool
-    direction: UP
-    timeout: 15000
+# The deck list filters by a hero's sphere: Spirit keeps Wisdom and Wizardry (Éowyn) and drops Stealth and Steadfastness.
+- tapOn:
+    id: decks-sphere-spirit
+- assertVisible: "Wisdom and Wizardry"
+- assertNotVisible: "Stealth and Steadfastness"
+- tapOn:
+    id: decks-sphere-spirit
 - tapOn:
     id: card-pool
 - tapOn:
@@ -39,6 +35,10 @@ appId: com.middleearth.lcg
     id: deck-stealth-and-steadfastness
 - assertVisible:
     id: deck-editor
+# The starter note is on the starter deck's own screen.
+- assertVisible:
+    id: starter-note
+- assertVisible: "When both decks are used together, replace the three copies of Gandalf in Stealth and Steadfastness with three copies of Elrond."
 - scrollUntilVisible:
     element:
       id: count-inc-01073
