@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -9,7 +9,12 @@ import { ROOT } from "./paths.ts";
 // The draft bundles list the schema's words. A verb declared through the verb() or codeVerb() helper is a verb too.
 describe("effect vocabulary for the draft bundles", () => {
   const vocab = vocabulary();
-  const source = readFileSync(path.join(ROOT, "src", "catalog", "effect-schema.ts"), "utf8");
+  // The schema is split across src/catalog/effect-schema*.ts.
+  const catalog = path.join(ROOT, "src", "catalog");
+  const source = readdirSync(catalog)
+    .filter((name) => /^effect-schema.*\.ts$/.test(name))
+    .map((name) => readFileSync(path.join(catalog, name), "utf8"))
+    .join("\n");
 
   it("lists every verb the schema declares, through either helper or a literal", () => {
     const declared = new Set([
