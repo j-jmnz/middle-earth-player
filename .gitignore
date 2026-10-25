@@ -65,7 +65,7 @@ agent-tools/
 !assets/images/*.png
 !assets/images/**/*.png
 !assets/expo.icon/**/*.png
-# game icon sources data:build reads
+# game icons: the raw DragnCards token art data:build reads, and the built icons the app requires
 !data/raw/icons/**/*.png
 !assets/icons/*.png
 

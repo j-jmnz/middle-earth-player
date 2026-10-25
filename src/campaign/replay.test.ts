@@ -9,6 +9,7 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 import { playOut } from "../../scripts/auto-player.ts";
 import { campaign, loadWorld, scenario } from "../../scripts/past-scene.ts";
 import { playStarter, starterWorld } from "../../scripts/starter-game.ts";
+import { KNIFE_GOLDENS, knifeWorld, playGolden } from "../../scripts/knife-game.ts";
 
 import { buildStart } from "./start.ts";
 import { beginActive, recordIntent, replay } from "./replay.ts";
@@ -50,6 +51,18 @@ describe("saves.activeScenario replay", () => {
     expect(replayed.ok).toBe(true);
     if (replayed.ok) expect(replayed.state).toEqual(run.state);
   });
+
+  it.each(KNIFE_GOLDENS.map((golden) => golden.name))("replays the A Knife in the Dark golden game (%s) to the same final state", async (name) => {
+    const golden = KNIFE_GOLDENS.find((item) => item.name === name);
+    if (!golden) throw new Error(name);
+    const { ctx } = await knifeWorld();
+    const game = playGolden(golden, ctx);
+    let active = beginActive(game.start, HASH);
+    for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
+    const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);
+    expect(replayed.ok).toBe(true);
+    if (replayed.ok) expect(replayed.state).toEqual(game.state);
+  }, 60_000);
 
   it("drops a save from another engine version, another data hash, another seed, or a refused intent", async () => {
     const { start, ctx } = await game(1);

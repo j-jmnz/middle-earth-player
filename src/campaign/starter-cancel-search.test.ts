@@ -1,4 +1,4 @@
-// Rules: rr.cancel, rr.response, rr.in-play-and-out-of-play, rr.restricted (data/rules/entries.json).
+// Rules: rr.cancel, rr.response, rr.staging, rr.in-play-and-out-of-play, rr.restricted (data/rules/entries.json).
 // Phase 9 batch 3: cancels, looking at the encounter deck, and searching a deck, played through the reducer.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -7,6 +7,7 @@ import { legalIntents } from "../rules/reduce.ts";
 import { withMode } from "../rules/state.ts";
 import { fund, payFor, starterBase } from "../../scripts/starter-scene.ts";
 import { begin, buildTable, idsOf, passWindows, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { loadPrinted } from "../../scripts/test-catalog.ts";
 
 const SAM = "141002";
 const MERRY = "141003";
@@ -60,8 +61,8 @@ describe("A Test of Will (01050:A:1)", () => {
     const event = idsOf(tab, "01050");
     expect(legalIntents(run.state, tab.ctx)).toContainEqual({ type: "Trigger", cardId: event, effectId: "01050:response:1" });
     run = send(run, { type: "Trigger", cardId: event, effectId: "01050:response:1", payments: payFor(run.state, tab.ctx, event) }, tab.ctx);
-    // The card was still revealed, but its effect never asked the first player anything. The treachery is then
-    // discarded (rr.treachery-cards).
+    // The card was still revealed, but its effect never asked the first player anything. A canceled treachery is still
+    // resolved, so it goes to the encounter discard pile (ltp.revealed-treachery, rr.cancel).
     expect(run.state.cards[idsOf(tab, LURE)]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[event]?.zone).toBe("discard");
     expect(run.state.window?.kind).not.toBe("choose");
@@ -84,6 +85,26 @@ describe("A Test of Will (01050:A:1)", () => {
       const offered = legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "01050:response:1");
       expect(offered).toBe(ring === "ready");
     }
+  });
+
+  // A Knife in the Dark: Trouble in Bree (141025) one progress short with The Prancing Pony gone, Into the Wild (141026)
+  // next. Advancing reveals stage 2, whose "When Revealed: Add Midgewater to the staging area" (141026:B:1) is a quest
+  // card's, not "a card that was just revealed from the encounter deck" (01050:A:1, rr.staging): A Test of Will is not
+  // offered against it, and Midgewater enters the staging area.
+  it("is not offered against a quest stage's when revealed effects after the quest advances", async () => {
+    const knife = new Map([...base.cards, ...(await loadPrinted(["141025", "141026", "141027", "141048"]))]);
+    const stages = [{ code: "141025" }, { code: "141026" }, { code: "141027" }];
+    const tab = buildTable({ definition: { ...base.definition, stages }, cards: knife }, { heroes: [{ code: EOWYN, seat: 0 }], progress: 7, deck: ["f0"], setAside: ["141048"], hand: [{ code: "01050", seat: 0 }], ring: "none" });
+    const state = fund(tab.state, 0, 6);
+    let run = send(begin(state), { type: "Commit", cardIds: [idsOf(tab, EOWYN)] }, tab.ctx);
+    for (let turn = 0; turn < 20 && !run.steps.some((step) => step.kind === "advance"); turn += 1) {
+      expect(legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "01050:response:1")).toBe(false);
+      run = send(run, { type: "Pass" }, tab.ctx);
+    }
+    expect(run.steps.some((step) => step.kind === "advance" && step.cardId === idsOf(tab, "141026"))).toBe(true);
+    expect(legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "01050:response:1")).toBe(false);
+    expect(run.state.cards[idsOf(tab, "141048")]?.zone).toBe("staging");
+    expect(run.state.cards[idsOf(tab, "01050")]?.zone).toBe("hand");
   });
 
   it("is not offered when the card has no when revealed effect", () => {

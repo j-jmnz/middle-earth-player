@@ -1,4 +1,5 @@
-// Rules: rr.quest-advancement, rr.step-3-4, ltp.quest-resolution, ltp.successful-quest, ltp.unsuccessful-quest,
+// Rules: rr.quest-advancement, rr.step-3-4, rr.engagement-check, rr.optional-engagement, rr.engaged,
+// rr.in-play-and-out-of-play, ltp.quest-resolution, ltp.successful-quest, ltp.unsuccessful-quest,
 // ltp.explored-active-location, ltp.quest-advancement, ltp.optional-engagement, ltp.engagement-checks-intro,
 // ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
@@ -7,7 +8,7 @@ import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
 import { printedOf } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
-import { livingSeats, updateCard, withMode } from "./state.ts";
+import { flagged, livingSeats, updateCard, withMode } from "./state.ts";
 import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
 
@@ -77,7 +78,10 @@ function advanceReady(state: ScenarioState, cards: Cards, steps: EngineStep[], c
   return advanceStage(state, cards, steps, canAdvance);
 }
 
-function placeQuestProgress(
+// Progress on the quest goes on the active location first, up to its quest points, and the rest on the current quest card
+// (rr.active-location). A full quest card advances when `canAdvance` allows it (rr.quest-advancement); progress beyond its
+// quest points is lost: "Additional progress tokens earned against the quest do not carry over to the next stage."
+export function placeQuestProgress(
   state: ScenarioState,
   amount: number,
   cards: Cards,
@@ -133,8 +137,8 @@ function placeQuestProgress(
   return next;
 }
 
-// Excess progress does not carry over (rr.quest-advancement), so a new stage only advances again on progress it
-// already holds.
+// The next stage arrives with no progress on it (rr.quest-advancement), side B up. A stage that prints no quest points
+// (141024, 141027) is won some other way, so the quest stops there. One with 0 quest points would be met at once.
 function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
   let next = state;
   const guard = next.stages.length + 1;
@@ -149,12 +153,11 @@ function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], c
     if (!nextId) return clearStage(next);
     next = moveCard(next, currentId, { zone: "setAside" });
     next = moveCard(next, nextId, { zone: "questStage" });
-    const arrived = next.cards[nextId];
-    const points = arrived ? questPointsOf(next, arrived, cards) : null;
-    const before = arrived?.progress ?? 0;
     next = updateCard(next, nextId, { face: "B" });
     steps.push({ kind: "advance", cardId: nextId });
-    if (points == null || before < points || !canAdvance(next)) return next;
+    const arrived = next.cards[nextId];
+    const points = arrived ? questPointsOf(next, arrived, cards) : null;
+    if (points == null || (arrived?.progress ?? 0) < points || !canAdvance(next)) return next;
   }
   return { ...next, stageCleared: true };
 }
@@ -187,6 +190,12 @@ export function stagingLocations(state: ScenarioState, cards: Cards): string[] {
   });
 }
 
+// The enemies in the staging area a player may optionally engage: not one that cannot be engaged at all (141048:A:1) or
+// cannot be optionally engaged (141051:A:1, 141052:A:1).
+export function optionalEnemies(state: ScenarioState, cards: Cards): string[] {
+  return stagingEnemies(state, cards).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged"));
+}
+
 export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
   return state.staging.filter((id) => {
     const instance = state.cards[id];
@@ -194,10 +203,21 @@ export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
   });
 }
 
+// An enemy in the staging area engages the seat: an engagement check, an optional engagement, or an effect that engages
+// one there. "Enemies cannot ... be engaged" (141048:A:1) stops it.
 export function engageEnemy(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
   const instance = state.cards[enemyId];
   if (!instance || instance.zone !== "staging") return state;
-  if (state.seats[seat]?.eliminated) return state;
+  if (flagged(state, enemyId, "cannotBeEngaged")) return state;
+  return engageWith(state, seat, enemyId, steps);
+}
+
+// The enemy enters the seat's play area from wherever it is, so it has engaged that player (rr.engaged). An effect that
+// puts an out-of-play enemy into play engaged (141045:A:2) comes here directly: "cannot be engaged" (141048:A:1) is held
+// only by enemies in play, and card abilities do not reach a card out of play (rr.in-play-and-out-of-play), so it does not
+// stop the enemy, which is engaged as it enters play.
+export function engageWith(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
+  if (!state.cards[enemyId] || state.seats[seat]?.eliminated) return state;
   const moved = moveCard(state, enemyId, { zone: "engaged", seat });
   steps.push({ kind: "engage", seat, enemyId });
   // Responses hear that the player engaged the enemy ("After you engage an enemy with a higher engagement cost ...").
@@ -209,7 +229,7 @@ export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Car
   const found: { id: string; cost: number }[] = [];
   for (const id of stagingEnemies(state, cards)) {
     const instance = state.cards[id];
-    if (!instance) continue;
+    if (!instance || flagged(state, id, "cannotBeEngaged")) continue;
     const cost = engagementCostOf(state, instance, cards);
     if (cost == null || cost > threat) continue;
     found.push({ id, cost });

@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.triggered-ability (data/rules/entries.json).
+// Rules: rr.forced, rr.triggered-ability, rr.in-play-and-out-of-play, rr.timing-of-ability-resolution (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
@@ -18,7 +18,10 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
   const found: Found[] = [];
   const actor = event.seat ?? state.firstPlayer;
   for (const instance of Object.values(state.cards)) {
-    if (!inPlay(instance.zone)) continue;
+    // "After this location leaves play" (141045:A:2, 141049:A:2) is heard by the card that left: an ability that requires
+    // its card to be out of play resolves from there (rr.in-play-and-out-of-play).
+    const leftItself = event.trigger === "leftPlay" && event.cardId === instance.id;
+    if (!inPlay(instance.zone) && !leftItself) continue;
     if (event.cardId != null && instance.id !== event.cardId) continue;
     for (const effect of ctx.effects) {
       if (effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;

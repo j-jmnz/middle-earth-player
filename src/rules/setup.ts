@@ -1,5 +1,6 @@
-// Rules: mec109.setting-up-the-game, rr.setup, rr.mulligan, easy-mode.setup (data/rules/entries.json).
+// Rules: mec109.setting-up-the-game, rr.setup, rr.mulligan, ltp.easy-mode, easy-mode.easy-mode (data/rules/entries.json).
 import type { ScenarioDefinition } from "../catalog/boundary.ts";
+import type { Difficulty } from "../catalog/scenario-data.ts";
 
 import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
@@ -30,8 +31,8 @@ export type StartScenario = {
   questDeck: readonly string[];
   // The burden deck of the scenario, when it has one. It is shuffled into a deck beside the quest deck.
   burdenDeck?: readonly string[];
-  // Easy Mode: each hero starts with 1 resource in its pool (easy-mode.setup).
-  easy?: boolean;
+  // Easy adds one resource to each hero's resource pool in Setup step 2 (easy-mode.easy-mode). Normal when absent.
+  difficulty?: Difficulty;
 };
 
 export function startScenario(input: StartScenario, ctx: ReduceContext): ScenarioState {
@@ -58,8 +59,10 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     if (!seat) throw new Error(`Missing seat ${index}`);
     let threat = input.threatModifier;
     for (const code of seat.heroes) {
-      const hero = spawn(state, code, { zone: "heroes", seat: index });
-      state = input.easy ? updateCard(hero.state, hero.id, { resources: 1 }) : hero.state;
+      const placed = spawn(state, code, { zone: "heroes", seat: index });
+      // Easy mode: "During step 2 of Setup, 'Place Heroes and Set Initial Threat Levels', add one resource to each hero's
+      // resource pool" (easy-mode.easy-mode; ltp.easy-mode step 1, which says only "during setup").
+      state = input.difficulty === "Easy" ? updateCard(placed.state, placed.id, { resources: 1 }) : placed.state;
       threat += printedOf(ctx.cards, code).threat ?? 0;
     }
     for (const attached of seat.attachments ?? []) {

@@ -1,0 +1,93 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 12. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json), which
+# opens the fixture route. The fixture is a real two-handed Easy game of A Knife in the Dark (seed 1) parked on its loss,
+# dealt from the log scenario 1's won fixture writes with Gandalf's Delay and Gildor Inglorion (src/campaign/fixtures).
+# A loss has no reward screen and writes nothing to the log.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/knife-lost"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-a-shadow-of-the-past-status
+    text: "Completed"
+- assertVisible:
+    id: node-a-knife-in-the-dark-status
+    text: "Current"
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- assertVisible:
+    id: rail-current
+    text: "Defeat"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 15000
+- assertVisible:
+    id: resolution-outcome
+    text: "Defeat"
+- assertVisible: "The scenario was lost. Nothing is written to the log."
+- assertNotVisible:
+    id: resolution-confirm
+- tapOn:
+    id: resolution-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+# The log is unchanged: scenario 1 completed, A Knife in the Dark still current, Flight to the Ford locked.
+- assertVisible:
+    id: node-a-shadow-of-the-past-status
+    text: "Completed"
+- assertVisible:
+    id: node-a-knife-in-the-dark-status
+    text: "Current"
+- assertVisible:
+    id: node-flight-to-the-ford-status
+    text: "Locked"
+# Kill and relaunch: the log is unchanged. A Knife in the Dark is still current, Flight to the Ford locked, and the log
+# holds only scenario 1's choices.
+- stopApp
+- launchApp
+- tapOn:
+    id: "save-.*"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-a-knife-in-the-dark-status
+    text: "Current"
+- assertVisible:
+    id: node-flight-to-the-ford-status
+    text: "Locked"
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertVisible:
+    id: log-burdens
+    text: ".*Gandalf's Delay.*"
+- assertVisible:
+    id: log-boons
+    text: ".*Gildor Inglorion.*"
+- assertNotVisible:
+    text: ".*Tireless Ranger.*"
+- assertVisible:
+    id: log-score
+    text: "146"
+- assertVisible:
+    id: log-scenario-a-knife-in-the-dark

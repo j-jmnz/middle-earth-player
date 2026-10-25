@@ -10,6 +10,7 @@ import { playOut } from "../../scripts/auto-player.ts";
 import { causeProblems, NUMBER_STEPS, verified } from "../../scripts/cause-check.ts";
 import { campaign, loadWorld, reveal, scenario, send, table } from "../../scripts/past-scene.ts";
 import { playStarter, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
+import { knife, KNIFE_GOLDENS, knifeWorld, playGolden } from "../../scripts/knife-game.ts";
 
 import { buildStart } from "./start.ts";
 
@@ -48,6 +49,20 @@ describe("engine step causes in the starter-deck goldens", () => {
     expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
     expect(causeProblems(all)).toEqual([]);
   });
+});
+
+describe("engine step causes in the A Knife in the Dark goldens", () => {
+  it("name a verified rule or a ledger line on every number-changing step, the scenario's records included", async () => {
+    const { ctx } = await knifeWorld();
+    const all: EngineStep[] = [];
+    for (const golden of KNIFE_GOLDENS) all.push(...playGolden(golden, ctx).steps);
+    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
+    expect(causeProblems(all)).toEqual([]);
+    // The scenario's own records move numbers too (Bill Ferny's threat, an encounter card's damage).
+    const own = new Set([knife.campaignCard, ...knife.stages, ...knife.cards.map((card) => card.code)]);
+    const causes = all.filter((step) => NUMBER_STEPS.has(step.kind)).map((step) => (step as { cause: Cause }).cause);
+    expect(causes.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
+  }, 120_000);
 });
 
 describe("engine step causes", () => {

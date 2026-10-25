@@ -1,5 +1,6 @@
-// Rules: rr.staging, rr.surge, rr.treachery-cards, rr.running-out-of-cards, mec109.saga-staging-rules, mec109.peril,
-// ltp.staging-placement, ltp.staging-treachery, faq.last-encounter-card (data/rules/entries.json).
+// Rules: rr.step-3-3, rr.staging, rr.surge, rr.treachery-cards, rr.running-out-of-cards, ltp.revealed-treachery,
+// mec109.saga-staging-rules, mec109.peril, ltp.staging-placement, ltp.staging-treachery, faq.last-encounter-card
+// (data/rules/entries.json).
 import { effectStep, pushCardEffects } from "./effect-frames.ts";
 import { currentCause, ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
@@ -74,7 +75,13 @@ export function revealNow(state: ScenarioState, seat: number, ctx: ReduceContext
 }
 
 export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const cursor = state.revealCursor ?? { seats: livingSeats(state), index: 0 };
+  // The staging step begins: Forced effects "at the beginning of the staging step" (141051:A:2) resolve before the first
+  // card is revealed (rr.step-3-3). The cursor is set first, so the step begins once.
+  if (state.revealCursor == null) {
+    const begun: ScenarioState = { ...state, revealCursor: { seats: livingSeats(state), index: 0 } };
+    return fireForced(begun, { trigger: "stagingStepBegins", seat: null }, ctx, steps);
+  }
+  const cursor = state.revealCursor;
   const seat = cursor.seats[cursor.index];
   if (seat == null || state.lost || state.failure) {
     return { ...withMode(state, "resolution"), revealCursor: null };
@@ -122,9 +129,10 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     case 4:
       return fireForced(patchTop(state, { step: 5 }), { trigger: "revealed", seat, cardId: id }, ctx, steps);
     case 5: {
-      // A treachery's effects are resolved: it goes to the encounter discard pile unless its text put it somewhere
-      // (rr.staging, rr.treachery-cards). Peril covers that card's staging only, so the lock ends before surge
-      // (mec109.peril, rr.surge).
+      // A revealed treachery is resolved, then placed in the encounter discard pile unless its text says otherwise
+      // (ltp.revealed-treachery, rr.treachery-cards, rr.step-3-3). A treachery whose text attached it (a Condition) has
+      // left the staging area and stays where its text put it. A canceled treachery is discarded too (rr.cancel). Peril
+      // covers that card's staging only, so the lock ends before surge (mec109.peril, rr.surge).
       const resolved = printed.type === "treachery" && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
       const unlocked = frame.peril && resolved.perilSeat === seat ? { ...resolved, perilSeat: null } : resolved;
       const next = patchTop(unlocked, { step: 6 });

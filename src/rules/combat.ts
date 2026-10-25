@@ -1,5 +1,5 @@
-// Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, rr.step-6-2, rr.ranged, rr.step-6-8b,
-// rr.step-6-8-1, mec109.archery, faq.limitations-on-attacks, ltp.deal-shadow-cards, ltp.resolve-enemy-attacks,
+// Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, rr.step-6-2, rr.step-6-4b, rr.ranged,
+// rr.step-6-8b, rr.step-6-8-1, mec109.archery, faq.limitations-on-attacks, ltp.deal-shadow-cards, ltp.resolve-enemy-attacks,
 // ltp.undefended-attack, ltp.resolve-player-attacks (data/rules/entries.json).
 import { attackBarred } from "./constants.ts";
 import type { EngineStep } from "./intents.ts";
@@ -14,6 +14,7 @@ import { engagementCostOf } from "./quest.ts";
 import { enemyAttackWindow, playerAttackWindow } from "./step-window.ts";
 import { inPlay } from "./zones.ts";
 import { ruleCause } from "./cause.ts";
+import { fireForced } from "./triggers.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -74,25 +75,42 @@ export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: s
 }
 
 // The shadow card is not turned up yet: it resolves once the defender is declared or the attack is undefended.
+// Forced effects "when this enemy attacks" (141069:A:2) resolve as the attack begins (rr.step-6-4b), before the defender is
+// declared: the defense window waits for their frames.
 export function beginEnemyAttack(
   state: ScenarioState,
   seat: number,
   enemyId: string,
-  _ctx: ReduceContext,
+  ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
   const attacker = state.cards[enemyId];
   if (!attacker || attacker.zone !== "engaged" || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
-  const begun: ScenarioState = { ...state, pendingAttack: { enemyId, seat }, window: null };
-  // 6.4b: the attack has begun; an action window comes before the defender is declared.
-  return enemyAttackWindow(begun, _ctx, "defense") ?? openDefense(begun);
+  const declared: ScenarioState = { ...state, pendingAttack: { enemyId, seat }, activeSeat: seat, window: null };
+  const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
+  if (fired.stack.length > declared.stack.length && fired.pendingAttack) {
+    return { ...fired, pendingAttack: { ...fired.pendingAttack, defenseWaits: true } };
+  }
+  return toDefense(declared, ctx);
 }
 
-export function openDefense(state: ScenarioState): ScenarioState {
+// 6.4b: the attack has begun; an action window comes before the defender is declared.
+function toDefense(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack) return state;
-  return { ...state, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
+  return enemyAttackWindow(state, ctx, "defense") ?? { ...state, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
+}
+
+// The Forced effects of the attack's start are done: the defender is declared next.
+export function openDefense(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack?.defenseWaits) return state;
+  const { defenseWaits: _done, ...rest } = attack;
+  const enemy = state.cards[attack.enemyId];
+  // The enemy left play while they resolved: the attack is over.
+  if (enemy?.zone !== "engaged") return { ...state, pendingAttack: null };
+  return toDefense({ ...state, pendingAttack: rest }, ctx);
 }
 
 export function defenderIds(state: ScenarioState, attackedSeat: number, cards: Cards): string[] {
@@ -249,7 +267,7 @@ export function strikeEnemy(
   steps.push({ kind: "attack", side: "player", seat, enemyId });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
-  const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "framework", ruleCause("rr.step-6-8-3"));
+  const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   // Each attacker hears that the attack destroyed the enemy ("After Merry participates in an attack that destroys an enemy").
   if (damaged.cards[enemyId]?.zone === "engaged") return damaged;
   return attackerIds.reduce((current, attackerId) => queueEvent(current, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, participants: attackerIds }), damaged);

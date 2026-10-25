@@ -6,15 +6,18 @@
 // number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../catalog/boundary.ts";
 import { modifiedStat } from "../rules/keywords.ts";
+import { rejectionReason } from "../rules/legal.ts";
+import { printedOf } from "../rules/printed.ts";
 import { hideWillpower } from "../rules/hide.ts";
 import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import type { Frame } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
+import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
-import { TIMING_WORDS, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type Sheet, type SheetNames, type SheetOption, type TriggerOption } from "./sheet-types.ts";
+import { TIMING_WORDS, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type PickOption, type Sheet, type SheetNames, type SheetOption, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 export function step(game: ScenarioState): string {
   return STEP_WORDS[game.mode] ?? game.phase;
@@ -80,6 +83,23 @@ function hideNumbers(game: ScenarioState, ctx: ReduceContext, frame: Frame | und
 
 function has(legal: readonly LegalIntent[], type: LegalIntent["type"]): boolean {
   return legal.some((intent) => intent.type === type);
+}
+
+/**
+ * The locations in staging the players cannot travel to, each with the reducer's reason and the card's Travel line
+ * (Weathertop while The One Ring is exhausted or gone: 141046:A:3, rr.travel). Nothing is listed while a location is active.
+ */
+export function travelRefusals(game: ScenarioState, ctx: ReduceContext, names: SheetNames, targets: readonly string[]): Unavailable[] {
+  if (game.activeLocation) return [];
+  return game.staging.flatMap((id): Unavailable[] => {
+    const card = game.cards[id];
+    if (!card || targets.includes(id) || printedOf(ctx.cards, card.code).type !== "location") return [];
+    const reason = rejectionReason(game, { type: "Travel", locationId: id }, ctx);
+    if (!reason) return [];
+    const travel = ctx.effects.find((effect) => effect.cardCode === card.code && effect.timing === "travel");
+    const line = lineOf(travel, names);
+    return [{ id, label: names.card(id), code: card.code, reason: line ? `${reason}. ${line}` : `${reason}.` }];
+  });
 }
 
 /** The heroes an undefended attack can land on, when there is more than one to choose from. */
@@ -204,16 +224,51 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const data = frame?.data.kind === "effect" ? frame.data : null;
       const effect = data ? effectOf(ctx, data.effectId) : undefined;
       const source = frame?.cardId ?? null;
-      return {
-        kind: "pick",
+      const words: ChoiceNames = { card: names.card, code: (code) => ctx.cards.get(code)?.name ?? code };
+      const line = lineOf(effect, names);
+      // Two-handed, the sheet says whose decision it is: the first player's for "the first player must either" (rr.first-player).
+      const who = game.seatCount > 1 ? ` Player ${window.seat + 1} chooses.` : "";
+      const wait = data?.wait;
+      const base = {
+        kind: "pick" as const,
         key: `choose:${frame?.id ?? ""}:${window.options.join(",")}`,
         step: effect ? TIMING_WORDS[effect.timing] : step(game),
         title: source ? names.card(source) : "Choose",
-        note: lineOf(effect, names),
-        verb: "Choose",
-        options: window.options.map((id) => ({ ...option(game, names, id), intent: { type: "Choose", optionId: id } })),
         primary: null,
         alternative: null,
+      };
+      // Either of two instructions (141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2): each option is a branch in words.
+      if (wait?.kind === "branch" && wait.item.instruction.verb === "Choose") {
+        const choose = wait.item.instruction;
+        return {
+          ...base,
+          note: [`Choose one.${who}`, line].filter((part) => part != null).join(" "),
+          verb: "Choose",
+          confirm: "Confirm",
+          options: window.options.map((id): PickOption => {
+            // A branch that raises or lowers threat carries the threat icon with the record's amount.
+            const threat = branchThreat(choose, id);
+            const stats: SheetStat[] = threat == null ? [] : [{ icon: "threat", value: threat, word: "Threat" }];
+            return { id, label: branchWords(choose, id, game, words, source), code: null, ...(stats.length > 0 ? { stats } : {}), intent: { type: "Choose", optionId: id } };
+          }),
+        };
+      }
+      // A Pick names what the card is for: a hero removed from the quest, an attachment discarded, an ally put into play,
+      // an enemy placed under Weather Hills.
+      const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source) : { verb: "Choose", prompt: "Choose one." };
+      const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
+      return {
+        ...base,
+        note: [`${asked.prompt}${who}`, line].filter((part) => part != null).join(" "),
+        verb: asked.verb,
+        // Which Ringwraith copy goes in: the primary says the action alone, so the pill does not wrap on a long zone name.
+        ...(outOfPlay ? { confirm: asked.verb } : {}),
+        options: window.options.map((id): PickOption => {
+          const card = option(game, names, id);
+          // Copies of one card in different zones are told apart by where each one is.
+          const label = outOfPlay ? outOfPlayLabel(game, id, words) : card.label;
+          return { ...card, label, intent: { type: "Choose", optionId: id } };
+        }),
       };
     }
     case "cancelOffer":
@@ -249,6 +304,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       };
     case "travel": {
       const targets = has(legal, "Travel") ? legalTargets(game, { type: "Travel" }, ctx) : [];
+      const unavailable = travelRefusals(game, ctx, names, targets);
       return {
         kind: "pick",
         key: `travel:${game.round}`,
@@ -262,6 +318,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const stats: SheetStat[] = [...statOf(game, ctx, id, "threat"), ...(points == null ? [] : [{ icon: "questPoints" as const, value: points, word: "Quest points" }])];
           return { ...option(game, names, id), stats, intent: { type: "Travel", locationId: id } };
         }),
+        ...(unavailable.length > 0 ? { unavailable } : {}),
         primary: null,
         alternative: { label: targets.length > 0 ? "Do not travel" : "Continue", intent: { type: "DeclineTravel" } },
       };

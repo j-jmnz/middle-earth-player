@@ -68,7 +68,8 @@ function words(step: EngineStep, names: LogNames): string | null {
     case "threat":
       return `${player(step.seat)} threat ${signed(step.amount)}`;
     case "progress":
-      return `${step.amount} progress on ${names.card(step.targetId)}`;
+      // A removal (141026:B:2) is a step with a negative amount: say what left the card, never a minus sign.
+      return step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : `${step.amount} progress on ${names.card(step.targetId)}`;
     case "destroy":
       return `${names.card(step.targetId)} is destroyed`;
     case "eliminate":

@@ -61,4 +61,19 @@ describe("log lines", () => {
     );
     expect(lines).toEqual([{ key: "1", text: "Player 1 threat +2", cause: `Rule: ${ruleTitle("rr.step-3-4")}`, mark: "threat" }]);
   });
+
+  it("words removed progress as a removal, not a negative number (141026:B:2)", () => {
+    const cause = { effect: "141026:forced:1", line: "141026:B:2" };
+    const lines = logLines(
+      [
+        { kind: "progress", targetId: "stage", amount: -2, cause },
+        { kind: "progress", targetId: "stage", amount: 3, cause: { rule: "rr.step-3-4" } },
+      ],
+      { ...names, card: () => "Into the Wild" },
+    );
+    expect(lines.map((line) => line.text)).toEqual(["2 progress removed from Into the Wild", "3 progress on Into the Wild"]);
+    expect(lines[0]?.mark).toBe("progress");
+    expect(lines[0]?.cause).toBe(causeText(cause, names));
+    expect(lines.some((line) => line.text.includes("-"))).toBe(false);
+  });
 });

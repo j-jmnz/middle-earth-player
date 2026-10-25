@@ -39,7 +39,7 @@ export function playerAttackWindow(state: ScenarioState, ctx: ReduceContext, the
 }
 
 // An attack is waiting on a step window that has closed, with everything played in it resolved.
-export function attackResumes(state: ScenarioState): boolean {
+export function stepWindowResumes(state: ScenarioState): boolean {
   if (state.window) return false;
   const attack = state.pendingAttack;
   if (attack?.awaiting && state.stack.length <= (attack.awaitDepth ?? 0)) return true;

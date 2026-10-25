@@ -160,6 +160,9 @@ describe("scenario facts", () => {
     const easy = startFor(inputOf(past, { difficulty: "Easy" }), SEED);
     const normal = startFor(inputOf(past), SEED);
     expect(easy.encounterDeck.length).toBeLessThanOrEqual(normal.encounterDeck.length);
+    // The start carries the difficulty, so Setup step 2 gives each hero one resource on Easy (easy-mode.easy-mode).
+    expect(easy.difficulty).toBe("Easy");
+    expect(normal.difficulty).toBe("Normal");
   });
 });
 

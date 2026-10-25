@@ -38,7 +38,7 @@ describe("buildStart", () => {
     expect(setAside("Easy")).toBe(2);
   });
 
-  it("Easy Mode puts 1 resource on each hero during setup (easy-mode.setup)", async () => {
+  it("Easy Mode puts 1 resource on each hero during setup (easy-mode.easy-mode)", async () => {
     const world = await loadWorld();
     const scenario = loadScenario("a-shadow-of-the-past");
     const loadout = [{ heroes: ["141001", "141002"], deck: [] }];

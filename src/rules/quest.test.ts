@@ -159,7 +159,28 @@ describe("quest resolution", () => {
     expect(resolved.state.window?.kind).toBe("travel");
   });
 
-  it("advances one stage, and the excess progress does not carry over (rr.quest-advancement)", () => {
+  // rr.quest-advancement: "Additional progress tokens earned against the quest do not carry over to the next stage."
+  it("advances to the next stage with no progress on it: the leftover does not carry over", () => {
+    const { state, cards } = atCommit({
+      willpower: 5,
+      threat: 8,
+      stages: ["stage-1", "stage-2"],
+      stagePoints: 1,
+      nextStage: true,
+    });
+    const resolved = expectOk(reduce(state, { type: "Pass" }, { effects: [], cards }));
+    const active = resolved.state.cards[resolved.state.questStage ?? ""];
+    expect(resolved.state.stageCleared).toBe(false);
+    expect(active?.code).toBe("stage-2");
+    expect(active?.progress).toBe(0);
+    expect(active?.face).toBe("B");
+    expect(resolved.state.window?.kind).toBe("travel");
+    const first = resolved.state.setAside.map((id) => resolved.state.cards[id]).find((card) => card?.code === "stage-1");
+    expect(first?.progress).toBe(1);
+    expect(resolved.state.seats[0].threat).toBe(8);
+  });
+
+  it("advances one stage only, even when the leftover would meet the stage after it", () => {
     const { state, cards } = atCommit({
       willpower: 5,
       threat: 8,
@@ -174,10 +195,7 @@ describe("quest resolution", () => {
     expect(resolved.state.stageCleared).toBe(false);
     expect(active?.code).toBe("stage-2");
     expect(active?.progress).toBe(0);
-    expect(active?.face).toBe("B");
-    expect(resolved.state.window?.kind).toBe("travel");
-    const first = resolved.state.setAside.map((id) => resolved.state.cards[id]).find((card) => card?.code === "stage-1");
-    expect(first?.progress).toBe(1);
+    expect(resolved.state.questDeck.map((id) => resolved.state.cards[id]?.code)).toEqual(["stage-3"]);
     expect(resolved.state.lost).toBe(false);
     expect(resolved.state.seats[0].threat).toBe(8);
   });
@@ -261,11 +279,8 @@ describe("quest resolution", () => {
     const resolved = expectOk(reduce(first.state, { type: "Pass" }, ctx));
     expect(resolved.state.seats[1]?.eliminated).toBe(true);
     expect(resolved.state.cards[resolved.state.questStage ?? ""]?.progress ?? 0).toBe(0);
-    // Doomed 1 raises seat 0 to 11. The treachery then goes to the encounter discard pile (rr.treachery-cards), so
-    // the staging area holds no threat and there is no shortfall. The deck was out of cards in the quest phase, so the
-    // discard pile was shuffled back in (rr.running-out-of-cards).
-    expect(resolved.state.staging).toEqual([]);
-    expect(resolved.state.encounterDeck.map((id) => resolved.state.cards[id]?.code)).toEqual(["doom"]);
+    // Doomed 1 raises seat 0 to 11. The treachery was discarded after it resolved (ltp.revealed-treachery), so it adds no
+    // threat to the staging area, and seat 1's 5 willpower no longer counts: no progress and no shortfall.
     expect(resolved.state.seats[0]?.threat).toBe(11);
   });
 

@@ -44,7 +44,9 @@ export type ZoneName =
   | "setAside"
   | "removed"
   | "shadow"
-  | "attached";
+  | "attached"
+  // Facedown under a location, out of play (141049:A:1). The card's host is the location.
+  | "under";
 
 export type CardFace = "up" | "down" | "A" | "B";
 
@@ -60,6 +62,9 @@ export type CardInstance = {
   attachments: readonly string[];
   committed: boolean;
   shadowId: string | null;
+  // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent
+  // when there are none.
+  extraShadowIds?: readonly string[];
   face: CardFace;
   controller: number | null;
   // The seat whose card it is, when another seat has taken control of it (Wandering Took, Stand and Fight). A discarded
@@ -403,9 +408,15 @@ export function inPlay(zone: ZoneName): boolean {
 }
 
 export function modifierActive(state: ScenarioState, modifier: Modifier): boolean {
+  if (modifier.until === "whileSourceInVictory") return state.cards[modifier.sourceId]?.zone === "victory";
   if (modifier.until !== "whileSourceInPlay") return true;
   const source = state.cards[modifier.sourceId];
   return source != null && inPlay(source.zone);
+}
+
+// A flag modifier (cannotAttack, cannotTakeDamage, ...) is on the card.
+export function flagged(state: ScenarioState, id: string, stat: Modifier["stat"]): boolean {
+  return state.modifiers.some((modifier) => modifier.stat === stat && modifier.instanceId === id && modifier.amount > 0 && modifierActive(state, modifier));
 }
 
 // Drops modifiers that end at one of these boundaries, and any that outlived their source.

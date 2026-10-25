@@ -1,4 +1,4 @@
-// Rules: rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x (data/rules/entries.json).
+// Rules: rr.attachment-cards, rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x, rr.modifiers, rr.lasting-effects, rr.damage (data/rules/entries.json).
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
@@ -6,10 +6,11 @@ import type { EngineStep } from "./intents.ts";
 import { fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
-import { livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
+import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 
-export type DamageSource = "framework" | "player";
+// `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
+export type DamageSource = "framework" | "player" | "combat";
 
 type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | "engagementCost";
 
@@ -29,7 +30,20 @@ function printedStat(printed: PrintedCard, stat: ModifierStat): number {
   }
 }
 
+// The stats of a card. A value below 0 is treated as 0 (rr.modifiers).
+const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "defense", "threat", "questPoints", "engagementCost", "hitPoints"]);
+
+// The holder of a modifier on every ally in play, now and entering play later: an encounter card's lasting effect
+// (rr.lasting-effects, 141071:A:1). It stands in the modifier's instance id.
+export const ALLIES_CLASS = "allies";
+
+// Whether a modifier is held by this card: by its id, or by the class ALLIES_CLASS.
+function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
+  return modifier.instanceId === instance.id || (modifier.instanceId === ALLIES_CLASS && printed.type === "ally" && inPlay(instance.zone));
+}
+
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
+// A set modifier overrides every other one, the most recent set winning (rr.modifiers).
 export function modifiedStat(
   state: ScenarioState,
   instance: CardInstance,
@@ -39,13 +53,16 @@ export function modifiedStat(
 ): number {
   const printed = printedOf(cards, instance.code);
   let total = printedStat(printed, stat);
+  let set: number | null = null;
   for (const modifier of state.modifiers) {
-    if (modifier.instanceId !== instance.id || modifier.stat !== stat) continue;
+    if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
-    total += modifier.amount;
+    if (modifier.set) set = modifier.amount;
+    else total += modifier.amount;
   }
-  return total;
+  const value = set ?? total;
+  return CARD_STATS.has(stat) ? Math.max(0, value) : value;
 }
 
 // The enemy in this attack costs more to engage than the threat of the holder's controller. "Your threat" in "defending
@@ -82,6 +99,18 @@ export function addModifier(
 ): ScenarioState {
   if (!state.cards[instanceId]) return state;
   return { ...state, modifiers: [...state.modifiers, { instanceId, sourceId, stat, amount, until }] };
+}
+
+// A modifier held by a class of cards rather than one card (ALLIES_CLASS): no card has to exist for it yet.
+export function addClassModifier(
+  state: ScenarioState,
+  holder: typeof ALLIES_CLASS,
+  sourceId: string,
+  stat: ModifierStat,
+  amount: number,
+  until: ModifierUntil,
+): ScenarioState {
+  return { ...state, modifiers: [...state.modifiers, { instanceId: holder, sourceId, stat, amount, until }] };
 }
 
 export function placedAmount(printed: PrintedCard, amount: number): number {
@@ -133,6 +162,8 @@ export function placeDamage(
   if (!instance || !inPlay(instance.zone)) return state;
   const printed = printedOf(cards, instance.code);
   if (source === "player" && !playerCardEffectCanChoose(printed)) return state;
+  // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.
+  if (flagged(state, id, "cannotTakeDamage") || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
   const dealt = placedAmount(printed, amount);
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
@@ -204,7 +235,9 @@ export function defeatedDestination(
   return { zone: "encounterDiscard" };
 }
 
-function releaseAttachments(
+// Each card attached to a card that leaves play is discarded at the same time (rr.attachment-cards), to the discard pile of
+// its own deck (rr.discard-pile-and-victory-display). A Permanent boon or burden on a hero is removed from the game instead.
+export function releaseAttachments(
   state: ScenarioState,
   id: string,
   cards: ReadonlyMap<string, PrintedCard>,
@@ -258,7 +291,7 @@ export function destroyCard(
 
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
 // owners' discard piles, and the enemies engaged with it return to the staging area with their damage. An attack on
-// that seat ends. If it held the first player token, the token passes clockwise at once (rr.first-player,
+// that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
 // faq.first-player-elimination). Nothing is cleared once the game is lost.
 export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
   if (state.lost) return state;
@@ -283,11 +316,18 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
       next = moveCard(next, card.id, dest);
       if (wasInPlay && printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
     }
+    // The action window between two steps of that attack closes with it.
     if (next.pendingAttack?.seat === index) {
-      next = { ...next, pendingAttack: null, window: next.window?.kind === "defense" ? null : next.window };
+      const between = next.pendingAttack.awaiting != null && next.window?.kind === "frameAction";
+      next = { ...next, pendingAttack: null, window: next.window?.kind === "defense" || between ? null : next.window };
     }
     if (next.window?.kind === "chooseEnemy" && next.window.seat === index) next = { ...next, window: null };
-    if (next.pendingStrike?.seat === index) next = { ...next, pendingStrike: null, window: next.window?.kind === "playerAttack" ? null : next.window };
+    if (next.pendingStrike?.seat === index) {
+      const between = next.pendingStrike.awaiting != null && next.window?.kind === "frameAction";
+      next = { ...next, pendingStrike: null, window: next.window?.kind === "playerAttack" || between ? null : next.window };
+    }
+    // A Peril card the seat was resolving locks no one now (mec109.peril).
+    if (next.perilSeat === index) next = { ...next, perilSeat: null };
   }
   if (next.seats[next.firstPlayer]?.eliminated) {
     for (let step = 1; step <= next.seatCount; step += 1) {

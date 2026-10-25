@@ -18,8 +18,8 @@ import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { attachmentTargets, playReason, playWindowReason } from "./planning.ts";
 import { resolutionIntents, resolutionReason } from "./resolution.ts";
-import { stagingEnemies, stagingLocations } from "./quest.ts";
-import { travelBlocked } from "./restrictions.ts";
+import { optionalEnemies, stagingLocations } from "./quest.ts";
+import { defenseBlocked, travelBlocked, travelCostUnpayable } from "./restrictions.ts";
 import { perilLock, type ScenarioState } from "./state.ts";
 
 const NUMBER = "The engine computes that number";
@@ -53,7 +53,7 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
     case "travel":
       return travelIntents(state, ctx);
     case "optionalEngage":
-      return [{ type: "Engage" }, { type: "DeclineEngage" }];
+      return optionalEnemies(state, ctx.cards).length > 0 ? [{ type: "Engage" }, { type: "DeclineEngage" }] : [{ type: "DeclineEngage" }];
     case "chooseEnemy":
       return [{ type: "ChooseEnemy" }];
     case "defense":
@@ -78,13 +78,13 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "Travel":
       return state.activeLocation ? [] : travelTargets(state, ctx);
     case "Engage":
-      return stagingEnemies(state, ctx.cards);
+      return optionalEnemies(state, ctx.cards);
     case "ChooseEnemy":
       return state.window?.kind === "chooseEnemy" ? state.window.options : [];
     case "DeclareDefender": {
       const seat = state.pendingAttack?.seat ?? state.activeSeat;
       if (state.pendingAttack?.undefended) return [];
-      return defenderIds(state, seat, ctx.cards);
+      return defenderIds(state, seat, ctx.cards).filter((id) => !defenseBlocked(state, ctx, id));
     }
     case "Undefended":
       return heroIds(state, state.pendingAttack?.seat ?? state.activeSeat);
@@ -174,7 +174,7 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
 }
 
 function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {
-  return stagingLocations(state, ctx.cards).filter((id) => !travelBlocked(state, ctx, id));
+  return stagingLocations(state, ctx.cards).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
 }
 
 function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
@@ -213,6 +213,7 @@ function travelReason(
   if (state.activeLocation) return "An active location is already in play";
   if (!stagingLocations(state, ctx.cards).includes(intent.locationId)) return "That location is not in staging";
   if (travelBlocked(state, ctx, intent.locationId)) return "Players cannot travel to that location now";
+  if (travelCostUnpayable(state, ctx, intent.locationId)) return "The players cannot pay that location's Travel cost";
   return null;
 }
 
@@ -222,7 +223,7 @@ function engageReason(
   ctx: ReduceContext,
 ): string | null {
   if (state.window?.kind !== "optionalEngage") return "That intent is not legal in this window";
-  if (!stagingEnemies(state, ctx.cards).includes(intent.enemyId)) return "That enemy is not in staging";
+  if (!optionalEnemies(state, ctx.cards).includes(intent.enemyId)) return "That enemy cannot be optionally engaged";
   return null;
 }
 
@@ -246,6 +247,7 @@ function defenderReason(
     if (!printed.keywords.sentinel) return "Sentinel is required to defend for another seat";
   }
   if (!canDefend(state, state.pendingAttack.seat, intent.defenderId, ctx.cards)) return "That character cannot defend";
+  if (defenseBlocked(state, ctx, intent.defenderId)) return "That character cannot defend this enemy's attack";
   return null;
 }
 

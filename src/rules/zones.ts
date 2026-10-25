@@ -8,7 +8,8 @@ export type Destination =
   | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" }
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage" }
   | { zone: "shadow"; enemyId: string }
-  | { zone: "attached" };
+  | { zone: "attached" }
+  | { zone: "under"; locationId: string };
 
 type SeatList = "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "staging";
 
@@ -82,13 +83,41 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       return state.activeLocation === id ? { ...state, activeLocation: null } : state;
     case "secondActiveLocation":
       return state.secondActiveLocation === id ? { ...state, secondActiveLocation: null } : state;
+    case "under":
+      return updateCard(state, id, { host: null });
     case "shadow": {
-      if (!current.host) return state;
-      return updateCard(state, current.host, { shadowId: null });
+      const enemy = current.host ? state.cards[current.host] : undefined;
+      if (!enemy) return state;
+      if (enemy.shadowId === id) return updateCard(state, enemy.id, { shadowId: null });
+      return withExtraShadows(state, enemy, (enemy.extraShadowIds ?? []).filter((other) => other !== id));
     }
     default:
       return state;
   }
+}
+
+// The additional shadow cards of an enemy. The field is left off when there are none.
+function withExtraShadows(state: ScenarioState, enemy: CardInstance, ids: readonly string[]): ScenarioState {
+  const current = state.cards[enemy.id];
+  if (!current) return state;
+  const { extraShadowIds: _old, ...rest } = current;
+  const next: CardInstance = ids.length > 0 ? { ...rest, extraShadowIds: ids } : rest;
+  return { ...state, cards: { ...state.cards, [enemy.id]: next } };
+}
+
+// The cards facedown under a location (141049:A:1), in instance id order (the order the cards were made, not the order
+// they were placed): the rules give the cards under a location no order, and the id keeps the list stable.
+export function cardsUnder(state: ScenarioState, locationId: string): string[] {
+  return Object.values(state.cards)
+    .filter((card) => card.zone === "under" && card.host === locationId)
+    .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true }))
+    .map((card) => card.id);
+}
+
+// Every shadow card dealt to the enemy, the first one first.
+export function shadowCards(instance: CardInstance | undefined): string[] {
+  if (!instance) return [];
+  return [...(instance.shadowId ? [instance.shadowId] : []), ...(instance.extraShadowIds ?? [])];
 }
 
 function unhost(state: ScenarioState, id: string): ScenarioState {
@@ -118,10 +147,18 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
     const seated = withSeat(state, dest.seat, { ...seat, questStage: id });
     return updateCard(seated, id, { zone: "seatQuest", controller: dest.seat });
   }
+  // Under a location: out of play, facedown, controlled by nobody, and not one of the location's attachments (141049:A:1).
+  if (dest.zone === "under") {
+    return updateCard(state, id, { zone: "under", host: dest.locationId, controller: null, face: "down", exhausted: false, committed: false });
+  }
   if (dest.zone === "shadow") {
     const enemy = state.cards[dest.enemyId];
     if (!enemy) return state;
-    const linked = updateCard(state, dest.enemyId, { shadowId: id });
+    // A second shadow card dealt to the same enemy is an additional one (141069:A:2).
+    const linked =
+      enemy.shadowId && enemy.shadowId !== id
+        ? withExtraShadows(state, enemy, [...(enemy.extraShadowIds ?? []), id])
+        : updateCard(state, dest.enemyId, { shadowId: id });
     return updateCard(linked, id, { zone: "shadow", host: dest.enemyId, controller: null });
   }
   const zone = dest.zone;
@@ -170,10 +207,12 @@ export function moveCard(state: ScenarioState, id: string, dest: Destination): S
   let next = detach(state, id);
   if (leavingPlay && current.host) next = unhost(next, id);
   const moved = stampEntry(attach(next, id, dest), id, current.zone);
-  // An enemy that leaves play takes its dealt shadow card to the encounter discard (Learn to Play p16).
+  // An enemy that leaves play takes its dealt shadow cards to the encounter discard (Learn to Play p16).
   // Staging and engaged are the zones an enemy is in play.
-  if (current.shadowId && dest.zone !== "engaged" && dest.zone !== "staging") {
-    return moveCard(moved, current.shadowId, { zone: "encounterDiscard" });
+  if (dest.zone !== "engaged" && dest.zone !== "staging") {
+    let discarded = moved;
+    for (const shadowId of shadowCards(current)) discarded = moveCard(discarded, shadowId, { zone: "encounterDiscard" });
+    return discarded;
   }
   return moved;
 }

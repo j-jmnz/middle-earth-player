@@ -172,6 +172,7 @@ export function TextButton({
   testID,
   tone = "bone",
   accessibilityLabel,
+  selected,
 }: {
   label: string;
   onPress: () => void;
@@ -179,13 +180,16 @@ export function TextButton({
   tone?: "bone" | "gold" | "ink";
   // What a screen reader says when the visible word is not enough alone ("Booklet" opens the campaign book).
   accessibilityLabel?: string;
+  // Set for a text option in a radio group (the No boon decline): the button is a radio with this selected state.
+  selected?: boolean;
 }) {
   const color = tone === "gold" ? "text-gold" : tone === "ink" ? "text-inkLabel" : "text-bone";
   return (
     <Pressable
       testID={testID}
       collapsable={false}
-      accessibilityRole="button"
+      accessibilityRole={selected == null ? "button" : "radio"}
+      {...(selected == null ? {} : { accessibilityState: { selected } })}
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       className="min-h-11 items-center justify-center rounded-tile px-3"

@@ -21,6 +21,8 @@ export type Modifier = {
   seat?: number;
   // A condition read each time the stat is read (see isStatCondition).
   when?: Condition;
+  // The stat is set to `amount`, overriding every modifier that is not a set (rr.modifiers).
+  set?: boolean;
 };
 
 export type FrameName =
@@ -167,6 +169,15 @@ export type PendingAttack = {
   awaitDepth?: number;
   // Combat damage is placed; only the end of the attack is left.
   damaged?: boolean;
+  // Forced effects "when this enemy attacks" (141069:A:2) are resolving: the defense window opens once they are done.
+  defenseWaits?: boolean;
+  // The additional shadow card (141069:A:2) whose cancel Responses were offered last.
+  extraOffered?: string;
+  // A shadow card whose effect asks a player (a Pick or a Choose, 141071:A:2) is resolving in its own frame. The attack
+  // goes on when it pops.
+  shadowFrame?: string;
+  // The shadow effects are resolved, and the window before combat damage has been offered.
+  shadowsDone?: boolean;
 };
 
 // A player attack declared and not finished: the action windows between its steps (rr.attack-resolution-chart).

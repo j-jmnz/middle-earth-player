@@ -14,6 +14,7 @@ import {
   hasLegalAttack,
   heroIds,
   nextEnemyGroup,
+  openDefense,
 } from "./combat.ts";
 import { applyChoice } from "./choices.ts";
 import { ruleCause } from "./cause.ts";
@@ -27,19 +28,21 @@ import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
 import { doRefresh } from "./refresh.ts";
-import { engagementStep, engageEnemy, stagingEnemies } from "./quest.ts";
+import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
 import { crossBoundary } from "./triggers.ts";
+import { constantWin } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
-import { discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
-import { attackResumes, stepWindow } from "./step-window.ts";
+import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
+import { stepWindow, stepWindowResumes } from "./step-window.ts";
 import { livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
 import { clearEliminated, destroyOverwhelmed } from "./keywords.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
+    current = constantWin(current, ctx);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {
@@ -124,10 +127,12 @@ export function applyIntent(
 function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // An attack waits on the action window between two of its steps; once it closes, the attack goes on before any frame
   // under it (an attack a Hide test started).
-  if (attackResumes(state)) return state.pendingAttack?.awaiting ? resumeAttack(state, ctx, steps) : continueStrike(state, ctx, steps);
+  if (stepWindowResumes(state)) return state.pendingAttack?.awaiting ? resumeAttack(state, ctx, steps) : continueStrike(state, ctx, steps);
   if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
-  // The Responses to a shadow effect are done: the attack goes on.
-  if (state.pendingAttack?.shadowOffered && !state.pendingAttack.shadowResolved) return resolveAttack(state, ctx, steps);
+  // The Forced effects of an attack's start are done: the defender is declared (141069:A:2).
+  if (state.pendingAttack?.defenseWaits) return openDefense(state, ctx);
+  // The Responses to a shadow effect, or a shadow effect that asked a player, are done: the attack goes on.
+  if (attackResumes(state)) return resolveAttack(state, ctx, steps);
   switch (state.mode) {
     case "afterOpening":
       return finishSetup(state, ctx, steps);
@@ -200,7 +205,8 @@ function grant(state: ScenarioState, steps: EngineStep[]): ScenarioState {
 }
 
 function openOptional(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  if (stagingEnemies(state, ctx.cards).length === 0) {
+  // No enemy a player could optionally engage (rr.optional-engagement): the step has nothing to offer.
+  if (optionalEnemies(state, ctx.cards).length === 0) {
     return { ...withMode(state, "engagement"), window: null, engagement: { ordinal: 0, engagedThisPass: false } };
   }
   const seated = state.mode === "optionalEngage" ? state : withMode(state, "optionalEngage");

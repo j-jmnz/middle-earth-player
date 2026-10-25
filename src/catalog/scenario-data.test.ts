@@ -59,6 +59,13 @@ describe("a-shadow-of-the-past scenario data", () => {
     expect(definition.stages.map((stage) => stage.code)).toEqual(["141022", "141023", "141024"]);
   });
 
+  // docs/brief.md, A Knife in the Dark: the table gains no widget for scenario 2.
+  it("declares no widget for A Knife in the Dark", () => {
+    const knife = scenarioDefinitionSchema.parse(scenarioDefinition(loadScenario("a-knife-in-the-dark"), campaign, EFFECTS));
+    expect(knife.widgets).toEqual({ hide: false, lifeTracker: false, burdenDeck: false, secondActiveLocation: false, perSeatStaging: false });
+    expect(knife.resolution.map((instruction) => instruction.verb)).toEqual(["ChooseCards"]);
+  });
+
   it("starts every scenario with The One Ring on the Ring-bearer", () => {
     expect(campaign.prelude).toEqual([{ code: "141085" }]);
   });

@@ -4,7 +4,7 @@ import { beginEffect } from "./cancel.ts";
 import { effectCause, inCause, type Cause } from "./cause.ts";
 import { beginEnemyAttack } from "./combat.ts";
 import { askTarget, openBranch } from "./choices.ts";
-import { hasTrait, holds, searchable } from "./conditions.ts";
+import { hasTrait, holds, outOfPlayChoices, searchable } from "./conditions.ts";
 import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
@@ -17,7 +17,7 @@ import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
 import { livingSeats, updateCard, withSeat } from "./state.ts";
 import { offerResponses } from "./responses.ts";
-import { holdsNow, seatFor, shuffleEncounterDeck } from "./verbs.ts";
+import { holdsNow, seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 
@@ -103,15 +103,25 @@ export function pushCardEffects(
   );
 }
 
+// The frame under a "when revealed" frame is the staging of that same card: it was revealed from the encounter deck.
+function revealedFromEncounterDeck(state: ScenarioState, frame: Frame): boolean {
+  const at = state.stack.findIndex((entry) => entry.id === frame.id);
+  const below = at > 0 ? state.stack[at - 1] : undefined;
+  return below?.frame === "reveal" && below.cardId === frame.cardId;
+}
+
 export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const data = frame.data;
   if (data.kind !== "effect") throw new Error(`Frame ${frame.frame} lost its effect data`);
   if (frame.step === 0) {
     if (data.canceled) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
-    // The "when revealed" effects of a card are about to resolve: a Response may cancel them first (rr.cancel).
+    // The "when revealed" effects of a card are about to resolve: a Response may cancel them first (rr.cancel). The only
+    // such Response is A Test of Will, which cancels those "of a card that was just revealed from the encounter deck"
+    // (01050:A:1); revealing from the encounter deck is staging (rr.staging), the `reveal` frame. A quest stage reached by
+    // advancing (141026:B:1, 141027:A:1) was not revealed from the encounter deck, so nothing is offered against it.
     // An effect that cannot be canceled now is not offered to those Responses at all.
     const blocked = data.blockCancel != null && holds(state, data.blockCancel, { actor: frame.seat, sourceId: frame.cardId, returned: 0 }, ctx);
-    if (frame.frame === "whenRevealed" && frame.cardId && !data.interrupted && !blocked) {
+    if (frame.frame === "whenRevealed" && frame.cardId && !data.interrupted && !blocked && revealedFromEncounterDeck(state, frame)) {
       const offered = offerResponses(state, { trigger: "whenRevealedPending", seat: frame.seat, subject: frame.cardId }, ctx, steps);
       if (offered.stack.length === state.stack.length) return beginEffect(state, frame, data, ctx);
       // Remember that the offer was made, so the frame begins when the Responses are done.
@@ -191,6 +201,7 @@ function runItemNow(
     case "SearchReveal":
     case "ShuffleIntoDeck":
     case "DiscardRestricted":
+    case "ShuffleOutOfPlayIntoEncounterDeck":
       return targeted(state, item, frame, ctx, steps);
     case "Pick":
       return pick(state, item, frame, ctx);
@@ -269,6 +280,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       return searchable(state, instruction, ctx, ["encounterDiscard"]);
     case "DiscardRestricted":
       return sourceId ? restrictedAttachments(state, sourceId, ctx) : [];
+    case "ShuffleOutOfPlayIntoEncounterDeck":
+      return outOfPlayChoices(state, instruction.code);
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -332,6 +345,8 @@ function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] 
 
 function picksOne(instruction: Instruction): boolean {
   if (instruction.verb === "ReturnToStaging") return instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose";
+  // "Add each Nazgûl enemy found": every match goes, and nobody chooses.
+  if (instruction.verb === "SearchMove") return instruction.each !== true;
   return true;
 }
 
@@ -340,6 +355,10 @@ function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Redu
   let ids = found;
   if (item.chosen) {
     ids = [item.chosen];
+  } else if (item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck") {
+    // On an encounter or quest effect the first player picks among the choices (rr.first-player).
+    if (found.length > 1) return askTarget(state, { ...item, seat: state.firstPlayer }, found);
+    ids = found.slice(0, 1);
   } else if (picksOne(item.instruction)) {
     const distinct = distinctByCode(state, found);
     const instruction = item.instruction;
@@ -378,14 +397,18 @@ function applyTargeted(
       return updateCard(attached, sourceId, { face: "up" });
     }
     case "SearchMove": {
-      if (!first) return state;
-      if (instruction.to === "staging") return moveCard(state, first, { zone: "staging" });
-      return moveCard(state, first, { zone: "engaged", seat: state.firstPlayer });
+      let next = state;
+      for (const id of instruction.each ? ids : ids.slice(0, 1)) {
+        next = instruction.to === "staging" ? moveCard(next, id, { zone: "staging" }) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
+        if (instruction.each) next = updateCard(next, id, { face: "up" });
+      }
+      return next;
     }
     case "SearchReveal":
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first) : state;
     case "ShuffleIntoDeck":
-      return first ? shuffleEncounterDeck(moveCard(state, first, { zone: "encounterDeck" })) : state;
+    case "ShuffleOutOfPlayIntoEncounterDeck":
+      return first ? shuffleIntoEncounterDeck(state, first) : state;
     case "DiscardRestricted": {
       const owner = first ? state.cards[first]?.controller : null;
       return first && owner != null ? moveCard(state, first, { zone: "discard", seat: owner }) : state;

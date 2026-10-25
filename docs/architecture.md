@@ -164,7 +164,7 @@ The window stack is part of game state. A nested frame pops before the parent co
 
 The effect record shape, and which sentences may stay inactive, are in the brief. Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog`. `src/effects/generated/` is written by `data:build`: `scripts/data/effects/templates.ts` holds ordered sentence patterns, and a template writes a record only when its pattern matches a whole line of card text. `src/effects/authored/` holds the records for the lines no template reads, and an authored id replaces a generated one when `AUTHORED_REPLACES` lists it. `pnpm effects:draft <scenario | starter deck id>` writes `.agent/drafts/<code>.md` for the lines that still lack a record.
 
-The interpreter takes the effect list as an argument. It does not import `src/effects`. The screens, `src/campaign` and `src/play` import `EFFECTS` and pass it in. There is no effects table in `catalog.db`. New verbs are added to `effect-schema.ts` and `src/rules/interpret.ts` by hand: that is engine work, not data.
+The interpreter takes the effect list as an argument. It does not import `src/effects`. The screens, `src/campaign` and `src/play` import `EFFECTS` and pass it in. There is no effects table in `catalog.db`. New verbs are added to `effect-schema.ts` (the simple verbs in `effect-schema-verbs.ts`; stat modifiers, picks and conditions in `effect-schema-stats.ts`, `effect-schema-pick.ts` and `effect-schema-conditions.ts`, all exported through `effect-schema.ts`) and `src/rules/interpret.ts` by hand: that is engine work, not data.
 
 ## Scenario definition
 
@@ -252,7 +252,7 @@ The first screen paints from SQLite. It does not scan the image directory, query
 
 `scripts/build-catalog.ts` reads `data/cards` and `data/raw/ringsdb/packs.json` and writes `catalog.db` and the `CATALOG_VERSION` constant (a hash of the rows). It does not fetch, and it does not write effects or scenarios: the app imports those from `src/effects` and `data/`. Identifiers are RingsDB codes. A card without a RingsDB row takes the code Hall of Beorn gives its Black Riders or Road Darkens printing, and `data/overrides.json` carries the two that have none.
 
-`assets/catalog.db`, `.cache/`, card images and booklet PDFs are gitignored. The game icons in `assets/icons` are small app assets built from `data/raw/icons` and are committed (`docs/design-system.md`, Icons). `data/` is committed, raw snapshots included, so no session starts without card text, scenario piles or rules text.
+`assets/catalog.db`, `.cache/`, card images and booklet PDFs are gitignored. The game icons in `assets/icons` are small app assets built from `data/raw/icons` and are committed (`docs/design-system.md`, Icons); `.gitignore` exempts their PNGs and the raw DragnCards token PNGs from the card-image rule, so a fresh clone builds without `pnpm data:sync icons`. `data/` is committed, raw snapshots included, so no session starts without card text, scenario piles or rules text.
 
 ## Tests
 

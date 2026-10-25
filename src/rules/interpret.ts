@@ -87,7 +87,7 @@ export function runInstruction(
     case "RevealStaging":
       return revealNow(state, focus.seat, ctx, steps);
     case "RaiseThreat":
-      return raiseFor(state, instruction, focus, steps);
+      return raiseFor(state, instruction, focus, ctx, steps);
     case "PlaceProgress":
       return placeOneProgress(state, focus.sourceId, steps);
     case "DealDamage":
@@ -104,14 +104,18 @@ export function runInstruction(
       return engageEnemy(state, focus.seat, enemyId, steps);
     }
     case "DealShadow":
-      return focus.sourceId ? dealOneShadow(state, focus.sourceId) : state;
+      if (!focus.sourceId) return state;
+      return instruction.additional ? dealAdditionalShadow(state, focus.sourceId) : dealOneShadow(state, focus.sourceId);
     case "ResolveEffect":
       return withFrame(state, "ResolveEffect", focus.sourceId, false, (framed) => framed, steps);
     case "ModifyStat":
       return modifyStat(state, instruction, focus, ctx);
     case "Exhaust": {
       const code = instruction.target?.kind === "byCode" ? instruction.target.code : undefined;
-      const id = code ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id : focus.sourceId;
+      const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;
+      const id = code
+        ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone) && (payer == null || card.controller === payer))?.id
+        : focus.sourceId;
       return id ? updateCard(state, id, { exhausted: true }) : state;
     }
     case "Ready":
@@ -124,7 +128,7 @@ export function runInstruction(
     case "MakeActiveLocation":
     case "SetAside":
     case "AttachToRingBearer":
-      return runSetupVerb(state, instruction, ctx);
+      return runSetupVerb(state, instruction, ctx, focus.sourceId);
     default:
       return runExtraVerb(state, instruction, focus, ctx, steps);
   }
@@ -168,10 +172,17 @@ function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: 
   return updateCard(state, id, { progress: instance.progress + 1 });
 }
 
+// The enemy's shadow card, when it has none yet.
 export function dealOneShadow(state: ScenarioState, enemyId: string): ScenarioState {
+  return state.cards[enemyId]?.shadowId ? state : dealAdditionalShadow(state, enemyId);
+}
+
+// One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
+// encounter deck deals nothing (rr.step-6-2).
+export function dealAdditionalShadow(state: ScenarioState, enemyId: string): ScenarioState {
   const enemy = state.cards[enemyId];
   const top = state.encounterDeck[0];
-  if (!enemy || enemy.shadowId || !top) return state;
+  if (!enemy || !top) return state;
   const moved = moveCard(state, top, { zone: "shadow", enemyId });
   return updateCard(moved, top, { face: "down" });
 }

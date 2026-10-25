@@ -7,6 +7,7 @@ import { cardMap, expectOk, fixtureDefinition, hero } from "./fixture.ts";
 import { definePrinted } from "./printed.ts";
 import { legalIntents, legalTargets, reduce } from "./reduce.ts";
 import { blankScenario, updateCard, withThreat, type ScenarioState } from "./state.ts";
+import { clearEliminated } from "./keywords.ts";
 import { discardShadows } from "./shadow.ts";
 import { moveCard, spawn } from "./zones.ts";
 
@@ -530,6 +531,32 @@ describe("player elimination", () => {
     expect(done.state.staging).toContain(orc.id);
     expect(done.state.firstPlayer).toBe(1);
     expect(done.state.lost).toBe(false);
+  });
+
+  // A Peril card's attack on seat 0 kills its last hero while the window after combat damage is open to both seats
+  // (faq.peril-attacks): the attack, its window and the Peril lock end with the seat, so seat 1 is not left locked out.
+  it("ends the seat's attack, the window between its steps and its Peril lock (rr.player-elimination, mec109.peril)", () => {
+    const cards = cardMap([hero("gimli", "tactics", 10, 1), enemy("orc")]);
+    let state = blankScenario({ seatCount: 2, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const g = spawn(state, "gimli", { zone: "heroes", seat: 1 });
+    const orc = spawn(g.state, "orc", { zone: "engaged", seat: 0 });
+    state = orc.state;
+    state = {
+      ...state,
+      seats: [{ ...state.seats[0], eliminated: true }, state.seats[1]],
+      phase: "Quest",
+      mode: "staging",
+      perilSeat: 0,
+      pendingAttack: { enemyId: orc.id, seat: 0, immediate: true, damaged: true, awaiting: "end", awaitDepth: 0 },
+      window: { kind: "frameAction" },
+      activeSeat: 1,
+      passed: [],
+    };
+    const cleared = clearEliminated(state, cards);
+    expect(cleared.pendingAttack).toBeNull();
+    expect(cleared.window).toBeNull();
+    expect(cleared.perilSeat).toBeNull();
+    expect(cleared.cards[orc.id]?.zone).toBe("staging");
   });
 });
 

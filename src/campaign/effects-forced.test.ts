@@ -86,6 +86,8 @@ describe("hideFailed triggered and forced events", () => {
     const cursor = run.state.seedCursor;
     run = send(run, { type: "Pass" }, ctx);
     expect(run.state.cards[rider]?.zone).toBe("encounterDeck");
+    // A deck is face down: the card shuffled in is turned over.
+    expect(run.state.cards[rider]?.face).toBe("down");
     expect(run.state.seedCursor).toBeGreaterThan(cursor);
   });
 });
