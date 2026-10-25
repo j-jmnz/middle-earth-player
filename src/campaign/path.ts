@@ -37,3 +37,14 @@ export function campaignPath(campaign: CampaignData, names: Readonly<Record<stri
 export function currentNode(path: readonly PathNode[]): PathNode | null {
   return path.find((node) => node.status === "current") ?? null;
 }
+
+// What a playthrough's next tap does: go back to the open scenario, begin the current one, or nothing is left to play.
+// The open scenario is the one the stored loadout dealt; like the path, a locked node is never resumed.
+export type NextStep = { kind: "resume" | "begin"; node: PathNode } | { kind: "finished" };
+
+export function nextStep(path: readonly PathNode[], openScenarioId: string | null | undefined): NextStep {
+  const open = openScenarioId ? path.find((node) => node.id === openScenarioId && node.status !== "locked") : undefined;
+  if (open) return { kind: "resume", node: open };
+  const current = currentNode(path);
+  return current ? { kind: "begin", node: current } : { kind: "finished" };
+}

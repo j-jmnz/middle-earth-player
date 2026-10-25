@@ -1,0 +1,24 @@
+appId: com.middleearth.lcg
+---
+# Written in a cloud session: it has not run. The dock's Rules tab finds a rule by name and opens it.
+- launchApp
+- assertVisible:
+    id: campaign-list
+- assertVisible:
+    id: cards-tab
+- tapOn:
+    id: rules-tab
+- assertVisible:
+    id: booklet-open
+- tapOn:
+    id: rules-search
+- inputText: "surge"
+- tapOn:
+    id: rule-rr.surge
+- assertVisible:
+    id: rule-text
+- assertVisible: "Surge"
+- tapOn:
+    id: rule-back
+- assertVisible:
+    id: rules

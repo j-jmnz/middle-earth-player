@@ -62,8 +62,9 @@ tags:
 # holds only scenario 1's choices.
 - stopApp
 - launchApp
+# The last playthrough opens on the list's Continue panel; Path opens its path.
 - tapOn:
-    id: "save-.*"
+    id: continue-path
 - extendedWaitUntil:
     visible:
       id: campaign-path

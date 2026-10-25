@@ -65,8 +65,9 @@ appId: com.middleearth.lcg
 # Kill and relaunch: the log and the chosen cards are still in user.db.
 - stopApp
 - launchApp
+# The last playthrough opens on the list's Continue panel; Path opens its path.
 - tapOn:
-    id: "save-.*"
+    id: continue-path
 - extendedWaitUntil:
     visible:
       id: campaign-path

@@ -2,12 +2,12 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
 
-import { campaignPath } from "../../../campaign/path";
+import { campaignPath, nextStep, type NextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
 import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { BodyText, Eyebrow, Label, Panel, PrimaryButton, RingMark, Screen, ScreenTitle, TextButton } from "../../chrome";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
-import { campaignOf } from "../../campaign-data";
+import { campaignOf, scenarioNames } from "../../campaign-data";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
@@ -55,7 +55,7 @@ function ProgressLine({ done, total }: { done: number; total: number }) {
 
 // One save as the list words it: campaign, seats and progress. Two playthroughs of one campaign differ only here, so every
 // control on a save names it with this line.
-type SaveLine = { name: string; seats: string; done: number; total: number };
+type SaveLine = { name: string; seats: string; done: number; total: number; next: NextStep };
 
 function describe(line: SaveLine): string {
   return `${line.name}, ${line.seats}, ${line.done} of ${line.total} completed`;
@@ -69,6 +69,59 @@ function SaveSummary({ line, eyebrow, archived = false }: { line: SaveLine; eyeb
       <Label>{`${line.seats} · ${line.done} of ${line.total} completed`}</Label>
       <ProgressLine done={line.done} total={line.total} />
     </>
+  );
+}
+
+// The sentence over the next step's button: the scenario on the table, the one to play next, or none left.
+function nextSentence(next: NextStep): string {
+  if (next.kind === "resume") return `On the table: ${next.node.name}`;
+  if (next.kind === "begin") return `Next: ${next.node.name}`;
+  return "Every scenario is won";
+}
+
+// The playthrough written last, on top of the list: what is next and the one tap that does it. Resume goes straight to the
+// table, Begin to the briefing, and a finished campaign to its path. Path and Log sit under it. While the Start block is
+// open it holds the screen's one primary, so the next step is a gold text button here instead.
+function ContinuePanel({
+  id,
+  line,
+  eyebrow,
+  primary,
+  onNext,
+  onPath,
+  onLog,
+}: {
+  id: string;
+  line: SaveLine;
+  eyebrow: boolean;
+  primary: boolean;
+  onNext: () => void;
+  onPath: () => void;
+  onLog: () => void;
+}) {
+  const label = line.next.kind === "resume" ? "Resume" : line.next.kind === "begin" ? "Begin" : "Open path";
+  const spoken = `${label}${line.next.kind === "finished" ? "" : ` ${line.next.node.name}`}, ${describe(line)}`;
+  return (
+    <View testID={`save-${id}`}>
+      <Panel current>
+        <SaveSummary line={line} eyebrow={eyebrow} />
+        <BodyText testID="continue-next" className="mt-4">
+          {nextSentence(line.next)}
+        </BodyText>
+        {primary ? (
+          <View className="mt-3">
+            <PrimaryButton label={label} testID="continue" accessibilityLabel={spoken} onPress={onNext} />
+          </View>
+        ) : null}
+        <View className="-mx-3 mt-2 flex-row">
+          {!primary ? <TextButton label={label} testID="continue" tone="gold" accessibilityLabel={spoken} onPress={onNext} /> : null}
+          {line.next.kind !== "finished" ? (
+            <TextButton label="Path" testID="continue-path" tone="gold" accessibilityLabel={`Path of ${describe(line)}`} onPress={onPath} />
+          ) : null}
+          <TextButton label="Log" testID="continue-log" tone="gold" accessibilityLabel={`Log of ${describe(line)}`} onPress={onLog} />
+        </View>
+      </Panel>
+    </View>
   );
 }
 
@@ -129,12 +182,17 @@ export default function CampaignList() {
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
   const fellowship = campaignOf(FELLOWSHIP_ID);
   const total = fellowship?.scenarios.length ?? 6;
-  const lineOf = (save: Save): SaveLine => ({
-    name: nameOf(save.campaignId),
-    seats: seatWord(save.seatCount),
-    done: fellowship ? campaignPath(fellowship, {}, save.log).filter((node) => node.status === "completed").length : 0,
-    total,
-  });
+  const names = fellowship ? scenarioNames(fellowship) : {};
+  const lineOf = (save: Save): SaveLine => {
+    const path = fellowship ? campaignPath(fellowship, names, save.log) : [];
+    return {
+      name: nameOf(save.campaignId),
+      seats: seatWord(save.seatCount),
+      done: path.filter((node) => node.status === "completed").length,
+      total,
+      next: nextStep(path, save.loadout?.scenarioId),
+    };
+  };
 
   const refresh = useCallback(() => {
     const open = listSaves(user);
@@ -156,15 +214,22 @@ export default function CampaignList() {
     }, [refresh]),
   );
 
-  function openBooklet(id: string): void {
-    router.push({ pathname: "/booklet/[id]", params: { id } });
+  function openPath(save: Save): void {
+    router.push({ pathname: "/path/[saveId]", params: { saveId: save.id } });
+  }
+
+  // The same places the path's Resume and Begin open.
+  function goNext(save: Save, next: NextStep): void {
+    if (next.kind === "resume") router.push({ pathname: "/table/[saveId]", params: { saveId: save.id } });
+    else if (next.kind === "begin") router.push({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: save.id, scenarioId: next.node.id } });
+    else openPath(save);
   }
 
   function start(): void {
     const save = createSave(user, FELLOWSHIP_ID, seats);
     refresh();
     setStarting(false);
-    router.push({ pathname: "/path/[saveId]", params: { saveId: save.id } });
+    openPath(save);
   }
 
   // The button a screen reader was on goes away with each of these, so each says what happened.
@@ -218,11 +283,9 @@ export default function CampaignList() {
   return (
     <Screen testID="campaign-list" scene="dusk">
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6">
-        <View className="-mx-2 flex-row items-center justify-end">
-          <TextButton label="Learn to Play" testID="booklet-open-learn-to-play" tone="gold" onPress={() => openBooklet("learn-to-play")} />
-          <TextButton label="Fellowship booklet" testID="booklet-open" tone="gold" onPress={() => openBooklet(FELLOWSHIP_ID)} />
+        <View className="pt-6">
+          <ScreenTitle>Campaigns</ScreenTitle>
         </View>
-        <ScreenTitle>Campaigns</ScreenTitle>
         {/* The scene's light sits above the cards. */}
         <View className="mt-40 gap-3">
           {saves.map((save, index) => {
@@ -237,17 +300,33 @@ export default function CampaignList() {
                 </View>
               );
             }
+            if (index === 0) {
+              const line = lineOf(save);
+              return (
+                <ContinuePanel
+                  key={save.id}
+                  id={save.id}
+                  line={line}
+                  eyebrow={eyebrow}
+                  primary={!showStart}
+                  onNext={() => goNext(save, line.next)}
+                  onPath={() => openPath(save)}
+                  onLog={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })}
+                />
+              );
+            }
             return (
               <Pressable
                 key={save.id}
                 testID={`save-${save.id}`}
                 collapsable={false}
                 accessibilityRole="button"
-                onPress={() => router.push({ pathname: "/path/[saveId]", params: { saveId: save.id } })}
+                accessibilityLabel={`Open ${describe(lineOf(save))}`}
+                onPress={() => openPath(save)}
               >
                 {({ pressed }) => (
-                  <Panel current={index === 0} pressed={pressed}>
-                    <SaveSummary line={lineOf(save)} eyebrow={eyebrow} />
+                  <Panel pressed={pressed}>
+                    <SaveSummary line={lineOf(save)} eyebrow={false} />
                   </Panel>
                 )}
               </Pressable>
