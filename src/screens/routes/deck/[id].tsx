@@ -15,6 +15,7 @@ import { BodyText, Label, ListRow, NavBar, PrimaryButton, Screen, SphereMark, Te
 import {
   changeDraftCount,
   getDeckDraft,
+  newDeckId,
   removeDraftHero,
   replaceDeckDraft,
   setDeckName,
@@ -207,7 +208,7 @@ export default function DeckEditor() {
     const heroes = [...current.heroes];
     const nextCards = current.cards.map((card) => ({ code: card.code, count: card.count }));
     if (current.id === "new") {
-      user.insert(decks).values({ id: crypto.randomUUID(), name, heroes, cards: nextCards }).run();
+      user.insert(decks).values({ id: newDeckId(), name, heroes, cards: nextCards }).run();
     } else {
       user.update(decks).set({ name, heroes, cards: nextCards }).where(eq(decks.id, current.id)).run();
     }
