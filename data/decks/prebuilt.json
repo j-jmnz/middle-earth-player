@@ -78,7 +78,7 @@
       }
     ],
     "sideboard": [],
-    "note": "The Learn to Play prints this deck with 47 cards. Add 3 to save it."
+    "note": "The Learn to Play prints this deck with 47 cards."
   },
   {
     "id": "core-tactics",
@@ -159,7 +159,7 @@
       }
     ],
     "sideboard": [],
-    "note": "The Learn to Play prints this deck with 47 cards. Add 3 to save it."
+    "note": "The Learn to Play prints this deck with 47 cards."
   },
   {
     "id": "core-spirit",
@@ -240,7 +240,7 @@
       }
     ],
     "sideboard": [],
-    "note": "The Learn to Play prints this deck with 47 cards. Add 3 to save it."
+    "note": "The Learn to Play prints this deck with 47 cards."
   },
   {
     "id": "core-lore",
@@ -321,7 +321,7 @@
       }
     ],
     "sideboard": [],
-    "note": "The Learn to Play prints this deck with 47 cards. Add 3 to save it."
+    "note": "The Learn to Play prints this deck with 47 cards."
   },
   {
     "id": "dwarves-of-durin",
@@ -2056,7 +2056,7 @@
       }
     ],
     "sideboard": [],
-    "note": "This list takes Gandalf and Fellowship of the Ring. The decklist allows Elfhelm instead of Gandalf, and Banner of Elendil with Aragorn."
+    "note": "This list takes Gandalf and Fellowship of the Ring. The decklist takes Elfhelm instead of Gandalf if another deck has the Gandalf hero, and Banner of Elendil with Aragorn."
   },
   {
     "id": "black-riders-hobbits",

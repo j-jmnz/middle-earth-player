@@ -185,8 +185,9 @@ export default function DeckImportScreen() {
     return [...new Set(deck.heroes.flatMap((code) => markedSphere(pool.get(code)?.sphereCode ?? null) ?? []))];
   }
 
+  // The screen is not inset, so a pinned group heading spans the width as a bar; every row pads itself.
   const form = (
-    <View className="pb-2">
+    <View className="px-6 pb-2">
       <View className="pt-6">
         <ScreenTitle>Import</ScreenTitle>
       </View>
@@ -234,26 +235,30 @@ export default function DeckImportScreen() {
   function renderRow({ item }: { item: PrebuiltRow }) {
     if (item.kind === "group") {
       return (
-        <View className="bg-night pb-2 pt-6">
+        <View accessibilityRole="header" className="border-b border-hairline bg-night px-6 pb-2 pt-6">
           <Eyebrow tone="muted">{item.title}</Eyebrow>
         </View>
       );
     }
     const deck = item.deck;
     return (
-      <ListRow
-        testID={`deck-prebuilt-${deck.id}`}
-        label={deck.name}
-        detail={prebuiltDetail(deck, (code) => pool.get(code)?.name ?? code)}
-        detailIcons={spheres(deck).map((sphere) => <SphereMark key={sphere} sphere={sphere} size={12} />)}
-        onPress={() => onPrebuilt(deck)}
-      />
+      <View className="px-6">
+        <ListRow
+          testID={`deck-prebuilt-${deck.id}`}
+          label={deck.name}
+          detail={prebuiltDetail(deck, (code) => pool.get(code)?.name ?? code)}
+          detailIcons={spheres(deck).map((sphere) => <SphereMark key={sphere} sphere={sphere} size={12} />)}
+          onPress={() => onPrebuilt(deck)}
+        />
+      </View>
     );
   }
 
   return (
-    <Screen scene="plain">
-      <NavBar backLabel="Decks" backTestID="deck-import-back" onBack={() => goBack(router, "/decks")} />
+    <Screen scene="plain" inset={false}>
+      <View className="px-6">
+        <NavBar backLabel="Decks" backTestID="deck-import-back" onBack={() => goBack(router, "/decks")} />
+      </View>
       <FlashList
         data={PREBUILT_ROWS}
         keyExtractor={(item) => (item.kind === "group" ? `group-${item.title}` : item.deck.id)}
