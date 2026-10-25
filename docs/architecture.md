@@ -244,7 +244,11 @@ The campaign list, the path, the briefing, the log, and the table each open the 
 
 NativeWind 4.2.7 styles the chrome. Tokens and screen specs live in [design-system.md](design-system.md). The table does not use NativeWind for cards. Tap targets are at least 44 points. The phase rail, the choice buttons, and the booklet close control sit in thumb reach. Reduced motion snaps the same transitions. A new gesture cancels the animation in progress.
 
-The phase rail, threat, life, and the choice sheets are React Native text and buttons with stable testIDs. Card pictures stay on the Skia canvas. A tap on a table card opens the inspect route. The picture stays on the canvas. The inspect screen is the React Native view. Those ids are how Maestro finds a control. A card drawn only on the canvas is not a view Maestro can address.
+The table is played in landscape only: the root `Stack` sets `orientation` to portrait for every route and to landscape for `table/[saveId]` (react-native-screens, no orientation package); `app.json` allows both so the stack option decides. The card and booklet routes follow the phone, so opening them from the table does not turn it.
+
+The phase rail, threat, life, the dock, the panels and the preview are React Native text and buttons with stable testIDs. Card pictures stay on the Skia canvas. A tap on a table card picks it for the open moment and never sends an intent; a long press shows it large with its attachments and the effects on it, and Details there opens the card route. The picture stays on the canvas. The inspect screen is the React Native view. Those ids are how Maestro finds a control. A card drawn only on the canvas is not a view Maestro can address.
+
+How a tap answers the open moment is `src/play/table-choice.ts`: the sheet `sheets.ts` builds for the window (or `windowSheet` for an ordinary action window) says what the rules allow; a tap picks a card or opens the question it leads to (a host, the attackers, a payment); the dock's buttons send the intent, and a button that sends one with nothing picked arms on the first tap and sends on the second. The motion of cards between states is worked out in `src/play/motion.ts` once per state and interpolated on the UI thread.
 
 The first screen paints from SQLite. It does not scan the image directory, query `cards`, or count the catalog before drawing.
 
