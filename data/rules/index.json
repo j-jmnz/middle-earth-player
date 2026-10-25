@@ -1,6 +1,7 @@
 [
   {"id": "rr.action", "doc": "rr", "page": 3, "column": 1, "from": "Action, Action Ability Some abilities are labeled", "to": "Ability, Appendix I", "title": "Action, Action Ability", "terms": ["action", "action ability"]},
   {"id": "rr.active-location", "doc": "rr", "page": 3, "column": 1, "from": "Active Location When the players travel to a location", "to": "also: Explored, Travel", "title": "Active Location", "terms": ["active location"]},
+  {"id": "rr.attachment-cards", "doc": "rr", "page": 3, "column": 2, "from": "Attachment Cards Attachment cards represent weapons", "to": "Cannot have attachments,” Appendix II", "title": "Attachment Cards", "terms": ["attachment", "attachments", "attached"]},
   {"id": "rr.attack-strength", "doc": "rr", "page": 4, "column": 1, "from": "Attack Strength Each character and enemy has an attack strength", "to": "also: Combat Phase", "title": "Attack Strength", "terms": ["attack strength"]},
   {"id": "rr.attacks-outside-the-combat-phase", "doc": "rr", "page": 4, "column": 1, "from": "Attacks Outside the Combat Phase If an enemy makes an attack", "to": "on page 26.", "title": "Attacks Outside the Combat Phase", "terms": ["attacks outside the combat phase"]},
   {"id": "rr.cancel", "doc": "rr", "page": 4, "column": 1, "from": "Cancel Some card abilities (usually response abilities)", "to": "Ability, Triggering Condition", "through": {"page": 4, "column": 2}, "title": "Cancel", "terms": ["cancel", "canceled"]},

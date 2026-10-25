@@ -1,4 +1,4 @@
-// Rules: rr.in-play-and-out-of-play, rr.response, mec109.immune-to-player-card-effects (data/rules/entries.json).
+// Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.discard-pile-and-victory-display, rr.response, mec109.immune-to-player-card-effects (data/rules/entries.json).
 // Weather Hills (141049): an enemy placed facedown under the location is out of play, and returns to the staging area when
 // the location leaves play. The records are fixtures written from the ledger lines.
 import { describe, expect, it } from "vitest";
@@ -13,7 +13,7 @@ import { definePrinted } from "./printed.ts";
 import { stagingThreat } from "./quest.ts";
 import { reduce } from "./reduce.ts";
 import { inPlay, updateCard, withMode, type ScenarioState } from "./state.ts";
-import { cardsUnder, moveCard, spawn } from "./zones.ts";
+import { attachTo, cardsUnder, moveCard, spawn } from "./zones.ts";
 
 const hills = definePrinted({ code: "hills", name: "Weather Hills", type: "location", threat: 2, questPoints: 2 });
 const rider = definePrinted({ code: "rider", name: "Rider", type: "enemy", threat: 2, engagementCost: 40, attack: 2, defense: 2, health: 4, keywords: { immuneToPlayerCardEffects: true } });
@@ -21,7 +21,9 @@ const orc = definePrinted({ code: "orc", name: "Orc", type: "enemy", threat: 1, 
 const king = definePrinted({ code: "king", name: "The Witch-king", type: "enemy", traits: ["Nazgûl"], threat: 4, engagementCost: 48, attack: 4, defense: 1, health: 9, isUnique: true });
 const mist = definePrinted({ code: "mist", name: "Mist", type: "treachery" });
 const stage = definePrinted({ code: "stage", name: "Stage", type: "quest", questPoints: 20 });
-const cards = cardMap([hills, rider, orc, king, mist, stage, hero("aragorn", "leadership")]);
+const blade = definePrinted({ code: "blade", name: "Pale Blade", type: "attachment" });
+const steed = definePrinted({ code: "steed", name: "Black Steed", type: "attachment" });
+const cards = cardMap([hills, rider, orc, king, mist, stage, blade, steed, hero("aragorn", "leadership")]);
 
 const response: Effect = {
   id: "hills:response:1",
@@ -79,6 +81,25 @@ describe("an enemy placed facedown under a location (141049:A:1)", () => {
     const scope = { actor: 0, sourceId: null, returned: 0 };
     const onlyUnder = updateCard(updateCard(placed, plain, { zone: "removed" }), unique, { zone: "removed" });
     expect(holds({ ...onlyUnder, staging: [] }, { kind: "enemyInPlay", is: true }, scope, ctx)).toBe(false);
+  });
+
+  it("takes its attachments out of play with it: each is discarded to the encounter discard pile (rr.attachment-cards)", () => {
+    const { state: base, location, immune } = table();
+    const armed = spawn(base, "blade", { zone: "attached" });
+    const mounted = spawn(attachTo(armed.state, armed.id, immune), "steed", { zone: "attached" });
+    const state = attachTo(mounted.state, mounted.id, immune);
+    expect(state.cards[immune]?.attachments).toEqual([armed.id, mounted.id]);
+    const travel = { ...withMode(state, "travel"), boundaryPhase: "Travel" as const, window: { kind: "travel" as const } };
+    const offered = expectOk(reduce(travel, { type: "Travel", locationId: location }, ctx)).state;
+    const asked = expectOk(reduce(offered, { type: "Trigger", cardId: location, effectId: response.id }, ctx)).state;
+    const placed = expectOk(reduce(asked, { type: "Choose", optionId: immune }, ctx)).state;
+    expect(placed.cards[immune]?.zone).toBe("under");
+    expect(placed.cards[immune]?.attachments).toEqual([]);
+    for (const id of [armed.id, mounted.id]) {
+      expect(placed.cards[id]?.zone).toBe("encounterDiscard");
+      expect(placed.cards[id]?.host).toBeNull();
+    }
+    expect(placed.encounterDiscard).toEqual(expect.arrayContaining([armed.id, mounted.id]));
   });
 
   it("returns to the staging area face up after the location leaves play (141049:A:2)", () => {

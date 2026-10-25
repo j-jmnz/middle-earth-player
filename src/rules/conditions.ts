@@ -169,6 +169,20 @@ export function outOfPlayCopies(state: ScenarioState, code: string): string[] {
   return [...state.setAside, ...state.encounterDiscard, ...state.victory, ...under].filter((id) => state.cards[id]?.code === code);
 }
 
+// The out-of-play copies the first player chooses among when one is shuffled into the encounter deck. Copies in one pile are
+// the same choice; copies in different zones are not (one under Weather Hills would come back to staging, one in the discard
+// pile is found by a search, one set aside is not), so there is one per zone, and one per location for cards under one.
+export function outOfPlayChoices(state: ScenarioState, code: string): string[] {
+  const seen = new Set<string>();
+  return outOfPlayCopies(state, code).filter((id) => {
+    const card = state.cards[id];
+    const key = `${card?.zone ?? id}:${card?.host ?? ""}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export function searchable(
   state: ScenarioState,
   selector: { code?: string; trait?: string; type?: string },

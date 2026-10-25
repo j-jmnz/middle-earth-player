@@ -4,7 +4,7 @@ import { beginEffect } from "./cancel.ts";
 import { effectCause, inCause, type Cause } from "./cause.ts";
 import { beginEnemyAttack } from "./combat.ts";
 import { askTarget, openBranch } from "./choices.ts";
-import { hasTrait, holds, outOfPlayCopies, searchable } from "./conditions.ts";
+import { hasTrait, holds, outOfPlayChoices, searchable } from "./conditions.ts";
 import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
@@ -16,7 +16,7 @@ import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
 import { livingSeats, updateCard, withSeat } from "./state.ts";
 import { offerResponses } from "./responses.ts";
-import { holdsNow, seatFor, shuffleEncounterDeck } from "./verbs.ts";
+import { holdsNow, seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 
@@ -272,7 +272,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     case "DiscardRestricted":
       return sourceId ? restrictedAttachments(state, sourceId, ctx) : [];
     case "ShuffleOutOfPlayIntoEncounterDeck":
-      return outOfPlayCopies(state, instruction.code);
+      return outOfPlayChoices(state, instruction.code);
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -334,18 +334,6 @@ function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] 
   });
 }
 
-// One card per zone (and per host, for cards under a location).
-function distinctByZone(state: ScenarioState, ids: readonly string[]): string[] {
-  const seen = new Set<string>();
-  return ids.filter((id) => {
-    const card = state.cards[id];
-    const key = `${card?.zone ?? id}:${card?.host ?? ""}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
 function picksOne(instruction: Instruction): boolean {
   if (instruction.verb === "ReturnToStaging") return instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose";
   // "Add each Nazgûl enemy found": every match goes, and nobody chooses.
@@ -359,11 +347,8 @@ function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Redu
   if (item.chosen) {
     ids = [item.chosen];
   } else if (item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck") {
-    // Copies in one pile are the same choice. Copies out of play in different zones are not (one under Weather Hills would
-    // come back to staging, one in the discard pile is found by a search, one set aside is not), and on an encounter or
-    // quest effect the first player picks among them (rr.first-player).
-    const zones = distinctByZone(state, found);
-    if (zones.length > 1) return askTarget(state, { ...item, seat: state.firstPlayer }, zones);
+    // On an encounter or quest effect the first player picks among the choices (rr.first-player).
+    if (found.length > 1) return askTarget(state, { ...item, seat: state.firstPlayer }, found);
     ids = found.slice(0, 1);
   } else if (picksOne(item.instruction)) {
     const distinct = distinctByCode(state, found);
@@ -411,9 +396,8 @@ function applyTargeted(
     case "SearchReveal":
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first) : state;
     case "ShuffleIntoDeck":
-      return first ? shuffleEncounterDeck(moveCard(state, first, { zone: "encounterDeck" })) : state;
     case "ShuffleOutOfPlayIntoEncounterDeck":
-      return first ? shuffleEncounterDeck(updateCard(moveCard(state, first, { zone: "encounterDeck" }), first, { face: "down" })) : state;
+      return first ? shuffleIntoEncounterDeck(state, first) : state;
     case "DiscardRestricted": {
       const owner = first ? state.cards[first]?.controller : null;
       return first && owner != null ? moveCard(state, first, { zone: "discard", seat: owner }) : state;

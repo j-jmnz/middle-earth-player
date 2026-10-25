@@ -1,13 +1,13 @@
-// Rules: rr.in-play-and-out-of-play, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
+// Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { runAttackVerb } from "./attack-verbs.ts";
 import { characters } from "./combat.ts";
-import { hasTrait, holds, outOfPlayCopies } from "./conditions.ts";
+import { hasTrait, holds, outOfPlayChoices } from "./conditions.ts";
 import { scheduleDelayed } from "./delayed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { destroyCard, eliminateEmpties, modifiedStat, placeDamage, raiseThreat } from "./keywords.ts";
+import { destroyCard, eliminateEmpties, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "./keywords.ts";
 import { lastPicked, otherSeat } from "./player-verbs.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
 import { engageEnemy, placeQuestProgress, stagingEnemies } from "./quest.ts";
@@ -32,6 +32,12 @@ export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
   return { ...state, encounterDeck: shuffled.ids, seedCursor: shuffled.cursor };
 }
 
+// A card goes into the encounter deck face down, as every card in a deck is, and the deck is shuffled.
+export function shuffleIntoEncounterDeck(state: ScenarioState, id: string): ScenarioState {
+  if (!state.cards[id]) return state;
+  return shuffleEncounterDeck(updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down" }));
+}
+
 // Verbs that run to completion with no choice and no child frame. A verb that needs either is handled
 // by the effect frame (effect-frames.ts) before it reaches here.
 export function runExtraVerb(
@@ -49,10 +55,10 @@ export function runExtraVerb(
       return id ? updateCard(moveCard(state, id, { zone: "staging" }), id, { face: "up" }) : state;
     }
     case "ShuffleOutOfPlayIntoEncounterDeck": {
-      // Outside an effect frame nobody can be asked, so the first out-of-play copy goes (effect-frames.ts asks the first
-      // player when copies are in different zones, rr.first-player).
-      const id = outOfPlayCopies(state, instruction.code)[0];
-      return id ? shuffleEncounterDeck(updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down" })) : state;
+      // Outside an effect frame nobody can be asked, so the first choice goes (effect-frames.ts asks the first player when
+      // there are several, rr.first-player).
+      const id = outOfPlayChoices(state, instruction.code)[0];
+      return id ? shuffleIntoEncounterDeck(state, id) : state;
     }
     case "RemoveQuestProgress":
       return removeQuestProgress(state, instruction.perPlayer * livingSeats(state).length, steps);
@@ -64,15 +70,15 @@ export function runExtraVerb(
     case "DiscardUntilEnemies":
       return discardUntilEnemies(state, instruction.perPlayer * livingSeats(state).length, ctx, steps);
     case "ShuffleSelfIntoEncounterDeck": {
-      if (!focus.sourceId || !state.cards[focus.sourceId]) return state;
-      return shuffleEncounterDeck(updateCard(moveCard(state, focus.sourceId, { zone: "encounterDeck" }), focus.sourceId, { face: "down" }));
+      return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
     case "DiscardRandomFromHand":
       return discardRandom(state, focus.seat, instruction.amount ?? 1);
     case "PlaceUnderSelf": {
       const id = lastPicked(state);
       if (!focus.sourceId || !state.cards[id] || !state.cards[focus.sourceId]) return state;
-      return moveCard(state, id, { zone: "under", locationId: focus.sourceId });
+      // The enemy leaves play, so the cards attached to it are discarded with it (rr.attachment-cards).
+      return moveCard(releaseAttachments(state, id, ctx.cards, steps), id, { zone: "under", locationId: focus.sourceId });
     }
     case "ReturnUnderToStaging": {
       let next = state;
