@@ -102,13 +102,23 @@ export function pushCardEffects(
   );
 }
 
+// The frame under a "when revealed" frame is the staging of that same card: it was revealed from the encounter deck.
+function revealedFromEncounterDeck(state: ScenarioState, frame: Frame): boolean {
+  const at = state.stack.findIndex((entry) => entry.id === frame.id);
+  const below = at > 0 ? state.stack[at - 1] : undefined;
+  return below?.frame === "reveal" && below.cardId === frame.cardId;
+}
+
 export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const data = frame.data;
   if (data.kind !== "effect") throw new Error(`Frame ${frame.frame} lost its effect data`);
   if (frame.step === 0) {
     if (data.canceled) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
-    // The "when revealed" effects of a card are about to resolve: a Response may cancel them first (rr.cancel).
-    if (frame.frame === "whenRevealed" && frame.cardId && !data.interrupted) {
+    // The "when revealed" effects of a card are about to resolve: a Response may cancel them first (rr.cancel). The only
+    // such Response is A Test of Will, which cancels those "of a card that was just revealed from the encounter deck"
+    // (01050:A:1); revealing from the encounter deck is staging (rr.staging), the `reveal` frame. A quest stage reached by
+    // advancing (141026:B:1, 141027:A:1) was not revealed from the encounter deck, so nothing is offered against it.
+    if (frame.frame === "whenRevealed" && frame.cardId && !data.interrupted && revealedFromEncounterDeck(state, frame)) {
       const offered = offerResponses(state, { trigger: "whenRevealedPending", seat: frame.seat, subject: frame.cardId }, ctx, steps);
       if (offered.stack.length === state.stack.length) return beginEffect(state, frame, data, ctx);
       // Remember that the offer was made, so the frame begins when the Responses are done.
