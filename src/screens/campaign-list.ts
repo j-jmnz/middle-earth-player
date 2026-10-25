@@ -1,17 +1,13 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { campaigns } from "../catalog/schema";
-import { saves } from "./user-schema";
 
-export function campaignListQueries<TCatalogRun, TUserRun>(
-  catalog: BaseSQLiteDatabase<"sync", TCatalogRun>,
-  user: BaseSQLiteDatabase<"sync", TUserRun>,
-) {
+// The campaign list's catalog read. Its saves come from campaign-store (listSaves, listArchivedSaves).
+export function campaignListQueries<TCatalogRun>(catalog: BaseSQLiteDatabase<"sync", TCatalogRun>) {
   return {
     campaigns: catalog
       .select({ id: campaigns.id, name: campaigns.name, scenarioCount: campaigns.scenarioCount, playable: campaigns.playable })
       .from(campaigns),
-    saves: user.select({ id: saves.id, campaignId: saves.campaignId }).from(saves),
   };
 }
 

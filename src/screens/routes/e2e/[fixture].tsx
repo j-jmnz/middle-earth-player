@@ -10,7 +10,7 @@ import { useEffect, useMemo } from "react";
 import { fixtureSave, hasFixture, isFixtureName } from "../../../campaign/fixtures";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { BodyText, NavBar, Screen } from "../../chrome";
-import { writeSave } from "../../campaign-store";
+import { restoreSave, writeSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { e2eBuild } from "../../e2e";
 import { goBack } from "../../go-back";
@@ -28,6 +28,8 @@ export default function E2eFixture() {
   useEffect(() => {
     if (!allowed || !saveId || !name || !isFixtureName(name)) return;
     writeSave(user, fixtureSave(name, saveId, CATALOG_VERSION));
+    // A fixture save archived by an earlier run is written again; it must also be back on the list.
+    restoreSave(user, saveId);
     router.replace({ pathname: "/path/[saveId]", params: { saveId } });
   }, [allowed, saveId, name, user, router]);
 

@@ -1,4 +1,4 @@
-import { desc, eq, isNotNull, isNull } from "drizzle-orm";
+import { asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { parseActive, parseLoadout, parseLog, parseSeatCount, newSave, type Save } from "../campaign/save";
@@ -37,9 +37,16 @@ function parseRow(row: typeof saves.$inferSelect): ReadSave {
   return { save: { id: row.id, campaignId: row.campaignId, seatCount: parseSeatCount(row.seatCount), log, active, loadout }, unreadable };
 }
 
-// The open playthroughs, the ones the campaign list shows first. An archived save is listed by listArchivedSaves.
+// The open playthroughs, the one written last first; rows never written since 0003 follow in the order they were made. An
+// archived save is listed by listArchivedSaves.
 export function listSaves<TRun>(user: UserDb<TRun>): Save[] {
-  return user.select().from(saves).where(isNull(saves.archivedAt)).all().map((row) => parseRow(row).save);
+  return user
+    .select()
+    .from(saves)
+    .where(isNull(saves.archivedAt))
+    .orderBy(desc(saves.updatedAt), asc(sql`rowid`))
+    .all()
+    .map((row) => parseRow(row).save);
 }
 
 // The archived playthroughs, the last one put away first.
@@ -56,7 +63,7 @@ export function readSaveChecked<TRun>(user: UserDb<TRun>, id: string): ReadSave 
   return row ? parseRow(row) : null;
 }
 
-export function writeSave<TRun>(user: UserDb<TRun>, save: Save): void {
+export function writeSave<TRun>(user: UserDb<TRun>, save: Save, now: number = Date.now()): void {
   const values = {
     id: save.id,
     campaignId: save.campaignId,
@@ -66,6 +73,7 @@ export function writeSave<TRun>(user: UserDb<TRun>, save: Save): void {
     pool: stored(save.log.campaignPool),
     activeScenario: save.active ? stored(save.active) : null,
     loadout: save.loadout ? stored(save.loadout) : null,
+    updatedAt: now,
   };
   user
     .insert(saves)
@@ -84,6 +92,8 @@ export function restoreSave<TRun>(user: UserDb<TRun>, id: string): void {
 }
 
 // Deleting removes the playthrough for good: its log, its open scenario and its loadout. Decks are not part of a save.
+// writeSave inserts a missing row, so no save screen may stay open under the list after a delete: today path, briefing,
+// table, log and resolution are all pushed above the list and gone while it shows.
 export function deleteSave<TRun>(user: UserDb<TRun>, id: string): void {
   user.delete(saves).where(eq(saves.id, id)).run();
 }
@@ -94,7 +104,7 @@ let created = 0;
 export function createSave<TRun>(user: UserDb<TRun>, campaignId: string, seatCount: 1 | 2, now: number = Date.now()): Save {
   created += 1;
   const save = newSave(`save-${now.toString(36)}${created > 1 ? `-${created}` : ""}`, campaignId, seatCount);
-  writeSave(user, save);
+  writeSave(user, save, now);
   return save;
 }
 
