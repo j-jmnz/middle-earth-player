@@ -39,6 +39,23 @@ export const saves = sqliteTable("saves", {
   updatedAt: integer("updated_at"),
 });
 
+// One row per standalone game: one deal of one scenario, outside any campaign (src/campaign/standalone.ts). No log and no
+// pool: `loadout` is what was dealt, `activeScenario` the open game's seed and intents, `result` how it ended.
+export const standaloneGames = sqliteTable("standalone_games", {
+  id: text("id").primaryKey(),
+  // The box the scenario is from ("fellowship-of-the-ring").
+  campaignId: text("campaign_id").notNull(),
+  scenarioId: text("scenario_id").notNull(),
+  seatCount: integer("seat_count").notNull(),
+  loadout: text("loadout", { mode: "json" }).$type<StoredJson>().notNull(),
+  activeScenario: text("active_scenario", { mode: "json" }).$type<StoredJson | null>(),
+  result: text("result", { mode: "json" }).$type<StoredJson | null>(),
+  // When it was dealt (ms since the epoch); the list shows the newest first.
+  createdAt: integer("created_at").notNull(),
+  // When the player put it away. An archived game keeps everything and comes back as it was on restore.
+  archivedAt: integer("archived_at"),
+});
+
 // One row per stored booklet PDF. `path` is relative to the document directory (booklets/<id>.pdf), so the row survives
 // the system moving the app container. `lastPage` is 1-based.
 export const booklets = sqliteTable("booklets", {

@@ -1,36 +1,23 @@
-import { and, eq, inArray, like } from "drizzle-orm";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useState, useSyncExternalStore } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { ScrollView, View } from "react-native";
 
 import { briefing, scenarioFacts, type BriefingInput, type BriefingSeat } from "../../../../campaign/briefing";
 import { deal } from "../../../../campaign/session";
 import { logCodes, loadWorld } from "../../../../campaign/world";
-import { cards } from "../../../../catalog/schema";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { BodyText, Eyebrow, Label, NavBar, PrimaryButton, RingMark, Screen, Segmented, TextButton, pressedNight } from "../../../chrome";
+import { BodyText, Eyebrow, Label, NavBar, PrimaryButton, Screen, TextButton } from "../../../chrome";
 import { FELLOWSHIP_ID } from "../../../../campaign/save";
 import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
 import { goBack } from "../../../go-back";
 import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
-import { EmptyHeroSlot, HeroTile, type HeroFace } from "../../../hero-tile";
-import { palette } from "../../../palette.js";
+import { expand, ScenarioHeader, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
 import { routeCode } from "../../../route-code";
-import { starterSeedReason, starterSeedStatus, subscribeStarterSeed } from "../../../starter-decks";
-import { decks } from "../../../user-schema";
 import { useSave } from "../../../use-save";
-
-type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
-
-const DIFFICULTIES = ["Easy", "Normal"] as const;
-
-function expand(deck: SavedDeck | undefined): string[] {
-  return deck ? deck.cards.flatMap((card) => Array.from({ length: card.count }, () => card.code)) : [];
-}
 
 export default function Briefing() {
   const router = useRouter();
@@ -49,17 +36,8 @@ export default function Briefing() {
 
   const campaign = save ? campaignOf(save.campaignId) : null;
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
-  // The starter decks are inserted just after launch; read the list again when that finishes.
-  const seeded = useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending");
-  const seedReason = useSyncExternalStore(subscribeStarterSeed, starterSeedReason, () => null);
-  const savedDecks = useMemo<SavedDeck[]>(
-    () => (seeded === "pending" ? [] : user.select({ id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards }).from(decks).all()),
-    [user, seeded],
-  );
-  const candidates = useMemo(
-    () => catalog.select({ code: cards.code, name: cards.name }).from(cards).where(and(eq(cards.typeCode, "hero"), eq(cards.sphereCode, "fellowship"), like(cards.traits, "%Ring-bearer%"))).all(),
-    [catalog],
-  );
+  const briefingDecks = useBriefingDecks();
+  const { savedDecks, candidates } = briefingDecks;
 
   const seatCount = save?.seatCount ?? 1;
   const seats: BriefingSeat[] = useMemo(
@@ -70,17 +48,6 @@ export default function Briefing() {
       }),
     [seatCount, savedDecks, picked],
   );
-
-  const faces = useMemo(() => {
-    const codes = [...new Set([...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes)])];
-    if (codes.length === 0) return new Map<string, HeroFace>();
-    const rows = catalog
-      .select({ code: cards.code, name: cards.name, sphereCode: cards.sphereCode, sphereName: cards.sphereName, imagesrc: cards.imagesrc })
-      .from(cards)
-      .where(inArray(cards.code, codes))
-      .all();
-    return new Map(rows.map((row) => [row.code, row]));
-  }, [catalog, candidates, savedDecks]);
 
   const world = useMemo(() => {
     if (!save || !campaign || !scenario) return null;
@@ -120,9 +87,8 @@ export default function Briefing() {
   }
 
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
-  const faceOf = (code: string): HeroFace => faces.get(code) ?? { code, name: nameOf(code), sphereCode: null, sphereName: null, imagesrc: null };
   const completed = save.log.completed.includes(scenario.id);
-  const heroNames = (codes: readonly string[]) => codes.map(nameOf).join(", ");
+  const fallen = save.log.fallenHeroesBySeat.flat();
 
   function pick(seat: number, deckId: string): void {
     setPicked((current) => current.map((item, index) => (index === seat ? deckId : item)));
@@ -153,39 +119,13 @@ export default function Briefing() {
     }
   }
 
-  const toolHeight = 120;
   const changeLines = result.steps.filter((step) => step.n >= 3).flatMap((step) => step.did.map((line, index) => ({ key: `${step.n}-${index}`, line })));
 
   return (
     <Screen testID="briefing" scene="vale">
       {back}
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6" keyboardShouldPersistTaps="handled">
-        <Eyebrow>{`Scenario ${facts.number}`}</Eyebrow>
-        <Text accessibilityRole="header" testID="briefing-title" className="mt-1 font-display text-display text-bone">
-          {facts.name}
-        </Text>
-        <Text testID="briefing-stages" className="mt-3 text-body text-bone">
-          {facts.stages.join(" › ")}
-        </Text>
-
-        <View className="mt-4 flex-row items-center justify-between">
-          <Segmented options={DIFFICULTIES} value={difficulty} onChange={(next) => setDifficulty(next)} testIDPrefix="difficulty" />
-          <Label className="ml-3">{`${facts.deckSize} encounter cards`}</Label>
-        </View>
-        <View testID="briefing-sets" className="mt-3 gap-1">
-          {facts.sets.map((set) => (
-            <Label key={set.name} tone="muted">{`${set.name} · ${set.count}`}</Label>
-          ))}
-        </View>
-        {facts.rules.length > 0 ? (
-          <View testID="briefing-rules" className="mt-3 flex-row flex-wrap gap-2">
-            {facts.rules.map((rule) => (
-              <View key={rule} className="rounded-pill px-3 py-1" style={{ borderWidth: 1, borderColor: palette.gold }}>
-                <Text className="text-label text-gold">{rule}</Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
+        <ScenarioHeader facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} eyebrow={`Scenario ${facts.number}`} />
         {completed ? (
           <BodyText tone="muted" className="mt-3" testID="briefing-replay">
             You have won this scenario. Playing it again does not grant its reward a second time.
@@ -193,76 +133,20 @@ export default function Briefing() {
         ) : null}
 
         {seats.map((seat, index) => (
-          <View key={index} className="mt-6">
-            <Eyebrow tone="muted">{seatCount === 1 ? "Deck" : `Seat ${index + 1}`}</Eyebrow>
-            {seeded === "pending" ? (
-              <BodyText tone="muted" className="mt-2">
-                Loading
-              </BodyText>
-            ) : savedDecks.length === 0 ? (
-              <View className="mt-2 gap-2">
-                <BodyText tone={seeded === "missing" ? "danger" : "muted"} testID="briefing-no-deck">
-                  {seeded === "missing" ? "The starter decks are missing. Save a deck in Decks first." : "No saved deck. Save one in Decks first."}
-                </BodyText>
-                {seeded === "missing" && seedReason ? (
-                  <BodyText tone="danger" testID="briefing-starter-reason">
-                    {seedReason}
-                  </BodyText>
-                ) : null}
-              </View>
-            ) : (
-              <View className="mt-2">
-                {savedDecks.map((deck) => {
-                  const selected = picked[index] === deck.id;
-                  const fallen = deck.heroes.filter((code) => save.log.fallenHeroesBySeat.flat().includes(code));
-                  return (
-                    <Pressable
-                      key={deck.id}
-                      testID={`deck-pick-${index}-${deck.id}`}
-                      collapsable={false}
-                      accessibilityRole="radio"
-                      accessibilityState={{ selected, disabled: fallen.length > 0 }}
-                      disabled={fallen.length > 0}
-                      onPress={() => pick(index, deck.id)}
-                      className="min-h-14 flex-row items-center gap-3 border-b border-hairline py-2"
-                      style={({ pressed }) => (pressed ? pressedNight : undefined)}
-                    >
-                      {/* The selected deck is a filled ring and the others an empty one, so the mark does not rest on color. */}
-                      <RingMark size={14} state={selected ? "done" : "locked"} />
-                      <View className="flex-1">
-                        <Text className={selected ? "text-body font-semibold text-gold" : fallen.length > 0 ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
-                        <Text className="text-label text-muted">{fallen.length > 0 ? `${heroNames(fallen)} fell and cannot be picked` : heroNames(deck.heroes)}</Text>
-                      </View>
-                      {selected ? <Text className="text-label text-gold">Selected</Text> : null}
-                    </Pressable>
-                  );
-                })}
-              </View>
-            )}
-            {seat.deckId ? (
-              <View className="mt-3 flex-row gap-2">
-                {seat.heroes.map((code) => (
-                  <HeroTile key={code} hero={faceOf(code)} height={toolHeight} dense />
-                ))}
-                {index === 0 && result.needsRingBearer ? (
-                  ringBearer ? (
-                    <HeroTile hero={faceOf(ringBearer)} height={toolHeight} dense onRemove={() => setRingBearer(null)} />
-                  ) : (
-                    <View testID="ringbearer-slot" className="flex-1">
-                      <EmptyHeroSlot height={toolHeight} label="Ring-bearer" />
-                    </View>
-                  )
-                ) : null}
-              </View>
-            ) : null}
-            {seat.deckId && index === 0 && result.needsRingBearer && !ringBearer ? (
-              <View className="mt-2">
-                {candidates.map((candidate) => (
-                  <TextButton key={candidate.code} label={`Choose ${candidate.name} as Ring-bearer`} testID={`ringbearer-${candidate.code}`} onPress={() => setRingBearer(candidate.code)} />
-                ))}
-              </View>
-            ) : null}
-          </View>
+          <SeatPicker
+            key={index}
+            index={index}
+            seatCount={seatCount}
+            decks={briefingDecks}
+            picked={seat.deckId}
+            heroes={seat.heroes}
+            fallen={fallen}
+            needsRingBearer={result.needsRingBearer}
+            ringBearer={ringBearer}
+            onPick={(deckId) => pick(index, deckId)}
+            onRingBearer={setRingBearer}
+            nameOf={nameOf}
+          />
         ))}
 
         {result.needs ? (

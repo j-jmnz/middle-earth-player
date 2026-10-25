@@ -12,7 +12,7 @@ describe("the table's Pass on a sheet", () => {
     expect(sheetSendsPass({ ...trigger, pass: "Continue" })).toBe(true);
     expect(sheetSendsPass({ ...pick, primary: { label: "Done", intent: { type: "Pass" } } })).toBe(true);
     expect(sheetSendsPass({ ...pick, alternative: { label: "Pass", intent: { type: "Pass" } } })).toBe(true);
-    expect(sheetSendsPass({ kind: "outcome", key: "won", result: "won", title: "Victory", note: "" })).toBe(true);
+    expect(sheetSendsPass({ kind: "outcome", key: "won", result: "won", step: "Resolution", title: "Victory", note: "", action: "Choose rewards" })).toBe(true);
   });
 
   it("is added to the Actions sheet and to a choice that cannot pass by itself", () => {
