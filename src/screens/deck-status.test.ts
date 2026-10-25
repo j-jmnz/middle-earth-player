@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { DeckSaveCard } from "../catalog/deck-save";
-import { copyDeckName, deckCountLine, deckReadiness, deckSections, newDeckName, savedDeckName, startingThreat } from "./deck-status.ts";
+import { copyDeckName, deckContentsPhrase, deckCountLine, deckReadiness, deckSections, newDeckName, savedDeckName, startingThreat } from "./deck-status.ts";
 
 function fact(name: string, typeCode: string, deckLimit: number | null = 3): DeckSaveCard {
   return { name, typeCode, sphereCode: "lore", deckLimit, deckLegal: true, traits: null };
@@ -26,7 +26,7 @@ describe("deckReadiness", () => {
   });
 
   it("names the card and the rule for any other refusal", () => {
-    expect(deckReadiness({ name: "x", heroes: ["h1"], cards: [...allies, { code: "zz", count: 1 }] }, facts)).toEqual({ ready: false, text: "zz Not a deck-legal card." });
+    expect(deckReadiness({ name: "x", heroes: ["h1"], cards: [...allies, { code: "zz", count: 1 }] }, facts)).toEqual({ ready: false, text: "zz: Not a deck-legal card." });
   });
 });
 
@@ -34,6 +34,7 @@ describe("deck lines", () => {
   it("counts heroes and cards against fifty", () => {
     expect(deckCountLine({ heroes: ["h1"], cards: [{ code: "a0", count: 3 }] })).toBe("1 hero · 3 of 50 cards");
     expect(deckCountLine({ heroes: ["h1", "h2"], cards: allies })).toBe("2 heroes · 51 cards");
+    expect(deckContentsPhrase({ heroes: ["h1"], cards: [{ code: "a0", count: 1 }] })).toBe("1 hero and 1 card");
   });
 
   it("adds the heroes' threat, and has none while a hero's threat is unknown", () => {

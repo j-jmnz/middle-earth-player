@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useFocusEffect, useIsFocused } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { AccessibilityInfo, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeOut, ReduceMotion } from "react-native-reanimated";
 
 import { TextButton } from "./chrome";
-import { dismissToast, toastDuration, useToast } from "./toast";
+import { dismissToast, leaveToastScreen, toastDuration, useToast } from "./toast";
 
 const enter = FadeInDown.duration(160).reduceMotion(ReduceMotion.System);
 const leave = FadeOut.duration(120).reduceMotion(ReduceMotion.System);
@@ -27,24 +28,28 @@ function useScreenReader(): boolean {
 }
 
 /**
- * The toast of src/screens/toast.ts, floating over the foot of the screen. `bottom` lifts it over a pinned action bar.
- * Each screen that can show one draws this as its last child.
+ * The toast of src/screens/toast.ts, docked at the foot of the screen's content, above its pinned bar. It takes its own
+ * room, so it never covers a row or sits on a row's +. Each screen that can show one draws it once.
  */
-export function ToastView({ bottom = 12 }: { bottom?: number }) {
-  const toast = useToast();
+export function ToastView() {
+  const store = useToast();
+  // Screens under the one in front stay mounted; only the focused screen shows, times and announces the toast.
+  const focused = useIsFocused();
+  const toast = focused ? store : null;
   const screenReader = useScreenReader();
+  useFocusEffect(useCallback(() => () => leaveToastScreen(), []));
 
   useEffect(() => {
     if (!toast) return;
     AccessibilityInfo.announceForAccessibility(toast.text);
-    const timer = setTimeout(() => dismissToast(toast.id), toastDuration(toast.tone, screenReader));
+    const timer = setTimeout(() => dismissToast(toast.id), toastDuration(toast, screenReader));
     return () => clearTimeout(timer);
   }, [toast, screenReader]);
 
   if (!toast) return null;
   const undo = toast.undo;
   return (
-    <View pointerEvents="box-none" style={{ position: "absolute", left: 16, right: 16, bottom }}>
+    <View className="py-2">
       {/* NativeWind does not style a Reanimated view, so the panel is a plain view inside it. */}
       <Animated.View key={toast.id} entering={enter} exiting={leave}>
         <View

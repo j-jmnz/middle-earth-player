@@ -1,18 +1,8 @@
 import { FlashList } from "@shopify/flash-list";
 import { eq } from "drizzle-orm";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
-import {
-  AccessibilityInfo,
-  Modal,
-  Pressable,
-  ScrollView,
-  Switch,
-  Text,
-  TextInput,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import { inactiveCodes as inactiveTextCodes } from "../../catalog/active-text";
 import { traitTokens } from "../../catalog/deck-save";
@@ -23,7 +13,6 @@ import {
   Eyebrow,
   ListRow,
   NavBar,
-  PaperSheet,
   PrimaryButton,
   Screen,
   SphereMark,
@@ -31,13 +20,14 @@ import {
   markedSphere,
   sphereWord,
 } from "../chrome";
-import { CountStepper, stepperFull } from "../count-stepper";
-import { addDraftCard, announceDraftChange, draftCopyCount, takeDraftCard, useDeckDraft, type DraftContent } from "../deck-draft";
+import { CountStepper } from "../count-stepper";
+import { addDraftCard, announceDraftChange, draftAddRefused, draftCopyCount, takeDraftCard, useDeckDraft, type TitleLookup } from "../deck-draft";
 import { deckCountLine } from "../deck-status";
 import { useDatabases } from "../databases";
 import { enqueueImageDownloads } from "../images/queue";
 import { CardThumb, useCardPreview } from "../images/picture";
 import { useListPreview } from "../list-preview";
+import { PoolFilterSheet } from "../pool-filter-sheet";
 import { ToastView } from "../toast-view";
 import type { PictureSource } from "../../play/table-canvas-types";
 import { palette } from "../palette.js";
@@ -47,16 +37,10 @@ import {
   cycleGroups,
   emptyPoolFilter,
   filterPool,
-  filterSheetAnimation,
-  packChooserRows,
   poolDetail,
-  traitChooserRows,
-  type CycleGroup,
   type PoolCard,
   type PoolFilter,
 } from "../pool-filter";
-import { GameIcon } from "../../play/game-icon";
-import type { IconName } from "../../play/icon-map";
 import { goBack } from "../go-back";
 
 type PoolRowCard = PoolCard & {
@@ -80,59 +64,10 @@ function onViewableItemsChanged({ viewableItems }: { viewableItems: { item?: Poo
   if (jobs.length > 0) enqueueImageDownloads(jobs);
 }
 
-function Chip({
-  label,
-  selected,
-  onPress,
-  sphere,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-  sphere?: string;
-}) {
-  const mark = sphere ? markedSphere(sphere) : null;
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      className={`mb-2 mr-2 min-h-11 flex-row items-center gap-2 rounded-pill px-3 ${selected ? "bg-gold" : "bg-paperPressed"}`}
-    >
-      {mark ? <SphereMark sphere={mark} /> : null}
-      <Text className={selected ? "text-body font-semibold text-onGold" : "text-body text-ink"}>{label}</Text>
-    </Pressable>
-  );
-}
-
-function OptionRow({ label, detail, onPress, icon }: { label: string; detail: string; onPress: () => void; icon?: IconName }) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      className="min-h-14 flex-row items-center justify-between border-b border-inkLine"
-    >
-      <View className="flex-row items-center gap-2">
-        {icon ? <GameIcon name={icon} size={16} tint="ink" /> : null}
-        <Text className="text-body text-ink">{label}</Text>
-      </View>
-      <Text className="ml-3 shrink text-label text-inkMuted" numberOfLines={1}>
-        {detail}
-      </Text>
-    </Pressable>
-  );
-}
-
 // The sphere's printed icon before the row's words ("Ally · Spirit · 2").
 function RowIcons({ sphere }: { sphere: string | null }) {
   const mark = markedSphere(sphere);
   return mark ? <SphereMark sphere={mark} size={12} /> : null;
-}
-
-// The + on a hero is spent when the hero is in the deck or the three slots are full; on another card, at its copy limit.
-function addFull(item: PoolRowCard, count: number, deck: DraftContent): boolean {
-  if (item.typeCode === "hero") return count > 0 || deck.heroes.length >= 3;
-  return stepperFull(count, item.deckLimit);
 }
 
 function PoolCardRow({
@@ -140,12 +75,15 @@ function PoolCardRow({
   adding,
   count,
   full,
+  lookup,
   onPreview,
 }: {
   item: PoolRowCard;
   adding: boolean;
   count: number;
+  // Whether + would be refused: the title is at its copy limit (any printing), or the hero is taken or the slots are full.
   full: boolean;
+  lookup: TitleLookup;
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
   const router = useRouter();
@@ -171,7 +109,7 @@ function PoolCardRow({
             full={full}
             minus={count > 0}
             ids={{ dec: `take-${item.code}`, count: `pool-count-${item.code}`, inc: `add-${item.code}` }}
-            onChange={(delta) => announceDraftChange(delta > 0 ? addDraftCard(card) : takeDraftCard(card))}
+            onChange={(delta) => announceDraftChange(delta > 0 ? addDraftCard(card, lookup) : takeDraftCard(card, lookup))}
           />
         ) : undefined
       }
@@ -210,7 +148,6 @@ export default function CardPool() {
   // An empty hero slot opens the pool on heroes.
   const startType = typeof params.type === "string" && params.type.length > 0 ? params.type : null;
   const draft = useDeckDraft();
-  const { height } = useWindowDimensions();
   const { catalog } = useDatabases();
   const preview = useListPreview();
   const [rows] = useState(() =>
@@ -259,52 +196,21 @@ export default function CardPool() {
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);
   const [search, setSearch] = useState("");
   const [applied, setApplied] = useState<PoolFilter>(() => ({ ...emptyPoolFilter, typeCode: startType }));
-  const [draftFilter, setDraftFilter] = useState<PoolFilter>(applied);
-  const [barHeight, setBarHeight] = useState(0);
   const [open, setOpen] = useState(false);
-  const [chooser, setChooser] = useState<"pack" | "trait" | "cost" | null>(null);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  useEffect(() => {
-    let current = true;
-    void AccessibilityInfo.isReduceMotionEnabled()
-      .then((enabled) => {
-        if (current) setReduceMotion(enabled);
-      })
-      .catch(() => undefined);
-    const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", (enabled) => {
-      setReduceMotion(enabled);
-    });
-    return () => {
-      current = false;
-      subscription.remove();
-    };
-  }, []);
   const visible = useMemo(
     () => filterPool(rows, search, applied, groups, inactiveCodes),
     [rows, search, applied, groups, inactiveCodes],
   );
   const spheres = useMemo(() => sphereChoices(rows), [rows]);
   const types = useMemo(() => typeChoices(rows), [rows]);
+  // Other printings of a title share its copy limit: the deck's codes are named from the loaded rows.
+  const lookup = useMemo<TitleLookup>(() => {
+    const byCode = new Map(rows.map((row) => [row.code, row]));
+    return (code) => byCode.get(code);
+  }, [rows]);
   const traits = useMemo(() => traitChoices(rows), [rows]);
   const costs = useMemo(() => costChoices(rows), [rows]);
   const filters = activeFilterCount(applied);
-
-  function openSheet(): void {
-    setDraftFilter(applied);
-    setChooser(null);
-    setOpen(true);
-  }
-
-  function dismiss(): void {
-    setChooser(null);
-    setOpen(false);
-  }
-
-  function apply(): void {
-    setApplied(draftFilter);
-    setChooser(null);
-    setOpen(false);
-  }
 
   return (
     <Screen scene="plain">
@@ -333,7 +239,7 @@ export default function CardPool() {
             testID="pool-filter"
             label={filters > 0 ? `Filter · ${filters}` : "Filter"}
             accessibilityLabel={filters > 0 ? `Filter, ${filters} on` : "Filter"}
-            onPress={openSheet}
+            onPress={() => setOpen(true)}
           />
         </View>
         <TypeChips types={types} value={applied.typeCode} onChange={(typeCode) => setApplied({ ...applied, typeCode })} />
@@ -358,19 +264,17 @@ export default function CardPool() {
                   item={item}
                   adding={adding}
                   count={draftCopyCount(draft, item.code, item.typeCode)}
-                  full={addFull(item, draftCopyCount(draft, item.code, item.typeCode), draft)}
+                  full={draftAddRefused(draft, item, lookup)}
+                  lookup={lookup}
                   onPreview={preview.open}
                 />
               ) : null
             }
           />
         </View>
+        <ToastView />
         {adding ? (
-          <View
-            testID="pool-deck-bar"
-            className="flex-row items-center gap-3 border-t border-hairline pb-safe pt-3"
-            onLayout={(event) => setBarHeight(Math.round(event.nativeEvent.layout.height))}
-          >
+          <View testID="pool-deck-bar" className="flex-row items-center gap-3 border-t border-hairline pb-safe pt-3">
             <View className="flex-1">
               <Text testID="pool-deck-count" className="text-body text-bone">
                 {deckCountLine(draft)}
@@ -383,208 +287,22 @@ export default function CardPool() {
           </View>
         ) : null}
       </View>
-      <Modal visible={open} transparent animationType={filterSheetAnimation(reduceMotion)} onRequestClose={dismiss}>
-        <View className="flex-1 justify-end">
-          <Pressable
-            accessibilityLabel="Close filter"
-            onPress={dismiss}
-            style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: palette.night, opacity: 0.72 }}
-          />
-          <PaperSheet step="Filter" title={chooserTitle(chooser)}>
-            {chooser === "pack" ? (
-              <OptionList
-                rows={packChooserRows(groups)}
-                listHeight={height * 0.62}
-                onBack={() => setChooser(null)}
-                onPick={(row) => {
-                  setDraftFilter({ ...draftFilter, pack: row.pack });
-                  setChooser(null);
-                }}
-              />
-            ) : chooser === "trait" ? (
-              <OptionList
-                rows={traitChooserRows(traits)}
-                listHeight={height * 0.62}
-                onBack={() => setChooser(null)}
-                onPick={(row) => {
-                  setDraftFilter({ ...draftFilter, trait: row.key === "any" ? null : row.label });
-                  setChooser(null);
-                }}
-              />
-            ) : (
-              <ScrollView style={{ maxHeight: height * 0.62 }} keyboardShouldPersistTaps="handled">
-                {chooser === null ? (
-                  <FilterBody
-                    filter={draftFilter}
-                    spheres={spheres}
-                    types={types}
-                    groups={groups}
-                    onChange={setDraftFilter}
-                    onChoose={setChooser}
-                  />
-                ) : (
-                  <CostChooser
-                    filter={draftFilter}
-                    costs={costs}
-                    onChange={setDraftFilter}
-                    onBack={() => setChooser(null)}
-                  />
-                )}
-              </ScrollView>
-            )}
-            {chooser === null ? (
-              <View className="mt-4">
-                <TextButton testID="pool-filter-close" label="Close" tone="ink" onPress={dismiss} />
-                <View className="mt-2">
-                  <PrimaryButton testID="pool-apply" label="Apply" surface="paper" onPress={apply} />
-                </View>
-              </View>
-            ) : null}
-          </PaperSheet>
-        </View>
-      </Modal>
-      <ToastView bottom={adding ? barHeight + 8 : 12} />
+      <PoolFilterSheet
+        open={open}
+        applied={applied}
+        groups={groups}
+        spheres={spheres}
+        traits={traits}
+        costs={costs}
+        onApply={(next) => {
+          setApplied(next);
+          setOpen(false);
+        }}
+        onClose={() => setOpen(false)}
+      />
       {preview.overlay}
     </Screen>
   );
-}
-
-function chooserTitle(chooser: "pack" | "trait" | "cost" | null): string {
-  if (chooser === "pack") return "Pack or cycle";
-  if (chooser === "trait") return "Trait";
-  if (chooser === "cost") return "Cost";
-  return "Card pool";
-}
-
-function FilterBody({
-  filter,
-  spheres,
-  types,
-  groups,
-  onChange,
-  onChoose,
-}: {
-  filter: PoolFilter;
-  spheres: { code: string; name: string }[];
-  types: { code: string; name: string }[];
-  groups: CycleGroup[];
-  onChange: (next: PoolFilter) => void;
-  onChoose: (chooser: "pack" | "trait" | "cost") => void;
-}) {
-  return (
-    <View>
-      <Text className="mb-2 text-label text-inkLabel">Sphere</Text>
-      <View className="flex-row flex-wrap">
-        {spheres.map((sphere) => (
-          <Chip
-            key={sphere.code}
-            label={sphere.name}
-            sphere={sphere.code}
-            selected={filter.sphere === sphere.code}
-            onPress={() => onChange({ ...filter, sphere: filter.sphere === sphere.code ? null : sphere.code })}
-          />
-        ))}
-      </View>
-      <Text className="mb-2 mt-3 text-label text-inkLabel">Type</Text>
-      <View className="flex-row flex-wrap">
-        {types.map((type) => (
-          <Chip
-            key={type.code}
-            label={type.name}
-            selected={filter.typeCode === type.code}
-            onPress={() => onChange({ ...filter, typeCode: filter.typeCode === type.code ? null : type.code })}
-          />
-        ))}
-      </View>
-      <OptionRow label="Pack or cycle" detail={packDetail(filter, groups)} onPress={() => onChoose("pack")} />
-      <OptionRow label="Trait" detail={filter.trait ?? "Any"} onPress={() => onChoose("trait")} />
-      <OptionRow label="Cost" icon="cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
-      <View className="min-h-14 flex-row items-center justify-between border-b border-inkLine">
-        <Text className="text-body text-ink">Unique</Text>
-        <Switch
-          value={filter.unique}
-          onValueChange={(unique) => onChange({ ...filter, unique })}
-          trackColor={{ false: palette.hairline, true: palette.gold }}
-          ios_backgroundColor={palette.hairline}
-        />
-      </View>
-      <View className="min-h-14 flex-row items-center justify-between">
-        <Text className="text-body text-ink">Active text</Text>
-        <Switch
-          value={filter.activeText}
-          onValueChange={(activeText) => onChange({ ...filter, activeText })}
-          trackColor={{ false: palette.hairline, true: palette.gold }}
-          ios_backgroundColor={palette.hairline}
-        />
-      </View>
-    </View>
-  );
-}
-
-function OptionList<T extends { key: string; label: string; detail: string }>({
-  rows,
-  listHeight,
-  onPick,
-  onBack,
-}: {
-  rows: readonly T[];
-  listHeight: number;
-  onPick: (row: T) => void;
-  onBack: () => void;
-}) {
-  return (
-    <View style={{ height: listHeight }}>
-      <TextButton testID="pool-chooser-back" label="Back" tone="ink" onPress={onBack} />
-      <FlashList
-        data={rows}
-        keyExtractor={(item) => item.key}
-        style={{ flex: 1 }}
-        renderItem={({ item }) =>
-          item ? <OptionRow label={item.label} detail={item.detail} onPress={() => onPick(item)} /> : null
-        }
-      />
-    </View>
-  );
-}
-
-function CostChooser({
-  filter,
-  costs,
-  onChange,
-  onBack,
-}: {
-  filter: PoolFilter;
-  costs: string[];
-  onChange: (next: PoolFilter) => void;
-  onBack: () => void;
-}) {
-  function pick(next: PoolFilter): void {
-    onChange(next);
-    onBack();
-  }
-
-  return (
-    <View>
-      <TextButton testID="pool-chooser-back" label="Back" tone="ink" onPress={onBack} />
-      <OptionRow label="Any" detail="" onPress={() => pick({ ...filter, cost: null })} />
-      {costs.map((cost) => (
-        <OptionRow key={cost} label={cost} icon="cost" detail="" onPress={() => pick({ ...filter, cost })} />
-      ))}
-    </View>
-  );
-}
-
-function packDetail(filter: PoolFilter, groups: readonly CycleGroup[]): string {
-  const selected = filter.pack;
-  if (!selected) return "Any";
-  if (selected.kind === "cycle") {
-    return groups.find((group) => group.cyclePosition === selected.cyclePosition)?.label ?? "Cycle";
-  }
-  for (const group of groups) {
-    const pack = group.packs.find((candidate) => candidate.code === selected.code);
-    if (pack) return pack.name;
-  }
-  return selected.code;
 }
 
 function sphereChoices(rows: readonly PoolRowCard[]): { code: string; name: string }[] {

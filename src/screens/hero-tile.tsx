@@ -4,6 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import { markedSphere, pressedNight, RingMark, sphereWord, SphereMark } from "./chrome";
 import { enqueueImageDownloads } from "./images/queue";
 import { CoverCardImage, useCardPreview } from "./images/picture";
+import type { PictureSource } from "../play/table-canvas-types";
 import { palette } from "./palette.js";
 
 export type HeroFace = {
@@ -14,16 +15,26 @@ export type HeroFace = {
   imagesrc: string | null;
 };
 
+/** The face of a hero the catalog lacks: its code (or a name the caller knows), with no sphere and no picture. */
+export function heroFace(faces: ReadonlyMap<string, HeroFace>, code: string, name: string = code): HeroFace {
+  return faces.get(code) ?? { code, name, sphereCode: null, sphereName: null, imagesrc: null };
+}
+
 export function HeroTile({
   hero,
   height,
   onRemove,
+  onPress,
+  onLongPress,
   flush = false,
   dense = false,
 }: {
   hero: HeroFace;
   height: number;
   onRemove?: () => void;
+  // The deck editor opens the hero's card on a tap and previews it on a long press, as it does a card row.
+  onPress?: () => void;
+  onLongPress?: (source: PictureSource | null) => void;
   flush?: boolean;
   dense?: boolean;
 }) {
@@ -48,37 +59,40 @@ export function HeroTile({
       {preview && width > 0 ? (
         <CoverCardImage code={hero.code} source={preview} width={width} height={height} />
       ) : null}
+      {/* The night band holds the name first; it grows past a third of the tile rather than lose the name. */}
       <View
         pointerEvents="none"
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: height / 3,
-          backgroundColor: palette.night,
-        }}
-      />
-      <View
-        pointerEvents="none"
-        className="justify-end px-2 pb-2"
-        style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: height / 3 }}
+        className="justify-end px-2 pb-2 pt-1"
+        style={{ position: "absolute", left: 0, right: 0, bottom: 0, minHeight: height / 3, backgroundColor: palette.night }}
       >
-        <Text className={dense ? "font-display text-label text-bone" : "font-display text-body text-bone"} numberOfLines={1}>
+        <Text className={dense ? "font-display text-label text-bone" : "font-display text-body text-bone"} numberOfLines={dense ? 1 : 2}>
           {hero.name}
         </Text>
-        <View className="mt-0.5 flex-row items-center gap-1">
+        <View className="mt-0.5 flex-row flex-wrap items-center gap-x-1">
           {mark ? <SphereMark sphere={mark} /> : null}
           <Text className="text-label text-bone" numberOfLines={1}>
             {sphere}
           </Text>
+          {hero.sphereCode === "fellowship" ? (
+            <Text testID={`saga-only-${hero.code}`} className="text-label text-gold" numberOfLines={1}>
+              Saga only
+            </Text>
+          ) : null}
         </View>
-        {hero.sphereCode === "fellowship" ? (
-          <Text testID={`saga-only-${hero.code}`} className="text-label text-gold">
-            Saga only
-          </Text>
-        ) : null}
       </View>
+      {onPress ? (
+        <Pressable
+          testID={`hero-${hero.code}`}
+          collapsable={false}
+          accessibilityRole="button"
+          accessibilityLabel={`${hero.name}, ${sphere}`}
+          accessibilityHint="Opens the card"
+          onPress={onPress}
+          onLongPress={onLongPress ? () => onLongPress(preview) : undefined}
+          delayLongPress={350}
+          style={({ pressed }) => ({ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, opacity: pressed ? 0.25 : 0, backgroundColor: palette.night })}
+        />
+      ) : null}
       {onRemove ? (
         <Pressable
           testID={`hero-remove-${hero.code}`}

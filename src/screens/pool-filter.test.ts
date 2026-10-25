@@ -105,8 +105,9 @@ describe("filter choosers", () => {
 });
 
 describe("activeFilterCount", () => {
-  it("counts each field the filter sets, for the Filter button", () => {
+  it("counts each field the sheet sets, not the type the chips show", () => {
     expect(activeFilterCount(emptyPoolFilter)).toBe(0);
-    expect(activeFilterCount({ ...emptyPoolFilter, typeCode: "hero", unique: true, pack: { kind: "pack", code: "Core" } })).toBe(3);
+    expect(activeFilterCount({ ...emptyPoolFilter, typeCode: "hero" })).toBe(0);
+    expect(activeFilterCount({ ...emptyPoolFilter, typeCode: "hero", unique: true, pack: { kind: "pack", code: "Core" } })).toBe(2);
   });
 });

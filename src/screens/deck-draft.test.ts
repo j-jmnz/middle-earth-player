@@ -5,6 +5,7 @@ import {
   announceDraftChange,
   changeDraftCount,
   discardDraftChanges,
+  draftAddRefused,
   draftCopyCount,
   draftIsDirty,
   editSavedDeck,
@@ -140,5 +141,51 @@ describe("unsaved changes", () => {
     addDraftCard(gandalf);
     discardDraftChanges();
     expect(getDeckDraft()).toMatchObject({ id: "new", heroes: [], cards: [] });
+  });
+});
+
+describe("copies by title", () => {
+  const titles = new Map([
+    ["141001", { name: "Frodo Baggins", deckLimit: 1 }],
+    ["01001", { name: "Frodo Baggins", deckLimit: 1 }],
+    ["01073", { name: "Gandalf", deckLimit: 3 }],
+    ["02073", { name: "Gandalf", deckLimit: 3 }],
+  ]);
+  const lookup = (code: string) => titles.get(code);
+
+  it("refuses a second printing of a hero already in the deck", () => {
+    addDraftCard({ code: "141001", name: "Frodo Baggins", typeCode: "hero", deckLimit: 1 }, lookup);
+    const other = { code: "01001", name: "Frodo Baggins", typeCode: "hero", deckLimit: 1 };
+    expect(draftAddRefused(getDeckDraft(), other, lookup)).toBe(true);
+    expect(addDraftCard(other, lookup)).toEqual({ ok: false, text: "Frodo Baggins: A hero appears once." });
+    expect(getDeckDraft().heroes).toEqual(["141001"]);
+  });
+
+  it("counts copies across printings against the three-copy limit", () => {
+    addDraftCard(gandalf, lookup);
+    addDraftCard(gandalf, lookup);
+    const reprint = { code: "02073", name: "Gandalf", typeCode: "ally", deckLimit: 3 };
+    expect(addDraftCard(reprint, lookup)).toMatchObject({ ok: true, text: "Added Gandalf · 3 of 3" });
+    expect(draftAddRefused(getDeckDraft(), reprint, lookup)).toBe(true);
+    expect(addDraftCard(reprint, lookup)).toEqual({ ok: false, text: "Gandalf: At most three copies." });
+    expect(takeDraftCard(gandalf, lookup)).toMatchObject({ ok: true, text: "Removed a copy of Gandalf · 2 of 3" });
+  });
+});
+
+describe("undo and order", () => {
+  it("Undo puts back the cards and keeps a name typed since", () => {
+    startNewDeck({ name: "New deck" });
+    const change = addDraftCard(gandalf);
+    setDeckName("Wizards");
+    if (change.ok) restoreDraft(change.before);
+    expect(getDeckDraft()).toMatchObject({ name: "Wizards", cards: [] });
+  });
+
+  it("a card taken out and put back leaves the deck clean, whatever its place in the list", () => {
+    editSavedDeck({ id: "deck-a", name: "Hobbits", heroes: [], cards: [{ code: "01073", count: 1 }, { code: "x", count: 1 }] });
+    takeDraftCard(gandalf);
+    addDraftCard(gandalf);
+    expect(getDeckDraft().cards.map((card) => card.code)).toEqual(["x", "01073"]);
+    expect(draftIsDirty(getDeckDraft())).toBe(false);
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { dismissToast, getToast, showToast, toastDuration } from "./toast.ts";
+import { dismissToast, getToast, leaveToastScreen, showToast, toastDuration } from "./toast.ts";
 
 describe("toast", () => {
   it("shows the newest sentence, and a stale dismiss leaves it", () => {
@@ -13,9 +13,21 @@ describe("toast", () => {
     expect(getToast()).toBeNull();
   });
 
-  it("stays longer for a refusal and with a screen reader", () => {
-    expect(toastDuration("bone", false)).toBe(3000);
-    expect(toastDuration("danger", false)).toBe(4500);
-    expect(toastDuration("bone", true)).toBe(10000);
+  it("goes with its screen unless it carries, and carries once", () => {
+    showToast("Made Hobbits copy", { undo: () => undefined });
+    leaveToastScreen();
+    expect(getToast()).toBeNull();
+    showToast("Saved Hobbits", { carry: true });
+    leaveToastScreen();
+    expect(getToast()).toMatchObject({ text: "Saved Hobbits", carry: false });
+    leaveToastScreen();
+    expect(getToast()).toBeNull();
+  });
+
+  it("stays longer for Undo, for a refusal and with a screen reader", () => {
+    expect(toastDuration({ tone: "bone", undo: null }, false)).toBe(3000);
+    expect(toastDuration({ tone: "danger", undo: null }, false)).toBe(4500);
+    expect(toastDuration({ tone: "bone", undo: () => undefined }, false)).toBe(5000);
+    expect(toastDuration({ tone: "bone", undo: null }, true)).toBe(10000);
   });
 });

@@ -94,20 +94,28 @@ describe("briefing", () => {
 
   it("validates each deck in two-handed play and requires a single Ring-bearer across the table", () => {
     const second = ["01002", "01007", "142002"];
-    const two = inputOf(past, { seatCount: 2, log: emptyLog(2), seats: [seat([SAM, MERRY, PIPPIN]), seat(second, [filler])] });
+    const two = inputOf(past, { seatCount: 2, log: emptyLog(2), seats: [seat([SAM, MERRY, PIPPIN]), seat(second)] });
     expect(briefing(two).problems).toEqual([]);
     // A second Fellowship hero in the other seat is a second Ring-bearer.
-    const twice = briefing({ ...two, seats: [seat([SAM, MERRY, PIPPIN]), seat([FRODO, "01002", "01007"], [filler])] });
+    const twice = briefing({ ...two, seats: [seat([SAM, MERRY, PIPPIN]), seat([FRODO, "01002", "01007"])] });
     expect(twice.dealable).toBe(false);
     expect(twice.problems.some((problem) => problem.rule === "Only one Fellowship-sphere hero may start")).toBe(true);
   });
 
   it("does not reject two decks that share a unique card", () => {
-    const two = inputOf(past, { seatCount: 2, log: emptyLog(2), seats: [seat([SAM, MERRY, PIPPIN]), seat(["01002", "01007", "142002"], [...deck.slice(0, 5)])] });
-    // The same unique ally in both decks.
-    const shared = deck.find((code) => past.cards.get(code)?.isUnique && past.cards.get(code)?.type === "ally") ?? deck[0] ?? filler;
-    const both = briefing({ ...two, seats: [seat([SAM, MERRY, PIPPIN]), seat(["01002", "01007", "142002"], [shared, ...deck])] });
+    // Both seats hold the same list, so every unique ally in it is in both decks.
+    expect(deck.some((code) => past.cards.get(code)?.isUnique && past.cards.get(code)?.type === "ally")).toBe(true);
+    const both = briefing(inputOf(past, { seatCount: 2, log: emptyLog(2), seats: [seat([SAM, MERRY, PIPPIN]), seat(["01002", "01007", "142002"])] }));
     expect(both.problems).toEqual([]);
+  });
+
+  it("refuses a saved deck that is not ready to play, naming the rule (rr.deckbuilding)", () => {
+    const short = briefing(inputOf(past, { seats: [seat([SAM, MERRY, PIPPIN], deck.slice(1))] }));
+    expect(short.dealable).toBe(false);
+    expect(short.problems).toEqual([{ rule: "The deck is ready to play", message: "The deck is not ready to play: At least 50 cards." }]);
+    const fourth = briefing(inputOf(past, { seats: [seat([SAM, MERRY, PIPPIN], [...deck, filler, filler, filler, filler])] }));
+    expect(fourth.dealable).toBe(false);
+    expect(fourth.problems[0]?.message).toMatch(/^The deck is not ready to play: .+: At most three copies\.$/);
   });
 
   it("refuses a fallen hero by name", () => {

@@ -1,6 +1,6 @@
-import { and, eq, inArray, like } from "drizzle-orm";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { and, eq, like } from "drizzle-orm";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { briefing, scenarioFacts, type BriefingInput, type BriefingSeat } from "../../../../campaign/briefing";
@@ -17,13 +17,13 @@ import { goBack } from "../../../go-back";
 import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
-import { EmptyHeroSlot, HeroTile, type HeroFace } from "../../../hero-tile";
+import { EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "../../../hero-tile";
 import { palette } from "../../../palette.js";
 import { routeCode } from "../../../route-code";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed } from "../../../starter-decks";
 import { deckReadiness } from "../../../deck-status";
-import { deckFaces } from "../../../deck-store";
-import { decks } from "../../../user-schema";
+import { editSavedDeck } from "../../../deck-draft";
+import { deckFaces, listDecks } from "../../../deck-store";
 import { useSave } from "../../../use-save";
 
 type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
@@ -54,9 +54,12 @@ export default function Briefing() {
   // The starter decks are inserted just after launch; read the list again when that finishes.
   const seeded = useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending");
   const seedReason = useSyncExternalStore(subscribeStarterSeed, starterSeedReason, () => null);
-  const savedDecks = useMemo<SavedDeck[]>(
-    () => (seeded === "pending" ? [] : user.select({ id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards }).from(decks).all()),
-    [user, seeded],
+  // In the Decks tab's order: the deck saved last first, then the starters. Read again on focus: Open in Decks edits one.
+  const [savedDecks, setSavedDecks] = useState<SavedDeck[]>([]);
+  useFocusEffect(
+    useCallback(() => {
+      setSavedDecks(seeded === "pending" ? [] : listDecks(user));
+    }, [seeded, user]),
   );
   const candidates = useMemo(
     () => catalog.select({ code: cards.code, name: cards.name }).from(cards).where(and(eq(cards.typeCode, "hero"), eq(cards.sphereCode, "fellowship"), like(cards.traits, "%Ring-bearer%"))).all(),
@@ -73,16 +76,7 @@ export default function Briefing() {
     [seatCount, savedDecks, picked],
   );
 
-  const faces = useMemo(() => {
-    const codes = [...new Set([...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes)])];
-    if (codes.length === 0) return new Map<string, HeroFace>();
-    const rows = catalog
-      .select({ code: cards.code, name: cards.name, sphereCode: cards.sphereCode, sphereName: cards.sphereName, imagesrc: cards.imagesrc })
-      .from(cards)
-      .where(inArray(cards.code, codes))
-      .all();
-    return new Map(rows.map((row) => [row.code, row]));
-  }, [catalog, candidates, savedDecks]);
+  const faces = useMemo(() => deckFaces(catalog, [...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes)]), [catalog, candidates, savedDecks]);
 
   // A deck saves before it is ready to play; the picker does not offer one that breaks a deckbuilding rule (rr.deckbuilding).
   const readiness = useMemo(() => {
@@ -128,7 +122,7 @@ export default function Briefing() {
   }
 
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
-  const faceOf = (code: string): HeroFace => faces.get(code) ?? { code, name: nameOf(code), sphereCode: null, sphereName: null, imagesrc: null };
+  const faceOf = (code: string): HeroFace => heroFace(faces, code, nameOf(code));
   const completed = save.log.completed.includes(scenario.id);
   const heroNames = (codes: readonly string[]) => codes.map(nameOf).join(", ");
 
@@ -223,30 +217,45 @@ export default function Briefing() {
                 {savedDecks.map((deck) => {
                   const selected = picked[index] === deck.id;
                   const fallen = deck.heroes.filter((code) => save.log.fallenHeroesBySeat.flat().includes(code));
-                  const ready = readiness.get(deck.id) ?? { ready: true, text: "" };
+                  const ready = readiness.get(deck.id) ?? { ready: false, text: "Not read yet" };
                   const blocked = fallen.length > 0 || !ready.ready;
                   return (
-                    <Pressable
-                      key={deck.id}
-                      testID={`deck-pick-${index}-${deck.id}`}
-                      collapsable={false}
-                      accessibilityRole="radio"
-                      accessibilityState={{ selected, disabled: blocked }}
-                      disabled={blocked}
-                      onPress={() => pick(index, deck.id)}
-                      className="min-h-14 flex-row items-center gap-3 border-b border-hairline py-2"
-                      style={({ pressed }) => (pressed ? pressedNight : undefined)}
-                    >
-                      {/* The selected deck is a filled ring and the others an empty one, so the mark does not rest on color. */}
-                      <RingMark size={14} state={selected ? "done" : "locked"} />
-                      <View className="flex-1">
-                        <Text className={selected ? "text-body font-semibold text-gold" : blocked ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
-                        <Text className="text-label text-muted">
-                          {fallen.length > 0 ? `${heroNames(fallen)} fell and cannot be picked` : ready.ready ? heroNames(deck.heroes) : `Not ready to play: ${ready.text}`}
-                        </Text>
-                      </View>
-                      {selected ? <Text className="text-label text-gold">Selected</Text> : null}
-                    </Pressable>
+                    <View key={deck.id}>
+                      <Pressable
+                        testID={`deck-pick-${index}-${deck.id}`}
+                        collapsable={false}
+                        accessibilityRole="radio"
+                        accessibilityState={{ selected, disabled: blocked }}
+                        disabled={blocked}
+                        onPress={() => pick(index, deck.id)}
+                        className="min-h-14 flex-row items-center gap-3 border-b border-hairline py-2"
+                        style={({ pressed }) => (pressed ? pressedNight : undefined)}
+                      >
+                        {/* The selected deck is a filled ring and the others an empty one, so the mark does not rest on color. */}
+                        <RingMark size={14} state={selected ? "done" : "locked"} />
+                        <View className="flex-1">
+                          <Text className={selected ? "text-body font-semibold text-gold" : blocked ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
+                          <Text className="text-label text-muted">
+                            {fallen.length > 0 ? `${heroNames(fallen)} fell and cannot be picked` : ready.ready ? heroNames(deck.heroes) : `Not ready to play: ${ready.text}`}
+                          </Text>
+                        </View>
+                        {selected ? <Text className="text-label text-gold">Selected</Text> : null}
+                      </Pressable>
+                      {!ready.ready && fallen.length === 0 ? (
+                        <View className="-mx-3 items-start">
+                          <TextButton
+                            label="Open in Decks"
+                            testID={`deck-open-${index}-${deck.id}`}
+                            tone="gold"
+                            accessibilityLabel={`Open ${deck.name} in Decks to finish it`}
+                            onPress={() => {
+                              editSavedDeck(deck);
+                              router.push({ pathname: "/deck/[id]", params: { id: deck.id } });
+                            }}
+                          />
+                        </View>
+                      ) : null}
+                    </View>
                   );
                 })}
               </View>

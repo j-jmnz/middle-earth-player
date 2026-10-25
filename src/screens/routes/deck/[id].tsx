@@ -1,6 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, usePreventRemove, useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, Text, TextInput, useWindowDimensions, View } from "react-native";
 
 import {
@@ -22,6 +22,7 @@ import {
   announceDraftChange,
   changeDraftCount,
   discardDraftChanges,
+  draftAddRefused,
   draftIsDirty,
   editSavedDeck,
   getDeckDraft,
@@ -31,17 +32,18 @@ import {
   setDeckName,
   startNewDeck,
   useDeckDraft,
+  type TitleLookup,
 } from "../../deck-draft";
-import { deckCountLine, deckReadiness, deckSections, savedDeckName, startingThreat, type DeckSectionRow } from "../../deck-status";
+import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, savedDeckName, startingThreat, type DeckSectionRow } from "../../deck-status";
 import { deckFaces, listDecks, readDeck, writeDeck } from "../../deck-store";
-import { CountStepper, stepperFull } from "../../count-stepper";
+import { CountStepper } from "../../count-stepper";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { CardThumb, useCardPreview } from "../../images/picture";
 import { useListPreview } from "../../list-preview";
 import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
-import { EmptyHeroSlot, HeroTile, type HeroFace } from "../../hero-tile";
+import { EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "../../hero-tile";
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
 import { goBack } from "../../go-back";
@@ -73,7 +75,18 @@ function onViewableItemsChanged({ viewableItems }: { viewableItems: { item: Edit
   if (jobs.length > 0) enqueueImageDownloads(jobs);
 }
 
-function EditorCardRow({ card, onPreview }: { card: EditorCard; onPreview: (code: string, name: string, source: PictureSource | null) => void }) {
+function EditorCardRow({
+  card,
+  full,
+  lookup,
+  onPreview,
+}: {
+  card: EditorCard;
+  // Whether + would be refused: the title (any printing) is at its copy limit.
+  full: boolean;
+  lookup: TitleLookup;
+  onPreview: (code: string, name: string, source: PictureSource | null) => void;
+}) {
   const router = useRouter();
   const picture = useCardPreview(card.code, card.imagesrc);
   const mark = markedSphere(card.sphereCode);
@@ -91,8 +104,8 @@ function EditorCardRow({ card, onPreview }: { card: EditorCard; onPreview: (code
           code={card.code}
           name={card.name}
           count={card.count}
-          full={stepperFull(card.count, card.deckLimit)}
-          onChange={(delta) => announceDraftChange(changeDraftCount(card.code, card.name, card.deckLimit, delta))}
+          full={full}
+          onChange={(delta) => announceDraftChange(changeDraftCount(card.code, card.name, card.deckLimit, delta, lookup))}
         />
       }
     />
@@ -107,7 +120,6 @@ export default function DeckEditor() {
   const draft = useDeckDraft();
   const { catalog, user } = useDatabases();
   const preview = useListPreview();
-  const [barHeight, setBarHeight] = useState(0);
   // The navigation Back, a swipe or Save as asked to finish while the deck has unsaved changes.
   const [leaving, setLeaving] = useState<(() => void) | null>(null);
   const dirty = draftIsDirty(draft);
@@ -124,6 +136,7 @@ export default function DeckEditor() {
 
   const codeKey = [...draft.heroes, ...draft.cards.map((card) => card.code)].join("\0");
   const faces = useMemo(() => deckFaces(catalog, codeKey.length === 0 ? [] : codeKey.split("\0")), [catalog, codeKey]);
+  const lookup = useCallback<TitleLookup>((code) => faces.get(code), [faces]);
 
   const rows = deckSections<EditorCard>(
     draft.cards.map((card) => {
@@ -142,7 +155,7 @@ export default function DeckEditor() {
   );
   const readiness = deckReadiness(draft, faces);
   const threat = startingThreat(draft.heroes, faces);
-  const heroes: HeroFace[] = draft.heroes.map((code) => faces.get(code) ?? { code, name: code, sphereCode: null, sphereName: null, imagesrc: null });
+  const heroes: HeroFace[] = draft.heroes.map((code) => heroFace(faces, code));
   const emptySlots = Math.max(0, 3 - heroes.length);
   const baseTile = Math.max(120, Math.min(Math.round(height / 4), 200));
   const tileHeight = heroes.length > 3 ? Math.max(96, Math.round(baseTile * 0.6)) : baseTile;
@@ -158,7 +171,7 @@ export default function DeckEditor() {
     const name = savedDeckName(current.name, others);
     const savedId = writeDeck(user, { id: current.id === NEW_DECK_ID ? null : current.id, name, heroes: current.heroes, cards: current.cards });
     markDraftSaved(savedId, name);
-    showToast(`Saved ${name}`);
+    showToast(`Saved ${name}`, { carry: true });
   }
 
   function onSave(): void {
@@ -182,7 +195,13 @@ export default function DeckEditor() {
       <View className={heroes.length > 3 ? "mt-2 flex-row flex-wrap justify-between" : "mt-2 flex-row gap-2"}>
         {heroes.map((hero) => (
           <View key={hero.code} style={heroes.length > 3 ? { width: "48%", height: tileHeight, marginBottom: 8 } : { flex: 1 }}>
-            <HeroTile hero={hero} height={tileHeight} onRemove={() => announceDraftChange(removeDraftHero(hero.code, hero.name))} />
+            <HeroTile
+              hero={hero}
+              height={tileHeight}
+              onPress={() => router.push({ pathname: "/card/[code]", params: { code: hero.code } })}
+              onLongPress={(source) => preview.open(hero.code, hero.name, source)}
+              onRemove={() => announceDraftChange(removeDraftHero(hero.code, hero.name))}
+            />
           </View>
         ))}
         {Array.from({ length: emptySlots }, (_, index) => (
@@ -235,7 +254,7 @@ export default function DeckEditor() {
             keyExtractor={(item) => item.key}
             getItemType={(item) => item.kind}
             style={{ flex: 1 }}
-            extraData={faces}
+            extraData={draft}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
             keyboardShouldPersistTaps="handled"
@@ -253,12 +272,18 @@ export default function DeckEditor() {
                   <Eyebrow tone="muted">{`${item.title} · ${item.count}`}</Eyebrow>
                 </View>
               ) : (
-                <EditorCardRow card={item.card} onPreview={preview.open} />
+                <EditorCardRow
+                  card={item.card}
+                  full={draftAddRefused(draft, { code: item.card.code, name: item.card.name, typeCode: item.card.typeCode ?? "", deckLimit: item.card.deckLimit }, lookup)}
+                  lookup={lookup}
+                  onPreview={preview.open}
+                />
               )
             }
           />
         </View>
-        <View className="flex-row items-center gap-2 pb-safe pt-2" onLayout={(event) => setBarHeight(Math.round(event.nativeEvent.layout.height))}>
+        <ToastView />
+        <View className="flex-row items-center gap-2 pb-safe pt-2">
           <TextButton testID="deck-add" label="Add cards" tone="gold" onPress={() => router.push({ pathname: "/pool", params: { adding: "1" } })} />
           <View className="flex-1">
             <PrimaryButton testID="deck-save" label="Save" onPress={onSave} />
@@ -272,23 +297,27 @@ export default function DeckEditor() {
             onPress={() => setLeaving(null)}
             style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: palette.night, opacity: 0.72 }}
           />
-          <PaperSheet step="Unsaved changes" title={draft.name.trim() || "New deck"}>
+          <PaperSheet step={draft.saved ? "Unsaved changes" : "Not saved yet"} title={draft.name.trim() || "New deck"}>
             <Text className="text-body text-ink">
-              {readiness.ready
-                ? "Save your changes before you leave?"
-                : `Save your changes before you leave? The deck is not ready to play yet (${readiness.text.replace(/\.$/, "")}). You can finish it later.`}
+              {[
+                draft.saved
+                  ? "Save your changes before you leave?"
+                  : `This deck has not been saved. Discard throws away its ${deckContentsPhrase(draft)}.`,
+                readiness.ready ? null : `It is not ready to play yet (${readiness.text.replace(/\.$/, "")}); you can save it and finish it later.`,
+              ]
+                .filter((line) => line)
+                .join(" ")}
             </Text>
             <View className="mt-5">
               <PrimaryButton testID="leave-save" label="Save" surface="paper" onPress={() => finishLeaving("save")} />
               <View className="mt-2 flex-row justify-center">
-                <TextButton testID="leave-discard" label="Discard changes" tone="ink" onPress={() => finishLeaving("discard")} />
+                <TextButton testID="leave-discard" label={draft.saved ? "Discard changes" : "Discard deck"} tone="ink" onPress={() => finishLeaving("discard")} />
                 <TextButton testID="leave-keep" label="Keep editing" tone="ink" onPress={() => setLeaving(null)} />
               </View>
             </View>
           </PaperSheet>
         </View>
       </Modal>
-      <ToastView bottom={barHeight + 8} />
       {preview.overlay}
     </Screen>
   );

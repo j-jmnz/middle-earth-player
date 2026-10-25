@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { TextInput, View } from "react-native";
 
+import { formatDeckRefusal } from "../../catalog/deck-save";
 import { cards } from "../../catalog/schema";
 import { BodyText, Eyebrow, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SphereMark, markedSphere, type MarkedSphere } from "../chrome";
 import { editSavedDeck, startNewDeck } from "../deck-draft";
@@ -134,7 +135,7 @@ export default function DeckImportScreen() {
   // deck still lacks. A hero listed twice is refused: the list itself is wrong.
   function save(built: BuiltDecklist, names: readonly string[]): void {
     if (built.heroLimit) {
-      setMessage(`${built.heroLimit.cardName} Deck limit is 1.`);
+      setMessage(formatDeckRefusal({ cardName: built.heroLimit.cardName, rule: "Deck limit is 1." }));
       return;
     }
     const name = savedDeckName(built.name, listDecks(user).map((deck) => deck.name));
@@ -143,7 +144,7 @@ export default function DeckImportScreen() {
     if (!row) return;
     opening.current = true;
     editSavedDeck(row, droppedSentence(names));
-    showToast(`Imported ${name}`);
+    showToast(`Imported ${name}`, { carry: true });
     router.replace({ pathname: "/deck/[id]", params: { id } });
   }
 

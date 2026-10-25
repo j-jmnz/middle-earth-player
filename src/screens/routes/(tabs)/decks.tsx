@@ -8,7 +8,7 @@ import { editSavedDeck, startNewDeck } from "../../deck-draft";
 import { copyDeckName, deckCountLine, deckReadiness, newDeckName } from "../../deck-status";
 import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, resetStarterDeck, type SavedDeck } from "../../deck-store";
 import { useDatabases } from "../../databases";
-import { DeckCover, type HeroFace } from "../../hero-tile";
+import { DeckCover, heroFace, type HeroFace } from "../../hero-tile";
 import {
   STARTER_NOTE,
   starterSeedReason,
@@ -135,7 +135,7 @@ export default function Decks() {
   const rows = useMemo(() => listRows(saved, seed), [saved, seed]);
 
   function facesFor(deck: SavedDeck): HeroFace[] {
-    return deck.heroes.map((code) => faces.get(code) ?? { code, name: code, sphereCode: null, sphereName: null, imagesrc: null });
+    return deck.heroes.map((code) => heroFace(faces, code));
   }
 
   function openDeck(deck: SavedDeck): void {

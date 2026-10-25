@@ -171,11 +171,10 @@ export function filterSheetAnimation(reduceMotion: boolean): "none" | "fade" {
   return reduceMotion ? "none" : "fade";
 }
 
-/** How many fields the filter sets, for the Filter button ("Filter · 2"). */
+/** How many fields the filter sheet sets, for the Filter button ("Filter · 2"). The type is the chip row's, in plain sight. */
 export function activeFilterCount(filter: PoolFilter): number {
   let count = 0;
   if (filter.sphere) count += 1;
-  if (filter.typeCode) count += 1;
   if (filter.pack) count += 1;
   if (filter.trait) count += 1;
   if (filter.cost) count += 1;

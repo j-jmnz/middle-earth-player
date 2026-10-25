@@ -54,6 +54,11 @@ export function deckCountLine(deck: Pick<DeckContent, "heroes" | "cards">): stri
   return `${plural(deck.heroes.length, "hero", "heroes")} · ${cards}`;
 }
 
+/** "2 heroes and 4 cards": what a deck holds, for a sentence. */
+export function deckContentsPhrase(deck: Pick<DeckContent, "heroes" | "cards">): string {
+  return `${plural(deck.heroes.length, "hero", "heroes")} and ${plural(deckCardCount(deck.cards), "card", "cards")}`;
+}
+
 /** The heroes' printed threat added up: the starting threat before any campaign penalty (rr.initial-threat-level). */
 export function startingThreat(heroes: readonly string[], faces: ReadonlyMap<string, Pick<DeckFace, "threat">>): number | null {
   if (heroes.length === 0) return null;
