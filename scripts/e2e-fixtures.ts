@@ -114,14 +114,19 @@ function searchWin(): { seed: number; loadout: StoredLoadout; intents: PlayerInt
   const random = generator(12345);
   type Line = { seed: number; state: ScenarioState; intents: PlayerIntent[]; memory: Set<string>; ctx: ReduceContext };
   const stageAt = (state: ScenarioState) => scenario.stages.indexOf(state.cards[state.questStage ?? ""]?.code ?? "");
+  const heroes = (state: ScenarioState) => state.seats.slice(0, state.seatCount).reduce((sum, seat) => sum + seat.heroes.length, 0);
+  const threat = (state: ScenarioState) => Math.max(...state.seats.slice(0, state.seatCount).map((seat) => seat.threat));
   const score = (state: ScenarioState) =>
-    stageAt(state) * 1000 + (state.cards[state.questStage ?? ""]?.progress ?? 0) * 20 + state.victory.length * 30 -
-    Math.max(...state.seats.slice(0, state.seatCount).map((seat) => seat.threat));
+    stageAt(state) * 1000 + (state.cards[state.questStage ?? ""]?.progress ?? 0) * 20 + state.victory.length * 30 + heroes(state) * 60 - threat(state);
+  // The safest games: every hero standing, low threat. Half the beam keeps them, so a strong table is not dropped for one
+  // that ran ahead and cannot survive the next stage.
+  const safety = (state: ScenarioState) => heroes(state) * 100 - threat(state) * 3 + (state.cards[state.questStage ?? ""]?.progress ?? 0);
   let beam: Line[] = [];
   for (let seed = 1; seed <= 40; seed += 1) {
     const { state, ctx } = opened(2, loadout, seed);
     beam.push({ seed, state, intents: [], memory: new Set(), ctx });
   }
+  let retries = 0;
   for (let depth = 0; depth < 40 && beam.length > 0; depth += 1) {
     const children: Line[] = [];
     for (const line of beam) {
@@ -144,8 +149,15 @@ function searchWin(): { seed: number; loadout: StoredLoadout; intents: PlayerInt
         if (!state.lost) children.push({ seed: line.seed, state, intents, memory, ctx: line.ctx });
       }
     }
-    children.sort((left, right) => score(right.state) - score(left.state));
-    beam = children.slice(0, 40);
+    // Every branch lost: play the same round again with fresh answers.
+    if (children.length === 0 && retries < 30) {
+      retries += 1;
+      depth -= 1;
+      continue;
+    }
+    const ahead = [...children].sort((left, right) => score(right.state) - score(left.state)).slice(0, 20);
+    const safe = [...children].sort((left, right) => safety(right.state) - safety(left.state)).filter((line) => !ahead.includes(line)).slice(0, 20);
+    beam = [...ahead, ...safe];
     console.log(`depth ${depth}: ${children.length} alive, best stage ${beam[0] ? stageAt(beam[0].state) : -1}`);
   }
   throw new Error("No won game found");
