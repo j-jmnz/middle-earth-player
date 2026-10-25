@@ -4,7 +4,7 @@
 // - "Allies" headings over "Name x2" rows (the saga and Hobbit rulesheets); a parenthesis there qualifies the name.
 // - "A l ly ( 1 7)" letter-spaced headings over "3x" then "Name (Product, Product)" (the Community Deck Lists).
 // Column extraction can split a row: "3x Daughter of the Nimrodel" over "( 58)", or "Círdan the Shipwright (" with its
-// "5)" a few lines later. Those pieces are joined back to their row.
+// "5)" a few lines later. Those pieces are joined back to their row; a count left with no row fails.
 
 export type Section = "hero" | "ally" | "attachment" | "event" | "player-side-quest";
 
@@ -63,6 +63,7 @@ export function parseDecklist(text: string): PrintedDecklist {
     const line = raw.trim();
     if (line === "") continue;
     const head = heading(line);
+    if (head && pending) throw new Error(`Decklist count with no row before ${line}`);
     if (head) {
       section = head.section;
       if (head.total !== null) totals.set(section, head.total);
@@ -84,8 +85,13 @@ export function parseDecklist(text: string): PrintedDecklist {
       continue;
     }
     const last = pieces.at(-1);
-    if (line.startsWith("(") && last) {
-      last.text = `${last.text} ${line}`;
+    if (line.startsWith("(")) {
+      // A product line printed under its row. When a column prints two names before their products ("Círdan the
+      // Shipwright", "Erestor", "(The Grey Havens)", "(The Treachery of Rhudaur)"), each goes to the first row of the
+      // section still without one.
+      const owner = pieces.find((piece) => piece.section === section && !piece.text.includes("("));
+      if (!owner) throw new Error(`Decklist product line with no row: ${line}`);
+      owner.text = `${owner.text} ${line}`;
       continue;
     }
     const first = COUNT_FIRST.exec(line);
@@ -111,5 +117,6 @@ export function parseDecklist(text: string): PrintedDecklist {
     if (!last || last.section !== section) throw new Error(`Decklist line is not a row: ${line}`);
     last.text = `${last.text} ${line}`;
   }
+  if (pending) throw new Error("Decklist ends on a count with no row");
   return { rows: pieces.map((piece) => ({ section: piece.section, ...split(piece.text), min: piece.min, max: piece.max })), totals };
 }

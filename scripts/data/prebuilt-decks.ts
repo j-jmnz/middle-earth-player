@@ -22,7 +22,7 @@ import type { RuleEntry } from "./rules/spans.ts";
 //   deck also names its RingsDB `product` and DragnCards deck: the sideboard is the rest of the product, and all three
 //   lists must equal DragnCards'.
 // `aliases` maps a name as printed to the card it means, with the reason: a misspelling, a name the card does not carry,
-// or a card listed under the wrong heading.
+// or a collector number that is not the card's.
 const rangeSchema = z.strictObject({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -42,6 +42,9 @@ const printedSchema = z.strictObject({
   sets: z.union([z.array(z.string().min(1)).min(1), z.literal("printed")]),
   product: z.string().min(1).optional(),
   dragncards: z.string().min(1).optional(),
+  // Hall of Beorn numbers this product's reprints differently from its printed collector numbers, so a row whose number
+  // matches no printing falls back to its name (accepted only when one card has it).
+  renumbered: z.literal(true).optional(),
   counts: z.record(z.string(), z.number().int().nonnegative()).optional(),
   misprints: z.partialRecord(sectionSchema, z.string().min(1)).optional(),
   note: z.string().min(1).optional(),
@@ -50,8 +53,9 @@ const aliasSchema = z.strictObject({
   printed: z.string().min(1),
   qualifier: z.string().min(1).optional(),
   collector: z.number().int().positive().optional(),
+  // The one deck the alias is about; without it, every decklist.
+  deck: z.string().min(1).optional(),
   name: z.string().min(1),
-  type: sectionSchema.optional(),
   sets: z.array(z.string().min(1)).optional(),
   sphere: z.string().min(1).optional(),
   reason: z.string().min(1),
@@ -85,7 +89,7 @@ function sameCounts(a: ReadonlyMap<string, number>, b: ReadonlyMap<string, numbe
 
 // Letters and digits only, without accents: "Celebrían’s Stone" and "Celebrian's Stone" compare equal.
 export function plain(text: string): string {
-  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  return text.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
 // "Mountain of Fire" names Hall of Beorn's "The Mountain of Fire"; "Over Hill and Under Hill" its "The Hobbit: Over Hill…".
@@ -117,14 +121,16 @@ function octgnCodes(raw: RawData): Map<string, string> {
 // The catalog card a Hall of Beorn printing is: its RingsDB id when that is a card of the same name (a reprint in a
 // revised product carries a placeholder id), else the one deck-legal card with its name, type and sphere.
 function catalogCode(hob: HobCard, byCode: ReadonlyMap<string, Card>, legal: readonly Card[]): string | null {
-  const direct = hob.RingsDbCardId ? byCode.get(hob.RingsDbCardId) : undefined;
-  if (direct && plain(direct.name) === plain(hob.Title)) return direct.code;
   const sphere = (hob.Sphere ?? "neutral").toLowerCase();
-  const matches = legal.filter((card) => plain(card.name) === plain(hob.Title) && card.type === HOB_TYPE[hob.CardType] && (card.sphere ?? "neutral") === sphere);
+  const same = (card: Card): boolean => plain(card.name) === plain(hob.Title) && card.type === HOB_TYPE[hob.CardType] && (card.sphere ?? "neutral") === sphere;
+  const direct = hob.RingsDbCardId ? byCode.get(hob.RingsDbCardId) : undefined;
+  if (direct && same(direct)) return direct.code;
+  const matches = legal.filter(same);
   return matches.length === 1 ? (matches[0]?.code ?? null) : null;
 }
 
-function rangeDeck(entry: RangeEntry, { raw, byCode, dragn }: Context, fail: Fail): Lists {
+function rangeDeck(entry: RangeEntry, context: Context, fail: Fail): Lists {
+  const { raw, byCode } = context;
   const product = productRows(raw, entry.product);
   const heroNamed = (name: string): string =>
     product.find((row) => byCode.get(row.code)?.type === "hero" && byCode.get(row.code)?.name === name)?.code ?? fail(`${entry.product} has no hero ${name}`);
@@ -133,37 +139,77 @@ function rangeDeck(entry: RangeEntry, { raw, byCode, dragn }: Context, fail: Fai
   const deck: Counts = new Map();
   for (const row of product) if (row.collector >= entry.collectors.from && row.collector <= entry.collectors.to) add(deck, row.code, row.quantity);
   for (const extra of entry.plus) add(deck, atCollector(extra.collector), extra.count);
-  const theirs = dragn(entry.dragncards);
-  if (!sameCounts(new Map(heroes.map((code) => [code, 1])), theirs.play)) fail(`heroes differ from DragnCards ${entry.dragncards}`);
-  if ([...deck.keys()].sort().join() !== [...theirs.deck.keys()].sort().join()) fail(`cards differ from DragnCards ${entry.dragncards}`);
+  // The 2011 core set's 30-card lists: the same heroes and titles, fewer copies.
+  sameAsDragnCards(entry.dragncards, { heroes, titles: deck }, context, fail);
   const collector = new Map(product.map((row) => [row.code, row.collector]));
   return { heroes, deck, side: new Map(), source: entry.span, order: (code) => collector.get(code) ?? 0 };
 }
 
-function printedDeck(entry: PrintedEntry, context: Context, fail: Fail): Lists {
-  const { raw, byCode, entries, aliases } = context;
-  const span = entries.get(entry.span) ?? fail(`span ${entry.span} is not in data/rules/index.json`);
-  const printed = parseDecklist(span.text);
-  const sets = entry.sets === "printed" ? [...new Set(printed.rows.flatMap((row) => (row.qualifier ?? "").split(",").map((name) => name.trim()).filter((name) => name !== "")))] : entry.sets;
-  const legal = [...byCode.values()].filter((card) => card.deckLegal);
+// The products a qualifier names: "The Voice of Isengard, Riders of Rohan".
+function products(qualifier: string | null): string[] {
+  return (qualifier ?? "").split(",").map((name) => name.trim()).filter((name) => name !== "");
+}
 
-  const resolve = (row: PrintedRow): string => {
-    const alias = aliases.find(
-      (item) => item.printed === row.name && (item.qualifier === undefined || item.qualifier === row.qualifier) && (item.collector === undefined || item.collector === row.collector),
-    );
-    const name = alias?.name ?? row.name;
-    const type = alias?.type ?? row.section;
-    // A Community Deck List row names its own products; a row without them looks in every product the list names.
-    const own = entry.sets === "printed" && row.qualifier ? row.qualifier.split(",").map((name) => name.trim()) : null;
-    const within = alias?.sets ?? own ?? sets;
-    const named = raw.hob.filter((hob) => within.some((set) => setMatches(hob.CardSet, set)) && plain(hob.Title) === plain(name) && HOB_TYPE[hob.CardType] === type);
-    const sphered = alias?.sphere ? named.filter((hob) => (hob.Sphere ?? "").toLowerCase() === alias.sphere) : named;
-    const atCollector = sphered.filter((hob) => hob.Number === row.collector);
-    const codes = new Set((atCollector.length > 0 ? atCollector : sphered).map((hob) => catalogCode(hob, byCode, legal)));
-    const [code] = codes;
-    if (codes.size !== 1 || !code) fail(`"${row.name}"${row.collector === null ? "" : ` (${row.collector})`} as a ${type} in ${within.join(", ")} is ${codes.size === 0 ? "no card" : [...codes].join(" or ")}`);
-    return code as string;
-  };
+export function aliasFor(aliases: readonly Alias[], row: PrintedRow, deck: string): Alias | undefined {
+  return aliases.find(
+    (alias) =>
+      plain(alias.printed) === plain(row.name) &&
+      (alias.qualifier === undefined || alias.qualifier === row.qualifier) &&
+      (alias.collector === undefined || alias.collector === row.collector) &&
+      (alias.deck === undefined || alias.deck === deck),
+  );
+}
+
+export type Scope = { deck: string; sets: readonly string[] | "printed"; renumbered: boolean };
+export type Catalog = { hob: readonly HobCard[]; byCode: ReadonlyMap<string, Card>; legal: readonly Card[]; aliases: readonly Alias[] };
+
+// The catalog code of one printed row, or the reason there is not exactly one. A row is looked up by name and type in the
+// products its deck names (a Community Deck List row: the products it prints), then by its collector number.
+export function resolveRow(row: PrintedRow, scope: Scope, catalog: Catalog): { code: string } | { problem: string } {
+  const alias = aliasFor(catalog.aliases, row, scope.deck);
+  const name = alias?.name ?? row.name;
+  const own = scope.sets === "printed" ? products(row.qualifier) : null;
+  if (own && own.length === 0 && !alias?.sets) return { problem: `"${row.name}" prints no product` };
+  const within = alias?.sets ?? own ?? (scope.sets as readonly string[]);
+  const named = catalog.hob.filter((hob) => within.some((set) => setMatches(hob.CardSet, set)) && plain(hob.Title) === plain(name) && HOB_TYPE[hob.CardType] === row.section);
+  const sphered = alias?.sphere ? named.filter((hob) => (hob.Sphere ?? "").toLowerCase() === alias.sphere) : named;
+  // An alias keyed by a collector number says the printed number is not the card's, so the name decides.
+  const atCollector = row.collector === null || alias?.collector !== undefined ? sphered : sphered.filter((hob) => hob.Number === row.collector);
+  const printings = row.collector !== null && atCollector.length === 0 && scope.renumbered ? sphered : atCollector;
+  const codes = new Set(printings.map((hob) => catalogCode(hob, catalog.byCode, catalog.legal)));
+  const [code] = codes;
+  if (codes.size === 1 && code) return { code };
+  const where = `${row.name}${row.collector === null ? "" : ` (${row.collector})`} as a ${row.section} in ${within.join(", ")}`;
+  return { problem: `"${where}" is ${codes.size === 0 ? "no card" : [...codes].join(" or ")}` };
+}
+
+function checkTotals(entry: PrintedEntry, totals: ReadonlyMap<Section, number>, counted: ReadonlyMap<Section, number>, fail: Fail): void {
+  for (const [section, total] of totals) {
+    const misprint = entry.misprints?.[section];
+    if ((counted.get(section) ?? 0) !== total && !misprint) fail(`${section} heading says ${total}, the rows add to ${counted.get(section) ?? 0}`);
+    if ((counted.get(section) ?? 0) === total && misprint) fail(`${section} is recorded as a misprint, but the rows add to the heading`);
+  }
+  for (const section of Object.keys(entry.misprints ?? {})) if (!totals.has(section as Section)) fail(`${section} is recorded as a misprint, but no total is printed`);
+}
+
+// The product's cards that are not in the deck: a starter deck's sideboard.
+function productSideboard(product: readonly ProductRow[], heroes: readonly string[], deck: ReadonlyMap<string, number>, fail: Fail): Counts {
+  const side: Counts = new Map(product.map((row) => [row.code, row.quantity]));
+  for (const [code, count] of [...heroes.map((hero): [string, number] => [hero, 1]), ...deck]) {
+    const left = (side.get(code) ?? 0) - count;
+    if (left < 0) fail(`${code} is not ${count} more cards of the product`);
+    if (left === 0) side.delete(code);
+    else side.set(code, left);
+  }
+  return side;
+}
+
+function printedDeck(entry: PrintedEntry, context: Context, fail: Fail): Lists {
+  const span = context.entries.get(entry.span) ?? fail(`span ${entry.span} is not in data/rules/index.json`);
+  const printed = parseDecklist(span.text);
+  const catalog: Catalog = { hob: context.raw.hob, byCode: context.byCode, legal: [...context.byCode.values()].filter((card) => card.deckLegal), aliases: context.aliases };
+  const scope: Scope = { deck: entry.id, sets: entry.sets, renumbered: entry.renumbered === true };
+  for (const name of Object.keys(entry.counts ?? {})) if (!printed.rows.some((row) => row.name === name && row.min !== row.max)) fail(`counts names "${name}", which is not a printed range`);
 
   const counted = new Map<Section, number>();
   const heroes: string[] = [];
@@ -173,38 +219,32 @@ function printedDeck(entry: PrintedEntry, context: Context, fail: Fail): Lists {
     const chosen = entry.counts?.[row.name];
     if (row.min !== row.max && chosen === undefined) fail(`"${row.name}" is printed ${row.min}-${row.max}x; counts must choose`);
     if (chosen !== undefined && (chosen < row.min || chosen > row.max)) fail(`"${row.name}" count ${chosen} is outside the printed ${row.min}-${row.max}`);
-    const count = chosen ?? row.max;
     counted.set(row.section, (counted.get(row.section) ?? 0) + row.max);
-    const code = resolve(row);
+    const resolved = resolveRow(row, scope, catalog);
+    if ("problem" in resolved) fail(resolved.problem);
+    const code = (resolved as { code: string }).code;
     if (!order.has(code)) order.set(code, order.size);
+    const count = chosen ?? row.max;
     if (count === 0) continue;
     if (row.section === "hero") heroes.push(code);
     else add(deck, code, count);
   }
-  for (const [section, total] of printed.totals) {
-    const misprint = entry.misprints?.[section];
-    if ((counted.get(section) ?? 0) !== total && !misprint) fail(`${section} heading says ${total}, the rows add to ${counted.get(section) ?? 0}`);
-    if ((counted.get(section) ?? 0) === total && misprint) fail(`${section} is recorded as a misprint, but the rows add to the heading`);
-  }
+  checkTotals(entry, printed.totals, counted, fail);
 
-  let side: Counts = new Map();
-  if (entry.product) {
-    side = new Map(productRows(raw, entry.product).map((row) => [row.code, row.quantity]));
-    for (const [code, count] of [...heroes.map((hero): [string, number] => [hero, 1]), ...deck]) {
-      const left = (side.get(code) ?? 0) - count;
-      if (left < 0) fail(`${code} is not ${count} more cards of ${entry.product}`);
-      if (left === 0) side.delete(code);
-      else side.set(code, left);
-    }
-  }
-  if (entry.dragncards) {
-    const theirs = context.dragn(entry.dragncards);
-    if (!sameCounts(new Map(heroes.map((code) => [code, 1])), theirs.play)) fail(`heroes differ from DragnCards ${entry.dragncards}`);
-    if (!sameCounts(deck, theirs.deck)) fail(`deck differs from DragnCards ${entry.dragncards}`);
-    if (!sameCounts(side, theirs.side)) fail(`sideboard differs from DragnCards ${entry.dragncards}`);
-  }
-  const sideOrder = new Map(entry.product ? productRows(raw, entry.product).map((row) => [row.code, row.collector]) : []);
-  return { heroes, deck, side, source: entry.span, order: (code) => order.get(code) ?? 1000 + (sideOrder.get(code) ?? 0), ...(entry.note ? { note: entry.note } : {}) };
+  const product = entry.product ? productRows(context.raw, entry.product) : [];
+  const side = entry.product ? productSideboard(product, heroes, deck, fail) : new Map<string, number>();
+  if (entry.dragncards) sameAsDragnCards(entry.dragncards, { heroes, deck, side }, context, fail);
+  // The printed rows keep their order; the sideboard follows, in the product's collector order.
+  const collector = new Map(product.map((row) => [row.code, row.collector]));
+  return { heroes, deck, side, source: entry.span, order: (code) => order.get(code) ?? order.size + (collector.get(code) ?? 0), ...(entry.note ? { note: entry.note } : {}) };
+}
+
+function sameAsDragnCards(id: string, ours: { heroes: readonly string[]; deck?: Counts; side?: Counts; titles?: Counts }, context: Context, fail: Fail): void {
+  const theirs = context.dragn(id);
+  if (!sameCounts(new Map(ours.heroes.map((code) => [code, 1])), theirs.play)) fail(`heroes differ from DragnCards ${id}`);
+  if (ours.deck && !sameCounts(ours.deck, theirs.deck)) fail(`deck differs from DragnCards ${id}`);
+  if (ours.side && !sameCounts(ours.side, theirs.side)) fail(`sideboard differs from DragnCards ${id}`);
+  if (ours.titles && [...ours.titles.keys()].sort().join() !== [...theirs.deck.keys()].sort().join()) fail(`cards differ from DragnCards ${id}`);
 }
 
 export function loadPrebuiltDecks(raw: RawData, cards: readonly Card[], ruleEntries: readonly RuleEntry[], dataDir = DATA_DIR): PrebuiltDeck[] {

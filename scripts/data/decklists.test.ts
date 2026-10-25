@@ -33,4 +33,14 @@ describe("parseDecklist", () => {
       ["attachment", "Resourceful", null, "The Watcher in the Water", 1],
     ]);
   });
+
+  it("gives each product line to the first row still without one, and fails on a count with no row", () => {
+    const printed = parseDecklist("HE R O (2)\nCírdan the Shipwright\nErestor\n(The Grey Havens)\n(The Treachery of Rhudaur)");
+    expect(printed.rows.map((row) => [row.name, row.qualifier])).toEqual([
+      ["Círdan the Shipwright", "The Grey Havens"],
+      ["Erestor", "The Treachery of Rhudaur"],
+    ]);
+    expect(() => parseDecklist("Allies\n3x\nEvents\nFeint x2")).toThrow("count with no row");
+    expect(() => parseDecklist("Allies\nGandalf x3\n3x")).toThrow("count with no row");
+  });
 });

@@ -116,7 +116,8 @@ export default function DeckImportScreen() {
       heroes: built.heroes,
       cards: built.cards,
       heldRefusal: null,
-      droppedNote: droppedSentence(built.droppedCodes),
+      // The editor's note line also carries a condition the decklist prints with the list (Valor and Vigilance).
+      droppedNote: [droppedSentence(built.droppedCodes), deck.note].filter((text) => text).join(" ") || null,
     });
     router.push({ pathname: "/deck/[id]", params: { id: "new" } });
   }

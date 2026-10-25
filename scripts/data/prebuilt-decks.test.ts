@@ -7,7 +7,7 @@ import { deckSaveRefusal, type DeckSaveCard } from "../../src/catalog/deck-save.
 import { prebuiltDecksSchema } from "../../src/catalog/prebuilt-deck.ts";
 import { parseDecklist } from "./decklists.ts";
 import { loadCards } from "./load-cards.ts";
-import { prebuiltIndexSchema } from "./prebuilt-decks.ts";
+import { aliasFor, prebuiltIndexSchema } from "./prebuilt-decks.ts";
 import { DATA_DIR } from "./paths.ts";
 import type { RuleEntry } from "./rules/spans.ts";
 
@@ -57,17 +57,12 @@ describe("pre-built decks", () => {
   });
 
   it("uses every alias, so none outlives the decklist it was written for", () => {
-    const rows = index.flatMap((entry) => ("sets" in entry ? parseDecklist(entries.find((item) => item.id === entry.span)?.text ?? "").rows : []));
-    const unused = aliases.filter(
-      (alias) =>
-        !rows.some(
-          (row) =>
-            row.name === alias.printed &&
-            (alias.qualifier === undefined || alias.qualifier === row.qualifier) &&
-            (alias.collector === undefined || alias.collector === row.collector),
-        ),
+    const used = new Set(
+      index.flatMap((entry) =>
+        "sets" in entry ? parseDecklist(entries.find((item) => item.id === entry.span)?.text ?? "").rows.map((row) => aliasFor(aliases, row, entry.id)) : [],
+      ),
     );
-    expect(unused).toEqual([]);
+    expect(aliases.filter((alias) => !used.has(alias))).toEqual([]);
   });
 
   // The printed sizes: the Learn to Play's first-game decks are 47 cards, which a saved deck may not be (rr.deckbuilding);
