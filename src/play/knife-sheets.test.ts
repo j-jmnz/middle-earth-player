@@ -8,9 +8,9 @@ import { KNIFE_GOLDENS, knifeIntent, knifeStart, knifeWorld, type KnifeGolden } 
 import { intentsOf } from "../../scripts/sheet-intents.ts";
 
 import { actionsSheet, commitSheet } from "./bar-sheets.ts";
-import { tableLayout } from "./layout.ts";
+import { PEEK, tableLayout } from "./layout.ts";
 import { railFor } from "./rail.ts";
-import { TABLE_ZONES, inspectTargets, zoneSelector, type ZoneId, type ZoneView } from "./selectors.ts";
+import { PILES, TABLE_ZONES, inspectTargets, pileSelector, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
 import type { PickSheet, Sheet, SheetNames } from "./sheet-types.ts";
 import { isStepWindow, sheetFor } from "./sheets.ts";
 
@@ -50,7 +50,7 @@ function playChecked(golden: KnifeGolden, seen: Seen): ScenarioState {
       // An action window answered from the bar: an ordinary one, or one between two framework steps.
       expect(state.window?.kind === "pass" || isStepWindow(state), state.window?.kind).toBe(true);
       if (state.mode === "questCommit" && legal.some((intent) => intent.type === "Commit")) {
-        for (const intent of intentsOf(state, commitSheet(state, ctx, names, []))) expect(reduce(state, intent, ctx).ok).toBe(true);
+        for (const intent of intentsOf(state, commitSheet(state, ctx, names))) expect(reduce(state, intent, ctx).ok).toBe(true);
       }
       for (const intent of intentsOf(state, actionsSheet(state, ctx, legal, names))) expect(reduce(state, intent, ctx).ok).toBe(true);
     }
@@ -117,6 +117,7 @@ const codeOf = (state: ScenarioState, code: string) => Object.values(state.cards
 describe("shadow cards and the cards under Weather Hills", () => {
   const views = (state: ScenarioState): Record<ZoneId, ZoneView> =>
     Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, 0)(state)])) as Record<ZoneId, ZoneView>;
+  const piles = (state: ScenarioState): Record<PileId, PileView> => Object.fromEntries(PILES.map((pile) => [pile, pileSelector(pile, 0)(state)])) as Record<PileId, PileView>;
 
   it("an attacker carries each shadow card dealt to it, face down until its attack (141069:A:2)", () => {
     let state = opened(1);
@@ -127,18 +128,19 @@ describe("shadow cards and the cards under Weather Hills", () => {
     state = updateCard(updateCard(state, first, { face: "down" }), second, { face: "down" });
     expect(state.cards[wraith]?.shadowId).toBe(first);
     expect(state.cards[wraith]?.extraShadowIds).toEqual([second]);
-    const layout = tableLayout(390, 640, views(state));
+    const layout = tableLayout(640, 340, views(state), piles(state));
     const shadows = layout.slots.filter((slot) => slot.kind === "shadow");
     expect(shadows.map((slot) => slot.id)).toEqual([first, second]);
     expect(shadows.every((slot) => slot.faceDown && slot.zone === "engaged")).toBe(true);
     // The band is as deep as the two shadow cards, and the play area starts below the lower one.
-    expect(layout.zones.engaged.h).toBe(layout.card.h + 2 * 12);
+    expect(layout.zones.engaged.h).toBe(layout.card.h + 2 * PEEK);
     const lowest = Math.max(...shadows.map((slot) => slot.y + slot.h));
     expect(lowest).toBeLessThanOrEqual(layout.zones.engaged.y + layout.zones.engaged.h);
     expect(layout.zones.play.y).toBeGreaterThan(lowest);
-    const single = tableLayout(390, 640, views(moveCard(state, second, { zone: "encounterDiscard" })));
-    expect(single.zones.engaged.h).toBe(single.card.h + 12);
-    expect(layout.zones.play.y - single.zones.play.y).toBe(12);
+    const without = moveCard(state, second, { zone: "encounterDiscard" });
+    const single = tableLayout(640, 340, views(without), piles(without));
+    expect(single.zones.engaged.h).toBe(single.card.h + PEEK);
+    expect(layout.zones.play.y - single.zones.play.y).toBe(PEEK);
     // Face down, neither is a card the inspect list opens; turned up, both are.
     expect(inspectTargets(state, wraith)).toEqual([wraith]);
     const up = updateCard(updateCard(state, first, { face: "up" }), second, { face: "up" });
@@ -151,7 +153,7 @@ describe("shadow cards and the cards under Weather Hills", () => {
     const enemy = codeOf(state, "141052");
     state = moveCard(state, hills, { zone: "staging" });
     state = moveCard(state, enemy, { zone: "under", locationId: hills });
-    const layout = tableLayout(390, 640, views(state));
+    const layout = tableLayout(640, 340, views(state), piles(state));
     expect(layout.slots.some((slot) => slot.id === enemy)).toBe(false);
     expect(layout.slots.some((slot) => slot.id === hills)).toBe(true);
   });

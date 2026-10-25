@@ -2,24 +2,23 @@
 //
 // What a dragged card can do. The table never builds every card against every target: it lists which cards can be picked up
 // in this window (from legalIntents, computed once per window), and when the player lifts one it asks legalTargets for that
-// card only. A drop names a zone id or a card id that list returned; the card moves only when the reducer accepts the
-// intent the drop maps to.
+// card only. A drop names a zone id or a card id that list returned. A drop is a pick, like a tap: it never sends an intent.
+// The dock asks to confirm what it picked (table-choice.ts), and the card moves only when the reducer accepts that.
 import { printedOf } from "../rules/printed.ts";
-import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
 import type { DropRect, TableLayout } from "./layout.ts";
-import { playRequest, type PayRequest } from "./pay.ts";
 import { TABLE_ZONES, type ZoneId } from "./selectors.ts";
 
 export type DropTarget = { kind: "zone"; zone: ZoneId } | { kind: "card"; cardId: string };
 
 export type DropOutcome =
-  // Send this intent to the reducer.
-  | { kind: "intent"; intent: PlayerIntent }
-  // The card needs resources named first: open the pay sheet, then send PlayCard with the payments.
-  | { kind: "pay"; request: PayRequest; hostId: string | null }
+  // Play this card (on this host): the dock asks for the payment, or to confirm a free card.
+  | { kind: "play"; cardId: string; hostId: string | null }
   // Add or remove the character from the commit the player is building.
   | { kind: "commit"; cardId: string }
+  // Pick this card in the open sheet: the location to travel to, the enemy to engage.
+  | { kind: "choose"; cardId: string }
   | { kind: "none" };
 
 function has(legal: readonly LegalIntent[], type: LegalIntent["type"]): boolean {
@@ -64,23 +63,10 @@ export function dropOutcome(game: ScenarioState, ctx: ReduceContext, legal: read
   if (!target) return { kind: "none" };
   const targets = dropTargets(game, ctx, legal, cardId);
   if (!targets.some((candidate) => sameTarget(candidate, target))) return { kind: "none" };
-  if (playable(legal, cardId)) {
-    const hostId = target.kind === "card" ? target.cardId : null;
-    const request = playRequest(game, ctx, cardId);
-    if (request) return { kind: "pay", request, hostId };
-    return { kind: "intent", intent: hostId ? { type: "PlayCard", cardId, payments: [], hostId } : { type: "PlayCard", cardId, payments: [] } };
-  }
+  if (playable(legal, cardId)) return { kind: "play", cardId, hostId: target.kind === "card" ? target.cardId : null };
   if (target.kind === "zone" && target.zone === "questStage") return { kind: "commit", cardId };
-  if (target.kind === "zone" && target.zone === "activeLocation") return { kind: "intent", intent: { type: "Travel", locationId: cardId } };
-  if (target.kind === "zone" && target.zone === "engaged") return { kind: "intent", intent: { type: "Engage", enemyId: cardId } };
+  if (target.kind === "zone" && (target.zone === "activeLocation" || target.zone === "engaged")) return { kind: "choose", cardId };
   return { kind: "none" };
-}
-
-/** Adds or removes a character from the commit being built. Only characters the reducer lists can be in it. */
-export function toggleCommit(game: ScenarioState, ctx: ReduceContext, pending: readonly string[], cardId: string): readonly string[] {
-  if (pending.includes(cardId)) return pending.filter((id) => id !== cardId);
-  const legal = legalTargets(game, { type: "Commit" }, ctx);
-  return legal.includes(cardId) ? [...pending, cardId] : pending;
 }
 
 /** A drop target as one string, so a worklet can carry it: "zone:<id>" or "card:<instance id>". */

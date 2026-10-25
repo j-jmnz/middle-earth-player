@@ -6,7 +6,7 @@ import { createStore, type StoreApi } from "zustand/vanilla";
 
 import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
-import { draggableIds, dropTargets, toggleCommit, type DropTarget } from "./selection.ts";
+import { draggableIds, dropTargets, type DropTarget } from "./selection.ts";
 
 // The engine types the screens hold. src/screens reaches the reducer only through src/play and src/campaign.
 export type { EngineStep, LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
@@ -19,16 +19,16 @@ export type TableState = {
   roundSteps: readonly EngineStep[];
   selected: string | null;
   targets: readonly DropTarget[];
-  // Characters the player has put toward a quest commit; nothing is sent until the commit is confirmed.
-  pendingCommit: readonly string[];
   // Why the reducer refused the last intent. Cleared by the next accepted one.
   refusal: string | null;
+  // What the last accepted intent did: the state before it and the engine steps it ran, for the outcome banner. `seq` moves
+  // with each accepted intent.
+  moment: { seq: number; before: ScenarioState; steps: readonly EngineStep[] } | null;
 };
 
 export type TableActions = {
   dispatch: (intent: PlayerIntent) => boolean;
   select: (cardId: string | null) => void;
-  toggleCommit: (cardId: string) => void;
   clearRefusal: () => void;
 };
 
@@ -64,8 +64,8 @@ export function createTableStore(input: TableInput): TableStore {
     roundSteps: input.roundSteps ?? [],
     selected: null,
     targets: [],
-    pendingCommit: [],
     refusal: null,
+    moment: null,
     dispatch: (intent) => {
       const before = get().game;
       const result = reduce(before, intent, ctx);
@@ -79,8 +79,8 @@ export function createTableStore(input: TableInput): TableStore {
         roundSteps: nextRoundSteps(get().roundSteps, before, result.state, result.steps),
         selected: null,
         targets: [],
-        pendingCommit: [],
         refusal: null,
+        moment: { seq: (get().moment?.seq ?? 0) + 1, before, steps: result.steps },
       });
       input.onCommit?.(intent, result.state);
       return true;
@@ -89,10 +89,6 @@ export function createTableStore(input: TableInput): TableStore {
       const { game, legal, selected } = get();
       if (cardId === selected) return;
       set({ selected: cardId, targets: cardId ? dropTargets(game, ctx, legal, cardId) : [] });
-    },
-    toggleCommit: (cardId) => {
-      const { game, pendingCommit } = get();
-      set({ pendingCommit: toggleCommit(game, ctx, pendingCommit, cardId) });
     },
     clearRefusal: () => set({ refusal: null }),
   }));
