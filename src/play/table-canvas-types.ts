@@ -1,6 +1,22 @@
+import type { CardEffects } from "./card-effects.ts";
+import type { LayoutOptions } from "./layout.ts";
 import type { TableStore } from "./store.ts";
 
 export type PictureSource = { uri: string } | number;
+
+// What the open moment marks on the table: the cards a tap does something with, the ones picked (with the share a payment
+// or archery gives each), and what a share is (resources paid, or damage assigned).
+export type TableHighlight = {
+  tappable: ReadonlySet<string>;
+  picked: ReadonlyMap<string, number>;
+  share: "pay" | "damage" | null;
+  // A pick is open (a defender, a location, a payment): the cards it does not ask about are dimmed.
+  dimOthers: boolean;
+};
+
+// The engine's numbers the canvas draws on a card: the effects on it, its willpower while it is committed to the quest, and
+// the quest points of a location or a quest stage.
+export type SlotInfo = { effects: CardEffects; willpower: number | null; questPoints: number | null };
 
 export type TableCanvasProps = {
   store: TableStore;
@@ -15,10 +31,20 @@ export type TableCanvasProps = {
   sphereOf: (code: string) => string | null;
   // True for a card whose unique text has no effect record: the canvas veils its text box.
   inactive: (code: string) => boolean;
-  // A tap on a card. The picture stays on the canvas; the screen opens the inspect route.
-  onInspect: (cardId: string) => void;
+  // The engine's numbers on a card, read from the latest state. The canvas draws again when the cards, the effects in play
+  // or the attack in progress change.
+  info: (cardId: string) => SlotInfo;
+  highlight: TableHighlight;
+  // The hand card the player is playing: drawn whole above the bottom edge.
+  raised: string | null;
+  // A fight picked and not confirmed yet, drawn as if declared.
+  fight: LayoutOptions["preview"];
+  // The bottom safe-area inset the hand stays above.
+  bottomInset: number;
+  // A tap on a card, or on a pile ("pile:discard"). The screen decides what it does; a tap never sends an intent.
+  onTap: (cardId: string) => void;
   // A long press on a face-up card: the screen shows it large over the table.
   onPreview: (cardId: string) => void;
-  // A drag ended on one of the selected card's drop targets (a key from targetKey). The screen asks the reducer.
+  // A drag ended on one of the selected card's drop targets (a key from targetKey). The screen picks; it does not send.
   onDrop: (cardId: string, target: string) => void;
 };

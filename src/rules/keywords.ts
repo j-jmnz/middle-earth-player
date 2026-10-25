@@ -38,7 +38,7 @@ const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "d
 export const ALLIES_CLASS = "allies";
 
 // Whether a modifier is held by this card: by its id, or by the class ALLIES_CLASS.
-function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
+export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
   return modifier.instanceId === instance.id || (modifier.instanceId === ALLIES_CLASS && printed.type === "ally" && inPlay(instance.zone));
 }
 
@@ -87,6 +87,17 @@ export function versusHighEngagement(
   const enemy = enemyId ? state.cards[enemyId] : undefined;
   if (!enemy || printedOf(cards, enemy.code).engagementCost == null) return false;
   return modifiedStat(state, enemy, "engagementCost", cards) > threat;
+}
+
+// A character's defense as the defender of the attack in progress, read as if it were declared, so a modifier that holds
+// only while it defends counts ("while defending against an enemy with an engagement cost higher than your threat":
+// Hobbit Cloak 141013, Boromir 142004).
+export function defenseAsDefender(state: ScenarioState, defenderId: string, cards: ReadonlyMap<string, PrintedCard>): number {
+  const defender = state.cards[defenderId];
+  if (!defender) return 0;
+  const attack = state.pendingAttack;
+  const declared = attack ? { ...state, pendingAttack: { ...attack, defenderId, undefended: false } } : state;
+  return modifiedStat(declared, defender, "defense", cards);
 }
 
 export function addModifier(

@@ -34,6 +34,12 @@ export function intentsOf(state: ScenarioState, sheet: Sheet): PlayerIntent[] {
         ...(sheet.pass ? [{ type: "Pass" } as PlayerIntent] : []),
         ...sheet.options.filter((option) => !option.pay).map((option): PlayerIntent => ({ type: "Trigger", cardId: option.cardId, effectId: option.effectId })),
       ];
+    case "window":
+      return [
+        { type: "Pass" },
+        ...(sheet.commit ? intentsOf(state, sheet.commit).filter((intent) => intent.type !== "Commit" || intent.cardIds.length > 0) : []),
+        ...sheet.triggers.filter((option) => !option.pay).map((option): PlayerIntent => ({ type: "Trigger", cardId: option.cardId, effectId: option.effectId })),
+      ];
     case "outcome":
       return [];
   }

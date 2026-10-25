@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Tabs } from "expo-router";
 
 import { Backdrop } from "./backdrop";
@@ -15,7 +16,10 @@ type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>
 export const pressedNight = { backgroundColor: palette.pressed };
 const pressedPaper = { backgroundColor: palette.paperPressed };
 
-/** Night page with a scene backdrop. Content is inset 24 and starts under the status bar. */
+/**
+ * Night page with a scene backdrop. Content is inset 24 and starts under the status bar; in landscape (the card and booklet
+ * screens can turn with the phone) it is inset past the side safe areas too.
+ */
 export function Screen({
   children,
   testID,
@@ -27,10 +31,13 @@ export function Screen({
   scene?: SceneName;
   inset?: boolean;
 }) {
+  const insets = useSafeAreaInsets();
   return (
     <View testID={testID} collapsable={false} className="flex-1 bg-night">
       <Backdrop scene={scene} />
-      <View className={inset ? "flex-1 px-6 pt-safe" : "flex-1 pt-safe"}>{children}</View>
+      <View className="flex-1 pt-safe" style={inset ? { paddingLeft: 24 + insets.left, paddingRight: 24 + insets.right } : undefined}>
+        {children}
+      </View>
     </View>
   );
 }

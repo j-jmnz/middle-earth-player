@@ -258,19 +258,26 @@ export function strikeEnemy(
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
   const next = state;
-  let attack = 0;
-  for (const attackerId of attackerIds) {
-    const attacker = next.cards[attackerId];
-    if (attacker) attack += modifiedStat(next, attacker, "attack", ctx.cards, enemyId);
-  }
+  const attack = attackStrength(next, attackerIds, enemyId, ctx.cards);
   const defense = modifiedStat(next, enemy, "defense", ctx.cards);
   steps.push({ kind: "attack", side: "player", seat, enemyId });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
+  steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
   const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   // Each attacker hears that the attack destroyed the enemy ("After Merry participates in an attack that destroys an enemy").
   if (damaged.cards[enemyId]?.zone === "engaged") return damaged;
   return attackerIds.reduce((current, attackerId) => queueEvent(current, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, participants: attackerIds }), damaged);
+}
+
+// The attack strength of characters attacking one enemy (rr.step-6-8-2): each attacker's attack, read against that enemy.
+export function attackStrength(state: ScenarioState, attackerIds: readonly string[], enemyId: string, cards: Cards): number {
+  let attack = 0;
+  for (const attackerId of attackerIds) {
+    const attacker = state.cards[attackerId];
+    if (attacker) attack += modifiedStat(state, attacker, "attack", cards, enemyId);
+  }
+  return attack;
 }
 
 export function assignArchery(
