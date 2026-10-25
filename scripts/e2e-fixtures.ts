@@ -1,5 +1,6 @@
-// Writes src/campaign/fixtures/scenario-1.json: saves parked on a moment of A Shadow of the Past for the Maestro flows.
-// Run it again when src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
+// Writes src/campaign/fixtures/scenario-1.json (saves parked on a moment of A Shadow of the Past) and
+// src/campaign/fixtures/a-knife-in-the-dark.json (A Knife in the Dark) for the Maestro flows. Run it again when
+// src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
 //
 //   node --experimental-strip-types scripts/e2e-fixtures.ts
 //
@@ -7,16 +8,25 @@
 // game with the starter decks, so a seeded search tries varied (still legal) answers until one game is won; every intent is
 // one the reducer listed or accepted, and the search is deterministic. `lost`: Stealth and Steadfastness with the saga
 // Frodo, true solo, Normal, every intent up to the loss.
+//
+// `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
+// (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. That game's first seat lost Sam, Merry
+// and Pippin, so the seat plays the Stealth and Steadfastness list with Glóin, Legolas and Denethor (the same spheres) and
+// the briefing's threat penalty; the second seat keeps Wisdom and Wizardry. Two-handed, Easy, the auto-player's answers,
+// every intent up to the loss.
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
-import { deal, resume, contextOf } from "../src/campaign/session.ts";
-import { newSave, type StoredLoadout } from "../src/campaign/save.ts";
-import { loadWorld } from "../src/campaign/world.ts";
+import { deal, finish, resume, contextOf } from "../src/campaign/session.ts";
+import { resolutionView } from "../src/campaign/resolution-view.ts";
+import type { CampaignLog } from "../src/campaign/log.ts";
+import { newSave, type Save, type StoredLoadout } from "../src/campaign/save.ts";
+import { loadWorld, logCodes } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
+import { ENGINE_VERSION } from "../src/rules/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
 import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
 
@@ -139,12 +149,79 @@ function playLoss(): { seed: number; loadout: StoredLoadout; intents: PlayerInte
   return { seed, loadout, intents };
 }
 
+// The log the won game writes when its Resolution is answered with these cards, one choice at a time.
+const PAST_CHOICES = ["141078", "141077"];
+
+function wonLog(won: { seed: number; loadout: StoredLoadout; intents: PlayerIntent[] }): { log: CampaignLog; choices: string[] } {
+  const codes = [FRODO, ...won.loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
+  const world = loadWorld(catalog, campaign, scenario, EFFECTS, codes);
+  const save: Save = { ...newSave("fixture", campaign.id, 2), active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: won.seed, intents: [...won.intents] }, loadout: won.loadout };
+  const resumed = resume(save, world, CATALOG_VERSION);
+  if (!resumed.ok) throw new Error(resumed.reason);
+  let state = resumed.state;
+  const choices: string[] = [];
+  for (let view = resolutionView(state, world); view.kind === "choosing"; view = resolutionView(state, world)) {
+    const tile = view.tiles.find((item) => item.code != null && PAST_CHOICES.includes(item.code));
+    if (!tile) throw new Error(`No Resolution tile for ${PAST_CHOICES.join(" or ")}`);
+    const result = reduce(state, { type: "ChooseResolution", optionId: tile.optionId }, contextOf(world));
+    if (!result.ok) throw new Error(`The Resolution refused ${tile.optionId}: ${result.reason}`);
+    state = result.state;
+    choices.push(tile.optionId);
+  }
+  return { log: finish(save, world, state).log, choices };
+}
+
+function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout; intents: PlayerIntent[] } {
+  const knife = loadScenario("a-knife-in-the-dark");
+  const loadout: StoredLoadout = {
+    scenarioId: knife.id,
+    difficulty: "Easy",
+    seats: [
+      { deckId: "stealth-and-steadfastness", heroes: ["01003", "01005", "01010"], deck: stealth.deck },
+      { deckId: "wisdom-and-wizardry", heroes: wisdom.heroes, deck: wisdom.deck },
+    ],
+    ringBearer: FRODO,
+    choices: [],
+    acceptPenalty: true,
+  };
+  const codes = [FRODO, ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)];
+  const world = loadWorld(catalog, campaign, knife, EFFECTS, codes);
+  const seed = 1;
+  const dealt = deal({ ...newSave("fixture", campaign.id, 2), log }, world, loadout, seed, CATALOG_VERSION);
+  if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
+  const resumed = resume(dealt.save, world, CATALOG_VERSION);
+  if (!resumed.ok) throw new Error(resumed.reason);
+  const ctx = contextOf(world);
+  let state = resumed.state;
+  const intents: PlayerIntent[] = [];
+  const memory = new Set<string>();
+  for (let turn = 0; turn < 6000 && !state.lost && state.window?.kind !== "resolution"; turn += 1) {
+    const intent = nextIntent(state, ctx, { scout: "", prefer: "", protect: FRODO, play: true, act: true }, memory);
+    const result = reduce(state, intent, ctx);
+    if (!result.ok) throw new Error(`The policy sent a refused intent: ${result.reason}`);
+    state = result.state;
+    intents.push(intent);
+  }
+  if (!state.lost) throw new Error("The knife loss fixture did not lose");
+  console.log(`knife-lost: seed ${seed}, ${intents.length} intents, round ${state.round}, ${state.lossReason}`);
+  return { seed, loadout, intents };
+}
+
 const won = searchWin();
 const lost = playLoss();
 const out = {
   won: { seatCount: 2, ...won },
   lost: { seatCount: 1, ...lost },
 };
-const file = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "src", "campaign", "fixtures", "scenario-1.json");
+const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "src", "campaign", "fixtures");
+const file = path.join(dir, "scenario-1.json");
 writeFileSync(file, `${JSON.stringify(out)}\n`);
 console.log(`wrote ${file}`);
+
+const past = wonLog(won);
+const knifeOut = {
+  "knife-lost": { seatCount: 2, ...playKnifeLoss(past.log), log: past.log, past: { fixture: "won", choices: past.choices } },
+};
+const knifeFile = path.join(dir, "a-knife-in-the-dark.json");
+writeFileSync(knifeFile, `${JSON.stringify(knifeOut)}\n`);
+console.log(`wrote ${knifeFile}`);

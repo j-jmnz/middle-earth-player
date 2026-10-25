@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
@@ -8,35 +9,94 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 
+import { cards as cardRows } from "../catalog/schema.ts";
+import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
+
 import { briefing } from "./briefing.ts";
-import { fixture, fixtureSave, FIXTURE_NAMES } from "./fixtures.ts";
+import { fixture, fixtureSave, FIXTURE_NAMES, type FixtureName } from "./fixtures.ts";
+import { campaignPath } from "./path.ts";
 import { choiceSentence, resolutionView, settledSentence } from "./resolution-view.ts";
-import { contextOf, resume } from "./session.ts";
-import { loadWorld } from "./world.ts";
-import { emptyLog } from "./log.ts";
+import { contextOf, finish, resume } from "./session.ts";
+import { loadWorld, logCodes } from "./world.ts";
 import { reduce } from "../rules/reduce.ts";
 
-// The Maestro fixtures (src/campaign/fixtures/scenario-1.json) are real games of the two starter decks: a briefing would deal
-// each loadout, and the reducer replays each to its moment. When this fails, run scripts/e2e-fixtures.ts again.
+// The Maestro fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each
+// loadout, the reducer replays each to its moment, and the A Knife in the Dark one starts from the log scenario 1's won
+// game writes. When this fails, run scripts/e2e-fixtures.ts again.
+
 const campaign = loadCampaign();
-const scenario = loadScenario("a-shadow-of-the-past");
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 
-function worldFor(name: (typeof FIXTURE_NAMES)[number]) {
-  const { loadout } = fixture(name);
-  return loadWorld(catalog, campaign, scenario, EFFECTS, [...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])]);
+function worldFor(name: FixtureName) {
+  const { loadout, log } = fixture(name);
+  const codes = [...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)];
+  return loadWorld(catalog, campaign, loadScenario(loadout.scenarioId), EFFECTS, codes);
 }
 
 describe("Maestro fixtures", () => {
-  it("are loadouts a briefing deals", () => {
+  it("are loadouts a briefing deals, from the fixture's log", () => {
     for (const name of FIXTURE_NAMES) {
-      const { loadout, seatCount } = fixture(name);
-      const plan = briefing({ world: worldFor(name), log: emptyLog(seatCount), seatCount, seats: loadout.seats, ringBearer: loadout.ringBearer, difficulty: loadout.difficulty, choices: loadout.choices, acceptPenalty: loadout.acceptPenalty });
+      const { loadout, seatCount, log } = fixture(name);
+      const plan = briefing({ world: worldFor(name), log, seatCount, seats: loadout.seats, ringBearer: loadout.ringBearer, difficulty: loadout.difficulty, choices: loadout.choices, acceptPenalty: loadout.acceptPenalty });
       expect(plan.problems, name).toEqual([]);
     }
   });
 
+  it("deal ordinary saved decks: deck-legal catalog cards that the deck screen would save", () => {
+    for (const name of FIXTURE_NAMES) {
+      for (const seat of fixture(name).loadout.seats) {
+        const codes = [...new Set([...seat.heroes, ...seat.deck])];
+        const facts = new Map<string, DeckSaveCard>(
+          catalog
+            .select()
+            .from(cardRows)
+            .where(inArray(cardRows.code, codes))
+            .all()
+            .map((row) => [row.code, { name: row.name, typeCode: row.typeCode, sphereCode: row.sphereCode, deckLimit: row.deckLimit, deckLegal: row.deckLegal, traits: row.traits }]),
+        );
+        const counts = [...new Set(seat.deck)].map((code) => ({ code, count: seat.deck.filter((item) => item === code).length }));
+        expect(deckSaveRefusal(seat.heroes, counts, facts), `${name} ${seat.deckId}`).toBeNull();
+      }
+    }
+  });
+
+  it("knife-lost starts from the log scenario 1's won game writes with its Resolution answers", () => {
+    const found = fixture("knife-lost");
+    expect(found.past?.fixture).toBe("won");
+    const world = worldFor("won");
+    let save = fixtureSave("won", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    if (!resumed.ok) throw new Error(resumed.reason);
+    let state = resumed.state;
+    for (const optionId of found.past?.choices ?? []) {
+      const next = reduce(state, { type: "ChooseResolution", optionId }, contextOf(world));
+      if (!next.ok) throw new Error(next.reason);
+      state = next.state;
+    }
+    expect(resolutionView(state, world).kind).toBe("settled");
+    save = finish(save, world, state);
+    expect(found.log).toEqual(save.log);
+    // The answers the scenario-1 Maestro flow gives: Gandalf's Delay and Gildor Inglorion.
+    expect(found.log.campaignPool.map((card) => card.code)).toEqual(["141078", "141077"]);
+    expect(found.log.completed).toEqual(["a-shadow-of-the-past"]);
+    expect(found.loadout.scenarioId).toBe("a-knife-in-the-dark");
+  });
+
+  it("knife-lost: replays to a loss, and finishing it leaves the log as it was", () => {
+    const world = worldFor("knife-lost");
+    const save = fixtureSave("knife-lost", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
+    const after = finish(save, world, resumed.state);
+    expect(after.log).toEqual(save.log);
+    expect(after.active).toBeNull();
+    expect(campaignPath(campaign, {}, after.log).map((node) => node.status).slice(0, 3)).toEqual(["completed", "current", "locked"]);
+  });
+
   it("are stamped with this build's engine and catalog versions", () => {
+    expect(fixtureSave("knife-lost", "s", CATALOG_VERSION).log.completed).toEqual(["a-shadow-of-the-past"]);
     const save = fixtureSave("won", "s", CATALOG_VERSION);
     expect(save.active?.engineVersion).toBe(ENGINE_VERSION);
     expect(save.active?.dataHash).toBe(CATALOG_VERSION);
