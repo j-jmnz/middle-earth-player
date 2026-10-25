@@ -1,6 +1,8 @@
 export type BundledBooklet = {
   moduleId: number;
   filename: string;
+  bytes: number;
+  sha256: string;
 };
 
 // The stub every checkout carries. When `.cache/booklets/bundled-map.ts` exists (written by `pnpm booklets:pack`, which

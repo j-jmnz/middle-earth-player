@@ -56,7 +56,7 @@ describe("pack booklets", () => {
     expect(fetched).toEqual([`https://example.test/${ltp}`]);
     expect(readFileSync(path.join(staged.outDir, "learn-to-play.pdf"))).toEqual(Buffer.from(body(ltp)));
     const map = readFileSync(path.join(staged.outDir, "bundled-map.ts"), "utf8");
-    expect(map).toContain(`"fellowship-of-the-ring": { moduleId: require("./fellowship-of-the-ring.pdf") as number, filename: "${mec109}" },`);
+    expect(map).toContain(`"fellowship-of-the-ring": { moduleId: require("./fellowship-of-the-ring.pdf") as number, filename: "${mec109}", bytes: ${body(mec109).length}, sha256: "${sha256(body(mec109))}" },`);
   });
 
   it("fails when the fetched bytes do not match the pin", async () => {

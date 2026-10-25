@@ -17,6 +17,7 @@ export type PackedBooklet = {
   id: BookletId;
   filename: string;
   bytes: number;
+  sha256: string;
 };
 
 export type PackBookletsOptions = {
@@ -55,7 +56,7 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
       if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data:sync rules and check the change.`);
       writeFileSync(target, body);
     }
-    packed.push({ id, filename, bytes: pin.bytes });
+    packed.push({ id, filename, bytes: pin.bytes, sha256: pin.sha256 });
   }
   writeBookletMap(path.join(options.outDir, "bundled-map.ts"), packed);
   log.info(`packed ${packed.length} booklets (${bytes(packed.reduce((sum, book) => sum + book.bytes, 0))}) into ${options.outDir}; the next Metro bundle carries them`);
@@ -64,12 +65,12 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
 
 function writeBookletMap(mapPath: string, packed: readonly PackedBooklet[]): void {
   const lines = packed.map(
-    (book) => `  ${JSON.stringify(book.id)}: { moduleId: require("./${book.filename}") as number, filename: ${JSON.stringify(BOOKLET_SOURCES[book.id])} },`,
+    (book) => `  ${JSON.stringify(book.id)}: { moduleId: require("./${book.filename}") as number, filename: ${JSON.stringify(BOOKLET_SOURCES[book.id])}, bytes: ${book.bytes}, sha256: ${JSON.stringify(book.sha256)} },`,
   );
   const body = lines.length > 0 ? `\n${lines.join("\n")}\n` : "";
   writeFileSync(
     mapPath,
-    `export type BundledBooklet = {\n  moduleId: number;\n  filename: string;\n};\n\n// Written by scripts/pack-booklets.ts. metro.config.js uses this file in place of src/screens/booklets/bundled-map.ts.\nexport const bundledBooklets: Partial<Record<string, BundledBooklet>> = {${body}};\n`,
+    `export type BundledBooklet = {\n  moduleId: number;\n  filename: string;\n  bytes: number;\n  sha256: string;\n};\n\n// Written by scripts/pack-booklets.ts. metro.config.js uses this file in place of src/screens/booklets/bundled-map.ts.\nexport const bundledBooklets: Partial<Record<string, BundledBooklet>> = {${body}};\n`,
   );
 }
 
