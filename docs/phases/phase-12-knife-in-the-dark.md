@@ -38,6 +38,8 @@ The saga setup still runs: the first seat's chosen Ring-bearer, The One Ring, on
 
 `.maestro/a-knife-in-the-dark.yaml`, tagged `scenario`, opens a seeded save parked on this scenario's resolution, gives one seat a boon on a named hero, relaunches, and finds the boon on that hero in the log with `flight-to-the-ford` unlocked. A loss flow leaves the log unchanged.
 
+Open, 2026-10-25 (user-accepted): the loss flow `.maestro/a-knife-in-the-dark-loss.yaml` ships; the won flow `.maestro/a-knife-in-the-dark.yaml` stays open because no genuine win was found. The work in progress is a session-local patch (`/tmp/claude-0/-home-user-middle-earth-lcg/746912f6-5f4d-5377-98ca-fd6fcac70aec/scratchpad/knife-won-wip.patch`), not in the repository.
+
 ## Exit
 
 Both halves above. The table gains no widget for this scenario.
