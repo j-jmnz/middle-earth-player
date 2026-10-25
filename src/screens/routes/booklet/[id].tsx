@@ -1,12 +1,12 @@
 import { bookletPdfAvailable, bookletPdfUnavailableReason } from "booklet-pdf";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 
 import { BodyText, PrimaryButton, RingMark, Screen, TextButton } from "../../chrome";
 import { bookletName, isBookletId, startPage } from "../../booklets/books";
 import { BookletPdf } from "../../booklets/reader-view";
-import { bookletUri, importBooklet } from "../../booklets/store";
+import { bookletUri, hasBundledBooklet, importBooklet, installBundledBooklet } from "../../booklets/store";
 import { readBooklet, writeLastPage, type BookletRow } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
@@ -32,13 +32,31 @@ export default function Booklet() {
   const [busy, setBusy] = useState(false);
   // The first event a reader sends can be its starting position, not the player turning a page.
   const firstEvent = useRef(true);
+  const known = id != null && isBookletId(id);
+  const stored = row ? bookletUri(row) != null : false;
+  // A build that carries the book installs it the first time it is opened, and again when the stored file is gone.
+  const [installing, setInstalling] = useState(() => id != null && known && !stored && hasBundledBooklet(id) && bookletPdfAvailable());
+
+  useEffect(() => {
+    if (!installing || !id) return;
+    let live = true;
+    void installBundledBooklet(user, id).then((result) => {
+      if (!live) return;
+      if (result.ok) setRow(result.row);
+      else setMessage(result.message);
+      setInstalling(false);
+    });
+    return () => {
+      live = false;
+    };
+  }, [installing, id, user]);
 
   const close = () => {
     if (router.canGoBack()) router.back();
     else router.replace("/");
   };
 
-  if (!id || !isBookletId(id)) {
+  if (!id || !known) {
     return (
       <Screen testID="booklet" scene="plain">
         <View className="flex-1 justify-center gap-3">
@@ -71,6 +89,20 @@ export default function Booklet() {
               if (page >= 1) writeLastPage(user, id, page);
             }}
           />
+        </View>
+        <CloseBar onClose={close} />
+      </Screen>
+    );
+  }
+
+  if (installing) {
+    return (
+      <Screen testID="booklet" scene="plain">
+        <View testID="booklet-installing" className="flex-1 items-center justify-center gap-4 px-2">
+          <RingMark size={28} state="current" />
+          <BodyText tone="muted" className="text-center">
+            {`Opening ${bookletName(id)}`}
+          </BodyText>
         </View>
         <CloseBar onClose={close} />
       </Screen>

@@ -23,7 +23,7 @@ Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm i
 | Files and list images | `expo-file-system`, `expo-image` | image cache, lists, inspect, booklets |
 | Screen state | Zustand | subscribers of reducer output |
 | Local PDF reader | `modules/booklet-pdf`, a local Expo module: PDFKit on iOS, `PdfRenderer` on Android | `src/screens/booklets` |
-| Booklet import | `expo-document-picker` | `src/screens/booklets` |
+| Booklet import | `expo-document-picker`; bundled books through `expo-asset` | `src/screens/booklets` |
 | Dev build | `expo-dev-client` (the local module is not in Expo Go) | device builds |
 | Engine tests | Vitest | `src/rules`, `src/campaign` |
 | End-to-end | Maestro, flows in `.maestro/` | a built app, locally and in an EAS Workflow |
@@ -34,7 +34,7 @@ The catalog is one `drizzle-orm/sqlite-core` schema. The script opens it with `b
 
 Reanimated is the only animation library. Do not add TanStack Query, Redux, a Phoenix client, a server framework, MUI, Emotion, or styled-components.
 
-Android ships an APK or AAB. iOS ships an IPA. A physical iPhone needs Apple signing. The binary contains the Expo shell, native modules, and `catalog.db`. Image files and booklet PDFs stay in the document directory. The binary does not contain them.
+Android ships an APK or AAB. iOS ships an IPA. A physical iPhone needs Apple signing. The binary contains the Expo shell, native modules, `catalog.db`, and the booklet PDFs that `pnpm booklets:pack` bundles on the release machine (`assets/booklets/`, not committed). Image files stay in the document directory. A bundled booklet is copied into the document directory on first open, and the reader reads only that copy.
 
 ## Processes
 
@@ -211,7 +211,7 @@ Two files, two handles, both reachable from screens.
 
 `saves.activeScenario` is `{ engineVersion, dataHash, seed, intents }`, not the table. Loading rebuilds the start from the log and the decks and replays the intents through the reducer. When the engine version or the data hash differs, or the reducer refuses an intent, drop the in-progress scenario and keep the log, the decks, and the image index. Do not migrate a half-played game during this box. `saves.loadout` keeps what the briefing dealt (the heroes and cards of each deck, the Ring-bearer, the difficulty, the answers to the campaign card's choices), so a relaunch rebuilds the same start even if a deck is edited afterwards. The catalog's `cards` rows also carry `encounter_set` and the campaign-card facts the engine reads (`campaign_kind`, `burden_set`, `back_type`), so the phone builds the engine's cards from `catalog.db` and never reads `data/cards`.
 
-`booklets` stores one row per book: id, path, original filename, byte size, sha256, page count, and last page. One file per book lives in the document directory under `booklets/`. Those bytes stay eligible for backup. A catalog update does not delete the row or the file. `expo-document-picker` copies into the cache. Copy that file into `booklets/` before inserting the row. The ids for this box are `fellowship-of-the-ring` and `learn-to-play`. A later campaign adds its own id. The engine does not read the PDF.
+`booklets` stores one row per book: id, path, original filename, byte size, sha256, page count, and last page. One file per book lives in the document directory under `booklets/`. Those bytes stay eligible for backup. A catalog update does not delete the row or the file. `expo-document-picker` copies into the cache. Copy that file into `booklets/` before inserting the row. A bundled book (`src/screens/booklets/bundled-map.ts`, filled by `scripts/pack-booklets.ts`) is resolved through `expo-asset` and stored the same way. The ids for this box are `fellowship-of-the-ring` and `learn-to-play`. A later campaign adds its own id. The engine does not read the PDF.
 
 ## Images
 

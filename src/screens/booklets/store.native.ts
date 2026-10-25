@@ -1,3 +1,4 @@
+import { Asset } from "expo-asset";
 import * as DocumentPicker from "expo-document-picker";
 import { Directory, File, Paths } from "expo-file-system";
 import { pdfPageCount } from "booklet-pdf";
@@ -5,6 +6,7 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { writeBooklet, type BookletRow } from "../campaign-store";
 import { BOOKLET_DIRECTORY, bookletPath } from "./books";
+import { bundledBooklets } from "./bundled-map";
 
 export type ImportResult = { ok: true; row: BookletRow } | { ok: false; reason: "cancelled" | "notPdf" | "unavailable" | "failed"; message: string };
 
@@ -25,23 +27,16 @@ function booksDirectory(): Directory {
 }
 
 /**
- * Picks a PDF, copies it out of the picker's cache into `booklets/<id>.pdf` in the document directory, checks that the
- * platform can read it, and only then records the row. The picker cache is not the store. The file is never fetched
- * from a network and never read by the engine.
+ * Copies `source` into `booklets/<id>.pdf` in the document directory, checks that the platform can read it, and only
+ * then records the row. The source file is left where it is; the caller owns it.
  */
-export async function importBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: string): Promise<ImportResult> {
-  let picked: File | null = null;
+async function storeBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: string, source: File, originalFilename: string, sizeHint: number | null): Promise<ImportResult> {
   let partial: File | null = null;
   try {
-    const result = await DocumentPicker.getDocumentAsync({ type: "application/pdf", copyToCacheDirectory: true, multiple: false });
-    const asset = result.canceled ? null : (result.assets[0] ?? null);
-    if (!asset) return { ok: false, reason: "cancelled", message: "No file was picked." };
-    picked = new File(asset.uri);
-
     const directory = booksDirectory();
     partial = new File(directory, `${id}.partial`);
     if (partial.exists) partial.delete();
-    picked.copy(partial);
+    source.copy(partial);
 
     let pageCount: number;
     try {
@@ -66,8 +61,8 @@ export async function importBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>
       const row: BookletRow = {
         id,
         path: bookletPath(id),
-        originalFilename: asset.name,
-        byteSize: finalFile.size ?? asset.size ?? 0,
+        originalFilename,
+        byteSize: finalFile.size ?? sizeHint ?? 0,
         sha256,
         pageCount,
         lastPage: 1,
@@ -84,7 +79,62 @@ export async function importBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>
     const message = error instanceof Error ? error.message : "The booklet could not be stored.";
     return { ok: false, reason: "failed", message };
   } finally {
-    if (picked?.exists) picked.delete();
     if (partial?.exists) partial.delete();
+  }
+}
+
+/** True when this build carries the book's PDF (scripts/pack-booklets.ts filled the map). */
+export function hasBundledBooklet(id: string): boolean {
+  return bundledBooklets[id] != null;
+}
+
+/**
+ * Stores the copy of the book this build carries, as if the player had picked it. The asset is resolved to a local file
+ * (Android copies it out of the APK's resources into the cache) and copied into `booklets/`. A book the player added
+ * stays; the reader calls this only when no stored file is there.
+ */
+// One install per book at a time: a remounted reader (StrictMode, a quick reopen) joins the install already running.
+const installing = new Map<string, Promise<ImportResult>>();
+
+export function installBundledBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: string): Promise<ImportResult> {
+  const running = installing.get(id);
+  if (running) return running;
+  const install = installFromAsset(user, id).finally(() => installing.delete(id));
+  installing.set(id, install);
+  return install;
+}
+
+async function installFromAsset<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: string): Promise<ImportResult> {
+  const bundled = bundledBooklets[id];
+  if (!bundled) return { ok: false, reason: "unavailable", message: "This build does not carry that booklet." };
+  let resolved: File | null = null;
+  try {
+    const asset = await Asset.fromModule(bundled.moduleId).downloadAsync();
+    if (!asset.localUri) return { ok: false, reason: "failed", message: "The bundled booklet could not be read." };
+    resolved = new File(asset.localUri);
+    return await storeBooklet(user, id, resolved, bundled.filename, null);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "The bundled booklet could not be stored.";
+    return { ok: false, reason: "failed", message };
+  } finally {
+    // Android resolves the asset to a copy in the cache; the stored book is the only copy kept. iOS reads it in place.
+    if (resolved?.exists && resolved.uri.startsWith(Paths.cache.uri)) resolved.delete();
+  }
+}
+
+/** Picks a PDF and stores it. The picker cache is not the store. The file is never fetched from a network and never read by the engine. */
+export async function importBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: string): Promise<ImportResult> {
+  let picked: File | null = null;
+  try {
+    const result = await DocumentPicker.getDocumentAsync({ type: "application/pdf", copyToCacheDirectory: true, multiple: false });
+    const asset = result.canceled ? null : (result.assets[0] ?? null);
+    if (!asset) return { ok: false, reason: "cancelled", message: "No file was picked." };
+    picked = new File(asset.uri);
+    return await storeBooklet(user, id, picked, asset.name, asset.size ?? null);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "The booklet could not be stored.";
+    return { ok: false, reason: "failed", message };
+  } finally {
+    if (picked?.exists) picked.delete();
   }
 }

@@ -4,8 +4,8 @@ const { withNativeWind } = require("nativewind/metro");
 const config = getDefaultConfig(__dirname);
 config.resolver.sourceExts.push("sql");
 
-if (!config.resolver.assetExts.includes("wasm")) {
-  config.resolver.assetExts.push("wasm");
+for (const extension of ["wasm", "pdf"]) {
+  if (!config.resolver.assetExts.includes(extension)) config.resolver.assetExts.push(extension);
 }
 
 const enhanceMiddleware = config.server.enhanceMiddleware;

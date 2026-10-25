@@ -10,3 +10,11 @@ export function bookletUri(_row: BookletRow): string | null {
 export async function importBooklet(_user: unknown, _id: string): Promise<ImportResult> {
   return { ok: false, reason: "unavailable", message: "Booklets can be stored on a phone, not in the browser." };
 }
+
+export function hasBundledBooklet(_id: string): boolean {
+  return false;
+}
+
+export async function installBundledBooklet(_user: unknown, _id: string): Promise<ImportResult> {
+  return { ok: false, reason: "unavailable", message: "Booklets can be stored on a phone, not in the browser." };
+}
