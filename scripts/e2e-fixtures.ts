@@ -11,10 +11,9 @@
 // Frodo, true solo, Normal, every intent up to the loss.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
-// (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. That game's first seat lost Sam, Merry
-// and Pippin, so the seat plays the Stealth and Steadfastness list with Glóin, Legolas and Denethor (the same spheres) and
-// the briefing's threat penalty; the second seat keeps Wisdom and Wizardry. Two-handed, Easy, the auto-player's answers,
-// every intent up to the loss.
+// (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
+// a core set hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
+// penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -81,11 +80,17 @@ function varied(state: ScenarioState, ctx: ReduceContext, random: () => number, 
     if (code !== "141039" && code !== "141042") return { type: "Pass" };
   }
   if (base.type === "Commit") {
-    // How many characters quest, and so how many stay ready for Hide tests and defense, varies by decision.
+    // How many characters quest varies by decision, but one or two always stay ready: a Hide test is passed with the
+    // willpower of ready characters (mec109.hide-tests), and an exhausted table cannot defend.
     const share = [0.4, 0.65, 0.9][Math.floor(random() * 3)] ?? 0.65;
-    const ids = legalTargets(state, { type: "Commit" }, ctx).filter(() => random() < share);
+    const all = legalTargets(state, { type: "Commit" }, ctx);
+    const kept = new Set([...all].sort(() => random() - 0.5).slice(0, 1 + Math.floor(random() * 2)));
+    const ids = all.filter((id) => !kept.has(id) && random() < share);
     return ids.length > 0 ? { type: "Commit", cardIds: ids } : { type: "Pass" };
   }
+  // An Action in the resource phase spends its cost for nothing the phase uses (a stat bonus that ends with it, an
+  // exhausted ally): the search keeps its actions for planning and the quest.
+  if (base.type === "Trigger" && state.mode === "resourceActions") return { type: "Pass" };
   // A choice that could land on the Ring-bearer (a host for Have You Seen Baggins?) takes another option when there is one.
   if (base.type === "Choose" && state.cards[base.optionId]?.code === FRODO) {
     const other = legalIntents(state, ctx).find((intent) => intent.type === "Choose" && state.cards[intent.optionId]?.code !== FRODO);
@@ -222,19 +227,34 @@ function wonLog(won: { seed: number; loadout: StoredLoadout; intents: PlayerInte
   return { log: finish(save, world, state).log, choices };
 }
 
+// A core set hero of the same sphere for each starter hero that can fall (Gandalf is neutral: a Lore hero takes his place).
+const REPLACEMENT: Readonly<Record<string, string>> = {
+  "141002": "01003",
+  "141003": "01005",
+  "141004": "01010",
+  "142002": "01011",
+  "01002": "01001",
+  "01007": "01008",
+};
+
 function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout; intents: PlayerIntent[] } {
   const knife = loadScenario("a-knife-in-the-dark");
+  // Each seat replaces the heroes that fell in the won game (checklist step 2), and takes the threat penalty for it.
+  const replaced = (heroes: readonly string[], seat: number) =>
+    heroes.map((code) => ((log.fallenHeroesBySeat[seat] ?? []).includes(code) ? (REPLACEMENT[code] ?? code) : code));
+  const seats = [replaced(stealth.heroes, 0), replaced(wisdom.heroes, 1)];
   const loadout: StoredLoadout = {
     scenarioId: knife.id,
     difficulty: "Easy",
     seats: [
-      { deckId: "stealth-and-steadfastness", heroes: ["01003", "01005", "01010"], deck: stealth.deck },
-      { deckId: "wisdom-and-wizardry", heroes: wisdom.heroes, deck: wisdom.deck },
+      { deckId: "stealth-and-steadfastness", heroes: seats[0] ?? [], deck: stealth.deck },
+      { deckId: "wisdom-and-wizardry", heroes: seats[1] ?? [], deck: wisdom.deck },
     ],
     ringBearer: FRODO,
     choices: [],
-    acceptPenalty: true,
+    acceptPenalty: log.fallenHeroesBySeat.some((fallen) => fallen.length > 0),
   };
+  console.log(`knife-lost heroes: ${JSON.stringify(seats)}`);
   const codes = [FRODO, ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)];
   const world = loadWorld(catalog, campaign, knife, EFFECTS, codes);
   const seed = 1;
