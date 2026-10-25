@@ -102,7 +102,7 @@ flowchart TD
 | `src/rules` | Round, zones, keywords, window stack, modifier list, effect interpreter, reducer | `src/catalog` |
 | `src/campaign` | Save and log types, saga validators, `buildStart`, resolution | `src/catalog`, `src/rules`, `src/effects` |
 | `src/play` | Skia table, phase rail, sheets, gesture-to-intent mapping | `src/rules`, `src/catalog`, `src/effects` |
-| `modules/booklet-pdf` | Native view and `pageCount` for one local PDF (Swift on iOS, Kotlin on Android); `index.ts` is the JS side and reports `bookletPdfAvailable()` | `expo-modules-core` only |
+| `modules/booklet-pdf` | Native view and `pageCount` for one local PDF (Swift on iOS, Kotlin on Android; Android zooms in `ZoomList`, PDFKit zooms itself); `index.ts` is the JS side and reports `bookletPdfAvailable()` | `expo-modules-core` only |
 | `src/screens` | Expo Router routes, SQLite, image cache, deck editor, booklet reader | `src/play`, `src/campaign`, `src/catalog`, `src/effects` |
 
 The Expo Router root is `src/screens/routes`. Every file in that directory is a page. SQLite, the database provider, and tests stay in `src/screens`, outside that root.
