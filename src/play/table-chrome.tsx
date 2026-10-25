@@ -16,26 +16,35 @@ export { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
 
 const fade = FadeIn.duration(180).reduceMotion(ReduceMotion.System);
 
-/** Previous step, the current step in gold caps, the next step: one centered line. Text, not a control. */
-export function PhaseRail({ rail }: { rail: Rail }) {
+/**
+ * Previous step, the current step in gold caps, the next step: one centered line. Text, not a control. `narrow` (a small
+ * phone in landscape) keeps the current step alone, which may shrink a little to fit.
+ */
+export function PhaseRail({ rail, narrow = false }: { rail: Rail; narrow?: boolean }) {
   return (
     <View testID="rail" accessible accessibilityLabel={`Round ${rail.round}. ${rail.current}`} className="min-w-0 flex-1 flex-row items-center justify-center px-2">
-      <Text testID="rail-previous" numberOfLines={1} className="flex-1 text-right text-label text-muted">
-        {rail.previous}
-      </Text>
-      <Animated.View key={rail.current} entering={fade} className="mx-3">
+      {narrow ? null : (
+        <Text testID="rail-previous" numberOfLines={1} className="flex-1 text-right text-label text-muted">
+          {rail.previous}
+        </Text>
+      )}
+      <Animated.View key={rail.current} entering={fade} style={{ marginHorizontal: 12, flexShrink: 1 }}>
         <Text
           testID="rail-current"
           numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.85}
           className="font-display text-body uppercase text-gold"
           style={{ textShadowColor: t.gold, textShadowRadius: 8, textShadowOffset: { width: 0, height: 0 } }}
         >
           {rail.current}
         </Text>
       </Animated.View>
-      <Text testID="rail-next" numberOfLines={1} className="flex-1 text-label text-muted">
-        {rail.next}
-      </Text>
+      {narrow ? null : (
+        <Text testID="rail-next" numberOfLines={1} className="flex-1 text-label text-muted">
+          {rail.next}
+        </Text>
+      )}
     </View>
   );
 }
@@ -50,12 +59,30 @@ export function threatLine(threats: readonly SeatThreat[], life: number | null):
  * A threat number in a ring, Marcellus, with its label under it, or beside it when `compact` (the top bar of the landscape
  * table). The reducer is the only writer of the number.
  */
-export function ThreatRing({ threat, label, testID, icon = "threat", compact = false }: { threat: SeatThreat; label: string; testID?: string; icon?: IconName | null; compact?: boolean }) {
+export function ThreatRing({
+  threat,
+  label,
+  testID,
+  icon = "threat",
+  compact = false,
+  accessibilityName,
+  active = false,
+}: {
+  threat: SeatThreat;
+  label: string;
+  testID?: string;
+  icon?: IconName | null;
+  compact?: boolean;
+  // What a screen reader says for a short label ("P1" reads "Player 1 threat").
+  accessibilityName?: string;
+  // The seat the table shows in two-handed play: its ring is filled.
+  active?: boolean;
+}) {
   const id = testID ?? `threat-${threat.seat}`;
   if (compact) {
     return (
-      <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="min-h-11 flex-row items-center gap-1.5 px-1">
-        <View className="h-9 w-9 items-center justify-center rounded-pill" style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
+      <View testID={id} accessible accessibilityLabel={`${accessibilityName ?? label} ${threat.threat}`} className="min-h-11 flex-row items-center gap-1.5 px-1">
+        <View className={`h-9 w-9 items-center justify-center rounded-pill ${active ? "bg-goldLine" : ""}`} style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
           <Text testID={`${id}-value`} className="font-display text-body text-bone">
             {String(threat.threat)}
           </Text>

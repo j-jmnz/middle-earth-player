@@ -7,10 +7,12 @@ import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../sc
 
 import { windowSheet } from "./bar-sheets.ts";
 import { momentOf } from "./outcome.ts";
-import { onTableFor, shownSeat } from "./selectors.ts";
+import { tableLayout } from "./layout.ts";
+import { readoutFor } from "./readout.ts";
+import { onTableFor, PILES, pileSelector, shownSeat, TABLE_ZONES, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
-import { choiceFor, dockFor, onTheTable, primaryReady, readoutFor, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
+import { choiceFor, dockFor, onTheTable, primaryReady, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
 
 // Rules: rr.action-windows, rr.step-3-4, rr.step-6-4-3 (data/rules/entries.json). The table answers every moment of whole
 // starter games: a tap on a card only picks it (or opens the question it leads to), the dock's buttons send intents the
@@ -40,9 +42,9 @@ function buttonsOf(dock: Dock) {
 
 // Each button of the dock that sends an intent: the reducer takes it. `fresh` is true for the sheet the window opened with
 // nothing picked yet: there, every button that sends an intent must be armed first.
-function checkDock(state: ScenarioState, sheet: Sheet, choice: Choice | null, table: TapContext, overlay: boolean, fresh: boolean, seen: Seen): void {
+function checkDock(state: ScenarioState, sheet: Sheet, held: Choice | null, table: TapContext, overlay: boolean, fresh: boolean, seen: Seen): void {
   const passLegal = table.legal.some((intent) => intent.type === "Pass");
-  const dock = dockFor(sheet, choice, table, { overlay, passLegal });
+  const dock = dockFor(sheet, choiceFor(sheet, held), table, { overlay, passLegal, surface: "table" });
   for (const { button, ready } of buttonsOf(dock)) {
     if (!ready || button.action.kind !== "intent") continue;
     expect(accepted(state, button.action.intent), `${sheet.kind} ${button.label} ${JSON.stringify(button.action.intent)}`).toBe(true);
@@ -79,9 +81,19 @@ describe("the table answers each moment", () => {
         const sheet = sheetOf(state);
         const table: TapContext = { game: state, ctx, legal, names };
         checkSheet(state, sheet, table, false, 0, seen);
-        // A sheet answered on the table names only cards drawn there.
-        const onTable = onTableFor(state, shownSeat(state));
-        if (onTheTable(sheet, onTable)) for (const id of tappable(sheet)) expect(onTable(id), `${sheet.kind} ${id}`).toBe(true);
+        // A sheet answered on the table names only cards the layout draws whole: a card slot (or the playable top of the
+        // deck), never an attachment strip or a card that is not drawn at all.
+        const seat = shownSeat(state);
+        if (onTheTable(sheet, onTableFor(state, seat))) {
+          const views = Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat)(state)])) as Record<ZoneId, ZoneView>;
+          const piles = Object.fromEntries(PILES.map((pile) => [pile, pileSelector(pile, seat)(state)])) as Record<PileId, PileView>;
+          const deckTop = state.seats[seat]?.deck[0];
+          const layout = tableLayout(560, 330, views, piles, { deckTop: deckTop && legal.some((intent) => intent.type === "PlayCard" && intent.cardId === deckTop) ? state.cards[deckTop] : null });
+          const whole = new Set(layout.slots.filter((slot) => slot.kind === "card").map((slot) => slot.id));
+          // In the action window an attachment's Action peeks out on a strip; the dock's Actions list names it on paper.
+          const listed = new Set(sheet.kind === "window" ? sheet.triggers.map((item) => item.cardId) : []);
+          for (const id of tappable(sheet)) expect(whole.has(id) || listed.has(id), `${sheet.kind} ${id} is not drawn whole`).toBe(true);
+        }
         state = expectOk(reduce(state, nextIntent(state, ctx, { scout: "01002", prefer: "141035", protect: RING_BEARER, play: true, act: true }), ctx)).state;
       }
     }
@@ -112,7 +124,7 @@ describe("numbers beside the quest", () => {
       let state = expectOk(reduce(startScenario(starterStart(deck, seed), ctx), { type: "Keep" }, ctx)).state;
       for (let turn = 0; turn < 600 && !state.lost && !state.stageCleared; turn += 1) {
         const before = state;
-        const readout = readoutFor(before, ctx, sheetOf(before), null);
+        const readout = readoutFor(before, ctx, sheetOf(before), null, (id) => id);
         const result = expectOk(reduce(state, nextIntent(state, ctx, { scout: "01002", prefer: "141035", protect: RING_BEARER, play: true, act: true }), ctx));
         const quest = result.steps.find((step) => step.kind === "quest");
         if (quest?.kind === "quest") {
@@ -133,5 +145,59 @@ describe("numbers beside the quest", () => {
     }
     expect(quests).toBeGreaterThan(5);
     expect(compared).toBeGreaterThan(0);
+  });
+});
+
+describe("numbers beside an attack", () => {
+  it("are the attack and the defense the engine then strikes with, a defender's defending-only bonus included", async () => {
+    let compared = 0;
+    for (const deck of ["stealth-and-steadfastness", "wisdom-and-wizardry"]) {
+      const ctx = (await starterWorld(deck)).ctx;
+      for (const seed of STARTER_SEEDS) {
+        let state = expectOk(reduce(startScenario(starterStart(deck, seed), ctx), { type: "Keep" }, ctx)).state;
+        for (let turn = 0; turn < 900 && !state.lost && !state.stageCleared; turn += 1) {
+          const legal = legalIntents(state, ctx);
+          let intent: PlayerIntent = nextIntent(state, ctx, { scout: "01002", prefer: "141035", protect: RING_BEARER, play: true, act: true });
+          // Keep characters back from the quest so that defenders exist, and defend with the first one the rules allow.
+          if (state.mode === "questCommit" && state.window?.kind === "pass" && legal.some((item) => item.type === "Commit")) intent = { type: "Pass" };
+          const sheet = sheetFor(state, ctx, legal, names);
+          if (state.window?.kind === "defense" && sheet?.kind === "pick") {
+            const option = sheet.options.find((item) => "intent" in item && item.intent.type === "DeclareDefender");
+            if (option && "intent" in option) {
+              const readout = readoutFor(state, ctx, sheet, { key: sheet.key, ids: [option.id], shares: [] }, (id) => id);
+              const result = expectOk(reduce(state, option.intent, ctx));
+              const strike = result.steps.find((step) => step.kind === "strike" && step.targetId === option.id);
+              // A shadow effect may change the numbers after the pick; compare only attacks whose shadow card has none.
+              const shadowCode = state.cards[state.cards[state.window.enemyId]?.shadowId ?? ""]?.code;
+              const shadowed = ctx.effects.some((effect) => effect.cardCode === shadowCode && effect.timing === "shadow");
+              if (strike?.kind === "strike" && !shadowed) {
+                expect(readout?.stats.map((stat) => stat.value)).toEqual([strike.attack, strike.defense]);
+                expect(strike.undefended).toBe(false);
+                compared += 1;
+              }
+              state = result.state;
+              continue;
+            }
+          }
+          state = expectOk(reduce(state, intent, ctx)).state;
+        }
+      }
+    }
+    expect(compared).toBeGreaterThan(0);
+  }, 120_000);
+
+  it("say a defended attack against 0 defense was defended, in the banner and in the log", async () => {
+    const { logLines } = await import("./log.ts");
+    const state = startScenario(starterStart("wisdom-and-wizardry", 1), ctx);
+    const cause = { rule: "rr.step-6-4-3" };
+    const strike = { kind: "strike" as const, side: "enemy" as const, enemyId: "rider", targetId: "pony", attack: 2, defense: 0, undefended: false, cause };
+    const steps = [strike, { kind: "damage" as const, targetId: "pony", amount: 2, cause }];
+    const moment = momentOf(state, state, steps, names);
+    expect(moment?.lines[0]?.text).toBe("Attack 2 against pony's defense 0");
+    const words = (id: string) => id;
+    const lines = logLines(steps, { card: words, code: words, effectCard: () => null, rule: () => null, line: () => null });
+    expect(lines[0]?.text).toBe("Attack 2 against defense 0 on pony");
+    const undefended = logLines([{ ...strike, undefended: true }], { card: words, code: words, effectCard: () => null, rule: () => null, line: () => null });
+    expect(undefended[0]?.text).toBe("Attack 2, undefended, on pony");
   });
 });

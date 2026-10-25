@@ -21,8 +21,9 @@ export type EngineStep =
   | { kind: "quest"; willpower: number; threat: number; cause: Cause }
   | { kind: "attack"; side: "enemy" | "player"; seat: number; enemyId: string }
   // The numbers an attack's combat damage came from (rr.step-6-4-3, rr.step-6-8-3): the attack strength against the defense
-  // of the card it hits (0 for an undefended hero). The damage placed is the `damage` step after it.
-  | { kind: "strike"; side: "enemy" | "player"; enemyId: string; targetId: string; attack: number; defense: number; cause: Cause }
+  // of the card it hits (0 for the hero an undefended attack hits, `undefended`). The damage placed is the `damage` step
+  // after it.
+  | { kind: "strike"; side: "enemy" | "player"; enemyId: string; targetId: string; attack: number; defense: number; undefended: boolean; cause: Cause }
   | { kind: "cancel"; cardId: string }
   | { kind: "resetEncounterDeck"; count: number; cause: Cause };
 

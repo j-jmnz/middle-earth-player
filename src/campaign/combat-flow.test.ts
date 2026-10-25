@@ -89,7 +89,9 @@ function playGame(ctx: ReduceContext, start: ScenarioState, seen: Seen): Scenari
     if (finished) {
       for (const shadowId of shadowCards(before.cards[finished])) {
         const now = state.cards[shadowId];
-        if (now?.zone === "shadow") expect(now.face).toBe("up");
+        // Still with its enemy, it is face up; otherwise the end of combat has already discarded it.
+        if (now?.zone !== "shadow") continue;
+        expect(now.face).toBe("up");
         seen.shadowsTurned += 1;
       }
     }

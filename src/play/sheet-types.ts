@@ -100,6 +100,8 @@ export type TriggerSheet = {
   options: readonly TriggerOption[];
   // The pass button's word, or null when the window cannot be passed.
   pass: string | null;
+  // The ability already picked: the player tapped a card that has only this one.
+  preselect?: string;
 };
 
 export type OutcomeSheet = { kind: "outcome"; key: string; result: "won" | "lost"; title: string; note: string };
@@ -120,9 +122,10 @@ export type WindowSheet = {
   plays: readonly string[];
   // The Actions the rules allow now.
   triggers: readonly TriggerOption[];
-  // The pass button's word, and what passing does.
+  // The pass button's word, what passing does, and what the armed button says before the second tap.
   pass: string;
   passNote: string;
+  armed: string;
 };
 
 export type Sheet = PickSheet | MultiSheet | DistributeSheet | TriggerSheet | OutcomeSheet | WindowSheet;

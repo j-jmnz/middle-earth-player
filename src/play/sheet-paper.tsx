@@ -1,9 +1,10 @@
-// The table chrome's shared pieces: the text and pill buttons, the button that must be tapped twice, the choice tile, the
-// engine's numbers with their icons, the sentence under a disabled action, and the parchment frame (docs/design-system.md,
-// Table). Every press shows its pressed fill in the same frame. Nothing here holds a number the engine did not compute.
-import { useEffect, useRef, useState, type ReactNode } from "react";
+// The table chrome's shared pieces: the text and pill buttons, the choice tile, the engine's numbers with their icons, the
+// sentence under a disabled action, and the parchment frame (docs/design-system.md, Table). The dock's buttons, which arm
+// before they send, are dock-buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number
+// the engine did not compute.
+import type { ReactNode } from "react";
 import { Pressable, Text, View, type DimensionValue } from "react-native";
-import Animated, { Easing, ReduceMotion, SlideInDown, SlideInRight, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { ReduceMotion, SlideInDown, SlideInRight } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
@@ -13,8 +14,6 @@ import { tableTokens as t } from "./tokens.ts";
 const rise = SlideInDown.duration(220).reduceMotion(ReduceMotion.System);
 const slide = SlideInRight.duration(220).reduceMotion(ReduceMotion.System);
 const SHEET_RADIUS = 28;
-// How long an armed button waits for its second tap.
-export const ARM_MS = 3000;
 
 /**
  * The parchment a sheet sits on. From the bottom edge (`edge` "bottom", the default): its fill, corners and bottom inset are
@@ -78,6 +77,7 @@ export function ChromeButton({
   tone = "bone",
   disabled = false,
   accessibilityLabel,
+  accessibilityHint,
 }: {
   label: string;
   onPress: () => void;
@@ -85,6 +85,7 @@ export function ChromeButton({
   tone?: "bone" | "gold" | "ink" | "muted";
   disabled?: boolean;
   accessibilityLabel?: string;
+  accessibilityHint?: string;
 }) {
   const color = disabled ? (tone === "ink" ? "text-inkMuted" : "text-faint") : tone === "gold" ? "text-gold" : tone === "ink" ? "text-inkLabel" : tone === "muted" ? "text-muted" : "text-bone";
   return (
@@ -93,6 +94,7 @@ export function ChromeButton({
       collapsable={false}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
@@ -109,10 +111,28 @@ export function ChromeButton({
  * disabled on paper is an inkLine outline with inkMuted text (docs/design-system.md). A disabled action has a sentence
  * near it saying why.
  */
-export function ChromePrimary({ label, onPress, testID, disabled = false, surface = "night", compact = false }: { label: string; onPress: () => void; testID: string; disabled?: boolean; surface?: "night" | "paper"; compact?: boolean }) {
+export function ChromePrimary({
+  label,
+  onPress,
+  testID,
+  disabled = false,
+  surface = "night",
+  compact = false,
+  accessibilityHint,
+}: {
+  label: string;
+  onPress: () => void;
+  testID: string;
+  disabled?: boolean;
+  surface?: "night" | "paper";
+  // In the table's dock: a 48 pt pill whose label keeps its size (no widest tracking) and wraps to two lines when long.
+  compact?: boolean;
+  accessibilityHint?: string;
+}) {
   const paper = surface === "paper";
-  const fill = paper ? t.ink : t.gold;
-  const pressedFill = paper ? t.ink : t.goldDeep;
+  // The fill is a class, as on the screens' PrimaryButton: a style function alone loses it on the web build. The function
+  // only darkens the pressed pill.
+  const fill = disabled ? (paper ? "border border-inkLine" : "bg-raised") : paper ? "bg-ink" : "bg-gold";
   const text = disabled ? (paper ? "text-inkMuted" : "text-faint") : paper ? "text-paper" : "text-onGold";
   return (
     <Pressable
@@ -120,84 +140,18 @@ export function ChromePrimary({ label, onPress, testID, disabled = false, surfac
       collapsable={false}
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      className={`${compact ? "min-h-12" : "min-h-14"} items-center justify-center rounded-pill px-5`}
-      style={({ pressed }) =>
-        disabled
-          ? paper
-            ? { backgroundColor: "transparent", borderWidth: 1, borderColor: t.inkLine }
-            : { backgroundColor: t.raised }
-          : { backgroundColor: pressed ? pressedFill : fill, opacity: pressed && paper ? 0.85 : 1 }
-      }
+      className={`${compact ? "min-h-12 px-3" : "min-h-14 px-5"} items-center justify-center rounded-pill ${fill}`}
+      style={({ pressed }) => (pressed && !disabled ? (paper ? { opacity: 0.85 } : { backgroundColor: t.goldDeep }) : undefined)}
     >
-      <Text numberOfLines={1} adjustsFontSizeToFit className={`font-display text-body uppercase tracking-widest ${text}`}>
+      {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
+      <Text numberOfLines={compact ? 2 : 1} className={`text-center font-display text-body uppercase ${compact ? "tracking-wide" : "tracking-widest"} ${text}`}>
         {label}
       </Text>
     </Pressable>
-  );
-}
-
-/**
- * A button for an action that cannot be taken back. With `arm` (it sends an intent with nothing picked first: Pass, Keep,
- * Leave undefended), the first tap only arms it: the label asks for a second tap and a bar runs down for three seconds; the
- * second tap confirms, and the bar running out puts it back. Without `arm` (it confirms a pick the player made on the
- * table), one tap confirms. Reduced motion keeps the bar still.
- */
-export function ConfirmButton({
-  label,
-  onConfirm,
-  testID,
-  arm,
-  primary = false,
-  surface = "night",
-  disabled = false,
-}: {
-  label: string;
-  onConfirm: () => void;
-  testID: string;
-  arm: boolean;
-  primary?: boolean;
-  surface?: "night" | "paper";
-  disabled?: boolean;
-}) {
-  // The label the button was armed for: a new label is a new action, so it starts unarmed.
-  const [armedFor, setArmedFor] = useState<string | null>(null);
-  const armed = armedFor === label;
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const left = useSharedValue(1);
-  const reduceMotion = useReducedMotion();
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
-  const press = () => {
-    if (timer.current) clearTimeout(timer.current);
-    if (!arm || armed) {
-      setArmedFor(null);
-      onConfirm();
-      return;
-    }
-    setArmedFor(label);
-    left.set(1);
-    if (!reduceMotion) left.set(withTiming(0, { duration: ARM_MS, easing: Easing.linear }));
-    timer.current = setTimeout(() => setArmedFor(null), ARM_MS);
-  };
-  const bar = useAnimatedStyle(() => ({ width: `${Math.round(left.get() * 100)}%` }));
-  const shown = armed ? `Tap again: ${label}` : label;
-  const paper = surface === "paper";
-  return (
-    <View accessibilityHint={arm ? "Tap twice to confirm" : undefined}>
-      {primary ? (
-        <ChromePrimary label={shown} testID={testID} surface={surface} disabled={disabled} onPress={press} compact />
-      ) : (
-        <ChromeButton label={shown} testID={testID} tone={paper ? "ink" : armed ? "gold" : "bone"} disabled={disabled} onPress={press} />
-      )}
-      {armed ? <Animated.View testID={`${testID}-armed`} style={[{ height: 2, alignSelf: "center", backgroundColor: paper ? t.inkLabel : t.gold, marginTop: 2 }, bar]} /> : null}
-    </View>
   );
 }
 
@@ -238,12 +192,8 @@ export function Tile({
       accessibilityState={{ selected }}
       accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), detail ?? ""].filter((part) => part.length > 0).join(". ")}
       onPress={onPress}
-      className="mb-2 min-h-12 justify-center rounded-tile px-4 py-2"
-      style={({ pressed }) => ({
-        borderWidth: selected ? 1.5 : 1,
-        borderColor: selected ? t.ink : t.inkLine,
-        backgroundColor: pressed ? t.paperPressed : "transparent",
-      })}
+      className={`mb-2 min-h-12 justify-center rounded-tile border px-4 py-2 ${selected ? "border-ink" : "border-inkLine"}`}
+      style={({ pressed }) => ({ borderWidth: selected ? 1.5 : 1, ...(pressed ? { backgroundColor: t.paperPressed } : {}) })}
     >
       <View className="flex-row items-center justify-between gap-2">
         <Text className={`shrink text-body text-ink ${selected ? "font-semibold" : ""}`}>{label}</Text>

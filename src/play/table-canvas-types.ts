@@ -1,4 +1,5 @@
 import type { CardEffects } from "./card-effects.ts";
+import type { LayoutOptions } from "./layout.ts";
 import type { TableStore } from "./store.ts";
 
 export type PictureSource = { uri: string } | number;
@@ -9,6 +10,8 @@ export type TableHighlight = {
   tappable: ReadonlySet<string>;
   picked: ReadonlyMap<string, number>;
   share: "pay" | "damage" | null;
+  // A pick is open (a defender, a location, a payment): the cards it does not ask about are dimmed.
+  dimOthers: boolean;
 };
 
 // The engine's numbers the canvas draws on a card: the effects on it, its willpower while it is committed to the quest, and
@@ -28,10 +31,16 @@ export type TableCanvasProps = {
   sphereOf: (code: string) => string | null;
   // True for a card whose unique text has no effect record: the canvas veils its text box.
   inactive: (code: string) => boolean;
+  // The engine's numbers on a card, read from the latest state. The canvas draws again when the cards, the effects in play
+  // or the attack in progress change.
   info: (cardId: string) => SlotInfo;
   highlight: TableHighlight;
   // The hand card the player is playing: drawn whole above the bottom edge.
   raised: string | null;
+  // A fight picked and not confirmed yet, drawn as if declared.
+  fight: LayoutOptions["preview"];
+  // The bottom safe-area inset the hand stays above.
+  bottomInset: number;
   // A tap on a card, or on a pile ("pile:discard"). The screen decides what it does; a tap never sends an intent.
   onTap: (cardId: string) => void;
   // A long press on a face-up card: the screen shows it large over the table.

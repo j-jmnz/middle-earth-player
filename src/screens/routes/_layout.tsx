@@ -120,7 +120,9 @@ export default function RootLayout() {
                   orientation: "portrait",
                 }}
               >
-                <Stack.Screen name="table/[saveId]" options={{ orientation: "landscape" }} />
+                {/* The table hides the status bar for room, and turns off the edge swipe back: a drag from the hand's edge
+                    must not leave the table. ‹ Path leaves it. */}
+                <Stack.Screen name="table/[saveId]" options={{ orientation: "landscape", statusBarHidden: true, gestureEnabled: false }} />
                 <Stack.Screen name="card/[code]" options={{ orientation: "all" }} />
                 <Stack.Screen name="booklet/[id]" options={{ orientation: "all" }} />
               </Stack>

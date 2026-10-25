@@ -4,7 +4,7 @@
 // lowered (the engine's value against the printed one), each "cannot" an effect put on it, and the effects themselves in
 // words for the preview. The numbers are read with the engine's modifiedStat; nothing here adds one up.
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
-import { ALLIES_CLASS, modifiedStat } from "../rules/keywords.ts";
+import { heldBy, modifiedStat } from "../rules/keywords.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import { questPointsOf } from "../rules/quest.ts";
 import type { ReduceContext } from "../rules/reduce.ts";
@@ -107,8 +107,7 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   const shown = cardEffects(game, ctx, cardId);
   const lines: string[] = [];
   for (const modifier of game.modifiers) {
-    const held = modifier.instanceId === cardId || (modifier.instanceId === ALLIES_CLASS && printed.type === "ally" && inPlay(card.zone));
-    if (!held || !modifierActive(game, modifier)) continue;
+    if (!heldBy(modifier, card, printed) || !modifierActive(game, modifier)) continue;
     const source = modifier.sourceId === cardId ? "its own text" : cardName(modifier.sourceId);
     const word = NUMBER_WORD[modifier.stat];
     if (word) {

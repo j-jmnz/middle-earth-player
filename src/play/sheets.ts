@@ -5,7 +5,7 @@
 // legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a
 // number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../catalog/boundary.ts";
-import { modifiedStat } from "../rules/keywords.ts";
+import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
 import { rejectionReason } from "../rules/legal.ts";
 import { printedOf } from "../rules/printed.ts";
 import { hideWillpower } from "../rules/hide.ts";
@@ -113,6 +113,7 @@ function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNa
     title,
     note: `${note} Undefended: a hero takes all of it.`,
     verb: "Damage to",
+    confirm: "Take the damage",
     options: heroes.map((id) => ({ ...option(game, names, id), intent: { type: "Undefended", heroId: id } })),
     primary: null,
     alternative: null,
@@ -370,8 +371,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : `${note} Choose a defender, or leave it undefended.`,
         verb: "Defend with",
         options: defenders.map((id) => {
-          const defender = game.cards[id];
-          const defense = defender ? modifiedStat(game, defender, "defense", ctx.cards) : 0;
+          const defense = defenseAsDefender(game, id, ctx.cards);
           return { ...option(game, names, id), stats: [{ icon: "defense" as const, value: defense, word: "Defense" }], intent: { type: "DeclareDefender", defenderId: id } };
         }),
         primary: null,

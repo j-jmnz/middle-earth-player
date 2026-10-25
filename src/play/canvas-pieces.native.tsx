@@ -9,7 +9,7 @@ import { useDerivedValue } from "react-native-reanimated";
 import type { CardEffects } from "./card-effects.ts";
 import { SPHERE_TINT, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
-import type { CardSlot, CombatMark } from "./layout.ts";
+import type { CardSlot, CombatMark, Rect } from "./layout.ts";
 import type { Ghost, Motion } from "./motion.ts";
 import { tableTokens as t } from "./tokens.ts";
 import { wrapName } from "./wrap.ts";
@@ -18,7 +18,7 @@ export const RADIUS = 6;
 const LINE = 14;
 const INACTIVE = "Inactive";
 const TOKEN = 18;
-const BADGE_H = 14;
+const BADGE_H = 15;
 
 // Translucent night, from the token, so the palette drift test covers the canvas's veils too.
 export function withAlpha(hex: string, alpha: number): string {
@@ -28,10 +28,17 @@ export function withAlpha(hex: string, alpha: number): string {
 const veil = withAlpha(t.night, 0.62);
 const shadowColor = withAlpha(t.night, 0.5);
 const strip = withAlpha(t.night, 0.72);
-const glow = withAlpha(t.gold, 0.55);
+const dim = withAlpha(t.night, 0.45);
 
-export type Fonts = { names: SkFont; numbers: SkFont; small: SkFont };
-export type TokenImages = { resource: SkImage | null; damage: SkImage | null; progress: SkImage | null };
+export type Fonts = { names: SkFont; numbers: SkFont; small: SkFont; badge: SkFont };
+export type TokenImages = { resource: SkImage | null; damage: SkImage | null; progress: SkImage | null; questPoints: SkImage | null; engagementCost: SkImage | null };
+
+// A badge's icon: the vector glyph tinted, or the token art of quest points and engagement cost as printed.
+function BadgeIcon({ name, x, y, size, color, images }: { name: IconName; x: number; y: number; size: number; color: string; images: TokenImages }) {
+  const raster = name === "questPoints" ? images.questPoints : name === "engagementCost" ? images.engagementCost : null;
+  if (raster) return <Image image={raster} x={x} y={y} width={size} height={size} fit="contain" />;
+  return <CanvasIcon name={name} x={x} y={y} size={size} color={color} />;
+}
 
 // A game icon on the canvas: the vector glyph from ./icons/generated.ts, drawn as a Skia path, flipped from the font's
 // y-up units into the box (x, y, size) and filled with one colour. A raster icon (quest points) is drawn by its caller.
@@ -164,9 +171,12 @@ export function Pile({ slot, image, fonts, label }: { slot: CardSlot; image: SkI
   );
 }
 
-/** The token art on a card, each with its count: resources bottom left, damage top right, progress bottom right. */
-export function Tokens({ slot, images, fonts }: { slot: CardSlot; images: TokenImages; fonts: Fonts }) {
-  const { x, y, w, h } = slot;
+/**
+ * The token art on a card, each with its count: resources bottom left, damage top right, progress bottom right. `rect` is
+ * the card's rectangle on screen, so the tokens of an exhausted card stay upright in its sideways footprint.
+ */
+export function Tokens({ slot, rect, images, fonts }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts }) {
+  const { x, y, w, h } = rect;
   const items: { image: SkImage | null; value: number; cx: number; cy: number; fallback: string }[] = [];
   if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, cx: x + TOKEN / 2 + 1, cy: y + h - TOKEN / 2 - 1, fallback: t.gold });
   if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, cx: x + w - TOKEN / 2 - 1, cy: y + TOKEN / 2 + 1, fallback: t.threat });
@@ -188,44 +198,59 @@ export function Tokens({ slot, images, fonts }: { slot: CardSlot; images: TokenI
 }
 
 /**
- * The effects on a card, along its top edge: each changed number as its icon and the change ("+2"), gold when raised and
- * red when lowered, then each "cannot" as its icon struck through. A committed character shows its willpower at the foot.
+ * The effects on a card, stacked down its left edge under the top: each changed number as its icon and the change ("+2"),
+ * a gold pill when raised and a night pill with danger text when lowered; each "cannot" as its icon struck through; "+n" when
+ * more do not fit. A committed character shows its willpower at the foot, a quest stage or location its progress. `rect` is
+ * upright on screen, so an exhausted card's numbers read the right way.
  */
-export function Badges({ slot, effects, willpower, questPoints, fonts }: { slot: CardSlot; effects: CardEffects; willpower: number | null; questPoints: number | null; fonts: Fonts }) {
-  const { x, y, w, h } = slot;
-  let at = x + 2;
-  const pills: ReactElement[] = [];
-  for (const badge of effects.stats) {
-    const text = `${badge.delta > 0 ? "+" : ""}${badge.delta}`;
-    const width = 12 + fonts.small.getTextWidth(text) + 4;
+export function Badges({ slot, rect, effects, willpower, questPoints, fonts, images }: { slot: CardSlot; rect: Rect; effects: CardEffects; willpower: number | null; questPoints: number | null; fonts: Fonts; images: TokenImages }) {
+  const { x, y, w, h } = rect;
+  // Rows that fit between the top edge and the resource token at the bottom left.
+  const room = Math.max(1, Math.floor((h - TOKEN - 6) / (BADGE_H + 2)));
+  const items = [...effects.stats.map((badge) => ({ kind: "stat" as const, badge })), ...effects.flags.map((flag) => ({ kind: "flag" as const, flag }))];
+  const shown = items.length > room ? items.slice(0, room - 1) : items;
+  const hidden = items.length - shown.length;
+  const rows: ReactElement[] = shown.map((item, index) => {
+    const top = y + 3 + index * (BADGE_H + 2);
+    if (item.kind === "flag") {
+      return (
+        <Group key={`f${item.flag.flag}`}>
+          <RoundedRect x={x + 2} y={top} width={BADGE_H + 4} height={BADGE_H} r={BADGE_H / 2} color={t.night} />
+          <BadgeIcon name={item.flag.icon} x={x + 5} y={top + 2} size={11} color={t.danger} images={images} />
+          <Line p1={vec(x + 4, top + 2)} p2={vec(x + BADGE_H + 2, top + BADGE_H - 2)} color={t.danger} strokeWidth={1.5} />
+        </Group>
+      );
+    }
+    const { badge } = item;
     const up = badge.delta > 0;
-    pills.push(
+    const text = `${up ? "+" : "-"}${Math.abs(badge.delta)}`;
+    const width = 15 + fonts.badge.getTextWidth(text) + 5;
+    return (
       <Group key={`s${badge.stat}`}>
-        <RoundedRect x={at} y={y + 2} width={width} height={BADGE_H} r={BADGE_H / 2} color={up ? t.gold : t.threat} />
-        <CanvasIcon name={badge.icon} x={at + 2} y={y + 4} size={10} color={up ? t.onGold : t.bone} />
-        <Text x={at + 13} y={y + 13} text={text} font={fonts.small} color={up ? t.onGold : t.bone} />
+        <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={up ? t.gold : t.night} />
+        {up ? null : <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={t.danger} style="stroke" strokeWidth={1} />}
+        <BadgeIcon name={badge.icon} x={x + 5} y={top + 2} size={11} color={up ? t.onGold : t.danger} images={images} />
+        <Text x={x + 18} y={top + 11.5} text={text} font={fonts.badge} color={up ? t.onGold : t.danger} />
+      </Group>
+    );
+  });
+  if (hidden > 0) {
+    const top = y + 3 + shown.length * (BADGE_H + 2);
+    rows.push(
+      <Group key="more">
+        <RoundedRect x={x + 2} y={top} width={24} height={BADGE_H} r={BADGE_H / 2} color={t.night} />
+        <Text x={x + 6} y={top + 11.5} text={`+${hidden}`} font={fonts.badge} color={t.bone} />
       </Group>,
     );
-    at += width + 2;
-  }
-  for (const flag of effects.flags) {
-    pills.push(
-      <Group key={`f${flag.flag}`}>
-        <Circle cx={at + BADGE_H / 2} cy={y + 2 + BADGE_H / 2} r={BADGE_H / 2} color={t.night} />
-        <CanvasIcon name={flag.icon} x={at + 2} y={y + 4} size={10} color={t.danger} />
-        <Line p1={vec(at + 2, y + 4)} p2={vec(at + BADGE_H - 2, y + BADGE_H)} color={t.danger} strokeWidth={1.5} />
-      </Group>,
-    );
-    at += BADGE_H + 2;
   }
   return (
-    <Group clip={{ x, y, width: w, height: h }}>
-      {pills}
+    <Group>
+      {rows}
       {slot.committed && willpower != null ? (
         <Group>
-          <RoundedRect x={x + w / 2 - 15} y={y + h - BADGE_H - 3} width={30} height={BADGE_H} r={BADGE_H / 2} color={t.gold} />
-          <CanvasIcon name="willpower" x={x + w / 2 - 12} y={y + h - BADGE_H - 1} size={10} color={t.onGold} />
-          <Text x={x + w / 2 + 1} y={y + h - 6} text={String(willpower)} font={fonts.small} color={t.onGold} />
+          <RoundedRect x={x + w / 2 - 16} y={y + h - BADGE_H - 3} width={32} height={BADGE_H} r={BADGE_H / 2} color={t.gold} />
+          <CanvasIcon name="willpower" x={x + w / 2 - 13} y={y + h - BADGE_H - 1} size={11} color={t.onGold} />
+          <Text x={x + w / 2 + 1} y={y + h - 6.5} text={String(willpower)} font={fonts.badge} color={t.onGold} />
         </Group>
       ) : null}
       {questPoints != null ? (
@@ -239,41 +264,57 @@ export function Badges({ slot, effects, willpower, questPoints, fonts }: { slot:
 }
 
 /**
- * The open moment's marks on a card: a gold glow on a card a tap does something with, a gold edge and a ring on a picked
- * card, and the share a payment or archery gives it.
+ * The open moment's marks on a card, on its upright rectangle: a solid gold edge on a card a tap does something with, a
+ * thicker edge and a ring at its center on a picked card (the share a payment or archery gives it in the ring), and a night
+ * veil over a card the open pick does not ask about.
  */
-export function Marks({ slot, tappable, picked, share, fonts }: { slot: CardSlot; tappable: boolean; picked: number; share: "pay" | "damage" | null; fonts: Fonts }) {
-  const { x, y, w, h } = slot;
+export function Marks({ rect, tappable, picked, share, dimmed, fonts }: { rect: Rect; tappable: boolean; picked: number; share: "pay" | "damage" | null; dimmed: boolean; fonts: Fonts }) {
+  const { x, y, w, h } = rect;
+  if (dimmed) return <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={dim} />;
   if (!tappable && picked === 0) return null;
+  if (picked === 0) return <RoundedRect x={x + 1} y={y + 1} width={w - 2} height={h - 2} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2} />;
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  const text = share ? `${share === "pay" ? "-" : "+"}${picked}` : "";
   return (
     <Group>
-      {picked > 0 ? (
-        <Group>
-          <RoundedRect x={x - 1} y={y - 1} width={w + 2} height={h + 2} r={RADIUS + 1} color={t.gold} style="stroke" strokeWidth={3} />
-          <Circle cx={x + w - 4} cy={y + 4} r={9} color={share === "damage" ? t.threat : t.gold} />
-          {share ? (
-            <Text x={x + w - 4 - fonts.small.getTextWidth(`${share === "pay" ? "-" : "+"}${picked}`) / 2} y={y + 8} text={`${share === "pay" ? "-" : "+"}${picked}`} font={fonts.small} color={share === "damage" ? t.bone : t.onGold} />
-          ) : (
-            // A check, drawn: the system face may not have the glyph.
-            <Group>
-              <Line p1={vec(x + w - 8, y + 4)} p2={vec(x + w - 5, y + 7)} color={t.onGold} strokeWidth={2} />
-              <Line p1={vec(x + w - 5, y + 7)} p2={vec(x + w, y + 1)} color={t.onGold} strokeWidth={2} />
-            </Group>
-          )}
-        </Group>
+      <RoundedRect x={x - 1} y={y - 1} width={w + 2} height={h + 2} r={RADIUS + 1} color={t.gold} style="stroke" strokeWidth={3} />
+      <Circle cx={cx} cy={cy} r={11} color={share === "damage" ? t.threat : t.gold} />
+      {share ? (
+        <Text x={cx - fonts.badge.getTextWidth(text) / 2} y={cy + 4} text={text} font={fonts.badge} color={share === "damage" ? t.bone : t.onGold} />
       ) : (
-        <RoundedRect x={x - 1} y={y - 1} width={w + 2} height={h + 2} r={RADIUS + 1} color={glow} style="stroke" strokeWidth={2} />
+        // A check, drawn: the system face may not have the glyph.
+        <Group>
+          <Line p1={vec(cx - 5, cy)} p2={vec(cx - 1, cy + 4)} color={t.onGold} strokeWidth={2.5} />
+          <Line p1={vec(cx - 1, cy + 4)} p2={vec(cx + 6, cy - 4)} color={t.onGold} strokeWidth={2.5} />
+        </Group>
       )}
     </Group>
   );
 }
 
-/** The mark between an engaged enemy and the characters fighting it: a defense, an undefended hit, an attack. */
-export function CombatMarkView({ mark }: { mark: CombatMark }) {
-  const icon: IconName = mark.kind === "attack" ? "attack" : mark.kind === "defense" ? "defense" : "attack";
-  const color = mark.kind === "undefended" ? t.threat : t.gold;
+/** The enemy whose attack is in progress: a threat-red edge and its attack icon at its side. */
+export function AttackerMark({ rect }: { rect: Rect }) {
+  const { x, y, w, h } = rect;
   return (
     <Group>
+      <RoundedRect x={x - 1} y={y - 1} width={w + 2} height={h + 2} r={RADIUS + 1} color={t.threat} style="stroke" strokeWidth={3} />
+      <Circle cx={x + w} cy={y + h / 2} r={9} color={t.night} />
+      <Circle cx={x + w} cy={y + h / 2} r={9} color={t.threat} style="stroke" strokeWidth={1.5} />
+      <CanvasIcon name="attack" x={x + w - 6} y={y + h / 2 - 6} size={12} color={t.threat} />
+    </Group>
+  );
+}
+
+/**
+ * The mark between an engaged enemy and the characters fighting it: a defense, an undefended hit, an attack. A fight picked
+ * but not confirmed yet is drawn fainter.
+ */
+export function CombatMarkView({ mark }: { mark: CombatMark }) {
+  const icon: IconName = mark.kind === "defense" ? "defense" : "attack";
+  const color = mark.kind === "undefended" ? t.threat : t.gold;
+  return (
+    <Group opacity={mark.preview ? 0.7 : 1}>
       <Circle cx={mark.x} cy={mark.y} r={8} color={t.night} />
       <Circle cx={mark.x} cy={mark.y} r={8} color={color} style="stroke" strokeWidth={1.5} />
       <CanvasIcon name={icon} x={mark.x - 5} y={mark.y - 5} size={10} color={color} />
@@ -284,13 +325,18 @@ export function CombatMarkView({ mark }: { mark: CombatMark }) {
 /**
  * A slot moving into place: at `progress` 0 it is where its motion starts, at 1 where the layout puts it. `epoch` guards the
  * first frame of a new layout: until the UI thread has the new epoch, the slot is drawn where it starts, not where it ends.
+ * The card itself turns (exhausted, the hand's fan); `overlay` (tokens, effects, marks) moves with it but stays upright.
  */
-export function Moving({ slot, motion, progress, epoch, at, children }: { slot: CardSlot; motion: Motion; progress: SharedValue<number>; epoch: SharedValue<number>; at: number; children: ReactNode }) {
+export function Moving({ slot, motion, progress, epoch, at, children, overlay }: { slot: CardSlot; motion: Motion; progress: SharedValue<number>; epoch: SharedValue<number>; at: number; children: ReactNode; overlay?: ReactNode }) {
   const origin = vec(slot.x + slot.w / 2, slot.y + slot.h / 2);
   const transform = useDerivedValue(() => {
     const p = epoch.get() === at ? progress.get() : 0;
     const q = 1 - p;
-    return [{ translateX: motion.dx * q }, { translateY: motion.dy * q }, { scale: 1 + (motion.scale - 1) * q }, { rotate: motion.toRot + (motion.fromRot - motion.toRot) * q }];
+    return [{ translateX: motion.dx * q }, { translateY: motion.dy * q }, { scale: 1 + (motion.scale - 1) * q }];
+  }, [motion, at]);
+  const turn = useDerivedValue(() => {
+    const p = epoch.get() === at ? progress.get() : 0;
+    return [{ rotate: motion.toRot + (motion.fromRot - motion.toRot) * (1 - p) }];
   }, [motion, at]);
   const opacity = useDerivedValue(() => {
     const p = epoch.get() === at ? progress.get() : 0;
@@ -298,7 +344,10 @@ export function Moving({ slot, motion, progress, epoch, at, children }: { slot: 
   }, [motion, at]);
   return (
     <Group transform={transform} origin={origin} opacity={opacity}>
-      {children}
+      <Group transform={turn} origin={origin}>
+        {children}
+      </Group>
+      {overlay}
     </Group>
   );
 }

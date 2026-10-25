@@ -14,10 +14,16 @@ export type PileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
 
 export const PILES: readonly PileId[] = ["deck", "discard", "encounterDeck", "encounterDiscard"];
 
+export const PILE_WORDS: Readonly<Record<PileId, string>> = { deck: "Deck", discard: "Discard pile", encounterDeck: "Encounter deck", encounterDiscard: "Encounter discard pile" };
+
+// How characters fight an engaged enemy in the attack in progress: defending it, hit by it undefended, or attacking it.
+export type FightKind = "defense" | "undefended" | "attack";
+
 // One card on the table and the cards attached to it, in the order they were attached, then each shadow card dealt to it
 // (the first one first; a Ringwraith can carry an additional one, 141069:A:2). An engaged enemy in an attack also carries
-// the characters fighting it (`paired`): the defender, the hero an undefended attack hits, or the attackers.
-export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[] };
+// the characters fighting it (`paired`) and how (`fight`): the defender, the hero an undefended attack hits, or the
+// attackers.
+export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[]; fight: FightKind | null };
 export type ZoneView = { zone: ZoneId; seat: number; entries: readonly ZoneEntry[] };
 
 const NONE: readonly string[] = [];
@@ -27,20 +33,25 @@ const EMPTY: readonly CardInstance[] = [];
  * The characters in the attack in progress, by the enemy they fight: the declared defender, or the hero an undefended attack
  * hits once named; the attackers of a player attack. Only enemies engaged with `seat`.
  */
-export function combatPairs(game: ScenarioState, seat: number): ReadonlyMap<string, readonly string[]> {
-  const pairs = new Map<string, readonly string[]>();
+export function combatPairs(game: ScenarioState, seat: number): ReadonlyMap<string, { ids: readonly string[]; kind: FightKind }> {
+  const pairs = new Map<string, { ids: readonly string[]; kind: FightKind }>();
   const engaged = game.seats[seat]?.engaged ?? NONE;
   const attack = game.pendingAttack;
   if (attack && engaged.includes(attack.enemyId)) {
-    const fighter = attack.defenderId != null && !attack.undefended ? attack.defenderId : (attack.heroId ?? null);
-    if (fighter && game.cards[fighter]) pairs.set(attack.enemyId, [fighter]);
+    const defended = attack.defenderId != null && !attack.undefended;
+    const fighter = defended ? attack.defenderId : (attack.heroId ?? null);
+    if (fighter && game.cards[fighter]) pairs.set(attack.enemyId, { ids: [fighter], kind: defended ? "defense" : "undefended" });
   }
   const strike = game.pendingStrike;
   if (strike && engaged.includes(strike.enemyId)) {
     const attackers = strike.attackerIds.filter((id) => game.cards[id] != null);
-    if (attackers.length > 0) pairs.set(strike.enemyId, attackers);
+    if (attackers.length > 0) pairs.set(strike.enemyId, { ids: attackers, kind: "attack" });
   }
   return pairs;
+}
+
+function fightingIds(game: ScenarioState, seat: number): ReadonlySet<string> {
+  return new Set([...combatPairs(game, seat).values()].flatMap((pair) => pair.ids));
 }
 
 /** The instance ids a zone holds, for the seat the table shows. A one-card zone is a list of zero or one. */
@@ -61,7 +72,7 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number): readon
       if (!owner) return NONE;
       // An attachment is in its controller's play list and on its host; the table draws it on the host only. A character in
       // the attack in progress is drawn beside the enemy it fights, in the engagement area.
-      const fighting = new Set([...combatPairs(game, seat).values()].flat());
+      const fighting = fightingIds(game, seat);
       return [...owner.heroes, ...owner.play].filter((id) => {
         const card = game.cards[id];
         return card != null && card.host == null && !fighting.has(id);
@@ -83,7 +94,7 @@ function sameEntries(previous: readonly ZoneEntry[], next: readonly ZoneEntry[])
   for (let index = 0; index < next.length; index += 1) {
     const a = previous[index];
     const b = next[index];
-    if (!a || !b || a.card !== b.card || !sameCards(a.attached, b.attached) || !sameCards(a.paired, b.paired)) return false;
+    if (!a || !b || a.card !== b.card || a.fight !== b.fight || !sameCards(a.attached, b.attached) || !sameCards(a.paired, b.paired)) return false;
   }
   return true;
 }
@@ -97,15 +108,15 @@ function cardsOf(game: ScenarioState, ids: readonly string[]): CardInstance[] {
   return out;
 }
 
-function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReadonlyMap<string, readonly string[]>): ZoneEntry[] {
+function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnType<typeof combatPairs>): ZoneEntry[] {
   const entries: ZoneEntry[] = [];
   for (const id of ids) {
     const card = game.cards[id];
     if (!card) continue;
     // An engaged enemy's shadow cards travel with it, so turning one up changes this zone's view.
     const attached = cardsOf(game, [...card.attachments, ...shadowCards(card)]);
-    const paired = pairs.get(id);
-    entries.push({ card, attached, paired: paired ? cardsOf(game, paired) : EMPTY });
+    const pair = pairs.get(id);
+    entries.push({ card, attached, paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null });
   }
   return entries;
 }
@@ -117,7 +128,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReadonlyM
 export function zoneSelector(zone: ZoneId, seat: number): (game: ScenarioState) => ZoneView {
   let previous: ZoneView | null = null;
   return (game) => {
-    const pairs = zone === "engaged" ? combatPairs(game, seat) : new Map<string, readonly string[]>();
+    const pairs = zone === "engaged" ? combatPairs(game, seat) : new Map<string, { ids: readonly string[]; kind: FightKind }>();
     const entries = entriesOf(game, zoneIds(game, zone, seat), pairs);
     if (previous && sameEntries(previous.entries, entries)) return previous;
     previous = { zone, seat, entries };
@@ -189,15 +200,16 @@ export function inspectTargets(game: ScenarioState, cardId: string): readonly st
 }
 
 /**
- * Whether a card is drawn on the table the seat sees: in staging, the active location or the quest; in the seat's hand,
- * heroes, play area or engagement area; fighting one of its enemies; attached to (or a shadow card of) such a card; or the
- * top of its deck when the rules let it be played from there.
+ * Whether a card is drawn whole on the table the seat sees, a full target for a tap: in staging, the active location or the
+ * quest; in the seat's hand, heroes, play area or engagement area; fighting one of its enemies; or the top of its deck when
+ * the rules let it be played from there. An attachment or a shadow card only peeks out under its host, so a choice among
+ * them is made on a panel's tiles instead.
  */
 export function onTableFor(game: ScenarioState, seat: number): (cardId: string) => boolean {
-  const fighting = new Set([...combatPairs(game, seat).values()].flat());
-  const visible = (cardId: string, depth: number): boolean => {
+  const fighting = fightingIds(game, seat);
+  return (cardId) => {
     const card = game.cards[cardId];
-    if (!card || depth > 3) return false;
+    if (!card) return false;
     if (fighting.has(cardId)) return true;
     switch (card.zone) {
       case "staging":
@@ -210,15 +222,11 @@ export function onTableFor(game: ScenarioState, seat: number): (cardId: string) 
       case "engaged":
         return card.controller === seat;
       case "play":
-        return card.host ? visible(card.host, depth + 1) : card.controller === seat;
-      case "attached":
-      case "shadow":
-        return card.host != null && visible(card.host, depth + 1);
+        return card.host == null && card.controller === seat;
       case "deck":
         return game.seats[seat]?.deck[0] === cardId;
       default:
         return false;
     }
   };
-  return (cardId) => visible(cardId, 0);
 }

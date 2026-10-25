@@ -188,7 +188,12 @@ describe("layout", () => {
       // Staging, the engagement area and the play area are stacked above the hand's strip.
       expect(layout.zones.engaged.y).toBeGreaterThanOrEqual(layout.zones.staging.y + layout.zones.staging.h);
       expect(layout.zones.play.y).toBeGreaterThanOrEqual(layout.zones.engaged.y + layout.zones.engaged.h);
-      expect(layout.zones.hand.y).toBe(height - Math.round(size.h * HAND_SHOW));
+      // Each hand card shows at least a 44 pt target above the bottom edge, its fan drop included.
+      expect(height - layout.zones.hand.y).toBe(Math.max(52, Math.round(size.h * HAND_SHOW)));
+      for (const slot of layout.slots.filter((candidate) => candidate.zone === "hand")) expect(height - slot.y).toBeGreaterThanOrEqual(44);
+      // Laid out above a bottom inset, the hand leaves that zone clear.
+      const inset = tableLayout(width, height, views(kept), piles(kept), { bottomInset: 21 });
+      for (const slot of inset.slots.filter((candidate) => candidate.zone === "hand")) expect(height - 21 - slot.y).toBeGreaterThanOrEqual(44);
     }
   });
 

@@ -10,7 +10,7 @@ import { STEP_WORDS } from "./rail.ts";
 import type { DistributePurpose, DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet, WindowSheet } from "./sheet-types.ts";
 import { option, statOf, step, triggerOptions } from "./sheets.ts";
 
-export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, pendingCommit: readonly string[]): MultiSheet {
+export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames): MultiSheet {
   return {
     kind: "multi",
     key: `commit:${game.round}`,
@@ -21,7 +21,7 @@ export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: Shee
     options: legalTargets(game, { type: "Commit" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
     build: { kind: "Commit" },
     allowEmpty: false,
-    preselected: pendingCommit,
+    preselected: [],
     alternative: null,
   };
 }
@@ -42,10 +42,6 @@ export function actionsSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   };
 }
 
-function seatWords(game: ScenarioState): string {
-  return game.seatCount > 1 ? `Player ${game.activeSeat + 1}: ` : "";
-}
-
 /**
  * The ordinary action window as the table answers it: what can be played and used now, the quest commit in the commit
  * window, and Pass. Every card it names comes from legalIntents.
@@ -53,33 +49,30 @@ function seatWords(game: ScenarioState): string {
 export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): WindowSheet {
   const plays = legal.flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
   const triggers = triggerOptions(game, ctx, legal, names);
-  const commit = game.mode === "questCommit" && legal.some((intent) => intent.type === "Commit") ? commitSheet(game, ctx, names, []) : null;
+  const commit = game.mode === "questCommit" && legal.some((intent) => intent.type === "Commit") ? commitSheet(game, ctx, names) : null;
   const usable = plays.length > 0 || triggers.length > 0;
-  const base = { kind: "window" as const, key: `window:${game.round}:${game.mode}:${game.activeSeat}:${game.stepWindows.length}`, step: step(game), commit, plays, triggers };
+  // The eyebrow is the phase; the title says what the window is for.
+  const base = { kind: "window" as const, key: `window:${game.round}:${game.mode}:${game.activeSeat}:${game.stepWindows.length}`, step: game.phase, commit, plays, triggers };
   if (commit) {
-    return {
-      ...base,
-      title: `${seatWords(game)}Commit to the quest`,
-      note: "Tap characters to send them on the quest. Committed characters exhaust.",
-      pass: "Pass",
-      passNote: "Passing sends no one on the quest.",
-    };
+    return { ...base, title: "Commit to the quest", note: "Tap characters to quest. They exhaust.", pass: "Commit no one", passNote: "Pass sends no one.", armed: "Tap again: no one quests" };
   }
   if (game.mode === "planning") {
     return {
       ...base,
-      title: `${seatWords(game)}Planning`,
-      note: usable ? "Tap a glowing card to play or use it, or drag it onto the table." : "Nothing in your hand can be played now.",
+      title: "Play allies and attachments",
+      note: usable ? "Tap a glowing card to play it, or drag it." : "Nothing in your hand can be played now.",
       pass: "Pass",
-      passNote: "Passing ends your planning.",
+      passNote: "Pass ends your planning.",
+      armed: "Tap again: planning ends",
     };
   }
   return {
     ...base,
-    title: `${seatWords(game)}Action window`,
-    note: usable ? "Tap a glowing card to play or use it." : null,
+    title: "Action window",
+    note: usable ? "Tap a glowing card to use it." : null,
     pass: "Pass",
-    passNote: "The game goes on once every player has passed.",
+    passNote: game.seatCount > 1 ? "The game moves on once both players pass." : "Pass moves the game on.",
+    armed: "Tap again to pass",
   };
 }
 
@@ -140,6 +133,8 @@ export function cardTriggerSheet(game: ScenarioState, names: SheetNames, trigger
     hide: null,
     options,
     pass: null,
+    // The tap on the card was the pick when it has one ability.
+    ...(options.length === 1 && options[0] ? { preselect: options[0].id } : {}),
   };
 }
 

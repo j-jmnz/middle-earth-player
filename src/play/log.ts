@@ -90,9 +90,7 @@ function words(step: EngineStep, names: LogNames): string | null {
     case "quest":
       return `Quest: willpower ${step.willpower} against threat ${step.threat}`;
     case "strike":
-      return step.defense > 0 || step.side === "player"
-        ? `Attack ${step.attack} against defense ${step.defense} on ${names.card(step.targetId)}`
-        : `Attack ${step.attack}, undefended, on ${names.card(step.targetId)}`;
+      return step.undefended ? `Attack ${step.attack}, undefended, on ${names.card(step.targetId)}` : `Attack ${step.attack} against defense ${step.defense} on ${names.card(step.targetId)}`;
     case "advance":
       return `The quest advances to ${names.card(step.cardId)}`;
     case "attack":

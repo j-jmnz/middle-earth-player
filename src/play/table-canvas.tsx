@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useStore } from "zustand";
 
-import { PILES, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
+import { PILE_WORDS, PILES, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { tableTokens as t } from "./tokens.ts";
 
@@ -19,8 +19,6 @@ const ZONE_WORD: Record<ZoneId, string> = {
   hand: "Hand",
 };
 
-const PILE_WORD: Record<PileId, string> = { deck: "Deck", discard: "Discard pile", encounterDeck: "Encounter deck", encounterDiscard: "Encounter discard pile" };
-
 type RowProps = Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "onTap" | "onPreview" | "highlight"> & { seat: number };
 
 function CardButton({ id, label, faceDown, onTap, onPreview, highlight }: { id: string; label: string; faceDown: boolean } & Pick<TableCanvasProps, "onTap" | "onPreview" | "highlight">) {
@@ -33,8 +31,8 @@ function CardButton({ id, label, faceDown, onTap, onPreview, highlight }: { id: 
       onPress={() => onTap(id)}
       onLongPress={faceDown ? undefined : () => onPreview(id)}
       delayLongPress={350}
-      className="min-h-11 justify-center rounded-tile px-2"
-      style={({ pressed }) => ({ backgroundColor: pressed ? t.hairline : picked > 0 ? t.goldLine : t.raised, borderWidth: tappable ? 1 : 0, borderColor: t.gold })}
+      className={`min-h-11 justify-center rounded-tile px-2 ${picked > 0 ? "bg-goldLine" : "bg-raised"} ${tappable ? "border border-gold" : ""}`}
+      style={({ pressed }) => (pressed ? { backgroundColor: t.hairline } : undefined)}
     >
       <Text className={faceDown ? "text-label text-faint" : "text-label text-bone"}>{picked > 1 ? `${label} · ${picked}` : label}</Text>
     </Pressable>
@@ -69,7 +67,7 @@ function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight }: Row
   const select = useMemo(() => pileSelector(pile, seat), [pile, seat]);
   const view = useStore(store, (state) => select(state.game));
   const top = view.top ? ` · ${nameOf(view.top.code)} on top` : "";
-  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORD[pile]} (${view.ids.length})${top}`} onTap={onTap} onPreview={onPreview} highlight={highlight} />;
+  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORDS[pile]} (${view.ids.length})${top}`} onTap={onTap} onPreview={onPreview} highlight={highlight} />;
 }
 
 export function TableCanvas({ store, width, height, nameOf, inactive, onTap, onPreview, highlight }: TableCanvasProps) {

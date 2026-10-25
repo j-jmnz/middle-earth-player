@@ -7,7 +7,7 @@
 // with its shadow cards and the characters fighting it), the play area, and the hand, which peeks up from the bottom edge.
 import type { CardInstance } from "../rules/state.ts";
 
-import type { PileId, PileView, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
+import type { FightKind, PileId, PileView, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
 
 export type Rect = { x: number; y: number; w: number; h: number };
 
@@ -37,7 +37,8 @@ export type CardSlot = Rect & {
 
 // The mark between an engaged enemy and the characters fighting it: a defense, the hero an undefended attack hits, or an
 // attack by the players.
-export type CombatMark = { x: number; y: number; kind: "defense" | "undefended" | "attack"; enemyId: string };
+// `preview` marks a fight the player has picked but not confirmed yet.
+export type CombatMark = { x: number; y: number; kind: FightKind; enemyId: string; preview: boolean };
 
 export type TableLayout = {
   width: number;
@@ -47,6 +48,8 @@ export type TableLayout = {
   piles: Readonly<Record<PileId, Rect>>;
   slots: readonly CardSlot[];
   marks: readonly CombatMark[];
+  // The enemy whose attack is in progress, edged on the table from the moment it attacks.
+  attacker: string | null;
 };
 
 export type LayoutViews = Readonly<Record<ZoneId, ZoneView>>;
@@ -55,6 +58,12 @@ export type PileViews = Readonly<Record<PileId, PileView>>;
 export type LayoutOptions = {
   // The hand card the player has picked: drawn whole above the bottom edge.
   raised?: string | null;
+  // The bottom safe-area inset: the hand is laid out above it, out of the home indicator's zone.
+  bottomInset?: number;
+  // The enemy whose attack is in progress.
+  attacker?: string | null;
+  // A fight the player has picked and not confirmed: those characters are drawn beside that enemy already.
+  preview?: { enemyId: string; ids: readonly string[]; kind: FightKind } | null;
   // The top card of the deck when the rules let the player play it (Gandalf, 142002): face up on the deck, and a card.
   deckTop?: CardInstance | null;
 };
@@ -63,8 +72,10 @@ const GUTTER = 8;
 const GAP = 6;
 export const PEEK = 10;
 const ASPECT = 1.4;
-// How much of a hand card shows above the bottom edge.
+// How much of a hand card shows above the bottom edge: a share of the card, and never less than a 44 pt target plus the
+// fan's drop at the ends.
 export const HAND_SHOW = 0.56;
+const HAND_MIN = 52;
 // The left column is one and a half cards wide: the quest card is printed sideways.
 const LEFT = 1.5;
 // A face-up shadow card sits beside its enemy at this scale.
@@ -79,7 +90,8 @@ const MARK = 16;
  * cards, the rest holds six.
  */
 export function cardSize(width: number, height: number): { w: number; h: number } {
-  const byHeight = (height - GUTTER - 3 * GAP - 3 * PEEK) / (3 + HAND_SHOW) / ASPECT;
+  const room = height - GUTTER - 3 * GAP - 3 * PEEK;
+  const byHeight = Math.min(room / (3 + HAND_SHOW), (room - HAND_MIN) / 3) / ASPECT;
   const byWidth = (width - 3 * GUTTER - 5 * GAP) / (6 + LEFT);
   const w = Math.max(34, Math.floor(Math.min(byWidth, byHeight, 96)));
   return { w, h: Math.round(w * ASPECT) };
@@ -173,7 +185,7 @@ function groupWidth(entry: ZoneEntry, size: { w: number; h: number }): number {
   return footprint(entry.card, size) + shadows + paired;
 }
 
-function placeEngaged(entries: readonly ZoneEntry[], area: Rect, size: { w: number; h: number }, out: CardSlot[], marks: CombatMark[], defending: (enemy: CardInstance) => CombatMark["kind"]): void {
+function placeEngaged(entries: readonly ZoneEntry[], area: Rect, size: { w: number; h: number }, out: CardSlot[], marks: CombatMark[], preview: string | null): void {
   const widths = entries.map((entry) => groupWidth(entry, size) + (entry.paired.length > 0 ? GAP : 0));
   const xs = rowXs(widths, area.x, area.w);
   entries.forEach((entry, index) => {
@@ -189,7 +201,7 @@ function placeEngaged(entries: readonly ZoneEntry[], area: Rect, size: { w: numb
       at += small.w + GAP / 2;
     }
     if (entry.paired.length === 0) return;
-    marks.push({ x: at + MARK / 2 - GAP / 4, y: area.y + size.h / 2, kind: defending(entry.card), enemyId: entry.card.id });
+    marks.push({ x: at + MARK / 2 - GAP / 4, y: area.y + size.h / 2, kind: entry.fight ?? "defense", enemyId: entry.card.id, preview: preview === entry.card.id });
     at += MARK;
     // A character drawn here brings no attachment strips with it; the preview still lists them.
     entry.paired.forEach((fighter, pairIndex) => {
@@ -220,19 +232,29 @@ function pileSlot(view: PileView, rect: Rect, deckTop: CardInstance | null | und
   return view.pile === "deck" && deckTop ? { ...base, id: deckTop.id, kind: "card" } : base;
 }
 
+// The views with a picked, unconfirmed fight drawn as if it were declared: the characters leave the play area and stand
+// beside the enemy.
+function withPreview(views: LayoutViews, preview: NonNullable<LayoutOptions["preview"]>): LayoutViews {
+  const moving = new Set(preview.ids);
+  const fighters = views.play.entries.filter((entry) => moving.has(entry.card.id)).map((entry) => entry.card);
+  if (fighters.length === 0) return views;
+  const engaged = views.engaged.entries.map((entry) => (entry.card.id === preview.enemyId && entry.paired.length === 0 ? { ...entry, paired: fighters, fight: preview.kind } : entry));
+  return { ...views, play: { ...views.play, entries: views.play.entries.filter((entry) => !moving.has(entry.card.id)) }, engaged: { ...views.engaged, entries: engaged } };
+}
+
 /**
- * The table for one seat. `views` are the zones, `piles` the four piles; `defending` names what fights each engaged enemy in
- * the attack in progress.
+ * The table for one seat. `views` are the zones, `piles` the four piles.
  */
 export function tableLayout(
   width: number,
   height: number,
-  views: LayoutViews,
+  given: LayoutViews,
   piles: PileViews,
   options: LayoutOptions = {},
-  defending: (enemy: CardInstance) => CombatMark["kind"] = () => "defense",
 ): TableLayout {
-  const card = cardSize(width, height);
+  const views = options.preview ? withPreview(given, options.preview) : given;
+  const bottom = options.bottomInset ?? 0;
+  const card = cardSize(width, height - bottom);
   const leftW = Math.round(card.w * LEFT);
   const pile = { w: Math.floor((leftW - GAP) / 2), h: Math.round(Math.floor((leftW - GAP) / 2) * ASPECT) };
   const centerX = GUTTER + leftW + GUTTER;
@@ -245,7 +267,7 @@ export function tableLayout(
   const engagedH = card.h + PEEK * Math.max(1, deepestUnder(views.engaged.entries));
   const playY = engagedY + engagedH + GAP;
   const playH = card.h + 2 * PEEK;
-  const handY = height - Math.round(card.h * HAND_SHOW);
+  const handY = height - bottom - Math.max(HAND_MIN, Math.round(card.h * HAND_SHOW));
 
   // The encounter deck and its discard pile at the right end of staging.
   const encounterW = 2 * pile.w + GAP;
@@ -281,7 +303,7 @@ export function tableLayout(
     slots.push(slotOf(entry.card, id, "card", rect));
   }
   placeRow(views.staging.entries, "staging", staging, card, slots);
-  placeEngaged(views.engaged.entries, engaged, card, slots, marks, defending);
+  placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null);
   placeRow(views.play.entries, "play", play, card, slots);
   const pileRects: Record<PileId, Rect> = { deck, discard, encounterDeck, encounterDiscard };
   for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
@@ -295,7 +317,7 @@ export function tableLayout(
   handEntries.forEach((entry, index) => {
     const offset = index - middle;
     const raised = options.raised === entry.card.id;
-    const y = raised ? height - handCard.h - GAP : handY + Math.abs(offset) * 2;
+    const y = raised ? height - bottom - handCard.h - GAP : handY + Math.abs(offset) * 2;
     slots.push(slotOf(entry.card, "hand", "card", { x: xs[index] ?? hand.x, y, w: handCard.w, h: handCard.h }, false, raised ? 0 : offset * 0.03));
   });
 
@@ -307,6 +329,7 @@ export function tableLayout(
     piles: pileRects,
     slots,
     marks,
+    attacker: options.attacker ?? null,
   };
 }
 
@@ -315,6 +338,16 @@ export function slotBounds(slot: CardSlot): Rect {
   "worklet";
   if (!slot.exhausted) return slot;
   return { x: slot.x + (slot.w - slot.h) / 2, y: slot.y + (slot.h - slot.w) / 2, w: slot.h, h: slot.w };
+}
+
+/** The rectangle a tap or a drag finds a slot in: its bounds, grown to 44 pt for a pile drawn smaller than that. */
+export function hitBounds(slot: CardSlot): Rect {
+  "worklet";
+  const bounds = slotBounds(slot);
+  if (slot.kind !== "pile" || (bounds.w >= MIN_TARGET && bounds.h >= MIN_TARGET)) return bounds;
+  const w = Math.max(bounds.w, MIN_TARGET);
+  const h = Math.max(bounds.h, MIN_TARGET);
+  return { x: bounds.x - (w - bounds.w) / 2, y: bounds.y - (h - bounds.h) / 2, w, h };
 }
 
 export function contains(rect: Rect, x: number, y: number): boolean {
@@ -327,7 +360,7 @@ export function hitSlot(slots: readonly CardSlot[], x: number, y: number): numbe
   "worklet";
   for (let index = slots.length - 1; index >= 0; index -= 1) {
     const slot = slots[index];
-    if (slot && contains(slotBounds(slot), x, y)) return index;
+    if (slot && contains(hitBounds(slot), x, y)) return index;
   }
   return -1;
 }

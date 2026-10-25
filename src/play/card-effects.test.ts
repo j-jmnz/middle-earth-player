@@ -47,3 +47,33 @@ describe("effects on a card", () => {
     ]);
   });
 });
+
+describe("a defender's defense", () => {
+  it("counts a bonus that holds only while defending, before the defender is declared (Hobbit Cloak 141013)", async () => {
+    const { defenseAsDefender } = await import("../rules/keywords.ts");
+    const { moveCard } = await import("../rules/zones.ts");
+    const { readoutFor } = await import("./readout.ts");
+    const [, sam = ""] = kept.seats[0].heroes;
+    // An engaged enemy whose engagement cost is above the seat's threat attacks, and Sam holds Hobbit Cloak's +2.
+    const enemyId = kept.encounterDeck.find((id) => {
+      const card = kept.cards[id];
+      const printed = card ? ctx.cards.get(card.code) : undefined;
+      return printed?.type === "enemy" && (printed.engagementCost ?? 0) > kept.seats[0].threat;
+    });
+    expect(enemyId).toBeDefined();
+    if (!enemyId) return;
+    let state = moveCard(kept, enemyId, { zone: "engaged", seat: 0 });
+    state = { ...state, pendingAttack: { enemyId, seat: 0 }, modifiers: [...state.modifiers, { instanceId: sam, sourceId: sam, stat: "defense", amount: 2, until: "endOfRound", when: { kind: "versusHighEngagement", role: "defending" } }] };
+    const hero = state.cards[sam];
+    const base = hero ? modifiedStat(state, hero, "defense", ctx.cards) : -1;
+    expect(defenseAsDefender(state, sam, ctx.cards)).toBe(base + 2);
+    const sheet = { kind: "pick" as const, key: "defense", step: "Combat", title: "", note: null, verb: "Defend with", options: [{ id: sam, label: "Sam", code: null, intent: { type: "DeclareDefender" as const, defenderId: sam } }], primary: null, alternative: null };
+    const readout = readoutFor(state, ctx, sheet, { key: "defense", ids: [sam], shares: [] }, (id) => id);
+    expect(readout?.stats.find((stat) => stat.word === "Defense")?.value).toBe(base + 2);
+    // Leave undefended, then a hero: all of the attack on that hero, no defense taken off.
+    const hit = { ...sheet, key: "undefended", options: [{ id: sam, label: "Sam", code: null, intent: { type: "Undefended" as const, heroId: sam } }] };
+    const undefended = readoutFor(state, ctx, hit, { key: "undefended", ids: [sam], shares: [] }, (id) => id);
+    expect(undefended?.stats.map((stat) => stat.word)).toEqual(["Attack"]);
+    expect(undefended?.result).toContain(`damage on ${sam}`);
+  });
+});

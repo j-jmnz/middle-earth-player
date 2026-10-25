@@ -1,10 +1,7 @@
-// The table for the open scenario of a save, always in landscape (the route's stack option, routes/_layout.tsx). The canvas is
-// src/play; this screen opens the session, keeps each accepted intent in user.db, and hands the canvas the pictures in the
-// image cache. The reducer is the only writer of the game.
-//
-// The open moment is a sheet (src/play/sheets.ts, or the action window itself). Its choices are picked on the table, or on a
-// paper panel when they are not cards there, and confirmed from the dock at the right (src/play/table-choice.ts): a tap
-// only picks, and a button that sends an intent with nothing picked asks for a second tap.
+// The table for the open scenario of a save, always in landscape (the route's stack option, routes/_layout.tsx). The canvas,
+// the dock and the panels are src/play; this screen opens the session, keeps each accepted intent in user.db, hands the
+// canvas the pictures in the image cache, and lays the pieces out. The reducer is the only writer of the game; how a tap
+// becomes an intent is src/play/use-table-choice.ts.
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BackHandler, Text, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
@@ -12,25 +9,22 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
 import { backStep } from "../../../play/back";
-import { effectLines, slotNumbers } from "../../../play/card-effects";
-import { CardPreview, type PreviewCard } from "../../../play/card-preview";
-import { playSheet, windowSheet } from "../../../play/bar-sheets";
+import { slotNumbers } from "../../../play/card-effects";
+import { CardPreview } from "../../../play/card-preview";
 import { logLines, type LogNames } from "../../../play/log";
-import { momentOf, type Moment } from "../../../play/outcome";
 import { prefetchCodes, resolutionCodes } from "../../../play/prefetch";
 import { QuestBand } from "../../../play/quest-band";
 import { railFor } from "../../../play/rail";
-import { inspectTargets, onTableFor, shownSeat, threatSelector, type PileId } from "../../../play/selectors";
-import { dropOutcome, targetFromKey } from "../../../play/selection";
-import type { Sheet, SheetNames } from "../../../play/sheet-types";
-import { sheetFor } from "../../../play/sheets";
-import type { PlayerIntent, ScenarioState, TableStore } from "../../../play/store";
+import { PILE_WORDS, shownSeat, threatSelector, type PileId } from "../../../play/selectors";
+import type { SheetNames } from "../../../play/sheet-types";
+import type { TableStore } from "../../../play/store";
 import { TableCanvas } from "../../../play/table-canvas";
-import type { PictureSource, SlotInfo, TableHighlight } from "../../../play/table-canvas-types";
-import { choiceFor, dockFor, marked, onTheTable, readoutFor, tap, tappable, type Choice, type DockButton, type TapContext } from "../../../play/table-choice";
+import type { PictureSource, SlotInfo } from "../../../play/table-canvas-types";
 import { ChromeButton, PhaseRail, ThreatRing, threatLine } from "../../../play/table-chrome";
-import { MomentBanner, TableDock, type DockExtra } from "../../../play/table-dock";
+import { MomentBanner, TableDock } from "../../../play/table-dock";
 import { LogPanel, PileList, SidePanel } from "../../../play/table-panel";
+import { previewCards } from "../../../play/table-preview";
+import { useTableChoice } from "../../../play/use-table-choice";
 import { ledgerLine, ruleTitle } from "../../../play/ledger";
 import { BodyText, NavBar, Screen } from "../../chrome";
 import { bookletParams } from "../../campaign-data";
@@ -43,9 +37,9 @@ import { cachedImage, useImageSnapshot } from "../../images/store";
 import { routeCode } from "../../route-code";
 import { sessionStore, useTableSession, type TableSession } from "../../table-session";
 
-// How long the outcome banner stays up; a tap closes it sooner, and the log keeps it.
-const MOMENT_MS = 4500;
 const TOP_BAR = 44;
+// Under this height a panel covers the top bar too, so its options have room.
+const SHORT = 400;
 
 function picture(code: string): PictureSource | null {
   const cached = cachedImage(code);
@@ -54,12 +48,6 @@ function picture(code: string): PictureSource | null {
   return bundled ? bundled.moduleId : null;
 }
 
-// A sheet the player opened from the table (a payment, a host, an Action, the Actions list), for the game it was opened in.
-// `panel` keeps it on paper even when its choices are cards on the table (the Actions list reads the printed lines).
-type Overlay = { sheet: Sheet; game: ScenarioState; panel: boolean };
-
-const PILE_TITLE: Record<PileId, string> = { deck: "Deck", discard: "Discard pile", encounterDeck: "Encounter deck", encounterDiscard: "Encounter discard pile" };
-
 function Table({ session, store, saveId }: { session: Extract<TableSession, { ok: true }>; store: TableStore; saveId: string }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -67,24 +55,18 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   const images = useImageSnapshot();
   const game = useStore(store, (state) => state.game);
-  const legal = useStore(store, (state) => state.legal);
   const refusal = useStore(store, (state) => state.refusal);
   const threatOf = useMemo(() => threatSelector(), []);
   const threats = useStore(store, (state) => threatOf(state.game));
   const roundSteps = useStore(store, (state) => state.roundSteps);
-  const moment = useStore(store, (state) => state.moment);
   const selected = useStore(store, (state) => state.selected);
   const seat = shownSeat(game);
   const ctx = session.ctx;
 
-  const [overlay, setOverlay] = useState<Overlay | null>(null);
-  const [held, setHeld] = useState<Choice | null>(null);
-  const [folded, setFolded] = useState<string | null>(null);
   const [logOpen, setLogOpen] = useState(false);
   const [pile, setPile] = useState<PileId | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  // The last moment the player closed (or that timed out), by its sequence number.
-  const [closedMoment, setClosedMoment] = useState(0);
+  // The card shown large, and cards listed with it that are not on the table (the Look window's).
+  const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
 
   // Prefetch the hand, staging and the screen about to open; never the whole cache. The canvas draws names until a file lands.
   const hand = game.seats[seat]?.hand;
@@ -104,6 +86,8 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   // Unique text with no effect record is inactive: the canvas veils it, and no control applies it.
   const inactiveSet = useMemo(() => inactiveCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const), ctx.effects), [session, ctx]);
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
+  // Read from the latest state: the canvas draws again when the cards, the effects in play or the attack change.
+  const info = useCallback((cardId: string): SlotInfo => slotNumbers(store.getState().game, ctx, cardId), [store, ctx]);
   const rail = useMemo(() => railFor(game), [game]);
   const logNames: LogNames = useMemo(
     () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => ctx.effects.find((effect) => effect.id === effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
@@ -111,105 +95,12 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   );
   const lines = useMemo(() => (logOpen ? logLines(roundSteps, logNames) : []), [logOpen, roundSteps, logNames]);
 
-  // The open moment: a sheet opened from the table while the game is the one it was opened in, or the window's own.
-  const base = useMemo(() => sheetFor(game, ctx, legal, names) ?? windowSheet(game, ctx, legal, names), [game, ctx, legal, names]);
-  const live = overlay && overlay.game === game ? overlay : null;
-  const sheet = live?.sheet ?? base;
-  const table: TapContext = useMemo(() => ({ game, ctx, legal, names }), [game, ctx, legal, names]);
-  const onTable = useMemo(() => onTableFor(game, seat), [game, seat]);
-  const panel = (live?.panel ?? false) || !onTheTable(sheet, onTable);
-  const panelOpen = panel && folded !== sheet.key;
-  const choice = choiceFor(sheet, held);
-  const passLegal = legal.some((intent) => intent.type === "Pass");
-  const dock = useMemo(() => dockFor(sheet, choice, table, { overlay: live != null, passLegal }), [sheet, choice, table, live, passLegal]);
-  const readout = useMemo(() => readoutFor(game, ctx, sheet, choice), [game, ctx, sheet, choice]);
-  const highlight: TableHighlight = useMemo(
-    () => ({
-      tappable: panel ? new Set<string>() : tappable(sheet),
-      picked: marked(sheet, choice),
-      share: sheet.kind === "distribute" ? (sheet.purpose.kind === "archery" ? "damage" : "pay") : null,
-    }),
-    [panel, sheet, choice],
-  );
-  // The hand card being played rises whole above the bottom edge.
-  const raised = live && (live.sheet.kind === "pick" || live.sheet.kind === "distribute") ? (live.sheet.kind === "pick" ? (live.sheet.about?.[0] ?? null) : live.sheet.purpose.kind === "play" ? live.sheet.purpose.cardId : null) : null;
-
-  const info = useCallback((cardId: string): SlotInfo => slotNumbers(game, ctx, cardId), [game, ctx]);
-
-  // What the last accepted intent did, over the table for a few seconds.
-  const said = useMemo((): Moment | null => (moment ? momentOf(moment.before, game, moment.steps, names) : null), [moment, game, names]);
-  const banner = moment && said && closedMoment !== moment.seq ? said : null;
-  useEffect(() => {
-    if (!moment) return;
-    const timer = setTimeout(() => setClosedMoment(moment.seq), MOMENT_MS);
-    return () => clearTimeout(timer);
-  }, [moment]);
-
-  const dispatch = useCallback(
-    (intent: PlayerIntent) => {
-      if (store.getState().dispatch(intent)) {
-        setOverlay(null);
-        setHeld(null);
-        setFolded(null);
-      }
-    },
-    [store],
-  );
-  const open = useCallback(
-    (next: Sheet, asPanel = false) => {
-      setOverlay({ sheet: next, game: store.getState().game, panel: asPanel });
-      setHeld(null);
-    },
-    [store],
-  );
   const onOutcome = useCallback(() => router.replace({ pathname: "/resolution/[saveId]", params: { saveId } }), [router, saveId]);
-  const onButton = useCallback(
-    (button: DockButton) => {
-      const action = button.action;
-      if (action.kind === "intent") dispatch(action.intent);
-      else if (action.kind === "open") open(action.sheet);
-      else if (action.kind === "outcome") onOutcome();
-      else if (action.kind === "clear") setHeld({ key: sheet.key, ids: [], shares: [] });
-      else {
-        setOverlay(null);
-        setHeld(null);
-      }
-    },
-    [dispatch, open, onOutcome, sheet],
-  );
-
-  // A tap on the table: a pile's list, a pick for the open moment, or (on a card the moment does not ask about) the card large.
-  const onTap = useCallback(
-    (cardId: string) => {
-      if (cardId.startsWith("pile:")) {
-        const id = cardId.slice(5) as PileId;
-        if (id === "discard" || id === "encounterDiscard") setPile(id);
-        return;
-      }
-      const result = tap(sheet, held, cardId, table);
-      if (result.kind === "choice") setHeld(result.choice);
-      else if (result.kind === "open") open(result.sheet);
-      else if (game.cards[cardId]?.face !== "down") setPreview(cardId);
-    },
-    [sheet, held, table, open, game],
-  );
-  const onDrop = useCallback(
-    (cardId: string, key: string) => {
-      const outcome = dropOutcome(game, ctx, legal, cardId, targetFromKey(key));
-      store.getState().select(null);
-      if (outcome.kind === "play") {
-        const opened = playSheet(game, ctx, legal, names, cardId, outcome.hostId);
-        if (opened) open(opened);
-      } else if (outcome.kind === "commit" || outcome.kind === "choose") {
-        const result = tap(base, live ? null : held, cardId, table);
-        if (result.kind === "choice") {
-          setOverlay(null);
-          setHeld(result.choice);
-        }
-      }
-    },
-    [game, ctx, legal, names, store, open, base, live, held, table],
-  );
+  const onPile = useCallback((id: string) => {
+    if (id === "discard" || id === "encounterDiscard") setPile(id);
+  }, []);
+  const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
+  const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
 
   // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
   useEffect(() => {
@@ -218,16 +109,16 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
         setPreview(null);
         return true;
       }
-      const step = backStep({ logOpen, pileOpen: pile != null, overlayOpen: live != null, panelOpen });
+      const step = backStep({ logOpen, pileOpen: pile != null, overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen });
       if (step === "closeLog") setLogOpen(false);
       else if (step === "closePile") setPile(null);
-      else if (step === "closeOverlay") setOverlay(null);
-      else if (step === "foldPanel") setFolded(sheet.key);
+      else if (step === "closeOverlay") choice.closeOverlay();
+      else if (step === "foldPanel") choice.fold();
       else goBack(router, { pathname: "/path/[saveId]", params: { saveId } });
       return true;
     });
     return () => subscription.remove();
-  }, [preview, logOpen, pile, live, panelOpen, sheet, router, saveId]);
+  }, [preview, logOpen, pile, choice, router, saveId]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -238,46 +129,21 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
   const threatText = threatLine(threats, showLife ? (game.life ?? 0) : null);
   const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
   const panelWidth = Math.round(Math.min(480, Math.max(320, screen.width * 0.46)));
-  const pickedNames = choice.ids.length > 0 && sheet.kind !== "trigger" ? choice.ids.map((id) => names.card(id)).join(", ") : sheet.kind === "trigger" ? (sheet.options.find((item) => item.id === choice.ids[0])?.text ?? null) : null;
-  const header = dockHeader(sheet);
-
-  // The dock's extra buttons: read the card the moment is about, list every Action on paper, bring a folded panel back.
-  const extras: DockExtra[] = [];
-  const about = sheet.kind === "pick" ? sheet.about?.[0] : sheet.kind === "trigger" ? sheet.sourceId : undefined;
-  if (about) extras.push({ label: "Read the card", testID: "sheet-inspect", onPress: () => setPreview(about) });
-  if (sheet.kind === "window" && sheet.triggers.length > 0) {
-    extras.push({
-      label: `Actions (${sheet.triggers.length})`,
-      testID: "table-actions",
-      onPress: () => open({ kind: "trigger", key: `actions:${game.round}:${game.mode}`, step: sheet.step, title: "Actions", sourceId: null, timing: "Action", note: "Only the Actions the rules allow now are listed.", hide: null, options: sheet.triggers, pass: null }, true),
-    });
-  }
-  if (panel && !panelOpen) extras.push({ label: "Choose", testID: "sheet-expand", onPress: () => setFolded(null) });
-
-  // The long-pressed card, the cards attached to it and its face-up shadow cards, each with the effects on it now.
-  const previewCards = useMemo((): PreviewCard[] => {
-    if (!preview) return [];
-    return inspectTargets(game, preview).flatMap((id, index): PreviewCard[] => {
-      const card = game.cards[id];
-      if (!card) return [];
-      const type = session.world.cards.get(card.code)?.type;
-      return [
-        {
-          code: card.code,
-          name: nameOf(card.code),
-          source: picture(card.code),
-          landscape: type === "quest",
-          text: session.facts.get(card.code)?.text ?? null,
-          effects: effectLines(game, ctx, id, names.card),
-          ...(index > 0 ? { role: card.zone === "shadow" ? "Shadow card" : "Attachment" } : {}),
-        },
-      ];
-    });
-    // Read again when a scan lands while the preview is up (the image snapshot moves).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preview, game, session, ctx, nameOf, names, images.revision]);
-  // The preview opens on the long-pressed card even when it is an attachment.
-  const previewStart = preview ? Math.max(0, inspectTargets(game, preview).indexOf(preview)) : 0;
+  // A panel slides in from the right, under the top bar; on a short phone it covers the top bar too.
+  const panelTop = screen.height < SHORT ? 0 : insets.top + TOP_BAR;
+  const panelStyle = { position: "absolute" as const, top: panelTop, bottom: 0, right: 0, width: panelWidth + insets.right };
+  const narrow = screen.width - insets.left - insets.right < 760;
+  const previewed = preview
+    ? previewCards(
+        game,
+        ctx,
+        preview.id,
+        (code) => ({ name: nameOf(code), source: picture(code), landscape: session.world.cards.get(code)?.type === "quest", text: session.facts.get(code)?.text ?? null }),
+        names.card,
+        preview.extra,
+      )
+    : null;
+  const shown = previewed?.cards[previewed.start];
 
   return (
     <Screen testID="table" scene="felt" inset={false}>
@@ -286,12 +152,19 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
           <ChromeButton label="‹ Path" testID="table-back" accessibilityLabel="Back to the path" onPress={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} />
           <View className="flex-row">
             {threats.map((threat) => (
-              <ThreatRing key={threat.seat} threat={threat} label={threats.length > 1 ? `Player ${threat.seat + 1}` : "Threat"} compact />
+              <ThreatRing
+                key={threat.seat}
+                threat={threat}
+                label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
+                accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
+                active={threats.length > 1 && threat.seat === seat}
+                compact
+              />
             ))}
             {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} compact /> : null}
           </View>
-          <PhaseRail rail={rail} />
-          <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>
+          <PhaseRail rail={rail} narrow={narrow} />
+          {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}
           <ChromeButton label="Log" testID="log-open" tone="gold" accessibilityLabel="This round's log" onPress={() => setLogOpen(true)} />
           <ChromeButton
             label="Booklet"
@@ -314,86 +187,80 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
                 sphereOf={sphereOf}
                 inactive={inactive}
                 info={info}
-                highlight={highlight}
-                raised={raised}
-                onTap={onTap}
-                onPreview={setPreview}
-                onDrop={onDrop}
+                highlight={choice.highlight}
+                raised={choice.raised}
+                fight={choice.fight}
+                bottomInset={insets.bottom}
+                onTap={choice.onTap}
+                onPreview={onPreview}
+                onDrop={choice.onDrop}
               />
             ) : null}
-            {banner && moment ? <MomentBanner moment={banner} onClose={() => setClosedMoment(moment.seq)} /> : null}
+            {choice.banner ? <MomentBanner moment={choice.banner} /> : null}
           </View>
           <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8) }}>
-            <QuestBand game={game} ctx={ctx} nameOf={nameOf} />
+            {/* The quest card on the table already shows its progress: the band gives way while the dock shows numbers. */}
+            {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} />}
             <TableDock
-              step={header.step}
-              title={header.title}
-              note={header.note}
-              picked={panel ? null : pickedNames}
-              unavailable={sheet.kind === "pick" ? (sheet.unavailable ?? []) : []}
-              readout={readout}
+              step={choice.header.step}
+              title={choice.header.title}
+              note={choice.header.note}
+              picked={choice.picked}
+              unavailable={choice.unavailable}
+              readout={choice.readout}
               refusal={refusal}
-              dock={dock}
-              onButton={onButton}
-              extras={extras}
+              dock={choice.dock}
+              onButton={choice.onButton}
+              extras={choice.extras}
+              resetKey={choice.resetKey}
             />
           </View>
         </View>
       </View>
-      {panelOpen ? (
-        <View style={{ position: "absolute", top: insets.top + TOP_BAR, bottom: 0, right: 0, width: panelWidth + insets.right }}>
+      {choice.panelOpen ? (
+        <View style={panelStyle}>
           <SidePanel
-            sheet={sheet}
-            held={held}
-            dock={dock}
+            sheet={choice.sheet}
+            game={game}
+            choice={choice.choice}
+            dock={choice.dock}
+            readout={choice.readout}
             threat={threatText}
             refusal={refusal}
-            onTile={(cardId) => {
-              const result = tap(sheet, held, cardId, table);
-              if (result.kind === "choice") setHeld(result.choice);
-              else if (result.kind === "open") open(result.sheet);
-            }}
-            onButton={onButton}
-            onFold={() => setFolded(sheet.key)}
-            onRead={setPreview}
+            resetKey={choice.resetKey}
+            onTile={choice.onTile}
+            onButton={choice.onButton}
+            onFold={choice.fold}
+            onRead={(cardId) => onPreview(cardId)}
           />
         </View>
       ) : null}
       {pile ? (
-        <View style={{ position: "absolute", top: insets.top + TOP_BAR, bottom: 0, right: 0, width: panelWidth + insets.right }}>
+        <View style={panelStyle}>
           <PileList
-            title={PILE_TITLE[pile]}
+            title={PILE_WORDS[pile]}
             cards={[...(pile === "discard" ? (game.seats[seat]?.discard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
-            onRead={setPreview}
+            onRead={(cardId) => onPreview(cardId)}
             onClose={() => setPile(null)}
           />
         </View>
       ) : null}
       {logOpen ? (
-        <View style={{ position: "absolute", top: insets.top + TOP_BAR, bottom: 0, right: 0, width: panelWidth + insets.right }}>
+        <View style={panelStyle}>
           <LogPanel round={game.round} lines={lines} onClose={() => setLogOpen(false)} />
         </View>
       ) : null}
-      {preview && previewCards[0] ? (
-        <PreviewAt key={preview} cards={previewCards} start={previewStart} onClose={() => setPreview(null)} onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })} />
+      {preview && previewed && shown ? (
+        <CardPreview
+          key={preview.id}
+          card={shown}
+          related={previewed.cards.filter((_, index) => index !== previewed.start)}
+          onClose={() => setPreview(null)}
+          onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })}
+        />
       ) : null}
     </Screen>
   );
-}
-
-// The preview opened on one of a host's cards: that card first, the rest with it.
-function PreviewAt({ cards, start, onClose, onDetails }: { cards: readonly PreviewCard[]; start: number; onClose: () => void; onDetails: (code: string) => void }) {
-  const first = cards[start] ?? cards[0];
-  if (!first) return null;
-  const related = cards.filter((_, index) => index !== start);
-  return <CardPreview card={first} related={related} onClose={onClose} onDetails={onDetails} />;
-}
-
-// The dock's words for the open moment.
-function dockHeader(sheet: Sheet): { step: string; title: string; note: string | null } {
-  if (sheet.kind === "outcome") return { step: sheet.result === "won" ? "Resolution" : "Scenario", title: sheet.title, note: sheet.note };
-  if (sheet.kind === "window") return { step: sheet.step, title: sheet.title, note: [sheet.note, sheet.passNote].filter((part) => part != null).join(" ") || null };
-  return { step: sheet.step, title: sheet.title, note: sheet.note };
 }
 
 export default function TableScreen() {

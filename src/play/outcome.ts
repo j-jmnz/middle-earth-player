@@ -15,7 +15,8 @@ export type Moment = { title: string; tone: MomentTone; lines: readonly MomentLi
 
 const MOST = 5;
 
-type Names = { card: (cardId: string) => string };
+// `shadow` gives the printed shadow line of a card, or null when it has no shadow effect.
+type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null };
 
 function seatWord(state: ScenarioState, seat: number): string {
   return state.seatCount > 1 ? `Player ${seat + 1} threat` : "Threat";
@@ -43,10 +44,19 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   steps.forEach((step, index) => {
     switch (step.kind) {
       case "quest": {
-        const title = step.willpower > step.threat ? "Quest succeeded" : step.willpower < step.threat ? "Quest failed" : "Quest held even";
-        const group = open(0, title, step.willpower > step.threat ? "good" : step.willpower < step.threat ? "bad" : "plain");
+        const [title, tone]: [string, MomentTone] = step.willpower > step.threat ? ["Quest succeeded", "good"] : step.willpower < step.threat ? ["Quest failed", "bad"] : ["Quest held even", "plain"];
+        const group = open(0, title, tone);
         group.lines.push({ text: `Willpower ${step.willpower} against threat ${step.threat}`, mark: "willpower" });
-        if (step.willpower === step.threat) group.lines.push({ text: "No progress, no threat", mark: null });
+        if (tone === "plain") group.lines.push({ text: "No progress, no threat", mark: null });
+        return;
+      }
+      case "push": {
+        // A shadow card turned up for an attack: its effect, in its printed words.
+        // (A frame of an enemy's own after-attack instructions is also a "shadow" frame; its card is not a shadow card.)
+        const dealt = step.cardId != null && (before.cards[step.cardId]?.zone === "shadow" || after.cards[step.cardId]?.zone === "shadow");
+        if (step.frame !== "shadow" || !step.cardId || !dealt) return;
+        const text = names.shadow?.(step.cardId);
+        if (text) line(`Shadow, ${names.card(step.cardId)}: ${text}`, null);
         return;
       }
       case "threat":
@@ -64,7 +74,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         const target = names.card(step.targetId);
         if (step.side === "enemy") {
           open(2, `${enemy} attacks`, "plain");
-          line(step.defense > 0 ? `Attack ${step.attack} against ${target}'s defense ${step.defense}` : `Attack ${step.attack} on ${target}, undefended`, "attack");
+          line(step.undefended ? `Attack ${step.attack} on ${target}, undefended` : `Attack ${step.attack} against ${target}'s defense ${step.defense}`, "attack");
         } else {
           open(2, `Attack on ${enemy}`, "plain");
           line(`Attack ${step.attack} against defense ${step.defense}`, "attack");
