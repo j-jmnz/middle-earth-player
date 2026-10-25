@@ -71,7 +71,9 @@ function varied(state: ScenarioState, ctx: ReduceContext, random: () => number, 
     if (code !== "141039" && code !== "141042") return { type: "Pass" };
   }
   if (base.type === "Commit") {
-    const ids = legalTargets(state, { type: "Commit" }, ctx).filter(() => random() < 0.9);
+    // How many characters quest, and so how many stay ready for Hide tests and defense, varies by decision.
+    const share = [0.4, 0.65, 0.9][Math.floor(random() * 3)] ?? 0.65;
+    const ids = legalTargets(state, { type: "Commit" }, ctx).filter(() => random() < share);
     return ids.length > 0 ? { type: "Commit", cardIds: ids } : { type: "Pass" };
   }
   // A choice that could land on the Ring-bearer (a host for Have You Seen Baggins?) takes another option when there is one.
@@ -130,7 +132,7 @@ function searchWin(): { seed: number; loadout: StoredLoadout; intents: PlayerInt
   for (let depth = 0; depth < 40 && beam.length > 0; depth += 1) {
     const children: Line[] = [];
     for (const line of beam) {
-      for (let branch = 0; branch < 8; branch += 1) {
+      for (let branch = 0; branch < 10; branch += 1) {
         let state = line.state;
         const intents = [...line.intents];
         const memory = new Set(line.memory);
@@ -155,8 +157,8 @@ function searchWin(): { seed: number; loadout: StoredLoadout; intents: PlayerInt
       depth -= 1;
       continue;
     }
-    const ahead = [...children].sort((left, right) => score(right.state) - score(left.state)).slice(0, 20);
-    const safe = [...children].sort((left, right) => safety(right.state) - safety(left.state)).filter((line) => !ahead.includes(line)).slice(0, 20);
+    const ahead = [...children].sort((left, right) => score(right.state) - score(left.state)).slice(0, 30);
+    const safe = [...children].sort((left, right) => safety(right.state) - safety(left.state)).filter((line) => !ahead.includes(line)).slice(0, 30);
     beam = [...ahead, ...safe];
     console.log(`depth ${depth}: ${children.length} alive, best stage ${beam[0] ? stageAt(beam[0].state) : -1}`);
   }
