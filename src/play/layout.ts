@@ -96,6 +96,11 @@ function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, card:
   });
 }
 
+// The most cards stacked under one card in these zones (attachments and shadow cards).
+function deepestStack(zones: readonly ZoneView[]): number {
+  return Math.max(0, ...zones.flatMap((view) => view.entries.map((entry) => entry.attached.length)));
+}
+
 /**
  * The table for one seat: the pinned quest stage at the top, then staging, the active location beside the engaged enemies
  * (each carrying every shadow card dealt to it, face down until its attack), the play area, and the hand fanned at the bottom.
@@ -109,10 +114,12 @@ export function tableLayout(width: number, height: number, views: LayoutViews): 
   const middleY = stagingY + card.h + GAP;
   const hasSecond = views.secondActiveLocation.entries.length > 0;
   const locationsWidth = card.w * (hasSecond ? 2 : 1) + (hasSecond ? GAP : 0);
-  const activeLocation: Rect = { x: GUTTER, y: middleY, w: card.w, h: card.h + PEEK };
-  const secondActiveLocation: Rect = { x: GUTTER + card.w + GAP, y: middleY, w: hasSecond ? card.w : 0, h: hasSecond ? card.h + PEEK : 0 };
-  const engaged: Rect = { x: GUTTER + locationsWidth + GAP * 2, y: middleY, w: inner - locationsWidth - GAP * 2, h: card.h + PEEK };
-  const playY = middleY + card.h + PEEK + GAP;
+  // The band is as tall as its deepest stack: an enemy with two shadow cards peeks out two steps under it.
+  const middleH = card.h + PEEK * Math.max(1, deepestStack([views.activeLocation, views.secondActiveLocation, views.engaged]));
+  const activeLocation: Rect = { x: GUTTER, y: middleY, w: card.w, h: middleH };
+  const secondActiveLocation: Rect = { x: GUTTER + card.w + GAP, y: middleY, w: hasSecond ? card.w : 0, h: hasSecond ? middleH : 0 };
+  const engaged: Rect = { x: GUTTER + locationsWidth + GAP * 2, y: middleY, w: inner - locationsWidth - GAP * 2, h: middleH };
+  const playY = middleY + middleH + GAP;
   const play: Rect = { x: GUTTER, y: playY, w: inner, h: card.h + PEEK * 2 };
   const handY = playY + card.h + PEEK * 2 + GAP;
   const hand: Rect = { x: GUTTER, y: handY, w: inner, h: Math.max(card.h, height - handY) };

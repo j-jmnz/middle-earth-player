@@ -49,6 +49,8 @@ describe("which out-of-play Ringwraith", () => {
       [ids.under, "Ringwraith under Weather Hills"],
     ]);
     expect(sheet.verb).toBe("Shuffle in");
+    // The primary is the action alone, so a long zone name does not wrap the pill.
+    expect(sheet.confirm).toBe("Shuffle in");
     expect(sheet.note).toBe("Choose which out-of-play Ringwraith is shuffled into the encounter deck. Any other copy stays where it is. Player 2 chooses.");
     for (const option of sheet.options) {
       if (!("intent" in option)) throw new Error("an option opens another sheet");

@@ -110,6 +110,17 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   return words.length > 0 ? capital(words.join(", then ")) : capital(optionId);
 }
 
+/** The threat a branch changes, from its record's amount: +1 for "raise your threat by 1", -2 for "lower ... by 2". Null when the
+ * branch changes no threat, or the change depends on the table ("for each hero committed"). */
+export function branchThreat(choose: ChooseInstruction, optionId: string): number | null {
+  const option = choose.options.find((entry) => entry.id === optionId);
+  for (const instruction of option?.instructions ?? []) {
+    if (instruction.verb === "RaiseThreat" && !instruction.perCommitted) return instruction.amount ?? 1;
+    if (instruction.verb === "LowerThreat") return -instruction.amount;
+  }
+  return null;
+}
+
 export type PickWords = { verb: string; prompt: string };
 
 /** What a Pick asks for, from the instruction that uses the picked card: the verb for the button and a prompt sentence. */

@@ -44,7 +44,8 @@ export function PickView(props: SheetProps & { sheet: PickSheet }) {
           {unavailable.map((item) => (
             <View key={item.id} testID={`sheet-unavailable-${item.id}`} accessible accessibilityLabel={`${item.label}. ${item.reason}`} className="mb-2 rounded-tile px-4 py-2" style={{ borderWidth: 1, borderColor: t.inkLine, borderStyle: "dashed" }}>
               <Text className="text-body text-inkMuted">{item.label}</Text>
-              <Text className="mt-0.5 text-label text-inkMuted">{item.reason}</Text>
+              {/* With no tile to choose, the reason is the sheet's message and reads at body size. */}
+              <Text className={`mt-0.5 ${sheet.options.length === 0 ? "text-body" : "text-label"} text-inkMuted`}>{item.reason}</Text>
             </View>
           ))}
         </>

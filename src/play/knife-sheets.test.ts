@@ -130,6 +130,14 @@ describe("shadow cards and the cards under Weather Hills", () => {
     const shadows = layout.slots.filter((slot) => slot.kind === "shadow");
     expect(shadows.map((slot) => slot.id)).toEqual([first, second]);
     expect(shadows.every((slot) => slot.faceDown && slot.zone === "engaged")).toBe(true);
+    // The band is as deep as the two shadow cards, and the play area starts below the lower one.
+    expect(layout.zones.engaged.h).toBe(layout.card.h + 2 * 12);
+    const lowest = Math.max(...shadows.map((slot) => slot.y + slot.h));
+    expect(lowest).toBeLessThanOrEqual(layout.zones.engaged.y + layout.zones.engaged.h);
+    expect(layout.zones.play.y).toBeGreaterThan(lowest);
+    const single = tableLayout(390, 640, views(moveCard(state, second, { zone: "encounterDiscard" })));
+    expect(single.zones.engaged.h).toBe(single.card.h + 12);
+    expect(layout.zones.play.y - single.zones.play.y).toBe(12);
     // Face down, neither is a card the inspect list opens; turned up, both are.
     expect(inspectTargets(state, wraith)).toEqual([wraith]);
     const up = updateCard(updateCard(state, first, { face: "up" }), second, { face: "up" });
@@ -166,6 +174,30 @@ describe("the words of a choice", () => {
     expect(sentences).toContain("Remove 2 heroes you control from the quest");
     expect(sentences).toContain("Exhaust The One Ring");
     expect(sentences).toContain("Reveal an additional encounter card");
+  });
+});
+
+describe("the threat a branch changes", () => {
+  it("is the record's amount, shown with the threat icon: raised, lowered, or none when it depends on the table", async () => {
+    const { EFFECTS } = await import("../effects/index.ts");
+    const { branchThreat } = await import("./choice-words.ts");
+    const chooses = EFFECTS.flatMap((effect) => effect.instructions).filter((instruction): instruction is Extract<typeof instruction, { verb: "Choose" }> => instruction.verb === "Choose");
+    const amounts = chooses.flatMap((choose) => choose.options.map((option) => branchThreat(choose, option.id)));
+    expect(amounts).toContain(-2);
+    // 141051:A:2 raises threat per committed hero: the number depends on the table, so no icon is shown.
+    const committed = chooses.find((choose) => choose.options.some((option) => option.instructions.some((instruction) => instruction.verb === "RaiseThreat" && instruction.perCommitted)));
+    const option = committed?.options.find((entry) => entry.instructions.some((instruction) => instruction.verb === "RaiseThreat"));
+    expect(committed && option ? branchThreat(committed, option.id) : "missing").toBeNull();
+    const plain: Extract<import("../catalog/boundary.ts").Instruction, { verb: "Choose" }> = {
+      verb: "Choose",
+      who: "actor",
+      options: [
+        { id: "raise", instructions: [{ verb: "RaiseThreat", amount: 1 }] },
+        { id: "draw", instructions: [{ verb: "Draw" }] },
+      ],
+    };
+    expect(branchThreat(plain, "raise")).toBe(1);
+    expect(branchThreat(plain, "draw")).toBeNull();
   });
 });
 

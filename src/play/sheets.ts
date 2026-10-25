@@ -14,7 +14,7 @@ import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, 
 import type { Frame } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
-import { branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
+import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
 import { TIMING_WORDS, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type PickOption, type Sheet, type SheetNames, type SheetOption, type TriggerOption, type Unavailable } from "./sheet-types.ts";
@@ -235,21 +235,29 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           note: [`Choose one.${who}`, line].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
-          options: window.options.map((id): PickOption => ({ id, label: branchWords(choose, id, game, words, source), code: null, intent: { type: "Choose", optionId: id } })),
+          options: window.options.map((id): PickOption => {
+            // A branch that raises or lowers threat carries the threat icon with the record's amount.
+            const threat = branchThreat(choose, id);
+            const stats: SheetStat[] = threat == null ? [] : [{ icon: "threat", value: threat, word: "Threat" }];
+            return { id, label: branchWords(choose, id, game, words, source), code: null, ...(stats.length > 0 ? { stats } : {}), intent: { type: "Choose", optionId: id } };
+          }),
         };
       }
       // A Pick names what the card is for: a hero removed from the quest, an attachment discarded, an ally put into play,
       // an enemy placed under Weather Hills.
       const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source) : { verb: "Choose", prompt: "Choose one." };
+      const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,
         note: [`${asked.prompt}${who}`, line].filter((part) => part != null).join(" "),
         verb: asked.verb,
+        // Which Ringwraith copy goes in: the primary says the action alone, so the pill does not wrap on a long zone name.
+        ...(outOfPlay ? { confirm: asked.verb } : {}),
         options: window.options.map((id): PickOption => {
-          const base = option(game, names, id);
+          const card = option(game, names, id);
           // Copies of one card in different zones are told apart by where each one is.
-          const label = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck" ? outOfPlayLabel(game, id, words) : base.label;
-          return { ...base, label, intent: { type: "Choose", optionId: id } };
+          const label = outOfPlay ? outOfPlayLabel(game, id, words) : card.label;
+          return { ...card, label, intent: { type: "Choose", optionId: id } };
         }),
       };
     }
