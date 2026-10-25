@@ -11,7 +11,8 @@ import { buildIcons, flippedViewBox, iconRecords, parseIconCss, RASTER_ICONS, VE
 import { ROOT } from "./paths.ts";
 
 // The game icons (docs/design-system.md, Icons): every icon the app names is a committed file, each clears the
-// resolution bar (vector, or a raster of at least 256 px), and data:build writes the same bytes every time.
+// resolution bar (vector, or a raster at its bar: 256 px in chrome, 96 px for a token drawn on a card), and data:build
+// writes the same bytes every time.
 const ASSETS = path.join(ROOT, "assets", "icons");
 
 function files(dir: string): Map<string, Buffer> {
@@ -28,7 +29,7 @@ describe("icons", () => {
     for (const match of requires) expect(existsSync(path.resolve(ROOT, "src", "play", "icons", match[1] ?? "")), match[1]).toBe(true);
   });
 
-  it("clear the bar: vectors with a real box, rasters at least 256 px on the short side, each with its source", () => {
+  it("clear the bar: vectors with a real box, rasters at their bar on the short side, each with its source", () => {
     for (const icon of Object.values(ICONS)) {
       expect(icon.source).toMatch(/^https:\/\//);
       if (icon.kind === "vector") {
@@ -36,7 +37,9 @@ describe("icons", () => {
         expect(icon.viewBox[3]).toBeGreaterThan(0);
         expect(icon.d.length).toBeGreaterThan(10);
       } else {
-        expect(Math.min(icon.width, icon.height)).toBeGreaterThanOrEqual(256);
+        const bar = RASTER_ICONS.find((raster) => raster.name === icon.name)?.bar ?? 256;
+        expect(bar).toBeGreaterThanOrEqual(96);
+        expect(Math.min(icon.width, icon.height)).toBeGreaterThanOrEqual(bar);
       }
     }
   });

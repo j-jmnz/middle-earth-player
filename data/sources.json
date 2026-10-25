@@ -129,9 +129,9 @@
       "site": "https://ringsdb.com and https://dragncards-lotrlcg.s3.amazonaws.com",
       "pin": {
         "kind": "sha256",
-        "value": "474613f7090404a3b22b82d8d9daef39fb8b91b8efeb02fe256f9edb977c6524"
+        "value": "d4fce8e7d7e5a2fd7dee94a64c94d15a22832d3dcb090091903bfef4f280724a"
       },
-      "fetchedAt": "2026-10-24T18:27:06.254Z",
+      "fetchedAt": "2026-10-25T18:53:02.424Z",
       "files": [
         {
           "path": "raw/icons/ringsdb.svg",
@@ -156,6 +156,24 @@
           "url": "https://dragncards-lotrlcg.s3.amazonaws.com/tokens/engagementCost.png",
           "sha256": "493e35a650b21fb8b7145f53ba2d6f2bd6f98446d592d82d921195e6abd340f0",
           "bytes": 11323
+        },
+        {
+          "path": "raw/icons/dragncards/resource.png",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/tokens/resource.png",
+          "sha256": "c0efa7b214030ada0d3907ae38156579ed27a4d0d3329925974f8b2856f51fa6",
+          "bytes": 45169
+        },
+        {
+          "path": "raw/icons/dragncards/damage.png",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/tokens/damage.png",
+          "sha256": "d1b0b35be190f78fb98eddb6eaef01d3c15f489f3b87d0a1863c7e50b2fd93b2",
+          "bytes": 46103
+        },
+        {
+          "path": "raw/icons/dragncards/progress.png",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/tokens/progress.png",
+          "sha256": "be50c278c81d7207170c5ae1eeb530053d5eaef8e4291138221391e4284a062a",
+          "bytes": 47790
         }
       ]
     },
