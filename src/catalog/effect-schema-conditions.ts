@@ -45,6 +45,9 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
   // Some card matches this pick (for the actor now): a choice that could be made.
   z.strictObject({ kind: z.literal("canPick"), pick: pickSchema }),
+  // Each of the actor's heroes has this trait, and the actor has one ("Play only if each of your heroes is a Hobbit",
+  // 19121:A:1).
+  z.strictObject({ kind: z.literal("heroesAll"), trait: z.string().min(1) }),
   // The actor has a card in hand.
   z.strictObject({ kind: z.literal("handHasCard") }),
   // The event is about the actor engaging an enemy whose engagement cost is higher than the actor's threat.

@@ -489,6 +489,8 @@ Frodo Baggins (141001) is in every game as the Ring-bearer, so his Response is a
 
 3. **Player cards with no effect row.** The card can be paid for, played, quested, defended, and attacked with using printed numbers and implemented keywords. Its unique sentence is inactive: it is shown, it is not offered, and there is no sheet on which the player applies it. The mark is the absence of the row. When the row exists, the ability becomes a normal legal intent or a normal engine step.
 
+A player card outside the box that the player's own decks play can be brought into scope on request: it joins `PLAYER_REQUESTS` in `scripts/data/printed/scope.ts`, `pnpm data:sync scans` pins its scan, its lines are read into the ledger, and it gets a record like any other (user request, 2026-10-25). The first is The Shirefolk (19121): "Play only if each of your heroes is a Hobbit" is the `heroesAll` condition on its Action, so it cannot be played otherwise, and it reduces its player's threat by 4.
+
 Campaign-dealt cards cannot be inactive. That includes encounter cards, quest cards, boons, burdens, and The One Ring. A missing effect id there fails the coverage test, and the scenario stays unplayable.
 
 ### Window stack

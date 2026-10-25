@@ -954,9 +954,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "ca26535f176e779749e2015e583408f5fb47cb4f17aa60021055e08263ec6992"
+        "value": "c0031c4cd5782a24a5149e07155ae8b47690a52d08bd7d191204371a4d3265db"
       },
-      "fetchedAt": "2026-10-25T00:53:37.439Z",
+      "fetchedAt": "2026-10-25T23:42:56.923Z",
       "files": [
         {
           "path": "scans/01002.A.jpg",
@@ -2301,6 +2301,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ill-Fate.jpg",
           "sha256": "02ef6f2f027d0866e40ac4bf6404197a87906e8ab6e6724722ef1042d1b30529",
           "bytes": 157869
+        },
+        {
+          "path": "scans/19121.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Mount-Gundabad/The-Shirefolk.jpg",
+          "sha256": "d638d65ecae36e4035220e7376bb5c34c61ea320e800980af19df4d7203b7605",
+          "bytes": 920724
         }
       ]
     }
