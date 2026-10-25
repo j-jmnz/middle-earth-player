@@ -1,5 +1,5 @@
 // Rules: rr.modifiers, rr.lasting-effects, rr.constant-ability, rr.in-play-and-out-of-play, rr.optional-engagement,
-// rr.engagement-check, rr.step-6-4-1, rr.damage (data/rules/entries.json).
+// rr.engagement-check, rr.engaged, rr.step-6-4-1, rr.damage (data/rules/entries.json).
 // Constant and lasting modifiers, flags and restrictions for the A Knife in the Dark lines. The records are fixtures; each
 // test names the ledger line (data/printed) it is for.
 import { describe, expect, it } from "vitest";
@@ -10,7 +10,7 @@ import { syncConstants } from "./constants.ts";
 import { pushCardEffects } from "./effect-frames.ts";
 import { cardMap, expectOk, hero, idleScenario } from "./fixture.ts";
 import type { EngineStep } from "./intents.ts";
-import { dealOneShadow, type ReduceContext } from "./interpret.ts";
+import { dealOneShadow, runInstruction, type ReduceContext } from "./interpret.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
 import { settle } from "./machine.ts";
 import { definePrinted } from "./printed.ts";
@@ -95,6 +95,22 @@ describe("while a location is the active location, enemies cannot attack, take d
     const open = marshTable("staging").state;
     expect(qualifyingEnemies(open, 0, ctx.cards)).toEqual([staged]);
     expect(placeDamage(open, engaged, 3, ctx.cards, [], "combat", { rule: "rr.step-6-8-3" }).cards[engaged]?.damage).toBe(3);
+  });
+
+  // The Prancing Pony's Forced (141045:A:2) puts each discarded enemy "into play engaged with the first player". The enemy is
+  // out of play when the effect moves it, so the line, held by enemies in play, does not stop it (rr.in-play-and-out-of-play,
+  // rr.engaged).
+  it("does not stop an effect from putting an out-of-play enemy into play engaged", () => {
+    const { state: base } = marshTable("activeLocation");
+    const dealt = spawn(base, "rider", { zone: "encounterDeck" }, "down");
+    const state = syncConstants(dealt.state, ctx);
+    const steps: EngineStep[] = [];
+    const after = runInstruction(state, { verb: "DiscardUntilEnemies", perPlayer: 1 }, { seat: 0, sourceId: null }, ctx, steps);
+    expect(after.cards[dealt.id]?.zone).toBe("engaged");
+    expect(after.seats[0].engaged).toContain(dealt.id);
+    expect(steps).toContainEqual({ kind: "engage", seat: 0, enemyId: dealt.id });
+    // Once in play it holds the line like every other enemy: it cannot attack while the location is active.
+    expect(syncConstants(after, ctx).modifiers.some((modifier) => modifier.instanceId === dealt.id && modifier.stat === "cannotAttack")).toBe(true);
   });
 
   it("skips the optional engagement when no enemy can be engaged", () => {

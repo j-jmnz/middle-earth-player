@@ -112,7 +112,10 @@ export function runInstruction(
       return modifyStat(state, instruction, focus, ctx);
     case "Exhaust": {
       const code = instruction.target?.kind === "byCode" ? instruction.target.code : undefined;
-      const id = code ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id : focus.sourceId;
+      const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;
+      const id = code
+        ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone) && (payer == null || card.controller === payer))?.id
+        : focus.sourceId;
       return id ? updateCard(state, id, { exhausted: true }) : state;
     }
     case "Ready":
@@ -169,12 +172,9 @@ function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: 
   return updateCard(state, id, { progress: instance.progress + 1 });
 }
 
+// The enemy's shadow card, when it has none yet.
 export function dealOneShadow(state: ScenarioState, enemyId: string): ScenarioState {
-  const enemy = state.cards[enemyId];
-  const top = state.encounterDeck[0];
-  if (!enemy || enemy.shadowId || !top) return state;
-  const moved = moveCard(state, top, { zone: "shadow", enemyId });
-  return updateCard(moved, top, { face: "down" });
+  return state.cards[enemyId]?.shadowId ? state : dealAdditionalShadow(state, enemyId);
 }
 
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty

@@ -8,8 +8,9 @@ import { withMode, type ScenarioState } from "../rules/state.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { first, loadWorld, RING, table, type Layout, type World } from "../../scripts/past-scene.ts";
 
-// Weathertop's Travel cost (141046:A:3, "Travel: The first player must exhaust The One Ring to travel here.") and
-// rr.travel: "If the players cannot pay the Travel cost, then they cannot travel to that location."
+// Weathertop's Travel cost (141046:A:3, "Travel: The first player must exhaust The One Ring to travel here."),
+// rr.travel: "If the players cannot pay the Travel cost, then they cannot travel to that location.", and rr.first-player:
+// the first player token passes at the end of each refresh phase.
 const WEATHERTOP = "141046";
 
 let world: World;
@@ -20,9 +21,9 @@ beforeAll(async () => {
 });
 
 // An engaged enemy keeps the round in combat after the travel, before the refresh phase readies The One Ring again.
-function travelWindow(ring: Layout["ring"]) {
-  const { state, ctx } = table(world, { staging: [WEATHERTOP], ring, engaged: [{ code: "f0", seat: 0 }] });
-  const travel: ScenarioState = { ...withMode(state, "travel"), phase: "Travel", boundaryPhase: "Travel", window: { kind: "travel" } };
+function travelWindow(ring: Layout["ring"], seats: 1 | 2 = 1, firstPlayer = 0) {
+  const { state, ctx } = table(world, { staging: [WEATHERTOP], ring, seats, engaged: [{ code: "f0", seat: 0 }] });
+  const travel: ScenarioState = { ...withMode(state, "travel"), phase: "Travel", boundaryPhase: "Travel", firstPlayer, window: { kind: "travel" } };
   return { state: travel, ctx, weathertop: first(travel, WEATHERTOP) };
 }
 
@@ -53,7 +54,20 @@ describe("Weathertop's Travel cost (141046:A:3, rr.travel)", () => {
     expect(reduce(state, { type: "Travel", locationId: weathertop }, ctx).ok).toBe(false);
   });
 
-  it("is a record of the travel timing that exhausts The One Ring", () => {
-    expect(EFFECTS.find((effect) => effect.id === "141046:travel:1")?.instructions).toEqual([{ verb: "Exhaust", target: { kind: "byCode", code: RING } }]);
+  it("two-handed, is paid only by the first player: after the token passes, the Ring-bearer's ready Ring does not pay it", () => {
+    const own = travelWindow("ready", 2, 0);
+    expect(legalTargets(own.state, { type: "Travel" }, own.ctx)).toEqual([own.weathertop]);
+    const done = expectOk(reduce(own.state, { type: "Travel", locationId: own.weathertop }, own.ctx)).state;
+    expect(done.cards[first(done, RING)]?.exhausted).toBe(true);
+    const passed = travelWindow("ready", 2, 1);
+    expect(passed.state.cards[first(passed.state, RING)]?.controller).toBe(0);
+    expect(legalTargets(passed.state, { type: "Travel" }, passed.ctx)).toEqual([]);
+    const refused = reduce(passed.state, { type: "Travel", locationId: passed.weathertop }, passed.ctx);
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) expect(refused.reason).toBe("The players cannot pay that location's Travel cost");
+  });
+
+  it("is a record of the travel timing in which the first player exhausts The One Ring", () => {
+    expect(EFFECTS.find((effect) => effect.id === "141046:travel:1")?.instructions).toEqual([{ verb: "Exhaust", target: { kind: "byCode", code: RING }, who: "firstPlayer" }]);
   });
 });

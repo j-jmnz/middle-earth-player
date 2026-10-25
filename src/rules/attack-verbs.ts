@@ -7,7 +7,7 @@ import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { lastPicked, seatOf } from "./player-verbs.ts";
 import { topFrame } from "./windows.ts";
-import { addModifier } from "./keywords.ts";
+import { addClassModifier, addModifier, ALLIES_CLASS } from "./keywords.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats } from "./state.ts";
 import type { VerbFocus } from "./verbs.ts";
@@ -71,7 +71,7 @@ export function modifyStat(
     // Every ally, now and entering play later, until the effect ends: an encounter card's lasting effect (rr.lasting-effects,
     // 141071:A:1). The holder is the class, read by modifiedStat.
     case "allies":
-      targets = ["allies"];
+      targets = [ALLIES_CLASS];
       break;
     default:
       targets = [sourceId];
@@ -83,7 +83,9 @@ export function modifyStat(
   const trait = instruction.trait;
   for (const id of targets) {
     if (trait != null && !hasTrait(next, id, trait, ctx)) continue;
-    next = id === "allies" ? { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] } : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);
+    next = id === ALLIES_CLASS
+      ? addClassModifier(next, ALLIES_CLASS, sourceId, instruction.stat, amount, instruction.until)
+      : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);
   }
   return next;
 }

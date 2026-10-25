@@ -3,7 +3,7 @@
 // Pick is for (the heroes Unwanted Attention removes from the quest, 141054:A:2). The words describe the effect record's
 // instructions; the reducer still decides what each one does.
 import type { Instruction } from "../catalog/boundary.ts";
-import { livingSeats } from "../rules/state.ts";
+import { questProgressMoved } from "../rules/verbs.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
 
 export type ChoiceNames = {
@@ -30,13 +30,10 @@ function capital(text: string): string {
 /** One instruction in words, or null when it adds nothing the player decides on (a shuffle after a search). */
 function instructionWords(instruction: Instruction, game: ScenarioState, names: ChoiceNames, sourceId: string | null): string | null {
   switch (instruction.verb) {
-    case "RemoveQuestProgress": {
-      const stage = game.questStage ? game.cards[game.questStage] : undefined;
-      const amount = Math.min(instruction.perPlayer * livingSeats(game).length, stage?.progress ?? 0);
-      return `remove ${amount} progress from the quest`;
-    }
+    case "RemoveQuestProgress":
+      return `remove ${questProgressMoved(game, instruction)} progress from the quest`;
     case "PlaceQuestProgress":
-      return `place ${instruction.perPlayer * livingSeats(game).length} progress on the quest`;
+      return `place ${questProgressMoved(game, instruction)} progress on the quest`;
     case "ShuffleOutOfPlayIntoEncounterDeck":
       return `shuffle an out-of-play ${names.code(instruction.code)} into the encounter deck`;
     case "GainSurge":

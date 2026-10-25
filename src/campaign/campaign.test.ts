@@ -237,6 +237,7 @@ describe("A Knife in the Dark from the log of A Shadow of the Past", () => {
     expect(campaign.scenarios[2]).toBe("flight-to-the-ford");
     // Scenario 3's checklist puts the boon back on Sam in step 5.
     const third = checklist({ log: after, scenario: loadScenario("flight-to-the-ford"), seats: [{ heroes: [FRODO, SAM], deck: DECK }], effects: EFFECTS, cards });
+    expect(third.ok).toBe(true);
     if (third.ok) expect(third.seats[0]?.attachments).toContainEqual({ host: SAM, code: "141018" });
   });
 

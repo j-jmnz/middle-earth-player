@@ -1,4 +1,4 @@
-// Rules: rr.constant-ability, rr.step-6-4-1, rr.travel (data/rules/entries.json).
+// Rules: rr.constant-ability, rr.step-6-4-1, rr.travel, rr.first-player (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { constantInstructions } from "./constant-records.ts";
@@ -31,8 +31,11 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
 }
 
 // "If the players cannot pay the Travel cost, then they cannot travel to that location." (rr.travel). A Travel cost that
-// exhausts a named card (Weathertop, 141046:A:3: "The first player must exhaust The One Ring to travel here") can be paid
-// only while a ready copy of that card is in play. A Hide test on a Travel line is not a cost the players can fail to pay.
+// exhausts a named card can be paid only while a ready copy of that card is in play, and, when the line names who exhausts
+// it, under that player's control: Weathertop (141046:A:3) prints "The first player must exhaust The One Ring to travel
+// here", so the Ring must be ready and controlled by the player who holds the first player token now (rr.first-player); in
+// two-handed play that is not the Ring-bearer's seat every round. A Hide test on a Travel line is not a cost the players
+// can fail to pay.
 export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   const code = state.cards[locationId]?.code;
   if (code == null) return false;
@@ -42,7 +45,10 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
     .some((instruction) => {
       if (instruction.verb !== "Exhaust" || instruction.target?.kind !== "byCode") return false;
       const named = instruction.target.code;
-      return !Object.values(state.cards).some((card) => card.code === named && inPlay(card.zone) && !card.exhausted);
+      const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;
+      return !Object.values(state.cards).some(
+        (card) => card.code === named && inPlay(card.zone) && !card.exhausted && (payer == null || card.controller === payer),
+      );
     });
 }
 

@@ -10,9 +10,8 @@ import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, eliminateEmpties, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "./keywords.ts";
 import { lastPicked, otherSeat } from "./player-verbs.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
-import { engageEnemy, placeQuestProgress, stagingEnemies } from "./quest.ts";
+import { engageEnemy, engageWith, placeQuestProgress, stagingEnemies } from "./quest.ts";
 import { restricted } from "./restrictions.ts";
-import { queueEvent } from "./queue.ts";
 import { nextUint, shuffleIds } from "./seed.ts";
 import { afterProgress } from "./stage-reveal.ts";
 import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
@@ -61,10 +60,10 @@ export function runExtraVerb(
       return id ? shuffleIntoEncounterDeck(state, id) : state;
     }
     case "RemoveQuestProgress":
-      return removeQuestProgress(state, instruction.perPlayer * livingSeats(state).length, steps);
+      return removeQuestProgress(state, questProgressMoved(state, instruction), steps);
     case "PlaceQuestProgress": {
       const before = steps.length;
-      const placed = placeQuestProgress(state, instruction.perPlayer * livingSeats(state).length, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
+      const placed = placeQuestProgress(state, questProgressMoved(state, instruction), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
       return afterProgress(placed, before, ctx, steps);
     }
     case "DiscardUntilEnemies":
@@ -183,7 +182,7 @@ function committedHeroes(state: ScenarioState, seat: number, exceptSphere: strin
 
 // Cards come off the top of the encounter deck into its discard pile until `count` enemies are among them, or the deck is
 // empty (rr.effects: as many as there are). Each of those enemies is then put into play engaged with the first player
-// (141045:A:2): it has engaged that player (rr.engaged).
+// (141045:A:2): it has engaged that player (rr.engaged), "cannot be engaged" or not (engageWith).
 function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   const enemies: string[] = [];
@@ -193,13 +192,7 @@ function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceCon
     next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up" });
     if (printedOf(ctx.cards, next.cards[top]?.code ?? "").type === "enemy") enemies.push(top);
   }
-  const seat = next.firstPlayer;
-  if (next.seats[seat]?.eliminated) return next;
-  for (const id of enemies) {
-    next = moveCard(next, id, { zone: "engaged", seat });
-    steps.push({ kind: "engage", seat, enemyId: id });
-    next = queueEvent(next, { trigger: "engaged", seat, subject: id });
-  }
+  for (const id of enemies) next = engageWith(next, next.firstPlayer, id, steps);
   return next;
 }
 
@@ -241,12 +234,23 @@ function discardRandom(state: ScenarioState, seat: number, amount: number): Scen
   return next;
 }
 
-// Progress comes off the current quest card and stops at 0. The step records what was removed, as a negative amount.
-function removeQuestProgress(state: ScenarioState, amount: number, steps: EngineStep[]): ScenarioState {
+// The progress a quest progress instruction moves: X per player in the game ("remove X progress ... X is the number of
+// players", 141026:B:2). A removal takes no more than the current quest card holds, so its count stops at 0.
+export function questProgressMoved(
+  state: ScenarioState,
+  instruction: Extract<Instruction, { verb: "RemoveQuestProgress" | "PlaceQuestProgress" }>,
+): number {
+  const amount = instruction.perPlayer * livingSeats(state).length;
+  if (instruction.verb === "PlaceQuestProgress") return amount;
+  const stage = state.questStage ? state.cards[state.questStage] : undefined;
+  return Math.max(0, Math.min(amount, stage?.progress ?? 0));
+}
+
+// Progress comes off the current quest card, `removed` from questProgressMoved. The step records it as a negative amount.
+function removeQuestProgress(state: ScenarioState, removed: number, steps: EngineStep[]): ScenarioState {
   const id = state.questStage;
   const stage = id ? state.cards[id] : undefined;
   if (!id || !stage) return state;
-  const removed = Math.min(amount, stage.progress);
   if (removed <= 0) return state;
   steps.push({ kind: "progress", targetId: id, amount: -removed, cause: currentCause(steps, UNATTRIBUTED) });
   return updateCard(state, id, { progress: stage.progress - removed });

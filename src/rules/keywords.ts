@@ -33,10 +33,13 @@ function printedStat(printed: PrintedCard, stat: ModifierStat): number {
 // The stats of a card. A value below 0 is treated as 0 (rr.modifiers).
 const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "defense", "threat", "questPoints", "engagementCost", "hitPoints"]);
 
-// Whether a modifier is held by this card: by its id, or by the class "allies" (an encounter card's lasting effect on each
-// ally, which also holds for allies that enter play later, rr.lasting-effects).
+// The holder of a modifier on every ally in play, now and entering play later: an encounter card's lasting effect
+// (rr.lasting-effects, 141071:A:1). It stands in the modifier's instance id.
+export const ALLIES_CLASS = "allies";
+
+// Whether a modifier is held by this card: by its id, or by the class ALLIES_CLASS.
 function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
-  return modifier.instanceId === instance.id || (modifier.instanceId === "allies" && printed.type === "ally" && inPlay(instance.zone));
+  return modifier.instanceId === instance.id || (modifier.instanceId === ALLIES_CLASS && printed.type === "ally" && inPlay(instance.zone));
 }
 
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
@@ -96,6 +99,18 @@ export function addModifier(
 ): ScenarioState {
   if (!state.cards[instanceId]) return state;
   return { ...state, modifiers: [...state.modifiers, { instanceId, sourceId, stat, amount, until }] };
+}
+
+// A modifier held by a class of cards rather than one card (ALLIES_CLASS): no card has to exist for it yet.
+export function addClassModifier(
+  state: ScenarioState,
+  holder: typeof ALLIES_CLASS,
+  sourceId: string,
+  stat: ModifierStat,
+  amount: number,
+  until: ModifierUntil,
+): ScenarioState {
+  return { ...state, modifiers: [...state.modifiers, { instanceId: holder, sourceId, stat, amount, until }] };
 }
 
 export function placedAmount(printed: PrintedCard, amount: number): number {

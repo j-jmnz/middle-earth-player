@@ -275,11 +275,14 @@ const simpleVerbs = [
   verb("PayCost"),
   verb("PlayAlly"),
   verb("Attach"),
+  // Exhausts the source, the picked card, or a named card. `who` names the player who must control the named card ("The
+  // first player must exhaust The One Ring", 141046:A:3).
   z.strictObject({
     verb: z.literal("Exhaust"),
     target: z
       .discriminatedUnion("kind", [z.strictObject({ kind: z.literal("byCode"), code: z.string().min(1) }), z.strictObject({ kind: z.literal("picked") })])
       .optional(),
+    who: z.enum(["firstPlayer"]).optional(),
     ...when,
   }),
   // Readies the source (the default), the card it is attached to, the picked card, or every character in play.

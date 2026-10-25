@@ -1,4 +1,4 @@
-// Rules: rr.quest-advancement, rr.step-3-4, rr.engagement-check, rr.optional-engagement (data/rules/entries.json).
+// Rules: rr.quest-advancement, rr.step-3-4, rr.engagement-check, rr.optional-engagement, rr.engaged, rr.in-play-and-out-of-play (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
@@ -198,12 +198,21 @@ export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
   });
 }
 
+// An enemy in the staging area engages the seat: an engagement check, an optional engagement, or an effect that engages
+// one there. "Enemies cannot ... be engaged" (141048:A:1) stops it.
 export function engageEnemy(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
   const instance = state.cards[enemyId];
   if (!instance || instance.zone !== "staging") return state;
-  // "Enemies cannot ... be engaged" (141048:A:1).
   if (flagged(state, enemyId, "cannotBeEngaged")) return state;
-  if (state.seats[seat]?.eliminated) return state;
+  return engageWith(state, seat, enemyId, steps);
+}
+
+// The enemy enters the seat's play area from wherever it is, so it has engaged that player (rr.engaged). An effect that
+// puts an out-of-play enemy into play engaged (141045:A:2) comes here directly: "cannot be engaged" (141048:A:1) is held
+// only by enemies in play, and card abilities do not reach a card out of play (rr.in-play-and-out-of-play), so it does not
+// stop the enemy, which is engaged as it enters play.
+export function engageWith(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
+  if (!state.cards[enemyId] || state.seats[seat]?.eliminated) return state;
   const moved = moveCard(state, enemyId, { zone: "engaged", seat });
   steps.push({ kind: "engage", seat, enemyId });
   // Responses hear that the player engaged the enemy ("After you engage an enemy with a higher engagement cost ...").

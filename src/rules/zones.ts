@@ -105,7 +105,8 @@ function withExtraShadows(state: ScenarioState, enemy: CardInstance, ids: readon
   return { ...state, cards: { ...state.cards, [enemy.id]: next } };
 }
 
-// The cards facedown under a location (141049:A:1), in the order they were placed.
+// The cards facedown under a location (141049:A:1), in instance id order (the order the cards were made, not the order
+// they were placed): the rules give the cards under a location no order, and the id keeps the list stable.
 export function cardsUnder(state: ScenarioState, locationId: string): string[] {
   return Object.values(state.cards)
     .filter((card) => card.zone === "under" && card.host === locationId)
