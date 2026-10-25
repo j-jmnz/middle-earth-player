@@ -34,6 +34,8 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `node --experimental-strip-types scripts/e2e-fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. |
 
+The scripts log to stderr through `scripts/log.ts`: each line has the time since the start, the script and source (`data:sync › ringsdb`), and progress through long fetches. A failure prints its causes (a dropped connection's `ECONNRESET`, the URL and status of a bad response). Add `--verbose` for every request, file and stack (`pnpm data:sync ringsdb -- --verbose`), `--quiet` for warnings and errors only, or set `LOG_LEVEL` (`debug`, `info`, `warn`, `error`, `silent`). Data stays on stdout: `data:query` prints only rows there.
+
 CI (`.github/workflows/test.yml`) runs `data:check`, `lint`, `tsc`, and `test` on every push and pull request. [CLAUDE.md](CLAUDE.md) has the data commands in more detail.
 
 Do not commit `catalog.db`, card scans, or PDFs. The catalog is generated from `data/` and shipped inside the binary.

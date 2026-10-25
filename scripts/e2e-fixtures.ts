@@ -36,8 +36,10 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 
 import { nextIntent } from "./auto-player.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
+import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
+const say = createLog("e2e-fixtures");
 const FRODO = "141001";
 const campaign = loadCampaign();
 const scenario = loadScenario("a-shadow-of-the-past");
@@ -164,7 +166,7 @@ function searchWin(): { seed: number; loadout: StoredLoadout; intents: PlayerInt
           intents.push(intent);
         }
         if (state.window?.kind === "resolution") {
-          console.log(`won: seed ${line.seed}, depth ${depth}, ${intents.length} intents, round ${state.round}`);
+          say.info(`won: seed ${line.seed}, depth ${depth}, ${intents.length} intents, round ${state.round}`);
           return { seed: line.seed, loadout, intents };
         }
         if (!state.lost) children.push({ seed: line.seed, state, intents, memory, ctx: line.ctx });
@@ -179,7 +181,7 @@ function searchWin(): { seed: number; loadout: StoredLoadout; intents: PlayerInt
     const ahead = [...children].sort((left, right) => score(right.state) - score(left.state)).slice(0, 30);
     const safe = [...children].sort((left, right) => safety(right.state) - safety(left.state)).filter((line) => !ahead.includes(line)).slice(0, 30);
     beam = [...ahead, ...safe];
-    console.log(`depth ${depth}: ${children.length} alive, best stage ${beam[0] ? stageAt(beam[0].state) : -1}`);
+    say.info(`depth ${depth}: ${children.length} alive, best stage ${beam[0] ? stageAt(beam[0].state) : -1}`);
   }
   throw new Error("No won game found");
 }
@@ -205,7 +207,7 @@ function playLoss(): { seed: number; loadout: StoredLoadout; intents: PlayerInte
     intents.push(intent);
   }
   if (!state.lost) throw new Error("The loss fixture did not lose");
-  console.log(`lost: seed ${seed}, ${intents.length} intents, round ${state.round}, ${state.lossReason}`);
+  say.info(`lost: seed ${seed}, ${intents.length} intents, round ${state.round}, ${state.lossReason}`);
   return { seed, loadout, intents };
 }
 
@@ -258,7 +260,7 @@ function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout
     choices: [],
     acceptPenalty: log.fallenHeroesBySeat.some((fallen) => fallen.length > 0),
   };
-  console.log(`knife-lost heroes: ${JSON.stringify(seats)}`);
+  say.info(`knife-lost heroes: ${JSON.stringify(seats)}`);
   const codes = [FRODO, ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)];
   const world = loadWorld(catalog, campaign, knife, EFFECTS, codes);
   const seed = 1;
@@ -278,30 +280,33 @@ function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout
     intents.push(intent);
   }
   if (!state.lost) throw new Error("The knife loss fixture did not lose");
-  console.log(`knife-lost: seed ${seed}, ${intents.length} intents, round ${state.round}, ${state.lossReason}`);
+  say.info(`knife-lost: seed ${seed}, ${intents.length} intents, round ${state.round}, ${state.lossReason}`);
   return { seed, loadout, intents };
 }
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
 // the search runs only when asked, and `won` and `knife-lost` are written only when it finds one.
-const searching = process.argv.includes("--won");
-const lost = playLoss();
-const won = searching ? searchWin() : null;
-const out = {
-  ...(won ? { won: { seatCount: 2, ...won } } : {}),
-  lost: { seatCount: 1, ...lost },
-};
-const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "src", "campaign", "fixtures");
-const file = path.join(dir, "scenario-1.json");
-writeFileSync(file, `${JSON.stringify(out)}\n`);
-console.log(`wrote ${file}`);
-
-if (won) {
-  const past = wonLog(won);
-  const knifeOut = {
-    "knife-lost": { seatCount: 2, ...playKnifeLoss(past.log), log: past.log, past: { fixture: "won", choices: past.choices } },
+void runScript("e2e-fixtures", () => {
+  const searching = process.argv.includes("--won");
+  if (!searching) say.info("the won game is open: pass --won to search for it (about two hours with no result so far)");
+  const lost = say.step("play scenario 1's loss", () => playLoss());
+  const won = searching ? say.step("search scenario 1's won game", () => searchWin()) : null;
+  const out = {
+    ...(won ? { won: { seatCount: 2, ...won } } : {}),
+    lost: { seatCount: 1, ...lost },
   };
-  const knifeFile = path.join(dir, "a-knife-in-the-dark.json");
-  writeFileSync(knifeFile, `${JSON.stringify(knifeOut)}\n`);
-  console.log(`wrote ${knifeFile}`);
-}
+  const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "src", "campaign", "fixtures");
+  const file = path.join(dir, "scenario-1.json");
+  writeFileSync(file, `${JSON.stringify(out)}\n`);
+  say.info(`wrote ${file} (${Object.keys(out).join(", ")})`);
+
+  if (won) {
+    const past = wonLog(won);
+    const knifeOut = {
+      "knife-lost": { seatCount: 2, ...say.step("play A Knife in the Dark's loss", () => playKnifeLoss(past.log)), log: past.log, past: { fixture: "won", choices: past.choices } },
+    };
+    const knifeFile = path.join(dir, "a-knife-in-the-dark.json");
+    writeFileSync(knifeFile, `${JSON.stringify(knifeOut)}\n`);
+    say.info(`wrote ${knifeFile}`);
+  }
+});

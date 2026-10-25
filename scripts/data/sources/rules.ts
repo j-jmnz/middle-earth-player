@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { PDF_CACHE_DIR } from "../paths.ts";
+import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
 
 const FFG = "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09";
@@ -40,14 +41,18 @@ export const RULE_PDFS = [
 ] as const;
 
 // PDFs stay out of git. They are fetched into .cache/pdf and pinned by sha256 in data/sources.json.
-export async function syncRules(): Promise<SourceRecord> {
+export async function syncRules(log: Log = createLog("rules")): Promise<SourceRecord> {
   mkdirSync(PDF_CACHE_DIR, { recursive: true });
+  log.debug(`PDFs go to ${PDF_CACHE_DIR}`);
   const files: SourceFile[] = [];
+  const tick = log.progress(RULE_PDFS.length, "pdf");
   for (const pdf of RULE_PDFS) {
-    const bytes = await fetchBytes(pdf.url, 300_000);
-    if (new TextDecoder().decode(bytes.slice(0, 5)) !== "%PDF-") throw new Error(`${pdf.url} is not a PDF`);
-    writeFileSync(path.join(PDF_CACHE_DIR, pdf.file), bytes);
-    files.push({ path: `pdf/${pdf.file}`, url: pdf.url, sha256: sha256(bytes), bytes: bytes.length });
+    const body = await fetchBytes(pdf.url, 300_000, log);
+    const head = new TextDecoder().decode(body.slice(0, 5));
+    if (head !== "%PDF-") throw new Error(`${pdf.url} is not a PDF (starts ${JSON.stringify(head)}, ${bytes(body.length)})`);
+    writeFileSync(path.join(PDF_CACHE_DIR, pdf.file), body);
+    files.push({ path: `pdf/${pdf.file}`, url: pdf.url, sha256: sha256(body), bytes: body.length });
+    tick(`${pdf.doc}: ${pdf.file}, ${bytes(body.length)}`);
   }
   return { id: "rules", site: "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
 }

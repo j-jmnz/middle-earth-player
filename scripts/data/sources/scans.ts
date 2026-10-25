@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { SCAN_CACHE_DIR } from "../paths.ts";
 import { scanTargets } from "../printed/scope.ts";
+import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
 
 // Hall of Beorn serves some scans as PNG under a .jpg name. The cache file takes the extension of the bytes.
@@ -30,27 +31,36 @@ const MIN_WIDTH = 400;
 
 // Card scans stay out of git. They are fetched into .cache/scans/<code>.<side>.<jpg|png> and pinned by sha256 in
 // data/sources.json, which is what the printed-text ledger names.
-export async function syncScans(): Promise<SourceRecord> {
+export async function syncScans(log: Log = createLog("scans")): Promise<SourceRecord> {
   mkdirSync(SCAN_CACHE_DIR, { recursive: true });
   const files: SourceFile[] = [];
-  for (const target of scanTargets()) {
+  const targets = scanTargets();
+  log.info(`${targets.length} card sides to fetch into ${SCAN_CACHE_DIR}`);
+  const tick = log.progress(targets.length, "scan");
+  let fallbacks = 0;
+  for (const target of targets) {
     let fetched: { url: string; bytes: Uint8Array } | null = null;
     const failures: string[] = [];
     for (const url of target.urls) {
       try {
-        const bytes = await fetchBytes(url, 60_000);
-        if (extensionOf(bytes) === null) throw new Error("not a JPEG or PNG");
-        if (widthOf(bytes) < MIN_WIDTH) throw new Error(`too small to read (${widthOf(bytes)} px wide)`);
-        fetched = { url, bytes };
+        const body = await fetchBytes(url, 60_000, log);
+        if (extensionOf(body) === null) throw new Error("not a JPEG or PNG");
+        if (widthOf(body) < MIN_WIDTH) throw new Error(`too small to read (${widthOf(body)} px wide)`);
+        fetched = { url, bytes: body };
         break;
       } catch (error) {
-        failures.push(`${url}: ${error instanceof Error ? error.message : String(error)}`);
+        const reason = error instanceof Error ? error.message : String(error);
+        failures.push(`${url}: ${reason}`);
+        log.debug(`${target.code}.${target.side}: skipped ${url}: ${reason}`);
       }
     }
     if (!fetched) throw new Error(`No scan for ${target.code}.${target.side}:\n  ${failures.join("\n  ")}`);
+    if (failures.length > 0) fallbacks += 1;
     const extension = extensionOf(fetched.bytes) ?? "jpg";
     writeFileSync(path.join(SCAN_CACHE_DIR, `${target.code}.${target.side}.${extension}`), fetched.bytes);
     files.push({ path: `scans/${target.code}.${target.side}.${extension}`, url: fetched.url, sha256: sha256(fetched.bytes), bytes: fetched.bytes.length });
+    tick(`${target.code}.${target.side} ${widthOf(fetched.bytes)} px, ${bytes(fetched.bytes.length)}${failures.length > 0 ? ` (after ${failures.length} unusable URL${failures.length === 1 ? "" : "s"})` : ""}`);
   }
+  if (fallbacks > 0) log.info(`${fallbacks} side${fallbacks === 1 ? "" : "s"} came from a fallback URL (--verbose lists the skipped ones)`);
   return { id: "scans", site: "https://hallofbeorn.com", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
 }
