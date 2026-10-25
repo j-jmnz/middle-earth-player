@@ -8,7 +8,7 @@ import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { BodyText, Eyebrow, Label, Panel, PrimaryButton, RingMark, Screen, ScreenTitle, TextButton } from "../../chrome";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf } from "../../campaign-data";
-import { createSave, listSaves } from "../../campaign-store";
+import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
 
@@ -49,21 +49,46 @@ function ProgressLine({ done, total }: { done: number; total: number }) {
   );
 }
 
+// A delete is asked twice, in place: the panel says what is lost and offers Delete for good beside Keep.
+function DeleteConfirm({ id, onDelete, onKeep }: { id: string; onDelete: () => void; onKeep: () => void }) {
+  return (
+    <View className="mt-3 gap-1" testID={`delete-confirm-${id}`}>
+      <BodyText tone="danger">Delete this playthrough? Its log, pool and any open scenario are gone for good.</BodyText>
+      <View className="-mx-3 flex-row">
+        <TextButton label="Delete for good" testID={`delete-yes-${id}`} tone="danger" onPress={onDelete} />
+        <TextButton label="Keep" testID={`delete-no-${id}`} onPress={onKeep} />
+      </View>
+    </View>
+  );
+}
+
 export default function CampaignList() {
   const router = useRouter();
   const { catalog, user } = useDatabases();
   const [saves, setSaves] = useState<Save[]>([]);
+  const [archived, setArchived] = useState<Save[]>([]);
   const [starting, setStarting] = useState(false);
+  // Manage shows Archive and Delete on each open playthrough instead of opening it.
+  const [managing, setManaging] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
+  // The save whose delete is waiting on Delete for good.
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [seats, setSeats] = useState<Seats>(1);
   const campaigns = campaignListQueries(catalog, user).campaigns.all();
   const locked = lockedTiles(campaigns);
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
 
-  useFocusEffect(
-    useCallback(() => {
-      setSaves(listSaves(user));
-    }, [user]),
-  );
+  const refresh = useCallback(() => {
+    const open = listSaves(user);
+    const away = listArchivedSaves(user);
+    setSaves(open);
+    setArchived(away);
+    if (open.length === 0) setManaging(false);
+    if (away.length === 0) setShowArchived(false);
+    setDeleting(null);
+  }, [user]);
+
+  useFocusEffect(refresh);
 
   function openBooklet(id: string): void {
     router.push({ pathname: "/booklet/[id]", params: { id } });
@@ -71,13 +96,31 @@ export default function CampaignList() {
 
   function start(): void {
     const save = createSave(user, FELLOWSHIP_ID, seats);
-    setSaves(listSaves(user));
+    refresh();
     setStarting(false);
     router.push({ pathname: "/path/[saveId]", params: { saveId: save.id } });
   }
 
+  function archive(id: string): void {
+    archiveSave(user, id);
+    refresh();
+  }
+
+  function restore(id: string): void {
+    restoreSave(user, id);
+    refresh();
+  }
+
+  function remove(id: string): void {
+    deleteSave(user, id);
+    refresh();
+  }
+
   const showStart = saves.length === 0 || starting;
   const fellowship = campaignOf(FELLOWSHIP_ID);
+  const doneOf = (save: Save) => (fellowship ? campaignPath(fellowship, {}, save.log).filter((node) => node.status === "completed").length : 0);
+  const total = fellowship?.scenarios.length ?? 6;
+  const seatWord = (save: Save) => (save.seatCount === 1 ? "True solo" : "Two-handed");
 
   return (
     <Screen testID="campaign-list" scene="dusk">
@@ -90,7 +133,25 @@ export default function CampaignList() {
         {/* The scene's light sits above the cards. */}
         <View className="mt-40 gap-3">
           {saves.map((save, index) => {
-            const done = fellowship ? campaignPath(fellowship, {}, save.log).filter((node) => node.status === "completed").length : 0;
+            if (managing) {
+              return (
+                <View key={save.id} testID={`save-${save.id}`}>
+                  <Panel current={index === 0}>
+                    <Text className="font-display text-title text-bone">{nameOf(save.campaignId)}</Text>
+                    <Label>{seatWord(save)}</Label>
+                    <ProgressLine done={doneOf(save)} total={total} />
+                    {deleting === save.id ? (
+                      <DeleteConfirm id={save.id} onDelete={() => remove(save.id)} onKeep={() => setDeleting(null)} />
+                    ) : (
+                      <View className="-mx-3 mt-2 flex-row">
+                        <TextButton label="Archive" testID={`archive-${save.id}`} tone="gold" accessibilityLabel={`Archive ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => archive(save.id)} />
+                        <TextButton label="Delete" testID={`delete-${save.id}`} tone="danger" accessibilityLabel={`Delete ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => setDeleting(save.id)} />
+                      </View>
+                    )}
+                  </Panel>
+                </View>
+              );
+            }
             return (
               <Pressable
                 key={save.id}
@@ -103,14 +164,19 @@ export default function CampaignList() {
                   <Panel current={index === 0} pressed={pressed}>
                     {saves.length > 1 && index === 0 ? <Eyebrow>Current</Eyebrow> : null}
                     <Text className="mt-1 font-display text-title text-bone">{nameOf(save.campaignId)}</Text>
-                    <Label>{save.seatCount === 1 ? "True solo" : "Two-handed"}</Label>
-                    <ProgressLine done={done} total={fellowship?.scenarios.length ?? 6} />
+                    <Label>{seatWord(save)}</Label>
+                    <ProgressLine done={doneOf(save)} total={total} />
                   </Panel>
                 )}
               </Pressable>
             );
           })}
-          {saves.length === 0 ? <BodyText tone="muted">No playthrough exists</BodyText> : null}
+          {saves.length > 0 ? (
+            <View className="-mx-3 flex-row">
+              <TextButton label={managing ? "Done" : "Manage"} testID="manage-playthroughs" onPress={() => { setManaging(!managing); setDeleting(null); }} />
+            </View>
+          ) : null}
+          {saves.length === 0 && archived.length === 0 ? <BodyText tone="muted">No playthrough exists</BodyText> : null}
           {locked.length > 0 ? (
             <View className="flex-row gap-3" testID="locked-campaigns">
               {locked.map((tile) => (
@@ -145,6 +211,35 @@ export default function CampaignList() {
               <TextButton label="New playthrough" testID="new-playthrough" tone="gold" onPress={() => setStarting(true)} />
             </View>
           )}
+          {archived.length > 0 ? (
+            <View className="gap-3" testID="archived-playthroughs">
+              <View className="-mx-3 flex-row">
+                <TextButton
+                  label={`${showArchived ? "Hide archived" : "Archived"} \u00b7 ${archived.length}`}
+                  testID="archived-toggle"
+                  accessibilityLabel={`${showArchived ? "Hide" : "Show"} ${archived.length} archived ${archived.length === 1 ? "playthrough" : "playthroughs"}`}
+                  onPress={() => { setShowArchived(!showArchived); setDeleting(null); }}
+                />
+              </View>
+              {showArchived
+                ? archived.map((save) => (
+                    <View key={save.id} testID={`archived-${save.id}`} className="rounded-card border border-hairline p-5">
+                      <Text className="font-display text-title text-muted">{nameOf(save.campaignId)}</Text>
+                      <Label>{seatWord(save)}</Label>
+                      <ProgressLine done={doneOf(save)} total={total} />
+                      {deleting === save.id ? (
+                        <DeleteConfirm id={save.id} onDelete={() => remove(save.id)} onKeep={() => setDeleting(null)} />
+                      ) : (
+                        <View className="-mx-3 mt-2 flex-row">
+                          <TextButton label="Restore" testID={`restore-${save.id}`} tone="gold" accessibilityLabel={`Restore ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => restore(save.id)} />
+                          <TextButton label="Delete" testID={`delete-${save.id}`} tone="danger" accessibilityLabel={`Delete ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => setDeleting(save.id)} />
+                        </View>
+                      )}
+                    </View>
+                  ))
+                : null}
+            </View>
+          ) : null}
         </View>
       </ScrollView>
     </Screen>

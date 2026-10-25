@@ -15,6 +15,13 @@
       "when": 1761292800000,
       "tag": "0001_booklets",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1761379200000,
+      "tag": "0002_archived_saves",
+      "breakpoints": true
     }
   ]
 }
