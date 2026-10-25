@@ -4,28 +4,27 @@
 // confirm. Reads the scenario files and user.db only; it does not scan `cards`.
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
 
 import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { isPlayable } from "../../../campaign/playable";
-import { staleReason } from "../../../campaign/session";
-import { dropStandalone, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
+import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { campaignOf, scenarioNames } from "../../campaign-data";
 import { BodyText, Eyebrow, Label, Panel, RingMark, Screen, ScreenTitle, TextButton, pressedNight } from "../../chrome";
 import { useDatabases } from "../../databases";
-import { DeleteConfirm } from "../../delete-confirm";
+import { KeepOrDelete } from "../../keep-or-delete";
 import { gameCaption, STANDALONE_DROPPED } from "../../standalone-words";
 import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandalone } from "../../standalone-store";
 
-const DELETE_SENTENCE = "Delete this game? It is gone for good. Your decks are kept.";
+const DELETE_SENTENCE = "Delete this game? It is gone for good. Your decks stay.";
 
 export default function Scenarios() {
   const router = useRouter();
   const { user } = useDatabases();
   const [games, setGames] = useState<StandaloneGame[]>([]);
   const [archived, setArchived] = useState<StandaloneGame[]>([]);
-  // Manage shows Archive and Delete on each game instead of opening it.
+  // Manage shows Archive and Delete on each game instead of opening it. It ends when the list loses focus.
   const [managing, setManaging] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   // The game whose delete is waiting on Delete for good.
@@ -38,7 +37,8 @@ export default function Scenarios() {
     // A game in progress from another engine version or against other card data is dropped on the read, as a campaign
     // save's open scenario is; the row and its loadout stay.
     for (const game of listStandalone(user)) {
-      if (game.active && staleReason(game.active, CATALOG_VERSION)) writeStandalone(user, dropStandalone(game));
+      const dropped = droppedIfStale(game, CATALOG_VERSION);
+      if (dropped) writeStandalone(user, dropped);
     }
     const open = listStandalone(user);
     const away = listArchivedStandalone(user);
@@ -49,7 +49,15 @@ export default function Scenarios() {
     setDeleting(null);
   }, [user]);
 
-  useFocusEffect(refresh);
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+      return () => {
+        setManaging(false);
+        setDeleting(null);
+      };
+    }, [refresh]),
+  );
 
   function brief(scenarioId: string, from?: string): void {
     router.push({ pathname: "/standalone/briefing/[scenarioId]", params: from ? { scenarioId, from } : { scenarioId } });
@@ -60,22 +68,44 @@ export default function Scenarios() {
     else if (game.loadout) brief(game.scenarioId, game.id);
   }
 
-  function archive(id: string): void {
-    archiveStandalone(user, id);
-    refresh();
-  }
-
-  function restore(id: string): void {
-    restoreStandalone(user, id);
-    refresh();
-  }
-
-  function remove(id: string): void {
-    deleteStandalone(user, id);
-    refresh();
-  }
-
   const label = (game: StandaloneGame) => `${nameOf(game.scenarioId)}, ${gameCaption(game)}`;
+
+  // The button a screen reader was on goes away with each of these, so each says what happened.
+  function archive(game: StandaloneGame): void {
+    archiveStandalone(user, game.id);
+    refresh();
+    AccessibilityInfo.announceForAccessibility(`Archived ${label(game)}`);
+  }
+
+  function restore(game: StandaloneGame): void {
+    restoreStandalone(user, game.id);
+    refresh();
+    AccessibilityInfo.announceForAccessibility(`Restored ${label(game)}`);
+  }
+
+  function askDelete(id: string): void {
+    setDeleting(id);
+    AccessibilityInfo.announceForAccessibility(DELETE_SENTENCE);
+  }
+
+  function remove(game: StandaloneGame): void {
+    deleteStandalone(user, game.id);
+    refresh();
+    AccessibilityInfo.announceForAccessibility(`Deleted ${label(game)}`);
+  }
+
+  const actions = (game: StandaloneGame, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
+    <KeepOrDelete
+      id={game.id}
+      described={label(game)}
+      sentence={DELETE_SENTENCE}
+      keep={keep}
+      confirming={deleting === game.id}
+      onAskDelete={() => askDelete(game.id)}
+      onDelete={() => remove(game)}
+      onKeep={() => setDeleting(null)}
+    />
+  );
   // A game in progress sits above the scenarios, where the campaign list puts its open playthrough; finished games below.
   const playing = games.filter((game) => standaloneStatus(game) === "playing");
   const finished = games.filter((game) => standaloneStatus(game) !== "playing");
@@ -89,14 +119,7 @@ export default function Scenarios() {
           <Panel>
             <Text className="font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
             <Label>{gameCaption(game)}</Label>
-            {deleting === game.id ? (
-              <DeleteConfirm id={game.id} sentence={DELETE_SENTENCE} onDelete={() => remove(game.id)} onKeep={() => setDeleting(null)} />
-            ) : (
-              <View className="-mx-3 mt-2 flex-row">
-                <TextButton label="Archive" testID={`archive-${game.id}`} tone="gold" accessibilityLabel={`Archive ${label(game)}`} onPress={() => archive(game.id)} />
-                <TextButton label="Delete" testID={`delete-${game.id}`} tone="danger" accessibilityLabel={`Delete ${label(game)}`} onPress={() => setDeleting(game.id)} />
-              </View>
-            )}
+            {actions(game, { label: "Archive", onPress: () => archive(game) })}
           </Panel>
         </View>
       );
@@ -205,14 +228,7 @@ export default function Scenarios() {
                     <View key={game.id} testID={`archived-${game.id}`} className="rounded-card border border-hairline p-5">
                       <Text className="font-display text-title text-muted">{nameOf(game.scenarioId)}</Text>
                       <Label>{gameCaption(game)}</Label>
-                      {deleting === game.id ? (
-                        <DeleteConfirm id={game.id} sentence={DELETE_SENTENCE} onDelete={() => remove(game.id)} onKeep={() => setDeleting(null)} />
-                      ) : (
-                        <View className="-mx-3 mt-2 flex-row">
-                          <TextButton label="Restore" testID={`restore-${game.id}`} tone="gold" accessibilityLabel={`Restore ${label(game)}`} onPress={() => restore(game.id)} />
-                          <TextButton label="Delete" testID={`delete-${game.id}`} tone="danger" accessibilityLabel={`Delete ${label(game)}`} onPress={() => setDeleting(game.id)} />
-                        </View>
-                      )}
+                      {actions(game, { label: "Restore", onPress: () => restore(game) })}
                     </View>
                   ))
                 : null}
