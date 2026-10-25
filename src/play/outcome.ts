@@ -134,3 +134,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   if (lines.length > MOST) kept.push({ text: `And ${lines.length - MOST} more in the log`, mark: null });
   return { title: lead.title || "This turn", tone: lead.tone, lines: kept };
 }
+
+/** The banner after Undo: "Taken back", and what the intent taken back had done when it said anything. */
+export function takenBack(undone: Moment | null): Moment {
+  const lines: MomentLine[] = undone ? [{ text: undone.title, mark: null }, ...undone.lines] : [{ text: "The table is as it was before your last choice", mark: null }];
+  return { title: "Taken back", tone: "plain", lines: lines.slice(0, MOST) };
+}

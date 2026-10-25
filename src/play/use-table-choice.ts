@@ -6,7 +6,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useStore } from "zustand";
 
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
-import { momentOf, type Moment } from "./outcome.ts";
+import { tickRefused, tickSent } from "./haptics.ts";
+import { momentOf, takenBack, type Moment } from "./outcome.ts";
 import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { onTableFor, shownSeat } from "./selectors.ts";
@@ -17,7 +18,7 @@ import type { PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./s
 import type { LayoutOptions } from "./layout.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
 import type { DockExtra } from "./dock-buttons.tsx";
-import { choiceFor, dockFor, fightPreview, headerOf, marked, onTheTable, pickedWords, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
+import { answerCount, choiceFor, dockFor, fightPreview, headerOf, marked, onTheTable, pickedWords, primaryReady, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
 
 // How long the outcome banner stays up; the log keeps it.
 const MOMENT_MS = 4500;
@@ -44,6 +45,8 @@ export type TableChoice = {
   // Changes with the moment and the pick, so an armed button goes back to unarmed.
   resetKey: string;
   banner: Moment | null;
+  // Undo goes back one intent (store.ts, undo-history.ts), or null when nothing can be taken back.
+  undo: (() => void) | null;
   onTap: (cardId: string) => void;
   onTile: (id: string) => void;
   onDrop: (cardId: string, key: string) => void;
@@ -73,6 +76,7 @@ export function useTableChoice({
   const game = useStore(store, (state) => state.game);
   const legal = useStore(store, (state) => state.legal);
   const moment = useStore(store, (state) => state.moment);
+  const canUndo = useStore(store, (state) => state.history.length > 0);
   const reader = useScreenReader();
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const [held, setHeld] = useState<Choice | null>(null);
@@ -92,9 +96,11 @@ export function useTableChoice({
   const asked = (live?.panel ?? false) || listed === sheet.key || (reader && sheet.kind !== "window" && sheet.kind !== "outcome" && tappable(sheet).size > 0);
   const panel = asked || !onTheTable(sheet, onTable);
   const panelOpen = panel && folded !== sheet.key;
-  const choice = useMemo(() => choiceFor(sheet, held), [sheet, held]);
   const passLegal = legal.some((intent) => intent.type === "Pass");
-  const dock = useMemo(() => dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table" }), [sheet, choice, table, live, passLegal, panelOpen]);
+  // A moment with one answer has it picked already, and one tap sends it (table-choice.ts, answerCount).
+  const single = answerCount(sheet, { overlay: live != null, passLegal }) === 1;
+  const choice = useMemo(() => choiceFor(sheet, held, single), [sheet, held, single]);
+  const dock = useMemo(() => dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single }), [sheet, choice, table, live, passLegal, panelOpen, single]);
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)
   // does not draw the table again (docs/architecture.md, State). Card ids carry no commas.
@@ -133,7 +139,12 @@ export function useTableChoice({
     },
     [store, ctx, names],
   );
-  const said = useMemo((): Moment | null => (moment ? momentOf(moment.before, game, moment.steps, { card: names.card, shadow }) : null), [moment, game, names, shadow]);
+  const said = useMemo((): Moment | null => {
+    if (!moment) return null;
+    // After an undo the game is the state before the intent taken back, and `before` the state it had made.
+    if (moment.undone) return takenBack(momentOf(game, moment.before, moment.steps, { card: names.card, shadow }));
+    return momentOf(moment.before, game, moment.steps, { card: names.card, shadow });
+  }, [moment, game, names, shadow]);
   const banner = moment && said && closedMoment !== moment.seq ? said : null;
   useEffect(() => {
     if (!moment) return;
@@ -141,17 +152,26 @@ export function useTableChoice({
     return () => clearTimeout(timer);
   }, [moment]);
 
+  const reset = useCallback(() => {
+    setOverlay(null);
+    setHeld(null);
+    setFolded(null);
+    setListed(null);
+  }, []);
   const dispatch = useCallback(
     (intent: PlayerIntent) => {
       if (store.getState().dispatch(intent)) {
-        setOverlay(null);
-        setHeld(null);
-        setFolded(null);
-        setListed(null);
-      }
+        tickSent();
+        reset();
+      } else tickRefused();
     },
-    [store],
+    [store, reset],
   );
+  const undo = useCallback(() => {
+    if (!store.getState().undo()) return;
+    tickSent();
+    reset();
+  }, [store, reset]);
   const open = useCallback(
     (next: Sheet, asPanel = false) => {
       setOverlay({ sheet: next, game: store.getState().game, panel: asPanel });
@@ -176,12 +196,17 @@ export function useTableChoice({
   );
   const pick = useCallback(
     (id: string): boolean => {
+      // The only answer of the moment: the tap on its card sends it.
+      if (dock.single && dock.primary && primaryReady(dock) && tappable(sheet).has(id)) {
+        onButton(dock.primary);
+        return true;
+      }
       const result = tap(sheet, held, id, table);
       if (result.kind === "choice") setHeld(result.choice);
       else if (result.kind === "open") open(result.sheet);
       return result.kind !== "none";
     },
-    [sheet, held, table, open],
+    [dock, onButton, sheet, held, table, open],
   );
   // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
   const onTap = useCallback(
@@ -244,6 +269,7 @@ export function useTableChoice({
     extras,
     resetKey,
     banner,
+    undo: canUndo ? undo : null,
     onTap: tapOnTable,
     onTile,
     onDrop: dropOnTable,

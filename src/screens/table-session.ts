@@ -1,17 +1,18 @@
 // Opens the scenario a save has in progress for the table: reads the save, drops an open scenario played on another engine
 // version or other card data (the log and decks stay), loads the cards from catalog.db, and replays the intents through the
-// reducer, keeping the steps of the round it reopens on for the log sheet. The table's state is never read from SQLite again
-// after this: the store holds the reducer's result (docs/architecture.md, State).
+// reducer, keeping the steps of the round it reopens on for the log sheet and the states Undo can go back to. The table's
+// state is never read from SQLite again after this: the store holds the reducer's result (docs/architecture.md, State).
 import { inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import type { Save } from "../campaign/save";
-import { contextOf, drop, record, resume, staleReason } from "../campaign/session";
+import { contextOf, drop, record, resume, staleReason, unrecord } from "../campaign/session";
 import { logCodes, loadWorld, type World } from "../campaign/world";
 import { cards } from "../catalog/schema";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
 import { createTableStore, nextRoundSteps, type EngineStep, type ReduceContext, type ScenarioState, type TableStore } from "../play/store";
+import { nextUndoable, type Undoable } from "../play/undo-history";
 import { useEffect, useMemo } from "react";
 
 import { campaignOf, scenarioOf } from "./campaign-data";
@@ -23,7 +24,7 @@ type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 export type CardFacts = { imagesrc: string | null; text: string | null };
 
 export type TableSession =
-  | { ok: true; save: Save; world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; facts: ReadonlyMap<string, CardFacts> }
+  | { ok: true; save: Save; world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; history: readonly Undoable[]; facts: ReadonlyMap<string, CardFacts> }
   | { ok: false; reason: "missing" | "none" | "dropped"; save: Save | null; write: Save | null };
 
 /** The codes the open scenario can show: the log's cards, the Ring-bearer and every card of each dealt deck. */
@@ -57,7 +58,9 @@ export function openTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser
   }
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, loadoutCodes(save));
   let roundSteps: readonly EngineStep[] = [];
+  let history: readonly Undoable[] = [];
   const resumed = resume(save, world, CATALOG_VERSION, (before, after, steps) => {
+    history = nextUndoable(history, before, after, roundSteps, steps);
     roundSteps = nextRoundSteps(roundSteps, before, after, steps);
   });
   if (!resumed.ok) {
@@ -65,7 +68,7 @@ export function openTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser
     const dropped = drop(save);
     return { ok: false, reason: "dropped", save: dropped, write: dropped };
   }
-  return { ok: true, save, world, ctx: contextOf(world), game: resumed.state, roundSteps, facts: factsOf(catalog, world.cards.keys()) };
+  return { ok: true, save, world, ctx: contextOf(world), game: resumed.state, roundSteps, history, facts: factsOf(catalog, world.cards.keys()) };
 }
 
 /** The open scenario of a save, opened once per save id. A drop it decided on is written after the render. */
@@ -81,8 +84,8 @@ export function useTableSession(saveId: string | null): TableSession | null {
 export type SessionStore = { store: TableStore; save: () => Save };
 
 /**
- * The table store for an opened session. Each intent the reducer accepts is appended to the save and written at once, so a
- * kill and relaunch replays the same game. `save` is the save as last written.
+ * The table store for an opened session. Each intent the reducer accepts is appended to the save and written at once, and an
+ * undo takes the last one off, so a kill and relaunch replays the same game. `save` is the save as last written.
  */
 export function sessionStore<TRun>(session: Extract<TableSession, { ok: true }>, user: Db<TRun>): SessionStore {
   let saved: Save = session.save;
@@ -90,8 +93,13 @@ export function sessionStore<TRun>(session: Extract<TableSession, { ok: true }>,
     ctx: session.ctx,
     game: session.game,
     roundSteps: session.roundSteps,
+    history: session.history,
     onCommit: (intent) => {
       saved = record(saved, intent);
+      writeSave(user, saved);
+    },
+    onUndo: () => {
+      saved = unrecord(saved);
       writeSave(user, saved);
     },
   });

@@ -24,6 +24,11 @@ export function recordIntent(active: ActiveScenario, intent: PlayerIntent): Acti
   return { ...active, intents: [...active.intents, intent] };
 }
 
+// Takes the last intent back (the table's Undo): replaying the rest gives the state before it.
+export function dropLastIntent(active: ActiveScenario): ActiveScenario {
+  return { ...active, intents: active.intents.slice(0, -1) };
+}
+
 export type Replayed =
   | { ok: true; state: ScenarioState }
   | { ok: false; reason: "engineVersion" | "dataHash" | "seed" | "intent" };

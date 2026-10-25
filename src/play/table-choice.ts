@@ -4,7 +4,9 @@
 // How the player answers the open moment on the table. A sheet (sheets.ts, bar-sheets.ts) says what the rules allow; this
 // file says what a tap on a card does with it and which buttons confirm it. A tap only picks: it never sends an intent.
 // Every intent goes out from a button, and a button that sends one without anything picked first (Pass, Keep, Leave
-// undefended, Do not travel) must be tapped twice: once to arm it, once to confirm (docs/design-system.md, Table).
+// undefended, Do not travel) must be tapped twice: once to arm it, once to confirm (docs/design-system.md, Table). The one
+// exception is a moment with a single answer (`answerCount`): there is no decision to take back, so its answer is picked
+// already and one tap, on the card or the button, sends it.
 //
 // When every choice of a sheet is a card drawn whole on the table, the cards are picked on the canvas and the dock beside the
 // table holds the buttons. Otherwise (an either/or of an effect, a seat, a card out of play, an attachment that only peeks
@@ -23,20 +25,61 @@ export type Choice = { key: string; ids: readonly string[]; shares: readonly Sha
 
 /**
  * The choice a sheet starts with: the characters already put toward a commit, the first guess of a payment, or the one
- * ability of a card the player tapped to use.
+ * ability of a card the player tapped to use. `single` (the moment has one answer, `answerCount`) picks that answer.
  */
-export function startChoice(sheet: Sheet): Choice {
-  if (sheet.kind === "multi") return { key: sheet.key, ids: sheet.preselected.filter((id) => sheet.options.some((item) => item.id === id)), shares: [] };
-  if (sheet.kind === "distribute" && sheet.purpose.kind !== "archery") {
-    return { key: sheet.key, ids: [], shares: firstShares({ seat: 0, cardId: "", total: sheet.total, exact: sheet.exact, pools: sheet.options.map((item) => ({ heroId: item.id, max: item.max })) }) };
+export function startChoice(sheet: Sheet, single = false): Choice {
+  const none: Choice = { key: sheet.key, ids: [], shares: [] };
+  if (sheet.kind === "multi") {
+    const only = single && !sheet.allowEmpty && sheet.options.length === 1 ? sheet.options.map((item) => item.id) : [];
+    return { ...none, ids: [...new Set([...sheet.preselected.filter((id) => sheet.options.some((item) => item.id === id)), ...only])] };
   }
-  if (sheet.kind === "trigger" && sheet.preselect) return { key: sheet.key, ids: [sheet.preselect], shares: [] };
-  return { key: sheet.key, ids: [], shares: [] };
+  if (sheet.kind === "distribute" && (sheet.purpose.kind !== "archery" || single)) {
+    return { ...none, shares: firstShares({ seat: 0, cardId: "", total: sheet.total, exact: sheet.exact, pools: sheet.options.map((item) => ({ heroId: item.id, max: item.max })) }) };
+  }
+  if (sheet.kind === "trigger" && sheet.preselect) return { ...none, ids: [sheet.preselect] };
+  if (single && sheet.kind === "trigger" && sheet.options.length === 1) return { ...none, ids: sheet.options.map((item) => item.id) };
+  if (single && sheet.kind === "pick" && !sheet.primary && !sheet.alternative && sheet.options.length === 1) return { ...none, ids: sheet.options.map((item) => item.id) };
+  return none;
 }
 
 /** The choice for this sheet: the one held if it is the sheet's, a fresh one otherwise. */
-export function choiceFor(sheet: Sheet, held: Choice | null): Choice {
-  return held && held.key === sheet.key ? held : startChoice(sheet);
+export function choiceFor(sheet: Sheet, held: Choice | null, single = false): Choice {
+  return held && held.key === sheet.key ? held : startChoice(sheet, single);
+}
+
+// The ways a fixed total can be shared: none when the cards cannot take it all, one when a single card takes it or every
+// card must give all it can, more otherwise (and always more for a total that need not be met).
+function shareWays(sheet: Extract<Sheet, { kind: "distribute" }>): number {
+  if (!sheet.exact) return 2;
+  const room = sheet.options.reduce((sum, item) => sum + item.max, 0);
+  if (room < sheet.total) return 0;
+  return sheet.options.length === 1 || room === sheet.total ? 1 : 2;
+}
+
+/**
+ * How many different answers the open moment has, the window's own Pass included (user request, 2026-10-25: one tap when
+ * there is only one legal choice). One means the player has nothing to decide: the answer is picked already and one tap
+ * sends it. Two stands for "more than one": a commit among several characters has many.
+ */
+export function answerCount(sheet: Sheet, options: { overlay: boolean; passLegal: boolean }): number {
+  const windowPass = options.passLegal && !sheetSendsPass(sheet) && !options.overlay ? 1 : 0;
+  switch (sheet.kind) {
+    case "pick":
+      return sheet.options.length + (sheet.primary ? 1 : 0) + (sheet.alternative ? 1 : 0) + windowPass;
+    case "multi": {
+      const count = sheet.options.length;
+      const ways = count === 0 ? (sheet.allowEmpty ? 1 : 0) : count === 1 && !sheet.allowEmpty ? 1 : 2;
+      return ways + (sheet.alternative ? 1 : 0) + windowPass;
+    }
+    case "distribute":
+      return shareWays(sheet) + windowPass;
+    case "trigger":
+      return sheet.options.length + (sheet.pass ? 1 : 0) + windowPass;
+    case "window":
+      return 1 + ((sheet.commit?.options.length ?? 0) > 0 ? 2 : 0) + sheet.plays.length + sheet.triggers.length;
+    case "outcome":
+      return 1;
+  }
 }
 
 // What the table needs to open the sheets a tap leads to.
@@ -168,6 +211,8 @@ export type Dock = {
   // Why the primary is not ready yet, or null.
   why: string | null;
   secondary: readonly DockButton[];
+  // The moment has one answer: the primary sends it on one tap, and so does a tap on its card.
+  single: boolean;
 };
 
 // The name in a tile's label, without the numbers a tile adds.
@@ -194,9 +239,9 @@ function verbOf(verb: string): string {
 /**
  * The buttons that answer the sheet. `overlay` is true for a sheet the player opened from the table (a payment, a host, an
  * Action), which gets a Cancel that sends nothing. `passLegal` adds Pass when the rules allow it and the sheet has none.
- * `surface` words the sentence under a primary that waits for a pick.
+ * `surface` words the sentence under a primary that waits for a pick. `single` (the moment has one answer) arms nothing.
  */
-export function dockFor(sheet: Sheet, choice: Choice, table: TapContext, options: { overlay: boolean; passLegal: boolean; surface: "table" | "panel" }): Dock {
+export function dockFor(sheet: Sheet, choice: Choice, table: TapContext, options: { overlay: boolean; passLegal: boolean; surface: "table" | "panel"; single?: boolean }): Dock {
   const secondary: DockButton[] = [];
   let primary: DockButton | null = null;
   let why: string | null = null;
@@ -267,7 +312,10 @@ export function dockFor(sheet: Sheet, choice: Choice, table: TapContext, options
   }
   if (options.passLegal && !sheetSendsPass(sheet) && !options.overlay) secondary.push(PASS("Pass", "sheet-pass-window", "Tap again to pass"));
   if (options.overlay) secondary.push({ label: "Cancel", action: { kind: "close" }, arm: false, testID: "sheet-cancel" });
-  return { primary, why, secondary };
+  const single = options.single ?? false;
+  if (!single) return { primary, why, secondary, single };
+  const once = (button: DockButton): DockButton => ({ ...button, arm: false });
+  return { primary: primary ? once(primary) : null, why, secondary: secondary.map(once), single };
 }
 
 /** True when the dock's primary can be pressed now. */

@@ -54,7 +54,11 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
   // The eyebrow is the phase; the title says what the window is for.
   const base = { kind: "window" as const, key: `window:${game.round}:${game.mode}:${game.activeSeat}:${game.stepWindows.length}`, step: game.phase, commit, plays, triggers };
   if (commit) {
-    return { ...base, title: "Commit to the quest", note: "Tap characters to quest. They exhaust.", pass: "Commit no one", passNote: "Pass sends no one.", armed: "Tap again: no one quests" };
+    // Once a character is committed, passing ends the commit rather than sending no one.
+    const some = Object.values(game.cards).some((card) => card.committed && card.controller === game.activeSeat);
+    return some
+      ? { ...base, title: "Commit to the quest", note: "Tap more characters to quest, or end the commit.", pass: "Done", passNote: "Done ends the commit.", armed: "Tap again: no one else quests" }
+      : { ...base, title: "Commit to the quest", note: "Tap characters to quest. They exhaust.", pass: "Commit no one", passNote: "Pass sends no one.", armed: "Tap again: no one quests" };
   }
   if (game.mode === "planning") {
     return {

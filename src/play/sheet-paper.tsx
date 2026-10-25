@@ -69,12 +69,21 @@ export function SheetFrame({
   );
 }
 
-/** A text button on night or paper: 44 pt target, the pressed fill in the same frame. */
+// Every fill and text colour of a button is a style object from the tokens, never only a class: on the phone NativeWind can
+// drop a class from a Pressable whose style is a function, and the dock's gold pill was left as dark text on night (user
+// report, 2026-10-25). The pressed state comes from the Pressable's children function, so no style function is needed.
+
+/**
+ * A text button on night or paper: 44 pt target, the pressed fill in the same frame. `variant` "text" is a word alone (the
+ * top bar, a panel's Close); "outline" is a raised pill with a goldLine edge (the dock's other answers: Pass, Cancel, the
+ * alternative); "quiet" is a raised pill with a hairline edge (the dock's Read the card, List, Actions).
+ */
 export function ChromeButton({
   label,
   onPress,
   testID,
   tone = "bone",
+  variant = "text",
   disabled = false,
   accessibilityLabel,
   accessibilityHint,
@@ -83,11 +92,15 @@ export function ChromeButton({
   onPress: () => void;
   testID: string;
   tone?: "bone" | "gold" | "ink" | "muted";
+  variant?: "text" | "outline" | "quiet";
   disabled?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;
 }) {
-  const color = disabled ? (tone === "ink" ? "text-inkMuted" : "text-faint") : tone === "gold" ? "text-gold" : tone === "ink" ? "text-inkLabel" : tone === "muted" ? "text-muted" : "text-bone";
+  const ink = tone === "ink";
+  const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "gold" ? t.gold : ink ? t.inkLabel : tone === "muted" ? t.muted : t.bone;
+  const edge = variant === "outline" ? (ink ? t.inkLabel : t.goldLine) : variant === "quiet" ? (ink ? t.inkLine : t.hairline) : null;
+  const rest = variant === "text" ? "transparent" : ink ? t.paper : t.raised;
   return (
     <Pressable
       testID={testID}
@@ -98,18 +111,26 @@ export function ChromeButton({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      className="min-h-11 min-w-11 items-center justify-center rounded-tile px-3"
-      style={({ pressed }) => (pressed && !disabled ? { backgroundColor: tone === "ink" ? t.paperPressed : t.pressed } : undefined)}
+      style={{ minHeight: 44, minWidth: 44, justifyContent: "center", paddingVertical: variant === "text" ? 0 : 2 }}
     >
-      <Text className={`text-body font-medium ${color}`}>{label}</Text>
+      {({ pressed }) => (
+        <View
+          className={`items-center justify-center px-3 ${variant === "text" ? "min-h-11 rounded-tile" : "min-h-10 rounded-pill"}`}
+          style={{ backgroundColor: pressed && !disabled ? (ink ? t.paperPressed : t.pressed) : rest, ...(edge ? { borderWidth: 1, borderColor: edge } : {}) }}
+        >
+          <Text className="text-body font-medium" style={{ color }}>
+            {label}
+          </Text>
+        </View>
+      )}
     </Pressable>
   );
 }
 
 /**
- * The one filled action: a gold pill on night, an ink pill on paper. Disabled on night is a raised pill with faint text;
- * disabled on paper is an inkLine outline with inkMuted text (docs/design-system.md). A disabled action has a sentence
- * near it saying why.
+ * The one filled action: a gold pill on night with a soft gold glow, an ink pill on paper. Disabled, it is an outline (a
+ * goldLine edge with muted text on night, inkLine with inkMuted on paper) that still reads as the button it will be
+ * (docs/design-system.md). A disabled action has a sentence near it saying why.
  */
 export function ChromePrimary({
   label,
@@ -130,10 +151,7 @@ export function ChromePrimary({
   accessibilityHint?: string;
 }) {
   const paper = surface === "paper";
-  // The fill is a class, as on the screens' PrimaryButton: a style function alone loses it on the web build. The function
-  // only darkens the pressed pill.
-  const fill = disabled ? (paper ? "border border-inkLine" : "bg-raised") : paper ? "bg-ink" : "bg-gold";
-  const text = disabled ? (paper ? "text-inkMuted" : "text-faint") : paper ? "text-paper" : "text-onGold";
+  const color = disabled ? (paper ? t.inkMuted : t.muted) : paper ? t.paper : t.onGold;
   return (
     <Pressable
       testID={testID}
@@ -144,15 +162,28 @@ export function ChromePrimary({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      className={`${compact ? "min-h-12 px-3" : "min-h-14 px-5"} items-center justify-center rounded-pill ${fill}`}
-      style={({ pressed }) => (pressed && !disabled ? (paper ? { opacity: 0.85 } : { backgroundColor: t.goldDeep }) : undefined)}
     >
-      {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
-      <Text numberOfLines={compact ? 2 : 1} className={`text-center font-display text-body uppercase ${compact ? "tracking-wide" : "tracking-widest"} ${text}`}>
-        {label}
-      </Text>
+      {({ pressed }) => (
+        <View className={`${compact ? "min-h-12 px-3" : "min-h-14 px-5"} items-center justify-center rounded-pill`} style={primaryFill(paper, disabled, pressed)}>
+          {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
+          <Text numberOfLines={compact ? 2 : 1} className={`text-center font-display text-body uppercase ${compact ? "tracking-wide" : "tracking-widest"}`} style={{ color }}>
+            {label}
+          </Text>
+        </View>
+      )}
     </Pressable>
   );
+}
+
+function primaryFill(paper: boolean, disabled: boolean, pressed: boolean) {
+  if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderColor: paper ? t.inkLine : t.goldLine };
+  if (paper) return { backgroundColor: t.ink, opacity: pressed ? 0.85 : 1 };
+  return {
+    backgroundColor: pressed ? t.goldDeep : t.gold,
+    borderTopWidth: 1,
+    borderColor: t.goldHigh,
+    boxShadow: pressed ? undefined : `0 0 12px ${t.gold}8C`,
+  };
 }
 
 /** The engine's numbers with the game's icons beside them. Each reads as "Willpower 2" to a screen reader. */

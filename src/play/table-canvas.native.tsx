@@ -14,7 +14,7 @@ import { cancelAnimation, Easing, useDerivedValue, useReducedMotion, useSharedVa
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
-import { AttackerMark, Badges, CardBody, CombatMarkView, Leaving, Marks, Moving, Pile, RADIUS, Tokens, withAlpha, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, Badges, CardBody, CombatMarkView, Glow, Leaving, Marks, Moving, Pile, RADIUS, Tokens, withAlpha, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { ICON_FILES } from "./icons/files.generated.ts";
 import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
@@ -223,14 +223,18 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
 
-  // The card itself (it turns when exhausted), and what is drawn upright on it: tokens, effects, the open moment's marks.
+  // The card itself (it turns when exhausted), with the glow of the open moment under it, and what is drawn upright on it:
+  // tokens, effects, the open moment's marks.
   const drawBody = (slot: CardSlot, dim: boolean) => {
     const image = images.get(slot.code) ?? null;
     // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
     if (slot.kind === "pile" || slot.zone === "deck") return <Pile slot={slot.zone === "deck" ? { ...slot, faceDown: false } : slot} image={image} fonts={fonts} label />;
     const encounterBack = slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck";
+    const picked = (highlight.picked.get(slot.id) ?? 0) > 0;
+    const glows = slot.kind === "card" && (picked || highlight.tappable.has(slot.id) || targetIds.has(slot.id));
     return (
       <Group opacity={dim ? 0.35 : 1}>
+        {glows ? <Glow slot={slot} picked={picked} /> : null}
         <CardBody slot={slot} image={image} name={nameOf(slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} inactive={!slot.faceDown && inactive(slot.code)} encounterBack={encounterBack} />
       </Group>
     );

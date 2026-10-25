@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 
+import { tickArmed } from "./haptics.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
 import { primaryReady, type Dock, type DockButton } from "./table-choice.ts";
@@ -40,6 +41,7 @@ export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Do
       left.set(1);
       if (!reduceMotion) left.set(withTiming(0, { duration: wait, easing: Easing.linear }));
       timer.current = setTimeout(() => setArmed(null), wait);
+      tickArmed();
       return;
     }
     setArmed(null);
@@ -77,12 +79,13 @@ export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Do
           onPress={() => press(primary)}
         />
       ) : null}
-      <View className="flex-row flex-wrap items-center justify-center">
+      {/* The other answers are outlined pills, the reading aids quieter ones: each reads as a button on night. */}
+      <View className="flex-row flex-wrap items-center justify-center gap-1.5">
         {dock.secondary.map((button) => (
-          <ChromeButton key={button.testID} label={button.label} testID={button.testID} tone={paper ? "ink" : armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
+          <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="outline" tone={paper ? "ink" : armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
         ))}
         {extras.map((item) => (
-          <ChromeButton key={item.testID} label={item.label} testID={item.testID} tone={paper ? "ink" : "muted"} onPress={extra(item.onPress)} />
+          <ChromeButton key={item.testID} label={item.label} testID={item.testID} variant="quiet" tone={paper ? "ink" : "bone"} onPress={extra(item.onPress)} />
         ))}
       </View>
     </View>
