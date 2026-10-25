@@ -1,3 +1,5 @@
+// Rules: rr.framework-steps, ltp.playing-the-game, ltp.phase-1-resource, ltp.gain-resources, ltp.draw-cards,
+// ltp.phase-6-combat, mec109.archery, rr.hit-points, rr.player-elimination (data/rules/entries.json).
 import { applyTrigger } from "./actions.ts";
 import {
   applyDefense,
@@ -31,6 +33,7 @@ import { crossBoundary } from "./triggers.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
 import { discardShadows, resolveAttack } from "./shadow.ts";
 import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
+import { clearEliminated, destroyOverwhelmed } from "./keywords.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -48,6 +51,11 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
         current = announced;
         continue;
       }
+    }
+    const swept = current.lost || current.failure ? current : destroyOverwhelmed(clearEliminated(current, ctx.cards), ctx.cards, steps);
+    if (swept !== current) {
+      current = swept;
+      continue;
     }
     if (current.lost || current.stageCleared || current.failure || current.window) return current;
     const crossed = crossBoundary(current, ctx, steps);
@@ -71,8 +79,11 @@ export function applyIntent(
       return finishMulliganChoice(mulliganSeat(state, state.activeSeat, steps), true);
     case "Pass":
       return applyPass(state);
-    case "PlayCard":
-      return playCard(state, intent, ctx, steps);
+    case "PlayCard": {
+      // A play is an action opportunity taken: every seat may act again before the window closes (rr.action-windows).
+      const played = playCard(state, intent, ctx, steps);
+      return played.window?.kind === "pass" ? { ...played, passed: [] } : played;
+    }
     case "Commit":
       return commit(state, intent.cardIds, steps);
     case "CommitHide":
@@ -123,9 +134,12 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "resourceGrant":
       return grant(state, steps);
     case "resourceActions":
-    case "planning":
     case "questCommit":
       return openPass(state);
+    case "planning": {
+      const opened = openPass(state);
+      return { ...opened, planningSeat: opened.activeSeat };
+    }
     case "staging":
       return stagingStep(state, ctx, steps);
     case "resolution":
@@ -144,7 +158,9 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "engagement":
       return engagementStep(state, ctx.cards, steps);
     case "combatStart":
-      return startCombat(state, ctx, steps);
+      return startCombat(state, ctx);
+    case "combatShadows":
+      return withMode(dealShadows(state, ctx.cards), "combatActions");
     case "combatActions":
       return hasCombatAction(state, ctx) ? openPass(state) : withMode(state, "enemyAttacks");
     case "enemyAttacks":
@@ -181,10 +197,11 @@ function openOptional(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   return { ...seated, window: { kind: "optionalEngage" }, activeSeat: livingSeats(seated)[0] ?? seated.firstPlayer };
 }
 
-function startCombat(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const dealt = dealShadows(state, steps);
-  const total = archeryTotal(dealt, ctx.cards);
-  const next = { ...withMode(dealt, "combatActions"), resolvedAttacks: [], pendingAttack: null };
+// Archery damage is dealt as the combat phase begins (mec109.archery, rr.step-6-1), before the shadow cards
+// (rr.step-6-2).
+function startCombat(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  const total = archeryTotal(state, ctx.cards);
+  const next = { ...withMode(state, "combatShadows"), resolvedAttacks: [], declaredAttacks: [], pendingAttack: null };
   if (total > 0 && archeryRecipients(next, ctx.cards).length > 0) {
     return { ...next, window: { kind: "archery", total }, activeSeat: livingSeats(next)[0] ?? next.firstPlayer };
   }

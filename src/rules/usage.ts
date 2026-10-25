@@ -5,6 +5,7 @@ import { playCost } from "./attach.ts";
 import type { EngineStep, Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard } from "./keywords.ts";
+import { deckPlayHero, markDeckPlay } from "./deck-play.ts";
 import { heroPays, validatePayments } from "./payments.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
@@ -33,11 +34,11 @@ function limitSpent(state: ScenarioState, effect: Effect, sourceId: string, seat
 }
 
 // Heroes of the seat that can pay `sphere` and the resources they hold.
-function pool(state: ScenarioState, seat: number, sphere: Sphere | null, ctx: ReduceContext): number {
+function pool(state: ScenarioState, seat: number, sphere: Sphere | null, ctx: ReduceContext, forCard?: string): number {
   let total = 0;
   for (const id of state.seats[seat]?.heroes ?? []) {
     const hero = state.cards[id];
-    if (hero && heroPays(state, id, sphere, ctx)) total += hero.resources;
+    if (hero && heroPays(state, id, sphere, ctx, forCard)) total += hero.resources;
   }
   return total;
 }
@@ -63,7 +64,7 @@ export function usable(state: ScenarioState, effect: Effect, sourceId: string, s
       return pool(state, seat, costSphere(effect, source, ctx), ctx) >= cost.amount;
     case "playEvent": {
       const price = playCost(state, sourceId, seat, ctx);
-      return price != null && pool(state, seat, printedOf(ctx.cards, source.code).sphere, ctx) >= price;
+      return price != null && pool(state, seat, printedOf(ctx.cards, source.code).sphere, ctx, sourceId) >= price;
     }
   }
 }
@@ -84,7 +85,7 @@ export function usageReason(
   if (cost?.kind === "playEvent") {
     const price = playCost(state, sourceId, seat, ctx);
     if (price == null) return "That card has no printed cost";
-    return validatePayments(state, payments, { seat, sphere: printedOf(ctx.cards, source.code).sphere, amount: price }, ctx);
+    return validatePayments(state, payments, { seat, sphere: printedOf(ctx.cards, source.code).sphere, amount: price, forCard: sourceId }, ctx);
   }
   if (cost?.kind !== "resources") {
     if (payments.length > 0) return "That effect has no resource cost";
@@ -115,8 +116,20 @@ export function payUsage(
     case "discardSelf":
       next = destroyCard(next, sourceId, ctx.cards, steps);
       break;
-    case "resources":
     case "playEvent":
+      // A Response event played from the top of the deck (Gandalf, 142002) spends that permission and is held like a card
+      // in the hand until its effect is done.
+      if (source?.zone === "deck" && source.controller != null) {
+        const permission = deckPlayHero(next, source.controller, ctx);
+        if (permission) next = markDeckPlay(next, permission);
+        next = moveCard(next, sourceId, { zone: "hand", seat: source.controller });
+      }
+      for (const payment of payments) {
+        const hero = next.cards[payment.heroId];
+        if (hero) next = updateCard(next, payment.heroId, { resources: hero.resources - payment.amount });
+      }
+      break;
+    case "resources":
       for (const payment of payments) {
         const hero = next.cards[payment.heroId];
         if (hero) next = updateCard(next, payment.heroId, { resources: hero.resources - payment.amount });

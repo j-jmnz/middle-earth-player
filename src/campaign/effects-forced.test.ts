@@ -23,7 +23,8 @@ function make(layout: Layout = {}) {
 
 describe("hideFailed triggered and forced events", () => {
   it("141022 triggered resolves before the 141039 forced, then play goes on", () => {
-    const made = make({ deck: [RIDER, "f3", "f3", "f0"] });
+    // The spare f0 keeps the encounter deck from running out during the quest phase.
+    const made = make({ deck: [RIDER, "f3", "f3", "f0", "f0"] });
     // Sam Gamgee's Response to an engagement (141002:response:1) is not what this test is about.
     const ctx = { ...made.ctx, effects: made.ctx.effects.filter((effect) => effect.id !== "141002:response:1") };
     const { state } = made;
@@ -43,8 +44,14 @@ describe("hideFailed triggered and forced events", () => {
     expect(engageAt).toBeGreaterThanOrEqual(0);
     expect(attackAt).toBeGreaterThan(engageAt);
     expect(frames(run.steps)).toEqual(["push:reveal", "push:hide", "push:event", "push:forced", "pop:forced", "push:forced"]);
+    // An attack outside the combat phase is dealt a shadow card (rr.attacks-outside-the-combat-phase), which is
+    // discarded once the attack resolves (faq.enemy-attacks-outside-combat).
+    const shadow = run.state.cards[rider]?.shadowId;
+    expect(shadow).toBeTruthy();
     run = send(run, { type: "Undefended", heroId: sam }, ctx);
-    expect(frames(run.steps).slice(6)).toEqual(["pop:forced", "pop:event", "pop:hide", "pop:reveal"]);
+    expect(frames(run.steps).slice(6)).toEqual(["push:shadow", "pop:shadow", "pop:forced", "pop:event", "pop:hide", "pop:reveal"]);
+    expect(run.state.cards[shadow ?? ""]?.zone).toBe("encounterDiscard");
+    expect(run.state.cards[rider]?.shadowId).toBeNull();
     expect(run.state.cards[sam]?.damage).toBe(5);
     expect(run.state.stack).toEqual([]);
     expect(run.state.lost).toBe(false);
@@ -120,7 +127,9 @@ describe("forced on attached cards", () => {
 describe("141077 forced on endOfRound", () => {
   function gildorInPlay(resources: number) {
     const { state, ctx } = make({ deck: ["141077", "f0"], resources });
-    const run = reveal(state, ctx);
+    let run = reveal(state, ctx);
+    // With a resource and the Ring ready, Frodo may cancel the card just revealed (141001:response:1); he passes.
+    if (run.state.window?.kind === "response") run = send(run, { type: "Pass" }, ctx);
     const gildor = first(run.state, "141077");
     return { run, ctx, gildor, frodo: first(run.state, FRODO), sam: first(run.state, SAM) };
   }
@@ -147,14 +156,15 @@ describe("141077 forced on endOfRound", () => {
     expect(paid.state.cards[gildor]?.zone).toBe("play");
     expect(paid.state.cards[frodo]?.resources).toBe(0);
     const passed = expectOk(reduce(offered, { type: "Pass" }, ctx));
-    expect(passed.state.cards[gildor]?.zone).toBe("discard");
-    expect(passed.state.seats[0]?.discard).toContain(gildor);
+    // Gildor came from the encounter deck, so he goes to the encounter discard pile (rr.discard-pile-and-victory-display).
+    expect(passed.state.cards[gildor]?.zone).toBe("encounterDiscard");
+    expect(passed.state.seats[0]?.discard).not.toContain(gildor);
   });
 
   it("no cancel offer is made when nobody can pay", () => {
     const { run, ctx, gildor } = gildorInPlay(0);
     const ended = atEndOfRound(run.state, ctx);
     expect(ended.window).toBeNull();
-    expect(ended.cards[gildor]?.zone).toBe("discard");
+    expect(ended.cards[gildor]?.zone).toBe("encounterDiscard");
   });
 });

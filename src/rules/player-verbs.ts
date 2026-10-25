@@ -166,14 +166,18 @@ export function runPlayerVerb(
       return queueEvent(returned, { trigger: "allyLeftPlay", seat: card.controller, subject: id });
     }
     case "ShuffleSelfIntoDeck": {
+      // Only a card still in play is shuffled back: once Beorn has left play (returned to the hand by Sneak Attack, or
+      // destroyed), the effect no longer applies to him (faq.simultaneous-effects). Leaving play this way is heard by
+      // "after an ally card leaves play" (Valiant Sacrifice).
       const card = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-      if (!card || card.controller == null) return state;
+      if (!card || !inPlay(card.zone) || card.controller == null) return state;
       const seat = card.owner ?? card.controller;
       const moved = moveCard(state, card.id, { zone: "deck", seat });
       const pile = moved.seats[seat];
       if (!pile) return moved;
       const shuffled = shuffleIds(pile.deck, moved.seed, moved.seedCursor);
-      return { ...withSeat(moved, seat, { ...pile, deck: shuffled.ids }), seedCursor: shuffled.cursor };
+      const done = { ...withSeat(moved, seat, { ...pile, deck: shuffled.ids }), seedCursor: shuffled.cursor };
+      return queueEvent(done, { trigger: "allyLeftPlay", seat: card.controller, subject: card.id });
     }
     case "AttachPicked": {
       const list = pickedList(state);
@@ -206,6 +210,12 @@ function cancelAnswered(state: ScenarioState): ScenarioState {
     const trigger = frame.data.event.trigger;
     if (trigger === "shadowPending") {
       return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, shadowCanceled: true } } : state;
+    }
+    if (trigger === "encounterRevealed") {
+      const target = state.stack[index - 1];
+      if (target?.data.kind !== "reveal") return state;
+      const stack = state.stack.map((entry, at) => (at === index - 1 && entry.data.kind === "reveal" ? { ...entry, data: { ...entry.data, canceled: true } } : entry));
+      return { ...state, stack };
     }
     if (trigger !== "whenRevealedPending") continue;
     const target = state.stack[index - 1];

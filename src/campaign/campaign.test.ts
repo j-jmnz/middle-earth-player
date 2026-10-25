@@ -4,7 +4,8 @@ import { EFFECTS } from "../effects/index.ts";
 import { scenarioCards } from "../catalog/scenario-data.ts";
 import { updateCard, type ScenarioState } from "../rules/state.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { startScenario, type ReduceContext } from "../rules/reduce.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
+import { expectOk } from "../rules/fixture.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Table } from "../../scripts/test-scene.ts";
@@ -63,6 +64,11 @@ describe("two scenarios of the campaign", () => {
     const started = startScenario(start, ctx);
     const inDeck = started.encounterDeck.map((id) => started.cards[id]?.code);
     expect(inDeck).toContain("141078");
+    // It is in the encounter deck at the beginning of the game, so its hand sentence counts before the hands are drawn
+    // (mec109.setup): 6 less 1. Once the hand is kept, the encounter search puts it in the staging area.
+    expect(started.seats[0]?.hand).toHaveLength(5);
+    const kept = expectOk(reduce(started, { type: "Keep" }, ctx)).state;
+    expect(kept.staging.map((id) => kept.cards[id]?.code)).toContain("141078");
     const underhill = Object.values(started.cards).find((card) => card.code === "141017");
     expect(started.cards[underhill?.host ?? ""]?.code).toBe(FRODO);
   });
@@ -88,6 +94,20 @@ describe("two scenarios of the campaign", () => {
       expect(changed.log.threatPenalty).toBe(1);
       expect(changed.steps[2]?.did[0]).toContain("add 1");
     }
+  });
+
+  it("refuses a logged hero left out without a trade, and a second trade (ltp.fellowship-of-heroes)", () => {
+    const { log } = wonWith("141078", "141017");
+    const logged = { ...log, heroesBySeat: [[FRODO, SAM, MERRY]] };
+    const dropped = plan(logged, [FRODO, SAM]);
+    expect(dropped.ok).toBe(false);
+    if (!dropped.ok) expect(dropped.errors.join(" ")).toContain("must start unless traded");
+    const twice = plan({ ...log, heroesBySeat: [[FRODO, SAM]] }, [FRODO, MERRY, PIPPIN]);
+    expect(twice.ok).toBe(false);
+    if (!twice.ok) expect(twice.errors.join(" ")).toContain("only 1 hero");
+    // A fallen hero may be left out.
+    const fallen = plan({ ...logged, fallenHeroesBySeat: [[MERRY]] }, [FRODO, SAM]);
+    expect(fallen.ok).toBe(true);
   });
 
   // 142019 (The Ring Goes South) waives the +1 threat penalty for changing heroes; its Setup record has WaiveThreatPenalty.
@@ -124,7 +144,8 @@ describe("two scenarios of the campaign", () => {
     expect(both.seats[0]?.hand).toEqual(["142011"]);
     expect(both.seats[1]?.hand).toEqual(["142013"]);
     expect(both.seats[0]?.deck).toEqual([...DECK, "142012", "142014"]);
-    expect(both.log.campaignPool.map((card) => card.code)).toContain("142011");
+    // All four were earned: the two nobody chose are in the pool too, and stay with the first player's deck later.
+    expect(both.log.campaignPool.map((card) => card.code)).toEqual(expect.arrayContaining(["142011", "142012", "142013", "142014"]));
     expect(checklist({ ...input, choices: ["142011", "142011"] }).ok).toBe(false);
   });
 

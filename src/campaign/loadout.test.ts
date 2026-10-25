@@ -25,6 +25,12 @@ const DECK = ["c1", "c1", "c1"];
 const seat = (heroes: string[], deck: string[] = DECK): LoadoutSeat => ({ heroes, deck });
 
 describe("Fellowship loadout", () => {
+  it("refuses the same hero in two seats (rr.unique-cards)", () => {
+    const errors = validateLoadout([seat([SAGA_FRODO, "h1", "h2"]), seat(["h1", "h3", "h4"])], cards);
+    expect(errors.map((error) => error.rule)).toEqual(["sameHero"]);
+    expect(errors[0]?.message).toContain("Hero h1");
+  });
+
   it("accepts the Ring-bearer with two or three other heroes", () => {
     expect(validateLoadout([seat([SAGA_FRODO, "h1", "h2"])], cards)).toEqual([]);
     expect(validateLoadout([seat([SAGA_FRODO, "h1", "h2", "h3"])], cards)).toEqual([]);
@@ -80,7 +86,7 @@ describe("Fellowship loadout", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0]).toMatchObject({ rule: "tooManyHeroes", code: "h4" });
     // The second seat has no Ring-bearer, so three is its limit.
-    const second = validateLoadout([seat([SAGA_FRODO, "h1"]), seat(["h1", "h2", "h3", "h4"])], cards);
+    const second = validateLoadout([seat([SAGA_FRODO]), seat(["h1", "h2", "h3", "h4"])], cards);
     expect(second.map((error) => error.rule)).toEqual(["tooManyHeroes"]);
   });
 

@@ -109,10 +109,11 @@ function attackNumbers(game: ScenarioState, ctx: ReduceContext): { attack: numbe
 function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, enemyId: string): MultiSheet {
   const enemy = game.cards[enemyId];
   const defense = enemy ? modifiedStat(game, enemy, "defense", ctx.cards) : 0;
-  const seat = game.activeSeat;
-  const characters = [...(game.seats[seat]?.heroes ?? []), ...(game.seats[seat]?.play ?? [])].filter((id) =>
-    legalTargets(game, { type: "DeclareAttackers", cardId: id }, ctx).includes(enemyId),
-  );
+  // Another seat's ranged characters may join the attack (rr.ranged, rr.step-6-8-1); the active seat's come first.
+  const seats = [game.activeSeat, ...game.seats.map((_, index) => index).filter((index) => index !== game.activeSeat && index < game.seatCount)];
+  const characters = seats
+    .flatMap((seat) => [...(game.seats[seat]?.heroes ?? []), ...(game.seats[seat]?.play ?? [])])
+    .filter((id) => legalTargets(game, { type: "DeclareAttackers", cardId: id }, ctx).includes(enemyId));
   return {
     kind: "multi",
     key: `attackers:${enemyId}`,

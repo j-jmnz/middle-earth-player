@@ -58,6 +58,9 @@ export const triggerSchema = z.enum([
   // shadow effect of the card just turned up in an attack (rr.cancel).
   "whenRevealedPending",
   "shadowPending",
+  // An encounter card was just revealed from the encounter deck, before any of its effects (keywords included) resolve.
+  // A Response here can cancel all of them (Frodo Baggins, 141001).
+  "encounterRevealed",
   // Heard by every card that was attached to a location that left play (the event's subject).
   "hostLeftPlay",
   // An enemy was engaged with a player (subject), and a player's attack destroyed an enemy (heard by each attacker).
@@ -101,6 +104,8 @@ export const pickSchema = z.strictObject({
   committed: z.boolean().optional(),
   // A character that took part in the attack the Response answers (not the card itself).
   participating: z.boolean().optional(),
+  // A card that belongs to a sphere of influence: "any sphere" does not include a neutral card (faq.stand-and-fight).
+  nonNeutral: z.boolean().optional(),
   // A non-unique card; an enemy with a shadow card dealt to it.
   nonUnique: z.boolean().optional(),
   hasShadow: z.boolean().optional(),
@@ -324,7 +329,9 @@ const simpleVerbs = [
   z.strictObject({
     verb: z.literal("AttachSelf"),
     to: z.discriminatedUnion("kind", [
-      z.strictObject({ kind: z.literal("hero") }),
+      // A hero the revealing player controls, or (`control: "any"`, "Attach to a hero.") any player's hero, chosen by the
+      // first player (rr.first-player).
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any"]).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
     ]),
     ...when,
@@ -497,6 +504,8 @@ export const effectSchema = z.strictObject({
   limit: z.enum(["oncePerPhase", "oncePerRound", "oncePerRoundEachPlayer"]).optional(),
   cost: costSchema.optional(),
   cancel: cancelSchema.optional(),
+  // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").
+  uncancelable: conditionSchema.optional(),
   condition: conditionSchema.optional(),
   instructions: z.array(instructionSchema),
 });

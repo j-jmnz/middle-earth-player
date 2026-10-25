@@ -32,12 +32,29 @@ export function emptyLog(seatCount: number): CampaignLog {
   return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "" };
 }
 
+// The Ring-bearer may have moved to another seat with the first player token (mec109.multiplayer-the-one-ring).
 function ringBearerOf(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): string | null {
-  for (const id of state.seats[0]?.heroes ?? []) {
-    const code = state.cards[id]?.code;
-    if (code && printedOf(cards, code).traits.includes("Ring-bearer")) return code;
+  for (const seat of state.seats.slice(0, state.seatCount)) {
+    for (const id of seat.heroes) {
+      const code = state.cards[id]?.code;
+      if (code && printedOf(cards, code).traits.includes("Ring-bearer")) return code;
+    }
   }
   return null;
+}
+
+// The heroes in play at the end, listed under the seat that owns them (rr.ownership-and-control): a Ring-bearer another
+// seat controls now is still its owner's hero on the log.
+function heroesByOwner(state: ScenarioState): string[][] {
+  const out = Array.from({ length: state.seatCount }, () => [] as string[]);
+  for (const seat of state.seats.slice(0, state.seatCount)) {
+    for (const id of seat.heroes) {
+      const card = state.cards[id];
+      const owner = card?.owner ?? card?.controller;
+      if (card && owner != null) out[owner]?.push(card.code);
+    }
+  }
+  return out;
 }
 
 // A transaction on the log. A loss writes nothing, a scenario that is still being resolved writes nothing, and a
@@ -46,7 +63,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   const result = resolutionResult(state);
   if (!result || state.scenarioId !== scenarioId || log.completed.includes(scenarioId)) return log;
   const bearer = ringBearerOf(state, cards);
-  const heroesBySeat = state.seats.slice(0, state.seatCount).map((seat, index) => (log.heroesBySeat[index]?.length ? log.heroesBySeat[index] ?? [] : seat.heroes.map((id) => state.cards[id]?.code ?? "")));
+  const owned = heroesByOwner(state);
+  const heroesBySeat = owned.map((codes, index) => (log.heroesBySeat[index]?.length ? log.heroesBySeat[index] ?? [] : codes));
   // A hero in a discard pile at the end of the game is a fallen hero (ltp.fellowship-of-heroes), and so is one a
   // Resolution names.
   const fellBy = new Set<string>(result.fallen);

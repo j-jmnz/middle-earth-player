@@ -9,7 +9,9 @@ import { first, loadWorld, table, type World } from "../../scripts/past-scene.ts
 import { scoreOf } from "./score.ts";
 
 // Learn to Play: final threat, plus the threat cost of each destroyed hero, plus damage on surviving heroes, plus 10
-// per round, minus victory points (ltp.scoring, rr.scoring). An eliminated player counts 50 and all their heroes.
+// per completed round, minus victory points (ltp.scoring, rr.scoring). An eliminated player counts 50 and all their
+// heroes. The players win during round 4 here: 3 rounds were completed (faq.scoring tallies a round at the end of its
+// refresh phase).
 const FRODO = "141001";
 const SAM = "141002";
 
@@ -21,13 +23,13 @@ beforeAll(async () => {
   cards = world.cards;
 });
 
-function base(round = 3): ScenarioState {
+function base(round = 4): ScenarioState {
   const { state } = table(world, {});
   return { ...withThreat(state, 0, 30), round };
 }
 
 describe("scoreOf", () => {
-  it("adds threat, damage on surviving heroes and 10 per round", () => {
+  it("adds threat, damage on surviving heroes and 10 per completed round", () => {
     const state = base();
     const marked = updateCard(updateCard(state, first(state, FRODO), { damage: 2 }), first(state, SAM), { damage: 1 });
     expect(scoreOf(marked, cards)).toEqual({ rounds: 3, victoryPoints: 0, score: 30 + 3 + 30 });

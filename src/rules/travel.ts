@@ -1,4 +1,4 @@
-// Rules: rr.travel, rr.active-location, rr.step-4-2 (data/rules/entries.json).
+// Rules: rr.travel, rr.active-location, rr.step-4-2, ltp.phase-4-travel, ltp.traveling-to-locations (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { effectCause } from "./cause.ts";

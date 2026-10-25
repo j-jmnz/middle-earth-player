@@ -1,11 +1,12 @@
-// Rules: rr.response (data/rules/entries.json).
+// Rules: rr.response, mec109.peril (data/rules/entries.json).
 import { holds } from "./conditions.ts";
+import { playableFromDeck } from "./deck-play.ts";
 import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { GameEvent, ResponseOffer, ScenarioState } from "./state.ts";
-import { inPlay, livingSeats } from "./state.ts";
+import { inPlay, livingSeats, perilLock } from "./state.ts";
 import { payUsage, controllerSeat, usable, usageReason } from "./usage.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 
@@ -21,12 +22,16 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
   );
   for (const instance of cards) {
     // An event about one card is heard by that card even after it has left play.
-    // An event card in the hand hears every event; a card in play hears the events about itself or about the table.
-    const inHand = instance.zone === "hand";
+    // An event card in the hand hears every event; a card in play hears the events about itself or about the table. The
+    // top card of a deck its controller may play as if it were in the hand (Gandalf, 142002) is in the hand for this.
+    const inHand = instance.zone === "hand" || (instance.zone === "deck" && instance.controller != null && playableFromDeck(state, instance.id, instance.controller, ctx));
     if (event.cardId != null ? instance.id !== event.cardId : !(inPlay(instance.zone) || inHand)) continue;
-    const seat = controllerSeat(state, instance);
+    // A card nobody controls (a quest or encounter card) is answered by the first player, or, while a Peril card's
+    // staging resolves, by the revealing player: the other players are the ones Peril keeps out (mec109.peril).
+    const locked = perilLock(state);
+    const seat = instance.controller == null && locked != null ? locked : controllerSeat(state, instance);
     // Peril: the other seats cannot trigger Responses while the card resolves.
-    if (!order.includes(seat) || (state.perilSeat != null && seat !== state.perilSeat)) continue;
+    if (!order.includes(seat) || (locked != null && seat !== locked)) continue;
     for (const effect of ctx.effects) {
       if (effect.timing !== "response" || effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;
       // Only an event used from the hand has a Response there.

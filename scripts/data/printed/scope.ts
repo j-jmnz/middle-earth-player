@@ -47,6 +47,11 @@ function boxCodes(): string[] {
     }
   }
   for (const card of cards) if (card.campaignKind && card.printings.some((printing) => printing.pack === "TFotR")) codes.add(card.code);
+  // The box's Ring-bearer: every scenario starts with a Fellowship-sphere Ring-bearer hero in play (mec109.setting-up-the-game),
+  // so his text is part of every game.
+  for (const card of cards) {
+    if (card.sphere === "fellowship" && card.type === "hero" && card.traits.includes("Ring-bearer") && card.printings.some((printing) => printing.pack === "TFotR")) codes.add(card.code);
+  }
   return [...codes];
 }
 

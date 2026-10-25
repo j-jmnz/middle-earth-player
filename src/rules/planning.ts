@@ -1,4 +1,5 @@
-// Rules: rr.planning-phase (data/rules/entries.json).
+// Rules: rr.planning-phase, rr.step-2-2, rr.step-2-3, rr.resource-match, ltp.planning-order, ltp.paying-costs-multiple,
+// ltp.unique-cards, ltp.neutral-cards (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
@@ -11,7 +12,9 @@ import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
 import { queueEvent } from "./queue.ts";
 import { playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
-import { heroPays } from "./payments.ts";
+import { targetCandidates } from "./effect-verbs.ts";
+import { planningTurn } from "./pass.ts";
+import { hasResourceMatch, heroPays } from "./payments.ts";
 import { printedOf, type PrintedCard } from "./printed.ts";
 import { attachBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
@@ -107,6 +110,11 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
   if (running.length === 0) return "That card cannot be played now";
   for (const effect of running) {
     for (const instruction of effect.instructions) {
+      // "Choose an enemy engaged with a player" with none engaged (Feint): there is no valid target (rr.the-word-choose).
+      if ((instruction.verb === "BarAttack" || instruction.verb === "PlaceProgressOnLocation") && !instruction.when) {
+        if (targetCandidates(state, instruction, seat, ctx).length === 0) return "That card has no legal target";
+        continue;
+      }
       if (instruction.verb !== "Pick" || instruction.pick.different || instruction.pick.attackableByPicked) continue;
       if (pickCandidates(state, instruction.pick, seat, [], cardId, ctx).length === 0) return "That card has no legal target";
     }
@@ -122,9 +130,12 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   if (!instance || (instance.zone !== "hand" && !fromDeck) || instance.controller !== state.activeSeat) return "That card is not in hand";
   const printed = printedOf(ctx.cards, instance.code);
   if (printed.type !== "ally" && printed.type !== "attachment" && printed.type !== "event") return "That card cannot be played";
-  // Events are Actions: any action window. Allies and attachments are played in the planning phase only.
+  // Events are Actions: any action window. Allies and attachments are played in the planning phase only, by the
+  // player whose planning window it is (rr.step-2-2).
   if (printed.type !== "event" && state.mode !== "planning") return "That intent is not legal in this window";
+  if (printed.type !== "event" && planningTurn(state) !== state.activeSeat) return "Only the active player plays allies and attachments now";
   if (uniqueBlocked(state, printed, ctx.cards)) return "A second copy of that unique card cannot enter play";
+  if (!hasResourceMatch(state, state.activeSeat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
   return printed.type === "event" ? eventReason(state, cardId, state.activeSeat, ctx) : null;
 }
 
@@ -182,6 +193,7 @@ function paymentReason(
     if (!heroPays(state, heroId, printed.sphere, ctx, cardId)) return "Wrong sphere";
     if (hero.resources < amount) return "That hero does not have those resources";
   }
+  if (sum === 0 && !hasResourceMatch(state, seat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
   // X is whatever the player pays.
   if (printed.costX) return null;
   if (cost == null) return "That card has no printed cost";

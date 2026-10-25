@@ -67,6 +67,7 @@ const RULE_OF: Readonly<Record<string, string>> = {
   noRingBearer: "A Ring-bearer is required",
   tooManyHeroes: "Three heroes besides the Ring-bearer",
   ringInDeck: "The One Ring is not a deck card",
+  sameHero: "No two players use the same hero",
 };
 
 function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSeat[] } {

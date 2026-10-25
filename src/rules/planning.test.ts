@@ -34,10 +34,22 @@ function planning(cardCode: string, resources = 5): { state: ScenarioState; hero
   return { state, heroId: heroSpawn.id, cardId: cardSpawn.id };
 }
 
-const cards = cardMap([leadership, ally, spirit, neutral, unique]);
+const freeSpirit = definePrinted({ code: "freeSpirit", name: "Free", type: "ally", sphere: "spirit", cost: 0 });
+const freeNeutral = definePrinted({ code: "freeNeutral", name: "Loose", type: "ally", sphere: "neutral", cost: 0 });
+const cards = cardMap([leadership, ally, spirit, neutral, unique, freeSpirit, freeNeutral]);
 const ctx = { effects: [], cards };
 
 describe("planning costs", () => {
+  it("needs a hero of the card's sphere for a 0-cost card, and none for a neutral one (rr.resource-match)", () => {
+    const off = planning("freeSpirit");
+    const refused = reduce(off.state, { type: "PlayCard", cardId: off.cardId, payments: [] }, ctx);
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) expect(refused.reason).toBe("No hero matches that card's sphere");
+    expect(legalIntents(off.state, ctx).some((intent) => intent.type === "PlayCard")).toBe(false);
+    const loose = planning("freeNeutral");
+    expect(expectOk(reduce(loose.state, { type: "PlayCard", cardId: loose.cardId, payments: [] }, ctx)).state.cards[loose.cardId]?.zone).toBe("play");
+  });
+
   it("removes exactly the printed cost", () => {
     const { state, heroId, cardId } = planning("ally");
     const played = expectOk(reduce(state, { type: "PlayCard", cardId, payments: [{ heroId, amount: 2 }] }, ctx));
@@ -56,7 +68,7 @@ describe("planning costs", () => {
     }, ctx);
     expect(wrongResult.ok).toBe(false);
     if (!wrongResult.ok) {
-      expect(wrongResult.reason).toBe("Wrong sphere");
+      expect(wrongResult.reason).toBe("No hero matches that card's sphere");
       expect(wrongResult.state).toBe(wrong.state);
     }
 
@@ -210,7 +222,9 @@ describe("planning costs", () => {
     expect(played.state.window?.kind).toBe("pass");
     expect(played.state.activeSeat).toBe(1);
     expect(played.state.cards[event.id]?.zone).toBe("discard");
-    expect(played.state.cards[allyCard.id]?.zone).toBe("hand");
+    // rr.player-elimination: the eliminated seat's hand goes to its discard pile, and the first player token passes.
+    expect(played.state.cards[allyCard.id]?.zone).toBe("discard");
+    expect(played.state.firstPlayer).toBe(1);
     expect(legalIntents(played.state, local).some((intent) => intent.type === "PlayCard")).toBe(false);
     const stuck = { ...played.state, activeSeat: 0 };
     expect(legalIntents(stuck, local)).toEqual([]);
@@ -219,7 +233,6 @@ describe("planning costs", () => {
     if (!again.ok) {
       expect(again.reason).toBe("That seat is eliminated");
       expect(again.state).toBe(stuck);
-      expect(again.state.cards[allyCard.id]?.zone).toBe("hand");
     }
   });
 
@@ -244,5 +257,44 @@ describe("planning costs", () => {
       expect(again.reason).toBe("The game is lost");
       expect(again.state).toBe(played.state);
     }
+  });
+});
+
+describe("planning turns and passing", () => {
+  it("gives each seat its own planning window in player order, and asks a seat again after another plays (rr.step-2-2, rr.step-2-3, rr.action-windows)", () => {
+    const gimli = hero("gimli", "leadership");
+    const local = { effects: [], cards: cardMap([leadership, gimli, ally]) };
+    let state = blankScenario({ seatCount: 2, seed: 3, definition: fixtureDefinition(["stage"]) });
+    const a = spawn(state, "aragorn", { zone: "heroes", seat: 0 });
+    const g = spawn(a.state, "gimli", { zone: "heroes", seat: 1 });
+    state = updateCard(updateCard(g.state, a.id, { resources: 5 }), g.id, { resources: 5 });
+    const mine = spawn(state, "ally", { zone: "hand", seat: 0 });
+    const theirs = spawn(mine.state, "ally", { zone: "hand", seat: 1 });
+    state = { ...theirs.state, phase: "Resource", mode: "resourceActions", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0, passed: [] };
+    // The resource window closes; seat 0's planning window opens.
+    let run = expectOk(reduce(state, { type: "Pass" }, local));
+    run = expectOk(reduce(run.state, { type: "Pass" }, local));
+    expect(run.state.mode).toBe("planning");
+    expect(run.state.planningSeat).toBe(0);
+    expect(run.state.activeSeat).toBe(0);
+    // Seat 0 passes; seat 1 may act in seat 0's window but cannot play its ally there.
+    run = expectOk(reduce(run.state, { type: "Pass" }, local));
+    expect(run.state.activeSeat).toBe(1);
+    const early = reduce(run.state, { type: "PlayCard", cardId: theirs.id, payments: [{ heroId: g.id, amount: 2 }] }, local);
+    expect(early.ok).toBe(false);
+    if (!early.ok) expect(early.reason).toBe("Only the active player plays allies and attachments now");
+    // Seat 1 passes: seat 0's window is closed and seat 1's opens.
+    run = expectOk(reduce(run.state, { type: "Pass" }, local));
+    expect(run.state.mode).toBe("planning");
+    expect(run.state.planningSeat).toBe(1);
+    expect(run.state.activeSeat).toBe(1);
+    run = expectOk(reduce(run.state, { type: "PlayCard", cardId: theirs.id, payments: [{ heroId: g.id, amount: 2 }] }, local));
+    // Seat 1 played, so the passes start over: seat 1 passes, seat 0 passes, and the phase moves on.
+    run = expectOk(reduce(run.state, { type: "Pass" }, local));
+    expect(run.state.activeSeat).toBe(0);
+    expect(run.state.mode).toBe("planning");
+    run = expectOk(reduce(run.state, { type: "Pass" }, local));
+    expect(run.state.mode).not.toBe("planning");
+    expect(run.state.planningSeat).toBeNull();
   });
 });

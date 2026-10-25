@@ -147,7 +147,7 @@ describe("static stat modifiers (141013:A:2, 141014:A:2, 01027:A:2, 142004:A:1, 
     expect(withIcon).toBeNull();
     const bare = table({ heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: "01043", seat: 0 }] });
     const without = refusal(give(bare, idsOf(bare, ARAGORN), 2).state, { type: "PlayCard", cardId: idsOf(bare, "01043"), payments: [{ heroId: idsOf(bare, ARAGORN), amount: 2 }] }, bare.ctx);
-    expect(without).toBe("Wrong sphere");
+    expect(without).toBe("No hero matches that card's sphere");
   });
 
   it("Boromir: +2 Defense only while defending against an enemy that costs more than your threat", () => {

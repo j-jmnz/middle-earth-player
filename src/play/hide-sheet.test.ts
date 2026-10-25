@@ -7,7 +7,8 @@ import { buildTable, begin, FRODO, idsOf, RIDER, sceneCards, send } from "../../
 import { sheetFor } from "./sheets.ts";
 
 // Rules: mec109.hide-x, mec109.hide-tests (data/rules/entries.json). The Hide sheet shows the willpower the engine will
-// measure, held modifiers included: on stage 141023 each ally of the testing seat adds 1 (141023:constant:1).
+// measure, held modifiers included: on stage 141023 each ally of the testing seat adds 1 to the total threat
+// (141023:constant:1, printed line 141023:B:2).
 let base: Awaited<ReturnType<typeof sceneCards>>;
 
 beforeAll(async () => {
@@ -23,10 +24,13 @@ describe("Hide sheet numbers", () => {
     run = send(run, { type: "CommitHide", cardIds: [idsOf(table, FRODO)] }, table.ctx);
     expect(run.state.window?.kind).toBe("frameAction");
     const sheet = sheetFor(run.state, table.ctx, legalIntents(run.state, table.ctx), { card: (id) => id, line: () => null });
-    const shown = sheet?.kind === "trigger" ? sheet.hide?.willpower : undefined;
+    const shown = sheet?.kind === "trigger" ? sheet.hide : undefined;
     run = send(run, { type: "Pass" }, table.ctx);
     const step = run.steps.find((entry) => entry.kind === "hideTest");
-    expect(step?.kind === "hideTest" ? step.willpower : null).toBe(4);
-    expect(shown).toBe(4);
+    // Frodo's 2 willpower against the discarded threat plus 1 for each of the two allies.
+    expect(step?.kind === "hideTest" ? [step.willpower, step.threat] : null).toEqual([2, shown?.threat]);
+    expect(shown?.willpower).toBe(2);
+    // Hide 2 discards two cards of threat 3: 6, plus 2 for the allies.
+    expect(shown?.threat).toBe(8);
   });
 });

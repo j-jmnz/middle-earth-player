@@ -109,7 +109,9 @@ export type FrameData =
   | { kind: "event"; event: GameEvent }
   | { kind: "responses"; event: GameEvent; offers: readonly ResponseOffer[] }
   | { kind: "none" }
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean }
+  // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
+  // effects of the card just revealed (Frodo Baggins).
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean }
   | HideData
   | EffectData;
 

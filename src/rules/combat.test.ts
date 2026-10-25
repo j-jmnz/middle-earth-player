@@ -417,6 +417,122 @@ describe("combat", () => {
   });
 });
 
+describe("combat framework rules", () => {
+  function fighter(code: string, patch: Partial<Parameters<typeof definePrinted>[0]> = {}) {
+    return definePrinted({ code, name: code, type: "hero", sphere: "leadership", threat: 10, willpower: 1, attack: 3, defense: 1, health: 5, ...patch });
+  }
+
+  function attackPhase(state: ScenarioState): ScenarioState {
+    return { ...state, phase: "Combat", mode: "playerAttacks", window: { kind: "playerAttack" }, activeSeat: 0, passed: [] };
+  }
+
+  it("lets a seat declare one attack against each enemy in the combat phase (faq.limitations-on-attacks)", () => {
+    const cards = cardMap([fighter("a"), fighter("b"), enemy("orc", { defense: 2, health: 9 })]);
+    let state = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const a = spawn(state, "a", { zone: "heroes", seat: 0 });
+    const b = spawn(a.state, "b", { zone: "heroes", seat: 0 });
+    const orc = spawn(b.state, "orc", { zone: "engaged", seat: 0 });
+    state = attackPhase(orc.state);
+    const ctx = { effects: [], cards };
+    const first = expectOk(reduce(state, { type: "DeclareAttackers", enemyId: orc.id, attackerIds: [a.id] }, ctx));
+    expect(first.state.cards[orc.id]?.damage).toBe(1);
+    // b is still ready, but the seat has already attacked the orc this phase.
+    expect(legalTargets(first.state, { type: "DeclareAttackers", cardId: b.id }, ctx)).toEqual([]);
+    const second = reduce(first.state, { type: "DeclareAttackers", enemyId: orc.id, attackerIds: [b.id] }, ctx);
+    expect(second.ok).toBe(false);
+    if (!second.ok) expect(second.reason).toBe("That enemy was already attacked this phase");
+  });
+
+  it("lets another seat's ranged character join an attack (rr.ranged, rr.step-6-8-1), but not a character without ranged", () => {
+    const cards = cardMap([fighter("a", { attack: 2 }), fighter("archer", { attack: 2, keywords: { ranged: true } }), fighter("plain"), enemy("orc", { defense: 3 })]);
+    let state = blankScenario({ seatCount: 2, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const a = spawn(state, "a", { zone: "heroes", seat: 0 });
+    const archer = spawn(a.state, "archer", { zone: "heroes", seat: 1 });
+    const plain = spawn(archer.state, "plain", { zone: "heroes", seat: 1 });
+    const orc = spawn(plain.state, "orc", { zone: "engaged", seat: 0 });
+    state = attackPhase(orc.state);
+    const ctx = { effects: [], cards };
+    expect(reduce(state, { type: "DeclareAttackers", enemyId: orc.id, attackerIds: [a.id, plain.id] }, ctx).ok).toBe(false);
+    const joined = expectOk(reduce(state, { type: "DeclareAttackers", enemyId: orc.id, attackerIds: [a.id, archer.id] }, ctx));
+    // 2 + 2 attack against 3 defense.
+    expect(joined.state.cards[orc.id]?.damage).toBe(1);
+    expect(joined.state.cards[archer.id]?.exhausted).toBe(true);
+  });
+
+  it("deals shadow cards to a seat's enemies by highest engagement cost first (rr.step-6-2)", () => {
+    const cards = cardMap([hero("aragorn", "leadership", 10, 1), enemy("low", { engagementCost: 10 }), enemy("high", { engagementCost: 40 }), definePrinted({ code: "s1", name: "s1", type: "treachery" }), definePrinted({ code: "s2", name: "s2", type: "treachery" })]);
+    let state = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const h = spawn(state, "aragorn", { zone: "heroes", seat: 0 });
+    const low = spawn(h.state, "low", { zone: "engaged", seat: 0 });
+    const high = spawn(low.state, "high", { zone: "engaged", seat: 0 });
+    const s1 = spawn(high.state, "s1", { zone: "encounterDeck" });
+    const s2 = spawn(s1.state, "s2", { zone: "encounterDeck" });
+    state = withThreat(s2.state, 0, 50 - 1);
+    state = { ...state, phase: "Encounter", mode: "optionalEngage", window: { kind: "optionalEngage" }, activeSeat: 0, passed: [] };
+    const dealt = expectOk(reduce(state, { type: "DeclineEngage" }, { effects: [], cards }));
+    expect(dealt.state.cards[high.id]?.shadowId).toBe(s1.id);
+    expect(dealt.state.cards[low.id]?.shadowId).toBe(s2.id);
+  });
+
+  it("assigns archery as the combat phase begins, before any shadow card is dealt (mec109.archery, rr.step-6-1)", () => {
+    const { state, ids } = engageWindow({ seatCount: 1, enemies: [{ code: "orc", seat: 0 }], shadows: ["shade"], heroes: [{ code: "aragorn", seat: 0 }] });
+    const cards = cardMap([enemy("orc", { keywords: { archery: 1 } }), hero("aragorn", "leadership", 10, 1), definePrinted({ code: "shade", name: "shade", type: "treachery" })]);
+    const ctx = { effects: [], cards };
+    const opened = expectOk(reduce(state, { type: "DeclineEngage" }, ctx));
+    expect(opened.state.window).toEqual({ kind: "archery", total: 1 });
+    expect(opened.state.cards[ids.shade ?? ""]?.zone).toBe("encounterDeck");
+    const assigned = expectOk(reduce(opened.state, { type: "Distribute", assignments: [{ cardId: ids.aragorn ?? "", amount: 1 }] }, ctx));
+    expect(assigned.state.cards[ids.orc ?? ""]?.shadowId).toBe(ids.shade);
+  });
+
+  it("destroys a character whose hit point bonus ends while its damage is at its hit points (rr.hit-points)", () => {
+    const pony: Effect = {
+      id: "pony:constant:1", cardCode: "pony", lines: ["fixture:A:1"], timing: "constant",
+      instructions: [{ verb: "ModifyStat", stat: "hitPoints", amount: 1, until: "whileSourceInPlay", target: "ownHeroes" }],
+    };
+    const cards = cardMap([fighter("a", { health: 2 }), definePrinted({ code: "pony", name: "pony", type: "ally", health: 1, cost: 1, sphere: "leadership" }), enemy("orc", { attack: 1 })]);
+    let state = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const a = spawn(state, "a", { zone: "heroes", seat: 0 });
+    const b = spawn(a.state, "a", { zone: "heroes", seat: 0 });
+    const pet = spawn(b.state, "pony", { zone: "play", seat: 0 });
+    const orc = spawn(pet.state, "orc", { zone: "engaged", seat: 0 });
+    state = updateCard(orc.state, a.id, { damage: 2 });
+    state = { ...state, phase: "Combat", mode: "enemyAttacks", window: { kind: "defense", enemyId: orc.id, seat: 0 }, pendingAttack: { enemyId: orc.id, seat: 0 }, activeSeat: 0, passed: [] };
+    const ctx = { effects: [pony], cards };
+    state = { ...state, modifiers: [{ instanceId: a.id, sourceId: pet.id, stat: "hitPoints", amount: 1, until: "whileSourceInPlay", origin: pony.id }, { instanceId: b.id, sourceId: pet.id, stat: "hitPoints", amount: 1, until: "whileSourceInPlay", origin: pony.id }] };
+    // The pony defends and is destroyed; a's third hit point goes with it.
+    const done = expectOk(reduce(state, { type: "DeclareDefender", defenderId: pet.id }, ctx));
+    expect(done.state.cards[pet.id]?.zone).toBe("discard");
+    expect(done.state.cards[a.id]?.zone).toBe("discard");
+    expect(done.state.cards[b.id]?.zone).toBe("heroes");
+  });
+});
+
+describe("player elimination", () => {
+  it("discards the seat's cards, returns its enemies to staging with their damage, and passes the first player token (rr.player-elimination)", () => {
+    const cards = cardMap([hero("aragorn", "leadership", 10, 1), hero("gimli", "tactics", 10, 1), enemy("orc"), definePrinted({ code: "spear", name: "spear", type: "attachment", sphere: "leadership", cost: 1 })]);
+    let state = blankScenario({ seatCount: 2, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const a = spawn(state, "aragorn", { zone: "heroes", seat: 0 });
+    const g = spawn(a.state, "gimli", { zone: "heroes", seat: 1 });
+    const orc = spawn(g.state, "orc", { zone: "engaged", seat: 0 });
+    const held = spawn(orc.state, "spear", { zone: "hand", seat: 0 });
+    state = updateCard(held.state, orc.id, { damage: 3 });
+    state = withThreat(state, 0, 49);
+    state = { ...state, phase: "Planning", mode: "planning", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0, passed: [] };
+    const bolt: Effect = { id: "bolt:action:1", cardCode: "bolt", lines: ["fixture:A:1"], timing: "action", instructions: [{ verb: "RaiseThreat" }] };
+    const withBolt = spawn(state, "bolt", { zone: "hand", seat: 0 });
+    const local = { effects: [bolt], cards: cardMap([...cards.values(), definePrinted({ code: "bolt", name: "bolt", type: "event", sphere: "neutral", cost: 0 })]) };
+    const done = expectOk(reduce(withBolt.state, { type: "PlayCard", cardId: withBolt.id, payments: [] }, local));
+    expect(done.state.seats[0]?.eliminated).toBe(true);
+    expect(done.state.cards[a.id]?.zone).toBe("discard");
+    expect(done.state.cards[held.id]?.zone).toBe("discard");
+    expect(done.state.cards[orc.id]).toMatchObject({ zone: "staging", damage: 3, controller: null });
+    expect(done.state.staging).toContain(orc.id);
+    expect(done.state.firstPlayer).toBe(1);
+    expect(done.state.lost).toBe(false);
+  });
+});
+
 describe("unused shadow cards", () => {
   function dealt() {
     const { state, ids, cards } = engageWindow({

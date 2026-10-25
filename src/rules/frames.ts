@@ -1,14 +1,17 @@
+// Rules: rr.staging, rr.surge, rr.treachery-cards, rr.running-out-of-cards, mec109.saga-staging-rules, mec109.peril,
+// ltp.staging-placement, ltp.staging-treachery, faq.last-encounter-card (data/rules/entries.json).
 import { effectStep, pushCardEffects } from "./effect-frames.ts";
 import { currentCause, ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hideStep, pushHide } from "./hide.ts";
 import { raiseThreat } from "./keywords.ts";
-import { responseStep } from "./responses.ts";
+import { offerResponses, responseStep } from "./responses.ts";
 import { printedOf } from "./printed.ts";
 import { livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "./state.ts";
 import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
+import { resetEncounterDeck, shuffleEncounterDeck } from "./verbs.ts";
 import { moveCard } from "./zones.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
@@ -42,11 +45,13 @@ export function startReveal(
   steps: EngineStep[],
   cardId?: string,
 ): ScenarioState {
-  const id = cardId ?? state.encounterDeck[0];
-  const instance = id ? state.cards[id] : undefined;
-  if (!id || !instance) return state;
+  const ready = cardId ? state : resetEncounterDeck(state, steps);
+  const id = cardId ?? ready.encounterDeck[0];
+  const instance = id ? ready.cards[id] : undefined;
+  if (!id || !instance) return ready;
   const peril = printedOf(ctx.cards, instance.code).keywords.peril;
-  return pushFrame(state, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false } }, steps);
+  const fromDeck = cardId == null ? { fromDeck: true } : {};
+  return pushFrame(ready, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false, ...fromDeck } }, steps);
 }
 
 // A reveal started by an effect instruction. It cannot wait for a player, so a Hide test or any other
@@ -84,39 +89,62 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
   if (!id || frame.data.kind !== "reveal") throw new Error("Reveal frame lost its card");
   const printed = printedOf(ctx.cards, state.cards[id]?.code ?? "");
   const seat = frame.seat;
+  // The card's effects were canceled just after it was revealed: it goes back into the encounter deck and the same
+  // seat reveals another card (141001:A:1).
+  if (frame.data.canceled && frame.step >= 1) return revealAnother(state, frame, ctx, steps);
   switch (frame.step) {
     case 0: {
       let next = moveCard(state, id, { zone: "staging" });
       next = updateCard(next, id, { face: "up", controller: seat });
       steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
+      next = patchTop(next, { step: 1 });
+      // A card just revealed from the encounter deck: a Response may cancel its effects before any of them resolves.
+      return frame.data.fromDeck ? offerResponses(next, { trigger: "encounterRevealed", seat, subject: id }, ctx, steps) : next;
+    }
+    case 1: {
+      let next = patchTop(state, { step: 2 });
       if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
         for (let index = 0; index < next.seatCount; index += 1) {
           next = raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x"));
         }
       }
-      return patchTop(next, { step: 1 });
+      return next;
     }
-    case 1: {
-      const next = patchTop(state, { step: 2 });
+    case 2: {
+      const next = patchTop(state, { step: 3 });
       const hide = printed.keywords.hide;
       if (hide == null || state.seats[seat]?.eliminated) return next;
       return pushHide(next, frame, hide, steps);
     }
-    case 2:
-      return runRevealed(patchTop(state, { step: 3 }), id, seat, frame.peril, ctx, steps);
     case 3:
-      return fireForced(patchTop(state, { step: 4 }), { trigger: "revealed", seat, cardId: id }, ctx, steps);
-    case 4: {
-      const next = patchTop(state, { step: 5 });
+      return runRevealed(patchTop(state, { step: 4 }), id, seat, frame.peril, ctx, steps);
+    case 4:
+      return fireForced(patchTop(state, { step: 5 }), { trigger: "revealed", seat, cardId: id }, ctx, steps);
+    case 5: {
+      // A treachery's effects are resolved: it goes to the encounter discard pile unless its text put it somewhere
+      // (rr.staging, rr.treachery-cards). Peril covers that card's staging only, so the lock ends before surge
+      // (mec109.peril, rr.surge).
+      const resolved = printed.type === "treachery" && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
+      const unlocked = frame.peril && resolved.perilSeat === seat ? { ...resolved, perilSeat: null } : resolved;
+      const next = patchTop(unlocked, { step: 6 });
       const revealing = next.seats[seat];
       const surge = printed.keywords.surge || (frame.data.kind === "reveal" && frame.data.surge);
       if (!surge || !revealing || revealing.eliminated) return next;
       return startReveal(next, seat, ctx, steps);
     }
     default:
-      return popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps);
+      // The revealed card's staging is resolved: an encounter deck it emptied is reset now (faq.last-encounter-card).
+      return resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps);
   }
+}
+
+function revealAnother(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = frame.cardId ?? "";
+  const popped = popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps);
+  const returned = state.cards[id] ? shuffleEncounterDeck(updateCard(moveCard(popped, id, { zone: "encounterDeck" }), id, { face: "down", controller: null })) : popped;
+  if (returned.seats[frame.seat]?.eliminated) return returned;
+  return startReveal(returned, frame.seat, ctx, steps);
 }
 
 function runRevealed(

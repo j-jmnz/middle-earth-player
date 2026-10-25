@@ -1,5 +1,5 @@
 import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, encounterCodes, recordInstructions, scenarioDefinition, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { StartScenario, StartSeat } from "../rules/setup.ts";
 
 export type StartInput = {
@@ -40,13 +40,14 @@ export function buildStart(input: StartInput): StartScenario {
       setup: [
         ...input.campaign.prelude.map((card) => ({ verb: "AttachToRingBearer" as const, code: card.code })),
         ...dealt,
-        ...definition.setup,
+        ...setupInstructions(input.scenario, input.difficulty, input.seatCount),
         { verb: "ShuffleEncounterDeck" as const },
       ],
     },
     seats: input.seats,
-    encounterDeck: [...encounterCodes(input.scenario, input.difficulty), ...shuffledIn, ...(input.poolEncounterCards ?? [])],
+    encounterDeck: [...encounterCodes(input.scenario, input.difficulty, input.seatCount), ...shuffledIn, ...(input.poolEncounterCards ?? [])],
     questDeck: input.scenario.stages,
+    ...(input.difficulty === "Easy" ? { easy: true } : {}),
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
   };
 }

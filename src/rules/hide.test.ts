@@ -273,7 +273,8 @@ describe("hide", () => {
     const effects: Effect[] = [
       { id: "d1:whenRevealed:2", cardCode: "d1", lines: ["fixture:A:1"], timing: "whenRevealed", instructions: [{ verb: "RaiseThreat" }] },
     ];
-    const { state, ctx } = table({ deck: ["hider", "d1"], cards: [rider("hider", {}, 1), filler("d1", 1)], effects });
+    // A spare card keeps the encounter deck from running out, which would shuffle the discard pile back in.
+    const { state, ctx } = table({ deck: ["hider", "d1", "d1"], cards: [rider("hider", {}, 1), filler("d1", 1)], effects });
     const opened = begin(state, ctx);
     expect(opened.steps.some((step) => step.kind === "threat")).toBe(false);
     const committed = expectOk(reduce(opened.state, { type: "CommitHide", cardIds: [] }, ctx));

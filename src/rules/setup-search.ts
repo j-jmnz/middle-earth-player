@@ -58,10 +58,15 @@ function setupIds(state: ScenarioState, code: string, kind: "player" | "encounte
 // Setup before the hand, and encounter Setup before the quest card's Setup; a card that the quest card's
 // Setup puts out (so it is not in the encounter deck) still applies its hand sentence at this point,
 // because the sentence cannot change a hand that was already drawn. Only the hand instructions run here;
-// the card's placement stays with the quest card's Setup, so nothing is placed twice. A card that is only found in the
-// encounter deck is not handled here: no dealt card needs it.
+// the card's placement stays with the quest card's Setup, so nothing is placed twice. A card that is in the encounter
+// deck at the beginning of the game (Gandalf's Delay shuffled in from the campaign pool) applies its hand sentence here
+// too, and is placed by the encounter search after the hands are drawn (mec109.setup).
 export function handSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const named = new Set(state.setup.flatMap((instruction) => ("code" in instruction ? [instruction.code] : [])));
+  for (const id of state.encounterDeck) {
+    const code = state.cards[id]?.code;
+    if (code) named.add(code);
+  }
   let next = state;
   for (const effect of ctx.effects) {
     if (effect.timing !== "setup") continue;

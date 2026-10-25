@@ -1,4 +1,6 @@
-// Rules: rr.quest-advancement, rr.step-3-4 (data/rules/entries.json).
+// Rules: rr.quest-advancement, rr.step-3-4, ltp.quest-resolution, ltp.successful-quest, ltp.unsuccessful-quest,
+// ltp.explored-active-location, ltp.quest-advancement, ltp.optional-engagement, ltp.engagement-checks-intro,
+// ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
@@ -72,7 +74,7 @@ function advanceReady(state: ScenarioState, cards: Cards, steps: EngineStep[], c
   if (!stage || state.stageCleared) return state;
   const points = questPointsOf(state, stage, cards);
   if (points == null || stage.progress < points || !canAdvance(state)) return state;
-  return advanceStage(state, cards, steps, 0, canAdvance);
+  return advanceStage(state, cards, steps, canAdvance);
 }
 
 function placeQuestProgress(
@@ -113,15 +115,17 @@ function placeQuestProgress(
         next = updateCard(next, stageId, { progress: stage.progress + remaining });
         steps.push({ kind: "progress", targetId: stageId, amount: remaining, cause: ruleCause("rr.step-3-4") });
       } else {
-        const need = Math.max(0, points - stage.progress);
-        const placed = Math.min(remaining, need);
+        // A quest that can advance takes what it needs: the rest does not carry over to the next stage
+        // (rr.quest-advancement). One that cannot advance has no upper limit (faq.progress-without-advancing).
+        const advancing = canAdvance(next);
+        const placed = advancing ? Math.min(remaining, Math.max(0, points - stage.progress)) : remaining;
         if (placed > 0) {
           next = updateCard(next, stageId, { progress: stage.progress + placed });
           steps.push({ kind: "progress", targetId: stageId, amount: placed, cause: ruleCause("rr.step-3-4") });
         }
         const updated = next.cards[stageId];
-        if (updated && updated.progress >= points && canAdvance(next)) {
-          next = advanceStage(next, cards, steps, remaining - placed, canAdvance);
+        if (updated && updated.progress >= points && advancing) {
+          next = advanceStage(next, cards, steps, canAdvance);
         }
       }
     }
@@ -129,9 +133,10 @@ function placeQuestProgress(
   return next;
 }
 
-function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], overflow: number, canAdvance: Gate): ScenarioState {
+// Excess progress does not carry over (rr.quest-advancement), so a new stage only advances again on progress it
+// already holds.
+function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
   let next = state;
-  let carried = overflow;
   const guard = next.stages.length + 1;
   for (let hop = 0; hop < guard; hop += 1) {
     const currentId = next.questStage;
@@ -147,24 +152,9 @@ function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], o
     const arrived = next.cards[nextId];
     const points = arrived ? questPointsOf(next, arrived, cards) : null;
     const before = arrived?.progress ?? 0;
-    if (points == null) {
-      if (carried > 0) {
-        next = updateCard(next, nextId, { face: "B", progress: before + carried });
-        steps.push({ kind: "progress", targetId: nextId, amount: carried, cause: ruleCause("rr.step-3-4") });
-      } else {
-        next = updateCard(next, nextId, { face: "B" });
-      }
-      steps.push({ kind: "advance", cardId: nextId });
-      return next;
-    }
-    const need = Math.max(0, points - before);
-    const placed = Math.min(carried, need);
-    next = updateCard(next, nextId, { face: "B", progress: before + placed });
-    if (placed > 0) steps.push({ kind: "progress", targetId: nextId, amount: placed, cause: ruleCause("rr.step-3-4") });
+    next = updateCard(next, nextId, { face: "B" });
     steps.push({ kind: "advance", cardId: nextId });
-    const updated = next.cards[nextId];
-    if (!updated || updated.progress < points || !canAdvance(next)) return next;
-    carried -= placed;
+    if (points == null || before < points || !canAdvance(next)) return next;
   }
   return { ...next, stageCleared: true };
 }

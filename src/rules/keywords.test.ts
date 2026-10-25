@@ -85,7 +85,7 @@ describe("keywords", () => {
     expect(eliminated.lost).toBe(true);
   });
 
-  it("sends a defeated treasure with printed health to its controller's discard", () => {
+  it("sends a defeated treasure, a player card, to its controller's discard (rr.discard-pile-and-victory-display)", () => {
     const elf = definePrinted({ code: "elf", name: "Elf Lord", type: "treasure", attack: 2, defense: 2, health: 3 });
     const relic = definePrinted({ code: "relic", name: "Relic", type: "treasure" });
     const cards = cardMap([elf, relic]);
@@ -95,7 +95,7 @@ describe("keywords", () => {
     const instance = state.cards[spawned.id];
     if (!instance) throw new Error("missing card");
     expect(defeatedDestination(instance, elf)).toEqual({ zone: "discard", seat: 0 });
-    expect(defeatedDestination(instance, relic)).toEqual({ zone: "encounterDiscard" });
+    expect(defeatedDestination(instance, relic)).toEqual({ zone: "discard", seat: 0 });
     const fallen = placeDamage(state, spawned.id, 3, cards, [], "framework", ruleCause("rr.effects"));
     expect(fallen.cards[spawned.id]?.zone).toBe("discard");
     expect(fallen.seats[0]?.discard).toContain(spawned.id);

@@ -72,9 +72,11 @@ describe("the first-player token passes with The One Ring", () => {
   it("keeps the exhausted Ring and the damage on the hero", () => {
     const table = buildTable(base, { seats: 2, ring: "exhausted", deck: ["f0", "f0", "f0", "f0"] });
     const frodo = idsOf(table, FRODO);
-    const hurt = updateCard(table.state, frodo, { damage: 2 });
+    const hurt = updateCard(table.state, frodo, { damage: 1 });
     const ready = { ...hurt, mode: "refresh" as const, phase: "Refresh" as const, boundaryPhase: "Refresh" as const, window: null };
     const state = settle(ready, table.ctx, []);
-    expect(state.cards[frodo]).toMatchObject({ controller: 1, damage: 2 });
+    expect(state.cards[frodo]).toMatchObject({ controller: 1, damage: 1 });
+    // Control passed, ownership did not (rr.ownership-and-control): the log keeps him under seat 0.
+    expect(state.cards[frodo]?.owner).toBe(0);
   });
 });

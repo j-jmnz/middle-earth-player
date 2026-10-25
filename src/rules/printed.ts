@@ -127,6 +127,14 @@ export function isCharacterType(printed: PrintedCard): boolean {
   return printed.type === "hero" || isAllyLike(printed);
 }
 
+// A card whose originating deck is the encounter deck: an encounter card, or a campaign card with an encounter back.
+// Discarded, it goes to the encounter discard pile even while a player controls it (Gildor Inglorion)
+// (rr.discard-pile-and-victory-display, rr.ownership-and-control).
+export function fromEncounterDeck(printed: PrintedCard): boolean {
+  if (printed.backType != null) return printed.backType === "encounter";
+  return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure");
+}
+
 export function isPlayerType(printed: PrintedCard): boolean {
   return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event";
 }

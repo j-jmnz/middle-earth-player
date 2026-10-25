@@ -1,4 +1,6 @@
-// Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, mec109.archery (data/rules/entries.json).
+// Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, rr.step-6-2, rr.ranged, rr.step-6-8b,
+// rr.step-6-8-1, mec109.archery, faq.limitations-on-attacks, ltp.deal-shadow-cards, ltp.resolve-enemy-attacks,
+// ltp.undefended-attack, ltp.resolve-player-attacks (data/rules/entries.json).
 import { attackBarred } from "./constants.ts";
 import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
@@ -8,6 +10,7 @@ import { livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, type ReduceContext } from "./interpret.ts";
 import { queueEvent } from "./queue.ts";
 import { resolveAttack } from "./shadow.ts";
+import { engagementCostOf } from "./quest.ts";
 import { inPlay } from "./zones.ts";
 import { ruleCause } from "./cause.ts";
 
@@ -44,12 +47,17 @@ export function characters(state: ScenarioState, seat: number, cards: Cards): st
   return ids;
 }
 
-export function dealShadows(state: ScenarioState, _steps: EngineStep[]): ScenarioState {
+// Each seat's enemies in player order, the highest engagement cost first (rr.step-6-2). Equal costs keep the order
+// they engaged in.
+export function dealShadows(state: ScenarioState, cards: Cards): ScenarioState {
   let next = state;
   for (const seat of livingSeats(next)) {
-    for (const enemyId of next.seats[seat]?.engaged ?? []) {
-      next = dealOneShadow(next, enemyId);
-    }
+    const cost = (id: string) => {
+      const instance = next.cards[id];
+      return instance ? (engagementCostOf(next, instance, cards) ?? 0) : 0;
+    };
+    const order = [...(next.seats[seat]?.engaged ?? [])].sort((a, b) => cost(b) - cost(a));
+    for (const enemyId of order) next = dealOneShadow(next, enemyId);
   }
   return next;
 }
@@ -138,12 +146,14 @@ export function canAttack(
 ): boolean {
   const attacker = state.cards[attackerId];
   const enemy = state.cards[enemyId];
-  if (!attacker || !enemy || (attacker.exhausted && !exhaustedOk) || attacker.controller !== seat) return false;
+  if (!attacker || !enemy || (attacker.exhausted && !exhaustedOk) || attacker.controller == null) return false;
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed)) return false;
   if (enemy.zone !== "engaged") return false;
-  if (enemy.controller === seat) return true;
+  // The declaring seat's own characters attack its own enemies. A ranged character may attack an enemy engaged with
+  // another player, and may join an attack another player declares (rr.ranged, rr.step-6-8-1).
+  if (attacker.controller === seat && enemy.controller === seat) return true;
   return printed.keywords.ranged;
 }
 
@@ -157,9 +167,20 @@ export function legalAttackEnemies(state: ScenarioState, seat: number, attackerI
   return ids;
 }
 
+// The framework gives a seat one declared attack against each enemy each combat phase; an attack a card effect makes
+// (Quick Strike) is extra and does not count (faq.limitations-on-attacks).
+export function attackDeclared(state: ScenarioState, seat: number, enemyId: string): boolean {
+  return state.declaredAttacks.includes(`${seat}:${enemyId}`);
+}
+
+// The enemies the seat may still declare an attack against with this character.
+export function declarableEnemies(state: ScenarioState, seat: number, attackerId: string, cards: Cards): string[] {
+  return legalAttackEnemies(state, seat, attackerId, cards).filter((enemyId) => !attackDeclared(state, seat, enemyId));
+}
+
 export function hasLegalAttack(state: ScenarioState, seat: number, cards: Cards): boolean {
   for (const attackerId of characters(state, seat, cards)) {
-    if (legalAttackEnemies(state, seat, attackerId, cards).length > 0) return true;
+    if (declarableEnemies(state, seat, attackerId, cards).length > 0) return true;
   }
   return false;
 }
@@ -174,7 +195,7 @@ export function applyPlayerAttack(
 ): ScenarioState {
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
-  let next = state;
+  let next: ScenarioState = { ...state, declaredAttacks: [...state.declaredAttacks, `${seat}:${enemyId}`] };
   for (const attackerId of attackerIds) {
     if (next.cards[attackerId]) next = updateCard(next, attackerId, { exhausted: true });
   }

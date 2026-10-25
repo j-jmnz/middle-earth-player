@@ -12,7 +12,7 @@ import { engageEnemy, stagingEnemies } from "./quest.ts";
 import { shuffleIds } from "./seed.ts";
 import { updateCard, type ScenarioState } from "./state.ts";
 import { attachTo, moveCard } from "./zones.ts";
-import { currentCause, UNATTRIBUTED } from "./cause.ts";
+import { currentCause, ruleCause, UNATTRIBUTED } from "./cause.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
@@ -25,6 +25,19 @@ export function seatFor(state: ScenarioState, who: "actor" | "firstPlayer" | "ot
 export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
   const shuffled = shuffleIds(state.encounterDeck, state.seed, state.seedCursor);
   return { ...state, encounterDeck: shuffled.ids, seedCursor: shuffled.cursor };
+}
+
+// An encounter deck that is out of cards during the quest phase gets the encounter discard pile back, shuffled
+// (rr.running-out-of-cards, rr.step-3-3). Outside the quest phase it stays empty.
+export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+  if (state.phase !== "Quest" || state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return state;
+  const count = state.encounterDiscard.length;
+  let next = state;
+  for (const id of [...state.encounterDiscard]) {
+    next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down" });
+  }
+  steps.push({ kind: "resetEncounterDeck", count, cause: ruleCause("rr.running-out-of-cards") });
+  return shuffleEncounterDeck(next);
 }
 
 // Verbs that run to completion with no choice and no child frame. A verb that needs either is handled
@@ -100,11 +113,17 @@ function transferHost(state: ScenarioState, focus: VerbFocus, seat: number, step
   const host = hostId ? state.cards[hostId] : undefined;
   if (!hostId || !host || host.controller == null || host.controller === seat) return state;
   const attachments = [...host.attachments];
+  // Control changes, ownership does not (rr.ownership-and-control): the hero stays the card of the seat that brought it.
+  const owners = new Map([hostId, ...attachments].map((id) => [id, state.cards[id]?.owner ?? state.cards[id]?.controller ?? undefined]));
   let next = moveCard(state, hostId, { zone: "heroes", seat });
   for (const id of attachments) {
     if (next.cards[id]?.zone === "play") next = moveCard(next, id, { zone: "play", seat });
     else next = updateCard(next, id, { controller: seat });
     next = attachTo(next, id, hostId);
+  }
+  for (const [id, owner] of owners) {
+    if (owner != null && owner !== seat) next = updateCard(next, id, { owner });
+    else if (owner === seat && next.cards[id]?.owner != null) next = updateCard(next, id, { owner: undefined });
   }
   return eliminateEmpties(next, steps);
 }

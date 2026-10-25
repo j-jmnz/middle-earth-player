@@ -73,12 +73,17 @@ function campaignChoices(campaignSetup: readonly Instruction[], input: Checklist
       const hero = host ?? null;
       if (instruction.to === "hero" && hero) seats[seat]?.attachments.push({ host: hero, code });
       if (instruction.to === "hand") seats[seat]?.hand.push(code);
-      pool.push({ code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo: hero, seat });
+      // Only a Permanent card stays recorded on its hero (ltp.campaign-pool); another gift goes on the hero for this
+      // scenario and is shuffled into a deck in later ones.
+      pool.push({ code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo: printed.keywords.permanent ? hero : null, seat });
       did.push(`Seat ${seat + 1} takes ${name(code)}${hero ? ` onto ${name(hero)}` : instruction.to === "hand" ? " into hand" : ""}.`);
     }
     if (instruction.leftover === "firstPlayerDeck") {
+      // The players earned every one of these cards, so the unchosen ones join the pool too, as the first player's:
+      // step 7 shuffles them into that deck.
       for (const code of instruction.codes.filter((item) => !taken.includes(item))) {
-        seats[0]?.deck.push(code);
+        const printed = printedOf(input.cards, code);
+        pool.push({ code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo: null, seat: 0 });
         did.push(`${name(code)} was not chosen: it is shuffled into the first player's deck.`);
       }
     }
@@ -108,6 +113,13 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     }
     const added = seat.heroes.filter((code) => !logged.includes(code));
     const dropped = logged.filter((code) => !seat.heroes.includes(code));
+    // The same heroes every scenario, with two exceptions (ltp.fellowship-of-heroes): a fallen hero may be replaced, and
+    // a player may trade 1 hero for a new one. A hero still alive is never left out without that trade.
+    const droppedFallen = dropped.filter((code) => fallen.has(code)).length;
+    const droppedAlive = dropped.filter((code) => !fallen.has(code));
+    const trades = Math.max(0, added.length - droppedFallen);
+    if (droppedAlive.length > trades) errors.push(`Seat ${index + 1}: ${droppedAlive.map(name).join(", ")} is listed in the Campaign Log and must start unless traded for a new hero`);
+    if (trades > 1) errors.push(`Seat ${index + 1}: a player may trade only 1 hero between scenarios`);
     for (const code of dropped) {
       const carrying = log.campaignPool.find((card) => card.attachedTo === code && printedOf(cards, card.code).keywords.permanent);
       if (carrying && !fallen.has(code)) errors.push(`${name(code)} carries ${name(carrying.code)}, a Permanent card that must be attached to that hero at the start`);
@@ -160,7 +172,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const poolEncounterCards: string[] = [];
   for (const card of pool) {
     if (card.attachedTo != null) continue;
-    if (seats.some((seat) => seat.hand?.includes(card.code))) continue;
+    if (seats.some((seat) => seat.hand?.includes(card.code) || seat.attachments.some((attached) => attached.code === card.code))) continue;
     if (card.back === "player") {
       const seat = Math.min(card.seat ?? 0, seatCount - 1);
       seats[seat]?.deck.push(card.code);

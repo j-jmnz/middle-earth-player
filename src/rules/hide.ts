@@ -1,6 +1,7 @@
 // Rules: mec109.hide-x, mec109.hide-tests (data/rules/entries.json).
 import { characters } from "./combat.ts";
 import { heldStat, NO_COUNTS } from "./constants.ts";
+import { resetEncounterDeck } from "./verbs.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
@@ -69,7 +70,7 @@ export function hideStep(state: ScenarioState, frame: Frame, ctx: ReduceContext,
     case 0:
       return openCommit(state, frame);
     case 1:
-      return discardTop(state, data, frame.seat, ctx);
+      return discardTop(state, data, frame.seat, ctx, steps);
     case 2:
       return measure(state, frame, data, ctx, steps);
     case 3:
@@ -86,11 +87,14 @@ function openCommit(state: ScenarioState, frame: Frame): ScenarioState {
 }
 
 // Discarded cards are not revealed: no When Revealed, no Forced. A treachery adds 0.
-function discardTop(state: ScenarioState, data: HideData, seat: number, ctx: ReduceContext): ScenarioState {
+// The seat or the table may add to the total threat (A Shortcut to Mushrooms: 1 for each ally that player controls).
+// An encounter deck that runs out during the quest phase is reset from the discard pile (rr.running-out-of-cards).
+function discardTop(state: ScenarioState, data: HideData, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
-  let threat = heldStat(state, seat, "hideThreat", NO_COUNTS);
+  let threat = heldStat(state, seat, "hideThreat", { committed: data.committedIds.length, ally: allies(state, seat, ctx) });
   const discardedIds: string[] = [];
   for (let count = 0; count < data.x; count += 1) {
+    next = resetEncounterDeck(next, steps);
     const id = next.encounterDeck[0];
     const instance = id ? next.cards[id] : undefined;
     if (!id || !instance) break;

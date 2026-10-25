@@ -154,12 +154,13 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   }
 }
 
-// Stamps the order in which a card entered play, so Forced effects can resolve oldest first.
+// Stamps the order in which a card entered play, so Forced effects can resolve oldest first. A card enters play ready
+// (rr.ready) and carries no tokens from an earlier time in play: an ally destroyed with 3 damage comes back with none.
 function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioState {
   const now = state.cards[id];
   if (!now || inPlay(from) || !inPlay(now.zone)) return state;
   const clock = state.clock + 1;
-  return updateCard({ ...state, clock }, id, { enteredPlay: clock });
+  return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: 0, progress: 0, resources: 0, exhausted: false });
 }
 
 export function moveCard(state: ScenarioState, id: string, dest: Destination): ScenarioState {

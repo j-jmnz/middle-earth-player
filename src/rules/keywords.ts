@@ -3,7 +3,7 @@ import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
-import { isCharacterType, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
+import { fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
@@ -129,7 +129,8 @@ export function placeDamage(
   cause: Cause,
 ): ScenarioState {
   const instance = state.cards[id];
-  if (!instance) return state;
+  // Damage goes only on a card in play (rr.in-play-and-out-of-play): a defender that already left play takes none.
+  if (!instance || !inPlay(instance.zone)) return state;
   const printed = printedOf(cards, instance.code);
   if (source === "player" && !playerCardEffectCanChoose(printed)) return state;
   const dealt = placedAmount(printed, amount);
@@ -145,6 +146,22 @@ export function placeDamage(
   } else if (hurt) {
     // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
     next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id });
+  }
+  return next;
+}
+
+// A character or enemy whose damage is at or above its hit points is destroyed however the hit points came down
+// (rr.hit-points): a hit point bonus that ends, or leaves with its source, puts the card it held up in the discard pile.
+export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  for (const instance of Object.values(state.cards)) {
+    if (instance.damage <= 0 || !inPlay(instance.zone)) continue;
+    const printed = printedOf(cards, instance.code);
+    if (printed.health == null || (printed.type === "enemy" && printed.keywords.indestructible)) continue;
+    const current = next.cards[instance.id];
+    if (!current || !inPlay(current.zone) || current.damage < modifiedStat(next, current, "hitPoints", cards)) continue;
+    next = destroyCard(next, instance.id, cards, steps);
+    if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
   }
   return next;
 }
@@ -180,7 +197,7 @@ export function defeatedDestination(
   if ((printed.type === "enemy" || printed.type === "location") && printed.victory != null) {
     return { zone: "victory" };
   }
-  if (isPlayerType(printed) && instance.controller != null) {
+  if (!fromEncounterDeck(printed) && instance.controller != null) {
     return { zone: "discard", seat: instance.owner ?? instance.controller };
   }
   if (printed.type === "quest") return { zone: "setAside" };
@@ -237,6 +254,50 @@ export function destroyCard(
   if (printed.type === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
   return eliminateEmpties(next, steps);
+}
+
+// An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
+// owners' discard piles, and the enemies engaged with it return to the staging area with their damage. An attack on
+// that seat ends. If it held the first player token, the token passes clockwise at once (rr.first-player,
+// faq.first-player-elimination). Nothing is cleared once the game is lost.
+export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
+  if (state.lost) return state;
+  let next = state;
+  for (let index = 0; index < next.seatCount; index += 1) {
+    const seat = next.seats[index];
+    if (!seat?.eliminated) continue;
+    const controlled = Object.values(next.cards).filter(
+      (card) => card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging",
+    );
+    if (controlled.length === 0 && seat.engaged.length === 0) continue;
+    for (const enemyId of seat.engaged) {
+      next = moveCard(next, enemyId, { zone: "staging" });
+      next = updateCard(next, enemyId, { controller: null });
+    }
+    for (const card of controlled) {
+      const current = next.cards[card.id];
+      if (!current || current.controller !== index) continue;
+      const printed = printedOf(cards, card.code);
+      const wasInPlay = inPlay(current.zone);
+      const dest: Destination = fromEncounterDeck(printed) ? { zone: "encounterDiscard" } : { zone: "discard", seat: current.owner ?? index };
+      next = moveCard(next, card.id, dest);
+      if (wasInPlay && printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
+    }
+    if (next.pendingAttack?.seat === index) {
+      next = { ...next, pendingAttack: null, window: next.window?.kind === "defense" ? null : next.window };
+    }
+    if (next.window?.kind === "chooseEnemy" && next.window.seat === index) next = { ...next, window: null };
+  }
+  if (next.seats[next.firstPlayer]?.eliminated) {
+    for (let step = 1; step <= next.seatCount; step += 1) {
+      const candidate = (next.firstPlayer + step) % next.seatCount;
+      if (!next.seats[candidate]?.eliminated) {
+        next = { ...next, firstPlayer: candidate };
+        break;
+      }
+    }
+  }
+  return next;
 }
 
 export function eliminateEmpties(state: ScenarioState, steps: EngineStep[]): ScenarioState {

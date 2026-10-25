@@ -22,7 +22,7 @@ beforeAll(async () => {
   }
 });
 
-type Scene = { shadow: string; seats?: 1 | 2; hideFailed?: boolean; ring?: "ready" | "exhausted"; heroes?: readonly string[] };
+type Scene = { shadow: string; seats?: 1 | 2; hideFailed?: boolean; ring?: "ready" | "exhausted"; heroes?: readonly string[]; next?: string };
 
 function ctx(): ReduceContext {
   return { effects: EFFECTS, cards: cardMap([...cards.values()]) };
@@ -50,6 +50,11 @@ function attackWindow(scene: Scene): { state: ScenarioState; steps: EngineStep[]
   const shadow = spawn(state, scene.shadow, { zone: "encounterDeck" });
   state = shadow.state;
   ids.shadow = shadow.id;
+  if (scene.next) {
+    const below = spawn(state, scene.next, { zone: "encounterDeck" });
+    state = below.state;
+    ids.next = below.id;
+  }
   if (scene.ring) {
     const ring = spawn(state, RING, { zone: "play", seat: 0 });
     state = { ...ring.state, cards: { ...ring.state.cards, [ring.id]: { ...ring.state.cards[ring.id]!, exhausted: scene.ring === "exhausted" } } };
@@ -167,12 +172,14 @@ describe.each([
 });
 
 describe("141073 shadow AfterAttack ImmediateAttack", () => {
-  it("the attack repeats with no new shadow card", () => {
+  it("the first shadow card is discarded before the repeated attack; an empty encounter deck deals no new one", () => {
     const run = attackWindow({ shadow: "141073" });
     const first = send(run, { type: "Undefended" });
     expect(damageOf(first.state, run.ids.hero0)).toBe(5);
     expect(first.state.window).toEqual({ kind: "defense", enemyId: run.ids.rider, seat: 0 });
     expect(first.state.pendingAttack).toMatchObject({ enemyId: run.ids.rider, immediate: true });
+    // faq.additional-attacks: the shadow card dealt for the first attack is discarded first.
+    expect(first.state.cards[run.ids.shadow ?? ""]?.zone).toBe("encounterDiscard");
     const second = send(first, { type: "Undefended" });
     expect(damageOf(second.state, run.ids.hero0)).toBe(10);
     expect(second.state.pendingAttack).toBeNull();
@@ -181,16 +188,25 @@ describe("141073 shadow AfterAttack ImmediateAttack", () => {
     expect(second.steps.filter((step) => step.kind === "attack")).toHaveLength(2);
     expect(second.steps.filter((step) => step.kind === "push" && step.frame === "shadow" && step.cardId === run.ids.shadow)).toHaveLength(1);
   });
+
+  it("the repeated attack is dealt a new shadow card (faq.additional-attacks)", () => {
+    const run = attackWindow({ shadow: "141073", next: "141036" });
+    const first = send(run, { type: "Undefended" });
+    expect(first.state.cards[run.ids.shadow ?? ""]?.zone).toBe("encounterDiscard");
+    expect(first.state.cards[run.ids.rider ?? ""]?.shadowId).toBe(run.ids.next);
+    expect(first.state.cards[run.ids.next ?? ""]).toMatchObject({ zone: "shadow", face: "down" });
+  });
 });
 
 describe("141072 shadow AfterAttack EngageNextPlayer", () => {
-  it("the enemy is engaged to the next seat and attacks again; with one seat, the same seat", () => {
+  it("with one seat there is no next player, so the enemy neither engages nor attacks again (faq.next-player)", () => {
     const run = attackWindow({ shadow: "141072" });
     const first = send(run, { type: "Undefended" });
-    expect(first.state.window).toEqual({ kind: "defense", enemyId: run.ids.rider, seat: 0 });
-    expect(first.state.cards[run.ids.rider ?? ""]?.controller).toBe(0);
-    const second = send(first, { type: "Undefended" });
-    expect(damageOf(second.state, run.ids.hero0)).toBe(10);
+    expect(damageOf(first.state, run.ids.hero0)).toBe(5);
+    expect(first.state.pendingAttack).toBeNull();
+    expect(first.state.cards[run.ids.rider ?? ""]).toMatchObject({ zone: "engaged", controller: 0 });
+    expect(first.steps.filter((step) => step.kind === "attack")).toHaveLength(1);
+    expect(first.steps.some((step) => step.kind === "engage")).toBe(false);
   });
 
   it("with two seats, seat 1 answers the repeated attack", () => {

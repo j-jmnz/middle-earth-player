@@ -9,7 +9,8 @@ import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
-import { runInstruction, type ReduceContext } from "./interpret.ts";
+import { dealOneShadow, runInstruction, type ReduceContext } from "./interpret.ts";
+import { discardShadowOf } from "./shadow.ts";
 import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
@@ -96,7 +97,7 @@ export function pushCardEffects(
       instructions: running.flatMap((effect) => effect.instructions),
       causes: running.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
       cancel: null,
-      blockCancel: null,
+      blockCancel: running.find((effect) => effect.uncancelable)?.uncancelable ?? null,
     },
     steps,
   );
@@ -108,7 +109,9 @@ export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContex
   if (frame.step === 0) {
     if (data.canceled) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
     // The "when revealed" effects of a card are about to resolve: a Response may cancel them first (rr.cancel).
-    if (frame.frame === "whenRevealed" && frame.cardId && !data.interrupted) {
+    // An effect that cannot be canceled now is not offered to those Responses at all.
+    const blocked = data.blockCancel != null && holds(state, data.blockCancel, { actor: frame.seat, sourceId: frame.cardId, returned: 0 }, ctx);
+    if (frame.frame === "whenRevealed" && frame.cardId && !data.interrupted && !blocked) {
       const offered = offerResponses(state, { trigger: "whenRevealedPending", seat: frame.seat, subject: frame.cardId }, ctx, steps);
       if (offered.stack.length === state.stack.length) return beginEffect(state, frame, data, ctx);
       // Remember that the offer was made, so the frame begins when the Responses are done.
@@ -217,7 +220,10 @@ function expandPlayers(
 function immediateAttack(state: ScenarioState, sourceId: string | null, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
-  const begun = beginEnemyAttack(state, enemy.controller, sourceId, ctx, steps);
+  // An attack an effect makes is dealt a shadow card of its own; one dealt for an earlier attack is discarded first
+  // (rr.attacks-outside-the-combat-phase, faq.additional-attacks).
+  const dealt = dealOneShadow(discardShadowOf(state, sourceId), sourceId);
+  const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };
 }
@@ -247,7 +253,10 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       const free = (id: string): boolean =>
         !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) &&
         (code == null || !attachBlocked(state, ctx, id, code));
-      if (instruction.to.kind === "hero") return (state.seats[item.seat]?.heroes ?? []).filter(free);
+      if (instruction.to.kind === "hero") {
+        const seats = instruction.to.control === "any" ? livingSeats(state) : [item.seat];
+        return seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter(free);
+      }
       const trait = instruction.to.trait;
       return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])]
         .filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx))
@@ -333,7 +342,9 @@ function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Redu
     ids = [item.chosen];
   } else if (picksOne(item.instruction)) {
     const distinct = distinctByCode(state, found);
-    if (distinct.length > 1) return askTarget(state, item, distinct);
+    const instruction = item.instruction;
+    const firstChooses = instruction.verb === "AttachSelf" && instruction.to.kind === "hero" && instruction.to.control === "any";
+    if (distinct.length > 1) return askTarget(state, firstChooses ? { ...item, seat: state.firstPlayer } : item, distinct);
     ids = found.slice(0, 1);
   }
   return applyTargeted(state, item, ids, frame.cardId, ctx, steps);

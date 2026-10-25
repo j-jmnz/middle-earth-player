@@ -462,6 +462,22 @@
    "confirmedBy": null
   },
   {
+   "code": "141001",
+   "side": "A",
+   "printing": "TBR",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Frodo-Baggins-Black-Riders.jpg",
+    "sha256": "ff73769c48ec94f424ca3834bcd0d5e18c1aebbc04f7237485490f115ee5775a"
+   },
+   "lines": [
+    "Response: Spend 1 Fellowship resource and exhaust The One Ring to cancel the effects of an encounter card just revealed from the encounter deck. Shuffle that card back into the encounter deck and reveal another encounter card."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code session_01Mk2PDFr6UJDtACnSBRLyZ6, read from the scan image",
+   "confirmedBy": null
+  },
+  {
    "code": "141002",
    "side": "A",
    "printing": "TBR",
@@ -2038,6 +2054,22 @@
    "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
    "confirmedBy": null,
    "notes": "Hall of Beorn serves this MEC109 scan with a 2014 copyright line. The 2013 Black Riders card prints only the last sentence; the printed text below is the one the scan carries, and it matches Hall of Beorn's MEC109 transcription."
+  },
+  {
+   "code": "142001",
+   "side": "A",
+   "printing": "TRD",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Frodo-Baggins-Road-Darkens.jpg",
+    "sha256": "2ba7fcc0552a48201306744ddc9d2409ddc041ab30b9d28f0e94b0cf7df788d4"
+   },
+   "lines": [
+    "Response: After Frodo Baggins exhausts to defend an attack, exhaust The One Ring and spend 1 Fellowship resource to target the attacking enemy. Then, this attack deals no damage and each player raises his threat by 2."
+   ],
+   "inert": [],
+   "misprints": [],
+   "readBy": "Claude Code session_01Mk2PDFr6UJDtACnSBRLyZ6, read from the scan image",
+   "confirmedBy": null
   },
   {
    "code": "142002",

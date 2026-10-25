@@ -74,7 +74,7 @@ describe("141024 response on hideSucceeded", () => {
     expect(offered).not.toContain("141024:response:1");
   });
 
-  it("no response offered to a seat that Peril locks out", () => {
+  it("under Peril, the revealing seat answers a card nobody controls; the first player is not offered it", () => {
     // Seat 1 reveals the card with Hide, and succeeds. The first player is seat 0.
     function seatOneTests(hideCard: string) {
       const table = buildTable(base, { ...scene, staging: ["141036"], seats: 2, deck: ["f0", hideCard, "f0", "f0", "f0", "f0"] });
@@ -89,11 +89,12 @@ describe("141024 response on hideSucceeded", () => {
     let plain = seatOneTests(RIDER);
     plain.run = send(send(plain.run, { type: "Pass" }, plain.table.ctx), { type: "Pass" }, plain.table.ctx);
     expect(plain.run.state.window).toEqual({ kind: "response", seat: 0 });
-    // 141041 has Peril: only seat 1 acts, and the offer for seat 0 is not made.
+    // 141041 has Peril: only seat 1 acts. The other players are the ones kept out (mec109.peril), so the Response on a
+    // card nobody controls goes to seat 1 rather than to the first player.
     const perilous = seatOneTests("141041");
     const run = send(perilous.run, { type: "Pass" }, perilous.table.ctx);
     expect(run.steps.some((step) => step.kind === "hideTest" && step.success)).toBe(true);
-    expect(run.state.window?.kind).not.toBe("response");
+    expect(run.state.window).toEqual({ kind: "response", seat: 1 });
   });
 });
 

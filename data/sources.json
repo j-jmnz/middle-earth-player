@@ -804,9 +804,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "7b462d5333a45afbcca5a13d81287f306f74e130009575926a75c981536bcb47"
+        "value": "ca26535f176e779749e2015e583408f5fb47cb4f17aa60021055e08263ec6992"
       },
-      "fetchedAt": "2026-10-24T12:29:40.045Z",
+      "fetchedAt": "2026-10-25T00:53:37.439Z",
       "files": [
         {
           "path": "scans/01002.A.jpg",
@@ -975,6 +975,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gandalf.jpg",
           "sha256": "f658e30508315ee2159e1ccd976a130b4e4f0038458fb50df418711ad0509c07",
           "bytes": 145176
+        },
+        {
+          "path": "scans/141001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Frodo-Baggins-Black-Riders.jpg",
+          "sha256": "ff73769c48ec94f424ca3834bcd0d5e18c1aebbc04f7237485490f115ee5775a",
+          "bytes": 148338
         },
         {
           "path": "scans/141002.A.jpg",
@@ -1509,6 +1515,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-One-Ring.jpg",
           "sha256": "95df6d41c248b0e483a74b7f765554a2bc5cd0930c804a59cf1820f568197474",
           "bytes": 137929
+        },
+        {
+          "path": "scans/142001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Frodo-Baggins-Road-Darkens.jpg",
+          "sha256": "2ba7fcc0552a48201306744ddc9d2409ddc041ab30b9d28f0e94b0cf7df788d4",
+          "bytes": 129519
         },
         {
           "path": "scans/142002.A.jpg",

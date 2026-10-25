@@ -331,7 +331,7 @@ export const PLAYER_TEMPLATES: readonly Template[] = [
         timing: "response",
         trigger: "played",
         instructions: [
-          { verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: count(match[1]), cardType: "attachment", maxCost: count(match[2]) } },
+          { verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: count(match[1]), cardType: "attachment", maxCost: count(match[2]), intoPlay: true } },
           { verb: "Pick", pick: { type: "character", control: "any", hostForPicked: true } },
           { verb: "AttachPicked" },
           { verb: "ArrangeTop" },
@@ -388,7 +388,8 @@ export const PLAYER_TEMPLATES: readonly Template[] = [
     build: () => [
       {
         timing: "action",
-        instructions: [{ verb: "Pick", pick: { type: "ally", control: "any", from: "discard", costIsX: true, intoPlay: true } }, { verb: "MovePicked", to: "play" }],
+        // faq.stand-and-fight: a neutral ally does not belong to "any sphere".
+        instructions: [{ verb: "Pick", pick: { type: "ally", control: "any", from: "discard", costIsX: true, intoPlay: true, nonNeutral: true } }, { verb: "MovePicked", to: "play" }],
       },
     ],
   },

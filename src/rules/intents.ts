@@ -17,7 +17,8 @@ export type EngineStep =
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   | { kind: "advance"; cardId: string }
   | { kind: "attack"; side: "enemy" | "player"; seat: number; enemyId: string }
-  | { kind: "cancel"; cardId: string };
+  | { kind: "cancel"; cardId: string }
+  | { kind: "resetEncounterDeck"; count: number; cause: Cause };
 
 export type Payment = { heroId: string; amount: number };
 

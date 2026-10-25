@@ -1,11 +1,12 @@
-// Rules: rr.step-6-2 (data/rules/entries.json).
+// Rules: rr.step-6-2, rr.step-6-4-3, rr.attacks-outside-the-combat-phase, faq.enemy-attacks-outside-combat,
+// faq.additional-attacks, ltp.shadow-discard (data/rules/entries.json).
 import { pushEffectFrame } from "./effect-frames.ts";
 import { holdsNow } from "./verbs.ts";
 import type { EngineStep } from "./intents.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
 import type { ScenarioState } from "./state.ts";
-import { expireModifiers, updateCard } from "./state.ts";
+import { expireModifiers, inPlay, updateCard } from "./state.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 import { effectCause, inCause, ruleCause } from "./cause.ts";
@@ -30,11 +31,17 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
     }
     return next;
   }, steps);
-  if (!resolved.cards[shadowId]) return resolved;
-  return moveCard(resolved, shadowId, { zone: "encounterDiscard" });
+  // A resolved shadow card stays with its enemy: it is discarded when the enemy leaves play or the combat phase ends.
+  return resolved;
 }
 
-// End of the combat phase: every shadow card still dealt is discarded unused (Learn to Play p16).
+// A card the enemy was dealt for an earlier attack, discarded before it makes another (faq.additional-attacks).
+export function discardShadowOf(state: ScenarioState, enemyId: string): ScenarioState {
+  const shadowId = state.cards[enemyId]?.shadowId;
+  return shadowId && state.cards[shadowId] ? moveCard(state, shadowId, { zone: "encounterDiscard" }) : state;
+}
+
+// End of the combat phase: every shadow card dealt this round is discarded (ltp.shadow-discard).
 export function discardShadows(state: ScenarioState): ScenarioState {
   let next = state;
   for (const instance of Object.values(state.cards)) {
@@ -70,7 +77,10 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   const attack = next.pendingAttack;
   const enemy = attack ? next.cards[attack.enemyId] : undefined;
   if (!attack || !enemy || enemy.zone !== "engaged") return finishAttack(next, ctx, steps);
-  if (attack.defenderId != null && !attack.undefended) {
+  // A defender that left play before damage leaves the attack undefended (rr.step-6-4-3).
+  const gone = attack.defenderId != null && !attack.undefended && !inPlay(next.cards[attack.defenderId]?.zone ?? "removed");
+  if (gone) next = { ...next, pendingAttack: { ...attack, undefended: true } };
+  if (attack.defenderId != null && !attack.undefended && !gone) {
     const defender = next.cards[attack.defenderId];
     const raw = defender ? Math.max(0, modifiedStat(next, enemy, "attack", ctx.cards) - modifiedStat(next, defender, "defense", ctx.cards)) : 0;
     const damaged = defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "framework", ruleCause("rr.step-6-4-3")) : next;
@@ -90,7 +100,10 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
     attack.immediate || done.resolvedAttacks.includes(attack.enemyId) ? done.resolvedAttacks : [...done.resolvedAttacks, attack.enemyId];
-  const ended: ScenarioState = { ...done, pendingAttack: null, window: null, resolvedAttacks };
+  // The shadow card an attack outside the combat phase was dealt is discarded once it resolves
+  // (faq.enemy-attacks-outside-combat).
+  const cleared = attack.immediate && done.phase !== "Combat" ? discardShadowOf(done, attack.enemyId) : done;
+  const ended: ScenarioState = { ...cleared, pendingAttack: null, window: null, resolvedAttacks };
   const after = attack.after ?? [];
   if (after.length === 0 || ended.cards[attack.enemyId]?.zone !== "engaged") return ended;
   return pushEffectFrame(

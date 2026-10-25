@@ -85,8 +85,23 @@ describe("surge", () => {
     const revealed = expectOk(reduce(first.state, { type: "Pass" }, ctx));
     expect(revealed.state.seats[1]?.eliminated).toBe(true);
     expect(revealed.state.lost).toBe(false);
-    expect(revealed.state.staging).toEqual([doom.id]);
+    // The revealed treachery went to the encounter discard pile (rr.treachery-cards); seat 1 revealed nothing.
+    expect(revealed.state.staging).toEqual([]);
+    expect(revealed.state.encounterDiscard).toEqual([doom.id]);
     expect(revealed.state.encounterDeck).toEqual([second.id]);
+  });
+
+  it("shuffles the encounter discard pile back in when the deck is out of cards in the quest phase (rr.running-out-of-cards)", () => {
+    const later = definePrinted({ code: "later", name: "Later", type: "enemy", threat: 0, engagementCost: 50 });
+    const cards = cardMap([later, hero("aragorn", "leadership")]);
+    let state = blankScenario({ seatCount: 1, seed: 4, definition: fixtureDefinition(["stage"]) });
+    state = spawn(state, "aragorn", { zone: "heroes", seat: 0 }).state;
+    const gone = spawn(state, "later", { zone: "encounterDiscard" });
+    state = { ...gone.state, phase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0 };
+    const revealed = expectOk(reduce(state, { type: "Pass" }, { effects: [], cards }));
+    expect(revealed.steps.some((step) => step.kind === "resetEncounterDeck" && step.count === 1)).toBe(true);
+    expect(revealed.state.staging).toEqual([gone.id]);
+    expect(revealed.state.encounterDiscard).toEqual([]);
   });
 
   it("does not surge after the revealing seat is eliminated", () => {

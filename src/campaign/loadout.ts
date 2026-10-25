@@ -11,7 +11,8 @@ export type LoadoutRule =
   | "secondFrodo"
   | "noRingBearer"
   | "tooManyHeroes"
-  | "ringInDeck";
+  | "ringInDeck"
+  | "sameHero";
 
 export type LoadoutError = { rule: LoadoutRule; code: string; card: string; message: string };
 
@@ -66,6 +67,16 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
         fail("secondFrodo", card, `a second ${ringBearer.name} cannot be a starting hero or in the deck`);
       }
     });
+  }
+
+  // Heroes are unique: the players as a group have one copy of each title in play, so no two seats start with the
+  // same hero (rr.unique-cards).
+  const heroNames = new Set<string>();
+  for (const card of heroCards.flat()) {
+    // A second Ring-bearer is already named by secondFrodo.
+    if (card == null || card.type !== "hero" || card.name === ringBearer?.name) continue;
+    if (heroNames.has(card.name)) fail("sameHero", card, `only one ${card.name} can be in play, so no two heroes may share that title`);
+    heroNames.add(card.name);
   }
 
   // The One Ring is granted by setup. It is never a deck card, so it never counts toward the deck minimum.

@@ -155,6 +155,12 @@ describe("Feint (01034:A:1)", () => {
     expect(run.steps.some((step) => step.kind === "attack" && step.side === "enemy")).toBe(false);
   });
 
+  it("cannot be played with no enemy engaged with a player (rr.the-word-choose)", () => {
+    const tab = table({ heroes: [{ code: MERRY, seat: 0 }], hand: [{ code: "01034", seat: 0 }] });
+    const combat = { ...withMode(tab.state, "combatActions"), window: { kind: "pass" as const }, activeSeat: 0 };
+    expect(refusal(combat, { type: "PlayCard", cardId: idsOf(tab, "01034"), payments: payFor(combat, tab.ctx, idsOf(tab, "01034")) }, tab.ctx)).toBe("That card has no legal target");
+  });
+
   it("without a Combat Action in hand the window does not open, and the enemy attacks", () => {
     const tab = table({ heroes: [{ code: MERRY, seat: 0 }], engaged: [{ code: CHEAP, seat: 0 }], hand: [{ code: "01020", seat: 0 }] });
     const opened = settle({ ...withMode(tab.state, "combatStart"), window: null }, tab.ctx, []);

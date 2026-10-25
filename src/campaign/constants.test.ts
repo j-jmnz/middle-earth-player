@@ -63,14 +63,17 @@ describe("Hide numbers from constant effects", () => {
     expect(hideTest({ staging: ["141036"] }, both).step.willpower).toBe(5);
   });
 
-  it("141023 constant: hideWillpower per ally of the testing seat", () => {
+  it("141023 constant: hideThreat per ally of the testing seat (141023:B:2 adds to the total Threat)", () => {
     const frodo = (table: Table) => [idsOf(table, FRODO)];
     const stage = { stage: "141023" };
-    expect(hideTest(stage, frodo).step.willpower).toBe(2);
+    const plain = hideTest(stage, frodo).step;
+    expect(plain.willpower).toBe(2);
     const allies = [{ code: "ally", seat: 0 }, { code: "ally", seat: 0 }];
-    expect(hideTest({ ...stage, allies }, frodo).step.willpower).toBe(4);
+    const crowded = hideTest({ ...stage, allies }, frodo).step;
+    expect(crowded.willpower).toBe(2);
+    expect(crowded.threat).toBe(plain.threat + 2);
     // An ally another seat controls does not count.
-    expect(hideTest({ ...stage, seats: 2, allies: [{ code: "ally", seat: 1 }] }, frodo).step.willpower).toBe(2);
+    expect(hideTest({ ...stage, seats: 2, allies: [{ code: "ally", seat: 1 }] }, frodo).step.threat).toBe(plain.threat);
   });
 
   it("constant records follow their source out of play", () => {
@@ -131,7 +134,8 @@ describe("rules from constant effects", () => {
     const gate = (state: ScenarioState) => restricted(state, table.ctx, "advance").length === 0;
     expect(gate(full)).toBe(false);
     const held = resolveQuest(full, table.ctx.cards, [], gate);
-    expect(held.cards[stage]).toMatchObject({ progress: 1, face: "B" });
+    // A stage that cannot advance takes all of Sam's 3 progress (faq.progress-without-advancing).
+    expect(held.cards[stage]).toMatchObject({ progress: 3, face: "B" });
     expect(held.questStage).toBe(stage);
     // Bag End reaches the victory display; the next resolution moves the stage on.
     const bagEnd = spawn(held, "141031", { zone: "victory" });
@@ -147,7 +151,7 @@ describe("rules from constant effects", () => {
     let run = send(begin(table.state), { type: "Commit", cardIds: [idsOf(table, SAM)] }, table.ctx);
     run = send(run, { type: "Pass" }, table.ctx);
     expect(run.steps.some((step) => step.kind === "advance")).toBe(false);
-    expect(run.state.cards[stage]).toMatchObject({ zone: "questStage", progress: 1 });
+    expect(run.state.cards[stage]).toMatchObject({ zone: "questStage", progress: 3 });
     expect(run.state.mode).toBe("travel");
   });
 

@@ -23,10 +23,11 @@ export function runAttackVerb(state: ScenarioState, instruction: Instruction, fo
     case "EngageNextPlayer": {
       const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
       if (!focus.sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
+      // With no other player there is no next player to engage (faq.next-player).
       const seats = livingSeats(state);
       const at = seats.indexOf(enemy.controller);
       const next = seats[(at + 1) % seats.length];
-      if (next == null) return state;
+      if (next == null || next === enemy.controller) return state;
       steps.push({ kind: "engage", seat: next, enemyId: focus.sourceId });
       return moveCard(state, focus.sourceId, { zone: "engaged", seat: next });
     }

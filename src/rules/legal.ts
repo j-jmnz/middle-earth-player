@@ -1,13 +1,14 @@
 import { triggerIntents, triggerReason } from "./actions.ts";
 import {
   archeryRecipients,
+  attackDeclared,
   canAttack,
   canDefend,
   characters,
+  declarableEnemies,
   defenderIds,
   hasLegalAttack,
   heroIds,
-  legalAttackEnemies,
 } from "./combat.ts";
 import { optionIntents, optionReason } from "./choices.ts";
 import { hideCommitReason, hideCommitters } from "./hide.ts";
@@ -19,7 +20,7 @@ import { attachmentTargets, playReason, playWindowReason } from "./planning.ts";
 import { resolutionIntents, resolutionReason } from "./resolution.ts";
 import { stagingEnemies, stagingLocations } from "./quest.ts";
 import { travelBlocked } from "./restrictions.ts";
-import type { ScenarioState } from "./state.ts";
+import { perilLock, type ScenarioState } from "./state.ts";
 
 const NUMBER = "The engine computes that number";
 
@@ -88,7 +89,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "Undefended":
       return heroIds(state, state.pendingAttack?.seat ?? state.activeSeat);
     case "DeclareAttackers":
-      return legalAttackEnemies(state, state.activeSeat, selection.cardId, ctx.cards);
+      return declarableEnemies(state, state.activeSeat, selection.cardId, ctx.cards);
     case "Distribute":
       return archeryRecipients(state, ctx.cards);
   }
@@ -98,7 +99,8 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
   if (suppliesNumber(intent)) return NUMBER;
   if (state.lost) return "The game is lost";
   if (state.seats[state.activeSeat]?.eliminated) return "That seat is eliminated";
-  if (state.perilSeat != null && state.activeSeat !== state.perilSeat && !mandatory(state)) {
+  const locked = perilLock(state);
+  if (locked != null && state.activeSeat !== locked && !mandatory(state)) {
     return "Peril: other seats cannot act";
   }
   switch (intent.type) {
@@ -269,6 +271,7 @@ function attackReason(
   if (intent.attackerIds.length === 0) return "Declare at least one attacker";
   const enemy = state.cards[intent.enemyId];
   if (!enemy || enemy.zone !== "engaged") return "That enemy cannot be attacked";
+  if (attackDeclared(state, state.activeSeat, intent.enemyId)) return "That enemy was already attacked this phase";
   const seen = new Set<string>();
   for (const attackerId of intent.attackerIds) {
     if (seen.has(attackerId)) return "That character cannot attack twice";

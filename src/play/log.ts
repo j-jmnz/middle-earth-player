@@ -89,6 +89,8 @@ function words(step: EngineStep, names: LogNames): string | null {
       return step.side === "enemy" ? `${names.card(step.enemyId)} attacks ${player(step.seat)}` : `${player(step.seat)} attacks ${names.card(step.enemyId)}`;
     case "cancel":
       return `${names.card(step.cardId)} is canceled`;
+    case "resetEncounterDeck":
+      return `The encounter discard pile (${step.count}) is shuffled into the encounter deck`;
   }
 }
 

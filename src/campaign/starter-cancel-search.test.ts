@@ -51,7 +51,7 @@ describe("Response-only events", () => {
 describe("A Test of Will (01050:A:1)", () => {
   // The first encounter card is Lure of the Ring: "When Revealed: The first player must either exhaust The One Ring or raise
   // his threat by 3." With no Ring in play the choice is the threat.
-  const scene = (): Table => table({ heroes: [{ code: EOWYN, seat: 0 }], deck: [LURE, "f0"], hand: [{ code: "01050", seat: 0 }] });
+  const scene = (): Table => table({ heroes: [{ code: EOWYN, seat: 0 }], deck: [LURE, "f0", "f0"], hand: [{ code: "01050", seat: 0 }] });
 
   it("cancels the when revealed effects of the card just revealed", () => {
     const tab = scene();
@@ -60,8 +60,9 @@ describe("A Test of Will (01050:A:1)", () => {
     const event = idsOf(tab, "01050");
     expect(legalIntents(run.state, tab.ctx)).toContainEqual({ type: "Trigger", cardId: event, effectId: "01050:response:1" });
     run = send(run, { type: "Trigger", cardId: event, effectId: "01050:response:1", payments: payFor(run.state, tab.ctx, event) }, tab.ctx);
-    // The card was still revealed, but its effect never asked the first player anything.
-    expect(run.state.cards[idsOf(tab, LURE)]?.zone).toBe("staging");
+    // The card was still revealed, but its effect never asked the first player anything. The treachery is then
+    // discarded (rr.treachery-cards).
+    expect(run.state.cards[idsOf(tab, LURE)]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[event]?.zone).toBe("discard");
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.steps.some((step) => step.kind === "threat")).toBe(false);
@@ -76,10 +77,34 @@ describe("A Test of Will (01050:A:1)", () => {
     expect(run.steps.some((step) => step.kind === "threat" && step.amount === 3)).toBe(true);
   });
 
+  it("is not offered against The Ring Draws Them while The One Ring is exhausted (141079:A:2)", () => {
+    for (const ring of ["ready", "exhausted"] as const) {
+      const tab = table({ ring, heroes: [{ code: EOWYN, seat: 0 }], deck: ["141079", "f0", "f0", "f0"], hand: [{ code: "01050", seat: 0 }] });
+      const run = send(begin(tab.state), { type: "Pass" }, tab.ctx);
+      const offered = legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "01050:response:1");
+      expect(offered).toBe(ring === "ready");
+    }
+  });
+
   it("is not offered when the card has no when revealed effect", () => {
     const tab = table({ heroes: [{ code: EOWYN, seat: 0 }], deck: ["f0"], hand: [{ code: "01050", seat: 0 }] });
     const run = send(begin(tab.state), { type: "Pass" }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("response");
+  });
+});
+
+describe("A Test of Will on top of Gandalf's deck (142002:A:1)", () => {
+  it("is offered as if it were in the hand, paid with Gandalf's icons, and spends his permission for the phase", () => {
+    const tab = table({ heroes: [{ code: "142002", seat: 0 }], deck: [LURE, "f0", "f0"], playerDeck: [{ code: "01050", seat: 0 }, { code: AXEHAND, seat: 0 }] });
+    const event = idsOf(tab, "01050");
+    const gandalf = idsOf(tab, "142002");
+    let run = send(begin(tab.state), { type: "Pass" }, tab.ctx);
+    expect(run.state.window).toEqual({ kind: "response", seat: 0 });
+    expect(legalIntents(run.state, tab.ctx)).toContainEqual({ type: "Trigger", cardId: event, effectId: "01050:response:1" });
+    run = send(run, { type: "Trigger", cardId: event, effectId: "01050:response:1", payments: [{ heroId: gandalf, amount: 1 }] }, tab.ctx);
+    expect(run.state.cards[event]?.zone).toBe("discard");
+    expect(run.steps.some((step) => step.kind === "threat")).toBe(false);
+    expect(run.state.uses.some((use) => use.sourceId === gandalf && use.phase === "Quest")).toBe(true);
   });
 });
 
@@ -166,6 +191,21 @@ describe("Galadriel (142003:A:2)", () => {
     expect(names(run)?.slice(0, 4)).toEqual([STEWARD, CLOAK, BOROMIR, AXEHAND]);
     expect(run.state.window).toEqual({ kind: "pass" });
     expect(run.state.stack).toEqual([]);
+  });
+
+  it("does not offer a unique attachment already in play, because it would be put into play (rr.unique-cards)", () => {
+    const deck = [STEWARD, DAGGER, AXEHAND, AXEHAND, AXEHAND];
+    const tab = table({
+      start: "planning",
+      heroes: [{ code: SAM, seat: 0 }, { code: MERRY, seat: 0 }],
+      attached: [{ code: STEWARD, host: SAM }],
+      hand: [{ code: "142003", seat: 0 }],
+      playerDeck: deck.map((code) => ({ code, seat: 0 })),
+    });
+    let run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, "142003"), payments: payFor(tab.state, tab.ctx, idsOf(tab, "142003")) }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, "142003"), effectId: "142003:response:1" }, tab.ctx);
+    // Only the Dagger is offered, so it is taken without a choice; the next question is its host.
+    expect(choices(run, tab).sort()).toEqual([idsOf(tab, SAM), idsOf(tab, MERRY)].sort());
   });
 
   it("with no attachment of cost 3 or less in the top five, the five go back in any order", () => {

@@ -16,13 +16,20 @@ export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | 
   return forCard != null && deckPlayIcons(state, heroId, forCard, ctx).some((icon) => spherePays(icon, sphere));
 }
 
+// A card that belongs to a sphere needs a hero of the seat with that resource icon even when nothing is paid for it: a
+// 0-cost card is no exception (rr.resource-match). A neutral card needs none.
+export function hasResourceMatch(state: ScenarioState, seat: number, sphere: Sphere | null, ctx: ReduceContext, forCard?: string): boolean {
+  if (sphere == null || sphere === "neutral") return true;
+  return (state.seats[seat]?.heroes ?? []).some((id) => heroPays(state, id, sphere, ctx, forCard));
+}
+
 // Checks an offered resource payment against a cost: whole numbers, heroes the seat controls, the sphere
 // that may pay, what each hero holds (one hero can appear twice, so its payments are summed), and the
 // exact total. Returns why it is refused, or null.
 export function validatePayments(
   state: ScenarioState,
   payments: readonly Payment[],
-  cost: { seat: number; sphere: Sphere | null; amount: number },
+  cost: { seat: number; sphere: Sphere | null; amount: number; forCard?: string },
   ctx: ReduceContext,
 ): string | null {
   const spent = new Map<string, number>();
@@ -35,10 +42,11 @@ export function validatePayments(
   for (const [heroId, amount] of spent) {
     const hero = state.cards[heroId];
     if (!hero || hero.zone !== "heroes" || hero.controller !== cost.seat) return "That hero cannot pay";
-    if (!heroPays(state, heroId, cost.sphere, ctx)) return "Wrong sphere";
+    if (!heroPays(state, heroId, cost.sphere, ctx, cost.forCard)) return "Wrong sphere";
     if (hero.resources < amount) return "That hero does not have those resources";
   }
   if (sum > cost.amount) return "Overpay";
   if (sum < cost.amount) return "Underpay";
+  if (sum === 0 && !hasResourceMatch(state, cost.seat, cost.sphere, ctx, cost.forCard)) return "No hero matches that card's sphere";
   return null;
 }

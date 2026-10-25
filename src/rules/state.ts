@@ -108,6 +108,7 @@ export type ModeName =
   | "optionalEngage"
   | "engagement"
   | "combatStart"
+  | "combatShadows"
   | "combatActions"
   | "enemyAttacks"
   | "playerAttacks"
@@ -210,6 +211,11 @@ export type ScenarioState = {
   resolutionLog: ResolutionLog;
   engagement: { ordinal: number; engagedThisPass: boolean } | null;
   resolvedAttacks: readonly string[];
+  // The active player of the planning phase: the one seat that may play allies and attachments in the window
+  // (rr.step-2-2). Each seat has its turn in player order (rr.step-2-3). Null outside the planning phase.
+  planningSeat: number | null;
+  // "seat:enemyId" for each attack a seat declared this combat phase: one per enemy (faq.limitations-on-attacks).
+  declaredAttacks: readonly string[];
   pendingAttack: PendingAttack | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
@@ -255,6 +261,7 @@ export function phaseOf(mode: ModeName): Phase {
     case "engagement":
       return "Encounter";
     case "combatStart":
+    case "combatShadows":
     case "combatActions":
     case "enemyAttacks":
     case "playerAttacks":
@@ -326,6 +333,8 @@ export function blankScenario(input: {
     resolutionLog: { earned: [], fallen: [], captives: [] },
     engagement: null,
     resolvedAttacks: [],
+    declaredAttacks: [],
+    planningSeat: null,
     pendingAttack: null,
     undo: { phase: undoPhase, snapshot: null, cards: null, intents: [], steps: [] },
   };
@@ -352,6 +361,12 @@ export function withMode(state: ScenarioState, mode: ModeName): ScenarioState {
   if (state.phase !== phase) expiring.push("endOfPhase");
   if (mode === "beginRound" && state.mode !== "beginRound") expiring.push("endOfRound");
   return expiring.length === 0 ? changed : expireModifiers(changed, expiring);
+}
+
+// The seat a Peril card's staging is locked to, or null. An enemy attack that card starts is open to every player
+// (faq.peril-attacks): the lock does not hold while the attack resolves.
+export function perilLock(state: ScenarioState): number | null {
+  return state.pendingAttack ? null : state.perilSeat;
 }
 
 export function inPlay(zone: ZoneName): boolean {

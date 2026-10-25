@@ -1,4 +1,4 @@
-// Rules: rr.refresh-phase, rr.step-7-3 (data/rules/entries.json).
+// Rules: rr.refresh-phase, rr.step-7-3, ltp.phase-7-refresh (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";

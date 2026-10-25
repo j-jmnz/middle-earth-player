@@ -106,26 +106,38 @@ describe("Beorn (01031:A:1)", () => {
   });
 });
 
+describe("Beorn (01031:A:1) after he left play", () => {
+  it("is not shuffled back from the discard pile once he was destroyed (faq.simultaneous-effects)", () => {
+    const tab = table({ heroes: [{ code: SAM, seat: 0 }], allies: [{ code: BEORN, seat: 0 }], playerDeck: [{ code: AXEHAND, seat: 0 }] });
+    const beorn = idsOf(tab, BEORN);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: beorn, effectId: "01031:action:1" }, tab.ctx);
+    run = { ...run, state: destroyCard(run.state, beorn, tab.ctx.cards, []) };
+    run = send(run, { type: "Pass" }, tab.ctx);
+    expect(run.state.cards[beorn]?.zone).toBe("discard");
+    expect(run.state.seats[0]?.deck).not.toContain(beorn);
+  });
+});
+
 describe("Stand and Fight (01051:A:1)", () => {
   it("pays X and puts an ally of printed cost X from any discard pile into play under your control", () => {
     let tab = table({ seats: 2, heroes: [{ code: EOWYN, seat: 0 }, { code: MERRY, seat: 1 }], hand: [{ code: "01051", seat: 0 }] });
-    tab = discard(tab, BOROMIR, 0);
-    tab = discard(tab, GANDALF, 1);
+    tab = discard(tab, BOROMIR, 1);
+    tab = discard(tab, GANDALF, 0);
     const stand = idsOf(tab, "01051");
-    const gandalf = idsOf(tab, GANDALF);
+    const boromir = idsOf(tab, BOROMIR);
     const eowyn = idsOf(tab, EOWYN);
-    let run = send(begin(tab.state), { type: "PlayCard", cardId: stand, payments: [{ heroId: eowyn, amount: 5 }] }, tab.ctx);
-    expect(run.state.cards[gandalf]?.zone).toBe("play");
-    expect(run.state.cards[gandalf]?.controller).toBe(0);
-    expect(run.state.cards[gandalf]?.owner).toBe(1);
-    expect(run.state.cards[idsOf(tab, BOROMIR)]?.zone).toBe("discard");
+    let run = send(begin(tab.state), { type: "PlayCard", cardId: stand, payments: [{ heroId: eowyn, amount: 4 }] }, tab.ctx);
+    expect(run.state.cards[boromir]?.zone).toBe("play");
+    expect(run.state.cards[boromir]?.controller).toBe(0);
+    expect(run.state.cards[boromir]?.owner).toBe(1);
     expect(run.state.cards[stand]?.zone).toBe("discard");
     // When it is destroyed it goes to its owner's discard pile.
-    const destroyed = destroyCard(run.state, gandalf, tab.ctx.cards, []);
-    expect(destroyed.seats[1]?.discard).toContain(gandalf);
-    expect(destroyed.seats[0]?.discard).not.toContain(gandalf);
-    run = send(begin(tab.state), { type: "PlayCard", cardId: stand, payments: [{ heroId: eowyn, amount: 4 }] }, tab.ctx);
-    expect(run.state.cards[idsOf(tab, BOROMIR)]?.zone).toBe("play");
+    const destroyed = destroyCard(run.state, boromir, tab.ctx.cards, []);
+    expect(destroyed.seats[1]?.discard).toContain(boromir);
+    expect(destroyed.seats[0]?.discard).not.toContain(boromir);
+    // Gandalf is neutral, and a neutral ally does not belong to "any sphere" (faq.stand-and-fight).
+    run = send(begin(tab.state), { type: "PlayCard", cardId: stand, payments: [{ heroId: eowyn, amount: 5 }] }, tab.ctx);
+    expect(run.state.cards[idsOf(tab, GANDALF)]?.zone).toBe("discard");
   });
 
   it("can be played for any X, and an X with no ally of that cost does nothing", () => {

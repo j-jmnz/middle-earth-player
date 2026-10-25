@@ -13,11 +13,11 @@ import { buildStart } from "./start.ts";
 
 // A whole A Shadow of the Past on fixed seeds. The Ring-bearer is the saga hero; the three other heroes
 // and the deck are in-memory cards with big numbers, so the outcome depends on the engine and the seed
-// and not on card play. Seeds 1 and 2 win; seed 9 loses when the Ring-bearer's card leaves play.
+// and not on card play. Seeds 2 and 3 win; seed 9 loses when the Ring-bearer's card leaves play.
 const RING_BEARER = "141001";
 const POLICY = { scout: "scout", prefer: "141035", protect: RING_BEARER } as const;
-const WIN_SEED = 1;
-const OTHER_WIN_SEED = 2;
+const WIN_SEED = 2;
+const OTHER_WIN_SEED = 3;
 const LOSS_SEED = 9;
 
 let world: World;

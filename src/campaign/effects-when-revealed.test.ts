@@ -90,6 +90,17 @@ describe("whenRevealed on locations and treacheries", () => {
     expect(codesOf(attached.state, attached.state.staging)).toContain("f0");
   });
 
+  it("141043 whenRevealed: \"Attach to a hero\" offers every player's heroes, and the first player chooses", () => {
+    const { state, ctx } = make({ seats: 2, deck: ["f0", "141043", "f0", "f0"] });
+    // Seat 0 reveals a filler, then seat 1 reveals Have You Seen Baggins?.
+    const opened = reveal(state, ctx, 2);
+    const merry = first(opened.state, "141003");
+    expect(opened.state.window).toMatchObject({ kind: "choose", seat: 0 });
+    expect(opened.state.window?.kind === "choose" ? opened.state.window.options : []).toEqual([first(opened.state, FRODO), first(opened.state, SAM), merry]);
+    const attached = send(opened, { type: "Choose", optionId: merry }, ctx);
+    expect(attached.state.cards[first(attached.state, "141043")]).toMatchObject({ zone: "attached", host: merry });
+  });
+
   it("141074 whenRevealed: AttachSelf to an enemy with the trait", () => {
     const { state, ctx } = make({ deck: ["141074", "f0"], engaged: [{ code: RIDER, seat: 0 }] });
     const run = reveal(state, ctx);
@@ -98,11 +109,12 @@ describe("whenRevealed on locations and treacheries", () => {
     expect(run.state.cards[steed]).toMatchObject({ zone: "attached", host: rider });
   });
 
-  it("141074 whenRevealed: AttachSelf finds no enemy with the trait and stays in staging", () => {
-    const { state, ctx } = make({ deck: ["141074", "f0"] });
+  it("141074 whenRevealed: AttachSelf finds no enemy with the trait, so the treachery is discarded", () => {
+    const { state, ctx } = make({ deck: ["141074", "f0", "f0"] });
     const run = reveal(state, ctx);
     const steed = first(run.state, "141074");
-    expect(run.state.cards[steed]?.zone).toBe("staging");
+    // "if able": nothing to attach to, so it is placed in the encounter discard pile (rr.treachery-cards).
+    expect(run.state.cards[steed]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[steed]?.host).toBeNull();
   });
 
@@ -113,10 +125,12 @@ describe("whenRevealed on locations and treacheries", () => {
     expect(returned.state.cards[rider]?.zone).toBe("staging");
     expect(returned.state.cards[rider]?.controller).toBeNull();
     expect(returned.state.encounterDeck).toHaveLength(1);
-    const without = make({ deck: ["141075", "f0"] });
+    expect(codesOf(returned.state, returned.state.encounterDiscard)).toEqual(["141075"]);
+    const without = make({ deck: ["141075", "f0", "f0"] });
     const surged = reveal(without.state, without.ctx);
-    expect(surged.state.encounterDeck).toHaveLength(0);
-    expect(codesOf(surged.state, surged.state.staging)).toEqual(["141075", "f0"]);
+    expect(surged.state.encounterDeck).toHaveLength(1);
+    expect(codesOf(surged.state, surged.state.staging)).toEqual(["f0"]);
+    expect(codesOf(surged.state, surged.state.encounterDiscard)).toEqual(["141075"]);
   });
 });
 
@@ -246,5 +260,29 @@ describe("quest stages", () => {
     expect(run.state.window).toEqual({ kind: "response", seat: 0 });
     run = send(run, { type: "Pass" }, ctx);
     expect(run.state.mode).toBe("travel");
+  });
+});
+
+describe("141001 Frodo Baggins response on encounterRevealed", () => {
+  it("spends a Fellowship resource and exhausts The One Ring to cancel the card just revealed, shuffles it back and reveals another", () => {
+    const { state, ctx } = make({ deck: [RIDER, "f0", "f0", "f0"], resources: 1 });
+    let run = reveal(state, ctx);
+    const frodo = first(run.state, FRODO);
+    const rider = first(run.state, RIDER);
+    expect(run.state.window).toEqual({ kind: "response", seat: 0 });
+    expect(legalIntents(run.state, ctx)).toContainEqual({ type: "Trigger", cardId: frodo, effectId: "141001:response:1" });
+    run = send(run, { type: "Trigger", cardId: frodo, effectId: "141001:response:1", payments: [{ heroId: frodo, amount: 1 }] }, ctx);
+    // The Black Rider's Hide test never happens: its effects were canceled before any of them resolved.
+    expect(run.steps.some((step) => step.kind === "hideTest")).toBe(false);
+    expect(run.state.cards[rider]?.zone).toBe("encounterDeck");
+    expect(run.state.cards[frodo]?.resources).toBe(0);
+    expect(run.state.cards[first(run.state, RING)]?.exhausted).toBe(true);
+    expect(codesOf(run.state, run.state.staging)).toEqual(["f0"]);
+  });
+
+  it("is not offered while The One Ring is exhausted", () => {
+    const { state, ctx } = make({ deck: [RIDER, "f0", "f0", "f0"], resources: 1, ring: "exhausted" });
+    const run = reveal(state, ctx);
+    expect(run.state.window?.kind).not.toBe("response");
   });
 });

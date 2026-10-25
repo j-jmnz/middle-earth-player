@@ -126,11 +126,24 @@ export function normalCopiesByCode(data: ScenarioData): Map<string, number> {
 
 export type Difficulty = "Easy" | "Normal";
 
+function copiesAt(card: Placement, difficulty: Difficulty): number {
+  return difficulty === "Easy" ? card.easy : card.normal;
+}
+
+// The copies the quest card's Setup puts out: all of them, or for "1 Fell Rider per player" one per seat. With no seat
+// count (the catalog's definition) every copy is counted.
+function placedCopies(card: Placement, difficulty: Difficulty, seatCount?: number): number {
+  const copies = copiesAt(card, difficulty);
+  return card.perPlayer != null && seatCount != null ? Math.min(copies, card.perPlayer * seatCount) : copies;
+}
+
 // The encounter deck at a difficulty. Easy drops the cards the booklet marks (the `easy` count of each placement).
-export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Normal"): string[] {
-  return data.cards
-    .filter((card) => card.pile === "encounter")
-    .flatMap((card) => Array.from({ length: difficulty === "Easy" ? card.easy : card.normal }, () => card.code));
+// The copies of a per-player Setup card the players did not take stay in the encounter deck.
+export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): string[] {
+  return data.cards.flatMap((card) => {
+    const copies = card.pile === "encounter" ? copiesAt(card, difficulty) : card.pile === "quest" || card.pile === "burden" ? 0 : copiesAt(card, difficulty) - placedCopies(card, difficulty, seatCount);
+    return Array.from({ length: copies }, () => card.code);
+  });
 }
 
 const SETUP_VERB = {
@@ -141,14 +154,14 @@ const SETUP_VERB = {
 } as const;
 
 // Order of the quest card's setup steps: set aside, add to staging, make a location active, then attach.
-// Each copy is one instruction; a per-player card is one per seat, which the engine counts. The encounter, quest
-// and burden piles are dealt by buildStart.
-export function setupInstructions(data: ScenarioData): Instruction[] {
+// Each copy is one instruction at the difficulty played; a per-player card is one per seat when the seat count is known
+// (buildStart). The encounter, quest and burden piles are dealt by buildStart.
+export function setupInstructions(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): Instruction[] {
   const instructions: Instruction[] = [];
   for (const pile of ["setAside", "staging", "activeLocation", "attached"] as const) {
     for (const card of data.cards) {
       if (card.pile !== pile) continue;
-      for (let copy = 0; copy < card.normal; copy += 1) instructions.push({ verb: SETUP_VERB[pile], code: card.code });
+      for (let copy = 0; copy < placedCopies(card, difficulty, seatCount); copy += 1) instructions.push({ verb: SETUP_VERB[pile], code: card.code });
     }
   }
   return instructions;
