@@ -11,7 +11,7 @@ appId: com.middleearth.lcg
     id: starter-note
 - assertVisible: "When both decks are used together, replace the three copies of Gandalf in Stealth and Steadfastness with three copies of Elrond."
 - tapOn:
-    id: card-pool
+    id: cards-tab
 - tapOn:
     id: pool-search
 - inputText: "Unexpected Courage"
@@ -23,7 +23,7 @@ appId: com.middleearth.lcg
 - tapOn:
     id: back
 - tapOn:
-    id: pool-back
+    id: decks-tab
 - tapOn:
     id: deck-stealth-and-steadfastness
 - assertVisible:

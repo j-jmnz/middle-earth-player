@@ -227,11 +227,11 @@ On the fetch recorded in the brief, 1,039 official rows had an `imagesrc`. About
 
 ## Screens
 
-Expo Router. The app opens on the campaign list.
+Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaigns, Scenarios, Decks, Cards and Rules (user request, 2026-10-25).
 
 | Route | Reads | Writes |
 | --- | --- | --- |
-| Campaign list | `saves`, `campaigns` | a new save: id, campaign id, seat count; `saves.archivedAt` on Archive and Restore; a deleted save's row. It reads saves through `campaign-store` and does not query `cards`. |
+| Campaign list | `saves`, `campaigns`, the campaign file's scenario names | a new save: id, campaign id, seat count; `saves.archivedAt` on Archive and Restore; a deleted save's row. It reads saves through `campaign-store` and does not query `cards`. The last save's next step (`nextStep` in `src/campaign/path.ts`) opens the table, the briefing or the path. |
 | Scenarios | `standalone_games`, the scenario files, `PLAYABLE_SCENARIOS` | `standalone_games.archivedAt` on Archive and Restore; a deleted game's row; an open game from another engine version or data hash dropped on the read. It does not query `cards`. |
 | Standalone briefing | decks, catalog, scenario definition; a finished game's loadout for Play again | a new `standalone_games` row with its loadout and open game |
 | Standalone table | the same table view (`src/screens/table-view.tsx`) over a game replayed by `src/screens/standalone-session.ts` (the replay and the committing store are shared with the campaign table in `src/screens/open-game.ts`) | each accepted intent, appended to `standalone_games.activeScenario` |
@@ -242,11 +242,13 @@ Expo Router. The app opens on the campaign list.
 | Table | game slice (a Zustand store of the reducer result, rebuilt by replaying the save once on open), image cache, `EFFECTS` from `src/effects` | each accepted intent, appended to `saves.activeScenario` |
 | Resolution | the campaign card's Resolution options the reducer lists, one group and one seat at a time | each chosen `ChooseResolution` intent, then the log on Confirm; a loss drops the open scenario and writes no log field |
 | Card | one cached file, catalog text | nothing |
-| Card pool | card rows loaded when the screen opens, then filtered in memory; `image_files` | nothing |
+| Card pool | card rows loaded when the screen opens, then filtered in memory; `image_files`. One view (`src/screens/card-pool.tsx`) is the Cards tab and the deck editor's `/pool?adding=1` | the open deck draft, when adding |
+| Packs | `packs`; a pack's cards | nothing |
+| Rules | `data/rules/entries.json`, parsed by `src/catalog/rule-entry.ts` (the one rule-span type the build, the table's causes and the glossary share), through `src/screens/rules-glossary.ts`: the Rules Reference, Learn to Play, FAQ, Easy Mode and MEC109 rule spans, searched in memory (`src/screens/rules-view.tsx`, also the `/glossary` route the table opens); the two books open the booklet route | nothing |
 | Deck | catalog, `decks` | `decks` |
 | Booklet | one `booklets` row and the file under `booklets/`; the import, the file copy and the reader view are in `src/screens/booklets/` | last page |
 
-The campaign list, the path, the briefing, the log, and the table each open the booklet route and close back to that same screen. The reader is an in-app native view, full screen, with the close control in thumb reach. It is not a Skia surface and not a WebView. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 58 release when the campaign shell starts. That phase adds `expo-dev-client` and verifies one Expo PDF module against SDK 58. If that module does not build, a local view is allowed: PDFKit on iOS, `PdfRenderer` on Android. Phase 10 found no SDK 58 release (its README stops at SDK 56), so the reader is the local `modules/booklet-pdf`. It renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. A missing file does not block a scenario. Opening from a scenario starts on its `bookletPages` entry when one exists, and otherwise on the saved last page.
+The Rules tab, the path, the briefing, the log, and the table each open the booklet route and close back to that same screen. The reader is an in-app native view, full screen, with the close control in thumb reach. It is not a Skia surface and not a WebView. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 58 release when the campaign shell starts. That phase adds `expo-dev-client` and verifies one Expo PDF module against SDK 58. If that module does not build, a local view is allowed: PDFKit on iOS, `PdfRenderer` on Android. Phase 10 found no SDK 58 release (its README stops at SDK 56), so the reader is the local `modules/booklet-pdf`. It renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. A missing file does not block a scenario. Opening from a scenario starts on its `bookletPages` entry when one exists, and otherwise on the saved last page.
 
 NativeWind 4.2.7 styles the chrome. Tokens and screen specs live in [design-system.md](design-system.md). The table does not use NativeWind for cards. Tap targets are at least 44 points. The phase rail, the choice buttons, and the booklet close control sit in thumb reach. Reduced motion snaps the same transitions. A new gesture cancels the animation in progress.
 

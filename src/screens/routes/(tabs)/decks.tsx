@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { useWindowDimensions, View } from "react-native";
 
 import { cards } from "../../../catalog/schema";
-import { BodyText, ListRow, Screen, ScreenTitle, TextButton } from "../../chrome";
+import { BodyText, Screen, ScreenTitle, TextButton } from "../../chrome";
 import { replaceDeckDraft, startNewDeck } from "../../deck-draft";
 import { useDatabases } from "../../databases";
 import { DeckCover, type HeroFace } from "../../hero-tile";
@@ -179,15 +179,6 @@ export default function Decks() {
             ) : (
               <View className="flex-1" />
             )}
-            <View className="pb-2">
-              <ListRow
-                testID="card-pool"
-                label="Card pool"
-                onPress={() => {
-                  router.push("/pool");
-                }}
-              />
-            </View>
           </>
         )}
       </View>

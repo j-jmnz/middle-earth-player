@@ -7,7 +7,7 @@ import { Backdrop } from "./backdrop";
 import type { SceneName } from "./backdrop-scenes";
 import { palette } from "./palette.js";
 import { GameIcon } from "../play/game-icon";
-import { SPHERE_TINT } from "../play/icon-map";
+import { SPHERE_TINT, iconAspect, type IconName } from "../play/icon-map";
 import { SheetFrame } from "../play/sheet-paper";
 import type { MarkedSphere } from "./sphere-mark";
 
@@ -368,6 +368,20 @@ export function PaperSheet({ step, title, children }: { step: string; title: str
 }
 
 /** Text tabs on night. Current is semibold bone with a small gold dot above. */
+// A dock icon is 24 pt tall, and a wide one (the One Ring) may run to 32 pt across, so each carries about the same weight
+// and the labels sit on one line.
+const DOCK_ICON = 24;
+const DOCK_ICON_WIDE = 32;
+
+/** The `tabBarIcon` of a dock tab: one of the game's printed icons, gold on the current tab and muted on the others. */
+export function dockIcon(name: IconName) {
+  const aspect = iconAspect(name);
+  const size = Math.round(Math.min(DOCK_ICON, DOCK_ICON_WIDE / aspect));
+  return function DockIcon({ focused }: { focused: boolean }) {
+    return <GameIcon name={name} size={size} tint={focused ? "gold" : "muted"} />;
+  };
+}
+
 export function AppTabBar({ state, descriptors, emitter, navigateToTab }: TabBarProps) {
   return (
     <View accessibilityRole="tablist" className="flex-row border-t border-hairline bg-night pb-safe">
@@ -393,11 +407,16 @@ export function AppTabBar({ state, descriptors, emitter, navigateToTab }: TabBar
                 navigateToTab(route.key);
               }
             }}
-            className="min-h-14 flex-1 items-center justify-center"
+            className="min-h-14 flex-1 items-center justify-center pb-1 pt-2"
             style={({ pressed }) => (pressed ? pressedNight : undefined)}
           >
-            <View className={`mb-1.5 h-1.5 w-1.5 rounded-pill ${focused ? "bg-gold" : ""}`} />
-            <Text className={focused ? "text-label font-semibold text-bone" : "text-label text-muted"}>{label}</Text>
+            {/* The icon in a fixed box, so each label sits on the same line; the label says the tab, the icon is not read. */}
+            <View className="mb-1 items-center justify-center" style={{ height: DOCK_ICON }} importantForAccessibility="no-hide-descendants">
+              {options.tabBarIcon?.({ focused, color: focused ? palette.gold : palette.muted, size: DOCK_ICON })}
+            </View>
+            <Text className={focused ? "text-label font-semibold text-bone" : "text-label text-muted"} numberOfLines={1}>
+              {label}
+            </Text>
           </Pressable>
         );
       })}

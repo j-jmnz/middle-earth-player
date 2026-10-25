@@ -1,4 +1,4 @@
-# Solo LOTR LCG — decisions and implementer brief
+# Middle Earth LCG — decisions and implementer brief
 
 This is the source of truth for the app. Read it before writing code. It records what was decided and how to build it.
 
@@ -22,7 +22,7 @@ A personal, offline, single-device app for The Lord of the Rings Living Card Gam
 
 One human. No accounts, no rooms, no matchmaking, no server in the play loop. True solo is one local seat. Two-handed solo is two local seats on the same phone, because staging and engagement are defined per player. That is not multiplayer. The paper log has Player 3 and Player 4 columns. This app does not. `seatCount` is 1 or 2, chosen once at campaign start.
 
-The app opens on the campaign list, not on a blank table. Deckbuilding is a separate root screen and is available before any scenario is won.
+The app opens on the campaign list, not on a blank table. Deckbuilding is a separate root screen and is available before any scenario is won. The dock under the root screens is Campaigns, Scenarios, Decks, Cards and Rules (user request, 2026-10-25): the campaign list, standalone play, the deck list, the card pool, and the rules to look up between turns.
 
 The booklet allows playing a scenario as a standalone adventure (`mec109.campaign-mode`: "players can still play the scenarios as standalone adventures if they choose"). The app has it: a Scenarios tab beside the campaign list deals any playable scenario of the box on its own, with no campaign mechanics (Standalone play, below). User decision 2026-10-25, replacing "out of scope until the campaign path is done"; for now only the Fellowship of the Ring scenarios are listed.
 
@@ -558,7 +558,7 @@ Chrome follows [design-system.md](design-system.md). Phase 17 writes that file f
 
 | Route | Behavior |
 | --- | --- |
-| Campaign list | Root. Reads campaigns and saves. It does not scan `cards`. Fellowship is playable. Later campaigns may show as locked, with name and scenario count. Locking does not hide cards. Opens a stored booklet and returns here on close. Archives a playthrough out of the open list and restores it as it was, log and open scenario included. Deletes a playthrough, open or archived, only after a second, explicit confirm; a delete cannot be undone and leaves the decks. |
+| Campaign list | Root. Reads campaigns and saves. It does not scan `cards`. Fellowship is playable. Later campaigns may show as locked, with name and scenario count. Locking does not hide cards. The playthrough written last says what is next and does it in one tap: Resume opens the table on its open scenario, Begin the briefing of its current scenario, and a finished campaign its path; its path and log are one tap each. Archives a playthrough out of the open list and restores it as it was, log and open scenario included. Deletes a playthrough, open or archived, only after a second, explicit confirm; a delete cannot be undone and leaves the decks. |
 | Scenarios | Root tab beside the campaign list. A game in progress sits on top (Resume). Then the box's scenarios in book order; a playable one opens the standalone briefing, the others read "Not playable yet". Under them the finished games, newest first, each with its result and score and Play again. Manage turns each into Archive and Delete; archived games sit under "Archived · n" with Restore and Delete. A delete is asked a second time and cannot be undone; it leaves the decks. |
 | Standalone briefing | The briefing without a campaign: stages, sets and counts, special rules, Easy or Normal, True solo or Two-handed, a saved deck per seat and the Ring-bearer slot, validator errors that name the card. No checklist, penalty or choices. Deal writes a new game and opens its table. |
 | Standalone outcome | Victory with the score and its parts, or Defeat with the reason. The result asks for nothing, so it is written as the screen opens; Done returns to Scenarios and Play again opens the briefing with the same choices. Nothing is written to a campaign. The table's last sheet for a standalone win says "The scenario is won." and See the score, never the campaign card's rewards. |
@@ -569,7 +569,8 @@ Chrome follows [design-system.md](design-system.md). Phase 17 writes that file f
 | Resolution | Choice buttons from the script. A loss has no reward screen. |
 | Booklet | Full-screen native reader for one stored PDF, with pinch and double-tap zoom. Close sits in thumb reach and returns to the screen that opened it. The engine does not read the file. A build that carries the book installs it on first open. A missing file does not block a scenario. The control offers to add the booklet and names which book is absent. Ids for this box: `fellowship-of-the-ring` and `learn-to-play`. The same reader opens both. Opening from a scenario starts on that scenario's page index when one is recorded, and otherwise on the saved last page. Turning a page writes the last page. It is not a Skia surface and not a WebView. |
 | Card | Full-screen view of the cached RingsDB file. Lists and this screen use `expo-image`. The table decodes the same file with Skia, at the size on screen. Details on the table's long-press preview opens this route. The picture stays on the canvas. |
-| Card pool | Search and filters. Loads card rows when the screen opens, then filters in memory. No campaign writes. |
+| Card pool | The Cards tab, and the deck editor's picker. Search and filters. Loads card rows when the screen opens, then filters in memory. No campaign writes. Packs, encounter cards included, open from the Cards tab. |
+| Rules | The two stored booklets, each opening the booklet reader and returning here on close, and a glossary of the rule spans in `data/rules` (Rules Reference, Learn to Play, FAQ, Easy Mode, the MEC109 rules; not its decklists, setups or stage text) searched by title and term. The table's Rules opens the same glossary over the game, and Back returns to the table. A rule shows its book and page, its text as the span prints it, and its See also names as links; a rule from a stored booklet opens the reader on its page. |
 | Deck | Up to three hero slots, count against 50, copy limit by title, saga-only badge. Save without a campaign check. |
 
 ## Build order
