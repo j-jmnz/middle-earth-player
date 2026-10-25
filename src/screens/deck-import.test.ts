@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import {
   buildDecklist,
   droppedSentence,
-  importSavedSentence,
   parseDecklistRef,
   prebuiltBody,
   prebuiltDecks,
@@ -109,13 +108,6 @@ describe("buildDecklist", () => {
       slots: { "01073": 1 },
     });
     expect(buildDecklist(body!, pool).cards).toEqual([{ code: "01073", count: 4 }]);
-  });
-});
-
-describe("importSavedSentence", () => {
-  it("says the deck was saved and names the dropped cards", () => {
-    expect(importSavedSentence([])).toBe("The deck was saved.");
-    expect(importSavedSentence(["Elrond", "01026"])).toBe("The deck was saved. Dropped Elrond, 01026.");
   });
 });
 

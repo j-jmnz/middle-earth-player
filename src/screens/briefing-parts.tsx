@@ -1,20 +1,28 @@
 // What the campaign briefing and the standalone briefing share: the saved decks and the Ring-bearer candidates, the
-// scenario's header (stages, difficulty, sets, special rules), and one seat's deck picker with the Ring-bearer slot.
-import { and, eq, inArray, like } from "drizzle-orm";
-import { useMemo, useSyncExternalStore } from "react";
-import { Pressable, Text, View } from "react-native";
+// scenario's header (stages, difficulty, sets, special rules), the deck filter, and one seat's deck picker with the
+// Ring-bearer slot. The picker is the Decks tab's list (user request, 2026-10-25): the same order, views and filters.
+import { and, eq, like } from "drizzle-orm";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { Text, View } from "react-native";
 
 import type { ScenarioFacts } from "../campaign/briefing";
 import { cards, packs } from "../catalog/schema";
 import type { Difficulty } from "../catalog/scenario-data";
-import { BodyText, Eyebrow, Label, RingMark, Segmented, TextButton, pressedNight } from "./chrome";
+import { BodyText, Eyebrow, Label, Segmented, TextButton } from "./chrome";
+import { editSavedDeck } from "./deck-draft";
+import { deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "./deck-list";
+import { DeckListBar } from "./deck-list-bar";
+import { deckCountLine, deckReadiness, type DeckReadiness } from "./deck-status";
+import { deckFaces, listDecks } from "./deck-store";
 import { useDatabases } from "./databases";
-import { EmptyHeroSlot, HeroTile, type HeroFace } from "./hero-tile";
+import { DeckCover, DeckRow, EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "./hero-tile";
 import { palette } from "./palette.js";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed, type StarterSeed } from "./starter-decks";
-import { decks } from "./user-schema";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
+
+const COVER_HEIGHT = 120;
 
 const DIFFICULTIES = ["Easy", "Normal"] as const;
 
@@ -33,17 +41,29 @@ export type BriefingDecks = {
   // each is named with the pack it came in.
   candidates: { code: string; name: string; packName: string | null }[];
   faces: ReadonlyMap<string, HeroFace>;
+  // Whether each deck is ready to play (rr.deckbuilding): a deck saves before it is, and is not offered until it is.
+  readiness: ReadonlyMap<string, DeckReadiness>;
+  // The one filter over every seat's list, and the decks it keeps.
+  filter: DeckListFilter;
+  setFilter: (next: DeckListFilter) => void;
+  spheres: { code: string; name: string }[];
+  shown: SavedDeck[];
 };
 
-/** The saved decks (read again once the starter decks are inserted), the Ring-bearer candidates and the hero faces. */
+/**
+ * The saved decks in the Decks tab's order (read again on focus, so a deck finished through Open in Decks comes back
+ * ready, and once the starter decks are inserted), the Ring-bearer candidates, the hero faces, readiness and the filter.
+ */
 export function useBriefingDecks(): BriefingDecks {
   const { catalog, user } = useDatabases();
   // The starter decks are inserted just after launch; read the list again when that finishes.
   const seeded = useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending" as const);
   const seedReason = useSyncExternalStore(subscribeStarterSeed, starterSeedReason, () => null);
-  const savedDecks = useMemo<SavedDeck[]>(
-    () => (seeded === "pending" ? [] : user.select({ id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards }).from(decks).all()),
-    [user, seeded],
+  const [savedDecks, setSavedDecks] = useState<SavedDeck[]>([]);
+  useFocusEffect(
+    useCallback(() => {
+      setSavedDecks(seeded === "pending" ? [] : listDecks(user));
+    }, [seeded, user]),
   );
   const candidates = useMemo(
     () =>
@@ -56,17 +76,27 @@ export function useBriefingDecks(): BriefingDecks {
         .all(),
     [catalog],
   );
-  const faces = useMemo(() => {
-    const codes = [...new Set([...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes)])];
-    if (codes.length === 0) return new Map<string, HeroFace>();
-    const rows = catalog
-      .select({ code: cards.code, name: cards.name, sphereCode: cards.sphereCode, sphereName: cards.sphereName, imagesrc: cards.imagesrc })
-      .from(cards)
-      .where(inArray(cards.code, codes))
-      .all();
-    return new Map(rows.map((row) => [row.code, row]));
-  }, [catalog, candidates, savedDecks]);
-  return { savedDecks, seeded, seedReason, candidates, faces };
+  const faces = useMemo(
+    () => deckFaces(catalog, [...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)])]),
+    [catalog, candidates, savedDecks],
+  );
+  const readiness = useMemo(() => new Map(savedDecks.map((deck) => [deck.id, deckReadiness(deck, faces)])), [savedDecks, faces]);
+  const [filter, setFilter] = useState<DeckListFilter>(emptyDeckListFilter);
+  const spheres = useMemo(() => deckListSpheres(savedDecks, faces), [savedDecks, faces]);
+  const shown = useMemo(() => filterDecks(savedDecks, filter, faces, (deck) => readiness.get(deck.id)?.ready ?? false), [savedDecks, filter, faces, readiness]);
+  return { savedDecks, seeded, seedReason, candidates, faces, readiness, filter, setFilter, spheres, shown };
+}
+
+/** The deck list's search, Cards / List switch and filter chips, once above every seat's picker. */
+export function DeckFilter({ decks: briefingDecks }: { decks: BriefingDecks }) {
+  const { savedDecks, seeded, filter, setFilter, spheres, shown } = briefingDecks;
+  if (seeded === "pending" || savedDecks.length === 0) return null;
+  return (
+    <View className="mt-6">
+      <Eyebrow tone="muted">Decks</Eyebrow>
+      <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={savedDecks.length} testIDPrefix="briefing-decks" />
+    </View>
+  );
 }
 
 /** The scenario: its number, name and stages, the difficulty, the encounter sets with their counts, and its special rules. */
@@ -103,8 +133,9 @@ export function ScenarioHeader({ facts, difficulty, onDifficulty, eyebrow }: { f
 }
 
 /**
- * One seat: its deck picker (a radio list of the saved decks; a deck with a fallen hero is shown and cannot be picked),
- * the picked deck's heroes, and for the first seat the Ring-bearer slot when the deck brings none.
+ * One seat: its deck picker (the filtered decks as covers or rows, each a radio; a deck with a fallen hero, or one not
+ * ready to play, is shown and cannot be picked; the seat's picked deck stays listed whatever the filter), the picked
+ * deck's heroes, and for the first seat the Ring-bearer slot when the deck brings none.
  */
 export function SeatPicker({
   index,
@@ -132,8 +163,12 @@ export function SeatPicker({
   onRingBearer: (code: string | null) => void;
   nameOf: (code: string) => string;
 }) {
-  const { savedDecks, seeded, seedReason, candidates, faces } = briefingDecks;
-  const faceOf = (code: string): HeroFace => faces.get(code) ?? { code, name: nameOf(code), sphereCode: null, sphereName: null, imagesrc: null };
+  const router = useRouter();
+  const view = useDeckListView();
+  const { savedDecks, seeded, seedReason, candidates, faces, readiness, shown, setFilter } = briefingDecks;
+  const kept = savedDecks.find((deck) => deck.id === picked);
+  const listed = kept && !shown.includes(kept) ? [kept, ...shown] : shown;
+  const faceOf = (code: string): HeroFace => heroFace(faces, code, nameOf(code));
   const heroNames = (codes: readonly string[]) => codes.map(nameOf).join(", ");
   const slot = index === 0 && needsRingBearer;
   return (
@@ -156,31 +191,57 @@ export function SeatPicker({
         </View>
       ) : (
         <View className="mt-2">
-          {savedDecks.map((deck) => {
-            const selected = picked === deck.id;
+          {listed.map((deck) => {
             const fell = deck.heroes.filter((code) => fallen.includes(code));
-            return (
-              <Pressable
-                key={deck.id}
-                testID={`deck-pick-${index}-${deck.id}`}
-                collapsable={false}
-                accessibilityRole="radio"
-                accessibilityState={{ selected, disabled: fell.length > 0 }}
-                disabled={fell.length > 0}
-                onPress={() => onPick(deck.id)}
-                className="min-h-14 flex-row items-center gap-3 border-b border-hairline py-2"
-                style={({ pressed }) => (pressed ? pressedNight : undefined)}
-              >
-                {/* The selected deck is a filled ring and the others an empty one, so the mark does not rest on color. */}
-                <RingMark size={14} state={selected ? "done" : "locked"} />
-                <View className="flex-1">
-                  <Text className={selected ? "text-body font-semibold text-gold" : fell.length > 0 ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
-                  <Text className="text-label text-muted">{fell.length > 0 ? `${heroNames(fell)} fell and cannot be picked` : heroNames(deck.heroes)}</Text>
+            const ready = readiness.get(deck.id) ?? { ready: false, text: "Not read yet" };
+            const summary = {
+              testID: `deck-pick-${index}-${deck.id}`,
+              name: deck.name,
+              heroes: deck.heroes.map(faceOf),
+              detail: deckCountLine(deck),
+              status: fell.length > 0 ? { ready: false, text: `${heroNames(fell)} fell and cannot be picked` } : ready,
+              onPress: () => onPick(deck.id),
+              selected: picked === deck.id,
+              disabled: fell.length > 0 || !ready.ready,
+            };
+            // A deck that is not ready to play cannot be picked; this opens it to be finished.
+            const open =
+              !ready.ready && fell.length === 0 ? (
+                <View className="items-start px-1">
+                  <TextButton
+                    label="Open in Decks"
+                    testID={`deck-open-${index}-${deck.id}`}
+                    tone="gold"
+                    accessibilityLabel={`Open ${deck.name} in Decks to finish it`}
+                    onPress={() => {
+                      editSavedDeck(deck);
+                      router.push({ pathname: "/deck/[id]", params: { id: deck.id } });
+                    }}
+                  />
                 </View>
-                {selected ? <Text className="text-label text-gold">Selected</Text> : null}
-              </Pressable>
+              ) : null;
+            return view === "List" ? (
+              <DeckRow key={deck.id} {...summary}>
+                {open}
+              </DeckRow>
+            ) : (
+              <View key={deck.id} className="pb-3">
+                <DeckCover {...summary} height={COVER_HEIGHT}>
+                  {open}
+                </DeckCover>
+              </View>
             );
           })}
+          {listed.length === 0 ? (
+            <View className="items-start">
+              <BodyText tone="muted" testID={`briefing-no-match-${index}`}>
+                No decks match.
+              </BodyText>
+              <View className="-mx-3">
+                <TextButton testID={`briefing-clear-filter-${index}`} label="Clear filter" tone="gold" onPress={() => setFilter(emptyDeckListFilter)} />
+              </View>
+            </View>
+          ) : null}
         </View>
       )}
       {picked ? (

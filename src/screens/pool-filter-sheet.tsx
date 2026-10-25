@@ -21,7 +21,7 @@ type FilterRow = PoolCard & { typeName: string; sphereName: string | null };
 
 type Chooser = "pack" | "trait" | "cost" | null;
 
-// The pool's filter as a paper sheet over the list: sphere and type chips, then pack, trait and cost choosers and the two
+// The pool's filter as a paper sheet over the list: sphere chips, then pack, trait and cost choosers and the two
 // switches. It edits `filter` (the draft); Apply hands it back, Close and the scrim drop it.
 export function PoolFilterSheet({
   open,
@@ -59,7 +59,6 @@ export function PoolFilterSheet({
     };
   }, []);
   const spheres = useMemo(() => sphereChoices(rows), [rows]);
-  const types = useMemo(() => typeChoices(rows), [rows]);
   const traits = useMemo(() => traitChoices(rows), [rows]);
   const costs = useMemo(() => costOptions(rows), [rows]);
 
@@ -108,7 +107,6 @@ export function PoolFilterSheet({
                 <FilterBody
                   filter={filter}
                   spheres={spheres}
-                  types={types}
                   groups={groups}
                   onChange={onChange}
                   onChoose={setChooser}
@@ -190,14 +188,12 @@ function chooserTitle(chooser: "pack" | "trait" | "cost" | null): string {
 function FilterBody({
   filter,
   spheres,
-  types,
   groups,
   onChange,
   onChoose,
 }: {
   filter: PoolFilter;
   spheres: { code: string; name: string }[];
-  types: { code: string; name: string }[];
   groups: CycleGroup[];
   onChange: (next: PoolFilter) => void;
   onChoose: (chooser: "pack" | "trait" | "cost") => void;
@@ -216,17 +212,7 @@ function FilterBody({
           />
         ))}
       </View>
-      <Text className="mb-2 mt-3 text-label text-inkLabel">Type</Text>
-      <View className="flex-row flex-wrap">
-        {types.map((type) => (
-          <Chip
-            key={type.code}
-            label={type.name}
-            selected={filter.typeCode === type.code}
-            onPress={() => onChange({ ...filter, typeCode: filter.typeCode === type.code ? null : type.code })}
-          />
-        ))}
-      </View>
+      <View className="mt-1" />
       <OptionRow label="Pack or cycle" detail={packDetail(filter, groups)} onPress={() => onChoose("pack")} />
       <OptionRow label="Trait" detail={filter.trait ?? "Any"} onPress={() => onChoose("trait")} />
       <OptionRow label="Cost" icon="cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
@@ -332,7 +318,8 @@ function sphereChoices(rows: readonly FilterRow[]): { code: string; name: string
   return [...known, ...rest];
 }
 
-function typeChoices(rows: readonly FilterRow[]): { code: string; name: string }[] {
+/** The pool's card types in the game's order: the type chips over the list (the sheet leaves the type to them). */
+export function typeChoices(rows: readonly { typeCode: string; typeName: string }[]): { code: string; name: string }[] {
   const order = ["hero", "ally", "attachment", "event", "contract", "player-side-quest"];
   const byCode = new Map<string, string>();
   for (const row of rows) {

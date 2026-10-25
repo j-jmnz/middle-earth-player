@@ -8,8 +8,15 @@ appId: com.middleearth.lcg
     timeout: 15000
 - assertVisible: "Wisdom and Wizardry"
 - assertVisible:
-    id: starter-note
-- assertVisible: "When both decks are used together, replace the three copies of Gandalf in Stealth and Steadfastness with three copies of Elrond."
+    id: deck-stealth-and-steadfastness-status
+    text: "Ready to play"
+# The deck list filters by a hero's sphere: Spirit keeps Wisdom and Wizardry (Éowyn) and drops Stealth and Steadfastness.
+- tapOn:
+    id: decks-sphere-spirit
+- assertVisible: "Wisdom and Wizardry"
+- assertNotVisible: "Stealth and Steadfastness"
+- tapOn:
+    id: decks-sphere-spirit
 - tapOn:
     id: cards-tab
 - tapOn:
@@ -28,6 +35,10 @@ appId: com.middleearth.lcg
     id: deck-stealth-and-steadfastness
 - assertVisible:
     id: deck-editor
+# The starter note is on the starter deck's own screen.
+- assertVisible:
+    id: starter-note
+- assertVisible: "When both decks are used together, replace the three copies of Gandalf in Stealth and Steadfastness with three copies of Elrond."
 - scrollUntilVisible:
     element:
       id: count-inc-01073
@@ -35,15 +46,15 @@ appId: com.middleearth.lcg
     timeout: 40000
     speed: 40
     visibilityPercentage: 100
+# A fourth copy is refused at the tap: the toast names the card and the rule, and the count stays at 3.
 - tapOn:
     id: count-inc-01073
 - assertVisible:
-    id: deck-error
-- assertVisible: "Gandalf"
-- assertVisible: "At most three copies."
+    id: toast-text
+    text: "Gandalf: At most three copies."
 - assertVisible:
-    id: deck-save
-    enabled: false
+    id: count-01073
+    text: "3"
 - stopApp
 - launchApp
 - tapOn:

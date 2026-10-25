@@ -11,7 +11,7 @@ A root deck builder that saves any official deck-legal card, seeds the two print
 
 Route beside the campaign list. Filters: name, sphere, type, pack or cycle, trait, cost, unique, and whether unique text is active. Opening a card shows stats, text, and the errata line. An inactive sentence is labeled inactive. This screen writes no campaign.
 
-Save rules, enforced on every save, are the Rules Reference's (`rr.deckbuilding`; user decision 2026-10-25, which replaced this phase's original three-hero and sphere-match rules; `docs/brief.md`, Deckbuilding):
+A deck saves at any stage (user decision 2026-10-25; `docs/brief.md`, Deckbuilding). The rules below decide whether it is ready to play: the list and the editor say so, the briefing deals only a ready deck, and a copy past the limit or a hero twice is refused at the tap. They are the Rules Reference's (`rr.deckbuilding`; user decision 2026-10-25, which replaced this phase's original three-hero and sphere-match rules; `docs/brief.md`, Deckbuilding):
 
 - One to three heroes, no two with the same title.
 - At least 50 other cards.
@@ -33,7 +33,7 @@ When both decks are used together, the booklet says to replace the three copies 
 
 ## E2E
 
-`.maestro/deck.yaml` filters the pool, saves a legal deck, relaunches, and finds that deck. A fourth copy shows the refusal and does not save. A Fellowship hero saves. The flow uses testIDs on the editor, the save action, and the error. It does not fling the list to judge frame rate.
+`.maestro/deck.yaml` filters the pool, saves a legal deck, relaunches, and finds that deck. A fourth copy is refused at the tap: the toast names the card and the rule, and the count stays at three. A Fellowship hero saves. The flow uses testIDs on the editor, the save action, and the error. It does not fling the list to judge frame rate.
 
 ## Exit
 

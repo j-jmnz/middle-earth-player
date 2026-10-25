@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  activeFilterCount,
   costOptions,
   cycleGroups,
   emptyPoolFilter,
@@ -113,5 +114,13 @@ describe("filter choosers", () => {
   it("opens the filter sheet with no animation when reduced motion is on", () => {
     expect(filterSheetAnimation(true)).toBe("none");
     expect(filterSheetAnimation(false)).toBe("fade");
+  });
+});
+
+describe("activeFilterCount", () => {
+  it("counts each field the sheet sets, not the type the chips show", () => {
+    expect(activeFilterCount(emptyPoolFilter)).toBe(0);
+    expect(activeFilterCount({ ...emptyPoolFilter, typeCode: "hero" })).toBe(0);
+    expect(activeFilterCount({ ...emptyPoolFilter, typeCode: "hero", unique: true, pack: { kind: "pack", code: "Core" } })).toBe(2);
   });
 });

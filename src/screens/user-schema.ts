@@ -19,6 +19,9 @@ export const decks = sqliteTable("decks", {
   name: text("name").notNull(),
   heroes: text("heroes", { mode: "json" }).$type<string[]>().notNull(),
   cards: text("cards", { mode: "json" }).$type<DeckCard[]>().notNull(),
+  // When the player last saved the deck (ms since the epoch). The deck list puts the one saved last first. Starter rows
+  // and rows from before 0005 read null and follow.
+  updatedAt: integer("updated_at"),
 });
 
 export const saves = sqliteTable("saves", {

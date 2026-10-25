@@ -36,7 +36,7 @@ export function traitTokens(traits: string | null): string[] {
 }
 
 export function formatDeckRefusal(refusal: Pick<DeckSaveRefusal, "cardName" | "rule">): string {
-  if (refusal.cardName && refusal.cardName.length > 0) return `${refusal.cardName} ${refusal.rule}`;
+  if (refusal.cardName && refusal.cardName.length > 0) return `${refusal.cardName}: ${refusal.rule}`;
   return refusal.rule;
 }
 

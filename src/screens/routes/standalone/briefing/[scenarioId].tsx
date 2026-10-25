@@ -12,7 +12,7 @@ import { loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { expand, ScenarioHeader, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
+import { DeckFilter, expand, ScenarioHeader, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
 import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
 import { BodyText, Label, NavBar, PrimaryButton, Screen, Segmented, TextButton } from "../../../chrome";
 import { useDatabases } from "../../../databases";
@@ -123,6 +123,7 @@ export default function StandaloneBriefing() {
         <Label tone="muted" className="mt-3">
           No campaign card, boons or burdens. A win is scored; nothing is written to a campaign.
         </Label>
+        <DeckFilter decks={briefingDecks} />
         {seats.map((seat, index) => (
           <SeatPicker
             key={index}
