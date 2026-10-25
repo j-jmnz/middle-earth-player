@@ -3,8 +3,8 @@ import { Text, View } from "react-native";
 import type { NextStep } from "../campaign/path";
 import { BodyText, Eyebrow, Label, Panel, PrimaryButton, RingMark, TextButton } from "./chrome";
 
-// The campaign list's panels for one playthrough: its summary line, the Continue panel on top, and the Archive, Restore and
-// Delete row of Manage and Archived.
+// The campaign list's panels for one playthrough: its summary line and the Continue panel on top. Manage and Archived put
+// KeepOrDelete (keep-or-delete.tsx) under the summary.
 
 function ProgressLine({ done, total }: { done: number; total: number }) {
   return (
@@ -89,41 +89,3 @@ export function ContinuePanel({
 }
 
 export const DELETE_SENTENCE = "Delete this playthrough? Its log, pool and any open scenario are gone for good. Your decks stay.";
-
-// Under a save in Manage or in Archived: one action that keeps it (Archive, or Restore) and Delete. A delete is asked twice,
-// in place: the panel says what is lost and offers Delete for good beside Keep.
-export function SaveActions({
-  id,
-  line,
-  keep,
-  confirming,
-  onAskDelete,
-  onDelete,
-  onKeep,
-}: {
-  id: string;
-  line: SaveLine;
-  keep: { label: "Archive" | "Restore"; onPress: () => void };
-  confirming: boolean;
-  onAskDelete: () => void;
-  onDelete: () => void;
-  onKeep: () => void;
-}) {
-  if (confirming) {
-    return (
-      <View className="mt-3 gap-1" testID={`delete-confirm-${id}`}>
-        <BodyText tone="danger">{DELETE_SENTENCE}</BodyText>
-        <View className="-mx-3 flex-row">
-          <TextButton label="Delete for good" testID={`delete-yes-${id}`} tone="danger" accessibilityLabel={`Delete ${describe(line)}, for good`} onPress={onDelete} />
-          <TextButton label="Keep" testID={`delete-no-${id}`} accessibilityLabel={`Keep ${describe(line)}`} onPress={onKeep} />
-        </View>
-      </View>
-    );
-  }
-  return (
-    <View className="-mx-3 mt-2 flex-row">
-      <TextButton label={keep.label} testID={`${keep.label.toLowerCase()}-${id}`} tone="gold" accessibilityLabel={`${keep.label} ${describe(line)}`} onPress={keep.onPress} />
-      <TextButton label="Delete" testID={`delete-${id}`} tone="danger" accessibilityLabel={`Delete ${describe(line)}`} onPress={onAskDelete} />
-    </View>
-  );
-}

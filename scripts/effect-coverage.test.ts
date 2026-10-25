@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { PLAYABLE_SCENARIOS as PLAYABLE } from "../src/campaign/playable.ts";
 import { AUTHORED_EFFECTS, AUTHORED_REPLACES, EFFECTS, GENERATED_EFFECTS } from "../src/effects/index.ts";
 
 import { loadCards } from "./data/load-cards.ts";
@@ -22,8 +23,7 @@ const byCode = new Map(cards.map((card) => [card.code, card]));
 // A scenario is playable when every printed line of the cards it deals is owned, its campaignPlaced cards (the boons
 // 141044's Resolution attaches) included. Scenarios 1 and 2 are. Scenarios 3 to 6 are built (data/scenarios, with their
 // campaign cards) and not yet playable: phases 13 to 16 write their records. The campaign cards' Setup and Resolution
-// lines are owned for all six, which is the 8d exit.
-const PLAYABLE = ["a-shadow-of-the-past", "a-knife-in-the-dark"];
+// lines are owned for all six, which is the 8d exit. The list is src/campaign/playable.ts, which also gates standalone play.
 const PENDING_LINES: Readonly<Record<string, string>> = {
   "141056:A:2": "Flight to the Ford (phase 13): the cancel response needs the attacker-declared trigger.",
 };

@@ -11,14 +11,12 @@ import { campaignOf, scenarioNames } from "../../campaign-data";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
-import { ContinuePanel, DELETE_SENTENCE, SaveActions, SaveSummary, describe, type SaveLine } from "../../save-panels";
+import { KeepOrDelete } from "../../keep-or-delete";
+import { ContinuePanel, DELETE_SENTENCE, SaveSummary, describe, type SaveLine } from "../../save-panels";
 import { nextStepHref, pathHref } from "../../scenario-links";
+import { seatWord } from "../../seats";
 
 type Seats = 1 | 2;
-
-function seatWord(seats: Seats): string {
-  return seats === 1 ? "True solo" : "Two-handed";
-}
 
 function SeatTile({ seats, selected, onPress }: { seats: Seats; selected: boolean; onPress: () => void }) {
   const label = seatWord(seats);
@@ -142,9 +140,10 @@ export default function CampaignList() {
 
   const showStart = !managing && (saves.length === 0 || starting);
   const actions = (save: Save, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
-    <SaveActions
+    <KeepOrDelete
       id={save.id}
-      line={lineOf(save)}
+      described={describe(lineOf(save))}
+      sentence={DELETE_SENTENCE}
       keep={keep}
       confirming={deleting === save.id}
       onAskDelete={() => askDelete(save.id)}

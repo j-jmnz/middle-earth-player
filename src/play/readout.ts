@@ -32,9 +32,11 @@ function damageWords(attack: number, defense: number): string {
 }
 
 // The card the open sheet has picked, and what the pick means in the enemy's attack: a defender, or the hero an undefended
-// attack hits (the sheet Leave undefended opens).
+// attack hits (the sheet Leave undefended opens). With nothing picked, the one hero Leave undefended already names.
 function pickedInAttack(sheet: Sheet | null, choice: Choice | null): { id: string; role: "defender" | "hit" } | null {
-  if (sheet?.kind !== "pick" || !choice?.ids[0]) return null;
+  if (sheet?.kind !== "pick") return null;
+  const leave = sheet.alternative && "intent" in sheet.alternative && sheet.alternative.intent.type === "Undefended" ? sheet.alternative.intent.heroId : undefined;
+  if (!choice?.ids[0]) return leave ? { id: leave, role: "hit" } : null;
   const item = sheet.options.find((option) => option.id === choice.ids[0]);
   if (!item || !("intent" in item)) return null;
   if (item.intent.type === "DeclareDefender") return { id: item.id, role: "defender" };

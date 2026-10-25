@@ -4,11 +4,12 @@
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { resolutionResult } from "../rules/resolution.ts";
 import type { PlayerIntent } from "../rules/intents.ts";
+import type { StartScenario } from "../rules/setup.ts";
 import { ENGINE_VERSION } from "../rules/version.ts";
 
 import { briefing, checklistPlan, startFor, type Briefing, type BriefingInput, type BriefingSeat } from "./briefing.ts";
 import { applyResolution } from "./log.ts";
-import { beginActive, recordIntent, replay, type ActiveScenario, type ReplayObserver } from "./replay.ts";
+import { beginActive, dropLastIntent, recordIntent, replay, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import type { Save, StoredLoadout } from "./save.ts";
 import type { World } from "./world.ts";
 
@@ -51,16 +52,16 @@ export function staleReason(active: ActiveScenario, dataHash: number): "engineVe
 
 export type Resumed = { ok: true; state: ScenarioState } | { ok: false; reason: "none" | "engineVersion" | "dataHash" | "seed" | "intent" | "loadout" };
 
-// Replays the open scenario. A save from another engine version or data hash is not rebuilt at all. The caller drops the
-// scenario on any failure and keeps the log, the decks and the image index.
-export function resume(save: Save, world: World, dataHash: number, observe?: ReplayObserver): Resumed {
-  const { active, loadout } = save;
-  if (!active || !loadout) return { ok: false, reason: "none" };
+// Replays an open game, a campaign save's scenario or a standalone game, from the start `startOf` builds for its seed. One
+// from another engine version or data hash is not rebuilt at all, and a start that no longer builds is reported as the
+// loadout. The caller drops the game on any failure.
+export function resumeFrom(active: ActiveScenario | null, startOf: ((seed: number) => StartScenario) | null, world: World, dataHash: number, observe?: ReplayObserver): Resumed {
+  if (!active || !startOf) return { ok: false, reason: "none" };
   const stale = staleReason(active, dataHash);
   if (stale) return { ok: false, reason: stale };
   let start;
   try {
-    start = startFor(inputOf(save, world, loadout), active.seed);
+    start = startOf(active.seed);
   } catch {
     return { ok: false, reason: "loadout" };
   }
@@ -68,14 +69,26 @@ export function resume(save: Save, world: World, dataHash: number, observe?: Rep
   return replayed.ok ? { ok: true, state: replayed.state } : { ok: false, reason: replayed.reason };
 }
 
+// Replays the open scenario of a save. The caller drops the scenario on any failure and keeps the log, the decks and the
+// image index.
+export function resume(save: Save, world: World, dataHash: number, observe?: ReplayObserver): Resumed {
+  const { loadout } = save;
+  return resumeFrom(save.active, loadout ? (seed) => startFor(inputOf(save, world, loadout), seed) : null, world, dataHash, observe);
+}
+
 // Drops the open scenario and keeps everything else.
 export function drop(save: Save): Save {
   return { ...save, active: null, loadout: null };
 }
 
-// Records one intent the reducer accepted on the open scenario.
-export function record(save: Save, intent: PlayerIntent): Save {
-  return save.active ? { ...save, active: recordIntent(save.active, intent) } : save;
+// Records one intent the reducer accepted on the open game: a save's scenario or a standalone game.
+export function record<T extends { active: ActiveScenario | null }>(holder: T, intent: PlayerIntent): T {
+  return holder.active ? { ...holder, active: recordIntent(holder.active, intent) } : holder;
+}
+
+// Takes back the last intent of the open scenario (the table's Undo, brief: Rules engine).
+export function unrecord<T extends { active: ActiveScenario | null }>(holder: T): T {
+  return holder.active ? { ...holder, active: dropLastIntent(holder.active) } : holder;
 }
 
 export function isWon(state: ScenarioState): boolean {

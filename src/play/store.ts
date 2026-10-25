@@ -1,12 +1,14 @@
 // The table's screen state. Zustand holds the latest reducer result so each subscriber selects the slice it draws; the
 // reducer is the only writer of the game (docs/architecture.md, State). A dispatch that the reducer refuses leaves the game
 // as it was and keeps the reason, so a drop moves nothing until it is accepted. legalIntents runs once per accepted intent
-// (every accepted intent is a new window), and drop targets are computed for the selected card only.
+// (every accepted intent is a new window), and drop targets are computed for the selected card only. Undo goes back to the
+// state before an accepted intent while that intent showed no hidden card (undo-history.ts).
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
 import { draggableIds, dropTargets, type DropTarget } from "./selection.ts";
+import { nextUndoable, type Undoable } from "./undo-history.ts";
 
 // The engine types the screens hold. src/screens reaches the reducer only through src/play and src/campaign.
 export type { EngineStep, LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
@@ -21,18 +23,40 @@ export type TableState = {
   targets: readonly DropTarget[];
   // Why the reducer refused the last intent. Cleared by the next accepted one.
   refusal: string | null;
-  // What the last accepted intent did: the state before it and the engine steps it ran, for the outcome banner. `seq` moves
-  // with each accepted intent.
-  moment: { seq: number; before: ScenarioState; steps: readonly EngineStep[] } | null;
+  // What the last change of the table was, for the outcome banner; `seq` moves with each. "sent": an accepted intent, the
+  // state before it and the engine steps it ran. "undone": the intent Undo took back, the state it had made and its steps.
+  moment: TableMoment | null;
+  // The states Undo can go back to, oldest first.
+  history: readonly Undoable[];
 };
 
 export type TableActions = {
   dispatch: (intent: PlayerIntent) => boolean;
+  // Goes back to the state before the last intent that can be taken back. False when there is none.
+  undo: () => boolean;
   select: (cardId: string | null) => void;
   clearRefusal: () => void;
 };
 
 export type TableStore = StoreApi<TableState & TableActions>;
+
+export type TableMoment =
+  | { seq: number; kind: "sent"; before: ScenarioState; steps: readonly EngineStep[] }
+  | { seq: number; kind: "undone"; intent: PlayerIntent; left: ScenarioState; steps: readonly EngineStep[] };
+
+/** What the table keeps of the intents sent so far: the round's log and the states Undo can go back to. */
+export type Kept = { roundSteps: readonly EngineStep[]; history: readonly Undoable[] };
+
+/**
+ * One more accepted intent folded into what the table keeps. The store calls it for each intent sent, and reopening a save
+ * calls it for each intent replayed, so both keep the same log and the same Undo list.
+ */
+export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], intent: PlayerIntent): Kept {
+  return {
+    roundSteps: nextRoundSteps(kept.roundSteps, before, after, steps),
+    history: nextUndoable(kept.history, after, { before, roundSteps: kept.roundSteps, intent, steps }),
+  };
+}
 
 /**
  * The steps of the round the table is in. A reduce that crosses into a new round starts the list again from the steps it
@@ -47,8 +71,11 @@ export type TableInput = {
   ctx: ReduceContext;
   game: ScenarioState;
   roundSteps?: readonly EngineStep[];
+  history?: readonly Undoable[];
   // Called after the reducer accepts an intent, with the state it returned. The screen writes the intent to the save here.
   onCommit?: (intent: PlayerIntent, game: ScenarioState) => void;
+  // Called after an undo: the screen drops the last intent from the save.
+  onUndo?: (game: ScenarioState) => void;
 };
 
 function windowState(game: ScenarioState, ctx: ReduceContext): Pick<TableState, "legal" | "draggable"> {
@@ -58,6 +85,8 @@ function windowState(game: ScenarioState, ctx: ReduceContext): Pick<TableState, 
 
 export function createTableStore(input: TableInput): TableStore {
   const { ctx } = input;
+  // The table on a new game: its window, nothing picked or dragged, no refusal.
+  const showing = (game: ScenarioState) => ({ game, ...windowState(game, ctx), selected: null, targets: [], refusal: null });
   return createStore<TableState & TableActions>()((set, get) => ({
     game: input.game,
     ...windowState(input.game, ctx),
@@ -66,6 +95,7 @@ export function createTableStore(input: TableInput): TableStore {
     targets: [],
     refusal: null,
     moment: null,
+    history: input.history ?? [],
     dispatch: (intent) => {
       const before = get().game;
       const result = reduce(before, intent, ctx);
@@ -74,15 +104,24 @@ export function createTableStore(input: TableInput): TableStore {
         return false;
       }
       set({
-        game: result.state,
-        ...windowState(result.state, ctx),
-        roundSteps: nextRoundSteps(get().roundSteps, before, result.state, result.steps),
-        selected: null,
-        targets: [],
-        refusal: null,
-        moment: { seq: (get().moment?.seq ?? 0) + 1, before, steps: result.steps },
+        ...showing(result.state),
+        ...keepIntent(get(), before, result.state, result.steps, intent),
+        moment: { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, steps: result.steps },
       });
       input.onCommit?.(intent, result.state);
+      return true;
+    },
+    undo: () => {
+      const { history, game, moment } = get();
+      const last = history[history.length - 1];
+      if (!last) return false;
+      set({
+        ...showing(last.before),
+        roundSteps: last.roundSteps,
+        history: history.slice(0, -1),
+        moment: { seq: (moment?.seq ?? 0) + 1, kind: "undone", intent: last.intent, left: game, steps: last.steps },
+      });
+      input.onUndo?.(last.before);
       return true;
     },
     select: (cardId) => {

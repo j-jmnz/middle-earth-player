@@ -1,6 +1,6 @@
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import type { ScenarioState } from "./state.ts";
+import type { CardInstance, ScenarioState } from "./state.ts";
 
 export type ReduceFn = (
   state: ScenarioState,
@@ -66,4 +66,42 @@ export function replay(
     state = result.state;
   }
   return state;
+}
+
+// Zones whose cards the player has not seen.
+const UNSEEN: ReadonlySet<CardInstance["zone"]> = new Set(["deck", "encounterDeck", "questDeck", "burdenDeck"]);
+
+function unseen(card: CardInstance): boolean {
+  return UNSEEN.has(card.zone) || card.face === "down";
+}
+
+// The cards the open window names, for a player to read: a Look's cards, a Choose's options (a Pick among the top of a deck,
+// a search). Option ids that are not cards are skipped.
+function windowCards(state: ScenarioState): readonly string[] {
+  const window = state.window;
+  if (window?.kind === "look") return window.cardIds;
+  if (window?.kind === "choose" || window?.kind === "chooseEnemy") return window.options;
+  return [];
+}
+
+/**
+ * True when the intent from `before` to `after` showed the player something they had not seen, so the table's Undo cannot
+ * take it back (docs/brief.md, Rules engine): a card that left a deck or turned face up (a draw, a reveal, a shadow card
+ * turned), a card in a deck or face down that the open window names (a Look, a Pick among the top cards, a search), a new
+ * card on top of a player's deck, a card that did not exist before, or a random result (the seed cursor moved: a shuffle, a
+ * random discard).
+ */
+export function showedHidden(before: ScenarioState, after: ScenarioState): boolean {
+  if (after.seedCursor !== before.seedCursor) return true;
+  for (const [id, card] of Object.entries(after.cards)) {
+    const was = before.cards[id];
+    if (!was || (unseen(was) && !unseen(card))) return true;
+  }
+  if (after.window !== before.window && windowCards(after).some((id) => after.cards[id] && unseen(after.cards[id]))) return true;
+  return after.seats.some((seat, index) => seat.deck[0] !== before.seats[index]?.deck[0]);
+}
+
+/** True when the scenario is won or lost: its result is not taken back. */
+export function isOver(state: ScenarioState): boolean {
+  return state.lost || state.stageCleared;
 }

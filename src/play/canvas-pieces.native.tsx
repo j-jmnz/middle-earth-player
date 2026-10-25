@@ -1,7 +1,7 @@
 // The pieces the table canvas draws: a card (its picture, or its name while the file is missing, or its back), a pile, the
 // token art on a card, the effects on it, the marks of the open moment, and the mark between an enemy and the characters
 // fighting it. Each is a Skia group at a slot's rectangle; table-canvas.native.tsx places and moves them.
-import { Circle, DashPathEffect, Group, Image, Line, Path, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
+import { BlurMask, Circle, DashPathEffect, Group, Image, Line, Path, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 import type { ReactElement, ReactNode } from "react";
 import type { SharedValue } from "react-native-reanimated";
 import { useDerivedValue } from "react-native-reanimated";
@@ -29,6 +29,7 @@ const veil = withAlpha(t.night, 0.62);
 const shadowColor = withAlpha(t.night, 0.5);
 const strip = withAlpha(t.night, 0.72);
 const dim = withAlpha(t.night, 0.45);
+const glow = withAlpha(t.gold, 0.9);
 
 export type Fonts = { names: SkFont; numbers: SkFont; small: SkFont; badge: SkFont };
 export type TokenImages = { resource: SkImage | null; damage: SkImage | null; progress: SkImage | null; questPoints: SkImage | null; engagementCost: SkImage | null };
@@ -264,15 +265,29 @@ export function Badges({ slot, rect, effects, willpower, questPoints, fonts, ima
 }
 
 /**
- * The open moment's marks on a card, on its upright rectangle: a solid gold edge on a card a tap does something with, a
- * thicker edge and a ring at its center on a picked card (the share a payment or archery gives it in the ring), and a night
- * veil over a card the open pick does not ask about.
+ * Gold light around a card a tap does something with, so it reads at arm's length on the felt (user request, 2026-10-25:
+ * the edge alone was too faint). It is drawn behind the card, which covers its middle: an "outer" blur mask on a rounded
+ * rectangle filled a block inside the card in Skia's renderer, so the glow is a plain blur under the body instead. Wider
+ * on a picked card.
+ */
+export function Glow({ slot, picked }: { slot: Rect; picked: boolean }) {
+  return (
+    <RoundedRect x={slot.x} y={slot.y} width={slot.w} height={slot.h} r={RADIUS} color={glow}>
+      <BlurMask blur={picked ? 4.5 : 3} style="normal" />
+    </RoundedRect>
+  );
+}
+
+/**
+ * The open moment's marks on a card, on its upright rectangle: a solid gold edge on a card a tap does something with (its
+ * glow is drawn under the card, `Glow`), a thicker edge and a ring at its center on a picked card (the share a payment or
+ * archery gives it in the ring), and a night veil over a card the open pick does not ask about.
  */
 export function Marks({ rect, tappable, picked, share, dimmed, fonts }: { rect: Rect; tappable: boolean; picked: number; share: "pay" | "damage" | null; dimmed: boolean; fonts: Fonts }) {
   const { x, y, w, h } = rect;
   if (dimmed) return <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={dim} />;
   if (!tappable && picked === 0) return null;
-  if (picked === 0) return <RoundedRect x={x + 1} y={y + 1} width={w - 2} height={h - 2} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2} />;
+  if (picked === 0) return <RoundedRect x={x + 1.25} y={y + 1.25} width={w - 2.5} height={h - 2.5} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2.5} />;
   const cx = x + w / 2;
   const cy = y + h / 2;
   const text = share ? `${share === "pay" ? "-" : "+"}${picked}` : "";

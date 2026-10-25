@@ -163,11 +163,26 @@ export function isStepWindow(game: ScenarioState): boolean {
  * The sheet for the open window, or null when the bar alone answers it (an ordinary action window, where Pass and the
  * Actions list sit on the bar).
  */
+// A won game opens the campaign card's Resolution when it has one. A standalone game has none (rr.campaign-cards): its
+// win has nothing to choose, and the outcome screen shows the score.
+export function wonSheet(game: ScenarioState): Sheet {
+  const rewards = game.resolution.length > 0;
+  return {
+    kind: "outcome",
+    key: "won",
+    result: "won",
+    step: rewards ? "Resolution" : "Scenario",
+    title: "Victory",
+    note: rewards ? "The scenario is won. Choose the rewards the campaign card offers." : "The scenario is won.",
+    action: rewards ? "Choose rewards" : "See the score",
+  };
+}
+
 export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): Sheet | null {
   if (game.lost) {
-    return { kind: "outcome", key: "lost", result: "lost", title: "Defeat", note: game.lossReason ? `${game.lossReason}.` : "The scenario is lost." };
+    return { kind: "outcome", key: "lost", result: "lost", step: "Scenario", title: "Defeat", note: game.lossReason ? `${game.lossReason}.` : "The scenario is lost.", action: "Continue" };
   }
-  if (game.stageCleared) return { kind: "outcome", key: "won", result: "won", title: "Victory", note: "The scenario is won. Choose the rewards the campaign card offers." };
+  if (game.stageCleared) return wonSheet(game);
   const window = game.window;
   if (!window) return null;
   const frame = topFrame(game);
@@ -368,7 +383,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         step: "Combat",
         title,
         stats: numbers ? statOf(game, ctx, numbers.enemyId, "attack") : [],
-        note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : `${note} Choose a defender, or leave it undefended.`,
+        note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`,
         verb: "Defend with",
         options: defenders.map((id) => {
           const defense = defenseAsDefender(game, id, ctx.cards);
@@ -428,7 +443,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       };
     }
     case "resolution":
-      return { kind: "outcome", key: "won", result: "won", title: "Victory", note: "The scenario is won. Choose the rewards the campaign card offers." };
+      return wonSheet(game);
   }
 }
 

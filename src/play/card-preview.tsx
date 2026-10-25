@@ -164,18 +164,24 @@ export function CardPreview({
                         accessibilityRole="button"
                         accessibilityState={{ selected: index === at }}
                         onPress={() => setAt(index)}
-                        className="mt-1 min-h-11 flex-row items-center gap-2 rounded-tile px-2"
-                        style={({ pressed }) => ({ backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent", borderWidth: 1, borderColor: index === at ? t.goldLine : t.hairline })}
                       >
-                        <View style={{ width: 24, height: 34, borderRadius: 3, overflow: "hidden", backgroundColor: t.raised }}>
-                          {item.source ? <Image source={item.source} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24, height: 34 }} /> : null}
-                        </View>
-                        <View className="shrink">
-                          <Text numberOfLines={1} className="text-body text-bone">
-                            {item.name}
-                          </Text>
-                          {item.role ? <Text className="text-label text-muted">{item.role}</Text> : null}
-                        </View>
+                        {/* Layout and fill are styles, not classes: a class on a Pressable with a style function can be dropped on the phone. */}
+                        {({ pressed }) => (
+                          <View
+                            className="mt-1 flex-row items-center gap-2 rounded-tile px-2"
+                            style={{ minHeight: 44, backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent", borderWidth: 1, borderColor: index === at ? t.goldLine : t.hairline }}
+                          >
+                            <View style={{ width: 24, height: 34, borderRadius: 3, overflow: "hidden", backgroundColor: t.raised }}>
+                              {item.source ? <Image source={item.source} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24, height: 34 }} /> : null}
+                            </View>
+                            <View className="shrink">
+                              <Text numberOfLines={1} className="text-body text-bone">
+                                {item.name}
+                              </Text>
+                              {item.role ? <Text className="text-label text-muted">{item.role}</Text> : null}
+                            </View>
+                          </View>
+                        )}
                       </Pressable>
                     ))}
                   </View>

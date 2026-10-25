@@ -5,19 +5,20 @@ import { legalIntents, reduce, startScenario, type PlayerIntent, type ReduceCont
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 
-import { windowSheet } from "./bar-sheets.ts";
+import { actionsSheet, commitSheet, windowSheet } from "./bar-sheets.ts";
 import { momentOf } from "./outcome.ts";
 import { tableLayout } from "./layout.ts";
 import { readoutFor } from "./readout.ts";
 import { onTableFor, PILES, pileSelector, shownSeat, TABLE_ZONES, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
-import { choiceFor, dockFor, onTheTable, primaryReady, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
+import { choiceFor, dockFor, onlyAnswer, onTheTable, primaryReady, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
 
 // Rules: rr.action-windows, rr.step-3-4, rr.step-6-4-3 (data/rules/entries.json). The table answers every moment of whole
 // starter games: a tap on a card only picks it (or opens the question it leads to), the dock's buttons send intents the
-// reducer accepts, every button that would send one with nothing picked must be armed first, and the numbers beside the
-// quest are the ones the engine then resolves it with.
+// reducer accepts, every button that would send one with nothing picked must be armed first (unless the moment has only one
+// answer, which is picked already and sends on one tap), and the numbers beside the quest are the ones the engine then
+// resolves it with.
 let ctx: ReduceContext;
 const names: SheetNames = { card: (id) => id, line: () => null };
 
@@ -34,7 +35,7 @@ function sheetOf(state: ScenarioState): Sheet {
   return sheetFor(state, ctx, legal, names) ?? windowSheet(state, ctx, legal, names);
 }
 
-type Seen = { taps: number; opened: number; sent: number; armed: number };
+type Seen = { taps: number; opened: number; sent: number; armed: number; single: number; done: number };
 
 function buttonsOf(dock: Dock) {
   return [...(dock.primary ? [{ button: dock.primary, ready: primaryReady(dock) }] : []), ...dock.secondary.map((button) => ({ button, ready: true }))];
@@ -44,12 +45,26 @@ function buttonsOf(dock: Dock) {
 // nothing picked yet: there, every button that sends an intent must be armed first.
 function checkDock(state: ScenarioState, sheet: Sheet, held: Choice | null, table: TapContext, overlay: boolean, fresh: boolean, seen: Seen): void {
   const passLegal = table.legal.some((intent) => intent.type === "Pass");
-  const dock = dockFor(sheet, choiceFor(sheet, held), table, { overlay, passLegal, surface: "table" });
+  const only = onlyAnswer(sheet, table.legal);
+  const single = only != null;
+  const dock = dockFor(sheet, choiceFor(sheet, held, only), table, { overlay, passLegal, surface: "table", single });
+  // A sheet opened from the table always has the window's other answers behind it.
+  if (overlay) expect(single, `${sheet.kind} ${sheet.key} opened from the table counts as one answer`).toBe(false);
+  if (single && held == null) {
+    // The one answer is picked already: the primary is ready, sends on one tap, and is the engine's only legal intent.
+    expect(primaryReady(dock), `${sheet.kind} ${sheet.key} has one answer and its primary waits`).toBe(true);
+    expect(dock.primary?.arm, `${sheet.kind} ${sheet.key} has one answer and arms`).toBe(false);
+    expect(table.legal).toHaveLength(1);
+    if (dock.primary?.action.kind === "intent") {
+      expect(dock.primary.action.intent.type).toBe(table.legal[0]?.type);
+      seen.single += 1;
+    }
+  }
   for (const { button, ready } of buttonsOf(dock)) {
     if (!ready || button.action.kind !== "intent") continue;
     expect(accepted(state, button.action.intent), `${sheet.kind} ${button.label} ${JSON.stringify(button.action.intent)}`).toBe(true);
     seen.sent += 1;
-    if (fresh) {
+    if (fresh && !single) {
       expect(button.arm, `${sheet.kind} ${button.label} sends an intent with nothing picked`).toBe(true);
       seen.armed += 1;
     }
@@ -73,7 +88,7 @@ function checkSheet(state: ScenarioState, sheet: Sheet, table: TapContext, overl
 
 describe("the table answers each moment", () => {
   it("with taps that only pick and buttons the reducer accepts, the ones that send with nothing picked armed, in whole games", () => {
-    const seen: Seen = { taps: 0, opened: 0, sent: 0, armed: 0 };
+    const seen: Seen = { taps: 0, opened: 0, sent: 0, armed: 0, single: 0, done: 0 };
     for (const seed of STARTER_SEEDS) {
       let state = startScenario(starterStart("wisdom-and-wizardry", seed), ctx);
       for (let turn = 0; turn < 600 && !state.lost && !state.stageCleared; turn += 1) {
@@ -81,6 +96,15 @@ describe("the table answers each moment", () => {
         const sheet = sheetOf(state);
         const table: TapContext = { game: state, ctx, legal, names };
         checkSheet(state, sheet, table, false, 0, seen);
+        // The panels the dock's List and Actions (n) open over the window.
+        if (sheet.kind === "window" && sheet.commit) checkSheet(state, commitSheet(state, ctx, names), table, true, 1, seen);
+        if (sheet.kind === "window" && sheet.triggers.length > 0) checkSheet(state, actionsSheet(state, ctx, legal, names), table, true, 1, seen);
+        // The commit window's pass says Done once a character of the seat is committed.
+        if (sheet.kind === "window" && sheet.commit) {
+          const committed = Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat);
+          expect(sheet.pass).toBe(committed ? "Done" : "Commit no one");
+          seen.done += committed ? 1 : 0;
+        }
         // A sheet answered on the table names only cards the layout draws whole: a card slot (or the playable top of the
         // deck), never an attachment strip or a card that is not drawn at all.
         const seat = shownSeat(state);
@@ -101,6 +125,8 @@ describe("the table answers each moment", () => {
     expect(seen.opened).toBeGreaterThan(0);
     expect(seen.sent).toBeGreaterThan(100);
     expect(seen.armed).toBeGreaterThan(50);
+    expect(seen.single).toBeGreaterThan(0);
+    expect(seen.done).toBeGreaterThan(0);
   });
 
   it("a choice belongs to its sheet: a new sheet starts empty, a payment starts from the first guess", () => {
