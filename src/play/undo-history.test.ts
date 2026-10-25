@@ -5,8 +5,10 @@ import { reduce, startScenario, type EngineStep, type PlayerIntent, type ReduceC
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 
-import { createTableStore } from "./store.ts";
-import { isOver, nextUndoable, showedHidden } from "./undo-history.ts";
+import { isOver, showedHidden } from "../rules/undo.ts";
+
+import { createTableStore, keepIntent, type Kept } from "./store.ts";
+import { nextUndoable } from "./undo-history.ts";
 
 // Rules: brief, Rules engine, Undo. An intent can be taken back while it showed no hidden card, and taking it back gives
 // the state before it exactly: the save that drops it replays to the same state.
@@ -45,12 +47,29 @@ describe("which intents can be taken back", () => {
         }
         if (shows) hidden += 1;
         else if (!isOver(after)) clean.add(intent.type);
-        expect(nextUndoable([], before, after, [], steps).length).toBe(shows || isOver(after) ? 0 : 1);
+        expect(nextUndoable([], after, { before, roundSteps: [], intent, steps }).length).toBe(shows || isOver(after) ? 0 : 1);
       }
     }
     expect(hidden).toBeGreaterThan(10);
     expect(clean.has("Commit")).toBe(true);
     expect(clean.has("PlayCard")).toBe(true);
+  });
+});
+
+describe("what counts as showing a hidden card", () => {
+  it("a window that names cards in a deck (a Pick among the top cards, a search), a random result, a new card", () => {
+    const [{ before }] = playGame(1).slice(-1);
+    const deckCard = before.seats[0]?.deck[1];
+    if (!deckCard) throw new Error("The deck is empty");
+    expect(showedHidden(before, { ...before })).toBe(false);
+    expect(showedHidden(before, { ...before, window: { kind: "choose", seat: 0, options: [deckCard] } })).toBe(true);
+    expect(showedHidden(before, { ...before, window: { kind: "look", seat: 0, cardIds: [deckCard] } })).toBe(true);
+    // A choice among options that are not cards shows nothing.
+    expect(showedHidden(before, { ...before, window: { kind: "choose", seat: 0, options: ["141017:A:1:a"] } })).toBe(false);
+    expect(showedHidden(before, { ...before, seedCursor: before.seedCursor + 1 })).toBe(true);
+    const first = Object.values(before.cards)[0];
+    if (!first) throw new Error("No card");
+    expect(showedHidden(before, { ...before, cards: { ...before.cards, spawned: { ...first, id: "spawned" } } })).toBe(true);
   });
 });
 
@@ -70,7 +89,7 @@ describe("Undo on the table", () => {
     expect(store.getState().game).toBe(step.before);
     expect(store.getState().roundSteps).toEqual([]);
     expect(store.getState().history).toHaveLength(0);
-    expect(store.getState().moment?.undone).toBe(true);
+    expect(store.getState().moment).toMatchObject({ kind: "undone", intent: step.intent, left: step.after });
     expect(undone).toEqual([step.before]);
 
     // Sending it again gives the same state: the seed cursor went back with it.
@@ -83,5 +102,21 @@ describe("Undo on the table", () => {
     expect(store.getState().game).toEqual(played[later]?.after);
     expect(store.getState().history).toHaveLength(0);
     expect(store.getState().undo()).toBe(false);
+  });
+});
+
+describe("reopening a save", () => {
+  it("keeps the same round log and Undo list as the table that sent the intents", () => {
+    const played = playGame(2);
+    const upTo = played.slice(0, 120);
+    const start = upTo[0]?.before;
+    if (!start) throw new Error("No game");
+    const store = createTableStore({ ctx, game: start });
+    for (const { intent } of upTo) expect(store.getState().dispatch(intent)).toBe(true);
+    let kept: Kept = { roundSteps: [], history: [] };
+    for (const { before, after, steps, intent } of upTo) kept = keepIntent(kept, before, after, steps, intent);
+    expect(kept.roundSteps).toEqual(store.getState().roundSteps);
+    expect(kept.history.map((entry) => entry.intent)).toEqual(store.getState().history.map((entry) => entry.intent));
+    expect(kept.history.length).toBe(store.getState().history.length);
   });
 });

@@ -368,7 +368,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         step: "Combat",
         title,
         stats: numbers ? statOf(game, ctx, numbers.enemyId, "attack") : [],
-        note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : `${note} Choose a defender, or leave it undefended.`,
+        note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`,
         verb: "Defend with",
         options: defenders.map((id) => {
           const defense = defenseAsDefender(game, id, ctx.cards);

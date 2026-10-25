@@ -128,9 +128,10 @@ export function ChromeButton({
 }
 
 /**
- * The one filled action: a gold pill on night with a soft gold glow, an ink pill on paper. Disabled, it is an outline (a
- * goldLine edge with muted text on night, inkLine with inkMuted on paper) that still reads as the button it will be
- * (docs/design-system.md). A disabled action has a sentence near it saying why.
+ * The one filled action: a gold pill on night with a soft gold glow, an ink pill on paper. Disabled, it is a dashed outline
+ * (a goldLine edge with muted text on night, inkLine with inkMuted on paper) that still reads as the button it will be and
+ * not as one of the solid-edged answers beside it (docs/design-system.md). A disabled action has a sentence near it saying
+ * why.
  */
 export function ChromePrimary({
   label,
@@ -176,7 +177,7 @@ export function ChromePrimary({
 }
 
 function primaryFill(paper: boolean, disabled: boolean, pressed: boolean) {
-  if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderColor: paper ? t.inkLine : t.goldLine };
+  if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: paper ? t.inkLine : t.goldLine };
   if (paper) return { backgroundColor: t.ink, opacity: pressed ? 0.85 : 1 };
   return {
     backgroundColor: pressed ? t.goldDeep : t.gold,
@@ -223,14 +224,19 @@ export function Tile({
       accessibilityState={{ selected }}
       accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), detail ?? ""].filter((part) => part.length > 0).join(". ")}
       onPress={onPress}
-      className={`mb-2 min-h-12 justify-center rounded-tile border px-4 py-2 ${selected ? "border-ink" : "border-inkLine"}`}
-      style={({ pressed }) => ({ borderWidth: selected ? 1.5 : 1, ...(pressed ? { backgroundColor: t.paperPressed } : {}) })}
     >
-      <View className="flex-row items-center justify-between gap-2">
-        <Text className={`shrink text-body text-ink ${selected ? "font-semibold" : ""}`}>{label}</Text>
-        <Stats stats={stats} />
-      </View>
-      {detail ? <Text className="mt-0.5 text-label text-inkMuted">{detail}</Text> : null}
+      {({ pressed }) => (
+        <View
+          className="mb-2 justify-center rounded-tile px-4 py-2"
+          style={{ minHeight: 48, borderWidth: selected ? 1.5 : 1, borderColor: selected ? t.ink : t.inkLine, backgroundColor: pressed ? t.paperPressed : "transparent" }}
+        >
+          <View className="flex-row items-center justify-between gap-2">
+            <Text className={`shrink text-body text-ink ${selected ? "font-semibold" : ""}`}>{label}</Text>
+            <Stats stats={stats} />
+          </View>
+          {detail ? <Text className="mt-0.5 text-label text-inkMuted">{detail}</Text> : null}
+        </View>
+      )}
     </Pressable>
   );
 }

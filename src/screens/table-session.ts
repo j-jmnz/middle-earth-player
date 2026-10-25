@@ -11,8 +11,8 @@ import { logCodes, loadWorld, type World } from "../campaign/world";
 import { cards } from "../catalog/schema";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
-import { createTableStore, nextRoundSteps, type EngineStep, type ReduceContext, type ScenarioState, type TableStore } from "../play/store";
-import { nextUndoable, type Undoable } from "../play/undo-history";
+import { createTableStore, keepIntent, type EngineStep, type Kept, type ReduceContext, type ScenarioState, type TableStore } from "../play/store";
+import type { Undoable } from "../play/undo-history";
 import { useEffect, useMemo } from "react";
 
 import { campaignOf, scenarioOf } from "./campaign-data";
@@ -57,18 +57,16 @@ export function openTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser
     return { ok: false, reason: "dropped", save: dropped, write: dropped };
   }
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, loadoutCodes(save));
-  let roundSteps: readonly EngineStep[] = [];
-  let history: readonly Undoable[] = [];
-  const resumed = resume(save, world, CATALOG_VERSION, (before, after, steps) => {
-    history = nextUndoable(history, before, after, roundSteps, steps);
-    roundSteps = nextRoundSteps(roundSteps, before, after, steps);
+  let kept: Kept = { roundSteps: [], history: [] };
+  const resumed = resume(save, world, CATALOG_VERSION, (before, after, steps, intent) => {
+    kept = keepIntent(kept, before, after, steps, intent);
   });
   if (!resumed.ok) {
     // The reducer refused a stored intent, or the start no longer builds: drop the open scenario and keep the log.
     const dropped = drop(save);
     return { ok: false, reason: "dropped", save: dropped, write: dropped };
   }
-  return { ok: true, save, world, ctx: contextOf(world), game: resumed.state, roundSteps, history, facts: factsOf(catalog, world.cards.keys()) };
+  return { ok: true, save, world, ctx: contextOf(world), game: resumed.state, ...kept, facts: factsOf(catalog, world.cards.keys()) };
 }
 
 /** The open scenario of a save, opened once per save id. A drop it decided on is written after the render. */

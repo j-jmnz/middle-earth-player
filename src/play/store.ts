@@ -23,10 +23,9 @@ export type TableState = {
   targets: readonly DropTarget[];
   // Why the reducer refused the last intent. Cleared by the next accepted one.
   refusal: string | null;
-  // What the last accepted intent did: the state before it and the engine steps it ran, for the outcome banner. `seq` moves
-  // with each accepted intent and each undo. After an undo (`undone`), `before` is the state taken back and `steps` what its
-  // intent ran.
-  moment: { seq: number; before: ScenarioState; steps: readonly EngineStep[]; undone?: boolean } | null;
+  // What the last change of the table was, for the outcome banner; `seq` moves with each. "sent": an accepted intent, the
+  // state before it and the engine steps it ran. "undone": the intent Undo took back, the state it had made and its steps.
+  moment: TableMoment | null;
   // The states Undo can go back to, oldest first.
   history: readonly Undoable[];
 };
@@ -40,6 +39,24 @@ export type TableActions = {
 };
 
 export type TableStore = StoreApi<TableState & TableActions>;
+
+export type TableMoment =
+  | { seq: number; kind: "sent"; before: ScenarioState; steps: readonly EngineStep[] }
+  | { seq: number; kind: "undone"; intent: PlayerIntent; left: ScenarioState; steps: readonly EngineStep[] };
+
+/** What the table keeps of the intents sent so far: the round's log and the states Undo can go back to. */
+export type Kept = { roundSteps: readonly EngineStep[]; history: readonly Undoable[] };
+
+/**
+ * One more accepted intent folded into what the table keeps. The store calls it for each intent sent, and reopening a save
+ * calls it for each intent replayed, so both keep the same log and the same Undo list.
+ */
+export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], intent: PlayerIntent): Kept {
+  return {
+    roundSteps: nextRoundSteps(kept.roundSteps, before, after, steps),
+    history: nextUndoable(kept.history, after, { before, roundSteps: kept.roundSteps, intent, steps }),
+  };
+}
 
 /**
  * The steps of the round the table is in. A reduce that crosses into a new round starts the list again from the steps it
@@ -68,6 +85,8 @@ function windowState(game: ScenarioState, ctx: ReduceContext): Pick<TableState, 
 
 export function createTableStore(input: TableInput): TableStore {
   const { ctx } = input;
+  // The table on a new game: its window, nothing picked or dragged, no refusal.
+  const showing = (game: ScenarioState) => ({ game, ...windowState(game, ctx), selected: null, targets: [], refusal: null });
   return createStore<TableState & TableActions>()((set, get) => ({
     game: input.game,
     ...windowState(input.game, ctx),
@@ -85,14 +104,9 @@ export function createTableStore(input: TableInput): TableStore {
         return false;
       }
       set({
-        game: result.state,
-        ...windowState(result.state, ctx),
-        roundSteps: nextRoundSteps(get().roundSteps, before, result.state, result.steps),
-        selected: null,
-        targets: [],
-        refusal: null,
-        moment: { seq: (get().moment?.seq ?? 0) + 1, before, steps: result.steps },
-        history: nextUndoable(get().history, before, result.state, get().roundSteps, result.steps),
+        ...showing(result.state),
+        ...keepIntent(get(), before, result.state, result.steps, intent),
+        moment: { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, steps: result.steps },
       });
       input.onCommit?.(intent, result.state);
       return true;
@@ -102,14 +116,10 @@ export function createTableStore(input: TableInput): TableStore {
       const last = history[history.length - 1];
       if (!last) return false;
       set({
-        game: last.before,
-        ...windowState(last.before, ctx),
+        ...showing(last.before),
         roundSteps: last.roundSteps,
-        selected: null,
-        targets: [],
-        refusal: null,
-        moment: { seq: (moment?.seq ?? 0) + 1, before: game, steps: last.steps, undone: true },
         history: history.slice(0, -1),
+        moment: { seq: (moment?.seq ?? 0) + 1, kind: "undone", intent: last.intent, left: game, steps: last.steps },
       });
       input.onUndo?.(last.before);
       return true;

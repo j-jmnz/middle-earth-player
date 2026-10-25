@@ -233,8 +233,19 @@ export function PrimaryButton({
   surface?: "night" | "paper";
   accessibilityLabel?: string;
 }) {
-  const filled = surface === "paper" ? "bg-ink" : "border-t border-goldHigh bg-gold";
-  const text = surface === "paper" ? "text-paper" : "text-onGold";
+  const paper = surface === "paper";
+  // The fill and the text colour are styles, not only classes: on the phone a class on a Pressable whose style is a function
+  // can be dropped, which left a gold pill as dark text on night (user report, 2026-10-25). The pressed state comes from the
+  // Pressable's children.
+  const fill = (pressed: boolean) =>
+    disabled
+      ? paper
+        ? { borderWidth: 1, borderColor: palette.inkLine }
+        : { backgroundColor: palette.raised }
+      : paper
+        ? { backgroundColor: palette.ink, opacity: pressed ? 0.85 : 1 }
+        : { backgroundColor: pressed ? palette.goldDeep : palette.gold, borderTopWidth: 1, borderColor: palette.goldHigh };
+  const color = disabled ? (paper ? palette.inkMuted : palette.faint) : paper ? palette.paper : palette.onGold;
   return (
     <Pressable
       testID={testID}
@@ -244,10 +255,14 @@ export function PrimaryButton({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      className={`min-h-14 items-center justify-center rounded-pill px-8 ${disabled ? (surface === "paper" ? "border border-inkLine" : "bg-raised") : filled}`}
-      style={({ pressed }) => (pressed && !disabled ? { backgroundColor: surface === "paper" ? palette.ink : palette.goldDeep } : undefined)}
     >
-      <Text className={`font-display text-body uppercase tracking-widest ${disabled ? (surface === "paper" ? "text-inkMuted" : "text-faint") : text}`}>{label}</Text>
+      {({ pressed }) => (
+        <View className="items-center justify-center rounded-pill px-8" style={{ minHeight: 56, ...fill(pressed) }}>
+          <Text className="font-display text-body uppercase tracking-widest" style={{ color }}>
+            {label}
+          </Text>
+        </View>
+      )}
     </Pressable>
   );
 }

@@ -165,8 +165,6 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
           </View>
           <PhaseRail rail={rail} narrow={narrow} />
           {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}
-          {/* Undo shows while the last intent can be taken back: it showed no hidden card (undo-history.ts). */}
-          {choice.undo ? <ChromeButton label="Undo" testID="table-undo" accessibilityLabel="Take back your last choice" onPress={choice.undo} /> : null}
           <ChromeButton label="Log" testID="log-open" tone="gold" accessibilityLabel="This round's log" onPress={() => setLogOpen(true)} />
           <ChromeButton
             label="Booklet"
@@ -234,6 +232,7 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
             onButton={choice.onButton}
             onFold={choice.fold}
             onRead={(cardId) => onPreview(cardId)}
+            undo={choice.undo}
           />
         </View>
       ) : null}
