@@ -9,7 +9,7 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 
 import { briefing, checklistPlan, startFor, type Briefing, type BriefingInput, type BriefingSeat } from "./briefing.ts";
 import { applyResolution } from "./log.ts";
-import { beginActive, recordIntent, replay, type ActiveScenario, type ReplayObserver } from "./replay.ts";
+import { beginActive, dropLastIntent, recordIntent, replay, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import type { Save, StoredLoadout } from "./save.ts";
 import type { World } from "./world.ts";
 
@@ -84,6 +84,11 @@ export function drop(save: Save): Save {
 // Records one intent the reducer accepted on the open game: a save's scenario or a standalone game.
 export function record<T extends { active: ActiveScenario | null }>(holder: T, intent: PlayerIntent): T {
   return holder.active ? { ...holder, active: recordIntent(holder.active, intent) } : holder;
+}
+
+// Takes back the last intent of the open scenario (the table's Undo, brief: Rules engine).
+export function unrecord<T extends { active: ActiveScenario | null }>(holder: T): T {
+  return holder.active ? { ...holder, active: dropLastIntent(holder.active) } : holder;
 }
 
 export function isWon(state: ScenarioState): boolean {

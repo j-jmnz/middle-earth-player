@@ -242,6 +242,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
             onButton={choice.onButton}
             onFold={choice.fold}
             onRead={(cardId) => onPreview(cardId)}
+            undo={choice.undo}
           />
         </View>
       ) : null}

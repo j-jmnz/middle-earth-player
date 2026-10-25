@@ -5,7 +5,7 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { useEffect, useMemo } from "react";
 
 import type { Save } from "../campaign/save";
-import { drop, record, resume, staleReason } from "../campaign/session";
+import { drop, record, resume, staleReason, unrecord } from "../campaign/session";
 import { logCodes, loadWorld } from "../campaign/world";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
@@ -65,14 +65,21 @@ export function useTableSession(saveId: string | null): TableSession | null {
 export type SessionStore = { store: TableStore; save: () => Save };
 
 /**
- * The table store for an opened session. Each intent the reducer accepts is appended to the save and written at once, so a
- * kill and relaunch replays the same game. `save` is the save as last written.
+ * The table store for an opened session. Each intent the reducer accepts is appended to the save and written at once, and an
+ * undo takes the last one off, so a kill and relaunch replays the same game. `save` is the save as last written.
  */
 export function sessionStore<TRun>(session: Extract<TableSession, { ok: true }>, user: Db<TRun>): SessionStore {
   let saved: Save = session.save;
-  const store = committingStore(session, (intent) => {
-    saved = record(saved, intent);
-    writeSave(user, saved);
-  });
+  const store = committingStore(
+    session,
+    (intent) => {
+      saved = record(saved, intent);
+      writeSave(user, saved);
+    },
+    () => {
+      saved = unrecord(saved);
+      writeSave(user, saved);
+    },
+  );
   return { store, save: () => saved };
 }

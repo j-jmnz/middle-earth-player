@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 
+import { tickArmed } from "./haptics.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
 import { primaryReady, type Dock, type DockButton } from "./table-choice.ts";
@@ -17,8 +18,11 @@ import { tableTokens as t } from "./tokens.ts";
 const ARM_MS = 3000;
 const ARM_READER_MS = 10000;
 const HINT = "Tap twice to confirm";
+// A moment with one legal answer: the line above the buttons says the one tap sends it.
+const ONLY = "The only choice now: one tap sends it";
+const ONLY_HINT = "Sends at once";
 
-export type DockExtra = { label: string; testID: string; onPress: () => void };
+export type DockExtra = { label: string; testID: string; onPress: () => void; accessibilityLabel?: string };
 
 export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Dock; extras?: readonly DockExtra[]; surface: "night" | "paper"; onButton: (button: DockButton) => void }) {
   const [armed, setArmed] = useState<string | null>(null);
@@ -40,6 +44,7 @@ export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Do
       left.set(1);
       if (!reduceMotion) left.set(withTiming(0, { duration: wait, easing: Easing.linear }));
       timer.current = setTimeout(() => setArmed(null), wait);
+      tickArmed();
       return;
     }
     setArmed(null);
@@ -54,13 +59,13 @@ export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Do
   const paper = surface === "paper";
   const primary = dock.primary;
   const armedButton = [primary, ...dock.secondary].find((button) => button?.testID === armed) ?? null;
-  const line = armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : dock.why;
+  const line = armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : (dock.why ?? (dock.single ? ONLY : null));
   return (
     <View className="gap-1">
       {/* One line above the buttons, always there: what the armed button's second tap does, or what the primary waits for. */}
       <View style={{ minHeight: 20, justifyContent: "flex-end" }}>
         {line ? (
-          <Text testID={armedButton ? `${armedButton.testID}-armed` : "sheet-why"} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} className={`text-center text-label ${armedButton ? (paper ? "text-inkLabel" : "text-gold") : paper ? "text-inkMuted" : "text-muted"}`}>
+          <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} className={`text-center text-label ${armedButton ? (paper ? "text-inkLabel" : "text-gold") : paper ? "text-inkMuted" : "text-muted"}`}>
             {line}
           </Text>
         ) : null}
@@ -73,16 +78,17 @@ export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Do
           surface={surface}
           compact
           disabled={!primaryReady(dock)}
-          accessibilityHint={primary.arm ? HINT : undefined}
+          accessibilityHint={primary.arm ? HINT : dock.single ? ONLY_HINT : undefined}
           onPress={() => press(primary)}
         />
       ) : null}
-      <View className="flex-row flex-wrap items-center justify-center">
+      {/* The other answers are outlined pills, the reading aids quieter ones: each reads as a button on night. */}
+      <View className="flex-row flex-wrap items-center justify-center gap-1.5">
         {dock.secondary.map((button) => (
-          <ChromeButton key={button.testID} label={button.label} testID={button.testID} tone={paper ? "ink" : armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
+          <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="outline" tone={paper ? "ink" : armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
         ))}
         {extras.map((item) => (
-          <ChromeButton key={item.testID} label={item.label} testID={item.testID} tone={paper ? "ink" : "muted"} onPress={extra(item.onPress)} />
+          <ChromeButton key={item.testID} label={item.label} testID={item.testID} variant="quiet" tone={paper ? "ink" : "bone"} accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
         ))}
       </View>
     </View>

@@ -24,13 +24,18 @@ export function recordIntent(active: ActiveScenario, intent: PlayerIntent): Acti
   return { ...active, intents: [...active.intents, intent] };
 }
 
+// Takes the last intent back (the table's Undo): replaying the rest gives the state before it.
+export function dropLastIntent(active: ActiveScenario): ActiveScenario {
+  return { ...active, intents: active.intents.slice(0, -1) };
+}
+
 export type Replayed =
   | { ok: true; state: ScenarioState }
   | { ok: false; reason: "engineVersion" | "dataHash" | "seed" | "intent" };
 
-// Sees each accepted intent of a replay: the state before, the state after, and the engine steps between them. The table
-// uses it to rebuild the log of the round it reopens on.
-export type ReplayObserver = (before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[]) => void;
+// Sees each accepted intent of a replay: the state before, the state after, the engine steps between them, and the intent.
+// The table uses it to rebuild the log of the round it reopens on and what Undo can take back.
+export type ReplayObserver = (before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], intent: PlayerIntent) => void;
 
 // Replays a save. A save from another engine version or another data hash is dropped, not migrated; the caller
 // keeps the log, the decks and the image index. An intent the reducer now refuses also drops it.
@@ -42,7 +47,7 @@ export function replay(active: ActiveScenario, start: StartScenario, dataHash: n
   for (const intent of active.intents) {
     const result = reduce(state, intent, ctx);
     if (!result.ok) return { ok: false, reason: "intent" };
-    observe?.(state, result.state, result.steps);
+    observe?.(state, result.state, result.steps, intent);
     state = result.state;
   }
   return { ok: true, state };

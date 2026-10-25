@@ -8,6 +8,7 @@ export const tableTokens = {
   muted: "#A39C8E",
   faint: "#8A857C",
   gold: "#D9B86C",
+  goldHigh: "#EBD08E",
   goldLine: "#5E5032",
   onGold: "#1A140A",
   pressed: "#1E2026",

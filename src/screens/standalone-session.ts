@@ -4,7 +4,7 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { useEffect, useMemo } from "react";
 
-import { record } from "../campaign/session";
+import { record, unrecord } from "../campaign/session";
 import { droppedIfStale, dropStandalone, resumeStandalone, type StandaloneGame } from "../campaign/standalone";
 import { loadWorld } from "../campaign/world";
 import { CATALOG_VERSION } from "../catalog/version";
@@ -61,11 +61,18 @@ export function useStandaloneSession(gameId: string | null): StandaloneSession |
   return session;
 }
 
-/** The table store for an opened game. Each intent the reducer accepts is appended and written at once. */
+/** The table store for an opened game. Each intent the reducer accepts is appended and written at once; Undo takes it off. */
 export function standaloneStore<TRun>(session: Extract<StandaloneSession, { ok: true }>, user: Db<TRun>): TableStore {
   let saved: StandaloneGame = session.stored;
-  return committingStore(session, (intent) => {
-    saved = record(saved, intent);
-    writeStandalone(user, saved);
-  });
+  return committingStore(
+    session,
+    (intent) => {
+      saved = record(saved, intent);
+      writeStandalone(user, saved);
+    },
+    () => {
+      saved = unrecord(saved);
+      writeStandalone(user, saved);
+    },
+  );
 }
