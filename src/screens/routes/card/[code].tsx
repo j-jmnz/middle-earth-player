@@ -258,6 +258,7 @@ export default function CardScreen() {
             <BodyText className="mt-2">{row.errata}</BodyText>
           </View>
         ) : null}
+        <View className="pb-safe" />
       </ScrollView>
     </Screen>
   );
