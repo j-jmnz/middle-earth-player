@@ -44,6 +44,10 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return [...state.staging, state.activeLocation, state.secondActiveLocation].some(
         (id) => id != null && id !== scope.sourceId && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location",
       );
+    case "heroesAll": {
+      const heroes = state.seats[scope.actor]?.heroes ?? [];
+      return heroes.length > 0 && heroes.every((id) => hasTrait(state, id, condition.trait, ctx));
+    }
     case "heroExhausted":
       return (state.seats[scope.actor]?.heroes ?? []).some((id) => state.cards[id]?.exhausted === true);
     case "exhausted": {

@@ -92,6 +92,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"141071:whenRevealed:1","cardCode":"141071","lines":["141071:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":-1,"until":"endOfRound","target":"allies"},{"verb":"DamageAll","amount":2,"type":"ally","maxWillpower":0}]},
   {"id":"141071:shadow:1","cardCode":"141071","lines":["141071:A:2"],"timing":"shadow","instructions":[{"verb":"Pick","pick":{"type":"attachment","control":"you"}},{"verb":"DiscardPicked"}]},
 
+  // Player cards of the player's own decks that the box does not print (user request, 2026-10-25).
+  // 19121 The Shirefolk: its play restriction (19121:A:1, inert in the ledger) is the condition of its one Action.
+  {"id":"19121:action:1","cardCode":"19121","lines":["19121:A:2"],"timing":"action","condition":{"kind":"heroesAll","trait":"Hobbit"},"instructions":[{"verb":"LowerThreat","amount":4,"who":"actor"}]},
   // Campaign cards: the Setup on the front and the Resolution on the back (Learn to Play p29, Rules Reference Appendix III).
   // 141030 A Shadow of the Past
   {"id":"141030:campaignSetup:1","cardCode":"141030","lines":["141030:A:2"],"timing":"campaignSetup","instructions":[{"verb":"AttachToRingBearer","code":"141017"},{"verb":"AddToStaging","code":"141078"},{"verb":"ShuffleIntoEncounterDeck","code":"141077"},{"verb":"ShuffleIntoEncounterDeck","code":"141079"}]},

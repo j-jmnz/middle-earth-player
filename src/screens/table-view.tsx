@@ -173,7 +173,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 compact
               />
             ))}
-            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} compact /> : null}
+            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
           </View>
           <PhaseRail rail={rail} narrow={narrow} />
           {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}
