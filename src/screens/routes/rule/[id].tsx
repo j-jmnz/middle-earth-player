@@ -5,7 +5,7 @@ import { CardTextView } from "../../../play/card-text-view";
 import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, TextButton } from "../../chrome";
 import { goBack } from "../../go-back";
 import { routeCode } from "../../route-code";
-import { GLOSSARY, glossaryEntry, paragraphs, seeAlso } from "../../rules-glossary";
+import { GLOSSARY, bookPage, glossaryEntry, paragraphs, seeAlso } from "../../rules-glossary";
 
 // One rule span as its book prints it, with the rules it sends the reader on to.
 export default function Rule() {
@@ -29,6 +29,7 @@ export default function Rule() {
 
   const body = paragraphs(entry).filter((paragraph) => !paragraph.startsWith("See also:"));
   const links = seeAlso(entry, GLOSSARY);
+  const book = bookPage(entry);
 
   return (
     <Screen scene="plain" testID="rule">
@@ -37,6 +38,18 @@ export default function Rule() {
         <View className="gap-1">
           <Eyebrow>{entry.source}</Eyebrow>
           <ScreenTitle size="title">{entry.title}</ScreenTitle>
+          {/* A rule from a book the app carries opens the reader on its page; Close comes back here. */}
+          {book ? (
+            <View className="-mx-3 flex-row">
+              <TextButton
+                label={`Open in book · page ${book.page}`}
+                testID="rule-open-book"
+                tone="gold"
+                accessibilityLabel={`Open ${book.name} at page ${book.page}`}
+                onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: book.id, page: String(book.page) } })}
+              />
+            </View>
+          ) : null}
         </View>
         <CardTextView text={body.join("\n")} testID="rule-text" />
         {links.length > 0 ? (

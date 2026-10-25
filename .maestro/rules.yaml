@@ -22,3 +22,20 @@ appId: com.middleearth.lcg
     id: rule-back
 - assertVisible:
     id: rules
+# A rule from the campaign book opens the reader on its page, and Close comes back to the rule.
+- tapOn:
+    id: rules-search
+- eraseText
+- inputText: "hide tests"
+- tapOn:
+    id: rule-mec109.hide-tests
+- tapOn:
+    id: rule-open-book
+- extendedWaitUntil:
+    visible:
+      id: booklet-close
+    timeout: 15000
+- tapOn:
+    id: booklet-close
+- assertVisible:
+    id: rule-open-book

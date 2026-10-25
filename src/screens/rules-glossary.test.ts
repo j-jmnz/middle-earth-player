@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { GLOSSARY, glossaryEntry, paragraphs, searchGlossary, seeAlso } from "./rules-glossary.ts";
+import { GLOSSARY, bookPage, glossaryEntry, paragraphs, searchGlossary, seeAlso } from "./rules-glossary.ts";
 
 describe("GLOSSARY", () => {
   it("holds the rule books' spans and leaves out decklists, setups and stages", () => {
@@ -60,5 +60,14 @@ describe("seeAlso", () => {
       ["Triggered Ability", "rr.triggered-ability"],
       ["Appendix I", null],
     ]);
+  });
+});
+
+describe("bookPage", () => {
+  it("opens the campaign book and Learn to Play on the rule's page, and no other book", () => {
+    expect(bookPage(glossaryEntry("mec109.hide-tests")!)).toEqual({ id: "fellowship-of-the-ring", name: "Fellowship of the Ring campaign book", page: 4 });
+    expect(bookPage(glossaryEntry("ltp.surge")!)).toEqual({ id: "learn-to-play", name: "Learn to Play", page: 22 });
+    expect(bookPage(glossaryEntry("rr.surge")!)).toBeNull();
+    expect(bookPage(glossaryEntry("faq.limitations-on-attacks")!)).toBeNull();
   });
 });

@@ -2,9 +2,8 @@
 // term. The text is the span as read from its PDF column, so its line breaks are the column's; `paragraphs` joins them back.
 import entries from "../../data/rules/entries.json";
 
-import { bookletName } from "./booklets/books";
-
-export type RuleEntry = { id: string; doc: string; page: number; title: string; text: string; terms: string[] };
+import { parseRuleEntries, type RuleEntry } from "../catalog/rule-entry";
+import { bookletName, type BookletId } from "./booklets/books";
 
 export type GlossaryEntry = RuleEntry & { source: string };
 
@@ -45,7 +44,16 @@ export function glossaryOf(rows: readonly RuleEntry[]): GlossaryEntry[] {
     .sort((a, b) => sortKey(a.title).localeCompare(sortKey(b.title)) || a.id.localeCompare(b.id));
 }
 
-export const GLOSSARY: readonly GlossaryEntry[] = glossaryOf(entries as RuleEntry[]);
+export const GLOSSARY: readonly GlossaryEntry[] = glossaryOf(parseRuleEntries(entries));
+
+// The rule books the app carries (src/screens/booklets/books.ts); a rule from one opens the reader on its page.
+const BOOKS: Readonly<Partial<Record<string, BookletId>>> = { mec109: "fellowship-of-the-ring", "learn-to-play": "learn-to-play" };
+
+/** The stored book and page a rule is printed on, when the app carries that book; the Rules Reference and FAQ it does not. */
+export function bookPage(entry: Pick<RuleEntry, "doc" | "page">): { id: BookletId; name: string; page: number } | null {
+  const id = BOOKS[entry.doc];
+  return id ? { id, name: bookletName(id), page: entry.page } : null;
+}
 
 export function glossaryEntry(id: string): GlossaryEntry | null {
   return GLOSSARY.find((entry) => entry.id === id) ?? null;
