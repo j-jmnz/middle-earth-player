@@ -36,7 +36,8 @@ async function storeBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: st
     const directory = booksDirectory();
     partial = new File(directory, `${id}.partial`);
     if (partial.exists) partial.delete();
-    source.copy(partial);
+    // copy() is asynchronous in this expo-file-system: without the await, the reader opened a file still being written.
+    await source.copy(partial);
 
     let pageCount: number;
     try {

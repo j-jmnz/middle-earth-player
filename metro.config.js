@@ -14,6 +14,12 @@ for (const extension of ["wasm", "pdf"]) {
 // when that map exists, it is bundled in place of the empty stub in src/screens/booklets.
 const bookletStub = path.join(__dirname, "src/screens/booklets/bundled-map.ts");
 const bookletMap = path.join(__dirname, ".cache/booklets/bundled-map.ts");
+// Said once per Metro start, so a bundle without the books is never a surprise.
+console.log(
+  fs.existsSync(bookletMap)
+    ? "booklets: bundling the packed PDFs from .cache/booklets"
+    : "booklets: not packed, so this bundle carries none. Run pnpm booklets:pack, then restart Metro with --clear.",
+);
 const resolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   const resolved = (resolveRequest ?? context.resolveRequest)(context, moduleName, platform);
