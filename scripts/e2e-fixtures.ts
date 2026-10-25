@@ -2,7 +2,11 @@
 // src/campaign/fixtures/a-knife-in-the-dark.json (A Knife in the Dark) for the Maestro flows. Run it again when
 // src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
 //
-//   node --experimental-strip-types scripts/e2e-fixtures.ts
+//   node --experimental-strip-types scripts/e2e-fixtures.ts          # `lost`
+//   node --experimental-strip-types scripts/e2e-fixtures.ts --won    # also search for `won`, then write `knife-lost`
+//
+// `won` and `knife-lost` are open (docs/phases/STATUS.md): with the rules as the sources state them, the search has found no
+// legal win of the two starter decks, so they are not committed, and the tests that replay them are skipped until they are.
 //
 // `won`: both starter decks, two-handed, Easy, parked on the first Resolution choice. The naive auto-player loses every
 // game with the starter decks, so a seeded beam search plays varied (still legal) answers a round at a time and keeps the
@@ -278,10 +282,13 @@ function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout
   return { seed, loadout, intents };
 }
 
-const won = searchWin();
+// The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
+// the search runs only when asked, and `won` and `knife-lost` are written only when it finds one.
+const searching = process.argv.includes("--won");
 const lost = playLoss();
+const won = searching ? searchWin() : null;
 const out = {
-  won: { seatCount: 2, ...won },
+  ...(won ? { won: { seatCount: 2, ...won } } : {}),
   lost: { seatCount: 1, ...lost },
 };
 const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "src", "campaign", "fixtures");
@@ -289,10 +296,12 @@ const file = path.join(dir, "scenario-1.json");
 writeFileSync(file, `${JSON.stringify(out)}\n`);
 console.log(`wrote ${file}`);
 
-const past = wonLog(won);
-const knifeOut = {
-  "knife-lost": { seatCount: 2, ...playKnifeLoss(past.log), log: past.log, past: { fixture: "won", choices: past.choices } },
-};
-const knifeFile = path.join(dir, "a-knife-in-the-dark.json");
-writeFileSync(knifeFile, `${JSON.stringify(knifeOut)}\n`);
-console.log(`wrote ${knifeFile}`);
+if (won) {
+  const past = wonLog(won);
+  const knifeOut = {
+    "knife-lost": { seatCount: 2, ...playKnifeLoss(past.log), log: past.log, past: { fixture: "won", choices: past.choices } },
+  };
+  const knifeFile = path.join(dir, "a-knife-in-the-dark.json");
+  writeFileSync(knifeFile, `${JSON.stringify(knifeOut)}\n`);
+  console.log(`wrote ${knifeFile}`);
+}

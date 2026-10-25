@@ -5,7 +5,8 @@
 // the `won` game writes when its Resolution is answered with `past.choices` (scenario 1's earned cards reach scenario 2
 // through the Campaign Setup Checklist). The e2e-fixtures script writes them, and `fixtures.test.ts` replays each through the
 // reducer (and the scenario 1 game into that log) so a change to the engine or the cards that moves a game fails there and
-// the script is run again.
+// the script is run again. `won`, and so `knife-lost`, are open (docs/phases/STATUS.md): no legal win of the two starter
+// decks has been found, so neither is committed, and a name whose fixture is absent is not offered (`hasFixture`).
 import knifeFixtures from "./fixtures/a-knife-in-the-dark.json";
 import fixtures from "./fixtures/scenario-1.json";
 
@@ -28,13 +29,19 @@ export function isFixtureName(value: string): value is FixtureName {
   return (FIXTURE_NAMES as readonly string[]).includes(value);
 }
 
-const STORED: Readonly<Record<FixtureName, StoredFixture>> = {
-  ...(fixtures as Record<"won" | "lost", StoredFixture>),
-  ...(knifeFixtures as Record<"knife-lost", StoredFixture>),
+const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = {
+  ...(fixtures as Partial<Record<"won" | "lost", StoredFixture>>),
+  ...(knifeFixtures as Partial<Record<"knife-lost", StoredFixture>>),
 };
+
+// The fixture is committed. The e2e route opens only these.
+export function hasFixture(name: FixtureName): boolean {
+  return STORED[name] != null;
+}
 
 export function fixture(name: FixtureName): Fixture {
   const stored = STORED[name];
+  if (!stored) throw new Error(`Fixture ${name} is not committed`);
   const loadout = parseLoadout(stored.loadout);
   if (!loadout) throw new Error(`Fixture ${name} has no loadout`);
   const seatCount = parseSeatCount(stored.seatCount);
