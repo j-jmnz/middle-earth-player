@@ -62,6 +62,8 @@ function generator(start: number): () => number {
 
 function varied(state: ScenarioState, ctx: ReduceContext, random: () => number, memory: Set<string>): PlayerIntent {
   const base = nextIntent(state, ctx, { scout: "", prefer: "141035", protect: FRODO, play: true, act: true }, memory);
+  // Frodo's cancel (141001:response:1) exhausts The One Ring each time, which the scenario punishes; the search keeps it.
+  if (base.type === "Trigger" && base.effectId === "141001:response:1") return { type: "Pass" };
   if (base.type === "Commit") {
     const ids = legalTargets(state, { type: "Commit" }, ctx).filter(() => random() < 0.6);
     return ids.length > 0 ? { type: "Commit", cardIds: ids } : { type: "Pass" };
