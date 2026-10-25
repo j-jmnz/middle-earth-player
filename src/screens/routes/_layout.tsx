@@ -4,6 +4,7 @@ import "../../../global.css";
 import { useEffect, useRef, useState } from "react";
 import { Appearance, Platform } from "react-native";
 import { Stack } from "expo-router";
+import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import { colorScheme } from "nativewind";
 
@@ -100,22 +101,26 @@ export default function RootLayout() {
     };
   }, [databases]);
 
+  // NativeWind fills pt-safe and pb-safe from a SafeAreaProvider rendered here. Expo Router's own provider
+  // is compiled without NativeWind's JSX, so on a phone every inset would read 0 without this one.
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.night }}>
-      {failure ? (
-        <DatabaseError message={failure} />
-      ) : databases ? (
-        <DatabaseBoundary>
-          <DatabaseProvider databases={databases}>
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: palette.night },
-              }}
-            />
-          </DatabaseProvider>
-        </DatabaseBoundary>
-      ) : null}
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        {failure ? (
+          <DatabaseError message={failure} />
+        ) : databases ? (
+          <DatabaseBoundary>
+            <DatabaseProvider databases={databases}>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: palette.night },
+                }}
+              />
+            </DatabaseProvider>
+          </DatabaseBoundary>
+        ) : null}
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

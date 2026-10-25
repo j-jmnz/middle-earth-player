@@ -102,6 +102,7 @@ export default function PackCards() {
             style={{ flex: 1 }}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
+            ListFooterComponent={<View className="pb-safe" />}
             renderItem={({ item }) => (
               <PackCardRow
                 item={item}

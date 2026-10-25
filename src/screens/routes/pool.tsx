@@ -302,6 +302,7 @@ export default function CardPool() {
             keyboardShouldPersistTaps="handled"
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
+            ListFooterComponent={<View className="pb-safe" />}
             ListEmptyComponent={
               <BodyText testID="pool-empty" tone="muted" className="mt-6">
                 No cards match.
