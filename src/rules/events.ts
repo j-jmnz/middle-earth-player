@@ -6,11 +6,24 @@ import type { ScenarioState } from "./state.ts";
 import { fireForced } from "./triggers.ts";
 import { pushFrame } from "./windows.ts";
 
-// Whether an event may be announced now: no window is open, or one that only waits for the player's next step is (an action
-// window, the next attack, the optional engagement, the travel choice), which the announcement closes and then gives back.
+// Whether an event may be announced now. A Response is used immediately after its triggering condition has occurred and
+// resolved (rr.response), so an event is announced over any window the framework opened since (an action window, an
+// attack's defense, archery, the choice of an enemy, the next attack, the optional engagement, the travel choice): the
+// announcement sets that window aside and gives it back. It waits while an effect or a revealed card is still resolving
+// and asks for a choice or a Hide commit, while another event's Responses or cancel are being offered, and at setup.
 export function canAnnounce(state: ScenarioState): boolean {
   const kind = state.window?.kind;
-  return kind === undefined || kind === "pass" || kind === "frameAction" || kind === "playerAttack" || kind === "optionalEngage" || kind === "travel";
+  return (
+    kind === undefined ||
+    kind === "pass" ||
+    kind === "frameAction" ||
+    kind === "playerAttack" ||
+    kind === "optionalEngage" ||
+    kind === "travel" ||
+    kind === "defense" ||
+    kind === "archery" ||
+    kind === "chooseEnemy"
+  );
 }
 
 // Announces the oldest queued event (queue.ts): Responses are offered once the Forced effects have resolved, so the

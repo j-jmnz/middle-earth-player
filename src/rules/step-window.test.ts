@@ -77,3 +77,27 @@ describe("framework action windows", () => {
     expect(current.pendingAttack).toBeNull();
   });
 });
+
+describe("responses", () => {
+  it("are offered as soon as their trigger has resolved, over a defense window, which then comes back (rr.response)", () => {
+    const shield: Effect = {
+      id: "aragorn:response:1", cardCode: "aragorn", lines: ["fixture:A:1"], timing: "response", trigger: "damaged",
+      instructions: [{ verb: "RaiseThreat" }],
+    };
+    const ctx = { effects: [shield], cards };
+    const built = table(false);
+    const engaged = spawn(built.state, "orc", { zone: "engaged", seat: 0 });
+    const waiting: ScenarioState = {
+      ...engaged.state,
+      phase: "Combat",
+      mode: "enemyAttacks",
+      pendingAttack: { enemyId: engaged.id, seat: 0 },
+      window: { kind: "defense", enemyId: engaged.id, seat: 0 },
+      pendingEvents: [{ trigger: "damaged", seat: 0, cardId: built.aragorn, subject: built.aragorn }],
+    };
+    const offered = settle(waiting, ctx, []);
+    expect(offered.window).toEqual({ kind: "response", seat: 0 });
+    const back = expectOk(reduce(offered, { type: "Pass" }, ctx)).state;
+    expect(back.window).toEqual({ kind: "defense", enemyId: engaged.id, seat: 0 });
+  });
+});
