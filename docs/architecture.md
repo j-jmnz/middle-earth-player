@@ -238,7 +238,7 @@ Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaign
 | Card | one cached file, catalog text | nothing |
 | Card pool | card rows loaded when the screen opens, then filtered in memory; `image_files`. One view (`src/screens/card-pool.tsx`) is the Cards tab and the deck editor's `/pool?adding=1` | the open deck draft, when adding |
 | Packs | `packs`; a pack's cards | nothing |
-| Rules | `data/rules/entries.json` through `src/screens/rules-glossary.ts`: the Rules Reference, Learn to Play, FAQ, Easy Mode and MEC109 rule spans, searched in memory; the two books open the booklet route | nothing |
+| Rules | `data/rules/entries.json` through `src/screens/rules-glossary.ts`: the Rules Reference, Learn to Play, FAQ, Easy Mode and MEC109 rule spans, searched in memory (`src/screens/rules-view.tsx`, also the `/glossary` route the table opens); the two books open the booklet route | nothing |
 | Deck | catalog, `decks` | `decks` |
 | Booklet | one `booklets` row and the file under `booklets/`; the import, the file copy and the reader view are in `src/screens/booklets/` | last page |
 

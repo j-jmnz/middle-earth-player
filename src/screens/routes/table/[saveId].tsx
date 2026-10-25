@@ -166,6 +166,7 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
           <PhaseRail rail={rail} narrow={narrow} />
           {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}
           <ChromeButton label="Log" testID="log-open" tone="gold" accessibilityLabel="This round's log" onPress={() => setLogOpen(true)} />
+          <ChromeButton label="Rules" testID="rules-open" tone="gold" accessibilityLabel="Look up a rule" onPress={() => router.push("/glossary")} />
           <ChromeButton
             label="Booklet"
             testID="booklet-open"

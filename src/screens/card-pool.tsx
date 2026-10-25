@@ -42,6 +42,7 @@ import {
   cycleGroups,
   emptyPoolFilter,
   filterPool,
+  sortPool,
   filterSheetAnimation,
   packChooserRows,
   poolDetail,
@@ -183,29 +184,31 @@ export function CardPool({ adding, header }: { adding: boolean; header: ReactNod
   const { height } = useWindowDimensions();
   const { catalog } = useDatabases();
   const preview = useListPreview();
+  // Sorted in memory: a printing's tag ("(MotK) Aragorn") files under the name.
   const [rows] = useState(() =>
-    catalog
-      .select({
-        code: cards.code,
-        name: cards.name,
-        typeCode: cards.typeCode,
-        typeName: cards.typeName,
-        sphereCode: cards.sphereCode,
-        sphereName: cards.sphereName,
-        packCode: cards.packCode,
-        packCodes: cards.packCodes,
-        traits: cards.traits,
-        cost: cards.cost,
-        threat: cards.threat,
-        isUnique: cards.isUnique,
-        deckLimit: cards.deckLimit,
-        deckLegal: cards.deckLegal,
-        imagesrc: cards.imagesrc,
-      })
-      .from(cards)
-      .where(eq(cards.deckLegal, true))
-      .orderBy(cards.name, cards.code)
-      .all(),
+    sortPool(
+      catalog
+        .select({
+          code: cards.code,
+          name: cards.name,
+          typeCode: cards.typeCode,
+          typeName: cards.typeName,
+          sphereCode: cards.sphereCode,
+          sphereName: cards.sphereName,
+          packCode: cards.packCode,
+          packCodes: cards.packCodes,
+          traits: cards.traits,
+          cost: cards.cost,
+          threat: cards.threat,
+          isUnique: cards.isUnique,
+          deckLimit: cards.deckLimit,
+          deckLegal: cards.deckLegal,
+          imagesrc: cards.imagesrc,
+        })
+        .from(cards)
+        .where(eq(cards.deckLegal, true))
+        .all(),
+    ),
   );
   const [packRows] = useState(() =>
     catalog
@@ -288,7 +291,7 @@ export function CardPool({ adding, header }: { adding: boolean; header: ReactNod
             placeholderTextColor={palette.faint}
             autoCorrect={false}
             autoCapitalize="none"
-            className="min-h-11 flex-1 rounded-pill bg-raised px-4 text-body text-bone"
+            className="min-h-11 min-w-0 flex-1 rounded-pill bg-raised px-4 text-body text-bone"
           />
           <TextButton testID="pool-filter" label="Filter" onPress={openSheet} />
         </View>

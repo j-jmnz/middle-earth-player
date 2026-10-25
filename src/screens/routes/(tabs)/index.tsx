@@ -332,7 +332,6 @@ export default function CampaignList() {
               </Pressable>
             );
           })}
-          {saves.length === 0 && archived.length === 0 ? <BodyText tone="muted">No playthrough exists</BodyText> : null}
           {showStart ? (
             <Panel>
               <Text className="font-display text-title text-bone">{nameOf(FELLOWSHIP_ID)}</Text>

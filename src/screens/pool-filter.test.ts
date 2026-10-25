@@ -5,6 +5,7 @@ import {
   cycleGroups,
   emptyPoolFilter,
   filterPool,
+  sortPool,
   filterSheetAnimation,
   packChooserRows,
   shownCost,
@@ -32,6 +33,18 @@ function card(overrides: Partial<PoolCard> & Pick<PoolCard, "code" | "name">): P
     ...overrides,
   };
 }
+
+describe("sortPool", () => {
+  it("files a tagged printing under its name, after the untagged one", () => {
+    const names = sortPool([
+      { code: "3", name: "(MotK) Aragorn" },
+      { code: "2", name: "Beorn" },
+      { code: "1", name: "Aragorn" },
+      { code: "4", name: "(MotK) Anborn" },
+    ]).map((card) => card.name);
+    expect(names).toEqual(["(MotK) Anborn", "Aragorn", "(MotK) Aragorn", "Beorn"]);
+  });
+});
 
 describe("filterPool", () => {
   const groups = cycleGroups(packs);
