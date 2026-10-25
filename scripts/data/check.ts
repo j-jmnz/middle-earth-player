@@ -35,7 +35,7 @@ process.env.ICON_MODULES_OUT = path.join(scratch, "icon-modules");
 build(path.join(scratch, "data"));
 
 const problems = [
-  ...["cards", "scenarios", "campaigns"].flatMap((dir) => compare(`data/${dir}`, path.join(DATA_DIR, dir), path.join(scratch, "data", dir))),
+  ...["cards", "scenarios", "campaigns", "decks"].flatMap((dir) => compare(`data/${dir}`, path.join(DATA_DIR, dir), path.join(scratch, "data", dir))),
   ...compare("data/rules", path.join(DATA_DIR, "rules"), path.join(scratch, "data", "rules"), (name) => name.endsWith(".json") || name.endsWith(".md")),
   ...compare("src/effects/generated", path.join(ROOT, "src", "effects", "generated"), path.join(scratch, "effects")),
   ...compare("assets/icons", path.join(ROOT, "assets", "icons"), path.join(scratch, "icons")),

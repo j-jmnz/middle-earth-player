@@ -1,0 +1,1022 @@
+[
+  {
+    "id": "core-leadership",
+    "name": "Leadership Deck",
+    "product": "RevCore",
+    "productName": "Revised Core Set",
+    "source": "ltp.starter-decks",
+    "heroes": [
+      "01001",
+      "01002",
+      "01003"
+    ],
+    "cards": [
+      {
+        "code": "01013",
+        "count": 3
+      },
+      {
+        "code": "01014",
+        "count": 3
+      },
+      {
+        "code": "01015",
+        "count": 3
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "01017",
+        "count": 3
+      },
+      {
+        "code": "01018",
+        "count": 3
+      },
+      {
+        "code": "01019",
+        "count": 3
+      },
+      {
+        "code": "01020",
+        "count": 3
+      },
+      {
+        "code": "01021",
+        "count": 3
+      },
+      {
+        "code": "01022",
+        "count": 3
+      },
+      {
+        "code": "01023",
+        "count": 3
+      },
+      {
+        "code": "01024",
+        "count": 3
+      },
+      {
+        "code": "01025",
+        "count": 3
+      },
+      {
+        "code": "01026",
+        "count": 3
+      },
+      {
+        "code": "01027",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "core-tactics",
+    "name": "Tactics Deck",
+    "product": "RevCore",
+    "productName": "Revised Core Set",
+    "source": "ltp.starter-decks",
+    "heroes": [
+      "01004",
+      "01005",
+      "01006"
+    ],
+    "cards": [
+      {
+        "code": "01028",
+        "count": 3
+      },
+      {
+        "code": "01029",
+        "count": 3
+      },
+      {
+        "code": "01030",
+        "count": 3
+      },
+      {
+        "code": "01031",
+        "count": 3
+      },
+      {
+        "code": "01032",
+        "count": 3
+      },
+      {
+        "code": "01033",
+        "count": 3
+      },
+      {
+        "code": "01034",
+        "count": 3
+      },
+      {
+        "code": "01035",
+        "count": 3
+      },
+      {
+        "code": "01036",
+        "count": 3
+      },
+      {
+        "code": "01037",
+        "count": 3
+      },
+      {
+        "code": "01038",
+        "count": 3
+      },
+      {
+        "code": "01039",
+        "count": 3
+      },
+      {
+        "code": "01040",
+        "count": 3
+      },
+      {
+        "code": "01041",
+        "count": 3
+      },
+      {
+        "code": "01042",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "core-spirit",
+    "name": "Spirit Deck",
+    "product": "RevCore",
+    "productName": "Revised Core Set",
+    "source": "ltp.starter-decks",
+    "heroes": [
+      "01007",
+      "01008",
+      "01009"
+    ],
+    "cards": [
+      {
+        "code": "01043",
+        "count": 3
+      },
+      {
+        "code": "01044",
+        "count": 3
+      },
+      {
+        "code": "01045",
+        "count": 3
+      },
+      {
+        "code": "01046",
+        "count": 3
+      },
+      {
+        "code": "01047",
+        "count": 3
+      },
+      {
+        "code": "01048",
+        "count": 3
+      },
+      {
+        "code": "01049",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 3
+      },
+      {
+        "code": "01051",
+        "count": 3
+      },
+      {
+        "code": "01052",
+        "count": 3
+      },
+      {
+        "code": "01053",
+        "count": 3
+      },
+      {
+        "code": "01054",
+        "count": 3
+      },
+      {
+        "code": "01055",
+        "count": 3
+      },
+      {
+        "code": "01056",
+        "count": 3
+      },
+      {
+        "code": "01057",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "core-lore",
+    "name": "Lore Deck",
+    "product": "RevCore",
+    "productName": "Revised Core Set",
+    "source": "ltp.starter-decks",
+    "heroes": [
+      "01010",
+      "01011",
+      "01012"
+    ],
+    "cards": [
+      {
+        "code": "01058",
+        "count": 3
+      },
+      {
+        "code": "01059",
+        "count": 3
+      },
+      {
+        "code": "01060",
+        "count": 3
+      },
+      {
+        "code": "01061",
+        "count": 3
+      },
+      {
+        "code": "01062",
+        "count": 3
+      },
+      {
+        "code": "01063",
+        "count": 3
+      },
+      {
+        "code": "01064",
+        "count": 3
+      },
+      {
+        "code": "01065",
+        "count": 3
+      },
+      {
+        "code": "01066",
+        "count": 3
+      },
+      {
+        "code": "01067",
+        "count": 3
+      },
+      {
+        "code": "01068",
+        "count": 3
+      },
+      {
+        "code": "01069",
+        "count": 3
+      },
+      {
+        "code": "01070",
+        "count": 3
+      },
+      {
+        "code": "01071",
+        "count": 3
+      },
+      {
+        "code": "01072",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "dwarves-of-durin",
+    "name": "Dwarves of Durin",
+    "product": "DoD",
+    "productName": "Dwarves of Durin",
+    "source": "dragncards:starterDwarves",
+    "heroes": [
+      "02116",
+      "131004",
+      "03002"
+    ],
+    "cards": [
+      {
+        "code": "04035",
+        "count": 1
+      },
+      {
+        "code": "131009",
+        "count": 2
+      },
+      {
+        "code": "01059",
+        "count": 3
+      },
+      {
+        "code": "03011",
+        "count": 3
+      },
+      {
+        "code": "12066",
+        "count": 3
+      },
+      {
+        "code": "06141",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "132006",
+        "count": 2
+      },
+      {
+        "code": "04102",
+        "count": 3
+      },
+      {
+        "code": "01061",
+        "count": 2
+      },
+      {
+        "code": "131011",
+        "count": 2
+      },
+      {
+        "code": "04109",
+        "count": 2
+      },
+      {
+        "code": "132018",
+        "count": 3
+      },
+      {
+        "code": "04061",
+        "count": 2
+      },
+      {
+        "code": "03003",
+        "count": 2
+      },
+      {
+        "code": "131013",
+        "count": 2
+      },
+      {
+        "code": "131014",
+        "count": 2
+      },
+      {
+        "code": "06143",
+        "count": 3
+      },
+      {
+        "code": "04030",
+        "count": 2
+      },
+      {
+        "code": "04129",
+        "count": 3
+      },
+      {
+        "code": "03004",
+        "count": 2
+      }
+    ],
+    "sideboard": [
+      {
+        "code": "04035",
+        "count": 2
+      },
+      {
+        "code": "131009",
+        "count": 1
+      },
+      {
+        "code": "132006",
+        "count": 1
+      },
+      {
+        "code": "131011",
+        "count": 1
+      },
+      {
+        "code": "04109",
+        "count": 1
+      },
+      {
+        "code": "04061",
+        "count": 1
+      },
+      {
+        "code": "03003",
+        "count": 1
+      },
+      {
+        "code": "131013",
+        "count": 1
+      },
+      {
+        "code": "131014",
+        "count": 1
+      },
+      {
+        "code": "04030",
+        "count": 1
+      },
+      {
+        "code": "03004",
+        "count": 1
+      },
+      {
+        "code": "131003",
+        "count": 1
+      },
+      {
+        "code": "131007",
+        "count": 3
+      },
+      {
+        "code": "131006",
+        "count": 3
+      },
+      {
+        "code": "03009",
+        "count": 3
+      },
+      {
+        "code": "16004",
+        "count": 3
+      },
+      {
+        "code": "17007",
+        "count": 3
+      },
+      {
+        "code": "17143",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": "elves-of-lorien",
+    "name": "Elves of Lórien",
+    "product": "EoL",
+    "productName": "Elves of Lórien",
+    "source": "dragncards:starterElves",
+    "heroes": [
+      "08001",
+      "08112",
+      "08056"
+    ],
+    "cards": [
+      {
+        "code": "08065",
+        "count": 3
+      },
+      {
+        "code": "08063",
+        "count": 3
+      },
+      {
+        "code": "08117",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "16003",
+        "count": 3
+      },
+      {
+        "code": "01060",
+        "count": 2
+      },
+      {
+        "code": "02123",
+        "count": 2
+      },
+      {
+        "code": "08002",
+        "count": 3
+      },
+      {
+        "code": "08114",
+        "count": 2
+      },
+      {
+        "code": "06037",
+        "count": 2
+      },
+      {
+        "code": "02102",
+        "count": 2
+      },
+      {
+        "code": "08064",
+        "count": 2
+      },
+      {
+        "code": "08121",
+        "count": 3
+      },
+      {
+        "code": "08058",
+        "count": 3
+      },
+      {
+        "code": "08092",
+        "count": 2
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "04108",
+        "count": 2
+      },
+      {
+        "code": "04059",
+        "count": 2
+      },
+      {
+        "code": "08027",
+        "count": 3
+      },
+      {
+        "code": "22036",
+        "count": 2
+      },
+      {
+        "code": "08009",
+        "count": 2
+      }
+    ],
+    "sideboard": [
+      {
+        "code": "02123",
+        "count": 1
+      },
+      {
+        "code": "08114",
+        "count": 1
+      },
+      {
+        "code": "06037",
+        "count": 1
+      },
+      {
+        "code": "02102",
+        "count": 1
+      },
+      {
+        "code": "08064",
+        "count": 1
+      },
+      {
+        "code": "08092",
+        "count": 1
+      },
+      {
+        "code": "04108",
+        "count": 1
+      },
+      {
+        "code": "04059",
+        "count": 1
+      },
+      {
+        "code": "22036",
+        "count": 1
+      },
+      {
+        "code": "08009",
+        "count": 1
+      },
+      {
+        "code": "08087",
+        "count": 3
+      },
+      {
+        "code": "08028",
+        "count": 3
+      },
+      {
+        "code": "08088",
+        "count": 3
+      },
+      {
+        "code": "04131",
+        "count": 3
+      },
+      {
+        "code": "08060",
+        "count": 3
+      },
+      {
+        "code": "04137",
+        "count": 3
+      },
+      {
+        "code": "04128",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": "defenders-of-gondor",
+    "name": "Defenders of Gondor",
+    "product": "DoG",
+    "productName": "Defenders of Gondor",
+    "source": "dragncards:starterGondor",
+    "heroes": [
+      "05002",
+      "02050",
+      "08084"
+    ],
+    "cards": [
+      {
+        "code": "22028",
+        "count": 2
+      },
+      {
+        "code": "22002",
+        "count": 3
+      },
+      {
+        "code": "05004",
+        "count": 2
+      },
+      {
+        "code": "05007",
+        "count": 3
+      },
+      {
+        "code": "06135",
+        "count": 2
+      },
+      {
+        "code": "05003",
+        "count": 2
+      },
+      {
+        "code": "01014",
+        "count": 2
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "01029",
+        "count": 2
+      },
+      {
+        "code": "05018",
+        "count": 3
+      },
+      {
+        "code": "06108",
+        "count": 3
+      },
+      {
+        "code": "08140",
+        "count": 1
+      },
+      {
+        "code": "06005",
+        "count": 2
+      },
+      {
+        "code": "08113",
+        "count": 1
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "22083",
+        "count": 3
+      },
+      {
+        "code": "06136",
+        "count": 3
+      },
+      {
+        "code": "05008",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "22029",
+        "count": 2
+      },
+      {
+        "code": "22003",
+        "count": 2
+      },
+      {
+        "code": "01024",
+        "count": 2
+      },
+      {
+        "code": "131015",
+        "count": 2
+      }
+    ],
+    "sideboard": [
+      {
+        "code": "22028",
+        "count": 1
+      },
+      {
+        "code": "05004",
+        "count": 1
+      },
+      {
+        "code": "06135",
+        "count": 1
+      },
+      {
+        "code": "05003",
+        "count": 1
+      },
+      {
+        "code": "08140",
+        "count": 2
+      },
+      {
+        "code": "06005",
+        "count": 1
+      },
+      {
+        "code": "08113",
+        "count": 2
+      },
+      {
+        "code": "05008",
+        "count": 1
+      },
+      {
+        "code": "22029",
+        "count": 1
+      },
+      {
+        "code": "22003",
+        "count": 1
+      },
+      {
+        "code": "131015",
+        "count": 1
+      },
+      {
+        "code": "05001",
+        "count": 1
+      },
+      {
+        "code": "06081",
+        "count": 1
+      },
+      {
+        "code": "17141",
+        "count": 3
+      },
+      {
+        "code": "05017",
+        "count": 3
+      },
+      {
+        "code": "06064",
+        "count": 3
+      },
+      {
+        "code": "17009",
+        "count": 3
+      },
+      {
+        "code": "22090",
+        "count": 1
+      },
+      {
+        "code": "04103",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": "riders-of-rohan",
+    "name": "Riders of Rohan",
+    "product": "RoR",
+    "productName": "Riders of Rohan",
+    "source": "dragncards:starterRohan",
+    "heroes": [
+      "07001",
+      "17055",
+      "22027"
+    ],
+    "cards": [
+      {
+        "code": "02030",
+        "count": 3
+      },
+      {
+        "code": "02055",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "06110",
+        "count": 1
+      },
+      {
+        "code": "01030",
+        "count": 2
+      },
+      {
+        "code": "17112",
+        "count": 3
+      },
+      {
+        "code": "02121",
+        "count": 3
+      },
+      {
+        "code": "02006",
+        "count": 2
+      },
+      {
+        "code": "07007",
+        "count": 2
+      },
+      {
+        "code": "22142",
+        "count": 3
+      },
+      {
+        "code": "07006",
+        "count": 3
+      },
+      {
+        "code": "02056",
+        "count": 2
+      },
+      {
+        "code": "08004",
+        "count": 2
+      },
+      {
+        "code": "22035",
+        "count": 2
+      },
+      {
+        "code": "17058",
+        "count": 1
+      },
+      {
+        "code": "22032",
+        "count": 2
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "02122",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "06138",
+        "count": 2
+      },
+      {
+        "code": "17085",
+        "count": 2
+      },
+      {
+        "code": "22062",
+        "count": 2
+      },
+      {
+        "code": "17005",
+        "count": 2
+      }
+    ],
+    "sideboard": [
+      {
+        "code": "06110",
+        "count": 2
+      },
+      {
+        "code": "02006",
+        "count": 1
+      },
+      {
+        "code": "07007",
+        "count": 1
+      },
+      {
+        "code": "02056",
+        "count": 1
+      },
+      {
+        "code": "08004",
+        "count": 1
+      },
+      {
+        "code": "22035",
+        "count": 1
+      },
+      {
+        "code": "22032",
+        "count": 1
+      },
+      {
+        "code": "02122",
+        "count": 1
+      },
+      {
+        "code": "06138",
+        "count": 1
+      },
+      {
+        "code": "17085",
+        "count": 1
+      },
+      {
+        "code": "22062",
+        "count": 1
+      },
+      {
+        "code": "17005",
+        "count": 1
+      },
+      {
+        "code": "17081",
+        "count": 1
+      },
+      {
+        "code": "02077",
+        "count": 3
+      },
+      {
+        "code": "06137",
+        "count": 3
+      },
+      {
+        "code": "06139",
+        "count": 3
+      },
+      {
+        "code": "07008",
+        "count": 3
+      },
+      {
+        "code": "08116",
+        "count": 3
+      }
+    ]
+  }
+]

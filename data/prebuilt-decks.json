@@ -1,0 +1,10 @@
+[
+  {"id": "core-leadership", "name": "Leadership Deck", "product": "RevCore", "span": "ltp.starter-decks", "heroes": ["Aragorn", "Théodred", "Glóin"], "collectors": {"from": 13, "to": 27}, "plus": [{"collector": 73, "count": 2}], "dragncards": "coreLeadership"},
+  {"id": "core-tactics", "name": "Tactics Deck", "product": "RevCore", "span": "ltp.starter-decks", "heroes": ["Gimli", "Legolas", "Thalin"], "collectors": {"from": 28, "to": 42}, "plus": [{"collector": 73, "count": 2}], "dragncards": "coreTactics"},
+  {"id": "core-spirit", "name": "Spirit Deck", "product": "RevCore", "span": "ltp.starter-decks", "heroes": ["Éowyn", "Eleanor", "Dúnhere"], "collectors": {"from": 43, "to": 57}, "plus": [{"collector": 73, "count": 2}], "dragncards": "coreSpirit"},
+  {"id": "core-lore", "name": "Lore Deck", "product": "RevCore", "span": "ltp.starter-decks", "heroes": ["Denethor", "Glorfindel", "Beravor"], "collectors": {"from": 58, "to": 72}, "plus": [{"collector": 73, "count": 2}], "dragncards": "coreLore"},
+  {"id": "dwarves-of-durin", "name": "Dwarves of Durin", "product": "DoD", "dragncards": "starterDwarves"},
+  {"id": "elves-of-lorien", "name": "Elves of Lórien", "product": "EoL", "dragncards": "starterElves"},
+  {"id": "defenders-of-gondor", "name": "Defenders of Gondor", "product": "DoG", "dragncards": "starterGondor"},
+  {"id": "riders-of-rohan", "name": "Riders of Rohan", "product": "RoR", "dragncards": "starterRohan"}
+]

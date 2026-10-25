@@ -1,11 +1,12 @@
 import { eq } from "drizzle-orm";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
+import { FlashList } from "@shopify/flash-list";
 import { TextInput, View } from "react-native";
 
 import { deckSaveRefusal, type DeckSaveCard } from "../../catalog/deck-save";
 import { cards } from "../../catalog/schema";
-import { BodyText, NavBar, PrimaryButton, Screen } from "../chrome";
+import { BodyText, Eyebrow, ListRow, NavBar, PrimaryButton, Screen } from "../chrome";
 import { replaceDeckDraft } from "../deck-draft";
 import {
   buildDecklist,
@@ -14,7 +15,11 @@ import {
   droppedSentence,
   importSavedSentence,
   parseDecklistRef,
+  prebuiltBody,
+  prebuiltDecks,
+  prebuiltDetail,
   readDecklistBody,
+  type BuiltDecklist,
 } from "../deck-import";
 import { useDatabases } from "../databases";
 import { palette } from "../palette.js";
@@ -93,57 +98,72 @@ export default function DeckImportScreen() {
       }
       const built = buildDecklist(body, pool);
       const names = await Promise.all(built.droppedCodes.map((code) => droppedName(code)));
-      const sentence = droppedSentence(names);
-      if (sentence) setDropped(sentence);
-      if (built.heroLimit) {
-        setMessage(`${built.heroLimit.cardName} Deck limit is 1.`);
-        return;
-      }
-      const facts = new Map<string, DeckSaveCard>();
-      for (const code of [...built.heroes, ...built.cards.map((card) => card.code)]) {
-        const row = pool.get(code);
-        if (!row) continue;
-        facts.set(code, {
-          name: row.name,
-          typeCode: row.typeCode,
-          sphereCode: row.sphereCode,
-          deckLimit: row.deckLimit,
-          deckLegal: row.deckLegal,
-          traits: row.traits,
-        });
-      }
-      const draft = {
-        id: "new",
-        name: built.name,
-        heroes: built.heroes,
-        cards: built.cards,
-        heldRefusal: null,
-        droppedNote: sentence,
-      };
-      const refusal = built.name.trim().length === 0
-        ? { cardCode: null, cardName: null, rule: "Name the deck." }
-        : deckSaveRefusal(built.heroes, built.cards, facts, []);
-      if (refusal) {
-        replaceDeckDraft(draft);
-        router.push({ pathname: "/deck/[id]", params: { id: "new" } });
-        return;
-      }
-      user.insert(decks).values({
-        id: crypto.randomUUID(),
-        name: built.name.trim(),
-        heroes: [...built.heroes],
-        cards: built.cards.map((card) => ({ code: card.code, count: card.count })),
-      }).run();
-      if (sentence) {
-        setSaved(true);
-        setDropped(null);
-        setSavedNote(importSavedSentence(names));
-        return;
-      }
-      goBack(router, "/decks");
+      save(built, names);
     } finally {
       setBusy(false);
     }
+  }
+
+  // A pre-built deck is local data: no fetch, and every code is in the catalog the same build wrote.
+  function onPrebuilt(index: number): void {
+    const deck = prebuiltDecks[index];
+    if (busy || saved || !deck) return;
+    setMessage(null);
+    setDropped(null);
+    const built = buildDecklist(prebuiltBody(deck), pool);
+    save(built, built.droppedCodes);
+  }
+
+  // Saves the deck when the deckbuilding rules allow it; otherwise opens it in the editor with the refusal held.
+  function save(built: BuiltDecklist, names: readonly string[]): void {
+    const sentence = droppedSentence(names);
+    if (sentence) setDropped(sentence);
+    if (built.heroLimit) {
+      setMessage(`${built.heroLimit.cardName} Deck limit is 1.`);
+      return;
+    }
+    const facts = new Map<string, DeckSaveCard>();
+    for (const code of [...built.heroes, ...built.cards.map((card) => card.code)]) {
+      const row = pool.get(code);
+      if (!row) continue;
+      facts.set(code, {
+        name: row.name,
+        typeCode: row.typeCode,
+        sphereCode: row.sphereCode,
+        deckLimit: row.deckLimit,
+        deckLegal: row.deckLegal,
+        traits: row.traits,
+      });
+    }
+    const draft = {
+      id: "new",
+      name: built.name,
+      heroes: built.heroes,
+      cards: built.cards,
+      heldRefusal: null,
+      droppedNote: sentence,
+    };
+    const refusal = built.name.trim().length === 0
+      ? { cardCode: null, cardName: null, rule: "Name the deck." }
+      : deckSaveRefusal(built.heroes, built.cards, facts, []);
+    if (refusal) {
+      replaceDeckDraft(draft);
+      router.push({ pathname: "/deck/[id]", params: { id: "new" } });
+      return;
+    }
+    user.insert(decks).values({
+      id: crypto.randomUUID(),
+      name: built.name.trim(),
+      heroes: [...built.heroes],
+      cards: built.cards.map((card) => ({ code: card.code, count: card.count })),
+    }).run();
+    if (sentence) {
+      setSaved(true);
+      setDropped(null);
+      setSavedNote(importSavedSentence(names));
+      return;
+    }
+    goBack(router, "/decks");
   }
 
   return (
@@ -178,6 +198,19 @@ export default function DeckImportScreen() {
       ) : null}
       <View className="mt-6">
         <PrimaryButton testID="deck-import-submit" label="Import" disabled={busy || saved} onPress={() => void onImport()} />
+      </View>
+      <View className="mt-8">
+        <Eyebrow tone="muted">Pre-built</Eyebrow>
+      </View>
+      <View className="mt-2 min-h-0 flex-1">
+        <FlashList
+          data={prebuiltDecks}
+          keyExtractor={(item) => item.id}
+          style={{ flex: 1 }}
+          renderItem={({ item, index }) => (
+            <ListRow testID={`deck-prebuilt-${item.id}`} label={item.name} detail={prebuiltDetail(item)} onPress={() => onPrebuilt(index)} />
+          )}
+        />
       </View>
     </Screen>
   );
