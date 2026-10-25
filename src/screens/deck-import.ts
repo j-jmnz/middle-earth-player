@@ -143,7 +143,30 @@ export function prebuiltBody(deck: PrebuiltDeck): DecklistBody {
   };
 }
 
-/** The product and the heroes, so a row says what the player is choosing before it opens. */
+// The product's own title, when the group heading and the deck's name do not already say it: "Angmar Awakened" for a
+// Dúnedain deck, nothing for "The Road Darkens I" or a Starter Deck.
+function productTitle(deck: PrebuiltDeck): string | null {
+  const title = deck.productName.replace(/^The Hobbit: /, "").replace(/ (Hero|Saga) Expansion$| Starter Deck$/, "");
+  if (deck.group === "Core Set" || deck.group === "Community Deck Lists" || deck.name.startsWith(title)) return null;
+  return title;
+}
+
+/** The heroes, after the product when the row does not already name it, so a row says what the player is choosing. */
 export function prebuiltDetail(deck: PrebuiltDeck, heroName: (code: string) => string): string {
-  return `${deck.productName} · ${deck.heroes.map(heroName).join(", ")}`;
+  const heroes = deck.heroes.map(heroName).join(", ");
+  const title = productTitle(deck);
+  return title ? `${title} · ${heroes}` : heroes;
+}
+
+export type PrebuiltRow = { kind: "group"; title: string } | { kind: "deck"; deck: PrebuiltDeck };
+
+/** The list the import screen draws: each group's heading, then its decks. */
+export function prebuiltRows(decks: readonly PrebuiltDeck[]): PrebuiltRow[] {
+  const rows: PrebuiltRow[] = [];
+  for (const deck of decks) {
+    const last = rows.at(-1);
+    if (!last || (last.kind === "deck" ? last.deck.group : last.title) !== deck.group) rows.push({ kind: "group", title: deck.group });
+    rows.push({ kind: "deck", deck });
+  }
+  return rows;
 }

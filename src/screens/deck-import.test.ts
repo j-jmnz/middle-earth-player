@@ -8,6 +8,7 @@ import {
   prebuiltBody,
   prebuiltDecks,
   prebuiltDetail,
+  prebuiltRows,
   readDecklistBody,
   type PoolFact,
 } from "./deck-import.ts";
@@ -128,11 +129,35 @@ describe("pre-built decks", () => {
     expect(Object.keys(body.heroes).sort()).toEqual([...rohan.heroes].sort());
     expect(Object.values(body.slots).reduce((total, count) => total + count, 0)).toBe(50);
     const names: Record<string, string> = { "07001": "Éomer", "17055": "Hirgon", "22027": "Lothíriel" };
-    expect(prebuiltDetail(rohan, (code) => names[code] ?? code)).toBe("Riders of Rohan Starter Deck · Éomer, Hirgon, Lothíriel");
+    expect(prebuiltDetail(rohan, (code) => names[code] ?? code)).toBe("Éomer, Hirgon, Lothíriel");
   });
 
   it("lists the four Learn to Play core decks first, then the printed decklists", () => {
     expect(prebuiltDecks.slice(0, 5).map((deck) => deck.id)).toEqual(["core-leadership", "core-tactics", "core-spirit", "core-lore", "dwarves-of-durin"]);
     expect(prebuiltDecks.length).toBe(35);
+  });
+
+  it("names the product in the detail only when the group and the name do not", () => {
+    const named = (id: string) => prebuiltDetail(prebuiltDecks.find((deck) => deck.id === id)!, () => "H");
+    expect(named("dunedain")).toBe("Angmar Awakened · H, H, H");
+    expect(named("valor-and-vigilance")).toBe("The Return of the King · H, H, H");
+    expect(named("over-hill-1")).toBe("H, H, H");
+    expect(named("road-darkens-1")).toBe("H, H, H");
+    expect(named("core-lore")).toBe("H, H, H");
+    expect(named("the-red-arrow")).toBe("H, H, H");
+  });
+
+  it("puts each group's heading before its decks, once", () => {
+    const rows = prebuiltRows(prebuiltDecks);
+    expect(rows.filter((row) => row.kind === "group").map((row) => (row.kind === "group" ? row.title : ""))).toEqual([
+      "Core Set",
+      "Starter Decks",
+      "Hero Expansions",
+      "Saga Expansions",
+      "Original Saga Expansions",
+      "The Hobbit",
+      "Community Deck Lists",
+    ]);
+    expect(rows.filter((row) => row.kind === "deck")).toHaveLength(35);
   });
 });

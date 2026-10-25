@@ -2,6 +2,7 @@
   {
     "id": "core-leadership",
     "name": "Leadership Deck",
+    "group": "Core Set",
     "product": "RevCore",
     "productName": "Revised Core Set",
     "source": "ltp.starter-decks",
@@ -76,11 +77,13 @@
         "count": 2
       }
     ],
-    "sideboard": []
+    "sideboard": [],
+    "note": "The Learn to Play prints this deck with 47 cards. Add 3 to save it."
   },
   {
     "id": "core-tactics",
     "name": "Tactics Deck",
+    "group": "Core Set",
     "product": "RevCore",
     "productName": "Revised Core Set",
     "source": "ltp.starter-decks",
@@ -155,11 +158,13 @@
         "count": 2
       }
     ],
-    "sideboard": []
+    "sideboard": [],
+    "note": "The Learn to Play prints this deck with 47 cards. Add 3 to save it."
   },
   {
     "id": "core-spirit",
     "name": "Spirit Deck",
+    "group": "Core Set",
     "product": "RevCore",
     "productName": "Revised Core Set",
     "source": "ltp.starter-decks",
@@ -234,11 +239,13 @@
         "count": 2
       }
     ],
-    "sideboard": []
+    "sideboard": [],
+    "note": "The Learn to Play prints this deck with 47 cards. Add 3 to save it."
   },
   {
     "id": "core-lore",
     "name": "Lore Deck",
+    "group": "Core Set",
     "product": "RevCore",
     "productName": "Revised Core Set",
     "source": "ltp.starter-decks",
@@ -313,11 +320,13 @@
         "count": 2
       }
     ],
-    "sideboard": []
+    "sideboard": [],
+    "note": "The Learn to Play prints this deck with 47 cards. Add 3 to save it."
   },
   {
     "id": "dwarves-of-durin",
     "name": "Dwarves of Durin",
+    "group": "Starter Decks",
     "product": "DoD",
     "productName": "Dwarves of Durin Starter Deck",
     "source": "decklist.mec103-dwarves",
@@ -490,6 +499,7 @@
   {
     "id": "elves-of-lorien",
     "name": "Elves of Lórien",
+    "group": "Starter Decks",
     "product": "EoL",
     "productName": "Elves of Lórien Starter Deck",
     "source": "decklist.mec104-elves",
@@ -658,6 +668,7 @@
   {
     "id": "defenders-of-gondor",
     "name": "Defenders of Gondor",
+    "group": "Starter Decks",
     "product": "DoG",
     "productName": "Defenders of Gondor Starter Deck",
     "source": "decklist.mec105-gondor",
@@ -842,6 +853,7 @@
   {
     "id": "riders-of-rohan",
     "name": "Riders of Rohan",
+    "group": "Starter Decks",
     "product": "RoR",
     "productName": "Riders of Rohan Starter Deck",
     "source": "decklist.mec106-rohan",
@@ -1022,6 +1034,7 @@
   {
     "id": "dunedain",
     "name": "Dúnedain",
+    "group": "Hero Expansions",
     "productName": "Angmar Awakened Hero Expansion",
     "source": "decklist.mec107-dunedain",
     "heroes": [
@@ -1132,6 +1145,7 @@
   {
     "id": "angmar-elves",
     "name": "Elves",
+    "group": "Hero Expansions",
     "productName": "Angmar Awakened Hero Expansion",
     "source": "decklist.mec107-elves",
     "heroes": [
@@ -1238,6 +1252,7 @@
   {
     "id": "ruling-steward",
     "name": "Ruling Steward",
+    "group": "Hero Expansions",
     "productName": "Dream-chaser Hero Expansion",
     "source": "decklist.mec110-ruling-steward",
     "heroes": [
@@ -1348,6 +1363,7 @@
   {
     "id": "elf-friend",
     "name": "Elf-friend",
+    "group": "Hero Expansions",
     "productName": "Dream-chaser Hero Expansion",
     "source": "decklist.mec110-elf-friend",
     "heroes": [
@@ -1444,8 +1460,207 @@
     "sideboard": []
   },
   {
+    "id": "lords-of-dale",
+    "name": "Lords of Dale",
+    "group": "Hero Expansions",
+    "productName": "Ered Mithrin Hero Expansion",
+    "source": "decklist.mec114-lords-of-dale",
+    "heroes": [
+      "18001",
+      "18002",
+      "01007"
+    ],
+    "cards": [
+      {
+        "code": "19002",
+        "count": 3
+      },
+      {
+        "code": "18003",
+        "count": 3
+      },
+      {
+        "code": "19027",
+        "count": 2
+      },
+      {
+        "code": "19091",
+        "count": 2
+      },
+      {
+        "code": "19008",
+        "count": 3
+      },
+      {
+        "code": "18004",
+        "count": 3
+      },
+      {
+        "code": "19033",
+        "count": 3
+      },
+      {
+        "code": "01014",
+        "count": 1
+      },
+      {
+        "code": "01045",
+        "count": 2
+      },
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "18007",
+        "count": 2
+      },
+      {
+        "code": "19058",
+        "count": 1
+      },
+      {
+        "code": "19003",
+        "count": 3
+      },
+      {
+        "code": "18009",
+        "count": 2
+      },
+      {
+        "code": "18008",
+        "count": 2
+      },
+      {
+        "code": "19029",
+        "count": 1
+      },
+      {
+        "code": "18010",
+        "count": 3
+      },
+      {
+        "code": "18011",
+        "count": 1
+      },
+      {
+        "code": "19147",
+        "count": 2
+      },
+      {
+        "code": "18012",
+        "count": 2
+      },
+      {
+        "code": "01023",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 3
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "guardians-of-the-wild",
+    "name": "Guardians of the Wild",
+    "group": "Hero Expansions",
+    "productName": "Ered Mithrin Hero Expansion",
+    "source": "decklist.mec114-guardians-of-the-wild",
+    "heroes": [
+      "19001",
+      "19145",
+      "01012"
+    ],
+    "cards": [
+      {
+        "code": "19146",
+        "count": 2
+      },
+      {
+        "code": "19004",
+        "count": 3
+      },
+      {
+        "code": "19061",
+        "count": 3
+      },
+      {
+        "code": "19031",
+        "count": 2
+      },
+      {
+        "code": "19059",
+        "count": 2
+      },
+      {
+        "code": "19148",
+        "count": 3
+      },
+      {
+        "code": "19087",
+        "count": 3
+      },
+      {
+        "code": "01031",
+        "count": 2
+      },
+      {
+        "code": "01059",
+        "count": 3
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "01062",
+        "count": 2
+      },
+      {
+        "code": "19006",
+        "count": 3
+      },
+      {
+        "code": "19030",
+        "count": 3
+      },
+      {
+        "code": "19154",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 3
+      },
+      {
+        "code": "01072",
+        "count": 2
+      },
+      {
+        "code": "19005",
+        "count": 3
+      },
+      {
+        "code": "01034",
+        "count": 3
+      },
+      {
+        "code": "01064",
+        "count": 3
+      },
+      {
+        "code": "01066",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
     "id": "ents-and-friends",
     "name": "Ents and Friends",
+    "group": "Saga Expansions",
     "productName": "The Two Towers Saga Expansion",
     "source": "decklist.mec112-ents-and-friends",
     "heroes": [
@@ -1540,6 +1755,7 @@
   {
     "id": "king-of-rohan-rides",
     "name": "The King of Rohan Rides",
+    "group": "Saga Expansions",
     "productName": "The Two Towers Saga Expansion",
     "source": "decklist.mec112-king-of-rohan",
     "heroes": [
@@ -1638,6 +1854,7 @@
   {
     "id": "foresight-and-fortitude",
     "name": "Foresight and Fortitude",
+    "group": "Saga Expansions",
     "productName": "The Return of the King Saga Expansion",
     "source": "decklist.mec113-foresight",
     "heroes": [
@@ -1744,6 +1961,7 @@
   {
     "id": "valor-and-vigilance",
     "name": "Valor and Vigilance",
+    "group": "Saga Expansions",
     "productName": "The Return of the King Saga Expansion",
     "source": "decklist.mec113-valor",
     "heroes": [
@@ -1838,207 +2056,12 @@
       }
     ],
     "sideboard": [],
-    "note": "The rulebook says: include Gandalf instead of Elfhelm if no other player is playing the Gandalf hero; include Banner of Elendil if playing with Aragorn, and Fellowship of the Ring if playing with the Ring-bearer. This list takes Gandalf and Fellowship of the Ring: 50 cards."
-  },
-  {
-    "id": "lords-of-dale",
-    "name": "Lords of Dale",
-    "productName": "Ered Mithrin Hero Expansion",
-    "source": "decklist.mec114-lords-of-dale",
-    "heroes": [
-      "18001",
-      "18002",
-      "01007"
-    ],
-    "cards": [
-      {
-        "code": "19002",
-        "count": 3
-      },
-      {
-        "code": "18003",
-        "count": 3
-      },
-      {
-        "code": "19027",
-        "count": 2
-      },
-      {
-        "code": "19091",
-        "count": 2
-      },
-      {
-        "code": "19008",
-        "count": 3
-      },
-      {
-        "code": "18004",
-        "count": 3
-      },
-      {
-        "code": "19033",
-        "count": 3
-      },
-      {
-        "code": "01014",
-        "count": 1
-      },
-      {
-        "code": "01045",
-        "count": 2
-      },
-      {
-        "code": "01073",
-        "count": 3
-      },
-      {
-        "code": "18007",
-        "count": 2
-      },
-      {
-        "code": "19058",
-        "count": 1
-      },
-      {
-        "code": "19003",
-        "count": 3
-      },
-      {
-        "code": "18009",
-        "count": 2
-      },
-      {
-        "code": "18008",
-        "count": 2
-      },
-      {
-        "code": "19029",
-        "count": 1
-      },
-      {
-        "code": "18010",
-        "count": 3
-      },
-      {
-        "code": "18011",
-        "count": 1
-      },
-      {
-        "code": "19147",
-        "count": 2
-      },
-      {
-        "code": "18012",
-        "count": 2
-      },
-      {
-        "code": "01023",
-        "count": 3
-      },
-      {
-        "code": "01050",
-        "count": 3
-      }
-    ],
-    "sideboard": []
-  },
-  {
-    "id": "guardians-of-the-wild",
-    "name": "Guardians of the Wild",
-    "productName": "Ered Mithrin Hero Expansion",
-    "source": "decklist.mec114-guardians-of-the-wild",
-    "heroes": [
-      "19001",
-      "19145",
-      "01012"
-    ],
-    "cards": [
-      {
-        "code": "19146",
-        "count": 2
-      },
-      {
-        "code": "19004",
-        "count": 3
-      },
-      {
-        "code": "19061",
-        "count": 3
-      },
-      {
-        "code": "19031",
-        "count": 2
-      },
-      {
-        "code": "19059",
-        "count": 2
-      },
-      {
-        "code": "19148",
-        "count": 3
-      },
-      {
-        "code": "19087",
-        "count": 3
-      },
-      {
-        "code": "01031",
-        "count": 2
-      },
-      {
-        "code": "01059",
-        "count": 3
-      },
-      {
-        "code": "01060",
-        "count": 1
-      },
-      {
-        "code": "01062",
-        "count": 2
-      },
-      {
-        "code": "19006",
-        "count": 3
-      },
-      {
-        "code": "19030",
-        "count": 3
-      },
-      {
-        "code": "19154",
-        "count": 2
-      },
-      {
-        "code": "01070",
-        "count": 3
-      },
-      {
-        "code": "01072",
-        "count": 2
-      },
-      {
-        "code": "19005",
-        "count": 3
-      },
-      {
-        "code": "01034",
-        "count": 3
-      },
-      {
-        "code": "01064",
-        "count": 3
-      },
-      {
-        "code": "01066",
-        "count": 2
-      }
-    ],
-    "sideboard": []
+    "note": "This list takes Gandalf and Fellowship of the Ring. The decklist allows Elfhelm instead of Gandalf, and Banner of Elendil with Aragorn."
   },
   {
     "id": "black-riders-hobbits",
     "name": "The Black Riders",
+    "group": "Original Saga Expansions",
     "productName": "The Black Riders Saga Expansion",
     "source": "decklist.tbr",
     "heroes": [
@@ -2153,6 +2176,7 @@
   {
     "id": "road-darkens-1",
     "name": "The Road Darkens I",
+    "group": "Original Saga Expansions",
     "productName": "The Road Darkens Saga Expansion",
     "source": "decklist.trd-1",
     "heroes": [
@@ -2267,6 +2291,7 @@
   {
     "id": "road-darkens-2",
     "name": "The Road Darkens II",
+    "group": "Original Saga Expansions",
     "productName": "The Road Darkens Saga Expansion",
     "source": "decklist.trd-2",
     "heroes": [
@@ -2381,6 +2406,7 @@
   {
     "id": "treason-of-saruman-1",
     "name": "The Treason of Saruman I",
+    "group": "Original Saga Expansions",
     "productName": "The Treason of Saruman Saga Expansion",
     "source": "decklist.tos-1",
     "heroes": [
@@ -2503,6 +2529,7 @@
   {
     "id": "treason-of-saruman-2",
     "name": "The Treason of Saruman II",
+    "group": "Original Saga Expansions",
     "productName": "The Treason of Saruman Saga Expansion",
     "source": "decklist.tos-2",
     "heroes": [
@@ -2621,6 +2648,7 @@
   {
     "id": "land-of-shadow",
     "name": "The Land of Shadow",
+    "group": "Original Saga Expansions",
     "productName": "The Land of Shadow Saga Expansion",
     "source": "decklist.los",
     "heroes": [
@@ -2743,6 +2771,7 @@
   {
     "id": "flame-of-the-west-1",
     "name": "The Flame of the West I",
+    "group": "Original Saga Expansions",
     "productName": "The Flame of the West Saga Expansion",
     "source": "decklist.fotw-1",
     "heroes": [
@@ -2869,6 +2898,7 @@
   {
     "id": "flame-of-the-west-2",
     "name": "The Flame of the West II",
+    "group": "Original Saga Expansions",
     "productName": "The Flame of the West Saga Expansion",
     "source": "decklist.fotw-2",
     "heroes": [
@@ -3003,6 +3033,7 @@
   {
     "id": "mountain-of-fire-1",
     "name": "The Mountain of Fire I",
+    "group": "Original Saga Expansions",
     "productName": "The Mountain of Fire Saga Expansion",
     "source": "decklist.mof-1",
     "heroes": [
@@ -3125,6 +3156,7 @@
   {
     "id": "mountain-of-fire-2",
     "name": "The Mountain of Fire II",
+    "group": "Original Saga Expansions",
     "productName": "The Mountain of Fire Saga Expansion",
     "source": "decklist.mof-2",
     "heroes": [
@@ -3251,6 +3283,7 @@
   {
     "id": "over-hill-1",
     "name": "Over Hill and Under Hill I",
+    "group": "The Hobbit",
     "productName": "The Hobbit: Over Hill and Under Hill",
     "source": "decklist.ohauh-1",
     "heroes": [
@@ -3357,6 +3390,7 @@
   {
     "id": "over-hill-2",
     "name": "Over Hill and Under Hill II",
+    "group": "The Hobbit",
     "productName": "The Hobbit: Over Hill and Under Hill",
     "source": "decklist.ohauh-2",
     "heroes": [
@@ -3463,6 +3497,7 @@
   {
     "id": "on-the-doorstep-1",
     "name": "On the Doorstep I",
+    "group": "The Hobbit",
     "productName": "The Hobbit: On the Doorstep",
     "source": "decklist.otd-1",
     "heroes": [
@@ -3573,6 +3608,7 @@
   {
     "id": "on-the-doorstep-2",
     "name": "On the Doorstep II",
+    "group": "The Hobbit",
     "productName": "The Hobbit: On the Doorstep",
     "source": "decklist.otd-2",
     "heroes": [
@@ -3683,6 +3719,7 @@
   {
     "id": "eomer-and-eowyn",
     "name": "Éomer and Éowyn",
+    "group": "Community Deck Lists",
     "productName": "Community Deck List",
     "source": "decklist.community-eomer-eowyn",
     "heroes": [
@@ -3773,6 +3810,7 @@
   {
     "id": "the-red-arrow",
     "name": "The Red Arrow",
+    "group": "Community Deck Lists",
     "productName": "Community Deck List",
     "source": "decklist.community-red-arrow",
     "heroes": [
@@ -3891,6 +3929,7 @@
   {
     "id": "swords-of-the-noldor",
     "name": "The Swords of the Noldor",
+    "group": "Community Deck Lists",
     "productName": "Community Deck List",
     "source": "decklist.community-noldor",
     "heroes": [

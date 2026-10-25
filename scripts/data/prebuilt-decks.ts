@@ -23,20 +23,26 @@ import type { RuleEntry } from "./rules/spans.ts";
 //   lists must equal DragnCards'.
 // `aliases` maps a name as printed to the card it means, with the reason: a misspelling, a name the card does not carry,
 // or a collector number that is not the card's.
+// The heading the import screen lists a deck under, in this order.
+export const PREBUILT_GROUPS = ["Core Set", "Starter Decks", "Hero Expansions", "Saga Expansions", "Original Saga Expansions", "The Hobbit", "Community Deck Lists"] as const;
+const groupSchema = z.enum(PREBUILT_GROUPS);
 const rangeSchema = z.strictObject({
   id: z.string().min(1),
   name: z.string().min(1),
+  group: groupSchema,
   product: z.string().min(1),
   span: z.string().min(1),
   heroes: z.array(z.string().min(1)).min(1).max(3),
   collectors: z.strictObject({ from: z.number().int().positive(), to: z.number().int().positive() }),
   plus: z.array(z.strictObject({ collector: z.number().int().positive(), count: z.number().int().positive() })),
   dragncards: z.string().min(1),
+  note: z.string().min(1).optional(),
 });
 const sectionSchema = z.enum(["hero", "ally", "attachment", "event", "player-side-quest"]);
 const printedSchema = z.strictObject({
   id: z.string().min(1),
   name: z.string().min(1),
+  group: groupSchema,
   productName: z.string().min(1),
   span: z.string().regex(/^decklist\./),
   sets: z.union([z.array(z.string().min(1)).min(1), z.literal("printed")]),
@@ -142,7 +148,7 @@ function rangeDeck(entry: RangeEntry, context: Context, fail: Fail): Lists {
   // The 2011 core set's 30-card lists: the same heroes and titles, fewer copies.
   sameAsDragnCards(entry.dragncards, { heroes, titles: deck }, context, fail);
   const collector = new Map(product.map((row) => [row.code, row.collector]));
-  return { heroes, deck, side: new Map(), source: entry.span, order: (code) => collector.get(code) ?? 0 };
+  return { heroes, deck, side: new Map(), source: entry.span, order: (code) => collector.get(code) ?? 0, ...(entry.note ? { note: entry.note } : {}) };
 }
 
 // The products a qualifier names: "The Voice of Isengard, Riders of Rohan".
@@ -268,6 +274,8 @@ export function loadPrebuiltDecks(raw: RawData, cards: readonly Card[], ruleEntr
   };
   const context: Context = { raw, byCode, entries: new Map(ruleEntries.map((entry) => [entry.id, entry])), aliases: index.aliases, dragn };
 
+  const groups = index.decks.map((entry) => PREBUILT_GROUPS.indexOf(entry.group));
+  if (groups.some((group, at) => at > 0 && group < (groups[at - 1] ?? 0))) throw new Error("data/prebuilt-decks.json lists the decks out of group order");
   return index.decks.map((entry) => {
     const fail: Fail = (message) => {
       throw new Error(`Pre-built deck ${entry.id}: ${message}`);
@@ -288,6 +296,7 @@ export function loadPrebuiltDecks(raw: RawData, cards: readonly Card[], ruleEntr
     return {
       id: entry.id,
       name: entry.name,
+      group: entry.group,
       ...("product" in entry && entry.product ? { product: entry.product } : {}),
       productName,
       source: lists.source,
