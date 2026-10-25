@@ -44,6 +44,10 @@ example
 # generated native folders
 /ios
 /android
+# Gradle output of the local Expo modules (written by pnpm android)
+modules/*/android/build/
+modules/*/android/.gradle/
+modules/*/android/.cxx/
 
 # generated data and local caches
 .cache/
