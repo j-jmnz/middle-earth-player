@@ -183,13 +183,14 @@ export function TextButton({
   label: string;
   onPress: () => void;
   testID: string;
-  tone?: "bone" | "gold" | "ink";
+  // Danger is for an action that cannot be undone (Delete a playthrough).
+  tone?: "bone" | "gold" | "ink" | "danger";
   // What a screen reader says when the visible word is not enough alone ("Booklet" opens the campaign book).
   accessibilityLabel?: string;
   // Set for a text option in a radio group (the No boon decline): the button is a radio with this selected state.
   selected?: boolean;
 }) {
-  const color = tone === "gold" ? "text-gold" : tone === "ink" ? "text-inkLabel" : "text-bone";
+  const color = tone === "gold" ? "text-gold" : tone === "ink" ? "text-inkLabel" : tone === "danger" ? "text-danger" : "text-bone";
   return (
     <Pressable
       testID={testID}

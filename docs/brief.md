@@ -543,7 +543,7 @@ Chrome follows [design-system.md](design-system.md). Phase 17 writes that file f
 
 | Route | Behavior |
 | --- | --- |
-| Campaign list | Root. Reads campaigns and saves. It does not scan `cards`. Fellowship is playable. Later campaigns may show as locked, with name and scenario count. Locking does not hide cards. Opens a stored booklet and returns here on close. |
+| Campaign list | Root. Reads campaigns and saves. It does not scan `cards`. Fellowship is playable. Later campaigns may show as locked, with name and scenario count. Locking does not hide cards. Opens a stored booklet and returns here on close. Archives a playthrough out of the open list and restores it as it was, log and open scenario included. Deletes a playthrough, open or archived, only after a second, explicit confirm; a delete cannot be undone and leaves the decks. |
 | Campaign path | Six nodes in book order: locked, current, or completed. A completed node shows the reward that was chosen. The pool sits under the path. The log is one tap away, not a settings page. Opens a stored booklet and returns here on close. |
 | Log | The sheet as data: heroes per seat, fallen heroes per seat, threat modifier, boons and which hero a permanent boon is stuck to, burdens, the six scenario rows, score, notes. Opens a stored booklet and returns here on close. |
 | Briefing | Stages in order, encounter sets and counts for Easy or Normal, special rules by name, deck picker, the Ring-bearer slot, validator errors that name the card. The slot is required when the deck has no Ring-bearer. Refuses to deal on failure. Opens a stored booklet and returns here on close. |

@@ -31,6 +31,9 @@ export const saves = sqliteTable("saves", {
   activeScenario: text("active_scenario", { mode: "json" }).$type<StoredJson | null>(),
   // What the briefing chose for the open scenario (src/campaign/save.ts StoredLoadout), so a relaunch rebuilds the same start.
   loadout: text("loadout", { mode: "json" }).$type<StoredJson | null>(),
+  // When the player put the playthrough away (ms since the epoch). An archived save leaves the campaign list's open
+  // playthroughs and keeps its log and its open scenario; restoring clears it.
+  archivedAt: integer("archived_at"),
 });
 
 // One row per stored booklet PDF. `path` is relative to the document directory (booklets/<id>.pdf), so the row survives
