@@ -124,7 +124,7 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
 
 // Whether a card in the active seat's hand may be played in the open window, before its host and its cost are looked at.
 export function playWindowReason(state: ScenarioState, cardId: string, ctx: ReduceContext): string | null {
-  if (state.window?.kind !== "pass") return "That intent is not legal in this window";
+  if (state.window?.kind !== "pass" && state.window?.kind !== "frameAction") return "That intent is not legal in this window";
   const instance = state.cards[cardId];
   const fromDeck = instance?.zone === "deck" && playableFromDeck(state, cardId, state.activeSeat, ctx);
   if (!instance || (instance.zone !== "hand" && !fromDeck) || instance.controller !== state.activeSeat) return "That card is not in hand";

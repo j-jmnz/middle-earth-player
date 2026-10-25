@@ -9,6 +9,7 @@ import {
   archeryTotal,
   assignArchery,
   beginEnemyAttack,
+  continueStrike,
   dealShadows,
   hasLegalAttack,
   heroIds,
@@ -31,8 +32,9 @@ import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
 import { crossBoundary } from "./triggers.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
-import { discardShadows, resolveAttack } from "./shadow.ts";
-import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
+import { discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
+import { attackResumes, stepWindow } from "./step-window.ts";
+import { livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
 import { clearEliminated, destroyOverwhelmed } from "./keywords.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -97,7 +99,7 @@ export function applyIntent(
     case "Travel":
       return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":
-      return { ...withMode(state, "optionalEngage"), window: null };
+      return { ...markReached(state, "traveled"), window: null };
     case "Engage":
       return finishOptional(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat);
     case "DeclineEngage":
@@ -109,10 +111,7 @@ export function applyIntent(
     case "Undefended":
       return applyUndefended(state, undefendedHero(state, intent.heroId), ctx, steps);
     case "DeclareAttackers":
-      return {
-        ...applyPlayerAttack(state, state.activeSeat, intent.enemyId, intent.attackerIds, ctx, steps),
-        window: { kind: "playerAttack" },
-      };
+      return applyPlayerAttack(state, state.activeSeat, intent.enemyId, intent.attackerIds, ctx, steps);
     case "DeclineAttack":
       return { ...state, passed: [...state.passed, state.activeSeat], window: null };
     case "Distribute":
@@ -123,6 +122,9 @@ export function applyIntent(
 }
 
 function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // An attack waits on the action window between two of its steps; once it closes, the attack goes on before any frame
+  // under it (an attack a Hide test started).
+  if (attackResumes(state)) return state.pendingAttack?.awaiting ? resumeAttack(state, ctx, steps) : continueStrike(state, ctx, steps);
   if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
   // The Responses to a shadow effect are done: the attack goes on.
   if (state.pendingAttack?.shadowOffered && !state.pendingAttack.shadowResolved) return resolveAttack(state, ctx, steps);
@@ -143,8 +145,11 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "staging":
       return stagingStep(state, ctx, steps);
     case "resolution":
-      return resolutionStep(state, ctx, steps);
+      // The windows after staging (3.3) and after quest resolution (3.4).
+      return stepWindow(state, ctx, state.questResolved ? "3.4" : "3.3") ?? resolutionStep(state, ctx, steps);
     case "travel": {
+      // The travel opportunity was taken or declined: the window after it (4.2), still in the Travel phase.
+      if (reached(state, "traveled")) return stepWindow(state, ctx, "4.2") ?? withMode(state, "optionalEngage");
       const seat = livingSeats(state)[0];
       if (seat == null) {
         return state.lost
@@ -155,14 +160,19 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     }
     case "optionalEngage":
       return openOptional(state, ctx);
-    case "engagement":
-      return engagementStep(state, ctx.cards, steps);
+    case "engagement": {
+      const opened = stepWindow(state, ctx, "5.2");
+      if (opened) return opened;
+      const next = engagementStep(state, ctx.cards, steps);
+      // The checks are done: the window after them (5.3) opens in the Encounter phase, before combat begins.
+      return next.mode === "combatStart" ? (stepWindow(state, ctx, "5.3") ?? next) : next;
+    }
     case "combatStart":
       return startCombat(state, ctx);
     case "combatShadows":
       return withMode(dealShadows(state, ctx.cards), "combatActions");
     case "combatActions":
-      return hasCombatAction(state, ctx) ? openPass(state) : withMode(state, "enemyAttacks");
+      return stepWindow(state, ctx, "6.2") ?? withMode(state, "enemyAttacks");
     case "enemyAttacks":
       return enemyStep(state, ctx, steps);
     case "playerAttacks":
@@ -170,7 +180,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "refresh":
       return doRefresh(state, ctx, steps);
     case "endRound":
-      return hasTiming(state, ctx, "endOfRound") ? openPass(state) : withMode(state, "beginRound");
+      return stepWindow(state, ctx, "7.4") ?? withMode(state, "beginRound");
     default:
       return state;
   }
@@ -206,17 +216,6 @@ function startCombat(state: ScenarioState, ctx: ReduceContext): ScenarioState {
     return { ...next, window: { kind: "archery", total }, activeSeat: livingSeats(next)[0] ?? next.firstPlayer };
   }
   return next;
-}
-
-// The action window after the shadow cards are dealt (rr.framework-steps, 6.2) opens when a player holds a Combat Action:
-// an event in the hand or a card in play whose Action is limited to the Combat phase (Feint). Any other Action can be
-// used in the windows before it, so a table that holds none skips a window nobody could use.
-function hasCombatAction(state: ScenarioState, ctx: ReduceContext): boolean {
-  const codes = new Set(ctx.effects.filter((effect) => effect.timing === "action" && effect.condition?.kind === "phase" && effect.condition.is === "Combat").map((effect) => effect.cardCode));
-  if (codes.size === 0) return false;
-  return livingSeats(state).some((seat) =>
-    Object.values(state.cards).some((instance) => instance.controller === seat && codes.has(instance.code) && (instance.zone === "hand" || instance.zone === "heroes" || instance.zone === "play")),
-  );
 }
 
 function enemyStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

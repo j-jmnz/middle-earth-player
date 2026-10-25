@@ -10,7 +10,7 @@ import { firstShares, playRequest, sharesReady, tapShare } from "./pay.ts";
 import { dropTargets } from "./selection.ts";
 import { actionsSheet, commitSheet, distributeIntent, multiIntent, paySheet } from "./bar-sheets.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
-import { sheetFor } from "./sheets.ts";
+import { isStepWindow, sheetFor } from "./sheets.ts";
 
 // Rules: rr.framework-steps, mec109.hide-tests, rr.step-6-4-3 (data/rules/entries.json). Every choice a sheet offers is an
 // intent the reducer accepts, in every window two starter decks meet in whole games of A Shadow of the Past; the rail names
@@ -73,7 +73,8 @@ describe("choice sheets", () => {
           seen.add(sheet.kind === "outcome" ? sheet.result : `${state.window?.kind}:${sheet.kind}`);
           for (const intent of intentsOf(state, sheet)) expect(accepted(state, intent), `${state.window?.kind} ${JSON.stringify(intent)}`).toBe(true);
         } else {
-          expect(state.window?.kind).toBe("pass");
+          // An action window answered from the bar: an ordinary one, or one between two framework steps.
+          expect(state.window?.kind === "pass" || isStepWindow(state), state.window?.kind).toBe(true);
           if (state.mode === "questCommit" && legal.some((intent) => intent.type === "Commit")) {
             for (const intent of intentsOf(state, commitSheet(state, ctx, names, []))) expect(accepted(state, intent)).toBe(true);
           }

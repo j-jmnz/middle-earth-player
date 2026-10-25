@@ -140,11 +140,12 @@ describe("Feint (01034:A:1)", () => {
 
   it("opens the combat action window, and the enemy it is played on does not attack that phase", () => {
     const tab = table({ heroes: [{ code: MERRY, seat: 0 }], engaged: [{ code: CHEAP, seat: 0 }], hand: [{ code: "01034", seat: 0 }] });
-    // Combat starts: the shadow cards are dealt, then a window opens because the player holds a Combat Action.
+    // Combat starts: the shadow cards are dealt, then the window after them (rr.framework-steps, 6.2) opens because the
+    // player holds a Combat Action.
     const start = { ...withMode(tab.state, "combatStart"), window: null };
     const opened = settle(start, tab.ctx, []);
     expect(opened.mode).toBe("combatActions");
-    expect(opened.window).toEqual({ kind: "pass" });
+    expect(opened.window).toEqual({ kind: "frameAction" });
     expect(legalIntents(opened, tab.ctx)).toContainEqual({ type: "PlayCard", cardId: idsOf(tab, "01034") });
     let run = play(tab, begin(opened), "01034");
     const enemy = idsOf(tab, CHEAP);

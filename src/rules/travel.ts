@@ -9,7 +9,7 @@ import { travelTo } from "./quest.ts";
 import { offerResponses } from "./responses.ts";
 import { travelBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
-import { withMode } from "./state.ts";
+import { markReached } from "./state.ts";
 
 const TRAVEL_HERE: Instruction = { verb: "Travel", to: "self" };
 
@@ -19,7 +19,8 @@ export function travelNow(state: ScenarioState, locationId: string, ctx: ReduceC
   if (travelBlocked(state, ctx, locationId)) return null;
   const traveled = travelTo(state, locationId, ctx.cards);
   if (!traveled) return null;
-  const moved = traveled.mode === "travel" ? withMode(traveled, "optionalEngage") : traveled;
+  // The travel opportunity is taken; the Travel phase ends after the window that follows it (rr.framework-steps, 4.2).
+  const moved = traveled.mode === "travel" ? markReached(traveled, "traveled") : traveled;
   return offerResponses(moved, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
 }
 

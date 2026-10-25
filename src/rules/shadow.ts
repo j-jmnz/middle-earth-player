@@ -11,6 +11,7 @@ import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 import { effectCause, inCause, ruleCause } from "./cause.ts";
 import { offerResponses } from "./responses.ts";
+import { enemyAttackWindow } from "./step-window.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -73,6 +74,9 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     next = { ...next, pendingAttack: { ...current, shadowResolved: true } };
     if (!current.shadowCanceled) next = resolveShadow(next, begun.enemyId, begun.seat, ctx, steps);
     if (next.lost || next.failure) return next;
+    // 6.4.2: the shadow effect is resolved; an action window comes before combat damage.
+    const between = next.pendingAttack ? enemyAttackWindow(next, ctx, "damage") : null;
+    if (between) return between;
   }
   const attack = next.pendingAttack;
   const enemy = attack ? next.cards[attack.enemyId] : undefined;
@@ -84,12 +88,38 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     const defender = next.cards[attack.defenderId];
     const raw = defender ? Math.max(0, modifiedStat(next, enemy, "attack", ctx.cards) - modifiedStat(next, defender, "defense", ctx.cards)) : 0;
     const damaged = defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "framework", ruleCause("rr.step-6-4-3")) : next;
-    return damaged.lost ? damaged : finishAttack(damaged, ctx, steps);
+    return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   const hit = placeDamage(next, attack.heroId, modifiedStat(next, enemy, "attack", ctx.cards), ctx.cards, steps, "framework", ruleCause("rr.step-6-4-3"));
-  return hit.lost ? hit : finishAttack(hit, ctx, steps);
+  return hit.lost ? hit : afterDamage(hit, ctx, steps);
+}
+
+// 6.4.3: combat damage is placed; an action window comes before the attack ends.
+function afterDamage(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack) return state;
+  const marked: ScenarioState = { ...state, pendingAttack: { ...attack, damaged: true } };
+  return enemyAttackWindow(marked, ctx, "end") ?? finishAttack(marked, ctx, steps);
+}
+
+// The step window between two steps of an attack has closed: the attack goes on with the step that follows it.
+export function resumeAttack(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack?.awaiting) return state;
+  const { awaiting, awaitDepth: _depth, ...rest } = attack;
+  const cleared: ScenarioState = { ...state, pendingAttack: rest };
+  if (cleared.cards[attack.enemyId]?.zone !== "engaged") return finishAttack(cleared, ctx, steps);
+  switch (awaiting) {
+    case "defense":
+      return { ...cleared, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
+    case "shadow":
+    case "damage":
+      return resolveAttack(cleared, ctx, steps);
+    case "end":
+      return finishAttack(cleared, ctx, steps);
+  }
 }
 
 // Ends the attack: endOfAttack modifiers expire, the enemy's attack is used up, and instructions a

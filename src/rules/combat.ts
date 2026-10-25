@@ -11,6 +11,7 @@ import { dealOneShadow, type ReduceContext } from "./interpret.ts";
 import { queueEvent } from "./queue.ts";
 import { resolveAttack } from "./shadow.ts";
 import { engagementCostOf } from "./quest.ts";
+import { enemyAttackWindow, playerAttackWindow } from "./step-window.ts";
 import { inPlay } from "./zones.ts";
 import { ruleCause } from "./cause.ts";
 
@@ -83,12 +84,15 @@ export function beginEnemyAttack(
   const attacker = state.cards[enemyId];
   if (!attacker || attacker.zone !== "engaged" || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
-  return {
-    ...state,
-    pendingAttack: { enemyId, seat },
-    window: { kind: "defense", enemyId, seat },
-    activeSeat: seat,
-  };
+  const begun: ScenarioState = { ...state, pendingAttack: { enemyId, seat }, window: null };
+  // 6.4b: the attack has begun; an action window comes before the defender is declared.
+  return enemyAttackWindow(begun, _ctx, "defense") ?? openDefense(begun);
+}
+
+export function openDefense(state: ScenarioState): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack) return state;
+  return { ...state, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
 }
 
 export function defenderIds(state: ScenarioState, attackedSeat: number, cards: Cards): string[] {
@@ -120,8 +124,9 @@ export function applyDefense(
 ): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack || !state.cards[attack.enemyId] || !state.cards[defenderId]) return state;
-  const exhausted = updateCard(state, defenderId, { exhausted: true });
-  return resolveAttack({ ...exhausted, pendingAttack: { ...attack, defenderId } }, ctx, steps);
+  const exhausted: ScenarioState = { ...updateCard(state, defenderId, { exhausted: true }), pendingAttack: { ...attack, defenderId }, window: null };
+  // 6.4.1: the defender is declared; an action window comes before the shadow card is turned up.
+  return enemyAttackWindow(exhausted, ctx, "shadow") ?? resolveAttack(exhausted, ctx, steps);
 }
 
 export function applyUndefended(
@@ -132,7 +137,11 @@ export function applyUndefended(
 ): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack || !state.cards[attack.enemyId]) return state;
-  return resolveAttack({ ...state, pendingAttack: { ...attack, heroId } }, ctx, steps);
+  const named: ScenarioState = { ...state, pendingAttack: { ...attack, heroId }, window: null };
+  // The attack is undefended (6.4.1); an action window comes before the shadow card is turned up. A shadow effect that
+  // made a defended attack undefended has already resolved, so the attack goes straight on.
+  if (attack.shadowResolved) return resolveAttack(named, ctx, steps);
+  return enemyAttackWindow(named, ctx, "shadow") ?? resolveAttack(named, ctx, steps);
 }
 
 export function canAttack(
@@ -195,11 +204,27 @@ export function applyPlayerAttack(
 ): ScenarioState {
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
-  let next: ScenarioState = { ...state, declaredAttacks: [...state.declaredAttacks, `${seat}:${enemyId}`] };
+  let next: ScenarioState = { ...state, declaredAttacks: [...state.declaredAttacks, `${seat}:${enemyId}`], window: null };
   for (const attackerId of attackerIds) {
     if (next.cards[attackerId]) next = updateCard(next, attackerId, { exhausted: true });
   }
-  return strikeEnemy(next, seat, enemyId, attackerIds, ctx, steps);
+  const declared: ScenarioState = { ...next, pendingStrike: { seat, enemyId, attackerIds: [...attackerIds] } };
+  // 6.8.1: the attack and its attackers are declared; an action window comes before its strength and damage.
+  return playerAttackWindow(declared, ctx, "strike") ?? continueStrike(declared, ctx, steps);
+}
+
+// The rest of a declared player attack after its step window: the damage (6.8.2, 6.8.3), the window after it, and the end
+// of the attack (6.8.4), when the active player may declare the next one.
+export function continueStrike(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const strike = state.pendingStrike;
+  if (!strike) return state;
+  let next = state;
+  if (strike.awaiting !== "end") {
+    next = strikeEnemy({ ...state, pendingStrike: { seat: strike.seat, enemyId: strike.enemyId, attackerIds: strike.attackerIds } }, strike.seat, strike.enemyId, strike.attackerIds, ctx, steps);
+    const after = playerAttackWindow(next, ctx, "end");
+    if (after) return after;
+  }
+  return { ...next, pendingStrike: null, window: { kind: "playerAttack" }, activeSeat: strike.seat };
 }
 
 // The attackers' strength against the enemy's defense, as combat damage. The attackers are already exhausted: a player

@@ -162,4 +162,18 @@ export type PendingAttack = {
   // Instructions to run, with the attacker as the source, when the attack ends.
   after?: readonly Instruction[];
   afterCause?: Cause;
+  // The step that follows the action window open between two steps of the attack, and the stack depth it opened at.
+  awaiting?: "defense" | "shadow" | "damage" | "end";
+  awaitDepth?: number;
+  // Combat damage is placed; only the end of the attack is left.
+  damaged?: boolean;
+};
+
+// A player attack declared and not finished: the action windows between its steps (rr.attack-resolution-chart).
+export type PendingStrike = {
+  seat: number;
+  enemyId: string;
+  attackerIds: readonly string[];
+  awaiting?: "strike" | "end";
+  awaitDepth?: number;
 };

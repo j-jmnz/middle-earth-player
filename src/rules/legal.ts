@@ -37,7 +37,7 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
     case "pass":
       return passIntents(state, ctx);
     case "frameAction":
-      return [{ type: "Pass" }, ...triggerIntents(state, ctx)];
+      return passIntents(state, ctx);
     case "hideCommit":
       return [{ type: "CommitHide" }];
     case "choose":

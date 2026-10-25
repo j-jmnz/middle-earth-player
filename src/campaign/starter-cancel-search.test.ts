@@ -6,7 +6,7 @@ import { settle } from "../rules/machine.ts";
 import { legalIntents } from "../rules/reduce.ts";
 import { withMode } from "../rules/state.ts";
 import { fund, payFor, starterBase } from "../../scripts/starter-scene.ts";
-import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { begin, buildTable, idsOf, passWindows, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
 
 const SAM = "141002";
 const MERRY = "141003";
@@ -112,9 +112,10 @@ describe("Hasty Stroke (01048:A:1)", () => {
   // A Black Rider engaged with seat 0 and Green Hill Country (Shadow: +1 Attack) dealt to it as a shadow card. Eowyn pays, Sam defends.
   const scene = (): Table => table({ heroes: [{ code: SAM, seat: 0 }, { code: EOWYN, seat: 0 }], engaged: [{ code: RIDER, seat: 0 }], deck: [CROW], hand: [{ code: "01048", seat: 0 }] });
   const defended = (tab: Table): Run => {
-    const combat = settle({ ...withMode(tab.state, "combatStart"), window: null }, tab.ctx, []);
-    expect(combat.window?.kind).toBe("defense");
-    return send(begin(combat), { type: "DeclareDefender", defenderId: idsOf(tab, SAM) }, tab.ctx);
+    const combat = passWindows(begin(settle({ ...withMode(tab.state, "combatStart"), window: null }, tab.ctx, [])), tab.ctx);
+    expect(combat.state.window?.kind).toBe("defense");
+    // The windows after the defender is declared (6.4.1) pass before the shadow card is turned up.
+    return passWindows(send(combat, { type: "DeclareDefender", defenderId: idsOf(tab, SAM) }, tab.ctx), tab.ctx);
   };
   const damage = (run: Run, tab: Table): number => run.steps.flatMap((step) => (step.kind === "damage" && step.targetId === idsOf(tab, SAM) ? [step.amount] : []))[0] ?? 0;
 
@@ -123,7 +124,7 @@ describe("Hasty Stroke (01048:A:1)", () => {
     let run = defended(tab);
     expect(run.state.window).toEqual({ kind: "response", seat: 0 });
     const event = idsOf(tab, "01048");
-    run = send(run, { type: "Trigger", cardId: event, effectId: "01048:response:1", payments: payFor(run.state, tab.ctx, event) }, tab.ctx);
+    run = passWindows(send(run, { type: "Trigger", cardId: event, effectId: "01048:response:1", payments: payFor(run.state, tab.ctx, event) }, tab.ctx), tab.ctx);
     const plain = (tab.ctx.cards.get(RIDER)?.attack ?? 0) - (tab.ctx.cards.get(SAM)?.defense ?? 0);
     expect(damage(run, tab)).toBe(plain);
     expect(run.state.cards[event]?.zone).toBe("discard");
@@ -133,7 +134,7 @@ describe("Hasty Stroke (01048:A:1)", () => {
   it("lets the shadow effect resolve when the response is passed", () => {
     const tab = scene();
     let run = defended(tab);
-    run = send(run, { type: "Pass" }, tab.ctx);
+    run = passWindows(send(run, { type: "Pass" }, tab.ctx), tab.ctx);
     const plain = (tab.ctx.cards.get(RIDER)?.attack ?? 0) - (tab.ctx.cards.get(SAM)?.defense ?? 0);
     expect(damage(run, tab)).toBeGreaterThan(plain);
     expect(run.state.cards[idsOf(tab, "01048")]?.zone).toBe("hand");
@@ -141,8 +142,8 @@ describe("Hasty Stroke (01048:A:1)", () => {
 
   it("is not offered against a shadow card with no shadow effect", () => {
     const tab = table({ heroes: [{ code: SAM, seat: 0 }, { code: EOWYN, seat: 0 }], engaged: [{ code: RIDER, seat: 0 }], deck: ["f0"], hand: [{ code: "01048", seat: 0 }] });
-    const combat = settle({ ...withMode(tab.state, "combatStart"), window: null }, tab.ctx, []);
-    const run = send(begin(combat), { type: "DeclareDefender", defenderId: idsOf(tab, SAM) }, tab.ctx);
+    const combat = passWindows(begin(settle({ ...withMode(tab.state, "combatStart"), window: null }, tab.ctx, [])), tab.ctx);
+    const run = send(combat, { type: "DeclareDefender", defenderId: idsOf(tab, SAM) }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("response");
   });
 });

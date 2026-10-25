@@ -131,6 +131,14 @@ function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNam
 }
 
 /**
+ * An action window between two framework steps (rr.framework-steps), not the one inside a Hide test: the bar answers it
+ * like any action window, with Pass, the Actions list and the hand.
+ */
+export function isStepWindow(game: ScenarioState): boolean {
+  return game.window?.kind === "frameAction" && topFrame(game)?.frame !== "hide";
+}
+
+/**
  * The sheet for the open window, or null when the bar alone answers it (an ordinary action window, where Pass and the
  * Actions list sit on the bar).
  */
@@ -176,6 +184,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       };
     }
     case "frameAction": {
+      if (isStepWindow(game)) return null;
       const hide = game.widgets.hide && frame?.data.kind === "hide" ? hideNumbers(game, ctx, frame) : null;
       const source = frame?.cardId ?? null;
       return {

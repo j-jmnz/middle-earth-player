@@ -287,6 +287,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
       next = { ...next, pendingAttack: null, window: next.window?.kind === "defense" ? null : next.window };
     }
     if (next.window?.kind === "chooseEnemy" && next.window.seat === index) next = { ...next, window: null };
+    if (next.pendingStrike?.seat === index) next = { ...next, pendingStrike: null, window: next.window?.kind === "playerAttack" ? null : next.window };
   }
   if (next.seats[next.firstPlayer]?.eliminated) {
     for (let step = 1; step <= next.seatCount; step += 1) {

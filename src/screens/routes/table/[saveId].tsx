@@ -13,7 +13,7 @@ import { inspectTargets, shownSeat, threatSelector, zoneSelector } from "../../.
 import { dropOutcome, targetFromKey } from "../../../play/selection";
 import { actionsSheet, commitSheet, paySheet } from "../../../play/bar-sheets";
 import type { Sheet, SheetNames } from "../../../play/sheet-types";
-import { sheetFor } from "../../../play/sheets";
+import { isStepWindow, sheetFor } from "../../../play/sheets";
 import type { PlayerIntent, ScenarioState, TableStore } from "../../../play/store";
 import { TableCanvas } from "../../../play/table-canvas";
 import type { PictureSource } from "../../../play/table-canvas-types";
@@ -152,9 +152,10 @@ function Table({ session, store, saveId }: { session: Extract<TableSession, { ok
     setSize((current) => (current && current.width === width && current.height === height ? current : { width, height }));
   };
 
-  const canPass = legal.some((intent) => intent.type === "Pass") && game.window?.kind === "pass";
+  const actionWindow = game.window?.kind === "pass" || isStepWindow(game);
+  const canPass = legal.some((intent) => intent.type === "Pass") && actionWindow;
   const canCommit = legal.some((intent) => intent.type === "Commit");
-  const hasActions = game.window?.kind === "pass" && legal.some((intent) => intent.type === "Trigger");
+  const hasActions = actionWindow && legal.some((intent) => intent.type === "Trigger");
   const committing = canCommit && pending.length > 0;
   const showLife = game.widgets.lifeTracker && game.life != null;
   const threatText = threatLine(threats, showLife ? (game.life ?? 0) : null);

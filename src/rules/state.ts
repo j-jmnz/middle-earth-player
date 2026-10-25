@@ -1,6 +1,6 @@
 import type { Instruction, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
 
-import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAttack, UsedEffect } from "./frame-types.ts";
+import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAttack, PendingStrike, UsedEffect } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 
 export type {
@@ -16,6 +16,7 @@ export type {
   HideResult,
   Modifier,
   PendingAttack,
+  PendingStrike,
   ResponseOffer,
   ResumeData,
   UsedEffect,
@@ -211,12 +212,16 @@ export type ScenarioState = {
   resolutionLog: ResolutionLog;
   engagement: { ordinal: number; engagedThisPass: boolean } | null;
   resolvedAttacks: readonly string[];
+  // "round:step" for each framework action window opened this round (rr.framework-steps), so each opens once, and
+  // "round:traveled" once the travel opportunity is taken or declined.
+  stepWindows: readonly string[];
   // The active player of the planning phase: the one seat that may play allies and attachments in the window
   // (rr.step-2-2). Each seat has its turn in player order (rr.step-2-3). Null outside the planning phase.
   planningSeat: number | null;
   // "seat:enemyId" for each attack a seat declared this combat phase: one per enemy (faq.limitations-on-attacks).
   declaredAttacks: readonly string[];
   pendingAttack: PendingAttack | null;
+  pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
   undo: UndoLog;
@@ -335,7 +340,9 @@ export function blankScenario(input: {
     resolvedAttacks: [],
     declaredAttacks: [],
     planningSeat: null,
+    stepWindows: [],
     pendingAttack: null,
+    pendingStrike: null,
     undo: { phase: undoPhase, snapshot: null, cards: null, intents: [], steps: [] },
   };
 }
@@ -367,6 +374,17 @@ export function withMode(state: ScenarioState, mode: ModeName): ScenarioState {
 // (faq.peril-attacks): the lock does not hold while the attack resolves.
 export function perilLock(state: ScenarioState): number | null {
   return state.pendingAttack ? null : state.perilSeat;
+}
+
+// A framework point reached this round (stepWindows).
+export function reached(state: ScenarioState, step: string): boolean {
+  return state.stepWindows.includes(`${state.round}:${step}`);
+}
+
+export function markReached(state: ScenarioState, step: string): ScenarioState {
+  const at = `${state.round}:${step}`;
+  if (state.stepWindows.includes(at)) return state;
+  return { ...state, stepWindows: [...state.stepWindows.filter((key) => key.startsWith(`${state.round}:`)), at] };
 }
 
 export function inPlay(zone: ZoneName): boolean {

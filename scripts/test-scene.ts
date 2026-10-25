@@ -6,6 +6,7 @@ import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
 import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
 import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
 import { attachTo, spawn } from "../src/rules/zones.ts";
+import { topFrame } from "../src/rules/windows.ts";
 
 import { causeProblems } from "./cause-check.ts";
 import { loadDefinition, loadPrinted } from "./test-catalog.ts";
@@ -132,6 +133,16 @@ export function send(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
   const problems = causeProblems(result.steps);
   if (problems.length > 0) throw new Error(`Steps without a verified cause after ${intent.type}: ${problems.join("; ")}`);
   return { state: result.state, steps: [...run.steps, ...result.steps] };
+}
+
+// Passes the framework action windows that are open (rr.framework-steps) until the game asks for something else. A window
+// opens when some seat has an action it could take, Éowyn's included.
+export function passWindows(run: Run, ctx: ReduceContext): Run {
+  let next = run;
+  for (let guard = 0; guard < 20 && next.state.window?.kind === "frameAction" && topFrame(next.state)?.frame !== "hide"; guard += 1) {
+    next = send(next, { type: "Pass" }, ctx);
+  }
+  return next;
 }
 
 export function idsOf(table: Table, code: string): string {
