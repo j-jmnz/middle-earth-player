@@ -176,13 +176,18 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   if (gone) next = { ...next, pendingAttack: { ...attack, undefended: true } };
   if (attack.defenderId != null && !attack.undefended && !gone) {
     const defender = next.cards[attack.defenderId];
-    const raw = defender ? Math.max(0, modifiedStat(next, enemy, "attack", ctx.cards) - modifiedStat(next, defender, "defense", ctx.cards)) : 0;
+    const strength = modifiedStat(next, enemy, "attack", ctx.cards);
+    const defense = defender ? modifiedStat(next, defender, "defense", ctx.cards) : 0;
+    if (defender) steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.defenderId, attack: strength, defense, cause: ruleCause("rr.step-6-4-3") });
+    const raw = defender ? Math.max(0, strength - defense) : 0;
     const damaged = defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")) : next;
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
-  const hit = placeDamage(next, attack.heroId, modifiedStat(next, enemy, "attack", ctx.cards), ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3"));
+  const strength = modifiedStat(next, enemy, "attack", ctx.cards);
+  steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.heroId, attack: strength, defense: 0, cause: ruleCause("rr.step-6-4-3") });
+  const hit = placeDamage(next, attack.heroId, strength, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3"));
   return hit.lost ? hit : afterDamage(hit, ctx, steps);
 }
 

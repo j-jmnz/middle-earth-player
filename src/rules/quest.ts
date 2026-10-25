@@ -59,6 +59,7 @@ export function resolveQuest(
 ): ScenarioState {
   const willpower = committedWillpower(state, cards);
   const threat = stagingThreat(state, cards);
+  steps.push({ kind: "quest", willpower, threat, cause: ruleCause("rr.step-3-4") });
   let next = state;
   if (willpower < threat) {
     // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.

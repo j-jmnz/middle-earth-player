@@ -16,7 +16,13 @@ export type EngineStep =
   | { kind: "hideCommit"; cardId: string }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   | { kind: "advance"; cardId: string }
+  // The numbers quest resolution compared (rr.step-3-4): committed willpower against the threat in staging. It reports what
+  // the engine read; the threat or progress that followed is its own step.
+  | { kind: "quest"; willpower: number; threat: number; cause: Cause }
   | { kind: "attack"; side: "enemy" | "player"; seat: number; enemyId: string }
+  // The numbers an attack's combat damage came from (rr.step-6-4-3, rr.step-6-8-3): the attack strength against the defense
+  // of the card it hits (0 for an undefended hero). The damage placed is the `damage` step after it.
+  | { kind: "strike"; side: "enemy" | "player"; enemyId: string; targetId: string; attack: number; defense: number; cause: Cause }
   | { kind: "cancel"; cardId: string }
   | { kind: "resetEncounterDeck"; count: number; cause: Cause };
 
