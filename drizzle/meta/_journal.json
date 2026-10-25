@@ -22,6 +22,13 @@
       "when": 1761379200000,
       "tag": "0002_archived_saves",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1761465600000,
+      "tag": "0003_standalone_games",
+      "breakpoints": true
     }
   ]
 }

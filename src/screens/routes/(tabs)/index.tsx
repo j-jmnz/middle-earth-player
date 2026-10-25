@@ -10,6 +10,7 @@ import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf } from "../../campaign-data";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
+import { DeleteConfirm } from "../../delete-confirm";
 import { palette } from "../../palette.js";
 
 type Seats = 1 | 2;
@@ -49,18 +50,7 @@ function ProgressLine({ done, total }: { done: number; total: number }) {
   );
 }
 
-// A delete is asked twice, in place: the panel says what is lost and offers Delete for good beside Keep.
-function DeleteConfirm({ id, onDelete, onKeep }: { id: string; onDelete: () => void; onKeep: () => void }) {
-  return (
-    <View className="mt-3 gap-1" testID={`delete-confirm-${id}`}>
-      <BodyText tone="danger">Delete this playthrough? Its log, pool and any open scenario are gone for good.</BodyText>
-      <View className="-mx-3 flex-row">
-        <TextButton label="Delete for good" testID={`delete-yes-${id}`} tone="danger" onPress={onDelete} />
-        <TextButton label="Keep" testID={`delete-no-${id}`} onPress={onKeep} />
-      </View>
-    </View>
-  );
-}
+const DELETE_SENTENCE = "Delete this playthrough? Its log, pool and any open scenario are gone for good.";
 
 export default function CampaignList() {
   const router = useRouter();
@@ -141,7 +131,7 @@ export default function CampaignList() {
                     <Label>{seatWord(save)}</Label>
                     <ProgressLine done={doneOf(save)} total={total} />
                     {deleting === save.id ? (
-                      <DeleteConfirm id={save.id} onDelete={() => remove(save.id)} onKeep={() => setDeleting(null)} />
+                      <DeleteConfirm id={save.id} sentence={DELETE_SENTENCE} onDelete={() => remove(save.id)} onKeep={() => setDeleting(null)} />
                     ) : (
                       <View className="-mx-3 mt-2 flex-row">
                         <TextButton label="Archive" testID={`archive-${save.id}`} tone="gold" accessibilityLabel={`Archive ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => archive(save.id)} />
@@ -228,7 +218,7 @@ export default function CampaignList() {
                       <Label>{seatWord(save)}</Label>
                       <ProgressLine done={doneOf(save)} total={total} />
                       {deleting === save.id ? (
-                        <DeleteConfirm id={save.id} onDelete={() => remove(save.id)} onKeep={() => setDeleting(null)} />
+                        <DeleteConfirm id={save.id} sentence={DELETE_SENTENCE} onDelete={() => remove(save.id)} onKeep={() => setDeleting(null)} />
                       ) : (
                         <View className="-mx-3 mt-2 flex-row">
                           <TextButton label="Restore" testID={`restore-${save.id}`} tone="gold" accessibilityLabel={`Restore ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => restore(save.id)} />

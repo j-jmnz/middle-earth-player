@@ -50,7 +50,7 @@ describe("user migration", () => {
     expect(stored?.applied_catalog_version).toBe(CATALOG_VERSION);
   });
 
-  it("adds the booklets table, the save loadout and the archive mark without touching a save row", () => {
+  it("adds the booklets table, the save loadout, the archive mark and the standalone games without touching a save row", () => {
     const database = new DatabaseSync(":memory:");
     const [first, ...rest] = migrations.journal.entries;
     if (!first) throw new Error("No migrations");
@@ -66,5 +66,12 @@ describe("user migration", () => {
     );
     const booklet = database.prepare("SELECT page_count, last_page FROM booklets WHERE id = 'learn-to-play'").get();
     expect(booklet).toEqual({ page_count: 4, last_page: 1 });
+    const saveCount = database.prepare("SELECT count(*) AS n FROM saves").get();
+    expect(saveCount).toEqual({ n: 1 });
+    database.exec(
+      `INSERT INTO standalone_games (id, campaign_id, scenario_id, seat_count, loadout, created_at) VALUES ('game-1', 'fellowship-of-the-ring', 'a-shadow-of-the-past', 1, '{}', 5)`,
+    );
+    const game = database.prepare("SELECT id, active_scenario, result, archived_at FROM standalone_games").get();
+    expect(game).toEqual({ id: "game-1", active_scenario: null, result: null, archived_at: null });
   });
 });

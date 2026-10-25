@@ -33,7 +33,7 @@ export function loadoutCodes(save: Save): string[] {
   return [...logCodes(save.log), ...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
 }
 
-function factsOf<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map<string, CardFacts> {
+export function factsOf<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map<string, CardFacts> {
   const wanted = [...new Set(codes)];
   if (wanted.length === 0) return new Map();
   const rows = catalog.select({ code: cards.code, imagesrc: cards.imagesrc, text: cards.text }).from(cards).where(inArray(cards.code, wanted)).all();

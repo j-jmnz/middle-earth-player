@@ -8,6 +8,7 @@ The app applies the rules, keywords, phases, card effects, and every number they
 
 - A Shadow of the Past and A Knife in the Dark are playable: every printed line of the cards they deal has an effect record. Flight to the Ford through Breaking of the Fellowship are phases 13 to 16.
 - The deck builder, the campaign path, the briefing, the table, the resolution screen, and the campaign log exist.
+- The Scenarios tab plays a scenario as a standalone adventure: no campaign card, log, boons or burdens, a scored win, and each game can be resumed, archived, restored or deleted. Only the playable Fellowship scenarios are dealt.
 - Everything is checked offline in Node. No phone check and no Maestro flow has run yet. Phone checks stay open in [docs/phases/STATUS.md](docs/phases/STATUS.md).
 - Scenario 1's won save fixture is open: no legal win of the two starter decks has been found. Its Maestro flows wait for it. STATUS lists this and the other open items.
 
