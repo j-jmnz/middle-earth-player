@@ -15,11 +15,12 @@ import {
 } from "react-native";
 
 import { inactiveCodes as inactiveTextCodes } from "../../catalog/active-text";
-import { formatDeckRefusal, traitTokens } from "../../catalog/deck-save";
+import { traitTokens } from "../../catalog/deck-save";
 import { cards, packs } from "../../catalog/schema";
 import { EFFECTS } from "../../effects";
 import {
   BodyText,
+  Eyebrow,
   ListRow,
   NavBar,
   PaperSheet,
@@ -28,17 +29,20 @@ import {
   SphereMark,
   TextButton,
   markedSphere,
-  pressedNight,
   sphereWord,
 } from "../chrome";
-import { addDraftCard, draftCopyCount, useDeckDraft } from "../deck-draft";
+import { CountStepper, stepperFull } from "../count-stepper";
+import { addDraftCard, announceDraftChange, draftCopyCount, takeDraftCard, useDeckDraft, type DraftContent } from "../deck-draft";
+import { deckCountLine } from "../deck-status";
 import { useDatabases } from "../databases";
 import { enqueueImageDownloads } from "../images/queue";
 import { CardThumb, useCardPreview } from "../images/picture";
 import { useListPreview } from "../list-preview";
+import { ToastView } from "../toast-view";
 import type { PictureSource } from "../../play/table-canvas-types";
 import { palette } from "../palette.js";
 import {
+  activeFilterCount,
   costOptions,
   cycleGroups,
   emptyPoolFilter,
@@ -125,19 +129,28 @@ function RowIcons({ sphere }: { sphere: string | null }) {
   return mark ? <SphereMark sphere={mark} size={12} /> : null;
 }
 
+// The + on a hero is spent when the hero is in the deck or the three slots are full; on another card, at its copy limit.
+function addFull(item: PoolRowCard, count: number, deck: DraftContent): boolean {
+  if (item.typeCode === "hero") return count > 0 || deck.heroes.length >= 3;
+  return stepperFull(count, item.deckLimit);
+}
+
 function PoolCardRow({
   item,
   adding,
   count,
+  full,
   onPreview,
 }: {
   item: PoolRowCard;
   adding: boolean;
   count: number;
+  full: boolean;
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
   const router = useRouter();
   const picture = useCardPreview(item.code, item.imagesrc);
+  const card = { code: item.code, name: item.name, typeCode: item.typeCode, deckLimit: item.deckLimit };
   return (
     <ListRow
       testID={`card-${item.code}`}
@@ -151,37 +164,51 @@ function PoolCardRow({
       onLongPress={() => onPreview(item.code, item.name, picture)}
       trailing={
         adding ? (
-          <View className="flex-row items-center">
-            <Text className="min-w-6 text-center text-body text-bone">{String(count)}</Text>
-            <Pressable
-              testID={`add-${item.code}`}
-              collapsable={false}
-              accessibilityRole="button"
-              accessibilityLabel={`Add ${item.name}`}
-              onPress={() => {
-                addDraftCard({
-                  code: item.code,
-                  name: item.name,
-                  typeCode: item.typeCode,
-                  deckLimit: item.deckLimit,
-                });
-              }}
-              className="min-h-11 min-w-11 items-center justify-center rounded-tile"
-              style={({ pressed }) => (pressed ? pressedNight : undefined)}
-            >
-              <Text className="text-body text-bone">+</Text>
-            </Pressable>
-          </View>
+          <CountStepper
+            code={item.code}
+            name={item.name}
+            count={count}
+            full={full}
+            minus={count > 0}
+            ids={{ dec: `take-${item.code}`, count: `pool-count-${item.code}`, inc: `add-${item.code}` }}
+            onChange={(delta) => announceDraftChange(delta > 0 ? addDraftCard(card) : takeDraftCard(card))}
+          />
         ) : undefined
       }
     />
   );
 }
 
+// Night chips for the type, one tap from the search field. The filter sheet sets the same field.
+function TypeChips({ types, value, onChange }: { types: { code: string; name: string }[]; value: string | null; onChange: (next: string | null) => void }) {
+  const options = [{ code: null, name: "All" }, ...types];
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-2 px-6">
+      {options.map((option) => {
+        const selected = value === option.code;
+        return (
+          <Pressable
+            key={option.code ?? "all"}
+            testID={`pool-type-${option.code ?? "all"}`}
+            accessibilityRole="radio"
+            accessibilityState={{ selected }}
+            onPress={() => onChange(option.code)}
+            className={`min-h-11 justify-center rounded-pill px-4 ${selected ? "bg-gold" : "bg-raised"}`}
+          >
+            <Text className={selected ? "text-body font-semibold text-onGold" : "text-body text-muted"}>{option.name}</Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
 export default function CardPool() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ adding?: string | string[] }>();
+  const params = useLocalSearchParams<{ adding?: string | string[]; type?: string | string[] }>();
   const adding = params.adding === "1" || (Array.isArray(params.adding) && params.adding[0] === "1");
+  // An empty hero slot opens the pool on heroes.
+  const startType = typeof params.type === "string" && params.type.length > 0 ? params.type : null;
   const draft = useDeckDraft();
   const { height } = useWindowDimensions();
   const { catalog } = useDatabases();
@@ -231,8 +258,9 @@ export default function CardPool() {
   );
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);
   const [search, setSearch] = useState("");
-  const [applied, setApplied] = useState<PoolFilter>(emptyPoolFilter);
-  const [draftFilter, setDraftFilter] = useState<PoolFilter>(emptyPoolFilter);
+  const [applied, setApplied] = useState<PoolFilter>(() => ({ ...emptyPoolFilter, typeCode: startType }));
+  const [draftFilter, setDraftFilter] = useState<PoolFilter>(applied);
+  const [barHeight, setBarHeight] = useState(0);
   const [open, setOpen] = useState(false);
   const [chooser, setChooser] = useState<"pack" | "trait" | "cost" | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -259,7 +287,7 @@ export default function CardPool() {
   const types = useMemo(() => typeChoices(rows), [rows]);
   const traits = useMemo(() => traitChoices(rows), [rows]);
   const costs = useMemo(() => costChoices(rows), [rows]);
-  const held = adding ? draft.heldRefusal : null;
+  const filters = activeFilterCount(applied);
 
   function openSheet(): void {
     setDraftFilter(applied);
@@ -281,7 +309,15 @@ export default function CardPool() {
   return (
     <Screen scene="plain">
       <View className="min-h-0 flex-1">
-        <NavBar backLabel="Decks" backTestID="pool-back" onBack={() => goBack(router, "/decks")} />
+        <NavBar backLabel={adding ? "Deck" : "Decks"} backTestID="pool-back" onBack={() => goBack(router, "/decks")} />
+        {adding ? (
+          <View className="mt-1">
+            <Eyebrow tone="muted">Adding to</Eyebrow>
+            <Text className="mt-0.5 font-display text-title text-bone" numberOfLines={1}>
+              {draft.name.trim() || "New deck"}
+            </Text>
+          </View>
+        ) : null}
         <View className="mt-3 flex-row items-center gap-2">
           <TextInput
             testID="pool-search"
@@ -291,15 +327,16 @@ export default function CardPool() {
             placeholderTextColor={palette.faint}
             autoCorrect={false}
             autoCapitalize="none"
-            className="min-h-11 flex-1 rounded-pill bg-raised px-4 text-body text-bone"
+            className="min-h-11 min-w-0 flex-1 rounded-pill bg-raised px-4 text-body text-bone"
           />
-          <TextButton testID="pool-filter" label="Filter" onPress={openSheet} />
+          <TextButton
+            testID="pool-filter"
+            label={filters > 0 ? `Filter · ${filters}` : "Filter"}
+            accessibilityLabel={filters > 0 ? `Filter, ${filters} on` : "Filter"}
+            onPress={openSheet}
+          />
         </View>
-        {held ? (
-          <BodyText tone="danger" className="mt-3">
-            {formatDeckRefusal(held)}
-          </BodyText>
-        ) : null}
+        <TypeChips types={types} value={applied.typeCode} onChange={(typeCode) => setApplied({ ...applied, typeCode })} />
         <View className="mt-2 min-h-0 flex-1">
           <FlashList
             data={visible}
@@ -309,7 +346,7 @@ export default function CardPool() {
             keyboardShouldPersistTaps="handled"
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
-            ListFooterComponent={<View className="pb-safe" />}
+            ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} />}
             ListEmptyComponent={
               <BodyText testID="pool-empty" tone="muted" className="mt-6">
                 No cards match.
@@ -321,12 +358,30 @@ export default function CardPool() {
                   item={item}
                   adding={adding}
                   count={draftCopyCount(draft, item.code, item.typeCode)}
+                  full={addFull(item, draftCopyCount(draft, item.code, item.typeCode), draft)}
                   onPreview={preview.open}
                 />
               ) : null
             }
           />
         </View>
+        {adding ? (
+          <View
+            testID="pool-deck-bar"
+            className="flex-row items-center gap-3 border-t border-hairline pb-safe pt-3"
+            onLayout={(event) => setBarHeight(Math.round(event.nativeEvent.layout.height))}
+          >
+            <View className="flex-1">
+              <Text testID="pool-deck-count" className="text-body text-bone">
+                {deckCountLine(draft)}
+              </Text>
+              <Text className="text-label text-muted" numberOfLines={1}>
+                Tap + to add, − to take out
+              </Text>
+            </View>
+            <PrimaryButton testID="pool-done" label="Done" onPress={() => goBack(router, "/decks")} />
+          </View>
+        ) : null}
       </View>
       <Modal visible={open} transparent animationType={filterSheetAnimation(reduceMotion)} onRequestClose={dismiss}>
         <View className="flex-1 justify-end">
@@ -388,6 +443,7 @@ export default function CardPool() {
           </PaperSheet>
         </View>
       </Modal>
+      <ToastView bottom={adding ? barHeight + 8 : 12} />
       {preview.overlay}
     </Screen>
   );

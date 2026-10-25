@@ -8,8 +8,19 @@ appId: com.middleearth.lcg
     timeout: 15000
 - assertVisible: "Wisdom and Wizardry"
 - assertVisible:
-    id: starter-note
+    id: deck-stealth-and-steadfastness-status
+    text: "Ready to play"
+- scrollUntilVisible:
+    element:
+      id: starter-note
+    direction: DOWN
+    timeout: 15000
 - assertVisible: "When both decks are used together, replace the three copies of Gandalf in Stealth and Steadfastness with three copies of Elrond."
+- scrollUntilVisible:
+    element:
+      id: card-pool
+    direction: UP
+    timeout: 15000
 - tapOn:
     id: card-pool
 - tapOn:
@@ -35,15 +46,15 @@ appId: com.middleearth.lcg
     timeout: 40000
     speed: 40
     visibilityPercentage: 100
+# A fourth copy is refused at the tap: the toast names the card and the rule, and the count stays at 3.
 - tapOn:
     id: count-inc-01073
 - assertVisible:
-    id: deck-error
-- assertVisible: "Gandalf"
-- assertVisible: "At most three copies."
+    id: toast-text
+    text: "Gandalf: At most three copies."
 - assertVisible:
-    id: deck-save
-    enabled: false
+    id: count-01073
+    text: "3"
 - stopApp
 - launchApp
 - tapOn:

@@ -1,52 +1,64 @@
 import { FlashList } from "@shopify/flash-list";
-import { eq, inArray } from "drizzle-orm";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useMemo } from "react";
-import { Pressable, Text, TextInput, useWindowDimensions, View } from "react-native";
+import { useLocalSearchParams, usePreventRemove, useRouter } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
+import { Modal, Pressable, Text, TextInput, useWindowDimensions, View } from "react-native";
 
 import {
-  deckSaveRefusal,
-  formatDeckRefusal,
-  type DeckSaveCard,
-  type DeckSaveRefusal,
-} from "../../../catalog/deck-save";
-import { cards } from "../../../catalog/schema";
-import { BodyText, Label, ListRow, NavBar, PrimaryButton, Screen, SphereMark, TextButton, markedSphere, pressedNight, sphereWord } from "../../chrome";
+  BodyText,
+  Eyebrow,
+  Label,
+  ListRow,
+  NavBar,
+  PaperSheet,
+  PrimaryButton,
+  RingMark,
+  Screen,
+  SphereMark,
+  TextButton,
+  markedSphere,
+  sphereWord,
+} from "../../chrome";
 import {
+  announceDraftChange,
   changeDraftCount,
+  discardDraftChanges,
+  draftIsDirty,
+  editSavedDeck,
   getDeckDraft,
-  newDeckId,
+  markDraftSaved,
+  NEW_DECK_ID,
   removeDraftHero,
-  replaceDeckDraft,
   setDeckName,
+  startNewDeck,
   useDeckDraft,
-  type DeckDraft,
 } from "../../deck-draft";
+import { deckCountLine, deckReadiness, deckSections, savedDeckName, startingThreat, type DeckSectionRow } from "../../deck-status";
+import { deckFaces, listDecks, readDeck, writeDeck } from "../../deck-store";
+import { CountStepper, stepperFull } from "../../count-stepper";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
-import { CardThumb } from "../../images/picture";
+import { CardThumb, useCardPreview } from "../../images/picture";
+import { useListPreview } from "../../list-preview";
 import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
 import { EmptyHeroSlot, HeroTile, type HeroFace } from "../../hero-tile";
-import { decks } from "../../user-schema";
+import { showToast } from "../../toast";
+import { ToastView } from "../../toast-view";
 import { goBack } from "../../go-back";
+import type { PictureSource } from "../../../play/table-canvas-types";
 
-type Face = HeroFace & {
-  typeCode: string;
-  deckLimit: number | null;
-  deckLegal: boolean;
-  traits: string | null;
-};
-
-type EditorRow = {
+type EditorCard = {
   code: string;
   count: number;
   name: string;
+  typeCode: string | null;
   imagesrc: string | null;
   deckLimit: number | null;
   sphereCode: string | null;
   sphereName: string | null;
 };
+
+type EditorRow = DeckSectionRow<EditorCard>;
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
 const thumb = { width: 28, height: 38 };
@@ -55,71 +67,33 @@ function onViewableItemsChanged({ viewableItems }: { viewableItems: { item: Edit
   const jobs = [];
   for (const token of viewableItems) {
     const item = token.item;
-    if (!item?.imagesrc) continue;
-    jobs.push({ code: item.code, imagesrc: item.imagesrc });
+    if (item?.kind !== "card" || !item.card.imagesrc) continue;
+    jobs.push({ code: item.card.code, imagesrc: item.card.imagesrc });
   }
   if (jobs.length > 0) enqueueImageDownloads(jobs);
 }
 
-function draftRefusal(draft: DeckDraft, faces: ReadonlyMap<string, Face>): DeckSaveRefusal | null {
-  if (draft.name.trim().length === 0) {
-    return { cardCode: null, cardName: null, rule: "Name the deck." };
-  }
-  if (draft.heldRefusal) return draft.heldRefusal;
-  const facts = new Map<string, DeckSaveCard>();
-  for (const [code, face] of faces) {
-    facts.set(code, {
-      name: face.name,
-      typeCode: face.typeCode,
-      sphereCode: face.sphereCode,
-      deckLimit: face.deckLimit,
-      deckLegal: face.deckLegal,
-      traits: face.traits,
-    });
-  }
-  return deckSaveRefusal(draft.heroes, draft.cards, facts, []);
-}
-
-function EditorRowView({ item }: { item: EditorRow }) {
+function EditorCardRow({ card, onPreview }: { card: EditorCard; onPreview: (code: string, name: string, source: PictureSource | null) => void }) {
   const router = useRouter();
+  const picture = useCardPreview(card.code, card.imagesrc);
+  const mark = markedSphere(card.sphereCode);
   return (
     <ListRow
-      testID={`deck-card-${item.code}`}
-      label={item.name}
-      detail={sphereWord(item.sphereName)}
-      detailIcons={markedSphere(item.sphereCode) ? <SphereMark sphere={markedSphere(item.sphereCode) ?? "neutral"} size={12} /> : null}
-      leading={<CardThumb code={item.code} imagesrc={item.imagesrc} width={thumb.width} height={thumb.height} />}
-      onPress={() => {
-        router.push({ pathname: "/card/[code]", params: { code: item.code } });
-      }}
+      testID={`deck-card-${card.code}`}
+      label={card.name}
+      detail={sphereWord(card.sphereName)}
+      detailIcons={mark ? <SphereMark sphere={mark} size={12} /> : null}
+      leading={<CardThumb code={card.code} imagesrc={card.imagesrc} width={thumb.width} height={thumb.height} />}
+      onPress={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })}
+      onLongPress={() => onPreview(card.code, card.name, picture)}
       trailing={
-        <View className="flex-row items-center">
-          <Pressable
-            testID={`count-dec-${item.code}`}
-            collapsable={false}
-            accessibilityRole="button"
-            accessibilityLabel={`Remove a copy of ${item.name}`}
-            onPress={() => changeDraftCount(item.code, item.name, item.deckLimit, -1)}
-            className="min-h-11 min-w-11 items-center justify-center rounded-tile"
-            style={({ pressed }) => (pressed ? pressedNight : undefined)}
-          >
-            <Text className="text-body text-bone">−</Text>
-          </Pressable>
-          <Text testID={`count-${item.code}`} className="min-w-6 text-center text-body text-bone">
-            {String(item.count)}
-          </Text>
-          <Pressable
-            testID={`count-inc-${item.code}`}
-            collapsable={false}
-            accessibilityRole="button"
-            accessibilityLabel={`Add a copy of ${item.name}`}
-            onPress={() => changeDraftCount(item.code, item.name, item.deckLimit, 1)}
-            className="min-h-11 min-w-11 items-center justify-center rounded-tile"
-            style={({ pressed }) => (pressed ? pressedNight : undefined)}
-          >
-            <Text className="text-body text-bone">+</Text>
-          </Pressable>
-        </View>
+        <CountStepper
+          code={card.code}
+          name={card.name}
+          count={card.count}
+          full={stepperFull(card.count, card.deckLimit)}
+          onChange={(delta) => announceDraftChange(changeDraftCount(card.code, card.name, card.deckLimit, delta))}
+        />
       }
     />
   );
@@ -132,157 +106,190 @@ export default function DeckEditor() {
   const { height } = useWindowDimensions();
   const draft = useDeckDraft();
   const { catalog, user } = useDatabases();
-  const baseTile = Math.max(120, Math.min(Math.round(height / 3), height - 340));
-  const tileHeight = draft.heroes.length > 3 ? Math.max(96, Math.round(baseTile * 0.55)) : baseTile;
+  const preview = useListPreview();
+  const [barHeight, setBarHeight] = useState(0);
+  // The navigation Back, a swipe or Save as asked to finish while the deck has unsaved changes.
+  const [leaving, setLeaving] = useState<(() => void) | null>(null);
+  const dirty = draftIsDirty(draft);
+  const release = usePreventRemove(dirty, ({ repeat }) => setLeaving(() => repeat));
 
+  // A deck opened from a link, or a relaunch on this route: read it from user.db. The list and the import screen fill the
+  // draft before they open this screen.
   useEffect(() => {
     if (!id || getDeckDraft().id === id) return;
-    if (id === "new") {
-      replaceDeckDraft({ id: "new", name: "", heroes: [], cards: [], heldRefusal: null, droppedNote: null });
-      return;
-    }
-    const row = user
-      .select({ id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards })
-      .from(decks)
-      .where(eq(decks.id, id))
-      .get();
-    if (!row) {
-      replaceDeckDraft({ id: "new", name: "", heroes: [], cards: [], heldRefusal: null, droppedNote: null });
-      return;
-    }
-    replaceDeckDraft({
-      id: row.id,
-      name: row.name,
-      heroes: [...row.heroes],
-      cards: row.cards.map((card) => ({ code: card.code, count: card.count })),
-      heldRefusal: null,
-      droppedNote: null,
-    });
+    const row = id === NEW_DECK_ID ? null : readDeck(user, id);
+    if (row) editSavedDeck(row);
+    else startNewDeck();
   }, [id, user]);
 
   const codeKey = [...draft.heroes, ...draft.cards.map((card) => card.code)].join("\0");
-  const faces = useMemo(() => {
-    const codes = codeKey.length === 0 ? [] : codeKey.split("\0");
-    if (codes.length === 0) return new Map<string, Face>();
-    const rows = catalog
-      .select({
-        code: cards.code,
-        name: cards.name,
-        typeCode: cards.typeCode,
-        sphereCode: cards.sphereCode,
-        sphereName: cards.sphereName,
-        deckLimit: cards.deckLimit,
-        deckLegal: cards.deckLegal,
-        traits: cards.traits,
-        imagesrc: cards.imagesrc,
-      })
-      .from(cards)
-      .where(inArray(cards.code, codes))
-      .all();
-    return new Map(rows.map((row) => [row.code, row]));
-  }, [catalog, codeKey]);
+  const faces = useMemo(() => deckFaces(catalog, codeKey.length === 0 ? [] : codeKey.split("\0")), [catalog, codeKey]);
 
-  const rows: EditorRow[] = draft.cards.map((card) => {
-    const face = faces.get(card.code);
-    return {
-      code: card.code,
-      count: card.count,
-      name: face?.name ?? card.code,
-      imagesrc: face?.imagesrc ?? null,
-      deckLimit: face?.deckLimit ?? null,
-      sphereCode: face?.sphereCode ?? null,
-      sphereName: face?.sphereName ?? null,
-    };
-  });
-  const total = draft.cards.reduce((sum, card) => sum + card.count, 0);
-  const refusal = draftRefusal(draft, faces);
-  const heroes = draft.heroes.map(
-    (code) => faces.get(code) ?? { code, name: code, sphereCode: null, sphereName: null, imagesrc: null },
+  const rows = deckSections<EditorCard>(
+    draft.cards.map((card) => {
+      const face = faces.get(card.code);
+      return {
+        code: card.code,
+        count: card.count,
+        name: face?.name ?? card.code,
+        typeCode: face?.typeCode ?? null,
+        imagesrc: face?.imagesrc ?? null,
+        deckLimit: face?.deckLimit ?? null,
+        sphereCode: face?.sphereCode ?? null,
+        sphereName: face?.sphereName ?? null,
+      };
+    }),
   );
+  const readiness = deckReadiness(draft, faces);
+  const threat = startingThreat(draft.heroes, faces);
+  const heroes: HeroFace[] = draft.heroes.map((code) => faces.get(code) ?? { code, name: code, sphereCode: null, sphereName: null, imagesrc: null });
   const emptySlots = Math.max(0, 3 - heroes.length);
+  const baseTile = Math.max(120, Math.min(Math.round(height / 4), 200));
+  const tileHeight = heroes.length > 3 ? Math.max(96, Math.round(baseTile * 0.6)) : baseTile;
+
+  function addHero(): void {
+    router.push({ pathname: "/pool", params: { adding: "1", type: "hero" } });
+  }
+
+  // Writes the deck as it stands, ready to play or not, and says so.
+  function save(): void {
+    const current = getDeckDraft();
+    const others = listDecks(user).filter((deck) => deck.id !== current.id).map((deck) => deck.name);
+    const name = savedDeckName(current.name, others);
+    const savedId = writeDeck(user, { id: current.id === NEW_DECK_ID ? null : current.id, name, heroes: current.heroes, cards: current.cards });
+    markDraftSaved(savedId, name);
+    showToast(`Saved ${name}`);
+  }
 
   function onSave(): void {
-    const current = getDeckDraft();
-    if (draftRefusal(current, faces)) return;
-    const name = current.name.trim();
-    const heroes = [...current.heroes];
-    const nextCards = current.cards.map((card) => ({ code: card.code, count: card.count }));
-    if (current.id === "new") {
-      user.insert(decks).values({ id: newDeckId(), name, heroes, cards: nextCards }).run();
-    } else {
-      user.update(decks).set({ name, heroes, cards: nextCards }).where(eq(decks.id, current.id)).run();
-    }
+    if (dirty || !draft.saved) save();
+    release();
     goBack(router, "/decks");
+  }
+
+  function finishLeaving(keep: "save" | "discard"): void {
+    const go = leaving;
+    if (keep === "save") save();
+    else discardDraftChanges();
+    setLeaving(null);
+    go?.();
   }
 
   if (!id) throw new Error("Missing route code");
 
+  const header = (
+    <View>
+      <View className={heroes.length > 3 ? "mt-2 flex-row flex-wrap justify-between" : "mt-2 flex-row gap-2"}>
+        {heroes.map((hero) => (
+          <View key={hero.code} style={heroes.length > 3 ? { width: "48%", height: tileHeight, marginBottom: 8 } : { flex: 1 }}>
+            <HeroTile hero={hero} height={tileHeight} onRemove={() => announceDraftChange(removeDraftHero(hero.code, hero.name))} />
+          </View>
+        ))}
+        {Array.from({ length: emptySlots }, (_, index) => (
+          <View key={`empty-${index}`} className="flex-1">
+            <EmptyHeroSlot height={tileHeight} testID={index === 0 ? "deck-add-hero" : `deck-add-hero-${index}`} onPress={addHero} />
+          </View>
+        ))}
+      </View>
+      <TextInput
+        testID="deck-name"
+        value={draft.name}
+        onChangeText={setDeckName}
+        placeholder="Name this deck"
+        placeholderTextColor={palette.faint}
+        accessibilityLabel="Deck name"
+        selectTextOnFocus
+        returnKeyType="done"
+        className="mt-4 border-b border-hairline pb-1 font-display text-title text-bone"
+        style={{ minHeight: 44 }}
+      />
+      <Label testID="deck-count" className="mt-2">
+        {threat == null ? deckCountLine(draft) : `${deckCountLine(draft)} · Starting threat ${threat}`}
+      </Label>
+      <View className="mt-1 flex-row items-center gap-1.5">
+        <RingMark size={10} state={readiness.ready ? "done" : "locked"} />
+        <Text testID={readiness.ready ? "deck-ready" : "deck-error"} className={`text-label ${readiness.ready ? "text-gold" : "text-danger"}`}>
+          {readiness.ready ? readiness.text : `Not ready to play: ${readiness.text}`}
+        </Text>
+      </View>
+      {draft.droppedNote ? (
+        <BodyText testID="deck-import-dropped" tone="muted" className="mt-2">
+          {draft.droppedNote}
+        </BodyText>
+      ) : null}
+    </View>
+  );
+
   return (
     <Screen testID="deck-editor" scene="plain">
       <View className="min-h-0 flex-1">
-        <NavBar backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} />
-        <View className={heroes.length > 3 ? "mt-2 flex-row flex-wrap justify-between" : "mt-2 flex-row gap-2"}>
-          {heroes.map((hero) => (
-            <View
-              key={hero.code}
-              style={heroes.length > 3 ? { width: "48%", height: tileHeight, marginBottom: 8 } : { flex: 1 }}
-            >
-              <HeroTile hero={hero} height={tileHeight} onRemove={() => removeDraftHero(hero.code)} />
-            </View>
-          ))}
-          {Array.from({ length: emptySlots }, (_, index) => (
-            <View key={`empty-${index}`} className="flex-1">
-              <EmptyHeroSlot height={tileHeight} />
-            </View>
-          ))}
-        </View>
-        <TextInput
-          testID="deck-name"
-          value={draft.name}
-          onChangeText={setDeckName}
-          placeholder="Deck name"
-          placeholderTextColor={palette.faint}
-          className="mt-4 font-display text-title text-bone"
-          style={{ minHeight: 44 }}
+        <NavBar
+          backLabel="Decks"
+          backTestID="deck-back"
+          onBack={() => goBack(router, "/decks")}
+          right={dirty ? <Label testID="deck-unsaved">Unsaved changes</Label> : null}
         />
-        <Label tone={total < 50 ? "danger" : "muted"} className="mt-2">
-          {`${total} of 50`}
-        </Label>
-        {draft.droppedNote ? (
-          <BodyText testID="deck-import-dropped" tone="muted" className="mt-2">
-            {draft.droppedNote}
-          </BodyText>
-        ) : null}
-        {refusal ? (
-          <BodyText testID="deck-error" tone="danger" className="mt-2">
-            {formatDeckRefusal(refusal)}
-          </BodyText>
-        ) : null}
-        <View className="mt-2 min-h-0 flex-1">
+        <View className="min-h-0 flex-1">
           <FlashList
             data={rows}
-            keyExtractor={(item) => item.code}
+            keyExtractor={(item) => item.key}
+            getItemType={(item) => item.kind}
             style={{ flex: 1 }}
-            extraData={total}
+            extraData={faces}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
             keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => <EditorRowView item={item} />}
+            keyboardDismissMode="on-drag"
+            ListHeaderComponent={header}
+            ListEmptyComponent={
+              <BodyText testID="deck-empty" tone="muted" className="mt-6">
+                No cards yet. Tap Add cards to pick allies, attachments and events from the full player pool.
+              </BodyText>
+            }
+            ListFooterComponent={<View className="h-6" />}
+            renderItem={({ item }) =>
+              item.kind === "type" ? (
+                <View accessibilityRole="header" className="pb-1 pt-5">
+                  <Eyebrow tone="muted">{`${item.title} · ${item.count}`}</Eyebrow>
+                </View>
+              ) : (
+                <EditorCardRow card={item.card} onPreview={preview.open} />
+              )
+            }
           />
         </View>
-        <View className="pb-safe">
-          <TextButton
-            testID="deck-add"
-            label="Add cards"
-            onPress={() => {
-              router.push({ pathname: "/pool", params: { adding: "1" } });
-            }}
-          />
-          <View className="mt-2">
-            <PrimaryButton testID="deck-save" label="Save" disabled={refusal !== null} onPress={onSave} />
+        <View className="flex-row items-center gap-2 pb-safe pt-2" onLayout={(event) => setBarHeight(Math.round(event.nativeEvent.layout.height))}>
+          <TextButton testID="deck-add" label="Add cards" tone="gold" onPress={() => router.push({ pathname: "/pool", params: { adding: "1" } })} />
+          <View className="flex-1">
+            <PrimaryButton testID="deck-save" label="Save" onPress={onSave} />
           </View>
         </View>
       </View>
+      <Modal visible={leaving !== null} transparent animationType="fade" onRequestClose={() => setLeaving(null)}>
+        <View className="flex-1 justify-end">
+          <Pressable
+            accessibilityLabel="Keep editing"
+            onPress={() => setLeaving(null)}
+            style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: palette.night, opacity: 0.72 }}
+          />
+          <PaperSheet step="Unsaved changes" title={draft.name.trim() || "New deck"}>
+            <Text className="text-body text-ink">
+              {readiness.ready
+                ? "Save your changes before you leave?"
+                : `Save your changes before you leave? The deck is not ready to play yet (${readiness.text.replace(/\.$/, "")}). You can finish it later.`}
+            </Text>
+            <View className="mt-5">
+              <PrimaryButton testID="leave-save" label="Save" surface="paper" onPress={() => finishLeaving("save")} />
+              <View className="mt-2 flex-row justify-center">
+                <TextButton testID="leave-discard" label="Discard changes" tone="ink" onPress={() => finishLeaving("discard")} />
+                <TextButton testID="leave-keep" label="Keep editing" tone="ink" onPress={() => setLeaving(null)} />
+              </View>
+            </View>
+          </PaperSheet>
+        </View>
+      </Modal>
+      <ToastView bottom={barHeight + 8} />
+      {preview.overlay}
     </Screen>
   );
 }

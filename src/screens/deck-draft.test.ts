@@ -2,13 +2,24 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import {
   addDraftCard,
+  announceDraftChange,
+  changeDraftCount,
+  discardDraftChanges,
   draftCopyCount,
+  draftIsDirty,
+  editSavedDeck,
   getDeckDraft,
-  newDeckId,
+  markDraftSaved,
   removeDraftHero,
-  replaceDeckDraft,
+  restoreDraft,
+  setDeckName,
   startNewDeck,
+  takeDraftCard,
 } from "./deck-draft.ts";
+import { getToast } from "./toast.ts";
+
+const sam = { code: "141002", name: "Sam Gamgee", typeCode: "hero", deckLimit: 1 };
+const gandalf = { code: "01073", name: "Gandalf", typeCode: "ally", deckLimit: 3 };
 
 beforeEach(() => {
   startNewDeck();
@@ -16,33 +27,71 @@ beforeEach(() => {
 
 describe("deck draft", () => {
   it("names a hero already in the deck and does not add a second copy", () => {
-    addDraftCard({ code: "141002", name: "Sam Gamgee", typeCode: "hero", deckLimit: 1 });
-    addDraftCard({ code: "141002", name: "Sam Gamgee", typeCode: "hero", deckLimit: 1 });
+    expect(addDraftCard(sam)).toMatchObject({ ok: true, text: "Added Sam Gamgee · hero 1 of 3" });
+    expect(addDraftCard(sam)).toEqual({ ok: false, text: "Sam Gamgee: A hero appears once." });
     const draft = getDeckDraft();
     expect(draft.heroes).toEqual(["141002"]);
-    expect(draft.heldRefusal).toEqual({
-      cardCode: "141002",
-      cardName: "Sam Gamgee",
-      rule: "A hero appears once.",
-    });
     expect(draftCopyCount(draft, "141002", "hero")).toBe(1);
   });
 
-  it("counts copies of a card already in the draft", () => {
-    addDraftCard({ code: "01073", name: "Gandalf", typeCode: "ally", deckLimit: 3 });
-    addDraftCard({ code: "01073", name: "Gandalf", typeCode: "ally", deckLimit: 3 });
+  it("refuses a fourth hero and leaves the three", () => {
+    for (const code of ["h1", "h2", "h3"]) addDraftCard({ code, name: code, typeCode: "hero", deckLimit: 1 });
+    expect(addDraftCard({ code: "h4", name: "Aragorn", typeCode: "hero", deckLimit: 1 })).toEqual({ ok: false, text: "Aragorn: At most three heroes." });
+    expect(getDeckDraft().heroes).toEqual(["h1", "h2", "h3"]);
+  });
+
+  it("counts copies and says how many of the limit the deck holds", () => {
+    expect(addDraftCard(gandalf)).toMatchObject({ ok: true, text: "Added Gandalf · 1 of 3" });
+    expect(addDraftCard(gandalf)).toMatchObject({ ok: true, text: "Added Gandalf · 2 of 3" });
     expect(draftCopyCount(getDeckDraft(), "01073", "ally")).toBe(2);
   });
 
-  it("keeps a fourth hero until that hero is removed", () => {
-    replaceDeckDraft({
-      id: "new",
-      name: "Imported",
-      heroes: ["h0", "h1", "h2", "h3"],
-      cards: [],
-      heldRefusal: null,
-      droppedNote: "Dropped Elrond.",
-    });
+  it("refuses a fourth copy without adding it, and a copy past a lower deck limit", () => {
+    for (let n = 0; n < 3; n += 1) addDraftCard(gandalf);
+    expect(addDraftCard(gandalf)).toEqual({ ok: false, text: "Gandalf: At most three copies." });
+    expect(draftCopyCount(getDeckDraft(), "01073", "ally")).toBe(3);
+    addDraftCard({ code: "x", name: "Steward", typeCode: "attachment", deckLimit: 1 });
+    expect(addDraftCard({ code: "x", name: "Steward", typeCode: "attachment", deckLimit: 1 })).toEqual({ ok: false, text: "Steward: Deck limit is 1." });
+  });
+
+  it("takes out one copy at a time and drops the row at none", () => {
+    addDraftCard(gandalf);
+    addDraftCard(gandalf);
+    expect(takeDraftCard(gandalf)).toMatchObject({ ok: true, text: "Removed a copy of Gandalf · 1 of 3" });
+    expect(changeDraftCount("01073", "Gandalf", 3, -1)).toMatchObject({ ok: true, text: "Removed Gandalf" });
+    expect(getDeckDraft().cards).toEqual([]);
+    expect(takeDraftCard(gandalf)).toEqual({ ok: false, text: "Gandalf: Not in this deck." });
+  });
+
+  it("puts the deck back as it was before a change (Undo)", () => {
+    addDraftCard(gandalf);
+    const change = takeDraftCard(gandalf);
+    expect(getDeckDraft().cards).toEqual([]);
+    if (!change.ok) throw new Error("expected a change");
+    restoreDraft(change.before);
+    expect(getDeckDraft().cards).toEqual([{ code: "01073", count: 1 }]);
+  });
+
+  it("removes a hero and offers it back", () => {
+    addDraftCard(sam);
+    const change = removeDraftHero("141002", "Sam Gamgee");
+    expect(change).toMatchObject({ ok: true, text: "Removed Sam Gamgee" });
+    expect(getDeckDraft().heroes).toEqual([]);
+    announceDraftChange(change);
+    const toast = getToast();
+    expect(toast?.text).toBe("Removed Sam Gamgee");
+    toast?.undo?.();
+    expect(getDeckDraft().heroes).toEqual(["141002"]);
+  });
+
+  it("shows a refusal as a danger toast with no Undo", () => {
+    for (let n = 0; n < 3; n += 1) addDraftCard(gandalf);
+    announceDraftChange(addDraftCard(gandalf));
+    expect(getToast()).toMatchObject({ text: "Gandalf: At most three copies.", tone: "danger", undo: null });
+  });
+
+  it("keeps a fourth hero from an import until that hero is removed", () => {
+    startNewDeck({ name: "Imported", heroes: ["h0", "h1", "h2", "h3"], droppedNote: "Dropped Elrond." });
     expect(getDeckDraft().heroes).toEqual(["h0", "h1", "h2", "h3"]);
     expect(getDeckDraft().droppedNote).toBe("Dropped Elrond.");
     removeDraftHero("h3");
@@ -50,13 +99,46 @@ describe("deck draft", () => {
   });
 });
 
-describe("newDeckId", () => {
-  it("is the time and an eight-character random tail, without crypto", () => {
-    expect(newDeckId(0, () => 0)).toBe("deck-0-00000000");
-    expect(newDeckId(36, () => 0.5)).toBe("deck-10-i0000000");
+describe("unsaved changes", () => {
+  it("a new deck is dirty once it holds a hero or a card, not for its name alone", () => {
+    startNewDeck({ name: "New deck" });
+    expect(draftIsDirty(getDeckDraft())).toBe(false);
+    setDeckName("Hobbits");
+    expect(draftIsDirty(getDeckDraft())).toBe(false);
+    addDraftCard(sam);
+    expect(draftIsDirty(getDeckDraft())).toBe(true);
   });
 
-  it("differs between two decks saved in the same millisecond", () => {
-    expect(newDeckId(1000)).not.toBe(newDeckId(1000));
+  it("a saved deck is dirty after a change and clean once it is back as saved", () => {
+    editSavedDeck({ id: "deck-a", name: "Hobbits", heroes: ["141002"], cards: [{ code: "01073", count: 1 }] });
+    expect(draftIsDirty(getDeckDraft())).toBe(false);
+    const change = addDraftCard(gandalf);
+    expect(draftIsDirty(getDeckDraft())).toBe(true);
+    if (change.ok) restoreDraft(change.before);
+    expect(draftIsDirty(getDeckDraft())).toBe(false);
+    setDeckName("Hobbits ");
+    expect(draftIsDirty(getDeckDraft())).toBe(false);
+    setDeckName("Halflings");
+    expect(draftIsDirty(getDeckDraft())).toBe(true);
+  });
+
+  it("Save makes the draft the saved deck under its new id", () => {
+    addDraftCard(sam);
+    markDraftSaved("deck-b", "New deck");
+    const draft = getDeckDraft();
+    expect(draft.id).toBe("deck-b");
+    expect(draft.name).toBe("New deck");
+    expect(draftIsDirty(draft)).toBe(false);
+  });
+
+  it("Discard puts a saved deck back and empties a new one", () => {
+    editSavedDeck({ id: "deck-a", name: "Hobbits", heroes: ["141002"], cards: [] });
+    addDraftCard(gandalf);
+    discardDraftChanges();
+    expect(getDeckDraft()).toMatchObject({ id: "deck-a", heroes: ["141002"], cards: [] });
+    startNewDeck();
+    addDraftCard(gandalf);
+    discardDraftChanges();
+    expect(getDeckDraft()).toMatchObject({ id: "new", heroes: [], cards: [] });
   });
 });

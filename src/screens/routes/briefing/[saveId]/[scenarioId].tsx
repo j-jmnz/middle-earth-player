@@ -21,6 +21,8 @@ import { EmptyHeroSlot, HeroTile, type HeroFace } from "../../../hero-tile";
 import { palette } from "../../../palette.js";
 import { routeCode } from "../../../route-code";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed } from "../../../starter-decks";
+import { deckReadiness } from "../../../deck-status";
+import { deckFaces } from "../../../deck-store";
 import { decks } from "../../../user-schema";
 import { useSave } from "../../../use-save";
 
@@ -81,6 +83,12 @@ export default function Briefing() {
       .all();
     return new Map(rows.map((row) => [row.code, row]));
   }, [catalog, candidates, savedDecks]);
+
+  // A deck saves before it is ready to play; the picker does not offer one that breaks a deckbuilding rule (rr.deckbuilding).
+  const readiness = useMemo(() => {
+    const facts = deckFaces(catalog, savedDecks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)]));
+    return new Map(savedDecks.map((deck) => [deck.id, deckReadiness(deck, facts)]));
+  }, [catalog, savedDecks]);
 
   const world = useMemo(() => {
     if (!save || !campaign || !scenario) return null;
@@ -215,14 +223,16 @@ export default function Briefing() {
                 {savedDecks.map((deck) => {
                   const selected = picked[index] === deck.id;
                   const fallen = deck.heroes.filter((code) => save.log.fallenHeroesBySeat.flat().includes(code));
+                  const ready = readiness.get(deck.id) ?? { ready: true, text: "" };
+                  const blocked = fallen.length > 0 || !ready.ready;
                   return (
                     <Pressable
                       key={deck.id}
                       testID={`deck-pick-${index}-${deck.id}`}
                       collapsable={false}
                       accessibilityRole="radio"
-                      accessibilityState={{ selected, disabled: fallen.length > 0 }}
-                      disabled={fallen.length > 0}
+                      accessibilityState={{ selected, disabled: blocked }}
+                      disabled={blocked}
                       onPress={() => pick(index, deck.id)}
                       className="min-h-14 flex-row items-center gap-3 border-b border-hairline py-2"
                       style={({ pressed }) => (pressed ? pressedNight : undefined)}
@@ -230,8 +240,10 @@ export default function Briefing() {
                       {/* The selected deck is a filled ring and the others an empty one, so the mark does not rest on color. */}
                       <RingMark size={14} state={selected ? "done" : "locked"} />
                       <View className="flex-1">
-                        <Text className={selected ? "text-body font-semibold text-gold" : fallen.length > 0 ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
-                        <Text className="text-label text-muted">{fallen.length > 0 ? `${heroNames(fallen)} fell and cannot be picked` : heroNames(deck.heroes)}</Text>
+                        <Text className={selected ? "text-body font-semibold text-gold" : blocked ? "text-body text-faint" : "text-body text-bone"}>{deck.name}</Text>
+                        <Text className="text-label text-muted">
+                          {fallen.length > 0 ? `${heroNames(fallen)} fell and cannot be picked` : ready.ready ? heroNames(deck.heroes) : `Not ready to play: ${ready.text}`}
+                        </Text>
                       </View>
                       {selected ? <Text className="text-label text-gold">Selected</Text> : null}
                     </Pressable>

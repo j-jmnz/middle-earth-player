@@ -125,12 +125,6 @@ export function droppedSentence(names: readonly string[]): string | null {
   return `Dropped ${names.join(", ")}.`;
 }
 
-export function importSavedSentence(names: readonly string[]): string {
-  const dropped = droppedSentence(names);
-  if (!dropped) return "The deck was saved.";
-  return `The deck was saved. ${dropped}`;
-}
-
 /** The pre-built player decks from data/decks/prebuilt.json, in the order the index lists them. */
 export const prebuiltDecks: readonly PrebuiltDeck[] = prebuiltDecksSchema.parse(prebuiltJson);
 

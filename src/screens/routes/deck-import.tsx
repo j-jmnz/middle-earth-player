@@ -4,16 +4,16 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { TextInput, View } from "react-native";
 
-import { deckSaveRefusal, type DeckSaveCard } from "../../catalog/deck-save";
 import { cards } from "../../catalog/schema";
 import { BodyText, Eyebrow, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SphereMark, markedSphere, type MarkedSphere } from "../chrome";
-import { newDeckId, replaceDeckDraft } from "../deck-draft";
+import { editSavedDeck, startNewDeck } from "../deck-draft";
+import { savedDeckName } from "../deck-status";
+import { listDecks, readDeck, writeDeck } from "../deck-store";
 import {
   buildDecklist,
   cardUrl,
   decklistUrl,
   droppedSentence,
-  importSavedSentence,
   parseDecklistRef,
   prebuiltBody,
   prebuiltDecks,
@@ -26,8 +26,8 @@ import {
 import { useDatabases } from "../databases";
 import { palette } from "../palette.js";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
-import { decks } from "../user-schema";
 import { goBack } from "../go-back";
+import { showToast } from "../toast";
 
 const FETCH_FAILURE = "RingsDB did not respond.";
 
@@ -75,10 +75,7 @@ export default function DeckImportScreen() {
   }, [catalog]);
   const [value, setValue] = useState("");
   const [message, setMessage] = useState<string | null>(null);
-  const [dropped, setDropped] = useState<string | null>(null);
-  const [savedNote, setSavedNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [saved, setSaved] = useState(false);
   // One editor per tap: a second tap before the editor is on screen does nothing. Coming back here clears it.
   const opening = useRef(false);
   useFocusEffect(
@@ -88,9 +85,8 @@ export default function DeckImportScreen() {
   );
 
   async function onImport(): Promise<void> {
-    if (busy || saved) return;
+    if (busy || opening.current) return;
     setMessage(null);
-    setDropped(null);
     const id = parseDecklistRef(value);
     if (!id) {
       setMessage("That is not a RingsDB decklist.");
@@ -124,60 +120,31 @@ export default function DeckImportScreen() {
     if (busy || opening.current) return;
     opening.current = true;
     const built = buildDecklist(prebuiltBody(deck), pool);
-    replaceDeckDraft({
-      id: "new",
+    startNewDeck({
       name: built.name,
       heroes: built.heroes,
       cards: built.cards,
-      heldRefusal: null,
       // The editor's note line also carries the deck's note: a printed condition, or why a core deck is short of 50.
       droppedNote: [droppedSentence(built.droppedCodes), deck.note].filter((text) => text).join(" ") || null,
     });
     router.push({ pathname: "/deck/[id]", params: { id: "new" } });
   }
 
-  // Saves an imported deck when the deckbuilding rules allow it; otherwise opens it in the editor.
+  // Saves an imported deck, ready to play or not, and opens it in the editor, which names what was dropped and what the
+  // deck still lacks. A hero listed twice is refused: the list itself is wrong.
   function save(built: BuiltDecklist, names: readonly string[]): void {
-    const sentence = droppedSentence(names);
-    if (sentence) setDropped(sentence);
     if (built.heroLimit) {
       setMessage(`${built.heroLimit.cardName} Deck limit is 1.`);
       return;
     }
-    const facts = new Map<string, DeckSaveCard>();
-    for (const code of [...built.heroes, ...built.cards.map((card) => card.code)]) {
-      const row = pool.get(code);
-      if (row) facts.set(code, row);
-    }
-    const draft = {
-      id: "new",
-      name: built.name,
-      heroes: built.heroes,
-      cards: built.cards,
-      heldRefusal: null,
-      droppedNote: sentence,
-    };
-    const refusal = built.name.trim().length === 0
-      ? { cardCode: null, cardName: null, rule: "Name the deck." }
-      : deckSaveRefusal(built.heroes, built.cards, facts, []);
-    if (refusal) {
-      replaceDeckDraft(draft);
-      router.push({ pathname: "/deck/[id]", params: { id: "new" } });
-      return;
-    }
-    user.insert(decks).values({
-      id: newDeckId(),
-      name: built.name.trim(),
-      heroes: [...built.heroes],
-      cards: built.cards.map((card) => ({ code: card.code, count: card.count })),
-    }).run();
-    if (sentence) {
-      setSaved(true);
-      setDropped(null);
-      setSavedNote(importSavedSentence(names));
-      return;
-    }
-    goBack(router, "/decks");
+    const name = savedDeckName(built.name, listDecks(user).map((deck) => deck.name));
+    const id = writeDeck(user, { id: null, name, heroes: built.heroes, cards: built.cards });
+    const row = readDeck(user, id);
+    if (!row) return;
+    opening.current = true;
+    editSavedDeck(row, droppedSentence(names));
+    showToast(`Imported ${name}`);
+    router.replace({ pathname: "/deck/[id]", params: { id } });
   }
 
   // The heroes' spheres, once each, in hero order.
@@ -211,18 +178,8 @@ export default function DeckImportScreen() {
           {message}
         </BodyText>
       ) : null}
-      {savedNote ? (
-        <BodyText tone="muted" className="mt-4">
-          {savedNote}
-        </BodyText>
-      ) : null}
-      {dropped ? (
-        <BodyText testID="deck-import-dropped" tone="muted" className="mt-4">
-          {dropped}
-        </BodyText>
-      ) : null}
       <View className="mt-6">
-        <PrimaryButton testID="deck-import-submit" label="Import" disabled={busy || saved} onPress={() => void onImport()} />
+        <PrimaryButton testID="deck-import-submit" label="Import" disabled={busy} onPress={() => void onImport()} />
       </View>
       {busy ? (
         <BodyText testID="deck-import-busy" tone="muted" className="mt-4">
