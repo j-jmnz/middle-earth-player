@@ -111,12 +111,19 @@ export default function RootLayout() {
         ) : databases ? (
           <DatabaseBoundary>
             <DatabaseProvider databases={databases}>
+              {/* Portrait everywhere but the table, which is played in landscape only. The card and booklet screens open from
+                  both, so they follow the phone and the table does not turn the phone back to read a card. */}
               <Stack
                 screenOptions={{
                   headerShown: false,
                   contentStyle: { backgroundColor: palette.night },
+                  orientation: "portrait",
                 }}
-              />
+              >
+                <Stack.Screen name="table/[saveId]" options={{ orientation: "landscape" }} />
+                <Stack.Screen name="card/[code]" options={{ orientation: "all" }} />
+                <Stack.Screen name="booklet/[id]" options={{ orientation: "all" }} />
+              </Stack>
             </DatabaseProvider>
           </DatabaseBoundary>
         ) : null}

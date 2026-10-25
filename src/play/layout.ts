@@ -1,18 +1,24 @@
-// Where each zone and card sits on the one table canvas. Pure geometry: the canvas draws these rectangles, and the drag
-// worklets hit-test them on the UI thread (the functions marked "worklet" run there; in Node the directive is an unused
-// string). Zones are regions of the felt with no boxed labels (docs/design-system.md, Table).
+// Where each zone, pile and card sits on the one table canvas, which is always wider than it is tall: the table is played
+// in landscape (docs/design-system.md, Table). Pure geometry: the canvas draws these rectangles, and the drag worklets
+// hit-test them on the UI thread (the functions marked "worklet" run there; in Node the directive is an unused string).
+//
+// The quest stage, the active location and the player's deck and discard pile make a column at the left. To its right, top
+// to bottom: staging (the encounter deck and its discard pile at its right end), the engagement area (each engaged enemy
+// with its shadow cards and the characters fighting it), the play area, and the hand, which peeks up from the bottom edge.
 import type { CardInstance } from "../rules/state.ts";
 
-import type { ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
+import type { PileId, PileView, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
 
 export type Rect = { x: number; y: number; w: number; h: number };
 
-export type SlotKind = "card" | "attachment" | "shadow";
+export type SlotKind = "card" | "attachment" | "shadow" | "pile";
+
+export type SlotZone = ZoneId | PileId;
 
 export type CardSlot = Rect & {
   id: string;
   code: string;
-  zone: ZoneId;
+  zone: SlotZone;
   kind: SlotKind;
   exhausted: boolean;
   faceDown: boolean;
@@ -23,29 +29,59 @@ export type CardSlot = Rect & {
   progress: number;
   // A slight turn for the hand fan, in radians.
   tilt: number;
+  // How many cards a pile holds; 0 for anything else.
+  count: number;
+  // Committed to the quest: drawn a step higher, with its willpower.
+  committed: boolean;
 };
+
+// The mark between an engaged enemy and the characters fighting it: a defense, the hero an undefended attack hits, or an
+// attack by the players.
+export type CombatMark = { x: number; y: number; kind: "defense" | "undefended" | "attack"; enemyId: string };
 
 export type TableLayout = {
   width: number;
   height: number;
   card: { w: number; h: number };
   zones: Readonly<Record<ZoneId, Rect>>;
+  piles: Readonly<Record<PileId, Rect>>;
   slots: readonly CardSlot[];
+  marks: readonly CombatMark[];
 };
 
 export type LayoutViews = Readonly<Record<ZoneId, ZoneView>>;
+export type PileViews = Readonly<Record<PileId, PileView>>;
 
-const GUTTER = 12;
-const GAP = 8;
-const BAND = 72;
-const PEEK = 12;
+export type LayoutOptions = {
+  // The hand card the player has picked: drawn whole above the bottom edge.
+  raised?: string | null;
+  // The top card of the deck when the rules let the player play it (Gandalf, 142002): face up on the deck, and a card.
+  deckTop?: CardInstance | null;
+};
+
+const GUTTER = 8;
+const GAP = 6;
+export const PEEK = 10;
 const ASPECT = 1.4;
+// How much of a hand card shows above the bottom edge.
+export const HAND_SHOW = 0.56;
+// The left column is one and a half cards wide: the quest card is printed sideways.
+const LEFT = 1.5;
+// A face-up shadow card sits beside its enemy at this scale.
+const SHADOW_SCALE = 0.8;
+// Characters fighting the same enemy overlap by this much of a card.
+const PAIR_STEP = 0.72;
+// Room for the mark between an enemy and the characters fighting it.
+const MARK = 16;
 
-/** The card size that fits five across and every row in the height the canvas has. */
+/**
+ * The card size that fits three rows, the hand's strip and seven cards across the canvas: the left column is one and a half
+ * cards, the rest holds six.
+ */
 export function cardSize(width: number, height: number): { w: number; h: number } {
-  const byWidth = (width - 2 * GUTTER - 4 * GAP) / 5;
-  const byHeight = (height - BAND - 5 * GAP - 2 * PEEK) / (ASPECT * 3.85);
-  const w = Math.max(36, Math.floor(Math.min(byWidth, byHeight, 84)));
+  const byHeight = (height - GUTTER - 3 * GAP - 3 * PEEK) / (3 + HAND_SHOW) / ASPECT;
+  const byWidth = (width - 3 * GUTTER - 5 * GAP) / (6 + LEFT);
+  const w = Math.max(34, Math.floor(Math.min(byWidth, byHeight, 96)));
   return { w, h: Math.round(w * ASPECT) };
 }
 
@@ -58,7 +94,7 @@ export function handCardSize(card: { w: number; h: number }, width: number, coun
   return w === card.w ? card : { w, h: Math.round(w * ASPECT) };
 }
 
-function slotOf(card: CardInstance, zone: ZoneId, kind: SlotKind, rect: Rect, landscape = false, tilt = 0): CardSlot {
+function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect: Rect, landscape = false, tilt = 0): CardSlot {
   return {
     ...rect,
     id: card.id,
@@ -72,84 +108,213 @@ function slotOf(card: CardInstance, zone: ZoneId, kind: SlotKind, rect: Rect, la
     damage: card.damage,
     progress: card.progress,
     tilt,
+    count: 0,
+    committed: card.committed,
   };
 }
 
-// Positions for `count` cards across a row from `x` to `x + width`: spaced by one gap, overlapping when they do not fit.
-function rowXs(count: number, x: number, width: number, cardWidth: number): number[] {
-  if (count === 0) return [];
-  const natural = cardWidth + GAP;
-  const step = count === 1 ? 0 : Math.min(natural, (width - cardWidth) / (count - 1));
-  return Array.from({ length: count }, (_, index) => x + index * step);
+// The width a card takes in a row: an exhausted card is turned sideways.
+function footprint(card: CardInstance, size: { w: number; h: number }): number {
+  return card.exhausted ? size.h : size.w;
 }
 
-function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, card: { w: number; h: number }, out: CardSlot[], shadows = false): void {
-  const xs = rowXs(entries.length, area.x, area.w, card.w);
+// Left edges for items of these widths across a row from `x` to `x + width`: spaced by one gap, squeezed (overlapping) when
+// they do not fit.
+function rowXs(widths: readonly number[], x: number, width: number): number[] {
+  if (widths.length === 0) return [];
+  const natural = widths.reduce((sum, w) => sum + w, 0) + GAP * (widths.length - 1);
+  const squeeze = widths.length > 1 && natural > width ? (natural - width) / (widths.length - 1) : 0;
+  const xs: number[] = [];
+  let at = x;
+  for (const w of widths) {
+    xs.push(at);
+    at += w + GAP - squeeze;
+  }
+  return xs;
+}
+
+// A card at the left edge `x` of its footprint: an exhausted card is drawn centered in its sideways footprint.
+function cardRect(card: CardInstance, x: number, y: number, size: { w: number; h: number }): Rect {
+  const offset = card.exhausted ? (size.h - size.w) / 2 : 0;
+  return { x: x + offset, y, w: size.w, h: size.h };
+}
+
+// Attachments and face-down shadow cards peek out from under the host, the most recent lowest.
+function placeUnder(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: CardSlot[], faceUpShadows: CardInstance[]): void {
+  const under = entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down"));
+  under.forEach((attached, at) => {
+    const kind: SlotKind = attached.zone === "shadow" ? "shadow" : "attachment";
+    out.push(slotOf(attached, zone, kind, { x: rect.x, y: rect.y + (under.length - at) * PEEK, w: rect.w, h: rect.h }));
+  });
+  faceUpShadows.push(...entry.attached.filter((attached) => attached.zone === "shadow" && attached.face !== "down"));
+}
+
+function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[]): void {
+  const xs = rowXs(entries.map((entry) => footprint(entry.card, size)), area.x, area.w);
   entries.forEach((entry, index) => {
-    const x = xs[index] ?? area.x;
-    // Attachments peek out from under the host, the most recent lowest.
-    entry.attached.forEach((attached, at) => {
-      const kind: SlotKind = shadows && attached.zone === "shadow" ? "shadow" : "attachment";
-      out.push(slotOf(attached, zone, kind, { x, y: area.y + (entry.attached.length - at) * PEEK, w: card.w, h: card.h }));
-    });
-    out.push(slotOf(entry.card, zone, "card", { x, y: area.y, w: card.w, h: card.h }));
+    const rect = cardRect(entry.card, xs[index] ?? area.x, area.y, size);
+    placeUnder(entry, zone, rect, out, []);
+    // A committed character stands a step higher, sent toward the quest.
+    const lift = entry.card.committed ? -PEEK / 2 : 0;
+    out.push(slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }));
   });
 }
 
-// The most cards stacked under one card in these zones (attachments and shadow cards).
-function deepestStack(zones: readonly ZoneView[]): number {
-  return Math.max(0, ...zones.flatMap((view) => view.entries.map((entry) => entry.attached.length)));
+// The most cards peeking out under one card of these entries: attachments and face-down shadow cards.
+function deepestUnder(entries: readonly ZoneEntry[]): number {
+  return Math.max(0, ...entries.map((entry) => entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down")).length));
+}
+
+// The engagement area: each enemy, its resolved shadow cards beside it, then the characters fighting it.
+function groupWidth(entry: ZoneEntry, size: { w: number; h: number }): number {
+  const shadowsUp = entry.attached.filter((card) => card.zone === "shadow" && card.face !== "down").length;
+  const shadows = shadowsUp * (Math.round(size.w * SHADOW_SCALE) + GAP / 2);
+  const paired = entry.paired.length === 0 ? 0 : MARK + footprint(entry.paired[0] as CardInstance, size) + (entry.paired.length - 1) * size.w * PAIR_STEP;
+  return footprint(entry.card, size) + shadows + paired;
+}
+
+function placeEngaged(entries: readonly ZoneEntry[], area: Rect, size: { w: number; h: number }, out: CardSlot[], marks: CombatMark[], defending: (enemy: CardInstance) => CombatMark["kind"]): void {
+  const widths = entries.map((entry) => groupWidth(entry, size) + (entry.paired.length > 0 ? GAP : 0));
+  const xs = rowXs(widths, area.x, area.w);
+  entries.forEach((entry, index) => {
+    const x = xs[index] ?? area.x;
+    const rect = cardRect(entry.card, x, area.y, size);
+    const faceUp: CardInstance[] = [];
+    placeUnder(entry, "engaged", rect, out, faceUp);
+    out.push(slotOf(entry.card, "engaged", "card", rect));
+    let at = x + footprint(entry.card, size) + GAP / 2;
+    const small = { w: Math.round(size.w * SHADOW_SCALE), h: Math.round(size.h * SHADOW_SCALE) };
+    for (const shadow of faceUp) {
+      out.push(slotOf(shadow, "engaged", "shadow", { x: at, y: area.y + (size.h - small.h), w: small.w, h: small.h }));
+      at += small.w + GAP / 2;
+    }
+    if (entry.paired.length === 0) return;
+    marks.push({ x: at + MARK / 2 - GAP / 4, y: area.y + size.h / 2, kind: defending(entry.card), enemyId: entry.card.id });
+    at += MARK;
+    // A character drawn here brings no attachment strips with it; the preview still lists them.
+    entry.paired.forEach((fighter, pairIndex) => {
+      out.push(slotOf(fighter, "engaged", "card", cardRect(fighter, at + pairIndex * size.w * PAIR_STEP, area.y, size)));
+    });
+  });
+}
+
+function pileSlot(view: PileView, rect: Rect, deckTop: CardInstance | null | undefined): CardSlot {
+  const top = view.pile === "deck" ? (deckTop ?? null) : view.top;
+  const base: CardSlot = {
+    ...rect,
+    id: `pile:${view.pile}`,
+    code: top?.code ?? "",
+    zone: view.pile,
+    kind: "pile",
+    exhausted: false,
+    faceDown: top == null,
+    landscape: false,
+    resources: 0,
+    damage: 0,
+    progress: 0,
+    tilt: 0,
+    count: view.ids.length,
+    committed: false,
+  };
+  // A deck whose top card can be played (Gandalf) is that card: it is picked up and played like a card in the hand.
+  return view.pile === "deck" && deckTop ? { ...base, id: deckTop.id, kind: "card" } : base;
 }
 
 /**
- * The table for one seat: the pinned quest stage at the top, then staging, the active location beside the engaged enemies
- * (each carrying every shadow card dealt to it, face down until its attack), the play area, and the hand fanned at the bottom.
+ * The table for one seat. `views` are the zones, `piles` the four piles; `defending` names what fights each engaged enemy in
+ * the attack in progress.
  */
-export function tableLayout(width: number, height: number, views: LayoutViews): TableLayout {
+export function tableLayout(
+  width: number,
+  height: number,
+  views: LayoutViews,
+  piles: PileViews,
+  options: LayoutOptions = {},
+  defending: (enemy: CardInstance) => CombatMark["kind"] = () => "defense",
+): TableLayout {
   const card = cardSize(width, height);
-  const inner = width - 2 * GUTTER;
-  const stage: Rect = { x: GUTTER, y: 0, w: inner, h: BAND };
-  const stagingY = BAND + GAP;
-  const staging: Rect = { x: GUTTER, y: stagingY, w: inner, h: card.h };
-  const middleY = stagingY + card.h + GAP;
+  const leftW = Math.round(card.w * LEFT);
+  const pile = { w: Math.floor((leftW - GAP) / 2), h: Math.round(Math.floor((leftW - GAP) / 2) * ASPECT) };
+  const centerX = GUTTER + leftW + GUTTER;
+  const centerW = width - GUTTER - centerX;
+
+  // Rows, top to bottom.
+  const stagingY = GUTTER;
+  const engagedY = stagingY + card.h + GAP;
+  // The band is as deep as its deepest stack: an enemy with two face-down shadow cards peeks out two steps under it.
+  const engagedH = card.h + PEEK * Math.max(1, deepestUnder(views.engaged.entries));
+  const playY = engagedY + engagedH + GAP;
+  const playH = card.h + 2 * PEEK;
+  const handY = height - Math.round(card.h * HAND_SHOW);
+
+  // The encounter deck and its discard pile at the right end of staging.
+  const encounterW = 2 * pile.w + GAP;
+  const staging: Rect = { x: centerX, y: stagingY, w: Math.max(card.w, centerW - encounterW - GAP), h: card.h };
+  const pileY = stagingY + Math.round((card.h - pile.h) / 2);
+  const encounterDeck: Rect = { x: width - GUTTER - encounterW, y: pileY, w: pile.w, h: pile.h };
+  const encounterDiscard: Rect = { x: encounterDeck.x + pile.w + GAP, y: pileY, w: pile.w, h: pile.h };
+
+  // The left column: the quest card (sideways) level with staging, the active location level with the engagement area, the
+  // player's deck and discard pile level with the play area.
+  const questW = leftW;
+  const questH = Math.round(questW / ASPECT);
+  const questStage: Rect = { x: GUTTER, y: stagingY + Math.max(0, Math.round((card.h - questH) / 2)), w: questW, h: questH };
   const hasSecond = views.secondActiveLocation.entries.length > 0;
-  const locationsWidth = card.w * (hasSecond ? 2 : 1) + (hasSecond ? GAP : 0);
-  // The band is as tall as its deepest stack: an enemy with two shadow cards peeks out two steps under it.
-  const middleH = card.h + PEEK * Math.max(1, deepestStack([views.activeLocation, views.secondActiveLocation, views.engaged]));
-  const activeLocation: Rect = { x: GUTTER, y: middleY, w: card.w, h: middleH };
-  const secondActiveLocation: Rect = { x: GUTTER + card.w + GAP, y: middleY, w: hasSecond ? card.w : 0, h: hasSecond ? middleH : 0 };
-  const engaged: Rect = { x: GUTTER + locationsWidth + GAP * 2, y: middleY, w: inner - locationsWidth - GAP * 2, h: middleH };
-  const playY = middleY + middleH + GAP;
-  const play: Rect = { x: GUTTER, y: playY, w: inner, h: card.h + PEEK * 2 };
-  const handY = playY + card.h + PEEK * 2 + GAP;
-  const hand: Rect = { x: GUTTER, y: handY, w: inner, h: Math.max(card.h, height - handY) };
+  const location = hasSecond ? { w: Math.floor((leftW - GAP) / 2), h: Math.round(Math.floor((leftW - GAP) / 2) * ASPECT) } : card;
+  const activeLocation: Rect = { x: GUTTER + (hasSecond ? 0 : Math.round((leftW - card.w) / 2)), y: engagedY, w: location.w, h: location.h };
+  const secondActiveLocation: Rect = hasSecond ? { x: GUTTER + location.w + GAP, y: engagedY, w: location.w, h: location.h } : { x: GUTTER, y: engagedY, w: 0, h: 0 };
+  const deck: Rect = { x: GUTTER, y: playY + Math.round((card.h - pile.h) / 2), w: pile.w, h: pile.h };
+  const discard: Rect = { x: GUTTER + pile.w + GAP, y: deck.y, w: pile.w, h: pile.h };
+
+  const engaged: Rect = { x: centerX, y: engagedY, w: centerW, h: engagedH };
+  const play: Rect = { x: centerX, y: playY, w: centerW, h: playH };
+  const hand: Rect = { x: GUTTER, y: handY, w: width - 2 * GUTTER, h: height - handY };
 
   const slots: CardSlot[] = [];
+  const marks: CombatMark[] = [];
   const stageEntry = views.questStage.entries[0];
-  if (stageEntry) {
-    // The stage art is small and sideways at the left of the band; its name and progress are text beside it.
-    const h = BAND - GAP;
-    slots.push(slotOf(stageEntry.card, "questStage", "card", { x: GUTTER, y: GAP / 2, w: Math.round(h * ASPECT), h }, true));
+  if (stageEntry) slots.push(slotOf(stageEntry.card, "questStage", "card", questStage, true));
+  for (const [id, rect] of [["activeLocation", activeLocation], ["secondActiveLocation", secondActiveLocation]] as const) {
+    const entry = views[id].entries[0];
+    if (!entry) continue;
+    placeUnder(entry, id, rect, slots, []);
+    slots.push(slotOf(entry.card, id, "card", rect));
   }
   placeRow(views.staging.entries, "staging", staging, card, slots);
-  placeRow(views.activeLocation.entries, "activeLocation", activeLocation, card, slots);
-  placeRow(views.secondActiveLocation.entries, "secondActiveLocation", secondActiveLocation, card, slots);
-  // An engaged enemy's shadow cards sit under it, each peeking out, face down until its attack.
-  placeRow(views.engaged.entries, "engaged", engaged, card, slots, true);
+  placeEngaged(views.engaged.entries, engaged, card, slots, marks, defending);
   placeRow(views.play.entries, "play", play, card, slots);
+  const pileRects: Record<PileId, Rect> = { deck, discard, encounterDeck, encounterDiscard };
+  for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
 
-  // The hand fans: a slight turn from the middle out, overlapping when it is long.
+  // The hand fans along the bottom edge, a slight turn from the middle out, overlapping when it is long. Each card keeps at
+  // least a 44 pt strip to touch: a long hand narrows its cards before the strip gets thinner. The picked card rises whole.
   const handEntries = views.hand.entries;
-  // Each hand card keeps at least a 44 pt strip to touch: a long hand narrows its cards before the strip gets thinner.
   const handCard = handCardSize(card, hand.w, handEntries.length);
-  const xs = rowXs(handEntries.length, hand.x, hand.w, handCard.w);
+  const xs = rowXs(handEntries.map(() => handCard.w), hand.x, hand.w);
   const middle = (handEntries.length - 1) / 2;
   handEntries.forEach((entry, index) => {
     const offset = index - middle;
-    slots.push(slotOf(entry.card, "hand", "card", { x: xs[index] ?? hand.x, y: handY + Math.abs(offset) * 3, w: handCard.w, h: handCard.h }, false, offset * 0.04));
+    const raised = options.raised === entry.card.id;
+    const y = raised ? height - handCard.h - GAP : handY + Math.abs(offset) * 2;
+    slots.push(slotOf(entry.card, "hand", "card", { x: xs[index] ?? hand.x, y, w: handCard.w, h: handCard.h }, false, raised ? 0 : offset * 0.03));
   });
 
-  return { width, height, card, zones: { questStage: stage, staging, activeLocation, secondActiveLocation, engaged, play, hand }, slots };
+  return {
+    width,
+    height,
+    card,
+    zones: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
+    piles: pileRects,
+    slots,
+    marks,
+  };
+}
+
+/** The rectangle a slot covers on screen: an exhausted card is turned sideways about its center. */
+export function slotBounds(slot: CardSlot): Rect {
+  "worklet";
+  if (!slot.exhausted) return slot;
+  return { x: slot.x + (slot.w - slot.h) / 2, y: slot.y + (slot.h - slot.w) / 2, w: slot.h, h: slot.w };
 }
 
 export function contains(rect: Rect, x: number, y: number): boolean {
@@ -162,7 +327,7 @@ export function hitSlot(slots: readonly CardSlot[], x: number, y: number): numbe
   "worklet";
   for (let index = slots.length - 1; index >= 0; index -= 1) {
     const slot = slots[index];
-    if (slot && contains(slot, x, y)) return index;
+    if (slot && contains(slotBounds(slot), x, y)) return index;
   }
   return -1;
 }

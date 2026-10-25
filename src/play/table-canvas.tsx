@@ -1,11 +1,11 @@
-// The web build has no Skia canvas (the same split as src/screens/backdrop.tsx): it lists each zone's cards by name, a
-// tap opens the inspect route and a long press the preview. The phone draws the canvas in table-canvas.native.tsx.
-// Choices still go through the sheets.
+// The web build has no Skia canvas (the same split as src/screens/backdrop.tsx): it lists each zone's cards and each pile
+// by name. A tap picks, as on the canvas, and a long press previews; the cards the open moment lets the player tap are
+// outlined, the picked ones filled. The phone draws the canvas in table-canvas.native.tsx.
 import { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useStore } from "zustand";
 
-import { TABLE_ZONES, shownSeat, zoneSelector, type ZoneId } from "./selectors.ts";
+import { PILES, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { tableTokens as t } from "./tokens.ts";
 
@@ -19,7 +19,29 @@ const ZONE_WORD: Record<ZoneId, string> = {
   hand: "Hand",
 };
 
-function ZoneRow({ store, zone, seat, nameOf, inactive, onInspect, onPreview }: Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "onInspect" | "onPreview"> & { zone: ZoneId; seat: number }) {
+const PILE_WORD: Record<PileId, string> = { deck: "Deck", discard: "Discard pile", encounterDeck: "Encounter deck", encounterDiscard: "Encounter discard pile" };
+
+type RowProps = Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "onTap" | "onPreview" | "highlight"> & { seat: number };
+
+function CardButton({ id, label, faceDown, onTap, onPreview, highlight }: { id: string; label: string; faceDown: boolean } & Pick<TableCanvasProps, "onTap" | "onPreview" | "highlight">) {
+  const picked = highlight.picked.get(id) ?? 0;
+  const tappable = highlight.tappable.has(id);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: picked > 0 }}
+      onPress={() => onTap(id)}
+      onLongPress={faceDown ? undefined : () => onPreview(id)}
+      delayLongPress={350}
+      className="min-h-11 justify-center rounded-tile px-2"
+      style={({ pressed }) => ({ backgroundColor: pressed ? t.hairline : picked > 0 ? t.goldLine : t.raised, borderWidth: tappable ? 1 : 0, borderColor: t.gold })}
+    >
+      <Text className={faceDown ? "text-label text-faint" : "text-label text-bone"}>{picked > 1 ? `${label} · ${picked}` : label}</Text>
+    </Pressable>
+  );
+}
+
+function ZoneRow({ store, zone, seat, nameOf, inactive, onTap, onPreview, highlight }: RowProps & { zone: ZoneId }) {
   const select = useMemo(() => zoneSelector(zone, seat), [zone, seat]);
   const view = useStore(store, (state) => select(state.game));
   if (view.entries.length === 0) return null;
@@ -27,33 +49,42 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, onInspect, onPreview }: 
     <View className="mb-2">
       <Text className="text-label text-muted">{ZONE_WORD[zone]}</Text>
       <View className="flex-row flex-wrap gap-1">
-        {view.entries.map(({ card }) => (
-          <Pressable
+        {view.entries.flatMap(({ card, attached, paired }) => [card, ...attached, ...paired]).map((card) => (
+          <CardButton
             key={card.id}
-            accessibilityRole="button"
-            onPress={() => onInspect(card.id)}
-            onLongPress={card.face === "down" ? undefined : () => onPreview(card.id)}
-            delayLongPress={350}
-            className="min-h-11 justify-center rounded-tile bg-raised px-2"
-            style={({ pressed }) => (pressed ? { backgroundColor: t.hairline } : undefined)}
-          >
-            <Text className={card.face === "down" ? "text-label text-faint" : "text-label text-bone"}>
-              {card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Inactive" : ""}`}
-            </Text>
-          </Pressable>
+            id={card.id}
+            faceDown={card.face === "down"}
+            label={card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Inactive" : ""}`}
+            onTap={onTap}
+            onPreview={onPreview}
+            highlight={highlight}
+          />
         ))}
       </View>
     </View>
   );
 }
 
-export function TableCanvas({ store, width, height, nameOf, inactive, onInspect, onPreview }: TableCanvasProps) {
+function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight }: RowProps & { pile: PileId }) {
+  const select = useMemo(() => pileSelector(pile, seat), [pile, seat]);
+  const view = useStore(store, (state) => select(state.game));
+  const top = view.top ? ` · ${nameOf(view.top.code)} on top` : "";
+  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORD[pile]} (${view.ids.length})${top}`} onTap={onTap} onPreview={onPreview} highlight={highlight} />;
+}
+
+export function TableCanvas({ store, width, height, nameOf, inactive, onTap, onPreview, highlight }: TableCanvasProps) {
   const seat = useStore(store, (state) => shownSeat(state.game));
+  const rowProps = { store, seat, nameOf, inactive, onTap, onPreview, highlight };
   return (
-    <View style={{ width, height, backgroundColor: t.felt, padding: 12 }}>
+    <ScrollView style={{ width, height, backgroundColor: t.felt }} contentContainerStyle={{ padding: 12 }}>
       {TABLE_ZONES.map((zone) => (
-        <ZoneRow key={zone} store={store} zone={zone} seat={seat} nameOf={nameOf} inactive={inactive} onInspect={onInspect} onPreview={onPreview} />
+        <ZoneRow key={zone} zone={zone} {...rowProps} />
       ))}
-    </View>
+      <View className="flex-row flex-wrap gap-1">
+        {PILES.map((pile) => (
+          <PileRow key={pile} pile={pile} {...rowProps} />
+        ))}
+      </View>
+    </ScrollView>
   );
 }

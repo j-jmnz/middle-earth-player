@@ -21,6 +21,7 @@ export const tableTokens = {
   felt: "#121613",
   feltLight: "#1F2620",
   threat: "#B9483A",
+  danger: "#E39A80",
   leadership: "#B06098",
   tactics: "#E03848",
   lore: "#62B02A",

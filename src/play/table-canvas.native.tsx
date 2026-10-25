@@ -1,168 +1,112 @@
-// The table: one Skia canvas, not a view per card (docs/architecture.md, Table). Zustand subscribers read the zone slices
-// it draws. A drag, a card lift and the return run on the UI thread with Gesture Handler and Reanimated; JavaScript hears
-// about a drag only when a card is picked up (to compute that card's drop targets) and when the finger lifts (to ask the
-// reducer). A new gesture cancels the return in progress; reduced motion snaps it.
-import { Canvas, Circle, Group, Image, matchFont, Path, useFont, Rect, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
-import { useCallback, useEffect, useMemo } from "react";
+// The table: one Skia canvas, not a view per card (docs/architecture.md, Table), played in landscape. Zustand subscribers
+// read the zone and pile slices it draws. A drag, a card lift and the return run on the UI thread with Gesture Handler and
+// Reanimated; JavaScript hears about a drag only when a card is picked up (to compute that card's drop targets) and when the
+// finger lifts. A tap picks (the screen decides what), a long press previews; neither sends an intent.
+//
+// When the state changes, each card moves from where it was to where it is now, a new card comes in from its deck or grows
+// in, and a card that left goes to its pile (motion.ts). The motion runs on the UI thread, never gates a rule, and snaps
+// under reduced motion; a new gesture cancels the lift in progress.
+import { Canvas, Circle, Group, matchFont, RoundedRect, Text, useFont, useImage, vec, type SkFont } from "@shopify/react-native-skia";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { cancelAnimation, useDerivedValue, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import { cancelAnimation, Easing, useDerivedValue, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
-import { SPHERE_TINT, sphereIcon, type IconName } from "./icon-map.ts";
-import { ICONS } from "./icons/generated.ts";
-import { hitDrop, hitSlot, tableLayout, type CardSlot, type DropRect, type LayoutViews } from "./layout.ts";
-import { TABLE_ZONES, shownSeat, zoneSelector, type ZoneId } from "./selectors.ts";
+import { Badges, CardBody, CombatMarkView, Leaving, Marks, Moving, Pile, RADIUS, Tokens, withAlpha, type Fonts } from "./canvas-pieces.native.tsx";
+import { sphereIcon } from "./icon-map.ts";
+import { ICON_FILES } from "./icons/files.generated.ts";
+import { hitDrop, hitSlot, tableLayout, type CardSlot, type CombatMark, type DropRect, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
+import { motionsBetween, type Ghost, type Motion } from "./motion.ts";
+import { PILES, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import { dropRects } from "./selection.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { useTableImages } from "./table-images.native.ts";
-import { wrapName } from "./wrap.ts";
 import { tableTokens as t } from "./tokens.ts";
 
-const RADIUS = 6;
-const LINE = 15;
-const INACTIVE = "Inactive";
 const MARCELLUS = require("../../assets/fonts/Marcellus-Regular.ttf") as number;
+const MOVE_MS = 320;
 
-// Translucent night, from the token, so the palette drift test covers the canvas's veils too.
-function withAlpha(hex: string, alpha: number): string {
-  const value = Number.parseInt(hex.slice(1), 16);
-  return `rgba(${(value >> 16) & 255},${(value >> 8) & 255},${value & 255},${alpha})`;
-}
-const veil = withAlpha(t.night, 0.62);
-const shadowColor = withAlpha(t.night, 0.5);
-const COIN = 10;
-
-function useViews(store: TableCanvasProps["store"], seat: number): LayoutViews {
-  const selectors = useMemo(() => Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat)])) as Record<ZoneId, ReturnType<typeof zoneSelector>>, [seat]);
-  const questStage = useStore(store, (state) => selectors.questStage(state.game));
-  const staging = useStore(store, (state) => selectors.staging(state.game));
-  const activeLocation = useStore(store, (state) => selectors.activeLocation(state.game));
-  const secondActiveLocation = useStore(store, (state) => selectors.secondActiveLocation(state.game));
-  const engaged = useStore(store, (state) => selectors.engaged(state.game));
-  const play = useStore(store, (state) => selectors.play(state.game));
-  const hand = useStore(store, (state) => selectors.hand(state.game));
+function useViews(store: TableCanvasProps["store"], seat: number): { views: LayoutViews; piles: PileViews } {
+  const zones = useMemo(() => Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat)])) as Record<ZoneId, ReturnType<typeof zoneSelector>>, [seat]);
+  const pileOf = useMemo(() => Object.fromEntries(PILES.map((pile) => [pile, pileSelector(pile, seat)])) as Record<PileId, ReturnType<typeof pileSelector>>, [seat]);
+  const questStage = useStore(store, (state) => zones.questStage(state.game));
+  const staging = useStore(store, (state) => zones.staging(state.game));
+  const activeLocation = useStore(store, (state) => zones.activeLocation(state.game));
+  const secondActiveLocation = useStore(store, (state) => zones.secondActiveLocation(state.game));
+  const engaged = useStore(store, (state) => zones.engaged(state.game));
+  const play = useStore(store, (state) => zones.play(state.game));
+  const hand = useStore(store, (state) => zones.hand(state.game));
+  const deck = useStore(store, (state) => pileOf.deck(state.game));
+  const discard = useStore(store, (state) => pileOf.discard(state.game));
+  const encounterDeck = useStore(store, (state) => pileOf.encounterDeck(state.game));
+  const encounterDiscard = useStore(store, (state) => pileOf.encounterDiscard(state.game));
   return useMemo(
-    () => ({ questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand }),
-    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand],
+    () => ({ views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand }, piles: { deck, discard, encounterDeck, encounterDiscard } }),
+    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard],
   );
 }
 
-// A game icon on the canvas: the vector glyph from ./icons/generated.ts, drawn as a Skia path, flipped from the font's
-// y-up units into the box (x, y, size) and filled with one token colour.
-function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: number; y: number; size: number; color: string }) {
-  const icon = ICONS[name];
-  if (icon.kind !== "vector") return null;
-  const [vx, vy, vw, vh] = icon.viewBox;
-  const scale = size / Math.max(vw, vh);
-  return (
-    <Group transform={[{ translateX: x - vx * scale }, { translateY: y - vy * scale }, { scaleX: scale }, { scaleY: -scale }]}>
-      <Path path={icon.d} color={color} />
-    </Group>
-  );
+// A faint word in an empty zone, so the player knows what the space is for.
+function ZoneWord({ rect, text, font }: { rect: Rect; text: string; font: SkFont }) {
+  return <Text x={rect.x + 6} y={rect.y + 16} text={text} font={font} color={t.faint} />;
 }
 
-// The veil over unique text with no effect record, with the word that says what it means.
-function Veil({ x, y, w, h, font }: { x: number; y: number; w: number; h: number; font: SkFont }) {
-  const top = y + h * 0.55;
-  const width = font.getTextWidth(INACTIVE);
-  return (
-    <Group>
-      <Rect x={x} y={top} width={w} height={h * 0.45} color={veil} />
-      <Text x={x + Math.max(3, (w - width) / 2)} y={top + 15} text={INACTIVE} font={font} color={t.bone} />
-    </Group>
-  );
-}
-
-function Coin({ x, y, color, text, textColor, font }: { x: number; y: number; color: string; text: string; textColor: string; font: SkFont }) {
-  const width = font.getTextWidth(text);
-  return (
-    <Group>
-      <Circle cx={x} cy={y} r={COIN} color={color} />
-      <Text x={x - width / 2} y={y + 4} text={text} font={font} color={textColor} />
-    </Group>
-  );
-}
-
-// One card: its picture or, while the file is missing, its name on a raised card. Face down is the card back with the ring.
-function CardFace({
-  slot,
-  image,
-  name,
-  sphere,
-  font,
-  numbers,
-  inactive,
-  edge,
-  dim,
-}: {
-  slot: CardSlot;
-  image: SkImage | null;
-  name: string;
-  sphere: IconName | null;
-  font: SkFont;
-  // Marcellus, for the numbers on the coins.
-  numbers: SkFont;
-  inactive: boolean;
-  edge: string | null;
-  dim: boolean;
-}) {
-  const { x, y, w, h } = slot;
-  const cx = x + w / 2;
-  const cy = y + h / 2;
-  const transform = slot.exhausted ? [{ rotate: Math.PI / 2 }] : slot.tilt !== 0 ? [{ rotate: slot.tilt }] : [];
-  return (
-    <Group transform={transform} origin={vec(cx, cy)} opacity={dim ? 0.35 : slot.exhausted ? 0.7 : 1}>
-      <RoundedRect x={x + 1} y={y + 2} width={w} height={h} r={RADIUS} color={shadowColor} />
-      {slot.faceDown ? (
-        <Group>
-          <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={t.raised} />
-          <Circle cx={cx} cy={cy} r={Math.min(w, h) / 4} color={t.gold} style="stroke" strokeWidth={2} />
-        </Group>
-      ) : image ? (
-        <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
-          <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
-          {/* Unique text with no effect record is inactive: the text box is veiled, and no control applies it. */}
-          {inactive ? <Veil x={x} y={y} w={w} h={h} font={font} /> : null}
-        </Group>
-      ) : (
-        <Group>
-          <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={t.raised} />
-          <Group clip={{ x: x + 3, y: y + 3, width: w - 6, height: h - 6 }}>
-            {wrapName(name, w - 10, (text) => font.getTextWidth(text)).map((line, index) => (
-              <Text key={index} x={x + 5} y={y + 17 + index * LINE} text={line} font={font} color={t.bone} />
-            ))}
-          </Group>
-          {sphere ? <CanvasIcon name={sphere} x={x + w - 18} y={y + h - 18} size={14} color={t[SPHERE_TINT[sphere] ?? "faint"]} /> : null}
-          {inactive ? <Veil x={x} y={y} w={w} h={h} font={font} /> : null}
-        </Group>
-      )}
-      {edge ? <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={edge} style="stroke" strokeWidth={2} /> : null}
-      {slot.resources > 0 ? <Coin x={x + COIN + 2} y={y + h - COIN - 2} color={t.gold} text={String(slot.resources)} textColor={t.onGold} font={numbers} /> : null}
-      {slot.damage > 0 ? <Coin x={x + w - COIN - 2} y={y + COIN + 2} color={t.threat} text={String(slot.damage)} textColor={t.bone} font={numbers} /> : null}
-      {slot.progress > 0 ? <Coin x={x + w - COIN - 2} y={y + h - COIN - 2} color={t.bone} text={String(slot.progress)} textColor={t.ink} font={numbers} /> : null}
-    </Group>
-  );
-}
-
-export function TableCanvas({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, onInspect, onPreview, onDrop }: TableCanvasProps) {
+export function TableCanvas({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight, raised, onTap, onPreview, onDrop }: TableCanvasProps) {
   const seat = useStore(store, (state) => shownSeat(state.game));
-  const views = useViews(store, seat);
+  const { views, piles } = useViews(store, seat);
   const selected = useStore(store, (state) => state.selected);
   const targets = useStore(store, (state) => state.targets);
   const draggable = useStore(store, (state) => state.draggable);
-  const pending = useStore(store, (state) => state.pendingCommit);
+  const game = useStore(store, (state) => state.game);
   const reduceMotion = useReducedMotion();
 
-  const layout = useMemo(() => tableLayout(width, height, views), [width, height, views]);
-  const codes = useMemo(() => [...new Set(layout.slots.filter((slot) => !slot.faceDown).map((slot) => slot.code))], [layout]);
+  // The top of the deck is a card when the rules let it be played from there (Gandalf, 142002).
+  const deckTopId = game.seats[seat]?.deck[0];
+  const deckTop = deckTopId && draggable.includes(deckTopId) ? (game.cards[deckTopId] ?? null) : null;
+  const defending = useCallback(
+    (enemy: { id: string }): CombatMark["kind"] => {
+      if (game.pendingStrike?.enemyId === enemy.id) return "attack";
+      const attack = game.pendingAttack;
+      return attack?.enemyId === enemy.id && (attack.undefended || attack.defenderId == null) ? "undefended" : "defense";
+    },
+    [game.pendingAttack, game.pendingStrike],
+  );
+  const layout = useMemo(() => tableLayout(width, height, views, piles, { raised, deckTop }, defending), [width, height, views, piles, raised, deckTop, defending]);
+
+  // Each new layout: where every card comes from, and the cards that left, worked out once, before it is drawn. The layout
+  // the motions were worked out for is kept as state, so a new one is noticed during the render (React's pattern for state
+  // that follows a prop), and `at` counts the layouts.
+  const [track, setTrack] = useState(() => ({ layout, moves: { ...motionsBetween(null, layout, () => null), at: 1 } }));
+  if (track.layout !== layout) {
+    const zoneNow = (cardId: string) => game.cards[cardId]?.zone ?? null;
+    const sameSize = track.layout.width === layout.width && track.layout.height === layout.height;
+    const between = reduceMotion || !sameSize ? motionsBetween(null, layout, zoneNow) : motionsBetween(track.layout, layout, zoneNow);
+    setTrack({ layout, moves: { ...between, at: track.moves.at + 1 } });
+  }
+  const moves = track.moves;
+  const progress = useSharedValue(1);
+  const epoch = useSharedValue(0);
+  useLayoutEffect(() => {
+    epoch.set(moves.at);
+    if (reduceMotion) {
+      progress.set(1);
+      return;
+    }
+    progress.set(0);
+    progress.set(withTiming(1, { duration: MOVE_MS, easing: Easing.out(Easing.cubic) }));
+  }, [moves, progress, epoch, reduceMotion]);
+
+  const codes = useMemo(() => [...new Set([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)].filter((slot) => !slot.faceDown && slot.code !== "").map((slot) => slot.code))], [layout, moves]);
   const images = useTableImages(codes, picture, layout.card, pictureRevision);
-  // Names and the Inactive word in the system face at 12 pt; coin numbers in the embedded Marcellus (the system face stands
-  // in for the moment the font file takes to load).
-  const font = useMemo(() => matchFont({ fontFamily: Platform.select({ ios: "Helvetica", default: "sans-serif" }), fontSize: 12 }), []);
+  const tokens = { resource: useImage(ICON_FILES.resource), damage: useImage(ICON_FILES.damage), progress: useImage(ICON_FILES.progress) };
+  // Names and small words in the system face; numbers in the embedded Marcellus (the system face stands in for the moment
+  // the font file takes to load).
+  const names = useMemo(() => matchFont({ fontFamily: Platform.select({ ios: "Helvetica", default: "sans-serif" }), fontSize: 11 }), []);
+  const small = useMemo(() => matchFont({ fontFamily: Platform.select({ ios: "Helvetica", default: "sans-serif" }), fontSize: 10, fontWeight: "bold" }), []);
   const marcellus = useFont(MARCELLUS, 12);
-  const numbers = marcellus ?? font;
+  const fonts: Fonts = { names, numbers: marcellus ?? names, small };
 
   // What the worklets read: the slots, which of them can be picked up, and the selected card's drop rectangles.
   const slots = useSharedValue<readonly CardSlot[]>(layout.slots);
@@ -183,7 +127,7 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
   }, [layout, targets, drops]);
 
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
-  const lifted = selected ? layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null : null;
+  const lifted = selected ? (layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null) : null;
   const liftTransform = useDerivedValue(() => [{ translateX: dx.get() }, { translateY: dy.get() }, { scale: lift.get() }]);
 
   // Built once per set of callbacks, not on every render. The worklets read the shared values, never React state.
@@ -226,7 +170,7 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
         const target = hitDrop(drops.get(), event.x, event.y);
         lift.set(1);
         if (target !== "") {
-          // The reducer decides; the card is drawn where the next state puts it, or back in place when it refuses.
+          // The drop picks; the dock asks to confirm it. The card is drawn where the next state puts it.
           scheduleOnRN(onDrop, slot.id, target);
           dx.set(0);
           dy.set(0);
@@ -253,56 +197,86 @@ export function TableCanvas({ store, width, height, picture, pictureRevision, na
 
     const tap = Gesture.Tap().onEnd((event) => {
       const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
-      if (slot && !slot.faceDown) scheduleOnRN(onInspect, slot.id);
+      if (slot) scheduleOnRN(onTap, slot.id);
     });
 
-    // Held still past the press delay, a face-up card opens large. A drag (the finger moves first) or a tap wins otherwise.
+    // Held still past the press delay, a face-up card opens large; a discard pile opens its list.
     const hold = Gesture.LongPress()
       .minDuration(350)
       .onStart((event) => {
         const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
-        if (slot && !slot.faceDown) scheduleOnRN(onPreview, slot.id);
+        if (!slot) return;
+        if (slot.kind === "pile") scheduleOnRN(onTap, slot.id);
+        else if (!slot.faceDown) scheduleOnRN(onPreview, slot.id);
       });
 
     return Gesture.Race(pan, hold, tap);
-  }, [slots, lifts, drops, dragging, dx, dy, lift, reduceMotion, select, onDrop, onInspect, onPreview]);
+  }, [slots, lifts, drops, dragging, dx, dy, lift, reduceMotion, select, onDrop, onTap, onPreview]);
 
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
-  const pendingSet = useMemo(() => new Set(pending), [pending]);
 
-  const edgeOf = (slot: CardSlot): string | null => {
-    if (slot.kind !== "card") return null;
-    if (targetIds.has(slot.id) || pendingSet.has(slot.id)) return t.gold;
-    if (slot.zone === "hand" && draggableSet.has(slot.id)) return t.gold;
-    return null;
+  const drawSlot = (slot: CardSlot, dim: boolean) => {
+    const image = images.get(slot.code) ?? null;
+    if (slot.kind === "pile") return <Pile slot={slot} image={image} fonts={fonts} label />;
+    // The top of the deck the rules let the player play (Gandalf): the pile, face up, picked like a hand card.
+    if (slot.zone === "deck") {
+      return (
+        <Group opacity={dim ? 0.35 : 1}>
+          <Pile slot={{ ...slot, faceDown: false }} image={image} fonts={fonts} label />
+          <Marks slot={slot} tappable={highlight.tappable.has(slot.id) || targetIds.has(slot.id)} picked={highlight.picked.get(slot.id) ?? 0} share={highlight.share} fonts={fonts} />
+        </Group>
+      );
+    }
+    const encounterBack = slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck";
+    const slotInfo = slot.kind === "card" && !slot.faceDown && slot.zone !== "hand" ? info(slot.id) : null;
+    return (
+      <Group opacity={dim ? 0.35 : 1}>
+        <CardBody slot={slot} image={image} name={nameOf(slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} inactive={!slot.faceDown && inactive(slot.code)} encounterBack={encounterBack} />
+        {slotInfo ? <Badges slot={slot} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} /> : null}
+        <Tokens slot={slot} images={tokens} fonts={fonts} />
+        {slot.kind === "card" ? <Marks slot={slot} tappable={highlight.tappable.has(slot.id) || targetIds.has(slot.id)} picked={highlight.picked.get(slot.id) ?? 0} share={highlight.share} fonts={fonts} /> : null}
+      </Group>
+    );
   };
+
+  const still: Motion = { dx: 0, dy: 0, scale: 1, fromRot: 0, toRot: 0, fromOpacity: 1 };
+  const emptyWords: [Rect, string][] = [
+    ...(views.staging.entries.length === 0 ? [[layout.zones.staging, "Staging"] as [Rect, string]] : []),
+    ...(views.engaged.entries.length === 0 ? [[layout.zones.engaged, "No enemy engaged"] as [Rect, string]] : []),
+    ...(views.activeLocation.entries.length === 0 ? [[layout.zones.activeLocation, "No location"] as [Rect, string]] : []),
+  ];
 
   return (
     <GestureDetector gesture={gesture}>
       <Canvas style={{ width, height }}>
-        <Rect x={0} y={0} width={width} height={height} color={t.felt} />
-        <Circle cx={width / 2} cy={height * 0.42} r={Math.max(width, height) * 0.55} color={t.feltLight} opacity={0.55} />
+        <RoundedRect x={0} y={0} width={width} height={height} r={0} color={t.felt} />
+        <Circle cx={width / 2} cy={height * 0.45} r={Math.max(width, height) * 0.55} color={t.feltLight} opacity={0.55} />
+        {/* The engagement area is a band of its own, between staging and the player's cards. */}
+        <RoundedRect x={layout.zones.engaged.x - 4} y={layout.zones.engaged.y - 3} width={layout.zones.engaged.w + 8} height={layout.zones.engaged.h + 6} r={RADIUS * 2} color={withAlpha(t.threat, 0.07)} />
+        {emptyWords.map(([rect, text]) => (
+          <ZoneWord key={text} rect={rect} text={text} font={fonts.small} />
+        ))}
         {targetZones.map((rect, index) => (
-          <RoundedRect key={`z${index}`} x={rect.x - 4} y={rect.y - 4} width={rect.w + 8} height={rect.h + 8} r={RADIUS * 2} color={t.goldLine} style="stroke" strokeWidth={1.5} />
+          <RoundedRect key={`z${index}`} x={rect.x - 4} y={rect.y - 4} width={rect.w + 8} height={rect.h + 8} r={RADIUS * 2} color={t.gold} style="stroke" strokeWidth={1.5} />
+        ))}
+        {moves.ghosts.map((ghost: Ghost) => (
+          <Leaving key={`ghost:${ghost.slot.id}:${moves.at}`} ghost={ghost} progress={progress} epoch={epoch} at={moves.at}>
+            {drawSlot(ghost.slot, false)}
+          </Leaving>
         ))}
         {layout.slots.map((slot) => (
-          <CardFace
-            key={`${slot.kind}:${slot.id}`}
-            slot={slot}
-            image={images.get(slot.code) ?? null}
-            name={nameOf(slot.code)}
-            sphere={sphereIcon(sphereOf(slot.code))}
-            font={font}
-            numbers={numbers}
-            inactive={!slot.faceDown && inactive(slot.code)}
-            edge={edgeOf(slot)}
-            dim={lifted?.id === slot.id && slot.kind === "card"}
-          />
+          <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? still} progress={progress} epoch={epoch} at={moves.at}>
+            {drawSlot(slot, lifted?.id === slot.id && slot.kind === "card")}
+          </Moving>
+        ))}
+        {layout.marks.map((mark) => (
+          <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} />
         ))}
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-            <CardFace slot={{ ...lifted, tilt: 0 }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} font={font} numbers={numbers} inactive={inactive(lifted.code)} edge={t.gold} dim={false} />
+            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} inactive={inactive(lifted.code)} encounterBack={false} />
+            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2} />
           </Group>
         ) : null}
       </Canvas>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { previewSize } from "./preview-size.ts";
+import { previewSideSize, previewSize } from "./preview-size.ts";
 
 describe("the long-press preview", () => {
   it("fills a phone's width with a portrait card and leaves room for the buttons", () => {
@@ -19,5 +19,13 @@ describe("the long-press preview", () => {
     const size = previewSize(390, 760, true);
     expect(size.width).toBeGreaterThan(size.height);
     expect(size.width).toBeLessThanOrEqual(358);
+  });
+
+  it("on a landscape table, stands the card at the left as tall as the screen and leaves the right for its effects", () => {
+    const size = previewSideSize(844, 390, false);
+    expect(size.height).toBe(390 - 32);
+    expect(size.width).toBeLessThan(844 * 0.55);
+    expect(size.width / size.height).toBeCloseTo(0.705, 2);
+    expect(previewSideSize(844, 390, true).width).toBeGreaterThan(previewSideSize(844, 390, true).height);
   });
 });

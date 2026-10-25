@@ -1,11 +1,13 @@
-// The sheets the bar opens (the quest commit, the Actions list, a pay sheet) and the intents a multi-choice or distribute
-// sheet sends for what the player picked. The reducer still checks every intent.
+// The sheets of an ordinary action window (the window itself, the quest commit, the Actions list) and those a tap on a card
+// opens (playing it, paying for it, using its Action), and the intents a multi-choice or distribute sheet sends for what the
+// player picked. The reducer still checks every intent.
+import { printedOf } from "../rules/printed.ts";
 import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { legalTargets } from "../rules/reduce.ts";
 
-import type { PayRequest, Share } from "./pay.ts";
+import { playRequest, type PayRequest, type Share } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
-import type { DistributePurpose, DistributeSheet, MultiSheet, Sheet, SheetNames, TriggerSheet } from "./sheet-types.ts";
+import type { DistributePurpose, DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet, WindowSheet } from "./sheet-types.ts";
 import { option, statOf, step, triggerOptions } from "./sheets.ts";
 
 export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, pendingCommit: readonly string[]): MultiSheet {
@@ -36,6 +38,107 @@ export function actionsSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
     note: "Only the Actions the rules allow now are listed.",
     hide: null,
     options: triggerOptions(game, ctx, legal, names),
+    pass: null,
+  };
+}
+
+function seatWords(game: ScenarioState): string {
+  return game.seatCount > 1 ? `Player ${game.activeSeat + 1}: ` : "";
+}
+
+/**
+ * The ordinary action window as the table answers it: what can be played and used now, the quest commit in the commit
+ * window, and Pass. Every card it names comes from legalIntents.
+ */
+export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): WindowSheet {
+  const plays = legal.flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
+  const triggers = triggerOptions(game, ctx, legal, names);
+  const commit = game.mode === "questCommit" && legal.some((intent) => intent.type === "Commit") ? commitSheet(game, ctx, names, []) : null;
+  const usable = plays.length > 0 || triggers.length > 0;
+  const base = { kind: "window" as const, key: `window:${game.round}:${game.mode}:${game.activeSeat}:${game.stepWindows.length}`, step: step(game), commit, plays, triggers };
+  if (commit) {
+    return {
+      ...base,
+      title: `${seatWords(game)}Commit to the quest`,
+      note: "Tap characters to send them on the quest. Committed characters exhaust.",
+      pass: "Pass",
+      passNote: "Passing sends no one on the quest.",
+    };
+  }
+  if (game.mode === "planning") {
+    return {
+      ...base,
+      title: `${seatWords(game)}Planning`,
+      note: usable ? "Tap a glowing card to play or use it, or drag it onto the table." : "Nothing in your hand can be played now.",
+      pass: "Pass",
+      passNote: "Passing ends your planning.",
+    };
+  }
+  return {
+    ...base,
+    title: `${seatWords(game)}Action window`,
+    note: usable ? "Tap a glowing card to play or use it." : null,
+    pass: "Pass",
+    passNote: "The game goes on once every player has passed.",
+  };
+}
+
+/**
+ * Playing one card the player picked on the table: an attachment asks for its host first, a card with a cost asks which
+ * pools pay it, and a free card asks only to confirm. Null when the rules do not let it be played now.
+ */
+export function playSheet(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames, cardId: string, hostId: string | null = null): Sheet | null {
+  const instance = game.cards[cardId];
+  if (!instance || !legal.some((intent) => intent.type === "PlayCard" && intent.cardId === cardId)) return null;
+  const name = names.card(cardId);
+  const request = playRequest(game, ctx, cardId);
+  const at = (host: string | null): PlayerIntent => (host ? { type: "PlayCard", cardId, payments: [], hostId: host } : { type: "PlayCard", cardId, payments: [] });
+  if (printedOf(ctx.cards, instance.code).type === "attachment" && hostId == null) {
+    const hosts = legalTargets(game, { type: "PlayCard", cardId }, ctx);
+    return {
+      kind: "pick",
+      key: `play:${cardId}`,
+      step: step(game),
+      title: `Play ${name}`,
+      note: hosts.length > 0 ? "Tap the card to attach it to." : "No card can take it now.",
+      verb: "Attach to",
+      options: hosts.map((id) => ({ ...option(game, names, id), ...(request ? { next: paySheet(game, names, request, { kind: "play", cardId, hostId: id }) } : { intent: at(id) }) })),
+      primary: null,
+      alternative: null,
+      about: [cardId],
+    };
+  }
+  if (request) return paySheet(game, names, request, { kind: "play", cardId, hostId });
+  const sheet: PickSheet = {
+    kind: "pick",
+    key: `play:${cardId}:${hostId ?? ""}`,
+    step: step(game),
+    title: hostId ? `Attach ${name} to ${names.card(hostId)}` : `Play ${name}`,
+    note: "It costs nothing.",
+    verb: "",
+    options: [],
+    primary: { label: `Play ${name}`, intent: at(hostId) },
+    alternative: null,
+    selectionMade: true,
+    about: [cardId],
+  };
+  return sheet;
+}
+
+/** Using an Action of one card the player picked on the table: its options only, each with its printed line. */
+export function cardTriggerSheet(game: ScenarioState, names: SheetNames, triggers: readonly TriggerOption[], cardId: string): TriggerSheet | null {
+  const options = triggers.filter((item) => item.cardId === cardId);
+  if (options.length === 0) return null;
+  return {
+    kind: "trigger",
+    key: `use:${cardId}`,
+    step: step(game),
+    title: names.card(cardId),
+    sourceId: cardId,
+    timing: options[0]?.timing ?? "Action",
+    note: options.length > 1 ? "Tap the card again for its other ability." : null,
+    hide: null,
+    options,
     pass: null,
   };
 }
@@ -96,6 +199,7 @@ export function sheetSendsPass(sheet: Sheet): boolean {
       return sheet.primary?.intent.type === "Pass" || (alternative != null && "intent" in alternative && alternative.intent.type === "Pass");
     }
     case "outcome":
+    case "window":
       return true;
     case "multi":
     case "distribute":
