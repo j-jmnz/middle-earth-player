@@ -7,6 +7,7 @@ import type { SceneName } from "./backdrop-scenes";
 import { palette } from "./palette.js";
 import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
+import { SheetFrame } from "../play/sheet-paper";
 import type { MarkedSphere } from "./sphere-mark";
 
 type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
@@ -128,6 +129,7 @@ export function ListRow({
   label,
   detail,
   onPress,
+  onLongPress,
   testID,
   leading,
   trailing,
@@ -135,6 +137,8 @@ export function ListRow({
 }: {
   label: string;
   detail?: string;
+  // A long press on a card row shows the card large (src/play/card-preview.tsx).
+  onLongPress?: () => void;
   // Small game icons before the detail line (a sphere, a cost). The detail stays words.
   detailIcons?: ReactNode;
   onPress: () => void;
@@ -148,6 +152,8 @@ export function ListRow({
       collapsable={false}
       accessibilityRole="button"
       onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={350}
       className="min-h-14 flex-row items-center border-b border-hairline py-2"
       style={({ pressed }) => (pressed ? pressedNight : undefined)}
     >
@@ -316,17 +322,17 @@ export function SphereMark({ sphere, size = 14 }: { sphere: MarkedSphere; size?:
   return <GameIcon name={sphere} size={size} tint={SPHERE_TINT[sphere] ?? "faint"} />;
 }
 
-/** Parchment sheet over the rail or a list. Repeats the step in an eyebrow. */
+/** Parchment sheet over the rail or a list, on the table sheets' frame. Repeats the step in an eyebrow. */
 export function PaperSheet({ step, title, children }: { step: string; title: string; children: ReactNode }) {
   return (
-    <View className="rounded-t-sheet bg-paper px-6 pb-safe pt-3">
+    <SheetFrame animated={false}>
       <View className="mb-4 h-1 w-10 self-center rounded-pill bg-inkLine" />
       <View className="items-center">
         <Eyebrow tone="inkLabel">{step}</Eyebrow>
         <Text className="mt-1 text-center font-display text-title text-ink">{title}</Text>
       </View>
       <View className="mt-5">{children}</View>
-    </View>
+    </SheetFrame>
   );
 }
 

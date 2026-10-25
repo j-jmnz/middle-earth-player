@@ -1,9 +1,10 @@
 // The paper sheet's shared pieces: the text and pill buttons, the choice tile, the engine's numbers with their icons, the
 // sentence under a disabled action, and the parchment frame itself (docs/design-system.md, Table). Every press shows its
 // pressed fill in the same frame. Nothing here holds a number the engine did not compute.
-import type { ReactNode } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { Pressable, ScrollView, Text, View, type DimensionValue } from "react-native";
 import Animated, { ReduceMotion, SlideInDown } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
 import type { Sheet, SheetNames, SheetStat } from "./sheet-types.ts";
@@ -11,6 +12,47 @@ import type { PlayerIntent, ScenarioState } from "./store.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 const rise = SlideInDown.duration(220).reduceMotion(ReduceMotion.System);
+const SHEET_RADIUS = 28;
+
+/**
+ * The parchment every sheet sits on, rising from the bottom edge. Its fill, corners and bottom inset are plain styles from
+ * the tokens and useSafeAreaInsets, not NativeWind classes: once the root SafeAreaProvider made pb-safe live, sheets that
+ * carried it in their classes lost their parchment on the phone. The paper runs under the navigation bar; the inset keeps
+ * the last button above it.
+ */
+export function SheetFrame({
+  children,
+  testID,
+  maxHeight,
+  paddingTop = 12,
+  animated = true,
+}: {
+  children: ReactNode;
+  testID?: string;
+  maxHeight?: DimensionValue;
+  paddingTop?: number;
+  animated?: boolean;
+}) {
+  const insets = useSafeAreaInsets();
+  const style = {
+    backgroundColor: t.paper,
+    borderTopLeftRadius: SHEET_RADIUS,
+    borderTopRightRadius: SHEET_RADIUS,
+    paddingHorizontal: 24,
+    paddingTop,
+    paddingBottom: Math.max(insets.bottom, 12),
+    ...(maxHeight != null ? { maxHeight } : {}),
+  };
+  return animated ? (
+    <Animated.View entering={rise} testID={testID} collapsable={false} style={style}>
+      {children}
+    </Animated.View>
+  ) : (
+    <View testID={testID} collapsable={false} style={style}>
+      {children}
+    </View>
+  );
+}
 
 /** A text button on night or paper: 44 pt target, the pressed fill in the same frame. */
 export function ChromeButton({
@@ -153,6 +195,7 @@ export function Paper({
   children,
   actions,
   onCollapse,
+  onPass = null,
   stats = [],
 }: {
   step: string;
@@ -164,9 +207,11 @@ export function Paper({
   children?: ReactNode;
   actions: ReactNode;
   onCollapse: () => void;
+  // Pass, when the rules allow it now and the sheet's own buttons do not already send it.
+  onPass?: (() => void) | null;
 }) {
   return (
-    <Animated.View entering={rise} testID="sheet" className="rounded-t-sheet bg-paper px-6 pb-safe pt-3" style={{ maxHeight: "78%" }}>
+    <SheetFrame testID="sheet" maxHeight="78%">
       <View className="mb-2 h-1 w-10 self-center rounded-pill bg-inkLine" />
       <View className="items-center">
         <Text testID="sheet-step" className="font-display text-eyebrow uppercase text-inkLabel">
@@ -201,11 +246,12 @@ export function Paper({
           </Text>
         ) : null}
         {actions}
-        <View className="items-center">
+        <View className="flex-row items-center justify-center gap-2">
+          {onPass ? <ChromeButton label="Pass" testID="sheet-pass-window" tone="ink" onPress={onPass} /> : null}
           <ChromeButton label="Look at the table" testID="sheet-collapse" tone="ink" onPress={onCollapse} />
         </View>
       </View>
-    </Animated.View>
+    </SheetFrame>
   );
 }
 
@@ -221,8 +267,22 @@ export type SheetProps = {
   onOutcome: () => void;
   onInspect: (cardId: string) => void;
   onCollapse: () => void;
+  // Pass, when the rules allow it now and the sheet does not offer it itself; null otherwise.
+  onPass: (() => void) | null;
+  // Lets the open sheet take a tap on a card on the table (a hero to pay from, a character to choose). The handler returns
+  // true when it used the tap; the returned function releases the claim.
+  claimTaps: (handler: (cardId: string) => boolean) => () => void;
 };
 
 export function paperProps(props: SheetProps, sheet: { step: string; title: string; note: string | null; stats?: readonly SheetStat[] }) {
-  return { step: sheet.step, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [], threat: props.threat, refusal: props.refusal, onCollapse: props.onCollapse };
+  return { step: sheet.step, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [], threat: props.threat, refusal: props.refusal, onCollapse: props.onCollapse, onPass: props.onPass };
+}
+
+/** While the sheet is up, a tap on a card on the table goes to `handler` first; the table inspects the card when it says no. */
+export function useTableTaps(claimTaps: SheetProps["claimTaps"], handler: (cardId: string) => boolean): void {
+  const latest = useRef(handler);
+  useLayoutEffect(() => {
+    latest.current = handler;
+  });
+  useEffect(() => claimTaps((cardId) => latest.current(cardId)), [claimTaps]);
 }

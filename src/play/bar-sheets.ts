@@ -5,7 +5,7 @@ import { legalTargets } from "../rules/reduce.ts";
 
 import type { PayRequest, Share } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
-import type { DistributePurpose, DistributeSheet, MultiSheet, SheetNames, TriggerSheet } from "./sheet-types.ts";
+import type { DistributePurpose, DistributeSheet, MultiSheet, Sheet, SheetNames, TriggerSheet } from "./sheet-types.ts";
 import { option, statOf, step, triggerOptions } from "./sheets.ts";
 
 export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, pendingCommit: readonly string[]): MultiSheet {
@@ -80,5 +80,25 @@ export function distributeIntent(sheet: DistributeSheet, shares: readonly Share[
     }
     case "trigger":
       return { type: "Trigger", cardId: sheet.purpose.cardId, effectId: sheet.purpose.effectId, payments: given.map((share) => ({ heroId: share.id, amount: share.amount })) };
+  }
+}
+
+/**
+ * True when the sheet's own buttons already send Pass (a Response's Pass, an action window's Continue, Look's Done) or the
+ * game is over, so the table adds no second Pass beside them.
+ */
+export function sheetSendsPass(sheet: Sheet): boolean {
+  switch (sheet.kind) {
+    case "trigger":
+      return sheet.pass != null;
+    case "pick": {
+      const alternative = sheet.alternative;
+      return sheet.primary?.intent.type === "Pass" || (alternative != null && "intent" in alternative && alternative.intent.type === "Pass");
+    }
+    case "outcome":
+      return true;
+    case "multi":
+    case "distribute":
+      return false;
   }
 }

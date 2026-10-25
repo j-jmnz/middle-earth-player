@@ -14,6 +14,8 @@ import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
 import { goBack } from "../../go-back";
+import { useListPreview } from "../../list-preview";
+import type { PictureSource } from "../../../play/table-canvas-types";
 
 type PackCard = {
   code: string;
@@ -33,7 +35,7 @@ function onViewableItemsChanged({ viewableItems }: { viewableItems: { item: Pack
   if (jobs.length > 0) enqueueImageDownloads(jobs);
 }
 
-function PackCardRow({ item, onPress }: { item: PackCard; onPress: () => void }) {
+function PackCardRow({ item, onPress, onPreview }: { item: PackCard; onPress: () => void; onPreview: (code: string, name: string, source: PictureSource | null) => void }) {
   const cached = useCachedImage(item.code);
   const { source } = shownCardImage({
     cached,
@@ -53,6 +55,7 @@ function PackCardRow({ item, onPress }: { item: PackCard; onPress: () => void })
         </View>
       }
       onPress={onPress}
+      onLongPress={() => onPreview(item.code, item.name, preview)}
     />
   );
 }
@@ -62,6 +65,7 @@ export default function PackCards() {
   const params = useLocalSearchParams<{ code: string }>();
   const code = routeCode(params.code);
   const { catalog } = useDatabases();
+  const preview = useListPreview();
   const pack = useMemo(() => {
     if (!code) return undefined;
     return catalog
@@ -109,11 +113,13 @@ export default function PackCards() {
                 onPress={() => {
                   router.push({ pathname: "/card/[code]", params: { code: item.code } });
                 }}
+                onPreview={preview.open}
               />
             )}
           />
         </View>
       )}
+      {preview.overlay}
     </Screen>
   );
 }
