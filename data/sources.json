@@ -757,9 +757,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "b254b637a09fc65c66e0e622f619ea99afc73a0f18cfa19a5c05f0b4f2d0ff23"
+        "value": "5bc8a652a1fd7ff8787aef2dd0aae6a41f92e8bd5b72536615591f489ead5413"
       },
-      "fetchedAt": "2026-10-24T11:44:01.602Z",
+      "fetchedAt": "2026-10-25T14:34:04.157Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -796,6 +796,126 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/lotr_easy_mode.pdf",
           "sha256": "52fd5fde07ee01398f46399fa6afd6dd77f2b0987150756b4d0944fe288d1a9f",
           "bytes": 3090516
+        },
+        {
+          "path": "pdf/mec103_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec103_rules.pdf",
+          "sha256": "cae203120eb894f84efb52b88408241e6356eac53a7638f9bd2b259f0d206f4c",
+          "bytes": 1158293
+        },
+        {
+          "path": "pdf/mec104_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec104_rules.pdf",
+          "sha256": "8684eace6a091fc6e971d397235f2ac10daa11d2112c58a653a0deccbe4451aa",
+          "bytes": 1215521
+        },
+        {
+          "path": "pdf/mec105_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec105_rules.pdf",
+          "sha256": "72d87a8540c040cfd702389c9101d2ccbfd14f4b0ab8282c56dc177f42cfd3f4",
+          "bytes": 1252302
+        },
+        {
+          "path": "pdf/mec106_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec106_rules.pdf",
+          "sha256": "6a388d23b5de4cb5a50a8afecdbfca392f26042a64473a7c68b60e2194e0cf02",
+          "bytes": 1251354
+        },
+        {
+          "path": "pdf/mec107_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec107_rules.pdf",
+          "sha256": "cfe2956cba8ffcd3e9ee50272c53e86c56a3212ec4f71b18c9e54549036cddf7",
+          "bytes": 3755710
+        },
+        {
+          "path": "pdf/mec110_hero_rules_insert_web.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec110_hero_rules_insert_web.pdf",
+          "sha256": "75783b110899c3c08b7fdf3fa290b5d41ff743f9d7f824f6b91f0a249f32c45b",
+          "bytes": 3305122
+        },
+        {
+          "path": "pdf/mec112_rulebook_eng.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec112_rulebook_eng.pdf",
+          "sha256": "793d43e2dd7e0d989d880f32fe9419959ac563ef40e6ae430f9b8fb01bbafbf9",
+          "bytes": 12216245
+        },
+        {
+          "path": "pdf/mec113_rules-web.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec113_rules-web.pdf",
+          "sha256": "03b82903464d3a7beed1ea69874aaf4a4cc8a0fbb6aae70e610f4b03422b525a",
+          "bytes": 2938205
+        },
+        {
+          "path": "pdf/mec114_rules-web.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec114_rules-web.pdf",
+          "sha256": "94fec1e69ddacdf32dad1e7872f4b6e83402ef4de000e079d26aa58bd11ac3c2",
+          "bytes": 695628
+        },
+        {
+          "path": "pdf/the-black-riders-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/the-black-riders-rulesheet.pdf",
+          "sha256": "b8edb0816a474885e5ad31f02dd8fdf4d6c3c3b93c19f0143f095d00e5165154",
+          "bytes": 8017511
+        },
+        {
+          "path": "pdf/the-road-darkens-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/the-road-darkens-rulesheet.pdf",
+          "sha256": "93ed884682ce8b06268647cfe9ad3d685f87919762ec3ae44b9be9102bc23137",
+          "bytes": 8677210
+        },
+        {
+          "path": "pdf/mec45-the-treason-of-saruman-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec45-the-treason-of-saruman-rulesheet.pdf",
+          "sha256": "6fa55394ba632d0f5a23bb8d4cda8b1825acbfc4997a5a53fcf16d64f87eba01",
+          "bytes": 4940984
+        },
+        {
+          "path": "pdf/mec46-the-land-of-shadow-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec46-the-land-of-shadow-rulesheet.pdf",
+          "sha256": "129e40853b7ddf502eed8cbe1676e9c0f25e4d2e1b7bd4e838f72f8f1942f39c",
+          "bytes": 5505167
+        },
+        {
+          "path": "pdf/mec54_rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec54_rulesheet.pdf",
+          "sha256": "cb71829130bdc63fcab3c5c6b155b8d465f2385497191178b6ac12a685c4dcf5",
+          "bytes": 6521200
+        },
+        {
+          "path": "pdf/mountain_of_fire_rules_insert_eng.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mountain_of_fire_rules_insert_eng.pdf",
+          "sha256": "17352d549c858d3daf1b8a2c031e8c4625312d5ed6ecb684fa38c94973243001",
+          "bytes": 34515979
+        },
+        {
+          "path": "pdf/hobbit_over_hill_and_under_hill_rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/hobbit_over_hill_and_under_hill_rulesheet.pdf",
+          "sha256": "1cbad735146bf3ee562321c56388273a230a6eab994d92fc99c1d691f2650502",
+          "bytes": 3299863
+        },
+        {
+          "path": "pdf/hobbit_on_the_doorstep_rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/hobbit_on_the_doorstep_rulesheet.pdf",
+          "sha256": "c7a6d8904aa055744d88e06149f2af4ccc0f356dc7d4bf46410f4d452c6cd882",
+          "bytes": 2709473
+        },
+        {
+          "path": "pdf/mec_communitydecklists_eomerandeowyn-compressed.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec_communitydecklists_eomerandeowyn-compressed.pdf",
+          "sha256": "5cfc904b2e07a1d07c68918c220bc0afd643ad69df380a808f31960c6c4f79d7",
+          "bytes": 1842791
+        },
+        {
+          "path": "pdf/mec_communitydecklists_theredarrow-compressed.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec_communitydecklists_theredarrow-compressed.pdf",
+          "sha256": "c39c6ccdeb53aa6ecd9fa489665bd361749de84eb82f5f82b188047491d035e2",
+          "bytes": 1797584
+        },
+        {
+          "path": "pdf/mec_communitydecklists_theswordsofthenoldor-compressed.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec_communitydecklists_theswordsofthenoldor-compressed.pdf",
+          "sha256": "f8ba37508167224152585f5f74a6051c787cbedfe2648230a03589dac08a15c6",
+          "bytes": 9131141
         }
       ]
     },

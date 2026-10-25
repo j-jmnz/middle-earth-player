@@ -10,7 +10,8 @@ import { RULE_PDFS } from "../sources/rules.ts";
 // interleaves the two columns of the books. The boxes are recorded per document in data/rules/columns.json:
 // a default for every page and an override for a page that lays out differently.
 export type Box = { x: number; y: number; w: number; h: number };
-export type DocColumns = { default: Box[]; pages?: Record<string, Box[]> };
+// `only` limits extraction to those pages: a product insert whose decklist page is all that is read.
+export type DocColumns = { default: Box[]; pages?: Record<string, Box[]>; only?: number[] };
 export type ColumnsFile = Record<string, DocColumns>;
 
 export type Page = { number: number; columns: string[] };
@@ -43,7 +44,9 @@ function clean(text: string): string {
 export function extractPdf(doc: string, file: string, columns: DocColumns): ExtractedDoc {
   const bytes = readFileSync(file);
   const pages: Page[] = [];
-  for (let number = 1; number <= pageCount(file); number += 1) {
+  const count = pageCount(file);
+  for (const number of columns.only ?? Array.from({ length: count }, (_, at) => at + 1)) {
+    if (number > count) throw new Error(`${doc} has no page ${number}`);
     const texts = boxesFor(columns, number).map((box) =>
       clean(
         execFileSync(

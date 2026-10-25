@@ -7,7 +7,7 @@ import type { ExtractedDoc } from "./extract.ts";
 // on into later columns names where it ends in `through`. There is no heading heuristic: a quote that is not found
 // verbatim, in order, fails the build.
 export const spanSchema = z.strictObject({
-  id: z.string().regex(/^(rr|ltp|mec109|faq|campaign-log|easy-mode)\.[a-z0-9][a-z0-9-]*$/),
+  id: z.string().regex(/^(rr|ltp|mec109|faq|campaign-log|easy-mode|decklist)\.[a-z0-9][a-z0-9-]*$/),
   doc: z.string().min(1),
   page: z.number().int().positive(),
   column: z.number().int().positive(),

@@ -128,19 +128,11 @@ describe("pre-built decks", () => {
     expect(Object.keys(body.heroes).sort()).toEqual([...rohan.heroes].sort());
     expect(Object.values(body.slots).reduce((total, count) => total + count, 0)).toBe(50);
     const names: Record<string, string> = { "07001": "Éomer", "17055": "Hirgon", "22027": "Lothíriel" };
-    expect(prebuiltDetail(rohan, (code) => names[code] ?? code)).toBe("Riders of Rohan · Éomer, Hirgon, Lothíriel");
+    expect(prebuiltDetail(rohan, (code) => names[code] ?? code)).toBe("Riders of Rohan Starter Deck · Éomer, Hirgon, Lothíriel");
   });
 
-  it("lists the four Learn to Play core decks before the four starter decks", () => {
-    expect(prebuiltDecks.map((deck) => deck.id)).toEqual([
-      "core-leadership",
-      "core-tactics",
-      "core-spirit",
-      "core-lore",
-      "dwarves-of-durin",
-      "elves-of-lorien",
-      "defenders-of-gondor",
-      "riders-of-rohan",
-    ]);
+  it("lists the four Learn to Play core decks first, then the printed decklists", () => {
+    expect(prebuiltDecks.slice(0, 5).map((deck) => deck.id)).toEqual(["core-leadership", "core-tactics", "core-spirit", "core-lore", "dwarves-of-durin"]);
+    expect(prebuiltDecks.length).toBe(35);
   });
 });
