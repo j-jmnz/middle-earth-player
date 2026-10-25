@@ -301,6 +301,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         options: [],
         primary: { label: "Done", intent: { type: "Pass" } },
         alternative: null,
+        about: window.cardIds,
       };
     case "travel": {
       const targets = has(legal, "Travel") ? legalTargets(game, { type: "Travel" }, ctx) : [];
