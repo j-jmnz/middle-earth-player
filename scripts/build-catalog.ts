@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,6 +13,7 @@ import { contentVersion, writeCatalogVersion } from "./catalog-version.ts";
 import { bytes, createLog, runScript } from "./log.ts";
 import { loadCards } from "./data/load-cards.ts";
 import { DATA_DIR } from "./data/paths.ts";
+import { parseLedger } from "./data/printed/ledger.ts";
 
 const FELLOWSHIP_CAMPAIGN_ID = "fellowship-of-the-ring";
 const FELLOWSHIP_PACK_CODES = new Set(["TBR", "TRD"]);
@@ -83,7 +84,33 @@ function capitalize(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-function cardRow(card: Card, knownPacks: ReadonlySet<string>): Row {
+// The front scan each ledgered card was read from (data/printed), by code. Each is pinned in data/sources.json.
+function ledgerFronts(dataDir: string): Map<string, string> {
+  const fronts = new Map<string, string>();
+  const dir = path.join(dataDir, "printed");
+  if (!existsSync(dir)) return fronts;
+  for (const name of readdirSync(dir).filter((file) => file.endsWith(".json")).sort()) {
+    const ledger = parseLedger(JSON.parse(readFileSync(path.join(dir, name), "utf8")) as unknown);
+    for (const entry of ledger.entries) {
+      if (entry.side === "A") fronts.set(entry.code, entry.scan.url);
+    }
+  }
+  return fronts;
+}
+
+// The picture the phone downloads: RingsDB's `imagesrc` path. A card RingsDB has no picture for (quest and encounter cards)
+// gets the full URL of its scan instead: the ledgered front, else the Hall of Beorn front of its MEC109 printing, else of
+// another printing (docs/brief.md, Card images).
+export function pictureOf(card: Card, fronts: ReadonlyMap<string, string>): string | null {
+  if (card.imagesrc) return card.imagesrc;
+  const ledgered = fronts.get(card.code);
+  if (ledgered) return ledgered;
+  const printings = [...card.printings].sort((left, right) => Number(right.pack === "TFotR") - Number(left.pack === "TFotR"));
+  const urls = printings.flatMap((printing) => printing.imageUrls ?? []);
+  return urls.find((url) => !url.includes("dragncards")) ?? urls[0] ?? null;
+}
+
+function cardRow(card: Card, knownPacks: ReadonlySet<string>, fronts: ReadonlyMap<string, string>): Row {
   const primary = card.printings[0];
   if (!primary) throw new Error(`Card ${card.code} has no printing`);
   // Printings from packs the pack list does not know (the MEC109 box) are not catalog packs.
@@ -119,7 +146,7 @@ function cardRow(card: Card, knownPacks: ReadonlySet<string>): Row {
     text: card.text,
     has_errata: bit(card.hasErrata),
     errata: card.errata,
-    imagesrc: card.imagesrc,
+    imagesrc: pictureOf(card, fronts),
     deck_legal: bit(card.deckLegal),
     campaign_id: packCodes.some((code) => FELLOWSHIP_PACK_CODES.has(code)) ? FELLOWSHIP_CAMPAIGN_ID : null,
   });
@@ -242,7 +269,8 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
         available: availableFlag(pack.available),
       }),
     );
-  const cardRows = allCards.map((card) => cardRow(card, knownPacks)).sort((left, right) => String(left.code).localeCompare(String(right.code)));
+  const fronts = ledgerFronts(dataDir);
+  const cardRows = allCards.map((card) => cardRow(card, knownPacks, fronts)).sort((left, right) => String(left.code).localeCompare(String(right.code)));
   const day = fetchedDay(dataDir);
   const metaRows = included.map((pack) => rowFrom(meta, { pack_code: pack.code, fetched_at: day }));
   const campaignRows = campaignIndexSchema

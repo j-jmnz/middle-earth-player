@@ -15,7 +15,7 @@ import { GameIcon } from "../../../play/game-icon";
 import { SPHERE_TINT, sphereIcon, typeIcon, type IconName } from "../../../play/icon-map";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
-import { imageLayoutSize, ringsdbImageUrl, shownCardImage } from "../../images/policy";
+import { cardImageUrl, imageLayoutSize, shownCardImage } from "../../images/policy";
 import { InspectCardImage } from "../../images/picture";
 import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
@@ -234,7 +234,7 @@ export default function CardScreen() {
     imagesrc: row?.imagesrc ?? null,
     bundled,
   });
-  const remotePreview = !source && row?.imagesrc ? ringsdbImageUrl(row.imagesrc) : null;
+  const remotePreview = !source && row?.imagesrc ? cardImageUrl(row.imagesrc) : null;
   const previewSource = source ?? (remotePreview ? { uri: remotePreview } : null);
   const maxWidth = Math.max(0, Math.min(windowWidth - 96, 300));
   const pixels =
