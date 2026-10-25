@@ -6,7 +6,7 @@ The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The R
 
 `data/` is committed and is the only thing tests and agents read for cards, scenarios and rules text. Sources are listed in `data/sources.json`.
 
-- `pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules|scans]` is the only command that uses the network. It refreshes `data/raw/`, `.cache/pdf/` and `.cache/scans/` (card scans, never committed; the ledger pins each by sha256).
+- `pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules|scans]` is the only command that uses the network. It refreshes `data/raw/`, `.cache/pdf/` and `.cache/scans/` (card scans, never committed; the ledger pins each by sha256). `rules` also packs the two booklet PDFs the app bundles into `.cache/booklets/` (`pnpm booklets:pack` does only that).
 - `data/printed/<campaign>.json` is the printed-text ledger: the lines on each card side, read from its scan. The build uses it in place of Hall of Beorn text. An effect record names the ledger lines it implements (`lines`).
 - `data/rules/index.json` is the hand-checked list of rule spans (exact `from` and `to` quotes per page column); `data/rules/columns.json` holds the per-document column boxes. `data/rules/entries.json` is built from them.
 - `data/prebuilt-decks.json` names the pre-built player decks: the Learn to Play's four core decks (`ltp.starter-decks`) and every decklist an official product prints (`decklist.*` spans, read from the product PDFs that `data:sync rules` pins). The build resolves each row through Hall of Beorn and writes `data/decks/prebuilt.json`; a printed misspelling is an alias with its reason, a wrong heading total a recorded misprint.

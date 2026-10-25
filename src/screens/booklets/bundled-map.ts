@@ -3,5 +3,6 @@ export type BundledBooklet = {
   filename: string;
 };
 
-// Leave this object empty in git. scripts/pack-booklets.ts replaces it on the release machine.
+// The stub every checkout carries. When `.cache/booklets/bundled-map.ts` exists (written by `pnpm booklets:pack`, which
+// `data:sync rules`, `pnpm android` and the EAS hook run), metro.config.js bundles that file in its place.
 export const bundledBooklets: Partial<Record<string, BundledBooklet>> = {};

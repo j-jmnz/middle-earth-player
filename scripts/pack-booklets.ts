@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { BOOKLETS, type BookletId } from "../src/screens/booklets/books.ts";
+import { BOOKLET_CACHE_DIR, DATA_DIR, PDF_CACHE_DIR } from "./data/paths.ts";
 import { fetchBytes, sha256, type SourceRecord } from "./data/sources/fetch.ts";
 import { bytes, runScript, type Log } from "./log.ts";
 
@@ -21,8 +22,8 @@ export type PackedBooklet = {
 export type PackBookletsOptions = {
   sourcesPath: string;
   pdfCacheDir: string;
-  bookletsDir: string;
-  mapPath: string;
+  /** Gets each `<id>.pdf` and the `bundled-map.ts` that requires them; metro.config.js puts that map in place of the stub. */
+  outDir: string;
   fetch?: (url: string) => Promise<Uint8Array>;
 };
 
@@ -35,14 +36,14 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
   const { sources } = JSON.parse(readFileSync(options.sourcesPath, "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
   const files = sources.rules?.files ?? [];
   const fetchPdf = options.fetch ?? ((url: string) => fetchBytes(url, 300_000, log));
-  mkdirSync(options.bookletsDir, { recursive: true });
+  mkdirSync(options.outDir, { recursive: true });
   const packed: PackedBooklet[] = [];
   for (const { id } of BOOKLETS) {
     const file = BOOKLET_SOURCES[id];
     const pin = files.find((entry) => entry.path === `pdf/${file}`);
     if (!pin) throw new Error(`${file} (booklet ${id}) is not a pinned rules file in ${options.sourcesPath}`);
     const filename = `${id}.pdf`;
-    const target = path.join(options.bookletsDir, filename);
+    const target = path.join(options.outDir, filename);
     const cached = path.join(options.pdfCacheDir, file);
     if (existsSync(cached) && sha256(readFileSync(cached)) === pin.sha256) {
       copyFileSync(cached, target);
@@ -56,20 +57,25 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
     }
     packed.push({ id, filename, bytes: pin.bytes });
   }
-  writeBookletMap(options.mapPath, packed);
-  log.info(`bundled ${packed.length} booklets (${bytes(packed.reduce((sum, book) => sum + book.bytes, 0))}) into ${options.bookletsDir}`);
+  writeBookletMap(path.join(options.outDir, "bundled-map.ts"), packed);
+  log.info(`packed ${packed.length} booklets (${bytes(packed.reduce((sum, book) => sum + book.bytes, 0))}) into ${options.outDir}; the next Metro bundle carries them`);
   return packed;
 }
 
 function writeBookletMap(mapPath: string, packed: readonly PackedBooklet[]): void {
   const lines = packed.map(
-    (book) => `  ${JSON.stringify(book.id)}: { moduleId: require("../../../assets/booklets/${book.filename}") as number, filename: ${JSON.stringify(BOOKLET_SOURCES[book.id])} },`,
+    (book) => `  ${JSON.stringify(book.id)}: { moduleId: require("./${book.filename}") as number, filename: ${JSON.stringify(BOOKLET_SOURCES[book.id])} },`,
   );
   const body = lines.length > 0 ? `\n${lines.join("\n")}\n` : "";
   writeFileSync(
     mapPath,
-    `export type BundledBooklet = {\n  moduleId: number;\n  filename: string;\n};\n\n// Leave this object empty in git. scripts/pack-booklets.ts replaces it on the release machine.\nexport const bundledBooklets: Partial<Record<string, BundledBooklet>> = {${body}};\n`,
+    `export type BundledBooklet = {\n  moduleId: number;\n  filename: string;\n};\n\n// Written by scripts/pack-booklets.ts. metro.config.js uses this file in place of src/screens/booklets/bundled-map.ts.\nexport const bundledBooklets: Partial<Record<string, BundledBooklet>> = {${body}};\n`,
   );
+}
+
+/** Packs from this checkout's pins and PDF cache into `.cache/booklets`. `data:sync rules` runs it after a fetch. */
+export function packBookletsHere(log: Log): Promise<PackedBooklet[]> {
+  return packBooklets({ sourcesPath: path.join(DATA_DIR, "sources.json"), pdfCacheDir: PDF_CACHE_DIR, outDir: BOOKLET_CACHE_DIR }, log);
 }
 
 function isDirectRun(): boolean {
@@ -79,15 +85,6 @@ function isDirectRun(): boolean {
 
 if (isDirectRun()) {
   void runScript("pack-booklets", async (log) => {
-    const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-    await packBooklets(
-      {
-        sourcesPath: path.join(root, "data/sources.json"),
-        pdfCacheDir: path.join(root, ".cache/pdf"),
-        bookletsDir: path.join(root, "assets/booklets"),
-        mapPath: path.join(root, "src/screens/booklets/bundled-map.ts"),
-      },
-      log,
-    );
+    await packBookletsHere(log);
   });
 }
