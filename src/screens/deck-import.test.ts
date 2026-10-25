@@ -90,6 +90,17 @@ describe("buildDecklist", () => {
     expect(built.heroLimit).toBeNull();
   });
 
+  it("drops a hero the pool does not hold once, though RingsDB repeats it in slots", () => {
+    const body = readDecklistBody({
+      name: "New pack",
+      heroes: { "141002": 1, "999001": 1 },
+      slots: { "141002": 1, "999001": 1, "01073": 3 },
+    });
+    const built = buildDecklist(body!, pool);
+    expect(built.heroes).toEqual(["141002"]);
+    expect(built.droppedCodes).toEqual(["999001"]);
+  });
+
   it("sums a code that is listed in both heroes and slots", () => {
     const body = readDecklistBody({
       name: "Split",
@@ -116,7 +127,8 @@ describe("pre-built decks", () => {
     expect(body.name).toBe("Riders of Rohan");
     expect(Object.keys(body.heroes).sort()).toEqual([...rohan.heroes].sort());
     expect(Object.values(body.slots).reduce((total, count) => total + count, 0)).toBe(50);
-    expect(prebuiltDetail(rohan)).toBe("Riders of Rohan · 50 cards");
+    const names: Record<string, string> = { "07001": "Éomer", "17055": "Hirgon", "22027": "Lothíriel" };
+    expect(prebuiltDetail(rohan, (code) => names[code] ?? code)).toBe("Riders of Rohan · Éomer, Hirgon, Lothíriel");
   });
 
   it("lists the four Learn to Play core decks before the four starter decks", () => {

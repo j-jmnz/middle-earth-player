@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { deckSaveRefusal, type DeckSaveCard } from "../../src/catalog/deck-save.ts";
 import { prebuiltDecksSchema } from "../../src/catalog/prebuilt-deck.ts";
 import { loadCards } from "./load-cards.ts";
+import { prebuiltIndexSchema } from "./prebuilt-decks.ts";
 import { DATA_DIR } from "./paths.ts";
 import type { RuleEntry } from "./rules/spans.ts";
 
@@ -13,21 +14,14 @@ import type { RuleEntry } from "./rules/spans.ts";
 // (ltp.starter-decks); the build resolves them against RingsDB's Revised Core Set. The four starter decks are DragnCards'
 // lists, and the build checks that each is exactly its product's contents.
 const entries = JSON.parse(readFileSync(path.join(DATA_DIR, "rules", "entries.json"), "utf8")) as RuleEntry[];
-const index = JSON.parse(readFileSync(path.join(DATA_DIR, "prebuilt-decks.json"), "utf8")) as {
-  id: string;
-  name: string;
-  span?: string;
-  heroes?: string[];
-  collectors?: { from: number; to: number };
-  plus?: { collector: number; count: number }[];
-}[];
+const index = prebuiltIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "prebuilt-decks.json"), "utf8")) as unknown);
 const decks = prebuiltDecksSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "decks", "prebuilt.json"), "utf8")) as unknown);
 const cards = new Map(loadCards().map((card) => [card.code, card]));
 
 const facts = new Map<string, DeckSaveCard>(
   [...cards.values()].map((card) => [
     card.code,
-    { name: card.name, typeCode: card.type, sphereCode: card.sphere, deckLimit: card.deckLimit, deckLegal: card.deckLegal, traits: JSON.stringify(card.traits) },
+    { name: card.name, typeCode: card.type, sphereCode: card.sphere, deckLimit: card.deckLimit, deckLegal: card.deckLegal, traits: card.traits.map((trait) => `${trait}.`).join(" ") },
   ]),
 );
 
@@ -55,8 +49,8 @@ describe("pre-built decks", () => {
     expect(span?.doc).toBe("learn-to-play");
     const printed = printedDecks(span?.text ?? "");
     expect(printed.map((deck) => deck.name)).toEqual(["Leadership Deck", "Tactics Deck", "Spirit Deck", "Lore Deck"]);
-    const ours = index.filter((entry) => entry.span === "ltp.starter-decks");
-    expect(ours.map((entry) => ({ name: entry.name, heroes: entry.heroes, from: entry.collectors?.from, to: entry.collectors?.to, extra: entry.plus }))).toEqual(
+    const ours = index.flatMap((entry) => ("span" in entry && entry.span === "ltp.starter-decks" ? [entry] : []));
+    expect(ours.map((entry) => ({ name: entry.name, heroes: entry.heroes, from: entry.collectors.from, to: entry.collectors.to, extra: entry.plus }))).toEqual(
       printed.map((deck) => ({ name: deck.name, heroes: deck.heroes, from: deck.from, to: deck.to, extra: [{ collector: deck.extra, count: 2 }] })),
     );
   });

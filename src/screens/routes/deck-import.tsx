@@ -23,6 +23,7 @@ import {
 } from "../deck-import";
 import { useDatabases } from "../databases";
 import { palette } from "../palette.js";
+import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
 import { decks } from "../user-schema";
 import { goBack } from "../go-back";
 
@@ -104,17 +105,23 @@ export default function DeckImportScreen() {
     }
   }
 
-  // A pre-built deck is local data: no fetch, and every code is in the catalog the same build wrote.
-  function onPrebuilt(index: number): void {
-    const deck = prebuiltDecks[index];
-    if (busy || saved || !deck) return;
-    setMessage(null);
-    setDropped(null);
+  // A pre-built deck is local data. It opens in the editor, where Save is the one action: nothing is saved by the tap,
+  // and the 47-card core decks show what they lack. A code the bundled catalog lacks is named by its code.
+  function onPrebuilt(deck: PrebuiltDeck): void {
+    if (busy) return;
     const built = buildDecklist(prebuiltBody(deck), pool);
-    save(built, built.droppedCodes);
+    replaceDeckDraft({
+      id: "new",
+      name: built.name,
+      heroes: built.heroes,
+      cards: built.cards,
+      heldRefusal: null,
+      droppedNote: droppedSentence(built.droppedCodes),
+    });
+    router.push({ pathname: "/deck/[id]", params: { id: "new" } });
   }
 
-  // Saves the deck when the deckbuilding rules allow it; otherwise opens it in the editor with the refusal held.
+  // Saves an imported deck when the deckbuilding rules allow it; otherwise opens it in the editor.
   function save(built: BuiltDecklist, names: readonly string[]): void {
     const sentence = droppedSentence(names);
     if (sentence) setDropped(sentence);
@@ -125,15 +132,7 @@ export default function DeckImportScreen() {
     const facts = new Map<string, DeckSaveCard>();
     for (const code of [...built.heroes, ...built.cards.map((card) => card.code)]) {
       const row = pool.get(code);
-      if (!row) continue;
-      facts.set(code, {
-        name: row.name,
-        typeCode: row.typeCode,
-        sphereCode: row.sphereCode,
-        deckLimit: row.deckLimit,
-        deckLegal: row.deckLegal,
-        traits: row.traits,
-      });
+      if (row) facts.set(code, row);
     }
     const draft = {
       id: "new",
@@ -207,8 +206,15 @@ export default function DeckImportScreen() {
           data={prebuiltDecks}
           keyExtractor={(item) => item.id}
           style={{ flex: 1 }}
-          renderItem={({ item, index }) => (
-            <ListRow testID={`deck-prebuilt-${item.id}`} label={item.name} detail={prebuiltDetail(item)} onPress={() => onPrebuilt(index)} />
+          ListFooterComponent={<View className="pb-safe" />}
+          keyboardShouldPersistTaps="handled"
+          renderItem={({ item }) => (
+            <ListRow
+              testID={`deck-prebuilt-${item.id}`}
+              label={item.name}
+              detail={prebuiltDetail(item, (code) => pool.get(code)?.name ?? code)}
+              onPress={() => onPrebuilt(item)}
+            />
           )}
         />
       </View>

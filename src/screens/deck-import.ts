@@ -111,7 +111,9 @@ export function buildDecklist(
   for (const [code, count] of Object.entries(body.heroes)) take(code, count);
   // RingsDB's public decklist repeats each hero in `slots`. That entry is the same hero, not a second copy.
   for (const [code, count] of Object.entries(body.slots)) {
-    if (code in body.heroes && pool.get(code)?.typeCode === "hero") continue;
+    // A code the pool does not hold was already dropped from `heroes`, so it is not dropped twice.
+    const fact = pool.get(code);
+    if (code in body.heroes && (!fact || fact.typeCode === "hero")) continue;
     take(code, count);
   }
 
@@ -132,7 +134,7 @@ export function importSavedSentence(names: readonly string[]): string {
 /** The pre-built player decks from data/decks/prebuilt.json, in the order the index lists them. */
 export const prebuiltDecks: readonly PrebuiltDeck[] = prebuiltDecksSchema.parse(prebuiltJson);
 
-/** A pre-built deck as a decklist body, so it is saved like an import. Its sideboard is left out, like RingsDB sideslots. */
+/** A pre-built deck as a decklist body, read like an import. Its sideboard is left out, like RingsDB sideslots. */
 export function prebuiltBody(deck: PrebuiltDeck): DecklistBody {
   return {
     name: deck.name,
@@ -141,7 +143,7 @@ export function prebuiltBody(deck: PrebuiltDeck): DecklistBody {
   };
 }
 
-export function prebuiltDetail(deck: PrebuiltDeck): string {
-  const total = deck.cards.reduce((count, slot) => count + slot.count, 0);
-  return `${deck.productName} · ${total} cards`;
+/** The product and the heroes, so a row says what the player is choosing before it opens. */
+export function prebuiltDetail(deck: PrebuiltDeck, heroName: (code: string) => string): string {
+  return `${deck.productName} · ${deck.heroes.map(heroName).join(", ")}`;
 }
