@@ -229,7 +229,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const drawBody = (slot: CardSlot, dim: boolean) => {
     const image = images.get(slot.code) ?? null;
     // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
-    if (slot.kind === "pile" || slot.zone === "deck") return <Pile slot={slot.zone === "deck" ? { ...slot, faceDown: false } : slot} image={image} fonts={fonts} label backs={backs} />;
+    if (slot.kind === "pile" || slot.zone === "deck") return <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.code)} fonts={fonts} label backs={backs} />;
     const encounterBack = slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck";
     const picked = (highlight.picked.get(slot.id) ?? 0) > 0;
     const glows = slot.kind === "card" && (picked || highlight.tappable.has(slot.id) || targetIds.has(slot.id));

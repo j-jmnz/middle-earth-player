@@ -151,7 +151,7 @@ export function CardBody({
 const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard" };
 
 /** A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. */
-export function Pile({ slot, image, fonts, label, backs }: { slot: CardSlot; image: SkImage | null; fonts: Fonts; label: boolean; backs: BackImages }) {
+export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlot; image: SkImage | null; name: string; fonts: Fonts; label: boolean; backs: BackImages }) {
   const { x, y, w, h } = slot;
   const encounter = slot.zone === "encounterDeck" || slot.zone === "encounterDiscard";
   const word = PILE_WORD[slot.zone] ?? "";
@@ -171,11 +171,21 @@ export function Pile({ slot, image, fonts, label, backs }: { slot: CardSlot; ima
       {Array.from({ length: depth }, (_, index) => (
         <RoundedRect key={index} x={x + (depth - index) * 1.5} y={y + (depth - index) * 1.5} width={w} height={h} r={RADIUS} color={encounter ? t.night : t.raised} />
       ))}
-      {slot.faceDown || !image ? (
+      {slot.faceDown ? (
         <Back x={x} y={y} w={w} h={h} encounter={encounter} backs={backs} />
-      ) : (
+      ) : image ? (
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
+        </Group>
+      ) : (
+        // A face-up top whose file is missing shows its name, so a discard pile never looks like a deck.
+        <Group>
+          <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={t.raised} />
+          <Group clip={{ x: x + 3, y: y + 3, width: w - 6, height: h - 21 }}>
+            {wrapName(name, w - 10, (text) => fonts.names.getTextWidth(text)).map((line, index) => (
+              <Text key={index} x={x + 5} y={y + 15 + index * LINE} text={line} font={fonts.names} color={t.bone} />
+            ))}
+          </Group>
         </Group>
       )}
       <RoundedRect x={x} y={y + h - 15} width={w} height={15} r={0} color={strip} />

@@ -48,6 +48,8 @@ export type TableChoice = {
   // Changes with the moment and the pick, so an armed button goes back to unarmed.
   resetKey: string;
   banner: Moment | null;
+  // The moment's number: a new one enters the banner afresh, even while the last is still up.
+  bannerKey: number;
   // The Undo button: puts back the pick being made, or goes back one intent (store.ts, undo-history.ts); null when there is
   // neither. It is also the first of `extras`.
   undo: DockExtra | null;
@@ -291,6 +293,7 @@ export function useTableChoice({
     extras,
     resetKey,
     banner,
+    bannerKey: moment?.seq ?? 0,
     undo: undoButton,
     onTap: tapOnTable,
     onTile,

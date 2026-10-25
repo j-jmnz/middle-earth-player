@@ -79,7 +79,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
 
   // Prefetch the hand, the cards on the table and the screen about to open; never the whole cache. The canvas draws names
-  // until a file lands.
+  // until a file lands. The codes are joined into one string so the effect runs when the set changes, not on every intent.
   const wanted = useMemo(() => {
     const next = [...resolutionCodes(game), ...(selected ? [game.cards[selected]?.code ?? ""] : [])];
     return prefetchCodes(game, seat, next).join(",");
@@ -263,7 +263,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         </View>
       ) : null}
       {/* Over the table and any open panel, centered on the screen under the top bar. */}
-      {choice.banner ? <MomentBanner moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} /> : null}
+      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} /> : null}
       {preview && previewed && shown ? (
         <CardPreview
           key={preview.id}

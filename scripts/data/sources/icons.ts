@@ -16,6 +16,7 @@ const DRAGNCARDS_TOKENS = "https://dragncards-lotrlcg.s3.amazonaws.com/tokens";
 export const DRAGNCARDS_TOKEN_FILES = ["questPoints", "engagementCost", "resource", "damage", "progress"] as const;
 export const DRAGNCARDS_CARDBACKS = "https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks";
 export const DRAGNCARDS_CARDBACK_FILES = ["player", "encounter"] as const;
+export type CardBackName = (typeof DRAGNCARDS_CARDBACK_FILES)[number];
 
 export async function syncIcons(log: Log = createLog("icons")): Promise<SourceRecord> {
   const files: SourceFile[] = [];
