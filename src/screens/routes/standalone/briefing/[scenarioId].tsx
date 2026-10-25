@@ -19,9 +19,8 @@ import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
 import { goBack } from "../../../go-back";
 import { routeCode } from "../../../route-code";
+import { SEAT_WORDS, seatCountOf, seatWord } from "../../../seats";
 import { newStandaloneId, readStandalone, writeStandalone } from "../../../standalone-store";
-
-const SEATS = ["True solo", "Two-handed"] as const;
 
 export default function StandaloneBriefing() {
   const router = useRouter();
@@ -115,9 +114,9 @@ export default function StandaloneBriefing() {
         <ScenarioHeader facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} eyebrow={`Standalone · Scenario ${facts.number}`} />
         <View className="mt-5">
           <Segmented
-            options={SEATS}
-            value={seatCount === 1 ? "True solo" : "Two-handed"}
-            onChange={(next) => setSeatCount(next === "True solo" ? 1 : 2)}
+            options={SEAT_WORDS}
+            value={seatWord(seatCount)}
+            onChange={(next) => setSeatCount(seatCountOf(next))}
             testIDPrefix="seats"
           />
         </View>
@@ -130,7 +129,7 @@ export default function StandaloneBriefing() {
             index={index}
             seatCount={seatCount}
             decks={briefingDecks}
-            picked={picked[index] ?? null}
+            picked={seat.deckId}
             heroes={seat.heroes}
             fallen={[]}
             needsRingBearer={result.needsRingBearer}

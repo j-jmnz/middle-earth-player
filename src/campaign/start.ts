@@ -35,9 +35,13 @@ export type StartInput = {
 export function buildStart(input: StartInput): StartScenario {
   const effects = input.effects ?? [];
   const standalone = input.mode === "standalone";
-  const { campaignCard, ...rest }: ScenarioDefinition = scenarioDefinition(input.scenario, input.campaign, effects);
-  // Standalone: no campaign card beside the quest deck, so no campaign Setup and no Resolution to follow on a win.
-  const definition: ScenarioDefinition = standalone ? { ...rest, resolution: [] } : { ...rest, ...(campaignCard ? { campaignCard } : {}) };
+  const full: ScenarioDefinition = scenarioDefinition(input.scenario, input.campaign, effects);
+  let definition = full;
+  if (standalone) {
+    // No campaign card beside the quest deck, so no campaign Setup and no Resolution to follow on a win.
+    const { campaignCard: _unused, ...withoutCard } = full;
+    definition = { ...withoutCard, resolution: [] };
+  }
   const campaignSetup = standalone ? [] : recordInstructions(effects, input.scenario.campaignCard, "campaignSetup");
   const dealt = campaignSetup.filter((instruction) => instruction.verb === "AttachToRingBearer" || instruction.verb === "AddToStaging");
   const shuffledIn = campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoEncounterDeck" ? [instruction.code] : []));

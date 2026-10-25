@@ -11,12 +11,13 @@ import { campaignOf } from "../../campaign-data";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { DeleteConfirm } from "../../delete-confirm";
+import { seatWord } from "../../seats";
 import { palette } from "../../palette.js";
 
 type Seats = 1 | 2;
 
 function SeatTile({ seats, selected, onPress }: { seats: Seats; selected: boolean; onPress: () => void }) {
-  const label = seats === 1 ? "True solo" : "Two-handed";
+  const label = seatWord(seats);
   return (
     <Pressable
       testID={`seats-${seats}`}
@@ -110,7 +111,6 @@ export default function CampaignList() {
   const fellowship = campaignOf(FELLOWSHIP_ID);
   const doneOf = (save: Save) => (fellowship ? campaignPath(fellowship, {}, save.log).filter((node) => node.status === "completed").length : 0);
   const total = fellowship?.scenarios.length ?? 6;
-  const seatWord = (save: Save) => (save.seatCount === 1 ? "True solo" : "Two-handed");
 
   return (
     <Screen testID="campaign-list" scene="dusk">
@@ -128,14 +128,14 @@ export default function CampaignList() {
                 <View key={save.id} testID={`save-${save.id}`}>
                   <Panel current={index === 0}>
                     <Text className="font-display text-title text-bone">{nameOf(save.campaignId)}</Text>
-                    <Label>{seatWord(save)}</Label>
+                    <Label>{seatWord(save.seatCount)}</Label>
                     <ProgressLine done={doneOf(save)} total={total} />
                     {deleting === save.id ? (
                       <DeleteConfirm id={save.id} sentence={DELETE_SENTENCE} onDelete={() => remove(save.id)} onKeep={() => setDeleting(null)} />
                     ) : (
                       <View className="-mx-3 mt-2 flex-row">
-                        <TextButton label="Archive" testID={`archive-${save.id}`} tone="gold" accessibilityLabel={`Archive ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => archive(save.id)} />
-                        <TextButton label="Delete" testID={`delete-${save.id}`} tone="danger" accessibilityLabel={`Delete ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => setDeleting(save.id)} />
+                        <TextButton label="Archive" testID={`archive-${save.id}`} tone="gold" accessibilityLabel={`Archive ${nameOf(save.campaignId)}, ${seatWord(save.seatCount)}`} onPress={() => archive(save.id)} />
+                        <TextButton label="Delete" testID={`delete-${save.id}`} tone="danger" accessibilityLabel={`Delete ${nameOf(save.campaignId)}, ${seatWord(save.seatCount)}`} onPress={() => setDeleting(save.id)} />
                       </View>
                     )}
                   </Panel>
@@ -154,7 +154,7 @@ export default function CampaignList() {
                   <Panel current={index === 0} pressed={pressed}>
                     {saves.length > 1 && index === 0 ? <Eyebrow>Current</Eyebrow> : null}
                     <Text className="mt-1 font-display text-title text-bone">{nameOf(save.campaignId)}</Text>
-                    <Label>{seatWord(save)}</Label>
+                    <Label>{seatWord(save.seatCount)}</Label>
                     <ProgressLine done={doneOf(save)} total={total} />
                   </Panel>
                 )}
@@ -215,14 +215,14 @@ export default function CampaignList() {
                 ? archived.map((save) => (
                     <View key={save.id} testID={`archived-${save.id}`} className="rounded-card border border-hairline p-5">
                       <Text className="font-display text-title text-muted">{nameOf(save.campaignId)}</Text>
-                      <Label>{seatWord(save)}</Label>
+                      <Label>{seatWord(save.seatCount)}</Label>
                       <ProgressLine done={doneOf(save)} total={total} />
                       {deleting === save.id ? (
                         <DeleteConfirm id={save.id} sentence={DELETE_SENTENCE} onDelete={() => remove(save.id)} onKeep={() => setDeleting(null)} />
                       ) : (
                         <View className="-mx-3 mt-2 flex-row">
-                          <TextButton label="Restore" testID={`restore-${save.id}`} tone="gold" accessibilityLabel={`Restore ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => restore(save.id)} />
-                          <TextButton label="Delete" testID={`delete-${save.id}`} tone="danger" accessibilityLabel={`Delete ${nameOf(save.campaignId)}, ${seatWord(save)}`} onPress={() => setDeleting(save.id)} />
+                          <TextButton label="Restore" testID={`restore-${save.id}`} tone="gold" accessibilityLabel={`Restore ${nameOf(save.campaignId)}, ${seatWord(save.seatCount)}`} onPress={() => restore(save.id)} />
+                          <TextButton label="Delete" testID={`delete-${save.id}`} tone="danger" accessibilityLabel={`Delete ${nameOf(save.campaignId)}, ${seatWord(save.seatCount)}`} onPress={() => setDeleting(save.id)} />
                         </View>
                       )}
                     </View>

@@ -1,8 +1,9 @@
 // The end of a standalone game. Won: Victory and the score (ltp.scoring); there is no campaign card, so nothing to choose.
-// Lost: Defeat and the reason. Done writes the result and closes the game; Play again opens a new briefing with the same
-// seats, decks and difficulty. Leaving by Back writes nothing: the game waits on the list (Resume) and ends here again.
+// Lost: Defeat and the reason. The result is fixed by the game state and asks for nothing, so it is written as the screen
+// opens and the list shows it at once; Done returns to the scenarios, and Play again opens a new briefing with the same
+// seats, decks and difficulty. A game already finished shows its stored result.
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Text, View } from "react-native";
 
 import { finishStandalone } from "../../../../campaign/standalone";
@@ -13,7 +14,7 @@ import { goBack } from "../../../go-back";
 import { palette } from "../../../palette.js";
 import { routeCode } from "../../../route-code";
 import { useStandaloneSession } from "../../../standalone-session";
-import { outcomeLines } from "../../../standalone-list";
+import { outcomeLines } from "../../../standalone-words";
 import { writeStandalone } from "../../../standalone-store";
 
 export default function StandaloneOutcome() {
@@ -22,10 +23,14 @@ export default function StandaloneOutcome() {
   const gameId = routeCode(params.gameId);
   const { user } = useDatabases();
   const session = useStandaloneSession(gameId);
-  const finished = useMemo(() => (session?.ok ? finishStandalone(session.stored, session.world, session.game) : null), [session]);
+  const finished = useMemo(() => (session?.ok ? finishStandalone(session.stored, session.world, session.game) : (session?.stored ?? null)), [session]);
+  const ended = session?.ok === true && finished?.result != null;
+  useEffect(() => {
+    if (ended && finished) writeStandalone(user, finished);
+  }, [ended, finished, user]);
   const back = <NavBar onBack={() => goBack(router, "/scenarios")} backTestID="outcome-back" backLabel="Scenarios" />;
 
-  if (!gameId || !session?.ok || !finished) {
+  if (!gameId || !finished || (!session?.ok && !finished.result)) {
     return (
       <Screen testID="standalone-outcome" scene="plain">
         {back}
@@ -48,12 +53,8 @@ export default function StandaloneOutcome() {
   }
 
   const won = result.outcome === "won";
-  const done = () => {
-    writeStandalone(user, finished);
-    router.replace("/scenarios");
-  };
+  const done = () => router.replace("/scenarios");
   const again = () => {
-    writeStandalone(user, finished);
     router.replace({ pathname: "/standalone/briefing/[scenarioId]", params: { scenarioId: finished.scenarioId, from: finished.id } });
   };
 

@@ -204,8 +204,8 @@ export function SheetView(props: SheetProps & { sheet: Sheet }) {
     case "outcome":
       return (
         <Paper
-          {...paperProps(props, { step: sheet.result === "won" ? "Resolution" : "Scenario", title: sheet.title, note: sheet.note })}
-          actions={<ChromePrimary label={sheet.result === "won" ? "Choose rewards" : "Continue"} testID="sheet-outcome" surface="paper" onPress={props.onOutcome} />}
+          {...paperProps(props, { step: sheet.step, title: sheet.title, note: sheet.note })}
+          actions={<ChromePrimary label={sheet.action} testID="sheet-outcome" surface="paper" onPress={props.onOutcome} />}
         />
       );
   }

@@ -1,26 +1,25 @@
 // Opens a standalone game for the table and the outcome screen: reads the row, drops an open game played on another engine
 // version or other card data (the row and its loadout stay, so it can be dealt again), loads the cards from catalog.db,
-// and replays the intents through the reducer. The same shape as a campaign save's session (table-session.ts), with no
-// log, pool or checklist.
+// and replays the intents through the reducer (open-game.ts). No log, pool or checklist.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { useEffect, useMemo } from "react";
 
-import { contextOf, staleReason } from "../campaign/session";
-import { dropStandalone, recordStandalone, resumeStandalone, type StandaloneGame } from "../campaign/standalone";
-import { loadWorld, type World } from "../campaign/world";
+import { record } from "../campaign/session";
+import { droppedIfStale, dropStandalone, resumeStandalone, type StandaloneGame } from "../campaign/standalone";
+import { loadWorld } from "../campaign/world";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
-import { createTableStore, nextRoundSteps, type EngineStep, type ReduceContext, type ScenarioState, type TableStore } from "../play/store";
+import type { TableStore } from "../play/store";
 
 import { campaignOf, scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
+import { committingStore, replayForTable, type ReplayedGame } from "./open-game";
 import { readStandalone, writeStandalone } from "./standalone-store";
-import { factsOf, type CardFacts } from "./table-session";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
 export type StandaloneSession =
-  | { ok: true; stored: StandaloneGame; world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; facts: ReadonlyMap<string, CardFacts> }
+  | ({ ok: true; stored: StandaloneGame } & ReplayedGame)
   | { ok: false; reason: "missing" | "none" | "dropped"; stored: StandaloneGame | null; write: StandaloneGame | null };
 
 /** The codes the game can show: the Ring-bearer and every card of each dealt deck. */
@@ -38,20 +37,18 @@ export function openStandalone<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<
   if (!stored.active || !stored.loadout) return { ok: false, reason: read.unreadable ? "dropped" : "none", stored, write: read.unreadable ? stored : null };
   const campaign = campaignOf(stored.campaignId);
   const scenario = scenarioOf(stored.scenarioId);
-  if (!campaign || !scenario || staleReason(stored.active, CATALOG_VERSION)) {
-    const dropped = dropStandalone(stored);
+  const stale = droppedIfStale(stored, CATALOG_VERSION);
+  if (!campaign || !scenario || stale) {
+    const dropped = stale ?? dropStandalone(stored);
     return { ok: false, reason: "dropped", stored: dropped, write: dropped };
   }
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, standaloneCodes(stored));
-  let roundSteps: readonly EngineStep[] = [];
-  const resumed = resumeStandalone(stored, world, CATALOG_VERSION, (before, after, steps) => {
-    roundSteps = nextRoundSteps(roundSteps, before, after, steps);
-  });
-  if (!resumed.ok) {
+  const replayed = replayForTable(catalog, world, (observe) => resumeStandalone(stored, world, CATALOG_VERSION, observe));
+  if (!replayed) {
     const dropped = dropStandalone(stored);
     return { ok: false, reason: "dropped", stored: dropped, write: dropped };
   }
-  return { ok: true, stored, world, ctx: contextOf(world), game: resumed.state, roundSteps, facts: factsOf(catalog, world.cards.keys()) };
+  return { ok: true, stored, ...replayed };
 }
 
 /** The open game, opened once per id. A drop it decided on is written after the render. */
@@ -64,19 +61,11 @@ export function useStandaloneSession(gameId: string | null): StandaloneSession |
   return session;
 }
 
-export type StandaloneStore = { store: TableStore; stored: () => StandaloneGame };
-
 /** The table store for an opened game. Each intent the reducer accepts is appended and written at once. */
-export function standaloneStore<TRun>(session: Extract<StandaloneSession, { ok: true }>, user: Db<TRun>): StandaloneStore {
+export function standaloneStore<TRun>(session: Extract<StandaloneSession, { ok: true }>, user: Db<TRun>): TableStore {
   let saved: StandaloneGame = session.stored;
-  const store = createTableStore({
-    ctx: session.ctx,
-    game: session.game,
-    roundSteps: session.roundSteps,
-    onCommit: (intent) => {
-      saved = recordStandalone(saved, intent);
-      writeStandalone(user, saved);
-    },
+  return committingStore(session, (intent) => {
+    saved = record(saved, intent);
+    writeStandalone(user, saved);
   });
-  return { store, stored: () => saved };
 }

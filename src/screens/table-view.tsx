@@ -28,7 +28,7 @@ import { scanAssets } from "./images/scan-map";
 import { cachedImage, useImageSnapshot } from "./images/store";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { logLines, type LogNames } from "../play/log";
-import type { CardFacts } from "./table-session";
+import type { CardFacts } from "./open-game";
 import type { World } from "../campaign/world";
 
 function picture(code: string): PictureSource | null {

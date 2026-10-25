@@ -15,7 +15,7 @@ import { campaignOf, scenarioNames } from "../../campaign-data";
 import { BodyText, Eyebrow, Label, Panel, RingMark, Screen, ScreenTitle, TextButton, pressedNight } from "../../chrome";
 import { useDatabases } from "../../databases";
 import { DeleteConfirm } from "../../delete-confirm";
-import { gameCaption, STANDALONE_DROPPED } from "../../standalone-list";
+import { gameCaption, STANDALONE_DROPPED } from "../../standalone-words";
 import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandalone } from "../../standalone-store";
 
 const DELETE_SENTENCE = "Delete this game? It is gone for good. Your decks are kept.";
@@ -76,6 +76,57 @@ export default function Scenarios() {
   }
 
   const label = (game: StandaloneGame) => `${nameOf(game.scenarioId)}, ${gameCaption(game)}`;
+  // A game in progress sits above the scenarios, where the campaign list puts its open playthrough; finished games below.
+  const playing = games.filter((game) => standaloneStatus(game) === "playing");
+  const finished = games.filter((game) => standaloneStatus(game) !== "playing");
+
+  // A game panel: Resume or Play again, or under Manage, Archive and Delete.
+  function renderGame(game: StandaloneGame) {
+    const status = standaloneStatus(game);
+    if (managing) {
+      return (
+        <View key={game.id} testID={`game-${game.id}`}>
+          <Panel>
+            <Text className="font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
+            <Label>{gameCaption(game)}</Label>
+            {deleting === game.id ? (
+              <DeleteConfirm id={game.id} sentence={DELETE_SENTENCE} onDelete={() => remove(game.id)} onKeep={() => setDeleting(null)} />
+            ) : (
+              <View className="-mx-3 mt-2 flex-row">
+                <TextButton label="Archive" testID={`archive-${game.id}`} tone="gold" accessibilityLabel={`Archive ${label(game)}`} onPress={() => archive(game.id)} />
+                <TextButton label="Delete" testID={`delete-${game.id}`} tone="danger" accessibilityLabel={`Delete ${label(game)}`} onPress={() => setDeleting(game.id)} />
+              </View>
+            )}
+          </Panel>
+        </View>
+      );
+    }
+    const action = status === "playing" ? "Resume" : game.loadout ? "Play again" : null;
+    return (
+      <Pressable
+        key={game.id}
+        testID={`game-${game.id}`}
+        collapsable={false}
+        accessibilityRole="button"
+        accessibilityLabel={action ? `${action} ${label(game)}` : label(game)}
+        disabled={action == null}
+        onPress={() => open(game)}
+      >
+        {({ pressed }) => (
+          <Panel current={status === "playing"} pressed={pressed}>
+            <Text className="font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
+            <Label>{gameCaption(game)}</Label>
+            {status === "dropped" ? (
+              <Label tone="muted" className="mt-2">
+                {STANDALONE_DROPPED}
+              </Label>
+            ) : null}
+            {action ? <Text className="mt-2 text-body font-medium text-gold">{action}</Text> : null}
+          </Panel>
+        )}
+      </Pressable>
+    );
+  }
 
   return (
     <Screen testID="scenarios" scene="dusk">
@@ -84,6 +135,13 @@ export default function Scenarios() {
           <ScreenTitle>Scenarios</ScreenTitle>
           <Label className="mt-1">Standalone adventures. No campaign log, boons or burdens.</Label>
         </View>
+
+        {playing.length > 0 ? (
+          <View className="mt-6 gap-3" testID="standalone-playing">
+            <Eyebrow>In progress</Eyebrow>
+            {playing.map(renderGame)}
+          </View>
+        ) : null}
 
         <View className="mt-6" testID="standalone-scenarios">
           <Eyebrow>{campaign?.name ?? "Fellowship of the Ring"}</Eyebrow>
@@ -115,53 +173,8 @@ export default function Scenarios() {
 
         <View className="mt-8 gap-3" testID="standalone-games">
           <Eyebrow tone="muted">Games</Eyebrow>
-          {games.length === 0 && archived.length === 0 ? <BodyText tone="muted">No game yet. Pick a scenario to deal one.</BodyText> : null}
-          {games.map((game) => {
-            const status = standaloneStatus(game);
-            if (managing) {
-              return (
-                <View key={game.id} testID={`game-${game.id}`}>
-                  <Panel>
-                    <Text className="font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
-                    <Label>{gameCaption(game)}</Label>
-                    {deleting === game.id ? (
-                      <DeleteConfirm id={game.id} sentence={DELETE_SENTENCE} onDelete={() => remove(game.id)} onKeep={() => setDeleting(null)} />
-                    ) : (
-                      <View className="-mx-3 mt-2 flex-row">
-                        <TextButton label="Archive" testID={`archive-${game.id}`} tone="gold" accessibilityLabel={`Archive ${label(game)}`} onPress={() => archive(game.id)} />
-                        <TextButton label="Delete" testID={`delete-${game.id}`} tone="danger" accessibilityLabel={`Delete ${label(game)}`} onPress={() => setDeleting(game.id)} />
-                      </View>
-                    )}
-                  </Panel>
-                </View>
-              );
-            }
-            const action = status === "playing" ? "Resume" : game.loadout ? "Play again" : null;
-            return (
-              <Pressable
-                key={game.id}
-                testID={`game-${game.id}`}
-                collapsable={false}
-                accessibilityRole="button"
-                accessibilityLabel={action ? `${action} ${label(game)}` : label(game)}
-                disabled={action == null}
-                onPress={() => open(game)}
-              >
-                {({ pressed }) => (
-                  <Panel current={status === "playing"} pressed={pressed}>
-                    <Text className="font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
-                    <Label>{gameCaption(game)}</Label>
-                    {status === "dropped" ? (
-                      <Label tone="muted" className="mt-2">
-                        {STANDALONE_DROPPED}
-                      </Label>
-                    ) : null}
-                    {action ? <Text className="mt-2 text-body font-medium text-gold">{action}</Text> : null}
-                  </Panel>
-                )}
-              </Pressable>
-            );
-          })}
+          {games.length === 0 ? <BodyText tone="muted">{archived.length === 0 ? "No game yet. Pick a scenario to deal one." : "No open game. Pick a scenario to deal one."}</BodyText> : null}
+          {finished.map(renderGame)}
           {games.length > 0 ? (
             <View className="-mx-3 flex-row">
               <TextButton

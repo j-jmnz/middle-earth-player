@@ -98,7 +98,9 @@ export type TriggerSheet = {
   pass: string | null;
 };
 
-export type OutcomeSheet = { kind: "outcome"; key: string; result: "won" | "lost"; title: string; note: string };
+// `step` is the eyebrow (Resolution only when a campaign card has one); `action` labels the button that leaves the table
+// for the outcome screen.
+export type OutcomeSheet = { kind: "outcome"; key: string; result: "won" | "lost"; step: string; title: string; note: string; action: string };
 
 export type Sheet = PickSheet | MultiSheet | DistributeSheet | TriggerSheet | OutcomeSheet;
 

@@ -233,8 +233,8 @@ Expo Router. The app opens on the campaign list.
 | Campaign list | `saves`, `campaigns` | a new save: id, campaign id, seat count; `saves.archivedAt` on Archive and Restore; a deleted save's row. It does not query `cards`. |
 | Scenarios | `standalone_games`, the scenario files, `PLAYABLE_SCENARIOS` | `standalone_games.archivedAt` on Archive and Restore; a deleted game's row; an open game from another engine version or data hash dropped on the read. It does not query `cards`. |
 | Standalone briefing | decks, catalog, scenario definition; a finished game's loadout for Play again | a new `standalone_games` row with its loadout and open game |
-| Standalone table | the same table view (`src/screens/table-view.tsx`) over a game replayed by `src/screens/standalone-session.ts` | each accepted intent, appended to `standalone_games.activeScenario` |
-| Standalone outcome | the replayed game | the result (score or loss reason) on Done; the open game is cleared |
+| Standalone table | the same table view (`src/screens/table-view.tsx`) over a game replayed by `src/screens/standalone-session.ts` (the replay and the committing store are shared with the campaign table in `src/screens/open-game.ts`) | each accepted intent, appended to `standalone_games.activeScenario` |
+| Standalone outcome | the replayed game, or the stored result of a game already finished | the result (score or loss reason) as the screen opens; the open game is cleared |
 | Campaign path | save, pool | nothing until a scenario ends |
 | Log | save | notes |
 | Briefing | save, deck, catalog, scenario definition | the loadout, then the opening `ScenarioState` from the reducer |

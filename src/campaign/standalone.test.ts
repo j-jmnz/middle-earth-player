@@ -14,15 +14,15 @@ import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 import { scenarioFacts, startFor } from "./briefing.ts";
 import { emptyLog } from "./log.ts";
 import { PLAYABLE_SCENARIOS } from "./playable.ts";
-import { contextOf } from "./session.ts";
+import { contextOf, record } from "./session.ts";
 import {
   dealStandalone,
   dropStandalone,
+  droppedIfStale,
   finishStandalone,
   parseStandaloneActive,
   parseStandaloneLoadout,
   parseStandaloneResult,
-  recordStandalone,
   resumeStandalone,
   standaloneBriefing,
   standaloneStart,
@@ -173,7 +173,7 @@ describe("a standalone game", () => {
 
   it("replays the recorded intents to the same state", () => {
     const world = worldOf(PAST);
-    const game = recordStandalone(dealt(), { type: "Keep" });
+    const game = record(dealt(), { type: "Keep" });
     const resumed = resumeStandalone(game, world, CATALOG_VERSION);
     if (!resumed.ok) throw new Error(resumed.reason);
     const direct = expectOk(reduce(opening(PAST), { type: "Keep" }, contextOf(world))).state;
@@ -182,6 +182,8 @@ describe("a standalone game", () => {
 
   it("is not replayed against another engine version or other data, and a drop keeps the loadout", () => {
     const game = dealt();
+    expect(droppedIfStale(game, CATALOG_VERSION)).toBeNull();
+    expect(droppedIfStale(game, CATALOG_VERSION + 1)?.active).toBeNull();
     expect(resumeStandalone(game, worldOf(PAST), CATALOG_VERSION + 1)).toEqual({ ok: false, reason: "dataHash" });
     const old = { ...game, active: game.active ? { ...game.active, engineVersion: ENGINE_VERSION - 1 } : null };
     expect(resumeStandalone(old, worldOf(PAST), CATALOG_VERSION)).toEqual({ ok: false, reason: "engineVersion" });
@@ -214,7 +216,7 @@ describe("a standalone game", () => {
   });
 
   it("reads back what it stored, and reads a broken record as nothing", () => {
-    const game = recordStandalone(dealt(), { type: "Keep" });
+    const game = record(dealt(), { type: "Keep" });
     const stored = JSON.parse(JSON.stringify(game)) as Record<string, unknown>;
     expect(parseStandaloneLoadout(stored.loadout)).toEqual(game.loadout);
     expect(parseStandaloneActive(stored.active)).toEqual(game.active);

@@ -138,7 +138,7 @@ export default function Briefing() {
             index={index}
             seatCount={seatCount}
             decks={briefingDecks}
-            picked={picked[index] ?? null}
+            picked={seat.deckId}
             heroes={seat.heroes}
             fallen={fallen}
             needsRingBearer={result.needsRingBearer}

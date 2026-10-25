@@ -3,14 +3,11 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { parseSeatCount } from "../campaign/save";
 import { parseStandaloneActive, parseStandaloneLoadout, parseStandaloneResult, type StandaloneGame } from "../campaign/standalone";
-import { standaloneGames, type StoredJson } from "./user-schema";
+import { stored } from "./campaign-store";
+import { standaloneGames } from "./user-schema";
 
 // user.db `standalone_games`, read and written whole. The rules stay in src/campaign/standalone.ts.
 type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
-
-function stored(value: unknown): StoredJson {
-  return JSON.parse(JSON.stringify(value)) as StoredJson;
-}
 
 // A game as read, and whether an open game was stored but did not read, so the player is told it is gone.
 export type ReadStandalone = { game: StandaloneGame; unreadable: boolean };

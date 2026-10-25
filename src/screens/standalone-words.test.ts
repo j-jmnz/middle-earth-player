@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { StandaloneGame } from "../campaign/standalone";
-import { gameCaption, outcomeLines, statusWord } from "./standalone-list";
+import { gameCaption, outcomeLines, statusWord } from "./standalone-words";
 
 const game: StandaloneGame = {
   id: "game-a",
@@ -23,6 +23,6 @@ describe("standalone list words", () => {
 
   it("words the outcome: the score and its parts on a win, the reason on a loss", () => {
     expect(outcomeLines({ outcome: "won", score: { rounds: 1, victoryPoints: 0, score: 40 } })).toEqual(["Score 40. Lower is better.", "1 completed round · 0 victory points"]);
-    expect(outcomeLines({ outcome: "lost", reason: "The One Ring left play", rounds: 3 })).toEqual(["The One Ring left play", "3 rounds completed."]);
+    expect(outcomeLines({ outcome: "lost", reason: "The One Ring left play", rounds: 3 })).toEqual(["The One Ring left play.", "3 rounds completed."]);
   });
 });

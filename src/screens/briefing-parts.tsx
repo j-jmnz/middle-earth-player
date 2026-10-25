@@ -5,7 +5,7 @@ import { useMemo, useSyncExternalStore } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import type { ScenarioFacts } from "../campaign/briefing";
-import { cards } from "../catalog/schema";
+import { cards, packs } from "../catalog/schema";
 import type { Difficulty } from "../catalog/scenario-data";
 import { BodyText, Eyebrow, Label, RingMark, Segmented, TextButton, pressedNight } from "./chrome";
 import { useDatabases } from "./databases";
@@ -16,7 +16,7 @@ import { decks } from "./user-schema";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
 
-export const DIFFICULTIES = ["Easy", "Normal"] as const;
+const DIFFICULTIES = ["Easy", "Normal"] as const;
 
 const TOOL_HEIGHT = 120;
 
@@ -29,8 +29,9 @@ export type BriefingDecks = {
   savedDecks: SavedDeck[];
   seeded: StarterSeed;
   seedReason: string | null;
-  // Fellowship-sphere heroes with the Ring-bearer trait, for the slot.
-  candidates: { code: string; name: string }[];
+  // Fellowship-sphere heroes with the Ring-bearer trait, for the slot. Every saga box prints its own Frodo Baggins, so
+  // each is named with the pack it came in.
+  candidates: { code: string; name: string; packName: string | null }[];
   faces: ReadonlyMap<string, HeroFace>;
 };
 
@@ -45,7 +46,14 @@ export function useBriefingDecks(): BriefingDecks {
     [user, seeded],
   );
   const candidates = useMemo(
-    () => catalog.select({ code: cards.code, name: cards.name }).from(cards).where(and(eq(cards.typeCode, "hero"), eq(cards.sphereCode, "fellowship"), like(cards.traits, "%Ring-bearer%"))).all(),
+    () =>
+      catalog
+        .select({ code: cards.code, name: cards.name, packName: packs.name })
+        .from(cards)
+        .leftJoin(packs, eq(packs.code, cards.packCode))
+        .where(and(eq(cards.typeCode, "hero"), eq(cards.sphereCode, "fellowship"), like(cards.traits, "%Ring-bearer%")))
+        .orderBy(cards.code)
+        .all(),
     [catalog],
   );
   const faces = useMemo(() => {
@@ -194,7 +202,7 @@ export function SeatPicker({
       {picked && slot && !ringBearer ? (
         <View className="mt-2">
           {candidates.map((candidate) => (
-            <TextButton key={candidate.code} label={`Choose ${candidate.name} as Ring-bearer`} testID={`ringbearer-${candidate.code}`} onPress={() => onRingBearer(candidate.code)} />
+            <TextButton key={candidate.code} label={`Choose ${candidate.name}${candidate.packName ? ` (${candidate.packName})` : ""} as Ring-bearer`} testID={`ringbearer-${candidate.code}`} onPress={() => onRingBearer(candidate.code)} />
           ))}
         </View>
       ) : null}

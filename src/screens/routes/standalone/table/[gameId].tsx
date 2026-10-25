@@ -9,7 +9,7 @@ import { goBack } from "../../../go-back";
 import { routeCode } from "../../../route-code";
 import { standaloneStore, useStandaloneSession } from "../../../standalone-session";
 import { TableView, type TableNav } from "../../../table-view";
-import { STANDALONE_DROPPED } from "../../../standalone-list";
+import { STANDALONE_DROPPED } from "../../../standalone-words";
 
 export default function StandaloneTableScreen() {
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function StandaloneTableScreen() {
   const { user } = useDatabases();
   // Opened once per game: the store holds the game from here on, and each accepted intent is written to user.db.
   const session = useStandaloneSession(gameId);
-  const store = useMemo(() => (session?.ok ? standaloneStore(session, user).store : null), [session, user]);
+  const store = useMemo(() => (session?.ok ? standaloneStore(session, user) : null), [session, user]);
 
   if (!gameId || !session || !session.ok || !store) {
     const sentence = session?.ok === false && session.reason === "dropped" ? STANDALONE_DROPPED : "This game is not open.";
