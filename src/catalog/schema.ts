@@ -52,6 +52,7 @@ export const cards = sqliteTable("cards", {
   text: text("text"),
   hasErrata: integer("has_errata", { mode: "boolean" }).notNull(),
   errata: text("errata"),
+  // The picture to download: a RingsDB path, or the full Hall of Beorn or DragnCards scan URL where RingsDB has none.
   imagesrc: text("imagesrc"),
   deckLegal: integer("deck_legal", { mode: "boolean" }).notNull(),
   campaignId: text("campaign_id").references(() => campaigns.id),

@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 
 import Database from "better-sqlite3";
 
-import { sniffImage } from "../src/screens/images/policy.ts";
+import { isRingsdbImagePath, sniffImage } from "../src/screens/images/policy.ts";
 import { bytes, createLog, runScript } from "./log.ts";
 
 const log = createLog("pack-scans");
@@ -94,7 +94,8 @@ export function packScans(options: PackScansOptions): PackedScan[] {
         | { name: string; imagesrc: string | null }
         | undefined;
       if (!card) throw new Error(`Fixture code ${code} is not in the catalog`);
-      if (card.imagesrc) {
+      // The catalog gives a card RingsDB lacks the URL of its scan; only a RingsDB path is left to download.
+      if (card.imagesrc && isRingsdbImagePath(card.imagesrc)) {
         log.debug(`${code} ${card.name}: RingsDB has a picture, not bundled`);
         continue;
       }

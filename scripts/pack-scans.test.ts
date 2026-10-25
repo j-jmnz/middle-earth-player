@@ -54,7 +54,7 @@ function stage(): { root: string; fixtures: string; reading: string; scans: stri
   const insert = database.prepare("insert into cards (code, name, imagesrc) values (?, ?, ?)");
   insert.run("141031", "Bag End", null);
   insert.run("141001", "Frodo Baggins", "/bundles/cards/141001.png");
-  insert.run("141022", "Three is Company", null);
+  insert.run("141022", "Three is Company", "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Riders/Three-is-Company-1A.jpg");
   database.close();
   writeFileSync(path.join(reading, "Bag-End.jpg"), jpeg(600));
   writeFileSync(path.join(ringsdb, "Bag-End.jpg"), jpeg(100));
@@ -68,7 +68,7 @@ function stage(): { root: string; fixtures: string; reading: string; scans: stri
 }
 
 describe("pack scans", () => {
-  it("copies a null-imagesrc code, skips imagesrc, and skips RingsDB previews and PDFs", () => {
+  it("copies a code with no RingsDB path (null or a scan URL), skips a RingsDB path, and skips RingsDB previews and PDFs", () => {
     const staged = stage();
     const packed = packScans({
       root: staged.root,

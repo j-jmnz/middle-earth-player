@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 
 import { normalCopiesByCode, scenarioCards } from "../src/catalog/scenario-data.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
+import { cardImageUrl } from "../src/screens/images/policy.ts";
 import { loadScenario } from "./data/load-scenarios.ts";
 import { buildCatalog } from "./build-catalog.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
@@ -63,6 +64,20 @@ describe("built catalog", () => {
         const row = database.prepare("select quantity from cards where code = ?").get(code);
         expect(row?.quantity).toBe(copies.get(code));
       }
+
+      // Quest and encounter cards have no RingsDB picture; the catalog points them at their scan so the phone downloads one.
+      const scenarios = ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship"];
+      const pictureless: string[] = [];
+      for (const id of scenarios) {
+        for (const code of new Set(scenarioCards(loadScenario(id)).map((card) => card.code))) {
+          const row = database.prepare("select imagesrc from cards where code = ?").get(code);
+          if (typeof row?.imagesrc !== "string" || cardImageUrl(row.imagesrc) === null) pictureless.push(`${id} ${code}`);
+        }
+      }
+      expect(pictureless).toEqual([]);
+      expect(database.prepare("select imagesrc from cards where code = ?").get("141031")?.imagesrc).toBe(
+        "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bag-End.jpg",
+      );
 
       const sagaRing = database
         .prepare(

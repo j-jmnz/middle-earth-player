@@ -215,7 +215,7 @@ Two files, two handles, both reachable from screens.
 
 ## Images
 
-RingsDB `imagesrc` is the asset. The build sniffs magic bytes because the URL often ends in `.png` while the body is a JPEG. About 430×600 is the native size of a normal card. The inspect screen may decode the cached file at that size.
+RingsDB `imagesrc` is the asset. Quest and encounter cards have none, so `pnpm catalog:build` writes the full URL of the card's scan into their `imagesrc`: the front the printed ledger was read from, else the Hall of Beorn front from `imageUrls`. The download queue accepts a RingsDB path and those two scan hosts, and nothing else. The build sniffs magic bytes because the URL often ends in `.png` while the body is a JPEG. About 430×600 is the native size of a normal card. The inspect screen may decode the cached file at that size.
 
 Download with `File.createDownloadTask` from `expo-file-system`. The legacy `FileSystem.createDownloadResumable` throws. Persist `DownloadPauseState` so a kill mid-file can resume. Cap concurrency and retry a 503. Keep the bytes in the document directory so iOS cannot purge them under the airplane-mode exit. A cache-directory file would not survive that exit. `expo-file-system` does not expose backup exclusion, so one local function sets `isExcludedFromBackup` on the image directory and does nothing else. About 420 MB of player-card art, plus quest and encounter art, must not enter an iCloud backup. Booklet files are not part of that directory.
 

@@ -6,7 +6,7 @@ import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { Card } from "../src/catalog/card-facts.ts";
-import { buildCatalog, type BuildCatalogOptions } from "./build-catalog.ts";
+import { buildCatalog, pictureOf, type BuildCatalogOptions } from "./build-catalog.ts";
 
 const databases: DatabaseSync[] = [];
 
@@ -151,6 +151,24 @@ describe("buildCatalog", () => {
     writeFileSync(dirs.versionPath, `export const CATALOG_VERSION = 1;${tail}`);
     const { version } = buildCatalog(options(dirs));
     expect(readFileSync(dirs.versionPath, "utf8")).toBe(`export const CATALOG_VERSION = ${version};${tail}`);
+  });
+
+  it("points a card RingsDB has no picture for at its scan: the ledgered front, else the MEC109 Hall of Beorn front", () => {
+    const hob = (set: string, name: string) => `https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/${set}/${name}.jpg`;
+    const dragn = "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/guid.jpg";
+    const location = card({
+      code: "30001",
+      imagesrc: null,
+      printings: [
+        { pack: "TBR", number: 31, imageUrls: [dragn, hob("The-Black-Riders", "Bag-End")] },
+        { pack: "TFotR", number: 37, imageUrls: [hob("The-Fellowship-of-the-Ring", "Bag-End")] },
+      ],
+    });
+    expect(pictureOf(card(), new Map())).toBe("/primary.png");
+    expect(pictureOf(location, new Map())).toBe(hob("The-Fellowship-of-the-Ring", "Bag-End"));
+    expect(pictureOf(location, new Map([["30001", dragn]]))).toBe(dragn);
+    expect(pictureOf(card({ imagesrc: null, printings: [{ pack: "TBR", number: 1, imageUrls: [dragn] }] }), new Map())).toBe(dragn);
+    expect(pictureOf(card({ imagesrc: null }), new Map())).toBeNull();
   });
 
   it("holds only cards, packs, campaigns and meta", () => {
