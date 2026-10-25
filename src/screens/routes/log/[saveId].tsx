@@ -77,11 +77,11 @@ export default function Log() {
 
   const { log } = save;
   const seats = Array.from({ length: save.seatCount }, (_, index) => index);
-  const bySeat = (lists: readonly (readonly string[])[]) => (lists.every((list) => list.length === 0) ? "None" : seats.map((seat) => `${save.seatCount > 1 ? `Seat ${seat + 1}: ` : ""}${(lists[seat] ?? []).map(nameOf).join(", ") || "None"}`).join("\n"));
+  const bySeat = (lists: readonly (readonly string[])[]) => (lists.every((list) => list.length === 0) ? "None" : seats.map((seat) => `${save.seatCount > 1 ? `Player ${seat + 1}: ` : ""}${(lists[seat] ?? []).map(nameOf).join(", ") || "None"}`).join("\n"));
   const pool = (kind: "boon" | "burden") => {
     const picked = log.campaignPool.filter((card) => printed.get(card.code)?.campaignKind === kind);
     // A boon stuck to a hero names that hero, and in two-handed play the seat that took it (141044:B:1).
-    const seatOf = (card: (typeof picked)[number]) => (save.seatCount > 1 && card.attachedTo && card.seat != null ? `Seat ${card.seat + 1}: ` : "");
+    const seatOf = (card: (typeof picked)[number]) => (save.seatCount > 1 && card.attachedTo && card.seat != null ? `Player ${card.seat + 1}: ` : "");
     return picked.length === 0 ? "None" : picked.map((card) => `${seatOf(card)}${card.attachedTo ? `${nameOf(card.code)} on ${nameOf(card.attachedTo)}` : nameOf(card.code)}`).join("\n");
   };
   const names = scenarioNames(campaign);
@@ -102,7 +102,7 @@ export default function Log() {
           <Row label="Burdens" value={pool("burden")} testID="log-burdens" />
           <Row
             label="Captives"
-            value={log.captives.length === 0 ? "None" : log.captives.map((captive) => `${nameOf(captive.hero)}${save.seatCount > 1 ? ` (seat ${captive.seat + 1})` : ""}`).join("\n")}
+            value={log.captives.length === 0 ? "None" : log.captives.map((captive) => `${nameOf(captive.hero)}${save.seatCount > 1 ? ` (Player ${captive.seat + 1})` : ""}`).join("\n")}
             testID="log-captives"
           />
           <View className="border-b border-inkLine py-3">

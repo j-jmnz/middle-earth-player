@@ -124,6 +124,12 @@ function asking(state: ScenarioState): { instruction: Choosing; seat: number } |
   return { instruction, seat: state.window.seat };
 }
 
+// The seats that have already answered the open choice, in the order they answered (first player first).
+export function answeredSeats(state: ScenarioState): number[] {
+  const found = asking(state);
+  return found ? seatsFor(state, found.instruction).slice(0, state.resolutionSeat) : [];
+}
+
 export function openResolution(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   if (!state.stageCleared || state.lost || state.window || state.resolutionAt >= state.resolution.length) return state;
   // Dropping the frame stack is safe: a frame only continues a reveal, hide, response, or effect of the round

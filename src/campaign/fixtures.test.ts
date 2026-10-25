@@ -15,7 +15,7 @@ import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
 import { briefing } from "./briefing.ts";
 import { fixture, fixtureSave, FIXTURE_NAMES, type FixtureName } from "./fixtures.ts";
 import { campaignPath } from "./path.ts";
-import { choiceSentence, resolutionView, settledSentence } from "./resolution-view.ts";
+import { choiceSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import { contextOf, finish, resume } from "./session.ts";
 import { loadWorld, logCodes } from "./world.ts";
 import { reduce } from "../rules/reduce.ts";
@@ -116,6 +116,10 @@ describe("Maestro fixtures", () => {
     expect(burden.tiles.map((tile) => tile.code).sort()).toEqual(["141078", "141079"]);
     const tile = burden.tiles.find((item) => item.code === "141078");
     expect(tile && choiceSentence(burden, tile)).toBe("Gandalf's Delay is added to the campaign pool.");
+    // The prompt is built from the noun; this burden cannot be declined.
+    expect(burden.decline).toBeNull();
+    expect(promptSentence(burden)).toBe("Choose a burden. Your choice is written to the campaign log when you confirm.");
+    expect(promptSentence({ ...burden, decline: { optionId: "skip", label: "No burden" } })).toBe("Choose a burden, or tap No burden. Your choice is written to the campaign log when you confirm.");
     const next = reduce(resumed.state, { type: "ChooseResolution", optionId: "141078" }, contextOf(world));
     expect(next.ok).toBe(true);
     if (!next.ok) return;

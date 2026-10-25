@@ -7,7 +7,7 @@
 // intents the reducer lists; the screen sends the one the player picks and nothing else. A choice the card lets a seat pass
 // ("each player may choose") lists the reducer's `skip` as `decline`, a visible "No boon", not as one more tile.
 import { legalIntents, type ScenarioState } from "../rules/reduce.ts";
-import { resolutionResult, SKIP } from "../rules/resolution.ts";
+import { answeredSeats, resolutionResult, SKIP } from "../rules/resolution.ts";
 
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
@@ -16,6 +16,9 @@ export type ResolutionTile = { optionId: string; code: string | null; name: stri
 
 // The decline of an optional choice: the reducer's `skip` option, with its words ("No boon").
 export type ResolutionDecline = { optionId: string; label: string };
+
+// A choice a seat already confirmed in this group: its words ("Tireless Ranger on Sam Gamgee", "No boon").
+export type ResolutionAnswer = { seat: number; words: string };
 
 // A card the log will hold, with the hero it goes on when it is attached.
 export type SettledCard = { code: string; hero: string | null; seat: number | null };
@@ -30,6 +33,9 @@ export type ResolutionView =
       seatCount: number;
       eyebrow: string;
       seatLabel: string | null;
+      // What is chosen: boon, burden, card or captive.
+      noun: string;
+      answered: readonly ResolutionAnswer[];
       tiles: readonly ResolutionTile[];
       decline: ResolutionDecline | null;
       to: "pool" | "hand" | "hero" | "captive";
@@ -57,7 +63,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
   if (instruction?.verb !== "ChooseCards" && instruction?.verb !== "NameCaptives") return { kind: "playing" };
   let decline: ResolutionDecline | null = null;
   let eyebrow = "Name a captive";
-  let noun = "card";
+  let noun = "captive";
   if (instruction.verb === "ChooseCards") {
     const kinds = new Set(instruction.codes.map((code) => world.cards.get(code)?.campaignKind ?? null));
     noun = kinds.size === 1 && kinds.has("burden") ? "burden" : kinds.size === 1 && kinds.has("boon") ? "boon" : "card";
@@ -66,7 +72,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
   const tiles: ResolutionTile[] = legalIntents(state, contextOf(world)).flatMap((intent): ResolutionTile[] => {
     if (intent.type !== "ChooseResolution") return [];
     if (intent.optionId === SKIP) {
-      decline = { optionId: SKIP, label: instruction.verb === "NameCaptives" ? "No captive" : `No ${noun}` };
+      decline = { optionId: SKIP, label: `No ${noun}` };
       return [];
     }
     if (instruction.verb === "NameCaptives") {
@@ -79,6 +85,15 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
   });
   const eachSeat = instruction.verb === "NameCaptives" || instruction.who === "eachSeat";
   const first = window.seat === state.firstPlayer ? " (first player)" : "";
+  // The seats before this one have confirmed: each recorded card in this group, or the decline when nothing was recorded.
+  const answered = answeredSeats(state).map((seat): ResolutionAnswer => {
+    if (instruction.verb === "NameCaptives") {
+      const captive = state.resolutionLog.captives.find((item) => item.seat === seat);
+      return { seat, words: captive ? nameOf(world, captive.hero) : `No ${noun}` };
+    }
+    const card = state.resolutionLog.earned.find((item) => item.step === window.step && item.seat === seat);
+    return { seat, words: card ? cardWords(world, { code: card.code, hero: card.hero, seat }) : `No ${noun}` };
+  });
   return {
     kind: "choosing",
     step: window.step,
@@ -86,6 +101,8 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     seatCount: state.seatCount,
     eyebrow,
     seatLabel: eachSeat && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
+    noun,
+    answered,
     tiles,
     decline,
     to: instruction.verb === "NameCaptives" ? "captive" : instruction.to,
@@ -112,6 +129,19 @@ export function declineSentence(view: Extract<ResolutionView, { kind: "choosing"
   const who = view.seatCount > 1 && view.seatLabel ? `Player ${view.seat + 1}` : "You";
   const what = view.decline?.label.replace(/^No /, "") ?? "card";
   return `${who} ${who === "You" ? "take" : "takes"} no ${what}. Nothing is recorded for this choice.`;
+}
+
+/** The sentence above Confirm before anything is chosen, built from the noun: "Choose a boon and a hero, or tap No boon." */
+export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" }>): string {
+  const what = view.to === "hero" ? `a ${view.noun} and a hero` : view.to === "captive" ? "a hero to name as a captive" : `a ${view.noun}`;
+  const decline = view.decline ? `, or tap ${view.decline.label}` : "";
+  return `Choose ${what}${decline}. Your choice is written to the campaign log when you confirm.`;
+}
+
+/** The sentence above Confirm: what the chosen tile or the decline writes, or the prompt while nothing is chosen. */
+export function consequenceSentence(view: Extract<ResolutionView, { kind: "choosing" }>, picked: ResolutionTile | null, declined: boolean): string {
+  if (picked) return choiceSentence(view, picked);
+  return declined ? declineSentence(view) : promptSentence(view);
 }
 
 function cardWords(world: World, card: SettledCard): string {

@@ -5,7 +5,7 @@ import { expectOk } from "../rules/fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import { campaign, knife, knifeIntent, knifeStart, knifeWorld } from "../../scripts/knife-game.ts";
 
-import { choiceSentence, declineSentence, resolutionView, settledSentence } from "./resolution-view.ts";
+import { choiceSentence, consequenceSentence, declineSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import type { World } from "./world.ts";
 
 // Rules: rr.first-player, ltp.campaign-pool (data/rules/entries.json). The resolution screen's view of 141044:B:1: starting
@@ -53,6 +53,10 @@ describe("141044's Resolution on the resolution screen", () => {
     }
     expect(new Set(first.tiles.map((tile) => tile.code))).toEqual(new Set(BOONS));
     expect(declineSentence(first)).toBe("Player 2 takes no boon. Nothing is recorded for this choice.");
+    expect(first.answered).toEqual([]);
+    expect(promptSentence(first)).toBe("Choose a boon and a hero, or tap No boon. Your choice is written to the campaign log when you confirm.");
+    expect(consequenceSentence(first, null, false)).toBe(promptSentence(first));
+    expect(consequenceSentence(first, null, true)).toBe(declineSentence(first));
 
     state = expectOk(reduce(state, { type: "ChooseResolution", optionId: "skip" }, ctx)).state;
     const second = resolutionView(state, world);
@@ -60,6 +64,8 @@ describe("141044's Resolution on the resolution screen", () => {
     if (second.kind !== "choosing") return;
     expect(second.seat).toBe(0);
     expect(second.seatLabel).toBe("Player 1 chooses");
+    // The first player's decline is shown as confirmed.
+    expect(second.answered).toEqual([{ seat: 1, words: "No boon" }]);
     // Nothing was taken, so every boon is still offered.
     expect(new Set(second.tiles.map((tile) => tile.code))).toEqual(new Set(BOONS));
     const tile = second.tiles[0];
@@ -72,6 +78,20 @@ describe("141044's Resolution on the resolution screen", () => {
     if (settled.kind !== "settled") return;
     expect(settled.earned).toHaveLength(1);
     expect(settledSentence(settled, world, "Flight to the Ford")).toBe(`Confirming records ${tile.name} on ${tile.hero} in the campaign and unlocks Flight to the Ford.`);
+  }, 120_000);
+
+  it("two-handed: a boon the first player took is shown, on its hero, while the other seat chooses", () => {
+    const state = atResolution(2, 2);
+    const first = resolutionView(state, world);
+    if (first.kind !== "choosing") throw new Error("not choosing");
+    const tile = first.tiles[0];
+    if (!tile) throw new Error("no tile");
+    const second = resolutionView(expectOk(reduce(state, { type: "ChooseResolution", optionId: tile.optionId }, ctx)).state, world);
+    expect(second.kind).toBe("choosing");
+    if (second.kind !== "choosing") return;
+    expect(second.seat).toBe(0);
+    expect(second.answered).toEqual([{ seat: 1, words: `${tile.name} on ${tile.hero}` }]);
+    expect(consequenceSentence(second, tile, false)).toBe(choiceSentence(second, tile));
   }, 120_000);
 
   it("true solo: no seat label, and the decline speaks to the one player", () => {
