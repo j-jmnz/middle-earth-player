@@ -86,6 +86,10 @@ export const ringsDbCardSchema = z
     victory: optionalInt,
     has_errata: z.boolean(),
     imagesrc: optionalString,
+    // A reprint is listed under its first pack; `packs` holds each product's position (its collector number), quantity
+    // and OCTGN id. DragnCards' databaseId is that OCTGN id.
+    octgnid: optionalString,
+    packs: z.array(z.object({ pack_code: z.string(), position: z.number().int(), quantity: z.number().int(), octgnid: optionalString }).strip()).optional(),
     // Not in the RingsDB payload. Local records and the build overrides carry them.
     engagement_cost: optionalInt,
     keywords: printedKeywordsSchema.nullish(),

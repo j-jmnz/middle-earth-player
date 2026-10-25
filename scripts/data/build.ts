@@ -10,6 +10,7 @@ import { generateEffects, renderGenerated } from "./effects/generate.ts";
 import { applyPrinted } from "./normalize/printed.ts";
 import { buildCampaignIndex } from "./normalize/campaigns.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
+import { loadPrebuiltDecks } from "./prebuilt-decks.ts";
 import { loadStarterDecks } from "./starter-decks.ts";
 import { loadLedger, verifyScans } from "./printed/ledger.ts";
 import { extractAll, parseColumns } from "./rules/extract.ts";
@@ -73,6 +74,11 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR): void {
   for (const file of readdirSync(scenarioDir)) rmSync(path.join(scenarioDir, file));
   for (const scenario of built.scenarios) writeFileSync(path.join(scenarioDir, `${scenario.id}.json`), `${JSON.stringify(scenario, null, 2)}\n`);
   writeFileSync(path.join(campaignDir, "fellowship-of-the-ring.json"), `${JSON.stringify(built.campaign, null, 2)}\n`);
+  // Pre-built player decks (data/prebuilt-decks.json): the Learn to Play's core decks and the DragnCards starter decks.
+  const prebuilt = loadPrebuiltDecks(raw, cards, entries);
+  mkdirSync(path.join(outDir, "decks"), { recursive: true });
+  writeFileSync(path.join(outDir, "decks", "prebuilt.json"), `${JSON.stringify(prebuilt, null, 2)}\n`);
+  console.log(`pre-built decks: ${prebuilt.map((deck) => deck.id).join(", ")}`);
   const campaignIndex = buildCampaignIndex(raw, overrides, built.campaign);
   writeFileSync(path.join(campaignDir, "index.json"), `${JSON.stringify(campaignIndex, null, 2)}\n`);
   const effectsDir = process.env.EFFECTS_OUT ?? path.join(ROOT, "src", "effects", "generated");

@@ -1,0 +1,4028 @@
+[
+  {
+    "id": "core-leadership",
+    "name": "Leadership Deck",
+    "group": "Core Set",
+    "product": "RevCore",
+    "productName": "Revised Core Set",
+    "source": "ltp.starter-decks",
+    "heroes": [
+      "01001",
+      "01002",
+      "01003"
+    ],
+    "cards": [
+      {
+        "code": "01013",
+        "count": 3
+      },
+      {
+        "code": "01014",
+        "count": 3
+      },
+      {
+        "code": "01015",
+        "count": 3
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "01017",
+        "count": 3
+      },
+      {
+        "code": "01018",
+        "count": 3
+      },
+      {
+        "code": "01019",
+        "count": 3
+      },
+      {
+        "code": "01020",
+        "count": 3
+      },
+      {
+        "code": "01021",
+        "count": 3
+      },
+      {
+        "code": "01022",
+        "count": 3
+      },
+      {
+        "code": "01023",
+        "count": 3
+      },
+      {
+        "code": "01024",
+        "count": 3
+      },
+      {
+        "code": "01025",
+        "count": 3
+      },
+      {
+        "code": "01026",
+        "count": 3
+      },
+      {
+        "code": "01027",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      }
+    ],
+    "sideboard": [],
+    "note": "The Learn to Play prints this deck with 47 cards."
+  },
+  {
+    "id": "core-tactics",
+    "name": "Tactics Deck",
+    "group": "Core Set",
+    "product": "RevCore",
+    "productName": "Revised Core Set",
+    "source": "ltp.starter-decks",
+    "heroes": [
+      "01004",
+      "01005",
+      "01006"
+    ],
+    "cards": [
+      {
+        "code": "01028",
+        "count": 3
+      },
+      {
+        "code": "01029",
+        "count": 3
+      },
+      {
+        "code": "01030",
+        "count": 3
+      },
+      {
+        "code": "01031",
+        "count": 3
+      },
+      {
+        "code": "01032",
+        "count": 3
+      },
+      {
+        "code": "01033",
+        "count": 3
+      },
+      {
+        "code": "01034",
+        "count": 3
+      },
+      {
+        "code": "01035",
+        "count": 3
+      },
+      {
+        "code": "01036",
+        "count": 3
+      },
+      {
+        "code": "01037",
+        "count": 3
+      },
+      {
+        "code": "01038",
+        "count": 3
+      },
+      {
+        "code": "01039",
+        "count": 3
+      },
+      {
+        "code": "01040",
+        "count": 3
+      },
+      {
+        "code": "01041",
+        "count": 3
+      },
+      {
+        "code": "01042",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      }
+    ],
+    "sideboard": [],
+    "note": "The Learn to Play prints this deck with 47 cards."
+  },
+  {
+    "id": "core-spirit",
+    "name": "Spirit Deck",
+    "group": "Core Set",
+    "product": "RevCore",
+    "productName": "Revised Core Set",
+    "source": "ltp.starter-decks",
+    "heroes": [
+      "01007",
+      "01008",
+      "01009"
+    ],
+    "cards": [
+      {
+        "code": "01043",
+        "count": 3
+      },
+      {
+        "code": "01044",
+        "count": 3
+      },
+      {
+        "code": "01045",
+        "count": 3
+      },
+      {
+        "code": "01046",
+        "count": 3
+      },
+      {
+        "code": "01047",
+        "count": 3
+      },
+      {
+        "code": "01048",
+        "count": 3
+      },
+      {
+        "code": "01049",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 3
+      },
+      {
+        "code": "01051",
+        "count": 3
+      },
+      {
+        "code": "01052",
+        "count": 3
+      },
+      {
+        "code": "01053",
+        "count": 3
+      },
+      {
+        "code": "01054",
+        "count": 3
+      },
+      {
+        "code": "01055",
+        "count": 3
+      },
+      {
+        "code": "01056",
+        "count": 3
+      },
+      {
+        "code": "01057",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      }
+    ],
+    "sideboard": [],
+    "note": "The Learn to Play prints this deck with 47 cards."
+  },
+  {
+    "id": "core-lore",
+    "name": "Lore Deck",
+    "group": "Core Set",
+    "product": "RevCore",
+    "productName": "Revised Core Set",
+    "source": "ltp.starter-decks",
+    "heroes": [
+      "01010",
+      "01011",
+      "01012"
+    ],
+    "cards": [
+      {
+        "code": "01058",
+        "count": 3
+      },
+      {
+        "code": "01059",
+        "count": 3
+      },
+      {
+        "code": "01060",
+        "count": 3
+      },
+      {
+        "code": "01061",
+        "count": 3
+      },
+      {
+        "code": "01062",
+        "count": 3
+      },
+      {
+        "code": "01063",
+        "count": 3
+      },
+      {
+        "code": "01064",
+        "count": 3
+      },
+      {
+        "code": "01065",
+        "count": 3
+      },
+      {
+        "code": "01066",
+        "count": 3
+      },
+      {
+        "code": "01067",
+        "count": 3
+      },
+      {
+        "code": "01068",
+        "count": 3
+      },
+      {
+        "code": "01069",
+        "count": 3
+      },
+      {
+        "code": "01070",
+        "count": 3
+      },
+      {
+        "code": "01071",
+        "count": 3
+      },
+      {
+        "code": "01072",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      }
+    ],
+    "sideboard": [],
+    "note": "The Learn to Play prints this deck with 47 cards."
+  },
+  {
+    "id": "dwarves-of-durin",
+    "name": "Dwarves of Durin",
+    "group": "Starter Decks",
+    "product": "DoD",
+    "productName": "Dwarves of Durin Starter Deck",
+    "source": "decklist.mec103-dwarves",
+    "heroes": [
+      "02116",
+      "131004",
+      "03002"
+    ],
+    "cards": [
+      {
+        "code": "04035",
+        "count": 1
+      },
+      {
+        "code": "131009",
+        "count": 2
+      },
+      {
+        "code": "01059",
+        "count": 3
+      },
+      {
+        "code": "03011",
+        "count": 3
+      },
+      {
+        "code": "12066",
+        "count": 3
+      },
+      {
+        "code": "06141",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "132006",
+        "count": 2
+      },
+      {
+        "code": "04102",
+        "count": 3
+      },
+      {
+        "code": "01061",
+        "count": 2
+      },
+      {
+        "code": "131011",
+        "count": 2
+      },
+      {
+        "code": "04109",
+        "count": 2
+      },
+      {
+        "code": "132018",
+        "count": 3
+      },
+      {
+        "code": "04061",
+        "count": 2
+      },
+      {
+        "code": "03003",
+        "count": 2
+      },
+      {
+        "code": "131013",
+        "count": 2
+      },
+      {
+        "code": "131014",
+        "count": 2
+      },
+      {
+        "code": "06143",
+        "count": 3
+      },
+      {
+        "code": "04030",
+        "count": 2
+      },
+      {
+        "code": "04129",
+        "count": 3
+      },
+      {
+        "code": "03004",
+        "count": 2
+      }
+    ],
+    "sideboard": [
+      {
+        "code": "04035",
+        "count": 2
+      },
+      {
+        "code": "131009",
+        "count": 1
+      },
+      {
+        "code": "132006",
+        "count": 1
+      },
+      {
+        "code": "131011",
+        "count": 1
+      },
+      {
+        "code": "04109",
+        "count": 1
+      },
+      {
+        "code": "04061",
+        "count": 1
+      },
+      {
+        "code": "03003",
+        "count": 1
+      },
+      {
+        "code": "131013",
+        "count": 1
+      },
+      {
+        "code": "131014",
+        "count": 1
+      },
+      {
+        "code": "04030",
+        "count": 1
+      },
+      {
+        "code": "03004",
+        "count": 1
+      },
+      {
+        "code": "131003",
+        "count": 1
+      },
+      {
+        "code": "131007",
+        "count": 3
+      },
+      {
+        "code": "131006",
+        "count": 3
+      },
+      {
+        "code": "03009",
+        "count": 3
+      },
+      {
+        "code": "16004",
+        "count": 3
+      },
+      {
+        "code": "17007",
+        "count": 3
+      },
+      {
+        "code": "17143",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": "elves-of-lorien",
+    "name": "Elves of Lórien",
+    "group": "Starter Decks",
+    "product": "EoL",
+    "productName": "Elves of Lórien Starter Deck",
+    "source": "decklist.mec104-elves",
+    "heroes": [
+      "08001",
+      "08112",
+      "08056"
+    ],
+    "cards": [
+      {
+        "code": "08065",
+        "count": 3
+      },
+      {
+        "code": "08063",
+        "count": 3
+      },
+      {
+        "code": "08117",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "16003",
+        "count": 3
+      },
+      {
+        "code": "01060",
+        "count": 2
+      },
+      {
+        "code": "02123",
+        "count": 2
+      },
+      {
+        "code": "08002",
+        "count": 3
+      },
+      {
+        "code": "08114",
+        "count": 2
+      },
+      {
+        "code": "06037",
+        "count": 2
+      },
+      {
+        "code": "02102",
+        "count": 2
+      },
+      {
+        "code": "08064",
+        "count": 2
+      },
+      {
+        "code": "08121",
+        "count": 3
+      },
+      {
+        "code": "08058",
+        "count": 3
+      },
+      {
+        "code": "08092",
+        "count": 2
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "04108",
+        "count": 2
+      },
+      {
+        "code": "04059",
+        "count": 2
+      },
+      {
+        "code": "08027",
+        "count": 3
+      },
+      {
+        "code": "22036",
+        "count": 2
+      },
+      {
+        "code": "08009",
+        "count": 2
+      }
+    ],
+    "sideboard": [
+      {
+        "code": "02123",
+        "count": 1
+      },
+      {
+        "code": "08114",
+        "count": 1
+      },
+      {
+        "code": "06037",
+        "count": 1
+      },
+      {
+        "code": "02102",
+        "count": 1
+      },
+      {
+        "code": "08064",
+        "count": 1
+      },
+      {
+        "code": "08092",
+        "count": 1
+      },
+      {
+        "code": "04108",
+        "count": 1
+      },
+      {
+        "code": "04059",
+        "count": 1
+      },
+      {
+        "code": "22036",
+        "count": 1
+      },
+      {
+        "code": "08009",
+        "count": 1
+      },
+      {
+        "code": "08087",
+        "count": 3
+      },
+      {
+        "code": "08028",
+        "count": 3
+      },
+      {
+        "code": "08088",
+        "count": 3
+      },
+      {
+        "code": "04131",
+        "count": 3
+      },
+      {
+        "code": "08060",
+        "count": 3
+      },
+      {
+        "code": "04137",
+        "count": 3
+      },
+      {
+        "code": "04128",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": "defenders-of-gondor",
+    "name": "Defenders of Gondor",
+    "group": "Starter Decks",
+    "product": "DoG",
+    "productName": "Defenders of Gondor Starter Deck",
+    "source": "decklist.mec105-gondor",
+    "heroes": [
+      "05002",
+      "02050",
+      "08084"
+    ],
+    "cards": [
+      {
+        "code": "22028",
+        "count": 2
+      },
+      {
+        "code": "22002",
+        "count": 3
+      },
+      {
+        "code": "05004",
+        "count": 2
+      },
+      {
+        "code": "05007",
+        "count": 3
+      },
+      {
+        "code": "06135",
+        "count": 2
+      },
+      {
+        "code": "05003",
+        "count": 2
+      },
+      {
+        "code": "01014",
+        "count": 2
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "01029",
+        "count": 2
+      },
+      {
+        "code": "05018",
+        "count": 3
+      },
+      {
+        "code": "06108",
+        "count": 3
+      },
+      {
+        "code": "08140",
+        "count": 1
+      },
+      {
+        "code": "06005",
+        "count": 2
+      },
+      {
+        "code": "08113",
+        "count": 1
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "22083",
+        "count": 3
+      },
+      {
+        "code": "06136",
+        "count": 3
+      },
+      {
+        "code": "05008",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "22029",
+        "count": 2
+      },
+      {
+        "code": "22003",
+        "count": 2
+      },
+      {
+        "code": "01024",
+        "count": 2
+      },
+      {
+        "code": "131015",
+        "count": 2
+      }
+    ],
+    "sideboard": [
+      {
+        "code": "22028",
+        "count": 1
+      },
+      {
+        "code": "05004",
+        "count": 1
+      },
+      {
+        "code": "06135",
+        "count": 1
+      },
+      {
+        "code": "05003",
+        "count": 1
+      },
+      {
+        "code": "08140",
+        "count": 2
+      },
+      {
+        "code": "06005",
+        "count": 1
+      },
+      {
+        "code": "08113",
+        "count": 2
+      },
+      {
+        "code": "05008",
+        "count": 1
+      },
+      {
+        "code": "22029",
+        "count": 1
+      },
+      {
+        "code": "22003",
+        "count": 1
+      },
+      {
+        "code": "131015",
+        "count": 1
+      },
+      {
+        "code": "05001",
+        "count": 1
+      },
+      {
+        "code": "06081",
+        "count": 1
+      },
+      {
+        "code": "17141",
+        "count": 3
+      },
+      {
+        "code": "05017",
+        "count": 3
+      },
+      {
+        "code": "06064",
+        "count": 3
+      },
+      {
+        "code": "17009",
+        "count": 3
+      },
+      {
+        "code": "22090",
+        "count": 1
+      },
+      {
+        "code": "04103",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": "riders-of-rohan",
+    "name": "Riders of Rohan",
+    "group": "Starter Decks",
+    "product": "RoR",
+    "productName": "Riders of Rohan Starter Deck",
+    "source": "decklist.mec106-rohan",
+    "heroes": [
+      "07001",
+      "17055",
+      "22027"
+    ],
+    "cards": [
+      {
+        "code": "02030",
+        "count": 3
+      },
+      {
+        "code": "02055",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "06110",
+        "count": 1
+      },
+      {
+        "code": "01030",
+        "count": 2
+      },
+      {
+        "code": "17112",
+        "count": 3
+      },
+      {
+        "code": "02121",
+        "count": 3
+      },
+      {
+        "code": "02006",
+        "count": 2
+      },
+      {
+        "code": "07007",
+        "count": 2
+      },
+      {
+        "code": "22142",
+        "count": 3
+      },
+      {
+        "code": "07006",
+        "count": 3
+      },
+      {
+        "code": "02056",
+        "count": 2
+      },
+      {
+        "code": "08004",
+        "count": 2
+      },
+      {
+        "code": "22035",
+        "count": 2
+      },
+      {
+        "code": "17058",
+        "count": 1
+      },
+      {
+        "code": "22032",
+        "count": 2
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "02122",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "06138",
+        "count": 2
+      },
+      {
+        "code": "17085",
+        "count": 2
+      },
+      {
+        "code": "22062",
+        "count": 2
+      },
+      {
+        "code": "17005",
+        "count": 2
+      }
+    ],
+    "sideboard": [
+      {
+        "code": "06110",
+        "count": 2
+      },
+      {
+        "code": "02006",
+        "count": 1
+      },
+      {
+        "code": "07007",
+        "count": 1
+      },
+      {
+        "code": "02056",
+        "count": 1
+      },
+      {
+        "code": "08004",
+        "count": 1
+      },
+      {
+        "code": "22035",
+        "count": 1
+      },
+      {
+        "code": "22032",
+        "count": 1
+      },
+      {
+        "code": "02122",
+        "count": 1
+      },
+      {
+        "code": "06138",
+        "count": 1
+      },
+      {
+        "code": "17085",
+        "count": 1
+      },
+      {
+        "code": "22062",
+        "count": 1
+      },
+      {
+        "code": "17005",
+        "count": 1
+      },
+      {
+        "code": "17081",
+        "count": 1
+      },
+      {
+        "code": "02077",
+        "count": 3
+      },
+      {
+        "code": "06137",
+        "count": 3
+      },
+      {
+        "code": "06139",
+        "count": 3
+      },
+      {
+        "code": "07008",
+        "count": 3
+      },
+      {
+        "code": "08116",
+        "count": 3
+      }
+    ]
+  },
+  {
+    "id": "dunedain",
+    "name": "Dúnedain",
+    "group": "Hero Expansions",
+    "productName": "Angmar Awakened Hero Expansion",
+    "source": "decklist.mec107-dunedain",
+    "heroes": [
+      "10115",
+      "09002",
+      "09001"
+    ],
+    "cards": [
+      {
+        "code": "10002",
+        "count": 2
+      },
+      {
+        "code": "10029",
+        "count": 2
+      },
+      {
+        "code": "10118",
+        "count": 1
+      },
+      {
+        "code": "10031",
+        "count": 3
+      },
+      {
+        "code": "09004",
+        "count": 2
+      },
+      {
+        "code": "10004",
+        "count": 3
+      },
+      {
+        "code": "10010",
+        "count": 2
+      },
+      {
+        "code": "01014",
+        "count": 3
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "01028",
+        "count": 3
+      },
+      {
+        "code": "01031",
+        "count": 1
+      },
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "10055",
+        "count": 2
+      },
+      {
+        "code": "10142",
+        "count": 2
+      },
+      {
+        "code": "09012",
+        "count": 2
+      },
+      {
+        "code": "01026",
+        "count": 3
+      },
+      {
+        "code": "01027",
+        "count": 1
+      },
+      {
+        "code": "10030",
+        "count": 2
+      },
+      {
+        "code": "09007",
+        "count": 1
+      },
+      {
+        "code": "10144",
+        "count": 1
+      },
+      {
+        "code": "01023",
+        "count": 3
+      },
+      {
+        "code": "01034",
+        "count": 3
+      },
+      {
+        "code": "10086",
+        "count": 1
+      },
+      {
+        "code": "09014",
+        "count": 1
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "angmar-elves",
+    "name": "Elves",
+    "group": "Hero Expansions",
+    "productName": "Angmar Awakened Hero Expansion",
+    "source": "decklist.mec107-elves",
+    "heroes": [
+      "10140",
+      "01007",
+      "01011"
+    ],
+    "cards": [
+      {
+        "code": "10033",
+        "count": 3
+      },
+      {
+        "code": "10089",
+        "count": 3
+      },
+      {
+        "code": "10120",
+        "count": 1
+      },
+      {
+        "code": "10091",
+        "count": 1
+      },
+      {
+        "code": "10061",
+        "count": 2
+      },
+      {
+        "code": "01045",
+        "count": 2
+      },
+      {
+        "code": "01059",
+        "count": 3
+      },
+      {
+        "code": "01060",
+        "count": 2
+      },
+      {
+        "code": "01062",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 1
+      },
+      {
+        "code": "10090",
+        "count": 3
+      },
+      {
+        "code": "10122",
+        "count": 1
+      },
+      {
+        "code": "01057",
+        "count": 3
+      },
+      {
+        "code": "01069",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 2
+      },
+      {
+        "code": "10145",
+        "count": 3
+      },
+      {
+        "code": "10060",
+        "count": 2
+      },
+      {
+        "code": "01048",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 3
+      },
+      {
+        "code": "01051",
+        "count": 3
+      },
+      {
+        "code": "01053",
+        "count": 2
+      },
+      {
+        "code": "10034",
+        "count": 1
+      },
+      {
+        "code": "09014",
+        "count": 1
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "ruling-steward",
+    "name": "Ruling Steward",
+    "group": "Hero Expansions",
+    "productName": "Dream-chaser Hero Expansion",
+    "source": "decklist.mec110-ruling-steward",
+    "heroes": [
+      "12001",
+      "01001",
+      "01012"
+    ],
+    "cards": [
+      {
+        "code": "12058",
+        "count": 2
+      },
+      {
+        "code": "12083",
+        "count": 1
+      },
+      {
+        "code": "12139",
+        "count": 3
+      },
+      {
+        "code": "12008",
+        "count": 1
+      },
+      {
+        "code": "12117",
+        "count": 2
+      },
+      {
+        "code": "12089",
+        "count": 1
+      },
+      {
+        "code": "01014",
+        "count": 3
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "01059",
+        "count": 2
+      },
+      {
+        "code": "01060",
+        "count": 2
+      },
+      {
+        "code": "01062",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "12059",
+        "count": 3
+      },
+      {
+        "code": "12084",
+        "count": 1
+      },
+      {
+        "code": "01026",
+        "count": 3
+      },
+      {
+        "code": "01027",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 2
+      },
+      {
+        "code": "12032",
+        "count": 2
+      },
+      {
+        "code": "12009",
+        "count": 3
+      },
+      {
+        "code": "01020",
+        "count": 2
+      },
+      {
+        "code": "01021",
+        "count": 1
+      },
+      {
+        "code": "01023",
+        "count": 3
+      },
+      {
+        "code": "01024",
+        "count": 1
+      },
+      {
+        "code": "01025",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "elf-friend",
+    "name": "Elf-friend",
+    "group": "Hero Expansions",
+    "productName": "Dream-chaser Hero Expansion",
+    "source": "decklist.mec110-elf-friend",
+    "heroes": [
+      "11001",
+      "01004",
+      "01007"
+    ],
+    "cards": [
+      {
+        "code": "12004",
+        "count": 1
+      },
+      {
+        "code": "12033",
+        "count": 3
+      },
+      {
+        "code": "11003",
+        "count": 3
+      },
+      {
+        "code": "12006",
+        "count": 2
+      },
+      {
+        "code": "12062",
+        "count": 3
+      },
+      {
+        "code": "11012",
+        "count": 3
+      },
+      {
+        "code": "12035",
+        "count": 1
+      },
+      {
+        "code": "12087",
+        "count": 3
+      },
+      {
+        "code": "01045",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "12116",
+        "count": 2
+      },
+      {
+        "code": "11015",
+        "count": 2
+      },
+      {
+        "code": "01040",
+        "count": 3
+      },
+      {
+        "code": "01057",
+        "count": 3
+      },
+      {
+        "code": "12007",
+        "count": 3
+      },
+      {
+        "code": "01034",
+        "count": 3
+      },
+      {
+        "code": "01035",
+        "count": 3
+      },
+      {
+        "code": "01048",
+        "count": 1
+      },
+      {
+        "code": "01050",
+        "count": 3
+      },
+      {
+        "code": "01051",
+        "count": 1
+      },
+      {
+        "code": "01053",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "lords-of-dale",
+    "name": "Lords of Dale",
+    "group": "Hero Expansions",
+    "productName": "Ered Mithrin Hero Expansion",
+    "source": "decklist.mec114-lords-of-dale",
+    "heroes": [
+      "18001",
+      "18002",
+      "01007"
+    ],
+    "cards": [
+      {
+        "code": "19002",
+        "count": 3
+      },
+      {
+        "code": "18003",
+        "count": 3
+      },
+      {
+        "code": "19027",
+        "count": 2
+      },
+      {
+        "code": "19091",
+        "count": 2
+      },
+      {
+        "code": "19008",
+        "count": 3
+      },
+      {
+        "code": "18004",
+        "count": 3
+      },
+      {
+        "code": "19033",
+        "count": 3
+      },
+      {
+        "code": "01014",
+        "count": 1
+      },
+      {
+        "code": "01045",
+        "count": 2
+      },
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "18007",
+        "count": 2
+      },
+      {
+        "code": "19058",
+        "count": 1
+      },
+      {
+        "code": "19003",
+        "count": 3
+      },
+      {
+        "code": "18009",
+        "count": 2
+      },
+      {
+        "code": "18008",
+        "count": 2
+      },
+      {
+        "code": "19029",
+        "count": 1
+      },
+      {
+        "code": "18010",
+        "count": 3
+      },
+      {
+        "code": "18011",
+        "count": 1
+      },
+      {
+        "code": "19147",
+        "count": 2
+      },
+      {
+        "code": "18012",
+        "count": 2
+      },
+      {
+        "code": "01023",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 3
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "guardians-of-the-wild",
+    "name": "Guardians of the Wild",
+    "group": "Hero Expansions",
+    "productName": "Ered Mithrin Hero Expansion",
+    "source": "decklist.mec114-guardians-of-the-wild",
+    "heroes": [
+      "19001",
+      "19145",
+      "01012"
+    ],
+    "cards": [
+      {
+        "code": "19146",
+        "count": 2
+      },
+      {
+        "code": "19004",
+        "count": 3
+      },
+      {
+        "code": "19061",
+        "count": 3
+      },
+      {
+        "code": "19031",
+        "count": 2
+      },
+      {
+        "code": "19059",
+        "count": 2
+      },
+      {
+        "code": "19148",
+        "count": 3
+      },
+      {
+        "code": "19087",
+        "count": 3
+      },
+      {
+        "code": "01031",
+        "count": 2
+      },
+      {
+        "code": "01059",
+        "count": 3
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "01062",
+        "count": 2
+      },
+      {
+        "code": "19006",
+        "count": 3
+      },
+      {
+        "code": "19030",
+        "count": 3
+      },
+      {
+        "code": "19154",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 3
+      },
+      {
+        "code": "01072",
+        "count": 2
+      },
+      {
+        "code": "19005",
+        "count": 3
+      },
+      {
+        "code": "01034",
+        "count": 3
+      },
+      {
+        "code": "01064",
+        "count": 3
+      },
+      {
+        "code": "01066",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "ents-and-friends",
+    "name": "Ents and Friends",
+    "group": "Saga Expansions",
+    "productName": "The Two Towers Saga Expansion",
+    "source": "decklist.mec112-ents-and-friends",
+    "heroes": [
+      "143003",
+      "141003",
+      "141004"
+    ],
+    "cards": [
+      {
+        "code": "143005",
+        "count": 3
+      },
+      {
+        "code": "144006",
+        "count": 2
+      },
+      {
+        "code": "144005",
+        "count": 3
+      },
+      {
+        "code": "143006",
+        "count": 3
+      },
+      {
+        "code": "142004",
+        "count": 2
+      },
+      {
+        "code": "01031",
+        "count": 1
+      },
+      {
+        "code": "01058",
+        "count": 3
+      },
+      {
+        "code": "01059",
+        "count": 3
+      },
+      {
+        "code": "01060",
+        "count": 3
+      },
+      {
+        "code": "01062",
+        "count": 2
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "143009",
+        "count": 2
+      },
+      {
+        "code": "141014",
+        "count": 3
+      },
+      {
+        "code": "141016",
+        "count": 3
+      },
+      {
+        "code": "01070",
+        "count": 2
+      },
+      {
+        "code": "01072",
+        "count": 2
+      },
+      {
+        "code": "141009",
+        "count": 2
+      },
+      {
+        "code": "141012",
+        "count": 3
+      },
+      {
+        "code": "01034",
+        "count": 3
+      },
+      {
+        "code": "01035",
+        "count": 3
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "king-of-rohan-rides",
+    "name": "The King of Rohan Rides",
+    "group": "Saga Expansions",
+    "productName": "The Two Towers Saga Expansion",
+    "source": "decklist.mec112-king-of-rohan",
+    "heroes": [
+      "144002",
+      "143002",
+      "141002"
+    ],
+    "cards": [
+      {
+        "code": "144004",
+        "count": 3
+      },
+      {
+        "code": "143004",
+        "count": 3
+      },
+      {
+        "code": "144007",
+        "count": 1
+      },
+      {
+        "code": "143007",
+        "count": 3
+      },
+      {
+        "code": "141006",
+        "count": 2
+      },
+      {
+        "code": "142003",
+        "count": 2
+      },
+      {
+        "code": "142006",
+        "count": 2
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "143010",
+        "count": 2
+      },
+      {
+        "code": "144010",
+        "count": 2
+      },
+      {
+        "code": "01026",
+        "count": 3
+      },
+      {
+        "code": "01027",
+        "count": 2
+      },
+      {
+        "code": "01057",
+        "count": 3
+      },
+      {
+        "code": "01020",
+        "count": 1
+      },
+      {
+        "code": "01023",
+        "count": 3
+      },
+      {
+        "code": "01024",
+        "count": 2
+      },
+      {
+        "code": "01025",
+        "count": 2
+      },
+      {
+        "code": "01048",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 3
+      },
+      {
+        "code": "01053",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "foresight-and-fortitude",
+    "name": "Foresight and Fortitude",
+    "group": "Saga Expansions",
+    "productName": "The Return of the King Saga Expansion",
+    "source": "decklist.mec113-foresight",
+    "heroes": [
+      "145003",
+      "142002",
+      "141004"
+    ],
+    "cards": [
+      {
+        "code": "142006",
+        "count": 2
+      },
+      {
+        "code": "146007",
+        "count": 2
+      },
+      {
+        "code": "146008",
+        "count": 2
+      },
+      {
+        "code": "145005",
+        "count": 1
+      },
+      {
+        "code": "143006",
+        "count": 2
+      },
+      {
+        "code": "144005",
+        "count": 1
+      },
+      {
+        "code": "145007",
+        "count": 2
+      },
+      {
+        "code": "142005",
+        "count": 2
+      },
+      {
+        "code": "01045",
+        "count": 2
+      },
+      {
+        "code": "01062",
+        "count": 2
+      },
+      {
+        "code": "01060",
+        "count": 2
+      },
+      {
+        "code": "142009",
+        "count": 2
+      },
+      {
+        "code": "142008",
+        "count": 3
+      },
+      {
+        "code": "143014",
+        "count": 1
+      },
+      {
+        "code": "01057",
+        "count": 3
+      },
+      {
+        "code": "01072",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 3
+      },
+      {
+        "code": "142007",
+        "count": 3
+      },
+      {
+        "code": "145009",
+        "count": 3
+      },
+      {
+        "code": "01048",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 3
+      },
+      {
+        "code": "01051",
+        "count": 2
+      },
+      {
+        "code": "01053",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "valor-and-vigilance",
+    "name": "Valor and Vigilance",
+    "group": "Saga Expansions",
+    "productName": "The Return of the King Saga Expansion",
+    "source": "decklist.mec113-valor",
+    "heroes": [
+      "145002",
+      "144002",
+      "141002"
+    ],
+    "cards": [
+      {
+        "code": "141006",
+        "count": 2
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "146005",
+        "count": 3
+      },
+      {
+        "code": "145006",
+        "count": 2
+      },
+      {
+        "code": "143004",
+        "count": 3
+      },
+      {
+        "code": "144004",
+        "count": 2
+      },
+      {
+        "code": "01029",
+        "count": 3
+      },
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "144006",
+        "count": 2
+      },
+      {
+        "code": "142004",
+        "count": 2
+      },
+      {
+        "code": "143005",
+        "count": 2
+      },
+      {
+        "code": "01026",
+        "count": 3
+      },
+      {
+        "code": "141014",
+        "count": 3
+      },
+      {
+        "code": "143008",
+        "count": 1
+      },
+      {
+        "code": "01027",
+        "count": 1
+      },
+      {
+        "code": "145010",
+        "count": 1
+      },
+      {
+        "code": "142010",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 3
+      },
+      {
+        "code": "01020",
+        "count": 3
+      },
+      {
+        "code": "01024",
+        "count": 3
+      },
+      {
+        "code": "01023",
+        "count": 3
+      }
+    ],
+    "sideboard": [],
+    "note": "This list takes Gandalf and Fellowship of the Ring. The decklist takes Elfhelm instead of Gandalf if another deck has the Gandalf hero, and Banner of Elendil with Aragorn."
+  },
+  {
+    "id": "black-riders-hobbits",
+    "name": "The Black Riders",
+    "group": "Original Saga Expansions",
+    "productName": "The Black Riders Saga Expansion",
+    "source": "decklist.tbr",
+    "heroes": [
+      "141002",
+      "141003",
+      "141004"
+    ],
+    "cards": [
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "01031",
+        "count": 1
+      },
+      {
+        "code": "01014",
+        "count": 1
+      },
+      {
+        "code": "141008",
+        "count": 2
+      },
+      {
+        "code": "141007",
+        "count": 2
+      },
+      {
+        "code": "141006",
+        "count": 2
+      },
+      {
+        "code": "01062",
+        "count": 2
+      },
+      {
+        "code": "01059",
+        "count": 2
+      },
+      {
+        "code": "01013",
+        "count": 2
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "01025",
+        "count": 1
+      },
+      {
+        "code": "141011",
+        "count": 3
+      },
+      {
+        "code": "141012",
+        "count": 3
+      },
+      {
+        "code": "141009",
+        "count": 3
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "01066",
+        "count": 2
+      },
+      {
+        "code": "01023",
+        "count": 2
+      },
+      {
+        "code": "01065",
+        "count": 2
+      },
+      {
+        "code": "141013",
+        "count": 2
+      },
+      {
+        "code": "141014",
+        "count": 2
+      },
+      {
+        "code": "141016",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 2
+      },
+      {
+        "code": "01042",
+        "count": 1
+      },
+      {
+        "code": "01026",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "road-darkens-1",
+    "name": "The Road Darkens I",
+    "group": "Original Saga Expansions",
+    "productName": "The Road Darkens Saga Expansion",
+    "source": "decklist.trd-1",
+    "heroes": [
+      "01001",
+      "141002",
+      "141004"
+    ],
+    "cards": [
+      {
+        "code": "01014",
+        "count": 2
+      },
+      {
+        "code": "142005",
+        "count": 3
+      },
+      {
+        "code": "142003",
+        "count": 2
+      },
+      {
+        "code": "01058",
+        "count": 2
+      },
+      {
+        "code": "01017",
+        "count": 2
+      },
+      {
+        "code": "141006",
+        "count": 2
+      },
+      {
+        "code": "01062",
+        "count": 2
+      },
+      {
+        "code": "01013",
+        "count": 3
+      },
+      {
+        "code": "01059",
+        "count": 2
+      },
+      {
+        "code": "01061",
+        "count": 1
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "01025",
+        "count": 1
+      },
+      {
+        "code": "141011",
+        "count": 2
+      },
+      {
+        "code": "141012",
+        "count": 2
+      },
+      {
+        "code": "01023",
+        "count": 2
+      },
+      {
+        "code": "01020",
+        "count": 2
+      },
+      {
+        "code": "01066",
+        "count": 2
+      },
+      {
+        "code": "01065",
+        "count": 2
+      },
+      {
+        "code": "142010",
+        "count": 2
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "01027",
+        "count": 1
+      },
+      {
+        "code": "141016",
+        "count": 3
+      },
+      {
+        "code": "01070",
+        "count": 2
+      },
+      {
+        "code": "141013",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "road-darkens-2",
+    "name": "The Road Darkens II",
+    "group": "Original Saga Expansions",
+    "productName": "The Road Darkens Saga Expansion",
+    "source": "decklist.trd-2",
+    "heroes": [
+      "142002",
+      "141003",
+      "141005"
+    ],
+    "cards": [
+      {
+        "code": "01031",
+        "count": 1
+      },
+      {
+        "code": "142004",
+        "count": 2
+      },
+      {
+        "code": "01045",
+        "count": 2
+      },
+      {
+        "code": "141008",
+        "count": 2
+      },
+      {
+        "code": "01044",
+        "count": 3
+      },
+      {
+        "code": "142006",
+        "count": 2
+      },
+      {
+        "code": "01029",
+        "count": 3
+      },
+      {
+        "code": "01028",
+        "count": 3
+      },
+      {
+        "code": "01043",
+        "count": 2
+      },
+      {
+        "code": "01046",
+        "count": 1
+      },
+      {
+        "code": "141012",
+        "count": 1
+      },
+      {
+        "code": "141010",
+        "count": 3
+      },
+      {
+        "code": "142007",
+        "count": 3
+      },
+      {
+        "code": "141009",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "01048",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "01053",
+        "count": 1
+      },
+      {
+        "code": "01051",
+        "count": 1
+      },
+      {
+        "code": "142008",
+        "count": 2
+      },
+      {
+        "code": "01057",
+        "count": 1
+      },
+      {
+        "code": "01042",
+        "count": 1
+      },
+      {
+        "code": "141014",
+        "count": 2
+      },
+      {
+        "code": "142009",
+        "count": 2
+      },
+      {
+        "code": "141015",
+        "count": 3
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "treason-of-saruman-1",
+    "name": "The Treason of Saruman I",
+    "group": "Original Saga Expansions",
+    "productName": "The Treason of Saruman Saga Expansion",
+    "source": "decklist.tos-1",
+    "heroes": [
+      "142002",
+      "143002",
+      "01002"
+    ],
+    "cards": [
+      {
+        "code": "01014",
+        "count": 2
+      },
+      {
+        "code": "143004",
+        "count": 2
+      },
+      {
+        "code": "142003",
+        "count": 2
+      },
+      {
+        "code": "01045",
+        "count": 2
+      },
+      {
+        "code": "01017",
+        "count": 2
+      },
+      {
+        "code": "141006",
+        "count": 2
+      },
+      {
+        "code": "143007",
+        "count": 2
+      },
+      {
+        "code": "01013",
+        "count": 2
+      },
+      {
+        "code": "142006",
+        "count": 2
+      },
+      {
+        "code": "01043",
+        "count": 2
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "01025",
+        "count": 1
+      },
+      {
+        "code": "143013",
+        "count": 2
+      },
+      {
+        "code": "143012",
+        "count": 1
+      },
+      {
+        "code": "01020",
+        "count": 2
+      },
+      {
+        "code": "142007",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "01048",
+        "count": 2
+      },
+      {
+        "code": "01051",
+        "count": 1
+      },
+      {
+        "code": "01046",
+        "count": 2
+      },
+      {
+        "code": "143014",
+        "count": 2
+      },
+      {
+        "code": "142008",
+        "count": 2
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "01027",
+        "count": 1
+      },
+      {
+        "code": "143010",
+        "count": 1
+      },
+      {
+        "code": "142009",
+        "count": 2
+      },
+      {
+        "code": "01057",
+        "count": 1
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "treason-of-saruman-2",
+    "name": "The Treason of Saruman II",
+    "group": "Original Saga Expansions",
+    "productName": "The Treason of Saruman Saga Expansion",
+    "source": "decklist.tos-2",
+    "heroes": [
+      "141003",
+      "141004",
+      "143003"
+    ],
+    "cards": [
+      {
+        "code": "01031",
+        "count": 1
+      },
+      {
+        "code": "142004",
+        "count": 1
+      },
+      {
+        "code": "143005",
+        "count": 2
+      },
+      {
+        "code": "141008",
+        "count": 1
+      },
+      {
+        "code": "142005",
+        "count": 3
+      },
+      {
+        "code": "01058",
+        "count": 2
+      },
+      {
+        "code": "01029",
+        "count": 3
+      },
+      {
+        "code": "143006",
+        "count": 3
+      },
+      {
+        "code": "01062",
+        "count": 2
+      },
+      {
+        "code": "141007",
+        "count": 1
+      },
+      {
+        "code": "01059",
+        "count": 2
+      },
+      {
+        "code": "01061",
+        "count": 2
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "141012",
+        "count": 3
+      },
+      {
+        "code": "01065",
+        "count": 2
+      },
+      {
+        "code": "141009",
+        "count": 2
+      },
+      {
+        "code": "01066",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "143011",
+        "count": 2
+      },
+      {
+        "code": "01042",
+        "count": 1
+      },
+      {
+        "code": "143008",
+        "count": 1
+      },
+      {
+        "code": "141016",
+        "count": 3
+      },
+      {
+        "code": "141014",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 2
+      },
+      {
+        "code": "143009",
+        "count": 3
+      },
+      {
+        "code": "01072",
+        "count": 1
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "land-of-shadow",
+    "name": "The Land of Shadow",
+    "group": "Original Saga Expansions",
+    "productName": "The Land of Shadow Saga Expansion",
+    "source": "decklist.los",
+    "heroes": [
+      "141002",
+      "144002",
+      "144003"
+    ],
+    "cards": [
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "144004",
+        "count": 2
+      },
+      {
+        "code": "143004",
+        "count": 2
+      },
+      {
+        "code": "142003",
+        "count": 2
+      },
+      {
+        "code": "142005",
+        "count": 2
+      },
+      {
+        "code": "141006",
+        "count": 2
+      },
+      {
+        "code": "144005",
+        "count": 2
+      },
+      {
+        "code": "01017",
+        "count": 2
+      },
+      {
+        "code": "01059",
+        "count": 2
+      },
+      {
+        "code": "01013",
+        "count": 2
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "01025",
+        "count": 1
+      },
+      {
+        "code": "141011",
+        "count": 1
+      },
+      {
+        "code": "141012",
+        "count": 2
+      },
+      {
+        "code": "01022",
+        "count": 1
+      },
+      {
+        "code": "01023",
+        "count": 2
+      },
+      {
+        "code": "144011",
+        "count": 2
+      },
+      {
+        "code": "01066",
+        "count": 2
+      },
+      {
+        "code": "144012",
+        "count": 2
+      },
+      {
+        "code": "144013",
+        "count": 2
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 1
+      },
+      {
+        "code": "01069",
+        "count": 1
+      },
+      {
+        "code": "144009",
+        "count": 3
+      },
+      {
+        "code": "141013",
+        "count": 2
+      },
+      {
+        "code": "144008",
+        "count": 1
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "flame-of-the-west-1",
+    "name": "The Flame of the West I",
+    "group": "Original Saga Expansions",
+    "productName": "The Flame of the West Saga Expansion",
+    "source": "decklist.fotw-1",
+    "heroes": [
+      "144002",
+      "01010",
+      "141004"
+    ],
+    "cards": [
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "143004",
+        "count": 1
+      },
+      {
+        "code": "144004",
+        "count": 1
+      },
+      {
+        "code": "145006",
+        "count": 2
+      },
+      {
+        "code": "142003",
+        "count": 1
+      },
+      {
+        "code": "142005",
+        "count": 2
+      },
+      {
+        "code": "143006",
+        "count": 2
+      },
+      {
+        "code": "144005",
+        "count": 2
+      },
+      {
+        "code": "01062",
+        "count": 2
+      },
+      {
+        "code": "145007",
+        "count": 2
+      },
+      {
+        "code": "01059",
+        "count": 2
+      },
+      {
+        "code": "01013",
+        "count": 3
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "143013",
+        "count": 1
+      },
+      {
+        "code": "141011",
+        "count": 2
+      },
+      {
+        "code": "144012",
+        "count": 2
+      },
+      {
+        "code": "01022",
+        "count": 2
+      },
+      {
+        "code": "01066",
+        "count": 2
+      },
+      {
+        "code": "01023",
+        "count": 2
+      },
+      {
+        "code": "144011",
+        "count": 2
+      },
+      {
+        "code": "145013",
+        "count": 1
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "01027",
+        "count": 1
+      },
+      {
+        "code": "145012",
+        "count": 1
+      },
+      {
+        "code": "144009",
+        "count": 2
+      },
+      {
+        "code": "141016",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "flame-of-the-west-2",
+    "name": "The Flame of the West II",
+    "group": "Original Saga Expansions",
+    "productName": "The Flame of the West Saga Expansion",
+    "source": "decklist.fotw-2",
+    "heroes": [
+      "143002",
+      "145002",
+      "141003"
+    ],
+    "cards": [
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "143005",
+        "count": 2
+      },
+      {
+        "code": "142004",
+        "count": 2
+      },
+      {
+        "code": "145005",
+        "count": 1
+      },
+      {
+        "code": "145004",
+        "count": 2
+      },
+      {
+        "code": "143007",
+        "count": 2
+      },
+      {
+        "code": "144007",
+        "count": 1
+      },
+      {
+        "code": "144006",
+        "count": 1
+      },
+      {
+        "code": "141008",
+        "count": 1
+      },
+      {
+        "code": "01030",
+        "count": 2
+      },
+      {
+        "code": "142006",
+        "count": 2
+      },
+      {
+        "code": "01029",
+        "count": 3
+      },
+      {
+        "code": "01028",
+        "count": 2
+      },
+      {
+        "code": "01043",
+        "count": 2
+      },
+      {
+        "code": "143013",
+        "count": 1
+      },
+      {
+        "code": "01046",
+        "count": 1
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "145009",
+        "count": 2
+      },
+      {
+        "code": "01035",
+        "count": 2
+      },
+      {
+        "code": "145008",
+        "count": 2
+      },
+      {
+        "code": "01051",
+        "count": 2
+      },
+      {
+        "code": "145013",
+        "count": 1
+      },
+      {
+        "code": "143010",
+        "count": 1
+      },
+      {
+        "code": "01057",
+        "count": 1
+      },
+      {
+        "code": "144010",
+        "count": 2
+      },
+      {
+        "code": "01042",
+        "count": 1
+      },
+      {
+        "code": "145010",
+        "count": 1
+      },
+      {
+        "code": "141014",
+        "count": 3
+      },
+      {
+        "code": "145011",
+        "count": 1
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "mountain-of-fire-1",
+    "name": "The Mountain of Fire I",
+    "group": "Original Saga Expansions",
+    "productName": "The Mountain of Fire Saga Expansion",
+    "source": "decklist.mof-1",
+    "heroes": [
+      "141002",
+      "141003",
+      "141004"
+    ],
+    "cards": [
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "143004",
+        "count": 1
+      },
+      {
+        "code": "143005",
+        "count": 1
+      },
+      {
+        "code": "142004",
+        "count": 1
+      },
+      {
+        "code": "145006",
+        "count": 1
+      },
+      {
+        "code": "142003",
+        "count": 2
+      },
+      {
+        "code": "142005",
+        "count": 2
+      },
+      {
+        "code": "146005",
+        "count": 2
+      },
+      {
+        "code": "141006",
+        "count": 2
+      },
+      {
+        "code": "144005",
+        "count": 2
+      },
+      {
+        "code": "143006",
+        "count": 1
+      },
+      {
+        "code": "145007",
+        "count": 1
+      },
+      {
+        "code": "141007",
+        "count": 1
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "141012",
+        "count": 3
+      },
+      {
+        "code": "141009",
+        "count": 3
+      },
+      {
+        "code": "01023",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "144011",
+        "count": 2
+      },
+      {
+        "code": "144013",
+        "count": 2
+      },
+      {
+        "code": "142010",
+        "count": 2
+      },
+      {
+        "code": "141014",
+        "count": 3
+      },
+      {
+        "code": "141013",
+        "count": 2
+      },
+      {
+        "code": "144008",
+        "count": 1
+      },
+      {
+        "code": "141016",
+        "count": 2
+      },
+      {
+        "code": "146009",
+        "count": 2
+      },
+      {
+        "code": "146012",
+        "count": 3
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "mountain-of-fire-2",
+    "name": "The Mountain of Fire II",
+    "group": "Original Saga Expansions",
+    "productName": "The Mountain of Fire Saga Expansion",
+    "source": "decklist.mof-2",
+    "heroes": [
+      "142002",
+      "146003",
+      "145003"
+    ],
+    "cards": [
+      {
+        "code": "143004",
+        "count": 1
+      },
+      {
+        "code": "143005",
+        "count": 1
+      },
+      {
+        "code": "145005",
+        "count": 1
+      },
+      {
+        "code": "145006",
+        "count": 1
+      },
+      {
+        "code": "01014",
+        "count": 1
+      },
+      {
+        "code": "144004",
+        "count": 1
+      },
+      {
+        "code": "146006",
+        "count": 2
+      },
+      {
+        "code": "143007",
+        "count": 2
+      },
+      {
+        "code": "146008",
+        "count": 2
+      },
+      {
+        "code": "146007",
+        "count": 2
+      },
+      {
+        "code": "142003",
+        "count": 1
+      },
+      {
+        "code": "142006",
+        "count": 2
+      },
+      {
+        "code": "01013",
+        "count": 3
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "143013",
+        "count": 1
+      },
+      {
+        "code": "146010",
+        "count": 2
+      },
+      {
+        "code": "142007",
+        "count": 3
+      },
+      {
+        "code": "145009",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "01051",
+        "count": 1
+      },
+      {
+        "code": "145013",
+        "count": 2
+      },
+      {
+        "code": "143014",
+        "count": 2
+      },
+      {
+        "code": "142008",
+        "count": 3
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "146011",
+        "count": 2
+      },
+      {
+        "code": "01027",
+        "count": 1
+      },
+      {
+        "code": "01057",
+        "count": 1
+      },
+      {
+        "code": "142009",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "over-hill-1",
+    "name": "Over Hill and Under Hill I",
+    "group": "The Hobbit",
+    "productName": "The Hobbit: Over Hill and Under Hill",
+    "source": "decklist.ohauh-1",
+    "heroes": [
+      "01004",
+      "01006",
+      "131004"
+    ],
+    "cards": [
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "01031",
+        "count": 1
+      },
+      {
+        "code": "131008",
+        "count": 3
+      },
+      {
+        "code": "01028",
+        "count": 3
+      },
+      {
+        "code": "01029",
+        "count": 2
+      },
+      {
+        "code": "131009",
+        "count": 2
+      },
+      {
+        "code": "01059",
+        "count": 2
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "131016",
+        "count": 3
+      },
+      {
+        "code": "131015",
+        "count": 3
+      },
+      {
+        "code": "01035",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "131018",
+        "count": 3
+      },
+      {
+        "code": "01066",
+        "count": 2
+      },
+      {
+        "code": "01065",
+        "count": 2
+      },
+      {
+        "code": "01063",
+        "count": 2
+      },
+      {
+        "code": "131019",
+        "count": 3
+      },
+      {
+        "code": "01042",
+        "count": 1
+      },
+      {
+        "code": "01039",
+        "count": 2
+      },
+      {
+        "code": "131013",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 2
+      },
+      {
+        "code": "01041",
+        "count": 2
+      },
+      {
+        "code": "01040",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "over-hill-2",
+    "name": "Over Hill and Under Hill II",
+    "group": "The Hobbit",
+    "productName": "The Hobbit: Over Hill and Under Hill",
+    "source": "decklist.ohauh-2",
+    "heroes": [
+      "131002",
+      "01003",
+      "131003"
+    ],
+    "cards": [
+      {
+        "code": "131010",
+        "count": 3
+      },
+      {
+        "code": "01019",
+        "count": 1
+      },
+      {
+        "code": "01018",
+        "count": 2
+      },
+      {
+        "code": "131006",
+        "count": 3
+      },
+      {
+        "code": "131007",
+        "count": 2
+      },
+      {
+        "code": "01017",
+        "count": 2
+      },
+      {
+        "code": "01043",
+        "count": 2
+      },
+      {
+        "code": "01013",
+        "count": 3
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "131014",
+        "count": 3
+      },
+      {
+        "code": "131017",
+        "count": 3
+      },
+      {
+        "code": "131019",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "01048",
+        "count": 2
+      },
+      {
+        "code": "01053",
+        "count": 1
+      },
+      {
+        "code": "01020",
+        "count": 2
+      },
+      {
+        "code": "01023",
+        "count": 2
+      },
+      {
+        "code": "01046",
+        "count": 2
+      },
+      {
+        "code": "01025",
+        "count": 1
+      },
+      {
+        "code": "131011",
+        "count": 3
+      },
+      {
+        "code": "131012",
+        "count": 2
+      },
+      {
+        "code": "01057",
+        "count": 1
+      },
+      {
+        "code": "01026",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "on-the-doorstep-1",
+    "name": "On the Doorstep I",
+    "group": "The Hobbit",
+    "productName": "The Hobbit: On the Doorstep",
+    "source": "decklist.otd-1",
+    "heroes": [
+      "01004",
+      "132005",
+      "131004"
+    ],
+    "cards": [
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "132007",
+        "count": 2
+      },
+      {
+        "code": "131008",
+        "count": 2
+      },
+      {
+        "code": "131009",
+        "count": 1
+      },
+      {
+        "code": "01031",
+        "count": 1
+      },
+      {
+        "code": "01028",
+        "count": 3
+      },
+      {
+        "code": "01059",
+        "count": 2
+      },
+      {
+        "code": "01061",
+        "count": 2
+      },
+      {
+        "code": "131016",
+        "count": 3
+      },
+      {
+        "code": "131015",
+        "count": 3
+      },
+      {
+        "code": "131019",
+        "count": 3
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "131018",
+        "count": 3
+      },
+      {
+        "code": "01066",
+        "count": 2
+      },
+      {
+        "code": "01065",
+        "count": 2
+      },
+      {
+        "code": "01063",
+        "count": 2
+      },
+      {
+        "code": "132011",
+        "count": 3
+      },
+      {
+        "code": "01042",
+        "count": 1
+      },
+      {
+        "code": "01039",
+        "count": 2
+      },
+      {
+        "code": "131013",
+        "count": 1
+      },
+      {
+        "code": "132017",
+        "count": 2
+      },
+      {
+        "code": "01070",
+        "count": 2
+      },
+      {
+        "code": "01041",
+        "count": 2
+      },
+      {
+        "code": "01040",
+        "count": 1
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "on-the-doorstep-2",
+    "name": "On the Doorstep II",
+    "group": "The Hobbit",
+    "productName": "The Hobbit: On the Doorstep",
+    "source": "decklist.otd-2",
+    "heroes": [
+      "131002",
+      "132002",
+      "131003"
+    ],
+    "cards": [
+      {
+        "code": "01019",
+        "count": 1
+      },
+      {
+        "code": "01018",
+        "count": 2
+      },
+      {
+        "code": "131006",
+        "count": 3
+      },
+      {
+        "code": "131007",
+        "count": 2
+      },
+      {
+        "code": "01017",
+        "count": 2
+      },
+      {
+        "code": "01043",
+        "count": 2
+      },
+      {
+        "code": "132008",
+        "count": 2
+      },
+      {
+        "code": "132006",
+        "count": 1
+      },
+      {
+        "code": "01016",
+        "count": 3
+      },
+      {
+        "code": "131010",
+        "count": 3
+      },
+      {
+        "code": "131014",
+        "count": 3
+      },
+      {
+        "code": "131017",
+        "count": 3
+      },
+      {
+        "code": "132013",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "01048",
+        "count": 2
+      },
+      {
+        "code": "132012",
+        "count": 3
+      },
+      {
+        "code": "01023",
+        "count": 2
+      },
+      {
+        "code": "01046",
+        "count": 2
+      },
+      {
+        "code": "01025",
+        "count": 1
+      },
+      {
+        "code": "131011",
+        "count": 3
+      },
+      {
+        "code": "131012",
+        "count": 2
+      },
+      {
+        "code": "132018",
+        "count": 2
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "132016",
+        "count": 1
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "eomer-and-eowyn",
+    "name": "Éomer and Éowyn",
+    "group": "Community Deck Lists",
+    "productName": "Community Deck List",
+    "source": "decklist.community-eomer-eowyn",
+    "heroes": [
+      "07001",
+      "01007",
+      "04101"
+    ],
+    "cards": [
+      {
+        "code": "09004",
+        "count": 3
+      },
+      {
+        "code": "17033",
+        "count": 3
+      },
+      {
+        "code": "05018",
+        "count": 3
+      },
+      {
+        "code": "01029",
+        "count": 3
+      },
+      {
+        "code": "01044",
+        "count": 2
+      },
+      {
+        "code": "07007",
+        "count": 3
+      },
+      {
+        "code": "08004",
+        "count": 3
+      },
+      {
+        "code": "01042",
+        "count": 1
+      },
+      {
+        "code": "04107",
+        "count": 3
+      },
+      {
+        "code": "04062",
+        "count": 2
+      },
+      {
+        "code": "01057",
+        "count": 3
+      },
+      {
+        "code": "01050",
+        "count": 3
+      },
+      {
+        "code": "04059",
+        "count": 3
+      },
+      {
+        "code": "10145",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 3
+      },
+      {
+        "code": "01048",
+        "count": 3
+      },
+      {
+        "code": "01051",
+        "count": 3
+      },
+      {
+        "code": "01046",
+        "count": 2
+      },
+      {
+        "code": "04004",
+        "count": 2
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "the-red-arrow",
+    "name": "The Red Arrow",
+    "group": "Community Deck Lists",
+    "productName": "Community Deck List",
+    "source": "decklist.community-red-arrow",
+    "heroes": [
+      "12001",
+      "17055",
+      "143002"
+    ],
+    "cards": [
+      {
+        "code": "12058",
+        "count": 1
+      },
+      {
+        "code": "12060",
+        "count": 2
+      },
+      {
+        "code": "146006",
+        "count": 1
+      },
+      {
+        "code": "02030",
+        "count": 1
+      },
+      {
+        "code": "10141",
+        "count": 1
+      },
+      {
+        "code": "02055",
+        "count": 1
+      },
+      {
+        "code": "144007",
+        "count": 1
+      },
+      {
+        "code": "145004",
+        "count": 2
+      },
+      {
+        "code": "06110",
+        "count": 1
+      },
+      {
+        "code": "10004",
+        "count": 3
+      },
+      {
+        "code": "17112",
+        "count": 3
+      },
+      {
+        "code": "04033",
+        "count": 2
+      },
+      {
+        "code": "01016",
+        "count": 2
+      },
+      {
+        "code": "02121",
+        "count": 3
+      },
+      {
+        "code": "02006",
+        "count": 1
+      },
+      {
+        "code": "07007",
+        "count": 3
+      },
+      {
+        "code": "07006",
+        "count": 1
+      },
+      {
+        "code": "06005",
+        "count": 3
+      },
+      {
+        "code": "146011",
+        "count": 3
+      },
+      {
+        "code": "144010",
+        "count": 3
+      },
+      {
+        "code": "17058",
+        "count": 1
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "131014",
+        "count": 3
+      },
+      {
+        "code": "02122",
+        "count": 1
+      },
+      {
+        "code": "01024",
+        "count": 2
+      },
+      {
+        "code": "16008",
+        "count": 3
+      }
+    ],
+    "sideboard": []
+  },
+  {
+    "id": "swords-of-the-noldor",
+    "name": "The Swords of the Noldor",
+    "group": "Community Deck Lists",
+    "productName": "Community Deck List",
+    "source": "decklist.community-noldor",
+    "heroes": [
+      "10140",
+      "11001",
+      "10084"
+    ],
+    "cards": [
+      {
+        "code": "146007",
+        "count": 2
+      },
+      {
+        "code": "146008",
+        "count": 2
+      },
+      {
+        "code": "10033",
+        "count": 3
+      },
+      {
+        "code": "17114",
+        "count": 3
+      },
+      {
+        "code": "10091",
+        "count": 1
+      },
+      {
+        "code": "02079",
+        "count": 1
+      },
+      {
+        "code": "12006",
+        "count": 1
+      },
+      {
+        "code": "12010",
+        "count": 3
+      },
+      {
+        "code": "12008",
+        "count": 3
+      },
+      {
+        "code": "08120",
+        "count": 2
+      },
+      {
+        "code": "04107",
+        "count": 3
+      },
+      {
+        "code": "11015",
+        "count": 3
+      },
+      {
+        "code": "12034",
+        "count": 2
+      },
+      {
+        "code": "04031",
+        "count": 3
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "11014",
+        "count": 3
+      },
+      {
+        "code": "04059",
+        "count": 3
+      },
+      {
+        "code": "10145",
+        "count": 3
+      },
+      {
+        "code": "10121",
+        "count": 1
+      },
+      {
+        "code": "19153",
+        "count": 3
+      },
+      {
+        "code": "01049",
+        "count": 3
+      }
+    ],
+    "sideboard": []
+  }
+]
