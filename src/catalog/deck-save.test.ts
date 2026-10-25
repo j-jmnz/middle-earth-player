@@ -60,19 +60,19 @@ describe("deckSaveRefusal", () => {
     expect(deckSaveRefusal(codes, cards, facts, [])).toBeNull();
   });
 
-  it("refuses 2 heroes, 4 heroes, and 49 cards", () => {
+  it("saves 1 or 2 heroes; refuses none, 4 heroes, and 49 cards (rr.deckbuilding)", () => {
+    const one = heroes(["leadership"]);
+    expect(deckSaveRefusal(one.codes, fill(one.facts, 50), one.facts)).toBeNull();
     const two = heroes(["leadership", "tactics"]);
-    expect(deckSaveRefusal(two.codes, fill(two.facts, 50), two.facts)).toEqual({
-      cardCode: null,
-      cardName: null,
-      rule: "Exactly three heroes.",
-    });
+    expect(deckSaveRefusal(two.codes, fill(two.facts, 50), two.facts)).toBeNull();
+    const none = heroes([]);
+    expect(deckSaveRefusal(none.codes, fill(none.facts, 50), none.facts)).toEqual({ cardCode: null, cardName: null, rule: "At least one hero." });
 
     const four = heroes(["leadership", "tactics", "spirit", "lore"]);
     expect(deckSaveRefusal(four.codes, fill(four.facts, 50), four.facts)).toEqual({
       cardCode: "h3",
       cardName: "Hero 3",
-      rule: "Exactly three heroes.",
+      rule: "At most three heroes.",
     });
 
     const three = heroes(["leadership", "tactics", "spirit"]);
@@ -141,14 +141,27 @@ describe("deckSaveRefusal", () => {
     expect(deckSaveRefusal(codes, cards, facts, [])).toBeNull();
   });
 
-  it("refuses a leadership card with no leadership hero", () => {
+  it("saves a leadership card with no leadership hero: the sphere matters when it is played (rr.resource-match)", () => {
     const { codes, facts } = heroes(["tactics", "spirit", "lore"]);
     const cards = fill(facts, 49);
     facts.set("lead", card({ name: "Sneak Attack", typeCode: "event", sphereCode: "leadership" }));
     cards.push({ code: "lead", count: 1 });
-    const refusal = deckSaveRefusal(codes, cards, facts, []);
-    expect(refusal?.cardName).toBe("Sneak Attack");
-    expect(refusal?.rule).toBe("Sphere must match a hero.");
+    expect(deckSaveRefusal(codes, cards, facts, [])).toBeNull();
+  });
+
+  it("counts copies by title across printings (rr.deckbuilding)", () => {
+    const { codes, facts } = heroes(["leadership", "tactics", "spirit"]);
+    const cards = fill(facts, 46);
+    facts.set("01073", card({ name: "Gandalf", typeCode: "ally", sphereCode: "neutral", deckLimit: 3 }));
+    facts.set("131010", card({ name: "Gandalf", typeCode: "ally", sphereCode: "neutral", deckLimit: 3 }));
+    cards.push({ code: "01073", count: 3 }, { code: "131010", count: 1 });
+    expect(deckSaveRefusal(codes, cards, facts, [])).toEqual({ cardCode: "01073", cardName: "Gandalf", rule: "At most three copies." });
+  });
+
+  it("refuses two heroes with the same title", () => {
+    const { codes, facts } = heroes(["leadership", "tactics"]);
+    facts.set("h9", card({ name: "Hero 0", typeCode: "hero", sphereCode: "lore" }));
+    expect(deckSaveRefusal([...codes, "h9"], fill(facts, 50), facts, [])?.rule).toBe("A hero appears once.");
   });
 
   it("saves a fellowship hero among the three heroes", () => {

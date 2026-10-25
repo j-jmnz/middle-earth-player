@@ -384,17 +384,17 @@ The builder is a root route beside the campaign list.
 
 `deck_legal` is set at catalog build for `hero`, `ally`, `attachment`, `event`, and the later official player types (contracts, player side quests, treasures) once those `type_code` values are confirmed from a live pack payload. `Campaign`, encounter, quest, and nightmare rows are not deck-legal. TBR's pack file mixes heroes with `type_name: "Campaign"`. Filter those out in the build script, not in the UI.
 
-Universal rules, enforced on every save:
+Universal rules, enforced on every save, are the Rules Reference's (`rr.deckbuilding`; user decision 2026-10-25, replacing the earlier three-hero and sphere-match rules):
 
-- Exactly three heroes.
+- One to three heroes, no two with the same title.
 - At least 50 other cards.
-- At most three copies, and never more than the card's `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check. Official contract decks that change the hero count or the copy limit are a known limit of this proof of concept. Do not invent that support here.
-- A non-neutral card's sphere must match one of the heroes. A fellowship sphere card may be saved with no fellowship hero. Saga rules still run on the briefing loadout, not on this save.
+- At most three copies of a title, across its printings, and never more than the card's `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check. Official contract decks that change the hero count or the copy limit are a known limit of this proof of concept. Do not invent that support here.
+- A card's sphere does not have to match a hero to be saved. It needs a hero of that sphere to be played (`rr.resource-match`), which the table checks. Saga rules still run on the briefing loadout, not on this save.
 - A restriction record on a card (trait, sphere, campaign) is enforced when that record exists. If the printed deckbuilding limit has no record yet, the card can still be saved and carries the inactive-text mark. Do not invent a restriction, and do not ask the player to enforce it at the table.
 
 Fellowship rules run on the briefing loadout, not on the saved deck. MEC109 says Frodo is the only Ring-bearer in this box. The player chooses that hero. Do not insert a Frodo they did not choose.
 
-- The three-hero rule runs on the saved deck. The saga rules run on the loadout.
+- The hero count runs on the saved deck. The saga rules run on the loadout.
 - The first seat's loadout has exactly one Fellowship-sphere Ring-bearer. Once The One Ring is attached, that hero does not count toward the hero limit.
 - The Ring-bearer slot is required when the saved deck has no Ring-bearer, and unused when it already has one. A fourth hero is legal only when the extra hero is that Ring-bearer.
 - No second Frodo in that seat's cards.
@@ -533,7 +533,7 @@ Chrome follows [design-system.md](design-system.md). Phase 17 writes that file f
 | Booklet | Full-screen native reader for one stored PDF. Close sits in thumb reach and returns to the screen that opened it. The engine does not read the file. A missing file does not block a scenario. The control offers to add the booklet and names which book is absent. Ids for this box: `fellowship-of-the-ring` and `learn-to-play`. The same reader opens both. Opening from a scenario starts on that scenario's page index when one is recorded, and otherwise on the saved last page. Turning a page writes the last page. It is not a Skia surface and not a WebView. |
 | Card | Full-screen view of the cached RingsDB file. Lists and this screen use `expo-image`. The table decodes the same file with Skia, at the size on screen. A tap on a table card opens this route. The picture stays on the canvas. |
 | Card pool | Search and filters. Loads card rows when the screen opens, then filters in memory. No campaign writes. |
-| Deck | Three hero slots, count against 50, copy limit, saga-only badge. Save without a campaign check. |
+| Deck | Up to three hero slots, count against 50, copy limit by title, saga-only badge. Save without a campaign check. |
 
 ## Build order
 

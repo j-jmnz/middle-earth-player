@@ -106,7 +106,7 @@ export function addDraftCard(card: DraftAdd): void {
     if (draft.heroes.length >= 3) {
       update({
         ...draft,
-        heldRefusal: { cardCode: card.code, cardName: card.name, rule: "Exactly three heroes." },
+        heldRefusal: { cardCode: card.code, cardName: card.name, rule: "At most three heroes." },
       });
       return;
     }

@@ -25,8 +25,6 @@ export type DeckRestriction =
   | { cardCode: string; kind: "sphere"; sphere: string }
   | { cardCode: string; kind: "campaignId" };
 
-const OPEN_SPHERES = new Set(["neutral", "fellowship"]);
-
 export function traitTokens(traits: string | null): string[] {
   if (!traits) return [];
   const tokens: string[] = [];
@@ -74,6 +72,9 @@ function combinedCounts(cards: readonly DeckSaveEntry[]): DeckSaveEntry[] {
   return combined;
 }
 
+// The Rules Reference's deckbuilding rules (rr.deckbuilding): 1 to 3 heroes, at least 50 player cards, and at most 3
+// copies of a title, whichever printings they are. A card's sphere does not have to match a hero to be in a deck: it
+// needs a matching hero to be played (rr.resource-match), which the table checks.
 export function deckSaveRefusal(
   heroCodes: readonly string[],
   cards: readonly DeckSaveEntry[],
@@ -103,11 +104,17 @@ export function deckSaveRefusal(
 
   if (heroCodes.length > 3) {
     const extra = heroCodes[3];
-    if (!extra) return { cardCode: null, cardName: null, rule: "Exactly three heroes." };
+    if (!extra) return { cardCode: null, cardName: null, rule: "At most three heroes." };
     const fact = facts.get(extra);
-    return named(extra, fact?.name ?? extra, "Exactly three heroes.");
+    return named(extra, fact?.name ?? extra, "At most three heroes.");
   }
-  if (heroCodes.length !== 3) return { cardCode: null, cardName: null, rule: "Exactly three heroes." };
+  if (heroCodes.length === 0) return { cardCode: null, cardName: null, rule: "At least one hero." };
+  const heroNames = new Set<string>();
+  for (const code of heroCodes) {
+    const fact = facts.get(code);
+    if (fact && heroNames.has(fact.name)) return named(code, fact.name, "A hero appears once.");
+    if (fact) heroNames.add(fact.name);
+  }
 
   const combined = combinedCounts(cards);
   for (const card of cards) {
@@ -117,30 +124,23 @@ export function deckSaveRefusal(
       return named(card.code, fact.name, "Count must be at least 1.");
     }
   }
+  // Copies count by title: two printings of one card share the 3-copy limit and the lower deck limit.
+  const byTitle = new Map<string, { code: string; count: number; deckLimit: number | null }>();
   for (const card of combined) {
     const fact = facts.get(card.code);
     if (!fact) return unresolved(card.code);
-    const rule = copyCapRule(card.count, fact.deckLimit);
-    if (rule) return named(card.code, fact.name, rule);
+    const title = byTitle.get(fact.name);
+    const deckLimit = title?.deckLimit == null ? fact.deckLimit : fact.deckLimit == null ? title.deckLimit : Math.min(title.deckLimit, fact.deckLimit);
+    byTitle.set(fact.name, { code: title?.code ?? card.code, count: (title?.count ?? 0) + card.count, deckLimit });
+  }
+  for (const [name, title] of byTitle) {
+    const rule = copyCapRule(title.count, title.deckLimit);
+    if (rule) return named(title.code, name, rule);
   }
 
   let total = 0;
   for (const card of combined) total += card.count;
   if (total < 50) return { cardCode: null, cardName: null, rule: "At least 50 cards." };
-
-  const heroSpheres = new Set<string>();
-  for (const code of heroCodes) {
-    const sphere = facts.get(code)?.sphereCode;
-    if (sphere) heroSpheres.add(sphere);
-  }
-
-  for (const card of combined) {
-    const fact = facts.get(card.code);
-    if (!fact) return unresolved(card.code);
-    const sphere = fact.sphereCode;
-    if (sphere == null || OPEN_SPHERES.has(sphere)) continue;
-    if (!heroSpheres.has(sphere)) return named(card.code, fact.name, "Sphere must match a hero.");
-  }
 
   const inDeck = new Set(codes);
   for (const restriction of restrictions) {

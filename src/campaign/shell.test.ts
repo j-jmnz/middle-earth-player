@@ -86,8 +86,9 @@ describe("briefing", () => {
     expect(startFor({ ...own, ringBearer: FRODO }, SEED).seats[0]?.heroes).toEqual([FRODO, SAM, MERRY]);
   });
 
-  it("refuses a deck that does not have exactly three heroes, and a seat with no deck", () => {
-    expect(briefing(inputOf(past, { seats: [seat([SAM, MERRY])] })).problems[0]?.rule).toBe("Exactly three heroes");
+  it("deals a deck of two heroes (rr.deckbuilding), refuses one of none, and refuses a seat with no deck", () => {
+    expect(briefing(inputOf(past, { seats: [seat([SAM, MERRY])] })).problems).toEqual([]);
+    expect(briefing(inputOf(past, { seats: [seat([])] })).problems[0]?.rule).toBe("One to three heroes");
     expect(briefing(inputOf(past, { seats: [{ deckId: null, heroes: [], deck: [] }] })).problems[0]?.rule).toBe("Choose a deck");
   });
 

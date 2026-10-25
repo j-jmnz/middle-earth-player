@@ -74,11 +74,11 @@ function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSea
   const problems: Problem[] = [];
   const { world } = input;
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
-  // The three-hero rule runs on the saved deck.
+  // The hero count (1 to 3, rr.deckbuilding) runs on the saved deck.
   input.seats.slice(0, input.seatCount).forEach((seat, index) => {
     const label = input.seatCount === 1 ? "The deck" : `Seat ${index + 1}'s deck`;
     if (seat.deckId == null) problems.push({ rule: "Choose a deck", message: `Choose a saved deck for seat ${index + 1}.` });
-    else if (seat.heroes.length !== 3) problems.push({ rule: "Exactly three heroes", message: `${label} has ${seat.heroes.length} heroes. A saved deck has exactly three.` });
+    else if (seat.heroes.length < 1 || seat.heroes.length > 3) problems.push({ rule: "One to three heroes", message: `${label} has ${seat.heroes.length} heroes. A saved deck has one to three.` });
     for (const code of seat.heroes) {
       const fell = (input.log.fallenHeroesBySeat.flat()).includes(code);
       if (fell) problems.push({ rule: "A fallen hero cannot start", message: `${nameOf(code)} is a fallen hero and cannot start.` });
