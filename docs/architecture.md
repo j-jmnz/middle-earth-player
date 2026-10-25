@@ -252,7 +252,7 @@ The first screen paints from SQLite. It does not scan the image directory, query
 
 `scripts/build-catalog.ts` reads `data/cards` and `data/raw/ringsdb/packs.json` and writes `catalog.db` and the `CATALOG_VERSION` constant (a hash of the rows). It does not fetch, and it does not write effects or scenarios: the app imports those from `src/effects` and `data/`. Identifiers are RingsDB codes. A card without a RingsDB row takes the code Hall of Beorn gives its Black Riders or Road Darkens printing, and `data/overrides.json` carries the two that have none.
 
-`assets/catalog.db`, `.cache/`, card images and booklet PDFs are gitignored. The game icons in `assets/icons` are small app assets built from `data/raw/icons` and are committed (`docs/design-system.md`, Icons). `data/` is committed, raw snapshots included, so no session starts without card text, scenario piles or rules text.
+`assets/catalog.db`, `.cache/`, card images and booklet PDFs are gitignored. The game icons in `assets/icons` are small app assets built from `data/raw/icons` and are committed (`docs/design-system.md`, Icons); `.gitignore` exempts their PNGs and the raw DragnCards token PNGs from the card-image rule, so a fresh clone builds without `pnpm data:sync icons`. `data/` is committed, raw snapshots included, so no session starts without card text, scenario piles or rules text.
 
 ## Tests
 
