@@ -4,6 +4,7 @@ import {
   addDraftCard,
   draftCopyCount,
   getDeckDraft,
+  newDeckId,
   removeDraftHero,
   replaceDeckDraft,
   startNewDeck,
@@ -46,5 +47,16 @@ describe("deck draft", () => {
     expect(getDeckDraft().droppedNote).toBe("Dropped Elrond.");
     removeDraftHero("h3");
     expect(getDeckDraft().heroes).toEqual(["h0", "h1", "h2"]);
+  });
+});
+
+describe("newDeckId", () => {
+  it("is the time and an eight-character random tail, without crypto", () => {
+    expect(newDeckId(0, () => 0)).toBe("deck-0-00000000");
+    expect(newDeckId(36, () => 0.5)).toBe("deck-10-i0000000");
+  });
+
+  it("differs between two decks saved in the same millisecond", () => {
+    expect(newDeckId(1000)).not.toBe(newDeckId(1000));
   });
 });

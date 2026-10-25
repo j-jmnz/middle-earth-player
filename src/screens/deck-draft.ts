@@ -24,6 +24,12 @@ export type DraftAdd = {
   deckLimit: number | null;
 };
 
+// Hermes has no global `crypto`, so a saved deck's id is the time and a random tail rather than `crypto.randomUUID()`.
+// The `deck-` prefix keeps it apart from a starter deck's slug.
+export function newDeckId(now: number = Date.now(), random: () => number = Math.random): string {
+  return `deck-${now.toString(36)}-${Math.floor(random() * 36 ** 8).toString(36).padStart(8, "0")}`;
+}
+
 function blankDraft(id: string): DeckDraft {
   return { id, name: "", heroes: [], cards: [], heldRefusal: null, droppedNote: null };
 }

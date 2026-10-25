@@ -7,7 +7,7 @@ import { TextInput, View } from "react-native";
 import { deckSaveRefusal, type DeckSaveCard } from "../../catalog/deck-save";
 import { cards } from "../../catalog/schema";
 import { BodyText, Eyebrow, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SphereMark, markedSphere, type MarkedSphere } from "../chrome";
-import { replaceDeckDraft } from "../deck-draft";
+import { newDeckId, replaceDeckDraft } from "../deck-draft";
 import {
   buildDecklist,
   cardUrl,
@@ -166,7 +166,7 @@ export default function DeckImportScreen() {
       return;
     }
     user.insert(decks).values({
-      id: crypto.randomUUID(),
+      id: newDeckId(),
       name: built.name.trim(),
       heroes: [...built.heroes],
       cards: built.cards.map((card) => ({ code: card.code, count: card.count })),

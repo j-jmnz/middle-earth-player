@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
@@ -93,6 +94,27 @@ describe("campaign store", () => {
     restoreSave(user, "save-d");
     expect(listSaves(user).map((save) => save.id).sort()).toEqual([other.id, "save-d"].sort());
     expect(readSave(user, "save-d")).toEqual({ ...kept, log: { ...kept.log, notes: "still archived" } });
+  });
+
+  it("lists the save written last first, and a restore does not move it ahead", () => {
+    const user = openUser();
+    writeSave(user, newSave("save-h", "fellowship-of-the-ring", 1), 100);
+    writeSave(user, newSave("save-i", "fellowship-of-the-ring", 2), 200);
+    expect(listSaves(user).map((save) => save.id)).toEqual(["save-i", "save-h"]);
+    writeSave(user, newSave("save-h", "fellowship-of-the-ring", 1), 300);
+    expect(listSaves(user).map((save) => save.id)).toEqual(["save-h", "save-i"]);
+    archiveSave(user, "save-i", 400);
+    restoreSave(user, "save-i");
+    expect(listSaves(user).map((save) => save.id)).toEqual(["save-h", "save-i"]);
+  });
+
+  it("keeps rows never written since the order column in the order they were made, after the written ones", () => {
+    const user = openUser();
+    writeSave(user, newSave("save-j", "fellowship-of-the-ring", 1));
+    writeSave(user, newSave("save-k", "fellowship-of-the-ring", 1));
+    writeSave(user, newSave("save-l", "fellowship-of-the-ring", 1), 50);
+    user.update(saves).set({ updatedAt: null }).where(inArray(saves.id, ["save-j", "save-k"])).run();
+    expect(listSaves(user).map((save) => save.id)).toEqual(["save-l", "save-j", "save-k"]);
   });
 
   it("deletes one save and leaves the others", () => {
