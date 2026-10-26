@@ -1,7 +1,7 @@
 // Conditions in effect records, the targets an instruction names, and the phase names a condition reads.
 import { z } from "zod";
 
-import { pickSchema, sphereSchema } from "./effect-schema-pick.ts";
+import { pickSchema } from "./effect-schema-pick.ts";
 
 export const phaseNameSchema = z.enum([
   "Setup",

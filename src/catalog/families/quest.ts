@@ -2,9 +2,9 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
-import { amountSchema, cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
+import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
-import { pickSchema, sphereSchema } from "../effect-schema-pick.ts";
+import { pickSchema } from "../effect-schema-pick.ts";
 
 export const VERBS = [
   // Commits the card (the picked card by default) to the quest without exhausting it, and announces `committed`. `stat:
@@ -13,8 +13,6 @@ export const VERBS = [
   // The location (the picked card by default) becomes the active location; any other active location returns to the staging
   // area. This is not traveling: no Travel cost or Travel effect, no `traveled` event (131013:A:2, 19034:A:1).
   z.strictObject({ verb: z.literal("MakeActive"), target: cardRefSchema.optional(), ...when }),
-  // The players travel to the location (the picked card by default) without resolving its Travel effect (145007:A:2).
-  z.strictObject({ verb: z.literal("TravelTo"), target: cardRefSchema.optional(), ...when }),
   // Moves progress tokens to the last picked location, from the source card, the current quest card or the card picked before
   // the last: `amount` (at most what is there), or `all`. With `choose` the actor chooses how many, from 1 to `amount` (or to
   // all of them). Progress placed on a location can explore it (04008:A:1, 12037:A:2, 17034:A:2).

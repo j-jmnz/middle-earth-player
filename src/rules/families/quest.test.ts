@@ -229,8 +229,8 @@ describe("choosing X (rr.the-word-choose)", () => {
     const source = add(state, "onward", "hand");
     const ctx = { effects: [elevenses], cards };
     const asked = run(source.state, elevenses, source.id, [elevenses]);
-    expect(asked.window).toEqual({ kind: "choose", seat: 0, options: ["1", "2"] });
-    const one = expectOk(reduce(asked, { type: "Choose", optionId: "1" }, ctx));
+    expect(asked.window).toEqual({ kind: "choose", seat: 0, options: ["x1", "x2"] });
+    const one = expectOk(reduce(asked, { type: "Choose", optionId: "x1" }, ctx));
     expect(one.state.window?.kind).toBe("choose");
     const picked = expectOk(reduce(one.state, { type: "Choose", optionId: heroes[0]?.[1] ?? "" }, ctx));
     expect(picked.state.cards[heroes[0]?.[1] ?? ""]).toMatchObject({ committed: false, exhausted: false });
@@ -245,7 +245,7 @@ describe("spending resources in an effect (rr.resources)", () => {
     { id: "discard", instructions: [{ verb: "Discard", target: { kind: "self" } }] },
   ] }]);
 
-  it("offers to pay only when the heroes hold enough of the sphere, and asks which hero pays when more than one can", () => {
+  it("offers to pay only when the heroes hold enough of the sphere, and pays from the only pools that can when they hold just enough", () => {
     const { state: base, heroes } = table(2);
     const ally = add(base, "eagle", "play");
     const broke = run(ally.state, pay, ally.id, [pay]);
@@ -258,9 +258,8 @@ describe("spending resources in an effect (rr.resources)", () => {
     rich = updateCard(second.state, second.id, { resources: 1 });
     const asked = settle(pushCardEffects(rich, "forced", ally.id, 0, false, [pay], ctx, []), ctx, []);
     expect(asked.window?.kind).toBe("choose");
-    const chose = expectOk(reduce(asked, { type: "Choose", optionId: "pay" }, ctx));
-    expect(chose.state.window?.kind).toBe("choose");
-    const first = expectOk(reduce(chose.state, { type: "Choose", optionId: second.id }, ctx));
+    // Two Tactics pools hold one resource each: both pay, with nothing to choose (families/costs-verbs.ts spendResources).
+    const first = expectOk(reduce(asked, { type: "Choose", optionId: "pay" }, ctx));
     expect(first.state.cards[second.id]?.resources).toBe(0);
     expect(first.state.cards[heroes[0]?.[1] ?? ""]?.resources).toBe(0);
     expect(first.state.cards[heroes[1]?.[0] ?? ""]?.resources).toBe(1);

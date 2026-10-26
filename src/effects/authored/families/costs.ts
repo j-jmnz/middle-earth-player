@@ -307,7 +307,7 @@ export const RECORDS: readonly Effect[] = [
   },
   { id: "18002:constant:1", cardCode: "18002", lines: ["18002:A:1"], timing: "constant", instructions: [{ verb: "PaysAsIcons", pick: { type: "card", control: "you", cardType: "attachment", trait: "Item" }, icons: ["leadership", "lore", "tactics"] }] },
   { id: "19145:constant:1", cardCode: "19145", lines: ["19145:A:1"], timing: "constant", instructions: [{ verb: "PaysAsIcons", pick: { type: "card", control: "you", cardType: "ally", trait: "Creature" }, icons: ["leadership", "spirit", "tactics"] }] },
-  { id: "22054:constant:1", cardCode: "22054", lines: ["22054:A:2"], timing: "constant", instructions: [{ verb: "PaysAsIcons", pick: { type: "card", control: "you", cardType: "event", keyword: "doomed" }, icons: ["leadership", "spirit", "tactics"] }] },
+  { id: "22054:constant:2", cardCode: "22054", lines: ["22054:A:2"], timing: "constant", instructions: [{ verb: "PaysAsIcons", pick: { type: "card", control: "you", cardType: "event", keyword: "doomed" }, icons: ["leadership", "spirit", "tactics"] }] },
   { id: "22062:constant:1", cardCode: "22062", lines: ["22062:A:1"], timing: "constant", instructions: [{ verb: "PaidByIcons", heroes: { type: "hero", control: "you", trait: "Rohan" }, icons: ["spirit"] }] },
 
   // Additional costs and who may not pay.

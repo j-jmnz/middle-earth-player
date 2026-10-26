@@ -1,13 +1,12 @@
 // Rules: rr.framework-steps, rr.step-3-3, rr.step-3-4, rr.step-5-3, rr.engagement-check, rr.resources (data/rules/entries.json).
 // The conditions the quest family adds (src/catalog/effect-schema-conditions.ts): where the round is in its framework steps,
-// whether an enemy was engaged this encounter phase, the current quest card's keywords, and whether resources can pay.
+// whether an enemy was engaged this encounter phase, and the current quest card's keywords.
 import type { Condition } from "../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../interpret.ts";
-import { heroPays } from "../payments.ts";
 import { printedOf } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
-import { flagged, livingSeats, reached } from "../state.ts";
+import { flagged, reached } from "../state.ts";
 
 type Step = Extract<Condition, { kind: "step" }>["is"];
 

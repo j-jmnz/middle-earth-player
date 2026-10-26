@@ -13,7 +13,6 @@ import { pickedList } from "../player-verbs.ts";
 import { printedOf } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
 import { updateCard } from "../state.ts";
-import { travelNow } from "../travel.ts";
 import { fireForced } from "../triggers.ts";
 import { patchTop, topFrame } from "../windows.ts";
 import { moveCard } from "../zones.ts";
@@ -36,14 +35,6 @@ export function makeActive(state: ScenarioState, instruction: Verb<"MakeActive">
   if (next.activeLocation && next.activeLocation !== id) next = moveCard(next, next.activeLocation, { zone: "staging" });
   next = moveCard(next, id, { zone: "activeLocation" });
   return fireForced(next, { trigger: "becameActive", seat: null, cardId: id }, ctx, steps);
-}
-
-// The players travel to the location without resolving its Travel effect (145007:A:2): only while there is no active location
-// and nothing forbids the travel.
-export function travelWithoutEffect(state: ScenarioState, instruction: Verb<"TravelTo">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
-  if (!isLocation(state, id, ctx)) return state;
-  return travelNow(state, id, ctx, steps) ?? state;
 }
 
 // Where moved progress comes from: the source card, the current quest card, or the card picked before the last.

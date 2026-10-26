@@ -4,7 +4,7 @@ import type { Instruction, SimpleInstruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../cause.ts";
-import { askTarget, openBranch } from "../choices.ts";
+import { openBranch } from "../choices.ts";
 import { characters } from "../combat.ts";
 import { hasTrait } from "../conditions.ts";
 import type { EngineStep } from "../intents.ts";
@@ -16,10 +16,10 @@ import { isCharacterType, isPlayerType, printedOf } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import type { Modifier, QueueItem, ScenarioState } from "../state.ts";
 import { inPlay, livingSeats, updateCard } from "../state.ts";
-import { patchTop, topFrame } from "../windows.ts";
+import { topFrame } from "../windows.ts";
 import { attachTo, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
-import { lowerCardThreat, makeActive, moveProgress, travelWithoutEffect } from "./quest-places.ts";
+import { lowerCardThreat, makeActive, moveProgress } from "./quest-places.ts";
 import { raiseQuestThreat, resetThreat } from "./quest-threat.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -31,8 +31,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return commitToQuest(state, instruction, focus, ctx, steps);
     case "MakeActive":
       return makeActive(state, instruction, focus, ctx, steps);
-    case "TravelTo":
-      return travelWithoutEffect(state, instruction, focus, ctx, steps);
     case "MoveProgress":
       return moveProgress(state, instruction, focus, ctx, steps, (current, max, option) => askNumber(current, max, option, focus, ctx, steps));
     case "LowerCardThreat":
@@ -71,14 +69,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 function withModifier(state: ScenarioState, modifier: Modifier): ScenarioState {
   return { ...state, modifiers: [...state.modifiers, modifier] };
-}
-
-// The instruction runs next in the running effect, before the rest of its queue.
-function prepend(state: ScenarioState, instruction: Instruction, seat: number, steps: EngineStep[]): ScenarioState {
-  const data = topFrame(state)?.data;
-  if (data?.kind !== "effect") return state;
-  const item: QueueItem = { instruction, seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) };
-  return patchTop(state, { data: { ...data, queue: [item, ...data.queue] } });
 }
 
 // The actor chooses a number from 1 to `max`: a Choose the engine makes, one option per number (rr.the-word-choose). With one
