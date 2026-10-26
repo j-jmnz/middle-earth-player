@@ -2,6 +2,7 @@
 // faq.limitations-on-attacks (data/rules/entries.json).
 import type { CardRef, Instruction } from "../../catalog/boundary.ts";
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";
+import { continueStrike } from "../combat.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { pickCandidates } from "../pick.ts";
@@ -14,18 +15,19 @@ import type { ScenarioState } from "../state.ts";
 import { flagged, updateCard } from "../state.ts";
 import { playerAttackWindow } from "../step-window.ts";
 import { topFrame } from "../windows.ts";
-import { awaitStrike, declareStrike, pickAttacker } from "./attack-flow.ts";
+import { awaitStrike, declareStrike, discardPlayedEvent, pickAttacker } from "./attack-flow.ts";
 import type { Focus } from "./index.ts";
 
 // The verbs src/catalog/families/attack.ts adds, for player attacks: attack modifiers and targets, immediate attacks, attacks into the staging area. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "DeclareAttack":
-      return declareAttack(state, instruction, focus, ctx);
+      return declareAttack(state, instruction, focus, ctx, steps);
     case "OfferAttacks": {
       // A player card's choice of targets: an enemy immune to player card effects is not offered.
       const targets = pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx);
-      return targets.length > 0 ? { ...state, window: { kind: "playerAttack", targets }, activeSeat: focus.seat, passed: [] } : state;
+      if (targets.length === 0) return state;
+      return { ...discardPlayedEvent(state, topFrame(state)?.id), window: { kind: "playerAttack", targets }, activeSeat: focus.seat, passed: [] };
     }
     case "QuestProgress": {
       const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
@@ -58,7 +60,7 @@ export function commitCard(state: ScenarioState, target: CardRef, focus: Focus):
 // attack (rr.attacks-outside-the-combat-phase): the Responses to the declaration, the action windows, strength and damage, and
 // the end of the attack. It is an extra attack (faq.limitations-on-attacks), declared by the attacker's controller. A declared
 // attacker exhausts (rr.step-6-8b): it must be ready, unless the effect's cost already exhausted it.
-function declareAttack(state: ScenarioState, instruction: Extract<Instruction, { verb: "DeclareAttack" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
+function declareAttack(state: ScenarioState, instruction: Extract<Instruction, { verb: "DeclareAttack" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const scope = frameScope(state, focus.seat, focus.sourceId);
   const picked = scope.picked ?? [];
   const attackerId = instruction.attacker ? refCard(state, instruction.attacker, scope) : (picked.at(-2) ?? null);
@@ -75,7 +77,7 @@ function declareAttack(state: ScenarioState, instruction: Extract<Instruction, {
   let next = exhausts ? updateCard(state, attackerId, { exhausted: true }) : state;
   next = queueEvent(next, { trigger: "declaredAttacker", seat, cardId: attackerId, other: enemyId });
   next = declareStrike({ ...next, window: null }, { seat, enemyId, attackerIds: [attackerId], back: null, ...(instruction.ranged ? { ranged: true } : {}) });
-  next = pickAttacker(next, attackerId, frameId);
+  next = discardPlayedEvent(pickAttacker(next, attackerId, frameId), frameId);
   // 6.8.1: an action window comes before its strength; the Responses to the declaration resolve first either way.
-  return playerAttackWindow(next, ctx, "strike") ?? awaitStrike(next);
+  return playerAttackWindow(next, ctx, "strike") ?? awaitStrike(next, ctx) ?? continueStrike(next, ctx, steps);
 }

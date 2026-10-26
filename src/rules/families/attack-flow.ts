@@ -8,9 +8,12 @@
 import type { Modifier } from "../frame-types.ts";
 import { pushEffectFrame } from "../effect-frames.ts";
 import type { EngineStep } from "../intents.ts";
+import type { ReduceContext } from "../interpret.ts";
 import { queueEvent } from "../queue.ts";
+import { heard, strikeWaits } from "./attack-events.ts";
 import type { PendingStrike, ScenarioState, Window } from "../state.ts";
 import { pushFrame } from "../windows.ts";
+import { moveCard } from "../zones.ts";
 
 // The attack is declared and in progress from now on. It remembers the player the enemy is engaged with, and the attack it was
 // declared during (an attack an effect makes inside another one's action window). An attacker's Attack "for its next attack
@@ -30,10 +33,11 @@ function useNextAttackBonuses(state: ScenarioState, attackerIds: readonly string
 }
 
 // No action window opens after the declaration (6.8.1): the attack still waits until the Responses to "is declared as an
-// attacker" have resolved (rr.response), and settle then goes on with its strength and damage (continueStrike).
-export function awaitStrike(state: ScenarioState): ScenarioState {
+// attacker" have resolved (rr.response) and the constants that read who is attacking are rebuilt, and settle then goes on
+// with its strength and damage (continueStrike). Null when no card in the game asks for that wait: the attack goes straight on.
+export function awaitStrike(state: ScenarioState, ctx: ReduceContext): ScenarioState | null {
   const strike = state.pendingStrike;
-  if (!strike) return state;
+  if (!strike || !strikeWaits(state, ctx)) return null;
   return { ...state, pendingStrike: { ...strike, awaiting: "strike", awaitDepth: state.stack.length } };
 }
 
@@ -50,12 +54,14 @@ export function strikeResumes(state: ScenarioState): boolean {
 // attacker hears `attacked`; effects delayed until the end of the attack resolve, with the enemy as their other card. Then the
 // window the attack came from comes back: the combat phase's player attack window, a card's window with the targets still left,
 // or none (an effect declared it and goes on), and an attack it was declared during is in progress again.
-export function endStrike(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+export function endStrike(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const strike = state.pendingStrike;
   if (!strike) return state;
   const held = new Set([...strike.attackerIds, strike.enemyId]);
   let next: ScenarioState = { ...state, modifiers: state.modifiers.filter((modifier) => !(modifier.until === "endOfAttack" && held.has(modifier.instanceId))) };
-  for (const attackerId of strike.attackerIds) next = queueEvent(next, { trigger: "attacked", seat: strike.seat, cardId: attackerId, other: strike.enemyId, participants: strike.attackerIds });
+  if (heard(next, ctx, "attacked")) {
+    for (const attackerId of strike.attackerIds) next = queueEvent(next, { trigger: "attacked", seat: strike.seat, cardId: attackerId, other: strike.enemyId, participants: strike.attackerIds });
+  }
   const window: Window | null = strike.back === undefined ? { kind: "playerAttack" } : strike.back;
   next = { ...next, pendingStrike: strike.outer ?? null, window, ...(window ? { activeSeat: strike.seat } : {}) };
   const due = next.delayed.filter((entry) => entry.until === "endOfAttack");
@@ -91,6 +97,19 @@ export function backAfter(window: Window | null, enemyId: string): Pick<PendingS
   if (window?.kind !== "playerAttack" || !window.targets) return {};
   const targets = window.targets.filter((id) => id !== enemyId);
   return { back: targets.length > 0 ? { kind: "playerAttack", targets } : null };
+}
+
+// An event whose effect goes on into an attack and its action windows leaves the hand now: it is in its owner's discard pile
+// when its effect is done anyway, and a card still in the hand could be played again in those windows.
+export function discardPlayedEvent(state: ScenarioState, frameId: string | undefined): ScenarioState {
+  const index = state.stack.findIndex((frame) => frame.id === frameId);
+  const frame = state.stack[index];
+  if (!frame || frame.data.kind !== "effect" || frame.data.finish !== "discardSource" || !frame.cardId) return state;
+  const card = state.cards[frame.cardId];
+  if (card?.zone !== "hand" || card.controller == null) return state;
+  const { finish: _done, ...data } = frame.data;
+  const moved = moveCard(state, frame.cardId, { zone: "discard", seat: card.controller });
+  return { ...moved, stack: moved.stack.map((entry, at) => (at === index ? { ...entry, data } : entry)) };
 }
 
 // What the instructions after DeclareAttack act on: the attacker, as the last picked card.

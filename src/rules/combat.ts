@@ -248,7 +248,7 @@ export function applyPlayerAttack(
   const declared: ScenarioState = declareStrike(next, { seat, enemyId, attackerIds: [...attackerIds], ...backAfter(state.window, enemyId) });
   // 6.8.1: the attack and its attackers are declared; an action window comes before its strength and damage. The Responses to
   // the declaration ("After ~ is declared as an attacker") resolve before them either way (families/attack-flow.ts).
-  return playerAttackWindow(declared, ctx, "strike") ?? awaitStrike(declared);
+  return playerAttackWindow(declared, ctx, "strike") ?? awaitStrike(declared, ctx) ?? continueStrike(declared, ctx, steps);
 }
 
 // The rest of a declared player attack after its step window: the damage (6.8.2, 6.8.3), the window after it, and the end
@@ -264,7 +264,7 @@ export function continueStrike(state: ScenarioState, ctx: ReduceContext, steps: 
     if (after) return after;
   }
   // 6.8.4: "for this attack" expires, the window the attack came from comes back (families/attack-flow.ts).
-  return endStrike({ ...next, pendingStrike: next.pendingStrike ?? declared }, steps);
+  return endStrike({ ...next, pendingStrike: next.pendingStrike ?? declared }, ctx, steps);
 }
 
 // The attackers' strength against the enemy's defense, as combat damage. The attackers are already exhausted: a player

@@ -13,6 +13,7 @@ import { printedOf } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import type { CardInstance, PendingStrike, ScenarioState } from "../state.ts";
 import { flagged, inPlay } from "../state.ts";
+import { heard } from "./attack-events.ts";
 
 type Attacking = Extract<Condition, { kind: "attacking" }>;
 
@@ -80,11 +81,11 @@ export function struck(
     if (excess > 0) next = placeDamage(next, strike.excessTo, excess, ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   }
   const about = { seat, other: enemyId, participants: attackerIds };
-  if (hurt) for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDamaged", cardId: attackerId, ...about });
+  if (hurt && heard(next, ctx, "attackDamaged")) for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDamaged", cardId: attackerId, ...about });
   if (!destroyed) return next;
-  for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDestroyed", cardId: attackerId, subject: enemyId, ...about });
+  for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, other: enemyId, participants: attackerIds });
   const engaged = was.zone === "engaged" ? was.controller : null;
-  if (engaged != null) {
+  if (engaged != null && heard(next, ctx, "attackDestroyedEngaged")) {
     for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDestroyedEngaged", cardId: attackerId, subject: enemyId, ...about, seat: engaged });
   }
   for (const modifier of next.modifiers.filter((entry) => entry.stat === "drawOnAttackDestroy" && entry.instanceId === `seat:${seat}`)) {

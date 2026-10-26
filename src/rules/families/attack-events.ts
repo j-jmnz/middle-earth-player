@@ -10,6 +10,18 @@ import type { ScenarioState } from "../state.ts";
 import { heldAmount } from "../state.ts";
 import { gameReads } from "./costs-pay.ts";
 
+// Whether some card in the game hears this trigger: the attack family's own events are queued only then (attackDamaged,
+// attackDestroyedEngaged, attacked).
+export function heard(state: ScenarioState, ctx: ReduceContext, trigger: string): boolean {
+  return gameReads(state, ctx, `"trigger":"${trigger}"`);
+}
+
+// Whether a declared player attack waits before its strength is read: when a card in the game answers "is declared as an
+// attacker", or reads whether a card is attacking (a constant settle rebuilds, "While Aragorn is attacking").
+export function strikeWaits(state: ScenarioState, ctx: ReduceContext): boolean {
+  return heard(state, ctx, "declaredAttacker") || gameReads(state, ctx, '"attacking"');
+}
+
 // A drained `engaged` event marks its seat until the end of the round (an endOfRound modifier on "seat:N").
 export function noteEngaged(state: ScenarioState, event: GameEvent, ctx: ReduceContext): ScenarioState {
   if (event.trigger !== "engaged" || event.seat == null || engagedThisRound(state, event.seat)) return state;
