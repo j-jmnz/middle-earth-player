@@ -267,7 +267,7 @@ export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: R
 }
 
 // An encounter card its own text attached to a card "counts as" an attachment with a trait while it is attached ("Counts as a
-// Condition attachment", 141043:A:2, 141055:A:2): its CountsAs records.
+// Condition attachment", 141043:A:2, 141055:A:2; rr.attachment-cards): the traits its CountsAs records give it.
 function countedTraits(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
   const instance = state.cards[id];
   if (!instance || instance.zone !== "attached" || instance.host == null) return [];
@@ -277,9 +277,7 @@ function countedTraits(state: ScenarioState, id: string, ctx: ReduceContext): st
 }
 
 export function countsAsAttachment(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
-  const instance = state.cards[id];
-  if (!instance || instance.zone !== "attached" || instance.host == null) return false;
-  return ctx.effects.some((effect) => effect.cardCode === instance.code && effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === "CountsAs"));
+  return countedTraits(state, id, ctx).length > 0;
 }
 
 // What the constant records of a card's attachments give it: the Gondor trait from Steward of Gondor, a resource icon

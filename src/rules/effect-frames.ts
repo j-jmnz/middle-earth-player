@@ -10,11 +10,10 @@ import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
-import { dealOneShadow, runInstruction, type ReduceContext } from "./interpret.ts";
+import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { runEncounterItem } from "./families/encounter-items.ts";
 import { chooseEach } from "./families/deck-each.ts";
 import { lookedDeckSeat } from "./families/deck-rules.ts";
-import { discardShadowOf } from "./shadow.ts";
 import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
@@ -25,7 +24,7 @@ import { holdsNow, seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { chooseAmount } from "./families/defense.ts";
-import { queueHeard } from "./families/defense-listen.ts";
+import { dealAttackShadow } from "./families/defense-listen.ts";
 
 export type EffectSpec = {
   frame: FrameName;
@@ -302,12 +301,8 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
 function immediateAttack(state: ScenarioState, sourceId: string | null, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
-  // An attack an effect makes is dealt a shadow card of its own; one dealt for an earlier attack is discarded first
-  // (rr.attacks-outside-the-combat-phase, faq.additional-attacks). A card just dealt is heard as in the combat phase ("look
-  // at 1 shadow card that was just dealt to an enemy attacking you", 01071:A:2).
-  const cleared = discardShadowOf(state, sourceId);
-  const shadowed = dealOneShadow(cleared, sourceId);
-  const dealt = shadowed !== cleared ? queueHeard(shadowed, ctx, { trigger: "shadowsDealt", seat: enemy.controller }) : shadowed;
+  // An attack an effect makes is dealt a shadow card of its own (families/defense-listen.ts).
+  const dealt = dealAttackShadow(state, sourceId, ctx);
   const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };

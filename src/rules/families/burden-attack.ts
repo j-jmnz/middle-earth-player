@@ -8,14 +8,14 @@ import type { Instruction } from "../../catalog/boundary.ts";
 import { beginEnemyAttack } from "../combat.ts";
 import { attackBarred } from "../constants.ts";
 import type { EngineStep } from "../intents.ts";
-import { dealOneShadow, type ReduceContext } from "../interpret.ts";
+import type { ReduceContext } from "../interpret.ts";
 import { printedOf } from "../printed.ts";
-import { discardShadowOf } from "../shadow.ts";
 import type { PendingAttack, QueueItem, ScenarioState } from "../state.ts";
 import { livingSeats } from "../state.ts";
 import { patchTop } from "../windows.ts";
 import type { Focus } from "./index.ts";
 import { declaredDefenders } from "./defense-defenders.ts";
+import { dealAttackShadow } from "./defense-listen.ts";
 import { effectData } from "./encounter-moves.ts";
 
 type Each = Extract<Instruction, { verb: "ImmediateAttackEach" }>;
@@ -33,7 +33,7 @@ function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceContext, s
   if (enemy?.zone !== "engaged" || enemy.controller == null || attackBarred(state, enemyId, enemy.controller)) return state;
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  const dealt = dealOneShadow(discardShadowOf(counted, enemyId), enemyId);
+  const dealt = dealAttackShadow(counted, enemyId, ctx);
   const begun = beginEnemyAttack(dealt, enemy.controller, enemyId, ctx, steps);
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }

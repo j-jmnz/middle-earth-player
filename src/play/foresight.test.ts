@@ -107,7 +107,11 @@ describe("several defenders (Stand Together, 01038:A:1)", () => {
     let run = begin(settle({ ...withMode(funded, "combatStart"), window: null }, tab.ctx, []));
     run = send(run, { type: "PlayCard", cardId: stand ?? "", payments: payFor(run.state, tab.ctx, stand ?? "") }, tab.ctx);
     run = send(passWindows(run, tab.ctx), { type: "DeclareDefender", defenderId: gimli ?? "" }, tab.ctx);
-    // Another defender, or done (families/defense-defenders.ts moreDefenders).
+    // Another defender, or done (families/defense-defenders.ts moreDefenders). Holding "another" pools nothing yet.
+    const branch = sheetFor(run.state, tab.ctx, legalIntents(run.state, tab.ctx), names);
+    if (branch?.kind !== "pick") throw new Error("no branch sheet");
+    expect(branch.title).toBe(`${pounder} attacks`);
+    expect(readoutFor(run.state, tab.ctx, branch, { key: branch.key, ids: ["another"], shares: [] }, (id) => id)?.result).not.toContain("one defender you choose");
     run = send(run, { type: "Choose", optionId: "another" }, tab.ctx);
     const legal = legalIntents(run.state, tab.ctx);
     const sheet = sheetFor(run.state, tab.ctx, legal, names);

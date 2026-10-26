@@ -138,11 +138,12 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
   if (records.length === 0) {
     // An event whose only records are Responses is played from its Response window, never as an ordinary play.
     const code = state.cards[cardId]?.code ?? "";
-    if (ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "response")) return "That card cannot be played";
+    const own = ctx.effects.filter((effect) => effect.cardCode === code);
+    if (own.some((effect) => effect.timing === "response")) return "That card cannot be played";
     // An event with no record at all: as the engine applies it, its Action could not change the game state, so it is not
     // initiated (rr.triggered-ability: "can only be initiated if its effect has the potential to change the game state on
     // its own"; user decision 2026-10-26, brief, Effects, layer 3).
-    if (!ctx.effects.some((effect) => effect.cardCode === code)) return "The app does not apply that card's text yet, so it cannot be played";
+    if (own.length === 0) return "The app does not apply that card's text yet, so it cannot be played";
     return null;
   }
   const running = runningActions(state, cardId, seat, ctx);

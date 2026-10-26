@@ -93,7 +93,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         // The damage the strike placed comes before the next attack: say so when there is none.
         const rest = steps.slice(index + 1);
         const end = rest.findIndex((later) => later.kind === "strike" || later.kind === "attack");
-        const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => later.kind === "damage" && later.targetId === step.targetId);
+        const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => later.kind === "damage" && later.amount > 0 && later.targetId === step.targetId);
         if (!placed) line("No damage");
         return;
       }

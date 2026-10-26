@@ -98,6 +98,9 @@ function declareMore(pick: PickSpec, times: number): Instruction[] {
   }));
 }
 
+// The effect id of the frame in which further defenders are declared (the table names its sheet and readout by it).
+export const DEFENDERS_FRAME = "defense:defenders";
+
 // After the defending player declared a defender, a seat that may declare any number of defenders this phase (Stand Together,
 // 01038) declares the others in a frame; the attack goes on to the window after the declaration when it is done.
 export function moreDefenders(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -107,7 +110,7 @@ export function moreDefenders(state: ScenarioState, ctx: ReduceContext, steps: E
   const count = pickCandidates(state, pick, attack.seat, [], null, ctx).length;
   if (count === 0) return null;
   const waiting: ScenarioState = { ...state, pendingAttack: { ...attack, awaiting: "defenders", awaitDepth: state.stack.length } };
-  return pushEffectFrame(waiting, { frame: "ResolveEffect", sourceId: null, actor: attack.seat, peril: false, effectId: "defense:defenders", instructions: declareMore(pick, count), cancel: null, blockCancel: null }, steps);
+  return pushEffectFrame(waiting, { frame: "ResolveEffect", sourceId: null, actor: attack.seat, peril: false, effectId: DEFENDERS_FRAME, instructions: declareMore(pick, count), cancel: null, blockCancel: null }, steps);
 }
 
 // The damage of a defended attack when the family decides it: several defenders pool their Defense and the defending player

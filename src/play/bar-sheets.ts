@@ -183,6 +183,15 @@ export function multiIntent(sheet: MultiSheet, ids: readonly string[]): PlayerIn
   }
 }
 
+// The card's own rule on how many pools pay (PayDistinctHeroes): "from 3 different heroes' pools", "from a single hero's pool".
+function distinctWords(distinct: PayRequest["distinct"]): string {
+  if (!distinct) return "";
+  if (distinct.max === 1) return " Pay from a single hero.";
+  if (distinct.min != null && distinct.max != null) return ` Pay from ${distinct.min} to ${distinct.max} different heroes.`;
+  if (distinct.min != null) return ` Pay from ${distinct.min} different heroes.`;
+  return distinct.max != null ? ` Pay from at most ${distinct.max} heroes.` : "";
+}
+
 /** The pay sheet for a card or an effect whose cost takes resources. */
 export function paySheet(game: ScenarioState, names: SheetNames, request: PayRequest, purpose: DistributePurpose): DistributeSheet {
   const source = names.card(request.cardId);
@@ -191,7 +200,7 @@ export function paySheet(game: ScenarioState, names: SheetNames, request: PayReq
     key: `pay:${request.cardId}:${purpose.kind}`,
     step: STEP_WORDS[game.mode],
     title: request.exact ? `Pay ${request.total} for ${source}` : `Pay for ${source}`,
-    note: `${request.exact ? "" : "X is what you pay. "}Tap a hero to take one resource from its pool.${request.distinct?.min ? ` Pay from ${request.distinct.min} different heroes.` : ""}`,
+    note: `${request.exact ? "" : "X is what you pay. "}Tap a hero to take one resource from its pool.${distinctWords(request.distinct)}`,
     total: request.total,
     exact: request.exact,
     options: request.pools.map((pool) => ({ ...option(game, names, pool.heroId), max: pool.max })),

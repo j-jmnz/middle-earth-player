@@ -18,6 +18,7 @@ import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./
 import { threatRows } from "./foresight.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
+import { DEFENDERS_FRAME } from "../rules/families/defense-defenders.ts";
 import { freeSlot } from "../rules/families/south-locations.ts";
 import { has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
@@ -208,11 +209,14 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       // Two-handed, the sheet says whose decision it is: the first player's for "the first player must either" (rr.first-player).
       const who = game.seatCount > 1 ? ` Player ${window.seat + 1} chooses.` : "";
       const wait = data?.wait;
+      const defending = data?.effectId === DEFENDERS_FRAME;
       const base = {
         kind: "pick" as const,
         key: `choose:${frame?.id ?? ""}:${window.options.join(",")}`,
         step: effect ? TIMING_WORDS[effect.timing] : step(game),
-        title: source ? names.card(source) : "Choose",
+        // Stand Together's further defenders (families/defense-defenders.ts): the sheet names the attack it is about.
+        title: source ? names.card(source) : defending && game.pendingAttack ? `${names.card(game.pendingAttack.enemyId)} attacks` : "Choose",
+        ...(defending && game.pendingAttack ? { stats: statOf(game, ctx, game.pendingAttack.enemyId, "attack") } : {}),
         primary: null,
         alternative: null,
       };
@@ -247,7 +251,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // Copies of one card in different zones are told apart by where each one is.
           const label = outOfPlay ? outOfPlayLabel(game, id, words) : card.label;
           // Another defender's pooled damage (Stand Together, families/defense-defenders.ts).
-          const pooled = data?.effectId === "defense:defenders" ? extraDefender(game, ctx, id) : null;
+          const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
           return { ...card, label, ...(pooled ?? {}), intent: { type: "Choose", optionId: id } };
         }),
       };

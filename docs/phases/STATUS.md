@@ -131,12 +131,26 @@ User directive: every deck-legal player card is automated, and every card the si
 
 ## Table experience merged with the mechanic families, 2026-10-26
 
-Branch `ccr-c7b5b4ea-4ei4kn` (table experience, Not applied, the core Learn to Play decks) merged with main after `ccr-a8ef8247-8087n8` landed (user request). Main's history had been rewritten, so the merge used `99da7ae` as its base. Green offline: `pnpm test`, `pnpm lint`, `tsc` and `pnpm data:check`. ENGINE_VERSION 7.
+Branch `ccr-c7b5b4ea-4ei4kn` (table experience, Not applied, the core Learn to Play decks) merged with main after `ccr-a8ef8247-8087n8` landed (user request). Main's history had been rewritten, so the merge used `99da7ae` as its base. Green offline: `pnpm test`, `pnpm lint`, `tsc` and `pnpm data:check`. ENGINE_VERSION 8 (7 at the merge, 8 after the review fixes).
 
 - **One implementation each:** main's records for the 01xxx core cards (`pool/Core.ts`, the families) replace this branch's, which repeated them line for line; main's verbs replace this branch's (`card-verbs.ts`, `damage-verbs.ts` are gone): healing, putting into play, looking at a shadow card, several defenders (`families/defense-defenders.ts`, which now exports `standingDefenders` and `pooledDefense` for the readout and foresight), "3 different heroes" (`PayDistinctHeroes`; the pay sheet reads `distinct`).
 - **Kept from this branch on main's engine:** the Responses of one occurrence share one window, and an offer whose cost cannot be paid yet waits (`responses.ts`, `usage.ts` `offerable`, `events.ts`); an event with no record cannot be played (`planning.ts`); Thalin hears only the encounter deck's reveals (`byEncounterDeck`); Dark Knowledge hears the shadow card of an attack outside combat; `CountsAs` (141043, 141055); a heal is a step in the log; an Action or Response with nothing to act on is not offered (01058, 01061, 01072).
 - **Not applied:** the per-line check now reads a card outside the box ledger with the pool's own line reading (`src/catalog/pool-lines.ts`), so it names exactly the lines of `src/effects/open-lines.ts`; `scripts/effect-coverage.test.ts` checks the two agree. Tests that show a card with no record take that card's records away, since main has records for nearly every pool card.
 - **Test fixtures:** fixture events that are played (`filler`, `secret`, Ford's `filler`) got a no-op Action record. Main's Steward of Orthanc test played the deck filler instead of the second Quick; it plays Quick now.
 - **Seeds:** unchanged (A Knife in the Dark: true solo 35, two-handed 4, two-handed with a seat eliminated 10); the goldens were regenerated.
-- **Open:** `reviewer` and `ux` on the merge (below, when run); the phone checks of both branches (no phone in a cloud session).
+- **Reviews:** `reviewer` and `ux` ran on the merge. Fixed:
+  - Holding "another" no longer reads as a pooled defender.
+  - The further-defender sheet names the attack and its strength.
+  - The pay note says "single hero" (`distinct.max`).
+  - The location lines are clamped, and the facedown Ring-bearer line is gold.
+  - Both immediate-attack paths deal the shadow card through one helper, so Dark Knowledge hears both (`dealAttackShadow`).
+  - Each event of one occurrence is its own triggering condition for the offers.
+  - A heal no longer hides the banner's "No damage".
+  - `DEFENDERS_FRAME` replaces the string.
+- **Left as notes:**
+  - A confirmed "another" cannot be backed out of. The engine's declaration frame has no pass.
+  - `CountsAs` and `byEncounterDeck` live in the shared schema rather than a family.
+  - `why.ts` matches the engine's "different heroes" refusal by its wording.
+  - The new press targets need a 44 pt check on a phone.
+- **Open:** the phone checks of both branches (no phone in a cloud session).
 

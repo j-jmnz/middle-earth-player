@@ -68,7 +68,8 @@ export function offerResponses(state: ScenarioState, event: GameEvent, ctx: Redu
   const offers = [event, ...also]
     .flatMap((each) => collect(state, each, ctx))
     .filter((offer) => {
-      const key = `${offer.cardId}|${offer.effectId}|${offer.seat}`;
+      // Each event of the occurrence is its own triggering condition: a card that hears two of them is offered twice.
+      const key = `${offer.cardId}|${offer.effectId}|${offer.seat}|${offer.event ? (aboutCard(offer.event) ?? "") : ""}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -133,7 +134,10 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
   const seat = state.window.seat;
   // The event the used Response answers: one of the occurrence's events, when the window holds several.
   const event = frame.data.offers.find((offer) => offer.cardId === intent.cardId && offer.effectId === intent.effectId && offer.seat === seat)?.event ?? frame.data.event;
-  const left = frame.data.offers.filter((offer) => !(offer.cardId === intent.cardId && offer.effectId === intent.effectId));
+  const opened = frame.data.event;
+  // The offer is spent for this event only (every seat's, for "any player may trigger"); one for another event of the
+  // occurrence stays, and the effect's limit decides whether it is still usable.
+  const left = frame.data.offers.filter((offer) => !(offer.cardId === intent.cardId && offer.effectId === intent.effectId && (offer.event ?? opened) === event));
   // The seat answering pays: its threat for a raiseThreat cost, its deck for discardDeckTop, its use of a per-player limit.
   const paid = payUsage(patchTop(state, { data: { ...frame.data, offers: left } }), effect, intent.cardId, intent.payments ?? [], ctx, steps, seat);
   return pushEffectFrame(

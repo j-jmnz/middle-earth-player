@@ -250,12 +250,12 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
             <View>
               {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} line={ledgerLine} />}
               {locations && locations.active.length > 0 ? (
-                <Text testID="active-locations" className="text-label text-muted">
+                <Text testID="active-locations" className="text-label text-muted" numberOfLines={2}>
                   {`Active: ${locations.active.map(nameOf).join(" and ")}`}
                 </Text>
               ) : null}
               {locations?.heldUnder ? (
-                <Text testID="ring-bearer-held" className="text-label text-muted">
+                <Text testID="ring-bearer-held" className="text-label text-gold" numberOfLines={2}>
                   {`The Ring-bearer is facedown under ${nameOf(locations.heldUnder)}`}
                 </Text>
               ) : null}

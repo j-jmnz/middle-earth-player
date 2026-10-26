@@ -4,9 +4,10 @@
 // plays exactly as before.
 import type { Trigger } from "../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../interpret.ts";
+import { dealOneShadow, type ReduceContext } from "../interpret.ts";
 import { effectsOf } from "../listen.ts";
 import { queueEvent } from "../queue.ts";
+import { discardShadowOf } from "../shadow.ts";
 import type { GameEvent, PendingAttack, ScenarioState } from "../state.ts";
 import { inPlay } from "../state.ts";
 
@@ -21,6 +22,16 @@ export function listened(state: ScenarioState, ctx: ReduceContext, triggers: rea
 // Queues the event when some card could hear its trigger; otherwise the state is unchanged.
 export function queueHeard(state: ScenarioState, ctx: ReduceContext, event: GameEvent): ScenarioState {
   return listened(state, ctx, [event.trigger]) ? queueEvent(state, event) : state;
+}
+
+// An attack outside the combat phase is dealt a shadow card of its own; one dealt for an earlier attack is discarded first
+// (rr.attacks-outside-the-combat-phase, faq.additional-attacks). A card just dealt is heard as in the combat phase ("look at 1
+// shadow card that was just dealt to an enemy attacking you", 01071:A:2).
+export function dealAttackShadow(state: ScenarioState, enemyId: string, ctx: ReduceContext): ScenarioState {
+  const cleared = discardShadowOf(state, enemyId);
+  const dealt = dealOneShadow(cleared, enemyId);
+  const seat = state.cards[enemyId]?.controller ?? null;
+  return dealt.cards[enemyId]?.shadowId != null && seat != null ? queueHeard(dealt, ctx, { trigger: "shadowsDealt", seat }) : dealt;
 }
 
 // The attack waits, with no window open, until the queued events on these triggers have been announced and everything they
