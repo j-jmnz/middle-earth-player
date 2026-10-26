@@ -81,7 +81,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"141083:shadow:1","cardCode":"141083","lines":["141083:A:3"],"timing":"shadow","instructions":[{"verb":"Pick","pick":{"type":"character","control":"you","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}}]},
 
   // 141084 Overcome by Terror
-  {"id":"141084:whenRevealed:1","cardCode":"141084","lines":["141084:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":RING},"who":"firstPlayer","when":{"kind":"exhausted","code":RING,"is":false}},{"verb":"DiscardRandomFromHand","amount":2,"who":"firstPlayer","when":{"kind":"exhausted","code":RING,"is":true}}]},
+  // "If The One Ring is already exhausted" is the other branch of one choice, so exhausting it does not also discard.
+  {"id":"141084:whenRevealed:1","cardCode":"141084","lines":["141084:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Choose","who":"firstPlayer","options":[{"id":"exhaust","requires":{"kind":"exhausted","code":RING,"is":false},"instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":RING},"who":"firstPlayer"}]},{"id":"discard","requires":{"kind":"exhausted","code":RING,"is":true},"instructions":[{"verb":"DiscardRandomFromHand","amount":2,"who":"firstPlayer"}]}]}]},
   {"id":"141084:shadow:1","cardCode":"141084","lines":["141084:A:3"],"timing":"shadow","instructions":[{"verb":"DiscardRandomFromHand"}]},
 ];
 

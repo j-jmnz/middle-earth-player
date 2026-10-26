@@ -9,6 +9,7 @@ import { attachmentPickWords, attachmentWords } from "./attachment-words.ts";
 import { deckPickWords, deckWords } from "./deck-words.ts";
 import { encounterPickWords, encounterWords } from "./encounter-words.ts";
 import { attackWords } from "./attack-words.ts";
+import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden-words.ts";
 import { playPickWords, playWords } from "./play-words.ts";
 
 export type ChoiceNames = {
@@ -136,7 +137,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     case "CancelEffect":
       return "cancel those effects";
     case "Engage":
-      return "engage that enemy";
+      return instruction.target === "self" && sourceId ? `engage ${names.card(sourceId)}` : "engage that enemy";
     case "Discard":
       return instruction.target.kind === "self" ? "discard this card" : "discard it";
     case "PlaceProgressOn":
@@ -258,7 +259,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction);
+      return burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction);
   }
 }
 
@@ -267,6 +268,8 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   const option = choose.options.find((entry) => entry.id === optionId);
   if (!option) return capital(optionId);
   if (option.instructions.length === 0) return "Do nothing";
+  const whole = burdenBranchWords(option.instructions);
+  if (whole) return whole;
   // A run of "pick a hero, remove it from the quest" is one decision: how many heroes leave the quest.
   const removals = option.instructions.filter((instruction) => instruction.verb === "RemoveFromQuest").length;
   const picks = option.instructions.filter((instruction): instruction is PickInstruction => instruction.verb === "Pick");
@@ -306,6 +309,8 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
   const play = playPickWords(pick);
   if (play) return play;
+  const burden = burdenPickWords(pick, next);
+  if (burden) return burden;
   if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);
