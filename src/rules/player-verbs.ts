@@ -3,7 +3,8 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
-import { characters, strikeEnemy } from "./combat.ts";
+import { characters } from "./combat.ts";
+import { declareAttack } from "./families/attack.ts";
 import { enforceRestricted } from "./attach.ts";
 import { placeProgress } from "./effect-verbs.ts";
 import { queueEvent } from "./queue.ts";
@@ -251,14 +252,10 @@ export function runPlayerVerb(
       const attached = queueEvent(attachTo(placed, attachment, host), { trigger: "enteredPlay", seat: focus.seat, cardId: attachment });
       return enforceRestricted(attached, host, ctx, steps);
     }
-    case "AttackEnemy": {
-      const list = pickedList(state);
-      const attackerId = list.at(-2) ?? "";
-      const enemyId = list.at(-1) ?? "";
-      const attacker = state.cards[attackerId];
-      if (!attacker || !state.cards[enemyId] || attacker.controller == null) return state;
-      return strikeEnemy(state, attacker.controller, enemyId, [attackerId], ctx, steps);
-    }
+    // The attack resolves with the steps of a player attack: its declaration is announced and "for this attack" ends with it
+    // (families/attack.ts, the DeclareAttack of an attacker its cost exhausted).
+    case "AttackEnemy":
+      return declareAttack(state, { verb: "DeclareAttack", exhausted: true }, focus, ctx, steps);
     default:
       return null;
   }

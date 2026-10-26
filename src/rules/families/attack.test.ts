@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { expectOk } from "../fixture.ts";
 import { modifiedStat } from "../keywords.ts";
-import { legalIntents, legalTargets, reduce } from "../reduce.ts";
+import { legalIntents, reduce } from "../reduce.ts";
 import { actionWindow, record, table } from "./attack-fixture.ts";
 
 // Rules: rr.step-6-8b, rr.step-6-8-1, rr.step-6-8-2, rr.step-6-8-3, rr.step-6-8-4, rr.response, rr.lasting-effects, rr.ranged,

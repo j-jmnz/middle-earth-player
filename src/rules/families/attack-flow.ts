@@ -22,10 +22,10 @@ export function declareStrike(state: ScenarioState, strike: PendingStrike): Scen
   const enemy = state.cards[strike.enemyId];
   const engaged = enemy?.zone === "engaged" && enemy.controller != null ? { engagedSeat: enemy.controller } : {};
   const outer = state.pendingStrike ? { outer: state.pendingStrike } : {};
-  return useNextAttackBonuses({ ...state, pendingStrike: { ...strike, ...engaged, ...outer } }, strike.attackerIds);
+  return spendNextAttackBonuses({ ...state, pendingStrike: { ...strike, ...engaged, ...outer } }, strike.attackerIds);
 }
 
-function useNextAttackBonuses(state: ScenarioState, attackerIds: readonly string[]): ScenarioState {
+function spendNextAttackBonuses(state: ScenarioState, attackerIds: readonly string[]): ScenarioState {
   const kept = state.modifiers.filter((modifier) => modifier.stat === "nextAttackBonus" && attackerIds.includes(modifier.instanceId));
   if (kept.length === 0) return state;
   const bonuses: Modifier[] = kept.map((modifier) => ({ instanceId: modifier.instanceId, sourceId: modifier.sourceId, stat: "attack", amount: modifier.amount, until: "endOfAttack" }));

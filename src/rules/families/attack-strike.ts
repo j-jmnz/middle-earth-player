@@ -70,7 +70,8 @@ export function struck(
 ): ScenarioState {
   const was = before.cards[enemyId];
   const now = damaged.cards[enemyId];
-  if (!was) return damaged;
+  // An enemy that left play before the damage was neither damaged nor destroyed by this attack.
+  if (!was || !inPlay(was.zone)) return damaged;
   const destroyed = !now || !inPlay(now.zone);
   const hurt = destroyed || now.damage > was.damage;
   let next = damaged;

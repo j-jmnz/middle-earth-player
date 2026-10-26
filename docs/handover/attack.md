@@ -49,3 +49,9 @@ Sword of Númenor: minHitPoints. Derufin, Brand: attackDestroyedEngaged. Swift a
 engagedWith picked holders + group spend + drawOnAttackDestroy on pickedSeat. Rain of Arrows: Each engagedWith picked.
 Mithlond Sea-watcher: count topOfDiscard ally. Firefoot: declaredAttacker + ExcessDamageTo. Dwarrowdelf Axe: attacked + DamageCard
 other. Ithilien Archer: attackDamaged + ReturnToStaging other.
+
+## Interrupted by the API usage limit (2026-10-26, about 11:30 UTC)
+
+The main session committed the uncommitted work as it stood, unreviewed and possibly not compiling, in the commit after
+this note's previous version. The agent's last stated next step was: "Now add a helper in attack-flow.ts to put a played event in the discard pile once it opens attack windows."
+Before continuing: run `pnpm exec tsc --noEmit` and the family tests, and finish or revert that step.

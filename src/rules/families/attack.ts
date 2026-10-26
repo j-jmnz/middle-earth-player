@@ -60,7 +60,7 @@ export function commitCard(state: ScenarioState, target: CardRef, focus: Focus):
 // attack (rr.attacks-outside-the-combat-phase): the Responses to the declaration, the action windows, strength and damage, and
 // the end of the attack. It is an extra attack (faq.limitations-on-attacks), declared by the attacker's controller. A declared
 // attacker exhausts (rr.step-6-8b): it must be ready, unless the effect's cost already exhausted it.
-function declareAttack(state: ScenarioState, instruction: Extract<Instruction, { verb: "DeclareAttack" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function declareAttack(state: ScenarioState, instruction: Extract<Instruction, { verb: "DeclareAttack" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const scope = frameScope(state, focus.seat, focus.sourceId);
   const picked = scope.picked ?? [];
   const attackerId = instruction.attacker ? refCard(state, instruction.attacker, scope) : (picked.at(-2) ?? null);
