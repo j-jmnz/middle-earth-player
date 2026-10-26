@@ -181,7 +181,7 @@ describe("cards that leave play by their own rule", () => {
     expect(state.cards[sellsword.id]?.zone).toBe("play");
     expect(state.cards[table.heroes[2] ?? ""]?.resources).toBe(4);
     // No Leadership resource to spend: discarded.
-    const broke = [0, 2].reduce((acc, index) => updateCard(acc, table.heroes[index] ?? "", { resources: 0 }), ending);
+    const broke = [0, 2].reduce<ScenarioState>((acc, index) => updateCard(acc, table.heroes[index] ?? "", { resources: 0 }), ending);
     expect(crossTo(broke, "Beginning of round", ctx).cards[sellsword.id]?.zone).toBe("discard");
   });
 
