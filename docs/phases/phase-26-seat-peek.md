@@ -120,3 +120,16 @@ The table makes plain that this is not the seat acting. Who acts never changes b
 ## Handover from phase 22
 
 - A seat's dial can carry a small gold Ring mark (`threat-<seat>-ring`) on its label while the Ring-bearer is facedown under a location; it sits on the first player's dial (the seat that gets the hero back, `heldBy` in `src/play/widgets.ts`), and the dial's accessibility label says so (`ringWords`). The peek's eye mark and bone ring must not crowd it at 667x375.
+
+## Handover from phase 23
+
+Phase 23 is merged. What phase 26 builds on:
+
+- Every duration, curve and spring is a token in `src/play/motion-tokens.ts` (`MOTION`; distances and scales in `SHAPE`). Add the peek's slide there (`peekSlide`, `tween(250, "outCubic")` in, and an ease-in `tween` for the way back if it differs). Every token stays at or under 500 ms (`motion-tokens.test.ts`), and `rg -n "duration\(|withTiming\(.*[0-9]{3}" src/play` finds nothing outside `motion-tokens.ts`.
+- Every duration passes through `motionScale(speed, reduced)` (1 Normal, 0.6 Quick, 0 under reduced motion), read once with `useMotionScale()` (`motion-run.ts`); hand Reanimated `timing(token, scale)`. Scale 0 is the reduced-motion snap the phase asks for.
+- The seat handoff (two-handed play), which a peek must not play:
+  - The dial pulse: `src/play/table-chrome.tsx`, a gold ring on the acting seat's dial, 1 to `SHAPE.seatPulse` (1.12) and back, two halves of `MOTION.seatPulseHalf` (150 ms; `seatPulse` 300 ms is the whole). It fires only when the dial's `active` goes false to true, never on mount. A peek changes the shown seat, not `activeSeat`, so keep the dial's `active` on `activeSeat`.
+  - The hand slide and the cross-fade: `motionsBetween(prev, next, zone, { handoff })` (`src/play/motion.ts`) slides the new seat's hand up from `SHAPE.seatHandRise` (0.6 of the card height) and fades its other slots in, both over `MOTION.seatHand` (300 ms), while the old seat's cards fade out as ghosts. `card-motion.native.tsx` passes `handoff: seat !== track.seat`, where the seat is the shown one. A peek also changes the shown seat, so pass the handoff flag from `activeSeat` changing (not the shown seat) and run the peek's own slide instead.
+- The hurry tap: a touch on the canvas calls `finishMotions(progress, clear)` in the canvas pan's `onBegin` (card clock to 1, pending `tickLand` dropped) and is then handled as usual. The peek's swipe starts with it; the slide must finish on a hurry too, and never delay or swallow an intent.
+- `tickLand()` (`src/play/haptics.ts`) is one light impact per new state when a played card lands; a peek is not a new state and plays none.
+- `tokenDeltas(prev, next)` (`token-deltas.ts`) pops tokens and floats numbers from the reducer's counts between two states. A peek shows the same state from another seat, so it must not read as a delta: key the pops by state, not by the shown seat.
