@@ -74,7 +74,7 @@ export function lossWords(reason: string): string {
 
 /**
  * What a card's damage comes to, in words, for the dock: "Sam Gamgee is destroyed", with the loss or the elimination it
- * causes; or, while a shadow card may still add to the attack, how much more it can take ("+2 more destroys Sam Gamgee").
+ * causes; or, while a shadow card may still add to the attack, how much more it can take ("2 more damage destroys Sam Gamgee").
  */
 export function outcomeWords(outcome: DamageOutcome, name: string, shadowNext: boolean): string {
   if (outcome.destroyed) {
@@ -82,7 +82,7 @@ export function outcomeWords(outcome: DamageOutcome, name: string, shadowNext: b
     if (outcome.eliminated.length > 0) return `${name} is destroyed: ${outcome.eliminated.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated`;
     return `${name} is destroyed`;
   }
-  if (shadowNext && outcome.spare != null) return `+${outcome.spare} more destroys ${name}`;
+  if (shadowNext && outcome.spare != null) return `${outcome.spare} more damage destroys ${name}`;
   return "";
 }
 

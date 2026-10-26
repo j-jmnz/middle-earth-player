@@ -7,7 +7,7 @@
 import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
-import { damageOutcome, defenseDamage, lossWords, undefendedDamage } from "./foresight.ts";
+import { damageOutcome, defenseDamage, undefendedDamage } from "./foresight.ts";
 import { has, option, statOf } from "./sheet-parts.ts";
 import type { Alternative, MultiSheet, OptionMark, Sheet, SheetNames, SheetStat } from "./sheet-types.ts";
 
@@ -18,7 +18,8 @@ function foreseen(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id
   const stats: SheetStat[] = [{ icon: "damage", value: damage, word: "Damage" }];
   const mark: OptionMark = { icon: "damage", value: damage, danger: outcome.destroyed };
   if (!outcome.destroyed) return { stats, suffix: "", mark };
-  const caution = outcome.loss ? `Tap again: ${names.card(id)} is destroyed, ${lossWords(outcome.loss)}` : undefined;
+  // Short enough for the two lines above the buttons; the readout says why the game is lost.
+  const caution = outcome.loss ? `Tap again: ${names.card(id)} falls and the game is lost` : undefined;
   return { stats, suffix: " · destroyed", mark, ...(caution ? { caution } : {}) };
 }
 

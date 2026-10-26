@@ -29,6 +29,9 @@ const DECISIONS: Readonly<Record<string, string>> = {
   "7.R": "Ready every card; each player's threat rises by 1; the first player token passes.",
 };
 
+// A step the chart draws as many boxes (the attack resolution charts) goes by one short name; its windows are listed under it.
+const NAMES: Readonly<Record<string, string>> = { "6.E": "Enemy attacks, one at a time", "6.P": "Player attacks, one enemy at a time" };
+
 // The action windows after each step that the table can pass (rail.ts names them), in order.
 const WINDOWS: Readonly<Record<string, readonly string[]>> = {
   "1.R": ["resourceActions"],
@@ -76,7 +79,7 @@ export function turnReference(game: ScenarioState, title: (id: string) => string
     if (!decision) continue;
     const step: ReferenceStep = {
       id: row.id,
-      titles: row.entries.map((entry) => (title(entry) ?? entry).replace(/^[0-9.ab]+\s*/, "")),
+      titles: NAMES[row.id] ? [NAMES[row.id] ?? ""] : row.entries.map((entry) => (title(entry) ?? entry).replace(/^[0-9.ab]+\s*/, "")),
       decision,
       current: row.id === now,
       windows: (WINDOWS[row.id] ?? []).map((id) => ({ id, title: pointTitle(id) ?? id, note: pointNote(id) ?? "" })),
@@ -93,6 +96,10 @@ export function stepOf(game: ScenarioState): string | null {
   return STEP_OF[game.mode] ?? null;
 }
 
+// The window in which the player makes a step's own decision. The guide explains a step there only, never in a Response, a
+// cancel or a pick that comes up inside it (Frodo's Response at staging is not the staging step's decision).
+const ASKS: Readonly<Record<string, string>> = { "2.P": "pass", "3.2": "pass", "4.2": "travel", "5.2": "optionalEngage", "6.E": "defense", "6.P": "playerAttack" };
+
 /**
  * The first-game guide's line for the moment (table-settings.ts, guide): the step's decision the first two times it comes up,
  * and what an action window is for. Null when the moment has no line. `key` counts how often it was shown.
@@ -101,5 +108,6 @@ export function guideLine(game: ScenarioState, window: boolean): { key: string; 
   if (window) return { key: "window", text: "An action window: play an event or use an Action now, or pass and the game moves on." };
   const step = stepOf(game);
   const decision = step ? DECISIONS[step] : undefined;
-  return step && decision ? { key: step, text: decision } : null;
+  if (!step || !decision || game.window?.kind == null || ASKS[step] !== game.window.kind) return null;
+  return { key: step, text: decision };
 }

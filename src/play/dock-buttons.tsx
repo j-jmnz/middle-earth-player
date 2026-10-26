@@ -5,7 +5,7 @@
 // it back. Arming changes no button's size, so the second tap lands where the first did. The parent keys this component on
 // the moment and the pick, so nothing stays armed into the next one.
 import { useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
+import { AccessibilityInfo, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { tickArmed } from "./haptics.ts";
@@ -45,6 +45,8 @@ export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Do
       if (!reduceMotion) left.set(withTiming(0, { duration: wait, easing: Easing.linear }));
       timer.current = setTimeout(() => setArmed(null), wait);
       tickArmed();
+      // A screen reader hears what the second tap does, the loss a caution names included.
+      AccessibilityInfo.announceForAccessibility(button.armed ?? `Tap again: ${button.label}`);
       return;
     }
     setArmed(null);
@@ -62,10 +64,11 @@ export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Do
   const line = armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : (dock.why ?? (dock.single ? ONLY : null));
   return (
     <View className="gap-1">
-      {/* One line above the buttons, always there: what the armed button's second tap does, or what the primary waits for. */}
-      <View style={{ minHeight: 20, justifyContent: "flex-end" }}>
+      {/* Two lines above the buttons, always held: what the armed button's second tap does (a caution names the loss in full),
+          or what the primary waits for. Arming moves nothing. */}
+      <View style={{ minHeight: 36, justifyContent: "flex-end" }}>
         {line ? (
-          <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} className={`text-center text-label ${armedButton ? (paper ? "text-inkLabel" : "text-gold") : paper ? "text-inkMuted" : "text-muted"}`}>
+          <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={2} className={`text-center text-label ${armedButton ? (paper ? "text-inkLabel" : "text-gold") : paper ? "text-inkMuted" : "text-muted"}`}>
             {line}
           </Text>
         ) : null}

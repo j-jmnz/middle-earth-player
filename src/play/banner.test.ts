@@ -93,5 +93,7 @@ describe("the first-game guide", () => {
     expect(guideLine(quest.state, true)?.key).toBe("window");
     const travel = buildTable(base, { start: "travel" });
     expect(guideLine(travel.state, false)?.key).toBe("4.2");
+    // A Response inside a step is not the step's decision: Frodo's Response at staging has no staging line.
+    expect(guideLine({ ...quest.state, mode: "staging", window: { kind: "response", seat: 0 } }, false)).toBeNull();
   });
 });

@@ -50,14 +50,19 @@ export function PhaseRail({ rail, narrow = false, onPress }: { rail: Rail; narro
       accessibilityHint={onPress ? "Opens the turn reference" : undefined}
       disabled={!onPress}
       onPress={onPress}
-      style={{ minWidth: 0, flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", paddingHorizontal: 8, minHeight: 44 }}
+      style={({ pressed }) => ({ minWidth: 0, flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", paddingHorizontal: 8, minHeight: 44, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
     >
       {narrow ? null : (
         <Text testID="rail-previous" numberOfLines={1} className="flex-1 text-right text-label text-muted">
           {rail.previous}
         </Text>
       )}
-      <Animated.View key={rail.current} entering={fade} style={{ marginHorizontal: 12, flexShrink: 1 }}>
+      {/* With the turn reference behind it, the current step sits in a hairline pill: it reads as something to tap. */}
+      <Animated.View
+        key={rail.current}
+        entering={fade}
+        style={{ marginHorizontal: 12, flexShrink: 1, ...(onPress ? { borderWidth: 1, borderColor: t.hairline, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 2 } : {}) }}
+      >
         <Text
           testID="rail-current"
           numberOfLines={1}
@@ -181,20 +186,22 @@ function ThreatDial({
   const deltaWords = change ? threatDeltaWords(name, change.before, change.after) : null;
   const critical = level === "critical" && !threat.eliminated;
   const engaging = ticks.filter((cost) => cost <= threat.threat).length;
-  const tickWords = ticks.length > 0 ? `, ${engaging} of ${ticks.length} enemies in staging engage at this threat` : "";
+  const tickWords = ticks.length === 0 ? "" : ticks.length === 1 ? `, the enemy in staging ${engaging === 1 ? "engages" : "does not engage"} at this threat` : `, ${engaging} of the ${ticks.length} enemies in staging engage at this threat`;
+  // The dial is one control with one name (the change badge's words included), so Android gives it one focus stop.
+  const dialWords = `${name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
       disabled={!onPress}
       onPress={onPress}
+      accessible
       accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={dialWords}
       accessibilityHint={onPress ? "Shows each enemy's engagement cost against your threat" : undefined}
-      style={{ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 4 }}
+      style={({ pressed }) => ({ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 4, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
     >
       <Animated.View style={pop}>
         <View
           testID={id}
-          accessible
-          accessibilityLabel={`${name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}`}
           className="h-10 flex-row items-center gap-1 overflow-hidden rounded-pill px-2.5 pb-1"
           style={{ minWidth: 64, borderWidth: 2, borderColor: look.edge, backgroundColor: look.fill }}
         >
@@ -222,7 +229,7 @@ function ThreatDial({
             exiting={badgeOut}
             style={{ borderRadius: 999, paddingHorizontal: 6, borderWidth: 1, borderColor: delta.lowered ? t.gold : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.gold : t.threat, 0.22) }}
           >
-            <Text testID={`${id}-delta`} accessible accessibilityLabel={deltaWords ?? undefined} className="font-display text-label text-bone">
+            <Text testID={`${id}-delta`} className="font-display text-label text-bone">
               {delta.text}
             </Text>
           </Animated.View>

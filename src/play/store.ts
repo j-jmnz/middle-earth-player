@@ -111,7 +111,8 @@ export function createTableStore(input: TableInput): TableStore {
         set({ refusal: result.reason });
         return false;
       }
-      const crossed = result.state.round !== before.round;
+      // A round ends with its refresh: setup (round 0) ends with no summary.
+      const crossed = result.state.round !== before.round && before.round > 0;
       const ended = crossed ? { ended: { round: before.round, steps: finishedRoundSteps([...get().roundSteps, ...result.steps]) } } : {};
       const moment: TableMoment = { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, after: result.state, steps: result.steps, ...ended };
       set({

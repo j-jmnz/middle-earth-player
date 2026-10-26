@@ -23,5 +23,7 @@ describe("the response window of one commit", () => {
     const run = send(begin(tab.state), { type: "Commit", cardIds: [aragorn, idsOf(tab, "01002")] }, tab.ctx);
     const sheet = sheetFor(run.state, tab.ctx, legalIntents(run.state, tab.ctx), names);
     expect(sheet?.kind === "trigger" ? sheet.note : "").toBe(`A Response may be used now, or passed. Waiting for its cost, and offered once it can be paid: ${aragorn}. Passing gives it up too.`);
+    // Aragorn was committed first, but only Théodred's Response is listed: the window is named after Théodred.
+    expect(sheet?.kind === "trigger" ? [sheet.title, sheet.sourceId] : []).toEqual([idsOf(tab, "01002"), idsOf(tab, "01002")]);
   });
 });

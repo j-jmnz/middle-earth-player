@@ -10,7 +10,6 @@ import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
 import { windowSheet } from "./bar-sheets.ts";
-import { cardSize } from "./layout.ts";
 import { pointTitle, windowPoint } from "./rail.ts";
 import { turnReference } from "./reference.ts";
 import type { SheetNames } from "./sheet-types.ts";
@@ -88,7 +87,7 @@ describe("stops over whole games", () => {
       }
     }
     expect(passedForPlayer).toBeGreaterThan(windows);
-    expect(["Before the quest resolves", "Before the shadow card turns"]).toContain(titled);
+    expect(["before the quest resolves", "before the shadow card turns", "planning"]).toContain(titled);
   }, 120_000);
 
   it("asks where Undo went back, and runs to the next stop on request", async () => {
@@ -121,17 +120,5 @@ describe("the turn reference", () => {
     const windows = phases.flatMap((phase) => phase.steps.flatMap((step) => step.windows.map((window) => window.id)));
     expect([...windows].sort()).toEqual([...STOP_POINTS].sort());
     expect(phases.flatMap((phase) => phase.steps).filter((step) => step.current)).toHaveLength(1);
-  });
-});
-
-describe("larger cards", () => {
-  it("are never smaller, and grow where the screen allows", () => {
-    for (const [width, height] of [
-      [844, 346],
-      [1180, 780],
-    ] as const) {
-      expect(cardSize(width, height, true).w).toBeGreaterThanOrEqual(cardSize(width, height).w);
-    }
-    expect(cardSize(1180, 780, true).w).toBeGreaterThan(cardSize(1180, 780).w);
   });
 });

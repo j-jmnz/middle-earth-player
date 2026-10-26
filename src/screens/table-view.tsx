@@ -80,7 +80,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // A reading panel over the table's right side: the threat panel (a tap on a dial) for a seat.
   const [reading, setReading] = useState<{ kind: "threat"; seat: number } | { kind: "reference" } | null>(null);
   const settings = useStore(tableSettings, (state) => state.settings);
-  const look = useMemo(() => ({ large: settings.largeCards, contrast: settings.highContrast }), [settings.largeCards, settings.highContrast]);
+  const look = useMemo(() => ({ contrast: settings.highContrast }), [settings.highContrast]);
   const [pile, setPile] = useState<PileId | null>(null);
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
@@ -258,7 +258,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               extras={choice.extras}
               resetKey={choice.resetKey}
               guide={choice.guide}
-              onHideGuide={choice.hideGuide}
             />
           </View>
         </View>
@@ -304,7 +303,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
             settings={settings}
             always={settings.alwaysUse.map((effectId) => {
               const code = ctx.effects.find((effect) => effect.id === effectId)?.cardCode;
-              return { effectId, label: code ? `${nameOf(code)}: always used` : effectId };
+              return { effectId, label: `Ask again: ${code ? nameOf(code) : effectId}` };
             })}
             onChange={(change) => tableSettings.getState().update(change)}
             onClose={() => setReading(null)}

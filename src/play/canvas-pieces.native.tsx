@@ -74,8 +74,9 @@ function Outlined({ x, y, text, font, color = t.bone, heavy = false }: { x: numb
  * action, and not danger, which marks a refusal.
  */
 export function NotAppliedMark({ rect }: { rect: Rect }) {
+  // At the right edge, just under the damage token's corner; the delayed effect's clock goes under it.
   const cx = rect.x + rect.w - 8;
-  const cy = rect.y + rect.h / 2;
+  const cy = rect.y + TOKEN + 3 + 6.5;
   return (
     <Group>
       <Circle cx={cx} cy={cy} r={6.5} color={t.night} />
@@ -360,50 +361,43 @@ export function Marks({ rect, tappable, picked, share, dimmed, fonts }: { rect: 
 }
 
 /**
- * A number the open pick draws on a card it asks about (the damage a defender would take, before the shadow card): the
- * token art and the number on a pill at the card's foot, threat red when it destroys the card. Upright, like the tokens.
+ * A number on a pill at a card's foot, upright like the tokens: the token art (or an icon) and the number, threat red with a
+ * danger edge when `danger`, night with a hairline otherwise. `lift` raises it above the token row, clear of the resource
+ * count a character may hold.
  */
-export function OptionMarkView({ rect, mark, fonts, images }: { rect: Rect; mark: OptionMark; fonts: Fonts; images: TokenImages }) {
+function FootPill({ rect, image, icon, value, danger, lift, fonts }: { rect: Rect; image: SkImage | null; icon: IconName; value: number; danger: boolean; lift: boolean; fonts: Fonts }) {
   const { x, y, w, h } = rect;
-  const text = String(mark.value);
+  const text = String(value);
   const width = TOKEN + fonts.badge.getTextWidth(text) + 8;
   const left = x + (w - width) / 2;
-  const top = y + h - TOKEN - 4;
-  const image = mark.icon === "damage" ? images.damage : null;
+  const top = y + h - TOKEN - 4 - (lift ? TOKEN + 2 : 0);
   return (
     <Group>
-      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={mark.danger ? t.threat : t.night} />
-      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={mark.danger ? t.danger : t.hairline} style="stroke" strokeWidth={1} />
-      {image ? <Image image={image} x={left + 1} y={top + 1} width={TOKEN - 2} height={TOKEN - 2} fit="contain" /> : <CanvasIcon name={mark.icon} x={left + 3} y={top + 3} size={TOKEN - 6} color={t.bone} />}
+      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={danger ? t.threat : t.night} />
+      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={danger ? t.danger : t.hairline} style="stroke" strokeWidth={1} />
+      {image ? <Image image={image} x={left + 1} y={top + 1} width={TOKEN - 2} height={TOKEN - 2} fit="contain" /> : <CanvasIcon name={icon} x={left + 3} y={top + 3} size={TOKEN - 6} color={t.bone} />}
       <Text x={left + TOKEN + 2} y={top + TOKEN - 5} text={text} font={fonts.badge} color={t.bone} />
     </Group>
   );
+}
+
+/** A number the open pick draws on a card it asks about: the damage a defender would take, before the shadow card. */
+export function OptionMarkView({ rect, mark, fonts, images }: { rect: Rect; mark: OptionMark; fonts: Fonts; images: TokenImages }) {
+  return <FootPill rect={rect} image={mark.icon === "damage" ? images.damage : null} icon={mark.icon} value={mark.value} danger={mark.danger} lift fonts={fonts} />;
+}
+
+/** An enemy's engagement cost in staging: threat red when the shown seat's threat engages it at the checks (rr.engagement-check). */
+export function EngagementMark({ rect, cost, engages, fonts, images }: { rect: Rect; cost: number; engages: boolean; fonts: Fonts; images: TokenImages }) {
+  return <FootPill rect={rect} image={images.engagementCost} icon="threat" value={cost} danger={engages} lift={false} fonts={fonts} />;
 }
 
 /**
- * An enemy's engagement cost in staging, at its foot: the engagement token art and the number, on threat red when the
- * shown seat's threat engages it at the checks (rr.engagement-check), on night when it stays. Upright, like the tokens.
+ * A card a delayed effect will act on (Sneak Attack's return): a small clock at the right edge, under the damage token and
+ * the not-applied mark, clear of the effect pills down the left edge. The preview says what.
  */
-export function EngagementMark({ rect, cost, engages, fonts, images }: { rect: Rect; cost: number; engages: boolean; fonts: Fonts; images: TokenImages }) {
-  const { x, y, w, h } = rect;
-  const text = String(cost);
-  const width = TOKEN + fonts.badge.getTextWidth(text) + 8;
-  const left = x + (w - width) / 2;
-  const top = y + h - TOKEN - 4;
-  return (
-    <Group>
-      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={engages ? t.threat : t.night} />
-      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={engages ? t.danger : t.hairline} style="stroke" strokeWidth={1} />
-      {images.engagementCost ? <Image image={images.engagementCost} x={left + 1} y={top + 1} width={TOKEN - 2} height={TOKEN - 2} fit="contain" /> : null}
-      <Text x={left + TOKEN + 2} y={top + TOKEN - 5} text={text} font={fonts.badge} color={t.bone} />
-    </Group>
-  );
-}
-
-/** A card a delayed effect will act on (Sneak Attack's return): a small clock at its top center. The preview says what. */
 export function DelayedMark({ rect }: { rect: Rect }) {
-  const cx = rect.x + rect.w / 2;
-  const cy = rect.y + 9;
+  const cx = rect.x + rect.w - 8;
+  const cy = rect.y + TOKEN + 3 + 13 + 2 + 7;
   return (
     <Group>
       <Circle cx={cx} cy={cy} r={7} color={t.night} />

@@ -60,7 +60,6 @@ function ZoneWord({ rect, text, font }: { rect: Rect; text: string; font: SkFont
 }
 
 function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight, raised, fight, bottomInset, look, onTap, onPreview, onDrop }: TableCanvasProps) {
-  const large = look?.large ?? false;
   const contrast = look?.contrast ?? false;
   const seat = useStore(store, (state) => shownSeat(state.game));
   const { views, piles } = useViews(store, seat);
@@ -81,8 +80,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // The top of the deck is a card when the rules let it be played from there (Gandalf, 142002).
   const deckTop = deckTopId && draggable.includes(deckTopId) ? deckTopCard : null;
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, large }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, large],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset }),
+    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset],
   );
 
   // Each new layout: where every card comes from, and the cards that left, worked out once, before it is drawn. The layout

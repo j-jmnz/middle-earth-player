@@ -10,7 +10,7 @@ import { printedOf } from "../rules/printed.ts";
 import { hideWillpower } from "../rules/hide.ts";
 import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import type { Frame } from "../rules/state.ts";
+import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
@@ -77,6 +77,15 @@ export function travelRefusals(game: ScenarioState, ctx: ReduceContext, names: S
     const line = lineOf(travel, names);
     return [{ id, label: names.card(id), code: card.code, reason: line ? `${reason}. ${line}` : `${reason}.` }];
   });
+}
+
+// The card the listed Responses answer. One window may hold the Responses of one occurrence (each character of one commit,
+// rr.triggering-condition): it is named after the card they answer when they share one, and not named when they do not.
+function answeredCard(event: GameEvent, offers: readonly ResponseOffer[], listed: readonly TriggerOption[]): string | null {
+  const about = (answered: GameEvent) => answered.subject ?? answered.cardId ?? null;
+  const cards = new Set(listed.flatMap((item) => offers.filter((offer) => offer.cardId === item.cardId && offer.effectId === item.effectId).map((offer) => about(offer.event ?? event))));
+  if (cards.size === 0) return about(event);
+  return cards.size === 1 ? ([...cards][0] ?? null) : null;
 }
 
 // A response window's sentence, naming the Responses of this occurrence that wait for a cost another one may pay
@@ -243,7 +252,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     case "response": {
       const options = triggerOptions(game, ctx, legal, names);
       const data = frame?.data;
-      const about = data?.kind === "responses" ? (data.event.subject ?? data.event.cardId ?? null) : (frame?.cardId ?? null);
+      const about = data?.kind === "responses" ? answeredCard(data.event, data.offers, options) : (frame?.cardId ?? null);
       const cancel = window.kind === "cancelOffer";
       return {
         kind: "trigger",

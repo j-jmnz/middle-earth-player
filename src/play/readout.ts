@@ -105,7 +105,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const defense = modifiedStat(game, enemy, "defense", ctx.cards);
     // Whether the attack destroys the enemy (toughness and indestructible are the engine's), or how far short it falls.
     const outcome = attackers.length > 0 && !strike ? damageOutcome(game, ctx, enemyId, Math.max(0, total - defense)) : null;
-    const after = outcome ? (outcome.destroyed ? `; ${cardName(enemyId)} is destroyed` : outcome.spare != null ? `; ${outcome.spare} more would destroy it` : "") : "";
+    const after = outcome ? (outcome.destroyed ? `; ${cardName(enemyId)} is destroyed` : outcome.spare != null ? `; ${outcome.spare} more damage destroys it` : "") : "";
     return { kind: "attack", stats: [ATTACK(total), DEFENSE(defense)], result: `${damageWords(total, defense)}${after}` };
   }
   // Travel: the staging threat now and after the picked location leaves staging, and the progress it takes first (rr.travel).

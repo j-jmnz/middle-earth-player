@@ -18,7 +18,7 @@ export function QuestBand({ game, ctx, nameOf, line }: { game: ScenarioState; ct
   // A stage with no quest points is won some other way: its printed line says how (objective.ts).
   const objective = points == null ? questObjective(game, ctx, line) : null;
   return (
-    <View accessible accessibilityLabel={points != null ? `${nameOf(stage.code)}. ${stage.progress} of ${points} progress` : `${nameOf(stage.code)}. ${objective ?? "No quest points"}`}>
+    <View accessible accessibilityLabel={points != null ? `${nameOf(stage.code)}. ${stage.progress} of ${points} progress` : `${nameOf(stage.code)}. ${objective ? `To win: ${objective}` : "No quest points"}`}>
       <Text testID="quest-stage" numberOfLines={1} className="font-display text-label text-bone">
         {nameOf(stage.code)}
       </Text>
@@ -32,7 +32,7 @@ export function QuestBand({ game, ctx, nameOf, line }: { game: ScenarioState; ct
         </View>
       ) : (
         <Text testID="quest-progress" numberOfLines={4} className="mt-1 text-label text-muted">
-          {objective ?? "No quest points"}
+          {objective ? `To win: ${objective}` : "No quest points"}
         </Text>
       )}
     </View>

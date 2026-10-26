@@ -51,13 +51,16 @@ export function stopDecision(input: StopInput): "pass" | "ask" {
   return usableIds(sheet).every((id) => seen.has(id)) ? "pass" : "ask";
 }
 
-/** The title of the next stop after this window, in round order (rail.ts names it), for "Pass to next stop". */
+/** Where Pass to stop runs to at the latest, for its armed line: the next stop after this window (rail.ts names it), or planning. */
 export function nextStopTitle(game: ScenarioState, settings: TableSettings, titleOf: (point: string) => string | null): string {
   const here = windowPoint(game)?.id ?? null;
+  // Planning always asks: from the resource window the run ends there, and later in the round it ends there at the latest,
+  // after the next round's resource window.
+  if (here == null || here === "resourceActions") return "planning";
   const order = STOP_POINTS as readonly string[];
-  const from = here ? order.indexOf(here) + 1 : 0;
-  const ahead = [...order.slice(from), ...order.slice(0, from)].find((point) => settings.stops.includes(point));
-  return (ahead ? titleOf(ahead) : null) ?? "the next choice";
+  const ahead = [...order.slice(order.indexOf(here) + 1), "resourceActions"].find((point) => settings.stops.includes(point));
+  const title = ahead ? titleOf(ahead) : null;
+  return title ? title.charAt(0).toLowerCase() + title.slice(1) : "planning";
 }
 
 const FREE_VERBS: ReadonlySet<string> = new Set(["Draw", "AddResources", "Ready", "ModifyStat", "LowerThreat", "Heal"]);

@@ -24,7 +24,7 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
     switch (refused) {
       case "That intent is not legal in this window":
         if (printed.type === "ally" || printed.type === "attachment") return `${printed.type === "ally" ? "Allies" : "Attachments"} are played in the planning phase.`;
-        return game.window ? "Nothing can be played at this point." : "Nothing can be played until the engine asks.";
+        return game.window ? "Nothing can be played at this point." : "Nothing can be played right now.";
       case "Only the active player plays allies and attachments now":
         return "Allies and attachments are played in your own planning turn.";
       case "A second copy of that unique card cannot enter play":

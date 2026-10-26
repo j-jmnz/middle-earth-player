@@ -1,6 +1,8 @@
 import prebuiltJson from "../../data/decks/prebuilt.json";
 import { prebuiltDecksSchema, type PrebuiltDeck } from "../catalog/prebuilt-deck";
 
+import { notAppliedCards } from "./deck-status";
+
 export type DecklistCounts = Record<string, number>;
 
 export type DecklistBody = {
@@ -166,13 +168,14 @@ export function prebuiltRows(decks: readonly PrebuiltDeck[]): PrebuiltRow[] {
 }
 
 /**
- * "12 of 47 cards not applied": the copies of a pre-built deck (heroes included) whose printed text the app does not fully
- * apply, against the deck's total; null when it applies every card (docs/plans/inactive-text.md).
+ * "12 of 47 cards with text not applied": the copies of a pre-built deck (heroes included) whose printed text the app does not
+ * fully apply (notAppliedCards, as the deck screens count them), against the deck's total; null when it applies every card
+ * (docs/plans/inactive-text.md).
  */
 export function prebuiltNotApplied(deck: PrebuiltDeck, inactive: ReadonlySet<string>): string | null {
   const total = deck.heroes.length + deck.cards.reduce((sum, card) => sum + card.count, 0);
-  const off = deck.heroes.filter((code) => inactive.has(code)).length + deck.cards.reduce((sum, card) => sum + (inactive.has(card.code) ? card.count : 0), 0);
-  return off === 0 ? null : `${off} of ${total} cards not applied`;
+  const off = notAppliedCards(deck, inactive).reduce((sum, card) => sum + card.copies, 0);
+  return off === 0 ? null : `${off} of ${total} cards with text not applied`;
 }
 
 /** A row's detail with the not-applied count after it. */

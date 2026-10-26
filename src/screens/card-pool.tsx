@@ -115,16 +115,18 @@ function TypeChips({
   const options = [{ code: null, name: "All" }, ...types];
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-2 px-6">
+      {/* A switch, not a type: an outlined pill with a check when on, and a hairline after it before the type chips. */}
       <Pressable
         testID="pool-applied-only"
         accessibilityRole="switch"
         accessibilityState={{ checked: applied }}
         accessibilityLabel="Applied only: cards whose text the app applies"
         onPress={() => onApplied(!applied)}
-        className={`min-h-11 justify-center rounded-pill px-4 ${applied ? "bg-gold" : "bg-raised"}`}
+        className={`min-h-11 justify-center rounded-pill border px-4 ${applied ? "border-gold" : "border-hairline"}`}
       >
-        <Text className={applied ? "text-body font-semibold text-onGold" : "text-body text-muted"}>Applied only</Text>
+        <Text className={applied ? "text-body font-semibold text-gold" : "text-body text-muted"}>{applied ? "✓ Applied only" : "Applied only"}</Text>
       </Pressable>
+      <View className="my-2 w-px bg-hairline" />
       {options.map((option) => {
         const selected = value === option.code;
         return (

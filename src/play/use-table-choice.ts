@@ -59,7 +59,6 @@ export type TableChoice = {
   onBeat: (cards: readonly string[]) => void;
   // The first-game guide's line for this moment, and turning the guide off.
   guide: string | null;
-  hideGuide: () => void;
   // The Undo button: puts back the pick being made, or goes back one intent (store.ts, undo-history.ts); null when there is
   // neither. It is also the first of `extras`.
   undo: DockExtra | null;
@@ -126,7 +125,8 @@ export function useTableChoice({
   const single = only != null;
   const choice = useMemo(() => choiceFor(sheet, held, only), [sheet, held, only]);
   // "Pass to next stop" on a step window the table could pass, named by the stop it runs to (stops.ts).
-  const stopPass = !live && !single && passableWindow(game, sheet, legal) ? `Tap again: pass to ${nextStopTitle(game, settings, pointTitle)}` : null;
+  // Pass to stop is offered while stops are on, naming where the run ends at the latest (a choice on the way ends it sooner).
+  const stopPass = settings.stopsOn && !live && !single && passableWindow(game, sheet, legal) ? `Tap again: pass until ${nextStopTitle(game, settings, pointTitle)}` : null;
   const free = useMemo(() => new Set(sheet.kind === "trigger" && game.window?.kind === "response" ? sheet.options.filter((item) => isFreeResponse(ctx.effects.find((effect) => effect.id === item.effectId))).map((item) => item.effectId) : []), [sheet, game, ctx]);
   const dock = useMemo(
     () => dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single, stopPass, free }),
@@ -176,18 +176,23 @@ export function useTableChoice({
   // The hand card being played rises whole above the bottom edge.
   const raised = live ? playedCard(live.sheet) : null;
   // The first-game guide: the moment's step explained the first two times it comes up (reference.ts, guideLine).
+  const baseHeader = headerOf(sheet, game);
+  // While stops are on, the eyebrow says so first (a long eyebrow is cut at its end): the table passes some windows.
+  const header = settings.stopsOn ? { ...baseHeader, step: `Stops on · ${baseHeader.step}` } : baseHeader;
   const guideFor = settings.guide && !live ? guideLine(game, sheet.kind === "window" && passableWindow(game, sheet, legal)) : null;
-  const guide = guideFor && (settings.guideSeen[guideFor.key] ?? 0) < 2 ? guideFor : null;
+  // A line the note already says is not said twice.
+  const guide = guideFor && (settings.guideSeen[guideFor.key] ?? 0) < 2 && !(header.note ?? "").includes(guideFor.text) ? guideFor : null;
   const guideKey = guide ? `${guide.key}:${sheet.key}` : "";
+  // A showing is counted when its moment ends, so the line stays up for the whole moment it explains.
+  const guideShowing = useRef<string | null>(null);
   useEffect(() => {
-    if (!guide) return;
+    const ended = guideShowing.current;
+    guideShowing.current = guide?.key ?? null;
+    if (ended == null) return;
     const now = tableSettings.getState().settings;
-    tableSettings.getState().update({ guideSeen: { ...now.guideSeen, [guide.key]: (now.guideSeen[guide.key] ?? 0) + 1 } });
+    tableSettings.getState().update({ guideSeen: { ...now.guideSeen, [ended]: (now.guideSeen[ended] ?? 0) + 1 } });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- counted once per moment the line appears in.
   }, [guideKey]);
-  const base_header = headerOf(sheet, game);
-  // While stops are on, the eyebrow says so: the table is passing some windows for the player.
-  const header = settings.stopsOn ? { ...base_header, step: `${base_header.step} · Stops on` } : base_header;
 
   // A shadow card's printed shadow line, for the banner.
   const shadow = useCallback(
@@ -396,7 +401,6 @@ export function useTableChoice({
     bannerKey: `${shown?.seq ?? 0}:${momentOpen ? "moment" : "summary"}`,
     onBeat,
     guide: guide?.text ?? null,
-    hideGuide: () => tableSettings.getState().update({ guide: false }),
     undo: undoButton,
     onTap: tapOnTable,
     onTile,

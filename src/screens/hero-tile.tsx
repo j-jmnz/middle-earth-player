@@ -29,6 +29,7 @@ export function HeroTile({
   flush = false,
   dense = false,
   bare = false,
+  loss = null,
 }: {
   hero: HeroFace;
   height: number;
@@ -40,6 +41,8 @@ export function HeroTile({
   dense?: boolean;
   // The picture alone, with no name band: the deck list's covers, where the deck's own name is the only text.
   bare?: boolean;
+  // What the app leaves out of this hero's text ("Ability not applied"), under its sphere; null when it applies all of it.
+  loss?: string | null;
 }) {
   const [width, setWidth] = useState(0);
   const preview = useCardPreview(hero.code, hero.imagesrc);
@@ -84,6 +87,11 @@ export function HeroTile({
                 </Text>
               ) : null}
             </View>
+            {loss ? (
+              <Text testID={`hero-loss-${hero.code}`} className="text-label text-muted" numberOfLines={1}>
+                {loss}
+              </Text>
+            ) : null}
           </View>
         </>
       )}
@@ -92,7 +100,7 @@ export function HeroTile({
           testID={`hero-${hero.code}`}
           collapsable={false}
           accessibilityRole="button"
-          accessibilityLabel={`${hero.name}, ${sphere}`}
+          accessibilityLabel={`${hero.name}, ${sphere}${loss ? `, ${loss}` : ""}`}
           accessibilityHint="Opens the card"
           onPress={onPress}
           onLongPress={onLongPress ? () => onLongPress(preview) : undefined}

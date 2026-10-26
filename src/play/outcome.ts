@@ -217,7 +217,7 @@ export function roundSummary(round: number, steps: readonly EngineStep[], after:
   for (let seat = 0; seat < after.seatCount; seat += 1) {
     const raised = steps.reduce((sum, step) => sum + (step.kind === "threat" && step.seat === seat ? step.amount : 0), 0);
     const end = after.seats[seat]?.threat ?? 0;
-    lines.push({ text: `${seatWord(after, seat)} ${end - raised} → ${end}`, mark: "threat" });
+    if (raised !== 0) lines.push({ text: `${seatWord(after, seat)} ${end - raised} → ${end}`, mark: "threat" });
   }
   const progress = steps.reduce((sum, step) => sum + (step.kind === "progress" && step.amount > 0 ? step.amount : 0), 0);
   if (progress > 0) lines.push({ text: `${progress} progress placed`, mark: "progress" });

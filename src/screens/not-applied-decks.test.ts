@@ -41,7 +41,7 @@ describe("not applied on the deck screens", () => {
       expect(deck && prebuiltNotApplied(deck, inactive), id).toBeNull();
     }
     const elves = byId.get("elves-of-lorien");
-    expect(elves && prebuiltNotApplied(elves, inactive)).toMatch(/^\d+ of \d+ cards not applied$/);
-    expect(withNotApplied("Galadriel", "3 of 50 cards not applied")).toBe("Galadriel · 3 of 50 cards not applied");
+    expect(elves && prebuiltNotApplied(elves, inactive)).toMatch(/^\d+ of \d+ cards with text not applied$/);
+    expect(withNotApplied("Galadriel", "3 of 50 cards with text not applied")).toBe("Galadriel · 3 of 50 cards with text not applied");
   });
 });

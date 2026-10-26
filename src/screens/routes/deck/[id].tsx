@@ -217,6 +217,7 @@ export default function DeckEditor() {
               onPress={() => router.push({ pathname: "/card/[code]", params: { code: hero.code } })}
               onLongPress={(source) => preview.open(hero.code, hero.name, source)}
               onRemove={() => announceDraftChange(removeDraftHero(hero.code, hero.name))}
+              loss={inactive.has(hero.code) ? notAppliedWords(hero.code, "hero") : null}
             />
           </View>
         ))}

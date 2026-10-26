@@ -15,8 +15,6 @@ export type TableSettings = {
   stops: readonly string[];
   // Effect ids of Responses with no cost and no choice that the player always uses (Sam Gamgee's ready, Pippin's draw).
   alwaysUse: readonly string[];
-  // Larger cards: five across, the hand overlapping more.
-  largeCards: boolean;
   // Effect pills and token counts drawn with stronger outlines.
   highContrast: boolean;
   // The first-game guide: a line under the dock's title the first two times each step comes up.
@@ -28,7 +26,7 @@ export type TableSettings = {
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], largeCards: false, highContrast: false, guide: true, guideSeen: {} };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {} };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -43,7 +41,6 @@ export function parseSettings(raw: unknown): TableSettings {
     stopsOn: flag(value.stopsOn, DEFAULT_SETTINGS.stopsOn),
     stops: strings(value.stops, DEFAULT_SETTINGS.stops).filter((stop) => (STOP_POINTS as readonly string[]).includes(stop)),
     alwaysUse: strings(value.alwaysUse, []),
-    largeCards: flag(value.largeCards, false),
     highContrast: flag(value.highContrast, false),
     guide: flag(value.guide, true),
     guideSeen: seen,

@@ -2,7 +2,7 @@
 // (an either/or of an effect, a seat, a card out of play), a discard pile's cards, and this round's log
 // (docs/design-system.md, Table). A panel's tiles are picked the same way as cards on the table, and its buttons are the
 // dock's: one that sends with nothing picked asks for a second tap.
-import { ScrollView, Switch, Text, View } from "react-native";
+import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
 import type { LogLine } from "./log.ts";
@@ -215,9 +215,17 @@ export function ThreatPanel({
         <Text className="text-body text-inkMuted">At the engagement checks, each enemy in staging whose engagement cost is at or below your threat engages you. At 50 you are eliminated.</Text>
         {rows.length === 0 ? <Text className="mt-2 text-body text-inkMuted">No enemy is in staging.</Text> : null}
         {rows.map((row) => (
-          <View key={row.id} testID={`threat-row-${row.id}`} accessible accessibilityLabel={`${row.name}, engagement cost ${row.cost}, ${row.verdict.word}`} className="flex-row items-center justify-between border-b py-2" style={{ borderColor: t.inkLine }}>
+          <View
+            key={row.id}
+            testID={`threat-row-${row.id}`}
+            accessible
+            accessibilityLabel={`${row.name}, engagement cost ${row.cost}, ${row.verdict.word}`}
+            className="flex-row items-center justify-between border-b py-2 pl-2"
+            // An enemy that engages you is marked by a threat-red rule at its left; its word stays ink, readable on paper.
+            style={{ borderColor: t.inkLine, borderLeftWidth: 3, borderLeftColor: row.verdict.engages ? t.threat : "transparent" }}
+          >
             <Text className="shrink text-body text-ink">{row.name}</Text>
-            <Text className={`font-display text-body ${row.verdict.engages ? "text-danger" : "text-inkMuted"}`}>{`${row.cost} · ${row.verdict.word}`}</Text>
+            <Text className={`font-display text-body ${row.verdict.engages ? "text-ink" : "text-inkMuted"}`}>{`${row.cost} · ${row.verdict.word}`}</Text>
           </View>
         ))}
         <Text className="mt-2 text-label text-inkMuted">The refresh phase raises your threat by 1 at the end of the round; a failed quest raises it by what it falls short.</Text>
@@ -229,16 +237,34 @@ export function ThreatPanel({
   );
 }
 
-// A labelled switch on paper, at least 44 pt tall.
+// A labelled switch on paper: the whole row, at least 44 pt tall, is the control, and a screen reader hears it as a switch
+// with its detail as the hint. The tracks hold 3:1 against paper (inkMuted off, ink on).
 function PaperSwitch({ label, detail, value, onChange, testID }: { label: string; detail?: string; value: boolean; onChange: (value: boolean) => void; testID: string }) {
   return (
-    <View className="flex-row items-center justify-between gap-3 py-1" style={{ minHeight: 44 }}>
-      <View className="shrink">
+    <Pressable
+      testID={`${testID}-row`}
+      accessibilityRole="switch"
+      accessibilityLabel={label}
+      accessibilityHint={detail}
+      accessibilityState={{ checked: value }}
+      onPress={() => onChange(!value)}
+      style={({ pressed }) => ({ minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingVertical: 4, backgroundColor: pressed ? t.paperPressed : "transparent" })}
+    >
+      <View className="shrink" importantForAccessibility="no-hide-descendants">
         <Text className="text-body text-ink">{label}</Text>
         {detail ? <Text className="text-label text-inkMuted">{detail}</Text> : null}
       </View>
-      <Switch testID={testID} accessibilityLabel={label} value={value} onValueChange={onChange} trackColor={{ false: t.inkLine, true: t.goldDeep }} thumbColor={t.paper} ios_backgroundColor={t.inkLine} />
-    </View>
+      <Switch
+        testID={testID}
+        accessible={false}
+        importantForAccessibility="no"
+        value={value}
+        onValueChange={onChange}
+        trackColor={{ false: t.inkMuted, true: t.ink }}
+        thumbColor={t.paper}
+        ios_backgroundColor={t.inkMuted}
+      />
+    </Pressable>
   );
 }
 
@@ -308,10 +334,9 @@ export function ReferencePanel({
         ))}
         <View className="mt-3 border-t pt-2" style={{ borderColor: t.inkLine }}>
           <Text className="font-display text-eyebrow uppercase text-inkLabel">Table</Text>
-          <PaperSwitch label="Larger cards" detail="Five cards across; the hand overlaps more." value={settings.largeCards} onChange={(largeCards) => onChange({ largeCards })} testID="reference-large" />
           <PaperSwitch label="Strong outlines" detail="Effect marks and token counts drawn with heavier outlines." value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID="reference-contrast" />
           <PaperSwitch label="First-game guide" detail="A line under the dock's title the first two times each step comes up." value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID="reference-guide" />
-          {always.length > 0 ? <Text className="mt-2 text-label text-inkMuted">Responses used every time (tap to be asked again):</Text> : null}
+          {always.length > 0 ? <Text className="mt-2 text-label text-inkMuted">Responses used every time:</Text> : null}
           {always.map((item) => (
             <ChromeButton key={item.effectId} label={item.label} testID={`reference-always-${item.effectId}`} tone="ink" onPress={() => onChange({ alwaysUse: settings.alwaysUse.filter((id) => id !== item.effectId) })} />
           ))}

@@ -44,7 +44,7 @@ describe("damage foresight", () => {
     const hit = damageOutcome(table.state, table.ctx, sam, 1);
     expect(hit.destroyed).toBe(false);
     expect(hit.spare).toBe(2);
-    expect(outcomeWords(hit, "Sam Gamgee", true)).toBe("+2 more destroys Sam Gamgee");
+    expect(outcomeWords(hit, "Sam Gamgee", true)).toBe("2 more damage destroys Sam Gamgee");
     expect(outcomeWords(hit, "Sam Gamgee", false)).toBe("");
     expect(table.state.lost).toBe(false);
   });

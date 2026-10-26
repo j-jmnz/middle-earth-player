@@ -9,7 +9,7 @@ import Animated, { FadeInUp, FadeOut, ReduceMotion, useReducedMotion } from "rea
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
 import { BEAT_MS, type Moment } from "./outcome.ts";
 import type { Readout } from "./readout.ts";
-import { ChromeButton, Stats } from "./sheet-paper.tsx";
+import { Stats } from "./sheet-paper.tsx";
 import type { Unavailable } from "./sheet-types.ts";
 import type { Dock, DockButton } from "./table-choice.ts";
 import { LineMark } from "./table-chrome.tsx";
@@ -50,7 +50,6 @@ export function TableDock({
   extras = [],
   resetKey,
   guide = null,
-  onHideGuide,
 }: {
   step: string;
   title: string;
@@ -65,27 +64,26 @@ export function TableDock({
   extras?: readonly DockExtra[];
   // Changes with the moment and the pick: an armed button goes back to unarmed.
   resetKey: string;
-  // The first-game guide's line for the moment (reference.ts), and turning the guide off.
+  // The first-game guide's line for the moment (reference.ts); it is turned off in the turn reference.
   guide?: string | null;
-  onHideGuide?: () => void;
 }) {
   return (
     <View testID="dock" className="rounded-card px-3 pb-2 pt-2" style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
       {/* On a short phone only the sentence scrolls; the numbers, the pick and the buttons stay in sight. */}
-      <Text testID="sheet-step" numberOfLines={1} className="text-center font-display text-eyebrow uppercase text-gold">
+      <Text testID="sheet-step" numberOfLines={1} className="text-center font-display text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
         {step}
       </Text>
-      <Text testID="sheet-title" accessibilityRole="header" numberOfLines={2} className="text-center font-display text-body text-bone">
+      <Text testID="sheet-title" accessibilityRole="header" numberOfLines={2} className="text-center font-display text-body text-bone" style={{ flexShrink: 0 }}>
         {title}
       </Text>
-      {guide ? (
-        <View testID="dock-guide" className="mt-0.5 flex-row items-center justify-center gap-1">
-          <Text className="shrink text-center text-label italic text-gold">{guide}</Text>
-          {onHideGuide ? <ChromeButton label="Hide" testID="dock-guide-hide" variant="quiet" tone="bone" accessibilityLabel="Turn off the first-game guide" onPress={onHideGuide} /> : null}
-        </View>
-      ) : null}
-      {note || unavailable.length > 0 ? (
+      {note || guide || unavailable.length > 0 ? (
         <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 18 }}>
+          {/* The first-game guide scrolls with the note: on a short phone it must not push the buttons off the screen. */}
+          {guide ? (
+            <Text testID="dock-guide" className="text-center text-label text-bone">
+              {`Guide: ${guide}`}
+            </Text>
+          ) : null}
           {note ? (
             <Text testID="sheet-note" className="text-center text-label text-muted">
               {note}
