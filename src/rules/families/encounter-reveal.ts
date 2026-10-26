@@ -44,18 +44,21 @@ export function listens(state: ScenarioState, ctx: ReduceContext, trigger: Trigg
 }
 
 // The staging step reveals one card per player (rr.step-3-3), fewer while the table holds revealFewer flags: "Reveal 1
-// less card from the encounter deck this phase (To a minimum of 1.)" and "(to a minimum of 0)".
+// less card from the encounter deck this phase (To a minimum of 1.)" and "(to a minimum of 0)", and more while it holds
+// revealMore flags: "reveal an additional encounter card this phase" (141080:A:2).
 export function revealsAllowed(state: ScenarioState, base: number): number {
   let toZero = 0;
   let toOne = 0;
+  let more = 0;
   for (const modifier of state.modifiers) {
     if (!modifierActive(state, modifier)) continue;
     if (modifier.stat === "revealFewer") toZero += modifier.amount;
     else if (modifier.stat === "revealFewerMinOne") toOne += modifier.amount;
+    else if (modifier.stat === "revealMore") more += modifier.amount;
   }
-  if (toZero === 0 && toOne === 0) return base;
+  if (toZero === 0 && toOne === 0) return base + more;
   const floored = toOne > 0 ? Math.max(Math.min(1, base), base - toOne) : base;
-  return Math.max(0, floored - toZero);
+  return Math.max(0, floored - toZero) + more;
 }
 
 // The record that set a watcher, for the cause of what it does.

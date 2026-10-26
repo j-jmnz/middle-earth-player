@@ -19,7 +19,9 @@ export type CardType =
   | "treachery"
   | "quest"
   | "objective"
-  | "treasure";
+  | "treasure"
+  // The campaign card, next to the quest deck. The engine holds it only when it has an ability that works during the scenario.
+  | "campaign";
 
 export type Keywords = {
   surge: boolean;
@@ -151,7 +153,7 @@ export function isPlayerType(printed: PrintedCard): boolean {
   return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event";
 }
 
-const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure"];
+const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure", "campaign"];
 const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"];
 
 // The engine-facing subset of a data/cards record. A type or sphere the engine does not know fails loudly.

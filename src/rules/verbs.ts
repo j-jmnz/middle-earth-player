@@ -90,7 +90,7 @@ export function runExtraVerb(
       return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
     case "DiscardRandomFromHand":
-      return discardRandom(state, focus.seat, instruction.amount ?? 1);
+      return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount ?? 1);
     case "PlaceUnderSelf": {
       const id = lastPicked(state);
       if (!focus.sourceId || !state.cards[id] || !state.cards[focus.sourceId]) return state;
@@ -326,5 +326,5 @@ export function holdsNow(
   // A stat condition is not a gate: the modifier carries it and it is read with the stat (attack-verbs.ts).
   if (instruction.verb === "ModifyStat" && isStatCondition(instruction.when)) return true;
   const frame = frameScope(state, scope.actor, scope.sourceId);
-  return holds(state, instruction.when, { ...scope, ...(frame.picked ? { picked: frame.picked } : {}), ...(frame.subject ? { subject: frame.subject } : {}), ...(frame.other ? { other: frame.other } : {}) }, ctx);
+  return holds(state, instruction.when, { ...scope, ...(frame.picked ? { picked: frame.picked } : {}), ...(frame.subject ? { subject: frame.subject } : {}), ...(frame.other ? { other: frame.other } : {}), ...(frame.x != null ? { x: frame.x } : {}) }, ctx);
 }

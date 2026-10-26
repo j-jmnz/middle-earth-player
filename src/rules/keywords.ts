@@ -3,7 +3,7 @@ import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
 import { threatSaved } from "./families/quest-threat.ts";
-import { isGuarded, noteHostDefeated, releaseGuarded } from "./families/attachments-hold.ts";
+import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "./families/attachments-hold.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
@@ -14,6 +14,7 @@ import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts
 import { attackingHolds } from "./families/attack-strike.ts";
 import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hooks.ts";
 import { alliesToHandDestination } from "./families/deck-rules.ts";
+import { reduceLife, takesLifeInstead } from "./families/burden-life.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -191,6 +192,8 @@ export function placeDamage(
   if (!instance || !inPlay(instance.zone)) return state;
   const printed = printedOf(cards, instance.code);
   if (source === "player" && !playerCardEffectCanChoose(printed)) return state;
+  // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
+  if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
   // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.
   if (flagged(state, id, "cannotTakeDamage") || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
   const dealt = placedAmount(printed, amount);
@@ -421,8 +424,10 @@ export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel"
   const instance = state.cards[id];
   if (!instance) return false;
   const printed = printedOf(cards, instance.code);
-  if (keyword === "doomed") return (printed.keywords.doomed ?? 0) > 0;
-  if (printed.keywords[keyword]) return true;
+  // A card whose printed text box is blank has none of its printed keywords; one gained from another source stays (rr.blank).
+  const blank = textBlank(state, id);
+  if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
+  if (!blank && printed.keywords[keyword]) return true;
   return (keyword === "sentinel" || keyword === "ranged") && flagged(state, id, keyword);
 }
 

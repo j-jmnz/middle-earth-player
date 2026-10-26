@@ -30,6 +30,8 @@ Created by the Setup line at 15. Its own number. The refresh step does not chang
 
 `.maestro/flight-to-the-ford.yaml` opens a seeded save at the start of this scenario and asserts the life readout is 15 and the burden deck count is 5. The same ids are absent on a scenario 1 save. A resolution flow unlocks `the-ring-goes-south` on a win and writes nothing on a loss.
 
+Written, 2026-10-26 (cloud session, none has run): `.maestro/flight-to-the-ford.yaml` (the start: life 15, burden deck 5, kill and relaunch), `.maestro/flight-to-the-ford-win.yaml` (the Resolution asks nothing and unlocks `the-ring-goes-south`) and `.maestro/flight-to-the-ford-loss.yaml` (Defeat at life 0 writes nothing); `scenario-1.yaml` asserts `life` and `burden-deck` are absent. The ids are `life` and `burden-deck` (the value is `<id>-value`). **Open:** their fixtures `ford-start`, `ford-won` and `ford-lost` are not committed. A fixture is a real save, and these start from the log that scenarios 1 and 2 write when won; no win of either has been found with the starter decks (phases 11 and 12), so the chain cannot be built honestly. Add the three names to `src/campaign/fixtures.ts` when `scripts/e2e-fixtures.ts --won` finds the chain.
+
 ## Exit
 
 The procedure's two halves. A win adds exactly the burdens the campaign card names. Life 0 loses. Healing does not raise life. On the phone, the tracker and the burden deck show for this scenario and are hidden for scenario 1.

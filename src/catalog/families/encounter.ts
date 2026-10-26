@@ -61,6 +61,9 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), ...when }),
   // The staging step of this phase reveals `amount` fewer cards (rr.step-3-3), to a minimum of `min` (0 or 1).
   z.strictObject({ verb: z.literal("RevealFewer"), amount: z.number().int().positive(), min: z.union([z.literal(0), z.literal(1)]), ...when }),
+  // The staging step of this phase reveals `amount` more cards (rr.step-3-3): "reveal an additional encounter card this phase"
+  // (141080:A:2). The extra cards are revealed by the players in turn, from the first player on.
+  z.strictObject({ verb: z.literal("RevealMore"), amount: z.number().int().positive(), ...when }),
   // A lasting effect on the encounter cards revealed from now until `until`, for those of `type` (any type without it):
   // `threatZero`, the next such card added to the staging area has Threat 0 until the end of the phase; `damage`, the first
   // such card revealed takes `amount` damage from the source; `discard`, the next card revealed is discarded without
@@ -112,6 +115,8 @@ export const FLAGS = [
   // (`revealFewer`) or of 1 (`revealFewerMinOne`).
   "revealFewer",
   "revealFewerMinOne",
+  // Held by the table until the end of the phase: the staging step reveals this many more cards (`RevealMore`).
+  "revealMore",
   // Held by the table: the lasting effects WatchReveals sets (its `when` names the type of card it watches for).
   "watchThreatZero",
   "watchDamage",

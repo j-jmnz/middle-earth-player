@@ -32,6 +32,8 @@ export type Scope = {
   // What the running effect has picked, and the other card the answered event names.
   picked?: readonly string[];
   other?: string;
+  // The running effect's X.
+  x?: number;
 };
 
 // The card a `matches` condition reads.
@@ -195,6 +197,13 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
     }
     case "engagedThisRound":
       return engagedThisRound(state, scope.actor) === condition.is;
+    // The burden deck, Campaign Mode and the effect's X (families/burden.ts).
+    case "burdenDeck":
+      return (state.burdenDeck?.length ?? 0) >= (condition.min ?? 1);
+    case "campaign":
+      return Object.values(state.cards).some((card) => card.zone === "campaign");
+    case "x":
+      return (scope.x ?? 0) >= condition.min;
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":

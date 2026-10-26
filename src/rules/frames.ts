@@ -88,7 +88,8 @@ export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: Eng
   }
   const cursor = state.revealCursor;
   // "Reveal 1 less card from the encounter deck this phase" (RevealFewer) ends the step early.
-  const seat = cursor.index < revealsAllowed(state, cursor.seats.length) ? cursor.seats[cursor.index] : undefined;
+  // Cards beyond one per player ("reveal an additional encounter card") are revealed by the players in turn from the first.
+  const seat = cursor.index < revealsAllowed(state, cursor.seats.length) ? cursor.seats[cursor.index % Math.max(1, cursor.seats.length)] : undefined;
   if (seat == null || state.lost || state.failure) {
     const ended: ScenarioState = { ...withMode(state, "resolution"), revealCursor: null };
     // Responses "at the end of the staging step" (22145:A:1).

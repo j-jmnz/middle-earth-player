@@ -66,6 +66,29 @@ describe("a-shadow-of-the-past scenario data", () => {
     expect(knife.resolution.map((instruction) => instruction.verb)).toEqual(["ChooseCards"]);
   });
 
+  // docs/brief.md, Flight to the Ford burden deck and life: the Setup line creates both pieces.
+  it("declares the life tracker and the burden deck for Flight to the Ford, and nothing else", () => {
+    const ford = scenarioDefinitionSchema.parse(scenarioDefinition(loadScenario("flight-to-the-ford"), campaign, EFFECTS));
+    expect(ford.widgets).toEqual({ hide: false, lifeTracker: true, burdenDeck: true, secondActiveLocation: false, perSeatStaging: false });
+    expect(ford.life).toBe(15);
+    expect(ford.burdenDeck).toEqual(["141080", "141081", "141082", "141083", "141084"]);
+    expect(ford.campaignCard).toBe("141056");
+    expect(ford.resolution).toEqual([{ verb: "EarnAllBurdens" }]);
+    // The pile order runs the quest card's Setup: two cards set aside, The Last Bridge and the Fell Riders in staging (every copy
+    // here; buildStart places one for each player), then An Evil Wound on the Ring-bearer. 141028:A:1 prints the same cards in
+    // its own order, which the record 141028:setup:1 states.
+    expect(ford.setup.map((instruction) => ("code" in instruction ? `${instruction.verb} ${instruction.code}` : instruction.verb))).toEqual([
+      "SetAside 141059",
+      "SetAside 141068",
+      "AddToStaging 141058",
+      "AddToStaging 141063",
+      "AddToStaging 141063",
+      "AddToStaging 141063",
+      "AddToStaging 141063",
+      "AttachToRingBearer 141057",
+    ]);
+  });
+
   it("starts every scenario with The One Ring on the Ring-bearer", () => {
     expect(campaign.prelude).toEqual([{ code: "141085" }]);
   });

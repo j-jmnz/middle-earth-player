@@ -46,7 +46,10 @@ export type ZoneName =
   | "shadow"
   | "attached"
   // Facedown under a location, out of play (141049:A:1). The card's host is the location.
-  | "under";
+  | "under"
+  // The campaign card next to the quest deck (rr.campaign-cards). Placed only when the card has an ability that works during
+  // the scenario (a Response, a Forced effect, a constant, an Action), so it is in play: 141056:A:2.
+  | "campaign";
 
 export type CardFace = "up" | "down" | "A" | "B";
 
@@ -447,7 +450,8 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "secondActiveLocation" ||
     zone === "questStage" ||
     zone === "seatQuest" ||
-    zone === "attached"
+    zone === "attached" ||
+    zone === "campaign"
   );
 }
 

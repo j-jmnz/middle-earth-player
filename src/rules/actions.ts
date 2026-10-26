@@ -9,10 +9,15 @@ import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { applyResponse, responseIntents, responseReason } from "./responses.ts";
 import { applyMulliganTrigger, mulliganTriggerReason } from "./families/deck-play.ts";
-import type { ScenarioState } from "./state.ts";
+import { textBlank } from "./families/attachments-hold.ts";
+import { printedOf } from "./printed.ts";
+import { inPlay, type ScenarioState } from "./state.ts";
 import { payUsage, usable, usageReason } from "./usage.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
+
+// The cards whose Actions any player may use while they are in play: an objective, quest or location ability (rr.action).
+const SHARED_TYPES: ReadonlySet<string> = new Set(["objective", "quest", "location"]);
 
 function inTriggerWindow(state: ScenarioState): boolean {
   return state.window?.kind === "pass" || state.window?.kind === "frameAction";
@@ -22,11 +27,15 @@ function inTriggerWindow(state: ScenarioState): boolean {
 function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, effectId: string): Effect | undefined {
   const instance = state.cards[cardId];
   if (!instance) return undefined;
+  // A card whose printed text box is blank has none of its abilities (rr.blank).
+  if (textBlank(state, instance.id)) return undefined;
   const effect = effectsOf(ctx, instance.code).find((entry) => entry.id === effectId && entry.timing === "action");
+  // An objective, quest or location in play belongs to no player: any player may initiate its Action (rr.action).
+  const shared = inPlay(instance.zone) && SHARED_TYPES.has(printedOf(ctx.cards, instance.code).type);
   // An Action used from the hand ("put ~ into play from your hand", effect.fromHand) is used there; any other in play.
-  if (effect?.fromHand ? instance.zone !== "hand" : instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached") return undefined;
+  if (effect?.fromHand ? instance.zone !== "hand" : instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached" && !shared) return undefined;
   // Only the card's controller uses its Action, unless any player may (Éowyn's once a round each, "Any player may trigger").
-  if (!effect || (instance.controller !== state.activeSeat && effect.limit !== "oncePerRoundEachPlayer" && !effect.anyPlayer)) return undefined;
+  if (!effect || (instance.controller !== state.activeSeat && !shared && effect.limit !== "oncePerRoundEachPlayer" && !effect.anyPlayer)) return undefined;
   const scope = { actor: state.activeSeat, sourceId: cardId, returned: 0 };
   return !effect.condition || holds(state, effect.condition, scope, ctx) ? effect : undefined;
 }

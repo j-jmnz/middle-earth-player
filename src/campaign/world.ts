@@ -11,7 +11,7 @@ import type { PrintedCard } from "../rules/printed.ts";
 
 import type { CampaignLog } from "./log.ts";
 
-import { printedMap, type CatalogRow } from "./cards.ts";
+import { printedFromRow, printedMap, type CatalogRow } from "./cards.ts";
 
 export type World = {
   campaign: CampaignData;
@@ -60,7 +60,11 @@ export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effect
     if (row.encounterSet) sets.set(row.code, row.encounterSet);
     deckFacts.set(row.code, { name: row.name, typeCode: row.typeCode, sphereCode: row.sphereCode, deckLimit: row.deckLimit, deckLegal: row.deckLegal, traits: row.traits });
   }
-  return { campaign, scenario, effects, cards: printedMap(rows), sets, deckFacts };
+  const printed = printedMap(rows);
+  // The campaign card is dealt as an engine card only for the scenario being played, and only when it has an ability that works
+  // while the scenario is played (141056:A:2), which the engine places beside the quest deck (families/burden-campaign.ts).
+  for (const row of rows) if (row.code === scenario.campaignCard && row.typeCode === "campaign") printed.set(row.code, printedFromRow(row));
+  return { campaign, scenario, effects, cards: printed, sets, deckFacts };
 }
 
 // Reads the rows a scenario needs from catalog.db, read-only, and builds the world. `extra` is the heroes and deck cards

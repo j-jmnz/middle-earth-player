@@ -21,6 +21,11 @@ appId: com.middleearth.lcg
     timeout: 30000
 - assertVisible:
     id: rail
+# Only Flight to the Ford declares a life tracker and a burden deck (flight-to-the-ford.yaml asserts both there).
+- assertNotVisible:
+    id: life
+- assertNotVisible:
+    id: burden-deck
 - assertVisible:
     id: rail-current
     text: "Victory"

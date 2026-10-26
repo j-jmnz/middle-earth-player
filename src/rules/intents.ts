@@ -7,6 +7,8 @@ export type EngineStep =
   | { kind: "gainResource"; seat: number; heroId: string; cause: Cause }
   | { kind: "damage"; targetId: string; amount: number; cause: Cause }
   | { kind: "threat"; seat: number; amount: number; cause: Cause }
+  // The Ring-bearer's life went down by -`amount` (mec109.ringbearers-life).
+  | { kind: "life"; amount: number; cause: Cause }
   | { kind: "progress"; targetId: string; amount: number; cause: Cause }
   | { kind: "destroy"; targetId: string }
   | { kind: "eliminate"; seat: number }

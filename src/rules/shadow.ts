@@ -19,6 +19,7 @@ import { noteAttackDamage } from "./families/defense-damage.ts";
 import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "./families/defense-defenders.ts";
 import { holdAttack } from "./families/defense-listen.ts";
 import { announceShadowRaise, noteShadowStart } from "./families/defense-shadow.ts";
+import { charactersDestroyed } from "./families/burden-attack.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -243,6 +244,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   // The Responses to the damage just dealt, and what the end of the attack says about its defenders, come first (defense family).
   const held = holdAttackEnd(state, ctx, steps);
   if (held) return held;
+  // The characters this attack destroyed are the X of the effect it leaves for its end ("If this attack destroys a character").
+  const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx) : 0;
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
     attack.immediate || done.resolvedAttacks.includes(attack.enemyId) ? done.resolvedAttacks : [...done.resolvedAttacks, attack.enemyId];
@@ -266,6 +269,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       instructions: after,
       cancel: null,
       blockCancel: null,
+      ...(destroyed > 0 ? { x: destroyed } : {}),
       ...(attack.afterCause ? { cause: attack.afterCause } : {}),
     },
     steps,
