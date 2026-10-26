@@ -95,6 +95,9 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
     case "noneReturned":
       return scope.returned === 0;
     case "phase":
+      // The action window after 7.4 (the engine's "End of round" step) is still in the refresh phase (rr.step-7-4,
+      // rr.step-7-5): a Refresh Action may be used there. An ended phase an event names is read as it is.
+      if (scope.phase == null && condition.is === "Refresh" && state.phase === "End of round") return true;
       return (scope.phase ?? state.phase) === condition.is;
     case "undefended":
       return state.pendingAttack != null && (state.pendingAttack.defenderId == null || state.pendingAttack.undefended === true);

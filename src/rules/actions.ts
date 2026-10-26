@@ -65,7 +65,7 @@ export function applyTrigger(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  if (state.window?.kind === "cancelOffer") return applyCancel(state, intent, steps);
+  if (state.window?.kind === "cancelOffer") return applyCancel(state, intent, ctx, steps);
   if (state.window?.kind === "response") return applyResponse(state, intent, ctx, steps);
   if (state.window?.kind === "mulligan") return applyMulliganTrigger(state, intent, ctx, steps);
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);

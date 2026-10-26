@@ -117,7 +117,9 @@ export function putAttachmentIntoPlay(state: ScenarioState, instruction: Verb<"P
   let next = enforceRestricted(attachTo(moveCard(state, id, { zone: "play", seat }), id, host), host, ctx, steps);
   // A card that came from another player's deck stays that player's card (rr.ownership-and-control).
   if (owner !== seat && next.cards[id]?.owner == null) next = updateCard(next, id, { owner });
-  return queueEvent(next, { trigger: "enteredPlay", seat, cardId: id });
+  // It entered play, and it was attached to its host ("After ~ is attached to a hero").
+  next = queueEvent(next, { trigger: "enteredPlay", seat, cardId: id });
+  return queueEvent(next, { trigger: "attached", seat, subject: id, other: host });
 }
 
 // GivePicked: the card picked before the last leaves its player's hand for the hand of the player picked last, and is picked

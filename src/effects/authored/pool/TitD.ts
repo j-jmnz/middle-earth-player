@@ -18,7 +18,7 @@ export const RECORDS: readonly Effect[] = [
   // 12035 Sam Gamgee (line 2 is open)
   {"id":"12035:constant:1","cardCode":"12035","lines":["12035:A:1"],"timing":"constant","instructions":[{"verb":"ReduceCost","amount":2,"when":{"kind":"count","pick":{"type":"character","control":"you","names":["Frodo Baggins"]},"min":1}}]},
   // 12037 Mirkwood Explorer: he quested successfully when he was committed and his controller's quest succeeded.
-  {"id":"12037:response:1","cardCode":"12037","lines":["12037:A:1"],"timing":"response","trigger":"questSucceeded","eventSeat":"you","condition":{"kind":"matches","card":"self","pick":{"type":"character","control":"any","committed":true}},"instructions":[{"verb":"PlaceProgressOn","amount":1,"target":"self"}]},
+  {"id":"12037:response:1","cardCode":"12037","lines":["12037:A:1"],"timing":"response","trigger":"questedSuccessfully","subject":"self","instructions":[{"verb":"PlaceProgressOn","amount":1,"target":"self"}]},
   // 12038 Guarded Ceaselessly
   {"id":"12038:constant:1","cardCode":"12038","lines":["12038:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"location","control":"any"}]}]},
   {"id":"12038:action:1","cardCode":"12038","lines":["12038:A:2"],"timing":"action","condition":{"kind":"canPick","pick":{"type":"character","control":"you","traits":["Ranger","Scout"],"state":"ready"}},"instructions":[{"verb":"Pick","pick":{"type":"character","control":"you","traits":["Ranger","Scout"],"state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},{"verb":"ModifyStat","stat":"threat","amount":-2,"until":"endOfPhase","target":"host"}]},

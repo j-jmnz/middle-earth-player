@@ -45,15 +45,15 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
   }
   for (const cardId of [...explored].reverse()) {
     next = runQuestResolution(next, cardId, ctx, steps);
-    next = announceLeftPlay(next, cardId, ctx, steps);
+    next = announceLeftPlay(next, cardId, ctx, steps, true);
   }
   return next;
 }
 
 // A card left play: Responses are offered once its Forced effects have resolved, so their frame goes under the Forced ones
-// (rr.timing-of-ability-resolution).
-export function announceLeftPlay(state: ScenarioState, cardId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const event = { trigger: "leftPlay", seat: null, cardId } as const;
+// (rr.timing-of-ability-resolution). `explored`: the location left play explored (rr.explored), read by `subjectExplored`.
+export function announceLeftPlay(state: ScenarioState, cardId: string, ctx: ReduceContext, steps: EngineStep[], explored = false): ScenarioState {
+  const event = { trigger: "leftPlay", seat: null, cardId, ...(explored ? { explored: true } : {}) } as const;
   return fireForced(offerResponses(state, event, ctx, steps), event, ctx, steps);
 }
 

@@ -106,5 +106,5 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   const next = updateCard(state, id, { progress: location.progress + placed });
   if (points == null || location.progress + placed < points) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);
-  return announceLeftPlay(runQuestResolution(explored, id, ctx, steps), id, ctx, steps);
+  return announceLeftPlay(runQuestResolution(explored, id, ctx, steps), id, ctx, steps, true);
 }
