@@ -7,7 +7,6 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../interpret.ts";
-import { fromEncounterDeck, printedOf } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
 import { inPlay, updateCard } from "../state.ts";
 import { attachTo, moveCard } from "../zones.ts";
@@ -28,7 +27,10 @@ export function captureRingBearer(state: ScenarioState, instruction: Extract<Ins
   const attachments = [...(state.cards[heroId]?.attachments ?? [])];
   let next = updateCard(moveCard(state, heroId, { zone: "captive", hostId }), heroId, { damage: 0, resources: 0, progress: 0 });
   for (const id of attachments) {
-    const moved = updateCard(moveCard(next, id, { zone: "attached" }), id, { damage: 0, resources: 0, progress: 0, face: "down" });
+    // A card a player played keeps its owner, so the release knows to give it to the first player (a Condition an encounter card
+    // attached has no controller and no owner).
+    const controller = next.cards[id]?.controller;
+    const moved = updateCard(moveCard(next, id, { zone: "attached" }), id, { damage: 0, resources: 0, progress: 0, face: "down", ...(controller != null ? { owner: controller } : {}) });
     next = attachTo(moved, id, heroId);
   }
   return next;
@@ -47,7 +49,7 @@ export function releaseRingBearer(state: ScenarioState, instruction: Extract<Ins
   for (const id of attachments) {
     const card = next.cards[id];
     if (!card) continue;
-    const placed = fromEncounterDeck(printedOf(ctx.cards, card.code)) ? next : moveCard(next, id, { zone: "play", seat });
+    const placed = card.owner == null ? next : moveCard(next, id, { zone: "play", seat });
     next = attachTo(updateCard(placed, id, { face: "up" }), id, heroId);
   }
   return next;

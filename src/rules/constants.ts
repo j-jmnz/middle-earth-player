@@ -89,7 +89,8 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
     // "for each Hobbit hero you control", "for each enemy engaged with you" are counted here, each time the records are rebuilt.
     const seat = source.controller ?? state.firstPlayer;
     const base = resolveAmount(state, instruction.amount, { actor: seat, sourceId: source.id }, ctx);
-    const amount = instruction.per === "hobbitHero" ? base * hobbitHeroes(state, source, ctx) : base;
+    const read = instruction.per === "hobbitHero" ? base * hobbitHeroes(state, source, ctx) : base;
+    const amount = instruction.subtract ? -read : read;
     if (amount === 0) continue;
     const named = instruction.holders ? matching(state, source, instruction.holders, ctx) : holders(state, source, instruction.target, ctx, instruction.trait);
     for (const holder of named) {

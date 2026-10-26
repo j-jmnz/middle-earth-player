@@ -88,6 +88,9 @@ export const modifyStatSchema = z.strictObject({
   // gets +1 Attack", "Each enemy engaged with you gets -1 Defense"): read when the effect resolves, or for a constant each time
   // its records are rebuilt.
   holders: pickSchema.optional(),
+  // The amount, once read, is taken away instead of added ("gets -5 engagement cost for each enemy in the staging area", 142026:A:2): a
+  // read amount is never below 0, so the sign is given here.
+  subtract: z.boolean().optional(),
   // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has.
   per: z.enum(["committed", "ally", "hobbitHero", "x"]).optional(),
   ...when,

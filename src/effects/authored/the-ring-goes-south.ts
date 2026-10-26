@@ -63,7 +63,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"142025:forced:1","cardCode":"142025","lines":["142025:A:2"],"timing":"forced","trigger":"engaged","subject":"self","instructions":[{"verb":"DiscardUntil","type":"enemy","trait":"Warg"},{"verb":"MoveEncounterCard","to":"engaged"}]},
 
   // 142026 Hound of Sauron (Surge is a keyword)
-  {"id":"142026:constant:1","cardCode":"142026","lines":["142026:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"engagementCost","amount":{"count":{"type":"enemy","control":"any","stagingOnly":true},"times":-5},"until":"whileSourceInPlay"}]},
+  {"id":"142026:constant:1","cardCode":"142026","lines":["142026:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"engagementCost","amount":{"count":{"type":"enemy","control":"any","stagingOnly":true},"times":5},"subtract":true,"until":"whileSourceInPlay"}]},
   {"id":"142026:shadow:1","cardCode":"142026","lines":["142026:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":{"kind":"not","condition":ENGAGED_THIS_ROUND}},{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker","when":ENGAGED_THIS_ROUND}]},
 
   // 142027 Howling Warg
@@ -114,7 +114,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 142084 Lust for the Ring (Peril and Surge are keywords). A Condition attachment with a Forced effect of its own.
   {"id":"142084:whenRevealed:1","cardCode":"142084","lines":["142084:A:2"],"timing":"whenRevealed","instructions":[{"verb":"AttachSelf","to":{"kind":"hero","control":"any","exceptSphere":"fellowship"}}]},
-  {"id":"142084:forced:1","cardCode":"142084","lines":["142084:A:2"],"timing":"forced","trigger":"exhausted","subject":{"type":"attachment","control":"any","names":["The One Ring"]},"instructions":[{"verb":"RaiseThreat","amount":1,"who":"eachSeat"},{"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]},
+  {"id":"142084:forced:1","cardCode":"142084","lines":["142084:A:2"],"timing":"forced","trigger":"exhausted","subject":{"type":"card","control":"any","names":["The One Ring"]},"instructions":[{"verb":"RaiseThreat","amount":1,"who":"eachSeat"},{"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]},
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

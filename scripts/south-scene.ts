@@ -4,7 +4,8 @@ import { scenarioCards, scenarioDefinition, type CampaignData, type ScenarioData
 import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
 import type { ReduceContext, ScenarioState } from "../src/rules/reduce.ts";
 import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
-import { attachTo, moveCard, spawn } from "../src/rules/zones.ts";
+import { captureRingBearer } from "../src/rules/families/south-captive.ts";
+import { attachTo, spawn } from "../src/rules/zones.ts";
 
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 import { FRODO, MERRY, RING, SAM } from "./past-scene.ts";
@@ -33,6 +34,7 @@ export async function loadSouthWorld(): Promise<SouthWorld> {
   }
   cards.set("grunt", definePrinted({ code: "grunt", name: "grunt", type: "enemy", threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
   cards.set("warg", definePrinted({ code: "warg", name: "warg", type: "enemy", traits: ["Creature", "Warg"], threat: 2, engagementCost: 33, attack: 3, defense: 1, health: 4 }));
+  cards.set("orc", definePrinted({ code: "orc", name: "orc", type: "enemy", traits: ["Creature", "Orc"], threat: 1, engagementCost: 20, attack: 2, defense: 1, health: 3 }));
   cards.set("warg2", definePrinted({ code: "warg2", name: "warg2", type: "enemy", traits: ["Creature", "Warg"], threat: 2, engagementCost: 20, attack: 3, defense: 1, health: 4 }));
   cards.set("strong", definePrinted({ code: "strong", name: "strong", type: "hero", sphere: "tactics", threat: 8, willpower: 6, attack: 4, defense: 3, health: 20 }));
   cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
@@ -58,6 +60,10 @@ export type SouthLayout = {
   // The Ring-bearer is facedown under the Watcher in the Water (which is in the staging area).
   captive?: boolean;
   ring?: boolean;
+  // Attachments the first seat controls, on Sam.
+  onSam?: readonly string[];
+  // More heroes for the first seat.
+  heroes?: readonly string[];
   hand?: readonly string[];
   allies?: readonly string[];
   // Cards on the top of the first seat's deck, and of the second seat's.
@@ -80,6 +86,7 @@ export function southTable(world: SouthWorld, layout: SouthLayout = {}): { state
   const frodo = spawn(state, FRODO, { zone: "heroes", seat: 0 });
   const sam = spawn(frodo.state, SAM, { zone: "heroes", seat: 0 });
   state = sam.state;
+  for (const code of layout.heroes ?? []) state = spawn(state, code, { zone: "heroes", seat: 0 }).state;
   let merry: string | null = null;
   if (seats === 2) {
     const placed = spawn(state, MERRY, { zone: "heroes", seat: 1 });
@@ -89,6 +96,10 @@ export function southTable(world: SouthWorld, layout: SouthLayout = {}): { state
   if (layout.ring !== false) {
     const ring = spawn(state, RING, { zone: "play", seat: 0 });
     state = attachTo(ring.state, ring.id, frodo.id);
+  }
+  for (const code of layout.onSam ?? []) {
+    const placed = spawn(state, code, { zone: "play", seat: 0 });
+    state = attachTo(placed.state, placed.id, sam.id);
   }
   const wound = spawn(state, "141057", { zone: "attached" });
   state = attachTo(wound.state, wound.id, frodo.id);
@@ -111,19 +122,10 @@ export function southTable(world: SouthWorld, layout: SouthLayout = {}): { state
     const placed = spawn(state, WATCHER, { zone: "staging" });
     watcher = placed.id;
     state = placed.state;
-    state = captive(state, frodo.id, watcher);
+    state = captureRingBearer(state, { verb: "CaptureRingBearer", under: WATCHER }, { effects: EFFECTS, cards: world.cards });
   }
   const phase = layout.phase ?? "Quest";
   const mode = phase === "Quest" ? "questCommit" : phase === "Encounter" ? "optionalEngage" : phase === "Travel" ? "travel" : phase === "Planning" ? "planning" : "combatActions";
   state = { ...state, phase, boundaryPhase: phase, mode, window: phase === "Encounter" ? { kind: "optionalEngage" } : phase === "Travel" ? { kind: "travel" } : { kind: "pass" }, activeSeat: 0 };
   return { state, ctx: { effects: EFFECTS, cards: world.cards }, frodo: frodo.id, sam: sam.id, merry, watcher };
-}
-
-// Frodo and his attachments facedown under the card, as the stage 4A Setup leaves them.
-function captive(state: ScenarioState, heroId: string, hostId: string): ScenarioState {
-  let next = moveCard(state, heroId, { zone: "captive", hostId });
-  for (const id of [...(next.cards[heroId]?.attachments ?? [])]) {
-    next = attachTo(updateCard(moveCard(next, id, { zone: "attached" }), id, { face: "down" }), id, heroId);
-  }
-  return next;
 }
