@@ -65,6 +65,11 @@ describe("effect coverage", () => {
     }
   });
 
+  const lineOf = (id: string): string => {
+    const [code, side, n] = id.split(":");
+    return lines.byKey.get(keyOf(code ?? "", side ?? ""))?.lines[Number(n) - 1] ?? "";
+  };
+
   it("has a record that names a line of its own card, for every shipped record", () => {
     for (const effect of EFFECTS) {
       expect(effect.lines.length, `${effect.id} names a line`).toBeGreaterThan(0);
@@ -74,8 +79,11 @@ describe("effect coverage", () => {
         expect(code, `${effect.id} claims ${id}, a line of another card`).toBe(effect.cardCode);
         const line = entry?.lines[Number(n) - 1];
         expect(line, `${effect.id} claims ${id}, which is not a printed line`).toBeDefined();
-        // A ledger edit that shifts line numbers moves a record onto a line with another label.
-        expect(lineTimings(line ?? ""), `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
+        // A ledger edit that shifts line numbers moves a record onto a line with another label. A record may also own an
+        // unlabeled line it carries out with its labeled one (Close Call's "Doomed X." raised by its Response, 08005).
+        const timings = lineTimings(line ?? "");
+        const alongside = timings.has("constant") && effect.lines.some((other) => other !== id && lineTimings(lineOf(other)).has(effect.timing));
+        if (!alongside) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
       }
     }
   });

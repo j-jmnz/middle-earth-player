@@ -10,7 +10,7 @@ import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
-import { combatStepIs, groupResources } from "./families/defense-conditions.ts";
+import { combatStepIs } from "./families/defense-conditions.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
