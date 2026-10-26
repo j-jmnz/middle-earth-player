@@ -6,7 +6,7 @@
 //     part of the command column above the dock. That tap is swallowed.
 //   - A reading panel and the carousel have a scrim from the top bar's foot down: a tap anywhere else closes it and does nothing
 //     more. The top bar stays live, so a dial or the rail replaces the layer.
-//   - The carousel keeps clear of the tray's reach into the canvas, and neither covers the dock's armed line or buttons.
+//   - The carousel hangs over the canvas only, and the tray stays in the command column; neither covers the dock's armed line or buttons.
 import { useMemo } from "react";
 import { Pressable, Text } from "react-native";
 import { useStore } from "zustand";
@@ -27,13 +27,12 @@ import type { PictureSource } from "./table-canvas-types.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
 import { BAR_PAD, MENU_BUTTON } from "./top-bar-layout.ts";
+import { DENSE_BELOW } from "./dock-budget.ts";
 import { outsideLayers, trayBox } from "./tray-logic.ts";
 import type { TableChoice } from "./use-table-choice.ts";
 
 // The menu button's zone at the top bar's right. A tap there is the menu's, never the tray's.
 const MENU_ZONE = MENU_BUTTON + BAR_PAD;
-// Under this height the tray's tiles go on one line.
-const SHORT = 400;
 const READING_MIN = 300;
 const EDGE = 8;
 
@@ -82,14 +81,14 @@ export function TableLayers({
   const seat = shownSeat(game);
   const close = () => onReading(null);
   const anchor = anchorTop ?? Math.round(screen.height * 0.55);
-  const box = trayBox({ commandWidth, insetRight: insets.right, screenWidth: screen.width, screenHeight: screen.height, barBottom, anchorTop: anchor });
+  const canvas = screen.width - insets.left - insets.right - commandWidth;
+  const box = trayBox({ commandWidth, insetRight: insets.right, screenHeight: screen.height, barBottom, anchorTop: anchor });
   const trayShown = choice.panelOpen;
   // The panel layer (everything but the carousel).
   const panel = reading && reading.kind !== "carousel" ? reading : null;
   const held = useHeld(panel);
   const width = Math.max(READING_MIN, box.width);
   const foot = Math.max(insets.bottom, EDGE);
-  const canvas = screen.width - insets.left - insets.right - commandWidth;
   const open = reading?.kind === "carousel";
   const logging = held?.kind === "log";
   const lines = useMemo(() => (logging ? logLines(roundSteps, logNames) : []), [logging, roundSteps, logNames]);
@@ -105,7 +104,7 @@ export function TableLayers({
           <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: anchor - barBottom }} />
         </>
       ) : null}
-      <ChoiceTray open={trayShown} place={box} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={screen.height < SHORT} onTile={choice.onTile} onRead={onPreview} />
+      <ChoiceTray open={trayShown} place={box} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={screen.height < DENSE_BELOW} onTile={choice.onTile} onRead={onPreview} />
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
       <TrayFrame open={panel != null} surface="paper" testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE }}>
         {held?.kind === "pile" ? (
@@ -143,14 +142,14 @@ export function TableLayers({
           </Text>
         ) : null}
       </TrayFrame>
-      {/* The strip hangs over the canvas only, and short of the tray's reach into it. */}
+      {/* The strip hangs over the canvas only; the tray stays in the command column. */}
       <PhaseCarousel
         open={open}
         carousel={carousel}
         settings={settings}
         top={barBottom}
         left={insets.left}
-        width={canvas - (trayShown ? box.overlap : 0)}
+        width={canvas}
         height={Math.round(Math.min(340, (screen.height - barBottom) * 0.92))}
         onChange={(change) => tableSettings.getState().update(change)}
         onClose={close}

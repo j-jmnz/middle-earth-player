@@ -1,18 +1,19 @@
 // What the Android hardware Back does on the table, one layer at a time, topmost first:
-//   1. the table menu, or the dock's More popover (they share a frame; only one is ever open);
+//   1. the table menu, the dock's More popover or its "i" popover (they share a frame; only one is ever open);
 //   2. the card preview;
 //   3. the reading layer (the threat panel, the phase carousel, the table settings, a discard pile's list, the log; reading.ts);
 //   4. a sheet the player opened from the table (a payment, a host, an Action; nothing was sent);
 //   5. the choice tray, which it folds;
 //   and only then it leaves the table. A folded tray stays a choice the engine is waiting for; leaving loses nothing because
 // every accepted intent is already saved.
-export type BackLayers = { menuOpen: boolean; moreOpen: boolean; previewOpen: boolean; readingOpen: boolean; overlayOpen: boolean; panelOpen: boolean };
+export type BackLayers = { menuOpen: boolean; moreOpen: boolean; linesOpen: boolean; previewOpen: boolean; readingOpen: boolean; overlayOpen: boolean; panelOpen: boolean };
 
-export type BackStep = "closeMenu" | "closeMore" | "closePreview" | "closeReading" | "closeOverlay" | "foldPanel" | "leave";
+export type BackStep = "closeMenu" | "closeMore" | "closeLines" | "closePreview" | "closeReading" | "closeOverlay" | "foldPanel" | "leave";
 
 export function backStep(layers: BackLayers): BackStep {
   if (layers.menuOpen) return "closeMenu";
   if (layers.moreOpen) return "closeMore";
+  if (layers.linesOpen) return "closeLines";
   if (layers.previewOpen) return "closePreview";
   if (layers.readingOpen) return "closeReading";
   if (layers.overlayOpen) return "closeOverlay";

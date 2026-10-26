@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import { openReading, type Reading } from "./reading.ts";
 import type { MultiSheet, PickSheet, TriggerSheet } from "./sheet-types.ts";
 import type { Choice } from "./table-choice.ts";
-import { outsideLayers, tapRoute, TRAY_MAX, TRAY_REACH, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
+import { tableLayout } from "./layout.ts";
+import { PILES, TABLE_ZONES, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
+import { outsideLayers, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
 
 // The choice tray (docs/design-system.md, Table; phase 21): its tiles, its count, what a tap outside it does, and where it sits
 // against the command column and the dock. No rule is implemented here.
@@ -111,20 +113,36 @@ describe("the outside tap", () => {
 describe("where the tray sits", () => {
   const phone = (width: number, height: number, anchorTop: number, insetRight = 0) => {
     const commandWidth = Math.round(Math.min(280, Math.max(210, width * 0.3)));
-    return { commandWidth, box: trayBox({ commandWidth, insetRight, screenWidth: width, screenHeight: height, barBottom: 44, anchorTop }) };
+    return { commandWidth, box: trayBox({ commandWidth, insetRight, screenHeight: height, barBottom: 44, anchorTop }) };
   };
 
-  it("is the command column's width plus 40 pt into the canvas on a wide phone, at most 340", () => {
+  it("is the command column's width, at most 340", () => {
     expect(phone(844, 390, 200).commandWidth).toBe(253);
-    expect(phone(844, 390, 200).box).toMatchObject({ width: 293, overlap: TRAY_REACH });
+    expect(phone(844, 390, 200).box.width).toBe(253);
+    expect(phone(667, 375, 200).box.width).toBe(210);
     const wide = phone(1100, 500, 300);
     expect(wide.commandWidth).toBe(280);
     expect(wide.box.width).toBeLessThanOrEqual(TRAY_MAX);
   });
 
-  it("reaches no further than the command column under 720 pt wide, so the encounter discard stays in view", () => {
-    expect(phone(667, 375, 200).commandWidth).toBe(210);
-    expect(phone(667, 375, 200).box).toMatchObject({ width: 210, overlap: 0 });
+  it("covers neither encounter pile with the tray open, at 844x390 and 667x375, with insets 0 and 47 (the canvas is the real layout)", () => {
+    const views = Object.fromEntries(TABLE_ZONES.map((zone) => [zone, { zone, seat: 0, entries: [] } satisfies ZoneView])) as unknown as Record<ZoneId, ZoneView>;
+    const piles = Object.fromEntries(PILES.map((pile) => [pile, { pile, seat: 0, ids: [], top: null } satisfies PileView])) as unknown as Record<(typeof PILES)[number], PileView>;
+    for (const [width, height] of [[844, 390], [667, 375]] as const) {
+      for (const inset of [0, 47]) {
+        const { box, commandWidth } = phone(width, height, 200, inset);
+        const canvas = width - 2 * inset - commandWidth;
+        const layout = tableLayout(canvas, height - 44, views, piles, {});
+        // The canvas ends where the command column begins; the tray starts there.
+        const trayLeft = canvas + commandWidth - box.width;
+        expect(trayLeft, `${width} inset ${inset}`).toBe(canvas);
+        for (const id of ["encounterDeck", "encounterDiscard"] as const) {
+          const rect = layout.piles[id];
+          expect(rect.x + rect.w, `${id} at ${width} inset ${inset}`).toBeLessThanOrEqual(trayLeft);
+          expect(rect.x).toBeGreaterThanOrEqual(0);
+        }
+      }
+    }
   });
 
   it("ends above the dock's block and rises no higher than the top bar", () => {
