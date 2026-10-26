@@ -151,7 +151,10 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
     }
     case "matches": {
       const id = conditionCard(state, condition.card, scope);
-      return id != null && matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId: null, counting: true }, ctx);
+      const card = id ? state.cards[id] : undefined;
+      if (!id || !card) return false;
+      if (condition.inPlay != null && inPlay(card.zone) !== condition.inPlay) return false;
+      return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId: null, counting: true }, ctx);
     }
     case "copiesPlayedThisRound": {
       const code = scope.sourceId ? state.cards[scope.sourceId]?.code : undefined;

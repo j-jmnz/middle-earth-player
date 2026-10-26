@@ -45,8 +45,14 @@ export function smokeCodes(effects: readonly Effect[] = EFFECTS): string[] {
 // The first deck-legal hero an attachment's AttachesTo record accepts, one with no record of its own when there is one.
 function hostHero(code: string, cards: readonly Card[], recorded: ReadonlySet<string>): string | null {
   const rule = EFFECTS.flatMap((effect) => (effect.cardCode === code ? effect.instructions : [])).find((instruction) => instruction.verb === "AttachesTo");
-  if (rule?.verb !== "AttachesTo" || (rule.host.kind !== "hero" && rule.host.kind !== "character")) return null;
-  const { trait, name, sphere } = rule.host;
+  if (rule?.verb !== "AttachesTo") return null;
+  // A host filter list: the first filter's trait, name or sphere stands for it.
+  const filter = rule.hosts?.[0];
+  if (filter && filter.type !== "hero" && filter.type !== "character") return null;
+  if (!filter && rule.host && rule.host.kind !== "hero" && rule.host.kind !== "character") return null;
+  const trait = filter ? (filter.trait ?? filter.traits?.[0]) : rule.host?.trait;
+  const name = filter ? filter.names?.[0] : rule.host?.name;
+  const sphere = filter ? (filter.sphere ?? filter.spheres?.[0]) : rule.host?.sphere;
   if (!trait && !name && !sphere) return null;
   const fits = cards.filter((card) => card.type === "hero" && card.deckLegal && (!trait || card.traits.includes(trait)) && (!name || card.name === name) && (!sphere || card.sphere === sphere));
   return (fits.find((card) => !recorded.has(card.code)) ?? fits[0])?.code ?? null;

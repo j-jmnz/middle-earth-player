@@ -87,7 +87,13 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("threat"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
   // The source card, its host, the card the event was about, or the active location matches the filter (its zone is not
   // checked): "while ~ is committed to a quest", "if attached hero is a Dwarf", "if that enemy is an Orc".
-  z.strictObject({ kind: z.literal("matches"), card: z.enum(["self", "host", "subject", "other", "activeLocation", "picked", "attacker", "defender"]), pick: pickSchema }),
+  // `inPlay`: the card is in play now (`false`: it is not), for "if that ally is still in play".
+  z.strictObject({
+    kind: z.literal("matches"),
+    card: z.enum(["self", "host", "subject", "other", "activeLocation", "picked", "attacker", "defender"]),
+    pick: pickSchema.optional(),
+    inPlay: z.boolean().optional(),
+  }),
   // At most `max` other copies of the source card were played from the hand this round ("if this is the first time you
   // played a copy of ~ this round").
   z.strictObject({ kind: z.literal("copiesPlayedThisRound"), max: z.number().int().min(0) }),

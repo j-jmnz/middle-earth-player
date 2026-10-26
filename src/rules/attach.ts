@@ -31,17 +31,18 @@ export function attachRule(ctx: ReduceContext, code: string): AttachRule | undef
 // seat; one without goes on a character of the seat that plays it.
 export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext): string[] {
   const rule = attachRule(ctx, code);
+  const named = rule?.host ?? { kind: "character" as const };
   const candidates: string[] = [];
   if (rule?.hosts) {
     // Any of the filters, from the playing seat's side; a filter that says `control: "you"` keeps the seat's own cards.
     for (const filter of rule.hosts) candidates.push(...pickCandidates(state, filter, seat, [], null, ctx).filter((id) => !candidates.includes(id)));
   } else if (!rule) {
     candidates.push(...characters(state, seat, ctx.cards));
-  } else if (rule.host.kind === "activeLocation") {
+  } else if (named.kind === "activeLocation") {
     if (state.activeLocation) candidates.push(state.activeLocation);
   } else {
     for (const index of livingSeats(state)) {
-      if (rule.host.kind === "hero" || rule.host.kind === "ringBearer") candidates.push(...(state.seats[index]?.heroes ?? []));
+      if (named.kind === "hero" || named.kind === "ringBearer") candidates.push(...(state.seats[index]?.heroes ?? []));
       else candidates.push(...characters(state, index, ctx.cards));
     }
   }
@@ -52,10 +53,10 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     if (!rule) return true;
     if (rule.limitPerHost && host.attachments.some((other) => state.cards[other]?.code === code)) return false;
     if (rule.hosts) return true;
-    if (rule.host.kind === "ringBearer" && !hasTrait(state, id, "Ring-bearer", ctx)) return false;
-    if (rule.host.trait && !hasTrait(state, id, rule.host.trait, ctx)) return false;
-    if (rule.host.name && printedOf(ctx.cards, host.code).name !== rule.host.name) return false;
-    if (rule.host.sphere && printedOf(ctx.cards, host.code).sphere !== rule.host.sphere) return false;
+    if (named.kind === "ringBearer" && !hasTrait(state, id, "Ring-bearer", ctx)) return false;
+    if (named.trait && !hasTrait(state, id, named.trait, ctx)) return false;
+    if (named.name && printedOf(ctx.cards, host.code).name !== named.name) return false;
+    if (named.sphere && printedOf(ctx.cards, host.code).sphere !== named.sphere) return false;
     return true;
   });
 }
