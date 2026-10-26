@@ -30,6 +30,12 @@ export const amountExprSchema = z.strictObject({
   hand: z.literal(true).optional(),
   // The damage the answered event dealt ("cancel that damage", "place that damage on ~ instead").
   dealt: z.literal(true).optional(),
+  // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the
+  // source card hold above the number on this one (Keeping Count; the most any copy holds), read by families/misc-amounts.ts.
+  facedown: z.literal(true).optional(),
+  resourcesAboveCopies: z.literal(true).optional(),
+  // The amount comes out negative ("gets -1 Willpower for each damaged hero you control"): the value read, below 0.
+  negative: z.literal(true).optional(),
   // amount = value × times + plus, at most `limit`, at least 0.
   times: z.number().int().optional(),
   plus: z.number().int().optional(),

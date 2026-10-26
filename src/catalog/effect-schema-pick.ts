@@ -140,6 +140,17 @@ export const pickSchema = z.strictObject({
   minHitPoints: z.number().int().positive().optional(),
   // The top card of its discard pile ("While the top card of your discard pile is an ally").
   topOfDiscard: z.boolean().optional(),
+  // The misc family's filters (families/misc-pick.ts). A card controlled by the player the effect last picked ("each hero
+  // controlled by that player"); an attachment attached to the last picked card; a player card (not an encounter card); a
+  // character whose current Defense is at most this ("an enemy with 0 Defense"); a card in the hand that was drawn by the
+  // resource phase's draw step this round ("choose and discard 1 of those cards").
+  controlledBy: z.literal("picked").optional(),
+  onPicked: z.boolean().optional(),
+  playerCard: z.boolean().optional(),
+  maxDefense: z.number().int().min(0).optional(),
+  drawn: z.boolean().optional(),
+  // A card with at most this many attachments on it ("a Dale character without an attachment" is read after the attachment arrived: 1).
+  maxAttachments: z.number().int().min(0).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

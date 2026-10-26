@@ -5,6 +5,7 @@ import type { Amount, CardRef } from "../catalog/boundary.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
 import { threatCostOf } from "./families/costs-stats.ts";
+import { miscAmount } from "./families/misc-amounts.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import { countMatching, pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
@@ -98,7 +99,8 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
     value = amount.threat === "tens" ? Math.floor(threat / 10) : threat;
   } else if (amount.hand) value = (state.seats[scope.actor]?.hand ?? []).length;
   else if (amount.dealt) value = scope.dealt ?? 0;
+  else if (amount.facedown || amount.resourcesAboveCopies) value = miscAmount(state, amount, scope.sourceId);
   value = value * (amount.times ?? 1) + (amount.plus ?? 0);
   if (amount.limit != null) value = Math.min(value, amount.limit);
-  return Math.max(0, value);
+  return amount.negative ? -Math.max(0, value) : Math.max(0, value);
 }

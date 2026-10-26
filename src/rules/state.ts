@@ -246,6 +246,9 @@ export type ScenarioState = {
   pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
+  // The cards each seat drew in the draw step at the beginning of this round's resource phase ("choose and discard 1 of those
+  // cards", families/misc-pick.ts).
+  resourceDrawn?: Readonly<Record<number, readonly string[]>>;
   // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
   // damage then waits for those Responses before it destroys the character (settle keeps it current).
   holdLethal?: true;

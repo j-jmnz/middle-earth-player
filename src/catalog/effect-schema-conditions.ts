@@ -130,6 +130,9 @@ const atomSchema = z.discriminatedUnion("kind", [
     alone: z.boolean().optional(),
     ranged: z.boolean().optional(),
   }),
+  // The characters the actor controls have at least `min` different Traits between them ("a total of at least 9 different Traits
+  // between them", 17064:A:1).
+  z.strictObject({ kind: z.literal("distinctTraits"), min: z.number().int().positive() }),
   // The actor engaged an enemy this round (`is`), or did not ("If you have not engaged an enemy this round", 08056:A:2).
   z.strictObject({ kind: z.literal("engagedThisRound"), is: z.boolean() }),
 ]);

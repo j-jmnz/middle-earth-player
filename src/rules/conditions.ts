@@ -5,6 +5,7 @@ import { spendablePools } from "./families/costs-verbs.ts";
 import { engagedThisRound } from "./families/attack-events.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
 import { seatThreat } from "./families/play-hooks.ts";
+import { distinctTraitCount, flaggedTrait } from "./families/misc-traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
@@ -190,6 +191,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
     }
     case "engagedThisRound":
       return engagedThisRound(state, scope.actor) === condition.is;
+    case "distinctTraits":
+      return distinctTraitCount(state, scope.actor, ctx) >= condition.min;
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":
@@ -227,7 +230,7 @@ function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLo
 
 export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
-  return instance != null && (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait));
+  return instance != null && (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait) || flaggedTrait(state, id, trait));
 }
 
 // What the constant records of a card's attachments give it: the Gondor trait from Steward of Gondor, a resource icon

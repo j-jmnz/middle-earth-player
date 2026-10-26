@@ -7,6 +7,8 @@ import { hasTrait } from "./conditions.ts";
 import { attachmentsPickMatches } from "./families/attachments-pick.ts";
 import { costsPickMatches } from "./families/costs-pick.ts";
 import { attackPickMatches } from "./families/attack-pick.ts";
+import { miscPickMatches } from "./families/misc-pick.ts";
+import { countsExtra } from "./families/misc-traits.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import { playPickMatches } from "./families/play-pick.ts";
 import { lookedPool } from "./families/deck-pick.ts";
@@ -134,6 +136,9 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (!attackPickMatches(state, id, spec, at, ctx)) return false;
   // The play family's filters: a Trait shared with the source or its host (families/play-pick.ts).
   if (!playPickMatches(state, id, spec, at.sourceId, ctx)) return false;
+  // The misc family's filters: controlled by the picked player, attached to the picked card, a player card, a Defense limit, drawn
+  // in the resource phase (families/misc-pick.ts).
+  if (!miscPickMatches(state, id, spec, at, ctx)) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   // Every defender of the attack in progress, the extra ones too (rr.multiple-defenders).
   if (spec.defending && !isDefending(state, id)) return false;
@@ -235,5 +240,7 @@ function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLo
 
 // How many cards match a filter from a seat's side: the count an amount or a condition reads.
 export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext): number {
-  return pickCandidates(state, spec, seat, [], sourceId, ctx, undefined, undefined, true).length;
+  const found = pickCandidates(state, spec, seat, [], sourceId, ctx, undefined, undefined, true);
+  // "When counting the number of Dwarf characters you control, Bombur counts as two" (families/misc-traits.ts).
+  return found.length + countsExtra(state, found, spec);
 }

@@ -11,11 +11,12 @@ import { pushEffectFrame } from "./effect-frames.ts";
 import { playIntoRule } from "./families/attachments-play.ts";
 import { questHosts } from "./families/attachments-quest.ts";
 import { seatThreat } from "./families/play-hooks.ts";
+import { fixedX, grantedSecrecy } from "./families/misc-cost.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { playerCardEffectCanChoose } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
-import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
+import { attachBlocked, restrictedLoad } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
 import { heldAmount, livingSeats } from "./state.ts";
 import { matchesPick, pickCandidates } from "./pick.ts";
@@ -75,11 +76,14 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
   const instance = state.cards[cardId];
   if (!instance) return null;
   const printed = printedOf(ctx.cards, instance.code);
-  if (printed.cost == null) return null;
-  let cost = printed.cost;
+  // A cost of X that a record fixes ("X is the number of players in the game") is that number (families/misc-cost.ts).
+  const base = printed.cost ?? fixedX(state, cardId, ctx);
+  if (base == null) return null;
+  let cost = base;
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
-  // Secrecy X: X less while the player's threat is 20 or less.
+  // Secrecy X: X less while the player's threat is 20 or less, and the Secrecy a card in play grants this card.
   if (printed.keywords.secrecy != null && state.seats[seat] && seatThreat(state, seat) <= 20) cost -= printed.keywords.secrecy;
+  cost -= grantedSecrecy(state, cardId, seat, ctx);
   for (const effect of effectsOf(ctx, instance.code)) {
     if (effect.timing !== "constant") continue;
     for (const instruction of effect.instructions) {
@@ -99,7 +103,7 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
 // too many arrives, its controller chooses one of the restricted attachments and it moves at once to its owner's discard
 // pile (rr.restricted).
 export function enforceRestricted(state: ScenarioState, hostId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (restrictedAttachments(state, hostId, ctx).length <= 2 + Math.max(0, heldAmount(state, hostId, "extraRestricted"))) return state;
+  if (restrictedLoad(state, hostId, ctx) <= 2 + Math.max(0, heldAmount(state, hostId, "extraRestricted"))) return state;
   const host = state.cards[hostId];
   const actor = host?.controller ?? state.activeSeat;
   return pushEffectFrame(

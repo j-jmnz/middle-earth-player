@@ -11,6 +11,7 @@ import { constantInstructions } from "./constant-records.ts";
 import { holds } from "./conditions.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { effectsOf } from "./listen.ts";
+import { spendsAsSphere } from "./families/misc-cost.ts";
 import { matchesPick } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import type { Discount, ScenarioState } from "./state.ts";
@@ -82,6 +83,8 @@ export function heroPaysFor(state: ScenarioState, heroId: string, cardId: string
   // The discount the card would spend says it needs no resource match ("That ally does not require a resource match").
   if (discountFor(state, cardId, seat, ctx)?.noMatch) return true;
   const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
+  // A lasting effect names a sphere: resources of any sphere pay for its cards (A Good Harvest, families/misc-cost.ts).
+  if (spendsAsSphere(state, seat, sphere)) return true;
   return rules(state, "PaysFor", cardId, seat, ctx).some(
     ({ sourceId, rule }) => rule.verb === "PaysFor" && sourceId === heroId && (rule.spheres == null || (sphere != null && rule.spheres.includes(sphere))),
   );

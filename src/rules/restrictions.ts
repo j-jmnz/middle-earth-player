@@ -5,7 +5,7 @@ import { constantInstructions } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
-import { flagged, inPlay, type ScenarioState } from "./state.ts";
+import { flagged, heldAmount, inPlay, type ScenarioState } from "./state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
 export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string; maxWillpower?: number };
@@ -83,6 +83,12 @@ export function restrictedAttachments(state: ScenarioState, hostId: string, ctx:
   if (!host) return [];
   return host.attachments.filter((id) => {
     const attachment = state.cards[id];
-    return attachment != null && printedOf(ctx.cards, attachment.code).keywords.restricted;
+    // Snowmane "loses the restricted keyword" while a flag says so (families/misc-traits.ts).
+    return attachment != null && printedOf(ctx.cards, attachment.code).keywords.restricted && !flagged(state, id, "losesRestricted");
   });
+}
+
+// How many restricted attachments the card counts as having: one each, two for a card that "counts as 2 Restricted attachments".
+export function restrictedLoad(state: ScenarioState, hostId: string, ctx: ReduceContext): number {
+  return restrictedAttachments(state, hostId, ctx).reduce((sum, id) => sum + Math.max(1, heldAmount(state, id, "countsAsRestricted")), 0);
 }
