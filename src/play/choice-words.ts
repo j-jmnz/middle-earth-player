@@ -5,6 +5,7 @@
 import type { Amount, Instruction } from "../catalog/boundary.ts";
 import { questProgressMoved } from "../rules/verbs.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
+import { deckPickWords, deckWords } from "./deck-words.ts";
 import { encounterPickWords, encounterWords } from "./encounter-words.ts";
 
 export type ChoiceNames = {
@@ -184,7 +185,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
         ? `add ${article(`${instruction.trait ?? ""} enemy`.trim())} from the encounter deck or discard pile to the staging area`
         : `put ${article(`${instruction.trait ?? ""} enemy`.trim())} into play engaged with the first player`;
     case "Pick": {
-      const noun = PICK_NOUNS[instruction.pick.type] ?? "card";
+      // A card out of play is named by its printed type when the pick asks for one ("choose an ally" from the deck).
+      const noun = instruction.pick.type === "card" && instruction.pick.cardType && instruction.pick.cardType !== "player-side-quest" ? instruction.pick.cardType : (PICK_NOUNS[instruction.pick.type] ?? "card");
       return `choose ${article(noun)}`;
     }
     case "RemoveFromQuest":
@@ -198,8 +200,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     case "ShuffleEncounterDeck":
       return null;
     default:
-      // The encounter family's verbs (src/catalog/families/encounter.ts).
-      return encounterWords(instruction);
+      // The encounter family's verbs (src/catalog/families/encounter.ts), then the deck family's (src/catalog/families/deck.ts).
+      return encounterWords(instruction) ?? deckWords(instruction);
   }
 }
 
@@ -244,7 +246,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "PlayFromHand") return { verb: "Play", prompt: "Choose a card to play from your hand." };
   if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
   if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
-  if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? { verb: "Choose", prompt: "Choose one." };
+  if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? deckPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);
   switch (next?.verb) {

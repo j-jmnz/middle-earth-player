@@ -95,7 +95,7 @@ export function encounterWords(instruction: Instruction): string | null {
   const verb = instruction as EncounterVerb;
   switch (verb.verb) {
     case "LookAtTop":
-      return `look at ${cards(verb.count ?? 1)} of ${verb.deck === "own" ? "your deck" : "the encounter deck"}`;
+      return `look at ${typeof verb.count === "object" ? "the top X cards" : cards(verb.count ?? 1)} of ${verb.deck === "own" ? "your deck" : verb.deck === "picked" ? "that player's deck" : "the encounter deck"}`;
     case "PickEncounter":
       return verb.from === "looked" ? "choose one of them" : `choose ${article(verb.type ?? "card")}`;
     case "MoveEncounterCard":

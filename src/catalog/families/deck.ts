@@ -40,8 +40,8 @@ export const VERBS = [
     host: pickSchema.optional(),
     ...when,
   }),
-  // The last picked card (in a player's hand) goes to the hand of the player picked before it ("add it to another player's
-  // hand"). Its owner does not change.
+  // The card picked before the last (in a player's hand) goes to the hand of the player picked last ("add it to another
+  // player's hand"), and is the picked card again ("the chosen card"). Its owner does not change.
   z.strictObject({ verb: z.literal("GivePicked"), ...when }),
   // The card picked before the last (in a deck) and the last picked card (in a hand) change places: the hand's card takes the
   // deck card's position and counts as one of the cards the effect looked at ("Switch one of those cards with a card from
@@ -75,8 +75,8 @@ export const VERBS = [
   // an event resolves its Action and goes to its owner's discard pile, an attachment goes on a host the actor chooses. It is
   // paid for from the actor's heroes, or costs nothing with `free` (an attachment is played only for free). Copies of one card
   // are one choice. The played card is picked for the instructions after it ("Then, place that event on the bottom of your
-  // deck").
-  z.strictObject({ verb: z.literal("PlayFrom"), pick: pickSchema, free: z.boolean().optional(), ...when }),
+  // deck"). `card` is engine use: the attachment chosen, waiting for its host.
+  z.strictObject({ verb: z.literal("PlayFrom"), pick: pickSchema, free: z.boolean().optional(), card: z.string().optional(), ...when }),
   // The next event with the Doomed keyword the actor plays before `until` raises each player's threat by `amount` less
   // (not below 0): "Reduce the X value of the next Doomed X event you play this phase by 2".
   z.strictObject({ verb: z.literal("ReduceNextDoomed"), amount: z.number().int().positive(), until: z.enum(["endOfPhase", "endOfRound"]), ...when }),

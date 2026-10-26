@@ -28,6 +28,7 @@ import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
 import { afterPlay } from "./families/costs-play.ts";
+import { afterPaying } from "./families/deck-play.ts";
 import { doRefresh } from "./refresh.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
@@ -96,7 +97,8 @@ export function applyIntent(
     case "PlayCard": {
       // A play is an action opportunity taken: every seat may act again before the window closes (rr.action-windows).
       // What the play adds beyond moving the card (families/costs-play.ts): its discount's riders, its additional costs.
-      const played = afterPlay(state, playCard(state, intent, ctx, steps), intent, ctx, steps);
+      // A Response that lowered its cost as it was played is paid for (families/deck-play.ts).
+      const played = afterPaying(state, afterPlay(state, playCard(state, intent, ctx, steps), intent, ctx, steps), intent, ctx, steps);
       return played.window?.kind === "pass" ? { ...played, passed: [] } : played;
     }
     case "Commit":

@@ -194,8 +194,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         step: "Setup",
         title: game.seatCount > 1 ? `Player ${game.activeSeat + 1}: opening hand` : "Opening hand",
         note: "Keep this hand, or shuffle it back and draw a new one once.",
-        verb: "",
-        options: [],
+        verb: has(legal, "Trigger") ? "Use" : "",
+        // A Response used in place of the mulligan (Galdor of the Havens).
+        options: legal.flatMap((intent): PickOption[] => (intent.type === "Trigger" ? [{ ...option(game, names, intent.cardId), intent: { type: "Trigger", cardId: intent.cardId, effectId: intent.effectId } }] : [])),
         primary: { label: "Keep", intent: { type: "Keep" } },
         alternative: has(legal, "Mulligan") ? { label: "Mulligan", intent: { type: "Mulligan" } } : null,
       };
@@ -313,7 +314,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         step: step(game),
         title: window.cardIds.map((id) => names.card(id)).join(", ") || "Look",
         // A look at the top of a player's own deck (LookAtTop with `deck: "own"`) says so.
-        note: game.cards[window.cardIds[0] ?? ""]?.zone === "deck" ? "The top of your deck. Nothing moves." : "The top of the encounter deck. Nothing moves.",
+        note: game.cards[window.cardIds[0] ?? ""]?.zone === "deck" ? (game.cards[window.cardIds[0] ?? ""]?.controller === window.seat ? "The top of your deck. Nothing moves." : "The top of that player's deck. Nothing moves.") : "The top of the encounter deck. Nothing moves.",
         verb: "",
         options: [],
         primary: { label: "Done", intent: { type: "Pass" } },

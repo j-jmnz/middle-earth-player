@@ -5,11 +5,11 @@
 // area, the active location.
 import type { Instruction } from "../../catalog/boundary.ts";
 
-import { frameScope, refCard } from "../amounts.ts";
+import { frameScope, refCard, resolveAmount } from "../amounts.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { releaseAttachments } from "../keywords.ts";
-import { pickedList } from "../player-verbs.ts";
+import { pickedList, seatOf } from "../player-verbs.ts";
 import { printedOf, type CardType } from "../printed.ts";
 import { engageWith } from "../quest.ts";
 import { queueEvent } from "../queue.ts";
@@ -148,9 +148,11 @@ export function discardUntil(state: ScenarioState, type: CardType, ctx: ReduceCo
 
 // Shows the actor the top cards of the encounter deck or of their own deck. The top card is picked, and the cards shown are
 // remembered for ArrangeEncounter and PickEncounter.
-export function lookAtTop(state: ScenarioState, instruction: Extract<Instruction, { verb: "LookAtTop" }>, seat: number): ScenarioState {
-  const count = instruction.count ?? 1;
-  const ids = instruction.deck === "own" ? (state.seats[seat]?.deck ?? []).slice(0, count) : state.encounterDeck.slice(0, count);
+export function lookAtTop(state: ScenarioState, instruction: Extract<Instruction, { verb: "LookAtTop" }>, seat: number, ctx: ReduceContext, sourceId: string | null): ScenarioState {
+  const count = instruction.count == null ? 1 : resolveAmount(state, instruction.count, frameScope(state, seat, sourceId), ctx);
+  // A player's deck: the actor's, or the last picked player's (families/deck.ts).
+  const owner = instruction.deck === "picked" ? seatOf(pickedList(state).at(-1) ?? "") : seat;
+  const ids = instruction.deck === "own" || instruction.deck === "picked" ? (owner == null ? [] : (state.seats[owner]?.deck ?? []).slice(0, count)) : state.encounterDeck.slice(0, count);
   const data = effectData(state);
   const noted = data ? patchTop(state, { data: { ...data, looked: ids, picked: [...(data.picked ?? []), ids[0] ?? ""] } }) : state;
   if (ids.length === 0) return noted;

@@ -44,3 +44,9 @@ picked player's deck). ArrangeTop (effect-frames.ts) is to work on the deck the 
 ## Lines still open
 
 All 43 at this checkpoint. Candidate to stay open: 145005:A:1 (card type change).
+
+## Interrupted by the API usage limit (2026-10-26, about 11:30 UTC)
+
+The main session committed the uncommitted work as it stood, unreviewed and possibly not compiling, in the commit after
+this note's previous version. The agent's last stated next step was: "Now the records file."
+Before continuing: run `pnpm exec tsc --noEmit` and the family tests, and finish or revert that step.

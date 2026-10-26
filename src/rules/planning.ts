@@ -11,6 +11,8 @@ import { distinctHeroesReason, spendDiscount } from "./cost-rules.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import { payerOk } from "./families/costs-pay.ts";
 import { exhaustSlack, extraCostReason } from "./families/costs-play.ts";
+import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "./families/deck-play.ts";
+import { doomedRaise } from "./families/deck-rules.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
@@ -56,9 +58,12 @@ export function playCard(
   // The discount it used is spent, and the card joins this round's plays.
   next = spendDiscount(next, intent.cardId, seat, ctx);
   next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round }] };
-  // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x).
-  if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
-    for (const index of livingSeats(next)) next = raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x"));
+  // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x), less a reduction the seat holds for
+  // its next Doomed event (families/deck-rules.ts).
+  const doomed = doomedRaise(next, seat, printed);
+  next = doomed.state;
+  if (doomed.amount > 0) {
+    for (const index of livingSeats(next)) next = raiseThreat(next, index, doomed.amount, steps, ruleCause("rr.doomed-x"));
   }
   if (printed.type === "event") {
     const x = printed.costX ? intent.payments.reduce((sum, payment) => sum + payment.amount, 0) : undefined;
@@ -93,16 +98,18 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
   const running = runningActions(state, cardId, seat, ctx);
   const first = running[0];
   if (!first) return moveCard(state, cardId, { zone: "discard", seat });
+  // Two Actions on different lines (an Action and a Valour Action): the player uses one (families/deck-play.ts).
+  const choice = alternativeActions(running);
   return pushEffectFrame(
-    { ...state, window: null },
+    { ...noteEventLimits(state, running, cardId, seat, ctx, steps), window: null },
     {
       frame: "ResolveEffect",
       sourceId: cardId,
       actor: seat,
       peril: state.perilSeat != null,
       effectId: first.id,
-      instructions: running.flatMap((effect) => effect.instructions),
-      causes: running.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
+      instructions: choice ?? running.flatMap((effect) => effect.instructions),
+      causes: choice ? [effectCause(first)] : running.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
       cancel: null,
       blockCancel: null,
       finish: "discardSource",
@@ -124,6 +131,9 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
   }
   const running = runningActions(state, cardId, seat, ctx);
   if (running.length === 0) return "That card cannot be played now";
+  // "You can only play 1 copy of ~ each phase" (families/deck-play.ts).
+  const limited = eventLimitReason(state, running, cardId, seat);
+  if (limited) return limited;
   for (const effect of running) {
     for (const instruction of effect.instructions) {
       // "Choose an enemy engaged with a player" with none engaged (Feint): there is no valid target (rr.the-word-choose).
@@ -131,7 +141,8 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
         if (targetCandidates(state, instruction, seat, ctx).length === 0) return "That card has no legal target";
         continue;
       }
-      if (instruction.verb !== "Pick" || instruction.pick.different || instruction.pick.attackableByPicked) continue;
+      // A search finds what it finds, and a later or conditional choice is made as the effect resolves (rr.search).
+      if (instruction.verb !== "Pick" || searchOrLaterPick(instruction.pick, instruction.when)) continue;
       if (pickCandidates(state, instruction.pick, seat, [], cardId, ctx).length === 0) return "That card has no legal target";
     }
   }
@@ -253,6 +264,7 @@ function paymentReason(
   if (cost == null) return "That card has no printed cost";
   if (sum > cost) return "Overpay";
   // Characters exhausted as part of the cost pay the rest (ExhaustToReduce, families/costs-play.ts).
-  if (sum < cost - exhaustSlack(state, seat, cardId, ctx)) return "Underpay";
+  // A Response that lowers its cost as it is played pays the rest (families/deck-play.ts).
+  if (sum < cost - exhaustSlack(state, seat, cardId, ctx) - payingSlack(state, seat, cardId, ctx)) return "Underpay";
   return null;
 }

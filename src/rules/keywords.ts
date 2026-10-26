@@ -8,6 +8,7 @@ import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
+import { alliesToHandDestination } from "./families/deck-rules.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -303,7 +304,8 @@ export function destroyCard(
   }
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
-  next = moveCard(next, id, defeatedDestination(latest, printed));
+  // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck-rules.ts).
+  next = moveCard(next, id, alliesToHandDestination(next, latest, printed) ?? defeatedDestination(latest, printed));
   steps.push({ kind: "destroy", targetId: id });
   if (printed.type === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);

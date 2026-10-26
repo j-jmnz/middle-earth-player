@@ -155,7 +155,8 @@ const forEachPlayerSchema = z.strictObject({
 const eachSchema = z.strictObject({
   verb: z.literal("Each"),
   pick: pickSchema,
-  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema])),
+  // A Delay here is made once for each card ("If any of those allies are still in play at the end of the round, discard them").
+  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, delaySchema])),
   // The actor chooses up to this many (`any`: any number) of the matching cards, one at a time, and may stop ("search the top
   // 10 cards for up to 4 Rohan allies"); the instructions then run for each chosen card, and the effect's X becomes how many
   // were chosen. `totalCost`: the chosen cards' printed costs add up to at most this. `taken` is engine use: the cards chosen
