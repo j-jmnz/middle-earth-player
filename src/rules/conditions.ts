@@ -158,6 +158,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       const card = id ? state.cards[id] : undefined;
       if (!id || !card) return false;
       if (condition.inPlay != null && inPlay(card.zone) !== condition.inPlay) return false;
+      // "While attached enemy is engaged with you": an enemy filter's `engaged` is read against the actor here too.
+      if (condition.pick?.type === "enemy" && condition.pick.engaged && !engagedAs(card, condition.pick.engaged, scope.actor)) return false;
       return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId: null, counting: true }, ctx);
     }
     case "copiesPlayedThisRound": {
@@ -191,7 +193,17 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
           return card.code === condition.code && card.zone === "attached" && host != null && printedOf(ctx.cards, host.code).type === "hero";
         }) === condition.is
       );
+    case "hostActive": {
+      const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
+      return host != null && (host === state.activeLocation || host === state.secondActiveLocation);
+    }
   }
+}
+
+// An enemy engaged with the seat (`you`) or with another player (`other`).
+function engagedAs(card: { zone: string; controller: number | null }, engaged: "you" | "other", seat: number): boolean {
+  if (card.zone !== "engaged") return false;
+  return engaged === "you" ? card.controller === seat : card.controller !== seat;
 }
 
 function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory"): boolean {

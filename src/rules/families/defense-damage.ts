@@ -91,11 +91,11 @@ export function defenseFromWillpower(state: ScenarioState, id: string): boolean 
 // takesQuestProgress the rest is assigned to it as damage instead of being placed on the quest (Ride Them Down, 08142).
 export function placeQuestingProgress(state: ScenarioState, amount: number, cards: Cards, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean): ScenarioState {
   const enemy = Object.values(state.cards).find((card) => inPlay(card.zone) && printedOf(cards, card.code).type === "enemy" && flagged(state, card.id, "takesQuestProgress"));
-  if (!enemy) return placeQuestProgress(state, amount, cards, steps, canAdvance);
+  if (!enemy) return placeQuestProgress(state, amount, cards, steps, canAdvance, true);
   const location = state.activeLocation ? state.cards[state.activeLocation] : undefined;
   const points = location ? questPointsOf(state, location, cards) : null;
   const toLocation = location && points != null ? Math.min(amount, Math.max(0, points - location.progress)) : 0;
-  const placed = toLocation > 0 ? placeQuestProgress(state, toLocation, cards, steps, canAdvance) : state;
+  const placed = toLocation > 0 ? placeQuestProgress(state, toLocation, cards, steps, canAdvance, true) : state;
   const rest = amount - toLocation;
   return rest > 0 && placed.cards[enemy.id] ? placeDamage(placed, enemy.id, rest, cards, steps, "player", currentCause(steps, UNATTRIBUTED)) : placed;
 }

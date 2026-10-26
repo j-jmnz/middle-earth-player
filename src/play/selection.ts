@@ -45,7 +45,8 @@ export function dropTargets(game: ScenarioState, ctx: ReduceContext, legal: read
   if (!instance) return [];
   if (playable(legal, cardId)) {
     const printed = printedOf(ctx.cards, instance.code);
-    if (printed.type === "attachment") return legalTargets(game, { type: "PlayCard", cardId }, ctx).map((id) => ({ kind: "card", cardId: id }));
+    // A Trap or a Guarded card is played into the staging area: the zone is its target (src/rules/families/attachments-play.ts).
+    if (printed.type === "attachment") return legalTargets(game, { type: "PlayCard", cardId }, ctx).map((id): DropTarget => (id === "staging" ? { kind: "zone", zone: "staging" } : { kind: "card", cardId: id }));
     return [{ kind: "zone", zone: "play" }];
   }
   if (game.mode === "questCommit" && has(legal, "Commit") && legalTargets(game, { type: "Commit" }, ctx).includes(cardId)) return [{ kind: "zone", zone: "questStage" }];
@@ -63,7 +64,7 @@ export function dropOutcome(game: ScenarioState, ctx: ReduceContext, legal: read
   if (!target) return { kind: "none" };
   const targets = dropTargets(game, ctx, legal, cardId);
   if (!targets.some((candidate) => sameTarget(candidate, target))) return { kind: "none" };
-  if (playable(legal, cardId)) return { kind: "play", cardId, hostId: target.kind === "card" ? target.cardId : null };
+  if (playable(legal, cardId)) return { kind: "play", cardId, hostId: target.kind === "card" ? target.cardId : target.zone === "staging" ? "staging" : null };
   if (target.kind === "zone" && target.zone === "questStage") return { kind: "commit", cardId };
   if (target.kind === "zone" && (target.zone === "activeLocation" || target.zone === "engaged")) return { kind: "choose", cardId };
   return { kind: "none" };

@@ -4,6 +4,7 @@ import type { PickSpec } from "../catalog/boundary.ts";
 import { attachmentHostIds } from "./attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
+import { attachmentsPickMatches } from "./families/attachments-pick.ts";
 import { costsPickMatches } from "./families/costs-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
@@ -115,6 +116,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
   if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
   if (spec.notHost && at.sourceId != null && state.cards[at.sourceId]?.host === id) return false;
+  // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments-pick.ts).
+  if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   // Every defender of the attack in progress, the extra ones too (rr.multiple-defenders).
   if (spec.defending && !isDefending(state, id)) return false;

@@ -5,8 +5,10 @@
 import { ruleCause } from "./cause.ts";
 import { checkCost } from "./families/costs-stats.ts";
 import { engagementBarred, noteEngaged } from "./families/quest-engage.ts";
+import { noteHostDefeated, withStagingThreat } from "./families/attachments-hold.ts";
+import { progressFirstLocations } from "./families/attachments-quest.ts";
 import type { EngineStep } from "./intents.ts";
-import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
+import { destroyCard, modifiedStat, raiseThreat, releaseAttachments } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
 import { printedOf } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
@@ -37,7 +39,7 @@ export function stagingThreat(state: ScenarioState, cards: Cards): number {
     if (!instance || flagged(state, id, "noThreatContribution")) continue;
     total += modifiedStat(state, instance, "threat", cards);
   }
-  return total;
+  return withStagingThreat(state, total);
 }
 
 export function committedWillpower(state: ScenarioState, cards: Cards): number {
@@ -100,6 +102,8 @@ export function placeQuestProgress(
   cards: Cards,
   steps: EngineStep[],
   canAdvance: Gate,
+  // Progress from questing successfully (rr.step-3-4): a location that may take it before the quest does (families/attachments-quest.ts).
+  questing = false,
 ): ScenarioState {
   let remaining = amount;
   let next = state;
@@ -123,6 +127,7 @@ export function placeQuestProgress(
       }
     }
   }
+  if (questing && remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps));
   if (remaining > 0 && next.questStage && !next.stageCleared) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];
@@ -164,6 +169,8 @@ function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], c
     const nextCode = index < 0 ? undefined : next.stages[index + 1]?.code;
     const nextId = nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     if (!nextId) return clearStage(next);
+    // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards).
+    next = releaseAttachments(noteHostDefeated(next, currentId), currentId, cards, steps);
     next = moveCard(next, currentId, { zone: "setAside" });
     next = moveCard(next, nextId, { zone: "questStage" });
     next = updateCard(next, nextId, { face: "B" });

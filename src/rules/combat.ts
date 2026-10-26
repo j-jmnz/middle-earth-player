@@ -199,10 +199,13 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed)) return false;
-  if (enemy.zone !== "engaged") return false;
+  // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area.
+  const open = flagged(state, enemyId, "attackableByAny");
+  if (enemy.zone !== "engaged" && !(open && enemy.zone === "staging")) return false;
   // The declaring seat's own characters attack its own enemies. A ranged character may attack an enemy engaged with
   // another player, and may join an attack another player declares (rr.ranged, rr.step-6-8-1).
   if (flagged(state, attackerId, "cannotAttack")) return false;
+  if (open) return true;
   if (attacker.controller === seat && enemy.controller === seat) return true;
   return printed.keywords.ranged || flagged(state, attackerId, "ranged");
 }
@@ -214,6 +217,8 @@ export function legalAttackEnemies(state: ScenarioState, seat: number, attackerI
       if (canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk)) ids.push(enemyId);
     }
   }
+  // An enemy in the staging area any character may choose as the target of an attack (attackableByAny).
+  for (const enemyId of state.staging) if (flagged(state, enemyId, "attackableByAny") && canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk)) ids.push(enemyId);
   return ids;
 }
 
@@ -291,7 +296,8 @@ export function strikeEnemy(
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
   const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   // Each attacker hears that the attack destroyed the enemy ("After Merry participates in an attack that destroys an enemy").
-  if (damaged.cards[enemyId]?.zone === "engaged") return damaged;
+  const left = damaged.cards[enemyId]?.zone;
+  if (left === "engaged" || left === "staging") return damaged;
   return attackerIds.reduce((current, attackerId) => queueEvent(current, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, other: enemyId, participants: attackerIds }), damaged);
 }
 

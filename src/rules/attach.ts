@@ -8,6 +8,8 @@ import { ruleCause } from "./cause.ts";
 import { characters } from "./combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
+import { playIntoRule } from "./families/attachments-play.ts";
+import { questHosts } from "./families/attachments-quest.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { playerCardEffectCanChoose } from "./keywords.ts";
@@ -31,6 +33,8 @@ export function attachRule(ctx: ReduceContext, code: string): AttachRule | undef
 // The cards an attachment with this code may be attached to. A card with an "Attach to" record may go on a card of any
 // seat; one without goes on a character of the seat that plays it.
 export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext): string[] {
+  // A card played unattached or onto a threat dial goes on no card (families/attachments-play.ts).
+  if (playIntoRule(ctx, code)) return [];
   const rule = attachRule(ctx, code);
   const named = rule?.host ?? { kind: "character" as const };
   const candidates: string[] = [];
@@ -41,6 +45,8 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     candidates.push(...characters(state, seat, ctx.cards));
   } else if (named.kind === "activeLocation") {
     if (state.activeLocation) candidates.push(state.activeLocation);
+  } else if (named.kind === "quest") {
+    candidates.push(...questHosts(state, ctx));
   } else {
     for (const index of livingSeats(state)) {
       if (named.kind === "hero" || named.kind === "ringBearer") candidates.push(...(state.seats[index]?.heroes ?? []));

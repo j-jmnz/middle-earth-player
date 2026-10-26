@@ -4,6 +4,7 @@ import type { EngineStep } from "./intents.ts";
 import { runQuestResolution } from "./explore.ts";
 import { afterQuestOutcome, questOutcome } from "./families/quest-outcome.ts";
 import { questFailureRaise } from "./families/quest-threat.ts";
+import { askQuestProgress } from "./families/attachments-quest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { resolveQuest } from "./quest.ts";
@@ -17,6 +18,9 @@ import { fireForced } from "./triggers.ts";
 // the phase. The phase does not end while a new stage is still resolving.
 export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.questResolved) return finish({ ...state, questResolved: false });
+  // A location that may take the progress first asks the players once (Explorer's Almanac, families/attachments-quest.ts).
+  const asked = askQuestProgress(state, ctx, steps);
+  if (asked) return asked;
   const before = steps.length;
   // Who was committed, read before resolving clears it, and the threat a failed quest raises (families/quest-*.ts).
   const outcome = questOutcome(state, ctx);

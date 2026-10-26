@@ -3,6 +3,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
+import { textBlank } from "./families/attachments-hold.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { travelTo } from "./quest.ts";
@@ -32,7 +33,8 @@ export function travelNow(state: ScenarioState, locationId: string, ctx: ReduceC
 export function travelIntent(state: ScenarioState, locationId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const location = state.cards[locationId];
   if (!location) return state;
-  const effects = ctx.effects.filter((effect) => effect.cardCode === location.code && effect.timing === "travel");
+  // A location whose printed text box is blank has no Travel effect (rr.blank).
+  const effects = textBlank(state, locationId) ? [] : ctx.effects.filter((effect) => effect.cardCode === location.code && effect.timing === "travel");
   const first = effects[0];
   if (!first) {
     const traveled = travelNow(state, locationId, ctx, steps);

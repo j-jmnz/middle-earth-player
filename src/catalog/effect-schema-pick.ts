@@ -113,6 +113,12 @@ export const pickSchema = z.strictObject({
   facedownShadow: z.boolean().optional(),
   // The enemy making the attack in progress (`false`: any other enemy, "another enemy engaged with you").
   attackingEnemy: z.boolean().optional(),
+  // The attachments family's filters (families/attachments-pick.ts): a card attached to another card (`false`: one attached
+  // to nothing, "If unattached"), a card with the Guarded keyword (a Guarded record), a card with progress tokens on it
+  // (`false`: with none, "a location with no progress tokens on it").
+  attached: z.boolean().optional(),
+  guarded: z.boolean().optional(),
+  progress: z.boolean().optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

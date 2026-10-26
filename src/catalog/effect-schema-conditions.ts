@@ -115,6 +115,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // after shadow cards have been dealt and before any attack has resolved; `afterEnemyAttacks`, once the resolving enemy attacks
   // step is complete.
   z.strictObject({ kind: z.literal("combatStep"), is: z.enum(["beforeEnemyAttacks", "beforeAttacksResolve", "afterEnemyAttacks"]) }),
+  // The source is attached to the active location ("While attached location is the active location").
+  z.strictObject({ kind: z.literal("hostActive") }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [
