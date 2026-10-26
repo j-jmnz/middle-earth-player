@@ -74,6 +74,9 @@ export const triggerSchema = z.enum([
   "resourcesAdded",
   // About an enemy: damage destroyed it (any player's attack or effect).
   "enemyDestroyed",
+  // About a character: damage was just dealt to it, before it can be destroyed by it. The window for "cancel X damage just
+  // dealt" and "place that damage on ~ instead" (CancelDamage; the event's amount is `{ dealt: true }`).
+  "damageDealt",
 ]);
 
 // What a player pays to use an Action or Response. Resources come from the payments on the Trigger intent. A cost that asks

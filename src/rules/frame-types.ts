@@ -87,6 +87,9 @@ export type EffectData = {
   // names (the enemy a character defends against).
   subject?: string;
   other?: string;
+  // The damage the answered event dealt, and the card whose destruction waits while this effect resolves.
+  dealt?: number;
+  hold?: string;
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
@@ -106,7 +109,8 @@ export type HideData = {
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
 // `other` is a second card the event names: the enemy a character defends against or attacks.
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean };
+// `amount` is the damage a `damaged` event dealt.
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; amount?: number };
 
 // A Response a player may use after an event. It is offered once and may be passed.
 export type ResponseOffer = { cardId: string; effectId: string; seat: number };

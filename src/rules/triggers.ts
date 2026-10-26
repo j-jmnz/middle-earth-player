@@ -59,6 +59,7 @@ function pushFound(state: ScenarioState, found: readonly Found[], event: GameEve
         eventSeat: event.seat,
         ...(aboutCard(event) ? { subject: aboutCard(event) } : {}),
         ...(event.other ? { other: event.other } : {}),
+        ...(event.trigger === "damageDealt" && event.cardId ? { dealt: event.amount ?? 0, hold: event.cardId } : {}),
         peril: state.perilSeat != null,
         effectId: effect.id,
         cause: effectCause(effect),

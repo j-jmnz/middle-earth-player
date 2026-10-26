@@ -125,6 +125,8 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
       ...(frame.data.event.participants ? { participants: frame.data.event.participants } : {}),
       ...(aboutCard(frame.data.event) ? { subject: aboutCard(frame.data.event) } : {}),
       ...(frame.data.event.other ? { other: frame.data.event.other } : {}),
+      // A Response to damage just dealt resolves before the damaged card can be destroyed (rr.cancel).
+      ...(frame.data.event.trigger === "damageDealt" && frame.data.event.cardId ? { dealt: frame.data.event.amount ?? 0, hold: frame.data.event.cardId } : {}),
       ...(costOfKind(effect, "playEvent") ? { finish: "discardSource" as const } : {}),
     },
     steps,

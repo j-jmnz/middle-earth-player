@@ -18,6 +18,7 @@ export type AmountScope = {
   subject?: string | null;
   other?: string | null;
   x?: number;
+  dealt?: number;
 };
 
 // The running effect frame's picks, subject and X, for an amount or a card reference read inside it.
@@ -31,6 +32,7 @@ export function frameScope(state: ScenarioState, actor: number, sourceId: string
     ...(data.subject ? { subject: data.subject } : {}),
     ...(data.other ? { other: data.other } : {}),
     ...(data.x != null ? { x: data.x } : {}),
+    ...(data.dealt != null ? { dealt: data.dealt } : {}),
   };
 }
 
@@ -89,6 +91,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
     const threat = state.seats[scope.actor]?.threat ?? 0;
     value = amount.threat === "tens" ? Math.floor(threat / 10) : threat;
   } else if (amount.hand) value = (state.seats[scope.actor]?.hand ?? []).length;
+  else if (amount.dealt) value = scope.dealt ?? 0;
   value = value * (amount.times ?? 1) + (amount.plus ?? 0);
   if (amount.limit != null) value = Math.min(value, amount.limit);
   return Math.max(0, value);

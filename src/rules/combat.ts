@@ -309,3 +309,10 @@ export function assignArchery(
 export function heroIds(state: ScenarioState, seat: number): string[] {
   return [...(state.seats[seat]?.heroes ?? [])];
 }
+
+// The characters an undefended attack's damage may be assigned to: the seat's heroes, and a character that says damage from
+// undefended attacks may be assigned to it (takesUndefendedDamage).
+export function undefendedTargets(state: ScenarioState, seat: number, cards: Cards): string[] {
+  const heroes = heroIds(state, seat);
+  return [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
+}

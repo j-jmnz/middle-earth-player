@@ -8,7 +8,7 @@ import {
   declarableEnemies,
   defenderIds,
   hasLegalAttack,
-  heroIds,
+  undefendedTargets,
 } from "./combat.ts";
 import { optionIntents, optionReason } from "./choices.ts";
 import { hideCommitReason, hideCommitters } from "./hide.ts";
@@ -87,7 +87,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
       return defenderIds(state, seat, ctx.cards).filter((id) => !defenseBlocked(state, ctx, id));
     }
     case "Undefended":
-      return heroIds(state, state.pendingAttack?.seat ?? state.activeSeat);
+      return undefendedTargets(state, state.pendingAttack?.seat ?? state.activeSeat, ctx.cards);
     case "DeclareAttackers":
       return declarableEnemies(state, state.activeSeat, selection.cardId, ctx.cards);
     case "Distribute":
@@ -142,7 +142,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
     case "DeclareDefender":
       return defenderReason(state, intent, ctx);
     case "Undefended":
-      return undefendedReason(state, intent);
+      return undefendedReason(state, intent, ctx);
     case "DeclareAttackers":
       return attackReason(state, intent, ctx);
     case "DeclineAttack":
@@ -250,9 +250,9 @@ function defenderReason(
   return null;
 }
 
-function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "Undefended" }>): string | null {
+function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "Undefended" }>, ctx: ReduceContext): string | null {
   if (state.window?.kind !== "defense" || !state.pendingAttack) return "That intent is not legal in this window";
-  const heroes = heroIds(state, state.pendingAttack.seat);
+  const heroes = undefendedTargets(state, state.pendingAttack.seat, ctx.cards);
   if (heroes.length === 0) return "No hero can take the attack";
   if (heroes.length === 1) {
     const only = heroes[0];

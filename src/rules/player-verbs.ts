@@ -116,6 +116,19 @@ export function runPlayerVerb(
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
       return state.cards[id] ? moveCard(state, id, { zone: "victory" }) : state;
     }
+    case "CancelDamage": {
+      const scope = frameScope(state, focus.seat, focus.sourceId);
+      const id = refCard(state, instruction.target ?? "subject", scope) ?? "";
+      const card = state.cards[id];
+      const dealt = scope.dealt ?? 0;
+      if (!card || dealt <= 0) return state;
+      const amount = Math.min(dealt, card.damage, instruction.all ? dealt : resolveAmount(state, instruction.amount ?? 1, scope, ctx));
+      if (amount <= 0) return state;
+      const data = topFrame(state)?.data;
+      const canceled = updateCard(state, id, { damage: card.damage - amount });
+      // What is left of the damage is what a later cancel of the same damage can take.
+      return data?.kind === "effect" ? patchTop(canceled, { data: { ...data, dealt: dealt - amount } }) : canceled;
+    }
     case "SetThreat":
       return withThreat(state, focus.seat, instruction.value);
     case "LowerThreat": {

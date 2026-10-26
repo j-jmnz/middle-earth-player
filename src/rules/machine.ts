@@ -12,7 +12,7 @@ import {
   continueStrike,
   dealShadows,
   hasLegalAttack,
-  heroIds,
+  undefendedTargets,
   nextEnemyGroup,
   openDefense,
 } from "./combat.ts";
@@ -36,8 +36,9 @@ import { constantWin, heldStat, NO_COUNTS } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
-import { flagged, livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
-import { clearEliminated, destroyOverwhelmed } from "./keywords.ts";
+import { flagged, inPlay, livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
+import { clearEliminated, damageHeld, destroyOverwhelmed } from "./keywords.ts";
+import { effectsOf } from "./listen.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -57,7 +58,14 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
         continue;
       }
     }
-    const swept = current.lost || current.failure ? current : destroyOverwhelmed(clearEliminated(current, ctx.cards), ctx.cards, steps);
+    // A character's lethal damage waits for the Responses that could cancel it, when some card in play or in hand has one.
+    const answerable = damageAnswerable(current, ctx);
+    if (answerable !== (current.holdLethal === true)) {
+      const { holdLethal: _was, ...rest } = current;
+      current = answerable ? { ...rest, holdLethal: true } : rest;
+    }
+    const held = answerable ? damageHeld : undefined;
+    const swept = current.lost || current.failure ? current : destroyOverwhelmed(clearEliminated(current, ctx.cards), ctx.cards, steps, held);
     if (swept !== current) {
       current = swept;
       continue;
@@ -112,7 +120,7 @@ export function applyIntent(
     case "DeclareDefender":
       return applyDefense(state, intent.defenderId, ctx, steps);
     case "Undefended":
-      return applyUndefended(state, undefendedHero(state, intent.heroId), ctx, steps);
+      return applyUndefended(state, undefendedHero(state, intent.heroId, ctx), ctx, steps);
     case "DeclareAttackers":
       return applyPlayerAttack(state, state.activeSeat, intent.enemyId, intent.attackerIds, ctx, steps);
     case "DeclineAttack":
@@ -317,8 +325,15 @@ function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineS
   return next;
 }
 
-function undefendedHero(state: ScenarioState, heroId: string | undefined): string {
-  const heroes = heroIds(state, state.pendingAttack?.seat ?? state.activeSeat);
+function undefendedHero(state: ScenarioState, heroId: string | undefined, ctx: ReduceContext): string {
+  const heroes = undefendedTargets(state, state.pendingAttack?.seat ?? state.activeSeat, ctx.cards);
   if (heroes.length === 1) return heroes[0] ?? "";
   return heroId ?? "";
+}
+
+// Whether any card that could answer damage just dealt (a damageDealt Response or Forced effect) is in play or in a hand.
+function damageAnswerable(state: ScenarioState, ctx: ReduceContext): boolean {
+  return Object.values(state.cards).some(
+    (card) => (inPlay(card.zone) || card.zone === "hand") && effectsOf(ctx, card.code).some((effect) => effect.trigger === "damageDealt"),
+  );
 }

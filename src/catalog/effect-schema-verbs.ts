@@ -73,6 +73,9 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("MoveResources"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), ...when }),
   // The actor chooses and discards this many cards from their hand (fewer when the hand runs out).
   z.strictObject({ verb: z.literal("DiscardFromHand"), amount: positiveAmountSchema, ...when }),
+  // Cancels damage the answered `damageDealt` event just dealt to its card (or `target`): `amount` of it, or all of it. The card
+  // is not destroyed by damage that was canceled (rr.cancel).
+  z.strictObject({ verb: z.literal("CancelDamage"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), target: cardRefSchema.optional(), ...when }),
   // The card is added to the victory display: the picked card, or `target`.
   z.strictObject({ verb: z.literal("AddToVictory"), target: cardRefSchema.optional(), ...when }),
   // The actor's threat is set to this value.

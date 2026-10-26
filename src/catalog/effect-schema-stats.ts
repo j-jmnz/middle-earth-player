@@ -49,6 +49,8 @@ export const modifierStatSchema = z.enum([
   // Numbers a seat or a hero holds: cards drawn beyond the one in the resource phase (on "seat:N"), resources a hero
   // collects beyond the one, restricted attachments a character may have beyond two.
   "extraDraw",
+  // A character that may take the damage of an undefended attack against its controller, as a hero would.
+  "takesUndefendedDamage",
   "extraResource",
   "extraRestricted",
 ]);

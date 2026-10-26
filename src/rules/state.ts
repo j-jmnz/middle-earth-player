@@ -229,6 +229,9 @@ export type ScenarioState = {
   pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
+  // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
+  // damage then waits for those Responses before it destroys the character (settle keeps it current).
+  holdLethal?: true;
   // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first
   // Rohan ally you play each round"). Only this round's are kept.
   played?: readonly { id: string; code: string; seat: number; round: number }[];

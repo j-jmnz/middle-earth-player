@@ -26,6 +26,8 @@ export const amountExprSchema = z.strictObject({
   threat: z.enum(["actor", "tens"]).optional(),
   // Cards in the actor's hand.
   hand: z.literal(true).optional(),
+  // The damage the answered event dealt ("cancel that damage", "place that damage on ~ instead").
+  dealt: z.literal(true).optional(),
   // amount = value × times + plus, at most `limit`, at least 0.
   times: z.number().int().optional(),
   plus: z.number().int().optional(),

@@ -181,21 +181,29 @@ export function placeDamage(
   let next = updateCard(state, id, { damage });
   const hurt = dealt > 0 && inPlay(instance.zone);
   if (printed.type === "enemy" && printed.keywords.indestructible) return next;
-  if (printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards)) {
+  const lethal = printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards);
+  // Damage dealt to a character is first offered to the Responses that cancel it ("cancel X damage just dealt", rr.cancel).
+  // A character it would destroy is destroyed by the sweep once they have had their chance (destroyOverwhelmed, damageHeld).
+  if (hurt && isCharacterType(printed)) {
+    next = queueEvent(next, { trigger: "damageDealt", seat: instance.controller, cardId: id, subject: id, amount: dealt });
+    if (lethal && state.holdLethal) return next;
+  }
+  if (lethal) {
     next = destroyCard(next, id, cards, steps);
     // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
     if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: id });
   } else if (hurt) {
     // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
-    next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id });
+    next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt });
   }
   return next;
 }
 
 // A character or enemy whose damage is at or above its hit points is destroyed however the hit points came down
 // (rr.hit-points): a hit point bonus that ends, or leaves with its source, puts the card it held up in the discard pile.
-export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
+// `held` keeps a card whose damage is still being answered (damageHeld, when some card could cancel it).
+export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], held: (state: ScenarioState, id: string) => boolean = () => false): ScenarioState {
   let next = state;
   for (const instance of Object.values(state.cards)) {
     if (instance.damage <= 0 || !inPlay(instance.zone)) continue;
@@ -203,6 +211,7 @@ export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<stri
     if (printed.health == null || (printed.type === "enemy" && printed.keywords.indestructible)) continue;
     const current = next.cards[instance.id];
     if (!current || !inPlay(current.zone) || current.damage < modifiedStat(next, current, "hitPoints", cards)) continue;
+    if (held(next, instance.id)) continue;
     next = destroyCard(next, instance.id, cards, steps);
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
   }
@@ -376,4 +385,15 @@ export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel"
   if (keyword === "doomed") return (printed.keywords.doomed ?? 0) > 0;
   if (printed.keywords[keyword]) return true;
   return (keyword === "sentinel" || keyword === "ranged") && flagged(state, id, keyword);
+}
+
+// A character's destruction by damage waits while that damage is still being answered: its `damageDealt` event is queued, its
+// Responses are being offered, or one of them is resolving (rr.cancel: "cancel X damage just dealt").
+export function damageHeld(state: ScenarioState, id: string): boolean {
+  if ((state.pendingEvents ?? []).some((event) => event.trigger === "damageDealt" && event.cardId === id)) return true;
+  return state.stack.some(
+    (frame) =>
+      ((frame.data.kind === "responses" || frame.data.kind === "event") && frame.data.event.trigger === "damageDealt" && frame.data.event.cardId === id) ||
+      (frame.data.kind === "effect" && frame.data.hold === id),
+  );
 }

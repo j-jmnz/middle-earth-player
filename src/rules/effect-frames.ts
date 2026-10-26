@@ -43,6 +43,9 @@ export type EffectSpec = {
   // The card the answered event was about, and the other card it names.
   subject?: string;
   other?: string;
+  // The damage the answered event dealt, and the card whose destruction waits while the effect resolves.
+  dealt?: number;
+  hold?: string;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
   cause?: Cause;
@@ -73,6 +76,8 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.picked ? { picked: spec.picked } : {}),
     ...(spec.subject ? { subject: spec.subject } : {}),
     ...(spec.other ? { other: spec.other } : {}),
+    ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
+    ...(spec.hold ? { hold: spec.hold } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
 }
