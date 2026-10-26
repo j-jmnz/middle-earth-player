@@ -1,4 +1,5 @@
 import type { CardEffects } from "./card-effects.ts";
+import type { OptionMark } from "./sheet-types.ts";
 import type { LayoutOptions } from "./layout.ts";
 import type { TableStore } from "./store.ts";
 
@@ -12,6 +13,8 @@ export type TableHighlight = {
   share: "pay" | "damage" | null;
   // A pick is open (a defender, a location, a payment): the cards it does not ask about are dimmed.
   dimOthers: boolean;
+  // A number the open pick draws on a card it asks about: the damage a defender would take, in danger when it destroys it.
+  marks: ReadonlyMap<string, OptionMark>;
 };
 
 // The engine's numbers the canvas draws on a card: the effects on it, its willpower while it is committed to the quest, and

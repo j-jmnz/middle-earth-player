@@ -1,4 +1,5 @@
-// Rules: rr.step-3-4, rr.step-6-4-3, rr.step-6-8-2, mec109.hide-tests (data/rules/entries.json).
+// Rules: rr.step-3-4, rr.step-6-4-3, rr.step-6-8-2, rr.threat-elimination-level, rr.engagement-check, mec109.hide-tests
+// (data/rules/entries.json).
 //
 // The engine's numbers for the open moment, as the dock shows them beside the choice: attack against defense while an attack
 // is going on (an enemy can attack during staging), the Hide numbers, otherwise willpower against threat while questing.
@@ -6,13 +7,16 @@
 import { attackStrength } from "../rules/combat.ts";
 import { hidePassed, hideWillpower } from "../rules/hide.ts";
 import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
-import { committedWillpower, stagingThreat } from "../rules/quest.ts";
+import { committedWillpower, questPointsOf, stagingThreat } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
+import { damageOutcome, enemiesToFace, lossWords, outcomeWords } from "./foresight.ts";
 import type { Sheet, SheetStat } from "./sheet-types.ts";
 import { choiceFor, type Choice } from "./table-choice.ts";
 
-export type Readout = { kind: "quest" | "hide" | "attack" | "defense"; stats: readonly SheetStat[]; result: string | null };
+// `join` is the word between two numbers: "against" (willpower against threat), or "then" for the staging threat before and
+// after a travel.
+export type Readout = { kind: "quest" | "hide" | "attack" | "defense" | "travel"; stats: readonly SheetStat[]; result: string | null; join?: string };
 
 const WILL = (value: number): SheetStat => ({ icon: "willpower", value, word: "Willpower" });
 const THREAT = (value: number): SheetStat => ({ icon: "threat", value, word: "Threat" });
@@ -44,12 +48,12 @@ function pickedInAttack(sheet: Sheet | null, choice: Choice | null): { id: strin
   return null;
 }
 
-// ", Sam Gamgee is destroyed" when the damage would reach the hit points the character has left.
-function destroyedWords(game: ScenarioState, ctx: ReduceContext, cardId: string, damage: number, cardName: (cardId: string) => string): string {
-  const card = game.cards[cardId];
-  if (!card || damage <= 0) return "";
-  const left = modifiedStat(game, card, "hitPoints", ctx.cards) - card.damage;
-  return damage >= left ? `; ${cardName(cardId)} is destroyed` : "";
+// "; Sam Gamgee is destroyed" when the damage would destroy the character, with the loss or elimination it causes (the
+// Ring-bearer takes The One Ring with him); while the shadow card is still to come, how much more would destroy it.
+function destroyedWords(game: ScenarioState, ctx: ReduceContext, cardId: string, damage: number, cardName: (cardId: string) => string, shadowNext: boolean): string {
+  if (!game.cards[cardId]) return "";
+  const words = outcomeWords(damageOutcome(game, ctx, cardId, damage), cardName(cardId), shadowNext);
+  return words ? `; ${words}` : "";
 }
 
 /** The numbers to show beside the open sheet, or null when the moment has none. */
@@ -73,11 +77,11 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const defenderId = attack.undefended ? undefined : (attack.defenderId ?? (picked?.role === "defender" ? picked.id : undefined));
     if (defenderId && game.cards[defenderId]) {
       const defense = defenseAsDefender(game, defenderId, ctx.cards);
-      const destroyed = destroyedWords(game, ctx, defenderId, Math.max(0, strength - defense), cardName);
+      const destroyed = destroyedWords(game, ctx, defenderId, Math.max(0, strength - defense), cardName, !attack.shadowResolved);
       return { kind: "defense", stats: [ATTACK(strength), DEFENSE(defense)], result: `${damageWords(strength, defense)}${shadowNote}${destroyed}` };
     }
     const hit = attack.heroId ?? (picked?.role === "hit" ? picked.id : undefined);
-    if (hit) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${shadowNote}${destroyedWords(game, ctx, hit, strength, cardName)}` };
+    if (hit) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${shadowNote}${destroyedWords(game, ctx, hit, strength, cardName, !attack.shadowResolved)}` };
     return { kind: "defense", stats: [ATTACK(strength)], result: attack.undefended ? `Undefended: ${strength} damage${shadowNote}` : `Undefended, a hero takes ${strength}` };
   }
   // The players attack: the attackers picked (or declared) against the enemy's defense.
@@ -87,9 +91,23 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
   if (enemyId) {
     const enemy = game.cards[enemyId];
     if (!enemy) return null;
-    const total = attackStrength(game, strike?.attackerIds ?? choice?.ids ?? [], enemyId, ctx.cards);
+    const attackers = strike?.attackerIds ?? choice?.ids ?? [];
+    const total = attackStrength(game, attackers, enemyId, ctx.cards);
     const defense = modifiedStat(game, enemy, "defense", ctx.cards);
-    return { kind: "attack", stats: [ATTACK(total), DEFENSE(defense)], result: damageWords(total, defense) };
+    // Whether the attack destroys the enemy (toughness and indestructible are the engine's), or how far short it falls.
+    const outcome = attackers.length > 0 && !strike ? damageOutcome(game, ctx, enemyId, Math.max(0, total - defense)) : null;
+    const after = outcome ? (outcome.destroyed ? `; ${cardName(enemyId)} is destroyed` : outcome.spare != null ? `; ${outcome.spare} more would destroy it` : "") : "";
+    return { kind: "attack", stats: [ATTACK(total), DEFENSE(defense)], result: `${damageWords(total, defense)}${after}` };
+  }
+  // Travel: the staging threat now and after the picked location leaves staging, and the progress it takes first (rr.travel).
+  if (sheet?.kind === "pick" && game.window?.kind === "travel") {
+    const now = stagingThreat(game, ctx.cards);
+    const pickedId = choice?.ids[0];
+    const location = pickedId ? game.cards[pickedId] : undefined;
+    if (!location) return now > 0 ? { kind: "travel", stats: [THREAT(now)], result: "Staging threat now" } : null;
+    const after = stagingThreat({ ...game, staging: game.staging.filter((id) => id !== location.id) }, ctx.cards);
+    const points = questPointsOf(game, location, ctx.cards);
+    return { kind: "travel", stats: [THREAT(now), THREAT(after)], join: "then", result: points != null ? `It takes the next ${points} progress before the quest` : null };
   }
   // The quest, when no attack is going on: committed willpower (and the characters picked to join it) against staging.
   if (game.phase === "Quest" && !game.questResolved && (game.mode === "questCommit" || game.mode === "staging" || game.mode === "resolution")) {
@@ -106,7 +124,40 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     }, 0);
     const willpower = committedWillpower(game, ctx.cards) + added;
     const threat = stagingThreat(game, ctx.cards);
-    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: game.mode === "questCommit" ? "Staging reveals more threat next" : questResult(willpower, threat) };
+    if (game.mode === "questCommit") return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: commitWords(game, ctx, picked) };
+    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${questResult(willpower, threat)}${eliminationWords(game, threat - willpower)}` };
   }
   return null;
+}
+
+// While committing: what staging reveals next, and what the commit leaves for combat (the video's "hold back some heroes"):
+// the seat's characters still ready after the commit against the enemies it will face this round.
+function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly string[]): string {
+  const seat = game.activeSeat;
+  const reveals = game.seatCount > 1 ? "Staging reveals 1 card per player next" : "Staging reveals 1 card next";
+  const owner = game.seats[seat];
+  if (!owner) return reveals;
+  const ready = [...owner.heroes, ...owner.play].filter((id) => {
+    const card = game.cards[id];
+    const type = card ? ctx.cards.get(card.code)?.type : undefined;
+    return card != null && (type === "hero" || type === "ally") && !card.exhausted && !card.committed && !picked.includes(id);
+  }).length;
+  const enemies = enemiesToFace(game, ctx, seat);
+  if (enemies.length === 0) return `${reveals}. Ready after this: ${ready}`;
+  const attacks = enemies.map((id) => {
+    const enemy = game.cards[id];
+    return enemy ? modifiedStat(game, enemy, "attack", ctx.cards) : 0;
+  });
+  return `${reveals}. Ready after this: ${ready} · Enemies to face: ${enemies.length} (${attacks.join(", ")} attack)`;
+}
+
+// A quest that would fail by `shortfall` and take a seat's threat to 50 (rr.threat-elimination-level): the seat is
+// eliminated, and with no seat left the game is lost.
+function eliminationWords(game: ScenarioState, shortfall: number): string {
+  if (shortfall <= 0) return "";
+  const out = game.seats.flatMap((seat, index) => (!seat.eliminated && seat.threat + shortfall >= 50 ? [index] : []));
+  if (out.length === 0) return "";
+  const living = game.seats.filter((seat) => !seat.eliminated).length;
+  if (out.length === living) return `; threat reaches 50: ${lossWords("No seats remain")}`;
+  return `; threat reaches 50: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated`;
 }

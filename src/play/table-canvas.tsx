@@ -24,6 +24,9 @@ type RowProps = Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "onTap"
 function CardButton({ id, label, faceDown, onTap, onPreview, highlight }: { id: string; label: string; faceDown: boolean } & Pick<TableCanvasProps, "onTap" | "onPreview" | "highlight">) {
   const picked = highlight.picked.get(id) ?? 0;
   const tappable = highlight.tappable.has(id);
+  // The number the open pick draws on the card (the damage a defender would take).
+  const mark = highlight.marks.get(id);
+  const marked = mark ? ` · ${mark.value} ${mark.icon === "damage" ? "damage" : ""}${mark.danger ? ", destroyed" : ""}`.trimEnd() : "";
   return (
     <Pressable
       accessibilityRole="button"
@@ -34,7 +37,7 @@ function CardButton({ id, label, faceDown, onTap, onPreview, highlight }: { id: 
       className={`min-h-11 justify-center rounded-tile px-2 ${picked > 0 ? "bg-goldLine" : "bg-raised"} ${tappable ? "border border-gold" : ""}`}
       style={({ pressed }) => (pressed ? { backgroundColor: t.hairline } : undefined)}
     >
-      <Text className={faceDown ? "text-label text-faint" : "text-label text-bone"}>{picked > 1 ? `${label} · ${picked}` : label}</Text>
+      <Text className={faceDown ? "text-label text-faint" : "text-label text-bone"}>{`${picked > 1 ? `${label} · ${picked}` : label}${marked}`}</Text>
     </Pressable>
   );
 }

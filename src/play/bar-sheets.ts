@@ -2,11 +2,13 @@
 // opens (playing it, paying for it, using its Action), and the intents a multi-choice or distribute sheet sends for what the
 // player picked. The reducer still checks every intent.
 import { printedOf } from "../rules/printed.ts";
+import { stagingThreat } from "../rules/quest.ts";
 import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { legalTargets } from "../rules/reduce.ts";
 
+import { checkFor, playCaution } from "./not-applied.ts";
 import { playRequest, type PayRequest, type Share } from "./pay.ts";
-import { STEP_WORDS } from "./rail.ts";
+import { STEP_WORDS, windowPoint } from "./rail.ts";
 import type { DistributePurpose, DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet, WindowSheet } from "./sheet-types.ts";
 import { option, statOf, step, triggerOptions } from "./sheets.ts";
 
@@ -42,6 +44,11 @@ export function actionsSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   };
 }
 
+// The armed line of Commit no one: the quest still resolves, against the threat in staging and what the reveal adds.
+export function noOneQuests(threat: number): string {
+  return threat > 0 ? `Tap again: no one quests (threat ${threat}+)` : "Tap again: no one quests";
+}
+
 /**
  * The ordinary action window as the table answers it: what can be played and used now, the quest commit in the commit
  * window, and Pass. Every card it names comes from legalIntents.
@@ -58,7 +65,15 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
     const some = Object.values(game.cards).some((card) => card.committed && card.controller === game.activeSeat);
     return some
       ? { ...base, title: "Commit to the quest", note: "Tap more characters to quest, or end the commit.", pass: "Done", passNote: "Done ends the commit.", armed: "Tap again: no one else quests" }
-      : { ...base, title: "Commit to the quest", note: "Tap characters to quest. They exhaust.", pass: "Commit no one", passNote: "Pass sends no one.", armed: "Tap again: no one quests" };
+      : {
+          ...base,
+          title: "Commit to the quest",
+          note: "Tap characters to quest. They exhaust, so they cannot defend or attack this round.",
+          pass: "Commit no one",
+          passNote: "Pass sends no one.",
+          // The quest is never skipped (rr.step-3-3): staging still reveals and its threat still counts against no willpower.
+          armed: noOneQuests(stagingThreat(game, ctx.cards)),
+        };
   }
   if (game.mode === "planning") {
     return {
@@ -70,10 +85,12 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
       armed: "Tap again: planning ends",
     };
   }
+  // The window is named by what comes next, so the player knows what an action here can still change (rail.ts).
+  const point = windowPoint(game);
   return {
     ...base,
-    title: "Action window",
-    note: usable ? "Tap a glowing card to use it." : null,
+    title: point?.title ?? "Action window",
+    note: [point?.note, usable ? "Tap a glowing card to use it." : null].filter((part) => part != null).join(" ") || null,
     pass: "Pass",
     passNote: game.seatCount > 1 ? "The game moves on once both players pass." : "Pass moves the game on.",
     armed: "Tap again to pass",
@@ -89,35 +106,46 @@ export function playSheet(game: ScenarioState, ctx: ReduceContext, legal: readon
   if (!instance || !legal.some((intent) => intent.type === "PlayCard" && intent.cardId === cardId)) return null;
   const name = names.card(cardId);
   const request = playRequest(game, ctx, cardId);
+  const printed = printedOf(ctx.cards, instance.code);
+  // A card the app does not fully apply says so before it is paid for; an attachment that would do nothing asks twice.
+  const warn = playCaution(instance.code, printed.type, request?.total ?? 0, checkFor(ctx.effects));
+  const caution = warn?.armed ? { caution: warn.armed } : {};
+  const said = (note: string | null): string | null => (warn ? [warn.words + ".", note].filter((part) => part != null).join(" ") : note);
   const at = (host: string | null): PlayerIntent => (host ? { type: "PlayCard", cardId, payments: [], hostId: host } : { type: "PlayCard", cardId, payments: [] });
-  if (printedOf(ctx.cards, instance.code).type === "attachment" && hostId == null) {
+  const pay = (host: string | null): DistributeSheet => {
+    const sheet = paySheet(game, names, request as PayRequest, { kind: "play", cardId, hostId: host });
+    return { ...sheet, note: said(sheet.note) ?? sheet.note, ...caution };
+  };
+  if (printed.type === "attachment" && hostId == null) {
     const hosts = legalTargets(game, { type: "PlayCard", cardId }, ctx);
     return {
       kind: "pick",
       key: `play:${cardId}`,
       step: step(game),
       title: `Play ${name}`,
-      note: hosts.length > 0 ? "Tap the card to attach it to." : "No card can take it now.",
+      note: said(hosts.length > 0 ? "Tap the card to attach it to." : "No card can take it now."),
       verb: "Attach to",
-      options: hosts.map((id) => ({ ...option(game, names, id), ...(request ? { next: paySheet(game, names, request, { kind: "play", cardId, hostId: id }) } : { intent: at(id) }) })),
+      options: hosts.map((id) => ({ ...option(game, names, id), ...(request ? { next: pay(id) } : { intent: at(id) }) })),
       primary: null,
       alternative: null,
       about: [cardId],
+      ...caution,
     };
   }
-  if (request) return paySheet(game, names, request, { kind: "play", cardId, hostId });
+  if (request) return pay(hostId);
   const sheet: PickSheet = {
     kind: "pick",
     key: `play:${cardId}:${hostId ?? ""}`,
     step: step(game),
     title: hostId ? `Attach ${name} to ${names.card(hostId)}` : `Play ${name}`,
-    note: "It costs nothing.",
+    note: said("It costs nothing."),
     verb: "",
     options: [],
     primary: { label: `Play ${name}`, intent: at(hostId) },
     alternative: null,
     selectionMade: true,
     about: [cardId],
+    ...caution,
   };
   return sheet;
 }

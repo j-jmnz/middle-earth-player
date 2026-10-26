@@ -12,7 +12,7 @@ import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { onTableFor, shownSeat } from "./selectors.ts";
 import { dropOutcome, targetFromKey } from "./selection.ts";
-import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
+import type { OptionMark, Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
@@ -116,14 +116,27 @@ export function useTableChoice({
   const share = sheet.kind === "distribute" ? (sheet.purpose.kind === "archery" ? "damage" : "pay") : null;
   // A pick (a defender, a location, a payment) dims what it does not ask about; the action window does not.
   const dimOthers = !panel && glowKey !== "" && sheet.kind !== "window";
+  // The numbers the pick draws on its cards (the damage each defender would take), keyed so the canvas draws again only
+  // when they change.
+  const optionMarks = panel ? [] : optionMarksOf(sheet);
+  const markKey = optionMarks.map(([id, mark]) => `${id}=${mark.icon}:${mark.value}:${mark.danger ? 1 : 0}`).join(",");
   const highlight = useMemo(
     (): TableHighlight => ({
       tappable: new Set(glowKey === "" ? [] : glowKey.split(",")),
       picked: new Map(pickedKey === "" ? [] : pickedKey.split(",").map((entry): [string, number] => [entry.split("=")[0] ?? "", Number(entry.split("=")[1])])),
       share,
       dimOthers,
+      marks: new Map(
+        markKey === ""
+          ? []
+          : markKey.split(",").map((entry): [string, OptionMark] => {
+              const [id = "", rest = ""] = entry.split("=");
+              const [icon = "damage", value = "0", danger = "0"] = rest.split(":");
+              return [id, { icon: icon as OptionMark["icon"], value: Number(value), danger: danger === "1" }];
+            }),
+      ),
     }),
-    [glowKey, pickedKey, share, dimOthers],
+    [glowKey, pickedKey, share, dimOthers, markKey],
   );
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";
@@ -312,6 +325,12 @@ function useStable<A extends unknown[]>(handler: (...args: A) => void): (...args
     latest.current = handler;
   });
   return useCallback((...args: A) => latest.current(...args), []);
+}
+
+// The marks a sheet's options carry, by card id.
+function optionMarksOf(sheet: Sheet): [string, OptionMark][] {
+  if (sheet.kind !== "pick" && sheet.kind !== "multi") return [];
+  return sheet.options.flatMap((item): [string, OptionMark][] => (item.mark ? [[item.id, item.mark]] : []));
 }
 
 // The hand card a sheet the player opened is about: the card being played.

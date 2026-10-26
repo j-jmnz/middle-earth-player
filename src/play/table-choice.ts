@@ -241,6 +241,7 @@ function alternativeButton(alternative: NonNullable<Extract<Sheet, { kind: "pick
     label: alternative.label,
     action: "intent" in alternative ? { kind: "intent", intent: alternative.intent } : { kind: "open", sheet: alternative.next },
     arm: "intent" in alternative,
+    ...("intent" in alternative && alternative.caution ? { armed: alternative.caution } : {}),
     testID: "sheet-alternative",
   };
 }
@@ -265,13 +266,15 @@ export function dockFor(sheet: Sheet, choice: Choice, table: TapContext, options
   switch (sheet.kind) {
     case "pick": {
       if (sheet.primary) {
-        const armed = sheet.primary.intent.type === "Pass" ? "Tap again to close it" : `Tap again to ${sheet.primary.label.toLowerCase()}`;
-        primary = { label: sheet.primary.label, action: { kind: "intent", intent: sheet.primary.intent }, arm: !sheet.selectionMade, armed, testID: "sheet-primary" };
+        const armed = sheet.caution ?? (sheet.primary.intent.type === "Pass" ? "Tap again to close it" : `Tap again to ${sheet.primary.label.toLowerCase()}`);
+        primary = { label: sheet.primary.label, action: { kind: "intent", intent: sheet.primary.intent }, arm: !sheet.selectionMade || sheet.caution != null, armed, testID: "sheet-primary" };
       } else if (sheet.options.length > 0) {
         const item = sheet.options.find((option) => option.id === choice.ids[0]) ?? null;
         const label = sheet.confirm ?? verbOf(sheet.verb);
         const action: DockAction = !item ? { kind: "clear" } : "intent" in item ? { kind: "intent", intent: item.intent } : { kind: "open", sheet: item.next };
-        primary = { label, action, arm: false, testID: "sheet-primary" };
+        // A pick whose result the player may not expect (the game lost, resources spent for nothing) asks twice.
+        const caution = action.kind === "intent" ? (item?.caution ?? sheet.caution) : undefined;
+        primary = caution ? { label, action, arm: true, armed: caution, testID: "sheet-primary" } : { label, action, arm: false, testID: "sheet-primary" };
         if (!item) why = options.surface === "panel" ? pickWords : "Tap a glowing card to choose it.";
       }
       // With nothing to pick (no defender is ready, no location to travel to), the alternative is the one filled button.
@@ -290,7 +293,8 @@ export function dockFor(sheet: Sheet, choice: Choice, table: TapContext, options
     case "distribute": {
       const purpose = sheet.purpose;
       const label = purpose.kind === "archery" ? "Assign" : purpose.kind === "play" ? "Play" : "Use";
-      primary = { label, action: { kind: "intent", intent: distributeIntent(sheet, choice.shares) }, arm: false, testID: "sheet-primary" };
+      const action: DockAction = { kind: "intent", intent: distributeIntent(sheet, choice.shares) };
+      primary = sheet.caution ? { label, action, arm: true, armed: sheet.caution, testID: "sheet-primary" } : { label, action, arm: false, testID: "sheet-primary" };
       if (!sharesReady(choice.shares, sheet.total, sheet.exact)) why = sheet.options.length === 0 ? "Nothing can pay this." : `Assign all ${sheet.total} first.`;
       if (choice.shares.length > 0) secondary.push({ label: "Clear", action: { kind: "clear" }, arm: false, testID: "sheet-clear" });
       break;

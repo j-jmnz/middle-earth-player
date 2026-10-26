@@ -10,6 +10,7 @@ import type { CardEffects } from "./card-effects.ts";
 import { SPHERE_TINT, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
 import type { CardSlot, CombatMark, Rect } from "./layout.ts";
+import type { OptionMark } from "./sheet-types.ts";
 import type { Ghost, Motion } from "./motion.ts";
 import { tableTokens as t } from "./tokens.ts";
 import { wrapName } from "./wrap.ts";
@@ -327,6 +328,27 @@ export function Marks({ rect, tappable, picked, share, dimmed, fonts }: { rect: 
           <Line p1={vec(cx - 1, cy + 4)} p2={vec(cx + 6, cy - 4)} color={t.onGold} strokeWidth={2.5} />
         </Group>
       )}
+    </Group>
+  );
+}
+
+/**
+ * A number the open pick draws on a card it asks about (the damage a defender would take, before the shadow card): the
+ * token art and the number on a pill at the card's foot, threat red when it destroys the card. Upright, like the tokens.
+ */
+export function OptionMarkView({ rect, mark, fonts, images }: { rect: Rect; mark: OptionMark; fonts: Fonts; images: TokenImages }) {
+  const { x, y, w, h } = rect;
+  const text = String(mark.value);
+  const width = TOKEN + fonts.badge.getTextWidth(text) + 8;
+  const left = x + (w - width) / 2;
+  const top = y + h - TOKEN - 4;
+  const image = mark.icon === "damage" ? images.damage : null;
+  return (
+    <Group>
+      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={mark.danger ? t.threat : t.night} />
+      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={mark.danger ? t.danger : t.hairline} style="stroke" strokeWidth={1} />
+      {image ? <Image image={image} x={left + 1} y={top + 1} width={TOKEN - 2} height={TOKEN - 2} fit="contain" /> : <CanvasIcon name={mark.icon} x={left + 3} y={top + 3} size={TOKEN - 6} color={t.bone} />}
+      <Text x={left + TOKEN + 2} y={top + TOKEN - 5} text={text} font={fonts.badge} color={t.bone} />
     </Group>
   );
 }

@@ -16,14 +16,21 @@ export type SheetNames = {
 // A number the engine computed, shown with the game's icon beside it (willpower on a commit, defense on a defender).
 export type SheetStat = { icon: IconName; value: number; word: string };
 
-export type SheetOption = { id: string; label: string; code: string | null; stats?: readonly SheetStat[] };
+// `mark`: a number drawn on the option's card while the pick is open (the damage a defender would take), in danger when
+// it destroys the card.
+export type OptionMark = { icon: IconName; value: number; danger: boolean };
 
-export type PickOption = SheetOption & ({ intent: PlayerIntent } | { next: Sheet });
+export type SheetOption = { id: string; label: string; code: string | null; stats?: readonly SheetStat[]; mark?: OptionMark };
+
+// `caution`: what confirming this option costs that the player may not expect (a hero destroyed and the game lost). The
+// confirm then arms on its first tap and the line above it says this (docs/design-system.md, Table, Two taps).
+export type PickOption = SheetOption & ({ intent: PlayerIntent } | { next: Sheet }) & { caution?: string };
 
 // An option the rules do not allow now, shown with the reducer's reason so the player sees why it is missing.
 export type Unavailable = { id: string; label: string; code: string | null; reason: string };
 
-export type Alternative = { label: string; intent: PlayerIntent } | { label: string; next: Sheet };
+// `caution` on an alternative that sends an intent: the armed line says it in place of "Tap again" (the game lost).
+export type Alternative = { label: string; intent: PlayerIntent; caution?: string } | { label: string; next: Sheet };
 
 export type PickSheet = {
   kind: "pick";
@@ -47,6 +54,8 @@ export type PickSheet = {
   selectionMade?: boolean;
   // Cards the moment is about that the player may want to read first (the top of the encounter deck under Look).
   about?: readonly string[];
+  // A warning the confirm repeats before it sends, whatever is picked: the primary arms on its first tap.
+  caution?: string;
 };
 
 export type MultiBuild = { kind: "Commit" } | { kind: "CommitHide" } | { kind: "attack"; enemyId: string };
@@ -81,6 +90,8 @@ export type DistributeSheet = {
   exact: boolean;
   options: readonly (SheetOption & { max: number })[];
   purpose: DistributePurpose;
+  // A warning the confirm repeats before it sends (an attachment whose text the app does not apply): Play arms first.
+  caution?: string;
 };
 
 export type TriggerOption = SheetOption & { effectId: string; cardId: string; timing: string; text: string | null; pay: PayRequest | null };

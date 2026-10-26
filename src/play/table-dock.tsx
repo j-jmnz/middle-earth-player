@@ -23,13 +23,13 @@ export function ReadoutView({ readout, surface = "night" }: { readout: Readout; 
       <View className="flex-row items-center justify-center gap-2">
         {readout.stats.map((stat, index) => (
           <View key={stat.word} className="flex-row items-center gap-2">
-            {index > 0 ? <Text className={`text-label ${paper ? "text-inkMuted" : "text-muted"}`}>against</Text> : null}
+            {index > 0 ? <Text className={`text-label ${paper ? "text-inkMuted" : "text-muted"}`}>{readout.join ?? "against"}</Text> : null}
             <Stats stats={[stat]} surface={surface} size="title" />
           </View>
         ))}
       </View>
       {readout.result ? (
-        <Text testID="readout-result" numberOfLines={2} className={`mt-0.5 text-center text-label ${paper ? "text-ink" : "text-bone"}`}>
+        <Text testID="readout-result" numberOfLines={3} className={`mt-0.5 text-center text-label ${paper ? "text-ink" : "text-bone"}`}>
           {readout.result}
         </Text>
       ) : null}

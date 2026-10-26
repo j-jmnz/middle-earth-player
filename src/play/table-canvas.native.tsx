@@ -14,7 +14,7 @@ import { cancelAnimation, Easing, useDerivedValue, useReducedMotion, useSharedVa
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
-import { AttackerMark, Badges, CardBody, CombatMarkView, Glow, Leaving, Marks, Moving, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, Badges, CardBody, CombatMarkView, Glow, Leaving, Marks, Moving, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
@@ -246,11 +246,13 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     const slotInfo = slot.kind === "card" && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck" ? info(slot.id) : null;
     const tappable = highlight.tappable.has(slot.id) || targetIds.has(slot.id);
     const picked = highlight.picked.get(slot.id) ?? 0;
+    const optionMark = highlight.marks.get(slot.id);
     return (
       <Group>
         {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} images={tokens} /> : null}
         <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} />
         {slot.kind === "card" ? <Marks rect={rect} tappable={tappable} picked={picked} share={highlight.share} dimmed={highlight.dimOthers && !tappable && picked === 0} fonts={fonts} /> : null}
+        {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} /> : null}
       </Group>
     );
   };

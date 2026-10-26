@@ -2,15 +2,25 @@
 // ledger: which lines of a card no record reads, and what the player loses with them. One check for the table, the
 // preview, the card screen, the pool, the deck screens and the briefing (docs/plans/inactive-text.md).
 import { cardLines, inactiveCodes, LOSS_WORDS, textCheck, textLoss, unappliedLines, type CardLine, type TextCheck, type TextLoss } from "../catalog/active-text.ts";
+import type { Effect } from "../catalog/boundary.ts";
 import { shippedLedger } from "../catalog/printed-ledger.ts";
 import { EFFECTS } from "../effects/index.ts";
 
-let check: TextCheck | null = null;
+const checks = new WeakMap<readonly Effect[], TextCheck>();
+
+/** The check over these records (the reducer context's) and the shipped ledger, worked out once per record list. */
+export function checkFor(effects: readonly Effect[]): TextCheck {
+  let found = checks.get(effects);
+  if (!found) {
+    found = textCheck(effects, shippedLedger());
+    checks.set(effects, found);
+  }
+  return found;
+}
 
 /** The check over the shipped records and ledger. */
 export function shippedCheck(): TextCheck {
-  check ??= textCheck(EFFECTS, shippedLedger());
-  return check;
+  return checkFor(EFFECTS);
 }
 
 export type NotApplied = { lines: readonly CardLine[]; loss: TextLoss; words: string };
@@ -41,3 +51,19 @@ export function notAppliedCodes(texts: Iterable<readonly [string, string | null]
 }
 
 export { cardLines };
+
+/**
+ * What playing a card the app does not fully apply costs, said before it is confirmed: an attachment with no record attaches
+ * and does nothing (the confirm arms on its first tap); an ally plays with its printed numbers. Null when every line is
+ * applied. Events with no record are never offered (src/rules/planning.ts), so they have no caution.
+ */
+export function playCaution(code: string, type: string, cost: number, against: TextCheck = shippedCheck()): { words: string; armed: string | null } | null {
+  if (type === "attachment" && !against.recorded.has(code)) {
+    return cost > 0
+      ? { words: `Its text is not applied: you pay ${cost} for no effect`, armed: `Tap again: pay ${cost} for no effect` }
+      : { words: "Its text is not applied: it has no effect", armed: "Tap again: play it for no effect" };
+  }
+  const lines = unappliedLines(code, null, against);
+  if (type === "ally" && (!against.recorded.has(code) || lines.length > 0)) return { words: "Its ability is not applied: it plays with its printed numbers", armed: null };
+  return null;
+}

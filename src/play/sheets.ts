@@ -15,9 +15,10 @@ import type { Frame } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
+import { damageOutcome, defenseDamage, lossWords, undefendedDamage } from "./foresight.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
-import { TIMING_WORDS, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type PickOption, type Sheet, type SheetNames, type SheetOption, type TriggerOption, type Unavailable } from "./sheet-types.ts";
+import { TIMING_WORDS, type OptionMark, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type PickOption, type Sheet, type SheetNames, type SheetOption, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 export function step(game: ScenarioState): string {
   return STEP_WORDS[game.mode] ?? game.phase;
@@ -102,10 +103,23 @@ export function travelRefusals(game: ScenarioState, ctx: ReduceContext, names: S
   });
 }
 
+// What an attack would do to a character before the shadow card (foresight.ts): the damage as a stat on its tile and card,
+// "destroyed" in the label when it would be, and a caution when that loses the game, so the confirm asks twice.
+function foreseen(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, damage: number): { stats: SheetStat[]; suffix: string; mark: OptionMark; caution?: string } {
+  const outcome = damageOutcome(game, ctx, id, damage);
+  const stats: SheetStat[] = [{ icon: "damage", value: damage, word: "Damage" }];
+  const mark: OptionMark = { icon: "damage", value: damage, danger: outcome.destroyed };
+  if (!outcome.destroyed) return { stats, suffix: "", mark };
+  const caution = outcome.loss ? `Tap again: ${names.card(id)} is destroyed, ${lossWords(outcome.loss)}` : undefined;
+  return { stats, suffix: " · destroyed", mark, ...(caution ? { caution } : {}) };
+}
+
 /** The heroes an undefended attack can land on, when there is more than one to choose from. */
 function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, title: string, note: string): Sheet | PlayerIntent {
   const heroes = legalTargets(game, { type: "Undefended" }, ctx);
   if (heroes.length <= 1) return heroes[0] ? { type: "Undefended", heroId: heroes[0] } : { type: "Undefended" };
+  const enemyId = game.pendingAttack?.enemyId ?? "";
+  const damage = undefendedDamage(game, ctx, enemyId);
   return {
     kind: "pick",
     key: `undefended:${game.pendingAttack?.enemyId ?? ""}`,
@@ -114,7 +128,11 @@ function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNa
     note: `${note} Undefended: a hero takes all of it.`,
     verb: "Damage to",
     confirm: "Take the damage",
-    options: heroes.map((id) => ({ ...option(game, names, id), intent: { type: "Undefended", heroId: id } })),
+    options: heroes.map((id) => {
+      const seen = foreseen(game, ctx, names, id, damage);
+      const base = option(game, names, id);
+      return { ...base, label: `${base.label}${seen.suffix}`, stats: seen.stats, mark: seen.mark, intent: { type: "Undefended", heroId: id }, ...(seen.caution ? { caution: seen.caution } : {}) };
+    }),
     primary: null,
     alternative: null,
   };
@@ -322,18 +340,32 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     case "travel": {
       const targets = has(legal, "Travel") ? legalTargets(game, { type: "Travel" }, ctx) : [];
       const unavailable = travelRefusals(game, ctx, names, targets);
+      // Only one location can be active (rr.travel): while one is, say what exploring it still takes.
+      const active = game.activeLocation ? game.cards[game.activeLocation] : undefined;
+      const activePoints = active ? questPointsOf(game, active, ctx.cards) : null;
+      const waiting = game.staging.some((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").type === "location");
+      const blocked = targets.length === 0 && active != null && waiting;
       return {
         kind: "pick",
         key: `travel:${game.round}`,
         step: "Travel",
-        title: targets.length > 0 ? "Travel to a location" : "No location to travel to",
-        note: targets.length > 0 ? "The location becomes active and leaves staging." : null,
+        title: targets.length > 0 ? "Travel to a location" : blocked && active ? `Explore ${names.card(active.id)} first` : "No location to travel to",
+        note:
+          targets.length > 0
+            ? "The location becomes active and leaves staging: its threat stops counting, and progress goes on it before the quest."
+            : blocked && active && activePoints != null
+              ? `${Math.max(0, activePoints - active.progress)} more progress explores it. Only one location can be active.`
+              : null,
         verb: "Travel to",
         options: targets.map((id) => {
           const location = game.cards[id];
           const points = location ? questPointsOf(game, location, ctx.cards) : null;
           const stats: SheetStat[] = [...statOf(game, ctx, id, "threat"), ...(points == null ? [] : [{ icon: "questPoints" as const, value: points, word: "Quest points" }])];
-          return { ...option(game, names, id), stats, intent: { type: "Travel", locationId: id } };
+          // Its Travel line, when it prints one (a cost the travel pays: Great Forest Web's "exhaust 1 hero").
+          const travel = ctx.effects.find((effect) => effect.cardCode === location?.code && effect.timing === "travel");
+          const line = lineOf(travel, names);
+          const base = option(game, names, id);
+          return { ...base, label: line ? `${base.label} · ${line}` : base.label, stats, intent: { type: "Travel", locationId: id } };
         }),
         ...(unavailable.length > 0 ? { unavailable } : {}),
         primary: null,
@@ -376,7 +408,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const note = numbers ? `Attack ${numbers.attack}.` : "";
       const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
       const undefended = undefendedSheet(game, ctx, names, title, note);
-      const leave: Alternative = "kind" in undefended ? { label: "Leave undefended", next: undefended } : { label: "Leave undefended", intent: undefended };
+      // Leave undefended with one hero to take it: the armed line says when that hero falls and the game with it.
+      const lone = "kind" in undefended ? null : undefended.type === "Undefended" ? undefended.heroId : null;
+      const loneCaution = lone && numbers ? foreseen(game, ctx, names, lone, numbers.attack).caution : undefined;
+      const leave: Alternative = "kind" in undefended ? { label: "Leave undefended", next: undefended } : { label: "Leave undefended", intent: undefended, ...(loneCaution ? { caution: loneCaution } : {}) };
       return {
         kind: "pick",
         key: `defense:${numbers?.enemyId ?? ""}:${game.pendingAttack?.undefended ? "u" : "d"}`,
@@ -387,7 +422,16 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         verb: "Defend with",
         options: defenders.map((id) => {
           const defense = defenseAsDefender(game, id, ctx.cards);
-          return { ...option(game, names, id), stats: [{ icon: "defense" as const, value: defense, word: "Defense" }], intent: { type: "DeclareDefender", defenderId: id } };
+          const seen = foreseen(game, ctx, names, id, numbers ? defenseDamage(game, ctx, numbers.enemyId, id) : 0);
+          const base = option(game, names, id);
+          return {
+            ...base,
+            label: `${base.label}${seen.suffix}`,
+            stats: [{ icon: "defense" as const, value: defense, word: "Defense" }, ...seen.stats],
+            mark: seen.mark,
+            intent: { type: "DeclareDefender", defenderId: id },
+            ...(seen.caution ? { caution: seen.caution } : {}),
+          };
         }),
         primary: null,
         alternative: leave,
