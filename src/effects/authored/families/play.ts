@@ -202,7 +202,7 @@ export const RECORDS: readonly Effect[] = [
   // Bard son of Brand: when a character leaves play, its attachments go back to their owners' hands (once per phase).
   { id: "18002:response:1", cardCode: "18002", lines: ["18002:A:2"], timing: "response", trigger: "leftPlayWithAttachments", subject: { type: "character", control: "any" }, limit: "oncePerPhase", instructions: [{ verb: "ReturnAttachments" }] },
   // Horn of the Mark: when a character that shares a trait with the attached hero leaves play, exhaust it to draw 1 card.
-  { id: "22035:response:1", cardCode: "22035", lines: ["22035:A:2"], timing: "response", trigger: "leftPlay", subject: { type: "character", control: "any", sharesTraitWith: "host" }, cost: { kind: "exhaustSelf" }, instructions: [{ verb: "Draw", amount: 1 }] },
+  { id: "22035:response:1", cardCode: "22035", lines: ["22035:A:2"], timing: "response", trigger: "leftPlay", subject: { type: "character", control: "any", sharesTrait: "host" }, cost: { kind: "exhaustSelf" }, instructions: [{ verb: "Draw", amount: 1 }] },
   // Horns! Horns! Horns!: each player may put one ally into play from their hand; shuffled into their owners' decks at the end
   // of the phase if still in play.
   {

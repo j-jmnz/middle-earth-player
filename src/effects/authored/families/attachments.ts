@@ -144,7 +144,7 @@ export const RECORDS: readonly Effect[] = [
     timing: "action",
     instructions: [
       { verb: "Pick", pick: { type: "enemy", control: "any", staging: true, hasAttachment: { trait: "Trap" } } },
-      { verb: "LookAtEncounterCards", amount: { stat: "threat", of: "picked", printed: true } },
+      { verb: "LookAtTop", count: { stat: "threat", of: "picked", printed: true } },
       {
         verb: "Choose",
         who: "actor",

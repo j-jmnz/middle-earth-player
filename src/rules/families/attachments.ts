@@ -6,7 +6,7 @@ import type { ScenarioState } from "../state.ts";
 import type { Focus } from "./index.ts";
 import { attachSourceTo, guardWith, putAttachmentIntoPlay } from "./attachments-play.ts";
 import { answerQuestProgress } from "./attachments-quest.ts";
-import { declareAttack, healAmong, lookAtEncounterCards } from "./attachments-verbs.ts";
+import { declareAttack, healAmong } from "./attachments-verbs.ts";
 
 // The verbs src/catalog/families/attachments.ts adds, for attachments on enemies, locations, quests and threat dials: Traps, Guarded, played unattached. Null when the verb is not one of them.
 // PlayInto and Guarded are constants the engine reads when the card is played (attachments-play.ts): run alone they do nothing.
@@ -23,8 +23,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return putAttachmentIntoPlay(state, instruction, focus, ctx, steps);
     case "HealAmong":
       return healAmong(state, instruction, focus, ctx);
-    case "LookAtEncounterCards":
-      return lookAtEncounterCards(state, instruction, focus, ctx);
     case "ChooseAttackers":
       return declareAttack(state, instruction, focus, ctx, steps);
     case "QuestProgressFirst":

@@ -20,6 +20,7 @@ import { queueEvent } from "../queue.ts";
 import type { ScenarioState } from "../state.ts";
 import { inPlay, livingSeats, updateCard } from "../state.ts";
 import { moveCard } from "../zones.ts";
+import { putAttachmentIntoPlay } from "./deck-moves.ts";
 import type { Focus } from "./index.ts";
 import { lastPickedSeat, markPicked, namedCard, queueFront, scheduleFor } from "./play-refs.ts";
 
@@ -88,6 +89,8 @@ function seatOptions(state: ScenarioState): string[] {
 export function putIntoPlay(state: ScenarioState, instruction: PutIntoPlay, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = namedCard(state, instruction.card ?? "self", focus);
   const card = id ? state.cards[id] : undefined;
+  // An attachment goes on a host (families/deck-moves.ts).
+  if (id && card && printedOf(ctx.cards, card.code).type === "attachment") return putAttachmentIntoPlay(state, instruction, id, focus, ctx, steps);
   if (!id || !card || !canEnter(state, id, ctx)) return state;
   let seat: number | null = focus.seat;
   if (instruction.who === "owner") seat = card.owner ?? card.controller ?? focus.seat;

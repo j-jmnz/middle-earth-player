@@ -14,8 +14,9 @@ export const VERBS = [
   // Shows the actor the top `count` cards (1 by default) of the encounter deck, or of their own deck (`deck: "own"`), in a
   // look window they close with a pass. Nothing moves. The top card becomes the picked card ("that card", "the looked at
   // card"), and the effect remembers every card shown (for ArrangeEncounter and PickEncounter `from: "looked"`). An empty
-  // deck shows nothing and picks nothing.
-  z.strictObject({ verb: z.literal("LookAtTop"), count: z.number().int().positive().optional(), deck: z.enum(["encounter", "own"]).optional(), ...when }),
+  // deck shows nothing and picks nothing. `count` may be read (X: "Look at the top X cards"); `deck: "picked"` is the deck of
+  // the last picked player, still shown to the actor ("Look at the top X cards of any player's deck", families/deck.ts).
+  z.strictObject({ verb: z.literal("LookAtTop"), count: positiveAmountSchema.optional(), deck: z.enum(["encounter", "own", "picked"]).optional(), ...when }),
   // Chooses one encounter card for the instructions after it (the picked card; "" when none matches): among the top `top`
   // cards of the encounter deck (all of it without `top`), the deck and the encounter discard pile, the cards LookAtTop
   // showed that are still on top (`looked`), or the enemies and locations in play (`play`). It must be of `type`, non-unique

@@ -15,6 +15,7 @@ import { printedOf, type Sphere } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { inPlay, updateCard } from "./state.ts";
 import { moveCard } from "./zones.ts";
+import { queueEvent } from "./queue.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
 
 // Costs and limits on an Action or a Response. A cost is paid when the effect is triggered, before
@@ -39,6 +40,7 @@ const LIMITS: Readonly<Record<Limit, LimitRule>> = {
   oncePerGameGroup: { times: 1, per: "game", group: true },
   thricePerGameGroup: { times: 3, per: "game", group: true },
   oncePerRoundGroupEachPlayer: { times: 1, per: "round", eachPlayer: true, group: true },
+  oncePerPhaseGroupEachPlayer: { times: 1, per: "phase", eachPlayer: true, group: true },
 };
 
 // The attack in progress, as a key a once-per-attack use is recorded under.
@@ -50,7 +52,7 @@ function attackKey(state: ScenarioState): string | undefined {
 // A limit counts the uses of this record on this card (on any card, for a group limit) in this round, in this phase for a
 // phase limit, in this attack, or in the whole game, by this player for a per-player limit (rr.limits). A per-game limit is
 // the player's, whichever copy of the card they used it on (rr.limits: "regardless of which card is used").
-function limitSpent(state: ScenarioState, effect: Effect, sourceId: string, seat: number): boolean {
+export function limitSpent(state: ScenarioState, effect: Effect, sourceId: string, seat: number): boolean {
   if (!effect.limit) return false;
   const rule = LIMITS[effect.limit];
   const attack = attackKey(state);
@@ -216,7 +218,8 @@ export function payUsage(
         next = raiseThreat(next, seat, cost.amount, steps, currentCause(steps, UNATTRIBUTED));
         break;
       case "discardDeckTop":
-        for (const id of (next.seats[seat]?.deck ?? []).slice(0, cost.amount)) next = moveCard(next, id, { zone: "discard", seat });
+        // Each card is announced ("After ~ is discarded from your deck", families/deck-moves.ts).
+        for (const id of (next.seats[seat]?.deck ?? []).slice(0, cost.amount)) next = queueEvent(moveCard(next, id, { zone: "discard", seat }), { trigger: "discardedFromDeck", seat, cardId: id });
         break;
       case "playEvent":
         // A Response event played from the top of the deck (Gandalf, 142002) spends that permission and is held like a card

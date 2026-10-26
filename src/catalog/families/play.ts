@@ -22,6 +22,8 @@ export const VERBS = [
   // play stays where it is. A hero goes among its controller's heroes, any other card into the play area, ready unless
   // `exhausted`, `committed` to the quest if asked, with `damage` tokens on it. `who` is its controller: the actor, the picked
   // player, its owner, or a player the actor chooses ("under any player's control"). `until` and `then` schedule its leaving.
+  // An attachment goes on a card it may be attached to that matches `host`, chosen by the actor; it stays where it is when
+  // none can take it (families/deck-moves.ts).
   z.strictObject({
     verb: z.literal("PutIntoPlay"),
     card: card.optional(),
@@ -29,6 +31,7 @@ export const VERBS = [
     exhausted: z.boolean().optional(),
     committed: z.boolean().optional(),
     damage: z.number().int().positive().optional(),
+    host: pickSchema.optional(),
     ...temporary,
     ...when,
   }),

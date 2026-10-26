@@ -8,6 +8,7 @@ import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { applyResponse, responseIntents, responseReason } from "./responses.ts";
+import { applyMulliganTrigger, mulliganTriggerReason } from "./families/deck-play.ts";
 import type { ScenarioState } from "./state.ts";
 import { payUsage, usable, usageReason } from "./usage.ts";
 
@@ -48,6 +49,8 @@ export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalI
 export function triggerReason(state: ScenarioState, intent: TriggerIntent, ctx: ReduceContext): string | null {
   if (state.window?.kind === "cancelOffer") return cancelReason(state, intent, ctx);
   if (state.window?.kind === "response") return responseReason(state, intent, ctx);
+  // A Response offered in place of the mulligan (families/deck-play.ts).
+  if (state.window?.kind === "mulligan") return mulliganTriggerReason(state, intent, ctx);
   if (!inTriggerWindow(state)) return "That intent is not legal in this window";
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);
   if (!effect) return "That effect cannot be triggered";
@@ -64,6 +67,7 @@ export function applyTrigger(
 ): ScenarioState {
   if (state.window?.kind === "cancelOffer") return applyCancel(state, intent, steps);
   if (state.window?.kind === "response") return applyResponse(state, intent, ctx, steps);
+  if (state.window?.kind === "mulligan") return applyMulliganTrigger(state, intent, ctx, steps);
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);
   if (!effect || !state.window) return state;
   const seat = state.activeSeat;

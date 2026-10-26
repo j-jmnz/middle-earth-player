@@ -11,6 +11,7 @@ import {
   undefendedTargets,
 } from "./combat.ts";
 import { optionIntents, optionReason } from "./choices.ts";
+import { mulliganTriggers } from "./families/deck-play.ts";
 import { hideCommitReason, hideCommitters } from "./hide.ts";
 import type { LegalIntent, PlayerIntent, Selection } from "./intents.ts";
 import { suppliesNumber } from "./intents.ts";
@@ -32,9 +33,10 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
   if (!window) return [];
   switch (window.kind) {
     case "mulligan":
+      // A Response used in place of the mulligan (Galdor of the Havens, families/deck-play.ts) is offered beside them.
       return state.mulliganSeats.includes(state.activeSeat)
         ? [{ type: "Keep" }]
-        : [{ type: "Keep" }, { type: "Mulligan" }];
+        : [{ type: "Keep" }, { type: "Mulligan" }, ...mulliganTriggers(state, ctx)];
     case "pass":
       return passIntents(state, ctx);
     case "frameAction":

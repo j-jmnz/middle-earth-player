@@ -12,7 +12,6 @@ type AttachmentVerb = Extract<
       | "GuardWith"
       | "PutAttachmentIntoPlay"
       | "HealAmong"
-      | "LookAtEncounterCards"
       | "ChooseAttackers"
       | "QuestProgressFirst";
   }
@@ -32,8 +31,6 @@ export function attachmentWords(instruction: Instruction): string | null {
       return "put it into play";
     case "HealAmong":
       return `heal up to ${amountWords(verb.amount)} damage from among characters you control`;
-    case "LookAtEncounterCards":
-      return `look at the top ${amountWords(verb.amount)} cards of the encounter deck`;
     case "ChooseAttackers":
       return "declare an attack against the attached enemy";
     case "QuestProgressFirst":

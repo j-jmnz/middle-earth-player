@@ -38,9 +38,6 @@ export const VERBS = [
   // The actor heals up to `amount` damage from among the cards that match `pick` (from their side), one damage at a time on
   // the card they choose each time, and may stop ("heals up to 5 damage from among characters he controls").
   z.strictObject({ verb: z.literal("HealAmong"), amount: positiveAmountSchema, pick: pickSchema, healed: z.number().int().min(0).optional(), ...when }),
-  // Shows the actor the top `amount` cards of the encounter deck ("the top X cards ..., where X is that enemy's printed
-  // Threat"), as LookAtTop does with a printed number: the cards shown can be chosen with PickEncounter `from: "looked"`.
-  z.strictObject({ verb: z.literal("LookAtEncounterCards"), amount: positiveAmountSchema, ...when }),
   // The actor declares an attack against the card the reference names ("declare an attack against the attached enemy"): they
   // (Not the attack family's DeclareAttack, which declares one given attacker.) choose its attackers one at a time among their ready characters that may attack it, then stop; each exhausts (unless it
   // does not exhaust to attack) and the attack resolves (rr.step-6-8-1). It is an attack an effect makes, beside the one the

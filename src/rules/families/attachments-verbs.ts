@@ -17,7 +17,7 @@ import type { ScenarioState } from "../state.ts";
 import { flagged, inPlay, updateCard } from "../state.ts";
 import { patchTop, topFrame } from "../windows.ts";
 import { openStrike } from "./attack.ts";
-import { effectData, lookAtTop } from "./encounter-moves.ts";
+import { effectData } from "./encounter-moves.ts";
 import type { Focus } from "./index.ts";
 
 // The option that ends a choice made one card at a time.
@@ -41,12 +41,6 @@ export function healAmong(state: ScenarioState, instruction: Extract<Instruction
   if (!card) return state;
   const healedOne = queueEvent(updateCard(state, chosen, { damage: card.damage - 1 }), { trigger: "healed", seat: card.controller, cardId: chosen });
   return again(healedOne, { ...instruction, healed: healed + 1 }, focus.seat);
-}
-
-// LookAtEncounterCards: LookAtTop with the number read now.
-export function lookAtEncounterCards(state: ScenarioState, instruction: Extract<Instruction, { verb: "LookAtEncounterCards" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
-  const count = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
-  return lookAtTop(state, { verb: "LookAtTop", count: Math.max(0, count) }, focus.seat);
 }
 
 // ChooseAttackers: the enemy is read (and the source discarded, when that is the cost), then the actor chooses attackers one at

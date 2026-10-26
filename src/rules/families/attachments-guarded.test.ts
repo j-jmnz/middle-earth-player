@@ -102,11 +102,11 @@ describe("The King's Return", () => {
     expect(played.cards[event.id]?.zone).toBe("discard");
   });
 
-  it("cannot be played without a Guarded attachment in the deck", () => {
+  it("may be played without a Guarded attachment in the deck: the search finds nothing (rr.search)", () => {
     const table = seat();
     const other = put(table.state, "05017", "deck");
     const event = put(other.state, "19147", "hand");
-    expect(reduce(event.state, { type: "PlayCard", cardId: event.id, payments: [] }, ctx).ok).toBe(false);
+    expect(reduce(event.state, { type: "PlayCard", cardId: event.id, payments: [] }, ctx).ok).toBe(true);
   });
 });
 

@@ -13,6 +13,7 @@ import { inPlay, moveCard, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
 import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hooks.ts";
+import { alliesToHandDestination } from "./families/deck-rules.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -331,7 +332,8 @@ export function destroyCard(
   if (explored && printed.type === "location" && state.activeLocation === id) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
-  next = moveCard(next, id, defeatedDestination(latest, printed), instance.attachments);
+  // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck-rules.ts).
+  next = moveCard(next, id, alliesToHandDestination(next, latest, printed) ?? defeatedDestination(latest, printed), instance.attachments);
   steps.push({ kind: "destroy", targetId: id });
   if (printed.type === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   next = discardedFromPlay(next, instance, byDamage);

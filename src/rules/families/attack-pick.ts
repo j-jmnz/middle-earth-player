@@ -27,7 +27,7 @@ export function attackPickMatches(state: ScenarioState, id: string, spec: PickSp
   if (spec.printedKeyword && !printed.keywords[spec.printedKeyword]) return false;
   if (spec.minHitPoints != null && (printed.health ?? 0) < spec.minHitPoints) return false;
   if (spec.topOfDiscard && !state.seats.some((seat) => seat.discard.at(-1) === id)) return false;
-  if (!spec.engagedWith && !spec.sharesTrait && !spec.onSubject) return true;
+  if (!spec.engagedWith && spec.sharesTrait !== "other" && !spec.onSubject) return true;
   const data = topFrame(state)?.data;
   const frame = data?.kind === "effect" ? data : undefined;
   if (spec.engagedWith === "picked") {
@@ -38,7 +38,7 @@ export function attackPickMatches(state: ScenarioState, id: string, spec: PickSp
     const asking = spec.who === "firstPlayer" ? state.firstPlayer : at.seat;
     if (instance.zone === "engaged" && instance.controller === asking) return false;
   }
-  if (spec.sharesTrait) {
+  if (spec.sharesTrait === "other") {
     const other = at.other ?? frame?.other;
     const traits = other && state.cards[other] ? printedOf(ctx.cards, state.cards[other]?.code ?? "").traits : [];
     if (!other || other === id || !traits.some((trait) => hasTrait(state, id, trait, ctx))) return false;

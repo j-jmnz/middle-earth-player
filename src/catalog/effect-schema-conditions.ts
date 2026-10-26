@@ -33,8 +33,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
-  // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2).
-  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory"]) }),
+  // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
+  // its player uses from the hand ("put Emery into play from your hand", families/deck-play.ts).
+  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand"]) }),
   // A card with this code is in the victory display (`is`) or is not.
   z.strictObject({ kind: z.literal("inVictory"), code: z.string().min(1), is: z.boolean() }),
   // Some location other than the source is in the staging area or is the active location.

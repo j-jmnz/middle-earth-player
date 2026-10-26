@@ -12,6 +12,8 @@ import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
 import { dealOneShadow, runInstruction, type ReduceContext } from "./interpret.ts";
 import { runEncounterItem } from "./families/encounter-items.ts";
+import { chooseEach } from "./families/deck-each.ts";
+import { lookedDeckSeat } from "./families/deck-rules.ts";
 import { discardShadowOf } from "./shadow.ts";
 import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
@@ -258,6 +260,8 @@ function expandEach(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Re
   const instruction = item.instruction;
   const data = topFrame(state)?.data;
   if (instruction.verb !== "Each" || data?.kind !== "effect") return state;
+  // "Up to 4 Rohan allies", "any number of Gondor allies": the actor chooses them (families/deck-each.ts).
+  if (instruction.upTo != null) return chooseEach(state, item, frame, ctx);
   const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants);
   const cause = item.cause ? { cause: item.cause } : {};
   const expanded = ids.flatMap((id) => [
@@ -384,7 +388,9 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
 // top position first, then the next, until one choice is left.
 function arrangeTop(state: ScenarioState, item: QueueItem): ScenarioState {
   const data = topFrame(state)?.data;
-  const seat = state.seats[item.seat];
+  // The deck the looked cards are in: the actor's, or the player's whose deck the actor looked at (Gandalf's Search).
+  const owner = (data?.kind === "effect" ? lookedDeckSeat(state, data) : null) ?? item.seat;
+  const seat = state.seats[owner];
   if (data?.kind !== "effect" || !seat) return state;
   const offset = item.offset ?? 0;
   const count = (data.looked ?? []).filter((id) => seat.deck.includes(id)).length;
@@ -395,7 +401,7 @@ function arrangeTop(state: ScenarioState, item: QueueItem): ScenarioState {
   if (from < offset) return state;
   const deck = [...seat.deck];
   [deck[offset], deck[from]] = [deck[from] ?? "", deck[offset] ?? ""];
-  const arranged = withSeat(state, item.seat, { ...seat, deck });
+  const arranged = withSeat(state, owner, { ...seat, deck });
   if (rest.length <= 2) return arranged;
   const next = topFrame(arranged)?.data;
   if (next?.kind !== "effect") return arranged;

@@ -31,8 +31,13 @@ const OWNERS: Readonly<Record<string, string>> = { picked: "that player", eventS
 export function playWords(instruction: Instruction): string | null {
   const verb = instruction as PlayVerb;
   switch (verb.verb) {
-    case "PutIntoPlay":
-      return `put ${NAMES[verb.card ?? "self"]} into play`;
+    case "PutIntoPlay": {
+      if (verb.host) return `attach ${NAMES[verb.card ?? "self"]} to ${verb.host.trait ? `a ${verb.host.trait} ${verb.host.type}` : `a ${verb.host.type}`}`;
+      const who = verb.who === "owner" ? " under its owner's control" : verb.who === "picked" ? " under that player's control" : "";
+      const state = verb.committed ? " exhausted and committed to the quest" : verb.exhausted ? " exhausted" : "";
+      const damage = verb.damage ? ` with ${verb.damage} damage on it` : "";
+      return `put ${NAMES[verb.card ?? "self"]} into play${who}${state}${damage}`;
+    }
     case "PutIntoPlayFromHand":
       return `put ${verb.upTo && verb.upTo > 1 ? `up to ${verb.upTo} cards` : "a card"} into play from ${verb.from === "picked" ? "that player's hand" : verb.from === "any" ? "the players' hands" : "your hand"}`;
     case "ChangeControl":
@@ -66,7 +71,7 @@ export function playWords(instruction: Instruction): string | null {
 
 /** What a play family verb that stopped for a choice asks: the button's verb and the prompt. Null for any other verb. */
 export function playPickWords(asked: Instruction): { verb: string; prompt: string } | null {
-  if (asked.verb === "PutIntoPlay") return { verb: "Choose", prompt: "Choose the player who controls it." };
+  if (asked.verb === "PutIntoPlay") return asked.host ? { verb: "Attach", prompt: "Choose the card to attach it to." } : { verb: "Choose", prompt: "Choose the player who controls it." };
   if (asked.verb !== "PutIntoPlayFromHand") return null;
   if (asked.card) return { verb: "Choose", prompt: "Choose the player who controls it." };
   return { verb: "Put into play", prompt: `Choose a card to put into play from ${asked.from === "any" ? "the players' hands" : "your hand"}, or none.` };

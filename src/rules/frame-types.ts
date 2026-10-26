@@ -80,6 +80,8 @@ export type EffectData = {
   interrupted?: boolean;
   // The cards a Pick looked at in a deck: the ones still there are put back by ArrangeTop.
   looked?: readonly string[];
+  // The options a `different` Choose has taken in this effect (families/deck-choose.ts).
+  options?: readonly string[];
   // The seat the event that offered this Response happened to.
   eventSeat?: number | null;
   // The X an event was played for (Stand and Fight), or the cost of the card an effect discarded (Flame of Anor).

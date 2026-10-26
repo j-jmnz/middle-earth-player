@@ -31,7 +31,16 @@ export const pickSchema = z.strictObject({
   printedIcon: sphereSchema.optional(),
   from: z.enum(["play", "hand", "discard", "deck", "victory"]).optional(),
   // From the deck: only its top cards are looked at. The cards still in the deck are the ones ArrangeTop puts back in order.
+  // From the discard pile: only its top cards, the last put there ("While the top card of your discard pile is an event").
   top: z.number().int().positive().optional(),
+  // Only the cards the running effect looked at (LookAtTop) or discarded (DiscardFromDeck), still in a deck or a discard pile
+  // ("add 1 of those cards to its owner's hand", "Put up to 2 allies discarded by this effect into play"; families/deck-each.ts).
+  looked: z.boolean().optional(),
+  // A card that shares at least one Trait with the source card (`self`: "an ally who shares at least 1 Trait with him"), the
+  // source's host (`host`: "if that character shares at least one trait with the attached hero"), or the answered event's
+  // other card (`other`: "another enemy that shares a Trait with the enemy just destroyed"); never that card itself. A Trait
+  // gained from an attachment counts (families/play-pick.ts, families/attack-pick.ts).
+  sharesTrait: z.enum(["self", "host", "other"]).optional(),
   // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
   cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest"]).optional(),
   maxCost: z.number().int().min(0).optional(),
@@ -125,18 +134,12 @@ export const pickSchema = z.strictObject({
   // An enemy engaged with the player the effect last picked (`picked`: "each enemy engaged with that player"), or one not engaged
   // with the chooser (`notYou`: in the staging area, with `staging`, or engaged with another player).
   engagedWith: z.enum(["picked", "notYou"]).optional(),
-  // A card that shares a Trait with the answered event's other card ("another enemy that shares a Trait with the enemy just
-  // destroyed"); never that card itself.
-  sharesTrait: z.literal("other").optional(),
   // An attachment on the card the answered event is about ("a Weapon attached to that character").
   onSubject: z.boolean().optional(),
   // A card with at least this many printed hit points ("an enemy with 5 or more printed hit points").
   minHitPoints: z.number().int().positive().optional(),
   // The top card of its discard pile ("While the top card of your discard pile is an ally").
   topOfDiscard: z.boolean().optional(),
-  // A card that shares at least one trait with the source (`self`) or the source's host (`host`): "if that character shares at
-  // least one trait with the attached hero" (families/play-pick.ts).
-  sharesTraitWith: z.enum(["self", "host"]).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;
