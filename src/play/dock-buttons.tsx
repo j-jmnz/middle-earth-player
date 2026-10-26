@@ -102,7 +102,7 @@ export function DockButtons({
       <View style={{ height: armedRoom(lines, dense) }}>
         <View style={{ height: lines * LINE_PX, justifyContent: "flex-end" }}>
           {line ? (
-            <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} className={`text-center text-label ${armedButton ? "text-gold" : "text-muted"}`}>
+            <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} accessibilityLabel={armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : undefined} className={`text-center text-label ${armedButton ? "text-gold" : "text-muted"}`}>
               {line}
             </Text>
           ) : null}
