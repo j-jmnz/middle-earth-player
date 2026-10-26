@@ -817,9 +817,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "5bc8a652a1fd7ff8787aef2dd0aae6a41f92e8bd5b72536615591f489ead5413"
+        "value": "e648541d9f8a3044b06c2f3a897e90812814b35fad05d8c09d5a79a2403078ab"
       },
-      "fetchedAt": "2026-10-25T14:34:04.157Z",
+      "fetchedAt": "2026-10-26T12:50:42.027Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -958,6 +958,18 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/hobbit_on_the_doorstep_rulesheet.pdf",
           "sha256": "c7a6d8904aa055744d88e06149f2af4ccc0f356dc7d4bf46410f4d452c6cd882",
           "bytes": 2709473
+        },
+        {
+          "path": "pdf/heirs-of-numenor_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/heirs-of-numenor_rules.pdf",
+          "sha256": "2d290387b7963814746273a884c99718873c1b41cff95f6200db96b37aaa480a",
+          "bytes": 2714611
+        },
+        {
+          "path": "pdf/mec65_web_the-wilds-of_rhovanion_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec65_web_the-wilds-of_rhovanion_rules.pdf",
+          "sha256": "a822a79776d1e7df282c12789b21ed5b001025e016413b4a81602328f3b83dd6",
+          "bytes": 4748254
         },
         {
           "path": "pdf/mec_communitydecklists_eomerandeowyn-compressed.pdf",
