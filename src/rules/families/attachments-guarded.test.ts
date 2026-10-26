@@ -4,13 +4,15 @@
 // into play). Real records with fixture cards.
 import { describe, expect, it } from "vitest";
 
+import { EFFECTS } from "../../effects/index.ts";
+
 import { legalTargets } from "../legal.ts";
 import { settle } from "../machine.ts";
 import { reduce } from "../reduce.ts";
 import { updateCard, type ScenarioState } from "../state.ts";
-import { attachmentCtx, deck, offered, play, put, resolveChoices, seat, send } from "./attachments-fixture.ts";
+import { attachmentCtx, deck, offered, play, put, seat, send } from "./attachments-fixture.ts";
 
-const ctx = attachmentCtx();
+const ctx = attachmentCtx(EFFECTS);
 
 // Combat damage the first hero deals to an engaged enemy, in a player attack window.
 function attack(state: ScenarioState, enemyId: string, attackerId: string): ScenarioState {

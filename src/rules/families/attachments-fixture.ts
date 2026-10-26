@@ -1,8 +1,6 @@
 // A small table for the attachments family's tests (attachments*.test.ts): printed cards under the real codes of the cards
 // whose records the family authored, a few encounter cards, and helpers that seat the players and build the encounter deck.
 import type { Effect } from "../../catalog/boundary.ts";
-import { RECORDS } from "../../effects/authored/families/attachments.ts";
-import { EFFECTS } from "../../effects/index.ts";
 
 import { cardMap, expectOk, idleScenario } from "../fixture.ts";
 import { definePrinted, type PrintedCard } from "../printed.ts";
@@ -56,15 +54,12 @@ export const ATTACHMENT_CARDS = cardMap([
   attachment("144009", "Ambush", ["Condition", "Trap"]),
 ]);
 
-// Every real record of these cards (the family's, and their other lines' in pool or generated), plus any fixture records a
-// test adds. The reducer receives effects as an argument.
-export function attachmentCtx(extra: readonly Effect[] = []) {
-  const real = EFFECTS.filter((effect) => ATTACHMENT_CARDS.has(effect.cardCode));
-  return { effects: [...real, ...extra], cards: ATTACHMENT_CARDS };
+// The records of these cards among those a test passes (the tests pass every real record, src/effects EFFECTS: the family's,
+// and the cards' other lines in pool or generated), plus fixture records. The reducer receives effects as an argument and
+// never imports them.
+export function attachmentCtx(effects: readonly Effect[]) {
+  return { effects: effects.filter((effect) => ATTACHMENT_CARDS.has(effect.cardCode)), cards: ATTACHMENT_CARDS };
 }
-
-// The family's records are among them.
-export const FAMILY_RECORD_IDS: readonly string[] = RECORDS.map((effect) => effect.id);
 
 export type Ctx = ReturnType<typeof attachmentCtx>;
 export type Table = { state: ScenarioState; heroes: string[] };

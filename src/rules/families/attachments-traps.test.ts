@@ -4,6 +4,8 @@
 // unattached, attached to the next eligible enemy, and what they do to it. Real records with fixture cards.
 import { describe, expect, it } from "vitest";
 
+import { EFFECTS } from "../../effects/index.ts";
+
 import type { EngineStep } from "../intents.ts";
 import { modifiedStat } from "../keywords.ts";
 import { legalTargets } from "../legal.ts";
@@ -15,7 +17,7 @@ import { updateCard, withMode, type ScenarioState } from "../state.ts";
 import { attachTo } from "../zones.ts";
 import { attachmentCtx, deck, offered, play, put, resolveChoices, seat, send } from "./attachments-fixture.ts";
 
-const ctx = attachmentCtx();
+const ctx = attachmentCtx(EFFECTS);
 
 // The staging step, run until a player is asked something.
 function stage(state: ScenarioState, steps: EngineStep[] = []): ScenarioState {
