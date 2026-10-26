@@ -21,6 +21,16 @@ export const VERBS = [
   // The source card is removed from the campaign pool ("add ~ to the victory display and remove it from the campaign pool"): the
   // campaign log drops it when the scenario is won.
   z.strictObject({ verb: z.literal("RemoveFromCampaignPool"), ...when }),
+  // Constant on a player card ("Encounter."): the card is not part of its player's drawn deck. At the start of the game it is set
+  // aside, still its owner's card; a player card effect shuffles it into the encounter deck, where it is revealed like an
+  // encounter card (families/sidequests-encounter.ts).
+  z.strictObject({ verb: z.literal("EncounterKeyword"), ...when }),
+  // Shuffles one set-aside copy of the card with this code into the encounter deck ("Shuffle 1 of your set aside Ranger of the
+  // North allies into the encounter deck"): the actor's own copy with `own`, any player's otherwise. Nothing happens with none.
+  z.strictObject({ verb: z.literal("ShuffleSetAsideIntoEncounterDeck"), code: z.string().min(1), own: z.boolean().optional(), ...when }),
+  // The source card, an Encounter-keyword player card just revealed into the staging area, enters the play area of the player
+  // `who` names (the last picked player, the actor or the first player): ready, or `committed` to the quest, still its owner's card.
+  z.strictObject({ verb: z.literal("TakeRevealedCard"), who: z.enum(["picked", "actor", "firstPlayer"]), committed: z.boolean().optional(), ...when }),
 ] as const;
 
 export const TRIGGERS = [

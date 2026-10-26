@@ -6,6 +6,7 @@ import { ruleCause } from "./cause.ts";
 import { threatCostCut } from "./families/costs-stats.ts";
 import type { EngineStep } from "./intents.ts";
 import { recordStartingThreat } from "./families/quest-threat.ts";
+import { setAsideEncounterCards } from "./families/sidequests-encounter.ts";
 import { pushPlayerSetup } from "./families/sidequests-setup.ts";
 import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
@@ -76,6 +77,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     }
     for (const code of seat.hand ?? []) state = spawn(state, code, { zone: "hand", seat: index }).state;
     for (const code of seat.deck) state = spawn(state, code, { zone: "deck", seat: index }).state;
+    // The cards with the Encounter keyword are set aside, not drawn (families/sidequests-encounter.ts).
+    state = setAsideEncounterCards(state, index, ctx);
     // Threat costs lowered by a card in play ("Each hero you control with a printed Lore resource icon gets -1 threat cost").
     threat -= threatCostCut(state, index, ctx);
     state = withThreat(state, index, threat);

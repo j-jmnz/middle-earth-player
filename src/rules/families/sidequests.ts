@@ -4,6 +4,7 @@ import type { ReduceContext } from "../interpret.ts";
 import type { ScenarioState } from "../state.ts";
 import { livingSeats, withSeat } from "../state.ts";
 import { attachTo, moveCard } from "../zones.ts";
+import { shuffleSetAside, takeRevealed } from "./sidequests-encounter.ts";
 import type { Focus } from "./index.ts";
 
 // Rules: rr.player-elimination (data/rules/entries.json).
@@ -17,6 +18,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     // player's deck goes on the first hero of that player that has no copy of it (effect frames attach an encounter card themselves).
     case "AttachSelf":
       return instruction.to.kind === "hero" ? attachSetupCard(state, focus) : null;
+    case "ShuffleSetAsideIntoEncounterDeck":
+      return shuffleSetAside(state, instruction, focus);
+    case "TakeRevealedCard":
+      return takeRevealed(state, instruction, focus);
     case "RemoveFromCampaignPool": {
       const code = focus.sourceId ? state.cards[focus.sourceId]?.code : undefined;
       return code ? { ...state, removedFromPool: [...(state.removedFromPool ?? []), code] } : state;

@@ -17,6 +17,7 @@ import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "./verbs.ts";
 import { moveCard } from "./zones.ts";
 import { announceEntered, noteEncounterThreat, revealsAllowed, watchReveal } from "./families/encounter-reveal.ts";
+import { discardsAfterReveal } from "./families/sidequests-encounter.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.
@@ -149,7 +150,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // (ltp.revealed-treachery, rr.treachery-cards, rr.step-3-3). A treachery whose text attached it (a Condition) has
       // left the staging area and stays where its text put it. A canceled treachery is discarded too (rr.cancel). Peril
       // covers that card's staging only, so the lock ends before surge (mec109.peril, rr.surge).
-      const resolved = printed.type === "treachery" && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
+      const resolved = (printed.type === "treachery" || discardsAfterReveal(printed)) && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
       const unlocked = frame.peril && resolved.perilSeat === seat ? { ...resolved, perilSeat: null } : resolved;
       // A card still in play has entered play (rr.staging, step 3): "After a location enters play" (04060:A:1).
       const next = patchTop(announceEntered(unlocked, id, seat, ctx), { step: 6 });

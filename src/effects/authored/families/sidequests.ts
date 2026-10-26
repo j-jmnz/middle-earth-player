@@ -4,6 +4,11 @@ import type { Effect } from "../../../catalog/boundary.ts";
 
 // "While this side quest is in the victory display": the quest's constants work from there, for every seat.
 const IN_VICTORY = { kind: "sourceIn", zone: "victory" } as const;
+// The first player chooses a player (rr.first-player): "The first player chooses a player to take control of ~."
+const FIRST_PLAYER_CHOOSES = { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } } as const;
+// "This effect cannot be cancelled": a condition that always holds.
+const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 } as const;
+const encounterKeyword = (code: string, line: string, n: number): Effect => ({ id: `${code}:constant:${n}`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "EncounterKeyword" }] });
 // Each side quest in the victory display.
 const SIDE_QUESTS_IN_VICTORY = { type: "card", control: "any", from: "victory", cardType: "player-side-quest" } as const;
 const SIDE_QUEST_IN_VICTORY = { kind: "count", pick: SIDE_QUESTS_IN_VICTORY, min: 1 } as const;
@@ -325,6 +330,131 @@ export const RECORDS: readonly Effect[] = [
       { verb: "HeroesGainResources", amount: 3 },
       { verb: "Delay", until: "endOfRound", instructions: [{ verb: "EliminatePlayer" }] },
     ],
+  },
+  // The Encounter keyword: the card is set aside at the start of the game and shuffled into the encounter deck by a card.
+  encounterKeyword("09015", "09015:A:1", 1),
+  encounterKeyword("19035", "19035:A:1", 2),
+  encounterKeyword("22010", "22010:A:1", 1),
+  encounterKeyword("17144", "17144:A:1", 1),
+  // Ranger of the North: "When Revealed: The first player chooses a player to take control of Ranger of the North. Then, either deal
+  // 2 damage to an enemy or place 2 progress tokens on a location."
+  {
+    id: "09015:whenRevealed:1",
+    cardCode: "09015",
+    lines: ["09015:A:2"],
+    timing: "whenRevealed",
+    instructions: [
+      FIRST_PLAYER_CHOOSES,
+      { verb: "TakeRevealedCard", who: "picked" },
+      {
+        verb: "Choose",
+        who: "actor",
+        options: [
+          {
+            id: "damage",
+            requires: { kind: "canPick", pick: { type: "enemy", control: "any", staging: true } },
+            instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", staging: true } }, { verb: "DamageCard", amount: 2, target: "picked" }],
+          },
+          {
+            id: "progress",
+            requires: { kind: "canPick", pick: { type: "location", control: "any" } },
+            instructions: [{ verb: "Pick", pick: { type: "location", control: "any" } }, { verb: "PlaceProgressOn", amount: 2, target: "picked" }],
+          },
+        ],
+      },
+    ],
+  },
+  // Eagle of the North: "When Revealed: The first player chooses a player to take control of Eagle of the North. The chosen player
+  // may choose and discard a non-unique enemy in the staging area."
+  {
+    id: "19035:whenRevealed:1",
+    cardCode: "19035",
+    lines: ["19035:A:3"],
+    timing: "whenRevealed",
+    instructions: [
+      FIRST_PLAYER_CHOOSES,
+      { verb: "TakeRevealedCard", who: "picked" },
+      { verb: "SwitchActor", to: "picked" },
+      { verb: "Pick", pick: { type: "enemy", control: "any", stagingOnly: true, nonUnique: true } },
+      { verb: "Discard", target: { kind: "picked" } },
+    ],
+  },
+  // Tom Bombadil: "When Revealed: Choose a player. That player gains control of Tom Bombadil, ready and committed to the quest. At
+  // the end of the round, remove Tom Bombadil and a copy of Tom Bombadillo! in the victory display from the game. This effect cannot
+  // be cancelled."
+  {
+    id: "22010:whenRevealed:1",
+    cardCode: "22010",
+    lines: ["22010:A:2"],
+    timing: "whenRevealed",
+    uncancelable: ALWAYS,
+    instructions: [
+      FIRST_PLAYER_CHOOSES,
+      { verb: "TakeRevealedCard", who: "picked", committed: true },
+      {
+        verb: "Delay",
+        until: "endOfRound",
+        uncancelable: ALWAYS,
+        instructions: [
+          { verb: "MoveCard", card: "self", to: "removed" },
+          { verb: "Pick", pick: { type: "card", control: "any", from: "victory", names: ["Tom Bombadillo!"] } },
+          { verb: "MoveCard", card: "picked", to: "removed" },
+        ],
+      },
+    ],
+  },
+  // Wind from the Sea: "When Revealed: Ready each hero committed to the quest and remove Wind from the Sea from the game."
+  {
+    id: "17144:whenRevealed:1",
+    cardCode: "17144",
+    lines: ["17144:A:2"],
+    timing: "whenRevealed",
+    instructions: [{ verb: "Each", pick: { type: "hero", control: "any", committed: true }, instructions: [{ verb: "Ready", target: "picked" }] }, { verb: "MoveCard", card: "self", to: "removed" }],
+  },
+  // Ranger Summons: "Planning Action: Shuffle 1 of your set aside Ranger of the North allies with the encounter keyword into the
+  // encounter deck. Then, remove Ranger Summons from the game."
+  {
+    id: "09007:action:1",
+    cardCode: "09007",
+    lines: ["09007:A:2"],
+    timing: "action",
+    condition: { kind: "phase", is: "Planning" },
+    instructions: [{ verb: "ShuffleSetAsideIntoEncounterDeck", code: "09015", own: true }, { verb: "MoveCard", card: "self", to: "removed" }],
+  },
+  // Flight to the Sea: "Planning Action: Shuffle a set aside Wind from the Sea into the encounter deck. Then, remove Flight to the Sea
+  // from the game."
+  {
+    id: "17140:action:1",
+    cardCode: "17140",
+    lines: ["17140:A:2"],
+    timing: "action",
+    condition: { kind: "phase", is: "Planning" },
+    instructions: [{ verb: "ShuffleSetAsideIntoEncounterDeck", code: "17144" }, { verb: "MoveCard", card: "self", to: "removed" }],
+  },
+  // Flight of the Eagles: "Action: Return an Eagle ally to your hand to shuffle a set-aside Eagle of the North into the encounter
+  // deck. Then, remove Flight of the Eagles from the game."
+  {
+    id: "19032:action:1",
+    cardCode: "19032",
+    lines: ["19032:A:1"],
+    timing: "action",
+    condition: { kind: "canPick", pick: { type: "ally", control: "you", trait: "Eagle" } },
+    instructions: [
+      { verb: "Pick", pick: { type: "ally", control: "you", trait: "Eagle" } },
+      { verb: "ReturnToHand", target: "picked" },
+      { verb: "ShuffleSetAsideIntoEncounterDeck", code: "19035" },
+      { verb: "MoveCard", card: "self", to: "removed" },
+    ],
+  },
+  // Tom Bombadillo!: "Planning Action: Add Tom Bombadillo! to the victory display to shuffle a set-aside copy of Tom Bombadil into the
+  // encounter deck."
+  {
+    id: "22005:action:1",
+    cardCode: "22005",
+    lines: ["22005:A:2"],
+    timing: "action",
+    condition: { kind: "phase", is: "Planning" },
+    instructions: [{ verb: "AddSourceToVictory" }, { verb: "ShuffleSetAsideIntoEncounterDeck", code: "22010" }],
   },
   // Out of the Wild: "Action: Search the top 5 cards of the encounter deck for any 1 non-objective card worth no victory points and
   // add it to your victory display. Shuffle the encounter deck. Add Out of the Wild to the victory display."
