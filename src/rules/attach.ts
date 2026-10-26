@@ -47,6 +47,7 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     if (rule.host.kind === "ringBearer" && !hasTrait(state, id, "Ring-bearer", ctx)) return false;
     if (rule.host.trait && !hasTrait(state, id, rule.host.trait, ctx)) return false;
     if (rule.host.name && printedOf(ctx.cards, host.code).name !== rule.host.name) return false;
+    if (rule.host.sphere && printedOf(ctx.cards, host.code).sphere !== rule.host.sphere) return false;
     if (rule.limitPerHost && host.attachments.some((other) => state.cards[other]?.code === code)) return false;
     return true;
   });

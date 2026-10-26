@@ -62,6 +62,8 @@ export function attachHost(text: string): Extract<Instruction, { verb: "Attaches
   if (bare === "Ring-bearer") return { kind: "ringBearer" };
   if (bare === "active location") return { kind: "activeLocation" };
   const typed = /^(\w+) (hero|character)$/.exec(bare);
+  const spheres = ["Leadership", "Tactics", "Spirit", "Lore", "Neutral", "Fellowship", "Baggins"];
+  if (typed?.[1] && typed[2] && spheres.includes(typed[1])) return { kind: typed[2] as "hero" | "character", sphere: typed[1].toLowerCase() as "lore" };
   if (typed?.[1] && typed[2]) return { kind: typed[2] as "hero" | "character", trait: typed[1] };
   if (/^[A-Z][\w']*$/.test(bare) && text === bare) return { kind: "character", name: bare };
   return null;

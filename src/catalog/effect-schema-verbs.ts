@@ -206,6 +206,8 @@ export const simpleVerbs = [
       kind: z.enum(["hero", "character", "activeLocation", "ringBearer"]),
       trait: z.string().min(1).optional(),
       name: z.string().min(1).optional(),
+      // The host's printed sphere ("Attach to a Lore character").
+      sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
     }),
     limitPerHost: z.boolean().optional(),
     ...when,

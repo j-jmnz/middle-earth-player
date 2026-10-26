@@ -7,6 +7,7 @@ import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { inactiveCodes as inactiveTextCodes } from "../catalog/active-text";
 import { cards, packs } from "../catalog/schema";
 import { EFFECTS } from "../effects";
+import { OPEN_LINES } from "../effects/open-lines";
 import { BodyText, Eyebrow, ListRow, PrimaryButton, Screen, SphereMark, TextButton, markedSphere } from "./chrome";
 import { CountStepper } from "./count-stepper";
 import { addDraftCard, announceDraftChange, draftAddRefused, draftCopyCount, takeDraftCard, useDeckDraft, type TitleLookup } from "./deck-draft";
@@ -175,11 +176,12 @@ export function CardPool({
       .orderBy(packs.cyclePosition, packs.position)
       .all(),
   );
-  // The same inactive-text check as the card screen and the table: unique text with no effect record.
+  // The same inactive-text check as the card screen and the table: a printed line with no effect record.
   const [inactiveCodes] = useState(() =>
     inactiveTextCodes(
       catalog.select({ code: cards.code, text: cards.text }).from(cards).where(eq(cards.deckLegal, true)).all().map((row) => [row.code, row.text] as const),
       EFFECTS,
+      OPEN_LINES,
     ),
   );
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);

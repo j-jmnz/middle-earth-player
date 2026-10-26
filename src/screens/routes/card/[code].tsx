@@ -8,6 +8,7 @@ import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanima
 import { activeCardCodes, textInactive } from "../../../catalog/active-text";
 import { cards } from "../../../catalog/schema";
 import { EFFECTS } from "../../../effects";
+import { OPEN_LINES } from "../../../effects/open-lines";
 import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, sphereWord } from "../../chrome";
 import { CardTextView } from "../../../play/card-text-view";
 import { traitLine } from "../../../play/card-text";
@@ -226,7 +227,7 @@ export default function CardScreen() {
       .where(eq(cards.code, code))
       .get();
   }, [catalog, code]);
-  const active = useMemo(() => activeCardCodes(EFFECTS), []);
+  const active = useMemo(() => activeCardCodes(EFFECTS, OPEN_LINES), []);
   const cached = useCachedImage(code ?? "");
   const bundled = code ? (scanAssets[code] ?? null) : null;
   const { resolved, source } = shownCardImage({

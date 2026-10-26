@@ -28,6 +28,7 @@ import { useTableChoice } from "../play/use-table-choice";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { Screen } from "./chrome";
 import { inactiveCodes } from "../catalog/active-text";
+import { OPEN_LINES } from "../effects/open-lines";
 import { goBack } from "./go-back";
 import { enqueueImageDownloads } from "./images/queue";
 import { scanAssets } from "./images/scan-map";
@@ -95,8 +96,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
   const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
   const names: SheetNames = useMemo(() => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine }), [nameOf, store]);
-  // Unique text with no effect record is inactive: the canvas veils it, and no control applies it.
-  const inactiveSet = useMemo(() => inactiveCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const), ctx.effects), [session, ctx]);
+  // A printed line with no effect record is inactive: the canvas veils the card, and no control applies the line.
+  const inactiveSet = useMemo(() => inactiveCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const), ctx.effects, OPEN_LINES), [session, ctx]);
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
   // Read from the latest state: the canvas draws again when the cards, the effects in play or the attack change.
   const info = useCallback((cardId: string): SlotInfo => slotNumbers(store.getState().game, ctx, cardId), [store, ctx]);

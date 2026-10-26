@@ -5,11 +5,17 @@ import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
 import { dealtCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
+import { isPoolCard } from "../printed/pool.ts";
 import { TEMPLATES, type Draft, type TemplateContext } from "./templates.ts";
 
 export type Segment = { card: Card; index: number; side: "front" | "back" | "shadow"; line: string; lineId: string };
 
 export type Unmatched = Segment & { timing: string | null };
+
+// The box's cards (what the scenarios deal and both starter lists) as opposed to the rest of the player pool.
+export function boxCodes(campaign: CampaignData, scenarios: readonly ScenarioData[]): Set<string> {
+  return new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign)]);
+}
 
 export type Generated = {
   effects: Effect[];
@@ -88,15 +94,24 @@ export function segmentsOf(card: Card, ledger: Ledger): Segment[] {
   return out;
 }
 
+// The cards templates read: what the scenarios deal, both starter lists, and every deck-legal player card (user decision,
+// 2026-10-26: the whole pool is automated). The ledger passed in holds the pool's lines (withPool).
 export function generateEffects(cards: readonly Card[], scenarios: readonly ScenarioData[], campaign: CampaignData, ledger: Ledger): Generated {
-  const wanted = new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign)]);
+  const wanted = new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign), ...cards.filter(isPoolCard).map((card) => card.code)]);
   const scope = cards.filter((card) => wanted.has(card.code)).sort((a, b) => a.code.localeCompare(b.code));
   const setAside = new Set(scenarios.flatMap((scenario) => scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code)));
-  const codeOf = (name: string): string | null => {
-    // The printed text has typos ("Buckleberry Ferry"), so a name may be a letter or two off.
-    const exact = scope.filter((card) => card.name.toLowerCase() === name.trim().toLowerCase());
-    const hits = exact.length > 0 ? exact : scope.filter((card) => sameName(card.name, name.trim()));
-    return hits.length === 1 ? (hits[0]?.code ?? null) : null;
+  const box = boxCodes(campaign, scenarios);
+  // A name a box card prints is a box card; a pool card's is a card of its own pack, else the one pool card of that name.
+  const codeOf = (reader: Card, name: string): string | null => {
+    const among = (list: readonly Card[]): string | null => {
+      // The printed text has typos ("Buckleberry Ferry"), so a name may be a letter or two off.
+      const exact = list.filter((card) => card.name.toLowerCase() === name.trim().toLowerCase());
+      const hits = exact.length > 0 ? exact : list.filter((card) => sameName(card.name, name.trim()));
+      return hits.length === 1 ? (hits[0]?.code ?? null) : null;
+    };
+    if (box.has(reader.code)) return among(scope.filter((card) => box.has(card.code)));
+    const pack = reader.printings[0]?.pack;
+    return among(scope.filter((card) => card.printings[0]?.pack === pack)) ?? among(scope.filter((card) => !box.has(card.code)));
   };
 
   const effects: Effect[] = [];
@@ -109,7 +124,7 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       counters.set(timing, value);
       return value;
     };
-    const context: TemplateContext = { card, codeOf, setAside };
+    const context: TemplateContext = { card, codeOf: (name) => codeOf(card, name), setAside };
     for (const segment of segmentsOf(card, ledger)) {
       const named = stripKeywords(segment.line).replaceAll(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "{self}");
       const { line, condition, limit } = wrapped(named);
@@ -139,14 +154,15 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
   return { effects, unmatched, usage };
 }
 
-export function renderGenerated(effects: readonly Effect[], campaignId: string): string {
+// `name` is the exported constant: GENERATED_EFFECTS for the box's cards, POOL_GENERATED_EFFECTS for the rest of the pool.
+export function renderGenerated(effects: readonly Effect[], campaignId: string, name = "GENERATED_EFFECTS"): string {
   const lines = effects.map((effect) => `  ${JSON.stringify(effect)},`);
   return [
     `import type { Effect } from "../../catalog/boundary.ts";`,
     ``,
     `// Written by pnpm data:build from data/cards and data/scenarios (${campaignId}). Do not edit.`,
     `// scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.`,
-    `export const GENERATED_EFFECTS: readonly Effect[] = [`,
+    `export const ${name}: readonly Effect[] = [`,
     ...lines,
     `];`,
     ``,

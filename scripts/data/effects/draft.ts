@@ -9,14 +9,16 @@ import type { Card } from "../../../src/catalog/card-facts.ts";
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaign, loadScenario } from "../load-scenarios.ts";
 import { keyOf, loadLedger } from "../printed/ledger.ts";
+import { isPoolCard, withPool } from "../printed/pool.ts";
 import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
 import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, type Unmatched } from "./generate.ts";
 import { vocabulary } from "./vocabulary.ts";
 
-// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id>
-// Writes .agent/drafts/<code>.md for every card in the scenario, or in the starter deck, that has a printed line no record covers yet.
-// With --all it also drafts the lines that authored records already cover, to review or redo them.
+// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id | pack | code,code,...>
+// Writes .agent/drafts/<code>.md for every card in the scenario, the starter deck, the player pack (a data/cards file name,
+// "Core", "TRD"), or the list of codes, that has a printed line no record covers yet. With --all it also drafts the lines
+// that authored records already cover, to review or redo them.
 
 function words(text: string): Set<string> {
   return new Set(text.toLowerCase().match(/[a-z]{4,}/g) ?? []);
@@ -31,25 +33,28 @@ function similarity(left: string, right: string): number {
 
 function main(log: Log): void {
   const scenarioId = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
-  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id>");
+  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id | pack | code,code,...>");
   const campaign = loadCampaign();
-  const deck = campaign.starterDecks.find((entry) => entry.id === scenarioId);
-  const scenario = deck ? null : loadScenario(scenarioId);
-  log.info(deck ? `starter deck ${deck.id}: ${deck.rows.length} rows` : `scenario ${scenarioId}`);
   const cards = loadCards();
-  const ledger = loadLedger();
+  const deck = campaign.starterDecks.find((entry) => entry.id === scenarioId);
+  const packCodes = cards.filter((card) => isPoolCard(card) && card.printings[0]?.pack === scenarioId).map((card) => card.code);
+  const listed = /^[0-9A-Za-z]+(,[0-9A-Za-z]+)+$|^\d{5,6}$/.test(scenarioId) ? scenarioId.split(",") : [];
+  const chosen = deck ? deck.rows.map((row) => row.code) : packCodes.length > 0 ? packCodes : listed;
+  const scenario = chosen.length > 0 ? null : loadScenario(scenarioId);
+  log.info(deck ? `starter deck ${deck.id}: ${deck.rows.length} rows` : packCodes.length > 0 ? `pack ${scenarioId}: ${packCodes.length} player cards` : listed.length > 0 ? `${listed.length} cards` : `scenario ${scenarioId}`);
+  const ledger = withPool(loadLedger(), cards);
   const byCode = new Map(cards.map((card) => [card.code, card]));
   const entries = JSON.parse(readFileSync(path.join(DATA_DIR, "rules", "entries.json"), "utf8")) as RuleEntry[];
   const vocab = vocabulary();
   const automation = new Map<string, unknown>();
-  for (const file of ["encounterCards.json", "playerCards.json"]) {
+  for (const file of ["encounterCards.json", "playerCards.json", "basicAttachments-GENERATED.json", "globalPassiveEffects-GENERATED.json", "localPassiveEffects-GENERATED.json", "globalActionEffects-GENERATED.json", "questAutomation.json"]) {
     const parsed = parseJsonc(readFileSync(path.join(RAW_DIR, "dragncards", file), "utf8")) as { automation?: { cards?: Record<string, unknown> } };
     for (const [guid, rules] of Object.entries(parsed.automation?.cards ?? {})) automation.set(guid, rules);
   }
 
   const generated = generateEffects(cards, scenario ? [scenario] : [], campaign, ledger);
   // Every card the scenario deals: its piles, its campaign card, the cards that card places (campaignPlaced) and the prelude.
-  const dealt = deck ? new Set(deck.rows.map((row) => row.code)) : dealtCodes(campaign, scenario ? [scenario] : []);
+  const dealt = chosen.length > 0 ? new Set(chosen) : dealtCodes(campaign, scenario ? [scenario] : []);
   const all = process.argv.includes("--all");
   // A line the ledger marks inert (a reminder, a keyword the engine reads) is owned and needs no record.
   const inert = (lineId: string): boolean => {
@@ -68,7 +73,7 @@ function main(log: Log): void {
     const sections: string[] = [
       `# ${code} ${card.name}`,
       ``,
-      `Scenario: ${scenarioId}. Write the records into src/effects/authored/fellowship-of-the-ring.ts, each with \`lines\` naming the line ids above, then run \`pnpm vitest run scripts/effect-coverage.test.ts\` and the scenario tests.`,
+      `Scenario: ${scenarioId}. Write the records into ${isPoolCard(card) && !campaign.starterDecks.some((entry) => entry.rows.some((row) => row.code === code)) ? `src/effects/authored/pool/${card.printings[0]?.pack}.ts` : "src/effects/authored/fellowship-of-the-ring.ts"}, each with \`lines\` naming the line ids above, then run \`pnpm effects:open\`, \`pnpm vitest run scripts/effect-coverage.test.ts\` and the scenario tests.`,
       ``,
       `## Lines without a record`,
       ...lines.map((line) => `- ${line.lineId} (${line.side}${line.timing ? `, ${line.timing}` : ""}) ${line.line}`),
