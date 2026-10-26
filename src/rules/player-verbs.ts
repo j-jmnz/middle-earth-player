@@ -20,6 +20,7 @@ import { printedOf } from "./printed.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { afterCancel } from "./families/defense-damage.ts";
+import { healBlocked } from "./families/burden-life.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
 export type PlayerFocus = { seat: number; sourceId: string | null };
@@ -97,7 +98,7 @@ export function runPlayerVerb(
       const scope = frameScope(state, focus.seat, focus.sourceId);
       const id = refCard(state, instruction.target ?? "picked", scope) ?? "";
       const card = state.cards[id];
-      if (!card || card.damage <= 0) return state;
+      if (!card || card.damage <= 0 || healBlocked(state, id)) return state;
       const amount = instruction.all ? card.damage : Math.min(card.damage, resolveAmount(state, instruction.amount ?? 1, scope, ctx));
       if (amount <= 0) return state;
       return queueEvent(updateCard(state, id, { damage: card.damage - amount }), { trigger: "healed", seat: card.controller, cardId: id });

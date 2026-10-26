@@ -11,6 +11,7 @@ export type Destination =
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage" }
   | { zone: "shadow"; enemyId: string }
   | { zone: "attached" }
+  | { zone: "campaign" }
   | { zone: "under"; locationId: string };
 
 type SeatList = "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "staging";

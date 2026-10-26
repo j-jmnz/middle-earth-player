@@ -26,12 +26,10 @@ const lines = withPool(ledger, cards);
 const byCode = new Map(cards.map((card) => [card.code, card]));
 
 // A scenario is playable when every printed line of the cards it deals is owned, its campaignPlaced cards (the boons
-// 141044's Resolution attaches) included. Scenarios 1 and 2 are. Scenarios 3 to 6 are built (data/scenarios, with their
-// campaign cards) and not yet playable: phases 13 to 16 write their records. The campaign cards' Setup and Resolution
+// 141044's Resolution attaches) included. Scenarios 1 to 3 are. Scenarios 4 to 6 are built (data/scenarios, with their
+// campaign cards) and not yet playable: phases 14 to 16 write their records. The campaign cards' Setup and Resolution
 // lines are owned for all six, which is the 8d exit. The list is src/campaign/playable.ts, which also gates standalone play.
-const PENDING_LINES: Readonly<Record<string, string>> = {
-  "141056:A:2": "Flight to the Ford (phase 13): the cancel response needs the attacker-declared trigger.",
-};
+const PENDING_LINES: Readonly<Record<string, string>> = {};
 const campaignCards = new Set(Object.values(campaign.campaignCards));
 const dealt = new Set([...dealtCodes(campaign, scenarios.filter((scenario) => PLAYABLE.includes(scenario.id))), ...campaignCards, ...starterCodes(campaign)]);
 const unplayable = scenarios.filter((scenario) => !PLAYABLE.includes(scenario.id));

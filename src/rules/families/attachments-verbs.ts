@@ -17,6 +17,7 @@ import type { ScenarioState } from "../state.ts";
 import { flagged, inPlay, updateCard } from "../state.ts";
 import { patchTop, topFrame } from "../windows.ts";
 import { openStrike } from "./attack.ts";
+import { healBlocked } from "./burden-life.ts";
 import { effectData } from "./encounter-moves.ts";
 import type { Focus } from "./index.ts";
 
@@ -33,7 +34,7 @@ export function healAmong(state: ScenarioState, instruction: Extract<Instruction
   const total = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   const healed = instruction.healed ?? 0;
   if (healed >= total || focus.chosen === DONE) return state;
-  const options = pickCandidates(state, { ...instruction.pick, damaged: true }, focus.seat, [], focus.sourceId, ctx);
+  const options = pickCandidates(state, { ...instruction.pick, damaged: true }, focus.seat, [], focus.sourceId, ctx).filter((id) => !healBlocked(state, id));
   if (options.length === 0) return state;
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : undefined;
   if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, [...options, DONE]) : state;

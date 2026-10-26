@@ -48,11 +48,12 @@ import { eventWaits } from "./families/defense-listen.ts";
 import { announceShadowsDealt } from "./families/defense-shadow.ts";
 import { attackedEarly, earlyAttacks } from "./families/defense-order.ts";
 import { strikeResumes } from "./families/attack-flow.ts";
+import { announceProgress } from "./families/burden-effects.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
-    current = constantWin(current, ctx);
+    current = announceProgress(constantWin(current, ctx), steps, ctx);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {

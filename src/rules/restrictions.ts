@@ -43,6 +43,8 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
     .filter((effect) => effect.cardCode === code && effect.timing === "travel")
     .flatMap((effect) => effect.instructions)
     .some((instruction) => {
+      // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
+      if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
       if (instruction.verb !== "Exhaust" || instruction.target?.kind !== "byCode") return false;
       const named = instruction.target.code;
       const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;

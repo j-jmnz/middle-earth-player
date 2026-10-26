@@ -9,7 +9,7 @@ import { keyOf, loadLedger } from "./data/printed/ledger.ts";
 // Test helper. Every step that changes a number says why: its cause is a rule span in data/rules, or an effect record
 // with one of its printed ledger lines. `causeProblems` lists the steps that fail that, so a card-effect test can call
 // it on the steps it collected (past-scene.ts and test-scene.ts do, in `send`).
-export const NUMBER_STEPS: ReadonlySet<string> = new Set(["threat", "damage", "progress", "gainResource", "draw", "reveal"]);
+export const NUMBER_STEPS: ReadonlySet<string> = new Set(["threat", "damage", "progress", "gainResource", "draw", "reveal", "life"]);
 
 const ruleIds = new Set((JSON.parse(readFileSync(new URL("../data/rules/entries.json", import.meta.url), "utf8")) as { id: string }[]).map((entry) => entry.id));
 const ledger = loadLedger();

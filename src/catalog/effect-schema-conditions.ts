@@ -28,7 +28,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("exhausted"), code: z.string().min(1), is: z.boolean() }),
   // The source is an enemy engaged with the actor.
   z.strictObject({ kind: z.literal("engagedWithActor") }),
-  // The running effect has returned no enemy to staging.
+  // The running effect has returned no enemy to staging (or, for ImmediateAttackEach, made no attack).
   z.strictObject({ kind: z.literal("noneReturned") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
@@ -132,6 +132,14 @@ const atomSchema = z.discriminatedUnion("kind", [
   }),
   // The actor engaged an enemy this round (`is`), or did not ("If you have not engaged an enemy this round", 08056:A:2).
   z.strictObject({ kind: z.literal("engagedThisRound"), is: z.boolean() }),
+  // The burden deck holds at least `min` cards (1 by default): "shuffle the top card of the burden deck into the encounter deck".
+  z.strictObject({ kind: z.literal("burdenDeck"), min: z.number().int().positive().optional() }),
+  // The scenario is played in Campaign Mode, which is when its campaign card is in the game (rr.campaign-cards): "Use this
+  // action only if you are playing campaign mode" (141062:A:1).
+  z.strictObject({ kind: z.literal("campaign") }),
+  // The running effect's X is at least `min`. The effect an attack leaves for its end has as X the number of characters the
+  // attack destroyed ("If this attack destroys a character", 141065:A:2, 141066:A:2).
+  z.strictObject({ kind: z.literal("x"), min: z.number().int().min(0) }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [

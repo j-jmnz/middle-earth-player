@@ -11,6 +11,7 @@ import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
 import { handSetup, searchSetup } from "./setup-search.ts";
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
+import { placeCampaignCard } from "./families/burden-campaign.ts";
 import { cloneGame } from "./undo.ts";
 import { attachTo, moveCard, spawn } from "./zones.ts";
 
@@ -56,6 +57,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     const shuffled = shuffleIds(state.burdenDeck ?? [], state.seed, state.seedCursor);
     state = { ...state, burdenDeck: shuffled.ids, seedCursor: shuffled.cursor };
   }
+  state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   for (let index = 0; index < input.seatCount; index += 1) {
     const seat = input.seats[index];
     if (!seat) throw new Error(`Missing seat ${index}`);

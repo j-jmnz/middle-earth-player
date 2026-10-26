@@ -57,6 +57,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "RevealFewer":
       return addTableModifier(state, { stat: instruction.min === 1 ? "revealFewerMinOne" : "revealFewer", amount: instruction.amount, until: "endOfPhase" }, focus);
+    case "RevealMore":
+      return addTableModifier(state, { stat: "revealMore", amount: instruction.amount, until: "endOfPhase" }, focus);
     case "WatchReveals": {
       const when = instruction.type ? { when: { kind: "matches" as const, card: "subject" as const, pick: { type: instruction.type, control: "any" as const } } } : {};
       return addTableModifier(state, { stat: WATCH_STATS[instruction.effect], amount: instruction.amount ?? 1, until: instruction.until, seat: focus.seat, ...when }, focus);

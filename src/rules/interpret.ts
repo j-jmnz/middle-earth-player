@@ -198,7 +198,8 @@ export function dealOneShadow(state: ScenarioState, enemyId: string): ScenarioSt
 export function dealAdditionalShadow(state: ScenarioState, enemyId: string): ScenarioState {
   const enemy = state.cards[enemyId];
   const top = state.encounterDeck[0];
-  if (!enemy || !top) return state;
+  // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).
+  if (!enemy || !top || flagged(state, enemyId, "noShadowDealt")) return state;
   // Face down, or face up while the player it is engaged with holds shadowsFaceUp (07009).
   const face = shadowFace(state, enemyId);
   const moved = moveCard(state, top, { zone: "shadow", enemyId });
