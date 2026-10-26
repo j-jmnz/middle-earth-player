@@ -23,6 +23,7 @@ Continue automating every player card in this repository. The previous session s
 - Before a usage limit can stop work, every agent and the main session update their handover file and commit and push, so
   no progress is lost. Agents checkpoint (`WIP <family>: ...` commits, pushed to `wip/<family>`) after every meaningful step.
   Run at most 4 agents at a time: more than that exhausted the usage limit twice.
+- Spawn every agent on Sonnet 5.5: pass `model: "sonnet"` in each Agent call.
 - If a question comes up, answer it yourself and record the decision. When everything is done, merge
   `ccr-a8ef8247-8087n8` into `main` and push, without waiting for confirmation.
 - No model names in commits. End commit messages with the attribution lines your environment gives you.
@@ -34,7 +35,7 @@ Continue automating every player card in this repository. The previous session s
    - play (`wip/play`): 34 of 35 lines; final full test and commit left.
    - attack (`wip/attack`): records and tests written; one helper in `attack-flow.ts` unfinished; last commit unreviewed.
    - deck (`wip/deck`): schema and part of the engine; records, words and tests left; last commit unreviewed.
-   For each, start a fresh agent (general-purpose, `isolation: "worktree"`) with the agent brief, telling it to
+   For each, start a fresh agent (general-purpose, `model: "sonnet"`, `isolation: "worktree"`) with the agent brief, telling it to
    `git fetch origin wip/<family> && git checkout -B wip-<family> origin/wip/<family>` in its worktree first, read its
    handover, check `pnpm exec tsc --noEmit`, finish, keep pushing `wip/<family>`, and report.
 2. Merge each finished family onto `ccr-a8ef8247-8087n8` as `docs/handover/main.md` says ("Merging a family"):

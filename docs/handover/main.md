@@ -4,6 +4,7 @@ User directives (2026-10-26):
 - Make every deck-legal player card fully playable, using whatever resources are needed.
 - Leave the Messenger of the King cards out (pack MotKA and contract 22134: `outOfScope` in `data/overrides.json`).
 - When the work is done, merge to `main` without waiting for confirmation, and answer open questions without asking.
+- Every agent spawned for this work runs on Sonnet 5.5 (`model: "sonnet"` in the Agent call).
 - Extra branches on GitHub are fine. Before usage limits stop work, every agent and the main session write a handover and
   commit (and push) so no progress is lost.
 
