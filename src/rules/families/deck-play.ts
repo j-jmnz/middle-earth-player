@@ -129,7 +129,9 @@ export function playFrom(state: ScenarioState, instruction: PlayFrom, focus: Foc
   if (!chosen) return options.length > 1 ? askTarget(state, { instruction, seat, chosen: null }, options) : state;
   const printed = printedOf(ctx.cards, state.cards[chosen]?.code ?? "");
   if (printed.type === "attachment") return playFrom(state, { ...instruction, card: chosen }, { seat, sourceId: focus.sourceId }, ctx, steps);
-  return queueFront(intoHand(state, chosen, seat), seat, [{ verb: "PayToPlay", card: chosen, ...(instruction.free ? { free: true } : {}), paid: [] }]);
+  // The event is the picked card, for the instructions that follow the play (Book of Eldacar puts it on the bottom of the deck).
+  const marked = frame ? patchTop(state, { data: { ...frame, picked: [...(frame.picked ?? []), chosen] } }) : state;
+  return queueFront(intoHand(marked, chosen, seat), seat, [{ verb: "PayToPlay", card: chosen, ...(instruction.free ? { free: true } : {}), paid: [] }]);
 }
 
 /** An event whose Action records that hold now are on different printed lines ("Action: ..." and "Valour Action: ...") uses
