@@ -25,7 +25,7 @@ A choice whose options are not all whole cards on the table opens a compact nigh
   - all of `DockButtons`.
 - "Look at the table" (`sheet-collapse`, `table-panel.tsx:139`) folds it. `Choose` (`sheet-expand`, `use-table-choice.ts:299`) brings it back.
 - When it opens: `panel = asked || !onTheTable(sheet, onTable)` (`use-table-choice.ts:110-112`). `panelOpen = panel && folded !== sheet.key`.
-- `PileList`, `LogPanel`, `ThreatPanel` and `ReferencePanel` use the same rectangle, so two can stack.
+- `PileList`, `LogPanel`, `ThreatPanel` and `SettingsPanel` (phase 20 renamed `ReferencePanel`; the phases and Stops moved to the carousel) use the same rectangle, so two can stack.
 
 ## Build
 
