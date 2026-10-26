@@ -29,6 +29,9 @@ export const VERBS = [
     type: encounterType.optional(),
     nonUnique: z.boolean().optional(),
     maxThreat: amountSchema.optional(),
+    // Not of this printed type ("a non-objective card"), and worth no victory points (the sidequests family's: 04036:A:2).
+    notType: encounterType.optional(),
+    noVictory: z.boolean().optional(),
     ...when,
   }),
   // The actor puts the cards LookAtTop showed that are still on top of the encounter deck back in the order they choose.

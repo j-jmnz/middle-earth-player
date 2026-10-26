@@ -20,6 +20,7 @@ import { printedOf } from "./printed.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { afterCancel } from "./families/defense-damage.ts";
+import { addToVictory } from "./families/sidequests-victory.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
 export type PlayerFocus = { seat: number; sourceId: string | null };
@@ -117,7 +118,7 @@ export function runPlayerVerb(
     }
     case "AddToVictory": {
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
-      return state.cards[id] ? moveCard(state, id, { zone: "victory" }) : state;
+      return state.cards[id] ? addToVictory(state, id, ctx) : state;
     }
     case "CancelDamage": {
       const scope = frameScope(state, focus.seat, focus.sourceId);
@@ -189,7 +190,7 @@ export function runPlayerVerb(
       return data?.kind === "effect" ? patchTop(discarded, { data: { ...data, x: printedOf(ctx.cards, card.code).cost ?? 0 } }) : discarded;
     }
     case "AddSourceToVictory":
-      return focus.sourceId && state.cards[focus.sourceId] ? moveCard(state, focus.sourceId, { zone: "victory" }) : state;
+      return focus.sourceId && state.cards[focus.sourceId] ? addToVictory(state, focus.sourceId, ctx) : state;
     case "ExchangeWithDeckTop": {
       const handId = lastPicked(state);
       const seat = state.seats[focus.seat];

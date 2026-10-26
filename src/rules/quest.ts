@@ -49,7 +49,8 @@ export function committedWillpower(state: ScenarioState, cards: Cards): number {
     if (seat.eliminated) continue;
     for (const id of [...seat.heroes, ...seat.play]) {
       const instance = state.cards[id];
-      if (!instance?.committed) continue;
+      // A character committed to a side quest places its Willpower on that quest, not against the staging area (families/sidequests-quest.ts).
+      if (!instance?.committed || instance.questTo != null) continue;
       // "Using its Attack instead of its Willpower" (11005:A:2).
       total += modifiedStat(state, instance, flagged(state, id, "questsWithAttack") ? "attack" : "willpower", cards);
     }

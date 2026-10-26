@@ -5,6 +5,7 @@ import { runQuestResolution } from "./explore.ts";
 import { afterQuestOutcome, questOutcome } from "./families/quest-outcome.ts";
 import { questFailureRaise } from "./families/quest-threat.ts";
 import { askQuestProgress } from "./families/attachments-quest.ts";
+import { resolveSideQuests, sideQuestTotals } from "./families/sidequests-quest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { resolveQuest } from "./quest.ts";
@@ -24,7 +25,9 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const before = steps.length;
   // Who was committed, read before resolving clears it, and the threat a failed quest raises (families/quest-*.ts).
   const outcome = questOutcome(state, ctx);
-  const resolved = resolveQuest(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, questFailureRaise(ctx, steps));
+  // The progress each side quest takes from its committed characters, read before resolution clears who is committed.
+  const sides = sideQuestTotals(state, ctx);
+  const resolved = resolveSideQuests(resolveQuest(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, questFailureRaise(ctx, steps)), sides, ctx, steps);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
   return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);

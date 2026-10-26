@@ -75,6 +75,8 @@ export function encounterCandidates(state: ScenarioState, instruction: PickEncou
     if (!card) return false;
     const printed = printedOf(ctx.cards, card.code);
     if (instruction.type && printed.type !== instruction.type) return false;
+    if (instruction.notType && printed.type === instruction.notType) return false;
+    if (instruction.noVictory && (printed.victory ?? 0) > 0) return false;
     if (instruction.nonUnique && printed.isUnique) return false;
     if (inPlay(card.zone) && playerEffect && !playerCardEffectCanChoose(printed)) return false;
     if (max != null && (inPlay(card.zone) ? modifiedStat(state, card, "threat", ctx.cards) : (printed.threat ?? 0)) > max) return false;

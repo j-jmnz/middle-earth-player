@@ -19,7 +19,11 @@ export type CardType =
   | "treachery"
   | "quest"
   | "objective"
-  | "treasure";
+  | "treasure"
+  // A player card played in the planning phase into its player's quest area (families/sidequests-play.ts), and a contract
+  // card that begins the game in its player's play area (families/sidequests-contract.ts).
+  | "player-side-quest"
+  | "contract";
 
 export type Keywords = {
   surge: boolean;
@@ -134,14 +138,14 @@ export function isCharacterType(printed: PrintedCard): boolean {
 // (rr.discard-pile-and-victory-display, rr.ownership-and-control).
 export function fromEncounterDeck(printed: PrintedCard): boolean {
   if (printed.backType != null) return printed.backType === "encounter";
-  return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure");
+  return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure" || printed.type === "player-side-quest" || printed.type === "contract");
 }
 
 export function isPlayerType(printed: PrintedCard): boolean {
-  return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event";
+  return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest";
 }
 
-const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure"];
+const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure", "player-side-quest", "contract"];
 const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"];
 
 // The engine-facing subset of a data/cards record. A type or sphere the engine does not know fails loudly.

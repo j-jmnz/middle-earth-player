@@ -77,6 +77,9 @@ export type CardInstance = {
   host: string | null;
   attachments: readonly string[];
   committed: boolean;
+  // The side quest a committed character quests on instead of the current quest (families/sidequests-quest.ts). Absent for the
+  // current quest.
+  questTo?: string;
   shadowId: string | null;
   // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent
   // when there are none.

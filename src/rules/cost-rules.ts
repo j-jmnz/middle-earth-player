@@ -36,7 +36,8 @@ type CostRule = Extract<Instruction, { verb: "ReduceCostOf" | "IgnoreResourceMat
 function rules(state: ScenarioState, verb: CostRule["verb"], cardId: string, seat: number, ctx: ReduceContext): { sourceId: string; rule: CostRule }[] {
   const found: { sourceId: string; rule: CostRule }[] = [];
   for (const { source, instruction } of constantInstructions(state, ctx)) {
-    if (instruction.verb !== verb || (source.controller ?? state.firstPlayer) !== seat) continue;
+    // A rule of a card in the victory display belongs to no player: it applies to every seat (The Storm Comes, 16013:A:2).
+    if (instruction.verb !== verb || (source.zone !== "victory" && (source.controller ?? state.firstPlayer) !== seat)) continue;
     const rule = instruction as CostRule;
     if (!fits(state, cardId, rule.pick, seat, ctx)) continue;
     if (rule.verb !== "PaysFor" && rule.firstEachRound && playedMatching(state, seat, rule.pick, cardId, ctx)) continue;
