@@ -27,7 +27,7 @@ function playedMatching(state: ScenarioState, seat: number, pick: PickSpec, card
 
 // The first discount of the seat the card would spend.
 export function discountFor(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): Discount | undefined {
-  return (state.discounts ?? []).find((discount) => discount.seat === seat && fits(state, cardId, discount.pick, seat, ctx));
+  return (state.discounts ?? []).find((discount) => (discount.seat === seat || discount.anySeat) && fits(state, cardId, discount.pick, seat, ctx));
 }
 
 type CostRule = Extract<Instruction, { verb: "ReduceCostOf" | "IgnoreResourceMatch" | "PaysFor" }>;
@@ -79,6 +79,8 @@ export function heroPaysFor(state: ScenarioState, heroId: string, cardId: string
   if (!hero || hero.controller == null) return false;
   const seat = hero.controller;
   if (rules(state, "IgnoreResourceMatch", cardId, seat, ctx).length > 0) return true;
+  // The discount the card would spend says it needs no resource match ("That ally does not require a resource match").
+  if (discountFor(state, cardId, seat, ctx)?.noMatch) return true;
   const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
   return rules(state, "PaysFor", cardId, seat, ctx).some(
     ({ sourceId, rule }) => rule.verb === "PaysFor" && sourceId === heroId && (rule.spheres == null || (sphere != null && rule.spheres.includes(sphere))),

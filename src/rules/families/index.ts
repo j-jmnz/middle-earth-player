@@ -15,8 +15,9 @@ import * as attachments from "./attachments.ts";
 import * as sidequests from "./sidequests.ts";
 import * as misc from "./misc.ts";
 
-/** The seat an instruction resolves for and the card whose effect it is. */
-export type Focus = { seat: number; sourceId: string | null };
+/** The seat an instruction resolves for and the card whose effect it is. `chosen`: the target a player chose when the verb
+ * asked for one (askTarget in choices.ts puts the instruction back with it). */
+export type Focus = { seat: number; sourceId: string | null; chosen?: string };
 
 type Runner = (state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]) => ScenarioState | null;
 

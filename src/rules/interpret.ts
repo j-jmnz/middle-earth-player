@@ -6,6 +6,7 @@ import { placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { modifyStat } from "./attack-verbs.ts";
 import { frameScope, refCard } from "./amounts.ts";
+import { collectAllyResources } from "./families/costs-pay.ts";
 import { runFamilyVerb } from "./families/index.ts";
 import { exhaustCard, readyCard, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
@@ -24,7 +25,8 @@ export type ReduceContext = {
   cards: ReadonlyMap<string, PrintedCard>;
 };
 
-type Focus = { seat: number; sourceId: string | null };
+// `chosen`: the card a player chose for this instruction when it asked (a family verb that asks for a target).
+type Focus = { seat: number; sourceId: string | null; chosen?: string };
 
 export function addToStaging(state: ScenarioState, id: string): ScenarioState {
   const instance = state.cards[id];
@@ -167,7 +169,8 @@ export function gainSeatResources(state: ScenarioState, seat: number, steps: Eng
     next = updateCard(next, heroId, { resources: hero.resources + gained });
     for (let count = 0; count < gained; count += 1) steps.push({ kind: "gainResource", seat, heroId, cause: currentCause(steps, fallback) });
   }
-  return next;
+  // An ally that "collects 1 resource each resource phase" (families/costs-pay.ts).
+  return collectAllyResources(next, seat, steps, currentCause(steps, fallback));
 }
 
 function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: EngineStep[]): ScenarioState {

@@ -1,4 +1,5 @@
 // Rules: rr.timing-of-ability-resolution, rr.forced, rr.response, rr.triggering-condition (data/rules/entries.json).
+import { noteEvent } from "./families/costs-pay.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { offerResponses } from "./responses.ts";
@@ -33,7 +34,7 @@ export function drainEvents(state: ScenarioState, ctx: ReduceContext, steps: Eng
   const [event, ...rest] = state.pendingEvents ?? [];
   if (!event) return state;
   const { pendingEvents: _queued, ...without } = state;
-  const cleared: ScenarioState = rest.length > 0 ? { ...without, pendingEvents: rest } : without;
+  const cleared: ScenarioState = noteEvent(rest.length > 0 ? { ...without, pendingEvents: rest } : without, event, ctx);
   const window = cleared.window;
   if (!window) return fireForced(offerResponses(cleared, event, ctx, steps), event, ctx, steps);
   const before = steps.length;

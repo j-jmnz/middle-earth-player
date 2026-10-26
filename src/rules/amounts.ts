@@ -4,7 +4,8 @@ import type { Amount, CardRef } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
-import { countMatching } from "./pick.ts";
+import { threatCostOf } from "./families/costs-stats.ts";
+import { countMatching, pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats } from "./state.ts";
@@ -73,7 +74,8 @@ function statOf(state: ScenarioState, id: string | null, stat: NonNullable<Exclu
     case "cost":
       return card.cost ?? 0;
     case "threatCost":
-      return card.type === "hero" ? (card.threat ?? 0) : 0;
+      // With the ThreatCost constants that lower it, unless the printed value is asked for (families/costs-stats.ts).
+      return card.type !== "hero" ? 0 : printed ? (card.threat ?? 0) : threatCostOf(state, instance.id, ctx);
     default:
       if (printed) return (stat === "hitPoints" ? card.health : card[stat]) ?? 0;
       return modifiedStat(state, instance, stat, ctx.cards);
@@ -83,7 +85,8 @@ function statOf(state: ScenarioState, id: string | null, stat: NonNullable<Exclu
 export function resolveAmount(state: ScenarioState, amount: Amount, scope: AmountScope, ctx: ReduceContext): number {
   if (typeof amount === "number") return amount;
   let value = 0;
-  if (amount.count) value = countMatching(state, amount.count, scope.actor, scope.sourceId, ctx);
+  if (amount.count && amount.distinct) value = new Set(pickCandidates(state, amount.count, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name)).size;
+  else if (amount.count) value = countMatching(state, amount.count, scope.actor, scope.sourceId, ctx);
   else if (amount.stat) value = statOf(state, refCard(state, amount.of ?? "self", scope), amount.stat, amount.printed === true, ctx);
   else if (amount.x) value = scope.x ?? 0;
   else if (amount.players) value = livingSeats(state).length;

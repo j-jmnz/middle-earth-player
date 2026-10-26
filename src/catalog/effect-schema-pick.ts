@@ -17,7 +17,8 @@ export const pickSchema = z.strictObject({
   control: z.enum(["you", "any", "other"]),
   // An enemy in the staging area counts too (an enemy "in play"), not only one engaged with a player.
   staging: z.boolean().optional(),
-  // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player.
+  // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player. With `type: card`:
+  // any card in the staging area ("choose a card in the staging area").
   stagingOnly: z.boolean().optional(),
   // An enemy engaged with the chooser (`you`) or with another player (`other`). `control` is ignored for enemies.
   engaged: z.enum(["you", "other"]).optional(),
@@ -74,10 +75,19 @@ export const pickSchema = z.strictObject({
   defending: z.boolean().optional(),
   // A card with an attachment on it; with `trait`, an attachment with that trait.
   hasAttachment: z.strictObject({ trait: z.string().min(1).optional(), playerCard: z.boolean().optional() }).optional(),
-  // A card attached to the source (`source`) or to the source's host (`host`).
-  attachedTo: z.enum(["source", "host"]).optional(),
-  // A hero with at least one resource in its pool.
+  // A card attached to the source (`source`), to the source's host (`host`), or to the active location (`activeLocation`).
+  attachedTo: z.enum(["source", "host", "activeLocation"]).optional(),
+  // A hero with at least one resource in its pool; with at least this many (`minResources`).
   hasResources: z.boolean().optional(),
+  minResources: z.number().int().positive().optional(),
+  // A card with a Valour ability: one of its records asks for a threat of 40 or more ("an event that has a Valour trigger").
+  valour: z.boolean().optional(),
+  // A hero whose threat cost is lower than that of the first card the effect picked ("each hero with lower threat cost than the
+  // chosen hero").
+  lowerThreatCost: z.boolean().optional(),
+  // A card whose pool paid resources for the card the answered event is about, when it was played this round ("if you paid
+  // all of its cost from a single hero's resource pool, that hero ...").
+  paidFor: z.literal("subject").optional(),
   // An enemy whose engagement cost is higher than the chooser's threat.
   aboveThreat: z.boolean().optional(),
   different: z.boolean().optional(),

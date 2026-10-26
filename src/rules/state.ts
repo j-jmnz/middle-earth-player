@@ -51,7 +51,20 @@ export type ZoneName =
 export type CardFace = "up" | "down" | "A" | "B";
 
 // "Reduce the cost of the next Silvan ally you play this phase by 1": spent by the first card that matches.
-export type Discount = { seat: number; sourceId: string; pick: PickSpec; amount: number; until: "endOfPhase" | "endOfRound"; min?: number };
+// `anySeat`: any player's next matching card spends it. The card that spends it gains Doomed `doomed`, needs no resource match
+// (`noMatch`) and cannot quest this round (`cannotQuest`). `used`: it lasts until spent.
+export type Discount = {
+  seat: number;
+  sourceId: string;
+  pick: PickSpec;
+  amount: number;
+  until: "endOfPhase" | "endOfRound" | "used";
+  min?: number;
+  anySeat?: true;
+  doomed?: number;
+  noMatch?: true;
+  cannotQuest?: true;
+};
 
 export type CardInstance = {
   id: string;
@@ -239,7 +252,13 @@ export type ScenarioState = {
   discounts?: readonly Discount[];
   // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first
   // Rohan ally you play each round"). Only this round's are kept.
-  played?: readonly { id: string; code: string; seat: number; round: number }[];
+  // `paid`: the pools that paid for it and how much each (Linhir Sea-captain's "paid all of its cost from a single hero").
+  played?: readonly { id: string; code: string; seat: number; round: number; paid?: readonly { heroId: string; amount: number }[] }[];
+  // The cards that spent resources this round ("each hero ... that did not spend any resources this round").
+  spent?: { round: number; ids: readonly string[] };
+  // This round's quest (rr.step-3-4): the characters committed to it, and the seats whose quest succeeded ("If you quest
+  // successfully this phase", "After Hirgon quests successfully"). Kept only in a game that reads it (families/costs-pay.ts).
+  quested?: { round: number; committed: readonly string[]; succeeded: readonly number[] };
   undo: UndoLog;
 };
 
@@ -386,7 +405,7 @@ export function withMode(state: ScenarioState, mode: ModeName): ScenarioState {
   if (state.phase !== phase) expiring.push("endOfPhase");
   if (mode === "beginRound" && state.mode !== "beginRound") expiring.push("endOfRound");
   if (expiring.length === 0) return changed;
-  const discounts = (changed.discounts ?? []).filter((discount) => !expiring.includes(discount.until));
+  const discounts = (changed.discounts ?? []).filter((discount) => discount.until === "used" || !expiring.includes(discount.until));
   const kept = discounts.length === (changed.discounts ?? []).length ? changed : { ...changed, discounts };
   return expireModifiers(kept, expiring);
 }

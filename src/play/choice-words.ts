@@ -93,6 +93,12 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `add ${amount} resource${amount === "1" ? "" : "s"} to ${instruction.to === "host" || instruction.to == null ? "the attached hero's" : instruction.to === "self" ? "this card's" : "its"} pool`;
     }
     case "ModifyStat": {
+      // A resource icon held as a flag (Narvi's Belt): "the attached card gains a Leadership icon until the end of the phase".
+      const icon = /^(leadership|lore|tactics|spirit)Icon$/.exec(instruction.stat)?.[1];
+      if (icon) {
+        const until = instruction.until === "endOfPhase" ? " until the end of the phase" : instruction.until === "endOfRound" ? " until the end of the round" : "";
+        return `${refWords(instruction.target === "picked" || instruction.target == null ? undefined : instruction.target)} gains a ${capital(icon)} icon${until}`;
+      }
       const stat = STAT_WORDS[instruction.stat] ?? instruction.stat;
       const amount = typeof instruction.amount === "number" ? (instruction.amount >= 0 ? `+${instruction.amount}` : `${instruction.amount}`) : "+X";
       const until = instruction.until === "endOfPhase" ? " until the end of the phase" : instruction.until === "endOfRound" ? " until the end of the round" : "";
@@ -127,6 +133,23 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `place ${amountWords(instruction.amount)} progress on ${instruction.target === "eachStagingLocation" ? "each location in the staging area" : instruction.target === "activeLocation" ? "the active location" : "it"}`;
     case "ReduceNextCost":
       return `reduce the cost of the next matching card you play by ${amountWords(instruction.amount)}`;
+    // The costs family's verbs (src/catalog/families/costs.ts).
+    case "SpendResources": {
+      const sphere = instruction.sphere ? `${capital(instruction.sphere)} ` : "";
+      return `${instruction.group ? "the players as a group spend" : "spend"} ${instruction.amount} ${sphere}resource${instruction.amount === 1 ? "" : "s"}`;
+    }
+    case "SetX":
+      return `X is ${instruction.value}`;
+    case "ChooseX":
+      return "choose X";
+    case "DiscardResources":
+      return instruction.all ? "discard all its resources" : `discard ${amountWords(instruction.amount)} resource${amountWords(instruction.amount) === "1" ? "" : "s"}`;
+    case "HeroesGainResources":
+      return `each hero ${instruction.who === "picked" ? "that player controls" : "you control"} gains ${amountWords(instruction.amount)} resource${amountWords(instruction.amount) === "1" ? "" : "s"}`;
+    case "PlayFromHand":
+      return instruction.picked ? "play each of those cards from your hand" : "play a card from your hand";
+    case "Reattach":
+      return "attach this card to another hero";
     case "LookAtEncounterTop":
       return "look at the top card of the encounter deck";
     case "AttackEnemy":
@@ -217,6 +240,10 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     const name = names.code(pick.code);
     return { verb: "Shuffle in", prompt: `Choose which out-of-play ${name} is shuffled into the encounter deck. Any other copy stays where it is.` };
   }
+  // The costs family's verbs that ask for a card: which card to play, which pool pays the next resource, the new host.
+  if (pick.verb === "PlayFromHand") return { verb: "Play", prompt: "Choose a card to play from your hand." };
+  if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
+  if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
   if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);

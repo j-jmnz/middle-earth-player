@@ -3,6 +3,7 @@
 // ltp.explored-active-location, ltp.quest-advancement, ltp.optional-engagement, ltp.engagement-checks-intro,
 // ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
+import { checkCost } from "./families/costs-stats.ts";
 import type { EngineStep } from "./intents.ts";
 import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
@@ -237,7 +238,8 @@ export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Car
     const instance = state.cards[id];
     // An enemy that "does not make engagement checks" is passed over (it can still be engaged optionally).
     if (!instance || flagged(state, id, "cannotBeEngaged") || flagged(state, id, "noEngagementChecks")) continue;
-    const cost = engagementCostOf(state, instance, cards);
+    // With what the enemy gets while checking against this player (Orc Disguise, families/costs-stats.ts).
+    const cost = checkCost(state, instance, seat, cards);
     if (cost == null || cost > threat) continue;
     found.push({ id, cost });
   }
@@ -262,10 +264,10 @@ export function engagementStep(state: ScenarioState, cards: Cards, steps: Engine
   const highestId = options[0];
   if (!highestId) return state;
   const highest = state.cards[highestId];
-  const highestCost = highest ? engagementCostOf(state, highest, cards) : null;
+  const highestCost = highest ? checkCost(state, highest, seat, cards) : null;
   const tied = options.filter((id) => {
     const instance = state.cards[id];
-    return instance != null && engagementCostOf(state, instance, cards) === highestCost;
+    return instance != null && checkCost(state, instance, seat, cards) === highestCost;
   });
   if (tied.length > 1) {
     return {

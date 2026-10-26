@@ -13,6 +13,8 @@ export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").
   count: pickSchema.optional(),
+  // With `count`: cards with the same title count once ("for each different player attachment on attached hero").
+  distinct: z.literal(true).optional(),
   // A stat of a card. `printed` reads the printed value, else the current one. `damage`, `resources` and `progress` are
   // tokens on the card; `cost` is its printed cost; `threatCost` a hero's printed threat.
   stat: z.enum(["willpower", "attack", "defense", "threat", "hitPoints", "engagementCost", "questPoints", "damage", "resources", "progress", "cost", "threatCost"]).optional(),

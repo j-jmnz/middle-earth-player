@@ -15,7 +15,7 @@ import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
 import { heldAmount, livingSeats } from "./state.ts";
-import { pickCandidates } from "./pick.ts";
+import { matchesPick, pickCandidates } from "./pick.ts";
 
 type AttachRule = Extract<Instruction, { verb: "AttachesTo" }>;
 
@@ -78,6 +78,8 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
     for (const instruction of effect.instructions) {
       if (instruction.verb !== "ReduceCost") continue;
       if (instruction.when && !holds(state, instruction.when, scope, ctx)) continue;
+      // "Reduce the cost to play Herugrim on Théoden by 1": only onto a host that matches.
+      if (instruction.host && (hostId == null || !matchesPick(state, hostId, instruction.host, { seat, sourceId: cardId, counting: true }, ctx))) continue;
       cost -= resolveAmount(state, instruction.amount, { actor: seat, sourceId: cardId }, ctx);
     }
   }

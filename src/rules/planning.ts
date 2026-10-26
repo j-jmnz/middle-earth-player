@@ -9,6 +9,8 @@ import { holds } from "./conditions.ts";
 import { effectsOf } from "./listen.ts";
 import { distinctHeroesReason, spendDiscount } from "./cost-rules.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
+import { payerOk } from "./families/costs-pay.ts";
+import { exhaustSlack, extraCostReason } from "./families/costs-play.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
@@ -182,6 +184,9 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   if (printed.type !== "event" && planningTurn(state) !== state.activeSeat) return "Only the active player plays allies and attachments now";
   if (uniqueBlocked(state, printed, ctx.cards)) return "A second copy of that unique card cannot enter play";
   if (!hasResourceMatch(state, state.activeSeat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
+  // An additional cost that cannot be paid (PlayCost, families/costs-play.ts).
+  const extra = extraCostReason(state, cardId, state.activeSeat, ctx);
+  if (extra) return extra;
   return printed.type === "event" ? eventReason(state, cardId, state.activeSeat, ctx) : null;
 }
 
@@ -238,7 +243,7 @@ function paymentReason(
   }
   for (const [heroId, amount] of spent) {
     const hero = state.cards[heroId];
-    if (!hero || hero.zone !== "heroes" || hero.controller !== seat) return "That hero cannot pay";
+    if (!hero || !payerOk(state, heroId, seat, cardId, ctx)) return "That hero cannot pay";
     if (!heroPays(state, heroId, printed.sphere, ctx, cardId)) return "Wrong sphere";
     if (hero.resources < amount) return "That hero does not have those resources";
   }
@@ -247,6 +252,7 @@ function paymentReason(
   if (printed.costX) return null;
   if (cost == null) return "That card has no printed cost";
   if (sum > cost) return "Overpay";
-  if (sum < cost) return "Underpay";
+  // Characters exhausted as part of the cost pay the rest (ExhaustToReduce, families/costs-play.ts).
+  if (sum < cost - exhaustSlack(state, seat, cardId, ctx)) return "Underpay";
   return null;
 }

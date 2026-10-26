@@ -207,6 +207,9 @@ export const limitSchema = z.enum([
   "oncePerGame",
   "oncePerGameGroup",
   "thricePerGameGroup",
+  // Once a round for each player, counting every copy of the card ("You cannot trigger this ability if you have already
+  // triggered the ability of a Steward of Orthanc this round").
+  "oncePerRoundGroupEachPlayer",
 ]);
 
 // Which card an event must be about for an effect to hear it. Without it, an event about one card is heard by that card only.

@@ -4,6 +4,7 @@ import type { PickSpec } from "../catalog/boundary.ts";
 import { attachmentHostIds } from "./attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
+import { costsPickMatches } from "./families/costs-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
@@ -64,6 +65,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   } else if (spec.type === "location") {
     raw.push(...stagingLocations(state, ctx.cards));
     if (!spec.stagingOnly) raw.push(...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
+  } else if (spec.type === "card" && spec.stagingOnly) {
+    raw.push(...state.staging);
   } else if (spec.type === "card") {
     for (const index of seats) raw.push(...(state.seats[index]?.heroes ?? []), ...(state.seats[index]?.play ?? []));
     if (spec.control === "any") raw.push(...state.staging, ...[state.activeLocation].filter((id): id is string => id != null));
@@ -105,6 +108,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.keyword && !hasKeyword(state, id, spec.keyword, ctx.cards)) return false;
   if (spec.damaged != null && instance.damage > 0 !== spec.damaged) return false;
   if (spec.hasResources && instance.resources <= 0) return false;
+  // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs-pick.ts).
+  if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   if (spec.defending && !(state.pendingAttack?.defenderId === id && !state.pendingAttack.undefended)) return false;
   if (spec.hasAttachment) {
@@ -180,10 +185,10 @@ export function pickCandidates(
   });
 }
 
-// The cards attached to the source, or to the source's host.
-function attachedPool(state: ScenarioState, where: "source" | "host", sourceId: string | null): string[] {
+// The cards attached to the source, to the source's host, or to the active location.
+function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLocation", sourceId: string | null): string[] {
   const source = sourceId ? state.cards[sourceId] : undefined;
-  const holder = where === "source" ? source : source?.host ? state.cards[source.host] : undefined;
+  const holder = where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : source?.host ? state.cards[source.host] : undefined;
   return holder ? holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed")) : [];
 }
 

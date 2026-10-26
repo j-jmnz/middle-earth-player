@@ -1,5 +1,7 @@
 import type { Condition } from "../catalog/boundary.ts";
 
+import { questSucceeded } from "./families/costs-pay.ts";
+import { spendablePools } from "./families/costs-verbs.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
@@ -161,6 +163,10 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       const played = (state.played ?? []).filter((entry) => entry.round === state.round && entry.code === code && entry.id !== scope.sourceId).length;
       return played <= condition.max;
     }
+    case "resources":
+      return spendablePools(state, scope.actor, condition, ctx).total >= condition.min;
+    case "questSucceeded":
+      return questSucceeded(state, scope.actor, scope.sourceId, condition.committed === true);
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":

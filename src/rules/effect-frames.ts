@@ -229,7 +229,7 @@ function runItemNow(
     case "ArrangeTop":
       return arrangeTop(state, item);
     default:
-      return runInstruction(state, instruction, { seat: item.seat, sourceId: frame.cardId }, ctx, steps);
+      return runInstruction(state, instruction, { seat: item.seat, sourceId: frame.cardId, ...(item.chosen ? { chosen: item.chosen } : {}) }, ctx, steps);
   }
 }
 

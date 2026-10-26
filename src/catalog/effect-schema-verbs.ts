@@ -243,7 +243,8 @@ export const simpleVerbs = [
     ...when,
   }),
   // Constant on a card in hand: it costs this much less to play while `when` holds ("by 1 for each Hobbit hero you control").
-  z.strictObject({ verb: z.literal("ReduceCost"), amount: positiveAmountSchema, ...when }),
+  // `host`: only while it is played onto a host that matches ("Reduce the cost to play Herugrim on Théoden by 1").
+  z.strictObject({ verb: z.literal("ReduceCost"), amount: positiveAmountSchema, host: pickSchema.optional(), ...when }),
   // Constants on a card in hand, read when it would be played: it can only be played while the condition holds; it can be
   // played from its owner's discard pile (`only`: and from nowhere else); an ally or attachment enters play exhausted.
   z.strictObject({ verb: z.literal("PlayOnlyIf"), condition: conditionSchema, ...when }),
@@ -255,9 +256,17 @@ export const simpleVerbs = [
     verb: z.literal("ReduceNextCost"),
     pick: pickSchema,
     amount: positiveAmountSchema,
-    until: z.enum(["endOfPhase", "endOfRound"]),
+    // `used`: until a card spends it ("the next card you play"). `who: any`: the next one any player plays ("the next Silvan
+    // ally played this phase"). `hostSphere`: only a card of the sphere of the source's host, read now. The card that spends it
+    // gains Doomed `doomed` (each player raises their threat as it is played, rr.doomed-x), needs no resource match (`noMatch`)
+    // and cannot quest this round (`cannotQuest`). With one of those the discount is made even when its amount comes to 0.
+    until: z.enum(["endOfPhase", "endOfRound", "used"]),
     min: z.number().int().min(0).optional(),
-    who: z.enum(["actor", "picked"]).optional(),
+    who: z.enum(["actor", "picked", "any"]).optional(),
+    hostSphere: z.boolean().optional(),
+    doomed: z.number().int().positive().optional(),
+    noMatch: z.boolean().optional(),
+    cannotQuest: z.boolean().optional(),
     ...when,
   }),
   // Constants on a card in play, read when its controller plays a card that matches. ReduceCostOf: it costs less (`firstEachRound`:
@@ -286,7 +295,7 @@ export const simpleVerbs = [
   verb("DiscardRestricted"),
   // Adds resources to the pool of the hero the source card is attached to.
   // To the host by default, or to the picked card, the source itself, or the card the answered event was about.
-  z.strictObject({ verb: z.literal("AddResources"), amount: positiveAmountSchema, to: z.enum(["host", "picked", "self", "subject"]).optional(), ...when }),
+  z.strictObject({ verb: z.literal("AddResources"), amount: positiveAmountSchema, to: z.enum(["host", "picked", "self", "subject", "other"]).optional(), ...when }),
   // The picked card goes to its owner's discard pile.
   verb("DiscardPicked"),
   // The top card of the actor's deck is discarded. Its printed cost is the effect's X.

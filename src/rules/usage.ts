@@ -8,6 +8,9 @@ import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, placeDamage, raiseThreat } from "./keywords.ts";
 import { deckPlayHero, markDeckPlay } from "./deck-play.ts";
 import { heroPays, validatePayments } from "./payments.ts";
+import { distinctHeroesReason } from "./cost-rules.ts";
+import { allyPools, noteSpent } from "./families/costs-pay.ts";
+import { eventPlayReason } from "./families/costs-play.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { inPlay, updateCard } from "./state.ts";
@@ -35,6 +38,7 @@ const LIMITS: Readonly<Record<Limit, LimitRule>> = {
   oncePerGame: { times: 1, per: "game" },
   oncePerGameGroup: { times: 1, per: "game", group: true },
   thricePerGameGroup: { times: 3, per: "game", group: true },
+  oncePerRoundGroupEachPlayer: { times: 1, per: "round", eachPlayer: true, group: true },
 };
 
 // The attack in progress, as a key a once-per-attack use is recorded under.
@@ -63,8 +67,11 @@ function limitSpent(state: ScenarioState, effect: Effect, sourceId: string, seat
 
 // Heroes of the seat that can pay `sphere` and the resources they hold. `only` keeps the one hero a cost names.
 function pool(state: ScenarioState, seat: number, sphere: Sphere | null, ctx: ReduceContext, forCard?: string, only?: string | null): number {
+  // One card's own pool pays, an ally's too ("Pay 2 resources from Treebeard's pool"); allies whose pool pays for the card
+  // count beside the heroes (families/costs-pay.ts).
+  if (only != null && sphere == null) return state.cards[only]?.resources ?? 0;
   let total = 0;
-  for (const id of state.seats[seat]?.heroes ?? []) {
+  for (const id of [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx)]) {
     const hero = state.cards[id];
     if (only !== undefined && id !== only) continue;
     if (hero && heroPays(state, id, sphere, ctx, forCard)) total += hero.resources;
@@ -110,6 +117,8 @@ function payable(state: ScenarioState, cost: Cost, source: CardInstance, seat: n
       return pool(state, seat, costSphere(cost, source, ctx), ctx, undefined, payer) >= cost.amount;
     }
     case "playEvent": {
+      // Its play restrictions and its resource match first: a 0-cost event is offered only when it could be played.
+      if (eventPlayReason(state, source.id, seat, ctx)) return false;
       const price = playCost(state, source.id, seat, ctx);
       return price != null && pool(state, seat, printedOf(ctx.cards, source.code).sphere, ctx, source.id) >= price;
     }
@@ -138,9 +147,11 @@ export function usageReason(
   const costs = costsOf(effect);
   const event = costs.find((cost) => cost.kind === "playEvent");
   if (event) {
+    const refused = eventPlayReason(state, sourceId, seat, ctx);
+    if (refused) return refused;
     const price = playCost(state, sourceId, seat, ctx);
     if (price == null) return "That card has no printed cost";
-    return validatePayments(state, payments, { seat, sphere: printedOf(ctx.cards, source.code).sphere, amount: price, forCard: sourceId }, ctx);
+    return validatePayments(state, payments, { seat, sphere: printedOf(ctx.cards, source.code).sphere, amount: price, forCard: sourceId }, ctx) ?? distinctHeroesReason(state, sourceId, payments, ctx);
   }
   for (const cost of costs) if (cost.kind !== "resources" && !payable(state, cost, source, seat, ctx)) return "That cost cannot be paid";
   const resources = costs.find((cost): cost is Extract<Cost, { kind: "resources" }> => cost.kind === "resources");
@@ -212,10 +223,10 @@ export function payUsage(
           if (permission) next = markDeckPlay(next, permission);
           next = moveCard(next, sourceId, { zone: "hand", seat: source.controller });
         }
-        next = spend(next, payments);
+        next = noteSpent(spend(next, payments), payments, ctx);
         break;
       case "resources":
-        next = spend(next, payments);
+        next = noteSpent(spend(next, payments), payments, ctx);
         break;
     }
   }

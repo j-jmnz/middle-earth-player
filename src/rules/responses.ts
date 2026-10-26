@@ -108,7 +108,8 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
   if (frame?.data.kind !== "responses" || !effect || state.window?.kind !== "response") return state;
   const seat = state.window.seat;
   const left = frame.data.offers.filter((offer) => !(offer.cardId === intent.cardId && offer.effectId === intent.effectId));
-  const paid = payUsage(patchTop(state, { data: { ...frame.data, offers: left } }), effect, intent.cardId, intent.payments ?? [], ctx, steps);
+  // The seat answering pays: its threat for a raiseThreat cost, its deck for discardDeckTop, its use of a per-player limit.
+  const paid = payUsage(patchTop(state, { data: { ...frame.data, offers: left } }), effect, intent.cardId, intent.payments ?? [], ctx, steps, seat);
   return pushEffectFrame(
     { ...paid, window: null },
     {

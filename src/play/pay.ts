@@ -8,6 +8,8 @@ import { costOfKind } from "../catalog/costs.ts";
 import { playCost } from "../rules/attach.ts";
 import type { Payment } from "../rules/intents.ts";
 import type { ReduceContext } from "../rules/interpret.ts";
+import { allyPools, distinctRule } from "../rules/families/costs-pay.ts";
+import { exhaustSlack } from "../rules/families/costs-play.ts";
 import { heroPays } from "../rules/payments.ts";
 import { printedOf, type Sphere } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
@@ -24,11 +26,14 @@ export type PayRequest = {
   total: number;
   exact: boolean;
   pools: readonly { heroId: string; max: number }[];
+  // The card's own rule on how many different pools pay (PayDistinctHeroes), which the first guess follows.
+  distinct?: { min?: number; max?: number };
 };
 
 function poolsFor(state: ScenarioState, ctx: ReduceContext, seat: number, sphere: Sphere | null, forCard?: string): { heroId: string; max: number }[] {
   const pools: { heroId: string; max: number }[] = [];
-  for (const heroId of state.seats[seat]?.heroes ?? []) {
+  // An ally whose own pool pays for the card (Radagast for Creature cards) is a pool beside the heroes.
+  for (const heroId of [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx)]) {
     const hero = state.cards[heroId];
     if (!hero || hero.resources <= 0) continue;
     if (!heroPays(state, heroId, sphere, ctx, forCard)) continue;
@@ -46,7 +51,10 @@ export function playRequest(state: ScenarioState, ctx: ReduceContext, cardId: st
   const cost = playCost(state, cardId, seat, ctx, hostId) ?? 0;
   const pools = poolsFor(state, ctx, seat, printed.sphere, cardId);
   if (!printed.costX && cost === 0) return null;
-  return { seat, cardId, total: cost, exact: !printed.costX, pools };
+  // A cost that characters exhausted may pay in part (ExhaustToReduce) need not be met in resources: what is left unpaid is
+  // paid by exhausting them, and the reducer checks there are enough.
+  const distinct = distinctRule(state, cardId, ctx);
+  return { seat, cardId, total: cost, exact: !printed.costX && exhaustSlack(state, seat, cardId, ctx) === 0, pools, ...(distinct ? { distinct } : {}) };
 }
 
 /** The pay request for an Action or Response with a resource cost, or null when its cost takes no resources. */
@@ -58,7 +66,8 @@ export function triggerRequest(state: ScenarioState, ctx: ReduceContext, cardId:
   if (costOfKind(effect, "playEvent")) {
     const cost = playCost(state, cardId, seat, ctx) ?? 0;
     if (!printed.costX && cost === 0) return null;
-    return { seat, cardId, total: cost, exact: !printed.costX, pools: poolsFor(state, ctx, seat, printed.sphere, cardId) };
+    const distinct = distinctRule(state, cardId, ctx);
+    return { seat, cardId, total: cost, exact: !printed.costX, pools: poolsFor(state, ctx, seat, printed.sphere, cardId), ...(distinct ? { distinct } : {}) };
   }
   const resources = costOfKind(effect, "resources");
   if (!resources) return null;
@@ -74,15 +83,25 @@ export function triggerRequest(state: ScenarioState, ctx: ReduceContext, cardId:
 
 /** A first guess the player can change: the pools in seat order, each giving what it holds until the total is met. */
 export function firstShares(request: PayRequest): Share[] {
-  const shares: Share[] = [];
-  let left = request.exact ? request.total : 0;
+  const total = request.exact ? request.total : 0;
+  // "Paid from a single hero's resource pool": the first pool that holds it all.
+  const single = request.distinct?.max === 1 ? request.pools.find((pool) => pool.max >= total) : undefined;
+  if (single && total > 0) return [{ id: single.heroId, amount: total }];
+  // "From 3 different heroes' pools": one from each of the first pools before any pool gives more.
+  const given = new Map<string, number>();
+  let left = total;
+  for (const pool of request.pools.slice(0, Math.min(request.distinct?.min ?? 0, total))) {
+    given.set(pool.heroId, 1);
+    left -= 1;
+  }
   for (const pool of request.pools) {
     if (left <= 0) break;
-    const amount = Math.min(left, pool.max);
-    shares.push({ id: pool.heroId, amount });
-    left -= amount;
+    const more = Math.min(left, pool.max - (given.get(pool.heroId) ?? 0));
+    if (more <= 0) continue;
+    given.set(pool.heroId, (given.get(pool.heroId) ?? 0) + more);
+    left -= more;
   }
-  return shares;
+  return request.pools.filter((pool) => given.has(pool.heroId)).map((pool) => ({ id: pool.heroId, amount: given.get(pool.heroId) ?? 0 }));
 }
 
 export function shareSum(shares: readonly Share[]): number {
