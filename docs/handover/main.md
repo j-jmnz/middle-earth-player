@@ -64,6 +64,16 @@ attachments with Guarded per wor.guarded-x) and phase 13 (Flight to the Ford pla
 Running: sidequests, misc, phase 14 (wip/phase-14), reviewer on phase 13 (3198cf0). Next: phases 15, 16 in order.
 Left for the end: the cookbook's "Not expressible yet" section, STATUS.md.
 
+Phase 13 review (non-blocking; fix after phases 14-16 merge, since they build on the burden family):
+1. burden-effects.ts passFirstPlayer duplicates refresh.ts passToken: one function.
+2. burden-attack.ts attackWith duplicates effect-frames.ts immediateAttack: export and reuse.
+3. 141028 Setup record never runs (setup comes from scenario-data/setup.ts); SetLife/ShuffleBurdenDeck only used by tests:
+   make the record drive setup or drop the verbs and mark the line inert with a reason.
+4. burden-effects.ts announceProgress keeps a module-level WeakMap (SEEN): queue progressPlaced where progress is placed.
+5. Move non-burden verbs out of the burden family (EndQuestPhase, RemoveAllQuestProgress -> quest; PassFirstPlayer -> play;
+   ImmediateAttackEach -> attack/defense; SetStatUntil -> a duration on SetStat/ModifyStat).
+6. burden-words.ts hard-codes "Ring-bearer's" for SetStatUntil: derive from holders.
+
 ## After the families
 
 1. Scenarios 3 to 6 (Flight to the Ford 141xxx, The Ring Goes South / Journey in the Dark / Breaking of the Fellowship
