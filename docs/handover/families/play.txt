@@ -1,0 +1,35 @@
+01019:A:1 | Brok Ironfist (ally) | Response: After a Dwarf hero you control leaves play, put Brok Ironfist into play from your hand.
+02053:A:3 | Landroval (ally) | Response: After a hero card is destroyed, return Landroval to his owner's hand to put that hero back into play, with 1 damage token on it. (Limit once per game.)
+02119:A:2 | Eagles of the Misty Mountains (ally) | Response: After another Eagle character leaves play, you may attach that card facedown to Eagles of the Misty Mountains.
+03006:A:1 | Veteran of Nanduhirion (ally) | Veteran of Nanduhirion enters play with 1 damage on it.
+04006:A:1 | Bofur (ally) | Quest Action: Spend 1 Spirit resource to put Bofur into play from your hand, exhausted and committed to a quest. If you quest successfully this phase and Bofur is still in play, return him to your hand.
+04033:A:1 | Rider of the Mark (ally) | Action: Spend 1 Spirit resource to give control of Rider of the Mark to another player. (Limit once per round.)
+05016:A:1 | Master of Lore (ally) | Action: Exhaust Master of Lore to name a card type. Lower the cost for you to play the next Lore card of that type by 1 until the end of the phase (to a minimum of 1).
+06036:A:2 | Trained for War (event) | Action: Until the end of the phase, if the current quest does not have Siege, it gains Battle.
+06057:A:2 | Denethor (ally) | Discard Denethor if his Willpower is 0 or less.
+08003:A:1 | Swift and Silent (event) | Action: Ready a hero you control. Then, if your threat is 20 or less and this is the first time you played a copy of Swift and Silent this round, return this card to your hand instead of discarding it.
+08006:A:1 | Blue Mountain Trader (ally) | Action: Choose another player. That player gains control of Blue Mountain Trader. Then, that player moves 1 resource from the resource pool of a hero he controls to the resource pool of a hero you control, or Blue Mountain Trader is discarded. (Limit once per round.)
+08033:A:1 | Noiseless Movement (event) | Action: Choose an enemy in the staging area. That enemy does not make engagement checks this round. Then, if your threat is 20 or less and this is the first time you played a copy of Noiseless Movement this round, return this card to your hand instead of discarding it.
+08057:A:1 | Herald of Anórien (ally) | You may give Herald of Anórien doomed 2 when you play it from your hand. If you do, it gains: "Response: After you play Herald of Anórien, choose a player. That player may put into play 1 ally from his hand with a printed cost 2 or lower."
+08061:A:1 | Courage Awakened (event) | Action: Choose a hero. That hero gets +2 Willpower until the end of the phase. Then, if your threat is 20 or less and this is the first time you played a copy of Courage Awakened this round, return this card to your hand instead of discarding it.
+08085:A:1 | Follow Me! (event) | Action: Take control of the first player token and draw 1 card.
+08093:A:2 | Defender of the West (attachment) | The first player gains control of attached ally.
+10006:A:2 | Curious Brandybuck (ally) | Response: After you travel to a location, put Curious Brandybuck into play from your hand, under any player's control.
+10010:A:1 | Ranger of Cardolan (ally) | Response: After you engage an enemy, if you control at least 1 Dúnedain hero, spend 1 resource to put Ranger of Cardolan into play from your hand, under your control. At the end of the round, if Ranger of Cardolan is still in play, shuffle it into its owner's deck.
+10033:A:1 | Elven Jeweler (ally) | Action: Discard 2 cards from your hand to put Elven Jeweler into play from your hand, under your control.
+10085:A:2 | Reinforcements (event) | Action: The players, as a group, can put up to 2 allies into play from their hands. Each of these allies may enter play under any player's control. At the end of the phase, return each of those allies that are still in play to their owners' hands.
+10141:A:1 | Éothain (ally) | Response: After a Rohan ally is discarded from play by a card effect, ready Éothain.
+10149:A:2 | Sword-thain (attachment) | Attached character loses the ally card type and gains the hero card type.
+12011:A:2 | Vanish from Sight (event) | Action: Until the end of the phase, if your threat is higher than 20, treat your threat as if it is 20.
+12058:A:1 | Ceorl (ally) | Spend 1 Spirit resource to ready Ceorl. Then, you may give control of Ceorl to another player. Any player may trigger this action. (Limit once per phase).
+12083:A:1 | Dwarven Sellsword (ally) | Forced: At the end of the round, discard Dwarven Sellsword unless the players as a group spend 1 Leadership resource.
+17035:A:1 | Eryn Galen Settler (ally) | Response: When the active location leaves play as an explored location, discard Eryn Galen Settler to discard a location in the staging with the same title as the just explored location.
+18002:A:2 | Bard son of Brand (hero) | Response: When a character leaves play, return each attachment attached to that character to its owner's hand. (Limit once per phase.)
+22035:A:2 | Horn of the Mark (attachment) | Response: When a character leaves play, if that character shares at least one trait with the attached hero, exhaust Horn of the Mark to draw 1 card.
+22056:A:2 | Horns! Horns! Horns! (event) | Action: Each player may put one ally card into play from his hand. At the end of the phase, shuffle each of those allies that are still in play into their owners' decks.
+22057:A:2 | Soldier of Isengard (ally) | Response: After a player raises his threat from the doomed keyword, give control of Soldier of Isengard to that player.
+22108:A:3 | Gwaihir (hero) | Response: After an Eagle ally enters or leaves play, ready Gwaihir. (Limit once per phase.)
+22117:A:3 | Wilyador (ally) | Forced: At the end of the round, discard Wilyador unless the players as a group spend 1 resource.
+132010:A:1 | Desperate Alliance (event) | Action: Choose a hero you control. Until the end of the phase, give control of that hero and all resources in that hero's resource pool to another player. (Limit 1 per phase.)
+144007:A:1 | Gamling (ally) | Response: After a Rohan ally you control is discarded from play, exhaust Gamling to return that ally to your hand.
+146006:A:1 | Elfhelm (ally) | Action: Spend 1 resource from a Rohan hero's resource pool to put Elfhelm into play from your hand under your control. At the end of the phase, discard Elfhelm if he is still in play.

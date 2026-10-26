@@ -14,8 +14,8 @@ limits loom, agents and the main session write handover files and commit so prog
 - In progress in agent worktrees under `.claude/worktrees` (local branches `worktree-agent-*`, not pushed): attack, play,
   attachments, deck. Not started: sidequests, misc (incl. saga heroes and One Ring cards), motk (Messenger of the King
   heroes, codes 99<ally code>).
-- Family line lists and the agent brief are regenerated from `src/effects/open-lines.ts` plus the card text (the main
-  session wrote them to its scratchpad; regenerate if lost: group open lines by mechanic).
+- The agent brief is `docs/handover/agent-brief.md`; each unmerged family's line list (as assigned, some lines may be
+  closed since) is `docs/handover/families/<F>.txt`. All of `docs/handover/` is removed when the work is done.
 
 ## Merging a family
 

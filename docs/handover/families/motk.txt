@@ -1,0 +1,108 @@
+9901014:A:1 | (MotK) Faramir (hero) | Action: Exhaust Faramir to choose a player. Each character controlled by that player gets +1 Willpower until the end of the phase.
+9901019:A:1 | (MotK) Brok Ironfist (hero) | Response: After a Dwarf hero you control leaves play, put Brok Ironfist into play from your hand.
+9901031:A:1 | (MotK) Beorn (hero) | Action: Beorn gains +5 Attack until the end of the phase. At the end of the phase in which you trigger this effect, shuffle Beorn back into your deck. (Limit once per round.)
+9901060:A:1 | (MotK) Henamarth Riversong (hero) | Action: Exhaust Henamarth Riversong to look at the top card of the encounter deck.
+9901062:A:1 | (MotK) Gléowine (hero) | Action: Exhaust Gléowine to choose a player. That player draws 1 card.
+9902030:A:1 | (MotK) Éomund (hero) | Response: After Éomund leaves play, ready all Rohan characters in play.
+9902053:A:2 | (MotK) Landroval (hero) | Landroval cannot have restricted attachments.
+9902053:A:3 | (MotK) Landroval (hero) | Response: After a hero card is destroyed, return Landroval to his owner's hand to put that hero back into play, with 1 damage token on it. (Limit once per game.)
+9902079:A:1 | (MotK) Gildor Inglorion (hero) | Action: Exhaust Gildor Inglorion to look at the top 3 cards of your deck. Switch one of those cards with a card from your hand. Then, return the 3 cards to the top of your deck, in any order.
+9902100:A:1 | (MotK) Elfhelm (hero) | While Elfhelm is ready, he gains: "Response: After your threat is raised as the result of questing unsuccessfully, or by an encounter or quest card effect, reduce your threat by 1."
+9904006:A:1 | (MotK) Bofur (hero) | Quest Action: Spend 1 Spirit resource to put Bofur into play from your hand, exhausted and committed to a quest. If you quest successfully this phase and Bofur is still in play, return him to your hand.
+9904035:A:1 | (MotK) Bombur (hero) | Action: Exhaust Bombur to choose a location. That location gets -1 Threat until the end of the phase. (That location does not contribute its Threat instead if it is an Underground location.)
+9904058:A:1 | (MotK) Arwen Undómiel (hero) | Response: After Arwen Undómiel exhausts, choose a character. That character gains sentinel and gets +1 Defense until the end of the round.
+9904077:A:1 | (MotK) Erestor (hero) | Action: Choose and discard 1 card from your hand to draw 1 card. (Limit once per round.)
+9905010:A:1 | (MotK) Damrod (hero) | Action: Discard Damrod from play to lower your threat by 1 for each enemy in the staging area.
+9906033:A:1 | (MotK) Forlong (hero) | While you control Outlands allies that belong to 4 different spheres, ready Forlong at the beginning of each phase.
+9906057:A:1 | (MotK) Denethor (hero) | Denethor gets -1 Willpower for each damaged hero you control.
+9906057:A:2 | (MotK) Denethor (hero) | Discard Denethor if his Willpower is 0 or less.
+9906110:A:1 | (MotK) Guthlaf (hero) | If there is at least 1 Rohan hero in play, lower the cost to play Guthlaf by 1.
+9906110:A:2 | (MotK) Guthlaf (hero) | If there is at least 1 Gondor hero in play, Guthlaf gains sentinel.
+9906112:A:1 | (MotK) Emery (hero) | Action: Discard the top 3 card of your deck to put Emery into play from your hand, under any player's control. Then, if any of the discarded cards have the Tactics, Lore or Leadership sphere, discard Emery.
+9906114:A:1 | (MotK) Anborn (hero) | Action: Exhaust Anborn to return 1 Trap card from your discard pile to your hand.
+9908028:A:2 | (MotK) Rúmil (hero) | Response: After you play Rúmil from your hand, choose an enemy engaged with a player. Deal X damage to that enemy where X is the number of ranged characters you control.
+9908059:A:1 | (MotK) Gwaihir (hero) | Cannot have restricted attachments.
+9908059:A:2 | (MotK) Gwaihir (hero) | Response: After Gwaihir enters play, search your discard pile for an Eagle ally and put it into play under your control. At the end of the round, if that ally is still in play, add it to your hand.
+9908114:A:2 | (MotK) Orophin (hero) | Response: After Orophin enters play, return a Silvan ally from your discard pile to your hand.
+9910002:A:1 | (MotK) Ingold (hero) | Ingold gets +1 Willpower for each hero you control with at least 1 resource in its resource pool.
+9910091:A:1 | (MotK) Galdor of the Havens (hero) | Response: After 1 or more cards are discarded from your hand, draw 1 card. Limit once per round.
+9910118:A:1 | (MotK) Beechbone (hero) | Cannot have restricted attachments. Enters play exhausted.
+9910118:A:2 | (MotK) Beechbone (hero) | Response: After Beechbone is declared as an attacker, deal 1 damage to him to deal X damage to the defending enemy. X is the amount of damage on Beechbone.
+9910120:A:1 | (MotK) Lindir (hero) | Response: After Lindir enters play, if you have less than 3 cards in your hand, draw until you have 3 cards in your hand.
+9910141:A:1 | (MotK) Éothain (hero) | Response: After a Rohan ally is discarded from play by a card effect, ready Éothain.
+9912004:A:1 | (MotK) Azain Silverbeard (hero) | Response: After Azain Silverbeard participates in an attack that destroys an enemy, spend 1 Tactics resource to deal 2 damage to another enemy that shares a Trait with the destroyed enemy. Any player may trigger this response.
+9912006:A:1 | (MotK) Glorfindel (hero) | Glorfindel can be played from your discard pile.
+9912006:A:2 | (MotK) Glorfindel (hero) | Action: Discard a card from your hand to ready Glorfindel. (Limit once per phase.)
+9912031:A:2 | (MotK) Eldahir (hero) | Action: Spend 1 Lore resource to look at a facedown shadow card dealt to an engaged enemy. If that card has a shadow effect, Eldahir gets +2 Defense until the end of the phase. Any player may trigger this action. (Limit once per phase.)
+9912035:A:1 | (MotK) Sam Gamgee (hero) | Reduce the cost to play Sam Gamgee by 2 if you control Frodo Baggins.
+9912035:A:2 | (MotK) Sam Gamgee (hero) | Response: After a player raises his threat, that player may spend 1 Spirit resource to ready Sam Gamgee. He gets +1 Willpower, +1 Attack and +1 Defense until the end of the round. (Limit once per round.)
+9912058:A:1 | (MotK) Ceorl (hero) | Spend 1 Spirit resource to ready Ceorl. Then, you may give control of Ceorl to another player. Any player may trigger this action. (Limit once per phase).
+9912060:A:2 | (MotK) Déorwine (hero) | Action: While Déorwine is defending, spend 1 Leadership resource to cancel a shadow effect dealt to the attacking enemy. Any player may trigger this action.
+9912089:A:1 | (MotK) Robin Smallburrow (hero) | Response: After you travel to a location, spend 1 Spirit resource to raise the engagement cost of each enemy in play by X until the end of the round, where X is that location's quest points. Any player may trigger this response.
+9912117:A:1 | (MotK) Ioreth (hero) | Cannot attack or defend.
+9912117:A:2 | (MotK) Ioreth (hero) | Action: Spend 1 Lore resource and exhaust Ioreth. Then, heal 3 points of damage on a character. Any player may trigger this action.
+9912142:A:1 | (MotK) Súlien (hero) | Action: Spend 1 Lore resource to exhaust Súlien. Then, each location in the staging area gets ?1 Threat until the end of the phase. Any player may trigger this action.
+9917004:A:2 | (MotK) Yazan (hero) | Response: After Yazan is declared as an attacker, deal 1 damage to a non-unique enemy in play. (Limit once per phase.)
+9917006:A:2 | (MotK) Jubayr (hero) | Response: After Jubayr exhausts to defend an attack, discard 1 facedown shadow card from a non-unique enemy. (Limit once per phase.)
+9917008:A:1 | (MotK) Firyal (hero) | Response: After Firyal commits to the quest, look at the top card of the encounter deck. Then, you may discard the looked at card.
+9917116:A:1 | (MotK) Leaflock (hero) | Cannot have restricted attachments.
+9917116:A:2 | (MotK) Leaflock (hero) | Enters play exhausted.
+9917116:A:3 | (MotK) Leaflock (hero) | Leaflock gets +1 Willpower for each damaged Ent character you control. (Limit +4 Willpower.)
+9917136:A:1 | (MotK) Halfast Gamgee (hero) | Reduce the cost to play Halfast Gamgee by 1 for each side quest in the victory display.
+9917136:A:2 | (MotK) Halfast Gamgee (hero) | Response: After Halfast Gamgee enters play, add 1 resource to a hero's resource pool.
+9919027:A:1 | (MotK) Wiglaf (hero) | Response: After you play Wiglaf, play an Item attachment on him from your hand for no cost.
+9919027:A:2 | (MotK) Wiglaf (hero) | Action: Exhaust an attachment on Wiglaf to ready him. (Limit once per phase.)
+9919031:A:1 | (MotK) Meneldor (hero) | Cannot have restricted attachments.
+9919031:A:2 | (MotK) Meneldor (hero) | Response: After Meneldor enters or leaves play, place 2 progress on a location.
+9919063:A:1 | (MotK) Galion (hero) | Cannot attack or defend.
+9919063:A:2 | (MotK) Galion (hero) | Response: After Galion enters play, he gets +1 Willpower until the end of the round.
+9919115:A:1 | (MotK) Gaffer Gamgee (hero) | Combat Action: Return Gaffer Gamgee to your hand to choose an enemy with engagement cost higher than your threat. Until the end of the round, that enemy cannot attack you.
+9921003:A:1 | (MotK) Merry (hero) | Response: After Merry enters play, each unique ally you control gets +1 Willpower until the end of the round.
+9921004:A:1 | (MotK) Pippin (hero) | Pippin gets +2 Attack while attacking an enemy with an engagement cost higher than your threat.
+9921004:A:2 | (MotK) Pippin (hero) | Response: After you engage an enemy with an engagement cost higher than your threat, ready Pippin.
+9921005:A:1 | (MotK) Faramir (hero) | Response: After Faramir enters play, choose a non-unique enemy in the staging area. Engage that enemy and deal 2 damage to it (4 damage instead if it has an attachment on it).
+9921006:A:3 | (MotK) Derufin (hero) | Response: After Derufin participates in an attack which destroys an enemy engaged with a player, discard Derufin to reduce the engaged player's threat by X, where X is the destroyed enemy's printed Threat.
+9922028:A:1 | (MotK) Angbor the Fearless (hero) | While your threat is 40 or higher, Angbor the Fearless gets +2 Attack and does not exhaust to quest.
+9922059:A:1 | (MotK) Nori (hero) | Response: After Nori participates in an attack that destroys an enemy, put the top card of your discard pile on the bottom of your deck.
+9922088:A:1 | (MotK) Odo Proudfoot (hero) | Response: After Odo Proudfoot enters play, search the top 5 cards of your deck for a Hobbit ally and add it to your hand. Shuffle the other cards back into your deck.
+9922140:A:1 | (MotK) Haleth (hero) | Response: After Haleth quests successfully, search the top 5 cards of your deck for an attachment and add it to your hand. Shuffle your deck.
+99131006:A:1 | (MotK) Fili (hero) | Response: After you play Fili from your hand during the planning phase, search your deck for Kili and put him into play under your control. Then, shuffle your deck.
+99131007:A:1 | (MotK) Kili (hero) | Response: After you play Kili from your hand during the planning phase, search your deck for Fili and put him into play under your control. Then, shuffle your deck.
+99131008:A:1 | (MotK) Bofur (hero) | Action: Exhaust Bofur to search the top 5 cards of your deck for 1 Weapon attachment. Add that card to your hand and shuffle the other cards back into your deck.
+99131009:A:1 | (MotK) Dori (hero) | Response: After a hero is assigned any amount of damage, exhaust Dori to place that damage on Dori instead.
+99132006:A:1 | (MotK) Glóin (hero) | While you control at least 5 Dwarf characters, Glóin gains: "Response: After you play Glóin from your hand, choose a hero. Add 2 resources to that hero's resource pool."
+99132007:A:1 | (MotK) Bifur (hero) | While you control at least 5 Dwarf characters, Bifur gains: "Response: After you play Bifur from your hand, draw 2 cards."
+99132008:A:2 | (MotK) Dwalin (hero) | While you control at least 5 Dwarf characters, lower the cost to play Dwalin by 2.
+99141006:A:1 | (MotK) Bill the Pony (hero) | Cannot have attachments.
+99141006:A:2 | (MotK) Bill the Pony (hero) | Lower the cost to play Bill the Pony by 2 if you control Sam Gamgee.
+99141007:A:1 | (MotK) Barliman Butterbur (hero) | If each hero you control has the Hobbit trait, damage from undefended attacks against you may be assigned to Barliman Butterbur.
+99141008:A:1 | (MotK) Farmer Maggot (hero) | Response: After Farmer Maggot enters play, deal 1 damage to an enemy engaged with you. (Deal 2 damage instead if that enemy's engagement cost is higher than your threat.)
+99142003:A:1 | (MotK) Galadriel (hero) | At the end of the round, discard Galadriel from play.
+99142003:A:2 | (MotK) Galadriel (hero) | Response: After you play Galadriel from your hand, search the top 5 cards of your deck for an attachment of cost 3 or less and put it into play. Put the remaining cards back in any order.
+99142004:A:1 | (MotK) Boromir (hero) | Boromir gets +2 Defense while defending against an enemy with an engagement cost higher than your threat.
+99142004:A:2 | (MotK) Boromir (hero) | Response: After Boromir takes any amount of damage, ready him.
+99142005:A:1 | (MotK) Elrond (hero) | At the end of the round, discard Elrond from play.
+99142005:A:2 | (MotK) Elrond (hero) | Response: After Elrond enters play, choose one: heal all damage on a hero, discard a Condition attachment, or each player draws 1 card.
+99142006:A:1 | (MotK) Bilbo Baggins (hero) | Response: After Bilbo Baggins enters play, search your deck for a Pipe attachment and add it to your hand. Shuffle your deck.
+99143004:A:2 | (MotK) Gimli (hero) | Response: After an enemy is revealed from the encounter deck, ready Gimli.
+99143005:A:2 | (MotK) Legolas (hero) | Response: After Legolas participates in an attack that destroys an enemy, draw 1 card.
+99143006:A:1 | (MotK) Quickbeam (hero) | Cannot have restricted attachments. Enters play exhausted.
+99143006:A:2 | (MotK) Quickbeam (hero) | Response: After Quickbeam enters play, deal 1 damage to him to ready him.
+99143007:A:1 | (MotK) Háma (hero) | Combat Action: Ready Háma. He gets +3 Defense until the end of the phase. At the end of the phase, discard Háma. (Limit once per round.)
+99144004:A:1 | (MotK) Anborn (hero) | Response: After an enemy is added to the staging area, exhaust Anborn to give that enemy +5 engagement cost until the end of the round. Then, deal 1 damage to that enemy.
+99144005:A:1 | (MotK) Mablung (hero) | Response: After Mablung enters play, choose an enemy to get +5 engagement cost until the end of the round. Then, you may engage that enemy, or return it to the staging area.
+99144006:A:1 | (MotK) Skinbark (hero) | Cannot have restricted attachments. Enters play exhausted.
+99144006:A:2 | (MotK) Skinbark (hero) | While Skinbark is attacking alone against an Orc enemy, that enemy does not count its Defense.
+99144007:A:1 | (MotK) Gamling (hero) | Response: After a Rohan ally you control is discarded from play, exhaust Gamling to return that ally to your hand.
+99145004:A:1 | (MotK) Grimbold (hero) | Combat Action: Discard Grimbold to choose an enemy engaged with a player. That enemy cannot attack that player this phase.
+99145005:A:1 | (MotK) Prince Imrahil (hero) | While there is a hero in your discard pile, Prince Imrahil loses the ally card type and gains the hero card type.
+99145006:A:1 | (MotK) Halbarad (hero) | Reduce the cost to play Halbarad by 1 for each enemy engaged with you.
+99145006:A:2 | (MotK) Halbarad (hero) | Each enemy engaged with you gets +10 engagement cost.
+99145007:A:1 | (MotK) Ghân-buri-Ghân (hero) | X is the Threat of the active location.
+99145007:A:2 | (MotK) Ghân-buri-Ghân (hero) | Travel Action: Discard Ghân-buri-Ghân to travel to a location without resolving its Travel effect.
+99146005:A:1 | (MotK) Rosie Cotton (hero) | Action: Exhaust Rosie Cotton to choose a Hobbit hero and an attribute (Willpower, Attack, Defense). Add Rosie Cotton's Willpower to that hero's chosen attribute until the end of the phase. (Limit once per phase.)
+99146006:A:1 | (MotK) Elfhelm (hero) | Action: Spend 1 resource from a Rohan hero's resource pool to put Elfhelm into play from your hand under your control. At the end of the phase, discard Elfhelm if he is still in play.
+99146007:A:1 | (MotK) Elladan (hero) | While Elrohir is in play, Elladan gets +2 Attack.
+99146007:A:2 | (MotK) Elladan (hero) | Response: After you optionally engage an Orc enemy, ready Elladan.
+99146008:A:1 | (MotK) Elrohir (hero) | While Elladan is in play, Elrohir gets +2 Defense.
+99146008:A:2 | (MotK) Elrohir (hero) | Response: After you optionally engage an Orc enemy, ready Elrohir.
