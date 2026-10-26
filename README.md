@@ -6,7 +6,8 @@ The app applies the rules, keywords, phases, card effects, and every number they
 
 ## Where it stands
 
-- A Shadow of the Past and A Knife in the Dark are playable: every printed line of the cards they deal has an effect record. Flight to the Ford through Breaking of the Fellowship are phases 13 to 16.
+- Four Fellowship scenarios are playable (`src/campaign/playable.ts`): A Shadow of the Past, A Knife in the Dark, Flight to the Ford and The Ring Goes South. Every printed line of the cards they deal has an effect record. Journey in the Dark and Breaking of the Fellowship (phases 15 and 16) are not: their lines are still open (`pnpm effects:open` lists them). Flight to the Ford and The Ring Goes South have their engine half done; their phone halves are open.
+- Every deck-legal player card has effect records too, apart from the Messenger of the King cards (out of scope, `data/overrides.json`) and the Gollum side of Smeagol (21072). The rules engine is split by mechanic family (`src/catalog/families`, `src/rules/families`, `src/effects/authored/families`).
 - The deck builder, the campaign path, the briefing, the table, the resolution screen, and the campaign log exist.
 - The Scenarios tab plays a scenario as a standalone adventure: no campaign card, log, boons or burdens, a scored win, and each game can be resumed, archived, restored or deleted. Only the playable Fellowship scenarios are dealt.
 - Everything is checked offline in Node. No phone check and no Maestro flow has run yet. Phone checks stay open in [docs/phases/STATUS.md](docs/phases/STATUS.md).
@@ -29,9 +30,13 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm lint` | Checks import boundaries. |
 | `pnpm exec tsc --noEmit` | Type-checks. |
 | `pnpm data:check` | Rebuilds `data/` into a temporary directory and fails on any difference. |
-| `pnpm data:sync` | Refreshes the raw sources. It is the only command that uses the network. |
-| `pnpm data:build` | Builds cards, scenarios, rules, and generated effect records from `data/raw`, offline and deterministic. |
+| `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|icons]` | Refreshes the raw sources. It is the only command that uses the network. `scans` runs only when named, after `data:build`. |
+| `pnpm data:build` | Builds cards, scenarios, rules, generated effect records and the game icons from `data/raw`, offline and deterministic. |
 | `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards`, and `rules` in memory. |
+| `pnpm effects:draft <scenario \| starter deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line no effect record owns. |
+| `pnpm effects:open` | Rewrites `src/effects/open-lines.ts`, the printed lines no record owns. |
+| `node --experimental-strip-types scripts/card-smoke.ts <codes>` | Plays a seeded game with the cards' records and reports any throw, refusal or stall. |
+| `pnpm booklets:pack` | Copies the pinned booklet PDFs into `.cache/booklets/` for Metro. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `node --experimental-strip-types scripts/e2e-fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. |
 
@@ -47,10 +52,12 @@ Do not commit `catalog.db`, card scans, or PDFs. The catalog is generated from `
 - [docs/architecture.md](docs/architecture.md): how the code is split, and the test layers.
 - [docs/design-system.md](docs/design-system.md): the screens' look.
 - [docs/phases/](docs/phases/): one file per phase, and [STATUS.md](docs/phases/STATUS.md).
+- [docs/plans/](docs/plans/): plans, among them [effect-authoring.md](docs/plans/effect-authoring.md), the cookbook for effect records and mechanic families.
+- [docs/handover/](docs/handover/): where the mechanic-family work stands, and [agent-brief.md](docs/handover/agent-brief.md), the brief a family agent follows.
 
 ## Agents
 
-`/implementer` builds a phase, `/reviewer` reviews the diff, and `/ux` reviews the screens. `effect-author` turns a `pnpm effects:draft` bundle into effect records. Their instructions are in `.cursor/agents` (`effect-author` is in `.claude/agents` only).
+`/implementer` builds a phase, `/reviewer` reviews the diff, and `/ux` reviews the screens. `effect-author` turns a `pnpm effects:draft` bundle into effect records. The instructions of the first three are in `.cursor/agents`, with thin wrappers in `.claude/agents`; `effect-author` is in `.claude/agents` only.
 
 ## Run it locally
 
