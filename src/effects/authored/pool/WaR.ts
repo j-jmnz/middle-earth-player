@@ -11,7 +11,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"22003:action:1","cardCode":"22003","lines":["22003:A:2"],"timing":"action","instructions":[{"verb":"Draw","amount":4,"when":{"kind":"threat","max":30}},{"verb":"Draw","amount":1,"when":{"kind":"threat","min":31,"max":39}},{"verb":"SetThreat","value":40}]},
   // 22005 Tom Bombadillo! (line 2 shuffles in a copy of Tom Bombadil set aside by the Encounter keyword: open).
   {"id":"22005:constant:1","cardCode":"22005","lines":["22005:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"all","conditions":[{"kind":"count","pick":{"type":"hero","control":"you","trait":"Hobbit"},"min":1},{"kind":"inVictory","code":"22005","is":false}]}}]},
-  // 22006 Durin's Axe (lines 1 and 2 both print Guarded, which is open).
+  // 22006 Durin's Axe (lines 1 and 2 both print Guarded, which is no longer open).
   {"id":"22006:response:1","cardCode":"22006","lines":["22006:A:3"],"timing":"response","trigger":"attackDestroyed","subject":"host","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","engaged":"you"}},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","engaged":"you"}},{"verb":"DamageCard","amount":1}]},
   // 22008 Silver Circlet
   {"id":"22008:constant:1","cardCode":"22008","lines":["22008:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","sphere":"spirit"},"limitPerHost":true},{"verb":"ModifyStat","stat":"willpower","amount":2,"until":"whileSourceInPlay","target":"host"}]},

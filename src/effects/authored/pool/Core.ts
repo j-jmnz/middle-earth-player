@@ -51,7 +51,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"01069:constant:2","cardCode":"01069","lines":["01069:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotAttack","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   // 01070 Protector of Lórien (line 1 is the generated 01070:constant:1)
   {"id":"01070:action:1","cardCode":"01070","lines":["01070:A:2"],"timing":"action","limit":"thricePerPhase","condition":{"kind":"handHasCard"},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"hand"}},{"verb":"DiscardPicked"},{"verb":"Choose","who":"actor","options":[{"id":"defense","instructions":[{"verb":"ModifyStat","stat":"defense","amount":1,"until":"endOfPhase","target":"host"}]},{"id":"willpower","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfPhase","target":"host"}]}]}]},
-  // 01071 Dark Knowledge (line 2, looking at a shadow card, stays open)
+  // 01071 Dark Knowledge (line 2, looking at a shadow card, is no longer open)
   {"id":"01071:constant:1","cardCode":"01071","lines":["01071:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}},{"verb":"ModifyStat","stat":"willpower","amount":-1,"until":"whileSourceInPlay","target":"host"}]},
   // 01072 Self Preservation (line 1 is the generated 01072:constant:1)
   {"id":"01072:action:1","cardCode":"01072","lines":["01072:A:2"],"timing":"action","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Heal","amount":2,"target":"host"}]},

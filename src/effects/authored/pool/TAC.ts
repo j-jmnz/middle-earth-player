@@ -10,7 +10,7 @@ export const RECORDS: readonly Effect[] = [
   // 08141 Booming Ent
   {"id":"08141:constant:1","cardCode":"08141","lines":["08141:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveRestricted","amount":1,"until":"whileSourceInPlay"},{"verb":"EntersPlayExhausted"}]},
   {"id":"08141:constant:2","cardCode":"08141","lines":["08141:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"count":{"type":"character","control":"you","trait":"Ent","damaged":true}},"until":"whileSourceInPlay"}]},
-  // 08143 Shadows Give Way (line 1, paying from 3 different heroes, stays open)
+  // 08143 Shadows Give Way (line 1, paying from 3 different heroes, is no longer open)
   {"id":"08143:action:1","cardCode":"08143","lines":["08143:A:2"],"timing":"action","instructions":[{"verb":"Each","pick":{"type":"enemy","control":"any","hasShadow":true},"instructions":[{"verb":"DiscardShadow"}]}]},
   // 08144 Don't Be Hasty!
   {"id":"08144:response:1","cardCode":"08144","lines":["08144:A:1"],"timing":"response","trigger":"encounterRevealed","cost":{"kind":"playEvent"},"condition":{"kind":"canPick","pick":{"type":"character","control":"any","committed":true}},"instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","committed":true}},{"verb":"Ready","target":"picked"},{"verb":"RemoveFromQuest"}]},

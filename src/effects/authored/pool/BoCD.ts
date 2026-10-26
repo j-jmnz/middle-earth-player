@@ -3,7 +3,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // Records for the BoCD player cards whose lines no template reads (data/cards/BoCD.json). An id here that a template also
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
-  // 10115 Amarthiúl. Line 1 (a hero gaining a resource icon itself) stays open: GrantIcon is read from attachments only.
+  // 10115 Amarthiúl. Line 1 (a hero gaining a resource icon itself) is the record 10115:constant:1 in families/costs.ts.
   {"id":"10115:constant:2","cardCode":"10115","lines":["10115:A:2"],"timing":"constant","condition":{"kind":"count","pick":{"type":"enemy","control":"any","engaged":"you"},"min":2},"instructions":[{"verb":"ModifyStat","stat":"extraResource","amount":1,"until":"whileSourceInPlay"}]},
   // 10116 Guardian of Arnor (line 1 is the Sentinel keyword)
   {"id":"10116:constant:1","cardCode":"10116","lines":["10116:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":{"count":{"type":"enemy","control":"any","engaged":"you"}},"until":"whileSourceInPlay"}]},

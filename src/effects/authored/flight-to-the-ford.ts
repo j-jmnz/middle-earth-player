@@ -21,7 +21,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 141056 Flight to the Ford (the campaign card, in the game beside the quest deck). Any player may cancel an attack by shuffling
   // the top card of the burden deck into the encounter deck, as many times as there are burden cards and attacks. Its back (B:1)
-  // is the generated-in-phase-12 record 141056:resolution:1.
+  // is the record 141056:resolution:1 in fellowship-of-the-ring.ts.
   {"id":"141056:response:1","cardCode":"141056","lines":["141056:A:2"],"timing":"response","trigger":"enemyAttacks","subject":{"type":"enemy","control":"any"},"anyPlayer":true,"condition":{"kind":"burdenDeck"},"instructions":[{"verb":"MoveBurden","to":"encounterShuffle"},{"verb":"CancelAttack"}]},
 
   // 141057 An Evil Wound: attached to the Ring-bearer, who cannot be healed and takes damage as a loss of life (A:3 is inert).

@@ -22,7 +22,7 @@ export const RECORDS: readonly Effect[] = [
   // carries the same play restriction as its condition.
   {"id":"16008:constant:1","cardCode":"16008","lines":["16008:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":NOBLE_AND_SCOUT}]},
   {"id":"16008:response:1","cardCode":"16008","lines":["16008:A:2"],"timing":"response","trigger":"engaged","cost":{"kind":"playEvent"},"condition":NOBLE_AND_SCOUT,"instructions":[{"verb":"LowerThreat","amount":{"stat":"threat","of":"subject","printed":true},"who":"eventSeat"}]},
-  // 16010 Dwarven Shield (line 3, after damage from an enemy attack, is open)
+  // 16010 Dwarven Shield (line 3, after damage from an enemy attack, is no longer open)
   {"id":"16010:constant:2","cardCode":"16010","lines":["16010:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   // 16011 Mirkwood Long-knife
   {"id":"16011:constant:2","cardCode":"16011","lines":["16011:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"}]},

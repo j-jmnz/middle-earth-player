@@ -3,7 +3,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // Records for the ToS player cards whose lines no template reads (data/cards/ToS.json). An id here that a template also
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
-  // 143001 Aragorn (A:1, the first player gaining control, is open)
+  // 143001 Aragorn (A:1, the first player gaining control, is no longer open)
   {"id":"143001:action:1","cardCode":"143001","lines":["143001:A:2"],"timing":"action","cost":{"kind":"resources","amount":2,"from":"self"},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"Ready","target":"picked"}]},
   // 143003 Treebeard
   {"id":"143003:constant:1","cardCode":"143003","lines":["143003:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveRestricted","amount":1,"until":"whileSourceInPlay"}]},
@@ -24,7 +24,7 @@ export const RECORDS: readonly Effect[] = [
   // 143009 Ent Draught: A:2 is the generated 143009:constant:1, so A:1 and A:3 take the next numbers.
   {"id":"143009:constant:2","cardCode":"143009","lines":["143009:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"count","pick":{"type":"character","control":"you","trait":"Ent"},"min":1}}]},
   {"id":"143009:constant:3","cardCode":"143009","lines":["143009:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"hitPoints","amount":2,"until":"whileSourceInPlay","target":"host"}]},
-  // 143010 Herugrim (A:2, a cost reduction that depends on the host, is open)
+  // 143010 Herugrim (A:2, a cost reduction that depends on the host, is no longer open)
   {"id":"143010:response:1","cardCode":"143010","lines":["143010:A:3"],"timing":"response","trigger":"declaredAttacker","subject":"host","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"stat":"willpower","of":"host"},"until":"endOfAttack","target":"host"}]},
   // 143011 Entmoot: "any number" is a take-or-leave choice for each Ent card among the top 5.
   {"id":"143011:constant:1","cardCode":"143011","lines":["143011:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"count","pick":{"type":"character","control":"you","trait":"Ent"},"min":1}}]},
@@ -32,7 +32,7 @@ export const RECORDS: readonly Effect[] = [
     {"verb":"Each","pick":{"type":"card","control":"you","from":"deck","top":5,"trait":"Ent"},"instructions":[
       {"verb":"Choose","who":"actor","options":[{"id":"take","instructions":[{"verb":"MovePicked","to":"hand"}]},{"id":"leave","instructions":[]}]}]},
     {"verb":"ShuffleDeck"}]},
-  // 143012 Helm! Helm! (A:1, the play timing after the enemy attacks step, is open)
+  // 143012 Helm! Helm! (A:1, the play timing after the enemy attacks step, is no longer open)
   {"id":"143012:action:1","cardCode":"143012","lines":["143012:A:2"],"timing":"action","condition":{"kind":"phase","is":"Combat"},"instructions":[
     {"verb":"Pick","pick":{"type":"ally","control":"you","trait":"Rohan","state":"ready"}},
     {"verb":"Exhaust","target":{"kind":"picked"}},

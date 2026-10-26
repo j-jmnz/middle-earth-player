@@ -101,7 +101,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"141030:resolution:1","cardCode":"141030","lines":["141030:B:1"],"timing":"resolution","instructions":[{"verb":"ChooseCards","codes":["141078","141079"],"who":"firstPlayer","to":"pool"},{"verb":"ChooseCards","codes":["141077","141017"],"who":"firstPlayer","to":"pool"}]},
   // 141044 A Knife in the Dark
   {"id":"141044:resolution:1","cardCode":"141044","lines":["141044:B:1"],"timing":"resolution","instructions":[{"verb":"ChooseCards","codes":["141018","141019","141020","141021"],"who":"eachSeat","to":"hero","optional":true}]},
-  // 141056 Flight to the Ford (its front Response line is the scenario 3 engine half, phase 13)
+  // 141056 Flight to the Ford (its front Response, 141056:A:2, is in flight-to-the-ford.ts)
   {"id":"141056:resolution:1","cardCode":"141056","lines":["141056:B:1"],"timing":"resolution","instructions":[{"verb":"EarnAllBurdens"}]},
   // 142019 The Ring Goes South
   {"id":"142019:campaignSetup:1","cardCode":"142019","lines":["142019:A:2"],"timing":"campaignSetup","instructions":[{"verb":"WaiveThreatPenalty"},{"verb":"ChooseCards","codes":["142011","142012","142013","142014"],"who":"eachSeat","to":"hand","leftover":"firstPlayerDeck"}]},

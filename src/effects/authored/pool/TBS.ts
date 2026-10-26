@@ -10,7 +10,7 @@ export const RECORDS: readonly Effect[] = [
   // 17084 Defender of Cair Andros. Valour: while your threat is 40 or higher. The attacking enemy is the event's other card.
   {"id":"17084:constant:1","cardCode":"17084","lines":["17084:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":{"threat":"tens","limit":4},"until":"whileSourceInPlay"}]},
   {"id":"17084:response:1","cardCode":"17084","lines":["17084:A:2"],"timing":"response","trigger":"declaredDefender","subject":"self","condition":{"kind":"threat","min":40},"instructions":[{"verb":"DamageCard","amount":1,"target":"other"}]},
-  // 17085 Oath of Eorl (its Response, 17085:A:2, is open). "A unique Rohan and another unique Gondor character": one of each,
+  // 17085 Oath of Eorl (its Response, 17085:A:2, is no longer open). "A unique Rohan and another unique Gondor character": one of each,
   // and two different cards among them.
   {"id":"17085:constant:1","cardCode":"17085","lines":["17085:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"all","conditions":[{"kind":"count","pick":{"type":"character","control":"you","unique":true,"trait":"Rohan"},"min":1},{"kind":"count","pick":{"type":"character","control":"you","unique":true,"trait":"Gondor"},"min":1},{"kind":"count","pick":{"type":"character","control":"you","unique":true,"traits":["Rohan","Gondor"]},"min":2}]}}]},
   // 17086 Fearless Scout

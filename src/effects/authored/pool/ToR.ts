@@ -6,7 +6,7 @@ export const RECORDS: readonly Effect[] = [
   // 10084 Erestor. The 3 extra cards are drawn with the resource phase's draw.
   {"id":"10084:constant:1","cardCode":"10084","lines":["10084:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"extraDraw","amount":3,"until":"whileSourceInPlay","target":"actorSeat"}]},
   {"id":"10084:triggered:1","cardCode":"10084","lines":["10084:A:2"],"timing":"triggered","trigger":"endOfRound","instructions":[{"verb":"Each","pick":{"type":"card","control":"you","from":"hand"},"instructions":[{"verb":"DiscardPicked"}]}]},
-  // 10086 Send for Aid (a player side quest: line 2 is open)
+  // 10086 Send for Aid (a player side quest: line 2 is no longer open)
   {"id":"10086:constant:1","cardCode":"10086","lines":["10086:A:1"],"timing":"constant","instructions":[{"verb":"DeckLimit","copies":1}]},
   // 10087 Elven Spear
   {"id":"10087:constant:1","cardCode":"10087","lines":["10087:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","traits":["Noldor","Silvan"]}]}]},

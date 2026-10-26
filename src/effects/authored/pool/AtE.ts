@@ -12,7 +12,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"10056:action:1","cardCode":"10056","lines":["10056:A:1"],"timing":"action","instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","cardType":"player-side-quest"}},{"verb":"MovePicked","to":"hand"},{"verb":"ShuffleDeck"}]},
   // 10057 Longbeard Sentry
   {"id":"10057:action:1","cardCode":"10057","lines":["10057:A:1"],"timing":"action","limit":"oncePerPhase","cost":{"kind":"discardDeckTop","amount":2},"instructions":[{"verb":"ModifyStat","stat":"sentinel","amount":1,"until":"endOfPhase"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"endOfPhase"}]},
-  // 10058 Delay the Enemy (a player side quest: lines 1 and 3 are open)
+  // 10058 Delay the Enemy (a player side quest: lines 1 and 3 are no longer open)
   {"id":"10058:constant:1","cardCode":"10058","lines":["10058:A:2"],"timing":"constant","instructions":[{"verb":"DeckLimit","copies":1}]},
   // 10059 Steed of Imladris. With no active location there is nothing to place progress on, so the cost cannot be paid (rr.cost).
   {"id":"10059:constant:1","cardCode":"10059","lines":["10059:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","spheres":["spirit"]},{"type":"hero","control":"any","trait":"Noldor"}]}]},

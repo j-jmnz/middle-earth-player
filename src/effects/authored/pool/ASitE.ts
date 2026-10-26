@@ -14,9 +14,9 @@ export const RECORDS: readonly Effect[] = [
     {"verb":"Engage","target":"picked"},
     {"verb":"DamageCard","amount":2,"target":"picked","when":{"kind":"not","condition":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","hasAttachment":{}}}}},
     {"verb":"DamageCard","amount":4,"target":"picked","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","hasAttachment":{}}}}]},
-  // 21008 Put Off Pursuit (line 2, discarding encounter cards until a location, is open)
+  // 21008 Put Off Pursuit (line 2, discarding encounter cards until a location, is no longer open)
   {"id":"21008:constant:1","cardCode":"21008","lines":["21008:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"activeLocation"},"limitPerHost":true},{"verb":"ModifyStat","stat":"questPoints","amount":2,"until":"whileSourceInPlay","target":"host"}]},
-  // 21072 Sméagol, side A (the Setup on a hero, and side B, are open)
+  // 21072 Sméagol, side A (side B is open: its enemy stats are in no source, src/effects/open-lines.ts)
   {"id":"21072:constant:1","cardCode":"21072","lines":["21072:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"21072:response:1","cardCode":"21072","lines":["21072:A:3"],"timing":"response","trigger":"traveled","subject":{"type":"location","control":"any"},"cost":{"kind":"raiseThreat","amount":1},"instructions":[{"verb":"Draw","amount":1}]},
 ];

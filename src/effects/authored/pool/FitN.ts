@@ -5,7 +5,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 export const RECORDS: readonly Effect[] = [
   // 19057 The Elvenking: returning the Silvan ally is part of the cost.
   {"id":"19057:action:1","cardCode":"19057","lines":["19057:A:2"],"timing":"action","cost":{"kind":"exhaustSelf"},"condition":{"kind":"canPick","pick":{"type":"ally","control":"you","trait":"Silvan"}},"instructions":[{"verb":"Pick","pick":{"type":"ally","control":"you","trait":"Silvan"}},{"verb":"ReturnToHand","target":"picked"},{"verb":"Ready","target":"host"}]},
-  // 19058 Orcrist: an attack the attached hero makes destroys the enemy (line 1, Guarded, is open).
+  // 19058 Orcrist: an attack the attached hero makes destroys the enemy (line 1, Guarded, is no longer open).
   {"id":"19058:response:1","cardCode":"19058","lines":["19058:A:4"],"timing":"response","trigger":"attackDestroyed","subject":"host","instructions":[{"verb":"AddResources","amount":1,"to":"host"}]},
   // 19060 Leather Boots
   {"id":"19060:constant:1","cardCode":"19060","lines":["19060:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"},"hosts":[{"type":"character","control":"any","spheres":["lore"]},{"type":"character","control":"any","trait":"Ranger"}],"limitPerHost":true}]},

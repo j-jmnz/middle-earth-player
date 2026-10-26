@@ -11,7 +11,7 @@ export const RECORDS: readonly Effect[] = [
   // 19028 Ancestral Armor: "Limit 1 per character" is part of where it may be attached.
   {"id":"19028:constant:1","cardCode":"19028","lines":["19028:A:1","19028:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"character","control":"any","spheres":["leadership"]},{"type":"character","control":"any","trait":"Noble"}],"limitPerHost":true}]},
   {"id":"19028:constant:2","cardCode":"19028","lines":["19028:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":2,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"hitPoints","amount":2,"until":"whileSourceInPlay","target":"host"}]},
-  // 19029 Glamdring (line 1, Guarded, is open).
+  // 19029 Glamdring (line 1, Guarded, is no longer open).
   {"id":"19029:constant:1","cardCode":"19029","lines":["19029:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any"},{"type":"character","control":"any","names":["Gandalf"]}]}]},
   {"id":"19029:constant:2","cardCode":"19029","lines":["19029:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"whileSourceInPlay","target":"host"}]},
   {"id":"19029:response:1","cardCode":"19029","lines":["19029:A:4"],"timing":"response","trigger":"attackDestroyed","subject":"host","instructions":[{"verb":"Draw","amount":1}]},
@@ -21,7 +21,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"19031:response:2","cardCode":"19031","lines":["19031:A:2"],"timing":"response","trigger":"leftPlay","subject":"self","condition":{"kind":"canPick","pick":{"type":"location","control":"any"}},"instructions":[{"verb":"Pick","pick":{"type":"location","control":"any"}},{"verb":"PlaceProgressOn","amount":2,"target":"picked"}]},
   // 19033 Wild Stallion (line 2 attaches the ally to an ally: open).
   {"id":"19033:constant:1","cardCode":"19033","lines":["19033:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
-  // 19035 Eagle of the North (lines 1 and 3, the Encounter keyword and its When Revealed, are open).
+  // 19035 Eagle of the North (lines 1 and 3, the Encounter keyword and its When Revealed, are no longer open).
   {"id":"19035:constant:1","cardCode":"19035","lines":["19035:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveRestricted","amount":1,"until":"whileSourceInPlay"}]},
 ];
 

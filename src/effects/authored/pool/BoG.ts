@@ -7,7 +7,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"06107:action:1","cardCode":"06107","lines":["06107:A:1"],"timing":"action","limit":"oncePerGame","cost":{"kind":"discardSelf"},"instructions":[{"verb":"Repeat","times":{"count":{"type":"hero","control":"you","printedIcon":"spirit","other":true}},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"discard","cardType":"ally","sphere":"spirit","intoPlay":true}},{"verb":"MovePicked","to":"play"}]}]},
   // 06108 Squire of the Citadel
   {"id":"06108:response:1","cardCode":"06108","lines":["06108:A:1"],"timing":"response","trigger":"leftPlay","subject":"self","instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any","trait":"Gondor"}},{"verb":"AddResources","amount":1,"to":"picked"}]},
-  // 06109 Tome of Atanatar (line 3, playing an event from the discard pile, is open)
+  // 06109 Tome of Atanatar (line 3, playing an event from the discard pile, is no longer open)
   {"id":"06109:constant:2","cardCode":"06109","lines":["06109:A:2"],"timing":"constant","instructions":[{"verb":"ReduceCost","amount":{"count":{"type":"hero","control":"you","printedIcon":"leadership"}}}]},
   // 06110 Guthlaf
   {"id":"06110:constant:1","cardCode":"06110","lines":["06110:A:1"],"timing":"constant","instructions":[{"verb":"ReduceCost","amount":1,"when":{"kind":"count","pick":{"type":"hero","control":"any","trait":"Rohan"},"min":1}}]},
