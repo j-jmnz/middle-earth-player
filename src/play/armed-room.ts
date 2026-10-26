@@ -9,6 +9,11 @@ export const MIN_LINES = 2;
 export const MAX_LINES = 4;
 // The bar that runs down under the text (2 pt) and its gap, reserved whether or not a button is armed.
 export const BAR_PX = 4;
+// On a short phone's dock (under 400 pt tall) the bar's reserve is 2 pt: the bar itself is 2.
+export const BAR_DENSE_PX = 2;
+// The words a sheet's armed line leads with; a dense dock drops them when that saves a line (`armedWords`): the line is gold and
+// a bar runs down under the button, so it is plainly the second tap, and a screen reader still hears the full line.
+export const LEAD = "Tap again: ";
 
 /** How many lines a greedy word wrap of `text` takes at `chars` characters a line. */
 export function lineCount(text: string, chars: number = CHARS_PER_LINE): number {
@@ -31,6 +36,16 @@ export function armedLines(texts: readonly (string | null)[], chars: number = CH
 }
 
 /** The height of the armed line's room, the bar's reserve included. */
-export function armedRoom(lines: number): number {
-  return lines * LINE_PX + BAR_PX;
+export function armedRoom(lines: number, dense = false): number {
+  return lines * LINE_PX + (dense ? BAR_DENSE_PX : BAR_PX);
+}
+
+/**
+ * The armed line as the dense dock draws it: without its "Tap again: " lead-in when that takes a line off, so a caution that names
+ * a loss ("Eagles of the Misty Mountains falls and the game is lost") is still in full. Otherwise the words as they are.
+ */
+export function armedWords(text: string, dense: boolean, chars: number = CHARS_PER_LINE): string {
+  if (!dense || !text.startsWith(LEAD)) return text;
+  const short = text.slice(LEAD.length);
+  return lineCount(short, chars) < lineCount(text, chars) ? short : text;
 }

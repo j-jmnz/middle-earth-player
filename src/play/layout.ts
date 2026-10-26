@@ -100,6 +100,22 @@ export function cardSize(width: number, height: number): { w: number; h: number 
 
 export const MIN_TARGET = 44;
 
+/**
+ * The encounter deck and its discard pile at the right end of staging, for a canvas `width` wide whose card size is that of
+ * `height` (the table's height less the bottom inset); `gap` is how far the rightmost pile's right edge stands from the canvas's
+ * right edge (the choice tray's reach stops short of it: tray-logic.ts).
+ */
+export function encounterPiles(width: number, height: number): { rects: { encounterDeck: Rect; encounterDiscard: Rect }; gap: number } {
+  const card = cardSize(width, height);
+  const half = Math.floor((Math.round(card.w * LEFT) - GAP) / 2);
+  const pile = { w: half, h: Math.round(half * ASPECT) };
+  const x = width - GUTTER - (2 * pile.w + GAP);
+  const y = GUTTER + Math.round((card.h - pile.h) / 2);
+  const encounterDeck: Rect = { x, y, w: pile.w, h: pile.h };
+  const encounterDiscard: Rect = { x: x + pile.w + GAP, y, w: pile.w, h: pile.h };
+  return { rects: { encounterDeck, encounterDiscard }, gap: width - (encounterDiscard.x + encounterDiscard.w) };
+}
+
 /** The size of a hand card: the table's card, narrowed so `count` cards overlap by no more than leaves 44 pt of each. */
 export function handCardSize(card: { w: number; h: number }, width: number, count: number): { w: number; h: number } {
   if (count <= 1) return card;
@@ -273,9 +289,7 @@ export function tableLayout(
   // The encounter deck and its discard pile at the right end of staging.
   const encounterW = 2 * pile.w + GAP;
   const staging: Rect = { x: centerX, y: stagingY, w: Math.max(card.w, centerW - encounterW - GAP), h: card.h };
-  const pileY = stagingY + Math.round((card.h - pile.h) / 2);
-  const encounterDeck: Rect = { x: width - GUTTER - encounterW, y: pileY, w: pile.w, h: pile.h };
-  const encounterDiscard: Rect = { x: encounterDeck.x + pile.w + GAP, y: pileY, w: pile.w, h: pile.h };
+  const { encounterDeck, encounterDiscard } = encounterPiles(width, height - bottom).rects;
 
   // The left column: the quest card (sideways) level with staging, the active location level with the engagement area, the
   // player's deck and discard pile level with the play area.

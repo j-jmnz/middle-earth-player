@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { openReading, type Reading } from "./reading.ts";
 import type { MultiSheet, PickSheet, TriggerSheet } from "./sheet-types.ts";
 import type { Choice } from "./table-choice.ts";
-import { outsideLayers, tapRoute, TRAY_MAX, TRAY_REACH, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
+import { cardSize, encounterPiles } from "./layout.ts";
+import { outsideLayers, reachInto, tapRoute, TRAY_MAX, TRAY_REACH, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
 
 // The choice tray (docs/design-system.md, Table; phase 21): its tiles, its count, what a tap outside it does, and where it sits
 // against the command column and the dock. No rule is implemented here.
@@ -111,18 +112,49 @@ describe("the outside tap", () => {
 describe("where the tray sits", () => {
   const phone = (width: number, height: number, anchorTop: number, insetRight = 0) => {
     const commandWidth = Math.round(Math.min(280, Math.max(210, width * 0.3)));
-    return { commandWidth, box: trayBox({ commandWidth, insetRight, screenWidth: width, screenHeight: height, barBottom: 44, anchorTop }) };
+    const canvas = width - insetRight * 2 - commandWidth;
+    const pileGap = encounterPiles(canvas, height - 44).gap;
+    return { commandWidth, box: trayBox({ commandWidth, insetRight, screenWidth: width, screenHeight: height, barBottom: 44, anchorTop, pileGap }) };
   };
 
-  it("is the command column's width plus 40 pt into the canvas on a wide phone, at most 340", () => {
+  it("is the command column's width at 844, because the encounter discard stands 8 pt from the canvas's edge: the reach is clamped to 0", () => {
     expect(phone(844, 390, 200).commandWidth).toBe(253);
-    expect(phone(844, 390, 200).box).toMatchObject({ width: 293, overlap: TRAY_REACH });
+    expect(phone(844, 390, 200).box).toMatchObject({ width: 253, overlap: 0 });
+    expect(phone(844, 390, 200, 47).box.overlap).toBe(0);
     const wide = phone(1100, 500, 300);
     expect(wide.commandWidth).toBe(280);
     expect(wide.box.width).toBeLessThanOrEqual(TRAY_MAX);
+    expect(wide.box.overlap).toBe(0);
   });
 
-  it("reaches no further than the command column under 720 pt wide, so the encounter discard stays in view", () => {
+  it("clamps the reach to PILE_CLEAR short of the rightmost pile, never past TRAY_REACH, and 0 under WIDE", () => {
+    expect(reachInto(844, 8)).toBe(0);
+    expect(reachInto(844, 30)).toBe(22);
+    expect(reachInto(844, 200)).toBe(TRAY_REACH);
+    expect(reachInto(667, 200)).toBe(0);
+  });
+
+  it("covers neither encounter pile with the tray open, at 844x390 and 667x375, notch or not", () => {
+    for (const [width, height] of [[844, 390], [667, 375]] as const) {
+      for (const inset of [0, 47]) {
+        const { box, commandWidth } = phone(width, height, 200, inset);
+        const canvas = width - 2 * inset - commandWidth;
+        const piles = encounterPiles(canvas, height - 44).rects;
+        const trayLeft = canvas + commandWidth - box.width;
+        for (const rect of [piles.encounterDeck, piles.encounterDiscard]) expect(rect.x + rect.w, `${width} inset ${inset}`).toBeLessThanOrEqual(trayLeft);
+      }
+    }
+  });
+
+  it("is why the reach gives way: reserving it (+8 pt) in the canvas's right gutter shrinks the cards on a notched 844 (56 to 52), and costs nothing only without insets", () => {
+    const at = (width: number, height: number, inset: number, reserve: number) => cardSize(width - 2 * inset - Math.round(Math.min(280, Math.max(210, width * 0.3))) - reserve, height - 44).w;
+    expect(at(844, 390, 0, 0)).toBe(56);
+    expect(at(844, 390, 0, TRAY_REACH + 8)).toBe(56);
+    expect(at(844, 390, 47, 0)).toBe(56);
+    expect(at(844, 390, 47, TRAY_REACH + 8)).toBe(52);
+  });
+
+  it("reaches no further than the command column under 720 pt wide", () => {
     expect(phone(667, 375, 200).commandWidth).toBe(210);
     expect(phone(667, 375, 200).box).toMatchObject({ width: 210, overlap: 0 });
   });

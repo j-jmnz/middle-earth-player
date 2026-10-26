@@ -26,6 +26,7 @@ import type { PictureSource } from "./table-canvas-types.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
 import { BAR_PAD, MENU_BUTTON } from "./top-bar-layout.ts";
+import { encounterPiles } from "./layout.ts";
 import { outsideLayers, trayBox } from "./tray-logic.ts";
 import type { TableChoice } from "./use-table-choice.ts";
 
@@ -81,14 +82,14 @@ export function TableLayers({
   const seat = shownSeat(game);
   const close = () => onReading(null);
   const anchor = anchorTop ?? Math.round(screen.height * 0.55);
-  const box = trayBox({ commandWidth, insetRight: insets.right, screenWidth: screen.width, screenHeight: screen.height, barBottom, anchorTop: anchor });
+  const canvas = screen.width - insets.left - insets.right - commandWidth;
+  const box = trayBox({ commandWidth, insetRight: insets.right, screenWidth: screen.width, screenHeight: screen.height, barBottom, anchorTop: anchor, pileGap: encounterPiles(canvas, screen.height - barBottom - insets.bottom).gap });
   const trayShown = choice.panelOpen;
   // The panel layer (everything but the carousel).
   const panel = reading && reading.kind !== "carousel" ? reading : null;
   const held = useHeld(panel);
   const width = Math.max(READING_MIN, box.width);
   const foot = Math.max(insets.bottom, EDGE);
-  const canvas = screen.width - insets.left - insets.right - commandWidth;
   const open = reading?.kind === "carousel";
   const logging = held?.kind === "log";
   const lines = useMemo(() => (logging ? logLines(roundSteps, logNames) : []), [logging, roundSteps, logNames]);
