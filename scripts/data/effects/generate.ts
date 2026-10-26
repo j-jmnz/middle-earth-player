@@ -5,6 +5,7 @@ import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
 import { dealtCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
+import { PLAYER_REQUESTS } from "../printed/scope.ts";
 import { TEMPLATES, type Draft, type TemplateContext } from "./templates.ts";
 
 export type Segment = { card: Card; index: number; side: "front" | "back" | "shadow"; line: string; lineId: string };
@@ -32,10 +33,15 @@ const LABEL_TIMING: ReadonlyMap<string, string> = new Map([
 
 const PHASES = ["Resource", "Planning", "Quest", "Travel", "Encounter", "Combat", "Refresh"] as const;
 
+type Limit = { limit: "oncePerRound" | "oncePerPhase"; times: number };
+
+const TIMES: Readonly<Record<string, number>> = { once: 1, twice: 2 };
+
 // "Combat Action: ..." is an Action that can only be used in that phase's action windows (rr.action). "(Limit once per round.)"
-// ends a line whose ability may be used once a round or a phase (rr.limits). Both are lifted off the line so one template reads
-// the sentence whether or not the card carries them.
-function wrapped(line: string): { line: string; condition: Condition | null; limit: "oncePerRound" | "oncePerPhase" | null } {
+// ends a line whose ability may be used once a round or a phase (rr.limits); some printings drop the parentheses ("Limit once
+// per round.", 01012:A:1) or allow more uses ("Limit 3 times per phase.", 01070:A:2). Both are lifted off the line so one
+// template reads the sentence whether or not the card carries them.
+function wrapped(line: string): { line: string; condition: Condition | null; limit: Limit | null } {
   let rest = line;
   let condition: Condition | null = null;
   const phase = new RegExp(`^(${PHASES.join("|")}) Action: `).exec(rest);
@@ -43,10 +49,11 @@ function wrapped(line: string): { line: string; condition: Condition | null; lim
     condition = { kind: "phase", is: phase[1] as (typeof PHASES)[number] };
     rest = `Action: ${rest.slice(phase[0].length)}`;
   }
-  let limit: "oncePerRound" | "oncePerPhase" | null = null;
-  const limited = /\s*\(Limit once per (round|phase)\.?\)\s*$/.exec(rest);
-  if (limited) {
-    limit = limited[1] === "round" ? "oncePerRound" : "oncePerPhase";
+  let limit: Limit | null = null;
+  const limited = /\s*(\()?Limit (once|twice|\d+ times) per (round|phase)\.?(\))?\s*$/.exec(rest);
+  if (limited && Boolean(limited[1]) === Boolean(limited[4])) {
+    const times = TIMES[limited[2] ?? ""] ?? Number.parseInt(limited[2] ?? "1", 10);
+    limit = { limit: limited[3] === "round" ? "oncePerRound" : "oncePerPhase", times };
     rest = rest.slice(0, limited.index);
   }
   return { line: rest, condition, limit };
@@ -54,10 +61,10 @@ function wrapped(line: string): { line: string; condition: Condition | null; lim
 
 // The phase and the limit go on the record of the Action they were printed on. A record that already has its own condition
 // is not one a wrapper can be added to: the line is left to be authored.
-function withWrapper(drafts: Draft[], condition: Condition | null, limit: "oncePerRound" | "oncePerPhase" | null): Draft[] | null {
+function withWrapper(drafts: Draft[], condition: Condition | null, limit: Limit | null): Draft[] | null {
   if (drafts.some((draft) => draft.timing !== "action")) return null;
   if (condition && drafts.some((draft) => draft.condition)) return null;
-  return drafts.map((draft) => ({ ...draft, ...(condition ? { condition } : {}), ...(limit ? { limit } : {}) }));
+  return drafts.map((draft) => ({ ...draft, ...(condition ? { condition } : {}), ...(limit ? { limit: limit.limit, ...(limit.times > 1 ? { limitTimes: limit.times } : {}) } : {}) }));
 }
 
 function normalize(line: string): string {
@@ -89,7 +96,8 @@ export function segmentsOf(card: Card, ledger: Ledger): Segment[] {
 }
 
 export function generateEffects(cards: readonly Card[], scenarios: readonly ScenarioData[], campaign: CampaignData, ledger: Ledger): Generated {
-  const wanted = new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign)]);
+  // The player's requests (scripts/data/printed/scope.ts) are read by the same templates as the starter cards.
+  const wanted = new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign), ...PLAYER_REQUESTS]);
   const scope = cards.filter((card) => wanted.has(card.code)).sort((a, b) => a.code.localeCompare(b.code));
   const setAside = new Set(scenarios.flatMap((scenario) => scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code)));
   const codeOf = (name: string): string | null => {

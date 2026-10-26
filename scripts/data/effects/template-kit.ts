@@ -43,6 +43,12 @@ export function conditionOf(text: string, context: TemplateContext): Condition |
 export const ATTACK = (amount: number, extra?: { when: Condition }): Instruction => ({ verb: "ModifyStat", stat: "attack", amount, until: "endOfAttack", target: "attacker", ...extra });
 
 export const STATS: Readonly<Record<string, "willpower" | "attack" | "defense" | "threat">> = { Willpower: "willpower", Attack: "attack", Defense: "defense", Threat: "threat" };
+
+// A printed stat word, hit points included in any case ("+4 Hit Points", 01040:A:2; "+2 hit points", 141019:A:3).
+export function statOf(word: string): "willpower" | "attack" | "defense" | "threat" | "hitPoints" | null {
+  if (/^hit points?$/i.test(word)) return "hitPoints";
+  return STATS[word] ?? null;
+}
 export const SPHERES: Readonly<Record<string, "leadership" | "tactics" | "spirit" | "lore">> = { Leadership: "leadership", Tactics: "tactics", Spirit: "spirit", Lore: "lore" };
 export const OWN = { kind: "sourceIn", zone: "play" } as const;
 export const STAT = (stat: "willpower" | "attack" | "defense" | "threat", amount: number, target: "host" | "self" | "heroes", extra?: { when?: Condition; per?: "hobbitHero" }): Instruction => ({
@@ -55,12 +61,15 @@ export const STAT = (stat: "willpower" | "attack" | "defense" | "threat", amount
 });
 export const HIGH_COST = "an? enemy with an engagement cost higher than your threat";
 
-// "a Hobbit hero", "an Istari character", "the Ring-bearer", "the active location", "Gandalf".
+// "a Hobbit hero", "an Istari character", "the Ring-bearer", "the active location", "Gandalf", "a location", "an enemy engaged
+// with a player".
 export function attachHost(text: string): Extract<Instruction, { verb: "AttachesTo" }>["host"] | null {
   const bare = text.replace(/^(?:an?|the) /, "");
   if (bare === "hero" || bare === "character") return { kind: bare };
   if (bare === "Ring-bearer") return { kind: "ringBearer" };
   if (bare === "active location") return { kind: "activeLocation" };
+  if (bare === "location" && text !== bare) return { kind: "location" };
+  if (bare === "enemy engaged with a player") return { kind: "engagedEnemy" };
   const typed = /^(\w+) (hero|character)$/.exec(bare);
   if (typed?.[1] && typed[2]) return { kind: typed[2] as "hero" | "character", trait: typed[1] };
   if (/^[A-Z][\w']*$/.test(bare) && text === bare) return { kind: "character", name: bare };
