@@ -1,8 +1,9 @@
 // Rules: rr.framework-steps, rr.attack-resolution-chart (data/rules/entries.json; data/rules/steps.json).
 //
-// The turn reference behind the rail: the round as the Rules Reference's framework chart lays it out, phase by phase, each
-// step with its rule title (from data/rules) and what the player decides there, the current step marked, and the action
-// windows the table can stop at or pass (table-settings.ts). The video's "keep a round summary nearby".
+// The turn reference behind the rail (the phase carousel, carousel.ts, lays it out): the round as the Rules Reference's framework
+// chart lays it out, phase by phase, each step with its rule title (from data/rules) and what the player decides there, the
+// current step marked, and the action windows the table can stop at or pass (table-settings.ts). The
+// video's "keep a round summary nearby".
 import steps from "../../data/rules/steps.json";
 
 import type { ModeName, ScenarioState } from "../rules/state.ts";

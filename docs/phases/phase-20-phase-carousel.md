@@ -60,7 +60,7 @@ The middle of the top bar shows where the round is. A tap opens a strip of the r
 
 ## E2E
 
-Update the flows that assert `rail-current`, which is kept. Add a step to `.maestro/table-menu.yaml`: tap `rail`, assert `carousel-phase-quest`, tap outside, assert the strip is gone.
+Update the flows that assert `rail-current`, which is kept. Add a step to `.maestro/table-menu.yaml`: tap `rail`, assert `carousel-phase-quest`, tap outside, assert the strip is gone. (As built it asserts `carousel-phase-combat` and `rail-phase` "Combat": the flow's lost fixture is parked in the Combat phase, not Quest.)
 
 ## Exit
 

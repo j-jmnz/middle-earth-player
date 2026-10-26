@@ -2,10 +2,27 @@
 // rr.engagement-check, rr.combat-phase, rr.refresh-phase (data/rules/entries.json).
 //
 // The phase rail names, in words, the step the engine is in, with the step before and the step after. It reads the
-// engine's mode and nothing else, so it cannot skip a step the engine runs. It is not a control.
+// engine's mode and phase and nothing else, so it cannot skip a step the engine runs. The pill also names the phase and the
+// phases beside it (carousel.ts lays the whole round out for the strip a tap on the pill opens).
 import type { ModeName, ScenarioState } from "../rules/state.ts";
 
-export type Rail = { previous: string; current: string; next: string; phase: string; round: number };
+// `phase` is the word the pill shows over the step ("" when there is none: Setup, Mulligan); `previousPhase` and `nextPhase` are
+// the phases beside it in the round ("" before the first). `previous` and `next` are the steps beside the step.
+export type Rail = { previous: string; current: string; next: string; phase: string; round: number; previousPhase: string; nextPhase: string };
+
+/** The round's seven phases in order (steps.json; the carousel's cards). Beginning of round and End of round are not phases of play. */
+export const ROUND_PHASES: readonly string[] = ["Resource", "Planning", "Quest", "Travel", "Encounter", "Combat", "Refresh"];
+
+// Where the game is among ROUND_PHASES: -1 before the Resource phase (setup, the mulligan, the beginning of the round), the
+// phase's index inside the round, and ROUND_PHASES.length once the round has ended.
+export function phaseIndex(game: ScenarioState): number {
+  const at = ROUND_PHASES.indexOf(game.phase);
+  if (at >= 0) return at;
+  return game.phase === "End of round" ? ROUND_PHASES.length : -1;
+}
+
+// The pill's word for the phase: steps.json names the two outside the seven "Beginning" and "End".
+const PILL_PHASE: Readonly<Record<string, string>> = { "Beginning of round": "Beginning", "End of round": "End", Setup: "", Mulligan: "" };
 
 // The round in the order the engine runs it (Learn to Play, Rules Reference framework steps).
 const ROUND: readonly ModeName[] = [
@@ -53,7 +70,14 @@ export const STEP_WORDS: Readonly<Record<ModeName, string>> = {
 
 /** The rail for a state: the engine's step in words, the one before and the one after; Victory or Defeat once it is over. */
 export function railFor(game: ScenarioState): Rail {
-  const base = { phase: game.phase, round: game.round };
+  const phaseAt = phaseIndex(game);
+  const count = ROUND_PHASES.length;
+  const base = {
+    phase: PILL_PHASE[game.phase] ?? game.phase,
+    round: game.round,
+    previousPhase: phaseAt < 0 ? "" : (ROUND_PHASES[(Math.min(phaseAt, count) + count - 1) % count] ?? ""),
+    nextPhase: ROUND_PHASES[phaseAt >= count ? 0 : (phaseAt + 1) % count] ?? "",
+  };
   if (game.lost) return { ...base, previous: STEP_WORDS[game.mode], current: "Defeat", next: "" };
   if (game.stageCleared) return { ...base, previous: STEP_WORDS[game.mode], current: "Victory", next: "Resolution" };
   if (game.mode === "afterOpening" || game.mode === "mulligan") {

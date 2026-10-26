@@ -31,3 +31,9 @@ export const tableTokens = {
 } as const;
 
 export type TableToken = keyof typeof tableTokens;
+
+/** A token at some opacity, so the palette drift test covers tints too (`#RRGGBB` in, `rgba(...)` out). */
+export function withAlphaHex(hex: string, alpha: number): string {
+  const value = Number.parseInt(hex.slice(1), 16);
+  return `rgba(${(value >> 16) & 255},${(value >> 8) & 255},${value & 255},${alpha})`;
+}

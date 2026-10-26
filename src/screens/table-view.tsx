@@ -22,8 +22,9 @@ import { TableCanvas } from "../play/table-canvas";
 import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
 import { threatLine } from "../play/table-chrome";
 import { MomentBanner, TableDock } from "../play/table-dock";
-import { LogPanel, PileList, ReferencePanel, SidePanel, ThreatPanel } from "../play/table-panel";
-import { turnReference } from "../play/reference";
+import { LogPanel, PileList, SettingsPanel, SidePanel, ThreatPanel } from "../play/table-panel";
+import { PhaseCarousel } from "../play/phase-carousel";
+import { phaseCarousel } from "../play/carousel";
 import { tableSettings } from "../play/table-settings";
 import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
@@ -83,8 +84,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const [menuOpen, setMenuOpen] = useState(false);
   // The card preview closes with its own animation; the Back layers call it through this (back.ts).
   const previewClose = useRef<(() => void) | null>(null);
-  // A reading panel over the table's right side: the threat panel (a tap on a dial) for a seat.
-  const [reading, setReading] = useState<{ kind: "threat"; seat: number } | { kind: "reference" } | null>(null);
+  // The one reading layer over the table: the threat panel (a tap on a dial) for a seat, the phase carousel (a tap on the rail) or
+  // the table settings (the menu's row). Opening one closes another.
+  const [reading, setReading] = useState<{ kind: "threat"; seat: number } | { kind: "carousel" } | { kind: "settings" } | null>(null);
   const settings = useStore(tableSettings, (state) => state.settings);
   const look = useMemo(() => ({ contrast: settings.highContrast }), [settings.highContrast]);
   const [pile, setPile] = useState<PileId | null>(null);
@@ -120,6 +122,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     return slotNumbers(now, ctx, cardId, shownSeat(now));
   }, [store, ctx]);
   const rail = useMemo(() => railFor(game), [game]);
+  const carousel = useMemo(() => phaseCarousel(game, { stopsOn: settings.stopsOn, stops: settings.stops }, ruleTitle), [game, settings.stopsOn, settings.stops]);
   const logNames: LogNames = useMemo(
     () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => ctx.effects.find((effect) => effect.id === effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
     [names, nameOf, ctx],
@@ -144,7 +147,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           router.push({ pathname: "/booklet/[id]", params: nav.booklet });
           return;
         case "settings":
-          setReading({ kind: "reference" });
+          setReading({ kind: "settings" });
           return;
         default: {
           const unreachable: never = id;
@@ -208,6 +211,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const panelTop = screen.height < SHORT ? 0 : insets.top + TOP_BAR;
   const panelStyle = { position: "absolute" as const, top: panelTop, bottom: 0, right: 0, width: panelWidth + insets.right };
   const narrow = screen.width - insets.left - insets.right < 760;
+  // The strip covers the canvas top: as wide as the canvas, not the command column, and no taller than 92% of the room under the bar.
+  const carouselWidth = screen.width - insets.left - insets.right - commandWidth;
+  const carouselHeight = Math.round(Math.min(340, (screen.height - insets.top - TOP_BAR) * 0.92));
   const previewed = preview
     ? previewCards(
         game,
@@ -235,11 +241,13 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           life={widgets.life}
           burdenDeck={widgets.burdenDeck}
           rail={rail}
+          stopAhead={carousel.stopAhead}
+          carouselOpen={reading?.kind === "carousel"}
           narrow={narrow}
           ticks={ticks}
           menuOpen={menuOpen}
           onThreat={(threatSeat) => setReading({ kind: "threat", seat: threatSeat })}
-          onRail={() => setReading({ kind: "reference" })}
+          onRail={() => setReading((now) => (now?.kind === "carousel" ? null : { kind: "carousel" }))}
           onMenu={() => setMenuOpen((open) => !open)}
         />
         <View className="min-h-0 flex-1 flex-row">
@@ -332,10 +340,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           <LogPanel round={game.round} lines={lines} onClose={() => setLogOpen(false)} />
         </View>
       ) : null}
-      {reading?.kind === "reference" ? (
+      {reading?.kind === "settings" ? (
         <View style={panelStyle}>
-          <ReferencePanel
-            phases={turnReference(game, ruleTitle)}
+          <SettingsPanel
             settings={settings}
             always={settings.alwaysUse.map((effectId) => {
               const code = ctx.effects.find((effect) => effect.id === effectId)?.cardCode;
@@ -356,6 +363,18 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           />
         </View>
       ) : null}
+      {/* The strip under the top bar over the canvas (not the dock); a tap outside it closes it. */}
+      <PhaseCarousel
+        open={reading?.kind === "carousel"}
+        carousel={carousel}
+        settings={settings}
+        top={insets.top + TOP_BAR}
+        left={insets.left}
+        width={carouselWidth}
+        height={carouselHeight}
+        onChange={(change) => tableSettings.getState().update(change)}
+        onClose={() => setReading(null)}
+      />
       {/* Over the table and any open panel, centered on the screen under the top bar. */}
       {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} onBeat={choice.onBeat} /> : null}
       {preview && previewed && shown ? (

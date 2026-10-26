@@ -134,3 +134,12 @@ None. The canvas is phone-only. The settings flow, if one exists, asserts the An
   - no timer that redraws while nothing moves.
 - A flip shows the printed back the canvas already has (the One Ring for player cards, the Eye for encounter cards). It never shows a face the player may not see: a shadow card stays down.
 - Read the reduced-motion state once with `useReducedMotion()`, as the table does now. Pass `ReduceMotion.System` to layout animations.
+
+## Handover from phase 20
+
+Phase 20 is merged. What phase 23 builds on:
+
+- The rail's motion values are constants at the top of `src/play/phase-rail.tsx` (`SLIDE_MS` 280 ease-out for the neighbor names, `FLASH_MS` 300 for the pill's gold edge, `STEP_MS` 200 for the step cross-fade); the carousel's are at the top of `src/play/phase-carousel.tsx` (`ENTER_MS` 240 ease-out, translateY −12 to 0 with a fade; `LEAVE_MS` 180). Move them to `motion-tokens.ts`; each file's comment names them. All of them snap under reduced motion today, and the rail does not animate on its first render.
+- Nothing animates while the strip scrolls; keep it that way.
+- The middle zone of the top bar fades from opacity 0 once the bar and dials are measured (`src/screens/table-top-bar.tsx`, 400 ms fallback when the dials never report). That is a gate, not a motion token; leave it out of the scale.
+- Open phone checks phase 23 can fold into its own: the slide on a phase change, the strip's swipe (also starting on a Switch), and the 667x375 two-seat bar.
