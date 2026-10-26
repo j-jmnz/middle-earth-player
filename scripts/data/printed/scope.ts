@@ -6,7 +6,8 @@ import { dealtCodes, loadCampaign, loadScenarios } from "../load-scenarios.ts";
 import { RAW_DIR } from "../paths.ts";
 
 // The cards whose printed text the ledger holds in this phase: everything A Shadow of the Past deals, The One
-// Ring, the six campaign cards, and both starter lists. Phase 8d adds the cards of scenarios 2 to 6.
+// Ring, the six campaign cards, and both starter lists. Phase 8d adds the cards of scenarios 2 to 6; the player's
+// requests add cards of their own decks.
 export type ScanSide = "A" | "B";
 export type ScanTarget = { code: string; side: ScanSide; printing: string; urls: string[] };
 
@@ -26,6 +27,10 @@ const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
 };
 
 const CAMPAIGN_CARDS = ["141030", "141044", "141056", "142019", "142039", "142060"];
+
+// Player cards outside the box that the player's own decks play and reported doing nothing (user request, 2026-10-25):
+// The Shirefolk lowers its player's threat.
+const PLAYER_REQUESTS = ["19121"];
 
 // The codes of both starter lists, from the campaign file (data/starter-decks.json).
 export function starterCodes(): string[] {
@@ -56,7 +61,7 @@ function boxCodes(): string[] {
 }
 
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...CAMPAIGN_CARDS, ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaign(), loadScenarios()), ...boxCodes(), ...starterCodes()])].sort();
+  return [...new Set<string>([...CAMPAIGN_CARDS, ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaign(), loadScenarios()), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
 }
 
 type HobImages = { CardSet: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };

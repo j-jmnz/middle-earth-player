@@ -2,6 +2,7 @@
 // mec109.setup (data/rules/entries.json). The briefing turns a loadout (one saved deck per seat and the Ring-bearer slot)
 // into either the opening start the checklist produces or the sentences that refuse it. Pure: the screen shows what
 // this returns and deals only when `dealable` is true.
+import { deckSaveRefusal, formatDeckRefusal } from "../catalog/deck-save.ts";
 import { recordInstructions, type Difficulty } from "../catalog/scenario-data.ts";
 import { printedOf } from "../rules/printed.ts";
 import type { StartScenario } from "../rules/setup.ts";
@@ -73,6 +74,13 @@ const RULE_OF: Readonly<Record<string, string>> = {
   sameHero: "No two players use the same hero",
 };
 
+// A seat's saved deck as the deckbuilding check reads it: its heroes, and its cards counted by code.
+function deckCounts(deck: readonly string[]): { code: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const code of deck) counts.set(code, (counts.get(code) ?? 0) + 1);
+  return [...counts].map(([code, count]) => ({ code, count }));
+}
+
 // What a loadout must satisfy before any deal, campaign or standalone: a saved deck per seat with one to three heroes
 // (rr.deckbuilding), no fallen hero (the campaign's list; none in a standalone game), and the saga rules on the
 // loadout (validateLoadout).
@@ -84,6 +92,11 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[]):
     const label = input.seatCount === 1 ? "The deck" : `Seat ${index + 1}'s deck`;
     if (seat.deckId == null) problems.push({ rule: "Choose a deck", message: `Choose a saved deck for seat ${index + 1}.` });
     else if (seat.heroes.length < 1 || seat.heroes.length > 3) problems.push({ rule: "One to three heroes", message: `${label} has ${seat.heroes.length} heroes. A saved deck has one to three.` });
+    else if (world.deckFacts) {
+      // A deck saves before it is ready to play (rr.deckbuilding); it is not dealt until it is.
+      const refusal = deckSaveRefusal(seat.heroes, deckCounts(seat.deck), world.deckFacts);
+      if (refusal) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(refusal)}` });
+    }
     for (const code of seat.heroes) {
       if (fallen.includes(code)) problems.push({ rule: "A fallen hero cannot start", message: `${nameOf(code)} is a fallen hero and cannot start.` });
     }

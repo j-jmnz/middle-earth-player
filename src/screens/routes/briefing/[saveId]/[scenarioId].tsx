@@ -15,7 +15,7 @@ import { goBack } from "../../../go-back";
 import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
-import { expand, ScenarioHeader, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
+import { DeckFilter, expand, ScenarioHeader, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
 import { routeCode } from "../../../route-code";
 import { useSave } from "../../../use-save";
 
@@ -132,6 +132,7 @@ export default function Briefing() {
           </BodyText>
         ) : null}
 
+        <DeckFilter decks={briefingDecks} />
         {seats.map((seat, index) => (
           <SeatPicker
             key={index}

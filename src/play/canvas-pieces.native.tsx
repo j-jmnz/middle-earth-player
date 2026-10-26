@@ -1,4 +1,4 @@
-// The pieces the table canvas draws: a card (its picture, or its name while the file is missing, or its back), a pile, the
+// The pieces the table canvas draws: a card (its picture, or its name while the file is missing, or its printed back), a pile, the
 // token art on a card, the effects on it, the marks of the open moment, and the mark between an enemy and the characters
 // fighting it. Each is a Skia group at a slot's rectangle; table-canvas.native.tsx places and moves them.
 import { BlurMask, Circle, DashPathEffect, Group, Image, Line, Path, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
@@ -33,6 +33,8 @@ const glow = withAlpha(t.gold, 0.9);
 
 export type Fonts = { names: SkFont; numbers: SkFont; small: SkFont; badge: SkFont };
 export type TokenImages = { resource: SkImage | null; damage: SkImage | null; progress: SkImage | null; questPoints: SkImage | null; engagementCost: SkImage | null };
+// The printed card backs (src/play/icons, CARD_BACKS), null while the file decodes.
+export type BackImages = { player: SkImage | null; encounter: SkImage | null };
 
 // A badge's icon: the vector glyph tinted, or the token art of quest points and engagement cost as printed.
 function BadgeIcon({ name, x, y, size, color, images }: { name: IconName; x: number; y: number; size: number; color: string; images: TokenImages }) {
@@ -78,8 +80,17 @@ function Veil({ x, y, w, h, font }: { x: number; y: number; w: number; h: number
   );
 }
 
-// A card back: the player's is raised night with the gold ring, the encounter deck's is night with a threat-red ring.
-function Back({ x, y, w, h, encounter }: { x: number; y: number; w: number; h: number; encounter: boolean }) {
+// A card back: the printed one, the One Ring for a player card and the Eye for an encounter card. While its file decodes,
+// the player's is raised night with the gold ring, the encounter deck's night with a threat-red ring.
+function Back({ x, y, w, h, encounter, backs }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages }) {
+  const image = encounter ? backs.encounter : backs.player;
+  if (image) {
+    return (
+      <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
+        <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
+      </Group>
+    );
+  }
   return (
     <Group>
       <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={encounter ? t.night : t.raised} />
@@ -98,6 +109,7 @@ export function CardBody({
   fonts,
   inactive,
   encounterBack,
+  backs,
 }: {
   slot: CardSlot;
   image: SkImage | null;
@@ -106,13 +118,14 @@ export function CardBody({
   fonts: Fonts;
   inactive: boolean;
   encounterBack: boolean;
+  backs: BackImages;
 }) {
   const { x, y, w, h } = slot;
   return (
     <Group>
       <RoundedRect x={x + 1} y={y + 2} width={w} height={h} r={RADIUS} color={shadowColor} />
       {slot.faceDown ? (
-        <Back x={x} y={y} w={w} h={h} encounter={encounterBack} />
+        <Back x={x} y={y} w={w} h={h} encounter={encounterBack} backs={backs} />
       ) : image ? (
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
@@ -138,7 +151,7 @@ export function CardBody({
 const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard" };
 
 /** A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. */
-export function Pile({ slot, image, fonts, label }: { slot: CardSlot; image: SkImage | null; fonts: Fonts; label: boolean }) {
+export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlot; image: SkImage | null; name: string; fonts: Fonts; label: boolean; backs: BackImages }) {
   const { x, y, w, h } = slot;
   const encounter = slot.zone === "encounterDeck" || slot.zone === "encounterDiscard";
   const word = PILE_WORD[slot.zone] ?? "";
@@ -158,11 +171,21 @@ export function Pile({ slot, image, fonts, label }: { slot: CardSlot; image: SkI
       {Array.from({ length: depth }, (_, index) => (
         <RoundedRect key={index} x={x + (depth - index) * 1.5} y={y + (depth - index) * 1.5} width={w} height={h} r={RADIUS} color={encounter ? t.night : t.raised} />
       ))}
-      {slot.faceDown || !image ? (
-        <Back x={x} y={y} w={w} h={h} encounter={encounter} />
-      ) : (
+      {slot.faceDown ? (
+        <Back x={x} y={y} w={w} h={h} encounter={encounter} backs={backs} />
+      ) : image ? (
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
+        </Group>
+      ) : (
+        // A face-up top whose file is missing shows its name, so a discard pile never looks like a deck.
+        <Group>
+          <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={t.raised} />
+          <Group clip={{ x: x + 3, y: y + 3, width: w - 6, height: h - 21 }}>
+            {wrapName(name, w - 10, (text) => fonts.names.getTextWidth(text)).map((line, index) => (
+              <Text key={index} x={x + 5} y={y + 15 + index * LINE} text={line} font={fonts.names} color={t.bone} />
+            ))}
+          </Group>
         </Group>
       )}
       <RoundedRect x={x} y={y + h - 15} width={w} height={15} r={0} color={strip} />

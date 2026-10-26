@@ -78,17 +78,19 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
 
-  // Prefetch the hand, staging and the screen about to open; never the whole cache. The canvas draws names until a file lands.
-  const hand = game.seats[seat]?.hand;
+  // Prefetch the hand, the cards on the table and the screen about to open; never the whole cache. The canvas draws names
+  // until a file lands. The codes are joined into one string so the effect runs when the set changes, not on every intent.
+  const wanted = useMemo(() => {
+    const next = [...resolutionCodes(game), ...(selected ? [game.cards[selected]?.code ?? ""] : [])];
+    return prefetchCodes(game, seat, next).join(",");
+  }, [game, seat, selected]);
   useEffect(() => {
-    const current = store.getState().game;
-    const next = [...resolutionCodes(current), ...(selected ? [current.cards[selected]?.code ?? ""] : [])];
-    const jobs = prefetchCodes(current, seat, next).flatMap((code) => {
+    const jobs = wanted.split(",").flatMap((code) => {
       const imagesrc = session.facts.get(code)?.imagesrc;
       return imagesrc ? [{ code, imagesrc, first: true }] : [];
     });
     if (jobs.length > 0) enqueueImageDownloads(jobs);
-  }, [store, session, seat, hand, game.staging, selected, game.stageCleared]);
+  }, [session, wanted]);
 
   const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
   const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
@@ -171,7 +173,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 compact
               />
             ))}
-            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} compact /> : null}
+            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
           </View>
           <PhaseRail rail={rail} narrow={narrow} />
           {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}
@@ -207,7 +209,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 onDrop={choice.onDrop}
               />
             ) : null}
-            {choice.banner ? <MomentBanner moment={choice.banner} /> : null}
           </View>
           <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8) }}>
             {/* The quest card on the table already shows its progress: the band gives way while the dock shows numbers. */}
@@ -262,6 +263,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           <LogPanel round={game.round} lines={lines} onClose={() => setLogOpen(false)} />
         </View>
       ) : null}
+      {/* Over the table and any open panel, centered on the screen under the top bar. */}
+      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} /> : null}
       {preview && previewed && shown ? (
         <CardPreview
           key={preview.id}

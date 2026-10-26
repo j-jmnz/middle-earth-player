@@ -129,9 +129,9 @@
       "site": "https://ringsdb.com and https://dragncards-lotrlcg.s3.amazonaws.com",
       "pin": {
         "kind": "sha256",
-        "value": "d4fce8e7d7e5a2fd7dee94a64c94d15a22832d3dcb090091903bfef4f280724a"
+        "value": "703dcfb24198b173922f4863103a73ac6179b14e46deb8b02023af117653429c"
       },
-      "fetchedAt": "2026-10-25T18:53:02.424Z",
+      "fetchedAt": "2026-10-25T22:29:48.327Z",
       "files": [
         {
           "path": "raw/icons/ringsdb.svg",
@@ -174,6 +174,18 @@
           "url": "https://dragncards-lotrlcg.s3.amazonaws.com/tokens/progress.png",
           "sha256": "be50c278c81d7207170c5ae1eeb530053d5eaef8e4291138221391e4284a062a",
           "bytes": 47790
+        },
+        {
+          "path": "raw/icons/dragncards/cardbacks/player.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks/player.jpg",
+          "sha256": "bcdbe7ab9a7639a0e751e912bdaa22967ce9c1c6006199d3b4e77e14e003fa4d",
+          "bytes": 143012
+        },
+        {
+          "path": "raw/icons/dragncards/cardbacks/encounter.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks/encounter.jpg",
+          "sha256": "264316b5ba0d63d81aaaf8c90dfdae2c9f60c37cff017356047dfd8256bc519d",
+          "bytes": 133469
         }
       ]
     },
@@ -942,9 +954,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "ca26535f176e779749e2015e583408f5fb47cb4f17aa60021055e08263ec6992"
+        "value": "c0031c4cd5782a24a5149e07155ae8b47690a52d08bd7d191204371a4d3265db"
       },
-      "fetchedAt": "2026-10-25T00:53:37.439Z",
+      "fetchedAt": "2026-10-25T23:42:56.923Z",
       "files": [
         {
           "path": "scans/01002.A.jpg",
@@ -2289,6 +2301,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Ill-Fate.jpg",
           "sha256": "02ef6f2f027d0866e40ac4bf6404197a87906e8ab6e6724722ef1042d1b30529",
           "bytes": 157869
+        },
+        {
+          "path": "scans/19121.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Mount-Gundabad/The-Shirefolk.jpg",
+          "sha256": "d638d65ecae36e4035220e7376bb5c34c61ea320e800980af19df4d7203b7605",
+          "bytes": 920724
         }
       ]
     }

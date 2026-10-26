@@ -2,19 +2,38 @@
 // text with testIDs, so Maestro can read them; card pictures stay on the canvas (docs/design-system.md, Table). Phase
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
+import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
-import Animated, { FadeIn, ReduceMotion } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, ReduceMotion, useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import type { LogMark } from "./log.ts";
 import type { Rail } from "./rail.ts";
 import type { SeatThreat } from "./selectors.ts";
+import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 export { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
 
 const fade = FadeIn.duration(180).reduceMotion(ReduceMotion.System);
+const badgeIn = FadeIn.duration(160).reduceMotion(ReduceMotion.System);
+const badgeOut = FadeOut.duration(400).reduceMotion(ReduceMotion.System);
+// How long the change badge stays beside the dial; the banner and the log say it too.
+const DELTA_MS = 3000;
+
+// A token at some opacity, so the palette drift test covers the dial's tint too.
+function withAlphaHex(hex: string, alpha: number): string {
+  const value = Number.parseInt(hex.slice(1), 16);
+  return `rgba(${(value >> 16) & 255},${(value >> 8) & 255},${value & 255},${alpha})`;
+}
+
+// The dial's edge and fill at each level (threat-level.ts): threat red, tinted near elimination, solid when critical.
+const DIAL: Record<ThreatLevel, { edge: string; fill: string; meter: string }> = {
+  calm: { edge: t.threat, fill: t.night, meter: t.threat },
+  near: { edge: t.danger, fill: withAlphaHex(t.threat, 0.35), meter: t.danger },
+  critical: { edge: t.danger, fill: t.threat, meter: t.bone },
+};
 
 /**
  * Previous step, the current step in gold caps, the next step: one centered line. Text, not a control. `narrow` (a small
@@ -56,8 +75,11 @@ export function threatLine(threats: readonly SeatThreat[], life: number | null):
 }
 
 /**
- * A threat number in a ring, Marcellus, with its label under it, or beside it when `compact` (the top bar of the landscape
- * table). The reducer is the only writer of the number.
+ * The threat dial of the top bar (`compact`): the threat icon and the number large in Marcellus on a threat-red pill, with a
+ * meter along its foot that fills toward 50, the elimination level, and its label beside it. It warms near elimination,
+ * pops when the number changes, and shows the change ("−6" in gold when it fell, "+2" in threat red when it rose) for three
+ * seconds; reduced motion keeps it still. `elimination` false (Life) drops the meter and the levels. Elsewhere, a ring with
+ * its label under it. The reducer is the only writer of the number.
  */
 export function ThreatRing({
   threat,
@@ -67,6 +89,7 @@ export function ThreatRing({
   compact = false,
   accessibilityName,
   active = false,
+  elimination = true,
 }: {
   threat: SeatThreat;
   label: string;
@@ -75,25 +98,12 @@ export function ThreatRing({
   compact?: boolean;
   // What a screen reader says for a short label ("P1" reads "Player 1 threat").
   accessibilityName?: string;
-  // The seat the table shows in two-handed play: its ring is filled.
+  // The seat the table shows in two-handed play: its label is gold.
   active?: boolean;
+  elimination?: boolean;
 }) {
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) {
-    return (
-      <View testID={id} accessible accessibilityLabel={`${accessibilityName ?? label} ${threat.threat}`} className="min-h-11 flex-row items-center gap-1.5 px-1">
-        <View className={`h-9 w-9 items-center justify-center rounded-pill ${active ? "bg-goldLine" : ""}`} style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
-          <Text testID={`${id}-value`} className="font-display text-body text-bone">
-            {String(threat.threat)}
-          </Text>
-        </View>
-        <View className="items-start">
-          {icon ? <GameIcon name={icon} size={12} tint="muted" /> : null}
-          <Text className="text-label text-muted">{label}</Text>
-        </View>
-      </View>
-    );
-  }
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} active={active} elimination={elimination} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
@@ -104,6 +114,70 @@ export function ThreatRing({
       <View className="mt-0.5 flex-row items-center gap-1">
         {icon ? <GameIcon name={icon} size={12} tint="muted" /> : null}
         <Text className="text-label text-muted">{label}</Text>
+      </View>
+    </View>
+  );
+}
+
+function ThreatDial({ threat, label, id, icon, name, active, elimination }: { threat: SeatThreat; label: string; id: string; icon: IconName | null; name: string; active: boolean; elimination: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const level = elimination ? threatLevel(threat.threat) : "calm";
+  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? DIAL[level] : { edge: t.gold, fill: t.night, meter: t.gold };
+  // The change since the number last moved, shown beside the dial for DELTA_MS. A new change replaces it.
+  const seen = useRef(threat.threat);
+  const [change, setChange] = useState<{ before: number; after: number; at: number } | null>(null);
+  const scale = useSharedValue(1);
+  useEffect(() => {
+    const before = seen.current;
+    seen.current = threat.threat;
+    if (before === threat.threat) return;
+    setChange({ before, after: threat.threat, at: Date.now() });
+    if (!reduceMotion) scale.set(withSequence(withTiming(1.22, { duration: 140 }), withSpring(1, { damping: 9, stiffness: 220 })));
+  }, [threat.threat, reduceMotion, scale]);
+  useEffect(() => {
+    if (!change) return;
+    const timer = setTimeout(() => setChange(null), DELTA_MS);
+    return () => clearTimeout(timer);
+  }, [change]);
+  const pop = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
+  const delta = change ? threatDelta(change.before, change.after) : null;
+  const deltaWords = change ? threatDeltaWords(name, change.before, change.after) : null;
+  const critical = level === "critical" && !threat.eliminated;
+  return (
+    <View className="min-h-11 flex-row items-center gap-1.5 px-1">
+      <Animated.View style={pop}>
+        <View
+          testID={id}
+          accessible
+          accessibilityLabel={`${name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}`}
+          className="h-10 flex-row items-center gap-1 overflow-hidden rounded-pill px-2.5 pb-1"
+          style={{ minWidth: 64, borderWidth: 2, borderColor: look.edge, backgroundColor: look.fill }}
+        >
+          {icon ? <GameIcon name={icon} size={18} tint={critical ? "bone" : "danger"} /> : null}
+          <Text testID={`${id}-value`} className="font-display text-title text-bone">
+            {String(threat.threat)}
+          </Text>
+          {elimination && !threat.eliminated ? (
+            <View className="absolute overflow-hidden" style={{ left: 12, right: 12, bottom: 3, height: 3, borderRadius: 2, backgroundColor: withAlphaHex(t.bone, 0.16) }}>
+              <View style={{ height: 3, width: `${Math.round(threatMeter(threat.threat) * 100)}%`, backgroundColor: look.meter }} />
+            </View>
+          ) : null}
+        </View>
+      </Animated.View>
+      <View className="items-start gap-0.5">
+        <Text className={`text-label ${active ? "text-gold" : "text-muted"}`}>{label}</Text>
+        {delta ? (
+          <Animated.View
+            key={change?.at}
+            entering={badgeIn}
+            exiting={badgeOut}
+            style={{ borderRadius: 999, paddingHorizontal: 6, borderWidth: 1, borderColor: delta.lowered ? t.gold : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.gold : t.threat, 0.22) }}
+          >
+            <Text testID={`${id}-delta`} accessible accessibilityLabel={deltaWords ?? undefined} className="font-display text-label text-bone">
+              {delta.text}
+            </Text>
+          </Animated.View>
+        ) : null}
       </View>
     </View>
   );

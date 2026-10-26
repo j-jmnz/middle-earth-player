@@ -4,6 +4,7 @@ import { inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import type { Effect } from "../catalog/boundary.ts";
+import type { DeckSaveCard } from "../catalog/deck-save.ts";
 import { cards } from "../catalog/schema.ts";
 import { recordInstructions, scenarioCards, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { PrintedCard } from "../rules/printed.ts";
@@ -19,6 +20,9 @@ export type World = {
   cards: ReadonlyMap<string, PrintedCard>;
   // The encounter set of each card the catalog knows, for the briefing's per-set counts.
   sets: ReadonlyMap<string, string>;
+  // The deckbuilding facts of the same rows (rr.deckbuilding), so the briefing refuses a saved deck that is not ready to
+  // play. A world built by hand in a test may leave it out, and then that check is skipped.
+  deckFacts?: ReadonlyMap<string, DeckSaveCard>;
 };
 
 function instructionCodes(effects: readonly Effect[], card: string): string[] {
@@ -51,8 +55,12 @@ export function logCodes(log: CampaignLog): string[] {
 
 export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], rows: readonly CatalogRow[]): World {
   const sets = new Map<string, string>();
-  for (const row of rows) if (row.encounterSet) sets.set(row.code, row.encounterSet);
-  return { campaign, scenario, effects, cards: printedMap(rows), sets };
+  const deckFacts = new Map<string, DeckSaveCard>();
+  for (const row of rows) {
+    if (row.encounterSet) sets.set(row.code, row.encounterSet);
+    deckFacts.set(row.code, { name: row.name, typeCode: row.typeCode, sphereCode: row.sphereCode, deckLimit: row.deckLimit, deckLegal: row.deckLegal, traits: row.traits });
+  }
+  return { campaign, scenario, effects, cards: printedMap(rows), sets, deckFacts };
 }
 
 // Reads the rows a scenario needs from catalog.db, read-only, and builds the world. `extra` is the heroes and deck cards

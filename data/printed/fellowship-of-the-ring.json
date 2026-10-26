@@ -3892,6 +3892,28 @@
    "misprints": [],
    "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
    "confirmedBy": null
+  },
+  {
+   "code": "19121",
+   "side": "A",
+   "printing": "MG",
+   "scan": {
+    "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Mount-Gundabad/The-Shirefolk.jpg",
+    "sha256": "d638d65ecae36e4035220e7376bb5c34c61ea320e800980af19df4d7203b7605"
+   },
+   "lines": [
+    "Play only if each of your heroes is a Hobbit.",
+    "Action: Reduce your threat by 4."
+   ],
+   "inert": [
+    {
+     "line": 1,
+     "reason": "A play restriction, not an effect: it is the condition (heroesAll Hobbit) on the record of line 2, checked before the card can be played."
+    }
+   ],
+   "misprints": [],
+   "readBy": "Claude Code session_01QWfsE43C7DBanp2aKnkEnj, read from the scan image",
+   "confirmedBy": null
   }
  ]
 }
