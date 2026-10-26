@@ -14,19 +14,21 @@ The table shows what the current decision needs and nothing else. Everything rem
 
 The decisions below are this phase's. Keep this table in the phase file, updated if the build differs.
 
-| Item | Where | Decision | Why |
-| --- | --- | --- | --- |
-| Quest band (stage name, progress bar, count) | `src/play/quest-band.tsx`, `table-view.tsx:251` | Remove | The quest card's strip on the canvas shows progress / quest points. The stage name goes into the quest card's preview title. |
-| "Active: …" locations line | `table-view.tsx:252` | Remove | The active location is drawn. |
-| Ring-bearer held by another seat line | `table-view.tsx:257` | Replace | A small Ring mark on the dial of the seat that holds the Ring-bearer. Its accessibility label says it. |
-| Dock note, guide line and unavailable lines | `src/play/table-dock.tsx` | Fold | One line shows. An "i" pill (`dock-more`) expands the rest in place. The first-game guide stays one line at most. |
-| Picked-cards line | `table-dock.tsx` | Remove | The picked marks on the cards and the primary's verb ("COMMIT 2") already say it. The screen reader still hears it in the primary's hint. |
-| Reading pills (Undo, Read the card, List, Actions (n), Choose) | `use-table-choice.ts:287-299` | Merge | Undo always shows. When more than two others would show, they fold into one `More` pill that opens a small popover (`dock-more-actions`). With two or fewer, they show as now. |
-| Effect pills down a card's edge | `canvas-pieces.native.tsx` (`Badges`) | Cap | Two pills and "+n". The preview lists all of them. |
-| Empty-zone words | canvas | Keep | Already faint. |
-| Engagement-cost pills on staging enemies | canvas | Keep | They decide engagement. |
-| Not-applied mark, delayed-effect clock | canvas | Keep | Already small. |
-| Threat dial meter ticks | top bar | Keep | They decide engagement. |
+| Item | Where | Decision | Why | Built |
+| --- | --- | --- | --- | --- |
+| Quest band (stage name, progress bar, count) | `src/play/quest-band.tsx`, `table-view.tsx:251` | Remove | The quest card's strip on the canvas shows progress / quest points. The stage name goes into the quest card's preview title. | Removed (`quest-band.tsx` deleted). The preview's title line is "Name · progress / points" (`questTitle` in `table-preview.ts`); a stage with no quest points is titled by its name with "To win: …" under it. `quest-stage` and `quest-progress` were in no Maestro flow. |
+| "Active: …" locations line | `table-view.tsx:252` | Remove | The active location is drawn. | Removed. `the-ring-goes-south.yaml` asserted `active-locations`; the assertion is dropped. |
+| Ring-bearer held by another seat line | `table-view.tsx:257` | Replace | A small Ring mark on the dial of the seat that holds the Ring-bearer. Its accessibility label says it. | The line was "The Ring-bearer is facedown under X" (the Ring-bearer captive under a location, not held by a seat). The Ring (`oneRing` icon, 12 pt, gold) sits by the label of the dial of the first player, the seat that gets the hero back (the Watcher's Forced effect always returns it there; a captive card keeps no controller); the dial's name says it (`ringWords`). `threat-<seat>-ring`; the flow asserts `threat-0-ring` and the words. `ring-bearer-held` is gone. |
+| Dock note, guide line and unavailable lines | `src/play/table-dock.tsx` | Fold | One line shows. An "i" pill (`dock-more`) expands the rest in place. The first-game guide stays one line at most. | `dockLines` (`dock-lines.ts`, tested): guide, else note, else first refusal shows, one line under 400 pt tall, two above; "i" opens all (scrolling in at most 76 / 120 pt); a screen reader hears all from the folded line. A long single line also gets the "i". |
+| Picked-cards line | `table-dock.tsx` | Remove | The picked marks on the cards and the primary's verb ("COMMIT 2") already say it. The screen reader still hears it in the primary's hint. | Removed; "Picked: …" leads the primary's hint. `TableChoice.picked` is now always set (it was null while the tray was open). |
+| Reading pills (Undo, Read the card, List, Actions (n), Choose) | `use-table-choice.ts:287-299` | Merge | Undo always shows. When more than two others would show, they fold into one `More` pill that opens a small popover (`dock-more-actions`). With two or fewer, they show as now. | `dockPills(extras)` in `dock-extras.ts` (tested). The popover (`dock-more.tsx`) shares the table menu's frame (`popover-frame.tsx`, which `table-menu.tsx` now uses); it sits left of the command column, level with the pill. Back closes it like the menu (`back.ts`, `closeMore`). |
+| Effect pills down a card's edge | `canvas-pieces.native.tsx` (`Badges`) | Cap | Two pills and "+n". The preview lists all of them. | `badgeSplit` in `card-effects.ts` (tested); `canvas-pieces.native.tsx` stays at 445 lines. |
+| Empty-zone words | canvas | Keep | Already faint. | Kept. |
+| Engagement-cost pills on staging enemies | canvas | Keep | They decide engagement. | Kept. |
+| Not-applied mark, delayed-effect clock | canvas | Keep | Already small. | Kept. |
+| Threat dial meter ticks | top bar | Keep | They decide engagement. | Kept. |
+
+Also built, to keep the two-tap rule true: the armed line's room is sized to the longest thing the moment's buttons say when armed (`armed-room.ts`, two to four lines, so a caution is never cut) with its own 4 pt for the bar, held the same before and after arming (it was 36 pt plus a 3 pt bar, so a two-line caution moved every button down 3 pt when armed); the dock's text above the numbers scrolls alone and the readout, armed line and buttons are pinned to its foot; the dock's rows are 2 pt apart (were 4), its top padding 6 pt (was 8) and the readout's padding 4 pt (was 6), so a typical dock fits at 667x375 without scrolling.
 
 ## Build
 

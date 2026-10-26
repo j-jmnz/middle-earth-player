@@ -25,6 +25,10 @@ const SCRIM = 0.82;
 export type PreviewCard = {
   code: string;
   name: string;
+  // The line over the card's name when it has more to say than its name (the quest stage: its name and its progress), and a
+  // muted line under it (how a stage with no quest points is won).
+  title?: string;
+  detail?: string;
   // The scan, or null while it is not on the phone: the name and text are shown on paper instead.
   source: PictureSource | null;
   // Quest cards are printed sideways.
@@ -160,8 +164,9 @@ export function CardPreview({
             {/* The column is not a scrim: a tap here does not close the preview. */}
             <Pressable accessible={false} onPress={() => undefined} style={{ flexShrink: 1 }}>
               <Text testID="card-preview-name" accessibilityRole="header" className="font-display text-title text-bone">
-                {shown.name}
+                {shown.title ?? shown.name}
               </Text>
+              {shown.detail ? <Text testID="card-preview-detail" className="text-label text-muted">{shown.detail}</Text> : null}
               {shown.role ? <Text className="text-label text-muted">{shown.role}</Text> : null}
               <ScrollView style={{ flexShrink: 1 }} className="mt-2">
                 {shown.note ? (

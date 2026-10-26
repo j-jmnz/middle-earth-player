@@ -18,20 +18,23 @@ export function widgetReadouts(game: ScenarioState): WidgetReadouts {
 }
 
 export type LocationReadout = {
-  // The printed codes of the active locations, the first slot first, so the table can name both (mec109.stage-4).
-  active: readonly string[];
   // The code of the card the Ring-bearer is facedown under, when it is.
   heldUnder: string | null;
+  // The seat that gets it back: the Watcher's Forced effect always returns the hero to the first player (releaseRingBearer,
+  // families/south-captive.ts), and a captive card keeps no controller. Null when it is not held. Its dial wears the Ring mark.
+  heldBy: number | null;
 };
 
-// The active locations and the facedown Ring-bearer, for a scenario that declares a second active location slot; null otherwise. The
-// engine decides both; nothing here changes either.
+// The facedown Ring-bearer, for a scenario that declares a second active location slot (the active locations themselves are
+// drawn on the table); null otherwise. The engine decides both; nothing here changes either.
 export function locationReadout(game: ScenarioState): LocationReadout | null {
   if (!game.widgets.secondActiveLocation) return null;
-  const active = [game.activeLocation, game.secondActiveLocation].flatMap((id) => {
-    const code = id ? game.cards[id]?.code : undefined;
-    return code ? [code] : [];
-  });
   const captive = Object.values(game.cards).find((card) => card.zone === "captive");
-  return { active, heldUnder: captive?.host ? (game.cards[captive.host]?.code ?? null) : null };
+  const heldUnder = captive?.host ? (game.cards[captive.host]?.code ?? null) : null;
+  return { heldUnder, heldBy: heldUnder ? game.firstPlayer : null };
+}
+
+/** What the held Ring-bearer's dial says ("The Ring-bearer is facedown under Watcher in the Water"), or null when it is not held. */
+export function ringWords(readout: LocationReadout | null, nameOf: (code: string) => string): string | null {
+  return readout?.heldUnder ? `The Ring-bearer is facedown under ${nameOf(readout.heldUnder)}` : null;
 }

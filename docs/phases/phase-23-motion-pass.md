@@ -150,3 +150,10 @@ Phase 20 is merged. What phase 23 builds on:
 - The reading panels (`src/play/reading-panels.tsx`) sit in one paper `TrayFrame` (`src/play/table-layers.tsx`), so they have the same enter and exit. A new reading layer replaces the last one in the same open frame (`reading.ts`), so swapping one panel for another does not animate today.
 - Open phone check phase 23 can fold into its own: the 260 and 180 ms motion on a phone.
 
+
+## Handover from phase 22
+
+- The table menu and the dock's More popover (`dock-more-actions`) share one frame, `src/play/popover-frame.tsx`: it scales in from the corner it hangs from (`ENTER_MS` 200 ease-out from 0.96, `LEAVE_MS` 150 ease-in) with its scrim. Moving those to `motion-tokens.ts` moves both popovers at once.
+- The armed bar under the dock's armed line (`src/play/dock-buttons.tsx`) runs down in its own 4 pt under the text; it does not animate under reduced motion (the text carries the meaning). Its room is sized by `armed-room.ts` and never changes on arming, so any motion added there must not move the buttons.
+- The "i" pill (`dock-more`) opens the folded dock lines in place with no animation today.
+- The quest band is gone, so it has no motion to tune.

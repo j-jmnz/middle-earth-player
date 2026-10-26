@@ -2,14 +2,21 @@ import { describe, expect, it } from "vitest";
 
 import { backStep, type BackLayers } from "./back.ts";
 
-const none: BackLayers = { menuOpen: false, previewOpen: false, readingOpen: false, overlayOpen: false, panelOpen: false };
-const all: BackLayers = { menuOpen: true, previewOpen: true, readingOpen: true, overlayOpen: true, panelOpen: true };
+const none: BackLayers = { menuOpen: false, moreOpen: false, previewOpen: false, readingOpen: false, overlayOpen: false, panelOpen: false };
+const all: BackLayers = { menuOpen: true, moreOpen: true, previewOpen: true, readingOpen: true, overlayOpen: true, panelOpen: true };
 
 describe("hardware Back on the table", () => {
   it("closes the table menu before anything else, even a card preview", () => {
     expect(backStep(all)).toBe("closeMenu");
     expect(backStep({ ...none, menuOpen: true })).toBe("closeMenu");
-    expect(backStep({ ...all, menuOpen: false })).toBe("closePreview");
+    expect(backStep({ ...all, menuOpen: false, moreOpen: false })).toBe("closePreview");
+  });
+
+  it("closes the dock's More popover the way it closes the menu: before the preview, the reading layer, the sheet and the tray", () => {
+    expect(backStep({ ...all, menuOpen: false })).toBe("closeMore");
+    expect(backStep({ ...none, moreOpen: true, panelOpen: true })).toBe("closeMore");
+    expect(backStep({ ...none, moreOpen: true, previewOpen: true, readingOpen: true, overlayOpen: true })).toBe("closeMore");
+    expect(backStep({ ...all, menuOpen: false, moreOpen: false })).toBe("closePreview");
   });
 
   it("closes the menu before the tray when only the tray is under it", () => {
@@ -17,7 +24,7 @@ describe("hardware Back on the table", () => {
   });
 
   it("closes the reading layer (the carousel and the panels included) after the preview and before anything under it", () => {
-    expect(backStep({ ...all, menuOpen: false, previewOpen: false })).toBe("closeReading");
+    expect(backStep({ ...all, menuOpen: false, moreOpen: false, previewOpen: false })).toBe("closeReading");
     expect(backStep({ ...none, readingOpen: true, panelOpen: true })).toBe("closeReading");
   });
 

@@ -127,3 +127,9 @@ None. The canvas is phone-only. The banner flows still pass, because the banner 
 - Archery damage and damage from a card effect are not attacks and get no spotlight. The banner covers them.
 - An attack that is cancelled, or that ends without a damage step, gets no spotlight.
 - Keep `table-canvas.native.tsx` under 300 lines. The spotlight is its own file, given the images and the clashes as props.
+
+## Handover from phase 22
+
+- The dock's readout, armed line, buttons and quiet pills are pinned to the dock's foot (`src/play/table-dock.tsx`); only the step, title and folded lines above them scroll. The scrim over the dock covers that whole column; the readout block is still what the choice tray's foot is measured against (`onBlock`).
+- The quest band is gone from the command column; the quest card's preview carries the stage name and progress.
+- A card's edge shows at most two effect pills and "+n" (`badgeSplit` in `src/play/card-effects.ts`); the enlarged cards in the spotlight read the same split unless the spotlight draws its own.

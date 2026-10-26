@@ -10,7 +10,7 @@ import { starterBase } from "../../scripts/starter-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { buildTable, idsOf } from "../../scripts/test-scene.ts";
 
-import { cardEffects, effectLines } from "./card-effects.ts";
+import { badgeSplit, BADGE_CAP, cardEffects, effectLines } from "./card-effects.ts";
 
 // Rules: rr.modifiers (data/rules/entries.json). The table shows on the card each printed number an effect changed, by how
 // much, and each "cannot"; the preview words them with the card they come from.
@@ -91,5 +91,23 @@ describe("a defender's defense", () => {
     const undefended = readoutFor(state, ctx, hit, { key: "undefended", ids: [sam], shares: [] }, (id) => id);
     expect(undefended?.stats.map((stat) => stat.word)).toEqual(["Attack"]);
     expect(undefended?.result).toContain(`damage on ${sam}`);
+  });
+});
+
+describe("the pills down a card's edge", () => {
+  it("draws two pills and +n for the rest, and every pill when there are two or fewer", () => {
+    expect(BADGE_CAP).toBe(2);
+    expect(badgeSplit(0, 5)).toEqual({ shown: 0, hidden: 0 });
+    expect(badgeSplit(1, 5)).toEqual({ shown: 1, hidden: 0 });
+    expect(badgeSplit(2, 5)).toEqual({ shown: 2, hidden: 0 });
+    expect(badgeSplit(3, 5)).toEqual({ shown: 2, hidden: 1 });
+    expect(badgeSplit(6, 5)).toEqual({ shown: 2, hidden: 4 });
+  });
+
+  it("leaves a row for +n where the card's edge has little room", () => {
+    expect(badgeSplit(3, 2)).toEqual({ shown: 1, hidden: 2 });
+    expect(badgeSplit(2, 1)).toEqual({ shown: 0, hidden: 2 });
+    expect(badgeSplit(1, 1)).toEqual({ shown: 1, hidden: 0 });
+    expect(badgeSplit(4, 0)).toEqual({ shown: 0, hidden: 4 });
   });
 });

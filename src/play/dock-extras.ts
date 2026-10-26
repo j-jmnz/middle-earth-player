@@ -4,6 +4,26 @@ import type { DockExtra } from "./dock-buttons.tsx";
 import type { Sheet } from "./sheet-types.ts";
 import { tappable } from "./table-choice.ts";
 
+// Undo always shows on the dock. The other quiet pills show as they are while there are this many or fewer; one more and they
+// fold into a single More pill (dock-more-actions) that opens a popover (dock-more.tsx).
+export const UNDO_ID = "table-undo";
+export const PILLS_BEFORE_MORE = 2;
+export const MORE_ID = "dock-more-actions";
+
+export type DockPills = {
+  // The pills on the row, Undo first when there is one.
+  pills: readonly DockExtra[];
+  // The pills behind More, in order; empty when nothing folds (and then there is no More pill).
+  more: readonly DockExtra[];
+};
+
+/** Undo first and always out; the others as they are, or all of them behind More when more than PILLS_BEFORE_MORE would show. */
+export function dockPills(extras: readonly DockExtra[]): DockPills {
+  const undo = extras.filter((item) => item.testID === UNDO_ID);
+  const others = extras.filter((item) => item.testID !== UNDO_ID);
+  return others.length > PILLS_BEFORE_MORE ? { pills: undo, more: others } : { pills: [...undo, ...others], more: [] };
+}
+
 export function dockExtras(a: {
   sheet: Sheet;
   undoButton: DockExtra | null;
