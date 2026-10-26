@@ -95,3 +95,13 @@ export function windowPoint(game: ScenarioState): WindowPoint | null {
   const point = id ? POINTS[id] : undefined;
   return id && point ? { id, ...point } : null;
 }
+
+/** The title of a window point by its id ("Before the quest resolves"), or null for an unknown id. */
+export function pointTitle(id: string): string | null {
+  return POINTS[id]?.title ?? null;
+}
+
+/** The note of a window point by its id, or null. */
+export function pointNote(id: string): string | null {
+  return POINTS[id]?.note ?? null;
+}

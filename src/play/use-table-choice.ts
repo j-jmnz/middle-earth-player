@@ -7,6 +7,9 @@ import { useStore } from "zustand";
 
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
 import { tickRefused, tickSent } from "./haptics.ts";
+import { pointTitle } from "./rail.ts";
+import { alwaysUseIntent, isFreeResponse, nextStopTitle, passableWindow, stopDecision, usableIds } from "./stops.ts";
+import { tableSettings, toggleAlways } from "./table-settings.ts";
 import { intentWords, momentOf, takenBack, type Moment } from "./outcome.ts";
 import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
@@ -82,6 +85,7 @@ export function useTableChoice({
   const game = useStore(store, (state) => state.game);
   const legal = useStore(store, (state) => state.legal);
   const moment = useStore(store, (state) => state.moment);
+  const shown = useStore(store, (state) => state.shown);
   const canUndo = useStore(store, (state) => state.history.length > 0);
   const reader = useScreenReader();
   const [overlay, setOverlay] = useState<Overlay | null>(null);
@@ -91,6 +95,10 @@ export function useTableChoice({
   const [listed, setListed] = useState<string | null>(null);
   const [closedMoment, setClosedMoment] = useState(0);
   const seat = shownSeat(game);
+  const settings = useStore(tableSettings, (state) => state.settings);
+  // "Pass to next stop" is running; the cards usable where the player was last asked (stops.ts).
+  const running = useRef(false);
+  const seen = useRef<Set<string>>(new Set());
 
   const base = useMemo(() => sheetFor(game, ctx, legal, names) ?? windowSheet(game, ctx, legal, names), [game, ctx, legal, names]);
   const live = overlay && overlay.game === game ? overlay : null;
@@ -107,7 +115,13 @@ export function useTableChoice({
   const only = useMemo(() => onlyAnswer(sheet, legal), [sheet, legal]);
   const single = only != null;
   const choice = useMemo(() => choiceFor(sheet, held, only), [sheet, held, only]);
-  const dock = useMemo(() => dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single }), [sheet, choice, table, live, passLegal, panelOpen, single]);
+  // "Pass to next stop" on a step window the table could pass, named by the stop it runs to (stops.ts).
+  const stopPass = !live && !single && passableWindow(game, sheet, legal) ? `Tap again: pass to ${nextStopTitle(game, settings, pointTitle)}` : null;
+  const free = useMemo(() => new Set(sheet.kind === "trigger" && game.window?.kind === "response" ? sheet.options.filter((item) => isFreeResponse(ctx.effects.find((effect) => effect.id === item.effectId))).map((item) => item.effectId) : []), [sheet, game, ctx]);
+  const dock = useMemo(
+    () => dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single, stopPass, free }),
+    [sheet, choice, table, live, passLegal, panelOpen, single, stopPass, free],
+  );
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)
   // does not draw the table again (docs/architecture.md, State). Card ids carry no commas.
@@ -150,7 +164,9 @@ export function useTableChoice({
   }, [fightKey]);
   // The hand card being played rises whole above the bottom edge.
   const raised = live ? playedCard(live.sheet) : null;
-  const header = headerOf(sheet, game);
+  const base_header = headerOf(sheet, game);
+  // While stops are on, the eyebrow says so: the table is passing some windows for the player.
+  const header = settings.stopsOn ? { ...base_header, step: `${base_header.step} · Stops on` } : base_header;
 
   // A shadow card's printed shadow line, for the banner.
   const shadow = useCallback(
@@ -162,18 +178,19 @@ export function useTableChoice({
     },
     [store, ctx, names],
   );
+  // The banner reads the last moment that had something to show: after it, the state it made. Read once per moment.
   const said = useMemo((): Moment | null => {
-    if (!moment) return null;
+    if (!shown) return null;
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
-    if (moment.kind === "undone") return takenBack(intentWords(moment.intent, names.card), momentOf(game, moment.left, moment.steps, { card: names.card, shadow }));
-    return momentOf(moment.before, game, moment.steps, { card: names.card, shadow });
-  }, [moment, game, names, shadow]);
-  const banner = moment && said && closedMoment !== moment.seq ? said : null;
+    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow }));
+    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow });
+  }, [shown, names, shadow]);
+  const banner = shown && said && closedMoment !== shown.seq ? said : null;
   useEffect(() => {
-    if (!moment) return;
-    const timer = setTimeout(() => setClosedMoment(moment.seq), MOMENT_MS);
+    if (!shown) return;
+    const timer = setTimeout(() => setClosedMoment(shown.seq), MOMENT_MS);
     return () => clearTimeout(timer);
-  }, [moment]);
+  }, [shown]);
 
   const reset = useCallback(() => {
     setOverlay(null);
@@ -197,6 +214,29 @@ export function useTableChoice({
     },
     [store, reset],
   );
+  // The table answers for the player where the player's settings say so (stops.ts): a step window that is not a stop, and a
+  // free Response set to Always. Anything else asks; asking ends "Pass to next stop".
+  const autoKey = `${sheet.key}:${moment?.seq ?? 0}:${game.window?.kind ?? ""}`;
+  useEffect(() => {
+    if (live) return;
+    // The moment Undo went back to asks, even where the table would answer it; the next choice the player sends lifts that.
+    const held = moment?.kind === "undone";
+    if (held) running.current = false;
+    const always = alwaysUseIntent(game, sheet, ctx, settings, held);
+    if (always) {
+      store.getState().dispatch(always);
+      return;
+    }
+    if (stopDecision({ game, sheet, legal, settings, running: running.current, held, seen: seen.current }) === "pass") {
+      store.getState().dispatch({ type: "Pass" });
+      return;
+    }
+    // The table asks here: the cards usable now are seen, and a run to the next stop ends.
+    for (const id of usableIds(sheet)) seen.current.add(id);
+    running.current = false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per moment; the key holds what it reads.
+  }, [autoKey]);
+
   // A pick being made is put back first; otherwise the last intent is taken back.
   const picking = held != null && held.key === sheet.key && (held.ids.length > 0 || held.shares.length > 0);
   const undo = useCallback(() => {
@@ -222,8 +262,16 @@ export function useTableChoice({
   const onButton = useCallback(
     (button: DockButton) => {
       const action = button.action;
-      if ((action.kind === "intent" || action.kind === "outcome") && !settled()) return;
+      if ((action.kind === "intent" || action.kind === "outcome" || action.kind === "passToStop" || action.kind === "alwaysUse") && !settled()) return;
       if (action.kind === "intent") dispatch(action.intent);
+      else if (action.kind === "passToStop") {
+        running.current = true;
+        dispatch({ type: "Pass" });
+      } else if (action.kind === "alwaysUse") {
+        const current = tableSettings.getState().settings;
+        tableSettings.getState().update({ alwaysUse: toggleAlways(current.alwaysUse.filter((id) => id !== action.effectId), action.effectId) });
+        dispatch(action.intent);
+      }
       else if (action.kind === "open") open(action.sheet);
       else if (action.kind === "outcome") onOutcome();
       else if (action.kind === "clear") setHeld({ key: sheet.key, ids: [], shares: [] });
@@ -309,7 +357,7 @@ export function useTableChoice({
     extras,
     resetKey,
     banner,
-    bannerKey: moment?.seq ?? 0,
+    bannerKey: shown?.seq ?? 0,
     undo: undoButton,
     onTap: tapOnTable,
     onTile,

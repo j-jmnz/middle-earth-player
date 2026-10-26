@@ -57,7 +57,7 @@ describe("user migration", () => {
     expect(migrations.journal.entries.map((entry) => entry.idx)).toEqual(migrations.journal.entries.map((_, index) => index));
   });
 
-  it("adds the booklets table, the save loadout, the archive mark, the write time and the standalone games without touching a save row", () => {
+  it("adds the booklets table, the save loadout, the archive mark, the write time, the standalone games and the settings without touching a save row", () => {
     const database = new DatabaseSync(":memory:");
     const [first, ...rest] = migrations.journal.entries;
     if (!first) throw new Error("No migrations");
@@ -80,5 +80,8 @@ describe("user migration", () => {
     );
     const game = database.prepare("SELECT id, active_scenario, result, archived_at FROM standalone_games").get();
     expect(game).toEqual({ id: "game-1", active_scenario: null, result: null, archived_at: null });
+    // 0006: the table's settings, one JSON row per key (src/screens/settings-store.ts).
+    database.exec(`INSERT INTO settings (key, value) VALUES ('table', '{"stopsOn":true}')`);
+    expect(database.prepare("SELECT key, value FROM settings").get()).toEqual({ key: "table", value: '{"stopsOn":true}' });
   });
 });

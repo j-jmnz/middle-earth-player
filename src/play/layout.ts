@@ -66,6 +66,8 @@ export type LayoutOptions = {
   preview?: { enemyId: string; ids: readonly string[]; kind: FightKind } | null;
   // The top card of the deck when the rules let the player play it (Gandalf, 142002): face up on the deck, and a card.
   deckTop?: CardInstance | null;
+  // Larger cards (table-settings.ts).
+  large?: boolean;
 };
 
 const GUTTER = 8;
@@ -89,13 +91,19 @@ const MARK = 16;
  * The card size that fits three rows, the hand's strip and seven cards across the canvas: the left column is one and a half
  * cards, the rest holds six.
  */
-export function cardSize(width: number, height: number): { w: number; h: number } {
+export function cardSize(width: number, height: number, large = false): { w: number; h: number } {
   const room = height - GUTTER - 3 * GAP - 3 * PEEK;
-  const byHeight = Math.min(room / (3 + HAND_SHOW), (room - HAND_MIN) / 3) / ASPECT;
-  const byWidth = (width - 3 * GUTTER - 5 * GAP) / (6 + LEFT);
-  const w = Math.max(34, Math.floor(Math.min(byWidth, byHeight, 96)));
+  const show = large ? HAND_SHOW_LARGE : HAND_SHOW;
+  const least = large ? MIN_TARGET : HAND_MIN;
+  const byHeight = Math.min(room / (3 + show), (room - least) / 3) / ASPECT;
+  // Larger cards (table-settings.ts): five across (three and a half beside the left column), the hand overlapping more.
+  const byWidth = (width - 3 * GUTTER - 5 * GAP) / ((large ? 3.5 : 6) + LEFT);
+  const w = Math.max(34, Math.floor(Math.min(byWidth, byHeight, large ? 120 : 96)));
   return { w, h: Math.round(w * ASPECT) };
 }
+
+// How much of a hand card shows with larger cards: the hand overlaps the play area more, down to a 44 pt strip.
+const HAND_SHOW_LARGE = 0.34;
 
 export const MIN_TARGET = 44;
 
@@ -254,7 +262,7 @@ export function tableLayout(
 ): TableLayout {
   const views = options.preview ? withPreview(given, options.preview) : given;
   const bottom = options.bottomInset ?? 0;
-  const card = cardSize(width, height - bottom);
+  const card = cardSize(width, height - bottom, options.large ?? false);
   const leftW = Math.round(card.w * LEFT);
   const pile = { w: Math.floor((leftW - GAP) / 2), h: Math.round(Math.floor((leftW - GAP) / 2) * ASPECT) };
   const centerX = GUTTER + leftW + GUTTER;
@@ -267,7 +275,7 @@ export function tableLayout(
   const engagedH = card.h + PEEK * Math.max(1, deepestUnder(views.engaged.entries));
   const playY = engagedY + engagedH + GAP;
   const playH = card.h + 2 * PEEK;
-  const handY = height - bottom - Math.max(HAND_MIN, Math.round(card.h * HAND_SHOW));
+  const handY = height - bottom - (options.large ? Math.max(MIN_TARGET, Math.round(card.h * HAND_SHOW_LARGE)) : Math.max(HAND_MIN, Math.round(card.h * HAND_SHOW)));
 
   // The encounter deck and its discard pile at the right end of staging.
   const encounterW = 2 * pile.w + GAP;

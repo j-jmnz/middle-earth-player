@@ -81,6 +81,13 @@ export const imageFiles = sqliteTable("image_files", {
   sha256: text("sha256"),
 });
 
+// App-wide settings, one JSON value per key. "table": the table's settings (src/play/table-settings.ts): stops, free
+// Responses always used, readability, the first-game guide.
+export const settings = sqliteTable("settings", {
+  key: text("key").primaryKey(),
+  value: text("value", { mode: "json" }).$type<StoredJson>().notNull(),
+});
+
 export const meta = sqliteTable(
   "meta",
   {

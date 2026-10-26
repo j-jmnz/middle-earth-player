@@ -47,6 +47,8 @@ export type TableCanvasProps = {
   fight: LayoutOptions["preview"];
   // The bottom safe-area inset the hand stays above.
   bottomInset: number;
+  // Readability (table-settings.ts): larger cards, and effect marks and token counts with strong outlines.
+  look?: { large: boolean; contrast: boolean };
   // A tap on a card, or on a pile ("pile:discard"). The screen decides what it does; a tap never sends an intent.
   onTap: (cardId: string) => void;
   // A long press on a face-up card: the screen shows it large over the table.

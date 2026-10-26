@@ -59,7 +59,9 @@ function ZoneWord({ rect, text, font }: { rect: Rect; text: string; font: SkFont
   return <Text x={rect.x + 6} y={rect.y + 16} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight, raised, fight, bottomInset, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight, raised, fight, bottomInset, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+  const large = look?.large ?? false;
+  const contrast = look?.contrast ?? false;
   const seat = useStore(store, (state) => shownSeat(state.game));
   const { views, piles } = useViews(store, seat);
   const selected = useStore(store, (state) => state.selected);
@@ -79,8 +81,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // The top of the deck is a card when the rules let it be played from there (Gandalf, 142002).
   const deckTop = deckTopId && draggable.includes(deckTopId) ? deckTopCard : null;
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, large }),
+    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, large],
   );
 
   // Each new layout: where every card comes from, and the cards that left, worked out once, before it is drawn. The layout
@@ -258,10 +260,10 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     const optionMark = highlight.marks.get(slot.id);
     return (
       <Group>
-        {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} images={tokens} /> : null}
+        {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} images={tokens} contrast={contrast} /> : null}
         {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} /> : null}
         {slotInfo?.delayed ? <DelayedMark rect={rect} /> : null}
-        <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code)) : null} />
+        <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code)) : null} contrast={contrast} />
         {slot.kind === "card" ? <Marks rect={rect} tappable={tappable} picked={picked} share={highlight.share} dimmed={(highlight.dimOthers && !tappable && picked === 0) || highlight.muted.has(slot.id)} fonts={fonts} /> : null}
         {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} /> : null}
       </Group>

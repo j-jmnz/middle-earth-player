@@ -208,6 +208,10 @@ export function fightPreview(game: ScenarioState, sheet: Sheet, choice: Choice):
 
 export type DockAction =
   | { kind: "intent"; intent: PlayerIntent }
+  // Pass this window and every step window up to the next stop (stops.ts).
+  | { kind: "passToStop" }
+  // Set this free Response to Always, and use it now (stops.ts).
+  | { kind: "alwaysUse"; effectId: string; intent: PlayerIntent }
   | { kind: "open"; sheet: Sheet }
   // The scenario is over: the resolution screen.
   | { kind: "outcome" }
@@ -258,7 +262,21 @@ function verbOf(verb: string): string {
  * Action), which gets a Cancel that sends nothing. `passLegal` adds Pass when the rules allow it and the sheet has none.
  * `surface` words the sentence under a primary that waits for a pick. `single` (the moment has one answer) arms nothing.
  */
-export function dockFor(sheet: Sheet, choice: Choice, table: TapContext, options: { overlay: boolean; passLegal: boolean; surface: "table" | "panel"; single?: boolean }): Dock {
+export function dockFor(
+  sheet: Sheet,
+  choice: Choice,
+  table: TapContext,
+  options: {
+    overlay: boolean;
+    passLegal: boolean;
+    surface: "table" | "panel";
+    single?: boolean;
+    // The armed line of "Pass to next stop", when this window can be passed that way (stops.ts).
+    stopPass?: string | null;
+    // The free Responses the player may set to Always (stops.ts, isFreeResponse).
+    free?: ReadonlySet<string>;
+  },
+): Dock {
   const secondary: DockButton[] = [];
   let primary: DockButton | null = null;
   let why: string | null = null;
@@ -302,11 +320,12 @@ export function dockFor(sheet: Sheet, choice: Choice, table: TapContext, options
     case "trigger": {
       const item = sheet.options.find((option) => option.id === choice.ids[0]) ?? null;
       if (item) {
-        const action: DockAction = item.pay
-          ? { kind: "open", sheet: paySheet(table.game, table.names, item.pay, { kind: "trigger", cardId: item.cardId, effectId: item.effectId }) }
-          : { kind: "intent", intent: { type: "Trigger", cardId: item.cardId, effectId: item.effectId } };
+        const intent: PlayerIntent = { type: "Trigger", cardId: item.cardId, effectId: item.effectId };
+        const action: DockAction = item.pay ? { kind: "open", sheet: paySheet(table.game, table.names, item.pay, { kind: "trigger", cardId: item.cardId, effectId: item.effectId }) } : { kind: "intent", intent };
         primary = { label: "Use", action, arm: false, testID: "sheet-primary" };
         if (sheet.pass) secondary.push(PASS(sheet.pass, "sheet-pass", `Tap again: ${sheet.pass.toLowerCase()} without it`));
+        // A free Response may be set to Always: the table then uses it whenever it is offered (a standing answer).
+        if (!item.pay && options.free?.has(item.effectId)) secondary.push({ label: "Always use", action: { kind: "alwaysUse", effectId: item.effectId, intent }, arm: true, armed: "Tap again: use it now and every time", testID: "sheet-always" });
       } else if (sheet.pass) {
         // Nothing picked: the window's own Pass is the one filled button, in the same place.
         primary = PASS(sheet.pass, "sheet-pass", "Tap again: nothing is used");
@@ -324,6 +343,7 @@ export function dockFor(sheet: Sheet, choice: Choice, table: TapContext, options
         // Nothing picked: Pass is the filled button. In the commit window it sends no one on the quest.
         primary = PASS(sheet.pass, "table-pass", sheet.armed);
       }
+      if (options.stopPass && count === 0) secondary.push({ label: "Pass to stop", action: { kind: "passToStop" }, arm: true, armed: options.stopPass, testID: "table-pass-to-stop" });
       break;
     }
     case "outcome":

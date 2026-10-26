@@ -36,12 +36,22 @@ const DIAL: Record<ThreatLevel, { edge: string; fill: string; meter: string }> =
 };
 
 /**
- * Previous step, the current step in gold caps, the next step: one centered line. Text, not a control. `narrow` (a small
+ * Previous step, the current step in gold caps, the next step: one centered line; a tap opens the turn reference. `narrow` (a small
  * phone in landscape) keeps the current step alone, which may shrink a little to fit.
  */
-export function PhaseRail({ rail, narrow = false }: { rail: Rail; narrow?: boolean }) {
+export function PhaseRail({ rail, narrow = false, onPress }: { rail: Rail; narrow?: boolean; onPress?: () => void }) {
+  // A tap opens the turn reference (reference.ts): the round as the Rules Reference charts it, and the stops.
   return (
-    <View testID="rail" accessible accessibilityLabel={`Round ${rail.round}. ${rail.current}`} className="min-w-0 flex-1 flex-row items-center justify-center px-2">
+    <Pressable
+      testID="rail"
+      accessible
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={`Round ${rail.round}. ${rail.current}`}
+      accessibilityHint={onPress ? "Opens the turn reference" : undefined}
+      disabled={!onPress}
+      onPress={onPress}
+      style={{ minWidth: 0, flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", paddingHorizontal: 8, minHeight: 44 }}
+    >
       {narrow ? null : (
         <Text testID="rail-previous" numberOfLines={1} className="flex-1 text-right text-label text-muted">
           {rail.previous}
@@ -64,7 +74,7 @@ export function PhaseRail({ rail, narrow = false }: { rail: Rail; narrow?: boole
           {rail.next}
         </Text>
       )}
-    </View>
+    </Pressable>
   );
 }
 

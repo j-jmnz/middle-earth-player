@@ -26,6 +26,9 @@ export type TableState = {
   // What the last change of the table was, for the outcome banner; `seq` moves with each. "sent": an accepted intent, the
   // state before it and the engine steps it ran. "undone": the intent Undo took back, the state it had made and its steps.
   moment: TableMoment | null;
+  // The last moment that had something to show (an engine step, or an undo), for the banner: a pass that only closes a
+  // window (one the table passed for the player) leaves the banner of the moment before it up.
+  shown: TableMoment | null;
   // The states Undo can go back to, oldest first.
   history: readonly Undoable[];
 };
@@ -40,9 +43,11 @@ export type TableActions = {
 
 export type TableStore = StoreApi<TableState & TableActions>;
 
+// `after`: the state the moment made (the game right after the intent, or right after the undo), so the banner reads it even
+// once later passes have moved the game on.
 export type TableMoment =
-  | { seq: number; kind: "sent"; before: ScenarioState; steps: readonly EngineStep[] }
-  | { seq: number; kind: "undone"; intent: PlayerIntent; left: ScenarioState; steps: readonly EngineStep[] };
+  | { seq: number; kind: "sent"; before: ScenarioState; after: ScenarioState; steps: readonly EngineStep[] }
+  | { seq: number; kind: "undone"; intent: PlayerIntent; left: ScenarioState; after: ScenarioState; steps: readonly EngineStep[] };
 
 /** What the table keeps of the intents sent so far: the round's log and the states Undo can go back to. */
 export type Kept = { roundSteps: readonly EngineStep[]; history: readonly Undoable[] };
@@ -95,6 +100,7 @@ export function createTableStore(input: TableInput): TableStore {
     targets: [],
     refusal: null,
     moment: null,
+    shown: null,
     history: input.history ?? [],
     dispatch: (intent) => {
       const before = get().game;
@@ -103,10 +109,12 @@ export function createTableStore(input: TableInput): TableStore {
         set({ refusal: result.reason });
         return false;
       }
+      const moment: TableMoment = { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, after: result.state, steps: result.steps };
       set({
         ...showing(result.state),
         ...keepIntent(get(), before, result.state, result.steps, intent),
-        moment: { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, steps: result.steps },
+        moment,
+        shown: result.steps.length > 0 ? moment : get().shown,
       });
       input.onCommit?.(intent, result.state);
       return true;
@@ -115,11 +123,13 @@ export function createTableStore(input: TableInput): TableStore {
       const { history, game, moment } = get();
       const last = history[history.length - 1];
       if (!last) return false;
+      const undone: TableMoment = { seq: (moment?.seq ?? 0) + 1, kind: "undone", intent: last.intent, left: game, after: last.before, steps: last.steps };
       set({
         ...showing(last.before),
         roundSteps: last.roundSteps,
         history: history.slice(0, -1),
-        moment: { seq: (moment?.seq ?? 0) + 1, kind: "undone", intent: last.intent, left: game, steps: last.steps },
+        moment: undone,
+        shown: undone,
       });
       input.onUndo?.(last.before);
       return true;

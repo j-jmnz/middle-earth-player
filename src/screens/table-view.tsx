@@ -22,7 +22,9 @@ import { TableCanvas } from "../play/table-canvas";
 import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
 import { ChromeButton, PhaseRail, ThreatRing, threatLine } from "../play/table-chrome";
 import { MomentBanner, TableDock } from "../play/table-dock";
-import { LogPanel, PileList, SidePanel, ThreatPanel } from "../play/table-panel";
+import { LogPanel, PileList, ReferencePanel, SidePanel, ThreatPanel } from "../play/table-panel";
+import { turnReference } from "../play/reference";
+import { tableSettings } from "../play/table-settings";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
@@ -76,7 +78,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
 
   const [logOpen, setLogOpen] = useState(false);
   // A reading panel over the table's right side: the threat panel (a tap on a dial) for a seat.
-  const [reading, setReading] = useState<{ kind: "threat"; seat: number } | null>(null);
+  const [reading, setReading] = useState<{ kind: "threat"; seat: number } | { kind: "reference" } | null>(null);
+  const settings = useStore(tableSettings, (state) => state.settings);
+  const look = useMemo(() => ({ large: settings.largeCards, contrast: settings.highContrast }), [settings.largeCards, settings.highContrast]);
   const [pile, setPile] = useState<PileId | null>(null);
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
@@ -194,7 +198,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
             ))}
             {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
           </View>
-          <PhaseRail rail={rail} narrow={narrow} />
+          <PhaseRail rail={rail} narrow={narrow} onPress={() => setReading({ kind: "reference" })} />
           {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}
           <ChromeButton label="Log" testID="log-open" tone="gold" accessibilityLabel="This round's log" onPress={() => setLogOpen(true)} />
           <ChromeButton label="Rules" testID="rules-open" tone="gold" accessibilityLabel="Look up a rule" onPress={() => router.push("/glossary")} />
@@ -223,6 +227,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 raised={choice.raised}
                 fight={choice.fight}
                 bottomInset={insets.bottom}
+                look={look}
                 onTap={choice.onTap}
                 onPreview={onPreview}
                 onDrop={choice.onDrop}
@@ -280,6 +285,20 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       {logOpen ? (
         <View style={panelStyle}>
           <LogPanel round={game.round} lines={lines} onClose={() => setLogOpen(false)} />
+        </View>
+      ) : null}
+      {reading?.kind === "reference" ? (
+        <View style={panelStyle}>
+          <ReferencePanel
+            phases={turnReference(game, ruleTitle)}
+            settings={settings}
+            always={settings.alwaysUse.map((effectId) => {
+              const code = ctx.effects.find((effect) => effect.id === effectId)?.cardCode;
+              return { effectId, label: code ? `${nameOf(code)}: always used` : effectId };
+            })}
+            onChange={(change) => tableSettings.getState().update(change)}
+            onClose={() => setReading(null)}
+          />
         </View>
       ) : null}
       {reading?.kind === "threat" ? (

@@ -10,6 +10,7 @@ import { colorScheme } from "nativewind";
 
 import { DatabaseBoundary, DatabaseError } from "../database-error";
 import { DatabaseProvider } from "../databases";
+import { bindTableSettings } from "../settings-store";
 import { startImageDownloads } from "../images/queue";
 import { completeStarterInsert, insertStarterDecks } from "../starter-decks";
 import { openDatabases, type AppDatabases } from "../open-databases";
@@ -84,6 +85,17 @@ export default function RootLayout() {
       cancelled = true;
       cancelAnimationFrame(frame);
     };
+  }, [databases]);
+
+  // The table's settings (stops, free Responses always used, readability, the guide): loaded once, every change written back.
+  useEffect(() => {
+    if (!databases) return;
+    try {
+      return bindTableSettings(databases.user);
+    } catch (error: unknown) {
+      console.warn(error instanceof Error ? error.message : "Table settings did not load");
+      return undefined;
+    }
   }, [databases]);
 
   useEffect(() => {

@@ -59,11 +59,11 @@ export function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: num
 }
 
 // A number that stays readable on any token art or picture: a night outline under a bone fill.
-function Outlined({ x, y, text, font, color = t.bone }: { x: number; y: number; text: string; font: SkFont; color?: string }) {
+function Outlined({ x, y, text, font, color = t.bone, heavy = false }: { x: number; y: number; text: string; font: SkFont; color?: string; heavy?: boolean }) {
   const width = font.getTextWidth(text);
   return (
     <Group>
-      <Text x={x - width / 2} y={y} text={text} font={font} color={t.night} style="stroke" strokeWidth={3} />
+      <Text x={x - width / 2} y={y} text={text} font={font} color={t.night} style="stroke" strokeWidth={heavy ? 4.5 : 3} />
       <Text x={x - width / 2} y={y} text={text} font={font} color={color} />
     </Group>
   );
@@ -200,7 +200,7 @@ export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlo
  * The token art on a card, each with its count: resources bottom left, damage top right, progress bottom right. `rect` is
  * the card's rectangle on screen, so the tokens of an exhausted card stay upright in its sideways footprint.
  */
-export function Tokens({ slot, rect, images, fonts, ring = null }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; ring?: string | null }) {
+export function Tokens({ slot, rect, images, fonts, ring = null, contrast = false }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; ring?: string | null; contrast?: boolean }) {
   const { x, y, w, h } = rect;
   const items: { image: SkImage | null; value: number; cx: number; cy: number; fallback: string; ring: string | null }[] = [];
   if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, cx: x + TOKEN / 2 + 1, cy: y + h - TOKEN / 2 - 1, fallback: t.gold, ring });
@@ -217,7 +217,7 @@ export function Tokens({ slot, rect, images, fonts, ring = null }: { slot: CardS
           )}
           {/* A hero's resources pay for its own sphere: the token is ringed in that sphere's colour. */}
           {item.ring ? <Circle cx={item.cx} cy={item.cy} r={TOKEN / 2 + 0.5} color={item.ring} style="stroke" strokeWidth={1.75} /> : null}
-          <Outlined x={item.cx} y={item.cy + 4} text={String(item.value)} font={fonts.numbers} />
+          <Outlined x={item.cx} y={item.cy + 4} text={String(item.value)} font={contrast ? fonts.badge : fonts.numbers} heavy={contrast} />
         </Group>
       ))}
     </Group>
@@ -230,7 +230,26 @@ export function Tokens({ slot, rect, images, fonts, ring = null }: { slot: CardS
  * more do not fit. A committed character shows its willpower at the foot, a quest stage or location its progress. `rect` is
  * upright on screen, so an exhausted card's numbers read the right way.
  */
-export function Badges({ slot, rect, effects, willpower, questPoints, fonts, images }: { slot: CardSlot; rect: Rect; effects: CardEffects; willpower: number | null; questPoints: number | null; fonts: Fonts; images: TokenImages }) {
+export function Badges({
+  slot,
+  rect,
+  effects,
+  willpower,
+  questPoints,
+  fonts,
+  images,
+  contrast = false,
+}: {
+  slot: CardSlot;
+  rect: Rect;
+  effects: CardEffects;
+  willpower: number | null;
+  questPoints: number | null;
+  fonts: Fonts;
+  images: TokenImages;
+  // Strong outlines (table-settings.ts): each pill gets a bone edge, so it reads on any picture.
+  contrast?: boolean;
+}) {
   const { x, y, w, h } = rect;
   // Rows that fit between the top edge and the resource token at the bottom left.
   const room = Math.max(1, Math.floor((h - TOKEN - 6) / (BADGE_H + 2)));
@@ -256,6 +275,7 @@ export function Badges({ slot, rect, effects, willpower, questPoints, fonts, ima
       <Group key={`s${badge.stat}`}>
         <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={up ? t.gold : t.night} />
         {up ? null : <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={t.danger} style="stroke" strokeWidth={1} />}
+        {contrast ? <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={up ? t.night : t.bone} style="stroke" strokeWidth={1.5} /> : null}
         {/* An effect that ends with the phase, the round or the attack: a dashed edge says it will go (the preview says when). */}
         {badge.lasting ? (
           <RoundedRect x={x + 1} y={top - 1} width={width + 2} height={BADGE_H + 2} r={BADGE_H / 2 + 1} color={up ? t.bone : t.danger} style="stroke" strokeWidth={1}>

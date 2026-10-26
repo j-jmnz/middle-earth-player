@@ -2,7 +2,7 @@
 // (an either/or of an effect, a seat, a card out of play), a discard pile's cards, and this round's log
 // (docs/design-system.md, Table). A panel's tiles are picked the same way as cards on the table, and its buttons are the
 // dock's: one that sends with nothing picked asks for a second tap.
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Switch, Text, View } from "react-native";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
 import type { LogLine } from "./log.ts";
@@ -11,7 +11,9 @@ import { ChromeButton, SheetFrame, Stats, Tile } from "./sheet-paper.tsx";
 import type { Sheet, SheetOption, SheetStat } from "./sheet-types.ts";
 import { tableTokens as t } from "./tokens.ts";
 import { headerOf, marked, shareFor, type Choice, type Dock, type DockButton } from "./table-choice.ts";
+import type { ReferencePhase } from "./reference.ts";
 import type { ScenarioState } from "./store.ts";
+import { toggleStop, type TableSettings } from "./table-settings.ts";
 import { LineMark } from "./table-chrome.tsx";
 import { ReadoutView } from "./table-dock.tsx";
 
@@ -212,6 +214,101 @@ export function ThreatPanel({ seatLabel, threat, rows, onClose }: { seatLabel: s
       </ScrollView>
       <View className="items-center pt-2">
         <ChromeButton label="Close" testID="threat-panel-close" tone="ink" onPress={onClose} />
+      </View>
+    </SheetFrame>
+  );
+}
+
+// A labelled switch on paper, at least 44 pt tall.
+function PaperSwitch({ label, detail, value, onChange, testID }: { label: string; detail?: string; value: boolean; onChange: (value: boolean) => void; testID: string }) {
+  return (
+    <View className="flex-row items-center justify-between gap-3 py-1" style={{ minHeight: 44 }}>
+      <View className="shrink">
+        <Text className="text-body text-ink">{label}</Text>
+        {detail ? <Text className="text-label text-inkMuted">{detail}</Text> : null}
+      </View>
+      <Switch testID={testID} accessibilityLabel={label} value={value} onValueChange={onChange} trackColor={{ false: t.inkLine, true: t.goldDeep }} thumbColor={t.paper} ios_backgroundColor={t.inkLine} />
+    </View>
+  );
+}
+
+/**
+ * The turn reference a tap on the rail opens (reference.ts): the round phase by phase, each step with its rule title and the
+ * player's decision, the current step marked; under each step the action windows after it, each a stop the table asks at
+ * while stops are on. At its foot the table's settings (table-settings.ts). Text and switches only; nothing here sends an
+ * intent.
+ */
+export function ReferencePanel({
+  phases,
+  settings,
+  always,
+  onChange,
+  onClose,
+}: {
+  phases: readonly ReferencePhase[];
+  settings: TableSettings;
+  // The free Responses set to Always, by name: tap to have the table ask again.
+  always: readonly { effectId: string; label: string }[];
+  onChange: (change: Partial<TableSettings>) => void;
+  onClose: () => void;
+}) {
+  return (
+    <SheetFrame testID="reference-panel" edge="right">
+      <View className="items-center">
+        <Text className="font-display text-eyebrow uppercase text-inkLabel">Turn reference</Text>
+        <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">
+          The round
+        </Text>
+      </View>
+      <ScrollView className="mt-2" style={{ flexGrow: 0, flexShrink: 1 }}>
+        <PaperSwitch
+          label="Stops"
+          detail="Pass the action windows that are not stops, unless a card usable there is new. Planning, the commit, Responses and every choice still ask."
+          value={settings.stopsOn}
+          onChange={(stopsOn) => onChange({ stopsOn })}
+          testID="reference-stops"
+        />
+        {phases.map((phase) => (
+          <View key={phase.phase} className="mt-2">
+            <Text className="font-display text-eyebrow uppercase text-inkLabel">{phase.phase}</Text>
+            {phase.steps.map((step) => (
+              <View
+                key={step.id}
+                testID={`reference-step-${step.id}`}
+                accessible
+                accessibilityLabel={`${step.titles.join(", ")}. ${step.decision}${step.current ? " Now." : ""}`}
+                className="mt-1 rounded-tile px-2 py-1.5"
+                style={{ borderWidth: 1, borderColor: step.current ? t.inkLabel : "transparent", backgroundColor: step.current ? t.paperPressed : "transparent" }}
+              >
+                <Text className="text-body font-semibold text-ink">{`${step.titles.join(" · ")}${step.current ? "  · now" : ""}`}</Text>
+                <Text className="text-label text-inkMuted">{step.decision}</Text>
+                {step.windows.map((window) => (
+                  <PaperSwitch
+                    key={window.id}
+                    label={`Stop: ${window.title}`}
+                    detail={window.note}
+                    value={settings.stops.includes(window.id)}
+                    onChange={() => onChange({ stops: toggleStop(settings.stops, window.id) })}
+                    testID={`reference-stop-${window.id}`}
+                  />
+                ))}
+              </View>
+            ))}
+          </View>
+        ))}
+        <View className="mt-3 border-t pt-2" style={{ borderColor: t.inkLine }}>
+          <Text className="font-display text-eyebrow uppercase text-inkLabel">Table</Text>
+          <PaperSwitch label="Larger cards" detail="Five cards across; the hand overlaps more." value={settings.largeCards} onChange={(largeCards) => onChange({ largeCards })} testID="reference-large" />
+          <PaperSwitch label="Strong outlines" detail="Effect marks and token counts drawn with heavier outlines." value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID="reference-contrast" />
+          <PaperSwitch label="First-game guide" detail="A line under the dock's title the first two times each step comes up." value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID="reference-guide" />
+          {always.length > 0 ? <Text className="mt-2 text-label text-inkMuted">Responses used every time (tap to be asked again):</Text> : null}
+          {always.map((item) => (
+            <ChromeButton key={item.effectId} label={item.label} testID={`reference-always-${item.effectId}`} tone="ink" onPress={() => onChange({ alwaysUse: settings.alwaysUse.filter((id) => id !== item.effectId) })} />
+          ))}
+        </View>
+      </ScrollView>
+      <View className="items-center pt-2">
+        <ChromeButton label="Close" testID="reference-close" tone="ink" onPress={onClose} />
       </View>
     </SheetFrame>
   );
