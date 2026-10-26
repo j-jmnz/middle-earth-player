@@ -4,6 +4,7 @@ import type { ReduceContext } from "../interpret.ts";
 import type { ScenarioState } from "../state.ts";
 import { livingSeats, withSeat } from "../state.ts";
 import { attachTo, moveCard } from "../zones.ts";
+import { flipCard } from "./sidequests-contract.ts";
 import { shuffleSetAside, takeRevealed } from "./sidequests-encounter.ts";
 import type { Focus } from "./index.ts";
 
@@ -20,6 +21,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return instruction.to.kind === "hero" ? attachSetupCard(state, focus) : null;
     case "ShuffleSetAsideIntoEncounterDeck":
       return shuffleSetAside(state, instruction, focus);
+    case "FlipCard":
+      return flipCard(state, focus.sourceId);
     case "TakeRevealedCard":
       return takeRevealed(state, instruction, focus);
     case "RemoveFromCampaignPool": {

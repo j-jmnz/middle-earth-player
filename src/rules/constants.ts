@@ -6,6 +6,7 @@ import { resolveAmount } from "./amounts.ts";
 import { characters } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import { constantInstructions } from "./constant-records.ts";
+import { attachedCount } from "./families/sidequests-contract.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
 import { isCharacterType, printedOf } from "./printed.ts";
@@ -93,11 +94,14 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
     if (amount === 0) continue;
     const named = instruction.holders ? matching(state, source, instruction.holders, ctx) : holders(state, source, instruction.target, ctx, instruction.trait);
     for (const holder of named) {
+      // "+1 Willpower for each restricted attachment on it": the amount times the matching cards attached to the holder.
+      const factor = instruction.eachAttached ? attachedCount(state, holder, instruction.eachAttached, source.id, ctx) : 1;
+      if (factor === 0) continue;
       found.push({
         instanceId: holder,
         sourceId: source.id,
         stat: instruction.stat,
-        amount,
+        amount: amount * factor,
         until: source.zone === "victory" ? "whileSourceInVictory" : "whileSourceInPlay",
         origin: effect.id,
         ...(instruction.per === "committed" || instruction.per === "ally" ? { per: instruction.per } : {}),

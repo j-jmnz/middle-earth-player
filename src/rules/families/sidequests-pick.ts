@@ -7,6 +7,7 @@ import { grantedTraits } from "../conditions.ts";
 import type { ReduceContext } from "../interpret.ts";
 import type { PickContext } from "../pick.ts";
 import { printedOf } from "../printed.ts";
+import { restrictedAttachments } from "../restrictions.ts";
 import type { ScenarioState } from "../state.ts";
 
 function traitsOf(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
@@ -41,6 +42,7 @@ export function sidequestsPickMatches(state: ScenarioState, id: string, spec: Pi
     if (!instance || !compared || other === id) return false;
     if (printedOf(ctx.cards, instance.code).name !== printedOf(ctx.cards, compared.code).name) return false;
   }
+  if (spec.restrictedAttachments != null && restrictedAttachments(state, id, ctx).length < spec.restrictedAttachments) return false;
   if (spec.committedTo) {
     const instance = state.cards[id];
     if (!instance?.committed) return false;

@@ -11,6 +11,7 @@ import { constantInstructions } from "./constant-records.ts";
 import { holds } from "./conditions.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { effectsOf } from "./listen.ts";
+import { hostDiscount } from "./families/sidequests-contract.ts";
 import { matchesPick } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import type { Discount, ScenarioState } from "./state.ts";
@@ -21,8 +22,9 @@ function fits(state: ScenarioState, cardId: string, pick: PickSpec, seat: number
 }
 
 // The seat already played a card this round that matched (so "the first ... each round" is spent).
-function playedMatching(state: ScenarioState, seat: number, pick: PickSpec, cardId: string, ctx: ReduceContext): boolean {
-  return (state.played ?? []).some((entry) => entry.round === state.round && entry.seat === seat && entry.id !== cardId && state.cards[entry.id] != null && fits(state, entry.id, pick, seat, ctx));
+// `thisPhase`: only the plays of the current phase count ("the first ... each planning phase").
+function playedMatching(state: ScenarioState, seat: number, pick: PickSpec, cardId: string, ctx: ReduceContext, thisPhase = false): boolean {
+  return (state.played ?? []).some((entry) => entry.round === state.round && (!thisPhase || entry.phase === state.phase) && entry.seat === seat && entry.id !== cardId && state.cards[entry.id] != null && fits(state, entry.id, pick, seat, ctx));
 }
 
 // The first discount of the seat the card would spend.
@@ -41,6 +43,7 @@ function rules(state: ScenarioState, verb: CostRule["verb"], cardId: string, sea
     const rule = instruction as CostRule;
     if (!fits(state, cardId, rule.pick, seat, ctx)) continue;
     if (rule.verb !== "PaysFor" && rule.firstEachRound && playedMatching(state, seat, rule.pick, cardId, ctx)) continue;
+    if (rule.verb === "IgnoreResourceMatch" && rule.firstEachPhase && playedMatching(state, seat, rule.pick, cardId, ctx, true)) continue;
     found.push({ sourceId: source.id, rule });
   }
   return found;
@@ -63,6 +66,8 @@ export function costReduction(state: ScenarioState, cardId: string, seat: number
     amount += resolveAmount(state, rule.amount, { actor: seat, sourceId }, ctx);
     min = Math.max(min, rule.min ?? 0);
   }
+  // The first card played on each hero each round (the sidequests family's ReduceFirstOnEachHero).
+  amount += hostDiscount(state, cardId, seat, ctx, hostId);
   return { amount, min };
 }
 

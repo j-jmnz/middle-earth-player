@@ -14,6 +14,7 @@ import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
 import { combatStepIs } from "./families/defense-conditions.ts";
+import { faceUp, flagHeld } from "./families/sidequests-contract.ts";
 import { copyInVictory } from "./families/sidequests-pick.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
@@ -75,6 +76,10 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return sourceIn(state, scope.sourceId, condition.zone);
     case "inVictory":
       return state.victory.some((id) => state.cards[id]?.code === condition.code) === condition.is;
+    case "faceUp":
+      return faceUp(state, scope.sourceId, condition.side);
+    case "flag":
+      return flagHeld(state, condition, scope.sourceId, scope.actor);
     case "copyInVictory":
       return copyInVictory(state, conditionCard(state, condition.card, scope), ctx) === (condition.is !== false);
     case "otherLocationInPlay":

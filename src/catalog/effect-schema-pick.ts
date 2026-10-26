@@ -147,6 +147,8 @@ export const pickSchema = z.strictObject({
   sameTitleAs: z.literal("activeLocation").optional(),
   // A character committed to a side quest (`sideQuest`), or to the current quest (`mainQuest`).
   committedTo: z.enum(["sideQuest", "mainQuest"]).optional(),
+  // A card with at least this many Restricted attachments on it ("each of your heroes has at least 2 restricted attachments").
+  restrictedAttachments: z.number().int().positive().optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

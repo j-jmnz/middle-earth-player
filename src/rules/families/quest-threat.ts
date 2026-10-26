@@ -6,6 +6,7 @@
 // keeps its player in the game at the threat elimination level (Favor of the Valar).
 import type { Cause } from "../cause.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../cause.ts";
+import { holds } from "../conditions.ts";
 import { pushEffectFrame } from "../effect-frames.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
@@ -27,7 +28,13 @@ function playerSource(state: ScenarioState, sourceId: string | null, ctx: Reduce
 // A player card effect lowers the seat's threat: by at most 1 while the seat holds threatReductionToOne (22054:A:1). When the
 // dial moved, the seat hears which card lowered it (141015:A:2).
 export function lowerThreatByEffect(state: ScenarioState, seat: number, amount: number, sourceId: string | null, ctx: ReduceContext, steps: EngineStep[], cause: Cause): ScenarioState {
-  const capped = playerSource(state, sourceId, ctx) && heldAmount(state, `seat:${seat}`, "threatReductionToOne") > 0 ? Math.min(amount, 1) : amount;
+  const player = playerSource(state, sourceId, ctx);
+  // A contract bars the player's threat from being reduced by player card effects (1) or by those of cards other than contracts (2)
+  // (A Perilous Voyage, 40047).
+  const barred = player ? heldAmount(state, `seat:${seat}`, "noThreatReduction") : 0;
+  const fromContract = sourceId != null && state.cards[sourceId] != null && printedOf(ctx.cards, state.cards[sourceId]?.code ?? "").type === "contract";
+  const reduced = barred === 1 || (barred > 1 && !fromContract) ? 0 : amount;
+  const capped = player && heldAmount(state, `seat:${seat}`, "threatReductionToOne") > 0 ? Math.min(reduced, 1) : reduced;
   const before = state.seats[seat]?.threat ?? 0;
   const lowered = lowerThreat(state, seat, capped, steps, cause);
   if ((lowered.seats[seat]?.threat ?? 0) >= before || !sourceId) return lowered;
@@ -95,7 +102,12 @@ export function recordStartingThreat(state: ScenarioState, ctx: ReduceContext): 
 function savingSeats(state: ScenarioState, ctx: ReduceContext): number[] {
   if (!heard(state, ctx, "wouldBeEliminated")) return [];
   return livingSeats(state).filter((seat) =>
-    Object.values(state.cards).some((card) => card.controller === seat && inPlay(card.zone) && effectsOf(ctx, card.code).some((effect) => effect.timing === "forced" && effect.trigger === "wouldBeEliminated")),
+    Object.values(state.cards).some(
+      (card) =>
+        card.controller === seat &&
+        inPlay(card.zone) &&
+        effectsOf(ctx, card.code).some((effect) => effect.timing === "forced" && effect.trigger === "wouldBeEliminated" && (!effect.condition || holds(state, effect.condition, { actor: seat, sourceId: card.id, returned: 0 }, ctx))),
+    ),
   );
 }
 
@@ -103,6 +115,9 @@ export function syncThreatSaves(state: ScenarioState, ctx: ReduceContext, steps:
   const seats = savingSeats(state, ctx);
   const current = state.threatSaves ?? [];
   if (seats.length === current.length && seats.every((seat, at) => current[at] === seat)) return state;
+  // A save that is gone while effects still resolve waits for them: the card that saved the seat may have flipped to a side that
+  // lowers its threat (A Perilous Voyage, 40047:B:2).
+  if (current.some((seat) => !seats.includes(seat)) && (state.stack.length > 0 || (state.pendingEvents?.length ?? 0) > 0)) return state;
   const { threatSaves: _old, ...rest } = state;
   const next: ScenarioState = seats.length > 0 ? { ...rest, threatSaves: seats } : rest;
   // A seat that lost its save while at the elimination level is eliminated now.

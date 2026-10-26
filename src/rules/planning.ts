@@ -14,6 +14,7 @@ import { payerOk } from "./families/costs-pay.ts";
 import { exhaustSlack, extraCostReason } from "./families/costs-play.ts";
 import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "./families/deck-play.ts";
 import { doomedRaise } from "./families/deck-rules.ts";
+import { playBlocked } from "./families/sidequests-contract.ts";
 import { enterQuestArea, inPlayLimitReason, sideQuestPlayReason } from "./families/sidequests-play.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -59,7 +60,7 @@ export function playCard(
   }
   // The discount it used is spent, and the card joins this round's plays.
   next = spendDiscount(next, intent.cardId, seat, ctx);
-  next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round }] };
+  next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round, phase: next.phase }] };
   // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x), less a reduction the seat holds for
   // its next Doomed event (families/deck-rules.ts).
   const doomed = doomedRaise(next, seat, printed);
@@ -203,6 +204,8 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   if (printed.type !== "event" && state.mode !== "planning") return "That intent is not legal in this window";
   if (printed.type !== "event" && planningTurn(state) !== state.activeSeat) return "Only the active player plays allies and attachments now";
   if (uniqueBlocked(state, printed, ctx.cards)) return "A second copy of that unique card cannot enter play";
+  // "You cannot play non-unique allies" (a contract, families/sidequests-contract.ts).
+  if (playBlocked(state, cardId, state.activeSeat, ctx)) return "A card in play forbids that card to be played";
   if (!hasResourceMatch(state, state.activeSeat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
   // A player side quest needs a free quest area (families/sidequests-play.ts).
   const area = printed.type === "player-side-quest" ? sideQuestPlayReason(state, state.activeSeat) : null;

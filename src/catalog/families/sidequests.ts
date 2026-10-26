@@ -3,6 +3,20 @@
 import { z } from "zod";
 
 import { when } from "../effect-schema-conditions.ts";
+import { pickSchema } from "../effect-schema-pick.ts";
+
+// A deckbuilding rule a contract prints on its side A (src/catalog/deck-rules.ts reads them): `noCards`, "Your deck cannot include
+// ally cards"; `copies`, no more than this many copies of a title; `heroes`, how many starting heroes (and, with `differentSpheres`,
+// each of a different sphere); `size`, the deck holds at least `min` or exactly `exactly` cards; `perSphere`, exactly this many
+// cards of each of the Leadership, Lore, Spirit and Tactics spheres.
+export const deckRuleSchema = z.discriminatedUnion("kind", [
+  z.strictObject({ kind: z.literal("noCards"), type: z.enum(["ally", "attachment"]) }),
+  z.strictObject({ kind: z.literal("copies"), max: z.number().int().positive() }),
+  z.strictObject({ kind: z.literal("heroes"), max: z.number().int().positive(), differentSpheres: z.boolean().optional() }),
+  z.strictObject({ kind: z.literal("size"), min: z.number().int().positive().optional(), exactly: z.number().int().positive().optional() }),
+  z.strictObject({ kind: z.literal("perSphere"), count: z.number().int().positive() }),
+]);
+export type DeckRule = z.infer<typeof deckRuleSchema>;
 
 export const VERBS = [
   // Constant on a card that goes to the victory display ("Limit 3 copies of ~ in the victory display"): the display holds at
@@ -31,13 +45,33 @@ export const VERBS = [
   // The source card, an Encounter-keyword player card just revealed into the staging area, enters the play area of the player
   // `who` names (the last picked player, the actor or the first player): ready, or `committed` to the quest, still its owner's card.
   z.strictObject({ verb: z.literal("TakeRevealedCard"), who: z.enum(["picked", "actor", "firstPlayer"]), committed: z.boolean().optional(), ...when }),
+  // The source card is flipped over: side A becomes side B and side B side A ("flip this card over"). `flipped` is announced about
+  // it. A contract's records name their side in their line ids (`21074:B:1`) and carry a `faceUp` condition for it.
+  z.strictObject({ verb: z.literal("FlipCard"), ...when }),
+  // Constant on a card in play: its controller cannot play, or put into play, a card that matches `pick` ("You cannot play
+  // non-unique allies or put non-unique allies into play"). A card in a hand, a deck or a discard pile is read from its owner's side.
+  z.strictObject({ verb: z.literal("CannotPlay"), pick: pickSchema, ...when }),
+  // Constant on a card in play: the first card that matches `pick` its controller plays on each of their heroes each round costs
+  // `amount` less ("Reduce the cost of the first restricted attachment you play on each of your heroes each round by 1").
+  z.strictObject({ verb: z.literal("ReduceFirstOnEachHero"), pick: pickSchema, amount: z.number().int().positive(), ...when }),
+  // Constant on a contract: a deckbuilding rule of its side A (src/catalog/deck-rules.ts). It does nothing in a game.
+  z.strictObject({ verb: z.literal("DeckRule"), rule: deckRuleSchema, ...when }),
 ] as const;
 
 export const TRIGGERS = [
   // About a side quest: its progress reached its quest points and it was defeated. A player side quest in the victory display or
   // its owner's discard pile hears it ("Response: When this stage is defeated, ...").
   "questDefeated",
+  // About a card: it was flipped over (the FlipCard verb); a contract hears "When this card is flipped to this side".
+  "flipped",
 ] as const;
 
-export const FLAGS = [] as const;
+export const FLAGS = [
+  // On a seat: its threat cannot be reduced by player card effects (1), or by those of cards that are not contracts (2).
+  "noThreatReduction",
+  // Held by a seat until the end of the round: the option of Council of the Wise (22091:A:2) already taken this round.
+  "councilThreat",
+  "councilDraw",
+  "councilResource",
+] as const;
 

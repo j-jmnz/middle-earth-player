@@ -120,6 +120,12 @@ export function smokeCard(code: string, options: SmokeOptions): SmokeSummary {
     state = spawned.state;
     ids.add(spawned.id);
     summary.placed = "heroes";
+  } else if (printed.type === "contract") {
+    // A contract begins the game in play showing its side A.
+    const spawned = spawn(state, code, { zone: "play", seat: 0 }, "A");
+    state = spawned.state;
+    ids.add(spawned.id);
+    summary.placed = "table";
   } else {
     // A copy in the discard pile too, so an effect that takes a card of its own sphere or type from there has one.
     const discarded = spawn(state, code, { zone: "discard", seat: 0 });

@@ -4,6 +4,20 @@ import type { Effect } from "../../../catalog/boundary.ts";
 
 // "While this side quest is in the victory display": the quest's constants work from there, for every seat.
 const IN_VICTORY = { kind: "sourceIn", zone: "victory" } as const;
+// The side of a contract a record belongs to.
+const SIDE_A = { kind: "faceUp", side: "A" } as const;
+const SIDE_B = { kind: "faceUp", side: "B" } as const;
+// The Grey Wanderer's choose two: the player's only hero is the starting hero.
+const OWN_HERO = { type: "hero", control: "you" } as const;
+const GREY_WANDERER_OPTIONS: Extract<Effect["instructions"][number], { verb: "Choose" }>["options"] = [
+  { id: "ready", requires: { kind: "canPick", pick: { ...OWN_HERO, state: "exhausted" } }, instructions: [{ verb: "Pick", pick: OWN_HERO }, { verb: "Ready", target: "picked" }] },
+  { id: "resources", requires: { kind: "canPick", pick: OWN_HERO }, instructions: [{ verb: "Pick", pick: OWN_HERO }, { verb: "AddResources", amount: 2, to: "picked" }] },
+  { id: "heal", requires: { kind: "canPick", pick: { ...OWN_HERO, damaged: true } }, instructions: [{ verb: "Pick", pick: OWN_HERO }, { verb: "Heal", amount: 3, target: "picked" }] },
+];
+// Council of the Wise: a seat's option already taken this round is a flag it holds until the end of the round.
+const COUNCIL = ["councilThreat", "councilDraw", "councilResource"] as const;
+const notTaken = (flag: (typeof COUNCIL)[number]) => ({ kind: "flag", stat: flag, holder: "seat", is: false }) as const;
+const taken = (flag: (typeof COUNCIL)[number]) => ({ verb: "ModifyStat", stat: flag, amount: 1, until: "endOfRound", target: "actorSeat" }) as const;
 // The first player chooses a player (rr.first-player): "The first player chooses a player to take control of ~."
 const FIRST_PLAYER_CHOOSES = { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } } as const;
 // "This effect cannot be cancelled": a condition that always holds.
@@ -455,6 +469,244 @@ export const RECORDS: readonly Effect[] = [
     timing: "action",
     condition: { kind: "phase", is: "Planning" },
     instructions: [{ verb: "AddSourceToVictory" }, { verb: "ShuffleSetAsideIntoEncounterDeck", code: "22010" }],
+  },
+  // Fellowship (contract). Side A: "You cannot play non-unique allies or put non-unique allies into play." "Forced: When you control
+  // exactly 9 unique characters, flip this card over." Side B: "You cannot play allies or put allies into play. Each character you
+  // control gets +1 Willpower, +1 Attack, +1 Defense." "Forced: After a character you control leaves play, flip this card over."
+  {
+    id: "21074:constant:1",
+    cardCode: "21074",
+    lines: ["21074:A:1"],
+    timing: "constant",
+    condition: SIDE_A,
+    instructions: [{ verb: "CannotPlay", pick: { type: "ally", control: "any", nonUnique: true } }],
+  },
+  ...(["enteredPlay", "leftPlay"] as const).map(
+    (trigger, at): Effect => ({
+      id: `21074:forced:${at + 1}`,
+      cardCode: "21074",
+      lines: ["21074:A:2"],
+      timing: "forced",
+      trigger,
+      subject: { type: "character", control: "you", unique: true },
+      condition: { kind: "all", conditions: [SIDE_A, { kind: "count", pick: { type: "character", control: "you", unique: true }, min: 9, max: 9 }] },
+      instructions: [{ verb: "FlipCard" }],
+    }),
+  ),
+  {
+    id: "21074:constant:2",
+    cardCode: "21074",
+    lines: ["21074:B:1"],
+    timing: "constant",
+    condition: SIDE_B,
+    instructions: [
+      { verb: "CannotPlay", pick: { type: "ally", control: "any" } },
+      ...(["willpower", "attack", "defense"] as const).map((stat) => ({ verb: "ModifyStat" as const, stat, amount: 1, until: "whileSourceInPlay" as const, holders: { type: "character" as const, control: "you" as const } })),
+    ],
+  },
+  {
+    id: "21074:forced:3",
+    cardCode: "21074",
+    lines: ["21074:B:2"],
+    timing: "forced",
+    trigger: "leftPlay",
+    subject: { type: "character", control: "you" },
+    condition: SIDE_B,
+    instructions: [{ verb: "FlipCard" }],
+  },
+  // Forth, The Three Hunters! Side A: "Your deck cannot include ally cards." "Each of your heroes can have 1 additional restricted
+  // attachment. Reduce the cost of the first restricted attachment you play on each of your heroes each round by 1." "Refresh Action:
+  // If each of your heroes has at least 2 restricted attachments, flip this card over." Side B: "Each of your heroes can have 1
+  // additional restricted attachment and gets +1 Willpower for each restricted attachment on it." "Action: Exhaust this card to heal
+  // 1 damage from each of your heroes."
+  { id: "22049:constant:1", cardCode: "22049", lines: ["22049:A:1"], timing: "constant", instructions: [{ verb: "DeckRule", rule: { kind: "noCards", type: "ally" } }] },
+  {
+    id: "22049:constant:2",
+    cardCode: "22049",
+    lines: ["22049:A:2"],
+    timing: "constant",
+    condition: SIDE_A,
+    instructions: [
+      { verb: "ModifyStat", stat: "extraRestricted", amount: 1, until: "whileSourceInPlay", holders: { type: "hero", control: "you" } },
+      { verb: "ReduceFirstOnEachHero", pick: { type: "attachment", control: "you", keyword: "restricted" }, amount: 1 },
+    ],
+  },
+  {
+    id: "22049:action:1",
+    cardCode: "22049",
+    lines: ["22049:A:3"],
+    timing: "action",
+    condition: { kind: "all", conditions: [SIDE_A, { kind: "phase", is: "Refresh" }, { kind: "allMatch", of: { type: "hero", control: "you" }, match: { type: "hero", control: "you", restrictedAttachments: 2 } }] },
+    instructions: [{ verb: "FlipCard" }],
+  },
+  {
+    id: "22049:constant:3",
+    cardCode: "22049",
+    lines: ["22049:B:1"],
+    timing: "constant",
+    condition: SIDE_B,
+    instructions: [
+      { verb: "ModifyStat", stat: "extraRestricted", amount: 1, until: "whileSourceInPlay", holders: { type: "hero", control: "you" } },
+      { verb: "ModifyStat", stat: "willpower", amount: 1, until: "whileSourceInPlay", holders: { type: "hero", control: "you" }, eachAttached: { type: "attachment", control: "any", keyword: "restricted" } },
+    ],
+  },
+  {
+    id: "22049:action:2",
+    cardCode: "22049",
+    lines: ["22049:B:2"],
+    timing: "action",
+    cost: { kind: "exhaustSelf" },
+    condition: SIDE_B,
+    instructions: [{ verb: "Each", pick: { type: "hero", control: "you" }, instructions: [{ verb: "Heal", amount: 1, target: "picked" }] }],
+  },
+  // The Grey Wanderer. Side A: "You cannot choose more than 1 starting hero." "Setup: Search your deck for an attachment with a
+  // printed cost of 1 and put it into play. Then, flip this card over." Side B: "The first non-unique card you play each planning
+  // phase does not require a resource match." "Action: Exhaust this card and raise your threat by 1 to (choose two): Ready your
+  // starting hero, add 2 resources to your starting hero's resource pool, or heal 3 damage from your starting hero."
+  { id: "22074:constant:1", cardCode: "22074", lines: ["22074:A:1"], timing: "constant", instructions: [{ verb: "DeckRule", rule: { kind: "heroes", max: 1 } }] },
+  {
+    id: "22074:setup:1",
+    cardCode: "22074",
+    lines: ["22074:A:2"],
+    timing: "setup",
+    instructions: [
+      { verb: "Pick", pick: { type: "card", control: "you", from: "deck", cardType: "attachment", cost: 1, intoPlay: true } },
+      { verb: "PutAttachmentIntoPlay", card: "picked" },
+      { verb: "FlipCard" },
+    ],
+  },
+  {
+    id: "22074:constant:2",
+    cardCode: "22074",
+    lines: ["22074:B:1"],
+    timing: "constant",
+    condition: SIDE_B,
+    instructions: [{ verb: "IgnoreResourceMatch", pick: { type: "card", control: "you", nonUnique: true }, firstEachPhase: true, when: { kind: "phase", is: "Planning" } }],
+  },
+  {
+    id: "22074:action:1",
+    cardCode: "22074",
+    lines: ["22074:B:2"],
+    timing: "action",
+    cost: [{ kind: "exhaustSelf" }, { kind: "raiseThreat", amount: 1 }],
+    condition: SIDE_B,
+    instructions: [
+      { verb: "Choose", who: "actor", different: true, options: GREY_WANDERER_OPTIONS },
+      { verb: "Choose", who: "actor", different: true, options: GREY_WANDERER_OPTIONS },
+    ],
+  },
+  // Council of the Wise. Side A: "You cannot include more than 1 copy of a card, by title, in your deck." "Response: After you play
+  // an event from your hand, choose one: reduce your threat by 1, draw 1 card, or add 1 resource to your hero's resource pool. You
+  // can only choose each option once per round."
+  { id: "22091:constant:1", cardCode: "22091", lines: ["22091:A:1"], timing: "constant", instructions: [{ verb: "DeckRule", rule: { kind: "copies", max: 1 } }] },
+  {
+    id: "22091:response:1",
+    cardCode: "22091",
+    lines: ["22091:A:2"],
+    timing: "response",
+    trigger: "played",
+    eventSeat: "you",
+    subject: { type: "card", control: "you", cardType: "event" },
+    condition: { kind: "any", conditions: COUNCIL.map((flag) => ({ kind: "flag" as const, stat: flag, holder: "seat" as const, is: false })) },
+    instructions: [
+      {
+        verb: "Choose",
+        who: "actor",
+        options: [
+          { id: "threat", requires: notTaken("councilThreat"), instructions: [{ verb: "LowerThreat", amount: 1, who: "actor" }, taken("councilThreat")] },
+          { id: "draw", requires: notTaken("councilDraw"), instructions: [{ verb: "Draw", amount: 1 }, taken("councilDraw")] },
+          {
+            id: "resource",
+            requires: { kind: "all", conditions: [notTaken("councilResource"), { kind: "canPick", pick: { type: "hero", control: "you" } }] },
+            instructions: [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "AddResources", amount: 1, to: "picked" }, taken("councilResource")],
+          },
+        ],
+      },
+    ],
+  },
+  // Bond of Friendship: "Your deck must be exactly 50 players cards and include exactly 10 cards from each of these four spheres:
+  // Leadership, Lore, Spirit, and Tactics. You cannot include more than 2 copies of any card by title in your deck." "When choosing
+  // your starting heroes, you may choose 4 heroes instead of 3. Each of your heroes must belong to a different sphere."
+  {
+    id: "22147:constant:1",
+    cardCode: "22147",
+    lines: ["22147:A:1"],
+    timing: "constant",
+    instructions: [{ verb: "DeckRule", rule: { kind: "size", exactly: 50 } }, { verb: "DeckRule", rule: { kind: "perSphere", count: 10 } }, { verb: "DeckRule", rule: { kind: "copies", max: 2 } }],
+  },
+  { id: "22147:constant:2", cardCode: "22147", lines: ["22147:A:2"], timing: "constant", instructions: [{ verb: "DeckRule", rule: { kind: "heroes", max: 4, differentSpheres: true } }] },
+  // A Perilous Voyage. Side A: "Your minimum deck size is 100 cards. Your threat cannot be reduced by player card effects. Action:
+  // Exhaust this card and raise your threat by 1 to look at the top 2 cards of your deck, draw 1, and place the other on the bottom
+  // of your deck." "Forced: When you would be eliminated by reaching your threat elimination level, flip this card over instead."
+  // Side B: "Your threat cannot be reduced by non-contract player card effects. Heroes you control do not exhaust to quest." "Forced:
+  // When this card is flipped to this side, reduce your threat by 10. Search your deck for a card and either add it to your hand or
+  // play it, reducing its cost by 3. Shuffle your deck."
+  { id: "40047:constant:1", cardCode: "40047", lines: ["40047:A:1"], timing: "constant", instructions: [{ verb: "DeckRule", rule: { kind: "size", min: 100 } }] },
+  {
+    id: "40047:constant:2",
+    cardCode: "40047",
+    lines: ["40047:A:1"],
+    timing: "constant",
+    condition: SIDE_A,
+    instructions: [{ verb: "ModifyStat", stat: "noThreatReduction", amount: 1, until: "whileSourceInPlay", target: "actorSeat" }],
+  },
+  {
+    id: "40047:action:1",
+    cardCode: "40047",
+    lines: ["40047:A:1"],
+    timing: "action",
+    cost: [{ kind: "exhaustSelf" }, { kind: "raiseThreat", amount: 1 }],
+    condition: SIDE_A,
+    instructions: [
+      { verb: "LookAtTop", count: 2, deck: "own" },
+      { verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 2 } },
+      { verb: "MovePicked", to: "hand" },
+      { verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 1 } },
+      { verb: "MoveCard", card: "picked", to: "deckBottom" },
+    ],
+  },
+  {
+    id: "40047:forced:1",
+    cardCode: "40047",
+    lines: ["40047:A:2"],
+    timing: "forced",
+    trigger: "wouldBeEliminated",
+    eventSeat: "you",
+    condition: SIDE_A,
+    instructions: [{ verb: "FlipCard" }],
+  },
+  {
+    id: "40047:constant:3",
+    cardCode: "40047",
+    lines: ["40047:B:1"],
+    timing: "constant",
+    condition: SIDE_B,
+    instructions: [
+      { verb: "ModifyStat", stat: "noThreatReduction", amount: 2, until: "whileSourceInPlay", target: "actorSeat" },
+      { verb: "ModifyStat", stat: "noExhaustQuest", amount: 1, until: "whileSourceInPlay", holders: { type: "hero", control: "you" } },
+    ],
+  },
+  {
+    id: "40047:forced:2",
+    cardCode: "40047",
+    lines: ["40047:B:2"],
+    timing: "forced",
+    trigger: "flipped",
+    subject: "self",
+    condition: SIDE_B,
+    instructions: [
+      { verb: "LowerThreat", amount: 10, who: "actor" },
+      { verb: "Pick", pick: { type: "card", control: "you", from: "deck" } },
+      {
+        verb: "Choose",
+        who: "actor",
+        options: [
+          { id: "hand", instructions: [{ verb: "MovePicked", to: "hand" }] },
+          { id: "play", instructions: [{ verb: "MovePicked", to: "hand" }, { verb: "PlayFromHand", pick: { type: "card", control: "you" }, picked: true, reduce: 3 }] },
+        ],
+      },
+      { verb: "ShuffleDeck" },
+    ],
   },
   // Out of the Wild: "Action: Search the top 5 cards of the encounter deck for any 1 non-objective card worth no victory points and
   // add it to your victory display. Shuffle the encounter deck. Add Out of the Wild to the victory display."

@@ -59,6 +59,18 @@ export const SIDE_CARDS: ReadonlyMap<string, PrintedCard> = new Map([
     definePrinted({ code: "wolf", name: "Wolf", type: "enemy", threat: 1, engagementCost: 30, attack: 2, defense: 1, health: 3, traits: ["Creature"] }),
     definePrinted({ code: "wolf2", name: "Wolf", type: "enemy", threat: 1, engagementCost: 30, attack: 2, defense: 1, health: 3, traits: ["Creature"] }),
     definePrinted({ code: "plot", name: "Plot", type: "objective" }),
+    definePrinted({ code: "rblade", name: "Restricted Blade", type: "attachment", sphere: "tactics", cost: 2, traits: ["Item", "Weapon"], keywords: { restricted: true } }),
+    definePrinted({ code: "rshield", name: "Restricted Shield", type: "attachment", sphere: "tactics", cost: 1, traits: ["Item"], keywords: { restricted: true } }),
+    definePrinted({ code: "rcloak", name: "Restricted Cloak", type: "attachment", sphere: "tactics", cost: 1, traits: ["Item"], keywords: { restricted: true } }),
+    definePrinted({ code: "cheap1", name: "Cheap Charm", type: "attachment", sphere: "neutral", cost: 1, traits: ["Item"] }),
+    definePrinted({ code: "tactic", name: "Tactical Ally", type: "ally", sphere: "tactics", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2 }),
+    definePrinted({ code: "21074", name: "Fellowship", type: "contract", sphere: "neutral" }),
+    definePrinted({ code: "22024", name: "The Burglar's Turn", type: "contract", sphere: "neutral" }),
+    definePrinted({ code: "22049", name: "Forth, The Three Hunters!", type: "contract", sphere: "neutral" }),
+    definePrinted({ code: "22074", name: "The Grey Wanderer", type: "contract", sphere: "neutral" }),
+    definePrinted({ code: "22091", name: "Council of the Wise", type: "contract", sphere: "neutral" }),
+    definePrinted({ code: "22147", name: "Bond of Friendship", type: "contract", sphere: "neutral" }),
+    definePrinted({ code: "40047", name: "A Perilous Voyage", type: "contract", sphere: "neutral" }),
     ally("09015", "Ranger of the North", "neutral", ["Dúnedain", "Ranger"], { cost: null, willpower: 2, attack: 2, defense: 2, health: 3, keywords: { surge: true, sentinel: true, ranged: true } }),
     ally("19035", "Eagle of the North", "neutral", ["Creature", "Eagle"], { cost: null, willpower: 2, attack: 3, defense: 1, health: 3, keywords: { surge: true } }),
     ally("22010", "Tom Bombadil", "neutral", ["Istari"], { cost: null, willpower: 4, attack: 4, defense: 4, health: 4 }),
@@ -117,6 +129,12 @@ export function passQuestWindow(state: ScenarioState, ctx: SideCtx): ScenarioSta
 // The records read by the constants: rebuilt as the reducer does at the end of every step.
 export function synced(state: ScenarioState, ctx: SideCtx): ScenarioState {
   return syncConstants(run(state, ctx), ctx);
+}
+
+// A contract already in play, showing side A, for the seat.
+export function withContract(state: ScenarioState, code: string, seatIndex = 0) {
+  const made = put(state, code, "play", seatIndex);
+  return { ...made, state: updateCard(made.state, made.id, { face: "A" }) };
 }
 
 // A card of this code put into the victory display, with its constants in force.
