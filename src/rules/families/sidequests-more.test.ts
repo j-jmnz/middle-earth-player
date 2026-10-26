@@ -121,14 +121,13 @@ describe("the Lórien gifts' Actions (142015 to 142018)", () => {
   });
 
   it("Three Golden Hairs: lowers each player's threat by 3, then each draws 3 cards (142016:A:2)", () => {
-    const { table, made, state: attached } = gift("142016", 2);
+    const { made, state: attached } = gift("142016", 2);
     let state = [0, 1].reduce((acc, index) => withThreat(acc, index, 20), attached);
     for (const index of [0, 1]) for (let card = 0; card < 3; card += 1) state = put(state, "filler", "deck", index).state;
     state = trigger(state, made.id, "142016:action:1", ctx);
     expect(state.seats.map((entry) => entry.threat)).toEqual([17, 17]);
     expect(state.seats.map((entry) => entry.hand.length)).toEqual([3, 3]);
     expect(state.removedFromPool).toEqual(["142016"]);
-    void table;
   });
 
   it("Lórien Rope: each location in the staging area gets -2 Threat until the end of the phase (142017:A:2)", () => {

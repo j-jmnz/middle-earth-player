@@ -254,6 +254,10 @@ export type ScenarioState = {
   holdLethal?: true;
   // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests-setup.ts).
   playerSetup?: true;
+  // The loot decks (The Burglar's Turn, 22024): the cards each seat chose at deckbuilding (`lootPlan`, codes), and the ids of the
+  // loot deck each seat has built, top card first (families/sidequests-loot.ts).
+  lootPlan?: readonly (readonly string[])[];
+  lootDecks?: readonly (readonly string[])[];
   // The codes of the cards a player removed from the campaign pool during the game ("remove it from the campaign pool"); the
   // campaign log drops them when the scenario is won (campaign/log.ts).
   removedFromPool?: readonly string[];

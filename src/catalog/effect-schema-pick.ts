@@ -29,7 +29,8 @@ export const pickSchema = z.strictObject({
   spheres: z.array(sphereSchema).min(1).optional(),
   // A hero with this printed resource icon ("each hero you control with a printed Spirit resource icon").
   printedIcon: sphereSchema.optional(),
-  from: z.enum(["play", "hand", "discard", "deck", "victory"]).optional(),
+  // `loot`: the loot cards of the chooser's that guard a location, under it (The Burglar's Turn, 22024).
+  from: z.enum(["play", "hand", "discard", "deck", "victory", "loot"]).optional(),
   // From the deck: only its top cards are looked at. The cards still in the deck are the ones ArrangeTop puts back in order.
   // From the discard pile: only its top cards, the last put there ("While the top card of your discard pile is an event").
   top: z.number().int().positive().optional(),
@@ -147,6 +148,9 @@ export const pickSchema = z.strictObject({
   sameTitleAs: z.literal("activeLocation").optional(),
   // A character committed to a side quest (`sideQuest`), or to the current quest (`mainQuest`).
   committedTo: z.enum(["sideQuest", "mainQuest"]).optional(),
+  // The active location (or the second one). With `from: loot`, only the loot guarding the card the answered event is about.
+  isActive: z.boolean().optional(),
+  guardsSubject: z.boolean().optional(),
   // A card with at least this many Restricted attachments on it ("each of your heroes has at least 2 restricted attachments").
   restrictedAttachments: z.number().int().positive().optional(),
 });

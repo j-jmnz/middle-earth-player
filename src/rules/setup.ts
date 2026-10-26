@@ -24,6 +24,8 @@ export type StartSeat = {
   // (`host` is the hero's code), and cards a campaign card adds to the seat's hand before the opening hand is drawn.
   attachments?: readonly { host: string; code: string }[];
   hand?: readonly string[];
+  // The 14 Item or Artifact attachments a Burglar's Turn player chose from their collection: their loot deck (families/sidequests-loot.ts).
+  loot?: readonly string[];
 };
 
 export type StartScenario = {
@@ -87,6 +89,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = withThreat(state, index, threat);
     state = shuffleZone(state, index);
   }
+  if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
   const quiet: EngineStep[] = [];

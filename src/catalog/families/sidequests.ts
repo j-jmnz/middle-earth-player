@@ -48,6 +48,12 @@ export const VERBS = [
   // The source card is flipped over: side A becomes side B and side B side A ("flip this card over"). `flipped` is announced about
   // it. A contract's records name their side in their line ids (`21074:B:1`) and carry a `faceUp` condition for it.
   z.strictObject({ verb: z.literal("FlipCard"), ...when }),
+  // The actor's loot deck is built from the cards they chose at deckbuilding (StartSeat.loot), shuffled and set aside under the
+  // contract (The Burglar's Turn, families/sidequests-loot.ts).
+  z.strictObject({ verb: z.literal("BuildLootDeck"), ...when }),
+  // The top card of the actor's loot deck is attached faceup to the location the answered event is about, as a guarded objective:
+  // out of play under that location until it is explored.
+  z.strictObject({ verb: z.literal("AttachLoot"), ...when }),
   // Constant on a card in play: its controller cannot play, or put into play, a card that matches `pick` ("You cannot play
   // non-unique allies or put non-unique allies into play"). A card in a hand, a deck or a discard pile is read from its owner's side.
   z.strictObject({ verb: z.literal("CannotPlay"), pick: pickSchema, ...when }),

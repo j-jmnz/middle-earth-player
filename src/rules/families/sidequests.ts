@@ -5,6 +5,7 @@ import type { ScenarioState } from "../state.ts";
 import { livingSeats, withSeat } from "../state.ts";
 import { attachTo, moveCard } from "../zones.ts";
 import { flipCard } from "./sidequests-contract.ts";
+import { attachLoot, buildLootDeck } from "./sidequests-loot.ts";
 import { shuffleSetAside, takeRevealed } from "./sidequests-encounter.ts";
 import type { Focus } from "./index.ts";
 
@@ -23,6 +24,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return shuffleSetAside(state, instruction, focus);
     case "FlipCard":
       return flipCard(state, focus.sourceId);
+    case "BuildLootDeck":
+      return buildLootDeck(state, focus);
+    case "AttachLoot":
+      return attachLoot(state, focus);
     case "TakeRevealedCard":
       return takeRevealed(state, instruction, focus);
     case "RemoveFromCampaignPool": {

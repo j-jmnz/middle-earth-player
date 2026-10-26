@@ -142,7 +142,7 @@ export function fromEncounterDeck(printed: PrintedCard): boolean {
 }
 
 export function isPlayerType(printed: PrintedCard): boolean {
-  return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest";
+  return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest" || printed.type === "contract";
 }
 
 const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure", "player-side-quest", "contract"];

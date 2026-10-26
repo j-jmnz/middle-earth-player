@@ -28,7 +28,9 @@ export function copyInVictory(state: ScenarioState, id: string | null, ctx: Redu
   return state.victory.some((other) => other !== id && printedOf(ctx.cards, state.cards[other]?.code ?? code).name === name);
 }
 
-export function sidequestsPickMatches(state: ScenarioState, id: string, spec: PickSpec, _at: PickContext, ctx: ReduceContext): boolean {
+export function sidequestsPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext): boolean {
+  if (spec.isActive != null && (id === state.activeLocation || id === state.secondActiveLocation) !== spec.isActive) return false;
+  if (spec.guardsSubject && !(at.subject != null && state.cards[id]?.host === at.subject)) return false;
   if (spec.sharesTraitWith) {
     const other = comparedWith(state, spec.sharesTraitWith);
     if (!other || other === id) return false;

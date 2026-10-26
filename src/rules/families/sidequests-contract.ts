@@ -11,6 +11,7 @@ import { queueEvent } from "../queue.ts";
 import type { Modifier, ScenarioState } from "../state.ts";
 import { heldAmount, updateCard } from "../state.ts";
 import { moveCard } from "../zones.ts";
+import { lootUnder } from "./sidequests-loot.ts";
 
 // The `faceUp` condition: the card shows this side. A card dealt face up shows its side A.
 export function faceUp(state: ScenarioState, sourceId: string | null, side: "A" | "B"): boolean {
@@ -48,7 +49,9 @@ export function flipCard(state: ScenarioState, sourceId: string | null): Scenari
 export function attachedCount(state: ScenarioState, holderId: string, pick: PickSpec, sourceId: string, ctx: ReduceContext): number {
   const holder = state.cards[holderId];
   const seat = state.cards[sourceId]?.controller ?? state.firstPlayer;
-  return (holder?.attachments ?? []).filter((id) => matchesPick(state, id, pick, { seat, sourceId, counting: true }, ctx)).length;
+  // A guarded objective counts as attached to the location it guards (The Burglar's Turn).
+  const attached = [...(holder?.attachments ?? []), ...lootUnder(state, holderId)];
+  return attached.filter((id) => matchesPick(state, id, pick, { seat, sourceId, counting: true }, ctx)).length;
 }
 
 // ReduceFirstOnEachHero: how much less the card costs to play on this host, a hero of the seat, when it is the first card that
