@@ -14,7 +14,7 @@ import { payerOk } from "./families/costs-pay.ts";
 import { exhaustSlack, extraCostReason } from "./families/costs-play.ts";
 import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "./families/deck-play.ts";
 import { doomedRaise } from "./families/deck-rules.ts";
-import { enterQuestArea, sideQuestPlayReason } from "./families/sidequests-play.ts";
+import { enterQuestArea, inPlayLimitReason, sideQuestPlayReason } from "./families/sidequests-play.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
@@ -207,6 +207,9 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   // A player side quest needs a free quest area (families/sidequests-play.ts).
   const area = printed.type === "player-side-quest" ? sideQuestPlayReason(state, state.activeSeat) : null;
   if (area) return area;
+  // "Limit 2 copies of ~ in play" (families/sidequests-play.ts).
+  const limited = inPlayLimitReason(state, cardId, ctx);
+  if (limited) return limited;
   // An additional cost that cannot be paid (PlayCost, families/costs-play.ts).
   const extra = extraCostReason(state, cardId, state.activeSeat, ctx);
   if (extra) return extra;

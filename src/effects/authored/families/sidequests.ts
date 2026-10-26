@@ -326,6 +326,129 @@ export const RECORDS: readonly Effect[] = [
       { verb: "Delay", until: "endOfRound", instructions: [{ verb: "EliminatePlayer" }] },
     ],
   },
+  // Out of the Wild: "Action: Search the top 5 cards of the encounter deck for any 1 non-objective card worth no victory points and
+  // add it to your victory display. Shuffle the encounter deck. Add Out of the Wild to the victory display."
+  {
+    id: "04036:action:1",
+    cardCode: "04036",
+    lines: ["04036:A:2"],
+    timing: "action",
+    instructions: [
+      { verb: "PickEncounter", from: "deck", top: 5, notType: "objective", noVictory: true },
+      { verb: "MoveEncounterCard", to: "victory" },
+      { verb: "ShuffleEncounterDeck" },
+      { verb: "AddSourceToVictory" },
+    ],
+  },
+  // The Red Arrow: "Valour Response: After attached hero quests successfully, add The Red Arrow to the victory display to search the
+  // top 5 cards of your deck for an ally and put it into play."
+  {
+    id: "17058:response:1",
+    cardCode: "17058",
+    lines: ["17058:A:3"],
+    timing: "response",
+    trigger: "questedSuccessfully",
+    subject: "host",
+    cost: { kind: "addSelfToVictory" },
+    condition: { kind: "threat", min: 40 },
+    instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 5, cardType: "ally", intoPlay: true } }, { verb: "MovePicked", to: "play" }],
+  },
+  // Black Arrow: "Response: After attached hero declares an attack, add Black Arrow to the victory display to give attached hero +5
+  // Attack for this attack."
+  {
+    id: "132015:response:1",
+    cardCode: "132015",
+    lines: ["132015:A:2"],
+    timing: "response",
+    trigger: "declaredAttacker",
+    subject: "host",
+    cost: { kind: "addSelfToVictory" },
+    instructions: [{ verb: "ModifyStat", stat: "attack", amount: 5, until: "endOfAttack", target: "subject" }],
+  },
+  // Friend of Friends: "Attach to a Hobbit hero. Limit 2 copies of Friend of Friends in play."
+  {
+    id: "146012:constant:1",
+    cardCode: "146012",
+    lines: ["146012:A:1"],
+    timing: "constant",
+    instructions: [{ verb: "AttachesTo", host: { kind: "hero" }, hosts: [{ type: "hero", control: "any", trait: "Hobbit" }] }, { verb: "InPlayLimit", copies: 2 }],
+  },
+  // The Road Goes Ever On: "Response: When attached quest is defeated, the first player chooses a player. That player searches his
+  // deck for a side quest, adds it to his hand, and shuffles his deck."
+  {
+    id: "16012:response:1",
+    cardCode: "16012",
+    lines: ["16012:A:2"],
+    timing: "response",
+    trigger: "hostDefeated",
+    instructions: [
+      { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } },
+      { verb: "ActAs", who: "pickedPlayer" },
+      { verb: "Pick", pick: { type: "card", control: "you", from: "deck", cardType: "player-side-quest" } },
+      { verb: "MovePicked", to: "hand" },
+      { verb: "ShuffleDeck" },
+    ],
+  },
+  // Setup lines of heroes. Denethor: "Setup: Add 2 resources to Denethor's resource pool." Éowyn: "Setup: Reduce your threat by 3."
+  // Thurindir: "Setup: Search your deck for a side quest and add it to your hand. Shuffle your deck."
+  { id: "12001:setup:1", cardCode: "12001", lines: ["12001:A:1"], timing: "setup", instructions: [{ verb: "AddResources", amount: 2, to: "self" }] },
+  { id: "145002:setup:1", cardCode: "145002", lines: ["145002:A:1"], timing: "setup", instructions: [{ verb: "LowerThreat", amount: 3, who: "actor" }] },
+  {
+    id: "17028:setup:1",
+    cardCode: "17028",
+    lines: ["17028:A:2"],
+    timing: "setup",
+    instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", cardType: "player-side-quest" } }, { verb: "MovePicked", to: "hand" }, { verb: "ShuffleDeck" }],
+  },
+  // The Lórien gifts: "Setup: Attach to a hero in play." (the campaign pool shuffles one into its player's deck: the Setup search finds
+  // it and attaches it). Each Action adds the gift to the victory display and removes it from the campaign pool.
+  ...["142015", "142016", "142017", "142018"].map(
+    (code): Effect => ({ id: `${code}:setup:1`, cardCode: code, lines: [`${code}:A:1`], timing: "setup", instructions: [{ verb: "AttachSelf", to: { kind: "hero" } }] }),
+  ),
+  // Phial of Galadriel: "Action: Add Phial of Galadriel to the victory display and remove it from the campaign pool, to give each enemy
+  // engaged with you -4 Attack until the end of the round."
+  {
+    id: "142015:action:1",
+    cardCode: "142015",
+    lines: ["142015:A:2"],
+    timing: "action",
+    cost: { kind: "addSelfToVictory" },
+    instructions: [{ verb: "RemoveFromCampaignPool" }, { verb: "ModifyStat", stat: "attack", amount: -4, until: "endOfRound", holders: { type: "enemy", control: "any", engaged: "you" } }],
+  },
+  // Three Golden Hairs: "Action: Add Three Golden Hairs to the victory display and remove it from the campaign pool, to lower each
+  // player's threat by 3. Then, each player draws 3 cards."
+  {
+    id: "142016:action:1",
+    cardCode: "142016",
+    lines: ["142016:A:2"],
+    timing: "action",
+    cost: { kind: "addSelfToVictory" },
+    instructions: [
+      { verb: "RemoveFromCampaignPool" },
+      { verb: "LowerThreat", amount: 3, who: "eachSeat" },
+      { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Draw", amount: 3 }] },
+    ],
+  },
+  // Lórien Rope: "Action: Add Lórien Rope to the victory display, and remove it from the campaign pool to give each location in the
+  // staging area -2 Threat until the end of the phase."
+  {
+    id: "142017:action:1",
+    cardCode: "142017",
+    lines: ["142017:A:2"],
+    timing: "action",
+    cost: { kind: "addSelfToVictory" },
+    instructions: [{ verb: "RemoveFromCampaignPool" }, { verb: "ModifyStat", stat: "threat", amount: -2, until: "endOfPhase", holders: { type: "location", control: "any", stagingOnly: true } }],
+  },
+  // Leaf-wrapped Lembas: "Action: Add Leaf-wrapped Lembas to the victory display and remove it from the campaign pool, to ready all
+  // heroes in play."
+  {
+    id: "142018:action:1",
+    cardCode: "142018",
+    lines: ["142018:A:2"],
+    timing: "action",
+    cost: { kind: "addSelfToVictory" },
+    instructions: [{ verb: "RemoveFromCampaignPool" }, { verb: "Each", pick: { type: "hero", control: "any" }, instructions: [{ verb: "Ready", target: "picked" }] }],
+  },
   // Dour Handed: "Action: Deal X damage to an enemy engaged with you. X is the number of side quests in the victory display."
   {
     id: "16009:action:1",

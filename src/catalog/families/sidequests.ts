@@ -15,6 +15,12 @@ export const VERBS = [
   // The actor is eliminated from the game by a card effect ("At the end of the round, you are eliminated from the game",
   // rr.player-elimination).
   z.strictObject({ verb: z.literal("EliminatePlayer"), ...when }),
+  // Constant on a card in hand ("Limit 2 copies of ~ in play"): it cannot be played while this many copies of its title are in
+  // play (families/sidequests-play.ts).
+  z.strictObject({ verb: z.literal("InPlayLimit"), copies: z.number().int().positive(), ...when }),
+  // The source card is removed from the campaign pool ("add ~ to the victory display and remove it from the campaign pool"): the
+  // campaign log drops it when the scenario is won.
+  z.strictObject({ verb: z.literal("RemoveFromCampaignPool"), ...when }),
 ] as const;
 
 export const TRIGGERS = [

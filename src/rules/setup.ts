@@ -6,6 +6,7 @@ import { ruleCause } from "./cause.ts";
 import { threatCostCut } from "./families/costs-stats.ts";
 import type { EngineStep } from "./intents.ts";
 import { recordStartingThreat } from "./families/quest-threat.ts";
+import { pushPlayerSetup } from "./families/sidequests-setup.ts";
 import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
@@ -104,6 +105,9 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
 }
 
 export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // The Setup lines of the players' heroes and contracts resolve first, in frames that can ask (families/sidequests-setup.ts).
+  const players = pushPlayerSetup(state, ctx, steps);
+  if (players !== state) return players;
   let next = searchSetup(state, "encounter", ctx, steps);
   for (const instruction of next.setup) {
     next = runInstruction(

@@ -252,6 +252,11 @@ export type ScenarioState = {
   // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
   // damage then waits for those Responses before it destroys the character (settle keeps it current).
   holdLethal?: true;
+  // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests-setup.ts).
+  playerSetup?: true;
+  // The codes of the cards a player removed from the campaign pool during the game ("remove it from the campaign pool"); the
+  // campaign log drops them when the scenario is won (campaign/log.ts).
+  removedFromPool?: readonly string[];
   // Cost reductions waiting for the next matching card a seat plays (ReduceNextCost). They end with the phase or the round.
   discounts?: readonly Discount[];
   // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first
