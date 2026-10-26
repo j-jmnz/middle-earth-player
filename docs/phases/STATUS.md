@@ -35,6 +35,15 @@ Maestro flows are written in the phase that names them. `maestro test` runs afte
 | 15 | Journey in the Dark | not started | Engine half and phone half; the engine half can run beside 10 and 11. Not in `playable.ts`. Its lines are the open ones for 142040 to 142066 in `src/effects/open-lines.ts` (`pnpm effects:open`); the Setup (142040:A: 10 damage on Doom, Doom, Doom, one different location per player) is not built. |
 | 16 | Breaking of the Fellowship | not started | Engine half and phone half; the engine half can run beside 10 and 11. Not in `playable.ts`. Its lines are the open ones for the rest of 142040 to 142090 in `src/effects/open-lines.ts`; per-seat staging from stage 2B is not built. |
 | 17 | Design system | completed | 2026-10-23. Parchment chrome from the card frames and booklets, applied to the screens that exist. Reviewer has not reported. |
+| 18 | Card frames follow the card | not started | Board UX plan (`docs/plans/board-ux.md`). No dependency. |
+| 19 | Top bar and table menu | not started | Board UX plan. No dependency. |
+| 20 | Phase carousel | not started | Board UX plan. Depends on 19. |
+| 21 | Choice tray | not started | Board UX plan. Depends on 19. |
+| 22 | Declutter the board | not started | Board UX plan. Depends on 21. |
+| 23 | Motion pass | not started | Board UX plan. Depends on 20. |
+| 24 | Combat spotlight | not started | Board UX plan. Depends on 23. |
+| 25 | Hold and slide through the hand | not started | Board UX plan. Depends on 23. |
+| 26 | Peek at the other seat | not started | Board UX plan. Depends on 19 and 23. |
 
 ## Rules audit and the main merge, 2026-10-25
 
@@ -154,3 +163,14 @@ Branch `ccr-c7b5b4ea-4ei4kn` (table experience, Not applied, the core Learn to P
   - The new press targets need a 44 pt check on a phone.
 - **Open:** the phone checks of both branches (no phone in a cloud session).
 
+## Board UX plan, 2026-10-26
+
+User request: a quieter table with slower, more playful motion. The plan is `docs/plans/board-ux.md`: the user's list, the research it follows, the plan's own proposals and the order to build. Phases 18 to 26 carry it out. None depends on the scenario phases 14 to 16, so each can run beside them; start the phase the user names.
+
+- **Implementer:** every phase runs `implementer` on Sonnet 5.5 (`model: "sonnet"`), then `reviewer` and `ux` on the diff. Each phase file ends with notes for the implementer.
+- **User decisions:**
+  - "Hold the deck" is the hand; the player deck stays hidden.
+  - The right panel becomes a night tray over the dock.
+  - The two-handed peek shows the whole seat.
+- **Design system:** each phase may edit `docs/design-system.md` (Table) for what it changes. `/ux` reviews that.
+- **Phone checks:** a cloud session has none. Each phase lists its own, open.

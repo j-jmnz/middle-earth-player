@@ -1,0 +1,99 @@
+# Phase 18 — Card frames follow the card
+
+Depends on: nothing
+Blocks: nothing
+Can run beside: phases 14, 15, 16 and 19
+
+Plan: `docs/plans/board-ux.md` (user list item 9). Implementer: `implementer` on Sonnet 5.5.
+
+## Goal
+
+Every mark drawn in the shape of a card sits on the card at its turn, whether that turn is a fanned hand card's tilt or an exhausted card's quarter turn:
+- the halo;
+- the gold edge;
+- the picked edge;
+- the veil;
+- the beat ring.
+
+A tap on a fanned card's corner hits that card.
+
+## Now
+
+- `Moving` (`src/play/canvas-pieces.native.tsx:445-468`) turns only its `children`. `drawBody` (`src/play/table-canvas.native.tsx:239-252`) puts `Glow` and `CardBody` there, so the halo turns with the card.
+- `drawOverlay` (`table-canvas.native.tsx:253-273`) draws the following on `slotBounds(slot)` (`src/play/layout.ts:337-341`), which swaps width and height for an exhausted card and ignores `slot.tilt`:
+  - `Marks` (the gold edge, the picked edge, the check ring, the veil; `canvas-pieces.native.tsx:338-361`);
+  - the beat ring.
+- So a fanned hand card has a straight frame on a tilted picture. The end cards turn about 5°; a longer hand turns more.
+- `hitBounds` and `hitSlot` (`layout.ts:344-366`) ignore the tilt too.
+
+## Build
+
+- One pure helper, `cardFrame(slot)` in `src/play/layout.ts` (or a new `src/play/frame.ts` if `layout.ts` would pass 400 lines). It returns the card's center, its unturned width and height, and its turn (`slotRotation`, `src/play/motion.ts:17`). The body and every card-shaped mark read it.
+- Draw the card-shaped marks inside the turned group, next to `Glow`. `Moving` gains a second turned slot, or `drawBody` takes the marks:
+  - the gold edge;
+  - the picked edge;
+  - the veil (dim and muted);
+  - the beat ring.
+- These stay upright in the overlay, as `docs/design-system.md` says (tokens and effects stay upright):
+  - tokens;
+  - effect pills;
+  - the option pill;
+  - the not-applied mark;
+  - the clock;
+  - the picked check ring's center, with its "-1" or "+2".
+- `hitSlot` turns the touch point back by the slot's tilt around the card's center before testing the unturned rect. An exhausted card keeps its sideways footprint.
+- The halo must not bleed onto the next card (open note in `docs/phases/STATUS.md`, Table follow-up). Keep the blurred rect inset so that only about 3 pt of blur shows past the edge at sigma 4.5.
+
+## Tests
+
+- New `src/play/layout.test.ts` (or `frame.test.ts`):
+  - `cardFrame` gives the same turn as `slotRotation` for a fanned card, an exhausted card and a straight card;
+  - a point inside a tilted card's corner but outside its unturned rect hits that card;
+  - a point inside the unturned rect but outside the tilted card does not.
+
+## E2E
+
+None. The canvas is phone-only.
+
+## Exit
+
+- `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
+- `docs/design-system.md` (Table, Marks of the open moment) says the edge, veil and beat ring follow the card's turn.
+- STATUS.md lists the phone check as open: a five-card fanned hand in planning, with glowing and picked cards, the end cards' frames on the picture, and no blur on the neighbors.
+
+## Implementer notes (Sonnet 5.5)
+
+**Before you start**
+- Read `.cursor/agents/implementer.md` first and follow it. Ignore its `model` line.
+- Then read:
+  - this file;
+  - `docs/plans/board-ux.md`;
+  - `docs/design-system.md` (Table);
+  - `docs/architecture.md` (Play).
+- Implement this phase only.
+
+**What you may change**
+- This phase may edit `docs/design-system.md` (Table) for what it changes. That is the exception to "do not restyle screens". `/ux` reviews it.
+- No new dependency. Motion is Reanimated, drawing is Skia, gestures are Gesture Handler, haptics are `src/play/haptics.ts`. No `any`.
+- Colors come from `tableTokens` (`src/play/tokens.ts`). A hex in a component is a miss.
+
+**Boundaries**
+- `src/play` never imports `src/screens`.
+- `src/screens` never imports `src/rules`.
+- The reducer is the only writer of numbers.
+
+**Code and tests**
+- Logic goes in pure `.ts` files with a Vitest next to them. There are no component tests: Vitest runs in node on `*.test.ts`.
+- Keep files under about 300 lines and split by behavior. `canvas-pieces.native.tsx` is 487 lines: if you add to it, split it (marks into `card-marks.native.tsx`).
+- Keep every testID. If one moves behind a new control, update the `.maestro/*.yaml` flows that use it.
+
+**When you finish**
+- Exit gate: `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm data:check`.
+- A cloud session has no phone. List the phone checks as open in `docs/phases/STATUS.md`; do not mark them done.
+- Report back when the exit is green. The main session runs `reviewer` and `ux`.
+
+**Phase-specific**
+- This is the smallest phase.
+- Do not change the fan's tilt amounts (`layout.ts:321`) or the halo's sigmas.
+- Do not move tokens into the turned group: an exhausted card's tokens stay upright (design system, Cards).
+- The dragged card is drawn untilted (`table-canvas.native.tsx:314-319`). Its gold stroke is already straight; leave it.
