@@ -46,14 +46,15 @@ function playable(state: ScenarioState, ctx: ReduceContext, intents: readonly Le
   const seat = state.activeSeat;
   for (const intent of intents) {
     if (intent.type !== "PlayCard") continue;
-    const cost = playCost(state, intent.cardId, seat, ctx);
+    const printed = printedOf(ctx.cards, state.cards[intent.cardId]?.code ?? "");
+    // An attachment's cost can depend on its host (a discount for the first restricted attachment on a hero): the host comes first.
+    const host = printed.type === "attachment" ? legalTargets(state, { type: "PlayCard", cardId: intent.cardId }, ctx)[0] : undefined;
+    if (printed.type === "attachment" && !host) continue;
+    const cost = playCost(state, intent.cardId, seat, ctx, host ?? null);
     if (cost == null) continue;
     const paid = paymentsFor(state, ctx, seat, intent.cardId, cost);
     if (!paid) continue;
-    const printed = printedOf(ctx.cards, state.cards[intent.cardId]?.code ?? "");
-    if (printed.type !== "attachment") return { type: "PlayCard", cardId: intent.cardId, payments: paid };
-    const host = legalTargets(state, { type: "PlayCard", cardId: intent.cardId }, ctx)[0];
-    if (host) return { type: "PlayCard", cardId: intent.cardId, payments: paid, hostId: host };
+    return host ? { type: "PlayCard", cardId: intent.cardId, payments: paid, hostId: host } : { type: "PlayCard", cardId: intent.cardId, payments: paid };
   }
   return null;
 }

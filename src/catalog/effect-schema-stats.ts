@@ -84,6 +84,9 @@ export const modifyStatSchema = z.strictObject({
     .optional(),
   // Only holders with this trait ("Spy enemies get +1 Threat", 141047:A:1).
   trait: z.string().min(1).optional(),
+  // The amount is multiplied by the number of cards attached to each holder that match this filter ("+1 Willpower for each restricted
+  // attachment on it"): read for a constant each time its records are rebuilt (constants.ts).
+  eachAttached: pickSchema.optional(),
   // Every card that matches, from the source controller's side, instead of `target` ("Each Outlands character you control
   // gets +1 Attack", "Each enemy engaged with you gets -1 Defense"): read when the effect resolves, or for a constant each time
   // its records are rebuilt.

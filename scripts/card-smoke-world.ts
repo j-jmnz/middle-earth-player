@@ -21,7 +21,7 @@ export const SMOKE_DECK = "stealth-and-steadfastness";
 // The deal. The auto-player loses every starter game; on this seed it lasts longest (6 rounds, 128 steps, on 2026-10-26).
 export const SMOKE_SEED = 34;
 export const POLICY: PolicyOptions = { scout: "", prefer: "141035", protect: RING_BEARER, play: true, act: true };
-const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event"]);
+const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event", "player-side-quest", "contract"]);
 // The resources each hero holds when a copy is put in the hand (at least the card's cost).
 const RESOURCES = 5;
 // A hero added when none of Frodo, Sam and Merry can pay the card's sphere. Their text has no record (2026-10-26).

@@ -10,6 +10,7 @@ import { deckPlayHero, markDeckPlay } from "./deck-play.ts";
 import { hasResourceMatch, heroPays, validatePayments } from "./payments.ts";
 import { distinctHeroesReason } from "./cost-rules.ts";
 import { allyPools, noteSpent } from "./families/costs-pay.ts";
+import { addToVictory } from "./families/sidequests-victory.ts";
 import { eventPlayReason } from "./families/costs-play.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
@@ -105,7 +106,9 @@ function payable(state: ScenarioState, cost: Cost, source: CardInstance, seat: n
     }
     case "exhaustCode":
       return Object.values(state.cards).some((card) => card.code === cost.code && inPlay(card.zone) && !card.exhausted && (card.controller ?? seat) === seat);
+    // An attachment whose host just left play answers from its owner's discard pile (families/attachments-hold.ts hostDefeated).
     case "addSelfToVictory":
+      return inPlay(source.zone) || source.zone === "discard";
     case "discardSelf":
     case "damageSelf":
     case "returnSelfToHand":
@@ -201,7 +204,7 @@ export function payUsage(
         break;
       }
       case "addSelfToVictory":
-        next = moveCard(next, sourceId, { zone: "victory" });
+        next = addToVictory(next, sourceId, ctx);
         break;
       case "discardSelf":
         next = destroyCard(next, sourceId, ctx.cards, steps);

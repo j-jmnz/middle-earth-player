@@ -80,6 +80,9 @@ export type CardInstance = {
   host: string | null;
   attachments: readonly string[];
   committed: boolean;
+  // The side quest a committed character quests on instead of the current quest (families/sidequests-quest.ts). Absent for the
+  // current quest.
+  questTo?: string;
   shadowId: string | null;
   // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent
   // when there are none.
@@ -259,12 +262,22 @@ export type ScenarioState = {
   // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
   // damage then waits for those Responses before it destroys the character (settle keeps it current).
   holdLethal?: true;
+  // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests-setup.ts).
+  playerSetup?: true;
+  // The loot decks (The Burglar's Turn, 22024): the cards each seat chose at deckbuilding (`lootPlan`, codes), and the ids of the
+  // loot deck each seat has built, top card first (families/sidequests-loot.ts).
+  lootPlan?: readonly (readonly string[])[];
+  lootDecks?: readonly (readonly string[])[];
+  // The codes of the cards a player removed from the campaign pool during the game ("remove it from the campaign pool"); the
+  // campaign log drops them when the scenario is won (campaign/log.ts).
+  removedFromPool?: readonly string[];
   // Cost reductions waiting for the next matching card a seat plays (ReduceNextCost). They end with the phase or the round.
   discounts?: readonly Discount[];
   // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first
   // Rohan ally you play each round"). Only this round's are kept.
   // `paid`: the pools that paid for it and how much each (Linhir Sea-captain's "paid all of its cost from a single hero").
-  played?: readonly { id: string; code: string; seat: number; round: number; paid?: readonly { heroId: string; amount: number }[] }[];
+  // `phase`: the phase it was played in when that was not the Planning phase ("the first non-unique card you play each planning phase").
+  played?: readonly { id: string; code: string; seat: number; round: number; phase?: string; paid?: readonly { heroId: string; amount: number }[] }[];
   // The cards that spent resources this round ("each hero ... that did not spend any resources this round").
   spent?: { round: number; ids: readonly string[] };
   // This round's quest (rr.step-3-4): the characters committed to it, and the seats whose quest succeeded ("If you quest

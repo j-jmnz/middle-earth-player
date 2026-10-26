@@ -75,6 +75,8 @@ export function encounterCandidates(state: ScenarioState, instruction: PickEncou
     if (!card) return false;
     const printed = printedOf(ctx.cards, card.code);
     if (instruction.type && printed.type !== instruction.type) return false;
+    if (instruction.notType && printed.type === instruction.notType) return false;
+    if (instruction.noVictory && (printed.victory ?? 0) > 0) return false;
     if (instruction.nonUnique && printed.isUnique) return false;
     if (inPlay(card.zone) && playerEffect && !playerCardEffectCanChoose(printed)) return false;
     if (max != null && (inPlay(card.zone) ? modifiedStat(state, card, "threat", ctx.cards) : (printed.threat ?? 0)) > max) return false;
@@ -146,7 +148,7 @@ function playableActions(state: ScenarioState, cardId: string, seat: number, ctx
 function played(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[cardId];
   if (!card) return state;
-  let next: ScenarioState = { ...state, played: [...(state.played ?? []).filter((entry) => entry.round === state.round), { id: cardId, code: card.code, seat, round: state.round }] };
+  let next: ScenarioState = { ...state, played: [...(state.played ?? []).filter((entry) => entry.round === state.round), { id: cardId, code: card.code, seat, round: state.round, phase: state.phase }] };
   const doomed = printedOf(ctx.cards, card.code).keywords.doomed;
   if (doomed != null && doomed > 0) for (const index of livingSeats(next)) next = raiseThreat(next, index, doomed, steps, ruleCause("rr.doomed-x"));
   return next;

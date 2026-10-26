@@ -76,7 +76,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   }
   const fallenHeroesBySeat = heroesBySeat.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]);
   const fallen = new Set(fallenHeroesBySeat.flat());
-  const pool: PoolCard[] = log.campaignPool.filter((card) => card.attachedTo == null || !fallen.has(card.attachedTo));
+  // A card the game removed from the campaign pool ("add it to the victory display and remove it from the campaign pool") is gone.
+  const pool: PoolCard[] = log.campaignPool.filter((card) => (card.attachedTo == null || !fallen.has(card.attachedTo)) && !state.removedFromPool?.includes(card.code));
   for (const earned of result.earned) {
     if (pool.some((card) => card.code === earned.code)) continue;
     const printed = printedOf(cards, earned.code);

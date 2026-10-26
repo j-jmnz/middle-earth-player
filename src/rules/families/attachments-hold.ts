@@ -18,9 +18,21 @@ function heldAttachments(state: ScenarioState, hostId: string): string[] {
 
 // "When attached enemy is destroyed", "After attached quest card is defeated": each card attached to the host hears it from
 // wherever it goes, so this is queued before the host's attachments are released.
-export function noteHostDefeated(state: ScenarioState, hostId: string): ScenarioState {
+// The codes of the cards with a `hostDefeated` record, by card map: registered by the reducer so that a hero's destruction is
+// announced only to the attachments that listen for it (an enemy's and a quest card's always are).
+const HOST_LISTENERS = new WeakMap<object, ReadonlySet<string>>();
+
+export function registerHostListeners(ctx: { cards: object; effects: readonly { cardCode: string; trigger?: string }[] }): void {
+  if (HOST_LISTENERS.has(ctx.cards)) return;
+  HOST_LISTENERS.set(ctx.cards, new Set(ctx.effects.filter((effect) => effect.trigger === "hostDefeated").map((effect) => effect.cardCode)));
+}
+
+// `heroCards`: the host is a hero, so only the attachments with a `hostDefeated` record hear it (when the reducer registered them).
+export function noteHostDefeated(state: ScenarioState, hostId: string, heroCards?: object): ScenarioState {
   let next = state;
-  for (const id of heldAttachments(state, hostId)) next = queueEvent(next, { trigger: "hostDefeated", seat: next.cards[id]?.controller ?? null, cardId: id, other: hostId });
+  const listeners = heroCards ? HOST_LISTENERS.get(heroCards) : undefined;
+  const heard = (id: string) => listeners == null || listeners.has(state.cards[id]?.code ?? "");
+  for (const id of heldAttachments(state, hostId).filter(heard)) next = queueEvent(next, { trigger: "hostDefeated", seat: next.cards[id]?.controller ?? null, cardId: id, other: hostId });
   return next;
 }
 

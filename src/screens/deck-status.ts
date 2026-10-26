@@ -1,4 +1,6 @@
+import { deckRulesOf } from "../catalog/deck-rules";
 import { deckSaveRefusal, formatDeckRefusal, type DeckSaveCard, type DeckSaveRefusal } from "../catalog/deck-save";
+import { EFFECTS } from "../effects";
 
 // What the deck screens say about a deck: whether it is ready to play, its counts, and its cards grouped by type. A deck
 // saves at any stage (user decision, 2026-10-25); the deckbuilding rules decide whether it is ready, and the briefing does
@@ -26,7 +28,8 @@ export function deckCardCount(cards: DeckContent["cards"]): number {
 
 /** The first rule the deck breaks (rr.deckbuilding), or null when it is ready to play. The name is not a rule. */
 export function deckRefusal(deck: DeckContent, faces: ReadonlyMap<string, DeckSaveCard>): DeckSaveRefusal | null {
-  return deckSaveRefusal(deck.heroes, deck.cards, faces, []);
+  // The rules of the deck's contract, if it has one (a contract prints deckbuilding rules on its side A).
+  return deckSaveRefusal(deck.heroes, deck.cards, faces, [], deckRulesOf(EFFECTS, deck.cards.map((card) => card.code)));
 }
 
 export type DeckReadiness = { ready: true; text: string } | { ready: false; text: string };
@@ -35,8 +38,10 @@ export type DeckReadiness = { ready: true; text: string } | { ready: false; text
 export function deckReadiness(deck: DeckContent, faces: ReadonlyMap<string, DeckSaveCard>): DeckReadiness {
   const refusal = deckRefusal(deck, faces);
   if (!refusal) return { ready: true, text: "Ready to play" };
-  if (refusal.rule === "At least 50 cards.") {
-    const missing = DECK_MINIMUM - deckCardCount(deck.cards);
+  // "At least 50 cards." (100 with A Perilous Voyage): a contract is no deck card, so it is not counted.
+  const short = /^At least (\d+) cards\.$/.exec(refusal.rule);
+  if (short) {
+    const missing = Number(short[1]) - deckCardCount(deck.cards.filter((card) => faces.get(card.code)?.typeCode !== "contract"));
     return { ready: false, text: `Needs ${missing} more ${missing === 1 ? "card" : "cards"}` };
   }
   if (refusal.rule === "At least one hero.") return { ready: false, text: "Needs a hero" };

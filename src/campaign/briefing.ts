@@ -2,6 +2,7 @@
 // mec109.setup (data/rules/entries.json). The briefing turns a loadout (one saved deck per seat and the Ring-bearer slot)
 // into either the opening start the checklist produces or the sentences that refuse it. Pure: the screen shows what
 // this returns and deals only when `dealable` is true.
+import { deckRulesOf, heroLimit } from "../catalog/deck-rules.ts";
 import { deckSaveRefusal, formatDeckRefusal } from "../catalog/deck-save.ts";
 import { recordInstructions, type Difficulty } from "../catalog/scenario-data.ts";
 import { printedOf } from "../rules/printed.ts";
@@ -91,10 +92,12 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[]):
   input.seats.slice(0, input.seatCount).forEach((seat, index) => {
     const label = input.seatCount === 1 ? "The deck" : `Seat ${index + 1}'s deck`;
     if (seat.deckId == null) problems.push({ rule: "Choose a deck", message: `Choose a saved deck for seat ${index + 1}.` });
-    else if (seat.heroes.length < 1 || seat.heroes.length > 3) problems.push({ rule: "One to three heroes", message: `${label} has ${seat.heroes.length} heroes. A saved deck has one to three.` });
-    else if (world.deckFacts) {
-      // A deck saves before it is ready to play (rr.deckbuilding); it is not dealt until it is.
-      const refusal = deckSaveRefusal(seat.heroes, deckCounts(seat.deck), world.deckFacts);
+    else if (seat.heroes.length < 1 || seat.heroes.length > heroLimit(deckRulesOf(world.effects, seat.deck))) {
+      const limit = heroLimit(deckRulesOf(world.effects, seat.deck));
+      problems.push({ rule: limit === 3 ? "One to three heroes" : `One to ${limit} heroes`, message: `${label} has ${seat.heroes.length} heroes. A saved deck has one to ${limit === 3 ? "three" : limit}.` });
+    } else if (world.deckFacts) {
+      // A deck saves before it is ready to play (rr.deckbuilding); it is not dealt until it is. A contract's deckbuilding rules apply.
+      const refusal = deckSaveRefusal(seat.heroes, deckCounts(seat.deck), world.deckFacts, [], deckRulesOf(world.effects, seat.deck));
       if (refusal) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(refusal)}` });
     }
     for (const code of seat.heroes) {

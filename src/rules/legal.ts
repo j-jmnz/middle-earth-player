@@ -23,6 +23,7 @@ import { optionalEnemies, stagingLocations } from "./quest.ts";
 import { defenseBlocked, travelBlocked, travelCostUnpayable } from "./restrictions.ts";
 import { flagged, perilLock, type ScenarioState } from "./state.ts";
 import { attackRuleReason } from "./families/attack-targets.ts";
+import { sideQuestReason } from "./families/sidequests-quest.ts";
 
 const NUMBER = "The engine computes that number";
 
@@ -205,7 +206,7 @@ function commitReason(
   for (const id of intent.cardIds) {
     if (!legal.has(id)) return "That character cannot commit";
   }
-  return null;
+  return intent.sideQuestId ? sideQuestReason(state, intent.sideQuestId) : null;
 }
 
 function travelReason(

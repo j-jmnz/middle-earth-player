@@ -12,6 +12,8 @@ import { immuneToSource } from "./families/misc-guards.ts";
 import { countsExtra } from "./families/misc-traits.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import { playPickMatches } from "./families/play-pick.ts";
+import { playBlocked } from "./families/sidequests-contract.ts";
+import { sidequestsPickMatches } from "./families/sidequests-pick.ts";
 import { lookedPool } from "./families/deck-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
@@ -52,6 +54,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   if (spec.looked) return lookedPool(state, spec, seats);
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
   else if (from === "victory") raw.push(...state.victory);
+  else if (from === "loot") raw.push(...Object.values(state.cards).filter((card) => card.zone === "under" && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
   else if (from === "discard") {
     for (const index of seats) {
       // `top`: the last cards put on the pile.
@@ -141,6 +144,9 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // The misc family's filters: controlled by the picked player, attached to the picked card, a player card, a Defense limit, drawn
   // in the resource phase (families/misc-pick.ts).
   if (!miscPickMatches(state, id, spec, at, ctx)) return false;
+  // The sidequests family's filters: a Trait or a title shared with another card, the quest a character is committed to
+  // (families/sidequests-pick.ts).
+  if (!sidequestsPickMatches(state, id, spec, at, ctx)) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   // Every defender of the attack in progress, the extra ones too (rr.multiple-defenders).
   if (spec.defending && !isDefending(state, id)) return false;
@@ -162,7 +168,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     const threat = seatThreat(state, asking);
     if (printed.engagementCost == null || modifiedStat(state, instance, "engagementCost", ctx.cards) <= threat) return false;
   }
-  if (spec.intoPlay && uniqueBlocked(state, printed, ctx.cards)) return false;
+  if (spec.intoPlay && (uniqueBlocked(state, printed, ctx.cards) || playBlocked(state, id, asking, ctx))) return false;
   if (spec.costIsX && at.x != null && printed.cost !== at.x) return false;
   if (spec.maxCost != null && (printed.cost == null || printed.cost > spec.maxCost)) return false;
   if (spec.minCost != null && (printed.cost == null || printed.cost < spec.minCost)) return false;

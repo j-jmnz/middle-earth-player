@@ -16,6 +16,7 @@ import { pushEffectFrame } from "../effect-frames.ts";
 import type { EngineStep, Payment, PlayerIntent } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { addModifier, raiseThreat, uniqueBlocked } from "../keywords.ts";
+import { playBlocked } from "./sidequests-contract.ts";
 import { effectsOf } from "../listen.ts";
 import { heroPays, hasResourceMatch } from "../payments.ts";
 import { matchesPick, pickCandidates } from "../pick.ts";
@@ -158,8 +159,12 @@ function playableNow(state: ScenarioState, seat: number, cardId: string, terms: 
   const card = state.cards[cardId];
   if (!card || card.zone !== "hand" || card.controller !== seat) return false;
   const printed = printedOf(ctx.cards, card.code);
-  if (printed.type !== "ally" && !(printed.type === "attachment" && terms.onSelf)) return false;
-  if (printed.cost == null || uniqueBlocked(state, printed, ctx.cards)) return false;
+  // An ally, an event, or an attachment (on the source with `onSelf`, otherwise on a host it may be attached to: "search your deck
+  // for a card and play it, reducing its cost by 3").
+  if (printed.type !== "ally" && printed.type !== "event" && printed.type !== "attachment") return false;
+  if (printed.type === "event" && eventPlayReason(state, cardId, seat, ctx)) return false;
+  if (printed.type === "attachment" && !terms.onSelf && attachmentHostIds(state, seat, card.code, ctx).length === 0) return false;
+  if (printed.cost == null || uniqueBlocked(state, printed, ctx.cards) || playBlocked(state, cardId, seat, ctx)) return false;
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
   if (cardRules(state, cardId, "PlayOnlyIf", ctx).some((rule) => !holds(state, rule.condition, scope, ctx))) return false;
   if (extraCostReason(state, cardId, seat, ctx)) return false;
@@ -210,10 +215,23 @@ export function payToPlay(state: ScenarioState, instruction: PayToPlay, seat: nu
   const owner = card?.controller ?? seat;
   const terms = termsOf(instruction);
   if (!card || card.zone !== "hand") return state;
-  const hostId = terms.onSelf ? sourceId : null;
+  let hostId = terms.onSelf ? sourceId : instruction.host || null;
+  let answer = chosen;
+  if (card.zone === "hand" && printedOf(ctx.cards, card.code).type === "attachment" && !terms.onSelf) {
+    // The host comes first: the only one, or the one the player names (the answer to the question this asked).
+    const hosts = attachmentHostIds(state, owner, card.code, ctx);
+    if (instruction.host === "" && chosen) {
+      hostId = chosen;
+      answer = undefined;
+    } else if (instruction.host == null) {
+      if (hosts.length === 0) return state;
+      if (hosts.length > 1) return askTarget(state, { instruction: { ...instruction, card: cardId, host: "" }, seat: owner, chosen: null }, hosts);
+      hostId = hosts[0] ?? null;
+    }
+  }
   const cost = termsCost(state, cardId, owner, terms, hostId, ctx);
   if (cost == null) return state;
-  let paid = chosen ? [...instruction.paid, chosen] : [...instruction.paid];
+  let paid = answer ? [...instruction.paid, answer] : [...instruction.paid];
   while (paid.length < cost) {
     const pools = openPools(state, owner, cardId, terms, paid, ctx);
     if (pools.length === 0) return state;
@@ -222,7 +240,7 @@ export function payToPlay(state: ScenarioState, instruction: PayToPlay, seat: nu
       paid = [...paid, pools[0] ?? ""];
       continue;
     }
-    return askTarget(state, { instruction: { ...instruction, card: cardId, paid }, seat: owner, chosen: null }, pools);
+    return askTarget(state, { instruction: { ...instruction, card: cardId, paid, ...(hostId ? { host: hostId } : {}) }, seat: owner, chosen: null }, pools);
   }
   const payments: Payment[] = [];
   for (const id of paid) {

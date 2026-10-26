@@ -62,10 +62,12 @@ export const VERBS = [
     ...when,
   }),
   // Engine use (PlayFromHand): pays for one card, a resource at a time, and plays it. `card` is the card's id, or the last
-  // picked card; `paid` are the pools chosen so far, one entry per resource.
+  // picked card; `paid` are the pools chosen so far, one entry per resource. `host`: the card an attachment is played on ("" while
+  // the player is being asked where; an event or ally has none).
   z.strictObject({
     verb: z.literal("PayToPlay"),
     card: z.string().optional(),
+    host: z.string().optional(),
     free: z.boolean().optional(),
     reduce: z.number().int().positive().optional(),
     min: z.number().int().min(0).optional(),

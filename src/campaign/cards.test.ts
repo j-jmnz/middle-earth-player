@@ -46,8 +46,11 @@ describe("printedFromRow", () => {
   });
 
   it("throws, naming the code, when a row the engine cannot print is mapped", () => {
-    const nightmare = rows.find((row) => row.typeCode !== "campaign" && unprintable(row) !== undefined);
-    expect(nightmare, "the catalog holds a card the engine cannot print").toBeDefined();
-    if (nightmare) expect(() => printedMap([nightmare])).toThrow(nightmare.code);
+    // Every card type the catalog holds now prints (side quests and contracts included), so a row of a type no engine card has stands in.
+    const first = rows[0];
+    if (!first) throw new Error("the catalog is empty");
+    const nightmare = { ...first, code: "nightmare-row", typeCode: "nightmare" };
+    expect(unprintable(nightmare)).toBeDefined();
+    expect(() => printedMap([nightmare])).toThrow(nightmare.code);
   });
 });

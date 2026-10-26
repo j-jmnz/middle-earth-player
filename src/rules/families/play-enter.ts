@@ -21,6 +21,7 @@ import type { ScenarioState } from "../state.ts";
 import { inPlay, livingSeats, updateCard } from "../state.ts";
 import { moveCard } from "../zones.ts";
 import { putAttachmentIntoPlay } from "./attachments-play.ts";
+import { playBlocked } from "./sidequests-contract.ts";
 import type { Focus } from "./index.ts";
 import { lastPickedSeat, markPicked, namedCard, queueFront, scheduleFor } from "./play-refs.ts";
 
@@ -49,7 +50,7 @@ export function canEnter(state: ScenarioState, id: string, ctx: ReduceContext): 
   const card = state.cards[id];
   if (!card || inPlay(card.zone)) return false;
   const printed = printedOf(ctx.cards, card.code);
-  return (printed.type === "hero" || isAllyLike(printed)) && !uniqueBlocked(state, printed, ctx.cards);
+  return (printed.type === "hero" || isAllyLike(printed)) && !uniqueBlocked(state, printed, ctx.cards) && !playBlocked(state, id, card.controller ?? card.owner ?? state.firstPlayer, ctx);
 }
 
 // The card enters play under `seat`: among the heroes for a hero, in the play area otherwise. It is not played (no "played"

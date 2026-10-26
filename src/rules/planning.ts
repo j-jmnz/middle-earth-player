@@ -15,6 +15,8 @@ import { exhaustSlack, extraCostReason } from "./families/costs-play.ts";
 import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "./families/deck-play.ts";
 import { doomedRaise } from "./families/deck-rules.ts";
 import { chosenX } from "./families/misc-cost.ts";
+import { playBlocked } from "./families/sidequests-contract.ts";
+import { enterQuestArea, inPlayLimitReason, sideQuestPlayReason } from "./families/sidequests-play.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
@@ -59,7 +61,7 @@ export function playCard(
   }
   // The discount it used is spent, and the card joins this round's plays.
   next = spendDiscount(next, intent.cardId, seat, ctx);
-  next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round }] };
+  next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round, ...(next.phase === "Planning" ? {} : { phase: next.phase }) }] };
   // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x), less a reduction the seat holds for
   // its next Doomed event (families/deck-rules.ts).
   const doomed = doomedRaise(next, seat, printed);
@@ -71,6 +73,8 @@ export function playCard(
     const x = printed.costX ? intent.payments.reduce((sum, payment) => sum + payment.amount, 0) : undefined;
     return playEvent(queueEvent(next, { trigger: "played", seat, cardId: intent.cardId }), intent.cardId, seat, ctx, steps, x);
   }
+  // A player side quest enters its player's quest area (families/sidequests-play.ts).
+  if (printed.type === "player-side-quest") return enterQuestArea(next, intent.cardId, seat, steps);
   // An attachment played unattached, onto a threat dial, or guarded (families/attachments-play.ts).
   const elsewhere = printed.type === "attachment" ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
   if (elsewhere) return elsewhere;
@@ -193,7 +197,7 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
     if (instruction.verb === "PlayOnlyIf" && !holds(state, instruction.condition, scope, ctx)) return "That card's play restriction is not met";
   }
   const printed = printedOf(ctx.cards, instance.code);
-  if (printed.type !== "ally" && printed.type !== "attachment" && printed.type !== "event") return "That card cannot be played";
+  if (printed.type !== "ally" && printed.type !== "attachment" && printed.type !== "event" && printed.type !== "player-side-quest") return "That card cannot be played";
   // A card with no printed cost (an ally with the Encounter keyword) is never played from the hand (rr.cost).
   if (printed.cost == null && !printed.costX) return "That card cannot be played";
   // Events are Actions: any action window. Allies and attachments are played in the planning phase only, by the
@@ -201,7 +205,15 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   if (printed.type !== "event" && state.mode !== "planning") return "That intent is not legal in this window";
   if (printed.type !== "event" && planningTurn(state) !== state.activeSeat) return "Only the active player plays allies and attachments now";
   if (uniqueBlocked(state, printed, ctx.cards)) return "A second copy of that unique card cannot enter play";
+  // "You cannot play non-unique allies" (a contract, families/sidequests-contract.ts).
+  if (playBlocked(state, cardId, state.activeSeat, ctx)) return "A card in play forbids that card to be played";
   if (!hasResourceMatch(state, state.activeSeat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
+  // A player side quest needs a free quest area (families/sidequests-play.ts).
+  const area = printed.type === "player-side-quest" ? sideQuestPlayReason(state, state.activeSeat) : null;
+  if (area) return area;
+  // "Limit 2 copies of ~ in play" (families/sidequests-play.ts).
+  const limited = inPlayLimitReason(state, cardId, ctx);
+  if (limited) return limited;
   // An additional cost that cannot be paid (PlayCost, families/costs-play.ts).
   const extra = extraCostReason(state, cardId, state.activeSeat, ctx);
   if (extra) return extra;

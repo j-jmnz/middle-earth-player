@@ -2,6 +2,7 @@ import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { rejectionReason } from "./legal.ts";
 import { syncConstants } from "./constants.ts";
+import { registerHostListeners } from "./families/attachments-hold.ts";
 import { applyIntent, settle } from "./machine.ts";
 import type { ScenarioState } from "./state.ts";
 import { bindReduce, noteHistory } from "./undo.ts";
@@ -11,6 +12,7 @@ export type ReduceResult =
   | { ok: false; reason: string; state: ScenarioState };
 
 export function reduce(state: ScenarioState, intent: PlayerIntent, ctx: ReduceContext): ReduceResult {
+  registerHostListeners(ctx);
   const reason = rejectionReason(state, intent, ctx);
   if (reason) return { ok: false, reason, state };
   const steps: EngineStep[] = [];

@@ -5,9 +5,9 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { RECORDS } from "../../effects/authored/families/misc.ts";
 import { syncConstants } from "../constants.ts";
-import { cardMap, codes, fixtureDefinition } from "../fixture.ts";
+import { cardMap, codes, expectOk, fixtureDefinition } from "../fixture.ts";
 import { modifiedStat } from "../keywords.ts";
-import { startScenario } from "../reduce.ts";
+import { reduce, startScenario } from "../reduce.ts";
 import { updateCard } from "../state.ts";
 import { attachTo } from "../zones.ts";
 import { MISC_CARDS, miscCtx } from "./misc-fixture.ts";
@@ -110,10 +110,13 @@ describe("Sméagol's Setup", () => {
   it("shuffles 2 copies of Stinker into the encounter deck (21072:A:2)", () => {
     const filler = codes("f", 8);
     const cards = cardMap([...MISC_CARDS.values(), ...filler.map((code) => ({ ...MISC_CARDS.get("filler")!, code, name: code }))]);
-    const state = startScenario(
+    const begun = startScenario(
       { seatCount: 1, seed: 5, threatModifier: 0, definition: fixtureDefinition(["stage"]), seats: [{ heroes: ["21072", "dwarf"], deck: filler }], encounterDeck: ["grunt"], questDeck: ["stage"] },
       { effects: RECORDS, cards },
     );
+    // A hero's Setup resolves once the opening hand is kept (families/sidequests-setup.ts).
+    let state = begun;
+    for (let guard = 0; guard < 6 && state.window?.kind === "mulligan"; guard += 1) state = expectOk(reduce(state, { type: "Keep" }, { effects: RECORDS, cards })).state;
     const stinkers = state.encounterDeck.filter((id) => state.cards[id]?.code === "21071");
     expect(stinkers).toHaveLength(2);
     expect(state.encounterDeck).toHaveLength(3);

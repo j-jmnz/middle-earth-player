@@ -119,7 +119,7 @@ export function applyIntent(
       return played.window?.kind === "pass" ? { ...played, passed: [] } : played;
     }
     case "Commit":
-      return commit(state, intent.cardIds, steps);
+      return commit(state, intent.cardIds, steps, intent.sideQuestId);
     case "CommitHide":
       return commitHide(state, intent.cardIds, steps);
     case "Trigger":
@@ -354,11 +354,12 @@ function chooseEnemy(
   return { ...engaged, window: null, engagement: { ordinal: cursor.ordinal + 1, engagedThisPass: true } };
 }
 
-function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[]): ScenarioState {
+function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[], sideQuestId?: string): ScenarioState {
   let next = state;
   for (const id of cardIds) {
-    // "Does not exhaust to commit to a quest" (a flag) leaves the character ready.
-    next = updateCard(next, id, { committed: true, exhausted: !flagged(next, id, "noExhaustQuest") });
+    // "Does not exhaust to commit to a quest" (a flag) leaves the character ready. A side quest takes it instead of the current
+    // quest (families/sidequests-quest.ts).
+    next = updateCard(next, id, { committed: true, exhausted: !flagged(next, id, "noExhaustQuest"), questTo: sideQuestId });
     steps.push({ kind: "commit", cardId: id });
     next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id });
   }

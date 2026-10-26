@@ -6,6 +6,9 @@ import { ruleCause } from "./cause.ts";
 import { threatCostCut } from "./families/costs-stats.ts";
 import type { EngineStep } from "./intents.ts";
 import { recordStartingThreat } from "./families/quest-threat.ts";
+import { placeContracts } from "./families/sidequests-contract.ts";
+import { setAsideEncounterCards } from "./families/sidequests-encounter.ts";
+import { pushPlayerSetup } from "./families/sidequests-setup.ts";
 import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
@@ -22,6 +25,8 @@ export type StartSeat = {
   // (`host` is the hero's code), and cards a campaign card adds to the seat's hand before the opening hand is drawn.
   attachments?: readonly { host: string; code: string }[];
   hand?: readonly string[];
+  // The 14 Item or Artifact attachments a Burglar's Turn player chose from their collection: their loot deck (families/sidequests-loot.ts).
+  loot?: readonly string[];
 };
 
 export type StartScenario = {
@@ -77,11 +82,16 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     }
     for (const code of seat.hand ?? []) state = spawn(state, code, { zone: "hand", seat: index }).state;
     for (const code of seat.deck) state = spawn(state, code, { zone: "deck", seat: index }).state;
+    // The cards with the Encounter keyword are set aside, not drawn (families/sidequests-encounter.ts).
+    state = setAsideEncounterCards(state, index, ctx);
+    // A contract in the deck begins the game in its player's play area (families/sidequests-contract.ts).
+    state = placeContracts(state, index, ctx);
     // Threat costs lowered by a card in play ("Each hero you control with a printed Lore resource icon gets -1 threat cost").
     threat -= threatCostCut(state, index, ctx);
     state = withThreat(state, index, threat);
     state = shuffleZone(state, index);
   }
+  if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
   const quiet: EngineStep[] = [];
@@ -106,6 +116,9 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
 }
 
 export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // The Setup lines of the players' heroes and contracts resolve first, in frames that can ask (families/sidequests-setup.ts).
+  const players = pushPlayerSetup(state, ctx, steps);
+  if (players !== state) return players;
   let next = searchSetup(state, "encounter", ctx, steps);
   for (const instruction of next.setup) {
     next = runInstruction(

@@ -262,7 +262,7 @@ function expandEach(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Re
   if (instruction.verb !== "Each" || data?.kind !== "effect") return state;
   // "Up to 4 Rohan allies", "any number of Gondor allies": the actor chooses them (families/deck-each.ts).
   if (instruction.upTo != null) return chooseEach(state, item, frame, ctx);
-  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants);
+  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants, false, { subject: data.subject ?? null, other: data.other ?? null });
   const cause = item.cause ? { cause: item.cause } : {};
   const expanded = ids.flatMap((id) => [
     { instruction: { verb: "Pick" as const, pick: instruction.pick }, seat: item.seat, chosen: id, ...cause },

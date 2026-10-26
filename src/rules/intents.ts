@@ -36,7 +36,8 @@ export type PlayerIntent =
   | { type: "Mulligan" }
   | { type: "Pass" }
   | { type: "PlayCard"; cardId: string; payments: readonly Payment[]; hostId?: string }
-  | { type: "Commit"; cardIds: readonly string[] }
+  // `sideQuestId`: the characters quest on that side quest in a quest area instead of the current quest.
+  | { type: "Commit"; cardIds: readonly string[]; sideQuestId?: string }
   | { type: "CommitHide"; cardIds: readonly string[] }
   | { type: "Travel"; locationId: string }
   | { type: "DeclineTravel" }
