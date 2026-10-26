@@ -12,6 +12,7 @@ import type { EngineStep } from "./intents.ts";
 import { dealOneShadow, runInstruction, type ReduceContext } from "./interpret.ts";
 import { discardShadowOf } from "./shadow.ts";
 import { pickCandidates } from "./pick.ts";
+import { lastPicked, seatOf } from "./player-verbs.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
@@ -253,6 +254,11 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       if (target.kind === "self") return sourceId ? [sourceId] : [];
       if (target.kind === "host") return source?.host ? [source.host] : [];
       if (target.kind === "activeLocation") return state.activeLocation && state.activeLocation !== sourceId ? [state.activeLocation] : [];
+      // The enemy a Pick chose, if it is still engaged with a player (01052:A:1).
+      if (target.kind === "picked") {
+        const id = lastPicked(state);
+        return state.cards[id]?.zone === "engaged" ? [id] : [];
+      }
       const seats = target.who === "actor" ? [item.seat] : livingSeats(state);
       return seats
         .flatMap((seat) => state.seats[seat]?.engaged ?? [])
@@ -305,8 +311,12 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
     if (options.length > 1) return askTarget(state, { ...item, seat: chooser }, options);
     chosen = options[0] ?? "";
   }
-  // A look at the top of a deck: the cards seen are put back by ArrangeTop.
-  const looked = instruction.pick.top != null ? { looked: (state.seats[chooser]?.deck ?? []).slice(0, instruction.pick.top) } : {};
+  // A look at the top of a deck: the cards seen are put back by ArrangeTop. "The top X cards of any player's deck" (01067:A:1)
+  // are those of the player an earlier Pick chose.
+  const spec = instruction.pick;
+  const deckSeat = spec.ofPickedPlayer ? seatOf(data.picked?.at(-1) ?? "") : chooser;
+  const depth = spec.topIsX ? (data.x ?? 0) : spec.top;
+  const looked = depth != null && deckSeat != null ? { looked: (state.seats[deckSeat]?.deck ?? []).slice(0, depth) } : {};
   return patchTop(state, { data: { ...data, ...looked, picked: [...(data.picked ?? []), chosen] } });
 }
 
@@ -314,8 +324,11 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
 // top position first, then the next, until one choice is left.
 function arrangeTop(state: ScenarioState, item: QueueItem): ScenarioState {
   const data = topFrame(state)?.data;
-  const seat = state.seats[item.seat];
-  if (data?.kind !== "effect" || !seat) return state;
+  if (data?.kind !== "effect") return state;
+  // The deck the cards were looked at in: the actor's, or another player's (01067:A:1). The actor puts them back.
+  const owner = (data.looked ?? []).map((id) => state.cards[id]).find((card) => card?.zone === "deck")?.controller ?? item.seat;
+  const seat = state.seats[owner];
+  if (!seat) return state;
   const offset = item.offset ?? 0;
   const count = (data.looked ?? []).filter((id) => seat.deck.includes(id)).length;
   const rest = seat.deck.slice(offset, count);
@@ -325,7 +338,7 @@ function arrangeTop(state: ScenarioState, item: QueueItem): ScenarioState {
   if (from < offset) return state;
   const deck = [...seat.deck];
   [deck[offset], deck[from]] = [deck[from] ?? "", deck[offset] ?? ""];
-  const arranged = withSeat(state, item.seat, { ...seat, deck });
+  const arranged = withSeat(state, owner, { ...seat, deck });
   if (rest.length <= 2) return arranged;
   const next = topFrame(arranged)?.data;
   if (next?.kind !== "effect") return arranged;

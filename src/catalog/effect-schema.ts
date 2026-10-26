@@ -49,6 +49,19 @@ export const triggerSchema = z.enum([
   "becameActive",
   // Heard by the enemy itself: it attacks, before the defender is declared (141069:A:2, rr.step-6-4b).
   "attacks",
+  // Heard by every card: a hero left play (subject; seat is the player who controlled it, 01019:A:1).
+  "heroLeftPlay",
+  // Heard by every card: a character was declared as a defender (subject; seat is the defending player, 01029:A:2, 01037:A:1).
+  "defenderDeclared",
+  // Heard by every card: the players traveled to a location (subject, 01047:A:1). `traveled` is heard by the location only.
+  "locationTraveled",
+  // Heard by each attachment of each attacker: an attack it took part in destroyed an enemy (01039:A:3).
+  "hostAttackDestroyed",
+  // Heard by every card: the shadow cards of the combat phase were dealt (seat: a player with an engaged enemy, 01071:A:2).
+  "shadowsDealt",
+  // Heard by every card in play: a card was revealed from the encounter deck (subject), before its keywords and its "when
+  // revealed" effects resolve (01006:A:1).
+  "cardRevealed",
 ]);
 
 // What a player pays to use an Action or Response. Resources come from the payments on the Trigger intent.
@@ -63,6 +76,9 @@ export const costSchema = z.discriminatedUnion("kind", [
   }),
   // An event used from the hand: its printed cost is paid, and the card is discarded when the effect is done.
   z.strictObject({ kind: z.literal("playEvent") }),
+  // Resources from the source hero's own pool ("spend 1 resource from his resource pool", 01001:A:2; "Pay 1 resource from
+  // Glorfindel's pool", 01011:A:1).
+  z.strictObject({ kind: z.literal("selfResources"), amount: z.number().int().positive() }),
 ]);
 
 
@@ -143,7 +159,12 @@ export const effectSchema = z.strictObject({
   trigger: triggerSchema.optional(),
   // `oncePerRoundEachPlayer`: each player may use it once a round, and any player may.
   limit: z.enum(["oncePerPhase", "oncePerRound", "oncePerRoundEachPlayer"]).optional(),
+  // The uses the limit allows ("Limit 3 times per phase", 01070:A:2; rr.limits). One when it is not named.
+  limitTimes: z.number().int().min(2).optional(),
   cost: costSchema.optional(),
+  // A Response used while the card is in its controller's hand, though it is not an event ("put Brok Ironfist into play from
+  // your hand", 01019:A:1).
+  from: z.literal("hand").optional(),
   cancel: cancelSchema.optional(),
   // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").
   uncancelable: conditionSchema.optional(),

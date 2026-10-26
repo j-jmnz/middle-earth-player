@@ -1,8 +1,17 @@
-import { count, STATS, SPHERES, OWN, STAT, HIGH_COST, attachHost } from "./template-kit.ts";
+import type { Instruction } from "../../../src/catalog/boundary.ts";
+import { count, STATS, SPHERES, OWN, STAT, HIGH_COST, attachHost, statOf } from "./template-kit.ts";
 import type { Template } from "./template-kit.ts";
 import { PLAYER_ABILITY_TEMPLATES } from "./player-ability-templates.ts";
 import { PLAYER_SEARCH_TEMPLATES } from "./player-search-templates.ts";
 import { PLAYER_STARTER_TEMPLATES } from "./player-starter-templates.ts";
+
+// "+1 Willpower", "-1 Threat", "+4 Hit Points" on the card the source is attached to.
+function attachedStat(signed: string, word: string): Instruction | null {
+  const stat = statOf(word);
+  const amount = Number.parseInt(signed, 10);
+  if (!stat || !Number.isInteger(amount) || amount === 0) return null;
+  return { verb: "ModifyStat", stat, amount, until: "whileSourceInPlay", target: "host" };
+}
 
 // Player card templates: stats, traits and placement of attachments and characters. The rest are split by behavior
 // (abilities, search and temporary play, starter-deck lines); the order is kept, so the first template that matches still wins.
@@ -18,9 +27,53 @@ const PLAYER_CARD_TEMPLATES: readonly Template[] = [
     },
   },
   {
+    // "Attached hero gains +1 Willpower." (01055:A:2), "Attached hero gets +4 Hit Points." (01040:A:2), "Attached location gets
+    // -1 Threat." (01056:A:2).
     id: "attached-gets-stat",
-    pattern: /^Attached (?:hero|character) (?:gets|gains) \+(\d+) (Willpower|Attack|Defense|Threat)\.$/,
-    build: (match) => [{ timing: "constant", instructions: [STAT(STATS[match[2] ?? ""] ?? "attack", count(match[1]), "host")] }],
+    pattern: /^Attached (?:hero|character|location|enemy) (?:gets|gains) ([+-]\d+) (Willpower|Attack|Defense|Threat|[Hh]it [Pp]oints?)\.$/,
+    build: (match) => {
+      const instruction = attachedStat(match[1] ?? "", match[2] ?? "");
+      return instruction ? [{ timing: "constant", instructions: [instruction] }] : null;
+    },
+  },
+  {
+    // "Attach to a hero. Attached hero gets -1 Willpower." printed as one line (01071:A:1): where it goes and what it gives.
+    id: "attach-to-then-attached-stat",
+    pattern: /^Attach to (.+?)\. Attached (?:hero|character|location|enemy) (?:gets|gains) ([+-]\d+) (Willpower|Attack|Defense|Threat|[Hh]it [Pp]oints?)\.$/,
+    build: (match) => {
+      const host = attachHost(match[1] ?? "");
+      const instruction = attachedStat(match[2] ?? "", match[3] ?? "");
+      return host && instruction ? [{ timing: "constant", instructions: [{ verb: "AttachesTo", host }, instruction] }] : null;
+    },
+  },
+  {
+    // "Attached hero gains +1 Attack. (+2 Attack instead if attached hero is a Dwarf.)" (01041:A:2): the bonus, and the rest of
+    // it while the hero has the trait.
+    id: "attached-gets-stat-more-for-trait",
+    pattern: /^Attached (?:hero|character) (?:gets|gains) \+(\d+) (Willpower|Attack|Defense)\. \(\+(\d+) \2 instead if attached (?:hero|character) is an? (\w+)\.\)$/,
+    build: (match) => {
+      const stat = STATS[match[2] ?? ""] ?? "attack";
+      const extra = count(match[3]) - count(match[1]);
+      return [{ timing: "constant", instructions: [STAT(stat, count(match[1]), "host"), STAT(stat, extra, "host", { when: { kind: "hostTrait", trait: match[4] ?? "" } })] }];
+    },
+  },
+  {
+    // "Attached enemy cannot attack." (01069:A:2): a flag on the enemy the source is attached to.
+    id: "attached-enemy-cannot-attack",
+    pattern: /^Attached enemy cannot attack\.$/,
+    build: () => [{ timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotAttack", amount: 1, until: "whileSourceInPlay", target: "host" }] }],
+  },
+  {
+    // "Gimli gets +1 Attack for each damage token on him." (01004:A:1)
+    id: "self-stat-per-damage",
+    pattern: /^\{self\} gets \+(\d+) (Willpower|Attack|Defense) for each damage token on (?:him|her|it)\.$/,
+    build: (match) => [
+      {
+        timing: "constant",
+        condition: OWN,
+        instructions: [{ verb: "ModifyStat", stat: STATS[match[2] ?? ""] ?? "attack", amount: count(match[1]), until: "whileSourceInPlay", target: "self", per: "damage" }],
+      },
+    ],
   },
   {
     id: "attached-defense-vs-high-engagement",

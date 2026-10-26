@@ -88,6 +88,14 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `place it facedown under ${sourceId ? names.card(sourceId) : "the location"}`;
     case "ShuffleEncounterDeck":
       return null;
+    // Denethor (01010:A:1) and Protector of Lórien (01070:A:2).
+    case "EncounterTopToBottom":
+      return "move the top card of the encounter deck to its bottom";
+    case "ModifyStat": {
+      const stat = instruction.stat.charAt(0).toUpperCase() + instruction.stat.slice(1);
+      const who = instruction.target === "host" ? "attached hero" : "it";
+      return `${who} gets ${instruction.amount >= 0 ? "+" : ""}${instruction.amount} ${stat}`;
+    }
     default:
       return null;
   }

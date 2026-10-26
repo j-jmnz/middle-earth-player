@@ -26,11 +26,12 @@ export function engagementCostOf(state: ScenarioState, instance: CardInstance, c
 
 type Gate = (state: ScenarioState) => boolean;
 
+// A card that "does not contribute its Threat" (01065:A:1, 01066:A:1) is left out of the total (rr.staging-area).
 export function stagingThreat(state: ScenarioState, cards: Cards): number {
   let total = 0;
   for (const id of state.staging) {
     const instance = state.cards[id];
-    if (!instance) continue;
+    if (!instance || flagged(state, id, "noThreat")) continue;
     total += modifiedStat(state, instance, "threat", cards);
   }
   return total;

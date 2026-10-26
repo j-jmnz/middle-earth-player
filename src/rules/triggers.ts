@@ -26,7 +26,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
     for (const effect of ctx.effects) {
       if (effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;
       if (effect.timing !== timing) continue;
-      const scope = { actor, sourceId: instance.id, returned: 0, phase: event.phase };
+      const scope = { actor, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(event.subject ? { subject: event.subject } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       found.push({ effect, instance });
     }

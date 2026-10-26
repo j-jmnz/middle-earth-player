@@ -8,6 +8,7 @@ import { generateEffects } from "./data/effects/generate.ts";
 import { lineTimings } from "./data/normalize/timings.ts";
 import { isKeywordLine } from "./data/normalize/keywords.ts";
 import { keyOf, lineId, loadLedger } from "./data/printed/ledger.ts";
+import { PLAYER_REQUESTS } from "./data/printed/scope.ts";
 import { dealtCodes, loadCampaign, loadScenarios, starterCodes } from "./data/load-scenarios.ts";
 
 // Every printed line of a card the Fellowship scenarios deal is owned: by an effect record that names it in
@@ -28,7 +29,9 @@ const PENDING_LINES: Readonly<Record<string, string>> = {
   "141056:A:2": "Flight to the Ford (phase 13): the cancel response needs the attacker-declared trigger.",
 };
 const campaignCards = new Set(Object.values(campaign.campaignCards));
-const dealt = new Set([...dealtCodes(campaign, scenarios.filter((scenario) => PLAYABLE.includes(scenario.id))), ...campaignCards, ...starterCodes(campaign)]);
+// The player's requests (scripts/data/printed/scope.ts: The Shirefolk and the four core-set Learn to Play decks) are held to the
+// same rule as the starter cards: every printed line owned.
+const dealt = new Set([...dealtCodes(campaign, scenarios.filter((scenario) => PLAYABLE.includes(scenario.id))), ...campaignCards, ...starterCodes(campaign), ...PLAYER_REQUESTS]);
 const unplayable = scenarios.filter((scenario) => !PLAYABLE.includes(scenario.id));
 
 describe("effect coverage", () => {

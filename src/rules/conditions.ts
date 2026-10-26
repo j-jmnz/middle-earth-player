@@ -1,7 +1,7 @@
 import type { Condition } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
-import { modifiedStat, versusHighEngagement } from "./keywords.ts";
+import { attacking, modifiedStat, versusHighEngagement } from "./keywords.ts";
 import { pickCandidates } from "./pick.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
@@ -116,6 +116,30 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
           return card.code === condition.code && card.zone === "attached" && host != null && printedOf(ctx.cards, host.code).type === "hero";
         }) === condition.is
       );
+    case "sourceCommitted":
+      return scope.sourceId != null && state.cards[scope.sourceId]?.committed === true;
+    case "subject": {
+      const subject = scope.subject ? state.cards[scope.subject] : undefined;
+      if (!subject) return false;
+      if (condition.self && scope.subject !== scope.sourceId) return false;
+      if (condition.yours && scope.eventSeat !== scope.actor) return false;
+      if (condition.type && printedOf(ctx.cards, subject.code).type !== condition.type && !(condition.type === "attachment" && countsAsAttachment(state, subject.id, ctx))) return false;
+      return condition.trait == null || hasTrait(state, subject.id, condition.trait, ctx);
+    }
+    case "hostTrait": {
+      const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
+      return host != null && hasTrait(state, host, condition.trait, ctx);
+    }
+    case "hostDamaged": {
+      const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
+      return host != null && (state.cards[host]?.damage ?? 0) > 0;
+    }
+    case "activeLocation":
+      return state.activeLocation != null;
+    case "attacking": {
+      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+      return holder != null && attacking(state, condition, scope.against, ctx.cards);
+    }
   }
 }
 
@@ -127,7 +151,26 @@ function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLo
 
 export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
-  return instance != null && (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait));
+  return (
+    instance != null &&
+    (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait) || countedTraits(state, id, ctx).includes(trait))
+  );
+}
+
+// An encounter card its own text attached to a card "counts as" an attachment with a trait while it is attached ("Counts as a
+// Condition attachment", 141043:A:2, 141055:A:2): its CountsAs records.
+function countedTraits(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
+  const instance = state.cards[id];
+  if (!instance || instance.zone !== "attached" || instance.host == null) return [];
+  return ctx.effects.flatMap((effect) =>
+    effect.cardCode === instance.code && effect.timing === "constant" ? effect.instructions.flatMap((instruction) => (instruction.verb === "CountsAs" ? [instruction.trait] : [])) : [],
+  );
+}
+
+export function countsAsAttachment(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const instance = state.cards[id];
+  if (!instance || instance.zone !== "attached" || instance.host == null) return false;
+  return ctx.effects.some((effect) => effect.cardCode === instance.code && effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === "CountsAs"));
 }
 
 // What the constant records of a card's attachments give it: the Gondor trait from Steward of Gondor, a resource icon

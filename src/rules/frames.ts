@@ -116,7 +116,9 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
           next = raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x"));
         }
       }
-      return next;
+      // The card is revealed: what happens "as it is revealed" (01006:A:1) resolves before its keywords and "when revealed"
+      // effects, in frames above this one.
+      return fireForced(next, { trigger: "cardRevealed", seat, subject: id }, ctx, steps);
     }
     case 2: {
       const next = patchTop(state, { step: 3 });
@@ -138,8 +140,14 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       const next = patchTop(unlocked, { step: 6 });
       const revealing = next.seats[seat];
       const surge = printed.keywords.surge || (frame.data.kind === "reveal" && frame.data.surge);
-      if (!surge || !revealing || revealing.eliminated) return next;
-      return startReveal(next, seat, ctx, steps);
+      // A card whose "when revealed" effects were canceled and that is replaced (01008:A:1): the next card is revealed in its
+      // place, and a surge still adds one more, carried by that next card's reveal.
+      const replaced = frame.data.kind === "reveal" && frame.data.replaced === true;
+      if ((!surge && !replaced) || !revealing || revealing.eliminated) return next;
+      const again = startReveal(next, seat, ctx, steps);
+      const top = topFrame(again);
+      if (!(surge && replaced) || again.stack.length === next.stack.length || top?.data.kind !== "reveal") return again;
+      return patchTop(again, { data: { ...top.data, surge: true } });
     }
     default:
       // The revealed card's staging is resolved: an encounter deck it emptied is reset now (faq.last-encounter-card).

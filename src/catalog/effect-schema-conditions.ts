@@ -76,19 +76,42 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("questProgress") }),
   // An enemy (with this trait, if one is named) is in play (`is`) or none is (141027:B:1).
   z.strictObject({ kind: z.literal("enemyInPlay"), trait: z.string().min(1).optional(), is: z.boolean() }),
+  // The source card is committed to the quest ("While Thalin is committed to a quest", 01006:A:1).
+  z.strictObject({ kind: z.literal("sourceCommitted") }),
+  // The card the event is about: of this printed type, with this trait, the source card itself (`self`), or one the actor
+  // controlled when the event happened (`yours`). "A treachery card just revealed" (01008:A:1), "a Dwarf hero you control"
+  // (01019:A:1), "After Gondorian Spearman is declared as a defender" (01029:A:2).
+  z.strictObject({
+    kind: z.literal("subject"),
+    type: z.enum(["hero", "ally", "enemy", "location", "treachery", "attachment"]).optional(),
+    trait: z.string().min(1).optional(),
+    self: z.boolean().optional(),
+    yours: z.boolean().optional(),
+  }),
+  // The card the source is attached to has this trait ("if attached hero is a Dwarf", 01041:A:2).
+  z.strictObject({ kind: z.literal("hostTrait"), trait: z.string().min(1) }),
+  // The card the source is attached to has damage on it: a heal can change it (01072:A:2, rr.cost).
+  z.strictObject({ kind: z.literal("hostDamaged") }),
+  // There is an active location: progress can be placed on it (01044:A:1, rr.cost).
+  z.strictObject({ kind: z.literal("activeLocation") }),
+  // Read while a stat is read: the holder is attacking an enemy with this trait ("when attacking an Orc", 01039:A:2), or one in
+  // the staging area ("When doing so, he gets +1 Attack", 01009:A:1).
+  z.strictObject({ kind: z.literal("attacking"), trait: z.string().min(1).optional(), inStaging: z.boolean().optional() }),
 ]);
 
 // The conditions a stat modifier carries and checks each time the stat is read.
 
 export type Condition = z.infer<typeof conditionSchema>;
 
-export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" }> {
-  return condition?.kind === "versusHighEngagement";
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" }> {
+  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking";
 }
 
 export const targetSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("self") }),
   z.strictObject({ kind: z.literal("host") }),
+  // The card the last Pick chose ("Choose an enemy engaged with a player. Return that enemy to the staging area", 01052:A:1).
+  z.strictObject({ kind: z.literal("picked") }),
   z.strictObject({ kind: z.literal("activeLocation") }),
   z.strictObject({
     kind: z.literal("engagedEnemies"),

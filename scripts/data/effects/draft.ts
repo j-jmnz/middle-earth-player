@@ -6,6 +6,7 @@ import { parse as parseJsonc } from "jsonc-parser";
 import { EFFECTS } from "../../../src/effects/index.ts";
 import { runScript, type Log } from "../../log.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
+import { prebuiltDecksSchema } from "../../../src/catalog/prebuilt-deck.ts";
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaign, loadScenario } from "../load-scenarios.ts";
 import { keyOf, loadLedger } from "../printed/ledger.ts";
@@ -14,8 +15,9 @@ import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, type Unmatched } from "./generate.ts";
 import { vocabulary } from "./vocabulary.ts";
 
-// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id>
-// Writes .agent/drafts/<code>.md for every card in the scenario, or in the starter deck, that has a printed line no record covers yet.
+// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id | prebuilt-deck-id>
+// Writes .agent/drafts/<code>.md for every card in the scenario, or in the starter or pre-built deck (data/decks/prebuilt.json),
+// that has a printed line no record covers yet.
 // With --all it also drafts the lines that authored records already cover, to review or redo them.
 
 function words(text: string): Set<string> {
@@ -31,11 +33,12 @@ function similarity(left: string, right: string): number {
 
 function main(log: Log): void {
   const scenarioId = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
-  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id>");
+  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id | prebuilt-deck-id>");
   const campaign = loadCampaign();
-  const deck = campaign.starterDecks.find((entry) => entry.id === scenarioId);
+  const prebuilt = prebuiltDecksSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "decks", "prebuilt.json"), "utf8")) as unknown).find((entry) => entry.id === scenarioId);
+  const deck = campaign.starterDecks.find((entry) => entry.id === scenarioId) ?? (prebuilt ? { id: prebuilt.id, rows: [...prebuilt.heroes.map((code) => ({ code })), ...prebuilt.cards] } : undefined);
   const scenario = deck ? null : loadScenario(scenarioId);
-  log.info(deck ? `starter deck ${deck.id}: ${deck.rows.length} rows` : `scenario ${scenarioId}`);
+  log.info(deck ? `deck ${deck.id}: ${deck.rows.length} rows` : `scenario ${scenarioId}`);
   const cards = loadCards();
   const ledger = loadLedger();
   const byCode = new Map(cards.map((card) => [card.code, card]));

@@ -74,7 +74,8 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
   for (const { source, effect, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb === "SetStat") found.push(...setRecord(state, source, effect.id, instruction, ctx));
     if (instruction.verb !== "ModifyStat") continue;
-    // "for each Hobbit hero you control" is counted here, each time the records are rebuilt.
+    // "for each Hobbit hero you control" is counted here, each time the records are rebuilt. "For each damage token on him"
+    // (01004:A:1) is counted when the stat is read (modifiedStat), so it follows the damage at once.
     const amount = instruction.per === "hobbitHero" ? instruction.amount * hobbitHeroes(state, source, ctx) : instruction.amount;
     if (amount === 0) continue;
     for (const holder of holders(state, source, instruction.target, ctx, instruction.trait)) {
@@ -85,7 +86,7 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
         amount,
         until: source.zone === "victory" ? "whileSourceInVictory" : "whileSourceInPlay",
         origin: effect.id,
-        ...(instruction.per === "committed" || instruction.per === "ally" ? { per: instruction.per } : {}),
+        ...(instruction.per === "committed" || instruction.per === "ally" || instruction.per === "damage" ? { per: instruction.per } : {}),
         ...(isStatCondition(instruction.when) ? { when: instruction.when } : {}),
       });
     }

@@ -28,6 +28,13 @@ export const modifierStatSchema = z.enum([
   "cannotTakeNonCombatDamage",
   "cannotBeEngaged",
   "cannotBeOptionallyEngaged",
+  // Flag: a card in the staging area that does not contribute its threat to the total threat (01065:A:1, 01066:A:1).
+  "noThreat",
+  // Flag held by a seat ("seat:N"): the player may declare any number of defenders against each enemy attacking them
+  // (01038:A:1, rr.multiple-defenders).
+  "multipleDefenders",
+  // Flag: the character may attack an enemy in the staging area when it attacks alone (01009:A:1).
+  "stagingAttack",
 ]);
 
 export const modifyStatSchema = z.strictObject({
@@ -45,13 +52,16 @@ export const modifyStatSchema = z.strictObject({
   // `defender` is the character defending the attack in progress (141052:A:2). `allies` is every ally in play: from an
   // encounter card's lasting effect it also holds for allies that enter play later (rr.lasting-effects, 141071:A:1).
   // `engagedSeatCharacters` is every character of the player the source is engaged with (141050:A:2).
+  // `allCharacters` is every character in play when the effect resolves ("all characters get +1 Attack", 01022:A:1).
+  // `pickedPlayer` is the seat the last Pick chose, for a flag a seat holds (01038:A:1).
   target: z
-    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters"])
+    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters", "allCharacters", "pickedPlayer"])
     .optional(),
   // Only holders with this trait ("Spy enemies get +1 Threat", 141047:A:1).
   trait: z.string().min(1).optional(),
-  // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has.
-  per: z.enum(["committed", "ally", "hobbitHero", "x"]).optional(),
+  // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has,
+  // `damage` the damage tokens on the source ("for each damage token on him", 01004:A:1).
+  per: z.enum(["committed", "ally", "hobbitHero", "x", "damage"]).optional(),
   ...when,
 });
 

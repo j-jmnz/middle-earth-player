@@ -15,8 +15,9 @@ export type Modifier = {
   until: ModifierUntil;
   // A constant effect put this modifier here. The engine rebuilds these from the effect list.
   origin?: string;
-  // The amount counts once for each of these when the stat is read.
-  per?: "committed" | "ally";
+  // The amount counts once for each of these when the stat is read: a committed character or an ally of the seat (a Hide
+  // number), or a damage token on the holder (01004:A:1).
+  per?: "committed" | "ally" | "damage";
   // The modifier only applies to this seat (an enemy that cannot attack one player).
   seat?: number;
   // A condition read each time the stat is read (see isStatCondition).
@@ -101,7 +102,8 @@ export type HideData = {
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; participants?: readonly string[]; explored?: boolean };
+// `amount` is the damage a `damaged` event placed (01003:A:1).
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; participants?: readonly string[]; explored?: boolean; amount?: number };
 
 // A Response a player may use after an event. It is offered once and may be passed.
 export type ResponseOffer = { cardId: string; effectId: string; seat: number };
@@ -113,7 +115,8 @@ export type FrameData =
   | { kind: "none" }
   // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
   // effects of the card just revealed (Frodo Baggins).
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean }
+  // `replaced`: a Response canceled the card's "when revealed" effects and replaces it with the next encounter card (01008:A:1).
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean; replaced?: boolean }
   | HideData
   | EffectData;
 
@@ -164,8 +167,15 @@ export type PendingAttack = {
   // Instructions to run, with the attacker as the source, when the attack ends.
   after?: readonly Instruction[];
   afterCause?: Cause;
+  // Every defender declared, in order, when there is more than one (01038:A:1, rr.multiple-defenders). `defenderId` is the
+  // first. `damageTo` is the one the defending player assigned the damage to.
+  defenderIds?: readonly string[];
+  damageTo?: string;
+  // The defending player is choosing which defender takes the damage, in a frame of its own.
+  damageFrame?: boolean;
   // The step that follows the action window open between two steps of the attack, and the stack depth it opened at.
-  awaiting?: "defense" | "shadow" | "damage" | "end";
+  // `declared`: the Responses to a defender's declaration (01029:A:2) are open; the declaration goes on when they are done.
+  awaiting?: "declared" | "defense" | "shadow" | "damage" | "end";
   awaitDepth?: number;
   // Combat damage is placed; only the end of the attack is left.
   damaged?: boolean;

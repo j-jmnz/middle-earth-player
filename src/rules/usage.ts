@@ -20,17 +20,23 @@ export function controllerSeat(state: ScenarioState, source: CardInstance): numb
 }
 
 // A limit counts the uses of this record on this card in this round, in this phase for a phase limit, by this player for a
-// per-player limit (rr.limits).
+// per-player limit (rr.limits). "Limit X per phase" allows X of them (01070:A:2).
 function limitSpent(state: ScenarioState, effect: Effect, sourceId: string, seat: number): boolean {
   if (!effect.limit) return false;
-  return state.uses.some(
+  const used = state.uses.filter(
     (use) =>
       use.effectId === effect.id &&
       use.sourceId === sourceId &&
       use.round === state.round &&
       (effect.limit !== "oncePerPhase" || use.phase === state.phase) &&
       (effect.limit !== "oncePerRoundEachPlayer" || use.seat === seat),
-  );
+  ).length;
+  return used >= (effect.limitTimes ?? 1);
+}
+
+// A Response used from the hand: an event, or a card whose record says so (Brok Ironfist, 01019:A:1).
+export function usedFromHand(effect: Effect): boolean {
+  return effect.cost?.kind === "playEvent" || effect.from === "hand";
 }
 
 // Heroes of the seat that can pay `sphere` and the resources they hold.
@@ -66,6 +72,9 @@ export function usable(state: ScenarioState, effect: Effect, sourceId: string, s
       const price = playCost(state, sourceId, seat, ctx);
       return price != null && pool(state, seat, printedOf(ctx.cards, source.code).sphere, ctx, sourceId) >= price;
     }
+    // From the source hero's own pool (01001:A:2, 01011:A:1).
+    case "selfResources":
+      return source.resources >= cost.amount;
   }
 }
 
@@ -134,6 +143,9 @@ export function payUsage(
         const hero = next.cards[payment.heroId];
         if (hero) next = updateCard(next, payment.heroId, { resources: hero.resources - payment.amount });
       }
+      break;
+    case "selfResources":
+      if (source) next = updateCard(next, sourceId, { resources: source.resources - effect.cost.amount });
       break;
     default:
       break;
