@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 
+import { armedLines, armedRoom, BAR_PX, LINE_PX } from "./armed-room.ts";
 import { MORE_ID } from "./dock-extras.ts";
 import { tickArmed } from "./haptics.ts";
 import { useScreenReader } from "./screen-reader.ts";
@@ -18,13 +19,13 @@ import { tableTokens as t } from "./tokens.ts";
 // How long an armed button waits for its second tap; longer while a screen reader is on.
 const ARM_MS = 3000;
 const ARM_READER_MS = 10000;
-// Two lines of label type; the 2 pt bar that runs down is drawn over their foot, so arming moves nothing.
-const ARMED_ROOM = 36;
 const HINT = "Tap twice to confirm";
 // A moment with one legal answer: the line above the buttons says the one tap sends it.
 const ONLY = "The only choice now: one tap sends it";
 const ONLY_HINT = "Sends at once";
 
+// The More pill (`dock-more-actions`) folds the quiet pills behind a popover; it is not the "i" pill (`dock-more`) that opens the
+// dock's folded note lines (table-dock.tsx).
 export type DockExtra = { label: string; testID: string; onPress: () => void; accessibilityLabel?: string };
 
 export function DockButtons({
@@ -88,18 +89,22 @@ export function DockButtons({
   const primary = dock.primary;
   const armedButton = [primary, ...dock.secondary].find((button) => button?.testID === armed) ?? null;
   const line = armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : (dock.why ?? (dock.single ? ONLY : null));
+  // The room holds the longest thing this moment's buttons can say when armed, in full, so arming moves nothing (armed-room.ts).
+  const lines = armedLines([...[primary, ...dock.secondary].map((button) => (button?.arm ? (button.armed ?? `Tap again: ${button.label}`) : null)), dock.why, dock.single ? ONLY : null]);
   return (
     <View className="gap-0.5">
-      {/* Two lines above the buttons, always held: what the armed button's second tap does (a caution names the loss in full),
-          or what the primary waits for, and the bar that runs down over their foot. Arming moves nothing. */}
-      <View style={{ minHeight: ARMED_ROOM, justifyContent: "flex-end" }}>
-        {line ? (
-          <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={2} className={`text-center text-label ${armedButton ? "text-gold" : "text-muted"}`}>
-            {line}
-          </Text>
-        ) : null}
+      {/* The armed line, always held: what the armed button's second tap does (a caution names the loss in full), or what the
+          primary waits for; the bar that runs down has its own 4 pt under the text. Arming moves nothing. */}
+      <View style={{ height: armedRoom(lines) }}>
+        <View style={{ height: lines * LINE_PX, justifyContent: "flex-end" }}>
+          {line ? (
+            <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} className={`text-center text-label ${armedButton ? "text-gold" : "text-muted"}`}>
+              {line}
+            </Text>
+          ) : null}
+        </View>
         {armedButton ? (
-          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, alignItems: "center" }}>
+          <View pointerEvents="none" style={{ height: BAR_PX, justifyContent: "center", alignItems: "center" }}>
             <Animated.View style={[{ height: 2, backgroundColor: t.gold }, bar]} />
           </View>
         ) : null}

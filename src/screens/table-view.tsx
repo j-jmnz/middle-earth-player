@@ -31,7 +31,7 @@ import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
-import { locationReadout, widgetReadouts } from "../play/widgets";
+import { locationReadout, ringWords, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { Screen } from "./chrome";
@@ -161,20 +161,21 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
   const pills = dockPills(choice.extras);
   const more = useMorePopover(pills.more.length, choice.resetKey);
+  const { open: moreOpen, close: closeMore } = more;
 
   // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       const step = backStep({
         menuOpen,
-        moreOpen: more.open,
+        moreOpen,
         previewOpen: preview != null,
         readingOpen: reading != null,
         overlayOpen: choice.overlayOpen,
         panelOpen: choice.panelOpen,
       });
       if (step === "closeMenu") setMenuOpen(false);
-      else if (step === "closeMore") more.close();
+      else if (step === "closeMore") closeMore();
       else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
       else if (step === "closeReading") setReading(null);
       else if (step === "closeOverlay") choice.closeOverlay();
@@ -183,7 +184,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [menuOpen, more, preview, reading, choice, router, nav]);
+  }, [menuOpen, moreOpen, closeMore, preview, reading, choice, router, nav]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -235,7 +236,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           narrow={narrow}
           ticks={ticks}
           ringSeat={locations?.heldBy}
-          ringWords={locations?.heldUnder ? `The Ring-bearer is facedown under ${nameOf(locations.heldUnder)}` : null}
+          ringWords={ringWords(locations, nameOf)}
           menuOpen={menuOpen}
           onThreat={(threatSeat) => setReading({ kind: "threat", seat: threatSeat })}
           onRail={() => setReading((now) => openReading(now, { kind: "carousel" }))}

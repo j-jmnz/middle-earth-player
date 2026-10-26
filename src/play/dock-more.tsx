@@ -2,7 +2,7 @@
 // (dock-extras.ts, dockPills), they fold into one More pill, and this popover lists them. It draws in the table menu's frame
 // (popover-frame.tsx), left of the command column and level with the pill, so the dock's readout, armed line and buttons stay
 // uncovered. A tap outside closes it and does nothing else; a row closes it and then acts; Android Back closes it first (back.ts).
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useWindowDimensions } from "react-native";
 
 import type { DockExtra } from "./dock-buttons.tsx";
@@ -27,7 +27,10 @@ export type MorePopover = {
 export function useMorePopover(count: number, key: string): MorePopover {
   const [at, setAt] = useState<{ foot: number; key: string } | null>(null);
   if (at && (count === 0 || at.key !== key)) setAt(null);
-  return { open: at != null && count > 0, foot: at?.foot ?? null, show: (foot) => setAt({ foot, key }), close: () => setAt(null) };
+  // `close` is stable, so an effect (Android Back) can depend on it.
+  const close = useCallback(() => setAt(null), []);
+  const show = useCallback((foot: number) => setAt({ foot, key }), [key]);
+  return { open: at != null && count > 0, foot: at?.foot ?? null, show, close };
 }
 
 export function MorePopoverView({ more, items, commandWidth, insetRight, onClose }: { more: MorePopover; items: readonly DockExtra[]; commandWidth: number; insetRight: number; onClose: () => void }) {

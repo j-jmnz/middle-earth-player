@@ -38,8 +38,10 @@ export function ReadoutView({ readout, surface = "night" }: { readout: Readout; 
   );
 }
 
-// About how many characters one line of the dock holds in label type (the narrowest command column, 210 pt).
-const FOLDED_CHARS = 28;
+// Label type is about this many points a character, so a line of the dock holds its width over this many characters.
+const CHAR_PT = 6.6;
+// The tone of a line of words under the title: the guide in bone, the note muted, what the rules refuse faint.
+const lineTone = (kind: "guide" | "note" | "unavailable") => (kind === "guide" ? "text-bone" : kind === "note" ? "text-muted" : "text-faint");
 
 export function TableDock({
   step,
@@ -83,64 +85,63 @@ export function TableDock({
 }) {
   const block = useRef<ComponentRef<typeof View>>(null);
   const measure = () => block.current?.measureInWindow((_x, y) => onBlock?.(Math.round(y)));
-  // The folded line is one line on a short phone (under 400 pt tall, as the choice tray's dense tiles) and two on a taller one.
+  // The folded line is one line on a short phone (under 400 pt tall, as the choice tray's dense tiles) and two on a taller one;
+  // what a line holds comes from the width the dock gives it (label type is about CHAR_PT a character).
   const dense = useWindowDimensions().height < 400;
-  const lines = dockLines({ guide, note, unavailable, chars: dense ? FOLDED_CHARS : 2 * FOLDED_CHARS });
+  const [lineWidth, setLineWidth] = useState(168);
+  const chars = Math.max(12, Math.floor(lineWidth / CHAR_PT));
+  const lines = dockLines({ guide, note, unavailable, chars: dense ? chars : 2 * chars });
   // The folded lines open in place; a new moment folds them again.
   const [opened, setOpened] = useState<string | null>(null);
   const moment = `${step}|${title}`;
   const expanded = opened === moment && lines.foldable;
   return (
-    <View testID="dock" className="rounded-card px-3 pb-2 pt-1.5" style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
-      {/* A guard: where the dock is taller than the column (a short phone, a long title) it scrolls, so its foot is never cut. */}
-      <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled onScrollEndDrag={measure} onMomentumScrollEnd={measure}>
-      {/* On a short phone only the sentence scrolls; the numbers, the pick and the buttons stay in sight. */}
-      <Text testID="sheet-step" numberOfLines={1} className="text-center font-display text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
-        {step}
-      </Text>
-      <Text testID="sheet-title" accessibilityRole="header" numberOfLines={2} className="text-center font-display text-body text-bone" style={{ flexShrink: 0 }}>
-        {title}
-      </Text>
-      {lines.first ? (
-        <View className="flex-row items-start gap-1.5">
-          <View className="flex-1" style={{ flexShrink: 1 }}>
-            {expanded ? (
-              <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 18, maxHeight: dense ? 76 : 120 }} nestedScrollEnabled>
-                {[lines.first, ...lines.rest].map((line) => (
-                  <Text key={line.testID} testID={line.testID} className={`text-center text-label ${line.kind === "guide" ? "text-bone" : line.kind === "note" ? "text-muted" : "mt-1 text-faint"}`}>
+    <View testID="dock" className="rounded-card px-3 pb-1 pt-1.5" style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
+      {/* Only the words above the numbers scroll, where a short phone or a long title leaves them too little room: the readout, the
+          armed line and every button are pinned to the dock's foot and never scroll away. */}
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
+        <Text testID="sheet-step" numberOfLines={1} className="text-center font-display text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
+          {step}
+        </Text>
+        <Text testID="sheet-title" accessibilityRole="header" numberOfLines={2} className="text-center font-display text-body text-bone" style={{ flexShrink: 0 }}>
+          {title}
+        </Text>
+        {lines.first ? (
+          <View className="flex-row items-start gap-1.5">
+            <View className="flex-1" onLayout={(event) => setLineWidth(Math.round(event.nativeEvent.layout.width))}>
+              {expanded ? (
+                [lines.first, ...lines.rest].map((line) => (
+                  <Text key={line.testID} testID={line.testID} className={`text-center text-label ${lineTone(line.kind)} ${line.kind === "unavailable" ? "mt-1" : ""}`}>
                     {line.text}
                   </Text>
-                ))}
-              </ScrollView>
-            ) : (
-              // One line shows. A screen reader hears every line from it, folded or not.
-              <Text
-                testID={lines.first.testID}
-                numberOfLines={dense ? 1 : 2}
-                accessibilityLabel={lines.spoken}
-                className={`text-center text-label ${lines.first.kind === "guide" ? "text-bone" : lines.first.kind === "note" ? "text-muted" : "text-faint"}`}
+                ))
+              ) : (
+                // One line shows. A screen reader hears every line from it, folded or not.
+                <Text testID={lines.first.testID} numberOfLines={dense ? 1 : 2} accessibilityLabel={lines.spoken} className={`text-center text-label ${lineTone(lines.first.kind)}`}>
+                  {lines.first.text}
+                </Text>
+              )}
+            </View>
+            {lines.foldable ? (
+              // The "i" pill (`dock-more`) opens the folded lines; the More pill (`dock-more-actions`) folds the quiet buttons.
+              // 24 pt with a 44 pt target that stays clear of the line's words (6 pt gap) and inside the dock's padding.
+              <Pressable
+                testID="dock-more"
+                accessibilityRole="button"
+                accessibilityLabel={expanded ? "Fewer notes" : "More about this moment"}
+                accessibilityState={{ expanded }}
+                hitSlop={{ top: 10, bottom: 10, left: 6, right: 12 }}
+                onPress={() => setOpened(expanded ? null : moment)}
               >
-                {lines.first.text}
-              </Text>
-            )}
+                <View className="h-6 w-6 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: t.muted, backgroundColor: t.raised }}>
+                  <Text className="text-label font-medium text-bone">{expanded ? "−" : "i"}</Text>
+                </View>
+              </Pressable>
+            ) : null}
           </View>
-          {lines.foldable ? (
-            <Pressable
-              testID="dock-more"
-              accessibilityRole="button"
-              accessibilityLabel={expanded ? "Fewer notes" : "More about this moment"}
-              accessibilityState={{ expanded }}
-              hitSlop={12}
-              onPress={() => setOpened(expanded ? null : moment)}
-            >
-              <View className="h-5 w-5 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: t.hairline, backgroundColor: t.raised }}>
-                <Text className="text-label font-medium text-bone">{expanded ? "−" : "i"}</Text>
-              </View>
-            </Pressable>
-          ) : null}
-        </View>
-      ) : null}
-      <View ref={block} collapsable={false} onLayout={measure} className="mt-1 gap-1">
+        ) : null}
+      </ScrollView>
+      <View ref={block} collapsable={false} onLayout={measure} className="gap-1" style={{ flexShrink: 0 }}>
         {readout ? <ReadoutView readout={readout} /> : null}
         {refusal ? (
           <Text testID="sheet-refusal" numberOfLines={3} className="text-center text-label text-danger">
@@ -149,7 +150,6 @@ export function TableDock({
         ) : null}
         <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} onButton={onButton} />
       </View>
-      </ScrollView>
     </View>
   );
 }

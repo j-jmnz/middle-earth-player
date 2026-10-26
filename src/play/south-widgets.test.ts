@@ -1,11 +1,11 @@
-// Rules: mec109.stage-4 (data/rules/entries.json). The table's words for the active locations and the facedown Ring-bearer: shown
-// for The Ring Goes South, which declares a second active location, with what the engine holds, and absent for the other scenarios.
+// Rules: mec109.stage-4 (data/rules/entries.json). The table's words for the facedown Ring-bearer: shown for The Ring Goes South,
+// which declares a second active location, with what the engine holds, and absent for the other scenarios.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { DOORS, loadSouthWorld, southTable, WATCHER, type SouthWorld } from "../../scripts/south-scene.ts";
 import { first, loadWorld, table, type World } from "../../scripts/past-scene.ts";
 
-import { locationReadout } from "./widgets.ts";
+import { locationReadout, ringWords } from "./widgets.ts";
 
 let south: SouthWorld;
 let past: World;
@@ -15,13 +15,21 @@ beforeAll(async () => {
   past = await loadWorld();
 });
 
-describe("the active location readout", () => {
-  it("names both active locations in slot order, and the card holding the Ring-bearer", () => {
+describe("the facedown Ring-bearer readout", () => {
+  it("names the card holding the Ring-bearer and the seat that gets it back (the first player)", () => {
     const { state } = southTable(south, { stage: "142023", active: DOORS, second: "place", captive: true });
-    expect(locationReadout(state)).toEqual({ active: [DOORS, "place"], heldUnder: WATCHER, heldBy: state.firstPlayer });
+    expect(locationReadout(state)).toEqual({ heldUnder: WATCHER, heldBy: state.firstPlayer });
+    expect(locationReadout({ ...state, firstPlayer: 1 })).toEqual({ heldUnder: WATCHER, heldBy: 1 });
     const one = southTable(south, { stage: "142023", active: DOORS });
-    expect(locationReadout(one.state)).toEqual({ active: [DOORS], heldUnder: null, heldBy: null });
-    expect(locationReadout(southTable(south, { stage: "142023" }).state)).toEqual({ active: [], heldUnder: null, heldBy: null });
+    expect(locationReadout(one.state)).toEqual({ heldUnder: null, heldBy: null });
+    expect(locationReadout(southTable(south, { stage: "142023" }).state)).toEqual({ heldUnder: null, heldBy: null });
+  });
+
+  it("words it for the dial, exactly as the Maestro flow asserts it", () => {
+    const { state } = southTable(south, { stage: "142023", active: DOORS, captive: true });
+    expect(ringWords(locationReadout(state), (code) => (code === WATCHER ? "Watcher in the Water" : code))).toBe("The Ring-bearer is facedown under Watcher in the Water");
+    expect(ringWords(null, (code) => code)).toBeNull();
+    expect(ringWords({ heldUnder: null, heldBy: null }, (code) => code)).toBeNull();
   });
 
   it("follows the engine: the Ring-bearer back in play is no longer held", () => {
