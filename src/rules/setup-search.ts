@@ -20,7 +20,8 @@ export function searchSetup(
     const found = setupIds(next, effect.cardCode, kind);
     for (const foundId of found) {
       const seat = next.cards[foundId]?.controller ?? next.firstPlayer;
-      next = moveCard(next, foundId, { zone: "setAside" });
+      // A hero with a Setup (Sméagol) stays among its player's heroes; any other card leaves the deck it was in.
+      if (next.cards[foundId]?.zone !== "heroes") next = moveCard(next, foundId, { zone: "setAside" });
       next = runEffectBody(next, effect, foundId, seat, ctx, steps);
       if (next.failure || next.lost) return next;
     }
@@ -47,7 +48,7 @@ function setupIds(state: ScenarioState, code: string, kind: "player" | "encounte
   }
   const ids: string[] = [];
   for (let seat = 0; seat < state.seatCount; seat += 1) {
-    for (const id of state.seats[seat]?.deck ?? []) {
+    for (const id of [...(state.seats[seat]?.heroes ?? []), ...(state.seats[seat]?.deck ?? [])]) {
       if (state.cards[id]?.code === code) ids.push(id);
     }
   }

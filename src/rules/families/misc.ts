@@ -6,6 +6,9 @@ import { currentCause, UNATTRIBUTED } from "../cause.ts";
 import type { EngineStep } from "../intents.ts";
 import { drawOne, type ReduceContext } from "../interpret.ts";
 import { placeDamage } from "../keywords.ts";
+import { printedOf } from "../printed.ts";
+import { shuffleEncounterDeck } from "../verbs.ts";
+import { spawn } from "../zones.ts";
 import type { ScenarioState } from "../state.ts";
 import { livingSeats, updateCard } from "../state.ts";
 import { pickedList } from "../player-verbs.ts";
@@ -56,6 +59,23 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return healQuietly(state, instruction, focus, ctx);
     case "MoveDamage":
       return moveDamage(state, instruction, focus, ctx, steps);
+    // Setup of a player card that adds a card from the box to the encounter deck ("Shuffle 2 copies of Stinker into the encounter
+    // deck", 21072:A:2): a new copy joins the deck, which is shuffled.
+    case "ShuffleIntoEncounterDeck":
+      return shuffleEncounterDeck(spawn(state, instruction.code, { zone: "encounterDeck" }).state);
+    case "PayFromHero":
+      return state;
+    case "LoseGame": {
+      if (state.lost) return state;
+      const name = focus.sourceId && state.cards[focus.sourceId] ? printedOf(ctx.cards, state.cards[focus.sourceId]?.code ?? "").name : "A card";
+      return { ...state, lost: true, lossReason: `${name} left play`, window: null };
+    }
+    case "DiscardCanceled": {
+      const index = state.stack.findLastIndex((entry) => entry.data.kind === "reveal" && entry.data.canceled === true);
+      const frame = state.stack[index];
+      if (index < 0 || frame?.data.kind !== "reveal") return state;
+      return { ...state, stack: state.stack.map((entry, at) => (at === index && entry.data.kind === "reveal" ? { ...entry, data: { ...entry.data, discard: true } } : entry)) };
+    }
     default:
       return null;
   }

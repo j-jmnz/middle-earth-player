@@ -8,6 +8,7 @@ import { attachmentsPickMatches } from "./families/attachments-pick.ts";
 import { costsPickMatches } from "./families/costs-pick.ts";
 import { attackPickMatches } from "./families/attack-pick.ts";
 import { miscPickMatches } from "./families/misc-pick.ts";
+import { immuneToSource } from "./families/misc-guards.ts";
 import { countsExtra } from "./families/misc-traits.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import { playPickMatches } from "./families/play-pick.ts";
@@ -225,6 +226,8 @@ export function pickCandidates(
     // Only an attachment a player may discard is offered for one (141071:A:2): a Permanent card on a hero is not.
     if (spec.type === "attachment" && !counting && printedOf(ctx.cards, instance.code).keywords.permanent && state.cards[instance.host ?? ""]?.zone === "heroes") return false;
     if (playerEffect && !playerCardEffectCanChoose(printedOf(ctx.cards, instance.code))) return false;
+    // "Immune to non-Master card effects": a card without that Trait cannot choose or affect it (families/misc-guards.ts).
+    if (!counting && immuneToSource(state, id, sourceId, ctx)) return false;
     return matchesPick(state, id, spec, at, ctx);
   });
 }

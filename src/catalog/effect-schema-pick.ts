@@ -42,7 +42,7 @@ export const pickSchema = z.strictObject({
   // gained from an attachment counts (families/play-pick.ts, families/attack-pick.ts).
   sharesTrait: z.enum(["self", "host", "other"]).optional(),
   // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
-  cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest"]).optional(),
+  cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest", "treasure"]).optional(),
   maxCost: z.number().int().min(0).optional(),
   minCost: z.number().int().min(0).optional(),
   // The candidates are the cards the last picked attachment may be attached to.
@@ -151,6 +151,8 @@ export const pickSchema = z.strictObject({
   drawn: z.boolean().optional(),
   // A card with at most this many attachments on it ("a Dale character without an attachment" is read after the attachment arrived: 1).
   maxAttachments: z.number().int().min(0).optional(),
+  // Not a card with one of these titles ("a character in play (other than Bilbo Baggins)").
+  exceptNames: z.array(z.string().min(1)).min(1).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

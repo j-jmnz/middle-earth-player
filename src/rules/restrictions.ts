@@ -74,7 +74,7 @@ export function defenseBlocked(state: ScenarioState, ctx: ReduceContext, defende
 
 // The hero does not count against the hero limit while a card attached to it says so.
 export function heroLimitExempt(state: ScenarioState, ctx: ReduceContext, heroId: string): boolean {
-  return restricted(state, ctx, "heroLimit").some((rule) => state.cards[rule.sourceId]?.host === heroId);
+  return restricted(state, ctx, "heroLimit").some((rule) => rule.sourceId === heroId || state.cards[rule.sourceId]?.host === heroId);
 }
 
 // Attachments of the card that carry the Restricted keyword.

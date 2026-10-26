@@ -9,6 +9,7 @@ import { playCost } from "../rules/attach.ts";
 import type { Payment } from "../rules/intents.ts";
 import type { ReduceContext } from "../rules/interpret.ts";
 import { allyPools, distinctRule } from "../rules/families/costs-pay.ts";
+import { openPools } from "../rules/families/misc-guards.ts";
 import { exhaustSlack } from "../rules/families/costs-play.ts";
 import { payingSlack } from "../rules/families/deck-play.ts";
 import { chosenX } from "../rules/families/misc-cost.ts";
@@ -35,7 +36,7 @@ export type PayRequest = {
 function poolsFor(state: ScenarioState, ctx: ReduceContext, seat: number, sphere: Sphere | null, forCard?: string): { heroId: string; max: number }[] {
   const pools: { heroId: string; max: number }[] = [];
   // An ally whose own pool pays for the card (Radagast for Creature cards) is a pool beside the heroes.
-  for (const heroId of [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx)]) {
+  for (const heroId of [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx), ...openPools(state, seat, forCard, ctx)]) {
     const hero = state.cards[heroId];
     if (!hero || hero.resources <= 0) continue;
     if (!heroPays(state, heroId, sphere, ctx, forCard)) continue;

@@ -23,6 +23,16 @@ export const VERBS = [
   // `amount` (it costs that much less while the player's threat is 20 or less). `hostSphere`: only a card of the printed sphere
   // of the source's host ("matches attached hero's printed sphere", 08034:A:2).
   z.strictObject({ verb: z.literal("GrantSecrecy"), pick: pickSchema, amount: z.number().int().positive(), hostSphere: z.boolean().optional(), firstEachRound: z.boolean().optional(), ...when }),
+  // In the Action of a card in hand: a resource from the pool of the hero with this title may pay for it, even when the player
+  // does not control that hero (resolving it changes nothing) ("You may spend a Baggins resource from Bilbo Baggins' resource pool to play this card even if you do
+  // not control Bilbo Baggins", 131019:A:1).
+  z.strictObject({ verb: z.literal("PayFromHero"), name: z.string().min(1), ...when }),
+  // The players lose the game ("If Bilbo Baggins leaves play, the players lose the game").
+  z.strictObject({ verb: z.literal("LoseGame"), ...when }),
+  // After CancelEffect on an encounter card just revealed: that card is discarded instead of being shuffled back into the
+  // encounter deck ("cancel the effects of an encounter card just revealed ... and discard that card", 21009:A:1). The same player
+  // then reveals another card.
+  z.strictObject({ verb: z.literal("DiscardCanceled"), ...when }),
 ] as const;
 
 export const TRIGGERS = [
@@ -47,4 +57,15 @@ export const FLAGS = [
   "spendAsTactics",
   "spendAsSpirit",
   "spendAsLore",
+  // `eliminationReduction`, on "seat:N": the seat's threat elimination level is 50 less this ("reduced by 5", The One Ring).
+  "eliminationReduction",
+  // The holder is immune to effects of cards that lack this Trait ("Immune to non-Master card effects"): no such card's effect
+  // chooses or affects it.
+  "immuneToNonMaster",
+  "immuneToNonGollum",
+  // The holder gains no resources from player card effects (1), or from cards that are not treasures (2).
+  "noPlayerCardResources",
+  "noNonTreasureResources",
+  // The holder (an enemy) deals no damage in the attack it makes ("this attack deals no damage").
+  "dealsNoDamage",
 ] as const;

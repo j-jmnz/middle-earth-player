@@ -131,6 +131,64 @@ export const RECORDS: readonly Effect[] = [
   {"id":"132009:action:1","cardCode":"132009","lines":["132009:A:1"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"canPick","pick":{"type":"attachment","control":"you","trait":"Weapon","state":"ready"}},{"kind":"canPick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true,"maxDefense":0}}]},"instructions":[
     {"verb":"Pick","pick":{"type":"attachment","control":"you","trait":"Weapon","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
     {"verb":"Pick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true,"maxDefense":0}},{"verb":"Discard","target":{"kind":"picked"}}]},
+
+  // The One Ring and the Master cards (player deck).
+  // 21001 The One Ring: immune to non-Master card effects; its Setup waits for the opening hands (Delay `startOfGame`), attaches it
+  // to a hero its player chooses and searches the deck for a Master card; it lowers the threat elimination level by 5; the
+  // players lose if it leaves play. The last two sentences of the Setup line are constant and triggered, which a line that opens
+  // with "Setup:" cannot name; the unlabelled line 2 stands for them (the coverage check allows any timing there).
+  {"id":"21001:constant:1","cardCode":"21001","lines":["21001:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"immuneToNonMaster","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"21001:setup:1","cardCode":"21001","lines":["21001:A:3"],"timing":"setup","instructions":[{"verb":"Delay","until":"startOfGame","instructions":[
+    {"verb":"PutAttachmentIntoPlay","card":"self"},
+    {"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","trait":"Master"}},{"verb":"MovePicked","to":"hand"},{"verb":"ShuffleDeck"}]}]},
+  {"id":"21001:constant:2","cardCode":"21001","lines":["21001:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"you"}]},{"verb":"ModifyStat","stat":"eliminationReduction","amount":5,"until":"whileSourceInPlay","target":"actorSeat"}]},
+  {"id":"21001:triggered:1","cardCode":"21001","lines":["21001:A:2"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
+  // 21009 The Master Ring: cancel the effects of the card just revealed, discard it, reveal another.
+  {"id":"21009:response:1","cardCode":"21009","lines":["21009:A:1"],"timing":"response","trigger":"encounterRevealed","cost":[{"kind":"playEvent"},{"kind":"exhaustCode","code":"21001"},{"kind":"raiseThreat","amount":1}],"instructions":[{"verb":"CancelEffect"},{"verb":"DiscardCanceled"}]},
+  // 21010 The Ruling Ring (the costs are the first instructions: an event's Action does not pay its record's costs).
+  {"id":"21010:action:1","cardCode":"21010","lines":["21010:A:1"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Combat"},{"kind":"exhausted","code":"21001","is":false},{"kind":"canPick","pick":{"type":"enemy","control":"any","engaged":"you","notTraits":["Nazgûl"]}}]},"instructions":[
+    {"verb":"Exhaust","target":{"kind":"byCode","code":"21001"}},{"verb":"RaiseThreat","amount":1,"who":"actor"},
+    {"verb":"Pick","pick":{"type":"enemy","control":"any","engaged":"you","notTraits":["Nazgûl"]}},{"verb":"PreventAttacks","target":"picked","until":"endOfPhase"}]},
+  // 21011 The Ring of Power.
+  {"id":"21011:action:1","cardCode":"21011","lines":["21011:A:1"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"exhausted","code":"21001","is":false},{"kind":"canPick","pick":{"type":"hero","control":"any","hasAttachment":{"trait":"Ring"}}}]},"instructions":[
+    {"verb":"Exhaust","target":{"kind":"byCode","code":"21001"}},{"verb":"RaiseThreat","amount":1,"who":"actor"},
+    {"verb":"Pick","pick":{"type":"hero","control":"any","hasAttachment":{"trait":"Ring"}}},{"verb":"Ready","target":"picked"},
+    {"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfPhase","target":"picked"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfPhase","target":"picked"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"endOfPhase","target":"picked"}]},
+  // 21072 Sméagol, side A: 2 copies of Stinker join the encounter deck (side B, the Gollum enemy, has no data: see the handover).
+  {"id":"21072:setup:1","cardCode":"21072","lines":["21072:A:2"],"timing":"setup","instructions":[{"verb":"ShuffleIntoEncounterDeck","code":"21071"},{"verb":"ShuffleIntoEncounterDeck","code":"21071"}]},
+
+  // The saga heroes. "The first player gains control": ControlledBy; "the players lose the game": LoseGame when the hero leaves play.
+  // 131001 Bilbo Baggins (Over Hill and Under Hill).
+  {"id":"131001:constant:1","cardCode":"131001","lines":["131001:A:1"],"timing":"constant","instructions":[{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
+  {"id":"131001:constant:2","cardCode":"131001","lines":["131001:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"noPlayerCardResources","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"131001:triggered:1","cardCode":"131001","lines":["131001:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
+  // 132001 Bilbo Baggins (The Hobbit saga): not counted against the hero limit; no resources from non-treasure cards; searches for treasures.
+  {"id":"132001:constant:1","cardCode":"132001","lines":["132001:A:1"],"timing":"constant","instructions":[{"verb":"Restrict","what":"heroLimit"},{"verb":"ModifyStat","stat":"noNonTreasureResources","amount":1,"until":"whileSourceInPlay"},{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
+  {"id":"132001:action:1","cardCode":"132001","lines":["132001:A:2"],"timing":"action","cost":{"kind":"resources","amount":1,"sphere":"baggins","from":"self"},"condition":{"kind":"canPick","pick":{"type":"card","control":"you","from":"deck","cardType":"treasure"}},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","cardType":"treasure"}},{"verb":"MovePicked","to":"hand"},{"verb":"ShuffleDeck"}]},
+  {"id":"132001:triggered:1","cardCode":"132001","lines":["132001:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
+  // 131019 Burglar Baggins, 132013 The Lucky Number.
+  {"id":"131019:action:1","cardCode":"131019","lines":["131019:A:1"],"timing":"action","condition":{"kind":"canPick","pick":{"type":"hero","control":"any","names":["Bilbo Baggins"]}},"instructions":[
+    {"verb":"PayFromHero","name":"Bilbo Baggins"},{"verb":"Pick","pick":{"type":"hero","control":"any","names":["Bilbo Baggins"]}},{"verb":"ModifyStat","stat":"willpower","amount":2,"until":"endOfPhase","target":"picked"},{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfPhase","target":"picked"},{"verb":"ModifyStat","stat":"defense","amount":2,"until":"endOfPhase","target":"picked"}]},
+  {"id":"132013:action:1","cardCode":"132013","lines":["132013:A:1"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"count","pick":{"type":"hero","control":"any","names":["Bilbo Baggins"]},"min":1},{"kind":"canPick","pick":{"type":"character","control":"any","exceptNames":["Bilbo Baggins"]}}]},"instructions":[
+    {"verb":"Pick","pick":{"type":"character","control":"any","exceptNames":["Bilbo Baggins"]}},
+    {"verb":"ModifyStat","stat":"willpower","amount":{"stat":"willpower","ofNamed":"Bilbo Baggins"},"until":"endOfPhase","target":"picked"},
+    {"verb":"ModifyStat","stat":"attack","amount":{"stat":"attack","ofNamed":"Bilbo Baggins"},"until":"endOfPhase","target":"picked"},
+    {"verb":"ModifyStat","stat":"defense","amount":{"stat":"defense","ofNamed":"Bilbo Baggins"},"until":"endOfPhase","target":"picked"}]},
+  // 143001, 145001, 146002 Aragorn.
+  {"id":"143001:constant:1","cardCode":"143001","lines":["143001:A:1"],"timing":"constant","instructions":[{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
+  {"id":"143001:triggered:1","cardCode":"143001","lines":["143001:A:1"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
+  {"id":"145001:constant:2","cardCode":"145001","lines":["145001:A:1"],"timing":"constant","instructions":[{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
+  {"id":"145001:triggered:1","cardCode":"145001","lines":["145001:A:1"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
+  {"id":"146002:constant:1","cardCode":"146002","lines":["146002:A:1"],"timing":"constant","instructions":[{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
+  {"id":"146002:triggered:1","cardCode":"146002","lines":["146002:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
+  // 142001 Frodo Baggins: exhaust The One Ring (142091) and spend a Fellowship resource when he defends; the attack deals no damage.
+  {"id":"142001:response:1","cardCode":"142001","lines":["142001:A:1"],"timing":"response","trigger":"declaredDefender","subject":"self","cost":{"kind":"resources","amount":1,"sphere":"fellowship"},"condition":{"kind":"exhausted","code":"142091","is":false},"instructions":[
+    {"verb":"Exhaust","target":{"kind":"byCode","code":"142091"}},{"verb":"ModifyStat","stat":"dealsNoDamage","amount":1,"until":"endOfPhase","target":"other"},{"verb":"RaiseThreat","amount":2,"who":"eachSeat"}]},
+  // 144013 Speak Your Promise!: the Ring-bearer readies; the enemy's Attack and Defense drop by the Ring-bearer's Willpower above its Threat.
+  {"id":"144013:action:1","cardCode":"144013","lines":["144013:A:1"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"canPick","pick":{"type":"hero","control":"any","trait":"Ring-bearer"}},{"kind":"canPick","pick":{"type":"enemy","control":"any","engaged":"you"}}]},"instructions":[
+    {"verb":"Pick","pick":{"type":"hero","control":"any","trait":"Ring-bearer"}},{"verb":"Ready","target":"picked"},{"verb":"AddToX","amount":{"stat":"willpower","of":"picked"}},
+    {"verb":"Pick","pick":{"type":"enemy","control":"any","engaged":"you"}},{"verb":"AddToX","amount":{"stat":"threat","of":"picked","negative":true}},
+    {"verb":"ModifyStat","stat":"attack","amount":{"x":true,"negative":true},"until":"endOfPhase","target":"picked"},{"verb":"ModifyStat","stat":"defense","amount":{"x":true,"negative":true},"until":"endOfPhase","target":"picked"}]},
 ];
 
 // Generated record ids an authored record here replaces.

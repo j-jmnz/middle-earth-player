@@ -35,6 +35,7 @@ import { doRefresh } from "./refresh.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
+import { pushDue } from "./delayed.ts";
 import { crossBoundary } from "./triggers.ts";
 import { constantWin, heldStat, NO_COUNTS } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
@@ -165,8 +166,11 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
   // The Responses to a shadow effect, or a shadow effect that asked a player, are done: the attack goes on.
   if (attackResumes(state)) return resolveAttack(state, ctx, steps);
   switch (state.mode) {
-    case "afterOpening":
-      return finishSetup(state, ctx, steps);
+    case "afterOpening": {
+      // A Setup that waits for the opening hands (The One Ring: attach it to a hero, search the deck) resolves first.
+      const waiting = pushDue(state, "Setup", "startOfGame", steps);
+      return waiting !== state ? waiting : finishSetup(state, ctx, steps);
+    }
     case "beginRound":
       return enterBegin(state, ctx);
     case "resourceGrant":

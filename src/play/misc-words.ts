@@ -12,6 +12,12 @@ export function miscWords(instruction: Instruction): string | null {
       return "heal it";
     case "MoveDamage":
       return instruction.all ? "move all its damage to the other enemy" : "move damage from one enemy to the other";
+    case "LoseGame":
+      return "the players lose the game";
+    case "DiscardCanceled":
+      return "discard that card";
+    case "ShuffleIntoEncounterDeck":
+      return "shuffle a card into the encounter deck";
     default:
       return null;
   }

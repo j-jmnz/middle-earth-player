@@ -13,6 +13,7 @@ import { askTarget, openBranch } from "../choices.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { heroPays } from "../payments.ts";
+import { mayGainResources } from "./misc-guards.ts";
 import { lastPicked, seatOf } from "../player-verbs.ts";
 import { printedOf, type Sphere } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
@@ -122,7 +123,7 @@ export function heroesGain(state: ScenarioState, instruction: Extract<Instructio
   let next = state;
   for (const id of state.seats[seat]?.heroes ?? []) {
     const hero = next.cards[id];
-    if (!hero || amount <= 0 || (instruction.unspent && spentThisRound(state, id))) continue;
+    if (!hero || amount <= 0 || (instruction.unspent && spentThisRound(state, id)) || !mayGainResources(state, id, focus.sourceId, ctx)) continue;
     for (let added = 0; added < amount; added += 1) steps.push({ kind: "gainResource", seat, heroId: id, cause: currentCause(steps, UNATTRIBUTED) });
     next = queueEvent(updateCard(next, id, { resources: hero.resources + amount }), { trigger: "resourcesAdded", seat, cardId: id });
   }

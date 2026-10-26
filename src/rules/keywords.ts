@@ -8,7 +8,7 @@ import type { EngineStep } from "./intents.ts";
 import { fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
-import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
+import { flagged, heldAmount, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
@@ -398,7 +398,7 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[]): Sce
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
     if (!seat || seat.eliminated) continue;
-    if (seat.threat >= 50 || seat.heroes.length === 0) {
+    if (seat.threat >= 50 - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction")) || seat.heroes.length === 0) {
       // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).
       const saved = seat.heroes.length > 0 ? threatSaved(next, index) : null;
       if (saved) {

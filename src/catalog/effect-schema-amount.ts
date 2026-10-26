@@ -19,6 +19,8 @@ export const amountExprSchema = z.strictObject({
   // tokens on the card; `cost` is its printed cost; `threatCost` a hero's printed threat; `attachments` the cards attached to it.
   stat: z.enum(["willpower", "attack", "defense", "threat", "hitPoints", "engagementCost", "questPoints", "damage", "resources", "progress", "cost", "threatCost", "attachments"]).optional(),
   of: cardRefSchema.optional(),
+  // With `stat`: read it from the card in play with this title instead of `of` ("Add Bilbo Baggins' total Willpower").
+  ofNamed: z.string().min(1).optional(),
   printed: z.boolean().optional(),
   // The X the event was played for, or the X an earlier instruction fixed (the discarded card's cost).
   x: z.literal(true).optional(),

@@ -127,8 +127,8 @@ export type FrameData =
   | { kind: "responses"; event: GameEvent; offers: readonly ResponseOffer[] }
   | { kind: "none" }
   // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
-  // effects of the card just revealed (Frodo Baggins).
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean }
+  // effects of the card just revealed (Frodo Baggins). `discard`: and the card is discarded, not shuffled back (The Master Ring).
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean; discard?: boolean }
   | HideData
   | EffectData;
 
@@ -147,7 +147,8 @@ export type DelayedEffect = {
   // `questSucceeded`: run when the players quest successfully this phase (families/quest-outcome.ts), dropped when the quest
   // resolves otherwise.
   // `endOfAttack`: the end of the player attack in progress (families/attack-flow.ts).
-  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "endOfAttack";
+  // `startOfGame`: run once the opening hands are settled (misc family).
+  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "endOfAttack" | "startOfGame";
   sourceId: string | null;
   seat: number;
   // The phase the effect was scheduled in. An end-of-phase effect fires when that phase ends.

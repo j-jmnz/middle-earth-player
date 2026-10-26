@@ -20,6 +20,7 @@ import { printedOf } from "./printed.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { afterCancel } from "./families/defense-damage.ts";
+import { mayGainResources } from "./families/misc-guards.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
 export type PlayerFocus = { seat: number; sourceId: string | null };
@@ -110,7 +111,7 @@ export function runPlayerVerb(
       const list = pickedList(state);
       const from = state.cards[list.at(-2) ?? ""];
       const to = state.cards[list.at(-1) ?? ""];
-      if (!from || !to || from.id === to.id) return state;
+      if (!from || !to || from.id === to.id || !mayGainResources(state, to.id, focus.sourceId, ctx)) return state;
       const amount = instruction.all ? from.resources : Math.min(from.resources, resolveAmount(state, instruction.amount ?? 1, frameScope(state, focus.seat, focus.sourceId), ctx));
       if (amount <= 0) return state;
       return updateCard(updateCard(state, from.id, { resources: from.resources - amount }), to.id, { resources: to.resources + amount });

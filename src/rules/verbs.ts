@@ -16,6 +16,7 @@ import { engageEnemy, engageWith, placeQuestProgress, stagingEnemies } from "./q
 import { restricted } from "./restrictions.ts";
 import { nextUint, shuffleIds } from "./seed.ts";
 import { afterProgress } from "./stage-reveal.ts";
+import { mayGainResources } from "./families/misc-guards.ts";
 import { queueHeard } from "./families/quest-events.ts";
 import { encounterRaised } from "./families/quest-threat.ts";
 import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
@@ -145,7 +146,7 @@ export function runExtraVerb(
       const id = refCard(state, instruction.to ?? "host", scope);
       const hero = id ? state.cards[id] : undefined;
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
-      if (!hero || hero.controller == null || amount <= 0) return state;
+      if (!hero || hero.controller == null || amount <= 0 || !mayGainResources(state, hero.id, focus.sourceId, ctx)) return state;
       for (let added = 0; added < amount; added += 1) {
         steps.push({ kind: "gainResource", seat: hero.controller, heroId: hero.id, cause: currentCause(steps, UNATTRIBUTED) });
       }

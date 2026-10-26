@@ -20,7 +20,7 @@ function pickedOf(state: ScenarioState, at: MiscPickContext): readonly string[] 
 }
 
 export function miscPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: MiscPickContext, ctx: ReduceContext): boolean {
-  if (spec.controlledBy == null && !spec.onPicked && !spec.playerCard && spec.maxDefense == null && !spec.drawn && spec.maxAttachments == null) return true;
+  if (spec.controlledBy == null && !spec.onPicked && !spec.playerCard && spec.maxDefense == null && !spec.drawn && spec.maxAttachments == null && !spec.exceptNames) return true;
   const instance = state.cards[id];
   if (!instance) return false;
   if (spec.controlledBy === "picked") {
@@ -31,6 +31,7 @@ export function miscPickMatches(state: ScenarioState, id: string, spec: PickSpec
     const card = [...pickedOf(state, at)].reverse().find((value) => value !== "" && !value.startsWith("seat:"));
     if (!card || instance.host !== card) return false;
   }
+  if (spec.exceptNames?.includes(printedOf(ctx.cards, instance.code).name)) return false;
   if (spec.maxAttachments != null && instance.attachments.length > spec.maxAttachments) return false;
   if (spec.playerCard && !isPlayerType(printedOf(ctx.cards, instance.code))) return false;
   if (spec.maxDefense != null && modifiedStat(state, instance, "defense", ctx.cards) > spec.maxDefense) return false;
