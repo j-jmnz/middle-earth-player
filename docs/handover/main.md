@@ -54,18 +54,13 @@ Start each from the current branch head (not d2f8a7a), with the brief.
 4. `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm effects:open`, full `pnpm test` (goldens must not change), commit the
    regenerated open lines, push.
 
-## Known follow-ups (found by family agents)
+## Known follow-ups
 
-- An event Action record's `cost` is not paid when the event is played via PlayCard.
-- `announceLeftPlay` does not set `explored`, so `subjectExplored` never holds on a location's `leftPlay`.
-- Refresh Action records check phase "Refresh", but the 7.4 action window runs in phase "End of round".
-- `resolveQuest` clears `committed` before `questSucceeded` is announced: 12037:response:1 and 22110:response:1 should hear
-  `questedSuccessfully` instead.
-- Dúnedain Remedy has two records for one line (`played` and `enteredPlay`): use the costs family's `attached` trigger.
-- Cancel payments (`applyCancel`) are not noted as spent (Tighten Our Belts).
-- Rules spans missing from data/rules: Battle/Siege keywords, Guarded on player cards, Trap; get them with
-  `pnpm data:sync rules` from an online Rules Reference and record the source (CLAUDE.md).
-- docs/plans/effect-authoring.md "Not expressible yet" is out of date: update it once every family is merged.
+Done on this branch (commit "Fix known follow-ups"): event Action costs (none exist), explored leftPlay, the Refresh window,
+Mirkwood Explorer's questedSuccessfully, Dunedain Remedy's attached trigger, cancel payments spent. Rules spans for
+Battle/Siege/Archery/Guarded (X) are in data/rules (hon.*, wor.*); Trap has no official rule (card text only).
+In progress (agent `leftovers`, wip/leftovers): Battle/Siege + 06036:A:2, Imrahil's type change 145005:A:1, one path for
+putting an attachment into play (with Guarded). Left for the end: the cookbook's "Not expressible yet" section.
 
 ## After the families
 
