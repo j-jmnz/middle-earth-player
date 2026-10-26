@@ -7,7 +7,7 @@ User directives (2026-10-26):
 - Extra branches on GitHub are fine. Before usage limits stop work, every agent and the main session write a handover and
   commit (and push) so no progress is lost.
 
-## State (2026-10-26, 12:15 UTC)
+## State (2026-10-26, 12:30 UTC; all agents stopped by the user)
 
 - Main branch for this work: `ccr-a8ef8247-8087n8` (pushed). `src/effects/open-lines.ts` lists the printed lines no
   record owns yet (`pnpm effects:open` rewrites it): 833 before the mechanic families, **496** now.
@@ -18,20 +18,20 @@ User directives (2026-10-26):
 - The agent brief is `docs/handover/agent-brief.md`; each unmerged family's line list as assigned is
   `docs/handover/families/<F>.txt` (some lines may be closed since: check `src/effects/open-lines.ts`).
 
-## Families in progress (stopped by the usage limit at about 11:30 UTC)
+## Families in progress (stopped at about 12:25 UTC)
 
 Each pushed its work to `wip/<F>` on GitHub; its own handover is `docs/handover/<F>.md` there (a copy is next to this file).
-The last commit on attack, deck and attachments is the main session's save of uncommitted work: unreviewed, may not compile.
+The last commit on attack and deck is the main session's save of uncommitted work at the usage-limit stop: unreviewed, may
+not compile.
 
 | Family | Branch head | Base | State | Next |
 |---|---|---|---|---|
 | attack | `wip/attack` 3141b63 | 02f9ba6 | Engine, records for 42 lines (39 + 3 the defense family left), tests | Finish the attack-flow helper for events that open attack windows; checks; final commit |
 | play | `wip/play` 84f0d42 | 02f9ba6 | Engine, 34 of 35 lines, 35 tests, goldens unchanged | Full test, final commit (06036:A:2 Trained for War stays open: no Battle rules span) |
-| attachments | `wip/attachments` 4b8fdc8 | 6fa8029 | Engine, records for all 45 lines, trap/guarded/host tests (its handover's "Lines open" list predates the records) | Finish the "staging" pseudo-host label in sheets; checks; final commit |
+| attachments | `wip/attachments` b7c85c5 | 6fa8029 | Engine, records for all 45 lines, 28 tests, full suite green after two fixes | Re-run full suite, card-smoke, coverage; final commit |
 | deck | `wip/deck` 6795de4 | 6fa8029 | Schema, picks, Choose `different`, discard events from costs; engine modules partly written | deck.ts run(), deck-moves/each/play, records, words, tests (see its handover) |
 
-To continue a family in a new session: start an agent with `docs/handover/agent-brief.md`, family F, working on a checkout
-of `wip/<F>` (not the base), told to read `docs/handover/<F>.md` first and to keep pushing `wip/<F>`.
+To continue a family in a new session, see `docs/handover/RESUME.md` (the prompt for a new chat).
 
 ## Families not started
 
