@@ -40,6 +40,8 @@ import { stepWindow, stepWindowResumes } from "./step-window.ts";
 import { flagged, inPlay, livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
 import { clearEliminated, damageHeld, destroyOverwhelmed } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
+import { strikeResumes } from "./families/attack-flow.ts";
+import { optionallyEngaged } from "./families/attack-events.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -114,7 +116,8 @@ export function applyIntent(
     case "DeclineTravel":
       return { ...markReached(state, "traveled"), window: null };
     case "Engage":
-      return finishOptional(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat);
+      // "After you optionally engage an enemy" (families/attack-events.ts).
+      return finishOptional(optionallyEngaged(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx), state.activeSeat);
     case "DeclineEngage":
       return finishOptional(state, state.activeSeat);
     case "ChooseEnemy":
@@ -137,7 +140,8 @@ export function applyIntent(
 function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // An attack waits on the action window between two of its steps; once it closes, the attack goes on before any frame
   // under it (an attack a Hide test started).
-  if (stepWindowResumes(state)) return state.pendingAttack?.awaiting ? resumeAttack(state, ctx, steps) : continueStrike(state, ctx, steps);
+  // A player attack an effect made during an enemy attack's window goes on first (families/attack-flow.ts).
+  if (stepWindowResumes(state)) return strikeResumes(state) ? continueStrike(state, ctx, steps) : resumeAttack(state, ctx, steps);
   if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
   // The Forced effects of an attack's start are done: the defender is declared (141069:A:2).
   if (state.pendingAttack?.defenseWaits) return openDefense(state, ctx);

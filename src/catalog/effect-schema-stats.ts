@@ -75,9 +75,10 @@ export const modifyStatSchema = z.strictObject({
   // `defender` is the character defending the attack in progress (141052:A:2). `allies` is every ally in play: from an
   // encounter card's lasting effect it also holds for allies that enter play later (rr.lasting-effects, 141071:A:1).
   // `engagedSeatCharacters` is every character of the player the source is engaged with (141050:A:2). `subject` is the card
-  // the event a Response answers was about. `actorSeat` and `pickedSeat` hold a seat number (extraDraw).
+  // the event a Response answers was about. `actorSeat` and `pickedSeat` hold a seat number (extraDraw). `other` is the second card
+  // the answered event names (the enemy a character defends against or attacks).
   target: z
-    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters", "subject", "actorSeat", "pickedSeat"])
+    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters", "subject", "actorSeat", "pickedSeat", "other"])
     .optional(),
   // Only holders with this trait ("Spy enemies get +1 Threat", 141047:A:1).
   trait: z.string().min(1).optional(),

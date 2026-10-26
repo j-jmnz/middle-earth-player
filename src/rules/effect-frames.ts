@@ -315,7 +315,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       if (target.kind === "self") return sourceId ? [sourceId] : [];
       if (target.kind === "host") return source?.host ? [source.host] : [];
       if (target.kind === "activeLocation") return state.activeLocation && state.activeLocation !== sourceId ? [state.activeLocation] : [];
-      if (target.kind === "picked" || target.kind === "subject" || target.kind === "attacker") {
+      if (target.kind === "picked" || target.kind === "subject" || target.kind === "attacker" || target.kind === "other") {
         const id = refCard(state, target.kind, frameScope(state, item.seat, sourceId));
         return id && hasEnemyType(state, id, ctx) && state.cards[id]?.zone === "engaged" ? [id] : [];
       }

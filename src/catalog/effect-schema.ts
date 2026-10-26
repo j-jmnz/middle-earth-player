@@ -126,9 +126,11 @@ const choiceSchema = z.strictObject({
     .min(1),
 });
 
+// `endOfAttack`: when the player attack in progress ends (rr.step-6-8-4; "After this attack resolves, discard ~"), with the
+// attacked enemy as the frame's other card (families/attack-flow.ts).
 const delaySchema = z.strictObject({
   verb: z.literal("Delay"),
-  until: z.enum(["endOfPhase", "endOfRound"]),
+  until: z.enum(["endOfPhase", "endOfRound", "endOfAttack"]),
   uncancelable: conditionSchema.optional(),
   // The delayed instructions act on the card the last Pick chose (Sneak Attack's ally).
   subject: z.literal("picked").optional(),

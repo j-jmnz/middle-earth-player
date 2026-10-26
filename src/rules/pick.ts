@@ -5,6 +5,7 @@ import { attachmentHostIds } from "./attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import { costsPickMatches } from "./families/costs-pick.ts";
+import { attackPickMatches } from "./families/attack-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
@@ -22,6 +23,9 @@ export type PickContext = {
   x?: number;
   participants?: readonly string[];
   counting?: boolean;
+  // The answered event's cards, when a condition is read for it (families/attack-pick.ts).
+  subject?: string | null;
+  other?: string | null;
 };
 
 function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
@@ -110,6 +114,9 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.hasResources && instance.resources <= 0) return false;
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs-pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
+  // The attack family's filters: printed keywords, the source's host, engaged with whom, a shared Trait, an attachment on the
+  // event's card, printed hit points, the top of a discard pile (families/attack-pick.ts).
+  if (!attackPickMatches(state, id, spec, at, ctx)) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   if (spec.defending && !(state.pendingAttack?.defenderId === id && !state.pendingAttack.undefended)) return false;
   if (spec.hasAttachment) {
@@ -163,6 +170,8 @@ export function pickCandidates(
   // The characters that took part in the attack the Response answers.
   participants?: readonly string[],
   counting = false,
+  // The answered event's subject and other card, for a condition read about it (families/attack-pick.ts).
+  event?: { subject?: string | null; other?: string | null },
 ): string[] {
   const asking = spec.who === "firstPlayer" ? state.firstPlayer : seat;
   if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated).map((index) => `seat:${index}`);
@@ -174,7 +183,7 @@ export function pickCandidates(
   const source = sourceId ? state.cards[sourceId] : undefined;
   const playerEffect = !counting && (source == null || isPlayerType(printedOf(ctx.cards, source.code)));
   const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
-  const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting };
+  const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
   return raw.filter((id) => {
     const instance = state.cards[id];
     if (!instance) return false;

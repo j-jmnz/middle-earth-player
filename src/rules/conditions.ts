@@ -2,6 +2,8 @@ import type { Condition } from "../catalog/boundary.ts";
 
 import { questSucceeded } from "./families/costs-pay.ts";
 import { spendablePools } from "./families/costs-verbs.ts";
+import { engagedThisRound } from "./families/attack-events.ts";
+import { attackingHolds } from "./families/attack-strike.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
@@ -111,7 +113,7 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return scope.explored === true;
     }
     case "canPick":
-      return pickCandidates(state, condition.pick, scope.actor, [], scope.sourceId, ctx).length > 0;
+      return pickCandidates(state, condition.pick, scope.actor, [], scope.sourceId, ctx, undefined, undefined, false, { subject: scope.subject, other: scope.other }).length > 0;
     case "handHasCard":
       return (state.seats[scope.actor]?.hand ?? []).some((id) => id !== scope.sourceId);
     case "engagedAboveThreat": {
@@ -167,6 +169,14 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return spendablePools(state, scope.actor, condition, ctx).total >= condition.min;
     case "questSucceeded":
       return questSucceeded(state, scope.actor, scope.sourceId, condition.committed === true);
+    // The attack family's conditions (families/attack-strike.ts, families/attack-events.ts).
+    case "attacking": {
+      const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
+      const id = scope.holderId ?? (condition.card === "host" ? source?.host : condition.card === "subject" ? scope.subject : scope.sourceId);
+      return attackingHolds(state, condition, id ? state.cards[id] : undefined, ctx, scope.against);
+    }
+    case "engagedThisRound":
+      return engagedThisRound(state, scope.actor) === condition.is;
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":

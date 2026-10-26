@@ -8,6 +8,7 @@ import { modifyStat } from "./attack-verbs.ts";
 import { frameScope, refCard } from "./amounts.ts";
 import { collectAllyResources } from "./families/costs-pay.ts";
 import { runFamilyVerb } from "./families/index.ts";
+import { commitCard } from "./families/attack.ts";
 import { exhaustCard, readyCard, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "./frames.ts";
@@ -128,6 +129,8 @@ export function runInstruction(
     case "Ready":
       return focus.sourceId ? readyCard(state, focus.sourceId) : state;
     case "Commit":
+      // A card the effect names commits as it is, and is announced (families/attack.ts).
+      if (instruction.target) return commitCard(state, instruction.target, focus);
       return focus.sourceId
         ? updateCard(state, focus.sourceId, { committed: true, exhausted: true })
         : state;

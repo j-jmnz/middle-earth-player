@@ -100,6 +100,22 @@ export const pickSchema = z.strictObject({
   cost: z.number().int().min(0).optional(),
   // A card that prints no victory points ("a location worth no victory points").
   noVictory: z.boolean().optional(),
+  // The attack family's filters (families/attack-pick.ts). A card that prints this keyword, not one it gained ("a hero with the
+  // printed Ranged keyword"). Not the card the source is attached to ("each other attacking character" on an attachment).
+  printedKeyword: z.enum(["ranged", "sentinel"]).optional(),
+  notHost: z.boolean().optional(),
+  // An enemy engaged with the player the effect last picked (`picked`: "each enemy engaged with that player"), or one not engaged
+  // with the chooser (`notYou`: in the staging area, with `staging`, or engaged with another player).
+  engagedWith: z.enum(["picked", "notYou"]).optional(),
+  // A card that shares a Trait with the answered event's other card ("another enemy that shares a Trait with the enemy just
+  // destroyed"); never that card itself.
+  sharesTrait: z.literal("other").optional(),
+  // An attachment on the card the answered event is about ("a Weapon attached to that character").
+  onSubject: z.boolean().optional(),
+  // A card with at least this many printed hit points ("an enemy with 5 or more printed hit points").
+  minHitPoints: z.number().int().positive().optional(),
+  // The top card of its discard pile ("While the top card of your discard pile is an ally").
+  topOfDiscard: z.boolean().optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

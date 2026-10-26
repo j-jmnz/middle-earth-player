@@ -1,15 +1,81 @@
-import type { Instruction } from "../../catalog/boundary.ts";
+// Rules: rr.attacks-outside-the-combat-phase, rr.step-6-8b, rr.step-6-8-3, rr.active-location, rr.quest-advancement,
+// faq.limitations-on-attacks (data/rules/entries.json).
+import type { CardRef, Instruction } from "../../catalog/boundary.ts";
+import { frameScope, refCard, resolveAmount } from "../amounts.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
+import { pickCandidates } from "../pick.ts";
+import { isCharacterType, printedOf } from "../printed.ts";
+import { placeQuestProgress } from "../quest.ts";
+import { queueEvent } from "../queue.ts";
+import { restricted } from "../restrictions.ts";
+import { afterProgress } from "../stage-reveal.ts";
 import type { ScenarioState } from "../state.ts";
+import { flagged, updateCard } from "../state.ts";
+import { playerAttackWindow } from "../step-window.ts";
+import { topFrame } from "../windows.ts";
+import { awaitStrike, declareStrike, pickAttacker } from "./attack-flow.ts";
 import type { Focus } from "./index.ts";
 
 // The verbs src/catalog/families/attack.ts adds, for player attacks: attack modifiers and targets, immediate attacks, attacks into the staging area. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
-  void state;
-  void instruction;
-  void focus;
-  void ctx;
-  void steps;
-  return null;
+  switch (instruction.verb) {
+    case "DeclareAttack":
+      return declareAttack(state, instruction, focus, ctx);
+    case "OfferAttacks": {
+      // A player card's choice of targets: an enemy immune to player card effects is not offered.
+      const targets = pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx);
+      return targets.length > 0 ? { ...state, window: { kind: "playerAttack", targets }, activeSeat: focus.seat, passed: [] } : state;
+    }
+    case "QuestProgress": {
+      const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
+      if (amount <= 0) return state;
+      const before = steps.length;
+      const placed = placeQuestProgress(state, amount, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
+      return afterProgress(placed, before, ctx, steps);
+    }
+    case "ExcessDamageTo": {
+      const strike = state.pendingStrike;
+      const enemyId = refCard(state, "picked", frameScope(state, focus.seat, focus.sourceId));
+      if (!strike || !enemyId || enemyId === strike.enemyId || !state.cards[enemyId]) return state;
+      return { ...state, pendingStrike: { ...strike, excessTo: enemyId } };
+    }
+    default:
+      return null;
+  }
+}
+
+// Commit with a target: that character is committed to the quest as it is (it may already be exhausted, "commit that hero to
+// the quest", 12086:A:2), and "After ~ commits to the quest" hears it.
+export function commitCard(state: ScenarioState, target: CardRef, focus: Focus): ScenarioState {
+  const id = refCard(state, target, frameScope(state, focus.seat, focus.sourceId));
+  const card = id ? state.cards[id] : undefined;
+  if (!id || !card || card.committed || (card.zone !== "heroes" && card.zone !== "play")) return state;
+  return queueEvent(updateCard(state, id, { committed: true }), { trigger: "committed", seat: card.controller, cardId: id });
+}
+
+// A character is declared as an attacker against an enemy by an effect, and its attack resolves now with the steps of a player
+// attack (rr.attacks-outside-the-combat-phase): the Responses to the declaration, the action windows, strength and damage, and
+// the end of the attack. It is an extra attack (faq.limitations-on-attacks), declared by the attacker's controller. A declared
+// attacker exhausts (rr.step-6-8b): it must be ready, unless the effect's cost already exhausted it.
+function declareAttack(state: ScenarioState, instruction: Extract<Instruction, { verb: "DeclareAttack" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const scope = frameScope(state, focus.seat, focus.sourceId);
+  const picked = scope.picked ?? [];
+  const attackerId = instruction.attacker ? refCard(state, instruction.attacker, scope) : (picked.at(-2) ?? null);
+  const enemyId = instruction.enemy ? refCard(state, instruction.enemy, scope) : (picked.at(-1) ?? null);
+  const attacker = attackerId ? state.cards[attackerId] : undefined;
+  const enemy = enemyId ? state.cards[enemyId] : undefined;
+  if (!attackerId || !enemyId || !attacker || !enemy || attacker.controller == null) return state;
+  if ((attacker.zone !== "heroes" && attacker.zone !== "play") || !isCharacterType(printedOf(ctx.cards, attacker.code))) return state;
+  if ((enemy.zone !== "engaged" && enemy.zone !== "staging") || printedOf(ctx.cards, enemy.code).type !== "enemy") return state;
+  if (flagged(state, attackerId, "cannotAttack") || (!instruction.exhausted && attacker.exhausted)) return state;
+  const seat = attacker.controller;
+  const exhausts = !instruction.exhausted && !flagged(state, attackerId, "noExhaustAttack");
+  const frameId = topFrame(state)?.id;
+  let next = exhausts ? updateCard(state, attackerId, { exhausted: true }) : state;
+  next = queueEvent(next, { trigger: "declaredAttacker", seat, cardId: attackerId, other: enemyId });
+  next = declareStrike({ ...next, window: null }, { seat, enemyId, attackerIds: [attackerId], back: null, ...(instruction.ranged ? { ranged: true } : {}) });
+  next = pickAttacker(next, attackerId, frameId);
+  // 6.8.1: an action window comes before its strength; the Responses to the declaration resolve first either way.
+  return playerAttackWindow(next, ctx, "strike") ?? awaitStrike(next);
 }

@@ -42,7 +42,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
       // for an event about itself ("After ~ leaves play").
       const fromHand = costOfKind(effect, "playEvent") != null;
       if (fromHand ? !inHand : !(inPlay(instance.zone) || hearsFromAnywhere(effect, instance, event))) continue;
-      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}) };
+      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.explored ? { explored: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       // "Any player may trigger this response": each seat is offered it, the controller first.
       const seats = effect.anyPlayer ? [seat, ...order.filter((other) => other !== seat)] : [seat];

@@ -15,6 +15,9 @@ import { enemyAttackWindow, playerAttackWindow } from "./step-window.ts";
 import { inPlay } from "./zones.ts";
 import { ruleCause } from "./cause.ts";
 import { fireForced } from "./triggers.ts";
+import { awaitStrike, backAfter, declareStrike, endStrike } from "./families/attack-flow.ts";
+import { countsDefense, struck } from "./families/attack-strike.ts";
+import { offeredTargets, stagingAttackable, withCardTargets } from "./families/attack-targets.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -186,7 +189,8 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed)) return false;
-  if (enemy.zone !== "engaged") return false;
+  // An enemy in the staging area, when a card lets the character attack it there (families/attack-targets.ts).
+  if (enemy.zone !== "engaged") return stagingAttackable(state, seat, attackerId, enemyId, cards);
   // The declaring seat's own characters attack its own enemies. A ranged character may attack an enemy engaged with
   // another player, and may join an attack another player declares (rr.ranged, rr.step-6-8-1).
   if (flagged(state, attackerId, "cannotAttack")) return false;
@@ -201,13 +205,14 @@ export function legalAttackEnemies(state: ScenarioState, seat: number, attackerI
       if (canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk)) ids.push(enemyId);
     }
   }
-  return ids;
+  // Enemies in the staging area a card lets it attack; in a window a card opened, only that window's targets.
+  return withCardTargets(state, ids, (enemyId) => canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk));
 }
 
 // The framework gives a seat one declared attack against each enemy each combat phase; an attack a card effect makes
-// (Quick Strike) is extra and does not count (faq.limitations-on-attacks).
+// (Quick Strike, a card's attack window) is extra and does not count (faq.limitations-on-attacks).
 export function attackDeclared(state: ScenarioState, seat: number, enemyId: string): boolean {
-  return state.declaredAttacks.includes(`${seat}:${enemyId}`);
+  return offeredTargets(state) == null && state.declaredAttacks.includes(`${seat}:${enemyId}`);
 }
 
 // The enemies the seat may still declare an attack against with this character.
@@ -232,15 +237,18 @@ export function applyPlayerAttack(
 ): ScenarioState {
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
-  let next: ScenarioState = { ...state, declaredAttacks: [...state.declaredAttacks, `${seat}:${enemyId}`], window: null };
+  // An attack in a window a card opened is extra: it is not counted against the one attack per enemy.
+  const extra = offeredTargets(state) != null;
+  let next: ScenarioState = { ...state, declaredAttacks: extra ? state.declaredAttacks : [...state.declaredAttacks, `${seat}:${enemyId}`], window: null };
   for (const attackerId of attackerIds) {
     if (!next.cards[attackerId]) continue;
     if (!flagged(next, attackerId, "noExhaustAttack")) next = updateCard(next, attackerId, { exhausted: true });
     next = queueEvent(next, { trigger: "declaredAttacker", seat, cardId: attackerId, other: enemyId });
   }
-  const declared: ScenarioState = { ...next, pendingStrike: { seat, enemyId, attackerIds: [...attackerIds] } };
-  // 6.8.1: the attack and its attackers are declared; an action window comes before its strength and damage.
-  return playerAttackWindow(declared, ctx, "strike") ?? continueStrike(declared, ctx, steps);
+  const declared: ScenarioState = declareStrike(next, { seat, enemyId, attackerIds: [...attackerIds], ...backAfter(state.window, enemyId) });
+  // 6.8.1: the attack and its attackers are declared; an action window comes before its strength and damage. The Responses to
+  // the declaration ("After ~ is declared as an attacker") resolve before them either way (families/attack-flow.ts).
+  return playerAttackWindow(declared, ctx, "strike") ?? awaitStrike(declared);
 }
 
 // The rest of a declared player attack after its step window: the damage (6.8.2, 6.8.3), the window after it, and the end
@@ -249,12 +257,14 @@ export function continueStrike(state: ScenarioState, ctx: ReduceContext, steps: 
   const strike = state.pendingStrike;
   if (!strike) return state;
   let next = state;
-  if (strike.awaiting !== "end") {
-    next = strikeEnemy({ ...state, pendingStrike: { seat: strike.seat, enemyId: strike.enemyId, attackerIds: strike.attackerIds } }, strike.seat, strike.enemyId, strike.attackerIds, ctx, steps);
+  const { awaiting, awaitDepth: _depth, ...declared } = strike;
+  if (awaiting !== "end") {
+    next = strikeEnemy({ ...state, pendingStrike: declared }, strike.seat, strike.enemyId, strike.attackerIds, ctx, steps);
     const after = playerAttackWindow(next, ctx, "end");
     if (after) return after;
   }
-  return { ...next, pendingStrike: null, window: { kind: "playerAttack" }, activeSeat: strike.seat };
+  // 6.8.4: "for this attack" expires, the window the attack came from comes back (families/attack-flow.ts).
+  return endStrike({ ...next, pendingStrike: next.pendingStrike ?? declared }, steps);
 }
 
 // The attackers' strength against the enemy's defense, as combat damage. The attackers are already exhausted: a player
@@ -271,15 +281,16 @@ export function strikeEnemy(
   if (!enemy) return state;
   const next = state;
   const attack = attackStrength(next, attackerIds, enemyId, ctx.cards);
-  const defense = modifiedStat(next, enemy, "defense", ctx.cards);
+  // An attacker may say the enemy does not count its Defense (families/attack-strike.ts).
+  const defense = countsDefense(next, attackerIds) ? modifiedStat(next, enemy, "defense", ctx.cards) : 0;
   steps.push({ kind: "attack", side: "player", seat, enemyId });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
   const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
-  // Each attacker hears that the attack destroyed the enemy ("After Merry participates in an attack that destroys an enemy").
-  if (damaged.cards[enemyId]?.zone === "engaged") return damaged;
-  return attackerIds.reduce((current, attackerId) => queueEvent(current, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, other: enemyId, participants: attackerIds }), damaged);
+  // Each attacker hears that the attack damaged or destroyed the enemy ("After Merry participates in an attack that destroys
+  // an enemy"), and excess damage goes where a card sends it (families/attack-strike.ts).
+  return struck(next, damaged, seat, enemyId, attackerIds, Math.max(0, attack - defense), ctx, steps);
 }
 
 // The attack strength of characters attacking one enemy (rr.step-6-8-2): each attacker's attack, read against that enemy.
