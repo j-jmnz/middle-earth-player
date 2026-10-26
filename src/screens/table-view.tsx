@@ -4,7 +4,7 @@
 // the only writer of the game; how a tap becomes an intent is src/play/use-table-choice.ts.
 import { useRouter, type Href } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BackHandler, Text, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
+import { BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
@@ -13,7 +13,8 @@ import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
 import type { LogNames } from "../play/log";
 import { prefetchCodes, resolutionCodes } from "../play/prefetch";
-import { QuestBand } from "../play/quest-band";
+import { dockPills } from "../play/dock-extras";
+import { MorePopoverView, useMorePopover } from "../play/dock-more";
 import { railFor } from "../play/rail";
 import { shownSeat, threatSelector } from "../play/selectors";
 import type { SheetNames } from "../play/sheet-types";
@@ -157,18 +158,23 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   }, []);
   const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
   const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
+  // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
+  const pills = dockPills(choice.extras);
+  const more = useMorePopover(pills.more.length, choice.resetKey);
 
   // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       const step = backStep({
         menuOpen,
+        moreOpen: more.open,
         previewOpen: preview != null,
         readingOpen: reading != null,
         overlayOpen: choice.overlayOpen,
         panelOpen: choice.panelOpen,
       });
       if (step === "closeMenu") setMenuOpen(false);
+      else if (step === "closeMore") more.close();
       else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
       else if (step === "closeReading") setReading(null);
       else if (step === "closeOverlay") choice.closeOverlay();
@@ -177,7 +183,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [menuOpen, preview, reading, choice, router, nav]);
+  }, [menuOpen, more, preview, reading, choice, router, nav]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -210,13 +216,14 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         }),
         names.card,
         preview.extra,
+        ledgerLine,
       )
     : null;
   const shown = previewed?.cards[previewed.start];
 
   return (
     <Screen testID="table" scene="felt" inset={false}>
-      <View className="flex-1" importantForAccessibility={menuOpen ? "no-hide-descendants" : "auto"} style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
+      <View className="flex-1" importantForAccessibility={menuOpen || more.open ? "no-hide-descendants" : "auto"} style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
         <TableTopBar
           threats={threats}
           seat={seat}
@@ -227,6 +234,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           carouselOpen={reading?.kind === "carousel"}
           narrow={narrow}
           ticks={ticks}
+          ringSeat={locations?.heldBy}
+          ringWords={locations?.heldUnder ? `The Ring-bearer is facedown under ${nameOf(locations.heldUnder)}` : null}
           menuOpen={menuOpen}
           onThreat={(threatSeat) => setReading({ kind: "threat", seat: threatSeat })}
           onRail={() => setReading((now) => openReading(now, { kind: "carousel" }))}
@@ -257,20 +266,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
             ) : null}
           </View>
           <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8) }}>
-            {/* The quest card on the table already shows its progress: the band gives way while the dock shows numbers. */}
-            <View>
-              {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} line={ledgerLine} />}
-              {locations && locations.active.length > 0 ? (
-                <Text testID="active-locations" className="text-label text-muted" numberOfLines={2}>
-                  {`Active: ${locations.active.map(nameOf).join(" and ")}`}
-                </Text>
-              ) : null}
-              {locations?.heldUnder ? (
-                <Text testID="ring-bearer-held" className="text-label text-gold" numberOfLines={2}>
-                  {`The Ring-bearer is facedown under ${nameOf(locations.heldUnder)}`}
-                </Text>
-              ) : null}
-            </View>
             <TableDock
               step={choice.header.step}
               title={choice.header.title}
@@ -281,7 +276,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               refusal={refusal}
               dock={choice.dock}
               onButton={choice.onButton}
-              extras={choice.extras}
+              extras={pills.pills}
+              more={pills.more}
+              onMore={more.show}
               resetKey={choice.resetKey}
               guide={choice.guide}
               onBlock={setAnchor}
@@ -323,6 +320,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
       <TableMenu open={menuOpen} nav={nav} top={insets.top + TOP_BAR} right={insets.right + 8} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
+      <MorePopoverView more={more} items={pills.more} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );
 }

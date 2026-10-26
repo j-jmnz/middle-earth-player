@@ -29,13 +29,12 @@ tags:
     visible:
       id: table
     timeout: 30000
-# Two active locations, Doors of Durin first.
+# The Ring-bearer is facedown: a Ring mark on the holder's threat dial, and the dial says where (phase 22 removed the "Active:"
+# and Ring-bearer lines; the active locations are drawn on the table).
 - assertVisible:
-    id: active-locations
-    text: "Active: Doors of Durin and .*"
+    id: threat-0-ring
 - assertVisible:
-    id: ring-bearer-held
-    text: "The Ring-bearer is facedown under Watcher in the Water"
+    text: ".*The Ring-bearer is facedown under Watcher in the Water.*"
 # No life number and no burden deck on this table.
 - assertNotVisible:
     id: life
@@ -57,7 +56,4 @@ tags:
       id: table
     timeout: 30000
 - assertVisible:
-    id: active-locations
-    text: "Active: Doors of Durin and .*"
-- assertVisible:
-    id: ring-bearer-held
+    id: threat-0-ring

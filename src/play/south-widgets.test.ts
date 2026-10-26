@@ -18,16 +18,17 @@ beforeAll(async () => {
 describe("the active location readout", () => {
   it("names both active locations in slot order, and the card holding the Ring-bearer", () => {
     const { state } = southTable(south, { stage: "142023", active: DOORS, second: "place", captive: true });
-    expect(locationReadout(state)).toEqual({ active: [DOORS, "place"], heldUnder: WATCHER });
+    expect(locationReadout(state)).toEqual({ active: [DOORS, "place"], heldUnder: WATCHER, heldBy: state.firstPlayer });
     const one = southTable(south, { stage: "142023", active: DOORS });
-    expect(locationReadout(one.state)).toEqual({ active: [DOORS], heldUnder: null });
-    expect(locationReadout(southTable(south, { stage: "142023" }).state)).toEqual({ active: [], heldUnder: null });
+    expect(locationReadout(one.state)).toEqual({ active: [DOORS], heldUnder: null, heldBy: null });
+    expect(locationReadout(southTable(south, { stage: "142023" }).state)).toEqual({ active: [], heldUnder: null, heldBy: null });
   });
 
   it("follows the engine: the Ring-bearer back in play is no longer held", () => {
     const { state, frodo } = southTable(south, { stage: "142023", active: DOORS, captive: true });
     const freed = { ...state, cards: { ...state.cards, [frodo]: { ...state.cards[frodo]!, zone: "heroes" as const } } };
     expect(locationReadout(freed)?.heldUnder).toBeNull();
+    expect(locationReadout(freed)?.heldBy).toBeNull();
     void first;
   });
 

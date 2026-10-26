@@ -73,6 +73,17 @@ function printedValue(printed: PrintedCard, stat: BadgeStat): number | null {
   return stat === "hitPoints" ? (printed.health ?? null) : (printed[stat] ?? null);
 }
 
+// A card's edge shows this many effect pills, then "+n" for the rest (the preview lists all of them).
+export const BADGE_CAP = 2;
+
+/** How many of `total` effect pills are drawn and how many hide behind "+n", given the rows that fit on the card's edge. */
+export function badgeSplit(total: number, room: number): { shown: number; hidden: number } {
+  const fit = Math.max(1, room);
+  if (total <= Math.min(BADGE_CAP, fit)) return { shown: total, hidden: 0 };
+  const shown = Math.min(BADGE_CAP, fit - 1);
+  return { shown, hidden: total - shown };
+}
+
 /** The effects on one card in play now: changed numbers and "cannot"s. Empty for a card out of play or face down. */
 export function cardEffects(game: ScenarioState, ctx: ReduceContext, cardId: string): CardEffects {
   const card = game.cards[cardId];

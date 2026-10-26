@@ -6,7 +6,7 @@ import type { ReactElement, ReactNode } from "react";
 import type { SharedValue } from "react-native-reanimated";
 import { useDerivedValue } from "react-native-reanimated";
 
-import type { CardEffects } from "./card-effects.ts";
+import { badgeSplit, type CardEffects } from "./card-effects.ts";
 import { cardFrame } from "./frame.ts";
 import { SPHERE_TINT, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
@@ -253,8 +253,8 @@ export function Badges({
   // Rows that fit between the top edge and the resource token at the bottom left.
   const room = Math.max(1, Math.floor((h - TOKEN - 6) / (BADGE_H + 2)));
   const items = [...effects.stats.map((badge) => ({ kind: "stat" as const, badge })), ...effects.flags.map((flag) => ({ kind: "flag" as const, flag }))];
-  const shown = items.length > room ? items.slice(0, room - 1) : items;
-  const hidden = items.length - shown.length;
+  const { shown: count, hidden } = badgeSplit(items.length, room);
+  const shown = items.slice(0, count);
   const rows: ReactElement[] = shown.map((item, index) => {
     const top = y + 3 + index * (BADGE_H + 2);
     if (item.kind === "flag") {

@@ -42,6 +42,7 @@ export function ThreatRing({
   active = false,
   elimination = true,
   ticks = [],
+  ring = null,
   onPress,
 }: {
   threat: SeatThreat;
@@ -57,11 +58,13 @@ export function ThreatRing({
   // The engagement costs of the enemies in staging, marked on the meter (rr.engagement-check): those the threat has reached
   // engage at the checks.
   ticks?: readonly number[];
+  // The seat that holds the Ring-bearer facedown: a small Ring mark beside its label, and these words in its accessibility label.
+  ring?: string | null;
   // A tap opens the threat panel (each enemy's cost against the threat).
   onPress?: () => void;
 }) {
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} active={active} elimination={elimination} ticks={ticks} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} active={active} elimination={elimination} ticks={ticks} ring={ring} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
@@ -86,6 +89,7 @@ function ThreatDial({
   active,
   elimination,
   ticks,
+  ring,
   onPress,
 }: {
   threat: SeatThreat;
@@ -96,6 +100,7 @@ function ThreatDial({
   active: boolean;
   elimination: boolean;
   ticks: readonly number[];
+  ring: string | null;
   onPress?: () => void;
 }) {
   const reduceMotion = useReducedMotion();
@@ -124,7 +129,7 @@ function ThreatDial({
   const engaging = ticks.filter((cost) => cost <= threat.threat).length;
   const tickWords = ticks.length === 0 ? "" : ticks.length === 1 ? `, the enemy in staging ${engaging === 1 ? "engages" : "does not engage"} at this threat` : `, ${engaging} of the ${ticks.length} enemies in staging engage at this threat`;
   // The dial is one control with one name (the change badge's words included), so Android gives it one focus stop.
-  const dialWords = `${name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const dialWords = `${name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
       disabled={!onPress}
@@ -157,7 +162,14 @@ function ThreatDial({
         </View>
       </Animated.View>
       <View className="items-start gap-0.5">
-        <Text className={`text-label ${active ? "text-gold" : "text-muted"}`}>{label}</Text>
+        <View className="flex-row items-center gap-1">
+          <Text className={`text-label ${active ? "text-gold" : "text-muted"}`}>{label}</Text>
+          {ring ? (
+            <View testID={`${id}-ring`}>
+              <GameIcon name="oneRing" size={12} tint="gold" />
+            </View>
+          ) : null}
+        </View>
         {delta ? (
           <Animated.View
             key={change?.at}

@@ -288,8 +288,8 @@ export function useTableChoice({
     choice,
     dock,
     header,
-    // The tray says what is picked (its check and its count); the dock repeats it only once the tray is folded.
-    picked: panelOpen ? null : pickedWords(sheet, choice, names),
+    // No line shows it (the cards' marks and the primary's verb say it); the primary's hint speaks it.
+    picked: pickedWords(sheet, choice, names),
     unavailable: sheet.kind === "pick" ? (sheet.unavailable ?? []) : [],
     readout,
     highlight,

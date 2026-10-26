@@ -22,6 +22,9 @@ export type LocationReadout = {
   active: readonly string[];
   // The code of the card the Ring-bearer is facedown under, when it is.
   heldUnder: string | null;
+  // The seat whose dial carries the Ring mark while it is (its owner, else its controller, else the first player, who takes it
+  // back); null when it is not held.
+  heldBy: number | null;
 };
 
 // The active locations and the facedown Ring-bearer, for a scenario that declares a second active location slot; null otherwise. The
@@ -33,5 +36,6 @@ export function locationReadout(game: ScenarioState): LocationReadout | null {
     return code ? [code] : [];
   });
   const captive = Object.values(game.cards).find((card) => card.zone === "captive");
-  return { active, heldUnder: captive?.host ? (game.cards[captive.host]?.code ?? null) : null };
+  const heldUnder = captive?.host ? (game.cards[captive.host]?.code ?? null) : null;
+  return { active, heldUnder, heldBy: heldUnder && captive ? (captive.owner ?? captive.controller ?? game.firstPlayer) : null };
 }

@@ -32,13 +32,16 @@ export type TopBarProps = {
   // A small phone in landscape (under 760 pt inside the insets).
   narrow: boolean;
   ticks: readonly number[];
+  // The seat holding the Ring-bearer facedown and what to say of it (a Ring mark on its dial), or null.
+  ringSeat?: number | null;
+  ringWords?: string | null;
   menuOpen: boolean;
   onThreat: (seat: number) => void;
   onRail: () => void;
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, seat, life, burdenDeck, rail, stopAhead, carouselOpen, narrow, ticks, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, seat, life, burdenDeck, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const [bar, setBar] = useState(0);
   const [dials, setDials] = useState(0);
   const onBar = (event: LayoutChangeEvent) => setBar(Math.round(event.nativeEvent.layout.width));
@@ -75,6 +78,7 @@ export function TableTopBar({ threats, seat, life, burdenDeck, rail, stopAhead, 
                 active={threats.length > 1 && threat.seat === seat}
                 compact
                 ticks={ticks}
+                ring={ringSeat === threat.seat ? ringWords : null}
                 onPress={() => onThreat(threat.seat)}
               />
             ))}

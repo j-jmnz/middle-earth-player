@@ -4,10 +4,11 @@
 // tap does and a bar runs down under it; the second tap sends, and the bar running out, another button, or a new pick puts
 // it back. Arming changes no button's size, so the second tap lands where the first did. The parent keys this component on
 // the moment and the pick, so nothing stays armed into the next one.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 
+import { MORE_ID } from "./dock-extras.ts";
 import { tickArmed } from "./haptics.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
@@ -17,6 +18,8 @@ import { tableTokens as t } from "./tokens.ts";
 // How long an armed button waits for its second tap; longer while a screen reader is on.
 const ARM_MS = 3000;
 const ARM_READER_MS = 10000;
+// Two lines of label type; the 2 pt bar that runs down is drawn over their foot, so arming moves nothing.
+const ARMED_ROOM = 36;
 const HINT = "Tap twice to confirm";
 // A moment with one legal answer: the line above the buttons says the one tap sends it.
 const ONLY = "The only choice now: one tap sends it";
@@ -24,7 +27,25 @@ const ONLY_HINT = "Sends at once";
 
 export type DockExtra = { label: string; testID: string; onPress: () => void; accessibilityLabel?: string };
 
-export function DockButtons({ dock, extras = [], onButton }: { dock: Dock; extras?: readonly DockExtra[]; onButton: (button: DockButton) => void }) {
+export function DockButtons({
+  dock,
+  extras = [],
+  more = [],
+  onMore,
+  picked = null,
+  onButton,
+}: {
+  dock: Dock;
+  extras?: readonly DockExtra[];
+  // The quiet pills folded behind the More pill (dock-extras.ts, dockPills), and what the pill does: it reports the screen y of its foot.
+  more?: readonly DockExtra[];
+  onMore?: (foot: number) => void;
+  // What is picked, in words: no line on the dock says it (the cards wear their marks, the primary's verb counts them), so a
+  // screen reader hears it in the primary's hint.
+  picked?: string | null;
+  onButton: (button: DockButton) => void;
+}) {
+  const moreRef = useRef<ComponentRef<typeof View>>(null);
   const [armed, setArmed] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const left = useSharedValue(1);
@@ -57,21 +78,31 @@ export function DockButtons({ dock, extras = [], onButton }: { dock: Dock; extra
     setArmed(null);
     handler();
   };
+  // More folds the quiet pills: it reports where its foot is, so the popover sits level with it.
+  const pressMore = () => {
+    if (timer.current) clearTimeout(timer.current);
+    setArmed(null);
+    moreRef.current?.measureInWindow((_x, y, _w, height) => onMore?.(Math.round(y + height)));
+  };
   const bar = useAnimatedStyle(() => ({ width: `${Math.round(left.get() * 100)}%` }));
   const primary = dock.primary;
   const armedButton = [primary, ...dock.secondary].find((button) => button?.testID === armed) ?? null;
   const line = armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : (dock.why ?? (dock.single ? ONLY : null));
   return (
-    <View className="gap-1">
+    <View className="gap-0.5">
       {/* Two lines above the buttons, always held: what the armed button's second tap does (a caution names the loss in full),
-          or what the primary waits for. Arming moves nothing. */}
-      <View style={{ minHeight: 36, justifyContent: "flex-end" }}>
+          or what the primary waits for, and the bar that runs down over their foot. Arming moves nothing. */}
+      <View style={{ minHeight: ARMED_ROOM, justifyContent: "flex-end" }}>
         {line ? (
           <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={2} className={`text-center text-label ${armedButton ? "text-gold" : "text-muted"}`}>
             {line}
           </Text>
         ) : null}
-        {armedButton ? <Animated.View style={[{ height: 2, alignSelf: "center", backgroundColor: t.gold, marginTop: 1 }, bar]} /> : null}
+        {armedButton ? (
+          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, alignItems: "center" }}>
+            <Animated.View style={[{ height: 2, backgroundColor: t.gold }, bar]} />
+          </View>
+        ) : null}
       </View>
       {primary ? (
         <ChromePrimary
@@ -79,7 +110,7 @@ export function DockButtons({ dock, extras = [], onButton }: { dock: Dock; extra
           testID={primary.testID}
           compact
           disabled={!primaryReady(dock)}
-          accessibilityHint={primary.arm ? HINT : dock.single ? ONLY_HINT : undefined}
+          accessibilityHint={[picked ? `Picked: ${picked}` : null, primary.arm ? HINT : dock.single ? ONLY_HINT : null].filter(Boolean).join(". ") || undefined}
           onPress={() => press(primary)}
         />
       ) : null}
@@ -92,11 +123,23 @@ export function DockButtons({ dock, extras = [], onButton }: { dock: Dock; extra
           ))}
         </View>
       ) : null}
-      {extras.length > 0 ? (
+      {extras.length > 0 || more.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1.5">
           {extras.map((item) => (
             <ChromeButton key={item.testID} label={item.label} testID={item.testID} variant="quiet" tone="bone" accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
           ))}
+          {more.length > 0 ? (
+            <View ref={moreRef} collapsable={false}>
+              <ChromeButton
+                label="More"
+                testID={MORE_ID}
+                variant="quiet"
+                tone="bone"
+                accessibilityHint={`Lists ${more.map((item) => item.accessibilityLabel ?? item.label).join(", ")}`}
+                onPress={pressMore}
+              />
+            </View>
+          ) : null}
         </View>
       ) : null}
     </View>
