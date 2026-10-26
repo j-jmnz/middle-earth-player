@@ -6,6 +6,7 @@ import type { ReduceContext } from "../interpret.ts";
 import type { ScenarioState } from "../state.ts";
 import type { Focus } from "./index.ts";
 import { captureRingBearer, releaseRingBearer } from "./south-captive.ts";
+import { assignDamage, discardEach } from "./south-damage.ts";
 import { assignFaceup } from "./south-faceup.ts";
 import { attachToActiveLocation, makeSetAsideActive, pickHighestEngagement, revealUntilThreat } from "./south-reveal.ts";
 import { attackFromStaging, markLocationDamage } from "./south-watcher.ts";
@@ -16,12 +17,16 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   switch (instruction.verb) {
     case "MakeSetAsideActive":
       return makeSetAsideActive(state, instruction, focus, ctx, steps);
+    case "DiscardEach":
+      return discardEach(state, instruction, focus, ctx);
+    case "AssignDamage":
+      return assignDamage(state, instruction, focus, ctx, steps);
     case "RevealUntilThreat":
       return revealUntilThreat(state, instruction, focus, ctx, steps);
     case "AssignFaceup":
       return assignFaceup(state, instruction, focus, ctx, steps);
     case "CaptureRingBearer":
-      return captureRingBearer(state, focus, ctx);
+      return captureRingBearer(state, instruction, ctx);
     case "ReleaseRingBearer":
       return releaseRingBearer(state, instruction, focus, ctx);
     case "DamageActiveLocation":

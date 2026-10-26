@@ -93,6 +93,8 @@ export const pickSchema = z.strictObject({
   on: z.strictObject({ type: z.enum(["hero", "character"]), control: z.enum(["you", "other", "any"]) }).optional(),
   // Not the card the source is attached to ("each other questing character" on an attachment).
   notHost: z.boolean().optional(),
+  // An enemy that engaged a player this round (a Shadow card: "if it was engaged this round", 142026:A:3).
+  engagedThisRound: z.boolean().optional(),
   // Only the card the source is attached to ("attached hero" for a Condition that sets its stat).
   isHost: z.boolean().optional(),
   // A location that is an active location now (either slot), not one in the staging area (142021:B:2, 142027:A:1).

@@ -1,4 +1,4 @@
-// Rules: rr.in-player-order, rr.first-player, rr.shuffling (data/rules/entries.json); the Council of Elrond (142020:B:1).
+// Rules: rr.in-player-order, rr.first-player (data/rules/entries.json); the Council of Elrond (142020:B:1).
 //
 // AssignFaceup: each player places the top card of their deck faceup, in player order, until the right number of cards are faceup
 // between them; the first player then assigns each to a different outcome, one choice at a time. A faceup card stays on top of

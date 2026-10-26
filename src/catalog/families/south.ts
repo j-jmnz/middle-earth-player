@@ -3,13 +3,20 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/south*.ts runs them.
 import { z } from "zod";
 
-import { amountSchema } from "../effect-schema-amount.ts";
+import { amountSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { pickSchema } from "../effect-schema-pick.ts";
 
 export const VERBS = [
   // The set-aside card with this code becomes the active location (not traveling: no Travel effect, nothing hears "traveled").
   // A location already active goes back to the staging area, unless a second active location slot is free (ExtraActiveLocation).
   z.strictObject({ verb: z.literal("MakeSetAsideActive"), code: z.string().min(1), ...when }),
+  // Each player (`eachSeat`) assigns `amount` damage among the cards that match `pick` from their side, one damage at a time on the card
+  // they choose ("each player assigns X damage among characters he controls", 142029:A:2). `left` is engine use: the damage still to go.
+  z.strictObject({ verb: z.literal("AssignDamage"), amount: positiveAmountSchema, pick: pickSchema, who: z.literal("eachSeat").optional(), left: z.number().int().min(0).optional(), ...when }),
+  // The actor discards each card that matches `pick` (from their side) to its owner's discard pile ("discard each ally he controls",
+  // 142037:A:1).
+  z.strictObject({ verb: z.literal("DiscardEach"), pick: pickSchema, ...when }),
   // The first player reveals cards from the encounter deck, one after the other, until the staging area holds at least this much
   // Threat or the deck is empty (142021:A:1).
   z.strictObject({ verb: z.literal("RevealUntilThreat"), threat: amountSchema, ...when }),
@@ -26,9 +33,9 @@ export const VERBS = [
     ...when,
   }),
   // The Ring-bearer (the hero with that trait that a player controls) loses every token (damage, resources, progress), and it and
-  // each card attached to it are placed facedown under the source. It and its attachments stay in play, and nobody controls
+  // each card attached to it are placed facedown under the card in play with the code `under`. It and its attachments stay in play, and nobody controls
   // them (mec109.stage-4).
-  z.strictObject({ verb: z.literal("CaptureRingBearer"), ...when }),
+  z.strictObject({ verb: z.literal("CaptureRingBearer"), under: z.string().min(1), ...when }),
   // The first player takes control of the Ring-bearer facedown under the source and of the cards attached to it: it returns to play
   // faceup in their play area exhausted with `damage` damage on it (142024:A:3).
   z.strictObject({ verb: z.literal("ReleaseRingBearer"), damage: z.number().int().min(0), ...when }),

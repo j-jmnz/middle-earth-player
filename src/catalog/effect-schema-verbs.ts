@@ -167,6 +167,9 @@ export const simpleVerbs = [
     ...searchSelector,
     to: z.enum(["staging", "engagedFirstPlayer"]),
     each: z.boolean().optional(),
+    // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
+    // Great Warg Chief, if able", 142022:A:1).
+    require: z.string().min(1).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("ReturnToStaging"), target: targetSchema, ...when }),
@@ -182,7 +185,7 @@ export const simpleVerbs = [
     to: z.discriminatedUnion("kind", [
       // A hero the revealing player controls, or (`control: "any"`, "Attach to a hero.") any player's hero, chosen by the
       // first player (rr.first-player).
-      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any"]).optional() }),
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
     ]),
     ...when,
@@ -329,9 +332,9 @@ export const simpleVerbs = [
   verb("ReturnUnderToStaging"),
   // The source card (a shadow card) is shuffled into the encounter deck instead of being discarded (141069:A:3).
   verb("ShuffleSelfIntoEncounterDeck"),
-  // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default). The seed
+  // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default; read, so X works). The seed
   // picks them (141047:A:2, 141084:A:2).
-  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: z.number().int().positive().optional(), who: z.enum(["firstPlayer"]).optional(), ...when }),
+  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer"]).optional(), ...when }),
   // Setup: a card from the box joins the encounter deck. The deck is shuffled by the Setup step that says so.
   codeVerb("ShuffleIntoEncounterDeck"),
   // Campaign setup: the voluntary hero change costs no threat penalty on this scenario's card.

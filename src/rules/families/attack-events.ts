@@ -23,6 +23,14 @@ export function strikeWaits(state: ScenarioState, ctx: ReduceContext): boolean {
 
 // A drained `engaged` event marks its seat until the end of the round (an endOfRound modifier on "seat:N").
 export function noteEngaged(state: ScenarioState, event: GameEvent, ctx: ReduceContext): ScenarioState {
+  // The enemy engaged a player this round, for the `engagedThisRound` filter of a pick (a Shadow card, 142026:A:3).
+  if (event.trigger === "engaged" && event.subject && heldAmount(state, event.subject, "engagedThisRound") <= 0 && gameReads(state, ctx, '"engagedThisRound":true')) {
+    return noteEngagedSeat({ ...state, modifiers: [...state.modifiers, { instanceId: event.subject, sourceId: event.subject, stat: "engagedThisRound", amount: 1, until: "endOfRound" }] }, event, ctx);
+  }
+  return noteEngagedSeat(state, event, ctx);
+}
+
+function noteEngagedSeat(state: ScenarioState, event: GameEvent, ctx: ReduceContext): ScenarioState {
   if (event.trigger !== "engaged" || event.seat == null || engagedThisRound(state, event.seat)) return state;
   if (!gameReads(state, ctx, '"kind":"engagedThisRound"')) return state;
   const holder = `seat:${event.seat}`;

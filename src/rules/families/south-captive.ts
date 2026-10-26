@@ -9,7 +9,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { fromEncounterDeck, printedOf } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
-import { updateCard } from "../state.ts";
+import { inPlay, updateCard } from "../state.ts";
 import { attachTo, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { ringBearerId } from "./burden-deck.ts";
@@ -21,9 +21,9 @@ export function captiveUnder(state: ScenarioState, hostId: string): string | nul
 
 // CaptureRingBearer: discards every token on the Ring-bearer (its life is its own number, not a token), and places it and each
 // card attached to it facedown under the source. Nothing happens when no player controls a Ring-bearer.
-export function captureRingBearer(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
+export function captureRingBearer(state: ScenarioState, instruction: Extract<Instruction, { verb: "CaptureRingBearer" }>, ctx: ReduceContext): ScenarioState {
   const heroId = ringBearerId(state, ctx);
-  const hostId = focus.sourceId;
+  const hostId = Object.values(state.cards).find((card) => card.code === instruction.under && inPlay(card.zone))?.id;
   if (!heroId || !hostId || !state.cards[hostId]) return state;
   const attachments = [...(state.cards[heroId]?.attachments ?? [])];
   let next = updateCard(moveCard(state, heroId, { zone: "captive", hostId }), heroId, { damage: 0, resources: 0, progress: 0 });
