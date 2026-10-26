@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { cardFrame, haloInset, unturn } from "./frame.ts";
+import { cardFrame, halo, unturn } from "./frame.ts";
 import { contains, hitSlot, slotBounds, type CardSlot } from "./layout.ts";
 import { slotRotation } from "./motion.ts";
 
@@ -53,9 +53,28 @@ describe("hitSlot with a tilt", () => {
   });
 });
 
-describe("haloInset", () => {
-  it("leaves about 3 pt of blur past the edge at both sigmas", () => {
-    expect(2 * 3 - haloInset(3)).toBe(3);
-    expect(2 * 4.5 - haloInset(4.5)).toBe(3);
+describe("halo", () => {
+  // Abramowitz and Stegun 7.1.26, for x >= 0.
+  function erfc(x: number): number {
+    const k = 1 / (1 + 0.3275911 * x);
+    return k * (0.254829592 + k * (-0.284496736 + k * (1.421413741 + k * (-1.453152027 + k * 1.061405429)))) * Math.exp(-x * x);
+  }
+  // The share of the halo's light left a distance past the card's edge: a Gaussian blur's falloff past a straight edge.
+  const light = (picked: boolean, d: number) => {
+    const { sigma, inset } = halo(picked);
+    return 0.5 * erfc((d + inset) / (sigma * Math.SQRT2));
+  };
+
+  it("keeps the picked halo wider: brighter than the plain one from 3 pt past the edge", () => {
+    for (const d of [3.5, 4, 5, 6]) expect(light(true, d)).toBeGreaterThan(light(false, d));
+  });
+
+  it("does not light the next card, 6 pt away", () => {
+    expect(light(false, 6)).toBeLessThan(0.03);
+    expect(light(true, 6)).toBeLessThan(0.06);
+  });
+
+  it("leaves the plain halo at full strength at the card's edge", () => {
+    expect(halo(false).inset).toBe(0);
   });
 });

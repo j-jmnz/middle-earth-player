@@ -5,28 +5,24 @@
 import { BlurMask, Circle, Group, Line, RoundedRect, Text, vec } from "@shopify/react-native-skia";
 
 import { RADIUS, withAlpha, type Fonts } from "./canvas-pieces.native.tsx";
-import { cardFrame, haloInset } from "./frame.ts";
+import { cardFrame, halo } from "./frame.ts";
 import type { CardSlot, Rect } from "./layout.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 const dim = withAlpha(t.night, 0.45);
 const glow = withAlpha(t.gold, 0.9);
 
-// The halo's blur, in points: wider on a picked card.
-const SIGMA = 3;
-const SIGMA_PICKED = 4.5;
-
 /**
  * Gold light around a card a tap does something with, so it reads at arm's length on the felt (user request, 2026-10-25:
  * the edge alone was too faint). It is drawn behind the card, which covers its middle: an "outer" blur mask on a rounded
  * rectangle filled a block inside the card in Skia's renderer, so the glow is a plain blur under the body instead. Its
- * rectangle is pulled in so only about 3 pt of blur shows past the edge and the next card is not lit (`haloInset`).
+ * wider halo of a picked card is pulled in a little so it does not light the next card (`halo`).
  */
-export function Glow({ slot, picked }: { slot: Rect; picked: boolean }) {
-  const sigma = picked ? SIGMA_PICKED : SIGMA;
-  const inset = haloInset(sigma);
+export function Glow({ slot, picked }: { slot: CardSlot; picked: boolean }) {
+  const { cx, cy, w, h } = cardFrame(slot);
+  const { sigma, inset } = halo(picked);
   return (
-    <RoundedRect x={slot.x + inset} y={slot.y + inset} width={slot.w - 2 * inset} height={slot.h - 2 * inset} r={Math.max(0, RADIUS - inset)} color={glow}>
+    <RoundedRect x={cx - w / 2 + inset} y={cy - h / 2 + inset} width={w - 2 * inset} height={h - 2 * inset} r={Math.max(0, RADIUS - inset)} color={glow}>
       <BlurMask blur={sigma} style="normal" />
     </RoundedRect>
   );

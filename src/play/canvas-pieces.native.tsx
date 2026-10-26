@@ -7,6 +7,7 @@ import type { SharedValue } from "react-native-reanimated";
 import { useDerivedValue } from "react-native-reanimated";
 
 import type { CardEffects } from "./card-effects.ts";
+import { cardFrame } from "./frame.ts";
 import { SPHERE_TINT, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
 import type { CardSlot, CombatMark, Rect } from "./layout.ts";
@@ -398,7 +399,8 @@ export function CombatMarkView({ mark }: { mark: CombatMark }) {
  * `overlay` (tokens, effects, the check ring) moves with it but stays upright.
  */
 export function Moving({ slot, motion, progress, epoch, at, children, frame, overlay }: { slot: CardSlot; motion: Motion; progress: SharedValue<number>; epoch: SharedValue<number>; at: number; children: ReactNode; frame?: ReactNode; overlay?: ReactNode }) {
-  const origin = vec(slot.x + slot.w / 2, slot.y + slot.h / 2);
+  const { cx, cy } = cardFrame(slot);
+  const origin = vec(cx, cy);
   const transform = useDerivedValue(() => {
     const p = epoch.get() === at ? progress.get() : 0;
     const q = 1 - p;
@@ -425,8 +427,8 @@ export function Moving({ slot, motion, progress, epoch, at, children, frame, ove
 
 /** A card that left the table: it moves from where it was toward its pile, shrinking and fading. */
 export function Leaving({ ghost, progress, epoch, at, children }: { ghost: Ghost; progress: SharedValue<number>; epoch: SharedValue<number>; at: number; children: ReactNode }) {
-  const { slot } = ghost;
-  const origin = vec(slot.x + slot.w / 2, slot.y + slot.h / 2);
+  const { cx, cy } = cardFrame(ghost.slot);
+  const origin = vec(cx, cy);
   const transform = useDerivedValue(() => {
     const p = epoch.get() === at ? progress.get() : 0;
     return [{ translateX: ghost.dx * p }, { translateY: ghost.dy * p }, { scale: 1 + (ghost.scale - 1) * p }, { rotate: ghost.rot }];

@@ -22,25 +22,35 @@ export function cardFrame(slot: CardSlot): CardFrame {
   return { cx: slot.x + slot.w / 2, cy: slot.y + slot.h / 2, w: slot.w, h: slot.h, rotation: slotRotation(slot) };
 }
 
-/** A point turned back about the card's center by the fan's tilt, so it can be tested against the unturned rectangle. */
+/**
+ * A point turned back about the card's center by the turn it is drawn with, so it can be tested against the unturned
+ * rectangle. An exhausted card's quarter turn is left to its sideways footprint (`slotBounds`), so only a fan's tilt is undone.
+ */
 export function unturn(slot: CardSlot, x: number, y: number): { x: number; y: number } {
   "worklet";
-  if (slot.tilt === 0) return { x, y };
   const frame = cardFrame(slot);
-  const cos = Math.cos(-slot.tilt);
-  const sin = Math.sin(-slot.tilt);
+  const turn = slot.exhausted ? 0 : frame.rotation;
+  if (turn === 0) return { x, y };
+  const cos = Math.cos(-turn);
+  const sin = Math.sin(-turn);
   const dx = x - frame.cx;
   const dy = y - frame.cy;
   return { x: frame.cx + dx * cos - dy * sin, y: frame.cy + dx * sin + dy * cos };
 }
 
-// How far past a card's edge the halo's blur may show, in points.
-const HALO_REACH = 3;
+export type Halo = {
+  // The blur, in points.
+  sigma: number;
+  // How far the blurred rectangle is pulled in from the card's edge, in points.
+  inset: number;
+};
 
 /**
- * How far to pull the halo's rectangle in from the card's edge. A Gaussian blur spreads about two sigma past a rectangle's
- * edge; pulling the rectangle in by the rest leaves about 3 pt of light showing, so it does not light the next card.
+ * The gold light under a card a tap does something with, and the wider one under a picked card. A Gaussian blur at sigma 3
+ * has all but faded by the 6 pt gap to the next card, so it is not pulled in. The picked halo (sigma 4.5) is pulled in 1.5
+ * pt, so it stops lighting its neighbor yet still reaches farther than the plain one from 3 pt out; nearer the edge its 3 pt
+ * gold edge carries it.
  */
-export function haloInset(sigma: number): number {
-  return Math.max(0, 2 * sigma - HALO_REACH);
+export function halo(picked: boolean): Halo {
+  return picked ? { sigma: 4.5, inset: 1.5 } : { sigma: 3, inset: 0 };
 }

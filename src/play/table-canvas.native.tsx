@@ -235,6 +235,10 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
 
+  const isTappable = (slot: CardSlot) => highlight.tappable.has(slot.id) || targetIds.has(slot.id);
+  const pickedCount = (slot: CardSlot) => highlight.picked.get(slot.id) ?? 0;
+  const dimmed = (slot: CardSlot) => (highlight.dimOthers && !isTappable(slot) && pickedCount(slot) === 0) || highlight.muted.has(slot.id);
+
   // The card itself (it turns when exhausted), with the glow of the open moment under it, and what is drawn upright on it:
   // tokens, effects, the open moment's marks.
   const drawBody = (slot: CardSlot, dim: boolean) => {
@@ -242,8 +246,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
     if (slot.kind === "pile" || slot.zone === "deck") return <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.code)} fonts={fonts} label backs={backs} />;
     const encounterBack = slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck";
-    const picked = (highlight.picked.get(slot.id) ?? 0) > 0;
-    const glows = slot.kind === "card" && (picked || highlight.tappable.has(slot.id) || targetIds.has(slot.id));
+    const picked = pickedCount(slot) > 0;
+    const glows = slot.kind === "card" && (picked || isTappable(slot));
     return (
       <Group opacity={dim ? 0.35 : 1}>
         {glows ? <Glow slot={slot} picked={picked} /> : null}
@@ -251,29 +255,31 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
       </Group>
     );
   };
-  const dimmed = (slot: CardSlot) => (highlight.dimOthers && !isTappable(slot) && (highlight.picked.get(slot.id) ?? 0) === 0) || highlight.muted.has(slot.id);
-  const isTappable = (slot: CardSlot) => highlight.tappable.has(slot.id) || targetIds.has(slot.id);
   // What is drawn in the card's shape, inside its turned group: the gold edge, the picked edge, the veil, the beat ring.
   const drawFrame = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const card = slot.kind === "card";
-    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? (highlight.picked.get(slot.id) ?? 0) : 0} dimmed={card && dimmed(slot)} beat={highlight.beat.has(slot.id)} />;
+    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={highlight.beat.has(slot.id)} />;
   };
   const drawOverlay = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const rect = slotBounds(slot);
     const slotInfo = slot.kind === "card" && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck" ? info(slot.id) : null;
-    const picked = highlight.picked.get(slot.id) ?? 0;
     const optionMark = highlight.marks.get(slot.id);
+    // The veil is drawn in the card's turned group, under this upright layer, so a veiled card's tokens and marks are faded
+    // here instead; the option pill stays bright.
+    const veiled = slot.kind === "card" && dimmed(slot);
     return (
       <Group>
-        {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} images={tokens} contrast={contrast} /> : null}
-        {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} /> : null}
-        {slotInfo?.delayed ? <DelayedMark rect={rect} /> : null}
-        <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code)) : null} contrast={contrast} />
-        {slot.kind === "card" ? <PickRing rect={rect} picked={picked} share={highlight.share} dimmed={dimmed(slot)} fonts={fonts} /> : null}
+        <Group opacity={veiled ? 0.55 : 1}>
+          {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} images={tokens} contrast={contrast} /> : null}
+          {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} /> : null}
+          {slotInfo?.delayed ? <DelayedMark rect={rect} /> : null}
+          <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code)) : null} contrast={contrast} />
+          {slot.kind === "card" && !slot.faceDown && inactive(slot.code) ? <NotAppliedMark rect={rect} /> : null}
+        </Group>
+        {slot.kind === "card" ? <PickRing rect={rect} picked={pickedCount(slot)} share={highlight.share} dimmed={veiled} fonts={fonts} /> : null}
         {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} /> : null}
-        {slot.kind === "card" && !slot.faceDown && inactive(slot.code) ? <NotAppliedMark rect={rect} /> : null}
       </Group>
     );
   };
