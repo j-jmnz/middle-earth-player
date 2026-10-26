@@ -91,7 +91,7 @@ export function runExtraVerb(
       return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
     case "DiscardRandomFromHand":
-      return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount ?? 1);
+      return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx));
     case "PlaceUnderSelf": {
       const id = lastPicked(state);
       if (!focus.sourceId || !state.cards[id] || !state.cards[focus.sourceId]) return state;

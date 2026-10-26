@@ -31,6 +31,12 @@ owns three files, composed by the `index.ts` next to them, so families do not ed
 - `src/effects/authored/families/<family>.ts`: the family's records (`RECORDS`, `REPLACES`). A card's other lines may have
   records in `pool/<PACK>.ts`; record ids stay unique across every file (the next free `<n>` for the code and timing).
 
+The scenario cards of the saga box have families of their own, by what the scenarios add: `burden` (the burden deck and the
+Ring-bearer's life, Flight to the Ford) and `south` (a second active location, the Ring-bearer facedown under an enemy, an
+enemy engaged with every player, damage assigned among characters, progress gates and caps; The Ring Goes South). Their records
+sit in `src/effects/authored/<scenario-id>.ts`. A rule a constant sets for the whole table (there can be 2 active locations,
+the players must travel) is a `ModifyStat` flag on `table`, so the engine reads it from the state alone.
+
 ## The record
 
 ```ts

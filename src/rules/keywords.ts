@@ -201,7 +201,8 @@ export function placeDamage(
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
   let next = updateCard(state, id, { damage });
   const hurt = dealt > 0 && inPlay(instance.zone);
-  if (printed.type === "enemy" && printed.keywords.indestructible) return next;
+  // An indestructible enemy keeps its damage but is never destroyed; it hears that it took damage (the Watcher in the Water, 142024:A:3).
+  if (printed.type === "enemy" && printed.keywords.indestructible) return hurt ? queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt }) : next;
   const lethal = printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards);
   // Damage dealt to a character is first offered to the Responses that cancel it ("cancel X damage just dealt", rr.cancel).
   // A character it would destroy is destroyed by the sweep once they have had their chance (destroyOverwhelmed, damageHeld).
@@ -333,7 +334,7 @@ export function destroyCard(
     for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
   }
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
-  if (explored && printed.type === "location" && state.activeLocation === id) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
+  if (explored && printed.type === "location" && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck-rules.ts).

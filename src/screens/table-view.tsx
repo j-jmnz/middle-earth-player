@@ -25,7 +25,7 @@ import { MomentBanner, TableDock } from "../play/table-dock";
 import { LogPanel, PileList, SidePanel } from "../play/table-panel";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
-import { widgetReadouts } from "../play/widgets";
+import { locationReadout, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { Screen } from "./chrome";
 import { inactiveCodes } from "../catalog/active-text";
@@ -140,6 +140,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   };
 
   const widgets = widgetReadouts(game);
+  const locations = locationReadout(game);
   const threatText = threatLine(threats, widgets.life);
   const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
   const panelWidth = Math.round(Math.min(480, Math.max(320, screen.width * 0.46)));
@@ -215,7 +216,19 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           </View>
           <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8) }}>
             {/* The quest card on the table already shows its progress: the band gives way while the dock shows numbers. */}
-            {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} />}
+            <View>
+              {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} />}
+              {locations && locations.active.length > 0 ? (
+                <Text testID="active-locations" className="text-label text-muted">
+                  {`Active: ${locations.active.map(nameOf).join(" and ")}`}
+                </Text>
+              ) : null}
+              {locations?.heldUnder ? (
+                <Text testID="ring-bearer-held" className="text-label text-muted">
+                  {`The Ring-bearer is facedown under ${nameOf(locations.heldUnder)}`}
+                </Text>
+              ) : null}
+            </View>
             <TableDock
               step={choice.header.step}
               title={choice.header.title}

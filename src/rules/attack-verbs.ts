@@ -112,7 +112,8 @@ export function modifyStat(
   const data = topFrame(state)?.data;
   const scope = frameScope(state, focus.seat, sourceId);
   const base = resolveAmount(state, instruction.amount, scope, ctx);
-  const amount = instruction.per === "x" ? base * (data?.kind === "effect" ? (data.x ?? 0) : 0) : base;
+  const read = instruction.per === "x" ? base * (data?.kind === "effect" ? (data.x ?? 0) : 0) : base;
+  const amount = instruction.subtract ? -read : read;
   let next = state;
   const trait = instruction.trait;
   for (const id of targets) {

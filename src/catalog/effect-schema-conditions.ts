@@ -154,6 +154,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The running effect's X is at least `min`. The effect an attack leaves for its end has as X the number of characters the
   // attack destroyed ("If this attack destroys a character", 141065:A:2, 141066:A:2).
   z.strictObject({ kind: z.literal("x"), min: z.number().int().min(0) }),
+  // The answered damaged event placed the source's `nth` damage token: it holds at least that many now and held fewer before ("After
+  // placing the 6th damage here", 142024:A:3).
+  z.strictObject({ kind: z.literal("damageReached"), nth: z.number().int().positive() }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [

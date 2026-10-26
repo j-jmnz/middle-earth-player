@@ -722,7 +722,7 @@ export const RECORDS: readonly Effect[] = [
     lines: ["22024:B:1"],
     timing: "constant",
     condition: SIDE_B,
-    instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any", isActive: true }, eachAttached: { type: "attachment", control: "any" } }],
+    instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any", active: true }, eachAttached: { type: "attachment", control: "any" } }],
   },
   {
     id: "22024:forced:1",

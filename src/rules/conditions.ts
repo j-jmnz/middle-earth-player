@@ -37,6 +37,8 @@ export type Scope = {
   other?: string;
   // The running effect's X.
   x?: number;
+  // The damage the answered event placed.
+  dealt?: number;
 };
 
 // The card a `matches` condition reads.
@@ -215,6 +217,10 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return (scope.x ?? 0) >= condition.min;
     case "distinctTraits":
       return distinctTraitCount(state, scope.actor, ctx) >= condition.min;
+    case "damageReached": {
+      const damage = scope.sourceId ? (state.cards[scope.sourceId]?.damage ?? 0) : 0;
+      return damage >= condition.nth && damage - (scope.dealt ?? 0) < condition.nth;
+    }
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":
@@ -247,6 +253,8 @@ function engagedAs(card: { zone: string; controller: number | null }, engaged: "
 function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand"): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source) return false;
+  // The second active location slot is an active location too (mec109.stage-4).
+  if (zone === "activeLocation") return source.zone === "activeLocation" || source.zone === "secondActiveLocation";
   return zone === "play" ? inPlay(source.zone) : source.zone === zone;
 }
 

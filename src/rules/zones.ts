@@ -12,7 +12,8 @@ export type Destination =
   | { zone: "shadow"; enemyId: string }
   | { zone: "attached" }
   | { zone: "campaign" }
-  | { zone: "under"; locationId: string };
+  | { zone: "under"; locationId: string }
+  | { zone: "captive"; hostId: string };
 
 type SeatList = "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "staging";
 
@@ -87,6 +88,7 @@ function detach(state: ScenarioState, id: string): ScenarioState {
     case "secondActiveLocation":
       return state.secondActiveLocation === id ? { ...state, secondActiveLocation: null } : state;
     case "under":
+    case "captive":
       return updateCard(state, id, { host: null });
     case "shadow": {
       const enemy = current.host ? state.cards[current.host] : undefined;
@@ -153,6 +155,10 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   // Under a location: out of play, facedown, controlled by nobody, and not one of the location's attachments (141049:A:1).
   if (dest.zone === "under") {
     return updateCard(state, id, { zone: "under", host: dest.locationId, controller: null, face: "down", exhausted: false, committed: false });
+  }
+  // Facedown under an enemy, still in play and controlled by nobody (the Ring-bearer under the Watcher in the Water).
+  if (dest.zone === "captive") {
+    return updateCard(state, id, { zone: "captive", host: dest.hostId, controller: null, face: "down" });
   }
   if (dest.zone === "shadow") {
     const enemy = state.cards[dest.enemyId];

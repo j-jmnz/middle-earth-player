@@ -9,6 +9,7 @@ import { attachmentPickWords, attachmentWords } from "./attachment-words.ts";
 import { deckPickWords, deckWords } from "./deck-words.ts";
 import { encounterPickWords, encounterWords } from "./encounter-words.ts";
 import { attackWords } from "./attack-words.ts";
+import { southWords } from "./south-words.ts";
 import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden-words.ts";
 import { miscPickWords, miscWords } from "./misc-words.ts";
 import { playPickWords, playWords } from "./play-words.ts";
@@ -260,7 +261,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 

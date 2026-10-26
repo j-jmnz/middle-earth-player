@@ -340,7 +340,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
         (code == null || !attachBlocked(state, ctx, id, code));
       if (instruction.to.kind === "hero") {
         const seats = instruction.to.control === "any" ? livingSeats(state) : [item.seat];
-        return seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter(free);
+        const except = instruction.to.exceptSphere;
+        return seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter(free).filter((id) => except == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").sphere !== except);
       }
       const trait = instruction.to.trait;
       return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])]
@@ -348,8 +349,11 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
         .filter(free);
     }
     case "SearchMove":
-    case "SearchReveal":
-      return searchable(state, instruction, ctx);
+    case "SearchReveal": {
+      const found = searchable(state, instruction, ctx);
+      const required = instruction.verb === "SearchMove" && instruction.require ? searchable(state, { code: instruction.require }, ctx) : [];
+      return required.length > 0 ? required : found;
+    }
     case "ShuffleIntoDeck":
       return searchable(state, instruction, ctx, ["encounterDiscard"]);
     case "DiscardRestricted":

@@ -96,6 +96,12 @@ export const pickSchema = z.strictObject({
   on: z.strictObject({ type: z.enum(["hero", "character"]), control: z.enum(["you", "other", "any"]) }).optional(),
   // Not the card the source is attached to ("each other questing character" on an attachment).
   notHost: z.boolean().optional(),
+  // An enemy that engaged a player this round (a Shadow card: "if it was engaged this round", 142026:A:3).
+  engagedThisRound: z.boolean().optional(),
+  // Only the card the source is attached to ("attached hero" for a Condition that sets its stat).
+  isHost: z.boolean().optional(),
+  // A location that is an active location now (either slot), not one in the staging area (142021:B:2, 142027:A:1).
+  active: z.boolean().optional(),
   // A hero with at least one resource in its pool; with at least this many (`minResources`).
   hasResources: z.boolean().optional(),
   minResources: z.number().int().positive().optional(),
@@ -161,8 +167,7 @@ export const pickSchema = z.strictObject({
   sameTitleAs: z.literal("activeLocation").optional(),
   // A character committed to a side quest (`sideQuest`), or to the current quest (`mainQuest`).
   committedTo: z.enum(["sideQuest", "mainQuest"]).optional(),
-  // The active location (or the second one). With `from: loot`, only the loot guarding the card the answered event is about.
-  isActive: z.boolean().optional(),
+  // With `from: loot`, only the loot guarding the card the answered event is about.
   guardsSubject: z.boolean().optional(),
   // A card with at least this many Restricted attachments on it ("each of your heroes has at least 2 restricted attachments").
   restrictedAttachments: z.number().int().positive().optional(),

@@ -57,8 +57,10 @@ export function refCard(state: ScenarioState, ref: CardRef, scope: AmountScope):
       return state.pendingAttack?.enemyId ?? state.pendingStrike?.enemyId ?? null;
     case "defender":
       return state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? state.pendingAttack.defenderId : null;
+    // With two active locations (The Ring Goes South stage 4) "the active location" is the one that is not Doors of Durin, which
+    // is immune to player card effects and always the first (mec109.stage-4).
     case "activeLocation":
-      return state.activeLocation;
+      return state.secondActiveLocation ?? state.activeLocation;
   }
 }
 

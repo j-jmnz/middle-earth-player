@@ -29,7 +29,6 @@ export function copyInVictory(state: ScenarioState, id: string | null, ctx: Redu
 }
 
 export function sidequestsPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext): boolean {
-  if (spec.isActive != null && (id === state.activeLocation || id === state.secondActiveLocation) !== spec.isActive) return false;
   if (spec.guardsSubject && !(at.subject != null && state.cards[id]?.host === at.subject)) return false;
   if (spec.sharesTrait === "activeLocation" || spec.sharesTrait === "attackingEnemy") {
     const other = comparedWith(state, spec.sharesTrait);

@@ -10,7 +10,7 @@ import { noteHostDefeated, withStagingThreat } from "./families/attachments-hold
 import { progressFirstLocations } from "./families/attachments-quest.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import type { EngineStep } from "./intents.ts";
-import { destroyCard, modifiedStat, raiseThreat, releaseAttachments } from "./keywords.ts";
+import { modifiedStat, raiseThreat, releaseAttachments } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
 import { printedOf } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
@@ -18,6 +18,7 @@ import { flagged, livingSeats, updateCard, withMode } from "./state.ts";
 import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
 import { placeQuestingProgress } from "./families/defense-damage.ts";
+import { freeSlot, placeOnActive } from "./families/south-locations.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -118,28 +119,10 @@ export function placeQuestProgress(
   // Progress from questing successfully (rr.step-3-4): a location that may take it before the quest does (families/attachments-quest.ts).
   questing = false,
 ): ScenarioState {
-  let remaining = amount;
-  let next = state;
-  const locationId = next.activeLocation;
-  if (locationId && remaining > 0) {
-    const location = next.cards[locationId];
-    if (location) {
-      const points = questPointsOf(next, location, cards);
-      if (points != null) {
-        const need = Math.max(0, points - location.progress);
-        const placed = Math.min(remaining, need);
-        if (placed > 0) {
-          next = updateCard(next, locationId, { progress: location.progress + placed });
-          steps.push({ kind: "progress", targetId: locationId, amount: placed, cause: ruleCause("rr.step-3-4") });
-          remaining -= placed;
-        }
-        const updated = next.cards[locationId];
-        if (updated && updated.progress >= points) {
-          next = destroyCard(next, locationId, cards, steps, true);
-        }
-      }
-    }
-  }
+  // The active locations take it first (rr.active-location); stage 4 of The Ring Goes South has two (families/south-locations.ts).
+  const placedOn = placeOnActive(state, amount, cards, steps);
+  let next = placedOn.state;
+  let remaining = placedOn.remaining;
   if (questing && remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps));
   if (remaining > 0 && next.questStage && !next.stageCleared) {
     const stageId = next.questStage;
@@ -170,7 +153,7 @@ export function placeQuestProgress(
 
 // The next stage arrives with no progress on it (rr.quest-advancement), side B up. A stage that prints no quest points
 // (141024, 141027) is won some other way, so the quest stops there. One with 0 quest points would be met at once.
-function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
+export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
   let next = state;
   const guard = next.stages.length + 1;
   for (let hop = 0; hop < guard; hop += 1) {
@@ -209,11 +192,13 @@ function clearCommitted(state: ScenarioState): ScenarioState {
 }
 
 export function travelTo(state: ScenarioState, locationId: string, cards: Cards): ScenarioState | null {
-  if (state.activeLocation) return null;
+  // A second active location slot may be free (families/south-locations.ts).
+  const slot = freeSlot(state);
+  if (!slot) return null;
   const instance = state.cards[locationId];
   if (!instance || instance.zone !== "staging") return null;
   if (printedOf(cards, instance.code).type !== "location") return null;
-  return moveCard(state, locationId, { zone: "activeLocation" });
+  return moveCard(state, locationId, { zone: slot });
 }
 
 export function stagingLocations(state: ScenarioState, cards: Cards): string[] {

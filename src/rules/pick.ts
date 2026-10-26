@@ -20,7 +20,7 @@ import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } fr
 import { cardTypeOf, isPlayerType, printedOf } from "./printed.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
-import { inPlay, livingSeats } from "./state.ts";
+import { heldAmount, inPlay, livingSeats } from "./state.ts";
 import { canDeclareDefender, isDefending } from "./families/defense-defenders.ts";
 import { facedownShadow } from "./families/defense-shadow.ts";
 
@@ -83,7 +83,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     // `staging` with `engaged`: the staging area and the enemies engaged as `engaged` says ("or engaged with another player").
     if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...state.staging);
   } else if (spec.type === "location") {
-    raw.push(...stagingLocations(state, ctx.cards));
+    if (!spec.active) raw.push(...stagingLocations(state, ctx.cards));
     if (!spec.stagingOnly) raw.push(...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
   } else if (spec.type === "card" && spec.stagingOnly) {
     raw.push(...state.staging);
@@ -134,6 +134,9 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
   if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
   if (spec.notHost && at.sourceId != null && state.cards[at.sourceId]?.host === id) return false;
+  if (spec.engagedThisRound && heldAmount(state, id, "engagedThisRound") <= 0) return false;
+  if (spec.isHost && (at.sourceId == null || state.cards[at.sourceId]?.host !== id)) return false;
+  if (spec.active && state.activeLocation !== id && state.secondActiveLocation !== id) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments-pick.ts).
   if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
   // The attack family's filters: printed keywords, the source's host, engaged with whom, a shared Trait, an attachment on the

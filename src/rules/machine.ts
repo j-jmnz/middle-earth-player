@@ -51,11 +51,12 @@ import { announceShadowsDealt } from "./families/defense-shadow.ts";
 import { attackedEarly, earlyAttacks } from "./families/defense-order.ts";
 import { strikeResumes } from "./families/attack-flow.ts";
 import { announceProgress } from "./families/burden-effects.ts";
+import { damageLoss } from "./families/south-locations.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
-    current = announceProgress(constantWin(current, ctx), steps, ctx);
+    current = damageLoss(announceProgress(constantWin(current, ctx), steps, ctx), ctx.cards);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {
