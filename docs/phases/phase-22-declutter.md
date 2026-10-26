@@ -93,3 +93,16 @@ The decisions below are this phase's. Keep this table in the phase file, updated
 - A screen reader keeps every sentence: a folded line is still in the accessibility label or the hint.
 - The Maestro flows that assert the quest band's testIDs move to the quest card's preview, or are dropped with a note in STATUS.md if nothing else reads them.
 - Do not remove the threat dials' ticks or the engagement pills. They are the engagement foresight the table-experience plan built.
+
+## Handover from phase 21
+
+Phase 21 is merged. What phase 22 builds on:
+
+- The tray is short on a short phone. Its foot sits on the top of the dock's readout block (`TableDock` `onBlock`, measured with `measureInWindow`), and the dock's step, title and note sit above that block. At 667x375 the tray is 123 pt tall with an 83 pt list (about 1.5 tiles); at 844x390, 138 pt (about 2). Every line this phase folds out of the dock gives the tray its height back, which is the main payoff of this phase on a choice. Keep the anchor at the readout: the readout and the armed line are never covered. Re-measure the tray in the exit shots.
+- The picked-cards line (`dock-picked`) already hides while the tray is open; this phase removes it for good (the audit row). The tray's count ("Defend · 1 of 6 picked") carries it.
+- The dock's quiet pills are built by `dockExtras` in `src/play/dock-extras.ts` (not `use-table-choice.ts` any more): Undo, then "Read" (accessibility label "Read the card", `sheet-inspect`), List, Actions (n), Choose (`sheet-expand`). They sit on one wrapping row under the secondary. `dockPills` and the More fold go there.
+- The dock is a `ScrollView` guard so its foot never clips; it re-measures the anchor on scroll end. Once the dock fits, the guard should never scroll; keep it.
+- The quest band still draws in the command column's upper part, under the open tray. Removing it changes nothing in the tray.
+- The reading panels and the carousel are one `Reading` layer (`src/play/reading.ts`, drawn by `table-layers.tsx`). The More popover is a menu-frame popover, not a reading panel; Back should close it the way it closes the table menu (`back.ts`).
+- `table-view.tsx` is 329 lines and `use-table-choice.ts` 315: do not grow either.
+

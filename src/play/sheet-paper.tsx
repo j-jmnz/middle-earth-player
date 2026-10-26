@@ -4,7 +4,7 @@
 // the engine did not compute.
 import type { ReactNode } from "react";
 import { Pressable, Text, View, type DimensionValue } from "react-native";
-import Animated, { ReduceMotion, SlideInDown, SlideInRight } from "react-native-reanimated";
+import Animated, { ReduceMotion, SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
@@ -12,54 +12,26 @@ import type { SheetStat } from "./sheet-types.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 const rise = SlideInDown.duration(220).reduceMotion(ReduceMotion.System);
-const slide = SlideInRight.duration(220).reduceMotion(ReduceMotion.System);
 const SHEET_RADIUS = 28;
 
 /**
- * The parchment a sheet sits on. From the bottom edge (`edge` "bottom", the default): its fill, corners and bottom inset are
- * plain styles from the tokens and useSafeAreaInsets, not NativeWind classes (sheets that carried pb-safe in their classes
- * lost their parchment on the phone). From the right edge (`edge` "right", the table in landscape): full height, the left
- * corners rounded, the right inset kept clear of the notch.
+ * The parchment a sheet sits on, from the bottom edge: its fill, corners and bottom inset are plain styles from the tokens and
+ * useSafeAreaInsets, not NativeWind classes (sheets that carried pb-safe in their classes lost their parchment on the phone).
+ * (The table's choice tray and reading panels are tray-frame.tsx.)
  */
-export function SheetFrame({
-  children,
-  testID,
-  maxHeight,
-  paddingTop = 12,
-  animated = true,
-  edge = "bottom",
-}: {
-  children: ReactNode;
-  testID?: string;
-  maxHeight?: DimensionValue;
-  paddingTop?: number;
-  animated?: boolean;
-  edge?: "bottom" | "right";
-}) {
+export function SheetFrame({ children, testID, maxHeight, paddingTop = 12, animated = true }: { children: ReactNode; testID?: string; maxHeight?: DimensionValue; paddingTop?: number; animated?: boolean }) {
   const insets = useSafeAreaInsets();
-  const right = edge === "right";
-  const style = right
-    ? {
-        backgroundColor: t.paper,
-        borderTopLeftRadius: SHEET_RADIUS,
-        borderBottomLeftRadius: SHEET_RADIUS,
-        paddingLeft: 20,
-        paddingRight: Math.max(insets.right, 16),
-        paddingTop,
-        paddingBottom: Math.max(insets.bottom, 12),
-        flex: 1,
-      }
-    : {
-        backgroundColor: t.paper,
-        borderTopLeftRadius: SHEET_RADIUS,
-        borderTopRightRadius: SHEET_RADIUS,
-        paddingHorizontal: 24,
-        paddingTop,
-        paddingBottom: Math.max(insets.bottom, 12),
-        ...(maxHeight != null ? { maxHeight } : {}),
-      };
+  const style = {
+    backgroundColor: t.paper,
+    borderTopLeftRadius: SHEET_RADIUS,
+    borderTopRightRadius: SHEET_RADIUS,
+    paddingHorizontal: 24,
+    paddingTop,
+    paddingBottom: Math.max(insets.bottom, 12),
+    ...(maxHeight != null ? { maxHeight } : {}),
+  };
   return animated ? (
-    <Animated.View entering={right ? slide : rise} testID={testID} collapsable={false} style={style}>
+    <Animated.View entering={rise} testID={testID} collapsable={false} style={style}>
       {children}
     </Animated.View>
   ) : (
@@ -201,40 +173,83 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
   );
 }
 
+/**
+ * A choice tile, on paper (a pile's cards) or on night (the choice tray). `leading` is a card picture, `trailing` a pill (the
+ * foreseen damage); `dense` puts everything on one line (the tray on a short phone). A picked night tile has the gold edge and
+ * a gold check; a paper one a heavier ink edge. A long press (`onLongPress`) reads the card.
+ */
 export function Tile({
   label,
   selected,
   onPress,
+  onLongPress,
   testID,
   detail,
   stats = [],
+  surface = "paper",
+  dense = false,
+  leading = null,
+  trailing = null,
+  said = "",
 }: {
   label: string;
   selected: boolean;
   onPress: () => void;
+  onLongPress?: (() => void) | null;
   testID: string;
   detail?: string | null;
   stats?: readonly SheetStat[];
+  surface?: "night" | "paper";
+  dense?: boolean;
+  leading?: ReactNode;
+  trailing?: ReactNode;
+  // More for a screen reader to say (the foreseen damage).
+  said?: string;
 }) {
+  const night = surface === "night";
+  const numbers = stats.length > 0 || trailing != null ? (
+    <View className="flex-row flex-wrap items-center gap-2">
+      <Stats stats={stats} surface={surface} />
+      {trailing}
+    </View>
+  ) : null;
   return (
     <Pressable
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), detail ?? ""].filter((part) => part.length > 0).join(". ")}
+      accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), said, detail ?? ""].filter((part) => part.length > 0).join(". ")}
+      accessibilityHint={onLongPress ? "Hold to read the card" : undefined}
       onPress={onPress}
+      onLongPress={onLongPress ?? undefined}
     >
       {({ pressed }) => (
         <View
-          className="mb-2 justify-center rounded-tile px-4 py-2"
-          style={{ minHeight: 48, borderWidth: selected ? 1.5 : 1, borderColor: selected ? t.ink : t.inkLine, backgroundColor: pressed ? t.paperPressed : "transparent" }}
+          className={`${dense ? "mb-1 py-0.5" : night ? "mb-1.5 py-1" : "mb-2 py-2"} flex-row items-center gap-2 rounded-tile ${night ? "px-2" : "px-4"}`}
+          style={{
+            minHeight: dense ? 44 : night ? 52 : 48,
+            borderWidth: selected ? 1.5 : 1,
+            borderColor: selected ? (night ? t.gold : t.ink) : night ? t.hairline : t.inkLine,
+            backgroundColor: pressed ? (night ? t.pressed : t.paperPressed) : night ? t.night : "transparent",
+          }}
         >
-          <View className="flex-row items-center justify-between gap-2">
-            <Text className={`shrink text-body text-ink ${selected ? "font-semibold" : ""}`}>{label}</Text>
-            <Stats stats={stats} />
+          {leading}
+          <View className={`flex-1 ${dense ? "flex-row flex-wrap items-center gap-x-2 gap-y-0.5" : ""}`}>
+            <View className={dense ? "" : "flex-row items-center justify-between gap-2"} style={dense ? { flexGrow: 1, flexShrink: 1, minWidth: 84 } : undefined}>
+              <Text numberOfLines={2} className={`shrink text-body ${night ? "text-bone" : "text-ink"} ${selected ? "font-semibold" : ""}`}>
+                {label}
+              </Text>
+              {night || dense ? null : numbers}
+            </View>
+            {detail ? <Text className={`mt-0.5 text-label ${night ? "text-muted" : "text-inkMuted"}`}>{detail}</Text> : null}
+            {night || dense ? <View className={dense ? "" : "mt-0.5"}>{numbers}</View> : null}
           </View>
-          {detail ? <Text className="mt-0.5 text-label text-inkMuted">{detail}</Text> : null}
+          {selected && night ? (
+            <View accessible={false} importantForAccessibility="no" style={{ width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: t.gold }}>
+              <Text style={{ color: t.onGold, fontSize: 13, lineHeight: 16, fontWeight: "700" }}>{"\u2713"}</Text>
+            </View>
+          ) : null}
         </View>
       )}
     </Pressable>

@@ -2,7 +2,7 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# Phases 19 and 20. Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build
+# Phases 19, 20 and 21 (the Log is a reading panel, `log-sheet`). Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build
 # (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture is the solo game of Stealth and Steadfastness parked on its loss
 # (src/campaign/fixtures). The top bar holds the dials, the rail and the menu button; Back, Log, Rules, Booklet and Table
 # settings are rows of the menu. A tap on the rail opens the phase carousel (phase 20).
@@ -73,14 +73,14 @@ tags:
     id: log-open
 - extendedWaitUntil:
     visible:
-      id: log
+      id: log-sheet
     timeout: 15000
 - assertNotVisible:
     id: log-open
 - tapOn:
     id: log-close
 - assertNotVisible:
-    id: log
+    id: log-sheet
 # Leave the table: the game is saved and the path is under it.
 - tapOn:
     id: table-menu

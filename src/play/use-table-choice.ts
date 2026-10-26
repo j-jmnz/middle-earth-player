@@ -2,7 +2,7 @@
 // one the player opened from the table: a payment, a host, an Action), what is picked for it, whether it is answered on the
 // table or on a paper panel, the dock's buttons, the engine's numbers beside them, and the outcome banner of the last
 // intent. Taps, drops and tiles pick; only a dock button sends an intent, through the store (table-choice.ts).
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "zustand";
 
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
@@ -16,13 +16,17 @@ import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { onTableFor, shownSeat } from "./selectors.ts";
 import { dropOutcome, targetFromKey } from "./selection.ts";
-import type { OptionMark, Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
+import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
+import { dockExtras } from "./dock-extras.ts";
+import { useStable } from "./use-stable.ts";
+import { highlightKeys, highlightOf, playedCard } from "./highlight-of.ts";
+import { tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
 import type { DockExtra } from "./dock-buttons.tsx";
-import { choiceFor, dockFor, fightPreview, headerOf, marked, onTheTable, onlyAnswer, pickedWords, primaryReady, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
+import { choiceFor, dockFor, fightPreview, headerOf, onTheTable, onlyAnswer, pickedWords, primaryReady, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
 
 // How long a new moment ignores a send: the second tap of a double tap meant for the moment before lands where its button
 // was, and a moment with one answer would send on it.
@@ -64,6 +68,9 @@ export type TableChoice = {
   onDrop: (cardId: string, key: string) => void;
   onButton: (button: DockButton) => void;
   fold: () => void;
+  // A tap outside the open tray (the canvas, the top bar, the empty part of the command column): folds it and reports true, so
+  // the caller swallows the tap. With a screen reader on it does nothing and reports false.
+  foldOutside: () => boolean;
   closeOverlay: () => void;
 };
 
@@ -109,7 +116,7 @@ export function useTableChoice({
   // when the choices are not cards drawn whole on the table. The action window itself stays on the table.
   const asked = (live?.panel ?? false) || listed === sheet.key || (reader && sheet.kind !== "window" && sheet.kind !== "outcome" && tappable(sheet).size > 0);
   const panel = asked || !onTheTable(sheet, onTable);
-  const panelOpen = panel && folded !== sheet.key;
+  const panelOpen = trayOpen(panel, folded, sheet.key);
   const passLegal = legal.some((intent) => intent.type === "Pass");
   // A moment with one answer has it picked already, and one tap sends it (table-choice.ts, onlyAnswer).
   const only = useMemo(() => onlyAnswer(sheet, legal), [sheet, legal]);
@@ -126,37 +133,8 @@ export function useTableChoice({
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)
   // does not draw the table again (docs/architecture.md, State). Card ids carry no commas.
-  const glowKey = panel ? "" : [...tappable(sheet)].join(",");
-  const pickedKey = [...marked(sheet, choice)].map(([id, amount]) => `${id}=${amount}`).join(",");
-  const share = sheet.kind === "distribute" ? (sheet.purpose.kind === "archery" ? "damage" : "pay") : null;
-  // A pick (a defender, a location, a payment) dims what it does not ask about; the action window does not.
-  const dimOthers = !panel && glowKey !== "" && sheet.kind !== "window";
-  // The numbers the pick draws on its cards (the damage each defender would take), keyed so the canvas draws again only
-  // when they change.
-  const optionMarks = panel ? [] : optionMarksOf(sheet);
-  // In planning, the hand cards that cannot be played now are dimmed, so the player sees which can (a tap says why not).
-  const mutedKey = !panel && sheet.kind === "window" && game.mode === "planning" ? (game.seats[seat]?.hand ?? []).filter((id) => !sheet.plays.includes(id)).join(",") : "";
-  const markKey = optionMarks.map(([id, mark]) => `${id}=${mark.icon}:${mark.value}:${mark.danger ? 1 : 0}`).join(",");
-  const highlight = useMemo(
-    (): TableHighlight => ({
-      tappable: new Set(glowKey === "" ? [] : glowKey.split(",")),
-      picked: new Map(pickedKey === "" ? [] : pickedKey.split(",").map((entry): [string, number] => [entry.split("=")[0] ?? "", Number(entry.split("=")[1])])),
-      share,
-      dimOthers,
-      marks: new Map(
-        markKey === ""
-          ? []
-          : markKey.split(",").map((entry): [string, OptionMark] => {
-              const [id = "", rest = ""] = entry.split("=");
-              const [icon = "damage", value = "0", danger = "0"] = rest.split(":");
-              return [id, { icon: icon as OptionMark["icon"], value: Number(value), danger: danger === "1" }];
-            }),
-      ),
-      muted: new Set(mutedKey === "" ? [] : mutedKey.split(",")),
-      beat: new Set(beatKey === "" ? [] : beatKey.split(",")),
-    }),
-    [glowKey, pickedKey, share, dimOthers, markKey, mutedKey, beatKey],
-  );
+  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow } = highlightKeys({ game, seat, sheet, choice, panel, beatKey });
+  const highlight = useMemo((): TableHighlight => highlightOf({ glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow }), [glow, pickedKey, share, dim, markKey, mutedKey, beatNow]);
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";
   const fight = useMemo((): LayoutOptions["preview"] => {
@@ -251,21 +229,27 @@ export function useTableChoice({
     },
     [dock, onButton, sheet, held, table, open],
   );
+  // A tap or a drop outside the open tray folds it and is swallowed (tapRoute).
+  const foldOutside = useCallback((): boolean => {
+    if (tapRoute({ panelOpen, reader, cardId: "" }) !== "fold") return false;
+    setFolded(sheet.key);
+    return true;
+  }, [panelOpen, reader, sheet.key]);
   // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
   const onTap = useCallback(
     (cardId: string) => {
-      if (cardId.startsWith("pile:")) {
-        onPile(cardId.slice(5));
-        return;
-      }
-      if (!pick(cardId) && game.cards[cardId]?.face !== "down") onPreview(cardId);
+      const route = tapRoute({ panelOpen, reader, cardId });
+      if (route === "fold") setFolded(sheet.key);
+      else if (route === "pile") onPile(cardId.slice(5));
+      else if (!pick(cardId) && game.cards[cardId]?.face !== "down") onPreview(cardId);
     },
-    [pick, onPile, onPreview, game],
+    [panelOpen, reader, sheet.key, pick, onPile, onPreview, game],
   );
   const onTile = useCallback((id: string) => void pick(id), [pick]);
   const tapOnTable = useStable(onTap);
   const onDrop = useCallback(
     (cardId: string, key: string) => {
+      if (foldOutside()) return;
       const outcome = dropOutcome(game, ctx, legal, cardId, targetFromKey(key));
       store.getState().select(null);
       if (outcome.kind === "play") {
@@ -279,24 +263,24 @@ export function useTableChoice({
         }
       }
     },
-    [game, ctx, legal, names, store, open, base, live, held, table],
+    [foldOutside, game, ctx, legal, names, store, open, base, live, held, table],
   );
 
   const dropOnTable = useStable(onDrop);
 
-  // The dock's extra buttons: read the card the moment is about, list the choices on paper, list every Action, bring a
-  // folded panel back.
-  const extras: DockExtra[] = [];
-  // Undo is in the dock, in reach of the thumb and at the foot of a panel; a sheet opened from the table has Cancel instead.
+  // The dock's extra buttons (dock-extras.ts).
   const undoButton: DockExtra | null = !live && (canUndo || picking) ? { label: "Undo", testID: "table-undo", accessibilityLabel: picking ? "Put back this pick" : "Take back your last choice", onPress: undo } : null;
-  if (undoButton) extras.push(undoButton);
-  const about = sheet.kind === "pick" ? (sheet.about ?? []) : sheet.kind === "trigger" && sheet.sourceId ? [sheet.sourceId] : [];
-  const first = about[0];
-  if (first) extras.push({ label: "Read the card", testID: "sheet-inspect", onPress: () => onPreview(first, about) });
-  if (!panel && sheet.kind !== "window" && tappable(sheet).size > 0) extras.push({ label: "List", testID: "sheet-list", onPress: () => setListed(sheet.key) });
-  if (sheet.kind === "window" && sheet.commit) extras.push({ label: "List", testID: "sheet-list", onPress: () => open(commitSheet(game, ctx, names), true) });
-  if (sheet.kind === "window" && sheet.triggers.length > 0) extras.push({ label: `Actions (${sheet.triggers.length})`, testID: "table-actions", onPress: () => open(actionsSheet(game, ctx, legal, names), true) });
-  if (panel && !panelOpen) extras.push({ label: "Choose", testID: "sheet-expand", onPress: () => setFolded(null) });
+  const extras = dockExtras({
+    sheet,
+    undoButton,
+    panel,
+    panelOpen,
+    onRead: onPreview,
+    onList: () => setListed(sheet.key),
+    onCommit: () => open(commitSheet(game, ctx, names), true),
+    onActions: () => open(actionsSheet(game, ctx, legal, names), true),
+    onChoose: () => setFolded(null),
+  });
 
   const resetKey = `${sheet.key}:${moment?.seq ?? 0}:${choice.ids.join(",")}:${choice.shares.map((share) => `${share.id}=${share.amount}`).join(",")}`;
   return {
@@ -304,6 +288,7 @@ export function useTableChoice({
     choice,
     dock,
     header,
+    // The tray says what is picked (its check and its count); the dock repeats it only once the tray is folded.
     picked: panelOpen ? null : pickedWords(sheet, choice, names),
     unavailable: sheet.kind === "pick" ? (sheet.unavailable ?? []) : [],
     readout,
@@ -324,29 +309,7 @@ export function useTableChoice({
     onDrop: dropOnTable,
     onButton,
     fold: () => setFolded(sheet.key),
+    foldOutside,
     closeOverlay,
   };
-}
-
-// A handler that keeps its identity and always calls the latest one: the canvas's gesture is built once per set of
-// callbacks, and the table should not draw again because a handler closed over a newer game.
-function useStable<A extends unknown[]>(handler: (...args: A) => void): (...args: A) => void {
-  const latest = useRef(handler);
-  useLayoutEffect(() => {
-    latest.current = handler;
-  });
-  return useCallback((...args: A) => latest.current(...args), []);
-}
-
-// The marks a sheet's options carry, by card id.
-function optionMarksOf(sheet: Sheet): [string, OptionMark][] {
-  if (sheet.kind !== "pick" && sheet.kind !== "multi") return [];
-  return sheet.options.flatMap((item): [string, OptionMark][] => (item.mark ? [[item.id, item.mark]] : []));
-}
-
-// The hand card a sheet the player opened is about: the card being played.
-function playedCard(sheet: Sheet): string | null {
-  if (sheet.kind === "pick") return sheet.about?.[0] ?? null;
-  if (sheet.kind === "distribute" && sheet.purpose.kind === "play") return sheet.purpose.cardId;
-  return null;
 }

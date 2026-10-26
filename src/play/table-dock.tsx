@@ -2,7 +2,7 @@
 // engine's numbers for it (willpower against threat, attack against defense), what the player has picked on the table, and
 // the buttons that confirm it (docs/design-system.md, Table). Picking happens on the table; nothing here is sent until a
 // button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
 import Animated, { FadeInUp, FadeOut, ReduceMotion, useReducedMotion } from "react-native-reanimated";
 
@@ -50,6 +50,7 @@ export function TableDock({
   extras = [],
   resetKey,
   guide = null,
+  onBlock,
 }: {
   step: string;
   title: string;
@@ -66,9 +67,16 @@ export function TableDock({
   resetKey: string;
   // The first-game guide's line for the moment (reference.ts); it is turned off in the table settings.
   guide?: string | null;
+  // The screen y of the top of the block under the sentence (the readout, the pick, the armed line and the buttons): the choice
+  // tray's foot stays above it.
+  onBlock?: (top: number) => void;
 }) {
+  const block = useRef<ComponentRef<typeof View>>(null);
+  const measure = () => block.current?.measureInWindow((_x, y) => onBlock?.(Math.round(y)));
   return (
     <View testID="dock" className="rounded-card px-3 pb-2 pt-2" style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
+      {/* A guard: where the dock is taller than the column (a short phone, a long title) it scrolls, so its foot is never cut. */}
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled onScrollEndDrag={measure} onMomentumScrollEnd={measure}>
       {/* On a short phone only the sentence scrolls; the numbers, the pick and the buttons stay in sight. */}
       <Text testID="sheet-step" numberOfLines={1} className="text-center font-display text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
         {step}
@@ -96,7 +104,7 @@ export function TableDock({
           ))}
         </ScrollView>
       ) : null}
-      <View className="mt-1 gap-1">
+      <View ref={block} collapsable={false} onLayout={measure} className="mt-1 gap-1">
         {readout ? <ReadoutView readout={readout} /> : null}
         {picked ? (
           <Text testID="dock-picked" numberOfLines={3} className="text-center text-body text-bone">
@@ -108,8 +116,9 @@ export function TableDock({
             {refusal}
           </Text>
         ) : null}
-        <DockButtons key={resetKey} dock={dock} extras={extras} surface="night" onButton={onButton} />
+        <DockButtons key={resetKey} dock={dock} extras={extras} onButton={onButton} />
       </View>
+      </ScrollView>
     </View>
   );
 }

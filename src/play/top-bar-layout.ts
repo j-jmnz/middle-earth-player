@@ -5,6 +5,8 @@
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 
 export const MENU_BUTTON = 44;
+// The bar's side padding (px-2 in table-top-bar.tsx).
+export const BAR_PAD = 8;
 const GAP = 8;
 // Wide enough for the widest pill and both neighbor phases (RAIL_WIDE), with room over.
 export const RAIL_MAX = 460;

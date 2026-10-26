@@ -25,12 +25,6 @@ const DIAL: Record<ThreatLevel, { edge: string; fill: string; meter: string }> =
   critical: { edge: t.danger, fill: t.threat, meter: t.bone },
 };
 
-/** The seats' threat in one line, for a panel's header: "Threat 28", or "Player 1 28 · Player 2 31". */
-export function threatLine(threats: readonly SeatThreat[], life: number | null): string {
-  const seats = threats.length > 1 ? threats.map((row) => `Player ${row.seat + 1} ${row.threat}`).join(" · ") : `Threat ${threats[0]?.threat ?? 0}`;
-  return life != null ? `${seats} · Life ${life}` : seats;
-}
-
 /**
  * The threat dial of the top bar (`compact`): the threat icon and the number large in Marcellus on a threat-red pill, with a
  * meter along its foot that fills toward 50, the elimination level, and its label beside it. It warms near elimination,

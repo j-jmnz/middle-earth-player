@@ -1,0 +1,59 @@
+// What the canvas draws for the open moment, as strings that compare by value (so a change elsewhere in the game does not draw
+// the table again; docs/architecture.md, State) and the TableHighlight they build. Split out of use-table-choice.ts. Card ids
+// carry no commas.
+import { marked, tappable, type Choice } from "./table-choice.ts";
+import type { ScenarioState } from "./store.ts";
+import type { OptionMark, Sheet } from "./sheet-types.ts";
+import type { TableHighlight } from "./table-canvas-types.ts";
+
+export type HighlightKeys = { glow: string; picked: string; share: TableHighlight["share"]; dim: boolean; marks: string; muted: string; beat: string };
+
+export function highlightKeys({ game, seat, sheet, choice, panel, beatKey }: { game: ScenarioState; seat: number; sheet: Sheet; choice: Choice; panel: boolean; beatKey: string }): HighlightKeys {
+  const glow = panel ? "" : [...tappable(sheet)].join(",");
+  // In planning, the hand cards that cannot be played now are dimmed, so the player sees which can (a tap says why not).
+  const muted = !panel && sheet.kind === "window" && game.mode === "planning" ? (game.seats[seat]?.hand ?? []).filter((id) => !sheet.plays.includes(id)).join(",") : "";
+  const marks = (panel ? [] : optionMarksOf(sheet)).map(([id, mark]) => `${id}=${mark.icon}:${mark.value}:${mark.danger ? 1 : 0}`).join(",");
+  return {
+    glow,
+    picked: [...marked(sheet, choice)].map(([id, amount]) => `${id}=${amount}`).join(","),
+    share: sheet.kind === "distribute" ? (sheet.purpose.kind === "archery" ? "damage" : "pay") : null,
+    // A pick (a defender, a location, a payment) dims what it does not ask about; the action window does not.
+    dim: !panel && glow !== "" && sheet.kind !== "window",
+    marks,
+    muted,
+    beat: beatKey,
+  };
+}
+
+const ids = (key: string): string[] => (key === "" ? [] : key.split(","));
+
+export function highlightOf(keys: HighlightKeys): TableHighlight {
+  return {
+    tappable: new Set(ids(keys.glow)),
+    picked: new Map(ids(keys.picked).map((entry): [string, number] => [entry.split("=")[0] ?? "", Number(entry.split("=")[1])])),
+    share: keys.share,
+    dimOthers: keys.dim,
+    marks: new Map(
+      ids(keys.marks).map((entry): [string, OptionMark] => {
+        const [id = "", rest = ""] = entry.split("=");
+        const [icon = "damage", value = "0", danger = "0"] = rest.split(":");
+        return [id, { icon: icon as OptionMark["icon"], value: Number(value), danger: danger === "1" }];
+      }),
+    ),
+    muted: new Set(ids(keys.muted)),
+    beat: new Set(ids(keys.beat)),
+  };
+}
+
+// The marks a sheet's options carry, by card id.
+function optionMarksOf(sheet: Sheet): [string, OptionMark][] {
+  if (sheet.kind !== "pick" && sheet.kind !== "multi") return [];
+  return sheet.options.flatMap((item): [string, OptionMark][] => (item.mark ? [[item.id, item.mark]] : []));
+}
+
+// The hand card a sheet the player opened is about: the card being played.
+export function playedCard(sheet: Sheet): string | null {
+  if (sheet.kind === "pick") return sheet.about?.[0] ?? null;
+  if (sheet.kind === "distribute" && sheet.purpose.kind === "play") return sheet.purpose.cardId;
+  return null;
+}
