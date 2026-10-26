@@ -76,8 +76,9 @@ export const pickSchema = z.strictObject({
   defending: z.boolean().optional(),
   // A card with an attachment on it; with `trait`, an attachment with that trait.
   hasAttachment: z.strictObject({ trait: z.string().min(1).optional(), playerCard: z.boolean().optional() }).optional(),
-  // A card attached to the source (`source`), to the source's host (`host`), or to the active location (`activeLocation`).
-  attachedTo: z.enum(["source", "host", "activeLocation"]).optional(),
+  // A card attached to the source (`source`), to the source's host (`host`), to the active location (`activeLocation`), or to
+  // the defending character (`defender`).
+  attachedTo: z.enum(["source", "host", "activeLocation", "defender"]).optional(),
   // An attachment on a card of this type controlled by the chooser (`you`), by another player (`other`) or by anyone ("a Weapon
   // card attached to a hero you control", "an attachment on a hero you control").
   on: z.strictObject({ type: z.enum(["hero", "character"]), control: z.enum(["you", "other", "any"]) }).optional(),
@@ -106,6 +107,12 @@ export const pickSchema = z.strictObject({
   cost: z.number().int().min(0).optional(),
   // A card that prints no victory points ("a location worth no victory points").
   noVictory: z.boolean().optional(),
+  // A character that could be declared as a defender of the attack in progress and is not defending it yet (rr.step-6-4-1).
+  canDefend: z.boolean().optional(),
+  // An enemy with a facedown shadow card dealt to it.
+  facedownShadow: z.boolean().optional(),
+  // The enemy making the attack in progress (`false`: any other enemy, "another enemy engaged with you").
+  attackingEnemy: z.boolean().optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

@@ -19,6 +19,7 @@ import { flagged, heldAmount, inPlay, updateCard } from "./state.ts";
 import { raiseFor, runExtraVerb } from "./verbs.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
+import { shadowFace } from "./families/defense-shadow.ts";
 
 export type ReduceContext = {
   effects: readonly Effect[];
@@ -195,8 +196,10 @@ export function dealAdditionalShadow(state: ScenarioState, enemyId: string): Sce
   const enemy = state.cards[enemyId];
   const top = state.encounterDeck[0];
   if (!enemy || !top) return state;
+  // Face down, or face up while the player it is engaged with holds shadowsFaceUp (07009).
+  const face = shadowFace(state, enemyId);
   const moved = moveCard(state, top, { zone: "shadow", enemyId });
-  return updateCard(moved, top, { face: "down" });
+  return updateCard(moved, top, { face });
 }
 
 function dealInstructionDamage(

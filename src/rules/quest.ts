@@ -13,6 +13,7 @@ import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, livingSeats, updateCard, withMode } from "./state.ts";
 import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
+import { placeQuestingProgress } from "./families/defense-damage.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -71,7 +72,8 @@ export function resolveQuest(
     // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.
     for (const seat of livingSeats(state)) next = raise ? raise(next, seat, threat - willpower) : raiseThreat(next, seat, threat - willpower, steps, ruleCause("rr.step-3-4"));
   } else if (willpower > threat) {
-    next = placeQuestProgress(next, willpower - threat, cards, steps, canAdvance);
+    // Progress may be assigned as damage to an enemy instead (08142).
+    next = placeQuestingProgress(next, willpower - threat, cards, steps, canAdvance);
   }
   // Each seat hears how its quest went ("After you quest successfully"; questing exactly equal is neither, rr.step-3-4).
   if (willpower !== threat) {

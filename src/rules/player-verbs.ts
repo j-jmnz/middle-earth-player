@@ -18,6 +18,7 @@ import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "./state.t
 import { printedOf } from "./printed.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
+import { afterCancel } from "./families/defense-damage.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
 export type PlayerFocus = { seat: number; sourceId: string | null };
@@ -128,7 +129,9 @@ export function runPlayerVerb(
       const data = topFrame(state)?.data;
       const canceled = updateCard(state, id, { damage: card.damage - amount });
       // What is left of the damage is what a later cancel of the same damage can take.
-      return data?.kind === "effect" ? patchTop(canceled, { data: { ...data, dealt: dealt - amount } }) : canceled;
+      const patched = data?.kind === "effect" ? patchTop(canceled, { data: { ...data, dealt: dealt - amount } }) : canceled;
+      // Damage canceled is not taken: the "took damage" events that follow it lose that much (defense family).
+      return afterCancel(patched, id, amount, dealt - amount, ctx);
     }
     case "SetThreat":
       return withThreat(state, focus.seat, instruction.value);
@@ -160,7 +163,9 @@ export function runPlayerVerb(
       const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
       const seat = otherSeat(state, focus.seat);
       if (!source || seat == null) return state;
-      return updateCard(moveCard(state, source.id, { zone: "play", seat }), source.id, { owner: source.owner ?? source.controller ?? focus.seat });
+      const given = updateCard(moveCard(state, source.id, { zone: "play", seat }), source.id, { owner: source.owner ?? source.controller ?? focus.seat });
+      // "After ~ changes control".
+      return queueEvent(given, { trigger: "changedControl", seat, cardId: source.id });
     }
     case "DiscardPicked": {
       const id = lastPicked(state);

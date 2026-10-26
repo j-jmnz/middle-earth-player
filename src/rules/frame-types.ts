@@ -1,6 +1,7 @@
 import type { Cause } from "./cause.ts";
 import type { Condition, Instruction, ModifierStat, ModifierUntil, Trigger } from "../catalog/boundary.ts";
 
+import type { AttackDefense } from "./families/defense-types.ts";
 import type { Sphere } from "./printed.ts";
 import type { Window } from "./state.ts";
 
@@ -21,6 +22,8 @@ export type Modifier = {
   seat?: number;
   // A condition read each time the stat is read (see isStatCondition).
   when?: Condition;
+  // The modifier holds only while its holder attacks this enemy ("+2 Attack while attacking that enemy").
+  against?: string;
   // The stat is set to `amount`, overriding every modifier that is not a set (rr.modifiers).
   set?: boolean;
 };
@@ -177,7 +180,8 @@ export type PendingAttack = {
   after?: readonly Instruction[];
   afterCause?: Cause;
   // The step that follows the action window open between two steps of the attack, and the stack depth it opened at.
-  awaiting?: "defense" | "shadow" | "damage" | "end";
+  // `defenders`: more defenders were declared by an effect; the window after the declaration (6.4.1) comes next.
+  awaiting?: "defense" | "shadow" | "damage" | "end" | "defenders";
   awaitDepth?: number;
   // Combat damage is placed; only the end of the attack is left.
   damaged?: boolean;
@@ -190,6 +194,8 @@ export type PendingAttack = {
   shadowFrame?: string;
   // The shadow effects are resolved, and the window before combat damage has been offered.
   shadowsDone?: boolean;
+  // Extra defenders, damage marks and the attack's end, kept by the defense family (src/rules/families/defense-types.ts).
+  defense?: AttackDefense;
 };
 
 // A player attack declared and not finished: the action windows between its steps (rr.attack-resolution-chart).

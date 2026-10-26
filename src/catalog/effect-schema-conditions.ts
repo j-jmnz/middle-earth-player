@@ -1,7 +1,7 @@
 // Conditions in effect records, the targets an instruction names, and the phase names a condition reads.
 import { z } from "zod";
 
-import { pickSchema } from "./effect-schema-pick.ts";
+import { pickSchema, sphereSchema } from "./effect-schema-pick.ts";
 
 export const phaseNameSchema = z.enum([
   "Setup",
@@ -111,6 +111,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("engagedThisPhase"), is: z.boolean() }),
   // The current quest card has a printed keyword (`is`), or has none (17034:A:1).
   z.strictObject({ kind: z.literal("questKeywords"), is: z.boolean() }),
+  // Where the combat phase is (rr.combat-phase): `beforeEnemyAttacks`, before the resolving enemy attacks step; `beforeAttacksResolve`,
+  // after shadow cards have been dealt and before any attack has resolved; `afterEnemyAttacks`, once the resolving enemy attacks
+  // step is complete.
+  z.strictObject({ kind: z.literal("combatStep"), is: z.enum(["beforeEnemyAttacks", "beforeAttacksResolve", "afterEnemyAttacks"]) }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [

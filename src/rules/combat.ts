@@ -15,6 +15,9 @@ import { enemyAttackWindow, playerAttackWindow } from "./step-window.ts";
 import { inPlay } from "./zones.ts";
 import { ruleCause } from "./cause.ts";
 import { fireForced } from "./triggers.ts";
+import { undefendedExtras } from "./families/defense-damage.ts";
+import { markDefender, moreDefenders } from "./families/defense-defenders.ts";
+import { holdAttack, queueHeard } from "./families/defense-listen.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -95,11 +98,13 @@ export function beginEnemyAttack(
   return toDefense(declared, ctx);
 }
 
-// 6.4b: the attack has begun; an action window comes before the defender is declared.
+// 6.4b: the attack has begun; an action window comes before the defender is declared. "After an enemy is declared as an
+// attacker against you" is announced first, and the defense waits for its Responses (enemyAttacks).
 function toDefense(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack) return state;
-  return enemyAttackWindow(state, ctx, "defense") ?? { ...state, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
+  const begun = queueHeard(state, ctx, { trigger: "enemyAttacks", seat: attack.seat, cardId: attack.enemyId, subject: attack.enemyId });
+  return enemyAttackWindow(begun, ctx, "defense") ?? holdAttack(begun, ctx, "defense", ["enemyAttacks"]) ?? { ...begun, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
 }
 
 // The Forced effects of the attack's start are done: the defender is declared next.
@@ -147,13 +152,21 @@ export function applyDefense(
   // declared as a defender").
   const ready = flagged(state, defenderId, "noExhaustDefend");
   const declaredState = ready ? state : updateCard(state, defenderId, { exhausted: true });
-  const exhausted: ScenarioState = {
-    ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId }),
-    pendingAttack: { ...attack, defenderId },
-    window: null,
-  };
-  // 6.4.1: the defender is declared; an action window comes before the shadow card is turned up.
-  return enemyAttackWindow(exhausted, ctx, "shadow") ?? resolveAttack(exhausted, ctx, steps);
+  const exhausted: ScenarioState = markDefender(
+    {
+      ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId }),
+      pendingAttack: { ...attack, defenderId },
+      window: null,
+    },
+    defenderId,
+    ctx,
+  );
+  // A player who may declare more defenders declares them next (01038).
+  const more = moreDefenders(exhausted, ctx, steps);
+  if (more) return more;
+  // 6.4.1: the defender is declared; an action window comes before the shadow card is turned up. The Responses to the
+  // declaration ("After ~ is declared as a defender") come before the shadow card too.
+  return enemyAttackWindow(exhausted, ctx, "shadow") ?? holdAttack(exhausted, ctx, "shadow", ["declaredDefender"]) ?? resolveAttack(exhausted, ctx, steps);
 }
 
 export function applyUndefended(
@@ -314,5 +327,7 @@ export function heroIds(state: ScenarioState, seat: number): string[] {
 // undefended attacks may be assigned to it (takesUndefendedDamage).
 export function undefendedTargets(state: ScenarioState, seat: number, cards: Cards): string[] {
   const heroes = heroIds(state, seat);
-  return [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
+  const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
+  // A character another card lets take it for this player (08093), whoever controls that character.
+  return [...own, ...undefendedExtras(state, seat, cards).filter((id) => !own.includes(id))];
 }

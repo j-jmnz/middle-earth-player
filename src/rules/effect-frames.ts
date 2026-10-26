@@ -22,6 +22,7 @@ import { offerResponses } from "./responses.ts";
 import { holdsNow, seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
+import { chooseAmount } from "./families/defense.ts";
 
 export type EffectSpec = {
   frame: FrameName;
@@ -228,6 +229,9 @@ function runItemNow(
       return pick(state, item, frame, ctx);
     case "ArrangeTop":
       return arrangeTop(state, item);
+    // The actor chooses the effect's X (defense family).
+    case "ChooseAmount":
+      return chooseAmount(state, item, frame, ctx);
     default:
       return runInstruction(state, instruction, { seat: item.seat, sourceId: frame.cardId, ...(item.chosen ? { chosen: item.chosen } : {}) }, ctx, steps);
   }

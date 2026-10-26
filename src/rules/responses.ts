@@ -130,6 +130,8 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
       ...(frame.data.event.trigger === "damageDealt" && frame.data.event.cardId ? { dealt: frame.data.event.amount ?? 0, hold: frame.data.event.cardId } : {}),
       // Any other event's amount is the effect's X (the attachments an explored location had, 19026:A:2).
       ...(frame.data.event.trigger !== "damageDealt" && frame.data.event.amount != null ? { x: frame.data.event.amount } : {}),
+      // "For each point of damage he just suffered": the damage a damaged event reports.
+      ...((frame.data.event.trigger === "damaged" || frame.data.event.trigger === "damagedByAttack") && frame.data.event.amount != null ? { dealt: frame.data.event.amount } : {}),
       ...(costOfKind(effect, "playEvent") ? { finish: "discardSource" as const } : {}),
     },
     steps,

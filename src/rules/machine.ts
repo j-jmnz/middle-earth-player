@@ -42,6 +42,9 @@ import { clearEliminated, damageHeld, destroyOverwhelmed } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { engagesAgain, optionallyEngaged } from "./families/quest-engage.ts";
 import { syncThreatSaves } from "./families/quest-threat.ts";
+import { eventWaits } from "./families/defense-listen.ts";
+import { announceShadowsDealt } from "./families/defense-shadow.ts";
+import { attackedEarly, earlyAttacks } from "./families/defense-order.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -54,7 +57,8 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
         continue;
       }
     }
-    if (current.pendingEvents?.length && !current.lost && !current.stageCleared && !current.failure && canAnnounce(current)) {
+    // An event waits behind the damage it follows while that damage is still being answered (rr.cancel).
+    if (current.pendingEvents?.length && !current.lost && !current.stageCleared && !current.failure && canAnnounce(current) && !eventWaits(current)) {
       const announced = drainEvents(current, ctx, steps);
       if (announced !== current) {
         current = announced;
@@ -69,7 +73,10 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     }
     // The seats a card keeps in the game at the threat elimination level (10124:A:2).
     current = syncThreatSaves(current, ctx, steps);
-    const held = answerable ? damageHeld : undefined;
+    // A cancel already resolving holds the damage too, even when paying for it discarded the last card that could answer
+    // (Loyal Hound, 19148).
+    const resolving = current.stack.some((frame) => frame.data.kind === "effect" && frame.data.hold != null);
+    const held = answerable || resolving ? damageHeld : undefined;
     const swept = current.lost || current.failure ? current : destroyOverwhelmed(clearEliminated(current, ctx.cards), ctx.cards, steps, held);
     if (swept !== current) {
       current = swept;
@@ -192,7 +199,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "combatStart":
       return startCombat(state, ctx);
     case "combatShadows":
-      return withMode(dealShadows(state, ctx.cards), "combatActions");
+      return withMode(announceShadowsDealt(dealShadows(state, ctx.cards), ctx), "combatActions");
     case "combatActions":
       return stepWindow(state, ctx, "6.2") ?? withMode(state, "enemyAttacks");
     case "enemyAttacks":
@@ -246,6 +253,9 @@ function startCombat(state: ScenarioState, ctx: ReduceContext): ScenarioState {
 }
 
 function enemyStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // A player who attacks before enemy attacks resolve does so first (17085).
+  const early = earlyAttacks(state, ctx);
+  if (early) return early;
   const group = nextEnemyGroup(state);
   if (!group) return { ...withMode(state, "playerAttacks"), pendingAttack: null };
   if (group.enemies.length > 1) {
@@ -262,7 +272,7 @@ function enemyStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
 
 function openPlayer(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const seat = livingSeats(state).find(
-    (index) => !state.passed.includes(index) && hasLegalAttack(state, index, ctx.cards),
+    (index) => !state.passed.includes(index) && !attackedEarly(state, index) && hasLegalAttack(state, index, ctx.cards),
   );
   if (seat == null) return withMode(discardShadows(state), "refresh");
   return { ...state, window: { kind: "playerAttack" }, activeSeat: seat };

@@ -67,6 +67,12 @@ export function modifyStat(
     case "ownHeroes":
       targets = [...(state.seats[focus.seat]?.heroes ?? [])];
       break;
+    // Every hero the picked player controls (10144).
+    case "pickedPlayerHeroes": {
+      const seat = seatOf(lastPicked(state));
+      targets = seat == null ? [] : [...(state.seats[seat]?.heroes ?? [])];
+      break;
+    }
     // The character defending the attack in progress (141052:A:2).
     case "defender":
       targets = state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? [state.pendingAttack.defenderId] : [];
@@ -78,6 +84,7 @@ export function modifyStat(
       break;
     // The card the answered event was about ("that ally gets +2 Attack"), the source's host.
     case "subject":
+    case "other":
     case "host": {
       const id = refCard(state, instruction.target, frameScope(state, focus.seat, sourceId));
       targets = id ? [id] : [];

@@ -212,6 +212,39 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return "make it the active location";
     case "BarEngagement":
       return instruction.what === "checks" ? "that enemy makes no engagement checks against you" : "that enemy cannot engage you";
+    // The defense family's verbs (src/catalog/families/defense.ts).
+    case "ChooseAmount":
+      return "choose X";
+    case "SpendFromPool":
+      return `spend ${amountWords(instruction.amount)} resource${amountWords(instruction.amount) === "1" ? "" : "s"} from ${refWords(instruction.from)}`;
+    case "RedirectDamage":
+      return `place ${instruction.all ? "that damage" : `${amountWords(instruction.amount)} of that damage`} on ${refWords(instruction.to)} instead`;
+    case "PreventAttacks":
+      return instruction.who === "picked" ? "that player's engaged enemies cannot attack that player" : "that enemy cannot attack you";
+    case "DiscardShadowOf":
+      return `discard a shadow card from ${refWords(instruction.target)}`;
+    case "DealShadowTo":
+      return `deal ${refWords(instruction.target)} another shadow card`;
+    case "LookAtShadow":
+      return "look at its facedown shadow card";
+    case "StrikeBack":
+      return `${refWords(instruction.attacker)} attacks ${refWords(instruction.enemy)}`;
+    case "AddDefender":
+      return "declare it as a defender";
+    case "EndDeclaring":
+      return "declare no more defenders";
+    case "CancelAttack":
+      return "cancel the attack";
+    case "AssignAttackDamage":
+      return "it takes the damage of the attack";
+    case "ReadyUnharmed":
+      return "ready each defending character that took no damage";
+    case "ReadyAfterAttack":
+      return instruction.who === "subject" ? "ready that card after the attack" : "ready each defending character that takes no damage after the attack";
+    case "RedirectAttack":
+      return "reveal the attacking enemy's shadow card";
+    case "ModifyStatVersus":
+      return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts).
       return encounterWords(instruction);
@@ -259,6 +292,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "PlayFromHand") return { verb: "Play", prompt: "Choose a card to play from your hand." };
   if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
   if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
+  if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
   if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);
@@ -271,6 +305,13 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return next.to === "play" ? { verb: "Put into play", prompt: `Choose ${one} to put into play from your hand.` } : { verb: "Take", prompt: `Choose ${one} to put into your hand.` };
     case "PlaceUnderSelf":
       return { verb: "Place", prompt: `Choose ${one} to place facedown under ${sourceId ? names.card(sourceId) : "the location"}.` };
+    // Defenders (rr.multiple-defenders): one more declared, and the one that takes all the attack's damage.
+    case "AddDefender":
+      return { verb: "Defend", prompt: `Choose ${one} to declare as a defender.` };
+    case "AssignAttackDamage":
+      return { verb: "Assign", prompt: "Choose the defender that takes all the damage of this attack." };
+    case "SpendFromPool":
+      return { verb: "Spend", prompt: `Choose ${one} to spend a resource from.` };
     default:
       return { verb: "Choose", prompt: `Choose ${one}.` };
   }

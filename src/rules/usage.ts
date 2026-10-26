@@ -7,7 +7,7 @@ import type { EngineStep, Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, placeDamage, raiseThreat } from "./keywords.ts";
 import { deckPlayHero, markDeckPlay } from "./deck-play.ts";
-import { heroPays, validatePayments } from "./payments.ts";
+import { hasResourceMatch, heroPays, validatePayments } from "./payments.ts";
 import { distinctHeroesReason } from "./cost-rules.ts";
 import { allyPools, noteSpent } from "./families/costs-pay.ts";
 import { eventPlayReason } from "./families/costs-play.ts";
@@ -120,7 +120,9 @@ function payable(state: ScenarioState, cost: Cost, source: CardInstance, seat: n
       // Its play restrictions and its resource match first: a 0-cost event is offered only when it could be played.
       if (eventPlayReason(state, source.id, seat, ctx)) return false;
       const price = playCost(state, source.id, seat, ctx);
-      return price != null && pool(state, seat, printedOf(ctx.cards, source.code).sphere, ctx, source.id) >= price;
+      const sphere = printedOf(ctx.cards, source.code).sphere;
+      // A card that costs nothing still needs a hero with its resource icon (rr.resource-match), as the payment check says.
+      return price != null && hasResourceMatch(state, seat, sphere, ctx, source.id) && pool(state, seat, sphere, ctx, source.id) >= price;
     }
   }
 }

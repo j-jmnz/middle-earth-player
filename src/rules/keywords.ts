@@ -9,6 +9,7 @@ import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
+import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -52,6 +53,8 @@ export function modifiedStat(
   cards: ReadonlyMap<string, PrintedCard>,
   against?: string,
 ): number {
+  // "Use their Willpower instead of Defense" (06038).
+  if (stat === "defense" && defenseFromWillpower(state, instance.id)) return modifiedStat(state, instance, "willpower", cards, against);
   const printed = printedOf(cards, instance.code);
   let total = printedStat(printed, stat);
   let set: number | null = null;
@@ -61,6 +64,8 @@ export function modifiedStat(
     if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
+    // "+2 Attack while attacking that enemy": only while the holder attacks it.
+    if (modifier.against != null && modifier.against !== against) continue;
     if (modifier.set) set = modifier.amount;
     else total += modifier.amount;
     if (!modifier.set && modifier.amount > 0) floor += modifier.amount;
@@ -166,13 +171,15 @@ export function playerCardEffectCanChoose(printed: PrintedCard): boolean {
 
 export function placeDamage(
   state: ScenarioState,
-  id: string,
+  assigned: string,
   amount: number,
   cards: ReadonlyMap<string, PrintedCard>,
   steps: EngineStep[],
   source: DamageSource,
   cause: Cause,
 ): ScenarioState {
+  // Damage assigned to a card another takes for it ("attached hero takes all damage assigned to the chosen hero", 02099).
+  const id = damageGoesTo(state, assigned);
   const instance = state.cards[id];
   // Damage goes only on a card in play (rr.in-play-and-out-of-play): a defender that already left play takes none.
   if (!instance || !inPlay(instance.zone)) return state;

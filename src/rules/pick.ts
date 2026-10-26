@@ -11,6 +11,8 @@ import { isPlayerType, printedOf } from "./printed.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
+import { canDeclareDefender, isDefending } from "./families/defense-defenders.ts";
+import { facedownShadow } from "./families/defense-shadow.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
 // characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
@@ -114,7 +116,11 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
   if (spec.notHost && at.sourceId != null && state.cards[at.sourceId]?.host === id) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
-  if (spec.defending && !(state.pendingAttack?.defenderId === id && !state.pendingAttack.undefended)) return false;
+  // Every defender of the attack in progress, the extra ones too (rr.multiple-defenders).
+  if (spec.defending && !isDefending(state, id)) return false;
+  if (spec.canDefend && !canDeclareDefender(state, id, ctx.cards)) return false;
+  if (spec.facedownShadow && !facedownShadow(state, id)) return false;
+  if (spec.attackingEnemy != null && (state.pendingAttack?.enemyId === id) !== spec.attackingEnemy) return false;
   if (spec.hasAttachment) {
     const want = spec.hasAttachment;
     const found = instance.attachments.some((attachmentId) => {
@@ -197,10 +203,12 @@ export function pickCandidates(
   });
 }
 
-// The cards attached to the source, to the source's host, or to the active location.
-function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLocation", sourceId: string | null): string[] {
+// The cards attached to the source, to the source's host, to the active location, or to the defending character.
+function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLocation" | "defender", sourceId: string | null): string[] {
   const source = sourceId ? state.cards[sourceId] : undefined;
-  const holder = where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : source?.host ? state.cards[source.host] : undefined;
+  const defender = state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? state.cards[state.pendingAttack.defenderId] : undefined;
+  const holder =
+    where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : source?.host ? state.cards[source.host] : undefined;
   return holder ? holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed")) : [];
 }
 

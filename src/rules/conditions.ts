@@ -10,6 +10,7 @@ import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
+import { combatStepIs, groupResources } from "./families/defense-conditions.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -180,6 +181,9 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return condition.conditions.every((inner) => holds(state, inner, scope, ctx));
     case "any":
       return condition.conditions.some((inner) => holds(state, inner, scope, ctx));
+    // The combat step a card may be played in (09008, 02118, 143012).
+    case "combatStep":
+      return combatStepIs(state, condition.is);
     case "attachedToHero":
       return (
         Object.values(state.cards).some((card) => {
