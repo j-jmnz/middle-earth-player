@@ -16,16 +16,7 @@ const WARG_IN_STAGING = { type: "enemy", control: "any", stagingOnly: true, trai
 const ENGAGED_THIS_ROUND = { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", engagedThisRound: true } } as const;
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
-  // 142011 Sting (line 1 and the Response are generated)
-  {"id":"142011:constant:2","cardCode":"142011","lines":["142011:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"}]},
-  // 142012 Mithril Shirt
-  {"id":"142012:constant:2","cardCode":"142012","lines":["142012:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"hitPoints","amount":1,"until":"whileSourceInPlay","target":"host"}]},
-  // 142013 Glamdring (the +2 Attack is generated). The Response is the attached character's: it destroyed the Orc.
-  {"id":"142013:constant:2","cardCode":"142013","lines":["142013:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","trait":"Warrior"},{"type":"character","control":"any","names":["Gandalf"]}]}]},
-  {"id":"142013:response:1","cardCode":"142013","lines":["142013:A:3"],"timing":"response","trigger":"attackDestroyed","subject":"host","condition":{"kind":"matches","card":"other","pick":{"type":"enemy","control":"any","trait":"Orc"}},"instructions":[{"verb":"Draw","amount":1}]},
-  // 142014 Andúril (the Response is generated)
-  {"id":"142014:constant:2","cardCode":"142014","lines":["142014:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","trait":"Noble"},{"type":"character","control":"any","names":["Aragorn"]}]}]},
-  {"id":"142014:constant:3","cardCode":"142014","lines":["142014:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  // The boons 142011 to 142014 (Sting, Mithril Shirt, Glamdring, Andúril) are in src/effects/authored/families/misc.ts.
 
   // 142020 The Council of Elrond. 1B: the faceup cards are assigned in the order the card prints (played for no cost, to the owner's
   // hand, discarded, shuffled into the owner's deck); then the first player either shuffles Lust for the Ring in or each player
