@@ -42,9 +42,9 @@ export function paymentsFor(state: ScenarioState, ctx: ReduceContext, seat: numb
   return left === 0 ? out : null;
 }
 
-function playable(state: ScenarioState, ctx: ReduceContext): PlayerIntent | null {
+function playable(state: ScenarioState, ctx: ReduceContext, intents: readonly LegalIntent[]): PlayerIntent | null {
   const seat = state.activeSeat;
-  for (const intent of legalIntents(state, ctx)) {
+  for (const intent of intents) {
     if (intent.type !== "PlayCard") continue;
     const cost = playCost(state, intent.cardId, seat, ctx);
     if (cost == null) continue;
@@ -62,8 +62,8 @@ function has(intents: readonly LegalIntent[], type: LegalIntent["type"]): boolea
   return intents.some((intent) => intent.type === type);
 }
 
-function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory): PlayerIntent | null {
-  for (const intent of legalIntents(state, ctx)) {
+function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory, intents: readonly LegalIntent[]): PlayerIntent | null {
+  for (const intent of intents) {
     if (intent.type !== "Trigger") continue;
     const key = `${state.round}:${intent.cardId}:${intent.effectId}`;
     if (memory.has(key)) continue;
@@ -87,24 +87,30 @@ function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory): P
   return null;
 }
 
-export function nextIntent(state: ScenarioState, ctx: ReduceContext, options: PolicyOptions, memory: Memory = new Set()): PlayerIntent {
-  const intents = legalIntents(state, ctx);
+// `intents` is legalIntents(state, ctx), when the caller already has it.
+export function nextIntent(
+  state: ScenarioState,
+  ctx: ReduceContext,
+  options: PolicyOptions,
+  memory: Memory = new Set(),
+  intents: readonly LegalIntent[] = legalIntents(state, ctx),
+): PlayerIntent {
   const window = state.window;
   const scoutIds = new Set(Object.values(state.cards).filter((card) => card.code === options.scout).map((card) => card.id));
   switch (window?.kind) {
     case "mulligan":
       return { type: "Keep" };
     case "response": {
-      const answer = options.act ? triggerFor(state, ctx, memory) : null;
+      const answer = options.act ? triggerFor(state, ctx, memory, intents) : null;
       return answer ?? { type: "Pass" };
     }
     case "pass": {
       if (options.act) {
-        const action = triggerFor(state, ctx, memory);
+        const action = triggerFor(state, ctx, memory, intents);
         if (action) return action;
       }
       if (options.play && state.mode === "planning") {
-        const play = playable(state, ctx);
+        const play = playable(state, ctx, intents);
         if (play) return play;
       }
       // Each seat commits once, its own characters: a card committed by another seat does not count (a policy, not a rule).
