@@ -24,7 +24,10 @@ export function openBranch(state: ScenarioState, item: QueueItem, returned: numb
   const instruction = item.instruction;
   if (instruction.verb !== "Choose") return state;
   const seat = instruction.who === "firstPlayer" ? state.firstPlayer : item.seat;
-  const scope = { actor: seat, sourceId: topFrame(state)?.cardId ?? null, returned };
+  const data = effectData(state);
+  // An option may require something of the cards the effect picked or the event it answers ("If it is an enemy, you may
+  // discard it").
+  const scope = { actor: seat, sourceId: topFrame(state)?.cardId ?? null, returned, ...(data?.picked ? { picked: data.picked } : {}), ...(data?.subject ? { subject: data.subject } : {}), ...(data?.other ? { other: data.other } : {}) };
   const legal = instruction.options.filter((option) => !option.requires || holds(state, option.requires, scope, ctx));
   if (legal.length === 0) return state;
   const only = legal[0];

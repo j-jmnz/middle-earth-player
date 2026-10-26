@@ -1,8 +1,121 @@
 // The vocabulary the encounter deck: look, move, discard, search, cancel and replace revealed cards, reveal triggers adds to effect records: simple verbs, triggers and stat flags.
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
+import { z } from "zod";
 
-export const VERBS = [] as const;
+import { amountSchema, cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
+import { when } from "../effect-schema-conditions.ts";
 
-export const TRIGGERS = [] as const;
+// The printed types of the cards in an encounter deck (rr.encounter-deck).
+const encounterType = z.enum(["enemy", "location", "treachery", "objective"]);
 
-export const FLAGS = [] as const;
+const sphere = z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]);
+
+export const VERBS = [
+  // Shows the actor the top `count` cards (1 by default) of the encounter deck, or of their own deck (`deck: "own"`), in a
+  // look window they close with a pass. Nothing moves. The top card becomes the picked card ("that card", "the looked at
+  // card"), and the effect remembers every card shown (for ArrangeEncounter and PickEncounter `from: "looked"`). An empty
+  // deck shows nothing and picks nothing.
+  z.strictObject({ verb: z.literal("LookAtTop"), count: z.number().int().positive().optional(), deck: z.enum(["encounter", "own"]).optional(), ...when }),
+  // Chooses one encounter card for the instructions after it (the picked card; "" when none matches): among the top `top`
+  // cards of the encounter deck (all of it without `top`), the deck and the encounter discard pile, the cards LookAtTop
+  // showed that are still on top (`looked`), or the enemies and locations in play (`play`). It must be of `type`, non-unique
+  // with `nonUnique`, and have a Threat at most `maxThreat` (read when the choice is offered). The actor chooses; copies of
+  // one card in a deck or a pile are one choice (rr.search).
+  z.strictObject({
+    verb: z.literal("PickEncounter"),
+    from: z.enum(["deck", "deckAndDiscard", "looked", "play"]),
+    top: z.number().int().positive().optional(),
+    type: encounterType.optional(),
+    nonUnique: z.boolean().optional(),
+    maxThreat: amountSchema.optional(),
+    ...when,
+  }),
+  // The actor puts the cards LookAtTop showed that are still on top of the encounter deck back in the order they choose.
+  z.strictObject({ verb: z.literal("ArrangeEncounter"), ...when }),
+  // Moves an encounter card: the picked card, or `card` (another reference, `previous`: the card picked before the last,
+  // `deckTop` / `discardTop`: the top card of the encounter deck or of its discard pile, which then becomes the picked card).
+  // It goes to the top or the bottom of the encounter deck (face down), is shuffled into it, goes to the encounter discard
+  // pile, to the staging area, into play engaged with the actor, becomes the active location (an active location already
+  // there returns to the staging area), or goes to the victory display. A card that leaves play takes its attachments,
+  // tokens and shadow cards with it; a card that enters play is announced (encounterEnteredPlay). A player card's effect
+  // does not move a card in play that is immune to player card effects.
+  z.strictObject({
+    verb: z.literal("MoveEncounterCard"),
+    card: z.union([cardRefSchema, z.enum(["previous", "deckTop", "discardTop"])]).optional(),
+    to: z.enum(["deckTop", "deckBottom", "shuffle", "discard", "staging", "engaged", "activeLocation", "victory"]),
+    ...when,
+  }),
+  // Sets the effect's X to how many of the top `top` cards of the encounter deck are of `type` (`not`: are not).
+  z.strictObject({ verb: z.literal("CountEncounterTop"), top: z.number().int().positive(), type: encounterType, not: z.boolean().optional(), ...when }),
+  // Reveals the top card of the encounter deck for the actor, or for the player the answered event happened to
+  // (`eventSeat`), in a staging of its own (rr.reveal, rr.staging): the effect goes on once that card is resolved.
+  z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat"]).optional(), ...when }),
+  // The encounter discard pile is shuffled into the encounter deck.
+  z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), ...when }),
+  // Discards cards from the top of the encounter deck until one of `type` is discarded, or the deck is empty (rr.effects).
+  // That card becomes the picked card.
+  z.strictObject({ verb: z.literal("DiscardUntil"), type: encounterType, ...when }),
+  // The "when revealed" effects of the picked card (or `card`) resolve for the actor, as if it had just been revealed. It
+  // was not revealed from the encounter deck, so they are not offered to cancels of a card just revealed.
+  z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), ...when }),
+  // The staging step of this phase reveals `amount` fewer cards (rr.step-3-3), to a minimum of `min` (0 or 1).
+  z.strictObject({ verb: z.literal("RevealFewer"), amount: z.number().int().positive(), min: z.union([z.literal(0), z.literal(1)]), ...when }),
+  // A lasting effect on the encounter cards revealed from now until `until`, for those of `type` (any type without it):
+  // `threatZero`, the next such card added to the staging area has Threat 0 until the end of the phase; `damage`, the first
+  // such card revealed takes `amount` damage from the source; `discard`, the next card revealed is discarded without
+  // resolving its effects if it is of `type` (the effect ends with that reveal either way); `readyHost`, when such a card
+  // is revealed while the source is ready and its host exhausted, the source exhausts and its host readies.
+  z.strictObject({
+    verb: z.literal("WatchReveals"),
+    effect: z.enum(["threatZero", "damage", "discard", "readyHost"]),
+    type: encounterType.optional(),
+    amount: z.number().int().positive().optional(),
+    until: z.enum(["endOfPhase", "endOfRound"]),
+    ...when,
+  }),
+  // The players travel to the location (the picked card, or `target`) without resolving its Travel effect (rr.travel); an
+  // active location already there returns to the staging area first. Nothing happens if the players cannot travel there.
+  z.strictObject({ verb: z.literal("TravelTo"), target: cardRefSchema.optional(), ...when }),
+  // Places `amount` progress on the current quest; the active location takes it first (rr.active-location).
+  z.strictObject({ verb: z.literal("ProgressQuest"), amount: positiveAmountSchema, ...when }),
+  // The actor's threat becomes `amount` if it is lower ("set your threat equal to the engagement cost of that enemy").
+  z.strictObject({ verb: z.literal("RaiseThreatTo"), amount: amountSchema, ...when }),
+  // Lowers the actor's threat by the amount the answered encounterThreatRaised event raised it.
+  z.strictObject({ verb: z.literal("LowerThreatByRaise"), ...when }),
+  // The actor pays `amount` resources of `sphere` from the pools of heroes they control, choosing the hero when several
+  // could pay. Nothing is paid when they cannot pay it all. The last hero that paid becomes the picked card ("" when
+  // nothing was paid), so what follows can depend on the payment.
+  z.strictObject({ verb: z.literal("PayResources"), amount: z.number().int().positive(), sphere, ...when }),
+  // The event being played goes back to its owner's hand instead of the discard pile once its effect is done.
+  z.strictObject({ verb: z.literal("ReturnEventToHand"), ...when }),
+  // The picked card (the top card of the actor's deck) is played for no cost if it can be: an ally enters play, an
+  // attachment is attached to a host the actor chooses, an event's Action resolves. Otherwise it goes to the bottom of
+  // the deck.
+  z.strictObject({ verb: z.literal("PlayRevealedFree"), ...when }),
+] as const;
+
+export const TRIGGERS = [
+  // About an encounter card: it entered play, placed in the staging area once its staging resolved (rr.staging), or put
+  // into play by a player card effect (MoveEncounterCard).
+  "encounterEnteredPlay",
+  // The staging step of the quest phase ends, after its last card is resolved (rr.step-3-3).
+  "stagingStepEnds",
+  // About a location: it is the first location revealed by the encounter deck this round.
+  "firstLocationRevealed",
+  // About the seat: an encounter card effect raised its threat (the event's amount is how much).
+  "encounterThreatRaised",
+] as const;
+
+export const FLAGS = [
+  // Held by the table until the end of the phase: the staging step reveals this many fewer cards, to a minimum of 0
+  // (`revealFewer`) or of 1 (`revealFewerMinOne`).
+  "revealFewer",
+  "revealFewerMinOne",
+  // Held by the table: the lasting effects WatchReveals sets (its `when` names the type of card it watches for).
+  "watchThreatZero",
+  "watchDamage",
+  "watchDiscard",
+  "watchReadyHost",
+  // Held by the table until the end of the round: a location has been revealed by the encounter deck this round.
+  "locationRevealed",
+] as const;

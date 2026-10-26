@@ -5,6 +5,7 @@
 import type { Amount, Instruction } from "../catalog/boundary.ts";
 import { questProgressMoved } from "../rules/verbs.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
+import { encounterPickWords, encounterWords } from "./encounter-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -174,7 +175,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     case "ShuffleEncounterDeck":
       return null;
     default:
-      return null;
+      // The encounter family's verbs (src/catalog/families/encounter.ts).
+      return encounterWords(instruction);
   }
 }
 
@@ -215,7 +217,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     const name = names.code(pick.code);
     return { verb: "Shuffle in", prompt: `Choose which out-of-play ${name} is shuffled into the encounter deck. Any other copy stays where it is.` };
   }
-  if (pick.verb !== "Pick") return { verb: "Choose", prompt: "Choose one." };
+  if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);
   switch (next?.verb) {

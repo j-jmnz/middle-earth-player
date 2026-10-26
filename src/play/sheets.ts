@@ -312,7 +312,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         key: `look:${window.cardIds.join(",")}`,
         step: step(game),
         title: window.cardIds.map((id) => names.card(id)).join(", ") || "Look",
-        note: "The top of the encounter deck. Nothing moves.",
+        // A look at the top of a player's own deck (LookAtTop with `deck: "own"`) says so.
+        note: game.cards[window.cardIds[0] ?? ""]?.zone === "deck" ? "The top of your deck. Nothing moves." : "The top of the encounter deck. Nothing moves.",
         verb: "",
         options: [],
         primary: { label: "Done", intent: { type: "Pass" } },

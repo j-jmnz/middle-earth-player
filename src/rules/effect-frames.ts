@@ -11,6 +11,7 @@ import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
 import { dealOneShadow, runInstruction, type ReduceContext } from "./interpret.ts";
+import { runEncounterItem } from "./families/encounter-items.ts";
 import { discardShadowOf } from "./shadow.ts";
 import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
@@ -194,6 +195,9 @@ function runItemNow(
   steps: EngineStep[],
 ): ScenarioState {
   const instruction = item.instruction;
+  // The encounter family's verbs that ask a player to choose get the queue item, so the choice comes back to them.
+  const encounter = runEncounterItem(state, item, frame, ctx, steps);
+  if (encounter) return encounter;
   switch (instruction.verb) {
     case "Choose":
       return openBranch(state, item, returned, ctx);

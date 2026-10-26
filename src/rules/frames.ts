@@ -15,6 +15,7 @@ import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "./verbs.ts";
 import { moveCard } from "./zones.ts";
+import { announceEntered, noteEncounterThreat, revealsAllowed, watchReveal } from "./families/encounter-reveal.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.
@@ -80,12 +81,17 @@ export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: Eng
   // card is revealed (rr.step-3-3). The cursor is set first, so the step begins once.
   if (state.revealCursor == null) {
     const begun: ScenarioState = { ...state, revealCursor: { seats: livingSeats(state), index: 0 } };
-    return fireForced(begun, { trigger: "stagingStepBegins", seat: null }, ctx, steps);
+    // Responses "after the players have committed characters to the quest" (17057:A:2) are offered too, after the Forced ones.
+    const event = { trigger: "stagingStepBegins", seat: null } as const;
+    return fireForced(offerResponses(begun, event, ctx, steps), event, ctx, steps);
   }
   const cursor = state.revealCursor;
-  const seat = cursor.seats[cursor.index];
+  // "Reveal 1 less card from the encounter deck this phase" (RevealFewer) ends the step early.
+  const seat = cursor.index < revealsAllowed(state, cursor.seats.length) ? cursor.seats[cursor.index] : undefined;
   if (seat == null || state.lost || state.failure) {
-    return { ...withMode(state, "resolution"), revealCursor: null };
+    const ended: ScenarioState = { ...withMode(state, "resolution"), revealCursor: null };
+    // Responses "at the end of the staging step" (22145:A:1).
+    return state.lost || state.failure ? ended : offerResponses(ended, { trigger: "stagingStepEnds", seat: null }, ctx, steps);
   }
   const advanced: ScenarioState = { ...state, revealCursor: { seats: cursor.seats, index: cursor.index + 1 } };
   if (advanced.seats[seat]?.eliminated) return advanced;
@@ -106,6 +112,9 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       next = updateCard(next, id, { face: "up", controller: seat });
       steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
+      // The lasting effects that watch the reveals act on the card; one may discard it, ending its staging.
+      next = watchReveal(next, frame, ctx, steps);
+      if (next.stack.length < state.stack.length) return next;
       // "After an enemy is added to the staging area" hears the card arrive.
       next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
       next = patchTop(next, { step: 1 });
@@ -116,7 +125,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       let next = patchTop(state, { step: 2 });
       if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
         for (let index = 0; index < next.seatCount; index += 1) {
-          next = raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x"));
+          next = noteEncounterThreat(raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x")), index, printed.keywords.doomed, id, ctx);
         }
       }
       return next;
@@ -138,7 +147,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // covers that card's staging only, so the lock ends before surge (mec109.peril, rr.surge).
       const resolved = printed.type === "treachery" && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
       const unlocked = frame.peril && resolved.perilSeat === seat ? { ...resolved, perilSeat: null } : resolved;
-      const next = patchTop(unlocked, { step: 6 });
+      // A card still in play has entered play (rr.staging, step 3): "After a location enters play" (04060:A:1).
+      const next = patchTop(announceEntered(unlocked, id, seat, ctx), { step: 6 });
       const revealing = next.seats[seat];
       const surge = printed.keywords.surge || (frame.data.kind === "reveal" && frame.data.surge);
       if (!surge || !revealing || revealing.eliminated) return next;

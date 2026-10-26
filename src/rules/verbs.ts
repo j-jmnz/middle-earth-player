@@ -19,6 +19,7 @@ import { afterProgress } from "./stage-reveal.ts";
 import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
 import { attachTo, cardsUnder, moveCard } from "./zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "./cause.ts";
+import { noteEncounterThreat } from "./families/encounter-reveal.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
@@ -194,6 +195,8 @@ export function raiseFor(
   for (const seat of seats) {
     const count = instruction.perCommitted ? committedHeroes(next, seat, instruction.perCommitted.exceptSphere, ctx) : 1;
     next = raiseThreat(next, seat, amount * count, steps, currentCause(steps, UNATTRIBUTED));
+    // "After your threat is raised by an encounter card effect" (08062:A:1).
+    next = noteEncounterThreat(next, seat, amount * count, focus.sourceId, ctx);
   }
   return next;
 }

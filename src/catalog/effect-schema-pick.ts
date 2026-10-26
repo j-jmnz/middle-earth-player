@@ -11,8 +11,9 @@ export const sphereSchema = z.enum(["leadership", "tactics", "spirit", "lore", "
 // or only exhausted cards. `different` leaves out cards this effect has already picked. `attackableByPicked` keeps the enemies
 // the last picked character could attack. `type: player` picks a seat that is still in the game.
 export const pickSchema = z.strictObject({
-  // `attachment`: a card of the attachment type in play that the chooser controls (141071:A:2).
-  type: z.enum(["hero", "ally", "character", "enemy", "location", "player", "card", "attachment"]),
+  // `attachment`: a card of the attachment type in play that the chooser controls (141071:A:2). `treachery` and `objective`
+  // match an encounter card's printed type ("a treachery card just revealed").
+  type: z.enum(["hero", "ally", "character", "enemy", "location", "player", "card", "attachment", "treachery", "objective"]),
   control: z.enum(["you", "any", "other"]),
   // An enemy in the staging area counts too (an enemy "in play"), not only one engaged with a player.
   staging: z.boolean().optional(),
@@ -87,6 +88,8 @@ export const pickSchema = z.strictObject({
   canAttack: z.boolean().optional(),
   // An ally in a discard pile or the hand whose printed cost is X (Stand and Fight): the amount the effect names.
   cost: z.number().int().min(0).optional(),
+  // A card that prints no victory points ("a location worth no victory points").
+  noVictory: z.boolean().optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;
