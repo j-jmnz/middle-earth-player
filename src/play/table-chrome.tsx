@@ -57,6 +57,12 @@ export function PhaseRail({ rail, narrow = false, onPress }: { rail: Rail; narro
           {rail.previous}
         </Text>
       )}
+      {/* Until the phase carousel (phase 20) the round is "R3" before the step; the label says it in words. */}
+      {narrow ? null : (
+        <Text testID="rail-round" className="ml-2 text-label text-muted">
+          {`R${rail.round}`}
+        </Text>
+      )}
       {/* With the turn reference behind it, the current step sits in a hairline pill: it reads as something to tap. */}
       <Animated.View
         key={rail.current}

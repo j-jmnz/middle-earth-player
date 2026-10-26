@@ -3,6 +3,12 @@ import { describe, expect, it } from "vitest";
 import { backStep } from "./back.ts";
 
 describe("hardware Back on the table", () => {
+  it("closes the table menu before anything else, even a card preview", () => {
+    expect(backStep({ menuOpen: true, previewOpen: true, infoOpen: true, logOpen: true, pileOpen: true, overlayOpen: true, panelOpen: true })).toBe("closeMenu");
+    expect(backStep({ menuOpen: false, previewOpen: true, infoOpen: true, logOpen: true, pileOpen: true, overlayOpen: true, panelOpen: true })).toBe("closePreview");
+    expect(backStep({ menuOpen: true, logOpen: false, pileOpen: false, overlayOpen: false, panelOpen: false })).toBe("closeMenu");
+  });
+
   it("closes a reading panel, the log, then a pile's list, then a sheet opened from the table, then folds the panel, then leaves", () => {
     expect(backStep({ infoOpen: true, logOpen: true, pileOpen: true, overlayOpen: true, panelOpen: true })).toBe("closeInfo");
     expect(backStep({ logOpen: true, pileOpen: true, overlayOpen: true, panelOpen: true })).toBe("closeLog");

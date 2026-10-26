@@ -20,11 +20,13 @@ import type { SheetNames } from "../play/sheet-types";
 import type { ReduceContext, TableStore } from "../play/store";
 import { TableCanvas } from "../play/table-canvas";
 import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
-import { ChromeButton, PhaseRail, ThreatRing, threatLine } from "../play/table-chrome";
+import { threatLine } from "../play/table-chrome";
 import { MomentBanner, TableDock } from "../play/table-dock";
 import { LogPanel, PileList, ReferencePanel, SidePanel, ThreatPanel } from "../play/table-panel";
 import { turnReference } from "../play/reference";
 import { tableSettings } from "../play/table-settings";
+import { TableMenu } from "../play/table-menu";
+import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows, threatVerdict } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
@@ -32,6 +34,7 @@ import { locationReadout, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { Screen } from "./chrome";
+import { TableTopBar, TOP_BAR } from "./table-top-bar";
 import { goBack } from "./go-back";
 import { enqueueImageDownloads } from "./images/queue";
 import { scanAssets } from "./images/scan-map";
@@ -39,7 +42,6 @@ import { cachedImage, useImageSnapshot } from "./images/store";
 import type { World } from "../campaign/world";
 import type { CardFacts } from "./open-game";
 
-const TOP_BAR = 44;
 // Under this height a panel covers the top bar too, so its options have room.
 const SHORT = 400;
 
@@ -78,6 +80,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const ctx = session.ctx;
 
   const [logOpen, setLogOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   // A reading panel over the table's right side: the threat panel (a tap on a dial) for a seat.
   const [reading, setReading] = useState<{ kind: "threat"; seat: number } | { kind: "reference" } | null>(null);
   const settings = useStore(tableSettings, (state) => state.settings);
@@ -121,6 +124,18 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   );
   const lines = useMemo(() => (logOpen ? logLines(roundSteps, logNames) : []), [logOpen, roundSteps, logNames]);
 
+  // A menu row closes the menu and then acts (src/play/table-menu-items.ts).
+  const onMenuRow = useCallback(
+    (id: MenuItemId) => {
+      setMenuOpen(false);
+      if (id === "leave") goBack(router, nav.back);
+      else if (id === "log") setLogOpen(true);
+      else if (id === "rules") router.push("/glossary");
+      else if (id === "booklet") router.push({ pathname: "/booklet/[id]", params: nav.booklet });
+      else setReading({ kind: "reference" });
+    },
+    [router, nav],
+  );
   const onOutcome = useCallback(() => router.replace(nav.outcome), [router, nav]);
   const onPile = useCallback((id: string) => {
     if (id === "discard" || id === "encounterDiscard") setPile(id);
@@ -131,12 +146,18 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      if (preview) {
-        setPreview(null);
-        return true;
-      }
-      const step = backStep({ infoOpen: reading != null, logOpen, pileOpen: pile != null, overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen });
-      if (step === "closeInfo") setReading(null);
+      const step = backStep({
+        menuOpen,
+        previewOpen: preview != null,
+        infoOpen: reading != null,
+        logOpen,
+        pileOpen: pile != null,
+        overlayOpen: choice.overlayOpen,
+        panelOpen: choice.panelOpen,
+      });
+      if (step === "closeMenu") setMenuOpen(false);
+      else if (step === "closePreview") setPreview(null);
+      else if (step === "closeInfo") setReading(null);
       else if (step === "closeLog") setLogOpen(false);
       else if (step === "closePile") setPile(null);
       else if (step === "closeOverlay") choice.closeOverlay();
@@ -145,7 +166,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [preview, reading, logOpen, pile, choice, router, nav]);
+  }, [menuOpen, preview, reading, logOpen, pile, choice, router, nav]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -160,7 +181,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       .join(","),
   );
   const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
-  const ticksOf = (_seat: number): readonly number[] => ticks;
   const widgets = widgetReadouts(game);
   const locations = locationReadout(game);
   const threatText = threatLine(threats, widgets.life);
@@ -191,36 +211,19 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   return (
     <Screen testID="table" scene="felt" inset={false}>
       <View className="flex-1" style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
-        <View className="flex-row items-center px-2" style={{ minHeight: TOP_BAR }}>
-          <ChromeButton label={`‹ ${nav.backLabel}`} testID="table-back" accessibilityLabel={nav.backAccessibilityLabel} onPress={() => goBack(router, nav.back)} />
-          <View className="flex-row">
-            {threats.map((threat) => (
-              <ThreatRing
-                key={threat.seat}
-                threat={threat}
-                label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
-                accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
-                active={threats.length > 1 && threat.seat === seat}
-                compact
-                ticks={ticksOf(threat.seat)}
-                onPress={() => setReading({ kind: "threat", seat: threat.seat })}
-              />
-            ))}
-            {widgets.life != null ? <ThreatRing threat={{ seat: 0, threat: widgets.life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
-            {widgets.burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: widgets.burdenDeck, eliminated: false }} label="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
-          </View>
-          <PhaseRail rail={rail} narrow={narrow} onPress={() => setReading({ kind: "reference" })} />
-          {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}
-          <ChromeButton label="Log" testID="log-open" tone="gold" accessibilityLabel="This round's log" onPress={() => setLogOpen(true)} />
-          <ChromeButton label="Rules" testID="rules-open" tone="gold" accessibilityLabel="Look up a rule" onPress={() => router.push("/glossary")} />
-          <ChromeButton
-            label="Booklet"
-            testID="booklet-open"
-            tone="gold"
-            accessibilityLabel="Open the booklet"
-            onPress={() => router.push({ pathname: "/booklet/[id]", params: nav.booklet })}
-          />
-        </View>
+        <TableTopBar
+          threats={threats}
+          seat={seat}
+          life={widgets.life}
+          burdenDeck={widgets.burdenDeck}
+          rail={rail}
+          narrow={narrow}
+          ticks={ticks}
+          menuOpen={menuOpen}
+          onThreat={(threatSeat) => setReading({ kind: "threat", seat: threatSeat })}
+          onRail={() => setReading({ kind: "reference" })}
+          onMenu={() => setMenuOpen((open) => !open)}
+        />
         <View className="min-h-0 flex-1 flex-row">
           <View className="min-h-0 flex-1" onLayout={onLayout}>
             {size ? (
@@ -335,6 +338,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           />
         </View>
       ) : null}
+      <TableMenu open={menuOpen} nav={nav} top={insets.top + TOP_BAR} right={insets.right + 8} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       {/* Over the table and any open panel, centered on the screen under the top bar. */}
       {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} onBeat={choice.onBeat} /> : null}
       {preview && previewed && shown ? (
