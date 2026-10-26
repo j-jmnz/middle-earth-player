@@ -113,13 +113,13 @@ Profile the pool fling and the table drag on a physical phone before closing ste
 ## Repository layout
 
 ```
-src/rules/        pure TS. Core round, windows, keywords, effect interpreter.
-src/campaign/     pure TS. Registry, log, pool, saga validators, resolution.
-src/effects/      generated/ (written by data:build from sentence templates) and authored/ (records for the rest). Data, not UI.
-src/catalog/      Zod schemas, including Card, Effect, Instruction, Condition, Cost, ScenarioData and ScenarioDefinition. One drizzle-orm/sqlite-core catalog schema.
-src/play/         Skia table, phase rail, Hide sheet, life tracker, choice sheet.
-src/screens/      Expo Router. Campaigns, briefing, table, resolution, log, pool, decks.
-data/             committed. sources.json, raw/ (verbatim snapshots), cards/, scenarios/, campaigns/, rules/, overrides.json.
+src/rules/        pure TS. Core round, windows, keywords, effect interpreter. rules/families/<family>*.ts hold the engine half of each mechanic family.
+src/campaign/     pure TS. Registry, log, pool, saga validators, resolution, standalone games, the playable list, goldens (golden/) and Maestro save fixtures (fixtures/).
+src/effects/      generated/ (written by data:build from sentence templates) and authored/ (records for the rest: one file per box scenario, authored/families/<family>.ts for the families' cards, authored/pool/<pack>.ts for the player pool). open-lines.ts lists the printed lines no record owns. Data, not UI.
+src/catalog/      Zod schemas, including Card, Effect, Instruction, Condition, Cost, ScenarioData and ScenarioDefinition. One drizzle-orm/sqlite-core catalog schema. catalog/families/<family>.ts hold each family's verbs, triggers and flags (index.ts composes them).
+src/play/         Skia table, phase rail, sheets, widgets (life, burden deck, active locations), choice words.
+src/screens/      Expo Router. Campaigns, Scenarios, briefing, table, resolution, log, pool, decks, rules.
+data/             committed. sources.json, raw/ (verbatim snapshots), cards/, scenarios/, campaigns/, decks/, printed/, rules/, starter-decks.json, prebuilt-decks.json, overrides.json.
 scripts/data/     sync (network), build, check, query, effect templates and drafts.
 scripts/build-catalog.ts   data/ -> assets/catalog.db, offline
 assets/catalog.db          generated, gitignored
@@ -146,11 +146,12 @@ type Save = {
 // The open scenario is not stored as a table. Loading rebuilds the start from the log and the decks, then replays
 // the intents through the reducer (src/campaign/replay.ts).
 type ActiveScenario = {
-  engineVersion: number;         // ENGINE_VERSION in src/rules/version.ts
+  engineVersion: number;         // ENGINE_VERSION in src/rules/version.ts (6 today)
   dataHash: number;              // the catalog version the intents were played against
   seed: number;
   intents: PlayerIntent[];       // every intent sent, Keep included, in order
 };
+
 
 type CampaignLog = {
   heroesBySeat: string[][];      // RingsDB codes, length seatCount
@@ -206,8 +207,9 @@ A standalone game is one deal of one scenario, outside any campaign (`src/campai
 Zones are real objects, not a map of string-keyed piles copied four times.
 
 - Seat: threat, deck, hand, discard, heroes, play area (allies and attachments), engaged enemies. From Breaking of the Fellowship stage 2B, also that seat's staging area and quest stage. Model the per-seat slots from the first rules slice, even if the first playtest is true solo.
-- Shared, until a script says otherwise: staging area, active location (a second active-location slot only when the script says so), quest deck and current stage, encounter deck and discard, victory display, set aside, removed from the game.
-- Optional, declared by the script: burden deck, Ring-bearer life tracker, extra encounter deck.
+- Shared, until a script says otherwise: staging area, active location (a second active-location slot only when the script says so), quest deck and current stage, encounter deck and discard, victory display, set aside, removed from the game, the campaign card next to the quest deck (zone `campaign`, only while it has an ability that works during the scenario).
+- Optional, declared by the script: burden deck, Ring-bearer life tracker, extra encounter deck, the captive zone (the Ring-bearer and its attachments facedown under the Watcher in the Water, phase 14).
+- A seat's player side quest sits in its quest area (zone `seatQuest`), and a contract is in its play area from the start (Player side quests, contracts and saga cards, below). The full list is `ZoneName` in `src/rules/state.ts`.
 - Created by a card line: cards facedown under a location. Weather Hills (141049:A:1) prints "place 1 non-unique enemy in play facedown under this location. While an enemy is under this location, it is out of play", and 141049:A:2 returns each one to the staging area face up after the location leaves play. The engine holds such a card in the zone `under`, with the location as its host; it is out of play and is not one of the location's attachments. It is not a widget: the table draws nothing for it, and A Knife in the Dark adds no widget.
 
 A card instance has: instance id, catalog code, zone, exhausted, damage, progress, resources, host, attachment ids, committed to the quest, shadow card id if it is an enemy, face, controller. Control is not the same thing as in play. The Ring-bearer can be in play, facedown, under Watcher in the Water, and controlled by nobody. Tokens on that hero are discarded when the quest card says to discard them. Attached cards go with the hero and are also uncontrolled while the hero is facedown.
@@ -246,7 +248,7 @@ The table's Undo (user request, 2026-10-25) takes back the last accepted intent,
 
 ### Engine steps
 
-These are the verbs inside the reducer and inside effect instructions. They are not buttons.
+These are the core verbs inside the reducer and inside effect instructions. They are not buttons. The full vocabulary is the instruction schema in `src/catalog` and its families (Effects, below).
 
 `Draw`, `GainResources`, `PayCost`, `PlayAlly`, `Attach`, `Exhaust`, `Ready`, `Commit`, `RevealStaging`, `PlaceProgress`, `RaiseThreat`, `Travel`, `Engage`, `DealShadow`, `DeclareDefender`, `DealDamage`, `Attack`, `AdvanceStep`, `ResolveEffect`.
 
@@ -445,7 +447,7 @@ When both decks are used together, the booklet says to replace the three copies 
 
 The builder is a root route beside the campaign list.
 
-`deck_legal` is set at catalog build for `hero`, `ally`, `attachment`, `event`, and the later official player types (contracts, player side quests, treasures) once those `type_code` values are confirmed from a live pack payload. `Campaign`, encounter, quest, and nightmare rows are not deck-legal. TBR's pack file mixes heroes with `type_name: "Campaign"`. Filter those out in the build script, not in the UI.
+`deck_legal` is set at catalog build for `hero`, `ally`, `attachment`, `event`, `contract`, `player-side-quest` and `treasure` rows (`src/catalog/deck-legal.ts`; a treasure typed `Campaign` is not). `Campaign`, encounter, quest, and nightmare rows are not deck-legal. TBR's pack file mixes heroes with `type_name: "Campaign"`. Filter those out in the build script, not in the UI.
 
 A deck saves at any stage, so a deck can be built over several sittings (user decision, 2026-10-25). The deck list and the editor say whether it is ready to play, and name the first rule it breaks ("Needs 3 more cards"); the briefing does not offer a deck that is not ready. Adding a copy past the copy limit, a hero twice, or a fourth hero is refused at the tap, with a sentence naming the card and the rule, and does not change the deck.
 
@@ -453,7 +455,7 @@ Universal rules, which decide whether a deck is ready to play, are the Rules Ref
 
 - One to three heroes, no two with the same title.
 - At least 50 other cards.
-- At most three copies of a title, across its printings, and never more than the card's `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check. Official contract decks that change the hero count or the copy limit are a known limit of this proof of concept. Do not invent that support here.
+- At most three copies of a title, across its printings, and never more than the card's `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check. A contract in the deck is no deck card and does not count toward the minimum; at most one. The deckbuilding rules printed on its side A are `DeckRule` instructions on its records (no allies, copies by title, one starting hero or four, different spheres, an exact or larger size, cards per sphere) and change these checks (`src/catalog/deck-rules.ts`, `deck-save.ts`).
 - A card's sphere does not have to match a hero to be saved. It needs a hero of that sphere to be played (`rr.resource-match`), which the table checks. Saga rules still run on the briefing loadout, not on this save.
 - A restriction record on a card (trait, sphere, campaign) is enforced when that record exists. If the printed deckbuilding limit has no record yet, the card can still be saved and carries the inactive-text mark. Do not invent a restriction, and do not ask the player to enforce it at the table.
 
@@ -486,6 +488,7 @@ Filters on the pool screen: name, sphere, type, pack or cycle, trait, cost, uniq
 type Effect = {
   id: string; // "<code>:<timing>:<n>", unique
   cardCode: string;
+  lines: string[]; // the ledger lines it implements, "<code>:<side>:<n>"; at least one
   timing:
     | "setup"
     | "forced"
@@ -496,14 +499,19 @@ type Effect = {
     | "shadow"
     | "constant"
     | "questResolution"
+    | "campaignSetup"  // the Setup printed on a campaign card
+    | "resolution"     // the Resolution printed on a campaign card
     | "travel"
     | "engagement"
     | "beginningOfPhase"
     | "endOfPhase"
     | "endOfRound";
-  trigger?: "revealed" | "hideFailed" | "hideSucceeded" | "traveled" | "leftPlay" | "endOfPhase" | "endOfRound" | "firstPlayerTokenPassed";
-  limit?: "oncePerPhase" | "oncePerRound";
-  cost?: Cost;
+  trigger?: Trigger;  // the engine event it answers; the list is `triggerSchema` plus the families' TRIGGERS
+  limit?: Limit;      // oncePerPhase, oncePerRound, oncePerRoundEachPlayer, twicePerPhase, oncePerAttack, oncePerGame, ... (`limitSchema`)
+  cost?: Cost | Cost[];
+  subject?: "self" | "host" | PickSpec;  // which card the event must be about
+  anyPlayer?: boolean;                   // any player may use this Action or Response
+  fromHand?: true;                       // used from the owner's hand only
   cancel?: { cost: number; sphere?: Sphere; unless?: Condition }; // the first player may pay to cancel it
   condition?: Condition;
   instructions: Instruction[];
@@ -514,19 +522,29 @@ type Effect = {
 
 `constant` is a while-in-play modifier. It appends a record to the modifier list. The engine rebuilds those records from the effect list after every intent, so they follow the source card and its condition. Hide numbers (the X, the discarded threat, the committed willpower) are held by the table or by a seat in the same list. A constant that forbids something (`Restrict`: advance, travel, attach, hero limit, defend) is checked where the thing happens; a bar that falls on other cards (cannot attack, take damage, take non-combat damage, be engaged, be optionally engaged) is a flag on the modifier list of each card it bars. A card's stat below 0 counts as 0, and a stat set to a value (`SetStat`) overrides every other modifier (`rr.modifiers`). A constant whose condition is "while this card is in the victory display" works from there (141046:A:2, `rr.in-play-and-out-of-play`). A lasting effect of an encounter card on "each ally" also holds for allies that enter play later (`rr.lasting-effects`). A response names the event it answers in `trigger`.
 
-An Action or Response may name a `cost` (exhaust or discard the card, add it to the victory display, or pay resources from the heroes the player names) and a `limit`. The cost is paid when the effect is triggered, and the use is recorded for the limit. A Response window offers each Response a seat may use after an event; a pass gives up all of that seat's offers for it. Peril limits who is offered. Instructions are engine verbs. The verb list grows when a dealt card or a starter card needs a verb. That growth stays inside this interpreter. There is no second language. Scenario 1 needs static modifiers, a response trigger, cancel, and delayed instructions.
+An Action or Response may name a `cost` (exhaust or discard the card, add it to the victory display, or pay resources from the heroes the player names) and a `limit`. The cost is paid when the effect is triggered, and the use is recorded for the limit. A Response window offers each Response a seat may use after an event; a pass gives up all of that seat's offers for it. Peril limits who is offered. Instructions are engine verbs. The vocabulary (verbs, triggers, stat flags) is split by mechanic family: `src/catalog/families/<family>.ts` declares each family's share (encounter, costs, quest, defense, attachments, attack, play, deck, sidequests, misc, burden, south) and `index.ts` composes them; `src/rules/families/<family>*.ts` runs them and `src/effects/authored/families/<family>.ts` holds their records (`docs/plans/effect-authoring.md`). The verb list grows when a dealt card or a starter card needs a verb. That growth stays inside this interpreter. There is no second language. Scenario 1 needs static modifiers, a response trigger, cancel, and delayed instructions.
 
 The Zod schemas for `Effect`, `Instruction`, `Condition`, `Cost`, and `ScenarioDefinition` live in `src/catalog`. `src/effects` exports the generated records plus the authored ones, an authored id replacing a generated one. The interpreter takes the effect list as an argument and does not import `src/effects`; `src/campaign`, `src/play` and `src/screens` import it and pass it in. There is no effects table in `catalog.db`.
 
 Gandalf's Delay (141078) has two Setup records: the placement in staging, and `ReduceOpeningHand` amount 1. It is cited to MEC109 #46 (user-accepted). RingsDB's row for 141078 differs from the MEC109 printing on the starting-hand rule; the MEC109 printing wins (user decision). The engine applies it with player Setup, before the opening hand, so the opening hand and a mulligan redraw both draw 6 minus the reduction. The same holds in a later scenario, where the campaign pool has shuffled it into the encounter deck: it is in the encounter deck at the beginning of the game, so its hand sentence counts before the hands are drawn and the encounter search places it after them (`mec109.setup`).
 
-Frodo Baggins (141001) is in every game as the Ring-bearer, so his Response is a record like a dealt card's: after a card is revealed from the encounter deck, before any of its effects (keywords included) resolve, his controller may spend 1 Fellowship resource and exhaust The One Ring to cancel them; the card is shuffled back and the same seat reveals another. The other saga Frodo (142001) is in the ledger and has no record yet; his text is inactive.
+Frodo Baggins (141001) is in every game as the Ring-bearer, so his Response is a record like a dealt card's: after a card is revealed from the encounter deck, before any of its effects (keywords included) resolve, his controller may spend 1 Fellowship resource and exhaust The One Ring to cancel them; the card is shuffled back and the same seat reveals another. The other saga Frodo (142001) has a record too: when he defends, exhaust The One Ring and spend a Fellowship resource, and the attack deals no damage.
 
 3. **Player cards with an open line.** Every deck-legal player card is automated (user decision, 2026-10-26). A card outside the box has no scan-read ledger entry: its printed lines are its source text written to the ledger's conventions (`scripts/data/printed/pool.ts`, one ability per line, icons as words), and its records live in `src/effects/authored/pool/<pack>.ts`. Templates read the pool's lines like the box's. While a line has no record it is listed in `src/effects/open-lines.ts` (`pnpm effects:open` rewrites it; the coverage test checks it): the card can be paid for, played, quested, defended, and attacked with using printed numbers and implemented keywords, and its unique text is marked inactive. When the record exists, the ability becomes a normal legal intent or a normal engine step.
 
 A player card outside the box that the player's own decks play can be brought into scope on request: it joins `PLAYER_REQUESTS` in `scripts/data/printed/scope.ts`, `pnpm data:sync scans` pins its scan, its lines are read into the ledger, and it gets a record like any other (user request, 2026-10-25). The first is The Shirefolk (19121): "Play only if each of your heroes is a Hobbit" is the `heroesAll` condition on its Action, so it cannot be played otherwise, and it reduces its player's threat by 4.
 
 Campaign-dealt cards cannot be inactive. That includes encounter cards, quest cards, boons, burdens, and The One Ring. A missing effect id there fails the coverage test, and the scenario stays unplayable.
+
+### Player side quests, contracts and saga cards
+
+These are supported by the engine and the catalog (families `sidequests` and `misc`; every deck-legal card is in scope, user decision 2026-10-26). The Rules Reference in `data/rules` has no span for side quests or contracts, so the rules follow the printed cards and the Learn to Play; the Battle, Siege and Guarded (X) keywords follow `hon.battle`, `hon.siege` and `hon.archery` (the Heirs of Númenor rulesheet) and `wor.guarded-x` (the Wilds of Rhovanion rulesheet).
+
+- A player side quest sits in its player's quest area (zone `seatQuest`). Characters commit to it instead of the current quest; their Willpower (or attack for Battle, defense for Siege, `QuestsWith`) is placed on it as progress, not compared with staging threat, and it is defeated when its progress reaches its quest points.
+- A contract starts in its player's play area, outside the deck, showing side A; its own abilities flip it (`FlipCard`), and each side's records carry a `faceUp` condition. Its side A deckbuilding rules are checked on save (Deckbuilding, above).
+- A card with the Encounter keyword is set aside at the start and a player card effect shuffles it into the encounter deck, where it is revealed like an encounter card (`EncounterKeyword`). `VictoryLimit` and `InPlayLimit` cap copies in the victory display and in play.
+- Saga cards the box does not deal (The One Ring and Master cards, collection heroes) are records in the `misc` family.
+- Messenger of the King: the `(MotK)` hero versions of unique allies (pack `MotKA`) and the Messenger of the King contract (22134) are not in the card pool (`outOfScope` in `data/overrides.json`, user decision 2026-10-26).
 
 ### Window stack
 
@@ -536,7 +554,7 @@ Forced effects in the current window run in timestamp order. Responses are offer
 
 `scripts/effect-coverage.test.ts` reads the printed lines from `data/cards` and the dealt cards from `data/scenarios`, with no database. From phase 8c it checks line ownership against the ledger: every printed line is owned by a record, an implemented keyword, or an `inert` ledger entry with a reason. A campaign is not marked playable unless that test finds an effect record for every printed line on its quest deck, encounter deck, burden deck, and the seeded starter decks, and for every Setup, Forced, When Revealed, Response, Action, Travel and shadow label by timing. `pnpm effects:draft <scenario | starter deck id | pack | codes>` writes a bundle under `.agent/drafts` for each line no template reads; the `effect-author` agent turns a bundle into authored records. A player deck that contains other official cards does not fail this test; the open-lines list names what is left, and it is meant to reach empty (user decision, 2026-10-26).
 
-Author effects in scenario order. Scenario 1 and both starter decks are the first playable slice. Scenarios 2 through 6 reuse the keyword framework.
+Author effects in scenario order. Scenario 1 and both starter decks were the first playable slice; scenarios 2 to 4 are done, and 5 and 6 reuse the same framework (their lines are the box's share of `open-lines.ts`).
 
 ## Data sources
 
@@ -547,7 +565,7 @@ Author effects in scenario order. Scenario 1 and both starter decks are the firs
 | Packs, player cards, codes, errata, RingsDB images | RingsDB public API |
 | Every card as typed JSON, the MEC109 printing, Normal, Easy and Nightmare counts per scenario | Hall of Beorn export |
 | Card database, scenario load lists by pile, framework steps, automation snippets, card art | DragnCards LOTR plugin |
-| Procedures and definitions | MEC109 booklet, core-set Learn to Play, Rules Reference, FAQ, Easy mode, campaign log (PDFs, extracted per page) |
+| Procedures and definitions | MEC109 booklet, core-set Learn to Play, Rules Reference, FAQ, Easy mode, campaign log, and the keyword rules of two rulesheets (Heirs of Númenor, Wilds of Rhovanion) (PDFs, extracted per page) |
 
 Sources disagree. The build cross-checks them (Hall of Beorn counts against the DragnCards load lists, piles against the quest card's Setup text) and a scenario that fails a check is not written. Each resolved disagreement is a row in `data/overrides.json` with its reason and source.
 
@@ -579,7 +597,7 @@ Open `catalog.db` and `user.db` as two handles, both reachable from screens. Do 
 
 `booklets` is one row per book: id, path, original filename, byte size, sha256, page count, and last page. One file per book lives in the document directory under `booklets/`. Those bytes stay eligible for backup. A catalog update does not delete the row or the file. The picker cache is not the store. Copy the picked file into `booklets/` before recording the row. The ids for this box are `fellowship-of-the-ring` (MEC109) and `learn-to-play` (the core-set book). A later campaign adds its own id. When the build carries the book and no stored file is there, opening the reader copies the bundled PDF into `booklets/` through the same path as a picked file. A book the player added stays. Gitignore the PDFs.
 
-`catalog.db` tables: `packs`, `cards`, `effects`, `scenarios`, `campaigns`, `meta`. No decks, no saves, no image bytes. `cards.deck_legal` is true for builder types. `cards.campaign_id` is set only for rows a campaign owns. One `drizzle-orm/sqlite-core` schema in `src/catalog` defines those tables. The script opens it with `better-sqlite3`. The phone opens the same tables with `expo-sqlite`, read-only. RingsDB payloads are cached in a gitignored directory. A re-run with that cache present does not refetch. CI fetches on a miss.
+`catalog.db` tables: `packs`, `cards`, `campaigns`, `meta`. No decks, no saves, no image bytes, no effects (records are code in `src/effects`) and no scenarios (they are `data/scenarios`, read by `src/campaign`). `cards.deck_legal` is true for builder types. `cards.campaign_id` is set only for rows a campaign owns. One `drizzle-orm/sqlite-core` schema in `src/catalog` defines those tables. The script opens it with `better-sqlite3`. The phone opens the same tables with `expo-sqlite`, read-only. RingsDB payloads are cached in a gitignored directory. A re-run with that cache present does not refetch. CI fetches on a miss.
 
 Schema changes to `catalog.db` are a new file, not an in-place migration. Schema changes to `user.db` are migrations.
 
@@ -596,7 +614,7 @@ Chrome follows [design-system.md](design-system.md). Phase 17 writes that file f
 | Route | Behavior |
 | --- | --- |
 | Campaign list | Root. Reads campaigns and saves. It does not scan `cards`. Fellowship is playable. Later campaigns may show as locked, with name and scenario count. Locking does not hide cards. The playthrough written last says what is next and does it in one tap: Resume opens the table on its open scenario, Begin the briefing of its current scenario, and a finished campaign its path; its path and log are one tap each. Archives a playthrough out of the open list and restores it as it was, log and open scenario included. Deletes a playthrough, open or archived, only after a second, explicit confirm; a delete cannot be undone and leaves the decks. |
-| Scenarios | Root tab beside the campaign list. A game in progress sits on top (Resume). Then the box's scenarios in book order; a playable one opens the standalone briefing, the others read "Not playable yet". Under them the finished games, newest first, each with its result and score and Play again. Manage turns each into Archive and Delete; archived games sit under "Archived · n" with Restore and Delete. A delete is asked a second time and cannot be undone; it leaves the decks. |
+| Scenarios | Root tab beside the campaign list. A game in progress sits on top (Resume). Then the box's scenarios in book order; a playable one opens the standalone briefing, the others (5 and 6 today) read "Not playable yet". Under them the finished games, newest first, each with its result and score and Play again. Manage turns each into Archive and Delete; archived games sit under "Archived · n" with Restore and Delete. A delete is asked a second time and cannot be undone; it leaves the decks. |
 | Standalone briefing | The briefing without a campaign: stages, sets and counts, special rules, Easy or Normal, True solo or Two-handed, a saved deck per seat and the Ring-bearer slot, validator errors that name the card. No checklist, penalty or choices. Deal writes a new game and opens its table. |
 | Standalone outcome | Victory with the score and its parts, or Defeat with the reason. The result asks for nothing, so it is written as the screen opens; Done returns to Scenarios and Play again opens the briefing with the same choices. Nothing is written to a campaign. The table's last sheet for a standalone win says "The scenario is won." and See the score, never the campaign card's rewards. |
 | Campaign path | Six nodes in book order: locked, current, or completed. A completed node shows the reward that was chosen. The pool sits under the path. The log is one tap away, not a settings page. Opens a stored booklet and returns here on close. |
@@ -612,6 +630,8 @@ Chrome follows [design-system.md](design-system.md). Phase 17 writes that file f
 | Deck | Subsections in order: Heroes (up to three slots at the top, an empty one opens the pool on heroes), Allies, Attachments, Events, each with its count and Add. Count against 50, starting threat, ready to play or the rule it breaks, cards grouped by type with − and + on each. Copy limit by title, refused at the tap. Saga-only badge. Saves at any stage without a campaign check; Back with unsaved changes asks Save, Discard or Keep editing. |
 
 ## Build order
+
+State: steps 1 to 5 are built, and step 6 is built for scenarios 2 to 4 (engine halves merged; phone checks and Maestro runs open in the cloud sessions that built them). Scenarios 5 and 6 are not started. `docs/phases/STATUS.md` is the record.
 
 Do these in order. Do not start the Skia table before step 3 is green. Do not start scenario N+1 before scenario N's coverage test is green. The slice-by-slice work orders are in `docs/phases/`. What is active and what is done is in `docs/phases/STATUS.md`. Work one file until its exit is green.
 
