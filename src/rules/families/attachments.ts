@@ -4,7 +4,7 @@ import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import type { ScenarioState } from "../state.ts";
 import type { Focus } from "./index.ts";
-import { attachSourceTo, guardWith, putAttachmentIntoPlay } from "./attachments-play.ts";
+import { attachSourceTo, guardWith } from "./attachments-play.ts";
 import { answerQuestProgress } from "./attachments-quest.ts";
 import { declareAttack, healAmong } from "./attachments-verbs.ts";
 
@@ -19,8 +19,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attachSourceTo(state, instruction, focus, ctx);
     case "GuardWith":
       return guardWith(state, instruction, focus, ctx, steps);
-    case "PutAttachmentIntoPlay":
-      return putAttachmentIntoPlay(state, instruction, focus, ctx, steps);
     case "HealAmong":
       return healAmong(state, instruction, focus, ctx);
     case "ChooseAttackers":

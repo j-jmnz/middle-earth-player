@@ -44,7 +44,7 @@ function engageTrap(code: string): Effect[] {
 function guarded(code: string, lines: string[], types: ("enemy" | "location")[], constant: number): Effect[] {
   return [
     { id: `${code}:constant:${constant}`, cardCode: code, lines, timing: "constant", instructions: [{ verb: "Guarded", types }] },
-    { id: `${code}:triggered:1`, cardCode: code, lines: [lines[0] ?? ""], timing: "triggered", trigger: "unguarded", instructions: [{ verb: "PutAttachmentIntoPlay", card: "self", unguarded: true }] },
+    { id: `${code}:triggered:1`, cardCode: code, lines: [lines[0] ?? ""], timing: "triggered", trigger: "unguarded", instructions: [{ verb: "PutIntoPlay", card: "self", unguarded: true }] },
   ];
 }
 
@@ -198,7 +198,7 @@ export const RECORDS: readonly Effect[] = [
     timing: "action",
     instructions: [
       { verb: "Pick", pick: { type: "card", control: "you", from: "deck", cardType: "attachment", guarded: true, intoPlay: true } },
-      { verb: "PutAttachmentIntoPlay", card: "picked" },
+      { verb: "PutIntoPlay", card: "picked", who: "owner" },
       { verb: "ShuffleDeck" },
     ],
   },

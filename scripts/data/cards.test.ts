@@ -101,9 +101,9 @@ describe("Hall of Beorn records of deck-legal cards", () => {
 
 describe("parseKeywordTokens", () => {
   it("reads numbered and flag keywords and reports the rest", () => {
-    expect(parseKeywordTokens(["Hide 2.", "Surge.", "Immune to player card effects.", "Restricted.", "Battle."])).toEqual({
+    expect(parseKeywordTokens(["Hide 2.", "Surge.", "Immune to player card effects.", "Restricted.", "Encounter."])).toEqual({
       keywords: { hide: 2, surge: true, immune: true, restricted: true },
-      unknown: ["Battle"],
+      unknown: ["Encounter"],
     });
   });
 
