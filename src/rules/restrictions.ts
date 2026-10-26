@@ -55,6 +55,7 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
 export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: string, attachmentCode: string): boolean {
   const traits = printedOf(ctx.cards, attachmentCode).traits;
   if (flagged(state, hostId, "cannotHaveAttachments")) return true;
+  if (flagged(state, hostId, "cannotHaveRestricted") && printedOf(ctx.cards, attachmentCode).keywords.restricted) return true;
   return restricted(state, ctx, "attach").some(
     (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)),
   );

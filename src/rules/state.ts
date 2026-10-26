@@ -371,7 +371,9 @@ export function withThreat(state: ScenarioState, index: number, threat: number):
 export function withMode(state: ScenarioState, mode: ModeName): ScenarioState {
   const phase = phaseOf(mode);
   if (state.mode === mode && state.phase === phase) return state;
-  const changed: ScenarioState = { ...state, mode, phase, passed: [] };
+  // A phase that begins is announced ("At the beginning of the quest phase"), with the phase it is.
+  const begun = state.phase !== phase ? { pendingEvents: [...(state.pendingEvents ?? []), { trigger: "beginningOfPhase" as const, seat: null, phase }] } : {};
+  const changed: ScenarioState = { ...state, mode, phase, passed: [], ...begun };
   const expiring: ModifierUntil[] = [];
   if (state.phase !== phase) expiring.push("endOfPhase");
   if (mode === "beginRound" && state.mode !== "beginRound") expiring.push("endOfRound");

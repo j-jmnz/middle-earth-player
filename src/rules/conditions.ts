@@ -37,6 +37,8 @@ function conditionCard(state: ScenarioState, card: Extract<Condition, { kind: "m
       return source?.host ?? null;
     case "subject":
       return scope.subject ?? null;
+    case "other":
+      return scope.other ?? null;
     case "activeLocation":
       return state.activeLocation;
     case "picked":

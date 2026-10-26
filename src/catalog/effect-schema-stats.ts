@@ -42,6 +42,7 @@ export const modifierStatSchema = z.enum([
   "cannotQuest",
   "cannotDefend",
   "cannotHaveAttachments",
+  "cannotHaveRestricted",
   "doesNotReady",
   "noThreatContribution",
   "noEngagementChecks",

@@ -222,9 +222,12 @@ export const simpleVerbs = [
     ...when,
   }),
   // Constants on an attachment. Where it may be attached: `host` names the card, and `limitPerHost` allows one copy
-  // of the attachment on each (Limit 1 per hero). A card with no such record may go on any character.
+  // of the attachment on each (Limit 1 per hero). `hosts` is a list of filters, any of which a host may match ("Attach to a
+  // Dale or Dwarf character", "Attach to a hero or Gandalf", "Attach to a location", "Attach to an enemy engaged with a
+  // player"); with it, `host.kind` is ignored. A card with no such record may go on any character.
   z.strictObject({
     verb: z.literal("AttachesTo"),
+    hosts: z.array(pickSchema).min(1).optional(),
     host: z.strictObject({
       kind: z.enum(["hero", "character", "activeLocation", "ringBearer"]),
       trait: z.string().min(1).optional(),

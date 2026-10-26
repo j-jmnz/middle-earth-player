@@ -151,13 +151,18 @@ export function runPlayerVerb(
       const id = lastPicked(state);
       const card = state.cards[id];
       const seat = card?.owner ?? card?.controller;
-      return card && seat != null ? moveCard(state, id, { zone: "discard", seat }) : state;
+      if (!card || seat == null) return state;
+      const moved = moveCard(state, id, { zone: "discard", seat });
+      // "After 1 or more cards are discarded from your hand", "After ~ is discarded from your deck".
+      if (card.zone === "hand") return queueEvent(moved, { trigger: "discardedFromHand", seat, cardId: id });
+      if (card.zone === "deck") return queueEvent(moved, { trigger: "discardedFromDeck", seat, cardId: id });
+      return moved;
     }
     case "DiscardTopOfDeck": {
       const top = state.seats[focus.seat]?.deck[0];
       const card = top ? state.cards[top] : undefined;
       if (!top || !card) return state;
-      const discarded = moveCard(state, top, { zone: "discard", seat: focus.seat });
+      const discarded = queueEvent(moveCard(state, top, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: top });
       const data = topFrame(discarded)?.data;
       // The discarded card's printed cost is the effect's X.
       return data?.kind === "effect" ? patchTop(discarded, { data: { ...data, x: printedOf(ctx.cards, card.code).cost ?? 0 } }) : discarded;

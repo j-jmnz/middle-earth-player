@@ -13,7 +13,8 @@ import { playerCardEffectCanChoose } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
-import { livingSeats } from "./state.ts";
+import { heldAmount, livingSeats } from "./state.ts";
+import { pickCandidates } from "./pick.ts";
 
 type AttachRule = Extract<Instruction, { verb: "AttachesTo" }>;
 
@@ -31,7 +32,10 @@ export function attachRule(ctx: ReduceContext, code: string): AttachRule | undef
 export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext): string[] {
   const rule = attachRule(ctx, code);
   const candidates: string[] = [];
-  if (!rule) {
+  if (rule?.hosts) {
+    // Any of the filters, from the playing seat's side; a filter that says `control: "you"` keeps the seat's own cards.
+    for (const filter of rule.hosts) candidates.push(...pickCandidates(state, filter, seat, [], null, ctx).filter((id) => !candidates.includes(id)));
+  } else if (!rule) {
     candidates.push(...characters(state, seat, ctx.cards));
   } else if (rule.host.kind === "activeLocation") {
     if (state.activeLocation) candidates.push(state.activeLocation);
@@ -46,11 +50,12 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     if (!host || !playerCardEffectCanChoose(printedOf(ctx.cards, host.code))) return false;
     if (attachBlocked(state, ctx, id, code)) return false;
     if (!rule) return true;
+    if (rule.limitPerHost && host.attachments.some((other) => state.cards[other]?.code === code)) return false;
+    if (rule.hosts) return true;
     if (rule.host.kind === "ringBearer" && !hasTrait(state, id, "Ring-bearer", ctx)) return false;
     if (rule.host.trait && !hasTrait(state, id, rule.host.trait, ctx)) return false;
     if (rule.host.name && printedOf(ctx.cards, host.code).name !== rule.host.name) return false;
     if (rule.host.sphere && printedOf(ctx.cards, host.code).sphere !== rule.host.sphere) return false;
-    if (rule.limitPerHost && host.attachments.some((other) => state.cards[other]?.code === code)) return false;
     return true;
   });
 }
@@ -76,10 +81,11 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
   return Math.max(0, cost);
 }
 
-// A character cannot have more than 2 restricted attachments. When a third arrives, its controller chooses one of the
-// restricted attachments and it moves at once to its owner's discard pile (rr.restricted).
+// A character cannot have more than 2 restricted attachments (more when a card says it can have additional ones). When one
+// too many arrives, its controller chooses one of the restricted attachments and it moves at once to its owner's discard
+// pile (rr.restricted).
 export function enforceRestricted(state: ScenarioState, hostId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (restrictedAttachments(state, hostId, ctx).length <= 2) return state;
+  if (restrictedAttachments(state, hostId, ctx).length <= 2 + Math.max(0, heldAmount(state, hostId, "extraRestricted"))) return state;
   const host = state.cards[hostId];
   const actor = host?.controller ?? state.activeSeat;
   return pushEffectFrame(

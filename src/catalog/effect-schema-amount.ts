@@ -6,7 +6,9 @@ import { pickSchema } from "./effect-schema-pick.ts";
 
 // The card a stat is read from: the source, its host, the last picked card, the card the event was about (`subject`), or
 // the enemy and the defender of the attack in progress.
-export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "attacker", "defender", "activeLocation"]);
+// `other` is the second card the answered event names: the enemy a character defends against or attacks, the enemy an
+// attack destroyed, the defender of an attack that resolved.
+export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation"]);
 
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").

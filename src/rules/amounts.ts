@@ -46,6 +46,8 @@ export function refCard(state: ScenarioState, ref: CardRef, scope: AmountScope):
       return scope.picked?.at(-1) || null;
     case "subject":
       return scope.subject ?? null;
+    case "other":
+      return scope.other ?? null;
     case "attacker":
       return state.pendingAttack?.enemyId ?? state.pendingStrike?.enemyId ?? null;
     case "defender":

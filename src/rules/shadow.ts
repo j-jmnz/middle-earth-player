@@ -5,6 +5,7 @@ import type { Effect } from "../catalog/boundary.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import { holdsNow } from "./verbs.ts";
 import type { EngineStep } from "./intents.ts";
+import { queueEvent } from "./queue.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { defenseAsDefender, modifiedStat, placeDamage } from "./keywords.ts";
 import type { ScenarioState } from "./state.ts";
@@ -228,7 +229,10 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   // The shadow cards an attack outside the combat phase was dealt are discarded once it resolves
   // (faq.enemy-attacks-outside-combat).
   const cleared = attack.immediate && done.phase !== "Combat" ? discardShadowOf(done, attack.enemyId) : done;
-  const ended: ScenarioState = { ...cleared, pendingAttack: null, window: null, resolvedAttacks };
+  // "After an attack in which ~ defends resolves", "After a non-unique enemy attacks you": the attack is over.
+  const defender = attack.defenderId && !attack.undefended ? { other: attack.defenderId } : {};
+  const announced = queueEvent(cleared, { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender });
+  const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks };
   const after = attack.after ?? [];
   if (after.length === 0 || ended.cards[attack.enemyId]?.zone !== "engaged") return ended;
   return pushEffectFrame(
