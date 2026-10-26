@@ -114,6 +114,16 @@ function foreseen(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id
   return { stats, suffix: " · destroyed", mark, ...(caution ? { caution } : {}) };
 }
 
+// A response window's sentence, naming the Responses of this occurrence that wait for a cost another one may pay
+// (rr.triggering-condition: Aragorn's ready waits for Théodred's resource).
+function responseNote(game: ScenarioState, names: SheetNames, offers: readonly { cardId: string; effectId: string; seat: number }[], listed: readonly TriggerOption[]): string {
+  const seat = game.window?.kind === "response" ? game.window.seat : game.activeSeat;
+  const waiting = offers.filter((offer) => offer.seat === seat && !listed.some((item) => item.cardId === offer.cardId && item.effectId === offer.effectId));
+  const base = "A Response may be used now, or passed.";
+  if (waiting.length === 0) return base;
+  return `${base} Waiting for its cost, and offered once it can be paid: ${waiting.map((offer) => names.card(offer.cardId)).join(", ")}. Passing gives it up too.`;
+}
+
 // What the optional engagement is against: the seat's threat, and which enemies the engagement checks engage anyway or
 // leave in staging (rr.optional-engagement, rr.engagement-check).
 function optionalEngageNote(game: ScenarioState, ctx: ReduceContext, names: SheetNames): string {
@@ -332,7 +342,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         title: about ? names.card(about) : cancel ? "Cancel" : "Response",
         sourceId: about,
         timing: cancel ? "Cancel" : "Response",
-        note: cancel ? "The first player may pay to cancel this effect before it resolves." : "A Response may be used now, or passed.",
+        note: cancel ? "The first player may pay to cancel this effect before it resolves." : responseNote(game, names, data?.kind === "responses" ? data.offers : [], options),
         hide: null,
         options,
         pass: "Pass",

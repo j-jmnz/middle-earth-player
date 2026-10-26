@@ -33,10 +33,8 @@ describe("Responses to one commit", () => {
     expect(offered(run.state, tab)).toEqual(["01002:response:1"]);
     run = send(run, { type: "Trigger", cardId: theodred, effectId: "01002:response:1" }, tab.ctx);
     // Théodred chooses a committed hero to take the resource: Aragorn.
-    const pick = legalIntents(run.state, tab.ctx).find((intent) => intent.type === "Choose" && intent.optionId === aragorn);
-    expect(pick).toBeDefined();
-    if (!pick) return;
-    run = send(run, pick, tab.ctx);
+    expect(legalIntents(run.state, tab.ctx)).toContainEqual({ type: "Choose", optionId: aragorn });
+    run = send(run, { type: "Choose", optionId: aragorn }, tab.ctx);
     expect(run.state.cards[aragorn]?.resources).toBe(1);
     // Back in the same window, Aragorn's Response is now paid for and offered.
     expect(offered(run.state, tab)).toEqual(["01001:response:1"]);
