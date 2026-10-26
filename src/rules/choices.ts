@@ -1,6 +1,7 @@
 import type { LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { holds } from "./conditions.ts";
+import { noteOption, untakenOptions } from "./families/deck-choose.ts";
 import type { EffectData, QueueItem, ScenarioState } from "./state.ts";
 import { patchTop, topFrame } from "./windows.ts";
 
@@ -28,10 +29,10 @@ export function openBranch(state: ScenarioState, item: QueueItem, returned: numb
   // An option may require something of the cards the effect picked or the event it answers ("If it is an enemy, you may
   // discard it").
   const scope = { actor: seat, sourceId: topFrame(state)?.cardId ?? null, returned, ...(data?.picked ? { picked: data.picked } : {}), ...(data?.subject ? { subject: data.subject } : {}), ...(data?.other ? { other: data.other } : {}) };
-  const legal = instruction.options.filter((option) => !option.requires || holds(state, option.requires, scope, ctx));
+  const legal = untakenOptions(state, instruction, instruction.options.filter((option) => !option.requires || holds(state, option.requires, scope, ctx)));
   if (legal.length === 0) return state;
   const only = legal[0];
-  if (legal.length === 1 && only) return runBranch(state, only.instructions, seat, item.cause);
+  if (legal.length === 1 && only) return runBranch(noteOption(state, instruction, only.id), only.instructions, seat, item.cause);
   return ask(state, { kind: "branch", item: { ...item, seat } }, seat, legal.map((option) => option.id));
 }
 
@@ -69,5 +70,5 @@ export function applyChoice(state: ScenarioState, optionId: string): ScenarioSta
   const instruction = wait.item.instruction;
   if (instruction.verb !== "Choose") return closed;
   const option = instruction.options.find((entry) => entry.id === optionId);
-  return option ? runBranch(closed, option.instructions, wait.item.seat, wait.item.cause) : closed;
+  return option ? runBranch(noteOption(closed, instruction, option.id), option.instructions, wait.item.seat, wait.item.cause) : closed;
 }

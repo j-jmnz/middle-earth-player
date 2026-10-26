@@ -5,6 +5,7 @@ import { attachmentHostIds } from "./attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import { costsPickMatches } from "./families/costs-pick.ts";
+import { deckPickMatches, lookedPool } from "./families/deck-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
@@ -35,11 +36,14 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   const seats = seatsOf(state, spec, asking);
   const raw: string[] = [];
   const from = spec.from ?? "play";
+  // Only the cards the running effect looked at or discarded (families/deck-pick.ts).
+  if (spec.looked) return lookedPool(state, spec, seats);
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
   else if (from === "victory") raw.push(...state.victory);
   else if (from === "discard") {
     for (const index of seats) {
-      const pile = state.seats[index]?.discard ?? [];
+      // `top`: the last cards put on the pile.
+      const pile = spec.top != null ? (state.seats[index]?.discard ?? []).slice(-spec.top) : (state.seats[index]?.discard ?? []);
       if (!spec.topmost) raw.push(...pile);
       else {
         // The last card put on a discard pile is its top.
@@ -110,6 +114,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.hasResources && instance.resources <= 0) return false;
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs-pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
+  // The deck family's filters: a Trait shared with the source (families/deck-pick.ts).
+  if (!deckPickMatches(state, id, spec, at.sourceId, ctx)) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   if (spec.defending && !(state.pendingAttack?.defenderId === id && !state.pendingAttack.undefended)) return false;
   if (spec.hasAttachment) {

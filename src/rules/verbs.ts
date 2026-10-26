@@ -258,7 +258,8 @@ function discardRandom(state: ScenarioState, seat: number, amount: number): Scen
     next = { ...next, seedCursor: next.seedCursor + 1 };
     const card = id ? next.cards[id] : undefined;
     if (!id || !card) break;
-    next = moveCard(next, id, { zone: "discard", seat: card.owner ?? seat });
+    // "After a card is discarded from your hand" hears a random discard too.
+    next = queueEvent(moveCard(next, id, { zone: "discard", seat: card.owner ?? seat }), { trigger: "discardedFromHand", seat: card.owner ?? seat, cardId: id });
   }
   return next;
 }

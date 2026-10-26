@@ -30,7 +30,13 @@ export const pickSchema = z.strictObject({
   printedIcon: sphereSchema.optional(),
   from: z.enum(["play", "hand", "discard", "deck", "victory"]).optional(),
   // From the deck: only its top cards are looked at. The cards still in the deck are the ones ArrangeTop puts back in order.
+  // From the discard pile: only its top cards, the last put there ("While the top card of your discard pile is an event").
   top: z.number().int().positive().optional(),
+  // Only the cards the running effect looked at (LookAtTop) or discarded (DiscardFromDeck), still in a deck or a discard pile
+  // ("add 1 of those cards to its owner's hand", "Put up to 2 allies discarded by this effect into play"; families/deck-each.ts).
+  looked: z.boolean().optional(),
+  // A card that shares at least one Trait with the source card ("an ally who shares at least 1 Trait with him").
+  sharesTrait: z.literal("self").optional(),
   // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
   cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest"]).optional(),
   maxCost: z.number().int().min(0).optional(),

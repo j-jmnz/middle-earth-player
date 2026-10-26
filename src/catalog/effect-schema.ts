@@ -5,7 +5,7 @@ import { z } from "zod";
 // The vocabulary is split by behavior: stat modifiers (effect-schema-stats.ts), what a Pick offers (effect-schema-pick.ts), conditions and
 // targets (effect-schema-conditions.ts), and the simple verbs (effect-schema-verbs.ts). This file composes them and keeps every export.
 import { amountExprSchema, amountSchema, cardRefSchema } from "./effect-schema-amount.ts";
-import { conditionSchema, targetSchema } from "./effect-schema-conditions.ts";
+import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.ts";
 import { pickSchema, sphereSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifierStatSchema, modifierUntilSchema } from "./effect-schema-stats.ts";
 import { simpleInstructionSchema, simpleVerbs } from "./effect-schema-verbs.ts";
@@ -115,6 +115,9 @@ export const costSchema = z.discriminatedUnion("kind", [
 const choiceSchema = z.strictObject({
   verb: z.literal("Choose"),
   who: whoSchema,
+  // Each option may be taken once in this effect: a later Choose of the same effect offers only the options not taken yet
+  // ("each player chooses 1 different option", families/deck-choose.ts).
+  different: z.boolean().optional(),
   options: z
     .array(
       z.strictObject({
@@ -153,6 +156,14 @@ const eachSchema = z.strictObject({
   verb: z.literal("Each"),
   pick: pickSchema,
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema])),
+  // The actor chooses up to this many (`any`: any number) of the matching cards, one at a time, and may stop ("search the top
+  // 10 cards for up to 4 Rohan allies"); the instructions then run for each chosen card, and the effect's X becomes how many
+  // were chosen. `totalCost`: the chosen cards' printed costs add up to at most this. `taken` is engine use: the cards chosen
+  // so far (families/deck-each.ts).
+  upTo: z.union([z.number().int().positive(), z.literal("any")]).optional(),
+  totalCost: amountSchema.optional(),
+  taken: z.array(z.string()).optional(),
+  ...when,
 });
 
 // Runs the instructions this many times ("Resolve that effect again for each copy of ~ in your discard pile").
@@ -210,6 +221,9 @@ export const limitSchema = z.enum([
   // Once a round for each player, counting every copy of the card ("You cannot trigger this ability if you have already
   // triggered the ability of a Steward of Orthanc this round").
   "oncePerRoundGroupEachPlayer",
+  // Once a phase for each player, counting every copy of the card; on an event's Action, its play ("You can only play 1 copy
+  // of The Tree People each phase", families/deck-play.ts).
+  "oncePerPhaseGroupEachPlayer",
 ]);
 
 // Which card an event must be about for an effect to hear it. Without it, an event about one card is heard by that card only.

@@ -183,7 +183,7 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
   }
 }
 
-function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory"): boolean {
+function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand"): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source) return false;
   return zone === "play" ? inPlay(source.zone) : source.zone === zone;
