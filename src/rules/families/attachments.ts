@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards, rr.guarded, rr.blank, rr.step-6-8 (data/rules/entries.json).
+// Rules: rr.attachment-cards, rr.guarded, rr.blank, rr.step-6-8-1 (data/rules/entries.json).
 import type { Instruction } from "../../catalog/boundary.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";

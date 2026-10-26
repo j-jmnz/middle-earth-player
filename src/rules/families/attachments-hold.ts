@@ -20,7 +20,7 @@ function heldAttachments(state: ScenarioState, hostId: string): string[] {
 // wherever it goes, so this is queued before the host's attachments are released.
 export function noteHostDefeated(state: ScenarioState, hostId: string): ScenarioState {
   let next = state;
-  for (const id of heldAttachments(state, hostId)) next = queueEvent(next, { trigger: "hostDefeated", seat: next.cards[id]?.controller ?? null, cardId: id, subject: hostId });
+  for (const id of heldAttachments(state, hostId)) next = queueEvent(next, { trigger: "hostDefeated", seat: next.cards[id]?.controller ?? null, cardId: id, other: hostId });
   return next;
 }
 

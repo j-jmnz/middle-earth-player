@@ -86,7 +86,7 @@ export const RECORDS: readonly Effect[] = [
     lines: ["09012:A:3"],
     timing: "response",
     trigger: "hostDefeated",
-    instructions: [{ verb: "LowerThreat", amount: { stat: "threat", of: "subject", printed: true }, who: "eachSeat" }],
+    instructions: [{ verb: "LowerThreat", amount: { stat: "threat", of: "other", printed: true }, who: "eachSeat" }],
   },
   // The Long Defeat: "Attach to a quest card in play. Limit 1 per quest." "Response: After attached quest card is defeated, each
   // player either draws 2 cards or heals up to 5 damage from among characters he controls."

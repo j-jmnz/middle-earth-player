@@ -1,4 +1,4 @@
-// Rules: rr.step-6-8, rr.attacks-outside-the-combat-phase, faq.limitations-on-attacks, rr.the-word-choose, rr.encounter-deck
+// Rules: rr.step-6-8-1, rr.attacks-outside-the-combat-phase, faq.limitations-on-attacks, rr.the-word-choose, rr.encounter-deck
 // (data/rules/entries.json).
 //
 // The attachments family's verbs that ask a player step by step: healing damage split among characters, an attack an
@@ -50,7 +50,7 @@ export function lookAtEncounterCards(state: ScenarioState, instruction: Extract<
 
 // DeclareAttack: the enemy is read (and the source discarded, when that is the cost), then the actor chooses attackers one at
 // a time among their characters that may attack it, and the attack resolves: each attacker exhausts and is declared, and the
-// attack's strength is dealt against the enemy's defense (rr.step-6-8).
+// attack's strength is dealt against the enemy's defense (rr.step-6-8-1).
 export function declareAttack(state: ScenarioState, instruction: Extract<Instruction, { verb: "DeclareAttack" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (instruction.enemy == null) {
     const enemyId = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId));

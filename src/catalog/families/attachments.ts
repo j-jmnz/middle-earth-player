@@ -43,7 +43,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("LookAtEncounterCards"), amount: positiveAmountSchema, ...when }),
   // The actor declares an attack against the card the reference names ("declare an attack against the attached enemy"): they
   // choose its attackers one at a time among their ready characters that may attack it, then stop; each exhausts (unless it
-  // does not exhaust to attack) and the attack resolves (rr.step-6-8). It is an attack an effect makes, beside the one the
+  // does not exhaust to attack) and the attack resolves (rr.step-6-8-1). It is an attack an effect makes, beside the one the
   // framework allows against each enemy (faq.limitations-on-attacks). `discardSource`: the source is discarded first, its
   // host read before ("discards Ambush to declare an attack against the attached enemy"). `enemy` and `attackers` are engine
   // use: the enemy read, the attackers chosen so far.
@@ -61,9 +61,9 @@ export const VERBS = [
 ] as const;
 
 export const TRIGGERS = [
-  // Heard by each card that was attached to the event's subject: an enemy that damage destroyed (rr.destroy), or a quest card
-  // that was defeated (its stage advanced, rr.quest-advancement). The attachment hears it from wherever it went ("When
-  // attached enemy is destroyed", "After attached quest card is defeated").
+  // Heard by each card (the event's card) that was attached to the event's other card: an enemy that damage destroyed
+  // (rr.destroy), or a quest card that was defeated (its stage advanced, rr.quest-advancement). The attachment hears it from
+  // wherever it went ("When attached enemy is destroyed", "After attached quest card is defeated": that card is `other`).
   "hostDefeated",
   // Heard by a Guarded attachment (the event's card) whose guard just left play: its player puts it into play.
   "unguarded",
