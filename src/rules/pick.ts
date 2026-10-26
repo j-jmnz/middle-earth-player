@@ -6,6 +6,7 @@ import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import { attachmentsPickMatches } from "./families/attachments-pick.ts";
 import { costsPickMatches } from "./families/costs-pick.ts";
+import { attackPickMatches } from "./families/attack-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
@@ -25,6 +26,9 @@ export type PickContext = {
   x?: number;
   participants?: readonly string[];
   counting?: boolean;
+  // The answered event's cards, when a condition is read for it (families/attack-pick.ts).
+  subject?: string | null;
+  other?: string | null;
 };
 
 function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
@@ -118,6 +122,9 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.notHost && at.sourceId != null && state.cards[at.sourceId]?.host === id) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments-pick.ts).
   if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
+  // The attack family's filters: printed keywords, the source's host, engaged with whom, a shared Trait, an attachment on the
+  // event's card, printed hit points, the top of a discard pile (families/attack-pick.ts).
+  if (!attackPickMatches(state, id, spec, at, ctx)) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   // Every defender of the attack in progress, the extra ones too (rr.multiple-defenders).
   if (spec.defending && !isDefending(state, id)) return false;
@@ -184,6 +191,8 @@ export function pickCandidates(
   // The characters that took part in the attack the Response answers.
   participants?: readonly string[],
   counting = false,
+  // The answered event's subject and other card, for a condition read about it (families/attack-pick.ts).
+  event?: { subject?: string | null; other?: string | null },
 ): string[] {
   const asking = spec.who === "firstPlayer" ? state.firstPlayer : seat;
   if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated).map((index) => `seat:${index}`);
@@ -195,7 +204,7 @@ export function pickCandidates(
   const source = sourceId ? state.cards[sourceId] : undefined;
   const playerEffect = !counting && (source == null || isPlayerType(printedOf(ctx.cards, source.code)));
   const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
-  const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting };
+  const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
   return raw.filter((id) => {
     const instance = state.cards[id];
     if (!instance) return false;

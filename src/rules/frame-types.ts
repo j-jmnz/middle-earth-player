@@ -143,7 +143,8 @@ export type DelayedEffect = {
   id: string;
   // `questSucceeded`: run when the players quest successfully this phase (families/quest-outcome.ts), dropped when the quest
   // resolves otherwise.
-  until: "endOfPhase" | "endOfRound" | "questSucceeded";
+  // `endOfAttack`: the end of the player attack in progress (families/attack-flow.ts).
+  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "endOfAttack";
   sourceId: string | null;
   seat: number;
   // The phase the effect was scheduled in. An end-of-phase effect fires when that phase ends.
@@ -205,4 +206,13 @@ export type PendingStrike = {
   attackerIds: readonly string[];
   awaiting?: "strike" | "end";
   awaitDepth?: number;
+  // The attack family's marks (families/attack-flow.ts). `back`: the window given back when the attack ends (absent: the
+  // combat phase's player attack window; null: none, an effect declared the attack and goes on). `outer`: the player attack
+  // this one was declared during, which goes on when it ends. `engagedSeat`: the player the enemy was engaged with when the
+  // attack was declared. `ranged`: a card called it a ranged attack. `excessTo`: the enemy that takes its excess damage.
+  back?: Window | null;
+  outer?: PendingStrike;
+  engagedSeat?: number;
+  ranged?: boolean;
+  excessTo?: string;
 };

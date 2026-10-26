@@ -7,6 +7,7 @@ import { questProgressMoved } from "../rules/verbs.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
 import { attachmentPickWords, attachmentWords } from "./attachment-words.ts";
 import { encounterPickWords, encounterWords } from "./encounter-words.ts";
+import { attackWords } from "./attack-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -35,7 +36,7 @@ function amountWords(amount: Amount | undefined, fallback = 1): string {
   return typeof amount === "number" ? String(amount) : "X";
 }
 
-const STAT_WORDS: Readonly<Record<string, string>> = { willpower: "Willpower", attack: "Attack", defense: "Defense", threat: "Threat", hitPoints: "hit points" };
+const STAT_WORDS: Readonly<Record<string, string>> = { willpower: "Willpower", attack: "Attack", defense: "Defense", threat: "Threat", hitPoints: "hit points", drawOnAttackDestroy: "card drawn each time they attack and destroy an enemy" };
 
 // "the chosen card", "that card", "it": what a card reference names in a sentence.
 function refWords(ref: string | undefined): string {
@@ -247,8 +248,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     case "ModifyStatVersus":
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
-      // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments family's.
-      return encounterWords(instruction) ?? attachmentWords(instruction);
+      // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments and attack families'.
+      return encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction);
   }
 }
 

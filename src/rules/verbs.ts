@@ -1,5 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
-import type { Instruction } from "../catalog/boundary.ts";
+import { isStatCondition, type Instruction } from "../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { runAttackVerb } from "./attack-verbs.ts";
@@ -322,6 +322,8 @@ export function holdsNow(
   ctx: ReduceContext,
 ): boolean {
   if (!("when" in instruction) || !instruction.when) return true;
+  // A stat condition is not a gate: the modifier carries it and it is read with the stat (attack-verbs.ts).
+  if (instruction.verb === "ModifyStat" && isStatCondition(instruction.when)) return true;
   const frame = frameScope(state, scope.actor, scope.sourceId);
   return holds(state, instruction.when, { ...scope, ...(frame.picked ? { picked: frame.picked } : {}), ...(frame.subject ? { subject: frame.subject } : {}), ...(frame.other ? { other: frame.other } : {}) }, ctx);
 }

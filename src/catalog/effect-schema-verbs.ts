@@ -103,7 +103,9 @@ export const simpleVerbs = [
   verb("ArrangeTop"),
   // The last picked character (the one before it) attacks the last picked enemy. The attacker is already exhausted.
   z.strictObject({ verb: z.literal("AttackEnemy"), ...when }),
-  verb("Commit"),
+  // Commits the source to the quest and exhausts it. With `target`, commits that card (already exhausted or not, it stays as it
+  // is) and announces `committed` ("commit that hero to the quest", 12086:A:2).
+  z.strictObject({ verb: z.literal("Commit"), target: cardRefSchema.optional(), ...when }),
   verb("RevealStaging"),
   verb("PlaceProgress"),
   // Raises a threat dial by `amount` (1 by default). `eachSeat` raises every living seat's. With `perCommitted` the amount

@@ -1,5 +1,5 @@
 // Rules: rr.lasting-effects, rr.modifiers (data/rules/entries.json).
-import type { Instruction } from "../catalog/boundary.ts";
+import { isStatCondition, type Instruction } from "../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { characters } from "./combat.ts";
@@ -118,5 +118,9 @@ export function modifyStat(
       ? addClassModifier(next, ALLIES_CLASS, sourceId, instruction.stat, amount, instruction.until)
       : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);
   }
-  return next;
+  // A condition read each time the stat is read stays on the modifiers it made ("+3 Attack while attacking an enemy with a
+  // higher engagement cost than your threat", 04004:A:1).
+  const kept = instruction.when;
+  if (!isStatCondition(kept) || next.modifiers.length === state.modifiers.length) return next;
+  return { ...next, modifiers: [...state.modifiers, ...next.modifiers.slice(state.modifiers.length).map((modifier) => ({ ...modifier, when: kept }))] };
 }

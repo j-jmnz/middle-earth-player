@@ -21,6 +21,7 @@ import { resolutionIntents, resolutionReason } from "./resolution.ts";
 import { optionalEnemies, stagingLocations } from "./quest.ts";
 import { defenseBlocked, travelBlocked, travelCostUnpayable } from "./restrictions.ts";
 import { flagged, perilLock, type ScenarioState } from "./state.ts";
+import { attackRuleReason } from "./families/attack-targets.ts";
 
 const NUMBER = "The engine computes that number";
 
@@ -272,8 +273,10 @@ function attackReason(
   if (state.window?.kind !== "playerAttack") return "That intent is not legal in this window";
   if (intent.attackerIds.length === 0) return "Declare at least one attacker";
   const enemy = state.cards[intent.enemyId];
-  // An enemy in the staging area only when any character may choose it as a target (canAttack, attackableByAny).
-  if (!enemy || (enemy.zone !== "engaged" && !(enemy.zone === "staging" && flagged(state, enemy.id, "attackableByAny")))) return "That enemy cannot be attacked";
+  if (!enemy || (enemy.zone !== "engaged" && enemy.zone !== "staging")) return "That enemy cannot be attacked";
+  // A card's attack window, an attack into the staging area (families/attack-targets.ts).
+  const ruled = attackRuleReason(state, intent);
+  if (ruled) return ruled;
   if (attackDeclared(state, state.activeSeat, intent.enemyId)) return "That enemy was already attacked this phase";
   const seen = new Set<string>();
   for (const attackerId of intent.attackerIds) {

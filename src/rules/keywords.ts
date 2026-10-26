@@ -11,6 +11,7 @@ import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
+import { attackingHolds } from "./families/attack-strike.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -67,6 +68,8 @@ export function modifiedStat(
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
+    // "+1 Attack when attacking an Orc" (families/attack-strike.ts).
+    if (modifier.when?.kind === "attacking" && !attackingHolds(state, modifier.when, instance, { effects: [], cards }, against)) continue;
     if (modifier.set) set = modifier.amount;
     else total += modifier.amount;
     if (!modifier.set && modifier.amount > 0) floor += modifier.amount;

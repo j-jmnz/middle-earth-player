@@ -45,6 +45,7 @@ import { syncThreatSaves } from "./families/quest-threat.ts";
 import { eventWaits } from "./families/defense-listen.ts";
 import { announceShadowsDealt } from "./families/defense-shadow.ts";
 import { attackedEarly, earlyAttacks } from "./families/defense-order.ts";
+import { strikeResumes } from "./families/attack-flow.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -151,7 +152,8 @@ export function applyIntent(
 function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // An attack waits on the action window between two of its steps; once it closes, the attack goes on before any frame
   // under it (an attack a Hide test started).
-  if (stepWindowResumes(state)) return state.pendingAttack?.awaiting ? resumeAttack(state, ctx, steps) : continueStrike(state, ctx, steps);
+  // A player attack an effect made during an enemy attack's window goes on first (families/attack-flow.ts).
+  if (stepWindowResumes(state)) return strikeResumes(state) ? continueStrike(state, ctx, steps) : resumeAttack(state, ctx, steps);
   if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
   // The Forced effects of an attack's start are done: the defender is declared (141069:A:2).
   if (state.pendingAttack?.defenseWaits) return openDefense(state, ctx);

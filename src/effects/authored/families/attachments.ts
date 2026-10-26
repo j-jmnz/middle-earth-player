@@ -274,7 +274,7 @@ export const RECORDS: readonly Effect[] = [
     timing: "action",
     anyPlayer: true,
     condition: { kind: "all", conditions: [{ kind: "phase", is: "Combat" }, { kind: "matches", card: "host", pick: { type: "enemy", control: "any", engaged: "you" } }] },
-    instructions: [{ verb: "DeclareAttack", target: "host", discardSource: true }],
+    instructions: [{ verb: "ChooseAttackers", target: "host", discardSource: true }],
   },
 ];
 

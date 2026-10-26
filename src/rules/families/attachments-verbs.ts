@@ -7,7 +7,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";
 import { askTarget } from "../choices.ts";
-import { canAttack, characters, strikeEnemy } from "../combat.ts";
+import { canAttack, characters } from "../combat.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { destroyCard } from "../keywords.ts";
@@ -15,7 +15,8 @@ import { pickCandidates } from "../pick.ts";
 import { queueEvent } from "../queue.ts";
 import type { ScenarioState } from "../state.ts";
 import { flagged, inPlay, updateCard } from "../state.ts";
-import { patchTop } from "../windows.ts";
+import { patchTop, topFrame } from "../windows.ts";
+import { openStrike } from "./attack.ts";
 import { effectData, lookAtTop } from "./encounter-moves.ts";
 import type { Focus } from "./index.ts";
 
@@ -48,10 +49,10 @@ export function lookAtEncounterCards(state: ScenarioState, instruction: Extract<
   return lookAtTop(state, { verb: "LookAtTop", count: Math.max(0, count) }, focus.seat);
 }
 
-// DeclareAttack: the enemy is read (and the source discarded, when that is the cost), then the actor chooses attackers one at
+// ChooseAttackers: the enemy is read (and the source discarded, when that is the cost), then the actor chooses attackers one at
 // a time among their characters that may attack it, and the attack resolves: each attacker exhausts and is declared, and the
 // attack's strength is dealt against the enemy's defense (rr.step-6-8-1).
-export function declareAttack(state: ScenarioState, instruction: Extract<Instruction, { verb: "DeclareAttack" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function declareAttack(state: ScenarioState, instruction: Extract<Instruction, { verb: "ChooseAttackers" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (instruction.enemy == null) {
     const enemyId = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId));
     const paid = instruction.discardSource && focus.sourceId ? destroyCard(state, focus.sourceId, ctx.cards, steps) : state;
@@ -74,5 +75,5 @@ export function declareAttack(state: ScenarioState, instruction: Extract<Instruc
     if (!flagged(next, id, "noExhaustAttack")) next = updateCard(next, id, { exhausted: true });
     next = queueEvent(next, { trigger: "declaredAttacker", seat: focus.seat, cardId: id, other: enemyId });
   }
-  return strikeEnemy(next, focus.seat, enemyId, chosen, ctx, steps);
+  return openStrike(next, focus.seat, enemyId, chosen, topFrame(next)?.id, ctx, steps);
 }

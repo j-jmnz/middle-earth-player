@@ -25,7 +25,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return healAmong(state, instruction, focus, ctx);
     case "LookAtEncounterCards":
       return lookAtEncounterCards(state, instruction, focus, ctx);
-    case "DeclareAttack":
+    case "ChooseAttackers":
       return declareAttack(state, instruction, focus, ctx, steps);
     case "QuestProgressFirst":
       return answerQuestProgress(state, instruction.first, focus.sourceId);

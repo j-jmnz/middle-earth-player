@@ -117,6 +117,20 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("combatStep"), is: z.enum(["beforeEnemyAttacks", "beforeAttacksResolve", "afterEnemyAttacks"]) }),
   // The source is attached to the active location ("While attached location is the active location").
   z.strictObject({ kind: z.literal("hostActive") }),
+  // The card is attacking in the player attack in progress (rr.step-6-8-4): read while a stat is read, for the stat's holder
+  // (families/attack-strike.ts); elsewhere for `card` (the source by default). `enemy`: the attacked enemy matches the filter
+  // (from that card's controller's side: `engaged`, `stagingOnly`, then its predicates); `notEnemy`: it does not ("an enemy
+  // not engaged with you"); `alone`: no other character attacks with it; `ranged`: it is a ranged attack (rr.ranged).
+  z.strictObject({
+    kind: z.literal("attacking"),
+    card: z.enum(["self", "host", "subject"]).optional(),
+    enemy: pickSchema.optional(),
+    notEnemy: pickSchema.optional(),
+    alone: z.boolean().optional(),
+    ranged: z.boolean().optional(),
+  }),
+  // The actor engaged an enemy this round (`is`), or did not ("If you have not engaged an enemy this round", 08056:A:2).
+  z.strictObject({ kind: z.literal("engagedThisRound"), is: z.boolean() }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [
@@ -133,8 +147,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
 
 export type Condition = z.infer<typeof conditionSchema>;
 
-export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" }> {
-  return condition?.kind === "versusHighEngagement";
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" }> {
+  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking";
 }
 
 export const targetSchema = z.discriminatedUnion("kind", [
@@ -145,6 +159,8 @@ export const targetSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("subject") }),
   z.strictObject({ kind: z.literal("attacker") }),
   z.strictObject({ kind: z.literal("activeLocation") }),
+  // The second card the answered event names (the enemy a character attacked).
+  z.strictObject({ kind: z.literal("other") }),
   z.strictObject({
     kind: z.literal("engagedEnemies"),
     trait: z.string().min(1).optional(),

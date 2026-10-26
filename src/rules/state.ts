@@ -146,7 +146,8 @@ export type Window =
   | { kind: "chooseEnemy"; reason: "engagement" | "attack"; seat: number; options: readonly string[] }
   | { kind: "defense"; enemyId: string; seat: number }
   | { kind: "archery"; total: number }
-  | { kind: "playerAttack" }
+  // `targets`: a card opened the window (OfferAttacks): the seat may attack only these enemies, each once, as extra attacks.
+  | { kind: "playerAttack"; targets?: readonly string[] }
   | { kind: "hideCommit"; seat: number }
   | { kind: "frameAction" }
   | { kind: "choose"; seat: number; options: readonly string[] }

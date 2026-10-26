@@ -42,13 +42,13 @@ export const VERBS = [
   // Threat"), as LookAtTop does with a printed number: the cards shown can be chosen with PickEncounter `from: "looked"`.
   z.strictObject({ verb: z.literal("LookAtEncounterCards"), amount: positiveAmountSchema, ...when }),
   // The actor declares an attack against the card the reference names ("declare an attack against the attached enemy"): they
-  // choose its attackers one at a time among their ready characters that may attack it, then stop; each exhausts (unless it
+  // (Not the attack family's DeclareAttack, which declares one given attacker.) choose its attackers one at a time among their ready characters that may attack it, then stop; each exhausts (unless it
   // does not exhaust to attack) and the attack resolves (rr.step-6-8-1). It is an attack an effect makes, beside the one the
   // framework allows against each enemy (faq.limitations-on-attacks). `discardSource`: the source is discarded first, its
   // host read before ("discards Ambush to declare an attack against the attached enemy"). `enemy` and `attackers` are engine
   // use: the enemy read, the attackers chosen so far.
   z.strictObject({
-    verb: z.literal("DeclareAttack"),
+    verb: z.literal("ChooseAttackers"),
     target: cardRefSchema,
     discardSource: z.boolean().optional(),
     enemy: z.string().optional(),

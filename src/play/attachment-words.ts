@@ -13,7 +13,7 @@ type AttachmentVerb = Extract<
       | "PutAttachmentIntoPlay"
       | "HealAmong"
       | "LookAtEncounterCards"
-      | "DeclareAttack"
+      | "ChooseAttackers"
       | "QuestProgressFirst";
   }
 >;
@@ -34,7 +34,7 @@ export function attachmentWords(instruction: Instruction): string | null {
       return `heal up to ${amountWords(verb.amount)} damage from among characters you control`;
     case "LookAtEncounterCards":
       return `look at the top ${amountWords(verb.amount)} cards of the encounter deck`;
-    case "DeclareAttack":
+    case "ChooseAttackers":
       return "declare an attack against the attached enemy";
     case "QuestProgressFirst":
       return verb.first ? "place progress from questing on the location before the quest" : "place progress from questing on the quest";
@@ -53,7 +53,7 @@ export function attachmentPickWords(asked: Instruction): { verb: string; prompt:
   switch (asked.verb) {
     case "HealAmong":
       return { verb: "Heal", prompt: "Choose a character to heal 1 damage from, or Done to stop." };
-    case "DeclareAttack":
+    case "ChooseAttackers":
       return { verb: "Attack", prompt: "Choose a character to attack the enemy, or Done once all attackers are declared." };
     case "PutAttachmentIntoPlay":
       return { verb: "Attach", prompt: "Choose the card to attach it to." };
