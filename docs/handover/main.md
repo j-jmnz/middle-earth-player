@@ -21,23 +21,14 @@ User directives (2026-10-26):
 
 ## Resumed session (2026-10-26, session_01Ei8sWpP1Wh3AbvNb34oiyN)
 
-Fresh Sonnet agents (worktrees) are finishing attachments, play, attack and deck from their `wip/<F>` branches, with the
-brief plus an addendum (push to `wip/<F>`, this session's attribution lines). The main session merges each as it reports.
-
-## Families in progress (stopped at about 12:25 UTC)
-
-Each pushed its work to `wip/<F>` on GitHub; its own handover is `docs/handover/<F>.md` there (a copy is next to this file).
-The last commit on attack and deck is the main session's save of uncommitted work at the usage-limit stop: unreviewed, may
-not compile.
-
-| Family | Branch head | Base | State | Next |
-|---|---|---|---|---|
-| attack | `wip/attack` 3141b63 | 02f9ba6 | Engine, records for 42 lines (39 + 3 the defense family left), tests | Finish the attack-flow helper for events that open attack windows; checks; final commit |
-| play | `wip/play` 84f0d42 | 02f9ba6 | Engine, 34 of 35 lines, 35 tests, goldens unchanged | Full test, final commit (06036:A:2 Trained for War stays open: no Battle rules span) |
-| attachments | `wip/attachments` b7c85c5 | 6fa8029 | Engine, records for all 45 lines, 28 tests, full suite green after two fixes | Re-run full suite, card-smoke, coverage; final commit |
-| deck | `wip/deck` 6795de4 | 6fa8029 | Schema, picks, Choose `different`, discard events from costs; engine modules partly written | deck.ts run(), deck-moves/each/play, records, words, tests (see its handover) |
-
-To continue a family in a new session, see `docs/handover/RESUME.md` (the prompt for a new chat).
+- attachments, attack, play and deck are merged (squashed, duplicates reduced: see the four merge commits). Full suite green
+  (2144 tests), goldens unchanged. Open lines: **333** (sidequests 85, misc 74, scenario-141 34, scenario-142 138,
+  06036:A:2 Battle keyword, 145005:A:1 Imrahil ally-to-hero type change).
+- Running agents (Sonnet, worktrees), each pushing to its branch: sidequests (`wip/sidequests`), misc (`wip/misc`), rules
+  spans for Battle/Siege, Guarded player cards and Trap (`wip/rules`), phase 13 Flight to the Ford (`wip/phase-13`).
+  Their briefs: the agent brief plus an addendum (base = this branch head, push to wip/<F>, this session's attribution).
+- New follow-up from the deck merge: PutIntoPlay of an attachment (families/deck-moves.ts putAttachmentIntoPlay) and the
+  attachments family's PutAttachmentIntoPlay verb overlap; only the latter applies Guarded. Make them one.
 
 ## Families not started
 
