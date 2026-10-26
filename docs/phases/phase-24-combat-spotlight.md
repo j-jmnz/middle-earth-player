@@ -130,6 +130,6 @@ None. The canvas is phone-only. The banner flows still pass, because the banner 
 
 ## Handover from phase 22
 
-- The dock's readout, armed line, buttons and quiet pills are pinned to the dock's foot (`src/play/table-dock.tsx`); only the step, title and folded lines above them scroll. The scrim over the dock covers that whole column; the readout block is still what the choice tray's foot is measured against (`onBlock`).
+- The dock's readout, armed line, buttons and quiet pills are pinned to the dock's foot (`src/play/table-dock.tsx`); only the step, title and folded lines above them scroll. The scrim over the dock covers that whole column; the readout block is still what the choice tray's foot is measured against (`onBlock`). On a screen under 400 pt tall (`DENSE_BELOW`, `dock-budget.ts`) the readout shows one line while the tray is open; the full text is its accessibility label.
 - The quest band is gone from the command column; the quest card's preview carries the stage name and progress.
 - A card's edge shows at most two effect pills and "+n" (`badgeSplit` in `src/play/card-effects.ts`); the enlarged cards in the spotlight read the same split unless the spotlight draws its own.

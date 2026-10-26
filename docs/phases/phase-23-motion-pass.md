@@ -153,7 +153,7 @@ Phase 20 is merged. What phase 23 builds on:
 
 ## Handover from phase 22
 
-- The table menu and the dock's More popover (`dock-more-actions`) share one frame, `src/play/popover-frame.tsx`: it scales in from the corner it hangs from (`ENTER_MS` 200 ease-out from 0.96, `LEAVE_MS` 150 ease-in) with its scrim. Moving those to `motion-tokens.ts` moves both popovers at once.
+- The table menu, the dock's More popover (`dock-more-actions`) and the dock's "i" popover (`dock-more-lines`, `dock-lines-popover.tsx`) share one frame, `src/play/popover-frame.tsx`: it scales in from the corner it hangs from (`ENTER_MS` 200 ease-out from 0.96, `LEAVE_MS` 150 ease-in) with its scrim. Moving those to `motion-tokens.ts` moves all three popovers at once.
 - The armed bar under the dock's armed line (`src/play/dock-buttons.tsx`) runs down in its own 4 pt under the text; it does not animate under reduced motion (the text carries the meaning). Its room is sized by `armed-room.ts` and never changes on arming, so any motion added there must not move the buttons.
-- The "i" pill (`dock-more`) opens the folded dock lines in place with no animation today.
+- The "i" pill (`dock-more`) opens the folded dock lines in that shared popover; the dock itself never reflows when it opens.
 - The quest band is gone, so it has no motion to tune.
