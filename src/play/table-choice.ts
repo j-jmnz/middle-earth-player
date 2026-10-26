@@ -45,7 +45,7 @@ export function choiceFor(sheet: Sheet, held: Choice | null, only: Choice | null
 }
 
 function poolsOf(sheet: Extract<Sheet, { kind: "distribute" }>) {
-  return { total: sheet.total, exact: sheet.exact, pools: sheet.options.map((item) => ({ heroId: item.id, max: item.max })), ...(sheet.spread ? { spread: sheet.spread } : {}) };
+  return { total: sheet.total, exact: sheet.exact, pools: sheet.options.map((item) => ({ heroId: item.id, max: item.max })), ...(sheet.distinct ? { distinct: sheet.distinct } : {}) };
 }
 
 // The ways a fixed total can be shared: none when the cards cannot take it all, one when a single card takes it or every

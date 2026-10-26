@@ -21,6 +21,12 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
   if (card.controller !== game.activeSeat && game.window != null) return "It is another player's turn to act.";
   const refused = playWindowReason(game, cardId, ctx);
   if (refused) {
+    // "You must use resources from 3 different heroes' pools" (01036:A:1): the engine counts the pools that can pay.
+    const fewest = /^Pay from at least (\d+) different heroes$/.exec(refused);
+    if (fewest) {
+      const pools = playRequest(game, ctx, cardId)?.pools.filter((pool) => pool.max > 0).length ?? 0;
+      return `It is paid from ${fewest[1]} different heroes. ${pools} of yours can pay.`;
+    }
     switch (refused) {
       case "That intent is not legal in this window":
         if (printed.type === "ally" || printed.type === "attachment") return `${printed.type === "ally" ? "Allies" : "Attachments"} are played in the planning phase.`;
@@ -50,10 +56,6 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
     if (have < request.total) {
       const whose = printed.sphere === "neutral" || printed.sphere == null ? "Your heroes have" : `Your ${sphere} heroes have`;
       return `It costs ${request.total}. ${whose} ${have} ${have === 1 ? "resource" : "resources"}.`;
-    }
-    // "You must use resources from 3 different heroes' pools" (01036:A:1).
-    if (request.spread != null && request.pools.length < request.spread) {
-      return `It is paid from ${request.spread} different heroes. ${request.pools.length} of yours can pay.`;
     }
   }
   return null;

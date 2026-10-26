@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../catalog/boundary.ts";
 
+import { holds } from "./conditions.ts";
+import { placeProgress } from "./effect-verbs.ts";
+import { spentThisRound } from "./families/costs-pay.ts";
 import { cardMap, expectOk, hero, idleScenario } from "./fixture.ts";
 import type { EngineStep } from "./intents.ts";
 import { settle } from "./machine.ts";
@@ -60,6 +63,16 @@ describe("cancel payments", () => {
     expect(paid.state.cards[sam]?.resources).toBe(0);
     expect(paid.state.cards[elfId]?.zone).toBe("play");
   });
+
+  it("notes the pools that paid a cancel as spent this round, in a game that reads it (Tighten Our Belts)", () => {
+    const { state, ctx, frodo, sam, elf: elfId } = offered();
+    // A card in the game reads whether resources were spent (`unspent`), so spending is remembered.
+    const reader: Effect = { id: "frodo:action:1", cardCode: "frodo", lines: ["frodo:A:1"], timing: "action", instructions: [{ verb: "HeroesGainResources", amount: 1, unspent: true }] };
+    const reading = { ...ctx, effects: [effect, reader] };
+    const paid = expectOk(reduce(state, { type: "Trigger", cardId: elfId, effectId: effect.id, payments: [{ heroId: frodo, amount: 1 }, { heroId: sam, amount: 1 }] }, reading));
+    expect(spentThisRound(paid.state, frodo)).toBe(true);
+    expect(spentThisRound(paid.state, sam)).toBe(true);
+  });
 });
 
 describe("revealed events", () => {
@@ -97,5 +110,39 @@ describe("hide failures", () => {
     const next = settle(state, ctx, []);
     expect(next.round).toBe(2);
     expect(next.hideFailures).toEqual([]);
+  });
+});
+
+describe("the refresh phase's last action window", () => {
+  it("is still the refresh phase: a Refresh Action may be used after 7.4 (rr.step-7-4, rr.step-7-5)", () => {
+    const state = { ...idleScenario(1), phase: "End of round" as const };
+    const ctx = { effects: [], cards: cardMap([]) };
+    expect(holds(state, { kind: "phase", is: "Refresh" }, { actor: 0, sourceId: null, returned: 0 }, ctx)).toBe(true);
+    // An event about the end of a phase names the phase that ended.
+    expect(holds(state, { kind: "phase", is: "Refresh" }, { actor: 0, sourceId: null, returned: 0, phase: "End of round" }, ctx)).toBe(false);
+  });
+});
+
+describe("an explored location leaving play", () => {
+  it("is announced as explored (rr.explored): a Response to it with subjectExplored is offered", () => {
+    const glade = definePrinted({ code: "glade", name: "Glade", type: "location", threat: 1, questPoints: 2 });
+    const scout: Effect = {
+      id: "frodo:response:1",
+      cardCode: "frodo",
+      lines: ["frodo:A:1"],
+      timing: "response",
+      trigger: "leftPlay",
+      subject: { type: "location", control: "any" },
+      condition: { kind: "subjectExplored" },
+      instructions: [{ verb: "Draw", amount: 1 }],
+    };
+    const ctx = { effects: [scout], cards: cardMap([hero("frodo", "fellowship"), glade]) };
+    const frodo = spawn(idleScenario(1), "frodo", { zone: "heroes", seat: 0 });
+    const location = spawn(frodo.state, "glade", { zone: "activeLocation" });
+    const steps: EngineStep[] = [];
+    const explored = placeProgress({ ...location.state, activeLocation: location.id }, location.id, 2, ctx, steps);
+    expect(explored.cards[location.id]?.zone).not.toBe("activeLocation");
+    // The Response is offered: its condition held for the explored location.
+    expect(explored.stack.at(-1)?.data.kind).toBe("responses");
   });
 });

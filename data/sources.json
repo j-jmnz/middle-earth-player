@@ -7,7 +7,7 @@
         "kind": "git",
         "value": "629db897de0c5a82a72610ff76e22dc01f59a4ac"
       },
-      "fetchedAt": "2026-10-24T10:12:51.542Z",
+      "fetchedAt": "2026-10-26T00:33:38.812Z",
       "files": [
         {
           "path": "raw/dragncards/cardDb.tsv",
@@ -50,6 +50,36 @@
           "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/encounterCards.json",
           "sha256": "d80a33e52f61380e5de53166d0db09648e403d75f3e76a0e073d38050bc7b945",
           "bytes": 2300
+        },
+        {
+          "path": "raw/dragncards/basicAttachments-GENERATED.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/basicAttachments-GENERATED.json",
+          "sha256": "fc0845fc8ce1eaf532c306901864da62f004304bbc4255d6c911651f34282bdb",
+          "bytes": 453381
+        },
+        {
+          "path": "raw/dragncards/globalPassiveEffects-GENERATED.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/globalPassiveEffects-GENERATED.json",
+          "sha256": "93b06d3b6ea547c6e4790f1eb6e72fd23be5b26377495009ac2a54aaf2fa6f5d",
+          "bytes": 174829
+        },
+        {
+          "path": "raw/dragncards/localPassiveEffects-GENERATED.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/localPassiveEffects-GENERATED.json",
+          "sha256": "a716f361ca8d9939c249f5436e9d7a10bcd127eb9728051c03c6830d355a863b",
+          "bytes": 235045
+        },
+        {
+          "path": "raw/dragncards/globalActionEffects-GENERATED.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/globalActionEffects-GENERATED.json",
+          "sha256": "48eb641445cac3b971b33f1823824a004f9cf094a2694a4967da981b64cef704",
+          "bytes": 87207
+        },
+        {
+          "path": "raw/dragncards/questAutomation.json",
+          "url": "https://raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/629db897de0c5a82a72610ff76e22dc01f59a4ac/jsons/questAutomation.json",
+          "sha256": "28c33947a49a805881614e99161896aabdf946bb3b6f0411655c6e9b1a102659",
+          "bytes": 10211
         }
       ]
     },
@@ -787,9 +817,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "5bc8a652a1fd7ff8787aef2dd0aae6a41f92e8bd5b72536615591f489ead5413"
+        "value": "e648541d9f8a3044b06c2f3a897e90812814b35fad05d8c09d5a79a2403078ab"
       },
-      "fetchedAt": "2026-10-25T14:34:04.157Z",
+      "fetchedAt": "2026-10-26T12:50:42.027Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -928,6 +958,18 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/hobbit_on_the_doorstep_rulesheet.pdf",
           "sha256": "c7a6d8904aa055744d88e06149f2af4ccc0f356dc7d4bf46410f4d452c6cd882",
           "bytes": 2709473
+        },
+        {
+          "path": "pdf/heirs-of-numenor_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/heirs-of-numenor_rules.pdf",
+          "sha256": "2d290387b7963814746273a884c99718873c1b41cff95f6200db96b37aaa480a",
+          "bytes": 2714611
+        },
+        {
+          "path": "pdf/mec65_web_the-wilds-of_rhovanion_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec65_web_the-wilds-of_rhovanion_rules.pdf",
+          "sha256": "a822a79776d1e7df282c12789b21ed5b001025e016413b4a81602328f3b83dd6",
+          "bytes": 4748254
         },
         {
           "path": "pdf/mec_communitydecklists_eomerandeowyn-compressed.pdf",

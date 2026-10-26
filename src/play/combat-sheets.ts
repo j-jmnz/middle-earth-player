@@ -85,31 +85,26 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   const note = numbers ? `Attack ${numbers.attack}.` : "";
   const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
   const undefended = undefendedSheet(game, ctx, names, title, note);
-  // A defender is declared and Stand Together lets the player declare more (01038:A:1): a pass ends the declarations.
-  const more = has(legal, "Pass");
   // Leave undefended with one hero to take it: the armed line says when that hero falls and the game with it.
   const lone = "kind" in undefended ? null : undefended.type === "Undefended" ? undefended.heroId : null;
   const loneCaution = lone && numbers ? foreseen(game, ctx, names, lone, numbers.attack).caution : undefined;
-  const leave: Alternative = more
-    ? { label: "No more defenders", intent: { type: "Pass" } }
-    : "kind" in undefended
+  const leave: Alternative =
+    "kind" in undefended
       ? { label: "Leave undefended", next: undefended }
       : { label: "Leave undefended", intent: undefended, ...(loneCaution ? { caution: loneCaution } : {}) };
   return {
     kind: "pick",
-    key: `defense:${numbers?.enemyId ?? ""}:${game.pendingAttack?.undefended ? "u" : "d"}${more ? `:${defenders.length}` : ""}`,
+    key: `defense:${numbers?.enemyId ?? ""}:${game.pendingAttack?.undefended ? "u" : "d"}`,
     step: "Combat",
     title,
     stats: numbers ? statOf(game, ctx, numbers.enemyId, "attack") : [],
-    note: more ? `${note} Declare another defender, or stop. Their Defense is pooled, and you choose who takes the damage.` : game.pendingAttack?.undefended ? `${note} This attack is undefended.` : defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`,
+    note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`,
     verb: "Defend with",
     options: defenders.map((id) => {
       const defense = defenseAsDefender(game, id, ctx.cards);
       const damage = numbers ? defenseDamage(game, ctx, numbers.enemyId, id) : 0;
       const base = option(game, names, id);
-      // Another defender pools its Defense; who takes the damage is chosen after the declarations, so nothing is
-      // destroyed by this pick yet (rr.multiple-defenders).
-      const seen = more ? { stats: [{ icon: "damage" as const, value: damage, word: "Damage" }], suffix: "", mark: { icon: "damage" as const, value: damage, danger: false } } : foreseen(game, ctx, names, id, damage);
+      const seen = foreseen(game, ctx, names, id, damage);
       return {
         ...base,
         label: `${base.label}${seen.suffix}`,
@@ -121,6 +116,21 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
     }),
     primary: null,
     alternative: leave,
+  };
+}
+
+/**
+ * One more defender picked in the defense family's declaration frame (Stand Together, 01038:A:1): its Defense, and the
+ * pooled damage the attack would deal. Who takes it is chosen after the declarations, so nothing is destroyed by this pick
+ * yet (rr.multiple-defenders).
+ */
+export function extraDefender(game: ScenarioState, ctx: ReduceContext, id: string): { stats: SheetStat[]; mark: OptionMark } | null {
+  const numbers = attackNumbers(game, ctx);
+  if (!numbers || !game.cards[id]) return null;
+  const damage = defenseDamage(game, ctx, numbers.enemyId, id);
+  return {
+    stats: [{ icon: "defense", value: defenseAsDefender(game, id, ctx.cards), word: "Defense" }, { icon: "damage", value: damage, word: "Damage" }],
+    mark: { icon: "damage", value: damage, danger: false },
   };
 }
 

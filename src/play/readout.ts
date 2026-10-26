@@ -5,12 +5,14 @@
 // The engine's numbers for the open moment, as the dock shows them beside the choice: attack against defense while an attack
 // is going on (an enemy can attack during staging), the Hide numbers, otherwise willpower against threat while questing.
 // Every number is read with the engine's own functions on the current state; the picks only say whose numbers to add.
-import { attackStrength, defendersOf } from "../rules/combat.ts";
+import { attackStrength } from "../rules/combat.ts";
+import { declaredDefenders, pooledDefense, standingDefenders } from "../rules/families/defense-defenders.ts";
 import { hidePassed, hideWillpower } from "../rules/hide.ts";
-import { defenseAsDefender, modifiedStat, pooledDefense, standingDefenders } from "../rules/keywords.ts";
-import { committedWillpower, failQuest, questPointsOf, stagingThreat } from "../rules/quest.ts";
+import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
+import { committedWillpower, failQuest, questPointsOf, questStatOf, stagingThreat } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { livingSeats } from "../rules/state.ts";
+import { topFrame } from "../rules/windows.ts";
 
 import { damageOutcome, enemiesToFace, lossWords, outcomeWords } from "./foresight.ts";
 import type { Sheet, SheetStat } from "./sheet-types.ts";
@@ -39,7 +41,7 @@ function damageWords(attack: number, defense: number): string {
 
 // The card the open sheet has picked, and what the pick means in the enemy's attack: a defender, or the hero an undefended
 // attack hits (the sheet Leave undefended opens). With nothing picked, the one hero Leave undefended already names.
-function pickedInAttack(sheet: Sheet | null, choice: Choice | null): { id: string; role: "defender" | "hit" } | null {
+function pickedInAttack(game: ScenarioState, sheet: Sheet | null, choice: Choice | null): { id: string; role: "defender" | "hit" } | null {
   if (sheet?.kind !== "pick") return null;
   const leave = sheet.alternative && "intent" in sheet.alternative && sheet.alternative.intent.type === "Undefended" ? sheet.alternative.intent.heroId : undefined;
   if (!choice?.ids[0]) return leave ? { id: leave, role: "hit" } : null;
@@ -47,6 +49,9 @@ function pickedInAttack(sheet: Sheet | null, choice: Choice | null): { id: strin
   if (!item || !("intent" in item)) return null;
   if (item.intent.type === "DeclareDefender") return { id: item.id, role: "defender" };
   if (item.intent.type === "Undefended") return { id: item.id, role: "hit" };
+  // One more defender, picked in the defense family's declaration frame (Stand Together, families/defense-defenders.ts).
+  const data = topFrame(game)?.data;
+  if (item.intent.type === "Choose" && data?.kind === "effect" && data.effectId === "defense:defenders") return { id: item.id, role: "defender" };
   return null;
 }
 
@@ -75,10 +80,10 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     if (!enemy) return null;
     const strength = modifiedStat(game, enemy, "attack", ctx.cards);
     const shadowNote = attack.shadowResolved ? "" : ", shadow card next";
-    const picked = pickedInAttack(sheet, choice);
+    const picked = pickedInAttack(game, sheet, choice);
     // Several defenders (Stand Together, rr.multiple-defenders): their defense is pooled against the attack, and all the
     // damage goes on the one the defending player chooses.
-    const declared = attack.undefended ? [] : standingDefenders(game, defendersOf(game));
+    const declared = attack.undefended ? [] : standingDefenders(game, declaredDefenders(game.pendingAttack));
     const pooled = picked?.role === "defender" && declared.length > 0 && !declared.includes(picked.id) ? [...declared, picked.id] : declared;
     if (pooled.length > 1) {
       const defense = pooledDefense(game, pooled, ctx.cards);
@@ -130,7 +135,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const picked = sheet?.kind === "window" && sheet.commit ? (choice?.ids ?? []).filter((id) => !game.cards[id]?.committed) : [];
     const added = picked.reduce((sum, id) => {
       const card = game.cards[id];
-      return sum + (card ? modifiedStat(game, card, "willpower", ctx.cards) : 0);
+      return sum + (card ? modifiedStat(game, card, questStatOf(game, id, ctx.cards), ctx.cards) : 0);
     }, 0);
     const willpower = committedWillpower(game, ctx.cards) + added;
     const threat = stagingThreat(game, ctx.cards);

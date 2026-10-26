@@ -35,9 +35,9 @@ export function scheduleDelayed(
 
 // Delayed effects that come due when `ended` finishes. An end-of-round effect comes due when the
 // End of round phase finishes.
-function due(state: ScenarioState, ended: string, until: "endOfPhase" | "endOfRound") {
+function due(state: ScenarioState, ended: string, until: "endOfPhase" | "endOfRound" | "startOfGame") {
   return state.delayed.filter((entry) =>
-    until === "endOfPhase" ? entry.until === "endOfPhase" && entry.phase === ended : entry.until === "endOfRound" && ended === "End of round",
+    until === "endOfPhase" ? entry.until === "endOfPhase" && entry.phase === ended : until === "startOfGame" ? entry.until === "startOfGame" : entry.until === "endOfRound" && ended === "End of round",
   );
 }
 
@@ -45,7 +45,7 @@ function due(state: ScenarioState, ended: string, until: "endOfPhase" | "endOfRo
 export function pushDue(
   state: ScenarioState,
   ended: string,
-  until: "endOfPhase" | "endOfRound",
+  until: "endOfPhase" | "endOfRound" | "startOfGame",
   steps: EngineStep[],
 ): ScenarioState {
   const entries = due(state, ended, until);

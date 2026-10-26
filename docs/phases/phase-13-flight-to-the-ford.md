@@ -4,6 +4,8 @@ Engine half depends on: phase 12's engine half
 Phone half depends on: phase 12
 Blocks: phase 14
 
+**State (2026-10-26):** engine half done and merged (the `burden` family; records in `src/effects/authored/flight-to-the-ford.ts`; `flight-to-the-ford` is in `src/campaign/playable.ts`). `/reviewer` ran on it (non-blocking findings listed in `STATUS.md`); `/ux` has not. The phone half is built and unit-tested; the phone checks, the three Maestro runs and their fixtures are open.
+
 ## Goal
 
 `flight-to-the-ford` is playable, including the burden deck and the Ring-bearer's life. Follow the scenario procedure in phase 12.
@@ -29,6 +31,8 @@ Created by the Setup line at 15. Its own number. The refresh step does not chang
 ## E2E
 
 `.maestro/flight-to-the-ford.yaml` opens a seeded save at the start of this scenario and asserts the life readout is 15 and the burden deck count is 5. The same ids are absent on a scenario 1 save. A resolution flow unlocks `the-ring-goes-south` on a win and writes nothing on a loss.
+
+Written, 2026-10-26 (cloud session, none has run): `.maestro/flight-to-the-ford.yaml` (the start: life 15, burden deck 5, kill and relaunch), `.maestro/flight-to-the-ford-win.yaml` (the Resolution asks nothing and unlocks `the-ring-goes-south`) and `.maestro/flight-to-the-ford-loss.yaml` (Defeat at life 0 writes nothing); `scenario-1.yaml` asserts `life` and `burden-deck` are absent. The ids are `life` and `burden-deck` (the value is `<id>-value`). **Open:** their fixtures `ford-start`, `ford-won` and `ford-lost` are not committed. A fixture is a real save, and these start from the log that scenarios 1 and 2 write when won; no win of either has been found with the starter decks (phases 11 and 12), so the chain cannot be built honestly. Add the three names to `src/campaign/fixtures.ts` when `scripts/e2e-fixtures.ts --won` finds the chain.
 
 ## Exit
 

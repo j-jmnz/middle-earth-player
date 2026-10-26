@@ -31,12 +31,6 @@ export const PLAYER_ABILITY_TEMPLATES: readonly Template[] = [
     ],
   },
   {
-    // "Action: Choose a player. That player draws 3 cards." (01064:A:1)
-    id: "action-choose-player-draws",
-    pattern: /^Action: Choose a player\. That player draws (\d+|an?|one) cards?\.$/,
-    build: (match) => [{ timing: "action", instructions: [{ verb: "Pick", pick: { type: "player", control: "any" } }, { verb: "Draw", amount: count(match[1]), who: "picked" }] }],
-  },
-  {
     id: "action-exhaust-add-resources-to-attached",
     pattern: /^Action: Exhaust \{self\} to add (\d+|an?|one) resources? to attached hero's resource pool\.$/,
     build: (match) => [{ timing: "action", cost: { kind: "exhaustSelf" }, instructions: [{ verb: "AddResources", amount: count(match[1]) }] }],

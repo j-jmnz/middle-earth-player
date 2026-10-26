@@ -1,10 +1,12 @@
 // Rules: rr.lasting-effects, rr.modifiers (data/rules/entries.json).
-import type { Instruction } from "../catalog/boundary.ts";
+import { isStatCondition, type Instruction } from "../catalog/boundary.ts";
 
+import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { characters } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { pickCandidates } from "./pick.ts";
 import { lastPicked, seatOf } from "./player-verbs.ts";
 import { topFrame } from "./windows.ts";
 import { addClassModifier, addModifier, ALLIES_CLASS } from "./keywords.ts";
@@ -65,44 +67,65 @@ export function modifyStat(
     case "ownHeroes":
       targets = [...(state.seats[focus.seat]?.heroes ?? [])];
       break;
-    // The character defending the attack in progress (141052:A:2). With several defenders (Stand Together), the first
-    // declared: rr.multiple-defenders does not say which "the defending character" is, an open reading in the brief.
+    // Every hero the picked player controls (10144).
+    case "pickedPlayerHeroes": {
+      const seat = seatOf(lastPicked(state));
+      targets = seat == null ? [] : [...(state.seats[seat]?.heroes ?? [])];
+      break;
+    }
+    // The character defending the attack in progress (141052:A:2).
     case "defender":
       targets = state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? [state.pendingAttack.defenderId] : [];
+      break;
+    // The quest card being attempted: it gains Battle or Siege (hon.battle, hon.siege).
+    case "currentQuest":
+      targets = state.questStage ? [state.questStage] : [];
       break;
     // Every ally, now and entering play later, until the effect ends: an encounter card's lasting effect (rr.lasting-effects,
     // 141071:A:1). The holder is the class, read by modifiedStat.
     case "allies":
       targets = [ALLIES_CLASS];
       break;
-    // The card the source is attached to ("give attached hero +1 Defense", 01070:A:2).
+    // The card the answered event was about ("that ally gets +2 Attack"), the source's host.
+    case "subject":
+    case "other":
     case "host": {
-      const host = state.cards[sourceId]?.host;
-      targets = host ? [host] : [];
+      const id = refCard(state, instruction.target, frameScope(state, focus.seat, sourceId));
+      targets = id ? [id] : [];
       break;
     }
-    // Every character in play now ("all characters get +1 Attack", 01022:A:1, rr.lasting-effects).
-    case "allCharacters":
-      targets = livingSeats(state).flatMap((seat) => characters(state, seat, ctx.cards));
+    // A number a seat holds (the cards it draws in the resource phase): the actor's, or the picked player's.
+    case "actorSeat":
+      targets = [`seat:${focus.seat}`];
       break;
-    // A flag the picked player holds ("That player may declare any number of ... defenders", 01038:A:1).
-    case "pickedPlayer": {
+    case "pickedSeat": {
       const seat = seatOf(lastPicked(state));
-      return seat == null ? state : { ...state, modifiers: [...state.modifiers, { instanceId: `seat:${seat}`, sourceId, stat: instruction.stat, amount: instruction.amount, until: instruction.until, seat }] };
+      targets = seat == null ? [] : [`seat:${seat}`];
+      break;
     }
     default:
       targets = [sourceId];
   }
-  // "+X Attack, where X is the discarded card's cost": X is read from the frame once.
+  // "Each Dwarf character gets +1 Willpower until the end of the phase": the holders are the cards that match now.
+  if (instruction.holders) targets = pickCandidates(state, instruction.holders, focus.seat, [], sourceId, ctx);
+  // "+X Attack, where X is the discarded card's cost": X is read from the frame once, and so is any other amount.
   const data = topFrame(state)?.data;
-  const amount = instruction.per === "x" ? instruction.amount * (data?.kind === "effect" ? (data.x ?? 0) : 0) : instruction.amount;
+  const scope = frameScope(state, focus.seat, sourceId);
+  const base = resolveAmount(state, instruction.amount, scope, ctx);
+  const read = instruction.per === "x" ? base * (data?.kind === "effect" ? (data.x ?? 0) : 0) : base;
+  const amount = instruction.subtract ? -read : read;
   let next = state;
   const trait = instruction.trait;
   for (const id of targets) {
-    if (trait != null && !hasTrait(next, id, trait, ctx)) continue;
-    next = id === ALLIES_CLASS
+    if (trait != null && !id.startsWith("seat:") && !hasTrait(next, id, trait, ctx)) continue;
+    if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
+    else next = id === ALLIES_CLASS
       ? addClassModifier(next, ALLIES_CLASS, sourceId, instruction.stat, amount, instruction.until)
       : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);
   }
-  return next;
+  // A condition read each time the stat is read stays on the modifiers it made ("+3 Attack while attacking an enemy with a
+  // higher engagement cost than your threat", 04004:A:1).
+  const kept = instruction.when;
+  if (!isStatCondition(kept) || next.modifiers.length === state.modifiers.length) return next;
+  return { ...next, modifiers: [...state.modifiers, ...next.modifiers.slice(state.modifiers.length).map((modifier) => ({ ...modifier, when: kept }))] };
 }

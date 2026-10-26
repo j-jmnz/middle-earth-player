@@ -1,7 +1,9 @@
+import { costOfKind } from "../src/catalog/costs.ts";
 import { playCost } from "../src/rules/attach.ts";
 import { expectOk } from "../src/rules/fixture.ts";
 import { heroPays } from "../src/rules/payments.ts";
 import { printedOf } from "../src/rules/printed.ts";
+import { costPayer } from "../src/rules/usage.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "../src/rules/intents.ts";
 import { legalIntents, legalTargets, reduce, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
 
@@ -40,18 +42,19 @@ export function paymentsFor(state: ScenarioState, ctx: ReduceContext, seat: numb
   return left === 0 ? out : null;
 }
 
-function playable(state: ScenarioState, ctx: ReduceContext): PlayerIntent | null {
+function playable(state: ScenarioState, ctx: ReduceContext, intents: readonly LegalIntent[]): PlayerIntent | null {
   const seat = state.activeSeat;
-  for (const intent of legalIntents(state, ctx)) {
+  for (const intent of intents) {
     if (intent.type !== "PlayCard") continue;
-    const cost = playCost(state, intent.cardId, seat, ctx);
+    const printed = printedOf(ctx.cards, state.cards[intent.cardId]?.code ?? "");
+    // An attachment's cost can depend on its host (a discount for the first restricted attachment on a hero): the host comes first.
+    const host = printed.type === "attachment" ? legalTargets(state, { type: "PlayCard", cardId: intent.cardId }, ctx)[0] : undefined;
+    if (printed.type === "attachment" && !host) continue;
+    const cost = playCost(state, intent.cardId, seat, ctx, host ?? null);
     if (cost == null) continue;
     const paid = paymentsFor(state, ctx, seat, intent.cardId, cost);
     if (!paid) continue;
-    const printed = printedOf(ctx.cards, state.cards[intent.cardId]?.code ?? "");
-    if (printed.type !== "attachment") return { type: "PlayCard", cardId: intent.cardId, payments: paid };
-    const host = legalTargets(state, { type: "PlayCard", cardId: intent.cardId }, ctx)[0];
-    if (host) return { type: "PlayCard", cardId: intent.cardId, payments: paid, hostId: host };
+    return host ? { type: "PlayCard", cardId: intent.cardId, payments: paid, hostId: host } : { type: "PlayCard", cardId: intent.cardId, payments: paid };
   }
   return null;
 }
@@ -60,8 +63,8 @@ function has(intents: readonly LegalIntent[], type: LegalIntent["type"]): boolea
   return intents.some((intent) => intent.type === type);
 }
 
-function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory): PlayerIntent | null {
-  for (const intent of legalIntents(state, ctx)) {
+function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory, intents: readonly LegalIntent[]): PlayerIntent | null {
+  for (const intent of intents) {
     if (intent.type !== "Trigger") continue;
     const key = `${state.round}:${intent.cardId}:${intent.effectId}`;
     if (memory.has(key)) continue;
@@ -70,11 +73,13 @@ function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory): P
     if (!effect || !source) continue;
     const seat = state.activeSeat;
     let paid: { heroId: string; amount: number }[] | null = [];
-    if (effect.cost?.kind === "playEvent") {
+    const resources = costOfKind(effect, "resources");
+    if (costOfKind(effect, "playEvent")) {
       const cost = playCost(state, intent.cardId, seat, ctx);
       paid = cost == null ? null : paymentsFor(state, ctx, seat, intent.cardId, cost);
-    } else if (effect.cost?.kind === "resources") {
-      paid = paymentsFor(state, ctx, seat, intent.cardId, effect.cost.amount);
+    } else if (resources) {
+      const payer = costPayer(state, resources, source);
+      paid = payer === null ? null : payer !== undefined ? [{ heroId: payer, amount: resources.amount }] : paymentsFor(state, ctx, seat, intent.cardId, resources.amount);
     }
     if (!paid) continue;
     memory.add(key);
@@ -83,24 +88,30 @@ function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory): P
   return null;
 }
 
-export function nextIntent(state: ScenarioState, ctx: ReduceContext, options: PolicyOptions, memory: Memory = new Set()): PlayerIntent {
-  const intents = legalIntents(state, ctx);
+// `intents` is legalIntents(state, ctx), when the caller already has it.
+export function nextIntent(
+  state: ScenarioState,
+  ctx: ReduceContext,
+  options: PolicyOptions,
+  memory: Memory = new Set(),
+  intents: readonly LegalIntent[] = legalIntents(state, ctx),
+): PlayerIntent {
   const window = state.window;
   const scoutIds = new Set(Object.values(state.cards).filter((card) => card.code === options.scout).map((card) => card.id));
   switch (window?.kind) {
     case "mulligan":
       return { type: "Keep" };
     case "response": {
-      const answer = options.act ? triggerFor(state, ctx, memory) : null;
+      const answer = options.act ? triggerFor(state, ctx, memory, intents) : null;
       return answer ?? { type: "Pass" };
     }
     case "pass": {
       if (options.act) {
-        const action = triggerFor(state, ctx, memory);
+        const action = triggerFor(state, ctx, memory, intents);
         if (action) return action;
       }
       if (options.play && state.mode === "planning") {
-        const play = playable(state, ctx);
+        const play = playable(state, ctx, intents);
         if (play) return play;
       }
       // Each seat commits once, its own characters: a card committed by another seat does not count (a policy, not a rule).

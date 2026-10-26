@@ -9,11 +9,14 @@ import { ROOT } from "./paths.ts";
 // The draft bundles list the schema's words. A verb declared through the verb() or codeVerb() helper is a verb too.
 describe("effect vocabulary for the draft bundles", () => {
   const vocab = vocabulary();
-  // The schema is split across src/catalog/effect-schema*.ts.
+  // The schema is split across src/catalog/effect-schema*.ts, and each mechanic family's verbs in src/catalog/families.
   const catalog = path.join(ROOT, "src", "catalog");
-  const source = readdirSync(catalog)
-    .filter((name) => /^effect-schema.*\.ts$/.test(name))
-    .map((name) => readFileSync(path.join(catalog, name), "utf8"))
+  const families = path.join(catalog, "families");
+  const source = [
+    ...readdirSync(catalog).filter((name) => /^effect-schema.*\.ts$/.test(name)).map((name) => path.join(catalog, name)),
+    ...readdirSync(families).filter((name) => name.endsWith(".ts")).map((name) => path.join(families, name)),
+  ]
+    .map((file) => readFileSync(file, "utf8"))
     .join("\n");
 
   it("lists every verb the schema declares, through either helper or a literal", () => {

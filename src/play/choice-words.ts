@@ -2,9 +2,17 @@
 // branches of a Choose instruction ("either remove X progress or shuffle 1 out-of-play Ringwraith", 141026:B:2) and what a
 // Pick is for (the heroes Unwanted Attention removes from the quest, 141054:A:2). The words describe the effect record's
 // instructions; the reducer still decides what each one does.
-import type { Instruction } from "../catalog/boundary.ts";
+import type { Amount, Instruction } from "../catalog/boundary.ts";
 import { questProgressMoved } from "../rules/verbs.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
+import { attachmentPickWords, attachmentWords } from "./attachment-words.ts";
+import { deckPickWords, deckWords } from "./deck-words.ts";
+import { encounterPickWords, encounterWords } from "./encounter-words.ts";
+import { attackWords } from "./attack-words.ts";
+import { southWords } from "./south-words.ts";
+import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden-words.ts";
+import { miscPickWords, miscWords } from "./misc-words.ts";
+import { playPickWords, playWords } from "./play-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -27,6 +35,39 @@ function capital(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+// A record's amount in words: its number, or X when the engine reads it.
+function amountWords(amount: Amount | undefined, fallback = 1): string {
+  if (amount == null) return String(fallback);
+  return typeof amount === "number" ? String(amount) : "X";
+}
+
+const STAT_WORDS: Readonly<Record<string, string>> = { willpower: "Willpower", attack: "Attack", defense: "Defense", threat: "Threat", hitPoints: "hit points", drawOnAttackDestroy: "card drawn each time they attack and destroy an enemy" };
+
+// "the chosen card", "that card", "it": what a card reference names in a sentence.
+function refWords(ref: string | undefined): string {
+  switch (ref) {
+    case "self":
+      return "this card";
+    case "host":
+      return "the attached card";
+    case "subject":
+    case "other":
+      return "that card";
+    case "defender":
+      return "the defending character";
+    case "attacker":
+      return "the attacking enemy";
+    default:
+      return "it";
+  }
+}
+
+// The card a discount waits for, from its filter: "Lore ally" ("the next Lore card of that type", 05016:A:1), else "matching card".
+function nextCardWords(pick: Extract<Instruction, { verb: "ReduceNextCost" }>["pick"]): string {
+  const words = [pick.sphere ? capital(pick.sphere) : null, pick.trait ?? null, pick.cardType ? pick.cardType.replace("player-side-quest", "side quest") : null].filter((word) => word != null);
+  return pick.cardType ? words.join(" ") : "matching card";
+}
+
 /** One instruction in words, or null when it adds nothing the player decides on (a shuffle after a search). */
 function instructionWords(instruction: Instruction, game: ScenarioState, names: ChoiceNames, sourceId: string | null): string | null {
   switch (instruction.verb) {
@@ -43,23 +84,104 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
         const except = instruction.perCommitted.exceptSphere ? ` other than ${capital(instruction.perCommitted.exceptSphere)}` : "";
         return `each player raises threat by 1 for each ${instruction.perCommitted.type}${except} committed to the quest`;
       }
-      const amount = instruction.amount ?? 1;
+      const amount = amountWords(instruction.amount);
       if (instruction.who === "firstPlayer") return `the first player raises threat by ${amount}`;
       if (instruction.who === "eachSeat") return `each player raises threat by ${amount}`;
       return `raise your threat by ${amount}`;
     }
-    case "LowerThreat":
-      if (instruction.who === "eachSeat") return `each player lowers threat by ${instruction.amount}`;
-      return instruction.who === "picked" ? `lower that player's threat by ${instruction.amount}` : `lower your threat by ${instruction.amount}`;
+    case "LowerThreat": {
+      const amount = amountWords(instruction.amount);
+      if (instruction.who === "eachSeat") return `each player lowers threat by ${amount}`;
+      return instruction.who === "picked" || instruction.who === "eventSeat" ? `lower that player's threat by ${amount}` : `lower your threat by ${amount}`;
+    }
     case "Draw": {
-      const amount = instruction.amount ?? 1;
-      const cards = amount === 1 ? "1 card" : `${amount} cards`;
-      return instruction.who === "picked" ? `that player draws ${cards}` : `draw ${cards}`;
+      const amount = amountWords(instruction.amount);
+      const cards = amount === "1" ? "1 card" : `${amount} cards`;
+      return instruction.who === "picked" || instruction.who === "eventSeat" ? `that player draws ${cards}` : `draw ${cards}`;
     }
     case "DamageCard":
-      return `deal ${instruction.amount} damage to it`;
-    case "AddResources":
-      return `add ${instruction.amount} resource${instruction.amount === 1 ? "" : "s"} to its pool`;
+      return `deal ${amountWords(instruction.amount)} damage to ${refWords(instruction.target)}`;
+    case "AddResources": {
+      const amount = amountWords(instruction.amount);
+      return `add ${amount} resource${amount === "1" ? "" : "s"} to ${instruction.to === "host" || instruction.to == null ? "the attached hero's" : instruction.to === "self" ? "this card's" : "its"} pool`;
+    }
+    case "ModifyStat": {
+      // A resource icon held as a flag (Narvi's Belt): "the attached card gains a Leadership icon until the end of the phase".
+      const icon = /^(leadership|lore|tactics|spirit)Icon$/.exec(instruction.stat)?.[1];
+      if (icon) {
+        const until = instruction.until === "endOfPhase" ? " until the end of the phase" : instruction.until === "endOfRound" ? " until the end of the round" : "";
+        return `${refWords(instruction.target === "picked" || instruction.target == null ? undefined : instruction.target)} gains a ${capital(icon)} icon${until}`;
+      }
+      const stat = STAT_WORDS[instruction.stat] ?? instruction.stat;
+      const amount = typeof instruction.amount === "number" ? (instruction.amount >= 0 ? `+${instruction.amount}` : `${instruction.amount}`) : "+X";
+      const until = instruction.until === "endOfPhase" ? " until the end of the phase" : instruction.until === "endOfRound" ? " until the end of the round" : "";
+      const who = instruction.holders ? "each matching card" : refWords(instruction.target === "picked" || instruction.target == null ? undefined : instruction.target);
+      return `${who === "it" ? "it gets" : `${who} gets`} ${amount} ${stat}${until}`;
+    }
+    case "Heal":
+      return instruction.all ? `heal all damage on ${refWords(instruction.target)}` : `heal ${amountWords(instruction.amount)} damage on ${refWords(instruction.target)}`;
+    case "Ready":
+      return instruction.target === "allCharacters" ? "ready each character" : `ready ${refWords(instruction.target === "picked" ? undefined : instruction.target)}`;
+    case "ReturnToHand":
+      return `return ${refWords(instruction.target)} to its owner's hand`;
+    case "PutOnDeck":
+      return instruction.position === "shuffle" ? `shuffle ${refWords(instruction.target)} into its owner's deck` : `put ${refWords(instruction.target)} on the ${instruction.position} of its owner's deck`;
+    case "MoveResources":
+      return instruction.all ? "move all its resources" : `move ${amountWords(instruction.amount)} resource${amountWords(instruction.amount) === "1" ? "" : "s"}`;
+    case "DiscardFromHand":
+      return `discard ${amountWords(instruction.amount)} card${amountWords(instruction.amount) === "1" ? "" : "s"} from your hand`;
+    case "AddToVictory":
+      return `add ${refWords(instruction.target)} to the victory display`;
+    case "SetThreat":
+      return `set your threat to ${instruction.value}`;
+    case "CancelDamage":
+      return instruction.all ? "cancel that damage" : `cancel ${amountWords(instruction.amount)} of that damage`;
+    case "CancelEffect":
+      return "cancel those effects";
+    case "Engage":
+      return instruction.target === "self" && sourceId ? `engage ${names.card(sourceId)}` : "engage that enemy";
+    case "Discard":
+      return instruction.target.kind === "self" ? "discard this card" : "discard it";
+    case "PlaceProgressOn":
+      return `place ${amountWords(instruction.amount)} progress on ${instruction.target === "eachStagingLocation" ? "each location in the staging area" : instruction.target === "activeLocation" ? "the active location" : "it"}`;
+    case "ReduceNextCost":
+      return `reduce the cost of the next ${nextCardWords(instruction.pick)} you play by ${amountWords(instruction.amount)}`;
+    // The costs family's verbs (src/catalog/families/costs.ts).
+    case "SpendResources": {
+      const sphere = instruction.sphere ? `${capital(instruction.sphere)} ` : "";
+      return `${instruction.group ? "the players as a group spend" : "spend"} ${instruction.amount} ${sphere}resource${instruction.amount === 1 ? "" : "s"}`;
+    }
+    case "SetX":
+      return `X is ${instruction.value}`;
+    case "ChooseX":
+      return "choose X";
+    case "DiscardResources":
+      return instruction.all ? "discard all its resources" : `discard ${amountWords(instruction.amount)} resource${amountWords(instruction.amount) === "1" ? "" : "s"}`;
+    case "HeroesGainResources":
+      return `each hero ${instruction.who === "picked" ? "that player controls" : "you control"} gains ${amountWords(instruction.amount)} resource${amountWords(instruction.amount) === "1" ? "" : "s"}`;
+    case "PlayFromHand":
+      return instruction.picked ? "play each of those cards from your hand" : "play a card from your hand";
+    case "Reattach":
+      return "attach this card to another hero";
+    case "LookAtEncounterTop":
+      return "look at the top card of the encounter deck";
+    case "AttackEnemy":
+      return "attack that enemy";
+    case "BarAttack":
+      return "that enemy cannot attack you";
+    case "DiscardTopOfDeck":
+      return "discard the top card of your deck";
+    case "AttachPicked":
+      return "attach it";
+    case "Each":
+    case "Repeat":
+    case "Delay": {
+      const inner = instruction.instructions.map((entry) => instructionWords(entry, game, names, sourceId)).filter((text): text is string => text != null);
+      return inner.length > 0 ? inner.join(", then ") : null;
+    }
+    case "ShuffleDeck":
+    case "ArrangeTop":
+      return null;
     case "DiscardShadow":
       return "discard its shadow card";
     case "Exhaust":
@@ -75,7 +197,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
         ? `add ${article(`${instruction.trait ?? ""} enemy`.trim())} from the encounter deck or discard pile to the staging area`
         : `put ${article(`${instruction.trait ?? ""} enemy`.trim())} into play engaged with the first player`;
     case "Pick": {
-      const noun = PICK_NOUNS[instruction.pick.type] ?? "card";
+      // A card out of play is named by its printed type when the pick asks for one ("choose an ally" from the deck).
+      const noun = instruction.pick.type === "card" && instruction.pick.cardType && instruction.pick.cardType !== "player-side-quest" ? instruction.pick.cardType : (PICK_NOUNS[instruction.pick.type] ?? "card");
       return `choose ${article(noun)}`;
     }
     case "RemoveFromQuest":
@@ -88,16 +211,57 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `place it facedown under ${sourceId ? names.card(sourceId) : "the location"}`;
     case "ShuffleEncounterDeck":
       return null;
-    // Denethor (01010:A:1) and Protector of Lórien (01070:A:2).
-    case "EncounterTopToBottom":
-      return "move the top card of the encounter deck to its bottom";
-    case "ModifyStat": {
-      const stat = instruction.stat.charAt(0).toUpperCase() + instruction.stat.slice(1);
-      const who = instruction.target === "host" ? "attached hero" : "it";
-      return `${who} gets ${instruction.amount >= 0 ? "+" : ""}${instruction.amount} ${stat}`;
-    }
+    // The quest family's verbs (src/catalog/families/quest.ts).
+    case "DamageEach":
+      return instruction.engagedWith === "picked" ? `deal ${amountWords(instruction.amount)} damage to each enemy engaged with that player` : `deal ${amountWords(instruction.amount)} damage to each matching ${PICK_NOUNS[instruction.pick?.type ?? "enemy"] ?? "card"}`;
+    case "WaiveQuestThreat":
+      return `${instruction.who === "eachSeat" ? "players do" : "that player does"} not raise threat from questing unsuccessfully ${instruction.until === "endOfRound" ? "this round" : "this phase"}`;
+    case "SkipQuestPhase":
+      return "skip the quest phase this round";
+    case "MoveProgress":
+      return instruction.all ? "move all its progress" : `move ${amountWords(instruction.amount)} progress`;
+    case "CommitToQuest":
+      return "commit it to the quest";
+    case "MakeActive":
+      return "make it the active location";
+    case "BarEngagement":
+      return instruction.what === "checks" ? "that enemy makes no engagement checks against you" : "that enemy cannot engage you";
+    // The defense family's verbs (src/catalog/families/defense.ts).
+    case "ChooseAmount":
+      return "choose X";
+    case "SpendFromPool":
+      return `spend ${amountWords(instruction.amount)} resource${amountWords(instruction.amount) === "1" ? "" : "s"} from ${refWords(instruction.from)}`;
+    case "RedirectDamage":
+      return `place ${instruction.all ? "that damage" : `${amountWords(instruction.amount)} of that damage`} on ${refWords(instruction.to)} instead`;
+    case "PreventAttacks":
+      return instruction.who === "picked" ? "that player's engaged enemies cannot attack that player" : "that enemy cannot attack you";
+    case "DiscardShadowOf":
+      return `discard a shadow card from ${refWords(instruction.target)}`;
+    case "DealShadowTo":
+      return `deal ${refWords(instruction.target)} another shadow card`;
+    case "LookAtShadow":
+      return "look at its facedown shadow card";
+    case "StrikeBack":
+      return `${refWords(instruction.attacker)} attacks ${refWords(instruction.enemy)}`;
+    case "AddDefender":
+      return "declare it as a defender";
+    case "EndDeclaring":
+      return "declare no more defenders";
+    case "CancelAttack":
+      return "cancel the attack";
+    case "AssignAttackDamage":
+      return "it takes the damage of the attack";
+    case "ReadyUnharmed":
+      return "ready each defending character that took no damage";
+    case "ReadyAfterAttack":
+      return instruction.who === "subject" ? "ready that card after the attack" : "ready each defending character that takes no damage after the attack";
+    case "RedirectAttack":
+      return "reveal the attacking enemy's shadow card";
+    case "ModifyStatVersus":
+      return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
-      return null;
+      // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
+      return southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
@@ -106,6 +270,8 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   const option = choose.options.find((entry) => entry.id === optionId);
   if (!option) return capital(optionId);
   if (option.instructions.length === 0) return "Do nothing";
+  const whole = burdenBranchWords(option.instructions);
+  if (whole) return whole;
   // A run of "pick a hero, remove it from the quest" is one decision: how many heroes leave the quest.
   const removals = option.instructions.filter((instruction) => instruction.verb === "RemoveFromQuest").length;
   const picks = option.instructions.filter((instruction): instruction is PickInstruction => instruction.verb === "Pick");
@@ -123,8 +289,8 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
 export function branchThreat(choose: ChooseInstruction, optionId: string): number | null {
   const option = choose.options.find((entry) => entry.id === optionId);
   for (const instruction of option?.instructions ?? []) {
-    if (instruction.verb === "RaiseThreat" && !instruction.perCommitted) return instruction.amount ?? 1;
-    if (instruction.verb === "LowerThreat") return -instruction.amount;
+    if (instruction.verb === "RaiseThreat" && !instruction.perCommitted) return typeof instruction.amount === "object" ? null : (instruction.amount ?? 1);
+    if (instruction.verb === "LowerThreat") return typeof instruction.amount === "object" ? null : -instruction.amount;
   }
   return null;
 }
@@ -138,7 +304,16 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     const name = names.code(pick.code);
     return { verb: "Shuffle in", prompt: `Choose which out-of-play ${name} is shuffled into the encounter deck. Any other copy stays where it is.` };
   }
-  if (pick.verb !== "Pick") return { verb: "Choose", prompt: "Choose one." };
+  // The costs family's verbs that ask for a card: which card to play, which pool pays the next resource, the new host.
+  if (pick.verb === "PlayFromHand") return { verb: "Play", prompt: "Choose a card to play from your hand." };
+  if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
+  if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
+  if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
+  const play = playPickWords(pick);
+  if (play) return play;
+  const burden = burdenPickWords(pick, next);
+  if (burden) return burden;
+  if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);
   switch (next?.verb) {
@@ -150,6 +325,13 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return next.to === "play" ? { verb: "Put into play", prompt: `Choose ${one} to put into play from your hand.` } : { verb: "Take", prompt: `Choose ${one} to put into your hand.` };
     case "PlaceUnderSelf":
       return { verb: "Place", prompt: `Choose ${one} to place facedown under ${sourceId ? names.card(sourceId) : "the location"}.` };
+    // Defenders (rr.multiple-defenders): one more declared, and the one that takes all the attack's damage.
+    case "AddDefender":
+      return { verb: "Defend", prompt: `Choose ${one} to declare as a defender.` };
+    case "AssignAttackDamage":
+      return { verb: "Assign", prompt: "Choose the defender that takes all the damage of this attack." };
+    case "SpendFromPool":
+      return { verb: "Spend", prompt: `Choose ${one} to spend a resource from.` };
     default:
       return { verb: "Choose", prompt: `Choose ${one}.` };
   }

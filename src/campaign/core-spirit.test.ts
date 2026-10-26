@@ -88,7 +88,7 @@ describe("Dúnhere (01009:A:1)", () => {
     const state = attacking(tab.state);
     expect(legalTargets(state, { type: "DeclareAttackers", cardId: dunhere }, tab.ctx)).toEqual([enemy]);
     expect(legalTargets(state, { type: "DeclareAttackers", cardId: idsOf(tab, ELEANOR) }, tab.ctx)).toEqual([]);
-    expect(refusal(state, { type: "DeclareAttackers", enemyId: enemy, attackerIds: [dunhere, idsOf(tab, ELEANOR)] }, tab.ctx)).toBe("That enemy can only be attacked by one character alone");
+    expect(refusal(state, { type: "DeclareAttackers", enemyId: enemy, attackerIds: [dunhere, idsOf(tab, ELEANOR)] }, tab.ctx)).toBe("That character attacks the staging area only alone");
     const run = send(begin(state), { type: "DeclareAttackers", enemyId: enemy, attackerIds: [dunhere] }, tab.ctx);
     // Attack 2 + 1 against Defense 1.
     expect(run.state.cards[enemy]?.damage).toBe(2);

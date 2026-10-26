@@ -18,7 +18,8 @@ export const phaseNameSchema = z.enum([
 ]);
 
 
-export const conditionSchema = z.discriminatedUnion("kind", [
+// The conditions that hold no other condition. `not`, `all` and `any` (below) combine these, one level deep.
+const atomSchema = z.discriminatedUnion("kind", [
   // The actor failed a Hide test in the current phase or round.
   z.strictObject({ kind: z.literal("hideFailed"), scope: z.enum(["phase", "round"]) }),
   // The actor has an enemy engaged with them, with this trait if one is named.
@@ -27,15 +28,25 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("exhausted"), code: z.string().min(1), is: z.boolean() }),
   // The source is an enemy engaged with the actor.
   z.strictObject({ kind: z.literal("engagedWithActor") }),
-  // The running effect has returned no enemy to staging.
+  // The running effect has returned no enemy to staging (or, for ImmediateAttackEach, made no attack).
   z.strictObject({ kind: z.literal("noneReturned") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
-  // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2).
-  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory"]) }),
+  // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
+  // its player uses from the hand ("put Emery into play from your hand", src/rules/families/deck-play.ts).
+  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand"]) }),
+  // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
+  z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
+  // The actor's seat (`seat`) or the source card (`self`) holds this flag, a modifier of that stat that is in force now (`is`: false
+  // for not): "You can only choose each option once per round" records an option as taken on the seat until the end of the round.
+  z.strictObject({ kind: z.literal("flag"), stat: z.string().min(1), holder: z.enum(["seat", "self"]), is: z.boolean().optional() }),
   // A card with this code is in the victory display (`is`) or is not.
   z.strictObject({ kind: z.literal("inVictory"), code: z.string().min(1), is: z.boolean() }),
+  // The victory display holds a copy (a card with the same title) of the source, the card the answered event is about, the last
+  // picked card, the second card the event names or the active location (`is`), or none does ("if there is a card with the same
+  // title in the victory display", src/rules/families/sidequests-pick.ts).
+  z.strictObject({ kind: z.literal("copyInVictory"), card: z.enum(["self", "subject", "picked", "other", "activeLocation"]), is: z.boolean().optional() }),
   // Some location other than the source is in the staging area or is the active location.
   z.strictObject({ kind: z.literal("otherLocationInPlay") }),
   // The actor controls a hero that is exhausted.
@@ -76,27 +87,86 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("questProgress") }),
   // An enemy (with this trait, if one is named) is in play (`is`) or none is (141027:B:1).
   z.strictObject({ kind: z.literal("enemyInPlay"), trait: z.string().min(1).optional(), is: z.boolean() }),
-  // The source card is committed to the quest ("While Thalin is committed to a quest", 01006:A:1).
-  z.strictObject({ kind: z.literal("sourceCommitted") }),
-  // The card the event is about: of this printed type, with this trait, the source card itself (`self`), or one the actor
-  // controlled when the event happened (`yours`). "A treachery card just revealed" (01008:A:1), "a Dwarf hero you control"
-  // (01019:A:1), "After Gondorian Spearman is declared as a defender" (01029:A:2).
+  // How many cards match the filter, from the actor's side, is at least `min` and at most `max` ("while you control at least
+  // 5 Dwarf characters", "if there is at least 1 Gondor hero in play", "while you have no cards in your hand").
+  z.strictObject({ kind: z.literal("count"), pick: pickSchema, min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
+  // Every card of `of` also matches `match`, and there is at least one ("if each hero you control has a printed Leadership
+  // resource icon"; heroesAll is the Hobbit case).
+  z.strictObject({ kind: z.literal("allMatch"), of: pickSchema, match: pickSchema }),
+  // The actor's threat is at least `min` and at most `max` (Valour: 40 or higher; Secrecy: 20 or less).
+  z.strictObject({ kind: z.literal("threat"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
+  // The source card, its host, the card the event was about, or the active location matches the filter (its zone is not
+  // checked): "while ~ is committed to a quest", "if attached hero is a Dwarf", "if that enemy is an Orc".
+  // `inPlay`: the card is in play now (`false`: it is not), for "if that ally is still in play".
   z.strictObject({
-    kind: z.literal("subject"),
-    type: z.enum(["hero", "ally", "enemy", "location", "treachery", "attachment"]).optional(),
-    trait: z.string().min(1).optional(),
-    self: z.boolean().optional(),
-    yours: z.boolean().optional(),
+    kind: z.literal("matches"),
+    card: z.enum(["self", "host", "subject", "other", "activeLocation", "picked", "attacker", "defender"]),
+    pick: pickSchema.optional(),
+    inPlay: z.boolean().optional(),
   }),
-  // The card the source is attached to has this trait ("if attached hero is a Dwarf", 01041:A:2).
-  z.strictObject({ kind: z.literal("hostTrait"), trait: z.string().min(1) }),
-  // The card the source is attached to has damage on it: a heal can change it (01072:A:2, rr.cost).
-  z.strictObject({ kind: z.literal("hostDamaged") }),
-  // There is an active location: progress can be placed on it (01044:A:1, rr.cost).
-  z.strictObject({ kind: z.literal("activeLocation") }),
-  // Read while a stat is read: the holder is attacking an enemy with this trait ("when attacking an Orc", 01039:A:2), or one in
-  // the staging area ("When doing so, he gets +1 Attack", 01009:A:1).
-  z.strictObject({ kind: z.literal("attacking"), trait: z.string().min(1).optional(), inStaging: z.boolean().optional() }),
+  // At most `max` other copies of the source card were played from the hand this round ("if this is the first time you
+  // played a copy of ~ this round"); a card played again counts its earlier play. `you`: only the actor's plays count.
+  z.strictObject({ kind: z.literal("copiesPlayedThisRound"), max: z.number().int().min(0), you: z.boolean().optional() }),
+  // The actor's heroes with a resource icon that pays `sphere` (every player's, with `group`) hold at least `min` resources
+  // ("the players as a group may spend 2 Leadership resources").
+  z.strictObject({ kind: z.literal("resources"), min: z.number().int().positive(), sphere: z.enum(["leadership", "tactics", "spirit", "lore"]).optional(), group: z.boolean().optional() }),
+  // The actor's quest succeeded this round (rr.step-3-4): "If you quest successfully this phase", read in the quest phase.
+  // `committed`: and the source card was committed to it ("After Hirgon quests successfully").
+  z.strictObject({ kind: z.literal("questSucceeded"), committed: z.boolean().optional() }),
+  // Where the round is in its framework steps (rr.framework-steps): in the quest phase before the staging step, after it, or
+  // before the quest is resolved; in the travel phase with no active location, so the players could travel (rr.step-4-2); in
+  // the encounter phase after the engagement checks ("Play only after the staging step").
+  z.strictObject({ kind: z.literal("step"), is: z.enum(["beforeStaging", "afterStaging", "beforeResolution", "canTravel", "afterEngagementChecks"]) }),
+  // An enemy was engaged in this encounter phase (`is`), or none was (12065:A:2).
+  z.strictObject({ kind: z.literal("engagedThisPhase"), is: z.boolean() }),
+  // The current quest card has a printed keyword (`is`), or has none (17034:A:1).
+  z.strictObject({ kind: z.literal("questKeywords"), is: z.boolean() }),
+  // The current quest card has (`is`) or lacks the Battle / Siege keyword, printed or gained (hon.battle, hon.siege).
+  z.strictObject({ kind: z.literal("questKeyword"), keyword: z.enum(["battle", "siege"]), is: z.boolean() }),
+  // Where the combat phase is (rr.combat-phase): `beforeEnemyAttacks`, before the resolving enemy attacks step; `beforeAttacksResolve`,
+  // after shadow cards have been dealt and before any attack has resolved; `afterEnemyAttacks`, once the resolving enemy attacks
+  // step is complete.
+  z.strictObject({ kind: z.literal("combatStep"), is: z.enum(["beforeEnemyAttacks", "beforeAttacksResolve", "afterEnemyAttacks"]) }),
+  // The source is attached to the active location ("While attached location is the active location").
+  z.strictObject({ kind: z.literal("hostActive") }),
+  // The card is attacking in the player attack in progress (rr.step-6-8-4): read while a stat is read, for the stat's holder
+  // (src/rules/families/attack-strike.ts); elsewhere for `card` (the source by default). `enemy`: the attacked enemy matches the filter
+  // (from that card's controller's side: `engaged`, `stagingOnly`, then its predicates); `notEnemy`: it does not ("an enemy
+  // not engaged with you"); `alone`: no other character attacks with it; `ranged`: it is a ranged attack (rr.ranged).
+  z.strictObject({
+    kind: z.literal("attacking"),
+    card: z.enum(["self", "host", "subject"]).optional(),
+    enemy: pickSchema.optional(),
+    notEnemy: pickSchema.optional(),
+    alone: z.boolean().optional(),
+    ranged: z.boolean().optional(),
+  }),
+  // The characters the actor controls have at least `min` different Traits between them ("a total of at least 9 different Traits
+  // between them", 17064:A:1).
+  z.strictObject({ kind: z.literal("distinctTraits"), min: z.number().int().positive() }),
+  // The actor engaged an enemy this round (`is`), or did not ("If you have not engaged an enemy this round", 08056:A:2).
+  z.strictObject({ kind: z.literal("engagedThisRound"), is: z.boolean() }),
+  // The burden deck holds at least `min` cards (1 by default): "shuffle the top card of the burden deck into the encounter deck".
+  z.strictObject({ kind: z.literal("burdenDeck"), min: z.number().int().positive().optional() }),
+  // The scenario is played in Campaign Mode, which is when its campaign card is in the game (rr.campaign-cards): "Use this
+  // action only if you are playing campaign mode" (141062:A:1).
+  z.strictObject({ kind: z.literal("campaign") }),
+  // The running effect's X is at least `min`. The effect an attack leaves for its end has as X the number of characters the
+  // attack destroyed ("If this attack destroys a character", 141065:A:2, 141066:A:2).
+  z.strictObject({ kind: z.literal("x"), min: z.number().int().min(0) }),
+  // The answered damaged event placed the source's `nth` damage token: it holds at least that many now and held fewer before ("After
+  // placing the 6th damage here", 142024:A:3).
+  z.strictObject({ kind: z.literal("damageReached"), nth: z.number().int().positive() }),
+]);
+
+export const conditionSchema = z.discriminatedUnion("kind", [
+  ...atomSchema.options,
+  // The inner condition does not hold.
+  z.strictObject({ kind: z.literal("not"), condition: atomSchema }),
+  // Each inner condition holds.
+  z.strictObject({ kind: z.literal("all"), conditions: z.array(atomSchema).min(1) }),
+  // At least one inner condition holds.
+  z.strictObject({ kind: z.literal("any"), conditions: z.array(atomSchema).min(1) }),
 ]);
 
 // The conditions a stat modifier carries and checks each time the stat is read.
@@ -110,9 +180,13 @@ export function isStatCondition(condition: Condition | undefined): condition is 
 export const targetSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("self") }),
   z.strictObject({ kind: z.literal("host") }),
-  // The card the last Pick chose ("Choose an enemy engaged with a player. Return that enemy to the staging area", 01052:A:1).
+  // The last picked card, the card the answered event was about, the attacking enemy.
   z.strictObject({ kind: z.literal("picked") }),
+  z.strictObject({ kind: z.literal("subject") }),
+  z.strictObject({ kind: z.literal("attacker") }),
   z.strictObject({ kind: z.literal("activeLocation") }),
+  // The second card the answered event names (the enemy a character attacked).
+  z.strictObject({ kind: z.literal("other") }),
   z.strictObject({
     kind: z.literal("engagedEnemies"),
     trait: z.string().min(1).optional(),

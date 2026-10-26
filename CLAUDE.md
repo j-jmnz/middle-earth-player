@@ -6,15 +6,17 @@ The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The R
 
 `data/` is committed and is the only thing tests and agents read for cards, scenarios and rules text. Sources are listed in `data/sources.json`.
 
-- `pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules|scans]` is the only command that uses the network. It refreshes `data/raw/`, `.cache/pdf/` and `.cache/scans/` (card scans, never committed; the ledger pins each by sha256). `rules` also packs the two booklet PDFs the app bundles into `.cache/booklets/` (`pnpm booklets:pack` does only that).
+- `pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules|scans|icons]` is the only command that uses the network. It refreshes `data/raw/`, `.cache/pdf/` and `.cache/scans/` (card scans, never committed; the ledger pins each by sha256). `scans` reads `data/cards`, so a bare `data:sync` skips it: run `pnpm data:build`, then `pnpm data:sync scans`. `icons` fetches the game icons into `data/raw/icons`. `rules` also packs the two booklet PDFs the app bundles into `.cache/booklets/` (`pnpm booklets:pack` does only that).
 - `data/printed/<campaign>.json` is the printed-text ledger: the lines on each card side, read from its scan. The build uses it in place of Hall of Beorn text. An effect record names the ledger lines it implements (`lines`).
 - `data/rules/index.json` is the hand-checked list of rule spans (exact `from` and `to` quotes per page column); `data/rules/columns.json` holds the per-document column boxes. `data/rules/entries.json` is built from them.
 - `data/prebuilt-decks.json` names the pre-built player decks: the Learn to Play's four core decks (`ltp.starter-decks`) and every decklist an official product prints (`decklist.*` spans, read from the product PDFs that `data:sync rules` pins). The build resolves each row through Hall of Beorn and writes `data/decks/prebuilt.json`; a printed misspelling is an alias with its reason, a wrong heading total a recorded misprint.
 - Every script logs through `scripts/log.ts` to stderr; `--verbose` adds each request, file and stack, `--quiet` keeps warnings and errors, `LOG_LEVEL` sets either. A new script calls `runScript(tag, main)` and logs with the `Log` it is handed, not `console`.
-- `pnpm data:build` is offline and deterministic: raw to `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules`, and `src/effects/generated`. `pnpm data:build -- --verbose` lists the scenarios whose cross-checks failed.
+- `pnpm data:build` is offline and deterministic: raw to `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules`, `src/effects/generated`, and the game icons (`assets/icons`, `src/play/icons`). `pnpm data:build -- --verbose` lists the scenarios whose cross-checks failed.
 - `pnpm data:check` rebuilds into a temporary directory and fails on any difference. CI runs it.
 - `pnpm data:query "<sql>"` queries tables `cards`, `scenario_cards` and `rules` in memory. Rules text is `select id, title, text from rules where ...`.
-- `pnpm effects:draft <scenario-id | starter-deck-id>` writes `.agent/drafts/<code>.md` for each printed ledger line no effect record owns. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
+- `pnpm effects:draft <scenario-id | starter-deck-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` (not committed) for each card with a printed ledger line no effect record owns. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
+- `pnpm effects:open` rewrites `src/effects/open-lines.ts`, the printed lines no record owns. A test compares it, so run it after adding or changing records. `src/campaign/playable.ts` lists the scenarios whose lines are all covered.
+- `node --experimental-strip-types scripts/card-smoke.ts <codes>` plays a seeded game with a player card's records and reports any throw, refusal or stall (`--all` runs every card).
 
 **Sources are online.** Any resource a task needs (rules PDFs, booklets, card scans, card text) comes from an online source, fetched through `pnpm data:sync` and recorded in `data/sources.json`. Query the PDF when a rule or card line is in question; do not ask for a physical card, do not rely on memory, and do not paste a PDF into the repo. (User instruction, 2026-10-24.)
 
@@ -27,7 +29,7 @@ The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The R
 
 ## Agents
 
-`implementer`, `reviewer`, and `ux` in `.claude/agents` wrap the files in `.cursor/agents`. Edit the Cursor file to change an agent's behavior. After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. `effect-author` is a Claude agent only.
+`implementer`, `reviewer`, and `ux` in `.claude/agents` wrap the files in `.cursor/agents`. Edit the Cursor file to change an agent's behavior. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. `effect-author` is a Claude agent only.
 
 ## Cloud sessions
 

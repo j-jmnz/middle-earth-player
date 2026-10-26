@@ -106,7 +106,7 @@ export function playSheet(game: ScenarioState, ctx: ReduceContext, legal: readon
   const instance = game.cards[cardId];
   if (!instance || !legal.some((intent) => intent.type === "PlayCard" && intent.cardId === cardId)) return null;
   const name = names.card(cardId);
-  const request = playRequest(game, ctx, cardId);
+  const request = playRequest(game, ctx, cardId, hostId);
   const printed = printedOf(ctx.cards, instance.code);
   // A card the app does not fully apply says so before it is paid for; an attachment that would do nothing asks twice.
   const warn = playCaution(instance.code, printed.type, names.text?.(instance.code) ?? null, request?.total ?? 0, checkFor(ctx.effects));
@@ -191,12 +191,12 @@ export function paySheet(game: ScenarioState, names: SheetNames, request: PayReq
     key: `pay:${request.cardId}:${purpose.kind}`,
     step: STEP_WORDS[game.mode],
     title: request.exact ? `Pay ${request.total} for ${source}` : `Pay for ${source}`,
-    note: `${request.exact ? "" : "X is what you pay. "}Tap a hero to take one resource from its pool.${request.spread ? ` Pay from ${request.spread} different heroes.` : ""}`,
+    note: `${request.exact ? "" : "X is what you pay. "}Tap a hero to take one resource from its pool.${request.distinct?.min ? ` Pay from ${request.distinct.min} different heroes.` : ""}`,
     total: request.total,
     exact: request.exact,
     options: request.pools.map((pool) => ({ ...option(game, names, pool.heroId), max: pool.max })),
     purpose,
-    ...(request.spread ? { spread: request.spread } : {}),
+    ...(request.distinct ? { distinct: request.distinct } : {}),
   };
 }
 

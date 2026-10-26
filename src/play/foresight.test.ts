@@ -99,14 +99,16 @@ describe("the defense sheet", () => {
 describe("several defenders (Stand Together, 01038:A:1)", () => {
   it("pool their defense in the readout and are all marked against the enemy", async () => {
     const starter = await starterBase();
-    const cards = new Map([...starter.cards, ...(await loadPrinted(["01004", "01006", "01038"]))]);
+    const cards = new Map([...starter.cards, ...(await loadPrinted(["01004", "01005", "01006", "01038"]))]);
     cards.set("pounder", definePrinted({ code: "pounder", name: "Pounder", type: "enemy", threat: 1, engagementCost: 40, attack: 6, defense: 1, health: 9 }));
-    const tab = buildTable({ ...starter, cards }, { ring: "none", start: "planning", heroes: [{ code: "01004", seat: 0 }, { code: "01006", seat: 0 }], hand: [{ code: "01038", seat: 0 }], engaged: [{ code: "pounder", seat: 0 }] });
+    const tab = buildTable({ ...starter, cards }, { ring: "none", start: "planning", heroes: [{ code: "01004", seat: 0 }, { code: "01005", seat: 0 }, { code: "01006", seat: 0 }], hand: [{ code: "01038", seat: 0 }], engaged: [{ code: "pounder", seat: 0 }] });
     const [gimli, thalin, stand, pounder] = ["01004", "01006", "01038", "pounder"].map((code) => idsOf(tab, code));
     const funded = fund(tab.state, 0, 6);
     let run = begin(settle({ ...withMode(funded, "combatStart"), window: null }, tab.ctx, []));
     run = send(run, { type: "PlayCard", cardId: stand ?? "", payments: payFor(run.state, tab.ctx, stand ?? "") }, tab.ctx);
     run = send(passWindows(run, tab.ctx), { type: "DeclareDefender", defenderId: gimli ?? "" }, tab.ctx);
+    // Another defender, or done (families/defense-defenders.ts moreDefenders).
+    run = send(run, { type: "Choose", optionId: "another" }, tab.ctx);
     const legal = legalIntents(run.state, tab.ctx);
     const sheet = sheetFor(run.state, tab.ctx, legal, names);
     if (sheet?.kind !== "pick") throw new Error("no second defender pick");
@@ -116,8 +118,9 @@ describe("several defenders (Stand Together, 01038:A:1)", () => {
     expect(readout?.result).toBe("2 damage on one defender you choose, shadow card next");
     // The pick's mark is the pooled damage; nothing is destroyed by declaring, since who takes it is chosen after.
     expect(sheet.options.find((item) => item.id === thalin)?.mark).toEqual({ icon: "damage", value: 2, danger: false });
-    // With no one left to declare, the declarations end.
-    run = passWindows(send(run, { type: "DeclareDefender", defenderId: thalin ?? "" }, tab.ctx), tab.ctx);
+    // Thalin joins, and the declarations end.
+    run = send(run, { type: "Choose", optionId: thalin ?? "" }, tab.ctx);
+    run = passWindows(send(run, { type: "Choose", optionId: "done" }, tab.ctx), tab.ctx);
     expect(combatPairs(run.state, 0).get(pounder ?? "")).toEqual({ ids: [gimli, thalin], kind: "defense" });
   });
 });

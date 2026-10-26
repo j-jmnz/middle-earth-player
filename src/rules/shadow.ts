@@ -1,20 +1,26 @@
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.shadow-effects, rr.cancel, rr.attacks-outside-the-combat-phase,
-// faq.enemy-attacks-outside-combat, faq.additional-attacks, ltp.shadow-discard, rr.multiple-defenders (data/rules/entries.json).
+// faq.enemy-attacks-outside-combat, faq.additional-attacks, ltp.shadow-discard (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
 
-import { afterDeclared } from "./combat.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import { holdsNow } from "./verbs.ts";
 import type { EngineStep } from "./intents.ts";
+import { queueEvent } from "./queue.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
-import { defenseAsDefender, modifiedStat, placeDamage, pooledDefense, standingDefenders } from "./keywords.ts";
+import { defenseAsDefender, modifiedStat, placeDamage } from "./keywords.ts";
 import type { ScenarioState } from "./state.ts";
-import { expireModifiers, inPlay, updateCard } from "./state.ts";
+import { expireModifiers, flagged, inPlay, updateCard } from "./state.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard, shadowCards } from "./zones.ts";
 import { effectCause, inCause, ruleCause } from "./cause.ts";
 import { offerResponses } from "./responses.ts";
 import { enemyAttackWindow } from "./step-window.ts";
+import { noteAttackDamage } from "./families/defense-damage.ts";
+import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "./families/defense-defenders.ts";
+import { holdAttack } from "./families/defense-listen.ts";
+import { announceShadowRaise, noteShadowStart } from "./families/defense-shadow.ts";
+import { charactersDestroyed } from "./families/burden-attack.ts";
+import { attackHere, attackKey, locationDamage } from "./families/south-watcher.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -107,8 +113,6 @@ export function attackResumes(state: ScenarioState): boolean {
   const attack = state.pendingAttack;
   if (!attack || state.stack.length > 0 || state.window) return false;
   if (attack.shadowFrame != null) return true;
-  // The defending player chose which defender takes the damage (rr.multiple-defenders).
-  if (attack.damageFrame) return true;
   if (attack.shadowOffered && !attack.shadowResolved) return true;
   return attack.extraOffered != null && nextExtraShadow(state, attack.enemyId) === attack.extraOffered;
 }
@@ -138,9 +142,12 @@ function resolveExtraShadows(state: ScenarioState, ctx: ReduceContext, steps: En
 
 // Runs once the defender is declared or the hero is named. The shadow resolves first, then damage.
 export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
+  // The enemy's Attack as its shadow cards begin to resolve, to tell whether one raises it (defense family).
+  let next = noteShadowStart(state, ctx);
   const begun = next.pendingAttack;
   if (!begun) return state;
+  // A canceled attack resolves nothing more (rr.cancel).
+  if (attackCanceled(next)) return finishAttack(next, ctx, steps);
   if (!begun.shadowResolved) {
     // The shadow effect has just triggered: a Response may cancel it first (Hasty Stroke). The attack waits for the
     // Responses, and settle comes back here when they are done.
@@ -165,24 +172,19 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     if (extra.waits) return extra.state;
     next = extra.state;
   }
-  // 6.4.2: the shadow effects are resolved; an action window comes before combat damage.
+  // 6.4.2: the shadow effects are resolved; an action window comes before combat damage. "When a shadow card increases an
+  // enemy's Attack" is answered before it too.
   if (next.pendingAttack && !next.pendingAttack.shadowsDone) {
-    next = { ...next, pendingAttack: { ...next.pendingAttack, shadowsDone: true } };
-    const between = enemyAttackWindow(next, ctx, "damage");
+    next = announceShadowRaise({ ...next, pendingAttack: { ...next.pendingAttack, shadowsDone: true } }, ctx);
+    const between = enemyAttackWindow(next, ctx, "damage") ?? holdAttack(next, ctx, "damage", ["shadowRaisedAttack"]);
     if (between) return between;
   }
   const attack = next.pendingAttack;
   const enemy = attack ? next.cards[attack.enemyId] : undefined;
-  if (!attack || !enemy || enemy.zone !== "engaged") return finishAttack(next, ctx, steps);
-  // Several defenders (rr.multiple-defenders) pool their defense, and the defending player assigns all the damage to one of them.
-  if (attack.defenderIds && !attack.undefended) {
-    const standing = standingDefenders(next, attack.defenderIds);
-    if (standing.length > 1) return defendTogether(next, standing, ctx, steps);
-    // One left: the attack goes on as one defender's.
-    const { defenderIds: _all, ...rest } = attack;
-    next = { ...next, pendingAttack: { ...rest, ...(standing[0] ? { defenderId: standing[0] } : {}) } };
-    return resolveAttack(next, ctx, steps);
-  }
+  if (!attack || !enemy || !attackHere(next, attack.enemyId)) return finishAttack(next, ctx, steps);
+  // Several defenders (rr.multiple-defenders), or the attack turned on another enemy (06062): the defense family deals the damage.
+  const special = specialStrike(next, ctx, steps);
+  if (special) return special.wait || special.state.lost ? special.state : afterDamage(special.state, ctx, steps);
   // A defender that left play before damage leaves the attack undefended (rr.step-6-4-3).
   const gone = attack.defenderId != null && !attack.undefended && !inPlay(next.cards[attack.defenderId]?.zone ?? "removed");
   if (gone) next = { ...next, pendingAttack: { ...attack, undefended: true } };
@@ -191,55 +193,20 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     const strength = modifiedStat(next, enemy, "attack", ctx.cards);
     const defense = defender ? defenseAsDefender(next, attack.defenderId, ctx.cards) : 0;
     if (defender) steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.defenderId, attack: strength, defense, undefended: false, cause: ruleCause("rr.step-6-4-3") });
-    const raw = defender ? Math.max(0, strength - defense) : 0;
-    const damaged = defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")) : next;
+    // "This attack deals no damage" (a flag the enemy holds, families/misc.ts).
+    const raw = defender && !flagged(next, enemy.id, "dealsNoDamage") ? Math.max(0, strength - defense) : 0;
+    const damaged = noteAttackDamage(next, defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")) : next, ctx);
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
+  // A shadow effect sent the damage to an active location (families/south-watcher.ts).
+  const located = attack.toLocation ? locationDamage(next, attack, ctx, steps) : null;
+  if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx), ctx, steps);
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   const strength = modifiedStat(next, enemy, "attack", ctx.cards);
   steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.heroId, attack: strength, defense: 0, undefended: true, cause: ruleCause("rr.step-6-4-3") });
-  const hit = placeDamage(next, attack.heroId, strength, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3"));
+  const hit = noteAttackDamage(next, placeDamage(next, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")), ctx);
   return hit.lost ? hit : afterDamage(hit, ctx, steps);
-}
-
-// Combat damage against several defenders (rr.multiple-defenders): the attack strength against the pooled defense, all of it
-// assigned to one defender the defending player chooses, in a frame of its own; the attack goes on when it pops.
-function defendTogether(state: ScenarioState, standing: readonly string[], ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const attack = state.pendingAttack;
-  const enemy = attack ? state.cards[attack.enemyId] : undefined;
-  if (!attack || !enemy) return state;
-  const strength = modifiedStat(state, enemy, "attack", ctx.cards);
-  const defense = pooledDefense(state, standing, ctx.cards);
-  const raw = Math.max(0, strength - defense);
-  // Who takes it: the defender the player chose; with no damage, nothing to assign, so the first; once the choice came back
-  // empty, the first; otherwise the player is asked (below).
-  let chosen: string | undefined;
-  if (attack.damageTo != null && standing.includes(attack.damageTo)) chosen = attack.damageTo;
-  else if (raw === 0 || attack.damageFrame) chosen = standing[0];
-  if (chosen == null) {
-    const asking: ScenarioState = { ...state, window: null, pendingAttack: { ...attack, damageFrame: true } };
-    return pushEffectFrame(
-      asking,
-      {
-        frame: "ResolveEffect",
-        sourceId: attack.enemyId,
-        actor: attack.seat,
-        peril: false,
-        effectId: "rr.multiple-defenders",
-        instructions: [{ verb: "Pick", pick: { type: "character", control: "any", defending: true } }, { verb: "TakeAttackDamage" }],
-        cancel: null,
-        blockCancel: null,
-        cause: ruleCause("rr.multiple-defenders"),
-      },
-      steps,
-    );
-  }
-  const { damageFrame: _asked, ...rest } = attack;
-  const settled: ScenarioState = { ...state, pendingAttack: rest };
-  steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: chosen, attack: strength, defense, undefended: false, cause: ruleCause("rr.multiple-defenders") });
-  const damaged = placeDamage(settled, chosen, raw, ctx.cards, steps, "combat", ruleCause("rr.multiple-defenders"));
-  return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
 }
 
 // 6.4.3: combat damage is placed; an action window comes before the attack ends.
@@ -256,12 +223,16 @@ export function resumeAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (!attack?.awaiting) return state;
   const { awaiting, awaitDepth: _depth, ...rest } = attack;
   const cleared: ScenarioState = { ...state, pendingAttack: rest };
-  if (cleared.cards[attack.enemyId]?.zone !== "engaged") return finishAttack(cleared, ctx, steps);
+  if (!attackHere(cleared, attack.enemyId)) return finishAttack(cleared, ctx, steps);
   switch (awaiting) {
-    case "declared":
-      return afterDeclared(cleared, ctx, steps);
     case "defense":
+      // Defenders declared by an effect before the defense step (11007, 12140), or a canceled attack, skip it.
+      if (attackCanceled(cleared)) return finishAttack(cleared, ctx, steps);
+      if (defendersDeclared(cleared)) return enemyAttackWindow(cleared, ctx, "shadow") ?? holdAttack(cleared, ctx, "shadow", ["declaredDefender"]) ?? resolveAttack(cleared, ctx, steps);
       return { ...cleared, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
+    // More defenders were declared (01038): the window after the declaration (6.4.1), then the shadow cards.
+    case "defenders":
+      return enemyAttackWindow(cleared, ctx, "shadow") ?? holdAttack(cleared, ctx, "shadow", ["declaredDefender"]) ?? resolveAttack(cleared, ctx, steps);
     case "shadow":
     case "damage":
       return resolveAttack(cleared, ctx, steps);
@@ -275,15 +246,23 @@ export function resumeAttack(state: ScenarioState, ctx: ReduceContext, steps: En
 export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack) return state;
+  // The Responses to the damage just dealt, and what the end of the attack says about its defenders, come first (defense family).
+  const held = holdAttackEnd(state, ctx, steps);
+  if (held) return held;
+  // The characters this attack destroyed are the X of the effect it leaves for its end ("If this attack destroys a character").
+  const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx) : 0;
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
-    attack.immediate || done.resolvedAttacks.includes(attack.enemyId) ? done.resolvedAttacks : [...done.resolvedAttacks, attack.enemyId];
+    attack.immediate || done.resolvedAttacks.includes(attackKey(done, attack.enemyId, attack.seat)) ? done.resolvedAttacks : [...done.resolvedAttacks, attackKey(done, attack.enemyId, attack.seat)];
   // The shadow cards an attack outside the combat phase was dealt are discarded once it resolves
   // (faq.enemy-attacks-outside-combat).
   const cleared = attack.immediate && done.phase !== "Combat" ? discardShadowOf(done, attack.enemyId) : done;
-  const ended: ScenarioState = { ...cleared, pendingAttack: null, window: null, resolvedAttacks };
+  // "After an attack in which ~ defends resolves", "After a non-unique enemy attacks you": the attack is over.
+  const defender = attack.defenderId && !attack.undefended ? { other: attack.defenderId } : {};
+  const announced = queueEvent(cleared, { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender });
+  const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks };
   const after = attack.after ?? [];
-  if (after.length === 0 || ended.cards[attack.enemyId]?.zone !== "engaged") return ended;
+  if (after.length === 0 || !attackHere(ended, attack.enemyId)) return ended;
   return pushEffectFrame(
     ended,
     {
@@ -295,6 +274,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       instructions: after,
       cancel: null,
       blockCancel: null,
+      ...(destroyed > 0 ? { x: destroyed } : {}),
       ...(attack.afterCause ? { cause: attack.afterCause } : {}),
     },
     steps,

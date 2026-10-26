@@ -1,4 +1,4 @@
-import type { Instruction, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
+import type { Instruction, ModifierUntil, PickSpec, ScenarioDefinition } from "../catalog/boundary.ts";
 
 import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAttack, PendingStrike, UsedEffect } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
@@ -46,9 +46,31 @@ export type ZoneName =
   | "shadow"
   | "attached"
   // Facedown under a location, out of play (141049:A:1). The card's host is the location.
-  | "under";
+  | "under"
+  // The campaign card next to the quest deck (rr.campaign-cards). Placed only when the card has an ability that works during
+  // the scenario (a Response, a Forced effect, a constant, an Action), so it is in play: 141056:A:2.
+  | "campaign"
+  // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by
+  // nobody. The card's host is the Watcher.
+  | "captive";
 
 export type CardFace = "up" | "down" | "A" | "B";
+
+// "Reduce the cost of the next Silvan ally you play this phase by 1": spent by the first card that matches.
+// `anySeat`: any player's next matching card spends it. The card that spends it gains Doomed `doomed`, needs no resource match
+// (`noMatch`) and cannot quest this round (`cannotQuest`). `used`: it lasts until spent.
+export type Discount = {
+  seat: number;
+  sourceId: string;
+  pick: PickSpec;
+  amount: number;
+  until: "endOfPhase" | "endOfRound" | "used";
+  min?: number;
+  anySeat?: true;
+  doomed?: number;
+  noMatch?: true;
+  cannotQuest?: true;
+};
 
 export type CardInstance = {
   id: string;
@@ -61,6 +83,9 @@ export type CardInstance = {
   host: string | null;
   attachments: readonly string[];
   committed: boolean;
+  // The side quest a committed character quests on instead of the current quest (families/sidequests-quest.ts). Absent for the
+  // current quest.
+  questTo?: string;
   shadowId: string | null;
   // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent
   // when there are none.
@@ -72,6 +97,10 @@ export type CardInstance = {
   owner?: number;
   // Order in which the card entered play. Forced effects resolve oldest first.
   enteredPlay: number;
+  // A hero card taken from the collection (families/misc-collection.ts): the id of the card whose effect brought it out.
+  collection?: string;
+  // On an attachment: the id of the hero card from the collection attached to it, whose game text and resource icon its host has.
+  lends?: string;
 };
 
 export type Seat = {
@@ -130,7 +159,8 @@ export type Window =
   | { kind: "chooseEnemy"; reason: "engagement" | "attack"; seat: number; options: readonly string[] }
   | { kind: "defense"; enemyId: string; seat: number }
   | { kind: "archery"; total: number }
-  | { kind: "playerAttack" }
+  // `targets`: a card opened the window (OfferAttacks): the seat may attack only these enemies, each once, as extra attacks.
+  | { kind: "playerAttack"; targets?: readonly string[] }
   | { kind: "hideCommit"; seat: number }
   | { kind: "frameAction" }
   | { kind: "choose"; seat: number; options: readonly string[] }
@@ -229,6 +259,41 @@ export type ScenarioState = {
   pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
+  // The cards each seat drew in the draw step at the beginning of this round's resource phase ("choose and discard 1 of those
+  // cards", families/misc-pick.ts).
+  resourceDrawn?: Readonly<Record<number, readonly string[]>>;
+  // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
+  // damage then waits for those Responses before it destroys the character (settle keeps it current).
+  holdLethal?: true;
+  // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests-setup.ts).
+  playerSetup?: true;
+  // The loot decks (The Burglar's Turn, 22024): the cards each seat chose at deckbuilding (`lootPlan`, codes), and the ids of the
+  // loot deck each seat has built, top card first (families/sidequests-loot.ts).
+  lootPlan?: readonly (readonly string[])[];
+  lootDecks?: readonly (readonly string[])[];
+  // The codes of the cards a player removed from the campaign pool during the game ("remove it from the campaign pool"); the
+  // campaign log drops them when the scenario is won (campaign/log.ts).
+  removedFromPool?: readonly string[];
+  // Cost reductions waiting for the next matching card a seat plays (ReduceNextCost). They end with the phase or the round.
+  discounts?: readonly Discount[];
+  // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first
+  // Rohan ally you play each round"). Only this round's are kept.
+  // `paid`: the pools that paid for it and how much each (Linhir Sea-captain's "paid all of its cost from a single hero").
+  // `phase`: the phase it was played in when that was not the Planning phase ("the first non-unique card you play each planning phase").
+  played?: readonly { id: string; code: string; seat: number; round: number; phase?: string; paid?: readonly { heroId: string; amount: number }[] }[];
+  // The cards that spent resources this round ("each hero ... that did not spend any resources this round").
+  spent?: { round: number; ids: readonly string[] };
+  // This round's quest (rr.step-3-4): the characters committed to it, and the seats whose quest succeeded ("If you quest
+  // successfully this phase", "After Hirgon quests successfully"). Kept only in a game that reads it (families/costs-pay.ts).
+  quested?: { round: number; committed: readonly string[]; succeeded: readonly number[] };
+  // Each seat's starting threat level (rr.initial-threat-level), kept at setup only when a card of the game reads it (04053:A:2).
+  startingThreat?: readonly number[];
+  // The seats a card in play keeps in the game at the threat elimination level (10124:A:2): eliminateEmpties asks that card
+  // instead of eliminating the seat. settle keeps it current (families/quest-threat.ts).
+  threatSaves?: readonly number[];
+  // The seats that control an ally in play which can gain the hero card type (Prince Imrahil, 145005:A:1): a seat with no heroes left
+  // is not eliminated until the play sweep has given that ally the type (families/play-sweep.ts, rr.card-types).
+  heroSavers?: readonly number[];
   undo: UndoLog;
 };
 
@@ -368,11 +433,16 @@ export function withThreat(state: ScenarioState, index: number, threat: number):
 export function withMode(state: ScenarioState, mode: ModeName): ScenarioState {
   const phase = phaseOf(mode);
   if (state.mode === mode && state.phase === phase) return state;
-  const changed: ScenarioState = { ...state, mode, phase, passed: [] };
+  // A phase that begins is announced ("At the beginning of the quest phase"), with the phase it is.
+  const begun = state.phase !== phase ? { pendingEvents: [...(state.pendingEvents ?? []), { trigger: "beginningOfPhase" as const, seat: null, phase }] } : {};
+  const changed: ScenarioState = { ...state, mode, phase, passed: [], ...begun };
   const expiring: ModifierUntil[] = [];
   if (state.phase !== phase) expiring.push("endOfPhase");
   if (mode === "beginRound" && state.mode !== "beginRound") expiring.push("endOfRound");
-  return expiring.length === 0 ? changed : expireModifiers(changed, expiring);
+  if (expiring.length === 0) return changed;
+  const discounts = (changed.discounts ?? []).filter((discount) => discount.until === "used" || !expiring.includes(discount.until));
+  const kept = discounts.length === (changed.discounts ?? []).length ? changed : { ...changed, discounts };
+  return expireModifiers(kept, expiring);
 }
 
 // The seat a Peril card's staging is locked to, or null. An enemy attack that card starts is open to every player
@@ -403,7 +473,9 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "secondActiveLocation" ||
     zone === "questStage" ||
     zone === "seatQuest" ||
-    zone === "attached"
+    zone === "attached" ||
+    zone === "campaign" ||
+    zone === "captive"
   );
 }
 
@@ -417,6 +489,13 @@ export function modifierActive(state: ScenarioState, modifier: Modifier): boolea
 // A flag modifier (cannotAttack, cannotTakeDamage, ...) is on the card.
 export function flagged(state: ScenarioState, id: string, stat: Modifier["stat"]): boolean {
   return state.modifiers.some((modifier) => modifier.stat === stat && modifier.instanceId === id && modifier.amount > 0 && modifierActive(state, modifier));
+}
+
+// The sum of a number modifier held by one card ("collects 1 additional resource", extraResource).
+export function heldAmount(state: ScenarioState, id: string, stat: Modifier["stat"]): number {
+  let total = 0;
+  for (const modifier of state.modifiers) if (modifier.stat === stat && modifier.instanceId === id && modifierActive(state, modifier)) total += modifier.amount;
+  return total;
 }
 
 // Drops modifiers that end at one of these boundaries, and any that outlived their source.

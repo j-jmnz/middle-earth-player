@@ -15,7 +15,8 @@ export const RULE_PDFS = [
   { doc: "campaign-log", file: "campaign-log.pdf", url: `${FFG}/campaign-log.pdf` },
   { doc: "easy-mode", file: "lotr_easy_mode.pdf", url: `${FFG}/lotr_easy_mode.pdf` },
   // Official decklists: each product's rules insert prints its pre-built or suggested decks. Only the decklist pages are
-  // extracted (`only` in data/rules/columns.json).
+  // extracted (`only` in data/rules/columns.json). hon and wor are read for their keyword rules (battle, siege,
+  // guarded (X)), not for decklists.
   ...[
     ["mec103", "mec103_rules.pdf"],
     ["mec104", "mec104_rules.pdf"],
@@ -34,6 +35,8 @@ export const RULE_PDFS = [
     ["mof", "mountain_of_fire_rules_insert_eng.pdf"],
     ["ohauh", "hobbit_over_hill_and_under_hill_rulesheet.pdf"],
     ["otd", "hobbit_on_the_doorstep_rulesheet.pdf"],
+    ["hon", "heirs-of-numenor_rules.pdf"],
+    ["wor", "mec65_web_the-wilds-of_rhovanion_rules.pdf"],
     ["community-eomer-eowyn", "mec_communitydecklists_eomerandeowyn-compressed.pdf"],
     ["community-red-arrow", "mec_communitydecklists_theredarrow-compressed.pdf"],
     ["community-noldor", "mec_communitydecklists_theswordsofthenoldor-compressed.pdf"],

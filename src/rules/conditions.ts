@@ -1,11 +1,22 @@
 import type { Condition } from "../catalog/boundary.ts";
 
+import { questSucceeded } from "./families/costs-pay.ts";
+import { spendablePools } from "./families/costs-verbs.ts";
+import { engagedThisRound } from "./families/attack-events.ts";
+import { attackingHolds } from "./families/attack-strike.ts";
+import { seatThreat } from "./families/play-hooks.ts";
+import { distinctTraitCount, flaggedTrait } from "./families/misc-traits.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { attacking, modifiedStat, versusHighEngagement } from "./keywords.ts";
-import { pickCandidates } from "./pick.ts";
-import { printedOf, type Sphere } from "./printed.ts";
+import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
+import { modifiedStat, versusHighEngagement } from "./keywords.ts";
+import { effectsOf } from "./listen.ts";
+import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
+import { cardTypeOf, printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
+import { combatStepIs } from "./families/defense-conditions.ts";
+import { faceUp, flagHeld } from "./families/sidequests-contract.ts";
+import { copyInVictory } from "./families/sidequests-pick.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -21,7 +32,37 @@ export type Scope = {
   explored?: boolean;
   // The seat the event a Response answers happened to.
   eventSeat?: number | null;
+  // What the running effect has picked, and the other card the answered event names.
+  picked?: readonly string[];
+  other?: string;
+  // The running effect's X.
+  x?: number;
+  // The damage the answered event placed.
+  dealt?: number;
 };
+
+// The card a `matches` condition reads.
+function conditionCard(state: ScenarioState, card: Extract<Condition, { kind: "matches" }>["card"], scope: Scope): string | null {
+  const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
+  switch (card) {
+    case "self":
+      return scope.sourceId;
+    case "host":
+      return source?.host ?? null;
+    case "subject":
+      return scope.subject ?? null;
+    case "other":
+      return scope.other ?? null;
+    case "activeLocation":
+      return state.activeLocation;
+    case "picked":
+      return scope.picked?.at(-1) || null;
+    case "attacker":
+      return state.pendingAttack?.enemyId ?? state.pendingStrike?.enemyId ?? null;
+    case "defender":
+      return state.pendingAttack?.defenderId ?? null;
+  }
+}
 
 export function holds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean {
   switch (condition.kind) {
@@ -40,6 +81,12 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return sourceIn(state, scope.sourceId, condition.zone);
     case "inVictory":
       return state.victory.some((id) => state.cards[id]?.code === condition.code) === condition.is;
+    case "faceUp":
+      return faceUp(state, scope.sourceId, condition.side);
+    case "flag":
+      return flagHeld(state, condition, scope.sourceId, scope.actor);
+    case "copyInVictory":
+      return copyInVictory(state, conditionCard(state, condition.card, scope), ctx) === (condition.is !== false);
     case "otherLocationInPlay":
       return [...state.staging, state.activeLocation, state.secondActiveLocation].some(
         (id) => id != null && id !== scope.sourceId && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location",
@@ -61,6 +108,9 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
     case "noneReturned":
       return scope.returned === 0;
     case "phase":
+      // The action window after 7.4 (the engine's "End of round" step) is still in the refresh phase (rr.step-7-4,
+      // rr.step-7-5): a Refresh Action may be used there. An ended phase an event names is read as it is.
+      if (scope.phase == null && condition.is === "Refresh" && state.phase === "End of round") return true;
       return (scope.phase ?? state.phase) === condition.is;
     case "undefended":
       return state.pendingAttack != null && (state.pendingAttack.defenderId == null || state.pendingAttack.undefended === true);
@@ -82,13 +132,13 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return scope.explored === true;
     }
     case "canPick":
-      return pickCandidates(state, condition.pick, scope.actor, [], scope.sourceId, ctx).length > 0;
+      return pickCandidates(state, condition.pick, scope.actor, [], scope.sourceId, ctx, undefined, undefined, false, { subject: scope.subject, other: scope.other }).length > 0;
     case "handHasCard":
       return (state.seats[scope.actor]?.hand ?? []).some((id) => id !== scope.sourceId);
     case "engagedAboveThreat": {
       const enemy = scope.subject ? state.cards[scope.subject] : undefined;
       if (!enemy || scope.eventSeat !== scope.actor || enemy.controller !== scope.actor || printedOf(ctx.cards, enemy.code).engagementCost == null) return false;
-      return modifiedStat(state, enemy, "engagementCost", ctx.cards) > (state.seats[scope.actor]?.threat ?? 0);
+      return modifiedStat(state, enemy, "engagementCost", ctx.cards) > seatThreat(state, scope.actor);
     }
     case "otherPlayer":
       return livingSeats(state).some((seat) => seat !== scope.actor);
@@ -109,43 +159,102 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       );
       return found === condition.is;
     }
+    case "count": {
+      const found = countMatching(state, condition.pick, scope.actor, scope.sourceId, ctx);
+      return (condition.min == null || found >= condition.min) && (condition.max == null || found <= condition.max);
+    }
+    case "allMatch": {
+      const of = pickCandidates(state, condition.of, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true);
+      const at = { seat: scope.actor, sourceId: scope.sourceId, counting: true };
+      return of.length > 0 && of.every((id) => matchesPick(state, id, condition.match, at, ctx));
+    }
+    case "threat": {
+      const threat = seatThreat(state, scope.actor);
+      return (condition.min == null || threat >= condition.min) && (condition.max == null || threat <= condition.max);
+    }
+    case "matches": {
+      const id = conditionCard(state, condition.card, scope);
+      const card = id ? state.cards[id] : undefined;
+      if (!id || !card) return false;
+      if (condition.inPlay != null && inPlay(card.zone) !== condition.inPlay) return false;
+      // "While attached enemy is engaged with you": an enemy filter's `engaged` is read against the actor here too.
+      if (condition.pick?.type === "enemy" && condition.pick.engaged && !engagedAs(card, condition.pick.engaged, scope.actor)) return false;
+      return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId: null, counting: true }, ctx);
+    }
+    case "copiesPlayedThisRound": {
+      const code = scope.sourceId ? state.cards[scope.sourceId]?.code : undefined;
+      const plays = (state.played ?? []).filter((entry) => entry.round === state.round && entry.code === code && (!condition.you || entry.seat === scope.actor));
+      // The card's own latest play is not another copy; an earlier play of the same card (returned to the hand) is.
+      const played = plays.length - (plays.some((entry) => entry.id === scope.sourceId) ? 1 : 0);
+      return played <= condition.max;
+    }
+    case "resources":
+      return spendablePools(state, scope.actor, condition, ctx).total >= condition.min;
+    case "questSucceeded":
+      return questSucceeded(state, scope.actor, scope.sourceId, condition.committed === true);
+    case "step":
+      return stepHolds(state, condition.is);
+    case "engagedThisPhase":
+      return engagedThisPhase(state) === condition.is;
+    case "questKeyword":
+      return currentQuestHas(state, condition.keyword, ctx.cards) === condition.is;
+    case "questKeywords":
+      return questHasKeywords(state, ctx) === condition.is;
+    // The attack family's conditions (families/attack-strike.ts, families/attack-events.ts).
+    case "attacking": {
+      const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
+      const id = scope.holderId ?? (condition.card === "host" ? source?.host : condition.card === "subject" ? scope.subject : scope.sourceId);
+      return attackingHolds(state, condition, id ? state.cards[id] : undefined, ctx, scope.against);
+    }
+    case "engagedThisRound":
+      return engagedThisRound(state, scope.actor) === condition.is;
+    // The burden deck, Campaign Mode and the effect's X (families/burden.ts).
+    case "burdenDeck":
+      return (state.burdenDeck?.length ?? 0) >= (condition.min ?? 1);
+    case "campaign":
+      return Object.values(state.cards).some((card) => card.zone === "campaign");
+    case "x":
+      return (scope.x ?? 0) >= condition.min;
+    case "distinctTraits":
+      return distinctTraitCount(state, scope.actor, ctx) >= condition.min;
+    case "damageReached": {
+      const damage = scope.sourceId ? (state.cards[scope.sourceId]?.damage ?? 0) : 0;
+      return damage >= condition.nth && damage - (scope.dealt ?? 0) < condition.nth;
+    }
+    case "not":
+      return !holds(state, condition.condition, scope, ctx);
+    case "all":
+      return condition.conditions.every((inner) => holds(state, inner, scope, ctx));
+    case "any":
+      return condition.conditions.some((inner) => holds(state, inner, scope, ctx));
+    // The combat step a card may be played in (09008, 02118, 143012).
+    case "combatStep":
+      return combatStepIs(state, condition.is);
     case "attachedToHero":
       return (
         Object.values(state.cards).some((card) => {
           const host = card.host ? state.cards[card.host] : undefined;
-          return card.code === condition.code && card.zone === "attached" && host != null && printedOf(ctx.cards, host.code).type === "hero";
+          return card.code === condition.code && card.zone === "attached" && host != null && cardTypeOf(host, printedOf(ctx.cards, host.code)) === "hero";
         }) === condition.is
       );
-    case "sourceCommitted":
-      return scope.sourceId != null && state.cards[scope.sourceId]?.committed === true;
-    case "subject": {
-      const subject = scope.subject ? state.cards[scope.subject] : undefined;
-      if (!subject) return false;
-      if (condition.self && scope.subject !== scope.sourceId) return false;
-      if (condition.yours && scope.eventSeat !== scope.actor) return false;
-      if (condition.type && printedOf(ctx.cards, subject.code).type !== condition.type && !(condition.type === "attachment" && countsAsAttachment(state, subject.id, ctx))) return false;
-      return condition.trait == null || hasTrait(state, subject.id, condition.trait, ctx);
-    }
-    case "hostTrait": {
+    case "hostActive": {
       const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
-      return host != null && hasTrait(state, host, condition.trait, ctx);
-    }
-    case "hostDamaged": {
-      const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
-      return host != null && (state.cards[host]?.damage ?? 0) > 0;
-    }
-    case "activeLocation":
-      return state.activeLocation != null;
-    case "attacking": {
-      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
-      return holder != null && attacking(state, condition, scope.against, ctx.cards);
+      return host != null && (host === state.activeLocation || host === state.secondActiveLocation);
     }
   }
 }
 
-function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory"): boolean {
+// An enemy engaged with the seat (`you`) or with another player (`other`).
+function engagedAs(card: { zone: string; controller: number | null }, engaged: "you" | "other", seat: number): boolean {
+  if (card.zone !== "engaged") return false;
+  return engaged === "you" ? card.controller === seat : card.controller !== seat;
+}
+
+function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand"): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source) return false;
+  // The second active location slot is an active location too (mec109.stage-4).
+  if (zone === "activeLocation") return source.zone === "activeLocation" || source.zone === "secondActiveLocation";
   return zone === "play" ? inPlay(source.zone) : source.zone === zone;
 }
 
@@ -153,7 +262,7 @@ export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: R
   const instance = state.cards[id];
   return (
     instance != null &&
-    (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait) || countedTraits(state, id, ctx).includes(trait))
+    (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait) || flaggedTrait(state, id, trait) || countedTraits(state, id, ctx).includes(trait))
   );
 }
 
@@ -182,8 +291,12 @@ function grants(state: ScenarioState, id: string, ctx: ReduceContext): { trait?:
   for (const attachmentId of instance.attachments) {
     const attachment = state.cards[attachmentId];
     if (!attachment) continue;
-    for (const effect of ctx.effects) {
-      if (effect.cardCode !== attachment.code || effect.timing !== "constant") continue;
+    // A hero card attached to Thorongil lends its host its resource icon (families/misc-text.ts).
+    const lent = attachment.lends ? state.cards[attachment.lends] : undefined;
+    const lentSphere = lent ? printedOf(ctx.cards, lent.code).sphere : null;
+    if (lentSphere && lentSphere !== "neutral" && lentSphere !== "fellowship" && lentSphere !== "baggins") found.push({ sphere: lentSphere });
+    for (const effect of effectsOf(ctx, attachment.code)) {
+      if (effect.timing !== "constant") continue;
       const scope = { actor: attachment.controller ?? state.firstPlayer, sourceId: attachment.id, returned: 0 };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       for (const instruction of effect.instructions) {

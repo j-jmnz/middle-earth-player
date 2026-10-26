@@ -19,7 +19,13 @@ export type CardType =
   | "treachery"
   | "quest"
   | "objective"
-  | "treasure";
+  | "treasure"
+  // The campaign card, next to the quest deck. The engine holds it only when it has an ability that works during the scenario.
+  | "campaign"
+  // A player card played in the planning phase into its player's quest area (families/sidequests-play.ts), and a contract
+  // card that begins the game in its player's play area (families/sidequests-contract.ts).
+  | "player-side-quest"
+  | "contract";
 
 export type Keywords = {
   surge: boolean;
@@ -35,6 +41,9 @@ export type Keywords = {
   sentinel: boolean;
   ranged: boolean;
   restricted: boolean;
+  battle: boolean;
+  siege: boolean;
+  secrecy: number | null;
 };
 
 export type PrintedCard = {
@@ -77,7 +86,16 @@ const EMPTY_KEYWORDS: Keywords = {
   sentinel: false,
   ranged: false,
   restricted: false,
+  battle: false,
+  siege: false,
+  secrecy: null,
 };
+
+// The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play-sweep.ts) lost
+// the ally type and gained the hero type (rr.card-types: Sword-thain, Prince Imrahil). Everything else has its printed type.
+export function cardTypeOf(instance: { zone: string }, printed: PrintedCard): CardType {
+  return instance.zone === "heroes" ? "hero" : printed.type;
+}
 
 export function definePrinted(
   card: Partial<Omit<PrintedCard, "keywords">> &
@@ -132,14 +150,14 @@ export function isCharacterType(printed: PrintedCard): boolean {
 // (rr.discard-pile-and-victory-display, rr.ownership-and-control).
 export function fromEncounterDeck(printed: PrintedCard): boolean {
   if (printed.backType != null) return printed.backType === "encounter";
-  return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure");
+  return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure" || printed.type === "player-side-quest" || printed.type === "contract");
 }
 
 export function isPlayerType(printed: PrintedCard): boolean {
-  return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event";
+  return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest" || printed.type === "contract";
 }
 
-const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure"];
+const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure", "campaign", "player-side-quest", "contract"];
 const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"];
 
 // The engine-facing subset of a data/cards record. A type or sphere the engine does not know fails loudly.
@@ -187,6 +205,9 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       sentinel: keywords.sentinel === true,
       ranged: keywords.ranged === true,
       restricted: keywords.restricted === true,
+      battle: keywords.battle === true,
+      siege: keywords.siege === true,
+      secrecy: keywords.secrecy ?? null,
     },
   });
 }

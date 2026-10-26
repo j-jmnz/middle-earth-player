@@ -4,6 +4,8 @@
 // these selectors only keep that property through the join of ids and instances.
 import type { CardInstance, ScenarioState } from "../rules/state.ts";
 import { shadowCards } from "../rules/zones.ts";
+import { captiveUnder } from "../rules/families/south-captive.ts";
+import { declaredDefenders } from "../rules/families/defense-defenders.ts";
 
 export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActiveLocation" | "engaged" | "play" | "hand";
 
@@ -40,7 +42,7 @@ export function combatPairs(game: ScenarioState, seat: number): ReadonlyMap<stri
   if (attack && engaged.includes(attack.enemyId)) {
     const defended = attack.defenderId != null && !attack.undefended;
     // Every defender declared (Stand Together, rr.multiple-defenders), or the hero an undefended attack hits.
-    const fighters = (defended ? (attack.defenderIds ?? [attack.defenderId]) : [attack.heroId]).filter((id): id is string => id != null && game.cards[id] != null);
+    const fighters = (defended ? declaredDefenders(attack) : [attack.heroId]).filter((id): id is string => id != null && game.cards[id] != null);
     if (fighters.length > 0) pairs.set(attack.enemyId, { ids: fighters, kind: defended ? "defense" : "undefended" });
   }
   const strike = game.pendingStrike;
@@ -115,7 +117,9 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const card = game.cards[id];
     if (!card) continue;
     // An engaged enemy's shadow cards travel with it, so turning one up changes this zone's view.
-    const attached = cardsOf(game, [...card.attachments, ...shadowCards(card)]);
+    // The Ring-bearer facedown under the Watcher in the Water is drawn under it, in play and facedown (mec109.stage-4).
+    const captive = card.zone === "staging" ? captiveUnder(game, id) : null;
+    const attached = cardsOf(game, [...card.attachments, ...shadowCards(card), ...(captive ? [captive] : [])]);
     const pair = pairs.get(id);
     entries.push({ card, attached, paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null });
   }

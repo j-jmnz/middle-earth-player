@@ -1,6 +1,6 @@
 // Rules: ltp.campaign-setup-checklist (data/rules/entries.json). Everything a briefing, a replay and a resolution read
 // to turn a save into an opening state: the campaign file, the scenario, the effect records, and the engine's cards.
-import { inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import type { Effect } from "../catalog/boundary.ts";
@@ -11,7 +11,7 @@ import type { PrintedCard } from "../rules/printed.ts";
 
 import type { CampaignLog } from "./log.ts";
 
-import { printedMap, type CatalogRow } from "./cards.ts";
+import { printedFromRow, printedMap, type CatalogRow } from "./cards.ts";
 
 export type World = {
   campaign: CampaignData;
@@ -60,7 +60,16 @@ export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effect
     if (row.encounterSet) sets.set(row.code, row.encounterSet);
     deckFacts.set(row.code, { name: row.name, typeCode: row.typeCode, sphereCode: row.sphereCode, deckLimit: row.deckLimit, deckLegal: row.deckLegal, traits: row.traits });
   }
-  return { campaign, scenario, effects, cards: printedMap(rows), sets, deckFacts };
+  const printed = printedMap(rows);
+  // The campaign card is dealt as an engine card only for the scenario being played, and only when it has an ability that works
+  // while the scenario is played (141056:A:2), which the engine places beside the quest deck (families/burden-campaign.ts).
+  for (const row of rows) if (row.code === scenario.campaignCard && row.typeCode === "campaign") printed.set(row.code, printedFromRow(row));
+  return { campaign, scenario, effects, cards: printed, sets, deckFacts };
+}
+
+// Whether a card among these codes has a record that chooses a hero card from the collection.
+function namesCollection(effects: readonly Effect[], codes: ReadonlySet<string>): boolean {
+  return effects.some((effect) => codes.has(effect.cardCode) && /"(SwapHero|AttachCollectionHero)"/.test(JSON.stringify(effect.instructions)));
 }
 
 // Reads the rows a scenario needs from catalog.db, read-only, and builds the world. `extra` is the heroes and deck cards
@@ -74,5 +83,10 @@ export function loadWorld<TRun>(
 ): World {
   const codes = worldCodes(campaign, scenario, effects, extra);
   const rows = catalog.select().from(cards).where(inArray(cards.code, codes)).all();
-  return worldFrom(campaign, scenario, effects, rows);
+  // A card that names the player's collection (Helm of Secrecy, Thorongil) needs every hero card the player may own: the app
+  // tracks no collection, so that is every deck-legal hero (families/misc-collection.ts).
+  if (!namesCollection(effects, new Set(codes))) return worldFrom(campaign, scenario, effects, rows);
+  const known = new Set(rows.map((row) => row.code));
+  const heroes = catalog.select().from(cards).where(and(eq(cards.typeCode, "hero"), eq(cards.deckLegal, true))).all();
+  return worldFrom(campaign, scenario, effects, [...rows, ...heroes.filter((row) => !known.has(row.code))]);
 }

@@ -38,8 +38,9 @@ describe("effects on a card", () => {
     const gimli = idsOf(tab, "01004");
     const state = syncConstants(tab.state, tab.ctx);
     expect(effectLines(state, tab.ctx, gimli, () => "Gimli")).toEqual([]);
-    const hurt = updateCard(state, gimli, { damage: 3 });
-    expect(effectLines(hurt, tab.ctx, gimli, () => "Gimli")).toEqual(["+3 Attack (+1 for each damage on it) from its own text, while it is in play"]);
+    // The constant is counted each time the constants are rebuilt (after each intent).
+    const hurt = syncConstants(updateCard(state, gimli, { damage: 3 }), tab.ctx);
+    expect(effectLines(hurt, tab.ctx, gimli, () => "Gimli")).toEqual(["+3 Attack from its own text, while it is in play"]);
   });
 
   it("show each changed number with the engine's value and the change, and each cannot", () => {

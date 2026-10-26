@@ -1,9 +1,11 @@
 // The simple verbs of an effect record: every instruction that holds no instructions of its own.
 import { z } from "zod";
 
-import { targetSchema, when } from "./effect-schema-conditions.ts";
+import { cardRefSchema, positiveAmountSchema } from "./effect-schema-amount.ts";
+import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.ts";
 import { pickSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifyStatSchema } from "./effect-schema-stats.ts";
+import { FAMILY_VERBS } from "./families/index.ts";
 
 function verb<const Verb extends string>(name: Verb) {
   return z.strictObject({ verb: z.literal(name), ...when });
@@ -27,8 +29,8 @@ export const simpleVerbs = [
   z.strictObject({
     verb: z.literal("Draw"),
     perHero: z.string().min(1).optional(),
-    amount: z.number().int().positive().optional(),
-    who: z.enum(["actor", "picked", "eventSeat"]).optional(),
+    amount: positiveAmountSchema.optional(),
+    who: z.enum(["actor", "picked", "eventSeat", "firstPlayer"]).optional(),
     ...when,
   }),
   verb("GainResources"),
@@ -40,22 +42,46 @@ export const simpleVerbs = [
   z.strictObject({
     verb: z.literal("Exhaust"),
     target: z
-      .discriminatedUnion("kind", [z.strictObject({ kind: z.literal("byCode"), code: z.string().min(1) }), z.strictObject({ kind: z.literal("picked") })])
+      .discriminatedUnion("kind", [
+        z.strictObject({ kind: z.literal("byCode"), code: z.string().min(1) }),
+        z.strictObject({ kind: z.literal("picked") }),
+        // Another card the effect knows: its host, the event's subject, the attacker or the defender.
+        z.strictObject({ kind: z.literal("ref"), ref: cardRefSchema }),
+      ])
       .optional(),
     who: z.enum(["firstPlayer"]).optional(),
     ...when,
   }),
   // Readies the source (the default), the card it is attached to, the picked card, or every character in play.
-  z.strictObject({ verb: z.literal("Ready"), target: z.enum(["self", "host", "picked", "allCharacters"]).optional(), ...when }),
+  // `subject` is the card the answered event was about, `defender` the defending character.
+  // `other`: the second card the answered event names (the defender of an attack that resolved).
+  z.strictObject({ verb: z.literal("Ready"), target: z.enum(["self", "host", "picked", "allCharacters", "subject", "defender", "other"]).optional(), ...when }),
   // Chooses a card or a player for the instructions that follow (target "picked"). A choice of one is made without asking.
   z.strictObject({ verb: z.literal("Pick"), pick: pickSchema, ...when }),
   // Lowers a threat dial. It stops at 0.
-  z.strictObject({ verb: z.literal("LowerThreat"), amount: z.number().int().positive(), who: z.enum(["actor", "picked", "eachSeat"]), ...when }),
-  // Places damage on the picked card as a player card effect (toughness and immunity apply).
-  z.strictObject({ verb: z.literal("DamageCard"), amount: z.number().int().positive(), ...when }),
-  // Places progress tokens on the picked location, on every location in the staging area, or on the active location ("place 1
-  // progress token on the active location", 01044:A:1; 01047:A:1). A full location is explored.
-  z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: z.number().int().positive(), target: z.enum(["picked", "eachStagingLocation", "activeLocation"]), ...when }),
+  // `eventSeat` is the player the answered event happened to.
+  z.strictObject({ verb: z.literal("LowerThreat"), amount: positiveAmountSchema, who: z.enum(["actor", "picked", "eachSeat", "eventSeat"]), ...when }),
+  // Places damage on the picked card (or `target`) as a player card effect (toughness and immunity apply).
+  z.strictObject({ verb: z.literal("DamageCard"), amount: positiveAmountSchema, target: cardRefSchema.optional(), ...when }),
+  // Places progress tokens on the picked location, on every location in the staging area, on the source or the active
+  // location. A full location is explored. `host`: the location the source is attached to.
+  z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: positiveAmountSchema, target: z.enum(["picked", "eachStagingLocation", "self", "activeLocation", "subject", "host"]), ...when }),
+  // Heals damage from the picked card (or `target`): `amount`, or all of it.
+  z.strictObject({ verb: z.literal("Heal"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), target: cardRefSchema.optional(), ...when }),
+  // Puts the picked card (or `target`) on top or at the bottom of its owner's deck, or shuffles it in. A card leaving play this
+  // way leaves play.
+  z.strictObject({ verb: z.literal("PutOnDeck"), position: z.enum(["top", "bottom", "shuffle"]), target: cardRefSchema.optional(), ...when }),
+  // Moves resources from the card picked before the last to the last picked card: `amount`, or all of them.
+  z.strictObject({ verb: z.literal("MoveResources"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), ...when }),
+  // The actor chooses and discards this many cards from their hand (fewer when the hand runs out).
+  z.strictObject({ verb: z.literal("DiscardFromHand"), amount: positiveAmountSchema, ...when }),
+  // Cancels damage the answered `damageDealt` event just dealt to its card (or `target`): `amount` of it, or all of it. The card
+  // is not destroyed by damage that was canceled (rr.cancel).
+  z.strictObject({ verb: z.literal("CancelDamage"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), target: cardRefSchema.optional(), ...when }),
+  // The card is added to the victory display: the picked card, or `target`.
+  z.strictObject({ verb: z.literal("AddToVictory"), target: cardRefSchema.optional(), ...when }),
+  // The actor's threat is set to this value.
+  z.strictObject({ verb: z.literal("SetThreat"), value: z.number().int().min(0), ...when }),
   // Puts the source ally under another player's control.
   z.strictObject({ verb: z.literal("GiveControl"), ...when }),
   // Cancels what the Response it is played in answers: the "when revealed" effects about to resolve, or the shadow effect.
@@ -66,11 +92,9 @@ export const simpleVerbs = [
   verb("ShuffleDeck"),
   // Moves the last picked card to the actor's hand, or puts it into play under the actor's control.
   // A card goes to its own controller's hand (a card out of a discard pile or a deck is its player's), or into play under `who`.
-  // `owner` is the player whose pile the card was in ("Put that card into play, under its owner's control", 01054:A:1). A hero
-  // goes among its player's heroes.
-  z.strictObject({ verb: z.literal("MovePicked"), to: z.enum(["hand", "play"]), who: z.enum(["actor", "firstPlayer", "owner"]).optional(), ...when }),
-  // The picked card goes back to its controller's hand if it is still in play.
-  verb("ReturnToHand"),
+  z.strictObject({ verb: z.literal("MovePicked"), to: z.enum(["hand", "play"]), who: z.enum(["actor", "firstPlayer"]).optional(), ...when }),
+  // The picked card (or `target`) goes back to its owner's hand if it is still in play.
+  z.strictObject({ verb: z.literal("ReturnToHand"), target: cardRefSchema.optional(), ...when }),
   // The source goes back into its controller's deck, which is shuffled.
   verb("ShuffleSelfIntoDeck"),
   // Attaches the card picked before the last pick (an attachment) to the last picked card.
@@ -79,7 +103,9 @@ export const simpleVerbs = [
   verb("ArrangeTop"),
   // The last picked character (the one before it) attacks the last picked enemy. The attacker is already exhausted.
   z.strictObject({ verb: z.literal("AttackEnemy"), ...when }),
-  verb("Commit"),
+  // Commits the source to the quest and exhausts it. With `target`, commits that card (already exhausted or not, it stays as it
+  // is) and announces `committed` ("commit that hero to the quest", 12086:A:2).
+  z.strictObject({ verb: z.literal("Commit"), target: cardRefSchema.optional(), ...when }),
   verb("RevealStaging"),
   verb("PlaceProgress"),
   // Raises a threat dial by `amount` (1 by default). `eachSeat` raises every living seat's. With `perCommitted` the amount
@@ -87,8 +113,8 @@ export const simpleVerbs = [
   // quest", 141051:A:2).
   z.strictObject({
     verb: z.literal("RaiseThreat"),
-    amount: z.number().int().positive().optional(),
-    who: z.enum(["actor", "firstPlayer", "otherPlayer", "eachSeat"]).optional(),
+    amount: positiveAmountSchema.optional(),
+    who: z.enum(["actor", "firstPlayer", "otherPlayer", "eachSeat", "picked", "eventSeat"]).optional(),
     perCommitted: z
       .strictObject({
         type: z.literal("hero"),
@@ -98,7 +124,8 @@ export const simpleVerbs = [
     ...when,
   }),
   z.strictObject({ verb: z.literal("Travel"), to: z.literal("self").optional(), ...when }),
-  verb("Engage"),
+  // Engages the first enemy in the staging area, or the picked enemy (`target`), with the actor.
+  z.strictObject({ verb: z.literal("Engage"), target: cardRefSchema.optional(), ...when }),
   // Deals the source enemy a shadow card. `additional`: one more, beside the one it has ("deal it an additional shadow card",
   // 141069:A:2); every shadow card dealt to an attacking enemy resolves (rr.step-6-4-2).
   z.strictObject({ verb: z.literal("DealShadow"), additional: z.boolean().optional(), ...when }),
@@ -121,10 +148,9 @@ export const simpleVerbs = [
   codeVerb("ShuffleOutOfPlayIntoEncounterDeck"),
   // Removes progress from the current quest card, `perPlayer` for each player in the game. It stops at 0 (141026:B:2).
   z.strictObject({ verb: z.literal("RemoveQuestProgress"), perPlayer: z.number().int().positive(), ...when }),
-  // Places progress on the current quest, `perPlayer` for each player in the game, or `amount` ("place 2 progress tokens on the
-  // current quest", 01005:A:2). The active location takes it first (rr.active-location), and a full quest card advances
-  // (rr.quest-advancement) unless something forbids it (141026:B:1).
-  z.strictObject({ verb: z.literal("PlaceQuestProgress"), perPlayer: z.number().int().positive().optional(), amount: z.number().int().positive().optional(), ...when }),
+  // Places progress on the current quest, `perPlayer` for each player in the game. The active location takes it first
+  // (rr.active-location), and a full quest card advances (rr.quest-advancement) unless something forbids it (141026:B:1).
+  z.strictObject({ verb: z.literal("PlaceQuestProgress"), perPlayer: z.number().int().positive(), ...when }),
   // The last picked character is removed from the quest: it stays exhausted and its willpower no longer counts (141054:A:2).
   verb("RemoveFromQuest"),
   verb("ShuffleEncounterDeck"),
@@ -141,6 +167,9 @@ export const simpleVerbs = [
     ...searchSelector,
     to: z.enum(["staging", "engagedFirstPlayer"]),
     each: z.boolean().optional(),
+    // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
+    // Great Warg Chief, if able", 142022:A:1).
+    require: z.string().min(1).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("ReturnToStaging"), target: targetSchema, ...when }),
@@ -156,7 +185,7 @@ export const simpleVerbs = [
     to: z.discriminatedUnion("kind", [
       // A hero the revealing player controls, or (`control: "any"`, "Attach to a hero.") any player's hero, chosen by the
       // first player (rr.first-player).
-      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any"]).optional() }),
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
     ]),
     ...when,
@@ -188,91 +217,97 @@ export const simpleVerbs = [
   // Willpower, Attack, and Defense to 0", 141055:A:2).
   z.strictObject({
     verb: z.literal("SetStat"),
-    stat: z.enum(["willpower", "attack", "defense", "threat"]),
+    // `questPoints`: "reduce its quest point value to 1".
+    stat: z.enum(["willpower", "attack", "defense", "threat", "questPoints"]),
     value: z.number().int().min(0),
     target: z.enum(["self", "host"]).optional(),
     ...when,
   }),
-  // Deals damage to each ally in play, only those with willpower at most `maxWillpower` when it is named (a value below 0
-  // counts as 0, rr.modifiers) ("Deal 2 damage to each ally with 0 Willpower", 141071:A:1); or to each enemy in play (the
-  // staging area and engaged), only those with `trait` ("each Orc enemy in play", 01018:A:1), or only those engaged with the
-  // player the last Pick chose ("each enemy engaged with that player", 01033:A:1).
-  z.strictObject({
-    verb: z.literal("DamageAll"),
-    amount: z.number().int().positive(),
-    type: z.enum(["ally", "enemy"]),
-    maxWillpower: z.number().int().min(0).optional(),
-    trait: z.string().min(1).optional(),
-    engagedWith: z.literal("picked").optional(),
-    ...when,
-  }),
-  // Deals damage to the enemy making the attack in progress ("deal 1 damage to the attacking enemy", 01029:A:2, 01037:A:1).
-  z.strictObject({ verb: z.literal("DamageAttacker"), amount: z.number().int().positive(), ...when }),
-  // Deals damage to the card being revealed (the card of the reveal frame under the effect), when it is an enemy ("deal 1
-  // damage to each enemy as it is revealed by the encounter deck", 01006:A:1).
-  z.strictObject({ verb: z.literal("DamageRevealed"), amount: z.number().int().positive(), ...when }),
-  // Removes damage: `amount` at most, or all of it with no amount. From the picked card, the card the source is attached to, or
-  // each hero of the picked player (rr.damage; 01011:A:1, 01058:A:1, 01063:A:1, 01068:A:1, 01072:A:2).
-  z.strictObject({
-    verb: z.literal("Heal"),
-    amount: z.number().int().positive().optional(),
-    target: z.enum(["picked", "host", "pickedPlayerHeroes"]),
-    ...when,
-  }),
-  // The actor engages the picked enemy, from the staging area or from another player (01015:A:1, rr.engaged).
-  verb("EngagePicked"),
-  // The source card goes from its controller's hand into play (01019:A:1, rr.play-and-put-into-play).
-  verb("PutSelfIntoPlay"),
-  // Each enemy engaged with the picked player cannot attack that player until `until` (01036:A:2).
-  z.strictObject({ verb: z.literal("BarEngagedAttacks"), until: z.enum(["endOfPhase", "endOfRound"]), ...when }),
-  // The source card (an event being played) is removed from the game instead of going to the discard pile (01049:A:1).
-  verb("RemoveSourceFromGame"),
-  // The picked player's discard pile is shuffled into their deck (01049:A:1).
-  verb("ShuffleDiscardIntoDeck"),
-  // The top card of the encounter deck goes to its bottom (01010:A:1).
-  verb("EncounterTopToBottom"),
-  // The card the canceled "when revealed" effects belong to is replaced: once it is discarded, the same player reveals the next
-  // card of the encounter deck (01008:A:1).
-  verb("ReplaceRevealed"),
-  // Shows the actor the shadow card dealt to the picked enemy. The window closes with a pass (01071:A:2).
-  verb("LookAtShadow"),
-  // Engine use (rr.multiple-defenders): the picked defender takes all the damage of the attack in progress.
-  verb("TakeAttackDamage"),
-  // Constants on an attachment. Where it may be attached: `host` names the card, and `limitPerHost` allows one copy
-  // of the attachment on each (Limit 1 per hero). A card with no such record may go on any character. `location` is a location
-  // in play (01056:A:1), `engagedEnemy` an enemy engaged with a player (01069:A:1).
-  z.strictObject({
-    verb: z.literal("AttachesTo"),
-    host: z.strictObject({
-      kind: z.enum(["hero", "character", "activeLocation", "ringBearer", "location", "engagedEnemy"]),
-      trait: z.string().min(1).optional(),
-      name: z.string().min(1).optional(),
-    }),
-    limitPerHost: z.boolean().optional(),
-    ...when,
-  }),
-  // Constant on a card in hand: it costs this much less to play while `when` holds.
-  z.strictObject({ verb: z.literal("ReduceCost"), amount: z.number().int().positive(), ...when }),
-  // Constant on a card in hand: it must be paid for with resources from at least `count` different heroes' pools (01036:A:1).
-  z.strictObject({ verb: z.literal("PayFromHeroes"), count: z.number().int().min(2), ...when }),
   // Constant on an encounter card attached by its own text: it counts as an attachment with this trait while attached
   // ("Counts as a Condition attachment", 141043:A:2, 141055:A:2), so "a Condition attachment" finds it (01061:A:1).
   z.strictObject({ verb: z.literal("CountsAs"), cardType: z.literal("attachment"), trait: z.string().min(1), ...when }),
+  // Deals damage to each ally in play, only those with willpower at most `maxWillpower` when it is named (a value below 0
+  // counts as 0, rr.modifiers) ("Deal 2 damage to each ally with 0 Willpower", 141071:A:1).
+  z.strictObject({
+    verb: z.literal("DamageAll"),
+    amount: z.number().int().positive(),
+    type: z.literal("ally"),
+    maxWillpower: z.number().int().min(0).optional(),
+    ...when,
+  }),
+  // Constants on an attachment. Where it may be attached: `host` names the card, and `limitPerHost` allows one copy
+  // of the attachment on each (Limit 1 per hero). `hosts` is a list of filters, any of which a host may match ("Attach to a
+  // Dale or Dwarf character", "Attach to a hero or Gandalf", "Attach to a location", "Attach to an enemy engaged with a
+  // player"); with it, `host.kind` is ignored. A card with no such record may go on any character.
+  z.strictObject({
+    verb: z.literal("AttachesTo"),
+    hosts: z.array(pickSchema).min(1).optional(),
+    host: z.strictObject({
+      // `quest`: a quest card in play, the current quest or a side quest ("Attach to a quest card in play").
+      kind: z.enum(["hero", "character", "activeLocation", "ringBearer", "quest"]),
+      trait: z.string().min(1).optional(),
+      name: z.string().min(1).optional(),
+      // The host's printed sphere ("Attach to a Lore character").
+      sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
+    }).optional(),
+    limitPerHost: z.boolean().optional(),
+    ...when,
+  }),
+  // Constant on a card in hand: it costs this much less to play while `when` holds ("by 1 for each Hobbit hero you control").
+  // `host`: only while it is played onto a host that matches ("Reduce the cost to play Herugrim on Théoden by 1").
+  z.strictObject({ verb: z.literal("ReduceCost"), amount: positiveAmountSchema, host: pickSchema.optional(), ...when }),
+  // Constants on a card in hand, read when it would be played: it can only be played while the condition holds; it can be
+  // played from its owner's discard pile (`only`: and from nowhere else); an ally or attachment enters play exhausted.
+  z.strictObject({ verb: z.literal("PlayOnlyIf"), condition: conditionSchema, ...when }),
+  z.strictObject({ verb: z.literal("PlayFromDiscard"), only: z.boolean().optional(), ...when }),
+  verb("EntersPlayExhausted"),
+  // The next card the actor (or the picked player) plays that matches costs less, once, until the phase or round ends ("Reduce
+  // the cost of the next Silvan ally you play this phase by 1"). `min`: not below this ("to a minimum of 1").
+  z.strictObject({
+    verb: z.literal("ReduceNextCost"),
+    pick: pickSchema,
+    amount: positiveAmountSchema,
+    // `used`: until a card spends it ("the next card you play"). `who: any`: the next one any player plays ("the next Silvan
+    // ally played this phase"). `hostSphere`: only a card of the sphere of the source's host, read now. The card that spends it
+    // gains Doomed `doomed` (each player raises their threat as it is played, rr.doomed-x), needs no resource match (`noMatch`)
+    // and cannot quest this round (`cannotQuest`). With one of those the discount is made even when its amount comes to 0.
+    until: z.enum(["endOfPhase", "endOfRound", "used"]),
+    min: z.number().int().min(0).optional(),
+    who: z.enum(["actor", "picked", "any"]).optional(),
+    hostSphere: z.boolean().optional(),
+    doomed: z.number().int().positive().optional(),
+    noMatch: z.boolean().optional(),
+    cannotQuest: z.boolean().optional(),
+    ...when,
+  }),
+  // Constants on a card in play, read when its controller plays a card that matches. ReduceCostOf: it costs less (`firstEachRound`:
+  // only the first such card each round; `onHost`: only an attachment played on the source, or on the source's host).
+  // IgnoreResourceMatch: it needs no resource match, and any of the controller's heroes may pay for it. PaysFor: this hero's
+  // resources may pay for it (of the `spheres` named, or of any sphere).
+  z.strictObject({
+    verb: z.literal("ReduceCostOf"),
+    pick: pickSchema,
+    amount: positiveAmountSchema,
+    firstEachRound: z.boolean().optional(),
+    onHost: z.enum(["self", "host"]).optional(),
+    min: z.number().int().min(0).optional(),
+    ...when,
+  }),
+  // `firstEachPhase`: only the first such card played in the phase (the sidequests family: "The first non-unique card you play each planning phase").
+  z.strictObject({ verb: z.literal("IgnoreResourceMatch"), pick: pickSchema, firstEachRound: z.boolean().optional(), firstEachPhase: z.boolean().optional(), ...when }),
+  z.strictObject({ verb: z.literal("PaysFor"), pick: pickSchema, spheres: z.array(z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"])).min(1).optional(), ...when }),
+  // Constant on a card in hand: its cost must be paid from at least `min` (at most `max`) different heroes' pools.
+  z.strictObject({ verb: z.literal("PayDistinctHeroes"), min: z.number().int().positive().optional(), max: z.number().int().positive().optional(), ...when }),
+  // A deckbuilding limit: at most this many copies of the card in a deck ("Limit 1 per deck").
+  z.strictObject({ verb: z.literal("DeckLimit"), copies: z.number().int().positive(), ...when }),
   // Constants on an attachment: the attached card gains this trait, or this resource icon.
   z.strictObject({ verb: z.literal("GrantTrait"), trait: z.string().min(1), ...when }),
   z.strictObject({ verb: z.literal("GrantIcon"), sphere: z.enum(["leadership", "tactics", "spirit", "lore"]), ...when }),
   // Engine use (Restricted): the source card's controller moves one of its restricted attachments to its owner's discard pile.
   verb("DiscardRestricted"),
-  // Adds resources to the pool of the hero the source card is attached to, the picked hero, or the source hero itself. With
-  // `per: "damage"` the amount counts once for each point of damage the event placed ("add 1 resource to his resource pool for
-  // each point of damage he just suffered", 01003:A:1).
-  z.strictObject({
-    verb: z.literal("AddResources"),
-    amount: z.number().int().positive(),
-    to: z.enum(["host", "picked", "self"]).optional(),
-    per: z.literal("damage").optional(),
-    ...when,
-  }),
+  // Adds resources to the pool of the hero the source card is attached to.
+  // To the host by default, or to the picked card, the source itself, or the card the answered event was about.
+  z.strictObject({ verb: z.literal("AddResources"), amount: positiveAmountSchema, to: z.enum(["host", "picked", "self", "subject", "other"]).optional(), ...when }),
   // The picked card goes to its owner's discard pile.
   verb("DiscardPicked"),
   // The top card of the actor's deck is discarded. Its printed cost is the effect's X.
@@ -301,8 +336,9 @@ export const simpleVerbs = [
   verb("ReturnUnderToStaging"),
   // The source card (a shadow card) is shuffled into the encounter deck instead of being discarded (141069:A:3).
   verb("ShuffleSelfIntoEncounterDeck"),
-  // The actor discards cards at random from their hand, `amount` (1 by default). The seed picks them (141047:A:2).
-  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: z.number().int().positive().optional(), ...when }),
+  // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default; read, so X works). The seed
+  // picks them (141047:A:2, 141084:A:2).
+  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer"]).optional(), ...when }),
   // Setup: a card from the box joins the encounter deck. The deck is shuffled by the Setup step that says so.
   codeVerb("ShuffleIntoEncounterDeck"),
   // Campaign setup: the voluntary hero change costs no threat penalty on this scenario's card.
@@ -327,6 +363,8 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("MarkFallen"), attached: z.string().min(1), ...when }),
   // Resolution: each player names a hero they control as a captive, other than these traits or codes.
   z.strictObject({ verb: z.literal("NameCaptives"), except: z.array(z.string().min(1)), ...when }),
+  // The verbs each mechanic family adds (src/catalog/families).
+  ...FAMILY_VERBS,
 ] as const;
 
 export const simpleInstructionSchema = z.discriminatedUnion("verb", simpleVerbs);

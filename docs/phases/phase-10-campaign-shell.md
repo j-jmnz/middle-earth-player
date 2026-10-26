@@ -4,6 +4,8 @@ Depends on: phases 6 and 8d
 Blocks: phase 11
 Can run beside: phase 9
 
+**State (2026-10-26):** built; `active` in `STATUS.md` until its phone checks, Maestro flows and native compile run. The dev-only resolution control named below was deleted in phase 11 (the real resolution screen replaced it). The dock is now Campaigns, Scenarios, Decks, Cards, Rules.
+
 ## Goal
 
 The campaign list, the Fellowship path, the briefing, and the log, on the campaign model from phase 8d. Scenario 1 can be won or lost through the reducer. The table does not exist yet. Chrome uses the tokens in `docs/design-system.md`. Do not invent a palette or a type scale.

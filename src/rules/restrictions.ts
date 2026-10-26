@@ -5,7 +5,7 @@ import { constantInstructions } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
-import { inPlay, type ScenarioState } from "./state.ts";
+import { flagged, heldAmount, inPlay, type ScenarioState } from "./state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
 export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string; maxWillpower?: number };
@@ -43,6 +43,8 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
     .filter((effect) => effect.cardCode === code && effect.timing === "travel")
     .flatMap((effect) => effect.instructions)
     .some((instruction) => {
+      // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
+      if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
       if (instruction.verb !== "Exhaust" || instruction.target?.kind !== "byCode") return false;
       const named = instruction.target.code;
       const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;
@@ -54,6 +56,8 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
 
 export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: string, attachmentCode: string): boolean {
   const traits = printedOf(ctx.cards, attachmentCode).traits;
+  if (flagged(state, hostId, "cannotHaveAttachments")) return true;
+  if (flagged(state, hostId, "cannotHaveRestricted") && printedOf(ctx.cards, attachmentCode).keywords.restricted) return true;
   return restricted(state, ctx, "attach").some(
     (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)),
   );
@@ -72,7 +76,7 @@ export function defenseBlocked(state: ScenarioState, ctx: ReduceContext, defende
 
 // The hero does not count against the hero limit while a card attached to it says so.
 export function heroLimitExempt(state: ScenarioState, ctx: ReduceContext, heroId: string): boolean {
-  return restricted(state, ctx, "heroLimit").some((rule) => state.cards[rule.sourceId]?.host === heroId);
+  return restricted(state, ctx, "heroLimit").some((rule) => rule.sourceId === heroId || state.cards[rule.sourceId]?.host === heroId);
 }
 
 // Attachments of the card that carry the Restricted keyword.
@@ -81,6 +85,12 @@ export function restrictedAttachments(state: ScenarioState, hostId: string, ctx:
   if (!host) return [];
   return host.attachments.filter((id) => {
     const attachment = state.cards[id];
-    return attachment != null && printedOf(ctx.cards, attachment.code).keywords.restricted;
+    // Snowmane "loses the restricted keyword" while a flag says so (families/misc-traits.ts).
+    return attachment != null && (printedOf(ctx.cards, attachment.code).keywords.restricted || flagged(state, id, "countsAsRestricted")) && !flagged(state, id, "losesRestricted");
   });
+}
+
+// How many restricted attachments the card counts as having: one each, two for a card that "counts as 2 Restricted attachments".
+export function restrictedLoad(state: ScenarioState, hostId: string, ctx: ReduceContext): number {
+  return restrictedAttachments(state, hostId, ctx).reduce((sum, id) => sum + Math.max(1, heldAmount(state, id, "countsAsRestricted")), 0);
 }

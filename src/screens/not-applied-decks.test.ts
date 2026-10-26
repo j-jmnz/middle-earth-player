@@ -5,6 +5,9 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { textCheck } from "../catalog/active-text";
+import { shippedLedger } from "../catalog/printed-ledger";
+import { EFFECTS } from "../effects";
 import { notAppliedCodes, notAppliedWords } from "../play/not-applied";
 import { prebuiltDecks, prebuiltNotApplied, withNotApplied } from "./deck-import";
 import { notAppliedCards, notAppliedLine } from "./deck-status";
@@ -28,12 +31,15 @@ describe("not applied on the deck screens", () => {
   });
 
   it("words a row's loss by type", () => {
-    expect(notAppliedWords("02003", "event")).toBe("Cannot be played");
-    expect(notAppliedWords("02053", "ally")).toBe("Ability not applied");
-    expect(notAppliedWords("02026", "attachment")).toBe("Text not applied");
+    // Every card is meant to have records; these three have theirs taken away to show the words.
+    const unread = new Set(["02003", "02053", "02026"]);
+    const check = textCheck(EFFECTS.filter((effect) => !unread.has(effect.cardCode)), shippedLedger());
+    expect(notAppliedWords("02003", "event", check)).toBe("Cannot be played");
+    expect(notAppliedWords("02053", "ally", check)).toBe("Ability not applied");
+    expect(notAppliedWords("02026", "attachment", check)).toBe("Text not applied");
   });
 
-  it("counts each pre-built deck: the four core decks are applied in full, others are not", () => {
+  it("counts each pre-built deck: the four core decks are applied in full, and a deck with an unapplied card says how many", () => {
     const inactive = notAppliedCodes(texts());
     const byId = new Map(prebuiltDecks.map((deck) => [deck.id, deck]));
     for (const id of ["core-leadership", "core-tactics", "core-spirit", "core-lore"]) {
@@ -41,7 +47,8 @@ describe("not applied on the deck screens", () => {
       expect(deck && prebuiltNotApplied(deck, inactive), id).toBeNull();
     }
     const elves = byId.get("elves-of-lorien");
-    expect(elves && prebuiltNotApplied(elves, inactive)).toMatch(/^\d+ of \d+ cards with text not applied$/);
+    const hero = elves?.heroes[0] ?? "";
+    expect(elves && prebuiltNotApplied(elves, new Set([...inactive, hero]))).toMatch(/^\d+ of \d+ cards with text not applied$/);
     expect(withNotApplied("Galadriel", "3 of 50 cards with text not applied")).toBe("Galadriel · 3 of 50 cards with text not applied");
   });
 });

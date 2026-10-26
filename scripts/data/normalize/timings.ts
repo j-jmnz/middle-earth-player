@@ -13,7 +13,8 @@ const LABELS: ReadonlyMap<string, string> = new Map([
   ["resolution", "resolution"],
 ]);
 
-const LABEL = /^(?:(?:Valour|Planning|Quest|Travel|Encounter|Combat|Refresh|Resource)\s+)?([A-Z][A-Za-z ]+?):\s/;
+// Up to two words before the label: "Valour Planning Action:" (10117:A:2).
+const LABEL = /^(?:(?:Valour|Planning|Quest|Travel|Encounter|Combat|Refresh|Resource)\s+){0,2}([A-Z][A-Za-z ]+?):\s/;
 
 export function timingLabels(text: string | null, keywordsOnly: (line: string) => boolean, campaign = false): string[] {
   if (!text) return [];
@@ -45,6 +46,8 @@ export function lineTimings(line: string): Set<string> {
   }
   // A "(Counts as a ... attachment with the text: ...)" line also grants the attachment's own constant text.
   if (/Counts as an? \w+ attachment/.test(line)) allowed.add("constant");
+  // An unlabelled line that calls itself an action is one ("Any player may trigger this action", Ceorl 12058:A:1).
+  if (/trigger this action/i.test(line)) allowed.add("action");
   if (!lead) for (const timing of UNLABELLED) allowed.add(timing);
   return allowed;
 }

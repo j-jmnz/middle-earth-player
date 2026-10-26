@@ -5,26 +5,30 @@ import type { EngineStep } from "./intents.ts";
 import { placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { modifyStat } from "./attack-verbs.ts";
-import { runPlayerVerb } from "./player-verbs.ts";
-import { runCardVerb } from "./card-verbs.ts";
-import { runDamageVerb } from "./damage-verbs.ts";
+import { frameScope, refCard } from "./amounts.ts";
+import { collectAllyResources } from "./families/costs-pay.ts";
+import { runFamilyVerb } from "./families/index.ts";
+import { commitCard } from "./families/attack.ts";
+import { exhaustCard, readyCard, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "./frames.ts";
 import { runSetupVerb } from "./setup-verbs.ts";
-import { engageEnemy, stagingEnemies, stagingLocations } from "./quest.ts";
+import { engageEnemy, engageWith, stagingEnemies, stagingLocations } from "./quest.ts";
 import { travelNow } from "./travel.ts";
 import type { ScenarioState } from "./state.ts";
-import { inPlay, updateCard } from "./state.ts";
+import { flagged, heldAmount, inPlay, updateCard } from "./state.ts";
 import { raiseFor, runExtraVerb } from "./verbs.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
+import { shadowFace } from "./families/defense-shadow.ts";
 
 export type ReduceContext = {
   effects: readonly Effect[];
   cards: ReadonlyMap<string, PrintedCard>;
 };
 
-type Focus = { seat: number; sourceId: string | null };
+// `chosen`: the card a player chose for this instruction when it asked (a family verb that asks for a target).
+type Focus = { seat: number; sourceId: string | null; chosen?: string };
 
 export function addToStaging(state: ScenarioState, id: string): ScenarioState {
   const instance = state.cards[id];
@@ -79,7 +83,9 @@ export function runInstruction(
   steps: EngineStep[],
 ): ScenarioState {
   if (state.failure) return state;
-  const player = runPlayerVerb(state, instruction, focus, ctx, steps) ?? runDamageVerb(state, instruction, focus, ctx, steps) ?? runCardVerb(state, instruction, focus, ctx, steps);
+  const family = runFamilyVerb(state, instruction, focus, ctx, steps);
+  if (family) return family;
+  const player = runPlayerVerb(state, instruction, focus, ctx, steps);
   if (player) return player;
   switch (instruction.verb) {
     case "Draw":
@@ -101,8 +107,11 @@ export function runInstruction(
       return traveled ?? { ...state, failure: "Travel was refused" };
     }
     case "Engage": {
-      const enemyId = stagingEnemies(state, ctx.cards)[0];
-      if (!enemyId) return state;
+      const enemyId = instruction.target ? refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) : stagingEnemies(state, ctx.cards)[0];
+      const enemy = enemyId ? state.cards[enemyId] : undefined;
+      if (!enemyId || !enemy || (enemy.zone === "engaged" && enemy.controller === focus.seat)) return state;
+      // An enemy engaged with another player moves to the actor (01015:A:1, rr.engaged).
+      if (enemy.zone === "engaged") return flagged(state, enemyId, "cannotBeEngaged") ? state : engageWith(state, focus.seat, enemyId, steps);
       return engageEnemy(state, focus.seat, enemyId, steps);
     }
     case "DealShadow":
@@ -118,11 +127,13 @@ export function runInstruction(
       const id = code
         ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone) && (payer == null || card.controller === payer))?.id
         : focus.sourceId;
-      return id ? updateCard(state, id, { exhausted: true }) : state;
+      return id ? exhaustCard(state, id) : state;
     }
     case "Ready":
-      return focus.sourceId ? updateCard(state, focus.sourceId, { exhausted: false }) : state;
+      return focus.sourceId ? readyCard(state, focus.sourceId) : state;
     case "Commit":
+      // A card the effect names commits as it is, and is announced (families/attack.ts).
+      if (instruction.target) return commitCard(state, instruction.target, focus);
       return focus.sourceId
         ? updateCard(state, focus.sourceId, { committed: true, exhausted: true })
         : state;
@@ -159,10 +170,13 @@ export function gainSeatResources(state: ScenarioState, seat: number, steps: Eng
   for (const heroId of heroes) {
     const hero = next.cards[heroId];
     if (!hero) continue;
-    next = updateCard(next, heroId, { resources: hero.resources + 1 });
-    steps.push({ kind: "gainResource", seat, heroId, cause: currentCause(steps, fallback) });
+    // A hero that "collects 1 additional resource" holds an extraResource.
+    const gained = 1 + Math.max(0, heldAmount(next, heroId, "extraResource"));
+    next = updateCard(next, heroId, { resources: hero.resources + gained });
+    for (let count = 0; count < gained; count += 1) steps.push({ kind: "gainResource", seat, heroId, cause: currentCause(steps, fallback) });
   }
-  return next;
+  // An ally that "collects 1 resource each resource phase" (families/costs-pay.ts).
+  return collectAllyResources(next, seat, steps, currentCause(steps, fallback));
 }
 
 function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: EngineStep[]): ScenarioState {
@@ -184,9 +198,12 @@ export function dealOneShadow(state: ScenarioState, enemyId: string): ScenarioSt
 export function dealAdditionalShadow(state: ScenarioState, enemyId: string): ScenarioState {
   const enemy = state.cards[enemyId];
   const top = state.encounterDeck[0];
-  if (!enemy || !top) return state;
+  // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).
+  if (!enemy || !top || flagged(state, enemyId, "noShadowDealt")) return state;
+  // Face down, or face up while the player it is engaged with holds shadowsFaceUp (07009).
+  const face = shadowFace(state, enemyId);
   const moved = moveCard(state, top, { zone: "shadow", enemyId });
-  return updateCard(moved, top, { face: "down" });
+  return updateCard(moved, top, { face });
 }
 
 function dealInstructionDamage(

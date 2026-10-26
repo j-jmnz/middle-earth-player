@@ -1,7 +1,10 @@
 // Stat modifiers in effect records: what a modifier changes, how long it lasts, and the ModifyStat instruction.
 import { z } from "zod";
 
+import { amountSchema } from "./effect-schema-amount.ts";
 import { when } from "./effect-schema-conditions.ts";
+import { pickSchema } from "./effect-schema-pick.ts";
+import { FAMILY_FLAGS } from "./families/index.ts";
 
 
 // `whileSourceInVictory`: a constant that works from the victory display ("While Weathertop is in the victory display",
@@ -28,19 +31,39 @@ export const modifierStatSchema = z.enum([
   "cannotTakeNonCombatDamage",
   "cannotBeEngaged",
   "cannotBeOptionallyEngaged",
-  // Flag: a card in the staging area that does not contribute its threat to the total threat (01065:A:1, 01066:A:1).
-  "noThreat",
-  // Flag held by a seat ("seat:N"): the player may declare any number of defenders against each enemy attacking them
-  // (01038:A:1, rr.multiple-defenders).
-  "multipleDefenders",
-  // Flag: the character may attack an enemy in the staging area when it attacks alone (01009:A:1).
-  "stagingAttack",
+  // Flags a player card gives or takes away. A keyword gained ("Attached hero gains sentinel"); a character that does not
+  // exhaust to commit to the quest, to attack or to defend; one that cannot commit to the quest or defend (cannotAttack bars
+  // its attacks too); one that cannot have attachments; one that does not ready in the refresh phase; a card in the staging
+  // area that does not contribute its Threat; an enemy that does not make engagement checks.
+  "sentinel",
+  "ranged",
+  "noExhaustQuest",
+  "noExhaustAttack",
+  "noExhaustDefend",
+  "cannotQuest",
+  "cannotDefend",
+  "cannotHaveAttachments",
+  "cannotHaveRestricted",
+  "doesNotReady",
+  "noThreatContribution",
+  "noEngagementChecks",
+  // Numbers a seat or a hero holds: cards drawn beyond the one in the resource phase (on "seat:N"), resources a hero
+  // collects beyond the one, restricted attachments a character may have beyond two.
+  "extraDraw",
+  // A character that may take the damage of an undefended attack against its controller, as a hero would.
+  "takesUndefendedDamage",
+  "extraResource",
+  "extraRestricted",
+  // The flags each mechanic family adds (src/catalog/families).
+  ...FAMILY_FLAGS,
 ]);
 
 export const modifyStatSchema = z.strictObject({
   verb: z.literal("ModifyStat"),
   stat: modifierStatSchema,
-  amount: z.number().int(),
+  // A number, or one the engine reads ("+1 Attack for each enemy engaged with you"): when the effect resolves for a lasting
+  // effect, each time the constant records are rebuilt for a constant.
+  amount: amountSchema,
   until: modifierUntilSchema,
   // Whose stat changes. The default is the source card. `attacker` is the enemy in the attack in progress.
   // `host` is the card the source is attached to. `table` is every seat. `engagedSeat` is the seat the
@@ -51,17 +74,28 @@ export const modifyStatSchema = z.strictObject({
   // every hero the actor controls: all fixed when the effect resolves.
   // `defender` is the character defending the attack in progress (141052:A:2). `allies` is every ally in play: from an
   // encounter card's lasting effect it also holds for allies that enter play later (rr.lasting-effects, 141071:A:1).
-  // `engagedSeatCharacters` is every character of the player the source is engaged with (141050:A:2).
-  // `allCharacters` is every character in play when the effect resolves ("all characters get +1 Attack", 01022:A:1).
-  // `pickedPlayer` is the seat the last Pick chose, for a flag a seat holds (01038:A:1).
+  // `engagedSeatCharacters` is every character of the player the source is engaged with (141050:A:2). `subject` is the card
+  // the event a Response answers was about. `actorSeat` and `pickedSeat` hold a seat number (extraDraw). `other` is the second card
+  // the answered event names (the enemy a character defends against or attacks), `pickedPlayerHeroes` every hero the picked
+  // player controls, fixed when the effect resolves. `currentQuest` is the quest card being attempted now (it keeps the change if
+  // another stage replaces it later in the phase).
   target: z
-    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters", "allCharacters", "pickedPlayer"])
+    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters", "subject", "actorSeat", "pickedSeat", "other", "pickedPlayerHeroes", "currentQuest"])
     .optional(),
   // Only holders with this trait ("Spy enemies get +1 Threat", 141047:A:1).
   trait: z.string().min(1).optional(),
-  // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has,
-  // `damage` the damage tokens on the source ("for each damage token on him", 01004:A:1).
-  per: z.enum(["committed", "ally", "hobbitHero", "x", "damage"]).optional(),
+  // The amount is multiplied by the number of cards attached to each holder that match this filter ("+1 Willpower for each restricted
+  // attachment on it"): read for a constant each time its records are rebuilt (constants.ts).
+  eachAttached: pickSchema.optional(),
+  // Every card that matches, from the source controller's side, instead of `target` ("Each Outlands character you control
+  // gets +1 Attack", "Each enemy engaged with you gets -1 Defense"): read when the effect resolves, or for a constant each time
+  // its records are rebuilt.
+  holders: pickSchema.optional(),
+  // The amount, once read, is taken away instead of added ("gets -5 engagement cost for each enemy in the staging area", 142026:A:2): a
+  // read amount is never below 0, so the sign is given here.
+  subtract: z.boolean().optional(),
+  // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has.
+  per: z.enum(["committed", "ally", "hobbitHero", "x"]).optional(),
   ...when,
 });
 

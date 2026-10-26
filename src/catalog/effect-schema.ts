@@ -4,13 +4,15 @@ import { z } from "zod";
 // catalog, and the reducer reads it. Amounts in authored records are fine; a player intent never supplies one.
 // The vocabulary is split by behavior: stat modifiers (effect-schema-stats.ts), what a Pick offers (effect-schema-pick.ts), conditions and
 // targets (effect-schema-conditions.ts), and the simple verbs (effect-schema-verbs.ts). This file composes them and keeps every export.
-import { conditionSchema, targetSchema } from "./effect-schema-conditions.ts";
-import { pickSchema, whoSchema } from "./effect-schema-pick.ts";
+import { amountExprSchema, amountSchema, cardRefSchema } from "./effect-schema-amount.ts";
+import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.ts";
+import { pickSchema, sphereSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifierStatSchema, modifierUntilSchema } from "./effect-schema-stats.ts";
 import { simpleInstructionSchema, simpleVerbs } from "./effect-schema-verbs.ts";
+import { FAMILY_TRIGGERS } from "./families/index.ts";
 
 export { isStatCondition, phaseNameSchema, type Condition } from "./effect-schema-conditions.ts";
-export { conditionSchema, modifierStatSchema, modifierUntilSchema, pickSchema, targetSchema };
+export { amountExprSchema, amountSchema, cardRefSchema, conditionSchema, modifierStatSchema, modifierUntilSchema, pickSchema, sphereSchema, targetSchema };
 
 // Events the engine announces. Forced and triggered effects name one of these.
 export const triggerSchema = z.enum([
@@ -49,43 +51,73 @@ export const triggerSchema = z.enum([
   "becameActive",
   // Heard by the enemy itself: it attacks, before the defender is declared (141069:A:2, rr.step-6-4b).
   "attacks",
-  // Heard by every card: a hero left play (subject; seat is the player who controlled it, 01019:A:1).
-  "heroLeftPlay",
-  // Heard by every card: a character was declared as a defender (subject; seat is the defending player, 01029:A:2, 01037:A:1).
-  "defenderDeclared",
-  // Heard by every card: the players traveled to a location (subject, 01047:A:1). `traveled` is heard by the location only.
-  "locationTraveled",
-  // Heard by each attachment of each attacker: an attack it took part in destroyed an enemy (01039:A:3).
-  "hostAttackDestroyed",
-  // Heard by every card: shadow cards were dealt, the combat phase's or one for an attack outside it
-  // (rr.attacks-outside-the-combat-phase; 01071:A:2).
-  "shadowsDealt",
-  // Heard by every card in play: the encounter deck revealed a card (subject), before its keywords and its "when revealed"
-  // effects resolve (01006:A:1). A card a search found and revealed is not heard.
-  "cardRevealed",
+  // About a character: it was declared as a defender (the event's other card is the attacking enemy), or as an attacker (the
+  // other card is the enemy it attacks).
+  "declaredDefender",
+  "declaredAttacker",
+  // About the seat: its quest succeeded or failed this phase (rr.step-3-4), its threat was raised.
+  "questSucceeded",
+  "questFailed",
+  "threatRaised",
+  // About an encounter card: it was added to the staging area (revealed or put there).
+  "addedToStaging",
+  // About an enemy: its attack is over (the other card is the defender, when there was one).
+  "attackResolved",
+  // About a card: it was healed, it exhausted, it readied, it was discarded from a player's hand or deck.
+  "healed",
+  "exhausted",
+  "readied",
+  "discardedFromHand",
+  "discardedFromDeck",
+  // About the seat: a phase begins (the event's phase names it).
+  "beginningOfPhase",
+  // About a hero: a card effect added resources to its pool.
+  "resourcesAdded",
+  // About an enemy: damage destroyed it (any player's attack or effect).
+  "enemyDestroyed",
+  // About a character: damage was just dealt to it, before it can be destroyed by it. The window for "cancel X damage just
+  // dealt" and "place that damage on ~ instead" (CancelDamage; the event's amount is `{ dealt: true }`).
+  "damageDealt",
+  // The triggers each mechanic family adds (src/catalog/families).
+  ...FAMILY_TRIGGERS,
 ]);
 
-// What a player pays to use an Action or Response. Resources come from the payments on the Trigger intent.
+// What a player pays to use an Action or Response. Resources come from the payments on the Trigger intent. A cost that asks
+// the player to choose a card (exhaust a Dwarf character, discard a card from your hand) is the first instructions of the
+// effect, with a condition that the choice can be made.
 export const costSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("exhaustSelf") }),
   z.strictObject({ kind: z.literal("addSelfToVictory") }),
   z.strictObject({ kind: z.literal("discardSelf") }),
+  // The card the source is attached to exhausts too ("Exhaust ~ and attached hero").
+  z.strictObject({ kind: z.literal("exhaustHost") }),
+  // A card in play with this code exhausts (The One Ring).
+  z.strictObject({ kind: z.literal("exhaustCode"), code: z.string().min(1) }),
+  z.strictObject({ kind: z.literal("raiseThreat"), amount: z.number().int().positive() }),
+  // Damage on the source itself ("Deal 1 damage to ~ to ...").
+  z.strictObject({ kind: z.literal("damageSelf"), amount: z.number().int().positive() }),
+  z.strictObject({ kind: z.literal("returnSelfToHand") }),
+  // The top cards of the actor's deck go to the discard pile.
+  z.strictObject({ kind: z.literal("discardDeckTop"), amount: z.number().int().positive() }),
+  // `from`: only resources in the source's own pool (`self`), or its host's pool (`host`), may pay. Any hero of the actor's,
+  // with a matching icon, otherwise.
   z.strictObject({
     kind: z.literal("resources"),
     amount: z.number().int().positive(),
     sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
+    from: z.enum(["self", "host"]).optional(),
   }),
   // An event used from the hand: its printed cost is paid, and the card is discarded when the effect is done.
   z.strictObject({ kind: z.literal("playEvent") }),
-  // Resources from the source hero's own pool ("spend 1 resource from his resource pool", 01001:A:2; "Pay 1 resource from
-  // Glorfindel's pool", 01011:A:1).
-  z.strictObject({ kind: z.literal("selfResources"), amount: z.number().int().positive() }),
 ]);
 
 
 const choiceSchema = z.strictObject({
   verb: z.literal("Choose"),
   who: whoSchema,
+  // Each option may be taken once in this effect: a later Choose of the same effect offers only the options not taken yet
+  // ("each player chooses 1 different option", src/rules/families/deck-choose.ts).
+  different: z.boolean().optional(),
   options: z
     .array(
       z.strictObject({
@@ -97,9 +129,14 @@ const choiceSchema = z.strictObject({
     .min(1),
 });
 
+// `endOfAttack`: when the player attack in progress ends (rr.step-6-8-4; "After this attack resolves, discard ~"), with the
+// attacked enemy as the frame's other card (src/rules/families/attack-flow.ts).
 const delaySchema = z.strictObject({
   verb: z.literal("Delay"),
-  until: z.enum(["endOfPhase", "endOfRound"]),
+  // `questSucceeded`: when the players quest successfully this phase, and never if they do not ("If the players quest
+  // successfully, deal 1 damage to that enemy", 19112:A:1).
+  // `startOfGame`: once the opening hands and mulligans are done, before the first round (a Setup that needs the players to choose).
+  until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "endOfAttack", "startOfGame"]),
   uncancelable: conditionSchema.optional(),
   // The delayed instructions act on the card the last Pick chose (Sneak Attack's ally).
   subject: z.literal("picked").optional(),
@@ -118,7 +155,31 @@ const forEachPlayerSchema = z.strictObject({
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema])),
 });
 
-export const instructionSchema = z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, delaySchema, afterAttackSchema, forEachPlayerSchema]);
+// Runs the instructions once for each card that matches the filter now, each time with that card as the picked card ("Ready
+// each Dwarf character", "Deal 1 damage to each enemy in the staging area"). Nobody chooses.
+const eachSchema = z.strictObject({
+  verb: z.literal("Each"),
+  pick: pickSchema,
+  // A Delay here is made once for each card ("If any of those allies are still in play at the end of the round, discard them").
+  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, delaySchema])),
+  // The actor chooses up to this many (`any`: any number) of the matching cards, one at a time, and may stop ("search the top
+  // 10 cards for up to 4 Rohan allies"); the instructions then run for each chosen card, and the effect's X becomes how many
+  // were chosen. `totalCost`: the chosen cards' printed costs add up to at most this. `taken` is engine use: the cards chosen
+  // so far (src/rules/families/deck-each.ts).
+  upTo: z.union([z.number().int().positive(), z.literal("any")]).optional(),
+  totalCost: amountSchema.optional(),
+  taken: z.array(z.string()).optional(),
+  ...when,
+});
+
+// Runs the instructions this many times ("Resolve that effect again for each copy of ~ in your discard pile").
+const repeatSchema = z.strictObject({
+  verb: z.literal("Repeat"),
+  times: amountSchema,
+  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema])),
+});
+
+export const instructionSchema = z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, delaySchema, afterAttackSchema, forEachPlayerSchema, eachSchema, repeatSchema]);
 
 export const timingSchema = z.enum([
   "setup",
@@ -149,6 +210,33 @@ export const cancelSchema = z.strictObject({
   unless: conditionSchema.optional(),
 });
 
+// The uses an ability allows (rr.limits): `oncePerRoundEachPlayer` lets each player use it once a round; a `Group` limit counts
+// every copy of the card for the whole group of players.
+export const limitSchema = z.enum([
+  "oncePerPhase",
+  "oncePerRound",
+  "oncePerRoundEachPlayer",
+  "twicePerPhase",
+  "twicePerRound",
+  "thricePerPhase",
+  "fivePerPhase",
+  "oncePerAttack",
+  "oncePerGame",
+  "oncePerGameGroup",
+  "thricePerGameGroup",
+  // Once a round for each player, counting every copy of the card ("You cannot trigger this ability if you have already
+  // triggered the ability of a Steward of Orthanc this round").
+  "oncePerRoundGroupEachPlayer",
+  // Once a phase for each player, counting every copy of the card; on an event's Action, its play ("You can only play 1 copy
+  // of The Tree People each phase", src/rules/families/deck-play.ts).
+  "oncePerPhaseGroupEachPlayer",
+]);
+
+// Which card an event must be about for an effect to hear it. Without it, an event about one card is heard by that card only.
+// `self`: the source; `host`: the card it is attached to; a filter: any card that matches, from the source controller's side
+// ("After a Silvan ally enters play", "After an enemy is added to the staging area").
+export const subjectSchema = z.union([z.enum(["self", "host"]), pickSchema]);
+
 export const effectSchema = z.strictObject({
   // "<code>:<timing>:<n>"
   id: z.string().min(1),
@@ -159,13 +247,20 @@ export const effectSchema = z.strictObject({
   timing: timingSchema,
   trigger: triggerSchema.optional(),
   // `oncePerRoundEachPlayer`: each player may use it once a round, and any player may.
-  limit: z.enum(["oncePerPhase", "oncePerRound", "oncePerRoundEachPlayer"]).optional(),
-  // The uses the limit allows ("Limit 3 times per phase", 01070:A:2; rr.limits). One when it is not named.
-  limitTimes: z.number().int().min(2).optional(),
-  cost: costSchema.optional(),
-  // A Response used while the card is in its controller's hand, though it is not an event ("put Brok Ironfist into play from
-  // your hand", 01019:A:1).
-  from: z.literal("hand").optional(),
+  limit: limitSchema.optional(),
+  // One cost, or several paid together ("Exhaust ~ and raise your threat by 1").
+  cost: z.union([costSchema, z.array(costSchema).min(1)]).optional(),
+  subject: subjectSchema.optional(),
+  // The event happened to the source controller (`you`: "After you engage an enemy") or to another player (`other`).
+  eventSeat: z.enum(["you", "other"]).optional(),
+  // Any player may use this Action or Response, not only its controller ("Any player may trigger this ability").
+  anyPlayer: z.boolean().optional(),
+  // This Action or Response of a card that is not an event is used from its owner's hand, and only there ("put ~ into play
+  // from your hand", rr.in-play-and-out-of-play: an ability that refers to being used from an out-of-play area).
+  fromHand: z.literal(true).optional(),
+  // A "revealed" event is heard only when the encounter deck itself revealed the card (staging, a surge, the top card;
+  // rr.staging), not when a player searched for it and revealed it ("as it is revealed by the encounter deck", 01006:A:1).
+  byEncounterDeck: z.literal(true).optional(),
   cancel: cancelSchema.optional(),
   // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").
   uncancelable: conditionSchema.optional(),
@@ -183,3 +278,8 @@ export type Cost = z.infer<typeof costSchema>;
 export type Effect = z.infer<typeof effectSchema>;
 export type ModifierUntil = z.infer<typeof modifierUntilSchema>;
 export type ModifierStat = z.infer<typeof modifierStatSchema>;
+export type Limit = z.infer<typeof limitSchema>;
+export type Subject = z.infer<typeof subjectSchema>;
+export type Amount = z.infer<typeof amountSchema>;
+export type AmountExpr = z.infer<typeof amountExprSchema>;
+export type CardRef = z.infer<typeof cardRefSchema>;

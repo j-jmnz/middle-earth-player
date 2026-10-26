@@ -2,6 +2,10 @@
 import { pushCardEffects } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import { runQuestResolution } from "./explore.ts";
+import { afterQuestOutcome, questOutcome } from "./families/quest-outcome.ts";
+import { questFailureRaise } from "./families/quest-threat.ts";
+import { askQuestProgress } from "./families/attachments-quest.ts";
+import { resolveSideQuests, sideQuestTotals } from "./families/sidequests-quest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { resolveQuest } from "./quest.ts";
@@ -15,11 +19,18 @@ import { fireForced } from "./triggers.ts";
 // the phase. The phase does not end while a new stage is still resolving.
 export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.questResolved) return finish({ ...state, questResolved: false });
+  // A location that may take the progress first asks the players once (Explorer's Almanac, families/attachments-quest.ts).
+  const asked = askQuestProgress(state, ctx, steps);
+  if (asked) return asked;
   const before = steps.length;
-  const resolved = resolveQuest(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
+  // Who was committed, read before resolving clears it, and the threat a failed quest raises (families/quest-*.ts).
+  const outcome = questOutcome(state, ctx);
+  // The progress each side quest takes from its committed characters, read before resolution clears who is committed.
+  const sides = sideQuestTotals(state, ctx);
+  const resolved = resolveSideQuests(resolveQuest(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, questFailureRaise(ctx, steps)), sides, ctx, steps);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
-  return afterProgress({ ...resolved, questResolved: true }, before, ctx, steps);
+  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);
 }
 
 // After progress was placed on the quest (from `steps[before]` on): each stage the quest advanced to has its When Revealed
@@ -37,15 +48,15 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
   }
   for (const cardId of [...explored].reverse()) {
     next = runQuestResolution(next, cardId, ctx, steps);
-    next = announceLeftPlay(next, cardId, ctx, steps);
+    next = announceLeftPlay(next, cardId, ctx, steps, true);
   }
   return next;
 }
 
 // A card left play: Responses are offered once its Forced effects have resolved, so their frame goes under the Forced ones
-// (rr.timing-of-ability-resolution).
-export function announceLeftPlay(state: ScenarioState, cardId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const event = { trigger: "leftPlay", seat: null, cardId } as const;
+// (rr.timing-of-ability-resolution). `explored`: the location left play explored (rr.explored), read by `subjectExplored`.
+export function announceLeftPlay(state: ScenarioState, cardId: string, ctx: ReduceContext, steps: EngineStep[], explored = false): ScenarioState {
+  const event = { trigger: "leftPlay", seat: null, cardId, ...(explored ? { explored: true } : {}) } as const;
   return fireForced(offerResponses(state, event, ctx, steps), event, ctx, steps);
 }
 

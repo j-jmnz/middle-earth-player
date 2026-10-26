@@ -1,16 +1,24 @@
-// Rules: rr.quest-advancement, rr.step-3-4, rr.engagement-check, rr.optional-engagement, rr.engaged,
+// Rules: hon.battle, hon.siege, rr.quest-advancement, rr.step-3-4, rr.engagement-check, rr.optional-engagement, rr.engaged,
 // rr.in-play-and-out-of-play, ltp.quest-resolution, ltp.successful-quest, ltp.unsuccessful-quest,
 // ltp.explored-active-location, ltp.quest-advancement, ltp.optional-engagement, ltp.engagement-checks-intro,
 // ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
+import { checkCost } from "./families/costs-stats.ts";
+import { engagementBarred, noteEngaged } from "./families/quest-engage.ts";
+import { currentQuestHas } from "./families/quest-conditions.ts";
+import { noteHostDefeated, withStagingThreat } from "./families/attachments-hold.ts";
+import { progressFirstLocations } from "./families/attachments-quest.ts";
+import { seatThreat } from "./families/play-hooks.ts";
 import type { EngineStep } from "./intents.ts";
-import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
+import { modifiedStat, raiseThreat, releaseAttachments } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
 import { printedOf } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, livingSeats, updateCard, withMode } from "./state.ts";
 import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
+import { placeQuestingProgress } from "./families/defense-damage.ts";
+import { freeSlot, placeOnActive } from "./families/south-locations.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -26,15 +34,25 @@ export function engagementCostOf(state: ScenarioState, instance: CardInstance, c
 
 type Gate = (state: ScenarioState) => boolean;
 
-// A card that "does not contribute its Threat" (01065:A:1, 01066:A:1) is left out of the total (rr.staging-area).
 export function stagingThreat(state: ScenarioState, cards: Cards): number {
   let total = 0;
   for (const id of state.staging) {
     const instance = state.cards[id];
-    if (!instance || flagged(state, id, "noThreat")) continue;
+    // "Does not contribute its Threat" (a flag on the card).
+    if (!instance || flagged(state, id, "noThreatContribution")) continue;
     total += modifiedStat(state, instance, "threat", cards);
   }
-  return total;
+  return withStagingThreat(state, total);
+}
+
+// Which stat a character counts when it is committed to the current quest: Attack for a quest with Battle (hon.battle), Defense for
+// one with Siege (hon.siege), Willpower otherwise. A quest that has both counts Willpower: the two replacements contradict each other.
+// "Using its Attack instead of its Willpower" (11005:A:2) holds whatever the quest says.
+export function questStatOf(state: ScenarioState, id: string, cards: Cards): "willpower" | "attack" | "defense" {
+  if (flagged(state, id, "questsWithAttack")) return "attack";
+  const battle = currentQuestHas(state, "battle", cards);
+  const siege = currentQuestHas(state, "siege", cards);
+  return battle === siege ? "willpower" : battle ? "attack" : "defense";
 }
 
 export function committedWillpower(state: ScenarioState, cards: Cards): number {
@@ -43,11 +61,21 @@ export function committedWillpower(state: ScenarioState, cards: Cards): number {
     if (seat.eliminated) continue;
     for (const id of [...seat.heroes, ...seat.play]) {
       const instance = state.cards[id];
-      if (!instance?.committed) continue;
-      total += modifiedStat(state, instance, "willpower", cards);
+      // A character committed to a side quest places its Willpower on that quest, not against the staging area (families/sidequests-quest.ts).
+      if (!instance?.committed || instance.questTo != null) continue;
+      // "Using its Attack instead of its Willpower" (11005:A:2).
+      total += modifiedStat(state, instance, questStatOf(state, id, cards), cards);
     }
   }
   return total;
+}
+
+// Questing unsuccessfully: each living seat raises its threat by the shortfall (rr.step-3-4). The table's commit readout
+// runs it on a copy to say whether a seat would reach 50.
+export function failQuest(state: ScenarioState, shortfall: number, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  for (const seat of livingSeats(state)) next = raiseThreat(next, seat, shortfall, steps, ruleCause("rr.step-3-4"));
+  return next;
 }
 
 // `canAdvance` is asked each time a stage is ready to advance, so a stage that is held back moves on
@@ -57,25 +85,25 @@ export function resolveQuest(
   cards: Cards,
   steps: EngineStep[],
   canAdvance: Gate = () => true,
+  // Raises one seat's threat for the failed quest; the quest family's waives it or waits for the Responses (quest-threat.ts).
+  raise?: (state: ScenarioState, seat: number, amount: number) => ScenarioState,
 ): ScenarioState {
   const willpower = committedWillpower(state, cards);
   const threat = stagingThreat(state, cards);
   steps.push({ kind: "quest", willpower, threat, cause: ruleCause("rr.step-3-4") });
   let next = state;
   if (willpower < threat) {
-    next = failQuest(next, threat - willpower, steps);
+    // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.
+    next = raise ? livingSeats(state).reduce((current, seat) => raise(current, seat, threat - willpower), next) : failQuest(next, threat - willpower, steps);
   } else if (willpower > threat) {
-    next = placeQuestProgress(next, willpower - threat, cards, steps, canAdvance);
+    // Progress may be assigned as damage to an enemy instead (08142).
+    next = placeQuestingProgress(next, willpower - threat, cards, steps, canAdvance);
+  }
+  // Each seat hears how its quest went ("After you quest successfully"; questing exactly equal is neither, rr.step-3-4).
+  if (willpower !== threat) {
+    for (const seat of livingSeats(state)) next = queueEvent(next, { trigger: willpower > threat ? "questSucceeded" : "questFailed", seat });
   }
   return clearCommitted(advanceReady(next, cards, steps, canAdvance));
-}
-
-// A failed quest: every player's threat dial goes up by the difference (Learn to Play p12-13, rr.step-3-4). An eliminated
-// seat has no dial; a seat that reaches 50 is eliminated (rr.threat-elimination-level).
-export function failQuest(state: ScenarioState, shortfall: number, steps: EngineStep[]): ScenarioState {
-  let next = state;
-  for (const seat of livingSeats(state)) next = raiseThreat(next, seat, shortfall, steps, ruleCause("rr.step-3-4"));
-  return next;
 }
 
 // A stage that is full and was held back advances as soon as it is allowed to.
@@ -96,29 +124,14 @@ export function placeQuestProgress(
   cards: Cards,
   steps: EngineStep[],
   canAdvance: Gate,
+  // Progress from questing successfully (rr.step-3-4): a location that may take it before the quest does (families/attachments-quest.ts).
+  questing = false,
 ): ScenarioState {
-  let remaining = amount;
-  let next = state;
-  const locationId = next.activeLocation;
-  if (locationId && remaining > 0) {
-    const location = next.cards[locationId];
-    if (location) {
-      const points = questPointsOf(next, location, cards);
-      if (points != null) {
-        const need = Math.max(0, points - location.progress);
-        const placed = Math.min(remaining, need);
-        if (placed > 0) {
-          next = updateCard(next, locationId, { progress: location.progress + placed });
-          steps.push({ kind: "progress", targetId: locationId, amount: placed, cause: ruleCause("rr.step-3-4") });
-          remaining -= placed;
-        }
-        const updated = next.cards[locationId];
-        if (updated && updated.progress >= points) {
-          next = destroyCard(next, locationId, cards, steps, true);
-        }
-      }
-    }
-  }
+  // The active locations take it first (rr.active-location); stage 4 of The Ring Goes South has two (families/south-locations.ts).
+  const placedOn = placeOnActive(state, amount, cards, steps);
+  let next = placedOn.state;
+  let remaining = placedOn.remaining;
+  if (questing && remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps));
   if (remaining > 0 && next.questStage && !next.stageCleared) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];
@@ -148,7 +161,7 @@ export function placeQuestProgress(
 
 // The next stage arrives with no progress on it (rr.quest-advancement), side B up. A stage that prints no quest points
 // (141024, 141027) is won some other way, so the quest stops there. One with 0 quest points would be met at once.
-function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
+export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
   let next = state;
   const guard = next.stages.length + 1;
   for (let hop = 0; hop < guard; hop += 1) {
@@ -160,6 +173,8 @@ function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], c
     const nextCode = index < 0 ? undefined : next.stages[index + 1]?.code;
     const nextId = nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     if (!nextId) return clearStage(next);
+    // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards).
+    next = releaseAttachments(noteHostDefeated(next, currentId), currentId, cards, steps);
     next = moveCard(next, currentId, { zone: "setAside" });
     next = moveCard(next, nextId, { zone: "questStage" });
     next = updateCard(next, nextId, { face: "B" });
@@ -185,11 +200,13 @@ function clearCommitted(state: ScenarioState): ScenarioState {
 }
 
 export function travelTo(state: ScenarioState, locationId: string, cards: Cards): ScenarioState | null {
-  if (state.activeLocation) return null;
+  // A second active location slot may be free (families/south-locations.ts).
+  const slot = freeSlot(state);
+  if (!slot) return null;
   const instance = state.cards[locationId];
   if (!instance || instance.zone !== "staging") return null;
   if (printedOf(cards, instance.code).type !== "location") return null;
-  return moveCard(state, locationId, { zone: "activeLocation" });
+  return moveCard(state, locationId, { zone: slot });
 }
 
 export function stagingLocations(state: ScenarioState, cards: Cards): string[] {
@@ -202,7 +219,7 @@ export function stagingLocations(state: ScenarioState, cards: Cards): string[] {
 // The enemies in the staging area a player may optionally engage: not one that cannot be engaged at all (141048:A:1) or
 // cannot be optionally engaged (141051:A:1, 141052:A:1).
 export function optionalEnemies(state: ScenarioState, cards: Cards): string[] {
-  return stagingEnemies(state, cards).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged"));
+  return stagingEnemies(state, cards).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, state.activeSeat, "engage"));
 }
 
 export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
@@ -217,7 +234,7 @@ export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
 export function engageEnemy(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
   const instance = state.cards[enemyId];
   if (!instance || instance.zone !== "staging") return state;
-  if (flagged(state, enemyId, "cannotBeEngaged")) return state;
+  if (flagged(state, enemyId, "cannotBeEngaged") || engagementBarred(state, enemyId, seat, "engage")) return state;
   return engageWith(state, seat, enemyId, steps);
 }
 
@@ -227,19 +244,22 @@ export function engageEnemy(state: ScenarioState, seat: number, enemyId: string,
 // stop the enemy, which is engaged as it enters play.
 export function engageWith(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
   if (!state.cards[enemyId] || state.seats[seat]?.eliminated) return state;
-  const moved = moveCard(state, enemyId, { zone: "engaged", seat });
+  const moved = noteEngaged(moveCard(state, enemyId, { zone: "engaged", seat }), enemyId);
   steps.push({ kind: "engage", seat, enemyId });
   // Responses hear that the player engaged the enemy ("After you engage an enemy with a higher engagement cost ...").
   return queueEvent(moved, { trigger: "engaged", seat, subject: enemyId });
 }
 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {
-  const threat = state.seats[seat]?.threat ?? 0;
+  // The threat the seat is treated as having (families/play-hooks.ts).
+  const threat = seatThreat(state, seat);
   const found: { id: string; cost: number }[] = [];
   for (const id of stagingEnemies(state, cards)) {
     const instance = state.cards[id];
-    if (!instance || flagged(state, id, "cannotBeEngaged")) continue;
-    const cost = engagementCostOf(state, instance, cards);
+    // An enemy that "does not make engagement checks" is passed over (it can still be engaged optionally).
+    if (!instance || flagged(state, id, "cannotBeEngaged") || flagged(state, id, "noEngagementChecks") || engagementBarred(state, id, seat, "checks")) continue;
+    // With what the enemy gets while checking against this player (Orc Disguise, families/costs-stats.ts).
+    const cost = checkCost(state, instance, seat, cards);
     if (cost == null || cost > threat) continue;
     found.push({ id, cost });
   }
@@ -264,10 +284,10 @@ export function engagementStep(state: ScenarioState, cards: Cards, steps: Engine
   const highestId = options[0];
   if (!highestId) return state;
   const highest = state.cards[highestId];
-  const highestCost = highest ? engagementCostOf(state, highest, cards) : null;
+  const highestCost = highest ? checkCost(state, highest, seat, cards) : null;
   const tied = options.filter((id) => {
     const instance = state.cards[id];
-    return instance != null && engagementCostOf(state, instance, cards) === highestCost;
+    return instance != null && checkCost(state, instance, seat, cards) === highestCost;
   });
   if (tied.length > 1) {
     return {

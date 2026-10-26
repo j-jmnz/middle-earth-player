@@ -1,5 +1,7 @@
 // Rules: rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display (data/rules/entries.json).
 import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
+import { queueEvent } from "./queue.ts";
+import { leaveWith } from "./families/play-zones.ts";
 import { inPlay, updateCard, withSeat } from "./state.ts";
 
 export type Destination =
@@ -9,7 +11,9 @@ export type Destination =
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage" }
   | { zone: "shadow"; enemyId: string }
   | { zone: "attached" }
-  | { zone: "under"; locationId: string };
+  | { zone: "campaign" }
+  | { zone: "under"; locationId: string }
+  | { zone: "captive"; hostId: string };
 
 type SeatList = "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "staging";
 
@@ -84,6 +88,7 @@ function detach(state: ScenarioState, id: string): ScenarioState {
     case "secondActiveLocation":
       return state.secondActiveLocation === id ? { ...state, secondActiveLocation: null } : state;
     case "under":
+    case "captive":
       return updateCard(state, id, { host: null });
     case "shadow": {
       const enemy = current.host ? state.cards[current.host] : undefined;
@@ -151,6 +156,10 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   if (dest.zone === "under") {
     return updateCard(state, id, { zone: "under", host: dest.locationId, controller: null, face: "down", exhausted: false, committed: false });
   }
+  // Facedown under an enemy, still in play and controlled by nobody (the Ring-bearer under the Watcher in the Water).
+  if (dest.zone === "captive") {
+    return updateCard(state, id, { zone: "captive", host: dest.hostId, controller: null, face: "down" });
+  }
   if (dest.zone === "shadow") {
     const enemy = state.cards[dest.enemyId];
     if (!enemy) return state;
@@ -200,13 +209,21 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
   return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: 0, progress: 0, resources: 0, exhausted: false });
 }
 
-export function moveCard(state: ScenarioState, id: string, dest: Destination): ScenarioState {
+// `released`: the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
+export function moveCard(state: ScenarioState, id: string, dest: Destination, released: readonly string[] = []): ScenarioState {
   const current = state.cards[id];
   if (!current) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if (leavingPlay && current.host) next = unhost(next, id);
-  const moved = stampEntry(attach(next, id, dest), id, current.zone);
+  let moved = stampEntry(attach(next, id, dest), id, current.zone);
+  // Its attachments leave play with it, however it left (rr.attachment-cards, families/play-zones.ts).
+  if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
+  // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
+  // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
+  if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
+  // A card a player card put out of play under itself "while ~ is in play" comes back to the staging area when it leaves (07003:A:3).
+  if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) for (const under of cardsUnder(moved, id)) moved = updateCard(moveCard(moved, under, { zone: "staging" }), under, { face: "up" });
   // An enemy that leaves play takes its dealt shadow cards to the encounter discard (Learn to Play p16).
   // Staging and engaged are the zones an enemy is in play.
   if (dest.zone !== "engaged" && dest.zone !== "staging") {

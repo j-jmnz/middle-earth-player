@@ -12,6 +12,11 @@ export function distance(left: string, right: string): number {
   return row[right.length] ?? 0;
 }
 
+// The sources spell a card title with or without its accents and hyphens ("Dour Handed", "Dour-handed").
+export function titleKey(title: string): string {
+  return title.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+
 // Quest-card text has typos ("Buckleberry Ferry"). Two names match when they differ by at most two letters.
 export function sameName(left: string, right: string): boolean {
   const a = left.toLowerCase();

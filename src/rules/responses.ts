@@ -1,5 +1,10 @@
 // Rules: rr.response, rr.triggering-condition, mec109.peril (data/rules/entries.json).
+import { costOfKind } from "../catalog/costs.ts";
+
 import { holds } from "./conditions.ts";
+import { triggerHears } from "./families/play-hooks.ts";
+import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
+import { effectsOfCard } from "./families/misc-text.ts";
 import { playableFromDeck } from "./deck-play.ts";
 import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
@@ -7,7 +12,7 @@ import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { GameEvent, ResponseOffer, ScenarioState } from "./state.ts";
 import { inPlay, livingSeats, perilLock } from "./state.ts";
-import { payUsage, controllerSeat, offerable, usable, usageReason, usedFromHand } from "./usage.ts";
+import { payUsage, controllerSeat, offerable, usable, usageReason } from "./usage.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
@@ -17,29 +22,34 @@ type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): ResponseOffer[] {
   const offers: ResponseOffer[] = [];
   const order = livingSeats(state);
-  const cards = Object.values(state.cards).sort(
-    (left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }),
-  );
+  // Only the cards with a Response to this trigger are sorted and looked at.
+  const cards = Object.values(state.cards)
+    .filter((instance) => effectsOfCard(state, ctx, instance).some((effect) => effect.timing === "response" && triggerHears(effect.trigger, event.trigger)))
+    .sort((left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }));
   for (const instance of cards) {
     // An event about one card is heard by that card even after it has left play.
     // An event card in the hand hears every event; a card in play hears the events about itself or about the table. The
     // top card of a deck its controller may play as if it were in the hand (Gandalf, 142002) is in the hand for this.
     const inHand = instance.zone === "hand" || (instance.zone === "deck" && instance.controller != null && playableFromDeck(state, instance.id, instance.controller, ctx));
-    if (event.cardId != null ? instance.id !== event.cardId : !(inPlay(instance.zone) || inHand)) continue;
+    const records = effectsOfCard(state, ctx, instance).filter((effect) => effect.timing === "response" && hears(state, effect, instance, event, ctx));
+    if (records.length === 0) continue;
     // A card nobody controls (a quest or encounter card) is answered by the first player, or, while a Peril card's
     // staging resolves, by the revealing player: the other players are the ones Peril keeps out (mec109.peril).
     const locked = perilLock(state);
     const seat = instance.controller == null && locked != null ? locked : controllerSeat(state, instance);
     // Peril: the other seats cannot trigger Responses while the card resolves.
     if (!order.includes(seat) || (locked != null && seat !== locked)) continue;
-    for (const effect of ctx.effects) {
-      if (effect.timing !== "response" || effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;
-      // Only an event used from the hand, or a card whose record says so (01019:A:1), has a Response there.
-      if (inHand !== usedFromHand(effect)) continue;
-      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.subject ? { subject: event.subject } : {}), ...(event.explored ? { explored: true } : {}) };
+    for (const effect of records) {
+      // Only an event used from the hand has a Response there; any other listens in play, or from wherever its card went
+      // for an event about itself ("After ~ leaves play").
+      const fromHand = costOfKind(effect, "playEvent") != null || effect.fromHand === true;
+      if (fromHand ? !inHand : !(inPlay(instance.zone) || hearsFromAnywhere(effect, instance, event))) continue;
+      // `other`: the second card the event names ("After a Trap card you control is attached to an enemy": the new host).
+      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.phase ? { phase: event.phase } : {}), ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}), ...(event.other ? { other: event.other } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
-      if (!offerable(state, effect, instance.id, seat, ctx)) continue;
-      offers.push({ cardId: instance.id, effectId: effect.id, seat, event });
+      // "Any player may trigger this response": each seat is offered it, the controller first.
+      const seats = effect.anyPlayer ? [seat, ...order.filter((other) => other !== seat)] : [seat];
+      for (const offered of seats) if (offerable(state, effect, instance.id, offered, ctx)) offers.push({ cardId: instance.id, effectId: effect.id, seat: offered, event });
     }
   }
   return offers;
@@ -58,7 +68,7 @@ export function offerResponses(state: ScenarioState, event: GameEvent, ctx: Redu
   const offers = [event, ...also]
     .flatMap((each) => collect(state, each, ctx))
     .filter((offer) => {
-      const key = `${offer.cardId}|${offer.effectId}`;
+      const key = `${offer.cardId}|${offer.effectId}|${offer.seat}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -121,13 +131,11 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
   const effect = ctx.effects.find((entry) => entry.id === intent.effectId);
   if (frame?.data.kind !== "responses" || !effect || state.window?.kind !== "response") return state;
   const seat = state.window.seat;
-  const used = frame.data.offers.find((offer) => offer.cardId === intent.cardId && offer.effectId === intent.effectId);
-  const event = used?.event ?? frame.data.event;
+  // The event the used Response answers: one of the occurrence's events, when the window holds several.
+  const event = frame.data.offers.find((offer) => offer.cardId === intent.cardId && offer.effectId === intent.effectId && offer.seat === seat)?.event ?? frame.data.event;
   const left = frame.data.offers.filter((offer) => !(offer.cardId === intent.cardId && offer.effectId === intent.effectId));
-  // The effect reads the event it answers (answeredEvent): another of the occurrence's events than the window's first.
-  const { answering: _previous, ...data } = frame.data;
-  const answering = event !== frame.data.event ? { answering: event } : {};
-  const paid = payUsage(patchTop(state, { data: { ...data, offers: left, ...answering } }), effect, intent.cardId, intent.payments ?? [], ctx, steps);
+  // The seat answering pays: its threat for a raiseThreat cost, its deck for discardDeckTop, its use of a per-player limit.
+  const paid = payUsage(patchTop(state, { data: { ...frame.data, offers: left } }), effect, intent.cardId, intent.payments ?? [], ctx, steps, seat);
   return pushEffectFrame(
     { ...paid, window: null },
     {
@@ -142,7 +150,15 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
       cause: effectCause(effect),
       eventSeat: event.seat,
       ...(event.participants ? { participants: event.participants } : {}),
-      ...(effect.cost?.kind === "playEvent" ? { finish: "discardSource" as const } : {}),
+      ...(aboutCard(event) ? { subject: aboutCard(event) } : {}),
+      ...(event.other ? { other: event.other } : {}),
+      // A Response to damage just dealt resolves before the damaged card can be destroyed (rr.cancel).
+      ...(event.trigger === "damageDealt" && event.cardId ? { dealt: event.amount ?? 0, hold: event.cardId } : {}),
+      // Any other event's amount is the effect's X (the attachments an explored location had, 19026:A:2).
+      ...(event.trigger !== "damageDealt" && event.amount != null ? { x: event.amount } : {}),
+      // "For each point of damage he just suffered": the damage a damaged event reports.
+      ...((event.trigger === "damaged" || event.trigger === "damagedByAttack") && event.amount != null ? { dealt: event.amount } : {}),
+      ...(costOfKind(effect, "playEvent") ? { finish: "discardSource" as const } : {}),
     },
     steps,
   );

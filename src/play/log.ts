@@ -35,6 +35,9 @@ function markOf(step: EngineStep): LogMark {
       return "progress";
     case "gainResource":
       return "resource";
+    // Life lost wears the damage token: no icon of its own exists (docs/design-system.md, Icons).
+    case "life":
+      return "damage";
     default:
       return null;
   }
@@ -71,6 +74,8 @@ function words(step: EngineStep, names: LogNames): string | null {
       return step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`;
     case "threat":
       return `${player(step.seat)} threat ${signed(step.amount)}`;
+    case "life":
+      return `The Ring-bearer's life ${signed(step.amount)}`;
     case "progress":
       // A removal (141026:B:2) is a step with a negative amount: say what left the card, never a minus sign.
       return step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : `${step.amount} progress on ${names.card(step.targetId)}`;

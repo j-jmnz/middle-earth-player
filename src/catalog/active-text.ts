@@ -1,13 +1,15 @@
 // Rules: rr.keywords, rr.triggered-ability (data/rules/entries.json).
 //
-// Which printed lines of a card the app applies. A line is applied when an effect record names it in `lines`, when it is
-// only keywords the engine reads (keyword-line.ts), or when the printed-text ledger marks it inert; the coverage test
-// (scripts/effect-coverage.test.ts) reads ownership the same way. A card the ledger does not hold keeps its catalog text:
-// each line beyond keywords is applied only when the card has a record (brief, Effects, layer 3). Everything else is "not
-// applied" to the player and "inactive" in code. The pool filter, the card screen, the table, the preview and the deck
+// Which printed lines of a card the app applies. Every card is meant to be automated (user decision, 2026-10-26); until each
+// printed line has a record, the lines without one are "not applied" to the player and "inactive" in code. A line is
+// applied when an effect record names it in `lines`, when it is only keywords the engine reads (keyword-line.ts), or when
+// the printed-text ledger marks it inert. A card the shipped ledger does not hold is read from its source text the way the
+// data build reads the pool (pool-lines.ts), so the check names exactly the lines of src/effects/open-lines.ts and of the
+// coverage test (scripts/effect-coverage.test.ts). The pool filter, the card screen, the table, the preview and the deck
 // screens all read this one check (docs/plans/inactive-text.md).
 import type { Effect } from "./effect-schema.ts";
 import { isKeywordLine } from "./keyword-line.ts";
+import { poolSides } from "./pool-lines.ts";
 
 /** One side of a card in the printed-text ledger (data/printed): its ability lines and the ones that need no record. */
 export type PrintedSide = { code: string; side: string; lines: readonly string[]; inert: readonly { line: number }[] };
@@ -38,51 +40,43 @@ export function textCheck(records: readonly Pick<Effect, "cardCode" | "lines">[]
   return { owned: new Set(records.flatMap((record) => record.lines)), recorded: activeCardCodes(records), ledger };
 }
 
-function plain(text: string): string {
-  return text
-    .replace(/<[^>]+>/g, "")
-    .replace(/\[([a-z]+)\]/gi, (_, word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-    .trim();
+/**
+ * A card's printed lines in order, each with whether the app applies it: from the ledger when it holds the card, otherwise
+ * from its text (and its back's), front then back.
+ */
+export function cardLines(code: string, text: string | null | undefined, check: TextCheck, back: string | null = null): CardLine[] {
+  const sides = check.ledger.get(code) ?? sourceSides(code, text, back);
+  return sides.flatMap((side) =>
+    side.lines.map((line, at): CardLine => {
+      const id = `${code}:${side.side}:${at + 1}`;
+      const applied = check.owned.has(id) || isKeywordLine(line) || side.inert.some((mark) => mark.line === at + 1);
+      return { id, text: line, applied };
+    }),
+  );
 }
 
-/**
- * A card's printed lines in order, each with whether the app applies it. From the ledger when it holds the card (front, then
- * back); otherwise from the catalog text, where a line beyond keywords is applied only when the card has a record.
- */
-export function cardLines(code: string, text: string | null | undefined, check: TextCheck): CardLine[] {
-  const sides = check.ledger.get(code);
-  if (sides && sides.length > 0) {
-    return sides.flatMap((side) =>
-      side.lines.map((line, at): CardLine => {
-        const id = `${code}:${side.side}:${at + 1}`;
-        const applied = check.owned.has(id) || isKeywordLine(line) || side.inert.some((mark) => mark.line === at + 1);
-        return { id, text: line, applied };
-      }),
-    );
-  }
-  if (!text) return [];
-  const recorded = check.recorded.has(code);
-  return text
-    .split(/\r?\n/)
-    .map((raw) => plain(raw))
-    .filter((line) => line.length > 0)
-    .map((line) => ({ id: null, text: line, applied: recorded || isKeywordLine(line) }));
+function sourceSides(code: string, text: string | null | undefined, back: string | null): PrintedSide[] {
+  const { A, B } = poolSides({ text: text ?? null, back: { text: back } });
+  return [
+    { code, side: "A", lines: A, inert: [] },
+    { code, side: "B", lines: B, inert: [] },
+  ].filter((side) => side.lines.length > 0);
 }
 
 /** The lines of a card the app does not apply. */
-export function unappliedLines(code: string, text: string | null | undefined, check: TextCheck): CardLine[] {
-  return cardLines(code, text, check).filter((line) => !line.applied);
+export function unappliedLines(code: string, text: string | null | undefined, check: TextCheck, back: string | null = null): CardLine[] {
+  return cardLines(code, text, check, back).filter((line) => !line.applied);
 }
 
 /** True when the app leaves a line of this card unapplied. */
-export function textInactive(code: string, text: string | null | undefined, check: TextCheck): boolean {
-  return unappliedLines(code, text, check).length > 0;
+export function textInactive(code: string, text: string | null | undefined, check: TextCheck, back: string | null = null): boolean {
+  return unappliedLines(code, text, check, back).length > 0;
 }
 
 /** The codes with a line the app does not apply. */
-export function inactiveCodes(texts: Iterable<readonly [string, string | null]>, check: TextCheck): ReadonlySet<string> {
+export function inactiveCodes(texts: Iterable<readonly [string, string | null, (string | null)?]>, check: TextCheck): ReadonlySet<string> {
   const inactive = new Set<string>();
-  for (const [code, text] of texts) if (textInactive(code, text, check)) inactive.add(code);
+  for (const [code, text, back] of texts) if (textInactive(code, text, check, back ?? null)) inactive.add(code);
   return inactive;
 }
 

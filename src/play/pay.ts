@@ -4,30 +4,39 @@
 // only names where it comes from or goes, one token at a time, and the sheet confirms only when the shares sum to it.
 // The reducer still checks every payment (validatePayments) and refuses a wrong one with a reason.
 import type { Effect } from "../catalog/boundary.ts";
-import { payFromHeroes, playCost } from "../rules/attach.ts";
+import { costOfKind } from "../catalog/costs.ts";
+import { playCost } from "../rules/attach.ts";
 import type { Payment } from "../rules/intents.ts";
 import type { ReduceContext } from "../rules/interpret.ts";
+import { allyPools, distinctRule } from "../rules/families/costs-pay.ts";
+import { openPools } from "../rules/families/misc-guards.ts";
+import { exhaustSlack } from "../rules/families/costs-play.ts";
+import { payingSlack } from "../rules/families/deck-play.ts";
+import { chosenX } from "../rules/families/misc-cost.ts";
 import { heroPays } from "../rules/payments.ts";
 import { printedOf, type Sphere } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
+import { costPayer, costSphere } from "../rules/usage.ts";
 import { topFrame } from "../rules/windows.ts";
 
 export type Share = { id: string; amount: number };
 
 // What a pay sheet asks: the pools that may pay, what each holds, and the total. `exact` is false for an X cost, where the
-// amount paid is X. `spread` is the fewest different heroes the payment must come from (Thicket of Spears, 01036:A:1).
+// amount paid is X.
 export type PayRequest = {
   seat: number;
   cardId: string;
   total: number;
   exact: boolean;
   pools: readonly { heroId: string; max: number }[];
-  spread?: number;
+  // The card's own rule on how many different pools pay (PayDistinctHeroes), which the first guess follows.
+  distinct?: { min?: number; max?: number };
 };
 
 function poolsFor(state: ScenarioState, ctx: ReduceContext, seat: number, sphere: Sphere | null, forCard?: string): { heroId: string; max: number }[] {
   const pools: { heroId: string; max: number }[] = [];
-  for (const heroId of state.seats[seat]?.heroes ?? []) {
+  // An ally whose own pool pays for the card (Radagast for Creature cards) is a pool beside the heroes.
+  for (const heroId of [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx), ...openPools(state, seat, forCard, ctx)]) {
     const hero = state.cards[heroId];
     if (!hero || hero.resources <= 0) continue;
     if (!heroPays(state, heroId, sphere, ctx, forCard)) continue;
@@ -37,16 +46,20 @@ function poolsFor(state: ScenarioState, ctx: ReduceContext, seat: number, sphere
 }
 
 /** The pay request for playing a card from the hand (or the top of the deck), or null when it costs nothing to name. */
-export function playRequest(state: ScenarioState, ctx: ReduceContext, cardId: string): PayRequest | null {
+export function playRequest(state: ScenarioState, ctx: ReduceContext, cardId: string, hostId: string | null = null): PayRequest | null {
   const seat = state.activeSeat;
   const instance = state.cards[cardId];
   if (!instance) return null;
   const printed = printedOf(ctx.cards, instance.code);
-  const cost = playCost(state, cardId, seat, ctx) ?? 0;
+  const cost = playCost(state, cardId, seat, ctx, hostId) ?? 0;
   const pools = poolsFor(state, ctx, seat, printed.sphere, cardId);
-  if (!printed.costX && cost === 0) return null;
-  const spread = payFromHeroes(state, cardId, ctx);
-  return { seat, cardId, total: cost, exact: !printed.costX, pools, ...(spread != null ? { spread } : {}) };
+  const chosen = chosenX(state, cardId, ctx);
+  if (!chosen && cost === 0) return null;
+  // A cost that characters exhausted may pay in part (ExhaustToReduce) need not be met in resources: what is left unpaid is
+  // paid by exhausting them, and the reducer checks there are enough.
+  const distinct = distinctRule(state, cardId, ctx);
+  // So may one a Response lowers as the card is played (Erebor Guard, families/deck-play.ts).
+  return { seat, cardId, total: cost, exact: !chosen && exhaustSlack(state, seat, cardId, ctx) === 0 && payingSlack(state, seat, cardId, ctx) === 0, pools, ...(distinct ? { distinct } : {}) };
 }
 
 /** The pay request for an Action or Response with a resource cost, or null when its cost takes no resources. */
@@ -55,38 +68,46 @@ export function triggerRequest(state: ScenarioState, ctx: ReduceContext, cardId:
   const instance = state.cards[cardId];
   if (!instance) return null;
   const printed = printedOf(ctx.cards, instance.code);
-  if (effect.cost?.kind === "playEvent") {
+  if (costOfKind(effect, "playEvent")) {
     const cost = playCost(state, cardId, seat, ctx) ?? 0;
-    if (!printed.costX && cost === 0) return null;
-    const spread = payFromHeroes(state, cardId, ctx);
-    return { seat, cardId, total: cost, exact: !printed.costX, pools: poolsFor(state, ctx, seat, printed.sphere, cardId), ...(spread != null ? { spread } : {}) };
+    const chosen = chosenX(state, cardId, ctx);
+    if (!chosen && cost === 0) return null;
+    const distinct = distinctRule(state, cardId, ctx);
+    return { seat, cardId, total: cost, exact: !chosen, pools: poolsFor(state, ctx, seat, printed.sphere, cardId), ...(distinct ? { distinct } : {}) };
   }
-  if (effect.cost?.kind === "resources") {
-    const sphere = effect.cost.sphere ?? printed.sphere;
-    return { seat, cardId, total: effect.cost.amount, exact: true, pools: poolsFor(state, ctx, seat, sphere) };
+  const resources = costOfKind(effect, "resources");
+  if (!resources) return null;
+  // A cost paid from one card's own pool ("Pay 1 resource from ~'s pool") offers that pool only.
+  const payer = costPayer(state, resources, instance);
+  if (payer === null) return null;
+  if (payer !== undefined) {
+    const held = state.cards[payer]?.resources ?? 0;
+    return { seat, cardId, total: resources.amount, exact: true, pools: held > 0 ? [{ heroId: payer, max: held }] : [] };
   }
-  return null;
+  return { seat, cardId, total: resources.amount, exact: true, pools: poolsFor(state, ctx, seat, costSphere(resources, instance, ctx)) };
 }
 
-/**
- * A first guess the player can change: the pools in seat order, each giving what it holds until the total is met. A cost
- * that must come from several different heroes (01036:A:1) takes one from each of the first of them before the rest.
- */
-export function firstShares(request: Pick<PayRequest, "total" | "exact" | "pools" | "spread">): Share[] {
+/** A first guess the player can change: the pools in seat order, each giving what it holds until the total is met. */
+export function firstShares(request: Pick<PayRequest, "total" | "exact" | "pools" | "distinct">): Share[] {
+  const total = request.exact ? request.total : 0;
+  // "Paid from a single hero's resource pool": the first pool that holds it all.
+  const single = request.distinct?.max === 1 ? request.pools.find((pool) => pool.max >= total) : undefined;
+  if (single && total > 0) return [{ id: single.heroId, amount: total }];
+  // "From 3 different heroes' pools": one from each of the first pools before any pool gives more.
   const given = new Map<string, number>();
-  let left = request.exact ? request.total : 0;
-  for (const pool of request.pools.slice(0, request.spread ?? 0)) {
-    if (left <= 0) break;
+  let left = total;
+  for (const pool of request.pools.slice(0, Math.min(request.distinct?.min ?? 0, total))) {
     given.set(pool.heroId, 1);
     left -= 1;
   }
   for (const pool of request.pools) {
     if (left <= 0) break;
-    const amount = Math.min(left, pool.max - (given.get(pool.heroId) ?? 0));
-    if (amount > 0) given.set(pool.heroId, (given.get(pool.heroId) ?? 0) + amount);
-    left -= amount;
+    const more = Math.min(left, pool.max - (given.get(pool.heroId) ?? 0));
+    if (more <= 0) continue;
+    given.set(pool.heroId, (given.get(pool.heroId) ?? 0) + more);
+    left -= more;
   }
-  return request.pools.flatMap((pool) => (given.has(pool.heroId) ? [{ id: pool.heroId, amount: given.get(pool.heroId) ?? 0 }] : []));
+  return request.pools.filter((pool) => given.has(pool.heroId)).map((pool) => ({ id: pool.heroId, amount: given.get(pool.heroId) ?? 0 }));
 }
 
 export function shareSum(shares: readonly Share[]): number {

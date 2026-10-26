@@ -986,7 +986,12 @@
     "Forced: At the end of the round, reduce the Ring-bearer's life by 1.",
     "If the players defeat this stage, they have won the game."
    ],
-   "inert": [],
+   "inert": [
+    {
+     "line": 4,
+     "reason": "Restates rr.winning-the-game: the players win when they complete the final stage, which the engine ends the game on when the last quest card is defeated (src/rules/quest.ts)."
+    }
+   ],
    "misprints": [],
    "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
    "confirmedBy": null,
@@ -1527,7 +1532,12 @@
     "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead.",
     "If the Ring-bearer's life reaches zero, the players lose the game."
    ],
-   "inert": [],
+   "inert": [
+    {
+     "line": 3,
+     "reason": "Restates mec109.ringbearers-life: the players lose when the Ring-bearer's life reaches 0, which the engine applies whenever the life is reduced (src/rules/families/burden-life.ts)."
+    }
+   ],
    "misprints": [],
    "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_01Cs1G2UTwXtdE59XXnsreqw, read from the scan image",
    "confirmedBy": null

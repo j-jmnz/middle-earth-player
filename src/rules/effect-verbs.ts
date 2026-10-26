@@ -1,5 +1,6 @@
 import type { Instruction } from "../catalog/boundary.ts";
 
+import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
 import { runQuestResolution } from "./explore.ts";
 import type { EngineStep } from "./intents.ts";
@@ -7,6 +8,7 @@ import { drawOne, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
+import { notePlaced, progressRoom } from "./families/south-locations.ts";
 import { announceLeftPlay } from "./stage-reveal.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats, updateCard } from "./state.ts";
@@ -30,10 +32,19 @@ export function drawVerb(
 ): ScenarioState {
   const data = topFrame(state)?.data;
   const target =
-    instruction.who === "picked" ? seatOf(lastPicked(state)) : instruction.who === "eventSeat" ? (data?.kind === "effect" ? (data.eventSeat ?? null) : null) : seat;
+    instruction.who === "picked"
+      ? seatOf(lastPicked(state))
+      : instruction.who === "eventSeat"
+        ? data?.kind === "effect"
+          ? (data.eventSeat ?? null)
+          : null
+        : instruction.who === "firstPlayer"
+          ? state.firstPlayer
+          : seat;
   if (target == null) return state;
   const trait = instruction.perHero;
-  const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * (instruction.amount ?? 1);
+  const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, seat, topFrame(state)?.cardId ?? null), ctx);
+  const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * amount;
   let next = state;
   for (let draw = 0; draw < count; draw += 1) next = drawOne(next, target, steps, UNATTRIBUTED);
   return next;
@@ -90,11 +101,12 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   const location = state.cards[id];
   if (!location) return state;
   const points = questPointsOf(state, location, ctx.cards);
-  const placed = points == null ? amount : Math.min(amount, Math.max(0, points - location.progress));
+  // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south-locations.ts).
+  const placed = Math.min(amount, progressRoom(state, id, ctx.cards));
   if (placed <= 0) return state;
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED) });
-  const next = updateCard(state, id, { progress: location.progress + placed });
+  const next = notePlaced(updateCard(state, id, { progress: location.progress + placed }), id, placed);
   if (points == null || location.progress + placed < points) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);
-  return announceLeftPlay(runQuestResolution(explored, id, ctx, steps), id, ctx, steps);
+  return announceLeftPlay(runQuestResolution(explored, id, ctx, steps), id, ctx, steps, true);
 }

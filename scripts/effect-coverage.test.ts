@@ -2,13 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import { PLAYABLE_SCENARIOS as PLAYABLE } from "../src/campaign/playable.ts";
 import { AUTHORED_EFFECTS, AUTHORED_REPLACES, EFFECTS, GENERATED_EFFECTS } from "../src/effects/index.ts";
+import { textCheck, unappliedLines } from "../src/catalog/active-text.ts";
+import { shippedLedger } from "../src/catalog/printed-ledger.ts";
 
 import { loadCards } from "./data/load-cards.ts";
 import { generateEffects } from "./data/effects/generate.ts";
 import { lineTimings } from "./data/normalize/timings.ts";
 import { isKeywordLine } from "./data/normalize/keywords.ts";
 import { keyOf, lineId, loadLedger } from "./data/printed/ledger.ts";
+import { isPoolCard, withPool } from "./data/printed/pool.ts";
 import { PLAYER_REQUESTS } from "./data/printed/scope.ts";
+import { openLines } from "./data/effects/open-lines.ts";
+import { OPEN_LINES } from "../src/effects/open-lines.ts";
 import { dealtCodes, loadCampaign, loadScenarios, starterCodes } from "./data/load-scenarios.ts";
 
 // Every printed line of a card the Fellowship scenarios deal is owned: by an effect record that names it in
@@ -19,15 +24,15 @@ const cards = loadCards();
 const scenarios = loadScenarios();
 const campaign = loadCampaign();
 const ledger = loadLedger();
+// The box ledger plus the pool's lines (every deck-legal player card outside the box, from its source text).
+const lines = withPool(ledger, cards);
 const byCode = new Map(cards.map((card) => [card.code, card]));
 
 // A scenario is playable when every printed line of the cards it deals is owned, its campaignPlaced cards (the boons
-// 141044's Resolution attaches) included. Scenarios 1 and 2 are. Scenarios 3 to 6 are built (data/scenarios, with their
-// campaign cards) and not yet playable: phases 13 to 16 write their records. The campaign cards' Setup and Resolution
+// 141044's Resolution attaches) included. Scenarios 1 to 3 are. Scenarios 4 to 6 are built (data/scenarios, with their
+// campaign cards) and not yet playable: phases 14 to 16 write their records. The campaign cards' Setup and Resolution
 // lines are owned for all six, which is the 8d exit. The list is src/campaign/playable.ts, which also gates standalone play.
-const PENDING_LINES: Readonly<Record<string, string>> = {
-  "141056:A:2": "Flight to the Ford (phase 13): the cancel response needs the attacker-declared trigger.",
-};
+const PENDING_LINES: Readonly<Record<string, string>> = {};
 const campaignCards = new Set(Object.values(campaign.campaignCards));
 // The player's requests (scripts/data/printed/scope.ts: The Shirefolk and the four core-set Learn to Play decks) are held to the
 // same rule as the starter cards: every printed line owned.
@@ -63,17 +68,25 @@ describe("effect coverage", () => {
     }
   });
 
+  const lineOf = (id: string): string => {
+    const [code, side, n] = id.split(":");
+    return lines.byKey.get(keyOf(code ?? "", side ?? ""))?.lines[Number(n) - 1] ?? "";
+  };
+
   it("has a record that names a line of its own card, for every shipped record", () => {
     for (const effect of EFFECTS) {
       expect(effect.lines.length, `${effect.id} names a line`).toBeGreaterThan(0);
       for (const id of effect.lines) {
         const [code, side, n] = id.split(":");
-        const entry = ledger.byKey.get(keyOf(code ?? "", side ?? ""));
+        const entry = lines.byKey.get(keyOf(code ?? "", side ?? ""));
         expect(code, `${effect.id} claims ${id}, a line of another card`).toBe(effect.cardCode);
         const line = entry?.lines[Number(n) - 1];
-        expect(line, `${effect.id} claims ${id}, which is not in the ledger`).toBeDefined();
-        // A ledger edit that shifts line numbers moves a record onto a line with another label.
-        expect(lineTimings(line ?? ""), `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
+        expect(line, `${effect.id} claims ${id}, which is not a printed line`).toBeDefined();
+        // A ledger edit that shifts line numbers moves a record onto a line with another label. A record may also own an
+        // unlabeled line it carries out with its labeled one (Close Call's "Doomed X." raised by its Response, 08005).
+        const timings = lineTimings(line ?? "");
+        const alongside = timings.has("constant") && effect.lines.some((other) => other !== id && lineTimings(lineOf(other)).has(effect.timing));
+        if (!alongside) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
       }
     }
   });
@@ -98,10 +111,23 @@ describe("effect coverage", () => {
 });
 
 describe("generated and authored records", () => {
-  const regenerated = generateEffects(cards, scenarios, campaign, ledger);
+  const regenerated = generateEffects(cards, scenarios, campaign, lines);
+  const byId = (a: { id: string }, b: { id: string }) => a.id.localeCompare(b.id);
 
   it("match what the templates write today", () => {
-    expect(GENERATED_EFFECTS).toEqual(regenerated.effects);
+    expect([...GENERATED_EFFECTS].sort(byId)).toEqual([...regenerated.effects].sort(byId));
+  });
+
+  it("list every printed line still without a record in open-lines.ts (pnpm effects:open rewrites it)", () => {
+    expect(OPEN_LINES).toEqual(openLines(cards, lines, campaign, scenarios, EFFECTS));
+  });
+
+  it("agree with the app's not-applied check on every pool card: it names the open lines, and no other", () => {
+    const check = textCheck(EFFECTS, shippedLedger());
+    const pool = cards.filter(isPoolCard);
+    const fromApp = pool.flatMap((card) => unappliedLines(card.code, card.text, check, card.back?.text ?? null).map((line) => line.id ?? `${card.code}:?`));
+    const poolCodes = new Set(pool.map((card) => card.code));
+    expect(fromApp.sort()).toEqual(OPEN_LINES.filter((id) => poolCodes.has(id.split(":")[0] ?? "")).sort());
   });
 
   it("replace each other only where AUTHORED_REPLACES says so", () => {

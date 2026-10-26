@@ -6,6 +6,7 @@ import { deckLegal } from "../../../src/catalog/deck-legal.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import { parseKeywordTokens } from "./keywords.ts";
 import type { RawData } from "./load-raw.ts";
+import { titleKey } from "./names.ts";
 import { timingLabels } from "./timings.ts";
 
 const TFOTR = "The Fellowship of the Ring";
@@ -56,6 +57,10 @@ const overridesSchema = z.object({
   // A printed Easy count the sources disagree on. `easy` is the count of copies that stay in an Easy deck.
   scenarioEasy: z
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
+  // Cards the app leaves out of the player card pool (not deck-legal): every card of a pack, or one card by code.
+  outOfScope: z
+    .array(z.object({ pack: z.string().min(1).optional(), code: z.string().min(1).optional(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
   // A campaign no scenario file is built for yet. The sources group its scenarios under packs; the override names the
   // campaign and the packs (Hall of Beorn products), because no source names a campaign.
@@ -231,6 +236,28 @@ function assertRulesMatch(code: string, left: RingsDbCard, right: RingsDbCard): 
   }
 }
 
+// Hall of Beorn's type names for the RingsDB deck-legal types.
+const PLAYER_TYPE_BY_HOB: Readonly<Record<string, string>> = {
+  Hero: "hero",
+  Ally: "ally",
+  Attachment: "attachment",
+  Event: "event",
+  Contract: "contract",
+  Player_Side_Quest: "player-side-quest",
+};
+
+// Hall of Beorn's RingsDbCardId is not unique: the Nightmare decks, The Dark of Mirkwood and the hero and campaign
+// expansions reuse the codes of the cycle they belong to (02004 is Winged Guardian and also Forest Flies), and The
+// Mountain of Fire swaps three. A record is the same card only when the title matches and, for a deck-legal card, the
+// type and the sides do: a player card prints a side B only when its own text says Side A (contracts, Sméagol), and a
+// shadow effect only with the Encounter keyword.
+function sameCard(card: RingsDbCard, hob: HobCard): boolean {
+  if (titleKey(hob.Title) !== titleKey(card.name)) return false;
+  if (!deckLegal(card.type_code, card.type_name)) return true;
+  const encounter = hob.Front.Keywords.some((keyword) => /^Encounter\.?$/i.test(keyword.trim()));
+  return PLAYER_TYPE_BY_HOB[hob.CardType] === card.type_code && (!hob.Back || /\bSide A\b/.test(card.text ?? "")) && (!hob.Front.Shadow?.trim() || encounter);
+}
+
 function twinKey(card: HobCard): string {
   return `${card.Title}\u0000${card.CardType}`;
 }
@@ -271,11 +298,18 @@ function overrideFor(overrides: Overrides, report: BuildReport, probe: { code?: 
   return hit?.set;
 }
 
+// A card the overrides leave out of the player card pool, by its code or by a pack it is printed in.
+function outOfScope(overrides: Overrides, card: Pick<Card, "code" | "printings">): boolean {
+  return overrides.outOfScope.some((entry) => entry.code === card.code || (entry.pack != null && card.printings.some((printing) => printing.pack === entry.pack)));
+}
+
 export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[]; report: BuildReport } {
   const report: BuildReport = { unknownKeywords: {}, twinless: [], overridesUsed: [] };
 
   const hobByCode = new Map<string, HobCard[]>();
+  const hobByTitle = new Map<string, HobCard[]>();
   for (const card of raw.hob) {
+    hobByTitle.set(titleKey(card.Title), [...(hobByTitle.get(titleKey(card.Title)) ?? []), card]);
     if (UNCODED_SETS.has(card.CardSet) || !card.RingsDbCardId) continue;
     hobByCode.set(card.RingsDbCardId, [...(hobByCode.get(card.RingsDbCardId) ?? []), card]);
   }
@@ -296,15 +330,18 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   for (const [code, list] of copies) {
     const primary = list[0];
     if (!primary) continue;
-    const hob = hobByCode.get(code)?.[0];
-    const facts = hob ? hobFacts(hob, raw.dragn.get(hob.OctgnGuid ?? ""), report) : null;
     const base = ringsDbCardFacts(primary.card);
+    // A deck-legal card none of whose code's records is the same card is looked up by title in its own pack.
+    const hob =
+      hobByCode.get(code)?.find((candidate) => sameCard(primary.card, candidate)) ??
+      (base.deckLegal ? hobByTitle.get(titleKey(primary.card.name))?.find((candidate) => candidate.CardSet === primary.pack.name && sameCard(primary.card, candidate)) : undefined);
+    const facts = hob ? hobFacts(hob, raw.dragn.get(hob.OctgnGuid ?? ""), report) : null;
     const real = hob ? realType(hob) : null;
     byCode.set(code, {
       ...base,
       ...(real ?? {}),
       deckLegal: real ? false : base.deckLegal,
-      // Hall of Beorn carries keywords and timings for every card it can match by code. Elsewhere they stay unread.
+      // Hall of Beorn carries keywords and timings for every card it has a record of. Elsewhere they stay unread.
       victory: base.victory,
       campaignKind: facts?.campaignKind ?? null,
       burdenSet: facts?.burdenSet ?? null,
@@ -413,7 +450,8 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const set = overrideFor(overrides, report, { code: card.code, name: card.name });
     const withKeywords = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
     const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
-    const next = set?.name ? { ...withBurden, name: set.name } : withBurden;
+    const named = set?.name ? { ...withBurden, name: set.name } : withBurden;
+    const next = outOfScope(overrides, named) ? { ...named, deckLegal: false } : named;
     cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));

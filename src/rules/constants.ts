@@ -1,11 +1,15 @@
 // Rules: rr.constant-ability, rr.modifiers, rr.in-play-and-out-of-play (data/rules/entries.json).
-import { isStatCondition, type Instruction, type ModifierStat } from "../catalog/boundary.ts";
+import { isStatCondition, type Instruction, type ModifierStat, type PickSpec } from "../catalog/boundary.ts";
+
+import { resolveAmount } from "./amounts.ts";
 
 import { characters } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import { constantInstructions } from "./constant-records.ts";
+import { attachedCount } from "./families/sidequests-contract.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { isCharacterType, printedOf } from "./printed.ts";
+import { pickCandidates } from "./pick.ts";
+import { cardTypeOf, isCharacterType, printedOf } from "./printed.ts";
 import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { inPlay, livingSeats, modifierActive } from "./state.ts";
 
@@ -31,7 +35,7 @@ function holders(state: ScenarioState, source: CardInstance, target: string | un
 function holdersOf(state: ScenarioState, source: CardInstance, target: string | undefined, ctx: ReduceContext): string[] {
   switch (target) {
     case "heroes":
-      return cardsInPlay(state).filter((instance) => printedOf(ctx.cards, instance.code).type === "hero").map((instance) => instance.id);
+      return cardsInPlay(state).filter((instance) => cardTypeOf(instance, printedOf(ctx.cards, instance.code)) === "hero").map((instance) => instance.id);
     case "hobbitCharacters":
       return cardsInPlay(state)
         .filter((instance) => (instance.zone === "heroes" || instance.zone === "play") && isCharacterType(printedOf(ctx.cards, instance.code)) && hasTrait(state, instance.id, "Hobbit", ctx))
@@ -48,12 +52,21 @@ function holdersOf(state: ScenarioState, source: CardInstance, target: string | 
     case "engagedSeatCharacters":
       return source.zone === "engaged" && source.controller != null ? characters(state, source.controller, ctx.cards) : [];
     case "allies":
-      return cardsInPlay(state).filter((instance) => printedOf(ctx.cards, instance.code).type === "ally").map((instance) => instance.id);
+      return cardsInPlay(state).filter((instance) => cardTypeOf(instance, printedOf(ctx.cards, instance.code)) === "ally").map((instance) => instance.id);
     case "eachSeat":
       return livingSeats(state).map((seat) => `seat:${seat}`);
+    // The source controller's seat ("You draw 1 additional card during the resource phase").
+    case "actorSeat":
+      return [`seat:${source.controller ?? state.firstPlayer}`];
     default:
       return [source.id];
   }
+}
+
+// The holders a constant names by filter, from its controller's side ("Each Outlands character you control"). A player card's
+// constant does not reach a card immune to player card effects (mec109.immune-to-player-card-effects).
+function matching(state: ScenarioState, source: CardInstance, filter: PickSpec, ctx: ReduceContext): string[] {
+  return pickCandidates(state, filter, source.controller ?? state.firstPlayer, [], source.id, ctx);
 }
 
 // A constant set ("Reduce attached hero's Willpower, Attack, and Defense to 0", 141055:A:2) is a set modifier (rr.modifiers).
@@ -74,19 +87,25 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
   for (const { source, effect, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb === "SetStat") found.push(...setRecord(state, source, effect.id, instruction, ctx));
     if (instruction.verb !== "ModifyStat") continue;
-    // "for each Hobbit hero you control" is counted here, each time the records are rebuilt. "For each damage token on him"
-    // (01004:A:1) is counted when the stat is read (modifiedStat), so it follows the damage at once.
-    const amount = instruction.per === "hobbitHero" ? instruction.amount * hobbitHeroes(state, source, ctx) : instruction.amount;
+    // "for each Hobbit hero you control", "for each enemy engaged with you" are counted here, each time the records are rebuilt.
+    const seat = source.controller ?? state.firstPlayer;
+    const base = resolveAmount(state, instruction.amount, { actor: seat, sourceId: source.id }, ctx);
+    const read = instruction.per === "hobbitHero" ? base * hobbitHeroes(state, source, ctx) : base;
+    const amount = instruction.subtract ? -read : read;
     if (amount === 0) continue;
-    for (const holder of holders(state, source, instruction.target, ctx, instruction.trait)) {
+    const named = instruction.holders ? matching(state, source, instruction.holders, ctx) : holders(state, source, instruction.target, ctx, instruction.trait);
+    for (const holder of named) {
+      // "+1 Willpower for each restricted attachment on it": the amount times the matching cards attached to the holder.
+      const factor = instruction.eachAttached ? attachedCount(state, holder, instruction.eachAttached, source.id, ctx) : 1;
+      if (factor === 0) continue;
       found.push({
         instanceId: holder,
         sourceId: source.id,
         stat: instruction.stat,
-        amount,
+        amount: amount * factor,
         until: source.zone === "victory" ? "whileSourceInVictory" : "whileSourceInPlay",
         origin: effect.id,
-        ...(instruction.per === "committed" || instruction.per === "ally" || instruction.per === "damage" ? { per: instruction.per } : {}),
+        ...(instruction.per === "committed" || instruction.per === "ally" ? { per: instruction.per } : {}),
         ...(isStatCondition(instruction.when) ? { when: instruction.when } : {}),
       });
     }

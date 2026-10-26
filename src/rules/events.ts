@@ -1,4 +1,6 @@
 // Rules: rr.timing-of-ability-resolution, rr.forced, rr.response, rr.triggering-condition (data/rules/entries.json).
+import { noteEvent } from "./families/costs-pay.ts";
+import { noteEngaged } from "./families/attack-events.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { offerResponses } from "./responses.ts";
@@ -44,7 +46,11 @@ export function drainEvents(state: ScenarioState, ctx: ReduceContext, steps: Eng
   const together = sameOccurrence(event, queued);
   const rest = queued.slice(together.length);
   const { pendingEvents: _queued, ...without } = state;
-  const cleared: ScenarioState = rest.length > 0 ? { ...without, pendingEvents: rest } : without;
+  // An engagement is remembered for the round (families/attack-events.ts).
+  const cleared: ScenarioState = [event, ...together].reduce(
+    (current, each) => noteEngaged(noteEvent(current, each, ctx), each, ctx),
+    rest.length > 0 ? { ...without, pendingEvents: rest } : (without as ScenarioState),
+  );
   // The Forced effects go on top of the response frame, the first event's last, so they resolve in the order of the events.
   const announce = (from: ScenarioState): ScenarioState =>
     [event, ...together].reverse().reduce((current, each) => fireForced(current, each, ctx, steps), offerResponses(from, event, ctx, steps, together));

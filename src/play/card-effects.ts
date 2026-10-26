@@ -122,11 +122,7 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
     if (word) {
       // A conditional modifier counts only when its number shows.
       if (modifier.when && !shown.stats.some((badge) => badge.stat === modifier.stat)) continue;
-      // A modifier for each damage token (Gimli, 01004:A:1) is said as the total it comes to now; none yet says nothing.
-      const total = modifier.per === "damage" ? modifier.amount * card.damage : modifier.amount;
-      if (modifier.per === "damage" && total === 0) continue;
-      const each = modifier.per === "damage" ? ` (${modifier.amount >= 0 ? "+" : ""}${modifier.amount} for each damage on it)` : "";
-      const amount = modifier.set ? `${word} is ${modifier.amount}` : `${total >= 0 ? "+" : ""}${total} ${word}${each}`;
+      const amount = modifier.set ? `${word} is ${modifier.amount}` : `${modifier.amount >= 0 ? "+" : ""}${modifier.amount} ${word}`;
       lines.push(`${amount} from ${source}, ${UNTIL[modifier.until]}`);
       continue;
     }

@@ -9,22 +9,28 @@ import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 
-import { notApplied, notAppliedCodes } from "./not-applied.ts";
+import { inactiveCodes, textCheck } from "../catalog/active-text.ts";
+import { shippedLedger } from "../catalog/printed-ledger.ts";
+import { EFFECTS } from "../effects/index.ts";
+import { notApplied } from "./not-applied.ts";
 import { firstShares, playRequest } from "./pay.ts";
 import { distributeIntent, paySheet } from "./bar-sheets.ts";
 
-// Rules: rr.sentinel, rr.triggered-ability (data/rules/entries.json). Player cards outside the box and outside the core decks
-// brought into scope, so no record reads their text: Landroval (02053, a Tactics ally with Sentinel and a Response) is paid
+// Rules: rr.sentinel, rr.triggered-ability (data/rules/entries.json). Every player card is meant to have records (user decision,
+// 2026-10-26), so these tests take the records of three cards away to show what a card no record reads does: Landroval (02053, a Tactics ally with Sentinel and a Response) is paid
 // for and played with its printed cost and keeps its keyword, and its Response is never offered; Campfire Tales (02003, a
 // Leadership event) cannot be played at all; Dúnedain Warning (02026, a Leadership attachment) attaches and does nothing.
 const LANDROVAL = "02053";
 const CAMPFIRE = "02003";
 const WARNING = "02026";
+const UNREAD = new Set([LANDROVAL, CAMPFIRE, WARNING]);
+const EFFECTS_WITHOUT = EFFECTS.filter((effect) => !UNREAD.has(effect.cardCode));
+const CHECK = textCheck(EFFECTS_WITHOUT, shippedLedger());
 
 async function world(deckId: string, codes: readonly string[]) {
   const { ctx: base } = await starterWorld(deckId);
   const cards = new Map([...base.cards, ...(await loadPrinted(codes))]);
-  return { effects: base.effects, cards };
+  return { effects: base.effects.filter((effect) => !UNREAD.has(effect.cardCode)), cards };
 }
 
 function toPlanning(deckId: string, ctx: Awaited<ReturnType<typeof world>>): ScenarioState {
@@ -37,16 +43,16 @@ function toPlanning(deckId: string, ctx: Awaited<ReturnType<typeof world>>): Sce
 
 describe("text the app does not apply", () => {
   it("marks a card with a line no record reads, and not a starter card whose lines all have records", () => {
-    const codes = notAppliedCodes([
+    const codes = inactiveCodes([
       [LANDROVAL, "Sentinel.\nLandroval cannot have restricted attachments.\n<b>Response:</b> After a hero card is destroyed, return Landroval to his owner's hand to put that hero back into play."],
       [CAMPFIRE, "<b>Action:</b> Each player draws 1 card."],
       ["141002", "<b>Response:</b> After you engage an enemy..."],
       ["kw", "Sentinel."],
-    ]);
+    ], CHECK);
     expect([...codes].sort()).toEqual([CAMPFIRE, LANDROVAL]);
-    expect(notApplied(CAMPFIRE, "event", "<b>Action:</b> Each player draws 1 card.")?.words).toBe("Cannot be played");
-    expect(notApplied(WARNING, "attachment", "Attach to a hero.\nAttached hero gains +1 [defense].")?.words).toBe("Text not applied");
-    expect(notApplied(LANDROVAL, "ally", "Sentinel.\n<b>Response:</b> After a hero card is destroyed, return Landroval.")?.lines.map((line) => line.text)).toEqual([
+    expect(notApplied(CAMPFIRE, "event", "<b>Action:</b> Each player draws 1 card.", CHECK)?.words).toBe("Cannot be played");
+    expect(notApplied(WARNING, "attachment", "Attach to a hero.\nAttached hero gains +1 [defense].", CHECK)?.words).toBe("Text not applied");
+    expect(notApplied(LANDROVAL, "ally", "Sentinel.\n<b>Response:</b> After a hero card is destroyed, return Landroval.", CHECK)?.lines.map((line) => line.text)).toEqual([
       "Response: After a hero card is destroyed, return Landroval.",
     ]);
   });

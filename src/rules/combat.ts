@@ -1,6 +1,6 @@
 // Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, rr.step-6-2, rr.step-6-4b, rr.ranged,
 // rr.step-6-8b, rr.step-6-8-1, mec109.archery, faq.limitations-on-attacks, ltp.deal-shadow-cards, ltp.resolve-enemy-attacks,
-// ltp.undefended-attack, ltp.resolve-player-attacks, rr.multiple-defenders, rr.response (data/rules/entries.json).
+// ltp.undefended-attack, ltp.resolve-player-attacks (data/rules/entries.json).
 import { attackBarred } from "./constants.ts";
 import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
@@ -9,13 +9,19 @@ import type { ScenarioState } from "./state.ts";
 import { flagged, livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, type ReduceContext } from "./interpret.ts";
 import { queueEvent } from "./queue.ts";
-import { offerResponses } from "./responses.ts";
 import { resolveAttack } from "./shadow.ts";
 import { engagementCostOf } from "./quest.ts";
 import { enemyAttackWindow, playerAttackWindow } from "./step-window.ts";
 import { inPlay } from "./zones.ts";
 import { ruleCause } from "./cause.ts";
 import { fireForced } from "./triggers.ts";
+import { undefendedExtras } from "./families/defense-damage.ts";
+import { markDefender, moreDefenders } from "./families/defense-defenders.ts";
+import { holdAttack, queueHeard } from "./families/defense-listen.ts";
+import { awaitStrike, backAfter, declareStrike, endStrike } from "./families/attack-flow.ts";
+import { countsDefense, struck } from "./families/attack-strike.ts";
+import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations } from "./families/south-watcher.ts";
+import { offeredTargets, stagingAttackable, withCardTargets } from "./families/attack-targets.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -45,13 +51,14 @@ export function characters(state: ScenarioState, seat: number, cards: Cards): st
     const instance = state.cards[id];
     if (!instance) continue;
     const printed = printedOf(cards, instance.code);
-    if (isAllyLike(printed)) ids.push(id);
+    // An ally attached to another card (Wild Stallion) is an attachment, not a character.
+    if (isAllyLike(printed) && instance.host == null) ids.push(id);
   }
   return ids;
 }
 
 // Each seat's enemies in player order, the highest engagement cost first (rr.step-6-2). Equal costs keep the order
-// they engaged in. Once they are dealt, every card hears it ("look at 1 shadow card that was just dealt", 01071:A:2).
+// they engaged in.
 export function dealShadows(state: ScenarioState, cards: Cards): ScenarioState {
   let next = state;
   for (const seat of livingSeats(next)) {
@@ -62,8 +69,7 @@ export function dealShadows(state: ScenarioState, cards: Cards): ScenarioState {
     const order = [...(next.seats[seat]?.engaged ?? [])].sort((a, b) => cost(b) - cost(a));
     for (const enemyId of order) next = dealOneShadow(next, enemyId);
   }
-  const dealt = Object.values(next.cards).some((card) => card.zone === "shadow" && state.cards[card.id]?.zone !== "shadow");
-  return dealt ? queueEvent(next, { trigger: "shadowsDealt", seat: null }) : next;
+  return next;
 }
 
 export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: string[] } | null {
@@ -71,7 +77,9 @@ export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: s
     const enemies = (state.seats[seat]?.engaged ?? []).filter(
       (id) => !state.resolvedAttacks.includes(id) && !attackBarred(state, id, seat),
     );
-    if (enemies.length > 0) return { seat, enemies };
+    // An enemy in the staging area that is considered engaged with each player (families/south-watcher.ts).
+    const staging = stagingAttackers(state, seat);
+    if (enemies.length + staging.length > 0) return { seat, enemies: [...enemies, ...staging] };
   }
   return null;
 }
@@ -85,11 +93,15 @@ export function beginEnemyAttack(
   enemyId: string,
   ctx: ReduceContext,
   steps: EngineStep[],
+  // An effect made an enemy in the staging area attack (families/south-watcher.ts).
+  fromStaging = false,
 ): ScenarioState {
   const attacker = state.cards[enemyId];
-  if (!attacker || attacker.zone !== "engaged" || attackBarred(state, enemyId, seat)) return state;
+  const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || (fromStaging && attacker.zone === "staging"));
+  if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
-  const declared: ScenarioState = { ...state, pendingAttack: { enemyId, seat }, activeSeat: seat, window: null };
+  const dealt = engagedWithAll(state, enemyId) ? dealForAttack(state, enemyId) : state;
+  const declared: ScenarioState = { ...dealt, pendingAttack: { enemyId, seat, ...(fromStaging ? { fromStaging: true } : {}) }, activeSeat: seat, window: null };
   const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
   if (fired.stack.length > declared.stack.length && fired.pendingAttack) {
     return { ...fired, pendingAttack: { ...fired.pendingAttack, defenseWaits: true } };
@@ -97,11 +109,13 @@ export function beginEnemyAttack(
   return toDefense(declared, ctx);
 }
 
-// 6.4b: the attack has begun; an action window comes before the defender is declared.
+// 6.4b: the attack has begun; an action window comes before the defender is declared. "After an enemy is declared as an
+// attacker against you" is announced first, and the defense waits for its Responses (enemyAttacks).
 function toDefense(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack) return state;
-  return enemyAttackWindow(state, ctx, "defense") ?? { ...state, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
+  const begun = queueHeard(state, ctx, { trigger: "enemyAttacks", seat: attack.seat, cardId: attack.enemyId, subject: attack.enemyId });
+  return enemyAttackWindow(begun, ctx, "defense") ?? holdAttack(begun, ctx, "defense", ["enemyAttacks"]) ?? { ...begun, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat };
 }
 
 // The Forced effects of the attack's start are done: the defender is declared next.
@@ -109,9 +123,8 @@ export function openDefense(state: ScenarioState, ctx: ReduceContext): ScenarioS
   const attack = state.pendingAttack;
   if (!attack?.defenseWaits) return state;
   const { defenseWaits: _done, ...rest } = attack;
-  const enemy = state.cards[attack.enemyId];
   // The enemy left play while they resolved: the attack is over.
-  if (enemy?.zone !== "engaged") return { ...state, pendingAttack: null };
+  if (!attackHere(state, attack.enemyId)) return { ...state, pendingAttack: null };
   return toDefense({ ...state, pendingAttack: rest }, ctx);
 }
 
@@ -131,34 +144,10 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   if (!instance || instance.exhausted) return false;
   if (instance.zone !== "heroes" && instance.zone !== "play") return false;
   const printed = printedOf(cards, instance.code);
-  if (!isCharacterType(printed)) return false;
+  if (!isCharacterType(printed) || instance.host != null) return false;
+  if (flagged(state, defenderId, "cannotDefend")) return false;
   if (instance.controller === attackedSeat) return true;
-  return printed.keywords.sentinel;
-}
-
-// Every defender declared against the attack in progress, the first first.
-export function defendersOf(state: ScenarioState): string[] {
-  const attack = state.pendingAttack;
-  if (!attack?.defenderId) return [];
-  return [...(attack.defenderIds ?? [attack.defenderId])];
-}
-
-// The defending player may declare any number of defenders (Stand Together, 01038:A:1, rr.multiple-defenders).
-export function multipleDefenders(state: ScenarioState, seat: number): boolean {
-  return flagged(state, `seat:${seat}`, "multipleDefenders");
-}
-
-// The defense window is open again for another defender: one is declared and the attack is still defended. (A shadow effect
-// that made a defended attack undefended opens it to name the hero instead.)
-export function declaringMore(state: ScenarioState): boolean {
-  const attack = state.pendingAttack;
-  return state.window?.kind === "defense" && attack?.defenderId != null && attack.undefended !== true;
-}
-
-// The characters that may still join the defense: "any number of his eligible characters" (01038:A:1), the defending player's
-// own.
-export function moreDefenders(state: ScenarioState, seat: number, cards: Cards): string[] {
-  return defenderIds(state, seat, cards).filter((id) => state.cards[id]?.controller === seat);
+  return printed.keywords.sentinel || flagged(state, defenderId, "sentinel");
 }
 
 export function applyDefense(
@@ -169,33 +158,25 @@ export function applyDefense(
 ): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack || !state.cards[attack.enemyId] || !state.cards[defenderId]) return state;
-  const declared = [...defendersOf(state), defenderId];
-  const pending = { ...attack, defenderId: attack.defenderId ?? defenderId, ...(declared.length > 1 ? { defenderIds: declared } : {}) };
-  const exhausted: ScenarioState = { ...updateCard(state, defenderId, { exhausted: true }), pendingAttack: pending, window: null };
-  // Responses to the declaration ("After Gondorian Spearman is declared as a defender", 01029:A:2; 01037:A:1) come first;
-  // the attack waits for them.
-  const offered = offerResponses(exhausted, { trigger: "defenderDeclared", seat: attack.seat, subject: defenderId }, ctx, steps);
-  if (offered.stack.length > exhausted.stack.length && offered.pendingAttack) {
-    return { ...offered, pendingAttack: { ...offered.pendingAttack, awaiting: "declared", awaitDepth: exhausted.stack.length } };
-  }
-  return afterDeclared(exhausted, ctx, steps);
-}
-
-// A defender is declared and its Responses are done. With Stand Together the player may declare another while one can defend
-// (rr.multiple-defenders); a pass ends the declarations (finishDefense). Then 6.4.1 ends: an action window comes before the
-// shadow card is turned up.
-export function afterDeclared(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const attack = state.pendingAttack;
-  if (!attack) return state;
-  if (multipleDefenders(state, attack.seat) && moreDefenders(state, attack.seat, ctx.cards).length > 0) {
-    return { ...state, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat, passed: [] };
-  }
-  return finishDefense(state, ctx, steps);
-}
-
-export function finishDefense(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const closed: ScenarioState = { ...state, window: null };
-  return enemyAttackWindow(closed, ctx, "shadow") ?? resolveAttack(closed, ctx, steps);
+  // A character with "does not exhaust to defend" stays ready (rr.exhausted). Its declaration is announced ("After ~ is
+  // declared as a defender").
+  const ready = flagged(state, defenderId, "noExhaustDefend");
+  const declaredState = ready ? state : updateCard(state, defenderId, { exhausted: true });
+  const exhausted: ScenarioState = markDefender(
+    {
+      ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId }),
+      pendingAttack: { ...attack, defenderId },
+      window: null,
+    },
+    defenderId,
+    ctx,
+  );
+  // A player who may declare more defenders declares them next (01038).
+  const more = moreDefenders(exhausted, ctx, steps);
+  if (more) return more;
+  // 6.4.1: the defender is declared; an action window comes before the shadow card is turned up. The Responses to the
+  // declaration ("After ~ is declared as a defender") come before the shadow card too.
+  return enemyAttackWindow(exhausted, ctx, "shadow") ?? holdAttack(exhausted, ctx, "shadow", ["declaredDefender"]) ?? resolveAttack(exhausted, ctx, steps);
 }
 
 export function applyUndefended(
@@ -227,14 +208,17 @@ export function canAttack(
   if (!attacker || !enemy || (attacker.exhausted && !exhaustedOk) || attacker.controller == null) return false;
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
-  if (!isCharacterType(printed)) return false;
-  // "Dúnhere can target enemies in the staging area when he attacks alone" (01009:A:1): his own controller declares it.
-  if (enemy.zone === "staging") return attacker.controller === seat && printedOf(cards, enemy.code).type === "enemy" && flagged(state, attackerId, "stagingAttack");
-  if (enemy.zone !== "engaged") return false;
+  if (!isCharacterType(printed) || attacker.host != null) return false;
+  // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
+  // only when a card lets the character attack it (families/attack-targets.ts).
+  const open = flagged(state, enemyId, "attackableByAny");
+  if (enemy.zone !== "engaged" && !(open && enemy.zone === "staging")) return stagingAttackable(state, seat, attackerId, enemyId, cards);
   // The declaring seat's own characters attack its own enemies. A ranged character may attack an enemy engaged with
   // another player, and may join an attack another player declares (rr.ranged, rr.step-6-8-1).
+  if (flagged(state, attackerId, "cannotAttack")) return false;
+  if (open) return true;
   if (attacker.controller === seat && enemy.controller === seat) return true;
-  return printed.keywords.ranged;
+  return printed.keywords.ranged || flagged(state, attackerId, "ranged");
 }
 
 export function legalAttackEnemies(state: ScenarioState, seat: number, attackerId: string, cards: Cards, exhaustedOk = false): string[] {
@@ -244,16 +228,14 @@ export function legalAttackEnemies(state: ScenarioState, seat: number, attackerI
       if (canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk)) ids.push(enemyId);
     }
   }
-  if (flagged(state, attackerId, "stagingAttack")) {
-    for (const enemyId of state.staging) if (canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk)) ids.push(enemyId);
-  }
-  return ids;
+  // Enemies in the staging area a card lets it attack; in a window a card opened, only that window's targets.
+  return withCardTargets(state, ids, (enemyId) => canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk));
 }
 
 // The framework gives a seat one declared attack against each enemy each combat phase; an attack a card effect makes
-// (Quick Strike) is extra and does not count (faq.limitations-on-attacks).
+// (Quick Strike, a card's attack window) is extra and does not count (faq.limitations-on-attacks).
 export function attackDeclared(state: ScenarioState, seat: number, enemyId: string): boolean {
-  return state.declaredAttacks.includes(`${seat}:${enemyId}`);
+  return offeredTargets(state) == null && state.declaredAttacks.includes(`${seat}:${enemyId}`);
 }
 
 // The enemies the seat may still declare an attack against with this character.
@@ -278,13 +260,18 @@ export function applyPlayerAttack(
 ): ScenarioState {
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
-  let next: ScenarioState = { ...state, declaredAttacks: [...state.declaredAttacks, `${seat}:${enemyId}`], window: null };
+  // An attack in a window a card opened is extra: it is not counted against the one attack per enemy.
+  const extra = offeredTargets(state) != null;
+  let next: ScenarioState = { ...state, declaredAttacks: extra ? state.declaredAttacks : [...state.declaredAttacks, `${seat}:${enemyId}`], window: null };
   for (const attackerId of attackerIds) {
-    if (next.cards[attackerId]) next = updateCard(next, attackerId, { exhausted: true });
+    if (!next.cards[attackerId]) continue;
+    if (!flagged(next, attackerId, "noExhaustAttack")) next = updateCard(next, attackerId, { exhausted: true });
+    next = queueEvent(next, { trigger: "declaredAttacker", seat, cardId: attackerId, other: enemyId });
   }
-  const declared: ScenarioState = { ...next, pendingStrike: { seat, enemyId, attackerIds: [...attackerIds] } };
-  // 6.8.1: the attack and its attackers are declared; an action window comes before its strength and damage.
-  return playerAttackWindow(declared, ctx, "strike") ?? continueStrike(declared, ctx, steps);
+  const declared: ScenarioState = declareStrike(next, { seat, enemyId, attackerIds: [...attackerIds], ...backAfter(state.window, enemyId) });
+  // 6.8.1: the attack and its attackers are declared; an action window comes before its strength and damage. The Responses to
+  // the declaration ("After ~ is declared as an attacker") resolve before them either way (families/attack-flow.ts).
+  return playerAttackWindow(declared, ctx, "strike") ?? awaitStrike(declared, ctx) ?? continueStrike(declared, ctx, steps);
 }
 
 // The rest of a declared player attack after its step window: the damage (6.8.2, 6.8.3), the window after it, and the end
@@ -293,12 +280,14 @@ export function continueStrike(state: ScenarioState, ctx: ReduceContext, steps: 
   const strike = state.pendingStrike;
   if (!strike) return state;
   let next = state;
-  if (strike.awaiting !== "end") {
-    next = strikeEnemy({ ...state, pendingStrike: { seat: strike.seat, enemyId: strike.enemyId, attackerIds: strike.attackerIds } }, strike.seat, strike.enemyId, strike.attackerIds, ctx, steps);
+  const { awaiting, awaitDepth: _depth, ...declared } = strike;
+  if (awaiting !== "end") {
+    next = strikeEnemy({ ...state, pendingStrike: declared }, strike.seat, strike.enemyId, strike.attackerIds, ctx, steps);
     const after = playerAttackWindow(next, ctx, "end");
     if (after) return after;
   }
-  return { ...next, pendingStrike: null, window: { kind: "playerAttack" }, activeSeat: strike.seat };
+  // 6.8.4: "for this attack" expires, the window the attack came from comes back (families/attack-flow.ts).
+  return endStrike({ ...next, pendingStrike: next.pendingStrike ?? declared }, ctx, steps);
 }
 
 // The attackers' strength against the enemy's defense, as combat damage. The attackers are already exhausted: a player
@@ -315,21 +304,16 @@ export function strikeEnemy(
   if (!enemy) return state;
   const next = state;
   const attack = attackStrength(next, attackerIds, enemyId, ctx.cards);
-  const defense = modifiedStat(next, enemy, "defense", ctx.cards);
+  // An attacker may say the enemy does not count its Defense (families/attack-strike.ts).
+  const defense = countsDefense(next, attackerIds) ? modifiedStat(next, enemy, "defense", ctx.cards) : 0;
   steps.push({ kind: "attack", side: "player", seat, enemyId });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
   const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
-  // Each attacker hears that the attack destroyed the enemy ("After Merry participates in an attack that destroys an enemy"),
-  // and so does each card attached to it ("After attached hero attacks and destroys an enemy", 01039:A:3). An enemy in the
-  // staging area (01009:A:1) that is still there was not destroyed either.
-  const left = damaged.cards[enemyId]?.zone;
-  if (left === "engaged" || left === "staging") return damaged;
-  const heard = attackerIds.reduce((current, attackerId) => queueEvent(current, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, participants: attackerIds }), damaged);
-  return attackerIds
-    .flatMap((attackerId) => damaged.cards[attackerId]?.attachments ?? [])
-    .reduce((current, attachmentId) => queueEvent(current, { trigger: "hostAttackDestroyed", seat, cardId: attachmentId, subject: enemyId }), heard);
+  // Each attacker hears that the attack damaged or destroyed the enemy ("After Merry participates in an attack that destroys
+  // an enemy"), and excess damage goes where a card sends it (families/attack-strike.ts).
+  return struck(next, damaged, seat, enemyId, attackerIds, Math.max(0, attack - defense), ctx, steps);
 }
 
 // The attack strength of characters attacking one enemy (rr.step-6-8-2): each attacker's attack, read against that enemy.
@@ -358,4 +342,16 @@ export function assignArchery(
 
 export function heroIds(state: ScenarioState, seat: number): string[] {
   return [...(state.seats[seat]?.heroes ?? [])];
+}
+
+// The characters an undefended attack's damage may be assigned to: the seat's heroes, and a character that says damage from
+// undefended attacks may be assigned to it (takesUndefendedDamage).
+export function undefendedTargets(state: ScenarioState, seat: number, cards: Cards): string[] {
+  // A shadow effect sent the damage to an active location (families/south-watcher.ts).
+  const locations = undefendedLocations(state);
+  if (locations.length > 0) return locations;
+  const heroes = heroIds(state, seat);
+  const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
+  // A character another card lets take it for this player (08093), whoever controls that character.
+  return [...own, ...undefendedExtras(state, seat, cards).filter((id) => !own.includes(id))];
 }

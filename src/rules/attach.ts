@@ -1,26 +1,32 @@
-// Rules: rr.restricted, rr.resource-match, rr.attachment-cards, rr.play-restrictions-and-permissions (data/rules/entries.json).
+// Rules: rr.restricted, rr.resource-match (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
+import { resolveAmount } from "./amounts.ts";
+import { effectsOf } from "./listen.ts";
+import { costReduction } from "./cost-rules.ts";
 import { ruleCause } from "./cause.ts";
 import { characters } from "./combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
+import { playIntoRule } from "./families/attachments-play.ts";
+import { questHosts } from "./families/attachments-quest.ts";
+import { seatThreat } from "./families/play-hooks.ts";
+import { fixedX, grantedSecrecy } from "./families/misc-cost.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { playerCardEffectCanChoose } from "./keywords.ts";
-import { heroPays } from "./payments.ts";
 import { printedOf } from "./printed.ts";
-import { stagingLocations } from "./quest.ts";
-import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
+import { attachBlocked, restrictedLoad } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
-import { livingSeats } from "./state.ts";
+import { heldAmount, livingSeats } from "./state.ts";
+import { matchesPick, pickCandidates } from "./pick.ts";
 
 type AttachRule = Extract<Instruction, { verb: "AttachesTo" }>;
 
 // The "Attach to ..." line of an attachment, as its constant record. A card with no record may go on any character.
 export function attachRule(ctx: ReduceContext, code: string): AttachRule | undefined {
-  for (const effect of ctx.effects) {
-    if (effect.cardCode !== code || effect.timing !== "constant") continue;
+  for (const effect of effectsOf(ctx, code)) {
+    if (effect.timing !== "constant") continue;
     for (const instruction of effect.instructions) if (instruction.verb === "AttachesTo") return instruction;
   }
   return undefined;
@@ -29,21 +35,23 @@ export function attachRule(ctx: ReduceContext, code: string): AttachRule | undef
 // The cards an attachment with this code may be attached to. A card with an "Attach to" record may go on a card of any
 // seat; one without goes on a character of the seat that plays it.
 export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext): string[] {
+  // A card played unattached or onto a threat dial goes on no card (families/attachments-play.ts).
+  if (playIntoRule(ctx, code)) return [];
   const rule = attachRule(ctx, code);
+  const named = rule?.host ?? { kind: "character" as const };
   const candidates: string[] = [];
-  if (!rule) {
+  if (rule?.hosts) {
+    // Any of the filters, from the playing seat's side; a filter that says `control: "you"` keeps the seat's own cards.
+    for (const filter of rule.hosts) candidates.push(...pickCandidates(state, filter, seat, [], null, ctx).filter((id) => !candidates.includes(id)));
+  } else if (!rule) {
     candidates.push(...characters(state, seat, ctx.cards));
-  } else if (rule.host.kind === "activeLocation") {
+  } else if (named.kind === "activeLocation") {
     if (state.activeLocation) candidates.push(state.activeLocation);
-  } else if (rule.host.kind === "location") {
-    // "Attach to a location" (01056:A:1): one in the staging area or the active location.
-    candidates.push(...stagingLocations(state, ctx.cards), ...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
-  } else if (rule.host.kind === "engagedEnemy") {
-    // "Attach to an enemy engaged with a player" (01069:A:1).
-    for (const index of livingSeats(state)) candidates.push(...(state.seats[index]?.engaged ?? []).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy"));
+  } else if (named.kind === "quest") {
+    candidates.push(...questHosts(state, ctx));
   } else {
     for (const index of livingSeats(state)) {
-      if (rule.host.kind === "hero" || rule.host.kind === "ringBearer") candidates.push(...(state.seats[index]?.heroes ?? []));
+      if (named.kind === "hero" || named.kind === "ringBearer") candidates.push(...(state.seats[index]?.heroes ?? []));
       else candidates.push(...characters(state, index, ctx.cards));
     }
   }
@@ -52,63 +60,50 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     if (!host || !playerCardEffectCanChoose(printedOf(ctx.cards, host.code))) return false;
     if (attachBlocked(state, ctx, id, code)) return false;
     if (!rule) return true;
-    if (rule.host.kind === "ringBearer" && !hasTrait(state, id, "Ring-bearer", ctx)) return false;
-    if (rule.host.trait && !hasTrait(state, id, rule.host.trait, ctx)) return false;
-    if (rule.host.name && printedOf(ctx.cards, host.code).name !== rule.host.name) return false;
     if (rule.limitPerHost && host.attachments.some((other) => state.cards[other]?.code === code)) return false;
+    if (rule.hosts) return true;
+    if (named.kind === "ringBearer" && !hasTrait(state, id, "Ring-bearer", ctx)) return false;
+    if (named.trait && !hasTrait(state, id, named.trait, ctx)) return false;
+    if (named.name && printedOf(ctx.cards, host.code).name !== named.name) return false;
+    if (named.sphere && printedOf(ctx.cards, host.code).sphere !== named.sphere) return false;
     return true;
   });
 }
 
-// What a card costs to play from the hand: its printed cost less each ReduceCost record whose condition holds.
-export function playCost(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): number | null {
+// What a card costs to play from the hand: its printed cost less each ReduceCost record whose condition holds, Secrecy, the
+// seat's discounts and the constants of its cards in play (cost-rules.ts). `hostId` is where an attachment goes.
+export function playCost(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, hostId?: string | null): number | null {
   const instance = state.cards[cardId];
   if (!instance) return null;
   const printed = printedOf(ctx.cards, instance.code);
-  if (printed.cost == null) return null;
-  let cost = printed.cost;
+  // A cost of X that a record fixes ("X is the number of players in the game") is that number (families/misc-cost.ts).
+  const base = printed.cost ?? fixedX(state, cardId, ctx);
+  if (base == null) return null;
+  let cost = base;
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
-  for (const effect of ctx.effects) {
-    if (effect.cardCode !== instance.code || effect.timing !== "constant") continue;
+  // Secrecy X: X less while the player's threat is 20 or less, and the Secrecy a card in play grants this card.
+  if (printed.keywords.secrecy != null && state.seats[seat] && seatThreat(state, seat) <= 20) cost -= printed.keywords.secrecy;
+  cost -= grantedSecrecy(state, cardId, seat, ctx);
+  for (const effect of effectsOf(ctx, instance.code)) {
+    if (effect.timing !== "constant") continue;
     for (const instruction of effect.instructions) {
       if (instruction.verb !== "ReduceCost") continue;
       if (instruction.when && !holds(state, instruction.when, scope, ctx)) continue;
-      cost -= instruction.amount;
+      // "Reduce the cost to play Herugrim on Théoden by 1": only onto a host that matches.
+      if (instruction.host && (hostId == null || !matchesPick(state, hostId, instruction.host, { seat, sourceId: cardId, counting: true }, ctx))) continue;
+      cost -= resolveAmount(state, instruction.amount, { actor: seat, sourceId: cardId }, ctx);
     }
   }
+  const reduced = costReduction(state, cardId, seat, ctx, hostId);
+  if (reduced.amount > 0) cost = Math.max(Math.min(cost, reduced.min), cost - reduced.amount);
   return Math.max(0, cost);
 }
 
-// "You must use resources from 3 different heroes' pools to pay for this card" (01036:A:1): a play restriction checked on the
-// payment (rr.play-restrictions-and-permissions). Why the payment is refused, or null.
-export function payFromHeroesReason(state: ScenarioState, cardId: string, payments: readonly { heroId: string; amount: number }[], ctx: ReduceContext): string | null {
-  const count = payFromHeroes(state, cardId, ctx);
-  const heroes = new Set(payments.filter((payment) => payment.amount > 0).map((payment) => payment.heroId)).size;
-  return count != null && heroes < count ? `Pay with resources from ${count} different heroes` : null;
-}
-
-// The heroes whose pools must pay for the card, or null when any may (01036:A:1).
-export function payFromHeroes(state: ScenarioState, cardId: string, ctx: ReduceContext): number | null {
-  const code = state.cards[cardId]?.code;
-  for (const effect of ctx.effects) {
-    if (effect.cardCode !== code || effect.timing !== "constant") continue;
-    for (const instruction of effect.instructions) if (instruction.verb === "PayFromHeroes") return instruction.count;
-  }
-  return null;
-}
-
-// The seat has that many heroes with a resource of the card's sphere, so the card can be paid for as it must.
-export function payFromHeroesPossible(state: ScenarioState, seat: number, cardId: string, ctx: ReduceContext): boolean {
-  const count = payFromHeroes(state, cardId, ctx);
-  if (count == null) return true;
-  const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
-  return (state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, sphere, ctx, cardId)).length >= count;
-}
-
-// A character cannot have more than 2 restricted attachments. When a third arrives, its controller chooses one of the
-// restricted attachments and it moves at once to its owner's discard pile (rr.restricted).
+// A character cannot have more than 2 restricted attachments (more when a card says it can have additional ones). When one
+// too many arrives, its controller chooses one of the restricted attachments and it moves at once to its owner's discard
+// pile (rr.restricted).
 export function enforceRestricted(state: ScenarioState, hostId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (restrictedAttachments(state, hostId, ctx).length <= 2) return state;
+  if (restrictedLoad(state, hostId, ctx) <= 2 + Math.max(0, heldAmount(state, hostId, "extraRestricted"))) return state;
   const host = state.cards[hostId];
   const actor = host?.controller ?? state.activeSeat;
   return pushEffectFrame(

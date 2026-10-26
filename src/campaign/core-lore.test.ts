@@ -79,7 +79,7 @@ describe("Denethor (01010:A:1)", () => {
     let run = send(begin(tab.state), { type: "Trigger", cardId: denethor, effectId: "01010:action:1" }, tab.ctx);
     expect(run.state.window).toEqual({ kind: "look", seat: 0, cardIds: [idsOf(tab, LURE)] });
     run = send(run, { type: "Pass" }, tab.ctx);
-    expect(choices(run, tab)).toEqual(["bottom", "keep"]);
+    expect(choices(run, tab)).toEqual(["bottom", "leave"]);
     run = send(run, { type: "Choose", optionId: "bottom" }, tab.ctx);
     expect(run.state.encounterDeck).toEqual([idsOf(tab, "f0"), idsOf(tab, LURE)]);
     expect(run.state.cards[denethor]?.exhausted).toBe(true);
@@ -90,7 +90,7 @@ describe("Glorfindel (01011:A:1)", () => {
   it("pays 1 resource from his own pool to heal 1 damage on any character, once a round", () => {
     const tab = hurt(table({ heroes: [{ code: GLORFINDEL, seat: 0 }, { code: DENETHOR, seat: 0 }] }, 2), { [DENETHOR]: 2 });
     const glorfindel = idsOf(tab, GLORFINDEL);
-    const effect = { type: "Trigger" as const, cardId: glorfindel, effectId: "01011:action:1" };
+    const effect = { type: "Trigger" as const, cardId: glorfindel, effectId: "01011:action:1", payments: [{ heroId: glorfindel, amount: 1 }] };
     const run = send(begin(tab.state), effect, tab.ctx);
     expect(run.state.cards[idsOf(tab, DENETHOR)]?.damage).toBe(1);
     expect(run.state.cards[glorfindel]?.resources).toBe(1);
@@ -194,6 +194,8 @@ describe("Gandalf's Search (01067:A:1)", () => {
     const search = idsOf(tab, SEARCH);
     let run = send(begin(tab.state), { type: "PlayCard", cardId: search, payments: [{ heroId: idsOf(tab, DENETHOR), amount: 2 }] }, tab.ctx);
     // X is 2: the Axehand and Gandalf are looked at, not Lórien's Wealth.
+    expect(run.state.window).toEqual({ kind: "look", seat: 0, cardIds: [idsOf(tab, AXEHAND), idsOf(tab, GANDALF)] });
+    run = send(run, { type: "Pass" }, tab.ctx);
     expect(choices(run, tab).sort()).toEqual([idsOf(tab, AXEHAND), idsOf(tab, GANDALF)].sort());
     run = send(run, { type: "Choose", optionId: idsOf(tab, GANDALF) }, tab.ctx);
     expect(run.state.seats[0]?.hand).toEqual([idsOf(tab, GANDALF)]);

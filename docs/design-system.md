@@ -155,6 +155,8 @@ The cached RingsDB picture is the illustration everywhere it appears.
 
 ## Screens
 
+Route files named below, such as `(tabs)/index.tsx` or `rule/[id].tsx`, are under `src/screens/routes/`. The Decks tab is `(tabs)/decks.tsx`.
+
 ### Splash — built
 Paper (`#F2EBDB`) with one ink ring. Same as the adaptive icon background. No card art.
 

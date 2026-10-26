@@ -3,15 +3,22 @@ import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { raiseThreat } from "./keywords.ts";
+import { gameReads } from "./families/costs-pay.ts";
+import { queueEvent } from "./queue.ts";
 import { fireForced } from "./triggers.ts";
-import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
+import { flagged, livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
 import { inPlay } from "./zones.ts";
 
 export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
+  // A Response to "After a character readies during the refresh phase" (02102:A:1) hears each card that readies here.
+  const heard = gameReads(state, ctx, '"trigger":"readied"');
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (!instance.exhausted && !instance.committed)) continue;
-    next = updateCard(next, instance.id, { exhausted: false, committed: false });
+    // "Does not ready during the refresh phase" (a flag) leaves the card exhausted.
+    const stays = instance.exhausted && flagged(state, instance.id, "doesNotReady");
+    next = updateCard(next, instance.id, { exhausted: stays, committed: false });
+    if (heard && instance.exhausted && !stays) next = queueEvent(next, { trigger: "readied", seat: instance.controller, cardId: instance.id, phase: "Refresh" });
   }
   for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
   return withMode(passToken(next, ctx, steps), "endRound");

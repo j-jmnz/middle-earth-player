@@ -11,6 +11,10 @@ import { causeProblems, NUMBER_STEPS, verified } from "../../scripts/cause-check
 import { campaign, loadWorld, reveal, scenario, send, table } from "../../scripts/past-scene.ts";
 import { playStarter, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 import { knife, KNIFE_GOLDENS, knifeWorld, playGolden } from "../../scripts/knife-game.ts";
+import { FORD_GOLDENS, fordWorld, playGolden as playFordGolden } from "../../scripts/ford-game.ts";
+import { ford } from "../../scripts/ford-scene.ts";
+import { SOUTH_GOLDENS, southWorld, playGolden as playSouthGolden } from "../../scripts/south-game.ts";
+import { south } from "../../scripts/south-scene.ts";
 
 import { buildStart } from "./start.ts";
 
@@ -60,6 +64,35 @@ describe("engine step causes in the A Knife in the Dark goldens", () => {
     expect(causeProblems(all)).toEqual([]);
     // The scenario's own records move numbers too (Bill Ferny's threat, an encounter card's damage).
     const own = new Set([knife.campaignCard, ...knife.stages, ...knife.cards.map((card) => card.code)]);
+    const causes = all.filter((step) => NUMBER_STEPS.has(step.kind)).map((step) => (step as { cause: Cause }).cause);
+    expect(causes.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
+  }, 120_000);
+});
+
+describe("engine step causes in the Flight to the Ford goldens", () => {
+  it("name a verified rule or a ledger line on every number-changing step, the Ring-bearer's life included", async () => {
+    const worlds = { starter: await fordWorld("starter"), strong: await fordWorld("strong"), weak: await fordWorld("weak") };
+    const all: EngineStep[] = [];
+    for (const golden of FORD_GOLDENS) all.push(...playFordGolden(golden, worlds[golden.decks].ctx).steps);
+    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
+    expect(causeProblems(all)).toEqual([]);
+    // The scenario's own records move the life: the quest stages, the locations, the treacheries, the Fell Riders.
+    const own = new Set([ford.campaignCard, ...ford.stages, ...ford.cards.map((card) => card.code)]);
+    const lives = all.filter((step) => step.kind === "life").map((step) => (step as { cause: Cause }).cause);
+    expect(lives.length).toBeGreaterThan(20);
+    expect(lives.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
+    expect(lives.some((cause) => "rule" in cause)).toBe(true);
+  }, 120_000);
+});
+
+describe("engine step causes in The Ring Goes South goldens", () => {
+  it("name a verified rule or a ledger line on every number-changing step, the damage on locations included", async () => {
+    const worlds = { starter: await southWorld("starter"), strong: await southWorld("strong"), weak: await southWorld("weak") };
+    const all: EngineStep[] = [];
+    for (const golden of SOUTH_GOLDENS) all.push(...playSouthGolden(golden, worlds[golden.decks].ctx).steps);
+    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
+    expect(causeProblems(all)).toEqual([]);
+    const own = new Set([south.campaignCard, ...south.stages, ...south.cards.map((card) => card.code)]);
     const causes = all.filter((step) => NUMBER_STEPS.has(step.kind)).map((step) => (step as { cause: Cause }).cause);
     expect(causes.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
   }, 120_000);

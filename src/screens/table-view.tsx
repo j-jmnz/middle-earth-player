@@ -28,6 +28,7 @@ import { tableSettings } from "../play/table-settings";
 import { threatRows, threatVerdict } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
+import { locationReadout, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { Screen } from "./chrome";
@@ -160,8 +161,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   );
   const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
   const ticksOf = (_seat: number): readonly number[] => ticks;
-  const showLife = game.widgets.lifeTracker && game.life != null;
-  const threatText = threatLine(threats, showLife ? (game.life ?? 0) : null);
+  const widgets = widgetReadouts(game);
+  const locations = locationReadout(game);
+  const threatText = threatLine(threats, widgets.life);
   const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
   const panelWidth = Math.round(Math.min(480, Math.max(320, screen.width * 0.46)));
   // A panel slides in from the right, under the top bar; on a short phone it covers the top bar too.
@@ -204,7 +206,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 onPress={() => setReading({ kind: "threat", seat: threat.seat })}
               />
             ))}
-            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
+            {widgets.life != null ? <ThreatRing threat={{ seat: 0, threat: widgets.life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
+            {widgets.burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: widgets.burdenDeck, eliminated: false }} label="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
           </View>
           <PhaseRail rail={rail} narrow={narrow} onPress={() => setReading({ kind: "reference" })} />
           {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}
@@ -244,7 +247,19 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           </View>
           <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8) }}>
             {/* The quest card on the table already shows its progress: the band gives way while the dock shows numbers. */}
-            {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} line={ledgerLine} />}
+            <View>
+              {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} line={ledgerLine} />}
+              {locations && locations.active.length > 0 ? (
+                <Text testID="active-locations" className="text-label text-muted">
+                  {`Active: ${locations.active.map(nameOf).join(" and ")}`}
+                </Text>
+              ) : null}
+              {locations?.heldUnder ? (
+                <Text testID="ring-bearer-held" className="text-label text-muted">
+                  {`The Ring-bearer is facedown under ${nameOf(locations.heldUnder)}`}
+                </Text>
+              ) : null}
+            </View>
             <TableDock
               step={choice.header.step}
               title={choice.header.title}

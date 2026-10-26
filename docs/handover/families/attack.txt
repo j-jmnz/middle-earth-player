@@ -1,0 +1,39 @@
+01005:A:2 | Legolas (hero) | Response: After Legolas participates in an attack that destroys an enemy, place 2 progress tokens on the current quest.
+01009:A:1 | Dúnhere (hero) | Dúnhere can target enemies in the staging area when he attacks alone. When doing so, he gets +1 Attack.
+01033:A:1 | Rain of Arrows (event) | Action: Exhaust a character you control with the ranged keyword to choose a player. Deal 1 damage to each enemy engaged with that player.
+01039:A:2 | Blade of Gondolin (attachment) | Attached hero gets +1 Attack when attacking an Orc.
+01039:A:3 | Blade of Gondolin (attachment) | Response: After attached hero attacks and destroys an enemy, place 1 progress token on the current quest.
+02072:A:2 | Brand son of Bain (hero) | Response: After Brand son of Bain attacks and defeats an enemy engaged with another player, choose and ready one of that player's characters.
+02098:A:2 | Vassal of the Windlord (ally) | Forced: After an attack in which Vassal of the Windlord attacked resolves, discard Vassal of the Windlord from play.
+04004:A:1 | Unseen Strike (event) | Action: Choose a character you control. Until the end of the phase, that character gets +3 Attack while attacking an enemy with a higher engagement cost than your threat.
+04031:A:2 | Rivendell Blade (attachment) | When attached character attacks an enemy, that enemy gets -2 Defense until the end of the phase.
+04057:A:3 | Rivendell Bow (attachment) | If attached character has the printed ranged keyword, it gets +1 Attack during a ranged attack.
+04104:A:3 | Trollshaw Scout (ally) | Forced: After Trollshaw Scout attacks, either discard it from play or discard 1 card from your hand.
+04131:A:1 | Hands Upon the Bow (event) | Action: Exhaust a character you control with ranged to immediately declare it as an attacker (and resolve its attack) against an enemy in the staging area. It gets +1 Attack during this attack.
+06035:A:2 | Mighty Prowess (attachment) | Response: After attached hero attacks and destroys an enemy, deal 1 damage to another enemy that shares a Trait with the enemy just destroyed.
+06063:A:2 | Ithilien Archer (ally) | Response: After Ithilien Archer attacks and damages an enemy, return that enemy to the staging area.
+06084:A:1 | Knight of Minas Tirith (ally) | If each of your heroes has a printed Tactics hero resource icon, Knight of Minas Tirith Tirith gains: "Response: After Knight of Minas Tirith enters play, choose an enemy in the staging area. Engage that enemy and exhaust Knight of Minas Tirith to declare it as attacker (and resolve its attack) against that enemy."
+06137:A:3 | Spear of the Mark (attachment) | Attached character gets +1 Attack (+2 Attack instead if attacking an enemy in the staging area).
+06138:A:1 | Forth Eorlingas! (event) | Combat Action: Each Rohan hero can be declared as an attacker against enemies in the staging area this phase.
+08056:A:2 | Haldir of Lórien (hero) | Combat Action: If you have not engaged an enemy this round, exhaust Haldir of Lórien to declare him as an attacker (and resolve his attack) against an enemy not engaged with you. Limit once per round.
+08088:A:3 | Bow of the Galadhrim (attachment) | Attached character gets +1 Attack (+2 Attack instead if attacking an enemy not engaged with you.)
+10142:A:3 | Sword of Númenor (attachment) | Response: After attached hero participates in an attack that destroys an enemy with 5 or more printed hit points, exhaust Sword of Númenor to add 1 resource to attached hero's resource pool.
+11003:A:1 | Mithlond Sea-watcher (ally) | While the top card of your discard pile is an ally, Mithlond Sea-watcher gets +2 Attack and gains ranged.
+12004:A:1 | Azain Silverbeard (ally) | Response: After Azain Silverbeard participates in an attack that destroys an enemy, spend 1 Tactics resource to deal 2 damage to another enemy that shares a Trait with the destroyed enemy. Any player may trigger this response.
+12086:A:2 | Battle-fury (event) | Quest Action: Exhaust a hero you control to immediately declare it as an attacker (and resolve its attack) against any eligible enemy target. Then, the players as a group may spend 1 Spirit resource to commit that hero to the quest.
+12114:A:1 | Knife-work (event) | Action: Choose a player. Each enemy engaged with that player gets -1 Defense until the end of the phase. Then, the players as a group may spend 2 Lore resources to have the chosen player draw 1 card each time he attacks and destroys an enemy this phase.
+12145:A:2 | Ranger Spear (attachment) | Attached character gets +1 Attack (+2 Attack instead when attacking an enemy with an attachment on it).
+17056:A:3 | Haradrim Spear (attachment) | Response: After attached character is declared as an attacker, it gets +3 Attack for this attack. After this attack resolves, discard Haradrim Spear.
+17112:A:1 | Riddermark Knight (ally) | Response: After Riddermark Knight is declared as an attacker, it gets +2 Attack for this attack. At the end of this attack, discard Riddermark Knight.
+19090:A:1 | Swift and Strong (event) | Response: After a character you control attacks and destroys an enemy, exhaust a Weapon attached to that character to ready that character and give it +2 Attack for its next attack this phase.
+21006:A:3 | Derufin (ally) | Response: After Derufin participates in an attack which destroys an enemy engaged with a player, discard Derufin to reduce the engaged player's threat by X, where X is the destroyed enemy's printed Threat.
+22007:A:2 | Charge into Battle (event) | Quest Action: You may declare and resolve an attack against each non-unique enemy in the staging are as if it were engaged with you.
+131015:A:1 | Foe-hammer (event) | Response: After a hero you control attacks and destroys an enemy, exhaust a Weapon card attached to that hero to draw 3 cards.
+132003:A:2 | Bard the Bowman (hero) | When Bard the Bowman makes a ranged attack, the enemy he attacks gets -2 Defense until the end of the phase.
+132014:A:1 | Great Yew Bow (attachment) | Attach to a hero with the printed Ranged keyword. Restricted.
+132014:A:2 | Great Yew Bow (attachment) | Combat Action: Choose an enemy in the staging area. Exhaust Great Yew Bow and attached hero to make a ranged attack against that enemy. Declare attached hero as the attacker. No other attackers can be declared for this attack.
+144006:A:2 | Skinbark (ally) | While Skinbark is attacking alone against an Orc enemy, that enemy does not count its Defense.
+145012:A:3 | Roheryn (attachment) | Response: After you optionally engage an enemy, exhaust Roheryn and attached hero to declare attached hero as an attacker (and resolve its attack) against that enemy.
+145013:A:3 | Banner of Elendil (attachment) | While Aragorn is attacking, each other attacking character you control gets +1 Attack.
+146003:A:1 | Éomer (hero) | Response: After Éomer commits to the quest, spend 1 resource from his resource pool to immediately declare him as an attacker (and resolve his attack) against an enemy in the staging area.
+146011:A:2 | Gúthwinë (attachment) | Response: After attached hero is declared as an attacker, exhaust Gúthwinë to give that hero +2 Attack for this attack. If this attack destroys an enemy, return a Rohan ally from your discard pile to your hand.

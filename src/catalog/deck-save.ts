@@ -1,3 +1,6 @@
+import type { DeckRule } from "./deck-rules.ts";
+import { heroLimit } from "./deck-rules.ts";
+
 export type DeckSaveCard = {
   name: string;
   typeCode: string;
@@ -75,13 +78,23 @@ function combinedCounts(cards: readonly DeckSaveEntry[]): DeckSaveEntry[] {
 // The Rules Reference's deckbuilding rules (rr.deckbuilding): 1 to 3 heroes, at least 50 player cards, and at most 3
 // copies of a title, whichever printings they are. A card's sphere does not have to match a hero to be in a deck: it
 // needs a matching hero to be played (rr.resource-match), which the table checks.
+//
+// A contract in the deck is no deck card: it does not count toward the minimum, and the deckbuilding rules on its side A (`rules`,
+// deck-rules.ts) change the deck: no allies, one copy by title, one starting hero, exactly 50 cards with 10 of each sphere, at least
+// 100 cards.
 export function deckSaveRefusal(
   heroCodes: readonly string[],
-  cards: readonly DeckSaveEntry[],
+  cardEntries: readonly DeckSaveEntry[],
   facts: ReadonlyMap<string, DeckSaveCard>,
   restrictions: readonly DeckRestriction[] = [],
+  rules: readonly DeckRule[] = [],
 ): DeckSaveRefusal | null {
-  const codes = [...heroCodes, ...cards.map((card) => card.code)];
+  const isContract = (code: string) => facts.get(code)?.typeCode === "contract";
+  const contracts = cardEntries.filter((card) => isContract(card.code));
+  const cards = cardEntries.filter((card) => !isContract(card.code));
+  const contractCount = contracts.reduce((sum, card) => sum + card.count, 0);
+  if (contractCount > 1) return { cardCode: contracts[1]?.code ?? null, cardName: facts.get(contracts[1]?.code ?? "")?.name ?? null, rule: "At most one contract." };
+  const codes = [...heroCodes, ...cardEntries.map((card) => card.code)];
   for (const code of codes) {
     const fact = facts.get(code);
     if (!fact || !fact.deckLegal) return unresolved(code);
@@ -102,11 +115,22 @@ export function deckSaveRefusal(
     if (fact.typeCode === "hero") return named(card.code, fact.name, "A hero is not a deck card.");
   }
 
-  if (heroCodes.length > 3) {
-    const extra = heroCodes[3];
-    if (!extra) return { cardCode: null, cardName: null, rule: "At most three heroes." };
+  const limit = heroLimit(rules);
+  if (heroCodes.length > limit) {
+    const extra = heroCodes[limit];
+    const words = limit === 3 ? "three heroes" : limit === 1 ? "one hero" : `${limit} heroes`;
+    if (!extra) return { cardCode: null, cardName: null, rule: `At most ${words}.` };
     const fact = facts.get(extra);
-    return named(extra, fact?.name ?? extra, "At most three heroes.");
+    return named(extra, fact?.name ?? extra, `At most ${words}.`);
+  }
+  if (rules.some((rule) => rule.kind === "heroes" && rule.differentSpheres)) {
+    const spheres = new Set<string>();
+    for (const code of heroCodes) {
+      const fact = facts.get(code);
+      const sphere = fact?.sphereCode ?? code;
+      if (spheres.has(sphere)) return named(code, fact?.name ?? code, "Each hero must belong to a different sphere.");
+      spheres.add(sphere);
+    }
   }
   if (heroCodes.length === 0) return { cardCode: null, cardName: null, rule: "At least one hero." };
   const heroNames = new Set<string>();
@@ -137,10 +161,29 @@ export function deckSaveRefusal(
     const rule = copyCapRule(title.count, title.deckLimit);
     if (rule) return named(title.code, name, rule);
   }
+  for (const rule of rules) {
+    if (rule.kind === "copies") {
+      for (const [name, title] of byTitle) if (title.count > rule.max) return named(title.code, name, `At most ${rule.max} ${rule.max === 1 ? "copy" : "copies"} by title.`);
+    }
+    if (rule.kind === "noCards") {
+      const found = combined.find((card) => facts.get(card.code)?.typeCode === rule.type);
+      if (found) return named(found.code, facts.get(found.code)?.name ?? found.code, `The contract forbids ${rule.type} cards.`);
+    }
+  }
 
   let total = 0;
   for (const card of combined) total += card.count;
-  if (total < 50) return { cardCode: null, cardName: null, rule: "At least 50 cards." };
+  const sizeRule = rules.find((rule): rule is Extract<DeckRule, { kind: "size" }> => rule.kind === "size");
+  if (sizeRule?.exactly != null && total !== sizeRule.exactly) return { cardCode: null, cardName: null, rule: total < sizeRule.exactly ? `At least ${sizeRule.exactly} cards.` : `Exactly ${sizeRule.exactly} cards.` };
+  const minimum = sizeRule?.min ?? 50;
+  if (total < minimum) return { cardCode: null, cardName: null, rule: `At least ${minimum} cards.` };
+  const perSphere = rules.find((rule): rule is Extract<DeckRule, { kind: "perSphere" }> => rule.kind === "perSphere");
+  if (perSphere) {
+    for (const sphere of ["leadership", "lore", "spirit", "tactics"] as const) {
+      const count = combined.reduce((sum, card) => sum + (facts.get(card.code)?.sphereCode === sphere ? card.count : 0), 0);
+      if (count !== perSphere.count) return { cardCode: null, cardName: null, rule: `Exactly ${perSphere.count} ${sphere[0]?.toUpperCase()}${sphere.slice(1)} cards (it has ${count}).` };
+    }
+  }
 
   const inDeck = new Set(codes);
   for (const restriction of restrictions) {

@@ -11,10 +11,8 @@ import {
   beginEnemyAttack,
   continueStrike,
   dealShadows,
-  declaringMore,
-  finishDefense,
   hasLegalAttack,
-  heroIds,
+  undefendedTargets,
   nextEnemyGroup,
   openDefense,
 } from "./combat.ts";
@@ -29,22 +27,36 @@ import { drawOne, gainSeatResources, type ReduceContext } from "./interpret.ts";
 import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
+import { afterPlay } from "./families/costs-play.ts";
+import { gameReads } from "./families/costs-pay.ts";
+import { playSweep } from "./families/play-sweep.ts";
+import { afterPaying } from "./families/deck-play.ts";
 import { doRefresh } from "./refresh.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
+import { pushDue } from "./delayed.ts";
 import { crossBoundary } from "./triggers.ts";
-import { constantWin } from "./constants.ts";
+import { constantWin, heldStat, NO_COUNTS } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
-import { livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
-import { clearEliminated, destroyOverwhelmed } from "./keywords.ts";
+import { flagged, inPlay, livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
+import { clearEliminated, damageHeld, destroyOverwhelmed } from "./keywords.ts";
+import { effectsOf } from "./listen.ts";
+import { engagesAgain, optionallyEngaged } from "./families/quest-engage.ts";
+import { syncThreatSaves } from "./families/quest-threat.ts";
+import { eventWaits } from "./families/defense-listen.ts";
+import { announceShadowsDealt } from "./families/defense-shadow.ts";
+import { attackedEarly, earlyAttacks } from "./families/defense-order.ts";
+import { strikeResumes } from "./families/attack-flow.ts";
+import { announceProgress } from "./families/burden-effects.ts";
+import { damageLoss } from "./families/south-locations.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
-    current = constantWin(current, ctx);
+    current = damageLoss(announceProgress(constantWin(current, ctx), steps, ctx), ctx.cards);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {
@@ -52,14 +64,28 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
         continue;
       }
     }
-    if (current.pendingEvents?.length && !current.lost && !current.stageCleared && !current.failure && canAnnounce(current)) {
+    // An event waits behind the damage it follows while that damage is still being answered (rr.cancel).
+    if (current.pendingEvents?.length && !current.lost && !current.stageCleared && !current.failure && canAnnounce(current) && !eventWaits(current)) {
       const announced = drainEvents(current, ctx, steps);
       if (announced !== current) {
         current = announced;
         continue;
       }
     }
-    const swept = current.lost || current.failure ? current : destroyOverwhelmed(clearEliminated(current, ctx.cards), ctx.cards, steps);
+    // A character's lethal damage waits for the Responses that could cancel it, when some card in play or in hand has one.
+    const answerable = damageAnswerable(current, ctx);
+    if (answerable !== (current.holdLethal === true)) {
+      const { holdLethal: _was, ...rest } = current;
+      current = answerable ? { ...rest, holdLethal: true } : rest;
+    }
+    // The seats a card keeps in the game at the threat elimination level (10124:A:2).
+    current = syncThreatSaves(current, ctx, steps);
+    // A cancel already resolving holds the damage too, even when paying for it discarded the last card that could answer
+    // (Loyal Hound, 19148).
+    const resolving = current.stack.some((frame) => frame.data.kind === "effect" && frame.data.hold != null);
+    const held = answerable || resolving ? damageHeld : undefined;
+    // The play family's constants (families/play-sweep.ts): hero card type, first player control, discard at a stat.
+    const swept = current.lost || current.failure ? current : destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held);
     if (swept !== current) {
       current = swept;
       continue;
@@ -85,16 +111,16 @@ export function applyIntent(
     case "Mulligan":
       return finishMulliganChoice(mulliganSeat(state, state.activeSeat, steps), true);
     case "Pass":
-      // No more defenders are declared (rr.multiple-defenders, 01038:A:1).
-      if (declaringMore(state)) return finishDefense(state, ctx, steps);
       return applyPass(state);
     case "PlayCard": {
       // A play is an action opportunity taken: every seat may act again before the window closes (rr.action-windows).
-      const played = playCard(state, intent, ctx, steps);
+      // What the play adds beyond moving the card (families/costs-play.ts): its discount's riders, its additional costs.
+      // A Response that lowered its cost as it was played is paid for (families/deck-play.ts).
+      const played = afterPaying(state, afterPlay(state, playCard(state, intent, ctx, steps), intent, ctx, steps), intent, ctx, steps);
       return played.window?.kind === "pass" ? { ...played, passed: [] } : played;
     }
     case "Commit":
-      return commit(state, intent.cardIds, steps);
+      return commit(state, intent.cardIds, steps, intent.sideQuestId);
     case "CommitHide":
       return commitHide(state, intent.cardIds, steps);
     case "Trigger":
@@ -107,8 +133,11 @@ export function applyIntent(
       return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":
       return { ...markReached(state, "traveled"), window: null };
-    case "Engage":
-      return finishOptional(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat);
+    case "Engage": {
+      // "After you optionally engage an enemy", and a seat that may optionally engage an additional enemy (09002:A:2).
+      const engaged = optionallyEngaged(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx);
+      return engagesAgain(engaged, state.activeSeat, ctx) ? engaged : finishOptional(engaged, state.activeSeat);
+    }
     case "DeclineEngage":
       return finishOptional(state, state.activeSeat);
     case "ChooseEnemy":
@@ -116,7 +145,7 @@ export function applyIntent(
     case "DeclareDefender":
       return applyDefense(state, intent.defenderId, ctx, steps);
     case "Undefended":
-      return applyUndefended(state, undefendedHero(state, intent.heroId), ctx, steps);
+      return applyUndefended(state, undefendedHero(state, intent.heroId, ctx), ctx, steps);
     case "DeclareAttackers":
       return applyPlayerAttack(state, state.activeSeat, intent.enemyId, intent.attackerIds, ctx, steps);
     case "DeclineAttack":
@@ -131,19 +160,23 @@ export function applyIntent(
 function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // An attack waits on the action window between two of its steps; once it closes, the attack goes on before any frame
   // under it (an attack a Hide test started).
-  if (stepWindowResumes(state)) return state.pendingAttack?.awaiting ? resumeAttack(state, ctx, steps) : continueStrike(state, ctx, steps);
+  // A player attack an effect made during an enemy attack's window goes on first (families/attack-flow.ts).
+  if (stepWindowResumes(state)) return strikeResumes(state) ? continueStrike(state, ctx, steps) : resumeAttack(state, ctx, steps);
   if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
   // The Forced effects of an attack's start are done: the defender is declared (141069:A:2).
   if (state.pendingAttack?.defenseWaits) return openDefense(state, ctx);
   // The Responses to a shadow effect, or a shadow effect that asked a player, are done: the attack goes on.
   if (attackResumes(state)) return resolveAttack(state, ctx, steps);
   switch (state.mode) {
-    case "afterOpening":
-      return finishSetup(state, ctx, steps);
+    case "afterOpening": {
+      // A Setup that waits for the opening hands (The One Ring: attach it to a hero, search the deck) resolves first.
+      const waiting = pushDue(state, "Setup", "startOfGame", steps);
+      return waiting !== state ? waiting : finishSetup(state, ctx, steps);
+    }
     case "beginRound":
       return enterBegin(state, ctx);
     case "resourceGrant":
-      return grant(state, steps);
+      return grant(state, steps, ctx);
     case "resourceActions":
     case "questCommit":
       return openPass(state);
@@ -179,7 +212,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "combatStart":
       return startCombat(state, ctx);
     case "combatShadows":
-      return withMode(dealShadows(state, ctx.cards), "combatActions");
+      return withMode(announceShadowsDealt(dealShadows(state, ctx.cards), ctx), "combatActions");
     case "combatActions":
       return stepWindow(state, ctx, "6.2") ?? withMode(state, "enemyAttacks");
     case "enemyAttacks":
@@ -201,10 +234,23 @@ function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   return withMode(bumped, "resourceGrant");
 }
 
-function grant(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+function grant(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   let next = state;
   for (const seat of livingSeats(next)) next = gainSeatResources(next, seat, steps, ruleCause("rr.step-1-2"));
-  for (const seat of livingSeats(next)) next = drawOne(next, seat, steps, ruleCause("rr.step-1-3"));
+  const drawn: Record<number, string[]> = {};
+  for (const seat of livingSeats(next)) {
+    // A card that lets its player draw additional cards in the resource phase holds an extraDraw on the seat.
+    const draws = 1 + heldStat(next, seat, "extraDraw", NO_COUNTS);
+    const before = new Set(next.seats[seat]?.hand ?? []);
+    for (let draw = 0; draw < draws; draw += 1) next = drawOne(next, seat, steps, ruleCause("rr.step-1-3"));
+    drawn[seat] = (next.seats[seat]?.hand ?? []).filter((id) => !before.has(id));
+  }
+  // The draw step is done: Forced effects hear it ("After drawing cards at the beginning of the resource phase", misc family),
+  // and the cards drawn are kept for the Pick that names them. Both only in a game that has a card which reads them.
+  if (gameReads(next, ctx, '"trigger":"resourceDrawn"')) {
+    next = { ...next, resourceDrawn: drawn };
+    for (const seat of livingSeats(next)) next = queueEvent(next, { trigger: "resourceDrawn", seat, phase: "Resource" });
+  }
   return openPass(withMode(next, "resourceActions"));
 }
 
@@ -229,6 +275,9 @@ function startCombat(state: ScenarioState, ctx: ReduceContext): ScenarioState {
 }
 
 function enemyStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // A player who attacks before enemy attacks resolve does so first (17085).
+  const early = earlyAttacks(state, ctx);
+  if (early) return early;
   const group = nextEnemyGroup(state);
   if (!group) return { ...withMode(state, "playerAttacks"), pendingAttack: null };
   if (group.enemies.length > 1) {
@@ -245,7 +294,7 @@ function enemyStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
 
 function openPlayer(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const seat = livingSeats(state).find(
-    (index) => !state.passed.includes(index) && hasLegalAttack(state, index, ctx.cards),
+    (index) => !state.passed.includes(index) && !attackedEarly(state, index) && hasLegalAttack(state, index, ctx.cards),
   );
   if (seat == null) return withMode(discardShadows(state), "refresh");
   return { ...state, window: { kind: "playerAttack" }, activeSeat: seat };
@@ -306,10 +355,12 @@ function chooseEnemy(
   return { ...engaged, window: null, engagement: { ordinal: cursor.ordinal + 1, engagedThisPass: true } };
 }
 
-function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[]): ScenarioState {
+function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[], sideQuestId?: string): ScenarioState {
   let next = state;
   for (const id of cardIds) {
-    next = updateCard(next, id, { committed: true, exhausted: true });
+    // "Does not exhaust to commit to a quest" (a flag) leaves the character ready. A side quest takes it instead of the current
+    // quest (families/sidequests-quest.ts).
+    next = updateCard(next, id, { committed: true, exhausted: !flagged(next, id, "noExhaustQuest"), questTo: sideQuestId });
     steps.push({ kind: "commit", cardId: id });
     // One commit is one occurrence: its characters' Responses share a window (rr.triggering-condition).
     next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id, occurrence: `commit:${state.round}:${state.activeSeat}` });
@@ -317,8 +368,15 @@ function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineS
   return next;
 }
 
-function undefendedHero(state: ScenarioState, heroId: string | undefined): string {
-  const heroes = heroIds(state, state.pendingAttack?.seat ?? state.activeSeat);
+function undefendedHero(state: ScenarioState, heroId: string | undefined, ctx: ReduceContext): string {
+  const heroes = undefendedTargets(state, state.pendingAttack?.seat ?? state.activeSeat, ctx.cards);
   if (heroes.length === 1) return heroes[0] ?? "";
   return heroId ?? "";
+}
+
+// Whether any card that could answer damage just dealt (a damageDealt Response or Forced effect) is in play or in a hand.
+function damageAnswerable(state: ScenarioState, ctx: ReduceContext): boolean {
+  return Object.values(state.cards).some(
+    (card) => (inPlay(card.zone) || card.zone === "hand") && effectsOf(ctx, card.code).some((effect) => effect.trigger === "damageDealt"),
+  );
 }

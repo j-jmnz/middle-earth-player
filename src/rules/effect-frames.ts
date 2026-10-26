@@ -1,5 +1,6 @@
 import type { Condition, Effect, Instruction } from "../catalog/boundary.ts";
 
+import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { beginEffect } from "./cancel.ts";
 import { effectCause, inCause, type Cause } from "./cause.ts";
 import { beginEnemyAttack } from "./combat.ts";
@@ -8,12 +9,13 @@ import { hasTrait, holds, outOfPlayChoices, searchable } from "./conditions.ts";
 import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
-import { queueEvent } from "./queue.ts";
 import type { EngineStep } from "./intents.ts";
 import { dealOneShadow, runInstruction, type ReduceContext } from "./interpret.ts";
+import { runEncounterItem } from "./families/encounter-items.ts";
+import { chooseEach } from "./families/deck-each.ts";
+import { lookedDeckSeat } from "./families/deck-rules.ts";
 import { discardShadowOf } from "./shadow.ts";
 import { pickCandidates } from "./pick.ts";
-import { lastPicked, seatOf } from "./player-verbs.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
@@ -22,6 +24,8 @@ import { offerResponses } from "./responses.ts";
 import { holdsNow, seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
+import { chooseAmount } from "./families/defense.ts";
+import { queueHeard } from "./families/defense-listen.ts";
 
 export type EffectSpec = {
   frame: FrameName;
@@ -41,6 +45,12 @@ export type EffectSpec = {
   x?: number;
   // A delayed effect starts with the card it was made for already picked.
   picked?: readonly string[];
+  // The card the answered event was about, and the other card it names.
+  subject?: string;
+  other?: string;
+  // The damage the answered event dealt, and the card whose destruction waits while the effect resolves.
+  dealt?: number;
+  hold?: string;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
   cause?: Cause;
@@ -69,6 +79,10 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.x != null ? { x: spec.x } : {}),
     ...(spec.participants ? { participants: spec.participants } : {}),
     ...(spec.picked ? { picked: spec.picked } : {}),
+    ...(spec.subject ? { subject: spec.subject } : {}),
+    ...(spec.other ? { other: spec.other } : {}),
+    ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
+    ...(spec.hold ? { hold: spec.hold } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
 }
@@ -185,11 +199,20 @@ function runItemNow(
   steps: EngineStep[],
 ): ScenarioState {
   const instruction = item.instruction;
+  // The encounter family's verbs that ask a player to choose get the queue item, so the choice comes back to them.
+  const encounter = runEncounterItem(state, item, frame, ctx, steps);
+  if (encounter) return encounter;
   switch (instruction.verb) {
     case "Choose":
       return openBranch(state, item, returned, ctx);
     case "ForEachPlayer":
       return expandPlayers(state, instruction, item.cause);
+    case "Each":
+      return expandEach(state, item, frame, ctx);
+    case "Repeat":
+      return expandRepeat(state, item, frame, ctx);
+    case "DiscardFromHand":
+      return expandDiscards(state, item, frame, ctx);
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
@@ -209,8 +232,11 @@ function runItemNow(
       return pick(state, item, frame, ctx);
     case "ArrangeTop":
       return arrangeTop(state, item);
+    // The actor chooses the effect's X (defense family).
+    case "ChooseAmount":
+      return chooseAmount(state, item, frame, ctx);
     default:
-      return runInstruction(state, instruction, { seat: item.seat, sourceId: frame.cardId }, ctx, steps);
+      return runInstruction(state, instruction, { seat: item.seat, sourceId: frame.cardId, ...(item.chosen ? { chosen: item.chosen } : {}) }, ctx, steps);
   }
 }
 
@@ -229,6 +255,49 @@ function expandPlayers(
   return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
 }
 
+// "Each Dwarf character": the cards that match now, each in turn the picked card for the instructions (a Pick with its choice
+// already made), and nobody chooses.
+function expandEach(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceContext): ScenarioState {
+  const instruction = item.instruction;
+  const data = topFrame(state)?.data;
+  if (instruction.verb !== "Each" || data?.kind !== "effect") return state;
+  // "Up to 4 Rohan allies", "any number of Gondor allies": the actor chooses them (families/deck-each.ts).
+  if (instruction.upTo != null) return chooseEach(state, item, frame, ctx);
+  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants, false, { subject: data.subject ?? null, other: data.other ?? null });
+  const cause = item.cause ? { cause: item.cause } : {};
+  const expanded = ids.flatMap((id) => [
+    { instruction: { verb: "Pick" as const, pick: instruction.pick }, seat: item.seat, chosen: id, ...cause },
+    ...instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat: item.seat, chosen: null, ...cause })),
+  ]);
+  return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
+}
+
+// "Resolve that effect again for each copy of ~ in your discard pile": the instructions, that many times (read once, now).
+function expandRepeat(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceContext): ScenarioState {
+  const instruction = item.instruction;
+  const data = topFrame(state)?.data;
+  if (instruction.verb !== "Repeat" || data?.kind !== "effect") return state;
+  const times = resolveAmount(state, instruction.times, frameScope(state, item.seat, frame.cardId), ctx);
+  const cause = item.cause ? { cause: item.cause } : {};
+  const expanded = Array.from({ length: times }, () => instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat: item.seat, chosen: null, ...cause }))).flat();
+  return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
+}
+
+// The actor chooses a card in their hand and discards it, that many times.
+function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceContext): ScenarioState {
+  const instruction = item.instruction;
+  const data = topFrame(state)?.data;
+  if (instruction.verb !== "DiscardFromHand" || data?.kind !== "effect") return state;
+  const count = Math.min(resolveAmount(state, instruction.amount, frameScope(state, item.seat, frame.cardId), ctx), state.seats[item.seat]?.hand.length ?? 0);
+  const cause = item.cause ? { cause: item.cause } : {};
+  const pick = { verb: "Pick" as const, pick: { type: "card" as const, control: "you" as const, from: "hand" as const } };
+  const expanded = Array.from({ length: count }, (): QueueItem[] => [
+    { instruction: pick, seat: item.seat, chosen: null, ...cause },
+    { instruction: { verb: "DiscardPicked" as const }, seat: item.seat, chosen: null, ...cause },
+  ]).flat();
+  return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
+}
+
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window.
 function immediateAttack(state: ScenarioState, sourceId: string | null, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = sourceId ? state.cards[sourceId] : undefined;
@@ -238,7 +307,7 @@ function immediateAttack(state: ScenarioState, sourceId: string | null, ctx: Red
   // at 1 shadow card that was just dealt to an enemy attacking you", 01071:A:2).
   const cleared = discardShadowOf(state, sourceId);
   const shadowed = dealOneShadow(cleared, sourceId);
-  const dealt = shadowed !== cleared ? queueEvent(shadowed, { trigger: "shadowsDealt", seat: null }) : shadowed;
+  const dealt = shadowed !== cleared ? queueHeard(shadowed, ctx, { trigger: "shadowsDealt", seat: enemy.controller }) : shadowed;
   const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };
@@ -258,10 +327,9 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       if (target.kind === "self") return sourceId ? [sourceId] : [];
       if (target.kind === "host") return source?.host ? [source.host] : [];
       if (target.kind === "activeLocation") return state.activeLocation && state.activeLocation !== sourceId ? [state.activeLocation] : [];
-      // The enemy a Pick chose, if it is still engaged with a player (01052:A:1).
-      if (target.kind === "picked") {
-        const id = lastPicked(state);
-        return state.cards[id]?.zone === "engaged" ? [id] : [];
+      if (target.kind === "picked" || target.kind === "subject" || target.kind === "attacker" || target.kind === "other") {
+        const id = refCard(state, target.kind, frameScope(state, item.seat, sourceId));
+        return id && hasEnemyType(state, id, ctx) && state.cards[id]?.zone === "engaged" ? [id] : [];
       }
       const seats = target.who === "actor" ? [item.seat] : livingSeats(state);
       return seats
@@ -276,7 +344,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
         (code == null || !attachBlocked(state, ctx, id, code));
       if (instruction.to.kind === "hero") {
         const seats = instruction.to.control === "any" ? livingSeats(state) : [item.seat];
-        return seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter(free);
+        const except = instruction.to.exceptSphere;
+        return seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter(free).filter((id) => except == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").sphere !== except);
       }
       const trait = instruction.to.trait;
       return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])]
@@ -284,8 +353,11 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
         .filter(free);
     }
     case "SearchMove":
-    case "SearchReveal":
-      return searchable(state, instruction, ctx);
+    case "SearchReveal": {
+      const found = searchable(state, instruction, ctx);
+      const required = instruction.verb === "SearchMove" && instruction.require ? searchable(state, { code: instruction.require }, ctx) : [];
+      return required.length > 0 ? required : found;
+    }
     case "ShuffleIntoDeck":
       return searchable(state, instruction, ctx, ["encounterDiscard"]);
     case "DiscardRestricted":
@@ -315,12 +387,8 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
     if (options.length > 1) return askTarget(state, { ...item, seat: chooser }, options);
     chosen = options[0] ?? "";
   }
-  // A look at the top of a deck: the cards seen are put back by ArrangeTop. "The top X cards of any player's deck" (01067:A:1)
-  // are those of the player an earlier Pick chose.
-  const spec = instruction.pick;
-  const deckSeat = spec.ofPickedPlayer ? seatOf(data.picked?.at(-1) ?? "") : chooser;
-  const depth = spec.topIsX ? (data.x ?? 0) : spec.top;
-  const looked = depth != null && deckSeat != null ? { looked: (state.seats[deckSeat]?.deck ?? []).slice(0, depth) } : {};
+  // A look at the top of a deck: the cards seen are put back by ArrangeTop.
+  const looked = instruction.pick.top != null ? { looked: (state.seats[chooser]?.deck ?? []).slice(0, instruction.pick.top) } : {};
   return patchTop(state, { data: { ...data, ...looked, picked: [...(data.picked ?? []), chosen] } });
 }
 
@@ -328,11 +396,10 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
 // top position first, then the next, until one choice is left.
 function arrangeTop(state: ScenarioState, item: QueueItem): ScenarioState {
   const data = topFrame(state)?.data;
-  if (data?.kind !== "effect") return state;
-  // The deck the cards were looked at in: the actor's, or another player's (01067:A:1). The actor puts them back.
-  const owner = (data.looked ?? []).map((id) => state.cards[id]).find((card) => card?.zone === "deck")?.controller ?? item.seat;
+  // The deck the looked cards are in: the actor's, or the player's whose deck the actor looked at (Gandalf's Search).
+  const owner = (data?.kind === "effect" ? lookedDeckSeat(state, data) : null) ?? item.seat;
   const seat = state.seats[owner];
-  if (!seat) return state;
+  if (data?.kind !== "effect" || !seat) return state;
   const offset = item.offset ?? 0;
   const count = (data.looked ?? []).filter((id) => seat.deck.includes(id)).length;
   const rest = seat.deck.slice(offset, count);

@@ -14,10 +14,11 @@ import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
-import { archerySheet, defenseSheet, playerAttackSheet } from "./combat-sheets.ts";
+import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
 import { threatRows } from "./foresight.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
+import { freeSlot } from "../rules/families/south-locations.ts";
 import { has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
@@ -64,10 +65,10 @@ function hideNumbers(game: ScenarioState, ctx: ReduceContext, frame: Frame | und
 
 /**
  * The locations in staging the players cannot travel to, each with the reducer's reason and the card's Travel line
- * (Weathertop while The One Ring is exhausted or gone: 141046:A:3, rr.travel). Nothing is listed while a location is active.
+ * (Weathertop while The One Ring is exhausted or gone: 141046:A:3, rr.travel). Nothing is listed while the active location slots are full.
  */
 export function travelRefusals(game: ScenarioState, ctx: ReduceContext, names: SheetNames, targets: readonly string[]): Unavailable[] {
-  if (game.activeLocation) return [];
+  if (!freeSlot(game)) return [];
   return game.staging.flatMap((id): Unavailable[] => {
     const card = game.cards[id];
     if (!card || targets.includes(id) || printedOf(ctx.cards, card.code).type !== "location") return [];
@@ -155,8 +156,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         step: "Setup",
         title: game.seatCount > 1 ? `Player ${game.activeSeat + 1}: opening hand` : "Opening hand",
         note: "Keep this hand, or shuffle it back and draw a new one once.",
-        verb: "",
-        options: [],
+        verb: has(legal, "Trigger") ? "Use" : "",
+        // A Response used in place of the mulligan (Galdor of the Havens).
+        options: legal.flatMap((intent): PickOption[] => (intent.type === "Trigger" ? [{ ...option(game, names, intent.cardId), intent: { type: "Trigger", cardId: intent.cardId, effectId: intent.effectId } }] : [])),
         primary: { label: "Keep", intent: { type: "Keep" } },
         alternative: has(legal, "Mulligan") ? { label: "Mulligan", intent: { type: "Mulligan" } } : null,
       };
@@ -244,7 +246,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const card = option(game, names, id);
           // Copies of one card in different zones are told apart by where each one is.
           const label = outOfPlay ? outOfPlayLabel(game, id, words) : card.label;
-          return { ...card, label, intent: { type: "Choose", optionId: id } };
+          // Another defender's pooled damage (Stand Together, families/defense-defenders.ts).
+          const pooled = data?.effectId === "defense:defenders" ? extraDefender(game, ctx, id) : null;
+          return { ...card, label, ...(pooled ?? {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }
@@ -273,8 +277,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         key: `look:${window.cardIds.join(",")}`,
         step: step(game),
         title: window.cardIds.map((id) => names.card(id)).join(", ") || "Look",
-        // Dark Knowledge (01071:A:2) looks at a shadow card dealt to an enemy, not at the encounter deck.
-        note: window.cardIds.some((id) => game.cards[id]?.zone === "shadow") ? "A shadow card dealt to an enemy attacking you. Nothing moves." : "The top of the encounter deck. Nothing moves.",
+        // Dark Knowledge (01071:A:2) looks at a shadow card dealt to an enemy; a look at the top of a player's own deck
+        // (LookAtTop with `deck: "own"`) says so.
+        note: lookNote(game, window.cardIds, window.seat),
         verb: "",
         options: [],
         primary: { label: "Done", intent: { type: "Pass" } },
@@ -313,7 +318,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         }),
         ...(unavailable.length > 0 ? { unavailable } : {}),
         primary: null,
-        alternative: { label: targets.length > 0 ? "Do not travel" : "Continue", intent: { type: "DeclineTravel" } },
+        // The players must travel if able on some stages (mec109.stage-4): the engine then offers no way to decline.
+        alternative: has(legal, "DeclineTravel") ? { label: targets.length > 0 ? "Do not travel" : "Continue", intent: { type: "DeclineTravel" } } : null,
       };
     }
     case "optionalEngage": {
@@ -355,6 +361,14 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     case "resolution":
       return wonSheet(game);
   }
+}
+
+// What a look window shows: a shadow card dealt to an enemy, the top of a player's deck, or the top of the encounter deck.
+function lookNote(game: ScenarioState, cardIds: readonly string[], seat: number): string {
+  if (cardIds.some((id) => game.cards[id]?.zone === "shadow")) return "A shadow card dealt to an enemy attacking you. Nothing moves.";
+  const first = game.cards[cardIds[0] ?? ""];
+  if (first?.zone === "deck") return first.controller === seat ? "The top of your deck. Nothing moves." : "The top of that player's deck. Nothing moves.";
+  return "The top of the encounter deck. Nothing moves.";
 }
 
 /** The quest commit the bar sends: the characters dragged to the quest stage, or every legal one picked on the sheet. */

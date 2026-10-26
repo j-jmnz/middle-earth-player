@@ -2,6 +2,9 @@
 import type { Effect } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
+import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
+import { effectsOfCard } from "./families/misc-text.ts";
+import { isPlayerType, printedOf } from "./printed.ts";
 import { syncConstants } from "./constants.ts";
 import { pushDue } from "./delayed.ts";
 import { effectCause } from "./cause.ts";
@@ -14,19 +17,24 @@ import { patchTop, popFrame, pushFrame } from "./windows.ts";
 
 type Found = { effect: Effect; instance: CardInstance };
 
+// Whose a Forced effect is: a player card's, its controller's ("Forced: After ~ attacks, discard ~ or discard a card from your
+// hand"); an encounter card's, the player the event happened to.
+function forcedActor(state: ScenarioState, instance: CardInstance, event: GameEvent, ctx: ReduceContext): number {
+  const player = instance.controller != null && isPlayerType(printedOf(ctx.cards, instance.code));
+  return player ? (instance.controller ?? state.firstPlayer) : (event.seat ?? state.firstPlayer);
+}
+
 function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, timing: "forced" | "triggered"): Found[] {
   const found: Found[] = [];
-  const actor = event.seat ?? state.firstPlayer;
   for (const instance of Object.values(state.cards)) {
     // "After this location leaves play" (141045:A:2, 141049:A:2) is heard by the card that left: an ability that requires
     // its card to be out of play resolves from there (rr.in-play-and-out-of-play).
     const leftItself = event.trigger === "leftPlay" && event.cardId === instance.id;
-    if (!inPlay(instance.zone) && !leftItself) continue;
-    if (event.cardId != null && instance.id !== event.cardId) continue;
-    for (const effect of ctx.effects) {
-      if (effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;
-      if (effect.timing !== timing) continue;
-      const scope = { actor, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(event.subject ? { subject: event.subject } : {}) };
+    for (const effect of effectsOfCard(state, ctx, instance)) {
+      if (effect.timing !== timing || !hears(state, effect, instance, event, ctx)) continue;
+      if (!inPlay(instance.zone) && !leftItself && !hearsFromAnywhere(effect, instance, event)) continue;
+      const owner = forcedActor(state, instance, event, ctx);
+      const scope = { actor: owner, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.trigger === "damaged" && event.amount != null ? { dealt: event.amount } : {}), ...(event.explored ? { explored: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       found.push({ effect, instance });
     }
@@ -40,7 +48,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
 }
 
 // Each matching effect gets its own forced frame. The oldest resolves first, so it is pushed last.
-function pushFound(state: ScenarioState, found: readonly Found[], event: GameEvent, steps: EngineStep[]): ScenarioState {
+function pushFound(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const { effect, instance } of [...found].reverse()) {
     next = pushEffectFrame(
@@ -48,7 +56,14 @@ function pushFound(state: ScenarioState, found: readonly Found[], event: GameEve
       {
         frame: "forced",
         sourceId: instance.id,
-        actor: event.seat ?? state.firstPlayer,
+        actor: forcedActor(state, instance, event, ctx),
+        eventSeat: event.seat,
+        ...(aboutCard(event) ? { subject: aboutCard(event) } : {}),
+        ...(event.other ? { other: event.other } : {}),
+        ...(event.trigger === "damageDealt" && event.cardId ? { dealt: event.amount ?? 0, hold: event.cardId } : {}),
+        // Any other event's amount is the effect's X (the attachments an explored location had).
+        ...(event.trigger !== "damageDealt" && event.amount != null ? { x: event.amount } : {}),
+        ...((event.trigger === "damaged" || event.trigger === "damagedByAttack") && event.amount != null ? { dealt: event.amount } : {}),
         peril: state.perilSeat != null,
         effectId: effect.id,
         cause: effectCause(effect),
@@ -69,13 +84,13 @@ function pushFound(state: ScenarioState, found: readonly Found[], event: GameEve
 export function fireForced(state: ScenarioState, event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (ctx.effects.length === 0) return state;
   const triggered = collect(state, event, ctx, "triggered");
-  if (triggered.length === 0) return pushFound(state, collect(state, event, ctx, "forced"), event, steps);
+  if (triggered.length === 0) return pushFound(state, collect(state, event, ctx, "forced"), event, ctx, steps);
   const marker = pushFrame(
     state,
     { frame: "event", cardId: null, seat: event.seat ?? state.firstPlayer, peril: false, data: { kind: "event", event } },
     steps,
   );
-  return pushFound(marker, triggered, event, steps);
+  return pushFound(marker, triggered, event, ctx, steps);
 }
 
 // The marker frame sits under the triggered effects. When they are done it pushes the Forced ones.
@@ -83,7 +98,7 @@ export function eventStep(state: ScenarioState, frame: Frame, ctx: ReduceContext
   if (frame.data.kind !== "event") throw new Error("Event frame lost its event");
   if (frame.step > 0) return popFrame(state, steps);
   const event = frame.data.event;
-  return pushFound(patchTop(state, { step: 1 }), collect(state, event, ctx, "forced"), event, steps);
+  return pushFound(patchTop(state, { step: 1 }), collect(state, event, ctx, "forced"), event, ctx, steps);
 }
 
 // Called whenever the phase may have moved. When it has, the phase that ended fires its Forced

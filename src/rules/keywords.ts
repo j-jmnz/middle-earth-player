@@ -1,13 +1,20 @@
-// Rules: rr.attachment-cards, rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x, rr.modifiers, rr.lasting-effects, rr.damage, rr.multiple-defenders (data/rules/entries.json).
+// Rules: rr.attachment-cards, rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x, rr.modifiers, rr.lasting-effects, rr.damage (data/rules/entries.json).
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
+import { threatSaved } from "./families/quest-threat.ts";
+import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "./families/attachments-hold.ts";
 import type { EngineStep } from "./intents.ts";
-import { fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
+import { cardTypeOf, fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
-import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
+import { flagged, heldAmount, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
+import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
+import { attackingHolds } from "./families/attack-strike.ts";
+import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hooks.ts";
+import { alliesToHandDestination } from "./families/deck-rules.ts";
+import { reduceLife, takesLifeInstead } from "./families/burden-life.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -39,7 +46,7 @@ export const ALLIES_CLASS = "allies";
 
 // Whether a modifier is held by this card: by its id, or by the class ALLIES_CLASS.
 export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
-  return modifier.instanceId === instance.id || (modifier.instanceId === ALLIES_CLASS && printed.type === "ally" && inPlay(instance.zone));
+  return modifier.instanceId === instance.id || (modifier.instanceId === ALLIES_CLASS && cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone));
 }
 
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
@@ -51,18 +58,27 @@ export function modifiedStat(
   cards: ReadonlyMap<string, PrintedCard>,
   against?: string,
 ): number {
+  // "Use their Willpower instead of Defense" (06038).
+  if (stat === "defense" && defenseFromWillpower(state, instance.id)) return modifiedStat(state, instance, "willpower", cards, against);
   const printed = printedOf(cards, instance.code);
   let total = printedStat(printed, stat);
   let set: number | null = null;
+  // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2).
+  let floor = total;
   for (const modifier of state.modifiers) {
     if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
-    if (modifier.when?.kind === "attacking" && !attacking(state, modifier.when, against, cards)) continue;
+    // "+2 Attack while attacking that enemy": only while the holder attacks it.
+    if (modifier.against != null && modifier.against !== against) continue;
+    // "+1 Attack when attacking an Orc" (families/attack-strike.ts).
+    if (modifier.when?.kind === "attacking" && !attackingHolds(state, modifier.when, instance, { effects: [], cards }, against)) continue;
     if (modifier.set) set = modifier.amount;
-    else total += modifier.amount * (modifier.per === "damage" ? instance.damage : 1);
+    else total += modifier.amount;
+    if (!modifier.set && modifier.amount > 0) floor += modifier.amount;
   }
-  const value = set ?? total;
+  const lowered = set ?? total;
+  const value = stat === "willpower" && lowered < floor && flagged(state, instance.id, "cannotReduceWillpower") ? floor : lowered;
   return CARD_STATS.has(stat) ? Math.max(0, value) : value;
 }
 
@@ -76,7 +92,7 @@ export function versusHighEngagement(
   against?: string,
 ): boolean {
   if (holder.controller == null) return false;
-  const threat = state.seats[holder.controller]?.threat ?? 0;
+  const threat = seatThreat(state, holder.controller);
   let enemyId: string | undefined;
   if (role === "defending") {
     const attack = state.pendingAttack;
@@ -90,20 +106,6 @@ export function versusHighEngagement(
   return modifiedStat(state, enemy, "engagementCost", cards) > threat;
 }
 
-// The enemy a character attacks matches a stat condition ("when attacking an Orc", 01039:A:2; an enemy in the staging area,
-// 01009:A:1). `against` is the enemy, read while the attack strength is read (rr.step-6-8-2).
-export function attacking(
-  state: ScenarioState,
-  condition: { trait?: string | undefined; inStaging?: boolean | undefined },
-  against: string | undefined,
-  cards: ReadonlyMap<string, PrintedCard>,
-): boolean {
-  const enemy = against ? state.cards[against] : undefined;
-  if (!enemy) return false;
-  if (condition.inStaging && enemy.zone !== "staging") return false;
-  return condition.trait == null || printedOf(cards, enemy.code).traits.includes(condition.trait);
-}
-
 // A character's defense as the defender of the attack in progress, read as if it were declared, so a modifier that holds
 // only while it defends counts ("while defending against an enemy with an engagement cost higher than your threat":
 // Hobbit Cloak 141013, Boromir 142004).
@@ -113,15 +115,6 @@ export function defenseAsDefender(state: ScenarioState, defenderId: string, card
   const attack = state.pendingAttack;
   const declared = attack ? { ...state, pendingAttack: { ...attack, defenderId, undefended: false } } : state;
   return modifiedStat(declared, defender, "defense", cards);
-}
-
-// Several defenders (rr.multiple-defenders): those of the declared still in play defend, and their defense is pooled.
-export function standingDefenders(state: ScenarioState, declared: readonly string[]): string[] {
-  return declared.filter((id) => inPlay(state.cards[id]?.zone ?? "removed"));
-}
-
-export function pooledDefense(state: ScenarioState, defenders: readonly string[], cards: ReadonlyMap<string, PrintedCard>): number {
-  return defenders.reduce((sum, id) => sum + defenseAsDefender(state, id, cards), 0);
 }
 
 export function addModifier(
@@ -164,7 +157,7 @@ export function raiseThreat(
   if (amount <= 0) return state;
   const current = state.seats[seat];
   if (!current || current.eliminated) return state;
-  const raised = withThreat(state, seat, current.threat + amount);
+  const raised = doomedRaised(queueEvent(withThreat(state, seat, current.threat + amount), { trigger: "threatRaised", seat }), seat, cause);
   steps.push({ kind: "threat", seat, amount, cause });
   return eliminateEmpties(raised, steps);
 }
@@ -185,18 +178,22 @@ export function playerCardEffectCanChoose(printed: PrintedCard): boolean {
 
 export function placeDamage(
   state: ScenarioState,
-  id: string,
+  assigned: string,
   amount: number,
   cards: ReadonlyMap<string, PrintedCard>,
   steps: EngineStep[],
   source: DamageSource,
   cause: Cause,
 ): ScenarioState {
+  // Damage assigned to a card another takes for it ("attached hero takes all damage assigned to the chosen hero", 02099).
+  const id = damageGoesTo(state, assigned);
   const instance = state.cards[id];
   // Damage goes only on a card in play (rr.in-play-and-out-of-play): a defender that already left play takes none.
   if (!instance || !inPlay(instance.zone)) return state;
   const printed = printedOf(cards, instance.code);
   if (source === "player" && !playerCardEffectCanChoose(printed)) return state;
+  // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
+  if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
   // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.
   if (flagged(state, id, "cannotTakeDamage") || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
   const dealt = placedAmount(printed, amount);
@@ -204,14 +201,24 @@ export function placeDamage(
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
   let next = updateCard(state, id, { damage });
   const hurt = dealt > 0 && inPlay(instance.zone);
-  if (printed.type === "enemy" && printed.keywords.indestructible) return next;
-  if (printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards)) {
-    next = destroyCard(next, id, cards, steps);
-    // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy).
+  // An indestructible enemy keeps its damage but is never destroyed; it hears that it took damage (the Watcher in the Water, 142024:A:3).
+  if (printed.type === "enemy" && printed.keywords.indestructible) return hurt ? queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt }) : next;
+  const lethal = printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards);
+  // Damage dealt to a character is first offered to the Responses that cancel it ("cancel X damage just dealt", rr.cancel).
+  // A character it would destroy is destroyed by the sweep once they have had their chance (destroyOverwhelmed, damageHeld).
+  if (hurt && isCharacterType(printed)) {
+    next = queueEvent(next, { trigger: "damageDealt", seat: instance.controller, cardId: id, subject: id, amount: dealt });
+    if (lethal && state.holdLethal) return next;
+  }
+  if (lethal) {
+    // The cards attached to an enemy hear that it was destroyed ("When attached enemy is destroyed", families/attachments-hold.ts).
+    if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, id, printed.type === "hero" ? cards : undefined);
+    next = destroyCard(next, id, cards, steps, false, true);
+    // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
+    if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: id });
   } else if (hurt) {
-    // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage"), with the
-    // damage it just took ("for each point of damage he just suffered", 01003:A:1).
+    // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
     next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt });
   }
   return next;
@@ -219,7 +226,8 @@ export function placeDamage(
 
 // A character or enemy whose damage is at or above its hit points is destroyed however the hit points came down
 // (rr.hit-points): a hit point bonus that ends, or leaves with its source, puts the card it held up in the discard pile.
-export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
+// `held` keeps a card whose damage is still being answered (damageHeld, when some card could cancel it).
+export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], held: (state: ScenarioState, id: string) => boolean = () => false): ScenarioState {
   let next = state;
   for (const instance of Object.values(state.cards)) {
     if (instance.damage <= 0 || !inPlay(instance.zone)) continue;
@@ -227,7 +235,9 @@ export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<stri
     if (printed.health == null || (printed.type === "enemy" && printed.keywords.indestructible)) continue;
     const current = next.cards[instance.id];
     if (!current || !inPlay(current.zone) || current.damage < modifiedStat(next, current, "hitPoints", cards)) continue;
-    next = destroyCard(next, instance.id, cards, steps);
+    if (held(next, instance.id)) continue;
+    if (printed.type === "hero") next = noteHostDefeated(next, instance.id, cards);
+    next = destroyCard(next, instance.id, cards, steps, false, true);
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
   }
   return next;
@@ -287,9 +297,14 @@ export function releaseAttachments(
   for (const attachmentId of attachmentIds) {
     const attachment = next.cards[attachmentId];
     if (!attachment) continue;
+    // A Guarded attachment the card guarded goes to its player instead (families/attachments-hold.ts).
+    if (isGuarded(next, attachmentId)) {
+      next = releaseGuarded(next, attachmentId);
+      continue;
+    }
     const printed = printedOf(cards, attachment.code);
     const dest: Destination =
-      hostPrinted.type === "hero" && printed.keywords.permanent
+      cardTypeOf(host, hostPrinted) === "hero" && printed.keywords.permanent
         ? { zone: "removed" }
         : defeatedDestination(attachment, printed);
     next = moveCard(next, attachmentId, dest);
@@ -305,6 +320,8 @@ export function destroyCard(
   cards: ReadonlyMap<string, PrintedCard>,
   steps: EngineStep[],
   explored = false,
+  // Damage destroyed it: it was not discarded (rr.destroy, families/play-hooks.ts).
+  byDamage = false,
 ): ScenarioState {
   const instance = state.cards[id];
   if (!instance) return state;
@@ -316,18 +333,17 @@ export function destroyCard(
   if (printed.type === "location") {
     for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
   }
+  // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
+  if (explored && printed.type === "location" && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
-  next = moveCard(next, id, defeatedDestination(latest, printed));
+  // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck-rules.ts).
+  next = moveCard(next, id, alliesToHandDestination(next, latest, printed) ?? defeatedDestination(latest, printed), instance.attachments);
   steps.push({ kind: "destroy", targetId: id });
-  if (printed.type === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
+  if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
+  next = discardedFromPlay(next, instance, byDamage);
   if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
-  const after = eliminateEmpties(next, steps);
-  // "After a Dwarf hero you control leaves play" (01019:A:1): the seat is the player who controlled it. A player the loss
-  // eliminated has nobody left to hear it.
-  const seat = instance.controller;
-  if (printed.type !== "hero" || !inPlay(instance.zone) || seat == null || after.lost || after.seats[seat]?.eliminated) return after;
-  return queueEvent(after, { trigger: "heroLeftPlay", seat, subject: id });
+  return eliminateEmpties(next, steps);
 }
 
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
@@ -382,16 +398,50 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
   return next;
 }
 
-export function eliminateEmpties(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+// `final`: the play sweep has already let an ally gain the hero card type, so a seat in heroSavers with no heroes is eliminated now.
+export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], final = false): ScenarioState {
   let next = state;
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
     if (!seat || seat.eliminated) continue;
-    if (seat.threat >= 50 || seat.heroes.length === 0) {
+    // The elimination level, lowered by a card the seat holds (The One Ring, families/misc.ts).
+    const level = 50 - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
+    if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
+    if (seat.threat >= level || seat.heroes.length === 0) {
+      // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).
+      const saved = seat.heroes.length > 0 ? threatSaved(next, index) : null;
+      if (saved) {
+        next = saved;
+        continue;
+      }
       next = withSeat(next, index, { ...seat, eliminated: true });
       steps.push({ kind: "eliminate", seat: index });
     }
   }
   if (!next.lost && livingSeats(next).length === 0) next = markLoss(next, "No seats remain");
   return next;
+}
+
+// A keyword a card prints or has gained: a flag modifier of the same name ("Attached hero gains sentinel", rr.sentinel,
+// rr.ranged).
+export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel" | "ranged" | "restricted" | "doomed" | "surge", cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const instance = state.cards[id];
+  if (!instance) return false;
+  const printed = printedOf(cards, instance.code);
+  // A card whose printed text box is blank has none of its printed keywords; one gained from another source stays (rr.blank).
+  const blank = textBlank(state, id);
+  if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
+  if (!blank && printed.keywords[keyword]) return true;
+  return (keyword === "sentinel" || keyword === "ranged") && flagged(state, id, keyword);
+}
+
+// A character's destruction by damage waits while that damage is still being answered: its `damageDealt` event is queued, its
+// Responses are being offered, or one of them is resolving (rr.cancel: "cancel X damage just dealt").
+export function damageHeld(state: ScenarioState, id: string): boolean {
+  if ((state.pendingEvents ?? []).some((event) => event.trigger === "damageDealt" && event.cardId === id)) return true;
+  return state.stack.some(
+    (frame) =>
+      ((frame.data.kind === "responses" || frame.data.kind === "event") && frame.data.event.trigger === "damageDealt" && frame.data.event.cardId === id) ||
+      (frame.data.kind === "effect" && frame.data.hold === id),
+  );
 }

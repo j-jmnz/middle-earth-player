@@ -21,6 +21,8 @@ export function statOf(game: ScenarioState, ctx: ReduceContext, id: string, stat
 
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
   if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
+  // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments-play.ts).
+  if (id === "staging") return { id, label: "The staging area", code: null };
   const card = game.cards[id];
   if (card) return { id, label: names.card(id), code: card.code };
   // A branch of a Choose instruction is named by its id in the effect record.

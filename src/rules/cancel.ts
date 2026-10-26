@@ -2,6 +2,7 @@
 import { holds } from "./conditions.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { noteSpent } from "./families/costs-pay.ts";
 import { heroPays, validatePayments } from "./payments.ts";
 import type { CancelOffer, EffectData, Frame, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
@@ -46,7 +47,7 @@ export function cancelReason(state: ScenarioState, intent: TriggerIntent, ctx: R
   return validatePayments(state, intent.payments ?? [], { seat: state.firstPlayer, sphere: data.cancel.sphere, amount: data.cancel.amount }, ctx);
 }
 
-export function applyCancel(state: ScenarioState, intent: TriggerIntent, steps: EngineStep[]): ScenarioState {
+export function applyCancel(state: ScenarioState, intent: TriggerIntent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const data = topFrame(state)?.data;
   if (data?.kind !== "effect") return state;
   let next = state;
@@ -54,6 +55,8 @@ export function applyCancel(state: ScenarioState, intent: TriggerIntent, steps: 
     const hero = next.cards[payment.heroId];
     if (hero) next = updateCard(next, payment.heroId, { resources: hero.resources - payment.amount });
   }
+  // The pools that paid spent resources this round ("If you have not spent any resources this round", families/costs-pay.ts).
+  next = noteSpent(next, intent.payments ?? [], ctx);
   steps.push({ kind: "cancel", cardId: intent.cardId });
   const canceled = patchTop(next, { data: { ...data, canceled: true, wait: null } });
   return { ...canceled, window: null };

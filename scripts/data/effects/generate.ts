@@ -1,16 +1,21 @@
-import type { Condition, Effect } from "../../../src/catalog/boundary.ts";
+import type { Condition, Effect, Limit } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
 import { dealtCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
-import { PLAYER_REQUESTS } from "../printed/scope.ts";
+import { isPoolCard } from "../printed/pool.ts";
 import { TEMPLATES, type Draft, type TemplateContext } from "./templates.ts";
 
 export type Segment = { card: Card; index: number; side: "front" | "back" | "shadow"; line: string; lineId: string };
 
 export type Unmatched = Segment & { timing: string | null };
+
+// The box's cards (what the scenarios deal and both starter lists) as opposed to the rest of the player pool.
+export function boxCodes(campaign: CampaignData, scenarios: readonly ScenarioData[]): Set<string> {
+  return new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign)]);
+}
 
 export type Generated = {
   effects: Effect[];
@@ -33,9 +38,15 @@ const LABEL_TIMING: ReadonlyMap<string, string> = new Map([
 
 const PHASES = ["Resource", "Planning", "Quest", "Travel", "Encounter", "Combat", "Refresh"] as const;
 
-type Limit = { limit: "oncePerRound" | "oncePerPhase"; times: number };
-
-const TIMES: Readonly<Record<string, number>> = { once: 1, twice: 2 };
+// The printed limits a wrapper reads, by "<times> per <round|phase>" (rr.limits).
+const LIMITS: Readonly<Record<string, Limit>> = {
+  "once per round": "oncePerRound",
+  "once per phase": "oncePerPhase",
+  "twice per round": "twicePerRound",
+  "twice per phase": "twicePerPhase",
+  "3 times per phase": "thricePerPhase",
+  "5 times per phase": "fivePerPhase",
+};
 
 // "Combat Action: ..." is an Action that can only be used in that phase's action windows (rr.action). "(Limit once per round.)"
 // ends a line whose ability may be used once a round or a phase (rr.limits); some printings drop the parentheses ("Limit once
@@ -51,9 +62,9 @@ function wrapped(line: string): { line: string; condition: Condition | null; lim
   }
   let limit: Limit | null = null;
   const limited = /\s*(\()?Limit (once|twice|\d+ times) per (round|phase)\.?(\))?\s*$/.exec(rest);
-  if (limited && Boolean(limited[1]) === Boolean(limited[4])) {
-    const times = TIMES[limited[2] ?? ""] ?? Number.parseInt(limited[2] ?? "1", 10);
-    limit = { limit: limited[3] === "round" ? "oncePerRound" : "oncePerPhase", times };
+  const named = limited ? LIMITS[`${limited[2]} per ${limited[3]}`] : undefined;
+  if (limited && named && Boolean(limited[1]) === Boolean(limited[4])) {
+    limit = named;
     rest = rest.slice(0, limited.index);
   }
   return { line: rest, condition, limit };
@@ -64,7 +75,7 @@ function wrapped(line: string): { line: string; condition: Condition | null; lim
 function withWrapper(drafts: Draft[], condition: Condition | null, limit: Limit | null): Draft[] | null {
   if (drafts.some((draft) => draft.timing !== "action")) return null;
   if (condition && drafts.some((draft) => draft.condition)) return null;
-  return drafts.map((draft) => ({ ...draft, ...(condition ? { condition } : {}), ...(limit ? { limit: limit.limit, ...(limit.times > 1 ? { limitTimes: limit.times } : {}) } : {}) }));
+  return drafts.map((draft) => ({ ...draft, ...(condition ? { condition } : {}), ...(limit ? { limit } : {}) }));
 }
 
 function normalize(line: string): string {
@@ -95,16 +106,24 @@ export function segmentsOf(card: Card, ledger: Ledger): Segment[] {
   return out;
 }
 
+// The cards templates read: what the scenarios deal, both starter lists, and every deck-legal player card (user decision,
+// 2026-10-26: the whole pool is automated). The ledger passed in holds the pool's lines (withPool).
 export function generateEffects(cards: readonly Card[], scenarios: readonly ScenarioData[], campaign: CampaignData, ledger: Ledger): Generated {
-  // The player's requests (scripts/data/printed/scope.ts) are read by the same templates as the starter cards.
-  const wanted = new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign), ...PLAYER_REQUESTS]);
+  const wanted = new Set([...dealtCodes(campaign, scenarios), ...starterCodes(campaign), ...cards.filter(isPoolCard).map((card) => card.code)]);
   const scope = cards.filter((card) => wanted.has(card.code)).sort((a, b) => a.code.localeCompare(b.code));
   const setAside = new Set(scenarios.flatMap((scenario) => scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code)));
-  const codeOf = (name: string): string | null => {
-    // The printed text has typos ("Buckleberry Ferry"), so a name may be a letter or two off.
-    const exact = scope.filter((card) => card.name.toLowerCase() === name.trim().toLowerCase());
-    const hits = exact.length > 0 ? exact : scope.filter((card) => sameName(card.name, name.trim()));
-    return hits.length === 1 ? (hits[0]?.code ?? null) : null;
+  const box = boxCodes(campaign, scenarios);
+  // A name a box card prints is a box card; a pool card's is a card of its own pack, else the one pool card of that name.
+  const codeOf = (reader: Card, name: string): string | null => {
+    const among = (list: readonly Card[]): string | null => {
+      // The printed text has typos ("Buckleberry Ferry"), so a name may be a letter or two off.
+      const exact = list.filter((card) => card.name.toLowerCase() === name.trim().toLowerCase());
+      const hits = exact.length > 0 ? exact : list.filter((card) => sameName(card.name, name.trim()));
+      return hits.length === 1 ? (hits[0]?.code ?? null) : null;
+    };
+    if (box.has(reader.code)) return among(scope.filter((card) => box.has(card.code)));
+    const pack = reader.printings[0]?.pack;
+    return among(scope.filter((card) => card.printings[0]?.pack === pack)) ?? among(scope.filter((card) => !box.has(card.code)));
   };
 
   const effects: Effect[] = [];
@@ -117,7 +136,7 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       counters.set(timing, value);
       return value;
     };
-    const context: TemplateContext = { card, codeOf, setAside };
+    const context: TemplateContext = { card, codeOf: (name) => codeOf(card, name), setAside };
     for (const segment of segmentsOf(card, ledger)) {
       const named = stripKeywords(segment.line).replaceAll(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "{self}");
       const { line, condition, limit } = wrapped(named);
@@ -147,14 +166,15 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
   return { effects, unmatched, usage };
 }
 
-export function renderGenerated(effects: readonly Effect[], campaignId: string): string {
+// `name` is the exported constant: GENERATED_EFFECTS for the box's cards, POOL_GENERATED_EFFECTS for the rest of the pool.
+export function renderGenerated(effects: readonly Effect[], campaignId: string, name = "GENERATED_EFFECTS"): string {
   const lines = effects.map((effect) => `  ${JSON.stringify(effect)},`);
   return [
     `import type { Effect } from "../../catalog/boundary.ts";`,
     ``,
     `// Written by pnpm data:build from data/cards and data/scenarios (${campaignId}). Do not edit.`,
     `// scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.`,
-    `export const GENERATED_EFFECTS: readonly Effect[] = [`,
+    `export const ${name}: readonly Effect[] = [`,
     ...lines,
     `];`,
     ``,

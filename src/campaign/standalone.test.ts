@@ -40,6 +40,8 @@ const PIPPIN = "141004";
 const SEED = 1;
 const PAST = "a-shadow-of-the-past";
 const KNIFE = "a-knife-in-the-dark";
+const FORD = "flight-to-the-ford";
+const SOUTH = "the-ring-goes-south";
 // The cards 141030's Setup deals in Campaign Mode: Mr. Underhill, Gildor Inglorion, Gandalf's Delay, The Ring Draws Them.
 const CAMPAIGN_DEALT = ["141017", "141077", "141078", "141079"];
 
@@ -145,8 +147,8 @@ describe("standalone briefing", () => {
   });
 
   it("refuses a scenario whose dealt cards are not all automated", () => {
-    expect(PLAYABLE_SCENARIOS).toEqual([PAST, KNIFE]);
-    const world = loadWorld(catalog, campaign, loadScenario("flight-to-the-ford"), EFFECTS, [FRODO, SAM, MERRY, PIPPIN, ...deck]);
+    expect(PLAYABLE_SCENARIOS).toEqual([PAST, KNIFE, FORD, SOUTH]);
+    const world = loadWorld(catalog, campaign, loadScenario("journey-in-the-dark"), EFFECTS, [FRODO, SAM, MERRY, PIPPIN, ...deck]);
     const result = standaloneBriefing({ world, seatCount: 1, seats: loadoutOf().seats, ringBearer: FRODO, difficulty: "Normal" });
     expect(result.dealable).toBe(false);
     expect(result.problems[0]?.rule).toBe("Not playable yet");

@@ -5,7 +5,6 @@
 // Gondolin, Citadel Plate and Dwarven Axe.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { attackStrength } from "../rules/combat.ts";
 import { attackBarred, syncConstants } from "../rules/constants.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import { startReveal } from "../rules/frames.ts";
@@ -81,7 +80,8 @@ describe("Gimli (01004:A:1)", () => {
     const tab = table({ heroes: [{ code: GIMLI, seat: 0 }] });
     const gimli = idsOf(tab, GIMLI);
     expect(stat(tab.state, tab, gimli, "attack")).toBe(2);
-    expect(stat(updateCard(tab.state, gimli, { damage: 3 }), tab, gimli, "attack")).toBe(5);
+    // The constant is rebuilt after each intent and before each trigger (syncConstants).
+    expect(stat(syncConstants(updateCard(tab.state, gimli, { damage: 3 }), tab.ctx), tab, gimli, "attack")).toBe(5);
   });
 });
 
@@ -181,7 +181,7 @@ describe("Rain of Arrows (01033:A:1)", () => {
   it("cannot be played without a ready character with the ranged keyword", () => {
     const tab = table({ heroes: [{ code: LEGOLAS, seat: 0 }, { code: GIMLI, seat: 0 }], hand: [{ code: RAIN, seat: 0 }], engaged: [{ code: ORC, seat: 0 }] });
     const state = updateCard(tab.state, idsOf(tab, LEGOLAS), { exhausted: true });
-    expect(refusal(state, { type: "PlayCard", cardId: idsOf(tab, RAIN), payments: payFor(state, tab.ctx, idsOf(tab, RAIN)) }, tab.ctx)).toBe("That card has no legal target");
+    expect(refusal(state, { type: "PlayCard", cardId: idsOf(tab, RAIN), payments: payFor(state, tab.ctx, idsOf(tab, RAIN)) }, tab.ctx)).toBe("That card cannot be played now");
   });
 });
 
@@ -191,7 +191,7 @@ describe("Thicket of Spears (01036:A:1 and A:2)", () => {
   it("must be paid for from 3 different heroes' pools", () => {
     const tab = scene();
     const card = idsOf(tab, THICKET);
-    expect(refusal(tab.state, { type: "PlayCard", cardId: card, payments: [{ heroId: idsOf(tab, GIMLI), amount: 3 }] }, tab.ctx)).toBe("Pay with resources from 3 different heroes");
+    expect(refusal(tab.state, { type: "PlayCard", cardId: card, payments: [{ heroId: idsOf(tab, GIMLI), amount: 3 }] }, tab.ctx)).toBe("Pay from at least 3 different heroes");
     const three = [GIMLI, LEGOLAS, THALIN].map((code) => ({ heroId: idsOf(tab, code), amount: 1 }));
     expect(refusal(tab.state, { type: "PlayCard", cardId: card, payments: three }, tab.ctx)).toBeNull();
   });
@@ -223,12 +223,12 @@ describe("Stand Together (01038:A:1, rr.multiple-defenders)", () => {
     run = passWindows(run, tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
     run = send(run, { type: "DeclareDefender", defenderId: gimli ?? "" }, tab.ctx);
-    // Another defender may be declared, or a pass ends the declarations; the attack is no longer undefended-able.
-    expect(run.state.window?.kind).toBe("defense");
-    expect(legalIntents(run.state, tab.ctx)).toEqual([{ type: "DeclareDefender" }, { type: "Pass" }]);
-    expect(refusal(run.state, { type: "Undefended", heroId: legolas ?? "" }, tab.ctx)).toBe("A defender is declared: pass to declare no more");
-    run = send(run, { type: "DeclareDefender", defenderId: thalin ?? "" }, tab.ctx);
-    run = passWindows(send(run, { type: "Pass" }, tab.ctx), tab.ctx);
+    // Another defender may be declared, or the declarations end (families/defense-defenders.ts moreDefenders).
+    expect(choices(run, tab)).toEqual(["another", "done"]);
+    run = send(run, { type: "Choose", optionId: "another" }, tab.ctx);
+    expect(choices(run, tab).sort()).toEqual([legolas, thalin].sort());
+    run = send(run, { type: "Choose", optionId: thalin ?? "" }, tab.ctx);
+    run = passWindows(send(run, { type: "Choose", optionId: "done" }, tab.ctx), tab.ctx);
     // Attack 6 against Gimli's 2 and Thalin's 2 Defense: 2 damage, all of it on one defender the player chooses.
     expect(choices(run, tab).sort()).toEqual([gimli, thalin].sort());
     run = passWindows(send(run, { type: "Choose", optionId: thalin ?? "" }, tab.ctx), tab.ctx);
@@ -250,8 +250,14 @@ describe("Blade of Gondolin (01039; line 1 is the attach-to template's)", () => 
   it("gives the attached hero +1 Attack when attacking an Orc (01039:A:2)", () => {
     const tab = table({ heroes: [{ code: LEGOLAS, seat: 0 }], attached: [{ code: GONDOLIN, host: LEGOLAS }], engaged: [{ code: ORC, seat: 0 }, { code: GOBLIN, seat: 0 }] });
     const legolas = idsOf(tab, LEGOLAS);
-    expect(attackStrength(tab.state, [legolas], idsOf(tab, ORC), tab.ctx.cards)).toBe(4);
-    expect(attackStrength(tab.state, [legolas], idsOf(tab, GOBLIN), tab.ctx.cards)).toBe(3);
+    // The bonus is read during the attack itself (attackingHolds): the strike's Attack says it.
+    const strikeAttack = (enemy: string): number | undefined => {
+      const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, enemy), attackerIds: [legolas] }, tab.ctx);
+      const strike = run.steps.find((step) => step.kind === "strike" && step.side === "player");
+      return strike?.kind === "strike" ? strike.attack : undefined;
+    };
+    expect(strikeAttack(ORC)).toBe(4);
+    expect(strikeAttack(GOBLIN)).toBe(3);
   });
 
   it("after the attached hero attacks and destroys an enemy, places 1 progress on the current quest (01039:A:3)", () => {

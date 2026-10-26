@@ -38,7 +38,8 @@ describe("a card the app does not fully apply, before it is played", () => {
 
   it("an attachment with no record asks twice before it is paid for", async () => {
     const { ctx: base } = await starterWorld("wisdom-and-wizardry");
-    const ctx = { effects: base.effects, cards: new Map([...base.cards, ...(await loadPrinted([WARNING]))]) };
+    // Every card is meant to have records; the Warning's are taken away to show a card no record reads.
+    const ctx = { effects: base.effects.filter((effect) => effect.cardCode !== WARNING), cards: new Map([...base.cards, ...(await loadPrinted([WARNING]))]) };
     let state: ScenarioState = expectOk(reduce(startScenario(starterStart("wisdom-and-wizardry", 1), ctx), { type: "Keep" }, ctx)).state;
     const policy = { scout: "", prefer: "141035", protect: RING_BEARER };
     for (let turn = 0; turn < 400 && state.mode !== "planning"; turn += 1) state = expectOk(reduce(state, nextIntent(state, ctx, policy), ctx)).state;

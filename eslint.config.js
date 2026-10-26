@@ -106,7 +106,7 @@ const importSettings = {
 module.exports = defineConfig([
   expoConfig,
   {
-    ignores: ["dist/**", "ios/**", "android/**", ".expo/**", "web-build/**", ".claude/worktrees/**"],
+    ignores: ["dist/**", "ios/**", "android/**", ".expo/**", "web-build/**", ".claude/**"],
   },
   {
     plugins: {

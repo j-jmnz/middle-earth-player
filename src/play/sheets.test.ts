@@ -123,7 +123,7 @@ describe("pay sheet", () => {
     const state = fund(tab.state, 0, 6);
     const thicket = idsOf(tab, "01036");
     const request = playRequest(state, tab.ctx, thicket);
-    expect(request?.spread).toBe(3);
+    expect(request?.distinct?.min).toBe(3);
     const shares = request ? firstShares(request) : [];
     expect(shares.map((share) => share.amount)).toEqual([1, 1, 1]);
     const sheet = request ? paySheet(state, names, request, { kind: "play", cardId: thicket, hostId: null }) : null;

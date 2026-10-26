@@ -1,5 +1,7 @@
 # Plan: a local game-data store, fetched once, generated wherever possible
 
+**Status, 2026-10-26: carried out (phase 8b, `docs/phases/phase-08b-data-store.md`), then extended.** This file is the plan as written. Where the repository has moved on, the step carries a note marked "Now". `docs/plans/authoritative-data.md` changed the card text and rules parts, and the current commands are in `CLAUDE.md`.
+
 ## Context
 
 The engine (`src/rules`) is sound. What costs agents time is getting game data into it:
@@ -43,19 +45,22 @@ The engine (`src/rules`) is sound. What costs agents time is getting game data i
 ```
 data/                                  committed; the only thing tests and agents read
   sources.json                         every source: URL, pin (sha256 or git SHA), fetchedAt
-  raw/                                 verbatim snapshots (HoB *.json, RingsDB *.json, DragnCards cardDb.tsv + jsons)
+  raw/                                 verbatim snapshots (hallofbeorn, ringsdb, dragncards, icons)
   cards/<pack>.json                    normalized cards, all printings, WITH text, one card per line, sorted
-  scenarios/<id>.json                  generated: stages, groups {encounter, staging, active, setAside, ...}, easy deck
-  campaigns/<id>.json                  generated plus authored fields: scenario order, prelude, resolution groups
-  rules/<doc>.md                       page-anchored text of each PDF ({#rr-p12}, {#mec109-p3})
-  rules/entries.json                   split rules: {id, doc, page, title, text, terms[]}
+  scenarios/<id>.json                  generated: stages, piles with Normal and Easy counts, campaign card, widgets
+  campaigns/<id>.json, index.json      generated campaign files and the campaign list
+  rules/<doc>.md                       column-anchored text of each PDF (`## p12`, `### p12 c1`)
+  rules/index.json, columns.json       the hand-checked spans and the column boxes
+  rules/entries.json, steps.json       built from them: rule entries, and the framework step ids
+  printed/<campaign>.json              printed-text ledger, read from card scans
+  starter-decks.json, prebuilt-decks.json, decks/prebuilt.json   the player decks the app ships
   overrides.json                       the few facts sources get wrong, each with a reason and source
-.cache/pdf/                            downloaded PDFs (gitignored, pinned by sha256)
+.cache/pdf/, .cache/scans/             downloaded PDFs and card scans (not committed, pinned by sha256)
 src/effects/generated/<set>.ts         written by the template generator (committed, deterministic)
-src/effects/authored/<set>.ts          agent-drafted records for what templates can't express
+src/effects/authored/                  records the templates can't express: one file per scenario, pool/<pack>.ts, families/<family>.ts
 ```
 
-- `pnpm data:sync` is the only network command. It refreshes `data/raw/` and `.cache/pdf/`, then runs `data:build`.
+- `pnpm data:sync` is the only network command. It refreshes `data/raw/`, `.cache/pdf/` and `.cache/scans/`. Now: it does not run `data:build`; run that next.
 - `pnpm data:build` is offline and deterministic: raw → normalized `data/`, plus the generated effects.
 - `pnpm data:check` re-runs `data:build` into a temporary directory and fails on any diff. CI runs it.
 - `pnpm catalog:build` becomes an offline transform of `data/` into `assets/catalog.db` for the phone.
@@ -98,16 +103,18 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
 - Cross-checks fail the build unless resolved by an override:
   - Group counts must equal Hall of Beorn's per-scenario Normal and Easy counts for the scenario's encounter sets, minus Nightmare.
   - Placement must agree with the template parse of the stage-1 quest card's `Setup:` text, step 5. This catches Mr. Underhill in staging.
-- The engine reads placement from the scenario's groups:
+- Now: the scenario file holds piles, not DragnCards groups, and the start is built from the cards' Setup records (`docs/plans/authoritative-data.md`, C). As planned, the engine read placement from the scenario's groups:
   - `startScenario` and `finishSetup` (`src/rules/setup.ts`) spawn each group into its zone, in the order the quest card's Setup text gives (set aside, staging, active, attach). `searchSetup` and `handSetup` (`src/rules/setup-search.ts`) are unchanged in what they compute.
   - `sharedEncounterDeck2`, `sharedQuestDeck2` and `sharedBoons` map to the optional zones the brief already reserves (burden deck, second encounter deck). The widget flags become derived: a non-empty group turns the widget on.
 - Delete the `fixtures/` directory, `src/catalog/scenario-fixture.ts`, `scripts/join-scenario-fixtures.ts`, the authored `141022:setup:1` placement record, `src/campaign/effects-setup-records.test.ts`, `ScenarioScript`, `registry.ts` and `fellowship/a-shadow-of-the-past.ts`.
-  - They're replaced by a pure `buildStart(campaign, scenarioId, input)` in `src/campaign/start.ts`.
+  - They're replaced by a pure `buildStart(input)` in `src/campaign/start.ts` (done; none of the deleted files exists).
 - `data/campaigns/fellowship-of-the-ring.json` is generated: scenario list from the `Q0C` keys, and the prelude (The One Ring attached to the Ring-bearer, from `player1Play1`).
   - Only `resolution` groups are authored, in an `authored` block of the same file. Each group's codes are validated against the scenario's cards.
   - Template extraction of reward choices from the MEC109 resolution text in `data/rules/` is a follow-up, if the text proves regular.
 
 ### 4. Rules store
+
+Now: the heading splitter was replaced by the curated `data/rules/index.json` (`docs/plans/authoritative-data.md`, E); `scripts/data/rules/` holds `extract.ts`, `spans.ts` and `steps.ts`. The id convention (`rr.surge`) and the header-comment rule below stand.
 - `data:build` runs `pdftotext` (reading order, not `-layout`) per page into `data/rules/<doc>.md`, with `## p<N> {#<doc>-p<N>}` headings.
 - A splitter turns the Rules Reference glossary (alphabetical headings), the Learn to Play phase sections and the MEC109 keyword and campaign sections into `data/rules/entries.json`: `{ id: "rr.surge", doc, page, title, text, terms }`.
 - Cleanup is one agent pass, then committed: fixing column interleaving the splitter can't. The extraction is regenerated only when a PDF's sha256 changes. A test asserts each entry's page exists and its title appears on that page.
@@ -126,7 +133,7 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
 
   A pattern only fires when the whole sentence matches. Partial matches go to the drafts list.
 - `data:build` writes `src/effects/generated/<set>.ts`.
-- `src/effects/authored/<set>.ts` holds records for sentences no template covers. An authored record with the same `id` replaces the generated one, so a wrong template can be overridden without editing it.
+- `src/effects/authored/` holds records for sentences no template covers (now per scenario, pack and mechanic family: `docs/plans/effect-authoring.md`). An authored record with the same `id` replaces the generated one, so a wrong template can be overridden without editing it.
 - Seed the template library from the existing records in `src/effects/fellowship-of-the-ring/*.ts`. Each existing record is either reproduced by a template (and deleted from authored) or stays authored. The step 0 golden plus `full-game.test.ts` prove nothing changed.
 - `pnpm effects:draft <scenario>` writes `.agent/drafts/<code>.md` for every card whose printed timings still lack records. Each bundle holds:
   - all printings' text;
@@ -140,7 +147,7 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
 - `scripts/effect-coverage.test.ts` reads timings from `data/cards`, iterates `data/scenarios/*.json` plus the prelude, and requires the nth record from generated plus authored. There's no manifest file and no SQLite.
 
 ### 6. Direct imports, slim catalog
-- `src/effects/index.ts` exports generated plus authored. `src/screens` and `src/campaign` import it, and `eslint.config.js` drops the `allowEffects` gating. `src/rules` still receives effects as an argument.
+- `src/effects/index.ts` exports generated plus authored. `src/screens`, `src/play` and `src/campaign` import it. `src/rules` still receives effects as an argument; `eslint.config.js` keeps `allowEffects` only for tests and scripts, which may import `src/effects` into `src/rules` and `src/catalog`.
 - `scripts/validate-effects.ts` moves into a Vitest schema test. Delete the `effects` and `scenarios` tables, `scripts/effects-roundtrip.test.ts`, and the readers in `src/screens/routes/{pool,card/[code],debug}.tsx`. `activeCardCodes` (`src/catalog/active-text.ts`) takes the effect list.
 - `scripts/build-catalog.ts` becomes an offline `data/` → `catalog.db` transform (`cards` with text and image URLs, `packs`, `campaigns`, `meta`).
   - The version is a content hash. `src/screens/applied-catalog-version.ts` compares for equality.
@@ -186,5 +193,5 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
 - Golden: identical `PrintedCard`s for the 26 dealt codes plus `141085`; the generated scenario 1 has a 42-card Normal deck, the current Easy counts and the same placement; `full-game.test.ts` gives an identical step log and final state.
 - `effect-coverage` is green for scenario 1, with records split between generated and authored. The report lists how many came from templates.
 - The rules test confirms every rule id referenced in `src/rules` and in tests exists in `data/rules/entries.json` with a valid page anchor.
-- `pnpm data:query "select count(*) from cards where printings like '%TFotR%'"` returns 136.
+- `pnpm data:query "select count(*) from cards where printings like '%TFotR%'"` returned 136 when this was written (it returns 175 now: more cards carry that printing).
 - Run `/reviewer` per step, and `/ux` for step 6 (screens and images). Phone checks stay open in STATUS.

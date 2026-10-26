@@ -2,15 +2,22 @@ import type { Effect } from "../catalog/boundary.ts";
 
 import { applyCancel, cancelIntents, cancelReason } from "./cancel.ts";
 import { holds } from "./conditions.ts";
+import { effectsOfCard } from "./families/misc-text.ts";
 import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { applyResponse, responseIntents, responseReason } from "./responses.ts";
-import type { ScenarioState } from "./state.ts";
+import { applyMulliganTrigger, mulliganTriggerReason } from "./families/deck-play.ts";
+import { textBlank } from "./families/attachments-hold.ts";
+import { printedOf } from "./printed.ts";
+import { inPlay, type ScenarioState } from "./state.ts";
 import { payUsage, usable, usageReason } from "./usage.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
+
+// The cards whose Actions any player may use while they are in play: an objective, quest or location ability (rr.action).
+const SHARED_TYPES: ReadonlySet<string> = new Set(["objective", "quest", "location"]);
 
 function inTriggerWindow(state: ScenarioState): boolean {
   return state.window?.kind === "pass" || state.window?.kind === "frameAction";
@@ -20,12 +27,15 @@ function inTriggerWindow(state: ScenarioState): boolean {
 function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, effectId: string): Effect | undefined {
   const instance = state.cards[cardId];
   if (!instance) return undefined;
-  if (instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached") return undefined;
-  const effect = ctx.effects.find(
-    (entry) => entry.id === effectId && entry.cardCode === instance.code && entry.timing === "action",
-  );
-  // Only the card's controller uses its Action, unless every player may use it once a round (Éowyn).
-  if (!effect || (instance.controller !== state.activeSeat && effect.limit !== "oncePerRoundEachPlayer")) return undefined;
+  // A card whose printed text box is blank has none of its abilities (rr.blank).
+  if (textBlank(state, instance.id)) return undefined;
+  const effect = effectsOfCard(state, ctx, instance).find((entry) => entry.id === effectId && entry.timing === "action");
+  // An objective, quest or location in play belongs to no player: any player may initiate its Action (rr.action).
+  const shared = inPlay(instance.zone) && SHARED_TYPES.has(printedOf(ctx.cards, instance.code).type);
+  // An Action used from the hand ("put ~ into play from your hand", effect.fromHand) is used there; any other in play.
+  if (effect?.fromHand ? instance.zone !== "hand" : instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached" && !shared) return undefined;
+  // Only the card's controller uses its Action, unless any player may (Éowyn's once a round each, "Any player may trigger").
+  if (!effect || (instance.controller !== state.activeSeat && !shared && effect.limit !== "oncePerRoundEachPlayer" && !effect.anyPlayer)) return undefined;
   const scope = { actor: state.activeSeat, sourceId: cardId, returned: 0 };
   return !effect.condition || holds(state, effect.condition, scope, ctx) ? effect : undefined;
 }
@@ -37,8 +47,8 @@ export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalI
   if (!inTriggerWindow(state)) return [];
   const intents: LegalIntent[] = [];
   for (const instance of Object.values(state.cards)) {
-    for (const effect of ctx.effects) {
-      if (actionEffect(state, ctx, instance.id, effect.id) !== effect) continue;
+    for (const effect of effectsOfCard(state, ctx, instance)) {
+      if (effect.timing !== "action" || actionEffect(state, ctx, instance.id, effect.id) !== effect) continue;
       if (usable(state, effect, instance.id, state.activeSeat, ctx)) intents.push({ type: "Trigger", cardId: instance.id, effectId: effect.id });
     }
   }
@@ -48,6 +58,8 @@ export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalI
 export function triggerReason(state: ScenarioState, intent: TriggerIntent, ctx: ReduceContext): string | null {
   if (state.window?.kind === "cancelOffer") return cancelReason(state, intent, ctx);
   if (state.window?.kind === "response") return responseReason(state, intent, ctx);
+  // A Response offered in place of the mulligan (families/deck-play.ts).
+  if (state.window?.kind === "mulligan") return mulliganTriggerReason(state, intent, ctx);
   if (!inTriggerWindow(state)) return "That intent is not legal in this window";
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);
   if (!effect) return "That effect cannot be triggered";
@@ -62,8 +74,9 @@ export function applyTrigger(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  if (state.window?.kind === "cancelOffer") return applyCancel(state, intent, steps);
+  if (state.window?.kind === "cancelOffer") return applyCancel(state, intent, ctx, steps);
   if (state.window?.kind === "response") return applyResponse(state, intent, ctx, steps);
+  if (state.window?.kind === "mulligan") return applyMulliganTrigger(state, intent, ctx, steps);
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);
   if (!effect || !state.window) return state;
   const seat = state.activeSeat;

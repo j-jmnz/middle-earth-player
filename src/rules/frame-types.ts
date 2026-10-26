@@ -1,6 +1,7 @@
 import type { Cause } from "./cause.ts";
 import type { Condition, Instruction, ModifierStat, ModifierUntil, Trigger } from "../catalog/boundary.ts";
 
+import type { AttackDefense } from "./families/defense-types.ts";
 import type { Sphere } from "./printed.ts";
 import type { Window } from "./state.ts";
 
@@ -15,13 +16,14 @@ export type Modifier = {
   until: ModifierUntil;
   // A constant effect put this modifier here. The engine rebuilds these from the effect list.
   origin?: string;
-  // The amount counts once for each of these when the stat is read: a committed character or an ally of the seat (a Hide
-  // number), or a damage token on the holder (01004:A:1).
-  per?: "committed" | "ally" | "damage";
+  // The amount counts once for each of these when the stat is read.
+  per?: "committed" | "ally";
   // The modifier only applies to this seat (an enemy that cannot attack one player).
   seat?: number;
   // A condition read each time the stat is read (see isStatCondition).
   when?: Condition;
+  // The modifier holds only while its holder attacks this enemy ("+2 Attack while attacking that enemy").
+  against?: string;
   // The stat is set to `amount`, overriding every modifier that is not a set (rr.modifiers).
   set?: boolean;
 };
@@ -78,12 +80,21 @@ export type EffectData = {
   interrupted?: boolean;
   // The cards a Pick looked at in a deck: the ones still there are put back by ArrangeTop.
   looked?: readonly string[];
+  // The options a `different` Choose has taken in this effect (families/deck-choose.ts).
+  options?: readonly string[];
   // The seat the event that offered this Response happened to.
   eventSeat?: number | null;
   // The X an event was played for (Stand and Fight), or the cost of the card an effect discarded (Flame of Anor).
   x?: number;
   // The characters that took part in the attack a Response answers.
   participants?: readonly string[];
+  // The card the event a Response or Forced effect answers was about ("that ally", "that enemy"), and the other card it
+  // names (the enemy a character defends against).
+  subject?: string;
+  other?: string;
+  // The damage the answered event dealt, and the card whose destruction waits while this effect resolves.
+  dealt?: number;
+  hold?: string;
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
@@ -102,10 +113,12 @@ export type HideData = {
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
-// `amount` is the damage a `damaged` event placed (01003:A:1).
+// `other` is a second card the event names: the enemy a character defends against or attacks.
+// `amount` is the damage a `damaged` event dealt. `attachments` are the cards that left play with the card a
+// `leftPlayWithAttachments` event is about (families/play-zones.ts).
 // `occurrence`: events one game occurrence created share it (each character of one commit), and are announced together in
-// a single response window (rr.triggering-condition).
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; participants?: readonly string[]; explored?: boolean; amount?: number; occurrence?: string };
+// a single response window (rr.triggering-condition). `fromDeck`: a "revealed" card the encounter deck itself revealed.
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean };
 
 // A Response a player may use after an event. It is offered once and may be passed. `event` is the one it answers, when a
 // window answers several events of one occurrence.
@@ -114,13 +127,11 @@ export type ResponseOffer = { cardId: string; effectId: string; seat: number; ev
 export type FrameData =
   | ResumeData
   | { kind: "event"; event: GameEvent }
-  // `answering`: the event of the Response being used, when the window holds several (one occurrence's) and it is not `event`.
-  | { kind: "responses"; event: GameEvent; offers: readonly ResponseOffer[]; answering?: GameEvent }
+  | { kind: "responses"; event: GameEvent; offers: readonly ResponseOffer[] }
   | { kind: "none" }
   // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
-  // effects of the card just revealed (Frodo Baggins).
-  // `replaced`: a Response canceled the card's "when revealed" effects and replaces it with the next encounter card (01008:A:1).
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean; replaced?: boolean }
+  // effects of the card just revealed (Frodo Baggins). `discard`: and the card is discarded, not shuffled back (The Master Ring).
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean; discard?: boolean }
   | HideData
   | EffectData;
 
@@ -136,7 +147,11 @@ export type Frame = {
 
 export type DelayedEffect = {
   id: string;
-  until: "endOfPhase" | "endOfRound";
+  // `questSucceeded`: run when the players quest successfully this phase (families/quest-outcome.ts), dropped when the quest
+  // resolves otherwise.
+  // `endOfAttack`: the end of the player attack in progress (families/attack-flow.ts).
+  // `startOfGame`: run once the opening hands are settled (misc family).
+  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "endOfAttack" | "startOfGame";
   sourceId: string | null;
   seat: number;
   // The phase the effect was scheduled in. An end-of-phase effect fires when that phase ends.
@@ -149,7 +164,8 @@ export type DelayedEffect = {
 };
 
 // One use of an effect with a limit. A oncePerPhase use is spent in the round and phase it was made.
-export type UsedEffect = { effectId: string; sourceId: string; round: number; phase: string; seat?: number };
+// `game` keeps the use for the rest of the game (a once-per-game limit); `attack` names the attack it was made in.
+export type UsedEffect = { effectId: string; sourceId: string; round: number; phase: string; seat?: number; game?: boolean; attack?: string };
 
 export type HideFailure = { seat: number; round: number; phase: string };
 
@@ -171,15 +187,9 @@ export type PendingAttack = {
   // Instructions to run, with the attacker as the source, when the attack ends.
   after?: readonly Instruction[];
   afterCause?: Cause;
-  // Every defender declared, in order, when there is more than one (01038:A:1, rr.multiple-defenders). `defenderId` is the
-  // first. `damageTo` is the one the defending player assigned the damage to.
-  defenderIds?: readonly string[];
-  damageTo?: string;
-  // The defending player is choosing which defender takes the damage, in a frame of its own.
-  damageFrame?: boolean;
   // The step that follows the action window open between two steps of the attack, and the stack depth it opened at.
-  // `declared`: the Responses to a defender's declaration (01029:A:2) are open; the declaration goes on when they are done.
-  awaiting?: "declared" | "defense" | "shadow" | "damage" | "end";
+  // `defenders`: more defenders were declared by an effect; the window after the declaration (6.4.1) comes next.
+  awaiting?: "defense" | "shadow" | "damage" | "end" | "defenders";
   awaitDepth?: number;
   // Combat damage is placed; only the end of the attack is left.
   damaged?: boolean;
@@ -192,6 +202,12 @@ export type PendingAttack = {
   shadowFrame?: string;
   // The shadow effects are resolved, and the window before combat damage has been offered.
   shadowsDone?: boolean;
+  // The attacking enemy is in the staging area (an effect made it attack, 142038:A:2), not engaged (families/south-watcher.ts).
+  fromStaging?: boolean;
+  // A shadow effect says the undefended damage of this attack goes on an active location (142035:A:2).
+  toLocation?: boolean;
+  // Extra defenders, damage marks and the attack's end, kept by the defense family (src/rules/families/defense-types.ts).
+  defense?: AttackDefense;
 };
 
 // A player attack declared and not finished: the action windows between its steps (rr.attack-resolution-chart).
@@ -201,4 +217,13 @@ export type PendingStrike = {
   attackerIds: readonly string[];
   awaiting?: "strike" | "end";
   awaitDepth?: number;
+  // The attack family's marks (families/attack-flow.ts). `back`: the window given back when the attack ends (absent: the
+  // combat phase's player attack window; null: none, an effect declared the attack and goes on). `outer`: the player attack
+  // this one was declared during, which goes on when it ends. `engagedSeat`: the player the enemy was engaged with when the
+  // attack was declared. `ranged`: a card called it a ranged attack. `excessTo`: the enemy that takes its excess damage.
+  back?: Window | null;
+  outer?: PendingStrike;
+  engagedSeat?: number;
+  ranged?: boolean;
+  excessTo?: string;
 };

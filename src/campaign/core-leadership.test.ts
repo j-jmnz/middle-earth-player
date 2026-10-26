@@ -64,7 +64,7 @@ describe("Aragorn (01001:A:2; line 1 is Sentinel)", () => {
     const aragorn = idsOf(tab, ARAGORN);
     let run = send(begin(tab.state), { type: "Commit", cardIds: [aragorn] }, tab.ctx);
     expect(offered(run.state, tab)).toEqual(["01001:response:1"]);
-    run = send(run, { type: "Trigger", cardId: aragorn, effectId: "01001:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: aragorn, effectId: "01001:response:1", payments: [{ heroId: aragorn, amount: 1 }] }, tab.ctx);
     expect(run.state.cards[aragorn]?.exhausted).toBe(false);
     expect(run.state.cards[aragorn]?.committed).toBe(true);
     expect(run.state.cards[aragorn]?.resources).toBe(0);

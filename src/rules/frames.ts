@@ -6,7 +6,9 @@ import { currentCause, ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hideStep, pushHide } from "./hide.ts";
+import { encounterRaised } from "./families/quest-threat.ts";
 import { raiseThreat } from "./keywords.ts";
+import { queueEvent } from "./queue.ts";
 import { offerResponses, responseStep } from "./responses.ts";
 import { printedOf } from "./printed.ts";
 import { livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "./state.ts";
@@ -14,6 +16,8 @@ import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "./verbs.ts";
 import { moveCard } from "./zones.ts";
+import { announceEntered, noteEncounterThreat, revealsAllowed, watchReveal } from "./families/encounter-reveal.ts";
+import { discardsAfterReveal } from "./families/sidequests-encounter.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.
@@ -79,12 +83,18 @@ export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: Eng
   // card is revealed (rr.step-3-3). The cursor is set first, so the step begins once.
   if (state.revealCursor == null) {
     const begun: ScenarioState = { ...state, revealCursor: { seats: livingSeats(state), index: 0 } };
-    return fireForced(begun, { trigger: "stagingStepBegins", seat: null }, ctx, steps);
+    // Responses "after the players have committed characters to the quest" (17057:A:2) are offered too, after the Forced ones.
+    const event = { trigger: "stagingStepBegins", seat: null } as const;
+    return fireForced(offerResponses(begun, event, ctx, steps), event, ctx, steps);
   }
   const cursor = state.revealCursor;
-  const seat = cursor.seats[cursor.index];
+  // "Reveal 1 less card from the encounter deck this phase" (RevealFewer) ends the step early.
+  // Cards beyond one per player ("reveal an additional encounter card") are revealed by the players in turn from the first.
+  const seat = cursor.index < revealsAllowed(state, cursor.seats.length) ? cursor.seats[cursor.index % Math.max(1, cursor.seats.length)] : undefined;
   if (seat == null || state.lost || state.failure) {
-    return { ...withMode(state, "resolution"), revealCursor: null };
+    const ended: ScenarioState = { ...withMode(state, "resolution"), revealCursor: null };
+    // Responses "at the end of the staging step" (22145:A:1).
+    return state.lost || state.failure ? ended : offerResponses(ended, { trigger: "stagingStepEnds", seat: null }, ctx, steps);
   }
   const advanced: ScenarioState = { ...state, revealCursor: { seats: cursor.seats, index: cursor.index + 1 } };
   if (advanced.seats[seat]?.eliminated) return advanced;
@@ -98,13 +108,19 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
   const seat = frame.seat;
   // The card's effects were canceled just after it was revealed: it goes back into the encounter deck and the same
   // seat reveals another card (141001:A:1).
-  if (frame.data.canceled && frame.step >= 1) return revealAnother(state, frame, ctx, steps);
+  // A card a Response discarded as it canceled it (The Door is Closed!, 10092:A:1) is not returned: the reveal is over.
+  if (frame.data.canceled && frame.step >= 1) return state.cards[id]?.zone === "staging" ? revealAnother(state, frame, ctx, steps) : resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps);
   switch (frame.step) {
     case 0: {
       let next = moveCard(state, id, { zone: "staging" });
       next = updateCard(next, id, { face: "up", controller: seat });
       steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
+      // The lasting effects that watch the reveals act on the card; one may discard it, ending its staging.
+      next = watchReveal(next, frame, ctx, steps);
+      if (next.stack.length < state.stack.length) return next;
+      // "After an enemy is added to the staging area" hears the card arrive.
+      next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
       next = patchTop(next, { step: 1 });
       // A card just revealed from the encounter deck: a Response may cancel its effects before any of them resolves.
       return frame.data.fromDeck ? offerResponses(next, { trigger: "encounterRevealed", seat, subject: id }, ctx, steps) : next;
@@ -113,14 +129,12 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       let next = patchTop(state, { step: 2 });
       if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
         for (let index = 0; index < next.seatCount; index += 1) {
-          next = raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x"));
+          next = noteEncounterThreat(raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x")), index, printed.keywords.doomed, id, ctx);
         }
+        // An encounter card's Doomed raise is heard by Elfhelm (02100:A:1).
+        next = encounterRaised(next, livingSeats(next), id, ctx);
       }
-      // The card is revealed: what happens "as it is revealed by the encounter deck" (01006:A:1) resolves before its keywords
-      // and "when revealed" effects, in frames above this one. Only the encounter deck's own reveal counts (staging, a surge,
-      // the top card; rr.staging): a card a player searches for and reveals is not revealed by the encounter deck, as it is
-      // not "revealed from the encounter deck" for a cancel (141001:A:1).
-      return frame.data.fromDeck ? fireForced(next, { trigger: "cardRevealed", seat, subject: id }, ctx, steps) : next;
+      return next;
     }
     case 2: {
       const next = patchTop(state, { step: 3 });
@@ -131,25 +145,20 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     case 3:
       return runRevealed(patchTop(state, { step: 4 }), id, seat, frame.peril, ctx, steps);
     case 4:
-      return fireForced(patchTop(state, { step: 5 }), { trigger: "revealed", seat, cardId: id }, ctx, steps);
+      return fireForced(patchTop(state, { step: 5 }), { trigger: "revealed", seat, cardId: id, ...(frame.data.fromDeck ? { fromDeck: true } : {}) }, ctx, steps);
     case 5: {
       // A revealed treachery is resolved, then placed in the encounter discard pile unless its text says otherwise
       // (ltp.revealed-treachery, rr.treachery-cards, rr.step-3-3). A treachery whose text attached it (a Condition) has
       // left the staging area and stays where its text put it. A canceled treachery is discarded too (rr.cancel). Peril
       // covers that card's staging only, so the lock ends before surge (mec109.peril, rr.surge).
-      const resolved = printed.type === "treachery" && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
+      const resolved = (printed.type === "treachery" || discardsAfterReveal(printed)) && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
       const unlocked = frame.peril && resolved.perilSeat === seat ? { ...resolved, perilSeat: null } : resolved;
-      const next = patchTop(unlocked, { step: 6 });
+      // A card still in play has entered play (rr.staging, step 3): "After a location enters play" (04060:A:1).
+      const next = patchTop(announceEntered(unlocked, id, seat, ctx), { step: 6 });
       const revealing = next.seats[seat];
       const surge = printed.keywords.surge || (frame.data.kind === "reveal" && frame.data.surge);
-      // A card whose "when revealed" effects were canceled and that is replaced (01008:A:1): the next card is revealed in its
-      // place, and a surge still adds one more, carried by that next card's reveal.
-      const replaced = frame.data.kind === "reveal" && frame.data.replaced === true;
-      if ((!surge && !replaced) || !revealing || revealing.eliminated) return next;
-      const again = startReveal(next, seat, ctx, steps);
-      const top = topFrame(again);
-      if (!(surge && replaced) || again.stack.length === next.stack.length || top?.data.kind !== "reveal") return again;
-      return patchTop(again, { data: { ...top.data, surge: true } });
+      if (!surge || !revealing || revealing.eliminated) return next;
+      return startReveal(next, seat, ctx, steps);
     }
     default:
       // The revealed card's staging is resolved: an encounter deck it emptied is reset now (faq.last-encounter-card).
@@ -160,7 +169,12 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
 function revealAnother(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = frame.cardId ?? "";
   const popped = popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps);
-  const returned = state.cards[id] ? shuffleEncounterDeck(updateCard(moveCard(popped, id, { zone: "encounterDeck" }), id, { face: "down", controller: null })) : popped;
+  const discarded = frame.data.kind === "reveal" && frame.data.discard === true;
+  const returned = state.cards[id]
+    ? discarded
+      ? moveCard(popped, id, { zone: "encounterDiscard" })
+      : shuffleEncounterDeck(updateCard(moveCard(popped, id, { zone: "encounterDeck" }), id, { face: "down", controller: null }))
+    : popped;
   if (returned.seats[frame.seat]?.eliminated) return returned;
   return startReveal(returned, frame.seat, ctx, steps);
 }
