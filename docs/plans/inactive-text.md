@@ -76,3 +76,12 @@ These are scratch scripts over `data/`, `src/effects` and the auto-player; none 
 3. The decision on inactive events (3). Either way, the attachment warning.
 4. The table mark in place of the veil (5), then the preview and card screen (6).
 5. The core-deck requests (7) can run in parallel. They are data work for `effect-author`, not table work.
+
+## Built
+
+All seven proposals were built on 2026-10-26 (branch `ccr-c7b5b4ea-4ei4kn`; the rules are in `docs/brief.md`, Effects, layer 3, and the look in `docs/design-system.md`, Table, Card and States). Where the build differs:
+
+- The decision (3) went to not offering an event with no record (`rr.triggered-ability`). Its rows read "Cannot be played", and it opens no action window.
+- Card rows (4) put the loss in the detail line ("Ability not applied") with no extra mark beside the name.
+- The card screen (6) sets the unapplied lines apart under the Not applied eyebrow with the loss sentence. It does not mark each line in place.
+- The core decks (7) are in scope: their 42 cards have records for every line, and the four core decks are fully applied.

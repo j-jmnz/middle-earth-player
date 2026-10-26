@@ -83,3 +83,24 @@ User request: play the Fellowship of the Ring scenarios as standalone adventures
 ## Core Learn to Play decks, 2026-10-26
 
 - User request: the 42 cards of the core-set Learn to Play decks (core-leadership, core-tactics, core-spirit, core-lore) with text and no record are in scope: ledgered from the Revised Core Set scans, every printed line owned by a template record, an authored record or a keyword (`src/campaign/core-*.test.ts`); ENGINE_VERSION 6; the defense sheet gained "No more defenders" for Stand Together, and no phone check ran (cloud session).
+
+## Table experience and Not applied, 2026-10-26
+
+User requests: build every proposal in `docs/plans/table-experience.md` and `docs/plans/inactive-text.md`, following the authoritative rules. Done in a cloud session (no phone, simulator or Maestro). Green offline: `pnpm test`, `pnpm lint`, `tsc` and `pnpm data:check`.
+
+- **Not applied:** a per-line check (`src/catalog/active-text.ts`) gives the same reading as the coverage test, and the word is "Not applied". An event with no record cannot be played (`rr.triggered-ability`, user decision). An attachment with no record arms with its price. The veil is gone: a small struck ring marks the card, and the preview, the card screen, the pool rows, the deck list and editor, the briefing and the import list say what is not applied.
+- **Dock and table:** window names, the commit, travel and combat foresight (several defenders pooled), the loss caution, engagement marks and dial ticks, the threat panel, the quest objective, why a card does not glow, effects that end and come back, the banner in beats, the round summary, and the first-game guide.
+- **Settings:** `user.db` migration 0006 adds `settings`. Stops (off by default), Pass to stop, Always use for a free Response, larger cards and strong outlines all live in the turn reference behind the rail.
+- **Engine:**
+  - The Responses of one occurrence (each character of one commit) share one window, used in any order. A Response whose cost cannot be paid yet waits there (`rr.triggering-condition`).
+  - Brok's Response is not offered while a Brok is in play.
+  - Thalin hears only the encounter deck's own reveals.
+  - Dark Knowledge hears the shadow card of an attack outside combat.
+  - The golden games were re-seeded where an unplayable event changed them (`scripts/knife-game.ts`).
+- **Open (phone checks):**
+  - The struck ring's legibility on a real picture.
+  - The option and engagement marks at 51 pt cards.
+  - The banner's 650 ms beats with a real thumb.
+  - Stops and Pass to stop through a whole round.
+  - The settings surviving a relaunch.
+  - Larger cards on a 390 pt tall phone.
