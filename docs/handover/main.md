@@ -59,8 +59,10 @@ Start each from the current branch head (not d2f8a7a), with the brief.
 Done on this branch (commit "Fix known follow-ups"): event Action costs (none exist), explored leftPlay, the Refresh window,
 Mirkwood Explorer's questedSuccessfully, Dunedain Remedy's attached trigger, cancel payments spent. Rules spans for
 Battle/Siege/Archery/Guarded (X) are in data/rules (hon.*, wor.*); Trap has no official rule (card text only).
-In progress (agent `leftovers`, wip/leftovers): Battle/Siege + 06036:A:2, Imrahil's type change 145005:A:1, one path for
-putting an attachment into play (with Guarded). Left for the end: the cookbook's "Not expressible yet" section.
+Merged: leftovers (Battle/Siege + 06036:A:2, Imrahil 145005:A:1 via cardTypeOf/heroType, one PutIntoPlay path for
+attachments with Guarded per wor.guarded-x) and phase 13 (Flight to the Ford playable; burden family). Open lines: 296.
+Running: sidequests, misc, phase 14 (wip/phase-14), reviewer on phase 13 (3198cf0). Next: phases 15, 16 in order.
+Left for the end: the cookbook's "Not expressible yet" section, STATUS.md.
 
 ## After the families
 
