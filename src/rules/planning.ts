@@ -174,6 +174,8 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   }
   const printed = printedOf(ctx.cards, instance.code);
   if (printed.type !== "ally" && printed.type !== "attachment" && printed.type !== "event") return "That card cannot be played";
+  // A card with no printed cost (an ally with the Encounter keyword) is never played from the hand (rr.cost).
+  if (printed.cost == null && !printed.costX) return "That card cannot be played";
   // Events are Actions: any action window. Allies and attachments are played in the planning phase only, by the
   // player whose planning window it is (rr.step-2-2).
   if (printed.type !== "event" && state.mode !== "planning") return "That intent is not legal in this window";
