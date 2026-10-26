@@ -4,7 +4,8 @@ import { RECORDS } from "../../effects/authored/families/deck.ts";
 
 import { expectOk } from "../fixture.ts";
 import { legalIntents, reduce } from "../reduce.ts";
-import type { ScenarioState } from "../state.ts";
+import { destroyCard } from "../keywords.ts";
+import { withThreat, type ScenarioState } from "../state.ts";
 import { card, put, table } from "./costs-fixture.ts";
 
 // Rules: rr.search, rr.play-and-put-into-play, rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display,
@@ -88,11 +89,25 @@ describe("discarding from the deck", () => {
 });
 
 describe("a card going back to the hand from the discard pile", () => {
-  it("Rallying Cry's Valour Action sends allies that leave play to their owner's hand instead of the discard pile", () => {
-    const { state, ctx } = table(RECORDS, CARDS, [["lead"]]);
-    const event = put(state, "10003", "hand");
+  it("Rallying Cry's Valour Action sends every ally that leaves play this phase to its owner's hand", () => {
+    const { state, ids, ctx } = table(RECORDS, CARDS, [["lead"]]);
+    const event = put(withThreat(state, 0, 40), "10003", "hand");
     const ally = put(event.state, "cheap", "play");
-    const raised = { ...ally.state, seats: ally.state.seats.map((seat) => ({ ...seat })) } as ScenarioState;
-    expect(legalIntents(raised, ctx)).not.toContainEqual({ type: "PlayCard", cardId: event.id });
+    const played = settle(expectOk(reduce(ally.state, { type: "PlayCard", cardId: event.id, payments: [] }, ctx)).state, ctx);
+    expect(ids[0]).toBeDefined();
+    const gone = destroyCard(played, ally.id, ctx.cards, []);
+    expect(gone.cards[ally.id]?.zone).toBe("hand");
+  });
+
+  it("Rallying Cry's Valour Action is not offered below 40 threat", () => {
+    const { state, ctx } = table(RECORDS, CARDS, [["lead"]]);
+    const event = put(withThreat(state, 0, 39), "10003", "hand");
+    expect(legalIntents(event.state, ctx)).not.toContainEqual({ type: "PlayCard", cardId: event.id });
+  });
+
+  it("an ally destroyed without the Valour Action goes to the discard pile", () => {
+    const { state, ctx } = table(RECORDS, CARDS, [["lead"]]);
+    const ally = put(state, "cheap", "play");
+    expect(destroyCard(ally.state, ally.id, ctx.cards, []).cards[ally.id]?.zone).toBe("discard");
   });
 });

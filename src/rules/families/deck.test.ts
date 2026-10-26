@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { RECORDS } from "../../effects/authored/families/deck.ts";
 
 import { expectOk } from "../fixture.ts";
-import { legalIntents, reduce } from "../reduce.ts";
-import type { ScenarioState } from "../state.ts";
+import { reduce } from "../reduce.ts";
+import { withThreat, type ScenarioState } from "../state.ts";
 import { card, put, table } from "./costs-fixture.ts";
 
 // Rules: rr.search, rr.play-and-put-into-play, rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display,
@@ -76,5 +76,15 @@ describe("searching the deck", () => {
     const done = used.window?.kind === "choose" ? chosen(used, ctx, used.window.options[0] ?? "") : used;
     expect(done.seats[0].hand.length).toBe(1);
     expect(done.seats[0].deck.length).toBe(1);
+  });
+
+  it("Soldier of Gondor takes any number of Gondor allies at threat 40 or higher", () => {
+    const { state, ids, ctx } = table(RECORDS, CARDS, [["lead"]]);
+    const first = put(put(withThreat(state, 0, 40), "gondor", "deck").state, "gondor", "deck");
+    const ally = put(put(first.state, "gondor", "deck").state, "22002", "hand");
+    const played = expectOk(reduce(ally.state, { type: "PlayCard", cardId: ally.id, payments: [{ heroId: ids[0]?.[0] ?? "", amount: 1 }] }, ctx)).state;
+    let next = expectOk(reduce(played, { type: "Trigger", cardId: ally.id, effectId: "22002:response:1" }, ctx)).state;
+    for (let guard = 0; guard < 10 && next.window?.kind === "choose"; guard += 1) next = chosen(next, ctx, next.window.options.find((option) => option !== "done") ?? "");
+    expect(next.seats[0].hand.length).toBeGreaterThanOrEqual(2);
   });
 });
