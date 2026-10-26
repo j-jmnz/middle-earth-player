@@ -1,5 +1,8 @@
 // Rules: rr.response, mec109.peril (data/rules/entries.json).
+import { costOfKind } from "../catalog/costs.ts";
+
 import { holds } from "./conditions.ts";
+import { aboutCard, effectsOf, hears, hearsFromAnywhere } from "./listen.ts";
 import { playableFromDeck } from "./deck-play.ts";
 import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
@@ -25,21 +28,24 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
     // An event card in the hand hears every event; a card in play hears the events about itself or about the table. The
     // top card of a deck its controller may play as if it were in the hand (Gandalf, 142002) is in the hand for this.
     const inHand = instance.zone === "hand" || (instance.zone === "deck" && instance.controller != null && playableFromDeck(state, instance.id, instance.controller, ctx));
-    if (event.cardId != null ? instance.id !== event.cardId : !(inPlay(instance.zone) || inHand)) continue;
+    const records = effectsOf(ctx, instance.code).filter((effect) => effect.timing === "response" && hears(state, effect, instance, event, ctx));
+    if (records.length === 0) continue;
     // A card nobody controls (a quest or encounter card) is answered by the first player, or, while a Peril card's
     // staging resolves, by the revealing player: the other players are the ones Peril keeps out (mec109.peril).
     const locked = perilLock(state);
     const seat = instance.controller == null && locked != null ? locked : controllerSeat(state, instance);
     // Peril: the other seats cannot trigger Responses while the card resolves.
     if (!order.includes(seat) || (locked != null && seat !== locked)) continue;
-    for (const effect of ctx.effects) {
-      if (effect.timing !== "response" || effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;
-      // Only an event used from the hand has a Response there.
-      if (inHand !== (effect.cost?.kind === "playEvent")) continue;
-      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.subject ? { subject: event.subject } : {}), ...(event.explored ? { explored: true } : {}) };
+    for (const effect of records) {
+      // Only an event used from the hand has a Response there; any other listens in play, or from wherever its card went
+      // for an event about itself ("After ~ leaves play").
+      const fromHand = costOfKind(effect, "playEvent") != null;
+      if (fromHand ? !inHand : !(inPlay(instance.zone) || hearsFromAnywhere(effect, instance, event))) continue;
+      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
-      if (!usable(state, effect, instance.id, seat, ctx)) continue;
-      offers.push({ cardId: instance.id, effectId: effect.id, seat });
+      // "Any player may trigger this response": each seat is offered it, the controller first.
+      const seats = effect.anyPlayer ? [seat, ...order.filter((other) => other !== seat)] : [seat];
+      for (const offered of seats) if (usable(state, effect, instance.id, offered, ctx)) offers.push({ cardId: instance.id, effectId: effect.id, seat: offered });
     }
   }
   return offers.sort((left, right) => order.indexOf(left.seat) - order.indexOf(right.seat));
@@ -116,7 +122,9 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
       cause: effectCause(effect),
       eventSeat: frame.data.event.seat,
       ...(frame.data.event.participants ? { participants: frame.data.event.participants } : {}),
-      ...(effect.cost?.kind === "playEvent" ? { finish: "discardSource" as const } : {}),
+      ...(aboutCard(frame.data.event) ? { subject: aboutCard(frame.data.event) } : {}),
+      ...(frame.data.event.other ? { other: frame.data.event.other } : {}),
+      ...(costOfKind(effect, "playEvent") ? { finish: "discardSource" as const } : {}),
     },
     steps,
   );

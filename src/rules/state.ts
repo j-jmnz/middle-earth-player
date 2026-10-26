@@ -229,6 +229,9 @@ export type ScenarioState = {
   pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
+  // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first
+  // Rohan ally you play each round"). Only this round's are kept.
+  played?: readonly { id: string; code: string; seat: number; round: number }[];
   undo: UndoLog;
 };
 
@@ -417,6 +420,13 @@ export function modifierActive(state: ScenarioState, modifier: Modifier): boolea
 // A flag modifier (cannotAttack, cannotTakeDamage, ...) is on the card.
 export function flagged(state: ScenarioState, id: string, stat: Modifier["stat"]): boolean {
   return state.modifiers.some((modifier) => modifier.stat === stat && modifier.instanceId === id && modifier.amount > 0 && modifierActive(state, modifier));
+}
+
+// The sum of a number modifier held by one card ("collects 1 additional resource", extraResource).
+export function heldAmount(state: ScenarioState, id: string, stat: Modifier["stat"]): number {
+  let total = 0;
+  for (const modifier of state.modifiers) if (modifier.stat === stat && modifier.instanceId === id && modifierActive(state, modifier)) total += modifier.amount;
+  return total;
 }
 
 // Drops modifiers that end at one of these boundaries, and any that outlived their source.

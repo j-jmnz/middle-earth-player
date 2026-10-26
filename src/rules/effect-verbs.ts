@@ -1,5 +1,6 @@
 import type { Instruction } from "../catalog/boundary.ts";
 
+import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
 import { runQuestResolution } from "./explore.ts";
 import type { EngineStep } from "./intents.ts";
@@ -30,10 +31,19 @@ export function drawVerb(
 ): ScenarioState {
   const data = topFrame(state)?.data;
   const target =
-    instruction.who === "picked" ? seatOf(lastPicked(state)) : instruction.who === "eventSeat" ? (data?.kind === "effect" ? (data.eventSeat ?? null) : null) : seat;
+    instruction.who === "picked"
+      ? seatOf(lastPicked(state))
+      : instruction.who === "eventSeat"
+        ? data?.kind === "effect"
+          ? (data.eventSeat ?? null)
+          : null
+        : instruction.who === "firstPlayer"
+          ? state.firstPlayer
+          : seat;
   if (target == null) return state;
   const trait = instruction.perHero;
-  const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * (instruction.amount ?? 1);
+  const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, seat, topFrame(state)?.cardId ?? null), ctx);
+  const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * amount;
   let next = state;
   for (let draw = 0; draw < count; draw += 1) next = drawOne(next, target, steps, UNATTRIBUTED);
   return next;

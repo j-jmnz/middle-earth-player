@@ -1,6 +1,8 @@
 // Rules: rr.restricted, rr.resource-match (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
+import { resolveAmount } from "./amounts.ts";
+import { effectsOf } from "./listen.ts";
 import { ruleCause } from "./cause.ts";
 import { characters } from "./combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
@@ -17,8 +19,8 @@ type AttachRule = Extract<Instruction, { verb: "AttachesTo" }>;
 
 // The "Attach to ..." line of an attachment, as its constant record. A card with no record may go on any character.
 export function attachRule(ctx: ReduceContext, code: string): AttachRule | undefined {
-  for (const effect of ctx.effects) {
-    if (effect.cardCode !== code || effect.timing !== "constant") continue;
+  for (const effect of effectsOf(ctx, code)) {
+    if (effect.timing !== "constant") continue;
     for (const instruction of effect.instructions) if (instruction.verb === "AttachesTo") return instruction;
   }
   return undefined;
@@ -61,12 +63,14 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
   if (printed.cost == null) return null;
   let cost = printed.cost;
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
-  for (const effect of ctx.effects) {
-    if (effect.cardCode !== instance.code || effect.timing !== "constant") continue;
+  // Secrecy X: X less while the player's threat is 20 or less.
+  if (printed.keywords.secrecy != null && (state.seats[seat]?.threat ?? 99) <= 20) cost -= printed.keywords.secrecy;
+  for (const effect of effectsOf(ctx, instance.code)) {
+    if (effect.timing !== "constant") continue;
     for (const instruction of effect.instructions) {
       if (instruction.verb !== "ReduceCost") continue;
       if (instruction.when && !holds(state, instruction.when, scope, ctx)) continue;
-      cost -= instruction.amount;
+      cost -= resolveAmount(state, instruction.amount, { actor: seat, sourceId: cardId }, ctx);
     }
   }
   return Math.max(0, cost);

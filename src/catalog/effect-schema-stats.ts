@@ -1,7 +1,9 @@
 // Stat modifiers in effect records: what a modifier changes, how long it lasts, and the ModifyStat instruction.
 import { z } from "zod";
 
+import { amountSchema } from "./effect-schema-amount.ts";
 import { when } from "./effect-schema-conditions.ts";
+import { pickSchema } from "./effect-schema-pick.ts";
 
 
 // `whileSourceInVictory`: a constant that works from the victory display ("While Weathertop is in the victory display",
@@ -28,12 +30,34 @@ export const modifierStatSchema = z.enum([
   "cannotTakeNonCombatDamage",
   "cannotBeEngaged",
   "cannotBeOptionallyEngaged",
+  // Flags a player card gives or takes away. A keyword gained ("Attached hero gains sentinel"); a character that does not
+  // exhaust to commit to the quest, to attack or to defend; one that cannot commit to the quest or defend (cannotAttack bars
+  // its attacks too); one that cannot have attachments; one that does not ready in the refresh phase; a card in the staging
+  // area that does not contribute its Threat; an enemy that does not make engagement checks.
+  "sentinel",
+  "ranged",
+  "noExhaustQuest",
+  "noExhaustAttack",
+  "noExhaustDefend",
+  "cannotQuest",
+  "cannotDefend",
+  "cannotHaveAttachments",
+  "doesNotReady",
+  "noThreatContribution",
+  "noEngagementChecks",
+  // Numbers a seat or a hero holds: cards drawn beyond the one in the resource phase (on "seat:N"), resources a hero
+  // collects beyond the one, restricted attachments a character may have beyond two.
+  "extraDraw",
+  "extraResource",
+  "extraRestricted",
 ]);
 
 export const modifyStatSchema = z.strictObject({
   verb: z.literal("ModifyStat"),
   stat: modifierStatSchema,
-  amount: z.number().int(),
+  // A number, or one the engine reads ("+1 Attack for each enemy engaged with you"): when the effect resolves for a lasting
+  // effect, each time the constant records are rebuilt for a constant.
+  amount: amountSchema,
   until: modifierUntilSchema,
   // Whose stat changes. The default is the source card. `attacker` is the enemy in the attack in progress.
   // `host` is the card the source is attached to. `table` is every seat. `engagedSeat` is the seat the
@@ -44,12 +68,17 @@ export const modifyStatSchema = z.strictObject({
   // every hero the actor controls: all fixed when the effect resolves.
   // `defender` is the character defending the attack in progress (141052:A:2). `allies` is every ally in play: from an
   // encounter card's lasting effect it also holds for allies that enter play later (rr.lasting-effects, 141071:A:1).
-  // `engagedSeatCharacters` is every character of the player the source is engaged with (141050:A:2).
+  // `engagedSeatCharacters` is every character of the player the source is engaged with (141050:A:2). `subject` is the card
+  // the event a Response answers was about. `actorSeat` and `pickedSeat` hold a seat number (extraDraw).
   target: z
-    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters"])
+    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters", "subject", "actorSeat", "pickedSeat"])
     .optional(),
   // Only holders with this trait ("Spy enemies get +1 Threat", 141047:A:1).
   trait: z.string().min(1).optional(),
+  // Every card that matches, from the source controller's side, instead of `target` ("Each Outlands character you control
+  // gets +1 Attack", "Each enemy engaged with you gets -1 Defense"): read when the effect resolves, or for a constant each time
+  // its records are rebuilt.
+  holders: pickSchema.optional(),
   // Multiplies the amount by this count when the stat is read. `hobbitHero` is the Hobbit heroes the source's controller has.
   per: z.enum(["committed", "ally", "hobbitHero", "x"]).optional(),
   ...when,

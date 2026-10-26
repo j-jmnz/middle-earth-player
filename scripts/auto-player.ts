@@ -1,7 +1,9 @@
+import { costOfKind } from "../src/catalog/costs.ts";
 import { playCost } from "../src/rules/attach.ts";
 import { expectOk } from "../src/rules/fixture.ts";
 import { heroPays } from "../src/rules/payments.ts";
 import { printedOf } from "../src/rules/printed.ts";
+import { costPayer } from "../src/rules/usage.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "../src/rules/intents.ts";
 import { legalIntents, legalTargets, reduce, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
 
@@ -70,11 +72,13 @@ function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory): P
     if (!effect || !source) continue;
     const seat = state.activeSeat;
     let paid: { heroId: string; amount: number }[] | null = [];
-    if (effect.cost?.kind === "playEvent") {
+    const resources = costOfKind(effect, "resources");
+    if (costOfKind(effect, "playEvent")) {
       const cost = playCost(state, intent.cardId, seat, ctx);
       paid = cost == null ? null : paymentsFor(state, ctx, seat, intent.cardId, cost);
-    } else if (effect.cost?.kind === "resources") {
-      paid = paymentsFor(state, ctx, seat, intent.cardId, effect.cost.amount);
+    } else if (resources) {
+      const payer = costPayer(state, resources, source);
+      paid = payer === null ? null : payer !== undefined ? [{ heroId: payer, amount: resources.amount }] : paymentsFor(state, ctx, seat, intent.cardId, resources.amount);
     }
     if (!paid) continue;
     memory.add(key);

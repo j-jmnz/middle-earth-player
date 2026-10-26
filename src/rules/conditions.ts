@@ -2,7 +2,8 @@ import type { Condition } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
-import { pickCandidates } from "./pick.ts";
+import { effectsOf } from "./listen.ts";
+import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
@@ -21,7 +22,31 @@ export type Scope = {
   explored?: boolean;
   // The seat the event a Response answers happened to.
   eventSeat?: number | null;
+  // What the running effect has picked, and the other card the answered event names.
+  picked?: readonly string[];
+  other?: string;
 };
+
+// The card a `matches` condition reads.
+function conditionCard(state: ScenarioState, card: Extract<Condition, { kind: "matches" }>["card"], scope: Scope): string | null {
+  const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
+  switch (card) {
+    case "self":
+      return scope.sourceId;
+    case "host":
+      return source?.host ?? null;
+    case "subject":
+      return scope.subject ?? null;
+    case "activeLocation":
+      return state.activeLocation;
+    case "picked":
+      return scope.picked?.at(-1) || null;
+    case "attacker":
+      return state.pendingAttack?.enemyId ?? state.pendingStrike?.enemyId ?? null;
+    case "defender":
+      return state.pendingAttack?.defenderId ?? null;
+  }
+}
 
 export function holds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean {
   switch (condition.kind) {
@@ -109,6 +134,34 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       );
       return found === condition.is;
     }
+    case "count": {
+      const found = countMatching(state, condition.pick, scope.actor, scope.sourceId, ctx);
+      return (condition.min == null || found >= condition.min) && (condition.max == null || found <= condition.max);
+    }
+    case "allMatch": {
+      const of = pickCandidates(state, condition.of, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true);
+      const at = { seat: scope.actor, sourceId: scope.sourceId, counting: true };
+      return of.length > 0 && of.every((id) => matchesPick(state, id, condition.match, at, ctx));
+    }
+    case "threat": {
+      const threat = state.seats[scope.actor]?.threat ?? 0;
+      return (condition.min == null || threat >= condition.min) && (condition.max == null || threat <= condition.max);
+    }
+    case "matches": {
+      const id = conditionCard(state, condition.card, scope);
+      return id != null && matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId: null, counting: true }, ctx);
+    }
+    case "copiesPlayedThisRound": {
+      const code = scope.sourceId ? state.cards[scope.sourceId]?.code : undefined;
+      const played = (state.played ?? []).filter((entry) => entry.round === state.round && entry.code === code && entry.id !== scope.sourceId).length;
+      return played <= condition.max;
+    }
+    case "not":
+      return !holds(state, condition.condition, scope, ctx);
+    case "all":
+      return condition.conditions.every((inner) => holds(state, inner, scope, ctx));
+    case "any":
+      return condition.conditions.some((inner) => holds(state, inner, scope, ctx));
     case "attachedToHero":
       return (
         Object.values(state.cards).some((card) => {
@@ -139,8 +192,8 @@ function grants(state: ScenarioState, id: string, ctx: ReduceContext): { trait?:
   for (const attachmentId of instance.attachments) {
     const attachment = state.cards[attachmentId];
     if (!attachment) continue;
-    for (const effect of ctx.effects) {
-      if (effect.cardCode !== attachment.code || effect.timing !== "constant") continue;
+    for (const effect of effectsOf(ctx, attachment.code)) {
+      if (effect.timing !== "constant") continue;
       const scope = { actor: attachment.controller ?? state.firstPlayer, sourceId: attachment.id, returned: 0 };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       for (const instruction of effect.instructions) {

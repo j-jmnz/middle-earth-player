@@ -1,6 +1,7 @@
 // Rules: rr.exhausted, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.damage, rr.explored, rr.cancel, rr.shadow-effects, rr.restricted, rr.initiating-abilities-playing-cards (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
+import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
 import { characters, strikeEnemy } from "./combat.ts";
 import { enforceRestricted } from "./attach.ts";
@@ -12,7 +13,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { lowerThreat, placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
-import { inPlay, livingSeats, updateCard, withSeat } from "./state.ts";
+import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "./state.ts";
 import { printedOf } from "./printed.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
@@ -44,10 +45,17 @@ export function otherSeat(state: ScenarioState, seat: number): number | null {
   return next == null || next === seat ? null : next;
 }
 
-function seatsFor(state: ScenarioState, who: "actor" | "picked" | "eachSeat", actor: number): number[] {
+// The seats a verb names: the actor's, each living one, the picked player's, or the one the answered event happened to.
+export function seatsFor(state: ScenarioState, who: "actor" | "picked" | "eachSeat" | "eventSeat" | "firstPlayer", actor: number): number[] {
   if (who === "eachSeat") return livingSeats(state);
+  if (who === "firstPlayer") return [state.firstPlayer];
   if (who === "picked") {
     const seat = seatOf(lastPicked(state));
+    return seat == null ? [] : [seat];
+  }
+  if (who === "eventSeat") {
+    const data = topFrame(state)?.data;
+    const seat = data?.kind === "effect" ? data.eventSeat : null;
     return seat == null ? [] : [seat];
   }
   return [actor];
@@ -63,9 +71,9 @@ export function runPlayerVerb(
 ): ScenarioState | null {
   switch (instruction.verb) {
     case "Ready": {
-      if (instruction.target === "picked") {
-        const id = lastPicked(state);
-        return state.cards[id] ? updateCard(state, id, { exhausted: false }) : state;
+      if (instruction.target === "picked" || instruction.target === "subject" || instruction.target === "defender") {
+        const id = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) ?? "";
+        return state.cards[id] ? readyCard(state, id) : state;
       }
       if (instruction.target === "host") {
         const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
@@ -77,23 +85,60 @@ export function runPlayerVerb(
       return next;
     }
     case "Exhaust": {
-      if (instruction.target?.kind !== "picked") return null;
-      const id = lastPicked(state);
-      return state.cards[id] ? updateCard(state, id, { exhausted: true }) : state;
+      if (instruction.target?.kind !== "picked" && instruction.target?.kind !== "ref") return null;
+      const ref = instruction.target.kind === "ref" ? instruction.target.ref : "picked";
+      const id = refCard(state, ref, frameScope(state, focus.seat, focus.sourceId)) ?? "";
+      return state.cards[id] ? exhaustCard(state, id) : state;
     }
+    case "Heal": {
+      const scope = frameScope(state, focus.seat, focus.sourceId);
+      const id = refCard(state, instruction.target ?? "picked", scope) ?? "";
+      const card = state.cards[id];
+      if (!card || card.damage <= 0) return state;
+      const amount = instruction.all ? card.damage : Math.min(card.damage, resolveAmount(state, instruction.amount ?? 1, scope, ctx));
+      if (amount <= 0) return state;
+      return queueEvent(updateCard(state, id, { damage: card.damage - amount }), { trigger: "healed", seat: card.controller, cardId: id });
+    }
+    case "PutOnDeck": {
+      const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
+      return putOnDeck(state, id, instruction.position);
+    }
+    case "MoveResources": {
+      const list = pickedList(state);
+      const from = state.cards[list.at(-2) ?? ""];
+      const to = state.cards[list.at(-1) ?? ""];
+      if (!from || !to || from.id === to.id) return state;
+      const amount = instruction.all ? from.resources : Math.min(from.resources, resolveAmount(state, instruction.amount ?? 1, frameScope(state, focus.seat, focus.sourceId), ctx));
+      if (amount <= 0) return state;
+      return updateCard(updateCard(state, from.id, { resources: from.resources - amount }), to.id, { resources: to.resources + amount });
+    }
+    case "AddToVictory": {
+      const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
+      return state.cards[id] ? moveCard(state, id, { zone: "victory" }) : state;
+    }
+    case "SetThreat":
+      return withThreat(state, focus.seat, instruction.value);
     case "LowerThreat": {
+      const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
       let next = state;
-      for (const seat of seatsFor(state, instruction.who, focus.seat)) next = lowerThreat(next, seat, instruction.amount, steps, currentCause(steps, UNATTRIBUTED));
+      for (const seat of seatsFor(state, instruction.who, focus.seat)) next = lowerThreat(next, seat, amount, steps, currentCause(steps, UNATTRIBUTED));
       return next;
     }
     case "DamageCard": {
-      const id = lastPicked(state);
-      return state.cards[id] ? placeDamage(state, id, instruction.amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED)) : state;
+      const scope = frameScope(state, focus.seat, focus.sourceId);
+      const id = refCard(state, instruction.target ?? "picked", scope) ?? "";
+      const amount = resolveAmount(state, instruction.amount, scope, ctx);
+      return state.cards[id] && amount > 0 ? placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED)) : state;
     }
     case "PlaceProgressOn": {
-      const targets = instruction.target === "picked" ? [lastPicked(state)] : stagingLocations(state, ctx.cards);
+      const scope = frameScope(state, focus.seat, focus.sourceId);
+      const targets =
+        instruction.target === "eachStagingLocation"
+          ? stagingLocations(state, ctx.cards)
+          : [refCard(state, instruction.target === "self" ? "self" : instruction.target, scope) ?? ""];
+      const amount = resolveAmount(state, instruction.amount, scope, ctx);
       let next = state;
-      for (const id of targets) if (next.cards[id]) next = placeProgress(next, id, instruction.amount, ctx, steps);
+      for (const id of targets) if (next.cards[id] && amount > 0) next = placeProgress(next, id, amount, ctx, steps);
       return next;
     }
     case "GiveControl": {
@@ -159,7 +204,7 @@ export function runPlayerVerb(
       return queueEvent(entered, { trigger: "enteredPlay", seat, cardId: id });
     }
     case "ReturnToHand": {
-      const id = lastPicked(state);
+      const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
       const card = state.cards[id];
       if (!card || !inPlay(card.zone) || card.controller == null) return state;
       const returned = moveCard(state, id, { zone: "hand", seat: card.owner ?? card.controller });
@@ -224,4 +269,32 @@ function cancelAnswered(state: ScenarioState): ScenarioState {
     return { ...state, stack };
   }
   return state;
+}
+
+// A card readies or exhausts, and the Responses that hear it are told ("After ~ readies", "After ~ exhausts").
+export function readyCard(state: ScenarioState, id: string): ScenarioState {
+  const card = state.cards[id];
+  if (!card?.exhausted) return state;
+  return queueEvent(updateCard(state, id, { exhausted: false }), { trigger: "readied", seat: card.controller, cardId: id });
+}
+
+export function exhaustCard(state: ScenarioState, id: string): ScenarioState {
+  const card = state.cards[id];
+  if (!card || card.exhausted) return state;
+  return queueEvent(updateCard(state, id, { exhausted: true }), { trigger: "exhausted", seat: card.controller, cardId: id });
+}
+
+// A player card goes on top or at the bottom of its owner's deck, or is shuffled in. Only a player card has a deck to go to.
+export function putOnDeck(state: ScenarioState, id: string, position: "top" | "bottom" | "shuffle"): ScenarioState {
+  const card = state.cards[id];
+  const seat = card ? (card.owner ?? card.controller) : null;
+  if (!card || seat == null) return state;
+  const moved = moveCard(state, id, { zone: "deck", seat });
+  const pile = moved.seats[seat];
+  if (!pile) return moved;
+  const rest = pile.deck.filter((entry) => entry !== id);
+  if (position === "top") return withSeat(moved, seat, { ...pile, deck: [id, ...rest] });
+  if (position === "bottom") return withSeat(moved, seat, { ...pile, deck: [...rest, id] });
+  const shuffled = shuffleIds(pile.deck, moved.seed, moved.seedCursor);
+  return { ...withSeat(moved, seat, { ...pile, deck: shuffled.ids }), seedCursor: shuffled.cursor };
 }

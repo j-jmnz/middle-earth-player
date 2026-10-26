@@ -15,12 +15,12 @@ import { hideCommitReason, hideCommitters } from "./hide.ts";
 import type { LegalIntent, PlayerIntent, Selection } from "./intents.ts";
 import { suppliesNumber } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { printedOf } from "./printed.ts";
-import { attachmentTargets, playReason, playWindowReason } from "./planning.ts";
+import { hasKeyword } from "./keywords.ts";
+import { attachmentTargets, discardPlayable, playReason, playWindowReason } from "./planning.ts";
 import { resolutionIntents, resolutionReason } from "./resolution.ts";
 import { optionalEnemies, stagingLocations } from "./quest.ts";
 import { defenseBlocked, travelBlocked, travelCostUnpayable } from "./restrictions.ts";
-import { perilLock, type ScenarioState } from "./state.ts";
+import { flagged, perilLock, type ScenarioState } from "./state.ts";
 
 const NUMBER = "The engine computes that number";
 
@@ -165,7 +165,7 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   // Events are Actions and may be played in any action window; allies and attachments in the planning phase.
   // The top card of the deck too, when a hero lets the seat play it (Gandalf).
   const top = state.seats[state.activeSeat]?.deck[0];
-  for (const cardId of [...(state.seats[state.activeSeat]?.hand ?? []), ...(top ? [top] : [])]) {
+  for (const cardId of [...(state.seats[state.activeSeat]?.hand ?? []), ...(top ? [top] : []), ...discardPlayable(state, state.activeSeat, ctx)]) {
     if (playWindowReason(state, cardId, ctx) === null) intents.push({ type: "PlayCard", cardId });
   }
   if (state.mode === "questCommit") intents.push({ type: "Commit" });
@@ -186,7 +186,7 @@ function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] 
 function committers(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
   return characters(state, seat, ctx.cards).filter((id) => {
     const instance = state.cards[id];
-    return instance != null && !instance.exhausted && !instance.committed;
+    return instance != null && !instance.exhausted && !instance.committed && !flagged(state, id, "cannotQuest");
   });
 }
 
@@ -243,8 +243,7 @@ function defenderReason(
   const defender = state.cards[intent.defenderId];
   if (!defender) return "That character cannot defend";
   if (defender.controller !== state.pendingAttack.seat) {
-    const printed = printedOf(ctx.cards, defender.code);
-    if (!printed.keywords.sentinel) return "Sentinel is required to defend for another seat";
+    if (!hasKeyword(state, defender.id, "sentinel", ctx.cards)) return "Sentinel is required to defend for another seat";
   }
   if (!canDefend(state, state.pendingAttack.seat, intent.defenderId, ctx.cards)) return "That character cannot defend";
   if (defenseBlocked(state, ctx, intent.defenderId)) return "That character cannot defend this enemy's attack";

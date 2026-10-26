@@ -32,11 +32,11 @@ import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
 import { crossBoundary } from "./triggers.ts";
-import { constantWin } from "./constants.ts";
+import { constantWin, heldStat, NO_COUNTS } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
-import { livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
+import { flagged, livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
 import { clearEliminated, destroyOverwhelmed } from "./keywords.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -200,7 +200,11 @@ function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
 function grant(state: ScenarioState, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const seat of livingSeats(next)) next = gainSeatResources(next, seat, steps, ruleCause("rr.step-1-2"));
-  for (const seat of livingSeats(next)) next = drawOne(next, seat, steps, ruleCause("rr.step-1-3"));
+  for (const seat of livingSeats(next)) {
+    // A card that lets its player draw additional cards in the resource phase holds an extraDraw on the seat.
+    const draws = 1 + heldStat(next, seat, "extraDraw", NO_COUNTS);
+    for (let draw = 0; draw < draws; draw += 1) next = drawOne(next, seat, steps, ruleCause("rr.step-1-3"));
+  }
   return openPass(withMode(next, "resourceActions"));
 }
 
@@ -305,7 +309,8 @@ function chooseEnemy(
 function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const id of cardIds) {
-    next = updateCard(next, id, { committed: true, exhausted: true });
+    // "Does not exhaust to commit to a quest" (a flag) leaves the character ready.
+    next = updateCard(next, id, { committed: true, exhausted: !flagged(next, id, "noExhaustQuest") });
     steps.push({ kind: "commit", cardId: id });
     next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id });
   }

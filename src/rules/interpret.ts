@@ -5,14 +5,15 @@ import type { EngineStep } from "./intents.ts";
 import { placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { modifyStat } from "./attack-verbs.ts";
-import { runPlayerVerb } from "./player-verbs.ts";
+import { frameScope, refCard } from "./amounts.ts";
+import { exhaustCard, readyCard, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "./frames.ts";
 import { runSetupVerb } from "./setup-verbs.ts";
 import { engageEnemy, stagingEnemies, stagingLocations } from "./quest.ts";
 import { travelNow } from "./travel.ts";
 import type { ScenarioState } from "./state.ts";
-import { inPlay, updateCard } from "./state.ts";
+import { heldAmount, inPlay, updateCard } from "./state.ts";
 import { raiseFor, runExtraVerb } from "./verbs.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
@@ -99,8 +100,9 @@ export function runInstruction(
       return traveled ?? { ...state, failure: "Travel was refused" };
     }
     case "Engage": {
-      const enemyId = stagingEnemies(state, ctx.cards)[0];
-      if (!enemyId) return state;
+      const enemyId = instruction.target ? refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) : stagingEnemies(state, ctx.cards)[0];
+      const enemy = enemyId ? state.cards[enemyId] : undefined;
+      if (!enemyId || !enemy || (enemy.zone === "engaged" && enemy.controller === focus.seat)) return state;
       return engageEnemy(state, focus.seat, enemyId, steps);
     }
     case "DealShadow":
@@ -116,10 +118,10 @@ export function runInstruction(
       const id = code
         ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone) && (payer == null || card.controller === payer))?.id
         : focus.sourceId;
-      return id ? updateCard(state, id, { exhausted: true }) : state;
+      return id ? exhaustCard(state, id) : state;
     }
     case "Ready":
-      return focus.sourceId ? updateCard(state, focus.sourceId, { exhausted: false }) : state;
+      return focus.sourceId ? readyCard(state, focus.sourceId) : state;
     case "Commit":
       return focus.sourceId
         ? updateCard(state, focus.sourceId, { committed: true, exhausted: true })
@@ -157,8 +159,10 @@ export function gainSeatResources(state: ScenarioState, seat: number, steps: Eng
   for (const heroId of heroes) {
     const hero = next.cards[heroId];
     if (!hero) continue;
-    next = updateCard(next, heroId, { resources: hero.resources + 1 });
-    steps.push({ kind: "gainResource", seat, heroId, cause: currentCause(steps, fallback) });
+    // A hero that "collects 1 additional resource" holds an extraResource.
+    const gained = 1 + Math.max(0, heldAmount(next, heroId, "extraResource"));
+    next = updateCard(next, heroId, { resources: hero.resources + gained });
+    for (let count = 0; count < gained; count += 1) steps.push({ kind: "gainResource", seat, heroId, cause: currentCause(steps, fallback) });
   }
   return next;
 }

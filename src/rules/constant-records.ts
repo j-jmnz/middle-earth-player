@@ -1,6 +1,7 @@
 import { isStatCondition, type Effect, type Instruction } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
+import { effectsOf } from "./listen.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { inPlay } from "./state.ts";
@@ -20,8 +21,8 @@ export function* constantInstructions(state: ScenarioState, ctx: ReduceContext):
     .filter((instance) => inPlay(instance.zone) || instance.zone === "victory")
     .sort((left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }));
   for (const source of sources) {
-    for (const effect of ctx.effects) {
-      if (effect.timing !== "constant" || effect.cardCode !== source.code) continue;
+    for (const effect of effectsOf(ctx, source.code)) {
+      if (effect.timing !== "constant") continue;
       if ((source.zone === "victory") !== fromVictory(effect)) continue;
       const scope = { actor: source.controller ?? state.firstPlayer, sourceId: source.id, returned: 0 };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;

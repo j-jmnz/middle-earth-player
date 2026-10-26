@@ -83,6 +83,10 @@ export type EffectData = {
   x?: number;
   // The characters that took part in the attack a Response answers.
   participants?: readonly string[];
+  // The card the event a Response or Forced effect answers was about ("that ally", "that enemy"), and the other card it
+  // names (the enemy a character defends against).
+  subject?: string;
+  other?: string;
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
@@ -101,7 +105,8 @@ export type HideData = {
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; participants?: readonly string[]; explored?: boolean };
+// `other` is a second card the event names: the enemy a character defends against or attacks.
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean };
 
 // A Response a player may use after an event. It is offered once and may be passed.
 export type ResponseOffer = { cardId: string; effectId: string; seat: number };
@@ -142,7 +147,8 @@ export type DelayedEffect = {
 };
 
 // One use of an effect with a limit. A oncePerPhase use is spent in the round and phase it was made.
-export type UsedEffect = { effectId: string; sourceId: string; round: number; phase: string; seat?: number };
+// `game` keeps the use for the rest of the game (a once-per-game limit); `attack` names the attack it was made in.
+export type UsedEffect = { effectId: string; sourceId: string; round: number; phase: string; seat?: number; game?: boolean; attack?: string };
 
 export type HideFailure = { seat: number; round: number; phase: string };
 

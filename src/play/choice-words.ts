@@ -115,8 +115,8 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
 export function branchThreat(choose: ChooseInstruction, optionId: string): number | null {
   const option = choose.options.find((entry) => entry.id === optionId);
   for (const instruction of option?.instructions ?? []) {
-    if (instruction.verb === "RaiseThreat" && !instruction.perCommitted) return instruction.amount ?? 1;
-    if (instruction.verb === "LowerThreat") return -instruction.amount;
+    if (instruction.verb === "RaiseThreat" && !instruction.perCommitted) return typeof instruction.amount === "object" ? null : (instruction.amount ?? 1);
+    if (instruction.verb === "LowerThreat") return typeof instruction.amount === "object" ? null : -instruction.amount;
   }
   return null;
 }

@@ -1,5 +1,6 @@
 // Rules: rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display (data/rules/entries.json).
 import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
+import { queueEvent } from "./queue.ts";
 import { inPlay, updateCard, withSeat } from "./state.ts";
 
 export type Destination =
@@ -206,7 +207,10 @@ export function moveCard(state: ScenarioState, id: string, dest: Destination): S
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if (leavingPlay && current.host) next = unhost(next, id);
-  const moved = stampEntry(attach(next, id, dest), id, current.zone);
+  let moved = stampEntry(attach(next, id, dest), id, current.zone);
+  // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
+  // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
+  if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
   // An enemy that leaves play takes its dealt shadow cards to the encounter discard (Learn to Play p16).
   // Staging and engaged are the zones an enemy is in play.
   if (dest.zone !== "engaged" && dest.zone !== "staging") {

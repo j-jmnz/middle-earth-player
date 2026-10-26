@@ -7,6 +7,7 @@ import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hideStep, pushHide } from "./hide.ts";
 import { raiseThreat } from "./keywords.ts";
+import { queueEvent } from "./queue.ts";
 import { offerResponses, responseStep } from "./responses.ts";
 import { printedOf } from "./printed.ts";
 import { livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "./state.ts";
@@ -105,6 +106,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       next = updateCard(next, id, { face: "up", controller: seat });
       steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
+      // "After an enemy is added to the staging area" hears the card arrive.
+      next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
       next = patchTop(next, { step: 1 });
       // A card just revealed from the encounter deck: a Response may cancel its effects before any of them resolves.
       return frame.data.fromDeck ? offerResponses(next, { trigger: "encounterRevealed", seat, subject: id }, ctx, steps) : next;

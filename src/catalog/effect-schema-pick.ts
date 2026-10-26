@@ -1,26 +1,38 @@
-// What a Pick offers in an effect record, and who makes a choice.
+// What a Pick offers in an effect record, and who makes a choice. The same filter counts cards (an amount, a condition),
+// names the holders of a constant modifier, and says which cards a trigger hears about.
 import { z } from "zod";
 
 export const whoSchema = z.enum(["actor", "firstPlayer"]);
 
-// The cards or players a Pick offers. `control` is whose cards: yours, or any player's. `from` is the zone group: in play (the
-// default), the hand, or the discard pile. `state` keeps only ready or only exhausted cards. `different` leaves out cards this
-// effect has already picked. `attackableByPicked` keeps the enemies the last picked character could attack. `type: player` picks a
-// seat that is still in the game.
+export const sphereSchema = z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]);
+
+// The cards or players a Pick offers. `control` is whose cards: yours, or any player's (`other`: another player's). `from` is
+// the zone group: in play (the default), the hand, the discard pile, the deck or the victory display. `state` keeps only ready
+// or only exhausted cards. `different` leaves out cards this effect has already picked. `attackableByPicked` keeps the enemies
+// the last picked character could attack. `type: player` picks a seat that is still in the game.
 export const pickSchema = z.strictObject({
   // `attachment`: a card of the attachment type in play that the chooser controls (141071:A:2).
   type: z.enum(["hero", "ally", "character", "enemy", "location", "player", "card", "attachment"]),
-  control: z.enum(["you", "any"]),
+  control: z.enum(["you", "any", "other"]),
   // An enemy in the staging area counts too (an enemy "in play"), not only one engaged with a player.
   staging: z.boolean().optional(),
+  // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player.
+  stagingOnly: z.boolean().optional(),
+  // An enemy engaged with the chooser (`you`) or with another player (`other`). `control` is ignored for enemies.
+  engaged: z.enum(["you", "other"]).optional(),
   // A card of this sphere of influence, for a card picked from the hand or a discard pile.
   sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral"]).optional(),
-  from: z.enum(["play", "hand", "discard", "deck"]).optional(),
+  // A card of any of these spheres ("a Leadership or Lore character"), its printed sphere.
+  spheres: z.array(sphereSchema).min(1).optional(),
+  // A hero with this printed resource icon ("each hero you control with a printed Spirit resource icon").
+  printedIcon: sphereSchema.optional(),
+  from: z.enum(["play", "hand", "discard", "deck", "victory"]).optional(),
   // From the deck: only its top cards are looked at. The cards still in the deck are the ones ArrangeTop puts back in order.
   top: z.number().int().positive().optional(),
   // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
-  cardType: z.enum(["ally", "attachment", "event"]).optional(),
+  cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest"]).optional(),
   maxCost: z.number().int().min(0).optional(),
+  minCost: z.number().int().min(0).optional(),
   // The candidates are the cards the last picked attachment may be attached to.
   hostForPicked: z.boolean().optional(),
   // The card is going to be put into play: a unique card already in play cannot be chosen.
@@ -33,7 +45,7 @@ export const pickSchema = z.strictObject({
   who: z.enum(["actor", "firstPlayer"]).optional(),
   // Not the source card itself: "another character". The source is never offered from a hand, a discard pile or a deck.
   other: z.boolean().optional(),
-  // A character committed to the quest.
+  // A character committed to the quest (`false`: one that is not).
   committed: z.boolean().optional(),
   // A character that took part in the attack the Response answers (not the card itself).
   participating: z.boolean().optional(),
@@ -41,9 +53,32 @@ export const pickSchema = z.strictObject({
   nonNeutral: z.boolean().optional(),
   // A non-unique card; an enemy with a shadow card dealt to it.
   nonUnique: z.boolean().optional(),
+  // A unique card.
+  unique: z.boolean().optional(),
   hasShadow: z.boolean().optional(),
   trait: z.string().min(1).optional(),
+  // Any of these traits ("a Noldor or Silvan character").
+  traits: z.array(z.string().min(1)).min(1).optional(),
+  // None of these traits ("a non-Nazgûl enemy").
+  notTraits: z.array(z.string().min(1)).min(1).optional(),
+  // A card with one of these titles ("a hero or Gandalf" is two picks; "Elladan or Elrohir" is one with two names).
+  names: z.array(z.string().min(1)).min(1).optional(),
+  // A card that has this keyword, printed or gained (sentinel, ranged).
+  keyword: z.enum(["sentinel", "ranged", "restricted", "doomed", "surge"]).optional(),
   state: z.enum(["ready", "exhausted"]).optional(),
+  // A card with damage on it (`false`: one with none).
+  damaged: z.boolean().optional(),
+  // The character attacking or defending in the attack in progress.
+  attacking: z.boolean().optional(),
+  defending: z.boolean().optional(),
+  // A card with an attachment on it; with `trait`, an attachment with that trait.
+  hasAttachment: z.strictObject({ trait: z.string().min(1).optional(), playerCard: z.boolean().optional() }).optional(),
+  // A card attached to the source (`source`) or to the source's host (`host`).
+  attachedTo: z.enum(["source", "host"]).optional(),
+  // A hero with at least one resource in its pool.
+  hasResources: z.boolean().optional(),
+  // An enemy whose engagement cost is higher than the chooser's threat.
+  aboveThreat: z.boolean().optional(),
   different: z.boolean().optional(),
   attackableByPicked: z.boolean().optional(),
   // A card of any sphere but this one ("non-Fellowship hero", 141051:A:2).
@@ -53,3 +88,5 @@ export const pickSchema = z.strictObject({
   // An ally in a discard pile or the hand whose printed cost is X (Stand and Fight): the amount the effect names.
   cost: z.number().int().min(0).optional(),
 });
+
+export type PickSpec = z.infer<typeof pickSchema>;

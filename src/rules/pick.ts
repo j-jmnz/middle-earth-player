@@ -5,11 +5,142 @@ import { attachmentHostIds } from "./attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
+import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
-import { livingSeats } from "./state.ts";
+import { inPlay, livingSeats } from "./state.ts";
+
+// What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
+// characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
+// condition is not a player card effect choosing a card.
+export type PickContext = {
+  seat: number;
+  sourceId: string | null;
+  picked?: readonly string[];
+  x?: number;
+  participants?: readonly string[];
+  counting?: boolean;
+};
+
+function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
+  if (spec.control === "you") return [asking];
+  if (spec.control === "other") return livingSeats(state).filter((seat) => seat !== asking);
+  return livingSeats(state);
+}
+
+// The cards a filter starts from: its zone group and whose cards they are.
+function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext): string[] {
+  const seats = seatsOf(state, spec, asking);
+  const raw: string[] = [];
+  const from = spec.from ?? "play";
+  if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
+  else if (from === "victory") raw.push(...state.victory);
+  else if (from === "discard") {
+    for (const index of seats) {
+      const pile = state.seats[index]?.discard ?? [];
+      if (!spec.topmost) raw.push(...pile);
+      else {
+        // The last card put on a discard pile is its top.
+        const top = [...pile].reverse().find((id) => {
+          const instance = state.cards[id];
+          return instance != null && (!spec.cardType || printedOf(ctx.cards, instance.code).type === spec.cardType);
+        });
+        if (top) raw.push(top);
+      }
+    }
+  } else if (from === "deck") for (const index of seats) raw.push(...(state.seats[index]?.deck ?? []).slice(0, spec.top ?? Number.MAX_SAFE_INTEGER));
+  else if (spec.type === "attachment") {
+    for (const instance of Object.values(state.cards)) {
+      if (instance.host == null || (instance.zone !== "play" && instance.zone !== "attached")) continue;
+      // An encounter attachment (a Condition) has no controller: any player's filter sees it.
+      if (instance.controller != null && !seats.includes(instance.controller)) continue;
+      raw.push(instance.id);
+    }
+  } else if (spec.type === "enemy") {
+    const engagedSeats = spec.engaged === "you" ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
+    if (!spec.stagingOnly) for (const index of engagedSeats) raw.push(...(state.seats[index]?.engaged ?? []));
+    if ((spec.staging || spec.stagingOnly) && spec.engaged == null) raw.push(...state.staging);
+  } else if (spec.type === "location") {
+    raw.push(...stagingLocations(state, ctx.cards));
+    if (!spec.stagingOnly) raw.push(...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
+  } else if (spec.type === "card") {
+    for (const index of seats) raw.push(...(state.seats[index]?.heroes ?? []), ...(state.seats[index]?.play ?? []));
+    if (spec.control === "any") raw.push(...state.staging, ...[state.activeLocation].filter((id): id is string => id != null));
+  } else {
+    for (const index of seats) raw.push(...characters(state, index, ctx.cards));
+  }
+  return raw;
+}
+
+// Whether one card matches a filter's predicates (not its zone): what the filter reads of the card itself.
+export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext): boolean {
+  const instance = state.cards[id];
+  if (!instance) return false;
+  const printed = printedOf(ctx.cards, instance.code);
+  const asking = spec.who === "firstPlayer" ? state.firstPlayer : at.seat;
+  const picked = at.picked ?? [];
+  const from = spec.from ?? "play";
+  if ((id === at.sourceId && (from !== "play" || spec.other)) || (spec.different && picked.includes(id))) return false;
+  if (spec.type !== "card" && spec.type !== "player") {
+    const type = printed.type;
+    const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type;
+    if (!typed) return false;
+  }
+  if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
+  if (spec.traits && !spec.traits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
+  if (spec.notTraits && spec.notTraits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
+  if (spec.names && !spec.names.includes(printed.name)) return false;
+  if (spec.sphere && printed.sphere !== spec.sphere) return false;
+  if (spec.spheres && (printed.sphere == null || !spec.spheres.includes(printed.sphere))) return false;
+  if (spec.printedIcon && !(printed.type === "hero" && printed.sphere === spec.printedIcon)) return false;
+  if (spec.nonNeutral && (printed.sphere == null || printed.sphere === "neutral")) return false;
+  if (spec.exceptSphere && printed.sphere === spec.exceptSphere) return false;
+  if (spec.cardType && printed.type !== spec.cardType) return false;
+  if (spec.committed != null && instance.committed !== spec.committed) return false;
+  if (spec.participating && !(at.participants ?? []).includes(id)) return false;
+  if (spec.nonUnique && printed.isUnique) return false;
+  if (spec.unique && !printed.isUnique) return false;
+  if (spec.hasShadow && !instance.shadowId) return false;
+  if (spec.keyword && !hasKeyword(state, id, spec.keyword, ctx.cards)) return false;
+  if (spec.damaged != null && instance.damage > 0 !== spec.damaged) return false;
+  if (spec.hasResources && instance.resources <= 0) return false;
+  if (spec.attacking && !attackingNow(state, id)) return false;
+  if (spec.defending && !(state.pendingAttack?.defenderId === id && !state.pendingAttack.undefended)) return false;
+  if (spec.hasAttachment) {
+    const want = spec.hasAttachment;
+    const found = instance.attachments.some((attachmentId) => {
+      const attachment = state.cards[attachmentId];
+      if (!attachment) return false;
+      if (want.trait && !hasTrait(state, attachmentId, want.trait, ctx)) return false;
+      if (want.playerCard && !isPlayerType(printedOf(ctx.cards, attachment.code))) return false;
+      return true;
+    });
+    if (!found) return false;
+  }
+  if (spec.aboveThreat) {
+    const threat = state.seats[asking]?.threat ?? 0;
+    if (printed.engagementCost == null || modifiedStat(state, instance, "engagementCost", ctx.cards) <= threat) return false;
+  }
+  if (spec.intoPlay && uniqueBlocked(state, printed, ctx.cards)) return false;
+  if (spec.costIsX && at.x != null && printed.cost !== at.x) return false;
+  if (spec.maxCost != null && (printed.cost == null || printed.cost > spec.maxCost)) return false;
+  if (spec.minCost != null && (printed.cost == null || printed.cost < spec.minCost)) return false;
+  if (spec.cost != null && (from === "play" || printed.cost !== spec.cost)) return false;
+  if (spec.state === "ready" && instance.exhausted) return false;
+  if (spec.state === "exhausted" && !instance.exhausted) return false;
+  if (spec.canAttack && !legalAttackEnemies(state, instance.controller ?? asking, id, ctx.cards, true).length) return false;
+  if (spec.attackableByPicked) {
+    const attacker = picked.at(-1);
+    if (!attacker || !canAttack(state, state.cards[attacker]?.controller ?? asking, attacker, id, ctx.cards, true)) return false;
+  }
+  return true;
+}
+
+// The character is attacking in the attack in progress: one of the attackers of a player attack.
+function attackingNow(state: ScenarioState, id: string): boolean {
+  return state.pendingStrike?.attackerIds.includes(id) === true;
+}
 
 // A Pick names cards or players a player may choose for the instructions after it. The seat is the one making the choice.
 // Cards that are immune to player card effects cannot be chosen by a player card's Pick (mec109.immune-to-player-card-effects).
@@ -25,78 +156,37 @@ export function pickCandidates(
   x?: number,
   // The characters that took part in the attack the Response answers.
   participants?: readonly string[],
+  counting = false,
 ): string[] {
   const asking = spec.who === "firstPlayer" ? state.firstPlayer : seat;
-  const seats = spec.control === "you" ? [asking] : livingSeats(state);
-  if (spec.type === "player") return seats.filter((index) => !state.seats[index]?.eliminated).map((index) => `seat:${index}`);
+  if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated).map((index) => `seat:${index}`);
   if (spec.hostForPicked) {
     const code = state.cards[picked.at(-1) ?? ""]?.code;
     return code ? attachmentHostIds(state, asking, code, ctx) : [];
   }
-  const raw: string[] = [];
-  const from = spec.from ?? "play";
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   const source = sourceId ? state.cards[sourceId] : undefined;
-  const playerEffect = source == null || isPlayerType(printedOf(ctx.cards, source.code));
-  if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
-  else if (from === "discard") {
-    for (const index of seats) {
-      const pile = state.seats[index]?.discard ?? [];
-      if (!spec.topmost) raw.push(...pile);
-      else {
-        // The last card put on a discard pile is its top.
-        const top = [...pile].reverse().find((id) => {
-          const instance = state.cards[id];
-          return instance != null && (!spec.cardType || printedOf(ctx.cards, instance.code).type === spec.cardType);
-        });
-        if (top) raw.push(top);
-      }
-    }
-  }
-  else if (from === "deck") for (const index of seats) raw.push(...(state.seats[index]?.deck ?? []).slice(0, spec.top ?? Number.MAX_SAFE_INTEGER));
-  else if (spec.type === "attachment") {
-    // Attachments in play that the chooser (or any player) controls, on any host. The pick is for a discard (141071:A:2):
-    // a Permanent card on a hero cannot be discarded (mec109.permanent), so it is not offered.
-    for (const instance of Object.values(state.cards)) {
-      if (instance.host == null || instance.controller == null || !seats.includes(instance.controller)) continue;
-      if (instance.zone !== "play" && instance.zone !== "attached") continue;
-      if (printedOf(ctx.cards, instance.code).keywords.permanent && state.cards[instance.host]?.zone === "heroes") continue;
-      raw.push(instance.id);
-    }
-  } else if (spec.type === "enemy") {
-    for (const index of seats) raw.push(...(state.seats[index]?.engaged ?? []));
-    if (spec.staging) raw.push(...state.staging);
-  } else if (spec.type === "location") {
-    raw.push(...stagingLocations(state, ctx.cards), ...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
-  } else {
-    for (const index of seats) raw.push(...characters(state, index, ctx.cards));
-  }
+  const playerEffect = !counting && (source == null || isPlayerType(printedOf(ctx.cards, source.code)));
+  const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
+  const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting };
   return raw.filter((id) => {
     const instance = state.cards[id];
-    if (!instance || (id === sourceId && (from !== "play" || spec.other)) || picked.includes(id)) return false;
-    const printed = printedOf(ctx.cards, instance.code);
-    if (playerEffect && !playerCardEffectCanChoose(printed)) return false;
-    if (spec.type !== "card" && !(spec.type === "character" ? printed.type === "hero" || printed.type === "ally" : printed.type === spec.type)) return false;
-    if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
-    if (spec.sphere && printed.sphere !== spec.sphere) return false;
-    if (spec.nonNeutral && (printed.sphere == null || printed.sphere === "neutral")) return false;
-    if (spec.exceptSphere && printed.sphere === spec.exceptSphere) return false;
-    if (spec.cardType && printed.type !== spec.cardType) return false;
-    if (spec.committed && !instance.committed) return false;
-    if (spec.participating && !(participants ?? []).includes(id)) return false;
-    if (spec.nonUnique && printed.isUnique) return false;
-    if (spec.hasShadow && !instance.shadowId) return false;
-    if (spec.intoPlay && uniqueBlocked(state, printed, ctx.cards)) return false;
-    if (spec.costIsX && x != null && printed.cost !== x) return false;
-    if (spec.maxCost != null && (printed.cost == null || printed.cost > spec.maxCost)) return false;
-    if (spec.cost != null && (from === "play" || printed.cost !== spec.cost)) return false;
-    if (spec.state === "ready" && instance.exhausted) return false;
-    if (spec.state === "exhausted" && !instance.exhausted) return false;
-    if (spec.canAttack && !legalAttackEnemies(state, instance.controller ?? seat, id, ctx.cards, true).length) return false;
-    if (spec.attackableByPicked) {
-      const attacker = picked.at(-1);
-      if (!attacker || !canAttack(state, state.cards[attacker]?.controller ?? seat, attacker, id, ctx.cards, true)) return false;
-    }
-    return true;
+    if (!instance) return false;
+    // Only an attachment a player may discard is offered for one (141071:A:2): a Permanent card on a hero is not.
+    if (spec.type === "attachment" && !counting && printedOf(ctx.cards, instance.code).keywords.permanent && state.cards[instance.host ?? ""]?.zone === "heroes") return false;
+    if (playerEffect && !playerCardEffectCanChoose(printedOf(ctx.cards, instance.code))) return false;
+    return matchesPick(state, id, spec, at, ctx);
   });
+}
+
+// The cards attached to the source, or to the source's host.
+function attachedPool(state: ScenarioState, where: "source" | "host", sourceId: string | null): string[] {
+  const source = sourceId ? state.cards[sourceId] : undefined;
+  const holder = where === "source" ? source : source?.host ? state.cards[source.host] : undefined;
+  return holder ? holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed")) : [];
+}
+
+// How many cards match a filter from a seat's side: the count an amount or a condition reads.
+export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext): number {
+  return pickCandidates(state, spec, seat, [], sourceId, ctx, undefined, undefined, true).length;
 }

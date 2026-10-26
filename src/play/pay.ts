@@ -4,12 +4,14 @@
 // only names where it comes from or goes, one token at a time, and the sheet confirms only when the shares sum to it.
 // The reducer still checks every payment (validatePayments) and refuses a wrong one with a reason.
 import type { Effect } from "../catalog/boundary.ts";
+import { costOfKind } from "../catalog/costs.ts";
 import { playCost } from "../rules/attach.ts";
 import type { Payment } from "../rules/intents.ts";
 import type { ReduceContext } from "../rules/interpret.ts";
 import { heroPays } from "../rules/payments.ts";
 import { printedOf, type Sphere } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
+import { costPayer, costSphere } from "../rules/usage.ts";
 import { topFrame } from "../rules/windows.ts";
 
 export type Share = { id: string; amount: number };
@@ -53,16 +55,21 @@ export function triggerRequest(state: ScenarioState, ctx: ReduceContext, cardId:
   const instance = state.cards[cardId];
   if (!instance) return null;
   const printed = printedOf(ctx.cards, instance.code);
-  if (effect.cost?.kind === "playEvent") {
+  if (costOfKind(effect, "playEvent")) {
     const cost = playCost(state, cardId, seat, ctx) ?? 0;
     if (!printed.costX && cost === 0) return null;
     return { seat, cardId, total: cost, exact: !printed.costX, pools: poolsFor(state, ctx, seat, printed.sphere, cardId) };
   }
-  if (effect.cost?.kind === "resources") {
-    const sphere = effect.cost.sphere ?? printed.sphere;
-    return { seat, cardId, total: effect.cost.amount, exact: true, pools: poolsFor(state, ctx, seat, sphere) };
+  const resources = costOfKind(effect, "resources");
+  if (!resources) return null;
+  // A cost paid from one card's own pool ("Pay 1 resource from ~'s pool") offers that pool only.
+  const payer = costPayer(state, resources, instance);
+  if (payer === null) return null;
+  if (payer !== undefined) {
+    const held = state.cards[payer]?.resources ?? 0;
+    return { seat, cardId, total: resources.amount, exact: true, pools: held > 0 ? [{ heroId: payer, max: held }] : [] };
   }
-  return null;
+  return { seat, cardId, total: resources.amount, exact: true, pools: poolsFor(state, ctx, seat, costSphere(resources, instance, ctx)) };
 }
 
 /** A first guess the player can change: the pools in seat order, each giving what it holds until the total is met. */

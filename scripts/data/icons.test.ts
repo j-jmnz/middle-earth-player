@@ -66,7 +66,8 @@ describe("icons", () => {
     expect(files(path.join(one, "assets"))).toEqual(files(ASSETS));
     expect(files(path.join(one, "modules"))).toEqual(files(path.join(ROOT, "src", "play", "icons")));
     expect(iconRecords().length).toBe(Object.keys(ICONS).length);
-  });
+    // Two full icon builds (font glyphs and rasters): about 2 s alone, past the 5 s default when the whole suite runs at once.
+  }, 30_000);
 
   it("map every sphere and player card type the app shows to an icon, tinted with an existing token", () => {
     for (const sphere of ["leadership", "tactics", "spirit", "lore", "fellowship", "baggins", "neutral"]) {

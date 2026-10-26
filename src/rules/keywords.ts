@@ -140,7 +140,7 @@ export function raiseThreat(
   if (amount <= 0) return state;
   const current = state.seats[seat];
   if (!current || current.eliminated) return state;
-  const raised = withThreat(state, seat, current.threat + amount);
+  const raised = queueEvent(withThreat(state, seat, current.threat + amount), { trigger: "threatRaised", seat });
   steps.push({ kind: "threat", seat, amount, cause });
   return eliminateEmpties(raised, steps);
 }
@@ -183,8 +183,9 @@ export function placeDamage(
   if (printed.type === "enemy" && printed.keywords.indestructible) return next;
   if (printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards)) {
     next = destroyCard(next, id, cards, steps);
-    // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy).
+    // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
+    if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: id });
   } else if (hurt) {
     // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
     next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id });
@@ -364,4 +365,15 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[]): Sce
   }
   if (!next.lost && livingSeats(next).length === 0) next = markLoss(next, "No seats remain");
   return next;
+}
+
+// A keyword a card prints or has gained: a flag modifier of the same name ("Attached hero gains sentinel", rr.sentinel,
+// rr.ranged).
+export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel" | "ranged" | "restricted" | "doomed" | "surge", cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const instance = state.cards[id];
+  if (!instance) return false;
+  const printed = printedOf(cards, instance.code);
+  if (keyword === "doomed") return (printed.keywords.doomed ?? 0) > 0;
+  if (printed.keywords[keyword]) return true;
+  return (keyword === "sentinel" || keyword === "ranged") && flagged(state, id, keyword);
 }

@@ -18,7 +18,8 @@ export const phaseNameSchema = z.enum([
 ]);
 
 
-export const conditionSchema = z.discriminatedUnion("kind", [
+// The conditions that hold no other condition. `not`, `all` and `any` (below) combine these, one level deep.
+const atomSchema = z.discriminatedUnion("kind", [
   // The actor failed a Hide test in the current phase or round.
   z.strictObject({ kind: z.literal("hideFailed"), scope: z.enum(["phase", "round"]) }),
   // The actor has an enemy engaged with them, with this trait if one is named.
@@ -76,6 +77,30 @@ export const conditionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("questProgress") }),
   // An enemy (with this trait, if one is named) is in play (`is`) or none is (141027:B:1).
   z.strictObject({ kind: z.literal("enemyInPlay"), trait: z.string().min(1).optional(), is: z.boolean() }),
+  // How many cards match the filter, from the actor's side, is at least `min` and at most `max` ("while you control at least
+  // 5 Dwarf characters", "if there is at least 1 Gondor hero in play", "while you have no cards in your hand").
+  z.strictObject({ kind: z.literal("count"), pick: pickSchema, min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
+  // Every card of `of` also matches `match`, and there is at least one ("if each hero you control has a printed Leadership
+  // resource icon"; heroesAll is the Hobbit case).
+  z.strictObject({ kind: z.literal("allMatch"), of: pickSchema, match: pickSchema }),
+  // The actor's threat is at least `min` and at most `max` (Valour: 40 or higher; Secrecy: 20 or less).
+  z.strictObject({ kind: z.literal("threat"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
+  // The source card, its host, the card the event was about, or the active location matches the filter (its zone is not
+  // checked): "while ~ is committed to a quest", "if attached hero is a Dwarf", "if that enemy is an Orc".
+  z.strictObject({ kind: z.literal("matches"), card: z.enum(["self", "host", "subject", "activeLocation", "picked", "attacker", "defender"]), pick: pickSchema }),
+  // At most `max` other copies of the source card were played from the hand this round ("if this is the first time you
+  // played a copy of ~ this round").
+  z.strictObject({ kind: z.literal("copiesPlayedThisRound"), max: z.number().int().min(0) }),
+]);
+
+export const conditionSchema = z.discriminatedUnion("kind", [
+  ...atomSchema.options,
+  // The inner condition does not hold.
+  z.strictObject({ kind: z.literal("not"), condition: atomSchema }),
+  // Each inner condition holds.
+  z.strictObject({ kind: z.literal("all"), conditions: z.array(atomSchema).min(1) }),
+  // At least one inner condition holds.
+  z.strictObject({ kind: z.literal("any"), conditions: z.array(atomSchema).min(1) }),
 ]);
 
 // The conditions a stat modifier carries and checks each time the stat is read.
@@ -89,6 +114,10 @@ export function isStatCondition(condition: Condition | undefined): condition is 
 export const targetSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("self") }),
   z.strictObject({ kind: z.literal("host") }),
+  // The last picked card, the card the answered event was about, the attacking enemy.
+  z.strictObject({ kind: z.literal("picked") }),
+  z.strictObject({ kind: z.literal("subject") }),
+  z.strictObject({ kind: z.literal("attacker") }),
   z.strictObject({ kind: z.literal("activeLocation") }),
   z.strictObject({
     kind: z.literal("engagedEnemies"),

@@ -1,6 +1,7 @@
 // Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
+import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { runAttackVerb } from "./attack-verbs.ts";
 import { characters } from "./combat.ts";
 import { hasTrait, holds, outOfPlayChoices } from "./conditions.ts";
@@ -8,7 +9,8 @@ import { scheduleDelayed } from "./delayed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, eliminateEmpties, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "./keywords.ts";
-import { lastPicked, otherSeat } from "./player-verbs.ts";
+import { lastPicked, otherSeat, seatsFor } from "./player-verbs.ts";
+import { queueEvent } from "./queue.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
 import { engageEnemy, engageWith, placeQuestProgress, stagingEnemies } from "./quest.ts";
 import { restricted } from "./restrictions.ts";
@@ -113,7 +115,7 @@ export function runExtraVerb(
       return next;
     }
     case "Discard":
-      return discardTarget(state, instruction.target.kind, focus.sourceId, ctx, steps);
+      return discardTarget(state, instruction.target.kind, focus, ctx, steps);
     case "UncommitAll": {
       const seat = seatFor(state, instruction.who, focus.seat);
       let next = state;
@@ -134,13 +136,16 @@ export function runExtraVerb(
     case "GainSurge":
       return markSurge(state, focus.sourceId);
     case "AddResources": {
-      const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-      const hero = instruction.to === "picked" ? state.cards[lastPicked(state)] : source?.host ? state.cards[source.host] : undefined;
-      if (!hero || hero.controller == null) return state;
-      for (let added = 0; added < instruction.amount; added += 1) {
+      const scope = frameScope(state, focus.seat, focus.sourceId);
+      const id = refCard(state, instruction.to ?? "host", scope);
+      const hero = id ? state.cards[id] : undefined;
+      const amount = resolveAmount(state, instruction.amount, scope, ctx);
+      if (!hero || hero.controller == null || amount <= 0) return state;
+      for (let added = 0; added < amount; added += 1) {
         steps.push({ kind: "gainResource", seat: hero.controller, heroId: hero.id, cause: currentCause(steps, UNATTRIBUTED) });
       }
-      return updateCard(state, hero.id, { resources: hero.resources + instruction.amount });
+      // "After a card effect adds resources to a hero's pool" (rr.resources).
+      return queueEvent(updateCard(state, hero.id, { resources: hero.resources + amount }), { trigger: "resourcesAdded", seat: hero.controller, cardId: hero.id });
     }
     case "Delay":
       return scheduleDelayed(state, instruction, focus, ctx, currentCause(steps, UNATTRIBUTED));
@@ -182,11 +187,13 @@ export function raiseFor(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  const seats = instruction.who === "eachSeat" ? livingSeats(state) : [seatFor(state, instruction.who, focus.seat)];
+  const who = instruction.who;
+  const seats = who === "eachSeat" || who === "picked" || who === "eventSeat" ? seatsFor(state, who, focus.seat) : [seatFor(state, who, focus.seat)];
+  const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   let next = state;
   for (const seat of seats) {
     const count = instruction.perCommitted ? committedHeroes(next, seat, instruction.perCommitted.exceptSphere, ctx) : 1;
-    next = raiseThreat(next, seat, (instruction.amount ?? 1) * count, steps, currentCause(steps, UNATTRIBUTED));
+    next = raiseThreat(next, seat, amount * count, steps, currentCause(steps, UNATTRIBUTED));
   }
   return next;
 }
@@ -278,12 +285,11 @@ function removeQuestProgress(state: ScenarioState, removed: number, steps: Engin
 function discardTarget(
   state: ScenarioState,
   kind: string,
-  sourceId: string | null,
+  focus: VerbFocus,
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  const source = sourceId ? state.cards[sourceId] : undefined;
-  const id = kind === "self" ? sourceId : kind === "host" ? source?.host : null;
+  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "subject" || kind === "attacker" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
   return destroyCard(state, id, ctx.cards, steps);
 }
@@ -308,5 +314,6 @@ export function holdsNow(
   ctx: ReduceContext,
 ): boolean {
   if (!("when" in instruction) || !instruction.when) return true;
-  return holds(state, instruction.when, scope, ctx);
+  const frame = frameScope(state, scope.actor, scope.sourceId);
+  return holds(state, instruction.when, { ...scope, ...(frame.picked ? { picked: frame.picked } : {}), ...(frame.subject ? { subject: frame.subject } : {}), ...(frame.other ? { other: frame.other } : {}) }, ctx);
 }

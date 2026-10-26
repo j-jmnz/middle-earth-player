@@ -3,6 +3,7 @@ import { z } from "zod";
 import { instructionSchema } from "./effect-schema.ts";
 
 export {
+  amountSchema,
   cancelSchema,
   conditionSchema,
   costSchema,
@@ -17,7 +18,12 @@ export {
   triggerSchema,
 } from "./effect-schema.ts";
 export type {
+  Amount,
+  AmountExpr,
+  CardRef,
   Condition,
+  Limit,
+  Subject,
   Cost,
   Effect,
   Instruction,
@@ -47,6 +53,8 @@ export const printedKeywordsSchema = z.strictObject({
   sentinel: z.boolean().optional(),
   ranged: z.boolean().optional(),
   restricted: z.boolean().optional(),
+  // Secrecy X: the card costs X less to play while its player's threat is 20 or less.
+  secrecy: z.number().int().positive().optional(),
   // Leaving play ends the game (flag).
   leavesPlayLoses: z.boolean().optional(),
 });

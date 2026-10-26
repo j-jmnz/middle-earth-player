@@ -4,14 +4,15 @@ import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { raiseThreat } from "./keywords.ts";
 import { fireForced } from "./triggers.ts";
-import { livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
+import { flagged, livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
 import { inPlay } from "./zones.ts";
 
 export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (!instance.exhausted && !instance.committed)) continue;
-    next = updateCard(next, instance.id, { exhausted: false, committed: false });
+    // "Does not ready during the refresh phase" (a flag) leaves the card exhausted.
+    next = updateCard(next, instance.id, { exhausted: instance.exhausted && flagged(state, instance.id, "doesNotReady"), committed: false });
   }
   for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
   return withMode(passToken(next, ctx, steps), "endRound");

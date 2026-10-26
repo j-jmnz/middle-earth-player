@@ -64,10 +64,19 @@ function plain(line: string): string {
     .trim();
 }
 
+// A line that ends "gains:" grants the quoted ability on the next line, so the two are one line. A line that is only a
+// quotation, or a "–Name" attribution, is flavor text.
 export function poolLines(text: string | null | undefined): string[] {
   if (!text) return [];
-  return text
-    .split(/\r?\n/)
+  const raw = text.split(/\r?\n/).map((line) => line.trim());
+  const joined: string[] = [];
+  for (const line of raw) {
+    const last = joined.at(-1);
+    if (last != null && /:\s*$/.test(last) && /^["\u201c]/.test(line)) joined[joined.length - 1] = `${last} ${line}`;
+    else joined.push(line);
+  }
+  return joined
+    .filter((line) => !/^["\u201c][^"\u201d]*["\u201d]$/.test(plain(line)) && !/^[\u2013\u2014-]\s*\S/.test(plain(line)))
     .flatMap(splitAbilities)
     .map(plain)
     .filter((line) => line !== "");

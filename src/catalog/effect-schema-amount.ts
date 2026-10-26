@@ -1,0 +1,40 @@
+// Amounts in effect records: a printed number, or a number the engine reads when the instruction runs ("X is the number of
+// enemies engaged with you", "for each Hobbit hero you control", "equal to that enemy's Threat"). A player never supplies one.
+import { z } from "zod";
+
+import { pickSchema } from "./effect-schema-pick.ts";
+
+// The card a stat is read from: the source, its host, the last picked card, the card the event was about (`subject`), or
+// the enemy and the defender of the attack in progress.
+export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "attacker", "defender", "activeLocation"]);
+
+export const amountExprSchema = z.strictObject({
+  // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").
+  count: pickSchema.optional(),
+  // A stat of a card. `printed` reads the printed value, else the current one. `damage`, `resources` and `progress` are
+  // tokens on the card; `cost` is its printed cost; `threatCost` a hero's printed threat.
+  stat: z.enum(["willpower", "attack", "defense", "threat", "hitPoints", "engagementCost", "questPoints", "damage", "resources", "progress", "cost", "threatCost"]).optional(),
+  of: cardRefSchema.optional(),
+  printed: z.boolean().optional(),
+  // The X the event was played for, or the X an earlier instruction fixed (the discarded card's cost).
+  x: z.literal(true).optional(),
+  // The number of players in the game.
+  players: z.literal(true).optional(),
+  // The actor's threat, and its tens digit (17084:A:1).
+  threat: z.enum(["actor", "tens"]).optional(),
+  // Cards in the actor's hand.
+  hand: z.literal(true).optional(),
+  // amount = value × times + plus, at most `limit`, at least 0.
+  times: z.number().int().optional(),
+  plus: z.number().int().optional(),
+  limit: z.number().int().min(0).optional(),
+});
+
+export const amountSchema = z.union([z.number().int(), amountExprSchema]);
+
+// An amount a verb moves or deals: a printed number is at least 1 (a read one may come to 0, and then nothing happens).
+export const positiveAmountSchema = z.union([z.number().int().positive(), amountExprSchema]);
+
+export type AmountExpr = z.infer<typeof amountExprSchema>;
+export type Amount = z.infer<typeof amountSchema>;
+export type CardRef = z.infer<typeof cardRefSchema>;

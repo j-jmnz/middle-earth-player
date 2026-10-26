@@ -1,5 +1,6 @@
 import type { Condition, Effect, Instruction } from "../catalog/boundary.ts";
 
+import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { beginEffect } from "./cancel.ts";
 import { effectCause, inCause, type Cause } from "./cause.ts";
 import { beginEnemyAttack } from "./combat.ts";
@@ -39,6 +40,9 @@ export type EffectSpec = {
   x?: number;
   // A delayed effect starts with the card it was made for already picked.
   picked?: readonly string[];
+  // The card the answered event was about, and the other card it names.
+  subject?: string;
+  other?: string;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
   cause?: Cause;
@@ -67,6 +71,8 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.x != null ? { x: spec.x } : {}),
     ...(spec.participants ? { participants: spec.participants } : {}),
     ...(spec.picked ? { picked: spec.picked } : {}),
+    ...(spec.subject ? { subject: spec.subject } : {}),
+    ...(spec.other ? { other: spec.other } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
 }
@@ -188,6 +194,12 @@ function runItemNow(
       return openBranch(state, item, returned, ctx);
     case "ForEachPlayer":
       return expandPlayers(state, instruction, item.cause);
+    case "Each":
+      return expandEach(state, item, frame, ctx);
+    case "Repeat":
+      return expandRepeat(state, item, frame, ctx);
+    case "DiscardFromHand":
+      return expandDiscards(state, item, frame, ctx);
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
@@ -227,6 +239,47 @@ function expandPlayers(
   return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
 }
 
+// "Each Dwarf character": the cards that match now, each in turn the picked card for the instructions (a Pick with its choice
+// already made), and nobody chooses.
+function expandEach(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceContext): ScenarioState {
+  const instruction = item.instruction;
+  const data = topFrame(state)?.data;
+  if (instruction.verb !== "Each" || data?.kind !== "effect") return state;
+  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants);
+  const cause = item.cause ? { cause: item.cause } : {};
+  const expanded = ids.flatMap((id) => [
+    { instruction: { verb: "Pick" as const, pick: instruction.pick }, seat: item.seat, chosen: id, ...cause },
+    ...instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat: item.seat, chosen: null, ...cause })),
+  ]);
+  return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
+}
+
+// "Resolve that effect again for each copy of ~ in your discard pile": the instructions, that many times (read once, now).
+function expandRepeat(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceContext): ScenarioState {
+  const instruction = item.instruction;
+  const data = topFrame(state)?.data;
+  if (instruction.verb !== "Repeat" || data?.kind !== "effect") return state;
+  const times = resolveAmount(state, instruction.times, frameScope(state, item.seat, frame.cardId), ctx);
+  const cause = item.cause ? { cause: item.cause } : {};
+  const expanded = Array.from({ length: times }, () => instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat: item.seat, chosen: null, ...cause }))).flat();
+  return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
+}
+
+// The actor chooses a card in their hand and discards it, that many times.
+function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceContext): ScenarioState {
+  const instruction = item.instruction;
+  const data = topFrame(state)?.data;
+  if (instruction.verb !== "DiscardFromHand" || data?.kind !== "effect") return state;
+  const count = Math.min(resolveAmount(state, instruction.amount, frameScope(state, item.seat, frame.cardId), ctx), state.seats[item.seat]?.hand.length ?? 0);
+  const cause = item.cause ? { cause: item.cause } : {};
+  const pick = { verb: "Pick" as const, pick: { type: "card" as const, control: "you" as const, from: "hand" as const } };
+  const expanded = Array.from({ length: count }, (): QueueItem[] => [
+    { instruction: pick, seat: item.seat, chosen: null, ...cause },
+    { instruction: { verb: "DiscardPicked" as const }, seat: item.seat, chosen: null, ...cause },
+  ]).flat();
+  return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
+}
+
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window.
 function immediateAttack(state: ScenarioState, sourceId: string | null, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = sourceId ? state.cards[sourceId] : undefined;
@@ -253,6 +306,10 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       if (target.kind === "self") return sourceId ? [sourceId] : [];
       if (target.kind === "host") return source?.host ? [source.host] : [];
       if (target.kind === "activeLocation") return state.activeLocation && state.activeLocation !== sourceId ? [state.activeLocation] : [];
+      if (target.kind === "picked" || target.kind === "subject" || target.kind === "attacker") {
+        const id = refCard(state, target.kind, frameScope(state, item.seat, sourceId));
+        return id && hasEnemyType(state, id, ctx) && state.cards[id]?.zone === "engaged" ? [id] : [];
+      }
       const seats = target.who === "actor" ? [item.seat] : livingSeats(state);
       return seats
         .flatMap((seat) => state.seats[seat]?.engaged ?? [])

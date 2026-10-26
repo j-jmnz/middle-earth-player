@@ -6,7 +6,7 @@ import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
-import { livingSeats, updateCard } from "./state.ts";
+import { flagged, livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, type ReduceContext } from "./interpret.ts";
 import { queueEvent } from "./queue.ts";
 import { resolveAttack } from "./shadow.ts";
@@ -130,8 +130,9 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   if (instance.zone !== "heroes" && instance.zone !== "play") return false;
   const printed = printedOf(cards, instance.code);
   if (!isCharacterType(printed)) return false;
+  if (flagged(state, defenderId, "cannotDefend")) return false;
   if (instance.controller === attackedSeat) return true;
-  return printed.keywords.sentinel;
+  return printed.keywords.sentinel || flagged(state, defenderId, "sentinel");
 }
 
 export function applyDefense(
@@ -142,7 +143,15 @@ export function applyDefense(
 ): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack || !state.cards[attack.enemyId] || !state.cards[defenderId]) return state;
-  const exhausted: ScenarioState = { ...updateCard(state, defenderId, { exhausted: true }), pendingAttack: { ...attack, defenderId }, window: null };
+  // A character with "does not exhaust to defend" stays ready (rr.exhausted). Its declaration is announced ("After ~ is
+  // declared as a defender").
+  const ready = flagged(state, defenderId, "noExhaustDefend");
+  const declaredState = ready ? state : updateCard(state, defenderId, { exhausted: true });
+  const exhausted: ScenarioState = {
+    ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId }),
+    pendingAttack: { ...attack, defenderId },
+    window: null,
+  };
   // 6.4.1: the defender is declared; an action window comes before the shadow card is turned up.
   return enemyAttackWindow(exhausted, ctx, "shadow") ?? resolveAttack(exhausted, ctx, steps);
 }
@@ -180,8 +189,9 @@ export function canAttack(
   if (enemy.zone !== "engaged") return false;
   // The declaring seat's own characters attack its own enemies. A ranged character may attack an enemy engaged with
   // another player, and may join an attack another player declares (rr.ranged, rr.step-6-8-1).
+  if (flagged(state, attackerId, "cannotAttack")) return false;
   if (attacker.controller === seat && enemy.controller === seat) return true;
-  return printed.keywords.ranged;
+  return printed.keywords.ranged || flagged(state, attackerId, "ranged");
 }
 
 export function legalAttackEnemies(state: ScenarioState, seat: number, attackerId: string, cards: Cards, exhaustedOk = false): string[] {
@@ -224,7 +234,9 @@ export function applyPlayerAttack(
   if (!enemy) return state;
   let next: ScenarioState = { ...state, declaredAttacks: [...state.declaredAttacks, `${seat}:${enemyId}`], window: null };
   for (const attackerId of attackerIds) {
-    if (next.cards[attackerId]) next = updateCard(next, attackerId, { exhausted: true });
+    if (!next.cards[attackerId]) continue;
+    if (!flagged(next, attackerId, "noExhaustAttack")) next = updateCard(next, attackerId, { exhausted: true });
+    next = queueEvent(next, { trigger: "declaredAttacker", seat, cardId: attackerId, other: enemyId });
   }
   const declared: ScenarioState = { ...next, pendingStrike: { seat, enemyId, attackerIds: [...attackerIds] } };
   // 6.8.1: the attack and its attackers are declared; an action window comes before its strength and damage.

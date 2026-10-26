@@ -2,6 +2,7 @@ import type { Effect } from "../catalog/boundary.ts";
 
 import { applyCancel, cancelIntents, cancelReason } from "./cancel.ts";
 import { holds } from "./conditions.ts";
+import { effectsOf } from "./listen.ts";
 import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
@@ -21,11 +22,9 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   const instance = state.cards[cardId];
   if (!instance) return undefined;
   if (instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached") return undefined;
-  const effect = ctx.effects.find(
-    (entry) => entry.id === effectId && entry.cardCode === instance.code && entry.timing === "action",
-  );
-  // Only the card's controller uses its Action, unless every player may use it once a round (Éowyn).
-  if (!effect || (instance.controller !== state.activeSeat && effect.limit !== "oncePerRoundEachPlayer")) return undefined;
+  const effect = effectsOf(ctx, instance.code).find((entry) => entry.id === effectId && entry.timing === "action");
+  // Only the card's controller uses its Action, unless any player may (Éowyn's once a round each, "Any player may trigger").
+  if (!effect || (instance.controller !== state.activeSeat && effect.limit !== "oncePerRoundEachPlayer" && !effect.anyPlayer)) return undefined;
   const scope = { actor: state.activeSeat, sourceId: cardId, returned: 0 };
   return !effect.condition || holds(state, effect.condition, scope, ctx) ? effect : undefined;
 }
@@ -37,8 +36,8 @@ export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalI
   if (!inTriggerWindow(state)) return [];
   const intents: LegalIntent[] = [];
   for (const instance of Object.values(state.cards)) {
-    for (const effect of ctx.effects) {
-      if (actionEffect(state, ctx, instance.id, effect.id) !== effect) continue;
+    for (const effect of effectsOf(ctx, instance.code)) {
+      if (effect.timing !== "action" || actionEffect(state, ctx, instance.id, effect.id) !== effect) continue;
       if (usable(state, effect, instance.id, state.activeSeat, ctx)) intents.push({ type: "Trigger", cardId: instance.id, effectId: effect.id });
     }
   }

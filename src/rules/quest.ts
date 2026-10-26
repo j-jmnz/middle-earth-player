@@ -30,7 +30,8 @@ export function stagingThreat(state: ScenarioState, cards: Cards): number {
   let total = 0;
   for (const id of state.staging) {
     const instance = state.cards[id];
-    if (!instance) continue;
+    // "Does not contribute its Threat" (a flag on the card).
+    if (!instance || flagged(state, id, "noThreatContribution")) continue;
     total += modifiedStat(state, instance, "threat", cards);
   }
   return total;
@@ -66,6 +67,10 @@ export function resolveQuest(
     for (const seat of livingSeats(state)) next = raiseThreat(next, seat, threat - willpower, steps, ruleCause("rr.step-3-4"));
   } else if (willpower > threat) {
     next = placeQuestProgress(next, willpower - threat, cards, steps, canAdvance);
+  }
+  // Each seat hears how its quest went ("After you quest successfully"; questing exactly equal is neither, rr.step-3-4).
+  if (willpower !== threat) {
+    for (const seat of livingSeats(state)) next = queueEvent(next, { trigger: willpower > threat ? "questSucceeded" : "questFailed", seat });
   }
   return clearCommitted(advanceReady(next, cards, steps, canAdvance));
 }
@@ -230,7 +235,8 @@ export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Car
   const found: { id: string; cost: number }[] = [];
   for (const id of stagingEnemies(state, cards)) {
     const instance = state.cards[id];
-    if (!instance || flagged(state, id, "cannotBeEngaged")) continue;
+    // An enemy that "does not make engagement checks" is passed over (it can still be engaged optionally).
+    if (!instance || flagged(state, id, "cannotBeEngaged") || flagged(state, id, "noEngagementChecks")) continue;
     const cost = engagementCostOf(state, instance, cards);
     if (cost == null || cost > threat) continue;
     found.push({ id, cost });

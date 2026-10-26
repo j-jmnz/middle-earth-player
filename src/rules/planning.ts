@@ -3,22 +3,23 @@
 import type { Effect } from "../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
-import { effectCause } from "./cause.ts";
+import { effectCause, ruleCause } from "./cause.ts";
 import { deckPlayHero, markDeckPlay, playableFromDeck } from "./deck-play.ts";
 import { holds } from "./conditions.ts";
+import { effectsOf } from "./listen.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
 import { queueEvent } from "./queue.ts";
-import { playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
+import { playerCardEffectCanChoose, raiseThreat, uniqueBlocked } from "./keywords.ts";
 import { targetCandidates } from "./effect-verbs.ts";
 import { planningTurn } from "./pass.ts";
 import { hasResourceMatch, heroPays } from "./payments.ts";
 import { printedOf, type PrintedCard } from "./printed.ts";
 import { attachBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
-import { updateCard } from "./state.ts";
+import { livingSeats, updateCard } from "./state.ts";
 import { attachTo, moveCard } from "./zones.ts";
 
 export function playCard(
@@ -44,12 +45,22 @@ export function playCard(
     next = moveCard(next, intent.cardId, { zone: "hand", seat });
     instance = next.cards[intent.cardId] ?? instance;
   }
+  // A card its text lets its owner play from the discard pile is played from there as if it were in the hand.
+  if (instance.zone === "discard") {
+    next = moveCard(next, intent.cardId, { zone: "hand", seat });
+    instance = next.cards[intent.cardId] ?? instance;
+  }
+  next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round }] };
+  // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x).
+  if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
+    for (const index of livingSeats(next)) next = raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x"));
+  }
   if (printed.type === "event") {
     const x = printed.costX ? intent.payments.reduce((sum, payment) => sum + payment.amount, 0) : undefined;
-    return playEvent(next, intent.cardId, seat, ctx, steps, x);
+    return playEvent(queueEvent(next, { trigger: "played", seat, cardId: intent.cardId }), intent.cardId, seat, ctx, steps, x);
   }
   next = moveCard(next, intent.cardId, { zone: "play", seat });
-  next = updateCard(next, intent.cardId, { exhausted: false });
+  next = updateCard(next, intent.cardId, { exhausted: entersExhausted(ctx, instance.code) });
   if (printed.type === "attachment" && intent.hostId) {
     next = attachTo(next, intent.cardId, intent.hostId);
     next = queueEvent(next, { trigger: "played", seat, cardId: intent.cardId });
@@ -122,12 +133,42 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
   return null;
 }
 
+// The constant records a card in hand carries about its own play: PlayOnlyIf, PlayFromDiscard, EntersPlayExhausted.
+function playRules(ctx: ReduceContext, code: string) {
+  return effectsOf(ctx, code)
+    .filter((effect) => effect.timing === "constant")
+    .flatMap((effect) => effect.instructions);
+}
+
+// "Enters play exhausted" (a constant on the card itself).
+export function entersExhausted(ctx: ReduceContext, code: string): boolean {
+  return playRules(ctx, code).some((instruction) => instruction.verb === "EntersPlayExhausted");
+}
+
+// The card may be played from its owner's discard pile; `only`: and from nowhere else.
+function discardPlay(ctx: ReduceContext, code: string): { allowed: boolean; only: boolean } {
+  const rule = playRules(ctx, code).find((instruction): instruction is Extract<typeof instruction, { verb: "PlayFromDiscard" }> => instruction.verb === "PlayFromDiscard");
+  return { allowed: rule != null, only: rule?.only === true };
+}
+
+// The cards of the seat's discard pile its text lets it play from there.
+export function discardPlayable(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
+  return (state.seats[seat]?.discard ?? []).filter((id) => discardPlay(ctx, state.cards[id]?.code ?? "").allowed);
+}
+
 // Whether a card in the active seat's hand may be played in the open window, before its host and its cost are looked at.
 export function playWindowReason(state: ScenarioState, cardId: string, ctx: ReduceContext): string | null {
   if (state.window?.kind !== "pass" && state.window?.kind !== "frameAction") return "That intent is not legal in this window";
   const instance = state.cards[cardId];
   const fromDeck = instance?.zone === "deck" && playableFromDeck(state, cardId, state.activeSeat, ctx);
-  if (!instance || (instance.zone !== "hand" && !fromDeck) || instance.controller !== state.activeSeat) return "That card is not in hand";
+  const fromDiscard = instance?.zone === "discard" && discardPlay(ctx, instance.code).allowed;
+  if (!instance || (instance.zone !== "hand" && !fromDeck && !fromDiscard) || instance.controller !== state.activeSeat) return "That card is not in hand";
+  if (instance.zone === "hand" && discardPlay(ctx, instance.code).only) return "That card can only be played from the discard pile";
+  // "Play only if ..." (a play restriction, rr.initiating-abilities-playing-cards).
+  const scope = { actor: state.activeSeat, sourceId: cardId, returned: 0 };
+  for (const instruction of playRules(ctx, instance.code)) {
+    if (instruction.verb === "PlayOnlyIf" && !holds(state, instruction.condition, scope, ctx)) return "That card's play restriction is not met";
+  }
   const printed = printedOf(ctx.cards, instance.code);
   if (printed.type !== "ally" && printed.type !== "attachment" && printed.type !== "event") return "That card cannot be played";
   // Events are Actions: any action window. Allies and attachments are played in the planning phase only, by the

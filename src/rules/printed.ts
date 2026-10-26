@@ -35,6 +35,7 @@ export type Keywords = {
   sentinel: boolean;
   ranged: boolean;
   restricted: boolean;
+  secrecy: number | null;
 };
 
 export type PrintedCard = {
@@ -77,6 +78,7 @@ const EMPTY_KEYWORDS: Keywords = {
   sentinel: false,
   ranged: false,
   restricted: false,
+  secrecy: null,
 };
 
 export function definePrinted(
@@ -187,6 +189,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       sentinel: keywords.sentinel === true,
       ranged: keywords.ranged === true,
       restricted: keywords.restricted === true,
+      secrecy: keywords.secrecy ?? null,
     },
   });
 }
