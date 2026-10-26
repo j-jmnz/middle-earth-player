@@ -1,4 +1,4 @@
-import type { Instruction, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
+import type { Instruction, ModifierUntil, PickSpec, ScenarioDefinition } from "../catalog/boundary.ts";
 
 import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAttack, PendingStrike, UsedEffect } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
@@ -49,6 +49,9 @@ export type ZoneName =
   | "under";
 
 export type CardFace = "up" | "down" | "A" | "B";
+
+// "Reduce the cost of the next Silvan ally you play this phase by 1": spent by the first card that matches.
+export type Discount = { seat: number; sourceId: string; pick: PickSpec; amount: number; until: "endOfPhase" | "endOfRound"; min?: number };
 
 export type CardInstance = {
   id: string;
@@ -232,6 +235,8 @@ export type ScenarioState = {
   // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
   // damage then waits for those Responses before it destroys the character (settle keeps it current).
   holdLethal?: true;
+  // Cost reductions waiting for the next matching card a seat plays (ReduceNextCost). They end with the phase or the round.
+  discounts?: readonly Discount[];
   // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first
   // Rohan ally you play each round"). Only this round's are kept.
   played?: readonly { id: string; code: string; seat: number; round: number }[];
@@ -380,7 +385,10 @@ export function withMode(state: ScenarioState, mode: ModeName): ScenarioState {
   const expiring: ModifierUntil[] = [];
   if (state.phase !== phase) expiring.push("endOfPhase");
   if (mode === "beginRound" && state.mode !== "beginRound") expiring.push("endOfRound");
-  return expiring.length === 0 ? changed : expireModifiers(changed, expiring);
+  if (expiring.length === 0) return changed;
+  const discounts = (changed.discounts ?? []).filter((discount) => !expiring.includes(discount.until));
+  const kept = discounts.length === (changed.discounts ?? []).length ? changed : { ...changed, discounts };
+  return expireModifiers(kept, expiring);
 }
 
 // The seat a Peril card's staging is locked to, or null. An enemy attack that card starts is open to every player

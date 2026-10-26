@@ -3,6 +3,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import { resolveAmount } from "./amounts.ts";
 import { effectsOf } from "./listen.ts";
+import { costReduction } from "./cost-rules.ts";
 import { ruleCause } from "./cause.ts";
 import { characters } from "./combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
@@ -61,8 +62,9 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
   });
 }
 
-// What a card costs to play from the hand: its printed cost less each ReduceCost record whose condition holds.
-export function playCost(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): number | null {
+// What a card costs to play from the hand: its printed cost less each ReduceCost record whose condition holds, Secrecy, the
+// seat's discounts and the constants of its cards in play (cost-rules.ts). `hostId` is where an attachment goes.
+export function playCost(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, hostId?: string | null): number | null {
   const instance = state.cards[cardId];
   if (!instance) return null;
   const printed = printedOf(ctx.cards, instance.code);
@@ -79,6 +81,8 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
       cost -= resolveAmount(state, instruction.amount, { actor: seat, sourceId: cardId }, ctx);
     }
   }
+  const reduced = costReduction(state, cardId, seat, ctx, hostId);
+  if (reduced.amount > 0) cost = Math.max(Math.min(cost, reduced.min), cost - reduced.amount);
   return Math.max(0, cost);
 }
 

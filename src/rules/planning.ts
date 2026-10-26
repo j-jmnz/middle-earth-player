@@ -7,6 +7,7 @@ import { effectCause, ruleCause } from "./cause.ts";
 import { deckPlayHero, markDeckPlay, playableFromDeck } from "./deck-play.ts";
 import { holds } from "./conditions.ts";
 import { effectsOf } from "./listen.ts";
+import { distinctHeroesReason, spendDiscount } from "./cost-rules.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -50,6 +51,8 @@ export function playCard(
     next = moveCard(next, intent.cardId, { zone: "hand", seat });
     instance = next.cards[intent.cardId] ?? instance;
   }
+  // The discount it used is spent, and the card joins this round's plays.
+  next = spendDiscount(next, intent.cardId, seat, ctx);
   next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round }] };
   // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x).
   if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
@@ -201,7 +204,10 @@ export function playReason(
       return "That host is illegal";
     }
   }
-  return paymentReason(state, state.activeSeat, intent.cardId, printed, playCost(state, intent.cardId, state.activeSeat, ctx), intent.payments, ctx);
+  return (
+    paymentReason(state, state.activeSeat, intent.cardId, printed, playCost(state, intent.cardId, state.activeSeat, ctx, intent.hostId ?? null), intent.payments, ctx) ??
+    distinctHeroesReason(state, intent.cardId, intent.payments, ctx)
+  );
 }
 
 export function attachmentTargets(state: ScenarioState, code: string | undefined, ctx: ReduceContext): readonly string[] {

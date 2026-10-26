@@ -61,11 +61,13 @@ function paymentsOf(request: PayRequest | null, roll: Dice): Payment[] | null {
 /** The PlayCard the table would send for this card: its first shares and, for an attachment, the first legal host. */
 export function playIntent(state: ScenarioState, ctx: ReduceContext, cardId: string, roll: Dice): PlayerIntent | null {
   const instance = state.cards[cardId];
-  const payments = paymentsOf(playRequest(state, ctx, cardId), roll);
-  if (!instance || !payments) return null;
-  if (printedOf(ctx.cards, instance.code).type !== "attachment") return { type: "PlayCard", cardId, payments };
-  const host = legalTargets(state, { type: "PlayCard", cardId }, ctx)[0];
-  return host ? { type: "PlayCard", cardId, payments, hostId: host } : null;
+  if (!instance) return null;
+  const attachment = printedOf(ctx.cards, instance.code).type === "attachment";
+  const host = attachment ? legalTargets(state, { type: "PlayCard", cardId }, ctx)[0] : undefined;
+  if (attachment && !host) return null;
+  const payments = paymentsOf(playRequest(state, ctx, cardId, host ?? null), roll);
+  if (!payments) return null;
+  return host ? { type: "PlayCard", cardId, payments, hostId: host } : { type: "PlayCard", cardId, payments };
 }
 
 /** The Trigger the table would send for an offered Action or Response: its first shares when its cost takes resources. */

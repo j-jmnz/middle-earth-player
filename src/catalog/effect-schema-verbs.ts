@@ -248,6 +248,34 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("PlayOnlyIf"), condition: conditionSchema, ...when }),
   z.strictObject({ verb: z.literal("PlayFromDiscard"), only: z.boolean().optional(), ...when }),
   verb("EntersPlayExhausted"),
+  // The next card the actor (or the picked player) plays that matches costs less, once, until the phase or round ends ("Reduce
+  // the cost of the next Silvan ally you play this phase by 1"). `min`: not below this ("to a minimum of 1").
+  z.strictObject({
+    verb: z.literal("ReduceNextCost"),
+    pick: pickSchema,
+    amount: positiveAmountSchema,
+    until: z.enum(["endOfPhase", "endOfRound"]),
+    min: z.number().int().min(0).optional(),
+    who: z.enum(["actor", "picked"]).optional(),
+    ...when,
+  }),
+  // Constants on a card in play, read when its controller plays a card that matches. ReduceCostOf: it costs less (`firstEachRound`:
+  // only the first such card each round; `onHost`: only an attachment played on the source, or on the source's host).
+  // IgnoreResourceMatch: it needs no resource match, and any of the controller's heroes may pay for it. PaysFor: this hero's
+  // resources may pay for it (of the `spheres` named, or of any sphere).
+  z.strictObject({
+    verb: z.literal("ReduceCostOf"),
+    pick: pickSchema,
+    amount: positiveAmountSchema,
+    firstEachRound: z.boolean().optional(),
+    onHost: z.enum(["self", "host"]).optional(),
+    min: z.number().int().min(0).optional(),
+    ...when,
+  }),
+  z.strictObject({ verb: z.literal("IgnoreResourceMatch"), pick: pickSchema, firstEachRound: z.boolean().optional(), ...when }),
+  z.strictObject({ verb: z.literal("PaysFor"), pick: pickSchema, spheres: z.array(z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"])).min(1).optional(), ...when }),
+  // Constant on a card in hand: its cost must be paid from at least `min` (at most `max`) different heroes' pools.
+  z.strictObject({ verb: z.literal("PayDistinctHeroes"), min: z.number().int().positive().optional(), max: z.number().int().positive().optional(), ...when }),
   // A deckbuilding limit: at most this many copies of the card in a deck ("Limit 1 per deck").
   z.strictObject({ verb: z.literal("DeckLimit"), copies: z.number().int().positive(), ...when }),
   // Constants on an attachment: the attached card gains this trait, or this resource icon.

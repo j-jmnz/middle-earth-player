@@ -88,7 +88,7 @@ export function playSheet(game: ScenarioState, ctx: ReduceContext, legal: readon
   const instance = game.cards[cardId];
   if (!instance || !legal.some((intent) => intent.type === "PlayCard" && intent.cardId === cardId)) return null;
   const name = names.card(cardId);
-  const request = playRequest(game, ctx, cardId);
+  const request = playRequest(game, ctx, cardId, hostId);
   const at = (host: string | null): PlayerIntent => (host ? { type: "PlayCard", cardId, payments: [], hostId: host } : { type: "PlayCard", cardId, payments: [] });
   if (printedOf(ctx.cards, instance.code).type === "attachment" && hostId == null) {
     const hosts = legalTargets(game, { type: "PlayCard", cardId }, ctx);

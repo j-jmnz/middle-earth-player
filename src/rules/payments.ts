@@ -1,5 +1,6 @@
 // Rules: rr.resource-match, rr.resources (data/rules/entries.json).
 import { grantedIcons } from "./conditions.ts";
+import { heroPaysFor } from "./cost-rules.ts";
 import { deckPlayIcons } from "./deck-play.ts";
 import type { Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -13,6 +14,7 @@ export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | 
   if (!hero) return false;
   if (spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) return true;
   if (grantedIcons(state, heroId, ctx).some((icon) => spherePays(icon, sphere))) return true;
+  if (forCard != null && heroPaysFor(state, heroId, forCard, ctx)) return true;
   return forCard != null && deckPlayIcons(state, heroId, forCard, ctx).some((icon) => spherePays(icon, sphere));
 }
 

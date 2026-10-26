@@ -129,6 +129,14 @@ export function runPlayerVerb(
       // What is left of the damage is what a later cancel of the same damage can take.
       return data?.kind === "effect" ? patchTop(canceled, { data: { ...data, dealt: dealt - amount } }) : canceled;
     }
+    case "ReduceNextCost": {
+      const scope = frameScope(state, focus.seat, focus.sourceId);
+      const seat = instruction.who === "picked" ? seatOf(lastPicked(state)) : focus.seat;
+      const amount = resolveAmount(state, instruction.amount, scope, ctx);
+      if (seat == null || amount <= 0) return state;
+      const discount = { seat, sourceId: focus.sourceId ?? "", pick: instruction.pick, amount, until: instruction.until, ...(instruction.min != null ? { min: instruction.min } : {}) };
+      return { ...state, discounts: [...(state.discounts ?? []), discount] };
+    }
     case "SetThreat":
       return withThreat(state, focus.seat, instruction.value);
     case "LowerThreat": {

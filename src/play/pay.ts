@@ -38,12 +38,12 @@ function poolsFor(state: ScenarioState, ctx: ReduceContext, seat: number, sphere
 }
 
 /** The pay request for playing a card from the hand (or the top of the deck), or null when it costs nothing to name. */
-export function playRequest(state: ScenarioState, ctx: ReduceContext, cardId: string): PayRequest | null {
+export function playRequest(state: ScenarioState, ctx: ReduceContext, cardId: string, hostId: string | null = null): PayRequest | null {
   const seat = state.activeSeat;
   const instance = state.cards[cardId];
   if (!instance) return null;
   const printed = printedOf(ctx.cards, instance.code);
-  const cost = playCost(state, cardId, seat, ctx) ?? 0;
+  const cost = playCost(state, cardId, seat, ctx, hostId) ?? 0;
   const pools = poolsFor(state, ctx, seat, printed.sphere, cardId);
   if (!printed.costX && cost === 0) return null;
   return { seat, cardId, total: cost, exact: !printed.costX, pools };
