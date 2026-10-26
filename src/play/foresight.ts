@@ -103,3 +103,19 @@ export function engagesAtThreat(game: ScenarioState, ctx: ReduceContext, enemyId
   const cost = engagementCostOf(game, card, ctx.cards);
   return cost != null && cost <= (game.seats[seat]?.threat ?? 0);
 }
+
+/** One enemy in staging against a seat's threat, for the threat panel: its engagement cost and whether the checks engage it. */
+export type ThreatRow = { id: string; cost: number; engages: boolean };
+
+/** The enemies in staging with an engagement cost, lowest first, against the seat's threat now (rr.engagement-check). */
+export function threatRows(game: ScenarioState, ctx: ReduceContext, seat: number): ThreatRow[] {
+  const threat = game.seats[seat]?.threat ?? 0;
+  return game.staging
+    .flatMap((id): ThreatRow[] => {
+      const card = game.cards[id];
+      if (!card || card.face === "down" || ctx.cards.get(card.code)?.type !== "enemy") return [];
+      const cost = engagementCostOf(game, card, ctx.cards);
+      return cost == null ? [] : [{ id, cost, engages: cost <= threat }];
+    })
+    .sort((left, right) => left.cost - right.cost);
+}

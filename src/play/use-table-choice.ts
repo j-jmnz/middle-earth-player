@@ -119,6 +119,8 @@ export function useTableChoice({
   // The numbers the pick draws on its cards (the damage each defender would take), keyed so the canvas draws again only
   // when they change.
   const optionMarks = panel ? [] : optionMarksOf(sheet);
+  // In planning, the hand cards that cannot be played now are dimmed, so the player sees which can (a tap says why not).
+  const mutedKey = !panel && sheet.kind === "window" && game.mode === "planning" ? (game.seats[seat]?.hand ?? []).filter((id) => !sheet.plays.includes(id)).join(",") : "";
   const markKey = optionMarks.map(([id, mark]) => `${id}=${mark.icon}:${mark.value}:${mark.danger ? 1 : 0}`).join(",");
   const highlight = useMemo(
     (): TableHighlight => ({
@@ -135,8 +137,9 @@ export function useTableChoice({
               return [id, { icon: icon as OptionMark["icon"], value: Number(value), danger: danger === "1" }];
             }),
       ),
+      muted: new Set(mutedKey === "" ? [] : mutedKey.split(",")),
     }),
-    [glowKey, pickedKey, share, dimOthers, markKey],
+    [glowKey, pickedKey, share, dimOthers, markKey, mutedKey],
   );
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";

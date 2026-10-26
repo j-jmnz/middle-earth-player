@@ -14,8 +14,8 @@ import { cancelAnimation, Easing, useDerivedValue, useReducedMotion, useSharedVa
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
-import { AttackerMark, Badges, CardBody, CombatMarkView, Glow, Leaving, Marks, Moving, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
-import { sphereIcon } from "./icon-map.ts";
+import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, Glow, Leaving, Marks, Moving, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
+import { SPHERE_TINT, sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
 import { motionsBetween, type Ghost, type Motion } from "./motion.ts";
@@ -48,6 +48,12 @@ function useViews(store: TableCanvasProps["store"], seat: number): { views: Layo
   );
 }
 
+// The sphere colour a hero's resource token is ringed with: its resources pay for cards of that sphere (rr.resource-match).
+function sphereRing(sphere: string | null): string | null {
+  const tint = sphere ? SPHERE_TINT[sphere] : undefined;
+  return tint && tint !== "faint" ? t[tint] : null;
+}
+
 // A faint word in an empty zone, so the player knows what the space is for.
 function ZoneWord({ rect, text, font }: { rect: Rect; text: string; font: SkFont }) {
   return <Text x={rect.x + 6} y={rect.y + 16} text={text} font={font} color={t.faint} />;
@@ -62,6 +68,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // Only the slices drawn here: a threat change alone does not draw the table again (docs/architecture.md, State). The
   // effects in play and the attack in progress change the numbers on cards.
   const modifiers = useStore(store, (state) => state.game.modifiers);
+  // The shown seat's threat sets which enemies in staging engage it (their marks), and the delayed effects mark cards.
+  const threat = useStore(store, (state) => state.game.seats[seat]?.threat ?? 0);
+  const delayed = useStore(store, (state) => state.game.delayed);
   const attacker = useStore(store, (state) => state.game.pendingAttack?.enemyId ?? null);
   const deckTopId = useStore(store, (state) => state.game.seats[seat]?.deck[0] ?? null);
   const deckTopCard = useStore(store, (state) => (deckTopId ? (state.game.cards[deckTopId] ?? null) : null));
@@ -250,16 +259,20 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     return (
       <Group>
         {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} images={tokens} /> : null}
-        <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} />
-        {slot.kind === "card" ? <Marks rect={rect} tappable={tappable} picked={picked} share={highlight.share} dimmed={highlight.dimOthers && !tappable && picked === 0} fonts={fonts} /> : null}
+        {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} /> : null}
+        {slotInfo?.delayed ? <DelayedMark rect={rect} /> : null}
+        <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code)) : null} />
+        {slot.kind === "card" ? <Marks rect={rect} tappable={tappable} picked={picked} share={highlight.share} dimmed={(highlight.dimOthers && !tappable && picked === 0) || highlight.muted.has(slot.id)} fonts={fonts} /> : null}
         {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} /> : null}
       </Group>
     );
   };
 
   const attackerSlot = layout.attacker ? (layout.slots.find((slot) => slot.id === layout.attacker && slot.kind === "card") ?? null) : null;
-  // The numbers on cards are read again when the effects in play change.
+  // The numbers on cards are read again when the effects in play, the threat or the delayed effects change.
   void modifiers;
+  void threat;
+  void delayed;
   const still: Motion = { dx: 0, dy: 0, scale: 1, fromRot: 0, toRot: 0, fromOpacity: 1 };
   const emptyWords: [Rect, string][] = [
     ...(views.staging.entries.length === 0 ? [[layout.zones.staging, "Staging"] as [Rect, string]] : []),

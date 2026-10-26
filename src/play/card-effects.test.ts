@@ -23,7 +23,7 @@ describe("effects on a card", () => {
     expect(cardEffects(kept, ctx, sam)).toEqual({ stats: [], flags: [] });
     // Merry (141003) gets +1 attack for each Hobbit hero his controller has: three, with Frodo and Sam.
     const hero = kept.cards[merry];
-    expect(cardEffects(kept, ctx, merry).stats).toEqual([{ stat: "attack", icon: "attack", word: "Attack", value: hero ? modifiedStat(kept, hero, "attack", ctx.cards) : -1, delta: 3 }]);
+    expect(cardEffects(kept, ctx, merry).stats).toEqual([{ stat: "attack", icon: "attack", word: "Attack", value: hero ? modifiedStat(kept, hero, "attack", ctx.cards) : -1, delta: 3, lasting: false }]);
     expect(effectLines(kept, ctx, merry, () => "Merry")).toEqual(["+3 Attack from its own text, while it is in play"]);
   });
 

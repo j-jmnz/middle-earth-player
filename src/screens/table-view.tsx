@@ -22,11 +22,12 @@ import { TableCanvas } from "../play/table-canvas";
 import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
 import { ChromeButton, PhaseRail, ThreatRing, threatLine } from "../play/table-chrome";
 import { MomentBanner, TableDock } from "../play/table-dock";
-import { LogPanel, PileList, SidePanel } from "../play/table-panel";
+import { LogPanel, PileList, SidePanel, ThreatPanel } from "../play/table-panel";
+import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
 import { ledgerLine, ruleTitle } from "../play/ledger";
-import { notAppliedCodes } from "../play/not-applied";
+import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { Screen } from "./chrome";
 import { goBack } from "./go-back";
 import { enqueueImageDownloads } from "./images/queue";
@@ -74,6 +75,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const ctx = session.ctx;
 
   const [logOpen, setLogOpen] = useState(false);
+  // A reading panel over the table's right side: the threat panel (a tap on a dial) for a seat.
+  const [reading, setReading] = useState<{ kind: "threat"; seat: number } | null>(null);
   const [pile, setPile] = useState<PileId | null>(null);
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
@@ -99,7 +102,10 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const inactiveSet = useMemo(() => notAppliedCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const)), [session]);
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
   // Read from the latest state: the canvas draws again when the cards, the effects in play or the attack change.
-  const info = useCallback((cardId: string): SlotInfo => slotNumbers(store.getState().game, ctx, cardId), [store, ctx]);
+  const info = useCallback((cardId: string): SlotInfo => {
+    const now = store.getState().game;
+    return slotNumbers(now, ctx, cardId, shownSeat(now));
+  }, [store, ctx]);
   const rail = useMemo(() => railFor(game), [game]);
   const logNames: LogNames = useMemo(
     () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => ctx.effects.find((effect) => effect.id === effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
@@ -121,8 +127,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         setPreview(null);
         return true;
       }
-      const step = backStep({ logOpen, pileOpen: pile != null, overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen });
-      if (step === "closeLog") setLogOpen(false);
+      const step = backStep({ infoOpen: reading != null, logOpen, pileOpen: pile != null, overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen });
+      if (step === "closeInfo") setReading(null);
+      else if (step === "closeLog") setLogOpen(false);
       else if (step === "closePile") setPile(null);
       else if (step === "closeOverlay") choice.closeOverlay();
       else if (step === "foldPanel") choice.fold();
@@ -130,13 +137,17 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [preview, logOpen, pile, choice, router, nav]);
+  }, [preview, reading, logOpen, pile, choice, router, nav]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
     setSize((current) => (current && current.width === width && current.height === height ? current : { width, height }));
   };
 
+  // The staging enemies' engagement costs, marked on each dial's meter (the same for every seat; each dial reads its own).
+  const tickKey = useStore(store, (state) => threatRows(state.game, ctx, 0).map((row) => row.cost).join(","));
+  const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
+  const ticksOf = (_seat: number): readonly number[] => ticks;
   const showLife = game.widgets.lifeTracker && game.life != null;
   const threatText = threatLine(threats, showLife ? (game.life ?? 0) : null);
   const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
@@ -150,7 +161,13 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         game,
         ctx,
         preview.id,
-        (code) => ({ name: nameOf(code), source: picture(code), landscape: session.world.cards.get(code)?.type === "quest", text: session.facts.get(code)?.text ?? null }),
+        (code) => ({
+          name: nameOf(code),
+          source: picture(code),
+          landscape: session.world.cards.get(code)?.type === "quest",
+          text: session.facts.get(code)?.text ?? null,
+          notApplied: notApplied(code, session.world.cards.get(code)?.type, session.facts.get(code)?.text ?? null),
+        }),
         names.card,
         preview.extra,
       )
@@ -171,6 +188,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
                 active={threats.length > 1 && threat.seat === seat}
                 compact
+                ticks={ticksOf(threat.seat)}
+                onPress={() => setReading({ kind: "threat", seat: threat.seat })}
               />
             ))}
             {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
@@ -212,7 +231,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           </View>
           <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8) }}>
             {/* The quest card on the table already shows its progress: the band gives way while the dock shows numbers. */}
-            {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} />}
+            {choice.readout ? <View /> : <QuestBand game={game} ctx={ctx} nameOf={nameOf} line={ledgerLine} />}
             <TableDock
               step={choice.header.step}
               title={choice.header.title}
@@ -261,6 +280,16 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       {logOpen ? (
         <View style={panelStyle}>
           <LogPanel round={game.round} lines={lines} onClose={() => setLogOpen(false)} />
+        </View>
+      ) : null}
+      {reading?.kind === "threat" ? (
+        <View style={panelStyle}>
+          <ThreatPanel
+            seatLabel={game.seatCount > 1 ? `Player ${reading.seat + 1}` : "Threat"}
+            threat={game.seats[reading.seat]?.threat ?? 0}
+            rows={threatRows(game, ctx, reading.seat).map((row) => ({ ...row, name: names.card(row.id) }))}
+            onClose={() => setReading(null)}
+          />
         </View>
       ) : null}
       {/* Over the table and any open panel, centered on the screen under the top bar. */}

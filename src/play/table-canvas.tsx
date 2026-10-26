@@ -19,7 +19,7 @@ const ZONE_WORD: Record<ZoneId, string> = {
   hand: "Hand",
 };
 
-type RowProps = Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "onTap" | "onPreview" | "highlight"> & { seat: number };
+type RowProps = Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "info" | "onTap" | "onPreview" | "highlight"> & { seat: number };
 
 function CardButton({ id, label, faceDown, onTap, onPreview, highlight }: { id: string; label: string; faceDown: boolean } & Pick<TableCanvasProps, "onTap" | "onPreview" | "highlight">) {
   const picked = highlight.picked.get(id) ?? 0;
@@ -42,7 +42,16 @@ function CardButton({ id, label, faceDown, onTap, onPreview, highlight }: { id: 
   );
 }
 
-function ZoneRow({ store, zone, seat, nameOf, inactive, onTap, onPreview, highlight }: RowProps & { zone: ZoneId }) {
+// What the canvas draws on a card, in words for the web list: an enemy's engagement cost against the threat, a delayed
+// effect to come.
+function marksText(info: TableCanvasProps["info"], cardId: string, zone: ZoneId): string {
+  if (zone === "hand") return "";
+  const slot = info(cardId);
+  const engagement = slot.engagement ? ` · engagement ${slot.engagement.cost}, ${slot.engagement.engages ? "engages" : "stays"}` : "";
+  return `${engagement}${slot.delayed ? " · an effect comes later" : ""}`;
+}
+
+function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, highlight }: RowProps & { zone: ZoneId }) {
   const select = useMemo(() => zoneSelector(zone, seat), [zone, seat]);
   const view = useStore(store, (state) => select(state.game));
   if (view.entries.length === 0) return null;
@@ -55,7 +64,7 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, onTap, onPreview, highli
             key={card.id}
             id={card.id}
             faceDown={card.face === "down"}
-            label={card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Inactive" : ""}`}
+            label={card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Not applied" : ""}${marksText(info, card.id, zone)}`}
             onTap={onTap}
             onPreview={onPreview}
             highlight={highlight}
@@ -73,9 +82,9 @@ function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight }: Row
   return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORDS[pile]} (${view.ids.length})${top}`} onTap={onTap} onPreview={onPreview} highlight={highlight} />;
 }
 
-export function TableCanvas({ store, width, height, nameOf, inactive, onTap, onPreview, highlight }: TableCanvasProps) {
+export function TableCanvas({ store, width, height, nameOf, inactive, info, onTap, onPreview, highlight }: TableCanvasProps) {
   const seat = useStore(store, (state) => shownSeat(state.game));
-  const rowProps = { store, seat, nameOf, inactive, onTap, onPreview, highlight };
+  const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight };
   return (
     <ScrollView style={{ width, height, backgroundColor: t.felt }} contentContainerStyle={{ padding: 12 }}>
       {TABLE_ZONES.map((zone) => (

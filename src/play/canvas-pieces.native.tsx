@@ -200,12 +200,12 @@ export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlo
  * The token art on a card, each with its count: resources bottom left, damage top right, progress bottom right. `rect` is
  * the card's rectangle on screen, so the tokens of an exhausted card stay upright in its sideways footprint.
  */
-export function Tokens({ slot, rect, images, fonts }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts }) {
+export function Tokens({ slot, rect, images, fonts, ring = null }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; ring?: string | null }) {
   const { x, y, w, h } = rect;
-  const items: { image: SkImage | null; value: number; cx: number; cy: number; fallback: string }[] = [];
-  if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, cx: x + TOKEN / 2 + 1, cy: y + h - TOKEN / 2 - 1, fallback: t.gold });
-  if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, cx: x + w - TOKEN / 2 - 1, cy: y + TOKEN / 2 + 1, fallback: t.threat });
-  if (slot.progress > 0) items.push({ image: images.progress, value: slot.progress, cx: x + w - TOKEN / 2 - 1, cy: y + h - TOKEN / 2 - 1, fallback: t.bone });
+  const items: { image: SkImage | null; value: number; cx: number; cy: number; fallback: string; ring: string | null }[] = [];
+  if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, cx: x + TOKEN / 2 + 1, cy: y + h - TOKEN / 2 - 1, fallback: t.gold, ring });
+  if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, cx: x + w - TOKEN / 2 - 1, cy: y + TOKEN / 2 + 1, fallback: t.threat, ring: null });
+  if (slot.progress > 0) items.push({ image: images.progress, value: slot.progress, cx: x + w - TOKEN / 2 - 1, cy: y + h - TOKEN / 2 - 1, fallback: t.bone, ring: null });
   return (
     <Group>
       {items.map((item, index) => (
@@ -215,6 +215,8 @@ export function Tokens({ slot, rect, images, fonts }: { slot: CardSlot; rect: Re
           ) : (
             <Circle cx={item.cx} cy={item.cy} r={TOKEN / 2} color={item.fallback} />
           )}
+          {/* A hero's resources pay for its own sphere: the token is ringed in that sphere's colour. */}
+          {item.ring ? <Circle cx={item.cx} cy={item.cy} r={TOKEN / 2 + 0.5} color={item.ring} style="stroke" strokeWidth={1.75} /> : null}
           <Outlined x={item.cx} y={item.cy + 4} text={String(item.value)} font={fonts.numbers} />
         </Group>
       ))}
@@ -254,6 +256,12 @@ export function Badges({ slot, rect, effects, willpower, questPoints, fonts, ima
       <Group key={`s${badge.stat}`}>
         <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={up ? t.gold : t.night} />
         {up ? null : <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={t.danger} style="stroke" strokeWidth={1} />}
+        {/* An effect that ends with the phase, the round or the attack: a dashed edge says it will go (the preview says when). */}
+        {badge.lasting ? (
+          <RoundedRect x={x + 1} y={top - 1} width={width + 2} height={BADGE_H + 2} r={BADGE_H / 2 + 1} color={up ? t.bone : t.danger} style="stroke" strokeWidth={1}>
+            <DashPathEffect intervals={[2, 2]} />
+          </RoundedRect>
+        ) : null}
         <BadgeIcon name={badge.icon} x={x + 5} y={top + 2} size={11} color={up ? t.onGold : t.danger} images={images} />
         <Text x={x + 18} y={top + 11.5} text={text} font={fonts.badge} color={up ? t.onGold : t.danger} />
       </Group>
@@ -349,6 +357,40 @@ export function OptionMarkView({ rect, mark, fonts, images }: { rect: Rect; mark
       <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={mark.danger ? t.danger : t.hairline} style="stroke" strokeWidth={1} />
       {image ? <Image image={image} x={left + 1} y={top + 1} width={TOKEN - 2} height={TOKEN - 2} fit="contain" /> : <CanvasIcon name={mark.icon} x={left + 3} y={top + 3} size={TOKEN - 6} color={t.bone} />}
       <Text x={left + TOKEN + 2} y={top + TOKEN - 5} text={text} font={fonts.badge} color={t.bone} />
+    </Group>
+  );
+}
+
+/**
+ * An enemy's engagement cost in staging, at its foot: the engagement token art and the number, on threat red when the
+ * shown seat's threat engages it at the checks (rr.engagement-check), on night when it stays. Upright, like the tokens.
+ */
+export function EngagementMark({ rect, cost, engages, fonts, images }: { rect: Rect; cost: number; engages: boolean; fonts: Fonts; images: TokenImages }) {
+  const { x, y, w, h } = rect;
+  const text = String(cost);
+  const width = TOKEN + fonts.badge.getTextWidth(text) + 8;
+  const left = x + (w - width) / 2;
+  const top = y + h - TOKEN - 4;
+  return (
+    <Group>
+      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={engages ? t.threat : t.night} />
+      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={engages ? t.danger : t.hairline} style="stroke" strokeWidth={1} />
+      {images.engagementCost ? <Image image={images.engagementCost} x={left + 1} y={top + 1} width={TOKEN - 2} height={TOKEN - 2} fit="contain" /> : null}
+      <Text x={left + TOKEN + 2} y={top + TOKEN - 5} text={text} font={fonts.badge} color={t.bone} />
+    </Group>
+  );
+}
+
+/** A card a delayed effect will act on (Sneak Attack's return): a small clock at its top center. The preview says what. */
+export function DelayedMark({ rect }: { rect: Rect }) {
+  const cx = rect.x + rect.w / 2;
+  const cy = rect.y + 9;
+  return (
+    <Group>
+      <Circle cx={cx} cy={cy} r={7} color={t.night} />
+      <Circle cx={cx} cy={cy} r={7} color={t.gold} style="stroke" strokeWidth={1.5} />
+      <Line p1={vec(cx, cy)} p2={vec(cx, cy - 4)} color={t.gold} strokeWidth={1.5} />
+      <Line p1={vec(cx, cy)} p2={vec(cx + 3, cy)} color={t.gold} strokeWidth={1.5} />
     </Group>
   );
 }

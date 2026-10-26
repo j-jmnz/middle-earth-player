@@ -6,7 +6,7 @@
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 import { heldBy, modifiedStat } from "../rules/keywords.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { questPointsOf } from "../rules/quest.ts";
+import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
 import type { ReduceContext } from "../rules/reduce.ts";
 import { flagged, inPlay, modifierActive, type ScenarioState } from "../rules/state.ts";
 
@@ -14,8 +14,10 @@ import type { IconName } from "./icon-map.ts";
 
 export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "threat" | "questPoints" | "engagementCost";
 
-// A printed number an effect changed: its icon, the engine's value now and how far it is from the printed one.
-export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number };
+// A printed number an effect changed: its icon, the engine's value now and how far it is from the printed one. `lasting`
+// when every effect behind it ends with the phase, the round or the attack (the forest spider's +1 until the end of the
+// round), so the pill shows it will go (rr.lasting-effects).
+export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean };
 
 export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged";
 
@@ -80,11 +82,17 @@ export function cardEffects(game: ScenarioState, ctx: ReduceContext, cardId: str
     const base = printedValue(printed, stat);
     if (base == null) continue;
     const value = modifiedStat(game, card, stat, ctx.cards);
-    if (value !== base) stats.push({ stat, icon: STAT_ICON[stat], word: STAT_WORD[stat], value, delta: value - base });
+    if (value === base) continue;
+    const behind = game.modifiers.filter((modifier) => modifier.stat === stat && heldBy(modifier, card, printed) && modifierActive(game, modifier));
+    const lasting = behind.length > 0 && behind.every((modifier) => TEMPORARY.has(modifier.until));
+    stats.push({ stat, icon: STAT_ICON[stat], word: STAT_WORD[stat], value, delta: value - base, lasting });
   }
   const flags = FLAGS.filter((entry) => flagged(game, cardId, entry.flag));
   return { stats, flags };
 }
+
+// The effects that end on their own with a phase, a round or an attack.
+const TEMPORARY: ReadonlySet<ModifierUntil> = new Set(["endOfPhase", "endOfRound", "endOfAttack"]);
 
 const UNTIL: Readonly<Record<ModifierUntil, string>> = {
   endOfPhase: "until the end of the phase",
@@ -123,17 +131,58 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   return lines;
 }
 
+// What a delayed effect will do, in words (rr.delayed-effects).
+function delayedWords(verb: string): string {
+  switch (verb) {
+    case "ReturnToHand":
+      return "returns to its owner's hand";
+    case "ShuffleSelfIntoDeck":
+      return "is shuffled into its owner's deck";
+    case "EngageAll":
+      return "each enemy in staging engages the first player";
+    default:
+      return "its effect resolves";
+  }
+}
+
+/** The delayed effects that will act on a card, in words: "At the end of this phase: returns to its owner's hand (Sneak Attack)". */
+export function delayedLines(game: ScenarioState, cardId: string, cardName: (id: string) => string): readonly string[] {
+  return game.delayed
+    .filter((entry) => entry.subjectId === cardId || (entry.subjectId == null && entry.sourceId === cardId))
+    .map((entry) => {
+      const when = entry.until === "endOfPhase" ? "At the end of this phase" : "At the end of the round";
+      const what = entry.instructions.map((instruction) => delayedWords(instruction.verb)).join(", then ");
+      const source = entry.sourceId && entry.sourceId !== cardId ? ` (${cardName(entry.sourceId)})` : "";
+      return `${when}: ${what}${source}`;
+    });
+}
+
 /**
  * The engine's numbers the canvas draws on one card: the effects on it, its willpower while it is committed to the quest,
- * and the quest points of a quest stage or an active location.
+ * the quest points of a quest stage or an active location, the engagement cost of an enemy in staging against the shown
+ * seat's threat (rr.engagement-check: it engages at the checks when the cost is at or below the threat), and whether a
+ * delayed effect will act on it.
  */
-export function slotNumbers(game: ScenarioState, ctx: ReduceContext, cardId: string): { effects: CardEffects; willpower: number | null; questPoints: number | null } {
+export function slotNumbers(game: ScenarioState, ctx: ReduceContext, cardId: string, seat = 0): SlotNumbers {
   const card = game.cards[cardId];
   const effects = cardEffects(game, ctx, cardId);
   const questing = card != null && (card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation");
+  const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
+  const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
+  const threat = game.seats[seat]?.threat ?? 0;
   return {
     effects,
     willpower: card?.committed ? modifiedStat(game, card, "willpower", ctx.cards) : null,
     questPoints: questing ? questPointsOf(game, card, ctx.cards) : null,
+    engagement: cost != null ? { cost, engages: cost <= threat } : null,
+    delayed: game.delayed.some((entry) => entry.subjectId === cardId || (entry.subjectId == null && entry.sourceId === cardId)),
   };
 }
+
+export type SlotNumbers = {
+  effects: CardEffects;
+  willpower: number | null;
+  questPoints: number | null;
+  engagement: { cost: number; engages: boolean } | null;
+  delayed: boolean;
+};

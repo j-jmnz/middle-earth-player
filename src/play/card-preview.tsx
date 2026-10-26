@@ -13,6 +13,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
 
 import { CardTextView } from "./card-text-view.tsx";
+import type { NotApplied } from "./not-applied.ts";
+import { NotAppliedView } from "./not-applied-view.tsx";
 import { previewSideSize, previewSize } from "./preview-size.ts";
 import { ChromeButton } from "./sheet-paper.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
@@ -32,6 +34,10 @@ export type PreviewCard = {
   effects?: readonly string[];
   // How it sits with the first card: "Attachment", "Shadow card".
   role?: string;
+  // Why a hand card cannot be played now (why.ts), when the tap that opened it found nothing to do.
+  note?: string | null;
+  // The lines of it the app does not apply, and what that costs (not-applied.ts).
+  notApplied?: NotApplied | null;
 };
 
 function Picture({ card, width, height }: { card: PreviewCard; width: number; height: number }) {
@@ -144,6 +150,17 @@ export function CardPreview({
               </Text>
               {shown.role ? <Text className="text-label text-muted">{shown.role}</Text> : null}
               <ScrollView style={{ flexShrink: 1 }} className="mt-2">
+                {shown.note ? (
+                  <View testID="card-preview-why" className="mb-2">
+                    <Text className="font-display text-eyebrow uppercase text-gold">Not playable now</Text>
+                    <Text className="mt-1 text-body text-bone">{shown.note}</Text>
+                  </View>
+                ) : null}
+                {shown.notApplied ? (
+                  <View className="mb-2">
+                    <NotAppliedView notApplied={shown.notApplied} testID="card-preview-not-applied" />
+                  </View>
+                ) : null}
                 {(shown.effects ?? []).length > 0 ? (
                   <View testID="card-preview-effects" className="mb-2">
                     <Text className="font-display text-eyebrow uppercase text-gold">Effects on it</Text>

@@ -3,7 +3,7 @@
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
 import { useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut, ReduceMotion, useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 
 import { GameIcon } from "./game-icon.tsx";
@@ -90,6 +90,8 @@ export function ThreatRing({
   accessibilityName,
   active = false,
   elimination = true,
+  ticks = [],
+  onPress,
 }: {
   threat: SeatThreat;
   label: string;
@@ -101,9 +103,14 @@ export function ThreatRing({
   // The seat the table shows in two-handed play: its label is gold.
   active?: boolean;
   elimination?: boolean;
+  // The engagement costs of the enemies in staging, marked on the meter (rr.engagement-check): those the threat has reached
+  // engage at the checks.
+  ticks?: readonly number[];
+  // A tap opens the threat panel (each enemy's cost against the threat).
+  onPress?: () => void;
 }) {
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} active={active} elimination={elimination} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} active={active} elimination={elimination} ticks={ticks} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
@@ -119,7 +126,27 @@ export function ThreatRing({
   );
 }
 
-function ThreatDial({ threat, label, id, icon, name, active, elimination }: { threat: SeatThreat; label: string; id: string; icon: IconName | null; name: string; active: boolean; elimination: boolean }) {
+function ThreatDial({
+  threat,
+  label,
+  id,
+  icon,
+  name,
+  active,
+  elimination,
+  ticks,
+  onPress,
+}: {
+  threat: SeatThreat;
+  label: string;
+  id: string;
+  icon: IconName | null;
+  name: string;
+  active: boolean;
+  elimination: boolean;
+  ticks: readonly number[];
+  onPress?: () => void;
+}) {
   const reduceMotion = useReducedMotion();
   const level = elimination ? threatLevel(threat.threat) : "calm";
   const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? DIAL[level] : { edge: t.gold, fill: t.night, meter: t.gold };
@@ -143,13 +170,21 @@ function ThreatDial({ threat, label, id, icon, name, active, elimination }: { th
   const delta = change ? threatDelta(change.before, change.after) : null;
   const deltaWords = change ? threatDeltaWords(name, change.before, change.after) : null;
   const critical = level === "critical" && !threat.eliminated;
+  const engaging = ticks.filter((cost) => cost <= threat.threat).length;
+  const tickWords = ticks.length > 0 ? `, ${engaging} of ${ticks.length} enemies in staging engage at this threat` : "";
   return (
-    <View className="min-h-11 flex-row items-center gap-1.5 px-1">
+    <Pressable
+      disabled={!onPress}
+      onPress={onPress}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityHint={onPress ? "Shows each enemy's engagement cost against your threat" : undefined}
+      style={{ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 4 }}
+    >
       <Animated.View style={pop}>
         <View
           testID={id}
           accessible
-          accessibilityLabel={`${name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}`}
+          accessibilityLabel={`${name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}`}
           className="h-10 flex-row items-center gap-1 overflow-hidden rounded-pill px-2.5 pb-1"
           style={{ minWidth: 64, borderWidth: 2, borderColor: look.edge, backgroundColor: look.fill }}
         >
@@ -160,6 +195,10 @@ function ThreatDial({ threat, label, id, icon, name, active, elimination }: { th
           {elimination && !threat.eliminated ? (
             <View className="absolute overflow-hidden" style={{ left: 12, right: 12, bottom: 3, height: 3, borderRadius: 2, backgroundColor: withAlphaHex(t.bone, 0.16) }}>
               <View style={{ height: 3, width: `${Math.round(threatMeter(threat.threat) * 100)}%`, backgroundColor: look.meter }} />
+              {/* A tick at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}
+              {ticks.map((cost, index) => (
+                <View key={`${cost}:${index}`} style={{ position: "absolute", left: `${Math.round(threatMeter(cost) * 100)}%`, top: 0, width: 2, height: 3, backgroundColor: cost <= threat.threat ? t.bone : t.faint }} />
+              ))}
             </View>
           ) : null}
         </View>
@@ -179,7 +218,7 @@ function ThreatDial({ threat, label, id, icon, name, active, elimination }: { th
           </Animated.View>
         ) : null}
       </View>
-    </View>
+    </Pressable>
   );
 }
 

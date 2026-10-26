@@ -15,7 +15,7 @@ import type { Frame } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
-import { damageOutcome, defenseDamage, lossWords, undefendedDamage } from "./foresight.ts";
+import { damageOutcome, defenseDamage, lossWords, threatRows, undefendedDamage } from "./foresight.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
 import { TIMING_WORDS, type OptionMark, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type PickOption, type Sheet, type SheetNames, type SheetOption, type TriggerOption, type Unavailable } from "./sheet-types.ts";
@@ -112,6 +112,20 @@ function foreseen(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id
   if (!outcome.destroyed) return { stats, suffix: "", mark };
   const caution = outcome.loss ? `Tap again: ${names.card(id)} is destroyed, ${lossWords(outcome.loss)}` : undefined;
   return { stats, suffix: " · destroyed", mark, ...(caution ? { caution } : {}) };
+}
+
+// What the optional engagement is against: the seat's threat, and which enemies the engagement checks engage anyway or
+// leave in staging (rr.optional-engagement, rr.engagement-check).
+function optionalEngageNote(game: ScenarioState, ctx: ReduceContext, names: SheetNames): string {
+  const seat = game.activeSeat;
+  const rows = threatRows(game, ctx, seat);
+  const threat = game.seats[seat]?.threat ?? 0;
+  const anyway = rows.filter((row) => row.engages).map((row) => `${names.card(row.id)} (${row.cost})`);
+  const stays = rows.filter((row) => !row.engages).map((row) => `${names.card(row.id)} (${row.cost})`);
+  const parts = [`You may engage one enemy in staging. Your threat is ${threat}.`];
+  if (anyway.length > 0) parts.push(`The checks engage ${anyway.join(", ")} anyway.`);
+  if (stays.length > 0) parts.push(`${stays.join(", ")} ${stays.length === 1 ? "stays" : "stay"} in staging.`);
+  return parts.join(" ");
 }
 
 /** The heroes an undefended attack can land on, when there is more than one to choose from. */
@@ -379,7 +393,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         key: `optionalEngage:${game.round}:${game.activeSeat}`,
         step: "Encounter",
         title: game.seatCount > 1 ? `Player ${game.activeSeat + 1}: optional engagement` : "Optional engagement",
-        note: "You may engage one enemy in staging.",
+        note: optionalEngageNote(game, ctx, names),
         verb: "Engage",
         options: targets.map((id) => {
           const enemy = game.cards[id];

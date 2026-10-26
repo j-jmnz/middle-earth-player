@@ -1,4 +1,4 @@
-import type { CardEffects } from "./card-effects.ts";
+import type { SlotNumbers } from "./card-effects.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import type { LayoutOptions } from "./layout.ts";
 import type { TableStore } from "./store.ts";
@@ -15,11 +15,14 @@ export type TableHighlight = {
   dimOthers: boolean;
   // A number the open pick draws on a card it asks about: the damage a defender would take, in danger when it destroys it.
   marks: ReadonlyMap<string, OptionMark>;
+  // Hand cards that cannot be played in this planning window (why.ts says why on a tap): dimmed.
+  muted: ReadonlySet<string>;
 };
 
-// The engine's numbers the canvas draws on a card: the effects on it, its willpower while it is committed to the quest, and
-// the quest points of a location or a quest stage.
-export type SlotInfo = { effects: CardEffects; willpower: number | null; questPoints: number | null };
+// The engine's numbers the canvas draws on a card (card-effects.ts, slotNumbers): the effects on it, its willpower while it
+// is committed, the quest points of a location or a quest stage, an enemy's engagement cost in staging against the threat,
+// and whether a delayed effect will act on it.
+export type SlotInfo = SlotNumbers;
 
 export type TableCanvasProps = {
   store: TableStore;
