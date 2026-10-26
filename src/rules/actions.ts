@@ -33,7 +33,7 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
 // Every Action the active seat can use now: its condition holds, its limit is unspent, its cost can be paid.
 export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   if (state.window?.kind === "cancelOffer") return cancelIntents(state);
-  if (state.window?.kind === "response") return responseIntents(state);
+  if (state.window?.kind === "response") return responseIntents(state, ctx);
   if (!inTriggerWindow(state)) return [];
   const intents: LegalIntent[] = [];
   for (const instance of Object.values(state.cards)) {

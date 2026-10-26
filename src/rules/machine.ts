@@ -311,7 +311,8 @@ function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineS
   for (const id of cardIds) {
     next = updateCard(next, id, { committed: true, exhausted: true });
     steps.push({ kind: "commit", cardId: id });
-    next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id });
+    // One commit is one occurrence: its characters' Responses share a window (rr.triggering-condition).
+    next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id, occurrence: `commit:${state.round}:${state.activeSeat}` });
   }
   return next;
 }

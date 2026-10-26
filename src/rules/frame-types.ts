@@ -103,10 +103,13 @@ export type HideData = {
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
 // `amount` is the damage a `damaged` event placed (01003:A:1).
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; participants?: readonly string[]; explored?: boolean; amount?: number };
+// `occurrence`: events one game occurrence created share it (each character of one commit), and are announced together in
+// a single response window (rr.triggering-condition).
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; participants?: readonly string[]; explored?: boolean; amount?: number; occurrence?: string };
 
-// A Response a player may use after an event. It is offered once and may be passed.
-export type ResponseOffer = { cardId: string; effectId: string; seat: number };
+// A Response a player may use after an event. It is offered once and may be passed. `event` is the one it answers, when a
+// window answers several events of one occurrence.
+export type ResponseOffer = { cardId: string; effectId: string; seat: number; event?: GameEvent };
 
 export type FrameData =
   | ResumeData

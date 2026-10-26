@@ -1,4 +1,4 @@
-// Rules: rr.limits (data/rules/entries.json).
+// Rules: rr.limits, rr.triggering-condition (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
 
 import { playCost } from "./attach.ts";
@@ -52,6 +52,18 @@ function pool(state: ScenarioState, seat: number, sphere: Sphere | null, ctx: Re
 function costSphere(effect: Effect, source: CardInstance, ctx: ReduceContext): Sphere | null {
   const cost = effect.cost;
   return cost?.kind === "resources" ? (cost.sphere ?? printedOf(ctx.cards, source.code).sphere) : null;
+}
+
+// True when the effect may be offered for an event: its source is there and its limit is not spent. A resource cost is not
+// read here: in a response window another Response may yet add the resources it needs (rr.triggering-condition: the
+// responses of one occurrence are used in any order), and `usable` decides what the window lists at each turn.
+export function offerable(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext): boolean {
+  const cost = effect.cost;
+  if (cost && (cost.kind === "resources" || cost.kind === "selfResources" || cost.kind === "playEvent")) {
+    const source = state.cards[sourceId];
+    return source != null && !limitSpent(state, effect, sourceId, seat);
+  }
+  return usable(state, effect, sourceId, seat, ctx);
 }
 
 // True when the cost could be paid and the limit is not spent. Used to decide what to offer.
