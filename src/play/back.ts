@@ -1,10 +1,14 @@
-// What the Android hardware Back does on the table, one layer at a time: it closes the table menu, then the card preview,
-// then a reading panel (the threat panel, the
-// turn reference, the table settings), then the log, then a discard pile's list, then
-// puts back a sheet the player opened from the table (a payment, a host, an Action; nothing was sent), then folds a choice
-// panel, and only then leaves the table. A folded panel stays a choice the engine is waiting for; leaving loses nothing
-// because every accepted intent is already saved.
-export type BackLayers = { menuOpen?: boolean; previewOpen?: boolean; infoOpen?: boolean; logOpen: boolean; pileOpen: boolean; overlayOpen: boolean; panelOpen: boolean };
+// What the Android hardware Back does on the table, one layer at a time, topmost first:
+//   1. the table menu;
+//   2. the card preview;
+//   3. a reading panel (the threat panel, the turn reference, the table settings);
+//   4. the log;
+//   5. a discard pile's list;
+//   6. a sheet the player opened from the table (a payment, a host, an Action; nothing was sent);
+//   7. a choice panel, which it folds;
+//   and only then it leaves the table. A folded panel stays a choice the engine is waiting for; leaving loses nothing because
+// every accepted intent is already saved.
+export type BackLayers = { menuOpen: boolean; previewOpen: boolean; infoOpen: boolean; logOpen: boolean; pileOpen: boolean; overlayOpen: boolean; panelOpen: boolean };
 
 export type BackStep = "closeMenu" | "closePreview" | "closeInfo" | "closeLog" | "closePile" | "closeOverlay" | "foldPanel" | "leave";
 

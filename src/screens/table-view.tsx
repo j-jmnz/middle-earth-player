@@ -3,7 +3,7 @@
 // intent in user.db, and this view hands the canvas the pictures in the image cache and lays the pieces out. The reducer is
 // the only writer of the game; how a tap becomes an intent is src/play/use-table-choice.ts.
 import { useRouter, type Href } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BackHandler, Text, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
@@ -81,6 +81,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
 
   const [logOpen, setLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // The card preview closes with its own animation; the Back layers call it through this (back.ts).
+  const previewClose = useRef<(() => void) | null>(null);
   // A reading panel over the table's right side: the threat panel (a tap on a dial) for a seat.
   const [reading, setReading] = useState<{ kind: "threat"; seat: number } | { kind: "reference" } | null>(null);
   const settings = useStore(tableSettings, (state) => state.settings);
@@ -128,11 +130,27 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const onMenuRow = useCallback(
     (id: MenuItemId) => {
       setMenuOpen(false);
-      if (id === "leave") goBack(router, nav.back);
-      else if (id === "log") setLogOpen(true);
-      else if (id === "rules") router.push("/glossary");
-      else if (id === "booklet") router.push({ pathname: "/booklet/[id]", params: nav.booklet });
-      else setReading({ kind: "reference" });
+      switch (id) {
+        case "leave":
+          goBack(router, nav.back);
+          return;
+        case "log":
+          setLogOpen(true);
+          return;
+        case "rules":
+          router.push("/glossary");
+          return;
+        case "booklet":
+          router.push({ pathname: "/booklet/[id]", params: nav.booklet });
+          return;
+        case "settings":
+          setReading({ kind: "reference" });
+          return;
+        default: {
+          const unreachable: never = id;
+          throw new Error(`Unknown menu row ${String(unreachable)}`);
+        }
+      }
     },
     [router, nav],
   );
@@ -156,7 +174,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         panelOpen: choice.panelOpen,
       });
       if (step === "closeMenu") setMenuOpen(false);
-      else if (step === "closePreview") setPreview(null);
+      else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
       else if (step === "closeInfo") setReading(null);
       else if (step === "closeLog") setLogOpen(false);
       else if (step === "closePile") setPile(null);
@@ -210,7 +228,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
 
   return (
     <Screen testID="table" scene="felt" inset={false}>
-      <View className="flex-1" style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
+      <View className="flex-1" importantForAccessibility={menuOpen ? "no-hide-descendants" : "auto"} style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
         <TableTopBar
           threats={threats}
           seat={seat}
@@ -338,7 +356,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           />
         </View>
       ) : null}
-      <TableMenu open={menuOpen} nav={nav} top={insets.top + TOP_BAR} right={insets.right + 8} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       {/* Over the table and any open panel, centered on the screen under the top bar. */}
       {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} onBeat={choice.onBeat} /> : null}
       {preview && previewed && shown ? (
@@ -347,9 +364,13 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           card={shown}
           related={previewed.cards.filter((_, index) => index !== previewed.start)}
           onClose={() => setPreview(null)}
+          ownsBack={false}
+          closeRef={previewClose}
           onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })}
         />
       ) : null}
+      {/* Last, so the layer Back closes first is the one on top. */}
+      <TableMenu open={menuOpen} nav={nav} top={insets.top + TOP_BAR} right={insets.right + 8} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
     </Screen>
   );
 }

@@ -58,11 +58,17 @@ export function CardPreview({
   related = [],
   onClose,
   onDetails = null,
+  ownsBack = true,
+  closeRef,
 }: {
   card: PreviewCard;
   // The cards attached to it and its face-up shadow cards, each shown in its place on a tap.
   related?: readonly PreviewCard[];
   onClose: () => void;
+  // The hardware Back closes the preview here (a list's preview) unless the screen routes Back itself (the table's layers,
+  // back.ts) and calls the animated close through `closeRef`.
+  ownsBack?: boolean;
+  closeRef?: { current: (() => void) | null };
   onDetails?: ((code: string) => void) | null;
 }) {
   const screen = useWindowDimensions();
@@ -94,12 +100,20 @@ export function CardPreview({
   }, [progress, reduceMotion, onClose]);
 
   useEffect(() => {
+    if (!ownsBack) return;
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       close();
       return true;
     });
     return () => subscription.remove();
-  }, [close]);
+  }, [close, ownsBack]);
+  useEffect(() => {
+    if (!closeRef) return;
+    closeRef.current = close;
+    return () => {
+      closeRef.current = null;
+    };
+  }, [close, closeRef]);
 
   const scrimStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.get())) * SCRIM }));
   const cardStyle = useAnimatedStyle(() => {

@@ -2,16 +2,18 @@
 // popover under the menu button at the top right. React Native views over the canvas, never on the canvas. The outside tap
 // is a Pressable that fills the screen under the popover, not a Modal: a Modal takes over the orientation lock and the status
 // bar. A row closes the menu and then acts (the caller's onSelect). Android Back closes it first (back.ts).
-import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useEffect, useRef, useState, type ComponentRef, type RefObject } from "react";
+import { AccessibilityInfo, findNodeHandle, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
 import { GameIcon } from "./game-icon.tsx";
+import { MENU_BUTTON } from "./top-bar-layout.ts";
 import { menuItems, type MenuItem, type MenuItemId, type MenuNav } from "./table-menu-items.ts";
 import { tableTokens as t } from "./tokens.ts";
 
-export const MENU_WIDTH = 240;
+const MENU_WIDTH = 240;
+type PressableRef = ComponentRef<typeof Pressable>;
 const ROW = 48;
 // Motion values for phase 23's motion-tokens.ts: in 200 ms ease-out from scale 0.96 at the top right, out 150 ms ease-in.
 const ENTER_MS = 200;
@@ -28,7 +30,7 @@ export function MenuButton({ open, onPress }: { open: boolean; onPress: () => vo
       accessibilityLabel="Menu"
       accessibilityState={{ expanded: open }}
       onPress={onPress}
-      style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
+      style={{ width: MENU_BUTTON, height: MENU_BUTTON, alignItems: "center", justifyContent: "center" }}
     >
       {({ pressed }) => (
         <View
@@ -43,10 +45,11 @@ export function MenuButton({ open, onPress }: { open: boolean; onPress: () => vo
   );
 }
 
-function Row({ item, onPress }: { item: MenuItem; onPress: () => void }) {
+function Row({ item, onPress, rowRef }: { item: MenuItem; onPress: () => void; rowRef?: RefObject<PressableRef | null> }) {
   return (
     <View>
       <Pressable
+        ref={rowRef}
         testID={item.testID}
         collapsable={false}
         accessibilityRole="button"
@@ -105,6 +108,21 @@ export function TableMenu({ open, nav, top, right, onClose, onSelect }: { open: 
     }
   }, [open, reduceMotion, progress]);
 
+  // Focus moves to the first row when the menu opens, so a screen reader starts inside it.
+  const first = useRef<PressableRef>(null);
+  useEffect(() => {
+    if (!open) return;
+    const timer = setTimeout(() => {
+      try {
+        const node = first.current ? findNodeHandle(first.current) : null;
+        if (node != null) AccessibilityInfo.setAccessibilityFocus(node);
+      } catch {
+        // A platform without accessibility focus has nothing to move.
+      }
+    }, ENTER_MS);
+    return () => clearTimeout(timer);
+  }, [open]);
+
   const style = useAnimatedStyle(() => {
     const p = Math.min(1, Math.max(0, progress.get()));
     return { opacity: p, transform: [{ scale: FROM_SCALE + (1 - FROM_SCALE) * p }] };
@@ -112,14 +130,15 @@ export function TableMenu({ open, nav, top, right, onClose, onSelect }: { open: 
 
   if (!open && !leaving) return null;
   return (
-    <>
+    // One modal layer: a screen reader stays inside the menu while it is open (the card preview does the same).
+    <View testID="table-menu-layer" accessibilityViewIsModal={open} pointerEvents={open ? "box-none" : "none"} style={StyleSheet.absoluteFill}>
       {open ? (
         <Pressable
           testID="table-menu-scrim"
           accessibilityRole="button"
           accessibilityLabel="Close the menu"
           onPress={onClose}
-          style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
+          style={StyleSheet.absoluteFill}
         />
       ) : null}
       <Animated.View
@@ -146,10 +165,10 @@ export function TableMenu({ open, nav, top, right, onClose, onSelect }: { open: 
           style,
         ]}
       >
-        {menuItems(nav).map((item) => (
-          <Row key={item.id} item={item} onPress={() => onSelect(item.id)} />
+        {menuItems(nav).map((item, index) => (
+          <Row key={item.id} item={item} rowRef={index === 0 ? first : undefined} onPress={() => onSelect(item.id)} />
         ))}
       </Animated.View>
-    </>
+    </View>
   );
 }

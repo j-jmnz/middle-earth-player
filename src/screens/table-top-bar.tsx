@@ -3,7 +3,7 @@
 // and Table settings are in the menu (src/play/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.
 import { useState } from "react";
-import { View, type LayoutChangeEvent } from "react-native";
+import { ScrollView, View, type LayoutChangeEvent } from "react-native";
 
 import type { Rail } from "../play/rail";
 import type { SeatThreat } from "../play/selectors";
@@ -37,23 +37,34 @@ export function TableTopBar({ threats, seat, life, burdenDeck, rail, narrow, tic
   const zones = bar > 0 ? barZones(bar - 16, dials) : null;
   return (
     <View testID="table-top-bar" className="flex-row items-center px-2" style={{ height: TOP_BAR }} onLayout={onBar}>
-      <View testID="top-bar-left" style={{ width: zones?.left ?? "30%", overflow: "hidden", flexDirection: "row", alignItems: "center" }}>
-        <View style={{ flexDirection: "row", flexShrink: 0 }} onLayout={onDials}>
-          {threats.map((threat) => (
-            <ThreatRing
-              key={threat.seat}
-              threat={threat}
-              label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
-              accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
-              active={threats.length > 1 && threat.seat === seat}
-              compact
-              ticks={ticks}
-              onPress={() => onThreat(threat.seat)}
-            />
-          ))}
-          {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
-          {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
-        </View>
+      <View testID="top-bar-left" style={{ width: zones?.left ?? "30%" }}>
+        {/* The scroll view is taller than the bar so a dial's pop (scale 1.22) is not clipped; it scrolls only when the dials
+            are wider than the room the rail leaves, so none is cut. */}
+        <ScrollView
+          testID="top-bar-scroll"
+          horizontal
+          scrollEnabled={zones?.scroll ?? false}
+          showsHorizontalScrollIndicator={false}
+          style={{ height: 64, marginVertical: -10 }}
+          contentContainerStyle={{ alignItems: "center", paddingVertical: 10 }}
+        >
+          <View style={{ flexDirection: "row", flexShrink: 0 }} onLayout={onDials}>
+            {threats.map((threat) => (
+              <ThreatRing
+                key={threat.seat}
+                threat={threat}
+                label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
+                accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
+                active={threats.length > 1 && threat.seat === seat}
+                compact
+                ticks={ticks}
+                onPress={() => onThreat(threat.seat)}
+              />
+            ))}
+            {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
+            {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
+          </View>
+        </ScrollView>
       </View>
       <View testID="top-bar-middle" style={{ width: zones?.rail ?? "40%" }}>
         <PhaseRail rail={rail} narrow={!zones || !railWide(zones.rail, narrow)} onPress={onRail} />
