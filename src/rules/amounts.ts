@@ -5,6 +5,7 @@ import type { Amount, CardRef } from "../catalog/boundary.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
 import { threatCostOf } from "./families/costs-stats.ts";
+import { miscAmount, namedInPlay } from "./families/misc-amounts.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import { countMatching, pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
@@ -90,7 +91,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   let value = 0;
   if (amount.count && amount.distinct) value = new Set(pickCandidates(state, amount.count, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name)).size;
   else if (amount.count) value = countMatching(state, amount.count, scope.actor, scope.sourceId, ctx);
-  else if (amount.stat) value = statOf(state, refCard(state, amount.of ?? "self", scope), amount.stat, amount.printed === true, ctx);
+  else if (amount.stat) value = statOf(state, amount.ofNamed ? namedInPlay(state, amount.ofNamed, ctx) : refCard(state, amount.of ?? "self", scope), amount.stat, amount.printed === true, ctx);
   else if (amount.x) value = scope.x ?? 0;
   else if (amount.players) value = livingSeats(state).length;
   else if (amount.threat) {
@@ -98,7 +99,8 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
     value = amount.threat === "tens" ? Math.floor(threat / 10) : threat;
   } else if (amount.hand) value = (state.seats[scope.actor]?.hand ?? []).length;
   else if (amount.dealt) value = scope.dealt ?? 0;
+  else if (amount.facedown || amount.resourcesAboveCopies) value = miscAmount(state, amount, scope.sourceId);
   value = value * (amount.times ?? 1) + (amount.plus ?? 0);
   if (amount.limit != null) value = Math.min(value, amount.limit);
-  return Math.max(0, value);
+  return amount.negative ? -Math.max(0, value) : Math.max(0, value);
 }

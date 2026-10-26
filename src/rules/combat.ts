@@ -50,7 +50,8 @@ export function characters(state: ScenarioState, seat: number, cards: Cards): st
     const instance = state.cards[id];
     if (!instance) continue;
     const printed = printedOf(cards, instance.code);
-    if (isAllyLike(printed)) ids.push(id);
+    // An ally attached to another card (Wild Stallion) is an attachment, not a character.
+    if (isAllyLike(printed) && instance.host == null) ids.push(id);
   }
   return ids;
 }
@@ -137,7 +138,7 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   if (!instance || instance.exhausted) return false;
   if (instance.zone !== "heroes" && instance.zone !== "play") return false;
   const printed = printedOf(cards, instance.code);
-  if (!isCharacterType(printed)) return false;
+  if (!isCharacterType(printed) || instance.host != null) return false;
   if (flagged(state, defenderId, "cannotDefend")) return false;
   if (instance.controller === attackedSeat) return true;
   return printed.keywords.sentinel || flagged(state, defenderId, "sentinel");
@@ -201,7 +202,7 @@ export function canAttack(
   if (!attacker || !enemy || (attacker.exhausted && !exhaustedOk) || attacker.controller == null) return false;
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
-  if (!isCharacterType(printed)) return false;
+  if (!isCharacterType(printed) || attacker.host != null) return false;
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
   // only when a card lets the character attack it (families/attack-targets.ts).
   const open = flagged(state, enemyId, "attackableByAny");

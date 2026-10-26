@@ -19,7 +19,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"10059:response:1","cardCode":"10059","lines":["10059:A:2"],"timing":"response","trigger":"committed","subject":"host","condition":{"kind":"all","conditions":[{"kind":"handHasCard"},{"kind":"matches","card":"activeLocation"}]},"instructions":[{"verb":"DiscardFromHand","amount":1},{"verb":"PlaceProgressOn","amount":2,"target":"activeLocation"}]},
   // 10060 Fair and Perilous. The source text splits the one Action over two lines; line 2 (the effect) has no label, so an
   // Action record cannot name it. This record is the whole ability.
-  {"id":"10060:action:1","cardCode":"10060","lines":["10060:A:1"],"timing":"action","instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","traits":["Noldor","Silvan"]}},{"verb":"ModifyStat","stat":"attack","amount":{"stat":"willpower","of":"picked"},"until":"endOfPhase","target":"picked"}]},
+  {"id":"10060:action:1","cardCode":"10060","lines":["10060:A:1","10060:A:2"],"timing":"action","instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","traits":["Noldor","Silvan"]}},{"verb":"ModifyStat","stat":"attack","amount":{"stat":"willpower","of":"picked"},"until":"endOfPhase","target":"picked"}]},
   // 10061 Wellinghall Preserver
   {"id":"10061:constant:1","cardCode":"10061","lines":["10061:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveRestricted","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"10061:constant:2","cardCode":"10061","lines":["10061:A:2"],"timing":"constant","instructions":[{"verb":"EntersPlayExhausted"}]},

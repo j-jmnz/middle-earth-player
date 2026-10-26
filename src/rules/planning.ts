@@ -14,6 +14,7 @@ import { payerOk } from "./families/costs-pay.ts";
 import { exhaustSlack, extraCostReason } from "./families/costs-play.ts";
 import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "./families/deck-play.ts";
 import { doomedRaise } from "./families/deck-rules.ts";
+import { chosenX } from "./families/misc-cost.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
@@ -268,7 +269,7 @@ function paymentReason(
   }
   if (sum === 0 && !hasResourceMatch(state, seat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
   // X is whatever the player pays.
-  if (printed.costX) return null;
+  if (chosenX(state, cardId, ctx)) return null;
   if (cost == null) return "That card has no printed cost";
   if (sum > cost) return "Overpay";
   // Characters exhausted as part of the cost pay the rest (ExhaustToReduce, families/costs-play.ts).

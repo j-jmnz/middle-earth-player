@@ -5,6 +5,7 @@ import { spendablePools } from "./families/costs-verbs.ts";
 import { engagedThisRound } from "./families/attack-events.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
 import { seatThreat } from "./families/play-hooks.ts";
+import { distinctTraitCount, flaggedTrait } from "./families/misc-traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
@@ -204,6 +205,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return Object.values(state.cards).some((card) => card.zone === "campaign");
     case "x":
       return (scope.x ?? 0) >= condition.min;
+    case "distinctTraits":
+      return distinctTraitCount(state, scope.actor, ctx) >= condition.min;
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":
@@ -241,7 +244,7 @@ function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLo
 
 export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
-  return instance != null && (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait));
+  return instance != null && (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait) || flaggedTrait(state, id, trait));
 }
 
 // What the constant records of a card's attachments give it: the Gondor trait from Steward of Gondor, a resource icon
@@ -253,6 +256,10 @@ function grants(state: ScenarioState, id: string, ctx: ReduceContext): { trait?:
   for (const attachmentId of instance.attachments) {
     const attachment = state.cards[attachmentId];
     if (!attachment) continue;
+    // A hero card attached to Thorongil lends its host its resource icon (families/misc-text.ts).
+    const lent = attachment.lends ? state.cards[attachment.lends] : undefined;
+    const lentSphere = lent ? printedOf(ctx.cards, lent.code).sphere : null;
+    if (lentSphere && lentSphere !== "neutral" && lentSphere !== "fellowship" && lentSphere !== "baggins") found.push({ sphere: lentSphere });
     for (const effect of effectsOf(ctx, attachment.code)) {
       if (effect.timing !== "constant") continue;
       const scope = { actor: attachment.controller ?? state.firstPlayer, sourceId: attachment.id, returned: 0 };

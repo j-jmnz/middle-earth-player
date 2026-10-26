@@ -135,7 +135,8 @@ const delaySchema = z.strictObject({
   verb: z.literal("Delay"),
   // `questSucceeded`: when the players quest successfully this phase, and never if they do not ("If the players quest
   // successfully, deal 1 damage to that enemy", 19112:A:1).
-  until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "endOfAttack"]),
+  // `startOfGame`: once the opening hands and mulligans are done, before the first round (a Setup that needs the players to choose).
+  until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "endOfAttack", "startOfGame"]),
   uncancelable: conditionSchema.optional(),
   // The delayed instructions act on the card the last Pick chose (Sneak Attack's ally).
   subject: z.literal("picked").optional(),

@@ -2,7 +2,8 @@
 import type { Effect } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
-import { aboutCard, effectsOf, hears, hearsFromAnywhere } from "./listen.ts";
+import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
+import { effectsOfCard } from "./families/misc-text.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
 import { syncConstants } from "./constants.ts";
 import { pushDue } from "./delayed.ts";
@@ -29,7 +30,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
     // "After this location leaves play" (141045:A:2, 141049:A:2) is heard by the card that left: an ability that requires
     // its card to be out of play resolves from there (rr.in-play-and-out-of-play).
     const leftItself = event.trigger === "leftPlay" && event.cardId === instance.id;
-    for (const effect of effectsOf(ctx, instance.code)) {
+    for (const effect of effectsOfCard(state, ctx, instance)) {
       if (effect.timing !== timing || !hears(state, effect, instance, event, ctx)) continue;
       if (!inPlay(instance.zone) && !leftItself && !hearsFromAnywhere(effect, instance, event)) continue;
       const owner = forcedActor(state, instance, event, ctx);

@@ -9,8 +9,10 @@ import { playCost } from "../rules/attach.ts";
 import type { Payment } from "../rules/intents.ts";
 import type { ReduceContext } from "../rules/interpret.ts";
 import { allyPools, distinctRule } from "../rules/families/costs-pay.ts";
+import { openPools } from "../rules/families/misc-guards.ts";
 import { exhaustSlack } from "../rules/families/costs-play.ts";
 import { payingSlack } from "../rules/families/deck-play.ts";
+import { chosenX } from "../rules/families/misc-cost.ts";
 import { heroPays } from "../rules/payments.ts";
 import { printedOf, type Sphere } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
@@ -34,7 +36,7 @@ export type PayRequest = {
 function poolsFor(state: ScenarioState, ctx: ReduceContext, seat: number, sphere: Sphere | null, forCard?: string): { heroId: string; max: number }[] {
   const pools: { heroId: string; max: number }[] = [];
   // An ally whose own pool pays for the card (Radagast for Creature cards) is a pool beside the heroes.
-  for (const heroId of [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx)]) {
+  for (const heroId of [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx), ...openPools(state, seat, forCard, ctx)]) {
     const hero = state.cards[heroId];
     if (!hero || hero.resources <= 0) continue;
     if (!heroPays(state, heroId, sphere, ctx, forCard)) continue;
@@ -51,12 +53,13 @@ export function playRequest(state: ScenarioState, ctx: ReduceContext, cardId: st
   const printed = printedOf(ctx.cards, instance.code);
   const cost = playCost(state, cardId, seat, ctx, hostId) ?? 0;
   const pools = poolsFor(state, ctx, seat, printed.sphere, cardId);
-  if (!printed.costX && cost === 0) return null;
+  const chosen = chosenX(state, cardId, ctx);
+  if (!chosen && cost === 0) return null;
   // A cost that characters exhausted may pay in part (ExhaustToReduce) need not be met in resources: what is left unpaid is
   // paid by exhausting them, and the reducer checks there are enough.
   const distinct = distinctRule(state, cardId, ctx);
   // So may one a Response lowers as the card is played (Erebor Guard, families/deck-play.ts).
-  return { seat, cardId, total: cost, exact: !printed.costX && exhaustSlack(state, seat, cardId, ctx) === 0 && payingSlack(state, seat, cardId, ctx) === 0, pools, ...(distinct ? { distinct } : {}) };
+  return { seat, cardId, total: cost, exact: !chosen && exhaustSlack(state, seat, cardId, ctx) === 0 && payingSlack(state, seat, cardId, ctx) === 0, pools, ...(distinct ? { distinct } : {}) };
 }
 
 /** The pay request for an Action or Response with a resource cost, or null when its cost takes no resources. */
@@ -67,9 +70,10 @@ export function triggerRequest(state: ScenarioState, ctx: ReduceContext, cardId:
   const printed = printedOf(ctx.cards, instance.code);
   if (costOfKind(effect, "playEvent")) {
     const cost = playCost(state, cardId, seat, ctx) ?? 0;
-    if (!printed.costX && cost === 0) return null;
+    const chosen = chosenX(state, cardId, ctx);
+    if (!chosen && cost === 0) return null;
     const distinct = distinctRule(state, cardId, ctx);
-    return { seat, cardId, total: cost, exact: !printed.costX, pools: poolsFor(state, ctx, seat, printed.sphere, cardId), ...(distinct ? { distinct } : {}) };
+    return { seat, cardId, total: cost, exact: !chosen, pools: poolsFor(state, ctx, seat, printed.sphere, cardId), ...(distinct ? { distinct } : {}) };
   }
   const resources = costOfKind(effect, "resources");
   if (!resources) return null;

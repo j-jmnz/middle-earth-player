@@ -8,7 +8,7 @@ import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
-import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
+import { flagged, heldAmount, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
@@ -402,8 +402,10 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
     if (!seat || seat.eliminated) continue;
-    if (!final && seat.threat < 50 && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
-    if (seat.threat >= 50 || seat.heroes.length === 0) {
+    // The elimination level, lowered by a card the seat holds (The One Ring, families/misc.ts).
+    const level = 50 - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
+    if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
+    if (seat.threat >= level || seat.heroes.length === 0) {
       // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).
       const saved = seat.heroes.length > 0 ? threatSaved(next, index) : null;
       if (saved) {

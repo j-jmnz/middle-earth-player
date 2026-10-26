@@ -9,7 +9,7 @@ import { queueEvent } from "./queue.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { defenseAsDefender, modifiedStat, placeDamage } from "./keywords.ts";
 import type { ScenarioState } from "./state.ts";
-import { expireModifiers, inPlay, updateCard } from "./state.ts";
+import { expireModifiers, flagged, inPlay, updateCard } from "./state.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard, shadowCards } from "./zones.ts";
 import { effectCause, inCause, ruleCause } from "./cause.ts";
@@ -192,7 +192,8 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     const strength = modifiedStat(next, enemy, "attack", ctx.cards);
     const defense = defender ? defenseAsDefender(next, attack.defenderId, ctx.cards) : 0;
     if (defender) steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.defenderId, attack: strength, defense, undefended: false, cause: ruleCause("rr.step-6-4-3") });
-    const raw = defender ? Math.max(0, strength - defense) : 0;
+    // "This attack deals no damage" (a flag the enemy holds, families/misc.ts).
+    const raw = defender && !flagged(next, enemy.id, "dealsNoDamage") ? Math.max(0, strength - defense) : 0;
     const damaged = noteAttackDamage(next, defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")) : next, ctx);
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
@@ -200,7 +201,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   const strength = modifiedStat(next, enemy, "attack", ctx.cards);
   steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.heroId, attack: strength, defense: 0, undefended: true, cause: ruleCause("rr.step-6-4-3") });
-  const hit = noteAttackDamage(next, placeDamage(next, attack.heroId, strength, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")), ctx);
+  const hit = noteAttackDamage(next, placeDamage(next, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")), ctx);
   return hit.lost ? hit : afterDamage(hit, ctx, steps);
 }
 

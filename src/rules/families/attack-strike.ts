@@ -82,7 +82,9 @@ export function struck(
     if (excess > 0) next = placeDamage(next, strike.excessTo, excess, ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   }
   const about = { seat, other: enemyId, participants: attackerIds };
-  if (hurt && heard(next, ctx, "attackDamaged")) for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDamaged", cardId: attackerId, ...about });
+  // The damage the attack dealt is the event's amount, and so the Response's X ("a Dwarf deals X damage", 04105:A:1).
+  const dealt = destroyed ? placedAmount(printedOf(ctx.cards, was.code), raw) : (now?.damage ?? 0) - was.damage;
+  if (hurt && heard(next, ctx, "attackDamaged")) for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDamaged", cardId: attackerId, amount: dealt, ...about });
   if (!destroyed) return next;
   for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, other: enemyId, participants: attackerIds });
   const engaged = was.zone === "engaged" ? was.controller : null;

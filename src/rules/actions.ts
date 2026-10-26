@@ -2,7 +2,7 @@ import type { Effect } from "../catalog/boundary.ts";
 
 import { applyCancel, cancelIntents, cancelReason } from "./cancel.ts";
 import { holds } from "./conditions.ts";
-import { effectsOf } from "./listen.ts";
+import { effectsOfCard } from "./families/misc-text.ts";
 import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
@@ -29,7 +29,7 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   if (!instance) return undefined;
   // A card whose printed text box is blank has none of its abilities (rr.blank).
   if (textBlank(state, instance.id)) return undefined;
-  const effect = effectsOf(ctx, instance.code).find((entry) => entry.id === effectId && entry.timing === "action");
+  const effect = effectsOfCard(state, ctx, instance).find((entry) => entry.id === effectId && entry.timing === "action");
   // An objective, quest or location in play belongs to no player: any player may initiate its Action (rr.action).
   const shared = inPlay(instance.zone) && SHARED_TYPES.has(printedOf(ctx.cards, instance.code).type);
   // An Action used from the hand ("put ~ into play from your hand", effect.fromHand) is used there; any other in play.
@@ -47,7 +47,7 @@ export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalI
   if (!inTriggerWindow(state)) return [];
   const intents: LegalIntent[] = [];
   for (const instance of Object.values(state.cards)) {
-    for (const effect of effectsOf(ctx, instance.code)) {
+    for (const effect of effectsOfCard(state, ctx, instance)) {
       if (effect.timing !== "action" || actionEffect(state, ctx, instance.id, effect.id) !== effect) continue;
       if (usable(state, effect, instance.id, state.activeSeat, ctx)) intents.push({ type: "Trigger", cardId: instance.id, effectId: effect.id });
     }

@@ -3,7 +3,8 @@ import { costOfKind } from "../catalog/costs.ts";
 
 import { holds } from "./conditions.ts";
 import { triggerHears } from "./families/play-hooks.ts";
-import { aboutCard, effectsOf, hears, hearsFromAnywhere } from "./listen.ts";
+import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
+import { effectsOfCard } from "./families/misc-text.ts";
 import { playableFromDeck } from "./deck-play.ts";
 import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
@@ -23,14 +24,14 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
   const order = livingSeats(state);
   // Only the cards with a Response to this trigger are sorted and looked at.
   const cards = Object.values(state.cards)
-    .filter((instance) => effectsOf(ctx, instance.code).some((effect) => effect.timing === "response" && triggerHears(effect.trigger, event.trigger)))
+    .filter((instance) => effectsOfCard(state, ctx, instance).some((effect) => effect.timing === "response" && triggerHears(effect.trigger, event.trigger)))
     .sort((left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }));
   for (const instance of cards) {
     // An event about one card is heard by that card even after it has left play.
     // An event card in the hand hears every event; a card in play hears the events about itself or about the table. The
     // top card of a deck its controller may play as if it were in the hand (Gandalf, 142002) is in the hand for this.
     const inHand = instance.zone === "hand" || (instance.zone === "deck" && instance.controller != null && playableFromDeck(state, instance.id, instance.controller, ctx));
-    const records = effectsOf(ctx, instance.code).filter((effect) => effect.timing === "response" && hears(state, effect, instance, event, ctx));
+    const records = effectsOfCard(state, ctx, instance).filter((effect) => effect.timing === "response" && hears(state, effect, instance, event, ctx));
     if (records.length === 0) continue;
     // A card nobody controls (a quest or encounter card) is answered by the first player, or, while a Peril card's
     // staging resolves, by the revealing player: the other players are the ones Peril keeps out (mec109.peril).
@@ -44,7 +45,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
       const fromHand = costOfKind(effect, "playEvent") != null || effect.fromHand === true;
       if (fromHand ? !inHand : !(inPlay(instance.zone) || hearsFromAnywhere(effect, instance, event))) continue;
       // `other`: the second card the event names ("After a Trap card you control is attached to an enemy": the new host).
-      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}), ...(event.other ? { other: event.other } : {}) };
+      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.phase ? { phase: event.phase } : {}), ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}), ...(event.other ? { other: event.other } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       // "Any player may trigger this response": each seat is offered it, the controller first.
       const seats = effect.anyPlayer ? [seat, ...order.filter((other) => other !== seat)] : [seat];

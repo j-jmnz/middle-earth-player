@@ -3,6 +3,7 @@ import { grantedIcons } from "./conditions.ts";
 import { heroPaysFor } from "./cost-rules.ts";
 import { deckPlayIcons } from "./deck-play.ts";
 import { allyPools, cannotPay, flagIcons, payerOk, payingIcons } from "./families/costs-pay.ts";
+import { openPools } from "./families/misc-guards.ts";
 import type { Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf, spherePays, type Sphere } from "./printed.ts";
@@ -27,7 +28,7 @@ export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | 
 // 0-cost card is no exception (rr.resource-match). A neutral card needs none. An ally whose pool pays for the card counts.
 export function hasResourceMatch(state: ScenarioState, seat: number, sphere: Sphere | null, ctx: ReduceContext, forCard?: string): boolean {
   if (sphere == null || sphere === "neutral") return true;
-  return [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx)].some((id) => heroPays(state, id, sphere, ctx, forCard));
+  return [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx), ...openPools(state, seat, forCard, ctx)].some((id) => heroPays(state, id, sphere, ctx, forCard));
 }
 
 // Checks an offered resource payment against a cost: whole numbers, heroes the seat controls, the sphere

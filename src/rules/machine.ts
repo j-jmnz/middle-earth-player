@@ -28,12 +28,14 @@ import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
 import { afterPlay } from "./families/costs-play.ts";
+import { gameReads } from "./families/costs-pay.ts";
 import { playSweep } from "./families/play-sweep.ts";
 import { afterPaying } from "./families/deck-play.ts";
 import { doRefresh } from "./refresh.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
+import { pushDue } from "./delayed.ts";
 import { crossBoundary } from "./triggers.ts";
 import { constantWin, heldStat, NO_COUNTS } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
@@ -165,12 +167,15 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
   // The Responses to a shadow effect, or a shadow effect that asked a player, are done: the attack goes on.
   if (attackResumes(state)) return resolveAttack(state, ctx, steps);
   switch (state.mode) {
-    case "afterOpening":
-      return finishSetup(state, ctx, steps);
+    case "afterOpening": {
+      // A Setup that waits for the opening hands (The One Ring: attach it to a hero, search the deck) resolves first.
+      const waiting = pushDue(state, "Setup", "startOfGame", steps);
+      return waiting !== state ? waiting : finishSetup(state, ctx, steps);
+    }
     case "beginRound":
       return enterBegin(state, ctx);
     case "resourceGrant":
-      return grant(state, steps);
+      return grant(state, steps, ctx);
     case "resourceActions":
     case "questCommit":
       return openPass(state);
@@ -228,13 +233,22 @@ function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   return withMode(bumped, "resourceGrant");
 }
 
-function grant(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+function grant(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   let next = state;
   for (const seat of livingSeats(next)) next = gainSeatResources(next, seat, steps, ruleCause("rr.step-1-2"));
+  const drawn: Record<number, string[]> = {};
   for (const seat of livingSeats(next)) {
     // A card that lets its player draw additional cards in the resource phase holds an extraDraw on the seat.
     const draws = 1 + heldStat(next, seat, "extraDraw", NO_COUNTS);
+    const before = new Set(next.seats[seat]?.hand ?? []);
     for (let draw = 0; draw < draws; draw += 1) next = drawOne(next, seat, steps, ruleCause("rr.step-1-3"));
+    drawn[seat] = (next.seats[seat]?.hand ?? []).filter((id) => !before.has(id));
+  }
+  // The draw step is done: Forced effects hear it ("After drawing cards at the beginning of the resource phase", misc family),
+  // and the cards drawn are kept for the Pick that names them. Both only in a game that has a card which reads them.
+  if (gameReads(next, ctx, '"trigger":"resourceDrawn"')) {
+    next = { ...next, resourceDrawn: drawn };
+    for (const seat of livingSeats(next)) next = queueEvent(next, { trigger: "resourceDrawn", seat, phase: "Resource" });
   }
   return openPass(withMode(next, "resourceActions"));
 }

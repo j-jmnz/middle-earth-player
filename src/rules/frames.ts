@@ -167,7 +167,12 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
 function revealAnother(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = frame.cardId ?? "";
   const popped = popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps);
-  const returned = state.cards[id] ? shuffleEncounterDeck(updateCard(moveCard(popped, id, { zone: "encounterDeck" }), id, { face: "down", controller: null })) : popped;
+  const discarded = frame.data.kind === "reveal" && frame.data.discard === true;
+  const returned = state.cards[id]
+    ? discarded
+      ? moveCard(popped, id, { zone: "encounterDiscard" })
+      : shuffleEncounterDeck(updateCard(moveCard(popped, id, { zone: "encounterDeck" }), id, { face: "down", controller: null }))
+    : popped;
   if (returned.seats[frame.seat]?.eliminated) return returned;
   return startReveal(returned, frame.seat, ctx, steps);
 }

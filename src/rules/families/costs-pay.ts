@@ -16,6 +16,7 @@ import { matchesPick } from "../pick.ts";
 import type { Sphere } from "../printed.ts";
 import type { GameEvent, ScenarioState } from "../state.ts";
 import { heldAmount, inPlay, updateCard } from "../state.ts";
+import { openPool } from "./misc-guards.ts";
 
 const ICON_FLAGS = [
   ["leadershipIcon", "leadership"],
@@ -106,6 +107,7 @@ export function allyPools(state: ScenarioState, seat: number, cardId: string | u
 // A pool that may hold resources to pay with: a hero of the seat, or an ally pool for this card.
 export function payerOk(state: ScenarioState, payerId: string, seat: number, cardId: string | undefined, ctx: ReduceContext): boolean {
   const payer = state.cards[payerId];
+  if (payer && cardId != null && openPool(state, payerId, cardId, ctx)) return true;
   if (!payer || payer.controller !== seat) return false;
   return payer.zone === "heroes" || (cardId != null && isAllyPool(state, payerId, cardId, ctx));
 }
