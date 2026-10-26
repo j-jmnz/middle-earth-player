@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { loadCards } from "./load-cards.ts";
 import { parseKeywordTokens } from "./normalize/keywords.ts";
+import { loadRaw } from "./normalize/load-raw.ts";
+import { titleKey } from "./normalize/names.ts";
 
 // The 26 dealt cards for A Shadow of the Past, as the MEC109 (The Fellowship of the Ring) printing prints them.
 // Numbers, keywords, traits and the unique flag only. A mismatch means data/cards moved away from that reading.
@@ -75,6 +77,25 @@ describe("MEC109 reading of the dealt cards", () => {
     for (const expected of CARDS.filter((card) => card.quest !== undefined)) {
       expect(cards.get(expected.code)?.questPoints, expected.code).toBe(expected.quest);
     }
+  });
+});
+
+// Hall of Beorn gives Nightmare, campaign and hero-expansion cards the codes of their cycle (02004 is Winged Guardian
+// and also Forest Flies), so a code alone does not find a deck-legal card's record.
+describe("Hall of Beorn records of deck-legal cards", () => {
+  const hob = new Map(loadRaw().hob.map((card) => [card.Slug, card]));
+  const legal = [...cards.values()].filter((card) => card.deckLegal);
+
+  it("are the same card", () => {
+    const wrong = legal.flatMap((card) =>
+      card.printings.flatMap((printing) => (printing.hobSlug && titleKey(hob.get(printing.hobSlug)?.Title ?? "") !== titleKey(card.name) ? [`${card.code} ${card.name}: ${printing.hobSlug}`] : [])),
+    );
+    expect(wrong).toEqual([]);
+  });
+
+  it("give a side B only to a card whose text says Side A, and a shadow only to Wind from the Sea (Encounter)", () => {
+    expect(legal.filter((card) => card.back && !/\bSide A\b/.test(card.text ?? "")).map((card) => card.code)).toEqual([]);
+    expect(legal.filter((card) => card.shadowText).map((card) => card.code)).toEqual(["17144"]);
   });
 });
 

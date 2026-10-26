@@ -81,7 +81,7 @@ export function poolSides(card: Card): { A: string[]; B: string[] } {
     const [front = "", back = ""] = text.replace(/<b>\s*Side A\s*<\/b>|^Side A$/m, "").split(/<b>\s*Side B\s*<\/b>|^Side B$/m);
     return { A: poolLines(front), B: poolLines(back) };
   }
-  // A player card prints no shadow effect: a shadowText on one is a mismatched Hall of Beorn join, not its text.
+  // shadowText is not read: the one player card that prints a shadow effect (Wind from the Sea, an Encounter card) has it in its text.
   return { A: poolLines(text), B: poolLines(card.back?.text) };
 }
 
