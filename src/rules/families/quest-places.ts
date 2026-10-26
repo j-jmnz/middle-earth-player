@@ -15,7 +15,6 @@ import type { ScenarioState } from "../state.ts";
 import { updateCard } from "../state.ts";
 import { fireForced } from "../triggers.ts";
 import { patchTop, topFrame } from "../windows.ts";
-import { moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { makeActiveIn } from "./south-locations.ts";
 

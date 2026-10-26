@@ -1,4 +1,4 @@
-// Rules: rr.active-location, rr.explored, rr.engaged, rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.shadow-effects, rr.surge, rr.peril,
+// Rules: rr.active-location, rr.explored, rr.engaged, rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.shadow-effects, rr.surge, mec109.peril,
 // rr.first-player, rr.lasting-effects, rr.damage, mec109.stage-4 (data/rules/entries.json). The encounter cards of The Ring Goes South.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -15,8 +15,8 @@ import { expectOk } from "../rules/fixture.ts";
 import { attachmentTargets } from "../rules/planning.ts";
 import { queueEvent } from "../rules/queue.ts";
 import { reduce } from "../rules/reduce.ts";
-import { stagingThreat } from "../rules/quest.ts";
 import { flagged, type ScenarioState } from "../rules/state.ts";
+import { attachTo, spawn } from "../rules/zones.ts";
 import { DOORS, GREAT_WARG_CHIEF, LUST, loadSouthWorld, REDHORN_PASS, southTable, STING, type SouthLayout, type SouthWorld } from "../../scripts/south-scene.ts";
 import { codesOf, first } from "../../scripts/past-scene.ts";
 
@@ -112,7 +112,6 @@ describe("the boons (142011 to 142014)", () => {
   });
 });
 
-import { attachTo, spawn } from "../rules/zones.ts";
 function spawnAttached(state: ScenarioState, code: string, hostId: string): ScenarioState {
   const placed = spawn(state, code, { zone: "play", seat: 0 });
   return attachTo(placed.state, placed.id, hostId);

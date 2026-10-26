@@ -10,7 +10,7 @@ import { noteHostDefeated, withStagingThreat } from "./families/attachments-hold
 import { progressFirstLocations } from "./families/attachments-quest.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import type { EngineStep } from "./intents.ts";
-import { destroyCard, modifiedStat, raiseThreat, releaseAttachments } from "./keywords.ts";
+import { modifiedStat, raiseThreat, releaseAttachments } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
 import { printedOf } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";

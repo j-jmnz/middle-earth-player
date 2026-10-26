@@ -17,6 +17,7 @@ import { topFrame } from "../rules/windows.ts";
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
+import { freeSlot } from "../rules/families/south-locations.ts";
 import { TIMING_WORDS, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type PickOption, type Sheet, type SheetNames, type SheetOption, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 export function step(game: ScenarioState): string {
@@ -89,10 +90,10 @@ function has(legal: readonly LegalIntent[], type: LegalIntent["type"]): boolean 
 
 /**
  * The locations in staging the players cannot travel to, each with the reducer's reason and the card's Travel line
- * (Weathertop while The One Ring is exhausted or gone: 141046:A:3, rr.travel). Nothing is listed while a location is active.
+ * (Weathertop while The One Ring is exhausted or gone: 141046:A:3, rr.travel). Nothing is listed while the active location slots are full.
  */
 export function travelRefusals(game: ScenarioState, ctx: ReduceContext, names: SheetNames, targets: readonly string[]): Unavailable[] {
-  if (game.activeLocation) return [];
+  if (!freeSlot(game)) return [];
   return game.staging.flatMap((id): Unavailable[] => {
     const card = game.cards[id];
     if (!card || targets.includes(id) || printedOf(ctx.cards, card.code).type !== "location") return [];
@@ -341,7 +342,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         }),
         ...(unavailable.length > 0 ? { unavailable } : {}),
         primary: null,
-        alternative: { label: targets.length > 0 ? "Do not travel" : "Continue", intent: { type: "DeclineTravel" } },
+        // The players must travel if able on some stages (mec109.stage-4): the engine then offers no way to decline.
+        alternative: has(legal, "DeclineTravel") ? { label: targets.length > 0 ? "Do not travel" : "Continue", intent: { type: "DeclineTravel" } } : null,
       };
     }
     case "optionalEngage": {

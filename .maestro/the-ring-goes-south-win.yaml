@@ -1,0 +1,67 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# OPEN (2026-10-26): its fixture `south-won` is not committed (see the-ring-goes-south.yaml): it is a game of The Ring Goes South
+# parked on its win, dealt from the log of three scenarios no win has been found for.
+# Phase 14. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json).
+# 142019's Resolution asks nothing: Lust for the Ring is added to the campaign pool only when it is attached to a hero. Confirming
+# writes the log and unlocks Journey in the Dark.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/south-won"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- assertVisible:
+    id: rail-current
+    text: "Victory"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 30000
+- assertVisible:
+    id: resolution-consequence
+    text: "Confirming .*unlocks Journey in the Dark\\."
+- tapOn:
+    id: resolution-confirm
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-the-ring-goes-south-status
+    text: "Completed"
+- assertVisible:
+    id: node-journey-in-the-dark-status
+    text: "Current"
+# Kill and relaunch: the scenario is on the log and Journey in the Dark is unlocked.
+- stopApp
+- launchApp
+- tapOn:
+    id: continue-path
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-journey-in-the-dark-status
+    text: "Current"
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertVisible:
+    id: log-scenario-the-ring-goes-south
+    text: ".*rounds.*"

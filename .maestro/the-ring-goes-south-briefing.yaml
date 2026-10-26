@@ -1,0 +1,51 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# OPEN (2026-10-26): its fixture `south-start` is not committed (see the-ring-goes-south.yaml): it is a campaign parked at The Ring
+# Goes South, dealt from the log of three scenarios no win has been found for.
+# Phase 14. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json).
+# The campaign card (142019) waives the hero-change penalty: the briefing says so, offers no "Accept +1 threat" for a hero change,
+# and asks each seat for one of Sting, Mithril Shirt, Glamdring and Andúril (rr.campaign-setup-checklist).
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/south-start"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: briefing
+    timeout: 15000
+- assertVisible: "The campaign card waives the hero-change penalty."
+- assertNotVisible:
+    id: accept-penalty
+- assertVisible:
+    id: briefing-choice
+- assertVisible:
+    id: choice-142011
+- assertVisible:
+    id: choice-142012
+- assertVisible:
+    id: choice-142013
+- assertVisible:
+    id: choice-142014
+# Each seat takes one; the three nobody took go to the first player's deck.
+- tapOn:
+    id: choice-142013
+- assertNotVisible:
+    id: briefing-choice
+- assertVisible:
+    id: deal
+    enabled: true
+- tapOn:
+    id: deal
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 15000
+- assertNotVisible:
+    id: accept-penalty

@@ -122,7 +122,6 @@ export function openDefense(state: ScenarioState, ctx: ReduceContext): ScenarioS
   const attack = state.pendingAttack;
   if (!attack?.defenseWaits) return state;
   const { defenseWaits: _done, ...rest } = attack;
-  const enemy = state.cards[attack.enemyId];
   // The enemy left play while they resolved: the attack is over.
   if (!attackHere(state, attack.enemyId)) return { ...state, pendingAttack: null };
   return toDefense({ ...state, pendingAttack: rest }, ctx);
