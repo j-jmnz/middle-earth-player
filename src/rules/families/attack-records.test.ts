@@ -76,6 +76,8 @@ describe("attack family records", () => {
     expect(first.cards[ids.goblin!]?.zone).toBe("encounterDiscard");
     // The hero is exhausted: the troll is still offered, but nobody can attack it.
     expect(legalIntents(first, ctx)).toEqual([{ type: "DeclineAttack" }]);
+    // The event left the hand when its attacks opened: it cannot be played again in their windows.
+    expect(opened.cards[ids["22007"]!]?.zone).toBe("discard");
   });
 
   it("Gúthwinë: +2 Attack for this attack, and a Rohan ally back to the hand when it destroys the enemy (146011:A:2)", () => {
