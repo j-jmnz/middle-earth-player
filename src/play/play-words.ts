@@ -71,7 +71,7 @@ export function playWords(instruction: Instruction): string | null {
 
 /** What a play family verb that stopped for a choice asks: the button's verb and the prompt. Null for any other verb. */
 export function playPickWords(asked: Instruction): { verb: string; prompt: string } | null {
-  if (asked.verb === "PutIntoPlay") return asked.host ? { verb: "Attach", prompt: "Choose the card to attach it to." } : { verb: "Choose", prompt: "Choose the player who controls it." };
+  if (asked.verb === "PutIntoPlay") return asked.host || asked.who !== "choose" ? { verb: "Attach", prompt: "Choose the card to attach it to." } : { verb: "Choose", prompt: "Choose the player who controls it." };
   if (asked.verb !== "PutIntoPlayFromHand") return null;
   if (asked.card) return { verb: "Choose", prompt: "Choose the player who controls it." };
   return { verb: "Put into play", prompt: `Choose a card to put into play from ${asked.from === "any" ? "the players' hands" : "your hand"}, or none.` };

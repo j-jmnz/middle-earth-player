@@ -112,6 +112,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("engagedThisPhase"), is: z.boolean() }),
   // The current quest card has a printed keyword (`is`), or has none (17034:A:1).
   z.strictObject({ kind: z.literal("questKeywords"), is: z.boolean() }),
+  // The current quest card has (`is`) or lacks the Battle / Siege keyword, printed or gained (hon.battle, hon.siege).
+  z.strictObject({ kind: z.literal("questKeyword"), keyword: z.enum(["battle", "siege"]), is: z.boolean() }),
   // Where the combat phase is (rr.combat-phase): `beforeEnemyAttacks`, before the resolving enemy attacks step; `beforeAttacksResolve`,
   // after shadow cards have been dealt and before any attack has resolved; `afterEnemyAttacks`, once the resolving enemy attacks
   // step is complete.

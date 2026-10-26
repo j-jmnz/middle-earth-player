@@ -14,7 +14,7 @@ export function activeCardCodes(records: readonly Pick<Effect, "cardCode">[], op
   return new Set(records.map((record) => record.cardCode).filter((code) => code.length > 0 && !open.has(code)));
 }
 
-const KEYWORD = /^(sentinel|ranged|restricted|surge|peril|indestructible|permanent|immune to player card effects|(doomed|hide|archery|toughness|secrecy) \d+)$/i;
+const KEYWORD = /^(sentinel|ranged|restricted|battle|siege|surge|peril|indestructible|permanent|immune to player card effects|(doomed|hide|archery|toughness|secrecy) \d+)$/i;
 
 function plain(text: string): string {
   return text

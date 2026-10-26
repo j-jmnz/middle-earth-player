@@ -164,6 +164,9 @@ export const RECORDS: readonly Effect[] = [
   {"id":"22137:action:1","cardCode":"22137","lines":["22137:A:2"],"timing":"action","limit":"oncePerRound","cost":{"kind":"exhaustSelf"},"condition":{"kind":"canPick","pick":STAGING_LOCATION},"instructions":[{"verb":"Pick","pick":STAGING_LOCATION},{"verb":"LowerCardThreat","amount":{"stat":"willpower","of":"self"},"until":"endOfPhase"},{"verb":"PlaceProgressOn","amount":{"x":true},"target":"picked"}]},
   // 22142 Westfold Lancer.
   {"id":"22142:response:1","cardCode":"22142","lines":["22142:A:1"],"timing":"response","trigger":"questedSuccessfully","subject":"self","cost":{"kind":"discardSelf"},"condition":{"kind":"canPick","pick":STAGING_NON_UNIQUE_ENEMY},"instructions":[{"verb":"Pick","pick":STAGING_NON_UNIQUE_ENEMY},{"verb":"DamageCard","amount":2}]},
+  // 06036 Trained for War (line 1 is the pool's PlayOnlyIf): a quest that has Siege keeps it (hon.siege), otherwise the current
+  // quest gains Battle until the end of the phase (hon.battle).
+  {"id":"06036:action:1","cardCode":"06036","lines":["06036:A:2"],"timing":"action","instructions":[{"verb":"ModifyStat","stat":"battle","amount":1,"until":"endOfPhase","target":"currentQuest","when":{"kind":"questKeyword","keyword":"siege","is":false}}]},
 ];
 
 // Generated record ids an authored record here replaces.

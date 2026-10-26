@@ -84,6 +84,10 @@ export const FLAGS = [
   "commitsExhausted",
   "questsWithAttack",
   "cannotReduceWillpower",
+  // On the current quest card: it has Battle / Siege, so committed characters count Attack / Defense instead of Willpower
+  // (hon.battle, hon.siege).
+  "battle",
+  "siege",
   // On an enemy, for the modifier's seat only: it makes no engagement checks against that player; it cannot engage that player.
   "noChecksAgainst",
   "cannotEngageSeat",

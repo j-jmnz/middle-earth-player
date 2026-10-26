@@ -12,23 +12,24 @@ import { attachmentHostIds, enforceRestricted } from "../attach.ts";
 import { effectCause } from "../cause.ts";
 import { askTarget } from "../choices.ts";
 import { pushEffectFrame } from "../effect-frames.ts";
-import { startReveal } from "../frames.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
-import { playerCardEffectCanChoose } from "../keywords.ts";
+import { playerCardEffectCanChoose, uniqueBlocked } from "../keywords.ts";
 import { effectsOf } from "../listen.ts";
+import { matchesPick } from "../pick.ts";
 import { lastPicked, seatOf } from "../player-verbs.ts";
 import { printedOf } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import { attachBlocked } from "../restrictions.ts";
-import type { ScenarioState } from "../state.ts";
+import type { CardInstance, ScenarioState } from "../state.ts";
 import { inPlay, livingSeats, updateCard } from "../state.ts";
 import { patchTop } from "../windows.ts";
 import { attachTo, moveCard } from "../zones.ts";
-import { effectData } from "./encounter-moves.ts";
+import { effectData, moveEncounter, shuffleDiscardIn } from "./encounter-moves.ts";
 import type { Focus } from "./index.ts";
 
 type PlayInto = Extract<Instruction, { verb: "PlayInto" }>;
+type PutIntoPlay = Extract<Instruction, { verb: "PutIntoPlay" }>;
 type GuardType = Extract<Instruction, { verb: "Guarded" }>["types"][number];
 
 // The pseudo host a card played into the staging area names.
@@ -131,24 +132,28 @@ function next(state: ScenarioState, instruction: Instruction, seat: number): Sce
   return data ? patchTop(state, { data: { ...data, queue: [{ instruction, seat, chosen: null }, ...data.queue] } }) : state;
 }
 
-// GuardWith: the first card of a named type that the last reveal put into play (the card revealed, or one its surge revealed)
-// guards the attachment; otherwise the next encounter card is revealed (rr.reveal: in a staging of its own), and this runs
-// again once it is resolved. With no card of a named type left in the encounter deck, the attachment enters play at once.
+// GuardWith (wor.guarded-x): cards come off the top of the encounter deck into its discard pile until one of a named type is
+// discarded, and that card is added to the staging area and guards the attachment. With the deck empty the encounter discard pile is
+// shuffled into it and the search goes on. With no card of a named type in the deck or the discard pile, the attachment enters play
+// at once.
 export function guardWith(state: ScenarioState, instruction: Extract<Instruction, { verb: "GuardWith" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[instruction.card];
   if (!card || card.zone !== "setAside" || card.host) return state;
   const types: readonly string[] = instruction.types;
-  const since = instruction.since;
-  if (since != null) {
-    const arrived = Object.values(state.cards)
-      .filter((other) => other.enteredPlay > since && inPlay(other.zone) && types.includes(typeOf(state, other.id, ctx) ?? ""))
-      .sort((left, right) => left.enteredPlay - right.enteredPlay)[0];
-    if (arrived) return guardBy(state, card.id, arrived.id);
+  const wanted = (id: string) => types.includes(typeOf(state, id, ctx) ?? "");
+  if (![...state.encounterDeck, ...state.encounterDiscard].some(wanted)) {
+    return next(state, { verb: "PutIntoPlay", card: "self", unguarded: true }, focus.seat);
   }
-  if (!state.encounterDeck.some((id) => types.includes(typeOf(state, id, ctx) ?? ""))) {
-    return next(state, { verb: "PutAttachmentIntoPlay", card: "self", unguarded: true }, focus.seat);
+  let current = state;
+  for (;;) {
+    const top = current.encounterDeck[0];
+    if (!top) {
+      current = shuffleDiscardIn(current);
+      continue;
+    }
+    current = updateCard(moveCard(current, top, { zone: "encounterDiscard" }), top, { face: "up", controller: null });
+    if (wanted(top)) return guardBy(moveEncounter(current, top, "staging", focus.seat, ctx, steps), card.id, top);
   }
-  return startReveal(next(state, { ...instruction, since: state.clock }, focus.seat), focus.seat, ctx, steps);
 }
 
 // Attaches a card in its owner's play area to a card, or places it on a pseudo host, and announces it.
@@ -160,20 +165,44 @@ function putOn(state: ScenarioState, id: string, hostId: string, seat: number, c
   return enforceRestricted(announced, hostId, ctx, steps);
 }
 
-// PutAttachmentIntoPlay: the picked card or the source goes into play under its owner's control, on a card it may be attached
-// to (or where its PlayInto rule puts it). A Guarded card from out of play is guarded first. With nowhere to go it does not
-// enter play: one its guard released goes to its owner's discard pile.
-export function putAttachmentIntoPlay(state: ScenarioState, instruction: Extract<Instruction, { verb: "PutAttachmentIntoPlay" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = instruction.card === "self" ? (focus.sourceId ?? "") : lastPicked(state);
+// The hosts an attachment put into play may go on: where its PlayInto rule puts it, else the cards it may be attached to for the
+// seat, that match the instruction's `host` filter (its `control` read from the actor's side).
+function hostsFor(state: ScenarioState, instruction: PutIntoPlay, card: CardInstance, seat: number, focus: Focus, ctx: ReduceContext): string[] {
+  const filter = instruction.host;
+  const base = (playIntoRule(ctx, card.code) ? playTargets(state, seat, card.code, ctx) : null) ?? attachmentHostIds(state, seat, card.code, ctx);
+  return base.filter((hostId) => {
+    if (hostId === card.id) return false;
+    if (!filter) return true;
+    const host = state.cards[hostId];
+    if (!host) return false;
+    if (filter.control === "you" && host.controller !== focus.seat) return false;
+    if (filter.control === "other" && (host.controller == null || host.controller === focus.seat)) return false;
+    return matchesPick(state, hostId, filter, { seat: focus.seat, sourceId: focus.sourceId, counting: true }, ctx);
+  });
+}
+
+// PutIntoPlay of an attachment (the play family's verb, families/play-enter.ts, the only way an effect puts one into play): it
+// enters play on a host the actor chooses, under the actor's, its owner's or the picked player's control, and is announced as
+// entered and attached. A card with Guarded (X) that comes from out of play is guarded first: an encounter card of the named type is
+// found and the attachment cannot be attached until it is free of encounters, when its owner gains control of it and attaches it
+// (wor.guarded-x). `unguarded` is that last step (the guard left play): the owner puts it into play; with nowhere to go it goes to
+// the owner's discard pile. With nowhere to go otherwise it stays where it is.
+export function putAttachmentIntoPlay(state: ScenarioState, instruction: PutIntoPlay, id: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[id];
-  if (!card || printedOf(ctx.cards, card.code).type !== "attachment" || inPlay(card.zone)) return state;
+  if (!card || inPlay(card.zone)) return state;
+  const printed = printedOf(ctx.cards, card.code);
+  if (printed.type !== "attachment" || uniqueBlocked(state, printed, ctx.cards)) return state;
   const owner = card.owner ?? card.controller ?? focus.seat;
   if (!instruction.unguarded && guardedRule(ctx, card.code)) return startGuard(state, id, owner, ctx, steps) ?? state;
-  const hosts = (playIntoRule(ctx, card.code) ? playTargets(state, owner, card.code, ctx) : null) ?? attachmentHostIds(state, owner, card.code, ctx).filter((hostId) => hostId !== id);
+  const seat = instruction.unguarded || instruction.who === "owner" ? owner : instruction.who === "picked" ? seatOf(lastPicked(state)) : focus.seat;
+  if (seat == null || !state.seats[seat] || state.seats[seat]?.eliminated) return state;
+  const hosts = hostsFor(state, instruction, card, seat, focus, ctx);
   if (hosts.length === 0) return instruction.unguarded ? updateCard(moveCard(state, id, { zone: "discard", seat: owner }), id, { host: null }) : state;
-  const chosen = focus.chosen && hosts.includes(focus.chosen) ? focus.chosen : hosts.length === 1 ? hosts[0] : undefined;
-  if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, hosts) : putOn(state, id, hosts[0] ?? "", owner, ctx, steps);
-  return putOn(state, id, chosen, owner, ctx, steps);
+  const host = focus.chosen && hosts.includes(focus.chosen) ? focus.chosen : hosts.length === 1 ? hosts[0] : undefined;
+  if (!host) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, hosts) : putOn(state, id, hosts[0] ?? "", seat, ctx, steps);
+  const placed = putOn(state, id, host, seat, ctx, steps);
+  // A card that came from another player's deck stays that player's card (rr.ownership-and-control).
+  return owner !== seat && placed.cards[id]?.owner == null ? updateCard(placed, id, { owner }) : placed;
 }
 
 // AttachSourceTo: the source attachment goes onto the card the reference names, if that card is in play and may have it.

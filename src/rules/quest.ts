@@ -1,10 +1,11 @@
-// Rules: rr.quest-advancement, rr.step-3-4, rr.engagement-check, rr.optional-engagement, rr.engaged,
+// Rules: hon.battle, hon.siege, rr.quest-advancement, rr.step-3-4, rr.engagement-check, rr.optional-engagement, rr.engaged,
 // rr.in-play-and-out-of-play, ltp.quest-resolution, ltp.successful-quest, ltp.unsuccessful-quest,
 // ltp.explored-active-location, ltp.quest-advancement, ltp.optional-engagement, ltp.engagement-checks-intro,
 // ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
 import { checkCost } from "./families/costs-stats.ts";
 import { engagementBarred, noteEngaged } from "./families/quest-engage.ts";
+import { currentQuestHas } from "./families/quest-conditions.ts";
 import { noteHostDefeated, withStagingThreat } from "./families/attachments-hold.ts";
 import { progressFirstLocations } from "./families/attachments-quest.ts";
 import { seatThreat } from "./families/play-hooks.ts";
@@ -43,6 +44,16 @@ export function stagingThreat(state: ScenarioState, cards: Cards): number {
   return withStagingThreat(state, total);
 }
 
+// Which stat a character counts when it is committed to the current quest: Attack for a quest with Battle (hon.battle), Defense for
+// one with Siege (hon.siege), Willpower otherwise. A quest that has both counts Willpower: the two replacements contradict each other.
+// "Using its Attack instead of its Willpower" (11005:A:2) holds whatever the quest says.
+export function questStatOf(state: ScenarioState, id: string, cards: Cards): "willpower" | "attack" | "defense" {
+  if (flagged(state, id, "questsWithAttack")) return "attack";
+  const battle = currentQuestHas(state, "battle", cards);
+  const siege = currentQuestHas(state, "siege", cards);
+  return battle === siege ? "willpower" : battle ? "attack" : "defense";
+}
+
 export function committedWillpower(state: ScenarioState, cards: Cards): number {
   let total = 0;
   for (const seat of state.seats) {
@@ -51,7 +62,7 @@ export function committedWillpower(state: ScenarioState, cards: Cards): number {
       const instance = state.cards[id];
       if (!instance?.committed) continue;
       // "Using its Attack instead of its Willpower" (11005:A:2).
-      total += modifiedStat(state, instance, flagged(state, id, "questsWithAttack") ? "attack" : "willpower", cards);
+      total += modifiedStat(state, instance, questStatOf(state, id, cards), cards);
     }
   }
   return total;

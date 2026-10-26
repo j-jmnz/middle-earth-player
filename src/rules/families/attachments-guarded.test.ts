@@ -1,7 +1,8 @@
-// Rules: rr.guarded, rr.reveal, rr.staging, rr.attachment-cards, rr.in-play-and-out-of-play, rr.destroy, rr.search
-// (data/rules/entries.json). The player Guarded (X) keyword has no rules text in data/rules: the brief's reading of it is
-// tested here (reveal encounter cards until one of the type, the attachment guarded by it until it leaves play, then put
-// into play). Real records with fixture cards.
+// Rules: wor.guarded-x, rr.guarded, rr.staging, rr.attachment-cards, rr.in-play-and-out-of-play, rr.destroy, rr.search
+// (data/rules/entries.json). Guarded (X) on a player attachment (wor.guarded-x): encounter cards are discarded until one of the type
+// is discarded, that card is added to the staging area and guards the attachment, which cannot be attached until it is free of
+// encounters, when its owner puts it into play (the one PutIntoPlay path, played or put into play by an effect). Real records with
+// fixture cards.
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../effects/index.ts";
@@ -21,15 +22,16 @@ function attack(state: ScenarioState, enemyId: string, attackerId: string): Scen
 }
 
 describe("Guarded (enemy): Sting", () => {
-  it("is played onto the staging area, reveals encounter cards until an enemy is revealed, and waits out of play on it", () => {
+  it("is played onto the staging area, discards encounter cards until an enemy is discarded, adds it to the staging area and waits out of play on it (wor.guarded-x)", () => {
     const table = seat(1, ["ranger", "hobbit"]);
     const built = deck(table.state, ["marsh", "orc", "ford"]);
     const sting = put(built.state, "19117", "hand");
     expect(legalTargets(sting.state, { type: "PlayCard", cardId: sting.id }, ctx)).toEqual(["staging"]);
     const played = play(sting.state, sting.id, ctx, "staging");
     const [marsh, orc, ford] = built.ids;
-    // The marsh was revealed first and stays in the staging area; the orc guards Sting; the ford is not revealed.
-    expect(played.staging).toEqual([marsh, orc]);
+    // The marsh was discarded, not revealed; the orc was discarded and added to the staging area, where it guards Sting; the ford stays.
+    expect(played.staging).toEqual([orc]);
+    expect(played.encounterDiscard).toEqual([marsh]);
     expect(played.encounterDeck).toEqual([ford]);
     expect(played.cards[sting.id]).toMatchObject({ zone: "setAside", host: orc, controller: 0 });
     expect(played.cards[orc ?? ""]?.attachments).toContain(sting.id);
@@ -55,6 +57,18 @@ describe("Guarded (enemy): Sting", () => {
     expect(killed.setAside).not.toContain(sting.id);
   });
 
+  it("shuffles the encounter discard pile into an empty deck and finishes the search (wor.guarded-x)", () => {
+    const table = seat(1, ["ranger", "hobbit"]);
+    const built = deck(table.state, ["marsh", "orc"]);
+    // Both cards are in the discard pile and the deck is empty.
+    const discarded = { ...built.state, encounterDeck: [], encounterDiscard: [...built.ids], cards: Object.fromEntries(Object.entries(built.state.cards).map(([id, card]) => [id, built.ids.includes(id) ? { ...card, zone: "encounterDiscard" as const } : card])) };
+    const sting = put(discarded, "19117", "hand");
+    const played = play(sting.state, sting.id, ctx, "staging");
+    const orc = built.ids[1] ?? "";
+    expect(played.cards[sting.id]).toMatchObject({ zone: "setAside", host: orc });
+    expect(played.staging).toEqual([orc]);
+  });
+
   it("enters play at once when the encounter deck holds no enemy", () => {
     const table = seat(1, ["ranger", "hobbit"]);
     const built = deck(table.state, ["marsh", "ford"]);
@@ -73,7 +87,8 @@ describe("Guarded (location): Mithril Shirt", () => {
     const played = play(shirt.state, shirt.id, ctx, "staging");
     const [orc, ford] = built.ids;
     expect(played.cards[shirt.id]?.host).toBe(ford);
-    expect(played.staging).toEqual([orc, ford]);
+    expect(played.staging).toEqual([ford]);
+    expect(played.encounterDiscard).toEqual([orc]);
     // The players travel to the ford and explore it: Mithril Shirt asks which hero takes it.
     const active = { ...played, staging: [orc ?? ""], activeLocation: ford ?? null, cards: { ...played.cards, [ford ?? ""]: { ...played.cards[ford ?? ""]!, zone: "activeLocation" as const, progress: 1 } } };
     const event = put(active, "12088", "hand");

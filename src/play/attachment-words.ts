@@ -10,7 +10,6 @@ type AttachmentVerb = Extract<
       | "AttachSourceTo"
       | "Guarded"
       | "GuardWith"
-      | "PutAttachmentIntoPlay"
       | "HealAmong"
       | "ChooseAttackers"
       | "QuestProgressFirst";
@@ -27,8 +26,6 @@ export function attachmentWords(instruction: Instruction): string | null {
   switch (verb.verb) {
     case "AttachSourceTo":
       return "attach this card to that card";
-    case "PutAttachmentIntoPlay":
-      return "put it into play";
     case "HealAmong":
       return `heal up to ${amountWords(verb.amount)} damage from among characters you control`;
     case "ChooseAttackers":
@@ -52,8 +49,6 @@ export function attachmentPickWords(asked: Instruction): { verb: string; prompt:
       return { verb: "Heal", prompt: "Choose a character to heal 1 damage from, or Done to stop." };
     case "ChooseAttackers":
       return { verb: "Attack", prompt: "Choose a character to attack the enemy, or Done once all attackers are declared." };
-    case "PutAttachmentIntoPlay":
-      return { verb: "Attach", prompt: "Choose the card to attach it to." };
     default:
       return null;
   }

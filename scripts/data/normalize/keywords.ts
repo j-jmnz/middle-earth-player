@@ -10,6 +10,8 @@ const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   sentinel: "sentinel",
   ranged: "ranged",
   restricted: "restricted",
+  battle: "battle",
+  siege: "siege",
   "immune to player card effects": "immune",
 };
 

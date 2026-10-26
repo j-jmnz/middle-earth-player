@@ -35,6 +35,8 @@ export type Keywords = {
   sentinel: boolean;
   ranged: boolean;
   restricted: boolean;
+  battle: boolean;
+  siege: boolean;
   secrecy: number | null;
 };
 
@@ -78,8 +80,16 @@ const EMPTY_KEYWORDS: Keywords = {
   sentinel: false,
   ranged: false,
   restricted: false,
+  battle: false,
+  siege: false,
   secrecy: null,
 };
+
+// The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play-sweep.ts) lost
+// the ally type and gained the hero type (rr.card-types: Sword-thain, Prince Imrahil). Everything else has its printed type.
+export function cardTypeOf(instance: { zone: string }, printed: PrintedCard): CardType {
+  return instance.zone === "heroes" ? "hero" : printed.type;
+}
 
 export function definePrinted(
   card: Partial<Omit<PrintedCard, "keywords">> &
@@ -189,6 +199,8 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       sentinel: keywords.sentinel === true,
       ranged: keywords.ranged === true,
       restricted: keywords.restricted === true,
+      battle: keywords.battle === true,
+      siege: keywords.siege === true,
       secrecy: keywords.secrecy ?? null,
     },
   });

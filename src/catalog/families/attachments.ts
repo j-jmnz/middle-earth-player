@@ -21,20 +21,15 @@ export const VERBS = [
   // barred from having attachments). It leaves the staging area, a play area or its old host and goes into its controller's
   // play area on that card; the `attached` event is announced.
   z.strictObject({ verb: z.literal("AttachSourceTo"), card: cardRefSchema, ...when }),
-  // Constant on an attachment, the Guarded (X) keyword: when the card is played or put into play, its player reveals
-  // encounter cards one at a time until a card of one of these types is revealed and is in play; the attachment is then
+  // Constant on an attachment, the Guarded (X) keyword (wor.guarded-x): when the card is played or put into play, its player
+  // discards encounter cards until one of these types is discarded and adds that card to the staging area; the attachment is then
   // guarded by that card: out of play, shown attached to it, until it leaves play. Then its player puts the attachment into
-  // play (the `unguarded` event, PutAttachmentIntoPlay). With no card of those types in the encounter deck it enters play at
+  // play (the `unguarded` event, then PutIntoPlay with `unguarded`). With no card of those types in the encounter deck or its discard pile it enters play at
   // once.
   z.strictObject({ verb: z.literal("Guarded"), types: z.array(guardType).min(1), ...when }),
-  // Engine use (Guarded): reveals the next encounter card for the actor, then (`since`: the clock before that reveal) guards
-  // `card` with the first card of one of `types` that entered play since and is still in play, or reveals again.
-  z.strictObject({ verb: z.literal("GuardWith"), card: z.string().min(1), types: z.array(guardType).min(1), since: z.number().int().min(0).optional(), ...when }),
-  // Puts an attachment into play under its owner's control, attached to a card it may be attached to (the actor chooses when
-  // there are several): the picked card ("Search your deck for a Guarded attachment and put it into play"), or the source.
-  // A Guarded attachment put into play from out of play is guarded first, unless `unguarded` (its guard just left play). One
-  // with nothing to attach to does not enter play; one its guard released goes to its owner's discard pile.
-  z.strictObject({ verb: z.literal("PutAttachmentIntoPlay"), card: z.enum(["picked", "self"]).optional(), unguarded: z.boolean().optional(), ...when }),
+  // Engine use (Guarded): discards encounter cards from the top of the deck until one of `types` is discarded (the discard pile is
+  // shuffled into an empty deck first), adds that card to the staging area and attaches `card` to it as its guard (wor.guarded-x).
+  z.strictObject({ verb: z.literal("GuardWith"), card: z.string().min(1), types: z.array(guardType).min(1), ...when }),
   // The actor heals up to `amount` damage from among the cards that match `pick` (from their side), one damage at a time on
   // the card they choose each time, and may stop ("heals up to 5 damage from among characters he controls").
   z.strictObject({ verb: z.literal("HealAmong"), amount: positiveAmountSchema, pick: pickSchema, healed: z.number().int().min(0).optional(), ...when }),

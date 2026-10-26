@@ -53,6 +53,9 @@ export const printedKeywordsSchema = z.strictObject({
   sentinel: z.boolean().optional(),
   ranged: z.boolean().optional(),
   restricted: z.boolean().optional(),
+  // Battle / Siege on a quest card: committed characters count Attack / Defense instead of Willpower (hon.battle, hon.siege).
+  battle: z.boolean().optional(),
+  siege: z.boolean().optional(),
   // Secrecy X: the card costs X less to play while its player's threat is 20 or less.
   secrecy: z.number().int().positive().optional(),
   // Leaving play ends the game (flag).

@@ -6,20 +6,18 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";
-import { attachmentHostIds, enforceRestricted } from "../attach.ts";
-import { askTarget } from "../choices.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
-import { releaseAttachments, uniqueBlocked } from "../keywords.ts";
+import { releaseAttachments } from "../keywords.ts";
 import { matchesPick } from "../pick.ts";
 import { lastPicked, pickedList, putOnDeck, seatOf } from "../player-verbs.ts";
-import { isPlayerType, printedOf } from "../printed.ts";
+import { cardTypeOf, isPlayerType, printedOf } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import { shuffleIds } from "../seed.ts";
 import type { CardInstance, EffectData, ScenarioState } from "../state.ts";
 import { inPlay, updateCard, withSeat } from "../state.ts";
 import { patchTop, topFrame } from "../windows.ts";
-import { attachTo, moveCard } from "../zones.ts";
+import { moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -58,7 +56,7 @@ function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, steps: 
   const card = state.cards[id];
   if (!card || !inPlay(card.zone)) return state;
   const released = updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false, committed: false });
-  return printedOf(ctx.cards, card.code).type === "ally" ? queueEvent(released, { trigger: "allyLeftPlay", seat: card.controller, subject: id }) : released;
+  return cardTypeOf(card, printedOf(ctx.cards, card.code)) === "ally" ? queueEvent(released, { trigger: "allyLeftPlay", seat: card.controller, subject: id }) : released;
 }
 
 // MoveCard: the card goes to its owner's hand, deck or discard pile, or is removed from the game.
@@ -85,41 +83,6 @@ export function moveCardVerb(state: ScenarioState, instruction: Verb<"MoveCard">
     case "removed":
       return moveCard(left, id, { zone: "removed" });
   }
-}
-
-// The hosts an attachment put into play may go on: those it may be attached to for the seat, that match the filter (its
-// `control` read from the actor's side).
-function hostsFor(state: ScenarioState, instruction: Verb<"PutIntoPlay">, card: CardInstance, seat: number, focus: Focus, ctx: ReduceContext): string[] {
-  const filter = instruction.host;
-  return attachmentHostIds(state, seat, card.code, ctx).filter((hostId) => {
-    if (!filter) return true;
-    const host = state.cards[hostId];
-    if (!host) return false;
-    if (filter.control === "you" && host.controller !== focus.seat) return false;
-    if (filter.control === "other" && (host.controller == null || host.controller === focus.seat)) return false;
-    return matchesPick(state, hostId, filter, { seat: focus.seat, sourceId: focus.sourceId, counting: true }, ctx);
-  });
-}
-
-// PutIntoPlay of an attachment (the play family's verb, families/play-enter.ts): it enters play on a host the actor chooses,
-// under the actor's, its owner's or the picked player's control.
-export function putAttachmentIntoPlay(state: ScenarioState, instruction: Verb<"PutIntoPlay">, id: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const card = state.cards[id];
-  if (!card || inPlay(card.zone)) return state;
-  const printed = printedOf(ctx.cards, card.code);
-  if (printed.type !== "attachment" || uniqueBlocked(state, printed, ctx.cards)) return state;
-  const owner = ownerOf(card) ?? focus.seat;
-  const seat = instruction.who === "owner" ? owner : instruction.who === "picked" ? seatOf(lastPicked(state)) : focus.seat;
-  if (seat == null || !state.seats[seat] || state.seats[seat]?.eliminated) return state;
-  const hosts = hostsFor(state, instruction, card, seat, focus, ctx);
-  const host = focus.chosen && hosts.includes(focus.chosen) ? focus.chosen : hosts.length === 1 ? hosts[0] : undefined;
-  if (!host) return hosts.length > 1 ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, hosts) : state;
-  let next = enforceRestricted(attachTo(moveCard(state, id, { zone: "play", seat }), id, host), host, ctx, steps);
-  // A card that came from another player's deck stays that player's card (rr.ownership-and-control).
-  if (owner !== seat && next.cards[id]?.owner == null) next = updateCard(next, id, { owner });
-  // It entered play, and it was attached to its host ("After ~ is attached to a hero").
-  next = queueEvent(next, { trigger: "enteredPlay", seat, cardId: id });
-  return queueEvent(next, { trigger: "attached", seat, subject: id, other: host });
 }
 
 // GivePicked: the card picked before the last leaves its player's hand for the hand of the player picked last, and is picked

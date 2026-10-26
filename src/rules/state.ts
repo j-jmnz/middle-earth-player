@@ -265,6 +265,9 @@ export type ScenarioState = {
   // The seats a card in play keeps in the game at the threat elimination level (10124:A:2): eliminateEmpties asks that card
   // instead of eliminating the seat. settle keeps it current (families/quest-threat.ts).
   threatSaves?: readonly number[];
+  // The seats that control an ally in play which can gain the hero card type (Prince Imrahil, 145005:A:1): a seat with no heroes left
+  // is not eliminated until the play sweep has given that ally the type (families/play-sweep.ts, rr.card-types).
+  heroSavers?: readonly number[];
   undo: UndoLog;
 };
 

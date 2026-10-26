@@ -6,11 +6,11 @@ import { engagedThisRound } from "./families/attack-events.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
+import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
-import { printedOf, type Sphere } from "./printed.ts";
+import { cardTypeOf, printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
 import { combatStepIs } from "./families/defense-conditions.ts";
@@ -183,6 +183,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return stepHolds(state, condition.is);
     case "engagedThisPhase":
       return engagedThisPhase(state) === condition.is;
+    case "questKeyword":
+      return currentQuestHas(state, condition.keyword, ctx.cards) === condition.is;
     case "questKeywords":
       return questHasKeywords(state, ctx) === condition.is;
     // The attack family's conditions (families/attack-strike.ts, families/attack-events.ts).
@@ -206,7 +208,7 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return (
         Object.values(state.cards).some((card) => {
           const host = card.host ? state.cards[card.host] : undefined;
-          return card.code === condition.code && card.zone === "attached" && host != null && printedOf(ctx.cards, host.code).type === "hero";
+          return card.code === condition.code && card.zone === "attached" && host != null && cardTypeOf(host, printedOf(ctx.cards, host.code)) === "hero";
         }) === condition.is
       );
     case "hostActive": {
