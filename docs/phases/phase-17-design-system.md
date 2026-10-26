@@ -51,7 +51,7 @@ Restyle the screens that exist:
 - `src/screens/routes/_layout.tsx`
 - `src/screens/routes/(tabs)/_layout.tsx`
 - `src/screens/routes/(tabs)/index.tsx`
-- `src/screens/routes/(tabs)/packs.tsx`
+- `src/screens/routes/packs.tsx` (moved out of the tabs when Packs went under Cards)
 - `src/screens/routes/(tabs)/decks.tsx`
 - `src/screens/routes/pack/[code].tsx`
 - `src/screens/routes/card/[code].tsx`

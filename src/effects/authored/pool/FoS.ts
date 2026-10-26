@@ -7,7 +7,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"04101:forced:1","cardCode":"04101","lines":["04101:A:1"],"timing":"forced","trigger":"committed","condition":{"kind":"matches","card":"self","pick":{"type":"character","control":"any","state":"exhausted"}},"instructions":[{"verb":"RaiseThreat","amount":1,"who":"actor"}]},
   // 04103 Path of Need (line 2 open: no condition says the attached location is the active location)
   {"id":"04103:constant:1","cardCode":"04103","lines":["04103:A:1"],"timing":"constant","instructions":[{"verb":"DeckLimit","copies":1},{"verb":"AttachesTo","hosts":[{"type":"location","control":"any"}]}]},
-  // 04104 Trollshaw Scout (line 1 is Ranged; line 3, "after ~ attacks", stays open)
+  // 04104 Trollshaw Scout
   {"id":"04104:constant:1","cardCode":"04104","lines":["04104:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"noExhaustAttack","amount":1,"until":"whileSourceInPlay"}]},
   // 04107 Light of Valinor
   {"id":"04107:constant:1","cardCode":"04107","lines":["04107:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","traits":["Noldor","Silvan"]}]}]},

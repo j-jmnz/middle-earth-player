@@ -10,12 +10,12 @@ export const RECORDS: readonly Effect[] = [
     {"id":"willpower","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":2,"until":"endOfPhase"}]}]}]},
   // 12032 Captain's Wisdom
   {"id":"12032:action:1","cardCode":"12032","lines":["12032:A:1"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Resource"},{"kind":"canPick","pick":{"type":"hero","control":"you","trait":"Noble","state":"ready"}}]},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you","trait":"Noble","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},{"verb":"AddResources","amount":2,"to":"picked"}]},
-  // 12034 Raiment of War (line 1, the host and "counts as 2 Restricted attachments", is open)
+  // 12034 Raiment of War
   {"id":"12034:constant:2","cardCode":"12034","lines":["12034:A:2"],"timing":"constant","instructions":[
     {"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"},
     {"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"},
     {"verb":"ModifyStat","stat":"hitPoints","amount":2,"until":"whileSourceInPlay","target":"host"}]},
-  // 12035 Sam Gamgee (line 2 is open)
+  // 12035 Sam Gamgee
   {"id":"12035:constant:1","cardCode":"12035","lines":["12035:A:1"],"timing":"constant","instructions":[{"verb":"ReduceCost","amount":2,"when":{"kind":"count","pick":{"type":"character","control":"you","names":["Frodo Baggins"]},"min":1}}]},
   // 12037 Mirkwood Explorer: he quested successfully when he was committed and his controller's quest succeeded.
   {"id":"12037:response:1","cardCode":"12037","lines":["12037:A:1"],"timing":"response","trigger":"questedSuccessfully","subject":"self","instructions":[{"verb":"PlaceProgressOn","amount":1,"target":"self"}]},

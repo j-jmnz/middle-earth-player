@@ -12,11 +12,11 @@ export const RECORDS: readonly Effect[] = [
   {"id":"06034:action:1","cardCode":"06034","lines":["06034:A:2"],"timing":"action","instructions":[{"verb":"Each","pick":{"type":"ally","control":"any"},"instructions":[{"verb":"Ready","target":"picked"}]}]},
   // 06035 Mighty Prowess ("a Tactics hero hero" is printed so). Line 2 needs "shares a Trait with": open.
   {"id":"06035:constant:1","cardCode":"06035","lines":["06035:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","sphere":"tactics"},"limitPerHost":true}]},
-  // 06036 Trained for War (line 2, Battle and Siege on the quest, is open).
+  // 06036 Trained for War.
   {"id":"06036:constant:1","cardCode":"06036","lines":["06036:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"allMatch","of":{"type":"hero","control":"you"},"match":{"type":"hero","control":"you","printedIcon":"tactics"}}}]},
   // 06037 Silvan Refugee: another character (its own leaving play leaves nothing to discard).
   {"id":"06037:forced:1","cardCode":"06037","lines":["06037:A:1"],"timing":"forced","trigger":"leftPlay","subject":{"type":"character","control":"any","other":true},"instructions":[{"verb":"Discard","target":{"kind":"self"}}]},
-  // 06038 Against the Shadow (line 2, Willpower used instead of Defense, is open).
+  // 06038 Against the Shadow.
   {"id":"06038:constant:1","cardCode":"06038","lines":["06038:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"allMatch","of":{"type":"hero","control":"you"},"match":{"type":"hero","control":"you","printedIcon":"spirit"}}}]},
   // 06039 Harbor Master
   {"id":"06039:response:1","cardCode":"06039","lines":["06039:A:1"],"timing":"response","trigger":"resourcesAdded","subject":{"type":"hero","control":"you"},"instructions":[{"verb":"ModifyStat","stat":"defense","amount":1,"until":"endOfRound"}]},

@@ -21,23 +21,23 @@ export type DeckRule = z.infer<typeof deckRuleSchema>;
 export const VERBS = [
   // Constant on a card that goes to the victory display ("Limit 3 copies of ~ in the victory display"): the display holds at
   // most `copies` of its title. A copy that would be added beyond that goes to its owner's discard pile instead
-  // (families/sidequests-victory.ts).
+  // (src/rules/families/sidequests-victory.ts).
   z.strictObject({ verb: z.literal("VictoryLimit"), copies: z.number().int().positive(), ...when }),
   // Constant on a side quest ("Battle.", "Siege."): the characters committed to it quest with this stat instead of their
-  // Willpower (families/sidequests-quest.ts).
+  // Willpower (src/rules/families/sidequests-quest.ts).
   z.strictObject({ verb: z.literal("QuestsWith"), stat: z.enum(["attack", "defense"]), ...when }),
   // The actor is eliminated from the game by a card effect ("At the end of the round, you are eliminated from the game",
   // rr.player-elimination).
   z.strictObject({ verb: z.literal("EliminatePlayer"), ...when }),
   // Constant on a card in hand ("Limit 2 copies of ~ in play"): it cannot be played while this many copies of its title are in
-  // play (families/sidequests-play.ts).
+  // play (src/rules/families/sidequests-play.ts).
   z.strictObject({ verb: z.literal("InPlayLimit"), copies: z.number().int().positive(), ...when }),
   // The source card is removed from the campaign pool ("add ~ to the victory display and remove it from the campaign pool"): the
   // campaign log drops it when the scenario is won.
   z.strictObject({ verb: z.literal("RemoveFromCampaignPool"), ...when }),
   // Constant on a player card ("Encounter."): the card is not part of its player's drawn deck. At the start of the game it is set
   // aside, still its owner's card; a player card effect shuffles it into the encounter deck, where it is revealed like an
-  // encounter card (families/sidequests-encounter.ts).
+  // encounter card (src/rules/families/sidequests-encounter.ts).
   z.strictObject({ verb: z.literal("EncounterKeyword"), ...when }),
   // Shuffles one set-aside copy of the card with this code into the encounter deck ("Shuffle 1 of your set aside Ranger of the
   // North allies into the encounter deck"): the actor's own copy with `own`, any player's otherwise. Nothing happens with none.
@@ -49,7 +49,7 @@ export const VERBS = [
   // it. A contract's records name their side in their line ids (`21074:B:1`) and carry a `faceUp` condition for it.
   z.strictObject({ verb: z.literal("FlipCard"), ...when }),
   // The actor's loot deck is built from the cards they chose at deckbuilding (StartSeat.loot), shuffled and set aside under the
-  // contract (The Burglar's Turn, families/sidequests-loot.ts).
+  // contract (The Burglar's Turn, src/rules/families/sidequests-loot.ts).
   z.strictObject({ verb: z.literal("BuildLootDeck"), ...when }),
   // The top card of the actor's loot deck is attached faceup to the location the answered event is about, as a guarded objective:
   // out of play under that location until it is explored.

@@ -55,7 +55,7 @@ export const TRIGGERS = [
 ] as const;
 
 // `traitRohan`, `traitGondor`, `traitMount`: the holder has this Trait besides its own ("each Gondor card gains the Rohan trait", "Lothíriel
-// gains the Rohan trait"); hasTrait reads them (families/misc-traits.ts).
+// gains the Rohan trait"); hasTrait reads them (src/rules/families/misc-traits.ts).
 // `losesRestricted`: the holder (an attachment) loses the restricted keyword. `countsAsRestricted`: the holder counts as this many
 // Restricted attachments on its host (amount 2). `countsAsTwoDwarves`: the holder counts as two when Dwarf characters are counted.
 // `spendAsLeadership` (and the three others), on "seat:N": the seat's resources of any sphere pay for cards of that sphere

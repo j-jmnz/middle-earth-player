@@ -9,9 +9,9 @@ export const RECORDS: readonly Effect[] = [
   {"id":"22082:response:1","cardCode":"22082","lines":["22082:A:1"],"timing":"response","trigger":"committed","subject":"self","condition":{"kind":"all","conditions":[{"kind":"handHasCard"},{"kind":"matches","card":"self","pick":{"type":"ally","control":"any","state":"exhausted"}}]},"instructions":[{"verb":"DiscardFromHand","amount":1},{"verb":"Ready"}]},
   // 22083 Valiant Sword (line 1 is Restricted)
   {"id":"22083:constant:1","cardCode":"22083","lines":["22083:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","trait":"Noble"},"limitPerHost":true},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host","when":{"kind":"threat","max":39}},{"verb":"ModifyStat","stat":"attack","amount":2,"until":"whileSourceInPlay","target":"host","when":{"kind":"threat","min":40}}]},
-  // 22084 Stone of Elostirion (its Guarded line, 22084:A:1, is open)
+  // 22084 Stone of Elostirion
   {"id":"22084:constant:1","cardCode":"22084","lines":["22084:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}},{"verb":"ModifyStat","stat":"willpower","amount":2,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"extraDraw","amount":1,"until":"whileSourceInPlay","target":"actorSeat"}]},
-  // 22085 Well Preserved (its host lines, 22085:A:1 and A:2, are open). The One Ring is the player card (21001) or the saga's
+  // 22085 Well Preserved. The One Ring is the player card (21001) or the saga's
   // objective (141085, 142091): one record for each, and only the copy in play can be exhausted. Healing changes the game
   // only while the hero is damaged.
   {"id":"22085:response:1","cardCode":"22085","lines":["22085:A:3"],"timing":"response","trigger":"beginningOfPhase","cost":[{"kind":"exhaustCode","code":"21001"},{"kind":"raiseThreat","amount":1}],"condition":{"kind":"all","conditions":[{"kind":"phase","is":"Beginning of round"},{"kind":"matches","card":"host","pick":{"type":"hero","control":"any","damaged":true}}]},"instructions":[{"verb":"Heal","all":true,"target":"host"}]},
@@ -26,7 +26,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"22088:response:1","cardCode":"22088","lines":["22088:A:1"],"timing":"response","trigger":"enteredPlay","subject":"self","instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","top":5,"cardType":"ally","trait":"Hobbit"}},{"verb":"MovePicked","to":"hand"},{"verb":"ShuffleDeck"}]},
   // 22089 Defiant Challenge (line 1 is Doomed 2). "May": each player chooses to ready one of their characters or not.
   {"id":"22089:action:1","cardCode":"22089","lines":["22089:A:2"],"timing":"action","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"Choose","who":"actor","options":[{"id":"ready","requires":{"kind":"canPick","pick":{"type":"character","control":"you","state":"exhausted"}},"instructions":[{"verb":"Pick","pick":{"type":"character","control":"you","state":"exhausted"}},{"verb":"Ready","target":"picked"}]},{"id":"skip","instructions":[]}]}]}]},
-  // 22090 Helm of Secrecy (its hero swap, 22090:A:2, is open)
+  // 22090 Helm of Secrecy
   {"id":"22090:constant:1","cardCode":"22090","lines":["22090:A:1"],"timing":"constant","instructions":[{"verb":"DeckLimit","copies":1}]},
 ];
 

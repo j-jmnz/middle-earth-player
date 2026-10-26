@@ -22,6 +22,9 @@ agent is running. Not merged into `main` yet.
   2 are Smeagol's Gollum side (21072:B:1-2: its enemy stats are in no source, and no hero-to-enemy flip exists).
 - Every player-card family line is closed apart from 21072:B:1-2. Trap has no official rule (card text only).
 
+Documentation was rewritten to match the code on 2026-10-26 (README, CLAUDE.md, agents, architecture, brief, plans,
+cookbook, STATUS, phase notes, stale code comments).
+
 ## Next steps (in order)
 
 1. Phase 15 (Journey in the Dark), then phase 16 (Breaking of the Fellowship): `implementer` agents like phases 13/14
@@ -29,7 +32,9 @@ agent is running. Not merged into `main` yet.
 2. Phase 13 review findings (non-blocking): see below.
 3. Second pass on open lines; update docs/plans/effect-authoring.md "Not expressible yet" and docs/phases/STATUS.md
    (phone checks stay open in a cloud session); run `reviewer` on phase 14 and `ux` on the phone-half changes.
-4. Delete docs/handover/, run the full checks, merge into `main`, push.
+4. Move `docs/handover/agent-brief.md` out of `docs/handover/` (CLAUDE.md and the agent definitions point at it) and
+   update those links; delete the rest of `docs/handover/` (the phase 13 review findings are also in
+   `docs/phases/STATUS.md`), run the full checks, merge into `main`, push.
 
 Phase 13 review (non-blocking):
 1. burden-effects.ts passFirstPlayer duplicates refresh.ts passToken: one function.

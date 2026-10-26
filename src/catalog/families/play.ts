@@ -23,7 +23,7 @@ export const VERBS = [
   // `exhausted`, `committed` to the quest if asked, with `damage` tokens on it. `who` is its controller: the actor, the picked
   // player, its owner, or a player the actor chooses ("under any player's control"). `until` and `then` schedule its leaving.
   // An attachment goes on a card it may be attached to that matches `host`, chosen by the actor; it stays where it is when
-  // none can take it (families/attachments-play.ts). An attachment with Guarded (X) put into play from out of play is guarded
+  // none can take it (src/rules/families/attachments-play.ts). An attachment with Guarded (X) put into play from out of play is guarded
   // first (wor.guarded-x); `unguarded` is the step after (engine use, the `unguarded` event): its guard left play, so its owner
   // puts it into play, or it goes to the owner's discard pile when it has nowhere to go.
   z.strictObject({

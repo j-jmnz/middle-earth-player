@@ -5,9 +5,9 @@ import type { Effect } from "../../../catalog/boundary.ts";
 export const RECORDS: readonly Effect[] = [
   // 146001 Frodo Baggins. The One Ring in play is the Fellowship box's (141085), the only one the playable scenarios deal.
   {"id":"146001:action:1","cardCode":"146001","lines":["146001:A:1"],"timing":"action","condition":{"kind":"phase","is":"Planning"},"cost":{"kind":"exhaustCode","code":"141085"},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"AddResources","amount":1,"to":"picked"}]},
-  // 146002 Aragorn (A:1, the first player gaining control, and A:3, losing when he leaves play, are open)
+  // 146002 Aragorn
   {"id":"146002:action:1","cardCode":"146002","lines":["146002:A:2"],"timing":"action","limit":"oncePerPhase","cost":{"kind":"resources","amount":1,"from":"self"},"instructions":[{"verb":"Ready"}]},
-  // 146004 Tom Cotton (A:1, the resource match for the first Hobbit ally, is open)
+  // 146004 Tom Cotton
   {"id":"146004:response:1","cardCode":"146004","lines":["146004:A:2"],"timing":"response","trigger":"enteredPlay","subject":{"type":"ally","control":"any","trait":"Hobbit"},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfRound","target":"subject"}]},
   // 146005 Rosie Cotton
   {"id":"146005:action:1","cardCode":"146005","lines":["146005:A:1"],"timing":"action","limit":"oncePerPhase","cost":{"kind":"exhaustSelf"},"instructions":[
@@ -16,11 +16,11 @@ export const RECORDS: readonly Effect[] = [
       {"id":"willpower","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":{"stat":"willpower","of":"self"},"until":"endOfPhase","target":"picked"}]},
       {"id":"attack","instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"stat":"willpower","of":"self"},"until":"endOfPhase","target":"picked"}]},
       {"id":"defense","instructions":[{"verb":"ModifyStat","stat":"defense","amount":{"stat":"willpower","of":"self"},"until":"endOfPhase","target":"picked"}]}]}]},
-  // 146007 Elladan (A:2, a Response to an optional engagement, is open)
+  // 146007 Elladan
   {"id":"146007:constant:1","cardCode":"146007","lines":["146007:A:1"],"timing":"constant","condition":{"kind":"count","pick":{"type":"character","control":"any","names":["Elrohir"]},"min":1},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"whileSourceInPlay"}]},
-  // 146008 Elrohir (A:2, a Response to an optional engagement, is open)
+  // 146008 Elrohir
   {"id":"146008:constant:1","cardCode":"146008","lines":["146008:A:1"],"timing":"constant","condition":{"kind":"count","pick":{"type":"character","control":"any","names":["Elladan"]},"min":1},"instructions":[{"verb":"ModifyStat","stat":"defense","amount":2,"until":"whileSourceInPlay"}]},
-  // 146009 Orc Disguise (A:2, a modifier only during an engagement check, and A:3, barring that enemy's attacks on you, are open)
+  // 146009 Orc Disguise
   {"id":"146009:constant:1","cardCode":"146009","lines":["146009:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"ringBearer"},"limitPerHost":true}]},
   // 146010 Captains of the West
   {"id":"146010:action:1","cardCode":"146010","lines":["146010:A:1"],"timing":"action","condition":{"kind":"phase","is":"Quest"},"instructions":[

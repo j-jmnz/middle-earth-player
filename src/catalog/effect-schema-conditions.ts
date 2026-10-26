@@ -34,7 +34,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
   // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
-  // its player uses from the hand ("put Emery into play from your hand", families/deck-play.ts).
+  // its player uses from the hand ("put Emery into play from your hand", src/rules/families/deck-play.ts).
   z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand"]) }),
   // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
   z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
@@ -45,7 +45,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("inVictory"), code: z.string().min(1), is: z.boolean() }),
   // The victory display holds a copy (a card with the same title) of the source, the card the answered event is about, the last
   // picked card, the second card the event names or the active location (`is`), or none does ("if there is a card with the same
-  // title in the victory display", families/sidequests-pick.ts).
+  // title in the victory display", src/rules/families/sidequests-pick.ts).
   z.strictObject({ kind: z.literal("copyInVictory"), card: z.enum(["self", "subject", "picked", "other", "activeLocation"]), is: z.boolean().optional() }),
   // Some location other than the source is in the staging area or is the active location.
   z.strictObject({ kind: z.literal("otherLocationInPlay") }),
@@ -130,7 +130,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The source is attached to the active location ("While attached location is the active location").
   z.strictObject({ kind: z.literal("hostActive") }),
   // The card is attacking in the player attack in progress (rr.step-6-8-4): read while a stat is read, for the stat's holder
-  // (families/attack-strike.ts); elsewhere for `card` (the source by default). `enemy`: the attacked enemy matches the filter
+  // (src/rules/families/attack-strike.ts); elsewhere for `card` (the source by default). `enemy`: the attacked enemy matches the filter
   // (from that card's controller's side: `engaged`, `stagingOnly`, then its predicates); `notEnemy`: it does not ("an enemy
   // not engaged with you"); `alone`: no other character attacks with it; `ranged`: it is a ranged attack (rr.ranged).
   z.strictObject({

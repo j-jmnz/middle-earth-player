@@ -4,6 +4,8 @@ Engine half depends on: phase 14's engine half
 Phone half depends on: phase 14
 Blocks: phase 16
 
+**State (2026-10-26):** not started. `journey-in-the-dark` is not in `src/campaign/playable.ts`; its printed lines are among those listed in `src/effects/open-lines.ts`. Records go in a scenario file in `src/effects/authored/` and new vocabulary in a family, as phases 13 and 14 did.
+
 ## Goal
 
 `journey-in-the-dark` is playable. No new widget unless a card creates one. Follow the scenario procedure in phase 12.

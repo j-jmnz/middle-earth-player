@@ -3,7 +3,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // Records for the HoEM player cards whose lines no template reads (data/cards/HoEM.json). An id here that a template also
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
-  // 02073 Keen-eyed Took (A:1, revealing the top card of each player's deck, is open)
+  // 02073 Keen-eyed Took
   {"id":"02073:action:1","cardCode":"02073","lines":["02073:A:2"],"timing":"action","cost":{"kind":"returnSelfToHand"},"instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"DiscardTopOfDeck"}]}]},
   // 02074 Rear Guard
   {"id":"02074:action:1","cardCode":"02074","lines":["02074:A:1"],"timing":"action","condition":{"kind":"phase","is":"Quest"},"instructions":[{"verb":"Pick","pick":{"type":"ally","control":"you","spheres":["leadership"]}},{"verb":"Discard","target":{"kind":"picked"}},{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfPhase","holders":{"type":"hero","control":"any","committed":true}}]},

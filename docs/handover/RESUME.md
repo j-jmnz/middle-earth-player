@@ -35,4 +35,5 @@ Continue automating every player card in this repository. The previous session s
 2. Fix the phase 13 review findings listed in `docs/handover/main.md`; run `reviewer` on phases 14 to 16.
 3. Run a second pass on any line left open, then update the cookbook's "Not expressible yet" section and
    `docs/phases/STATUS.md`. A cloud session has no phone checks, so say they stay open.
-4. Delete `docs/handover/`, run the full checks, merge into `main`, and push.
+4. Move `docs/handover/agent-brief.md` to a permanent place and update the links to it, delete the rest of
+   `docs/handover/`, run the full checks, merge into `main`, and push.

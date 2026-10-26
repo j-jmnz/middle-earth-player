@@ -35,14 +35,14 @@ export const pickSchema = z.strictObject({
   // From the discard pile: only its top cards, the last put there ("While the top card of your discard pile is an event").
   top: z.number().int().positive().optional(),
   // Only the cards the running effect looked at (LookAtTop) or discarded (DiscardFromDeck), still in a deck or a discard pile
-  // ("add 1 of those cards to its owner's hand", "Put up to 2 allies discarded by this effect into play"; families/deck-each.ts).
+  // ("add 1 of those cards to its owner's hand", "Put up to 2 allies discarded by this effect into play"; src/rules/families/deck-each.ts).
   looked: z.boolean().optional(),
   // A card that shares at least one Trait with the source card (`self`: "an ally who shares at least 1 Trait with him"), the
   // source's host (`host`: "if that character shares at least one trait with the attached hero"), or the answered event's
   // other card (`other`: "another enemy that shares a Trait with the enemy just destroyed"), the active location
   // (`activeLocation`: "a location in the victory display that shares a Trait with the active location") or the enemy of the
   // attack in progress (`attackingEnemy`); never that card itself. A Trait gained from an attachment counts
-  // (families/play-pick.ts, families/attack-pick.ts, families/sidequests-pick.ts).
+  // (src/rules/families/play-pick.ts, src/rules/families/attack-pick.ts, src/rules/families/sidequests-pick.ts).
   sharesTrait: z.enum(["self", "host", "other", "activeLocation", "attackingEnemy"]).optional(),
   // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
   cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest", "treasure"]).optional(),
@@ -131,13 +131,13 @@ export const pickSchema = z.strictObject({
   facedownShadow: z.boolean().optional(),
   // The enemy making the attack in progress (`false`: any other enemy, "another enemy engaged with you").
   attackingEnemy: z.boolean().optional(),
-  // The attachments family's filters (families/attachments-pick.ts): a card attached to another card (`false`: one attached
+  // The attachments family's filters (src/rules/families/attachments-pick.ts): a card attached to another card (`false`: one attached
   // to nothing, "If unattached"), a card with the Guarded keyword (a Guarded record), a card with progress tokens on it
   // (`false`: with none, "a location with no progress tokens on it").
   attached: z.boolean().optional(),
   guarded: z.boolean().optional(),
   progress: z.boolean().optional(),
-  // The attack family's filters (families/attack-pick.ts). A card that prints this keyword, not one it gained ("a hero with the
+  // The attack family's filters (src/rules/families/attack-pick.ts). A card that prints this keyword, not one it gained ("a hero with the
   // printed Ranged keyword").
   printedKeyword: z.enum(["ranged", "sentinel"]).optional(),
   // An enemy engaged with the player the effect last picked (`picked`: "each enemy engaged with that player"), or one not engaged
@@ -149,7 +149,7 @@ export const pickSchema = z.strictObject({
   minHitPoints: z.number().int().positive().optional(),
   // The top card of its discard pile ("While the top card of your discard pile is an ally").
   topOfDiscard: z.boolean().optional(),
-  // The misc family's filters (families/misc-pick.ts). A card controlled by the player the effect last picked ("each hero
+  // The misc family's filters (src/rules/families/misc-pick.ts). A card controlled by the player the effect last picked ("each hero
   // controlled by that player"); an attachment attached to the last picked card; a player card (not an encounter card); a
   // character whose current Defense is at most this ("an enemy with 0 Defense"); a card in the hand that was drawn by the
   // resource phase's draw step this round ("choose and discard 1 of those cards").
@@ -162,7 +162,7 @@ export const pickSchema = z.strictObject({
   maxAttachments: z.number().int().min(0).optional(),
   // Not a card with one of these titles ("a character in play (other than Bilbo Baggins)").
   exceptNames: z.array(z.string().min(1)).min(1).optional(),
-  // The sidequests family's filters (families/sidequests-pick.ts).
+  // The sidequests family's filters (src/rules/families/sidequests-pick.ts).
   // A card with the same title as the active location ("each location in the staging area with the same title as the active location").
   sameTitleAs: z.literal("activeLocation").optional(),
   // A character committed to a side quest (`sideQuest`), or to the current quest (`mainQuest`).

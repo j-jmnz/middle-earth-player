@@ -15,7 +15,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"22032:constant:2","cardCode":"22032","lines":["22032:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"count":{"type":"attachment","control":"any","attachedTo":"host","keyword":"restricted"}},"until":"whileSourceInPlay","target":"host"}]},
   // 22034 Knight of Belfalas
   {"id":"22034:response:1","cardCode":"22034","lines":["22034:A:1"],"timing":"response","trigger":"enteredPlay","subject":"self","condition":{"kind":"canPick","pick":{"type":"ally","control":"you","from":"discard","trait":"Gondor"}},"instructions":[{"verb":"Pick","pick":{"type":"ally","control":"you","from":"discard","trait":"Gondor"}},{"verb":"MovePicked","to":"hand"}]},
-  // 22035 Horn of the Mark (line 2 is open). Merry is a hero or an ally.
+  // 22035 Horn of the Mark. Merry is a hero or an ally.
   {"id":"22035:constant:1","cardCode":"22035","lines":["22035:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","trait":"Rohan"},{"type":"character","control":"any","names":["Merry"]}]}]},
 ];
 

@@ -4,6 +4,8 @@ Engine half depends on: phase 12's engine half
 Phone half depends on: phase 12
 Blocks: phase 14
 
+**State (2026-10-26):** engine half done and merged (the `burden` family; records in `src/effects/authored/flight-to-the-ford.ts`; `flight-to-the-ford` is in `src/campaign/playable.ts`). `/reviewer` ran on it (non-blocking findings listed in `STATUS.md`); `/ux` has not. The phone half is built and unit-tested; the phone checks, the three Maestro runs and their fixtures are open.
+
 ## Goal
 
 `flight-to-the-ford` is playable, including the burden deck and the Ring-bearer's life. Follow the scenario procedure in phase 12.

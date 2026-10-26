@@ -3,6 +3,8 @@
 Depends on: phases 5, 9, and 10
 Blocks: phase 12
 
+**State (2026-10-26):** built; `active` in `STATUS.md` until its phone checks and Maestro runs. The table has since become landscape only, with choices on the table, one-tap moments, Undo and haptics (`docs/brief.md`, Screens; `STATUS.md`, the 2026-10-25 sections). Of the fixtures only `lost` is committed (`src/campaign/fixtures/scenario-1.json`): no legal win of the starter decks has been found, so `won` is open.
+
 ## Goal
 
 A person can play A Shadow of the Past on a phone. The reducer remains the only writer of threat, damage, resources, progress, and log fields. Table chrome uses the tokens in `docs/design-system.md`. Do not invent a palette or a type scale. Card pictures stay on the Skia canvas.
