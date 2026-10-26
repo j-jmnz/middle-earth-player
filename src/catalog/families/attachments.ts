@@ -27,9 +27,9 @@ export const VERBS = [
   // play (the `unguarded` event, PutAttachmentIntoPlay). With no card of those types in the encounter deck it enters play at
   // once.
   z.strictObject({ verb: z.literal("Guarded"), types: z.array(guardType).min(1), ...when }),
-  // Engine use (Guarded): reveals the next encounter card for the actor, then (`revealed` names it) guards `card` with it if
-  // it is of one of `types` and in play, or reveals again.
-  z.strictObject({ verb: z.literal("GuardWith"), card: z.string().min(1), types: z.array(guardType).min(1), revealed: z.string().optional(), ...when }),
+  // Engine use (Guarded): reveals the next encounter card for the actor, then (`since`: the clock before that reveal) guards
+  // `card` with the first card of one of `types` that entered play since and is still in play, or reveals again.
+  z.strictObject({ verb: z.literal("GuardWith"), card: z.string().min(1), types: z.array(guardType).min(1), since: z.number().int().min(0).optional(), ...when }),
   // Puts an attachment into play under its owner's control, attached to a card it may be attached to (the actor chooses when
   // there are several): the picked card ("Search your deck for a Guarded attachment and put it into play"), or the source.
   // A Guarded attachment put into play from out of play is guarded first, unless `unguarded` (its guard just left play). One
@@ -44,8 +44,17 @@ export const VERBS = [
   // The actor declares an attack against the card the reference names ("declare an attack against the attached enemy"): they
   // choose its attackers one at a time among their ready characters that may attack it, then stop; each exhausts (unless it
   // does not exhaust to attack) and the attack resolves (rr.step-6-8). It is an attack an effect makes, beside the one the
-  // framework allows against each enemy (faq.limitations-on-attacks). `attackers` is engine use: those chosen so far.
-  z.strictObject({ verb: z.literal("DeclareAttack"), target: cardRefSchema, attackers: z.array(z.string()).optional(), ...when }),
+  // framework allows against each enemy (faq.limitations-on-attacks). `discardSource`: the source is discarded first, its
+  // host read before ("discards Ambush to declare an attack against the attached enemy"). `enemy` and `attackers` are engine
+  // use: the enemy read, the attackers chosen so far.
+  z.strictObject({
+    verb: z.literal("DeclareAttack"),
+    target: cardRefSchema,
+    discardSource: z.boolean().optional(),
+    enemy: z.string().optional(),
+    attackers: z.array(z.string()).optional(),
+    ...when,
+  }),
   // Engine use (takesQuestProgress): the player answers whether progress from questing successfully goes on the locations
   // that may take it first (`first`), this quest phase.
   z.strictObject({ verb: z.literal("QuestProgressFirst"), first: z.boolean(), ...when }),
@@ -64,9 +73,9 @@ export const FLAGS = [
   // On an enemy: any character may choose it as the target of an attack, in the staging area or engaged with any player
   // ("Any character may choose attached enemy as the target of an attack").
   "attackableByAny",
-  // Held by the table: added to the total Threat in the staging area (a negative amount reduces it, the total not below 0)
-  // ("reduce the total Threat in the staging area by X").
-  "stagingThreat",
+  // Held by the table: the total Threat in the staging area is reduced by this much, not below 0 ("reduce the total Threat in
+  // the staging area by X").
+  "lessStagingThreat",
   // On a card: its printed text box is blank, except for its traits (rr.blank): its own records do not apply. Text gained from
   // another source is not blanked.
   "blankText",

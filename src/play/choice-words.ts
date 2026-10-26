@@ -5,6 +5,7 @@
 import type { Amount, Instruction } from "../catalog/boundary.ts";
 import { questProgressMoved } from "../rules/verbs.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
+import { attachmentPickWords, attachmentWords } from "./attachment-words.ts";
 import { encounterPickWords, encounterWords } from "./encounter-words.ts";
 
 export type ChoiceNames = {
@@ -198,8 +199,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     case "ShuffleEncounterDeck":
       return null;
     default:
-      // The encounter family's verbs (src/catalog/families/encounter.ts).
-      return encounterWords(instruction);
+      // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments family's.
+      return encounterWords(instruction) ?? attachmentWords(instruction);
   }
 }
 
@@ -244,7 +245,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "PlayFromHand") return { verb: "Play", prompt: "Choose a card to play from your hand." };
   if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
   if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
-  if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? { verb: "Choose", prompt: "Choose one." };
+  if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);
   switch (next?.verb) {

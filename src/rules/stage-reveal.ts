@@ -2,6 +2,7 @@
 import { pushCardEffects } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import { runQuestResolution } from "./explore.ts";
+import { askQuestProgress } from "./families/attachments-quest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { resolveQuest } from "./quest.ts";
@@ -15,6 +16,9 @@ import { fireForced } from "./triggers.ts";
 // the phase. The phase does not end while a new stage is still resolving.
 export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.questResolved) return finish({ ...state, questResolved: false });
+  // A location that may take the progress first asks the players once (Explorer's Almanac, families/attachments-quest.ts).
+  const asked = askQuestProgress(state, ctx, steps);
+  if (asked) return asked;
   const before = steps.length;
   const resolved = resolveQuest(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
   // The scenario is over: settle stops on it, so there is no second pass.

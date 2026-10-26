@@ -9,6 +9,7 @@ import { holds } from "./conditions.ts";
 import { effectsOf } from "./listen.ts";
 import { distinctHeroesReason, spendDiscount } from "./cost-rules.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
+import { playElsewhere, playTargets } from "./families/attachments-play.ts";
 import { payerOk } from "./families/costs-pay.ts";
 import { exhaustSlack, extraCostReason } from "./families/costs-play.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
@@ -64,6 +65,9 @@ export function playCard(
     const x = printed.costX ? intent.payments.reduce((sum, payment) => sum + payment.amount, 0) : undefined;
     return playEvent(queueEvent(next, { trigger: "played", seat, cardId: intent.cardId }), intent.cardId, seat, ctx, steps, x);
   }
+  // An attachment played unattached, onto a threat dial, or guarded (families/attachments-play.ts).
+  const elsewhere = printed.type === "attachment" ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
+  if (elsewhere) return elsewhere;
   next = moveCard(next, intent.cardId, { zone: "play", seat });
   next = updateCard(next, intent.cardId, { exhausted: entersExhausted(ctx, instance.code) });
   if (printed.type === "attachment" && intent.hostId) {
@@ -203,7 +207,9 @@ export function playReason(
   if (printed.type === "attachment") {
     if (!intent.hostId) return "Choose a host";
     const host = state.cards[intent.hostId];
-    if (!host || !attachmentHostIds(state, state.activeSeat, instance.code, ctx).includes(intent.hostId)) {
+    // The staging area or a seat's play area, for a card that goes there (families/attachments-play.ts).
+    const targets = playTargets(state, state.activeSeat, instance.code, ctx) ?? attachmentHostIds(state, state.activeSeat, instance.code, ctx);
+    if (!targets.includes(intent.hostId)) {
       if (host && !playerCardEffectCanChoose(printedOf(ctx.cards, host.code))) {
         return "Immune to player card effects";
       }
@@ -221,7 +227,7 @@ export function attachmentTargets(state: ScenarioState, code: string | undefined
   if (!code) return [];
   const printed = ctx.cards.get(code);
   if (!printed || printed.type !== "attachment") return [];
-  return attachmentHostIds(state, state.activeSeat, code, ctx);
+  return playTargets(state, state.activeSeat, code, ctx) ?? attachmentHostIds(state, state.activeSeat, code, ctx);
 }
 
 function paymentReason(

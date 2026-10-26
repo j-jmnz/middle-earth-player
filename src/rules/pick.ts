@@ -4,6 +4,7 @@ import type { PickSpec } from "../catalog/boundary.ts";
 import { attachmentHostIds } from "./attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
+import { attachmentsPickMatches } from "./families/attachments-pick.ts";
 import { costsPickMatches } from "./families/costs-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
@@ -110,6 +111,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.hasResources && instance.resources <= 0) return false;
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs-pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
+  // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments-pick.ts).
+  if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   if (spec.defending && !(state.pendingAttack?.defenderId === id && !state.pendingAttack.undefended)) return false;
   if (spec.hasAttachment) {

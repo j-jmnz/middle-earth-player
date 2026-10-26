@@ -271,7 +271,8 @@ function attackReason(
   if (state.window?.kind !== "playerAttack") return "That intent is not legal in this window";
   if (intent.attackerIds.length === 0) return "Declare at least one attacker";
   const enemy = state.cards[intent.enemyId];
-  if (!enemy || enemy.zone !== "engaged") return "That enemy cannot be attacked";
+  // An enemy in the staging area only when any character may choose it as a target (canAttack, attackableByAny).
+  if (!enemy || (enemy.zone !== "engaged" && !(enemy.zone === "staging" && flagged(state, enemy.id, "attackableByAny")))) return "That enemy cannot be attacked";
   if (attackDeclared(state, state.activeSeat, intent.enemyId)) return "That enemy was already attacked this phase";
   const seen = new Set<string>();
   for (const attackerId of intent.attackerIds) {

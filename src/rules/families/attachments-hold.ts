@@ -44,9 +44,9 @@ export function textBlank(state: ScenarioState, id: string): boolean {
   return flagged(state, id, "blankText");
 }
 
-// The total Threat in the staging area with the table's stagingThreat modifiers ("reduce the total Threat in the staging area
-// by X"), not below 0.
+// The total Threat in the staging area less the table's lessStagingThreat modifiers ("reduce the total Threat in the staging
+// area by X"), not below 0.
 export function withStagingThreat(state: ScenarioState, total: number): number {
-  const extra = heldAmount(state, "table", "stagingThreat");
-  return extra === 0 ? total : Math.max(0, total + extra);
+  const less = heldAmount(state, "table", "lessStagingThreat");
+  return less === 0 ? total : Math.max(0, total - less);
 }
