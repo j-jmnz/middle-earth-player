@@ -15,7 +15,8 @@ export const pickSchema = z.strictObject({
   // match an encounter card's printed type ("a treachery card just revealed").
   type: z.enum(["hero", "ally", "character", "enemy", "location", "player", "card", "attachment", "treachery", "objective"]),
   control: z.enum(["you", "any", "other"]),
-  // An enemy in the staging area counts too (an enemy "in play"), not only one engaged with a player.
+  // An enemy in the staging area counts too (an enemy "in play"), not only one engaged with a player. With `engaged`, the
+  // enemies in the staging area and those engaged as `engaged` says ("in the staging area or engaged with another player").
   staging: z.boolean().optional(),
   // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player. With `type: card`:
   // any card in the staging area ("choose a card in the staging area").
@@ -77,6 +78,11 @@ export const pickSchema = z.strictObject({
   hasAttachment: z.strictObject({ trait: z.string().min(1).optional(), playerCard: z.boolean().optional() }).optional(),
   // A card attached to the source (`source`), to the source's host (`host`), or to the active location (`activeLocation`).
   attachedTo: z.enum(["source", "host", "activeLocation"]).optional(),
+  // An attachment on a card of this type controlled by the chooser (`you`), by another player (`other`) or by anyone ("a Weapon
+  // card attached to a hero you control", "an attachment on a hero you control").
+  on: z.strictObject({ type: z.enum(["hero", "character"]), control: z.enum(["you", "other", "any"]) }).optional(),
+  // Not the card the source is attached to ("each other questing character" on an attachment).
+  notHost: z.boolean().optional(),
   // A hero with at least one resource in its pool; with at least this many (`minResources`).
   hasResources: z.boolean().optional(),
   minResources: z.number().int().positive().optional(),

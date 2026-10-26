@@ -3,6 +3,7 @@ import type { Condition } from "../catalog/boundary.ts";
 import { questSucceeded } from "./families/costs-pay.ts";
 import { spendablePools } from "./families/costs-verbs.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
@@ -167,6 +168,12 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return spendablePools(state, scope.actor, condition, ctx).total >= condition.min;
     case "questSucceeded":
       return questSucceeded(state, scope.actor, scope.sourceId, condition.committed === true);
+    case "step":
+      return stepHolds(state, condition.is);
+    case "engagedThisPhase":
+      return engagedThisPhase(state) === condition.is;
+    case "questKeywords":
+      return questHasKeywords(state, ctx) === condition.is;
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":

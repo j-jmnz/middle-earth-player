@@ -2,6 +2,8 @@
 import { pushCardEffects } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import { runQuestResolution } from "./explore.ts";
+import { afterQuestOutcome, questOutcome } from "./families/quest-outcome.ts";
+import { questFailureRaise } from "./families/quest-threat.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { resolveQuest } from "./quest.ts";
@@ -16,10 +18,12 @@ import { fireForced } from "./triggers.ts";
 export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.questResolved) return finish({ ...state, questResolved: false });
   const before = steps.length;
-  const resolved = resolveQuest(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
+  // Who was committed, read before resolving clears it, and the threat a failed quest raises (families/quest-*.ts).
+  const outcome = questOutcome(state, ctx);
+  const resolved = resolveQuest(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, questFailureRaise(ctx, steps));
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
-  return afterProgress({ ...resolved, questResolved: true }, before, ctx, steps);
+  return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);
 }
 
 // After progress was placed on the quest (from `steps[before]` on): each stage the quest advanced to has its When Revealed

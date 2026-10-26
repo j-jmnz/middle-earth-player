@@ -211,6 +211,8 @@ export function moveCard(state: ScenarioState, id: string, dest: Destination): S
   // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
+  // A card a player card put out of play under itself "while ~ is in play" comes back to the staging area when it leaves (07003:A:3).
+  if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) for (const under of cardsUnder(moved, id)) moved = updateCard(moveCard(moved, under, { zone: "staging" }), under, { face: "up" });
   // An enemy that leaves play takes its dealt shadow cards to the encounter discard (Learn to Play p16).
   // Staging and engaged are the zones an enemy is in play.
   if (dest.zone !== "engaged" && dest.zone !== "staging") {

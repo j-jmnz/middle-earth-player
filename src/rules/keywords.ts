@@ -2,6 +2,7 @@
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
+import { threatSaved } from "./families/quest-threat.ts";
 import type { EngineStep } from "./intents.ts";
 import { fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
@@ -54,14 +55,18 @@ export function modifiedStat(
   const printed = printedOf(cards, instance.code);
   let total = printedStat(printed, stat);
   let set: number | null = null;
+  // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2).
+  let floor = total;
   for (const modifier of state.modifiers) {
     if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
     if (modifier.set) set = modifier.amount;
     else total += modifier.amount;
+    if (!modifier.set && modifier.amount > 0) floor += modifier.amount;
   }
-  const value = set ?? total;
+  const lowered = set ?? total;
+  const value = stat === "willpower" && lowered < floor && flagged(state, instance.id, "cannotReduceWillpower") ? floor : lowered;
   return CARD_STATS.has(stat) ? Math.max(0, value) : value;
 }
 
@@ -301,6 +306,8 @@ export function destroyCard(
   if (printed.type === "location") {
     for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
   }
+  // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
+  if (explored && printed.type === "location" && state.activeLocation === id) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
   next = moveCard(next, id, defeatedDestination(latest, printed));
@@ -368,6 +375,12 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[]): Sce
     const seat = next.seats[index];
     if (!seat || seat.eliminated) continue;
     if (seat.threat >= 50 || seat.heroes.length === 0) {
+      // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).
+      const saved = seat.heroes.length > 0 ? threatSaved(next, index) : null;
+      if (saved) {
+        next = saved;
+        continue;
+      }
       next = withSeat(next, index, { ...seat, eliminated: true });
       steps.push({ kind: "eliminate", seat: index });
     }

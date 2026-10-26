@@ -79,12 +79,12 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     case "LowerThreat": {
       const amount = amountWords(instruction.amount);
       if (instruction.who === "eachSeat") return `each player lowers threat by ${amount}`;
-      return instruction.who === "picked" ? `lower that player's threat by ${amount}` : `lower your threat by ${amount}`;
+      return instruction.who === "picked" || instruction.who === "eventSeat" ? `lower that player's threat by ${amount}` : `lower your threat by ${amount}`;
     }
     case "Draw": {
       const amount = amountWords(instruction.amount);
       const cards = amount === "1" ? "1 card" : `${amount} cards`;
-      return instruction.who === "picked" ? `that player draws ${cards}` : `draw ${cards}`;
+      return instruction.who === "picked" || instruction.who === "eventSeat" ? `that player draws ${cards}` : `draw ${cards}`;
     }
     case "DamageCard":
       return `deal ${amountWords(instruction.amount)} damage to ${refWords(instruction.target)}`;
@@ -197,6 +197,21 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `place it facedown under ${sourceId ? names.card(sourceId) : "the location"}`;
     case "ShuffleEncounterDeck":
       return null;
+    // The quest family's verbs (src/catalog/families/quest.ts).
+    case "DamageEach":
+      return instruction.engagedWith === "picked" ? `deal ${amountWords(instruction.amount)} damage to each enemy engaged with that player` : `deal ${amountWords(instruction.amount)} damage to each matching ${PICK_NOUNS[instruction.pick?.type ?? "enemy"] ?? "card"}`;
+    case "WaiveQuestThreat":
+      return `${instruction.who === "eachSeat" ? "players do" : "that player does"} not raise threat from questing unsuccessfully ${instruction.until === "endOfRound" ? "this round" : "this phase"}`;
+    case "SkipQuestPhase":
+      return "skip the quest phase this round";
+    case "MoveProgress":
+      return instruction.all ? "move all its progress" : `move ${amountWords(instruction.amount)} progress`;
+    case "CommitToQuest":
+      return "commit it to the quest";
+    case "MakeActive":
+      return "make it the active location";
+    case "BarEngagement":
+      return instruction.what === "checks" ? "that enemy makes no engagement checks against you" : "that enemy cannot engage you";
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts).
       return encounterWords(instruction);

@@ -13,7 +13,8 @@ const LABELS: ReadonlyMap<string, string> = new Map([
   ["resolution", "resolution"],
 ]);
 
-const LABEL = /^(?:(?:Valour|Planning|Quest|Travel|Encounter|Combat|Refresh|Resource)\s+)?([A-Z][A-Za-z ]+?):\s/;
+// Up to two words before the label: "Valour Planning Action:" (10117:A:2).
+const LABEL = /^(?:(?:Valour|Planning|Quest|Travel|Encounter|Combat|Refresh|Resource)\s+){0,2}([A-Z][A-Za-z ]+?):\s/;
 
 export function timingLabels(text: string | null, keywordsOnly: (line: string) => boolean, campaign = false): string[] {
   if (!text) return [];

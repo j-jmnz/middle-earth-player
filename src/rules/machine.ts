@@ -40,6 +40,8 @@ import { stepWindow, stepWindowResumes } from "./step-window.ts";
 import { flagged, inPlay, livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
 import { clearEliminated, damageHeld, destroyOverwhelmed } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
+import { engagesAgain, optionallyEngaged } from "./families/quest-engage.ts";
+import { syncThreatSaves } from "./families/quest-threat.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -65,6 +67,8 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
       const { holdLethal: _was, ...rest } = current;
       current = answerable ? { ...rest, holdLethal: true } : rest;
     }
+    // The seats a card keeps in the game at the threat elimination level (10124:A:2).
+    current = syncThreatSaves(current, ctx, steps);
     const held = answerable ? damageHeld : undefined;
     const swept = current.lost || current.failure ? current : destroyOverwhelmed(clearEliminated(current, ctx.cards), ctx.cards, steps, held);
     if (swept !== current) {
@@ -113,8 +117,11 @@ export function applyIntent(
       return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":
       return { ...markReached(state, "traveled"), window: null };
-    case "Engage":
-      return finishOptional(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat);
+    case "Engage": {
+      // "After you optionally engage an enemy", and a seat that may optionally engage an additional enemy (09002:A:2).
+      const engaged = optionallyEngaged(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx);
+      return engagesAgain(engaged, state.activeSeat, ctx) ? engaged : finishOptional(engaged, state.activeSeat);
+    }
     case "DeclineEngage":
       return finishOptional(state, state.activeSeat);
     case "ChooseEnemy":

@@ -61,7 +61,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   } else if (spec.type === "enemy") {
     const engagedSeats = spec.engaged === "you" ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
     if (!spec.stagingOnly) for (const index of engagedSeats) raw.push(...(state.seats[index]?.engaged ?? []));
-    if ((spec.staging || spec.stagingOnly) && spec.engaged == null) raw.push(...state.staging);
+    // `staging` with `engaged`: the staging area and the enemies engaged as `engaged` says ("or engaged with another player").
+    if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...state.staging);
   } else if (spec.type === "location") {
     raw.push(...stagingLocations(state, ctx.cards));
     if (!spec.stagingOnly) raw.push(...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
@@ -110,6 +111,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.hasResources && instance.resources <= 0) return false;
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs-pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
+  if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
+  if (spec.notHost && at.sourceId != null && state.cards[at.sourceId]?.host === id) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   if (spec.defending && !(state.pendingAttack?.defenderId === id && !state.pendingAttack.undefended)) return false;
   if (spec.hasAttachment) {
@@ -141,6 +144,15 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     if (!attacker || !canAttack(state, state.cards[attacker]?.controller ?? asking, attacker, id, ctx.cards, true)) return false;
   }
   return true;
+}
+
+// An attachment's host is of the type and controlled as the filter's `on` says, from the chooser's side.
+function onHost(state: ScenarioState, hostId: string | null, on: NonNullable<PickSpec["on"]>, asking: number, ctx: ReduceContext): boolean {
+  const host = hostId ? state.cards[hostId] : undefined;
+  if (!host || host.controller == null) return false;
+  const type = printedOf(ctx.cards, host.code).type;
+  if (on.type === "hero" ? type !== "hero" : type !== "hero" && type !== "ally") return false;
+  return on.control === "any" || (on.control === "you") === (host.controller === asking);
 }
 
 // The character is attacking in the attack in progress: one of the attackers of a player attack.

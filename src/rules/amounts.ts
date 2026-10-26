@@ -76,6 +76,8 @@ function statOf(state: ScenarioState, id: string | null, stat: NonNullable<Exclu
     case "threatCost":
       // With the ThreatCost constants that lower it, unless the printed value is asked for (families/costs-stats.ts).
       return card.type !== "hero" ? 0 : printed ? (card.threat ?? 0) : threatCostOf(state, instance.id, ctx);
+    case "attachments":
+      return instance.attachments.length;
     default:
       if (printed) return (stat === "hitPoints" ? card.health : card[stat]) ?? 0;
       return modifiedStat(state, instance, stat, ctx.cards);

@@ -4,6 +4,7 @@
 // ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
 import { checkCost } from "./families/costs-stats.ts";
+import { engagementBarred, noteEngaged } from "./families/quest-engage.ts";
 import type { EngineStep } from "./intents.ts";
 import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
@@ -45,7 +46,8 @@ export function committedWillpower(state: ScenarioState, cards: Cards): number {
     for (const id of [...seat.heroes, ...seat.play]) {
       const instance = state.cards[id];
       if (!instance?.committed) continue;
-      total += modifiedStat(state, instance, "willpower", cards);
+      // "Using its Attack instead of its Willpower" (11005:A:2).
+      total += modifiedStat(state, instance, flagged(state, id, "questsWithAttack") ? "attack" : "willpower", cards);
     }
   }
   return total;
@@ -58,6 +60,8 @@ export function resolveQuest(
   cards: Cards,
   steps: EngineStep[],
   canAdvance: Gate = () => true,
+  // Raises one seat's threat for the failed quest; the quest family's waives it or waits for the Responses (quest-threat.ts).
+  raise?: (state: ScenarioState, seat: number, amount: number) => ScenarioState,
 ): ScenarioState {
   const willpower = committedWillpower(state, cards);
   const threat = stagingThreat(state, cards);
@@ -65,7 +69,7 @@ export function resolveQuest(
   let next = state;
   if (willpower < threat) {
     // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.
-    for (const seat of livingSeats(state)) next = raiseThreat(next, seat, threat - willpower, steps, ruleCause("rr.step-3-4"));
+    for (const seat of livingSeats(state)) next = raise ? raise(next, seat, threat - willpower) : raiseThreat(next, seat, threat - willpower, steps, ruleCause("rr.step-3-4"));
   } else if (willpower > threat) {
     next = placeQuestProgress(next, willpower - threat, cards, steps, canAdvance);
   }
@@ -200,7 +204,7 @@ export function stagingLocations(state: ScenarioState, cards: Cards): string[] {
 // The enemies in the staging area a player may optionally engage: not one that cannot be engaged at all (141048:A:1) or
 // cannot be optionally engaged (141051:A:1, 141052:A:1).
 export function optionalEnemies(state: ScenarioState, cards: Cards): string[] {
-  return stagingEnemies(state, cards).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged"));
+  return stagingEnemies(state, cards).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, state.activeSeat, "engage"));
 }
 
 export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
@@ -215,7 +219,7 @@ export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
 export function engageEnemy(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
   const instance = state.cards[enemyId];
   if (!instance || instance.zone !== "staging") return state;
-  if (flagged(state, enemyId, "cannotBeEngaged")) return state;
+  if (flagged(state, enemyId, "cannotBeEngaged") || engagementBarred(state, enemyId, seat, "engage")) return state;
   return engageWith(state, seat, enemyId, steps);
 }
 
@@ -225,7 +229,7 @@ export function engageEnemy(state: ScenarioState, seat: number, enemyId: string,
 // stop the enemy, which is engaged as it enters play.
 export function engageWith(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
   if (!state.cards[enemyId] || state.seats[seat]?.eliminated) return state;
-  const moved = moveCard(state, enemyId, { zone: "engaged", seat });
+  const moved = noteEngaged(moveCard(state, enemyId, { zone: "engaged", seat }), enemyId);
   steps.push({ kind: "engage", seat, enemyId });
   // Responses hear that the player engaged the enemy ("After you engage an enemy with a higher engagement cost ...").
   return queueEvent(moved, { trigger: "engaged", seat, subject: enemyId });
@@ -237,7 +241,7 @@ export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Car
   for (const id of stagingEnemies(state, cards)) {
     const instance = state.cards[id];
     // An enemy that "does not make engagement checks" is passed over (it can still be engaged optionally).
-    if (!instance || flagged(state, id, "cannotBeEngaged") || flagged(state, id, "noEngagementChecks")) continue;
+    if (!instance || flagged(state, id, "cannotBeEngaged") || flagged(state, id, "noEngagementChecks") || engagementBarred(state, id, seat, "checks")) continue;
     // With what the enemy gets while checking against this player (Orc Disguise, families/costs-stats.ts).
     const cost = checkCost(state, instance, seat, cards);
     if (cost == null || cost > threat) continue;

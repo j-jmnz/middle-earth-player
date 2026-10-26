@@ -6,6 +6,7 @@ import { currentCause, ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hideStep, pushHide } from "./hide.ts";
+import { encounterRaised } from "./families/quest-threat.ts";
 import { raiseThreat } from "./keywords.ts";
 import { queueEvent } from "./queue.ts";
 import { offerResponses, responseStep } from "./responses.ts";
@@ -127,6 +128,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
         for (let index = 0; index < next.seatCount; index += 1) {
           next = noteEncounterThreat(raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x")), index, printed.keywords.doomed, id, ctx);
         }
+        // An encounter card's Doomed raise is heard by Elfhelm (02100:A:1).
+        next = encounterRaised(next, livingSeats(next), id, ctx);
       }
       return next;
     }

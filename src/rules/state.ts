@@ -259,6 +259,11 @@ export type ScenarioState = {
   // This round's quest (rr.step-3-4): the characters committed to it, and the seats whose quest succeeded ("If you quest
   // successfully this phase", "After Hirgon quests successfully"). Kept only in a game that reads it (families/costs-pay.ts).
   quested?: { round: number; committed: readonly string[]; succeeded: readonly number[] };
+  // Each seat's starting threat level (rr.initial-threat-level), kept at setup only when a card of the game reads it (04053:A:2).
+  startingThreat?: readonly number[];
+  // The seats a card in play keeps in the game at the threat elimination level (10124:A:2): eliminateEmpties asks that card
+  // instead of eliminating the seat. settle keeps it current (families/quest-threat.ts).
+  threatSaves?: readonly number[];
   undo: UndoLog;
 };
 

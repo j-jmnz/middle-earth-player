@@ -12,10 +12,10 @@ import { exhaustCard, readyCard, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "./frames.ts";
 import { runSetupVerb } from "./setup-verbs.ts";
-import { engageEnemy, stagingEnemies, stagingLocations } from "./quest.ts";
+import { engageEnemy, engageWith, stagingEnemies, stagingLocations } from "./quest.ts";
 import { travelNow } from "./travel.ts";
 import type { ScenarioState } from "./state.ts";
-import { heldAmount, inPlay, updateCard } from "./state.ts";
+import { flagged, heldAmount, inPlay, updateCard } from "./state.ts";
 import { raiseFor, runExtraVerb } from "./verbs.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
@@ -108,6 +108,8 @@ export function runInstruction(
       const enemyId = instruction.target ? refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) : stagingEnemies(state, ctx.cards)[0];
       const enemy = enemyId ? state.cards[enemyId] : undefined;
       if (!enemyId || !enemy || (enemy.zone === "engaged" && enemy.controller === focus.seat)) return state;
+      // An enemy engaged with another player moves to the actor (01015:A:1, rr.engaged).
+      if (enemy.zone === "engaged") return flagged(state, enemyId, "cannotBeEngaged") ? state : engageWith(state, focus.seat, enemyId, steps);
       return engageEnemy(state, focus.seat, enemyId, steps);
     }
     case "DealShadow":

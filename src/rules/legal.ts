@@ -186,7 +186,8 @@ function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] 
 function committers(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
   return characters(state, seat, ctx.cards).filter((id) => {
     const instance = state.cards[id];
-    return instance != null && !instance.exhausted && !instance.committed && !flagged(state, id, "cannotQuest");
+    // "Can commit to quests while exhausted" (11009:A:1).
+    return instance != null && (!instance.exhausted || flagged(state, id, "commitsExhausted")) && !instance.committed && !flagged(state, id, "cannotQuest");
   });
 }
 

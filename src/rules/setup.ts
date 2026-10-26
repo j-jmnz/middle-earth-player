@@ -5,6 +5,7 @@ import type { Difficulty } from "../catalog/scenario-data.ts";
 import { ruleCause } from "./cause.ts";
 import { threatCostCut } from "./families/costs-stats.ts";
 import type { EngineStep } from "./intents.ts";
+import { recordStartingThreat } from "./families/quest-threat.ts";
 import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
@@ -79,6 +80,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = withThreat(state, index, threat);
     state = shuffleZone(state, index);
   }
+  // The starting threat level, for a card that reduces threat back to it (04053:A:2).
+  state = recordStartingThreat(state, ctx);
   const quiet: EngineStep[] = [];
   state = searchSetup(state, "player", ctx, quiet);
   state = handSetup(state, ctx, quiet);

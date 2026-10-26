@@ -16,8 +16,8 @@ export const amountExprSchema = z.strictObject({
   // With `count`: cards with the same title count once ("for each different player attachment on attached hero").
   distinct: z.literal(true).optional(),
   // A stat of a card. `printed` reads the printed value, else the current one. `damage`, `resources` and `progress` are
-  // tokens on the card; `cost` is its printed cost; `threatCost` a hero's printed threat.
-  stat: z.enum(["willpower", "attack", "defense", "threat", "hitPoints", "engagementCost", "questPoints", "damage", "resources", "progress", "cost", "threatCost"]).optional(),
+  // tokens on the card; `cost` is its printed cost; `threatCost` a hero's printed threat; `attachments` the cards attached to it.
+  stat: z.enum(["willpower", "attack", "defense", "threat", "hitPoints", "engagementCost", "questPoints", "damage", "resources", "progress", "cost", "threatCost", "attachments"]).optional(),
   of: cardRefSchema.optional(),
   printed: z.boolean().optional(),
   // The X the event was played for, or the X an earlier instruction fixed (the discarded card's cost).

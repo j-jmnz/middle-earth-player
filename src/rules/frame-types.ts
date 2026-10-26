@@ -138,7 +138,9 @@ export type Frame = {
 
 export type DelayedEffect = {
   id: string;
-  until: "endOfPhase" | "endOfRound";
+  // `questSucceeded`: run when the players quest successfully this phase (families/quest-outcome.ts), dropped when the quest
+  // resolves otherwise.
+  until: "endOfPhase" | "endOfRound" | "questSucceeded";
   sourceId: string | null;
   seat: number;
   // The phase the effect was scheduled in. An end-of-phase effect fires when that phase ends.

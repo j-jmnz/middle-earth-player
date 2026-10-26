@@ -1,7 +1,7 @@
 // Rules: rr.action-windows, rr.step-2-2, rr.step-2-3 (data/rules/entries.json).
 import { declineCancel } from "./cancel.ts";
 import { declineResponses } from "./responses.ts";
-import { livingSeats, perilLock, withMode, type ModeName, type ScenarioState } from "./state.ts";
+import { flagged, livingSeats, perilLock, withMode, type ModeName, type ScenarioState } from "./state.ts";
 
 // Seats that may act in the open window. Peril limits a frame's action window to the revealing seat.
 export function actingSeats(state: ScenarioState): number[] {
@@ -45,7 +45,12 @@ export function applyPass(state: ScenarioState): ScenarioState {
     const following = livingSeats(state).find((seat) => seat > turn);
     if (following != null) return { ...state, planningSeat: following, passed: [], activeSeat: following };
   }
-  return { ...withMode({ ...state, planningSeat: null }, modeAfterPass(state.mode)), window: null };
+  return { ...withMode({ ...state, planningSeat: null }, skipQuestPhase(state, modeAfterPass(state.mode))), window: null };
+}
+
+// "Skip the quest phase this round" (10117:A:2): the planning phase is followed by the travel phase.
+function skipQuestPhase(state: ScenarioState, mode: ModeName): ModeName {
+  return mode === "questCommit" && flagged(state, "table", "skipQuestPhase") ? "travel" : mode;
 }
 
 export function modeAfterPass(mode: ModeName): ModeName {

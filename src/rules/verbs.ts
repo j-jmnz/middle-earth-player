@@ -16,6 +16,8 @@ import { engageEnemy, engageWith, placeQuestProgress, stagingEnemies } from "./q
 import { restricted } from "./restrictions.ts";
 import { nextUint, shuffleIds } from "./seed.ts";
 import { afterProgress } from "./stage-reveal.ts";
+import { queueHeard } from "./families/quest-events.ts";
+import { encounterRaised } from "./families/quest-threat.ts";
 import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
 import { attachTo, cardsUnder, moveCard } from "./zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "./cause.ts";
@@ -104,7 +106,9 @@ export function runExtraVerb(
       return damageAllies(state, instruction, focus, ctx, steps);
     case "RemoveFromQuest": {
       const id = lastPicked(state);
-      return state.cards[id]?.committed ? updateCard(state, id, { committed: false }) : state;
+      const card = state.cards[id];
+      // "After attached character is removed from the quest" (12116:A:3).
+      return card?.committed ? queueHeard(updateCard(state, id, { committed: false }), ctx, { trigger: "removedFromQuest", seat: card.controller, subject: id }) : state;
     }
     case "EngageAll": {
       const seat = seatFor(state, instruction.who, focus.seat);
@@ -198,7 +202,8 @@ export function raiseFor(
     // "After your threat is raised by an encounter card effect" (08062:A:1).
     next = noteEncounterThreat(next, seat, amount * count, focus.sourceId, ctx);
   }
-  return next;
+  // An encounter or quest card's raise is heard by Elfhelm (02100:A:1).
+  return encounterRaised(next, seats, focus.sourceId, ctx);
 }
 
 // The heroes a seat has committed to the quest, leaving out those of one sphere ("each non-Fellowship hero he committed").

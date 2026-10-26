@@ -1,7 +1,7 @@
 // Conditions in effect records, the targets an instruction names, and the phase names a condition reads.
 import { z } from "zod";
 
-import { pickSchema } from "./effect-schema-pick.ts";
+import { pickSchema, sphereSchema } from "./effect-schema-pick.ts";
 
 export const phaseNameSchema = z.enum([
   "Setup",
@@ -103,6 +103,14 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The actor's quest succeeded this round (rr.step-3-4): "If you quest successfully this phase", read in the quest phase.
   // `committed`: and the source card was committed to it ("After Hirgon quests successfully").
   z.strictObject({ kind: z.literal("questSucceeded"), committed: z.boolean().optional() }),
+  // Where the round is in its framework steps (rr.framework-steps): in the quest phase before the staging step, after it, or
+  // before the quest is resolved; in the travel phase with no active location, so the players could travel (rr.step-4-2); in
+  // the encounter phase after the engagement checks ("Play only after the staging step").
+  z.strictObject({ kind: z.literal("step"), is: z.enum(["beforeStaging", "afterStaging", "beforeResolution", "canTravel", "afterEngagementChecks"]) }),
+  // An enemy was engaged in this encounter phase (`is`), or none was (12065:A:2).
+  z.strictObject({ kind: z.literal("engagedThisPhase"), is: z.boolean() }),
+  // The current quest card has a printed keyword (`is`), or has none (17034:A:1).
+  z.strictObject({ kind: z.literal("questKeywords"), is: z.boolean() }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [

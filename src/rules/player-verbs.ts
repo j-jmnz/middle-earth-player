@@ -10,7 +10,8 @@ import { queueEvent } from "./queue.ts";
 import { shuffleIds } from "./seed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { lowerThreat, placeDamage } from "./keywords.ts";
+import { lowerThreatByEffect } from "./families/quest-threat.ts";
+import { placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "./state.ts";
@@ -134,7 +135,8 @@ export function runPlayerVerb(
     case "LowerThreat": {
       const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
       let next = state;
-      for (const seat of seatsFor(state, instruction.who, focus.seat)) next = lowerThreat(next, seat, amount, steps, currentCause(steps, UNATTRIBUTED));
+      // A player card's reduction is capped by Saruman (22054:A:1) and heard by Hobbit Pipe (141015:A:2).
+      for (const seat of seatsFor(state, instruction.who, focus.seat)) next = lowerThreatByEffect(next, seat, amount, focus.sourceId, ctx, steps, currentCause(steps, UNATTRIBUTED));
       return next;
     }
     case "DamageCard": {
