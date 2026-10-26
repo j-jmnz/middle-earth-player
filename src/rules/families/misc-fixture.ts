@@ -38,6 +38,7 @@ const EXTRA: PrintedCard[] = [
   ally("142005", "Elrond", "neutral", ["Noldor", "Noble"], { isUnique: true }),
   // Constants and events.
   ally("19002", "Guardian of Esgaroth", "neutral", ["Dale"], { willpower: 0, attack: 0, defense: 0, health: 1 }),
+  ally("19033", "Wild Stallion", "neutral", ["Creature"], { willpower: 0, attack: 1, defense: 1, health: 2 }),
   attachment("item1", "Trinket", "neutral", ["Item"]),
   attachment("item2", "Charm", "neutral", ["Item"]),
   attachment("04005", "Keeping Count", "neutral", []),

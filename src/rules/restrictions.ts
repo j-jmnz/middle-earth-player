@@ -84,7 +84,7 @@ export function restrictedAttachments(state: ScenarioState, hostId: string, ctx:
   return host.attachments.filter((id) => {
     const attachment = state.cards[id];
     // Snowmane "loses the restricted keyword" while a flag says so (families/misc-traits.ts).
-    return attachment != null && printedOf(ctx.cards, attachment.code).keywords.restricted && !flagged(state, id, "losesRestricted");
+    return attachment != null && (printedOf(ctx.cards, attachment.code).keywords.restricted || flagged(state, id, "countsAsRestricted")) && !flagged(state, id, "losesRestricted");
   });
 }
 

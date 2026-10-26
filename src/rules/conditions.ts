@@ -242,6 +242,10 @@ function grants(state: ScenarioState, id: string, ctx: ReduceContext): { trait?:
   for (const attachmentId of instance.attachments) {
     const attachment = state.cards[attachmentId];
     if (!attachment) continue;
+    // A hero card attached to Thorongil lends its host its resource icon (families/misc-text.ts).
+    const lent = attachment.lends ? state.cards[attachment.lends] : undefined;
+    const lentSphere = lent ? printedOf(ctx.cards, lent.code).sphere : null;
+    if (lentSphere && lentSphere !== "neutral" && lentSphere !== "fellowship" && lentSphere !== "baggins") found.push({ sphere: lentSphere });
     for (const effect of effectsOf(ctx, attachment.code)) {
       if (effect.timing !== "constant") continue;
       const scope = { actor: attachment.controller ?? state.firstPlayer, sourceId: attachment.id, returned: 0 };

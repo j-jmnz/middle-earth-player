@@ -189,6 +189,21 @@ export const RECORDS: readonly Effect[] = [
     {"verb":"Pick","pick":{"type":"hero","control":"any","trait":"Ring-bearer"}},{"verb":"Ready","target":"picked"},{"verb":"AddToX","amount":{"stat":"willpower","of":"picked"}},
     {"verb":"Pick","pick":{"type":"enemy","control":"any","engaged":"you"}},{"verb":"AddToX","amount":{"stat":"threat","of":"picked","negative":true}},
     {"verb":"ModifyStat","stat":"attack","amount":{"x":true,"negative":true},"until":"endOfPhase","target":"picked"},{"verb":"ModifyStat","stat":"defense","amount":{"x":true,"negative":true},"until":"endOfPhase","target":"picked"}]},
+
+  // Cards from the collection (hero swaps; the collection is every deck-legal hero card: families/misc-collection.ts).
+  // 22090 Helm of Secrecy.
+  {"id":"22090:action:1","cardCode":"22090","lines":["22090:A:2"],"timing":"action","condition":{"kind":"canPick","pick":{"type":"hero","control":"you"}},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you"}},{"verb":"SwapHero"}]},
+  // 22146 Thorongil: another version of the host is attached to it; the host has its game text and resource icon while Thorongil is in play.
+  {"id":"22146:response:1","cardCode":"22146","lines":["22146:A:2"],"timing":"response","trigger":"attached","subject":"self","eventSeat":"you","instructions":[{"verb":"AttachCollectionHero"}]},
+
+  // 19033 Wild Stallion: a Planning Action attaches it to another ally, where it counts as a Restricted Mount attachment.
+  {"id":"19033:action:1","cardCode":"19033","lines":["19033:A:2"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Planning"},{"kind":"canPick","pick":{"type":"ally","control":"you","other":true}}]},"instructions":[
+    {"verb":"Pick","pick":{"type":"ally","control":"you","other":true}},{"verb":"AttachAsMount"}]},
+  {"id":"19033:constant:2","cardCode":"19033","lines":["19033:A:2"],"timing":"constant","instructions":[
+    {"verb":"ModifyStat","stat":"traitMount","amount":1,"until":"whileSourceInPlay","when":{"kind":"matches","card":"host","pick":{"type":"ally","control":"any"}}},
+    {"verb":"ModifyStat","stat":"countsAsRestricted","amount":1,"until":"whileSourceInPlay","when":{"kind":"matches","card":"host","pick":{"type":"ally","control":"any"}}},
+    {"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"},
+    {"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"hitPoints","amount":1,"until":"whileSourceInPlay","target":"host"}]},
 ];
 
 // Generated record ids an authored record here replaces.

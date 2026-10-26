@@ -88,6 +88,10 @@ export type CardInstance = {
   owner?: number;
   // Order in which the card entered play. Forced effects resolve oldest first.
   enteredPlay: number;
+  // A hero card taken from the collection (families/misc-collection.ts): the id of the card whose effect brought it out.
+  collection?: string;
+  // On an attachment: the id of the hero card from the collection attached to it, whose game text and resource icon its host has.
+  lends?: string;
 };
 
 export type Seat = {

@@ -14,6 +14,7 @@ export function flaggedTrait(state: ScenarioState, id: string, trait: string): b
   if (state.modifiers.length === 0) return false;
   if (trait === "Rohan") return flagged(state, id, "traitRohan");
   if (trait === "Gondor") return flagged(state, id, "traitGondor");
+  if (trait === "Mount") return flagged(state, id, "traitMount");
   return false;
 }
 

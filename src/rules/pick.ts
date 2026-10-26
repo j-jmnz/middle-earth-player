@@ -104,7 +104,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if ((id === at.sourceId && (from !== "play" || spec.other)) || (spec.different && picked.includes(id))) return false;
   if (spec.type !== "card" && spec.type !== "player") {
     // A card among a player's heroes is a hero: an ally that gained the hero card type sits there (heroType, families/play-sweep.ts).
-    const type = instance.zone === "heroes" ? "hero" : printed.type;
+    // An ally attached to another card (Wild Stallion) is an attachment while it is.
+    const type = instance.zone === "heroes" ? "hero" : printed.type === "ally" && instance.host != null ? "attachment" : printed.type;
     const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type;
     if (!typed) return false;
   }

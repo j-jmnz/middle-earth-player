@@ -14,6 +14,8 @@ import { livingSeats, updateCard } from "../state.ts";
 import { pickedList } from "../player-verbs.ts";
 
 import type { Focus } from "./index.ts";
+import { attachCollectionHero, swapHero } from "./misc-collection.ts";
+import { attachAsMount } from "./misc-mount.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -65,6 +67,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return shuffleEncounterDeck(spawn(state, instruction.code, { zone: "encounterDeck" }).state);
     case "PayFromHero":
       return state;
+    case "SwapHero":
+      return swapHero(state, instruction, focus, ctx, steps);
+    case "AttachCollectionHero":
+      return attachCollectionHero(state, instruction, focus, ctx);
+    case "AttachAsMount":
+      return attachAsMount(state, focus, ctx, steps);
     case "LoseGame": {
       if (state.lost) return state;
       const name = focus.sourceId && state.cards[focus.sourceId] ? printedOf(ctx.cards, state.cards[focus.sourceId]?.code ?? "").name : "A card";
