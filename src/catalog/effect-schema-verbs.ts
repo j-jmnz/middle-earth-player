@@ -5,6 +5,7 @@ import { cardRefSchema, positiveAmountSchema } from "./effect-schema-amount.ts";
 import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.ts";
 import { pickSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifyStatSchema } from "./effect-schema-stats.ts";
+import { FAMILY_VERBS } from "./families/index.ts";
 
 function verb<const Verb extends string>(name: Verb) {
   return z.strictObject({ verb: z.literal(name), ...when });
@@ -340,6 +341,8 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("MarkFallen"), attached: z.string().min(1), ...when }),
   // Resolution: each player names a hero they control as a captive, other than these traits or codes.
   z.strictObject({ verb: z.literal("NameCaptives"), except: z.array(z.string().min(1)), ...when }),
+  // The verbs each mechanic family adds (src/catalog/families).
+  ...FAMILY_VERBS,
 ] as const;
 
 export const simpleInstructionSchema = z.discriminatedUnion("verb", simpleVerbs);

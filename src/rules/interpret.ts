@@ -6,6 +6,7 @@ import { placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { modifyStat } from "./attack-verbs.ts";
 import { frameScope, refCard } from "./amounts.ts";
+import { runFamilyVerb } from "./families/index.ts";
 import { exhaustCard, readyCard, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "./frames.ts";
@@ -78,6 +79,8 @@ export function runInstruction(
   steps: EngineStep[],
 ): ScenarioState {
   if (state.failure) return state;
+  const family = runFamilyVerb(state, instruction, focus, ctx, steps);
+  if (family) return family;
   const player = runPlayerVerb(state, instruction, focus, ctx, steps);
   if (player) return player;
   switch (instruction.verb) {

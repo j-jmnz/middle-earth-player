@@ -9,6 +9,7 @@ import { conditionSchema, targetSchema } from "./effect-schema-conditions.ts";
 import { pickSchema, sphereSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifierStatSchema, modifierUntilSchema } from "./effect-schema-stats.ts";
 import { simpleInstructionSchema, simpleVerbs } from "./effect-schema-verbs.ts";
+import { FAMILY_TRIGGERS } from "./families/index.ts";
 
 export { isStatCondition, phaseNameSchema, type Condition } from "./effect-schema-conditions.ts";
 export { amountExprSchema, amountSchema, cardRefSchema, conditionSchema, modifierStatSchema, modifierUntilSchema, pickSchema, sphereSchema, targetSchema };
@@ -77,6 +78,8 @@ export const triggerSchema = z.enum([
   // About a character: damage was just dealt to it, before it can be destroyed by it. The window for "cancel X damage just
   // dealt" and "place that damage on ~ instead" (CancelDamage; the event's amount is `{ dealt: true }`).
   "damageDealt",
+  // The triggers each mechanic family adds (src/catalog/families).
+  ...FAMILY_TRIGGERS,
 ]);
 
 // What a player pays to use an Action or Response. Resources come from the payments on the Trigger intent. A cost that asks

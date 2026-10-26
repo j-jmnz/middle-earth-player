@@ -16,6 +16,21 @@ not bend a verb to mean something else.
    `node --experimental-strip-types scripts/card-smoke.ts <code> <code> ...` for the cards you wrote. The coverage test also
    compares `src/effects/open-lines.ts`; `pnpm effects:open` rewrites it.
 
+## Mechanic families: engine and records together
+
+The lines the vocabulary could not express are worked by mechanic family (attack, defense, encounter, quest, play, costs,
+deck, motk, attachments, sidequests, misc): whoever takes a family adds the engine support and writes the records. A family
+owns three files, composed by the `index.ts` next to them, so families do not edit the same lists:
+
+- `src/catalog/families/<family>.ts`: `VERBS` (zod `strictObject`s with `...when` from `effect-schema-conditions.ts`, each
+  with a comment saying what the engine does), `TRIGGERS` (event names) and `FLAGS` (stat flags `ModifyStat` can set). They
+  join the verb union, the trigger enum and the stat enum.
+- `src/rules/families/<family>.ts`: `run` resolves the family's verbs; `runInstruction` asks the families first. New engine
+  behavior goes in new files under `src/rules/families/` with the smallest hook in an existing engine file. Tests go next to
+  it (`src/rules/families/<family>.test.ts`) and name the rule ids they implement.
+- `src/effects/authored/families/<family>.ts`: the family's records (`RECORDS`, `REPLACES`). A card's other lines may have
+  records in `pool/<PACK>.ts`; record ids stay unique across every file (the next free `<n>` for the code and timing).
+
 ## The record
 
 ```ts

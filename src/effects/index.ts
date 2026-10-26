@@ -1,6 +1,7 @@
 import type { Effect } from "../catalog/boundary.ts";
 
 import { AUTHORED_EFFECTS as BOX_AUTHORED, AUTHORED_REPLACES as BOX_REPLACES } from "./authored/fellowship-of-the-ring.ts";
+import { FAMILY_AUTHORED_EFFECTS, FAMILY_AUTHORED_REPLACES } from "./authored/families/index.ts";
 import { POOL_AUTHORED_EFFECTS, POOL_AUTHORED_REPLACES } from "./authored/pool/index.ts";
 import { GENERATED_EFFECTS as BOX_GENERATED } from "./generated/fellowship-of-the-ring.ts";
 import { POOL_GENERATED_EFFECTS } from "./generated/player-pool.ts";
@@ -12,9 +13,10 @@ export function mergeEffects(generated: readonly Effect[], authored: readonly Ef
   return [...generated.filter((effect) => !replaced.has(effect.id)), ...authored];
 }
 
-// The box's records (scenario cards and both starter lists) and the rest of the player pool's, one per pack.
+// The box's records (scenario cards and both starter lists) and the rest of the player pool's, one file per pack or
+// per mechanic family.
 export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...POOL_GENERATED_EFFECTS];
-export const AUTHORED_EFFECTS: readonly Effect[] = [...BOX_AUTHORED, ...POOL_AUTHORED_EFFECTS];
-export const AUTHORED_REPLACES: readonly string[] = [...BOX_REPLACES, ...POOL_AUTHORED_REPLACES];
+export const AUTHORED_EFFECTS: readonly Effect[] = [...BOX_AUTHORED, ...POOL_AUTHORED_EFFECTS, ...FAMILY_AUTHORED_EFFECTS];
+export const AUTHORED_REPLACES: readonly string[] = [...BOX_REPLACES, ...POOL_AUTHORED_REPLACES, ...FAMILY_AUTHORED_REPLACES];
 
 export const EFFECTS: readonly Effect[] = mergeEffects(GENERATED_EFFECTS, AUTHORED_EFFECTS);

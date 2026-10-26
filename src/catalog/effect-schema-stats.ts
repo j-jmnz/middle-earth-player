@@ -4,6 +4,7 @@ import { z } from "zod";
 import { amountSchema } from "./effect-schema-amount.ts";
 import { when } from "./effect-schema-conditions.ts";
 import { pickSchema } from "./effect-schema-pick.ts";
+import { FAMILY_FLAGS } from "./families/index.ts";
 
 
 // `whileSourceInVictory`: a constant that works from the victory display ("While Weathertop is in the victory display",
@@ -53,6 +54,8 @@ export const modifierStatSchema = z.enum([
   "takesUndefendedDamage",
   "extraResource",
   "extraRestricted",
+  // The flags each mechanic family adds (src/catalog/families).
+  ...FAMILY_FLAGS,
 ]);
 
 export const modifyStatSchema = z.strictObject({
