@@ -21,10 +21,23 @@ export function writeTableSettings<TRun>(user: Db<TRun>, value: TableSettings): 
   user.insert(settings).values({ key: TABLE_KEY, value: json }).onConflictDoUpdate({ target: settings.key, set: { value: json } }).run();
 }
 
-/** Loads the table settings into the app's store and writes every later change back. Returns the unsubscribe. */
-export function bindTableSettings<TRun>(user: Db<TRun>): () => void {
-  tableSettings.getState().hydrate(readTableSettings(user));
+/**
+ * Loads the table settings into the app's store and writes every later change back. Returns the unsubscribe. A row that
+ * cannot be read leaves the defaults in place and is still written over by the next change, so a change is never lost
+ * quietly; `warn` hears each failure.
+ */
+export function bindTableSettings<TRun>(user: Db<TRun>, warn: (message: string) => void): () => void {
+  try {
+    tableSettings.getState().hydrate(readTableSettings(user));
+  } catch (error: unknown) {
+    warn(`Table settings did not load (${error instanceof Error ? error.message : "unknown error"}); the defaults are used and the next change is saved over them`);
+  }
   return tableSettings.subscribe((state, previous) => {
-    if (state.settings !== previous.settings) writeTableSettings(user, state.settings);
+    if (state.settings === previous.settings) return;
+    try {
+      writeTableSettings(user, state.settings);
+    } catch (error: unknown) {
+      warn(`Table settings were not saved (${error instanceof Error ? error.message : "unknown error"})`);
+    }
   });
 }

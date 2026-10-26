@@ -2,7 +2,7 @@
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { offerResponses } from "./responses.ts";
-import type { ScenarioState } from "./state.ts";
+import type { GameEvent, ScenarioState } from "./state.ts";
 import { fireForced } from "./triggers.ts";
 import { pushFrame } from "./windows.ts";
 
@@ -26,6 +26,13 @@ export function canAnnounce(state: ScenarioState): boolean {
   );
 }
 
+// The queued events right after `event` that belong to its occurrence, up to the first that does not.
+function sameOccurrence(event: GameEvent, queued: readonly GameEvent[]): GameEvent[] {
+  if (!event.occurrence) return [];
+  const end = queued.findIndex((other) => other.occurrence !== event.occurrence);
+  return queued.slice(0, end < 0 ? queued.length : end);
+}
+
 // Announces the oldest queued event (queue.ts): Responses are offered once the Forced effects have resolved, so the
 // response frame goes down first and the Forced frames on top of it (rr.timing-of-ability-resolution). An open action
 // window waits under a resume frame and comes back when everything above it is done, with the same seat and passes.
@@ -34,7 +41,7 @@ export function drainEvents(state: ScenarioState, ctx: ReduceContext, steps: Eng
   if (!event) return state;
   // The events of one occurrence (each character of one commit) are announced together: their Forced effects fire, and
   // their Responses share one window in which they are used in any order (rr.triggering-condition).
-  const together = event.occurrence ? queued.filter((other, index) => other.occurrence === event.occurrence && queued.slice(0, index).every((before) => before.occurrence === event.occurrence)) : [];
+  const together = sameOccurrence(event, queued);
   const rest = queued.slice(together.length);
   const { pendingEvents: _queued, ...without } = state;
   const cleared: ScenarioState = rest.length > 0 ? { ...without, pendingEvents: rest } : without;

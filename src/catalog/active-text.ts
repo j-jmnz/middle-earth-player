@@ -45,15 +45,6 @@ function plain(text: string): string {
     .trim();
 }
 
-/** True when a card's text holds something besides the keywords the engine implements. */
-export function hasUniqueText(text: string | null | undefined): boolean {
-  if (!text) return false;
-  return text.split(/\r?\n/).some((raw) => {
-    const line = plain(raw);
-    return line.length > 0 && !isKeywordLine(line);
-  });
-}
-
 /**
  * A card's printed lines in order, each with whether the app applies it. From the ledger when it holds the card (front, then
  * back); otherwise from the catalog text, where a line beyond keywords is applied only when the card has a record.
@@ -109,9 +100,3 @@ export function textLoss(type: string | null | undefined, code: string, check: T
   return "ability";
 }
 
-/** The loss in a few words, for a row's detail and the briefing: "Ability not applied", "Cannot be played". */
-export const LOSS_WORDS: Readonly<Record<TextLoss, string>> = {
-  ability: "Ability not applied",
-  cannotPlay: "Cannot be played",
-  noEffect: "Text not applied",
-};

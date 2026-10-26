@@ -1,10 +1,17 @@
 // The app's own "not applied" check (src/catalog/active-text.ts) over the effect records it ships and the printed-text
 // ledger: which lines of a card no record reads, and what the player loses with them. One check for the table, the
 // preview, the card screen, the pool, the deck screens and the briefing (docs/plans/inactive-text.md).
-import { cardLines, inactiveCodes, LOSS_WORDS, textCheck, textLoss, unappliedLines, type CardLine, type TextCheck, type TextLoss } from "../catalog/active-text.ts";
+import { inactiveCodes, textCheck, textLoss, unappliedLines, type CardLine, type TextCheck, type TextLoss } from "../catalog/active-text.ts";
 import type { Effect } from "../catalog/boundary.ts";
 import { shippedLedger } from "../catalog/printed-ledger.ts";
 import { EFFECTS } from "../effects/index.ts";
+
+/** The loss in a few words, for a row's detail and the briefing: "Ability not applied", "Cannot be played". */
+const LOSS_WORDS: Readonly<Record<TextLoss, string>> = {
+  ability: "Ability not applied",
+  cannotPlay: "Cannot be played",
+  noEffect: "Text not applied",
+};
 
 const checks = new WeakMap<readonly Effect[], TextCheck>();
 
@@ -50,7 +57,6 @@ export function notAppliedCodes(texts: Iterable<readonly [string, string | null]
   return inactiveCodes(texts, shippedCheck());
 }
 
-export { cardLines };
 
 /**
  * What playing a card the app does not fully apply costs, said before it is confirmed: an attachment with no record attaches

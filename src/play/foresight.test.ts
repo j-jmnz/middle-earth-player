@@ -136,6 +136,15 @@ describe("the commit and travel", () => {
     expect(noOneQuests(0)).toBe("Tap again: no one quests");
   });
 
+  it("says when a failed quest takes the threat to 50, as the engine fails it (rr.threat-elimination-level)", () => {
+    const table = buildTable(base, { staging: [RIDER], start: "quest" });
+    // Nobody committed against the Black Rider's threat 4: at 48 the threat reaches 50 and the only seat is eliminated.
+    const staged: ScenarioState = { ...withThreat(table.state, 0, 48), mode: "staging" };
+    expect(readoutFor(staged, table.ctx, null, null, (id) => id)?.result).toBe("Threat +4 if nothing changes; threat reaches 50: the game is lost");
+    const safe: ScenarioState = { ...withThreat(table.state, 0, 40), mode: "staging" };
+    expect(readoutFor(safe, table.ctx, null, null, (id) => id)?.result).toBe("Threat +4 if nothing changes");
+  });
+
   it("while a location is active, says what exploring it still takes", () => {
     const table = buildTable(base, { start: "travel", active: "141036", staging: ["141037"] });
     const sheet = sheetFor(table.state, table.ctx, legalIntents(table.state, table.ctx), names);

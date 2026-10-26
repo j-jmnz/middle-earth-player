@@ -8,8 +8,9 @@
 import { attackStrength, defendersOf } from "../rules/combat.ts";
 import { hidePassed, hideWillpower } from "../rules/hide.ts";
 import { defenseAsDefender, modifiedStat, pooledDefense, standingDefenders } from "../rules/keywords.ts";
-import { committedWillpower, questPointsOf, stagingThreat } from "../rules/quest.ts";
+import { committedWillpower, failQuest, questPointsOf, stagingThreat } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { livingSeats } from "../rules/state.ts";
 
 import { damageOutcome, enemiesToFace, lossWords, outcomeWords } from "./foresight.ts";
 import type { Sheet, SheetStat } from "./sheet-types.ts";
@@ -160,13 +161,12 @@ function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly s
   return `${reveals}. Ready after this: ${ready} · Enemies to face: ${enemies.length} (${attacks.join(", ")} attack)`;
 }
 
-// A quest that would fail by `shortfall` and take a seat's threat to 50 (rr.threat-elimination-level): the seat is
-// eliminated, and with no seat left the game is lost.
+// A quest that would fail by `shortfall`, as the engine fails it on a copy (failQuest): a seat whose threat reaches 50 is
+// eliminated (rr.threat-elimination-level), and with no seat left the game is lost.
 function eliminationWords(game: ScenarioState, shortfall: number): string {
   if (shortfall <= 0) return "";
-  const out = game.seats.flatMap((seat, index) => (!seat.eliminated && seat.threat + shortfall >= 50 ? [index] : []));
-  if (out.length === 0) return "";
-  const living = game.seats.filter((seat) => !seat.eliminated).length;
-  if (out.length === living) return `; threat reaches 50: ${lossWords("No seats remain")}`;
-  return `; threat reaches 50: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated`;
+  const after = failQuest(game, shortfall, []);
+  if (after.lost && !game.lost) return `; threat reaches 50: ${lossWords(after.lossReason ?? "No seats remain")}`;
+  const out = livingSeats(game).filter((seat) => !livingSeats(after).includes(seat));
+  return out.length === 0 ? "" : `; threat reaches 50: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated`;
 }

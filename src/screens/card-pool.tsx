@@ -204,7 +204,8 @@ export function CardPool({
   );
   // The same "not applied" check as the card screen and the table: a printed line no effect record reads.
   const [inactiveCodes] = useState(() =>
-    notAppliedCodes(catalog.select({ code: cards.code, text: cards.text }).from(cards).where(eq(cards.deckLegal, true)).all().map((row) => [row.code, row.text] as const)),
+    // The text the app shows is the errata when there is one, as on the card screen and in the deck store.
+    notAppliedCodes(catalog.select({ code: cards.code, text: cards.text, errata: cards.errata }).from(cards).where(eq(cards.deckLegal, true)).all().map((row) => [row.code, row.errata ?? row.text] as const)),
   );
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);
   const [search, setSearch] = useState("");

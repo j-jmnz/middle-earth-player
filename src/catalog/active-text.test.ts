@@ -1,7 +1,7 @@
 // Rules: rr.keywords, rr.triggered-ability (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
-import { activeCardCodes, cardLines, hasUniqueText, inactiveCodes, ledgerByCode, textCheck, textInactive, textLoss, unappliedLines, type PrintedSide } from "./active-text.ts";
+import { activeCardCodes, cardLines, inactiveCodes, ledgerByCode, textCheck, textInactive, textLoss, unappliedLines, type PrintedSide } from "./active-text.ts";
 
 const SPEARMAN_TEXT = "Sentinel.\n<b>Response:</b> After Gondorian Spearman is declared as a defender, deal 1 damage to the attacking enemy.";
 
@@ -24,14 +24,15 @@ describe("activeCardCodes", () => {
   });
 });
 
-describe("hasUniqueText", () => {
-  it("is false for a line of keywords the engine reads", () => {
-    expect(hasUniqueText("Sentinel.")).toBe(false);
-    expect(hasUniqueText("Ranged. Sentinel.")).toBe(false);
-    expect(hasUniqueText("Doomed 2. Hide 3.")).toBe(false);
-    expect(hasUniqueText(null)).toBe(false);
-    expect(hasUniqueText("Hide 2. Cannot have non-Morgul attachments.")).toBe(true);
-    expect(hasUniqueText(SPEARMAN_TEXT)).toBe(true);
+describe("a card with no record outside the ledger", () => {
+  it("has nothing unapplied in a line of keywords the engine reads", () => {
+    const none = check([]);
+    expect(textInactive("x", "Sentinel.", none)).toBe(false);
+    expect(textInactive("x", "Ranged. Sentinel.", none)).toBe(false);
+    expect(textInactive("x", "Doomed 2. Hide 3.", none)).toBe(false);
+    expect(textInactive("x", null, none)).toBe(false);
+    expect(textInactive("x", "Hide 2. Cannot have non-Morgul attachments.", none)).toBe(true);
+    expect(textInactive("x", SPEARMAN_TEXT, none)).toBe(true);
   });
 });
 

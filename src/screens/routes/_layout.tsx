@@ -90,12 +90,7 @@ export default function RootLayout() {
   // The table's settings (stops, free Responses always used, readability, the guide): loaded once, every change written back.
   useEffect(() => {
     if (!databases) return;
-    try {
-      return bindTableSettings(databases.user);
-    } catch (error: unknown) {
-      console.warn(error instanceof Error ? error.message : "Table settings did not load");
-      return undefined;
-    }
+    return bindTableSettings(databases.user, (message) => console.warn(message));
   }, [databases]);
 
   useEffect(() => {

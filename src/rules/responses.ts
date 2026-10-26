@@ -124,7 +124,10 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
   const used = frame.data.offers.find((offer) => offer.cardId === intent.cardId && offer.effectId === intent.effectId);
   const event = used?.event ?? frame.data.event;
   const left = frame.data.offers.filter((offer) => !(offer.cardId === intent.cardId && offer.effectId === intent.effectId));
-  const paid = payUsage(patchTop(state, { data: { ...frame.data, offers: left } }), effect, intent.cardId, intent.payments ?? [], ctx, steps);
+  // The effect reads the event it answers (answeredEvent): another of the occurrence's events than the window's first.
+  const { answering: _previous, ...data } = frame.data;
+  const answering = event !== frame.data.event ? { answering: event } : {};
+  const paid = payUsage(patchTop(state, { data: { ...data, offers: left, ...answering } }), effect, intent.cardId, intent.payments ?? [], ctx, steps);
   return pushEffectFrame(
     { ...paid, window: null },
     {

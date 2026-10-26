@@ -96,7 +96,8 @@ The `ux` review of the rework (2026-10-25) put resolve in beats first, then comb
 - **Haptics on arm and confirm** (2026-10-25, `expo-haptics`, which the user allowed): a tick when a button arms, a confirm when an intent is sent or taken back, a reject on a refusal.
 - **Threat dial** (2026-10-25, on main): the threat as a threat-red pill whose meter fills toward 50, warming from 40, with a change badge. It covers the "50 ends the game" lesson; the engagement ticks of item 6 build on it.
 - **Proposals 1 to 16 and both engine notes** (2026-10-26, branch `ccr-c7b5b4ea-4ei4kn`; the rules are in `docs/brief.md`, Screens, Table and Effects, and the look in `docs/design-system.md`, Table). Where the build differs from the proposal:
-  - Stops (1) are off by default and live in the turn reference (9) with the readability options (16) and the first-game guide (14), kept in `user.db` (`settings`). The rail does not mark each stop; the eyebrow says "Stops on".
+  - Stops (1) are off by default and live in the turn reference (9) with the readability option (16) and the first-game guide (14), kept in `user.db` (`settings`). The rail does not mark each stop; the eyebrow says "Stops on".
+  - Larger cards (16) was removed after the `ux` review: on a phone the three rows bind the height, so it grew cards by about 2 pt and cut the hand under 44 pt. Strong outlines stays.
   - Text the app does not apply (5) took the user's decision: an event with no record is not offered (`rr.triggered-ability`). An attachment with no record arms with the price ("Tap again: pay 2 for no effect").
   - The loss warning (3) covers a defender and an undefended hero. A quest shortfall that reaches 50 is said in the commit readout, not armed.
   - Always use (engine note) is a standing setting, not a per-game one, offered as a dock answer on the Response itself.

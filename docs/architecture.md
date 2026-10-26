@@ -126,6 +126,7 @@ Three kinds of state, three owners.
 | Campaign log, pool, path | `src/campaign`, applied by the same commit | `user.db` `saves` |
 | A standalone game and its result | `src/rules` reducer, ended by `src/campaign/standalone.ts` | `user.db` `standalone_games`, each intent written when it commits |
 | Decks, image index, booklets, applied catalog version | screen writers | `user.db` |
+| The table's settings (stops, Responses always used, strong outlines, the first-game guide) | `src/play/table-settings.ts`, a vanilla Zustand store the table reads; `src/screens/settings-store.ts` hydrates it and writes each change | `user.db` `settings`, key `table` |
 | Card rows, effect rows, scenario definitions baked at build time | catalog build | `catalog.db`, replaced only by a version bump |
 | Finger position, card lift, in-progress sheet motion | Reanimated shared values on the UI thread | nowhere |
 | Which slice a screen draws | Zustand | memory, rehydrated from SQLite on launch |
@@ -203,7 +204,7 @@ Two files, two handles, both reachable from screens.
 | File | Contents | Replacement |
 | --- | --- | --- |
 | `catalog.db` | `packs`, `cards`, `campaigns` (id, name, scenario count, playable; from `data/campaigns/index.json`), `meta` | New asset when `CATALOG_VERSION` differs from the applied one. Not migrated in place. |
-| `user.db` | `decks`, `saves`, `standalone_games`, `image_files`, `booklets`, `meta` | SQL migrations in `drizzle/`, run on open. Never replaced by a catalog update. |
+| `user.db` | `decks`, `saves`, `standalone_games`, `image_files`, `booklets`, `settings`, `meta` | SQL migrations in `drizzle/`, run on open. Never replaced by a catalog update. |
 
 `catalog.db` is a Metro asset. `CATALOG_VERSION` is a hash of the catalog rows, so any change moves it. `forceOverwrite` is true when the bundled version differs from `user.db` `meta.appliedCatalogVersion`. First launch has no applied version, so the copy runs. `cards.deck_legal` is set at build time. `cards.campaign_id` is set only for rows a campaign owns. Errata text is what the app stores and shows when RingsDB sets `has_errata`.
 

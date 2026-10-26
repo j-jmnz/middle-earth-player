@@ -212,8 +212,11 @@ function defendTogether(state: ScenarioState, standing: readonly string[], ctx: 
   const strength = modifiedStat(state, enemy, "attack", ctx.cards);
   const defense = pooledDefense(state, standing, ctx.cards);
   const raw = Math.max(0, strength - defense);
-  // With no damage there is nothing to assign; a choice that came back empty falls on the first defender.
-  const chosen = attack.damageTo != null && standing.includes(attack.damageTo) ? attack.damageTo : raw === 0 || attack.damageFrame ? standing[0] : undefined;
+  // Who takes it: the defender the player chose; with no damage, nothing to assign, so the first; once the choice came back
+  // empty, the first; otherwise the player is asked (below).
+  let chosen: string | undefined;
+  if (attack.damageTo != null && standing.includes(attack.damageTo)) chosen = attack.damageTo;
+  else if (raw === 0 || attack.damageFrame) chosen = standing[0];
   if (chosen == null) {
     const asking: ScenarioState = { ...state, window: null, pendingAttack: { ...attack, damageFrame: true } };
     return pushEffectFrame(

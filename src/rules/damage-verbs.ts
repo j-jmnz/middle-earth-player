@@ -18,7 +18,7 @@ export type DamageFocus = { seat: number; sourceId: string | null };
 export function answeredEvent(state: ScenarioState): GameEvent | null {
   for (let index = state.stack.length - 1; index >= 0; index -= 1) {
     const data = state.stack[index]?.data;
-    if (data?.kind === "responses") return data.event;
+    if (data?.kind === "responses") return data.answering ?? data.event;
   }
   return null;
 }

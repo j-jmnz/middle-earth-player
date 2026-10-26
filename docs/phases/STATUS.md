@@ -39,7 +39,7 @@ Maestro flows are written in the phase that names them. `maestro test` runs afte
 A cloud session checked `data/rules`, the engine, the card records, the fixtures and the docs against the authorities (`.cursor/rules/authority.mdc`) and fixed what disagreed; `docs/brief.md` carries each rule with its span. User decisions in that session: every Rules Reference action window opens, Responses are offered as soon as their trigger resolves, and deckbuilding follows the Rules Reference (one to three heroes, no sphere match on save; phase 6 is amended). It was merged with main's phase 12 work; ENGINE_VERSION is 5. Green offline: `pnpm test`, `pnpm lint`, `tsc`, `pnpm data:check`. `/reviewer` and `/ux` have not run on it. Phone checks: none ran (cloud session).
 
 - **Open, user-accepted:** scenario 1's `won` fixture and the `knife-lost` fixture dealt from its log are not committed. Main's won game kept a seat with no heroes in the game (fixed: `rr.player-elimination`); with that fixed, a seeded beam search found no legal win of the two starter decks in about two hours. `.maestro/scenario-1.yaml` and `.maestro/a-knife-in-the-dark-loss.yaml` cannot run until they are; the tests that replay them are skipped (`hasFixture`). `scripts/e2e-fixtures.ts --won` searches again. The `lost` fixture is regenerated.
-- **Golden seeds moved:** A Knife in the Dark's true solo win is seed 54, and the 141044 Resolution tests use two-handed seed 8; two-handed seed 1 still wins after a seat is eliminated, so only living seats choose a boon.
+- **Golden seeds moved:** A Knife in the Dark's true solo win is seed 54, and the 141044 Resolution tests use two-handed seed 8; two-handed seed 1 still wins after a seat is eliminated, so only living seats choose a boon. (2026-10-26: once events with no record stopped being playable, the seeds moved again: true solo win 35, two-handed strong win 4, two-handed with a seat eliminated 10; `scripts/knife-game.ts`.)
 - **Open rules items:** the order of simultaneous Forced and delayed effects is fixed, not the first player's choice (FAQ 1.02; Responses to one occurrence share a window and are used in any order since 2026-10-26); Frodo Baggins 142001 is ledgered but has no effect record; Panicked (141083, not yet dealt by any playable scenario) must fire `firstPlayerTokenPassed` when it passes the token, so The One Ring's control change (141085:A:2) follows it. Journey in the Dark's Setup (142040:A: 10 damage on Doom, Doom, Doom, one different location per player) is not built; phase 15 plans it.
 
 ## Table and card screen fixes, 2026-10-25
@@ -90,17 +90,31 @@ User requests: build every proposal in `docs/plans/table-experience.md` and `doc
 
 - **Not applied:** a per-line check (`src/catalog/active-text.ts`) gives the same reading as the coverage test, and the word is "Not applied". An event with no record cannot be played (`rr.triggered-ability`, user decision). An attachment with no record arms with its price. The veil is gone: a small struck ring marks the card, and the preview, the card screen, the pool rows, the deck list and editor, the briefing and the import list say what is not applied.
 - **Dock and table:** window names, the commit, travel and combat foresight (several defenders pooled), the loss caution, engagement marks and dial ticks, the threat panel, the quest objective, why a card does not glow, effects that end and come back, the banner in beats, the round summary, and the first-game guide.
-- **Settings:** `user.db` migration 0006 adds `settings`. Stops (off by default), Pass to stop, Always use for a free Response, larger cards and strong outlines all live in the turn reference behind the rail.
+- **Settings:** `user.db` migration 0006 adds `settings`. Stops (off by default), Pass to stop, Always use for a free Response and strong outlines all live in the turn reference behind the rail. Larger cards was built and removed after the `ux` review: the three rows bind the height, so it grew cards by about 2 pt and cut the hand under 44 pt.
 - **Engine:**
   - The Responses of one occurrence (each character of one commit) share one window, used in any order. A Response whose cost cannot be paid yet waits there (`rr.triggering-condition`).
   - Brok's Response is not offered while a Brok is in play.
   - Thalin hears only the encounter deck's own reveals.
   - Dark Knowledge hears the shadow card of an attack outside combat.
   - The golden games were re-seeded where an unplayable event changed them (`scripts/knife-game.ts`).
+- **Reviews:** `reviewer` and `ux` ran once on the branch. Their blocks are fixed:
+  - Engagement foresight reads the engine's checks on a copy (`engagementForecast`).
+  - Pooled defense comes from one engine function (`pooledDefense`, `standingDefenders`).
+  - An ally with no text gets no caution.
+  - The combat sheets are split out (`combat-sheets.ts`, `sheet-parts.ts`).
+  - The guide no longer crowds the dock.
+  - Larger cards is removed.
+  - The paper switches are whole 44 pt rows.
+
+  Most of their changes and notes are done too, the hook split (`table-hooks.ts`) included. The fixes have not been re-reviewed. Left as notes:
+  - The card screen still lists the unapplied lines apart from the card text.
+  - The engagement ticks stay small.
+  - A ringed card under the banner may be hidden.
+  - A window the table passes leaves no line in the banner.
 - **Open (phone checks):**
   - The struck ring's legibility on a real picture.
   - The option and engagement marks at 51 pt cards.
   - The banner's 650 ms beats with a real thumb.
   - Stops and Pass to stop through a whole round.
   - The settings surviving a relaunch.
-  - Larger cards on a 390 pt tall phone.
+  - The dock at 667×375 with the guide on, and the two-line armed line.

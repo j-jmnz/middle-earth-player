@@ -114,7 +114,8 @@ export type ResponseOffer = { cardId: string; effectId: string; seat: number; ev
 export type FrameData =
   | ResumeData
   | { kind: "event"; event: GameEvent }
-  | { kind: "responses"; event: GameEvent; offers: readonly ResponseOffer[] }
+  // `answering`: the event of the Response being used, when the window holds several (one occurrence's) and it is not `event`.
+  | { kind: "responses"; event: GameEvent; offers: readonly ResponseOffer[]; answering?: GameEvent }
   | { kind: "none" }
   // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
   // effects of the card just revealed (Frodo Baggins).

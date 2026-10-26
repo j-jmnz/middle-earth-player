@@ -65,7 +65,8 @@ export function modifyStat(
     case "ownHeroes":
       targets = [...(state.seats[focus.seat]?.heroes ?? [])];
       break;
-    // The character defending the attack in progress (141052:A:2).
+    // The character defending the attack in progress (141052:A:2). With several defenders (Stand Together), the first
+    // declared: rr.multiple-defenders does not say which "the defending character" is, an open reading in the brief.
     case "defender":
       targets = state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? [state.pendingAttack.defenderId] : [];
       break;

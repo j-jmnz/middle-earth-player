@@ -150,10 +150,15 @@ function delayedWords(verb: string): string {
   }
 }
 
+// A delayed effect acts on its subject, or on its own source when it names none (rr.delayed-effects).
+function actsOn(entry: ScenarioState["delayed"][number], cardId: string): boolean {
+  return entry.subjectId === cardId || (entry.subjectId == null && entry.sourceId === cardId);
+}
+
 /** The delayed effects that will act on a card, in words: "At the end of this phase: returns to its owner's hand (Sneak Attack)". */
 export function delayedLines(game: ScenarioState, cardId: string, cardName: (id: string) => string): readonly string[] {
   return game.delayed
-    .filter((entry) => entry.subjectId === cardId || (entry.subjectId == null && entry.sourceId === cardId))
+    .filter((entry) => actsOn(entry, cardId))
     .map((entry) => {
       const when = entry.until === "endOfPhase" ? "At the end of this phase" : "At the end of the round";
       const what = entry.instructions.map((instruction) => delayedWords(instruction.verb)).join(", then ");
@@ -179,7 +184,7 @@ export function slotNumbers(game: ScenarioState, ctx: ReduceContext, cardId: str
     willpower: card?.committed ? modifiedStat(game, card, "willpower", ctx.cards) : null,
     questPoints: questing ? questPointsOf(game, card, ctx.cards) : null,
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
-    delayed: game.delayed.some((entry) => entry.subjectId === cardId || (entry.subjectId == null && entry.sourceId === cardId)),
+    delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
   };
 }
 
