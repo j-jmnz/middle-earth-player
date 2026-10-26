@@ -235,6 +235,9 @@ export const effectSchema = z.strictObject({
   eventSeat: z.enum(["you", "other"]).optional(),
   // Any player may use this Action or Response, not only its controller ("Any player may trigger this ability").
   anyPlayer: z.boolean().optional(),
+  // This Action or Response of a card that is not an event is used from its owner's hand, and only there ("put ~ into play
+  // from your hand", rr.in-play-and-out-of-play: an ability that refers to being used from an out-of-play area).
+  fromHand: z.literal(true).optional(),
   cancel: cancelSchema.optional(),
   // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").
   uncancelable: conditionSchema.optional(),

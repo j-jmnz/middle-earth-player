@@ -5,6 +5,8 @@ import { attachmentHostIds } from "./attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import { costsPickMatches } from "./families/costs-pick.ts";
+import { seatThreat } from "./families/play-hooks.ts";
+import { playPickMatches } from "./families/play-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
@@ -86,7 +88,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   const from = spec.from ?? "play";
   if ((id === at.sourceId && (from !== "play" || spec.other)) || (spec.different && picked.includes(id))) return false;
   if (spec.type !== "card" && spec.type !== "player") {
-    const type = printed.type;
+    // A card among a player's heroes is a hero: an ally that gained the hero card type sits there (heroType, families/play-sweep.ts).
+    const type = instance.zone === "heroes" ? "hero" : printed.type;
     const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type;
     if (!typed) return false;
   }
@@ -110,6 +113,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.hasResources && instance.resources <= 0) return false;
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs-pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
+  // The play family's filters: a shared trait (families/play-pick.ts).
+  if (!playPickMatches(state, id, spec, at.sourceId, ctx)) return false;
   if (spec.attacking && !attackingNow(state, id)) return false;
   if (spec.defending && !(state.pendingAttack?.defenderId === id && !state.pendingAttack.undefended)) return false;
   if (spec.hasAttachment) {
@@ -124,7 +129,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     if (!found) return false;
   }
   if (spec.aboveThreat) {
-    const threat = state.seats[asking]?.threat ?? 0;
+    const threat = seatThreat(state, asking);
     if (printed.engagementCost == null || modifiedStat(state, instance, "engagementCost", ctx.cards) <= threat) return false;
   }
   if (spec.intoPlay && uniqueBlocked(state, printed, ctx.cards)) return false;

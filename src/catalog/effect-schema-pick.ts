@@ -100,6 +100,9 @@ export const pickSchema = z.strictObject({
   cost: z.number().int().min(0).optional(),
   // A card that prints no victory points ("a location worth no victory points").
   noVictory: z.boolean().optional(),
+  // A card that shares at least one trait with the source (`self`) or the source's host (`host`): "if that character shares at
+  // least one trait with the attached hero" (families/play-pick.ts).
+  sharesTraitWith: z.enum(["self", "host"]).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

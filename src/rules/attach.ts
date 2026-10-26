@@ -8,6 +8,7 @@ import { ruleCause } from "./cause.ts";
 import { characters } from "./combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
+import { seatThreat } from "./families/play-hooks.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { playerCardEffectCanChoose } from "./keywords.ts";
@@ -72,7 +73,7 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
   let cost = printed.cost;
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
   // Secrecy X: X less while the player's threat is 20 or less.
-  if (printed.keywords.secrecy != null && (state.seats[seat]?.threat ?? 99) <= 20) cost -= printed.keywords.secrecy;
+  if (printed.keywords.secrecy != null && state.seats[seat] && seatThreat(state, seat) <= 20) cost -= printed.keywords.secrecy;
   for (const effect of effectsOf(ctx, instance.code)) {
     if (effect.timing !== "constant") continue;
     for (const instruction of effect.instructions) {

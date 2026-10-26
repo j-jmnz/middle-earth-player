@@ -5,6 +5,7 @@ import type { Amount, CardRef } from "../catalog/boundary.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
 import { threatCostOf } from "./families/costs-stats.ts";
+import { seatThreat } from "./families/play-hooks.ts";
 import { countMatching, pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
@@ -91,7 +92,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   else if (amount.x) value = scope.x ?? 0;
   else if (amount.players) value = livingSeats(state).length;
   else if (amount.threat) {
-    const threat = state.seats[scope.actor]?.threat ?? 0;
+    const threat = seatThreat(state, scope.actor);
     value = amount.threat === "tens" ? Math.floor(threat / 10) : threat;
   } else if (amount.hand) value = (state.seats[scope.actor]?.hand ?? []).length;
   else if (amount.dealt) value = scope.dealt ?? 0;

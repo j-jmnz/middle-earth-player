@@ -2,6 +2,7 @@
 import { costOfKind } from "../catalog/costs.ts";
 
 import { holds } from "./conditions.ts";
+import { triggerHears } from "./families/play-hooks.ts";
 import { aboutCard, effectsOf, hears, hearsFromAnywhere } from "./listen.ts";
 import { playableFromDeck } from "./deck-play.ts";
 import { effectCause } from "./cause.ts";
@@ -22,7 +23,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
   const order = livingSeats(state);
   // Only the cards with a Response to this trigger are sorted and looked at.
   const cards = Object.values(state.cards)
-    .filter((instance) => effectsOf(ctx, instance.code).some((effect) => effect.timing === "response" && effect.trigger === event.trigger))
+    .filter((instance) => effectsOf(ctx, instance.code).some((effect) => effect.timing === "response" && triggerHears(effect.trigger, event.trigger)))
     .sort((left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }));
   for (const instance of cards) {
     // An event about one card is heard by that card even after it has left play.
@@ -40,7 +41,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
     for (const effect of records) {
       // Only an event used from the hand has a Response there; any other listens in play, or from wherever its card went
       // for an event about itself ("After ~ leaves play").
-      const fromHand = costOfKind(effect, "playEvent") != null;
+      const fromHand = costOfKind(effect, "playEvent") != null || effect.fromHand === true;
       if (fromHand ? !inHand : !(inPlay(instance.zone) || hearsFromAnywhere(effect, instance, event))) continue;
       const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;

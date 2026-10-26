@@ -21,8 +21,9 @@ function inTriggerWindow(state: ScenarioState): boolean {
 function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, effectId: string): Effect | undefined {
   const instance = state.cards[cardId];
   if (!instance) return undefined;
-  if (instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached") return undefined;
   const effect = effectsOf(ctx, instance.code).find((entry) => entry.id === effectId && entry.timing === "action");
+  // An Action used from the hand ("put ~ into play from your hand", effect.fromHand) is used there; any other in play.
+  if (effect?.fromHand ? instance.zone !== "hand" : instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached") return undefined;
   // Only the card's controller uses its Action, unless any player may (Éowyn's once a round each, "Any player may trigger").
   if (!effect || (instance.controller !== state.activeSeat && effect.limit !== "oncePerRoundEachPlayer" && !effect.anyPlayer)) return undefined;
   const scope = { actor: state.activeSeat, sourceId: cardId, returned: 0 };

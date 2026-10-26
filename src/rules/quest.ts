@@ -4,6 +4,7 @@
 // ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
 import { checkCost } from "./families/costs-stats.ts";
+import { seatThreat } from "./families/play-hooks.ts";
 import type { EngineStep } from "./intents.ts";
 import { destroyCard, modifiedStat, raiseThreat } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
@@ -232,7 +233,8 @@ export function engageWith(state: ScenarioState, seat: number, enemyId: string, 
 }
 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {
-  const threat = state.seats[seat]?.threat ?? 0;
+  // The threat the seat is treated as having (families/play-hooks.ts).
+  const threat = seatThreat(state, seat);
   const found: { id: string; cost: number }[] = [];
   for (const id of stagingEnemies(state, cards)) {
     const instance = state.cards[id];

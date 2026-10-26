@@ -1,6 +1,7 @@
 // Rules: rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display (data/rules/entries.json).
 import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
 import { queueEvent } from "./queue.ts";
+import { leaveWith } from "./families/play-zones.ts";
 import { inPlay, updateCard, withSeat } from "./state.ts";
 
 export type Destination =
@@ -201,13 +202,16 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
   return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: 0, progress: 0, resources: 0, exhausted: false });
 }
 
-export function moveCard(state: ScenarioState, id: string, dest: Destination): ScenarioState {
+// `released`: the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
+export function moveCard(state: ScenarioState, id: string, dest: Destination, released: readonly string[] = []): ScenarioState {
   const current = state.cards[id];
   if (!current) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if (leavingPlay && current.host) next = unhost(next, id);
   let moved = stampEntry(attach(next, id, dest), id, current.zone);
+  // Its attachments leave play with it, however it left (rr.attachment-cards, families/play-zones.ts).
+  if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
   // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });

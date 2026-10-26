@@ -69,6 +69,8 @@ export function playCard(
   if (printed.type === "attachment" && intent.hostId) {
     next = attachTo(next, intent.cardId, intent.hostId);
     next = queueEvent(next, { trigger: "played", seat, cardId: intent.cardId });
+    // An attachment played enters play too (rr.in-play-and-out-of-play).
+    next = queueEvent(next, { trigger: "enteredPlay", seat, cardId: intent.cardId });
     return enforceRestricted(next, intent.hostId, ctx, steps);
   }
   // The card is announced to the Responses that hear it: it was played, and it entered play.
