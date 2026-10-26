@@ -6,17 +6,20 @@
 // the moment and the pick, so nothing stays armed into the next one.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, Text, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { armedLines, armedRoom, armedWords, BAR_DENSE_PX, BAR_PX, LINE_PX } from "./armed-room.ts";
 import { MORE_ID } from "./dock-extras.ts";
 import { tickArmed } from "./haptics.ts";
+import { armBarEasing, useMotionScale } from "./motion-run.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
 import { primaryReady, type Dock, type DockButton } from "./table-choice.ts";
 import { tableTokens as t } from "./tokens.ts";
 
-// How long an armed button waits for its second tap; longer while a screen reader is on.
+// How long an armed button waits for its second tap; longer while a screen reader is on. That is a timer, not a motion token: the bar
+// only shows it running out, on the linear curve of motion-tokens.ts, and does not run under reduced motion (the line says it).
+// Quick does not shorten it: the second tap's window stays the same.
 const ARM_MS = 3000;
 const ARM_READER_MS = 10000;
 const HINT = "Tap twice to confirm";
@@ -53,7 +56,7 @@ export function DockButtons({
   const [armed, setArmed] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const left = useSharedValue(1);
-  const reduceMotion = useReducedMotion();
+  const animates = useMotionScale() > 0;
   const reader = useScreenReader();
   useEffect(
     () => () => {
@@ -67,7 +70,7 @@ export function DockButtons({
       setArmed(button.testID);
       const wait = reader ? ARM_READER_MS : ARM_MS;
       left.set(1);
-      if (!reduceMotion) left.set(withTiming(0, { duration: wait, easing: Easing.linear }));
+      if (animates) left.set(withTiming(0, { duration: wait, easing: armBarEasing }));
       timer.current = setTimeout(() => setArmed(null), wait);
       tickArmed();
       // A screen reader hears what the second tap does, the loss a caution names included.

@@ -2,16 +2,17 @@
 // sentence under a disabled action, and the parchment frame (docs/design-system.md, Table). The dock's buttons, which arm
 // before they send, are dock-buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number
 // the engine did not compute.
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { Pressable, Text, View, type DimensionValue } from "react-native";
-import Animated, { ReduceMotion, SlideInDown } from "react-native-reanimated";
+import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
+import { layoutAnim, useMotionScale } from "./motion-run.ts";
+import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
 import { tableTokens as t } from "./tokens.ts";
 
-const rise = SlideInDown.duration(220).reduceMotion(ReduceMotion.System);
 const SHEET_RADIUS = 28;
 
 /**
@@ -21,6 +22,8 @@ const SHEET_RADIUS = 28;
  */
 export function SheetFrame({ children, testID, maxHeight, paddingTop = 12, animated = true }: { children: ReactNode; testID?: string; maxHeight?: DimensionValue; paddingTop?: number; animated?: boolean }) {
   const insets = useSafeAreaInsets();
+  const scale = useMotionScale();
+  const rise = useMemo(() => layoutAnim(SlideInDown, MOTION.sheetIn, scale), [scale]);
   const style = {
     backgroundColor: t.paper,
     borderTopLeftRadius: SHEET_RADIUS,

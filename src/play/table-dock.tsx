@@ -2,13 +2,15 @@
 // engine's numbers for it (willpower against threat, attack against defense), what the player has picked on the table, and
 // the buttons that confirm it (docs/design-system.md, Table). Picking happens on the table; nothing here is sent until a
 // button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did.
-import { useEffect, useRef, useState, type ComponentRef } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
-import Animated, { FadeInUp, FadeOut, ReduceMotion, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOut, useReducedMotion } from "react-native-reanimated";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
 import { DENSE_BELOW, labelChars, PILL_PT, planWords, wordsWindow } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
+import { layoutAnim, useMotionScale } from "./motion-run.ts";
+import { MOTION } from "./motion-tokens.ts";
 import { BEAT_MS, type Moment } from "./outcome.ts";
 import type { Readout } from "./readout.ts";
 import { Stats } from "./sheet-paper.tsx";
@@ -169,9 +171,6 @@ export function TableDock({
   );
 }
 
-const enter = FadeInUp.duration(200).reduceMotion(ReduceMotion.System);
-const leave = FadeOut.duration(200).reduceMotion(ReduceMotion.System);
-
 const BANNER_WIDTH = 440;
 
 /**
@@ -186,6 +185,9 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
   useEffect(() => {
     AccessibilityInfo.announceForAccessibility(label);
   }, [label]);
+  // The fades: the banner and each line come in and the banner goes out over MOTION.bannerIn and bannerOut.
+  const scale = useMotionScale();
+  const fade = useMemo(() => ({ enter: layoutAnim(FadeInUp, MOTION.bannerIn, scale), leave: layoutAnim(FadeOut, MOTION.bannerOut, scale) }), [scale]);
   // Resolve in beats: one line more every BEAT_MS, each ringing on the table the cards it names; reduced motion shows all.
   const reduceMotion = useReducedMotion();
   const [shownLines, setShownLines] = useState(reduceMotion ? moment.lines.length : 1);
@@ -202,7 +204,7 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
   }, [beatKey, onBeat]);
   const box = { minWidth: Math.min(260, width - 32), maxWidth: Math.min(BANNER_WIDTH, width - 32) };
   return (
-    <Animated.View entering={enter} exiting={leave} pointerEvents="none" style={{ position: "absolute", top, left: 0, right: 0, alignItems: "center" }}>
+    <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="none" style={{ position: "absolute", top, left: 0, right: 0, alignItems: "center" }}>
       {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
       <View
         className="rounded-card"
@@ -216,7 +218,7 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
               {moment.title}
             </Text>
             {moment.lines.slice(0, shownLines).map((line, index) => (
-              <Animated.View key={index} entering={enter} className="mt-0.5 flex-row items-center gap-2">
+              <Animated.View key={index} entering={fade.enter} className="mt-0.5 flex-row items-center gap-2">
                 <LineMark mark={line.mark} tint="bone" size={14} />
                 <Text className="shrink text-label text-bone">{line.text}</Text>
               </Animated.View>

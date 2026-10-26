@@ -31,6 +31,13 @@ describe("table settings", () => {
     expect(DEFAULT_SETTINGS.stops).toEqual(["3.3", "shadow"]);
   });
 
+  it("stores the animation speed: Normal by default, Quick when chosen, anything else back to Normal", () => {
+    expect(DEFAULT_SETTINGS.animationSpeed).toBe("normal");
+    expect(parseSettings({ animationSpeed: "quick" }).animationSpeed).toBe("quick");
+    expect(parseSettings({ animationSpeed: "slow" }).animationSpeed).toBe("normal");
+    expect(parseSettings({ animationSpeed: 2 }).animationSpeed).toBe("normal");
+  });
+
   it("keeps stops in round order, and toggles a Response to Always and back", () => {
     expect(toggleStop(["shadow"], "3.3")).toEqual(["3.3", "shadow"]);
     expect(toggleStop(["3.3", "shadow"], "3.3")).toEqual(["shadow"]);

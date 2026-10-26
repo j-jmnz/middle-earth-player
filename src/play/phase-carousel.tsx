@@ -2,22 +2,21 @@
 // horizontal snap-scroll, centered on the current one, each with its steps, what the player decides there and the action
 // windows as Stop switches; the master Stops switch sits at its head. It is for reading: a night raised surface with a hairline,
 // not paper. The data is carousel.ts. The only things it changes are the player's Stops settings (table-settings.ts); it sends
-// no intent. It drops in on open and leaves on close, snaps under reduced motion, and nothing animates while it scrolls.
+// no intent. It drops in on open and leaves on close (MOTION.carouselEnter, MOTION.carouselLeave), snaps under reduced motion, and
+// nothing animates while it scrolls.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
+import Animated, { useAnimatedStyle, useReducedMotion } from "react-native-reanimated";
 
 import { cardWidth, startIndex, STOP_AHEAD_WORDS, STOPS_TEXT, type Carousel } from "./carousel.ts";
 import { NightSwitch, PhaseCard, ROW } from "./carousel-cards.tsx";
+import { useOpenMotion } from "./motion-run.ts";
+import { MOTION } from "./motion-tokens.ts";
 import { Chevron } from "./phase-rail.tsx";
 import type { TableSettings } from "./table-settings.ts";
 import { tableTokens as t } from "./tokens.ts";
 
-// Motion values for phase 23's motion-tokens.ts: the strip drops in 240 ms ease-out (translateY -12 to 0 with a fade) and
-// leaves in 180 ms.
-const ENTER_MS = 240;
-const LEAVE_MS = 180;
+// The strip drops in by this much (translateY -12 to 0 with a fade).
 const DROP = 12;
 const GAP = 10;
 
@@ -165,34 +164,7 @@ export function PhaseCarousel({
   onChange: (change: Partial<TableSettings>) => void;
   onClose: () => void;
 }) {
-  const reduceMotion = useReducedMotion();
-  // Mounted while it leaves (`leaving`), set while rendering when `open` turns off, as the table menu does.
-  const [wasOpen, setWasOpen] = useState(open);
-  const [leaving, setLeaving] = useState(false);
-  if (open !== wasOpen) {
-    setWasOpen(open);
-    setLeaving(!open && !reduceMotion);
-  }
-  const progress = useSharedValue(open ? 1 : 0);
-  useEffect(() => {
-    if (open)
-      progress.set(
-        reduceMotion
-          ? 1
-          : withTiming(1, {
-              duration: ENTER_MS,
-              easing: Easing.out(Easing.cubic),
-            }),
-      );
-    else if (reduceMotion) progress.set(0);
-    else {
-      progress.set(
-        withTiming(0, { duration: LEAVE_MS, easing: Easing.in(Easing.cubic) }, (finished) => {
-          if (finished) scheduleOnRN(setLeaving, false);
-        }),
-      );
-    }
-  }, [open, reduceMotion, progress]);
+  const { progress, leaving } = useOpenMotion(open, MOTION.carouselEnter, MOTION.carouselLeave);
   const motion = useAnimatedStyle(() => ({
     opacity: progress.get(),
     transform: [{ translateY: (progress.get() - 1) * DROP }],

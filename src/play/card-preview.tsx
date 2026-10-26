@@ -8,13 +8,15 @@
 import { Image } from "expo-image";
 import { useCallback, useEffect, useState } from "react";
 import { BackHandler, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
 
 import { CardTextView } from "./card-text-view.tsx";
 import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
+import { springConfig, timing, useMotionScale } from "./motion-run.ts";
+import { MOTION } from "./motion-tokens.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
 import { ChromeButton } from "./sheet-paper.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
@@ -77,8 +79,8 @@ export function CardPreview({
 }) {
   const screen = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const reduceMotion = useReducedMotion();
-  const progress = useSharedValue(reduceMotion ? 1 : 0);
+  const scale = useMotionScale();
+  const progress = useSharedValue(scale === 0 ? 1 : 0);
   const all = [card, ...related];
   const [at, setAt] = useState(0);
   const shown = all[at] ?? card;
@@ -88,20 +90,20 @@ export function CardPreview({
   const size = wide ? previewSideSize(roomW, roomH, shown.landscape ?? false) : previewSize(screen.width, roomH, shown.landscape ?? false);
 
   useEffect(() => {
-    if (!reduceMotion) progress.set(withSpring(1, { damping: 20, stiffness: 260, mass: 0.7 }));
-  }, [progress, reduceMotion]);
+    if (scale > 0) progress.set(withSpring(1, springConfig(MOTION.previewIn, scale)));
+  }, [progress, scale]);
 
   const close = useCallback(() => {
-    if (reduceMotion) {
+    if (scale === 0) {
       onClose();
       return;
     }
     progress.set(
-      withTiming(0, { duration: 150, easing: Easing.in(Easing.quad) }, (finished) => {
+      withTiming(0, timing(MOTION.previewOut, scale), (finished) => {
         if (finished) scheduleOnRN(onClose);
       }),
     );
-  }, [progress, reduceMotion, onClose]);
+  }, [progress, scale, onClose]);
 
   useEffect(() => {
     if (!ownsBack) return;

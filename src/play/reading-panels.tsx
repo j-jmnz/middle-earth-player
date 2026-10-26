@@ -5,6 +5,7 @@
 import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 
 import type { LogLine } from "./log.ts";
+import type { Speed } from "./motion-tokens.ts";
 import { ChromeButton, Tile } from "./sheet-paper.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import type { TableSettings } from "./table-settings.ts";
@@ -137,8 +138,43 @@ function PaperSwitch({ label, detail, value, onChange, testID }: { label: string
   );
 }
 
+const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", quick: "Quick" };
+
+// Animation speed: one row at least 44 pt tall, as the switches are: the label and what it does at the left, the two choices as pills
+// at the right, each a 44 pt target. The chosen one is ink with paper text. A screen reader hears a radio group of two.
+function SpeedChoice({ value, onChange }: { value: Speed; onChange: (value: Speed) => void }) {
+  return (
+    <View testID="settings-speed" accessibilityRole="radiogroup" accessibilityLabel="Animation speed" style={{ minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingVertical: 4 }}>
+      <View className="shrink">
+        <Text className="text-body text-ink">Animation speed</Text>
+        <Text className="text-label text-inkMuted">Quick shortens every motion and skips the phase title.</Text>
+      </View>
+      <View className="flex-row gap-1.5">
+        {(["normal", "quick"] as const).map((speed) => {
+          const on = value === speed;
+          return (
+            <Pressable
+              key={speed}
+              testID={`settings-speed-${speed}`}
+              accessibilityRole="radio"
+              accessibilityLabel={SPEED_WORDS[speed]}
+              accessibilityState={{ checked: on }}
+              onPress={() => onChange(speed)}
+              style={({ pressed }) => ({ minWidth: 60, minHeight: 44, paddingHorizontal: 8, alignItems: "center", justifyContent: "center", borderRadius: 999, borderWidth: 1, borderColor: on ? t.ink : t.inkMuted, backgroundColor: on ? t.ink : pressed ? t.paperPressed : "transparent" })}
+            >
+              <Text className="text-label" style={{ color: on ? t.paper : t.ink }}>
+                {SPEED_WORDS[speed]}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 /**
- * The table's settings, a paper side panel from the menu's Table settings: Strong outlines, the First-game guide and the
+ * The table's settings, a paper side panel from the menu's Table settings: Animation speed, Strong outlines, the First-game guide and the
  * Responses used every time. (The round's phases and the Stops switches are the carousel behind the rail, phase-carousel.tsx.)
  * Text and switches only; nothing here sends an intent.
  */
@@ -162,6 +198,7 @@ export function SettingsPanel({
         </Text>
       </View>
       <ScrollView className="mt-2" style={{ flexGrow: 0, flexShrink: 1 }}>
+        <SpeedChoice value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} />
         <PaperSwitch label="Strong outlines" detail="Effect marks and token counts drawn with heavier outlines." value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID="settings-contrast" />
         <PaperSwitch label="First-game guide" detail="A line under the dock's title the first two times each step comes up." value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID="settings-guide" />
         {always.length > 0 ? <Text className="mt-2 text-label text-inkMuted">Responses used every time:</Text> : null}

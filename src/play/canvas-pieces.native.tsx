@@ -2,23 +2,19 @@
 // token art on a card, the effects on it, the marks of the open moment, and the mark between an enemy and the characters
 // fighting it. Each is a Skia group at a slot's rectangle; table-canvas.native.tsx places and moves them.
 import { Circle, DashPathEffect, Group, Image, Line, Path, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
-import type { ReactElement, ReactNode } from "react";
-import type { SharedValue } from "react-native-reanimated";
-import { useDerivedValue } from "react-native-reanimated";
+import type { ReactElement } from "react";
 
 import { badgeSplit, type CardEffects } from "./card-effects.ts";
-import { cardFrame } from "./frame.ts";
 import { SPHERE_TINT, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
 import type { CardSlot, CombatMark, Rect } from "./layout.ts";
 import type { OptionMark } from "./sheet-types.ts";
-import type { Ghost, Motion } from "./motion.ts";
+import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { tableTokens as t } from "./tokens.ts";
 import { wrapName } from "./wrap.ts";
 
 export const RADIUS = 6;
 const LINE = 14;
-const TOKEN = 18;
 const BADGE_H = 15;
 
 // Translucent night, from the token, so the palette drift test covers the canvas's veils too.
@@ -56,7 +52,7 @@ export function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: num
 }
 
 // A number that stays readable on any token art or picture: a night outline under a bone fill.
-function Outlined({ x, y, text, font, color = t.bone, heavy = false }: { x: number; y: number; text: string; font: SkFont; color?: string; heavy?: boolean }) {
+export function Outlined({ x, y, text, font, color = t.bone, heavy = false }: { x: number; y: number; text: string; font: SkFont; color?: string; heavy?: boolean }) {
   const width = font.getTextWidth(text);
   return (
     <Group>
@@ -200,11 +196,10 @@ export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlo
  * the card's rectangle on screen, so the tokens of an exhausted card stay upright in its sideways footprint.
  */
 export function Tokens({ slot, rect, images, fonts, ring = null, contrast = false }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; ring?: string | null; contrast?: boolean }) {
-  const { x, y, w, h } = rect;
   const items: { image: SkImage | null; value: number; cx: number; cy: number; fallback: string; ring: string | null }[] = [];
-  if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, cx: x + TOKEN / 2 + 1, cy: y + h - TOKEN / 2 - 1, fallback: t.gold, ring });
-  if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, cx: x + w - TOKEN / 2 - 1, cy: y + TOKEN / 2 + 1, fallback: t.threat, ring: null });
-  if (slot.progress > 0) items.push({ image: images.progress, value: slot.progress, cx: x + w - TOKEN / 2 - 1, cy: y + h - TOKEN / 2 - 1, fallback: t.bone, ring: null });
+  if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, ...tokenSpot(rect, "resources"), fallback: t.gold, ring });
+  if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, ...tokenSpot(rect, "damage"), fallback: t.threat, ring: null });
+  if (slot.progress > 0) items.push({ image: images.progress, value: slot.progress, ...tokenSpot(rect, "progress"), fallback: t.bone, ring: null });
   return (
     <Group>
       {items.map((item, index) => (
@@ -388,58 +383,6 @@ export function CombatMarkView({ mark }: { mark: CombatMark }) {
       <Circle cx={mark.x} cy={mark.y} r={8} color={t.night} />
       <Circle cx={mark.x} cy={mark.y} r={8} color={color} style="stroke" strokeWidth={1.5} />
       <CanvasIcon name={icon} x={mark.x - 5} y={mark.y - 5} size={10} color={color} />
-    </Group>
-  );
-}
-
-/**
- * A slot moving into place: at `progress` 0 it is where its motion starts, at 1 where the layout puts it. `epoch` guards the
- * first frame of a new layout: until the UI thread has the new epoch, the slot is drawn where it starts, not where it ends.
- * The card turns (exhausted, the hand's fan) with its `frame` (the halo, edge, veil and beat ring, in card-marks.native.tsx);
- * `overlay` (tokens, effects, the check ring) moves with it but stays upright.
- */
-export function Moving({ slot, motion, progress, epoch, at, children, frame, overlay }: { slot: CardSlot; motion: Motion; progress: SharedValue<number>; epoch: SharedValue<number>; at: number; children: ReactNode; frame?: ReactNode; overlay?: ReactNode }) {
-  const { cx, cy } = cardFrame(slot);
-  const origin = vec(cx, cy);
-  const transform = useDerivedValue(() => {
-    const p = epoch.get() === at ? progress.get() : 0;
-    const q = 1 - p;
-    return [{ translateX: motion.dx * q }, { translateY: motion.dy * q }, { scale: 1 + (motion.scale - 1) * q }];
-  }, [motion, at]);
-  const turn = useDerivedValue(() => {
-    const p = epoch.get() === at ? progress.get() : 0;
-    return [{ rotate: motion.toRot + (motion.fromRot - motion.toRot) * (1 - p) }];
-  }, [motion, at]);
-  const opacity = useDerivedValue(() => {
-    const p = epoch.get() === at ? progress.get() : 0;
-    return motion.fromOpacity + (1 - motion.fromOpacity) * p;
-  }, [motion, at]);
-  return (
-    <Group transform={transform} origin={origin} opacity={opacity}>
-      <Group transform={turn} origin={origin}>
-        {children}
-        {frame}
-      </Group>
-      {overlay}
-    </Group>
-  );
-}
-
-/** A card that left the table: it moves from where it was toward its pile, shrinking and fading. */
-export function Leaving({ ghost, progress, epoch, at, children }: { ghost: Ghost; progress: SharedValue<number>; epoch: SharedValue<number>; at: number; children: ReactNode }) {
-  const { cx, cy } = cardFrame(ghost.slot);
-  const origin = vec(cx, cy);
-  const transform = useDerivedValue(() => {
-    const p = epoch.get() === at ? progress.get() : 0;
-    return [{ translateX: ghost.dx * p }, { translateY: ghost.dy * p }, { scale: 1 + (ghost.scale - 1) * p }, { rotate: ghost.rot }];
-  }, [ghost, at]);
-  const opacity = useDerivedValue(() => {
-    const p = epoch.get() === at ? progress.get() : 0;
-    return Math.max(0, 1 - p * 1.1);
-  }, [ghost, at]);
-  return (
-    <Group transform={transform} origin={origin} opacity={opacity}>
-      {children}
     </Group>
   );
 }

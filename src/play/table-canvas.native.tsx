@@ -4,30 +4,33 @@
 // finger lifts. A tap picks (the screen decides what), a long press previews; neither sends an intent.
 //
 // When the state changes, each card moves from where it was to where it is now, a new card comes in from its deck or grows
-// in, and a card that left goes to its pile (motion.ts). The motion runs on the UI thread, never gates a rule, and snaps
-// under reduced motion; a new gesture cancels the lift in progress.
+// in, and a card that left goes to its pile (motion.ts, run by card-motion.native.tsx). The motion runs on the UI thread, never
+// gates a rule, and snaps under reduced motion; a touch finishes it at once, and a new gesture cancels the lift in progress.
 import { Canvas, Circle, Group, matchFont, RoundedRect, Text, useFont, useImage, vec, type SkFont } from "@shopify/react-native-skia";
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
 import { Platform } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { cancelAnimation, Easing, useDerivedValue, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import { cancelAnimation, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
-import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, Leaving, Moving, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
+import { finishMotions, Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
+import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
 import { SPHERE_TINT, sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
-import { motionsBetween, type Ghost, type Motion } from "./motion.ts";
+import { AT_REST } from "./motion.ts";
+import { timing } from "./motion-run.ts";
+import { MOTION } from "./motion-tokens.ts";
 import { PILES, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import { dropRects } from "./selection.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { useTableImages } from "./table-images.native.ts";
+import { TokenFx } from "./token-fx.native.tsx";
 import { tableTokens as t } from "./tokens.ts";
 
 const MARCELLUS = require("../../assets/fonts/Marcellus-Regular.ttf") as number;
-const MOVE_MS = 320;
 
 function useViews(store: TableCanvasProps["store"], seat: number): { views: LayoutViews; piles: PileViews } {
   const zones = useMemo(() => Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat)])) as Record<ZoneId, ReturnType<typeof zoneSelector>>, [seat]);
@@ -55,6 +58,11 @@ function sphereRing(sphere: string | null): string | null {
   return tint && tint !== "faint" ? t[tint] : null;
 }
 
+// The "progress / quest points" strip of a quest card or location, which pops when progress is placed on it.
+function stripText(slot: CardSlot, questPoints: number | null): string | null {
+  return questPoints == null ? null : `${slot.progress} / ${questPoints}`;
+}
+
 // A faint word in an empty zone, so the player knows what the space is for.
 function ZoneWord({ rect, text, font }: { rect: Rect; text: string; font: SkFont }) {
   return <Text x={rect.x + 6} y={rect.y + 16} text={text} font={font} color={t.faint} />;
@@ -76,7 +84,6 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const attacker = useStore(store, (state) => state.game.pendingAttack?.enemyId ?? null);
   const deckTopId = useStore(store, (state) => state.game.seats[seat]?.deck[0] ?? null);
   const deckTopCard = useStore(store, (state) => (deckTopId ? (state.game.cards[deckTopId] ?? null) : null));
-  const reduceMotion = useReducedMotion();
 
   // The top of the deck is a card when the rules let it be played from there (Gandalf, 142002).
   const deckTop = deckTopId && draggable.includes(deckTopId) ? deckTopCard : null;
@@ -85,29 +92,11 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset],
   );
 
-  // Each new layout: where every card comes from, and the cards that left, worked out once, before it is drawn. The layout
-  // the motions were worked out for is kept as state, so a new one is noticed during the render (React's pattern for state
-  // that follows a prop), and `at` counts the layouts.
-  const [track, setTrack] = useState(() => ({ layout, moves: { ...motionsBetween(null, layout, () => null), at: 1 } }));
-  if (track.layout !== layout) {
-    const cards = store.getState().game.cards;
-    const zoneNow = (cardId: string) => cards[cardId]?.zone ?? null;
-    const sameSize = track.layout.width === layout.width && track.layout.height === layout.height;
-    const between = reduceMotion || !sameSize ? motionsBetween(null, layout, zoneNow) : motionsBetween(track.layout, layout, zoneNow);
-    setTrack({ layout, moves: { ...between, at: track.moves.at + 1 } });
-  }
-  const moves = track.moves;
-  const progress = useSharedValue(1);
-  const epoch = useSharedValue(0);
-  useLayoutEffect(() => {
-    epoch.set(moves.at);
-    if (reduceMotion) {
-      progress.set(1);
-      return;
-    }
-    progress.set(0);
-    progress.set(withTiming(1, { duration: MOVE_MS, easing: Easing.out(Easing.cubic) }));
-  }, [moves, progress, epoch, reduceMotion]);
+  // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
+  const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat);
+  const { progress: hurryProgress, clear: hurryClear } = hurry;
+  const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);
+  const returnTiming = useMemo(() => timing(MOTION.dragReturn, k), [k]);
 
   const codes = useMemo(() => [...new Set([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)].filter((slot) => !slot.faceDown && slot.code !== "").map((slot) => slot.code))], [layout, moves]);
   const images = useTableImages(codes, picture, layout.card, pictureRevision);
@@ -158,6 +147,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         cancelAnimation(dx);
         cancelAnimation(dy);
         cancelAnimation(lift);
+        finishMotions(hurryProgress, hurryClear);
         dx.set(0);
         dy.set(0);
         lift.set(1);
@@ -175,7 +165,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         dragging.set(index);
         dx.set(event.translationX);
         dy.set(event.translationY);
-        lift.set(reduceMotion ? 1.08 : withTiming(1.08, { duration: 90 }));
+        lift.set(k === 0 ? 1.08 : withTiming(1.08, liftTiming));
         scheduleOnRN(select, slot.id);
       })
       .onUpdate((event) => {
@@ -196,7 +186,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           dragging.set(-1);
           return;
         }
-        if (reduceMotion) {
+        if (k === 0) {
           dx.set(0);
           dy.set(0);
           dragging.set(-1);
@@ -204,10 +194,10 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           return;
         }
         // Dropped on nothing: the card goes back, and nothing is asked.
-        dx.set(withTiming(0, { duration: 160 }));
+        dx.set(withTiming(0, returnTiming));
         dy.set(
           // Finished or cut short by a new touch, the lifted card is put down.
-          withTiming(0, { duration: 160 }, () => {
+          withTiming(0, returnTiming, () => {
             dragging.set(-1);
             scheduleOnRN(select, null);
           }),
@@ -230,7 +220,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
       });
 
     return Gesture.Race(pan, hold, tap);
-  }, [slots, lifts, drops, dragging, dx, dy, lift, reduceMotion, select, onDrop, onTap, onPreview]);
+  }, [slots, lifts, drops, dragging, dx, dy, lift, k, liftTiming, returnTiming, hurryProgress, hurryClear, select, onDrop, onTap, onPreview]);
 
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
@@ -289,7 +279,6 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   void modifiers;
   void threat;
   void delayed;
-  const still: Motion = { dx: 0, dy: 0, scale: 1, fromRot: 0, toRot: 0, fromOpacity: 1 };
   const emptyWords: [Rect, string][] = [
     ...(views.staging.entries.length === 0 ? [[layout.zones.staging, "Staging"] as [Rect, string]] : []),
     ...(views.engaged.entries.length === 0 ? [[layout.zones.engaged, "No enemy engaged"] as [Rect, string]] : []),
@@ -309,16 +298,17 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         {targetZones.map((rect, index) => (
           <RoundedRect key={`z${index}`} x={rect.x - 4} y={rect.y - 4} width={rect.w + 8} height={rect.h + 8} r={RADIUS * 2} color={t.gold} style="stroke" strokeWidth={1.5} />
         ))}
-        {moves.ghosts.map((ghost: Ghost) => (
-          <Leaving key={`ghost:${ghost.slot.id}:${moves.at}`} ghost={ghost} progress={progress} epoch={epoch} at={moves.at}>
+        {moves.ghosts.map((ghost) => (
+          <Leaving key={`ghost:${ghost.slot.id}:${moves.at}`} ghost={ghost} clock={clock}>
             {drawBody(ghost.slot, false)}
           </Leaving>
         ))}
         {layout.slots.map((slot) => (
-          <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? still} progress={progress} epoch={epoch} at={moves.at} frame={drawFrame(slot)} overlay={drawOverlay(slot)}>
+          <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? AT_REST} clock={clock} back={moves.motions.get(slot.id)?.flip ? drawBody({ ...slot, faceDown: true }, false) : undefined} frame={drawFrame(slot)} overlay={drawOverlay(slot)}>
             {drawBody(slot, lifted?.id === slot.id && slot.kind === "card")}
           </Moving>
         ))}
+        <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} ringOf={(code) => sphereRing(sphereOf(code))} stripOf={(slot) => stripText(slot, info(slot.id).questPoints)} contrast={contrast} />
         {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} /> : null}
         {layout.marks.map((mark) => (
           <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} />
