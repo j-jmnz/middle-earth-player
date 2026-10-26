@@ -14,8 +14,6 @@ import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
 import { tableTokens as t } from "./tokens.ts";
 
-export { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
-
 const fade = FadeIn.duration(180).reduceMotion(ReduceMotion.System);
 const badgeIn = FadeIn.duration(160).reduceMotion(ReduceMotion.System);
 const badgeOut = FadeOut.duration(400).reduceMotion(ReduceMotion.System);
@@ -50,18 +48,24 @@ export function PhaseRail({ rail, narrow = false, onPress }: { rail: Rail; narro
       accessibilityHint={onPress ? "Opens the turn reference" : undefined}
       disabled={!onPress}
       onPress={onPress}
-      style={({ pressed }) => ({ minWidth: 0, flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", paddingHorizontal: 8, minHeight: 44, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
+      style={({ pressed }) => ({ minWidth: 0, flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", paddingHorizontal: narrow ? 0 : 8, minHeight: 44, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
     >
       {narrow ? null : (
         <Text testID="rail-previous" numberOfLines={1} className="flex-1 text-right text-label text-muted">
           {rail.previous}
         </Text>
       )}
+      {/* Until the phase carousel (phase 20) the round is "R3" before the step; the label says it in words. */}
+      {narrow ? null : (
+        <Text testID="rail-round" className="ml-2 text-label text-muted">
+          {`R${rail.round}`}
+        </Text>
+      )}
       {/* With the turn reference behind it, the current step sits in a hairline pill: it reads as something to tap. */}
       <Animated.View
         key={rail.current}
         entering={fade}
-        style={{ marginHorizontal: 12, flexShrink: 1, ...(onPress ? { borderWidth: 1, borderColor: t.hairline, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 2 } : {}) }}
+        style={{ marginHorizontal: narrow ? 0 : 12, flexShrink: 1, ...(onPress ? { borderWidth: 1, borderColor: t.hairline, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 2 } : {}) }}
       >
         <Text
           testID="rail-current"

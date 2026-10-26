@@ -1,0 +1,76 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 19. Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build
+# (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture is the solo game of Stealth and Steadfastness parked on its loss
+# (src/campaign/fixtures). The top bar holds the dials, the rail and the menu button; Back, Log, Rules, Booklet and Table
+# settings are rows of the menu.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/lost"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+# The bar shows the dials, the rail and the menu button, and none of the controls that moved.
+- assertVisible:
+    id: threat-0
+- assertVisible:
+    id: rail
+- assertVisible:
+    id: table-menu
+- assertNotVisible:
+    id: log-open
+- assertNotVisible:
+    id: table-back
+# The menu has its five rows.
+- tapOn:
+    id: table-menu
+- assertVisible:
+    id: table-back
+    text: ".*Leave the table.*"
+- assertVisible:
+    id: log-open
+- assertVisible:
+    id: rules-open
+- assertVisible:
+    id: booklet-open
+- assertVisible:
+    id: settings-open
+# A tap outside closes it and sends nothing.
+- tapOn:
+    id: table-menu-scrim
+    point: "50%,90%"
+- assertNotVisible:
+    id: log-open
+# A row closes the menu and then acts: the Log opens and closes.
+- tapOn:
+    id: table-menu
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertNotVisible:
+    id: log-open
+- tapOn:
+    id: log-close
+- assertNotVisible:
+    id: log
+# Leave the table: the game is saved and the path is under it.
+- tapOn:
+    id: table-menu
+- tapOn:
+    id: table-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000

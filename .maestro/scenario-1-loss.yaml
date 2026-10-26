@@ -54,6 +54,8 @@ appId: com.middleearth.lcg
     id: pool
     text: "Nothing earned yet."
 - tapOn:
+    id: table-menu
+- tapOn:
     id: log-open
 - extendedWaitUntil:
     visible:
