@@ -30,3 +30,8 @@ export function tickSent(): void {
 export function tickRefused(): void {
   quietly(() => (android ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Reject) : Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)));
 }
+
+/** A card played from the hand landed on the table (the squash of its motion): a light tick, at most one per new state. */
+export function tickLand(): void {
+  quietly(() => (android ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Segment_Tick) : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)));
+}

@@ -5,6 +5,8 @@
 // stands on (brief, Screens, Table: no single tap sends an intent).
 import { createStore } from "zustand/vanilla";
 
+import { SPEEDS, type Speed } from "./motion-tokens.ts";
+
 /** The step action windows the table can pass for the player, in round order (rail.ts names each). */
 export const STOP_POINTS = ["resourceActions", "3.3", "3.4", "4.2", "5.2", "5.3", "6.2", "defense", "shadow", "damage", "end", "strike", "7.4"] as const;
 export type StopPoint = (typeof STOP_POINTS)[number];
@@ -21,12 +23,14 @@ export type TableSettings = {
   guide: boolean;
   // How many times the guide has explained each step.
   guideSeen: Readonly<Record<string, number>>;
+  // Animation speed (motion-tokens.ts, motionScale): Normal, or Quick at 0.6 of every length. Reduced motion snaps either.
+  animationSpeed: Speed;
 };
 
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {} };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal" };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -44,6 +48,7 @@ export function parseSettings(raw: unknown): TableSettings {
     highContrast: flag(value.highContrast, false),
     guide: flag(value.guide, true),
     guideSeen: seen,
+    animationSpeed: SPEEDS.find((speed) => speed === value.animationSpeed) ?? DEFAULT_SETTINGS.animationSpeed,
   };
 }
 

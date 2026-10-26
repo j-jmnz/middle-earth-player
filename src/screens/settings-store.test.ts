@@ -26,8 +26,8 @@ describe("table settings in user.db", () => {
     const warnings: string[] = [];
     const stop = bindTableSettings(user, (message) => warnings.push(message));
     expect(tableSettings.getState().settings.stopsOn).toBe(true);
-    tableSettings.getState().update({ guide: false });
-    expect(readTableSettings(user)).toMatchObject({ stopsOn: true, guide: false });
+    tableSettings.getState().update({ guide: false, animationSpeed: "quick" });
+    expect(readTableSettings(user)).toMatchObject({ stopsOn: true, guide: false, animationSpeed: "quick" });
     stop();
     expect(warnings).toEqual([]);
   });

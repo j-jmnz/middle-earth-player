@@ -271,7 +271,7 @@ describe("motion", () => {
     const motion = motions.get(drawn);
     expect(slot && motion && slot.x + slot.w / 2 + motion.dx).toBeCloseTo(deck.x + deck.w / 2);
     const hero = kept.seats[0].heroes[0] ?? "";
-    expect(still(motions.get(hero) ?? { dx: 1, dy: 0, scale: 1, fromRot: 0, toRot: 0, fromOpacity: 1 })).toBe(true);
+    expect(still(motions.get(hero) ?? { dx: 1, dy: 0, scale: 1, fromRot: 0, toRot: 0, fromOpacity: 1, flip: false, delay: 0, arc: 0, land: null, slide: false })).toBe(true);
     const ghost = ghosts.find((candidate) => candidate.slot.id === first);
     expect(ghost && ghost.slot.x + ghost.slot.w / 2 + ghost.dx).toBeCloseTo(next.piles.discard.x + next.piles.discard.w / 2);
     // The first draw of a table moves nothing.

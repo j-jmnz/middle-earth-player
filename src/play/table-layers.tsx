@@ -16,6 +16,7 @@ import type { Carousel } from "./carousel.ts";
 import { threatRows, threatVerdict } from "./foresight.ts";
 import { logLines, type LogNames } from "./log.ts";
 import { PhaseCarousel } from "./phase-carousel.tsx";
+import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
 import { LogPanel, PileList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
 import { useScreenReader } from "./screen-reader.ts";
@@ -94,6 +95,8 @@ export function TableLayers({
   const lines = useMemo(() => (logging ? logLines(roundSteps, logNames) : []), [logging, roundSteps, logNames]);
   return (
     <>
+      {/* The phase title crosses the canvas center; taps pass through it. */}
+      <PhaseSweep store={store} area={{ left: insets.left, top: barBottom, width: canvas, height: screen.height - barBottom }} />
       {/* A tap outside the open tray, away from the canvas (which folds it itself): the top bar but its menu button, and the empty
           part of the command column above the dock. A screen reader leaves the tray open. */}
       {outsideLayers({ trayShown, reading: reading != null, reader }) ? (

@@ -1,40 +1,18 @@
 // The phase rail in the top bar's middle (docs/design-system.md, Table; phase 20): a pill holding the round, the phase in gold
 // Marcellus caps and the step, with the previous and next phase beside it when there is room. A tap opens the phase carousel
 // (phase-carousel.tsx); the rail itself sends no intent. Phase changes slide the neighbor names one place and flash the pill's
-// edge, a step change cross-fades the step; all of it snaps under reduced motion and never gates a rule.
-import { useEffect, useRef } from "react";
+// edge, a step change cross-fades the step (MOTION.railSlide, railFlash, railStep); all of it snaps under reduced motion and never gates a rule.
+import { useEffect, useMemo, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated, {
-  Easing,
-  FadeIn,
-  FadeOut,
-  interpolateColor,
-  LayoutAnimationConfig,
-  ReduceMotion,
-  SlideInRight,
-  SlideOutLeft,
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, interpolateColor, LayoutAnimationConfig, SlideInRight, SlideOutLeft, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { STOP_AHEAD_WORDS } from "./carousel.ts";
+import { layoutAnim, timing, useMotionScale } from "./motion-run.ts";
+import { MOTION } from "./motion-tokens.ts";
 import type { Rail } from "./rail.ts";
 import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 import { CHEVRON, PHASE_SLOT, SIDE_GAP, STOP_MARK } from "./top-bar-layout.ts";
 
-// Motion values for phase 23's motion-tokens.ts: neighbor names slide 280 ms ease-out, the pill's edge flashes gold for 300 ms,
-// the step cross-fades in 200 ms.
-const SLIDE_MS = 280;
-const FLASH_IN_MS = 60;
-const FLASH_MS = 300;
-const STEP_MS = 200;
-const slideIn = SlideInRight.duration(SLIDE_MS).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System);
-const slideOut = SlideOutLeft.duration(SLIDE_MS).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System);
-const stepIn = FadeIn.duration(STEP_MS).reduceMotion(ReduceMotion.System);
-const stepOut = FadeOut.duration(STEP_MS).reduceMotion(ReduceMotion.System);
 
 /** A chevron drawn as two edges of a rotated square: no printed icon fits, and a glyph depends on the font. */
 export function Chevron({ direction, color = t.muted }: { direction: "previous" | "next" | "up" | "down"; color?: string }) {
@@ -70,6 +48,8 @@ export function Chevron({ direction, color = t.muted }: { direction: "previous" 
 
 // The neighbor phase's name in a slot of fixed width: a new name slides in from the right while the old one leaves to the left.
 function Neighbor({ side, name, stopAhead }: { side: "previous" | "next"; name: string; stopAhead: boolean }) {
+  const scale = useMotionScale();
+  const slide = useMemo(() => ({ in: layoutAnim(SlideInRight, MOTION.railSlide, scale), out: layoutAnim(SlideOutLeft, MOTION.railSlide, scale) }), [scale]);
   const slot = (
     <View style={{ width: PHASE_SLOT, height: 18, overflow: "hidden" }}>
       {name ? (
@@ -77,8 +57,8 @@ function Neighbor({ side, name, stopAhead }: { side: "previous" | "next"; name: 
           key={name}
           testID={`rail-${side}`}
           numberOfLines={1}
-          entering={slideIn}
-          exiting={slideOut}
+          entering={slide.in}
+          exiting={slide.out}
           style={{
             position: "absolute",
             left: 0,
@@ -143,14 +123,15 @@ export function PhaseRail({
   open?: boolean;
   onPress?: () => void;
 }) {
-  const reduceMotion = useReducedMotion();
+  const scale = useMotionScale();
+  const step = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.railStep, scale), out: layoutAnim(FadeOut, MOTION.railStep, scale) }), [scale]);
   const flash = useSharedValue(0);
   const lastPhase = useRef(rail.phase);
   useEffect(() => {
     if (lastPhase.current === rail.phase) return;
     lastPhase.current = rail.phase;
-    if (!reduceMotion) flash.set(withSequence(withTiming(1, { duration: FLASH_IN_MS }), withTiming(0, { duration: FLASH_MS - FLASH_IN_MS })));
-  }, [rail.phase, reduceMotion, flash]);
+    if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing({ ms: MOTION.railFlash.ms - MOTION.railFlashIn.ms, easing: null }, scale))));
+  }, [rail.phase, scale, flash]);
   const edge = useAnimatedStyle(() => ({
     borderColor: interpolateColor(flash.get(), [0, 1], [open ? t.gold : t.goldLine, t.gold]),
   }));
@@ -237,7 +218,7 @@ export function PhaseRail({
               ) : null}
             </View>
           ) : null}
-          <Animated.View key={rail.current} entering={stepIn} exiting={stepOut}>
+          <Animated.View key={rail.current} entering={step.in} exiting={step.out}>
             <Text testID="rail-current" numberOfLines={1} className="text-label" style={{ color: t.bone, lineHeight: 16 }}>
               {rail.current}
             </Text>

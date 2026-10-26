@@ -2,19 +2,19 @@
 // text with testIDs, so Maestro can read them; card pictures stay on the canvas (docs/design-system.md, Table). Phase
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
-import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut, ReduceMotion, useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import type { LogMark } from "./log.ts";
+import { layoutAnim, springConfig, timing, useMotionScale } from "./motion-run.ts";
+import { MOTION, SHAPE } from "./motion-tokens.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
 import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 
-const badgeIn = FadeIn.duration(160).reduceMotion(ReduceMotion.System);
-const badgeOut = FadeOut.duration(400).reduceMotion(ReduceMotion.System);
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
 
@@ -103,7 +103,8 @@ function ThreatDial({
   ring: string | null;
   onPress?: () => void;
 }) {
-  const reduceMotion = useReducedMotion();
+  const speed = useMotionScale();
+  const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
   const level = elimination ? threatLevel(threat.threat) : "calm";
   const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? DIAL[level] : { edge: t.gold, fill: t.night, meter: t.gold };
   // The change since the number last moved, shown beside the dial for DELTA_MS. A new change replaces it.
@@ -115,8 +116,19 @@ function ThreatDial({
     seen.current = threat.threat;
     if (before === threat.threat) return;
     setChange({ before, after: threat.threat, at: Date.now() });
-    if (!reduceMotion) scale.set(withSequence(withTiming(1.22, { duration: 140 }), withSpring(1, { damping: 9, stiffness: 220 })));
-  }, [threat.threat, reduceMotion, scale]);
+    if (speed > 0) scale.set(withSequence(withTiming(SHAPE.dialPop, timing(MOTION.dialPopRise, speed)), withSpring(1, springConfig(MOTION.dialPopSettle, speed))));
+  }, [threat.threat, speed, scale]);
+  // The seat that is asked turns active in two-handed play: its dial pulses once in a gold ring (1 to 1.12 and back).
+  const wasActive = useRef(active);
+  const pulse = useSharedValue(0);
+  useEffect(() => {
+    const was = wasActive.current;
+    wasActive.current = active;
+    if (!active || was || speed === 0) return;
+    const half = { ms: MOTION.seatPulse.ms / 2, easing: MOTION.seatPulse.easing };
+    pulse.set(withSequence(withTiming(1, timing(half, speed)), withTiming(0, timing(half, speed))));
+  }, [active, speed, pulse]);
+  const ringStyle = useAnimatedStyle(() => ({ opacity: pulse.get(), transform: [{ scale: 1 + (SHAPE.seatPulse - 1) * pulse.get() }] }));
   useEffect(() => {
     if (!change) return;
     const timer = setTimeout(() => setChange(null), DELTA_MS);
@@ -160,6 +172,7 @@ function ThreatDial({
             </View>
           ) : null}
         </View>
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2, borderColor: t.gold }, ringStyle]} />
       </Animated.View>
       <View className="items-start gap-0.5">
         <View className="flex-row items-center gap-1">
@@ -173,8 +186,8 @@ function ThreatDial({
         {delta ? (
           <Animated.View
             key={change?.at}
-            entering={badgeIn}
-            exiting={badgeOut}
+            entering={badge.in}
+            exiting={badge.out}
             style={{ borderRadius: 999, paddingHorizontal: 6, borderWidth: 1, borderColor: delta.lowered ? t.gold : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.gold : t.threat, 0.22) }}
           >
             <Text testID={`${id}-delta`} className="font-display text-label text-bone">

@@ -1,22 +1,20 @@
 // The frame of the table's popovers (docs/design-system.md, Table, Table menu): a raised night card with a hairline edge and
-// rounded-card corners that scales in from the corner it hangs from (200 ms ease-out from 0.96, out 150 ms ease-in), the layer
+// rounded-card corners that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
 // that holds it, and a Pressable scrim that fills the screen under it so a tap outside closes it and does nothing else. Not a
 // Modal: a Modal takes over the orientation lock and the status bar. The table menu (table-menu.tsx) and the dock's More
 // popover (dock-more.tsx) both draw in it; Android Back closes either first (back.ts).
-import { useEffect, useRef, useState, type ComponentRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
 import { AccessibilityInfo, findNodeHandle, Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
+import { useOpenMotion } from "./motion-run.ts";
+import { MOTION, ms } from "./motion-tokens.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 export type PressableRef = ComponentRef<typeof Pressable>;
 const ROW = 48;
-// Motion values for phase 23's motion-tokens.ts.
-const ENTER_MS = 200;
-const LEAVE_MS = 150;
 const FROM_SCALE = 0.96;
 
 export type PopoverRowItem = {
@@ -94,27 +92,7 @@ export function PopoverFrame({
   onClose: () => void;
   children: ReactNode;
 }) {
-  const reduceMotion = useReducedMotion();
-  // The popover stays mounted while it leaves (`leaving`), set while rendering when `open` turns off, not from an effect.
-  const [wasOpen, setWasOpen] = useState(open);
-  const [leaving, setLeaving] = useState(false);
-  if (open !== wasOpen) {
-    setWasOpen(open);
-    setLeaving(!open && !reduceMotion);
-  }
-  const progress = useSharedValue(open ? 1 : 0);
-
-  useEffect(() => {
-    if (open) progress.set(reduceMotion ? 1 : withTiming(1, { duration: ENTER_MS, easing: Easing.out(Easing.cubic) }));
-    else if (reduceMotion) progress.set(0);
-    else {
-      progress.set(
-        withTiming(0, { duration: LEAVE_MS, easing: Easing.in(Easing.cubic) }, (finished) => {
-          if (finished) scheduleOnRN(setLeaving, false);
-        }),
-      );
-    }
-  }, [open, reduceMotion, progress]);
+  const { progress, leaving, scale } = useOpenMotion(open, MOTION.menuEnter, MOTION.menuLeave);
 
   const fallback = useRef<PressableRef>(null);
   const first = focusRef ?? fallback;
@@ -127,9 +105,9 @@ export function PopoverFrame({
       } catch {
         // A platform without accessibility focus has nothing to move.
       }
-    }, ENTER_MS);
+    }, ms(MOTION.menuEnter, scale));
     return () => clearTimeout(timer);
-  }, [open, first]);
+  }, [open, first, scale]);
 
   const style = useAnimatedStyle(() => {
     const p = Math.min(1, Math.max(0, progress.get()));

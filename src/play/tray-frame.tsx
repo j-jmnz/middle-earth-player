@@ -1,15 +1,13 @@
 // The frame the choice tray and the reading panels share (docs/design-system.md, Table, Panels): a card-cornered box at the
-// command column's right edge. The tray is night raised with a hairline edge; a reading panel may stay on paper. It enters in
-// 260 ms decelerating (16 pt up and a fade), leaves in 180 ms accelerating, and snaps under reduced motion. Motion values for
-// phase 23's motion-tokens.ts.
-import { useEffect, useState, type ReactNode } from "react";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
+// command column's right edge. The tray is night raised with a hairline edge; a reading panel may stay on paper. It enters
+// decelerating (16 pt up and a fade) and leaves accelerating (MOTION.trayEnter, MOTION.trayLeave), and snaps under reduced motion.
+import { useState, type ReactNode } from "react";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
+import { MOTION } from "./motion-tokens.ts";
+import { useOpenMotion } from "./motion-run.ts";
 import { tableTokens as t } from "./tokens.ts";
 
-const ENTER_MS = 260;
-const LEAVE_MS = 180;
 const RISE = 16;
 const RADIUS = 20;
 
@@ -38,25 +36,7 @@ export function TrayFrame({
   testID: string;
   children: ReactNode;
 }) {
-  const reduceMotion = useReducedMotion();
-  // Mounted while it leaves, set while rendering when `open` turns off.
-  const [wasOpen, setWasOpen] = useState(open);
-  const [leaving, setLeaving] = useState(false);
-  if (open !== wasOpen) {
-    setWasOpen(open);
-    setLeaving(!open && !reduceMotion);
-  }
-  const progress = useSharedValue(open ? 1 : 0);
-  useEffect(() => {
-    if (open) progress.set(reduceMotion ? 1 : withTiming(1, { duration: ENTER_MS, easing: Easing.out(Easing.cubic) }));
-    else if (reduceMotion) progress.set(0);
-    else
-      progress.set(
-        withTiming(0, { duration: LEAVE_MS, easing: Easing.in(Easing.cubic) }, (finished) => {
-          if (finished) scheduleOnRN(setLeaving, false);
-        }),
-      );
-  }, [open, reduceMotion, progress]);
+  const { progress, leaving } = useOpenMotion(open, MOTION.trayEnter, MOTION.trayLeave);
   const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE }] }));
   if (!open && !leaving) return null;
   const paper = surface === "paper";
