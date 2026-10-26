@@ -137,14 +137,17 @@ export function playKnife(seatCount: 1 | 2, seed: number, difficulty: Difficulty
 // true solo seeds 1 to 4 and two-handed seed 1 at width 12 and 10 tries a round, after earlier runs at widths 4 to 16 on
 // seeds 1 to 3; the best lines died on stage 2 with threat near 50. Two-handed seed 1 lost until an out-of-play Ringwraith
 // could come from the encounter discard pile (rr.in-play-and-out-of-play); on the same seed and policy it now wins, so it is
-// labeled won and the two-handed losses are the starter-deck game.
+// labeled won and the two-handed losses are the starter-deck game. The strong deck's filler is an event with no record, which
+// stopped being playable on 2026-10-26 (rr.triggered-ability) and so stopped opening action windows; the strong games were
+// played again and new seeds chosen: true solo 35 wins, two-handed 4 wins with both seats, and two-handed 10 wins with one
+// seat eliminated.
 export type KnifeGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: KnifeDecks; outcome: "won" | "lost" };
 
 export const KNIFE_GOLDENS: readonly KnifeGolden[] = [
-  { name: "true solo, strong, won", seatCount: 1, seed: 54, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, strong, won", seatCount: 1, seed: 35, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, strong, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost" },
-  { name: "two-handed, strong, won", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed, strong, seed 1, won", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, strong, won", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, strong, a seat eliminated, won", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, starter decks, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "starter", outcome: "lost" },
   { name: "two-handed, starter decks, lost", seatCount: 2, seed: 1, difficulty: "Normal", decks: "starter", outcome: "lost" },
 ];

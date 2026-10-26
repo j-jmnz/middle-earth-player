@@ -50,7 +50,7 @@ describe("golden: a whole game of A Knife in the Dark", () => {
       expect(state.window).toBeNull();
       expect(state.cards[state.questStage ?? ""]?.code).toBe("141027");
       const earned = state.resolutionLog.earned;
-      // Each seat still in the game chooses, from the first player; an eliminated seat does not (two-handed seed 1).
+      // Each seat still in the game chooses, from the first player; an eliminated seat does not (two-handed, a seat eliminated).
       const order = Array.from({ length: golden.seatCount }, (_, at) => (state.firstPlayer + at) % golden.seatCount);
       expect(earned.map((item) => item.seat)).toEqual(order.filter((seat) => !state.seats[seat]?.eliminated));
       for (const item of earned) {

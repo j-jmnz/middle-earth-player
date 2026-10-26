@@ -95,7 +95,7 @@ describe("141044's Resolution on the resolution screen", () => {
   }, 120_000);
 
   it("true solo: no seat label, and the decline speaks to the one player", () => {
-    const state = atResolution(1, 54);
+    const state = atResolution(1, 35);
     const view = resolutionView(state, world);
     expect(view.kind).toBe("choosing");
     if (view.kind !== "choosing") return;

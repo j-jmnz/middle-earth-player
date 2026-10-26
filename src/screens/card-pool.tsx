@@ -4,9 +4,7 @@ import { useRouter } from "expo-router";
 import { useMemo, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
-import { inactiveCodes as inactiveTextCodes } from "../catalog/active-text";
 import { cards, packs } from "../catalog/schema";
-import { EFFECTS } from "../effects";
 import { BodyText, Eyebrow, ListRow, PrimaryButton, Screen, SphereMark, TextButton, markedSphere } from "./chrome";
 import { CountStepper } from "./count-stepper";
 import { addDraftCard, announceDraftChange, draftAddRefused, draftCopyCount, takeDraftCard, useDeckDraft, type TitleLookup } from "./deck-draft";
@@ -15,6 +13,7 @@ import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { CardThumb, useCardPreview } from "./images/picture";
 import { useListPreview } from "./list-preview";
+import { notAppliedCodes } from "../play/not-applied";
 import type { PictureSource } from "../play/table-canvas-types";
 import { palette } from "./palette.js";
 import { activeFilterCount, cycleGroups, emptyPoolFilter, filterPool, poolDetail, sortPool, type PoolCard, type PoolFilter } from "./pool-filter";
@@ -175,12 +174,9 @@ export function CardPool({
       .orderBy(packs.cyclePosition, packs.position)
       .all(),
   );
-  // The same inactive-text check as the card screen and the table: unique text with no effect record.
+  // The same "not applied" check as the card screen and the table: a printed line no effect record reads.
   const [inactiveCodes] = useState(() =>
-    inactiveTextCodes(
-      catalog.select({ code: cards.code, text: cards.text }).from(cards).where(eq(cards.deckLegal, true)).all().map((row) => [row.code, row.text] as const),
-      EFFECTS,
-    ),
+    notAppliedCodes(catalog.select({ code: cards.code, text: cards.text }).from(cards).where(eq(cards.deckLegal, true)).all().map((row) => [row.code, row.text] as const)),
   );
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);
   const [search, setSearch] = useState("");

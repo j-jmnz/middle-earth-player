@@ -26,8 +26,8 @@ import { LogPanel, PileList, SidePanel } from "../play/table-panel";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
 import { ledgerLine, ruleTitle } from "../play/ledger";
+import { notAppliedCodes } from "../play/not-applied";
 import { Screen } from "./chrome";
-import { inactiveCodes } from "../catalog/active-text";
 import { goBack } from "./go-back";
 import { enqueueImageDownloads } from "./images/queue";
 import { scanAssets } from "./images/scan-map";
@@ -95,8 +95,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
   const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
   const names: SheetNames = useMemo(() => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine }), [nameOf, store]);
-  // Unique text with no effect record is inactive: the canvas veils it, and no control applies it.
-  const inactiveSet = useMemo(() => inactiveCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const), ctx.effects), [session, ctx]);
+  // A printed line no effect record reads is not applied: the canvas marks the card, and no control applies the line.
+  const inactiveSet = useMemo(() => notAppliedCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const)), [session]);
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
   // Read from the latest state: the canvas draws again when the cards, the effects in play or the attack change.
   const info = useCallback((cardId: string): SlotInfo => slotNumbers(store.getState().game, ctx, cardId), [store, ctx]);

@@ -5,13 +5,13 @@ import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
-import { activeCardCodes, textInactive } from "../../../catalog/active-text";
 import { cards } from "../../../catalog/schema";
-import { EFFECTS } from "../../../effects";
-import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, sphereWord } from "../../chrome";
+import { BodyText, Eyebrow, NavBar, Screen, ScreenTitle, sphereWord } from "../../chrome";
 import { CardTextView } from "../../../play/card-text-view";
 import { traitLine } from "../../../play/card-text";
 import { GameIcon } from "../../../play/game-icon";
+import { notApplied, type NotApplied } from "../../../play/not-applied";
+import { NotAppliedView } from "../../../play/not-applied-view";
 import { SPHERE_TINT, sphereIcon, typeIcon, type IconName } from "../../../play/icon-map";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
@@ -44,7 +44,7 @@ type FactsRow = {
 // Type and sphere in one centered line under the name, each with its printed icon; then the traits as printed, the numbers
 // as a row of tiles (icon and value, the word under them), and the text on a raised panel: one paragraph per ability, the
 // timing words bold, the icons inline, flavor italic and muted.
-function CardFacts({ row, inactive }: { row: FactsRow; inactive: boolean }) {
+function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | null }) {
   const sphereMark = sphereIcon(row.sphereCode);
   const type = typeIcon(row.typeCode);
   // Player cards always name a sphere (Neutral when the catalog has none); encounter cards print none.
@@ -92,12 +92,13 @@ function CardFacts({ row, inactive }: { row: FactsRow; inactive: boolean }) {
           ))}
         </View>
       ) : null}
-      {row.text || inactive ? (
+      {row.text || unapplied ? (
         <View className="mt-6 rounded-card border border-hairline bg-raised px-5 py-4">
           <CardTextView text={row.text} testID="card-text" />
-          {inactive ? (
-            <View testID="card-inactive" className={row.text ? "mt-3 border-t border-hairline pt-3" : undefined}>
-              <Label tone="muted">Inactive: no effect record reads this text yet.</Label>
+          {/* The lines no effect record reads, and what the card still does without them. */}
+          {unapplied ? (
+            <View className={row.text ? "mt-3 border-t border-hairline pt-3" : undefined}>
+              <NotAppliedView notApplied={unapplied} />
             </View>
           ) : null}
         </View>
@@ -226,7 +227,6 @@ export default function CardScreen() {
       .where(eq(cards.code, code))
       .get();
   }, [catalog, code]);
-  const active = useMemo(() => activeCardCodes(EFFECTS), []);
   const cached = useCachedImage(code ?? "");
   const bundled = code ? (scanAssets[code] ?? null) : null;
   const { resolved, source } = shownCardImage({
@@ -278,7 +278,7 @@ export default function CardScreen() {
             </>
           )}
         </View>
-        {row ? <CardFacts row={row} inactive={textInactive(row.code, row.text, active)} /> : null}
+        {row ? <CardFacts row={row} unapplied={notApplied(row.code, row.typeCode, row.errata ?? row.text)} /> : null}
         {row?.errata ? (
           <View className="mt-6 rounded-card border border-goldLine px-5 py-4">
             <Eyebrow>Errata</Eyebrow>

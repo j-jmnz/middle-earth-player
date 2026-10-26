@@ -1,11 +1,9 @@
 // The printed lines and rule titles the table shows as causes: a card's line from the printed-text ledger (data/printed), a
 // rule's title from data/rules/entries.json. Both are committed data; the phone reads no other source for them.
-import printed from "../../data/printed/fellowship-of-the-ring.json";
 import rules from "../../data/rules/entries.json";
 
+import { shippedLedger } from "../catalog/printed-ledger.ts";
 import { parseRuleEntries } from "../catalog/rule-entry.ts";
-
-type LedgerEntry = { code: string; side: string; lines: string[] };
 
 let lines: Map<string, string> | null = null;
 let titles: Map<string, string> | null = null;
@@ -14,8 +12,8 @@ let titles: Map<string, string> | null = null;
 export function ledgerLine(id: string): string | null {
   if (!lines) {
     lines = new Map();
-    for (const entry of (printed as { entries: LedgerEntry[] }).entries) {
-      entry.lines.forEach((line, at) => lines?.set(`${entry.code}:${entry.side}:${at + 1}`, line));
+    for (const sides of shippedLedger().values()) {
+      for (const entry of sides) entry.lines.forEach((line, at) => lines?.set(`${entry.code}:${entry.side}:${at + 1}`, line));
     }
   }
   return lines.get(id) ?? null;

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import type { Effect } from "../catalog/boundary.ts";
 import { cardMap, expectOk, fixtureDefinition, hero } from "./fixture.ts";
 import { legalIntents, legalTargets, reduce } from "./reduce.ts";
 import { definePrinted } from "./printed.ts";
@@ -107,14 +108,27 @@ describe("planning costs", () => {
     const spiritCards = cardMap([spiritHero, spirit]);
     let spiritState = event.state;
     spiritState = updateCard(spiritState, event.heroId, { code: "eowyn" });
+    // The event's Action has a record, so it can be played (rr.triggered-ability): it lowers the player's threat.
+    const lower: Effect = { id: "spirit:action:1", cardCode: "spirit", lines: ["spirit:A:1"], timing: "action", instructions: [{ verb: "LowerThreat", amount: 1, who: "actor" }] };
     const paid = expectOk(
       reduce(spiritState, { type: "PlayCard", cardId: event.cardId, payments: [{ heroId: event.heroId, amount: 2 }] }, {
-        effects: [],
+        effects: [lower],
         cards: spiritCards,
       }),
     );
     expect(paid.state.cards[event.cardId]?.zone).toBe("discard");
     expect(paid.state.cards[event.heroId]?.resources).toBe(3);
+  });
+
+  it("refuses an event with no record: its Action could not change the game state as the engine applies it", () => {
+    // Rules: rr.triggered-ability. Before 2026-10-26 such an event was paid for and discarded with no effect.
+    const event = planning("spirit");
+    const spiritCards = cardMap([hero("eowyn", "spirit"), spirit]);
+    const state = updateCard(event.state, event.heroId, { code: "eowyn" });
+    const context = { effects: [], cards: spiritCards };
+    expect(legalIntents(state, context).some((intent) => intent.type === "PlayCard" && intent.cardId === event.cardId)).toBe(false);
+    const refused = reduce(state, { type: "PlayCard", cardId: event.cardId, payments: [{ heroId: event.heroId, amount: 2 }] }, context);
+    expect(refused.ok ? null : refused.reason).toBe("The app does not apply that card's text yet, so it cannot be played");
   });
 
   it("rejects a second unique title and does not list a host cross product", () => {
