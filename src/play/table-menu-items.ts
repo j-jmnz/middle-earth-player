@@ -38,6 +38,6 @@ export function menuItems(nav: MenuNav): readonly MenuItem[] {
     { id: "log", testID: "log-open", label: "Log", accessibilityLabel: "This round's log", icon: null },
     { id: "rules", testID: "rules-open", label: "Rules", accessibilityLabel: "Look up a rule", icon: null },
     { id: "booklet", testID: "booklet-open", label: "Booklet", accessibilityLabel: "Open the booklet", icon: null },
-    { id: "settings", testID: "settings-open", label: "Table settings", accessibilityLabel: "Table settings", accessibilityHint: "Opens the turn reference and the settings", icon: null },
+    { id: "settings", testID: "settings-open", label: "Table settings", accessibilityLabel: "Table settings", accessibilityHint: "Opens the table settings", icon: null },
   ];
 }

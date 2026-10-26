@@ -1,7 +1,7 @@
 // What the Android hardware Back does on the table, one layer at a time, topmost first:
 //   1. the table menu;
 //   2. the card preview;
-//   3. a reading panel (the threat panel, the turn reference, the table settings);
+//   3. a reading layer (the threat panel, the phase carousel, the table settings);
 //   4. the log;
 //   5. a discard pile's list;
 //   6. a sheet the player opened from the table (a payment, a host, an Action; nothing was sent);

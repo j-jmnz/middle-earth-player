@@ -1,31 +1,68 @@
 // The top bar's three zones (docs/design-system.md, Table): the dials at the left, the phase rail centered on the bar, one
 // menu button at the right. The rail is centered by giving both sides the same width, so it does not drift toward the
-// space the dials leave over. The rail never truncates the current step: its floor is the longest step name at the rail's
-// type size plus the pill's chrome. Pure, so a test reads it.
-import { STEP_WORDS } from "./rail.ts";
+// space the dials leave over. The rail never truncates the pill: its floor is the widest pill, counted from the pill's own words
+// ("Round 99 · ENCOUNTER", the longest step name) at its type sizes plus its chrome. Pure, so a test reads it.
+import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 
 export const MENU_BUTTON = 44;
 const GAP = 8;
-const RAIL_MAX = 420;
-// Under this width the rail keeps the current step alone.
-const RAIL_WIDE = 320;
+// Wide enough for the widest pill and both neighbor phases (RAIL_WIDE), with room over.
+export const RAIL_MAX = 440;
 
-// The current step is Marcellus caps at the body size (17 pt). A capital averages 0.625 em in Marcellus ("Optional engagement"
-// measures 202 pt on the web build); 0.65 leaves a margin, and the floor counts no shrinking (PhaseRail may shrink to 85% on a
-// phone, which is more margin). The glow is not counted. The pill adds its 2 x 1 pt edge and 2 x 10 pt padding.
-const STEP_SIZE = 17;
+// The rail's pill is two lines (table-chrome.tsx): "Round 3 · QUEST" over the step, "Staging". Its floor comes from the pill's
+// own words, never from a guess about the bar:
+// - the phase is Marcellus caps at the body size (17 pt). A capital averages 0.625 em in Marcellus ("Optional engagement"
+//   measures 202 pt on the web build); 0.65 leaves a margin;
+// - "Round 99" and the step are label size (13 pt) in the system font, which averages under 0.55 em a character; 0.55 leaves a
+//   margin;
+// - neither counts shrinking (PhaseRail may shrink the phase to 85%), which is more margin, nor the glow;
+// - the pill adds its 2 x 1 pt edge and 2 x 10 pt padding.
+const PHASE_SIZE = 17;
 const CAP_EM = 0.65;
+const LABEL_SIZE = 13;
+const LABEL_EM = 0.55;
 const PILL_CHROME = 22;
+// The dot between "Round 3" and the phase, with its margins.
+const DOT = 14;
+// Beside the pill (rail wide): a chevron, the neighbor phase's name, the gold S that marks a stop ahead.
+export const CHEVRON = 14;
+export const SIDE_GAP = 8;
+export const STOP_MARK = 14;
 // Words the rail shows beside the engine's steps.
 const EXTRA_STEPS = ["Victory", "Defeat"] as const;
+/** The room the slot for a neighbor phase's name keeps: the widest of the seven at label size. */
+export const PHASE_SLOT = Math.max(...ROUND_PHASES.map((name) => Math.ceil(name.length * LABEL_EM * LABEL_SIZE)));
+// One side of the wide rail: the chevron, the name's slot and the room for the gold S, a gap between each.
+export const SIDE_WIDTH = CHEVRON + PHASE_SLOT + STOP_MARK + 2 * SIDE_GAP;
+// The rounds the pill can name: two digits.
+const ROUND_WORDS = "Round 99";
+// The phase words the pill shows over the step (rail.ts: the seven phases, "Beginning" and "End").
+const PILL_PHASES = [...ROUND_PHASES, "Beginning", "End"];
 
-/** The width the rail needs to show a step name whole. */
-export function stepWidth(word: string): number {
-  return Math.ceil(word.length * CAP_EM * STEP_SIZE) + PILL_CHROME;
+const labelWidth = (word: string) => Math.ceil(word.length * LABEL_EM * LABEL_SIZE);
+const capsWidth = (word: string) => Math.ceil(word.length * CAP_EM * PHASE_SIZE);
+
+/** The width the pill needs for the round over the step: the wider of its two lines, plus its chrome. */
+export function pillWidth(round: string, phase: string, step: string): number {
+  const top = labelWidth(round) + (phase ? DOT + capsWidth(phase) : 0);
+  return Math.max(top, labelWidth(step)) + PILL_CHROME;
 }
 
-/** The rail's floor: the widest step name the rail can show. */
-export const RAIL_FLOOR = Math.max(...[...Object.values(STEP_WORDS), ...EXTRA_STEPS].map(stepWidth));
+/** The width the rail needs to show a step name whole, under its widest top line. */
+export function stepWidth(word: string): number {
+  return pillWidth(ROUND_WORDS, "", word);
+}
+
+/** The width the rail needs to show a phase name whole, over its widest step. */
+export function phaseWidth(phase: string): number {
+  return pillWidth(ROUND_WORDS, phase, "");
+}
+
+/** The rail's floor: the widest pill, by the pill's own words (a step name, or "Round 99 · ENCOUNTER"). */
+export const RAIL_FLOOR = Math.max(...[...Object.values(STEP_WORDS), ...EXTRA_STEPS].map(stepWidth), ...PILL_PHASES.map(phaseWidth));
+
+// The rail shows the neighbor phases when it can hold the widest pill and both neighbors with their chevrons, and the gold S.
+export const RAIL_WIDE = RAIL_FLOOR + 2 * (SIDE_WIDTH + SIDE_GAP);
 
 export type BarZones = {
   left: number;
@@ -51,7 +88,7 @@ export function barZones(bar: number, dials: number): BarZones {
   return { left, rail: Math.max(0, bar - left - right), right, scroll: Math.ceil(dials) > left };
 }
 
-/** The rail shows its neighbors and the round only when it has room. */
+/** The rail shows the phases beside the pill only when it has room, and the phone is 760 pt or wider inside the insets. */
 export function railWide(rail: number, narrowScreen: boolean): boolean {
   return !narrowScreen && rail >= RAIL_WIDE;
 }

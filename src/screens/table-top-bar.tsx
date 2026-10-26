@@ -7,7 +7,8 @@ import { ScrollView, View, type LayoutChangeEvent } from "react-native";
 
 import type { Rail } from "../play/rail";
 import type { SeatThreat } from "../play/selectors";
-import { PhaseRail, ThreatRing } from "../play/table-chrome";
+import { PhaseRail } from "../play/phase-rail";
+import { ThreatRing } from "../play/table-chrome";
 import { MenuButton } from "../play/table-menu";
 import { barZones, railWide } from "../play/top-bar-layout";
 
@@ -20,6 +21,10 @@ export type TopBarProps = {
   life: number | null;
   burdenDeck: number | null;
   rail: Rail;
+  // Stops are on and one of the player's stops lies ahead in this phase: a gold S by the next phase.
+  stopAhead: boolean;
+  // The phase carousel is open.
+  carouselOpen: boolean;
   // A small phone in landscape (under 760 pt inside the insets).
   narrow: boolean;
   ticks: readonly number[];
@@ -29,12 +34,14 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, seat, life, burdenDeck, rail, narrow, ticks, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, seat, life, burdenDeck, rail, stopAhead, carouselOpen, narrow, ticks, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const [bar, setBar] = useState(0);
   const [dials, setDials] = useState(0);
   const onBar = (event: LayoutChangeEvent) => setBar(Math.round(event.nativeEvent.layout.width));
   const onDials = (event: LayoutChangeEvent) => setDials(Math.round(event.nativeEvent.layout.width));
-  const zones = bar > 0 ? barZones(bar - 16, dials) : null;
+  // The zones need the bar and the dials measured. Until both are, the rail is held invisible rather than drawn at a guess, so it
+  // never jumps when the table opens.
+  const zones = bar > 0 && dials > 0 ? barZones(bar - 16, dials) : null;
   return (
     <View testID="table-top-bar" className="flex-row items-center px-2" style={{ height: TOP_BAR }} onLayout={onBar}>
       <View testID="top-bar-left" style={{ width: zones?.left ?? "30%" }}>
@@ -66,8 +73,8 @@ export function TableTopBar({ threats, seat, life, burdenDeck, rail, narrow, tic
           </View>
         </ScrollView>
       </View>
-      <View testID="top-bar-middle" style={{ width: zones?.rail ?? "40%" }}>
-        <PhaseRail rail={rail} narrow={!zones || !railWide(zones.rail, narrow)} onPress={onRail} />
+      <View testID="top-bar-middle" style={{ width: zones?.rail ?? "40%", opacity: zones ? 1 : 0 }}>
+        <PhaseRail rail={rail} wide={zones != null && railWide(zones.rail, narrow)} shortRound={narrow} stopAhead={stopAhead} open={carouselOpen} onPress={onRail} />
       </View>
       <View testID="top-bar-right" style={{ width: zones?.right ?? "30%", alignItems: "flex-end" }}>
         <MenuButton open={menuOpen} onPress={onMenu} />

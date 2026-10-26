@@ -2,10 +2,10 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# Phase 19. Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build
+# Phases 19 and 20. Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build
 # (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture is the solo game of Stealth and Steadfastness parked on its loss
 # (src/campaign/fixtures). The top bar holds the dials, the rail and the menu button; Back, Log, Rules, Booklet and Table
-# settings are rows of the menu.
+# settings are rows of the menu. A tap on the rail opens the phase carousel (phase 20).
 - launchApp:
     clearState: true
 - openLink: "middleearthlcg://e2e/lost"
@@ -30,6 +30,19 @@ tags:
     id: log-open
 - assertNotVisible:
     id: table-back
+# A tap on the rail opens the strip of the round's phases, centered on the current one (the fixture is parked on its loss in the Combat phase, round 4); a
+# tap outside closes it and sends nothing. The step keeps its id.
+- assertVisible:
+    id: rail-current
+- tapOn:
+    id: rail
+- assertVisible:
+    id: carousel-phase-combat
+- tapOn:
+    id: carousel-scrim
+    point: "50%,90%"
+- assertNotVisible:
+    id: carousel-phase-combat
 # The menu has its five rows.
 - tapOn:
     id: table-menu

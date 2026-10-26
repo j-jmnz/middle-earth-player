@@ -64,7 +64,7 @@ export function TableDock({
   extras?: readonly DockExtra[];
   // Changes with the moment and the pick: an armed button goes back to unarmed.
   resetKey: string;
-  // The first-game guide's line for the moment (reference.ts); it is turned off in the turn reference.
+  // The first-game guide's line for the moment (reference.ts); it is turned off in the table settings.
   guide?: string | null;
 }) {
   return (

@@ -1,4 +1,4 @@
-// The table's top bar pieces: the phase rail and the threat rings, and the mark beside a log line. These are React Native
+// The table's top bar pieces: the threat rings, and the mark beside a log line (the phase rail is phase-rail.tsx). These are React Native
 // text with testIDs, so Maestro can read them; card pictures stay on the canvas (docs/design-system.md, Table). Phase
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
@@ -9,19 +9,17 @@ import Animated, { FadeIn, FadeOut, ReduceMotion, useAnimatedStyle, useReducedMo
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import type { LogMark } from "./log.ts";
-import type { Rail } from "./rail.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
 import { tableTokens as t } from "./tokens.ts";
 
-const fade = FadeIn.duration(180).reduceMotion(ReduceMotion.System);
 const badgeIn = FadeIn.duration(160).reduceMotion(ReduceMotion.System);
 const badgeOut = FadeOut.duration(400).reduceMotion(ReduceMotion.System);
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
 
 // A token at some opacity, so the palette drift test covers the dial's tint too.
-function withAlphaHex(hex: string, alpha: number): string {
+export function withAlphaHex(hex: string, alpha: number): string {
   const value = Number.parseInt(hex.slice(1), 16);
   return `rgba(${(value >> 16) & 255},${(value >> 8) & 255},${value & 255},${alpha})`;
 }
@@ -32,60 +30,6 @@ const DIAL: Record<ThreatLevel, { edge: string; fill: string; meter: string }> =
   near: { edge: t.danger, fill: withAlphaHex(t.threat, 0.35), meter: t.danger },
   critical: { edge: t.danger, fill: t.threat, meter: t.bone },
 };
-
-/**
- * Previous step, the current step in gold caps, the next step: one centered line; a tap opens the turn reference. `narrow` (a small
- * phone in landscape) keeps the current step alone, which may shrink a little to fit.
- */
-export function PhaseRail({ rail, narrow = false, onPress }: { rail: Rail; narrow?: boolean; onPress?: () => void }) {
-  // A tap opens the turn reference (reference.ts): the round as the Rules Reference charts it, and the stops.
-  return (
-    <Pressable
-      testID="rail"
-      accessible
-      accessibilityRole={onPress ? "button" : undefined}
-      accessibilityLabel={`Round ${rail.round}. ${rail.current}`}
-      accessibilityHint={onPress ? "Opens the turn reference" : undefined}
-      disabled={!onPress}
-      onPress={onPress}
-      style={({ pressed }) => ({ minWidth: 0, flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", paddingHorizontal: narrow ? 0 : 8, minHeight: 44, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
-    >
-      {narrow ? null : (
-        <Text testID="rail-previous" numberOfLines={1} className="flex-1 text-right text-label text-muted">
-          {rail.previous}
-        </Text>
-      )}
-      {/* Until the phase carousel (phase 20) the round is "R3" before the step; the label says it in words. */}
-      {narrow ? null : (
-        <Text testID="rail-round" className="ml-2 text-label text-muted">
-          {`R${rail.round}`}
-        </Text>
-      )}
-      {/* With the turn reference behind it, the current step sits in a hairline pill: it reads as something to tap. */}
-      <Animated.View
-        key={rail.current}
-        entering={fade}
-        style={{ marginHorizontal: narrow ? 0 : 12, flexShrink: 1, ...(onPress ? { borderWidth: 1, borderColor: t.hairline, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 2 } : {}) }}
-      >
-        <Text
-          testID="rail-current"
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.85}
-          className="font-display text-body uppercase text-gold"
-          style={{ textShadowColor: t.gold, textShadowRadius: 8, textShadowOffset: { width: 0, height: 0 } }}
-        >
-          {rail.current}
-        </Text>
-      </Animated.View>
-      {narrow ? null : (
-        <Text testID="rail-next" numberOfLines={1} className="flex-1 text-label text-muted">
-          {rail.next}
-        </Text>
-      )}
-    </Pressable>
-  );
-}
 
 /** The seats' threat in one line, for a panel's header: "Threat 28", or "Player 1 28 · Player 2 31". */
 export function threatLine(threats: readonly SeatThreat[], life: number | null): string {
