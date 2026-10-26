@@ -12,6 +12,10 @@ describe("hardware Back on the table", () => {
     expect(backStep({ ...all, menuOpen: false })).toBe("closePreview");
   });
 
+  it("closes the menu before the tray when only the tray is under it", () => {
+    expect(backStep({ ...none, menuOpen: true, panelOpen: true })).toBe("closeMenu");
+  });
+
   it("closes the reading layer (the carousel and the panels included) after the preview and before anything under it", () => {
     expect(backStep({ ...all, menuOpen: false, previewOpen: false })).toBe("closeReading");
     expect(backStep({ ...none, readingOpen: true, panelOpen: true })).toBe("closeReading");

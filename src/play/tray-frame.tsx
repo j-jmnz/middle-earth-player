@@ -26,12 +26,15 @@ export function TrayFrame({
   open,
   place,
   surface = "night",
+  squareFoot = false,
   testID,
   children,
 }: {
   open: boolean;
   place: TrayPlace;
   surface?: "night" | "paper";
+  // The dock-side foot corner is square (the tray stands on the dock's block).
+  squareFoot?: boolean;
   testID: string;
   children: ReactNode;
 }) {
@@ -74,6 +77,7 @@ export function TrayFrame({
           borderWidth: 1,
           borderColor: paper ? t.inkLine : t.hairline,
           borderRadius: RADIUS,
+          ...(squareFoot ? { borderBottomRightRadius: 0 } : {}),
           paddingHorizontal: 12,
           paddingTop: 8,
           paddingBottom: 8,

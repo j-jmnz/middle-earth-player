@@ -173,40 +173,83 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
   );
 }
 
+/**
+ * A choice tile, on paper (a pile's cards) or on night (the choice tray). `leading` is a card picture, `trailing` a pill (the
+ * foreseen damage); `dense` puts everything on one line (the tray on a short phone). A picked night tile has the gold edge and
+ * a gold check; a paper one a heavier ink edge. A long press (`onLongPress`) reads the card.
+ */
 export function Tile({
   label,
   selected,
   onPress,
+  onLongPress,
   testID,
   detail,
   stats = [],
+  surface = "paper",
+  dense = false,
+  leading = null,
+  trailing = null,
+  said = "",
 }: {
   label: string;
   selected: boolean;
   onPress: () => void;
+  onLongPress?: (() => void) | null;
   testID: string;
   detail?: string | null;
   stats?: readonly SheetStat[];
+  surface?: "night" | "paper";
+  dense?: boolean;
+  leading?: ReactNode;
+  trailing?: ReactNode;
+  // More for a screen reader to say (the foreseen damage).
+  said?: string;
 }) {
+  const night = surface === "night";
+  const numbers = stats.length > 0 || trailing != null ? (
+    <View className="flex-row flex-wrap items-center gap-2">
+      <Stats stats={stats} surface={surface} />
+      {trailing}
+    </View>
+  ) : null;
   return (
     <Pressable
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), detail ?? ""].filter((part) => part.length > 0).join(". ")}
+      accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), said, detail ?? ""].filter((part) => part.length > 0).join(". ")}
+      accessibilityHint={onLongPress ? "Hold to read the card" : undefined}
       onPress={onPress}
+      onLongPress={onLongPress ?? undefined}
     >
       {({ pressed }) => (
         <View
-          className="mb-2 justify-center rounded-tile px-4 py-2"
-          style={{ minHeight: 48, borderWidth: selected ? 1.5 : 1, borderColor: selected ? t.ink : t.inkLine, backgroundColor: pressed ? t.paperPressed : "transparent" }}
+          className={`${dense ? "mb-1 py-0.5" : night ? "mb-1.5 py-1" : "mb-2 py-2"} flex-row items-center gap-2 rounded-tile ${night ? "px-2" : "px-4"}`}
+          style={{
+            minHeight: dense ? 44 : night ? 52 : 48,
+            borderWidth: selected ? 1.5 : 1,
+            borderColor: selected ? (night ? t.gold : t.ink) : night ? t.hairline : t.inkLine,
+            backgroundColor: pressed ? (night ? t.pressed : t.paperPressed) : night ? t.night : "transparent",
+          }}
         >
-          <View className="flex-row items-center justify-between gap-2">
-            <Text className={`shrink text-body text-ink ${selected ? "font-semibold" : ""}`}>{label}</Text>
-            <Stats stats={stats} />
+          {leading}
+          <View className={`flex-1 ${dense ? "flex-row flex-wrap items-center gap-x-2 gap-y-0.5" : ""}`}>
+            <View className={dense ? "" : "flex-row items-center justify-between gap-2"} style={dense ? { flexGrow: 1, flexShrink: 1, minWidth: 84 } : undefined}>
+              <Text numberOfLines={2} className={`shrink text-body ${night ? "text-bone" : "text-ink"} ${selected ? "font-semibold" : ""}`}>
+                {label}
+              </Text>
+              {night || dense ? null : numbers}
+            </View>
+            {detail ? <Text className={`mt-0.5 text-label ${night ? "text-muted" : "text-inkMuted"}`}>{detail}</Text> : null}
+            {night || dense ? <View className={dense ? "" : "mt-0.5"}>{numbers}</View> : null}
           </View>
-          {detail ? <Text className="mt-0.5 text-label text-inkMuted">{detail}</Text> : null}
+          {selected && night ? (
+            <View accessible={false} importantForAccessibility="no" style={{ width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: t.gold }}>
+              <Text style={{ color: t.onGold, fontSize: 13, lineHeight: 16, fontWeight: "700" }}>{"\u2713"}</Text>
+            </View>
+          ) : null}
         </View>
       )}
     </Pressable>

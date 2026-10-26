@@ -8,7 +8,7 @@
 //     more. The top bar stays live, so a dial or the rail replaces the layer.
 //   - The carousel keeps clear of the tray's reach into the canvas, and neither covers the dock's armed line or buttons.
 import { useMemo } from "react";
-import { Pressable } from "react-native";
+import { Pressable, Text } from "react-native";
 import { useStore } from "zustand";
 
 import { ChoiceTray } from "./choice-tray.tsx";
@@ -25,11 +25,14 @@ import type { ReduceContext, TableStore } from "./store.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
-import { trayBox } from "./tray-logic.ts";
+import { BAR_PAD, MENU_BUTTON } from "./top-bar-layout.ts";
+import { outsideLayers, trayBox } from "./tray-logic.ts";
 import type { TableChoice } from "./use-table-choice.ts";
 
-// The menu button's zone at the top bar's right: 44 pt and the bar's 8 pt padding. A tap there is the menu's, never the tray's.
-const MENU_ZONE = 52;
+// The menu button's zone at the top bar's right. A tap there is the menu's, never the tray's.
+const MENU_ZONE = MENU_BUTTON + BAR_PAD;
+// Under this height the tray's tiles go on one line.
+const SHORT = 400;
 const READING_MIN = 300;
 const EDGE = 8;
 
@@ -77,12 +80,13 @@ export function TableLayers({
   const reader = useScreenReader();
   const seat = shownSeat(game);
   const close = () => onReading(null);
-  const box = trayBox({ commandWidth, insetRight: insets.right, screenHeight: screen.height, barBottom, anchorTop: anchorTop ?? Math.round(screen.height * 0.55) });
-  const trayShown = choice.panelOpen && box != null;
+  const anchor = anchorTop ?? Math.round(screen.height * 0.55);
+  const box = trayBox({ commandWidth, insetRight: insets.right, screenWidth: screen.width, screenHeight: screen.height, barBottom, anchorTop: anchor });
+  const trayShown = choice.panelOpen;
   // The panel layer (everything but the carousel).
   const panel = reading && reading.kind !== "carousel" ? reading : null;
   const held = useHeld(panel);
-  const width = Math.max(READING_MIN, box?.width ?? READING_MIN);
+  const width = Math.max(READING_MIN, box.width);
   const foot = Math.max(insets.bottom, EDGE);
   const canvas = screen.width - insets.left - insets.right - commandWidth;
   const open = reading?.kind === "carousel";
@@ -92,23 +96,13 @@ export function TableLayers({
     <>
       {/* A tap outside the open tray, away from the canvas (which folds it itself): the top bar but its menu button, and the empty
           part of the command column above the dock. A screen reader leaves the tray open. */}
-      {trayShown && !panel && !open && !reader && box ? (
+      {outsideLayers({ trayShown, reading: reading != null, reader }) ? (
         <>
           <Pressable testID="tray-outside-bar" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: 0, left: 0, right: insets.right + MENU_ZONE, height: barBottom }} />
-          <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: box.maxHeight + 4 }} />
+          <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: anchor - barBottom }} />
         </>
       ) : null}
-      {box ? (
-        <ChoiceTray
-          open={trayShown}
-          place={box}
-          sheet={choice.sheet}
-          choice={choice.choice}
-          picture={picture}
-          onTile={choice.onTile}
-          onRead={onPreview}
-        />
-      ) : null}
+      <ChoiceTray open={trayShown} place={box} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={screen.height < SHORT} onTile={choice.onTile} onRead={onPreview} />
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
       <TrayFrame open={panel != null} surface="paper" testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE }}>
         {held?.kind === "pile" ? (
@@ -139,6 +133,12 @@ export function TableLayers({
             onClose={close}
           />
         ) : null}
+        {/* A choice is still open under the panel: say so, and the dock's armed button is untouched by closing it. */}
+        {trayShown && panel ? (
+          <Text testID="choice-waiting" className="pt-1 text-center text-label text-inkMuted">
+            Choice waiting
+          </Text>
+        ) : null}
       </TrayFrame>
       {/* The strip hangs over the canvas only, and short of the tray's reach into it. */}
       <PhaseCarousel
@@ -147,7 +147,7 @@ export function TableLayers({
         settings={settings}
         top={barBottom}
         left={insets.left}
-        width={canvas - (trayShown && box ? box.overlap : 0)}
+        width={canvas - (trayShown ? box.overlap : 0)}
         height={Math.round(Math.min(340, (screen.height - barBottom) * 0.92))}
         onChange={(change) => tableSettings.getState().update(change)}
         onClose={close}

@@ -20,7 +20,7 @@ import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
 import { dockExtras } from "./dock-extras.ts";
 import { useStable } from "./use-stable.ts";
 import { highlightKeys, highlightOf, playedCard } from "./highlight-of.ts";
-import { outsideTap, trayOpen } from "./tray-logic.ts";
+import { tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
@@ -229,28 +229,27 @@ export function useTableChoice({
     },
     [dock, onButton, sheet, held, table, open],
   );
-  // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
+  // A tap or a drop outside the open tray folds it and is swallowed (tapRoute).
   const foldOutside = useCallback((): boolean => {
-    if (outsideTap({ panelOpen, reader }) === "route") return false;
+    if (tapRoute({ panelOpen, reader, cardId: "" }) !== "fold") return false;
     setFolded(sheet.key);
     return true;
   }, [panelOpen, reader, sheet.key]);
+  // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
   const onTap = useCallback(
     (cardId: string) => {
-      // The tray is open: a tap on the canvas folds it and picks nothing.
-      if (foldOutside()) return;
-      if (cardId.startsWith("pile:")) {
-        onPile(cardId.slice(5));
-        return;
-      }
-      if (!pick(cardId) && game.cards[cardId]?.face !== "down") onPreview(cardId);
+      const route = tapRoute({ panelOpen, reader, cardId });
+      if (route === "fold") setFolded(sheet.key);
+      else if (route === "pile") onPile(cardId.slice(5));
+      else if (!pick(cardId) && game.cards[cardId]?.face !== "down") onPreview(cardId);
     },
-    [foldOutside, pick, onPile, onPreview, game],
+    [panelOpen, reader, sheet.key, pick, onPile, onPreview, game],
   );
   const onTile = useCallback((id: string) => void pick(id), [pick]);
   const tapOnTable = useStable(onTap);
   const onDrop = useCallback(
     (cardId: string, key: string) => {
+      if (foldOutside()) return;
       const outcome = dropOutcome(game, ctx, legal, cardId, targetFromKey(key));
       store.getState().select(null);
       if (outcome.kind === "play") {
@@ -264,7 +263,7 @@ export function useTableChoice({
         }
       }
     },
-    [game, ctx, legal, names, store, open, base, live, held, table],
+    [foldOutside, game, ctx, legal, names, store, open, base, live, held, table],
   );
 
   const dropOnTable = useStable(onDrop);
@@ -289,7 +288,8 @@ export function useTableChoice({
     choice,
     dock,
     header,
-    picked: pickedWords(sheet, choice, names),
+    // The tray says what is picked (its check and its count); the dock repeats it only once the tray is folded.
+    picked: panelOpen ? null : pickedWords(sheet, choice, names),
     unavailable: sheet.kind === "pick" ? (sheet.unavailable ?? []) : [],
     readout,
     highlight,

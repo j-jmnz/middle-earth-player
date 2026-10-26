@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { openReading, type Reading } from "./reading.ts";
 import type { MultiSheet, PickSheet, TriggerSheet } from "./sheet-types.ts";
 import type { Choice } from "./table-choice.ts";
-import { outsideTap, TRAY_MAX, TRAY_REACH, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
+import { outsideLayers, tapRoute, TRAY_MAX, TRAY_REACH, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
 
 // The choice tray (docs/design-system.md, Table; phase 21): its tiles, its count, what a tap outside it does, and where it sits
 // against the command column and the dock. No rule is implemented here.
@@ -66,20 +66,30 @@ describe("tray tiles and count", () => {
   });
 
   it("counts the picks in words and holds nothing for a window", () => {
-    expect(trayCount(multi, choice("commit", ["a", "b"]))).toBe("2 of 4 picked");
-    expect(trayCount(pick, choice("defense:1", []))).toBe("Pick one of 3");
-    expect(trayCount(pick, choice("defense:1", ["a"]))).toBe("1 picked");
+    expect(trayCount(multi, choice("commit", ["a", "b"]))).toBe("Commit · 2 of 4 picked");
+    expect(trayCount(pick, choice("defense:1", []))).toBe("Defend · pick 1 of 3");
+    expect(trayCount(pick, choice("defense:1", ["a"]))).toBe("Defend · 1 of 3 picked");
   });
 });
 
 describe("the outside tap", () => {
-  it("folds an open tray and is not routed on, so it picks nothing and sends no intent", () => {
-    expect(outsideTap({ panelOpen: true, reader: false })).toBe("fold");
+  it("folds an open tray and goes no further: no pick, no pile, no intent", () => {
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: "c1" })).toBe("fold");
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: "pile:discard" })).toBe("fold");
   });
 
-  it("does not fold while a screen reader is on, or when no tray is open", () => {
-    expect(outsideTap({ panelOpen: true, reader: true })).toBe("route");
-    expect(outsideTap({ panelOpen: false, reader: false })).toBe("route");
+  it("routes normally with a screen reader on or no tray open", () => {
+    expect(tapRoute({ panelOpen: true, reader: true, cardId: "c1" })).toBe("pick");
+    expect(tapRoute({ panelOpen: true, reader: true, cardId: "pile:discard" })).toBe("pile");
+    expect(tapRoute({ panelOpen: false, reader: false, cardId: "c1" })).toBe("pick");
+    expect(tapRoute({ panelOpen: false, reader: false, cardId: "pile:deck" })).toBe("pile");
+  });
+
+  it("mounts the hit layers only while the tray shows and nothing else reads or listens", () => {
+    expect(outsideLayers({ trayShown: true, reading: false, reader: false })).toBe(true);
+    expect(outsideLayers({ trayShown: false, reading: false, reader: false })).toBe(false);
+    expect(outsideLayers({ trayShown: true, reading: true, reader: false })).toBe(false);
+    expect(outsideLayers({ trayShown: true, reading: false, reader: true })).toBe(false);
   });
 
   it("is folded by key: Choose brings the same sheet back, and a new moment opens unfolded", () => {
@@ -99,33 +109,34 @@ describe("the outside tap", () => {
 });
 
 describe("where the tray sits", () => {
-  const phone = (width: number, height: number, anchorTop: number | null, insetRight = 0) => {
+  const phone = (width: number, height: number, anchorTop: number, insetRight = 0) => {
     const commandWidth = Math.round(Math.min(280, Math.max(210, width * 0.3)));
-    return { commandWidth, box: trayBox({ commandWidth, insetRight, screenHeight: height, barBottom: 44, anchorTop }) };
+    return { commandWidth, box: trayBox({ commandWidth, insetRight, screenWidth: width, screenHeight: height, barBottom: 44, anchorTop }) };
   };
 
-  it("is the command column's width plus up to 40 pt into the canvas, at most 340", () => {
+  it("is the command column's width plus 40 pt into the canvas on a wide phone, at most 340", () => {
     expect(phone(844, 390, 200).commandWidth).toBe(253);
     expect(phone(844, 390, 200).box).toMatchObject({ width: 293, overlap: TRAY_REACH });
-    expect(phone(667, 375, 200).commandWidth).toBe(210);
-    expect(phone(667, 375, 200).box).toMatchObject({ width: 250, overlap: TRAY_REACH });
     const wide = phone(1100, 500, 300);
     expect(wide.commandWidth).toBe(280);
-    expect(wide.box?.width).toBeLessThanOrEqual(TRAY_MAX);
+    expect(wide.box.width).toBeLessThanOrEqual(TRAY_MAX);
+  });
+
+  it("reaches no further than the command column under 720 pt wide, so the encounter discard stays in view", () => {
+    expect(phone(667, 375, 200).commandWidth).toBe(210);
+    expect(phone(667, 375, 200).box).toMatchObject({ width: 210, overlap: 0 });
   });
 
   it("ends above the dock's block and rises no higher than the top bar", () => {
     const { box } = phone(844, 390, 210, 47);
-    expect(box).not.toBeNull();
-    // The foot is above the anchor; the top is under the bar.
-    expect(390 - (box?.bottom ?? 0)).toBeLessThan(210);
-    expect((box?.maxHeight ?? 0) + 44 + (box?.bottom ?? 0)).toBeLessThanOrEqual(390);
-    expect(box?.right).toBe(47);
+    expect(390 - box.bottom).toBe(206);
+    expect(box.maxHeight + 44 + box.bottom).toBe(390);
+    expect(box.right).toBe(47);
   });
 
-  it("waits for the dock to be measured, and for room", () => {
-    expect(phone(844, 390, null).box).toBeNull();
-    expect(phone(844, 390, 46).box).toBeNull();
+  it("is never less than a minimum tall, even when the dock leaves no room", () => {
+    expect(phone(844, 390, 46).box.maxHeight).toBeGreaterThanOrEqual(72);
+    expect(phone(844, 390, 100).box.maxHeight).toBeGreaterThanOrEqual(72);
   });
 });
 

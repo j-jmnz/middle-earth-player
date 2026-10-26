@@ -1,4 +1,4 @@
-// The buttons that answer the open moment, in the dock on night or at the foot of a paper panel (docs/design-system.md,
+// The buttons that answer the open moment, in the dock (docs/design-system.md,
 // Table, Two taps). One filled pill always sits in the same place: the confirm of what is picked, or Pass when nothing is.
 // A button that sends an intent with nothing picked arms on its first tap: the line above the buttons says what the second
 // tap does and a bar runs down under it; the second tap sends, and the bar running out, another button, or a new pick puts
@@ -24,7 +24,7 @@ const ONLY_HINT = "Sends at once";
 
 export type DockExtra = { label: string; testID: string; onPress: () => void; accessibilityLabel?: string };
 
-export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Dock; extras?: readonly DockExtra[]; surface: "night" | "paper"; onButton: (button: DockButton) => void }) {
+export function DockButtons({ dock, extras = [], onButton }: { dock: Dock; extras?: readonly DockExtra[]; onButton: (button: DockButton) => void }) {
   const [armed, setArmed] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const left = useSharedValue(1);
@@ -58,7 +58,6 @@ export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Do
     handler();
   };
   const bar = useAnimatedStyle(() => ({ width: `${Math.round(left.get() * 100)}%` }));
-  const paper = surface === "paper";
   const primary = dock.primary;
   const armedButton = [primary, ...dock.secondary].find((button) => button?.testID === armed) ?? null;
   const line = armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : (dock.why ?? (dock.single ? ONLY : null));
@@ -68,32 +67,38 @@ export function DockButtons({ dock, extras = [], surface, onButton }: { dock: Do
           or what the primary waits for. Arming moves nothing. */}
       <View style={{ minHeight: 36, justifyContent: "flex-end" }}>
         {line ? (
-          <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={2} className={`text-center text-label ${armedButton ? (paper ? "text-inkLabel" : "text-gold") : paper ? "text-inkMuted" : "text-muted"}`}>
+          <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={2} className={`text-center text-label ${armedButton ? "text-gold" : "text-muted"}`}>
             {line}
           </Text>
         ) : null}
-        {armedButton ? <Animated.View style={[{ height: 2, alignSelf: "center", backgroundColor: paper ? t.inkLabel : t.gold, marginTop: 1 }, bar]} /> : null}
+        {armedButton ? <Animated.View style={[{ height: 2, alignSelf: "center", backgroundColor: t.gold, marginTop: 1 }, bar]} /> : null}
       </View>
       {primary ? (
         <ChromePrimary
           label={primary.label}
           testID={primary.testID}
-          surface={surface}
           compact
           disabled={!primaryReady(dock)}
           accessibilityHint={primary.arm ? HINT : dock.single ? ONLY_HINT : undefined}
           onPress={() => press(primary)}
         />
       ) : null}
-      {/* The other answers are outlined pills, the reading aids quieter ones: each reads as a button on night. */}
-      <View className="flex-row flex-wrap items-center justify-center gap-1.5">
-        {dock.secondary.map((button) => (
-          <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="outline" tone={paper ? "ink" : armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
-        ))}
-        {extras.map((item) => (
-          <ChromeButton key={item.testID} label={item.label} testID={item.testID} variant="quiet" tone={paper ? "ink" : "bone"} accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
-        ))}
-      </View>
+      {/* The other answers are outlined pills on a row of their own; the reading aids are quieter pills on one row under it (short
+          words: Undo, Read), which wraps if a third shows. */}
+      {dock.secondary.length > 0 ? (
+        <View className="flex-row flex-wrap items-center justify-center gap-1.5">
+          {dock.secondary.map((button) => (
+            <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="outline" tone={armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
+          ))}
+        </View>
+      ) : null}
+      {extras.length > 0 ? (
+        <View className="flex-row flex-wrap items-center justify-center gap-1.5">
+          {extras.map((item) => (
+            <ChromeButton key={item.testID} label={item.label} testID={item.testID} variant="quiet" tone="bone" accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
+          ))}
+        </View>
+      ) : null}
     </View>
   );
 }

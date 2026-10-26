@@ -72,8 +72,11 @@ export function TableDock({
   onBlock?: (top: number) => void;
 }) {
   const block = useRef<ComponentRef<typeof View>>(null);
+  const measure = () => block.current?.measureInWindow((_x, y) => onBlock?.(Math.round(y)));
   return (
     <View testID="dock" className="rounded-card px-3 pb-2 pt-2" style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
+      {/* A guard: where the dock is taller than the column (a short phone, a long title) it scrolls, so its foot is never cut. */}
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled onScrollEndDrag={measure} onMomentumScrollEnd={measure}>
       {/* On a short phone only the sentence scrolls; the numbers, the pick and the buttons stay in sight. */}
       <Text testID="sheet-step" numberOfLines={1} className="text-center font-display text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
         {step}
@@ -101,7 +104,7 @@ export function TableDock({
           ))}
         </ScrollView>
       ) : null}
-      <View ref={block} collapsable={false} onLayout={() => block.current?.measureInWindow((_x, y) => onBlock?.(Math.round(y)))} className="mt-1 gap-1">
+      <View ref={block} collapsable={false} onLayout={measure} className="mt-1 gap-1">
         {readout ? <ReadoutView readout={readout} /> : null}
         {picked ? (
           <Text testID="dock-picked" numberOfLines={3} className="text-center text-body text-bone">
@@ -113,8 +116,9 @@ export function TableDock({
             {refusal}
           </Text>
         ) : null}
-        <DockButtons key={resetKey} dock={dock} extras={extras} surface="night" onButton={onButton} />
+        <DockButtons key={resetKey} dock={dock} extras={extras} onButton={onButton} />
       </View>
+      </ScrollView>
     </View>
   );
 }

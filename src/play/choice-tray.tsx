@@ -4,10 +4,10 @@
 // (the tray's foot sits above them: tray-logic.ts, trayBox). A tile is picked like a card on the table (the same pick,
 // table-choice.ts); a long press on a card's tile shows it large. A tap outside folds the tray (use-table-choice.ts).
 import { Image } from "expo-image";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { IconValue } from "./game-icon.tsx";
-import { Stats } from "./sheet-paper.tsx";
+import { Tile } from "./sheet-paper.tsx";
 import type { Sheet, Unavailable } from "./sheet-types.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { shareFor, type Choice } from "./table-choice.ts";
@@ -15,17 +15,10 @@ import { TrayFrame, useHeld, type TrayPlace } from "./tray-frame.tsx";
 import { trayCount, trayTiles, type TrayTile } from "./tray-logic.ts";
 import { tableTokens as t } from "./tokens.ts";
 
-const PICTURE = { width: 32, height: 44 };
+// A card's picture beside its tile: 32 by 44, or 28 by 38 on a short phone.
+const pictureSize = (dense: boolean) => (dense ? { width: 28, height: 38 } : { width: 32, height: 44 });
 
-function Check() {
-  return (
-    <View accessible={false} importantForAccessibility="no" style={{ width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: t.gold }}>
-      <Text style={{ color: t.onGold, fontSize: 13, lineHeight: 16, fontWeight: "700" }}>{"✓"}</Text>
-    </View>
-  );
-}
-
-// The foreseen damage of a defender, as a pill; threat red edge when it would destroy the card.
+// The foreseen damage of a defender, as a pill; threat red when the card would be destroyed.
 function DamagePill({ mark }: { mark: NonNullable<TrayTile["mark"]> }) {
   return (
     <View
@@ -37,68 +30,10 @@ function DamagePill({ mark }: { mark: NonNullable<TrayTile["mark"]> }) {
   );
 }
 
-function TileView({
-  tile,
-  label,
-  selected,
-  testID,
-  source,
-  onPress,
-  onLongPress,
-}: {
-  tile: TrayTile;
-  label: string;
-  selected: boolean;
-  testID: string;
-  source: PictureSource | null;
-  onPress: () => void;
-  onLongPress: (() => void) | null;
-}) {
-  const said = [label, ...tile.stats.map((stat) => `${stat.word} ${stat.value}`), tile.mark ? `${tile.mark.danger ? "destroyed" : "damage"} ${tile.mark.value}` : "", tile.detail ?? ""].filter((part) => part.length > 0).join(". ");
-  return (
-    <Pressable
-      testID={testID}
-      collapsable={false}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      accessibilityLabel={said}
-      accessibilityHint={onLongPress ? "Hold to read the card" : undefined}
-      onPress={onPress}
-      onLongPress={onLongPress ?? undefined}
-    >
-      {({ pressed }) => (
-        <View
-          className="mb-1.5 flex-row items-center gap-2 rounded-tile px-2 py-1"
-          style={{ minHeight: 52, borderWidth: selected ? 1.5 : 1, borderColor: selected ? t.gold : t.hairline, backgroundColor: pressed ? t.pressed : t.night }}
-        >
-          {tile.code && source ? <Image source={source} recyclingKey={`${tile.code}:tray`} contentFit="contain" accessible={false} style={PICTURE} /> : null}
-          <View className="shrink flex-1">
-            <Text className={`text-body text-bone ${selected ? "font-semibold" : ""}`} numberOfLines={2}>
-              {label}
-            </Text>
-            {tile.detail ? (
-              <Text className="text-label text-muted" numberOfLines={4}>
-                {tile.detail}
-              </Text>
-            ) : null}
-            {tile.stats.length > 0 || tile.mark ? (
-              <View className="mt-0.5 flex-row flex-wrap items-center gap-2">
-                <Stats stats={tile.stats} surface="night" />
-                {tile.mark ? <DamagePill mark={tile.mark} /> : null}
-              </View>
-            ) : null}
-          </View>
-          {selected ? <Check /> : null}
-        </View>
-      )}
-    </Pressable>
-  );
-}
-
 // An option the rules refuse now: a dashed hairline outline with the reason in muted. Text, not a choice.
-function RefusedTile({ item }: { item: Unavailable }) {
+function RefusedTile({ item, dense }: { item: Unavailable; dense: boolean }) {
   return (
-    <View testID={`sheet-unavailable-${item.id}`} accessible accessibilityLabel={`${item.label}. ${item.reason}`} className="mb-2 rounded-tile px-3 py-2" style={{ borderWidth: 1, borderStyle: "dashed", borderColor: t.hairline }}>
+    <View testID={`sheet-unavailable-${item.id}`} accessible accessibilityLabel={`${item.label}. ${item.reason}`} className={`${dense ? "mb-1" : "mb-1.5"} rounded-tile px-3 py-1`} style={{ borderWidth: 1, borderStyle: "dashed", borderColor: t.hairline }}>
       <Text className="text-body text-muted">{item.label}</Text>
       <Text className="text-label text-muted">{item.reason}</Text>
     </View>
@@ -115,6 +50,7 @@ export function ChoiceTray({
   sheet,
   choice,
   picture,
+  dense,
   onTile,
   onRead,
 }: {
@@ -123,6 +59,8 @@ export function ChoiceTray({
   sheet: Sheet;
   choice: Choice;
   picture: (code: string) => PictureSource | null;
+  // A short phone (under 400 pt tall): tiles on one line.
+  dense: boolean;
   onTile: (id: string) => void;
   onRead: ((cardId: string) => void) | null;
 }) {
@@ -132,29 +70,36 @@ export function ChoiceTray({
   const marks = new Set(picked.ids);
   const refused = shown.kind === "pick" ? (shown.unavailable ?? []) : [];
   return (
-    <TrayFrame open={open} place={place} testID="sheet">
-      <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="mb-1 text-center text-label text-muted">
+    <TrayFrame open={open} place={place} squareFoot testID="sheet">
+      <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="mb-1 text-center text-label text-muted" style={{ flexShrink: 0 }}>
         {trayCount(shown, picked)}
       </Text>
       <ScrollView style={{ flexShrink: 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
         {tiles.map((tile) => {
           const share = shareFor(shown, picked, tile.id);
-          const selected = shown.kind === "distribute" ? share > 0 : marks.has(tile.id);
+          const readId = tile.readId;
+          const source = tile.code ? picture(tile.code) : null;
+          const mark = tile.mark;
           return (
-            <TileView
+            <Tile
               key={tile.id}
-              tile={tile}
+              surface="night"
+              dense={dense && tile.detail == null}
               label={shown.kind === "distribute" ? `${tile.label} · ${share}` : tile.label}
-              selected={selected}
+              detail={tile.detail}
+              stats={tile.stats}
+              selected={shown.kind === "distribute" ? share > 0 : marks.has(tile.id)}
               testID={shown.kind === "trigger" ? `sheet-trigger-${tile.id.split("|")[0] ?? tile.id}` : `sheet-option-${tile.id}`}
-              source={tile.code ? picture(tile.code) : null}
+              leading={tile.code && source ? <Image source={source} recyclingKey={`${tile.code}:tray`} contentFit="contain" accessible={false} style={pictureSize(dense)} /> : null}
+              trailing={mark ? <DamagePill mark={mark} /> : null}
+              said={mark ? `${mark.danger ? "destroyed" : "damage"} ${mark.value}` : ""}
               onPress={() => onTile(tile.id)}
-              onLongPress={onRead && tile.readId ? () => tile.readId && onRead(tile.readId) : null}
+              onLongPress={onRead && readId ? () => onRead(readId) : null}
             />
           );
         })}
         {refused.map((item) => (
-          <RefusedTile key={item.id} item={item} />
+          <RefusedTile key={item.id} item={item} dense={dense} />
         ))}
       </ScrollView>
     </TrayFrame>
