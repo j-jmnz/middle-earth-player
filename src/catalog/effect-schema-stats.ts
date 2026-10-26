@@ -77,9 +77,10 @@ export const modifyStatSchema = z.strictObject({
   // `engagedSeatCharacters` is every character of the player the source is engaged with (141050:A:2). `subject` is the card
   // the event a Response answers was about. `actorSeat` and `pickedSeat` hold a seat number (extraDraw). `other` is the second card
   // the answered event names (the enemy a character defends against or attacks), `pickedPlayerHeroes` every hero the picked
-  // player controls, fixed when the effect resolves.
+  // player controls, fixed when the effect resolves. `currentQuest` is the quest card being attempted now (it keeps the change if
+  // another stage replaces it later in the phase).
   target: z
-    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters", "subject", "actorSeat", "pickedSeat", "other", "pickedPlayerHeroes"])
+    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "engagedSeatCharacters", "subject", "actorSeat", "pickedSeat", "other", "pickedPlayerHeroes", "currentQuest"])
     .optional(),
   // Only holders with this trait ("Spy enemies get +1 Threat", 141047:A:1).
   trait: z.string().min(1).optional(),

@@ -6,7 +6,7 @@ import { engagedThisRound } from "./families/attack-events.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
+import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
@@ -183,6 +183,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return stepHolds(state, condition.is);
     case "engagedThisPhase":
       return engagedThisPhase(state) === condition.is;
+    case "questKeyword":
+      return currentQuestHas(state, condition.keyword, ctx.cards) === condition.is;
     case "questKeywords":
       return questHasKeywords(state, ctx) === condition.is;
     // The attack family's conditions (families/attack-strike.ts, families/attack-events.ts).

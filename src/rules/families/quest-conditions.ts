@@ -40,3 +40,11 @@ export function questHasKeywords(state: ScenarioState, ctx: ReduceContext): bool
   if (!stage) return false;
   return Object.values(printedOf(ctx.cards, stage.code).keywords).some((value) => value === true || typeof value === "number");
 }
+
+// The current quest card has this keyword, printed (Hall of Beorn's keywords) or gained from an effect (a flag on the card):
+// Battle and Siege change what the committed characters count (hon.battle, hon.siege; quest.ts questStatOf).
+export function currentQuestHas(state: ScenarioState, keyword: "battle" | "siege", cards: ReduceContext["cards"]): boolean {
+  const stage = state.questStage ? state.cards[state.questStage] : undefined;
+  if (!stage) return false;
+  return printedOf(cards, stage.code).keywords[keyword] || flagged(state, stage.id, keyword);
+}

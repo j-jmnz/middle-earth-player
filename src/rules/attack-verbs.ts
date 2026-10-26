@@ -77,6 +77,10 @@ export function modifyStat(
     case "defender":
       targets = state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? [state.pendingAttack.defenderId] : [];
       break;
+    // The quest card being attempted: it gains Battle or Siege (hon.battle, hon.siege).
+    case "currentQuest":
+      targets = state.questStage ? [state.questStage] : [];
+      break;
     // Every ally, now and entering play later, until the effect ends: an encounter card's lasting effect (rr.lasting-effects,
     // 141071:A:1). The holder is the class, read by modifiedStat.
     case "allies":

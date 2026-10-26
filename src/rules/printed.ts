@@ -35,6 +35,8 @@ export type Keywords = {
   sentinel: boolean;
   ranged: boolean;
   restricted: boolean;
+  battle: boolean;
+  siege: boolean;
   secrecy: number | null;
 };
 
@@ -78,6 +80,8 @@ const EMPTY_KEYWORDS: Keywords = {
   sentinel: false,
   ranged: false,
   restricted: false,
+  battle: false,
+  siege: false,
   secrecy: null,
 };
 
@@ -189,6 +193,8 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       sentinel: keywords.sentinel === true,
       ranged: keywords.ranged === true,
       restricted: keywords.restricted === true,
+      battle: keywords.battle === true,
+      siege: keywords.siege === true,
       secrecy: keywords.secrecy ?? null,
     },
   });

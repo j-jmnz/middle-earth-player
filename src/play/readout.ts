@@ -6,7 +6,7 @@
 import { attackStrength } from "../rules/combat.ts";
 import { hidePassed, hideWillpower } from "../rules/hide.ts";
 import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
-import { committedWillpower, stagingThreat } from "../rules/quest.ts";
+import { committedWillpower, questStatOf, stagingThreat } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 import type { Sheet, SheetStat } from "./sheet-types.ts";
@@ -102,7 +102,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const picked = sheet?.kind === "window" && sheet.commit ? (choice?.ids ?? []).filter((id) => !game.cards[id]?.committed) : [];
     const added = picked.reduce((sum, id) => {
       const card = game.cards[id];
-      return sum + (card ? modifiedStat(game, card, "willpower", ctx.cards) : 0);
+      return sum + (card ? modifiedStat(game, card, questStatOf(game, id, ctx.cards), ctx.cards) : 0);
     }, 0);
     const willpower = committedWillpower(game, ctx.cards) + added;
     const threat = stagingThreat(game, ctx.cards);
