@@ -7,12 +7,12 @@ import { queueEvent } from "../queue.ts";
 import type { ScenarioState } from "../state.ts";
 import { flagged, heldAmount, inPlay, updateCard } from "../state.ts";
 
-// The cards attached to a host that an enemy's destruction or a quest card's defeat is announced to: those in play (a
-// Guarded attachment it guarded hears `unguarded` instead).
+// The cards attached to a host that an enemy's destruction or a quest card's defeat is announced to: the player cards in play
+// (a Guarded attachment it guarded hears `unguarded` instead; an encounter card attached to it has no such ability).
 function heldAttachments(state: ScenarioState, hostId: string): string[] {
   return (state.cards[hostId]?.attachments ?? []).filter((id) => {
     const card = state.cards[id];
-    return card != null && inPlay(card.zone);
+    return card != null && card.controller != null && inPlay(card.zone);
   });
 }
 

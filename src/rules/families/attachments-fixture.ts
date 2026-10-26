@@ -54,7 +54,7 @@ export const ATTACHMENT_CARDS = cardMap([
   attachment("144009", "Ambush", ["Condition", "Trap"]),
 ]);
 
-// The records of these cards among those a test passes (the tests pass every real record, src/effects EFFECTS: the family's,
+// The records of these cards among those a test passes (the tests pass every real record, the effect list's: the family's,
 // and the cards' other lines in pool or generated), plus fixture records. The reducer receives effects as an argument and
 // never imports them.
 export function attachmentCtx(effects: readonly Effect[]) {
