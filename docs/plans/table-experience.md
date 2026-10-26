@@ -1,6 +1,6 @@
 # Table experience: next improvements
 
-Proposals for the landscape table after the 2026-10-25 rework (`docs/design-system.md`, Table). None is built. Each one keeps the brief's rules: the engine computes every number, the table only offers legal choices, and no single tap sends an intent.
+Proposals for the landscape table after the 2026-10-25 rework (`docs/design-system.md`, Table). Status at the current code: 8 and 9 are built, 1 is partly built, and the rest are not (nothing in `src/play` or `src/screens` implements them). Each one keeps the brief's rules: the engine computes every number, the table only offers legal choices, and no single tap sends an intent.
 
 ## Source
 
@@ -10,15 +10,15 @@ So these proposals rest on that structure (teach by playing, round one slowest, 
 
 ## Proposals, most useful first
 
-1. **Combat foresight on the defender pick.** While the player picks a defender, mark each ready character with what the engine says the attack would do to it before the shadow card: the damage, and "destroyed" in danger when the damage reaches its remaining hit points. Same for an undefended hero. The numbers come from `modifiedStat`, as the dock's readout already does for the picked defender.
-2. **A turn reference behind the rail.** A tap on the rail opens a panel listing the round's phases and steps (`rail.ts`, `STEP_WORDS`), the current one marked, each with one line from its rule title in `data/rules` and what the player decides there. It answers "what happens next" without the booklet.
+1. **Combat foresight on the defender pick.** While the player picks a defender, mark each ready character with what the engine says the attack would do to it before the shadow card: the damage, and "destroyed" in danger when the damage reaches its remaining hit points. Same for an undefended hero. The numbers come from `modifiedStat`, as the dock's readout already does for the picked defender. Partly built: `src/play/readout.ts` names the damage and "is destroyed" for the defender or the undefended hero the player has picked; no mark appears on the other characters before a pick.
+2. **A turn reference behind the rail.** A tap on the rail opens a panel listing the round's phases and steps (`src/play/rail.ts`, `STEP_WORDS`), the current one marked, each with one line from its rule title in `data/rules` and what the player decides there. It answers "what happens next" without the booklet.
 3. **A first-game guide.** For the first scenario of a campaign, a dismissible line under the dock's title explains the step the first two times it comes up ("Staging: each player reveals one encounter card; its threat adds to the quest"), worded from the rule spans. Later rounds are quiet, as the video's later rounds are shorter.
 4. **Fewer Pass presses, still confirmed.** A setting, off by default, that passes an action window for the player when nothing they hold can be played or used there. The engine already skips windows where no seat can act; this covers windows where the only actions are ones the player has said they never take early (for example events in the resource phase). The setting is the confirmation; it is shown on the dock while on.
 5. **Threat and engagement cues.** In staging, mark each enemy whose engagement cost is at or below the seat's threat ("Engages at the encounter phase"), and show the threat a failed quest would add next to the threat ring during the quest. Both are engine reads (`engagementCostOf`, the quest readout).
 6. **Affordable at a glance in planning.** Dim hand cards the seat cannot pay for now and show each hero's resources by sphere on its token, so the player sees why a card does not glow.
 7. **Round summary.** At the end of the round, the banner sums the round from the log: threat before and after, progress placed, damage taken, cards drawn and played.
-8. **Undo within an open decision.** Built 2026-10-25: the rule is in `docs/brief.md` (Rules engine). Undo, in the dock, takes back the last choice while it showed nothing hidden: a commit or a card played can be taken back; a defender usually cannot, because the shadow card turns with it.
-9. **Haptics on arm and confirm.** Built 2026-10-25 with `expo-haptics`, which the user allowed: a tick when a button arms, a confirm when an intent is sent or taken back, a reject on a refusal.
+8. **Undo within an open decision.** Built 2026-10-25: the rule is in `docs/brief.md` (Rules engine). Undo, in the dock, takes back the last choice while it showed nothing hidden (`showedHidden` in `src/rules/undo.ts`, the states kept by `src/play/undo-history.ts`): a commit or a card played can be taken back; a defender usually cannot, because the shadow card turns with it.
+9. **Haptics on arm and confirm.** Built 2026-10-25 (`src/play/haptics.ts`) with `expo-haptics`, which the user allowed: a tick when a button arms, a confirm when an intent is sent or taken back, a reject on a refusal.
 10. **Readability options.** A larger-cards setting that drops to five cards across and lets the hand overlap more, and a high-contrast badge option. The badges already carry a sign and an icon, so they do not rest on colour alone.
 11. **Resolve in beats.** After an attack, step the banner through what happened one beat at a time (the shadow card turns, its effect, the damage, a card destroyed), each beat drawn on the cards it touches, instead of one panel of lines. The steps already come in order from the engine; this paces them.
 

@@ -2,6 +2,20 @@
 
 Written 2026-10-24, after phase 8b. It reviews phases 9 to 16 against the new `data/` pipeline and changes the plan where the pipeline cannot yet give deterministic behavior from authoritative sources. Phases 8c and 8d are new. Phases 9 to 16 are rewritten to match.
 
+**Status, 2026-10-26: carried out.** The plan is a record of intent; the findings below describe the repository as it was on 2026-10-24, not now. What became of each part:
+
+| Part | Now |
+| --- | --- |
+| Findings 1 to 9 | All addressed. The RingsDB snapshot is committed (1). Findings 2 and 3 are fixed in the build: `pnpm data:build` writes all six scenarios in `data/scenarios`, with the campaign card, the burden deck and per-player counts modelled. Finding 4: the heading heuristic (`scripts/data/rules/split.ts`) is gone, see E. Finding 5 and 6: the checklist, scoring and the campaign cards' records are in `src/campaign` and `src/effects/authored`. 7: see B. 8: see F. 9: see below. |
+| A. Printed-text ledger | Done: `data/printed/fellowship-of-the-ring.json` (read by `scripts/data/printed/ledger.ts`), scans pinned by `data/sources.json` and kept in `.cache/scans/`. The build uses ledger lines in place of Hall of Beorn text. |
+| B. Line-addressed effects | Done: `Effect.lines`. `scripts/effect-coverage.test.ts` checks that every printed line of a dealt card is owned. `pnpm effects:open` (`src/effects/open-lines.ts`) lists the printed lines no record owns yet. |
+| C. Scenarios from cards | Done as written: the campaign card's and the quest card's Setup records are run by `buildStart` (`src/campaign/start.ts`); DragnCards and Hall of Beorn are cross-checks, with `data/overrides.json` for disagreements. |
+| D. Campaign is cards plus the checklist | Done: `src/campaign/checklist.ts`, `briefing.ts`, `log.ts` (`campaignPool`, `threatPenalty`, `captives`, per-scenario `rounds`), `score.ts`; the campaign cards' Setup and Resolution are records with timings `campaignSetup` and `resolution`; `authored.resolution` is gone from the campaign file. |
+| E. Rules as verified spans | Done, with the shape changed: `data/rules/index.json` (spans with `doc`, `page`, `column`, exact `from` and `to`), `data/rules/columns.json` (column boxes per document), and `data/rules/entries.json` built from them by `scripts/data/rules/`. Archery, toughness, scoring and the checklist have ids. |
+| F. Every step names its cause | Done: `src/rules/cause.ts`; `EngineStep` carries `cause`, and the golden tests refuse a step with no cause. |
+| G. A save is a seed, intents and a data hash | Done: `src/campaign/replay.ts` (`ActiveScenario`, `ENGINE_VERSION` in `src/rules/version.ts`). |
+| New order | Phases 8c and 8d are done. Playable scenarios (`src/campaign/playable.ts`): 1 to 4. Scenarios 5 and 6 (phases 15 and 16) still have open printed lines. Per-phase state is in `docs/phases/STATUS.md`. |
+
 ## What 8b got right
 
 - One network command, pinned snapshots, an offline deterministic build, and a drift check in CI.
@@ -47,7 +61,7 @@ Only the last row is a disagreement between sources. The rest are gaps in the bu
 
 `scripts/data/rules/split.ts` guesses headings in `pdftotext` output. Two-column pages interleave. The test checks that a cited id exists, not that it holds the right text.
 
-- `rr.campaign-pool` and `ltp.campaign-pool` hold the blank log sheet. `ltp.score` holds the credits page.
+- (As found on 2026-10-24; the store is now built from `data/rules/index.json`.) `rr.campaign-pool` and `ltp.campaign-pool` hold the blank log sheet. `ltp.score` holds the credits page.
 - `ltp.attack-strength` is `"12\nDefense Strength\n2"`, and the brief cites it for archery. No archery entry exists, and no toughness entry exists.
 - `rr.campaign-setup-checklist` stops after step 1 of 8. `rr.scoring` lost step 1. The full scoring rule is under `ltp.ending-a-campaign`.
 - 88 of 396 entries are under 80 characters. 145 contain page furniture (page numbers, "photocopy", log labels).
@@ -81,7 +95,7 @@ Stage 2A (142062) removes the Ring-bearer and its attachments from the game. Sta
 
 ### 9. Starter decks are hand-typed code
 
-`src/screens/starter-decks.ts` holds the two lists as TypeScript. The coverage test does not read them. `Restricted` appears in 79 cards (Sting, Glamdring, Andúril, and attachments in the starter decks) and is an unknown keyword token. The engine does not implement it.
+(Fixed: the lists are `data/starter-decks.json`, read from the booklet spans; `Restricted` is a parsed keyword, `src/rules/keywords.ts`.) `src/screens/starter-decks.ts` held the two lists as TypeScript. The coverage test does not read them. `Restricted` appears in 79 cards (Sting, Glamdring, Andúril, and attachments in the starter decks) and is an unknown keyword token. The engine does not implement it.
 
 ## Fundamental changes
 
