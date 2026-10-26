@@ -116,3 +116,7 @@ The table makes plain that this is not the seat acting. Who acts never changes b
 - True solo has one dial and no peek. Nothing changes there.
 - Staging and the quest are shared until Breaking of the Fellowship stage 2B (phase 16). The peek swaps only the seat zones (`zoneIds` and `pileIds`, `selectors.ts:61-87`, `147-158`). When phase 16 adds per-seat staging, it follows the same `shownSeat`.
 - An eliminated seat can still be viewed. Its zones are empty, and the banner says "Player 2 is out of the game".
+
+## Handover from phase 22
+
+- A seat's dial can carry a small gold Ring mark (`threat-<seat>-ring`) on its label while the Ring-bearer is facedown under a location; it sits on the first player's dial (the seat that gets the hero back, `heldBy` in `src/play/widgets.ts`), and the dial's accessibility label says so (`ringWords`). The peek's eye mark and bone ring must not crowd it at 667x375.
