@@ -19,6 +19,11 @@ User directives (2026-10-26):
 - The agent brief is `docs/handover/agent-brief.md`; each unmerged family's line list as assigned is
   `docs/handover/families/<F>.txt` (some lines may be closed since: check `src/effects/open-lines.ts`).
 
+## Resumed session (2026-10-26, session_01Ei8sWpP1Wh3AbvNb34oiyN)
+
+Fresh Sonnet agents (worktrees) are finishing attachments, play, attack and deck from their `wip/<F>` branches, with the
+brief plus an addendum (push to `wip/<F>`, this session's attribution lines). The main session merges each as it reports.
+
 ## Families in progress (stopped at about 12:25 UTC)
 
 Each pushed its work to `wip/<F>` on GitHub; its own handover is `docs/handover/<F>.md` there (a copy is next to this file).
