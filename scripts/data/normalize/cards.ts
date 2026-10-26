@@ -58,6 +58,10 @@ const overridesSchema = z.object({
   scenarioEasy: z
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
+  // Cards the app leaves out of the player card pool (not deck-legal): every card of a pack, or one card by code.
+  outOfScope: z
+    .array(z.object({ pack: z.string().min(1).optional(), code: z.string().min(1).optional(), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
   // A campaign no scenario file is built for yet. The sources group its scenarios under packs; the override names the
   // campaign and the packs (Hall of Beorn products), because no source names a campaign.
   campaigns: z
@@ -294,6 +298,11 @@ function overrideFor(overrides: Overrides, report: BuildReport, probe: { code?: 
   return hit?.set;
 }
 
+// A card the overrides leave out of the player card pool, by its code or by a pack it is printed in.
+function outOfScope(overrides: Overrides, card: Pick<Card, "code" | "printings">): boolean {
+  return overrides.outOfScope.some((entry) => entry.code === card.code || (entry.pack != null && card.printings.some((printing) => printing.pack === entry.pack)));
+}
+
 export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[]; report: BuildReport } {
   const report: BuildReport = { unknownKeywords: {}, twinless: [], overridesUsed: [] };
 
@@ -441,7 +450,8 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const set = overrideFor(overrides, report, { code: card.code, name: card.name });
     const withKeywords = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
     const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
-    const next = set?.name ? { ...withBurden, name: set.name } : withBurden;
+    const named = set?.name ? { ...withBurden, name: set.name } : withBurden;
+    const next = outOfScope(overrides, named) ? { ...named, deckLegal: false } : named;
     cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));

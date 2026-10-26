@@ -12,8 +12,8 @@ limits loom, agents and the main session write handover files and commit so prog
   family owns `src/catalog/families/<F>.ts`, `src/rules/families/<F>*.ts` and `src/effects/authored/families/<F>.ts`.
 - Merged into the branch: encounter, costs, quest, defense.
 - In progress in agent worktrees under `.claude/worktrees`; each agent pushes its WIP checkpoints to `wip/<F>` on GitHub
-  with its handover at `docs/handover/<F>.md` (the user allows extra branches): attack, play, attachments, deck. Not started: sidequests, misc (incl. saga heroes and One Ring cards), motk (Messenger of the King
-  heroes, codes 99<ally code>).
+  with its handover at `docs/handover/<F>.md` (the user allows extra branches): attack, play, attachments, deck. Not started: sidequests, misc (incl. saga heroes and One Ring cards). The Messenger of the King cards
+  (pack MotKA and contract 22134) are left out of the card pool by the user (2026-10-26): no family for them.
 - The agent brief is `docs/handover/agent-brief.md`; each unmerged family's line list (as assigned, some lines may be
   closed since) is `docs/handover/families/<F>.txt`. All of `docs/handover/` is removed when the work is done.
 

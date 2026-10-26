@@ -176,5 +176,17 @@
       "reason": "No source names a campaign. Hall of Beorn numbers the Saga scenarios 1-18 in book order: The Flame of the West 13-15 and The Mountain of Fire 16-18 follow the Two Towers scenarios. The pairing of the packs into one campaign and the campaign's name (the title of the book its scenarios follow) are the saga's published structure, recorded here because no fetched source states them; the scenario count is Hall of Beorn's listing.",
       "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 41"
     }
+  ],
+  "outOfScope": [
+    {
+      "pack": "MotKA",
+      "reason": "The Messenger of the King hero versions of unique allies are left out of the card pool.",
+      "source": "user decision, 2026-10-26"
+    },
+    {
+      "code": "22134",
+      "reason": "The Messenger of the King contract, whose heroes are left out, is left out of the card pool with them.",
+      "source": "user decision, 2026-10-26"
+    }
   ]
 }

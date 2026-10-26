@@ -10,7 +10,6 @@ import * as quest from "./quest.ts";
 import * as play from "./play.ts";
 import * as costs from "./costs.ts";
 import * as deck from "./deck.ts";
-import * as motk from "./motk.ts";
 import * as attachments from "./attachments.ts";
 import * as sidequests from "./sidequests.ts";
 import * as misc from "./misc.ts";
@@ -21,7 +20,7 @@ export type Focus = { seat: number; sourceId: string | null; chosen?: string };
 
 type Runner = (state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]) => ScenarioState | null;
 
-const RUNNERS: readonly Runner[] = [attack.run, defense.run, encounter.run, quest.run, play.run, costs.run, deck.run, motk.run, attachments.run, sidequests.run, misc.run];
+const RUNNERS: readonly Runner[] = [attack.run, defense.run, encounter.run, quest.run, play.run, costs.run, deck.run, attachments.run, sidequests.run, misc.run];
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */
 export function runFamilyVerb(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {

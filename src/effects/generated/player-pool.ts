@@ -118,5 +118,4 @@ export const POOL_GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"22112:constant:1","cardCode":"22112","lines":["22112:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"},"limitPerHost":true}]},
   {"id":"22115:constant:1","cardCode":"22115","lines":["22115:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
   {"id":"22138:constant:1","cardCode":"22138","lines":["22138:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","trait":"Noble"},"limitPerHost":true}]},
-  {"id":"99141006:constant:1","cardCode":"99141006","lines":["99141006:A:3"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"ModifyStat","stat":"hitPoints","amount":1,"until":"whileSourceInPlay","target":"hobbitCharacters"}]},
 ];

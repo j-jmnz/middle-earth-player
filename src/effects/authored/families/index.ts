@@ -7,13 +7,12 @@ import * as quest from "./quest.ts";
 import * as play from "./play.ts";
 import * as costs from "./costs.ts";
 import * as deck from "./deck.ts";
-import * as motk from "./motk.ts";
 import * as attachments from "./attachments.ts";
 import * as sidequests from "./sidequests.ts";
 import * as misc from "./misc.ts";
 
 // Records written by mechanic family rather than by pack (docs/plans/effect-authoring.md).
-const FAMILIES = [attack, defense, encounter, quest, play, costs, deck, motk, attachments, sidequests, misc];
+const FAMILIES = [attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc];
 
 export const FAMILY_AUTHORED_EFFECTS: readonly Effect[] = FAMILIES.flatMap((family) => family.RECORDS);
 export const FAMILY_AUTHORED_REPLACES: readonly string[] = FAMILIES.flatMap((family) => family.REPLACES);

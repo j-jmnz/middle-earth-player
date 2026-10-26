@@ -1,7 +1,7 @@
 # Authoring effect records for the player pool
 
-Every deck-legal player card is automated (user decision, 2026-10-26). This is the cookbook for turning a card's printed
-lines into effect records. The schema is the authority: `src/catalog/effect-schema.ts` and its parts
+Every deck-legal player card is automated (user decision, 2026-10-26); the Messenger of the King cards are left out of the
+pool. This is the cookbook for turning a card's printed lines into effect records. The schema is the authority: `src/catalog/effect-schema.ts` and its parts
 (`effect-schema-verbs.ts`, `-pick.ts`, `-conditions.ts`, `-stats.ts`, `-amount.ts`). Every field there has a comment saying
 what the engine does with it. If a line needs something the schema does not have, leave the line open and report it; do
 not bend a verb to mean something else.
@@ -19,7 +19,7 @@ not bend a verb to mean something else.
 ## Mechanic families: engine and records together
 
 The lines the vocabulary could not express are worked by mechanic family (attack, defense, encounter, quest, play, costs,
-deck, motk, attachments, sidequests, misc): whoever takes a family adds the engine support and writes the records. A family
+deck, attachments, sidequests, misc): whoever takes a family adds the engine support and writes the records. A family
 owns three files, composed by the `index.ts` next to them, so families do not edit the same lists:
 
 - `src/catalog/families/<family>.ts`: `VERBS` (zod `strictObject`s with `...when` from `effect-schema-conditions.ts`, each
