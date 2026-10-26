@@ -149,7 +149,15 @@ describe("motionsBetween: a seat handoff", () => {
     expect(hand?.flip).toBe(false);
     expect(hand?.delay).toBe(0);
     expect(hand?.dy).toBeGreaterThan(0);
-    expect(still(motions.get("z") as never)).toBe(true);
+    // The new seat's other cards fade in over the hand's slide, so the two seats cross-fade, without moving.
+    const play = motions.get("z");
+    expect(play?.slide).toBe(true);
+    expect(play?.fromOpacity).toBe(0);
+    expect(play?.dy).toBe(0);
+    expect(play?.flip).toBe(false);
+    expect(poseAt(play as never, 0, 1).opacity).toBe(0);
+    expect(poseAt(play as never, MOTION.seatHand.ms / 2, 1).opacity).toBeGreaterThan(0.4);
+    expect(poseAt(play as never, motionEnd(play as never), 1).opacity).toBe(1);
   });
 });
 
@@ -246,6 +254,9 @@ describe("ghostPoseAt", () => {
     expect(gone.opacity).toBe(0);
     expect(gone.dx).toBeCloseTo(ghost.dx, 5);
     expect(gone.scale).toBeCloseTo(ghost.scale, 5);
+    // It fades on the way out, not at the end: a quarter of the way into the run it is already down to 56%.
+    expect(ghostPoseAt(ghost, shake + MOTION.cardLeave.ms * 0.25, 1).opacity).toBeCloseTo(0.5625, 5);
+    expect(ghostPoseAt(ghost, shake + MOTION.cardLeave.ms * 0.5, 1).dx).toBeCloseTo(ghost.dx * 0.125, 5);
   });
 });
 

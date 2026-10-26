@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { clamp01 } from "./motion-curves.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { floatWords, tokenDeltas, type Counted } from "./token-deltas.ts";
-import { FLOAT_MS, POP_MS, floatAt, fxPlan, fxSpan, tokenPopScale } from "./token-fx.ts";
+import { FLOAT_MS, POP_MS, floatAt, fxPlan, fxSpan, popShows, tokenPopScale } from "./token-fx.ts";
 import { tokenSpot, TOKEN } from "./token-spots.ts";
 
 const counts = (damage: number, resources: number, progress: number) => ({ damage, resources, progress });
@@ -69,6 +69,17 @@ describe("token fx", () => {
   it("runs 0.6 as long at Quick", () => {
     expect(floatAt(FLOAT_MS * 0.6, 0.6).opacity).toBeCloseTo(0, 5);
     expect(clamp01(tokenPopScale(MOTION.tokenPopRise.ms * 0.6, 0.6) - 1)).toBeCloseTo(0.4, 5);
+  });
+});
+
+describe("popShows", () => {
+  it("pops a token that is still on the card and leaves a count that fell to 0 to the floating number", () => {
+    expect(popShows(2, false)).toBe(true);
+    expect(popShows(0, false)).toBe(false);
+  });
+
+  it("always pops a quest card or location's strip, which is drawn at 0 too", () => {
+    expect(popShows(0, true)).toBe(true);
   });
 });
 

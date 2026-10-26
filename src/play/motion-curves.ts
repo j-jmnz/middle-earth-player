@@ -3,6 +3,12 @@
 // motion-tokens.ts names the curves and springs; motion-run.ts gives Reanimated the same names for the chrome.
 import { SHAPE, springOmega, type EasingName, type Spring } from "./motion-tokens.ts";
 
+/** A token's length in ms at the motion scale `k`, never under 1 so a division by it is safe. */
+export function length(token: { ms: number }, k: number): number {
+  "worklet";
+  return Math.max(1, token.ms * k);
+}
+
 export function clamp01(x: number): number {
   "worklet";
   return x < 0 ? 0 : x > 1 ? 1 : x;
@@ -50,4 +56,19 @@ export function springStep(t: number, token: Spring): number {
 export function scaledSpring(token: Spring, scale: number): Spring {
   "worklet";
   return { ms: Math.max(1, token.ms * scale), zeta: token.zeta };
+}
+
+/**
+ * A pop that settles: 1 up to `peak` over `rise`, held for `hold` ms (unscaled), then back to 1 on `settle`. The reveal's pop and a
+ * token's pop are both this one curve.
+ */
+export function popScale(t: number, k: number, peak: number, rise: { ms: number }, hold: number, settle: Spring): number {
+  "worklet";
+  if (t <= 0) return 1;
+  const up = length(rise, k);
+  const stay = hold * k;
+  const bump = peak - 1;
+  if (t < up) return 1 + bump * ease("outCubic", t / up);
+  if (t < up + stay) return peak;
+  return 1 + bump * (1 - springStep(t - up - stay, scaledSpring(settle, k)));
 }

@@ -1,22 +1,21 @@
 // The pop of a token whose count changed and the number that floats up from it (phase 23). Pure functions of time, run on the UI
 // thread by token-fx.native.tsx (the functions marked "worklet" run there; in Node the directive is an unused string).
-import { clamp01, ease, scaledSpring, springStep } from "./motion-curves.ts";
+import { clamp01, ease, length, popScale } from "./motion-curves.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
 import type { TokenDelta } from "./token-deltas.ts";
-
-function length(token: { ms: number }, k: number): number {
-  "worklet";
-  return Math.max(1, token.ms * k);
-}
 
 /** The scale of a popping token `t` ms after its count changed: 1 up to the pop, then back to 1 on a spring. */
 export function tokenPopScale(t: number, k: number): number {
   "worklet";
-  if (t <= 0) return 1;
-  const rise = length(MOTION.tokenPopRise, k);
-  const bump = SHAPE.tokenPop - 1;
-  if (t < rise) return 1 + bump * ease("outCubic", t / rise);
-  return 1 + bump * (1 - springStep(t - rise, scaledSpring(MOTION.tokenPopSettle, k)));
+  return popScale(t, k, SHAPE.tokenPop, MOTION.tokenPopRise, 0, MOTION.tokenPopSettle);
+}
+
+/**
+ * Whether a change pops its token: the token is drawn only while its count is above 0, so a count that fell to 0 has nothing to
+ * pop (the floating number carries the change), unless the pop is a quest card or location's strip, which is always drawn.
+ */
+export function popShows(count: number, strip: boolean): boolean {
+  return strip || count > 0;
 }
 
 /** How long the pop runs, unscaled. */

@@ -98,8 +98,9 @@ export function motionsBetween(
       continue;
     }
     if (handoff) {
-      // The acting seat changed: nothing is dealt. Its hand slides up into place, and the rest is simply there.
-      motions.set(slot.id, slot.zone === "hand" ? { ...STILL(slot), dy: slot.h * SHAPE.seatHandRise, fromOpacity: 0, slide: true } : STILL(slot));
+      // The acting seat changed: nothing is dealt. Its hand slides up into place and the rest fades in over the same time, so the two
+      // seats cross-fade (the old seat's cards leave as ghosts).
+      motions.set(slot.id, { ...STILL(slot), dy: slot.zone === "hand" ? slot.h * SHAPE.seatHandRise : 0, fromOpacity: 0, slide: true });
       continue;
     }
     // New on the table: a hand card comes off the deck, an encounter card off the encounter deck, anything else grows in.

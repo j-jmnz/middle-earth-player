@@ -130,7 +130,7 @@ export function PhaseRail({
   useEffect(() => {
     if (lastPhase.current === rail.phase) return;
     lastPhase.current = rail.phase;
-    if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing({ ms: MOTION.railFlash.ms - MOTION.railFlashIn.ms, easing: null }, scale))));
+    if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing(MOTION.railFlashOut, scale))));
   }, [rail.phase, scale, flash]);
   const edge = useAnimatedStyle(() => ({
     borderColor: interpolateColor(flash.get(), [0, 1], [open ? t.gold : t.goldLine, t.gold]),

@@ -93,8 +93,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   );
 
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
-  const { moves, clock, k } = useCardMotion(store, layout, seat);
-  const motionClock = clock.progress;
+  const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat);
+  const { progress: hurryProgress, clear: hurryClear } = hurry;
   const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);
   const returnTiming = useMemo(() => timing(MOTION.dragReturn, k), [k]);
 
@@ -147,7 +147,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         cancelAnimation(dx);
         cancelAnimation(dy);
         cancelAnimation(lift);
-        finishMotions(motionClock);
+        finishMotions(hurryProgress, hurryClear);
         dx.set(0);
         dy.set(0);
         lift.set(1);
@@ -220,7 +220,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
       });
 
     return Gesture.Race(pan, hold, tap);
-  }, [slots, lifts, drops, dragging, dx, dy, lift, k, liftTiming, returnTiming, motionClock, select, onDrop, onTap, onPreview]);
+  }, [slots, lifts, drops, dragging, dx, dy, lift, k, liftTiming, returnTiming, hurryProgress, hurryClear, select, onDrop, onTap, onPreview]);
 
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
@@ -308,7 +308,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
             {drawBody(slot, lifted?.id === slot.id && slot.kind === "card")}
           </Moving>
         ))}
-        <TokenFx fx={moves.fx} layout={layout} clock={clock} images={tokens} fonts={fonts} ringOf={(code) => sphereRing(sphereOf(code))} stripOf={(slot) => stripText(slot, info(slot.id).questPoints)} contrast={contrast} />
+        <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} ringOf={(code) => sphereRing(sphereOf(code))} stripOf={(slot) => stripText(slot, info(slot.id).questPoints)} contrast={contrast} />
         {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} /> : null}
         {layout.marks.map((mark) => (
           <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} />

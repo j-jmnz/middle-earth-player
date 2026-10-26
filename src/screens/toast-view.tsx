@@ -1,13 +1,12 @@
 import { useFocusEffect, useIsFocused } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AccessibilityInfo, Text, View } from "react-native";
-import Animated, { FadeInDown, FadeOut, ReduceMotion } from "react-native-reanimated";
+import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
+import { layoutAnim, useMotionScale } from "../play/motion-run";
+import { MOTION } from "../play/motion-tokens";
 import { TextButton } from "./chrome";
 import { dismissToast, leaveToastScreen, toastDuration, useToast } from "./toast";
-
-const enter = FadeInDown.duration(160).reduceMotion(ReduceMotion.System);
-const leave = FadeOut.duration(120).reduceMotion(ReduceMotion.System);
 
 function useScreenReader(): boolean {
   const [enabled, setEnabled] = useState(false);
@@ -37,6 +36,9 @@ export function ToastView() {
   const focused = useIsFocused();
   const toast = focused ? store : null;
   const screenReader = useScreenReader();
+  // The fades are tokens (toastIn, toastOut) at the Animation speed; reduced motion snaps them.
+  const scale = useMotionScale();
+  const fade = useMemo(() => ({ enter: layoutAnim(FadeInDown, MOTION.toastIn, scale), leave: layoutAnim(FadeOut, MOTION.toastOut, scale) }), [scale]);
   useFocusEffect(useCallback(() => () => leaveToastScreen(), []));
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export function ToastView() {
   return (
     <View className="py-2">
       {/* NativeWind does not style a Reanimated view, so the panel is a plain view inside it. */}
-      <Animated.View key={toast.id} entering={enter} exiting={leave}>
+      <Animated.View key={toast.id} entering={fade.enter} exiting={fade.leave}>
         <View
           testID="toast"
           accessibilityLiveRegion="polite"

@@ -1,6 +1,6 @@
 // The token pop and the floating number (docs/design-system.md, Table, Motion; phase 23): when a damage, resource or progress count
 // changes, its token pops (1 to 1.4 and back on a spring) and a number rises 20 pt from it and fades ("+2" in gold for a gain,
-// "-1" in threat red for damage or a loss, Marcellus 13 pt with a night outline). Progress placed on a quest card or a location
+// "-1" in danger red for damage or a loss, Marcellus 13 pt with a night outline). Progress placed on a quest card or a location
 // pops its strip's count the same way. The numbers are the reducer's (token-deltas.ts); this only draws them, from the clock of
 // card-motion.native.tsx, on a layer over the cards. The pop is a copy of the token drawn over the real one, shown only while it
 // pops, so the table has nothing extra to redraw when it is over.
@@ -11,7 +11,7 @@ import { Outlined, type Fonts, type TokenImages } from "./canvas-pieces.native.t
 import type { Clock } from "./card-motion.native.tsx";
 import { slotBounds, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { floatWords, type TokenKind } from "./token-deltas.ts";
-import { FLOAT_MS, floatAt, POP_MS, tokenPopScale, type Fx } from "./token-fx.ts";
+import { FLOAT_MS, floatAt, POP_MS, popShows, tokenPopScale, type Fx } from "./token-fx.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { tableTokens as t } from "./tokens.ts";
 
@@ -65,7 +65,7 @@ function Float({ fx, rect, clock, font }: { fx: Fx; rect: Rect; clock: Clock; fo
   const opacity = useDerivedValue(() => (since.get() < 0 || since.get() > FLOAT_MS * k ? 0 : frame.get().opacity));
   return (
     <Group transform={transform} opacity={opacity}>
-      <Outlined x={spot.cx} y={spot.cy - TOKEN / 2} text={words.text} font={font} color={words.gain ? t.gold : t.threat} heavy />
+      <Outlined x={spot.cx} y={spot.cy - TOKEN / 2} text={words.text} font={font} color={words.gain ? t.gold : t.danger} heavy />
     </Group>
   );
 }
@@ -104,7 +104,7 @@ export function TokenFx({
         const strip = item.delta.token === "progress" ? stripOf(slot) : null;
         return (
           <Group key={key}>
-            <Pop fx={item} slot={slot} rect={rect} clock={clock} images={images} fonts={fonts} ring={item.delta.token === "resources" ? ringOf(slot.code) : null} contrast={contrast} strip={strip} />
+            {popShows(countOf(slot, item.delta.token), strip != null) ? <Pop fx={item} slot={slot} rect={rect} clock={clock} images={images} fonts={fonts} ring={item.delta.token === "resources" ? ringOf(slot.code) : null} contrast={contrast} strip={strip} /> : null}
             {font ? <Float fx={item} rect={rect} clock={clock} font={font} /> : null}
           </Group>
         );

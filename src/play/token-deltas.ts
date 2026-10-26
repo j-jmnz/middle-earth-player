@@ -5,7 +5,7 @@
 /** A token a card carries a count of. */
 export type TokenKind = "damage" | "resources" | "progress";
 
-export const TOKEN_KINDS: readonly TokenKind[] = ["resources", "damage", "progress"];
+const TOKEN_KINDS: readonly TokenKind[] = ["resources", "damage", "progress"];
 
 /** The part of a state this reads: each card's counts. A ScenarioState has it. */
 export type Counted = { readonly cards: Readonly<Record<string, { readonly damage: number; readonly resources: number; readonly progress: number }>> };

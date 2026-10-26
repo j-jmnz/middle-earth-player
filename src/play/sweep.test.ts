@@ -1,26 +1,62 @@
-// The phase title sweep (phase 23): which phase changes sweep, and its fade and slide.
+// The phase title sweep (phase 23): which phase changes sweep, when it is held back, and its fade and slide.
 import { describe, expect, it } from "vitest";
 
 import { SHAPE } from "./motion-tokens.ts";
-import { sweepFrame, sweepName } from "./sweep.ts";
+import { busyBetween, sweepFrame, sweepName, type PhasePoint, type Seen } from "./sweep.ts";
+
+const at = (phase: string, round = 3): PhasePoint => ({ phase, round });
 
 describe("sweepName", () => {
   it("names a new phase of the round", () => {
-    expect(sweepName("Resource", "Planning", "normal", 1)).toBe("Planning");
-    expect(sweepName("Combat", "Refresh", "normal", 1)).toBe("Refresh");
+    expect(sweepName(at("Resource"), at("Planning"), 1, false)).toBe("Planning");
+    expect(sweepName(at("Combat"), at("Refresh"), 1, false)).toBe("Refresh");
+  });
+
+  it("names the Resource phase of the next round", () => {
+    expect(sweepName(at("Refresh", 3), at("Resource", 4), 1, false)).toBe("Resource");
   });
 
   it("names nothing when the phase did not change", () => {
-    expect(sweepName("Quest", "Quest", "normal", 1)).toBeNull();
+    expect(sweepName(at("Quest"), at("Quest"), 1, false)).toBeNull();
   });
 
   it("names nothing for the setup, the mulligan or the round's ends", () => {
-    for (const now of ["Setup", "Mulligan", "Beginning of round", "End of round", ""]) expect(sweepName("Refresh", now, "normal", 1)).toBeNull();
+    for (const now of ["Setup", "Mulligan", "Beginning of round", "End of round", ""]) expect(sweepName(at("Refresh"), at(now), 1, false)).toBeNull();
   });
 
-  it("is skipped under Quick and under reduced motion", () => {
-    expect(sweepName("Resource", "Planning", "quick", 0.6)).toBeNull();
-    expect(sweepName("Resource", "Planning", "normal", 0)).toBeNull();
+  it("is skipped when the scale is not 1: under Quick (0.6) and under reduced motion (0)", () => {
+    expect(sweepName(at("Resource"), at("Planning"), 0.6, false)).toBeNull();
+    expect(sweepName(at("Resource"), at("Planning"), 0, false)).toBeNull();
+  });
+
+  it("is skipped when the state moves cards or changes a count", () => {
+    expect(sweepName(at("Beginning of round"), at("Resource"), 1, true)).toBeNull();
+    expect(sweepName(at("Resource"), at("Planning"), 1, true)).toBeNull();
+  });
+
+  it("is skipped when the phase goes back (Undo), in the round or across it", () => {
+    expect(sweepName(at("Quest"), at("Planning"), 1, false)).toBeNull();
+    expect(sweepName(at("Resource", 4), at("Refresh", 3), 1, false)).toBeNull();
+  });
+
+  it("names a phase reached from outside the seven", () => {
+    expect(sweepName(at("Setup", 0), at("Resource", 1), 1, false)).toBe("Resource");
+  });
+});
+
+describe("busyBetween", () => {
+  const card = (zone: string, exhausted: boolean, damage = 0) => ({ zone, exhausted, damage, resources: 0, progress: 0 });
+  const state = (cards: Seen["cards"]): Seen => ({ cards });
+  const base = state({ a: card("play", false), b: card("hand", false) });
+
+  it("is false when nothing moved, turned or counted differently", () => {
+    expect(busyBetween(base, state({ a: card("play", false), b: card("hand", false) }))).toBe(false);
+  });
+
+  it("is true for a card that changed zone, turned, or took a count", () => {
+    expect(busyBetween(base, state({ a: card("play", false), b: card("play", false) }))).toBe(true);
+    expect(busyBetween(base, state({ a: card("play", true), b: card("hand", false) }))).toBe(true);
+    expect(busyBetween(base, state({ a: card("play", false, 2), b: card("hand", false) }))).toBe(true);
   });
 });
 

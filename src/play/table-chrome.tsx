@@ -125,8 +125,7 @@ function ThreatDial({
     const was = wasActive.current;
     wasActive.current = active;
     if (!active || was || speed === 0) return;
-    const half = { ms: MOTION.seatPulse.ms / 2, easing: MOTION.seatPulse.easing };
-    pulse.set(withSequence(withTiming(1, timing(half, speed)), withTiming(0, timing(half, speed))));
+    pulse.set(withSequence(withTiming(1, timing(MOTION.seatPulseHalf, speed)), withTiming(0, timing(MOTION.seatPulseHalf, speed))));
   }, [active, speed, pulse]);
   const ringStyle = useAnimatedStyle(() => ({ opacity: pulse.get(), transform: [{ scale: 1 + (SHAPE.seatPulse - 1) * pulse.get() }] }));
   useEffect(() => {

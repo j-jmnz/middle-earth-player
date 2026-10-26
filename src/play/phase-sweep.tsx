@@ -9,35 +9,40 @@ import { useStore } from "zustand";
 
 import { timing, useMotionScale } from "./motion-run.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
-import { SETTLE_MS, sweepFrame, sweepName } from "./sweep.ts";
+import { busyBetween, SETTLE_MS, sweepFrame, sweepName } from "./sweep.ts";
 import type { TableStore } from "./store.ts";
-import { tableSettings } from "./table-settings.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 /** `area` is the canvas on the screen: the title crosses its center. */
 export function PhaseSweep({ store, area }: { store: TableStore; area: { left: number; top: number; width: number; height: number } }) {
-  const phase = useStore(store, (state) => state.game.phase);
-  const speed = useStore(tableSettings, (state) => state.settings.animationSpeed);
+  // Every state renders this, so the effect that keeps the game before reads the one just before this.
+  const game = useStore(store, (state) => state.game);
+  const { phase, round } = game;
   const scale = useMotionScale();
-  const before = useRef(phase);
+  const before = useRef(store.getState().game);
   const [shown, setShown] = useState<string | null>(null);
   const progress = useSharedValue(0);
+  // On a change of phase (or round): sweep unless the state moves cards, changes a count, or took the phase back. The game before
+  // is kept by the effect below, which runs after this one.
   useEffect(() => {
     const was = before.current;
-    before.current = phase;
-    const name = sweepName(was, phase, speed, scale);
+    const now = store.getState().game;
+    const name = sweepName({ phase: was.phase, round: was.round }, { phase: now.phase, round: now.round }, scale, busyBetween(was, now));
     if (!name) return;
     const timer = setTimeout(() => {
       setShown(name);
       progress.set(0);
       progress.set(
-        withTiming(1, timing(MOTION.sweep, 1), (finished) => {
+        withTiming(1, timing(MOTION.sweep, scale), (finished) => {
           if (finished) scheduleOnRN(setShown, null);
         }),
       );
     }, SETTLE_MS);
     return () => clearTimeout(timer);
-  }, [phase, speed, scale, progress]);
+  }, [phase, round, scale, store, progress]);
+  useEffect(() => {
+    before.current = store.getState().game;
+  });
   const style = useAnimatedStyle(() => {
     const frame = sweepFrame(progress.get(), SHAPE.sweepSlide);
     return { opacity: frame.opacity, transform: [{ translateX: frame.offset }] };

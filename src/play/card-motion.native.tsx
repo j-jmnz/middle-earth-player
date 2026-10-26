@@ -4,8 +4,9 @@
 // UI thread and draws the cards through it. The canvas still draws only when what it shows changes: the clock runs for one state
 // and stops, and there is no idle loop. A touch on the canvas finishes it at once (finishMotions); it never delays an intent.
 import { Group, vec } from "@shopify/react-native-skia";
-import { useLayoutEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 import { cardFrame } from "./frame.ts";
 import { tickLand } from "./haptics.ts";
@@ -26,22 +27,27 @@ export type Moves = { motions: ReadonlyMap<string, Motion>; ghosts: readonly Gho
  */
 export type Clock = { progress: SharedValue<number>; epoch: SharedValue<number>; at: number; k: number; span: number };
 
-/** A touch on the canvas finishes the running card motions at once: their progress is set to 1. */
-export function finishMotions(progress: SharedValue<number>): void {
+/**
+ * A touch on the canvas finishes the running card motions at once: their progress is set to 1, and the pending landing tick is
+ * dropped (`clear`, on the JavaScript thread), so no haptic follows a card that was snapped into place. The token pops and
+ * floating numbers have a clock of their own and keep running.
+ */
+export function finishMotions(progress: SharedValue<number>, clear: () => void): void {
   "worklet";
   cancelAnimation(progress);
   progress.set(1);
+  scheduleOnRN(clear);
 }
 
-type Track = { layout: TableLayout; seat: number; counts: ScenarioState; moves: Moves; span: number };
+type Track = { layout: TableLayout; seat: number; counts: ScenarioState; moves: Moves; span: number; fxSpan: number };
 
 /**
  * Works out the motion of each new layout once, during the render (React's pattern for state that follows a prop), and runs the
  * clock for it. With the scale at 0 (reduced motion), or when the canvas changed size, nothing moves and the clock is done.
  */
-export function useCardMotion(store: TableStore, layout: TableLayout, seat: number): { moves: Moves; clock: Clock; k: number } {
+export function useCardMotion(store: TableStore, layout: TableLayout, seat: number): { moves: Moves; clock: Clock; fxClock: Clock; k: number; hurry: { progress: SharedValue<number>; clear: () => void } } {
   const k = useMotionScale();
-  const [track, setTrack] = useState<Track>(() => ({ layout, seat, counts: store.getState().game, moves: { ...motionsBetween(null, layout, () => null), fx: [], at: 1 }, span: 0 }));
+  const [track, setTrack] = useState<Track>(() => ({ layout, seat, counts: store.getState().game, moves: { ...motionsBetween(null, layout, () => null), fx: [], at: 1 }, span: 0, fxSpan: 0 }));
   if (track.layout !== layout) {
     const game = store.getState().game;
     const zoneNow = (cardId: string) => game.cards[cardId]?.zone ?? null;
@@ -57,18 +63,27 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
           return slot ? (motion && !still(motion) ? motionEnd(motion) : 0) : null;
         })
       : [];
-    const span = animate ? Math.max(motionSpan(between), fxSpan(fx)) : 0;
-    setTrack({ layout, seat, counts: game, moves: { ...between, fx, at: track.moves.at + 1 }, span });
+    setTrack({ layout, seat, counts: game, moves: { ...between, fx, at: track.moves.at + 1 }, span: animate ? motionSpan(between) : 0, fxSpan: animate ? fxSpan(fx) : 0 });
   }
   const { moves, span } = track;
   const progress = useSharedValue(1);
+  const fxProgress = useSharedValue(1);
   const epoch = useSharedValue(0);
   const scaled = Math.ceil(span * k);
+  const fxScaled = Math.ceil(track.fxSpan * k);
+  const tick = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clear = useCallback(() => {
+    if (tick.current) clearTimeout(tick.current);
+    tick.current = null;
+  }, []);
   // Once per new state: start its clock, and time the tick of a played card's landing. A change of the speed setting alone does not
   // play the last state again.
   useLayoutEffect(() => {
     epoch.set(moves.at);
     cancelAnimation(progress);
+    cancelAnimation(fxProgress);
+    fxProgress.set(fxScaled === 0 ? 1 : 0);
+    if (fxScaled > 0) fxProgress.set(withTiming(1, { duration: fxScaled, easing: easingOf("linear") }));
     if (scaled === 0) {
       progress.set(1);
       return;
@@ -76,14 +91,14 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
     progress.set(0);
     progress.set(withTiming(1, { duration: scaled, easing: easingOf("linear") }));
     const landing = landAt(moves.motions);
-    const timer = landing == null ? null : setTimeout(tickLand, landing * k);
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
+    tick.current = landing == null ? null : setTimeout(tickLand, landing * k);
+    return clear;
     // eslint-disable-next-line react-hooks/exhaustive-deps -- the clock starts for a new state (`moves`), not for a new speed.
-  }, [moves, progress, epoch]);
+  }, [moves, progress, fxProgress, epoch, clear]);
   const clock = useMemo((): Clock => ({ progress, epoch, at: moves.at, k, span: Math.max(1, scaled) }), [progress, epoch, moves.at, k, scaled]);
-  return { moves, clock, k };
+  const fxClock = useMemo((): Clock => ({ progress: fxProgress, epoch, at: moves.at, k, span: Math.max(1, fxScaled) }), [fxProgress, epoch, moves.at, k, fxScaled]);
+  const hurry = useMemo(() => ({ progress, clear }), [progress, clear]);
+  return { moves, clock, fxClock, k, hurry };
 }
 
 /**

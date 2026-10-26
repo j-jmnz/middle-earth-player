@@ -74,6 +74,7 @@ export const MOTION = {
   // Chrome.
   sweep: tween(900, "linear"),
   seatPulse: tween(300, "outCubic"),
+  seatPulseHalf: tween(150, "outCubic"),
   seatHand: tween(300, "outCubic"),
   bannerIn: tween(260, null),
   bannerOut: tween(260, null),
@@ -86,6 +87,7 @@ export const MOTION = {
   carouselLeave: tween(180, "inCubic"),
   railSlide: tween(280, "outCubic"),
   railFlashIn: tween(60, null),
+  railFlashOut: tween(240, null),
   railFlash: tween(300, null),
   railStep: tween(200, null),
   previewIn: spring(280, 0.74),
@@ -96,9 +98,9 @@ export const MOTION = {
   dialPopSettle: spring(350, 0.5),
   threatBadgeIn: tween(160, null),
   threatBadgeOut: tween(400, null),
+  toastIn: tween(160, null),
+  toastOut: tween(120, null),
 } as const;
-
-export type MotionName = keyof typeof MOTION;
 
 /** The tokens that may pass 500 ms (a title sweep across the canvas; phase 24 adds the combat spotlight). */
 export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight"];

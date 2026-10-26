@@ -2,7 +2,7 @@
 // per frame from one clock, so a flip, a stagger, an arc, a squash or a pop is arithmetic on a time (the functions marked
 // "worklet" run there; in Node the directive is an unused string). motion.ts says what each card does, motion-tokens.ts how
 // long it takes. `now` is ms since the state was drawn and `k` is motionScale (Quick shortens every length to 0.6).
-import { clamp01, ease, scaledSpring, springStep } from "./motion-curves.ts";
+import { clamp01, ease, length, popScale, scaledSpring, springStep } from "./motion-curves.ts";
 import { still, type Ghost, type Motion } from "./motion.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
 
@@ -20,26 +20,9 @@ export type Pose = {
   back: boolean;
 };
 
-function length(token: { ms: number }, k: number): number {
-  "worklet";
-  return Math.max(1, token.ms * k);
-}
-
 function tilt(m: Motion, away: number): number {
   "worklet";
   return m.toRot + (m.fromRot - m.toRot) * away;
-}
-
-// A pop that settles: up to `scale` quickly, held, then back to 1 on a spring.
-function popFactor(t: number, k: number): number {
-  "worklet";
-  if (t <= 0) return 1;
-  const rise = length(MOTION.popRise, k);
-  const hold = length(MOTION.popHold, k);
-  const bump = SHAPE.popScale - 1;
-  if (t < rise) return 1 + bump * ease("outCubic", t / rise);
-  if (t < rise + hold) return SHAPE.popScale;
-  return 1 + bump * (1 - springStep(t - rise - hold, scaledSpring(MOTION.popSettle, k)));
 }
 
 /** Whether a motion is the quarter turn of exhausting or readying alone: the card stays where it is. */
@@ -100,7 +83,7 @@ export function poseAt(m: Motion, now: number, k: number): Pose {
     const u = clamp01((t - start) / turn);
     flipX = Math.abs(Math.cos(Math.PI * u));
     back = u < 0.5;
-    if (m.land === "pop") factor = popFactor(t - start - turn, k);
+    if (m.land === "pop") factor = popScale(t - start - turn, k, SHAPE.popScale, MOTION.popRise, MOTION.popHold.ms, MOTION.popSettle);
   }
   return {
     dx: m.dx * q,
@@ -137,8 +120,9 @@ export function ghostPoseAt(g: Ghost, now: number, k: number): GhostPose {
   const run = g.leave === "shake" ? length(MOTION.cardLeave, k) : length(MOTION.cardDepart, k);
   const x = clamp01((now - shake) / run);
   if (g.leave === "fade") return { dx: 0, dy: 0, scale: 1 + (g.scale - 1) * x, opacity: 1 - x };
+  // It accelerates toward the pile, but fades on the way out (ease out), so it does not linger at full strength.
   const p = ease("inCubic", x);
-  return { dx: g.dx * p, dy: g.dy * p, scale: 1 + (g.scale - 1) * p, opacity: Math.max(0, 1 - p * 1.1) };
+  return { dx: g.dx * p, dy: g.dy * p, scale: 1 + (g.scale - 1) * p, opacity: 1 - ease("outQuad", x) };
 }
 
 /** How long a motion runs from the start of the state, unscaled, its wait included. */
