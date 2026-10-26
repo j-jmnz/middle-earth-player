@@ -198,6 +198,10 @@ export type PendingAttack = {
   shadowFrame?: string;
   // The shadow effects are resolved, and the window before combat damage has been offered.
   shadowsDone?: boolean;
+  // The attacking enemy is in the staging area (an effect made it attack, 142038:A:2), not engaged (families/south-watcher.ts).
+  fromStaging?: boolean;
+  // A shadow effect says the undefended damage of this attack goes on an active location (142035:A:2).
+  toLocation?: boolean;
   // Extra defenders, damage marks and the attack's end, kept by the defense family (src/rules/families/defense-types.ts).
   defense?: AttackDefense;
 };

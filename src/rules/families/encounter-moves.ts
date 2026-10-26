@@ -6,6 +6,7 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";
+import { hasTrait } from "../conditions.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { releaseAttachments } from "../keywords.ts";
@@ -22,6 +23,7 @@ import { patchTop, topFrame } from "../windows.ts";
 import { moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { addedToStaging, announceEntered } from "./encounter-reveal.ts";
+import { freeSlot, makeActiveIn } from "./south-locations.ts";
 
 type MoveInstruction = Extract<Instruction, { verb: "MoveEncounterCard" }>;
 export type EncounterDestination = MoveInstruction["to"];
@@ -108,9 +110,8 @@ export function moveEncounter(
     }
     case "activeLocation": {
       if (typeOf(next, id, ctx) !== "location") return next;
-      const previous = next.activeLocation;
-      const cleared = previous && previous !== id ? updateCard(moveCard(next, previous, { zone: "staging" }), previous, { controller: null }) : next;
-      const placed = updateCard(moveCard(cleared, id, { zone: "activeLocation" }), id, { face: "up", controller: null });
+      // In a free active location slot, else in place of the last one (families/south-locations.ts).
+      const placed = updateCard(makeActiveIn(next, id), id, { face: "up", controller: null });
       const active = queueEvent(placed, { trigger: "becameActive", seat: null, cardId: id });
       return wasInPlay ? active : announceEntered(active, id, seat, ctx);
     }
@@ -121,7 +122,7 @@ export function moveEncounter(
 export function travelThere(state: ScenarioState, id: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[id];
   if (!card || typeOf(state, id, ctx) !== "location" || !inPlay(card.zone) || state.activeLocation === id || travelBlocked(state, ctx, id)) return state;
-  const previous = state.activeLocation;
+  const previous = freeSlot(state) ? null : (state.secondActiveLocation ?? state.activeLocation);
   let next = previous ? updateCard(moveCard(state, previous, { zone: "staging" }), previous, { controller: null }) : state;
   if (next.cards[id]?.zone !== "staging") next = moveCard(next, id, { zone: "staging" });
   return travelNow(next, id, ctx, steps) ?? state;
@@ -136,13 +137,13 @@ export function shuffleDiscardIn(state: ScenarioState): ScenarioState {
 
 // Cards come off the top of the encounter deck into its discard pile until one of `type` is among them, or the deck is empty.
 // That card is the picked card ("" when none came).
-export function discardUntil(state: ScenarioState, type: CardType, ctx: ReduceContext): ScenarioState {
+export function discardUntil(state: ScenarioState, type: CardType, ctx: ReduceContext, trait?: string): ScenarioState {
   let next = state;
   for (;;) {
     const top = next.encounterDeck[0];
     if (!top) return pushPicked(next, "");
     next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up", controller: null });
-    if (typeOf(next, top, ctx) === type) return pushPicked(next, top);
+    if (typeOf(next, top, ctx) === type && (trait == null || hasTrait(next, top, trait, ctx))) return pushPicked(next, top);
   }
 }
 

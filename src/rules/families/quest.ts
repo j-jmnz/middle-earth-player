@@ -21,6 +21,9 @@ import { attachTo, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { lowerCardThreat, makeActive, moveProgress } from "./quest-places.ts";
 import { raiseQuestThreat, resetThreat } from "./quest-threat.ts";
+import { advanceStage } from "../quest.ts";
+import { restricted } from "../restrictions.ts";
+import { afterProgress } from "../stage-reveal.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -56,6 +59,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "SkipQuestPhase":
       return withModifier(state, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "skipQuestPhase", amount: 1, until: "endOfRound" });
+    case "AdvanceStage": {
+      const before = steps.length;
+      return afterProgress(advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
+    }
     case "RaiseQuestThreat":
       return raiseQuestThreat(state, focus.seat, instruction.amount, ctx, steps);
     case "ResetThreat":

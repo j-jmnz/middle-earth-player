@@ -17,6 +17,7 @@ import { fireForced } from "../triggers.ts";
 import { patchTop, topFrame } from "../windows.ts";
 import { moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
+import { makeActiveIn } from "./south-locations.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -31,9 +32,7 @@ function isLocation(state: ScenarioState, id: string | null, ctx: ReduceContext)
 export function makeActive(state: ScenarioState, instruction: Verb<"MakeActive">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
   if (!isLocation(state, id, ctx) || state.cards[id]?.zone !== "staging") return state;
-  let next = state;
-  if (next.activeLocation && next.activeLocation !== id) next = moveCard(next, next.activeLocation, { zone: "staging" });
-  next = moveCard(next, id, { zone: "activeLocation" });
+  const next = makeActiveIn(state, id);
   return fireForced(next, { trigger: "becameActive", seat: null, cardId: id }, ctx, steps);
 }
 

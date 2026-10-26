@@ -45,6 +45,9 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("RaiseQuestThreat"), amount: z.number().int().positive(), ...when }),
   // The actor's threat is reduced to their starting threat level; nothing happens when it is at or below it (04053:A:2).
   z.strictObject({ verb: z.literal("ResetThreat"), ...when }),
+  // The quest advances to its next stage now, whatever progress is on it ("Advance to stage 2", 142020:B:1); that stage's When Revealed
+  // effects resolve. Advancing the last stage defeats the quest (rr.winning-the-game).
+  z.strictObject({ verb: z.literal("AdvanceStage"), ...when }),
   // The source attachment moves to the card (the picked card by default) and passes to that card's controller (19010:A:4).
   z.strictObject({ verb: z.literal("ReattachSelf"), target: cardRefSchema.optional(), ...when }),
 ] as const;

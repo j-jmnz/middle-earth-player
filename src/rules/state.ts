@@ -49,7 +49,10 @@ export type ZoneName =
   | "under"
   // The campaign card next to the quest deck (rr.campaign-cards). Placed only when the card has an ability that works during
   // the scenario (a Response, a Forced effect, a constant, an Action), so it is in play: 141056:A:2.
-  | "campaign";
+  | "campaign"
+  // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by
+  // nobody. The card's host is the Watcher.
+  | "captive";
 
 export type CardFace = "up" | "down" | "A" | "B";
 
@@ -451,7 +454,8 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "questStage" ||
     zone === "seatQuest" ||
     zone === "attached" ||
-    zone === "campaign"
+    zone === "campaign" ||
+    zone === "captive"
   );
 }
 

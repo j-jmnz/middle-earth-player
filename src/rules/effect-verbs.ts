@@ -8,6 +8,7 @@ import { drawOne, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
+import { notePlaced, progressRoom } from "./families/south-locations.ts";
 import { announceLeftPlay } from "./stage-reveal.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats, updateCard } from "./state.ts";
@@ -100,10 +101,11 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   const location = state.cards[id];
   if (!location) return state;
   const points = questPointsOf(state, location, ctx.cards);
-  const placed = points == null ? amount : Math.min(amount, Math.max(0, points - location.progress));
+  // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south-locations.ts).
+  const placed = Math.min(amount, progressRoom(state, id, ctx.cards));
   if (placed <= 0) return state;
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED) });
-  const next = updateCard(state, id, { progress: location.progress + placed });
+  const next = notePlaced(updateCard(state, id, { progress: location.progress + placed }), id, placed);
   if (points == null || location.progress + placed < points) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);
   return announceLeftPlay(runQuestResolution(explored, id, ctx, steps), id, ctx, steps, true);

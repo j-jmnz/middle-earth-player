@@ -20,6 +20,7 @@ import { markDefender, moreDefenders } from "./families/defense-defenders.ts";
 import { holdAttack, queueHeard } from "./families/defense-listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "./families/attack-flow.ts";
 import { countsDefense, struck } from "./families/attack-strike.ts";
+import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations } from "./families/south-watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "./families/attack-targets.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -75,7 +76,9 @@ export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: s
     const enemies = (state.seats[seat]?.engaged ?? []).filter(
       (id) => !state.resolvedAttacks.includes(id) && !attackBarred(state, id, seat),
     );
-    if (enemies.length > 0) return { seat, enemies };
+    // An enemy in the staging area that is considered engaged with each player (families/south-watcher.ts).
+    const staging = stagingAttackers(state, seat);
+    if (enemies.length + staging.length > 0) return { seat, enemies: [...enemies, ...staging] };
   }
   return null;
 }
@@ -89,11 +92,15 @@ export function beginEnemyAttack(
   enemyId: string,
   ctx: ReduceContext,
   steps: EngineStep[],
+  // An effect made an enemy in the staging area attack (families/south-watcher.ts).
+  fromStaging = false,
 ): ScenarioState {
   const attacker = state.cards[enemyId];
-  if (!attacker || attacker.zone !== "engaged" || attackBarred(state, enemyId, seat)) return state;
+  const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || (fromStaging && attacker.zone === "staging"));
+  if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
-  const declared: ScenarioState = { ...state, pendingAttack: { enemyId, seat }, activeSeat: seat, window: null };
+  const dealt = engagedWithAll(state, enemyId) ? dealForAttack(state, enemyId) : state;
+  const declared: ScenarioState = { ...dealt, pendingAttack: { enemyId, seat, ...(fromStaging ? { fromStaging: true } : {}) }, activeSeat: seat, window: null };
   const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
   if (fired.stack.length > declared.stack.length && fired.pendingAttack) {
     return { ...fired, pendingAttack: { ...fired.pendingAttack, defenseWaits: true } };
@@ -117,7 +124,7 @@ export function openDefense(state: ScenarioState, ctx: ReduceContext): ScenarioS
   const { defenseWaits: _done, ...rest } = attack;
   const enemy = state.cards[attack.enemyId];
   // The enemy left play while they resolved: the attack is over.
-  if (enemy?.zone !== "engaged") return { ...state, pendingAttack: null };
+  if (!attackHere(state, attack.enemyId)) return { ...state, pendingAttack: null };
   return toDefense({ ...state, pendingAttack: rest }, ctx);
 }
 
@@ -340,6 +347,9 @@ export function heroIds(state: ScenarioState, seat: number): string[] {
 // The characters an undefended attack's damage may be assigned to: the seat's heroes, and a character that says damage from
 // undefended attacks may be assigned to it (takesUndefendedDamage).
 export function undefendedTargets(state: ScenarioState, seat: number, cards: Cards): string[] {
+  // A shadow effect sent the damage to an active location (families/south-watcher.ts).
+  const locations = undefendedLocations(state);
+  if (locations.length > 0) return locations;
   const heroes = heroIds(state, seat);
   const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
   // A character another card lets take it for this player (08093), whoever controls that character.

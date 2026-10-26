@@ -23,6 +23,7 @@ import { optionalEnemies, stagingLocations } from "./quest.ts";
 import { defenseBlocked, travelBlocked, travelCostUnpayable } from "./restrictions.ts";
 import { flagged, perilLock, type ScenarioState } from "./state.ts";
 import { attackRuleReason } from "./families/attack-targets.ts";
+import { freeSlot, mustTravel } from "./families/south-locations.ts";
 
 const NUMBER = "The engine computes that number";
 
@@ -79,7 +80,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "CommitHide":
       return state.window?.kind === "hideCommit" ? hideCommitters(state, state.window.seat, ctx.cards) : [];
     case "Travel":
-      return state.activeLocation ? [] : travelTargets(state, ctx);
+      return freeSlot(state) ? travelTargets(state, ctx) : [];
     case "Engage":
       return optionalEnemies(state, ctx.cards);
     case "ChooseEnemy":
@@ -135,7 +136,8 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
     case "Travel":
       return travelReason(state, intent, ctx);
     case "DeclineTravel":
-      return state.window?.kind === "travel" ? null : "That intent is not legal in this window";
+      if (state.window?.kind !== "travel") return "That intent is not legal in this window";
+      return mustTravel(state) && freeSlot(state) && travelTargets(state, ctx).length > 0 ? "The players must travel to a location, if able" : null;
     case "Engage":
       return engageReason(state, intent, ctx);
     case "DeclineEngage":
@@ -182,7 +184,10 @@ function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {
 
 function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   const intents: LegalIntent[] = [{ type: "DeclineTravel" }];
-  if (!state.activeLocation && travelTargets(state, ctx).length > 0) intents.unshift({ type: "Travel" });
+  if (freeSlot(state) && travelTargets(state, ctx).length > 0) {
+    // "The players must travel to a location, if able" (mec109.stage-4): no declining while they can.
+    return mustTravel(state) ? [{ type: "Travel" }] : [{ type: "Travel" }, ...intents];
+  }
   return intents;
 }
 
@@ -214,7 +219,7 @@ function travelReason(
   ctx: ReduceContext,
 ): string | null {
   if (state.window?.kind !== "travel") return "That intent is not legal in this window";
-  if (state.activeLocation) return "An active location is already in play";
+  if (!freeSlot(state)) return "An active location is already in play";
   if (!stagingLocations(state, ctx.cards).includes(intent.locationId)) return "That location is not in staging";
   if (travelBlocked(state, ctx, intent.locationId)) return "Players cannot travel to that location now";
   if (travelCostUnpayable(state, ctx, intent.locationId)) return "The players cannot pay that location's Travel cost";

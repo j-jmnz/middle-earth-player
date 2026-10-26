@@ -20,6 +20,7 @@ import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from 
 import { holdAttack } from "./families/defense-listen.ts";
 import { announceShadowRaise, noteShadowStart } from "./families/defense-shadow.ts";
 import { charactersDestroyed } from "./families/burden-attack.ts";
+import { attackHere, attackKey, locationDamage } from "./families/south-watcher.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -180,7 +181,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   }
   const attack = next.pendingAttack;
   const enemy = attack ? next.cards[attack.enemyId] : undefined;
-  if (!attack || !enemy || enemy.zone !== "engaged") return finishAttack(next, ctx, steps);
+  if (!attack || !enemy || !attackHere(next, attack.enemyId)) return finishAttack(next, ctx, steps);
   // Several defenders (rr.multiple-defenders), or the attack turned on another enemy (06062): the defense family deals the damage.
   const special = specialStrike(next, ctx, steps);
   if (special) return special.wait || special.state.lost ? special.state : afterDamage(special.state, ctx, steps);
@@ -196,6 +197,9 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     const damaged = noteAttackDamage(next, defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")) : next, ctx);
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
+  // A shadow effect sent the damage to an active location (families/south-watcher.ts).
+  const located = attack.toLocation ? locationDamage(next, attack, ctx, steps) : null;
+  if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx), ctx, steps);
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   const strength = modifiedStat(next, enemy, "attack", ctx.cards);
@@ -218,7 +222,7 @@ export function resumeAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (!attack?.awaiting) return state;
   const { awaiting, awaitDepth: _depth, ...rest } = attack;
   const cleared: ScenarioState = { ...state, pendingAttack: rest };
-  if (cleared.cards[attack.enemyId]?.zone !== "engaged") return finishAttack(cleared, ctx, steps);
+  if (!attackHere(cleared, attack.enemyId)) return finishAttack(cleared, ctx, steps);
   switch (awaiting) {
     case "defense":
       // Defenders declared by an effect before the defense step (11007, 12140), or a canceled attack, skip it.
@@ -248,7 +252,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx) : 0;
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
-    attack.immediate || done.resolvedAttacks.includes(attack.enemyId) ? done.resolvedAttacks : [...done.resolvedAttacks, attack.enemyId];
+    attack.immediate || done.resolvedAttacks.includes(attackKey(done, attack.enemyId, attack.seat)) ? done.resolvedAttacks : [...done.resolvedAttacks, attackKey(done, attack.enemyId, attack.seat)];
   // The shadow cards an attack outside the combat phase was dealt are discarded once it resolves
   // (faq.enemy-attacks-outside-combat).
   const cleared = attack.immediate && done.phase !== "Combat" ? discardShadowOf(done, attack.enemyId) : done;
@@ -257,7 +261,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const announced = queueEvent(cleared, { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender });
   const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks };
   const after = attack.after ?? [];
-  if (after.length === 0 || ended.cards[attack.enemyId]?.zone !== "engaged") return ended;
+  if (after.length === 0 || !attackHere(ended, attack.enemyId)) return ended;
   return pushEffectFrame(
     ended,
     {
