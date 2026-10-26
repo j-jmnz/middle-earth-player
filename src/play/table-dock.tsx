@@ -2,7 +2,7 @@
 // engine's numbers for it (willpower against threat, attack against defense), what the player has picked on the table, and
 // the buttons that confirm it (docs/design-system.md, Table). Picking happens on the table; nothing here is sent until a
 // button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
 import Animated, { FadeInUp, FadeOut, ReduceMotion, useReducedMotion } from "react-native-reanimated";
 
@@ -50,6 +50,7 @@ export function TableDock({
   extras = [],
   resetKey,
   guide = null,
+  onBlock,
 }: {
   step: string;
   title: string;
@@ -66,7 +67,11 @@ export function TableDock({
   resetKey: string;
   // The first-game guide's line for the moment (reference.ts); it is turned off in the table settings.
   guide?: string | null;
+  // The screen y of the top of the block under the sentence (the readout, the pick, the armed line and the buttons): the choice
+  // tray's foot stays above it.
+  onBlock?: (top: number) => void;
 }) {
+  const block = useRef<ComponentRef<typeof View>>(null);
   return (
     <View testID="dock" className="rounded-card px-3 pb-2 pt-2" style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
       {/* On a short phone only the sentence scrolls; the numbers, the pick and the buttons stay in sight. */}
@@ -96,7 +101,7 @@ export function TableDock({
           ))}
         </ScrollView>
       ) : null}
-      <View className="mt-1 gap-1">
+      <View ref={block} collapsable={false} onLayout={() => block.current?.measureInWindow((_x, y) => onBlock?.(Math.round(y)))} className="mt-1 gap-1">
         {readout ? <ReadoutView readout={readout} /> : null}
         {picked ? (
           <Text testID="dock-picked" numberOfLines={3} className="text-center text-body text-bone">

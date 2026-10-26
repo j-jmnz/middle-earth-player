@@ -4,7 +4,7 @@
 // the engine did not compute.
 import type { ReactNode } from "react";
 import { Pressable, Text, View, type DimensionValue } from "react-native";
-import Animated, { ReduceMotion, SlideInDown, SlideInRight } from "react-native-reanimated";
+import Animated, { ReduceMotion, SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
@@ -12,54 +12,26 @@ import type { SheetStat } from "./sheet-types.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 const rise = SlideInDown.duration(220).reduceMotion(ReduceMotion.System);
-const slide = SlideInRight.duration(220).reduceMotion(ReduceMotion.System);
 const SHEET_RADIUS = 28;
 
 /**
- * The parchment a sheet sits on. From the bottom edge (`edge` "bottom", the default): its fill, corners and bottom inset are
- * plain styles from the tokens and useSafeAreaInsets, not NativeWind classes (sheets that carried pb-safe in their classes
- * lost their parchment on the phone). From the right edge (`edge` "right", the table in landscape): full height, the left
- * corners rounded, the right inset kept clear of the notch.
+ * The parchment a sheet sits on, from the bottom edge: its fill, corners and bottom inset are plain styles from the tokens and
+ * useSafeAreaInsets, not NativeWind classes (sheets that carried pb-safe in their classes lost their parchment on the phone).
+ * (The table's choice tray and reading panels are tray-frame.tsx.)
  */
-export function SheetFrame({
-  children,
-  testID,
-  maxHeight,
-  paddingTop = 12,
-  animated = true,
-  edge = "bottom",
-}: {
-  children: ReactNode;
-  testID?: string;
-  maxHeight?: DimensionValue;
-  paddingTop?: number;
-  animated?: boolean;
-  edge?: "bottom" | "right";
-}) {
+export function SheetFrame({ children, testID, maxHeight, paddingTop = 12, animated = true }: { children: ReactNode; testID?: string; maxHeight?: DimensionValue; paddingTop?: number; animated?: boolean }) {
   const insets = useSafeAreaInsets();
-  const right = edge === "right";
-  const style = right
-    ? {
-        backgroundColor: t.paper,
-        borderTopLeftRadius: SHEET_RADIUS,
-        borderBottomLeftRadius: SHEET_RADIUS,
-        paddingLeft: 20,
-        paddingRight: Math.max(insets.right, 16),
-        paddingTop,
-        paddingBottom: Math.max(insets.bottom, 12),
-        flex: 1,
-      }
-    : {
-        backgroundColor: t.paper,
-        borderTopLeftRadius: SHEET_RADIUS,
-        borderTopRightRadius: SHEET_RADIUS,
-        paddingHorizontal: 24,
-        paddingTop,
-        paddingBottom: Math.max(insets.bottom, 12),
-        ...(maxHeight != null ? { maxHeight } : {}),
-      };
+  const style = {
+    backgroundColor: t.paper,
+    borderTopLeftRadius: SHEET_RADIUS,
+    borderTopRightRadius: SHEET_RADIUS,
+    paddingHorizontal: 24,
+    paddingTop,
+    paddingBottom: Math.max(insets.bottom, 12),
+    ...(maxHeight != null ? { maxHeight } : {}),
+  };
   return animated ? (
-    <Animated.View entering={right ? slide : rise} testID={testID} collapsable={false} style={style}>
+    <Animated.View entering={rise} testID={testID} collapsable={false} style={style}>
       {children}
     </Animated.View>
   ) : (

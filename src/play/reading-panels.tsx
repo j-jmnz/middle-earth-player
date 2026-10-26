@@ -1,149 +1,19 @@
-// The paper panels that slide in from the right of the landscape table: a choice whose options are not cards on the table
-// (an either/or of an effect, a seat, a card out of play), a discard pile's cards, and this round's log
-// (docs/design-system.md, Table). A panel's tiles are picked the same way as cards on the table, and its buttons are the
-// dock's: one that sends with nothing picked asks for a second tap.
+// The reading panels (docs/design-system.md, Table, Panels; phase 21): a discard pile's cards, this round's log, the threat
+// panel from a dial and the table settings from the menu. They open in one place, the same tray frame (tray-frame.tsx), one at a
+// time: a new one replaces the last (reading.ts). Each has a labeled Close and closes on a tap outside. They stay on paper:
+// they are what gets read and recorded. Text, switches and tiles that show a card large; nothing here sends an intent.
 import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 
-import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
 import type { LogLine } from "./log.ts";
-import type { Readout } from "./readout.ts";
-import { ChromeButton, SheetFrame, Stats, Tile } from "./sheet-paper.tsx";
-import type { Sheet, SheetOption, SheetStat } from "./sheet-types.ts";
-import { tableTokens as t } from "./tokens.ts";
-import { headerOf, marked, shareFor, type Choice, type Dock, type DockButton } from "./table-choice.ts";
-import type { ScenarioState } from "./store.ts";
-import type { TableSettings } from "./table-settings.ts";
+import { ChromeButton, Tile } from "./sheet-paper.tsx";
 import { LineMark } from "./table-chrome.tsx";
-import { ReadoutView } from "./table-dock.tsx";
-
-type TileRow = { id: string; label: string; detail: string | null; stats: readonly SheetStat[] };
-
-// The tiles of a sheet: each option; a trigger by its ability, with its timing and printed line.
-function tilesOf(sheet: Sheet): TileRow[] {
-  const plain = (item: SheetOption): TileRow => ({ id: item.id, label: item.label, detail: null, stats: item.stats ?? [] });
-  switch (sheet.kind) {
-    case "pick":
-    case "multi":
-    case "distribute":
-      return sheet.options.map(plain);
-    case "trigger":
-      return sheet.options.map((item) => ({ id: item.id, label: `${item.label} · ${item.timing}`, detail: item.text, stats: [] }));
-    case "window":
-    case "outcome":
-      return [];
-  }
-}
-
-/**
- * A choice on paper: its tiles, picked like cards on the table, and the dock's buttons. Only the step, the moment and the
- * buttons are pinned; the sentence, the threat and the tiles scroll together, so a short phone still shows the options.
- */
-export function SidePanel({
-  sheet,
-  game,
-  choice,
-  dock,
-  readout,
-  threat,
-  refusal,
-  resetKey,
-  onTile,
-  onButton,
-  onFold,
-  onRead,
-  undo = null,
-}: {
-  sheet: Sheet;
-  game: ScenarioState;
-  choice: Choice;
-  dock: Dock;
-  readout: Readout | null;
-  threat: string;
-  refusal: string | null;
-  // Changes with the moment and the pick: an armed button goes back to unarmed.
-  resetKey: string;
-  // A tap on a tile: the same as a tap on that card on the table (a trigger's tile names its ability).
-  onTile: (id: string) => void;
-  onButton: (button: DockButton) => void;
-  // Folds the panel so the table under it can be read; the dock brings it back.
-  onFold: () => void;
-  // Shows a card large, for a tile or the card the moment is about.
-  onRead: ((cardId: string) => void) | null;
-  // The dock's Undo, at the panel's foot too: on a short phone the panel covers the top bar.
-  undo?: DockExtra | null;
-}) {
-  const head = headerOf(sheet, game);
-  const marks = marked(sheet, choice);
-  const unavailable = sheet.kind === "pick" ? (sheet.unavailable ?? []) : [];
-  const about = sheet.kind === "pick" ? (sheet.about ?? []) : sheet.kind === "trigger" && sheet.sourceId ? [sheet.sourceId] : [];
-  const tiles = tilesOf(sheet);
-  return (
-    <SheetFrame testID="sheet" edge="right" paddingTop={8}>
-      <View className="items-center">
-        <Text testID="sheet-step" numberOfLines={1} className="font-display text-eyebrow uppercase text-inkLabel">
-          {head.step}
-        </Text>
-        <Text testID="sheet-title" accessibilityRole="header" numberOfLines={2} className="text-center font-display text-title text-ink">
-          {head.title}
-        </Text>
-      </View>
-      <ScrollView className="mt-1" contentContainerClassName="pb-1" style={{ flexShrink: 1 }}>
-        <View className="items-center">
-          {head.stats.length > 0 ? <Stats stats={head.stats} testID="sheet-stats" /> : null}
-          {head.note ? (
-            <Text testID="sheet-note" className="mt-1 text-center text-body text-inkMuted">
-              {head.note}
-            </Text>
-          ) : null}
-          <Text testID="sheet-threat" className="mt-1 font-display text-label text-inkLabel">
-            {threat}
-          </Text>
-          {onRead && about[0] ? <ChromeButton label="Read the card" testID="sheet-inspect" tone="ink" onPress={() => about[0] && onRead(about[0])} /> : null}
-        </View>
-        <View className="mt-1">
-          {tiles.map((tile) => {
-            const share = shareFor(sheet, choice, tile.id);
-            const selected = sheet.kind === "trigger" ? choice.ids.includes(tile.id) : (marks.get(tile.id) ?? 0) > 0;
-            return (
-              <Tile
-                key={tile.id}
-                label={sheet.kind === "distribute" ? `${tile.label} · ${share}` : tile.label}
-                detail={tile.detail}
-                stats={tile.stats}
-                selected={selected}
-                testID={sheet.kind === "trigger" ? `sheet-trigger-${tile.id.split("|")[0] ?? tile.id}` : `sheet-option-${tile.id}`}
-                onPress={() => onTile(tile.id)}
-              />
-            );
-          })}
-          {/* What the rules refuse now, and why (Weathertop's Travel cost): text, not a choice. */}
-          {unavailable.map((item) => (
-            <View key={item.id} testID={`sheet-unavailable-${item.id}`} accessible accessibilityLabel={`${item.label}. ${item.reason}`} className="mb-2 rounded-tile border border-dashed border-inkLine px-4 py-2">
-              <Text className="text-body text-inkMuted">{item.label}</Text>
-              <Text className={`mt-0.5 ${tiles.length === 0 ? "text-body" : "text-label"} text-inkMuted`}>{item.reason}</Text>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-      {readout ? (
-        <View className="mt-1">
-          <ReadoutView readout={readout} surface="paper" />
-        </View>
-      ) : null}
-      {refusal ? (
-        <Text testID="sheet-refusal" numberOfLines={3} className="text-center text-label text-danger">
-          {refusal}
-        </Text>
-      ) : null}
-      <DockButtons key={resetKey} dock={dock} surface="paper" onButton={onButton} extras={[...(undo ? [undo] : []), { label: "Look at the table", testID: "sheet-collapse", onPress: onFold }]} />
-    </SheetFrame>
-  );
-}
+import type { TableSettings } from "./table-settings.ts";
+import { tableTokens as t } from "./tokens.ts";
 
 /** A discard pile's cards, the one on top first. A tap shows a card large; nothing here changes the game. */
 export function PileList({ title, cards, onRead, onClose }: { title: string; cards: readonly { id: string; label: string }[]; onRead: (cardId: string) => void; onClose: () => void }) {
   return (
-    <SheetFrame testID="pile-list" edge="right">
+    <View testID="pile-list" collapsable={false} style={{ flexShrink: 1 }}>
       <Text className="text-center font-display text-eyebrow uppercase text-inkLabel">{`${cards.length} ${cards.length === 1 ? "card" : "cards"}`}</Text>
       <Text accessibilityRole="header" className="mt-1 text-center font-display text-title text-ink">
         {title}
@@ -155,16 +25,16 @@ export function PileList({ title, cards, onRead, onClose }: { title: string; car
         ))}
       </ScrollView>
       <View className="items-center pt-1">
-        <ChromeButton label="Close" testID="pile-list-close" tone="ink" onPress={onClose} />
+        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="pile-list-close" tone="ink" onPress={onClose} />
       </View>
-    </SheetFrame>
+    </View>
   );
 }
 
 /** This round's engine steps and their causes, on paper. Text only: it is how a player checks a number against its source. */
 export function LogPanel({ round, lines, onClose }: { round: number; lines: readonly LogLine[]; onClose: () => void }) {
   return (
-    <SheetFrame testID="log-sheet" edge="right">
+    <View testID="log-sheet" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center">
         <Text className="font-display text-eyebrow uppercase text-inkLabel">Log</Text>
         <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">{`Round ${round}`}</Text>
@@ -182,9 +52,9 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
         ))}
       </ScrollView>
       <View className="items-center pt-2">
-        <ChromeButton label="Close" testID="log-close" tone="ink" onPress={onClose} />
+        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="log-close" tone="ink" onPress={onClose} />
       </View>
-    </SheetFrame>
+    </View>
   );
 }
 
@@ -205,7 +75,7 @@ export function ThreatPanel({
   onClose: () => void;
 }) {
   return (
-    <SheetFrame testID="threat-panel" edge="right">
+    <View testID="threat-panel" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center">
         <Text className="font-display text-eyebrow uppercase text-inkLabel">{seatLabel}</Text>
         <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">{`Threat ${threat} of 50`}</Text>
@@ -230,9 +100,9 @@ export function ThreatPanel({
         <Text className="mt-2 text-label text-inkMuted">The refresh phase raises your threat by 1 at the end of the round; a failed quest raises it by what it falls short.</Text>
       </ScrollView>
       <View className="items-center pt-2">
-        <ChromeButton label="Close" testID="threat-panel-close" tone="ink" onPress={onClose} />
+        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="threat-panel-close" tone="ink" onPress={onClose} />
       </View>
-    </SheetFrame>
+    </View>
   );
 }
 
@@ -285,7 +155,7 @@ export function SettingsPanel({
   onClose: () => void;
 }) {
   return (
-    <SheetFrame testID="settings-panel" edge="right">
+    <View testID="settings-panel" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center">
         <Text accessibilityRole="header" className="font-display text-title text-ink">
           Table settings
@@ -300,8 +170,8 @@ export function SettingsPanel({
         ))}
       </ScrollView>
       <View className="items-center pt-2">
-        <ChromeButton label="Close" testID="settings-close" tone="ink" onPress={onClose} />
+        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="settings-close" tone="ink" onPress={onClose} />
       </View>
-    </SheetFrame>
+    </View>
   );
 }

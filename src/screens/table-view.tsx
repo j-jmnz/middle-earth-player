@@ -11,24 +11,23 @@ import { useStore } from "zustand";
 import { backStep } from "../play/back";
 import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
-import { logLines, type LogNames } from "../play/log";
+import type { LogNames } from "../play/log";
 import { prefetchCodes, resolutionCodes } from "../play/prefetch";
 import { QuestBand } from "../play/quest-band";
 import { railFor } from "../play/rail";
-import { PILE_WORDS, shownSeat, threatSelector, type PileId } from "../play/selectors";
+import { shownSeat, threatSelector } from "../play/selectors";
 import type { SheetNames } from "../play/sheet-types";
 import type { ReduceContext, TableStore } from "../play/store";
 import { TableCanvas } from "../play/table-canvas";
 import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
-import { threatLine } from "../play/table-chrome";
 import { MomentBanner, TableDock } from "../play/table-dock";
-import { LogPanel, PileList, SettingsPanel, SidePanel, ThreatPanel } from "../play/table-panel";
-import { PhaseCarousel } from "../play/phase-carousel";
+import { TableLayers } from "../play/table-layers";
+import { openReading, type Reading } from "../play/reading";
 import { phaseCarousel } from "../play/carousel";
 import { tableSettings } from "../play/table-settings";
 import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
-import { threatRows, threatVerdict } from "../play/foresight";
+import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
 import { locationReadout, widgetReadouts } from "../play/widgets";
@@ -42,9 +41,6 @@ import { scanAssets } from "./images/scan-map";
 import { cachedImage, useImageSnapshot } from "./images/store";
 import type { World } from "../campaign/world";
 import type { CardFacts } from "./open-game";
-
-// Under this height a panel covers the top bar too, so its options have room.
-const SHORT = 400;
 
 function picture(code: string): PictureSource | null {
   const cached = cachedImage(code);
@@ -75,21 +71,20 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const refusal = useStore(store, (state) => state.refusal);
   const threatOf = useMemo(() => threatSelector(), []);
   const threats = useStore(store, (state) => threatOf(state.game));
-  const roundSteps = useStore(store, (state) => state.roundSteps);
   const selected = useStore(store, (state) => state.selected);
   const seat = shownSeat(game);
   const ctx = session.ctx;
 
-  const [logOpen, setLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   // The card preview closes with its own animation; the Back layers call it through this (back.ts).
   const previewClose = useRef<(() => void) | null>(null);
-  // The one reading layer over the table: the threat panel (a tap on a dial) for a seat, the phase carousel (a tap on the rail) or
-  // the table settings (the menu's row). Opening one closes another.
-  const [reading, setReading] = useState<{ kind: "threat"; seat: number } | { kind: "carousel" } | { kind: "settings" } | null>(null);
+  // The one reading layer over the table (reading.ts): a dial's threat panel, the phase carousel (the rail), the table settings,
+  // the log (the menu's rows), a discard pile's list. Opening one replaces the last.
+  const [reading, setReading] = useState<Reading | null>(null);
+  // The screen y of the top of the dock's buttons block, which the choice tray stays above.
+  const [anchor, setAnchor] = useState<number | null>(null);
   const settings = useStore(tableSettings, (state) => state.settings);
   const look = useMemo(() => ({ contrast: settings.highContrast }), [settings.highContrast]);
-  const [pile, setPile] = useState<PileId | null>(null);
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
 
@@ -127,7 +122,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => ctx.effects.find((effect) => effect.id === effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
     [names, nameOf, ctx],
   );
-  const lines = useMemo(() => (logOpen ? logLines(roundSteps, logNames) : []), [logOpen, roundSteps, logNames]);
 
   // A menu row closes the menu and then acts (src/play/table-menu-items.ts).
   const onMenuRow = useCallback(
@@ -138,7 +132,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           goBack(router, nav.back);
           return;
         case "log":
-          setLogOpen(true);
+          setReading({ kind: "log" });
           return;
         case "rules":
           router.push("/glossary");
@@ -159,7 +153,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   );
   const onOutcome = useCallback(() => router.replace(nav.outcome), [router, nav]);
   const onPile = useCallback((id: string) => {
-    if (id === "discard" || id === "encounterDiscard") setPile(id);
+    if (id === "discard" || id === "encounterDiscard") setReading({ kind: "pile", pile: id });
   }, []);
   const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
   const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
@@ -170,24 +164,20 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       const step = backStep({
         menuOpen,
         previewOpen: preview != null,
-        infoOpen: reading != null,
-        logOpen,
-        pileOpen: pile != null,
+        readingOpen: reading != null,
         overlayOpen: choice.overlayOpen,
         panelOpen: choice.panelOpen,
       });
       if (step === "closeMenu") setMenuOpen(false);
       else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
-      else if (step === "closeInfo") setReading(null);
-      else if (step === "closeLog") setLogOpen(false);
-      else if (step === "closePile") setPile(null);
+      else if (step === "closeReading") setReading(null);
       else if (step === "closeOverlay") choice.closeOverlay();
       else if (step === "foldPanel") choice.fold();
       else goBack(router, nav.back);
       return true;
     });
     return () => subscription.remove();
-  }, [menuOpen, preview, reading, logOpen, pile, choice, router, nav]);
+  }, [menuOpen, preview, reading, choice, router, nav]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -204,16 +194,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
   const widgets = widgetReadouts(game);
   const locations = locationReadout(game);
-  const threatText = threatLine(threats, widgets.life);
   const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
-  const panelWidth = Math.round(Math.min(480, Math.max(320, screen.width * 0.46)));
-  // A panel slides in from the right, under the top bar; on a short phone it covers the top bar too.
-  const panelTop = screen.height < SHORT ? 0 : insets.top + TOP_BAR;
-  const panelStyle = { position: "absolute" as const, top: panelTop, bottom: 0, right: 0, width: panelWidth + insets.right };
   const narrow = screen.width - insets.left - insets.right < 760;
-  // The strip covers the canvas top: as wide as the canvas, not the command column, and no taller than 92% of the room under the bar.
-  const carouselWidth = screen.width - insets.left - insets.right - commandWidth;
-  const carouselHeight = Math.round(Math.min(340, (screen.height - insets.top - TOP_BAR) * 0.92));
   const previewed = preview
     ? previewCards(
         game,
@@ -247,7 +229,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           ticks={ticks}
           menuOpen={menuOpen}
           onThreat={(threatSeat) => setReading({ kind: "threat", seat: threatSeat })}
-          onRail={() => setReading((now) => (now?.kind === "carousel" ? null : { kind: "carousel" }))}
+          onRail={() => setReading((now) => openReading(now, { kind: "carousel" }))}
           onMenu={() => setMenuOpen((open) => !open)}
         />
         <View className="min-h-0 flex-1 flex-row">
@@ -302,78 +284,29 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               extras={choice.extras}
               resetKey={choice.resetKey}
               guide={choice.guide}
+              onBlock={setAnchor}
             />
           </View>
         </View>
       </View>
-      {choice.panelOpen ? (
-        <View style={panelStyle}>
-          <SidePanel
-            sheet={choice.sheet}
-            game={game}
-            choice={choice.choice}
-            dock={choice.dock}
-            readout={choice.readout}
-            threat={threatText}
-            refusal={refusal}
-            resetKey={choice.resetKey}
-            onTile={choice.onTile}
-            onButton={choice.onButton}
-            onFold={choice.fold}
-            onRead={(cardId) => onPreview(cardId)}
-            undo={choice.undo}
-          />
-        </View>
-      ) : null}
-      {pile ? (
-        <View style={panelStyle}>
-          <PileList
-            title={PILE_WORDS[pile]}
-            cards={[...(pile === "discard" ? (game.seats[seat]?.discard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
-            onRead={(cardId) => onPreview(cardId)}
-            onClose={() => setPile(null)}
-          />
-        </View>
-      ) : null}
-      {logOpen ? (
-        <View style={panelStyle}>
-          <LogPanel round={game.round} lines={lines} onClose={() => setLogOpen(false)} />
-        </View>
-      ) : null}
-      {reading?.kind === "settings" ? (
-        <View style={panelStyle}>
-          <SettingsPanel
-            settings={settings}
-            always={settings.alwaysUse.map((effectId) => {
-              const code = ctx.effects.find((effect) => effect.id === effectId)?.cardCode;
-              return { effectId, label: `Ask again: ${code ? nameOf(code) : effectId}` };
-            })}
-            onChange={(change) => tableSettings.getState().update(change)}
-            onClose={() => setReading(null)}
-          />
-        </View>
-      ) : null}
-      {reading?.kind === "threat" ? (
-        <View style={panelStyle}>
-          <ThreatPanel
-            seatLabel={game.seatCount > 1 ? `Player ${reading.seat + 1}` : "Threat"}
-            threat={game.seats[reading.seat]?.threat ?? 0}
-            rows={threatRows(game, ctx).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, reading.seat) }))}
-            onClose={() => setReading(null)}
-          />
-        </View>
-      ) : null}
-      {/* The strip under the top bar over the canvas (not the dock); a tap outside it closes it. */}
-      <PhaseCarousel
-        open={reading?.kind === "carousel"}
-        carousel={carousel}
+      <TableLayers
+        store={store}
+        ctx={ctx}
+        names={names}
+        nameOf={nameOf}
+        picture={picture}
+        choice={choice}
+        reading={reading}
+        onReading={setReading}
         settings={settings}
-        top={insets.top + TOP_BAR}
-        left={insets.left}
-        width={carouselWidth}
-        height={carouselHeight}
-        onChange={(change) => tableSettings.getState().update(change)}
-        onClose={() => setReading(null)}
+        carousel={carousel}
+        logNames={logNames}
+        screen={screen}
+        insets={insets}
+        barBottom={insets.top + TOP_BAR}
+        commandWidth={commandWidth}
+        anchorTop={anchor}
+        onPreview={onPreview}
       />
       {/* Over the table and any open panel, centered on the screen under the top bar. */}
       {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} onBeat={choice.onBeat} /> : null}
