@@ -12,6 +12,9 @@ export const VERBS = [
   // Constant on a side quest ("Battle.", "Siege."): the characters committed to it quest with this stat instead of their
   // Willpower (families/sidequests-quest.ts).
   z.strictObject({ verb: z.literal("QuestsWith"), stat: z.enum(["attack", "defense"]), ...when }),
+  // The actor is eliminated from the game by a card effect ("At the end of the round, you are eliminated from the game",
+  // rr.player-elimination).
+  z.strictObject({ verb: z.literal("EliminatePlayer"), ...when }),
 ] as const;
 
 export const TRIGGERS = [

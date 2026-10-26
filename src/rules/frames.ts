@@ -106,7 +106,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
   const seat = frame.seat;
   // The card's effects were canceled just after it was revealed: it goes back into the encounter deck and the same
   // seat reveals another card (141001:A:1).
-  if (frame.data.canceled && frame.step >= 1) return revealAnother(state, frame, ctx, steps);
+  // A card a Response discarded as it canceled it (The Door is Closed!, 10092:A:1) is not returned: the reveal is over.
+  if (frame.data.canceled && frame.step >= 1) return state.cards[id]?.zone === "staging" ? revealAnother(state, frame, ctx, steps) : resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps);
   switch (frame.step) {
     case 0: {
       let next = moveCard(state, id, { zone: "staging" });

@@ -208,7 +208,7 @@ export function placeDamage(
   }
   if (lethal) {
     // The cards attached to an enemy hear that it was destroyed ("When attached enemy is destroyed", families/attachments-hold.ts).
-    if (printed.type === "enemy") next = noteHostDefeated(next, id);
+    if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, id);
     next = destroyCard(next, id, cards, steps, false, true);
     // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
@@ -232,6 +232,7 @@ export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<stri
     const current = next.cards[instance.id];
     if (!current || !inPlay(current.zone) || current.damage < modifiedStat(next, current, "hitPoints", cards)) continue;
     if (held(next, instance.id)) continue;
+    if (printed.type === "hero") next = noteHostDefeated(next, instance.id);
     next = destroyCard(next, instance.id, cards, steps, false, true);
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
   }

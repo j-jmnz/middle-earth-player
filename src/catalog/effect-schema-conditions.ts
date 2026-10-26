@@ -38,6 +38,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand"]) }),
   // A card with this code is in the victory display (`is`) or is not.
   z.strictObject({ kind: z.literal("inVictory"), code: z.string().min(1), is: z.boolean() }),
+  // The victory display holds a copy (a card with the same title) of the source, the card the answered event is about, the last
+  // picked card, the second card the event names or the active location (`is`), or none does ("if there is a card with the same
+  // title in the victory display", families/sidequests-pick.ts).
+  z.strictObject({ kind: z.literal("copyInVictory"), card: z.enum(["self", "subject", "picked", "other", "activeLocation"]), is: z.boolean().optional() }),
   // Some location other than the source is in the staging area or is the active location.
   z.strictObject({ kind: z.literal("otherLocationInPlay") }),
   // The actor controls a hero that is exhausted.

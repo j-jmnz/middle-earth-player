@@ -146,6 +146,186 @@ export const RECORDS: readonly Effect[] = [
     timing: "constant",
     instructions: [{ verb: "ReduceCost", amount: { count: { type: "card", control: "any", from: "victory", noVictory: true } } }],
   },
+  // Rossiel: "If the active location shares a Trait with a location in the victory display, Rossiel gets +2 Willpower." "If the
+  // attacking enemy shares a Trait with an enemy in the victory display, Rossiel gets +2 Defense."
+  {
+    id: "10028:constant:1",
+    cardCode: "10028",
+    lines: ["10028:A:1"],
+    timing: "constant",
+    instructions: [
+      {
+        verb: "ModifyStat",
+        stat: "willpower",
+        amount: 2,
+        until: "whileSourceInPlay",
+        when: { kind: "count", pick: { type: "location", control: "any", from: "victory", sharesTraitWith: "activeLocation" }, min: 1 },
+      },
+    ],
+  },
+  {
+    id: "10028:constant:2",
+    cardCode: "10028",
+    lines: ["10028:A:2"],
+    timing: "constant",
+    instructions: [
+      {
+        verb: "ModifyStat",
+        stat: "defense",
+        amount: 2,
+        until: "whileSourceInPlay",
+        when: { kind: "count", pick: { type: "enemy", control: "any", from: "victory", sharesTraitWith: "attackingEnemy" }, min: 1 },
+      },
+    ],
+  },
+  // The Door is Closed!: "Response: After an encounter card is revealed from the encounter deck, cancel its effects and discard it if
+  // there is a card with the same title in the victory display."
+  {
+    id: "10092:response:1",
+    cardCode: "10092",
+    lines: ["10092:A:1"],
+    timing: "response",
+    trigger: "encounterRevealed",
+    cost: { kind: "playEvent" },
+    condition: { kind: "copyInVictory", card: "subject" },
+    instructions: [{ verb: "CancelEffect" }, { verb: "MoveEncounterCard", card: "subject", to: "discard" }],
+  },
+  // Halfling Bounder: "While there is a side quest in the victory display, Halfling Bounder gains: 'Response: Discard Halfling
+  // Bounder to cancel the "when revealed" effects of an encounter card that was just revealed from the encounter deck.'"
+  {
+    id: "16005:response:1",
+    cardCode: "16005",
+    lines: ["16005:A:1"],
+    timing: "response",
+    trigger: "whenRevealedPending",
+    cost: { kind: "discardSelf" },
+    condition: SIDE_QUEST_IN_VICTORY,
+    instructions: [{ verb: "CancelEffect" }],
+  },
+  // Vigilant Dúnadan: "While there is a side quest in the victory display, Vigilant Dúnadan does not exhaust to defend."
+  {
+    id: "16006:constant:1",
+    cardCode: "16006",
+    lines: ["16006:A:1"],
+    timing: "constant",
+    condition: SIDE_QUEST_IN_VICTORY,
+    instructions: [{ verb: "ModifyStat", stat: "noExhaustDefend", amount: 1, until: "whileSourceInPlay" }],
+  },
+  // Rider of Rohan: "While a side quest is in the victory display, Rider of Rohan does not exhaust to quest."
+  {
+    id: "17060:constant:1",
+    cardCode: "17060",
+    lines: ["17060:A:1"],
+    timing: "constant",
+    condition: SIDE_QUEST_IN_VICTORY,
+    instructions: [{ verb: "ModifyStat", stat: "noExhaustQuest", amount: 1, until: "whileSourceInPlay" }],
+  },
+  // East Road Ranger: "East Road Ranger gets +2 Willpower while committed to a side quest."
+  {
+    id: "10008:constant:1",
+    cardCode: "10008",
+    lines: ["10008:A:1"],
+    timing: "constant",
+    condition: { kind: "matches", card: "self", pick: { type: "ally", control: "any", committedTo: "sideQuest" } },
+    instructions: [{ verb: "ModifyStat", stat: "willpower", amount: 2, until: "whileSourceInPlay" }],
+  },
+  // Legacy Blade: "Attached hero gets +1 Attack for each side quest in the victory display. (Limit +3 Attack.)"
+  {
+    id: "17117:constant:2",
+    cardCode: "17117",
+    lines: ["17117:A:2"],
+    timing: "constant",
+    instructions: [{ verb: "ModifyStat", stat: "attack", amount: { count: SIDE_QUESTS_IN_VICTORY, limit: 3 }, until: "whileSourceInPlay", target: "host" }],
+  },
+  // Thalion: "While there is at least 1 side quest in the victory display, ready Thalion at the beginning of the combat phase."
+  // "While there are at least 3 side quests in the victory display, Thalion loses the ally card type, gains the hero card type and
+  // the resource icons of each sphere on a side quest in the victory display."
+  {
+    id: "19065:triggered:1",
+    cardCode: "19065",
+    lines: ["19065:A:1"],
+    timing: "triggered",
+    trigger: "beginningOfPhase",
+    condition: { kind: "all", conditions: [{ kind: "phase", is: "Combat" }, SIDE_QUEST_IN_VICTORY] },
+    instructions: [{ verb: "Ready" }],
+  },
+  {
+    id: "19065:constant:1",
+    cardCode: "19065",
+    lines: ["19065:A:2"],
+    timing: "constant",
+    condition: { kind: "count", pick: SIDE_QUESTS_IN_VICTORY, min: 3 },
+    instructions: [
+      { verb: "ModifyStat", stat: "heroType", amount: 1, until: "whileSourceInPlay" },
+      ...(["leadership", "lore", "tactics", "spirit"] as const).map((sphere) => ({
+        verb: "ModifyStat" as const,
+        stat: `${sphere}Icon` as const,
+        amount: 1,
+        until: "whileSourceInPlay" as const,
+        when: { kind: "count" as const, pick: { ...SIDE_QUESTS_IN_VICTORY, sphere }, min: 1 },
+      })),
+    ],
+  },
+  // Woodland Sentry: "Response: After you play Woodland Sentry from your hand, choose an enemy or location in play. If there is a
+  // copy of that card in the victory display, discard the chosen card."
+  {
+    id: "22030:response:1",
+    cardCode: "22030",
+    lines: ["22030:A:1"],
+    timing: "response",
+    trigger: "played",
+    subject: "self",
+    instructions: [
+      {
+        verb: "Choose",
+        who: "actor",
+        options: [
+          {
+            id: "enemy",
+            requires: { kind: "canPick", pick: { type: "enemy", control: "any", staging: true } },
+            instructions: [
+              { verb: "Pick", pick: { type: "enemy", control: "any", staging: true } },
+              { verb: "Discard", target: { kind: "picked" }, when: { kind: "copyInVictory", card: "picked" } },
+            ],
+          },
+          {
+            id: "location",
+            requires: { kind: "canPick", pick: { type: "location", control: "any" } },
+            instructions: [
+              { verb: "Pick", pick: { type: "location", control: "any" } },
+              { verb: "Discard", target: { kind: "picked" }, when: { kind: "copyInVictory", card: "picked" } },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  // The Fall of Gil-Galad: "Response: When attached hero is destroyed, add The Fall of Gil-Galad to the victory display to reduce
+  // your threat by X, where X is the attached hero's threat cost."
+  {
+    id: "08007:response:1",
+    cardCode: "08007",
+    lines: ["08007:A:2"],
+    timing: "response",
+    trigger: "hostDefeated",
+    cost: { kind: "addSelfToVictory" },
+    instructions: [{ verb: "LowerThreat", amount: { stat: "threatCost", of: "other" }, who: "actor" }],
+  },
+  // Justice Shall Be Done: "Planning Action: Add Justice Shall Be Done to the victory display to draw 3 cards and add 3 resources to
+  // the resource pool of each hero you control. At the end of the round, you are eliminated from the game."
+  {
+    id: "12119:action:1",
+    cardCode: "12119",
+    lines: ["12119:A:2"],
+    timing: "action",
+    condition: { kind: "phase", is: "Planning" },
+    instructions: [
+      { verb: "AddSourceToVictory" },
+      { verb: "Draw", amount: 3 },
+      { verb: "HeroesGainResources", amount: 3 },
+      { verb: "Delay", until: "endOfRound", instructions: [{ verb: "EliminatePlayer" }] },
+    ],
+  },
   // Dour Handed: "Action: Deal X damage to an enemy engaged with you. X is the number of side quests in the victory display."
   {
     id: "16009:action:1",
@@ -159,7 +339,6 @@ export const RECORDS: readonly Effect[] = [
   },
 ];
 
-void SIDE_QUEST_IN_VICTORY;
 
 // Generated record ids an authored record here replaces.
 export const REPLACES: readonly string[] = [];

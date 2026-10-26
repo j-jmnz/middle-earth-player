@@ -143,9 +143,8 @@ export const pickSchema = z.strictObject({
   // The sidequests family's filters (families/sidequests-pick.ts). A card that shares a Trait with the active location, or with
   // the enemy of the attack in progress ("a location in the victory display that shares a Trait with the active location").
   sharesTraitWith: z.enum(["activeLocation", "attackingEnemy"]).optional(),
-  // A card with the same title as the active location, as the card the answered event is about, or as the last picked card ("a
-  // copy of that card in the victory display").
-  sameTitleAs: z.enum(["activeLocation", "subject", "picked"]).optional(),
+  // A card with the same title as the active location ("each location in the staging area with the same title as the active location").
+  sameTitleAs: z.literal("activeLocation").optional(),
   // A character committed to a side quest (`sideQuest`), or to the current quest (`mainQuest`).
   committedTo: z.enum(["sideQuest", "mainQuest"]).optional(),
 });

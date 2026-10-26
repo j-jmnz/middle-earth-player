@@ -52,6 +52,16 @@ export const SIDE_CARDS: ReadonlyMap<string, PrintedCard> = new Map([
     definePrinted({ code: "wolf", name: "Wolf", type: "enemy", threat: 1, engagementCost: 30, attack: 2, defense: 1, health: 3, traits: ["Creature"] }),
     definePrinted({ code: "wolf2", name: "Wolf", type: "enemy", threat: 1, engagementCost: 30, attack: 2, defense: 1, health: 3, traits: ["Creature"] }),
     definePrinted({ code: "plot", name: "Plot", type: "objective" }),
+    definePrinted({ code: "forest-road", name: "Old Forest Road", type: "location", threat: 1, questPoints: 4, traits: ["Forest"] }),
+    definePrinted({ code: "warg", name: "Warg", type: "enemy", threat: 2, engagementCost: 30, attack: 3, defense: 1, health: 4, traits: ["Orc", "Creature"] }),
+    definePrinted({ code: "curse", name: "Curse", type: "treachery" }),
+    definePrinted({ code: "08007", name: "The Fall of Gil-Galad", type: "attachment", sphere: "spirit", cost: 1, victory: 1, traits: ["Song"] }),
+    definePrinted({ code: "19065", name: "Thalion", type: "ally", sphere: "neutral", cost: 4, willpower: 2, attack: 2, defense: 2, health: 3, isUnique: true, traits: ["Dúnedain", "Ranger"] }),
+    definePrinted({ code: "22030", name: "Woodland Sentry", type: "ally", sphere: "lore", cost: 1, willpower: 0, attack: 1, defense: 1, health: 2, traits: ["Silvan"] }),
+    definePrinted({ code: "16005", name: "Halfling Bounder", type: "ally", sphere: "lore", cost: 2, willpower: 1, attack: 1, defense: 0, health: 2, traits: ["Hobbit"] }),
+    definePrinted({ code: "10092", name: "The Door is Closed!", type: "event", sphere: "lore", cost: 1 }),
+    definePrinted({ code: "12119", name: "Justice Shall Be Done", type: "event", sphere: "neutral", cost: 0 }),
+    definePrinted({ code: "17117", name: "Legacy Blade", type: "attachment", sphere: "lore", cost: 0, traits: ["Item", "Weapon"], keywords: { restricted: true } }),
   ]),
 ]);
 

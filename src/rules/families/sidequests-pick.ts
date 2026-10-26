@@ -15,28 +15,27 @@ function traitsOf(state: ScenarioState, id: string, ctx: ReduceContext): string[
 }
 
 // The card a `sharesTraitWith` or `sameTitleAs` filter compares with.
-function comparedWith(state: ScenarioState, which: "activeLocation" | "attackingEnemy" | "subject" | "picked", at: PickContext): string | null {
-  switch (which) {
-    case "activeLocation":
-      return state.activeLocation;
-    case "attackingEnemy":
-      return state.pendingAttack?.enemyId ?? state.pendingStrike?.enemyId ?? null;
-    case "subject":
-      return at.subject ?? null;
-    case "picked":
-      return at.picked?.at(-1) || null;
-  }
+function comparedWith(state: ScenarioState, which: "activeLocation" | "attackingEnemy"): string | null {
+  return which === "activeLocation" ? state.activeLocation : (state.pendingAttack?.enemyId ?? state.pendingStrike?.enemyId ?? null);
 }
 
-export function sidequestsPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext): boolean {
+// The victory display holds a card with the same title as this one (the `copyInVictory` condition).
+export function copyInVictory(state: ScenarioState, id: string | null, ctx: ReduceContext): boolean {
+  const code = id ? state.cards[id]?.code : undefined;
+  if (!code) return false;
+  const name = printedOf(ctx.cards, code).name;
+  return state.victory.some((other) => other !== id && printedOf(ctx.cards, state.cards[other]?.code ?? code).name === name);
+}
+
+export function sidequestsPickMatches(state: ScenarioState, id: string, spec: PickSpec, _at: PickContext, ctx: ReduceContext): boolean {
   if (spec.sharesTraitWith) {
-    const other = comparedWith(state, spec.sharesTraitWith, at);
+    const other = comparedWith(state, spec.sharesTraitWith);
     if (!other || other === id) return false;
     const mine = traitsOf(state, id, ctx);
     if (!traitsOf(state, other, ctx).some((trait) => mine.includes(trait))) return false;
   }
   if (spec.sameTitleAs) {
-    const other = comparedWith(state, spec.sameTitleAs, at);
+    const other = comparedWith(state, spec.sameTitleAs);
     const instance = state.cards[id];
     const compared = other ? state.cards[other] : undefined;
     if (!instance || !compared || other === id) return false;

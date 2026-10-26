@@ -14,6 +14,7 @@ import { printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
 import { combatStepIs } from "./families/defense-conditions.ts";
+import { copyInVictory } from "./families/sidequests-pick.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -74,6 +75,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return sourceIn(state, scope.sourceId, condition.zone);
     case "inVictory":
       return state.victory.some((id) => state.cards[id]?.code === condition.code) === condition.is;
+    case "copyInVictory":
+      return copyInVictory(state, conditionCard(state, condition.card, scope), ctx) === (condition.is !== false);
     case "otherLocationInPlay":
       return [...state.staging, state.activeLocation, state.secondActiveLocation].some(
         (id) => id != null && id !== scope.sourceId && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location",
