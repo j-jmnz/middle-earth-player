@@ -11,18 +11,12 @@ import type { IconName } from "./icon-map.ts";
 import type { LogMark } from "./log.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 
 const badgeIn = FadeIn.duration(160).reduceMotion(ReduceMotion.System);
 const badgeOut = FadeOut.duration(400).reduceMotion(ReduceMotion.System);
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
-
-// A token at some opacity, so the palette drift test covers the dial's tint too.
-export function withAlphaHex(hex: string, alpha: number): string {
-  const value = Number.parseInt(hex.slice(1), 16);
-  return `rgba(${(value >> 16) & 255},${(value >> 8) & 255},${value & 255},${alpha})`;
-}
 
 // The dial's edge and fill at each level (threat-level.ts): threat red, tinted near elimination, solid when critical.
 const DIAL: Record<ThreatLevel, { edge: string; fill: string; meter: string }> = {

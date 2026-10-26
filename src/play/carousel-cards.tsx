@@ -1,5 +1,6 @@
 // The cards of the phase carousel (phase-carousel.tsx): one per phase, with its steps, what the player decides there and the action
 // windows as Stop switches, on the night raised surface. Reading and the player's Stops settings only; nothing here sends an intent.
+import { useRef, type ComponentRef } from "react";
 import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 
 import type { CarouselPhase, CarouselStep } from "./carousel.ts";
@@ -73,15 +74,19 @@ function StepBlock({
   settings,
   onChange,
   past,
+  onLayoutY,
 }: {
   step: CarouselStep;
   settings: Pick<TableSettings, "stops">;
   onChange: (change: Partial<TableSettings>) => void;
   past: boolean;
+  // Called with the step's top inside its card: the current step's, so the card can open on it.
+  onLayoutY?: (y: number) => void;
 }) {
   return (
     <View
       testID={`carousel-step-${step.id}`}
+      onLayout={onLayoutY ? (event) => onLayoutY(event.nativeEvent.layout.y) : undefined}
       style={{
         marginTop: 6,
         borderRadius: 12,
@@ -126,6 +131,8 @@ export function PhaseCard({
 }) {
   const past = phase.state === "past";
   const current = phase.state === "current";
+  // The current card opens on its current step, so the step and its Stop switch show on a short phone.
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   return (
     <View
       testID={`carousel-phase-${phase.id}`}
@@ -172,12 +179,11 @@ export function PhaseCard({
           />
         ) : null}
       </View>
-      <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 8 }}>
+      <ScrollView ref={scroll} nestedScrollEnabled showsVerticalScrollIndicator persistentScrollbar contentContainerStyle={{ paddingBottom: 8 }}>
         {phase.steps.map((step) => (
-          <StepBlock key={step.id} step={step} settings={settings} onChange={onChange} past={past} />
+          <StepBlock key={step.id} step={step} settings={settings} onChange={onChange} past={past} onLayoutY={step.current && current ? (y) => scroll.current?.scrollTo({ y, animated: false }) : undefined} />
         ))}
       </ScrollView>
     </View>
   );
 }
-

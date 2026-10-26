@@ -93,3 +93,23 @@ function stopAhead(game: ScenarioState, phase: CarouselPhase | undefined, stops:
   const from = waiting >= 0 ? waiting + 1 : flat.findIndex((window) => window.index >= now);
   return from >= 0 && flat.slice(from).some((window) => stops.includes(window.id));
 }
+
+/** The Stops setting in words (the screen reader's hint on the master switch). */
+export const STOPS_TEXT = "Pass the action windows that are not stops, unless a card usable there is new. Planning, the commit, Responses and every choice still ask.";
+/** The words for the gold S: a stop of the player's lies ahead in this phase. */
+export const STOP_AHEAD_WORDS = "A stop is ahead";
+
+const CARD_MIN = 230;
+const CARD_MAX = 340;
+
+/** The card's width for a strip `width` wide: about 58% of it, so the neighbors show at the sides, clamped to 230..340. */
+export function cardWidth(width: number): number {
+  return Math.round(Math.min(CARD_MAX, Math.max(CARD_MIN, width * 0.58)));
+}
+
+/** The index the strip starts on: the current phase; the first before Resource, the last after Refresh. */
+export function startIndex(carousel: Carousel): number {
+  const at = carousel.phases.findIndex((phase) => phase.state === "current");
+  if (at >= 0) return at;
+  return carousel.phases[0]?.state === "past" ? carousel.phases.length - 1 : 0;
+}

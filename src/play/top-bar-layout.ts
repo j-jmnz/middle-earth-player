@@ -7,16 +7,17 @@ import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 export const MENU_BUTTON = 44;
 const GAP = 8;
 // Wide enough for the widest pill and both neighbor phases (RAIL_WIDE), with room over.
-export const RAIL_MAX = 440;
+export const RAIL_MAX = 460;
 
-// The rail's pill is two lines (table-chrome.tsx): "Round 3 · QUEST" over the step, "Staging". Its floor comes from the pill's
+// The rail's pill is two lines (phase-rail.tsx): "Round 3 · QUEST" over the step, "Staging". Its floor comes from the pill's
 // own words, never from a guess about the bar:
 // - the phase is Marcellus caps at the body size (17 pt). A capital averages 0.625 em in Marcellus ("Optional engagement"
 //   measures 202 pt on the web build); 0.65 leaves a margin;
 // - "Round 99" and the step are label size (13 pt) in the system font, which averages under 0.55 em a character; 0.55 leaves a
 //   margin;
 // - neither counts shrinking (PhaseRail may shrink the phase to 85%), which is more margin, nor the glow;
-// - the pill adds its 2 x 1 pt edge and 2 x 10 pt padding.
+// - the pill adds its 2 x 1 pt edge and 2 x 10 pt padding, and its top line keeps the room of the gold S that marks a stop ahead
+//   when the neighbors are not shown (STOP_MARK, counted whether or not it shows).
 const PHASE_SIZE = 17;
 const CAP_EM = 0.65;
 const LABEL_SIZE = 13;
@@ -44,7 +45,7 @@ const capsWidth = (word: string) => Math.ceil(word.length * CAP_EM * PHASE_SIZE)
 
 /** The width the pill needs for the round over the step: the wider of its two lines, plus its chrome. */
 export function pillWidth(round: string, phase: string, step: string): number {
-  const top = labelWidth(round) + (phase ? DOT + capsWidth(phase) : 0);
+  const top = labelWidth(round) + (phase ? DOT + capsWidth(phase) : 0) + STOP_MARK;
   return Math.max(top, labelWidth(step)) + PILL_CHROME;
 }
 

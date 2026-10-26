@@ -34,6 +34,9 @@ tags:
 # tap outside closes it and sends nothing. The step keeps its id.
 - assertVisible:
     id: rail-current
+- assertVisible:
+    id: rail-phase
+    text: "Combat"
 - tapOn:
     id: rail
 - assertVisible:

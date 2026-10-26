@@ -2,7 +2,7 @@
 // Life and the Burden deck), the phase rail centered on the bar, and the menu button at the right. Back, Log, Rules, Booklet
 // and Table settings are in the menu (src/play/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ScrollView, View, type LayoutChangeEvent } from "react-native";
 
 import type { Rail } from "../play/rail";
@@ -10,9 +10,13 @@ import type { SeatThreat } from "../play/selectors";
 import { PhaseRail } from "../play/phase-rail";
 import { ThreatRing } from "../play/table-chrome";
 import { MenuButton } from "../play/table-menu";
+import { tableTokens as t, withAlphaHex } from "../play/tokens";
 import { barZones, railWide } from "../play/top-bar-layout";
 
 export const TOP_BAR = 44;
+// The scroll fade: this many bands of this width, rising to nearly the felt.
+const FADE_BANDS = 7;
+const FADE_BAND = 4;
 
 export type TopBarProps = {
   threats: readonly SeatThreat[];
@@ -41,7 +45,13 @@ export function TableTopBar({ threats, seat, life, burdenDeck, rail, stopAhead, 
   const onDials = (event: LayoutChangeEvent) => setDials(Math.round(event.nativeEvent.layout.width));
   // The zones need the bar and the dials measured. Until both are, the rail is held invisible rather than drawn at a guess, so it
   // never jumps when the table opens.
-  const zones = bar > 0 && dials > 0 ? barZones(bar - 16, dials) : null;
+  // If the dials never report a width, the rail still shows after a moment, on a dial width of 0.
+  const [waited, setWaited] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setWaited(true), 400);
+    return () => clearTimeout(timer);
+  }, []);
+  const zones = bar > 0 && (dials > 0 || waited) ? barZones(bar - 16, dials) : null;
   return (
     <View testID="table-top-bar" className="flex-row items-center px-2" style={{ height: TOP_BAR }} onLayout={onBar}>
       <View testID="top-bar-left" style={{ width: zones?.left ?? "30%" }}>
@@ -72,8 +82,16 @@ export function TableTopBar({ threats, seat, life, burdenDeck, rail, stopAhead, 
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
           </View>
         </ScrollView>
+        {/* The dials scroll: a fade at the right edge so a cut dial reads as more to scroll to (bands, no gradient library). */}
+        {zones?.scroll ? (
+          <View testID="top-bar-fade" pointerEvents="none" style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: FADE_BANDS * FADE_BAND, flexDirection: "row" }}>
+            {Array.from({ length: FADE_BANDS }, (_, band) => (
+              <View key={band} style={{ width: FADE_BAND, backgroundColor: withAlphaHex(t.felt, ((band + 1) / FADE_BANDS) * 0.9) }} />
+            ))}
+          </View>
+        ) : null}
       </View>
-      <View testID="top-bar-middle" style={{ width: zones?.rail ?? "40%", opacity: zones ? 1 : 0 }}>
+      <View testID="top-bar-middle" style={{ width: zones?.rail ?? "40%", opacity: zones ? 1 : 0 }} pointerEvents={zones ? "auto" : "none"} importantForAccessibility={zones ? "auto" : "no-hide-descendants"}>
         <PhaseRail rail={rail} wide={zones != null && railWide(zones.rail, narrow)} shortRound={narrow} stopAhead={stopAhead} open={carouselOpen} onPress={onRail} />
       </View>
       <View testID="top-bar-right" style={{ width: zones?.right ?? "30%", alignItems: "flex-end" }}>

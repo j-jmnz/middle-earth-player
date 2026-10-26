@@ -287,8 +287,7 @@ export function SettingsPanel({
   return (
     <SheetFrame testID="settings-panel" edge="right">
       <View className="items-center">
-        <Text className="font-display text-eyebrow uppercase text-inkLabel">Table</Text>
-        <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">
+        <Text accessibilityRole="header" className="font-display text-title text-ink">
           Table settings
         </Text>
       </View>

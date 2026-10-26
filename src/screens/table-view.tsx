@@ -211,9 +211,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const panelTop = screen.height < SHORT ? 0 : insets.top + TOP_BAR;
   const panelStyle = { position: "absolute" as const, top: panelTop, bottom: 0, right: 0, width: panelWidth + insets.right };
   const narrow = screen.width - insets.left - insets.right < 760;
-  // The strip covers the canvas top: as wide as the canvas, not the command column, and no taller than 85% of the room under the bar.
+  // The strip covers the canvas top: as wide as the canvas, not the command column, and no taller than 92% of the room under the bar.
   const carouselWidth = screen.width - insets.left - insets.right - commandWidth;
-  const carouselHeight = Math.round(Math.min(300, (screen.height - insets.top - TOP_BAR) * 0.85));
+  const carouselHeight = Math.round(Math.min(340, (screen.height - insets.top - TOP_BAR) * 0.92));
   const previewed = preview
     ? previewCards(
         game,

@@ -20,9 +20,9 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { STOP_AHEAD_WORDS } from "./carousel.ts";
 import type { Rail } from "./rail.ts";
-import { withAlphaHex } from "./table-chrome.tsx";
-import { tableTokens as t } from "./tokens.ts";
+import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 import { CHEVRON, PHASE_SLOT, SIDE_GAP, STOP_MARK } from "./top-bar-layout.ts";
 
 // Motion values for phase 23's motion-tokens.ts: neighbor names slide 280 ms ease-out, the pill's edge flashes gold for 300 ms,
@@ -79,10 +79,13 @@ function Neighbor({ side, name, stopAhead }: { side: "previous" | "next"; name: 
           numberOfLines={1}
           entering={slideIn}
           exiting={slideOut}
-          className="absolute text-label text-muted"
           style={{
+            position: "absolute",
             left: 0,
             right: 0,
+            color: t.muted,
+            fontSize: 13,
+            lineHeight: 18,
             textAlign: side === "previous" ? "right" : "left",
           }}
         >
@@ -95,7 +98,7 @@ function Neighbor({ side, name, stopAhead }: { side: "previous" | "next"; name: 
   const mark = (
     <View style={{ width: STOP_MARK, alignItems: "center" }}>
       {side === "next" && stopAhead ? (
-        <Text testID="rail-stop-ahead" accessibilityLabel="A stop is ahead" className="font-display text-label text-gold">
+        <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display text-label text-gold">
           S
         </Text>
       ) : null}
@@ -123,7 +126,7 @@ function Neighbor({ side, name, stopAhead }: { side: "previous" | "next"; name: 
 /**
  * The rail: round, phase and step in a pill, "Round 3 · QUEST" over "Staging". `wide` adds the previous and next phase at its
  * sides; `shortRound` (a phone under 760 pt inside the insets) says "R3" for the round. `stopAhead` puts a gold S by the next
- * chevron. A tap calls `onPress` (the carousel opens or closes).
+ * chevron, or at the end of the pill's top line when the neighbors are not shown. The pill's goldLine edge says it is a button. A tap calls `onPress` (the carousel opens or closes).
  */
 export function PhaseRail({
   rail,
@@ -149,10 +152,10 @@ export function PhaseRail({
     if (!reduceMotion) flash.set(withSequence(withTiming(1, { duration: FLASH_IN_MS }), withTiming(0, { duration: FLASH_MS - FLASH_IN_MS })));
   }, [rail.phase, reduceMotion, flash]);
   const edge = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(flash.get(), [0, 1], [open ? t.goldLine : t.hairline, t.gold]),
+    borderColor: interpolateColor(flash.get(), [0, 1], [open ? t.gold : t.goldLine, t.gold]),
   }));
   const round = rail.round > 0 ? (shortRound ? `R${rail.round}` : `Round ${rail.round}`) : "";
-  const label = [rail.round > 0 ? `Round ${rail.round}` : "", rail.phase, rail.current, stopAhead ? "A stop is ahead" : ""].filter(Boolean).join(". ");
+  const label = [rail.round > 0 ? `Round ${rail.round}` : "", rail.phase, rail.current, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(". ");
   return (
     <Pressable
       testID="rail"
@@ -224,6 +227,12 @@ export function PhaseRail({
                   }}
                 >
                   {rail.phase}
+                </Text>
+              ) : null}
+              {/* Without the neighbors there is no chevron to carry the S: it stands in the pill, in the room the floor keeps. */}
+              {!wide && stopAhead ? (
+                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display text-label text-gold" style={{ marginLeft: 4, lineHeight: 20 }}>
+                  S
                 </Text>
               ) : null}
             </View>
