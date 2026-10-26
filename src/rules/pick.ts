@@ -12,7 +12,7 @@ import { playPickMatches } from "./families/play-pick.ts";
 import { lookedPool } from "./families/deck-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
-import { isPlayerType, printedOf } from "./printed.ts";
+import { cardTypeOf, isPlayerType, printedOf } from "./printed.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
@@ -101,7 +101,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if ((id === at.sourceId && (from !== "play" || spec.other)) || (spec.different && picked.includes(id))) return false;
   if (spec.type !== "card" && spec.type !== "player") {
     // A card among a player's heroes is a hero: an ally that gained the hero card type sits there (heroType, families/play-sweep.ts).
-    const type = instance.zone === "heroes" ? "hero" : printed.type;
+    const type = cardTypeOf(instance, printed);
     const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type;
     if (!typed) return false;
   }
@@ -175,7 +175,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
 function onHost(state: ScenarioState, hostId: string | null, on: NonNullable<PickSpec["on"]>, asking: number, ctx: ReduceContext): boolean {
   const host = hostId ? state.cards[hostId] : undefined;
   if (!host || host.controller == null) return false;
-  const type = printedOf(ctx.cards, host.code).type;
+  const type = cardTypeOf(host, printedOf(ctx.cards, host.code));
   if (on.type === "hero" ? type !== "hero" : type !== "hero" && type !== "ally") return false;
   return on.control === "any" || (on.control === "you") === (host.controller === asking);
 }

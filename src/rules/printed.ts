@@ -85,6 +85,12 @@ const EMPTY_KEYWORDS: Keywords = {
   secrecy: null,
 };
 
+// The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play-sweep.ts) lost
+// the ally type and gained the hero type (rr.card-types: Sword-thain, Prince Imrahil). Everything else has its printed type.
+export function cardTypeOf(instance: { zone: string }, printed: PrintedCard): CardType {
+  return instance.zone === "heroes" ? "hero" : printed.type;
+}
+
 export function definePrinted(
   card: Partial<Omit<PrintedCard, "keywords">> &
     Pick<PrintedCard, "code" | "name" | "type"> & { keywords?: Partial<Keywords> },

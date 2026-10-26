@@ -10,7 +10,7 @@ import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
-import { printedOf, type Sphere } from "./printed.ts";
+import { cardTypeOf, printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
 import { combatStepIs } from "./families/defense-conditions.ts";
@@ -208,7 +208,7 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return (
         Object.values(state.cards).some((card) => {
           const host = card.host ? state.cards[card.host] : undefined;
-          return card.code === condition.code && card.zone === "attached" && host != null && printedOf(ctx.cards, host.code).type === "hero";
+          return card.code === condition.code && card.zone === "attached" && host != null && cardTypeOf(host, printedOf(ctx.cards, host.code)) === "hero";
         }) === condition.is
       );
     case "hostActive": {

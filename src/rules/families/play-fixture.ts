@@ -71,6 +71,7 @@ export const PLAY_CARDS = cardMap([
   ally("22057", "Soldier of Isengard", "leadership", ["Dunland"], { keywords: { doomed: 2 } }),
   ally("22117", "Wilyador", "spirit", ["Creature", "Eagle"], { isUnique: true }),
   event("132010", "Desperate Alliance", "leadership"),
+  ally("145005", "Prince Imrahil", "leadership", ["Gondor", "Noble"], { isUnique: true, cost: 3 }),
   ally("144007", "Gamling", "spirit", ["Rohan"], { isUnique: true }),
   ally("146006", "Elfhelm", "spirit", ["Rohan"], { isUnique: true }),
 ]);

@@ -5,7 +5,7 @@ import type { Cause } from "./cause.ts";
 import { threatSaved } from "./families/quest-threat.ts";
 import { isGuarded, noteHostDefeated, releaseGuarded } from "./families/attachments-hold.ts";
 import type { EngineStep } from "./intents.ts";
-import { fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
+import { cardTypeOf, fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
@@ -45,7 +45,7 @@ export const ALLIES_CLASS = "allies";
 
 // Whether a modifier is held by this card: by its id, or by the class ALLIES_CLASS.
 export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
-  return modifier.instanceId === instance.id || (modifier.instanceId === ALLIES_CLASS && printed.type === "ally" && inPlay(instance.zone));
+  return modifier.instanceId === instance.id || (modifier.instanceId === ALLIES_CLASS && cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone));
 }
 
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
@@ -299,7 +299,7 @@ export function releaseAttachments(
     }
     const printed = printedOf(cards, attachment.code);
     const dest: Destination =
-      hostPrinted.type === "hero" && printed.keywords.permanent
+      cardTypeOf(host, hostPrinted) === "hero" && printed.keywords.permanent
         ? { zone: "removed" }
         : defeatedDestination(attachment, printed);
     next = moveCard(next, attachmentId, dest);
@@ -335,7 +335,7 @@ export function destroyCard(
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck-rules.ts).
   next = moveCard(next, id, alliesToHandDestination(next, latest, printed) ?? defeatedDestination(latest, printed), instance.attachments);
   steps.push({ kind: "destroy", targetId: id });
-  if (printed.type === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
+  if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   next = discardedFromPlay(next, instance, byDamage);
   if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
   return eliminateEmpties(next, steps);
@@ -393,11 +393,13 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
   return next;
 }
 
-export function eliminateEmpties(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+// `final`: the play sweep has already let an ally gain the hero card type, so a seat in heroSavers with no heroes is eliminated now.
+export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], final = false): ScenarioState {
   let next = state;
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
     if (!seat || seat.eliminated) continue;
+    if (!final && seat.threat < 50 && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
     if (seat.threat >= 50 || seat.heroes.length === 0) {
       // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).
       const saved = seat.heroes.length > 0 ? threatSaved(next, index) : null;

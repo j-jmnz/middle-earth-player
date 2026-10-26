@@ -13,7 +13,7 @@ import type { ReduceContext } from "../interpret.ts";
 import { releaseAttachments, uniqueBlocked } from "../keywords.ts";
 import { matchesPick } from "../pick.ts";
 import { lastPicked, pickedList, putOnDeck, seatOf } from "../player-verbs.ts";
-import { isPlayerType, printedOf } from "../printed.ts";
+import { cardTypeOf, isPlayerType, printedOf } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import { shuffleIds } from "../seed.ts";
 import type { CardInstance, EffectData, ScenarioState } from "../state.ts";
@@ -58,7 +58,7 @@ function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, steps: 
   const card = state.cards[id];
   if (!card || !inPlay(card.zone)) return state;
   const released = updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false, committed: false });
-  return printedOf(ctx.cards, card.code).type === "ally" ? queueEvent(released, { trigger: "allyLeftPlay", seat: card.controller, subject: id }) : released;
+  return cardTypeOf(card, printedOf(ctx.cards, card.code)) === "ally" ? queueEvent(released, { trigger: "allyLeftPlay", seat: card.controller, subject: id }) : released;
 }
 
 // MoveCard: the card goes to its owner's hand, deck or discard pile, or is removed from the game.

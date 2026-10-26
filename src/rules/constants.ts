@@ -8,7 +8,7 @@ import { hasTrait } from "./conditions.ts";
 import { constantInstructions } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
-import { isCharacterType, printedOf } from "./printed.ts";
+import { cardTypeOf, isCharacterType, printedOf } from "./printed.ts";
 import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { inPlay, livingSeats, modifierActive } from "./state.ts";
 
@@ -34,7 +34,7 @@ function holders(state: ScenarioState, source: CardInstance, target: string | un
 function holdersOf(state: ScenarioState, source: CardInstance, target: string | undefined, ctx: ReduceContext): string[] {
   switch (target) {
     case "heroes":
-      return cardsInPlay(state).filter((instance) => printedOf(ctx.cards, instance.code).type === "hero").map((instance) => instance.id);
+      return cardsInPlay(state).filter((instance) => cardTypeOf(instance, printedOf(ctx.cards, instance.code)) === "hero").map((instance) => instance.id);
     case "hobbitCharacters":
       return cardsInPlay(state)
         .filter((instance) => (instance.zone === "heroes" || instance.zone === "play") && isCharacterType(printedOf(ctx.cards, instance.code)) && hasTrait(state, instance.id, "Hobbit", ctx))
@@ -51,7 +51,7 @@ function holdersOf(state: ScenarioState, source: CardInstance, target: string | 
     case "engagedSeatCharacters":
       return source.zone === "engaged" && source.controller != null ? characters(state, source.controller, ctx.cards) : [];
     case "allies":
-      return cardsInPlay(state).filter((instance) => printedOf(ctx.cards, instance.code).type === "ally").map((instance) => instance.id);
+      return cardsInPlay(state).filter((instance) => cardTypeOf(instance, printedOf(ctx.cards, instance.code)) === "ally").map((instance) => instance.id);
     case "eachSeat":
       return livingSeats(state).map((seat) => `seat:${seat}`);
     // The source controller's seat ("You draw 1 additional card during the resource phase").

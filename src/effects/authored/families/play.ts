@@ -139,6 +139,8 @@ export const RECORDS: readonly Effect[] = [
   { id: "10141:response:1", cardCode: "10141", lines: ["10141:A:1"], timing: "response", trigger: "discardedFromPlay", subject: { type: "ally", control: "any", trait: "Rohan" }, condition: EXHAUSTED_SELF, instructions: [{ verb: "Ready" }] },
   // Sword-thain: the attached ally is a hero.
   { id: "10149:constant:2", cardCode: "10149", lines: ["10149:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "heroType", amount: 1, until: "whileSourceInPlay", target: "host" }] },
+  // Prince Imrahil: with a hero in his controller's discard pile he is a hero (rr.card-types), like an ally with Sword-thain.
+  { id: "145005:constant:1", cardCode: "145005", lines: ["145005:A:1"], timing: "constant", condition: { kind: "count", pick: { type: "hero", control: "you", from: "discard" }, min: 1 }, instructions: [{ verb: "ModifyStat", stat: "heroType", amount: 1, until: "whileSourceInPlay" }] },
   // Vanish from Sight: your threat is treated as 20 at most until the end of the phase.
   { id: "12011:action:1", cardCode: "12011", lines: ["12011:A:2"], timing: "action", instructions: [{ verb: "ModifyStat", stat: "threatCeiling", amount: 20, until: "endOfPhase", target: "actorSeat" }] },
   // Ceorl: any player may spend 1 Spirit resource to ready him, then may give control of him to another player.

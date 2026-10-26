@@ -11,5 +11,10 @@ Branch wip/leftovers (from ccr-a8ef8247-8087n8). Three tasks.
 - New condition `questKeyword`, new ModifyStat target `currentQuest`. Record 06036:action:1 in authored/families/quest.ts.
 - Tests: src/rules/families/quest-keywords.test.ts.
 
-## 2. Imrahil 145005:A:1 (todo)
+## 2. Imrahil 145005:A:1 (done)
+- Reused play family `heroType` flag (zone heroes = hero card type). Record 145005:constant:1 in authored/families/play.ts with a
+  `count` condition (hero in own discard). New `cardTypeOf(instance, printed)` in printed.ts: used by heldBy/allyLeftPlay/destroy
+  (keywords.ts), deck-moves leavePlay, deck-rules alliesToHand, conditions attachedToHero, pick.ts, constants.ts targets.
+- `heroSavers` state field (state.ts) kept by playSweep: eliminateEmpties(state, steps, final) waits for the sweep so the last
+  hero falling does not eliminate a seat whose Imrahil becomes a hero. Tests: play-types.test.ts.
 ## 3. Unify PutIntoPlay / PutAttachmentIntoPlay (todo)
