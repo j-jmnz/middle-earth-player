@@ -57,14 +57,15 @@ export { cardLines };
  * and does nothing (the confirm arms on its first tap); an ally plays with its printed numbers. Null when every line is
  * applied. Events with no record are never offered (src/rules/planning.ts), so they have no caution.
  */
-export function playCaution(code: string, type: string, cost: number, against: TextCheck = shippedCheck()): { words: string; armed: string | null } | null {
-  if (type === "attachment" && !against.recorded.has(code)) {
+export function playCaution(code: string, type: string, text: string | null, cost: number, against: TextCheck = shippedCheck()): { words: string; armed: string | null } | null {
+  const lines = unappliedLines(code, text, against);
+  if (type === "attachment" && !against.recorded.has(code) && lines.length > 0) {
     return cost > 0
       ? { words: `Its text is not applied: you pay ${cost} for no effect`, armed: `Tap again: pay ${cost} for no effect` }
       : { words: "Its text is not applied: it has no effect", armed: "Tap again: play it for no effect" };
   }
-  const lines = unappliedLines(code, null, against);
-  if (type === "ally" && (!against.recorded.has(code) || lines.length > 0)) return { words: "Its ability is not applied: it plays with its printed numbers", armed: null };
+  // An ally with no text, or only keywords the engine reads (Ranged), loses nothing.
+  if (type === "ally" && lines.length > 0) return { words: "Its ability is not applied: it plays with its printed numbers", armed: null };
   return null;
 }
 

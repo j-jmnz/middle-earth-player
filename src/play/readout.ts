@@ -5,9 +5,9 @@
 // The engine's numbers for the open moment, as the dock shows them beside the choice: attack against defense while an attack
 // is going on (an enemy can attack during staging), the Hide numbers, otherwise willpower against threat while questing.
 // Every number is read with the engine's own functions on the current state; the picks only say whose numbers to add.
-import { attackStrength } from "../rules/combat.ts";
+import { attackStrength, defendersOf } from "../rules/combat.ts";
 import { hidePassed, hideWillpower } from "../rules/hide.ts";
-import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
+import { defenseAsDefender, modifiedStat, pooledDefense, standingDefenders } from "../rules/keywords.ts";
 import { committedWillpower, questPointsOf, stagingThreat } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
@@ -77,10 +77,10 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const picked = pickedInAttack(sheet, choice);
     // Several defenders (Stand Together, rr.multiple-defenders): their defense is pooled against the attack, and all the
     // damage goes on the one the defending player chooses.
-    const declared = attack.undefended ? [] : (attack.defenderIds ?? (attack.defenderId ? [attack.defenderId] : [])).filter((id) => game.cards[id] != null);
+    const declared = attack.undefended ? [] : standingDefenders(game, defendersOf(game));
     const pooled = picked?.role === "defender" && declared.length > 0 && !declared.includes(picked.id) ? [...declared, picked.id] : declared;
     if (pooled.length > 1) {
-      const defense = pooled.reduce((sum, id) => sum + defenseAsDefender(game, id, ctx.cards), 0);
+      const defense = pooledDefense(game, pooled, ctx.cards);
       return { kind: "defense", stats: [ATTACK(strength), DEFENSE(defense)], result: `${damageWords(strength, defense)} on one defender you choose${shadowNote}` };
     }
     const defenderId = attack.undefended ? undefined : (attack.defenderId ?? (picked?.role === "defender" ? picked.id : undefined));

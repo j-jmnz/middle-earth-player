@@ -16,15 +16,24 @@ import type { SheetNames } from "./sheet-types.ts";
 import { choiceFor, dockFor } from "./table-choice.ts";
 
 const WARNING = "02026";
-const names: SheetNames = { card: (id) => id, line: () => null };
+// Dúnedain Warning's catalog text (it is not in the ledger): the table reads it from the catalog.
+const WARNING_TEXT = "Attach to a hero.\nAttached hero gains +1 [defense]\n<b>Action:</b> Pay 1 resource from attached hero's pool to attach Dúnedain Warning to another hero.";
+const names: SheetNames = { card: (id) => id, line: () => null, text: (code) => (code === WARNING ? WARNING_TEXT : null) };
 
 describe("a card the app does not fully apply, before it is played", () => {
   it("words the cost by type", () => {
     const check = checkFor([]);
-    expect(playCaution(WARNING, "attachment", 1, check)).toEqual({ words: "Its text is not applied: you pay 1 for no effect", armed: "Tap again: pay 1 for no effect" });
-    expect(playCaution(WARNING, "attachment", 0, check)?.words).toBe("Its text is not applied: it has no effect");
-    expect(playCaution("02053", "ally", 5, check)).toEqual({ words: "Its ability is not applied: it plays with its printed numbers", armed: null });
-    expect(playCaution("x", "attachment", 1, checkFor([{ id: "x:constant:1", cardCode: "x", lines: ["x:A:1"], timing: "constant", instructions: [] } as never]))).toBeNull();
+    expect(playCaution(WARNING, "attachment", WARNING_TEXT, 1, check)).toEqual({ words: "Its text is not applied: you pay 1 for no effect", armed: "Tap again: pay 1 for no effect" });
+    expect(playCaution(WARNING, "attachment", WARNING_TEXT, 0, check)?.words).toBe("Its text is not applied: it has no effect");
+    expect(playCaution("02053", "ally", "Sentinel.\nLandroval cannot have restricted attachments.", 5, check)).toEqual({ words: "Its ability is not applied: it plays with its printed numbers", armed: null });
+    expect(playCaution("x", "attachment", null, 1, checkFor([{ id: "x:constant:1", cardCode: "x", lines: ["x:A:1"], timing: "constant", instructions: [] } as never]))).toBeNull();
+    // An ally with no text, or only a keyword the engine reads, loses nothing: Veteran Axehand (01028, ledgered with no
+    // lines), Silverlode Archer (01017, "Ranged."), and a card outside the ledger with no text.
+    expect(playCaution("01028", "ally", null, 2, check)).toBeNull();
+    expect(playCaution("01017", "ally", null, 3, check)).toBeNull();
+    expect(playCaution("not-ledgered", "ally", null, 2, check)).toBeNull();
+    expect(playCaution("not-ledgered", "ally", "Ranged.", 2, check)).toBeNull();
+    expect(playCaution("not-ledgered", "ally", "Response: After this ally enters play, draw a card.", 2, check)?.words).toBe("Its ability is not applied: it plays with its printed numbers");
   });
 
   it("an attachment with no record asks twice before it is paid for", async () => {

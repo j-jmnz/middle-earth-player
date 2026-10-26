@@ -11,6 +11,8 @@ export type SheetNames = {
   card: (cardId: string) => string;
   // The printed line a ledger line id names, or null when the ledger has none.
   line: (lineId: string) => string | null;
+  // A card's catalog text by code, for a card the ledger does not hold (what is not applied is read from it).
+  text?: (code: string) => string | null;
 };
 
 // A number the engine computed, shown with the game's icon beside it (willpower on a commit, defense on a defender).

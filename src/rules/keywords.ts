@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards, rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x, rr.modifiers, rr.lasting-effects, rr.damage (data/rules/entries.json).
+// Rules: rr.attachment-cards, rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x, rr.modifiers, rr.lasting-effects, rr.damage, rr.multiple-defenders (data/rules/entries.json).
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
@@ -113,6 +113,15 @@ export function defenseAsDefender(state: ScenarioState, defenderId: string, card
   const attack = state.pendingAttack;
   const declared = attack ? { ...state, pendingAttack: { ...attack, defenderId, undefended: false } } : state;
   return modifiedStat(declared, defender, "defense", cards);
+}
+
+// Several defenders (rr.multiple-defenders): those of the declared still in play defend, and their defense is pooled.
+export function standingDefenders(state: ScenarioState, declared: readonly string[]): string[] {
+  return declared.filter((id) => inPlay(state.cards[id]?.zone ?? "removed"));
+}
+
+export function pooledDefense(state: ScenarioState, defenders: readonly string[], cards: ReadonlyMap<string, PrintedCard>): number {
+  return defenders.reduce((sum, id) => sum + defenseAsDefender(state, id, cards), 0);
 }
 
 export function addModifier(

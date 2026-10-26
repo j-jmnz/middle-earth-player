@@ -276,3 +276,25 @@ export function engagementStep(state: ScenarioState, cards: Cards, steps: Engine
     engagement: { ordinal: cursor.ordinal + 1, engagedThisPass: true },
   };
 }
+
+/**
+ * Which seat each enemy in staging would engage if the engagement checks ran at the threats now (rr.engagement-check): the
+ * checks themselves (engagementStep) run on a copy, and a tie the first player breaks is taken as its first option. For the
+ * table's foresight; it changes nothing.
+ */
+export function engagementForecast(state: ScenarioState, cards: Cards): ReadonlyMap<string, number> {
+  const engaged = new Map<string, number>();
+  let copy: ScenarioState = { ...state, engagement: null, window: null };
+  for (let guard = 0; guard < 4 * (state.staging.length + 1) * state.seatCount; guard += 1) {
+    const steps: EngineStep[] = [];
+    let next = engagementStep(copy, cards, steps);
+    if (next.window?.kind === "chooseEnemy" && next.window.options[0] != null) {
+      const ordinal = (next.engagement?.ordinal ?? 0) + 1;
+      next = { ...engageEnemy({ ...next, window: null }, next.window.seat, next.window.options[0], steps), engagement: { ordinal, engagedThisPass: true } };
+    }
+    for (const step of steps) if (step.kind === "engage") engaged.set(step.enemyId, step.seat);
+    if (next.mode === "combatStart" || next === copy) break;
+    copy = next;
+  }
+  return engaged;
+}

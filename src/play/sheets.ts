@@ -1,45 +1,25 @@
 // Rules: rr.action, rr.response, rr.cancel, rr.mulligan, mec109.hide-x, mec109.hide-tests, rr.travel,
-// rr.optional-engagement, rr.step-6-2, rr.step-6-4-3, mec109.archery (data/rules/entries.json).
+// rr.optional-engagement, rr.step-6-2 (data/rules/entries.json). The combat sheets are in combat-sheets.ts.
 //
 // What the choice sheet over the rail asks, for the window the engine has open. Every option is an intent legalIntents and
 // legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a
 // number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../catalog/boundary.ts";
-import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
 import { rejectionReason } from "../rules/legal.ts";
 import { printedOf } from "../rules/printed.ts";
 import { hideWillpower } from "../rules/hide.ts";
 import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
-import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import type { Frame } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
-import { damageOutcome, defenseDamage, lossWords, threatRows, undefendedDamage } from "./foresight.ts";
+import { archerySheet, defenseSheet, playerAttackSheet } from "./combat-sheets.ts";
+import { threatRows } from "./foresight.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
-import { TIMING_WORDS, type OptionMark, type SheetStat, type Alternative, type HideNumbers, type MultiSheet, type PickOption, type Sheet, type SheetNames, type SheetOption, type TriggerOption, type Unavailable } from "./sheet-types.ts";
-
-export function step(game: ScenarioState): string {
-  return STEP_WORDS[game.mode] ?? game.phase;
-}
-
-type StatName = "willpower" | "attack" | "defense" | "threat";
-const STAT_WORDS: Record<StatName, string> = { willpower: "Willpower", attack: "Attack", defense: "Defense", threat: "Threat" };
-
-/** One of a card's stats as the engine reads it now (modifiers applied), for a sheet tile or header. */
-export function statOf(game: ScenarioState, ctx: ReduceContext, id: string, stat: StatName): SheetStat[] {
-  const card = game.cards[id];
-  return card ? [{ icon: stat, value: modifiedStat(game, card, stat, ctx.cards), word: STAT_WORDS[stat] }] : [];
-}
-
-export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
-  if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
-  const card = game.cards[id];
-  if (card) return { id, label: names.card(id), code: card.code };
-  // A branch of a Choose instruction is named by its id in the effect record.
-  return { id, label: id.charAt(0).toUpperCase() + id.slice(1), code: null };
-}
+import { has, option, statOf, step } from "./sheet-parts.ts";
+import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
   return ctx.effects.find((effect) => effect.id === effectId);
@@ -82,10 +62,6 @@ function hideNumbers(game: ScenarioState, ctx: ReduceContext, frame: Frame | und
   return frame?.data.kind === "hide" ? { x: frame.data.x, threat: frame.data.threat, willpower: 0, committed: [] } : null;
 }
 
-function has(legal: readonly LegalIntent[], type: LegalIntent["type"]): boolean {
-  return legal.some((intent) => intent.type === type);
-}
-
 /**
  * The locations in staging the players cannot travel to, each with the reducer's reason and the card's Travel line
  * (Weathertop while The One Ring is exhausted or gone: 141046:A:3, rr.travel). Nothing is listed while a location is active.
@@ -103,17 +79,6 @@ export function travelRefusals(game: ScenarioState, ctx: ReduceContext, names: S
   });
 }
 
-// What an attack would do to a character before the shadow card (foresight.ts): the damage as a stat on its tile and card,
-// "destroyed" in the label when it would be, and a caution when that loses the game, so the confirm asks twice.
-function foreseen(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, damage: number): { stats: SheetStat[]; suffix: string; mark: OptionMark; caution?: string } {
-  const outcome = damageOutcome(game, ctx, id, damage);
-  const stats: SheetStat[] = [{ icon: "damage", value: damage, word: "Damage" }];
-  const mark: OptionMark = { icon: "damage", value: damage, danger: outcome.destroyed };
-  if (!outcome.destroyed) return { stats, suffix: "", mark };
-  const caution = outcome.loss ? `Tap again: ${names.card(id)} is destroyed, ${lossWords(outcome.loss)}` : undefined;
-  return { stats, suffix: " · destroyed", mark, ...(caution ? { caution } : {}) };
-}
-
 // A response window's sentence, naming the Responses of this occurrence that wait for a cost another one may pay
 // (rr.triggering-condition: Aragorn's ready waits for Théodred's resource).
 function responseNote(game: ScenarioState, names: SheetNames, offers: readonly { cardId: string; effectId: string; seat: number }[], listed: readonly TriggerOption[]): string {
@@ -128,69 +93,14 @@ function responseNote(game: ScenarioState, names: SheetNames, offers: readonly {
 // leave in staging (rr.optional-engagement, rr.engagement-check).
 function optionalEngageNote(game: ScenarioState, ctx: ReduceContext, names: SheetNames): string {
   const seat = game.activeSeat;
-  const rows = threatRows(game, ctx, seat);
+  const rows = threatRows(game, ctx);
   const threat = game.seats[seat]?.threat ?? 0;
-  const anyway = rows.filter((row) => row.engages).map((row) => `${names.card(row.id)} (${row.cost})`);
-  const stays = rows.filter((row) => !row.engages).map((row) => `${names.card(row.id)} (${row.cost})`);
+  const anyway = rows.filter((row) => row.engagesSeat === seat).map((row) => `${names.card(row.id)} (${row.cost})`);
+  const stays = rows.filter((row) => row.engagesSeat == null).map((row) => `${names.card(row.id)} (${row.cost})`);
   const parts = [`You may engage one enemy in staging. Your threat is ${threat}.`];
   if (anyway.length > 0) parts.push(`The checks engage ${anyway.join(", ")} anyway.`);
   if (stays.length > 0) parts.push(`${stays.join(", ")} ${stays.length === 1 ? "stays" : "stay"} in staging.`);
   return parts.join(" ");
-}
-
-/** The heroes an undefended attack can land on, when there is more than one to choose from. */
-function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, title: string, note: string): Sheet | PlayerIntent {
-  const heroes = legalTargets(game, { type: "Undefended" }, ctx);
-  if (heroes.length <= 1) return heroes[0] ? { type: "Undefended", heroId: heroes[0] } : { type: "Undefended" };
-  const enemyId = game.pendingAttack?.enemyId ?? "";
-  const damage = undefendedDamage(game, ctx, enemyId);
-  return {
-    kind: "pick",
-    key: `undefended:${game.pendingAttack?.enemyId ?? ""}`,
-    step: "Combat",
-    title,
-    note: `${note} Undefended: a hero takes all of it.`,
-    verb: "Damage to",
-    confirm: "Take the damage",
-    options: heroes.map((id) => {
-      const seen = foreseen(game, ctx, names, id, damage);
-      const base = option(game, names, id);
-      return { ...base, label: `${base.label}${seen.suffix}`, stats: seen.stats, mark: seen.mark, intent: { type: "Undefended", heroId: id }, ...(seen.caution ? { caution: seen.caution } : {}) };
-    }),
-    primary: null,
-    alternative: null,
-  };
-}
-
-function attackNumbers(game: ScenarioState, ctx: ReduceContext): { attack: number; enemyId: string } | null {
-  const enemyId = game.pendingAttack?.enemyId;
-  const enemy = enemyId ? game.cards[enemyId] : undefined;
-  return enemy && enemyId ? { attack: modifiedStat(game, enemy, "attack", ctx.cards), enemyId } : null;
-}
-
-/** The attackers that can join an attack on one enemy, for the second half of the player-attack sheet. */
-function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, enemyId: string): MultiSheet {
-  const enemy = game.cards[enemyId];
-  const defense = enemy ? modifiedStat(game, enemy, "defense", ctx.cards) : 0;
-  // Another seat's ranged characters may join the attack (rr.ranged, rr.step-6-8-1); the active seat's come first.
-  const seats = [game.activeSeat, ...game.seats.map((_, index) => index).filter((index) => index !== game.activeSeat && index < game.seatCount)];
-  const characters = seats
-    .flatMap((seat) => [...(game.seats[seat]?.heroes ?? []), ...(game.seats[seat]?.play ?? [])])
-    .filter((id) => legalTargets(game, { type: "DeclareAttackers", cardId: id }, ctx).includes(enemyId));
-  return {
-    kind: "multi",
-    key: `attackers:${enemyId}`,
-    step: "Combat",
-    title: `Attack ${names.card(enemyId)}`,
-    note: `Defense ${defense}. Choose the characters that attack it.`,
-    verb: "Attack",
-    stats: statOf(game, ctx, enemyId, "defense"),
-    options: characters.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "attack") })),
-    build: { kind: "attack", enemyId },
-    allowEmpty: false,
-    preselected: [],
-    alternative: { label: "No attack", intent: { type: "DeclineAttack" } },
-  };
 }
 
 /**
@@ -427,99 +337,12 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         primary: null,
         alternative: null,
       };
-    case "defense": {
-      const numbers = attackNumbers(game, ctx);
-      const title = numbers ? `${names.card(numbers.enemyId)} attacks` : "An enemy attacks";
-      const note = numbers ? `Attack ${numbers.attack}.` : "";
-      const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
-      const undefended = undefendedSheet(game, ctx, names, title, note);
-      // A defender is declared and Stand Together lets the player declare more (01038:A:1): a pass ends the declarations.
-      const more = has(legal, "Pass");
-      // Leave undefended with one hero to take it: the armed line says when that hero falls and the game with it.
-      const lone = "kind" in undefended ? null : undefended.type === "Undefended" ? undefended.heroId : null;
-      const loneCaution = lone && numbers ? foreseen(game, ctx, names, lone, numbers.attack).caution : undefined;
-      const leave: Alternative = more
-        ? { label: "No more defenders", intent: { type: "Pass" } }
-        : "kind" in undefended
-          ? { label: "Leave undefended", next: undefended }
-          : { label: "Leave undefended", intent: undefended, ...(loneCaution ? { caution: loneCaution } : {}) };
-      return {
-        kind: "pick",
-        key: `defense:${numbers?.enemyId ?? ""}:${game.pendingAttack?.undefended ? "u" : "d"}${more ? `:${defenders.length}` : ""}`,
-        step: "Combat",
-        title,
-        stats: numbers ? statOf(game, ctx, numbers.enemyId, "attack") : [],
-        note: more ? `${note} Declare another defender, or stop. Their Defense is pooled, and you choose who takes the damage.` : game.pendingAttack?.undefended ? `${note} This attack is undefended.` : defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`,
-        verb: "Defend with",
-        options: defenders.map((id) => {
-          const defense = defenseAsDefender(game, id, ctx.cards);
-          const damage = numbers ? defenseDamage(game, ctx, numbers.enemyId, id) : 0;
-          const base = option(game, names, id);
-          // Another defender pools its Defense; who takes the damage is chosen after the declarations, so nothing is
-          // destroyed by this pick yet (rr.multiple-defenders).
-          const seen = more ? { stats: [{ icon: "damage" as const, value: damage, word: "Damage" }], suffix: "", mark: { icon: "damage" as const, value: damage, danger: false } } : foreseen(game, ctx, names, id, damage);
-          return {
-            ...base,
-            label: `${base.label}${seen.suffix}`,
-            stats: [{ icon: "defense" as const, value: defense, word: "Defense" }, ...seen.stats],
-            mark: seen.mark,
-            intent: { type: "DeclareDefender", defenderId: id },
-            ...("caution" in seen && seen.caution ? { caution: seen.caution } : {}),
-          };
-        }),
-        primary: null,
-        alternative: leave,
-      };
-    }
-    case "archery": {
-      const recipients = legalTargets(game, { type: "Distribute" }, ctx);
-      return {
-        kind: "distribute",
-        key: `archery:${game.round}:${window.total}`,
-        step: "Combat",
-        title: `Archery ${window.total}`,
-        note: `Assign ${window.total} damage among your characters. Defense does not stop it.`,
-        total: window.total,
-        exact: true,
-        options: recipients.map((id) => {
-          const card = game.cards[id];
-          const health = card ? modifiedStat(game, card, "hitPoints", ctx.cards) - card.damage : 0;
-          return { ...option(game, names, id), stats: [{ icon: "hitPoints" as const, value: health, word: "Hit points left" }], max: window.total };
-        }),
-        purpose: { kind: "archery" },
-      };
-    }
-    case "playerAttack": {
-      if (!has(legal, "DeclareAttackers")) {
-        return {
-          kind: "pick",
-          key: `playerAttack:${game.round}:none`,
-          step: "Combat",
-          title: "No attack is possible",
-          note: null,
-          verb: "",
-          options: [],
-          primary: { label: "Continue", intent: { type: "DeclineAttack" } },
-          alternative: null,
-        };
-      }
-      const seat = game.activeSeat;
-      const enemies = new Set<string>();
-      for (const id of [...(game.seats[seat]?.heroes ?? []), ...(game.seats[seat]?.play ?? [])]) {
-        for (const enemyId of legalTargets(game, { type: "DeclareAttackers", cardId: id }, ctx)) enemies.add(enemyId);
-      }
-      return {
-        kind: "pick",
-        key: `playerAttack:${game.round}:${[...enemies].join(",")}`,
-        step: "Combat",
-        title: "Attack an enemy",
-        note: "Choose the enemy, then the characters that attack it.",
-        verb: "Attack",
-        options: [...enemies].map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "defense"), next: attackersSheet(game, ctx, names, id) })),
-        primary: null,
-        alternative: { label: "No attack", intent: { type: "DeclineAttack" } },
-      };
-    }
+    case "defense":
+      return defenseSheet(game, ctx, legal, names);
+    case "archery":
+      return archerySheet(game, ctx, names, window.total);
+    case "playerAttack":
+      return playerAttackSheet(game, ctx, legal, names);
     case "resolution":
       return wonSheet(game);
   }

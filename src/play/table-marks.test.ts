@@ -5,11 +5,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { legalIntents } from "../rules/reduce.ts";
-import { updateCard, withThreat } from "../rules/state.ts";
+import { updateCard, withThreat, type ScenarioState } from "../rules/state.ts";
 import { buildTable, FRODO, idsOf, RIDER, SAM, sceneCards } from "../../scripts/test-scene.ts";
 
 import { delayedLines, slotNumbers } from "./card-effects.ts";
-import { threatRows } from "./foresight.ts";
+import { enemiesToFace, threatRows, threatVerdict } from "./foresight.ts";
 import { ledgerLine } from "./ledger.ts";
 import { questObjective } from "./objective.ts";
 import type { SheetNames } from "./sheet-types.ts";
@@ -31,10 +31,30 @@ describe("engagement marks", () => {
     expect(slotNumbers(withThreat(table.state, 0, 34), table.ctx, rider, 0).engagement).toEqual({ cost: 35, engages: false });
     expect(slotNumbers(withThreat(table.state, 0, 35), table.ctx, rider, 0).engagement).toEqual({ cost: 35, engages: true });
     expect(slotNumbers(table.state, table.ctx, idsOf(table, FRODO), 0).engagement).toBeNull();
-    expect(threatRows(withThreat(table.state, 0, 40), table.ctx, 0).map((row) => [row.cost, row.engages])).toEqual([
-      [35, true],
-      [50, false],
+    expect(threatRows(withThreat(table.state, 0, 40), table.ctx).map((row) => [row.cost, row.engagesSeat])).toEqual([
+      [35, 0],
+      [50, null],
     ]);
+  });
+
+  it("follows the engine's checks: an enemy that cannot be engaged stays, and one enemy engages one seat (rr.engagement-check)", () => {
+    const table = buildTable(base, { staging: [RIDER] });
+    const rider = idsOf(table, RIDER);
+    // "Enemies cannot be engaged" (Midgewater, 141048:A:1), as the flag its record sets.
+    const barred: ScenarioState = { ...withThreat(table.state, 0, 40), modifiers: [{ instanceId: rider, sourceId: rider, stat: "cannotBeEngaged", amount: 1, until: "endOfRound" }] };
+    expect(slotNumbers(barred, table.ctx, rider, 0).engagement).toEqual({ cost: 35, engages: false });
+    const [row] = threatRows(barred, table.ctx);
+    expect(row && threatVerdict(row, 0)).toEqual({ word: "Cannot be engaged", engages: false });
+    expect(enemiesToFace(barred, table.ctx, 0)).toEqual([]);
+    // Two seats at threat 40: the first player's check engages the Black Rider, so the second seat does not face it.
+    const two = buildTable(base, { seats: 2, heroes: [{ code: FRODO, seat: 0 }, { code: SAM, seat: 1 }], ring: "none", staging: [RIDER] });
+    const both = withThreat(withThreat(two.state, 0, 40), 1, 40);
+    const first = both.firstPlayer;
+    const other = first === 0 ? 1 : 0;
+    expect(enemiesToFace(both, two.ctx, first)).toEqual([idsOf(two, RIDER)]);
+    expect(enemiesToFace(both, two.ctx, other)).toEqual([]);
+    const [shared] = threatRows(both, two.ctx);
+    expect(shared && threatVerdict(shared, other)).toEqual({ word: `Engages Player ${first + 1}`, engages: false });
   });
 
   it("the optional engagement says the threat and which enemies the checks engage anyway", () => {

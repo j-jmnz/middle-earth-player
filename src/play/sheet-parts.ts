@@ -1,0 +1,32 @@
+// The pieces every sheet builder uses: the step's words, a card's stat as the engine reads it, an option's label, and
+// whether an intent type is legal now.
+import type { LegalIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { modifiedStat } from "../rules/keywords.ts";
+
+import { STEP_WORDS } from "./rail.ts";
+import type { SheetNames, SheetOption, SheetStat } from "./sheet-types.ts";
+
+export function step(game: ScenarioState): string {
+  return STEP_WORDS[game.mode] ?? game.phase;
+}
+
+type StatName = "willpower" | "attack" | "defense" | "threat";
+const STAT_WORDS: Record<StatName, string> = { willpower: "Willpower", attack: "Attack", defense: "Defense", threat: "Threat" };
+
+/** One of a card's stats as the engine reads it now (modifiers applied), for a sheet tile or header. */
+export function statOf(game: ScenarioState, ctx: ReduceContext, id: string, stat: StatName): SheetStat[] {
+  const card = game.cards[id];
+  return card ? [{ icon: stat, value: modifiedStat(game, card, stat, ctx.cards), word: STAT_WORDS[stat] }] : [];
+}
+
+export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
+  if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
+  const card = game.cards[id];
+  if (card) return { id, label: names.card(id), code: card.code };
+  // A branch of a Choose instruction is named by its id in the effect record.
+  return { id, label: id.charAt(0).toUpperCase() + id.slice(1), code: null };
+}
+
+export function has(legal: readonly LegalIntent[], type: LegalIntent["type"]): boolean {
+  return legal.some((intent) => intent.type === type);
+}

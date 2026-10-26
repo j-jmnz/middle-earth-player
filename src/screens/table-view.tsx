@@ -25,7 +25,7 @@ import { MomentBanner, TableDock } from "../play/table-dock";
 import { LogPanel, PileList, ReferencePanel, SidePanel, ThreatPanel } from "../play/table-panel";
 import { turnReference } from "../play/reference";
 import { tableSettings } from "../play/table-settings";
-import { threatRows } from "../play/foresight";
+import { threatRows, threatVerdict } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
 import { ledgerLine, ruleTitle } from "../play/ledger";
@@ -101,7 +101,10 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
 
   const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
   const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
-  const names: SheetNames = useMemo(() => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine }), [nameOf, store]);
+  const names: SheetNames = useMemo(
+    () => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine, text: (code: string) => session.facts.get(code)?.text ?? null }),
+    [nameOf, store, session],
+  );
   // A printed line no effect record reads is not applied: the canvas marks the card, and no control applies the line.
   const inactiveSet = useMemo(() => notAppliedCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const)), [session]);
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
@@ -149,7 +152,12 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   };
 
   // The staging enemies' engagement costs, marked on each dial's meter (the same for every seat; each dial reads its own).
-  const tickKey = useStore(store, (state) => threatRows(state.game, ctx, 0).map((row) => row.cost).join(","));
+  const tickKey = useStore(store, (state) =>
+    threatRows(state.game, ctx)
+      .filter((row) => !row.blocked)
+      .map((row) => row.cost)
+      .join(","),
+  );
   const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
   const ticksOf = (_seat: number): readonly number[] => ticks;
   const showLife = game.widgets.lifeTracker && game.life != null;
@@ -308,7 +316,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           <ThreatPanel
             seatLabel={game.seatCount > 1 ? `Player ${reading.seat + 1}` : "Threat"}
             threat={game.seats[reading.seat]?.threat ?? 0}
-            rows={threatRows(game, ctx, reading.seat).map((row) => ({ ...row, name: names.card(row.id) }))}
+            rows={threatRows(game, ctx).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, reading.seat) }))}
             onClose={() => setReading(null)}
           />
         </View>

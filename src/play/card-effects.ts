@@ -10,6 +10,7 @@ import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
 import type { ReduceContext } from "../rules/reduce.ts";
 import { flagged, inPlay, modifierActive, type ScenarioState } from "../rules/state.ts";
 
+import { engagesAt } from "./foresight.ts";
 import type { IconName } from "./icon-map.ts";
 
 export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "threat" | "questPoints" | "engagementCost";
@@ -164,7 +165,7 @@ export function delayedLines(game: ScenarioState, cardId: string, cardName: (id:
 /**
  * The engine's numbers the canvas draws on one card: the effects on it, its willpower while it is committed to the quest,
  * the quest points of a quest stage or an active location, the engagement cost of an enemy in staging against the shown
- * seat's threat (rr.engagement-check: it engages at the checks when the cost is at or below the threat), and whether a
+ * seat's threat (rr.engagement-check: whether the checks would engage it with that seat now), and whether a
  * delayed effect will act on it.
  */
 export function slotNumbers(game: ScenarioState, ctx: ReduceContext, cardId: string, seat = 0): SlotNumbers {
@@ -173,12 +174,11 @@ export function slotNumbers(game: ScenarioState, ctx: ReduceContext, cardId: str
   const questing = card != null && (card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation");
   const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
   const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
-  const threat = game.seats[seat]?.threat ?? 0;
   return {
     effects,
     willpower: card?.committed ? modifiedStat(game, card, "willpower", ctx.cards) : null,
     questPoints: questing ? questPointsOf(game, card, ctx.cards) : null,
-    engagement: cost != null ? { cost, engages: cost <= threat } : null,
+    engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => entry.subjectId === cardId || (entry.subjectId == null && entry.sourceId === cardId)),
   };
 }

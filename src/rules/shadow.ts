@@ -7,7 +7,7 @@ import { pushEffectFrame } from "./effect-frames.ts";
 import { holdsNow } from "./verbs.ts";
 import type { EngineStep } from "./intents.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
-import { defenseAsDefender, modifiedStat, placeDamage } from "./keywords.ts";
+import { defenseAsDefender, modifiedStat, placeDamage, pooledDefense, standingDefenders } from "./keywords.ts";
 import type { ScenarioState } from "./state.ts";
 import { expireModifiers, inPlay, updateCard } from "./state.ts";
 import { withFrame } from "./windows.ts";
@@ -176,7 +176,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   if (!attack || !enemy || enemy.zone !== "engaged") return finishAttack(next, ctx, steps);
   // Several defenders (rr.multiple-defenders) pool their defense, and the defending player assigns all the damage to one of them.
   if (attack.defenderIds && !attack.undefended) {
-    const standing = attack.defenderIds.filter((id) => inPlay(next.cards[id]?.zone ?? "removed"));
+    const standing = standingDefenders(next, attack.defenderIds);
     if (standing.length > 1) return defendTogether(next, standing, ctx, steps);
     // One left: the attack goes on as one defender's.
     const { defenderIds: _all, ...rest } = attack;
@@ -210,7 +210,7 @@ function defendTogether(state: ScenarioState, standing: readonly string[], ctx: 
   const enemy = attack ? state.cards[attack.enemyId] : undefined;
   if (!attack || !enemy) return state;
   const strength = modifiedStat(state, enemy, "attack", ctx.cards);
-  const defense = standing.reduce((sum, id) => sum + defenseAsDefender(state, id, ctx.cards), 0);
+  const defense = pooledDefense(state, standing, ctx.cards);
   const raw = Math.max(0, strength - defense);
   // With no damage there is nothing to assign; a choice that came back empty falls on the first defender.
   const chosen = attack.damageTo != null && standing.includes(attack.damageTo) ? attack.damageTo : raw === 0 || attack.damageFrame ? standing[0] : undefined;

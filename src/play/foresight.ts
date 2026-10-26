@@ -7,10 +7,10 @@
 // and how much more damage the card can take. Nothing here changes the game: the copy is dropped.
 import { ruleCause } from "../rules/cause.ts";
 import { defendersOf } from "../rules/combat.ts";
-import { defenseAsDefender, modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { engagementCostOf } from "../rules/quest.ts";
+import { modifiedStat, placeDamage, pooledDefense, standingDefenders } from "../rules/keywords.ts";
+import { engagementCostOf, engagementForecast } from "../rules/quest.ts";
 import type { EngineStep, ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { inPlay, livingSeats } from "../rules/state.ts";
+import { flagged, inPlay, livingSeats } from "../rules/state.ts";
 
 export type DamageOutcome = {
   damage: number;
@@ -55,9 +55,8 @@ export function defenseDamage(game: ScenarioState, ctx: ReduceContext, enemyId: 
   const enemy = game.cards[enemyId];
   if (!enemy) return 0;
   // A defender declared alongside others adds its Defense to theirs (Stand Together, rr.multiple-defenders).
-  const pooled = [...defendersOf(game).filter((id) => id !== defenderId && game.cards[id] != null), defenderId];
-  const defense = pooled.reduce((sum, id) => sum + defenseAsDefender(game, id, ctx.cards), 0);
-  return Math.max(0, modifiedStat(game, enemy, "attack", ctx.cards) - defense);
+  const pooled = [...standingDefenders(game, defendersOf(game)).filter((id) => id !== defenderId), defenderId];
+  return Math.max(0, modifiedStat(game, enemy, "attack", ctx.cards) - pooledDefense(game, pooled, ctx.cards));
 }
 
 /** The damage an undefended attack would place on a hero now, before the shadow card. */
@@ -87,39 +86,46 @@ export function outcomeWords(outcome: DamageOutcome, name: string, shadowNext: b
   return "";
 }
 
-/** The enemies a seat will face this round: those engaged with it, and those in staging its threat engages at the checks. */
+// The engagement checks' forecast for a state, worked out once per state object (the state is never changed in place).
+const forecasts = new WeakMap<ScenarioState, ReadonlyMap<string, number>>();
+
+/** Which seat each enemy in staging would engage at the checks at the threats now: the engine's checks run on a copy. */
+export function engagesAt(game: ScenarioState, ctx: ReduceContext): ReadonlyMap<string, number> {
+  const known = forecasts.get(game);
+  if (known) return known;
+  const forecast = engagementForecast(game, ctx.cards);
+  forecasts.set(game, forecast);
+  return forecast;
+}
+
+/** The enemies a seat will face this round: those engaged with it, and those in staging the checks would engage with it. */
 export function enemiesToFace(game: ScenarioState, ctx: ReduceContext, seat: number): string[] {
-  const threat = game.seats[seat]?.threat ?? 0;
-  const engaged = game.seats[seat]?.engaged ?? [];
-  const engaging = game.staging.filter((id) => {
-    const card = game.cards[id];
-    if (!card || ctx.cards.get(card.code)?.type !== "enemy") return false;
-    const cost = engagementCostOf(game, card, ctx.cards);
-    return cost != null && cost <= threat;
-  });
-  return [...engaged, ...engaging];
+  const engaging = [...engagesAt(game, ctx)].filter(([, to]) => to === seat).map(([id]) => id);
+  return [...(game.seats[seat]?.engaged ?? []), ...engaging];
 }
 
-/** True when an enemy in staging would engage the seat at the engagement checks at its threat now (rr.engagement-check). */
-export function engagesAtThreat(game: ScenarioState, ctx: ReduceContext, enemyId: string, seat: number): boolean {
-  const card = game.cards[enemyId];
-  if (!card || card.zone !== "staging" || ctx.cards.get(card.code)?.type !== "enemy") return false;
-  const cost = engagementCostOf(game, card, ctx.cards);
-  return cost != null && cost <= (game.seats[seat]?.threat ?? 0);
-}
+/**
+ * One enemy in staging against a seat's threat, for the threat panel and the dial: its engagement cost, the seat the checks
+ * would engage it with (null: it stays), and whether it cannot be engaged at all (141048:A:1).
+ */
+export type ThreatRow = { id: string; cost: number; engagesSeat: number | null; blocked: boolean };
 
-/** One enemy in staging against a seat's threat, for the threat panel: its engagement cost and whether the checks engage it. */
-export type ThreatRow = { id: string; cost: number; engages: boolean };
-
-/** The enemies in staging with an engagement cost, lowest first, against the seat's threat now (rr.engagement-check). */
-export function threatRows(game: ScenarioState, ctx: ReduceContext, seat: number): ThreatRow[] {
-  const threat = game.seats[seat]?.threat ?? 0;
+/** The enemies in staging with an engagement cost, lowest first, and what the checks would do with each now (rr.engagement-check). */
+export function threatRows(game: ScenarioState, ctx: ReduceContext): ThreatRow[] {
+  const forecast = engagesAt(game, ctx);
   return game.staging
     .flatMap((id): ThreatRow[] => {
       const card = game.cards[id];
       if (!card || card.face === "down" || ctx.cards.get(card.code)?.type !== "enemy") return [];
       const cost = engagementCostOf(game, card, ctx.cards);
-      return cost == null ? [] : [{ id, cost, engages: cost <= threat }];
+      return cost == null ? [] : [{ id, cost, engagesSeat: forecast.get(id) ?? null, blocked: flagged(game, id, "cannotBeEngaged") }];
     })
     .sort((left, right) => left.cost - right.cost);
+}
+
+/** What the checks do with a staging enemy, for a seat's threat panel: "Engages", "Engages Player 2", "Stays", "Cannot be engaged". */
+export function threatVerdict(row: ThreatRow, seat: number): { word: string; engages: boolean } {
+  if (row.blocked) return { word: "Cannot be engaged", engages: false };
+  if (row.engagesSeat == null) return { word: "Stays", engages: false };
+  return row.engagesSeat === seat ? { word: "Engages", engages: true } : { word: `Engages Player ${row.engagesSeat + 1}`, engages: false };
 }

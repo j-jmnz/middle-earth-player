@@ -8,6 +8,7 @@ import { intentsOf } from "../../scripts/sheet-intents.ts";
 import { fund, starterBase } from "../../scripts/starter-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { buildTable, idsOf } from "../../scripts/test-scene.ts";
+import { updateCard } from "../rules/state.ts";
 
 import { railFor, STEP_WORDS } from "./rail.ts";
 import { firstShares, playRequest, sharesReady, tapShare } from "./pay.ts";
@@ -15,6 +16,7 @@ import { dropTargets } from "./selection.ts";
 import { actionsSheet, commitSheet, distributeIntent, paySheet } from "./bar-sheets.ts";
 import type { SheetNames } from "./sheet-types.ts";
 import { isStepWindow, sheetFor } from "./sheets.ts";
+import { whyNotPlayable } from "./why.ts";
 
 // Rules: rr.framework-steps, mec109.hide-tests, rr.step-6-4-3 (data/rules/entries.json). Every choice a sheet offers is an
 // intent the reducer accepts, in every window two starter decks meet in whole games of A Shadow of the Past; the rail names
@@ -127,6 +129,11 @@ describe("pay sheet", () => {
     const sheet = request ? paySheet(state, names, request, { kind: "play", cardId: thicket, hostId: null }) : null;
     expect(sheet?.note).toContain("Pay from 3 different heroes.");
     expect(sheet ? reduce(state, distributeIntent(sheet, shares), tab.ctx).ok : false).toBe(true);
+    // With only two heroes holding resources it does not glow, and the preview says why.
+    const [gimli, legolas, thalin] = ["01004", "01005", "01006"].map((code) => idsOf(tab, code));
+    const short = updateCard(updateCard(updateCard(state, gimli ?? "", { resources: 2 }), thalin ?? "", { resources: 1 }), legolas ?? "", { resources: 0 });
+    expect(legalIntents(short, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === thicket)).toBe(false);
+    expect(whyNotPlayable(short, tab.ctx, thicket, (id) => id)).toBe("It is paid from 3 different heroes. 2 of yours can pay.");
     // Without the restriction, the guess fills the first pool first.
     expect(firstShares({ total: 3, exact: true, pools: [{ heroId: "a", max: 3 }, { heroId: "b", max: 1 }] })).toEqual([{ id: "a", amount: 3 }]);
   });

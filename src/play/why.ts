@@ -51,6 +51,10 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
       const whose = printed.sphere === "neutral" || printed.sphere == null ? "Your heroes have" : `Your ${sphere} heroes have`;
       return `It costs ${request.total}. ${whose} ${have} ${have === 1 ? "resource" : "resources"}.`;
     }
+    // "You must use resources from 3 different heroes' pools" (01036:A:1).
+    if (request.spread != null && request.pools.length < request.spread) {
+      return `It is paid from ${request.spread} different heroes. ${request.pools.length} of yours can pay.`;
+    }
   }
   return null;
 }

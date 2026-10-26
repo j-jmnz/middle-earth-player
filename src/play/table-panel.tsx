@@ -194,7 +194,17 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
  * engagement cost and whether the engagement checks engage it at this threat, and what the round still adds (rr.engagement-check,
  * rr.refresh-phase, rr.threat-elimination-level). Text only.
  */
-export function ThreatPanel({ seatLabel, threat, rows, onClose }: { seatLabel: string; threat: number; rows: readonly { id: string; name: string; cost: number; engages: boolean }[]; onClose: () => void }) {
+export function ThreatPanel({
+  seatLabel,
+  threat,
+  rows,
+  onClose,
+}: {
+  seatLabel: string;
+  threat: number;
+  rows: readonly { id: string; name: string; cost: number; verdict: { word: string; engages: boolean } }[];
+  onClose: () => void;
+}) {
   return (
     <SheetFrame testID="threat-panel" edge="right">
       <View className="items-center">
@@ -205,9 +215,9 @@ export function ThreatPanel({ seatLabel, threat, rows, onClose }: { seatLabel: s
         <Text className="text-body text-inkMuted">At the engagement checks, each enemy in staging whose engagement cost is at or below your threat engages you. At 50 you are eliminated.</Text>
         {rows.length === 0 ? <Text className="mt-2 text-body text-inkMuted">No enemy is in staging.</Text> : null}
         {rows.map((row) => (
-          <View key={row.id} testID={`threat-row-${row.id}`} accessible accessibilityLabel={`${row.name}, engagement cost ${row.cost}, ${row.engages ? "engages" : "stays"}`} className="flex-row items-center justify-between border-b py-2" style={{ borderColor: t.inkLine }}>
+          <View key={row.id} testID={`threat-row-${row.id}`} accessible accessibilityLabel={`${row.name}, engagement cost ${row.cost}, ${row.verdict.word}`} className="flex-row items-center justify-between border-b py-2" style={{ borderColor: t.inkLine }}>
             <Text className="shrink text-body text-ink">{row.name}</Text>
-            <Text className={`font-display text-body ${row.engages ? "text-danger" : "text-inkMuted"}`}>{`${row.cost} · ${row.engages ? "Engages" : "Stays"}`}</Text>
+            <Text className={`font-display text-body ${row.verdict.engages ? "text-danger" : "text-inkMuted"}`}>{`${row.cost} · ${row.verdict.word}`}</Text>
           </View>
         ))}
         <Text className="mt-2 text-label text-inkMuted">The refresh phase raises your threat by 1 at the end of the round; a failed quest raises it by what it falls short.</Text>

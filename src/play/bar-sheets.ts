@@ -10,7 +10,8 @@ import { checkFor, playCaution } from "./not-applied.ts";
 import { playRequest, type PayRequest, type Share } from "./pay.ts";
 import { STEP_WORDS, windowPoint } from "./rail.ts";
 import type { DistributePurpose, DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet, WindowSheet } from "./sheet-types.ts";
-import { option, statOf, step, triggerOptions } from "./sheets.ts";
+import { option, statOf, step } from "./sheet-parts.ts";
+import { triggerOptions } from "./sheets.ts";
 
 export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames): MultiSheet {
   return {
@@ -108,7 +109,7 @@ export function playSheet(game: ScenarioState, ctx: ReduceContext, legal: readon
   const request = playRequest(game, ctx, cardId);
   const printed = printedOf(ctx.cards, instance.code);
   // A card the app does not fully apply says so before it is paid for; an attachment that would do nothing asks twice.
-  const warn = playCaution(instance.code, printed.type, request?.total ?? 0, checkFor(ctx.effects));
+  const warn = playCaution(instance.code, printed.type, names.text?.(instance.code) ?? null, request?.total ?? 0, checkFor(ctx.effects));
   const caution = warn?.armed ? { caution: warn.armed } : {};
   const said = (note: string | null): string | null => (warn ? [warn.words + ".", note].filter((part) => part != null).join(" ") : note);
   const at = (host: string | null): PlayerIntent => (host ? { type: "PlayCard", cardId, payments: [], hostId: host } : { type: "PlayCard", cardId, payments: [] });
