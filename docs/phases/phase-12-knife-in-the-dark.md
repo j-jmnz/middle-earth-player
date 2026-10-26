@@ -4,6 +4,8 @@ Engine half depends on: phases 8d and 9. It can run beside phases 10 and 11.
 Phone half depends on: phase 11
 Blocks: phase 13
 
+**State (2026-10-26):** engine half done and reviewed; phone half built; phone checks and Maestro runs open; the won flow stays open (no genuine win found; user-accepted). The procedure's verbs now live in mechanic families (`src/catalog/families/<family>.ts`, `src/rules/families/<family>*.ts`, `src/effects/authored/families/<family>.ts`); the scenario's own records are in `src/effects/authored/fellowship-of-the-ring.ts`.
+
 ## Goal
 
 `a-knife-in-the-dark` is playable on the phone. One scenario in this change. Do not start phase 13's engine half until this scenario's coverage is green.
@@ -14,7 +16,7 @@ This procedure is the same for phases 12 to 16. Each phase file names only what 
 
 1. `data/scenarios/<id>.json` already exists (phase 8d). Re-read its cross-check report with `pnpm data:build -- --verbose`. Every card it deals has a ledger entry (phase 8c). A scan the agent cannot read is a question for the user, not a guess.
 2. `pnpm effects:draft <id>`, then the `effect-author` agent, until ownership coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution.
-3. Reuse the keyword framework and the verbs. A new verb is engine work in `src/rules/interpret.ts`, cites a ledger line or a rule span, and gets its own test.
+3. Reuse the keyword framework and the verbs. A new verb is engine work in the mechanic family it belongs to (`src/catalog/families/<family>.ts` for the schema, `src/rules/families/<family>*.ts` for the engine), cites a ledger line or a rule span, and gets its own test.
 4. A zone or widget exists only when a setup record or a card line creates it. Cite the line in `docs/brief.md`.
 5. Add a golden: an auto-player game on fixed seeds, true solo and two-handed, through a win and through a loss. The phase 8d cause test covers it.
 6. The campaign test from phase 8d continues: the previous scenario's earned pool cards reach this scenario through the Campaign Setup Checklist.

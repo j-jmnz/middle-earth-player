@@ -4,6 +4,8 @@ Engine half depends on: phase 13's engine half
 Phone half depends on: phase 13
 Blocks: phase 15
 
+**State (2026-10-26):** engine half done and merged (the `south` family; records in `src/effects/authored/the-ring-goes-south.ts`; `the-ring-goes-south` is in `src/campaign/playable.ts`). `/reviewer` and `/ux` have not run. The phone half is built and unit-tested; the phone checks, the four Maestro runs and their fixtures are open.
+
 ## Goal
 
 `the-ring-goes-south` is playable, including the campaign boons, stage 1B's four face-up cards, stage 4's second active location, and the facedown Ring-bearer. Follow the scenario procedure in phase 12.
