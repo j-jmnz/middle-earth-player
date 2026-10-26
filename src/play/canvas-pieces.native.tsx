@@ -1,7 +1,7 @@
 // The pieces the table canvas draws: a card (its picture, or its name while the file is missing, or its printed back), a pile, the
 // token art on a card, the effects on it, the marks of the open moment, and the mark between an enemy and the characters
 // fighting it. Each is a Skia group at a slot's rectangle; table-canvas.native.tsx places and moves them.
-import { BlurMask, Circle, DashPathEffect, Group, Image, Line, Path, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
+import { Circle, DashPathEffect, Group, Image, Line, Path, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 import type { ReactElement, ReactNode } from "react";
 import type { SharedValue } from "react-native-reanimated";
 import { useDerivedValue } from "react-native-reanimated";
@@ -27,8 +27,6 @@ export function withAlpha(hex: string, alpha: number): string {
 }
 const shadowColor = withAlpha(t.night, 0.5);
 const strip = withAlpha(t.night, 0.72);
-const dim = withAlpha(t.night, 0.45);
-const glow = withAlpha(t.gold, 0.9);
 
 export type Fonts = { names: SkFont; numbers: SkFont; small: SkFont; badge: SkFont };
 export type TokenImages = { resource: SkImage | null; damage: SkImage | null; progress: SkImage | null; questPoints: SkImage | null; engagementCost: SkImage | null };
@@ -317,50 +315,6 @@ export function Badges({
 }
 
 /**
- * Gold light around a card a tap does something with, so it reads at arm's length on the felt (user request, 2026-10-25:
- * the edge alone was too faint). It is drawn behind the card, which covers its middle: an "outer" blur mask on a rounded
- * rectangle filled a block inside the card in Skia's renderer, so the glow is a plain blur under the body instead. Wider
- * on a picked card.
- */
-export function Glow({ slot, picked }: { slot: Rect; picked: boolean }) {
-  return (
-    <RoundedRect x={slot.x} y={slot.y} width={slot.w} height={slot.h} r={RADIUS} color={glow}>
-      <BlurMask blur={picked ? 4.5 : 3} style="normal" />
-    </RoundedRect>
-  );
-}
-
-/**
- * The open moment's marks on a card, on its upright rectangle: a solid gold edge on a card a tap does something with (its
- * glow is drawn under the card, `Glow`), a thicker edge and a ring at its center on a picked card (the share a payment or
- * archery gives it in the ring), and a night veil over a card the open pick does not ask about.
- */
-export function Marks({ rect, tappable, picked, share, dimmed, fonts }: { rect: Rect; tappable: boolean; picked: number; share: "pay" | "damage" | null; dimmed: boolean; fonts: Fonts }) {
-  const { x, y, w, h } = rect;
-  if (dimmed) return <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={dim} />;
-  if (!tappable && picked === 0) return null;
-  if (picked === 0) return <RoundedRect x={x + 1.25} y={y + 1.25} width={w - 2.5} height={h - 2.5} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2.5} />;
-  const cx = x + w / 2;
-  const cy = y + h / 2;
-  const text = share ? `${share === "pay" ? "-" : "+"}${picked}` : "";
-  return (
-    <Group>
-      <RoundedRect x={x - 1} y={y - 1} width={w + 2} height={h + 2} r={RADIUS + 1} color={t.gold} style="stroke" strokeWidth={3} />
-      <Circle cx={cx} cy={cy} r={11} color={share === "damage" ? t.threat : t.gold} />
-      {share ? (
-        <Text x={cx - fonts.badge.getTextWidth(text) / 2} y={cy + 4} text={text} font={fonts.badge} color={share === "damage" ? t.bone : t.onGold} />
-      ) : (
-        // A check, drawn: the system face may not have the glyph.
-        <Group>
-          <Line p1={vec(cx - 5, cy)} p2={vec(cx - 1, cy + 4)} color={t.onGold} strokeWidth={2.5} />
-          <Line p1={vec(cx - 1, cy + 4)} p2={vec(cx + 6, cy - 4)} color={t.onGold} strokeWidth={2.5} />
-        </Group>
-      )}
-    </Group>
-  );
-}
-
-/**
  * A number on a pill at a card's foot, upright like the tokens: the token art (or an icon) and the number, threat red with a
  * danger edge when `danger`, night with a hairline otherwise. `lift` raises it above the token row, clear of the resource
  * count a character may hold.
@@ -440,9 +394,10 @@ export function CombatMarkView({ mark }: { mark: CombatMark }) {
 /**
  * A slot moving into place: at `progress` 0 it is where its motion starts, at 1 where the layout puts it. `epoch` guards the
  * first frame of a new layout: until the UI thread has the new epoch, the slot is drawn where it starts, not where it ends.
- * The card itself turns (exhausted, the hand's fan); `overlay` (tokens, effects, marks) moves with it but stays upright.
+ * The card turns (exhausted, the hand's fan) with its `frame` (the halo, edge, veil and beat ring, in card-marks.native.tsx);
+ * `overlay` (tokens, effects, the check ring) moves with it but stays upright.
  */
-export function Moving({ slot, motion, progress, epoch, at, children, overlay }: { slot: CardSlot; motion: Motion; progress: SharedValue<number>; epoch: SharedValue<number>; at: number; children: ReactNode; overlay?: ReactNode }) {
+export function Moving({ slot, motion, progress, epoch, at, children, frame, overlay }: { slot: CardSlot; motion: Motion; progress: SharedValue<number>; epoch: SharedValue<number>; at: number; children: ReactNode; frame?: ReactNode; overlay?: ReactNode }) {
   const origin = vec(slot.x + slot.w / 2, slot.y + slot.h / 2);
   const transform = useDerivedValue(() => {
     const p = epoch.get() === at ? progress.get() : 0;
@@ -461,6 +416,7 @@ export function Moving({ slot, motion, progress, epoch, at, children, overlay }:
     <Group transform={transform} origin={origin} opacity={opacity}>
       <Group transform={turn} origin={origin}>
         {children}
+        {frame}
       </Group>
       {overlay}
     </Group>

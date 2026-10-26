@@ -7,6 +7,7 @@
 // with its shadow cards and the characters fighting it), the play area, and the hand, which peeks up from the bottom edge.
 import type { CardInstance } from "../rules/state.ts";
 
+import { unturn } from "./frame.ts";
 import type { FightKind, PileId, PileView, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
 
 export type Rect = { x: number; y: number; w: number; h: number };
@@ -355,12 +356,15 @@ export function contains(rect: Rect, x: number, y: number): boolean {
   return x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 }
 
-/** The topmost card slot under a point, or -1. Later slots are drawn on top. */
+/** The topmost card slot under a point, or -1. Later slots are drawn on top. A tilted card is hit where it is drawn. */
 export function hitSlot(slots: readonly CardSlot[], x: number, y: number): number {
   "worklet";
   for (let index = slots.length - 1; index >= 0; index -= 1) {
     const slot = slots[index];
-    if (slot && contains(hitBounds(slot), x, y)) return index;
+    if (!slot) continue;
+    // A fanned card is tested as it is drawn: the point is turned back by the tilt about the card's center.
+    const point = unturn(slot, x, y);
+    if (contains(hitBounds(slot), point.x, point.y)) return index;
   }
   return -1;
 }

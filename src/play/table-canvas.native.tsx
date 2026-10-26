@@ -14,7 +14,8 @@ import { cancelAnimation, Easing, useDerivedValue, useReducedMotion, useSharedVa
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
-import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, Glow, Leaving, Marks, Moving, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
+import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
+import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, Leaving, Moving, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
 import { SPHERE_TINT, sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
@@ -250,11 +251,18 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
       </Group>
     );
   };
+  const dimmed = (slot: CardSlot) => (highlight.dimOthers && !isTappable(slot) && (highlight.picked.get(slot.id) ?? 0) === 0) || highlight.muted.has(slot.id);
+  const isTappable = (slot: CardSlot) => highlight.tappable.has(slot.id) || targetIds.has(slot.id);
+  // What is drawn in the card's shape, inside its turned group: the gold edge, the picked edge, the veil, the beat ring.
+  const drawFrame = (slot: CardSlot) => {
+    if (slot.kind === "pile") return null;
+    const card = slot.kind === "card";
+    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? (highlight.picked.get(slot.id) ?? 0) : 0} dimmed={card && dimmed(slot)} beat={highlight.beat.has(slot.id)} />;
+  };
   const drawOverlay = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const rect = slotBounds(slot);
     const slotInfo = slot.kind === "card" && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck" ? info(slot.id) : null;
-    const tappable = highlight.tappable.has(slot.id) || targetIds.has(slot.id);
     const picked = highlight.picked.get(slot.id) ?? 0;
     const optionMark = highlight.marks.get(slot.id);
     return (
@@ -263,11 +271,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} /> : null}
         {slotInfo?.delayed ? <DelayedMark rect={rect} /> : null}
         <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code)) : null} contrast={contrast} />
-        {slot.kind === "card" ? <Marks rect={rect} tappable={tappable} picked={picked} share={highlight.share} dimmed={(highlight.dimOthers && !tappable && picked === 0) || highlight.muted.has(slot.id)} fonts={fonts} /> : null}
+        {slot.kind === "card" ? <PickRing rect={rect} picked={picked} share={highlight.share} dimmed={dimmed(slot)} fonts={fonts} /> : null}
         {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} /> : null}
-        {/* The banner's current beat names this card (the shadow card, the card damaged): a bone ring while it does. */}
         {slot.kind === "card" && !slot.faceDown && inactive(slot.code) ? <NotAppliedMark rect={rect} /> : null}
-        {highlight.beat.has(slot.id) ? <RoundedRect x={rect.x - 2} y={rect.y - 2} width={rect.w + 4} height={rect.h + 4} r={RADIUS + 2} color={t.bone} style="stroke" strokeWidth={2} /> : null}
       </Group>
     );
   };
@@ -303,7 +309,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           </Leaving>
         ))}
         {layout.slots.map((slot) => (
-          <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? still} progress={progress} epoch={epoch} at={moves.at} overlay={drawOverlay(slot)}>
+          <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? still} progress={progress} epoch={epoch} at={moves.at} frame={drawFrame(slot)} overlay={drawOverlay(slot)}>
             {drawBody(slot, lifted?.id === slot.id && slot.kind === "card")}
           </Moving>
         ))}

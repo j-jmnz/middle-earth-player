@@ -15,6 +15,7 @@ export type Ghost = { slot: CardSlot; dx: number; dy: number; scale: number; rot
 
 /** The turn a slot is drawn at: an exhausted card lies sideways, a hand card keeps its slight fan. */
 export function slotRotation(slot: CardSlot): number {
+  "worklet";
   return slot.exhausted ? Math.PI / 2 : slot.tilt;
 }
 
