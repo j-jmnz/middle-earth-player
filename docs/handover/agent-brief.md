@@ -68,7 +68,9 @@ work together with yours.
   lines still open, enough for a fresh agent to continue.
 - After each meaningful step (a mechanic implemented with its tests passing, a batch of records written), commit on your
   worktree branch with a `WIP <F>: ...` message (restore `src/effects/open-lines.ts` first), handover file included. If
-  you sense you are running long, checkpoint first. Your final commit deletes `docs/handover/<F>.md`; the main session
+  you sense you are running long, checkpoint first. Then push the worktree branch to GitHub (the user allows extra
+  branches): `git push -u origin HEAD:refs/heads/wip/<F>`, retrying on network errors (2s, 4s, 8s, 16s). Never push to
+  `ccr-a8ef8247-8087n8` or `main`. Your final commit deletes `docs/handover/<F>.md`; the main session
   squashes your branch when merging.
 
 ## Checks before committing
