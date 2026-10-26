@@ -49,3 +49,9 @@ start). Base: `origin/ccr-a8ef8247-8087n8` at 6fa8029 (encounter + costs merged)
 ## Lines open
 
 All 45 still open (no records yet).
+
+## Interrupted by the API usage limit (2026-10-26, about 11:30 UTC)
+
+The main session committed the uncommitted work as it stood, unreviewed and possibly not compiling, in the commit after
+this note's previous version. The agent's last stated next step was: "Now the sheets option label for the "staging" pseudo host."
+Before continuing: run `pnpm exec tsc --noEmit` and the family tests, and finish or revert that step.
