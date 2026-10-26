@@ -8,11 +8,23 @@ export const whoSchema = z.enum(["actor", "firstPlayer"]);
 // effect has already picked. `attackableByPicked` keeps the enemies the last picked character could attack. `type: player` picks a
 // seat that is still in the game.
 export const pickSchema = z.strictObject({
-  // `attachment`: a card of the attachment type in play that the chooser controls (141071:A:2).
+  // `attachment`: a card of the attachment type in play that the chooser controls (141071:A:2), or with `control: "any"` any
+  // attachment in play, an encounter card that counts as one included (01061:A:1).
   type: z.enum(["hero", "ally", "character", "enemy", "location", "player", "card", "attachment"]),
-  control: z.enum(["you", "any"]),
+  // `others`: the other players' cards, or the other players ("an enemy ... currently engaged with another player", 01015:A:1).
+  control: z.enum(["you", "any", "others"]),
   // An enemy in the staging area counts too (an enemy "in play"), not only one engaged with a player.
   staging: z.boolean().optional(),
+  // Only an enemy or location in the staging area ("Choose an enemy in the staging area", 01065:A:1, 01066:A:1).
+  stagingOnly: z.boolean().optional(),
+  // A character with damage on it: one a heal can change (01011:A:1, 01058:A:1, 01063:A:1).
+  damaged: z.boolean().optional(),
+  // A character with this keyword ("a character you control with the ranged keyword", 01033:A:1).
+  keyword: z.enum(["ranged", "sentinel"]).optional(),
+  // From a deck: the top X cards, X being what the event was played for (01067:A:1), of the deck of the player the last Pick
+  // chose ("any player's deck").
+  topIsX: z.boolean().optional(),
+  ofPickedPlayer: z.boolean().optional(),
   // A card of this sphere of influence, for a card picked from the hand or a discard pile.
   sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral"]).optional(),
   from: z.enum(["play", "hand", "discard", "deck"]).optional(),
@@ -37,6 +49,8 @@ export const pickSchema = z.strictObject({
   committed: z.boolean().optional(),
   // A character that took part in the attack the Response answers (not the card itself).
   participating: z.boolean().optional(),
+  // A character declared as a defender of the attack in progress (rr.multiple-defenders).
+  defending: z.boolean().optional(),
   // A card that belongs to a sphere of influence: "any sphere" does not include a neutral card (faq.stand-and-fight).
   nonNeutral: z.boolean().optional(),
   // A non-unique card; an enemy with a shadow card dealt to it.

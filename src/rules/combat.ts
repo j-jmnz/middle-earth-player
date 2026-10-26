@@ -1,14 +1,15 @@
 // Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, rr.step-6-2, rr.step-6-4b, rr.ranged,
 // rr.step-6-8b, rr.step-6-8-1, mec109.archery, faq.limitations-on-attacks, ltp.deal-shadow-cards, ltp.resolve-enemy-attacks,
-// ltp.undefended-attack, ltp.resolve-player-attacks (data/rules/entries.json).
+// ltp.undefended-attack, ltp.resolve-player-attacks, rr.multiple-defenders, rr.response (data/rules/entries.json).
 import { attackBarred } from "./constants.ts";
 import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
-import { livingSeats, updateCard } from "./state.ts";
+import { flagged, livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, type ReduceContext } from "./interpret.ts";
 import { queueEvent } from "./queue.ts";
+import { offerResponses } from "./responses.ts";
 import { resolveAttack } from "./shadow.ts";
 import { engagementCostOf } from "./quest.ts";
 import { enemyAttackWindow, playerAttackWindow } from "./step-window.ts";
@@ -50,7 +51,7 @@ export function characters(state: ScenarioState, seat: number, cards: Cards): st
 }
 
 // Each seat's enemies in player order, the highest engagement cost first (rr.step-6-2). Equal costs keep the order
-// they engaged in.
+// they engaged in. Once they are dealt, every card hears it ("look at 1 shadow card that was just dealt", 01071:A:2).
 export function dealShadows(state: ScenarioState, cards: Cards): ScenarioState {
   let next = state;
   for (const seat of livingSeats(next)) {
@@ -61,7 +62,8 @@ export function dealShadows(state: ScenarioState, cards: Cards): ScenarioState {
     const order = [...(next.seats[seat]?.engaged ?? [])].sort((a, b) => cost(b) - cost(a));
     for (const enemyId of order) next = dealOneShadow(next, enemyId);
   }
-  return next;
+  const dealt = Object.values(next.cards).some((card) => card.zone === "shadow" && state.cards[card.id]?.zone !== "shadow");
+  return dealt ? queueEvent(next, { trigger: "shadowsDealt", seat: null }) : next;
 }
 
 export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: string[] } | null {
@@ -134,6 +136,31 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   return printed.keywords.sentinel;
 }
 
+// Every defender declared against the attack in progress, the first first.
+export function defendersOf(state: ScenarioState): string[] {
+  const attack = state.pendingAttack;
+  if (!attack?.defenderId) return [];
+  return [...(attack.defenderIds ?? [attack.defenderId])];
+}
+
+// The defending player may declare any number of defenders (Stand Together, 01038:A:1, rr.multiple-defenders).
+export function multipleDefenders(state: ScenarioState, seat: number): boolean {
+  return flagged(state, `seat:${seat}`, "multipleDefenders");
+}
+
+// The defense window is open again for another defender: one is declared and the attack is still defended. (A shadow effect
+// that made a defended attack undefended opens it to name the hero instead.)
+export function declaringMore(state: ScenarioState): boolean {
+  const attack = state.pendingAttack;
+  return state.window?.kind === "defense" && attack?.defenderId != null && attack.undefended !== true;
+}
+
+// The characters that may still join the defense: "any number of his eligible characters" (01038:A:1), the defending player's
+// own.
+export function moreDefenders(state: ScenarioState, seat: number, cards: Cards): string[] {
+  return defenderIds(state, seat, cards).filter((id) => state.cards[id]?.controller === seat);
+}
+
 export function applyDefense(
   state: ScenarioState,
   defenderId: string,
@@ -142,9 +169,33 @@ export function applyDefense(
 ): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack || !state.cards[attack.enemyId] || !state.cards[defenderId]) return state;
-  const exhausted: ScenarioState = { ...updateCard(state, defenderId, { exhausted: true }), pendingAttack: { ...attack, defenderId }, window: null };
-  // 6.4.1: the defender is declared; an action window comes before the shadow card is turned up.
-  return enemyAttackWindow(exhausted, ctx, "shadow") ?? resolveAttack(exhausted, ctx, steps);
+  const declared = [...defendersOf(state), defenderId];
+  const pending = { ...attack, defenderId: attack.defenderId ?? defenderId, ...(declared.length > 1 ? { defenderIds: declared } : {}) };
+  const exhausted: ScenarioState = { ...updateCard(state, defenderId, { exhausted: true }), pendingAttack: pending, window: null };
+  // Responses to the declaration ("After Gondorian Spearman is declared as a defender", 01029:A:2; 01037:A:1) come first;
+  // the attack waits for them.
+  const offered = offerResponses(exhausted, { trigger: "defenderDeclared", seat: attack.seat, subject: defenderId }, ctx, steps);
+  if (offered.stack.length > exhausted.stack.length && offered.pendingAttack) {
+    return { ...offered, pendingAttack: { ...offered.pendingAttack, awaiting: "declared", awaitDepth: exhausted.stack.length } };
+  }
+  return afterDeclared(exhausted, ctx, steps);
+}
+
+// A defender is declared and its Responses are done. With Stand Together the player may declare another while one can defend
+// (rr.multiple-defenders); a pass ends the declarations (finishDefense). Then 6.4.1 ends: an action window comes before the
+// shadow card is turned up.
+export function afterDeclared(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack) return state;
+  if (multipleDefenders(state, attack.seat) && moreDefenders(state, attack.seat, ctx.cards).length > 0) {
+    return { ...state, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat }, activeSeat: attack.seat, passed: [] };
+  }
+  return finishDefense(state, ctx, steps);
+}
+
+export function finishDefense(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const closed: ScenarioState = { ...state, window: null };
+  return enemyAttackWindow(closed, ctx, "shadow") ?? resolveAttack(closed, ctx, steps);
 }
 
 export function applyUndefended(
@@ -177,6 +228,8 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed)) return false;
+  // "Dúnhere can target enemies in the staging area when he attacks alone" (01009:A:1): his own controller declares it.
+  if (enemy.zone === "staging") return attacker.controller === seat && printedOf(cards, enemy.code).type === "enemy" && flagged(state, attackerId, "stagingAttack");
   if (enemy.zone !== "engaged") return false;
   // The declaring seat's own characters attack its own enemies. A ranged character may attack an enemy engaged with
   // another player, and may join an attack another player declares (rr.ranged, rr.step-6-8-1).
@@ -190,6 +243,9 @@ export function legalAttackEnemies(state: ScenarioState, seat: number, attackerI
     for (const enemyId of state.seats[index]?.engaged ?? []) {
       if (canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk)) ids.push(enemyId);
     }
+  }
+  if (flagged(state, attackerId, "stagingAttack")) {
+    for (const enemyId of state.staging) if (canAttack(state, seat, attackerId, enemyId, cards, exhaustedOk)) ids.push(enemyId);
   }
   return ids;
 }
@@ -265,9 +321,15 @@ export function strikeEnemy(
   if (!enemyNow) return next;
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
   const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
-  // Each attacker hears that the attack destroyed the enemy ("After Merry participates in an attack that destroys an enemy").
-  if (damaged.cards[enemyId]?.zone === "engaged") return damaged;
-  return attackerIds.reduce((current, attackerId) => queueEvent(current, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, participants: attackerIds }), damaged);
+  // Each attacker hears that the attack destroyed the enemy ("After Merry participates in an attack that destroys an enemy"),
+  // and so does each card attached to it ("After attached hero attacks and destroys an enemy", 01039:A:3). An enemy in the
+  // staging area (01009:A:1) that is still there was not destroyed either.
+  const left = damaged.cards[enemyId]?.zone;
+  if (left === "engaged" || left === "staging") return damaged;
+  const heard = attackerIds.reduce((current, attackerId) => queueEvent(current, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, participants: attackerIds }), damaged);
+  return attackerIds
+    .flatMap((attackerId) => damaged.cards[attackerId]?.attachments ?? [])
+    .reduce((current, attachmentId) => queueEvent(current, { trigger: "hostAttackDestroyed", seat, cardId: attachmentId, subject: enemyId }), heard);
 }
 
 // The attack strength of characters attacking one enemy (rr.step-6-8-2): each attacker's attack, read against that enemy.

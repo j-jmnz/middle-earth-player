@@ -13,7 +13,7 @@ import { lowerThreat, placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats, updateCard, withSeat } from "./state.ts";
-import { printedOf } from "./printed.ts";
+import { fromEncounterDeck, printedOf } from "./printed.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 
@@ -91,7 +91,8 @@ export function runPlayerVerb(
       return state.cards[id] ? placeDamage(state, id, instruction.amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED)) : state;
     }
     case "PlaceProgressOn": {
-      const targets = instruction.target === "picked" ? [lastPicked(state)] : stagingLocations(state, ctx.cards);
+      const targets =
+        instruction.target === "picked" ? [lastPicked(state)] : instruction.target === "activeLocation" ? (state.activeLocation ? [state.activeLocation] : []) : stagingLocations(state, ctx.cards);
       let next = state;
       for (const id of targets) if (next.cards[id]) next = placeProgress(next, id, instruction.amount, ctx, steps);
       return next;
@@ -105,8 +106,12 @@ export function runPlayerVerb(
     case "DiscardPicked": {
       const id = lastPicked(state);
       const card = state.cards[id];
-      const seat = card?.owner ?? card?.controller;
-      return card && seat != null ? moveCard(state, id, { zone: "discard", seat }) : state;
+      if (!card) return state;
+      // An encounter card that counts as an attachment (141055:A:2) is controlled by nobody: it goes to the encounter discard
+      // pile (01061:A:1).
+      if (card.controller == null && card.owner == null && fromEncounterDeck(printedOf(ctx.cards, card.code))) return moveCard(state, id, { zone: "encounterDiscard" });
+      const seat = card.owner ?? card.controller;
+      return seat != null ? moveCard(state, id, { zone: "discard", seat }) : state;
     }
     case "DiscardTopOfDeck": {
       const top = state.seats[focus.seat]?.deck[0];
@@ -152,10 +157,13 @@ export function runPlayerVerb(
       if (!card) return state;
       // A card out of a deck or a discard pile goes to its own player's hand.
       if (instruction.to === "hand") return moveCard(state, id, { zone: "hand", seat: card.controller ?? focus.seat });
-      const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
+      // A card out of a discard pile is its owner's: "under its owner's control" (01054:A:1) puts it back with that player.
+      const seat = instruction.who === "firstPlayer" ? state.firstPlayer : instruction.who === "owner" ? (card.owner ?? card.controller ?? focus.seat) : focus.seat;
       // An ally taken from another player's discard pile is put into play under the new controller and stays its owner's card.
       const owner = card.controller != null && card.controller !== seat && card.owner == null ? { owner: card.controller } : {};
-      const entered = updateCard(moveCard(state, id, { zone: "play", seat }), id, { exhausted: false, ...owner });
+      // A hero is put into play among its player's heroes (01054:A:1).
+      const zone = printedOf(ctx.cards, card.code).type === "hero" ? "heroes" : "play";
+      const entered = updateCard(moveCard(state, id, { zone, seat }), id, { exhausted: false, ...owner });
       return queueEvent(entered, { trigger: "enteredPlay", seat, cardId: id });
     }
     case "ReturnToHand": {

@@ -74,6 +74,21 @@ export function modifyStat(
     case "allies":
       targets = [ALLIES_CLASS];
       break;
+    // The card the source is attached to ("give attached hero +1 Defense", 01070:A:2).
+    case "host": {
+      const host = state.cards[sourceId]?.host;
+      targets = host ? [host] : [];
+      break;
+    }
+    // Every character in play now ("all characters get +1 Attack", 01022:A:1, rr.lasting-effects).
+    case "allCharacters":
+      targets = livingSeats(state).flatMap((seat) => characters(state, seat, ctx.cards));
+      break;
+    // A flag the picked player holds ("That player may declare any number of ... defenders", 01038:A:1).
+    case "pickedPlayer": {
+      const seat = seatOf(lastPicked(state));
+      return seat == null ? state : { ...state, modifiers: [...state.modifiers, { instanceId: `seat:${seat}`, sourceId, stat: instruction.stat, amount: instruction.amount, until: instruction.until, seat }] };
+    }
     default:
       targets = [sourceId];
   }

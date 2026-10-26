@@ -1,4 +1,4 @@
-// Rules: rr.restricted, rr.resource-match (data/rules/entries.json).
+// Rules: rr.restricted, rr.resource-match, rr.attachment-cards, rr.play-restrictions-and-permissions (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { ruleCause } from "./cause.ts";
@@ -8,7 +8,9 @@ import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { playerCardEffectCanChoose } from "./keywords.ts";
+import { heroPays } from "./payments.ts";
 import { printedOf } from "./printed.ts";
+import { stagingLocations } from "./quest.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats } from "./state.ts";
@@ -33,6 +35,12 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     candidates.push(...characters(state, seat, ctx.cards));
   } else if (rule.host.kind === "activeLocation") {
     if (state.activeLocation) candidates.push(state.activeLocation);
+  } else if (rule.host.kind === "location") {
+    // "Attach to a location" (01056:A:1): one in the staging area or the active location.
+    candidates.push(...stagingLocations(state, ctx.cards), ...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
+  } else if (rule.host.kind === "engagedEnemy") {
+    // "Attach to an enemy engaged with a player" (01069:A:1).
+    for (const index of livingSeats(state)) candidates.push(...(state.seats[index]?.engaged ?? []).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy"));
   } else {
     for (const index of livingSeats(state)) {
       if (rule.host.kind === "hero" || rule.host.kind === "ringBearer") candidates.push(...(state.seats[index]?.heroes ?? []));
@@ -69,6 +77,32 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
     }
   }
   return Math.max(0, cost);
+}
+
+// "You must use resources from 3 different heroes' pools to pay for this card" (01036:A:1): a play restriction checked on the
+// payment (rr.play-restrictions-and-permissions). Why the payment is refused, or null.
+export function payFromHeroesReason(state: ScenarioState, cardId: string, payments: readonly { heroId: string; amount: number }[], ctx: ReduceContext): string | null {
+  const count = payFromHeroes(state, cardId, ctx);
+  const heroes = new Set(payments.filter((payment) => payment.amount > 0).map((payment) => payment.heroId)).size;
+  return count != null && heroes < count ? `Pay with resources from ${count} different heroes` : null;
+}
+
+// The heroes whose pools must pay for the card, or null when any may (01036:A:1).
+function payFromHeroes(state: ScenarioState, cardId: string, ctx: ReduceContext): number | null {
+  const code = state.cards[cardId]?.code;
+  for (const effect of ctx.effects) {
+    if (effect.cardCode !== code || effect.timing !== "constant") continue;
+    for (const instruction of effect.instructions) if (instruction.verb === "PayFromHeroes") return instruction.count;
+  }
+  return null;
+}
+
+// The seat has that many heroes with a resource of the card's sphere, so the card can be paid for as it must.
+export function payFromHeroesPossible(state: ScenarioState, seat: number, cardId: string, ctx: ReduceContext): boolean {
+  const count = payFromHeroes(state, cardId, ctx);
+  if (count == null) return true;
+  const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
+  return (state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, sphere, ctx, cardId)).length >= count;
 }
 
 // A character cannot have more than 2 restricted attachments. When a third arrives, its controller chooses one of the

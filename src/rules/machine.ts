@@ -11,6 +11,8 @@ import {
   beginEnemyAttack,
   continueStrike,
   dealShadows,
+  declaringMore,
+  finishDefense,
   hasLegalAttack,
   heroIds,
   nextEnemyGroup,
@@ -83,6 +85,8 @@ export function applyIntent(
     case "Mulligan":
       return finishMulliganChoice(mulliganSeat(state, state.activeSeat, steps), true);
     case "Pass":
+      // No more defenders are declared (rr.multiple-defenders, 01038:A:1).
+      if (declaringMore(state)) return finishDefense(state, ctx, steps);
       return applyPass(state);
     case "PlayCard": {
       // A play is an action opportunity taken: every seat may act again before the window closes (rr.action-windows).

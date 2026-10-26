@@ -6,9 +6,11 @@ import {
   canDefend,
   characters,
   declarableEnemies,
+  declaringMore,
   defenderIds,
   hasLegalAttack,
   heroIds,
+  moreDefenders,
 } from "./combat.ts";
 import { optionIntents, optionReason } from "./choices.ts";
 import { hideCommitReason, hideCommitters } from "./hide.ts";
@@ -16,6 +18,7 @@ import type { LegalIntent, PlayerIntent, Selection } from "./intents.ts";
 import { suppliesNumber } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
+import { payFromHeroesPossible, payFromHeroesReason } from "./attach.ts";
 import { attachmentTargets, playReason, playWindowReason } from "./planning.ts";
 import { resolutionIntents, resolutionReason } from "./resolution.ts";
 import { optionalEnemies, stagingLocations } from "./quest.ts";
@@ -57,6 +60,8 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
     case "chooseEnemy":
       return [{ type: "ChooseEnemy" }];
     case "defense":
+      // Another defender may be declared (Stand Together, 01038:A:1), or a pass ends the declarations (rr.multiple-defenders).
+      if (declaringMore(state)) return moreDefenders(state, state.pendingAttack?.seat ?? state.activeSeat, ctx.cards).length > 0 ? [{ type: "DeclareDefender" }, { type: "Pass" }] : [{ type: "Pass" }];
       return state.pendingAttack?.undefended ? [{ type: "Undefended" }] : [{ type: "DeclareDefender" }, { type: "Undefended" }];
     case "archery":
       return [{ type: "Distribute", total: window.total }];
@@ -84,7 +89,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "DeclareDefender": {
       const seat = state.pendingAttack?.seat ?? state.activeSeat;
       if (state.pendingAttack?.undefended) return [];
-      return defenderIds(state, seat, ctx.cards).filter((id) => !defenseBlocked(state, ctx, id));
+      return (declaringMore(state) ? moreDefenders(state, seat, ctx.cards) : defenderIds(state, seat, ctx.cards)).filter((id) => !defenseBlocked(state, ctx, id));
     }
     case "Undefended":
       return heroIds(state, state.pendingAttack?.seat ?? state.activeSeat);
@@ -114,11 +119,12 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
         state.window?.kind === "frameAction" ||
         state.window?.kind === "cancelOffer" ||
         state.window?.kind === "look" ||
-        state.window?.kind === "response"
+        state.window?.kind === "response" ||
+        declaringMore(state)
         ? null
         : "That intent is not legal in this window";
     case "PlayCard":
-      return playReason(state, intent, ctx);
+      return playReason(state, intent, ctx) ?? payFromHeroesReason(state, intent.cardId, intent.payments, ctx);
     case "Commit":
       return commitReason(state, intent, ctx);
     case "CommitHide":
@@ -166,7 +172,7 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   // The top card of the deck too, when a hero lets the seat play it (Gandalf).
   const top = state.seats[state.activeSeat]?.deck[0];
   for (const cardId of [...(state.seats[state.activeSeat]?.hand ?? []), ...(top ? [top] : [])]) {
-    if (playWindowReason(state, cardId, ctx) === null) intents.push({ type: "PlayCard", cardId });
+    if (playWindowReason(state, cardId, ctx) === null && payFromHeroesPossible(state, state.activeSeat, cardId, ctx)) intents.push({ type: "PlayCard", cardId });
   }
   if (state.mode === "questCommit") intents.push({ type: "Commit" });
   intents.push(...triggerIntents(state, ctx));
@@ -242,6 +248,7 @@ function defenderReason(
   if (state.pendingAttack.undefended) return "This attack is considered undefended";
   const defender = state.cards[intent.defenderId];
   if (!defender) return "That character cannot defend";
+  if (declaringMore(state) && defender.controller !== state.pendingAttack.seat) return "Only the defending player's characters join the defense";
   if (defender.controller !== state.pendingAttack.seat) {
     const printed = printedOf(ctx.cards, defender.code);
     if (!printed.keywords.sentinel) return "Sentinel is required to defend for another seat";
@@ -253,6 +260,7 @@ function defenderReason(
 
 function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "Undefended" }>): string | null {
   if (state.window?.kind !== "defense" || !state.pendingAttack) return "That intent is not legal in this window";
+  if (declaringMore(state)) return "A defender is declared: pass to declare no more";
   const heroes = heroIds(state, state.pendingAttack.seat);
   if (heroes.length === 0) return "No hero can take the attack";
   if (heroes.length === 1) {
@@ -272,7 +280,9 @@ function attackReason(
   if (state.window?.kind !== "playerAttack") return "That intent is not legal in this window";
   if (intent.attackerIds.length === 0) return "Declare at least one attacker";
   const enemy = state.cards[intent.enemyId];
-  if (!enemy || enemy.zone !== "engaged") return "That enemy cannot be attacked";
+  if (!enemy || (enemy.zone !== "engaged" && enemy.zone !== "staging")) return "That enemy cannot be attacked";
+  // An enemy in the staging area is attacked by one character alone (01009:A:1).
+  if (enemy.zone === "staging" && intent.attackerIds.length !== 1) return "That enemy can only be attacked by one character alone";
   if (attackDeclared(state, state.activeSeat, intent.enemyId)) return "That enemy was already attacked this phase";
   const seen = new Set<string>();
   for (const attackerId of intent.attackerIds) {

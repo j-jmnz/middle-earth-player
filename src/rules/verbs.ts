@@ -8,7 +8,8 @@ import { scheduleDelayed } from "./delayed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, eliminateEmpties, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "./keywords.ts";
-import { lastPicked, otherSeat } from "./player-verbs.ts";
+import { answeredEvent } from "./damage-verbs.ts";
+import { lastPicked, otherSeat, seatOf } from "./player-verbs.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
 import { engageEnemy, engageWith, placeQuestProgress, stagingEnemies } from "./quest.ts";
 import { restricted } from "./restrictions.ts";
@@ -135,12 +136,14 @@ export function runExtraVerb(
       return markSurge(state, focus.sourceId);
     case "AddResources": {
       const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-      const hero = instruction.to === "picked" ? state.cards[lastPicked(state)] : source?.host ? state.cards[source.host] : undefined;
+      const hero = instruction.to === "picked" ? state.cards[lastPicked(state)] : instruction.to === "self" ? source : source?.host ? state.cards[source.host] : undefined;
       if (!hero || hero.controller == null) return state;
-      for (let added = 0; added < instruction.amount; added += 1) {
+      // "for each point of damage he just suffered" (01003:A:1): the damage the answered event placed.
+      const amount = instruction.amount * (instruction.per === "damage" ? (answeredEvent(state)?.amount ?? 0) : 1);
+      for (let added = 0; added < amount; added += 1) {
         steps.push({ kind: "gainResource", seat: hero.controller, heroId: hero.id, cause: currentCause(steps, UNATTRIBUTED) });
       }
-      return updateCard(state, hero.id, { resources: hero.resources + instruction.amount });
+      return amount > 0 ? updateCard(state, hero.id, { resources: hero.resources + amount }) : state;
     }
     case "Delay":
       return scheduleDelayed(state, instruction, focus, ctx, currentCause(steps, UNATTRIBUTED));
@@ -215,7 +218,8 @@ function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceCon
   return next;
 }
 
-// Damage on each ally in play, those with willpower at most `maxWillpower` when it is named (141071:A:1). Willpower is read
+// Damage on each ally in play, those with willpower at most `maxWillpower` when it is named (141071:A:1), or on each enemy in
+// play, those with a trait (01018:A:1) or engaged with a chosen player (01033:A:1). Willpower is read
 // once for all of them, before any damage is placed. A player card's effect is a player card effect (immunity applies).
 function damageAllies(
   state: ScenarioState,
@@ -226,13 +230,20 @@ function damageAllies(
 ): ScenarioState {
   const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
   const kind = source && isPlayerType(printedOf(ctx.cards, source.code)) ? "player" : "framework";
-  const targets = livingSeats(state)
-    .flatMap((seat) => characters(state, seat, ctx.cards))
-    .filter((id) => {
-      const card = state.cards[id];
-      if (!card || printedOf(ctx.cards, card.code).type !== instruction.type) return false;
-      return instruction.maxWillpower == null || modifiedStat(state, card, "willpower", ctx.cards) <= instruction.maxWillpower;
-    });
+  // Enemies in play are in the staging area and engaged with the players; "each enemy engaged with that player" (01033:A:1)
+  // is the engaged enemies of the player the last Pick chose.
+  const pickedSeat = instruction.engagedWith === "picked" ? seatOf(lastPicked(state)) : null;
+  const enemies = (): string[] =>
+    instruction.engagedWith === "picked"
+      ? pickedSeat == null ? [] : [...(state.seats[pickedSeat]?.engaged ?? [])]
+      : [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])];
+  const pool = instruction.type === "enemy" ? enemies() : livingSeats(state).flatMap((seat) => characters(state, seat, ctx.cards));
+  const targets = pool.filter((id) => {
+    const card = state.cards[id];
+    if (!card || printedOf(ctx.cards, card.code).type !== instruction.type) return false;
+    if (instruction.trait != null && !hasTrait(state, id, instruction.trait, ctx)) return false;
+    return instruction.maxWillpower == null || modifiedStat(state, card, "willpower", ctx.cards) <= instruction.maxWillpower;
+  });
   let next = state;
   for (const id of targets) next = placeDamage(next, id, instruction.amount, ctx.cards, steps, kind, currentCause(steps, UNATTRIBUTED));
   return next;
@@ -259,7 +270,9 @@ export function questProgressMoved(
   state: ScenarioState,
   instruction: Extract<Instruction, { verb: "RemoveQuestProgress" | "PlaceQuestProgress" }>,
 ): number {
-  const amount = instruction.perPlayer * livingSeats(state).length;
+  // A flat amount: "place 2 progress tokens on the current quest" (01005:A:2).
+  if (instruction.verb === "PlaceQuestProgress" && instruction.amount != null) return instruction.amount;
+  const amount = (instruction.perPlayer ?? 0) * livingSeats(state).length;
   if (instruction.verb === "PlaceQuestProgress") return amount;
   const stage = state.questStage ? state.cards[state.questStage] : undefined;
   return Math.max(0, Math.min(amount, stage?.progress ?? 0));

@@ -6,6 +6,7 @@ import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { travelTo } from "./quest.ts";
+import { queueEvent } from "./queue.ts";
 import { offerResponses } from "./responses.ts";
 import { travelBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
@@ -22,7 +23,10 @@ export function travelNow(state: ScenarioState, locationId: string, ctx: ReduceC
   const traveled = travelTo(state, locationId, ctx.cards);
   if (!traveled) return null;
   // The travel opportunity is taken; the Travel phase ends after the window that follows it (rr.framework-steps, 4.2).
-  const moved = traveled.mode === "travel" ? markReached(traveled, "traveled") : traveled;
+  const marked = traveled.mode === "travel" ? markReached(traveled, "traveled") : traveled;
+  // Every card hears that the players traveled to a location ("After you travel to a location", 01047:A:1) once the location's
+  // own Responses and Forced effects are done.
+  const moved = queueEvent(marked, { trigger: "locationTraveled", seat: null, subject: locationId });
   const offered = offerResponses(moved, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
   return fireForced(offered, { trigger: "becameActive", seat: null, cardId: locationId }, ctx, steps);
 }

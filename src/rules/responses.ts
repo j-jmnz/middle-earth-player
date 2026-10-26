@@ -7,7 +7,7 @@ import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { GameEvent, ResponseOffer, ScenarioState } from "./state.ts";
 import { inPlay, livingSeats, perilLock } from "./state.ts";
-import { payUsage, controllerSeat, usable, usageReason } from "./usage.ts";
+import { payUsage, controllerSeat, usable, usageReason, usedFromHand } from "./usage.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
@@ -34,8 +34,8 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
     if (!order.includes(seat) || (locked != null && seat !== locked)) continue;
     for (const effect of ctx.effects) {
       if (effect.timing !== "response" || effect.cardCode !== instance.code || effect.trigger !== event.trigger) continue;
-      // Only an event used from the hand has a Response there.
-      if (inHand !== (effect.cost?.kind === "playEvent")) continue;
+      // Only an event used from the hand, or a card whose record says so (01019:A:1), has a Response there.
+      if (inHand !== usedFromHand(effect)) continue;
       const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.subject ? { subject: event.subject } : {}), ...(event.explored ? { explored: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       if (!usable(state, effect, instance.id, seat, ctx)) continue;

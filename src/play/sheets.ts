@@ -312,7 +312,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         key: `look:${window.cardIds.join(",")}`,
         step: step(game),
         title: window.cardIds.map((id) => names.card(id)).join(", ") || "Look",
-        note: "The top of the encounter deck. Nothing moves.",
+        // Dark Knowledge (01071:A:2) looks at a shadow card dealt to an enemy, not at the encounter deck.
+        note: window.cardIds.some((id) => game.cards[id]?.zone === "shadow") ? "A shadow card dealt to an enemy attacking you. Nothing moves." : "The top of the encounter deck. Nothing moves.",
         verb: "",
         options: [],
         primary: { label: "Done", intent: { type: "Pass" } },
@@ -376,14 +377,16 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const note = numbers ? `Attack ${numbers.attack}.` : "";
       const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
       const undefended = undefendedSheet(game, ctx, names, title, note);
-      const leave: Alternative = "kind" in undefended ? { label: "Leave undefended", next: undefended } : { label: "Leave undefended", intent: undefended };
+      // A defender is declared and Stand Together lets the player declare more (01038:A:1): a pass ends the declarations.
+      const more = has(legal, "Pass");
+      const leave: Alternative = more ? { label: "No more defenders", intent: { type: "Pass" } } : "kind" in undefended ? { label: "Leave undefended", next: undefended } : { label: "Leave undefended", intent: undefended };
       return {
         kind: "pick",
-        key: `defense:${numbers?.enemyId ?? ""}:${game.pendingAttack?.undefended ? "u" : "d"}`,
+        key: `defense:${numbers?.enemyId ?? ""}:${game.pendingAttack?.undefended ? "u" : "d"}${more ? `:${defenders.length}` : ""}`,
         step: "Combat",
         title,
         stats: numbers ? statOf(game, ctx, numbers.enemyId, "attack") : [],
-        note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`,
+        note: more ? `${note} Declare another defender, or stop.` : game.pendingAttack?.undefended ? `${note} This attack is undefended.` : defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`,
         verb: "Defend with",
         options: defenders.map((id) => {
           const defense = defenseAsDefender(game, id, ctx.cards);

@@ -58,8 +58,9 @@ export function modifiedStat(
     if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
+    if (modifier.when?.kind === "attacking" && !attacking(state, modifier.when, against, cards)) continue;
     if (modifier.set) set = modifier.amount;
-    else total += modifier.amount;
+    else total += modifier.amount * (modifier.per === "damage" ? instance.damage : 1);
   }
   const value = set ?? total;
   return CARD_STATS.has(stat) ? Math.max(0, value) : value;
@@ -87,6 +88,20 @@ export function versusHighEngagement(
   const enemy = enemyId ? state.cards[enemyId] : undefined;
   if (!enemy || printedOf(cards, enemy.code).engagementCost == null) return false;
   return modifiedStat(state, enemy, "engagementCost", cards) > threat;
+}
+
+// The enemy a character attacks matches a stat condition ("when attacking an Orc", 01039:A:2; an enemy in the staging area,
+// 01009:A:1). `against` is the enemy, read while the attack strength is read (rr.step-6-8-2).
+export function attacking(
+  state: ScenarioState,
+  condition: { trait?: string | undefined; inStaging?: boolean | undefined },
+  against: string | undefined,
+  cards: ReadonlyMap<string, PrintedCard>,
+): boolean {
+  const enemy = against ? state.cards[against] : undefined;
+  if (!enemy) return false;
+  if (condition.inStaging && enemy.zone !== "staging") return false;
+  return condition.trait == null || printedOf(cards, enemy.code).traits.includes(condition.trait);
 }
 
 // A character's defense as the defender of the attack in progress, read as if it were declared, so a modifier that holds
@@ -186,8 +201,9 @@ export function placeDamage(
     // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy).
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
   } else if (hurt) {
-    // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
-    next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id });
+    // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage"), with the
+    // damage it just took ("for each point of damage he just suffered", 01003:A:1).
+    next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt });
   }
   return next;
 }
@@ -297,7 +313,12 @@ export function destroyCard(
   steps.push({ kind: "destroy", targetId: id });
   if (printed.type === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
-  return eliminateEmpties(next, steps);
+  const after = eliminateEmpties(next, steps);
+  // "After a Dwarf hero you control leaves play" (01019:A:1): the seat is the player who controlled it. A player the loss
+  // eliminated has nobody left to hear it.
+  const seat = instance.controller;
+  if (printed.type !== "hero" || !inPlay(instance.zone) || seat == null || after.lost || after.seats[seat]?.eliminated) return after;
+  return queueEvent(after, { trigger: "heroLeftPlay", seat, subject: id });
 }
 
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
