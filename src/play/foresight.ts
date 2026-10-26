@@ -6,6 +6,7 @@
 // included), whether that loses the game (The One Ring leaves play with its bearer; no seat remains) or eliminates a seat,
 // and how much more damage the card can take. Nothing here changes the game: the copy is dropped.
 import { ruleCause } from "../rules/cause.ts";
+import { defendersOf } from "../rules/combat.ts";
 import { defenseAsDefender, modifiedStat, placeDamage } from "../rules/keywords.ts";
 import { engagementCostOf } from "../rules/quest.ts";
 import type { EngineStep, ReduceContext, ScenarioState } from "../rules/reduce.ts";
@@ -49,11 +50,14 @@ export function damageOutcome(game: ScenarioState, ctx: ReduceContext, cardId: s
   return { damage, destroyed, loss: after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : null, eliminated, spare };
 }
 
-/** The damage an enemy's attack would place on a defender now, before the shadow card (rr.step-6-4-4). */
+/** The damage an enemy's attack would place on a defender now, before the shadow card (rr.step-6-4-4); with others declared, the pooled damage. */
 export function defenseDamage(game: ScenarioState, ctx: ReduceContext, enemyId: string, defenderId: string): number {
   const enemy = game.cards[enemyId];
   if (!enemy) return 0;
-  return Math.max(0, modifiedStat(game, enemy, "attack", ctx.cards) - defenseAsDefender(game, defenderId, ctx.cards));
+  // A defender declared alongside others adds its Defense to theirs (Stand Together, rr.multiple-defenders).
+  const pooled = [...defendersOf(game).filter((id) => id !== defenderId && game.cards[id] != null), defenderId];
+  const defense = pooled.reduce((sum, id) => sum + defenseAsDefender(game, id, ctx.cards), 0);
+  return Math.max(0, modifiedStat(game, enemy, "attack", ctx.cards) - defense);
 }
 
 /** The damage an undefended attack would place on a hero now, before the shadow card. */

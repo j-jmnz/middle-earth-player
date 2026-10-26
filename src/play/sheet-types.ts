@@ -90,6 +90,8 @@ export type DistributeSheet = {
   exact: boolean;
   options: readonly (SheetOption & { max: number })[];
   purpose: DistributePurpose;
+  // The fewest different heroes a payment must come from (01036:A:1).
+  spread?: number;
   // A warning the confirm repeats before it sends (an attachment whose text the app does not apply): Play arms first.
   caution?: string;
 };

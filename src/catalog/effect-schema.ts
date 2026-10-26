@@ -57,10 +57,11 @@ export const triggerSchema = z.enum([
   "locationTraveled",
   // Heard by each attachment of each attacker: an attack it took part in destroyed an enemy (01039:A:3).
   "hostAttackDestroyed",
-  // Heard by every card: the shadow cards of the combat phase were dealt (seat: a player with an engaged enemy, 01071:A:2).
+  // Heard by every card: shadow cards were dealt, the combat phase's or one for an attack outside it
+  // (rr.attacks-outside-the-combat-phase; 01071:A:2).
   "shadowsDealt",
-  // Heard by every card in play: a card was revealed from the encounter deck (subject), before its keywords and its "when
-  // revealed" effects resolve (01006:A:1).
+  // Heard by every card in play: the encounter deck revealed a card (subject), before its keywords and its "when revealed"
+  // effects resolve (01006:A:1). A card a search found and revealed is not heard.
   "cardRevealed",
 ]);
 

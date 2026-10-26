@@ -154,6 +154,13 @@ describe("Brok Ironfist (01019:A:1)", () => {
     expect(offered(run.state, tab)).toEqual([]);
     expect(run.state.cards[idsOf(tab, BROK)]?.zone).toBe("hand");
   });
+
+  it("is not offered while a Brok Ironfist is in play: it could not change the game state (rr.triggered-ability, rr.unique-cards)", () => {
+    const tab = table({ heroes: [{ code: GLOIN, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: BROK, seat: 0 }], hand: [{ code: BROK, seat: 0 }] }, 0);
+    const run = lose(tab, GLOIN);
+    expect(offered(run.state, tab)).toEqual([]);
+    expect((tab.ids[BROK] ?? []).map((id) => run.state.cards[id]?.zone).sort()).toEqual(["hand", "play"]);
+  });
 });
 
 describe("For Gondor! (01022:A:1)", () => {

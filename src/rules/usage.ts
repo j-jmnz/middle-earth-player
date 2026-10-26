@@ -1,10 +1,10 @@
-// Rules: rr.limits, rr.triggering-condition (data/rules/entries.json).
+// Rules: rr.limits, rr.triggering-condition, rr.triggered-ability, rr.unique-cards (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
 
 import { playCost } from "./attach.ts";
 import type { EngineStep, Payment } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { destroyCard } from "./keywords.ts";
+import { destroyCard, uniqueBlocked } from "./keywords.ts";
 import { deckPlayHero, markDeckPlay } from "./deck-play.ts";
 import { heroPays, validatePayments } from "./payments.ts";
 import { printedOf, type Sphere } from "./printed.ts";
@@ -54,10 +54,20 @@ function costSphere(effect: Effect, source: CardInstance, ctx: ReduceContext): S
   return cost?.kind === "resources" ? (cost.sphere ?? printedOf(ctx.cards, source.code).sphere) : null;
 }
 
+// A triggered ability on a player card is initiated only if its effect could change the game state on its own
+// (rr.triggered-ability). Putting a unique card into play while a copy is in play cannot (rr.unique-cards): Brok Ironfist's
+// Response (01019:A:1) is not offered while a Brok Ironfist is in play.
+function cannotChangeState(state: ScenarioState, effect: Effect, sourceId: string, ctx: ReduceContext): boolean {
+  const source = state.cards[sourceId];
+  if (!source || !effect.instructions.every((instruction) => instruction.verb === "PutSelfIntoPlay")) return false;
+  return uniqueBlocked(state, printedOf(ctx.cards, source.code), ctx.cards);
+}
+
 // True when the effect may be offered for an event: its source is there and its limit is not spent. A resource cost is not
 // read here: in a response window another Response may yet add the resources it needs (rr.triggering-condition: the
 // responses of one occurrence are used in any order), and `usable` decides what the window lists at each turn.
 export function offerable(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext): boolean {
+  if (cannotChangeState(state, effect, sourceId, ctx)) return false;
   const cost = effect.cost;
   if (cost && (cost.kind === "resources" || cost.kind === "selfResources" || cost.kind === "playEvent")) {
     const source = state.cards[sourceId];
@@ -69,7 +79,7 @@ export function offerable(state: ScenarioState, effect: Effect, sourceId: string
 // True when the cost could be paid and the limit is not spent. Used to decide what to offer.
 export function usable(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext): boolean {
   const source = state.cards[sourceId];
-  if (!source || limitSpent(state, effect, sourceId, seat)) return false;
+  if (!source || limitSpent(state, effect, sourceId, seat) || cannotChangeState(state, effect, sourceId, ctx)) return false;
   const cost = effect.cost;
   if (!cost) return true;
   switch (cost.kind) {

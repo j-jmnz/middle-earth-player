@@ -39,8 +39,9 @@ export function combatPairs(game: ScenarioState, seat: number): ReadonlyMap<stri
   const attack = game.pendingAttack;
   if (attack && engaged.includes(attack.enemyId)) {
     const defended = attack.defenderId != null && !attack.undefended;
-    const fighter = defended ? attack.defenderId : (attack.heroId ?? null);
-    if (fighter && game.cards[fighter]) pairs.set(attack.enemyId, { ids: [fighter], kind: defended ? "defense" : "undefended" });
+    // Every defender declared (Stand Together, rr.multiple-defenders), or the hero an undefended attack hits.
+    const fighters = (defended ? (attack.defenderIds ?? [attack.defenderId]) : [attack.heroId]).filter((id): id is string => id != null && game.cards[id] != null);
+    if (fighters.length > 0) pairs.set(attack.enemyId, { ids: fighters, kind: defended ? "defense" : "undefended" });
   }
   const strike = game.pendingStrike;
   if (strike && engaged.includes(strike.enemyId)) {

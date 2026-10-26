@@ -8,6 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { attackStrength } from "../rules/combat.ts";
 import { attackBarred, syncConstants } from "../rules/constants.ts";
 import { modifiedStat } from "../rules/keywords.ts";
+import { startReveal } from "../rules/frames.ts";
 import { settle } from "../rules/machine.ts";
 import { definePrinted } from "../rules/printed.ts";
 import { legalIntents } from "../rules/reduce.ts";
@@ -118,6 +119,15 @@ describe("Thalin (01006:A:1)", () => {
     let run = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, GIMLI)] }, tab.ctx);
     run = send(run, { type: "Pass" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, "f3")]?.damage).toBe(0);
+  });
+
+  it("deals none to an enemy a player searched for and revealed: the encounter deck did not reveal it (rr.staging)", () => {
+    const tab = table({ start: "quest", heroes: [{ code: THALIN, seat: 0 }, { code: GIMLI, seat: 0 }], deck: ["f0", "f3"] });
+    const committed = { ...updateCard(tab.state, idsOf(tab, THALIN), { committed: true, exhausted: true }), window: null };
+    const steps: Parameters<typeof settle>[2] = [];
+    const found = settle(startReveal(committed, 0, tab.ctx, steps, idsOf(tab, "f3")), tab.ctx, steps);
+    expect(found.cards[idsOf(tab, "f3")]?.zone).toBe("staging");
+    expect(found.cards[idsOf(tab, "f3")]?.damage).toBe(0);
   });
 });
 

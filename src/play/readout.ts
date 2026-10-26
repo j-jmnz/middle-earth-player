@@ -1,4 +1,5 @@
-// Rules: rr.step-3-4, rr.step-6-4-3, rr.step-6-8-2, rr.threat-elimination-level, rr.engagement-check, mec109.hide-tests
+// Rules: rr.step-3-4, rr.step-6-4-3, rr.step-6-8-2, rr.threat-elimination-level, rr.engagement-check, rr.multiple-defenders,
+// mec109.hide-tests
 // (data/rules/entries.json).
 //
 // The engine's numbers for the open moment, as the dock shows them beside the choice: attack against defense while an attack
@@ -74,6 +75,14 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const strength = modifiedStat(game, enemy, "attack", ctx.cards);
     const shadowNote = attack.shadowResolved ? "" : ", shadow card next";
     const picked = pickedInAttack(sheet, choice);
+    // Several defenders (Stand Together, rr.multiple-defenders): their defense is pooled against the attack, and all the
+    // damage goes on the one the defending player chooses.
+    const declared = attack.undefended ? [] : (attack.defenderIds ?? (attack.defenderId ? [attack.defenderId] : [])).filter((id) => game.cards[id] != null);
+    const pooled = picked?.role === "defender" && declared.length > 0 && !declared.includes(picked.id) ? [...declared, picked.id] : declared;
+    if (pooled.length > 1) {
+      const defense = pooled.reduce((sum, id) => sum + defenseAsDefender(game, id, ctx.cards), 0);
+      return { kind: "defense", stats: [ATTACK(strength), DEFENSE(defense)], result: `${damageWords(strength, defense)} on one defender you choose${shadowNote}` };
+    }
     const defenderId = attack.undefended ? undefined : (attack.defenderId ?? (picked?.role === "defender" ? picked.id : undefined));
     if (defenderId && game.cards[defenderId]) {
       const defense = defenseAsDefender(game, defenderId, ctx.cards);

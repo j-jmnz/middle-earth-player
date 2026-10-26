@@ -5,6 +5,9 @@ import { legalIntents, reduce, startScenario, type PlayerIntent, type ReduceCont
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 import { intentsOf } from "../../scripts/sheet-intents.ts";
+import { fund, starterBase } from "../../scripts/starter-scene.ts";
+import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { buildTable, idsOf } from "../../scripts/test-scene.ts";
 
 import { railFor, STEP_WORDS } from "./rail.ts";
 import { firstShares, playRequest, sharesReady, tapShare } from "./pay.ts";
@@ -109,6 +112,23 @@ describe("pay sheet", () => {
       state = expectOk(reduce(state, nextIntent(state, ctx, { scout: "01002", prefer: "141035", protect: RING_BEARER }), ctx)).state;
     }
     expect(checked).toBeGreaterThan(0);
+  });
+
+  it("guesses a payment from 3 different heroes when the card must be paid that way (Thicket of Spears, 01036:A:1)", async () => {
+    const starter = await starterBase();
+    const cards = new Map([...starter.cards, ...(await loadPrinted(["01004", "01005", "01006", "01036"]))]);
+    const tab = buildTable({ ...starter, cards }, { ring: "none", start: "planning", heroes: ["01004", "01005", "01006"].map((code) => ({ code, seat: 0 })), hand: [{ code: "01036", seat: 0 }] });
+    const state = fund(tab.state, 0, 6);
+    const thicket = idsOf(tab, "01036");
+    const request = playRequest(state, tab.ctx, thicket);
+    expect(request?.spread).toBe(3);
+    const shares = request ? firstShares(request) : [];
+    expect(shares.map((share) => share.amount)).toEqual([1, 1, 1]);
+    const sheet = request ? paySheet(state, names, request, { kind: "play", cardId: thicket, hostId: null }) : null;
+    expect(sheet?.note).toContain("Pay from 3 different heroes.");
+    expect(sheet ? reduce(state, distributeIntent(sheet, shares), tab.ctx).ok : false).toBe(true);
+    // Without the restriction, the guess fills the first pool first.
+    expect(firstShares({ total: 3, exact: true, pools: [{ heroId: "a", max: 3 }, { heroId: "b", max: 1 }] })).toEqual([{ id: "a", amount: 3 }]);
   });
 
   it("a tap adds one up to the pool and the total, then clears", () => {

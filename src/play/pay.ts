@@ -4,7 +4,7 @@
 // only names where it comes from or goes, one token at a time, and the sheet confirms only when the shares sum to it.
 // The reducer still checks every payment (validatePayments) and refuses a wrong one with a reason.
 import type { Effect } from "../catalog/boundary.ts";
-import { playCost } from "../rules/attach.ts";
+import { payFromHeroes, playCost } from "../rules/attach.ts";
 import type { Payment } from "../rules/intents.ts";
 import type { ReduceContext } from "../rules/interpret.ts";
 import { heroPays } from "../rules/payments.ts";
@@ -15,13 +15,14 @@ import { topFrame } from "../rules/windows.ts";
 export type Share = { id: string; amount: number };
 
 // What a pay sheet asks: the pools that may pay, what each holds, and the total. `exact` is false for an X cost, where the
-// amount paid is X.
+// amount paid is X. `spread` is the fewest different heroes the payment must come from (Thicket of Spears, 01036:A:1).
 export type PayRequest = {
   seat: number;
   cardId: string;
   total: number;
   exact: boolean;
   pools: readonly { heroId: string; max: number }[];
+  spread?: number;
 };
 
 function poolsFor(state: ScenarioState, ctx: ReduceContext, seat: number, sphere: Sphere | null, forCard?: string): { heroId: string; max: number }[] {
@@ -44,7 +45,8 @@ export function playRequest(state: ScenarioState, ctx: ReduceContext, cardId: st
   const cost = playCost(state, cardId, seat, ctx) ?? 0;
   const pools = poolsFor(state, ctx, seat, printed.sphere, cardId);
   if (!printed.costX && cost === 0) return null;
-  return { seat, cardId, total: cost, exact: !printed.costX, pools };
+  const spread = payFromHeroes(state, cardId, ctx);
+  return { seat, cardId, total: cost, exact: !printed.costX, pools, ...(spread != null ? { spread } : {}) };
 }
 
 /** The pay request for an Action or Response with a resource cost, or null when its cost takes no resources. */
@@ -56,7 +58,8 @@ export function triggerRequest(state: ScenarioState, ctx: ReduceContext, cardId:
   if (effect.cost?.kind === "playEvent") {
     const cost = playCost(state, cardId, seat, ctx) ?? 0;
     if (!printed.costX && cost === 0) return null;
-    return { seat, cardId, total: cost, exact: !printed.costX, pools: poolsFor(state, ctx, seat, printed.sphere, cardId) };
+    const spread = payFromHeroes(state, cardId, ctx);
+    return { seat, cardId, total: cost, exact: !printed.costX, pools: poolsFor(state, ctx, seat, printed.sphere, cardId), ...(spread != null ? { spread } : {}) };
   }
   if (effect.cost?.kind === "resources") {
     const sphere = effect.cost.sphere ?? printed.sphere;
@@ -65,17 +68,25 @@ export function triggerRequest(state: ScenarioState, ctx: ReduceContext, cardId:
   return null;
 }
 
-/** A first guess the player can change: the pools in seat order, each giving what it holds until the total is met. */
-export function firstShares(request: PayRequest): Share[] {
-  const shares: Share[] = [];
+/**
+ * A first guess the player can change: the pools in seat order, each giving what it holds until the total is met. A cost
+ * that must come from several different heroes (01036:A:1) takes one from each of the first of them before the rest.
+ */
+export function firstShares(request: Pick<PayRequest, "total" | "exact" | "pools" | "spread">): Share[] {
+  const given = new Map<string, number>();
   let left = request.exact ? request.total : 0;
+  for (const pool of request.pools.slice(0, request.spread ?? 0)) {
+    if (left <= 0) break;
+    given.set(pool.heroId, 1);
+    left -= 1;
+  }
   for (const pool of request.pools) {
     if (left <= 0) break;
-    const amount = Math.min(left, pool.max);
-    shares.push({ id: pool.heroId, amount });
+    const amount = Math.min(left, pool.max - (given.get(pool.heroId) ?? 0));
+    if (amount > 0) given.set(pool.heroId, (given.get(pool.heroId) ?? 0) + amount);
     left -= amount;
   }
-  return shares;
+  return request.pools.flatMap((pool) => (given.has(pool.heroId) ? [{ id: pool.heroId, amount: given.get(pool.heroId) ?? 0 }] : []));
 }
 
 export function shareSum(shares: readonly Share[]): number {

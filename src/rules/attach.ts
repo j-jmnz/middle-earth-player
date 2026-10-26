@@ -88,7 +88,7 @@ export function payFromHeroesReason(state: ScenarioState, cardId: string, paymen
 }
 
 // The heroes whose pools must pay for the card, or null when any may (01036:A:1).
-function payFromHeroes(state: ScenarioState, cardId: string, ctx: ReduceContext): number | null {
+export function payFromHeroes(state: ScenarioState, cardId: string, ctx: ReduceContext): number | null {
   const code = state.cards[cardId]?.code;
   for (const effect of ctx.effects) {
     if (effect.cardCode !== code || effect.timing !== "constant") continue;

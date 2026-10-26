@@ -116,9 +116,11 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
           next = raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x"));
         }
       }
-      // The card is revealed: what happens "as it is revealed" (01006:A:1) resolves before its keywords and "when revealed"
-      // effects, in frames above this one.
-      return fireForced(next, { trigger: "cardRevealed", seat, subject: id }, ctx, steps);
+      // The card is revealed: what happens "as it is revealed by the encounter deck" (01006:A:1) resolves before its keywords
+      // and "when revealed" effects, in frames above this one. Only the encounter deck's own reveal counts (staging, a surge,
+      // the top card; rr.staging): a card a player searches for and reveals is not revealed by the encounter deck, as it is
+      // not "revealed from the encounter deck" for a cancel (141001:A:1).
+      return frame.data.fromDeck ? fireForced(next, { trigger: "cardRevealed", seat, subject: id }, ctx, steps) : next;
     }
     case 2: {
       const next = patchTop(state, { step: 3 });

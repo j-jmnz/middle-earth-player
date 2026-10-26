@@ -449,19 +449,22 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         step: "Combat",
         title,
         stats: numbers ? statOf(game, ctx, numbers.enemyId, "attack") : [],
-        note: more ? `${note} Declare another defender, or stop.` : game.pendingAttack?.undefended ? `${note} This attack is undefended.` : defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`,
+        note: more ? `${note} Declare another defender, or stop. Their Defense is pooled, and you choose who takes the damage.` : game.pendingAttack?.undefended ? `${note} This attack is undefended.` : defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`,
         verb: "Defend with",
         options: defenders.map((id) => {
           const defense = defenseAsDefender(game, id, ctx.cards);
-          const seen = foreseen(game, ctx, names, id, numbers ? defenseDamage(game, ctx, numbers.enemyId, id) : 0);
+          const damage = numbers ? defenseDamage(game, ctx, numbers.enemyId, id) : 0;
           const base = option(game, names, id);
+          // Another defender pools its Defense; who takes the damage is chosen after the declarations, so nothing is
+          // destroyed by this pick yet (rr.multiple-defenders).
+          const seen = more ? { stats: [{ icon: "damage" as const, value: damage, word: "Damage" }], suffix: "", mark: { icon: "damage" as const, value: damage, danger: false } } : foreseen(game, ctx, names, id, damage);
           return {
             ...base,
             label: `${base.label}${seen.suffix}`,
             stats: [{ icon: "defense" as const, value: defense, word: "Defense" }, ...seen.stats],
             mark: seen.mark,
             intent: { type: "DeclareDefender", defenderId: id },
-            ...(seen.caution ? { caution: seen.caution } : {}),
+            ...("caution" in seen && seen.caution ? { caution: seen.caution } : {}),
           };
         }),
         primary: null,

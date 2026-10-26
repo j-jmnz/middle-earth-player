@@ -190,11 +190,12 @@ export function paySheet(game: ScenarioState, names: SheetNames, request: PayReq
     key: `pay:${request.cardId}:${purpose.kind}`,
     step: STEP_WORDS[game.mode],
     title: request.exact ? `Pay ${request.total} for ${source}` : `Pay for ${source}`,
-    note: request.exact ? "Tap a hero to take one resource from its pool." : "X is what you pay. Tap a hero to take one resource from its pool.",
+    note: `${request.exact ? "" : "X is what you pay. "}Tap a hero to take one resource from its pool.${request.spread ? ` Pay from ${request.spread} different heroes.` : ""}`,
     total: request.total,
     exact: request.exact,
     options: request.pools.map((pool) => ({ ...option(game, names, pool.heroId), max: pool.max })),
     purpose,
+    ...(request.spread ? { spread: request.spread } : {}),
   };
 }
 

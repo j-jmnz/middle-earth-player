@@ -1,19 +1,25 @@
 // Rules: rr.step-6-4-4, rr.hit-points, rr.player-elimination, rr.threat-elimination-level, rr.travel, rr.step-3-3,
-// mec109.setting-up-the-game (data/rules/entries.json). What a choice would do, said before it is confirmed: the damage on
-// each possible defender, whether it destroys the card and loses the game, the commit's cost, and why travel waits.
+// rr.multiple-defenders, mec109.setting-up-the-game (data/rules/entries.json). What a choice would do, said before it is
+// confirmed: the damage on each possible defender (pooled, with several), whether it destroys the card and loses the game,
+// the commit's cost, and why travel waits.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/fixture.ts";
 import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
+import { settle } from "../rules/machine.ts";
+import { definePrinted } from "../rules/printed.ts";
 import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { withThreat } from "../rules/state.ts";
+import { withMode, withThreat } from "../rules/state.ts";
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
-import { buildTable, FRODO, idsOf, MERRY, RIDER, SAM, sceneCards } from "../../scripts/test-scene.ts";
+import { fund, payFor, starterBase } from "../../scripts/starter-scene.ts";
+import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { begin, buildTable, FRODO, idsOf, MERRY, passWindows, RIDER, SAM, sceneCards, send } from "../../scripts/test-scene.ts";
 
 import { noOneQuests, windowSheet } from "./bar-sheets.ts";
 import { damageOutcome, lossWords, outcomeWords } from "./foresight.ts";
 import { readoutFor } from "./readout.ts";
+import { combatPairs } from "./selectors.ts";
 import type { SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
 import { choiceFor, dockFor } from "./table-choice.ts";
@@ -88,6 +94,32 @@ describe("the defense sheet", () => {
     }
     expect(seenDefense).toBeGreaterThan(0);
   }, 120_000);
+});
+
+describe("several defenders (Stand Together, 01038:A:1)", () => {
+  it("pool their defense in the readout and are all marked against the enemy", async () => {
+    const starter = await starterBase();
+    const cards = new Map([...starter.cards, ...(await loadPrinted(["01004", "01006", "01038"]))]);
+    cards.set("pounder", definePrinted({ code: "pounder", name: "Pounder", type: "enemy", threat: 1, engagementCost: 40, attack: 6, defense: 1, health: 9 }));
+    const tab = buildTable({ ...starter, cards }, { ring: "none", start: "planning", heroes: [{ code: "01004", seat: 0 }, { code: "01006", seat: 0 }], hand: [{ code: "01038", seat: 0 }], engaged: [{ code: "pounder", seat: 0 }] });
+    const [gimli, thalin, stand, pounder] = ["01004", "01006", "01038", "pounder"].map((code) => idsOf(tab, code));
+    const funded = fund(tab.state, 0, 6);
+    let run = begin(settle({ ...withMode(funded, "combatStart"), window: null }, tab.ctx, []));
+    run = send(run, { type: "PlayCard", cardId: stand ?? "", payments: payFor(run.state, tab.ctx, stand ?? "") }, tab.ctx);
+    run = send(passWindows(run, tab.ctx), { type: "DeclareDefender", defenderId: gimli ?? "" }, tab.ctx);
+    const legal = legalIntents(run.state, tab.ctx);
+    const sheet = sheetFor(run.state, tab.ctx, legal, names);
+    if (sheet?.kind !== "pick") throw new Error("no second defender pick");
+    // Gimli is declared; picking Thalin as well pools 2 + 2 Defense against the attack of 6.
+    const readout = readoutFor(run.state, tab.ctx, sheet, { key: sheet.key, ids: [thalin ?? ""], shares: [] }, (id) => id);
+    expect(readout?.stats.map((stat) => stat.value)).toEqual([6, 4]);
+    expect(readout?.result).toBe("2 damage on one defender you choose, shadow card next");
+    // The pick's mark is the pooled damage; nothing is destroyed by declaring, since who takes it is chosen after.
+    expect(sheet.options.find((item) => item.id === thalin)?.mark).toEqual({ icon: "damage", value: 2, danger: false });
+    // With no one left to declare, the declarations end.
+    run = passWindows(send(run, { type: "DeclareDefender", defenderId: thalin ?? "" }, tab.ctx), tab.ctx);
+    expect(combatPairs(run.state, 0).get(pounder ?? "")).toEqual({ ids: [gimli, thalin], kind: "defense" });
+  });
 });
 
 describe("the commit and travel", () => {

@@ -1,9 +1,14 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/fixture.ts";
+import { syncConstants } from "../rules/constants.ts";
 import { addModifier, modifiedStat } from "../rules/keywords.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { updateCard } from "../rules/state.ts";
 import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
+import { starterBase } from "../../scripts/starter-scene.ts";
+import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { buildTable, idsOf } from "../../scripts/test-scene.ts";
 
 import { cardEffects, effectLines } from "./card-effects.ts";
 
@@ -25,6 +30,16 @@ describe("effects on a card", () => {
     const hero = kept.cards[merry];
     expect(cardEffects(kept, ctx, merry).stats).toEqual([{ stat: "attack", icon: "attack", word: "Attack", value: hero ? modifiedStat(kept, hero, "attack", ctx.cards) : -1, delta: 3, lasting: false }]);
     expect(effectLines(kept, ctx, merry, () => "Merry")).toEqual(["+3 Attack from its own text, while it is in play"]);
+  });
+
+  it("say a bonus for each damage token as the total it comes to now (Gimli, 01004:A:1)", async () => {
+    const starter = await starterBase();
+    const tab = buildTable({ ...starter, cards: new Map([...starter.cards, ...(await loadPrinted(["01004"]))]) }, { ring: "none", heroes: [{ code: "01004", seat: 0 }] });
+    const gimli = idsOf(tab, "01004");
+    const state = syncConstants(tab.state, tab.ctx);
+    expect(effectLines(state, tab.ctx, gimli, () => "Gimli")).toEqual([]);
+    const hurt = updateCard(state, gimli, { damage: 3 });
+    expect(effectLines(hurt, tab.ctx, gimli, () => "Gimli")).toEqual(["+3 Attack (+1 for each damage on it) from its own text, while it is in play"]);
   });
 
   it("show each changed number with the engine's value and the change, and each cannot", () => {

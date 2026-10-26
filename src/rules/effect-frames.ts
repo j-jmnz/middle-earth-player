@@ -8,6 +8,7 @@ import { hasTrait, holds, outOfPlayChoices, searchable } from "./conditions.ts";
 import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "./frames.ts";
 import { pushHide } from "./hide.ts";
+import { queueEvent } from "./queue.ts";
 import type { EngineStep } from "./intents.ts";
 import { dealOneShadow, runInstruction, type ReduceContext } from "./interpret.ts";
 import { discardShadowOf } from "./shadow.ts";
@@ -233,8 +234,11 @@ function immediateAttack(state: ScenarioState, sourceId: string | null, ctx: Red
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
   // An attack an effect makes is dealt a shadow card of its own; one dealt for an earlier attack is discarded first
-  // (rr.attacks-outside-the-combat-phase, faq.additional-attacks).
-  const dealt = dealOneShadow(discardShadowOf(state, sourceId), sourceId);
+  // (rr.attacks-outside-the-combat-phase, faq.additional-attacks). A card just dealt is heard as in the combat phase ("look
+  // at 1 shadow card that was just dealt to an enemy attacking you", 01071:A:2).
+  const cleared = discardShadowOf(state, sourceId);
+  const shadowed = dealOneShadow(cleared, sourceId);
+  const dealt = shadowed !== cleared ? queueEvent(shadowed, { trigger: "shadowsDealt", seat: null }) : shadowed;
   const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };

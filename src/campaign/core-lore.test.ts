@@ -7,6 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { attackBarred, syncConstants } from "../rules/constants.ts";
 import { modifiedStat } from "../rules/keywords.ts";
+import { pushEffectFrame } from "../rules/effect-frames.ts";
 import { settle } from "../rules/machine.ts";
 import { stagingThreat } from "../rules/quest.ts";
 import { legalIntents } from "../rules/reduce.ts";
@@ -244,6 +245,18 @@ describe("Dark Knowledge (01071)", () => {
     run = send(run, { type: "Trigger", cardId: idsOf(tab, DARK), effectId: "01071:response:1" }, tab.ctx);
     expect(run.state.window).toEqual({ kind: "look", seat: 0, cardIds: [idsOf(tab, LURE)] });
     expect(run.state.cards[idsOf(tab, DARK)]?.exhausted).toBe(true);
+  });
+
+  it("is offered for the shadow card of an attack outside the combat phase too (rr.attacks-outside-the-combat-phase)", () => {
+    const tab = table({ heroes: [{ code: GLORFINDEL, seat: 0 }], attached: [{ code: DARK, host: GLORFINDEL }], engaged: [{ code: "f3", seat: 0 }], deck: [LURE, "f0"] });
+    const enemy = idsOf(tab, "f3");
+    const steps: Parameters<typeof settle>[2] = [];
+    const attacked = pushEffectFrame({ ...tab.state, window: null }, { frame: "ResolveEffect", sourceId: enemy, actor: 0, peril: false, effectId: "test:immediate", instructions: [{ verb: "ImmediateAttack" }], cancel: null, blockCancel: null }, steps);
+    let run = begin(settle(attacked, tab.ctx, steps));
+    expect(run.state.pendingAttack).toMatchObject({ enemyId: enemy, immediate: true });
+    expect(offered(run.state, tab)).toEqual(["01071:response:1"]);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, DARK), effectId: "01071:response:1" }, tab.ctx);
+    expect(run.state.window).toEqual({ kind: "look", seat: 0, cardIds: [idsOf(tab, LURE)] });
   });
 });
 
