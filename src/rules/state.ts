@@ -266,7 +266,7 @@ export type ScenarioState = {
   // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first
   // Rohan ally you play each round"). Only this round's are kept.
   // `paid`: the pools that paid for it and how much each (Linhir Sea-captain's "paid all of its cost from a single hero").
-  // `phase`: the phase it was played in ("the first non-unique card you play each planning phase").
+  // `phase`: the phase it was played in when that was not the Planning phase ("the first non-unique card you play each planning phase").
   played?: readonly { id: string; code: string; seat: number; round: number; phase?: string; paid?: readonly { heroId: string; amount: number }[] }[];
   // The cards that spent resources this round ("each hero ... that did not spend any resources this round").
   spent?: { round: number; ids: readonly string[] };

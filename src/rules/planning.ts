@@ -60,7 +60,7 @@ export function playCard(
   }
   // The discount it used is spent, and the card joins this round's plays.
   next = spendDiscount(next, intent.cardId, seat, ctx);
-  next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round, phase: next.phase }] };
+  next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round, ...(next.phase === "Planning" ? {} : { phase: next.phase }) }] };
   // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x), less a reduction the seat holds for
   // its next Doomed event (families/deck-rules.ts).
   const doomed = doomedRaise(next, seat, printed);

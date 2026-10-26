@@ -31,7 +31,8 @@ export function placeContracts(state: ScenarioState, seat: number, ctx: ReduceCo
   let next = state;
   for (const id of state.seats[seat]?.deck ?? []) {
     const card = next.cards[id];
-    if (!card || printedOf(ctx.cards, card.code).type !== "contract") continue;
+    // A code the card map does not know (a test deck) is not a contract.
+    if (!card || ctx.cards.get(card.code)?.type !== "contract") continue;
     next = updateCard(moveCard(next, id, { zone: "play", seat }), id, { face: "A" });
   }
   return next;

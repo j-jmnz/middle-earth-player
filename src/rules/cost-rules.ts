@@ -24,7 +24,7 @@ function fits(state: ScenarioState, cardId: string, pick: PickSpec, seat: number
 // The seat already played a card this round that matched (so "the first ... each round" is spent).
 // `thisPhase`: only the plays of the current phase count ("the first ... each planning phase").
 function playedMatching(state: ScenarioState, seat: number, pick: PickSpec, cardId: string, ctx: ReduceContext, thisPhase = false): boolean {
-  return (state.played ?? []).some((entry) => entry.round === state.round && (!thisPhase || entry.phase === state.phase) && entry.seat === seat && entry.id !== cardId && state.cards[entry.id] != null && fits(state, entry.id, pick, seat, ctx));
+  return (state.played ?? []).some((entry) => entry.round === state.round && (!thisPhase || (entry.phase ?? "Planning") === state.phase) && entry.seat === seat && entry.id !== cardId && state.cards[entry.id] != null && fits(state, entry.id, pick, seat, ctx));
 }
 
 // The first discount of the seat the card would spend.
