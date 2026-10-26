@@ -8,63 +8,30 @@ User directives (2026-10-26):
 - Extra branches on GitHub are fine. Before usage limits stop work, every agent and the main session write a handover and
   commit (and push) so no progress is lost.
 
-## State (2026-10-26, 12:30 UTC; all agents stopped by the user)
+## State when the user stopped the work (2026-10-26, session_01Ei8sWpP1Wh3AbvNb34oiyN)
 
-- Main branch for this work: `ccr-a8ef8247-8087n8` (pushed). `src/effects/open-lines.ts` lists the printed lines no
-  record owns yet (`pnpm effects:open` rewrites it): 833 before the mechanic families, **496** now.
-- Merged into the branch: the **encounter**, **costs**, **quest** and **defense** families, plus the MotK exclusion. Full
-  `pnpm test`, `pnpm lint`, `tsc` and `pnpm data:check` were green at the last merge.
-- The remaining lines are split into mechanic families (docs/plans/effect-authoring.md, "Mechanic families"). Each family
-  owns `src/catalog/families/<F>.ts`, `src/rules/families/<F>*.ts` and `src/effects/authored/families/<F>.ts`.
-- The agent brief is `docs/handover/agent-brief.md`; each unmerged family's line list as assigned is
-  `docs/handover/families/<F>.txt` (some lines may be closed since: check `src/effects/open-lines.ts`).
+The user asked to stop after phase 14, sidequests and misc. Everything is merged on `ccr-a8ef8247-8087n8` and pushed; no
+agent is running. Not merged into `main` yet.
 
-## Resumed session (2026-10-26, session_01Ei8sWpP1Wh3AbvNb34oiyN)
+- Merged (squashed, duplicates reduced to one definition; see each commit message): attachments, attack, play, deck,
+  rules spans (hon.battle, hon.siege, hon.archery, wor.guarded-x), the known follow-ups, leftovers (Battle/Siege, Imrahil's
+  hero type, one PutIntoPlay path for attachments with Guarded), phase 13 (Flight to the Ford), misc, sidequests, phase 14
+  (The Ring Goes South). ENGINE_VERSION is 6.
+- Checks at the last merge: tsc, lint, data:check, full `pnpm test` green; existing goldens unchanged.
+- **Open lines: 100.** 98 belong to scenarios 5 and 6 (Journey in the Dark, Breaking of the Fellowship: 142040-142090);
+  2 are Smeagol's Gollum side (21072:B:1-2: its enemy stats are in no source, and no hero-to-enemy flip exists).
+- Every player-card family line is closed apart from 21072:B:1-2. Trap has no official rule (card text only).
 
-- attachments, attack, play and deck are merged (squashed, duplicates reduced: see the four merge commits). Full suite green
-  (2144 tests), goldens unchanged. Open lines: **333** (sidequests 85, misc 74, scenario-141 34, scenario-142 138,
-  06036:A:2 Battle keyword, 145005:A:1 Imrahil ally-to-hero type change).
-- Running agents (Sonnet, worktrees), each pushing to its branch: sidequests (`wip/sidequests`), misc (`wip/misc`), rules
-  spans for Battle/Siege, Guarded player cards and Trap (`wip/rules`), phase 13 Flight to the Ford (`wip/phase-13`).
-  Their briefs: the agent brief plus an addendum (base = this branch head, push to wip/<F>, this session's attribution).
-- New follow-up from the deck merge: PutIntoPlay of an attachment (families/deck-moves.ts putAttachmentIntoPlay) and the
-  attachments family's PutAttachmentIntoPlay verb overlap; only the latter applies Guarded. Make them one.
+## Next steps (in order)
 
-## Families not started
+1. Phase 15 (Journey in the Dark), then phase 16 (Breaking of the Fellowship): `implementer` agents like phases 13/14
+   (base = this branch, push to `wip/phase-1N`, records in `src/effects/authored/<scenario>.ts`, add to playable.ts).
+2. Phase 13 review findings (non-blocking): see below.
+3. Second pass on open lines; update docs/plans/effect-authoring.md "Not expressible yet" and docs/phases/STATUS.md
+   (phone checks stay open in a cloud session); run `reviewer` on phase 14 and `ux` on the phone-half changes.
+4. Delete docs/handover/, run the full checks, merge into `main`, push.
 
-- **sidequests**: player side quests, contracts, encounter-keyword player cards, the victory display
-  (`docs/handover/families/sidequests.txt`; 22134 is now out of scope).
-- **misc**: constants and responses no other family takes, the saga heroes, The One Ring and Master cards
-  (`docs/handover/families/misc.txt`).
-Start each from the current branch head (not d2f8a7a), with the brief.
-
-## Merging a family
-
-1. Squash its branch onto this one (`git diff <base>..wip/<F> | git apply -3`, or cherry-pick each commit), then delete
-   `docs/handover/<F>.md`.
-2. Conflicts are mostly additive (enum members, pick fields, condition kinds, word cases): keep both sides.
-3. The same verb, condition kind, trigger or flag added by two families must end up as one definition; convert the other
-   family's records and tests. Seen so far: ChooseX, SpendResources, TravelTo, the `resources` condition. Expected next:
-   - `optionallyEngaged` trigger and `notHost` pick field: attack and quest (quest's are merged).
-   - `changedControl` trigger: play and defense (defense's is merged). `activeExplored` trigger: play and quest (quest's
-     is merged; both emit it from keywords.ts destroyCard).
-   - `PutIntoPlay`: play and deck. `DeclareAttack`: attack and attachments. `endOfAttack` Delay: attack.
-   A duplicated verb or condition kind fails at load ("Duplicate discriminator value"); `src/catalog/families/families.test.ts`
-   catches duplicated triggers and flags; `src/effects/effects.test.ts` catches duplicated record ids.
-4. `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm effects:open`, full `pnpm test` (goldens must not change), commit the
-   regenerated open lines, push.
-
-## Known follow-ups
-
-Done on this branch (commit "Fix known follow-ups"): event Action costs (none exist), explored leftPlay, the Refresh window,
-Mirkwood Explorer's questedSuccessfully, Dunedain Remedy's attached trigger, cancel payments spent. Rules spans for
-Battle/Siege/Archery/Guarded (X) are in data/rules (hon.*, wor.*); Trap has no official rule (card text only).
-Merged: leftovers (Battle/Siege + 06036:A:2, Imrahil 145005:A:1 via cardTypeOf/heroType, one PutIntoPlay path for
-attachments with Guarded per wor.guarded-x) and phase 13 (Flight to the Ford playable; burden family). Open lines: 296.
-Running: sidequests, misc, phase 14 (wip/phase-14), reviewer on phase 13 (3198cf0). Next: phases 15, 16 in order.
-Left for the end: the cookbook's "Not expressible yet" section, STATUS.md.
-
-Phase 13 review (non-blocking; fix after phases 14-16 merge, since they build on the burden family):
+Phase 13 review (non-blocking):
 1. burden-effects.ts passFirstPlayer duplicates refresh.ts passToken: one function.
 2. burden-attack.ts attackWith duplicates effect-frames.ts immediateAttack: export and reuse.
 3. 141028 Setup record never runs (setup comes from scenario-data/setup.ts); SetLife/ShuffleBurdenDeck only used by tests:
@@ -74,12 +41,22 @@ Phase 13 review (non-blocking; fix after phases 14-16 merge, since they build on
    ImmediateAttackEach -> attack/defense; SetStatUntil -> a duration on SetStat/ModifyStat).
 6. burden-words.ts hard-codes "Ring-bearer's" for SetStatUntil: derive from holders.
 
-## After the families
+Other notes from the agents:
+- src/play/threat-level.ts shows 50 as the elimination level and ignores eliminationReduction (The One Ring).
+- Side quests and The Burglar's Turn loot have no phone UI yet (commit to a side quest, loot choice, loot deckbuilding).
+- A card with printed Surge that also gains surge reveals one extra card only (surge is boolean).
+- Maestro fixtures for scenarios 3-4 need a saved win of scenarios 1-2 (`scripts/e2e-fixtures.ts --won`).
 
-1. Scenarios 3 to 6 (Flight to the Ford 141xxx, The Ring Goes South / Journey in the Dark / Breaking of the Fellowship
-   142xxx): their encounter and campaign cards still have open lines (`docs/handover/families/scenario-141.txt`,
-   `scenario-142.txt`); `src/campaign/playable.ts` lists playable scenarios. Flight to the Ford needs the Ring-bearer's
-   life and a burden deck.
-2. A second pass on lines families left open; update the cookbook and `docs/phases/STATUS.md`.
-3. Delete `docs/handover/`, then merge `ccr-a8ef8247-8087n8` into `main` and push (the user asked for this without
-   confirmation).
+## How the families were run
+
+The agent brief is `docs/handover/agent-brief.md`. Each agent works in a worktree from this branch, pushes WIP to
+`wip/<name>`, and the main session squashes it here ("Merging a family" below). Spawn agents with `model: "sonnet"`, at most
+4 at a time.
+
+## Merging a family
+
+1. `git merge --squash origin/wip/<F>`, resolve, then delete `docs/handover/<F>.md`.
+2. Conflicts are mostly additive: keep both sides.
+3. A concept two families both added must end up as one definition; convert the other family's records and tests.
+4. `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm effects:open`, `pnpm data:check`, full `pnpm test` (goldens must not
+   change), commit the regenerated open lines, push.

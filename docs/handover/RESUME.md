@@ -28,30 +28,11 @@ Continue automating every player card in this repository. The previous session s
   `ccr-a8ef8247-8087n8` into `main` and push, without waiting for confirmation.
 - No model names in commits. End commit messages with the attribution lines your environment gives you.
 
-**Work, in order**
-1. Finish the four families that were in progress. Each has its work on `wip/<family>` and its own handover at
-   `docs/handover/<family>.md` (on that branch; copies are on the main branch):
-   - attachments (`wip/attachments`): done apart from the final checks and commit.
-   - play (`wip/play`): 34 of 35 lines; final full test and commit left.
-   - attack (`wip/attack`): records and tests written; one helper in `attack-flow.ts` unfinished; last commit unreviewed.
-   - deck (`wip/deck`): schema and part of the engine; records, words and tests left; last commit unreviewed.
-   For each, start a fresh agent (general-purpose, `model: "sonnet"`, `isolation: "worktree"`) with the agent brief, telling it to
-   `git fetch origin wip/<family> && git checkout -B wip-<family> origin/wip/<family>` in its worktree first, read its
-   handover, check `pnpm exec tsc --noEmit`, finish, keep pushing `wip/<family>`, and report.
-2. Merge each finished family onto `ccr-a8ef8247-8087n8` as `docs/handover/main.md` says ("Merging a family"):
-   - squash the branch;
-   - keep both sides of additive conflicts;
-   - reduce names two families both added to one definition (the expected clashes are listed there);
-   - run `tsc`, `pnpm lint`, `pnpm effects:open` and the full `pnpm test` (goldens must not change);
-   - commit the regenerated open lines and push.
-3. Start the two families not yet begun, from the current branch head: **sidequests** and **misc**. Their line lists are in
-   `docs/handover/families/`; drop the lines no longer in `src/effects/open-lines.ts`. Merge them the same way.
-4. Fix the known follow-ups listed in `docs/handover/main.md`.
-5. Scenarios 3 to 6 (Flight to the Ford; The Ring Goes South; Journey in the Dark; Breaking of the Fellowship):
-   - write records for their encounter and campaign cards (`docs/handover/families/scenario-141.txt`,
-     `scenario-142.txt`, filtered by the open lines);
-   - add the mechanics they need (for example the Ring-bearer's life and the burden deck);
-   - add each finished scenario to `src/campaign/playable.ts`.
-6. Run a second pass on any line left open, then update the cookbook's "Not expressible yet" section and
+**Work, in order** (steps 1 to 4 of the original plan and scenarios 3 and 4 are done; see `docs/handover/main.md`)
+1. Phase 15 (Journey in the Dark), then phase 16 (Breaking of the Fellowship): one `implementer` agent each
+   (`model: "sonnet"`, `isolation: "worktree"`), based on this branch, pushing to `wip/phase-15` / `wip/phase-16`, the
+   same way phases 13 and 14 were done. Merge each as `docs/handover/main.md` says ("Merging a family").
+2. Fix the phase 13 review findings listed in `docs/handover/main.md`; run `reviewer` on phases 14 to 16.
+3. Run a second pass on any line left open, then update the cookbook's "Not expressible yet" section and
    `docs/phases/STATUS.md`. A cloud session has no phone checks, so say they stay open.
-7. Delete `docs/handover/`, run the full checks, merge into `main`, and push.
+4. Delete `docs/handover/`, run the full checks, merge into `main`, and push.
