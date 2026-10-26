@@ -249,6 +249,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               onButton={choice.onButton}
               extras={choice.extras}
               resetKey={choice.resetKey}
+              guide={choice.guide}
+              onHideGuide={choice.hideGuide}
             />
           </View>
         </View>
@@ -312,7 +314,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         </View>
       ) : null}
       {/* Over the table and any open panel, centered on the screen under the top bar. */}
-      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} /> : null}
+      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} onBeat={choice.onBeat} /> : null}
       {preview && previewed && shown ? (
         <CardPreview
           key={preview.id}

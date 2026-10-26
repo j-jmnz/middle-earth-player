@@ -8,9 +8,10 @@ import { useStore } from "zustand";
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
 import { tickRefused, tickSent } from "./haptics.ts";
 import { pointTitle } from "./rail.ts";
+import { guideLine } from "./reference.ts";
 import { alwaysUseIntent, isFreeResponse, nextStopTitle, passableWindow, stopDecision, usableIds } from "./stops.ts";
 import { tableSettings, toggleAlways } from "./table-settings.ts";
-import { intentWords, momentOf, takenBack, type Moment } from "./outcome.ts";
+import { BEAT_MS, intentWords, momentOf, roundSummary, takenBack, type Moment } from "./outcome.ts";
 import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { onTableFor, shownSeat } from "./selectors.ts";
@@ -23,7 +24,8 @@ import type { TableHighlight } from "./table-canvas-types.ts";
 import type { DockExtra } from "./dock-buttons.tsx";
 import { choiceFor, dockFor, fightPreview, headerOf, marked, onTheTable, onlyAnswer, pickedWords, primaryReady, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
 
-// How long the outcome banner stays up; the log keeps it.
+// How long the outcome banner stays up once every line is shown; the log keeps it. Each line before the last takes a beat
+// (outcome.ts, BEAT_MS).
 const MOMENT_MS = 4500;
 // How long a new moment ignores a send: the second tap of a double tap meant for the moment before lands where its button
 // was, and a moment with one answer would send on it.
@@ -51,8 +53,13 @@ export type TableChoice = {
   // Changes with the moment and the pick, so an armed button goes back to unarmed.
   resetKey: string;
   banner: Moment | null;
-  // The moment's number: a new one enters the banner afresh, even while the last is still up.
-  bannerKey: number;
+  // The moment's number and whether the banner shows it or the round summary: a new one enters the banner afresh.
+  bannerKey: string;
+  // The banner reached a line: the cards it names are ringed on the table.
+  onBeat: (cards: readonly string[]) => void;
+  // The first-game guide's line for this moment, and turning the guide off.
+  guide: string | null;
+  hideGuide: () => void;
   // The Undo button: puts back the pick being made, or goes back one intent (store.ts, undo-history.ts); null when there is
   // neither. It is also the first of `extras`.
   undo: DockExtra | null;
@@ -94,6 +101,9 @@ export function useTableChoice({
   // The sheet the player asked to see listed on paper.
   const [listed, setListed] = useState<string | null>(null);
   const [closedMoment, setClosedMoment] = useState(0);
+  const [closedSummary, setClosedSummary] = useState(0);
+  // The cards the banner's current beat names, ringed on the table (MomentBanner calls onBeat as it reaches each line).
+  const [beatKey, setBeatKey] = useState("");
   const seat = shownSeat(game);
   const settings = useStore(tableSettings, (state) => state.settings);
   // "Pass to next stop" is running; the cards usable where the player was last asked (stops.ts).
@@ -152,8 +162,9 @@ export function useTableChoice({
             }),
       ),
       muted: new Set(mutedKey === "" ? [] : mutedKey.split(",")),
+      beat: new Set(beatKey === "" ? [] : beatKey.split(",")),
     }),
-    [glowKey, pickedKey, share, dimOthers, markKey, mutedKey],
+    [glowKey, pickedKey, share, dimOthers, markKey, mutedKey, beatKey],
   );
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";
@@ -164,6 +175,16 @@ export function useTableChoice({
   }, [fightKey]);
   // The hand card being played rises whole above the bottom edge.
   const raised = live ? playedCard(live.sheet) : null;
+  // The first-game guide: the moment's step explained the first two times it comes up (reference.ts, guideLine).
+  const guideFor = settings.guide && !live ? guideLine(game, sheet.kind === "window" && passableWindow(game, sheet, legal)) : null;
+  const guide = guideFor && (settings.guideSeen[guideFor.key] ?? 0) < 2 ? guideFor : null;
+  const guideKey = guide ? `${guide.key}:${sheet.key}` : "";
+  useEffect(() => {
+    if (!guide) return;
+    const now = tableSettings.getState().settings;
+    tableSettings.getState().update({ guideSeen: { ...now.guideSeen, [guide.key]: (now.guideSeen[guide.key] ?? 0) + 1 } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- counted once per moment the line appears in.
+  }, [guideKey]);
   const base_header = headerOf(sheet, game);
   // While stops are on, the eyebrow says so: the table is passing some windows for the player.
   const header = settings.stopsOn ? { ...base_header, step: `${base_header.step} · Stops on` } : base_header;
@@ -185,12 +206,27 @@ export function useTableChoice({
     if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow }));
     return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow });
   }, [shown, names, shadow]);
-  const banner = shown && said && closedMoment !== shown.seq ? said : null;
+  // The round summary, once the round's own moment has had its say (outcome.ts, roundSummary).
+  const summary = useMemo((): Moment | null => {
+    if (shown?.kind !== "sent" || !shown.ended) return null;
+    const after = shown.after;
+    return roundSummary(shown.ended.round, shown.ended.steps, after, (cardId) => ctx.cards.get(after.cards[cardId]?.code ?? "")?.backType === "player");
+  }, [shown, ctx]);
+  const momentOpen = shown != null && said != null && closedMoment !== shown.seq;
+  const summaryOpen = shown != null && summary != null && !momentOpen && closedSummary !== shown.seq;
+  const banner = momentOpen ? said : summaryOpen ? summary : null;
+  // The banner stays up for its beats (one line at a time) and then a while to read; the summary follows it.
   useEffect(() => {
-    if (!shown) return;
-    const timer = setTimeout(() => setClosedMoment(shown.seq), MOMENT_MS);
+    if (!shown || !momentOpen || !said) return;
+    const timer = setTimeout(() => setClosedMoment(shown.seq), MOMENT_MS + said.lines.length * BEAT_MS);
     return () => clearTimeout(timer);
-  }, [shown]);
+  }, [shown, momentOpen, said]);
+  useEffect(() => {
+    if (!shown || !summaryOpen) return;
+    const timer = setTimeout(() => setClosedSummary(shown.seq), MOMENT_MS);
+    return () => clearTimeout(timer);
+  }, [shown, summaryOpen]);
+  const onBeat = useCallback((cards: readonly string[]) => setBeatKey(cards.join(",")), []);
 
   const reset = useCallback(() => {
     setOverlay(null);
@@ -357,7 +393,10 @@ export function useTableChoice({
     extras,
     resetKey,
     banner,
-    bannerKey: shown?.seq ?? 0,
+    bannerKey: `${shown?.seq ?? 0}:${momentOpen ? "moment" : "summary"}`,
+    onBeat,
+    guide: guide?.text ?? null,
+    hideGuide: () => tableSettings.getState().update({ guide: false }),
     undo: undoButton,
     onTap: tapOnTable,
     onTile,

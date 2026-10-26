@@ -2,14 +2,14 @@
 // engine's numbers for it (willpower against threat, attack against defense), what the player has picked on the table, and
 // the buttons that confirm it (docs/design-system.md, Table). Picking happens on the table; nothing here is sent until a
 // button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did.
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
-import Animated, { FadeInUp, FadeOut, ReduceMotion } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOut, ReduceMotion, useReducedMotion } from "react-native-reanimated";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
-import type { Moment } from "./outcome.ts";
+import { BEAT_MS, type Moment } from "./outcome.ts";
 import type { Readout } from "./readout.ts";
-import { Stats } from "./sheet-paper.tsx";
+import { ChromeButton, Stats } from "./sheet-paper.tsx";
 import type { Unavailable } from "./sheet-types.ts";
 import type { Dock, DockButton } from "./table-choice.ts";
 import { LineMark } from "./table-chrome.tsx";
@@ -49,6 +49,8 @@ export function TableDock({
   onButton,
   extras = [],
   resetKey,
+  guide = null,
+  onHideGuide,
 }: {
   step: string;
   title: string;
@@ -63,6 +65,9 @@ export function TableDock({
   extras?: readonly DockExtra[];
   // Changes with the moment and the pick: an armed button goes back to unarmed.
   resetKey: string;
+  // The first-game guide's line for the moment (reference.ts), and turning the guide off.
+  guide?: string | null;
+  onHideGuide?: () => void;
 }) {
   return (
     <View testID="dock" className="rounded-card px-3 pb-2 pt-2" style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
@@ -73,6 +78,12 @@ export function TableDock({
       <Text testID="sheet-title" accessibilityRole="header" numberOfLines={2} className="text-center font-display text-body text-bone">
         {title}
       </Text>
+      {guide ? (
+        <View testID="dock-guide" className="mt-0.5 flex-row items-center justify-center gap-1">
+          <Text className="shrink text-center text-label italic text-gold">{guide}</Text>
+          {onHideGuide ? <ChromeButton label="Hide" testID="dock-guide-hide" variant="quiet" tone="bone" accessibilityLabel="Turn off the first-game guide" onPress={onHideGuide} /> : null}
+        </View>
+      ) : null}
       {note || unavailable.length > 0 ? (
         <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 18 }}>
           {note ? (
@@ -115,13 +126,27 @@ const BANNER_WIDTH = 440;
  * where it hangs (under the top bar); `width` is the screen's, so it never runs off a narrow phone. Taps go through it to
  * the cards under it; the log keeps every step. The caller keys it on the moment, so each one enters and is announced.
  */
-export function MomentBanner({ moment, top, width }: { moment: Moment; top: number; width: number }) {
+export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; top: number; width: number; onBeat?: (cards: readonly string[]) => void }) {
   const edge = moment.tone === "good" ? t.gold : moment.tone === "bad" ? t.threat : t.faint;
   const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
   useEffect(() => {
     AccessibilityInfo.announceForAccessibility(label);
   }, [label]);
+  // Resolve in beats: one line more every BEAT_MS, each ringing on the table the cards it names; reduced motion shows all.
+  const reduceMotion = useReducedMotion();
+  const [shownLines, setShownLines] = useState(reduceMotion ? moment.lines.length : 1);
+  useEffect(() => {
+    if (shownLines >= moment.lines.length) return;
+    const timer = setTimeout(() => setShownLines((count) => count + 1), BEAT_MS);
+    return () => clearTimeout(timer);
+  }, [shownLines, moment.lines.length]);
+  const beatCards = moment.lines[Math.max(0, shownLines - 1)]?.cards ?? [];
+  const beatKey = beatCards.join(",");
+  useEffect(() => {
+    onBeat?.(beatKey === "" ? [] : beatKey.split(","));
+    return () => onBeat?.([]);
+  }, [beatKey, onBeat]);
   const box = { minWidth: Math.min(260, width - 32), maxWidth: Math.min(BANNER_WIDTH, width - 32) };
   return (
     <Animated.View entering={enter} exiting={leave} pointerEvents="none" style={{ position: "absolute", top, left: 0, right: 0, alignItems: "center" }}>
@@ -137,11 +162,11 @@ export function MomentBanner({ moment, top, width }: { moment: Moment; top: numb
             <Text testID="moment-title" className="text-center font-display text-body text-bone">
               {moment.title}
             </Text>
-            {moment.lines.map((line, index) => (
-              <View key={index} className="mt-0.5 flex-row items-center gap-2">
+            {moment.lines.slice(0, shownLines).map((line, index) => (
+              <Animated.View key={index} entering={enter} className="mt-0.5 flex-row items-center gap-2">
                 <LineMark mark={line.mark} tint="bone" size={14} />
                 <Text className="shrink text-label text-bone">{line.text}</Text>
-              </View>
+              </Animated.View>
             ))}
           </View>
         </View>

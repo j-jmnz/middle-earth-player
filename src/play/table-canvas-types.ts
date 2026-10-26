@@ -17,6 +17,8 @@ export type TableHighlight = {
   marks: ReadonlyMap<string, OptionMark>;
   // Hand cards that cannot be played in this planning window (why.ts says why on a tap): dimmed.
   muted: ReadonlySet<string>;
+  // The cards the banner's current beat names (the shadow card, the card damaged): ringed while the banner is at that line.
+  beat: ReadonlySet<string>;
 };
 
 // The engine's numbers the canvas draws on a card (card-effects.ts, slotNumbers): the effects on it, its willpower while it

@@ -7,6 +7,7 @@ import { createStore, type StoreApi } from "zustand/vanilla";
 
 import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
+import { finishedRoundSteps } from "./outcome.ts";
 import { draggableIds, dropTargets, type DropTarget } from "./selection.ts";
 import { nextUndoable, type Undoable } from "./undo-history.ts";
 
@@ -45,8 +46,9 @@ export type TableStore = StoreApi<TableState & TableActions>;
 
 // `after`: the state the moment made (the game right after the intent, or right after the undo), so the banner reads it even
 // once later passes have moved the game on.
+// `ended`: the round this intent finished, with its steps up to the refresh's threat, for the round summary.
 export type TableMoment =
-  | { seq: number; kind: "sent"; before: ScenarioState; after: ScenarioState; steps: readonly EngineStep[] }
+  | { seq: number; kind: "sent"; before: ScenarioState; after: ScenarioState; steps: readonly EngineStep[]; ended?: { round: number; steps: readonly EngineStep[] } }
   | { seq: number; kind: "undone"; intent: PlayerIntent; left: ScenarioState; after: ScenarioState; steps: readonly EngineStep[] };
 
 /** What the table keeps of the intents sent so far: the round's log and the states Undo can go back to. */
@@ -109,12 +111,14 @@ export function createTableStore(input: TableInput): TableStore {
         set({ refusal: result.reason });
         return false;
       }
-      const moment: TableMoment = { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, after: result.state, steps: result.steps };
+      const crossed = result.state.round !== before.round;
+      const ended = crossed ? { ended: { round: before.round, steps: finishedRoundSteps([...get().roundSteps, ...result.steps]) } } : {};
+      const moment: TableMoment = { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, after: result.state, steps: result.steps, ...ended };
       set({
         ...showing(result.state),
         ...keepIntent(get(), before, result.state, result.steps, intent),
         moment,
-        shown: result.steps.length > 0 ? moment : get().shown,
+        shown: result.steps.length > 0 || crossed ? moment : get().shown,
       });
       input.onCommit?.(intent, result.state);
       return true;

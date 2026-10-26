@@ -266,6 +266,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code)) : null} contrast={contrast} />
         {slot.kind === "card" ? <Marks rect={rect} tappable={tappable} picked={picked} share={highlight.share} dimmed={(highlight.dimOthers && !tappable && picked === 0) || highlight.muted.has(slot.id)} fonts={fonts} /> : null}
         {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} /> : null}
+        {/* The banner's current beat names this card (the shadow card, the card damaged): a bone ring while it does. */}
+        {highlight.beat.has(slot.id) ? <RoundedRect x={rect.x - 2} y={rect.y - 2} width={rect.w + 4} height={rect.h + 4} r={RADIUS + 2} color={t.bone} style="stroke" strokeWidth={2} /> : null}
       </Group>
     );
   };

@@ -67,7 +67,8 @@ function words(step: EngineStep, names: LogNames): string | null {
     case "gainResource":
       return `${names.card(step.heroId)} gains 1 resource`;
     case "damage":
-      return `${step.amount} damage on ${names.card(step.targetId)}`;
+      // A heal is a damage step with a negative amount (rr.damage).
+      return step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`;
     case "threat":
       return `${player(step.seat)} threat ${signed(step.amount)}`;
     case "progress":

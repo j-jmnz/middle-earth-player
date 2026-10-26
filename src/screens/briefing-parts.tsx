@@ -26,6 +26,12 @@ const COVER_HEIGHT = 120;
 
 const DIFFICULTIES = ["Easy", "Normal"] as const;
 
+// What each difficulty changes (ltp.easy-mode, easy-mode.easy-mode), in the briefing under the switch.
+const DIFFICULTY_NOTES: Readonly<Record<Difficulty, string>> = {
+  Easy: "Easy: each hero starts with 1 resource, and the encounter cards with the gold difficulty border are left out. Good for a first game.",
+  Normal: "Normal: the full encounter deck, and no starting resources.",
+};
+
 const TOOL_HEIGHT = 120;
 
 /** A saved deck's cards, one code per copy. */
@@ -114,6 +120,10 @@ export function ScenarioHeader({ facts, difficulty, onDifficulty, eyebrow }: { f
         <Segmented options={DIFFICULTIES} value={difficulty} onChange={onDifficulty} testIDPrefix="difficulty" />
         <Label className="ml-3">{`${facts.deckSize} encounter cards`}</Label>
       </View>
+      {/* What the difficulty changes, for a first game (ltp.easy-mode, easy-mode.easy-mode). */}
+      <Label testID="briefing-difficulty-note" tone="muted" className="mt-1">
+        {DIFFICULTY_NOTES[difficulty]}
+      </Label>
       <View testID="briefing-sets" className="mt-3 gap-1">
         {facts.sets.map((set) => (
           <Label key={set.name} tone="muted">{`${set.name} · ${set.count}`}</Label>

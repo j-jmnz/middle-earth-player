@@ -87,3 +87,19 @@ export function turnReference(game: ScenarioState, title: (id: string) => string
   }
   return phases;
 }
+
+/** The framework step the engine is in (steps.json id), or null outside the round. */
+export function stepOf(game: ScenarioState): string | null {
+  return STEP_OF[game.mode] ?? null;
+}
+
+/**
+ * The first-game guide's line for the moment (table-settings.ts, guide): the step's decision the first two times it comes up,
+ * and what an action window is for. Null when the moment has no line. `key` counts how often it was shown.
+ */
+export function guideLine(game: ScenarioState, window: boolean): { key: string; text: string } | null {
+  if (window) return { key: "window", text: "An action window: play an event or use an Action now, or pass and the game moves on." };
+  const step = stepOf(game);
+  const decision = step ? DECISIONS[step] : undefined;
+  return step && decision ? { key: step, text: decision } : null;
+}

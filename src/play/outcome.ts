@@ -1,4 +1,5 @@
-// Rules: rr.step-3-4, rr.quest-advancement, rr.travel, rr.step-6-4-3, rr.step-6-8-3 (data/rules/entries.json).
+// Rules: rr.step-3-4, rr.quest-advancement, rr.travel, rr.step-6-4-3, rr.step-6-8-3, rr.damage, rr.step-7-3
+// (data/rules/entries.json).
 //
 // What the last accepted intent did, in a few words, for the banner over the table: the quest's result (willpower against
 // threat, then the threat raised or the progress placed and the stage it advanced to), each attack's numbers and damage,
@@ -9,11 +10,16 @@ import type { ScenarioState } from "../rules/state.ts";
 
 import type { LogMark } from "./log.ts";
 
-export type MomentLine = { text: string; mark: LogMark };
+// `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
+// is at that line (resolve in beats).
+export type MomentLine = { text: string; mark: LogMark; cards?: readonly string[] };
 export type MomentTone = "good" | "bad" | "plain";
 export type Moment = { title: string; tone: MomentTone; lines: readonly MomentLine[] };
 
 const MOST = 5;
+
+// The banner shows its lines one beat at a time (resolve in beats): this long between two lines.
+export const BEAT_MS = 650;
 
 // `shadow` gives the printed shadow line of a card, or null when it has no shadow effect.
 type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null };
@@ -37,8 +43,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     current = group;
     return group;
   };
-  const line = (text: string, mark: LogMark = null) => {
-    (current ?? open(9, "", "plain")).lines.push({ text, mark });
+  const line = (text: string, mark: LogMark = null, cards: readonly string[] = []) => {
+    (current ?? open(9, "", "plain")).lines.push({ text, mark, ...(cards.length > 0 ? { cards } : {}) });
   };
 
   steps.forEach((step, index) => {
@@ -56,7 +62,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         const dealt = step.cardId != null && (before.cards[step.cardId]?.zone === "shadow" || after.cards[step.cardId]?.zone === "shadow");
         if (step.frame !== "shadow" || !step.cardId || !dealt) return;
         const text = names.shadow?.(step.cardId);
-        if (text) line(`Shadow, ${names.card(step.cardId)}: ${text}`, null);
+        if (text) line(`Shadow, ${names.card(step.cardId)}: ${text}`, null, [step.cardId]);
         return;
       }
       case "threat":
@@ -74,10 +80,15 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         const target = names.card(step.targetId);
         if (step.side === "enemy") {
           open(2, `${enemy} attacks`, "plain");
-          line(step.undefended ? `Attack ${step.attack} on ${target}, undefended` : `Attack ${step.attack} against ${target}'s defense ${step.defense}`, "attack");
+          // A defender the shadow card destroyed leaves the attack undefended (rr.step-6-4-3): say why it is.
+          const declared = before.pendingAttack?.enemyId === step.enemyId ? before.pendingAttack.defenderId : undefined;
+          if (step.undefended && declared && declared !== step.targetId && steps.slice(0, index).some((earlier) => earlier.kind === "destroy" && earlier.targetId === declared)) {
+            line(`With ${names.card(declared)} gone, the attack is undefended`, null, [declared]);
+          }
+          line(step.undefended ? `Attack ${step.attack} on ${target}, undefended` : `Attack ${step.attack} against ${target}'s defense ${step.defense}`, "attack", [step.enemyId, step.targetId]);
         } else {
           open(2, `Attack on ${enemy}`, "plain");
-          line(`Attack ${step.attack} against defense ${step.defense}`, "attack");
+          line(`Attack ${step.attack} against defense ${step.defense}`, "attack", [step.enemyId]);
         }
         // The damage the strike placed comes before the next attack: say so when there is none.
         const rest = steps.slice(index + 1);
@@ -87,13 +98,14 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
       }
       case "damage":
-        line(`${step.amount} damage on ${names.card(step.targetId)}`, "damage");
+        // A heal is a damage step with a negative amount (rr.damage).
+        line(step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`, "damage", [step.targetId]);
         return;
       case "destroy": {
         // A location leaves play explored, an enemy defeated, a character destroyed.
         const was = before.cards[step.targetId]?.zone;
         const verb = was === "activeLocation" || was === "secondActiveLocation" ? "explored" : was === "engaged" || was === "staging" ? "defeated" : "destroyed";
-        line(`${names.card(step.targetId)} is ${verb}`);
+        line(`${names.card(step.targetId)} is ${verb}`, null, [step.targetId]);
         return;
       }
       case "reveal":
@@ -183,4 +195,38 @@ export function intentWords(intent: PlayerIntent, card: (cardId: string) => stri
 export function takenBack(choice: string, undone: Moment | null): Moment {
   const lines: MomentLine[] = [{ text: choice, mark: null }, ...(undone ? [{ text: undone.title, mark: null }, ...undone.lines] : [])];
   return { title: "Taken back", tone: "plain", lines: lines.slice(0, MOST) };
+}
+
+/** The steps of a reduce that belong to the round it finished: up to and including the refresh's threat (rr.step-7-3). */
+export function finishedRoundSteps(steps: readonly EngineStep[]): readonly EngineStep[] {
+  let cut = -1;
+  steps.forEach((step, index) => {
+    if (step.kind === "threat" && "rule" in step.cause && step.cause.rule === "rr.step-7-3") cut = index;
+  });
+  return cut < 0 ? steps : steps.slice(0, cut + 1);
+}
+
+/**
+ * The round in a few lines, for the banner when it ends: each seat's threat from the start of the round to its end, the
+ * progress placed, the damage players' cards took and enemies took, the enemies defeated and the cards drawn. Every number is
+ * a sum of the engine's own steps. `after` is the state the round ended in.
+ */
+export function roundSummary(round: number, steps: readonly EngineStep[], after: ScenarioState, isPlayerCard: (cardId: string) => boolean): Moment | null {
+  if (steps.length === 0) return null;
+  const lines: MomentLine[] = [];
+  for (let seat = 0; seat < after.seatCount; seat += 1) {
+    const raised = steps.reduce((sum, step) => sum + (step.kind === "threat" && step.seat === seat ? step.amount : 0), 0);
+    const end = after.seats[seat]?.threat ?? 0;
+    lines.push({ text: `${seatWord(after, seat)} ${end - raised} → ${end}`, mark: "threat" });
+  }
+  const progress = steps.reduce((sum, step) => sum + (step.kind === "progress" && step.amount > 0 ? step.amount : 0), 0);
+  if (progress > 0) lines.push({ text: `${progress} progress placed`, mark: "progress" });
+  const taken = steps.reduce((sum, step) => sum + (step.kind === "damage" && step.amount > 0 && isPlayerCard(step.targetId) ? step.amount : 0), 0);
+  const dealt = steps.reduce((sum, step) => sum + (step.kind === "damage" && step.amount > 0 && !isPlayerCard(step.targetId) ? step.amount : 0), 0);
+  if (taken > 0 || dealt > 0) lines.push({ text: `${taken} damage taken, ${dealt} dealt`, mark: "damage" });
+  const defeated = steps.filter((step) => step.kind === "destroy" && !isPlayerCard(step.targetId)).length;
+  if (defeated > 0) lines.push({ text: `${defeated} encounter ${defeated === 1 ? "card" : "cards"} defeated or explored`, mark: null });
+  const drawn = steps.filter((step) => step.kind === "draw").length;
+  if (drawn > 0) lines.push({ text: `${drawn} ${drawn === 1 ? "card" : "cards"} drawn`, mark: null });
+  return { title: `Round ${round} ends`, tone: "plain", lines };
 }
