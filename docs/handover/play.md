@@ -37,6 +37,9 @@ action" allows action: Ceorl 12058).
 ## Status
 
 - [x] catalog vocabulary, schema fields
-- [ ] engine modules, shared hooks, tests
-- [ ] records (src/effects/authored/families/play.ts)
+- [x] engine modules, shared hooks, tests (play-enter/leave/control.test.ts, 35 tests); goldens unchanged (new events are not
+      queued once the game is lost)
+- [x] records (src/effects/authored/families/play.ts): 34 of 35 lines
+- [x] usage.ts: a once-per-game limit is the player's across copies (rr.limits)
+- [ ] full `pnpm test`, final commit, report (delete this file in the final commit)
 - Open by design: 06036:A:2 Trained for War (Battle keyword has no rules span in data/rules; needs data:sync rules).

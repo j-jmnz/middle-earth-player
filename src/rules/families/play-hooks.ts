@@ -29,7 +29,7 @@ export function seatThreat(state: ScenarioState, seat: number): number {
 // A threat raise the doomed keyword caused is announced to "After a player raises his threat from the doomed keyword"
 // (22057:A:2).
 export function doomedRaised(state: ScenarioState, seat: number, cause: Cause): ScenarioState {
-  return "rule" in cause && cause.rule === "rr.doomed-x" ? queueEvent(state, { trigger: "doomedRaised", seat }) : state;
+  return !state.lost && "rule" in cause && cause.rule === "rr.doomed-x" ? queueEvent(state, { trigger: "doomedRaised", seat }) : state;
 }
 
 // A player card that was in play and is now in its owner's discard pile, not destroyed by damage, was discarded from play by
@@ -37,6 +37,7 @@ export function doomedRaised(state: ScenarioState, seat: number, cause: Cause): 
 // discarded (rr.destroy). Every card hears it (the event's subject).
 export function discardedFromPlay(state: ScenarioState, before: CardInstance, byDamage: boolean): ScenarioState {
   const after = state.cards[before.id];
-  if (byDamage || before.controller == null || after?.zone !== "discard" || (before.zone !== "play" && before.zone !== "heroes")) return state;
+  // A lost game is over: nothing answers any more.
+  if (byDamage || state.lost || before.controller == null || after?.zone !== "discard" || (before.zone !== "play" && before.zone !== "heroes")) return state;
   return queueEvent(state, { trigger: "discardedFromPlay", seat: before.controller, subject: before.id });
 }

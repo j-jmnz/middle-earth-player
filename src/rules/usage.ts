@@ -48,7 +48,8 @@ function attackKey(state: ScenarioState): string | undefined {
 }
 
 // A limit counts the uses of this record on this card (on any card, for a group limit) in this round, in this phase for a
-// phase limit, in this attack, or in the whole game, by this player for a per-player limit (rr.limits).
+// phase limit, in this attack, or in the whole game, by this player for a per-player limit (rr.limits). A per-game limit is
+// the player's, whichever copy of the card they used it on (rr.limits: "regardless of which card is used").
 function limitSpent(state: ScenarioState, effect: Effect, sourceId: string, seat: number): boolean {
   if (!effect.limit) return false;
   const rule = LIMITS[effect.limit];
@@ -56,7 +57,7 @@ function limitSpent(state: ScenarioState, effect: Effect, sourceId: string, seat
   const used = state.uses.filter(
     (use) =>
       use.effectId === effect.id &&
-      (rule.group || use.sourceId === sourceId) &&
+      (rule.group || use.sourceId === sourceId || (rule.per === "game" && use.seat === seat)) &&
       (rule.per === "game" || use.round === state.round) &&
       (rule.per !== "phase" || use.phase === state.phase) &&
       (rule.per !== "attack" || use.attack === attack) &&
@@ -238,7 +239,7 @@ export function payUsage(
     sourceId,
     round: next.round,
     phase: next.phase,
-    ...(rule.eachPlayer ? { seat } : {}),
+    ...(rule.eachPlayer || (rule.per === "game" && !rule.group) ? { seat } : {}),
     ...(rule.per === "game" ? { game: true } : {}),
     ...(rule.per === "attack" && attack ? { attack } : {}),
   };

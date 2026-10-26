@@ -6,7 +6,7 @@ import { cardMap, expectOk, idleScenario } from "../fixture.ts";
 import { settle } from "../machine.ts";
 import { definePrinted, type PrintedCard } from "../printed.ts";
 import { legalIntents, reduce, type PlayerIntent } from "../reduce.ts";
-import { updateCard, type ScenarioState } from "../state.ts";
+import { expireModifiers, updateCard, type ScenarioState } from "../state.ts";
 import { spawn } from "../zones.ts";
 
 type Sphere = PrintedCard["sphere"];
@@ -124,8 +124,10 @@ export function play(state: ScenarioState, cardId: string, ctx: Ctx, payments: {
 }
 
 // The phase changes to `phase` with nothing else moving: the delayed and Forced effects of the one that ended resolve.
+// Lasting effects that end with the phase (and the round, into a new one) end first, as withMode ends them.
 export function crossTo(state: ScenarioState, phase: ScenarioState["phase"], ctx: Ctx): ScenarioState {
-  return settle({ ...state, window: null, mode: "stopped", phase }, ctx, []);
+  const moved: ScenarioState = { ...state, window: null, mode: "stopped", phase };
+  return settle(expireModifiers(moved, phase === "Beginning of round" ? ["endOfPhase", "endOfRound"] : ["endOfPhase"]), ctx, []);
 }
 
 // Runs the engine until it waits on a player (the queued events are announced).

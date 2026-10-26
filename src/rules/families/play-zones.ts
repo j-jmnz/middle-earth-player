@@ -29,6 +29,7 @@ export function leaveWith(state: ScenarioState, card: CardInstance, released: re
       next = updateCard(moveCard(next, id, { zone: "discard", seat: owner }), id, { face: "up", owner: undefined });
     }
   }
-  if (gone.length === 0 || card.controller == null || (card.zone !== "play" && card.zone !== "heroes")) return next;
+  // A lost game is over: nothing answers any more (rr.player-elimination).
+  if (gone.length === 0 || next.lost || card.controller == null || (card.zone !== "play" && card.zone !== "heroes")) return next;
   return queueEvent(next, { trigger: "leftPlayWithAttachments", seat: card.controller, subject: card.id, attachments: gone });
 }
