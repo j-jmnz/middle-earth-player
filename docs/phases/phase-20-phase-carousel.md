@@ -107,3 +107,15 @@ Update the flows that assert `rail-current`, which is kept. Add a step to `.maes
 - Use a horizontal `ScrollView` with `snapToInterval` and `pagingEnabled`-like snapping. Seven items do not need FlashList.
 - The Stops logic stays `src/play/stops.ts` and `table-settings.ts`. The strip only reads and toggles them.
 - The strip covers the canvas top while open. It does not cover the dock.
+
+## Handover from phase 19
+
+Phase 19 is merged. What phase 20 builds on, and what its reviews left for it:
+
+- `PhaseRail` (`src/play/table-chrome.tsx`) sits in the bar's center zone. `barZones` (`src/play/top-bar-layout.ts`) gives it at least `RAIL_FLOOR` (about 232 pt, derived from the longest step name plus pill chrome; a test checks every name). The carousel's pill is longer ("Round 3 · QUEST · Staging"), so recompute the floor from the pill's own words and keep the test.
+- With two seats, Life and Burden the dials are about 426 pt wide: the rail sits right of the screen center and, at 667 pt, the dials scroll sideways. The carousel must not make that worse; the 667x375 two-seat bar is still an open phone check.
+- The round has no separate text any more. "R3" (`rail-round`) is drawn between the previous step and the current one, where it reads as part of the previous step ("Staging R3"). The pill should own it, and under 760 pt the pill-only rail must keep "R3": today no round shows below 760 pt.
+- A narrow rail already drops the pill's horizontal margin and the Pressable's padding; keep that or replace it with the carousel's own sizes.
+- The zones start at 30/40/30% until the bar is measured, so the rail can jump once when the table opens. Start from the computed zones, or hold the rail's opacity until it is measured.
+- Table settings opens `ReferencePanel` from the menu row `settings-open`; the menu ids are a closed `MenuItemId` union with an exhaustive switch in `table-view.tsx`.
+- Web check: the real table does not open on web (the SQLite migration fails), so phase 19 rendered `TableTopBar` and `TableMenu` with fake props in a temporary route. Do the same, compute `narrow` as `table-view.tsx` does (width minus both insets under 760), add a 47 pt inset shot, and delete the harness before committing.
