@@ -954,15 +954,45 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "c0031c4cd5782a24a5149e07155ae8b47690a52d08bd7d191204371a4d3265db"
+        "value": "9b173e786169e8bf52e944ef51adf9e8cce49b092b6bb91056ded12b078a6d10"
       },
-      "fetchedAt": "2026-10-25T23:42:56.923Z",
+      "fetchedAt": "2026-10-26T00:18:05.710Z",
       "files": [
+        {
+          "path": "scans/01001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Aragorn.jpg",
+          "sha256": "4d6979ccf426838d2f4aed54f87a5e6f79c359464ec54eeceabde370ef1a3dcd",
+          "bytes": 150904
+        },
         {
           "path": "scans/01002.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Théodred.jpg",
           "sha256": "d782f9d8d0d552e368218f1743366838e5d966a6b8aeb0dbc3bd72a41bbfa4e4",
           "bytes": 145635
+        },
+        {
+          "path": "scans/01003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Glóin.jpg",
+          "sha256": "997458d7c518c327a30da639158975dcbea7a24a08143b9b33436e1b28965db3",
+          "bytes": 150393
+        },
+        {
+          "path": "scans/01004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gimli.jpg",
+          "sha256": "b5a9a2fad2a75679233d7bf428b024ff057f6176f2fcb3c4956f6a3cc7f85bef",
+          "bytes": 145688
+        },
+        {
+          "path": "scans/01005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Legolas.jpg",
+          "sha256": "6500c861ba41378cd9d43d3a0f5a5c12eeceb58229c491318114419617f47249",
+          "bytes": 148983
+        },
+        {
+          "path": "scans/01006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Thalin.jpg",
+          "sha256": "f6e356f5bb9dbdd1a82012e83bdace06ce9c7265a6bb63692058eb96a370b779",
+          "bytes": 157386
         },
         {
           "path": "scans/01007.A.jpg",
@@ -971,16 +1001,64 @@
           "bytes": 153569
         },
         {
+          "path": "scans/01008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Eleanor.jpg",
+          "sha256": "f61b83c43d600327a1382f24d8aea53dd251fe97404b2354394d961fbd14fd7b",
+          "bytes": 144896
+        },
+        {
+          "path": "scans/01009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Dúnhere.jpg",
+          "sha256": "932f23989738847dc16dba5e3d1486dce1b92c3092842499cae4afcf66003221",
+          "bytes": 153387
+        },
+        {
+          "path": "scans/01010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Denethor.jpg",
+          "sha256": "3624ce183b515c7e29e8b7ead66ae82540950384c8fc1d7e59b1782b7c5d2f24",
+          "bytes": 147783
+        },
+        {
+          "path": "scans/01011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Glorfindel.jpg",
+          "sha256": "804ed065bf0b46cfb285700993f1ea43f1fdf2eb6e86d3bbe2b41e842b1d712c",
+          "bytes": 146356
+        },
+        {
+          "path": "scans/01012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Beravor.jpg",
+          "sha256": "f29c761b7e8fe9e4b178c3d560566665f9518363540f65a2f49168c358afca5c",
+          "bytes": 159506
+        },
+        {
           "path": "scans/01014.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Faramir.jpg",
           "sha256": "f2828886b5066e11af9dd567c382535ed8b30bd0107ba42352c868cc9f01645b",
           "bytes": 147801
         },
         {
+          "path": "scans/01015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Son-of-Arnor.jpg",
+          "sha256": "bc9e615692139846efad7b22f07dd8347fc1c9b31940e69e9cc380c135cdc091",
+          "bytes": 138451
+        },
+        {
           "path": "scans/01016.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Snowbourn-Scout.jpg",
           "sha256": "e414e5915a88a52afeeb242d033d751038c1e6faccba352e3ec077ba1b31d396",
           "bytes": 150103
+        },
+        {
+          "path": "scans/01018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Longbeard-Orc-Slayer.jpg",
+          "sha256": "2cc647b79a84fa4797d0de5c226bce7ffbb0ea358ca5860f35a2fd96ea1c204c",
+          "bytes": 141337
+        },
+        {
+          "path": "scans/01019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Brok-Ironfist.jpg",
+          "sha256": "85d9470d7de863ffd79244e26daa1cdb6052beec5045e920e9e7681d7505467b",
+          "bytes": 139649
         },
         {
           "path": "scans/01020.A.jpg",
@@ -993,6 +1071,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Common-Cause.jpg",
           "sha256": "780e110a64b09ebb45976a5319a0316fb36dc05c4ba73cc5c7c568e57de1500e",
           "bytes": 138968
+        },
+        {
+          "path": "scans/01022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/For-Gondor.jpg",
+          "sha256": "1b5fd41f73ae79c38f05241eba49d2972b9933bdfdeb36c493d1559d231f4834",
+          "bytes": 137605
         },
         {
           "path": "scans/01023.A.jpg",
@@ -1031,10 +1115,28 @@
           "bytes": 140107
         },
         {
+          "path": "scans/01029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gondorian-Spearman.jpg",
+          "sha256": "600acd234355992bf84bd615395cac91c02e8991a55eb12d5173f6df0141ae42",
+          "bytes": 148057
+        },
+        {
           "path": "scans/01031.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Beorn.jpg",
           "sha256": "0b0cbadd2977b65363c6b3a814c5afb81eb8fbbdd819c1759dead6e993f2315d",
           "bytes": 153124
+        },
+        {
+          "path": "scans/01032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Blade-Mastery.jpg",
+          "sha256": "c0316a263f8703648aaeef551332ad9e30ac723a5e84881967d72cdb1cd4240f",
+          "bytes": 146652
+        },
+        {
+          "path": "scans/01033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Rain-of-Arrows.jpg",
+          "sha256": "bf65f87f761a2e29d67686c061b01bcb47d1fc5457aba9984cb54e3fc97cb155",
+          "bytes": 149696
         },
         {
           "path": "scans/01034.A.jpg",
@@ -1049,6 +1151,42 @@
           "bytes": 143995
         },
         {
+          "path": "scans/01036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Thicket-of-Spears.jpg",
+          "sha256": "e4c1caf13e8e839f3f3ab14ec06a5d1d0d620ed0ef6a249302a4edb27c3e89ca",
+          "bytes": 914594
+        },
+        {
+          "path": "scans/01037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Swift-Strike.jpg",
+          "sha256": "15244c5e7ff4924c4e01192e6ebb241ed3ab4e631e2293b4c88d8347a549ba3b",
+          "bytes": 139804
+        },
+        {
+          "path": "scans/01038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Stand-Together.jpg",
+          "sha256": "2b31353a1a8db2af6243a3d3d57050f71c642f9a8caf93b78f28dcf49fc9cdd3",
+          "bytes": 140716
+        },
+        {
+          "path": "scans/01039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Blade-of-Gondolin.jpg",
+          "sha256": "d6dff2cb0e7aaf0d34bf589ff1b28c11f8aa21cbfd7e45603a26c4b98f87eb00",
+          "bytes": 136247
+        },
+        {
+          "path": "scans/01040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Citadel-Plate.jpg",
+          "sha256": "b4b01d5c751198c4c9012484f7621e05ef886d3c264337f9b582df34f97f31f0",
+          "bytes": 134177
+        },
+        {
+          "path": "scans/01041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Dwarven-Axe.jpg",
+          "sha256": "e6a6506e876e378a152140e0ccd0be0966f1a59777a357103ea6a64dd7a9e9ba",
+          "bytes": 150502
+        },
+        {
           "path": "scans/01042.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Horn-of-Gondor.jpg",
           "sha256": "eafd187baa3adc4704b2371b3c58af32ae14735d230851624d41f8303e609927",
@@ -1059,6 +1197,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Wandering-Took.jpg",
           "sha256": "e1accfb2a34b6f96c4507e48db676f8d87fc6f23e373e23692e21f6c3ddf362c",
           "bytes": 70390
+        },
+        {
+          "path": "scans/01044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Lórien-Guide.jpg",
+          "sha256": "4112ce09145e03539f562f51a32d4227af24d07b6e4999996ff4162ad5d9744f",
+          "bytes": 129721
         },
         {
           "path": "scans/01045.A.jpg",
@@ -1073,10 +1217,22 @@
           "bytes": 142622
         },
         {
+          "path": "scans/01047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Strength-of-Will.jpg",
+          "sha256": "7153a94416c5043758155ad2e0e4a6e5ddd8a838010a44993788a98b721a54da",
+          "bytes": 124624
+        },
+        {
           "path": "scans/01048.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Hasty-Stroke.jpg",
           "sha256": "ea7e266612f16e3abeb8aa595be298924a48ed8edaab1e626b7d7eb498782820",
           "bytes": 124187
+        },
+        {
+          "path": "scans/01049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Will-of-the-West.jpg",
+          "sha256": "827ac11f088a9f2c412ba5f29b4a9a03fd067c7f081fe601b1af3260676db5fe",
+          "bytes": 990980
         },
         {
           "path": "scans/01050.A.jpg",
@@ -1091,16 +1247,46 @@
           "bytes": 141932
         },
         {
+          "path": "scans/01052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/A-Light-in-the-Dark.jpg",
+          "sha256": "b67e00a253b686b9669830db8d31d3cc78c4af0fa1d4f4dc86865cca3efe5680",
+          "bytes": 133094
+        },
+        {
           "path": "scans/01053.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Dwarven-Tomb.jpg",
           "sha256": "ffa377649eda85e9adee8ee1f5f68ba63953b27597b4501b1bb7bc8d88d6b0b1",
           "bytes": 125434
         },
         {
+          "path": "scans/01054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Fortune-or-Fate.jpg",
+          "sha256": "1d703adb856e00e74cfa3be85084112247d7096241e9de8c789b99709441ef45",
+          "bytes": 126233
+        },
+        {
+          "path": "scans/01055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/The-Favor-of-the-Lady.jpg",
+          "sha256": "a4f7a65df80a9774ec03cc1a8c85d1b55059aff6404c8ca81d254e0f7c025660",
+          "bytes": 138528
+        },
+        {
+          "path": "scans/01056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Power-in-the-Earth.jpg",
+          "sha256": "fa85f786a7629dab6d5c408ea55541f9b4f1fb331dcb34bf9f032765320d4c7f",
+          "bytes": 134469
+        },
+        {
           "path": "scans/01057.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Unexpected-Courage.jpg",
           "sha256": "1dbd61b80e24e6465f312dde466222d535f7b85441347cc183b88ec45b4f34d8",
           "bytes": 142642
+        },
+        {
+          "path": "scans/01058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Daughter-of-the-Nimrodel.jpg",
+          "sha256": "11e1f5a5d825e86a742c5527ceec70b92a6557882f35e1c3f9f5d0770f43bf57",
+          "bytes": 151177
         },
         {
           "path": "scans/01059.A.jpg",
@@ -1115,10 +1301,76 @@
           "bytes": 152914
         },
         {
+          "path": "scans/01061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Miner-of-the-Iron-Hills.jpg",
+          "sha256": "750bc91d0ffbe148f9ea912d5f04bbc006f8b2ff01746f41488fead04d719723",
+          "bytes": 141865
+        },
+        {
           "path": "scans/01062.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gléowine.jpg",
           "sha256": "ca7bb6c6f3f97e299012797c02b7e00d74ef9d4bf6f2f004d58b8ea35a26c473",
           "bytes": 148316
+        },
+        {
+          "path": "scans/01063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Lore-of-Imladris.jpg",
+          "sha256": "fd5a85d3dd3c81a3eb1e072524d44b539d15e3459f0394ff243c4d21fbacc3cd",
+          "bytes": 140658
+        },
+        {
+          "path": "scans/01064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Lórien's-Wealth.jpg",
+          "sha256": "def81b090340d009a2348ad1e12a99e6e172e36a0150dce485f24b741c5bda4b",
+          "bytes": 136238
+        },
+        {
+          "path": "scans/01065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Radagast's-Cunning.jpg",
+          "sha256": "c7994ae057a5b3a26391e6fef739f7a09e05327dd51a625dd23d3b0c1184c93f",
+          "bytes": 147171
+        },
+        {
+          "path": "scans/01066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Secret-Paths.jpg",
+          "sha256": "9e7a17f7a8c6503d4a94c1713a9bdab3cc62d36401442ab4fec5e93f5e119666",
+          "bytes": 145175
+        },
+        {
+          "path": "scans/01067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gandalf's-Search.jpg",
+          "sha256": "825e0902ac0bc47e5c3e39350c8be9f664fd1c04b5a572edbd9386008039e2c8",
+          "bytes": 147184
+        },
+        {
+          "path": "scans/01068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Beorn's-Hospitality.jpg",
+          "sha256": "01bc35a9e4c779f91e285aae01141efec212ba1d8724e3c35b7211e568a2b881",
+          "bytes": 133649
+        },
+        {
+          "path": "scans/01069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Forest-Snare.jpg",
+          "sha256": "b362d06e5976e9934e37a051dcfcffbc76f348b2214f75faf7b829c1d03c2f51",
+          "bytes": 150497
+        },
+        {
+          "path": "scans/01070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Protector-of-Lórien.jpg",
+          "sha256": "68d9fe394ee2c8701ee159aaabd62e93b7c1965b10db3032015bd90fe637e526",
+          "bytes": 159912
+        },
+        {
+          "path": "scans/01071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Dark-Knowledge.jpg",
+          "sha256": "7491927e8bb7640246eea0e9a7a919179f53176ad1227b9118c324f142c7a11b",
+          "bytes": 141568
+        },
+        {
+          "path": "scans/01072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Self-Preservation.jpg",
+          "sha256": "3f882c59563a8b474c187268df50517b4975124ee85ce9bb818a5e9cc408e1b2",
+          "bytes": 141756
         },
         {
           "path": "scans/01073.A.jpg",

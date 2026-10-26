@@ -29,8 +29,16 @@ const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
 const CAMPAIGN_CARDS = ["141030", "141044", "141056", "142019", "142039", "142060"];
 
 // Player cards outside the box that the player's own decks play and reported doing nothing (user request, 2026-10-25):
-// The Shirefolk lowers its player's threat.
-const PLAYER_REQUESTS = ["19121"];
+// The Shirefolk lowers its player's threat. Then every card of the four core-set Learn to Play decks (core-leadership,
+// core-tactics, core-spirit, core-lore in data/decks/prebuilt.json) whose text had no record (user request, 2026-10-26).
+export const PLAYER_REQUESTS = [
+  "19121",
+  // The four core Learn to Play decks (user request, 2026-10-26).
+  ...["01001", "01003", "01004", "01005", "01006", "01008", "01009", "01010", "01011", "01012"],
+  ...["01015", "01018", "01019", "01022", "01029", "01032", "01033", "01036", "01037", "01038", "01039", "01040", "01041"],
+  ...["01044", "01047", "01049", "01052", "01054", "01055", "01056"],
+  ...["01058", "01061", "01063", "01064", "01065", "01066", "01067", "01068", "01069", "01070", "01071", "01072"],
+];
 
 // The codes of both starter lists, from the campaign file (data/starter-decks.json).
 export function starterCodes(): string[] {
