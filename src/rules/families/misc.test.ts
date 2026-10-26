@@ -1,4 +1,4 @@
-// Rules: rr.response, rr.the-word-choose, rr.step-7-3, rr.healing, rr.damage (data/rules/entries.json).
+// Rules: rr.response, rr.the-word-choose, rr.step-7-3, rr.damage (data/rules/entries.json).
 // The healing group of the misc family, run through its real records (src/effects/authored/families/misc.ts): choosing a player
 // and healing the cards that player controls, Responses to healing and readying, and the Response that follows the resource draw.
 import { describe, expect, it } from "vitest";

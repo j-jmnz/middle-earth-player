@@ -1,4 +1,4 @@
-// Rules: rr.the-word-choose, rr.controller, rr.step-1-3 (data/rules/entries.json).
+// Rules: rr.the-word-choose, rr.ownership-and-control, rr.step-1-3 (data/rules/entries.json).
 //
 // The Pick filters the misc family adds (effect-schema-pick.ts): `controlledBy`, `onPicked`, `playerCard`, `maxDefense` and
 // `drawn`. Each reads the card itself and what the running effect has picked.

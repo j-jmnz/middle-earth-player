@@ -3,6 +3,7 @@ import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { raiseThreat } from "./keywords.ts";
+import { gameReads } from "./families/costs-pay.ts";
 import { queueEvent } from "./queue.ts";
 import { fireForced } from "./triggers.ts";
 import { flagged, livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
@@ -11,7 +12,7 @@ import { inPlay } from "./zones.ts";
 export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   // A Response to "After a character readies during the refresh phase" (02102:A:1) hears each card that readies here.
-  const heard = ctx.effects.some((effect) => effect.trigger === "readied");
+  const heard = gameReads(state, ctx, '"trigger":"readied"');
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (!instance.exhausted && !instance.committed)) continue;
     // "Does not ready during the refresh phase" (a flag) leaves the card exhausted.

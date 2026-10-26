@@ -28,6 +28,7 @@ import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
 import { afterPlay } from "./families/costs-play.ts";
+import { gameReads } from "./families/costs-pay.ts";
 import { playSweep } from "./families/play-sweep.ts";
 import { afterPaying } from "./families/deck-play.ts";
 import { doRefresh } from "./refresh.ts";
@@ -169,7 +170,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "beginRound":
       return enterBegin(state, ctx);
     case "resourceGrant":
-      return grant(state, steps);
+      return grant(state, steps, ctx);
     case "resourceActions":
     case "questCommit":
       return openPass(state);
@@ -227,7 +228,7 @@ function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   return withMode(bumped, "resourceGrant");
 }
 
-function grant(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+function grant(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   let next = state;
   for (const seat of livingSeats(next)) next = gainSeatResources(next, seat, steps, ruleCause("rr.step-1-2"));
   const drawn: Record<number, string[]> = {};
@@ -238,9 +239,12 @@ function grant(state: ScenarioState, steps: EngineStep[]): ScenarioState {
     for (let draw = 0; draw < draws; draw += 1) next = drawOne(next, seat, steps, ruleCause("rr.step-1-3"));
     drawn[seat] = (next.seats[seat]?.hand ?? []).filter((id) => !before.has(id));
   }
-  next = { ...next, resourceDrawn: drawn };
-  // The draw step is done: Forced effects hear it ("After drawing cards at the beginning of the resource phase", misc family).
-  for (const seat of livingSeats(next)) next = queueEvent(next, { trigger: "resourceDrawn", seat, phase: "Resource" });
+  // The draw step is done: Forced effects hear it ("After drawing cards at the beginning of the resource phase", misc family),
+  // and the cards drawn are kept for the Pick that names them. Both only in a game that has a card which reads them.
+  if (gameReads(next, ctx, '"trigger":"resourceDrawn"')) {
+    next = { ...next, resourceDrawn: drawn };
+    for (const seat of livingSeats(next)) next = queueEvent(next, { trigger: "resourceDrawn", seat, phase: "Resource" });
+  }
   return openPass(withMode(next, "resourceActions"));
 }
 

@@ -1,4 +1,4 @@
-// Rules: rr.modifiers, rr.constant-ability, rr.restricted, rr.attachment-cards, rr.lasting-effects, rr.cost, rr.secrecy,
+// Rules: rr.modifiers, rr.constant-ability, rr.restricted, rr.attachment-cards, rr.lasting-effects, rr.cost,
 // rr.resource-match (data/rules/entries.json).
 // The constants and events of the misc family, run through its real records (src/effects/authored/families/misc.ts).
 import { describe, expect, it } from "vitest";

@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.hit-points, rr.first-player, rr.healing (data/rules/entries.json).
+// Rules: rr.damage, rr.hit-points, rr.first-player (data/rules/entries.json).
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";

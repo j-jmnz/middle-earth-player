@@ -1,4 +1,4 @@
-// Rules: rr.cost, rr.resource-match, rr.secrecy, rr.x (data/rules/entries.json).
+// Rules: rr.cost, rr.resource-match, rr.the-letter-x (data/rules/entries.json).
 //
 // What the misc family changes about paying for a card: a fixed X ("X is the number of players in the game"), Secrecy a card in
 // play grants the first matching card its controller plays each round, and the spheres a lasting effect lets any resource pay for.
