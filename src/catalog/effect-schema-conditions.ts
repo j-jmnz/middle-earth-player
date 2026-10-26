@@ -103,6 +103,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The actor's quest succeeded this round (rr.step-3-4): "If you quest successfully this phase", read in the quest phase.
   // `committed`: and the source card was committed to it ("After Hirgon quests successfully").
   z.strictObject({ kind: z.literal("questSucceeded"), committed: z.boolean().optional() }),
+  // The source is attached to the active location ("While attached location is the active location").
+  z.strictObject({ kind: z.literal("hostActive") }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [

@@ -100,6 +100,12 @@ export const pickSchema = z.strictObject({
   cost: z.number().int().min(0).optional(),
   // A card that prints no victory points ("a location worth no victory points").
   noVictory: z.boolean().optional(),
+  // The attachments family's filters (families/attachments-pick.ts): a card attached to another card (`false`: one attached
+  // to nothing, "If unattached"), a card with the Guarded keyword (a Guarded record), a card with progress tokens on it
+  // (`false`: with none, "a location with no progress tokens on it").
+  attached: z.boolean().optional(),
+  guarded: z.boolean().optional(),
+  progress: z.boolean().optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

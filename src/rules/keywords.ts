@@ -2,6 +2,7 @@
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
+import { isGuarded, noteHostDefeated, releaseGuarded } from "./families/attachments-hold.ts";
 import type { EngineStep } from "./intents.ts";
 import { fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
@@ -189,6 +190,8 @@ export function placeDamage(
     if (lethal && state.holdLethal) return next;
   }
   if (lethal) {
+    // The cards attached to an enemy hear that it was destroyed ("When attached enemy is destroyed", families/attachments-hold.ts).
+    if (printed.type === "enemy") next = noteHostDefeated(next, id);
     next = destroyCard(next, id, cards, steps);
     // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
@@ -272,6 +275,11 @@ export function releaseAttachments(
   for (const attachmentId of attachmentIds) {
     const attachment = next.cards[attachmentId];
     if (!attachment) continue;
+    // A Guarded attachment the card guarded goes to its player instead (families/attachments-hold.ts).
+    if (isGuarded(next, attachmentId)) {
+      next = releaseGuarded(next, attachmentId);
+      continue;
+    }
     const printed = printedOf(cards, attachment.code);
     const dest: Destination =
       hostPrinted.type === "hero" && printed.keywords.permanent

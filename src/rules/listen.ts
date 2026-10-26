@@ -1,6 +1,7 @@
 // Rules: rr.triggered-ability, rr.in-play-and-out-of-play, rr.triggering-condition (data/rules/entries.json).
 import type { Effect, PickSpec } from "../catalog/boundary.ts";
 
+import { textBlank } from "./families/attachments-hold.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { matchesPick } from "./pick.ts";
 import type { CardInstance, GameEvent, ScenarioState } from "./state.ts";
@@ -44,6 +45,8 @@ export function subjectMatches(state: ScenarioState, id: string, spec: PickSpec,
 // (an event about no card, by every card). `eventSeat` asks that it happened to the card's controller, or to another player.
 export function hears(state: ScenarioState, effect: Effect, listener: CardInstance, event: GameEvent, ctx: ReduceContext): boolean {
   if (effect.trigger !== event.trigger) return false;
+  // A card whose printed text box is blank has none of its abilities (rr.blank).
+  if (textBlank(state, listener.id)) return false;
   if (effect.eventSeat) {
     const mine = listener.controller ?? state.firstPlayer;
     if (event.seat == null || (effect.eventSeat === "you") !== (event.seat === mine)) return false;

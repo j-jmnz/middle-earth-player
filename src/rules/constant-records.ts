@@ -1,6 +1,7 @@
 import { isStatCondition, type Effect, type Instruction } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
+import { textBlank } from "./families/attachments-hold.ts";
 import { effectsOf } from "./listen.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
@@ -21,6 +22,8 @@ export function* constantInstructions(state: ScenarioState, ctx: ReduceContext):
     .filter((instance) => inPlay(instance.zone) || instance.zone === "victory")
     .sort((left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }));
   for (const source of sources) {
+    // A card whose printed text box is blank has no constant abilities (rr.blank).
+    if (textBlank(state, source.id)) continue;
     for (const effect of effectsOf(ctx, source.code)) {
       if (effect.timing !== "constant") continue;
       if ((source.zone === "victory") !== fromVictory(effect)) continue;

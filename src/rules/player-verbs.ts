@@ -71,7 +71,7 @@ export function runPlayerVerb(
 ): ScenarioState | null {
   switch (instruction.verb) {
     case "Ready": {
-      if (instruction.target === "picked" || instruction.target === "subject" || instruction.target === "defender") {
+      if (instruction.target === "picked" || instruction.target === "subject" || instruction.target === "defender" || instruction.target === "other") {
         const id = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) ?? "";
         return state.cards[id] ? readyCard(state, id) : state;
       }

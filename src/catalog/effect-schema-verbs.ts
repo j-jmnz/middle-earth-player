@@ -54,7 +54,8 @@ export const simpleVerbs = [
   }),
   // Readies the source (the default), the card it is attached to, the picked card, or every character in play.
   // `subject` is the card the answered event was about, `defender` the defending character.
-  z.strictObject({ verb: z.literal("Ready"), target: z.enum(["self", "host", "picked", "allCharacters", "subject", "defender"]).optional(), ...when }),
+  // `other`: the second card the answered event names (the defender of an attack that resolved).
+  z.strictObject({ verb: z.literal("Ready"), target: z.enum(["self", "host", "picked", "allCharacters", "subject", "defender", "other"]).optional(), ...when }),
   // Chooses a card or a player for the instructions that follow (target "picked"). A choice of one is made without asking.
   z.strictObject({ verb: z.literal("Pick"), pick: pickSchema, ...when }),
   // Lowers a threat dial. It stops at 0.
@@ -63,8 +64,8 @@ export const simpleVerbs = [
   // Places damage on the picked card (or `target`) as a player card effect (toughness and immunity apply).
   z.strictObject({ verb: z.literal("DamageCard"), amount: positiveAmountSchema, target: cardRefSchema.optional(), ...when }),
   // Places progress tokens on the picked location, on every location in the staging area, on the source or the active
-  // location. A full location is explored.
-  z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: positiveAmountSchema, target: z.enum(["picked", "eachStagingLocation", "self", "activeLocation", "subject"]), ...when }),
+  // location. A full location is explored. `host`: the location the source is attached to.
+  z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: positiveAmountSchema, target: z.enum(["picked", "eachStagingLocation", "self", "activeLocation", "subject", "host"]), ...when }),
   // Heals damage from the picked card (or `target`): `amount`, or all of it.
   z.strictObject({ verb: z.literal("Heal"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), target: cardRefSchema.optional(), ...when }),
   // Puts the picked card (or `target`) on top or at the bottom of its owner's deck, or shuffles it in. A card leaving play this
@@ -211,7 +212,8 @@ export const simpleVerbs = [
   // Willpower, Attack, and Defense to 0", 141055:A:2).
   z.strictObject({
     verb: z.literal("SetStat"),
-    stat: z.enum(["willpower", "attack", "defense", "threat"]),
+    // `questPoints`: "reduce its quest point value to 1".
+    stat: z.enum(["willpower", "attack", "defense", "threat", "questPoints"]),
     value: z.number().int().min(0),
     target: z.enum(["self", "host"]).optional(),
     ...when,
@@ -233,7 +235,8 @@ export const simpleVerbs = [
     verb: z.literal("AttachesTo"),
     hosts: z.array(pickSchema).min(1).optional(),
     host: z.strictObject({
-      kind: z.enum(["hero", "character", "activeLocation", "ringBearer"]),
+      // `quest`: a quest card in play, the current quest or a side quest ("Attach to a quest card in play").
+      kind: z.enum(["hero", "character", "activeLocation", "ringBearer", "quest"]),
       trait: z.string().min(1).optional(),
       name: z.string().min(1).optional(),
       // The host's printed sphere ("Attach to a Lore character").
