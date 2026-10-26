@@ -67,3 +67,8 @@ export function playCaution(code: string, type: string, cost: number, against: T
   if (type === "ally" && (!against.recorded.has(code) || lines.length > 0)) return { words: "Its ability is not applied: it plays with its printed numbers", armed: null };
   return null;
 }
+
+/** The few words a list row adds for a card the app does not fully apply: "Ability not applied", "Cannot be played". */
+export function notAppliedWords(code: string, type: string | null | undefined, against: TextCheck = shippedCheck()): string {
+  return LOSS_WORDS[textLoss(type, code, against)];
+}

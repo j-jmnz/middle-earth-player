@@ -34,8 +34,9 @@ import {
   useDeckDraft,
   type TitleLookup,
 } from "../../deck-draft";
-import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, savedDeckName, startingThreat, type DeckSectionRow } from "../../deck-status";
-import { deckFaces, isStarterDeck, listDecks, readDeck, writeDeck } from "../../deck-store";
+import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, notAppliedLine, savedDeckName, startingThreat, type DeckSectionRow } from "../../deck-status";
+import { deckFaces, isStarterDeck, listDecks, notAppliedIn, readDeck, writeDeck } from "../../deck-store";
+import { notAppliedWords } from "../../../play/not-applied";
 import { STARTER_NOTE } from "../../starter-decks";
 import { CountStepper } from "../../count-stepper";
 import { useDatabases } from "../../databases";
@@ -84,8 +85,11 @@ function EditorCardRow({
   full,
   lookup,
   onPreview,
+  loss = null,
 }: {
   card: EditorCard;
+  // What the app does not apply of this card ("Ability not applied"), or null.
+  loss?: string | null;
   // Whether + would be refused: the title (any printing) is at its copy limit.
   full: boolean;
   lookup: TitleLookup;
@@ -98,7 +102,7 @@ function EditorCardRow({
     <ListRow
       testID={`deck-card-${card.code}`}
       label={card.name}
-      detail={sphereWord(card.sphereName)}
+      detail={loss ? `${sphereWord(card.sphereName)} · ${loss}` : sphereWord(card.sphereName)}
       detailIcons={mark ? <SphereMark sphere={mark} size={12} /> : null}
       leading={<CardThumb code={card.code} imagesrc={card.imagesrc} width={thumb.width} height={thumb.height} />}
       onPress={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })}
@@ -163,6 +167,9 @@ export default function DeckEditor() {
     ...sections,
   ];
   const readiness = deckReadiness(draft, faces);
+  // The cards whose printed text the app does not apply: a line under the readiness, and the loss on each row.
+  const inactive = useMemo(() => notAppliedIn(faces), [faces]);
+  const notApplied = notAppliedLine(draft, inactive);
   const threat = startingThreat(draft.heroes, faces);
   const heroes: HeroFace[] = draft.heroes.map((code) => heroFace(faces, code));
   const emptySlots = Math.max(0, 3 - heroes.length);
@@ -244,6 +251,11 @@ export default function DeckEditor() {
           {readiness.ready ? readiness.text : `Not ready to play: ${readiness.text}`}
         </Text>
       </View>
+      {notApplied ? (
+        <Label testID="deck-not-applied" tone="muted" className="mt-1">
+          {`${notApplied}. Each row says what the app leaves out.`}
+        </Label>
+      ) : null}
       {draft.droppedNote ? (
         <BodyText testID="deck-import-dropped" tone="muted" className="mt-2">
           {draft.droppedNote}
@@ -295,6 +307,7 @@ export default function DeckEditor() {
         full={draftAddRefused(draft, { code: item.card.code, name: item.card.name, typeCode: item.card.typeCode ?? "", deckLimit: item.card.deckLimit }, lookup)}
         lookup={lookup}
         onPreview={preview.open}
+        loss={inactive.has(item.card.code) ? notAppliedWords(item.card.code, item.card.typeCode) : null}
       />
     );
   }

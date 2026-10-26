@@ -166,6 +166,8 @@ type DeckSummary = {
   // "3 heroes · 47 of 50 cards".
   detail: string;
   status: { ready: boolean; text: string };
+  // "6 cards with text not applied" (deck-status.ts, notAppliedLine), under the status; not a readiness rule.
+  note?: string | null;
   onPress: () => void;
   onLongPress?: () => void;
   testID: string;
@@ -178,14 +180,14 @@ type DeckSummary = {
 };
 
 // The press props of a deck in the list (a button) or in the briefing's picker (a radio).
-function pressProps({ name, heroes, detail, status, onPress, onLongPress, testID, selected, disabled }: DeckSummary) {
+function pressProps({ name, heroes, detail, status, note, onPress, onLongPress, testID, selected, disabled }: DeckSummary) {
   const picker = selected !== undefined;
   return {
     testID,
     collapsable: false,
     accessibilityRole: picker ? ("radio" as const) : ("button" as const),
     accessibilityState: picker ? { selected, disabled: disabled ?? false } : undefined,
-    accessibilityLabel: `${name}, ${heroNames(heroes)}, ${detail}, ${status.text}`,
+    accessibilityLabel: `${name}, ${heroNames(heroes)}, ${detail}, ${status.text}${note ? `, ${note}` : ""}`,
     accessibilityHint: picker ? undefined : "Opens the deck",
     disabled: disabled ?? false,
     onPress,
@@ -208,16 +210,23 @@ function heroNames(heroes: readonly HeroFace[]): string {
   return heroes.length > 0 ? heroes.map((hero) => hero.name).join(", ") : "No heroes yet";
 }
 
-function StatusLine({ testID, detail, status }: { testID: string; detail: string; status: DeckSummary["status"] }) {
+function StatusLine({ testID, detail, status, note }: { testID: string; detail: string; status: DeckSummary["status"]; note?: string | null }) {
   return (
-    <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
-      <Text className="text-label text-muted">{detail}</Text>
-      <View className="flex-row items-center gap-1.5">
-        <RingMark size={10} state={status.ready ? "done" : "locked"} />
-        <Text testID={`${testID}-status`} className={`text-label ${status.ready ? "text-gold" : "text-danger"}`}>
-          {status.text}
-        </Text>
+    <View>
+      <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
+        <Text className="text-label text-muted">{detail}</Text>
+        <View className="flex-row items-center gap-1.5">
+          <RingMark size={10} state={status.ready ? "done" : "locked"} />
+          <Text testID={`${testID}-status`} className={`text-label ${status.ready ? "text-gold" : "text-danger"}`}>
+            {status.text}
+          </Text>
+        </View>
       </View>
+      {note ? (
+        <Text testID={`${testID}-not-applied`} className="mt-0.5 text-label text-muted">
+          {note}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -227,7 +236,7 @@ function StatusLine({ testID, detail, status }: { testID: string; detail: string
  * with the deck's name, its heroes, the counts and whether it is ready to play.
  */
 export function DeckCover(props: DeckSummary & { height: number }) {
-  const { name, heroes, detail, status, height, testID, children, selected, disabled } = props;
+  const { name, heroes, detail, status, note, height, testID, children, selected, disabled } = props;
   return (
     <View className={`overflow-hidden rounded-card bg-raised ${selected ? "border-2 border-gold" : "border border-hairline"}`}>
       <Pressable {...pressProps(props)} style={({ pressed }) => (pressed && !disabled ? pressedNight : undefined)}>
@@ -252,7 +261,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
           <Text className="text-label text-bone" numberOfLines={1}>
             {heroNames(heroes)}
           </Text>
-          <StatusLine testID={testID} detail={detail} status={status} />
+          <StatusLine testID={testID} detail={detail} status={status} note={note} />
         </View>
       </Pressable>
       {children ? <View className="border-t border-hairline px-1">{children}</View> : null}
@@ -264,7 +273,7 @@ const rowThumb = { width: 30, height: 42 };
 
 /** A saved deck in the deck list's List view: the heroes as small pictures, the name, the counts and the readiness. */
 export function DeckRow(props: DeckSummary) {
-  const { name, heroes, detail, status, testID, children, selected, disabled } = props;
+  const { name, heroes, detail, status, note, testID, children, selected, disabled } = props;
   return (
     <View className="border-b border-hairline">
       <Pressable
@@ -289,7 +298,7 @@ export function DeckRow(props: DeckSummary) {
           <Text className={`font-display text-body ${disabled ? "text-faint" : selected ? "text-gold" : "text-bone"}`} numberOfLines={1}>
             {name}
           </Text>
-          <StatusLine testID={testID} detail={detail} status={status} />
+          <StatusLine testID={testID} detail={detail} status={status} note={note} />
         </View>
         {selected === undefined ? <Text className="text-body text-faint">›</Text> : <SelectedMark selected={selected} />}
       </Pressable>

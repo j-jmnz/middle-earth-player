@@ -164,3 +164,18 @@ export function prebuiltRows(decks: readonly PrebuiltDeck[]): PrebuiltRow[] {
   }
   return rows;
 }
+
+/**
+ * "12 of 47 cards not applied": the copies of a pre-built deck (heroes included) whose printed text the app does not fully
+ * apply, against the deck's total; null when it applies every card (docs/plans/inactive-text.md).
+ */
+export function prebuiltNotApplied(deck: PrebuiltDeck, inactive: ReadonlySet<string>): string | null {
+  const total = deck.heroes.length + deck.cards.reduce((sum, card) => sum + card.count, 0);
+  const off = deck.heroes.filter((code) => inactive.has(code)).length + deck.cards.reduce((sum, card) => sum + (inactive.has(card.code) ? card.count : 0), 0);
+  return off === 0 ? null : `${off} of ${total} cards not applied`;
+}
+
+/** A row's detail with the not-applied count after it. */
+export function withNotApplied(detail: string, notApplied: string | null): string {
+  return notApplied ? `${detail} · ${notApplied}` : detail;
+}

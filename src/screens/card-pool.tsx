@@ -13,7 +13,7 @@ import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { CardThumb, useCardPreview } from "./images/picture";
 import { useListPreview } from "./list-preview";
-import { notAppliedCodes } from "../play/not-applied";
+import { notAppliedCodes, notAppliedWords } from "../play/not-applied";
 import type { PictureSource } from "../play/table-canvas-types";
 import { palette } from "./palette.js";
 import { activeFilterCount, cycleGroups, emptyPoolFilter, filterPool, poolDetail, sortPool, type PoolCard, type PoolFilter } from "./pool-filter";
@@ -54,9 +54,12 @@ function PoolCardRow({
   full,
   lookup,
   onPreview,
+  loss = null,
 }: {
   item: PoolRowCard;
   adding: boolean;
+  // What the app does not apply of this card, in a few words ("Ability not applied"), or null.
+  loss?: string | null;
   count: number;
   // Whether + would be refused: the title is at its copy limit (any printing), or the hero is taken or the slots are full.
   full: boolean;
@@ -70,7 +73,7 @@ function PoolCardRow({
     <ListRow
       testID={`card-${item.code}`}
       label={item.name}
-      detail={poolDetail(item)}
+      detail={loss ? `${poolDetail(item)} · ${loss}` : poolDetail(item)}
       detailIcons={<RowIcons sphere={item.sphereCode} />}
       leading={<CardThumb code={item.code} imagesrc={item.imagesrc} width={thumb.width} height={thumb.height} />}
       onPress={() => {
@@ -95,10 +98,33 @@ function PoolCardRow({
 }
 
 // Night chips for the type, one tap from the search field. The filter sheet leaves the type to them.
-function TypeChips({ types, value, onChange }: { types: { code: string; name: string }[]; value: string | null; onChange: (next: string | null) => void }) {
+function TypeChips({
+  types,
+  value,
+  onChange,
+  applied,
+  onApplied,
+}: {
+  types: { code: string; name: string }[];
+  value: string | null;
+  onChange: (next: string | null) => void;
+  // "Applied only": the cards whose every printed line the app applies (the filter's Active text, as a chip). Off by default.
+  applied: boolean;
+  onApplied: (next: boolean) => void;
+}) {
   const options = [{ code: null, name: "All" }, ...types];
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-2 px-6">
+      <Pressable
+        testID="pool-applied-only"
+        accessibilityRole="switch"
+        accessibilityState={{ checked: applied }}
+        accessibilityLabel="Applied only: cards whose text the app applies"
+        onPress={() => onApplied(!applied)}
+        className={`min-h-11 justify-center rounded-pill px-4 ${applied ? "bg-gold" : "bg-raised"}`}
+      >
+        <Text className={applied ? "text-body font-semibold text-onGold" : "text-body text-muted"}>Applied only</Text>
+      </Pressable>
       {options.map((option) => {
         const selected = value === option.code;
         return (
@@ -239,7 +265,13 @@ export function CardPool({
             onPress={openSheet}
           />
         </View>
-        <TypeChips types={types} value={applied.typeCode} onChange={(typeCode) => setApplied({ ...applied, typeCode })} />
+        <TypeChips
+          types={types}
+          value={applied.typeCode}
+          onChange={(typeCode) => setApplied({ ...applied, typeCode })}
+          applied={applied.activeText}
+          onApplied={(activeText) => setApplied({ ...applied, activeText })}
+        />
         <View className="mt-2 min-h-0 flex-1">
           <FlashList
             data={visible}
@@ -260,6 +292,7 @@ export function CardPool({
                 <PoolCardRow
                   item={item}
                   adding={adding}
+                  loss={inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null}
                   count={draftCopyCount(draft, item.code, item.typeCode)}
                   full={draftAddRefused(draft, item, lookup)}
                   lookup={lookup}

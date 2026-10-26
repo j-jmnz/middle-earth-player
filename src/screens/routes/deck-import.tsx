@@ -18,6 +18,8 @@ import {
   parseDecklistRef,
   prebuiltBody,
   prebuiltDecks,
+  prebuiltNotApplied,
+  withNotApplied,
   prebuiltDetail,
   prebuiltRows,
   readDecklistBody,
@@ -27,6 +29,7 @@ import {
 import { useDatabases } from "../databases";
 import { palette } from "../palette.js";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
+import { notAppliedCodes } from "../../play/not-applied";
 import { goBack } from "../go-back";
 import { showToast } from "../toast";
 
@@ -68,12 +71,17 @@ export default function DeckImportScreen() {
         deckLimit: cards.deckLimit,
         deckLegal: cards.deckLegal,
         traits: cards.traits,
+        text: cards.text,
+        errata: cards.errata,
       })
       .from(cards)
       .where(eq(cards.deckLegal, true))
       .all();
     return new Map(rows.map((row) => [row.code, row]));
   }, [catalog]);
+  // How many cards of each pre-built deck the app does not fully apply (docs/plans/inactive-text.md): the row says so, so
+  // the player can pick a deck the app plays as printed.
+  const inactive = useMemo(() => notAppliedCodes([...pool.values()].map((row) => [row.code, row.errata ?? row.text] as const)), [pool]);
   const [value, setValue] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -204,7 +212,7 @@ export default function DeckImportScreen() {
         <ListRow
           testID={`deck-prebuilt-${deck.id}`}
           label={deck.name}
-          detail={prebuiltDetail(deck, (code) => pool.get(code)?.name ?? code)}
+          detail={withNotApplied(prebuiltDetail(deck, (code) => pool.get(code)?.name ?? code), prebuiltNotApplied(deck, inactive))}
           detailIcons={spheres(deck).map((sphere) => <SphereMark key={sphere} sphere={sphere} size={12} />)}
           onPress={() => onPrebuilt(deck)}
         />

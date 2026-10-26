@@ -14,7 +14,7 @@ import { cancelAnimation, Easing, useDerivedValue, useReducedMotion, useSharedVa
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
-import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, Glow, Leaving, Marks, Moving, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, Glow, Leaving, Marks, Moving, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
 import { SPHERE_TINT, sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
@@ -247,7 +247,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     return (
       <Group opacity={dim ? 0.35 : 1}>
         {glows ? <Glow slot={slot} picked={picked} /> : null}
-        <CardBody slot={slot} image={image} name={nameOf(slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} inactive={!slot.faceDown && inactive(slot.code)} encounterBack={encounterBack} backs={backs} />
+        <CardBody slot={slot} image={image} name={nameOf(slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} encounterBack={encounterBack} backs={backs} />
       </Group>
     );
   };
@@ -267,6 +267,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         {slot.kind === "card" ? <Marks rect={rect} tappable={tappable} picked={picked} share={highlight.share} dimmed={(highlight.dimOthers && !tappable && picked === 0) || highlight.muted.has(slot.id)} fonts={fonts} /> : null}
         {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} /> : null}
         {/* The banner's current beat names this card (the shadow card, the card damaged): a bone ring while it does. */}
+        {slot.kind === "card" && !slot.faceDown && inactive(slot.code) ? <NotAppliedMark rect={rect} /> : null}
         {highlight.beat.has(slot.id) ? <RoundedRect x={rect.x - 2} y={rect.y - 2} width={rect.w + 4} height={rect.h + 4} r={RADIUS + 2} color={t.bone} style="stroke" strokeWidth={2} /> : null}
       </Group>
     );
@@ -313,7 +314,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         ))}
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} inactive={inactive(lifted.code)} encounterBack={false} backs={backs} />
+            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} />
             <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2} />
           </Group>
         ) : null}

@@ -17,7 +17,6 @@ import { wrapName } from "./wrap.ts";
 
 export const RADIUS = 6;
 const LINE = 14;
-const INACTIVE = "Inactive";
 const TOKEN = 18;
 const BADGE_H = 15;
 
@@ -26,7 +25,6 @@ export function withAlpha(hex: string, alpha: number): string {
   const value = Number.parseInt(hex.slice(1), 16);
   return `rgba(${(value >> 16) & 255},${(value >> 8) & 255},${value & 255},${alpha})`;
 }
-const veil = withAlpha(t.night, 0.62);
 const shadowColor = withAlpha(t.night, 0.5);
 const strip = withAlpha(t.night, 0.72);
 const dim = withAlpha(t.night, 0.45);
@@ -69,14 +67,20 @@ function Outlined({ x, y, text, font, color = t.bone, heavy = false }: { x: numb
   );
 }
 
-// The veil over unique text with no effect record, with the word that says what it means.
-function Veil({ x, y, w, h, font }: { x: number; y: number; w: number; h: number; font: SkFont }) {
-  const top = y + h * 0.55;
-  const width = font.getTextWidth(INACTIVE);
+/**
+ * A card with printed text the app does not apply (src/catalog/active-text.ts): a small faint mark at its right edge, upright
+ * like the tokens, on a corner no token, effect pill or other mark uses: a ring struck through. Never a band over the picture
+ * and never a word on the canvas; the preview lists the lines (docs/plans/inactive-text.md). Not gold, which marks the one
+ * action, and not danger, which marks a refusal.
+ */
+export function NotAppliedMark({ rect }: { rect: Rect }) {
+  const cx = rect.x + rect.w - 8;
+  const cy = rect.y + rect.h / 2;
   return (
     <Group>
-      <RoundedRect x={x} y={top} width={w} height={h * 0.45} r={0} color={veil} />
-      <Text x={x + Math.max(3, (w - width) / 2)} y={top + 14} text={INACTIVE} font={font} color={t.bone} />
+      <Circle cx={cx} cy={cy} r={6.5} color={t.night} />
+      <Circle cx={cx} cy={cy} r={4.5} color={t.faint} style="stroke" strokeWidth={1.5} />
+      <Line p1={vec(cx - 3.2, cy + 3.2)} p2={vec(cx + 3.2, cy - 3.2)} color={t.faint} strokeWidth={1.5} />
     </Group>
   );
 }
@@ -108,7 +112,6 @@ export function CardBody({
   name,
   sphere,
   fonts,
-  inactive,
   encounterBack,
   backs,
 }: {
@@ -117,7 +120,6 @@ export function CardBody({
   name: string;
   sphere: IconName | null;
   fonts: Fonts;
-  inactive: boolean;
   encounterBack: boolean;
   backs: BackImages;
 }) {
@@ -130,8 +132,6 @@ export function CardBody({
       ) : image ? (
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
-          {/* Unique text with no effect record is inactive: the text box is veiled, and no control applies it. */}
-          {inactive ? <Veil x={x} y={y} w={w} h={h} font={fonts.small} /> : null}
         </Group>
       ) : (
         <Group>
@@ -142,7 +142,6 @@ export function CardBody({
             ))}
           </Group>
           {sphere ? <CanvasIcon name={sphere} x={x + w - 16} y={y + h - 16} size={12} color={t[SPHERE_TINT[sphere] ?? "faint"]} /> : null}
-          {inactive ? <Veil x={x} y={y} w={w} h={h} font={fonts.small} /> : null}
         </Group>
       )}
     </Group>

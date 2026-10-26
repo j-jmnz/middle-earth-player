@@ -13,8 +13,9 @@ import { BodyText, Eyebrow, Label, Segmented, TextButton } from "./chrome";
 import { editSavedDeck } from "./deck-draft";
 import { deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "./deck-list";
 import { DeckListBar } from "./deck-list-bar";
-import { deckCountLine, deckReadiness, type DeckReadiness } from "./deck-status";
-import { deckFaces, listDecks } from "./deck-store";
+import { deckCountLine, deckReadiness, notAppliedCards, notAppliedLine, type DeckReadiness } from "./deck-status";
+import { notAppliedWords } from "../play/not-applied";
+import { deckFaces, listDecks, notAppliedIn } from "./deck-store";
 import { useDatabases } from "./databases";
 import { DeckCover, DeckRow, EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "./hero-tile";
 import { palette } from "./palette.js";
@@ -54,6 +55,9 @@ export type BriefingDecks = {
   setFilter: (next: DeckListFilter) => void;
   spheres: { code: string; name: string }[];
   shown: SavedDeck[];
+  // The codes whose printed text the app does not apply (src/play/not-applied.ts), and each card's type for its loss words.
+  inactive: ReadonlySet<string>;
+  typeOf: (code: string) => string | null;
 };
 
 /**
@@ -90,7 +94,9 @@ export function useBriefingDecks(): BriefingDecks {
   const [filter, setFilter] = useState<DeckListFilter>(emptyDeckListFilter);
   const spheres = useMemo(() => deckListSpheres(savedDecks, faces), [savedDecks, faces]);
   const shown = useMemo(() => filterDecks(savedDecks, filter, faces, (deck) => readiness.get(deck.id)?.ready ?? false), [savedDecks, filter, faces, readiness]);
-  return { savedDecks, seeded, seedReason, candidates, faces, readiness, filter, setFilter, spheres, shown };
+  const inactive = useMemo(() => notAppliedIn(faces), [faces]);
+  const typeOf = useCallback((code: string) => faces.get(code)?.typeCode ?? null, [faces]);
+  return { savedDecks, seeded, seedReason, candidates, faces, readiness, filter, setFilter, spheres, shown, inactive, typeOf };
 }
 
 /** The deck list's search, Cards / List switch and filter chips, once above every seat's picker. */
@@ -175,8 +181,9 @@ export function SeatPicker({
 }) {
   const router = useRouter();
   const view = useDeckListView();
-  const { savedDecks, seeded, seedReason, candidates, faces, readiness, shown, setFilter } = briefingDecks;
+  const { savedDecks, seeded, seedReason, candidates, faces, readiness, shown, setFilter, inactive, typeOf } = briefingDecks;
   const kept = savedDecks.find((deck) => deck.id === picked);
+  const pickedDeck = kept ?? null;
   const listed = kept && !shown.includes(kept) ? [kept, ...shown] : shown;
   const faceOf = (code: string): HeroFace => heroFace(faces, code, nameOf(code));
   const heroNames = (codes: readonly string[]) => codes.map(nameOf).join(", ");
@@ -210,6 +217,7 @@ export function SeatPicker({
               heroes: deck.heroes.map(faceOf),
               detail: deckCountLine(deck),
               status: fell.length > 0 ? { ready: false, text: `${heroNames(fell)} fell and cannot be picked` } : ready,
+              note: notAppliedLine(deck, inactive),
               onPress: () => onPick(deck.id),
               selected: picked === deck.id,
               disabled: fell.length > 0 || !ready.ready,
@@ -268,6 +276,17 @@ export function SeatPicker({
               </View>
             )
           ) : null}
+        </View>
+      ) : null}
+      {/* The picked deck names each card whose text the app does not apply, and what that costs: say it before the deal. */}
+      {pickedDeck && notAppliedCards(pickedDeck, inactive).length > 0 ? (
+        <View testID={`briefing-not-applied-${index}`} className="mt-3">
+          <Label tone="muted">Not applied in this deck:</Label>
+          <Label tone="muted" className="mt-0.5">
+            {notAppliedCards(pickedDeck, inactive)
+              .map((card) => `${nameOf(card.code)}: ${notAppliedWords(card.code, typeOf(card.code)).toLowerCase()}`)
+              .join(" · ")}
+          </Label>
         </View>
       ) : null}
       {picked && slot && !ringBearer ? (

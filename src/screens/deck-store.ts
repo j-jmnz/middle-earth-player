@@ -2,6 +2,7 @@ import { asc, desc, eq, inArray, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { cards } from "../catalog/schema";
+import { notAppliedCodes } from "../play/not-applied";
 import type { DeckFace } from "./deck-status";
 import { STEALTH_ID, WISDOM_ID, starterDeck } from "./starter-decks";
 import { decks, type DeckCard } from "./user-schema";
@@ -101,9 +102,17 @@ export function deckFaces<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map
       traits: cards.traits,
       imagesrc: cards.imagesrc,
       threat: cards.threat,
+      text: cards.text,
+      errata: cards.errata,
     })
     .from(cards)
     .where(inArray(cards.code, unique))
     .all();
-  return new Map(rows.map((row) => [row.code, row]));
+  // The errata is the text the card has now (brief, Decisions: errata wins).
+  return new Map(rows.map(({ errata, ...row }) => [row.code, { ...row, text: errata ?? row.text }]));
+}
+
+/** The codes among these faces with a printed line the app does not apply (src/play/not-applied.ts). */
+export function notAppliedIn(faces: ReadonlyMap<string, DeckFace>): ReadonlySet<string> {
+  return notAppliedCodes([...faces.values()].map((face) => [face.code, face.text ?? null] as const));
 }

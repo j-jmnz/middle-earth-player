@@ -10,6 +10,8 @@ export type DeckFace = DeckSaveCard & {
   sphereName: string | null;
   imagesrc: string | null;
   threat: number | null;
+  // The printed text, for the "not applied" check (src/play/not-applied.ts). Optional: a face built elsewhere may lack it.
+  text?: string | null;
 };
 
 export type DeckContent = {
@@ -142,4 +144,22 @@ export function copyDeckName(name: string, taken: Iterable<string>): string {
 export function savedDeckName(typed: string, taken: Iterable<string>): string {
   const name = typed.trim();
   return name.length > 0 ? name : newDeckName(taken);
+}
+
+/** The deck's cards (heroes included) with a printed line the app does not apply, each title once, in deck order. */
+export function notAppliedCards(deck: Pick<DeckContent, "heroes" | "cards">, inactive: ReadonlySet<string>): { code: string; copies: number }[] {
+  const out = new Map<string, number>();
+  for (const code of deck.heroes) if (inactive.has(code)) out.set(code, (out.get(code) ?? 0) + 1);
+  for (const card of deck.cards) if (inactive.has(card.code)) out.set(card.code, (out.get(card.code) ?? 0) + card.count);
+  return [...out].map(([code, copies]) => ({ code, copies }));
+}
+
+/**
+ * "6 cards with text not applied": the copies in the deck (heroes included) with a printed line the app does not apply, for
+ * the deck list, the editor and the briefing (docs/plans/inactive-text.md). Null when the app applies every card. It is
+ * not a readiness rule: such a deck stays ready to play.
+ */
+export function notAppliedLine(deck: Pick<DeckContent, "heroes" | "cards">, inactive: ReadonlySet<string>): string | null {
+  const copies = notAppliedCards(deck, inactive).reduce((sum, card) => sum + card.copies, 0);
+  return copies === 0 ? null : `${plural(copies, "card", "cards")} with text not applied`;
 }

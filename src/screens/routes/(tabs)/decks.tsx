@@ -5,8 +5,8 @@ import { AccessibilityInfo, View } from "react-native";
 
 import { BodyText, Screen, ScreenTitle, TextButton } from "../../chrome";
 import { editSavedDeck, startNewDeck } from "../../deck-draft";
-import { copyDeckName, deckCountLine, deckReadiness, newDeckName } from "../../deck-status";
-import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, resetStarterDeck, type SavedDeck } from "../../deck-store";
+import { copyDeckName, deckCountLine, deckReadiness, newDeckName, notAppliedLine } from "../../deck-status";
+import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, type SavedDeck } from "../../deck-store";
 import { useDatabases } from "../../databases";
 import { deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck-list";
 import { DeckListBar } from "../../deck-list-bar";
@@ -131,6 +131,8 @@ export default function Decks() {
 
   const faces = useMemo(() => deckFaces(catalog, saved.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)])), [catalog, saved]);
   const readiness = useMemo(() => new Map(saved.map((deck) => [deck.id, deckReadiness(deck, faces)])), [saved, faces]);
+  // The cards whose text the app does not apply: each deck says how many it holds (docs/plans/inactive-text.md).
+  const inactive = useMemo(() => notAppliedIn(faces), [faces]);
   const spheres = useMemo(() => deckListSpheres(saved, faces), [saved, faces]);
   const shown = useMemo(() => filterDecks(saved, filter, faces, (deck) => readiness.get(deck.id)?.ready ?? false), [saved, filter, faces, readiness]);
   const rows = useMemo(() => listRows(shown, saved.length, seed), [shown, saved.length, seed]);
@@ -219,6 +221,7 @@ export default function Decks() {
       heroes: facesFor(deck),
       detail: deckCountLine(deck),
       status: readiness.get(deck.id) ?? { ready: false, text: "" },
+      note: notAppliedLine(deck, inactive),
       onPress: () => openDeck(deck),
       onLongPress: () => {
         setManaging(true);

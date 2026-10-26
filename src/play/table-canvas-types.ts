@@ -37,7 +37,7 @@ export type TableCanvasProps = {
   nameOf: (code: string) => string;
   // The sphere a card prints, for the icon on a card drawn as its name while its file is missing.
   sphereOf: (code: string) => string | null;
-  // True for a card whose unique text has no effect record: the canvas veils its text box.
+  // True for a card with a printed line the app does not apply (src/catalog/active-text.ts): the canvas marks it.
   inactive: (code: string) => boolean;
   // The engine's numbers on a card, read from the latest state. The canvas draws again when the cards, the effects in play
   // or the attack in progress change.
