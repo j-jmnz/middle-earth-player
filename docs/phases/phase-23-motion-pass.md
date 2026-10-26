@@ -143,3 +143,10 @@ Phase 20 is merged. What phase 23 builds on:
 - Nothing animates while the strip scrolls; keep it that way.
 - The middle zone of the top bar fades from opacity 0 once the bar and dials are measured (`src/screens/table-top-bar.tsx`, 400 ms fallback when the dials never report). That is a gate, not a motion token; leave it out of the scale.
 - Open phone checks phase 23 can fold into its own: the slide on a phase change, the strip's swipe (also starting on a Switch), and the 667x375 two-seat bar.
+
+## Handover from phase 21
+
+- The choice tray's motion is at the top of `src/play/tray-frame.tsx`: `ENTER_MS` 260 decelerate (`Easing.out(Easing.cubic)`, translateY 16 to 0 with a fade), `LEAVE_MS` 180 accelerate (`Easing.in(Easing.cubic)`); the frame stays mounted until the exit finishes. Both snap under reduced motion. Move them to `motion-tokens.ts`.
+- The reading panels (`src/play/reading-panels.tsx`) sit in one paper `TrayFrame` (`src/play/table-layers.tsx`), so they have the same enter and exit. A new reading layer replaces the last one in the same open frame (`reading.ts`), so swapping one panel for another does not animate today.
+- Open phone check phase 23 can fold into its own: the 260 and 180 ms motion on a phone.
+
