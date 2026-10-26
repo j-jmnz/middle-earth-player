@@ -68,8 +68,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"141080:whenRevealed:1","cardCode":"141080","lines":["141080:A:2"],"timing":"whenRevealed","instructions":[{"verb":"AttachSelfToRingBearer"}]},
   {"id":"141080:forced:1","cardCode":"141080","lines":["141080:A:2"],"timing":"forced","trigger":"beginningOfPhase","condition":{"kind":"phase","is":"Quest"},"instructions":[{"verb":"Choose","who":"firstPlayer","options":[{"id":"exhaust","requires":{"kind":"exhausted","code":RING,"is":false},"instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":RING}}]},{"id":"reveal","instructions":[{"verb":"RevealMore","amount":1}]}]}]},
 
-  // 141081 Fear of Discovery
-  {"id":"141081:whenRevealed:1","cardCode":"141081","lines":["141081:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Choose","who":"firstPlayer","options":[{"id":"exhaust","requires":{"kind":"canPick","pick":{...RING_BEARER,"state":"ready"}},"instructions":[{"verb":"Pick","pick":{...RING_BEARER,"state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}}]},{"id":"reveal","instructions":[{"verb":"GainSurge"}]}]}]},
+  // 141081 Fear of Discovery. Its Surge reveals one card after it; the additional card of its text is revealed by the choice
+  // itself, so choosing it makes two (rr.surge counts only the keyword).
+  {"id":"141081:whenRevealed:1","cardCode":"141081","lines":["141081:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Choose","who":"firstPlayer","options":[{"id":"exhaust","requires":{"kind":"canPick","pick":{...RING_BEARER,"state":"ready"}},"instructions":[{"verb":"Pick","pick":{...RING_BEARER,"state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}}]},{"id":"reveal","instructions":[{"verb":"RevealEncounter"}]}]}]},
   {"id":"141081:shadow:1","cardCode":"141081","lines":["141081:A:3"],"timing":"shadow","instructions":[{"verb":"RaiseThreat","amount":3,"who":"actor"}]},
 
   // 141082 Eaten Alive!: the first player deals one damage at a time, X times, to a hero they control.

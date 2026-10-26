@@ -10,6 +10,7 @@ import { playOut } from "../../scripts/auto-player.ts";
 import { campaign, loadWorld, scenario } from "../../scripts/past-scene.ts";
 import { playStarter, starterWorld } from "../../scripts/starter-game.ts";
 import { KNIFE_GOLDENS, knifeWorld, playGolden } from "../../scripts/knife-game.ts";
+import { FORD_GOLDENS, fordWorld, playGolden as playFordGolden } from "../../scripts/ford-game.ts";
 
 import { buildStart } from "./start.ts";
 import { beginActive, recordIntent, replay } from "./replay.ts";
@@ -57,6 +58,18 @@ describe("saves.activeScenario replay", () => {
     if (!golden) throw new Error(name);
     const { ctx } = await knifeWorld();
     const game = playGolden(golden, ctx);
+    let active = beginActive(game.start, HASH);
+    for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
+    const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);
+    expect(replayed.ok).toBe(true);
+    if (replayed.ok) expect(replayed.state).toEqual(game.state);
+  }, 60_000);
+
+  it.each(FORD_GOLDENS.map((golden) => golden.name))("replays the Flight to the Ford golden game (%s) to the same final state", async (name) => {
+    const golden = FORD_GOLDENS.find((item) => item.name === name);
+    if (!golden) throw new Error(name);
+    const { ctx } = await fordWorld(golden.decks);
+    const game = playFordGolden(golden, ctx);
     let active = beginActive(game.start, HASH);
     for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
     const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);

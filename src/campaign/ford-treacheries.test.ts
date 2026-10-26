@@ -2,9 +2,10 @@
 // mec109.ringbearers-life (data/rules/entries.json).
 import { beforeAll, describe, expect, it } from "vitest";
 
+import type { Effect } from "../catalog/boundary.ts";
 import { syncConstants } from "../rules/constants.ts";
-import { hasKeyword, modifiedStat } from "../rules/keywords.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
+import { hasKeyword } from "../rules/keywords.ts";
+import { legalIntents } from "../rules/legal.ts";
 import type { ReduceContext } from "../rules/reduce.ts";
 import { expireModifiers, flagged, updateCard, type ScenarioState } from "../rules/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
@@ -112,7 +113,7 @@ describe("The Nine are Abroad (141067:A:1)", () => {
   });
 
   it("a blank character has none of its Actions, and a card of another type keeps its own", () => {
-    const action = { id: "ally:action:1", cardCode: "ally", lines: ["ally:A:1"], timing: "action", instructions: [{ verb: "Draw" }] } as const;
+    const action: Effect = { id: "ally:action:1", cardCode: "ally", lines: ["ally:A:1"], timing: "action", instructions: [{ verb: "Draw" }] };
     const made = make({ allies: ["ally"], deck: ["141067", "f0", "f0", "f0"] });
     const ctx = { ...made.ctx, effects: [...made.ctx.effects, action] };
     const ally = first(made.state, "ally");
@@ -144,6 +145,9 @@ describe("Fear of Discovery (141081:A:2)", () => {
     expect(exhausted.state.cards[frodo]?.exhausted).toBe(true);
     const more = choose(run, "reveal", ctx);
     expect(more.state.cards[frodo]?.exhausted).toBe(false);
+    // The additional card of the choice, and the one its Surge reveals after it (rr.surge).
+    expect(exhausted.state.staging).toHaveLength(1);
+    expect(more.state.staging).toHaveLength(2);
   });
 
   it("offers only the additional card once the Ring-bearer is exhausted", () => {
@@ -151,7 +155,7 @@ describe("Fear of Discovery (141081:A:2)", () => {
     const frodo = first(made.state, FRODO);
     const run = reveal(updateCard(made.state, frodo, { exhausted: true }), made.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
-    expect(run.state.staging).toHaveLength(1);
+    expect(run.state.staging).toHaveLength(2);
   });
 });
 
@@ -221,7 +225,3 @@ describe("Overcome by Terror (141084:A:2)", () => {
     expect(run.state.seats[0].hand).toHaveLength(1);
   });
 });
-
-void legalIntents;
-void legalTargets;
-void modifiedStat;

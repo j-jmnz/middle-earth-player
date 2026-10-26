@@ -4,16 +4,15 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/constants.ts";
 import type { EngineStep } from "../rules/intents.ts";
-import { runInstruction } from "../rules/interpret.ts";
+import { dealOneShadow, runInstruction } from "../rules/interpret.ts";
 import { dealShadows } from "../rules/combat.ts";
-import { hasKeyword, modifiedStat } from "../rules/keywords.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
+import { modifiedStat } from "../rules/keywords.ts";
+import { legalIntents } from "../rules/legal.ts";
 import { settle } from "../rules/machine.ts";
-import type { PlayerIntent, ReduceContext } from "../rules/reduce.ts";
+import type { ReduceContext } from "../rules/reduce.ts";
 import { flagged, type ScenarioState } from "../rules/state.ts";
-import { dealOneShadow } from "../rules/interpret.ts";
-import { FELL_RIDER, FORD_OF_BRUINEN, fordTable, LAST_BRIDGE, loadFordWorld, WITCH_KING, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
-import { codesOf, first, FRODO, SAM, send, start } from "../../scripts/past-scene.ts";
+import { FORD_OF_BRUINEN, fordTable, LAST_BRIDGE, loadFordWorld, WITCH_KING, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
+import { codesOf, first, FRODO, SAM, send } from "../../scripts/past-scene.ts";
 
 let world: FordWorld;
 
@@ -141,8 +140,3 @@ describe("Ettenmoors (141061)", () => {
     expect(steps.filter((step) => step.kind === "life")).toHaveLength(1);
   });
 });
-
-void legalTargets;
-void hasKeyword;
-void (null as PlayerIntent | null);
-void FELL_RIDER;

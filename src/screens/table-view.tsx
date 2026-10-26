@@ -25,6 +25,7 @@ import { MomentBanner, TableDock } from "../play/table-dock";
 import { LogPanel, PileList, SidePanel } from "../play/table-panel";
 import { previewCards } from "../play/table-preview";
 import { useTableChoice } from "../play/use-table-choice";
+import { widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { Screen } from "./chrome";
 import { inactiveCodes } from "../catalog/active-text";
@@ -138,8 +139,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     setSize((current) => (current && current.width === width && current.height === height ? current : { width, height }));
   };
 
-  const showLife = game.widgets.lifeTracker && game.life != null;
-  const threatText = threatLine(threats, showLife ? (game.life ?? 0) : null);
+  const widgets = widgetReadouts(game);
+  const threatText = threatLine(threats, widgets.life);
   const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
   const panelWidth = Math.round(Math.min(480, Math.max(320, screen.width * 0.46)));
   // A panel slides in from the right, under the top bar; on a short phone it covers the top bar too.
@@ -174,7 +175,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 compact
               />
             ))}
-            {showLife ? <ThreatRing threat={{ seat: 0, threat: game.life ?? 0, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
+            {widgets.life != null ? <ThreatRing threat={{ seat: 0, threat: widgets.life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
+            {widgets.burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: widgets.burdenDeck, eliminated: false }} label="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
           </View>
           <PhaseRail rail={rail} narrow={narrow} />
           {narrow ? null : <Text testID="table-round" className="px-2 text-label text-muted">{`Round ${game.round}`}</Text>}

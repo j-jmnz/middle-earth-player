@@ -1,0 +1,79 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# OPEN (2026-10-26): its fixture `ford-lost` is not committed (see flight-to-the-ford.yaml): it is dealt from the log of two
+# scenarios no win has been found for.
+# Phase 13. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture
+# is a real game of Flight to the Ford parked on its loss: the Ring-bearer's life reached 0 (mec109.ringbearers-life). A loss
+# has no reward screen and writes nothing to the log.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/ford-lost"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- assertVisible:
+    id: rail-current
+    text: "Defeat"
+- assertVisible:
+    id: life-value
+    text: "0"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 15000
+- assertVisible:
+    id: resolution-outcome
+    text: "Defeat"
+- assertVisible: "The scenario was lost. Nothing is written to the log."
+- assertNotVisible:
+    id: resolution-confirm
+- tapOn:
+    id: resolution-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+# The log is unchanged: Flight to the Ford still current, The Ring Goes South locked.
+- assertVisible:
+    id: node-flight-to-the-ford-status
+    text: "Current"
+- assertVisible:
+    id: node-the-ring-goes-south-status
+    text: "Locked"
+- stopApp
+- launchApp
+- tapOn:
+    id: continue-path
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-flight-to-the-ford-status
+    text: "Current"
+- assertVisible:
+    id: node-the-ring-goes-south-status
+    text: "Locked"
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertVisible:
+    id: log-scenario-flight-to-the-ford
+    text: ".*Not completed.*"
+# None of this scenario's burdens is on the log.
+- assertNotVisible:
+    text: ".*Weight of the Ring.*"
