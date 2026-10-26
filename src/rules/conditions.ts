@@ -4,6 +4,7 @@ import { questSucceeded } from "./families/costs-pay.ts";
 import { spendablePools } from "./families/costs-verbs.ts";
 import { engagedThisRound } from "./families/attack-events.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
+import { seatThreat } from "./families/play-hooks.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
@@ -121,7 +122,7 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
     case "engagedAboveThreat": {
       const enemy = scope.subject ? state.cards[scope.subject] : undefined;
       if (!enemy || scope.eventSeat !== scope.actor || enemy.controller !== scope.actor || printedOf(ctx.cards, enemy.code).engagementCost == null) return false;
-      return modifiedStat(state, enemy, "engagementCost", ctx.cards) > (state.seats[scope.actor]?.threat ?? 0);
+      return modifiedStat(state, enemy, "engagementCost", ctx.cards) > seatThreat(state, scope.actor);
     }
     case "otherPlayer":
       return livingSeats(state).some((seat) => seat !== scope.actor);
@@ -152,7 +153,7 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return of.length > 0 && of.every((id) => matchesPick(state, id, condition.match, at, ctx));
     }
     case "threat": {
-      const threat = state.seats[scope.actor]?.threat ?? 0;
+      const threat = seatThreat(state, scope.actor);
       return (condition.min == null || threat >= condition.min) && (condition.max == null || threat <= condition.max);
     }
     case "matches": {
@@ -166,7 +167,9 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
     }
     case "copiesPlayedThisRound": {
       const code = scope.sourceId ? state.cards[scope.sourceId]?.code : undefined;
-      const played = (state.played ?? []).filter((entry) => entry.round === state.round && entry.code === code && entry.id !== scope.sourceId).length;
+      const plays = (state.played ?? []).filter((entry) => entry.round === state.round && entry.code === code && (!condition.you || entry.seat === scope.actor));
+      // The card's own latest play is not another copy; an earlier play of the same card (returned to the hand) is.
+      const played = plays.length - (plays.some((entry) => entry.id === scope.sourceId) ? 1 : 0);
       return played <= condition.max;
     }
     case "resources":

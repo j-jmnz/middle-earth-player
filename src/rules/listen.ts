@@ -2,6 +2,7 @@
 import type { Effect, PickSpec } from "../catalog/boundary.ts";
 
 import { textBlank } from "./families/attachments-hold.ts";
+import { triggerHears } from "./families/play-hooks.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { matchesPick } from "./pick.ts";
 import type { CardInstance, GameEvent, ScenarioState } from "./state.ts";
@@ -44,7 +45,7 @@ export function subjectMatches(state: ScenarioState, id: string, spec: PickSpec,
 // Whether an effect on this card hears the event. Without a subject an event about one card is heard by that card only
 // (an event about no card, by every card). `eventSeat` asks that it happened to the card's controller, or to another player.
 export function hears(state: ScenarioState, effect: Effect, listener: CardInstance, event: GameEvent, ctx: ReduceContext): boolean {
-  if (effect.trigger !== event.trigger) return false;
+  if (!triggerHears(effect.trigger, event.trigger)) return false;
   // A card whose printed text box is blank has none of its abilities (rr.blank).
   if (textBlank(state, listener.id)) return false;
   if (effect.eventSeat) {

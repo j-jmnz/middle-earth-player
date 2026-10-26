@@ -28,6 +28,7 @@ import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
 import { afterPlay } from "./families/costs-play.ts";
+import { playSweep } from "./families/play-sweep.ts";
 import { doRefresh } from "./refresh.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
@@ -78,7 +79,8 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     // (Loyal Hound, 19148).
     const resolving = current.stack.some((frame) => frame.data.kind === "effect" && frame.data.hold != null);
     const held = answerable || resolving ? damageHeld : undefined;
-    const swept = current.lost || current.failure ? current : destroyOverwhelmed(clearEliminated(current, ctx.cards), ctx.cards, steps, held);
+    // The play family's constants (families/play-sweep.ts): hero card type, first player control, discard at a stat.
+    const swept = current.lost || current.failure ? current : destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held);
     if (swept !== current) {
       current = swept;
       continue;

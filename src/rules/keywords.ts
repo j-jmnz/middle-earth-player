@@ -12,6 +12,7 @@ import { flagged, livingSeats, modifierActive, updateCard, withSeat, withThreat 
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
+import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hooks.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -89,7 +90,7 @@ export function versusHighEngagement(
   against?: string,
 ): boolean {
   if (holder.controller == null) return false;
-  const threat = state.seats[holder.controller]?.threat ?? 0;
+  const threat = seatThreat(state, holder.controller);
   let enemyId: string | undefined;
   if (role === "defending") {
     const attack = state.pendingAttack;
@@ -154,7 +155,7 @@ export function raiseThreat(
   if (amount <= 0) return state;
   const current = state.seats[seat];
   if (!current || current.eliminated) return state;
-  const raised = queueEvent(withThreat(state, seat, current.threat + amount), { trigger: "threatRaised", seat });
+  const raised = doomedRaised(queueEvent(withThreat(state, seat, current.threat + amount), { trigger: "threatRaised", seat }), seat, cause);
   steps.push({ kind: "threat", seat, amount, cause });
   return eliminateEmpties(raised, steps);
 }
@@ -207,7 +208,7 @@ export function placeDamage(
   if (lethal) {
     // The cards attached to an enemy hear that it was destroyed ("When attached enemy is destroyed", families/attachments-hold.ts).
     if (printed.type === "enemy") next = noteHostDefeated(next, id);
-    next = destroyCard(next, id, cards, steps);
+    next = destroyCard(next, id, cards, steps, false, true);
     // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
     if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: id });
@@ -230,7 +231,7 @@ export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<stri
     const current = next.cards[instance.id];
     if (!current || !inPlay(current.zone) || current.damage < modifiedStat(next, current, "hitPoints", cards)) continue;
     if (held(next, instance.id)) continue;
-    next = destroyCard(next, instance.id, cards, steps);
+    next = destroyCard(next, instance.id, cards, steps, false, true);
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
   }
   return next;
@@ -313,6 +314,8 @@ export function destroyCard(
   cards: ReadonlyMap<string, PrintedCard>,
   steps: EngineStep[],
   explored = false,
+  // Damage destroyed it: it was not discarded (rr.destroy, families/play-hooks.ts).
+  byDamage = false,
 ): ScenarioState {
   const instance = state.cards[id];
   if (!instance) return state;
@@ -328,9 +331,10 @@ export function destroyCard(
   if (explored && printed.type === "location" && state.activeLocation === id) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
-  next = moveCard(next, id, defeatedDestination(latest, printed));
+  next = moveCard(next, id, defeatedDestination(latest, printed), instance.attachments);
   steps.push({ kind: "destroy", targetId: id });
   if (printed.type === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
+  next = discardedFromPlay(next, instance, byDamage);
   if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
   return eliminateEmpties(next, steps);
 }

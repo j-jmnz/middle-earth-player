@@ -112,8 +112,9 @@ export type HideData = {
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
 // `other` is a second card the event names: the enemy a character defends against or attacks.
-// `amount` is the damage a `damaged` event dealt.
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; amount?: number };
+// `amount` is the damage a `damaged` event dealt. `attachments` are the cards that left play with the card a
+// `leftPlayWithAttachments` event is about (families/play-zones.ts).
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; amount?: number; attachments?: readonly string[] };
 
 // A Response a player may use after an event. It is offered once and may be passed.
 export type ResponseOffer = { cardId: string; effectId: string; seat: number };

@@ -95,8 +95,8 @@ const atomSchema = z.discriminatedUnion("kind", [
     inPlay: z.boolean().optional(),
   }),
   // At most `max` other copies of the source card were played from the hand this round ("if this is the first time you
-  // played a copy of ~ this round").
-  z.strictObject({ kind: z.literal("copiesPlayedThisRound"), max: z.number().int().min(0) }),
+  // played a copy of ~ this round"); a card played again counts its earlier play. `you`: only the actor's plays count.
+  z.strictObject({ kind: z.literal("copiesPlayedThisRound"), max: z.number().int().min(0), you: z.boolean().optional() }),
   // The actor's heroes with a resource icon that pays `sphere` (every player's, with `group`) hold at least `min` resources
   // ("the players as a group may spend 2 Leadership resources").
   z.strictObject({ kind: z.literal("resources"), min: z.number().int().positive(), sphere: z.enum(["leadership", "tactics", "spirit", "lore"]).optional(), group: z.boolean().optional() }),

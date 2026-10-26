@@ -7,6 +7,7 @@ import { checkCost } from "./families/costs-stats.ts";
 import { engagementBarred, noteEngaged } from "./families/quest-engage.ts";
 import { noteHostDefeated, withStagingThreat } from "./families/attachments-hold.ts";
 import { progressFirstLocations } from "./families/attachments-quest.ts";
+import { seatThreat } from "./families/play-hooks.ts";
 import type { EngineStep } from "./intents.ts";
 import { destroyCard, modifiedStat, raiseThreat, releaseAttachments } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
@@ -245,7 +246,8 @@ export function engageWith(state: ScenarioState, seat: number, enemyId: string, 
 }
 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {
-  const threat = state.seats[seat]?.threat ?? 0;
+  // The threat the seat is treated as having (families/play-hooks.ts).
+  const threat = seatThreat(state, seat);
   const found: { id: string; cost: number }[] = [];
   for (const id of stagingEnemies(state, cards)) {
     const instance = state.cards[id];

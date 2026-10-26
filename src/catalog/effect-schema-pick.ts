@@ -134,6 +134,9 @@ export const pickSchema = z.strictObject({
   minHitPoints: z.number().int().positive().optional(),
   // The top card of its discard pile ("While the top card of your discard pile is an ally").
   topOfDiscard: z.boolean().optional(),
+  // A card that shares at least one trait with the source (`self`) or the source's host (`host`): "if that character shares at
+  // least one trait with the attached hero" (families/play-pick.ts).
+  sharesTraitWith: z.enum(["self", "host"]).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

@@ -8,6 +8,7 @@ import type { ScenarioState } from "../rules/reduce.ts";
 import { attachmentPickWords, attachmentWords } from "./attachment-words.ts";
 import { encounterPickWords, encounterWords } from "./encounter-words.ts";
 import { attackWords } from "./attack-words.ts";
+import { playPickWords, playWords } from "./play-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -55,6 +56,12 @@ function refWords(ref: string | undefined): string {
     default:
       return "it";
   }
+}
+
+// The card a discount waits for, from its filter: "Lore ally" ("the next Lore card of that type", 05016:A:1), else "matching card".
+function nextCardWords(pick: Extract<Instruction, { verb: "ReduceNextCost" }>["pick"]): string {
+  const words = [pick.sphere ? capital(pick.sphere) : null, pick.trait ?? null, pick.cardType ? pick.cardType.replace("player-side-quest", "side quest") : null].filter((word) => word != null);
+  return pick.cardType ? words.join(" ") : "matching card";
 }
 
 /** One instruction in words, or null when it adds nothing the player decides on (a shuffle after a search). */
@@ -134,7 +141,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     case "PlaceProgressOn":
       return `place ${amountWords(instruction.amount)} progress on ${instruction.target === "eachStagingLocation" ? "each location in the staging area" : instruction.target === "activeLocation" ? "the active location" : "it"}`;
     case "ReduceNextCost":
-      return `reduce the cost of the next matching card you play by ${amountWords(instruction.amount)}`;
+      return `reduce the cost of the next ${nextCardWords(instruction.pick)} you play by ${amountWords(instruction.amount)}`;
     // The costs family's verbs (src/catalog/families/costs.ts).
     case "SpendResources": {
       const sphere = instruction.sphere ? `${capital(instruction.sphere)} ` : "";
@@ -248,8 +255,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     case "ModifyStatVersus":
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
-      // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments and attack families'.
-      return encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction);
+      // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack and play families'.
+      return encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction);
   }
 }
 
@@ -295,6 +302,8 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
   if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
   if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
+  const play = playPickWords(pick);
+  if (play) return play;
   if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);
