@@ -161,21 +161,21 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
   const pills = dockPills(choice.extras);
   const more = useMorePopover(pills.more.length, choice.resetKey);
-  const { open: moreOpen, close: closeMore } = more;
+  const { open: moreOpen, lines: linesOpen, close: closeMore } = more;
 
   // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       const step = backStep({
         menuOpen,
-        moreOpen,
+        moreOpen, linesOpen,
         previewOpen: preview != null,
         readingOpen: reading != null,
         overlayOpen: choice.overlayOpen,
         panelOpen: choice.panelOpen,
       });
       if (step === "closeMenu") setMenuOpen(false);
-      else if (step === "closeMore") closeMore();
+      else if (step === "closeMore" || step === "closeLines") closeMore();
       else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
       else if (step === "closeReading") setReading(null);
       else if (step === "closeOverlay") choice.closeOverlay();
@@ -184,7 +184,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [menuOpen, moreOpen, closeMore, preview, reading, choice, router, nav]);
+  }, [menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -224,7 +224,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
 
   return (
     <Screen testID="table" scene="felt" inset={false}>
-      <View className="flex-1" importantForAccessibility={menuOpen || more.open ? "no-hide-descendants" : "auto"} style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
+      <View className="flex-1" importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
         <TableTopBar
           threats={threats}
           seat={seat}
@@ -279,9 +279,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               onButton={choice.onButton}
               extras={pills.pills}
               more={pills.more}
-              onMore={more.show}
+              onMore={more.show} onLines={more.showLines}
               resetKey={choice.resetKey}
-              guide={choice.guide}
+              guide={choice.guide} trayOpen={choice.panelOpen}
               onBlock={setAnchor}
             />
           </View>
@@ -321,7 +321,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
       <TableMenu open={menuOpen} nav={nav} top={insets.top + TOP_BAR} right={insets.right + 8} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
-      <MorePopoverView more={more} items={pills.more} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
+      <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );
 }

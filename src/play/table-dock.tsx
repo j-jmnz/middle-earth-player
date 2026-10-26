@@ -7,6 +7,7 @@ import { AccessibilityInfo, Pressable, ScrollView, Text, useWindowDimensions, Vi
 import Animated, { FadeInUp, FadeOut, ReduceMotion, useReducedMotion } from "react-native-reanimated";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
+import { DENSE_BELOW, labelChars, PILL_PT, planWords, wordsWindow } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
 import { BEAT_MS, type Moment } from "./outcome.ts";
 import type { Readout } from "./readout.ts";
@@ -17,10 +18,11 @@ import { LineMark } from "./table-chrome.tsx";
 import { tableTokens as t } from "./tokens.ts";
 
 /** The engine's numbers for the moment, large, and what they come to: raised night in the dock, ink on a paper panel. */
-export function ReadoutView({ readout, surface = "night" }: { readout: Readout; surface?: "night" | "paper" }) {
+// `oneLine`: the result is one line (the choice tray is open over the dock on a short phone); its words stay in the label.
+export function ReadoutView({ readout, surface = "night", tight = false, oneLine = false }: { readout: Readout; surface?: "night" | "paper"; tight?: boolean; oneLine?: boolean }) {
   const paper = surface === "paper";
   return (
-    <View testID={`readout-${readout.kind}`} className={`rounded-tile border px-2 py-1 ${paper ? "border-inkLine" : "border-hairline bg-raised"}`}>
+    <View testID={`readout-${readout.kind}`} className={`rounded-tile border px-2 ${tight ? "py-0.5" : "py-1"} ${paper ? "border-inkLine" : "border-hairline bg-raised"}`}>
       <View className="flex-row items-center justify-center gap-2">
         {readout.stats.map((stat, index) => (
           <View key={stat.word} className="flex-row items-center gap-2">
@@ -30,7 +32,7 @@ export function ReadoutView({ readout, surface = "night" }: { readout: Readout; 
         ))}
       </View>
       {readout.result ? (
-        <Text testID="readout-result" numberOfLines={3} className={`mt-0.5 text-center text-label ${paper ? "text-ink" : "text-bone"}`}>
+        <Text testID="readout-result" numberOfLines={oneLine ? 1 : 3} accessibilityLabel={readout.result} className={`${tight ? "" : "mt-0.5"} text-center text-label ${paper ? "text-ink" : "text-bone"}`}>
           {readout.result}
         </Text>
       ) : null}
@@ -38,10 +40,8 @@ export function ReadoutView({ readout, surface = "night" }: { readout: Readout; 
   );
 }
 
-// Label type is about this many points a character, so a line of the dock holds its width over this many characters.
-const CHAR_PT = 6.6;
 // The tone of a line of words under the title: the guide in bone, the note muted, what the rules refuse faint.
-const lineTone = (kind: "guide" | "note" | "unavailable") => (kind === "guide" ? "text-bone" : kind === "note" ? "text-muted" : "text-faint");
+export const lineTone = (kind: "guide" | "note" | "unavailable") => (kind === "guide" ? "text-bone" : kind === "note" ? "text-muted" : "text-faint");
 
 export function TableDock({
   step,
@@ -56,8 +56,10 @@ export function TableDock({
   extras = [],
   more = [],
   onMore,
+  onLines,
   resetKey,
   guide = null,
+  trayOpen = false,
   onBlock,
 }: {
   step: string;
@@ -75,80 +77,93 @@ export function TableDock({
   // The quiet pills folded behind the More pill, and what it does (dock-extras.ts, dockPills; dock-more.tsx).
   more?: readonly DockExtra[];
   onMore?: (foot: number) => void;
+  // The "i" pill opens the full title and every line in a popover (dock-more.tsx); it reports the screen y of the pill's top.
+  onLines?: (top: number) => void;
   // Changes with the moment and the pick: an armed button goes back to unarmed.
   resetKey: string;
   // The first-game guide's line for the moment (reference.ts); it is turned off in the table settings.
   guide?: string | null;
+  // The choice tray is open over the words: they are not drawn (a half glyph would show in the gap above the block) and, on a
+  // short phone, the readout is one line (its words stay in the accessibility label), so the tray gets the room.
+  trayOpen?: boolean;
   // The screen y of the top of the block under the sentence (the readout, the armed line and the buttons): the choice tray's
   // foot stays above it.
   onBlock?: (top: number) => void;
 }) {
   const block = useRef<ComponentRef<typeof View>>(null);
+  const pillRef = useRef<ComponentRef<typeof View>>(null);
+  const [room, setRoom] = useState({ column: 0, block: 0, text: 198 });
   const measure = () => block.current?.measureInWindow((_x, y) => onBlock?.(Math.round(y)));
-  // The folded line is one line on a short phone (under 400 pt tall, as the choice tray's dense tiles) and two on a taller one;
-  // what a line holds comes from the width the dock gives it (label type is about CHAR_PT a character).
-  const dense = useWindowDimensions().height < 400;
-  const [lineWidth, setLineWidth] = useState(168);
-  const chars = Math.max(12, Math.floor(lineWidth / CHAR_PT));
-  const lines = dockLines({ guide, note, unavailable, chars: dense ? chars : 2 * chars });
-  // The folded lines open in place; a new moment folds them again.
-  const [opened, setOpened] = useState<string | null>(null);
-  const moment = `${step}|${title}`;
-  const expanded = opened === moment && lines.foldable;
+  // The folded line is one line on a short phone (under DENSE_BELOW tall, as the choice tray's dense tiles) and two on a taller one.
+  const dense = useWindowDimensions().height < DENSE_BELOW;
+  const lines = dockLines({ guide, note, unavailable, chars: (dense ? 1 : 2) * labelChars(room.text - PILL_PT) });
+  // The words' window (budget in dock-budget.ts): the title keeps the lines that fit under the step and the folded line, and the
+  // rest of it waits behind the "i", which sits on the title row when the room cannot hold a folded line.
+  const space = room.column > 0 ? wordsWindow({ room: room.column, block: room.block, dense }) : Infinity;
+  const plan = planWords({ space, dense, title, textWidth: room.text, hasLine: lines.first != null, foldable: lines.foldable });
+  const pill = plan.pill ? (
+    // The "i" pill (`dock-more`) opens the full title and every line; the More pill (`dock-more-actions`) folds the quiet
+    // buttons. 24 pt with a 44 pt target that stays clear of the line's words (6 pt gap) and inside the dock's padding.
+    <Pressable
+      ref={pillRef}
+      testID="dock-more"
+      collapsable={false}
+      accessibilityRole="button"
+      accessibilityLabel="More about this moment"
+      hitSlop={{ top: 10, bottom: 10, left: 6, right: 12 }}
+      onPress={() => pillRef.current?.measureInWindow((_x, y) => onLines?.(Math.round(y)))}
+    >
+      <View className="h-6 w-6 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: t.muted, backgroundColor: t.raised }}>
+        <Text className="text-label font-medium text-bone">i</Text>
+      </View>
+    </Pressable>
+  ) : null;
+  const readoutLine = dense && trayOpen;
   return (
-    <View testID="dock" className="rounded-card px-3 pb-1 pt-1.5" style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
-      {/* Only the words above the numbers scroll, where a short phone or a long title leaves them too little room: the readout, the
-          armed line and every button are pinned to the dock's foot and never scroll away. */}
-      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
-        <Text testID="sheet-step" numberOfLines={1} className="text-center font-display text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
-          {step}
-        </Text>
-        <Text testID="sheet-title" accessibilityRole="header" numberOfLines={2} className="text-center font-display text-body text-bone" style={{ flexShrink: 0 }}>
-          {title}
-        </Text>
-        {lines.first ? (
-          <View className="flex-row items-start gap-1.5">
-            <View className="flex-1" onLayout={(event) => setLineWidth(Math.round(event.nativeEvent.layout.width))}>
-              {expanded ? (
-                [lines.first, ...lines.rest].map((line) => (
-                  <Text key={line.testID} testID={line.testID} className={`text-center text-label ${lineTone(line.kind)} ${line.kind === "unavailable" ? "mt-1" : ""}`}>
-                    {line.text}
-                  </Text>
-                ))
-              ) : (
-                // One line shows. A screen reader hears every line from it, folded or not.
-                <Text testID={lines.first.testID} numberOfLines={dense ? 1 : 2} accessibilityLabel={lines.spoken} className={`text-center text-label ${lineTone(lines.first.kind)}`}>
+    <View style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
+      <View testID="dock" className={`rounded-card px-3 ${dense ? "pb-0.5 pt-0.5" : "pb-1 pt-1.5"}`} style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
+        {/* The words above the numbers are budgeted to fit (planWords); the guard scrolls only on a taller screen's long lines. The
+            readout, the armed line and every button are pinned to the dock's foot and never scroll away. */}
+        <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0, opacity: trayOpen ? 0 : 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
+          <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))}>
+            <Text testID="sheet-step" numberOfLines={1} className="text-center font-display text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
+              {step}
+            </Text>
+            <View className="flex-row items-start gap-1.5">
+              <Text testID="sheet-title" accessibilityRole="header" accessibilityLabel={title} numberOfLines={plan.titleLines} className="flex-1 text-center font-display text-body text-bone" style={{ flexShrink: 0 }}>
+                {title}
+              </Text>
+              {plan.pillOnTitle ? pill : null}
+            </View>
+            {plan.showLine && lines.first ? (
+              <View className="flex-row items-start gap-1.5">
+                {/* One line shows. A screen reader hears every line from it. */}
+                <Text testID={lines.first.testID} numberOfLines={dense ? 1 : 2} accessibilityLabel={lines.spoken} className={`flex-1 text-center text-label ${lineTone(lines.first.kind)}`}>
                   {lines.first.text}
                 </Text>
-              )}
-            </View>
-            {lines.foldable ? (
-              // The "i" pill (`dock-more`) opens the folded lines; the More pill (`dock-more-actions`) folds the quiet buttons.
-              // 24 pt with a 44 pt target that stays clear of the line's words (6 pt gap) and inside the dock's padding.
-              <Pressable
-                testID="dock-more"
-                accessibilityRole="button"
-                accessibilityLabel={expanded ? "Fewer notes" : "More about this moment"}
-                accessibilityState={{ expanded }}
-                hitSlop={{ top: 10, bottom: 10, left: 6, right: 12 }}
-                onPress={() => setOpened(expanded ? null : moment)}
-              >
-                <View className="h-6 w-6 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: t.muted, backgroundColor: t.raised }}>
-                  <Text className="text-label font-medium text-bone">{expanded ? "−" : "i"}</Text>
-                </View>
-              </Pressable>
+                {plan.pillOnTitle ? null : pill}
+              </View>
             ) : null}
           </View>
-        ) : null}
-      </ScrollView>
-      <View ref={block} collapsable={false} onLayout={measure} className="gap-1" style={{ flexShrink: 0 }}>
-        {readout ? <ReadoutView readout={readout} /> : null}
-        {refusal ? (
-          <Text testID="sheet-refusal" numberOfLines={3} className="text-center text-label text-danger">
-            {refusal}
-          </Text>
-        ) : null}
-        <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} onButton={onButton} />
+        </ScrollView>
+        <View
+          ref={block}
+          collapsable={false}
+          onLayout={(event) => {
+            setRoom((now) => ({ ...now, block: Math.round(event.nativeEvent.layout.height) }));
+            measure();
+          }}
+          className={dense ? "gap-0.5" : "gap-1"}
+          style={{ flexShrink: 0 }}
+        >
+          {readout ? <ReadoutView readout={readout} tight={dense} oneLine={readoutLine} /> : null}
+          {refusal ? (
+            <Text testID="sheet-refusal" numberOfLines={3} className="text-center text-label text-danger">
+              {refusal}
+            </Text>
+          ) : null}
+          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} dense={dense} onButton={onButton} />
+        </View>
       </View>
     </View>
   );

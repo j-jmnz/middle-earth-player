@@ -57,6 +57,7 @@ export function ChromeButton({
   tone = "bone",
   variant = "text",
   disabled = false,
+  tight = false,
   accessibilityLabel,
   accessibilityHint,
 }: {
@@ -66,6 +67,8 @@ export function ChromeButton({
   tone?: "bone" | "gold" | "ink" | "muted";
   variant?: "text" | "outline" | "quiet";
   disabled?: boolean;
+  // On a short phone's dock: a 36 pt pill in a 40 pt row, its 44 pt target kept by a 2 pt hit slop (docs/design-system.md, Table).
+  tight?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;
 }) {
@@ -83,11 +86,12 @@ export function ChromeButton({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={{ minHeight: 44, minWidth: 44, justifyContent: "center", paddingVertical: variant === "text" ? 0 : 2 }}
+      hitSlop={tight ? { top: 2, bottom: 2 } : undefined}
+      style={{ minHeight: tight ? 40 : 44, minWidth: 44, justifyContent: "center", paddingVertical: variant === "text" ? 0 : 2 }}
     >
       {({ pressed }) => (
         <View
-          className={`items-center justify-center px-3 ${variant === "text" ? "min-h-11 rounded-tile" : "min-h-10 rounded-pill"}`}
+          className={`items-center justify-center px-3 ${variant === "text" ? "min-h-11 rounded-tile" : tight ? "min-h-9 rounded-pill" : "min-h-10 rounded-pill"}`}
           style={{ backgroundColor: pressed && !disabled ? (ink ? t.paperPressed : t.pressed) : rest, ...(edge ? { borderWidth: 1, borderColor: edge } : {}) }}
         >
           <Text className="text-body font-medium" style={{ color }}>
@@ -112,6 +116,7 @@ export function ChromePrimary({
   disabled = false,
   surface = "night",
   compact = false,
+  tight = false,
   accessibilityHint,
 }: {
   label: string;
@@ -121,6 +126,8 @@ export function ChromePrimary({
   surface?: "night" | "paper";
   // In the table's dock: a 48 pt pill whose label keeps its size (no widest tracking) and wraps to two lines when long.
   compact?: boolean;
+  // A 44 pt pill (not 48) on a short phone's dock.
+  tight?: boolean;
   accessibilityHint?: string;
 }) {
   const paper = surface === "paper";
@@ -137,7 +144,7 @@ export function ChromePrimary({
       onPress={onPress}
     >
       {({ pressed }) => (
-        <View className={`${compact ? "min-h-12 px-3" : "min-h-14 px-5"} items-center justify-center rounded-pill`} style={primaryFill(paper, disabled, pressed)}>
+        <View className={`${compact ? (tight ? "min-h-11 px-3" : "min-h-12 px-3") : "min-h-14 px-5"} items-center justify-center rounded-pill`} style={primaryFill(paper, disabled, pressed)}>
           {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
           <Text numberOfLines={compact ? 2 : 1} className={`text-center font-display text-body uppercase ${compact ? "tracking-wide" : "tracking-widest"}`} style={{ color }}>
             {label}
