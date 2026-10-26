@@ -20,9 +20,10 @@ type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): ResponseOffer[] {
   const offers: ResponseOffer[] = [];
   const order = livingSeats(state);
-  const cards = Object.values(state.cards).sort(
-    (left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }),
-  );
+  // Only the cards with a Response to this trigger are sorted and looked at.
+  const cards = Object.values(state.cards)
+    .filter((instance) => effectsOf(ctx, instance.code).some((effect) => effect.timing === "response" && effect.trigger === event.trigger))
+    .sort((left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }));
   for (const instance of cards) {
     // An event about one card is heard by that card even after it has left play.
     // An event card in the hand hears every event; a card in play hears the events about itself or about the table. The
