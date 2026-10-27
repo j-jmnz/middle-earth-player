@@ -1,17 +1,17 @@
 // The frame the choice tray and the reading panels share (docs/design-system.md, Table, Panels): a card-cornered box at the
-// command column's right edge. The tray is night raised with a hairline edge; a reading panel may stay on paper. It enters
-// decelerating (16 pt up and a fade) and leaves accelerating (MOTION.trayEnter, MOTION.trayLeave), and snaps under reduced motion.
+// command column's right edge, with no drawn edge (user request, 2026-10-27: fewer borders). The choice tray is the dock's own flat
+// night and stands on the dock as its upper part (`joined`); a reading panel stays on paper. It enters decelerating (16 pt up and a
+// fade) and leaves accelerating (MOTION.trayEnter, MOTION.trayLeave), and snaps under reduced motion.
 import { useState, type ReactNode } from "react";
-import { View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { MOTION } from "./motion-tokens.ts";
 import { useOpenMotion } from "./motion-run.ts";
-import { goldSurface, panelSurface, raisedEdge } from "./surfaces.ts";
+import { raisedEdge } from "./surfaces.ts";
 import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 
 const RISE = 16;
-const RADIUS = 20;
+const RADIUS = 16;
 
 export type TrayPlace = { right: number; width: number; bottom: number; top?: number; maxHeight?: number };
 
@@ -26,19 +26,16 @@ export function TrayFrame({
   open,
   place,
   surface = "night",
-  squareFoot = false,
-  accent = false,
+  joined = false,
   testID,
   children,
 }: {
   open: boolean;
   place: TrayPlace;
   surface?: "night" | "paper";
-  // The dock-side foot corner is square (the tray stands on the dock's block).
-  squareFoot?: boolean;
-  // A choice waiting on the player (the choice tray): a goldLine edge, a worked-gold rule along its top and a deep shadow, so it
-  // stands apart from the dock under it, which shares the night surface.
-  accent?: boolean;
+  // The choice tray: it stands on the dock (its foot is the dock's top, its corners there square) in the dock's fill, so the two
+  // read as one panel, the choice above and the answers under it. Its shadow falls up and out, never onto the dock.
+  joined?: boolean;
   testID: string;
   children: ReactNode;
 }) {
@@ -59,21 +56,18 @@ export function TrayFrame({
           bottom: place.bottom,
           ...(place.top != null ? { top: place.top } : {}),
           ...(place.maxHeight != null ? { maxHeight: place.maxHeight } : {}),
-          ...(paper ? { backgroundColor: t.paper } : panelSurface()),
-          borderWidth: 1,
-          borderColor: paper ? t.inkLine : accent ? t.goldLine : t.hairline,
-          ...(accent ? { boxShadow: `${raisedEdge}, 0 10px 28px ${withAlphaHex(t.night, 0.7)}, 0 0 18px ${withAlphaHex(t.gold, 0.1)}` } : {}),
+          backgroundColor: paper ? t.paper : t.raised,
+          boxShadow: paper ? `0 10px 28px ${withAlphaHex(t.night, 0.6)}` : `${raisedEdge}, 0 -10px 24px -8px ${withAlphaHex(t.night, 0.6)}`,
           borderRadius: RADIUS,
-          ...(squareFoot ? { borderBottomRightRadius: 0 } : {}),
+          ...(joined ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}),
           paddingHorizontal: 12,
-          paddingTop: 8,
-          paddingBottom: 8,
+          paddingTop: 10,
+          paddingBottom: joined ? 4 : 8,
           overflow: "hidden",
         },
         motion,
       ]}
     >
-      {accent ? <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, ...goldSurface() }} /> : null}
       {children}
     </Animated.View>
   );

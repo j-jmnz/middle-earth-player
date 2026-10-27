@@ -48,7 +48,11 @@ export function goldPlate(pressed = false): Surface & { borderWidth: number; bor
   return { ...goldSurface(pressed), borderWidth: 1, borderColor: t.goldDeep, boxShadow: pressed ? goldEdge : `${goldEdge}, ${goldGlow}` };
 }
 
-/** A lit tile on a hairline: a stat tile, a card standing for a row (a save, a scenario, a book), a panel's plate. */
+/**
+ * A lit tile: a stat tile, a card standing for a row (a save, a scenario, a book), a panel's plate. No drawn edge: the fill and the
+ * lit top set it off the night (user request, 2026-10-27: fewer borders). The 1 pt edge is kept transparent, so a selected tile
+ * that draws its gold edge over it does not move.
+ */
 export function tileSurface(pressed = false): Surface & { borderWidth: number; borderColor: string; boxShadow?: string } {
-  return { ...panelSurface(pressed), borderWidth: 1, borderColor: t.hairline, ...(pressed ? {} : { boxShadow: raisedEdge }) };
+  return { ...panelSurface(pressed), borderWidth: 1, borderColor: "transparent", ...(pressed ? {} : { boxShadow: raisedEdge }) };
 }

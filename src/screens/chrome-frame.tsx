@@ -197,7 +197,8 @@ export function Panel({
       style={{
         ...(unfilled ? { backgroundColor: "transparent" } : panelSurface(pressed)),
         borderWidth: 1,
-        borderColor: current ? palette.goldLine : palette.hairline,
+        // A filled panel draws no edge (its fill and lit top set it off); one put away keeps the hairline, its only outline.
+        borderColor: current ? palette.goldLine : unfilled ? palette.hairline : "transparent",
         ...(unfilled ? {} : { boxShadow: raisedEdge }),
       }}
     >

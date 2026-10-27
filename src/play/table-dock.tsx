@@ -17,25 +17,29 @@ import { Stats } from "./sheet-paper.tsx";
 import type { Unavailable } from "./sheet-types.ts";
 import type { Dock, DockButton } from "./table-choice.ts";
 import { LineMark } from "./table-chrome.tsx";
-import { panelSurface, tileSurface } from "./surfaces.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { panelSurface, raisedEdge } from "./surfaces.ts";
+import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 
-/** The engine's numbers for the moment, large, and what they come to: raised night in the dock, ink on a paper panel. */
+/** The engine's numbers for the moment, large, and what they come to: on a sunk band in the dock (no drawn edge), ink on a paper panel. */
 // `oneLine`: the result is one line (the choice tray is open over the dock on a short phone); its words stay in the label.
 export function ReadoutView({ readout, surface = "night", tight = false, oneLine = false }: { readout: Readout; surface?: "night" | "paper"; tight?: boolean; oneLine?: boolean }) {
   const paper = surface === "paper";
   return (
-    <View testID={`readout-${readout.kind}`} className={`rounded-tile border px-2 ${tight ? "py-0.5" : "py-1"} ${paper ? "border-inkLine" : "border-hairline bg-raised"}`}>
+    <View
+      testID={`readout-${readout.kind}`}
+      className={`rounded-tile px-2 ${tight ? "py-0.5" : "py-1.5"} ${paper ? "border border-inkLine" : ""}`}
+      style={paper ? undefined : { backgroundColor: withAlphaHex(t.night, 0.5) }}
+    >
       <View className="flex-row items-center justify-center gap-2">
         {readout.stats.map((stat, index) => (
           <View key={stat.word} className="flex-row items-center gap-2">
-            {index > 0 ? <Text className={`text-label ${paper ? "text-inkMuted" : "text-muted"}`}>{readout.join ?? "against"}</Text> : null}
+            {index > 0 ? <Text className={`text-label ${paper ? "text-inkMuted" : "text-faint"}`}>{readout.join ?? "against"}</Text> : null}
             <Stats stats={[stat]} surface={surface} size="title" />
           </View>
         ))}
       </View>
       {readout.result ? (
-        <Text testID="readout-result" numberOfLines={oneLine ? 1 : 3} accessibilityLabel={readout.result} className={`${tight ? "" : "mt-0.5"} text-center text-label ${paper ? "text-ink" : "text-bone"}`}>
+        <Text testID="readout-result" numberOfLines={oneLine ? 1 : 3} accessibilityLabel={readout.result} className={`${tight ? "" : "mt-0.5"} text-center text-label ${paper ? "text-ink" : "text-muted"}`}>
           {readout.result}
         </Text>
       ) : null}
@@ -43,8 +47,15 @@ export function ReadoutView({ readout, surface = "night", tight = false, oneLine
   );
 }
 
-// The tone of a line of words under the title: the guide in bone, the note muted, what the rules refuse faint.
-export const lineTone = (kind: "guide" | "note" | "unavailable") => (kind === "guide" ? "text-bone" : kind === "note" ? "text-muted" : "text-faint");
+// The dock's padding (dock-budget.ts counts it): above the words, under the buttons, and both on a short phone.
+const TOP_PAD = 10;
+const FOOT_PAD = 8;
+const DENSE_PAD = 4;
+// The shadow that lifts the dock (and the tray standing on it) off the felt.
+export const DOCK_SHADOW = `0 8px 24px ${withAlphaHex(t.night, 0.55)}`;
+
+// The tone of a line of words under the title: the guide and the note muted, under the bone title; what the rules refuse faint.
+export const lineTone = (kind: "guide" | "note" | "unavailable") => (kind === "unavailable" ? "text-faint" : "text-muted");
 
 export function TableDock({
   step,
@@ -116,39 +127,56 @@ export function TableDock({
       hitSlop={{ top: 10, bottom: 10, left: 6, right: 12 }}
       onPress={() => pillRef.current?.measureInWindow((_x, y) => onLines?.(Math.round(y)))}
     >
-      <View className="h-6 w-6 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: t.muted, backgroundColor: t.raised }}>
-        <Text className="text-label font-medium text-bone">i</Text>
+      <View className="h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(t.bone, 0.1) }}>
+        <Text className="text-label font-semibold" style={{ color: t.bone }}>
+          i
+        </Text>
       </View>
     </Pressable>
   ) : null;
   const readoutLine = dense && trayOpen;
   return (
     <View style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
-      <View testID="dock" className={`rounded-card px-3 ${dense ? "pb-0.5 pt-0.5" : "pb-1 pt-1.5"}`} style={{ ...tileSurface(), flexShrink: 1 }}>
+      {/* One flat panel with no drawn edge, lifted off the felt by its shadow. While the choice tray is open the tray stands on it
+          as its upper part (tray-frame.tsx): the words are not drawn and the dock's top corners are square, so the two read as one. */}
+      <View
+        testID="dock"
+        className="rounded-card px-3"
+        style={{
+          backgroundColor: t.raised,
+          boxShadow: trayOpen ? DOCK_SHADOW : `${raisedEdge}, ${DOCK_SHADOW}`,
+          paddingTop: trayOpen ? 0 : dense ? DENSE_PAD : TOP_PAD,
+          paddingBottom: dense ? DENSE_PAD : FOOT_PAD,
+          ...(trayOpen ? { borderTopLeftRadius: 0, borderTopRightRadius: 0 } : {}),
+          flexShrink: 1,
+        }}
+      >
         {/* The words above the numbers are budgeted to fit (planWords); the guard scrolls only on a taller screen's long lines. The
             readout, the armed line and every button are pinned to the dock's foot and never scroll away. */}
-        <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0, opacity: trayOpen ? 0 : 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
-          <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))}>
-            <Text testID="sheet-step" numberOfLines={1} className="text-center font-display-bold text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
-              {step}
-            </Text>
-            <View className="flex-row items-start gap-1.5">
-              <Text testID="sheet-title" accessibilityRole="header" accessibilityLabel={title} numberOfLines={plan.titleLines} className="flex-1 text-center font-display text-heading text-bone" style={{ flexShrink: 0, lineHeight: 24 }}>
-                {title}
+        {trayOpen ? null : (
+          <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
+            <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: dense ? 2 : 8 }}>
+              <Text testID="sheet-step" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
+                {step}
               </Text>
-              {plan.pillOnTitle ? pill : null}
-            </View>
-            {plan.showLine && lines.first ? (
               <View className="flex-row items-start gap-1.5">
-                {/* One line shows. A screen reader hears every line from it. */}
-                <Text testID={lines.first.testID} numberOfLines={dense ? 1 : 2} accessibilityLabel={lines.spoken} className={`flex-1 text-center text-label ${lineTone(lines.first.kind)}`}>
-                  {lines.first.text}
+                <Text testID="sheet-title" accessibilityRole="header" accessibilityLabel={title} numberOfLines={plan.titleLines} className="flex-1 font-display text-heading text-bone" style={{ flexShrink: 0 }}>
+                  {title}
                 </Text>
-                {plan.pillOnTitle ? null : pill}
+                {plan.pillOnTitle ? pill : null}
               </View>
-            ) : null}
-          </View>
-        </ScrollView>
+              {plan.showLine && lines.first ? (
+                <View className="mt-0.5 flex-row items-start gap-1.5">
+                  {/* One line shows. A screen reader hears every line from it. */}
+                  <Text testID={lines.first.testID} numberOfLines={dense ? 1 : 2} accessibilityLabel={lines.spoken} className={`flex-1 text-label ${lineTone(lines.first.kind)}`}>
+                    {lines.first.text}
+                  </Text>
+                  {plan.pillOnTitle ? null : pill}
+                </View>
+              ) : null}
+            </View>
+          </ScrollView>
+        )}
         <View
           ref={block}
           collapsable={false}
@@ -157,7 +185,7 @@ export function TableDock({
             measure();
           }}
           className={dense ? "gap-0.5" : "gap-1"}
-          style={{ flexShrink: 0 }}
+          style={{ flexShrink: 0, paddingTop: trayOpen ? (dense ? DENSE_PAD : TOP_PAD) : 0 }}
         >
           {readout ? <ReadoutView readout={readout} tight={dense} oneLine={readoutLine} /> : null}
           {refusal ? (
@@ -165,7 +193,7 @@ export function TableDock({
               {refusal}
             </Text>
           ) : null}
-          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} dense={dense} onButton={onButton} />
+          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} dense={dense} chars={labelChars(room.text)} onButton={onButton} />
         </View>
       </View>
     </View>

@@ -6,12 +6,12 @@
  */
 const palette = {
   // Night surfaces: the page, a panel's base and its lit top edge, the pressed fill, the rules between rows
-  night: "#07080B",
-  dusk: "#0F1116",
-  raised: "#14171D",
-  raisedTop: "#1A1E26",
-  pressed: "#1E222B",
-  hairline: "#24272F",
+  night: "#0B0A08",
+  dusk: "#12110E",
+  raised: "#1A1814",
+  raisedTop: "#221F1A",
+  pressed: "#2A2620",
+  hairline: "#2C2923",
   // Text on night
   bone: "#EEE7D7",
   muted: "#A39B8C",

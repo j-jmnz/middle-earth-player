@@ -2,10 +2,12 @@
 // its loss in full, so the room is as many lines as the longest thing the dock's buttons can say when armed, held the same
 // before and after any of them is armed: arming moves nothing. Pure: a character-per-line estimate of the dock's text width.
 
-// Label type is about 6.6 pt a character; the narrowest dock text (the 210 pt column) is 168 pt wide, so about 25 a line. 24 keeps a margin.
+// Label type is about 6.6 pt a character; the narrowest dock text (the 210 pt column) is 168 pt wide, so about 25 a line. 24 keeps a
+// margin. The dock passes the characters its measured width holds (labelChars in dock-budget.ts); this is the default.
 export const CHARS_PER_LINE = 24;
 export const LINE_PX = 18;
-export const MIN_LINES = 2;
+// No line is held when nothing in the moment can be said there (no button arms, nothing waits): the room is the bar's alone.
+export const MIN_LINES = 0;
 export const MAX_LINES = 4;
 // The bar that runs down under the text (2 pt) and its gap, reserved whether or not a button is armed.
 export const BAR_PX = 4;
@@ -29,7 +31,7 @@ export function lineCount(text: string, chars: number = CHARS_PER_LINE): number 
   return lines + Math.max(0, Math.ceil((used === 0 ? 0 : used) / chars) - 1);
 }
 
-/** The lines the armed line holds for these texts (each armed button's words, what the primary waits for): MIN_LINES to MAX_LINES. */
+/** The lines the armed line holds for these texts (each armed button's words, what the primary waits for): the longest, up to MAX_LINES. */
 export function armedLines(texts: readonly (string | null)[], chars: number = CHARS_PER_LINE): number {
   const most = Math.max(0, ...texts.map((text) => (text ? lineCount(text, chars) : 0)));
   return Math.min(MAX_LINES, Math.max(MIN_LINES, most));

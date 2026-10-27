@@ -6,7 +6,7 @@ import type { Choice } from "./table-choice.ts";
 import { tableLayout } from "./layout.ts";
 import { TOP_BAR } from "./top-bar-layout.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
-import { outsideLayers, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
+import { COLUMN_PAD, outsideLayers, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
 
 // The choice tray (docs/design-system.md, Table; phase 21): its tiles, its count, what a tap outside it does, and where it sits
 // against the command column and the dock. No rule is implemented here.
@@ -121,10 +121,10 @@ describe("where the tray sits", () => {
     return { commandWidth, box: trayBox({ commandWidth, insetRight, screenHeight: height, barBottom: TOP_BAR, anchorTop }) };
   };
 
-  it("is the command column's width, at most 340", () => {
+  it("is the dock's width (the command column less its padding), at most 340", () => {
     expect(phone(844, 390, 200).commandWidth).toBe(253);
-    expect(phone(844, 390, 200).box.width).toBe(253);
-    expect(phone(667, 375, 200).box.width).toBe(210);
+    expect(phone(844, 390, 200).box.width).toBe(253 - 2 * COLUMN_PAD);
+    expect(phone(667, 375, 200).box.width).toBe(210 - 2 * COLUMN_PAD);
     const wide = phone(1100, 500, 300);
     expect(wide.commandWidth).toBe(280);
     expect(wide.box.width).toBeLessThanOrEqual(TRAY_MAX);
@@ -138,9 +138,9 @@ describe("where the tray sits", () => {
         const { box, commandWidth } = phone(width, height, 200, inset);
         const canvas = width - 2 * inset - commandWidth;
         const layout = tableLayout(canvas, height - TOP_BAR, views, piles, {});
-        // The canvas ends where the command column begins; the tray starts there.
-        const trayLeft = canvas + commandWidth - box.width;
-        expect(trayLeft, `${width} inset ${inset}`).toBe(canvas);
+        // The canvas ends where the command column begins; the tray starts where the dock does, the column's padding inside it.
+        const trayLeft = canvas + commandWidth - (box.right - inset) - box.width;
+        expect(trayLeft, `${width} inset ${inset}`).toBe(canvas + COLUMN_PAD);
         for (const id of ["encounterDeck", "encounterDiscard"] as const) {
           const rect = layout.piles[id];
           expect(rect.x + rect.w, `${id} at ${width} inset ${inset}`).toBeLessThanOrEqual(trayLeft);
@@ -150,11 +150,11 @@ describe("where the tray sits", () => {
     }
   });
 
-  it("ends above the dock's block and rises no higher than the top bar", () => {
+  it("stands on the dock's block and rises no higher than the top bar", () => {
     const { box } = phone(844, 390, 210, 47);
-    expect(390 - box.bottom).toBe(206);
+    expect(390 - box.bottom).toBe(210);
     expect(box.maxHeight + TOP_BAR + box.bottom).toBe(390);
-    expect(box.right).toBe(47);
+    expect(box.right).toBe(47 + COLUMN_PAD);
   });
 
   it("is never less than a minimum tall, even when the dock leaves no room", () => {

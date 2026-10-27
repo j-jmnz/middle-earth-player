@@ -25,7 +25,7 @@ export type Scene = {
   vignette: number;
 };
 
-const night = "#07080B";
+const night = "#0B0A08";
 
 export const scenes: Record<SceneName, Scene> = {
   // Campaigns and Scenarios: a moonlit night over far mountains, a cold light high on the right and an ember low on the left.

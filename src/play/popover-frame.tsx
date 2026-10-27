@@ -26,11 +26,9 @@ export type PopoverRowItem = {
   label: string;
   accessibilityLabel?: string;
   accessibilityHint?: string;
-  // Beside the label, muted.
-  detail?: string;
-  // A muted line under the label, inside the row.
-  note?: string;
   icon?: IconName | null;
+  // A mark drawn as views when no printed icon fits: the door of Leave the table.
+  glyph?: "leave";
   // The row opens a screen or a panel: a chevron at its right says so.
   opens?: boolean;
 };
@@ -56,31 +54,30 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
             alignItems: "center",
             gap: 10,
             paddingHorizontal: 10,
-            paddingVertical: item.note ? 6 : 0,
             borderRadius: 10,
             backgroundColor: pressed ? t.pressed : "transparent",
           }}
         >
           {item.icon ? <GameIcon name={item.icon} size={18} tint="bone" /> : null}
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text className="text-body font-medium" style={{ color: t.bone }} numberOfLines={1}>
-              {item.label}
-            </Text>
-            {item.note ? (
-              <Text className="text-label" style={{ color: t.muted }} numberOfLines={1}>
-                {item.note}
-              </Text>
-            ) : null}
-          </View>
-          {item.detail ? (
-            <Text className="text-label" style={{ color: t.muted }} numberOfLines={1}>
-              {item.detail}
-            </Text>
-          ) : null}
+          {item.glyph === "leave" ? <LeaveMark color={t.muted} /> : null}
+          <Text className="flex-1 text-body font-medium" style={{ color: t.bone, minWidth: 0 }} numberOfLines={1}>
+            {item.label}
+          </Text>
           {item.opens ? <Chevron direction="next" color={t.faint} /> : null}
         </View>
       )}
     </Pressable>
+  );
+}
+
+/** A door with an arrow leaving it, 18 pt, drawn as views (no printed icon fits): the frame open at its right, the arrow out through it. */
+function LeaveMark({ color }: { color: string }) {
+  return (
+    <View accessible={false} importantForAccessibility="no-hide-descendants" style={{ width: 18, height: 18 }}>
+      <View style={{ position: "absolute", left: 1, top: 2, width: 9, height: 14, borderWidth: 1.5, borderRightWidth: 0, borderColor: color, borderTopLeftRadius: 2, borderBottomLeftRadius: 2 }} />
+      <View style={{ position: "absolute", left: 6, top: 8.25, width: 10, height: 1.5, backgroundColor: color }} />
+      <View style={{ position: "absolute", left: 10, top: 6, width: 6, height: 6, borderTopWidth: 1.5, borderRightWidth: 1.5, borderColor: color, transform: [{ rotate: "45deg" }] }} />
+    </View>
   );
 }
 
