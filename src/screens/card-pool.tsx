@@ -22,6 +22,9 @@ import { ToastView } from "./toast-view";
 
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
+// FlashList keeps every cell it has ever mounted in its recycle pool unless told otherwise. A screen of three-across cards is about
+// twenty cells, so this keeps a screen's worth for reuse and unmounts the rest as they scroll off.
+const RECYCLE_POOL = 24;
 
 function poolKey(item: PoolRowCard): string {
   return item.code;
@@ -178,7 +181,6 @@ export function CardPool({
       if (!grid) {
         return <PoolCardRow item={item} adding={adding} loss={loss} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
       }
-      if (cellWidth <= 0) return null;
       return (
         <PoolCardCell
           item={item}
@@ -244,24 +246,29 @@ export function CardPool({
             setListWidth((current) => (current === next ? current : next));
           }}
         >
-          <FlashList
-            key={view}
-            data={visible}
-            keyExtractor={poolKey}
-            numColumns={grid ? columns : 1}
-            style={{ flex: 1 }}
-            extraData={draft}
-            keyboardShouldPersistTaps="handled"
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={viewabilityConfig}
-            ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} />}
-            ListEmptyComponent={
-              <BodyText testID="pool-empty" tone="muted" className="mt-6">
-                No cards match.
-              </BodyText>
-            }
-            renderItem={renderItem}
-          />
+          {/* Mounted once the width is measured, never before: a grid cell drawn at no width is no height, and FlashList then lays
+              out every card of the pool as on screen and mounts all of them (852 at once), which it never gives back. */}
+          {cellWidth > 0 ? (
+            <FlashList
+              key={view}
+              data={visible}
+              keyExtractor={poolKey}
+              numColumns={grid ? columns : 1}
+              style={{ flex: 1 }}
+              extraData={draft}
+              keyboardShouldPersistTaps="handled"
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
+              ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} />}
+              ListEmptyComponent={
+                <BodyText testID="pool-empty" tone="muted" className="mt-6">
+                  No cards match.
+                </BodyText>
+              }
+              renderItem={renderItem}
+              maxItemsInRecyclePool={RECYCLE_POOL}
+            />
+          ) : null}
         </View>
         <ToastView />
         {adding ? (
