@@ -151,7 +151,7 @@ export function SeatPicker({
         </View>
       ) : (
         <View testID={`briefing-party-${index}`} className="rounded-card p-4" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.goldLine }}>
-          {/* The name gets the card's whole width (a long one never breaks inside a word); Change sits under the counts. */}
+          {/* The name gets the card's whole width (a long one never breaks inside a word); Change sits beside the counts, under it. */}
           <Text className="font-display text-title text-bone">{pickedDeck.name}</Text>
           <View className="mt-1 flex-row items-center justify-between gap-3">
             <Label className="flex-1">{deckCountLine(pickedDeck)}</Label>
