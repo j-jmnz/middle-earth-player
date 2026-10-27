@@ -1,7 +1,7 @@
 # Phase 28 — Campaign registry, saga gating, log, booklets
 
 Depends on: phase 27
-Blocks: phase 29
+Blocks: phase 28b
 
 Plan: [docs/plans/mirkwood-paths.md](../plans/mirkwood-paths.md), "Phase 28" and "Notes for the orchestrator and the implementer agent".
 

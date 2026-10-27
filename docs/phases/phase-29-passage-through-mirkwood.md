@@ -1,7 +1,7 @@
 # Phase 29 — Passage Through Mirkwood
 
-Engine half depends on: phase 28
-Phone half depends on: phase 28
+Engine half depends on: phase 28b
+Phone half depends on: phase 28b
 Blocks: phase 30
 
 Plan: [docs/plans/mirkwood-paths.md](../plans/mirkwood-paths.md), "Phases 29–33" and "Notes for the orchestrator and the implementer agent".
