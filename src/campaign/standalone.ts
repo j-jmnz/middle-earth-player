@@ -15,7 +15,7 @@ import type { ScenarioState } from "../rules/reduce.ts";
 import { resolutionResult } from "../rules/resolution.ts";
 import type { StartScenario } from "../rules/setup.ts";
 
-import { deckHasRingBearer, loadoutProblems, type LoadoutInput, type Problem } from "./briefing.ts";
+import { loadoutProblems, needsRingBearerSlot, type LoadoutInput, type Problem } from "./briefing.ts";
 import type { LoadoutSeat } from "./loadout.ts";
 import { isPlayable } from "./playable.ts";
 import { beginActive, type ActiveScenario, type ReplayObserver } from "./replay.ts";
@@ -83,7 +83,7 @@ export type StandaloneBriefing = { problems: Problem[]; needsRingBearer: boolean
 
 // The briefing and the seats it would deal, from one pass over the loadout.
 function plan(input: StandaloneInput): { briefing: StandaloneBriefing; seats: LoadoutSeat[] } {
-  const needsRingBearer = !deckHasRingBearer(input.world, input.seats[0]);
+  const needsRingBearer = needsRingBearerSlot(input.world, input.seats[0]);
   const playable = isPlayable(input.world.scenario.id)
     ? []
     : [{ rule: "Not playable yet", message: `${input.world.scenario.name} is not playable yet: some of its cards have no effect record.` }];

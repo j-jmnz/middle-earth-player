@@ -1,12 +1,16 @@
 import type { PrintedCard } from "../rules/printed.ts";
 
-// The Fellowship saga rules on a briefing loadout: one deck and its heroes per seat. Pure. Each error
-// names the card and the rule. The Ring-bearer comes from the player's own heroes and is never inserted.
+// The loadout rules of a briefing: one deck and its heroes per seat. Pure. Each error names the card and the rule. In a saga
+// campaign (the Fellowship of the Ring) the Fellowship saga rules apply: a Ring-bearer from the player's own heroes, one
+// Fellowship-sphere hero, no second Frodo, no One Ring in a deck, a fourth hero only as the Ring-bearer. Outside a saga none of
+// them runs, and a Fellowship-sphere hero is refused (mec109.the-fellowship-sphere: "can only be used when playing the
+// scenarios in the saga expansions").
 
 export type LoadoutSeat = { heroes: readonly string[]; deck: readonly string[] };
 
 export type LoadoutRule =
   | "unknownCard"
+  | "fellowshipOutsideSaga"
   | "twoFellowshipHeroes"
   | "secondFrodo"
   | "noRingBearer"
@@ -26,7 +30,7 @@ function isRingBearer(card: PrintedCard): boolean {
   return isFellowship(card) && card.traits.includes("Ring-bearer");
 }
 
-export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>): LoadoutError[] {
+export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga = true): LoadoutError[] {
   const errors: LoadoutError[] = [];
   const fail = (rule: LoadoutRule, card: PrintedCard, why: string) =>
     errors.push({ rule, code: card.code, card: card.name, message: `${card.name} (${card.code}): ${why}` });
@@ -40,6 +44,20 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
   const heroCards = seats.map((seat) => seat.heroes.map(known));
   const deckCards = seats.map((seat) => seat.deck.map(known));
   if (errors.length > 0) return errors;
+
+  if (!saga) {
+    for (const card of heroCards.flat()) {
+      if (card != null && isFellowship(card)) fail("fellowshipOutsideSaga", card, "a Fellowship-sphere hero can only be used when playing the scenarios in the saga expansions (mec109.the-fellowship-sphere)");
+    }
+    // The same hero twice is still refused (rr.unique-cards).
+    const names = new Set<string>();
+    for (const card of heroCards.flat()) {
+      if (card == null || card.type !== "hero") continue;
+      if (names.has(card.name)) fail("sameHero", card, `only one ${card.name} can be in play, so no two heroes may share that title`);
+      names.add(card.name);
+    }
+    return errors;
+  }
 
   // The first seat needs a Ring-bearer of its own.
   const first = heroCards[0] ?? [];

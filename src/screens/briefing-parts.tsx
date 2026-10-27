@@ -62,7 +62,7 @@ export type BriefingDecks = {
  * The saved decks in the Decks tab's order (read again on focus, so a deck finished through Open in Decks comes back
  * ready, and once the starter decks are inserted), the Ring-bearer candidates, the hero faces, readiness and the filter.
  */
-export function useBriefingDecks(): BriefingDecks {
+export function useBriefingDecks(saga = true): BriefingDecks {
   const { catalog, user } = useDatabases();
   // The starter decks are inserted just after launch; read the list again when that finishes.
   const seeded = useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending" as const);
@@ -73,16 +73,19 @@ export function useBriefingDecks(): BriefingDecks {
       setSavedDecks(seeded === "pending" ? [] : listDecks(user));
     }, [seeded, user]),
   );
+  // The Ring-bearer candidates belong to a saga campaign; outside one the briefing has no such slot.
   const candidates = useMemo(
     () =>
-      catalog
+      !saga
+        ? []
+        : catalog
         .select({ code: cards.code, name: cards.name, packName: packs.name })
         .from(cards)
         .leftJoin(packs, eq(packs.code, cards.packCode))
         .where(and(eq(cards.typeCode, "hero"), eq(cards.sphereCode, "fellowship"), like(cards.traits, "%Ring-bearer%")))
         .orderBy(cards.code)
         .all(),
-    [catalog],
+    [catalog, saga],
   );
   const faces = useMemo(
     () => deckFaces(catalog, [...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)])]),

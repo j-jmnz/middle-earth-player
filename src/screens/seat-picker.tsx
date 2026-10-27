@@ -33,6 +33,7 @@ export function SeatPicker({
   heroes,
   fallen,
   needsRingBearer,
+  saga = true,
   ringBearer,
   onPick,
   onRingBearer,
@@ -46,6 +47,8 @@ export function SeatPicker({
   // Heroes the campaign log lists as fallen; none in a standalone game.
   fallen: readonly string[];
   needsRingBearer: boolean;
+  // The campaign is a saga: its party is "your fellowship". Outside one there is no Ring-bearer slot (needsRingBearer is false).
+  saga?: boolean;
   ringBearer: string | null;
   onPick: (deckId: string) => void;
   onRingBearer: (code: string | null) => void;
@@ -62,7 +65,7 @@ export function SeatPicker({
   const heroNames = (codes: readonly string[]) => codes.map(nameOf).join(", ");
   const slot = index === 0 && needsRingBearer;
   const choosing = !pickedDeck || changing;
-  const title = seatCount === 1 ? "Your fellowship" : `Seat ${index + 1}`;
+  const title = seatCount === 1 ? (saga ? "Your fellowship" : "Your party") : `Seat ${index + 1}`;
   // A Ring-bearer the deck brings itself is one of the candidates (a Fellowship hero with the Ring-bearer trait).
   const carries = (code: string) => candidates.some((candidate) => candidate.code === code);
 

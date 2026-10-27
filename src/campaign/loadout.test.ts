@@ -110,3 +110,28 @@ describe("Fellowship loadout", () => {
     expect(validateLoadout([seat([SAGA_FRODO, "nope"])], cards)[0]).toMatchObject({ rule: "unknownCard", code: "nope" });
   });
 });
+
+describe("loadout outside a saga (Mirkwood Paths, The Dark of Mirkwood)", () => {
+  it("needs no Ring-bearer: three plain heroes are dealt", () => {
+    expect(validateLoadout([seat(["h1", "h2", "h3"])], cards, false)).toEqual([]);
+    // The same loadout in the saga still has its first-seat error, so the default is unchanged.
+    expect(validateLoadout([seat(["h1", "h2", "h3"])], cards).map((error) => error.rule)).toEqual(["noRingBearer"]);
+  });
+
+  it("refuses a Fellowship-sphere hero and cites the rule", () => {
+    for (const hero of [SAGA_FRODO, FELLOWSHIP_ARAGORN]) {
+      const errors = validateLoadout([seat([hero, "h1"])], cards, false);
+      expect(errors.map((error) => error.rule)).toEqual(["fellowshipOutsideSaga"]);
+      expect(errors[0]?.message).toContain("mec109.the-fellowship-sphere");
+    }
+  });
+
+  it("skips the saga-only checks: another Frodo, The One Ring and a fourth hero are not this rule's business", () => {
+    expect(validateLoadout([seat([SPIRIT_FRODO, "h1"], [...DECK, OTHER_SAGA_FRODO])], cards, false)).toEqual([]);
+    expect(validateLoadout([seat(["h1", "h2", "h3", "h4"], [...DECK, RING])], cards, false)).toEqual([]);
+  });
+
+  it("still refuses the same hero in two seats (rr.unique-cards)", () => {
+    expect(validateLoadout([seat(["h1", "h2"]), seat(["h1", "h3"])], cards, false).map((error) => error.rule)).toEqual(["sameHero"]);
+  });
+});

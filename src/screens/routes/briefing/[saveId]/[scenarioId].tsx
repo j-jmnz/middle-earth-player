@@ -36,7 +36,7 @@ export default function Briefing() {
 
   const campaign = save ? campaignOf(save.campaignId) : null;
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
-  const briefingDecks = useBriefingDecks();
+  const briefingDecks = useBriefingDecks(campaign?.saga ?? true);
   const { savedDecks, candidates } = briefingDecks;
 
   const seatCount = save?.seatCount ?? 1;
@@ -158,6 +158,7 @@ export default function Briefing() {
           heroes={seat.heroes}
           fallen={fallen}
           needsRingBearer={result.needsRingBearer}
+          saga={campaign?.saga ?? true}
           ringBearer={ringBearer}
           onPick={(deckId) => pick(index, deckId)}
           onRingBearer={setRingBearer}

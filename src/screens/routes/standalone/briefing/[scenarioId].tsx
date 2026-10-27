@@ -27,8 +27,6 @@ export default function StandaloneBriefing() {
   const scenarioId = routeCode(params.scenarioId);
   const fromId = routeCode(params.from);
   const { catalog, user } = useDatabases();
-  const briefingDecks = useBriefingDecks();
-  const { savedDecks, candidates } = briefingDecks;
 
   // Play again: the finished game's choices, read once. A deck deleted since is simply not picked.
   const previous = useMemo(() => (fromId ? (readStandalone(user, fromId)?.game ?? null) : null), [user, fromId]);
@@ -42,6 +40,8 @@ export default function StandaloneBriefing() {
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
   // The box the scenario is printed in decides the campaign flags (saga, booklet) a standalone game follows.
   const campaign = scenarioId ? campaignOfScenario(scenarioId) : null;
+  const briefingDecks = useBriefingDecks(campaign?.saga ?? true);
+  const { savedDecks, candidates } = briefingDecks;
 
   const seats: BriefingSeat[] = useMemo(
     () =>
@@ -131,6 +131,7 @@ export default function StandaloneBriefing() {
           heroes={seat.heroes}
           fallen={[]}
           needsRingBearer={result.needsRingBearer}
+          saga={campaign.saga}
           ringBearer={ringBearer}
           onPick={(deckId) => pick(index, deckId)}
           onRingBearer={setRingBearer}

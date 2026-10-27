@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState, type ComponentRef } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
+import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
 
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";

@@ -38,7 +38,7 @@ export type LoadoutInput = Pick<BriefingInput, "world" | "seatCount" | "seats" |
 export type Briefing = {
   problems: Problem[];
   needs: Need | null;
-  // The Ring-bearer slot is required: the first seat's deck has no Fellowship Ring-bearer.
+  // The Ring-bearer slot is required: a saga campaign's first seat deck has no Fellowship Ring-bearer. Never outside a saga.
   needsRingBearer: boolean;
   // What the hero changes add to the permanent threat penalty. Zero when none, or when the campaign card waives it.
   penaltyAdded: number;
@@ -52,6 +52,11 @@ export function isRingBearerCard(world: World, code: string): boolean {
   return card != null && card.type === "hero" && card.sphere === "fellowship" && card.traits.includes("Ring-bearer");
 }
 
+/** The Ring-bearer slot is asked for only in a saga campaign, when the first seat's deck brings none. */
+export function needsRingBearerSlot(world: World, seat: BriefingSeat | undefined): boolean {
+  return world.campaign.saga && !deckHasRingBearer(world, seat);
+}
+
 export function deckHasRingBearer(world: World, seat: BriefingSeat | undefined): boolean {
   return (seat?.heroes ?? []).some((code) => isRingBearerCard(world, code));
 }
@@ -60,13 +65,14 @@ export function deckHasRingBearer(world: World, seat: BriefingSeat | undefined):
 // deck brings no Ring-bearer. A fallen hero is not special-cased here: step 2 of the checklist names it.
 export function loadoutOf(input: LoadoutInput): LoadoutSeat[] {
   return input.seats.slice(0, input.seatCount).map((seat, index) => {
-    const slot = index === 0 && input.ringBearer && !deckHasRingBearer(input.world, seat) ? [input.ringBearer] : [];
+    const slot = input.world.campaign.saga && index === 0 && input.ringBearer && !deckHasRingBearer(input.world, seat) ? [input.ringBearer] : [];
     return { heroes: [...slot, ...seat.heroes], deck: seat.deck };
   });
 }
 
 const RULE_OF: Readonly<Record<string, string>> = {
   unknownCard: "Every card is in the catalog",
+  fellowshipOutsideSaga: "Fellowship heroes only in a saga",
   twoFellowshipHeroes: "Only one Fellowship-sphere hero may start",
   secondFrodo: "One version of Frodo",
   noRingBearer: "A Ring-bearer is required",
@@ -106,7 +112,7 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[]):
   });
   const loadout = loadoutOf(input);
   if (problems.length === 0) {
-    for (const error of validateLoadout(loadout, world.cards)) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
+    for (const error of validateLoadout(loadout, world.cards, world.campaign.saga)) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
   }
   return { problems, loadout };
 }
@@ -118,7 +124,7 @@ function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSea
 export function briefing(input: BriefingInput): Briefing {
   const { world, log } = input;
   const { problems, loadout } = check(input);
-  const needsRingBearer = !deckHasRingBearer(world, input.seats[0]);
+  const needsRingBearer = needsRingBearerSlot(world, input.seats[0]);
   const waived = recordInstructions(world.effects, world.scenario.campaignCard, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty");
   const empty: Briefing = { problems, needs: null, needsRingBearer, penaltyAdded: 0, penaltyWaived: waived, steps: [], dealable: false };
   if (problems.length > 0) return empty;
