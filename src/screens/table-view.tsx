@@ -8,7 +8,7 @@ import { BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
-import { backStep } from "../play/back";
+import { backStep, cancelScrub, scrubOpen } from "../play/back";
 import { spotlightOpen } from "../play/spotlight-gate";
 import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
@@ -167,14 +167,14 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       const step = backStep({
         spotlightOpen: spotlightOpen(store.getState().spotlight),
-        menuOpen, moreOpen, linesOpen,
+        scrubOpen: scrubOpen(), menuOpen, moreOpen, linesOpen,
         previewOpen: preview != null,
         readingOpen: reading != null,
         overlayOpen: choice.overlayOpen,
         panelOpen: choice.panelOpen,
       });
       if (step === "skipSpotlight") store.getState().endSpotlight("skipped");
-      else if (step === "closeMenu") setMenuOpen(false);
+      else if (step === "cancelScrub") cancelScrub(); else if (step === "closeMenu") setMenuOpen(false);
       else if (step === "closeMore" || step === "closeLines") closeMore();
       else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
       else if (step === "closeReading") setReading(null);
