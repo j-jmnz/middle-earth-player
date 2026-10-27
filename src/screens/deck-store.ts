@@ -104,6 +104,7 @@ export function deckFaces<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map
       threat: cards.threat,
       text: cards.text,
       errata: cards.errata,
+      cost: cards.cost,
     })
     .from(cards)
     .where(inArray(cards.code, unique))

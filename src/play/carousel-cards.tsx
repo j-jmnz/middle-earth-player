@@ -5,6 +5,7 @@ import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 
 import type { CarouselPhase, CarouselStep } from "./carousel.ts";
 import { toggleStop, type TableSettings } from "./table-settings.ts";
+import { goldSurface } from "./surfaces.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 export const ROW = 44;
@@ -156,7 +157,7 @@ export function PhaseCard({
         <Text
           accessibilityRole="header"
           accessibilityLabel={`${phase.name} phase${past ? ", done this round" : current ? ", now" : ""}`}
-          className="font-display text-body uppercase"
+          className="font-display-bold text-body uppercase"
           style={{
             color: current ? t.gold : past ? t.muted : t.bone,
             lineHeight: 22,
@@ -164,7 +165,7 @@ export function PhaseCard({
         >
           {phase.name}
         </Text>
-        {/* RingMark's done state (src/screens/chrome.tsx; src/play cannot import it): a solid gold ring. */}
+        {/* RingMark's done state (src/screens/chrome-marks.tsx; src/play cannot import it): a disc of worked gold. */}
         {past ? (
           <View
             testID={`carousel-done-${phase.id}`}
@@ -174,7 +175,7 @@ export function PhaseCard({
               width: 12,
               height: 12,
               borderRadius: 6,
-              backgroundColor: t.gold,
+              ...goldSurface(),
             }}
           />
         ) : null}

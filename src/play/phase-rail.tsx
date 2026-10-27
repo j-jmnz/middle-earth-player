@@ -1,5 +1,5 @@
 // The phase rail in the top bar's middle (docs/design-system.md, Table; phase 20): a pill holding the round, the phase in gold
-// Marcellus caps and the step, with the previous and next phase beside it when there is room. A tap opens the phase carousel
+// Cinzel capitals and the step, with the previous and next phase beside it when there is room. A tap opens the phase carousel
 // (phase-carousel.tsx); the rail itself sends no intent. Phase changes slide the neighbor names one place and flash the pill's
 // edge, a step change cross-fades the step (MOTION.railSlide, railFlash, railStep); all of it snaps under reduced motion and never gates a rule.
 import { useEffect, useMemo, useRef } from "react";
@@ -78,7 +78,7 @@ function Neighbor({ side, name, stopAhead }: { side: "previous" | "next"; name: 
   const mark = (
     <View style={{ width: STOP_MARK, alignItems: "center" }}>
       {side === "next" && stopAhead ? (
-        <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display text-label text-gold">
+        <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-gold">
           S
         </Text>
       ) : null}
@@ -171,6 +171,7 @@ export function PhaseRail({
               borderRadius: 18,
               paddingHorizontal: 10,
               paddingVertical: 1,
+              backgroundColor: withAlphaHex(t.night, 0.72),
             },
             edge,
           ]}
@@ -199,8 +200,10 @@ export function PhaseRail({
                   numberOfLines={1}
                   adjustsFontSizeToFit
                   minimumFontScale={0.85}
-                  className="font-display text-body uppercase text-gold"
+                  className="font-display-bold uppercase text-gold"
                   style={{
+                    // 14 pt: top-bar-layout.ts counts the pill's floor from this size and Cinzel Bold's capitals.
+                    fontSize: 14,
                     lineHeight: 20,
                     textShadowColor: t.gold,
                     textShadowRadius: 8,
@@ -212,7 +215,7 @@ export function PhaseRail({
               ) : null}
               {/* Without the neighbors there is no chevron to carry the S: it stands in the pill, in the room the floor keeps. */}
               {!wide && stopAhead ? (
-                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display text-label text-gold" style={{ marginLeft: 4, lineHeight: 20 }}>
+                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-gold" style={{ marginLeft: 4, lineHeight: 20 }}>
                   S
                 </Text>
               ) : null}

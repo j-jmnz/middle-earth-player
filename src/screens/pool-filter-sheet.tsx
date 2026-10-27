@@ -152,10 +152,11 @@ function Chip({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      className={`mb-2 mr-2 min-h-11 flex-row items-center gap-2 rounded-pill px-3 ${selected ? "bg-gold" : "bg-paperPressed"}`}
+      className="mb-2 mr-2 min-h-11 flex-row items-center gap-2 rounded-tile px-3"
+      style={selected ? { backgroundColor: palette.ink } : { borderWidth: 1, borderColor: palette.inkLine }}
     >
       {mark ? <SphereMark sphere={mark} /> : null}
-      <Text className={selected ? "text-body font-semibold text-onGold" : "text-body text-ink"}>{label}</Text>
+      <Text className={selected ? "text-body font-semibold text-paper" : "text-body text-ink"}>{label}</Text>
     </Pressable>
   );
 }

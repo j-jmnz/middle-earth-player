@@ -62,7 +62,7 @@ function CarouselHead({
         </View>
         {stopAhead ? (
           <View testID="carousel-stop-ahead" accessible accessibilityLabel={STOP_AHEAD_WORDS} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-            <Text className="font-display text-label text-gold">S</Text>
+            <Text className="font-display-bold text-label text-gold">S</Text>
             <Text className="text-label" style={{ color: t.muted }}>
               {STOP_AHEAD_WORDS}
             </Text>

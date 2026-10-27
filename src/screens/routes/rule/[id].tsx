@@ -1,8 +1,8 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 
 import { CardTextView } from "../../../play/card-text-view";
-import { BodyText, Eyebrow, Label, NavBar, Screen, ScreenTitle, TextButton } from "../../chrome";
+import { BodyText, Eyebrow, Label, NavBar, Panel, Screen, ScreenScroll, ScreenTitle, SecondaryButton, TextButton } from "../../chrome";
 import { goBack } from "../../go-back";
 import { routeCode } from "../../route-code";
 import { GLOSSARY, bookPage, glossaryEntry, paragraphs, seeAlso } from "../../rules-glossary";
@@ -34,27 +34,32 @@ export default function Rule() {
   return (
     <Screen scene="plain" testID="rule">
       {back}
-      <ScrollView className="min-h-0 flex-1" contentContainerClassName="gap-4 pb-safe pt-2">
+      <ScreenScroll top={8}>
+        <View className="gap-4 pb-safe">
         <View className="gap-1">
           <Eyebrow>{entry.source}</Eyebrow>
           <ScreenTitle size="title">{entry.title}</ScreenTitle>
           {/* A rule from a book the app carries opens the reader on its page; Close comes back here. */}
           {book ? (
-            <View className="-mx-3 flex-row">
-              <TextButton
+            <View className="mt-2 flex-row">
+              <SecondaryButton
                 label={`Open in book · page ${book.page}`}
+                icon="lore"
                 testID="rule-open-book"
                 tone="gold"
+                compact
                 accessibilityLabel={`Open ${book.name} at page ${book.page}`}
                 onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: book.id, page: String(book.page) } })}
               />
             </View>
           ) : null}
         </View>
-        <CardTextView text={body.join("\n")} testID="rule-text" />
+        <Panel>
+          <CardTextView text={body.join("\n")} testID="rule-text" />
+        </Panel>
         {links.length > 0 ? (
           <View testID="rule-see-also">
-            <Label>See also</Label>
+            <Eyebrow tone="moon">See also</Eyebrow>
             <View className="-mx-3 flex-row flex-wrap items-center">
               {links.map(({ name, entry: target }) =>
                 target ? (
@@ -68,7 +73,8 @@ export default function Rule() {
             </View>
           </View>
         ) : null}
-      </ScrollView>
+        </View>
+      </ScreenScroll>
     </Screen>
   );
 }

@@ -6,6 +6,7 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { MOTION } from "./motion-tokens.ts";
 import { useOpenMotion } from "./motion-run.ts";
+import { panelSurface } from "./surfaces.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 const RISE = 16;
@@ -53,7 +54,7 @@ export function TrayFrame({
           bottom: place.bottom,
           ...(place.top != null ? { top: place.top } : {}),
           ...(place.maxHeight != null ? { maxHeight: place.maxHeight } : {}),
-          backgroundColor: paper ? t.paper : t.raised,
+          ...(paper ? { backgroundColor: t.paper } : panelSurface()),
           borderWidth: 1,
           borderColor: paper ? t.inkLine : t.hairline,
           borderRadius: RADIUS,

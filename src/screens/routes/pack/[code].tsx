@@ -90,7 +90,7 @@ export default function PackCards() {
     <Screen>
       <NavBar backTestID="pack-back" backLabel="Packs" onBack={() => goBack(router, "/packs")} />
       <View className="pt-2">
-        <ScreenTitle>{pack?.name ?? "Pack"}</ScreenTitle>
+        <ScreenTitle size="title">{pack?.name ?? "Pack"}</ScreenTitle>
       </View>
       {!pack ? (
         <BodyText className="mt-6">{`Pack ${code} is not in the catalog.`}</BodyText>

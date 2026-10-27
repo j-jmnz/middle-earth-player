@@ -35,7 +35,7 @@ export function LinesPopover({ open, top, words, commandWidth, insetRight, onClo
       <PopoverRow item={{ testID: "dock-more-lines-close", label: "✕ Close", accessibilityLabel: "Close the notes" }} rowRef={close} onPress={onClose} />
       <ScrollView testID="dock-more-lines-scroll" style={{ maxHeight: maxHeight - CLOSE_ROW - 8 }} showsVerticalScrollIndicator={false}>
         <View style={{ paddingHorizontal: 14, paddingBottom: 10, gap: 4 }}>
-          <Text testID="dock-more-lines-title" accessibilityRole="header" className="font-display text-body" style={{ color: t.bone }}>
+          <Text testID="dock-more-lines-title" accessibilityRole="header" className="font-display text-heading" style={{ color: t.bone, lineHeight: 24 }}>
             {words.title}
           </Text>
           {all.map((line) => (

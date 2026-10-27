@@ -24,7 +24,7 @@ export default function PackList() {
   return (
     <Screen>
       <NavBar backLabel="Cards" backTestID="packs-back" onBack={() => goBack(router, "/cards")} />
-      <View className="pt-2">
+      <View className="pt-1">
         <ScreenTitle>Packs</ScreenTitle>
       </View>
       {rows.length === 0 ? (

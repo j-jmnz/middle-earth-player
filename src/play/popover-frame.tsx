@@ -11,6 +11,7 @@ import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import { useOpenMotion } from "./motion-run.ts";
 import { MOTION, ms } from "./motion-tokens.ts";
+import { panelSurface } from "./surfaces.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 export type PressableRef = ComponentRef<typeof Pressable>;
@@ -128,10 +129,10 @@ export function PopoverFrame({
             ...place,
             width,
             paddingVertical: 4,
-            borderRadius: 20, // rounded-card
+            borderRadius: 16, // rounded-card
             borderWidth: 1,
             borderColor: t.hairline,
-            backgroundColor: t.raised,
+            ...panelSurface(),
             transformOrigin: origin,
             shadowColor: t.night,
             shadowOpacity: 0.4,

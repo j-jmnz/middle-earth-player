@@ -1,12 +1,14 @@
 import { eq } from "drizzle-orm";
+import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, type ReactNode } from "react";
-import { ScrollView, Text, useWindowDimensions, View } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
 import { cards } from "../../../catalog/schema";
-import { BodyText, Eyebrow, NavBar, Screen, ScreenTitle, sphereWord } from "../../chrome";
+import { BodyText, Chip, Eyebrow, NavBar, Panel, Screen, ScreenScroll, ScreenTitle, sphereWord } from "../../chrome";
+import { nightFade, tileSurface } from "../../../play/surfaces";
 import { CardTextView } from "../../../play/card-text-view";
 import { traitLine } from "../../../play/card-text";
 import { GameIcon } from "../../../play/game-icon";
@@ -93,7 +95,8 @@ function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | 
         </View>
       ) : null}
       {row.text || unapplied ? (
-        <View className="mt-6 rounded-card border border-hairline bg-raised px-5 py-4">
+        <View className="mt-6">
+          <Panel>
           <CardTextView text={row.text} testID="card-text" />
           {/* The lines no effect record reads, and what the card still does without them. */}
           {unapplied ? (
@@ -101,6 +104,7 @@ function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | 
               <NotAppliedView notApplied={unapplied} />
             </View>
           ) : null}
+          </Panel>
         </View>
       ) : null}
     </View>
@@ -110,10 +114,10 @@ function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | 
 // A number with the game's icon beside it, the word under them. The word stays on screen and in the label.
 function Stat({ label, value, icon }: { label: string; value: string; icon: IconName }) {
   return (
-    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-20 items-center rounded-tile border border-hairline bg-raised px-3 py-2">
+    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-20 items-center rounded-tile px-3 py-2" style={tileSurface()}>
       <View className="flex-row items-center gap-1.5">
         <GameIcon name={icon} size={18} tint="bone" />
-        <Text className="font-display text-title text-bone">{value}</Text>
+        <Text className="font-display-bold text-title text-bone">{value}</Text>
       </View>
       <Text className="mt-0.5 text-label text-muted">{label}</Text>
     </View>
@@ -253,12 +257,19 @@ export default function CardScreen() {
 
   return (
     <Screen scene="plain">
+      {/* The card's own picture, blurred and darkened, as the light behind it: each card sets its own mood. Drawn once, behind. */}
+      {previewSource ? (
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { height: 520 }]}>
+          <Image source={previewSource} contentFit="cover" blurRadius={28} accessible={false} style={{ width: "100%", height: 520, opacity: 0.45 }} />
+          <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.15, 1) }} />
+        </View>
+      ) : null}
       <NavBar
         backTestID="back"
         onBack={() => goBack(router, "/cards")}
-        right={row?.name ? <Text className="text-label text-faint">{row.code}</Text> : undefined}
+        right={row?.name ? <Chip label={row.code} tone="faint" /> : undefined}
       />
-      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-8 pt-4">
+      <ScreenScroll top={16}>
         {previewSource && pixels ? (
           <View className="self-center rounded-card" style={[{ width: pixels.width, height: pixels.height }, halo]}>
             <View className="overflow-hidden rounded-card" style={{ width: pixels.width, height: pixels.height }}>
@@ -280,15 +291,17 @@ export default function CardScreen() {
         </View>
         {row ? <CardFacts row={row} unapplied={notApplied(row.code, row.typeCode, row.errata ?? row.text)} /> : null}
         {row?.errata ? (
-          <View className="mt-6 rounded-card border border-goldLine px-5 py-4">
-            <Eyebrow>Errata</Eyebrow>
-            <View className="mt-2">
-              <CardTextView text={row.errata} />
-            </View>
+          <View className="mt-6">
+            <Panel current>
+              <Eyebrow>Errata</Eyebrow>
+              <View className="mt-2">
+                <CardTextView text={row.errata} />
+              </View>
+            </Panel>
           </View>
         ) : null}
         <View className="pb-safe" />
-      </ScrollView>
+      </ScreenScroll>
     </Screen>
   );
 }

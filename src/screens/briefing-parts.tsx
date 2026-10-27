@@ -1,29 +1,27 @@
-// What the campaign briefing and the standalone briefing share: the saved decks and the Ring-bearer candidates, the
-// scenario's header (stages, difficulty, sets, special rules), the deck filter, and one seat's deck picker with the
-// Ring-bearer slot. The picker is the Decks tab's list (user request, 2026-10-25): the same order, views and filters.
+// What the campaign briefing and the standalone briefing share: the screen's frame (the scenario's scene under a floating Back and
+// Booklet), the saved decks and the Ring-bearer candidates, the scenario's details (stages, difficulty, sets, special rules) and the
+// pinned Deal bar. One seat's fellowship is seat-picker.tsx.
 import { and, eq, like } from "drizzle-orm";
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import { Text, View } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import { ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import type { ScenarioFacts } from "../campaign/briefing";
+import type { Problem, ScenarioFacts } from "../campaign/briefing";
 import { cards, packs } from "../catalog/schema";
 import type { Difficulty } from "../catalog/scenario-data";
-import { BodyText, Eyebrow, Label, Segmented, TextButton } from "./chrome";
-import { editSavedDeck } from "./deck-draft";
-import { deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "./deck-list";
-import { DeckListBar } from "./deck-list-bar";
-import { deckCountLine, deckReadiness, notAppliedCards, notAppliedLine, type DeckReadiness } from "./deck-status";
-import { notAppliedWords } from "../play/not-applied";
+import { SceneArt } from "./art";
+import { dealSentence, problemWords } from "./briefing-words";
+import { ActionBar, Chevron, Chip, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, titleShadow } from "./chrome";
+import { deckListSpheres, emptyDeckListFilter, filterDecks, type DeckListFilter } from "./deck-list";
+import { deckReadiness, type DeckReadiness } from "./deck-status";
 import { deckFaces, listDecks, notAppliedIn } from "./deck-store";
 import { useDatabases } from "./databases";
-import { DeckCover, DeckRow, EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "./hero-tile";
+import type { HeroFace } from "./hero-tile";
 import { palette } from "./palette.js";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed, type StarterSeed } from "./starter-decks";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
-
-const COVER_HEIGHT = 120;
 
 const DIFFICULTIES = ["Easy", "Normal"] as const;
 
@@ -33,7 +31,7 @@ const DIFFICULTY_NOTES: Readonly<Record<Difficulty, string>> = {
   Normal: "Normal: the full encounter deck, and no starting resources.",
 };
 
-const TOOL_HEIGHT = 120;
+const BANNER_HEIGHT = 280;
 
 /** A saved deck's cards, one code per copy. */
 export function expand(deck: SavedDeck | undefined): string[] {
@@ -99,48 +97,127 @@ export function useBriefingDecks(): BriefingDecks {
   return { savedDecks, seeded, seedReason, candidates, faces, readiness, filter, setFilter, spheres, shown, inactive, typeOf };
 }
 
-/** The deck list's search, Cards / List switch and filter chips, once above every seat's picker. */
-export function DeckFilter({ decks: briefingDecks }: { decks: BriefingDecks }) {
-  const { savedDecks, seeded, filter, setFilter, spheres, shown } = briefingDecks;
-  if (seeded === "pending" || savedDecks.length === 0) return null;
+/**
+ * The briefing's frame. The scenario's scene runs under the status bar at the top, with Back and Booklet floating over it so
+ * they stay in reach as the page scrolls; the content scrolls under them; the Deal bar is pinned at the foot in thumb reach.
+ */
+export function BriefingScreen({
+  testID,
+  scenarioId,
+  onBack,
+  backLabel,
+  onBooklet,
+  banner,
+  children,
+  bar,
+}: {
+  testID: string;
+  scenarioId: string | null;
+  onBack: () => void;
+  backLabel?: string;
+  onBooklet: () => void;
+  // The words over the scene (ScenarioBanner); null while the scenario is loading or missing.
+  banner: ReactNode;
+  children: ReactNode;
+  bar?: ReactNode;
+}) {
+  const insets = useSafeAreaInsets();
+  const side = { paddingLeft: 24 + insets.left, paddingRight: 24 + insets.right };
+  // Past the scene, a night bar shows behind Back and Booklet so they never sit on the words that scroll under them.
+  const [past, setPast] = useState(false);
+  const threshold = BANNER_HEIGHT - 80;
   return (
-    <View className="mt-6">
-      <Eyebrow tone="muted">Decks</Eyebrow>
-      <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={savedDecks.length} testIDPrefix="briefing-decks" />
-    </View>
+    <Screen testID={testID} scene="vale" bleed>
+      <ScrollView
+        className="min-h-0 flex-1"
+        contentContainerStyle={{ paddingBottom: 24 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={64}
+        onScroll={(event) => {
+          const next = event.nativeEvent.contentOffset.y > threshold;
+          if (next !== past) setPast(next);
+        }}
+      >
+        <SceneArt scenarioId={scenarioId} height={BANNER_HEIGHT + insets.top} shade={0.4} fade={0.2}>
+          <View className="absolute bottom-0 left-0 right-0 pb-2" style={side}>
+            {banner}
+          </View>
+        </SceneArt>
+        <View style={side}>{children}</View>
+      </ScrollView>
+      {bar ? (
+        <View style={side}>
+          <ActionBar testID="briefing-deal-bar">{bar}</ActionBar>
+        </View>
+      ) : null}
+      <FloatingBarShade shown={past} top={insets.top} />
+      <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 + insets.left, paddingRight: 16 + insets.right }}>
+        <NavBar overlay onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={<IconButton overlay icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} />} />
+      </View>
+    </Screen>
   );
 }
 
-/** The scenario: its number, name and stages, the difficulty, the encounter sets with their counts, and its special rules. */
-export function ScenarioHeader({ facts, difficulty, onDifficulty, eyebrow }: { facts: ScenarioFacts; difficulty: Difficulty; onDifficulty: (next: Difficulty) => void; eyebrow: string }) {
+/** Over the scene: the scenario's number, its name and its stages in order. */
+export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebrow: string }) {
   return (
     <>
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <Text accessibilityRole="header" testID="briefing-title" className="mt-1 font-display text-display text-bone">
+      {/* Every word over the scene carries the title's night shadow: a long name pushes the eyebrow up into the bright sky. */}
+      <Text className="font-display-bold text-eyebrow uppercase text-gold" style={titleShadow}>
+        {eyebrow}
+      </Text>
+      <Text accessibilityRole="header" testID="briefing-title" className="mt-1 font-display text-display text-bone" style={titleShadow}>
         {facts.name}
       </Text>
-      <Text testID="briefing-stages" className="mt-3 text-body text-bone">
-        {facts.stages.join(" › ")}
-      </Text>
-      <View className="mt-4 flex-row items-center justify-between">
-        <Segmented options={DIFFICULTIES} value={difficulty} onChange={onDifficulty} testIDPrefix="difficulty" />
-        <Label className="ml-3">{`${facts.deckSize} encounter cards`}</Label>
+      <View testID="briefing-stages" accessible accessibilityLabel={`Stages: ${facts.stages.join(", ")}`} className="mt-3 flex-row flex-wrap items-center gap-x-2 gap-y-1.5">
+        {facts.stages.map((stage, index) => (
+          <View key={`${stage}:${index}`} className="flex-row items-center gap-2">
+            {index > 0 ? <Chevron direction="right" color={palette.faint} size={6} /> : null}
+            <View className="h-5 w-5 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: palette.goldLine }}>
+              <Text className="font-display-bold text-micro text-gold">{String(index + 1)}</Text>
+            </View>
+            <Text className="text-label text-bone" style={titleShadow}>
+              {stage}
+            </Text>
+          </View>
+        ))}
       </View>
+    </>
+  );
+}
+
+/** The difficulty, with what it changes and the encounter deck's size beside its heading. */
+export function DifficultyPicker({ facts, difficulty, onDifficulty }: { facts: ScenarioFacts; difficulty: Difficulty; onDifficulty: (next: Difficulty) => void }) {
+  return (
+    <>
+      <Section title="Difficulty" className="mt-4" right={<Chip label={`${facts.deckSize} encounter cards`} />} />
+      <Segmented options={DIFFICULTIES} value={difficulty} onChange={onDifficulty} testIDPrefix="difficulty" stretch />
       {/* What the difficulty changes, for a first game (ltp.easy-mode, easy-mode.easy-mode). */}
-      <Label testID="briefing-difficulty-note" tone="muted" className="mt-1">
+      <Label testID="briefing-difficulty-note" tone="muted" className="mt-2">
         {DIFFICULTY_NOTES[difficulty]}
       </Label>
-      <View testID="briefing-sets" className="mt-3 gap-1">
+    </>
+  );
+}
+
+/** The encounter sets with their counts, and the scenario's special rules as tags (words to read, not controls). */
+export function EncounterDetails({ facts }: { facts: ScenarioFacts }) {
+  return (
+    <>
+      <Section title="The encounter" className="mt-5" />
+      <View testID="briefing-sets" className="gap-1.5">
         {facts.sets.map((set) => (
-          <Label key={set.name} tone="muted">{`${set.name} · ${set.count}`}</Label>
+          <View key={set.name} className="flex-row items-center justify-between">
+            <Text className="text-body text-bone">{set.name}</Text>
+            <Text className="font-display-bold text-body text-muted">{String(set.count)}</Text>
+          </View>
         ))}
       </View>
       {facts.rules.length > 0 ? (
         <View testID="briefing-rules" className="mt-3 flex-row flex-wrap gap-2">
           {facts.rules.map((rule) => (
-            <View key={rule} className="rounded-pill px-3 py-1" style={{ borderWidth: 1, borderColor: palette.gold }}>
-              <Text className="text-label text-gold">{rule}</Text>
-            </View>
+            <Chip key={rule} label={rule} />
           ))}
         </View>
       ) : null}
@@ -149,153 +226,43 @@ export function ScenarioHeader({ facts, difficulty, onDifficulty, eyebrow }: { f
 }
 
 /**
- * One seat: its deck picker (the filtered decks as covers or rows, each a radio; a deck with a fallen hero, or one not
- * ready to play, is shown and cannot be picked; the seat's picked deck stays listed whatever the filter), the picked
- * deck's heroes, and for the first seat the Ring-bearer slot when the deck brings none.
+ * The briefing's Deal bar: the validator's sentences in danger (without collector codes), any extra control (the campaign's
+ * Accept +1 threat), the sentence naming the difficulty and what Deal does, and DEAL, disabled until the loadout is legal.
  */
-export function SeatPicker({
-  index,
-  seatCount,
-  decks: briefingDecks,
-  picked,
-  heroes,
-  fallen,
-  needsRingBearer,
-  ringBearer,
-  onPick,
-  onRingBearer,
-  nameOf,
+export function DealBar({
+  problems,
+  dealError,
+  difficulty,
+  dropsOpen = false,
+  dealable,
+  onDeal,
+  children,
 }: {
-  index: number;
-  seatCount: number;
-  decks: BriefingDecks;
-  picked: string | null;
-  heroes: readonly string[];
-  // Heroes the campaign log lists as fallen; none in a standalone game.
-  fallen: readonly string[];
-  needsRingBearer: boolean;
-  ringBearer: string | null;
-  onPick: (deckId: string) => void;
-  onRingBearer: (code: string | null) => void;
-  nameOf: (code: string) => string;
+  problems: readonly Problem[];
+  dealError: string | null;
+  difficulty: Difficulty;
+  dropsOpen?: boolean;
+  dealable: boolean;
+  onDeal: () => void;
+  children?: ReactNode;
 }) {
-  const router = useRouter();
-  const view = useDeckListView();
-  const { savedDecks, seeded, seedReason, candidates, faces, readiness, shown, setFilter, inactive, typeOf } = briefingDecks;
-  const kept = savedDecks.find((deck) => deck.id === picked);
-  const pickedDeck = kept ?? null;
-  const listed = kept && !shown.includes(kept) ? [kept, ...shown] : shown;
-  const faceOf = (code: string): HeroFace => heroFace(faces, code, nameOf(code));
-  const heroNames = (codes: readonly string[]) => codes.map(nameOf).join(", ");
-  const slot = index === 0 && needsRingBearer;
   return (
-    <View className="mt-6">
-      <Eyebrow tone="muted">{seatCount === 1 ? "Deck" : `Seat ${index + 1}`}</Eyebrow>
-      {seeded === "pending" ? (
-        <BodyText tone="muted" className="mt-2">
-          Loading
-        </BodyText>
-      ) : savedDecks.length === 0 ? (
-        <View className="mt-2 gap-2">
-          <BodyText tone={seeded === "missing" ? "danger" : "muted"} testID="briefing-no-deck">
-            {seeded === "missing" ? "The starter decks are missing. Save a deck in Decks first." : "No saved deck. Save one in Decks first."}
-          </BodyText>
-          {seeded === "missing" && seedReason ? (
-            <BodyText tone="danger" testID="briefing-starter-reason">
-              {seedReason}
-            </BodyText>
-          ) : null}
-        </View>
-      ) : (
-        <View className="mt-2">
-          {listed.map((deck) => {
-            const fell = deck.heroes.filter((code) => fallen.includes(code));
-            const ready = readiness.get(deck.id) ?? { ready: false, text: "Not read yet" };
-            const summary = {
-              testID: `deck-pick-${index}-${deck.id}`,
-              name: deck.name,
-              heroes: deck.heroes.map(faceOf),
-              detail: deckCountLine(deck),
-              status: fell.length > 0 ? { ready: false, text: `${heroNames(fell)} fell and cannot be picked` } : ready,
-              note: notAppliedLine(deck, inactive),
-              onPress: () => onPick(deck.id),
-              selected: picked === deck.id,
-              disabled: fell.length > 0 || !ready.ready,
-            };
-            // A deck that is not ready to play cannot be picked; this opens it to be finished.
-            const open =
-              !ready.ready && fell.length === 0 ? (
-                <View className="items-start px-1">
-                  <TextButton
-                    label="Open in Decks"
-                    testID={`deck-open-${index}-${deck.id}`}
-                    tone="gold"
-                    accessibilityLabel={`Open ${deck.name} in Decks to finish it`}
-                    onPress={() => {
-                      editSavedDeck(deck);
-                      router.push({ pathname: "/deck/[id]", params: { id: deck.id } });
-                    }}
-                  />
-                </View>
-              ) : null;
-            return view === "List" ? (
-              <DeckRow key={deck.id} {...summary}>
-                {open}
-              </DeckRow>
-            ) : (
-              <View key={deck.id} className="pb-3">
-                <DeckCover {...summary} height={COVER_HEIGHT}>
-                  {open}
-                </DeckCover>
-              </View>
-            );
-          })}
-          {listed.length === 0 ? (
-            <View className="items-start">
-              <BodyText tone="muted" testID={`briefing-no-match-${index}`}>
-                No decks match.
-              </BodyText>
-              <View className="-mx-3">
-                <TextButton testID={`briefing-clear-filter-${index}`} label="Clear filter" tone="gold" onPress={() => setFilter(emptyDeckListFilter)} />
-              </View>
-            </View>
-          ) : null}
-        </View>
-      )}
-      {picked ? (
-        <View className="mt-3 flex-row gap-2">
-          {heroes.map((code) => (
-            <HeroTile key={code} hero={faceOf(code)} height={TOOL_HEIGHT} dense />
-          ))}
-          {slot ? (
-            ringBearer ? (
-              <HeroTile hero={faceOf(ringBearer)} height={TOOL_HEIGHT} dense onRemove={() => onRingBearer(null)} />
-            ) : (
-              <View testID="ringbearer-slot" className="flex-1">
-                <EmptyHeroSlot height={TOOL_HEIGHT} label="Ring-bearer" />
-              </View>
-            )
-          ) : null}
-        </View>
+    <View className="gap-2">
+      {problems.map((problem, index) => (
+        <Label key={`${index}-${problem.message}`} tone="danger" testID={`briefing-error-${index}`}>
+          {problemWords(problem)}
+        </Label>
+      ))}
+      {dealError ? (
+        <Label tone="danger" testID="briefing-deal-error">
+          {dealError}
+        </Label>
       ) : null}
-      {/* The picked deck names each card whose text the app does not apply, and what that costs: say it before the deal. */}
-      {pickedDeck && notAppliedCards(pickedDeck, inactive).length > 0 ? (
-        <View testID={`briefing-not-applied-${index}`} className="mt-3">
-          <Label tone="muted">Not applied in this deck:</Label>
-          <Label tone="muted" className="mt-0.5">
-            {notAppliedCards(pickedDeck, inactive)
-              .map((card) => `${nameOf(card.code)}: ${notAppliedWords(card.code, typeOf(card.code)).toLowerCase()}`)
-              .join(" · ")}
-          </Label>
-        </View>
-      ) : null}
-      {picked && slot && !ringBearer ? (
-        <View className="mt-2">
-          {candidates.map((candidate) => (
-            <TextButton key={candidate.code} label={`Choose ${candidate.name}${candidate.packName ? ` (${candidate.packName})` : ""} as Ring-bearer`} testID={`ringbearer-${candidate.code}`} onPress={() => onRingBearer(candidate.code)} />
-          ))}
-        </View>
-      ) : null}
+      {children}
+      <Label tone="muted" testID="briefing-deal-note" className="text-center">
+        {dealSentence(difficulty, dropsOpen)}
+      </Label>
+      <PrimaryButton label="Deal" testID="deal" disabled={!dealable} onPress={onDeal} />
     </View>
   );
 }

@@ -1,23 +1,26 @@
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams, usePreventRemove, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Modal, Pressable, Text, TextInput, useWindowDimensions, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Modal, Pressable, Text, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
-  BodyText,
+  ActionBar,
+  Chip,
+  FloatingBarShade,
   Eyebrow,
-  Label,
   ListRow,
   NavBar,
   PaperSheet,
   PrimaryButton,
-  RingMark,
   Screen,
+  SecondaryButton,
   SphereMark,
   TextButton,
   markedSphere,
   sphereWord,
 } from "../../chrome";
+import { BANNER_HEIGHT, CostCoin, DeckGlance, type Jump } from "../../deck-glance";
 import {
   announceDraftChange,
   changeDraftCount,
@@ -54,6 +57,7 @@ import type { PictureSource } from "../../../play/table-canvas-types";
 type EditorCard = {
   code: string;
   count: number;
+  cost: string | null;
   name: string;
   typeCode: string | null;
   imagesrc: string | null;
@@ -68,7 +72,7 @@ type EditorRow = DeckSectionRow<EditorCard> | { kind: "heroes"; key: string };
 const TYPE_NOUN: Readonly<Record<string, string>> = { hero: "heroes", ally: "allies", attachment: "attachments", event: "events" };
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
-const thumb = { width: 28, height: 38 };
+const thumb = { width: 30, height: 42 };
 
 function onViewableItemsChanged({ viewableItems }: { viewableItems: { item: EditorRow | null }[] }): void {
   const jobs = [];
@@ -104,7 +108,12 @@ function EditorCardRow({
       label={card.name}
       detail={loss ? `${sphereWord(card.sphereName)} · ${loss}` : sphereWord(card.sphereName)}
       detailIcons={mark ? <SphereMark sphere={mark} size={12} /> : null}
-      leading={<CardThumb code={card.code} imagesrc={card.imagesrc} width={thumb.width} height={thumb.height} />}
+      leading={
+        <View className="flex-row items-center gap-2.5">
+          <CostCoin cost={card.cost} />
+          <CardThumb code={card.code} imagesrc={card.imagesrc} width={thumb.width} height={thumb.height} />
+        </View>
+      }
       onPress={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })}
       onLongPress={() => onPreview(card.code, card.name, picture)}
       trailing={
@@ -125,11 +134,15 @@ export default function DeckEditor() {
   const params = useLocalSearchParams<{ id: string }>();
   const id = routeCode(params.id);
   const { height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const draft = useDeckDraft();
+  const list = useRef<FlashListRef<EditorRow>>(null);
   const { catalog, user } = useDatabases();
   const preview = useListPreview();
   // The navigation Back, a swipe or Save as asked to finish while the deck has unsaved changes.
   const [leaving, setLeaving] = useState<(() => void) | null>(null);
+  // Past the heroes' paintings, a night bar shows behind Back so it never sits on a row.
+  const [past, setPast] = useState(false);
   const dirty = draftIsDirty(draft);
   const release = usePreventRemove(dirty, ({ repeat }) => setLeaving(() => repeat));
 
@@ -152,6 +165,7 @@ export default function DeckEditor() {
       return {
         code: card.code,
         count: card.count,
+        cost: face?.cost ?? null,
         name: face?.name ?? card.code,
         typeCode: face?.typeCode ?? null,
         imagesrc: face?.imagesrc ?? null,
@@ -229,45 +243,31 @@ export default function DeckEditor() {
       </View>
   );
 
+  // The headings the jump chips lead to, with the row each starts at.
+  const jumps: Jump[] = rows.flatMap((row, index) => (row.kind === "type" ? [{ key: row.key, title: row.title, count: row.type === "hero" ? heroes.length : row.count, index }] : []));
+  const side = { paddingLeft: 24 + insets.left, paddingRight: 24 + insets.right };
+  // FlashList v2 adds viewOffset to the row's offset (FlatList subtracts it): a negative one leaves the heading below the status bar
+  // and the floating Back.
+  const jumpTo = (jump: Jump) => list.current?.scrollToIndex({ index: jump.index, animated: true, viewOffset: -(insets.top + 56 + 8) });
+
   const header = (
-    <View>
-      <TextInput
-        testID="deck-name"
-        value={draft.name}
-        onChangeText={setDeckName}
-        placeholder="Name this deck"
-        placeholderTextColor={palette.faint}
-        accessibilityLabel="Deck name"
-        selectTextOnFocus
-        returnKeyType="done"
-        className="mt-2 border-b border-hairline pb-1 font-display text-title text-bone"
-        style={{ minHeight: 44 }}
-      />
-      <Label testID="deck-count" className="mt-2">
-        {threat == null ? deckCountLine(draft) : `${deckCountLine(draft)} · Starting threat ${threat}`}
-      </Label>
-      <View className="mt-1 flex-row items-center gap-1.5">
-        <RingMark size={10} state={readiness.ready ? "done" : "locked"} />
-        <Text testID={readiness.ready ? "deck-ready" : "deck-error"} className={`text-label ${readiness.ready ? "text-gold" : "text-danger"}`}>
-          {readiness.ready ? readiness.text : `Not ready to play: ${readiness.text}`}
-        </Text>
-      </View>
-      {notApplied ? (
-        <Label testID="deck-not-applied" tone="muted" className="mt-1">
-          {`${notApplied}. Each row says what the app leaves out.`}
-        </Label>
-      ) : null}
-      {draft.droppedNote ? (
-        <BodyText testID="deck-import-dropped" tone="muted" className="mt-2">
-          {draft.droppedNote}
-        </BodyText>
-      ) : null}
-      {isStarterDeck(draft.id) ? (
-        <Label testID="starter-note" className="mt-2">
-          {STARTER_NOTE}
-        </Label>
-      ) : null}
-    </View>
+    <DeckGlance
+      heroes={heroes}
+      cards={draft.cards}
+      faces={faces}
+      name={draft.name}
+      onName={setDeckName}
+      readiness={readiness}
+      threat={threat}
+      countLine={threat == null ? deckCountLine(draft) : `${deckCountLine(draft)} · Starting threat ${threat}`}
+      notApplied={notApplied}
+      droppedNote={draft.droppedNote ?? null}
+      starterNote={isStarterDeck(draft.id) ? STARTER_NOTE : null}
+      jumps={jumps}
+      onJump={jumpTo}
+      top={insets.top}
+      side={side}
+    />
   );
 
   function renderRow({ item }: { item: EditorRow }) {
@@ -276,10 +276,10 @@ export default function DeckEditor() {
       // Heroes add through their empty slots, so only the card subsections carry Add.
       const heroSection = item.type === "hero";
       return (
-        <View accessibilityRole="header" className="min-h-11 flex-row items-center justify-between pt-4">
-          <View className="flex-row items-baseline gap-2">
-            <Eyebrow tone="muted">{item.title}</Eyebrow>
-            <Label testID={`deck-section-count-${item.type}`}>{heroSection ? `${item.count} of 3` : String(item.count)}</Label>
+        <View accessibilityRole="header" className="min-h-11 flex-row items-center justify-between pt-5">
+          <View className="flex-row items-center gap-2.5">
+            <Eyebrow tone="moon">{item.title}</Eyebrow>
+            <Chip testID={`deck-section-count-${item.type}`} label={heroSection ? `${item.count} of 3` : String(item.count)} />
           </View>
           {!heroSection && TYPE_NOUN[item.type] ? (
             <View className="-mr-3">
@@ -314,36 +314,47 @@ export default function DeckEditor() {
   }
 
   return (
-    <Screen testID="deck-editor" scene="plain">
+    <Screen testID="deck-editor" scene="plain" bleed>
       <View className="min-h-0 flex-1">
-        <NavBar
-          backLabel="Decks"
-          backTestID="deck-back"
-          onBack={() => goBack(router, "/decks")}
-          right={dirty ? <Label testID="deck-unsaved">Unsaved changes</Label> : null}
-        />
         <View className="min-h-0 flex-1">
           <FlashList
+            ref={list}
             data={rows}
             keyExtractor={(item) => item.key}
             getItemType={(item) => item.kind}
             style={{ flex: 1 }}
+            contentContainerStyle={{ paddingBottom: 24 }}
             extraData={draft}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
+            scrollEventThrottle={64}
+            onScroll={(event) => {
+              const next = event.nativeEvent.contentOffset.y > BANNER_HEIGHT - 80;
+              if (next !== past) setPast(next);
+            }}
             ListHeaderComponent={header}
-            ListFooterComponent={<View className="h-6" />}
-            renderItem={renderRow}
+            renderItem={(info) => <View style={side}>{renderRow(info)}</View>}
           />
         </View>
-        <ToastView />
-        <View className="flex-row items-center gap-2 pb-safe pt-2">
-          <TextButton testID="deck-add" label="Add cards" tone="gold" onPress={() => router.push({ pathname: "/pool", params: { adding: "1" } })} />
-          <View className="flex-1">
-            <PrimaryButton testID="deck-save" label="Save" onPress={onSave} />
-          </View>
+        <View style={side}>
+          <ToastView />
+          <ActionBar>
+            <View className="flex-row items-center gap-2.5">
+              <View className="flex-1">
+                <SecondaryButton testID="deck-add" label="Add cards" tone="gold" onPress={() => router.push({ pathname: "/pool", params: { adding: "1" } })} />
+              </View>
+              <View className="flex-1">
+                <PrimaryButton testID="deck-save" label="Save" onPress={onSave} />
+              </View>
+            </View>
+          </ActionBar>
+        </View>
+        {/* Back floats over the heroes' paintings and stays in reach as the list scrolls. */}
+        <FloatingBarShade shown={past} top={insets.top} />
+        <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 + insets.left, paddingRight: 16 + insets.right }}>
+          <NavBar overlay backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
         </View>
       </View>
       <Modal visible={leaving !== null} transparent animationType="fade" onRequestClose={() => setLeaving(null)}>
@@ -378,3 +389,4 @@ export default function DeckEditor() {
     </Screen>
   );
 }
+

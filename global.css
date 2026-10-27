@@ -2,10 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Web dev loop only. Native embeds assets/fonts/Marcellus-Regular.ttf at build time. */
+/* Web dev loop only. Native embeds assets/fonts/Cinzel-SemiBold.ttf and Cinzel-Bold.ttf at build time. */
 @font-face {
-  font-family: "Marcellus-Regular";
-  src: url("/fonts/Marcellus-Regular.ttf") format("truetype");
+  font-family: "Cinzel-SemiBold";
+  src: url("/fonts/Cinzel-SemiBold.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cinzel-Bold";
+  src: url("/fonts/Cinzel-Bold.ttf") format("truetype");
   font-display: swap;
 }
 

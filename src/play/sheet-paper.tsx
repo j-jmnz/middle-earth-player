@@ -8,6 +8,7 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
+import { goldGlow, goldPlate, raisedEdge, slateSurface } from "./surfaces.ts";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
@@ -50,8 +51,8 @@ export function SheetFrame({ children, testID, maxHeight, paddingTop = 12, anima
 
 /**
  * A text button on night or paper: 44 pt target, the pressed fill in the same frame. `variant` "text" is a word alone (the
- * top bar, a panel's Close); "outline" is a raised pill with a goldLine edge (the dock's other answers: Pass, Cancel, the
- * alternative); "quiet" is a raised pill with a hairline edge (the dock's Read the card, List, Actions).
+ * top bar, a panel's Close); "outline" is a slate plate lit from above with a goldLine edge (the dock's other answers: Pass,
+ * Cancel, the alternative); "quiet" is the same plate with a hairline edge (the dock's Read the card, List, Actions).
  */
 export function ChromeButton({
   label,
@@ -78,7 +79,7 @@ export function ChromeButton({
   const ink = tone === "ink";
   const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "gold" ? t.gold : ink ? t.inkLabel : tone === "muted" ? t.muted : t.bone;
   const edge = variant === "outline" ? (ink ? t.inkLabel : t.goldLine) : variant === "quiet" ? (ink ? t.inkLine : t.hairline) : null;
-  const rest = variant === "text" ? "transparent" : ink ? t.paper : t.raised;
+  const rest = variant === "text" ? null : ink ? { backgroundColor: t.paper } : slateSurface();
   return (
     <Pressable
       testID={testID}
@@ -94,8 +95,12 @@ export function ChromeButton({
     >
       {({ pressed }) => (
         <View
-          className={`items-center justify-center px-3 ${variant === "text" ? "min-h-11 rounded-tile" : tight ? "min-h-9 rounded-pill" : "min-h-10 rounded-pill"}`}
-          style={{ backgroundColor: pressed && !disabled ? (ink ? t.paperPressed : t.pressed) : rest, ...(edge ? { borderWidth: 1, borderColor: edge } : {}) }}
+          className={`items-center justify-center px-3 ${variant === "text" ? "min-h-11 rounded-tile" : tight ? "min-h-9 rounded-tile" : "min-h-10 rounded-tile"}`}
+          style={{
+            ...(pressed && !disabled ? { backgroundColor: ink ? t.paperPressed : t.pressed } : (rest ?? { backgroundColor: "transparent" })),
+            ...(edge ? { borderWidth: 1, borderColor: edge } : {}),
+            ...(variant !== "text" && !ink ? { boxShadow: raisedEdge } : {}),
+          }}
         >
           <Text className="text-body font-medium" style={{ color }}>
             {label}
@@ -107,7 +112,8 @@ export function ChromeButton({
 }
 
 /**
- * The one filled action: a gold pill on night with a soft gold glow, an ink pill on paper. Disabled, it is a dashed outline
+ * The one filled action: worked gold on night with a lit top edge and a soft gold glow, an ink plate on paper; it sinks a
+ * little when pressed. Disabled, it is a dashed outline
  * (a goldLine edge with muted text on night, inkLine with inkMuted on paper) that still reads as the button it will be and
  * not as one of the solid-edged answers beside it (docs/design-system.md). A disabled action has a sentence near it saying
  * why.
@@ -147,9 +153,16 @@ export function ChromePrimary({
       onPress={onPress}
     >
       {({ pressed }) => (
-        <View className={`${compact ? (tight ? "min-h-11 px-3" : "min-h-12 px-3") : "min-h-14 px-5"} items-center justify-center rounded-pill`} style={primaryFill(paper, disabled, pressed)}>
+        <View
+          className={`${compact ? (tight ? "min-h-11 px-3" : "min-h-12 px-3") : "min-h-14 px-5"} items-center justify-center rounded-button`}
+          style={{ ...primaryFill(paper, disabled, pressed), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}
+        >
           {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
-          <Text numberOfLines={compact ? 2 : 1} className={`text-center font-display text-body uppercase ${compact ? "tracking-wide" : "tracking-widest"}`} style={{ color }}>
+          <Text
+            numberOfLines={compact ? 2 : 1}
+            className="text-center font-display-bold uppercase"
+            style={{ color, fontSize: compact ? 14 : 15, lineHeight: compact ? 19 : 20, letterSpacing: compact ? 1.4 : 2.4 }}
+          >
             {label}
           </Text>
         </View>
@@ -161,19 +174,14 @@ export function ChromePrimary({
 function primaryFill(paper: boolean, disabled: boolean, pressed: boolean) {
   if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: paper ? t.inkLine : t.goldLine };
   if (paper) return { backgroundColor: t.ink, opacity: pressed ? 0.85 : 1 };
-  return {
-    backgroundColor: pressed ? t.goldDeep : t.gold,
-    borderTopWidth: 1,
-    borderColor: t.goldHigh,
-    boxShadow: pressed ? undefined : `0 0 12px ${t.gold}8C`,
-  };
+  return goldPlate(pressed);
 }
 
 /** The engine's numbers with the game's icons beside them. Each reads as "Willpower 2" to a screen reader. */
 export function Stats({ stats, testID, surface = "paper", size = "body" }: { stats: readonly SheetStat[]; testID?: string; surface?: "night" | "paper"; size?: "body" | "title" }) {
   if (stats.length === 0) return null;
   const ink = surface === "paper";
-  const textClass = `font-display ${size === "title" ? "text-title" : "text-body"} ${ink ? "text-ink" : "text-bone"}`;
+  const textClass = `font-display-bold ${size === "title" ? "text-title" : "text-body"} ${ink ? "text-ink" : "text-bone"}`;
   return (
     <View testID={testID} className="flex-row flex-wrap items-center gap-3">
       {stats.map((stat) => (
@@ -241,7 +249,8 @@ export function Tile({
             minHeight: dense ? 44 : night ? 52 : 48,
             borderWidth: selected ? 1.5 : 1,
             borderColor: selected ? (night ? t.gold : t.ink) : night ? t.hairline : t.inkLine,
-            backgroundColor: pressed ? (night ? t.pressed : t.paperPressed) : night ? t.night : "transparent",
+            ...(pressed ? { backgroundColor: night ? t.pressed : t.paperPressed } : night ? slateSurface() : { backgroundColor: "transparent" }),
+            ...(selected && night ? { boxShadow: goldGlow } : {}),
           }}
         >
           {leading}

@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { View } from "react-native";
 
 import { CardPool } from "../../card-pool";
-import { ScreenTitle, TextButton } from "../../chrome";
+import { ScreenTitle, SecondaryButton } from "../../chrome";
 
 // Every deck-legal player card, searched and filtered. The packs, encounter cards included, are one tap away.
 export default function Cards() {
@@ -11,11 +11,9 @@ export default function Cards() {
     <CardPool
       adding={false}
       header={
-        <View className="flex-row items-end justify-between pt-6">
+        <View className="flex-row items-center justify-between pt-4">
           <ScreenTitle>Cards</ScreenTitle>
-          <View className="-mr-3">
-            <TextButton label="Packs" testID="packs-open" tone="gold" accessibilityLabel="Browse cards by pack" onPress={() => router.push("/packs")} />
-          </View>
+          <SecondaryButton label="Packs" icon="unique" testID="packs-open" compact accessibilityLabel="Browse cards by pack" onPress={() => router.push("/packs")} />
         </View>
       }
     />

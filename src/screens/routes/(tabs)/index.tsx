@@ -1,18 +1,20 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
 
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
 import { FELLOWSHIP_ID } from "../../../campaign/save";
-import { Label, Panel, PrimaryButton, RingMark, Screen, ScreenTitle, TextButton } from "../../chrome";
+import { Label, Panel, PrimaryButton, RingMark, Screen, ScreenScroll, ScreenTitle, Section, SecondaryButton, TextButton } from "../../chrome";
+import { SceneArt, type ArtCard } from "../../art";
+import { deckFaces } from "../../deck-store";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf, scenarioNames } from "../../campaign-data";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
 import { KeepOrDelete } from "../../keep-or-delete";
-import { ContinuePanel, DELETE_SENTENCE, SaveSummary, describe, type SaveLine } from "../../save-panels";
+import { ContinuePanel, DELETE_SENTENCE, SaveRow, SaveSummary, describe, type SaveLine } from "../../save-panels";
 import { nextStepHref, pathHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
 
@@ -27,8 +29,8 @@ function SeatTile({ seats, selected, onPress }: { seats: Seats; selected: boolea
       accessibilityRole="radio"
       accessibilityState={{ selected }}
       onPress={onPress}
-      className="min-h-14 flex-1 items-center justify-center gap-2 rounded-tile bg-raised px-3 py-3"
-      style={{ borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline }}
+      className="min-h-14 flex-1 items-center justify-center gap-2 rounded-tile px-3 py-3"
+      style={{ backgroundColor: selected ? palette.pressed : palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline }}
     >
       <View className="flex-row">
         <RingMark size={18} state={selected ? "current" : "locked"} />
@@ -43,6 +45,13 @@ function SeatTile({ seats, selected, onPress }: { seats: Seats; selected: boolea
   );
 }
 
+// The fellowship a playthrough plays: the heroes the campaign log records, else the heroes the last loadout dealt.
+function partyCodes(save: Save): string[] {
+  const logged = save.log.heroesBySeat.flat();
+  if (logged.length > 0) return logged;
+  return save.loadout?.seats.flatMap((seat) => seat.heroes) ?? [];
+}
+
 export default function CampaignList() {
   const router = useRouter();
   const { catalog, user } = useDatabases();
@@ -55,6 +64,9 @@ export default function CampaignList() {
   // The save whose delete is waiting on Delete for good.
   const [deleting, setDeleting] = useState<string | null>(null);
   const [seats, setSeats] = useState<Seats>(1);
+  // New playthrough opens the Start block under the saves: the list scrolls to it, so its primary is on screen.
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  const startAt = useRef(0);
   const campaigns = campaignListQueries(catalog).campaigns.all();
   const locked = lockedTiles(campaigns);
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
@@ -70,6 +82,16 @@ export default function CampaignList() {
       total,
       next: nextStep(path, save.loadout?.scenarioId),
     };
+  };
+
+  const faces = useMemo(() => deckFaces(catalog, saves.flatMap(partyCodes)), [catalog, saves]);
+  const partyOf = (save: Save): ArtCard[] => partyCodes(save).flatMap((code) => {
+    const face = faces.get(code);
+    return face ? [{ code, imagesrc: face.imagesrc }] : [];
+  });
+  const partyWords = (save: Save): string | null => {
+    const names = partyCodes(save).map((code) => faces.get(code)?.name ?? code);
+    return names.length > 0 ? names.join(", ") : null;
   };
 
   const refresh = useCallback(() => {
@@ -154,12 +176,22 @@ export default function CampaignList() {
 
   return (
     <Screen testID="campaign-list" scene="dusk">
-      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6">
-        <View className="pt-6">
+      <ScreenScroll scrollRef={scroll}>
+        <View className="flex-row items-center justify-between pb-3 pt-4">
           <ScreenTitle>Campaigns</ScreenTitle>
+          {saves.length > 0 ? (
+            <View className="-mr-3">
+              <TextButton
+                label={managing ? "Done" : "Manage"}
+                testID="manage-playthroughs"
+                tone="muted"
+                accessibilityLabel={managing ? "Done managing playthroughs" : "Manage playthroughs"}
+                onPress={toggleManage}
+              />
+            </View>
+          ) : null}
         </View>
-        {/* The scene's light sits above the cards. */}
-        <View className="mt-40 gap-3">
+        <View className="gap-3">
           {saves.map((save, index) => {
             const eyebrow = saves.length > 1 && index === 0;
             if (managing) {
@@ -181,6 +213,8 @@ export default function CampaignList() {
                   line={line}
                   eyebrow={eyebrow}
                   primary={!showStart}
+                  heroes={partyOf(save)}
+                  party={partyWords(save)}
                   onNext={() => router.push(nextStepHref(save.id, line.next))}
                   onPath={() => openPath(save)}
                   onLog={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })}
@@ -188,48 +222,44 @@ export default function CampaignList() {
               );
             }
             return (
-              <Pressable
-                key={save.id}
-                testID={`save-${save.id}`}
-                collapsable={false}
-                accessibilityRole="button"
-                accessibilityLabel={`Open ${describe(lineOf(save))}`}
-                onPress={() => openPath(save)}
-              >
-                {({ pressed }) => (
-                  <Panel pressed={pressed}>
-                    <SaveSummary line={lineOf(save)} eyebrow={false} />
-                  </Panel>
-                )}
-              </Pressable>
+              <View key={save.id} className={index === 1 ? "mt-2" : undefined}>
+                {index === 1 ? <Section title="Other journeys" /> : null}
+                <SaveRow id={save.id} line={lineOf(save)} lead={partyOf(save)[0] ?? null} onPress={() => openPath(save)} />
+              </View>
             );
           })}
           {showStart ? (
-            <Panel>
-              <Text className="font-display text-title text-bone">{nameOf(FELLOWSHIP_ID)}</Text>
-              <View className="mt-4 flex-row gap-3">
-                <SeatTile seats={1} selected={seats === 1} onPress={() => setSeats(1)} />
-                <SeatTile seats={2} selected={seats === 2} onPress={() => setSeats(2)} />
-              </View>
-              <View className="mt-4 gap-3">
-                <Label>Chosen once for this campaign</Label>
-                <PrimaryButton label="Start Fellowship" testID="start-fellowship" onPress={start} />
-              </View>
-            </Panel>
-          ) : null}
-          {/* The list's own actions, one row under the saves: New playthrough, then Manage. */}
-          {(!showStart && !managing) || saves.length > 0 ? (
-            <View className="-mx-3 flex-row justify-between">
-              {!showStart && !managing ? <TextButton label="New playthrough" testID="new-playthrough" tone="gold" onPress={() => setStarting(true)} /> : <View />}
+            <View
+              className={saves.length > 0 ? "mt-2" : undefined}
+              onLayout={(event) => {
+                startAt.current = event.nativeEvent.layout.y;
+                if (starting) scroll.current?.scrollTo({ y: Math.max(0, startAt.current - 8), animated: true });
+              }}
+            >
               {saves.length > 0 ? (
-                <TextButton
-                  label={managing ? "Done" : "Manage"}
-                  testID="manage-playthroughs"
-                  accessibilityLabel={managing ? "Done managing playthroughs" : "Manage playthroughs"}
-                  onPress={toggleManage}
-                />
+                <Section title="New playthrough" right={<TextButton label="Cancel" testID="start-cancel" tone="muted" accessibilityLabel="Cancel the new playthrough" onPress={() => setStarting(false)} />} />
               ) : null}
+              <Panel current={saves.length === 0} padded={false}>
+                <View className="overflow-hidden rounded-t-card">
+                  <SceneArt scenarioId={fellowship?.scenarios[0]} height={132} fade={0.3} fadeTo={palette.raised} />
+                </View>
+                <View className="px-5 pb-5" style={{ marginTop: -36 }}>
+                  <Text className="font-display text-title text-bone">{nameOf(FELLOWSHIP_ID)}</Text>
+                  <Label>{`${total} scenarios`}</Label>
+                  <View className="mt-4 flex-row gap-3">
+                    <SeatTile seats={1} selected={seats === 1} onPress={() => setSeats(1)} />
+                    <SeatTile seats={2} selected={seats === 2} onPress={() => setSeats(2)} />
+                  </View>
+                  <View className="mt-4 gap-3">
+                    <Label>Chosen once for this campaign</Label>
+                    <PrimaryButton label="Start Fellowship" testID="start-fellowship" onPress={start} />
+                  </View>
+                </View>
+              </Panel>
             </View>
+          ) : null}
+          {!showStart && !managing ? (
+            <SecondaryButton label="New playthrough" testID="new-playthrough" tone="gold" compact onPress={() => setStarting(true)} />
           ) : null}
           {archived.length > 0 ? (
             <View className="gap-3" testID="archived-playthroughs">
@@ -237,6 +267,7 @@ export default function CampaignList() {
                 <TextButton
                   label={`Archived · ${archived.length}`}
                   testID="archived-toggle"
+                  tone="muted"
                   accessibilityLabel={`${archived.length} archived ${archived.length === 1 ? "playthrough" : "playthroughs"}`}
                   expanded={showArchived}
                   onPress={toggleArchived}
@@ -255,24 +286,28 @@ export default function CampaignList() {
             </View>
           ) : null}
           {locked.length > 0 ? (
-            <View className="flex-row gap-3" testID="locked-campaigns">
-              {locked.map((tile) => (
-                <View
-                  key={tile.id}
-                  testID={`locked-${tile.id}`}
-                  accessible
-                  accessibilityLabel={`${tile.name}, ${tile.caption}`}
-                  className="flex-1 gap-2 rounded-tile border border-hairline px-3 py-3"
-                >
-                  <RingMark size={12} state="locked" />
-                  <Text className="font-display text-body text-faint">{tile.name}</Text>
-                  <Text className="text-label text-faint">{tile.caption}</Text>
-                </View>
-              ))}
+            <View className="mt-2">
+              <Section title="Coming later" />
+              <View className="flex-row gap-3" testID="locked-campaigns">
+                {locked.map((tile) => (
+                  <View
+                    key={tile.id}
+                    testID={`locked-${tile.id}`}
+                    accessible
+                    accessibilityLabel={`${tile.name}, ${tile.caption}`}
+                    className="min-h-32 flex-1 justify-end gap-1 rounded-card px-4 py-4"
+                    style={{ borderWidth: 1, borderStyle: "dashed", borderColor: palette.hairline }}
+                  >
+                    <RingMark size={14} state="locked" />
+                    <Text className="mt-2 font-display text-heading text-faint">{tile.name}</Text>
+                    <Text className="text-label text-faint">{tile.caption}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
           ) : null}
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </Screen>
   );
 }

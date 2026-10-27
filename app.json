@@ -48,7 +48,7 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/fonts/Marcellus-Regular.ttf"]
+          "fonts": ["./assets/fonts/Cinzel-SemiBold.ttf", "./assets/fonts/Cinzel-Bold.ttf"]
         }
       ],
       "expo-sqlite",

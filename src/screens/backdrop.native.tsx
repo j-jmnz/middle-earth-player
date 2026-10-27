@@ -60,6 +60,16 @@ export function Backdrop({ scene }: { scene: SceneName }) {
             />
           </Path>
         ))}
+        {s.vignette > 0 ? (
+          <Rect x={0} y={0} width={width} height={height}>
+            <RadialGradient
+              c={vec(width / 2, height * 0.42)}
+              r={Math.max(width, height) * 0.75}
+              positions={[0.45, 1]}
+              colors={[`rgba(0,0,0,0)`, `rgba(0,0,0,${s.vignette})`]}
+            />
+          </Rect>
+        ) : null}
         {s.ring ? (
           <Circle
             cx={s.ring.cx * width}

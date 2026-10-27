@@ -2,11 +2,11 @@ import { eq } from "drizzle-orm";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
-import { TextInput, View } from "react-native";
+import { View } from "react-native";
 
 import { formatDeckRefusal } from "../../catalog/deck-save";
 import { cards } from "../../catalog/schema";
-import { BodyText, Eyebrow, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SphereMark, markedSphere, type MarkedSphere } from "../chrome";
+import { BodyText, Eyebrow, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchField, Section, SphereMark, markedSphere, type MarkedSphere } from "../chrome";
 import { editSavedDeck, startNewDeck } from "../deck-draft";
 import { savedDeckName } from "../deck-status";
 import { listDecks, readDeck, writeDeck } from "../deck-store";
@@ -27,7 +27,6 @@ import {
   type PrebuiltRow,
 } from "../deck-import";
 import { useDatabases } from "../databases";
-import { palette } from "../palette.js";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
 import { notAppliedCodes } from "../../play/not-applied";
 import { goBack } from "../go-back";
@@ -167,20 +166,9 @@ export default function DeckImportScreen() {
       <View className="pt-6">
         <ScreenTitle>Import</ScreenTitle>
       </View>
-      <View className="mt-6">
-        <Eyebrow tone="muted">RingsDB</Eyebrow>
-      </View>
-      <View className="mt-2">
-        <TextInput
-          testID="deck-import-input"
-          value={value}
-          onChangeText={setValue}
-          placeholder="RingsDB decklist"
-          placeholderTextColor={palette.faint}
-          autoCorrect={false}
-          autoCapitalize="none"
-          className="min-h-14 rounded-pill bg-raised px-4 text-body text-bone"
-        />
+      <Section title="RingsDB" className="mt-4" />
+      <View className="flex-row">
+        <SearchField testID="deck-import-input" value={value} onChangeText={setValue} placeholder="RingsDB decklist" accessibilityLabel="RingsDB decklist link or number" search={false} />
       </View>
       {message ? (
         <BodyText tone="danger" className="mt-4">
@@ -202,7 +190,7 @@ export default function DeckImportScreen() {
     if (item.kind === "group") {
       return (
         <View accessibilityRole="header" className="border-b border-hairline bg-night px-6 pb-2 pt-6">
-          <Eyebrow tone="muted">{item.title}</Eyebrow>
+          <Eyebrow tone="moon">{item.title}</Eyebrow>
         </View>
       );
     }

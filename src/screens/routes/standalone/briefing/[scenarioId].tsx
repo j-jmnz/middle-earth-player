@@ -3,7 +3,6 @@
 // opens its table. `from` names a finished game whose seats, decks and difficulty are picked again (Play again).
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
 
 import { scenarioFacts, type BriefingSeat } from "../../../../campaign/briefing";
 import { FELLOWSHIP_ID } from "../../../../campaign/save";
@@ -12,9 +11,10 @@ import { loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { DeckFilter, expand, ScenarioHeader, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
+import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
+import { SeatPicker } from "../../../seat-picker";
 import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
-import { BodyText, Label, NavBar, PrimaryButton, Screen, Segmented, TextButton } from "../../../chrome";
+import { BodyText, Label, Section, Segmented } from "../../../chrome";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
 import { goBack } from "../../../go-back";
@@ -62,20 +62,20 @@ export default function StandaloneBriefing() {
   const result = useMemo(() => (input ? standaloneBriefing(input) : null), [input]);
   const facts = useMemo(() => (world ? scenarioFacts(world, difficulty, "standalone") : null), [world, difficulty]);
 
-  const back = (
-    <NavBar
-      onBack={() => goBack(router, "/scenarios")}
-      backTestID="briefing-back"
-      backLabel="Scenarios"
-      right={<TextButton label="Booklet" accessibilityLabel="Open the booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(FELLOWSHIP_ID, scenarioId) })} />}
-    />
-  );
+  const frame = {
+    testID: "standalone-briefing",
+    scenarioId,
+    backLabel: "Scenarios",
+    onBack: () => goBack(router, "/scenarios"),
+    onBooklet: () => router.push({ pathname: "/booklet/[id]", params: bookletParams(FELLOWSHIP_ID, scenarioId) }),
+  } as const;
   if (!campaign || !scenario || !world || !input || !result || !facts) {
     return (
-      <Screen testID="standalone-briefing" scene="vale">
-        {back}
-        <BodyText tone="danger">That scenario is not on this phone.</BodyText>
-      </Screen>
+      <BriefingScreen {...frame} banner={null}>
+        <BodyText tone="danger" className="mt-4">
+          That scenario is not on this phone.
+        </BodyText>
+      </BriefingScreen>
     );
   }
 
@@ -108,52 +108,34 @@ export default function StandaloneBriefing() {
   }
 
   return (
-    <Screen testID="standalone-briefing" scene="vale">
-      {back}
-      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6" keyboardShouldPersistTaps="handled">
-        <ScenarioHeader facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} eyebrow={`Standalone · Scenario ${facts.number}`} />
-        <View className="mt-5">
-          <Segmented
-            options={SEAT_WORDS}
-            value={seatWord(seatCount)}
-            onChange={(next) => setSeatCount(seatCountOf(next))}
-            testIDPrefix="seats"
-          />
-        </View>
-        <Label tone="muted" className="mt-3">
-          No campaign card, boons or burdens. A win is scored; nothing is written to a campaign.
-        </Label>
-        <DeckFilter decks={briefingDecks} />
-        {seats.map((seat, index) => (
-          <SeatPicker
-            key={index}
-            index={index}
-            seatCount={seatCount}
-            decks={briefingDecks}
-            picked={seat.deckId}
-            heroes={seat.heroes}
-            fallen={[]}
-            needsRingBearer={result.needsRingBearer}
-            ringBearer={ringBearer}
-            onPick={(deckId) => pick(index, deckId)}
-            onRingBearer={setRingBearer}
-            nameOf={nameOf}
-          />
-        ))}
-      </ScrollView>
-      <View testID="briefing-deal-bar" className="gap-2 pb-safe pt-3">
-        {result.problems.map((problem, index) => (
-          <BodyText key={`${index}-${problem.message}`} tone="danger" testID={`briefing-error-${index}`}>
-            {problem.message}
-          </BodyText>
-        ))}
-        {dealError ? (
-          <BodyText tone="danger" testID="briefing-deal-error">
-            {dealError}
-          </BodyText>
-        ) : null}
-        <PrimaryButton label="Deal" testID="deal" disabled={!result.dealable} onPress={onDeal} />
-      </View>
-    </Screen>
+    <BriefingScreen
+      {...frame}
+      banner={<ScenarioBanner facts={facts} eyebrow={`Standalone · Scenario ${facts.number}`} />}
+      bar={<DealBar problems={result.problems} dealError={dealError} difficulty={difficulty} dealable={result.dealable} onDeal={onDeal} />}
+    >
+      <Section title="Players" className="mt-4" />
+      <Segmented options={SEAT_WORDS} value={seatWord(seatCount)} onChange={(next) => setSeatCount(seatCountOf(next))} testIDPrefix="seats" stretch />
+      <Label tone="muted" className="mt-2">
+        No campaign card, boons or burdens. A win is scored; nothing is written to a campaign.
+      </Label>
+      <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} />
+      {seats.map((seat, index) => (
+        <SeatPicker
+          key={index}
+          index={index}
+          seatCount={seatCount}
+          decks={briefingDecks}
+          picked={seat.deckId}
+          heroes={seat.heroes}
+          fallen={[]}
+          needsRingBearer={result.needsRingBearer}
+          ringBearer={ringBearer}
+          onPick={(deckId) => pick(index, deckId)}
+          onRingBearer={setRingBearer}
+          nameOf={nameOf}
+        />
+      ))}
+      <EncounterDetails facts={facts} />
+    </BriefingScreen>
   );
 }

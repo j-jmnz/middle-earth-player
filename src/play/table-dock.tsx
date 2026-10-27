@@ -17,6 +17,7 @@ import { Stats } from "./sheet-paper.tsx";
 import type { Unavailable } from "./sheet-types.ts";
 import type { Dock, DockButton } from "./table-choice.ts";
 import { LineMark } from "./table-chrome.tsx";
+import { panelSurface, tileSurface } from "./surfaces.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 /** The engine's numbers for the moment, large, and what they come to: raised night in the dock, ink on a paper panel. */
@@ -123,16 +124,16 @@ export function TableDock({
   const readoutLine = dense && trayOpen;
   return (
     <View style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
-      <View testID="dock" className={`rounded-card px-3 ${dense ? "pb-0.5 pt-0.5" : "pb-1 pt-1.5"}`} style={{ backgroundColor: t.night, borderWidth: 1, borderColor: t.hairline, flexShrink: 1 }}>
+      <View testID="dock" className={`rounded-card px-3 ${dense ? "pb-0.5 pt-0.5" : "pb-1 pt-1.5"}`} style={{ ...tileSurface(), flexShrink: 1 }}>
         {/* The words above the numbers are budgeted to fit (planWords); the guard scrolls only on a taller screen's long lines. The
             readout, the armed line and every button are pinned to the dock's foot and never scroll away. */}
         <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0, opacity: trayOpen ? 0 : 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
           <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))}>
-            <Text testID="sheet-step" numberOfLines={1} className="text-center font-display text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
+            <Text testID="sheet-step" numberOfLines={1} className="text-center font-display-bold text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
               {step}
             </Text>
             <View className="flex-row items-start gap-1.5">
-              <Text testID="sheet-title" accessibilityRole="header" accessibilityLabel={title} numberOfLines={plan.titleLines} className="flex-1 text-center font-display text-body text-bone" style={{ flexShrink: 0 }}>
+              <Text testID="sheet-title" accessibilityRole="header" accessibilityLabel={title} numberOfLines={plan.titleLines} className="flex-1 text-center font-display text-heading text-bone" style={{ flexShrink: 0, lineHeight: 24 }}>
                 {title}
               </Text>
               {plan.pillOnTitle ? pill : null}
@@ -208,13 +209,13 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
       {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
       <View
         className="rounded-card"
-        style={{ ...box, backgroundColor: t.night, opacity: 0.96, shadowColor: t.night, shadowOpacity: 0.9, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 10 }}
+        style={{ ...box, ...panelSurface(), opacity: 0.97, shadowColor: t.night, shadowOpacity: 0.9, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 10 }}
       >
         <View testID="moment" accessible accessibilityLabel={label} className="overflow-hidden rounded-card" style={{ borderWidth: 1, borderColor: edge }}>
           {/* The tone, as a band along the top: gold for a success, threat red for a failure or an engagement. */}
           <View style={{ height: 3, backgroundColor: edge }} />
           <View className="items-center px-4 pb-2 pt-1.5">
-            <Text testID="moment-title" className="text-center font-display text-body text-bone">
+            <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 }}>
               {moment.title}
             </Text>
             {moment.lines.slice(0, shownLines).map((line, index) => (

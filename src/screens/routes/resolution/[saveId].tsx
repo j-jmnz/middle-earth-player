@@ -4,12 +4,14 @@
 // group as the tiles. Lost: Defeat and nothing written (docs/design-system.md, Resolution).
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useStore } from "zustand";
 
 import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
-import { BodyText, Eyebrow, NavBar, PrimaryButton, Screen, TextButton } from "../../chrome";
+import { ActionBar, BodyText, Corners, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton } from "../../chrome";
+import { tileSurface } from "../../../play/surfaces";
+import { withAlphaHex } from "../../../play/tokens";
 import { campaignOf, scenarioOf } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
@@ -29,21 +31,21 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       accessibilityState={{ selected }}
       accessibilityLabel={selected ? `${label}, selected` : label}
       onPress={onPress}
-      className="min-h-14 items-center rounded-tile p-3"
-      style={({ pressed }) => ({
-        // Two tiles a row: a boon offered on each hero makes a longer list than one row holds. An odd last tile keeps the
-        // two-column width.
-        flexBasis: "46%",
-        flexGrow: 1,
-        maxWidth: "50%",
-        borderWidth: selected ? 1.5 : 1,
-        borderColor: selected ? palette.gold : palette.hairline,
-        backgroundColor: pressed ? palette.pressed : palette.raised,
-      })}
+      // Two tiles a row: a boon offered on each hero makes a longer list than one row holds. An odd last tile keeps the
+      // two-column width.
+      style={{ flexBasis: "46%", flexGrow: 1, maxWidth: "50%" }}
     >
-      {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={64} height={88} /> : null}
-      <Text className={`mt-2 text-center text-body text-bone ${selected ? "font-semibold" : ""}`}>{label}</Text>
-      {selected ? <Text className="text-label text-gold">Selected</Text> : null}
+      {({ pressed }) => (
+        <View
+          className="min-h-14 items-center rounded-card p-3"
+          style={{ ...tileSurface(pressed), ...(selected ? { borderWidth: 1.5, borderColor: palette.gold, boxShadow: `0 0 18px ${withAlphaHex(palette.gold, 0.28)}` } : {}) }}
+        >
+          {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={72} height={100} /> : null}
+          <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-goldHigh" : "text-bone"}`}>{label}</Text>
+          {selected ? <Text className="mt-0.5 text-label font-semibold text-goldHigh">Selected</Text> : null}
+          {selected ? <Corners /> : null}
+        </View>
+      )}
     </Pressable>
   );
 }
@@ -71,20 +73,15 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
     return (
       <Screen testID="resolution" scene="plain">
         {back}
-        <View className="flex-1 justify-center">
-          <Text testID="resolution-outcome" accessibilityRole="header" className="font-display text-display text-bone">
-            Defeat
-          </Text>
-          <BodyText tone="muted" className="mt-2">
-            {scenario?.name ?? ""}
-          </BodyText>
-          <BodyText tone="muted" className="mt-4" testID="resolution-consequence">
+        <View className="flex-1 items-center justify-center">
+          <OutcomeTitle won={false} scenario={scenario?.name ?? ""} testID="resolution-outcome" />
+          <BodyText tone="muted" className="mt-6 text-center" testID="resolution-consequence">
             The scenario was lost. Nothing is written to the log.
           </BodyText>
-          <View className="mt-6 items-start">
-            <TextButton label="Back to path" testID="resolution-back" onPress={close} />
-          </View>
         </View>
+        <ActionBar>
+          <SecondaryButton label="Back to path" testID="resolution-back" onPress={close} />
+        </ActionBar>
       </Screen>
     );
   }
@@ -112,22 +109,15 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
       {back}
       {/* While choosing, the tiles and the decline under Confirm are one radio group. */}
       <View className="min-h-0 flex-1" {...(view.kind === "choosing" ? { accessibilityRole: "radiogroup" as const } : {})}>
-        <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6 pt-4">
-          <Text
-            testID="resolution-outcome"
-            accessibilityRole="header"
-            className="text-center font-display text-display uppercase text-gold"
-            style={{ textShadowColor: palette.gold, textShadowRadius: 12, textShadowOffset: { width: 0, height: 0 } }}
-          >
-            Victory
-          </Text>
-          <BodyText tone="muted" className="mt-1 text-center">
-            {scenario?.name ?? ""}
-          </BodyText>
+        <ScreenScroll top={16} bottom={24}>
+          {/* While choosing, the outcome word sits higher so a row of tiles shows whole above the bar. */}
+          <View className={view.kind === "choosing" ? "mt-4" : "mt-16"}>
+            <OutcomeTitle won scenario={scenario?.name ?? ""} testID="resolution-outcome" />
+          </View>
           {view.kind === "choosing" ? (
             <View className="mt-8">
-              <View className="items-center" testID="resolution-group">
-                <Eyebrow>{view.eyebrow}</Eyebrow>
+              <View testID="resolution-group">
+                <Section title={view.eyebrow} />
               </View>
               {view.seatLabel ? (
                 <BodyText tone="muted" className="mt-1 text-center" testID="resolution-seat">
@@ -147,8 +137,8 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
               </View>
             </View>
           ) : null}
-        </ScrollView>
-        <View className="pb-safe pt-2">
+        </ScreenScroll>
+        <ActionBar>
           {refusal ? (
             <BodyText tone="danger" className="mb-2">
               {refusal}
@@ -156,9 +146,9 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
           ) : null}
           {view.kind === "choosing" ? (
             <>
-              <BodyText tone="muted" className="mb-3 text-center" testID="resolution-consequence">
+              <Label tone="muted" className="mb-3 text-center" testID="resolution-consequence">
                 {consequenceSentence(view, picked, declined)}
-              </BodyText>
+              </Label>
               <PrimaryButton
                 label="Confirm"
                 testID="resolution-confirm"
@@ -178,15 +168,15 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                     accessibilityLabel={declined ? `${view.decline.label}, selected` : view.decline.label}
                     onPress={() => setChosen(view.decline?.optionId ?? null)}
                   />
-                  {declined ? <Text className="text-label text-gold">Selected</Text> : null}
+                  {declined ? <Text className="text-label font-semibold text-goldHigh">Selected</Text> : null}
                 </View>
               ) : null}
             </>
           ) : (
             <>
-              <BodyText tone="muted" className="mb-3 text-center" testID="resolution-consequence">
+              <Label tone="muted" className="mb-3 text-center" testID="resolution-consequence">
                 {done ? "You have won this scenario before. Nothing is granted a second time." : settledSentence(view, session.world, nextName)}
-              </BodyText>
+              </Label>
               <PrimaryButton
                 label="Confirm"
                 testID="resolution-confirm"
@@ -197,7 +187,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
               />
             </>
           )}
-        </View>
+        </ActionBar>
       </View>
     </Screen>
   );

@@ -14,6 +14,8 @@ export type DeckFace = DeckSaveCard & {
   threat: number | null;
   // The printed text, for the "not applied" check (src/play/not-applied.ts). Optional: a face built elsewhere may lack it.
   text?: string | null;
+  // The printed cost ("2", "X", "-"), for the editor's cost curve. Optional for the same reason.
+  cost?: string | null;
 };
 
 export type DeckContent = {
@@ -167,4 +169,36 @@ export function notAppliedCards(deck: Pick<DeckContent, "heroes" | "cards">, ina
 export function notAppliedLine(deck: Pick<DeckContent, "heroes" | "cards">, inactive: ReadonlySet<string>): string | null {
   const copies = notAppliedCards(deck, inactive).reduce((sum, card) => sum + card.copies, 0);
   return copies === 0 ? null : `${plural(copies, "card", "cards")} with text not applied`;
+}
+
+/** The editor's cost curve: the copies at each printed cost from 0 to 4, then 5 and over, and the average of the numbered costs. */
+export const CURVE_LABELS = ["0", "1", "2", "3", "4", "5+"] as const;
+
+export function costCurve(cards: readonly { code: string; count: number }[], faces: ReadonlyMap<string, Pick<DeckFace, "cost">>): { counts: number[]; average: number | null } {
+  const counts = CURVE_LABELS.map(() => 0);
+  let copies = 0;
+  let total = 0;
+  for (const card of cards) {
+    const printed = faces.get(card.code)?.cost;
+    // A cost printed as X or a dash is not on the curve.
+    if (printed == null || !/^\d+$/.test(printed)) continue;
+    const cost = Number(printed);
+    counts[Math.min(cost, CURVE_LABELS.length - 1)] += card.count;
+    copies += card.count;
+    total += cost * card.count;
+  }
+  return { counts, average: copies === 0 ? null : Math.round((total / copies) * 10) / 10 };
+}
+
+/** The deck's cards by sphere, in copies, largest first: the editor's sphere bar. Heroes are not counted; they show as icons. */
+export function sphereSplit(cards: readonly { code: string; count: number }[], faces: ReadonlyMap<string, Pick<DeckFace, "sphereCode" | "sphereName">>): { code: string; name: string; count: number }[] {
+  const split = new Map<string, { code: string; name: string; count: number }>();
+  for (const card of cards) {
+    const face = faces.get(card.code);
+    if (!face?.sphereCode) continue;
+    const entry = split.get(face.sphereCode) ?? { code: face.sphereCode, name: face.sphereName ?? face.sphereCode, count: 0 };
+    entry.count += card.count;
+    split.set(face.sphereCode, entry);
+  }
+  return [...split.values()].sort((left, right) => right.count - left.count || left.code.localeCompare(right.code));
 }

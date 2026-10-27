@@ -1,26 +1,32 @@
 /**
- * Chrome colors for the Night theme. See docs/design-system.md.
+ * Chrome colors for the Lamplight theme. See docs/design-system.md.
  * app.json splash and adaptive-icon backgrounds must match `paper`.
- * Backdrop gradient stops are scene art and live only in backdrop-scenes.ts.
+ * Backdrop gradient stops are scene art and live only in backdrop-scenes.ts; the gradients of a surface or a button are
+ * built from these tokens in surfaces.ts.
  */
 const palette = {
-  // Night surfaces
-  night: "#0A0B0E",
-  dusk: "#14171D",
-  raised: "#16181D",
-  pressed: "#1E2026",
-  hairline: "#24262B",
+  // Night surfaces: the page, a panel's base and its lit top edge, the pressed fill, the rules between rows
+  night: "#07080B",
+  dusk: "#0F1116",
+  raised: "#14171D",
+  raisedTop: "#1A1E26",
+  pressed: "#1E222B",
+  hairline: "#24272F",
   // Text on night
-  bone: "#F1EADB",
-  muted: "#A39C8E",
+  bone: "#EEE7D7",
+  muted: "#A39B8C",
   faint: "#8A857C",
-  danger: "#E39A80",
-  // Gold: the Ring. Current, primary, focus.
-  gold: "#D9B86C",
-  goldHigh: "#EBD08E",
-  goldDeep: "#B8924A",
-  goldLine: "#5E5032",
-  onGold: "#1A140A",
+  danger: "#E8917B",
+  // Gold: the Ring. The one primary action, the current step, what is selected.
+  gold: "#D9B66C",
+  goldHigh: "#F3DA9A",
+  goldDeep: "#A9813F",
+  goldLine: "#5E4C2C",
+  onGold: "#1A1309",
+  // Moonlight: section headings and quiet information, so gold stays for the one thing to do
+  moon: "#9DB0CC",
+  // A deck or a loadout that is ready to play
+  ok: "#8FBF7A",
   // Parchment: splash, log, choice sheets
   paper: "#F2EBDB",
   paperPressed: "#E5DBC4",
@@ -33,7 +39,7 @@ const palette = {
   felt: "#121613",
   feltLight: "#1F2620",
   // Encounter marks
-  threat: "#B9483A",
+  threat: "#C8432F",
   treachery: "#3A221C",
   quest: "#8F877E",
   location: "#7A5840",

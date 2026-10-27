@@ -3,7 +3,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { AccessibilityInfo, View } from "react-native";
 
-import { BodyText, Screen, ScreenTitle, TextButton } from "../../chrome";
+import { BodyText, IconButton, Screen, ScreenTitle, TextButton } from "../../chrome";
 import { editSavedDeck, startNewDeck } from "../../deck-draft";
 import { copyDeckName, deckCountLine, deckReadiness, newDeckName, notAppliedLine } from "../../deck-status";
 import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, type SavedDeck } from "../../deck-store";
@@ -26,7 +26,7 @@ type Row =
   | { kind: "no-match"; key: string }
   | { kind: "starter-missing"; key: string };
 
-const COVER_HEIGHT = 144;
+const COVER_HEIGHT = 128;
 
 function useSeedStatus(): StarterSeed {
   return useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending");
@@ -184,7 +184,7 @@ export default function Decks() {
     if (item.kind === "empty") {
       return (
         <BodyText testID="decks-empty" tone="muted" className="mt-4">
-          No decks yet. Tap New deck to build one, or Import one from RingsDB or a pre-built list.
+          No decks yet. Tap + to build one, or Import one from RingsDB or a pre-built list.
         </BodyText>
       );
     }
@@ -253,30 +253,32 @@ export default function Decks() {
   const filters =
     saved.length > 0 ? <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={saved.length} /> : null;
 
+  // The title with the list's own actions beside it: Import, Manage and New deck (+), so the decks start high on the screen.
   const header = (
-    <View className="pt-6">
+    <View className="pt-4">
       <View className="flex-row items-center justify-between">
         <ScreenTitle>Decks</ScreenTitle>
-        {seed !== "pending" && saved.length > 0 ? (
-          <View className="-mr-3">
-            <TextButton
-              testID="decks-manage"
-              label={managing ? "Done" : "Manage"}
-              accessibilityLabel={managing ? "Done managing decks" : "Manage decks"}
-              onPress={() => {
-                setManaging(!managing);
-                setAsking(null);
-              }}
-            />
+        {seed !== "pending" ? (
+          <View className="-mr-1 flex-row items-center">
+            <TextButton testID="deck-import" label="Import" tone="muted" accessibilityLabel="Import a deck" onPress={() => router.push("/deck-import")} />
+            {saved.length > 0 ? (
+              <TextButton
+                testID="decks-manage"
+                label={managing ? "Done" : "Manage"}
+                tone="muted"
+                accessibilityLabel={managing ? "Done managing decks" : "Manage decks"}
+                onPress={() => {
+                  setManaging(!managing);
+                  setAsking(null);
+                }}
+              />
+            ) : null}
+            <View className="ml-1">
+              <IconButton testID="deck-new" glyph="+" tone="gold" label="New deck" onPress={newDeck} />
+            </View>
           </View>
         ) : null}
       </View>
-      {seed !== "pending" ? (
-        <View className="-mx-3 mt-2 flex-row flex-wrap items-center">
-          <TextButton testID="deck-new" label="New deck" tone="gold" onPress={newDeck} />
-          <TextButton testID="deck-import" label="Import" onPress={() => router.push("/deck-import")} />
-        </View>
-      ) : null}
       {filters}
     </View>
   );
@@ -293,7 +295,7 @@ export default function Decks() {
           <FlashList
             data={rows}
             keyExtractor={(item) => item.key}
-            getItemType={(item) => item.kind}
+            getItemType={(item) => `${item.kind}:${view}`}
             renderItem={renderRow}
             extraData={{ managing, asking, readiness, view }}
             keyboardShouldPersistTaps="handled"

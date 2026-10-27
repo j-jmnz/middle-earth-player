@@ -21,44 +21,38 @@ export type Scene = {
   glows: readonly Glow[];
   ridges: readonly Ridge[];
   ring?: { cx: number; cy: number; r: number };
+  // How dark the screen's edges fall (0 to 1): a lamp-lit middle and night at the corners.
+  vignette: number;
 };
 
-const night = "#0A0B0E";
+const night = "#07080B";
 
 export const scenes: Record<SceneName, Scene> = {
-  // Campaigns: mountains at dusk, the eye drawn to a warm light past the ridge.
+  // Campaigns and Scenarios: a moonlit night over far mountains, a cold light high on the right and an ember low on the left.
   dusk: {
     base: {
       kind: "linear",
       stops: [
-        [0, "#121A28"],
-        [0.21, "#26293A"],
-        [0.31, "#4A3A2C"],
-        [0.41, "#1A1712"],
-        [0.62, night],
+        [0, "#0D1220"],
+        [0.32, "#0B0E17"],
+        [0.6, night],
         [1, night],
       ],
     },
     glows: [
-      { cx: 0.62, cy: 0.28, r: 0.55, rgb: "232,180,100", alpha: 0.55 },
-      { cx: 0.5, cy: 0.39, r: 0.7, rgb: "220,210,190", alpha: 0.1 },
+      { cx: 0.82, cy: 0.06, r: 0.75, rgb: "157,176,204", alpha: 0.16 },
+      { cx: 0.08, cy: 0.62, r: 0.7, rgb: "217,150,90", alpha: 0.07 },
     ],
     ridges: [
       {
-        points: [[0, 0.397], [0.1, 0.36], [0.19, 0.382], [0.31, 0.305], [0.42, 0.36], [0.54, 0.323], [0.63, 0.354], [0.76, 0.292], [0.88, 0.348], [1, 0.329]],
-        bottom: 0.56,
-        from: "#1D212C",
-        to: "#1D212C",
-        opacity: 0.85,
-      },
-      {
-        points: [[0, 0.434], [0.14, 0.402], [0.27, 0.444], [0.4, 0.408], [0.55, 0.449], [0.7, 0.397], [0.84, 0.434], [1, 0.412]],
-        bottom: 1,
-        from: "#101218",
+        points: [[0, 0.33], [0.12, 0.3], [0.22, 0.318], [0.34, 0.262], [0.46, 0.305], [0.58, 0.276], [0.7, 0.3], [0.82, 0.25], [0.92, 0.29], [1, 0.276]],
+        bottom: 0.5,
+        from: "#121725",
         to: night,
-        opacity: 1,
+        opacity: 0.9,
       },
     ],
+    vignette: 0.55,
   },
   // Campaign path: lamplight on the left, cold blue below.
   ember: {
@@ -68,6 +62,7 @@ export const scenes: Record<SceneName, Scene> = {
       { cx: 0.8, cy: 0.8, r: 0.9, rgb: "70,86,120", alpha: 0.18 },
     ],
     ridges: [],
+    vignette: 0.5,
   },
   // Briefing: a green vale in afternoon light.
   vale: {
@@ -91,12 +86,17 @@ export const scenes: Record<SceneName, Scene> = {
         opacity: 1,
       },
     ],
+    vignette: 0.5,
   },
   // Lists and detail screens: quiet, one cold light top-left.
   plain: {
-    base: { kind: "linear", stops: [[0, "#10131A"], [1, night]] },
-    glows: [{ cx: 0.2, cy: 0, r: 0.9, rgb: "90,110,150", alpha: 0.22 }],
+    base: { kind: "linear", stops: [[0, "#0E121A"], [1, night]] },
+    glows: [
+      { cx: 0.2, cy: 0, r: 0.9, rgb: "90,110,150", alpha: 0.2 },
+      { cx: 0.9, cy: 0.95, r: 0.6, rgb: "217,150,90", alpha: 0.05 },
+    ],
     ridges: [],
+    vignette: 0.5,
   },
   // Resolution: the Ring, lit.
   victory: {
@@ -104,11 +104,13 @@ export const scenes: Record<SceneName, Scene> = {
     glows: [{ cx: 0.5, cy: 0.22, r: 0.6, rgb: "232,190,110", alpha: 0.35 }],
     ridges: [],
     ring: { cx: 0.5, cy: 0.225, r: 0.28 },
+    vignette: 0.6,
   },
   // Table chrome around the Skia canvas.
   felt: {
     base: { kind: "radial", cx: 0.5, cy: 0.46, r: 0.9, stops: [[0, "#1F2620"], [0.6, "#121613"], [1, "#090A0B"]] },
     glows: [{ cx: 0.5, cy: 0.12, r: 0.6, rgb: "217,184,108", alpha: 0.08 }],
     ridges: [],
+    vignette: 0,
   },
 };

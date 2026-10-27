@@ -6,7 +6,7 @@ import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { cards } from "../../../catalog/schema";
 import { inArray } from "drizzle-orm";
-import { BodyText, NavBar, PrimaryButton, Screen, TextButton } from "../../chrome";
+import { BodyText, Eyebrow, IconButton, NavBar, PrimaryButton, Screen } from "../../chrome";
 import { campaignOf, scenarioNames } from "../../campaign-data";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
@@ -20,8 +20,8 @@ function Row({ label, value, testID, icon }: { label: string; value: string; tes
   return (
     <View className="border-b border-inkLine py-3">
       <View className="flex-row items-center gap-1">
-        {icon ? <GameIcon name={icon} size={13} tint="inkLabel" /> : null}
-        <Text className="text-label text-inkLabel">{label}</Text>
+        {icon ? <GameIcon name={icon} size={12} tint="inkLabel" /> : null}
+        <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
       </View>
       <Text testID={testID} className="mt-0.5 text-body text-ink">
         {value}
@@ -63,7 +63,7 @@ export default function Log() {
     update({ ...save, log: { ...save.log, notes: edited } });
     setEdited(null);
   }
-  const back = <NavBar onBack={() => { saveNotes(); goBack(router, save ? { pathname: "/path/[saveId]", params: { saveId: save.id } } : "/"); }} backTestID="log-back" right={<TextButton label="Booklet" accessibilityLabel="Open the booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? FELLOWSHIP_ID } })} />} />;
+  const back = <NavBar onBack={() => { saveNotes(); goBack(router, save ? { pathname: "/path/[saveId]", params: { saveId: save.id } } : "/"); }} backTestID="log-back" backLabel="Path" right={<IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? FELLOWSHIP_ID } })} />} />;
   if (!loaded) return <Screen testID="log" scene="plain">{back}<BodyText tone="muted">Loading</BodyText></Screen>;
   const campaign = save ? campaignOf(save.campaignId) : null;
   if (!save || !campaign) {
@@ -91,10 +91,18 @@ export default function Log() {
     <Screen testID="log" scene="plain">
       {back}
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-safe" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
-        <View className="mt-3 rounded-card bg-paper px-5 py-4">
-          <Text accessibilityRole="header" className="font-display text-title text-ink">
-            Campaign Log
-          </Text>
+        <View className="mt-2 rounded-card bg-paper px-5 py-5" style={{ borderWidth: 1, borderColor: palette.paperEdge }}>
+          <View className="items-center">
+            <Eyebrow tone="inkLabel">{campaign.name}</Eyebrow>
+            <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">
+              Campaign Log
+            </Text>
+          </View>
+          {/* A double rule under the title, as the printed log sheet has. */}
+          <View className="mt-3 gap-0.5">
+            <View className="h-px bg-inkLine" />
+            <View className="h-px bg-inkLine" />
+          </View>
           <Row label="Heroes" value={bySeat(log.heroesBySeat)} testID="log-heroes" />
           <Row label="Fallen Heroes" value={bySeat(log.fallenHeroesBySeat)} testID="log-fallen" />
           <Row label="Threat Modifiers" value={log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" icon="threat" />
@@ -106,20 +114,20 @@ export default function Log() {
             testID="log-captives"
           />
           <View className="border-b border-inkLine py-3">
-            <Text className="text-label text-inkLabel">Scenarios Completed</Text>
+            <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">Scenarios Completed</Text>
             {campaign.scenarios.map((id) => {
               const score = log.scenarios[id];
               return (
                 <View key={id} testID={`log-scenario-${id}`} className="mt-1 flex-row items-baseline justify-between">
                   <Text className={score ? "flex-1 text-body text-ink" : "flex-1 text-body text-inkMuted"}>{names[id] ?? id}</Text>
-                  <Text className="text-label text-inkMuted">{score ? `${score.rounds} rounds · ${score.score}` : "Not completed"}</Text>
+                  <Text className={score ? "font-display-bold text-label text-ink" : "text-label text-inkMuted"}>{score ? `${score.rounds} rounds · ${score.score}` : "Not completed"}</Text>
                 </View>
               );
             })}
           </View>
           <Row label="Campaign Total" value={String(log.score)} testID="log-score" />
           <View className="py-3">
-            <Text className="text-label text-inkLabel">Notes</Text>
+            <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">Notes</Text>
             <TextInput
               testID="log-notes"
               multiline
@@ -128,7 +136,7 @@ export default function Log() {
               onBlur={saveNotes}
               placeholder="Write a note"
               placeholderTextColor={palette.inkMuted}
-              className="mt-1 min-h-24 font-display text-body text-ink"
+              className="mt-1 min-h-24 text-body italic text-ink"
               textAlignVertical="top"
             />
           </View>
