@@ -21,7 +21,8 @@ export type EngineStep =
   // The numbers quest resolution compared (rr.step-3-4): committed willpower against the threat in staging. It reports what
   // the engine read; the threat or progress that followed is its own step.
   | { kind: "quest"; willpower: number; threat: number; cause: Cause }
-  | { kind: "attack"; side: "enemy" | "player"; seat: number; enemyId: string }
+  // A players' attack names the characters declared as attackers (`attackerIds`, rr.step-6-8b), which the table's spotlight shows.
+  | { kind: "attack"; side: "enemy" | "player"; seat: number; enemyId: string; attackerIds?: readonly string[] }
   // The numbers an attack's combat damage came from (rr.step-6-4-3, rr.step-6-8-3): the attack strength against the defense
   // of the card it hits (0 for the hero an undefended attack hits, `undefended`). The damage placed is the `damage` step
   // after it.

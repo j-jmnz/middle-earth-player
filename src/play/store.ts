@@ -7,8 +7,10 @@ import { createStore, type StoreApi } from "zustand/vanilla";
 
 import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
+import { clashesOf } from "./clash.ts";
 import { finishedRoundSteps } from "./outcome.ts";
 import { draggableIds, dropTargets, type DropTarget } from "./selection.ts";
+import { endGate, leaveGate, NO_SPOTLIGHT, openGate, type SpotlightGate } from "./spotlight-gate.ts";
 import { nextUndoable, type Undoable } from "./undo-history.ts";
 
 // The engine types the screens hold. src/screens reaches the reducer only through src/play and src/campaign.
@@ -32,6 +34,9 @@ export type TableState = {
   shown: TableMoment | null;
   // The states Undo can go back to, oldest first.
   history: readonly Undoable[];
+  // The combat spotlight of the moment in `shown`: the attacks it resolved, and whether the canvas is still playing them
+  // (spotlight-gate.ts). The banner, the settle after a new moment and the card motions wait for it; it holds no rule.
+  spotlight: SpotlightGate;
 };
 
 export type TableActions = {
@@ -40,6 +45,11 @@ export type TableActions = {
   undo: () => boolean;
   select: (cardId: string | null) => void;
   clearRefusal: () => void;
+  // The spotlight finished ("done") or was skipped by a tap (the default); for the moment `seq`, else the current one. A gate that
+  // already ended stays as it was.
+  endSpotlight: (how?: "done" | "skipped", seq?: number) => void;
+  // The last attack of the spotlight has begun to go back.
+  leaveSpotlight: (seq?: number) => void;
 };
 
 export type TableStore = StoreApi<TableState & TableActions>;
@@ -104,6 +114,7 @@ export function createTableStore(input: TableInput): TableStore {
     moment: null,
     shown: null,
     history: input.history ?? [],
+    spotlight: NO_SPOTLIGHT,
     dispatch: (intent) => {
       const before = get().game;
       const result = reduce(before, intent, ctx);
@@ -115,11 +126,14 @@ export function createTableStore(input: TableInput): TableStore {
       const crossed = result.state.round !== before.round && before.round > 0;
       const ended = crossed ? { ended: { round: before.round, steps: finishedRoundSteps([...get().roundSteps, ...result.steps]) } } : {};
       const moment: TableMoment = { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, after: result.state, steps: result.steps, ...ended };
+      const shows = result.steps.length > 0 || crossed;
       set({
         ...showing(result.state),
         ...keepIntent(get(), before, result.state, result.steps, intent),
         moment,
-        shown: result.steps.length > 0 || crossed ? moment : get().shown,
+        shown: shows ? moment : get().shown,
+        // The attacks this moment resolved play on the canvas before its banner; a pass that shows nothing leaves the last gate be.
+        spotlight: shows ? openGate(moment.seq, clashesOf(before, result.state, result.steps)) : get().spotlight,
       });
       input.onCommit?.(intent, result.state);
       return true;
@@ -135,6 +149,8 @@ export function createTableStore(input: TableInput): TableStore {
         history: history.slice(0, -1),
         moment: undone,
         shown: undone,
+        // Undo takes the attack back: nothing is replayed, and one still playing ends.
+        spotlight: endGate(get().spotlight, "skipped"),
       });
       input.onUndo?.(last.before);
       return true;
@@ -145,5 +161,13 @@ export function createTableStore(input: TableInput): TableStore {
       set({ selected: cardId, targets: cardId ? dropTargets(game, ctx, legal, cardId) : [] });
     },
     clearRefusal: () => set({ refusal: null }),
+    endSpotlight: (how = "skipped", seq) => {
+      const gate = endGate(get().spotlight, how, seq);
+      if (gate !== get().spotlight) set({ spotlight: gate });
+    },
+    leaveSpotlight: (seq) => {
+      const gate = leaveGate(get().spotlight, seq);
+      if (gate !== get().spotlight) set({ spotlight: gate });
+    },
   }));
 }

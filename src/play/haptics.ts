@@ -35,3 +35,8 @@ export function tickRefused(): void {
 export function tickLand(): void {
   quietly(() => (android ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Segment_Tick) : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)));
 }
+
+/** The strike of the combat spotlight met its target: a medium impact at the hit stop, at most one per strike. */
+export function tickImpact(): void {
+  quietly(() => (android ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Long_Press) : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)));
+}

@@ -2,11 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/fixture.ts";
 import type { EngineStep } from "../rules/intents.ts";
-import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { modifiedStat } from "../rules/keywords.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import { shadowCards } from "../rules/zones.ts";
-import { nextIntent } from "../../scripts/auto-player.ts";
-import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
+import { attackOrPolicy } from "../../scripts/combat-policy.ts";
+import { starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.step-6-8-3, ltp.shadow-discard (data/rules/entries.json). The combat
 // phase from the table's side, over whole games of both starter decks: every attacking enemy carries a face-down shadow card
@@ -32,40 +31,6 @@ function checkStrikes(steps: readonly EngineStep[], seen: Seen): void {
       expect(placed?.kind === "damage" ? placed.amount : 0).toBeLessThanOrEqual(owed);
     }
   });
-}
-
-// The hero with the most attack, kept back from the quest and from defense so the seat has someone to attack with.
-function striker(state: ScenarioState, ctx: ReduceContext): string | null {
-  const heroes = state.seats[state.activeSeat]?.heroes ?? [];
-  const attack = (id: string) => modifiedStat(state, state.cards[id] ?? (null as never), "attack", ctx.cards);
-  return [...heroes].filter((id) => state.cards[id]?.code !== RING_BEARER).sort((a, b) => attack(b) - attack(a))[0] ?? null;
-}
-
-// The auto-player never attacks (its goldens are pinned). Here the seat keeps its best attacker ready, and attacks the first
-// enemy it can with every character that may join, so player attacks are played too.
-function attackOrPolicy(state: ScenarioState, ctx: ReduceContext): PlayerIntent {
-  const kept = striker(state, ctx);
-  const legal = legalIntents(state, ctx);
-  if (state.mode === "questCommit" && state.window?.kind === "pass" && legal.some((intent) => intent.type === "Commit")) {
-    const cardIds = legalTargets(state, { type: "Commit" }, ctx).filter((id) => id !== kept);
-    if (cardIds.length > 0) return { type: "Commit", cardIds };
-  }
-  if (state.window?.kind === "defense" && kept) {
-    const heroes = legalTargets(state, { type: "Undefended" }, ctx).filter((id) => id !== kept && state.cards[id]?.code !== RING_BEARER);
-    const defenders = legalTargets(state, { type: "DeclareDefender" }, ctx).filter((id) => id !== kept);
-    if (defenders[0]) return { type: "DeclareDefender", defenderId: defenders[0] };
-    if (heroes[0]) return { type: "Undefended", heroId: heroes[0] };
-  }
-  if (state.window?.kind === "playerAttack" && legal.some((intent) => intent.type === "DeclareAttackers")) {
-    const seat = state.seats[state.activeSeat];
-    const ids = [...(seat?.heroes ?? []), ...(seat?.play ?? [])];
-    const enemyId = ids.flatMap((id) => legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx))[0];
-    if (enemyId) {
-      const attackerIds = ids.filter((id) => legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).includes(enemyId));
-      return { type: "DeclareAttackers", enemyId, attackerIds };
-    }
-  }
-  return nextIntent(state, ctx, { scout: "01002", prefer: "141035", protect: RING_BEARER, play: true, act: true });
 }
 
 function playGame(ctx: ReduceContext, start: ScenarioState, seen: Seen): ScenarioState {

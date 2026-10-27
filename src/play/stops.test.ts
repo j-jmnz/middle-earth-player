@@ -38,6 +38,13 @@ describe("table settings", () => {
     expect(parseSettings({ animationSpeed: 2 }).animationSpeed).toBe("normal");
   });
 
+  it("stores the combat spotlight switch: on by default, off when chosen, anything else back to on", () => {
+    expect(DEFAULT_SETTINGS.spotlight).toBe(true);
+    expect(parseSettings({ spotlight: false }).spotlight).toBe(false);
+    expect(parseSettings({ spotlight: "no" }).spotlight).toBe(true);
+    expect(parseSettings(null).spotlight).toBe(true);
+  });
+
   it("keeps stops in round order, and toggles a Response to Always and back", () => {
     expect(toggleStop(["shadow"], "3.3")).toEqual(["3.3", "shadow"]);
     expect(toggleStop(["3.3", "shadow"], "3.3")).toEqual(["shadow"]);

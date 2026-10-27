@@ -133,3 +133,12 @@ Phase 23 is merged. What phase 26 builds on:
 - The hurry tap: a touch on the canvas calls `finishMotions(progress, clear)` in the canvas pan's `onBegin` (card clock to 1, pending `tickLand` dropped) and is then handled as usual. The peek's swipe starts with it; the slide must finish on a hurry too, and never delay or swallow an intent.
 - `tickLand()` (`src/play/haptics.ts`) is one light impact per new state when a played card lands; a peek is not a new state and plays none.
 - `tokenDeltas(prev, next)` (`token-deltas.ts`) pops tokens and floats numbers from the reducer's counts between two states. A peek shows the same state from another seat, so it must not read as a delta: key the pops by state, not by the shown seat.
+
+## Handover from phase 24
+
+Phase 24 is merged. Where the peek meets the combat spotlight:
+
+- The spotlight's RN scrim (`spotlight-scrim.tsx`, mounted from `table-layers.tsx`) covers the top bar and the dock column while a spotlight plays. A press on it only skips (on press-in) and reaches nothing under it, so a dial tap during a spotlight skips it and does not peek; the next tap peeks. The scrim stops catching touches the moment the gate ends. Keep `peek-banner` and `peek-back` on the canvas side, not under the scrim's area.
+- Android Back: `backStep` (`src/play/back.ts`) now opens with `skipSpotlight` while a spotlight plays. "Back ends the peek before anything else" means right after that step: put `endPeek` second, not first.
+- The skip tap rides the hurry: the canvas pan's `onBegin` calls `finishMotions(progress, clear)` (which ends the spotlight) and sets `swallow` from `live` (`useSpotlight`), and `tap.onEnd`, `hold.onStart` and `pan.onStart` return early while it is set. The peek's swipe must check `swallow` the same way, so the touch that skips a spotlight does not also start a peek.
+- `tickImpact()` (`src/play/haptics.ts`) plays at a strike's hit stop. A peek is not a new state, plays no spotlight and no `tickImpact`. A spotlight replays the state from the shown (acting) seat's layout (`spotlight-plan.ts` reads the two layouts), and the peek resets on a new moment, so a spotlight never plays while peeking.

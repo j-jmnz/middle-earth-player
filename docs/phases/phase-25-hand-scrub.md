@@ -116,3 +116,11 @@ Phase 23 is merged. What phase 25 builds on:
 - Haptics live in `src/play/haptics.ts`: `tickLand()` (a played card landing, at most one per new state) is beside `tickArmed`. A card played from a scrub's drag lands with `tickLand` as any play does; do not add a second tick for it.
 - `tokenDeltas(prev, next)` (`token-deltas.ts`) drives the token pops and floating numbers; the scrub sends no intent, so it changes no count and pops nothing.
 - A card drawn into the hand arrives on an arc with a flip, staggered 90 ms (`stagger`, `SHAPE.maxStagger`); the scrub's flattened fan reads the same slots from `layout.ts`, so a scrub that starts mid-draw sees the cards at rest after the hurry.
+
+## Handover from phase 24
+
+Phase 24 is merged. Where the scrub meets the combat spotlight:
+
+- The skip tap rides the hurry. While a spotlight plays, the canvas pan's `onBegin` calls `finishMotions(progress, clear)` (whose `clear` ends the spotlight) and then sets the `swallow` shared value from `live` (`spot.playing`, from `useSpotlight`). `tap.onEnd`, `hold.onStart` and `pan.onStart` return early while `swallow` is set, so the skipping touch does nothing else; the next touch without a spotlight clears it. When you compose the scrub's `LongPress` and pan, keep `finishMotions` and the `swallow` copy in the first `onBegin`, and make the scrub's start return early on `swallow` too: a press that skips a spotlight must not start a scrub.
+- `tickImpact()` (`src/play/haptics.ts`, a medium impact at a strike's hit stop, at most one per strike) sits beside `tickLand` and `tickArmed`. A scrub cannot run during a spotlight, so its selection ticks never overlap it.
+- The spotlight's RN scrim (`spotlight-scrim.tsx`, mounted from `table-layers.tsx`) covers the top bar and the dock column, not the canvas or the hand. The scrub's 35% night is its own layer; it never runs under the spotlight's 65% night.

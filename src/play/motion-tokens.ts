@@ -3,7 +3,8 @@
 // (motion-curves.ts draws a curve from a name; motion-run.ts hands the same names to Reanimated).
 //
 // Every duration passes through `motionScale(speed, reduced)`: 1 for Normal, 0.6 for Quick, 0 under reduced motion (then
-// everything snaps). Each token is at most 500 ms; the sweep and the combat spotlight (phase 24) are the two exceptions.
+// everything snaps). Each token is at most 500 ms; the sweep and the whole run of the combat spotlight (phase 24) are the two
+// exceptions.
 // What is not motion stays out of the scale: a gate or a timer (the top bar's 400 ms measure fallback, the dock's second-tap
 // window, the banner's beats, the 350 ms settle after a new moment) is not a token.
 
@@ -100,9 +101,34 @@ export const MOTION = {
   threatBadgeOut: tween(400, null),
   toastIn: tween(160, null),
   toastOut: tween(120, null),
+  // The combat spotlight (phase 24), one attack: the table dims and the cards fly to the center (dim), the attacker draws back
+  // (draw), lunges (lunge), everything holds at the hit (hold), the target shakes while the damage tokens fly or the defense
+  // bounces (impact, with burstStep and burstFly inside it), and both go back (return). A destroyed target greys and drops (fall)
+  // as the attacker returns; a turned shadow card flips with `cardFlip`. The six beats add up to `spotlight`.
+  spotlightDim: tween(250, "outCubic"),
+  spotlightDraw: tween(250, "outCubic"),
+  spotlightLunge: tween(150, "inCubic"),
+  spotlightHold: tween(80, null),
+  spotlightImpact: tween(370, "linear"),
+  spotlightReturn: tween(400, "inCubic"),
+  spotlightBurstStep: tween(90, null),
+  spotlightBurstFly: tween(190, "outCubic"),
+  spotlightBounceRise: tween(120, "outCubic"),
+  spotlightBounceSettle: spring(250, 0.5),
+  spotlightFall: tween(250, "outCubic"),
+  // Several attacks in one state: the table is already dark, so the second and later attacks come in over a swap (no dim, no
+  // flight from the slots) with a shorter draw back, and only the last goes back. The scrim over the bar and the dock fades in and,
+  // when a tap skips the spotlight, out over `spotlightScrim`.
+  spotlightSwap: tween(150, "outCubic"),
+  spotlightDrawAgain: tween(125, "outCubic"),
+  spotlightScrim: tween(100, "outCubic"),
+  spotlight: tween(1500, "linear"),
 } as const;
 
-/** The tokens that may pass 500 ms (a title sweep across the canvas; phase 24 adds the combat spotlight). */
+/** The six beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
+export const SPOTLIGHT_BEATS = ["spotlightDim", "spotlightDraw", "spotlightLunge", "spotlightHold", "spotlightImpact", "spotlightReturn"] as const;
+
+/** The tokens that may pass 500 ms (a title sweep across the canvas, and the whole run of the combat spotlight, phase 24). */
 export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight"];
 
 /** The longest a token runs, apart from LONG_TOKENS. */
@@ -136,6 +162,28 @@ export const SHAPE = {
   dialPop: 1.22,
   // Drawn cards leave one after another, at most this many places apart.
   maxStagger: 5,
+  // The combat spotlight: the cards stand at this share of the canvas's height with this gap (pt) between them; the attacker
+  // draws back this far (pt) and tilts this many degrees away; the target shakes this far (pt) in this many swings; a blocked
+  // attack bounces its defense to this scale; a destroyed target drops this far (pt) under a night veil of this opacity; the
+  // table dims to this night opacity; up to this many attackers stand as a fan; a turned shadow card stands at this scale; the
+  // damage token art flies at this size (pt).
+  spotlightHeight: 0.42,
+  spotlightGap: 24,
+  spotlightDrawBack: 10,
+  spotlightTilt: 4,
+  spotlightShake: 5,
+  spotlightSwings: 3,
+  // A blocked defender shakes this share as far as one that was hit.
+  spotlightShakeBlocked: 0.4,
+  // A destroyed target's veil is full by this share of its fall; it fades out over the rest.
+  spotlightVeilBy: 0.4,
+  spotlightBounce: 1.25,
+  spotlightDrop: 12,
+  spotlightVeil: 0.5,
+  spotlightNight: 0.65,
+  spotlightFan: 3,
+  spotlightShadow: 0.8,
+  spotlightToken: 28,
 } as const;
 
 /** The curve of the dock's armed bar: it runs down the whole second-tap window, which is a timer and not a token. */
