@@ -4,7 +4,7 @@ import { readdirSync } from "node:fs";
 
 import index from "../../data/campaigns/index.json";
 import entries from "../../data/rules/entries.json";
-import { BOXES, bookletPageOf, bookletParams, boxOf, CAMPAIGN_IDS, campaignOf, campaignOfScenario, scenarioNames, scenarioOf } from "./campaign-data";
+import { BOXES, bookletPageOf, bookletParams, boxOf, CAMPAIGN_IDS, campaignOf, campaignOfScenario, scenarioName, scenarioNames, scenarioOf } from "./campaign-data";
 import { dealSeed } from "./e2e";
 
 describe("campaign data on the phone", () => {
@@ -54,7 +54,7 @@ describe("the registry", () => {
   });
 
   it("splits the scenarios into three boxes, each scenario in one, each box inside its own campaign", () => {
-    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core", "The Dark of Mirkwood"]);
+    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood"]);
     const listed = BOXES.flatMap((box) => box.scenarios);
     expect(new Set(listed).size).toBe(listed.length);
     const every = new Set(CAMPAIGN_IDS.flatMap((id) => campaignOf(id)?.scenarios ?? []));
@@ -79,6 +79,12 @@ describe("the registry", () => {
     expect(bookletParams("mirkwood-paths", "passage-through-mirkwood")).toEqual({ id: "learn-to-play", page: "25" });
     expect(bookletParams("the-dark-of-mirkwood", "the-oath")).toEqual({ id: "the-dark-of-mirkwood", page: "3" });
     expect(bookletParams("the-dark-of-mirkwood")).toEqual({ id: "the-dark-of-mirkwood" });
+  });
+
+  it("names a scenario as printed, without Hall of Beorn's \" (Campaign)\" suffix", () => {
+    expect(scenarioNames(campaignOf("mirkwood-paths")!)["passage-through-mirkwood"]).toBe("Passage Through Mirkwood");
+    expect(scenarioNames(campaignOf("the-dark-of-mirkwood")!)["the-oath"]).toBe("The Oath");
+    expect(scenarioName("the-caves-of-nibin-dum")).not.toContain("(Campaign)");
   });
 
   it("a scenario the campaign's book does not print opens the book of its box (the Oath and the Caves in Mirkwood Paths)", () => {

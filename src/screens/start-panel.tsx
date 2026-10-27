@@ -1,31 +1,43 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import type { PoolCard } from "../campaign/log";
+import { FELLOWSHIP_ID } from "../campaign/save";
 import type { CampaignData } from "../catalog/scenario-data";
 import { SceneArt } from "./art";
-import { Label, Panel, PrimaryButton, RingMark, ToggleChip } from "./chrome";
+import { Label, Panel, PrimaryButton, RingMark } from "./chrome";
 import { palette } from "./palette.js";
 import { seatWord } from "./seats";
 
 type Seats = 1 | 2;
 
 // The Fellowship's testIDs are the ones the Maestro flows already use (`seats-1`, `start-fellowship`); every other campaign
-// is `seats-<id>-<n>` and `start-<id>`.
-const FELLOWSHIP_ID = "fellowship-of-the-ring";
+// is `seats-<id>-<n>` and `start-<id>`. `campaign-choice-<id>` is a tile of the chooser.
+const isFellowship = (id: string): boolean => id === FELLOWSHIP_ID;
 
-function SeatTile({ seats, selected, testID, onPress }: { seats: Seats; selected: boolean; testID: string; onPress: () => void }) {
-  const label = seatWord(seats);
+// One choice of a group the player picks one from: a gold edge when chosen, the raised surface when not (never the gold plate,
+// which is the button's). `min-h-14` keeps the 44 pt target; the words wrap.
+function RadioTile({ selected, testID, label, onPress, className, children }: { selected: boolean; testID: string; label: string; onPress: () => void; className: string; children: ReactNode }) {
   return (
     <Pressable
       testID={testID}
       collapsable={false}
       accessibilityRole="radio"
-      accessibilityState={{ selected }}
+      accessibilityLabel={label}
+      accessibilityState={{ selected, checked: selected }}
       onPress={onPress}
-      className="min-h-14 flex-1 items-center justify-center gap-2 rounded-tile px-3 py-3"
+      className={className}
       style={{ backgroundColor: selected ? palette.pressed : palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline }}
     >
+      {children}
+    </Pressable>
+  );
+}
+
+function SeatTile({ seats, name, selected, testID, onPress }: { seats: Seats; name: string; selected: boolean; testID: string; onPress: () => void }) {
+  const label = seatWord(seats);
+  return (
+    <RadioTile selected={selected} testID={testID} label={`${label}, ${name}`} onPress={onPress} className="min-h-14 flex-1 items-center justify-center gap-2 rounded-tile px-3 py-3">
       <View className="flex-row">
         <RingMark size={18} state={selected ? "current" : "locked"} />
         {seats === 2 ? (
@@ -35,48 +47,96 @@ function SeatTile({ seats, selected, testID, onPress }: { seats: Seats; selected
         ) : null}
       </View>
       <Text className={selected ? "text-body font-semibold text-bone" : "text-body text-muted"}>{label}</Text>
-    </Pressable>
+    </RadioTile>
   );
 }
 
 /** What a finished playthrough hands to the next campaign, as the panel offers it. */
-export type CarryChoice = { saveId: string; label: string; words: string; cards: readonly PoolCard[] };
+export type CarryChoice = { saveId: string; label: string; source: string; words: string; cards: readonly PoolCard[] };
+
+/** A campaign the panel can start. */
+export type StartOption = { data: CampaignData; name: string };
 
 /**
- * The start panel of one playable campaign: its first scene, the seat count, the carry-over of a finished playthrough when there
- * is one to take in (Fresh start is the default), and the button that starts a playthrough.
+ * The start panel: one for the whole list, so the screen has one primary button. At its top the campaign to start (the scene and
+ * the scenario count follow the choice), then the seat count, chosen once for the campaign, then the carry-over of a finished
+ * playthrough when there is one to take in (Fresh start is the default), then Start. Every section stays mounted, so the panel
+ * keeps its state when one is hidden.
  */
-export function StartPanel({ campaign, name, current, carry, onStart }: { campaign: CampaignData; name: string; current: boolean; carry: readonly CarryChoice[]; onStart: (seats: Seats, carried: readonly PoolCard[]) => void }) {
+export function StartPanel({ options, current, carry, onStart }: { options: readonly StartOption[]; current: boolean; carry: readonly CarryChoice[]; onStart: (campaignId: string, seats: Seats, carried: CarryChoice | null) => void }) {
+  const [campaignId, setCampaignId] = useState<string | null>(null);
   const [seats, setSeats] = useState<Seats>(1);
   // The playthrough whose carry-over this one takes in, or null for a fresh start.
   const [taking, setTaking] = useState<string | null>(null);
-  const chosen = carry.find((choice) => choice.saveId === taking) ?? null;
-  const fellowship = campaign.id === FELLOWSHIP_ID;
-  const seatId = (count: Seats) => (fellowship ? `seats-${count}` : `seats-${campaign.id}-${count}`);
+  const chosen = options.find((option) => option.data.id === campaignId) ?? options[0];
+  if (!chosen) return null;
+  const { data, name } = chosen;
+  const taken = carry.find((choice) => choice.saveId === taking) ?? null;
+  const seatId = (count: Seats) => (isFellowship(data.id) ? `seats-${count}` : `seats-${data.id}-${count}`);
+  const count = `${data.scenarios.length} scenarios`;
   return (
     <Panel current={current} padded={false}>
       <View className="overflow-hidden rounded-t-card">
-        <SceneArt scenarioId={campaign.scenarios[0]} height={132} fade={0.3} fadeTo={palette.raised} />
+        <SceneArt scenarioId={data.scenarios[0]} height={132} fade={0.3} fadeTo={palette.raised} />
       </View>
       <View className="px-5 pb-5" style={{ marginTop: -36 }}>
         <Text className="font-display text-title text-bone">{name}</Text>
-        <Label>{`${campaign.scenarios.length} scenarios`}</Label>
-        <View className="mt-4 flex-row gap-3">
-          <SeatTile seats={1} testID={seatId(1)} selected={seats === 1} onPress={() => setSeats(1)} />
-          <SeatTile seats={2} testID={seatId(2)} selected={seats === 2} onPress={() => setSeats(2)} />
-        </View>
-        {carry.length > 0 ? (
-          <View className="mt-4 gap-2" testID={`carry-${campaign.id}`}>
-            <Label>Carry over from a finished campaign</Label>
-            <ToggleChip label="Fresh start" selected={taking == null} testID={`carry-none-${campaign.id}`} onPress={() => setTaking(null)} />
-            {carry.map((choice) => (
-              <ToggleChip key={choice.saveId} label={`${choice.label}: ${choice.words}`} selected={taking === choice.saveId} testID={`carry-${campaign.id}-${choice.saveId}`} onPress={() => setTaking(choice.saveId)} />
-            ))}
+        <Label>{count}</Label>
+        {options.length > 1 ? (
+          <View className="mt-4 gap-2" accessibilityRole="radiogroup" accessibilityLabel="Campaign" testID="campaign-choice">
+            {options.map((option) => {
+              const selected = option.data.id === data.id;
+              return (
+                <RadioTile
+                  key={option.data.id}
+                  selected={selected}
+                  testID={`campaign-choice-${option.data.id}`}
+                  label={`${option.name}, ${option.data.scenarios.length} scenarios`}
+                  onPress={() => setCampaignId(option.data.id)}
+                  className="min-h-14 justify-center rounded-tile px-4 py-3"
+                >
+                  <Text className={selected ? "text-body font-semibold text-bone" : "text-body text-muted"}>{option.name}</Text>
+                  <Text className="text-label text-faint">{`${option.data.scenarios.length} scenarios`}</Text>
+                </RadioTile>
+              );
+            })}
           </View>
         ) : null}
-        <View className="mt-4 gap-3">
-          <Label>Chosen once for this campaign</Label>
-          <PrimaryButton label={fellowship ? "Start Fellowship" : `Start ${name}`} testID={fellowship ? "start-fellowship" : `start-${campaign.id}`} onPress={() => onStart(seats, chosen?.cards ?? [])} />
+        <View className="mt-4 flex-row gap-3" accessibilityRole="radiogroup" accessibilityLabel={`Players for ${name}`}>
+          <SeatTile seats={1} name={name} testID={seatId(1)} selected={seats === 1} onPress={() => setSeats(1)} />
+          <SeatTile seats={2} name={name} testID={seatId(2)} selected={seats === 2} onPress={() => setSeats(2)} />
+        </View>
+        <Label className="mt-2">Chosen once for this campaign</Label>
+        {carry.length > 0 ? (
+          <View className="mt-4 gap-2" testID="carry-over">
+            <Label>Carry over from a finished campaign</Label>
+            <Text className="text-label text-muted">{"The cards join this campaign's pool at its first scenario."}</Text>
+            <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel={`Carry-over for ${name}`}>
+              <RadioTile selected={taking == null} testID="carry-none" label={`Fresh start, ${name}`} onPress={() => setTaking(null)} className="min-h-11 justify-center rounded-tile px-4 py-2">
+                <Text className={taking == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Fresh start</Text>
+              </RadioTile>
+              {carry.map((choice) => {
+                const selected = taking === choice.saveId;
+                return (
+                  <RadioTile
+                    key={choice.saveId}
+                    selected={selected}
+                    testID={`carry-${choice.saveId}`}
+                    label={`${choice.label}, ${choice.source}: ${choice.words}`}
+                    onPress={() => setTaking(choice.saveId)}
+                    className="min-h-11 justify-center rounded-tile px-4 py-2"
+                  >
+                    <Text className={selected ? "text-body font-semibold text-bone" : "text-body text-muted"}>{choice.label}</Text>
+                    <Text className="text-label text-faint">{choice.source}</Text>
+                    <Text className="text-label text-muted">{choice.words}</Text>
+                  </RadioTile>
+                );
+              })}
+            </View>
+          </View>
+        ) : null}
+        <View className="mt-4">
+          <PrimaryButton label={`Start ${name}`} testID={isFellowship(data.id) ? "start-fellowship" : `start-${data.id}`} onPress={() => onStart(data.id, seats, taken)} />
         </View>
       </View>
     </Panel>

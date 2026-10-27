@@ -3,7 +3,6 @@ import { useCallback, useMemo, useRef, useState, type ComponentRef } from "react
 import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
 
 import { carryOffers } from "../../../campaign/carry-over";
-import type { PoolCard } from "../../../campaign/log";
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
 import { Panel, RingMark, Screen, ScreenScroll, ScreenTitle, Section, SecondaryButton, TextButton } from "../../chrome";
@@ -11,8 +10,9 @@ import type { ArtCard } from "../../art";
 import { deckFaces } from "../../deck-store";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf, scenarioNames } from "../../campaign-data";
-import { StartPanel, type CarryChoice } from "../../start-panel";
-import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
+import { carrySource, carryWords } from "../../carry-words";
+import { StartPanel, type CarryChoice, type StartOption } from "../../start-panel";
+import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave, savedAt } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
 import { KeepOrDelete } from "../../keep-or-delete";
@@ -34,6 +34,8 @@ export default function CampaignList() {
   const { catalog, user } = useDatabases();
   const [saves, setSaves] = useState<Save[]>([]);
   const [archived, setArchived] = useState<Save[]>([]);
+  // When each playthrough was last written: a finished one's date in the carry-over offers.
+  const [saved, setSaved] = useState<ReadonlyMap<string, number>>(new Map());
   const [starting, setStarting] = useState(false);
   // Manage shows Archive and Delete on each open playthrough instead of opening it. It ends when the list loses focus.
   const [managing, setManaging] = useState(false);
@@ -46,10 +48,10 @@ export default function CampaignList() {
   const campaigns = campaignListQueries(catalog).campaigns.all();
   const locked = lockedTiles(campaigns);
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
-  // One start panel for each built campaign the catalog marks playable.
-  const startable = campaigns.flatMap((row) => {
+  // The campaigns the one start panel offers: each built campaign the catalog marks playable.
+  const startable: StartOption[] = campaigns.flatMap((row) => {
     const data = row.playable ? campaignOf(row.id) : null;
-    return data ? [data] : [];
+    return data ? [{ data, name: row.name }] : [];
   });
   // Each save's progress line reads its own campaign.
   const lineOf = (save: Save): SaveLine => {
@@ -81,6 +83,7 @@ export default function CampaignList() {
     const away = listArchivedSaves(user);
     setSaves(open);
     setArchived(away);
+    setSaved(savedAt(user));
     if (open.length === 0) setManaging(false);
     if (away.length === 0) setShowArchived(false);
     setDeleting(null);
@@ -103,12 +106,13 @@ export default function CampaignList() {
   const carryChoices: CarryChoice[] = offers.map((offer) => ({
     saveId: offer.saveId,
     label: nameOf(offer.campaignId),
-    words: offer.cards.map((card) => faces.get(card.code)?.name ?? card.code).join(", "),
+    source: carrySource(seatWord(offer.seatCount), saved.get(offer.saveId) ?? null, offer.score),
+    words: carryWords(offer.cards, (code) => faces.get(code)?.name ?? code),
     cards: offer.cards,
   }));
 
-  function start(campaignId: string, seats: Seats, carried: readonly PoolCard[]): void {
-    const save = createSave(user, campaignId, seats, undefined, carried);
+  function start(campaignId: string, seats: Seats, taken: CarryChoice | null): void {
+    const save = createSave(user, campaignId, seats, undefined, taken?.cards ?? [], taken?.saveId ?? null);
     refresh();
     setStarting(false);
     openPath(save);
@@ -228,11 +232,7 @@ export default function CampaignList() {
               {saves.length > 0 ? (
                 <Section title="New playthrough" right={<TextButton label="Cancel" testID="start-cancel" tone="muted" accessibilityLabel="Cancel the new playthrough" onPress={() => setStarting(false)} />} />
               ) : null}
-              <View className="gap-3">
-                {startable.map((campaign, index) => (
-                  <StartPanel key={campaign.id} campaign={campaign} name={nameOf(campaign.id)} current={saves.length === 0 && index === 0} carry={carryChoices} onStart={(seats, carried) => start(campaign.id, seats, carried)} />
-                ))}
-              </View>
+              <StartPanel options={startable} current={saves.length === 0} carry={carryChoices} onStart={start} />
             </View>
           ) : null}
           {!showStart && !managing ? (
@@ -265,14 +265,14 @@ export default function CampaignList() {
           {locked.length > 0 ? (
             <View className="mt-2">
               <Section title="Coming later" />
-              <View className="flex-row gap-3" testID="locked-campaigns">
+              <View className="flex-row flex-wrap gap-3" testID="locked-campaigns">
                 {locked.map((tile) => (
                   <View
                     key={tile.id}
                     testID={`locked-${tile.id}`}
                     accessible
                     accessibilityLabel={`${tile.name}, ${tile.caption}`}
-                    className="min-h-32 flex-1 justify-end gap-1 rounded-card px-4 py-4"
+                    className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-card px-4 py-4"
                     style={{ borderWidth: 1, borderStyle: "dashed", borderColor: palette.hairline }}
                   >
                     <RingMark size={14} state="locked" />

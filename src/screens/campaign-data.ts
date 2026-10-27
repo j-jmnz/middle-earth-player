@@ -43,7 +43,7 @@ export type Box = { id: string; name: string; campaignId: string; scenarios: rea
 
 export const BOXES: readonly Box[] = [
   { id: "fellowship-of-the-ring", name: "Fellowship of the Ring", campaignId: "fellowship-of-the-ring", scenarios: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship"] },
-  { id: "revised-core", name: "Revised Core", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
+  { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
   { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
 ];
 
@@ -87,12 +87,18 @@ export function bookletParams(campaignId: string, scenarioId?: string | null): {
   return page == null ? { id } : { id, page: String(page) };
 }
 
-/** A scenario's name, for any scenario in the registry; the id itself when it holds none. */
+// Hall of Beorn lists the campaign edition of a box scenario as "The Oath (Campaign)"; the player reads the printed title.
+function printedName(name: string): string {
+  return name.replace(/ \(Campaign\)$/, "");
+}
+
+/** A scenario's name as printed, for any scenario in the registry; the id itself when it holds none. */
 export function scenarioName(id: string): string {
-  return SCENARIOS[id]?.name ?? id;
+  const scenario = SCENARIOS[id];
+  return scenario ? printedName(scenario.name) : id;
 }
 
 /** Scenario names by id, for the path and the log. */
 export function scenarioNames(campaign: CampaignData): Record<string, string> {
-  return Object.fromEntries(campaign.scenarios.map((id) => [id, SCENARIOS[id]?.name ?? id]));
+  return Object.fromEntries(campaign.scenarios.map((id) => [id, scenarioName(id)]));
 }

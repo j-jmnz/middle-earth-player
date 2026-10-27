@@ -13,7 +13,7 @@ appId: com.middleearth.lcg
 - scrollUntilVisible:
     element:
       id: box-revised-core
-- assertVisible: "Revised Core"
+- assertVisible: "Revised Core Set"
 - assertVisible:
     id: standalone-passage-through-mirkwood
 - scrollUntilVisible:
