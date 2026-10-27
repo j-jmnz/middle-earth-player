@@ -7,6 +7,7 @@
 //   - A reading panel and the carousel have a scrim from the top bar's foot down: a tap anywhere else closes it and does nothing
 //     more. The top bar stays live, so a dial or the rail replaces the layer.
 //   - The carousel hangs over the canvas only, and the tray stays in the command column; neither covers the dock's armed line or buttons.
+//   - While the combat spotlight plays, its scrim (spotlight-scrim.tsx) is over the top bar and the dock, above all of these.
 import { useMemo } from "react";
 import { Pressable, Text } from "react-native";
 import { useStore } from "zustand";
@@ -22,6 +23,7 @@ import { LogPanel, PileList, SettingsPanel, ThreatPanel } from "./reading-panels
 import { useScreenReader } from "./screen-reader.ts";
 import { PILE_WORDS, shownSeat } from "./selectors.ts";
 import type { SheetNames } from "./sheet-types.ts";
+import { SpotlightScrim } from "./spotlight-scrim.tsx";
 import type { ReduceContext, TableStore } from "./store.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
@@ -154,6 +156,8 @@ export function TableLayers({
         onChange={(change) => tableSettings.getState().update(change)}
         onClose={close}
       />
+      {/* The combat spotlight dims the bar and the dock while it plays; a tap on it skips and reaches nothing under it. */}
+      <SpotlightScrim store={store} insets={insets} barBottom={barBottom} commandWidth={commandWidth} />
     </>
   );
 }

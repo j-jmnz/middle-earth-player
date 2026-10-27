@@ -6,9 +6,8 @@
 // When the state changes, each card moves from where it was to where it is now, a new card comes in from its deck or grows
 // in, and a card that left goes to its pile (motion.ts, run by card-motion.native.tsx). The motion runs on the UI thread, never
 // gates a rule, and snaps under reduced motion; a touch finishes it at once, and a new gesture cancels the lift in progress.
-import { Canvas, Circle, Group, matchFont, RoundedRect, Text, useFont, useImage, vec, type SkFont } from "@shopify/react-native-skia";
+import { Canvas, Circle, Group, RoundedRect, Text, useImage, vec, type SkFont } from "@shopify/react-native-skia";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { Platform } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { cancelAnimation, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -16,52 +15,23 @@ import { useStore } from "zustand";
 
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { finishMotions, Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
-import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
-import { SPHERE_TINT, sphereIcon } from "./icon-map.ts";
+import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
+import { sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
-import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
+import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type Rect } from "./layout.ts";
 import { AT_REST } from "./motion.ts";
 import { timing } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
-import { PILES, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
+import { shownSeat } from "./selectors.ts";
 import { dropRects } from "./selection.ts";
+import { Spotlight } from "./spotlight.native.tsx";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
+import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
+import { useTableFonts } from "./table-fonts.native.ts";
 import { useTableImages } from "./table-images.native.ts";
 import { TokenFx } from "./token-fx.native.tsx";
 import { tableTokens as t } from "./tokens.ts";
-
-const MARCELLUS = require("../../assets/fonts/Marcellus-Regular.ttf") as number;
-
-function useViews(store: TableCanvasProps["store"], seat: number): { views: LayoutViews; piles: PileViews } {
-  const zones = useMemo(() => Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat)])) as Record<ZoneId, ReturnType<typeof zoneSelector>>, [seat]);
-  const pileOf = useMemo(() => Object.fromEntries(PILES.map((pile) => [pile, pileSelector(pile, seat)])) as Record<PileId, ReturnType<typeof pileSelector>>, [seat]);
-  const questStage = useStore(store, (state) => zones.questStage(state.game));
-  const staging = useStore(store, (state) => zones.staging(state.game));
-  const activeLocation = useStore(store, (state) => zones.activeLocation(state.game));
-  const secondActiveLocation = useStore(store, (state) => zones.secondActiveLocation(state.game));
-  const engaged = useStore(store, (state) => zones.engaged(state.game));
-  const play = useStore(store, (state) => zones.play(state.game));
-  const hand = useStore(store, (state) => zones.hand(state.game));
-  const deck = useStore(store, (state) => pileOf.deck(state.game));
-  const discard = useStore(store, (state) => pileOf.discard(state.game));
-  const encounterDeck = useStore(store, (state) => pileOf.encounterDeck(state.game));
-  const encounterDiscard = useStore(store, (state) => pileOf.encounterDiscard(state.game));
-  return useMemo(
-    () => ({ views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand }, piles: { deck, discard, encounterDeck, encounterDiscard } }),
-    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard],
-  );
-}
-
-// The sphere colour a hero's resource token is ringed with: its resources pay for cards of that sphere (rr.resource-match).
-function sphereRing(sphere: string | null): string | null {
-  const tint = sphere ? SPHERE_TINT[sphere] : undefined;
-  return tint && tint !== "faint" ? t[tint] : null;
-}
-
-// The "progress / quest points" strip of a quest card or location, which pops when progress is placed on it.
-function stripText(slot: CardSlot, questPoints: number | null): string | null {
-  return questPoints == null ? null : `${slot.progress} / ${questPoints}`;
-}
+import { useSpotlight } from "./use-spotlight.ts";
 
 // A faint word in an empty zone, so the player knows what the space is for.
 function ZoneWord({ rect, text, font }: { rect: Rect; text: string; font: SkFont }) {
@@ -95,10 +65,12 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
   const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat);
   const { progress: hurryProgress, clear: hurryClear } = hurry;
+  // The attacks the state resolved play on top of the table before its own motions (spotlight.native.tsx).
+  const spot = useSpotlight(store, layout, k);
   const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);
   const returnTiming = useMemo(() => timing(MOTION.dragReturn, k), [k]);
 
-  const codes = useMemo(() => [...new Set([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)].filter((slot) => !slot.faceDown && slot.code !== "").map((slot) => slot.code))], [layout, moves]);
+  const codes = useMemo(() => [...new Set([...[...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)].filter((slot) => !slot.faceDown && slot.code !== "").map((slot) => slot.code), ...(spot.plan?.codes ?? [])])], [layout, moves, spot.plan]);
   const images = useTableImages(codes, picture, layout.card, pictureRevision);
   const tokens: TokenImages = {
     resource: useImage(ICON_FILES.resource),
@@ -108,13 +80,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     engagementCost: useImage(ICON_FILES.engagementCost),
   };
   const backs: BackImages = { player: useImage(CARD_BACK_FILES.player), encounter: useImage(CARD_BACK_FILES.encounter) };
-  // Names and small words in the system face; numbers in the embedded Marcellus (the system face stands in for the moment
-  // the font file takes to load).
-  const names = useMemo(() => matchFont({ fontFamily: Platform.select({ ios: "Helvetica", default: "sans-serif" }), fontSize: 11 }), []);
-  const small = useMemo(() => matchFont({ fontFamily: Platform.select({ ios: "Helvetica", default: "sans-serif" }), fontSize: 10, fontWeight: "bold" }), []);
-  const badge = useMemo(() => matchFont({ fontFamily: Platform.select({ ios: "Helvetica", default: "sans-serif" }), fontSize: 11, fontWeight: "bold" }), []);
-  const marcellus = useFont(MARCELLUS, 12);
-  const fonts: Fonts = { names, numbers: marcellus ?? names, small, badge };
+  const fonts = useTableFonts();
 
   // What the worklets read: the slots, which of them can be picked up, and the selected card's drop rectangles.
   const slots = useSharedValue<readonly CardSlot[]>(layout.slots);
@@ -319,6 +285,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
             <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2} />
           </Group>
         ) : null}
+        {spot.playing && spot.plan ? <Spotlight plan={spot.plan} progress={spot.progress} width={width} height={height} images={images} tokens={tokens} backs={backs} fonts={fonts} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} /> : null}
       </Canvas>
     </GestureDetector>
   );

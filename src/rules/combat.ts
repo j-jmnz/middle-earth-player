@@ -306,7 +306,7 @@ export function strikeEnemy(
   const attack = attackStrength(next, attackerIds, enemyId, ctx.cards);
   // An attacker may say the enemy does not count its Defense (families/attack-strike.ts).
   const defense = countsDefense(next, attackerIds) ? modifiedStat(next, enemy, "defense", ctx.cards) : 0;
-  steps.push({ kind: "attack", side: "player", seat, enemyId });
+  steps.push({ kind: "attack", side: "player", seat, enemyId, attackerIds: [...attackerIds] });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });

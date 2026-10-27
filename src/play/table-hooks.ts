@@ -10,6 +10,7 @@ import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { alwaysUseIntent, passableWindow, stopDecision, usableIds } from "./stops.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "./store.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
+import { useSpotlightHold } from "./use-spotlight.ts";
 
 // How long the outcome banner stays up once every line is shown; the log keeps it. Each line before the last takes a beat
 // (outcome.ts, BEAT_MS).
@@ -18,10 +19,12 @@ const MOMENT_MS = 4500;
 /**
  * The banner over the table: the last moment worth showing (store.ts, `shown`), line by line, then the round's summary when
  * that moment ended a round. `beatKey` is the cards the banner's current line names, ringed on the table; MomentBanner calls
- * `onBeat` as it reaches each line.
+ * `onBeat` as it reaches each line. While the combat spotlight plays the moment's attacks the banner waits: its beats and its
+ * hold start when the spotlight ends or is skipped, so they do not race it.
  */
 export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNames): { banner: Moment | null; bannerKey: string; beatKey: string; onBeat: (cards: readonly string[]) => void } {
   const shown = useStore(store, (state) => state.shown);
+  const spotlit = useSpotlightHold(store);
   const [closedMoment, setClosedMoment] = useState(0);
   const [closedSummary, setClosedSummary] = useState(0);
   const [beatKey, setBeatKey] = useState("");
@@ -48,8 +51,8 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     const after = shown.after;
     return roundSummary(shown.ended.round, shown.ended.steps, after, (cardId) => ctx.cards.get(after.cards[cardId]?.code ?? "")?.backType === "player");
   }, [shown, ctx]);
-  const momentOpen = shown != null && said != null && closedMoment !== shown.seq;
-  const summaryOpen = shown != null && summary != null && !momentOpen && closedSummary !== shown.seq;
+  const momentOpen = shown != null && said != null && closedMoment !== shown.seq && !spotlit;
+  const summaryOpen = shown != null && summary != null && !momentOpen && closedSummary !== shown.seq && !spotlit;
   // The banner stays up for its beats (one line at a time) and then a while to read; the summary follows it.
   useEffect(() => {
     if (!shown || !momentOpen || !said) return;
@@ -143,4 +146,19 @@ export function useAutoAnswer({
   return useCallback(() => {
     running.current = true;
   }, []);
+}
+
+// How long a new moment ignores a send: the second tap of a double tap meant for the moment before lands where its button was, and a
+// moment with one answer would send on it. A gate, not a motion, so it is outside the scale. It starts when the moment appears, and
+// again when a combat spotlight on it ends or is skipped (the tap that skipped it must not send).
+const SETTLE_MS = 350;
+
+/** `settled()` is true once the moment on the dock (`momentKey`) has been there for SETTLE_MS, and the spotlight on it, if any, has ended for as long. */
+export function useSettle(store: TableStore, momentKey: string): () => boolean {
+  const spotlit = useSpotlightHold(store);
+  const settledFrom = useRef(0);
+  useEffect(() => {
+    settledFrom.current = Date.now() + SETTLE_MS;
+  }, [momentKey, spotlit]);
+  return useCallback(() => Date.now() >= settledFrom.current, []);
 }

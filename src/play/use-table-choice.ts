@@ -2,14 +2,14 @@
 // one the player opened from the table: a payment, a host, an Action), what is picked for it, whether it is answered on the
 // table or on a paper panel, the dock's buttons, the engine's numbers beside them, and the outcome banner of the last
 // intent. Taps, drops and tiles pick; only a dock button sends an intent, through the store (table-choice.ts).
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useStore } from "zustand";
 
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
 import { tickRefused, tickSent } from "./haptics.ts";
 import { pointTitle } from "./rail.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "./stops.ts";
-import { useAutoAnswer, useBanner, useGuide } from "./table-hooks.ts";
+import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
 import { tableSettings, toggleAlways } from "./table-settings.ts";
 import type { Moment } from "./outcome.ts";
 import { readoutFor, type Readout } from "./readout.ts";
@@ -27,10 +27,6 @@ import type { LayoutOptions } from "./layout.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
 import type { DockExtra } from "./dock-buttons.tsx";
 import { choiceFor, dockFor, fightPreview, headerOf, onTheTable, onlyAnswer, pickedWords, primaryReady, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
-
-// How long a new moment ignores a send: the second tap of a double tap meant for the moment before lands where its button
-// was, and a moment with one answer would send on it.
-const SETTLE_MS = 350;
 
 // A sheet the player opened from the table, for the game it was opened in. `panel` keeps it on paper even when its choices
 // are cards on the table (the Actions list reads the printed lines).
@@ -154,13 +150,8 @@ export function useTableChoice({
     setFolded(null);
     setListed(null);
   }, []);
-  // When the moment on the dock last changed: a send just after it is the tail of a double tap (SETTLE_MS).
-  const momentKey = `${sheet.key}:${moment?.seq ?? 0}`;
-  const settledFrom = useRef(0);
-  useEffect(() => {
-    settledFrom.current = Date.now() + SETTLE_MS;
-  }, [momentKey]);
-  const settled = useCallback(() => Date.now() >= settledFrom.current, []);
+  // When the moment on the dock last changed, or its spotlight ended: a send just after it is the tail of a double tap (table-hooks.ts).
+  const settled = useSettle(store, `${sheet.key}:${moment?.seq ?? 0}`);
   const dispatch = useCallback(
     (intent: PlayerIntent) => {
       if (store.getState().dispatch(intent)) {

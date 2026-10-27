@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ease, springStep } from "./motion-curves.ts";
-import { ARM_BAR_EASING, LONG_TOKENS, MAX_TOKEN_MS, MOTION, ms, motionScale, springTune, timed, type EasingName, type Spring, type Tween } from "./motion-tokens.ts";
+import { ARM_BAR_EASING, LONG_TOKENS, MAX_TOKEN_MS, MOTION, ms, motionScale, SPOTLIGHT_BEATS, springTune, timed, type EasingName, type Spring, type Tween } from "./motion-tokens.ts";
 
 const entries = Object.entries(MOTION) as [string, Tween | Spring][];
 const springs = entries.filter((entry): entry is [string, Spring] => "zeta" in entry[1]);
@@ -39,6 +39,27 @@ describe("the tokens", () => {
       expect(token.ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
     }
     expect(MOTION.sweep.ms).toBe(900);
+  });
+
+  it("let only the sweep and the whole spotlight run pass 500 ms", () => {
+    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "sweep"]);
+    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "sweep"]);
+  });
+
+  it("make a spotlight of at most 1.6 s at Normal and 0.6 of it at Quick, each beat at most 500 ms", () => {
+    for (const name of SPOTLIGHT_BEATS) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
+    for (const name of ["spotlightBurstStep", "spotlightBurstFly", "spotlightBounceRise", "spotlightBounceSettle", "spotlightFall"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
+    // The six beats, in order, are the run.
+    expect(SPOTLIGHT_BEATS.reduce((sum, name) => sum + MOTION[name].ms, 0)).toBe(MOTION.spotlight.ms);
+    expect(MOTION.spotlight.ms).toBeLessThanOrEqual(1600);
+    expect(ms(MOTION.spotlight, motionScale("normal", false))).toBeLessThanOrEqual(1600);
+    expect(ms(MOTION.spotlight, motionScale("quick", false))).toBe(900);
+    // Reduced motion plays none.
+    expect(ms(MOTION.spotlight, motionScale("normal", true))).toBe(0);
+    // The beats of the table's sequence: 250 dim, 250 draw back, 150 lunge, 80 hold, 370 impact, 400 return.
+    expect(SPOTLIGHT_BEATS.map((name) => MOTION[name].ms)).toEqual([250, 250, 150, 80, 370, 400]);
+    // The burst fits the impact: three tokens 90 ms apart, the last landing as the impact ends.
+    expect(2 * MOTION.spotlightBurstStep.ms + MOTION.spotlightBurstFly.ms).toBe(MOTION.spotlightImpact.ms);
   });
 
   it("keep the values the earlier phases named", () => {
