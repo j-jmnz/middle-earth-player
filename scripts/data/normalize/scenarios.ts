@@ -9,11 +9,13 @@ import {
   type Placement,
   type ScenarioData,
 } from "../../../src/catalog/scenario-data.ts";
-import { CAMPAIGNS, CAMPAIGN_SUFFIX, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
+import { CAMPAIGNS, CAMPAIGN_SUFFIX, PRODUCTS, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import type { Overrides } from "./cards.ts";
 import { nameIndex, parseSetup, type ParsedSetup, type SetupClause } from "./setup-text.ts";
 import type { RuleEntry } from "../rules/spans.ts";
-import { sameName, titleKey } from "./names.ts";
+import { sameName } from "./names.ts";
+import { crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
+import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
 import type { RawData } from "./load-raw.ts";
 
 // Dragncards load groups -> our piles.
@@ -26,17 +28,15 @@ const GROUP_PILE: Readonly<Record<string, Pile>> = {
   // The second shared deck is the burden deck of Flight to the Ford.
   sharedEncounterDeck2: "burden",
 };
-const PLAYER_GROUP = "player1Play1";
-const PACK_BY_NAME: Readonly<Record<string, string>> = { "The Black Riders": "TBR", "The Road Darkens": "TRD" };
-
-type Deck = { label: string; cards: { databaseId: string; quantity: number; loadGroupId: string }[] };
+// The RingsDB twin packs (PRODUCTS): DragnCards names the Fellowship boxes by product, RingsDB by these pack codes.
+const TWIN_PACKS: ReadonlySet<string> = new Set(PRODUCTS.flatMap((product) => (product.twinPack ? [product.twinPack] : [])));
 
 // A scenario is written only when every check passes. The rest are listed in problems and stay unbuilt
 // until an override or a template resolves them.
 export type ScenarioResult = {
   scenarios: ScenarioData[];
-  // Every built campaign, each listing the scenarios of it that were built, in play order.
-  campaigns: CampaignData[];
+  // Every built campaign with its definition, each listing the scenarios of it that were built, in play order.
+  campaigns: { data: CampaignData; def: CampaignDef }[];
   problems: string[];
 };
 
@@ -61,56 +61,6 @@ function bookletSetsOf(entry: RuleEntry | undefined): string[] {
   return match[1].split(/,\s*(?:and\s+)?|\s+and\s+/).map((name) => name.trim()).filter((name) => name !== "");
 }
 
-// "the Journey in the Dark encounter set" and "The Ring Goes South" name the same set.
-const plain = (name: string): string => name.replace(/^the /i, "").replaceAll("\u2019", "'").toLowerCase();
-
-// The Easy Mode sheet's list of the cards to remove from each Core Set encounter set (easy-mode.core-set):
-// "Dol Guldur Orcs / 1x Chieftain Ufthak / ..." and "Passage Through Mirkwood / None". Set name -> card name -> copies.
-export function easyRemovals(text: string): Map<string, Map<string, number>> {
-  const sets = new Map<string, Map<string, number>>();
-  let heading: string[] = [];
-  let current: Map<string, number> | null = null;
-  for (const raw of text.split("\n")) {
-    const line = raw.trim().replaceAll("\u2019", "'");
-    if (line === "" || line === "Core Set") continue;
-    const card = /^(\d+)x (.+)$/.exec(line);
-    if (!card && line !== "None") {
-      heading.push(line);
-      continue;
-    }
-    if (heading.length > 0) {
-      current = new Map();
-      sets.set(plain(heading.join(" ")), current);
-      heading = [];
-    }
-    if (card?.[1] && card[2]) current?.set(card[2].toLowerCase(), Number(card[1]));
-  }
-  return sets;
-}
-
-// The packs a box's cards are printed in: the Fellowship box is the MEC109 printing, the others are RingsDB packs.
-const BOX_PACK: Readonly<Record<string, readonly string[]>> = {
-  "The Black Riders": ["TFotR"],
-  "The Road Darkens": ["TFotR"],
-  "Revised Core Set": ["RevCore"],
-  "The Dark of Mirkwood": ["TDoM"],
-};
-
-// Where a scenario's piles come from. The Fellowship box's come from DragnCards' Q0C deck, with the quest card's Setup text
-// as the check (phase 8d). The other boxes have no such deck (DragnCards' decks are the 2011 core and the Limited Collector's
-// Edition), so Hall of Beorn's counts lead and the printed Setup text places them; DragnCards' decks, where they exist, are
-// compared with the result (`crossCheck`).
-const LOAD_FROM_DRAGNCARDS: ReadonlySet<string> = new Set(["The Black Riders", "The Road Darkens"]);
-
-// DragnCards' 2011 core decks and Limited Collector's Edition decks, by scenario, where a deck of the same cards exists.
-const CROSS_CHECK: Readonly<Record<string, { normal: string; easy: string }>> = {
-  "passage-through-mirkwood": { normal: "Q01.1", easy: "E01.1" },
-  "journey-along-the-anduin": { normal: "Q01.2", easy: "E01.2" },
-  "escape-from-dol-guldur": { normal: "Q01.3", easy: "E01.3" },
-  "the-oath": { normal: "Q00.01B", easy: "E00.01B" },
-  "the-caves-of-nibin-dum": { normal: "Q00.02B", easy: "E00.02B" },
-};
-
 export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: Overrides, rules: readonly RuleEntry[], campaignDefs: readonly CampaignDef[] = CAMPAIGNS): ScenarioResult {
   const problems: string[] = [];
   const decks = (parseJsonc(raw.dragnRaw.preBuiltDecks) as { preBuiltDecks: Record<string, Deck> }).preBuiltDecks;
@@ -121,7 +71,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
   for (const card of cards) {
     for (const printing of card.printings) {
       if (printing.octgnGuid) byGuid.set(printing.octgnGuid, card);
-      if (printing.pack === "TBR" || printing.pack === "TRD") byPackNumber.set(`${printing.pack}:${printing.number}`, card);
+      if (TWIN_PACKS.has(printing.pack)) byPackNumber.set(`${printing.pack}:${printing.number}`, card);
       if (printing.hobSlug) bySlug.set(printing.hobSlug, card);
     }
   }
@@ -137,7 +87,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const direct = byGuid.get(databaseId);
     if (direct) return direct;
     const row = raw.dragn.get(databaseId);
-    const pack = PACK_BY_NAME[row?.packName ?? ""];
+    const pack = PRODUCTS.find((product) => product.name === row?.packName)?.twinPack;
     const hit = pack ? byPackNumber.get(`${pack}:${row?.numberInPack ?? ""}`) : undefined;
     return hit && row && sameName(hit.name, row.name ?? "") ? hit : null;
   };
@@ -148,15 +98,16 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
   const preludes = new Map<string, { code: string }[]>();
   const hobById = new Map(raw.scenarios.map((hob) => [scenarioSlug(hob.Title), hob]));
 
-  for (const def of scenarioDefs()) {
+  for (const def of scenarioDefs(campaignDefs)) {
     const hob = hobById.get(def.id);
     const id = def.id;
     if (!hob) {
       problems.push(`${id}: Hall of Beorn has no scenario file for it (data/raw/hallofbeorn/Scenarios)`);
       continue;
     }
-    const fromDragn = LOAD_FROM_DRAGNCARDS.has(def.product);
-    const packs = BOX_PACK[def.product] ?? [];
+    const product = productOf(def.product);
+    const fromDragn = product.load === "dragncards";
+    const packs = product.packs;
     const local: string[] = [];
     const entry = fromDragn ? Object.entries(decks).find(([key, deck]) => /^Q0C\.\d+$/.test(key) && deck.label === hob.Title) : undefined;
     if (fromDragn && !entry) {
@@ -229,44 +180,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       return { placements, player, campaign };
     };
 
-    // A box with no DragnCards load list: Hall of Beorn's counts put every card in the encounter deck, and the quest card's
-    // printed Setup (read from the ledger) moves cards out of it: staged, set aside, searched for.
-    const fromSetup = (difficulty: "Normal" | "Easy"): Loaded => {
-      const placements = new Map<string, number>();
-      const add = (code: string, pile: string, count: number) => placements.set(`${code}\u0000${pile}`, (placements.get(`${code}\u0000${pile}`) ?? 0) + count);
-      for (const code of stages) add(code, "quest", 1);
-      for (const item of hob.ScenarioCards) {
-        const card = bySlug.get(item.Slug);
-        if (!card || /\(Campaign\)$/.test(item.Title) || /Nightmare$/.test(item.EncounterSet ?? "")) continue;
-        // Boons, burdens and the campaign card are dealt by the campaign card's records, not by the load list.
-        if (card.type === "campaign" || card.campaignKind != null) continue;
-        const count = difficulty === "Normal" ? item.NormalQuantity : item.EasyQuantity;
-        if (count > 0) add(card.code, "encounter", count);
-      }
-      const move = (code: string, pile: string, wanted: number | "all") => {
-        const have = placements.get(`${code}\u0000encounter`) ?? 0;
-        const take = wanted === "all" ? have : Math.min(wanted, have);
-        if (take === 0 || (wanted !== "all" && take < wanted)) local.push(`${id}: Setup takes ${nameOf(code)} from the ${difficulty} encounter deck, which has ${have}`);
-        if (take === 0) return;
-        if (take === have) placements.delete(`${code}\u0000encounter`);
-        else placements.set(`${code}\u0000encounter`, have - take);
-        add(code, pile, take);
-      };
-      for (const clause of quest.clauses) {
-        if (clause.kind === "stage") for (const code of clause.codes) move(code, "staging", clause.count);
-        else if (clause.kind === "aside") for (const code of clause.codes) move(code, "setAside", clause.allCopies ? "all" : 1);
-        else if (clause.kind === "active") for (const code of clause.codes) move(code, "activeLocation", 1);
-        else if (clause.kind === "attachChosen") for (const code of clause.codes) move(code, "attachedChosen", 1);
-        else if (clause.kind === "searchObjectives") {
-          const objectives = [...placements.keys()].map((key) => key.split("\u0000")[0] ?? "").filter((code) => byCode.get(code)?.type === "objective" && placements.has(`${code}\u0000encounter`));
-          if (objectives.length !== clause.count) local.push(`${id}: Setup searches for ${clause.count} objective cards, the ${difficulty} encounter deck has ${objectives.length}`);
-          for (const code of objectives) move(code, "staging", 1);
-        }
-      }
-      return { placements, player: [], campaign: new Set<string>() };
-    };
-
-    type Loaded = { placements: Map<string, number>; player: string[]; campaign: Set<string> };
+    // A box with no DragnCards load list: Hall of Beorn's counts are the pile, and the quest card's printed Setup moves cards out of it.
+    const fromSetup = (difficulty: "Normal" | "Easy"): Loaded => pilesFromSetup({ id, difficulty, hob, stages, bySlug, byCode, clauses: quest.clauses, nameOf, problems: local });
     const empty: Loaded = { placements: new Map<string, number>(), player: [], campaign: new Set<string>() };
     let normal: Loaded;
     let easy: Loaded;
@@ -404,14 +319,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       const normalCount = mine.reduce((sum, p) => sum + p.normal, 0);
       const fixed = easyFix(card.code);
       const easyCount = fixed ?? mine.reduce((sum, p) => sum + p.easy, 0);
-      // The Easy Mode sheet lists what Easy removes from each Core Set encounter set, which the Revised Core Set reprints: the
-      // printed removal settles Hall of Beorn's Easy count. (DragnCards' 2011 decks are the other cross-check, below.)
-      const sheet = removals.get(canon(card.encounterSet ?? ""));
-      // The sheet spells a name as printed ("Chieftain Ufthak"); Hall of Beorn's title has a typo ("Chieftan"), so names match loosely.
-      const removed = sheet ? ([...sheet].find(([name]) => sameName(name, card.name))?.[1] ?? 0) : 0;
-      if (def.product === "Revised Core Set" && sheet && item.NormalQuantity - item.EasyQuantity !== removed) {
-        local.push(`${id}: ${item.Title} Easy removes ${item.NormalQuantity - item.EasyQuantity}, the Easy Mode sheet removes ${removed}`);
-      }
+      const sheetProblem = easySheetProblem(id, product, item, card, removals, canon);
+      if (sheetProblem) local.push(sheetProblem);
       if (normalCount !== item.NormalQuantity) local.push(`${id}: ${item.Title} Normal ${normalCount}, Hall of Beorn ${item.NormalQuantity}`);
       if (easyCount !== item.EasyQuantity) local.push(`${id}: ${item.Title} Easy ${easyCount}, Hall of Beorn ${item.EasyQuantity}`);
       if (fixed != null) for (const p of mine) p.easy = Math.min(fixed, p.normal);
@@ -425,30 +334,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       perSeatStaging: stages.some((code) => /creates? (?:his|their) own staging area/.test(textOf(code))),
     };
 
-    // DragnCards' decks are a cross-check where a deck of the same cards exists: every card's copies, Normal and Easy.
-    const cross = CROSS_CHECK[id];
-    for (const [difficulty, key] of cross && !normalDeck ? ([["normal", cross.normal], ["easy", cross.easy]] as const) : []) {
-      const deck = decks[key];
-      if (!deck) {
-        local.push(`${id}: DragnCards has no ${key} deck to cross-check`);
-        continue;
-      }
-      const theirs = new Map<string, number>();
-      for (const line of deck.cards) {
-        if (line.loadGroupId === "sharedQuestDeck" || line.loadGroupId === PLAYER_GROUP) continue;
-        const name = titleKey(raw.dragn.get(line.databaseId)?.name ?? "");
-        theirs.set(name, (theirs.get(name) ?? 0) + line.quantity);
-      }
-      const ours = new Map<string, number>();
-      for (const item of placed) {
-        if (item.pile === "quest") continue;
-        const name = titleKey(nameOf(item.code));
-        ours.set(name, (ours.get(name) ?? 0) + (difficulty === "normal" ? item.normal : item.easy));
-      }
-      for (const name of new Set([...theirs.keys(), ...ours.keys()])) {
-        if ((theirs.get(name) ?? 0) !== (ours.get(name) ?? 0)) local.push(`${id}: ${name} ${difficulty} ${ours.get(name) ?? 0}, DragnCards ${key} ${theirs.get(name) ?? 0}`);
-      }
-    }
+    // DragnCards' decks, where a deck of the same cards exists (copy counts only, not piles).
+    if (!normalDeck) local.push(...crossCheckProblems(def, decks, raw.dragn, placed, nameOf));
 
     if (local.length > 0) {
       problems.push(...local);
@@ -475,9 +362,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
 
   // Each campaign lists the scenarios of it that were built, in its own order. A campaign whose first scenario is a saga's
   // takes that scenario's player-1 play area as its prelude (the Fellowship's Ring-bearer attachments).
-  const campaigns: CampaignData[] = campaignDefs.map((def) => {
+  const campaigns = campaignDefs.map((def) => {
     const built = def.scenarios.filter((scenario) => scenarios.some((item) => item.id === scenario.id));
-    return {
+    const data: CampaignData = {
       id: def.id,
       name: def.name,
       scenarios: built.map((scenario) => scenario.id),
@@ -487,6 +374,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       prelude: preludes.get(built[0]?.id ?? "") ?? [],
       starterDecks: [],
     };
+    return { data, def };
   });
   return { scenarios, campaigns, problems };
 }

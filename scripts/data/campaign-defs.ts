@@ -11,7 +11,46 @@ export type ScenarioDef = {
   product: string;
   // The rules span (data/rules/index.json) that prints its encounter-deck paragraph.
   setupSpan: string;
+  // DragnCards' 2011 core decks and Limited Collector's Edition decks (`Q01.1`, `E01.1`), where a deck of the same cards exists
+  // for a box that has no load list of its own: the cross-check compares the built piles with them, copy counts only.
+  crossCheck?: { normal: string; easy: string };
 };
+
+// A Hall of Beorn product (a box) the pipeline builds cards or scenarios from: the one table every other site derives from.
+export type ProductDef = {
+  // The Hall of Beorn product / CardSet name.
+  name: string;
+  // The RingsDB packs the box's cards are printed in: the Fellowship box is the MEC109 printing (TFotR), the others are RingsDB packs.
+  packs: readonly string[];
+  // The campaign whose generated effects file (src/effects/generated/<id>.ts) holds the box's cards: the Oath is in two
+  // campaigns, and its records live once, with the box it is printed in.
+  home: string;
+  // Where a scenario's piles come from. "dragncards": the Q0C load list, with the quest card's Setup text as the check
+  // (phase 8d). "setup": Hall of Beorn's counts lead and the printed Setup text places them (DragnCards has no such deck).
+  load: "dragncards" | "setup";
+  // The Easy Mode sheet (easy-mode.core-set) lists what Easy removes from this box's encounter sets.
+  easySheet: boolean;
+  // The RingsDB twin pack Hall of Beorn's cards are paired with, which is also the pack name DragnCards gives them (the
+  // Fellowship boxes). null: the box's cards come from Hall of Beorn alone, stamped with packs[0].
+  twinPack: string | null;
+};
+
+export const PRODUCTS: readonly ProductDef[] = [
+  { name: "The Black Riders", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TBR" },
+  { name: "The Road Darkens", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TRD" },
+  { name: "Revised Core Set", packs: ["RevCore"], home: "mirkwood-paths", load: "setup", easySheet: true, twinPack: null },
+  { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
+];
+
+// A product the table does not hold is a build error, never an empty default.
+export function productOf(name: string): ProductDef {
+  const product = PRODUCTS.find((item) => item.name === name);
+  if (!product) throw new Error(`campaign-defs: no product "${name}" in PRODUCTS (scripts/data/campaign-defs.ts)`);
+  return product;
+}
+
+// The packs of every product: the printings whose boons and burdens a built campaign deals.
+export const PRODUCT_PACKS: ReadonlySet<string> = new Set(PRODUCTS.flatMap((product) => product.packs));
 
 export type CampaignDef = {
   id: string;
@@ -28,6 +67,9 @@ export type CampaignDef = {
   // Where the scan-read ledger for this campaign lives (data/printed/<ledger>.json).
   ledger: string;
 };
+
+const OATH: ScenarioDef = { id: "the-oath", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-oath", crossCheck: { normal: "Q00.01B", easy: "E00.01B" } };
+const CAVES: ScenarioDef = { id: "the-caves-of-nibin-dum", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-caves-of-nibin-dum", crossCheck: { normal: "Q00.02B", easy: "E00.02B" } };
 
 export const CAMPAIGNS: readonly CampaignDef[] = [
   {
@@ -52,11 +94,11 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     name: "Mirkwood Paths",
     products: ["Revised Core Set", "The Dark of Mirkwood"],
     scenarios: [
-      { id: "passage-through-mirkwood", product: "Revised Core Set", setupSpan: "ltp.setup-passage-through-mirkwood" },
-      { id: "journey-along-the-anduin", product: "Revised Core Set", setupSpan: "ltp.setup-journey-along-the-anduin" },
-      { id: "escape-from-dol-guldur", product: "Revised Core Set", setupSpan: "ltp.setup-escape-from-dol-guldur" },
-      { id: "the-oath", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-oath" },
-      { id: "the-caves-of-nibin-dum", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-caves-of-nibin-dum" },
+      { id: "passage-through-mirkwood", product: "Revised Core Set", setupSpan: "ltp.setup-passage-through-mirkwood", crossCheck: { normal: "Q01.1", easy: "E01.1" } },
+      { id: "journey-along-the-anduin", product: "Revised Core Set", setupSpan: "ltp.setup-journey-along-the-anduin", crossCheck: { normal: "Q01.2", easy: "E01.2" } },
+      { id: "escape-from-dol-guldur", product: "Revised Core Set", setupSpan: "ltp.setup-escape-from-dol-guldur", crossCheck: { normal: "Q01.3", easy: "E01.3" } },
+      OATH,
+      CAVES,
     ],
     bookletId: "learn-to-play",
     bookletDoc: "learn-to-play",
@@ -68,8 +110,8 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     name: "The Dark of Mirkwood",
     products: ["The Dark of Mirkwood"],
     scenarios: [
-      { id: "the-oath", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-oath" },
-      { id: "the-caves-of-nibin-dum", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-caves-of-nibin-dum" },
+      OATH,
+      CAVES,
     ],
     bookletId: "the-dark-of-mirkwood",
     bookletDoc: "tdom",
@@ -77,6 +119,15 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     ledger: "mirkwood-paths",
   },
 ];
+
+// The packs of the products built from Hall of Beorn alone (no twin pack): their boons and burdens have a pool file of their own.
+export const HOB_ONLY_PACKS: ReadonlySet<string> = new Set(PRODUCTS.flatMap((product) => (product.twinPack === null ? product.packs : [])));
+
+// Every product a campaign or scenario names is in PRODUCTS.
+for (const campaign of CAMPAIGNS) {
+  for (const name of campaign.products) productOf(name);
+  for (const scenario of campaign.scenarios) productOf(scenario.product);
+}
 
 // Every Hall of Beorn product some campaign is built from: what the sync snapshots scenario files for.
 export const BUILT_PRODUCTS: ReadonlySet<string> = new Set(CAMPAIGNS.flatMap((campaign) => campaign.products));
@@ -96,17 +147,8 @@ export function scenarioSlug(title: string): string {
 }
 
 // The built scenarios, each once, in the order the campaigns first list them.
-export function scenarioDefs(): ScenarioDef[] {
+export function scenarioDefs(campaigns: readonly CampaignDef[] = CAMPAIGNS): ScenarioDef[] {
   const seen = new Map<string, ScenarioDef>();
-  for (const campaign of CAMPAIGNS) for (const scenario of campaign.scenarios) if (!seen.has(scenario.id)) seen.set(scenario.id, scenario);
+  for (const campaign of campaigns) for (const scenario of campaign.scenarios) if (!seen.has(scenario.id)) seen.set(scenario.id, scenario);
   return [...seen.values()];
 }
-
-// The campaign whose generated effects file (src/effects/generated/<id>.ts) holds a product's box cards: the Oath is in two
-// campaigns, and its records live once, with the box it is printed in.
-export const PRODUCT_HOME: Readonly<Record<string, string>> = {
-  "The Black Riders": "fellowship-of-the-ring",
-  "The Road Darkens": "fellowship-of-the-ring",
-  "Revised Core Set": "mirkwood-paths",
-  "The Dark of Mirkwood": "the-dark-of-mirkwood",
-};

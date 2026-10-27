@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
+import { PRODUCT_PACKS } from "../campaign-defs.ts";
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaign, loadCampaigns, loadScenarios } from "../load-scenarios.ts";
 import { RAW_DIR } from "../paths.ts";
@@ -25,12 +26,6 @@ const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
   "142075": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Argonath.jpg"],
   "141064": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stricken-Dumb.jpg"],
 };
-
-const CAMPAIGN_CARDS = ["141030", "141044", "141056", "142019", "142039", "142060"];
-
-// The packs whose boons and burdens a built campaign deals: the Fellowship box's MEC109 printing, the Revised Core Set and
-// The Dark of Mirkwood.
-const BOX_PACKS: ReadonlySet<string> = new Set(["TFotR", "RevCore", "TDoM"]);
 
 // Player cards outside the box that the player's own decks play and reported doing nothing (user request, 2026-10-25):
 // The Shirefolk lowers its player's threat. Then every card of the four core-set Learn to Play decks (core-leadership,
@@ -73,7 +68,7 @@ function boxCodes(): string[] {
       if (code) codes.add(code);
     }
   }
-  for (const card of cards) if (card.campaignKind && card.printings.some((printing) => BOX_PACKS.has(printing.pack))) codes.add(card.code);
+  for (const card of cards) if (card.campaignKind && card.printings.some((printing) => PRODUCT_PACKS.has(printing.pack))) codes.add(card.code);
   // The box's Ring-bearer: every scenario starts with a Fellowship-sphere Ring-bearer hero in play (mec109.setting-up-the-game),
   // so his text is part of every game.
   for (const card of cards) {
@@ -83,7 +78,7 @@ function boxCodes(): string[] {
 }
 
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...CAMPAIGN_CARDS, ...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
+  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
 }
 
 type HobImages = { CardSet: string; Slug: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };

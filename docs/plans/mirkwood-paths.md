@@ -25,7 +25,7 @@ Today the pipeline, the registry and the screens are hard-wired to one campaign.
   - Revised Core: 49 encounter, 13 quest and the campaign cards.
   - The Dark of Mirkwood: 36 encounter and 9 quest/campaign cards.
 - The Revised Core Learn to Play (`learn-to-play`) and Rules Reference (`rr`, MEC101.pdf) are pinned. The Learn to Play has campaign mode (pp. 30–31) and each scenario's "encounter deck is built with…" paragraph. `rr.campaign-*` spans already exist.
-- The Dark of Mirkwood rulebook is not pinned. It is at `https://images-cdn.fantasyflightgames.com/filer_public/6c/05/6c05f84b-1485-4dce-bd47-92b1ce0974b2/dark_of_mirkwood_rulebook_v2.pdf` (8 pages; verified to be a PDF). It has the set lists and the campaign-mode page.
+- The Dark of Mirkwood rulebook is not pinned. It is at `https://images-cdn.fantasyflightgames.com/filer_public/6c/05/6c05f84b-1485-4dce-bd47-92b1ce0974b2/dark_of_mirkwood_rulebook_v2.pdf` (8 pages; verified to be a PDF). *Phase 27 note:* Node's fetch gets a 503 from that URL, so `RULE_PDFS` pins the same file (same sha256) at the asmodee host the other FFG PDFs use. It has the set lists and the campaign-mode page.
 
 **Card codes**
 - Hall of Beorn gives The Dark of Mirkwood cards `020NN` codes, which collide with The Hunt for Gollum's RingsDB codes. RingsDB lists the same cards as `410NN` (Stalking Goblin is 02041 in Hall of Beorn and 41041 in RingsDB).
@@ -33,7 +33,7 @@ Today the pipeline, the registry and the screens are hard-wired to one campaign.
 - Revised Core encounter cards reuse 2011 codes 01074–01131. The `RevCore` printing owns them. Hall of Beorn's ` (Campaign)` encounter-set suffix is normalized away.
 
 **DragnCards**
-- `Q01.x`/`E01.x` are the 2011 decks, with no campaign rows. There is no deck for The Dark of Mirkwood.
+- `Q01.x`/`E01.x` are the 2011 decks, with no campaign rows. There is no deck for The Dark of Mirkwood. *Phase 27 note:* this is wrong: DragnCards has `Q00.01B`/`E00.01B` and `Q00.02B`/`E00.02B` (the Limited Collector's Edition decks of The Oath and The Caves), and the build cross-checks them (copy counts only).
 - So for the new boxes, Hall of Beorn `ScenarioCards` counts lead. DragnCards is a cross-check where it exists, and printed Easy marks (read from the scans) settle any disagreement.
 
 **Player pool**

@@ -330,14 +330,23 @@
         "sha256": "27afa63605cb6303dadabf705c7596754e38154e8ec613bae95176d7e98b1818"
       },
       "lines": [
-        "Chieftan Ufthak gets +2 Attack for each resource token on him.",
-        "Forced: After Chieftan Ufthak attacks, place 1 resource token on him."
+        "Chieftain Ufthak gets +2 Attack for each resource token on him.",
+        "Forced: After Chieftain Ufthak attacks, place 1 resource token on him."
       ],
       "inert": [],
-      "misprints": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "Chieftan Ufthak gets +2 Attack for each resource token on him."
+        },
+        {
+          "line": 2,
+          "printed": "Forced: After Chieftan Ufthak attacks, place 1 resource token on him."
+        }
+      ],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "notes": "Printed title and text spell the name \"Chieftan\"."
+      "notes": "The card prints its title and both text lines with the misspelling \"Chieftan\" (the card name stays as printed; lines carry the corrected spelling, misprints the printed wording). Reading re-checked against the scan at full size on 2026-10-27 (not user-confirmed). Hall of Beorn's text spells the name \"Chieftain\" and reads \"get 2 attack\"; the scan reads \"gets +2 [Attack]\". The pinned scan is the 2010 Core Set printing (\"© 2010 FFG\", collector number 90), not a Revised Core Set printing; the wording is the same."
     },
     {
       "code": "01091",
@@ -1077,7 +1086,7 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "notes": "Side A prints only flavor text."
+      "notes": "Side A prints only flavor text. Reading re-checked against the scan at full size on 2026-10-27 (not user-confirmed). Hall of Beorn puts the stage's rules text on side A; the scan shows side A with flavor text only and the text on side B."
     },
     {
       "code": "01127",
@@ -1093,7 +1102,8 @@
       "inert": [],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
-      "confirmedBy": null
+      "confirmedBy": null,
+      "notes": "Reading re-checked against the scan at full size on 2026-10-27 (not user-confirmed). Hall of Beorn puts this text on side A; the scan prints it on side B (stage 2B)."
     },
     {
       "code": "01128",
@@ -1108,7 +1118,7 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "notes": "Side A prints only flavor text."
+      "notes": "Side A prints only flavor text. Reading re-checked against the scan at full size on 2026-10-27 (not user-confirmed). Hall of Beorn puts the stage's rules text on side A; the scan shows side A with flavor text only and the text on side B."
     },
     {
       "code": "01128",
@@ -1126,7 +1136,8 @@
       "inert": [],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
-      "confirmedBy": null
+      "confirmedBy": null,
+      "notes": "Reading re-checked against the scan at full size on 2026-10-27 (not user-confirmed). Hall of Beorn puts this text on side A; the scan prints it on side B (stage 3B)."
     },
     {
       "code": "01129",
@@ -1677,7 +1688,8 @@
       "inert": [],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
-      "confirmedBy": null
+      "confirmedBy": null,
+      "notes": "Reading re-checked against the scan at full size on 2026-10-27 (not user-confirmed). Hall of Beorn disagrees: its text reads \"the first player draws 2 cards.\"; the scan prints \"the first player may draw 2 cards.\""
     },
     {
       "code": "41013",
@@ -2347,7 +2359,7 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "notes": "Scan is a 350 px photograph; read at that size."
+      "notes": "Scan is a 350 px photograph; read at that size. Reading re-checked against the scan at full size on 2026-10-27 (not user-confirmed). Hall of Beorn disagrees: its text reads \"Forced: At the end of each round, place 1 resource token here.\"; the scan prints \"Response:\"."
     },
     {
       "code": "41050",

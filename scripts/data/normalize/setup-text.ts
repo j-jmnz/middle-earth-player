@@ -39,7 +39,8 @@ export type SetupClause =
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
 
-export type NameIndex = { codesOf(sentence: string): string[]; aliases: ReadonlyMap<string, string> };
+// `without` is the sentence with every card name blanked out: what is left says whether the sentence is only a list of names.
+export type NameIndex = { codesOf(sentence: string): string[]; without(sentence: string): string; aliases: ReadonlyMap<string, string> };
 
 // Builds the name matcher from the cards a scenario can name. When two cards share a name (the burden Pursued by the
 // Enemy and the quest of the same name), the one in `prefer` wins.
@@ -54,6 +55,16 @@ export function nameIndex(cards: readonly Card[], prefer: ReadonlySet<string>): 
   return {
     aliases: new Map([...byName].map(([name, card]) => [name, card.code])),
     codesOf(sentence) {
+      return scan(sentence).map((hit) => hit.code);
+    },
+    without(sentence) {
+      let rest = sentence.toLowerCase();
+      for (const hit of [...scan(sentence)].sort((a, b) => b.at - a.at)) rest = `${rest.slice(0, hit.at)} ${rest.slice(hit.at + hit.length)}`;
+      return rest;
+    },
+  };
+  function scan(sentence: string): { at: number; code: string; length: number }[] {
+    {
       const lower = sentence.toLowerCase();
       const found: { at: number; code: string; length: number }[] = [];
       const taken: [number, number][] = [];
@@ -72,9 +83,9 @@ export function nameIndex(cards: readonly Card[], prefer: ReadonlySet<string>): 
           from = at + 1;
         }
       }
-      return found.sort((a, b) => a.at - b.at).map((hit) => hit.code);
-    },
-  };
+      return found.sort((a, b) => a.at - b.at);
+    }
+  }
 }
 
 function sentencesOf(text: string): string[] {
@@ -88,9 +99,13 @@ function sentencesOf(text: string): string[] {
 const WORD: Readonly<Record<string, number>> = { a: 1, an: 1, one: 1, two: 2, three: 3 };
 const amount = (word: string | undefined): number => (word === undefined ? 1 : (WORD[word.toLowerCase()] ?? Number(word)));
 
+// Only separators and the quantity words are left once the names are blanked: "1 copy of  and  copy of ", ",  , and ".
+const isNameList = (rest: string): boolean => rest.replace(/\b(?:and|an?|the|\d+|copy|copies|of)\b/g, " ").replace(/[\s,.]/g, "") === "";
+
 export function parseSetup(text: string, names: NameIndex, set: (name: string) => string | null = () => null): ParsedSetup {
   const clauses: SetupClause[] = [];
   const unread: string[] = [];
+  const searches: { sentence: string; codes: string[] }[] = [];
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
@@ -101,7 +116,9 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
       clauses.push({ kind: "stage", codes: names.codesOf(match[1] ?? ""), perPlayer: null, count: 1 });
     } else if ((match = /^Search the encounter deck for the (\d+|an?|one) objective cards?, reveal and place them in the staging area$/i.exec(sentence))) {
       clauses.push({ kind: "searchObjectives", count: amount(match[1]) });
-    } else if ((match = /^Search the encounter deck for (?:\d+ copy of )?(.+)$/i.exec(sentence))) {
+    } else if ((match = /^Search the encounter deck for (.+)$/i.exec(sentence)) && isNameList(names.without(match[1] ?? ""))) {
+      // A bare list of names ("1 copy of X and Y", "X, Y, and Z"); a longer sentence is unread.
+      searches.push({ sentence, codes: names.codesOf(match[1] ?? "") });
       clauses.push({ kind: "search", codes: names.codesOf(match[1] ?? "") });
     } else if ((match = /^Add (.+?) to the staging area and set (.+?) aside,? out of play$/i.exec(sentence))) {
       clauses.push({ kind: "stage", codes: names.codesOf(match[1] ?? ""), perPlayer: null, count: 1 });
@@ -166,5 +183,10 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
     } else unread.push(sentence);
   }
   void set;
+  // "Search the encounter deck for X" only finds a card: a later clause must place every card it finds, else the sentence is
+  // reported unread and the scenario stays unbuilt.
+  const placing = new Set<SetupClause["kind"]>(["stage", "aside", "active", "attachChosen", "attachRingBearer", "putIntoPlay", "shuffleInto", "choose", "addToCampaignPool"]);
+  const placed = new Set(clauses.flatMap((clause) => (placing.has(clause.kind) && "codes" in clause ? clause.codes : [])));
+  for (const search of searches) if (search.codes.length === 0 || search.codes.some((code) => !placed.has(code))) unread.push(search.sentence);
   return { clauses, unread };
 }

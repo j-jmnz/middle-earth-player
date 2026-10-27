@@ -8,7 +8,6 @@ import { buildIcons } from "./icons.ts";
 import { buildCards, parseOverrides } from "./normalize/cards.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
 import { boxCodes, boxOwners, generateEffects, renderGenerated } from "./effects/generate.ts";
-import { CAMPAIGNS } from "./campaign-defs.ts";
 import { applyPrinted } from "./normalize/printed.ts";
 import { buildCampaignIndex } from "./normalize/campaigns.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
@@ -84,20 +83,17 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
   // Only the saga campaign has them. Key order is the file's: the booklet fields come last so the Fellowship's lines stay put.
   const built = {
     ...buildResult,
-    campaigns: buildResult.campaigns.map((campaign) => {
-      const def = CAMPAIGNS.find((item) => item.id === campaign.id);
-      return {
-        id: campaign.id,
-        name: campaign.name,
-        scenarios: campaign.scenarios,
-        campaignCards: campaign.campaignCards,
-        prelude: campaign.prelude,
-        starterDecks: campaign.saga ? loadStarterDecks(cards, entries) : [],
-        bookletPages: bookletPages(entries, campaign.scenarios, def?.bookletDoc),
-        bookletId: campaign.bookletId,
-        saga: campaign.saga,
-      };
-    }),
+    campaigns: buildResult.campaigns.map(({ data: campaign, def }) => ({
+      id: campaign.id,
+      name: campaign.name,
+      scenarios: campaign.scenarios,
+      campaignCards: campaign.campaignCards,
+      prelude: campaign.prelude,
+      starterDecks: campaign.saga ? loadStarterDecks(cards, entries) : [],
+      bookletPages: bookletPages(entries, campaign.scenarios, def.bookletDoc),
+      bookletId: campaign.bookletId,
+      saga: campaign.saga,
+    })),
   };
   const scenarioDir = path.join(outDir, "scenarios");
   const campaignDir = path.join(outDir, "campaigns");

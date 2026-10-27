@@ -3,7 +3,7 @@ import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
-import { PRODUCT_HOME, scenarioDefs } from "../campaign-defs.ts";
+import { productOf, scenarioDefs } from "../campaign-defs.ts";
 import { dealtCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
 import { isPoolCard } from "../printed/pool.ts";
@@ -19,10 +19,10 @@ export function boxCodes(campaign: CampaignData | readonly CampaignData[], scena
 }
 
 // The generated effects file each box card's records are written to: the campaign of the box that prints the scenario
-// dealing it (PRODUCT_HOME), else the Fellowship's (its starter lists and prelude).
+// dealing it (PRODUCTS, scripts/data/campaign-defs.ts), else the Fellowship's (its starter lists and prelude).
 export function boxOwners(campaigns: readonly CampaignData[], scenarios: readonly ScenarioData[]): Map<string, string> {
   const owners = new Map<string, string>();
-  const home = new Map(scenarioDefs().map((def) => [def.id, PRODUCT_HOME[def.product] ?? "fellowship-of-the-ring"]));
+  const home = new Map(scenarioDefs().map((def) => [def.id, productOf(def.product).home]));
   for (const scenario of scenarios) {
     for (const code of dealtCodes([], [scenario])) if (!owners.has(code)) owners.set(code, home.get(scenario.id) ?? "fellowship-of-the-ring");
   }

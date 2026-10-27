@@ -7,6 +7,7 @@ import { EFFECTS } from "../../../src/effects/index.ts";
 import { runScript, type Log } from "../../log.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { prebuiltDecksSchema } from "../../../src/catalog/prebuilt-deck.ts";
+import { HOB_ONLY_PACKS } from "../campaign-defs.ts";
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaigns, loadScenario, loadScenarios, starterCodes } from "../load-scenarios.ts";
 import { keyOf, loadLedger } from "../printed/ledger.ts";
@@ -67,15 +68,16 @@ function main(log: Log): void {
   const byCard = new Map<string, Unmatched[]>();
   for (const line of open) byCard.set(line.card.code, [...(byCard.get(line.card.code) ?? []), line]);
 
-  // Where a card's records go: a pool card's pack file, a boon or burden of the Revised Core Set or The Dark of Mirkwood in that
-  // pack's pool file, the Fellowship box's cards in the Fellowship file, and any other box card in the file of the first
-  // scenario that deals it (src/effects/authored/<scenario-id>.ts).
+  // Where a card's records go: a pool card's pack file, a boon or burden of a Hall-of-Beorn-only box (the Revised Core Set, The Dark
+  // of Mirkwood; HOB_ONLY_PACKS) in that pack's pool file (src/effects/authored/pool/RevCore.ts, TDoM.ts: the plan's phases 29 to
+  // 33 table puts them there), the Fellowship box's cards in the Fellowship file, and any other box card in the file of the
+  // first scenario that deals it (src/effects/authored/<scenario-id>.ts).
   const starters = starterCodes(campaigns);
   const fellowship = new Set(campaigns.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarios ?? []);
   const scenarios = loadScenarios();
   const targetOf = (card: Card): string => {
     const pack = card.printings[0]?.pack;
-    if ((isPoolCard(card) && !starters.has(card.code)) || (card.campaignKind != null && (pack === "RevCore" || pack === "TDoM"))) return `src/effects/authored/pool/${pack}.ts`;
+    if ((isPoolCard(card) && !starters.has(card.code)) || (card.campaignKind != null && (pack != null && HOB_ONLY_PACKS.has(pack)))) return `src/effects/authored/pool/${pack}.ts`;
     const dealer = scenarios.find((entry) => dealtCodes([], [entry]).has(card.code));
     return dealer && !fellowship.has(dealer.id) ? `src/effects/authored/${dealer.id}.ts` : "src/effects/authored/fellowship-of-the-ring.ts";
   };
