@@ -26,7 +26,7 @@ const DIAL: Record<ThreatLevel, { edge: string; fill: string; meter: string }> =
 };
 
 /**
- * The threat dial of the top bar (`compact`): the threat icon and the number large in Marcellus on a threat-red pill, with a
+ * The threat dial of the top bar (`compact`): the threat icon and the number large in Cinzel Bold on a threat-red pill, with a
  * meter along its foot that fills toward 50, the elimination level, and its label beside it. It warms near elimination,
  * pops when the number changes, and shows the change ("−6" in gold when it fell, "+2" in threat red when it rose) for three
  * seconds; reduced motion keeps it still. `elimination` false (Life) drops the meter and the levels. Elsewhere, a ring with
@@ -68,7 +68,7 @@ export function ThreatRing({
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
-        <Text testID={`${id}-value`} className="font-display text-title text-bone">
+        <Text testID={`${id}-value`} className="font-display-bold text-title text-bone">
           {String(threat.threat)}
         </Text>
       </View>
@@ -158,7 +158,7 @@ function ThreatDial({
           style={{ minWidth: 64, borderWidth: 2, borderColor: look.edge, backgroundColor: look.fill }}
         >
           {icon ? <GameIcon name={icon} size={18} tint={critical ? "bone" : "danger"} /> : null}
-          <Text testID={`${id}-value`} className="font-display text-title text-bone">
+          <Text testID={`${id}-value`} className="font-display-bold text-title text-bone">
             {String(threat.threat)}
           </Text>
           {elimination && !threat.eliminated ? (
@@ -189,7 +189,7 @@ function ThreatDial({
             exiting={badge.out}
             style={{ borderRadius: 999, paddingHorizontal: 6, borderWidth: 1, borderColor: delta.lowered ? t.gold : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.gold : t.threat, 0.22) }}
           >
-            <Text testID={`${id}-delta`} className="font-display text-label text-bone">
+            <Text testID={`${id}-delta`} className="font-display-bold text-label text-bone">
               {delta.text}
             </Text>
           </Animated.View>

@@ -1,4 +1,4 @@
-// The phase title sweep (phase 23): the new phase's name in Marcellus display crosses the canvas center once when the round moves into
+// The phase title sweep (phase 23): the new phase's name in Cinzel display crosses the canvas center once when the round moves into
 // it. Taps pass through it (pointerEvents none), it never gates a rule, and it is skipped under Quick, under reduced motion and
 // when the table passes the whole phase for the player (sweep.ts).
 import { useEffect, useRef, useState } from "react";

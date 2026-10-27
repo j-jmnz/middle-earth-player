@@ -13,15 +13,15 @@ export const RAIL_MAX = 460;
 
 // The rail's pill is two lines (phase-rail.tsx): "Round 3 · QUEST" over the step, "Staging". Its floor comes from the pill's
 // own words, never from a guess about the bar:
-// - the phase is Marcellus caps at the body size (17 pt). A capital averages 0.625 em in Marcellus ("Optional engagement"
-//   measures 202 pt on the web build); 0.65 leaves a margin;
+// - the phase is Cinzel Bold capitals at 14 pt. A capital averages up to 0.76 em in Cinzel Bold ("ENCOUNTER" measures 0.759 em,
+//   "COMBAT" 0.762 in the web build); 0.78 leaves a margin;
 // - "Round 99" and the step are label size (13 pt) in the system font, which averages under 0.55 em a character; 0.55 leaves a
 //   margin;
 // - neither counts shrinking (PhaseRail may shrink the phase to 85%), which is more margin, nor the glow;
 // - the pill adds its 2 x 1 pt edge and 2 x 10 pt padding, and its top line keeps the room of the gold S that marks a stop ahead
 //   when the neighbors are not shown (STOP_MARK, counted whether or not it shows).
-const PHASE_SIZE = 17;
-const CAP_EM = 0.65;
+const PHASE_SIZE = 14;
+const CAP_EM = 0.78;
 const LABEL_SIZE = 13;
 const LABEL_EM = 0.55;
 const PILL_CHROME = 22;

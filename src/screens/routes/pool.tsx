@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { CardPool } from "../card-pool";
 import { NavBar } from "../chrome";
+import { useDeckDraft } from "../deck-draft";
 import { goBack } from "../go-back";
 
 // The pool the deck editor opens to add cards (`adding=1`). Browsing alone is the Cards tab.
@@ -11,6 +12,9 @@ export default function DeckPool() {
   const adding = params.adding === "1" || (Array.isArray(params.adding) && params.adding[0] === "1");
   // An empty hero slot opens the pool on heroes; a subsection's Add on its type.
   const startType = typeof params.type === "string" && params.type.length > 0 ? params.type : null;
+  const draft = useDeckDraft();
   const back = () => goBack(router, "/decks");
-  return <CardPool adding={adding} startType={startType} onDone={back} header={<NavBar backLabel="Deck" backTestID="pool-back" onBack={back} />} />;
+  // Adding, the bar names the deck the cards go into.
+  const title = adding ? draft.name.trim() || "New deck" : undefined;
+  return <CardPool adding={adding} startType={startType} onDone={back} header={<NavBar backLabel="Deck" backTestID="pool-back" onBack={back} title={title} subtitle={adding ? "Adding cards" : undefined} />} />;
 }

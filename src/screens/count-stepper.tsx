@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "react-native";
 
 import { copyCapRule } from "../catalog/deck-save";
 import { pressedNight } from "./chrome";
+import { palette } from "./palette.js";
 
 /** Whether one more copy would break the copy limit (rr.deckbuilding). */
 export function stepperFull(count: number, deckLimit: number | null): boolean {
@@ -31,7 +32,7 @@ export function CountStepper({
   ids?: { dec: string; count: string; inc: string };
 }) {
   return (
-    <View className="flex-row items-center">
+    <View className="flex-row items-center rounded-tile" style={{ backgroundColor: palette.night, borderWidth: 1, borderColor: palette.hairline }}>
       {minus ? (
         <Pressable
           testID={ids.dec}
@@ -39,17 +40,17 @@ export function CountStepper({
           accessibilityRole="button"
           accessibilityLabel={count <= 1 ? `Remove ${name}` : `Remove a copy of ${name}`}
           onPress={() => onChange(-1)}
-          className="min-h-11 min-w-11 items-center justify-center rounded-tile"
+          className="min-h-11 min-w-10 items-center justify-center rounded-tile"
           style={({ pressed }) => (pressed ? pressedNight : undefined)}
         >
-          <Text className="text-title text-bone">−</Text>
+          <Text className="text-title text-muted">−</Text>
         </Pressable>
       ) : null}
       {count > 0 || minus ? (
         <Text
           testID={ids.count}
           accessibilityLabel={`${count} in the deck`}
-          className={`min-w-6 text-center text-title font-semibold ${count > 0 ? "text-gold" : "text-faint"}`}
+          className={`min-w-6 text-center font-display-bold text-body ${count > 0 ? "text-goldHigh" : "text-faint"}`}
         >
           {String(count)}
         </Text>
@@ -61,7 +62,7 @@ export function CountStepper({
         accessibilityLabel={`Add ${count > 0 ? "a copy of " : ""}${name}`}
         accessibilityState={{ disabled: full }}
         onPress={() => onChange(1)}
-        className="min-h-11 min-w-11 items-center justify-center rounded-tile"
+        className="min-h-11 min-w-10 items-center justify-center rounded-tile"
         style={({ pressed }) => (pressed ? pressedNight : undefined)}
       >
         <Text className={`text-title ${full ? "text-faint" : "text-bone"}`}>+</Text>

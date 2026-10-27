@@ -156,7 +156,7 @@ export function PhaseCard({
         <Text
           accessibilityRole="header"
           accessibilityLabel={`${phase.name} phase${past ? ", done this round" : current ? ", now" : ""}`}
-          className="font-display text-body uppercase"
+          className="font-display-bold text-body uppercase"
           style={{
             color: current ? t.gold : past ? t.muted : t.bone,
             lineHeight: 22,

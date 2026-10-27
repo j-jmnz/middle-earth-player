@@ -10,7 +10,7 @@ export default function Rules() {
       testID="rules"
       books
       header={
-        <View className="pt-6">
+        <View className="pt-4">
           <ScreenTitle>Rules</ScreenTitle>
         </View>
       }

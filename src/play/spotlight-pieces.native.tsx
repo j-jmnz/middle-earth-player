@@ -51,7 +51,7 @@ export function Veil({ rect, frame }: { rect: Rect; frame: SharedValue<Frame> })
   return <RoundedRect x={rect.x} y={rect.y} width={rect.w} height={rect.h} r={RADIUS} color={t.night} opacity={opacity} />;
 }
 
-/** A big pill under a group: the stat's icon and its number in Marcellus. The defense pill bounces when the attack is blocked. */
+/** A big pill under a group: the stat's icon and its number in Cinzel Bold. The defense pill bounces when the attack is blocked. */
 export function Pill({ at, icon, color, text, font, frame, bounce = false }: { at: { cx: number; cy: number }; icon: IconName; color: string; text: string; font: SkFont; frame: SharedValue<Frame>; bounce?: boolean }) {
   const width = 12 + 20 + 6 + font.getTextWidth(text) + 12;
   const left = at.cx - width / 2;

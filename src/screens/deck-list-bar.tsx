@@ -1,8 +1,7 @@
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
-import { Segmented, SphereMark, markedSphere, sphereWord } from "./chrome";
+import { SearchField, Segmented, SphereMark, ToggleChip, markedSphere, sphereWord } from "./chrome";
 import { deckListFiltered, setDeckListView, useDeckListView, type DeckListFilter, type DeckListStatus } from "./deck-list";
-import { palette } from "./palette.js";
 
 // The deck list's search, Cards / List switch and filter chips, shared by the Decks tab and the briefing's deck picker.
 
@@ -13,21 +12,10 @@ const STATUSES: { key: DeckListStatus; label: string }[] = [
   { key: "unready", label: "Not ready" },
 ];
 
-// A filter chip on night: raised pill, gold when on. A sphere chip carries the sphere's icon.
+// A filter chip: a hairline outline, the gold plate when on. A sphere chip carries the sphere's icon.
 function FilterChip({ label, selected, onPress, sphere, testID }: { label: string; selected: boolean; onPress: () => void; sphere?: string; testID: string }) {
   const mark = sphere ? markedSphere(sphere) : null;
-  return (
-    <Pressable
-      testID={testID}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      className={`min-h-11 flex-row items-center gap-1.5 rounded-pill px-4 ${selected ? "bg-gold" : "bg-raised"}`}
-    >
-      {mark ? <SphereMark sphere={mark} size={12} /> : null}
-      <Text className={selected ? "text-body font-semibold text-onGold" : "text-body text-muted"}>{label}</Text>
-    </Pressable>
-  );
+  return <ToggleChip testID={testID} label={label} selected={selected} onPress={onPress} leading={mark ? <SphereMark sphere={mark} size={12} /> : null} />;
 }
 
 export function DeckListBar({
@@ -50,20 +38,10 @@ export function DeckListBar({
   return (
     <View className="mt-2">
       <View className="flex-row items-center gap-2">
-        <TextInput
-          testID={`${testIDPrefix}-search`}
-          value={filter.query}
-          onChangeText={(query) => onFilter({ ...filter, query })}
-          placeholder="Search"
-          placeholderTextColor={palette.faint}
-          autoCorrect={false}
-          autoCapitalize="none"
-          accessibilityLabel="Search decks or heroes"
-          className="min-h-11 min-w-0 flex-1 rounded-pill bg-raised px-4 text-body text-bone"
-        />
+        <SearchField testID={`${testIDPrefix}-search`} value={filter.query} onChangeText={(query) => onFilter({ ...filter, query })} placeholder="Search" accessibilityLabel="Search decks or heroes" />
         <Segmented options={VIEWS} value={view} onChange={setDeckListView} testIDPrefix={`${testIDPrefix}-view`} />
       </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-2 px-6">
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-1.5 px-6">
         {STATUSES.map((status) => (
           <FilterChip
             key={status.key}

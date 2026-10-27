@@ -10,19 +10,25 @@ module.exports = {
     extend: {
       colors: palette,
       fontFamily: {
-        // Embedded at build time by the expo-font config plugin (app.json). No runtime load.
-        display: ["Marcellus-Regular", "Marcellus", "serif"],
+        // Embedded at build time by the expo-font config plugin (app.json). No runtime load. Cinzel's lower case is small capitals,
+        // so a name reads as engraved capitals: titles and names in SemiBold, buttons, tags and the numbers the player watches in Bold.
+        display: ["Cinzel-SemiBold", "Cinzel", "serif"],
+        "display-bold": ["Cinzel-Bold", "Cinzel", "serif"],
       },
       fontSize: {
-        display: ["34px", { lineHeight: "40px" }],
-        title: ["24px", { lineHeight: "30px" }],
+        display: ["28px", { lineHeight: "34px", letterSpacing: "0.6px" }],
+        title: ["22px", { lineHeight: "28px", letterSpacing: "0.4px" }],
+        heading: ["15px", { lineHeight: "22px", letterSpacing: "0.3px" }],
         body: ["17px", { lineHeight: "24px" }],
         label: ["13px", { lineHeight: "18px" }],
-        eyebrow: ["12px", { lineHeight: "16px", letterSpacing: "2.4px" }],
+        eyebrow: ["11px", { lineHeight: "16px", letterSpacing: "2px" }],
+        micro: ["11px", { lineHeight: "14px", letterSpacing: "0.6px" }],
       },
       borderRadius: {
         tile: "12px",
-        card: "20px",
+        button: "14px",
+        card: "16px",
+        hero: "20px",
         sheet: "28px",
         pill: "999px",
       },

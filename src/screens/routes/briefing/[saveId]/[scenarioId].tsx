@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 
 import { briefing, scenarioFacts, type BriefingInput, type BriefingSeat } from "../../../../campaign/briefing";
 import { deal } from "../../../../campaign/session";
@@ -8,14 +8,14 @@ import { logCodes, loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { BodyText, Eyebrow, Label, NavBar, PrimaryButton, Screen, TextButton } from "../../../chrome";
+import { BodyText, Label, PrimaryButton, Section, TextButton } from "../../../chrome";
 import { FELLOWSHIP_ID } from "../../../../campaign/save";
 import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
 import { goBack } from "../../../go-back";
 import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
-import { DeckFilter, expand, ScenarioHeader, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
+import { BriefingScreen, expand, ScenarioBanner, ScenarioDetails, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
 import { routeCode } from "../../../route-code";
 import { useSave } from "../../../use-save";
 
@@ -62,27 +62,28 @@ export default function Briefing() {
   const result = useMemo(() => (input ? briefing(input) : null), [input]);
   const facts = useMemo(() => (world ? scenarioFacts(world, difficulty) : null), [world, difficulty]);
 
-  const back = (
-    <NavBar
-      onBack={() => goBack(router, saveId ? { pathname: "/path/[saveId]", params: { saveId } } : "/")}
-      backTestID="briefing-back"
-      right={<TextButton label="Booklet" accessibilityLabel="Open the booklet" testID="booklet-open" tone="gold" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save?.campaignId ?? FELLOWSHIP_ID, scenarioId) })} />}
-    />
-  );
+  const frame = {
+    testID: "briefing",
+    scenarioId,
+    onBack: () => goBack(router, saveId ? { pathname: "/path/[saveId]", params: { saveId } } : "/"),
+    onBooklet: () => router.push({ pathname: "/booklet/[id]", params: bookletParams(save?.campaignId ?? FELLOWSHIP_ID, scenarioId) }),
+  } as const;
   if (!loaded) {
     return (
-      <Screen testID="briefing" scene="vale">
-        {back}
-        <BodyText tone="muted">Loading</BodyText>
-      </Screen>
+      <BriefingScreen {...frame} banner={null}>
+        <BodyText tone="muted" className="mt-4">
+          Loading
+        </BodyText>
+      </BriefingScreen>
     );
   }
   if (!save || !campaign || !scenario || !world || !input || !result || !facts) {
     return (
-      <Screen testID="briefing" scene="vale">
-        {back}
-        <BodyText tone="danger">That scenario is not on this phone.</BodyText>
-      </Screen>
+      <BriefingScreen {...frame} banner={null}>
+        <BodyText tone="danger" className="mt-4">
+          That scenario is not on this phone.
+        </BodyText>
+      </BriefingScreen>
     );
   }
 
@@ -122,83 +123,85 @@ export default function Briefing() {
   const changeLines = result.steps.filter((step) => step.n >= 3).flatMap((step) => step.did.map((line, index) => ({ key: `${step.n}-${index}`, line })));
 
   return (
-    <Screen testID="briefing" scene="vale">
-      {back}
-      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6" keyboardShouldPersistTaps="handled">
-        <ScenarioHeader facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} eyebrow={`Scenario ${facts.number}`} />
-        {completed ? (
-          <BodyText tone="muted" className="mt-3" testID="briefing-replay">
-            You have won this scenario. Playing it again does not grant its reward a second time.
-          </BodyText>
-        ) : null}
-
-        <DeckFilter decks={briefingDecks} />
-        {seats.map((seat, index) => (
-          <SeatPicker
-            key={index}
-            index={index}
-            seatCount={seatCount}
-            decks={briefingDecks}
-            picked={seat.deckId}
-            heroes={seat.heroes}
-            fallen={fallen}
-            needsRingBearer={result.needsRingBearer}
-            ringBearer={ringBearer}
-            onPick={(deckId) => pick(index, deckId)}
-            onRingBearer={setRingBearer}
-            nameOf={nameOf}
-          />
-        ))}
-
-        {result.needs ? (
-          <View testID="briefing-choice" className="mt-6">
-            <Eyebrow tone="muted">{`Seat ${result.needs.seat + 1} chooses`}</Eyebrow>
-            {choices.length > 0 ? <TextButton label="Undo last choice" testID="choice-undo" onPress={() => setChoices((current) => current.slice(0, -1))} /> : null}
-            {result.needs.options.map((option) => {
-              const [code = "", host] = option.split(">");
-              const label = option === "skip" ? "Skip" : host ? `${nameOf(code)} on ${nameOf(host)}` : nameOf(code);
-              return <TextButton key={option} label={label} testID={`choice-${option}`} onPress={() => setChoices((current) => [...current, option])} />;
-            })}
-          </View>
-        ) : null}
-
-        {changeLines.length > 0 ? (
-          <View testID="briefing-checklist" className="mt-6 gap-1">
-            <Eyebrow tone="muted">Before the deal</Eyebrow>
-            {changeLines.map((item) => (
-              <Label key={item.key} tone="muted">
-                {item.line}
-              </Label>
-            ))}
-          </View>
-        ) : null}
-        {result.penaltyWaived ? (
-          <Label tone="muted" className="mt-2">
-            The campaign card waives the hero-change penalty.
+    <BriefingScreen
+      {...frame}
+      banner={<ScenarioBanner facts={facts} eyebrow={`Scenario ${facts.number} · ${campaign.name}`} />}
+      bar={
+        <View className="gap-2">
+          {result.problems.map((problem, index) => (
+            <Label key={`${index}-${problem.message}`} tone="danger" testID={`briefing-error-${index}`}>
+              {problem.message}
+            </Label>
+          ))}
+          {dealError ? (
+            <Label tone="danger" testID="briefing-deal-error">
+              {dealError}
+            </Label>
+          ) : null}
+          {result.penaltyAdded > 0 && !accepted ? (
+            <View className="items-start">
+              <TextButton label={`Accept +${result.penaltyAdded} threat for the campaign`} testID="accept-penalty" tone="gold" onPress={() => setAccepted(true)} />
+            </View>
+          ) : null}
+          <Label tone="muted" testID="briefing-deal-note" className="text-center">
+            {save.loadout ? "A scenario is already open. Dealing again drops it." : "Dealing starts the scenario."}
           </Label>
-        ) : null}
-      </ScrollView>
-      <View testID="briefing-deal-bar" className="gap-2 pb-safe pt-3">
-        {result.problems.map((problem, index) => (
-          <BodyText key={`${index}-${problem.message}`} tone="danger" testID={`briefing-error-${index}`}>
-            {problem.message}
-          </BodyText>
-        ))}
-        {dealError ? (
-          <BodyText tone="danger" testID="briefing-deal-error">
-            {dealError}
-          </BodyText>
-        ) : null}
-        {result.penaltyAdded > 0 && !accepted ? (
-          <View className="items-start">
-            <TextButton label={`Accept +${result.penaltyAdded} threat for the campaign`} testID="accept-penalty" tone="gold" onPress={() => setAccepted(true)} />
-          </View>
-        ) : null}
-        <BodyText tone="muted" testID="briefing-deal-note">
-          {save.loadout ? "A scenario is already open. Dealing again drops it." : "Dealing starts the scenario."}
+          <PrimaryButton label="Deal" testID="deal" disabled={!result.dealable} onPress={onDeal} />
+        </View>
+      }
+    >
+      {completed ? (
+        <BodyText tone="muted" className="mt-3" testID="briefing-replay">
+          You have won this scenario. Playing it again does not grant its reward a second time.
         </BodyText>
-        <PrimaryButton label="Deal" testID="deal" disabled={!result.dealable} onPress={onDeal} />
-      </View>
-    </Screen>
+      ) : null}
+
+      {seats.map((seat, index) => (
+        <SeatPicker
+          key={index}
+          index={index}
+          seatCount={seatCount}
+          decks={briefingDecks}
+          picked={seat.deckId}
+          heroes={seat.heroes}
+          fallen={fallen}
+          needsRingBearer={result.needsRingBearer}
+          ringBearer={ringBearer}
+          onPick={(deckId) => pick(index, deckId)}
+          onRingBearer={setRingBearer}
+          nameOf={nameOf}
+        />
+      ))}
+
+      {result.needs ? (
+        <View testID="briefing-choice" className="mt-5">
+          <Section title={`Seat ${result.needs.seat + 1} chooses`} />
+          {choices.length > 0 ? <TextButton label="Undo last choice" testID="choice-undo" onPress={() => setChoices((current) => current.slice(0, -1))} /> : null}
+          {result.needs.options.map((option) => {
+            const [code = "", host] = option.split(">");
+            const label = option === "skip" ? "Skip" : host ? `${nameOf(code)} on ${nameOf(host)}` : nameOf(code);
+            return <TextButton key={option} label={label} testID={`choice-${option}`} onPress={() => setChoices((current) => [...current, option])} />;
+          })}
+        </View>
+      ) : null}
+
+      {changeLines.length > 0 ? (
+        <View testID="briefing-checklist" className="mt-5 gap-1">
+          <Section title="Before the deal" />
+          {changeLines.map((item) => (
+            <Label key={item.key} tone="muted">
+              {item.line}
+            </Label>
+          ))}
+        </View>
+      ) : null}
+      {result.penaltyWaived ? (
+        <Label tone="muted" className="mt-2">
+          The campaign card waives the hero-change penalty.
+        </Label>
+      ) : null}
+
+      <ScenarioDetails facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} />
+    </BriefingScreen>
   );
 }

@@ -2,13 +2,13 @@ import { FlashList } from "@shopify/flash-list";
 import { eq } from "drizzle-orm";
 import { useRouter } from "expo-router";
 import { useMemo, useState, type ReactNode } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
 
 import { cards, packs } from "../catalog/schema";
-import { BodyText, Eyebrow, ListRow, PrimaryButton, Screen, SphereMark, TextButton, markedSphere } from "./chrome";
+import { ActionBar, BodyText, ListRow, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, SecondaryButton, SphereMark, ToggleChip, markedSphere } from "./chrome";
 import { CountStepper } from "./count-stepper";
 import { addDraftCard, announceDraftChange, draftAddRefused, draftCopyCount, takeDraftCard, useDeckDraft, type TitleLookup } from "./deck-draft";
-import { deckCountLine } from "./deck-status";
+import { deckCardCount, deckCountLine, DECK_MINIMUM } from "./deck-status";
 import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { CardThumb, useCardPreview } from "./images/picture";
@@ -16,6 +16,8 @@ import { useListPreview } from "./list-preview";
 import { notAppliedCodes, notAppliedWords } from "../play/not-applied";
 import type { PictureSource } from "../play/table-canvas-types";
 import { palette } from "./palette.js";
+import { setPoolView, usePoolView } from "./pool-view";
+import { withAlphaHex } from "../play/tokens";
 import { activeFilterCount, cycleGroups, emptyPoolFilter, filterPool, poolDetail, sortPool, type PoolCard, type PoolFilter } from "./pool-filter";
 import { PoolFilterSheet, typeChoices } from "./pool-filter-sheet";
 import { ToastView } from "./toast-view";
@@ -97,6 +99,96 @@ function PoolCardRow({
   );
 }
 
+const GRID_COLUMNS = 3;
+const GRID_GAP = 10;
+const CARD_RATIO = 600 / 429;
+
+// One card in the grid: its picture, the name under a missing picture, the count the deck holds (gold) and, while adding, − and +
+// under it. A tap opens the card, a long press shows it large, as a row does.
+function PoolCardCell({
+  item,
+  width,
+  adding,
+  count,
+  full,
+  lookup,
+  onPreview,
+  loss = null,
+}: {
+  item: PoolRowCard;
+  width: number;
+  adding: boolean;
+  loss?: string | null;
+  count: number;
+  full: boolean;
+  lookup: TitleLookup;
+  onPreview: (code: string, name: string, source: PictureSource | null) => void;
+}) {
+  const router = useRouter();
+  const picture = useCardPreview(item.code, item.imagesrc);
+  const card = { code: item.code, name: item.name, typeCode: item.typeCode, deckLimit: item.deckLimit };
+  const height = Math.round(width * CARD_RATIO);
+  return (
+    <View style={{ width, marginBottom: 14 }}>
+      <Pressable
+        testID={`card-${item.code}`}
+        collapsable={false}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.name}, ${poolDetail(item)}${loss ? `, ${loss}` : ""}${adding && count > 0 ? `, ${count} in the deck` : ""}`}
+        accessibilityHint="Opens the card. Hold to show it large"
+        onPress={() => router.push({ pathname: "/card/[code]", params: { code: item.code } })}
+        onLongPress={() => onPreview(item.code, item.name, picture)}
+        delayLongPress={350}
+      >
+        {({ pressed }) => (
+          <View style={{ width, height, borderRadius: 8, overflow: "hidden", opacity: pressed ? 0.75 : 1, borderWidth: adding && count > 0 ? 1.5 : 1, borderColor: adding && count > 0 ? palette.gold : withAlphaHex(palette.bone, 0.08), backgroundColor: palette.raised }}>
+            {picture ? (
+              <CardThumb code={item.code} imagesrc={item.imagesrc} width={width - 2} height={height - 2} />
+            ) : (
+              <View className="flex-1 justify-between p-2">
+                <Text className="font-display text-label text-bone" numberOfLines={4}>
+                  {item.name}
+                </Text>
+                <View className="flex-row items-center gap-1">
+                  <RowIcons sphere={item.sphereCode} />
+                  <Text className="text-micro text-muted" numberOfLines={1}>
+                    {item.typeName}
+                  </Text>
+                </View>
+              </View>
+            )}
+            {loss ? (
+              <View className="absolute bottom-1 left-1 right-1 rounded px-1 py-0.5" style={{ backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+                <Text className="text-center text-micro text-muted" numberOfLines={1}>
+                  {loss}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        )}
+      </Pressable>
+      {adding && count > 0 ? (
+        <View pointerEvents="none" className="absolute -right-1.5 -top-1.5 h-6 min-w-6 items-center justify-center rounded-pill px-1.5" style={{ backgroundColor: palette.gold, borderWidth: 2, borderColor: palette.night }}>
+          <Text className="font-display-bold text-label text-onGold">{String(count)}</Text>
+        </View>
+      ) : null}
+      {adding ? (
+        <View className="mt-1.5 items-center">
+          <CountStepper
+            code={item.code}
+            name={item.name}
+            count={count}
+            full={full}
+            minus={count > 0}
+            ids={{ dec: `take-${item.code}`, count: `pool-count-${item.code}`, inc: `add-${item.code}` }}
+            onChange={(delta) => announceDraftChange(delta > 0 ? addDraftCard(card, lookup) : takeDraftCard(card, lookup))}
+          />
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 // Night chips for the type, one tap from the search field. The filter sheet leaves the type to them.
 function TypeChips({
   types,
@@ -114,42 +206,32 @@ function TypeChips({
 }) {
   const options = [{ code: null, name: "All" }, ...types];
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-2 px-6">
-      {/* A switch, not a type: an outlined pill with a check when on, and a hairline after it before the type chips. */}
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-1 grow-0" contentContainerClassName="gap-1.5 px-6">
+      {/* A switch, not a type: an outlined plate with a check when on, and a hairline after it before the type chips. */}
       <Pressable
         testID="pool-applied-only"
         accessibilityRole="switch"
         accessibilityState={{ checked: applied }}
         accessibilityLabel="Applied only: cards whose text the app applies"
         onPress={() => onApplied(!applied)}
-        className={`min-h-11 justify-center rounded-pill border px-4 ${applied ? "border-gold" : "border-hairline"}`}
+        className="min-h-11 justify-center"
       >
-        <Text className={applied ? "text-body font-semibold text-gold" : "text-body text-muted"}>{applied ? "✓ Applied only" : "Applied only"}</Text>
+        <View className="h-9 justify-center rounded-tile px-3" style={{ borderWidth: 1, borderColor: applied ? palette.gold : palette.hairline }}>
+          <Text className={applied ? "text-label font-semibold text-gold" : "text-label text-muted"}>{applied ? "✓ Applied only" : "Applied only"}</Text>
+        </View>
       </Pressable>
-      <View className="my-2 w-px bg-hairline" />
-      {options.map((option) => {
-        const selected = value === option.code;
-        return (
-          <Pressable
-            key={option.code ?? "all"}
-            testID={`pool-type-${option.code ?? "all"}`}
-            accessibilityRole="radio"
-            accessibilityState={{ selected }}
-            onPress={() => onChange(option.code)}
-            className={`min-h-11 justify-center rounded-pill px-4 ${selected ? "bg-gold" : "bg-raised"}`}
-          >
-            <Text className={selected ? "text-body font-semibold text-onGold" : "text-body text-muted"}>{option.name}</Text>
-          </Pressable>
-        );
-      })}
+      <View className="my-3 w-px bg-hairline" />
+      {options.map((option) => (
+        <ToggleChip key={option.code ?? "all"} testID={`pool-type-${option.code ?? "all"}`} label={option.name} selected={value === option.code} onPress={() => onChange(option.code)} />
+      ))}
     </ScrollView>
   );
 }
 
-// The deck-legal player pool, searched and filtered in memory. The Cards tab browses it; the deck editor opens it with
-// `adding` to put cards in the open draft: each row then has − and +, every change is said in a toast with Undo, and a bar
-// shows the deck's counts above Done. `header` is the screen's top: the tab's title, or the editor's NavBar. `startType`
-// opens it on one type (an empty hero slot opens it on heroes).
+// The deck-legal player pool, searched and filtered in memory, as a grid of the card pictures or a list of rows. The Cards tab
+// browses it; the deck editor opens it with `adding` to put cards in the open draft: each card then has − and +, every change is
+// said in a toast with Undo, and a bar shows the deck's count against 50 beside Done. `header` is the screen's top: the tab's
+// title, or the editor's NavBar naming the deck. `startType` opens it on one type (an empty hero slot opens it on heroes).
 export function CardPool({
   adding,
   header,
@@ -164,6 +246,10 @@ export function CardPool({
   const draft = useDeckDraft();
   const { catalog } = useDatabases();
   const preview = useListPreview();
+  const view = usePoolView();
+  const { width: screenWidth } = useWindowDimensions();
+  // The grid fills the page inside its inset: three cards a row with a 10 pt gap.
+  const cellWidth = Math.floor((Math.min(screenWidth, 600) - 48 - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS);
   // Sorted in memory: a printing's tag ("(MotK) Aragorn") files under the name.
   const [rows] = useState(() =>
     sortPool(
@@ -242,28 +328,13 @@ export function CardPool({
     <Screen scene="plain">
       <View className="min-h-0 flex-1">
         {header}
-        {adding ? (
-          <View className="mt-1">
-            <Eyebrow tone="muted">Adding to</Eyebrow>
-            <Text className="mt-0.5 font-display text-title text-bone" numberOfLines={1}>
-              {draft.name.trim() || "New deck"}
-            </Text>
-          </View>
-        ) : null}
         <View className="mt-3 flex-row items-center gap-2">
-          <TextInput
-            testID="pool-search"
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search"
-            placeholderTextColor={palette.faint}
-            autoCorrect={false}
-            autoCapitalize="none"
-            className="min-h-11 min-w-0 flex-1 rounded-pill bg-raised px-4 text-body text-bone"
-          />
-          <TextButton
+          <SearchField testID="pool-search" value={search} onChangeText={setSearch} placeholder="Search cards" accessibilityLabel="Search cards" />
+          <SecondaryButton
             testID="pool-filter"
             label={filters > 0 ? `Filter · ${filters}` : "Filter"}
+            tone={filters > 0 ? "gold" : "bone"}
+            compact
             accessibilityLabel={filters > 0 ? `Filter, ${filters} on` : "Filter"}
             onPress={openSheet}
           />
@@ -275,10 +346,16 @@ export function CardPool({
           applied={applied.activeText}
           onApplied={(activeText) => setApplied({ ...applied, activeText })}
         />
+        <View className="mt-1 flex-row items-center justify-between">
+          <Text testID="pool-shown" className="text-label text-muted">{`${visible.length} ${visible.length === 1 ? "card" : "cards"}`}</Text>
+          <Segmented options={["Grid", "List"] as const} value={view} onChange={setPoolView} testIDPrefix="pool-view" compact />
+        </View>
         <View className="mt-2 min-h-0 flex-1">
           <FlashList
+            key={view}
             data={visible}
             keyExtractor={(item) => item.code}
+            numColumns={view === "Grid" ? GRID_COLUMNS : 1}
             style={{ flex: 1 }}
             extraData={draft}
             keyboardShouldPersistTaps="handled"
@@ -290,34 +367,54 @@ export function CardPool({
                 No cards match.
               </BodyText>
             }
-            renderItem={({ item }) =>
+            renderItem={({ item, index }) =>
               item ? (
-                <PoolCardRow
-                  item={item}
-                  adding={adding}
-                  loss={inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null}
-                  count={draftCopyCount(draft, item.code, item.typeCode)}
-                  full={draftAddRefused(draft, item, lookup)}
-                  lookup={lookup}
-                  onPreview={preview.open}
-                />
+                view === "Grid" ? (
+                  <View style={{ marginLeft: index % GRID_COLUMNS === 0 ? 0 : GRID_GAP }}>
+                    <PoolCardCell
+                      item={item}
+                      width={cellWidth}
+                      adding={adding}
+                      loss={inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null}
+                      count={draftCopyCount(draft, item.code, item.typeCode)}
+                      full={draftAddRefused(draft, item, lookup)}
+                      lookup={lookup}
+                      onPreview={preview.open}
+                    />
+                  </View>
+                ) : (
+                  <PoolCardRow
+                    item={item}
+                    adding={adding}
+                    loss={inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null}
+                    count={draftCopyCount(draft, item.code, item.typeCode)}
+                    full={draftAddRefused(draft, item, lookup)}
+                    lookup={lookup}
+                    onPreview={preview.open}
+                  />
+                )
               ) : null
             }
           />
         </View>
         <ToastView />
         {adding ? (
-          <View testID="pool-deck-bar" className="flex-row items-center gap-3 border-t border-hairline pb-safe pt-3">
-            <View className="flex-1">
-              <Text testID="pool-deck-count" className="text-body text-bone">
-                {deckCountLine(draft)}
-              </Text>
-              <Text className="text-label text-muted" numberOfLines={1}>
-                Tap + to add, − to take out
-              </Text>
+          <ActionBar testID="pool-deck-bar">
+            <View className="flex-row items-center gap-3.5">
+              <View className="flex-1">
+                <View className="flex-row items-baseline justify-between">
+                  <Text className="text-label text-muted">Deck</Text>
+                  <Text testID="pool-deck-count" className="text-label text-bone" numberOfLines={1}>
+                    {deckCountLine(draft)}
+                  </Text>
+                </View>
+                <View className="mt-1.5">
+                  <ProgressBar value={deckCardCount(draft.cards)} max={DECK_MINIMUM} />
+                </View>
+              </View>
+              <PrimaryButton testID="pool-done" label="Done" onPress={() => onDone?.()} />
             </View>
-            <PrimaryButton testID="pool-done" label="Done" onPress={() => onDone?.()} />
-          </View>
+          </ActionBar>
         ) : null}
       </View>
       <PoolFilterSheet open={open} rows={rows} groups={groups} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />

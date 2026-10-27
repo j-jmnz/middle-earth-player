@@ -1,23 +1,32 @@
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, usePreventRemove, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Pressable, Text, TextInput, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
+  ActionBar,
   BodyText,
+  Chip,
   Eyebrow,
   Label,
   ListRow,
   NavBar,
   PaperSheet,
   PrimaryButton,
-  RingMark,
+  ProgressBar,
   Screen,
+  SecondaryButton,
   SphereMark,
+  StatTile,
   TextButton,
+  ToggleChip,
   markedSphere,
   sphereWord,
 } from "../../chrome";
+import { CroppedArt } from "../../art";
+import { PAINTING } from "../../art-crop";
+import { nightFade, panelSurface, raisedEdge, topShade } from "../../../play/surfaces";
 import {
   announceDraftChange,
   changeDraftCount,
@@ -34,7 +43,7 @@ import {
   useDeckDraft,
   type TitleLookup,
 } from "../../deck-draft";
-import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, notAppliedLine, savedDeckName, startingThreat, type DeckSectionRow } from "../../deck-status";
+import { costCurve, CURVE_LABELS, deckCardCount, deckContentsPhrase, deckCountLine, deckReadiness, deckSections, DECK_MINIMUM, notAppliedLine, savedDeckName, sphereSplit, startingThreat, type DeckSectionRow } from "../../deck-status";
 import { deckFaces, isStarterDeck, listDecks, notAppliedIn, readDeck, writeDeck } from "../../deck-store";
 import { notAppliedWords } from "../../../play/not-applied";
 import { STARTER_NOTE } from "../../starter-decks";
@@ -54,6 +63,7 @@ import type { PictureSource } from "../../../play/table-canvas-types";
 type EditorCard = {
   code: string;
   count: number;
+  cost: string | null;
   name: string;
   typeCode: string | null;
   imagesrc: string | null;
@@ -68,7 +78,8 @@ type EditorRow = DeckSectionRow<EditorCard> | { kind: "heroes"; key: string };
 const TYPE_NOUN: Readonly<Record<string, string>> = { hero: "heroes", ally: "allies", attachment: "attachments", event: "events" };
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
-const thumb = { width: 28, height: 38 };
+const thumb = { width: 30, height: 42 };
+const BANNER_HEIGHT = 196;
 
 function onViewableItemsChanged({ viewableItems }: { viewableItems: { item: EditorRow | null }[] }): void {
   const jobs = [];
@@ -104,7 +115,15 @@ function EditorCardRow({
       label={card.name}
       detail={loss ? `${sphereWord(card.sphereName)} · ${loss}` : sphereWord(card.sphereName)}
       detailIcons={mark ? <SphereMark sphere={mark} size={12} /> : null}
-      leading={<CardThumb code={card.code} imagesrc={card.imagesrc} width={thumb.width} height={thumb.height} />}
+      leading={
+        <View className="flex-row items-center gap-2.5">
+          {/* The printed cost on a dark coin, so the eye runs down the costs as it does on a played deck list. */}
+          <View accessible={false} importantForAccessibility="no" className="h-7 w-7 items-center justify-center rounded-pill" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.hairline }}>
+            <Text className="font-display-bold text-label text-bone">{card.cost ?? "–"}</Text>
+          </View>
+          <CardThumb code={card.code} imagesrc={card.imagesrc} width={thumb.width} height={thumb.height} />
+        </View>
+      }
       onPress={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })}
       onLongPress={() => onPreview(card.code, card.name, picture)}
       trailing={
@@ -125,7 +144,9 @@ export default function DeckEditor() {
   const params = useLocalSearchParams<{ id: string }>();
   const id = routeCode(params.id);
   const { height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const draft = useDeckDraft();
+  const list = useRef<{ scrollToIndex: (params: { index: number; animated?: boolean; viewOffset?: number }) => void } | null>(null);
   const { catalog, user } = useDatabases();
   const preview = useListPreview();
   // The navigation Back, a swipe or Save as asked to finish while the deck has unsaved changes.
@@ -152,6 +173,7 @@ export default function DeckEditor() {
       return {
         code: card.code,
         count: card.count,
+        cost: face?.cost ?? null,
         name: face?.name ?? card.code,
         typeCode: face?.typeCode ?? null,
         imagesrc: face?.imagesrc ?? null,
@@ -229,44 +251,109 @@ export default function DeckEditor() {
       </View>
   );
 
+  const cardCount = deckCardCount(draft.cards);
+  const curve = costCurve(draft.cards, faces);
+  const curveTop = Math.max(1, ...curve.counts);
+  const split = sphereSplit(draft.cards, faces);
+  const splitTotal = split.reduce((sum, entry) => sum + entry.count, 0);
+  const heroSpheres = [...new Set(heroes.map((hero) => markedSphere(hero.sphereCode)).filter((mark) => mark != null))];
+  // The headings the jump chips lead to, with the row each starts at.
+  const jumps = rows.flatMap((row, index) => (row.kind === "type" ? [{ key: row.key, title: row.title, count: row.type === "hero" ? heroes.length : row.count, index }] : []));
+  const side = { paddingLeft: 24 + insets.left, paddingRight: 24 + insets.right };
+
   const header = (
     <View>
-      <TextInput
-        testID="deck-name"
-        value={draft.name}
-        onChangeText={setDeckName}
-        placeholder="Name this deck"
-        placeholderTextColor={palette.faint}
-        accessibilityLabel="Deck name"
-        selectTextOnFocus
-        returnKeyType="done"
-        className="mt-2 border-b border-hairline pb-1 font-display text-title text-bone"
-        style={{ minHeight: 44 }}
-      />
-      <Label testID="deck-count" className="mt-2">
-        {threat == null ? deckCountLine(draft) : `${deckCountLine(draft)} · Starting threat ${threat}`}
-      </Label>
-      <View className="mt-1 flex-row items-center gap-1.5">
-        <RingMark size={10} state={readiness.ready ? "done" : "locked"} />
-        <Text testID={readiness.ready ? "deck-ready" : "deck-error"} className={`text-label ${readiness.ready ? "text-gold" : "text-danger"}`}>
-          {readiness.ready ? readiness.text : `Not ready to play: ${readiness.text}`}
-        </Text>
+      {/* The heroes' paintings side by side, the deck's name over them: the deck at a glance. */}
+      <View style={{ height: BANNER_HEIGHT + insets.top, flexDirection: "row", gap: 1, backgroundColor: palette.night }}>
+        {heroes.length > 0 ? (
+          heroes.slice(0, 4).map((hero) => (
+            <View key={hero.code} className="flex-1">
+              <CroppedArt card={hero} region={PAINTING} height={BANNER_HEIGHT + insets.top} />
+            </View>
+          ))
+        ) : (
+          <View className="flex-1" style={panelSurface()} />
+        )}
+        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(0.35) }} />
+        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.3, 1) }} />
       </View>
-      {notApplied ? (
-        <Label testID="deck-not-applied" tone="muted" className="mt-1">
-          {`${notApplied}. Each row says what the app leaves out.`}
+      <View style={{ ...side, marginTop: -64 }}>
+        <Eyebrow testID={readiness.ready ? "deck-ready" : "deck-error"} tone={readiness.ready ? "gold" : "muted"}>
+          {readiness.ready ? readiness.text : `Not ready to play: ${readiness.text}`}
+        </Eyebrow>
+        <TextInput
+          testID="deck-name"
+          value={draft.name}
+          onChangeText={setDeckName}
+          placeholder="Name this deck"
+          placeholderTextColor={palette.faint}
+          accessibilityLabel="Deck name"
+          selectTextOnFocus
+          returnKeyType="done"
+          className="mt-1 border-b border-hairline pb-1 font-display text-title text-bone"
+          style={{ minHeight: 44 }}
+        />
+        <View className="mt-3 flex-row gap-2">
+          <StatTile label="Threat" value={threat == null ? "–" : String(threat)} icon="threat" iconTint="danger" />
+          <StatTile label="Cards" value={String(cardCount)} detail={`/ ${DECK_MINIMUM}`}>
+            <View className="mt-1.5">
+              <ProgressBar value={cardCount} max={DECK_MINIMUM} />
+            </View>
+          </StatTile>
+          <View className="flex-1 rounded-tile px-3 py-2.5" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.hairline, boxShadow: raisedEdge }} accessible accessibilityLabel={`Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
+            <Text className="text-label text-muted">Spheres</Text>
+            <View className="mt-1 h-5 flex-row items-center gap-1.5">
+              {heroSpheres.map((mark) => (
+                <SphereMark key={mark} sphere={mark} size={14} />
+              ))}
+            </View>
+            <View className="mt-1.5 h-1 flex-row gap-0.5 overflow-hidden rounded-pill" style={{ backgroundColor: palette.hairline }}>
+              {split.map((entry) => (
+                <View key={entry.code} style={{ flex: entry.count / Math.max(1, splitTotal), backgroundColor: (palette as Record<string, string>)[entry.code] ?? palette.faint }} />
+              ))}
+            </View>
+          </View>
+        </View>
+        {/* The cost curve: the copies at each cost, so the deck's shape reads before its rows. */}
+        <View className="mt-2 rounded-tile px-3.5 py-2.5" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.hairline, boxShadow: raisedEdge }} accessible accessibilityLabel={`Cost curve: ${CURVE_LABELS.map((label, at) => `${curve.counts[at]} at cost ${label}`).join(", ")}${curve.average != null ? `, average ${curve.average}` : ""}`}>
+          <View className="flex-row justify-between">
+            <Text className="text-label text-muted">Cost curve</Text>
+            {curve.average != null ? <Text className="text-label text-muted">{`average ${curve.average}`}</Text> : null}
+          </View>
+          <View className="mt-2 h-14 flex-row items-end gap-1.5">
+            {CURVE_LABELS.map((label, at) => (
+              <View key={label} className="flex-1 items-center justify-end gap-1" style={{ height: "100%" }}>
+                <View className="w-full rounded-t" style={{ height: Math.max(2, Math.round((curve.counts[at] / curveTop) * 34)), backgroundColor: curve.counts[at] > 0 ? palette.goldDeep : palette.hairline }} />
+                <Text className="text-micro text-faint">{label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+        <Label testID="deck-count" className="mt-3">
+          {threat == null ? deckCountLine(draft) : `${deckCountLine(draft)} · Starting threat ${threat}`}
         </Label>
-      ) : null}
-      {draft.droppedNote ? (
-        <BodyText testID="deck-import-dropped" tone="muted" className="mt-2">
-          {draft.droppedNote}
-        </BodyText>
-      ) : null}
-      {isStarterDeck(draft.id) ? (
-        <Label testID="starter-note" className="mt-2">
-          {STARTER_NOTE}
-        </Label>
-      ) : null}
+        {notApplied ? (
+          <Label testID="deck-not-applied" tone="muted" className="mt-1">
+            {`${notApplied}. Each row says what the app leaves out.`}
+          </Label>
+        ) : null}
+        {draft.droppedNote ? (
+          <BodyText testID="deck-import-dropped" tone="muted" className="mt-2">
+            {draft.droppedNote}
+          </BodyText>
+        ) : null}
+        {isStarterDeck(draft.id) ? (
+          <Label testID="starter-note" className="mt-2">
+            {STARTER_NOTE}
+          </Label>
+        ) : null}
+        {/* Jump to a heading: the deck stays one list (every row reachable by scrolling), and these shorten the trip. */}
+        <View className="mt-2 flex-row flex-wrap gap-x-1.5">
+          {jumps.map((jump) => (
+            <ToggleChip key={jump.key} testID={`deck-jump-${jump.key}`} label={`${jump.title} ${jump.count}`} selected={false} accessibilityLabel={`Go to ${jump.title}, ${jump.count}`} onPress={() => list.current?.scrollToIndex({ index: jump.index, animated: true, viewOffset: 8 })} />
+          ))}
+        </View>
+      </View>
     </View>
   );
 
@@ -276,10 +363,10 @@ export default function DeckEditor() {
       // Heroes add through their empty slots, so only the card subsections carry Add.
       const heroSection = item.type === "hero";
       return (
-        <View accessibilityRole="header" className="min-h-11 flex-row items-center justify-between pt-4">
-          <View className="flex-row items-baseline gap-2">
-            <Eyebrow tone="muted">{item.title}</Eyebrow>
-            <Label testID={`deck-section-count-${item.type}`}>{heroSection ? `${item.count} of 3` : String(item.count)}</Label>
+        <View accessibilityRole="header" className="min-h-11 flex-row items-center justify-between pt-5">
+          <View className="flex-row items-center gap-2.5">
+            <Eyebrow tone="moon">{item.title}</Eyebrow>
+            <Chip testID={`deck-section-count-${item.type}`} label={heroSection ? `${item.count} of 3` : String(item.count)} />
           </View>
           {!heroSection && TYPE_NOUN[item.type] ? (
             <View className="-mr-3">
@@ -314,36 +401,41 @@ export default function DeckEditor() {
   }
 
   return (
-    <Screen testID="deck-editor" scene="plain">
+    <Screen testID="deck-editor" scene="plain" bleed>
       <View className="min-h-0 flex-1">
-        <NavBar
-          backLabel="Decks"
-          backTestID="deck-back"
-          onBack={() => goBack(router, "/decks")}
-          right={dirty ? <Label testID="deck-unsaved">Unsaved changes</Label> : null}
-        />
         <View className="min-h-0 flex-1">
           <FlashList
+            ref={list as never}
             data={rows}
             keyExtractor={(item) => item.key}
             getItemType={(item) => item.kind}
             style={{ flex: 1 }}
+            contentContainerStyle={{ paddingBottom: 24 }}
             extraData={draft}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             ListHeaderComponent={header}
-            ListFooterComponent={<View className="h-6" />}
-            renderItem={renderRow}
+            renderItem={(info) => <View style={side}>{renderRow(info)}</View>}
           />
         </View>
-        <ToastView />
-        <View className="flex-row items-center gap-2 pb-safe pt-2">
-          <TextButton testID="deck-add" label="Add cards" tone="gold" onPress={() => router.push({ pathname: "/pool", params: { adding: "1" } })} />
-          <View className="flex-1">
-            <PrimaryButton testID="deck-save" label="Save" onPress={onSave} />
-          </View>
+        <View style={side}>
+          <ToastView />
+          <ActionBar>
+            <View className="flex-row items-center gap-2.5">
+              <View className="flex-1">
+                <SecondaryButton testID="deck-add" label="Add cards" tone="gold" onPress={() => router.push({ pathname: "/pool", params: { adding: "1" } })} />
+              </View>
+              <View className="flex-1">
+                <PrimaryButton testID="deck-save" label="Save" onPress={onSave} />
+              </View>
+            </View>
+          </ActionBar>
+        </View>
+        {/* Back floats over the heroes' paintings and stays in reach as the list scrolls. */}
+        <View className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 + insets.left, paddingRight: 16 + insets.right }}>
+          <NavBar overlay backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
         </View>
       </View>
       <Modal visible={leaving !== null} transparent animationType="fade" onRequestClose={() => setLeaving(null)}>
@@ -378,3 +470,4 @@ export default function DeckEditor() {
     </Screen>
   );
 }
+

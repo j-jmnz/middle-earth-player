@@ -9,7 +9,7 @@ export function NotAppliedView({ notApplied, tone = "night", testID = "card-not-
   const paper = tone === "paper";
   return (
     <View testID={testID} accessible accessibilityLabel={`Not applied. ${lossSentence(notApplied.loss)} ${notApplied.lines.map((line) => line.text).join(" ")}`} className="gap-1.5">
-      <Text className={`font-display text-eyebrow uppercase ${paper ? "text-inkLabel" : "text-muted"}`}>Not applied</Text>
+      <Text className={`font-display-bold text-eyebrow uppercase ${paper ? "text-inkLabel" : "text-muted"}`}>Not applied</Text>
       <Text className={`text-label ${paper ? "text-inkMuted" : "text-muted"}`}>{lossSentence(notApplied.loss)}</Text>
       {notApplied.lines.map((line, index) => (
         <View key={line.id ?? index} style={{ borderLeftWidth: 2, borderColor: paper ? t.inkLine : t.hairline, paddingLeft: 8 }}>

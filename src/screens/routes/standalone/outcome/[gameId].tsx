@@ -7,7 +7,8 @@ import { useEffect, useMemo } from "react";
 import { Text, View } from "react-native";
 
 import { finishStandalone } from "../../../../campaign/standalone";
-import { BodyText, NavBar, PrimaryButton, Screen, TextButton } from "../../../chrome";
+import { ActionBar, BodyText, Label, NavBar, PrimaryButton, Screen, StatTile, TextButton } from "../../../chrome";
+import { withAlphaHex } from "../../../../play/tokens";
 import { scenarioOf } from "../../../campaign-data";
 import { useDatabases } from "../../../databases";
 import { goBack } from "../../../go-back";
@@ -58,38 +59,49 @@ export default function StandaloneOutcome() {
     router.replace({ pathname: "/standalone/briefing/[scenarioId]", params: { scenarioId: finished.scenarioId, from: finished.id } });
   };
 
+  const word = { fontSize: 44, lineHeight: 52, letterSpacing: 4 };
   return (
     <Screen testID="standalone-outcome" scene={won ? "victory" : "plain"}>
       {back}
-      <View className="flex-1 justify-center">
+      <View className={won ? "flex-1 pt-16" : "flex-1 justify-center"}>
         <Text
           testID="outcome-title"
           accessibilityRole="header"
-          className={won ? "text-center font-display text-display uppercase text-gold" : "font-display text-display text-bone"}
-          style={won ? { textShadowColor: palette.gold, textShadowRadius: 12, textShadowOffset: { width: 0, height: 0 } } : undefined}
+          className={`text-center font-display-bold ${won ? "text-goldHigh" : "text-danger"}`}
+          style={{ ...word, textShadowColor: won ? palette.gold : withAlphaHex(palette.threat, 0.6), textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
         >
           {won ? "Victory" : "Defeat"}
         </Text>
-        <BodyText tone="muted" className={won ? "mt-1 text-center" : "mt-2"}>
-          {scenario?.name ?? ""}
-        </BodyText>
-        <View className="mt-6 gap-1" testID="outcome-lines">
-          {outcomeLines(result).map((line) => (
-            <BodyText key={line} tone={won ? "bone" : "muted"} className={won ? "text-center" : undefined}>
-              {line}
-            </BodyText>
-          ))}
-        </View>
+        <Text className="mt-1 text-center font-display text-heading text-bone">{scenario?.name ?? ""}</Text>
+        {result.outcome === "won" ? (
+          // The score as the numbers the player watches: score, completed rounds, victory points (ltp.scoring).
+          <View className="mt-10" testID="outcome-lines">
+            <View className="flex-row gap-2">
+              <StatTile label="Score" value={String(result.score.score)} />
+              <StatTile label="Rounds" value={String(result.score.rounds)} />
+              <StatTile label="Victory points" value={String(result.score.victoryPoints)} />
+            </View>
+            <Label className="mt-2 text-center">Lower is better.</Label>
+          </View>
+        ) : (
+          <View className="mt-6 gap-1" testID="outcome-lines">
+            {outcomeLines(result).map((line) => (
+              <BodyText key={line} tone="muted" className="text-center">
+                {line}
+              </BodyText>
+            ))}
+          </View>
+        )}
       </View>
-      <View className="gap-1 pb-safe pt-2">
-        <BodyText tone="muted" className="mb-2 text-center" testID="outcome-consequence">
+      <ActionBar>
+        <Label tone="muted" className="mb-3 text-center" testID="outcome-consequence">
           A standalone game writes nothing to a campaign.
-        </BodyText>
+        </Label>
         <PrimaryButton label="Done" testID="outcome-done" onPress={done} />
-        <View className="items-center">
+        <View className="mt-1 items-center">
           <TextButton label="Play again" testID="outcome-again" tone="gold" onPress={again} />
         </View>
-      </View>
+      </ActionBar>
     </Screen>
   );
 }

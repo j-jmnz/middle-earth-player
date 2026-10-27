@@ -4,17 +4,22 @@
 // confirm. Reads the scenario files and user.db only; it does not scan `cards`.
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, Text, View } from "react-native";
 
 import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { isPlayable } from "../../../campaign/playable";
 import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { campaignOf, scenarioNames } from "../../campaign-data";
-import { BodyText, Eyebrow, Label, Panel, RingMark, Screen, ScreenTitle, TextButton, pressedNight } from "../../chrome";
+import { BodyText, Chevron, Chip, Corners, Eyebrow, Label, Panel, Screen, ScreenScroll, ScreenTitle, Section, TextButton } from "../../chrome";
+import { SceneArt } from "../../art";
+import { palette } from "../../palette.js";
+import { goldSurface, nightFade, panelSurface, raisedEdge, topShade } from "../../../play/surfaces";
+import { withAlphaHex } from "../../../play/tokens";
 import { useDatabases } from "../../databases";
 import { KeepOrDelete } from "../../keep-or-delete";
-import { gameCaption, STANDALONE_DROPPED } from "../../standalone-words";
+import { gameCaption, statusWord, STANDALONE_DROPPED } from "../../standalone-words";
+import { seatWord } from "../../seats";
 import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandalone } from "../../standalone-store";
 
 const DELETE_SENTENCE = "Delete this game? It is gone for good. Your decks stay.";
@@ -110,7 +115,8 @@ export default function Scenarios() {
   const playing = games.filter((game) => standaloneStatus(game) === "playing");
   const finished = games.filter((game) => standaloneStatus(game) !== "playing");
 
-  // A game panel: Resume or Play again, or under Manage, Archive and Delete.
+  // A game: Resume or Play again, or under Manage, Archive and Delete. A game in progress is a framed card with its scene; a
+  // finished one a row with its result.
   function renderGame(game: StandaloneGame) {
     const status = standaloneStatus(game);
     if (managing) {
@@ -125,27 +131,54 @@ export default function Scenarios() {
       );
     }
     const action = status === "playing" ? "Resume" : game.loadout ? "Play again" : null;
+    const spoken = action ? `${action} ${label(game)}` : label(game);
+    if (status === "playing") {
+      return (
+        <Pressable key={game.id} testID={`game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} onPress={() => open(game)}>
+          {({ pressed }) => (
+            <View className="rounded-card" style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdge }}>
+              <View className="overflow-hidden rounded-t-card">
+                <SceneArt scenarioId={game.scenarioId} height={136}>
+                  <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(0.4) }} />
+                  <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.35, 1, palette.raised) }} />
+                </SceneArt>
+              </View>
+              <View className="px-4 pb-4" style={{ marginTop: -34 }}>
+                <Eyebrow>In progress</Eyebrow>
+                <Text className="mt-1 font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
+                <Label>{gameCaption(game)}</Label>
+                {/* The look of the primary inside the card; the whole card is the one button. */}
+                <View className="mt-3 min-h-12 items-center justify-center rounded-button" style={{ ...goldSurface(pressed), borderWidth: 1, borderColor: palette.goldDeep }}>
+                  <Text className="font-display-bold uppercase" style={{ fontSize: 14, letterSpacing: 2.4, color: palette.onGold }}>
+                    Resume
+                  </Text>
+                </View>
+              </View>
+              <Corners />
+            </View>
+          )}
+        </Pressable>
+      );
+    }
+    const tone = status === "won" ? "gold" : status === "lost" ? "danger" : "faint";
     return (
-      <Pressable
-        key={game.id}
-        testID={`game-${game.id}`}
-        collapsable={false}
-        accessibilityRole="button"
-        accessibilityLabel={action ? `${action} ${label(game)}` : label(game)}
-        disabled={action == null}
-        onPress={() => open(game)}
-      >
+      <Pressable key={game.id} testID={`game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} disabled={action == null} onPress={() => open(game)}>
         {({ pressed }) => (
-          <Panel current={status === "playing"} pressed={pressed}>
-            <Text className="font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
-            <Label>{gameCaption(game)}</Label>
+          <View className="rounded-card px-4 py-3.5" style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.hairline, boxShadow: raisedEdge }}>
+            <View className="flex-row items-start justify-between gap-2">
+              <View className="flex-1">
+                <Text className="font-display text-heading text-bone">{nameOf(game.scenarioId)}</Text>
+                <Label>{`${seatWord(game.seatCount)}${game.loadout ? ` · ${game.loadout.difficulty}` : ""}`}</Label>
+              </View>
+              <Chip label={statusWord(game)} tone={tone} />
+            </View>
             {status === "dropped" ? (
               <Label tone="muted" className="mt-2">
                 {STANDALONE_DROPPED}
               </Label>
             ) : null}
-            {action ? <Text className="mt-2 text-body font-medium text-gold">{action}</Text> : null}
-          </Panel>
+            {action ? <Text className="mt-2 font-display-bold text-label text-gold">{action}</Text> : null}
+          </View>
         )}
       </Pressable>
     );
@@ -153,56 +186,18 @@ export default function Scenarios() {
 
   return (
     <Screen testID="scenarios" scene="dusk">
-      <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6">
-        <View className="pt-6">
-          <ScreenTitle>Scenarios</ScreenTitle>
-          <Label className="mt-1">Standalone adventures. No campaign log, boons or burdens.</Label>
-        </View>
-
-        {playing.length > 0 ? (
-          <View className="mt-6 gap-3" testID="standalone-playing">
-            <Eyebrow>In progress</Eyebrow>
-            {playing.map(renderGame)}
+      <ScreenScroll>
+        <View className="flex-row items-start justify-between pt-4">
+          <View className="flex-1">
+            <ScreenTitle>Scenarios</ScreenTitle>
+            <Label className="mt-1">Standalone adventures. No campaign log, boons or burdens.</Label>
           </View>
-        ) : null}
-
-        <View className="mt-6" testID="standalone-scenarios">
-          <Eyebrow>{campaign?.name ?? "Fellowship of the Ring"}</Eyebrow>
-          {(campaign?.scenarios ?? []).map((id, index) => {
-            const playable = isPlayable(id);
-            return (
-              <Pressable
-                key={id}
-                testID={`standalone-${id}`}
-                collapsable={false}
-                accessibilityRole="button"
-                accessibilityState={{ disabled: !playable }}
-                accessibilityLabel={playable ? `Play ${nameOf(id)}` : `${nameOf(id)}, not playable yet`}
-                disabled={!playable}
-                onPress={() => brief(id)}
-                className="min-h-14 flex-row items-center gap-3 border-b border-hairline py-2"
-                style={({ pressed }) => (pressed ? pressedNight : undefined)}
-              >
-                <RingMark size={14} state={playable ? "current" : "locked"} />
-                <View className="flex-1">
-                  <Text className={playable ? "font-display text-body text-bone" : "font-display text-body text-faint"}>{`${index + 1}. ${nameOf(id)}`}</Text>
-                  {playable ? null : <Text className="text-label text-faint">Not playable yet</Text>}
-                </View>
-                {playable ? <Text className="text-body text-faint">›</Text> : null}
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <View className="mt-8 gap-3" testID="standalone-games">
-          <Eyebrow tone="muted">Games</Eyebrow>
-          {games.length === 0 ? <BodyText tone="muted">{archived.length === 0 ? "No game yet. Pick a scenario to deal one." : "No open game. Pick a scenario to deal one."}</BodyText> : null}
-          {finished.map(renderGame)}
           {games.length > 0 ? (
-            <View className="-mx-3 flex-row">
+            <View className="-mr-3">
               <TextButton
                 label={managing ? "Done" : "Manage"}
                 testID="manage-games"
+                tone="muted"
                 onPress={() => {
                   setManaging(!managing);
                   setDeleting(null);
@@ -210,12 +205,69 @@ export default function Scenarios() {
               />
             </View>
           ) : null}
+        </View>
+
+        {playing.length > 0 ? (
+          <View className="mt-5 gap-3" testID="standalone-playing">
+            {playing.map(renderGame)}
+          </View>
+        ) : null}
+
+        <View className="mt-5" testID="standalone-scenarios">
+          <Section title={campaign?.name ?? "Fellowship of the Ring"} />
+          <View className="gap-2.5">
+            {(campaign?.scenarios ?? []).map((id, index) => {
+              const playable = isPlayable(id);
+              return (
+                <Pressable
+                  key={id}
+                  testID={`standalone-${id}`}
+                  collapsable={false}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !playable }}
+                  accessibilityLabel={playable ? `Play ${nameOf(id)}` : `${nameOf(id)}, not playable yet`}
+                  disabled={!playable}
+                  onPress={() => brief(id)}
+                >
+                  {({ pressed }) => (
+                    <View
+                      className="flex-row items-center gap-3.5 overflow-hidden rounded-card pr-4"
+                      style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.hairline, opacity: playable ? 1 : 0.55 }}
+                    >
+                      <View style={{ width: 92, height: 68 }}>
+                        <SceneArt scenarioId={id} width={92} height={68}>
+                          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? "transparent" : withAlphaHex(palette.night, 0.55) }} />
+                        </SceneArt>
+                        <View className="absolute bottom-1.5 left-1.5 h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(palette.night, 0.8), borderWidth: 1, borderColor: playable ? palette.goldLine : palette.hairline }}>
+                          <Text className={`font-display-bold text-micro ${playable ? "text-gold" : "text-faint"}`}>{String(index + 1)}</Text>
+                        </View>
+                      </View>
+                      <View className="flex-1 py-2">
+                        <Text className={`font-display text-heading ${playable ? "text-bone" : "text-faint"}`} numberOfLines={2}>
+                          {nameOf(id)}
+                        </Text>
+                        {playable ? null : <Text className="text-label text-faint">Not playable yet</Text>}
+                      </View>
+                      {playable ? <Chevron direction="right" color={palette.faint} size={8} /> : null}
+                    </View>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        <View className="mt-6 gap-3" testID="standalone-games">
+          <Section title="Games" />
+          {games.length === 0 ? <BodyText tone="muted">{archived.length === 0 ? "No game yet. Pick a scenario to deal one." : "No open game. Pick a scenario to deal one."}</BodyText> : null}
+          {finished.map(renderGame)}
           {archived.length > 0 ? (
             <View className="gap-3" testID="archived-games">
               <View className="-mx-3 flex-row">
                 <TextButton
                   label={`${showArchived ? "Hide archived" : "Archived"} · ${archived.length}`}
                   testID="archived-toggle"
+                  tone="muted"
                   accessibilityLabel={`${showArchived ? "Hide" : "Show"} ${archived.length} archived ${archived.length === 1 ? "game" : "games"}`}
                   onPress={() => {
                     setShowArchived(!showArchived);
@@ -225,17 +277,19 @@ export default function Scenarios() {
               </View>
               {showArchived
                 ? archived.map((game) => (
-                    <View key={game.id} testID={`archived-${game.id}`} className="rounded-card border border-hairline p-5">
-                      <Text className="font-display text-title text-muted">{nameOf(game.scenarioId)}</Text>
-                      <Label>{gameCaption(game)}</Label>
-                      {actions(game, { label: "Restore", onPress: () => restore(game) })}
+                    <View key={game.id} testID={`archived-${game.id}`}>
+                      <Panel unfilled>
+                        <Text className="font-display text-title text-muted">{nameOf(game.scenarioId)}</Text>
+                        <Label>{gameCaption(game)}</Label>
+                        {actions(game, { label: "Restore", onPress: () => restore(game) })}
+                      </Panel>
                     </View>
                   ))
                 : null}
             </View>
           ) : null}
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </Screen>
   );
 }

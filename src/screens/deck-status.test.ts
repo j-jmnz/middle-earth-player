@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { DeckSaveCard } from "../catalog/deck-save";
-import { copyDeckName, deckContentsPhrase, deckCountLine, deckReadiness, deckSections, newDeckName, savedDeckName, startingThreat } from "./deck-status.ts";
+import { copyDeckName, costCurve, deckContentsPhrase, deckCountLine, deckReadiness, deckSections, newDeckName, savedDeckName, sphereSplit, startingThreat } from "./deck-status.ts";
 
 function fact(name: string, typeCode: string, deckLimit: number | null = 3): DeckSaveCard {
   return { name, typeCode, sphereCode: "lore", deckLimit, deckLegal: true, traits: null };
@@ -91,5 +91,45 @@ describe("deck names", () => {
   it("saves an empty name as a New deck name", () => {
     expect(savedDeckName("  Hobbits ", [])).toBe("Hobbits");
     expect(savedDeckName("  ", ["New deck"])).toBe("New deck 2");
+  });
+});
+
+describe("deck curve and spheres", () => {
+  const faces = new Map([
+    ["a", { cost: "0", sphereCode: "lore", sphereName: "Lore" }],
+    ["b", { cost: "2", sphereCode: "tactics", sphereName: "Tactics" }],
+    ["c", { cost: "6", sphereCode: "lore", sphereName: "Lore" }],
+    ["d", { cost: "X", sphereCode: "neutral", sphereName: "Neutral" }],
+  ]);
+
+  it("counts copies at each cost, folds 5 and over, and leaves X off the curve", () => {
+    const curve = costCurve(
+      [
+        { code: "a", count: 3 },
+        { code: "b", count: 2 },
+        { code: "c", count: 1 },
+        { code: "d", count: 2 },
+      ],
+      faces,
+    );
+    expect(curve.counts).toEqual([3, 0, 2, 0, 0, 1]);
+    expect(curve.average).toBe(1.7);
+    expect(costCurve([], faces).average).toBeNull();
+  });
+
+  it("splits the cards by sphere, largest first", () => {
+    expect(
+      sphereSplit(
+        [
+          { code: "a", count: 3 },
+          { code: "b", count: 2 },
+          { code: "c", count: 1 },
+        ],
+        faces,
+      ).map((entry) => [entry.code, entry.count]),
+    ).toEqual([
+      ["lore", 4],
+      ["tactics", 2],
+    ]);
   });
 });
