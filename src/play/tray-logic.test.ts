@@ -85,6 +85,10 @@ describe("the outside tap", () => {
     expect(tapRoute({ panelOpen: true, reader: true, cardId: "pile:discard" })).toBe("pile");
     expect(tapRoute({ panelOpen: false, reader: false, cardId: "c1" })).toBe("pick");
     expect(tapRoute({ panelOpen: false, reader: false, cardId: "pile:deck" })).toBe("pile");
+    // Peeking at the other seat (phase 26): a card only previews, a pile still lists, the open tray still folds.
+    expect(tapRoute({ panelOpen: false, reader: false, cardId: "c1", peeking: true })).toBe("preview");
+    expect(tapRoute({ panelOpen: false, reader: false, cardId: "pile:discard", peeking: true })).toBe("pile");
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: "c1", peeking: true })).toBe("fold");
   });
 
   it("mounts the hit layers only while the tray shows and nothing else reads or listens", () => {

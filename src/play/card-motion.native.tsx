@@ -42,23 +42,26 @@ export function finishMotions(progress: SharedValue<number>, clear: () => void):
   scheduleOnRN(clear);
 }
 
-type Track = { layout: TableLayout; seat: number; counts: ScenarioState; moves: Moves; span: number; fxSpan: number };
+type Track = { layout: TableLayout; seat: number; acting: number; counts: ScenarioState; moves: Moves; span: number; fxSpan: number };
 
 /**
  * Works out the motion of each new layout once, during the render (React's pattern for state that follows a prop), and runs the
  * clock for it. With the scale at 0 (reduced motion), or when the canvas changed size, nothing moves and the clock is done.
  */
-export function useCardMotion(store: TableStore, layout: TableLayout, seat: number): { moves: Moves; clock: Clock; fxClock: Clock; k: number; hurry: { progress: SharedValue<number>; clear: () => void } } {
+export function useCardMotion(store: TableStore, layout: TableLayout, seat: number, acting: number): { moves: Moves; clock: Clock; fxClock: Clock; k: number; hurry: { progress: SharedValue<number>; clear: () => void } } {
   const k = useMotionScale();
   const held = useSpotlightHold(store);
-  const [track, setTrack] = useState<Track>(() => ({ layout, seat, counts: store.getState().game, moves: { ...motionsBetween(null, layout, () => null), fx: [], at: 1 }, span: 0, fxSpan: 0 }));
+  const [track, setTrack] = useState<Track>(() => ({ layout, seat, acting, counts: store.getState().game, moves: { ...motionsBetween(null, layout, () => null), fx: [], at: 1 }, span: 0, fxSpan: 0 }));
   if (track.layout !== layout) {
     const game = store.getState().game;
     const zoneNow = (cardId: string) => game.cards[cardId]?.zone ?? null;
     const sameSize = track.layout.width === layout.width && track.layout.height === layout.height;
     const animate = k > 0 && sameSize;
-    // The acting seat changed: its hand slides up into place, and nothing is dealt.
-    const between = animate ? motionsBetween(track.layout, layout, zoneNow, { handoff: seat !== track.seat }) : motionsBetween(null, layout, zoneNow);
+    // The acting seat changed (the engine turned to another): its hand slides up into place, and nothing is dealt. A peek changes the
+    // shown seat and not the acting one: it plays its own slide, from the side the seat lies on, and not the handoff.
+    const handoff = acting !== track.acting;
+    const peek = !handoff && seat !== track.seat ? (seat > track.seat ? 1 : -1) : 0;
+    const between = animate ? motionsBetween(track.layout, layout, zoneNow, { handoff, peek }) : motionsBetween(null, layout, zoneNow);
     // A token pops once its card has arrived; a card off the table shows none. The damage a spotlight's attacks placed pops in the
     // spotlight, at the end of its burst, so the state's own pop leaves out that much of the change (archery or an effect's damage on
     // the same card keeps its pop and its number).
@@ -75,7 +78,7 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
           return slot ? (motion && !still(motion) ? motionEnd(motion) : 0) : null;
         })
       : [];
-    setTrack({ layout, seat, counts: game, moves: { ...between, fx, at: track.moves.at + 1 }, span: animate ? motionSpan(between) : 0, fxSpan: animate ? fxSpan(fx) : 0 });
+    setTrack({ layout, seat, acting, counts: game, moves: { ...between, fx, at: track.moves.at + 1 }, span: animate ? motionSpan(between) : 0, fxSpan: animate ? fxSpan(fx) : 0 });
   }
   const { moves, span } = track;
   const progress = useSharedValue(1);

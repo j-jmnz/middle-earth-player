@@ -6,7 +6,9 @@
 // through the Campaign Setup Checklist). The e2e-fixtures script writes them, and `fixtures.test.ts` replays each through the
 // reducer (and the scenario 1 game into that log) so a change to the engine or the cards that moves a game fails there and
 // the script is run again. `won`, and so `knife-lost`, are open (docs/phases/STATUS.md): no legal win of the two starter
-// decks has been found, so neither is committed, and a name whose fixture is absent is not offered (`hasFixture`).
+// decks has been found, so neither is committed, and a name whose fixture is absent is not offered (`hasFixture`). `duo` is a
+// two-handed game of scenario 1 parked on the first player's planning window of round 1, for the flows that need two dials and a seat
+// that is not acting (the peek, `.maestro/seat-peek.yaml`).
 import knifeFixtures from "./fixtures/a-knife-in-the-dark.json";
 import fixtures from "./fixtures/scenario-1.json";
 
@@ -16,21 +18,21 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { FELLOWSHIP_ID, parseLoadout, parseLog, parseSeatCount, type Save, type StoredLoadout } from "./save.ts";
 
-export type FixtureName = "won" | "lost" | "knife-lost";
+export type FixtureName = "won" | "lost" | "knife-lost" | "duo";
 
 // `past`: the scenario 1 fixture and the Resolution answers whose log this fixture starts from.
 export type Fixture = { seatCount: 1 | 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: FixtureName; choices: string[] } | null };
 
 type StoredFixture = { seatCount: number; loadout: unknown; seed: number; intents: unknown[]; log?: unknown; past?: { fixture: string; choices: string[] } };
 
-export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost"];
+export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost", "duo"];
 
 export function isFixtureName(value: string): value is FixtureName {
   return (FIXTURE_NAMES as readonly string[]).includes(value);
 }
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = {
-  ...(fixtures as Partial<Record<"won" | "lost", StoredFixture>>),
+  ...(fixtures as Partial<Record<"won" | "lost" | "duo", StoredFixture>>),
   ...(knifeFixtures as Partial<Record<"knife-lost", StoredFixture>>),
 };
 

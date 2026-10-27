@@ -9,6 +9,7 @@ import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerInt
 
 import { clashesOf } from "./clash.ts";
 import { finishedRoundSteps } from "./outcome.ts";
+import { peekSeat } from "./peek.ts";
 import { draggableIds, dropTargets, type DropTarget } from "./selection.ts";
 import { endGate, leaveGate, NO_SPOTLIGHT, openGate, type SpotlightGate } from "./spotlight-gate.ts";
 import { nextUndoable, type Undoable } from "./undo-history.ts";
@@ -37,6 +38,9 @@ export type TableState = {
   // The combat spotlight of the moment in `shown`: the attacks it resolved, and whether the canvas is still playing them
   // (spotlight-gate.ts). The banner, the settle after a new moment and the card motions wait for it; it holds no rule.
   spotlight: SpotlightGate;
+  // The seat the player is peeking at in two-handed play (peek.ts), or null: UI-only, never the engine's and never in the save. It is
+  // null when the table opens and returns to null with every new state (a new moment, so also a new sheet key or acting seat).
+  viewedSeat: number | null;
 };
 
 export type TableActions = {
@@ -44,6 +48,9 @@ export type TableActions = {
   // Goes back to the state before the last intent that can be taken back. False when there is none.
   undo: () => boolean;
   select: (cardId: string | null) => void;
+  // Peek at a seat's whole area, or null to go back to the acting seat. A seat that is not a peek (the acting seat, one outside the
+  // game, any seat in a solo game) is null. The acting seat does not change.
+  peek: (seat: number | null) => void;
   clearRefusal: () => void;
   // The spotlight finished ("done") or was skipped by a tap (the default); for the moment `seq`, else the current one. A gate that
   // already ended stays as it was.
@@ -102,8 +109,8 @@ function windowState(game: ScenarioState, ctx: ReduceContext): Pick<TableState, 
 
 export function createTableStore(input: TableInput): TableStore {
   const { ctx } = input;
-  // The table on a new game: its window, nothing picked or dragged, no refusal.
-  const showing = (game: ScenarioState) => ({ game, ...windowState(game, ctx), selected: null, targets: [], refusal: null });
+  // The table on a new game: its window, nothing picked or dragged, no refusal, no peek.
+  const showing = (game: ScenarioState) => ({ game, ...windowState(game, ctx), selected: null, targets: [], refusal: null, viewedSeat: null });
   return createStore<TableState & TableActions>()((set, get) => ({
     game: input.game,
     ...windowState(input.game, ctx),
@@ -115,6 +122,7 @@ export function createTableStore(input: TableInput): TableStore {
     shown: null,
     history: input.history ?? [],
     spotlight: NO_SPOTLIGHT,
+    viewedSeat: null,
     dispatch: (intent) => {
       const before = get().game;
       const result = reduce(before, intent, ctx);
@@ -159,6 +167,10 @@ export function createTableStore(input: TableInput): TableStore {
       const { game, legal, selected } = get();
       if (cardId === selected) return;
       set({ selected: cardId, targets: cardId ? dropTargets(game, ctx, legal, cardId) : [] });
+    },
+    peek: (seat) => {
+      const viewedSeat = peekSeat(get().game, seat);
+      if (viewedSeat !== get().viewedSeat) set({ viewedSeat });
     },
     clearRefusal: () => set({ refusal: null }),
     endSpotlight: (how = "skipped", seq) => {

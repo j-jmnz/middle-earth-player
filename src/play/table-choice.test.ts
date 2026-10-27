@@ -6,12 +6,16 @@ import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 
 import { actionsSheet, commitSheet, windowSheet } from "./bar-sheets.ts";
+import { highlightKeys } from "./highlight-of.ts";
 import { momentOf } from "./outcome.ts";
 import { tableLayout } from "./layout.ts";
 import { readoutFor } from "./readout.ts";
-import { onTableFor, PILES, pileSelector, shownSeat, TABLE_ZONES, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
+import { actingSeat, onTableFor, PILES, pileSelector, shownSeat, TABLE_ZONES, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
+import { twoHanded } from "./seat-fixture.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
+import { createTableStore } from "./store.ts";
+import { tapRoute } from "./tray-logic.ts";
 import { choiceFor, dockFor, onlyAnswer, onTheTable, primaryReady, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
 
 // Rules: rr.action-windows, rr.step-3-4, rr.step-6-4-3 (data/rules/entries.json). The table answers every moment of whole
@@ -225,5 +229,93 @@ describe("numbers beside an attack", () => {
     expect(lines[0]?.text).toBe("Attack 2 against defense 0 on pony");
     const undefended = logLines([{ ...strike, undefended: true }], { card: words, code: words, effectCard: () => null, rule: () => null, line: () => null });
     expect(undefended[0]?.text).toBe("Attack 2, undefended, on pony");
+  });
+});
+
+// Peeking at the other seat (phase 26; docs/brief.md, Table). The table draws the seat peeked at; everything that picks, pays or sends
+// is still the acting seat's, and a tap on a card only opens its preview.
+describe("a peek at the other seat", () => {
+  const duo = twoHanded();
+  const sheetOfDuo = (state: ScenarioState): Sheet => {
+    const legal = legalIntents(state, duo.ctx);
+    return sheetFor(state, duo.ctx, legal, names) ?? windowSheet(state, duo.ctx, legal, names);
+  };
+
+  it("routes a tap on any card to its preview, never to a pick, and sends nothing", () => {
+    const store = createTableStore({ ctx: duo.ctx, game: duo.state });
+    store.getState().peek(1);
+    const before = store.getState().game;
+    const cards = [...duo.seats[1].hand, duo.seats[1].hero, ...duo.seats[1].engaged, ...duo.staging, ...duo.seats[0].hand];
+    for (const cardId of cards) {
+      expect(tapRoute({ panelOpen: false, reader: false, cardId, peeking: store.getState().viewedSeat != null }), cardId).toBe("preview");
+      // Not peeking, the same tap is a pick for the open moment.
+      expect(tapRoute({ panelOpen: false, reader: false, cardId, peeking: false }), cardId).toBe("pick");
+    }
+    // A pile still opens its list, which is reading, and a screen reader peeking still previews.
+    expect(tapRoute({ panelOpen: false, reader: false, cardId: "pile:discard", peeking: true })).toBe("pile");
+    expect(tapRoute({ panelOpen: true, reader: true, cardId: duo.seats[1].hand[0] ?? "", peeking: true })).toBe("preview");
+    // The open tray still folds on a tap outside it, peeking or not.
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: duo.seats[1].hand[0] ?? "", peeking: true })).toBe("fold");
+    // Nothing reached the reducer: the game is the same object, nothing was sent or undone.
+    expect(store.getState().game).toBe(before);
+    expect(store.getState().history).toHaveLength(0);
+    expect(store.getState().moment).toBeNull();
+  });
+
+  it("leaves every pick the acting seat's: the sheet, the cards that glow and what the table lets a tap pick", () => {
+    const store = createTableStore({ ctx: duo.ctx, game: duo.state });
+    const game = store.getState().game;
+    const sheet = sheetOfDuo(game);
+    const acting = actingSeat(game);
+    const glow = () => highlightKeys({ game: store.getState().game, seat: acting, sheet: sheetOfDuo(store.getState().game), choice: choiceFor(sheet, null), panel: false, beatKey: "" }).glow;
+    const plain = glow();
+    store.getState().peek(1);
+    // Seat 1 is drawn; seat 0 still acts. The moment, its sheet and its glow do not read the seat that is drawn.
+    expect(shownSeat(store.getState().game, store.getState().viewedSeat)).toBe(1);
+    expect(actingSeat(store.getState().game)).toBe(0);
+    expect(sheetOfDuo(store.getState().game).key).toBe(sheet.key);
+    expect(glow()).toBe(plain);
+    expect(sheet.kind).toBe("window");
+    const mine = new Set(duo.seats[0].hand);
+    const theirs = new Set(duo.seats[1].hand);
+    for (const id of tappable(sheet)) {
+      expect(mine.has(id), `${id} is seat 0's`).toBe(true);
+      expect(theirs.has(id)).toBe(false);
+    }
+    const onTable = onTableFor(game, acting);
+    for (const id of duo.seats[0].hand) expect(onTable(id)).toBe(true);
+    for (const id of duo.seats[1].hand) expect(onTable(id)).toBe(false);
+    // The dock sends seat 0's intent: it is seat 0's own card it plays.
+    const play = legalIntents(game, duo.ctx).find((intent) => intent.type === "PlayCard");
+    expect(play?.type === "PlayCard" ? mine.has(play.cardId) : false).toBe(true);
+  });
+
+  it("ends on a new sheet key and on a change of the acting seat", () => {
+    const store = createTableStore({ ctx: duo.ctx, game: duo.state });
+    const firstKey = sheetOfDuo(store.getState().game).key;
+    store.getState().peek(1);
+    expect(store.getState().viewedSeat).toBe(1);
+    // Seat 0 passes: the engine asks seat 1, a new sheet key and a new acting seat; the peek is over.
+    expect(store.getState().dispatch({ type: "Pass" })).toBe(true);
+    expect(sheetOfDuo(store.getState().game).key).not.toBe(firstKey);
+    expect(actingSeat(store.getState().game)).toBe(1);
+    expect(store.getState().viewedSeat).toBeNull();
+    // Peeking at seat 0 now (the acting seat is 1), the next state ends it as well.
+    store.getState().peek(0);
+    expect(store.getState().viewedSeat).toBe(0);
+    store.getState().dispatch({ type: "Pass" });
+    expect(store.getState().viewedSeat).toBeNull();
+  });
+
+  it("ends on a new state with the same sheet key and the same acting seat: any new moment", () => {
+    const store = createTableStore({ ctx: duo.ctx, game: duo.state });
+    const play = legalIntents(duo.state, duo.ctx).find((intent) => intent.type === "PlayCard");
+    if (play?.type !== "PlayCard") throw new Error("no card to play");
+    const key = sheetOfDuo(duo.state).key;
+    store.getState().peek(1);
+    expect(store.getState().dispatch({ ...play, payments: [] })).toBe(true);
+    expect(actingSeat(store.getState().game)).toBe(0);
+    expect(sheetOfDuo(store.getState().game).key).toBe(key);
+    expect(store.getState().viewedSeat).toBeNull();
   });
 });

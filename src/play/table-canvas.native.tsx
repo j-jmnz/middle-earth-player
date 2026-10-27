@@ -20,7 +20,8 @@ import { HandScrub } from "./hand-scrub.native.tsx";
 import { useTableGestures } from "./hand-gestures.native.ts";
 import { slotBounds, tableLayout, type CardSlot, type Rect } from "./layout.ts";
 import { AT_REST } from "./motion.ts";
-import { shownSeat } from "./selectors.ts";
+import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "./peek.ts";
+import { actingSeat, shownSeat } from "./selectors.ts";
 import { Spotlight } from "./spotlight.native.tsx";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { useScreenReader } from "./screen-reader.ts";
@@ -37,13 +38,18 @@ function ZoneWord({ rect, text, font }: { rect: Rect; text: string; font: SkFont
   return <Text x={rect.x + 6} y={rect.y + 16} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight, raised, fight, bottomInset, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight: marked, raised, fight, bottomInset, look, onTap, onPreview, onDrop }: TableCanvasProps) {
   const contrast = look?.contrast ?? false;
-  const seat = useStore(store, (state) => shownSeat(state.game));
+  // The seat drawn is the seat peeked at, if any (phase 26); the seat acting is the engine's. While peeking nothing glows, nothing can be
+  // lifted or dropped, and the hand carries a veil: a tap only opens a preview (use-table-choice.ts).
+  const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
+  const acting = useStore(store, (state) => actingSeat(state.game));
+  const peeking = useStore(store, (state) => state.viewedSeat != null);
+  const highlight = peeking ? NO_HIGHLIGHT : marked;
   const { views, piles } = useViews(store, seat);
   const selected = useStore(store, (state) => state.selected);
-  const targets = useStore(store, (state) => state.targets);
-  const draggable = useStore(store, (state) => state.draggable);
+  const targets = useStore(store, (state) => (state.viewedSeat != null ? NO_TARGETS : state.targets));
+  const draggable = useStore(store, (state) => (state.viewedSeat != null ? NO_DRAG : state.draggable));
   // Only the slices drawn here: a threat change alone does not draw the table again (docs/architecture.md, State). The
   // effects in play and the attack in progress change the numbers on cards.
   const modifiers = useStore(store, (state) => state.game.modifiers);
@@ -62,7 +68,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   );
 
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
-  const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat);
+  const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat, acting);
   // The attacks the state resolved play on top of the table first (spotlight.native.tsx); the touch that skips them does nothing else.
   const spot = useSpotlight(store, layout, k);
   const { swallow, live } = spot;
@@ -113,7 +119,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const drawFrame = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const card = slot.kind === "card";
-    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={highlight.beat.has(slot.id)} />;
+    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={highlight.beat.has(slot.id)} veiled={peeking && card && slot.zone === "hand"} />;
   };
   const drawOverlay = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;

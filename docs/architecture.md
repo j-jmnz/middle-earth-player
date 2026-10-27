@@ -131,6 +131,7 @@ Three kinds of state, three owners.
 | Card rows, effect rows, scenario definitions baked at build time | catalog build | `catalog.db`, replaced only by a version bump |
 | Finger position, card lift, in-progress sheet motion | Reanimated shared values on the UI thread | nowhere |
 | Which slice a screen draws | Zustand | memory, rehydrated from SQLite on launch |
+| The seat the table is peeking at in two-handed play (`viewedSeat`, phase 26) | the table store (`src/play/store.ts`), set by a tap on the other seat's dial (`src/play/peek.ts`); `shownSeat(game, viewed)` is what the canvas, the web list and the pile list draw, `actingSeat(game)` is what picks, pays and sends | memory only: never engine state, never in the save; null when the table opens and after every new state |
 
 Zustand stores the latest reducer result so a subscriber can select one slice. The reducer is the only writer of game numbers. A screen replaces the Zustand game slice with the value the reducer returned. Reducer updates keep the same object references for zones that did not change. A threat change updates the threat overlay and does not replace the hand slice. Do not use Drizzle `useLiveQuery` for scenario state.
 

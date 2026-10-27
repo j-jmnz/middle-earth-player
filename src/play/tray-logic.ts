@@ -70,11 +70,13 @@ export function trayOpen(onPaper: boolean, foldedKey: string | null, sheetKey: s
 /**
  * Where a tap on the canvas (or a drop) goes while the choice is on paper: with the tray open it folds it and goes no further, so
  * it picks nothing, opens no pile and sends no intent; with a screen reader on (the tray is the default and every choice stays a
- * control) or no tray open it is routed as usual: a pile's list, or a pick for the open moment.
+ * control) or no tray open it is routed as usual: a pile's list, or a pick for the open moment. While the table peeks at the other
+ * seat a card is never picked: it only opens its preview (`peeking`).
  */
-export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: string }): "fold" | "pile" | "pick" {
+export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking?: boolean }): "fold" | "pile" | "preview" | "pick" {
   if (state.panelOpen && !state.reader) return "fold";
-  return state.cardId.startsWith("pile:") ? "pile" : "pick";
+  if (state.cardId.startsWith("pile:")) return "pile";
+  return state.peeking ? "preview" : "pick";
 }
 
 /** The hit layers over the top bar and the command column that fold the open tray: only while it shows, and no reading layer or screen reader is up. */
