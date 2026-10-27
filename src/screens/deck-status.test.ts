@@ -15,6 +15,14 @@ const allies = Array.from({ length: 17 }, (_, at) => {
 });
 
 describe("deckReadiness", () => {
+  it("outside a saga, a Fellowship-sphere hero makes the deck not ready (mec109.the-fellowship-sphere)", () => {
+    const faces = new Map(facts);
+    faces.set("frodo", { name: "Frodo Baggins", typeCode: "hero", sphereCode: "fellowship", deckLimit: null, deckLegal: true, traits: "Ring-bearer" });
+    const deck = { name: "x", heroes: ["frodo", "h1"], cards: allies };
+    expect(deckReadiness(deck, faces, false)).toEqual({ ready: false, text: "Frodo Baggins: Fellowship heroes only in a saga" });
+    expect(deckReadiness(deck, faces).ready).toBe(true);
+  });
+
   it("is ready with a hero and fifty cards", () => {
     expect(deckReadiness({ name: "x", heroes: ["h1"], cards: allies }, facts)).toEqual({ ready: true, text: "Ready to play" });
   });

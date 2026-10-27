@@ -38,6 +38,7 @@ export const campaignLogSchema = z.strictObject({
   counters: z.record(z.string(), z.number().int()).default({}),
   carryOver: z.array(poolCardSchema).default([]),
   carryIn: z.array(poolCardSchema).default([]),
+  carriedFrom: z.string().optional(),
 });
 
 // The intents are checked by the reducer when they are replayed: one it does not know is refused, and the open
@@ -85,10 +86,10 @@ export type Save = {
 
 // A new save starts on a blank log (the Dark of Mirkwood mini campaign included). `carried` is the carry-over of a finished save
 // (carry-over.ts): the cards its first checklist takes into the pool. A copy for each player becomes one entry for each of this
-// save's seats, whatever the finished save had.
-export function newSave(id: string, campaignId: string, seatCount: 1 | 2, carried: readonly PoolCard[] = []): Save {
+// save's seats, whatever the finished save had. `carriedFrom` is the finished save's id.
+export function newSave(id: string, campaignId: string, seatCount: 1 | 2, carried: readonly PoolCard[] = [], carriedFrom: string | null = null): Save {
   const carryIn = carried.flatMap((card) => (card.perPlayer ? Array.from({ length: seatCount }, (_, seat) => ({ ...card, seat })) : [card]));
-  return { id, campaignId, seatCount, log: { ...emptyLog(seatCount), carryIn }, active: null, loadout: null };
+  return { id, campaignId, seatCount, log: { ...emptyLog(seatCount), carryIn, ...(carriedFrom ? { carriedFrom } : {}) }, active: null, loadout: null };
 }
 
 export function parseSeatCount(value: number): 1 | 2 {

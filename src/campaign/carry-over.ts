@@ -4,16 +4,18 @@
 import type { PoolCard } from "./log.ts";
 import type { Save } from "./save.ts";
 
-export type CarryOffer = { saveId: string; campaignId: string; cards: readonly PoolCard[] };
+export type CarryOffer = { saveId: string; campaignId: string; seatCount: 1 | 2; score: number; cards: readonly PoolCard[] };
 
 /**
- * The carry-over a new save may take in: each finished save of any campaign whose log holds cards for the next campaign, most
- * recent first as `saves` lists them. `scenarios` is a campaign's scenario ids; a campaign it does not know is never finished.
+ * The carry-over a new save may take in: each finished save of any campaign whose log holds cards for the next campaign and that no
+ * other save has taken (`log.carriedFrom`), most recent first as `saves` lists them. `scenarios` is a campaign's scenario ids; a
+ * campaign it does not know is never finished. A save that takes an offer holds it until it is deleted: the offer then returns.
  */
 export function carryOffers(saves: readonly Save[], scenarios: (campaignId: string) => readonly string[] | null): CarryOffer[] {
+  const taken = new Set(saves.flatMap((save) => (save.log.carriedFrom ? [save.log.carriedFrom] : [])));
   return saves.flatMap((save) => {
     const ids = scenarios(save.campaignId);
     const finished = ids != null && ids.length > 0 && ids.every((id) => save.log.completed.includes(id));
-    return finished && save.log.carryOver.length > 0 ? [{ saveId: save.id, campaignId: save.campaignId, cards: save.log.carryOver }] : [];
+    return finished && save.log.carryOver.length > 0 && !taken.has(save.id) ? [{ saveId: save.id, campaignId: save.campaignId, seatCount: save.seatCount, score: save.log.score, cards: save.log.carryOver }] : [];
   });
 }

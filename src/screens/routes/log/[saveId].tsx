@@ -62,7 +62,7 @@ export default function Log() {
     update({ ...save, log: { ...save.log, notes: edited } });
     setEdited(null);
   }
-  const back = <NavBar onBack={() => { saveNotes(); goBack(router, save ? { pathname: "/path/[saveId]", params: { saveId: save.id } } : "/"); }} backTestID="log-back" backLabel="Path" right={<IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => { if (save) router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId) }); }} />} />;
+  const back = <NavBar onBack={() => { saveNotes(); goBack(router, save ? { pathname: "/path/[saveId]", params: { saveId: save.id } } : "/"); }} backTestID="log-back" backLabel="Path" right={save ? <IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId) })} /> : undefined} />;
   if (!loaded) return <Screen testID="log" scene="plain">{back}<BodyText tone="muted">Loading</BodyText></Screen>;
   const campaign = save ? campaignOf(save.campaignId) : null;
   if (!save || !campaign) {

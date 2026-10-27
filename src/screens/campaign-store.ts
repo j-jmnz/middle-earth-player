@@ -102,10 +102,10 @@ export function deleteSave<TRun>(user: UserDb<TRun>, id: string): void {
 let created = 0;
 
 // A new playthrough. The seat count is chosen here and never changes.
-// `carried` is the carry-over of a finished playthrough (carryOffers): its cards go on the new log's carryIn.
-export function createSave<TRun>(user: UserDb<TRun>, campaignId: string, seatCount: 1 | 2, now: number = Date.now(), carried: readonly PoolCard[] = []): Save {
+// `carried` is the carry-over of a finished playthrough (carryOffers): its cards go on the new log's carryIn, and `carriedFrom` (its save id) keeps the offer from being made twice.
+export function createSave<TRun>(user: UserDb<TRun>, campaignId: string, seatCount: 1 | 2, now: number = Date.now(), carried: readonly PoolCard[] = [], carriedFrom: string | null = null): Save {
   created += 1;
-  const save = newSave(`save-${now.toString(36)}${created > 1 ? `-${created}` : ""}`, campaignId, seatCount, carried);
+  const save = newSave(`save-${now.toString(36)}${created > 1 ? `-${created}` : ""}`, campaignId, seatCount, carried, carriedFrom);
   writeSave(user, save, now);
   return save;
 }
@@ -126,4 +126,10 @@ export function writeBooklet<TRun>(user: UserDb<TRun>, row: BookletRow): void {
 
 export function writeLastPage<TRun>(user: UserDb<TRun>, id: string, page: number): void {
   user.update(booklets).set({ lastPage: Math.max(1, Math.floor(page)) }).where(eq(booklets.id, id)).run();
+}
+
+// When each playthrough was last written (the win that finished it is the last write of a finished one), by save id: what the
+// carry-over offers date a finished playthrough by.
+export function savedAt<TRun>(user: UserDb<TRun>): Map<string, number> {
+  return new Map(user.select({ id: saves.id, updatedAt: saves.updatedAt }).from(saves).all().flatMap((row) => (row.updatedAt == null ? [] : [[row.id, row.updatedAt] as const])));
 }

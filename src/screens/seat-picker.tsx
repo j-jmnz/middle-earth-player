@@ -33,7 +33,7 @@ export function SeatPicker({
   heroes,
   fallen,
   needsRingBearer,
-  saga = true,
+  saga,
   ringBearer,
   onPick,
   onRingBearer,
@@ -48,7 +48,7 @@ export function SeatPicker({
   fallen: readonly string[];
   needsRingBearer: boolean;
   // The campaign is a saga: its party is "your fellowship". Outside one there is no Ring-bearer slot (needsRingBearer is false).
-  saga?: boolean;
+  saga: boolean;
   ringBearer: string | null;
   onPick: (deckId: string) => void;
   onRingBearer: (code: string | null) => void;

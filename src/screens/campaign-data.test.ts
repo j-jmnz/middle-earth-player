@@ -80,6 +80,12 @@ describe("the registry", () => {
     expect(bookletParams("the-dark-of-mirkwood", "the-oath")).toEqual({ id: "the-dark-of-mirkwood", page: "3" });
     expect(bookletParams("the-dark-of-mirkwood")).toEqual({ id: "the-dark-of-mirkwood" });
   });
+
+  it("a scenario the campaign's book does not print opens the book of its box (the Oath and the Caves in Mirkwood Paths)", () => {
+    expect(bookletPageOf("mirkwood-paths", "the-oath")).toBeNull();
+    expect(bookletParams("mirkwood-paths", "the-oath")).toEqual({ id: "the-dark-of-mirkwood", page: String(bookletPageOf("the-dark-of-mirkwood", "the-oath")) });
+    expect(bookletParams("mirkwood-paths", "the-caves-of-nibin-dum").id).toBe("the-dark-of-mirkwood");
+  });
 });
 
 describe("booklet pages", () => {

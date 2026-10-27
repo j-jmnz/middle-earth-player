@@ -28,7 +28,7 @@ beforeAll(async () => {
 
 describe("golden: a whole game of A Knife in the Dark", () => {
   it("deals legal loadouts", () => {
-    for (const golden of KNIFE_GOLDENS) expect(validateLoadout(knifeLoadout(golden.seatCount, golden.decks), cards), golden.name).toEqual([]);
+    for (const golden of KNIFE_GOLDENS) expect(validateLoadout(knifeLoadout(golden.seatCount, golden.decks), cards, true), golden.name).toEqual([]);
   });
 
   it("plays the same intents to the same state on fixed seeds", async () => {

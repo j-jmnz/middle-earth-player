@@ -56,7 +56,7 @@ function play(seed: number): { state: ScenarioState; intents: number } {
 
 describe("a whole game of A Shadow of the Past", () => {
   it("the loadout is legal", () => {
-    expect(validateLoadout([loadout], cards)).toEqual([]);
+    expect(validateLoadout([loadout], cards, true)).toEqual([]);
   });
 
   it("is reproducible from the seed", () => {

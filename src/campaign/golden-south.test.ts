@@ -31,7 +31,7 @@ beforeAll(async () => {
 
 describe("golden: a whole game of The Ring Goes South", () => {
   it("deals legal loadouts", () => {
-    for (const golden of SOUTH_GOLDENS) expect(validateLoadout(southLoadout(golden.seatCount, golden.decks), worlds.get(golden.decks)!.cards), golden.name).toEqual([]);
+    for (const golden of SOUTH_GOLDENS) expect(validateLoadout(southLoadout(golden.seatCount, golden.decks), worlds.get(golden.decks)!.cards, true), golden.name).toEqual([]);
   });
 
   it("plays the same intents to the same state on fixed seeds", async () => {

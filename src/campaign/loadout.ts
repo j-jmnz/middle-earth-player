@@ -30,7 +30,7 @@ function isRingBearer(card: PrintedCard): boolean {
   return isFellowship(card) && card.traits.includes("Ring-bearer");
 }
 
-export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga = true): LoadoutError[] {
+export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean): LoadoutError[] {
   const errors: LoadoutError[] = [];
   const fail = (rule: LoadoutRule, card: PrintedCard, why: string) =>
     errors.push({ rule, code: card.code, card: card.name, message: `${card.name} (${card.code}): ${why}` });
@@ -39,6 +39,16 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     const card = cards.get(code);
     if (!card) errors.push({ rule: "unknownCard", code, card: code, message: `${code}: the catalog has no such card` });
     return card ?? null;
+  };
+
+  // One title once across the table: a second hero of a name is refused. `skip` is a name another rule already refused.
+  const refuseSameHero = (heroes: readonly (PrintedCard | null)[], skip: string | null) => {
+    const names = new Set<string>();
+    for (const card of heroes) {
+      if (card == null || card.type !== "hero" || card.name === skip) continue;
+      if (names.has(card.name)) fail("sameHero", card, `only one ${card.name} can be in play, so no two heroes may share that title`);
+      names.add(card.name);
+    }
   };
 
   const heroCards = seats.map((seat) => seat.heroes.map(known));
@@ -50,12 +60,7 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
       if (card != null && isFellowship(card)) fail("fellowshipOutsideSaga", card, "a Fellowship-sphere hero can only be used when playing the scenarios in the saga expansions (mec109.the-fellowship-sphere)");
     }
     // The same hero twice is still refused (rr.unique-cards).
-    const names = new Set<string>();
-    for (const card of heroCards.flat()) {
-      if (card == null || card.type !== "hero") continue;
-      if (names.has(card.name)) fail("sameHero", card, `only one ${card.name} can be in play, so no two heroes may share that title`);
-      names.add(card.name);
-    }
+    refuseSameHero(heroCards.flat(), null);
     return errors;
   }
 
@@ -88,14 +93,8 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
   }
 
   // Heroes are unique: the players as a group have one copy of each title in play, so no two seats start with the
-  // same hero (rr.unique-cards).
-  const heroNames = new Set<string>();
-  for (const card of heroCards.flat()) {
-    // A second Ring-bearer is already named by secondFrodo.
-    if (card == null || card.type !== "hero" || card.name === ringBearer?.name) continue;
-    if (heroNames.has(card.name)) fail("sameHero", card, `only one ${card.name} can be in play, so no two heroes may share that title`);
-    heroNames.add(card.name);
-  }
+  // same hero (rr.unique-cards). A second Ring-bearer is already named by secondFrodo.
+  refuseSameHero(heroCards.flat(), ringBearer?.name ?? null);
 
   // The One Ring is granted by setup. It is never a deck card, so it never counts toward the deck minimum.
   for (const card of [...heroCards.flat(), ...deckCards.flat()]) {

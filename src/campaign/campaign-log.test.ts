@@ -136,6 +136,16 @@ describe("carry-over to the next campaign", () => {
     expect(offers[0]?.cards).toHaveLength(2);
   });
 
+  it("an offer a save has taken is not made again, and returns when that save is gone", () => {
+    const done = { ...newSave("done", "campaign", 2), log: applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards) };
+    const taker = newSave("taker", "mirkwood-paths", 1, done.log.carryOver, done.id);
+    expect(taker.log.carriedFrom).toBe("done");
+    expect(carryOffers([done, taker], scenariosOf)).toEqual([]);
+    expect(carryOffers([done], scenariosOf).map((offer) => [offer.saveId, offer.seatCount])).toEqual([["done", 2]]);
+    expect(parseLog(JSON.parse(JSON.stringify(taker.log)))).toEqual(taker.log);
+    expect("carriedFrom" in newSave("plain", "mirkwood-paths", 1).log).toBe(false);
+  });
+
   it("a new save takes the cards in, and its first checklist moves them into the pool and clears carryIn", () => {
     const finished = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards);
     const fresh = newSave("next", "mirkwood-paths", 2, finished.carryOver);

@@ -13,7 +13,7 @@ describe("golden: A Shadow of the Past with a starter deck", () => {
   for (const deck of campaign.starterDecks) {
     it(`${deck.name}: the same intents play to the same state on fixed seeds`, async () => {
       const { cards, ctx } = await starterWorld(deck.id);
-      expect(validateLoadout([starterLoadout(deck.id)], cards)).toEqual([]);
+      expect(validateLoadout([starterLoadout(deck.id)], cards, true)).toEqual([]);
       const out: unknown[] = [];
       for (const seed of STARTER_SEEDS) {
         const { run } = playStarter(deck.id, seed, ctx);

@@ -61,6 +61,16 @@ export function bookPage(entry: Pick<RuleEntry, "doc" | "page">): { id: BookletI
   return id ? { id, name: bookletName(id), page: entry.page } : null;
 }
 
+const ALL_ENTRIES: ReadonlyMap<string, RuleEntry> = new Map(parseRuleEntries(entries).map((entry) => [entry.id, entry]));
+
+/** Where a rule span is printed, as a player reads it: "Fellowship of the Ring rulebook, page 4" (the book the app carries, else the document's name). */
+export function ruleSource(id: string): string | null {
+  const entry = ALL_ENTRIES.get(id);
+  if (!entry) return null;
+  const book = bookPage(entry);
+  return book ? `${book.name}, page ${book.page}` : `${DOC_NAMES[entry.doc] ?? entry.doc}, page ${entry.page}`;
+}
+
 export function glossaryEntry(id: string): GlossaryEntry | null {
   return GLOSSARY.find((entry) => entry.id === id) ?? null;
 }

@@ -40,7 +40,7 @@ export default function StandaloneBriefing() {
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
   // The box the scenario is printed in decides the campaign flags (saga, booklet) a standalone game follows.
   const campaign = scenarioId ? campaignOfScenario(scenarioId) : null;
-  const briefingDecks = useBriefingDecks(campaign?.saga ?? true);
+  const briefingDecks = useBriefingDecks(campaign?.saga ?? false);
   const { savedDecks, candidates } = briefingDecks;
 
   const seats: BriefingSeat[] = useMemo(
@@ -67,9 +67,7 @@ export default function StandaloneBriefing() {
     scenarioId,
     backLabel: "Scenarios",
     onBack: () => goBack(router, "/scenarios"),
-    onBooklet: () => {
-      if (campaign) router.push({ pathname: "/booklet/[id]", params: bookletParams(campaign.id, scenarioId) });
-    },
+    ...(campaign ? { onBooklet: () => router.push({ pathname: "/booklet/[id]", params: bookletParams(campaign.id, scenarioId) }) } : {}),
   } as const;
   if (!campaign || !scenario || !world || !input || !result || !facts) {
     return (

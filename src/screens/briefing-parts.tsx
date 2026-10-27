@@ -62,7 +62,7 @@ export type BriefingDecks = {
  * The saved decks in the Decks tab's order (read again on focus, so a deck finished through Open in Decks comes back
  * ready, and once the starter decks are inserted), the Ring-bearer candidates, the hero faces, readiness and the filter.
  */
-export function useBriefingDecks(saga = true): BriefingDecks {
+export function useBriefingDecks(saga: boolean): BriefingDecks {
   const { catalog, user } = useDatabases();
   // The starter decks are inserted just after launch; read the list again when that finishes.
   const seeded = useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending" as const);
@@ -91,7 +91,7 @@ export function useBriefingDecks(saga = true): BriefingDecks {
     () => deckFaces(catalog, [...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)])]),
     [catalog, candidates, savedDecks],
   );
-  const readiness = useMemo(() => new Map(savedDecks.map((deck) => [deck.id, deckReadiness(deck, faces)])), [savedDecks, faces]);
+  const readiness = useMemo(() => new Map(savedDecks.map((deck) => [deck.id, deckReadiness(deck, faces, saga)])), [savedDecks, faces, saga]);
   const [filter, setFilter] = useState<DeckListFilter>(emptyDeckListFilter);
   const spheres = useMemo(() => deckListSpheres(savedDecks, faces), [savedDecks, faces]);
   const shown = useMemo(() => filterDecks(savedDecks, filter, faces, (deck) => readiness.get(deck.id)?.ready ?? false), [savedDecks, filter, faces, readiness]);
@@ -118,7 +118,8 @@ export function BriefingScreen({
   scenarioId: string | null;
   onBack: () => void;
   backLabel?: string;
-  onBooklet: () => void;
+  // Left out when there is no book to open (no playthrough or campaign yet): the button is not shown.
+  onBooklet?: () => void;
   // The words over the scene (ScenarioBanner); null while the scenario is loading or missing.
   banner: ReactNode;
   children: ReactNode;
@@ -156,7 +157,7 @@ export function BriefingScreen({
       ) : null}
       <FloatingBarShade shown={past} top={insets.top} />
       <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 + insets.left, paddingRight: 16 + insets.right }}>
-        <NavBar overlay onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={<IconButton overlay icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} />} />
+        <NavBar overlay onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={onBooklet ? <IconButton overlay icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
       </View>
     </Screen>
   );

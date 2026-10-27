@@ -32,7 +32,7 @@ beforeAll(async () => {
 
 describe("golden: a whole game of Flight to the Ford", () => {
   it("deals legal loadouts", () => {
-    for (const golden of FORD_GOLDENS) expect(validateLoadout(fordLoadout(golden.seatCount, golden.decks), worlds.get(golden.decks)!.cards), golden.name).toEqual([]);
+    for (const golden of FORD_GOLDENS) expect(validateLoadout(fordLoadout(golden.seatCount, golden.decks), worlds.get(golden.decks)!.cards, true), golden.name).toEqual([]);
   });
 
   it("plays the same intents to the same state on fixed seeds", async () => {

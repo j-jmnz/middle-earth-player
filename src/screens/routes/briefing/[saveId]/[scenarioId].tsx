@@ -36,7 +36,7 @@ export default function Briefing() {
 
   const campaign = save ? campaignOf(save.campaignId) : null;
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
-  const briefingDecks = useBriefingDecks(campaign?.saga ?? true);
+  const briefingDecks = useBriefingDecks(campaign?.saga ?? false);
   const { savedDecks, candidates } = briefingDecks;
 
   const seatCount = save?.seatCount ?? 1;
@@ -67,9 +67,7 @@ export default function Briefing() {
     scenarioId,
     backLabel: "Path",
     onBack: () => goBack(router, saveId ? { pathname: "/path/[saveId]", params: { saveId } } : "/"),
-    onBooklet: () => {
-      if (save) router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId, scenarioId) });
-    },
+    ...(save ? { onBooklet: () => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId, scenarioId) }) } : {}),
   } as const;
   if (!loaded) {
     return (
@@ -158,7 +156,7 @@ export default function Briefing() {
           heroes={seat.heroes}
           fallen={fallen}
           needsRingBearer={result.needsRingBearer}
-          saga={campaign?.saga ?? true}
+          saga={campaign?.saga ?? false}
           ringBearer={ringBearer}
           onPick={(deckId) => pick(index, deckId)}
           onRingBearer={setRingBearer}

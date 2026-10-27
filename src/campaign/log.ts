@@ -43,6 +43,8 @@ export type CampaignLog = {
   carryOver: readonly PoolCard[];
   // Cards a new save took in from a finished campaign's carryOver. Its first checklist (step 1) moves them into the pool.
   carryIn: readonly PoolCard[];
+  // The finished save whose carry-over this one took in, so that save's offer is not made again. Absent when it took nothing.
+  carriedFrom?: string;
 };
 
 export function emptyLog(seatCount: number): CampaignLog {

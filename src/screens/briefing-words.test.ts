@@ -12,6 +12,10 @@ describe("briefing words", () => {
 
   it("drops collector codes from other sentences and keeps the rest", () => {
     expect(problemWords({ rule: "One version of Frodo", message: "Frodo Baggins (142001): only one version of Frodo may start" })).toBe("Frodo Baggins: only one version of Frodo may start");
+    // A rule span id becomes the book and page, and an id no book carries is left as it is.
+    const refused = problemWords({ rule: "Fellowship heroes only in a saga", message: "Frodo Baggins (141001): a Fellowship-sphere hero can only be used when playing the scenarios in the saga expansions (mec109.the-fellowship-sphere)" });
+    expect(refused).toMatch(/^Frodo Baggins: a Fellowship-sphere hero .* \(.+, page \d+\)$/);
+    expect(refused).not.toContain("mec109.");
     expect(problemWords({ rule: "Choose a deck", message: "Choose a saved deck for seat 1." })).toBe("Choose a saved deck for seat 1.");
   });
 

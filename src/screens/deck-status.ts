@@ -38,8 +38,16 @@ export function deckRefusal(deck: DeckContent, faces: ReadonlyMap<string, DeckSa
 
 export type DeckReadiness = { ready: true; text: string } | { ready: false; text: string };
 
-/** One sentence for the list, the editor and the briefing. A short deck says how many cards it still needs. */
-export function deckReadiness(deck: DeckContent, faces: ReadonlyMap<string, DeckSaveCard>): DeckReadiness {
+/**
+ * One sentence for the list, the editor and the briefing. A short deck says how many cards it still needs. Outside a saga
+ * (`saga` false: the briefing of a campaign or box that is not one) a Fellowship-sphere hero makes the deck not ready too
+ * (mec109.the-fellowship-sphere).
+ */
+export function deckReadiness(deck: DeckContent, faces: ReadonlyMap<string, DeckSaveCard>, saga = true): DeckReadiness {
+  if (!saga) {
+    const fellowship = deck.heroes.map((code) => faces.get(code)).find((face) => face?.sphereCode === "fellowship");
+    if (fellowship) return { ready: false, text: `${fellowship.name}: Fellowship heroes only in a saga` };
+  }
   const refusal = deckRefusal(deck, faces);
   if (!refusal) return { ready: true, text: "Ready to play" };
   // "At least 50 cards." (100 with A Perilous Voyage): a contract is no deck card, so it is not counted.

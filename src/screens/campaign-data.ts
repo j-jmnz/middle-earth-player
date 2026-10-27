@@ -58,11 +58,6 @@ export function campaignOfScenario(scenarioId: string): CampaignData | null {
   return box ? campaignOf(box.campaignId) : null;
 }
 
-/** A campaign's name, for any id; the id itself when the registry does not hold it. */
-export function campaignName(campaignId: string): string {
-  return CAMPAIGNS[campaignId]?.name ?? campaignId;
-}
-
 export function campaignOf(campaignId: string): CampaignData | null {
   return CAMPAIGNS[campaignId] ?? null;
 }
@@ -77,10 +72,18 @@ export function bookletPageOf(campaignId: string, scenarioId: string | null | un
   return page ?? null;
 }
 
-/** The router params that open the campaign's booklet (`bookletId`), on the scenario's page when one is recorded. */
+/**
+ * The router params that open the campaign's booklet (`bookletId`), on the scenario's page when one is recorded. A scenario the
+ * campaign has no page for (The Oath and The Caves of Nibin-Dûm in Mirkwood Paths: the campaign's book does not print them) opens
+ * the book of the box it is printed in, on its page there.
+ */
 export function bookletParams(campaignId: string, scenarioId?: string | null): { id: string; page?: string } {
-  const page = bookletPageOf(campaignId, scenarioId);
-  const id = campaignOf(campaignId)?.bookletId ?? campaignId;
+  const own = bookletPageOf(campaignId, scenarioId);
+  const box = own == null && scenarioId ? campaignOfScenario(scenarioId) : null;
+  const boxPage = box ? bookletPageOf(box.id, scenarioId) : null;
+  const from = boxPage != null && box ? box : campaignOf(campaignId);
+  const page = own ?? boxPage;
+  const id = from?.bookletId ?? campaignId;
   return page == null ? { id } : { id, page: String(page) };
 }
 
