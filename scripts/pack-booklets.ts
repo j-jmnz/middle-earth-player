@@ -11,6 +11,8 @@ import { bytes, describeError, runScript, type Log } from "./log.ts";
 export const BOOKLET_SOURCES: Record<BookletId, string> = {
   "fellowship-of-the-ring": "mec109_rulebook-compressed.pdf",
   "learn-to-play": "mec101_learn_to_play_eng_v11-compressed.pdf",
+  "rules-reference": "mec101_rules_reference.pdf",
+  "the-dark-of-mirkwood": "dark_of_mirkwood_rulebook_v2.pdf",
 };
 
 export type PackedBooklet = {

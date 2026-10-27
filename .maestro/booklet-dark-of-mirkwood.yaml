@@ -1,0 +1,32 @@
+appId: com.middleearth.lcg
+---
+# Phase 28. Written in a cloud session: it has not run. Needs no PDF (like booklet.yaml): the reader opens empty with the book's name.
+# The Dark of Mirkwood rulebook is the fourth book on the Rules tab, and the one The Dark of Mirkwood campaign opens.
+- launchApp:
+    clearState: true
+- tapOn:
+    id: rules-tab
+- assertVisible:
+    id: rules
+- tapOn:
+    id: booklet-open-the-dark-of-mirkwood
+- extendedWaitUntil:
+    visible:
+      id: booklet-empty
+    timeout: 15000
+- assertVisible:
+    id: booklet-name
+- assertVisible: "The Dark of Mirkwood rulebook"
+- tapOn:
+    id: booklet-close
+- assertVisible:
+    id: rules
+# The Rules Reference opens in the same reader.
+- tapOn:
+    id: booklet-open-rules-reference
+- assertVisible:
+    id: booklet-empty
+- tapOn:
+    id: booklet-close
+- assertVisible:
+    id: rules

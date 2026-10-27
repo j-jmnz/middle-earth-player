@@ -1,0 +1,26 @@
+appId: com.middleearth.lcg
+---
+# Phase 28. Written in a cloud session: it has not run. The Scenarios tab lists one section for each box the app plays.
+- launchApp:
+    clearState: true
+- tapOn:
+    id: scenarios-tab
+- assertVisible:
+    id: scenarios
+- assertVisible:
+    id: box-fellowship-of-the-ring
+- assertVisible: "Fellowship of the Ring"
+- scrollUntilVisible:
+    element:
+      id: box-revised-core
+- assertVisible: "Revised Core"
+- assertVisible:
+    id: standalone-passage-through-mirkwood
+- scrollUntilVisible:
+    element:
+      id: box-the-dark-of-mirkwood
+- assertVisible: "The Dark of Mirkwood"
+- assertVisible:
+    id: standalone-the-oath
+- assertVisible:
+    id: standalone-the-caves-of-nibin-dum

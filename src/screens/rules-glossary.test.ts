@@ -5,7 +5,7 @@ import { GLOSSARY, bookPage, glossaryEntry, paragraphs, searchGlossary, seeAlso 
 describe("GLOSSARY", () => {
   it("holds the rule books' spans and leaves out decklists, setups and stages", () => {
     const docs = new Set(GLOSSARY.map((entry) => entry.doc));
-    expect([...docs].sort()).toEqual(["easy-mode", "faq", "learn-to-play", "mec109", "rr"]);
+    expect([...docs].sort()).toEqual(["easy-mode", "faq", "learn-to-play", "mec109", "rr", "tdom"]);
     expect(GLOSSARY.some((entry) => /^(decklist\.|mec109\.(starter-|setup-|stage-))/.test(entry.id))).toBe(false);
     expect(glossaryEntry("mec109.hide-tests")?.source).toBe("Fellowship of the Ring campaign book · page 4");
   });
@@ -64,10 +64,18 @@ describe("seeAlso", () => {
 });
 
 describe("bookPage", () => {
-  it("opens the campaign book and Learn to Play on the rule's page, and no other book", () => {
+  it("opens each bundled book (the campaign books, Learn to Play, the Rules Reference) on the rule's page, and no other book", () => {
     expect(bookPage(glossaryEntry("mec109.hide-tests")!)).toEqual({ id: "fellowship-of-the-ring", name: "Fellowship of the Ring campaign book", page: 4 });
     expect(bookPage(glossaryEntry("ltp.surge")!)).toEqual({ id: "learn-to-play", name: "Learn to Play", page: 22 });
-    expect(bookPage(glossaryEntry("rr.surge")!)).toBeNull();
+    expect(bookPage(glossaryEntry("rr.surge")!)).toEqual({ id: "rules-reference", name: "Rules Reference", page: 17 });
+    expect(bookPage(glossaryEntry("tdom.mirkwood-paths")!)).toEqual({ id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood rulebook", page: 7 });
     expect(bookPage(glossaryEntry("faq.limitations-on-attacks")!)).toBeNull();
+  });
+});
+
+describe("scenario setup spans", () => {
+  it("are read on the briefing, not looked up: the glossary leaves out mec109, ltp and tdom setup spans", () => {
+    expect(GLOSSARY.filter((entry) => /^(mec109|ltp|tdom)\.setup-/.test(entry.id))).toEqual([]);
+    expect(glossaryEntry("tdom.campaign-mode")).not.toBeNull();
   });
 });

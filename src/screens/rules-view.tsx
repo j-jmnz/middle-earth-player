@@ -9,11 +9,11 @@ import { GameIcon } from "../play/game-icon";
 import { tileSurface } from "../play/surfaces";
 import { GLOSSARY, searchGlossary } from "./rules-glossary";
 
-// The books keep the testIDs they had on the campaign list.
+// The books keep the testIDs they had on the campaign list; the others are `booklet-open-<id>`.
 const BOOK_TEST_IDS: Readonly<Record<string, string>> = { "fellowship-of-the-ring": "booklet-open", "learn-to-play": "booklet-open-learn-to-play" };
 
 // The glossary, searched by name, under `header`: the search first, since a player reaches for a rule mid-game. The Rules tab
-// shows the two books as covers under the search; the table's Rules opens it without them (the table has its own Booklet). The
+// shows the books as covers under the search; the table's Rules opens it without them (the table has its own Booklet). The
 // books step aside while a query is typed, so the keyboard leaves room for results.
 export function RulesView({ header, books, testID }: { header: ReactNode; books: boolean; testID: string }) {
   const router = useRouter();
@@ -29,7 +29,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
       {books && search.trim() === "" ? (
         <View className="mt-4">
           <Section title="Books" />
-          <View className="flex-row gap-2.5">
+          <View className="flex-row flex-wrap gap-2.5">
             {BOOKLETS.map((book) => (
               <Pressable
                 key={book.id}
@@ -38,7 +38,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
                 accessibilityRole="button"
                 accessibilityLabel={`Open ${book.name}`}
                 onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: book.id } })}
-                className="flex-1"
+                className="min-w-[45%] flex-1"
               >
                 {({ pressed }) => (
                   <View className="min-h-28 justify-between rounded-card p-4" style={tileSurface(pressed)}>

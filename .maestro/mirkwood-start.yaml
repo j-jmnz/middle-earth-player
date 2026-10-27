@@ -1,0 +1,39 @@
+appId: com.middleearth.lcg
+---
+# Phase 28. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and a catalog
+# in which `mirkwood-paths` is marked playable (phase 29 puts Passage Through Mirkwood in PLAYABLE_SCENARIOS).
+# Starts Mirkwood Paths, which is not a saga: its briefing has no Ring-bearer slot, and a starter deck deals without one.
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: campaign-list
+# One start panel for each playable campaign; the Fellowship's keeps its id.
+- assertVisible:
+    id: start-fellowship
+- assertVisible:
+    id: start-mirkwood-paths
+- tapOn:
+    id: start-mirkwood-paths
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: briefing
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: deck-pick-0-stealth-and-steadfastness
+    timeout: 15000
+- tapOn:
+    id: deck-pick-0-stealth-and-steadfastness
+# No Ring-bearer slot, and no sentence asking for one.
+- assertNotVisible:
+    id: ringbearer-slot
+- assertNotVisible:
+    id: briefing-error-0
+- assertVisible:
+    id: briefing-checklist

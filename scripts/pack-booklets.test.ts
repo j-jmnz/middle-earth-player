@@ -52,8 +52,9 @@ describe("pack booklets", () => {
       },
       log,
     );
-    expect(packed.map((book) => book.filename)).toEqual(["fellowship-of-the-ring.pdf", "learn-to-play.pdf"]);
-    expect(fetched).toEqual([`https://example.test/${ltp}`]);
+    expect(packed.map((book) => book.filename)).toEqual(["fellowship-of-the-ring.pdf", "learn-to-play.pdf", "rules-reference.pdf", "the-dark-of-mirkwood.pdf"]);
+    // Only the stale cached copy and the books with no cached copy are fetched.
+    expect(fetched).toEqual([ltp, BOOKLET_SOURCES["rules-reference"], BOOKLET_SOURCES["the-dark-of-mirkwood"]].map((file) => `https://example.test/${file}`));
     expect(readFileSync(path.join(staged.outDir, "learn-to-play.pdf"))).toEqual(Buffer.from(body(ltp)));
     const map = readFileSync(path.join(staged.outDir, "bundled-map.ts"), "utf8");
     expect(map).toContain(`"fellowship-of-the-ring": { moduleId: require("./fellowship-of-the-ring.pdf") as number, filename: "${mec109}", bytes: ${body(mec109).length}, sha256: "${sha256(body(mec109))}" },`);
@@ -67,5 +68,26 @@ describe("pack booklets", () => {
   it("keeps the committed map empty", () => {
     const map = readFileSync(path.join(import.meta.dirname, "../src/screens/booklets/bundled-map.ts"), "utf8");
     expect(map).toContain("bundledBooklets: Partial<Record<string, BundledBooklet>> = {};");
+  });
+});
+
+describe("the booklet sources", () => {
+  it("bundle four books: the two campaign books, Learn to Play and the Rules Reference, each from its pinned file", () => {
+    expect(BOOKLETS.map((book) => book.id)).toEqual(["fellowship-of-the-ring", "learn-to-play", "rules-reference", "the-dark-of-mirkwood"]);
+    expect(BOOKLET_SOURCES["rules-reference"]).toBe("mec101_rules_reference.pdf");
+    expect(BOOKLET_SOURCES["the-dark-of-mirkwood"]).toBe("dark_of_mirkwood_rulebook_v2.pdf");
+  });
+
+  it("is the book each campaign's data opens", async () => {
+    const { campaignDataSchema } = await import("../src/catalog/scenario-data.ts");
+    const dir = path.join(import.meta.dirname, "../data/campaigns");
+    const opened = Object.fromEntries(
+      ["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood"].map((id) => {
+        const campaign = campaignDataSchema.parse(JSON.parse(readFileSync(path.join(dir, `${id}.json`), "utf8")) as unknown);
+        return [id, campaign.bookletId];
+      }),
+    );
+    expect(opened).toEqual({ "fellowship-of-the-ring": "fellowship-of-the-ring", "mirkwood-paths": "learn-to-play", "the-dark-of-mirkwood": "the-dark-of-mirkwood" });
+    for (const id of Object.values(opened)) expect(BOOKLETS.map((book) => book.id)).toContain(id);
   });
 });

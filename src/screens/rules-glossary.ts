@@ -13,12 +13,13 @@ const DOC_NAMES: Readonly<Record<string, string>> = {
   faq: "FAQ",
   "easy-mode": "Easy Mode",
   mec109: bookletName("fellowship-of-the-ring"),
+  tdom: bookletName("the-dark-of-mirkwood"),
 };
 
 // A decklist, a scenario's setup or one scenario's stage is read on its own screen (deck import, briefing), not looked up.
 function inGlossary(entry: RuleEntry): boolean {
   if (!(entry.doc in DOC_NAMES)) return false;
-  return !/^mec109\.(starter-|setup-|stage-)/.test(entry.id);
+  return !/^(mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-)/.test(entry.id);
 }
 
 function fold(text: string): string {
@@ -47,9 +48,14 @@ export function glossaryOf(rows: readonly RuleEntry[]): GlossaryEntry[] {
 export const GLOSSARY: readonly GlossaryEntry[] = glossaryOf(parseRuleEntries(entries));
 
 // The rule books the app carries (src/screens/booklets/books.ts); a rule from one opens the reader on its page.
-const BOOKS: Readonly<Partial<Record<string, BookletId>>> = { mec109: "fellowship-of-the-ring", "learn-to-play": "learn-to-play" };
+const BOOKS: Readonly<Partial<Record<string, BookletId>>> = {
+  mec109: "fellowship-of-the-ring",
+  "learn-to-play": "learn-to-play",
+  tdom: "the-dark-of-mirkwood",
+  rr: "rules-reference",
+};
 
-/** The stored book and page a rule is printed on, when the app carries that book; the Rules Reference and FAQ it does not. */
+/** The stored book and page a rule is printed on, when the app carries that book; the FAQ and the Easy Mode sheet it does not. */
 export function bookPage(entry: Pick<RuleEntry, "doc" | "page">): { id: BookletId; name: string; page: number } | null {
   const id = BOOKS[entry.doc];
   return id ? { id, name: bookletName(id), page: entry.page } : null;
