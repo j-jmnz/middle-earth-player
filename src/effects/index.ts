@@ -6,6 +6,8 @@ import { AUTHORED_EFFECTS as SOUTH_AUTHORED, AUTHORED_REPLACES as SOUTH_REPLACES
 import { FAMILY_AUTHORED_EFFECTS, FAMILY_AUTHORED_REPLACES } from "./authored/families/index.ts";
 import { POOL_AUTHORED_EFFECTS, POOL_AUTHORED_REPLACES } from "./authored/pool/index.ts";
 import { GENERATED_EFFECTS as BOX_GENERATED } from "./generated/fellowship-of-the-ring.ts";
+import { GENERATED_EFFECTS as MIRKWOOD_GENERATED } from "./generated/mirkwood-paths.ts";
+import { GENERATED_EFFECTS as TDOM_GENERATED } from "./generated/the-dark-of-mirkwood.ts";
 import { POOL_GENERATED_EFFECTS } from "./generated/player-pool.ts";
 
 // Generated records (pnpm data:build) plus authored records. An authored record with the id of a generated
@@ -15,9 +17,9 @@ export function mergeEffects(generated: readonly Effect[], authored: readonly Ef
   return [...generated.filter((effect) => !replaced.has(effect.id)), ...authored];
 }
 
-// The box's records (scenario cards and both starter lists) and the rest of the player pool's, one file per pack or
+// The records of each box (scenario cards and both starter lists: the Fellowship's, the Revised Core Set's and The Dark of Mirkwood's) and the rest of the player pool's, one file per pack or
 // per mechanic family.
-export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...POOL_GENERATED_EFFECTS];
+export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...POOL_GENERATED_EFFECTS];
 export const AUTHORED_EFFECTS: readonly Effect[] = [...BOX_AUTHORED, ...FORD_AUTHORED, ...SOUTH_AUTHORED, ...POOL_AUTHORED_EFFECTS, ...FAMILY_AUTHORED_EFFECTS];
 export const AUTHORED_REPLACES: readonly string[] = [...BOX_REPLACES, ...FORD_REPLACES, ...SOUTH_REPLACES, ...POOL_AUTHORED_REPLACES, ...FAMILY_AUTHORED_REPLACES];
 

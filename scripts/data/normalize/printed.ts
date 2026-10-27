@@ -46,7 +46,9 @@ export function applyPrinted(cards: readonly Card[], ledger: Ledger): { cards: C
     };
     if (a) compare(keyOf(card.code, "A"), a.lines, sourceFront);
     if (b) compare(keyOf(card.code, "B"), b.lines, sourceBack);
-    if (!card.printings.some((printing) => printing.pack === "TFotR")) return card;
+    // A card whose text came from Hall of Beorn takes the ledger text: the box cards (the Fellowship's MEC109 printing, and
+    // every campaign, quest, encounter, boon and burden card). A deck-legal player card keeps its RingsDB text.
+    if (card.deckLegal && !card.printings.some((printing) => printing.pack === "TFotR")) return card;
     const backText = b ? (b.lines.length > 0 ? b.lines.join("\n") : null) : (card.back?.text ?? null);
     const back = b || card.back ? { name: card.back?.name ?? null, text: backText, questPoints: card.back?.questPoints ?? null, stage: card.back?.stage ?? null } : null;
     return {

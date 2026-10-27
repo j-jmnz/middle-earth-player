@@ -75,6 +75,21 @@ describe("built catalog", () => {
         }
       }
       expect(pictureless).toEqual([]);
+
+      // Mirkwood Paths and The Dark of Mirkwood: every card their scenarios deal has a picture the phone can download, and the
+      // campaigns are listed (locked until a scenario is playable).
+      const mirkwood = ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur", "the-oath", "the-caves-of-nibin-dum"];
+      const missing: string[] = [];
+      for (const id of mirkwood) {
+        const scenario = loadScenario(id);
+        for (const code of new Set([...scenarioCards(scenario).map((card) => card.code), scenario.campaignCard, ...scenario.campaignPlaced])) {
+          const row = database.prepare("select imagesrc from cards where code = ?").get(code);
+          if (typeof row?.imagesrc !== "string" || cardImageUrl(row.imagesrc) === null) missing.push(`${id} ${code}`);
+        }
+      }
+      expect(missing).toEqual([]);
+      expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("mirkwood-paths")).toMatchObject({ name: "Mirkwood Paths", scenario_count: 5, playable: 0 });
+      expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("the-dark-of-mirkwood")).toMatchObject({ name: "The Dark of Mirkwood", scenario_count: 2, playable: 0 });
       expect(database.prepare("select imagesrc from cards where code = ?").get("141031")?.imagesrc).toBe(
         "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bag-End.jpg",
       );

@@ -1,0 +1,27 @@
+{
+  "id": "mirkwood-paths",
+  "name": "Mirkwood Paths",
+  "scenarios": [
+    "passage-through-mirkwood",
+    "journey-along-the-anduin",
+    "escape-from-dol-guldur",
+    "the-oath",
+    "the-caves-of-nibin-dum"
+  ],
+  "campaignCards": {
+    "passage-through-mirkwood": "01129",
+    "journey-along-the-anduin": "01130",
+    "escape-from-dol-guldur": "01131",
+    "the-oath": "41050",
+    "the-caves-of-nibin-dum": "41051"
+  },
+  "prelude": [],
+  "starterDecks": [],
+  "bookletPages": {
+    "passage-through-mirkwood": 25,
+    "journey-along-the-anduin": 25,
+    "escape-from-dol-guldur": 25
+  },
+  "bookletId": "learn-to-play",
+  "saga": false
+}

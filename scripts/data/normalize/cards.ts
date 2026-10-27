@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { PrintedKeywords, RingsDbCard, RingsDbPack } from "../../../src/catalog/boundary.ts";
 import { cardSchema, type Card, type Printing } from "../../../src/catalog/card-facts.ts";
 import { deckLegal } from "../../../src/catalog/deck-legal.ts";
+import { CAMPAIGN_SUFFIX } from "../campaign-defs.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import { parseKeywordTokens } from "./keywords.ts";
 import type { RawData } from "./load-raw.ts";
@@ -15,6 +16,14 @@ const TWIN_SETS: ReadonlyMap<string, string> = new Map([
   ["The Black Riders", "TBR"],
   ["The Road Darkens", "TRD"],
 ]);
+// The boxes whose encounter, quest and campaign cards RingsDB does not carry (Hall of Beorn is their only source), and the
+// RingsDB pack each is printed in. A product's cards are taken by CardSet, so its Nightmare sets stay out.
+const PRODUCT_PACKS: ReadonlyMap<string, string> = new Map([
+  ["Revised Core Set", "RevCore"],
+  ["The Dark of Mirkwood", "TDoM"],
+]);
+// Types of the cards taken from those boxes: what a scenario deals. Player cards of the box are RingsDB's.
+const PRODUCT_TYPES = new Set(["Enemy", "Location", "Treachery", "Quest", "Objective", "Objective_Ally", "Campaign"]);
 // Sets Hall of Beorn numbers from 00001 with no RingsDB code of their own.
 const UNCODED_SETS = new Set([TFOTR, "The Two Towers", "The Return of the King"]);
 
@@ -57,6 +66,15 @@ const overridesSchema = z.object({
   // A printed Easy count the sources disagree on. `easy` is the count of copies that stay in an Easy deck.
   scenarioEasy: z
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
+  // A product whose Hall of Beorn codes collide with another product's: the code is `prefix` and the two-digit collector
+  // number, which is the code RingsDB gives the same cards where it lists them.
+  productCodes: z
+    .array(z.object({ set: z.string().min(1), prefix: z.string().regex(/^\d{3}$/), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
+  // A name a booklet prints for an encounter set that the cards print otherwise (the Learn to Play's "Journey Down the Anduin").
+  encounterSetAliases: z
+    .array(z.object({ booklet: z.string().min(1), set: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
   // Cards the app leaves out of the player card pool (not deck-legal): every card of a pack, or one card by code.
   outOfScope: z
@@ -139,7 +157,13 @@ const ENCOUNTER_TYPES = new Set(["enemy", "location", "treachery", "objective"])
 // Hall of Beorn lists it as the card's encounter set.
 function campaignFacts(card: HobCard): { campaignKind: "boon" | "burden" | null; burdenSet: string | null } {
   const kind = card.CardSubType === "Boon" ? "boon" : card.CardSubType === "Burden" ? "burden" : null;
-  return { campaignKind: kind, burdenSet: kind === "burden" ? (card.EncounterInfo?.EncounterSet ?? null) : null };
+  return { campaignKind: kind, burdenSet: kind === "burden" ? setName(card.EncounterInfo?.EncounterSet) : null };
+}
+
+// Hall of Beorn names the encounter sets of the campaign editions "Spiders of Mirkwood (Campaign)". The suffix is not part
+// of the set's name.
+function setName(name: string | null | undefined): string | null {
+  return name == null ? null : name.replace(CAMPAIGN_SUFFIX, "");
 }
 
 // RingsDB types every boon and burden "treasure" and gives it the type name Campaign. The type bar prints the real
@@ -184,7 +208,7 @@ function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts
     isUnique: card.IsUnique,
     quantity: card.Quantity,
     easyQuantity: card.EncounterInfo?.EasyModeQuantity ?? null,
-    encounterSet: card.EncounterInfo?.EncounterSet ?? null,
+    encounterSet: setName(card.EncounterInfo?.EncounterSet),
     hasErrata: card.HasErrata,
     ...campaignFacts(card),
   };
@@ -306,12 +330,21 @@ function outOfScope(overrides: Overrides, card: Pick<Card, "code" | "printings">
 export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[]; report: BuildReport } {
   const report: BuildReport = { unknownKeywords: {}, twinless: [], overridesUsed: [] };
 
+  // A product whose Hall of Beorn codes collide takes the code from its collector number (overrides.productCodes).
+  const prefixes = new Map(overrides.productCodes.map((entry) => [entry.set, entry]));
+  const hobCode = (card: HobCard): string | null => {
+    const prefix = prefixes.get(card.CardSet);
+    if (!prefix) return card.RingsDbCardId;
+    report.overridesUsed.push(`${card.CardSet} #${card.Number}: ${prefix.reason}`);
+    return `${prefix.prefix}${String(card.Number).padStart(2, "0")}`;
+  };
   const hobByCode = new Map<string, HobCard[]>();
   const hobByTitle = new Map<string, HobCard[]>();
   for (const card of raw.hob) {
     hobByTitle.set(titleKey(card.Title), [...(hobByTitle.get(titleKey(card.Title)) ?? []), card]);
-    if (UNCODED_SETS.has(card.CardSet) || !card.RingsDbCardId) continue;
-    hobByCode.set(card.RingsDbCardId, [...(hobByCode.get(card.RingsDbCardId) ?? []), card]);
+    const code = hobCode(card);
+    if (UNCODED_SETS.has(card.CardSet) || !code) continue;
+    hobByCode.set(code, [...(hobByCode.get(code) ?? []), card]);
   }
 
   // RingsDB cards, merged across the packs that reprint them.
@@ -443,6 +476,18 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const code = twin.RingsDbCardId;
     if (claimed.has(twin) || !code || byCode.has(code)) continue;
     byCode.set(code, merge(code, twin, twin));
+  }
+
+  // The scenario, quest and campaign cards of the Revised Core Set and The Dark of Mirkwood come from Hall of Beorn alone,
+  // filtered by CardSet. The Revised Core Set's encounter cards reuse the 2011 codes (01074 to 01131) and its printing
+  // owns them; the boons and burdens RingsDB lists keep that record and take Hall of Beorn's text.
+  for (const source of raw.hob) {
+    const pack = PRODUCT_PACKS.get(source.CardSet);
+    const code = hobCode(source);
+    if (!pack || !code || !PRODUCT_TYPES.has(source.CardType) || byCode.has(code)) continue;
+    const merged = merge(code, source, source);
+    merged.printings = merged.printings.map((printing) => ({ ...printing, pack }));
+    byCode.set(code, merged);
   }
 
   const cards: Card[] = [];

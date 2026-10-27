@@ -6,6 +6,18 @@
     "playable": true
   },
   {
+    "id": "mirkwood-paths",
+    "name": "Mirkwood Paths",
+    "scenarioCount": 5,
+    "playable": false
+  },
+  {
+    "id": "the-dark-of-mirkwood",
+    "name": "The Dark of Mirkwood",
+    "scenarioCount": 2,
+    "playable": false
+  },
+  {
     "id": "the-two-towers",
     "name": "The Two Towers",
     "scenarioCount": 6,

@@ -188,5 +188,21 @@
       "reason": "The Messenger of the King contract, whose heroes are left out, is left out of the card pool with them.",
       "source": "user decision, 2026-10-26"
     }
+  ],
+  "productCodes": [
+    {
+      "set": "The Dark of Mirkwood",
+      "prefix": "410",
+      "reason": "Hall of Beorn numbers The Dark of Mirkwood's cards 02001 to 02051, which are the codes RingsDB gives The Hunt for Gollum (02004 is Winged Guardian and also Surprise Attack). RingsDB lists the nine burden, boon and adaptation cards of the box as 41041 to 41049 (Stalking Goblin is 02041 in Hall of Beorn and 41041 in RingsDB). The code is therefore 410 and the two-digit collector number, for every card of the box, so the quest, encounter and campaign cards RingsDB does not list take the same pattern (After the Raid 41001, The Oath 41050).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet The Dark of Mirkwood, Number); ringsdb.com pack TDoM (41041 to 41049)"
+    }
+  ],
+  "encounterSetAliases": [
+    {
+      "booklet": "Journey Down the Anduin",
+      "set": "Journey Along the Anduin",
+      "reason": "The Revised Core Set's Learn to Play (p25) and the Easy Mode sheet (p2) call the second core scenario and its encounter set \"Journey Down the Anduin\". The scenario's own campaign card, quest cards and encounter set icon print \"Journey Along the Anduin\" (Mirkwood Paths - Part 2, scan 01130.A), and Hall of Beorn follows the cards. The card wins (authority order); the booklet's name is an alias.",
+      "source": "Learn to Play p25 (ltp.setup-journey-along-the-anduin); scan 01130.A; hallofbeorn.com/Export/Scenarios/Journey-Along-the-Anduin-(Campaign)"
+    }
   ]
 }

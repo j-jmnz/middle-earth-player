@@ -65,3 +65,72 @@ describe("Normal deck sizes", () => {
     expect(encounterCodes(scenario)).toHaveLength(size);
   });
 });
+
+// Mirkwood Paths and The Dark of Mirkwood (phase 27). The Fellowship assertions above stay as they are.
+describe("Mirkwood campaigns", () => {
+  const paths = loadCampaign("mirkwood-paths");
+  const mini = loadCampaign("the-dark-of-mirkwood");
+
+  it("lists the scenarios of each campaign in play order, the Oath and the Caves in both", () => {
+    expect(paths.scenarios).toEqual(["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur", "the-oath", "the-caves-of-nibin-dum"]);
+    expect(mini.scenarios).toEqual(["the-oath", "the-caves-of-nibin-dum"]);
+    expect(mini.campaignCards).toEqual({ "the-oath": paths.campaignCards["the-oath"], "the-caves-of-nibin-dum": paths.campaignCards["the-caves-of-nibin-dum"] });
+  });
+
+  it("are not sagas: no prelude, no starter decks, and each opens its own booklet", () => {
+    for (const campaign of [paths, mini]) {
+      expect(campaign.saga).toBe(false);
+      expect(campaign.prelude).toEqual([]);
+      expect(campaign.starterDecks).toEqual([]);
+    }
+    expect(loadCampaign().saga).toBe(true);
+    expect(loadCampaign().bookletId).toBe("fellowship-of-the-ring");
+    expect(paths.bookletId).toBe("learn-to-play");
+    expect(mini.bookletId).toBe("the-dark-of-mirkwood");
+    expect(paths.bookletPages).toEqual({ "passage-through-mirkwood": 25, "journey-along-the-anduin": 25, "escape-from-dol-guldur": 25 });
+    expect(mini.bookletPages).toEqual({ "the-oath": 3, "the-caves-of-nibin-dum": 5 });
+  });
+
+  it("builds each scenario with its campaign card, and deals only cards data/cards has", () => {
+    const dataDir = new URL("../../data/", import.meta.url).pathname;
+    for (const campaign of [paths, mini]) {
+      expect(() => loadScenarioDefinitions(dataDir, byCode, [], campaign.id)).not.toThrow();
+      for (const id of campaign.scenarios) {
+        const scenario = loadScenario(id);
+        expect(campaign.campaignCards[id], id).toBe(scenario.campaignCard);
+        expect(byCode.get(scenario.campaignCard)?.type, id).toBe("campaign");
+      }
+    }
+  });
+
+  it("numbers each box's scenarios in order within the box", () => {
+    expect(["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"].map((id) => loadScenario(id).number)).toEqual([1, 2, 3]);
+    expect(["the-oath", "the-caves-of-nibin-dum"].map((id) => loadScenario(id).number)).toEqual([1, 2]);
+  });
+
+  // Pins: the printed Normal deck of each scenario, with the Setup moves written down from the quest card's Setup (the ledger),
+  // re-derived from Hall of Beorn's Normal quantities. The encounter deck at Normal and Easy is what encounterCodes deals.
+  const DECK = {
+    "passage-through-mirkwood": { normal: 34, easy: 25, staging: ["01096", "01099"], setAside: [] },
+    "journey-along-the-anduin": { normal: 47, easy: 32, staging: [], setAside: [] },
+    "escape-from-dol-guldur": { normal: 37, easy: 26, staging: ["01108", "01109", "01110"], setAside: ["01102"] },
+    "the-oath": { normal: 31, easy: 23, staging: ["41010"], setAside: ["41019"] },
+    "the-caves-of-nibin-dum": { normal: 33, easy: 25, staging: [], setAside: ["41027", "41028"] },
+  } as const;
+
+  it.each(Object.entries(DECK))("%s deals the encounter deck the quest card's Setup leaves", (id, pin) => {
+    const scenario = loadScenario(id);
+    expect(encounterCodes(scenario)).toHaveLength(pin.normal);
+    expect(encounterCodes(scenario, "Easy")).toHaveLength(pin.easy);
+    expect(scenario.cards.filter((card) => card.pile === "staging").map((card) => card.code).sort()).toEqual([...pin.staging]);
+    expect(scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code).sort()).toEqual([...pin.setAside]);
+    expect(scenario.source.dragnNormal).toBeNull();
+  });
+
+  it("sets Cave Torch aside for the first player to attach, and Valor, Scarred and the boons to the campaign card", () => {
+    expect(loadScenario("the-caves-of-nibin-dum").cards.find((card) => card.code === "41029")?.pile).toBe("attachedChosen");
+    expect(loadScenario("journey-along-the-anduin").campaignPlaced).toEqual(["01133", "01135", "01138"]);
+    expect(loadScenario("the-oath").campaignPlaced).toEqual(["41041", "41043", "41044", "41045", "41046", "41047"]);
+    expect(loadScenario("the-caves-of-nibin-dum").campaignPlaced).toEqual(["41042", "41048", "41049"]);
+  });
+});

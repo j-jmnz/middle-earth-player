@@ -141,3 +141,31 @@ describe("rules store", () => {
     expect(text("mec109.ringbearers-life")).toContain("set the Ring-bearer’s life at 15");
   });
 });
+
+// Mirkwood Paths and The Dark of Mirkwood (phase 27): the hand-checked spans their scenario data reads.
+describe("Mirkwood spans", () => {
+  const text = (id: string) => (byId.get(id)?.text ?? "").replace(/\s+/g, " ");
+
+  it("pin The Dark of Mirkwood rulebook as a document of 8 pages with its campaign-mode page", () => {
+    expect(docs.get("tdom")?.pages.length).toBe(8);
+    expect(text("tdom.campaign-mode")).toContain("pages 30");
+    expect(text("tdom.mirkwood-paths")).toContain("The Oath is part 4");
+    expect(text("tdom.mirkwood-paths")).toContain("is part 5");
+    expect(text("tdom.mini-campaign")).toContain("blank Campaign Log");
+  });
+
+  it("print each scenario's encounter-deck paragraph, the set lists the build checks Hall of Beorn against", () => {
+    expect(text("ltp.setup-passage-through-mirkwood")).toContain("Passage Through Mirkwood, Spiders of Mirkwood, and Dol Guldur Orcs");
+    expect(text("ltp.setup-journey-along-the-anduin")).toContain("Journey Down the Anduin, Sauron’s Reach, Dol Guldur Orcs, and Wilderlands");
+    expect(text("ltp.setup-escape-from-dol-guldur")).toContain("Escape from Dol Guldur, Spiders of Mirkwood, and Dol Guldur Orcs");
+    expect(text("tdom.setup-the-oath")).toContain("The Oath and The Goblins");
+    expect(text("tdom.setup-the-caves-of-nibin-dum")).toContain("The Caves of Nibin-dûm and The Goblins");
+  });
+
+  it("list what Easy Mode removes from each Core Set encounter set (easy-mode.core-set)", () => {
+    const sheet = text("easy-mode.core-set");
+    expect(sheet).toContain("Dol Guldur Orcs 1x Chieftain Ufthak 1x Dol Guldur Beastmaster");
+    expect(sheet).toContain("Passage Through Mirkwood None");
+    expect(sheet).toContain("2x Dungeon Jailor");
+  });
+});

@@ -29,7 +29,7 @@ export function openDataDatabase(dataDir = DATA_DIR): DatabaseSync {
     insertCard.run(c.code, c.name, c.type, c.typeName, c.sphere, json(c.traits), +c.isUnique, c.cost, c.deckLimit, c.threat, c.willpower, c.attack, c.defense, c.health, c.questPoints, c.victory, c.engagementCost, c.quantity, c.easyQuantity, c.encounterSet, c.stage, json(c.keywords), json(c.timings), c.text, c.shadowText, json(c.back), +c.hasErrata, c.errata, c.imagesrc, +c.deckLegal, json(c.printings));
   }
   const insertPlacement = db.prepare("insert into scenario_cards values (?,?,?,?,?)");
-  for (const scenario of loadScenarios(dataDir)) for (const card of scenario.cards) insertPlacement.run(scenario.id, card.code, card.pile, card.normal, card.easy);
+  for (const scenario of loadScenarios(undefined, dataDir)) for (const card of scenario.cards) insertPlacement.run(scenario.id, card.code, card.pile, card.normal, card.easy);
   const insertRule = db.prepare("insert into rules values (?,?,?,?,?,?)");
   for (const entry of JSON.parse(readFileSync(path.join(dataDir, "rules", "entries.json"), "utf8")) as RuleEntry[]) insertRule.run(entry.id, entry.doc, entry.page, entry.title, entry.text, json(entry.terms));
   return db;

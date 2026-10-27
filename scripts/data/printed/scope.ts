@@ -2,12 +2,12 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { loadCards } from "../load-cards.ts";
-import { dealtCodes, loadCampaign, loadScenarios } from "../load-scenarios.ts";
+import { dealtCodes, loadCampaign, loadCampaigns, loadScenarios } from "../load-scenarios.ts";
 import { RAW_DIR } from "../paths.ts";
 
-// The cards whose printed text the ledger holds in this phase: everything A Shadow of the Past deals, The One
-// Ring, the six campaign cards, and both starter lists. Phase 8d adds the cards of scenarios 2 to 6; the player's
-// requests add cards of their own decks.
+// The cards whose printed text the ledger holds: everything every built scenario deals (the six of the Fellowship box, the
+// three Revised Core scenarios, The Oath and The Caves of Nibin-Dûm), The One Ring, the campaign cards, the boons and
+// burdens of each box, and both starter lists. The player's requests add cards of their own decks.
 export type ScanSide = "A" | "B";
 export type ScanTarget = { code: string; side: ScanSide; printing: string; urls: string[] };
 
@@ -28,6 +28,10 @@ const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
 
 const CAMPAIGN_CARDS = ["141030", "141044", "141056", "142019", "142039", "142060"];
 
+// The packs whose boons and burdens a built campaign deals: the Fellowship box's MEC109 printing, the Revised Core Set and
+// The Dark of Mirkwood.
+const BOX_PACKS: ReadonlySet<string> = new Set(["TFotR", "RevCore", "TDoM"]);
+
 // Player cards outside the box that the player's own decks play and reported doing nothing (user request, 2026-10-25):
 // The Shirefolk lowers its player's threat. Then every card of the four core-set Learn to Play decks (core-leadership,
 // core-tactics, core-spirit, core-lore in data/decks/prebuilt.json) whose text had no record (user request, 2026-10-26).
@@ -38,6 +42,11 @@ export const PLAYER_REQUESTS = [
   ...["01015", "01018", "01019", "01022", "01029", "01032", "01033", "01036", "01037", "01038", "01039", "01040", "01041"],
   ...["01044", "01047", "01049", "01052", "01054", "01055", "01056"],
   ...["01058", "01061", "01063", "01064", "01065", "01066", "01067", "01068", "01069", "01070", "01071", "01072"],
+  // Core cards the Mirkwood Paths plan (docs/plans/mirkwood-paths.md, phase 27) ledgers beside its boxes: Guard of the Citadel,
+  // Silverlode Archer and Horseback Archer, the three core player cards the four Learn to Play decks hold that no record read.
+  "01013",
+  "01017",
+  "01030",
 ];
 
 // The codes of both starter lists, from the campaign file (data/starter-decks.json).
@@ -45,8 +54,13 @@ export function starterCodes(): string[] {
   return [...new Set(loadCampaign().starterDecks.flatMap((deck) => deck.rows.map((row) => row.code)))].sort();
 }
 
-// Every card Hall of Beorn lists for one of the six scenarios (Normal or Easy), the quest cards, and the box's
-// 28 boons and burdens. Phase 8d ledgers all of them.
+// Every built campaign's campaign cards, one per scenario.
+function campaignCards(): string[] {
+  return loadCampaigns().flatMap((campaign) => Object.values(campaign.campaignCards));
+}
+
+// Every card Hall of Beorn lists for a built scenario (Normal or Easy), the quest cards, and the boons and burdens of
+// each box.
 function boxCodes(): string[] {
   const cards = loadCards();
   const bySlug = new Map(cards.flatMap((card) => card.printings.flatMap((printing) => (printing.hobSlug ? [[printing.hobSlug, card.code] as const] : []))));
@@ -59,7 +73,7 @@ function boxCodes(): string[] {
       if (code) codes.add(code);
     }
   }
-  for (const card of cards) if (card.campaignKind && card.printings.some((printing) => printing.pack === "TFotR")) codes.add(card.code);
+  for (const card of cards) if (card.campaignKind && card.printings.some((printing) => BOX_PACKS.has(printing.pack))) codes.add(card.code);
   // The box's Ring-bearer: every scenario starts with a Fellowship-sphere Ring-bearer hero in play (mec109.setting-up-the-game),
   // so his text is part of every game.
   for (const card of cards) {
@@ -69,10 +83,10 @@ function boxCodes(): string[] {
 }
 
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...CAMPAIGN_CARDS, ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaign(), loadScenarios()), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
+  return [...new Set<string>([...CAMPAIGN_CARDS, ...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
 }
 
-type HobImages = { CardSet: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };
+type HobImages = { CardSet: string; Slug: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };
 
 function hobImages(): HobImages[] {
   return ["EncounterCards", "QuestCards", "PlayerCards"].flatMap((kind) => JSON.parse(readFileSync(path.join(RAW_DIR, "hallofbeorn", `${kind}.json`), "utf8")) as HobImages[]);
@@ -114,7 +128,11 @@ export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget
       }
     }
     if (sources.length === 0) {
-      const rows = hob.filter((row) => row.RingsDbCardId === code && row.Front.ImagePath);
+      // A card RingsDB carries with no picture: Hall of Beorn's record is found by the slug the build matched it by (The Dark of
+      // Mirkwood's 41041 is Hall of Beorn's 02041, a code that is another card's), else by code.
+      const slugs = new Set(card.printings.flatMap((printing) => (printing.hobSlug ? [printing.hobSlug] : [])));
+      const bySlug = hob.filter((row) => slugs.has(row.Slug) && row.Front.ImagePath);
+      const rows = bySlug.length > 0 ? bySlug : hob.filter((row) => row.RingsDbCardId === code && row.Front.ImagePath);
       rows.sort((a, b) => (CORE_ORDER.indexOf(a.CardSet) + 1 || 99) - (CORE_ORDER.indexOf(b.CardSet) + 1 || 99));
       const best = rows[0];
       if (best?.Front.ImagePath) sources.push({ printing: best.CardSet, urls: [best.Front.ImagePath, ...(best.Back?.ImagePath ? [best.Back.ImagePath] : [])] });

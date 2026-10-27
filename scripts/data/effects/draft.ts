@@ -8,7 +8,7 @@ import { runScript, type Log } from "../../log.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { prebuiltDecksSchema } from "../../../src/catalog/prebuilt-deck.ts";
 import { loadCards } from "../load-cards.ts";
-import { dealtCodes, loadCampaign, loadScenario } from "../load-scenarios.ts";
+import { dealtCodes, loadCampaigns, loadScenario, loadScenarios, starterCodes } from "../load-scenarios.ts";
 import { keyOf, loadLedger } from "../printed/ledger.ts";
 import { isPoolCard, withPool } from "../printed/pool.ts";
 import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
@@ -35,10 +35,10 @@ function similarity(left: string, right: string): number {
 function main(log: Log): void {
   const scenarioId = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
   if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,...>");
-  const campaign = loadCampaign();
+  const campaigns = loadCampaigns();
   const cards = loadCards();
   const prebuilt = prebuiltDecksSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "decks", "prebuilt.json"), "utf8")) as unknown).find((entry) => entry.id === scenarioId);
-  const deck = campaign.starterDecks.find((entry) => entry.id === scenarioId) ?? (prebuilt ? { id: prebuilt.id, rows: [...prebuilt.heroes.map((code) => ({ code })), ...prebuilt.cards] } : undefined);
+  const deck = campaigns.flatMap((campaign) => campaign.starterDecks).find((entry) => entry.id === scenarioId) ?? (prebuilt ? { id: prebuilt.id, rows: [...prebuilt.heroes.map((code) => ({ code })), ...prebuilt.cards] } : undefined);
   const packCodes = cards.filter((card) => isPoolCard(card) && card.printings[0]?.pack === scenarioId).map((card) => card.code);
   const listed = /^[0-9A-Za-z]+(,[0-9A-Za-z]+)+$|^\d{5,6}$/.test(scenarioId) ? scenarioId.split(",") : [];
   const chosen = deck ? deck.rows.map((row) => row.code) : packCodes.length > 0 ? packCodes : listed;
@@ -54,9 +54,9 @@ function main(log: Log): void {
     for (const [guid, rules] of Object.entries(parsed.automation?.cards ?? {})) automation.set(guid, rules);
   }
 
-  const generated = generateEffects(cards, scenario ? [scenario] : [], campaign, ledger);
+  const generated = generateEffects(cards, scenario ? [scenario] : [], campaigns, ledger);
   // Every card the scenario deals: its piles, its campaign card, the cards that card places (campaignPlaced) and the prelude.
-  const dealt = chosen.length > 0 ? new Set(chosen) : dealtCodes(campaign, scenario ? [scenario] : []);
+  const dealt = chosen.length > 0 ? new Set(chosen) : dealtCodes(campaigns, scenario ? [scenario] : []);
   const all = process.argv.includes("--all");
   // A line the ledger marks inert (a reminder, a keyword the engine reads) is owned and needs no record.
   const inert = (lineId: string): boolean => {
@@ -67,6 +67,19 @@ function main(log: Log): void {
   const byCard = new Map<string, Unmatched[]>();
   for (const line of open) byCard.set(line.card.code, [...(byCard.get(line.card.code) ?? []), line]);
 
+  // Where a card's records go: a pool card's pack file, a boon or burden of the Revised Core Set or The Dark of Mirkwood in that
+  // pack's pool file, the Fellowship box's cards in the Fellowship file, and any other box card in the file of the first
+  // scenario that deals it (src/effects/authored/<scenario-id>.ts).
+  const starters = starterCodes(campaigns);
+  const fellowship = new Set(campaigns.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarios ?? []);
+  const scenarios = loadScenarios();
+  const targetOf = (card: Card): string => {
+    const pack = card.printings[0]?.pack;
+    if ((isPoolCard(card) && !starters.has(card.code)) || (card.campaignKind != null && (pack === "RevCore" || pack === "TDoM"))) return `src/effects/authored/pool/${pack}.ts`;
+    const dealer = scenarios.find((entry) => dealtCodes([], [entry]).has(card.code));
+    return dealer && !fellowship.has(dealer.id) ? `src/effects/authored/${dealer.id}.ts` : "src/effects/authored/fellowship-of-the-ring.ts";
+  };
+
   const out = path.join(ROOT, ".agent", "drafts");
   mkdirSync(out, { recursive: true });
   for (const [code, lines] of byCard) {
@@ -75,7 +88,7 @@ function main(log: Log): void {
     const sections: string[] = [
       `# ${code} ${card.name}`,
       ``,
-      `Scenario: ${scenarioId}. Write the records into ${isPoolCard(card) && !campaign.starterDecks.some((entry) => entry.rows.some((row) => row.code === code)) ? `src/effects/authored/pool/${card.printings[0]?.pack}.ts` : "src/effects/authored/fellowship-of-the-ring.ts"}, each with \`lines\` naming the line ids above, then run \`pnpm effects:open\`, \`pnpm vitest run scripts/effect-coverage.test.ts\` and the scenario tests.`,
+      `Scenario: ${scenarioId}. Write the records into ${targetOf(card)}, each with \`lines\` naming the line ids above, then run \`pnpm effects:open\`, \`pnpm vitest run scripts/effect-coverage.test.ts\` and the scenario tests.`,
       ``,
       `## Lines without a record`,
       ...lines.map((line) => `- ${line.lineId} (${line.side}${line.timing ? `, ${line.timing}` : ""}) ${line.line}`),
