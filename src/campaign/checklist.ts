@@ -41,7 +41,6 @@ const TEXT: Readonly<Record<number, string>> = {
   8: "Set encounter deck.",
 };
 
-type Choosing = Extract<Instruction, { verb: "ChooseCards" }>;
 
 function poolCard(printed: PrintedCard, code: string, attachedTo: string | null, seat: number | null): PoolCard {
   return { code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo, seat };

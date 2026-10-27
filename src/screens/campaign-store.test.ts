@@ -32,6 +32,17 @@ describe("campaign store", () => {
     expect(listSaves(user).map((save) => save.id).sort()).toEqual([first.id, second.id].sort());
   });
 
+  it("a new playthrough stores the carry-over it took in, and an older stored log reads with the facts' defaults", () => {
+    const user = openUser();
+    const carried = [{ code: "01135", back: "encounter" as const, burdenSet: null, attachedTo: null, seat: null }];
+    const next = createSave(user, "mirkwood-paths", 1, 3000, carried);
+    expect(readSave(user, next.id)?.log.carryIn).toEqual(carried);
+    expect(createSave(user, "the-dark-of-mirkwood", 1, 4000).log).toEqual(emptyLog(1));
+    const { prisoner: _p, usedOnce: _u, counters: _c, carryOver: _o, carryIn: _i, ...old } = emptyLog(1);
+    writeSave(user, { ...next, log: old as unknown as typeof next.log }, 3000);
+    expect(readSave(user, next.id)?.log).toEqual(emptyLog(1));
+  });
+
   it("keeps the log, the open scenario and the loadout across a write and a read", () => {
     const user = openUser();
     const save = {

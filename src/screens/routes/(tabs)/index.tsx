@@ -108,7 +108,7 @@ export default function CampaignList() {
   }));
 
   function start(campaignId: string, seats: Seats, carried: readonly PoolCard[]): void {
-    const save = createSave(user, campaignId, seats, Date.now(), carried);
+    const save = createSave(user, campaignId, seats, undefined, carried);
     refresh();
     setStarting(false);
     openPath(save);
