@@ -1,0 +1,51 @@
+appId: com.middleearth.lcg
+---
+# Phase 28b. Written in a cloud session: it has not run. A folded section stays folded after a relaunch, on each tab. Needs the e2e-test build for the fixture save.
+- launchApp:
+    clearState: true
+# Campaigns: a fresh install has no playthrough, so the e2e-test build's fixture (EXPO_PUBLIC_E2E_SEED=1) writes one first.
+- openLink: "middleearthlcg://e2e/lost"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: path-back
+- assertVisible:
+    id: section-current
+- assertVisible:
+    id: section-current-body
+- tapOn:
+    id: section-current
+- assertNotVisible:
+    id: section-current-body
+- launchApp
+- assertVisible:
+    id: section-current
+- assertNotVisible:
+    id: section-current-body
+# Open it again, so the next run starts the same.
+- tapOn:
+    id: section-current
+- assertVisible:
+    id: section-current-body
+# Scenarios: fold a box and relaunch.
+- tapOn:
+    id: scenarios-tab
+- assertVisible:
+    id: section-box-fellowship-of-the-ring-body
+- tapOn:
+    id: section-box-fellowship-of-the-ring
+- assertNotVisible:
+    id: section-box-fellowship-of-the-ring-body
+- launchApp
+- tapOn:
+    id: scenarios-tab
+- assertVisible:
+    id: section-box-fellowship-of-the-ring
+- assertNotVisible:
+    id: section-box-fellowship-of-the-ring-body
+- tapOn:
+    id: section-box-fellowship-of-the-ring
+- assertVisible:
+    id: section-box-fellowship-of-the-ring-body

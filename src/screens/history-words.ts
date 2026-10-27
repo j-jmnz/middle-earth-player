@@ -1,0 +1,58 @@
+// The words History shows for a run. A field the store never knew (a back-filled run's end time, threats, start) is left out,
+// never invented. Pure.
+import type { RunRecord } from "../campaign/runs";
+import { seatWord } from "./seats";
+import { whenOf } from "./history-list";
+
+export function plural(count: number, word: string): string {
+  return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
+/** "24 Oct 2026", or null when the run has no time. */
+export function runDate(run: RunRecord): string | null {
+  const when = whenOf(run);
+  return when == null ? null : new Date(when).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+/** "Won", or "Lost" and the cause the engine gave. */
+export function resultWords(run: RunRecord): string {
+  return run.result === "won" ? "Won" : run.lossCause ? `Lost · ${run.lossCause}` : "Lost";
+}
+
+/** "True solo · Aragorn, Théodred" or, two-handed, "Two-handed · Aragorn, Théodred / Gimli". */
+export function seatsWords(run: RunRecord, nameOf: (code: string) => string): string {
+  const seats = run.heroes.map((seat) => seat.map(nameOf).join(", ")).filter((words) => words.length > 0);
+  return [seatWord(run.seatCount), seats.length > 0 ? seats.join(" / ") : null].filter((part) => part != null).join(" · ");
+}
+
+/** "4 rounds · threat 31" or "4 rounds · threat 28 / 33"; each part left out when the store did not know it. */
+export function courseWords(run: RunRecord): string | null {
+  const parts = [run.rounds == null ? null : plural(run.rounds, "round"), run.threats && run.threats.length > 0 ? `threat ${run.threats.join(" / ")}` : null].filter((part) => part != null);
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
+/** "Score 41 · 2 victory points · Mendor, Mendor's Support": a win's score and, in a campaign, what it earned. */
+export function scoreWords(run: RunRecord, nameOf: (code: string) => string): string | null {
+  if (run.result !== "won") return null;
+  const parts = [
+    run.score == null ? null : `Score ${run.score}`,
+    run.victoryPoints == null ? null : plural(run.victoryPoints, "victory point"),
+    run.reward && run.reward.length > 0 ? run.reward.map(nameOf).join(", ") : null,
+  ].filter((part) => part != null);
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
+/** The one line the screen reader gets for a row. */
+export function runLabel(run: RunRecord, scenario: string, nameOf: (code: string) => string, deleted: boolean): string {
+  return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), deleted ? deletedWords(run.kind) : null].filter((part) => part != null).join(", ");
+}
+
+export function deletedWords(kind: RunRecord["kind"]): string {
+  return kind === "campaign" ? "Its playthrough was deleted" : "This game was deleted";
+}
+
+/** The one line an empty list says. */
+export function emptyWords(kind: RunRecord["kind"], filtered: boolean): string {
+  if (filtered) return "No runs match these filters.";
+  return kind === "campaign" ? "No campaign run yet. A scenario you win or lose in a playthrough is listed here." : "No standalone run yet. A game you win or lose is listed here.";
+}

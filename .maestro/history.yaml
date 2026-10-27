@@ -1,0 +1,75 @@
+appId: com.middleearth.lcg
+---
+# Phase 28b. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The `lost`
+# fixture is a real solo game of A Shadow of the Past parked on its loss; closing the loss on the Resolution screen writes the run.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/lost"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: path-back
+- tapOn:
+    id: continue
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 15000
+- tapOn:
+    id: resolution-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: path-back
+# The Campaigns tab opens History on the campaign kind, and the loss is a run although it wrote no log entry.
+- tapOn:
+    id: history-open
+- assertVisible:
+    id: history
+- assertVisible:
+    id: "run-campaign:save-e2e-lost:a-shadow-of-the-past:.*"
+- assertVisible: "A Shadow of the Past"
+- assertVisible: "Lost"
+# The standalone kind has no run yet.
+- tapOn:
+    id: history-standalone
+- assertVisible:
+    id: history-empty
+- tapOn:
+    id: history-campaign
+- assertVisible:
+    id: "run-campaign:save-e2e-lost:a-shadow-of-the-past:.*"
+# A tap on a campaign run opens that playthrough's log.
+- tapOn:
+    id: "run-campaign:save-e2e-lost:a-shadow-of-the-past:.*"
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- tapOn:
+    id: log-back
+- tapOn:
+    id: history-back
+# The Scenarios tab opens History on the standalone kind.
+- tapOn:
+    id: scenarios-tab
+- tapOn:
+    id: history-open
+- assertVisible:
+    id: history
+- assertVisible:
+    id: history-empty
+- tapOn:
+    id: history-campaign
+- assertVisible:
+    id: "run-campaign:save-e2e-lost:a-shadow-of-the-past:.*"

@@ -198,8 +198,9 @@ export default function CampaignList() {
       <ScreenScroll scrollRef={scroll}>
         <View className="flex-row items-center justify-between pb-3 pt-4">
           <ScreenTitle>Campaigns</ScreenTitle>
-          {saves.length > 0 ? (
-            <View className="-mr-3">
+          <View className="-mr-3 flex-row">
+            <TextButton label="History" testID="history-open" tone="muted" accessibilityLabel="History of finished scenarios" onPress={() => router.push({ pathname: "/history", params: { kind: "campaign" } })} />
+            {saves.length > 0 ? (
               <TextButton
                 label={managing ? "Done" : "Manage"}
                 testID="manage-playthroughs"
@@ -207,8 +208,8 @@ export default function CampaignList() {
                 accessibilityLabel={managing ? "Done managing playthroughs" : "Manage playthroughs"}
                 onPress={toggleManage}
               />
-            </View>
-          ) : null}
+            ) : null}
+          </View>
         </View>
         <View className="gap-3">
           {current ? (

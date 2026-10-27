@@ -184,8 +184,9 @@ export default function Scenarios() {
             <ScreenTitle>Scenarios</ScreenTitle>
             <Label className="mt-1">Standalone adventures. No campaign log, boons or burdens.</Label>
           </View>
-          {games.length > 0 ? (
-            <View className="-mr-3">
+          <View className="-mr-3 flex-row">
+            <TextButton label="History" testID="history-open" tone="muted" accessibilityLabel="History of finished games" onPress={() => router.push({ pathname: "/history", params: { kind: "standalone" } })} />
+            {games.length > 0 ? (
               <TextButton
                 label={managing ? "Done" : "Manage"}
                 testID="manage-games"
@@ -195,8 +196,8 @@ export default function Scenarios() {
                   setDeleting(null);
                 }}
               />
-            </View>
-          ) : null}
+            ) : null}
+          </View>
         </View>
 
         {playing.length > 0 ? (

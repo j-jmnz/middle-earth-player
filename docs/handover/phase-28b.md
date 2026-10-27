@@ -7,9 +7,10 @@
 
 - Fold control (`fold-section.tsx`, `fold-state.ts`, `section-store.ts`), both tabs folded, design-system.md updated for it.
 
+- History screen (`history-view.tsx`, `history-list.ts`, `history-words.ts`, route `history.tsx`), history-open buttons, design-system.md, Maestro flows.
+
 ## In progress / next
-- History screen (`history`), history-open buttons, design-system.md.
-- Maestro: `.maestro/history.yaml`, `.maestro/sections-fold.yaml`.
+- Verify (tsc, lint, test, data:check, web export, screenshots), STATUS note, delete this file.
 
 ## Decisions
 - Back-fill runs in TS after migrate (not SQL): JSON logs are parsed with the app's own schemas, and it is testable.
