@@ -86,7 +86,6 @@ export const MOTION = {
   menuLeave: tween(150, "inCubic"),
   carouselEnter: tween(240, "outCubic"),
   carouselLeave: tween(180, "inCubic"),
-  railSlide: tween(280, "outCubic"),
   railFlashIn: tween(60, null),
   railFlashOut: tween(240, null),
   railFlash: tween(300, null),

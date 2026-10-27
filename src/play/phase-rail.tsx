@@ -1,17 +1,18 @@
 // The phase rail in the top bar's middle (docs/design-system.md, Table; phase 20): a pill holding the round, the phase in gold
-// Cinzel capitals and the step, with the previous and next phase beside it when there is room. A tap opens the phase carousel
-// (phase-carousel.tsx); the rail itself sends no intent. Phase changes slide the neighbor names one place and flash the pill's
-// edge, a step change cross-fades the step (MOTION.railSlide, railFlash, railStep); all of it snaps under reduced motion and never gates a rule.
+// Cinzel capitals and the step, with the previous and next phase inline at the phase's sides when there is room. A tap opens the
+// phase carousel (phase-carousel.tsx); the rail itself sends no intent. A phase change flashes the pill's edge, a step change
+// cross-fades the step (MOTION.railFlash, railStep); both snap under reduced motion and never gate a rule. The neighbor names do not
+// move: they change in place.
 import { useEffect, useMemo, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut, interpolateColor, LayoutAnimationConfig, SlideInRight, SlideOutLeft, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, interpolateColor, LayoutAnimationConfig, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { STOP_AHEAD_WORDS } from "./carousel.ts";
 import { layoutAnim, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { Rail } from "./rail.ts";
 import { tableTokens as t, withAlphaHex } from "./tokens.ts";
-import { CHEVRON, PHASE_SLOT, SIDE_GAP, STOP_MARK } from "./top-bar-layout.ts";
+import { CHEVRON, NEIGHBOR_GAP } from "./top-bar-layout.ts";
 
 
 /** A chevron drawn as two edges of a rotated square: no printed icon fits, and a glyph depends on the font. */
@@ -46,67 +47,27 @@ export function Chevron({ direction, color = t.muted }: { direction: "previous" 
   );
 }
 
-// The neighbor phase's name in a slot of fixed width: a new name slides in from the right while the old one leaves to the left.
-function Neighbor({ side, name, stopAhead }: { side: "previous" | "next"; name: string; stopAhead: boolean }) {
-  const scale = useMotionScale();
-  const slide = useMemo(() => ({ in: layoutAnim(SlideInRight, MOTION.railSlide, scale), out: layoutAnim(SlideOutLeft, MOTION.railSlide, scale) }), [scale]);
-  const slot = (
-    <View style={{ width: PHASE_SLOT, height: 18, overflow: "hidden" }}>
-      {name ? (
-        <Animated.Text
-          key={name}
-          testID={`rail-${side}`}
-          numberOfLines={1}
-          entering={slide.in}
-          exiting={slide.out}
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            color: t.muted,
-            fontSize: 13,
-            lineHeight: 18,
-            textAlign: side === "previous" ? "right" : "left",
-          }}
-        >
-          {name}
-        </Animated.Text>
-      ) : null}
-    </View>
-  );
-  // Both sides keep the room for the gold S, so the pill stays centered whether or not a stop is ahead.
-  const mark = (
-    <View style={{ width: STOP_MARK, alignItems: "center" }}>
-      {side === "next" && stopAhead ? (
-        <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-gold">
-          S
-        </Text>
-      ) : null}
-    </View>
-  );
+// A neighbor phase's name, inline at the phase's side in muted label. Plain text: it neither slides nor fades.
+function Neighbor({ side, name }: { side: "previous" | "next"; name: string }) {
+  if (!name) return null;
   return (
-    <View importantForAccessibility="no-hide-descendants" style={{ flexDirection: "row", alignItems: "center", gap: SIDE_GAP }}>
-      {side === "previous" ? (
-        <>
-          {mark}
-          <Chevron direction="previous" />
-          {slot}
-        </>
-      ) : (
-        <>
-          {slot}
-          <Chevron direction="next" />
-          {mark}
-        </>
-      )}
-    </View>
+    <Text
+      testID={`rail-${side}`}
+      numberOfLines={1}
+      importantForAccessibility="no"
+      className="text-label text-muted"
+      style={{ lineHeight: 20, [side === "previous" ? "marginRight" : "marginLeft"]: NEIGHBOR_GAP }}
+    >
+      {name}
+    </Text>
   );
 }
 
 /**
- * The rail: round, phase and step in a pill, "Round 3 · QUEST" over "Staging". `wide` adds the previous and next phase at its
- * sides; `shortRound` (a phone under 760 pt inside the insets) says "R3" for the round. `stopAhead` puts a gold S by the next
- * chevron, or at the end of the pill's top line when the neighbors are not shown. The pill's goldLine edge says it is a button. A tap calls `onPress` (the carousel opens or closes).
+ * The rail: round, phase and step in a pill, "Round 3 · QUEST" over "Staging". `wide` puts the previous and next phase inline at
+ * the phase's sides, "Round 3 · Planning QUEST Travel"; `shortRound` (a phone under 760 pt inside the insets) says "R3" for the
+ * round. `stopAhead` puts a gold S at the end of the pill's top line. The pill's goldLine edge says it is a button. A tap calls
+ * `onPress` (the carousel opens or closes).
  */
 export function PhaseRail({
   rail,
@@ -153,7 +114,6 @@ export function PhaseRail({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        gap: SIDE_GAP,
         minHeight: 44,
         borderRadius: 999,
         backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent",
@@ -161,7 +121,6 @@ export function PhaseRail({
     >
       {/* What is on the table when it opens appears; it does not slide or fade in. */}
       <LayoutAnimationConfig skipEntering>
-        {wide ? <Neighbor side="previous" name={rail.previousPhase} stopAhead={false} /> : null}
         <Animated.View
           style={[
             {
@@ -195,6 +154,7 @@ export function PhaseRail({
                   ·
                 </Text>
               ) : null}
+              {wide && rail.phase ? <Neighbor side="previous" name={rail.previousPhase} /> : null}
               {rail.phase ? (
                 <Text
                   testID="rail-phase"
@@ -214,8 +174,9 @@ export function PhaseRail({
                   {rail.phase}
                 </Text>
               ) : null}
-              {/* Without the neighbors there is no chevron to carry the S: it stands in the pill, in the room the floor keeps. */}
-              {!wide && stopAhead ? (
+              {wide && rail.phase ? <Neighbor side="next" name={rail.nextPhase} /> : null}
+              {/* The S stands at the end of the top line, in the room the floor keeps. */}
+              {stopAhead ? (
                 <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-gold" style={{ marginLeft: 4, lineHeight: 20 }}>
                   S
                 </Text>
@@ -228,7 +189,6 @@ export function PhaseRail({
             </Text>
           </Animated.View>
         </Animated.View>
-        {wide ? <Neighbor side="next" name={rail.nextPhase} stopAhead={stopAhead} /> : null}
       </LayoutAnimationConfig>
     </Pressable>
   );
