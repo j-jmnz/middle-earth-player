@@ -1,6 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { eq } from "drizzle-orm";
-import { useMemo, useState, type ReactNode } from "react";
+import { useRouter } from "expo-router";
+import { useCallback, useDeferredValue, useMemo, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { cards, packs } from "../catalog/schema";
@@ -21,6 +22,10 @@ import { ToastView } from "./toast-view";
 
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
+
+function poolKey(item: PoolRowCard): string {
+  return item.code;
+}
 
 function onViewableItemsChanged({ viewableItems }: { viewableItems: { item?: PoolRowCard | null }[] }): void {
   const jobs = [];
@@ -88,6 +93,7 @@ export function CardPool({
 }) {
   const draft = useDeckDraft();
   const { catalog } = useDatabases();
+  const router = useRouter();
   const preview = useListPreview();
   // Both views are read on every render (a hook is never chosen at run time); the mode picks which one shows and which one changes.
   const browsing = browseView.useValue();
@@ -143,12 +149,14 @@ export function CardPool({
   );
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);
   const [search, setSearch] = useState("");
+  // The field shows each keystroke at once; the list catches up when React has time, so typing never waits on the grid.
+  const query = useDeferredValue(search);
   const [applied, setApplied] = useState<PoolFilter>(() => ({ ...emptyPoolFilter, typeCode: startType }));
   const [draftFilter, setDraftFilter] = useState<PoolFilter>(applied);
   const [open, setOpen] = useState(false);
   const visible = useMemo(
-    () => filterPool(rows, search, applied, groups, inactiveCodes),
-    [rows, search, applied, groups, inactiveCodes],
+    () => filterPool(rows, query, applied, groups, inactiveCodes),
+    [rows, query, applied, groups, inactiveCodes],
   );
   const types = useMemo(() => typeChoices(rows), [rows]);
   // Other printings of a title share its copy limit: the deck's codes are named from the loaded rows.
@@ -157,6 +165,37 @@ export function CardPool({
     return (code) => byCode.get(code);
   }, [rows]);
   const filters = activeFilterCount(applied);
+  const openCard = useCallback((code: string) => router.push({ pathname: "/card/[code]", params: { code } }), [router]);
+  const previewCard = preview.open;
+  const grid = view === "Grid";
+  // One function while nothing it reads changes, so FlashList and the memoized cards skip the cards a render did not touch.
+  const renderItem = useCallback(
+    ({ item, index }: { item: PoolRowCard | undefined; index: number }) => {
+      if (!item) return null;
+      const loss = inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null;
+      const count = draftCopyCount(draft, item.code, item.typeCode);
+      const full = draftAddRefused(draft, item, lookup);
+      if (!grid) {
+        return <PoolCardRow item={item} adding={adding} loss={loss} count={count} full={full} lookup={lookup} onOpen={openCard} onPreview={previewCard} />;
+      }
+      if (cellWidth <= 0) return null;
+      return (
+        <PoolCardCell
+          item={item}
+          width={cellWidth}
+          offset={gridOffset(index, columns)}
+          adding={adding}
+          loss={loss}
+          count={count}
+          full={full}
+          lookup={lookup}
+          onOpen={openCard}
+          onPreview={previewCard}
+        />
+      );
+    },
+    [grid, cellWidth, columns, adding, inactiveCodes, draft, lookup, openCard, previewCard],
+  );
 
   function openSheet(): void {
     setDraftFilter(applied);
@@ -208,8 +247,8 @@ export function CardPool({
           <FlashList
             key={view}
             data={visible}
-            keyExtractor={(item) => item.code}
-            numColumns={view === "Grid" ? columns : 1}
+            keyExtractor={poolKey}
+            numColumns={grid ? columns : 1}
             style={{ flex: 1 }}
             extraData={draft}
             keyboardShouldPersistTaps="handled"
@@ -221,36 +260,7 @@ export function CardPool({
                 No cards match.
               </BodyText>
             }
-            renderItem={({ item, index }) =>
-              item ? (
-                view === "Grid" ? (
-                  cellWidth <= 0 ? null : (
-                  <View style={{ marginLeft: gridOffset(index, columns) }}>
-                    <PoolCardCell
-                      item={item}
-                      width={cellWidth}
-                      adding={adding}
-                      loss={inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null}
-                      count={draftCopyCount(draft, item.code, item.typeCode)}
-                      full={draftAddRefused(draft, item, lookup)}
-                      lookup={lookup}
-                      onPreview={preview.open}
-                    />
-                  </View>
-                  )
-                ) : (
-                  <PoolCardRow
-                    item={item}
-                    adding={adding}
-                    loss={inactiveCodes.has(item.code) ? notAppliedWords(item.code, item.typeCode) : null}
-                    count={draftCopyCount(draft, item.code, item.typeCode)}
-                    full={draftAddRefused(draft, item, lookup)}
-                    lookup={lookup}
-                    onPreview={preview.open}
-                  />
-                )
-              ) : null
-            }
+            renderItem={renderItem}
           />
         </View>
         <ToastView />

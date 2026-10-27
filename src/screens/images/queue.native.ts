@@ -42,6 +42,9 @@ let started = false;
 let pausing = false;
 let appStateBound = false;
 const queueListeners = new Set<() => void>();
+// The pause file's entry count as last read or written. Status is published several times per picture while a list scrolls, and
+// reading the file on the JS thread each time stalled the scroll. This module is the file's only writer.
+let pauseEntryCount = 0;
 let failureSentences: Record<string, string> = {};
 let queueSnapshot: ImageQueueStatus = {
   pending: 0,
@@ -55,7 +58,7 @@ function captureQueueStatus(): ImageQueueStatus {
     pending: pending.length + pump.waiting,
     active: activeTasks.size,
     failures: failureSentences,
-    pauseEntries: readPauseEntries().length,
+    pauseEntries: pauseEntryCount,
   };
 }
 
@@ -282,7 +285,7 @@ async function runResume(entry: DownloadPauseEntry): Promise<void> {
       const reason = error instanceof Error ? error : new Error("Image resume failed");
       recordFailure(entry.code, reason.message);
       console.warn(`${entry.code}: ${reason.message}`);
-      writePauseEntries(pauseEntriesWithout(readPauseEntries(), entry.code));
+      forgetPauseEntry(entry.code);
       activeTasks.delete(entry.code);
       activeUrls.delete(entry.code);
       resuming.delete(entry.code);
@@ -307,7 +310,7 @@ async function finishDownload(code: string, file: File): Promise<void> {
   const media = sniffImage(bytes);
   if (!media) {
     if (file.exists) file.delete();
-    writePauseEntries(pauseEntriesWithout(readPauseEntries(), code));
+    forgetPauseEntry(code);
     recordFailure(code, "Image is not a JPEG or PNG.");
     return;
   }
@@ -334,7 +337,7 @@ async function finishDownload(code: string, file: File): Promise<void> {
     if (existing.path && existing.width != null && existing.height != null && !isRemoteImageUri(existing.path)) {
       publishCachedImage(code, { uri: existing.path, width: existing.width, height: existing.height });
     }
-    writePauseEntries(pauseEntriesWithout(readPauseEntries(), code));
+    forgetPauseEntry(code);
     queued.add(code);
     return;
   }
@@ -353,7 +356,7 @@ async function finishDownload(code: string, file: File): Promise<void> {
   if (stored.path && stored.width != null && stored.height != null) {
     publishCachedImage(code, { uri: stored.path, width: stored.width, height: stored.height });
   }
-  writePauseEntries(pauseEntriesWithout(readPauseEntries(), code));
+  forgetPauseEntry(code);
   queued.add(code);
 }
 
@@ -462,7 +465,10 @@ function pauseStateFile(): File | null {
 
 function readPauseEntries(): DownloadPauseEntry[] {
   const file = pauseStateFile();
-  if (!file?.exists) return [];
+  if (!file?.exists) {
+    pauseEntryCount = 0;
+    return [];
+  }
   try {
     const parsed: unknown = JSON.parse(file.textSync());
     if (!Array.isArray(parsed)) return [];
@@ -471,12 +477,20 @@ function readPauseEntries(): DownloadPauseEntry[] {
       const entry = pauseEntry(value);
       if (entry) entries.push(entry);
     }
+    pauseEntryCount = entries.length;
     return entries;
   } catch (error: unknown) {
     const reason = error instanceof Error ? error : new Error("Pause state could not be read");
     console.warn(reason.message);
+    pauseEntryCount = 0;
     return [];
   }
+}
+
+// Drops a code from the pause file. Most downloads were never paused, so an empty file is neither read nor written.
+function forgetPauseEntry(code: string): void {
+  if (pauseEntryCount === 0) return;
+  writePauseEntries(pauseEntriesWithout(readPauseEntries(), code));
 }
 
 function writePauseEntries(entries: readonly DownloadPauseEntry[]): void {
@@ -484,6 +498,7 @@ function writePauseEntries(entries: readonly DownloadPauseEntry[]): void {
   if (!file) return;
   if (!file.exists) file.create();
   file.writeSync(JSON.stringify(entries));
+  pauseEntryCount = entries.length;
   publishQueueStatus();
 }
 

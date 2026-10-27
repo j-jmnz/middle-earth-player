@@ -1,4 +1,5 @@
 import { Image, type ImageContentPosition } from "expo-image";
+import { useMemo } from "react";
 import { View } from "react-native";
 
 import { cardImageUrl, shownCardImage } from "./policy";
@@ -7,17 +8,20 @@ import { useCachedImage } from "./store";
 
 const focusTop: ImageContentPosition = "top";
 
+// The same source object until the card's file changes: expo-image reloads on a new source, and a list re-renders its rows often.
 export function useCardPreview(code: string, imagesrc: string | null): { uri: string } | number | null {
   const cached = useCachedImage(code);
-  const { source } = shownCardImage({
-    cached,
-    imagesrc,
-    bundled: scanAssets[code] ?? null,
-  });
-  if (source) return source;
-  if (!imagesrc) return null;
-  const remote = cardImageUrl(imagesrc);
-  return remote ? { uri: remote } : null;
+  return useMemo(() => {
+    const { source } = shownCardImage({
+      cached,
+      imagesrc,
+      bundled: scanAssets[code] ?? null,
+    });
+    if (source) return source;
+    if (!imagesrc) return null;
+    const remote = cardImageUrl(imagesrc);
+    return remote ? { uri: remote } : null;
+  }, [code, imagesrc, cached]);
 }
 
 export function RowCardImage({
@@ -31,10 +35,12 @@ export function RowCardImage({
   width?: number;
   height?: number;
 }) {
+  // Kept decoded in memory as well: a list scrolled back shows its pictures again without reading and decoding the files.
   return (
     <Image
       recyclingKey={code}
       contentFit="contain"
+      cachePolicy="memory-disk"
       accessible={false}
       source={source}
       style={{ width, height }}
@@ -90,10 +96,24 @@ export function CardThumb({
   width: number;
   height: number;
 }) {
-  const preview = useCardPreview(code, imagesrc);
+  return <CardThumbFrame code={code} source={useCardPreview(code, imagesrc)} width={width} height={height} />;
+}
+
+/** A CardThumb for a row that already holds the card's picture (useCardPreview), so the image store is read once. */
+export function CardThumbFrame({
+  code,
+  source,
+  width,
+  height,
+}: {
+  code: string;
+  source: { uri: string } | number | null;
+  width: number;
+  height: number;
+}) {
   return (
     <View className="overflow-hidden rounded bg-raised" style={{ width, height }}>
-      {preview ? <RowCardImage code={code} source={preview} width={width} height={height} /> : null}
+      {source ? <RowCardImage code={code} source={source} width={width} height={height} /> : null}
     </View>
   );
 }
