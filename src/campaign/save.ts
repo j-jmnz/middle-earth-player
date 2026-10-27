@@ -48,6 +48,7 @@ export const activeScenarioSchema = z.strictObject({
   dataHash: z.number(),
   seed: z.number().int(),
   intents: z.array(z.looseObject({ type: z.string() })),
+  startedAt: z.number().optional(),
 });
 
 // What the briefing chose, kept with the open scenario so a relaunch rebuilds the same start: the heroes and the cards

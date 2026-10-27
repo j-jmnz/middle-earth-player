@@ -14,10 +14,12 @@ export type ActiveScenario = {
   dataHash: number;
   seed: number;
   intents: PlayerIntent[];
+  // When it was dealt (ms since the epoch), for the run history. A scenario dealt before phase 28b has none.
+  startedAt?: number;
 };
 
-export function beginActive(start: StartScenario, dataHash: number): ActiveScenario {
-  return { engineVersion: ENGINE_VERSION, dataHash, seed: start.seed, intents: [] };
+export function beginActive(start: StartScenario, dataHash: number, startedAt?: number): ActiveScenario {
+  return { engineVersion: ENGINE_VERSION, dataHash, seed: start.seed, intents: [], ...(startedAt == null ? {} : { startedAt }) };
 }
 
 export function recordIntent(active: ActiveScenario, intent: PlayerIntent): ActiveScenario {

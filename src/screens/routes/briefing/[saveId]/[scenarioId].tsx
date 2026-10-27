@@ -109,7 +109,7 @@ export default function Briefing() {
       acceptPenalty: accepted,
     };
     try {
-      const dealt = deal(save, world ?? input.world, stored, dealSeed(), CATALOG_VERSION);
+      const dealt = deal(save, world ?? input.world, stored, dealSeed(), CATALOG_VERSION, Date.now());
       if (!dealt.ok) {
         setDealError(dealt.briefing.problems.map((problem) => problem.message).join(" "));
         return;

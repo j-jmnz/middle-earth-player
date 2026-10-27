@@ -88,6 +88,32 @@ export const settings = sqliteTable("settings", {
   value: text("value", { mode: "json" }).$type<StoredJson>().notNull(),
 });
 
+// One row per scenario that ended, won or lost, campaign or standalone (src/campaign/runs.ts). It is written beside the campaign
+// log, never inside it, and never rewritten. It has no foreign key: deleting a save or a game keeps its runs. A null field is
+// one a back-filled row could not know.
+export const runs = sqliteTable("runs", {
+  id: text("id").primaryKey(),
+  kind: text("kind").$type<"campaign" | "standalone">().notNull(),
+  // The save id (campaign) or the standalone game id.
+  refId: text("ref_id").notNull(),
+  campaignId: text("campaign_id"),
+  box: text("box").notNull(),
+  scenarioId: text("scenario_id").notNull(),
+  result: text("result").$type<"won" | "lost">().notNull(),
+  lossCause: text("loss_cause"),
+  seatCount: integer("seat_count").notNull(),
+  heroes: text("heroes", { mode: "json" }).$type<string[][]>().notNull(),
+  rounds: integer("rounds"),
+  threats: text("threats", { mode: "json" }).$type<number[] | null>(),
+  victoryPoints: integer("victory_points"),
+  score: integer("score"),
+  reward: text("reward", { mode: "json" }).$type<string[] | null>(),
+  startedAt: integer("started_at"),
+  endedAt: integer("ended_at"),
+  engineVersion: integer("engine_version"),
+  backfilled: integer("backfilled", { mode: "boolean" }).notNull().default(false),
+});
+
 export const meta = sqliteTable(
   "meta",
   {

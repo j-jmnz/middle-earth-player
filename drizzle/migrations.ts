@@ -6,6 +6,7 @@ import m0003 from "./0003_save_updated_at.sql";
 import m0004 from "./0004_standalone_games.sql";
 import m0005 from "./0005_deck_updated_at.sql";
 import m0006 from "./0006_table_settings.sql";
+import m0007 from "./0007_runs.sql";
 
 export default {
   journal,
@@ -17,5 +18,6 @@ export default {
     m0004,
     m0005,
     m0006,
+    m0007,
   },
 };

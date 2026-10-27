@@ -1,0 +1,21 @@
+CREATE TABLE `runs` (
+	`id` text PRIMARY KEY NOT NULL,
+	`kind` text NOT NULL,
+	`ref_id` text NOT NULL,
+	`campaign_id` text,
+	`box` text NOT NULL,
+	`scenario_id` text NOT NULL,
+	`result` text NOT NULL,
+	`loss_cause` text,
+	`seat_count` integer NOT NULL,
+	`heroes` text NOT NULL,
+	`rounds` integer,
+	`threats` text,
+	`victory_points` integer,
+	`score` integer,
+	`reward` text,
+	`started_at` integer,
+	`ended_at` integer,
+	`engine_version` integer,
+	`backfilled` integer DEFAULT 0 NOT NULL
+);

@@ -14,6 +14,7 @@ import { goBack } from "../../../go-back";
 import { routeCode } from "../../../route-code";
 import { useStandaloneSession } from "../../../standalone-session";
 import { outcomeLines } from "../../../standalone-words";
+import { recordStandaloneRun } from "../../../run-writers";
 import { writeStandalone } from "../../../standalone-store";
 
 export default function StandaloneOutcome() {
@@ -25,8 +26,11 @@ export default function StandaloneOutcome() {
   const finished = useMemo(() => (session?.ok ? finishStandalone(session.stored, session.world, session.game) : (session?.stored ?? null)), [session]);
   const ended = session?.ok === true && finished?.result != null;
   useEffect(() => {
-    if (ended && finished) writeStandalone(user, finished);
-  }, [ended, finished, user]);
+    if (!ended || !finished) return;
+    writeStandalone(user, finished);
+    // One run for the game, written once (History); a reopened outcome writes nothing more.
+    if (session?.ok) recordStandaloneRun(user, finished, session.world, session.game);
+  }, [ended, finished, session, user]);
   const back = <NavBar onBack={() => goBack(router, "/scenarios")} backTestID="outcome-back" backLabel="Scenarios" />;
 
   if (!gameId || !finished || (!session?.ok && !finished.result)) {

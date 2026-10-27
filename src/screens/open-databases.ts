@@ -5,7 +5,9 @@ import { importDatabaseFromAssetAsync, openDatabaseAsync } from "expo-sqlite";
 import { CATALOG_VERSION, shouldReplaceCatalog } from "../catalog/version";
 import migrations from "../../drizzle/migrations";
 import { writeAppliedCatalogVersion } from "./applied-catalog-version";
+import { boxOf } from "./campaign-data";
 import { catalogAssetModule } from "./catalog-asset";
+import { backfillRunTable } from "./run-store";
 import { meta } from "./user-schema";
 
 function catalogAssetModuleId(): number {
@@ -30,6 +32,12 @@ async function openDatabasesOnce(): Promise<AppDatabases> {
   const userSqlite = await openDatabaseAsync("user.db");
   const user = drizzle(userSqlite);
   await migrate(user, migrations);
+  try {
+    // The runs the store already knew when the table was added (once; run-store.ts).
+    backfillRunTable(user, (id) => boxOf(id)?.id ?? null);
+  } catch (error: unknown) {
+    console.warn(`Run history was not back-filled (${error instanceof Error ? error.message : "unknown error"}); it is tried again at the next launch`);
+  }
 
   const stored = user
     .select({ appliedCatalogVersion: meta.appliedCatalogVersion })

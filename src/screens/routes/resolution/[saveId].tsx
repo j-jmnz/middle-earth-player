@@ -14,6 +14,7 @@ import { tileSurface } from "../../../play/surfaces";
 import { withAlphaHex } from "../../../play/tokens";
 import { campaignOf, scenarioOf } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
+import { recordCampaignRun } from "../../run-writers";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { CardThumb } from "../../images/picture";
@@ -64,8 +65,12 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const back = <NavBar onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backTestID="resolution-path" backLabel="Path" />;
 
   // A loss writes nothing to the log: the open scenario is dropped and the scenario stays current.
+  // The loss is a run all the same (History), written beside the log, not in it.
   const close = () => {
-    writeSave(user, finish(opened.save(), session.world, game));
+    const before = opened.save();
+    const after = finish(before, session.world, game);
+    recordCampaignRun(user, before, after, session.world, game);
+    writeSave(user, after);
     toPath();
   };
 
@@ -180,10 +185,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
               <PrimaryButton
                 label="Confirm"
                 testID="resolution-confirm"
-                onPress={() => {
-                  writeSave(user, finish(opened.save(), session.world, game));
-                  toPath();
-                }}
+                onPress={() => close()}
               />
             </>
           )}

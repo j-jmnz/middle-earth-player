@@ -35,12 +35,12 @@ export type DealResult = { ok: true; save: Save } | { ok: false; briefing: Brief
 
 // Deals the scenario: the briefing must be dealable. The save gets the loadout and an open scenario with no intents; the
 // log is not touched until the scenario is won. The caller keeps the result with a write.
-export function deal(save: Save, world: World, loadout: StoredLoadout, seed: number, dataHash: number): DealResult {
+export function deal(save: Save, world: World, loadout: StoredLoadout, seed: number, dataHash: number, startedAt?: number): DealResult {
   const input = inputOf(save, world, loadout);
   const result = briefing(input);
   if (!result.dealable) return { ok: false, briefing: result };
   const start = startFor(input, seed);
-  return { ok: true, save: { ...save, loadout, active: beginActive(start, dataHash) } };
+  return { ok: true, save: { ...save, loadout, active: beginActive(start, dataHash, startedAt) } };
 }
 
 // An open scenario played on another engine version or against other data is not replayed. This needs no start.
