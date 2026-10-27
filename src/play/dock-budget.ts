@@ -14,8 +14,8 @@ export const LABEL_PX = 18;
 // The dock's own border and padding around its two blocks: 1 + 6 top and 4 + 1 bottom, or 1 + 2 and 2 + 1 on a dense dock.
 export const DOCK_PAD_PX = 12;
 export const DOCK_PAD_DENSE_PX = 6;
-// The title, Cinzel SemiBold at 15 pt, is about this many points a character (0.61 em at most, 9.1 pt); label type about
-// LABEL_CHAR_PT.
+// The title, Cinzel SemiBold at 15 pt with the heading size's 0.3 pt tracking, is at most 0.61 em × 15 + 0.3 = 9.45 pt a
+// character; label type about LABEL_CHAR_PT.
 export const TITLE_CHAR_PT = 9.5;
 export const LABEL_CHAR_PT = 6.6;
 // The "i" pill's width and its gap beside a line or a title.

@@ -1,9 +1,9 @@
 import { Pressable, Text, View } from "react-native";
 
 import type { NextStep } from "../campaign/path";
-import { nightFade, panelSurface, raisedEdge, topShade } from "../play/surfaces";
-import { PortraitRow, SceneArt, type ArtCard } from "./art";
-import { Chevron, Chip, Corners, Eyebrow, JourneyBar, Label, PrimaryButton, SecondaryButton } from "./chrome";
+import { tileSurface } from "../play/surfaces";
+import { PortraitRow, SceneCard, type ArtCard } from "./art";
+import { Chevron, Chip, Eyebrow, JourneyBar, Label, PrimaryButton, SecondaryButton } from "./chrome";
 import { palette } from "./palette.js";
 
 // The campaign list's panels for one playthrough: its summary and the Continue card on top. Manage and Archived put
@@ -74,18 +74,19 @@ export function ContinuePanel({
   const number = line.next.kind === "finished" ? null : line.next.node.number;
   return (
     <View testID={`save-${id}`}>
-      <View className="rounded-hero" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdge }}>
-        <View className="overflow-hidden rounded-t-hero">
-          <SceneArt scenarioId={scenarioId} height={ART_HEIGHT}>
-            <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(0.4) }} />
-            <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.45, 1, palette.raised) }} />
-            <View className="absolute left-4 right-4 top-3 flex-row items-center justify-between">
-              <Chip label={line.seats} onArt />
-              {number ? <Chip tone="gold" onArt label={`Scenario ${number} of ${line.total}`} /> : <Chip tone="gold" onArt label="Completed" />}
-            </View>
-          </SceneArt>
-        </View>
-        <View className="px-5 pb-5" style={{ marginTop: -44 }}>
+      <SceneCard
+        scenarioId={scenarioId}
+        sceneHeight={ART_HEIGHT}
+        pullUp={44}
+        hero
+        over={
+          <View className="absolute left-4 right-4 top-3 flex-row items-center justify-between">
+            <Chip label={line.seats} onArt />
+            {number ? <Chip tone="gold" onArt label={`Scenario ${number} of ${line.total}`} /> : <Chip tone="gold" onArt label="Completed" />}
+          </View>
+        }
+      >
+        <View className="px-5 pb-5">
           <View className="flex-row items-center gap-2">
             <Eyebrow>{line.name}</Eyebrow>
             {eyebrow ? <Chip tone="faint" label="Current" /> : null}
@@ -132,8 +133,7 @@ export function ContinuePanel({
             </View>
           </View>
         </View>
-        <Corners />
-      </View>
+      </SceneCard>
     </View>
   );
 }
@@ -144,7 +144,7 @@ export function SaveRow({ id, line, lead, onPress }: { id: string; line: SaveLin
   return (
     <Pressable testID={`save-${id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={`Open ${describe(line)}`} onPress={onPress}>
       {({ pressed }) => (
-        <View className="flex-row items-center gap-3.5 rounded-card px-4 py-3.5" style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.hairline, boxShadow: raisedEdge }}>
+        <View className="flex-row items-center gap-3.5 rounded-card px-4 py-3.5" style={tileSurface(pressed)}>
           {lead ? <PortraitRow heroes={[lead]} size={44} /> : null}
           <View className="flex-1">
             <Text className="font-display text-heading text-bone" numberOfLines={1}>

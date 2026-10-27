@@ -13,8 +13,8 @@ export const RAIL_MAX = 460;
 
 // The rail's pill is two lines (phase-rail.tsx): "Round 3 · QUEST" over the step, "Staging". Its floor comes from the pill's
 // own words, never from a guess about the bar:
-// - the phase is Cinzel Bold capitals at 14 pt. A capital averages up to 0.76 em in Cinzel Bold ("ENCOUNTER" measures 0.759 em,
-//   "COMBAT" 0.762 in the web build); 0.78 leaves a margin;
+// - the phase is Cinzel Bold capitals at 14 pt with no added tracking. A capital averages up to 0.76 em in Cinzel Bold
+//   ("ENCOUNTER" measures 0.759 em, "COMBAT" 0.762 in the web build, untracked); 0.78 leaves a margin;
 // - "Round 99" and the step are label size (13 pt) in the system font, which averages under 0.55 em a character; 0.55 leaves a
 //   margin;
 // - neither counts shrinking (PhaseRail may shrink the phase to 85%), which is more margin, nor the glow;

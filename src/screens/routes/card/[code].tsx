@@ -2,13 +2,13 @@ import { eq } from "drizzle-orm";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, type ReactNode } from "react";
-import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
 import { cards } from "../../../catalog/schema";
-import { BodyText, Chip, Eyebrow, NavBar, Panel, Screen, ScreenTitle, sphereWord } from "../../chrome";
-import { nightFade, panelSurface, raisedEdge } from "../../../play/surfaces";
+import { BodyText, Chip, Eyebrow, NavBar, Panel, Screen, ScreenScroll, ScreenTitle, sphereWord } from "../../chrome";
+import { nightFade, tileSurface } from "../../../play/surfaces";
 import { CardTextView } from "../../../play/card-text-view";
 import { traitLine } from "../../../play/card-text";
 import { GameIcon } from "../../../play/game-icon";
@@ -114,7 +114,7 @@ function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | 
 // A number with the game's icon beside it, the word under them. The word stays on screen and in the label.
 function Stat({ label, value, icon }: { label: string; value: string; icon: IconName }) {
   return (
-    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-20 items-center rounded-tile px-3 py-2" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.hairline, boxShadow: raisedEdge }}>
+    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-20 items-center rounded-tile px-3 py-2" style={tileSurface()}>
       <View className="flex-row items-center gap-1.5">
         <GameIcon name={icon} size={18} tint="bone" />
         <Text className="font-display-bold text-title text-bone">{value}</Text>
@@ -269,7 +269,7 @@ export default function CardScreen() {
         onBack={() => goBack(router, "/cards")}
         right={row?.name ? <Chip label={row.code} tone="faint" /> : undefined}
       />
-      <ScrollView className="min-h-0 flex-1" style={{ marginHorizontal: -8 }} contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 32, paddingTop: 16 }}>
+      <ScreenScroll top={16}>
         {previewSource && pixels ? (
           <View className="self-center rounded-card" style={[{ width: pixels.width, height: pixels.height }, halo]}>
             <View className="overflow-hidden rounded-card" style={{ width: pixels.width, height: pixels.height }}>
@@ -301,7 +301,7 @@ export default function CardScreen() {
           </View>
         ) : null}
         <View className="pb-safe" />
-      </ScrollView>
+      </ScreenScroll>
     </Screen>
   );
 }

@@ -22,7 +22,7 @@ const pictureSize = (dense: boolean) => (dense ? { width: 28, height: 38 } : { w
 function DamagePill({ mark }: { mark: NonNullable<TrayTile["mark"]> }) {
   return (
     <View
-      className="flex-row items-center rounded-md px-2"
+      className="flex-row items-center rounded-chip px-2"
       style={{ borderWidth: 1, borderColor: mark.danger ? t.threat : t.goldLine, backgroundColor: mark.danger ? t.threat : "transparent", minHeight: 24 }}
     >
       <IconValue name={mark.icon} value={String(mark.value)} word={mark.danger ? "Destroying damage" : "Damage"} tint="bone" size={14} textClass="font-display-bold text-label text-bone" />

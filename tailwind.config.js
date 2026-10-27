@@ -25,6 +25,7 @@ module.exports = {
         micro: ["11px", { lineHeight: "14px", letterSpacing: "0.6px" }],
       },
       borderRadius: {
+        chip: "8px",
         tile: "12px",
         button: "14px",
         card: "16px",

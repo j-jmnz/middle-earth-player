@@ -20,9 +20,20 @@ tags:
     visible:
       id: briefing
     timeout: 15000
+# The briefing opens on the scenario's scene; the checklist and the choice sit below the fellowship.
+- scrollUntilVisible:
+    element:
+      text: "The campaign card waives the hero-change penalty."
+    direction: DOWN
+    timeout: 20000
 - assertVisible: "The campaign card waives the hero-change penalty."
 - assertNotVisible:
     id: accept-penalty
+- scrollUntilVisible:
+    element:
+      id: choice-142014
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: briefing-choice
 - assertVisible:

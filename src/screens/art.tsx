@@ -7,8 +7,9 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { View } from "react-native";
 
 import { cards } from "../catalog/schema";
-import { panelSurface } from "../play/surfaces";
+import { nightFade, raisedEdge, panelSurface, topShade } from "../play/surfaces";
 import { cropFrame, FACE, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, type Region } from "./art-crop";
+import { Corners } from "./chrome-marks";
 import { scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
@@ -58,7 +59,8 @@ export function CroppedArt({
             }
           : undefined
       }
-      style={{ width: width ?? "100%", height, overflow: "hidden", borderRadius: radius, ...panelSurface() }}
+      // A solid fill under the picture, never a gradient: a cropped picture is drawn inside list rows (docs/design-system.md, Performance).
+      style={{ width: width ?? "100%", height, overflow: "hidden", borderRadius: radius, backgroundColor: palette.raised }}
     >
       {card && source && crop ? (
         <Image
@@ -116,12 +118,73 @@ export function useSceneCard(scenarioId: string | null | undefined): ArtCard | n
   }, [catalog, code]);
 }
 
-/** A scenario's scene, cropped from its first quest card, filling a box. */
-export function SceneArt({ scenarioId, height, width, radius = 0, children }: { scenarioId: string | null | undefined; height: number; width?: number; radius?: number; children?: ReactNode }) {
+/**
+ * A scenario's scene, cropped from its first quest card, filling a box. `shade` lays a soft night over its top (for Back and the
+ * status bar, or chips), `fade` night rising from that fraction of its height to solid at its foot, in `fadeTo` (the surface the
+ * words below it sit on).
+ */
+export function SceneArt({
+  scenarioId,
+  height,
+  width,
+  radius = 0,
+  shade,
+  fade,
+  fadeTo = palette.night,
+  children,
+}: {
+  scenarioId: string | null | undefined;
+  height: number;
+  width?: number;
+  radius?: number;
+  shade?: number;
+  fade?: number;
+  fadeTo?: string;
+  children?: ReactNode;
+}) {
   const card = useSceneCard(scenarioId);
   return (
     <CroppedArt card={card} region={SCENE} aspect={QUEST_CARD_ASPECT} height={height} width={width} radius={radius}>
+      {shade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(shade) }} /> : null}
+      {fade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(fade, 1, fadeTo) }} /> : null}
       {children}
     </CroppedArt>
+  );
+}
+
+/**
+ * A framed card that opens on a scenario's scene (the Continue card, the scenario to play on the path, a game in progress): the
+ * goldLine edge and the gold corners, the scene on top with `over` laid on it (chips), and `children` pulled up over the scene's
+ * fade so the words start in its night.
+ */
+export function SceneCard({
+  scenarioId,
+  sceneHeight,
+  pullUp,
+  hero = false,
+  pressed = false,
+  over,
+  children,
+}: {
+  scenarioId: string | null | undefined;
+  sceneHeight: number;
+  // How far the words rise into the scene's fade.
+  pullUp: number;
+  // The Continue card's larger corners (rounded-hero).
+  hero?: boolean;
+  pressed?: boolean;
+  over?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <View className={hero ? "rounded-hero" : "rounded-card"} style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdge }}>
+      <View className={`overflow-hidden ${hero ? "rounded-t-hero" : "rounded-t-card"}`}>
+        <SceneArt scenarioId={scenarioId} height={sceneHeight} shade={0.4} fade={0.4} fadeTo={palette.raised}>
+          {over}
+        </SceneArt>
+      </View>
+      <View style={{ marginTop: -pullUp }}>{children}</View>
+      <Corners />
+    </View>
   );
 }

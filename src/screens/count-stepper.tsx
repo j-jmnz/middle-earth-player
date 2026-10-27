@@ -40,7 +40,7 @@ export function CountStepper({
           accessibilityRole="button"
           accessibilityLabel={count <= 1 ? `Remove ${name}` : `Remove a copy of ${name}`}
           onPress={() => onChange(-1)}
-          className="min-h-11 min-w-10 items-center justify-center rounded-tile"
+          className="min-h-11 min-w-11 items-center justify-center rounded-tile"
           style={({ pressed }) => (pressed ? pressedNight : undefined)}
         >
           <Text className="text-title text-muted">−</Text>
@@ -62,7 +62,7 @@ export function CountStepper({
         accessibilityLabel={`Add ${count > 0 ? "a copy of " : ""}${name}`}
         accessibilityState={{ disabled: full }}
         onPress={() => onChange(1)}
-        className="min-h-11 min-w-10 items-center justify-center rounded-tile"
+        className="min-h-11 min-w-11 items-center justify-center rounded-tile"
         style={({ pressed }) => (pressed ? pressedNight : undefined)}
       >
         <Text className={`text-title ${full ? "text-faint" : "text-bone"}`}>+</Text>

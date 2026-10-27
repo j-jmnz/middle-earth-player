@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { sessionSetting } from "./session-setting.ts";
 
 // The deck list's filter and view. Filtering runs in memory on the decks the list already read.
 
@@ -58,26 +58,8 @@ export function deckListFiltered(filter: DeckListFilter): boolean {
 // Cards: the hero pictures above each deck. List: one compact row per deck. Kept while the app is open.
 export type DeckListView = "Cards" | "List";
 
-let view: DeckListView = "Cards";
-const listeners = new Set<() => void>();
+const deckListView = sessionSetting<DeckListView>("Cards");
 
-export function setDeckListView(next: DeckListView): void {
-  if (view === next) return;
-  view = next;
-  for (const listener of listeners) listener();
-}
-
-export function getDeckListView(): DeckListView {
-  return view;
-}
-
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
-
-export function useDeckListView(): DeckListView {
-  return useSyncExternalStore(subscribe, getDeckListView, getDeckListView);
-}
+export const setDeckListView = deckListView.set;
+export const getDeckListView = deckListView.get;
+export const useDeckListView = deckListView.useValue;

@@ -204,7 +204,6 @@ export function PhaseRail({
                   style={{
                     // 14 pt: top-bar-layout.ts counts the pill's floor from this size and Cinzel Bold's capitals.
                     fontSize: 14,
-                    letterSpacing: 0.4,
                     lineHeight: 20,
                     textShadowColor: t.gold,
                     textShadowRadius: 8,

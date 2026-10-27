@@ -21,7 +21,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
     s.base.kind === "linear"
       ? `linear-gradient(180deg,${stopsCss(s.base.stops)})`
       : `radial-gradient(${Math.round(s.base.r * 100)}% ${Math.round(s.base.r * 100)}% at ${Math.round(s.base.cx * 100)}% ${Math.round(s.base.cy * 100)}%,${stopsCss(s.base.stops)})`;
-  const vignette = s.vignette > 0 ? [`radial-gradient(75% 75% at 50% 42%, rgba(0,0,0,0) 45%, rgba(0,0,0,${s.vignette}))`] : [];
+  const vignette = s.vignette > 0 ? `radial-gradient(75% 75% at 50% 42%, rgba(0,0,0,0) 45%, rgba(0,0,0,${s.vignette}))` : null;
   const fill: WebStyle = { backgroundImage: [...layers, base].join(",") };
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
@@ -39,7 +39,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
         };
         return <View key={index} style={[StyleSheet.absoluteFill, style as object]} />;
       })}
-      {vignette.length > 0 ? <View style={[StyleSheet.absoluteFill, { backgroundImage: vignette[0] } as object]} /> : null}
+      {vignette ? <View style={[StyleSheet.absoluteFill, { backgroundImage: vignette } as object]} /> : null}
       {s.ring ? (
         <View
           style={{

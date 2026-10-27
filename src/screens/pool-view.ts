@@ -1,23 +1,8 @@
-import { useSyncExternalStore } from "react";
+import { sessionSetting } from "./session-setting.ts";
 
-// The card pool's view: a grid of the card pictures, or one row per card. Kept while the app is open, shared by the Cards tab and
-// the pool the deck editor opens.
+// The card pool's view: a grid of the card pictures, or one row per card. Kept while the app is open. Browsing (the Cards tab) opens
+// on the grid; adding to a deck opens on the named rows, since a name is what a builder scans for, with the grid one tap away.
 export type PoolView = "Grid" | "List";
 
-let view: PoolView = "Grid";
-const listeners = new Set<() => void>();
-
-export function setPoolView(next: PoolView): void {
-  if (next === view) return;
-  view = next;
-  for (const listener of listeners) listener();
-}
-
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-export function usePoolView(): PoolView {
-  return useSyncExternalStore(subscribe, () => view, () => view);
-}
+export const browseView = sessionSetting<PoolView>("Grid");
+export const addingView = sessionSetting<PoolView>("List");

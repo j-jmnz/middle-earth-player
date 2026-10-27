@@ -11,10 +11,10 @@ import { isPlayable } from "../../../campaign/playable";
 import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { campaignOf, scenarioNames } from "../../campaign-data";
-import { BodyText, Chevron, Chip, Corners, Eyebrow, Label, Panel, Screen, ScreenScroll, ScreenTitle, Section, TextButton } from "../../chrome";
-import { SceneArt } from "../../art";
+import { BodyText, Chevron, Chip, Eyebrow, Label, Panel, Screen, ScreenScroll, ScreenTitle, Section, TextButton } from "../../chrome";
+import { SceneArt, SceneCard } from "../../art";
 import { palette } from "../../palette.js";
-import { goldSurface, nightFade, panelSurface, raisedEdge, topShade } from "../../../play/surfaces";
+import { goldPlate, panelSurface, tileSurface } from "../../../play/surfaces";
 import { withAlphaHex } from "../../../play/tokens";
 import { useDatabases } from "../../databases";
 import { KeepOrDelete } from "../../keep-or-delete";
@@ -117,7 +117,7 @@ export default function Scenarios() {
 
   // A game: Resume or Play again, or under Manage, Archive and Delete. A game in progress is a framed card with its scene; a
   // finished one a row with its result.
-  function renderGame(game: StandaloneGame) {
+  function renderGame(game: StandaloneGame, framed = false) {
     const status = standaloneStatus(game);
     if (managing) {
       return (
@@ -132,39 +132,33 @@ export default function Scenarios() {
     }
     const action = status === "playing" ? "Resume" : game.loadout ? "Play again" : null;
     const spoken = action ? `${action} ${label(game)}` : label(game);
-    if (status === "playing") {
+    // The latest game in progress is the framed card with the one gold Resume; an older one is a row (below) with Resume in gold text.
+    if (status === "playing" && framed) {
       return (
         <Pressable key={game.id} testID={`game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} onPress={() => open(game)}>
           {({ pressed }) => (
-            <View className="rounded-card" style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdge }}>
-              <View className="overflow-hidden rounded-t-card">
-                <SceneArt scenarioId={game.scenarioId} height={136}>
-                  <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(0.4) }} />
-                  <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.35, 1, palette.raised) }} />
-                </SceneArt>
-              </View>
-              <View className="px-4 pb-4" style={{ marginTop: -34 }}>
+            <SceneCard scenarioId={game.scenarioId} sceneHeight={136} pullUp={34} pressed={pressed}>
+              <View className="px-4 pb-4">
                 <Eyebrow>In progress</Eyebrow>
                 <Text className="mt-1 font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
                 <Label>{gameCaption(game)}</Label>
                 {/* The look of the primary inside the card; the whole card is the one button. */}
-                <View className="mt-3 min-h-12 items-center justify-center rounded-button" style={{ ...goldSurface(pressed), borderWidth: 1, borderColor: palette.goldDeep }}>
-                  <Text className="font-display-bold uppercase" style={{ fontSize: 14, letterSpacing: 2.4, color: palette.onGold }}>
+                <View className="mt-3 min-h-14 items-center justify-center rounded-button" style={goldPlate(pressed)}>
+                  <Text className="font-display-bold uppercase" style={{ fontSize: 15, lineHeight: 20, letterSpacing: 2.4, color: palette.onGold }}>
                     Resume
                   </Text>
                 </View>
               </View>
-              <Corners />
-            </View>
+            </SceneCard>
           )}
         </Pressable>
       );
     }
-    const tone = status === "won" ? "gold" : status === "lost" ? "danger" : "faint";
+    const tone = status === "won" ? "gold" : status === "lost" ? "danger" : status === "playing" ? "ok" : "faint";
     return (
       <Pressable key={game.id} testID={`game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} disabled={action == null} onPress={() => open(game)}>
         {({ pressed }) => (
-          <View className="rounded-card px-4 py-3.5" style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.hairline, boxShadow: raisedEdge }}>
+          <View className="rounded-card px-4 py-3.5" style={tileSurface(pressed)}>
             <View className="flex-row items-start justify-between gap-2">
               <View className="flex-1">
                 <Text className="font-display text-heading text-bone">{nameOf(game.scenarioId)}</Text>
@@ -209,7 +203,7 @@ export default function Scenarios() {
 
         {playing.length > 0 ? (
           <View className="mt-5 gap-3" testID="standalone-playing">
-            {playing.map(renderGame)}
+            {playing.map((game, index) => renderGame(game, index === 0))}
           </View>
         ) : null}
 
@@ -232,11 +226,12 @@ export default function Scenarios() {
                   {({ pressed }) => (
                     <View
                       className="flex-row items-center gap-3.5 overflow-hidden rounded-card pr-4"
-                      style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.hairline, opacity: playable ? 1 : 0.55 }}
+                      style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.hairline }}
                     >
                       <View style={{ width: 92, height: 68 }}>
                         <SceneArt scenarioId={id} width={92} height={68}>
-                          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? "transparent" : withAlphaHex(palette.night, 0.55) }} />
+                          {/* A scenario not playable yet keeps its faint words at full strength; only its scene is veiled. */}
+                          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? "transparent" : withAlphaHex(palette.night, 0.6) }} />
                         </SceneArt>
                         <View className="absolute bottom-1.5 left-1.5 h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(palette.night, 0.8), borderWidth: 1, borderColor: playable ? palette.goldLine : palette.hairline }}>
                           <Text className={`font-display-bold text-micro ${playable ? "text-gold" : "text-faint"}`}>{String(index + 1)}</Text>
@@ -260,7 +255,7 @@ export default function Scenarios() {
         <View className="mt-6 gap-3" testID="standalone-games">
           <Section title="Games" />
           {games.length === 0 ? <BodyText tone="muted">{archived.length === 0 ? "No game yet. Pick a scenario to deal one." : "No open game. Pick a scenario to deal one."}</BodyText> : null}
-          {finished.map(renderGame)}
+          {finished.map((game) => renderGame(game))}
           {archived.length > 0 ? (
             <View className="gap-3" testID="archived-games">
               <View className="-mx-3 flex-row">

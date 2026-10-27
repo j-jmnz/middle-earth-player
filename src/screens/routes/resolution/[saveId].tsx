@@ -4,13 +4,13 @@
 // group as the tiles. Lost: Defeat and nothing written (docs/design-system.md, Resolution).
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useStore } from "zustand";
 
 import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
-import { ActionBar, BodyText, Corners, Label, NavBar, PrimaryButton, Screen, Section, SecondaryButton, TextButton } from "../../chrome";
-import { panelSurface, raisedEdge } from "../../../play/surfaces";
+import { ActionBar, BodyText, Corners, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton } from "../../chrome";
+import { tileSurface } from "../../../play/surfaces";
 import { withAlphaHex } from "../../../play/tokens";
 import { campaignOf, scenarioOf } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
@@ -38,9 +38,9 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       {({ pressed }) => (
         <View
           className="min-h-14 items-center rounded-card p-3"
-          style={{ ...panelSurface(pressed), borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline, boxShadow: selected ? `0 0 18px ${withAlphaHex(palette.gold, 0.28)}` : raisedEdge }}
+          style={{ ...tileSurface(pressed), ...(selected ? { borderWidth: 1.5, borderColor: palette.gold, boxShadow: `0 0 18px ${withAlphaHex(palette.gold, 0.28)}` } : {}) }}
         >
-          {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={88} height={122} /> : null}
+          {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={72} height={100} /> : null}
           <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-goldHigh" : "text-bone"}`}>{label}</Text>
           {selected ? <Text className="mt-0.5 text-label font-semibold text-goldHigh">Selected</Text> : null}
           {selected ? <Corners /> : null}
@@ -49,8 +49,6 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
     </Pressable>
   );
 }
-
-const outcomeWord = { fontSize: 44, lineHeight: 52, letterSpacing: 4 };
 
 function Resolution({ session, opened, saveId }: { session: Extract<TableSession, { ok: true }>; opened: SessionStore; saveId: string }) {
   const router = useRouter();
@@ -76,15 +74,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
       <Screen testID="resolution" scene="plain">
         {back}
         <View className="flex-1 items-center justify-center">
-          <Text
-            testID="resolution-outcome"
-            accessibilityRole="header"
-            className="text-center font-display-bold text-danger"
-            style={{ ...outcomeWord, textShadowColor: withAlphaHex(palette.threat, 0.6), textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
-          >
-            Defeat
-          </Text>
-          <Text className="mt-2 text-center font-display text-heading text-muted">{scenario?.name ?? ""}</Text>
+          <OutcomeTitle won={false} scenario={scenario?.name ?? ""} testID="resolution-outcome" />
           <BodyText tone="muted" className="mt-6 text-center" testID="resolution-consequence">
             The scenario was lost. Nothing is written to the log.
           </BodyText>
@@ -119,16 +109,11 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
       {back}
       {/* While choosing, the tiles and the decline under Confirm are one radio group. */}
       <View className="min-h-0 flex-1" {...(view.kind === "choosing" ? { accessibilityRole: "radiogroup" as const } : {})}>
-        <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-6 pt-4">
-          <Text
-            testID="resolution-outcome"
-            accessibilityRole="header"
-            className="mt-16 text-center font-display-bold text-goldHigh"
-            style={{ ...outcomeWord, textShadowColor: palette.gold, textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
-          >
-            Victory
-          </Text>
-          <Text className="mt-1 text-center font-display text-heading text-bone">{scenario?.name ?? ""}</Text>
+        <ScreenScroll top={16} bottom={24}>
+          {/* While choosing, the outcome word sits higher so a row of tiles shows whole above the bar. */}
+          <View className={view.kind === "choosing" ? "mt-4" : "mt-16"}>
+            <OutcomeTitle won scenario={scenario?.name ?? ""} testID="resolution-outcome" />
+          </View>
           {view.kind === "choosing" ? (
             <View className="mt-8">
               <View testID="resolution-group">
@@ -152,7 +137,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
               </View>
             </View>
           ) : null}
-        </ScrollView>
+        </ScreenScroll>
         <ActionBar>
           {refusal ? (
             <BodyText tone="danger" className="mb-2">

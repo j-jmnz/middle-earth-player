@@ -17,7 +17,7 @@ import { Stats } from "./sheet-paper.tsx";
 import type { Unavailable } from "./sheet-types.ts";
 import type { Dock, DockButton } from "./table-choice.ts";
 import { LineMark } from "./table-chrome.tsx";
-import { panelSurface, raisedEdge } from "./surfaces.ts";
+import { panelSurface, tileSurface } from "./surfaces.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 /** The engine's numbers for the moment, large, and what they come to: raised night in the dock, ink on a paper panel. */
@@ -124,7 +124,7 @@ export function TableDock({
   const readoutLine = dense && trayOpen;
   return (
     <View style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
-      <View testID="dock" className={`rounded-card px-3 ${dense ? "pb-0.5 pt-0.5" : "pb-1 pt-1.5"}`} style={{ ...panelSurface(), borderWidth: 1, borderColor: t.hairline, boxShadow: raisedEdge, flexShrink: 1 }}>
+      <View testID="dock" className={`rounded-card px-3 ${dense ? "pb-0.5 pt-0.5" : "pb-1 pt-1.5"}`} style={{ ...tileSurface(), flexShrink: 1 }}>
         {/* The words above the numbers are budgeted to fit (planWords); the guard scrolls only on a taller screen's long lines. The
             readout, the armed line and every button are pinned to the dock's foot and never scroll away. */}
         <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0, opacity: trayOpen ? 0 : 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>

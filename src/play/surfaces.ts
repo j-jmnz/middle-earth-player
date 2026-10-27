@@ -42,3 +42,13 @@ export const goldGlow = `0 6px 20px ${withAlphaHex(t.gold, 0.22)}`;
 /** The lit top edge of a raised surface, and its dark foot, drawn as inset shadows so they cost no extra view. */
 export const raisedEdge = `inset 0 1px 0 ${withAlphaHex(t.bone, 0.06)}`;
 export const goldEdge = `inset 0 1px 0 ${withAlphaHex(t.bone, 0.5)}, inset 0 -2px 0 ${withAlphaHex(t.night, 0.18)}`;
+
+/** The primary's plate: worked gold with a goldDeep edge, a lit top and foot, and at rest a soft glow under it. */
+export function goldPlate(pressed = false): Surface & { borderWidth: number; borderColor: string; boxShadow: string } {
+  return { ...goldSurface(pressed), borderWidth: 1, borderColor: t.goldDeep, boxShadow: pressed ? goldEdge : `${goldEdge}, ${goldGlow}` };
+}
+
+/** A lit tile on a hairline: a stat tile, a card standing for a row (a save, a scenario, a book), a panel's plate. */
+export function tileSurface(pressed = false): Surface & { borderWidth: number; borderColor: string; boxShadow?: string } {
+  return { ...panelSurface(pressed), borderWidth: 1, borderColor: t.hairline, ...(pressed ? {} : { boxShadow: raisedEdge }) };
+}

@@ -8,14 +8,15 @@ import { logCodes, loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { BodyText, Label, PrimaryButton, Section, TextButton } from "../../../chrome";
+import { BodyText, Label, Section, TextButton } from "../../../chrome";
 import { FELLOWSHIP_ID } from "../../../../campaign/save";
 import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
 import { goBack } from "../../../go-back";
 import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
-import { BriefingScreen, expand, ScenarioBanner, ScenarioDetails, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
+import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
+import { SeatPicker } from "../../../seat-picker";
 import { routeCode } from "../../../route-code";
 import { useSave } from "../../../use-save";
 
@@ -65,6 +66,7 @@ export default function Briefing() {
   const frame = {
     testID: "briefing",
     scenarioId,
+    backLabel: "Path",
     onBack: () => goBack(router, saveId ? { pathname: "/path/[saveId]", params: { saveId } } : "/"),
     onBooklet: () => router.push({ pathname: "/booklet/[id]", params: bookletParams(save?.campaignId ?? FELLOWSHIP_ID, scenarioId) }),
   } as const;
@@ -127,27 +129,13 @@ export default function Briefing() {
       {...frame}
       banner={<ScenarioBanner facts={facts} eyebrow={`Scenario ${facts.number} · ${campaign.name}`} />}
       bar={
-        <View className="gap-2">
-          {result.problems.map((problem, index) => (
-            <Label key={`${index}-${problem.message}`} tone="danger" testID={`briefing-error-${index}`}>
-              {problem.message}
-            </Label>
-          ))}
-          {dealError ? (
-            <Label tone="danger" testID="briefing-deal-error">
-              {dealError}
-            </Label>
-          ) : null}
+        <DealBar problems={result.problems} dealError={dealError} difficulty={difficulty} dropsOpen={save.loadout != null} dealable={result.dealable} onDeal={onDeal}>
           {result.penaltyAdded > 0 && !accepted ? (
             <View className="items-start">
               <TextButton label={`Accept +${result.penaltyAdded} threat for the campaign`} testID="accept-penalty" tone="gold" onPress={() => setAccepted(true)} />
             </View>
           ) : null}
-          <Label tone="muted" testID="briefing-deal-note" className="text-center">
-            {save.loadout ? "A scenario is already open. Dealing again drops it." : "Dealing starts the scenario."}
-          </Label>
-          <PrimaryButton label="Deal" testID="deal" disabled={!result.dealable} onPress={onDeal} />
-        </View>
+        </DealBar>
       }
     >
       {completed ? (
@@ -155,6 +143,9 @@ export default function Briefing() {
           You have won this scenario. Playing it again does not grant its reward a second time.
         </BodyText>
       ) : null}
+
+      {/* The difficulty first: it is decided before the deck, and it must be seen before Deal (it is named over Deal too). */}
+      <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} />
 
       {seats.map((seat, index) => (
         <SeatPicker
@@ -201,7 +192,7 @@ export default function Briefing() {
         </Label>
       ) : null}
 
-      <ScenarioDetails facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} />
+      <EncounterDetails facts={facts} />
     </BriefingScreen>
   );
 }

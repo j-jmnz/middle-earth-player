@@ -1,12 +1,12 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { campaignPath, openNode, type PathNode } from "../../../campaign/path";
-import { nightFade, panelSurface, raisedEdge, topShade } from "../../../play/surfaces";
+import { tileSurface } from "../../../play/surfaces";
 import { withAlphaHex } from "../../../play/tokens";
-import { SceneArt } from "../../art";
-import { ActionBar, BodyText, Chip, Corners, Eyebrow, IconButton, JourneyBar, Label, NavBar, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
+import { SceneCard } from "../../art";
+import { ActionBar, BodyText, Chip, Eyebrow, IconButton, JourneyBar, Label, NavBar, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../campaign-data";
 import { cardNames } from "../../card-names";
 import { useDatabases } from "../../databases";
@@ -20,7 +20,9 @@ import { droppedSentence, useSave } from "../../use-save";
 const STATUS_WORD = { completed: "Completed", current: "Current", locked: "Locked" } as const;
 const RAIL = 44;
 
-type Action = { label: string; onPress: () => void; hint?: string } | null;
+// The path's one next move, pinned in the ActionBar: Resume the open scenario, else Begin the current one. `testID` keeps the ids the
+// flows know: `begin` for the current scenario, `resume-<id>` for an open replay of a won one.
+type Next = { label: string; testID: string; words: string; onPress: () => void };
 
 // The medallion on the trail: a gold disc with a check for a won scenario, a lit gold ring for the one to play, a night disc
 // with its number for one still locked.
@@ -50,25 +52,12 @@ function StatusChip({ node, onArt = false }: { node: PathNode; onArt?: boolean }
   return <Chip testID={`node-${node.id}-status`} label={STATUS_WORD[node.status]} tone={node.status === "completed" ? "ok" : node.status === "current" ? "gold" : "faint"} onArt={onArt} />;
 }
 
-function ActionButton({ node, action }: { node: PathNode; action: Action }) {
-  if (!action) return null;
-  return (
-    <View className="mt-4">
-      <PrimaryButton label={action.label} testID={node.status === "current" ? "begin" : `resume-${node.id}`} onPress={action.onPress} />
-      {action.hint ? (
-        <Text testID={`hint-${node.id}`} className="mt-1.5 text-label text-muted">
-          {action.hint}
-        </Text>
-      ) : null}
-    </View>
-  );
-}
-
 /**
  * One stop on the trail. A won scenario is a panel with its score and what it earned (Replay under it); the scenario to play is
- * a framed card with its scene and the one primary; a locked one is a dim line.
+ * a framed card with its scene (its Begin is the ActionBar's primary, or a secondary plate here while another scenario is open);
+ * a locked one is a dim line. The medallion column is drawn for the eye; the stop's words carry its status for a screen reader.
  */
-function Node({ node, index, count, reached, rewards, rounds, action, onOpen }: {
+function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
   node: PathNode;
   index: number;
   count: number;
@@ -76,14 +65,15 @@ function Node({ node, index, count, reached, rewards, rounds, action, onOpen }: 
   reached: boolean;
   rewards: readonly string[];
   rounds: number | null;
-  action: Action;
+  // Begin on this card: only while another scenario is open, which Begin drops.
+  begin: { hint: string; onPress: () => void } | null;
   onOpen: (() => void) | null;
 }) {
   const said = `${node.name}, ${STATUS_WORD[node.status]}${rewards.length > 0 ? `, ${rewards.join(", ")}` : ""}`;
   const stages = scenarioOf(node.id)?.stages.length ?? null;
   return (
     <View testID={`node-${node.id}`} className="flex-row">
-      <View style={{ width: RAIL }} className="items-center">
+      <View style={{ width: RAIL }} className="items-center" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
         {/* One segment of the trail per stop: gold up to the current stop, night past it. */}
         <View style={{ position: "absolute", top: index === 0 ? 20 : 0, bottom: index === count - 1 ? "50%" : 0, width: 2, backgroundColor: reached ? palette.gold : palette.hairline }} />
         <View style={{ marginTop: node.status === "current" ? 18 : 12 }}>
@@ -92,28 +82,32 @@ function Node({ node, index, count, reached, rewards, rounds, action, onOpen }: 
       </View>
       <View className="flex-1 pb-3.5">
         {node.status === "current" ? (
-          <View className="rounded-card" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdge }}>
-            <View className="overflow-hidden rounded-t-card">
-              <SceneArt scenarioId={node.id} height={128}>
-                <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(0.35) }} />
-                <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.35, 1, palette.raised) }} />
-                <View className="absolute right-3 top-3">
-                  <StatusChip node={node} onArt />
-                </View>
-              </SceneArt>
-            </View>
-            <View className="px-4 pb-4" style={{ marginTop: -30 }} accessible accessibilityLabel={said}>
+          <SceneCard
+            scenarioId={node.id}
+            sceneHeight={128}
+            pullUp={30}
+            over={
+              <View className="absolute right-3 top-3">
+                <StatusChip node={node} onArt />
+              </View>
+            }
+          >
+            <View className="px-4 pb-4" accessible accessibilityLabel={said}>
               <Eyebrow>{`Scenario ${node.number}`}</Eyebrow>
               <Text className="mt-1 font-display text-title text-bone">{node.name}</Text>
               {stages ? <Label>{`${stages} quest ${stages === 1 ? "stage" : "stages"}`}</Label> : null}
             </View>
-            <View className="px-4 pb-4" style={{ marginTop: -16 }}>
-              <ActionButton node={node} action={action} />
-            </View>
-            <Corners />
-          </View>
+            {begin ? (
+              <View className="px-4 pb-4">
+                <SecondaryButton label="Begin" testID="begin" tone="gold" onPress={begin.onPress} />
+                <Text testID={`hint-${node.id}`} className="mt-1.5 text-label text-muted">
+                  {begin.hint}
+                </Text>
+              </View>
+            ) : null}
+          </SceneCard>
         ) : node.status === "completed" ? (
-          <View className="rounded-card px-4 py-3" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.hairline, boxShadow: raisedEdge }}>
+          <View className="rounded-card px-4 py-3" style={tileSurface()}>
             <View accessible accessibilityLabel={said}>
               <View className="flex-row items-start justify-between gap-2">
                 <Text className="flex-1 font-display text-heading text-bone">{node.name}</Text>
@@ -128,7 +122,6 @@ function Node({ node, index, count, reached, rewards, rounds, action, onOpen }: 
                 </View>
               ) : null}
             </View>
-            <ActionButton node={node} action={action} />
             {onOpen ? (
               <View className="-mx-3 mt-1 flex-row">
                 <TextButton label="Replay" testID={`replay-${node.id}`} tone="gold" accessibilityLabel={`Replay ${node.name}`} onPress={onOpen} />
@@ -182,11 +175,19 @@ export default function CampaignPath() {
       ? "Nothing earned yet."
       : save.log.campaignPool.map((card) => (card.attachedTo ? `${name(card.code)} on ${name(card.attachedTo)}` : name(card.code))).join(", ");
 
+  const current = currentIndex >= 0 ? nodes[currentIndex] : null;
+  const next: Next | null = open
+    ? { label: "Resume", testID: open.status === "current" ? "begin" : `resume-${open.id}`, words: `On the table: ${open.name}`, onPress: () => router.push(tableHref(save.id)) }
+    : current
+      ? { label: "Begin", testID: "begin", words: `Next: ${current.name}`, onPress: () => router.push(briefingHref(save.id, current.id)) }
+      : null;
+
   return (
     <Screen scene="ember" testID="campaign-path">
       <NavBar
         onBack={() => goBack(router, "/")}
         backTestID="path-back"
+        backLabel="Campaigns"
         title={campaign.name}
         subtitle={`${seatWord(save.seatCount)} · ${done} of ${nodes.length} completed`}
         right={<IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId, nodes[currentIndex]?.id) })} />}
@@ -212,32 +213,28 @@ export default function CampaignPath() {
               reached={index < reachedUpTo}
               rewards={node.reward.map(name)}
               rounds={save.log.scenarios[node.id]?.rounds ?? null}
-              action={
-                open?.id === node.id
-                  ? { label: "Resume", onPress: () => router.push(tableHref(save.id)) }
-                  : node.status === "current"
-                    ? { label: "Begin", hint: open ? "A scenario is open. Dealing this one drops it." : undefined, onPress: () => router.push(briefingHref(save.id, node.id)) }
-                    : null
-              }
+              begin={open && open.id !== node.id && node.status === "current" ? { hint: "A scenario is open. Dealing this one drops it.", onPress: () => router.push(briefingHref(save.id, node.id)) } : null}
               onOpen={node.status === "completed" ? () => router.push(briefingHref(save.id, node.id)) : null}
             />
           ))}
         </View>
-      </ScreenScroll>
-      <ActionBar>
-        <View className="flex-row items-center gap-2.5">
-          <View className="flex-1 rounded-tile px-3.5 py-2" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.hairline }}>
+        {/* What the campaign has earned so far, and the log, at the end of the trail. */}
+        <View className="mt-2 flex-row items-center gap-2.5">
+          <View className="flex-1 rounded-tile px-3.5 py-2.5" style={tileSurface()}>
             <Eyebrow tone="moon">Pool</Eyebrow>
-            {/* A long pool scrolls inside its plate; it never pushes Log off the screen. */}
-            <ScrollView className="max-h-12" nestedScrollEnabled>
-              <Text testID="pool" className="text-label text-bone">
-                {poolText}
-              </Text>
-            </ScrollView>
+            <Text testID="pool" className="mt-0.5 text-label text-bone">
+              {poolText}
+            </Text>
           </View>
           <SecondaryButton label="Log" icon="lore" testID="log-open" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
         </View>
-      </ActionBar>
+      </ScreenScroll>
+      {next ? (
+        <ActionBar>
+          <Label className="mb-2.5 text-center">{next.words}</Label>
+          <PrimaryButton label={next.label} testID={next.testID} accessibilityLabel={`${next.label} ${next.words.replace(/^.*?: /, "")}`} onPress={next.onPress} />
+        </ActionBar>
+      ) : null}
     </Screen>
   );
 }

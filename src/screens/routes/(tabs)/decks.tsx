@@ -295,7 +295,7 @@ export default function Decks() {
           <FlashList
             data={rows}
             keyExtractor={(item) => item.key}
-            getItemType={(item) => item.kind}
+            getItemType={(item) => `${item.kind}:${view}`}
             renderItem={renderRow}
             extraData={{ managing, asking, readiness, view }}
             keyboardShouldPersistTaps="handled"

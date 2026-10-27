@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
-import { AccessibilityInfo, Pressable, Text, View } from "react-native";
+import { useCallback, useMemo, useRef, useState, type ComponentRef } from "react";
+import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
 
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
@@ -8,7 +8,6 @@ import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { Label, Panel, PrimaryButton, RingMark, Screen, ScreenScroll, ScreenTitle, Section, SecondaryButton, TextButton } from "../../chrome";
 import { SceneArt, type ArtCard } from "../../art";
 import { deckFaces } from "../../deck-store";
-import { nightFade } from "../../../play/surfaces";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf, scenarioNames } from "../../campaign-data";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
@@ -31,7 +30,7 @@ function SeatTile({ seats, selected, onPress }: { seats: Seats; selected: boolea
       accessibilityState={{ selected }}
       onPress={onPress}
       className="min-h-14 flex-1 items-center justify-center gap-2 rounded-tile px-3 py-3"
-      style={{ backgroundColor: selected ? palette.pressed : palette.night, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline }}
+      style={{ backgroundColor: selected ? palette.pressed : palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline }}
     >
       <View className="flex-row">
         <RingMark size={18} state={selected ? "current" : "locked"} />
@@ -65,6 +64,9 @@ export default function CampaignList() {
   // The save whose delete is waiting on Delete for good.
   const [deleting, setDeleting] = useState<string | null>(null);
   const [seats, setSeats] = useState<Seats>(1);
+  // New playthrough opens the Start block under the saves: the list scrolls to it, so its primary is on screen.
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  const startAt = useRef(0);
   const campaigns = campaignListQueries(catalog).campaigns.all();
   const locked = lockedTiles(campaigns);
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
@@ -174,7 +176,7 @@ export default function CampaignList() {
 
   return (
     <Screen testID="campaign-list" scene="dusk">
-      <ScreenScroll>
+      <ScreenScroll scrollRef={scroll}>
         <View className="flex-row items-center justify-between pb-3 pt-4">
           <ScreenTitle>Campaigns</ScreenTitle>
           {saves.length > 0 ? (
@@ -227,13 +229,19 @@ export default function CampaignList() {
             );
           })}
           {showStart ? (
-            <View className={saves.length > 0 ? "mt-2" : undefined}>
-              {saves.length > 0 ? <Section title="New playthrough" /> : null}
+            <View
+              className={saves.length > 0 ? "mt-2" : undefined}
+              onLayout={(event) => {
+                startAt.current = event.nativeEvent.layout.y;
+                if (starting) scroll.current?.scrollTo({ y: Math.max(0, startAt.current - 8), animated: true });
+              }}
+            >
+              {saves.length > 0 ? (
+                <Section title="New playthrough" right={<TextButton label="Cancel" testID="start-cancel" tone="muted" accessibilityLabel="Cancel the new playthrough" onPress={() => setStarting(false)} />} />
+              ) : null}
               <Panel current={saves.length === 0} padded={false}>
                 <View className="overflow-hidden rounded-t-card">
-                  <SceneArt scenarioId={fellowship?.scenarios[0]} height={132}>
-                    <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.3, 1, palette.raised) }} />
-                  </SceneArt>
+                  <SceneArt scenarioId={fellowship?.scenarios[0]} height={132} fade={0.3} fadeTo={palette.raised} />
                 </View>
                 <View className="px-5 pb-5" style={{ marginTop: -36 }}>
                   <Text className="font-display text-title text-bone">{nameOf(FELLOWSHIP_ID)}</Text>

@@ -8,7 +8,7 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
-import { goldEdge, goldGlow, goldSurface, raisedEdge, slateSurface } from "./surfaces.ts";
+import { goldGlow, goldPlate, raisedEdge, slateSurface } from "./surfaces.ts";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
@@ -174,12 +174,7 @@ export function ChromePrimary({
 function primaryFill(paper: boolean, disabled: boolean, pressed: boolean) {
   if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: paper ? t.inkLine : t.goldLine };
   if (paper) return { backgroundColor: t.ink, opacity: pressed ? 0.85 : 1 };
-  return {
-    ...goldSurface(pressed),
-    borderWidth: 1,
-    borderColor: t.goldDeep,
-    boxShadow: pressed ? goldEdge : `${goldEdge}, ${goldGlow}`,
-  };
+  return goldPlate(pressed);
 }
 
 /** The engine's numbers with the game's icons beside them. Each reads as "Willpower 2" to a screen reader. */

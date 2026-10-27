@@ -1,8 +1,8 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 
 import { CardTextView } from "../../../play/card-text-view";
-import { BodyText, Eyebrow, Label, NavBar, Panel, Screen, ScreenTitle, SecondaryButton, TextButton } from "../../chrome";
+import { BodyText, Eyebrow, Label, NavBar, Panel, Screen, ScreenScroll, ScreenTitle, SecondaryButton, TextButton } from "../../chrome";
 import { goBack } from "../../go-back";
 import { routeCode } from "../../route-code";
 import { GLOSSARY, bookPage, glossaryEntry, paragraphs, seeAlso } from "../../rules-glossary";
@@ -34,7 +34,8 @@ export default function Rule() {
   return (
     <Screen scene="plain" testID="rule">
       {back}
-      <ScrollView className="min-h-0 flex-1" style={{ marginHorizontal: -8 }} contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 8, gap: 16 }} contentContainerClassName="pb-safe">
+      <ScreenScroll top={8}>
+        <View className="gap-4 pb-safe">
         <View className="gap-1">
           <Eyebrow>{entry.source}</Eyebrow>
           <ScreenTitle size="title">{entry.title}</ScreenTitle>
@@ -72,7 +73,8 @@ export default function Rule() {
             </View>
           </View>
         ) : null}
-      </ScrollView>
+        </View>
+      </ScreenScroll>
     </Screen>
   );
 }

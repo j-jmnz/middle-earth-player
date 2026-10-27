@@ -4,15 +4,13 @@
 // seats, decks and difficulty. A game already finished shows its stored result.
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { finishStandalone } from "../../../../campaign/standalone";
-import { ActionBar, BodyText, Label, NavBar, PrimaryButton, Screen, StatTile, TextButton } from "../../../chrome";
-import { withAlphaHex } from "../../../../play/tokens";
+import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, StatTile, TextButton } from "../../../chrome";
 import { scenarioOf } from "../../../campaign-data";
 import { useDatabases } from "../../../databases";
 import { goBack } from "../../../go-back";
-import { palette } from "../../../palette.js";
 import { routeCode } from "../../../route-code";
 import { useStandaloneSession } from "../../../standalone-session";
 import { outcomeLines } from "../../../standalone-words";
@@ -59,20 +57,11 @@ export default function StandaloneOutcome() {
     router.replace({ pathname: "/standalone/briefing/[scenarioId]", params: { scenarioId: finished.scenarioId, from: finished.id } });
   };
 
-  const word = { fontSize: 44, lineHeight: 52, letterSpacing: 4 };
   return (
     <Screen testID="standalone-outcome" scene={won ? "victory" : "plain"}>
       {back}
       <View className={won ? "flex-1 pt-16" : "flex-1 justify-center"}>
-        <Text
-          testID="outcome-title"
-          accessibilityRole="header"
-          className={`text-center font-display-bold ${won ? "text-goldHigh" : "text-danger"}`}
-          style={{ ...word, textShadowColor: won ? palette.gold : withAlphaHex(palette.threat, 0.6), textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
-        >
-          {won ? "Victory" : "Defeat"}
-        </Text>
-        <Text className="mt-1 text-center font-display text-heading text-bone">{scenario?.name ?? ""}</Text>
+        <OutcomeTitle won={won} scenario={scenario?.name ?? ""} testID="outcome-title" />
         {result.outcome === "won" ? (
           // The score as the numbers the player watches: score, completed rounds, victory points (ltp.scoring).
           <View className="mt-10" testID="outcome-lines">

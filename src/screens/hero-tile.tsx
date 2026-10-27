@@ -5,7 +5,7 @@ import { CroppedArt } from "./art";
 import { PAINTING } from "./art-crop";
 import { Chevron, markedSphere, pressedNight, RingMark, sphereWord, SphereMark } from "./chrome";
 import { CardThumb, useCardPreview } from "./images/picture";
-import { nightFade, panelSurface, raisedEdge } from "../play/surfaces";
+import { nightFade } from "../play/surfaces";
 import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
 import { palette } from "./palette.js";
@@ -72,7 +72,7 @@ export function HeroTile({
                   {ringBearer ? <RingMark size={10} state="current" /> : null}
                 </View>
               ) : null}
-              <Text className={`font-display-bold ${dense ? "text-micro" : "text-heading"} ${ringBearer ? "text-goldHigh" : "text-bone"}`} numberOfLines={2}>
+              <Text className={`font-display-bold ${dense ? "" : "text-heading"} ${ringBearer ? "text-goldHigh" : "text-bone"}`} style={dense ? { fontSize: 12, lineHeight: 15 } : undefined} numberOfLines={2}>
                 {hero.name}
               </Text>
               {dense ? null : (
@@ -112,7 +112,8 @@ export function HeroTile({
           onPress={onPress}
           onLongPress={onLongPress ? () => onLongPress(preview) : undefined}
           delayLongPress={350}
-          style={({ pressed }) => ({ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, opacity: pressed ? 0.25 : 0, backgroundColor: palette.night })}
+          // A transparent fill at full opacity, not an invisible view: iOS skips a view below 0.01 opacity when it hit-tests.
+          style={({ pressed }) => ({ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: pressed ? withAlphaHex(palette.night, 0.25) : "transparent" })}
         />
       ) : null}
       {onRemove ? (
@@ -232,7 +233,7 @@ function StatusLine({ testID, detail, status, note }: { testID: string; detail: 
       <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
         <Text className="text-label text-muted">{detail}</Text>
         <View className="flex-row items-center gap-1.5">
-          <View style={{ width: 8, height: 8, borderRadius: 4, ...(status.ready ? { backgroundColor: palette.ok, boxShadow: `0 0 6px ${withAlphaHex(palette.ok, 0.8)}` } : { borderWidth: 1.5, borderColor: palette.danger }) }} />
+          <View style={{ width: 8, height: 8, borderRadius: 4, ...(status.ready ? { backgroundColor: palette.ok } : { borderWidth: 1.5, borderColor: palette.danger }) }} />
           <Text testID={`${testID}-status`} className={`text-label ${status.ready ? "text-ok" : "text-danger"}`}>
             {status.text}
           </Text>
@@ -254,7 +255,8 @@ function StatusLine({ testID, detail, status, note }: { testID: string; detail: 
 export function DeckCover(props: DeckSummary & { height: number }) {
   const { name, heroes, detail, status, note, height, testID, children, selected, disabled } = props;
   return (
-    <View className="overflow-hidden rounded-card" style={{ ...panelSurface(), borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline, boxShadow: raisedEdge }}>
+    // A FlashList row: a solid fill and no shadow (docs/design-system.md, Performance); only the night fade lays the words on the pictures.
+    <View className="overflow-hidden rounded-card" style={{ backgroundColor: palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline }}>
       <Pressable {...pressProps(props)}>
         {({ pressed }) => (
           <View style={pressed && !disabled ? pressedNight : undefined}>

@@ -5,9 +5,8 @@ import { Pressable, Text, View } from "react-native";
 
 import { BodyText, Chip, ListRow, Screen, SearchField, Section } from "./chrome";
 import { BOOKLETS } from "./booklets/books";
-import { palette } from "./palette.js";
 import { GameIcon } from "../play/game-icon";
-import { panelSurface, raisedEdge } from "../play/surfaces";
+import { tileSurface } from "../play/surfaces";
 import { GLOSSARY, searchGlossary } from "./rules-glossary";
 
 // The books keep the testIDs they had on the campaign list.
@@ -42,7 +41,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
                 className="flex-1"
               >
                 {({ pressed }) => (
-                  <View className="min-h-28 justify-between rounded-card p-4" style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.hairline, boxShadow: raisedEdge }}>
+                  <View className="min-h-28 justify-between rounded-card p-4" style={tileSurface(pressed)}>
                     <GameIcon name="lore" size={22} tint="gold" />
                     <Text className="mt-3 font-display text-heading text-bone" numberOfLines={3}>
                       {book.name}

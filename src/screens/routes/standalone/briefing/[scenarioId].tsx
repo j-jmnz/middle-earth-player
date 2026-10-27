@@ -3,7 +3,6 @@
 // opens its table. `from` names a finished game whose seats, decks and difficulty are picked again (Play again).
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { View } from "react-native";
 
 import { scenarioFacts, type BriefingSeat } from "../../../../campaign/briefing";
 import { FELLOWSHIP_ID } from "../../../../campaign/save";
@@ -12,9 +11,10 @@ import { loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { BriefingScreen, expand, ScenarioBanner, ScenarioDetails, SeatPicker, useBriefingDecks } from "../../../briefing-parts";
+import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
+import { SeatPicker } from "../../../seat-picker";
 import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
-import { BodyText, Label, PrimaryButton, Section, Segmented } from "../../../chrome";
+import { BodyText, Label, Section, Segmented } from "../../../chrome";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
 import { goBack } from "../../../go-back";
@@ -111,27 +111,14 @@ export default function StandaloneBriefing() {
     <BriefingScreen
       {...frame}
       banner={<ScenarioBanner facts={facts} eyebrow={`Standalone · Scenario ${facts.number}`} />}
-      bar={
-        <View className="gap-2">
-          {result.problems.map((problem, index) => (
-            <Label key={`${index}-${problem.message}`} tone="danger" testID={`briefing-error-${index}`}>
-              {problem.message}
-            </Label>
-          ))}
-          {dealError ? (
-            <Label tone="danger" testID="briefing-deal-error">
-              {dealError}
-            </Label>
-          ) : null}
-          <PrimaryButton label="Deal" testID="deal" disabled={!result.dealable} onPress={onDeal} />
-        </View>
-      }
+      bar={<DealBar problems={result.problems} dealError={dealError} difficulty={difficulty} dealable={result.dealable} onDeal={onDeal} />}
     >
       <Section title="Players" className="mt-4" />
       <Segmented options={SEAT_WORDS} value={seatWord(seatCount)} onChange={(next) => setSeatCount(seatCountOf(next))} testIDPrefix="seats" stretch />
       <Label tone="muted" className="mt-2">
         No campaign card, boons or burdens. A win is scored; nothing is written to a campaign.
       </Label>
+      <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} />
       {seats.map((seat, index) => (
         <SeatPicker
           key={index}
@@ -148,7 +135,7 @@ export default function StandaloneBriefing() {
           nameOf={nameOf}
         />
       ))}
-      <ScenarioDetails facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} />
+      <EncounterDetails facts={facts} />
     </BriefingScreen>
   );
 }
