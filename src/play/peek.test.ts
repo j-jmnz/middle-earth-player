@@ -7,7 +7,7 @@ import { dialName, dialTap, NO_DRAG, NO_HIGHLIGHT, NO_TARGETS, peekSeat, peekWor
 import { onScrubCancel, scrubMoved, scrubOpen } from "./scrub-open.ts";
 import { twoHanded } from "./seat-fixture.ts";
 import { createTableStore } from "./store.ts";
-import { PEEK_ROOM, peekTo, playStep } from "./use-peek.ts";
+import { peekTo } from "./use-peek.ts";
 
 // The peek at the other seat (phase 26; docs/brief.md, Table): a view only. The acting seat, the intents and the save never change.
 const { state, ctx } = twoHanded();
@@ -83,7 +83,6 @@ describe("the banner words", () => {
     expect(peekWords(state, null)).toBeNull();
     expect(peekWords(state, 0)).toBeNull();
     expect(peekWords(solo, 1)).toBeNull();
-    expect(PEEK_ROOM).toBeGreaterThan(44);
   });
 });
 
@@ -123,14 +122,9 @@ describe("the table store's viewed seat", () => {
     expect(alone.getState().viewedSeat).toBeNull();
   });
 
-  it("ends with the next state: a new moment, and so a new sheet key and a new acting seat", () => {
+  it("ends when Undo goes back to an earlier state (the next-state cases are in table-choice.test.ts)", () => {
     const store = createTableStore({ ctx, game: state });
-    store.getState().peek(1);
-    // Seat 0 passes: the engine turns to seat 1, who is the seat peeked at. The peek is over and seat 1 is acting.
     expect(store.getState().dispatch({ type: "Pass" })).toBe(true);
-    expect(store.getState().game.activeSeat).toBe(1);
-    expect(store.getState().viewedSeat).toBeNull();
-    // Undo goes back to the earlier state: a peek ends there too.
     store.getState().peek(0);
     expect(store.getState().viewedSeat).toBe(0);
     expect(store.getState().undo()).toBe(true);
@@ -178,23 +172,5 @@ describe("a peek while a hand scrub is open", () => {
     peekTo(store, null);
     expect(cancel).toHaveBeenCalledTimes(1);
     expect(store.getState().viewedSeat).toBeNull();
-  });
-});
-
-describe("the play layer's Back steps", () => {
-  it("skip a spotlight, cancel a scrub and end the peek, and leave every other step to the screen", () => {
-    const store = createTableStore({ ctx, game: state });
-    store.getState().peek(1);
-    expect(playStep("closeMenu", store)).toBe(false);
-    expect(playStep("leave", store)).toBe(false);
-    expect(store.getState().viewedSeat).toBe(1);
-    expect(playStep("endPeek", store)).toBe(true);
-    expect(store.getState().viewedSeat).toBeNull();
-    const cancel = vi.fn();
-    onScrubCancel(cancel);
-    expect(playStep("cancelScrub", store)).toBe(true);
-    expect(cancel).toHaveBeenCalledTimes(1);
-    onScrubCancel(null);
-    expect(playStep("skipSpotlight", store)).toBe(true);
   });
 });

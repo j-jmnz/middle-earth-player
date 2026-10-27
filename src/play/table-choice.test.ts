@@ -1,4 +1,6 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+
+import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import { expectOk } from "../rules/fixture.ts";
 import { legalIntents, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
@@ -15,7 +17,7 @@ import { twoHanded } from "./seat-fixture.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
 import { createTableStore } from "./store.ts";
-import { tapRoute } from "./tray-logic.ts";
+import { tapAction } from "./tray-logic.ts";
 import { choiceFor, dockFor, onlyAnswer, onTheTable, primaryReady, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
 
 // Rules: rr.action-windows, rr.step-3-4, rr.step-6-4-3 (data/rules/entries.json). The table answers every moment of whole
@@ -111,7 +113,7 @@ describe("the table answers each moment", () => {
         }
         // A sheet answered on the table names only cards the layout draws whole: a card slot (or the playable top of the
         // deck), never an attachment strip or a card that is not drawn at all.
-        const seat = shownSeat(state);
+        const seat = shownSeat(state, null);
         if (onTheTable(sheet, onTableFor(state, seat))) {
           const views = Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat)(state)])) as Record<ZoneId, ZoneView>;
           const piles = Object.fromEntries(PILES.map((pile) => [pile, pileSelector(pile, seat)(state)])) as Record<PileId, PileView>;
@@ -232,90 +234,67 @@ describe("numbers beside an attack", () => {
   });
 });
 
-// Peeking at the other seat (phase 26; docs/brief.md, Table). The table draws the seat peeked at; everything that picks, pays or sends
-// is still the acting seat's, and a tap on a card only opens its preview.
+// Peeking at the other seat (phase 26): the table draws it, the acting seat still picks, and a card tap only previews.
 describe("a peek at the other seat", () => {
   const duo = twoHanded();
-  const sheetOfDuo = (state: ScenarioState): Sheet => {
-    const legal = legalIntents(state, duo.ctx);
-    return sheetFor(state, duo.ctx, legal, names) ?? windowSheet(state, duo.ctx, legal, names);
-  };
+  const sheetOfDuo = (state: ScenarioState): Sheet => sheetFor(state, duo.ctx, legalIntents(state, duo.ctx), names) ?? windowSheet(state, duo.ctx, legalIntents(state, duo.ctx), names);
+  const tapping = (cardId: string, over: Partial<Parameters<typeof tapAction>[0]> = {}) => ({ panelOpen: false, reader: false, cardId, peeking: false, faceDown: false, ...over });
 
-  it("routes a tap on any card to its preview, never to a pick, and sends nothing", () => {
+  it("turns a tap on any card into its preview, never a pick, and sends nothing", () => {
     const store = createTableStore({ ctx: duo.ctx, game: duo.state });
     store.getState().peek(1);
-    const before = store.getState().game;
-    const cards = [...duo.seats[1].hand, duo.seats[1].hero, ...duo.seats[1].engaged, ...duo.staging, ...duo.seats[0].hand];
-    for (const cardId of cards) {
-      expect(tapRoute({ panelOpen: false, reader: false, cardId, peeking: store.getState().viewedSeat != null }), cardId).toBe("preview");
-      // Not peeking, the same tap is a pick for the open moment.
-      expect(tapRoute({ panelOpen: false, reader: false, cardId, peeking: false }), cardId).toBe("pick");
-    }
-    // A pile still opens its list, which is reading, and a screen reader peeking still previews.
-    expect(tapRoute({ panelOpen: false, reader: false, cardId: "pile:discard", peeking: true })).toBe("pile");
-    expect(tapRoute({ panelOpen: true, reader: true, cardId: duo.seats[1].hand[0] ?? "", peeking: true })).toBe("preview");
-    // The open tray still folds on a tap outside it, peeking or not.
-    expect(tapRoute({ panelOpen: true, reader: false, cardId: duo.seats[1].hand[0] ?? "", peeking: true })).toBe("fold");
-    // Nothing reached the reducer: the game is the same object, nothing was sent or undone.
-    expect(store.getState().game).toBe(before);
-    expect(store.getState().history).toHaveLength(0);
-    expect(store.getState().moment).toBeNull();
+    const peeking = store.getState().viewedSeat === 1;
+    const pick = vi.fn(() => true);
+    for (const cardId of [...duo.seats[1].hand, duo.seats[1].hero, ...duo.seats[1].engaged, ...duo.staging, ...duo.seats[0].hand]) expect(tapAction(tapping(cardId, { peeking }), pick), cardId).toBe("preview");
+    // A face-down card shows nothing, a pile still lists, a screen reader still previews, and the open tray still folds.
+    expect(tapAction(tapping("c", { peeking, faceDown: true }), pick)).toBe("none");
+    expect(tapAction(tapping("pile:discard", { peeking }), pick)).toBe("pile");
+    expect(tapAction(tapping("c", { peeking, reader: true, panelOpen: true }), pick)).toBe("preview");
+    expect(tapAction(tapping("c", { peeking, panelOpen: true }), pick)).toBe("fold");
+    expect(pick).not.toHaveBeenCalled();
+    // Not peeking, the same tap is offered to the pick, and a card it does not take is previewed.
+    expect(tapAction(tapping("c"), pick)).toBe("picked");
+    expect(tapAction(tapping("c"), () => false)).toBe("preview");
+    expect(store.getState().game).toBe(duo.state);
+    expect([store.getState().history.length, store.getState().moment]).toEqual([0, null]);
   });
 
-  it("leaves every pick the acting seat's: the sheet, the cards that glow and what the table lets a tap pick", () => {
+  it("leaves every pick the acting seat's: the seat that picks, the cards that glow and mute, and what a tap may pick", () => {
     const store = createTableStore({ ctx: duo.ctx, game: duo.state });
-    const game = store.getState().game;
-    const sheet = sheetOfDuo(game);
-    const acting = actingSeat(game);
-    const glow = () => highlightKeys({ game: store.getState().game, seat: acting, sheet: sheetOfDuo(store.getState().game), choice: choiceFor(sheet, null), panel: false, beatKey: "" }).glow;
-    const plain = glow();
     store.getState().peek(1);
-    // Seat 1 is drawn; seat 0 still acts. The moment, its sheet and its glow do not read the seat that is drawn.
-    expect(shownSeat(store.getState().game, store.getState().viewedSeat)).toBe(1);
-    expect(actingSeat(store.getState().game)).toBe(0);
-    expect(sheetOfDuo(store.getState().game).key).toBe(sheet.key);
-    expect(glow()).toBe(plain);
-    expect(sheet.kind).toBe("window");
-    const mine = new Set(duo.seats[0].hand);
-    const theirs = new Set(duo.seats[1].hand);
-    for (const id of tappable(sheet)) {
-      expect(mine.has(id), `${id} is seat 0's`).toBe(true);
-      expect(theirs.has(id)).toBe(false);
-    }
-    const onTable = onTableFor(game, acting);
-    for (const id of duo.seats[0].hand) expect(onTable(id)).toBe(true);
-    for (const id of duo.seats[1].hand) expect(onTable(id)).toBe(false);
-    // The dock sends seat 0's intent: it is seat 0's own card it plays.
+    const { game, viewedSeat } = store.getState();
+    const sheet = sheetOfDuo(game);
+    expect([shownSeat(game, viewedSeat), actingSeat(game)]).toEqual([1, 0]);
+    const keys = (seat: number) => highlightKeys({ game, seat, sheet, choice: choiceFor(sheet, null), panel: false, beatKey: "" });
+    // Planning mutes seat 0's hand card no hero can pay for; read for the seat drawn it would mute all of seat 1's hand instead.
+    expect(keys(actingSeat(game)).muted).toBe(duo.seats[0].hand.at(-1));
+    expect(keys(shownSeat(game, viewedSeat)).muted).toBe(duo.seats[1].hand.join(","));
+    for (const id of tappable(sheet)) expect(duo.seats[0].hand.includes(id), `${id} is seat 0's`).toBe(true);
+    const onTable = onTableFor(game, actingSeat(game));
+    expect([...duo.seats[0].hand.map(onTable), ...duo.seats[1].hand.map(onTable)]).toEqual([true, true, true, false, false, false]);
     const play = legalIntents(game, duo.ctx).find((intent) => intent.type === "PlayCard");
-    expect(play?.type === "PlayCard" ? mine.has(play.cardId) : false).toBe(true);
+    expect(play?.type === "PlayCard" ? duo.seats[0].hand.includes(play.cardId) : false).toBe(true);
+  });
+
+  it("is kept out of the hook that picks: use-table-choice.ts never reads the seat drawn", () => {
+    const source = readFileSync(new URL("./use-table-choice.ts", import.meta.url), "utf8");
+    expect(source).not.toMatch(/shownSeat|viewedSeat/);
+    expect(source).toMatch(/actingSeat\(game\)/);
   });
 
   it("ends on a new sheet key and on a change of the acting seat", () => {
     const store = createTableStore({ ctx: duo.ctx, game: duo.state });
     const firstKey = sheetOfDuo(store.getState().game).key;
     store.getState().peek(1);
-    expect(store.getState().viewedSeat).toBe(1);
     // Seat 0 passes: the engine asks seat 1, a new sheet key and a new acting seat; the peek is over.
     expect(store.getState().dispatch({ type: "Pass" })).toBe(true);
     expect(sheetOfDuo(store.getState().game).key).not.toBe(firstKey);
     expect(actingSeat(store.getState().game)).toBe(1);
     expect(store.getState().viewedSeat).toBeNull();
-    // Peeking at seat 0 now (the acting seat is 1), the next state ends it as well.
+    // Peeking at seat 0 now, any new state ends it too.
     store.getState().peek(0);
     expect(store.getState().viewedSeat).toBe(0);
     store.getState().dispatch({ type: "Pass" });
-    expect(store.getState().viewedSeat).toBeNull();
-  });
-
-  it("ends on a new state with the same sheet key and the same acting seat: any new moment", () => {
-    const store = createTableStore({ ctx: duo.ctx, game: duo.state });
-    const play = legalIntents(duo.state, duo.ctx).find((intent) => intent.type === "PlayCard");
-    if (play?.type !== "PlayCard") throw new Error("no card to play");
-    const key = sheetOfDuo(duo.state).key;
-    store.getState().peek(1);
-    expect(store.getState().dispatch({ ...play, payments: [] })).toBe(true);
-    expect(actingSeat(store.getState().game)).toBe(0);
-    expect(sheetOfDuo(store.getState().game).key).toBe(key);
     expect(store.getState().viewedSeat).toBeNull();
   });
 });

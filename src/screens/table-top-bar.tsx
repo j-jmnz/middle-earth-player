@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import { ScrollView, View, type LayoutChangeEvent } from "react-native";
 
+import { setDialsEdge } from "../play/bar-edge";
 import { seatDial } from "../play/peek";
 import type { Rail } from "../play/rail";
 import type { SeatThreat } from "../play/selectors";
@@ -58,6 +59,9 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, rail, s
     return () => clearTimeout(timer);
   }, []);
   const zones = bar > 0 && (dials > 0 || waited) ? barZones(bar - 16, dials) : null;
+  // The tray's outside-tap layer over the bar stops where the dials end, so a dial tap reaches the dial (src/play/bar-edge.ts).
+  const edge = zones ? 8 + Math.min(dials, zones.left) : 0;
+  useEffect(() => setDialsEdge(edge), [edge]);
   return (
     <View testID="table-top-bar" className="flex-row items-center px-2" style={{ height: TOP_BAR }} onLayout={onBar}>
       <View testID="top-bar-left" style={{ width: zones?.left ?? "30%" }}>
@@ -80,8 +84,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, rail, s
                   threat={threat}
                   label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
                   accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
-                  active={dial.role === "acting"}
-                  viewing={dial.role === "viewing"}
+                  role={dial.role}
                   hint={dial.hint}
                   compact
                   ticks={ticks}

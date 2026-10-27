@@ -79,6 +79,20 @@ export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: s
   return state.peeking ? "preview" : "pick";
 }
 
+/**
+ * What a tap on the canvas does, from its route and, for a pick, whether the table took it (`pick` is the hook's: it picks, or opens
+ * the question the card leads to, and says whether it did). While the table peeks at the other seat a card is never picked: `pick` is
+ * not called and the card only opens its preview (a face-down card shows nothing).
+ */
+export type TapAction = "fold" | "pile" | "picked" | "preview" | "none";
+
+export function tapAction(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking: boolean; faceDown: boolean }, pick: (cardId: string) => boolean): TapAction {
+  const route = tapRoute(state);
+  if (route === "fold" || route === "pile") return route;
+  if (route === "pick" && pick(state.cardId)) return "picked";
+  return state.faceDown ? "none" : "preview";
+}
+
 /** The hit layers over the top bar and the command column that fold the open tray: only while it shows, and no reading layer or screen reader is up. */
 export function outsideLayers(a: { trayShown: boolean; reading: boolean; reader: boolean }): boolean {
   return a.trayShown && !a.reading && !a.reader;

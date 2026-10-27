@@ -4,14 +4,10 @@
 import { useCallback, useEffect } from "react";
 import { useStore } from "zustand";
 
-import type { BackStep } from "./back.ts";
 import { dialTap, peekSeat, peekWords, type PeekWords } from "./peek.ts";
 import { cancelScrub, scrubOpen } from "./scrub-open.ts";
 import { actingSeat, shownSeat } from "./selectors.ts";
 import type { TableStore } from "./store.ts";
-
-/** The room the peek banner takes under the top bar (its 44 pt pill and a gap), which the table's own outcome banner moves down by. */
-export const PEEK_ROOM = 52;
 
 /**
  * Peeks at `seat`, or goes back to the acting seat with null. A hand scrub that is open when the shown seat changes is cancelled
@@ -21,18 +17,6 @@ export function peekTo(store: TableStore, seat: number | null): void {
   const { game, viewedSeat } = store.getState();
   if (shownSeat(game, peekSeat(game, seat)) !== shownSeat(game, viewedSeat) && scrubOpen()) cancelScrub();
   store.getState().peek(seat);
-}
-
-/**
- * The Back steps the play layer handles (back.ts, the first three, in that order): skip a spotlight, cancel a hand scrub, end the
- * peek. True when it handled the step; the screen peels the rest.
- */
-export function playStep(step: BackStep, store: TableStore): boolean {
-  if (step === "skipSpotlight") store.getState().endSpotlight("skipped");
-  else if (step === "cancelScrub") cancelScrub();
-  else if (step === "endPeek") peekTo(store, null);
-  else return false;
-  return true;
 }
 
 export type PeekView = {
@@ -71,6 +55,6 @@ export function usePeek(store: TableStore): PeekView {
  * table, or the moment's own) ends the peek; so does every new state, which the store does itself (store.ts, `viewedSeat`).
  */
 export function usePeeking(store: TableStore, sheetKey: string): boolean {
-  useEffect(() => store.getState().peek(null), [store, sheetKey]);
+  useEffect(() => peekTo(store, null), [store, sheetKey]);
   return useStore(store, (state) => state.viewedSeat != null);
 }

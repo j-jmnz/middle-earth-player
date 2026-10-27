@@ -12,9 +12,7 @@ describe("shownSeat", () => {
   const turned = { ...state, activeSeat: 1 };
 
   it("is the acting seat with no viewed seat", () => {
-    expect(shownSeat(state)).toBe(0);
     expect(shownSeat(state, null)).toBe(0);
-    expect(shownSeat(state, undefined)).toBe(0);
     expect(shownSeat(turned, null)).toBe(1);
   });
 
@@ -35,7 +33,7 @@ describe("shownSeat", () => {
 
   it("is seat 0 in a true solo game, viewed or not", () => {
     const solo = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
-    expect(shownSeat(solo)).toBe(0);
+    expect(shownSeat(solo, null)).toBe(0);
     expect(shownSeat(solo, 1)).toBe(0);
   });
 

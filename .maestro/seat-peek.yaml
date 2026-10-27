@@ -5,7 +5,8 @@ tags:
 # Phase 26. Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build
 # (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture is a real two-handed game of A Shadow of the Past parked on the first player's
 # planning window of round 1 (src/campaign/fixtures, `duo`): two dials, Player 1 acting. A tap on the dial of the seat that is not
-# shown peeks at that seat; the banner says whose area it is and who acts, and Back to Player 1 ends it.
+# shown peeks at that seat; the banner says whose area it is and who acts, and Back to Player 1 ends it. The banner's pill is a
+# plain view (not an accessibility element), so the flow asserts its text and its button.
 - launchApp:
     clearState: true
 - openLink: "middleearthlcg://e2e/duo"
@@ -13,8 +14,14 @@ tags:
     visible:
       id: campaign-path
     timeout: 15000
+# The campaign list's Continue panel resumes the open scenario on the table, as scenario-1-loss.yaml does.
 - tapOn:
-    id: begin
+    id: path-back
+- assertVisible:
+    id: continue-next
+    text: "On the table: A Shadow of the Past"
+- tapOn:
+    id: continue
 - extendedWaitUntil:
     visible:
       id: table
@@ -25,14 +32,14 @@ tags:
 - assertVisible:
     id: threat-1
 - assertNotVisible:
-    id: peek-banner
+    id: peek-text
 # The second seat's dial peeks: the banner says whose area this is and who is acting, the dial wears the viewing mark and the
 # way back is on the banner.
 - tapOn:
     id: threat-1
 - extendedWaitUntil:
     visible:
-      id: peek-banner
+      id: peek-text
     timeout: 5000
 - assertVisible:
     id: peek-text
@@ -43,14 +50,18 @@ tags:
     id: threat-1-viewing
 - assertVisible:
     id: threat-1-eye
-# The dock is still Player 1's: its eyebrow starts with the seat.
+# The dock is still Player 1's.
 - assertVisible:
     id: dock
 # Back to Player 1 ends the peek.
 - tapOn:
     id: peek-back
+- extendedWaitUntil:
+    notVisible:
+      id: peek-text
+    timeout: 5000
 - assertNotVisible:
-    id: peek-banner
+    id: peek-back
 - assertNotVisible:
     id: threat-1-viewing
 # The acting seat's dial is also the way back, and the same dial peeks again.
@@ -58,9 +69,11 @@ tags:
     id: threat-1
 - extendedWaitUntil:
     visible:
-      id: peek-banner
+      id: peek-back
     timeout: 5000
 - tapOn:
     id: threat-0
-- assertNotVisible:
-    id: peek-banner
+- extendedWaitUntil:
+    notVisible:
+      id: peek-back
+    timeout: 5000

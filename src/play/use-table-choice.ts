@@ -21,7 +21,7 @@ import { dockExtras } from "./dock-extras.ts";
 import { usePeeking } from "./use-peek.ts";
 import { useStable } from "./use-stable.ts";
 import { fightOf, highlightKeys, highlightOf, playedCard } from "./highlight-of.ts";
-import { tapRoute, trayOpen } from "./tray-logic.ts";
+import { tapAction, tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
@@ -229,10 +229,10 @@ export function useTableChoice({
   // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
   const onTap = useCallback(
     (cardId: string) => {
-      const route = tapRoute({ panelOpen, reader, cardId, peeking });
-      if (route === "fold") setFolded(sheet.key);
-      else if (route === "pile") onPile(cardId.slice(5));
-      else if ((route === "preview" || !pick(cardId)) && game.cards[cardId]?.face !== "down") onPreview(cardId);
+      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: game.cards[cardId]?.face === "down" }, pick);
+      if (action === "fold") setFolded(sheet.key);
+      else if (action === "pile") onPile(cardId.slice(5));
+      else if (action === "preview") onPreview(cardId);
     },
     [panelOpen, reader, peeking, sheet.key, pick, onPile, onPreview, game],
   );

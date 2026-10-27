@@ -8,9 +8,7 @@ import { BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
-import { backStep } from "../play/back";
-import { scrubOpen } from "../play/scrub-open";
-import { spotlightOpen } from "../play/spotlight-gate";
+import { backStep, playLayers, runBackStep } from "../play/back-steps";
 import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
 import type { LogNames } from "../play/log";
@@ -32,7 +30,8 @@ import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
-import { PEEK_ROOM, playStep, usePeek } from "../play/use-peek";
+import { PEEK_ROOM } from "../play/peek-banner";
+import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
 import { locationReadout, ringWords, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
@@ -168,12 +167,12 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       const step = backStep({
-        spotlightOpen: spotlightOpen(store.getState().spotlight), scrubOpen: scrubOpen(), peekOpen: peek.viewed != null,
+        ...playLayers(store),
         menuOpen, moreOpen, linesOpen,
         previewOpen: preview != null, readingOpen: reading != null,
         overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen,
       });
-      if (playStep(step, store)) return true;
+      if (runBackStep(step, store)) return true;
       if (step === "closeMenu") setMenuOpen(false);
       else if (step === "closeMore" || step === "closeLines") closeMore();
       else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
@@ -184,7 +183,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [store, peek.viewed, menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav]);
+  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -227,7 +226,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       <View className="flex-1" importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
         <TableTopBar
           threats={threats}
-          acting={peek.acting} viewed={peek.viewed}
+          acting={peek.acting}
+          viewed={peek.viewed}
           life={widgets.life}
           burdenDeck={widgets.burdenDeck}
           rail={rail}
@@ -238,7 +238,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           ringSeat={locations?.heldBy}
           ringWords={ringWords(locations, nameOf)}
           menuOpen={menuOpen}
-          onThreat={(threatSeat) => peek.tap(threatSeat) || setReading({ kind: "threat", seat: threatSeat })}
+          onThreat={(threatSeat) => { choice.foldOutside(); setReading(peek.tap(threatSeat) ? null : { kind: "threat", seat: threatSeat }); }}
           onRail={() => setReading((now) => openReading(now, { kind: "carousel" }))}
           onMenu={() => setMenuOpen((open) => !open)}
         />

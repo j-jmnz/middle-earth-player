@@ -175,4 +175,3 @@ describe("duo (the peek's two-handed fixture, phase 26)", () => {
     expect(state.seats[0]?.hand).not.toEqual(state.seats[1]?.hand);
   });
 });
-
