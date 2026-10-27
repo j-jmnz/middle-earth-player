@@ -6,11 +6,10 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { AccessibilityInfo, Pressable, Text, View } from "react-native";
 
-import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { isPlayable } from "../../../campaign/playable";
 import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
-import { campaignOf, scenarioNames } from "../../campaign-data";
+import { BOXES, scenarioName } from "../../campaign-data";
 import { BodyText, Chevron, Chip, Eyebrow, Label, Panel, Screen, ScreenScroll, ScreenTitle, Section, TextButton } from "../../chrome";
 import { SceneArt, SceneCard } from "../../art";
 import { palette } from "../../palette.js";
@@ -34,9 +33,7 @@ export default function Scenarios() {
   const [showArchived, setShowArchived] = useState(false);
   // The game whose delete is waiting on Delete for good.
   const [deleting, setDeleting] = useState<string | null>(null);
-  const campaign = campaignOf(FELLOWSHIP_ID);
-  const names = campaign ? scenarioNames(campaign) : {};
-  const nameOf = (id: string) => names[id] ?? id;
+  const nameOf = scenarioName;
 
   const refresh = useCallback(() => {
     // A game in progress from another engine version or against other card data is dropped on the read, as a campaign
@@ -207,10 +204,12 @@ export default function Scenarios() {
           </View>
         ) : null}
 
-        <View className="mt-5" testID="standalone-scenarios">
-          <Section title={campaign?.name ?? "Fellowship of the Ring"} />
+        <View className="mt-5 gap-6" testID="standalone-scenarios">
+          {BOXES.map((box) => (
+          <View key={box.id} testID={`box-${box.id}`}>
+          <Section title={box.name} />
           <View className="gap-2.5">
-            {(campaign?.scenarios ?? []).map((id, index) => {
+            {box.scenarios.map((id, index) => {
               const playable = isPlayable(id);
               return (
                 <Pressable
@@ -250,6 +249,8 @@ export default function Scenarios() {
               );
             })}
           </View>
+          </View>
+          ))}
         </View>
 
         <View className="mt-6 gap-3" testID="standalone-games">

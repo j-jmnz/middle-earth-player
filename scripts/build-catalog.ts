@@ -11,12 +11,11 @@ import { campaignIndexSchema } from "../src/catalog/scenario-data.ts";
 import { campaigns, cards, catalogTables, meta, packs } from "../src/catalog/schema.ts";
 import { contentVersion, writeCatalogVersion } from "./catalog-version.ts";
 import { bytes, createLog, runScript } from "./log.ts";
+import { PACK_CAMPAIGN } from "./data/campaign-defs.ts";
 import { loadCards } from "./data/load-cards.ts";
 import { DATA_DIR } from "./data/paths.ts";
 import { parseLedger } from "./data/printed/ledger.ts";
 
-const FELLOWSHIP_CAMPAIGN_ID = "fellowship-of-the-ring";
-const FELLOWSHIP_PACK_CODES = new Set(["TBR", "TRD"]);
 const log = createLog("catalog:build");
 
 type SqliteDatabase = InstanceType<typeof Database>;
@@ -110,6 +109,17 @@ export function pictureOf(card: Card, fronts: ReadonlyMap<string, string>): stri
   return urls.find((url) => !url.includes("dragncards")) ?? urls[0] ?? null;
 }
 
+// A card belongs to the campaign of the first catalog pack it is printed in that PACK_CAMPAIGN lists (a Fellowship card also in the
+// Starter box keeps its tag). A player card of the Core Set is also printed in the Revised Core Set and belongs to no campaign.
+function campaignOfPacks(packCodes: readonly string[]): string | null {
+  if (packCodes.includes("Core")) return null;
+  for (const code of packCodes) {
+    const campaign = PACK_CAMPAIGN.get(code);
+    if (campaign) return campaign;
+  }
+  return null;
+}
+
 function cardRow(card: Card, knownPacks: ReadonlySet<string>, fronts: ReadonlyMap<string, string>): Row {
   const primary = card.printings[0];
   if (!primary) throw new Error(`Card ${card.code} has no printing`);
@@ -148,7 +158,7 @@ function cardRow(card: Card, knownPacks: ReadonlySet<string>, fronts: ReadonlyMa
     errata: card.errata,
     imagesrc: pictureOf(card, fronts),
     deck_legal: bit(card.deckLegal),
-    campaign_id: packCodes.some((code) => FELLOWSHIP_PACK_CODES.has(code)) ? FELLOWSHIP_CAMPAIGN_ID : null,
+    campaign_id: campaignOfPacks(packCodes),
   });
 }
 

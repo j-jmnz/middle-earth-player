@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { readdirSync } from "node:fs";
+
+import index from "../../data/campaigns/index.json";
 import entries from "../../data/rules/entries.json";
-import { bookletPageOf, bookletParams, campaignOf, scenarioNames, scenarioOf } from "./campaign-data";
+import { BOXES, bookletPageOf, bookletParams, boxOf, CAMPAIGN_IDS, campaignOf, campaignOfScenario, scenarioNames, scenarioOf } from "./campaign-data";
 import { dealSeed } from "./e2e";
 
 describe("campaign data on the phone", () => {
@@ -19,6 +22,63 @@ describe("campaign data on the phone", () => {
     for (const id of campaign.scenarios) expect(scenarioOf(id)?.id).toBe(id);
     expect(scenarioNames(campaign)["a-knife-in-the-dark"]).toBe("A Knife in the Dark");
     expect(campaignOf("another-campaign")).toBeNull();
+  });
+});
+
+describe("the registry", () => {
+  it("holds every playable campaign data/campaigns/index.json lists, and nothing else that is built", () => {
+    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).sort();
+    expect([...CAMPAIGN_IDS].sort()).toEqual(built);
+    for (const entry of index) {
+      const campaign = campaignOf(entry.id);
+      if (built.includes(entry.id)) {
+        expect(campaign?.name, entry.id).toBe(entry.name);
+        expect(campaign?.scenarios.length, entry.id).toBe(entry.scenarioCount);
+      } else expect(campaign, entry.id).toBeNull();
+    }
+  });
+
+  it("holds every scenario file, and each campaign's scenarios are all in it", () => {
+    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).sort();
+    for (const id of files) expect(scenarioOf(id)?.id, id).toBe(id);
+    for (const id of CAMPAIGN_IDS) for (const scenario of campaignOf(id)?.scenarios ?? []) expect(files, `${id}: ${scenario}`).toContain(scenario);
+  });
+
+  it("answers campaignOf and scenarioNames for any id", () => {
+    for (const id of CAMPAIGN_IDS) {
+      const campaign = campaignOf(id);
+      if (!campaign) throw new Error(`${id} is not registered`);
+      expect(Object.keys(scenarioNames(campaign)).sort()).toEqual([...campaign.scenarios].sort());
+      for (const scenario of campaign.scenarios) expect(scenarioNames(campaign)[scenario]).not.toBe(scenario);
+    }
+  });
+
+  it("splits the scenarios into three boxes, each scenario in one, each box inside its own campaign", () => {
+    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core", "The Dark of Mirkwood"]);
+    const listed = BOXES.flatMap((box) => box.scenarios);
+    expect(new Set(listed).size).toBe(listed.length);
+    const every = new Set(CAMPAIGN_IDS.flatMap((id) => campaignOf(id)?.scenarios ?? []));
+    expect([...listed].sort()).toEqual([...every].sort());
+    for (const box of BOXES) {
+      const campaign = campaignOf(box.campaignId);
+      for (const scenario of box.scenarios) expect(campaign?.scenarios, `${box.id}: ${scenario}`).toContain(scenario);
+    }
+    expect(boxOf("the-oath")?.id).toBe("the-dark-of-mirkwood");
+    expect(boxOf("journey-along-the-anduin")?.id).toBe("revised-core");
+    expect(boxOf("nowhere")).toBeNull();
+  });
+
+  it("takes a standalone game's flags from its box: saga only for the Fellowship", () => {
+    expect(campaignOfScenario("a-knife-in-the-dark")?.saga).toBe(true);
+    expect(campaignOfScenario("passage-through-mirkwood")?.saga).toBe(false);
+    expect(campaignOfScenario("the-caves-of-nibin-dum")?.saga).toBe(false);
+    expect(campaignOfScenario("nowhere")).toBeNull();
+  });
+
+  it("opens each campaign's own booklet, on the scenario's page", () => {
+    expect(bookletParams("mirkwood-paths", "passage-through-mirkwood")).toEqual({ id: "learn-to-play", page: "25" });
+    expect(bookletParams("the-dark-of-mirkwood", "the-oath")).toEqual({ id: "the-dark-of-mirkwood", page: "3" });
+    expect(bookletParams("the-dark-of-mirkwood")).toEqual({ id: "the-dark-of-mirkwood" });
   });
 });
 

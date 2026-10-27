@@ -42,6 +42,12 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
 ];
 
+// The catalog's `cards.campaign_id`: the campaign a pack's cards belong to. A product with a twin pack (the Fellowship boxes, whose
+// MEC109 printing is not a catalog pack) is tagged through that pack; the others through their own packs. Derived from PRODUCTS.
+export const PACK_CAMPAIGN: ReadonlyMap<string, string> = new Map(
+  PRODUCTS.flatMap((product) => (product.twinPack ? [product.twinPack] : product.packs).map((pack): [string, string] => [pack, product.home])),
+);
+
 // A product the table does not hold is a build error, never an empty default.
 export function productOf(name: string): ProductDef {
   const product = PRODUCTS.find((item) => item.name === name);

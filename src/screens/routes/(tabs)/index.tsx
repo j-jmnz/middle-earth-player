@@ -4,12 +4,12 @@ import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-nati
 
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
-import { FELLOWSHIP_ID } from "../../../campaign/save";
-import { Label, Panel, PrimaryButton, RingMark, Screen, ScreenScroll, ScreenTitle, Section, SecondaryButton, TextButton } from "../../chrome";
-import { SceneArt, type ArtCard } from "../../art";
+import { Panel, RingMark, Screen, ScreenScroll, ScreenTitle, Section, SecondaryButton, TextButton } from "../../chrome";
+import type { ArtCard } from "../../art";
 import { deckFaces } from "../../deck-store";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf, scenarioNames } from "../../campaign-data";
+import { StartPanel } from "../../start-panel";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
@@ -19,31 +19,6 @@ import { nextStepHref, pathHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
 
 type Seats = 1 | 2;
-
-function SeatTile({ seats, selected, onPress }: { seats: Seats; selected: boolean; onPress: () => void }) {
-  const label = seatWord(seats);
-  return (
-    <Pressable
-      testID={`seats-${seats}`}
-      collapsable={false}
-      accessibilityRole="radio"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      className="min-h-14 flex-1 items-center justify-center gap-2 rounded-tile px-3 py-3"
-      style={{ backgroundColor: selected ? palette.pressed : palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline }}
-    >
-      <View className="flex-row">
-        <RingMark size={18} state={selected ? "current" : "locked"} />
-        {seats === 2 ? (
-          <View style={{ marginLeft: -6 }}>
-            <RingMark size={18} state={selected ? "current" : "locked"} />
-          </View>
-        ) : null}
-      </View>
-      <Text className={selected ? "text-body font-semibold text-bone" : "text-body text-muted"}>{label}</Text>
-    </Pressable>
-  );
-}
 
 // The fellowship a playthrough plays: the heroes the campaign log records, else the heroes the last loadout dealt.
 function partyCodes(save: Save): string[] {
@@ -63,23 +38,26 @@ export default function CampaignList() {
   const [showArchived, setShowArchived] = useState(false);
   // The save whose delete is waiting on Delete for good.
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [seats, setSeats] = useState<Seats>(1);
   // New playthrough opens the Start block under the saves: the list scrolls to it, so its primary is on screen.
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const startAt = useRef(0);
   const campaigns = campaignListQueries(catalog).campaigns.all();
   const locked = lockedTiles(campaigns);
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
-  const fellowship = campaignOf(FELLOWSHIP_ID);
-  const total = fellowship?.scenarios.length ?? 6;
-  const names = fellowship ? scenarioNames(fellowship) : {};
+  // One start panel for each built campaign the catalog marks playable.
+  const startable = campaigns.flatMap((row) => {
+    const data = row.playable ? campaignOf(row.id) : null;
+    return data ? [data] : [];
+  });
+  // Each save's progress line reads its own campaign.
   const lineOf = (save: Save): SaveLine => {
-    const path = fellowship ? campaignPath(fellowship, names, save.log) : [];
+    const campaign = campaignOf(save.campaignId);
+    const path = campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : [];
     return {
       name: nameOf(save.campaignId),
       seats: seatWord(save.seatCount),
       done: path.filter((node) => node.status === "completed").length,
-      total,
+      total: campaign?.scenarios.length ?? 0,
       next: nextStep(path, save.loadout?.scenarioId),
     };
   };
@@ -118,8 +96,8 @@ export default function CampaignList() {
     router.push(pathHref(save.id));
   }
 
-  function start(): void {
-    const save = createSave(user, FELLOWSHIP_ID, seats);
+  function start(campaignId: string, seats: Seats): void {
+    const save = createSave(user, campaignId, seats);
     refresh();
     setStarting(false);
     openPath(save);
@@ -239,23 +217,11 @@ export default function CampaignList() {
               {saves.length > 0 ? (
                 <Section title="New playthrough" right={<TextButton label="Cancel" testID="start-cancel" tone="muted" accessibilityLabel="Cancel the new playthrough" onPress={() => setStarting(false)} />} />
               ) : null}
-              <Panel current={saves.length === 0} padded={false}>
-                <View className="overflow-hidden rounded-t-card">
-                  <SceneArt scenarioId={fellowship?.scenarios[0]} height={132} fade={0.3} fadeTo={palette.raised} />
-                </View>
-                <View className="px-5 pb-5" style={{ marginTop: -36 }}>
-                  <Text className="font-display text-title text-bone">{nameOf(FELLOWSHIP_ID)}</Text>
-                  <Label>{`${total} scenarios`}</Label>
-                  <View className="mt-4 flex-row gap-3">
-                    <SeatTile seats={1} selected={seats === 1} onPress={() => setSeats(1)} />
-                    <SeatTile seats={2} selected={seats === 2} onPress={() => setSeats(2)} />
-                  </View>
-                  <View className="mt-4 gap-3">
-                    <Label>Chosen once for this campaign</Label>
-                    <PrimaryButton label="Start Fellowship" testID="start-fellowship" onPress={start} />
-                  </View>
-                </View>
-              </Panel>
+              <View className="gap-3">
+                {startable.map((campaign, index) => (
+                  <StartPanel key={campaign.id} campaign={campaign} name={nameOf(campaign.id)} current={saves.length === 0 && index === 0} onStart={(seats) => start(campaign.id, seats)} />
+                ))}
+              </View>
             </View>
           ) : null}
           {!showStart && !managing ? (

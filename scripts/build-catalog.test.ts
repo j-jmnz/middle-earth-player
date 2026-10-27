@@ -27,6 +27,9 @@ const PACKS = [
   { name: "Primary", code: "A", position: 4, cycle_position: 1, available: "2020-01-01" },
   { name: "Undated", code: "U", position: 1, cycle_position: 9, available: "" },
   { name: "Black Riders", code: "TBR", position: 1, cycle_position: 41, available: "2013-09-01" },
+  { name: "Revised Core Set", code: "RevCore", position: 1, cycle_position: 1, available: "2020-01-01" },
+  { name: "Core Set", code: "Core", position: 1, cycle_position: 1, available: "2011-01-01" },
+  { name: "The Dark of Mirkwood", code: "TDoM", position: 1, cycle_position: 90, available: "2020-01-01" },
   { name: "Unused", code: "E", position: 1, cycle_position: 4, available: "2020-01-05" },
 ];
 
@@ -37,7 +40,11 @@ function workspace(): Workspace {
 
   writeFileSync(path.join(dataDir, "raw", "ringsdb", "packs.json"), JSON.stringify(PACKS));
   mkdirSync(path.join(dataDir, "campaigns"), { recursive: true });
-  writeFileSync(path.join(dataDir, "campaigns", "index.json"), JSON.stringify([{ id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarioCount: 6, playable: true }]));
+  writeFileSync(path.join(dataDir, "campaigns", "index.json"), JSON.stringify([
+    { id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarioCount: 6, playable: true },
+    { id: "mirkwood-paths", name: "Mirkwood Paths", scenarioCount: 5, playable: false },
+    { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", scenarioCount: 2, playable: false },
+  ]));
   writeFileSync(path.join(dataDir, "sources.json"), JSON.stringify({ sources: { ringsdb: { fetchedAt: "2026-10-24T10:00:00.000Z" } } }));
   return { dataDir, dbPath: path.join(root, "catalog.db"), versionPath: path.join(root, "version.ts") };
 }
@@ -86,6 +93,9 @@ const CARDS: Card[] = [
   card(),
   card({ code: "10002", name: "Synthetic Ally", type: "ally", typeName: "Ally", cost: "X", hasErrata: true, errata: "", printings: [{ pack: "U", number: 1 }] }),
   card({ code: "20001", name: "Synthetic Fellowship Hero", sphere: "fellowship", printings: [{ pack: "TBR", number: 1 }], keywords: { hide: 2 } }),
+  card({ code: "30001", name: "Synthetic Core Player Card", printings: [{ pack: "Core", number: 5 }, { pack: "RevCore", number: 5 }] }),
+  card({ code: "30002", name: "Synthetic Revised Core Encounter Card", type: "enemy", typeName: "Enemy", sphere: null, deckLegal: false, printings: [{ pack: "RevCore", number: 80 }] }),
+  card({ code: "30003", name: "Synthetic Dark of Mirkwood Card", type: "enemy", typeName: "Enemy", sphere: null, deckLegal: false, printings: [{ pack: "TDoM", number: 41 }] }),
   card({ code: "20002", name: "Synthetic Campaign Card", type: "treasure", typeName: "Campaign", sphere: null, deckLegal: false, printings: [{ pack: "TBR", number: 2 }] }),
 ];
 
@@ -97,7 +107,7 @@ describe("buildCatalog", () => {
   it("writes the rows from data/cards and leaves the version unchanged on a repeat", () => {
     const dirs = workspace();
     const first = buildCatalog(options(dirs));
-    expect(first).toMatchObject({ packCount: 3, cardCount: 4 });
+    expect(first).toMatchObject({ packCount: 6, cardCount: 7 });
     expect(Number.isInteger(first.version)).toBe(true);
     expect(readFileSync(dirs.versionPath, "utf8")).toBe(`export const CATALOG_VERSION = ${first.version};\n`);
 
@@ -132,6 +142,18 @@ describe("buildCatalog", () => {
     expect(database.prepare("select fetched_at from meta where pack_code = ?").get("A")?.fetched_at).toBe("2026-10-24");
 
     expect(buildCatalog(options(dirs)).version).toBe(first.version);
+  });
+
+  it("tags cards.campaign_id from the product table's packs: each box its campaign, a core player card none", () => {
+    const dirs = workspace();
+    buildCatalog(options(dirs));
+    const database = openDb(dirs.dbPath);
+    const tag = (code: string) => database.prepare("select campaign_id from cards where code = ?").get(code)?.campaign_id;
+    expect(tag("20001")).toBe("fellowship-of-the-ring");
+    expect(tag("30002")).toBe("mirkwood-paths");
+    expect(tag("30003")).toBe("the-dark-of-mirkwood");
+    expect(tag("30001")).toBeNull();
+    expect(tag("10001")).toBeNull();
   });
 
   it("gives the same version for the same data and a different one when a row changes", () => {

@@ -9,7 +9,6 @@ import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
 import { BodyText, Label, Section, TextButton } from "../../../chrome";
-import { FELLOWSHIP_ID } from "../../../../campaign/save";
 import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
 import { goBack } from "../../../go-back";
 import { writeSave } from "../../../campaign-store";
@@ -68,7 +67,9 @@ export default function Briefing() {
     scenarioId,
     backLabel: "Path",
     onBack: () => goBack(router, saveId ? { pathname: "/path/[saveId]", params: { saveId } } : "/"),
-    onBooklet: () => router.push({ pathname: "/booklet/[id]", params: bookletParams(save?.campaignId ?? FELLOWSHIP_ID, scenarioId) }),
+    onBooklet: () => {
+      if (save) router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId, scenarioId) });
+    },
   } as const;
   if (!loaded) {
     return (

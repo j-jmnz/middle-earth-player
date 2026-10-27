@@ -5,7 +5,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 
 import { scenarioFacts, type BriefingSeat } from "../../../../campaign/briefing";
-import { FELLOWSHIP_ID } from "../../../../campaign/save";
 import { dealStandalone, standaloneBriefing, type StandaloneInput, type StandaloneLoadout } from "../../../../campaign/standalone";
 import { loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
@@ -13,7 +12,7 @@ import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
 import { SeatPicker } from "../../../seat-picker";
-import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
+import { bookletParams, campaignOfScenario, scenarioOf } from "../../../campaign-data";
 import { BodyText, Label, Section, Segmented } from "../../../chrome";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
@@ -40,8 +39,9 @@ export default function StandaloneBriefing() {
   const [ringBearer, setRingBearer] = useState<string | null>(from?.ringBearer ?? null);
   const [dealError, setDealError] = useState<string | null>(null);
 
-  const campaign = campaignOf(FELLOWSHIP_ID);
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
+  // The box the scenario is printed in decides the campaign flags (saga, booklet) a standalone game follows.
+  const campaign = scenarioId ? campaignOfScenario(scenarioId) : null;
 
   const seats: BriefingSeat[] = useMemo(
     () =>
@@ -67,7 +67,9 @@ export default function StandaloneBriefing() {
     scenarioId,
     backLabel: "Scenarios",
     onBack: () => goBack(router, "/scenarios"),
-    onBooklet: () => router.push({ pathname: "/booklet/[id]", params: bookletParams(FELLOWSHIP_ID, scenarioId) }),
+    onBooklet: () => {
+      if (campaign) router.push({ pathname: "/booklet/[id]", params: bookletParams(campaign.id, scenarioId) });
+    },
   } as const;
   if (!campaign || !scenario || !world || !input || !result || !facts) {
     return (

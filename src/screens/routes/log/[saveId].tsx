@@ -2,12 +2,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 
-import { FELLOWSHIP_ID } from "../../../campaign/save";
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { cards } from "../../../catalog/schema";
 import { inArray } from "drizzle-orm";
 import { BodyText, Eyebrow, IconButton, NavBar, PrimaryButton, Screen } from "../../chrome";
-import { campaignOf, scenarioNames } from "../../campaign-data";
+import { bookletParams, campaignOf, scenarioNames } from "../../campaign-data";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { palette } from "../../palette.js";
@@ -63,7 +62,7 @@ export default function Log() {
     update({ ...save, log: { ...save.log, notes: edited } });
     setEdited(null);
   }
-  const back = <NavBar onBack={() => { saveNotes(); goBack(router, save ? { pathname: "/path/[saveId]", params: { saveId: save.id } } : "/"); }} backTestID="log-back" backLabel="Path" right={<IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: save?.campaignId ?? FELLOWSHIP_ID } })} />} />;
+  const back = <NavBar onBack={() => { saveNotes(); goBack(router, save ? { pathname: "/path/[saveId]", params: { saveId: save.id } } : "/"); }} backTestID="log-back" backLabel="Path" right={<IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => { if (save) router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId) }); }} />} />;
   if (!loaded) return <Screen testID="log" scene="plain">{back}<BodyText tone="muted">Loading</BodyText></Screen>;
   const campaign = save ? campaignOf(save.campaignId) : null;
   if (!save || !campaign) {
