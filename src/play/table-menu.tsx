@@ -1,11 +1,11 @@
-// The table menu (docs/design-system.md, Table, top bar): Leave the table, Log, Rules, Booklet and Table settings, in a
+// The table menu (docs/design-system.md, Table, top bar): Log, Rules, Booklet, Table settings and, apart, Leave the table, in a
 // popover under the menu button at the top right. React Native views over the canvas, never on the canvas. The frame, the scrim
 // and the motion are the shared popover frame (popover-frame.tsx). A row closes the menu and then acts (the caller's onSelect).
 // Android Back closes it first (back.ts).
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { Pressable, View } from "react-native";
 
-import { PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx";
+import { PopoverDivider, PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx";
 import { MENU_BUTTON } from "./top-bar-layout.ts";
 import { menuItems, type MenuItemId, type MenuNav } from "./table-menu-items.ts";
 import { tableTokens as t } from "./tokens.ts";
@@ -56,7 +56,11 @@ export function TableMenu({ open, nav, top, right, onClose, onSelect }: { open: 
       onClose={onClose}
     >
       {menuItems(nav).map((item, index) => (
-        <PopoverRow key={item.id} item={item} rowRef={index === 0 ? first : undefined} onPress={() => onSelect(item.id)} />
+        <Fragment key={item.id}>
+          {/* Leaving stands apart from the rows that open something over the table. */}
+          {item.id === "leave" ? <PopoverDivider /> : null}
+          <PopoverRow item={item} rowRef={index === 0 ? first : undefined} onPress={() => onSelect(item.id)} />
+        </Fragment>
       ))}
     </PopoverFrame>
   );

@@ -2,12 +2,13 @@
 // command column's right edge. The tray is night raised with a hairline edge; a reading panel may stay on paper. It enters
 // decelerating (16 pt up and a fade) and leaves accelerating (MOTION.trayEnter, MOTION.trayLeave), and snaps under reduced motion.
 import { useState, type ReactNode } from "react";
+import { View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { MOTION } from "./motion-tokens.ts";
 import { useOpenMotion } from "./motion-run.ts";
-import { panelSurface } from "./surfaces.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { goldSurface, panelSurface, raisedEdge } from "./surfaces.ts";
+import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 
 const RISE = 16;
 const RADIUS = 20;
@@ -26,6 +27,7 @@ export function TrayFrame({
   place,
   surface = "night",
   squareFoot = false,
+  accent = false,
   testID,
   children,
 }: {
@@ -34,6 +36,9 @@ export function TrayFrame({
   surface?: "night" | "paper";
   // The dock-side foot corner is square (the tray stands on the dock's block).
   squareFoot?: boolean;
+  // A choice waiting on the player (the choice tray): a goldLine edge, a worked-gold rule along its top and a deep shadow, so it
+  // stands apart from the dock under it, which shares the night surface.
+  accent?: boolean;
   testID: string;
   children: ReactNode;
 }) {
@@ -56,7 +61,8 @@ export function TrayFrame({
           ...(place.maxHeight != null ? { maxHeight: place.maxHeight } : {}),
           ...(paper ? { backgroundColor: t.paper } : panelSurface()),
           borderWidth: 1,
-          borderColor: paper ? t.inkLine : t.hairline,
+          borderColor: paper ? t.inkLine : accent ? t.goldLine : t.hairline,
+          ...(accent ? { boxShadow: `${raisedEdge}, 0 10px 28px ${withAlphaHex(t.night, 0.7)}, 0 0 18px ${withAlphaHex(t.gold, 0.1)}` } : {}),
           borderRadius: RADIUS,
           ...(squareFoot ? { borderBottomRightRadius: 0 } : {}),
           paddingHorizontal: 12,
@@ -67,6 +73,7 @@ export function TrayFrame({
         motion,
       ]}
     >
+      {accent ? <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, ...goldSurface() }} /> : null}
       {children}
     </Animated.View>
   );

@@ -15,7 +15,7 @@ import { tickLand } from "./haptics.ts";
 import type { CardSlot, TableLayout } from "./layout.ts";
 import { easingOf, useMotionScale } from "./motion-run.ts";
 import { ghostPoseAt, landAt, motionEnd, motionSpan, poseAt } from "./motion-pose.ts";
-import { motionKind, peekSide } from "./motion-kind.ts";
+import { kindMoves, motionKind } from "./motion-kind.ts";
 import { UpdateLog } from "./update-log.ts";
 import { motionsBetween, slotRotation, still, type Ghost, type Motion } from "./motion.ts";
 import type { TableStore } from "./store.ts";
@@ -62,13 +62,13 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
     const game = store.getState().game;
     const prevGame = log.pending()?.prev ?? game;
     const zoneNow = (cardId: string) => game.cards[cardId]?.zone ?? null;
-    // The seat handoff, the peek's slide or the state's own motions (motion-kind.ts). A peek that ends with a new state is diffed from
-    // the layout the acting seat had, so a card played from its hand still lifts and lands and a drawn one is still dealt.
+    // The seat handoff, the state's own motions, or a peek, which is drawn at rest (motion-kind.ts). A peek that ends with a new state is
+    // diffed from the layout the acting seat had, so a card played from its hand still lifts and lands and a drawn one is still dealt.
     const kind = motionKind(prevGame, game, track.seat, seat, track.acting, acting);
     const from = kind === "ordinary" && track.seat !== seat ? track.actingLayout : track.layout;
     const sameSize = from.width === layout.width && from.height === layout.height;
-    const animate = k > 0 && sameSize;
-    const between = animate ? motionsBetween(from, layout, zoneNow, { handoff: kind === "handoff", peek: kind === "peek" ? peekSide(track.seat, seat) : 0 }) : motionsBetween(null, layout, zoneNow);
+    const animate = k > 0 && sameSize && kindMoves(kind);
+    const between = animate ? motionsBetween(from, layout, zoneNow, { handoff: kind === "handoff" }) : motionsBetween(null, layout, zoneNow);
     // A token pops once its card has arrived; a card off the table shows none. The damage a spotlight's attacks placed pops in the
     // spotlight, at the end of its burst, so the state's own pop leaves out that much of the change (archery or an effect's damage on
     // the same card keeps its pop and its number).

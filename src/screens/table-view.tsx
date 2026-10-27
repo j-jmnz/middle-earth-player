@@ -223,7 +223,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
 
   return (
     <Screen testID="table" scene="felt" inset={false}>
-      <View className="flex-1" importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
+      <View className="flex-1" importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }}>
         <TableTopBar
           threats={threats}
           acting={peek.acting}

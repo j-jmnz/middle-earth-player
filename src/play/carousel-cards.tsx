@@ -1,12 +1,12 @@
-// The cards of the phase carousel (phase-carousel.tsx): one per phase, with its steps, what the player decides there and the action
-// windows as Stop switches, on the night raised surface. Reading and the player's Stops settings only; nothing here sends an intent.
+// The cards of the phase carousel (phase-carousel.tsx): one per phase, numbered in the round, with its steps on a timeline, what the
+// player decides there and the action windows as Stop switches. Reading and the player's Stops settings only; nothing here sends an intent.
 import { useRef, type ComponentRef } from "react";
 import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 
 import type { CarouselPhase, CarouselStep } from "./carousel.ts";
 import { toggleStop, type TableSettings } from "./table-settings.ts";
-import { goldSurface } from "./surfaces.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { goldSurface, panelSurface } from "./surfaces.ts";
+import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 
 export const ROW = 44;
 
@@ -70,68 +70,121 @@ export function NightSwitch({
   );
 }
 
+// A small capsule beside the current phase's name: "Now" in gold.
+function NowChip() {
+  return (
+    <View style={{ borderRadius: 999, borderWidth: 1, borderColor: t.gold, paddingHorizontal: 6, backgroundColor: withAlphaHex(t.gold, 0.14) }}>
+      <Text className="font-display-bold text-micro uppercase" style={{ color: t.gold, lineHeight: 15 }}>
+        Now
+      </Text>
+    </View>
+  );
+}
+
+// The step's place on the card's timeline: a dot (gold and ringed now, deep gold when done, an outline to come) on a hairline
+// that runs on to the next step.
+function StepDot({ state, last }: { state: "past" | "current" | "next"; last: boolean }) {
+  return (
+    <View style={{ width: 14, alignItems: "center" }}>
+      <View
+        style={{
+          marginTop: 5,
+          width: state === "current" ? 10 : 8,
+          height: state === "current" ? 10 : 8,
+          borderRadius: 5,
+          borderWidth: state === "next" ? 1.5 : 0,
+          borderColor: t.muted,
+          backgroundColor: state === "current" ? t.gold : state === "past" ? t.goldDeep : "transparent",
+          boxShadow: state === "current" ? `0 0 0 3px ${withAlphaHex(t.gold, 0.22)}` : undefined,
+        }}
+      />
+      {last ? null : <View style={{ flex: 1, width: 1, marginTop: 3, backgroundColor: t.hairline }} />}
+    </View>
+  );
+}
+
 function StepBlock({
   step,
   settings,
   onChange,
-  past,
+  state,
+  last,
   onLayoutY,
 }: {
   step: CarouselStep;
   settings: Pick<TableSettings, "stops">;
   onChange: (change: Partial<TableSettings>) => void;
-  past: boolean;
+  // Where the step stands against the game's: done, the engine's own, or to come.
+  state: "past" | "current" | "next";
+  last: boolean;
   // Called with the step's top inside its card: the current step's, so the card can open on it.
   onLayoutY?: (y: number) => void;
 }) {
+  const now = state === "current";
   return (
     <View
       testID={`carousel-step-${step.id}`}
       onLayout={onLayoutY ? (event) => onLayoutY(event.nativeEvent.layout.y) : undefined}
-      style={{
-        marginTop: 6,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: step.current ? t.gold : "transparent",
-        backgroundColor: step.current ? t.pressed : "transparent",
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-      }}
+      style={{ flexDirection: "row", gap: 8 }}
     >
-      <Text className="text-label font-semibold" style={{ color: past ? t.muted : t.bone }}>
-        {step.current ? `${step.words}  · now` : step.words}
-      </Text>
-      <Text className="text-label" style={{ color: t.muted }}>
-        {step.decision}
-      </Text>
-      {step.windows.map((window) => (
-        <NightSwitch
-          key={window.id}
-          label={`Stop: ${window.title}`}
-          detail={window.note}
-          value={window.stop}
-          onChange={() => onChange({ stops: toggleStop(settings.stops, window.id) })}
-          testID={`carousel-stop-${window.id}`}
-          dim={past}
-        />
-      ))}
+      <StepDot state={state} last={last} />
+      <View
+        style={{
+          flex: 1,
+          marginBottom: last ? 0 : 6,
+          borderRadius: 10,
+          paddingHorizontal: now ? 8 : 0,
+          paddingVertical: now ? 6 : 1,
+          marginLeft: now ? -4 : 0,
+          backgroundColor: now ? withAlphaHex(t.gold, 0.08) : "transparent",
+          borderWidth: now ? 1 : 0,
+          borderColor: withAlphaHex(t.gold, 0.45),
+        }}
+      >
+        <Text accessibilityLabel={now ? `${step.words}, now` : undefined} className="text-label font-semibold" style={{ color: state === "past" ? t.muted : now ? t.goldHigh : t.bone }}>
+          {step.words}
+        </Text>
+        <Text className="text-label" style={{ color: t.muted }}>
+          {step.decision}
+        </Text>
+        {step.windows.map((window) => (
+          <NightSwitch
+            key={window.id}
+            label={`Stop: ${window.title}`}
+            detail={window.note}
+            value={window.stop}
+            onChange={() => onChange({ stops: toggleStop(settings.stops, window.id) })}
+            testID={`carousel-stop-${window.id}`}
+            dim={state === "past"}
+          />
+        ))}
+      </View>
     </View>
   );
 }
 
+/**
+ * One phase: its number and name (gold with a Now chip when current, muted with a gold done disc when past), then its steps on a
+ * timeline. `focused` is the card the strip rests on; the others step back so the one being read stands out.
+ */
 export function PhaseCard({
   phase,
+  number,
   width,
+  focused,
   settings,
   onChange,
 }: {
   phase: CarouselPhase;
+  number: number;
   width: number;
+  focused: boolean;
   settings: Pick<TableSettings, "stops">;
   onChange: (change: Partial<TableSettings>) => void;
 }) {
   const past = phase.state === "past";
   const current = phase.state === "current";
+  const nowAt = phase.steps.findIndex((step) => step.current);
   // The current card opens on its current step, so the step and its Stop switch show on a short phone.
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   return (
@@ -139,50 +192,70 @@ export function PhaseCard({
       testID={`carousel-phase-${phase.id}`}
       style={{
         width,
-        borderRadius: 16,
+        borderRadius: 14,
         borderWidth: 1,
         borderColor: current ? t.goldLine : t.hairline,
-        backgroundColor: current ? t.pressed : "transparent",
-        paddingHorizontal: 10,
-        paddingTop: 8,
+        ...(current ? panelSurface() : { backgroundColor: withAlphaHex(t.night, 0.35) }),
+        opacity: focused ? 1 : 0.55,
+        overflow: "hidden",
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 8 }}>
+        {/* The phase's place in the round, in a disc: worked gold now, a deep gold edge when done, a hairline to come. */}
+        <View
+          importantForAccessibility="no-hide-descendants"
+          style={{
+            width: 22,
+            height: 22,
+            borderRadius: 11,
+            alignItems: "center",
+            justifyContent: "center",
+            borderWidth: current ? 0 : 1,
+            borderColor: past ? t.goldDeep : t.hairline,
+            ...(current ? goldSurface() : {}),
+          }}
+        >
+          <Text className="font-display-bold text-micro" style={{ color: current ? t.onGold : past ? t.gold : t.muted, lineHeight: 15 }}>
+            {String(number)}
+          </Text>
+        </View>
         <Text
           accessibilityRole="header"
           accessibilityLabel={`${phase.name} phase${past ? ", done this round" : current ? ", now" : ""}`}
-          className="font-display-bold text-body uppercase"
-          style={{
-            color: current ? t.gold : past ? t.muted : t.bone,
-            lineHeight: 22,
-          }}
+          numberOfLines={1}
+          className="flex-1 font-display-bold text-body uppercase"
+          style={{ color: current ? t.gold : past ? t.muted : t.bone, lineHeight: 22, letterSpacing: 0.6 }}
         >
           {phase.name}
         </Text>
+        {current ? <NowChip /> : null}
         {/* RingMark's done state (src/screens/chrome-marks.tsx; src/play cannot import it): a disc of worked gold. */}
         {past ? (
           <View
             testID={`carousel-done-${phase.id}`}
             accessibilityLabel="Done this round"
             accessible
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: 6,
-              ...goldSurface(),
-            }}
-          />
+            style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+          >
+            <View style={{ width: 10, height: 10, borderRadius: 5, ...goldSurface() }} />
+            <Text className="text-micro" style={{ color: t.muted }}>
+              Done
+            </Text>
+          </View>
         ) : null}
       </View>
-      <ScrollView ref={scroll} nestedScrollEnabled showsVerticalScrollIndicator persistentScrollbar contentContainerStyle={{ paddingBottom: 8 }}>
-        {phase.steps.map((step) => (
-          <StepBlock key={step.id} step={step} settings={settings} onChange={onChange} past={past} onLayoutY={step.current && current ? (y) => scroll.current?.scrollTo({ y, animated: false }) : undefined} />
+      <View style={{ height: 1, marginHorizontal: 12, backgroundColor: current ? withAlphaHex(t.gold, 0.25) : t.hairline }} />
+      <ScrollView ref={scroll} nestedScrollEnabled showsVerticalScrollIndicator persistentScrollbar contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 10, paddingBottom: 12 }}>
+        {phase.steps.map((step, index) => (
+          <StepBlock
+            key={step.id}
+            step={step}
+            settings={settings}
+            onChange={onChange}
+            state={past || (current && nowAt >= 0 && index < nowAt) ? "past" : current && index === nowAt ? "current" : "next"}
+            last={index === phase.steps.length - 1}
+            onLayoutY={step.current && current ? (y) => scroll.current?.scrollTo({ y, animated: false }) : undefined}
+          />
         ))}
       </ScrollView>
     </View>

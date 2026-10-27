@@ -28,7 +28,7 @@ function tilt(m: Motion, away: number): number {
 /** Whether a motion is the quarter turn of exhausting or readying alone: the card stays where it is. */
 function turnOnly(m: Motion): boolean {
   "worklet";
-  return m.dx === 0 && m.dy === 0 && m.scale === 1 && m.fromRot !== m.toRot && !m.flip && m.land == null && !m.slide && !m.peek;
+  return m.dx === 0 && m.dy === 0 && m.scale === 1 && m.fromRot !== m.toRot && !m.flip && m.land == null && !m.slide;
 }
 
 /** The pose of a slot `now` ms after the state was drawn. At or past the end of its motion it is the rest pose. */
@@ -59,13 +59,6 @@ export function poseAt(m: Motion, now: number, k: number): Pose {
     // Exhaust and ready: the quarter turn is a spring with a light overshoot.
     const s = springStep(t, scaledSpring(MOTION.exhaust, k));
     return { dx: 0, dy: 0, scale: 1, rot: tilt(m, 1 - s), opacity: 1, flipX: 1, back: false };
-  }
-
-  if (m.peek) {
-    // A seat's zone comes in from the side the peek came from, decelerating, fading in.
-    const x = clamp01(t / length(MOTION.peekSlide, k));
-    const q = 1 - ease("outCubic", x);
-    return { dx: m.dx * q, dy: 0, scale: 1, rot: m.toRot, opacity: m.fromOpacity + (1 - m.fromOpacity) * x, flipX: 1, back: false };
   }
 
   if (m.slide) {
@@ -122,11 +115,6 @@ export type GhostPose = { dx: number; dy: number; scale: number; opacity: number
 /** The pose of a card that left, `now` ms after the state was drawn, as an offset from where it stood. */
 export function ghostPoseAt(g: Ghost, now: number, k: number): GhostPose {
   "worklet";
-  if (g.leave === "peek") {
-    // The seat that was shown slides off to the side, accelerating, fading out.
-    const x = clamp01(now / length(MOTION.peekLeave, k));
-    return { dx: g.dx * ease("inCubic", x), dy: 0, scale: 1, opacity: 1 - x };
-  }
   const shake = g.leave === "shake" ? length(MOTION.shakeStep, k) * SHAPE.shakeCount : 0;
   if (now < shake) return { dx: shakeAt(now, k), dy: 0, scale: 1, opacity: 1 };
   const run = g.leave === "shake" ? length(MOTION.cardLeave, k) : length(MOTION.cardDepart, k);
@@ -143,7 +131,6 @@ export function motionEnd(m: Motion): number {
   if (m.land === "squash") return wait + MOTION.lift.ms + MOTION.glide.ms + MOTION.land.ms;
   if (turnOnly(m)) return wait + MOTION.exhaust.ms;
   if (m.slide) return wait + MOTION.seatHand.ms;
-  if (m.peek) return wait + MOTION.peekSlide.ms;
   const arrive = MOTION.cardArrive.ms;
   if (m.land === "pop") {
     const popStart = (arrive - MOTION.cardFlip.ms) / 2 + MOTION.cardFlip.ms;
@@ -154,7 +141,6 @@ export function motionEnd(m: Motion): number {
 
 /** How long a ghost runs, unscaled. */
 export function ghostEnd(g: Ghost): number {
-  if (g.leave === "peek") return MOTION.peekLeave.ms;
   return g.leave === "shake" ? MOTION.shakeStep.ms * SHAPE.shakeCount + MOTION.cardLeave.ms : MOTION.cardDepart.ms;
 }
 

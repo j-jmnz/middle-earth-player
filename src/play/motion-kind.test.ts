@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { motionKind, peekSide } from "./motion-kind.ts";
+import { kindMoves, motionKind } from "./motion-kind.ts";
 
 // Which motion a new layout plays when the seat drawn changed (phase 26). The states are only compared by identity.
 const before = { name: "before" };
@@ -41,10 +41,10 @@ describe("motionKind", () => {
   });
 });
 
-describe("peekSide", () => {
-  it("comes in from the right to a higher seat and from the left to a lower one", () => {
-    expect(peekSide(0, 1)).toBe(1);
-    expect(peekSide(1, 0)).toBe(-1);
-    expect(peekSide(0, 3)).toBe(1);
+describe("kindMoves", () => {
+  it("draws a peek and its way back at rest, and moves the cards of a handoff or a new state", () => {
+    expect(kindMoves("peek")).toBe(false);
+    expect(kindMoves("handoff")).toBe(true);
+    expect(kindMoves("ordinary")).toBe(true);
   });
 });

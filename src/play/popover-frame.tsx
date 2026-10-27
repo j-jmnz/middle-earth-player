@@ -1,5 +1,5 @@
-// The frame of the table's popovers (docs/design-system.md, Table, Table menu): a raised night card with a hairline edge and
-// rounded-card corners that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
+// The frame of the table's popovers (docs/design-system.md, Table, Table menu): a lit night card (tileSurface) with a deep shadow
+// and rounded-card corners, its rows inset rounded plates, that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
 // that holds it, and a Pressable scrim that fills the screen under it so a tap outside closes it and does nothing else. Not a
 // Modal: a Modal takes over the orientation lock and the status bar. The table menu (table-menu.tsx) and the dock's More
 // popover (dock-more.tsx) both draw in it; Android Back closes either first (back.ts).
@@ -11,12 +11,15 @@ import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import { useOpenMotion } from "./motion-run.ts";
 import { MOTION, ms } from "./motion-tokens.ts";
-import { panelSurface } from "./surfaces.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { Chevron } from "./phase-rail.tsx";
+import { raisedEdge, tileSurface } from "./surfaces.ts";
+import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 
 export type PressableRef = ComponentRef<typeof Pressable>;
 const ROW = 48;
 const FROM_SCALE = 0.96;
+// The frame's inner padding: rows sit this far inside its edge, so their pressed fill is a rounded plate of its own.
+const PAD = 6;
 
 export type PopoverRowItem = {
   testID: string;
@@ -25,46 +28,65 @@ export type PopoverRowItem = {
   accessibilityHint?: string;
   // Beside the label, muted.
   detail?: string;
-  // A muted line under the row, outside its target.
+  // A muted line under the label, inside the row.
   note?: string;
   icon?: IconName | null;
+  // The row opens a screen or a panel: a chevron at its right says so.
+  opens?: boolean;
 };
 
-/** One 48 pt row of a popover. */
+/** One 48 pt row of a popover: a rounded plate inside the frame's padding that fills when pressed. */
 export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; onPress: () => void; rowRef?: RefObject<PressableRef | null> }) {
   return (
-    <View>
-      <Pressable
-        ref={rowRef}
-        testID={item.testID}
-        collapsable={false}
-        accessibilityRole="button"
-        accessibilityLabel={item.accessibilityLabel ?? item.label}
-        accessibilityHint={item.accessibilityHint}
-        onPress={onPress}
-        style={{ minHeight: ROW }}
-      >
-        {({ pressed }) => (
-          <View style={{ minHeight: ROW, flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 14, backgroundColor: pressed ? t.pressed : "transparent" }}>
-            {item.icon ? <GameIcon name={item.icon} size={18} tint="bone" /> : null}
-            <Text className="flex-1 text-body font-medium" style={{ color: t.bone }} numberOfLines={1}>
+    <Pressable
+      ref={rowRef}
+      testID={item.testID}
+      collapsable={false}
+      accessibilityRole="button"
+      accessibilityLabel={item.accessibilityLabel ?? item.label}
+      accessibilityHint={item.accessibilityHint}
+      onPress={onPress}
+      style={{ minHeight: ROW }}
+    >
+      {({ pressed }) => (
+        <View
+          style={{
+            minHeight: ROW,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            paddingHorizontal: 10,
+            paddingVertical: item.note ? 6 : 0,
+            borderRadius: 10,
+            backgroundColor: pressed ? t.pressed : "transparent",
+          }}
+        >
+          {item.icon ? <GameIcon name={item.icon} size={18} tint="bone" /> : null}
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text className="text-body font-medium" style={{ color: t.bone }} numberOfLines={1}>
               {item.label}
             </Text>
-            {item.detail ? (
+            {item.note ? (
               <Text className="text-label" style={{ color: t.muted }} numberOfLines={1}>
-                {item.detail}
+                {item.note}
               </Text>
             ) : null}
           </View>
-        )}
-      </Pressable>
-      {item.note ? (
-        <Text className="text-label" style={{ color: t.muted, paddingHorizontal: 14, paddingBottom: 8, marginTop: -4 }}>
-          {item.note}
-        </Text>
-      ) : null}
-    </View>
+          {item.detail ? (
+            <Text className="text-label" style={{ color: t.muted }} numberOfLines={1}>
+              {item.detail}
+            </Text>
+          ) : null}
+          {item.opens ? <Chevron direction="next" color={t.faint} /> : null}
+        </View>
+      )}
+    </Pressable>
   );
+}
+
+/** A hairline between groups of rows. */
+export function PopoverDivider() {
+  return <View style={{ height: 1, marginVertical: 4, marginHorizontal: 10, backgroundColor: t.hairline }} />;
 }
 
 /**
@@ -128,17 +150,11 @@ export function PopoverFrame({
             position: "absolute",
             ...place,
             width,
-            paddingVertical: 4,
+            padding: PAD,
             borderRadius: 16, // rounded-card
-            borderWidth: 1,
-            borderColor: t.hairline,
-            ...panelSurface(),
+            ...tileSurface(),
+            boxShadow: `${raisedEdge}, 0 12px 32px ${withAlphaHex(t.night, 0.65)}, 0 2px 6px ${withAlphaHex(t.night, 0.4)}`,
             transformOrigin: origin,
-            shadowColor: t.night,
-            shadowOpacity: 0.4,
-            shadowRadius: 12,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 8,
           },
           style,
         ]}
