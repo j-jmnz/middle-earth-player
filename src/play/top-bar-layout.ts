@@ -11,7 +11,7 @@ export const MENU_BUTTON = 44;
 // The bar's side padding (px-2 in table-top-bar.tsx).
 export const BAR_PAD = 8;
 const GAP = 8;
-// Wide enough for the widest pill and both neighbor phases (RAIL_WIDE), with room over.
+// Wide enough for the widest pill with both neighbor phases inline (RAIL_WIDE), with room over.
 export const RAIL_MAX = 460;
 
 // The rail's pill is two lines (phase-rail.tsx): "Round 3 · QUEST" over the step, "Staging". Its floor comes from the pill's
@@ -22,7 +22,7 @@ export const RAIL_MAX = 460;
 //   margin;
 // - neither counts shrinking (PhaseRail may shrink the phase to 85%), which is more margin, nor the glow;
 // - the pill adds its 2 x 1 pt edge and 2 x 10 pt padding, and its top line keeps the room of the gold S that marks a stop ahead
-//   when the neighbors are not shown (STOP_MARK, counted whether or not it shows).
+//   (STOP_MARK, counted whether or not it shows).
 const PHASE_SIZE = 14;
 const CAP_EM = 0.78;
 const LABEL_SIZE = 13;
@@ -30,16 +30,15 @@ const LABEL_EM = 0.55;
 const PILL_CHROME = 22;
 // The dot between "Round 3" and the phase, with its margins.
 const DOT = 14;
-// Beside the pill (rail wide): a chevron, the neighbor phase's name, the gold S that marks a stop ahead.
+// A chevron drawn as views (phase-rail.tsx), and the gold S that marks a stop ahead at the end of the pill's top line.
 export const CHEVRON = 14;
-export const SIDE_GAP = 8;
 export const STOP_MARK = 14;
+/** The gap on each side of the phase between it and a neighbor phase's name, inline in the pill's top line (rail wide). */
+export const NEIGHBOR_GAP = 8;
 // Words the rail shows beside the engine's steps.
 const EXTRA_STEPS = ["Victory", "Defeat"] as const;
-/** The room the slot for a neighbor phase's name keeps: the widest of the seven at label size. */
-export const PHASE_SLOT = Math.max(...ROUND_PHASES.map((name) => Math.ceil(name.length * LABEL_EM * LABEL_SIZE)));
-// One side of the wide rail: the chevron, the name's slot and the room for the gold S, a gap between each.
-export const SIDE_WIDTH = CHEVRON + PHASE_SLOT + STOP_MARK + 2 * SIDE_GAP;
+// The widest neighbor phase's name at label size.
+const PHASE_SLOT = Math.max(...ROUND_PHASES.map((name) => Math.ceil(name.length * LABEL_EM * LABEL_SIZE)));
 // The rounds the pill can name: two digits.
 const ROUND_WORDS = "Round 99";
 // The phase words the pill shows over the step (rail.ts: the seven phases, "Beginning" and "End").
@@ -67,8 +66,8 @@ export function phaseWidth(phase: string): number {
 /** The rail's floor: the widest pill, by the pill's own words (a step name, or "Round 99 · ENCOUNTER"). */
 export const RAIL_FLOOR = Math.max(...[...Object.values(STEP_WORDS), ...EXTRA_STEPS].map(stepWidth), ...PILL_PHASES.map(phaseWidth));
 
-// The rail shows the neighbor phases when it can hold the widest pill and both neighbors with their chevrons, and the gold S.
-export const RAIL_WIDE = RAIL_FLOOR + 2 * (SIDE_WIDTH + SIDE_GAP);
+// The rail shows the neighbor phases, inline on the pill's top line, when it can hold the widest pill with both of them.
+export const RAIL_WIDE = RAIL_FLOOR + 2 * (PHASE_SLOT + NEIGHBOR_GAP);
 
 export type BarZones = {
   left: number;
@@ -94,7 +93,7 @@ export function barZones(bar: number, dials: number): BarZones {
   return { left, rail: Math.max(0, bar - left - right), right, scroll: Math.ceil(dials) > left };
 }
 
-/** The rail shows the phases beside the pill only when it has room, and the phone is 760 pt or wider inside the insets. */
+/** The pill shows the neighbor phases only when it has room, and the phone is 760 pt or wider inside the insets. */
 export function railWide(rail: number, narrowScreen: boolean): boolean {
   return !narrowScreen && rail >= RAIL_WIDE;
 }

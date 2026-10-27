@@ -66,7 +66,6 @@ describe("the tokens", () => {
   });
 
   it("keep the values the earlier phases named", () => {
-    expect(MOTION.railSlide.ms).toBe(280);
     expect(MOTION.railFlash.ms).toBe(300);
     expect(MOTION.railFlashIn.ms + MOTION.railFlashOut.ms).toBe(MOTION.railFlash.ms);
     expect(MOTION.seatPulseHalf.ms * 2).toBe(MOTION.seatPulse.ms);
