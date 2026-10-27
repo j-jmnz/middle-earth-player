@@ -7,7 +7,7 @@ import { DATA_DIR, ROOT } from "./paths.ts";
 import { buildIcons } from "./icons.ts";
 import { buildCards, parseOverrides } from "./normalize/cards.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
-import { boxCodes, generateEffects, renderGenerated } from "./effects/generate.ts";
+import { boxCodes, boxOwners, generateEffects, renderGenerated } from "./effects/generate.ts";
 import { applyPrinted } from "./normalize/printed.ts";
 import { buildCampaignIndex } from "./normalize/campaigns.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
@@ -29,11 +29,12 @@ export function renderCardFile(cards: readonly Card[]): string {
   return `[\n${cards.map((card) => `  ${JSON.stringify(card)}`).join(",\n")}\n]\n`;
 }
 
-// The MEC109 page each scenario's setup span sits on (mec109.setup-<scenario id> in data/rules/index.json, checked against
-// the booklet's text). A scenario with no such span has no page.
-export function bookletPages(entries: readonly { id: string; page: number }[], scenarios: readonly string[]): Record<string, number> {
-  const pages = new Map(entries.map((entry) => [entry.id, entry.page]));
-  return Object.fromEntries(scenarios.flatMap((id) => (pages.has(`mec109.setup-${id}`) ? [[id, pages.get(`mec109.setup-${id}`) ?? 0]] : [])));
+// The page of a campaign's booklet where each scenario's setup span sits (<prefix>.setup-<scenario id> in data/rules/index.json,
+// checked against the booklet's text), `doc` being the booklet's rules document. A scenario with no such span in that booklet
+// has no page: Mirkwood Paths opens the Learn to Play, which does not print The Oath's setup.
+export function bookletPages(entries: readonly { id: string; doc?: string; page: number }[], scenarios: readonly string[], doc = "mec109"): Record<string, number> {
+  const pages = new Map(entries.filter((entry) => entry.doc === undefined || entry.doc === doc).map((entry) => [entry.id.replace(/^[a-z0-9]+\./, ""), entry.page]));
+  return Object.fromEntries(scenarios.flatMap((id) => (pages.has(`setup-${id}`) ? [[id, pages.get(`setup-${id}`) ?? 0]] : [])));
 }
 
 const buildLog = createLog("data:build");
@@ -72,10 +73,27 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
   });
   log.info(`rules: ${entries.length} entries, ${steps.length} framework steps`);
   const buildResult = log.step("scenarios", () => buildScenarios(raw, cards, overrides, entries));
+  if (buildResult.problems.length > 0) {
+    const perScenario = new Map<string, number>();
+    for (const problem of buildResult.problems) perScenario.set(problem.split(":")[0] ?? problem, (perScenario.get(problem.split(":")[0] ?? problem) ?? 0) + 1);
+    log.info(`unbuilt scenarios (cross-checks failed${verbose() ? "" : "; run with --verbose for each"}): ${[...perScenario].map(([name, count]) => `${name} ${count}`).join(", ")}`);
+    log.debug(`  ${buildResult.problems.join("\n  ")}`);
+  }
   // The starter decklists are a hand-checked input (data/starter-decks.json), pinned to the MEC109 span that prints them.
+  // Only the saga campaign has them. Key order is the file's: the booklet fields come last so the Fellowship's lines stay put.
   const built = {
     ...buildResult,
-    campaign: { ...buildResult.campaign, bookletPages: bookletPages(entries, buildResult.campaign.scenarios), starterDecks: loadStarterDecks(cards, entries) },
+    campaigns: buildResult.campaigns.map(({ data: campaign, def }) => ({
+      id: campaign.id,
+      name: campaign.name,
+      scenarios: campaign.scenarios,
+      campaignCards: campaign.campaignCards,
+      prelude: campaign.prelude,
+      starterDecks: campaign.saga ? loadStarterDecks(cards, entries) : [],
+      bookletPages: bookletPages(entries, campaign.scenarios, def.bookletDoc),
+      bookletId: campaign.bookletId,
+      saga: campaign.saga,
+    })),
   };
   const scenarioDir = path.join(outDir, "scenarios");
   const campaignDir = path.join(outDir, "campaigns");
@@ -83,20 +101,25 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
   mkdirSync(campaignDir, { recursive: true });
   for (const file of readdirSync(scenarioDir)) rmSync(path.join(scenarioDir, file));
   for (const scenario of built.scenarios) writeFileSync(path.join(scenarioDir, `${scenario.id}.json`), `${JSON.stringify(scenario, null, 2)}\n`);
-  writeFileSync(path.join(campaignDir, "fellowship-of-the-ring.json"), `${JSON.stringify(built.campaign, null, 2)}\n`);
+  for (const file of readdirSync(campaignDir)) rmSync(path.join(campaignDir, file));
+  for (const campaign of built.campaigns) writeFileSync(path.join(campaignDir, `${campaign.id}.json`), `${JSON.stringify(campaign, null, 2)}\n`);
   // Pre-built player decks (data/prebuilt-decks.json): the Learn to Play's core decks and the DragnCards starter decks.
   const prebuilt = log.step("pre-built decks", () => loadPrebuiltDecks(raw, cards, entries));
   mkdirSync(path.join(outDir, "decks"), { recursive: true });
   writeFileSync(path.join(outDir, "decks", "prebuilt.json"), `${JSON.stringify(prebuilt, null, 2)}\n`);
   log.info(`pre-built decks: ${prebuilt.length}`);
   log.debug(`  ${prebuilt.map((deck) => deck.id).join(", ")}`);
-  const campaignIndex = buildCampaignIndex(raw, overrides, built.campaign);
+  const campaignIndex = buildCampaignIndex(raw, overrides, built.campaigns);
   writeFileSync(path.join(campaignDir, "index.json"), `${JSON.stringify(campaignIndex, null, 2)}\n`);
   const effectsDir = process.env.EFFECTS_OUT ?? path.join(ROOT, "src", "effects", "generated");
   mkdirSync(effectsDir, { recursive: true });
-  const generated = log.step("effects", () => generateEffects(cards, built.scenarios, built.campaign, withPool(ledger, cards)));
-  const box = boxCodes(built.campaign, built.scenarios);
-  writeFileSync(path.join(effectsDir, "fellowship-of-the-ring.ts"), renderGenerated(generated.effects.filter((effect) => box.has(effect.cardCode)), built.campaign.id));
+  const generated = log.step("effects", () => generateEffects(cards, built.scenarios, built.campaigns, withPool(ledger, cards)));
+  // One generated file per campaign, holding the box cards of its product; the rest of the player pool is player-pool.ts.
+  const box = boxCodes(built.campaigns, built.scenarios);
+  const owners = boxOwners(built.campaigns, built.scenarios);
+  for (const campaign of built.campaigns) {
+    writeFileSync(path.join(effectsDir, `${campaign.id}.ts`), renderGenerated(generated.effects.filter((effect) => owners.get(effect.cardCode) === campaign.id), campaign.id));
+  }
   writeFileSync(path.join(effectsDir, "player-pool.ts"), renderGenerated(generated.effects.filter((effect) => !box.has(effect.cardCode)), "player pool", "POOL_GENERATED_EFFECTS"));
   const icons = log.step("icons", () => buildIcons(process.env.ICONS_OUT ?? path.join(ROOT, "assets", "icons"), process.env.ICON_MODULES_OUT ?? path.join(ROOT, "src", "play", "icons")));
   log.info(`icons: ${icons.length} (${icons.filter((icon) => icon.kind === "vector").length} vector, ${icons.filter((icon) => icon.kind === "raster").length} raster)`);
@@ -105,12 +128,6 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
   log.info(`templates: ${usage.length} used for ${usage.reduce((sum, [, lines]) => sum + lines, 0)} lines${verbose() ? "" : " (--verbose lists them)"}`);
   log.debug(`  ${usage.map(([id, lines]) => `${id} x${lines}`).join(", ")}`);
   log.info(`scenarios: ${built.scenarios.map((scenario) => scenario.id).join(", ") || "none"}`);
-  if (built.problems.length > 0) {
-    const perScenario = new Map<string, number>();
-    for (const problem of built.problems) perScenario.set(problem.split(":")[0] ?? problem, (perScenario.get(problem.split(":")[0] ?? problem) ?? 0) + 1);
-    log.info(`unbuilt scenarios (cross-checks failed${verbose() ? "" : "; run with --verbose for each"}): ${[...perScenario].map(([name, count]) => `${name} ${count}`).join(", ")}`);
-    log.debug(`  ${built.problems.join("\n  ")}`);
-  }
   log.info(`cards: ${cards.length} in ${byPack.size} packs`);
   if (report.twinless.length > 0) log.warn(`twinless without override: ${report.twinless.join(", ")}`);
   const unknown = Object.entries(report.unknownKeywords).sort(([a], [b]) => a.localeCompare(b));

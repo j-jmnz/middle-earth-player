@@ -443,6 +443,24 @@ These decks can be built from this expansion and the core set. Counts were check
 
 When both decks are used together, the booklet says to replace the three copies of Gandalf (73) in Stealth and Steadfastness with three copies of Elrond (19). Show that as a note on each starter deck's own screen, not on the deck list (user request, 2026-10-25). Do not mutate either saved deck. The same unique card may sit in both decks. A second copy cannot enter play. Do not reject the pair for sharing Faramir, Steward of Gondor, or Celebrían's Stone.
 
+## Mirkwood Paths and The Dark of Mirkwood
+
+Two more official campaigns are built from the Revised Core Set (FFG product MEC101, RingsDB pack `RevCore`) and The Dark of Mirkwood (RingsDB pack `TDoM`). The Dark of Mirkwood rulebook (`tdom`, pinned in `data/sources.json`; `tdom.campaign-mode`, `tdom.mirkwood-paths`, `tdom.mini-campaign`) says how they fit together. Their data is built (phase 27, `docs/plans/mirkwood-paths.md`); none of their scenarios is playable yet, so both tiles stay locked in `data/campaigns/index.json` until one scenario is in `PLAYABLE_SCENARIOS` (phases 29 to 33).
+
+| Campaign id | Name | Scenarios, in order | Booklet |
+| --- | --- | --- | --- |
+| `mirkwood-paths` | Mirkwood Paths | `passage-through-mirkwood` (part 1), `journey-along-the-anduin` (2), `escape-from-dol-guldur` (3), `the-oath` (4), `the-caves-of-nibin-dum` (5) | `learn-to-play` (core campaign pages 30 and 31) |
+| `the-dark-of-mirkwood` | The Dark of Mirkwood | `the-oath`, `the-caves-of-nibin-dum`, as a two-scenario mini campaign on a blank Campaign Log | `the-dark-of-mirkwood` |
+
+The two campaigns share the scenario files of The Oath and The Caves of Nibin-Dûm. Neither is a saga: `saga` is false in their campaign files, so no Ring-bearer, no Fellowship-sphere hero and no prelude. Each campaign file names its booklet (`bookletId`) and, where the booklet prints a scenario's setup paragraph, its page (`bookletPages`; Mirkwood Paths has them for the three core scenarios, whose paragraphs are on Learn to Play p25, `ltp.setup-passage-through-mirkwood` and its two siblings).
+
+Data rules, each with its reason in `data/overrides.json` or the code:
+
+- The cards come from Hall of Beorn alone for these boxes, by `CardSet` ("Revised Core Set", "The Dark of Mirkwood"). Nightmare sets are different `CardSet`s and stay out. Hall of Beorn's " (Campaign)" encounter-set suffix is not part of the set's name.
+- The Revised Core Set reprints the 2011 core encounter cards under the same codes (01074 to 01131); the `RevCore` printing owns them. The Dark of Mirkwood's Hall of Beorn codes (020NN) are The Hunt for Gollum's, so its code is `410` and the two-digit collector number (Stalking Goblin 41041, as RingsDB lists it).
+- Hall of Beorn's per-scenario counts lead. The quest card's printed Setup (from the scan-read ledger `data/printed/mirkwood-paths.json`) moves cards out of the encounter deck: searched for and staged, or set aside. DragnCards' decks (the 2011 core Q01/E01 and the Limited Collector's Edition Q00/E00 of The Oath and The Caves) are a cross-check: it compares each card's copy count (Normal and Easy), not which pile the copy is in. The Easy Mode sheet (`easy-mode.core-set`) lists the cards Easy removes from each Core Set encounter set and settles the Revised Core scenarios' Easy counts.
+- The Learn to Play calls the second core scenario's set "Journey Down the Anduin"; the cards print "Journey Along the Anduin". The card wins; the booklet name is an alias (`encounterSetAliases`).
+
 ## Deckbuilding
 
 The builder is a root route beside the campaign list.
@@ -565,9 +583,9 @@ Author effects in scenario order. Scenario 1 and both starter decks were the fir
 | Need | Source |
 | --- | --- |
 | Packs, player cards, codes, errata, RingsDB images | RingsDB public API |
-| Every card as typed JSON, the MEC109 printing, Normal, Easy and Nightmare counts per scenario | Hall of Beorn export |
+| Every card as typed JSON, the MEC109 printing, Normal, Easy and Nightmare counts per scenario (the Fellowship box, the Revised Core Set and The Dark of Mirkwood) | Hall of Beorn export |
 | Card database, scenario load lists by pile, framework steps, automation snippets, card art | DragnCards LOTR plugin |
-| Procedures and definitions | MEC109 booklet, core-set Learn to Play, Rules Reference, FAQ, Easy mode, campaign log, and the keyword rules of two rulesheets (Heirs of Númenor, Wilds of Rhovanion) (PDFs, extracted per page) |
+| Procedures and definitions | MEC109 booklet, core-set Learn to Play, The Dark of Mirkwood rulebook, Rules Reference, FAQ, Easy mode, campaign log, and the keyword rules of two rulesheets (Heirs of Númenor, Wilds of Rhovanion) (PDFs, extracted per page) |
 
 Sources disagree. The build cross-checks them (Hall of Beorn counts against the DragnCards load lists, piles against the quest card's Setup text) and a scenario that fails a check is not written. Each resolved disagreement is a row in `data/overrides.json` with its reason and source.
 

@@ -1,0 +1,20 @@
+{
+  "id": "the-dark-of-mirkwood",
+  "name": "The Dark of Mirkwood",
+  "scenarios": [
+    "the-oath",
+    "the-caves-of-nibin-dum"
+  ],
+  "campaignCards": {
+    "the-oath": "41050",
+    "the-caves-of-nibin-dum": "41051"
+  },
+  "prelude": [],
+  "starterDecks": [],
+  "bookletPages": {
+    "the-oath": 3,
+    "the-caves-of-nibin-dum": 5
+  },
+  "bookletId": "the-dark-of-mirkwood",
+  "saga": false
+}

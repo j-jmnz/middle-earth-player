@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { keyOf, loadLedger, verifyScans } from "./printed/ledger.ts";
+import { keyOf, loadLedger, mergeLedgers, verifyScans } from "./printed/ledger.ts";
 import { starterPrints } from "../../src/screens/starter-decks.ts";
 import { KNOWN_ERRORS, MEC109_CHANGED, scanTargets, scopeCodes, starterCodes } from "./printed/scope.ts";
 
@@ -55,5 +55,36 @@ describe("printed-text ledger", () => {
     expect(text("141056", "B")).toContain("each burden card in play");
     expect(text("142039", "A")).toContain("burden treachery cards");
     expect(text("142039", "B")).toContain("burden treachery cards");
+  });
+});
+
+// Mirkwood Paths and The Dark of Mirkwood (phase 27): data/printed/mirkwood-paths.json, read from the pinned scans.
+describe("Mirkwood printed-text ledger", () => {
+  it("merges every data/printed file, and refuses a card side two files both hold", () => {
+    expect(ledger.entries.length).toBeGreaterThan(267);
+    const one = { campaign: "a", entries: [ledger.entries[0] as (typeof ledger.entries)[number]], byKey: new Map([[keyOf((ledger.entries[0]?.code ?? ""), (ledger.entries[0]?.side ?? "")), ledger.entries[0] as (typeof ledger.entries)[number]]]) };
+    expect(() => mergeLedgers([{ name: "a.json", ledger: one }, { name: "b.json", ledger: one }])).toThrow("both hold");
+  });
+
+  it("holds each dealt, campaign, boon and burden card of both boxes, and each entry says who read it", () => {
+    const codes = [...Array.from({ length: 65 }, (_, at) => String(1074 + at).padStart(5, "0")), ...Array.from({ length: 51 }, (_, at) => String(41001 + at)), "01013", "01017", "01030"];
+    const mine = ledger.entries.filter((entry) => codes.includes(entry.code));
+    expect(new Set(mine.map((entry) => entry.code)), "every code has an entry").toEqual(new Set(codes));
+    for (const entry of mine) {
+      expect(entry.readBy, `${entry.code}.${entry.side}`).toMatch(/read from the scan image/);
+      expect(entry.scan.sha256, `${entry.code}.${entry.side}`).toMatch(/^[0-9a-f]{64}$/);
+    }
+  });
+
+  it("reads the printed Setup, not Hall of Beorn's", () => {
+    const text = (code: string, side: string) => ledger.byKey.get(keyOf(code, side))?.lines.join(" ") ?? "";
+    expect(text("01129", "A")).toContain("Setup: Put Mendor into play.");
+    expect(text("01131", "A")).toContain("Attach Appointed by Fate to a hero of the first player's choice");
+    expect(text("01123", "A")).toContain("Nazgûl of Dol Guldur face up but out of play");
+    expect(text("01126", "A")).toContain("Each player reveals 1 card from the top of the encounter deck");
+    expect(text("41004", "A")).toContain("The first player attaches Cave Torch to one of his heroes");
+    expect(text("41050", "A")).toContain("Each player chooses 1 Adaptation boon attachment");
+    expect(text("41051", "A")).toContain("after drawing their starting hand (including taking a mulligan)");
+    expect(text("41001", "A")).toContain("Shuffle the encounter deck.");
   });
 });

@@ -28,6 +28,10 @@ export function widthOf(bytes: Uint8Array): number {
 }
 
 const MIN_WIDTH = 400;
+// The Revised Core Set's and The Dark of Mirkwood's campaign cards exist only as 300 to 350 px Hall of Beorn images (no
+// DragnCards picture), which are still legible for their few lines. A side no URL serves at MIN_WIDTH takes the widest
+// image of at least this width; every side that already had a MIN_WIDTH image keeps it.
+const FALLBACK_WIDTH = 300;
 
 // Card scans stay out of git. They are fetched into .cache/scans/<code>.<side>.<jpg|png> and pinned by sha256 in
 // data/sources.json, which is what the printed-text ledger names.
@@ -40,12 +44,16 @@ export async function syncScans(log: Log = createLog("scans")): Promise<SourceRe
   let fallbacks = 0;
   for (const target of targets) {
     let fetched: { url: string; bytes: Uint8Array } | null = null;
+    let narrow: { url: string; bytes: Uint8Array } | null = null;
     const failures: string[] = [];
     for (const url of target.urls) {
       try {
         const body = await fetchBytes(url, 60_000, log);
         if (extensionOf(body) === null) throw new Error("not a JPEG or PNG");
-        if (widthOf(body) < MIN_WIDTH) throw new Error(`too small to read (${widthOf(body)} px wide)`);
+        if (widthOf(body) < MIN_WIDTH) {
+          if (widthOf(body) >= FALLBACK_WIDTH && widthOf(body) > (narrow ? widthOf(narrow.bytes) : 0)) narrow = { url, bytes: body };
+          throw new Error(`too small to read (${widthOf(body)} px wide)`);
+        }
         fetched = { url, bytes: body };
         break;
       } catch (error) {
@@ -53,6 +61,10 @@ export async function syncScans(log: Log = createLog("scans")): Promise<SourceRe
         failures.push(`${url}: ${reason}`);
         log.debug(`${target.code}.${target.side}: skipped ${url}: ${reason}`);
       }
+    }
+    if (!fetched && narrow) {
+      fetched = narrow;
+      log.info(`${target.code}.${target.side}: only ${widthOf(narrow.bytes)} px images exist; read from ${narrow.url}`);
     }
     if (!fetched) throw new Error(`No scan for ${target.code}.${target.side}:\n  ${failures.join("\n  ")}`);
     if (failures.length > 0) fallbacks += 1;

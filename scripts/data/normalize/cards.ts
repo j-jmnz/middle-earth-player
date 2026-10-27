@@ -3,18 +3,17 @@ import { z } from "zod";
 import type { PrintedKeywords, RingsDbCard, RingsDbPack } from "../../../src/catalog/boundary.ts";
 import { cardSchema, type Card, type Printing } from "../../../src/catalog/card-facts.ts";
 import { deckLegal } from "../../../src/catalog/deck-legal.ts";
+import { CAMPAIGN_SUFFIX, PRODUCTS } from "../campaign-defs.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import { parseKeywordTokens } from "./keywords.ts";
 import type { RawData } from "./load-raw.ts";
 import { titleKey } from "./names.ts";
+import { addProductCards, productCodeOf } from "./product-cards.ts";
 import { timingLabels } from "./timings.ts";
 
 const TFOTR = "The Fellowship of the Ring";
-// Hall of Beorn card sets whose twin codes are RingsDB codes. Order is campaign order.
-const TWIN_SETS: ReadonlyMap<string, string> = new Map([
-  ["The Black Riders", "TBR"],
-  ["The Road Darkens", "TRD"],
-]);
+// Hall of Beorn card sets whose twin codes are RingsDB codes, with the RingsDB pack of each (PRODUCTS, in campaign order).
+const TWIN_SETS: ReadonlyMap<string, string> = new Map(PRODUCTS.flatMap((product) => (product.twinPack ? [[product.name, product.twinPack] as const] : [])));
 // Sets Hall of Beorn numbers from 00001 with no RingsDB code of their own.
 const UNCODED_SETS = new Set([TFOTR, "The Two Towers", "The Return of the King"]);
 
@@ -58,6 +57,15 @@ const overridesSchema = z.object({
   scenarioEasy: z
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
+  // A product whose Hall of Beorn codes collide with another product's: the code is `prefix` and the two-digit collector
+  // number, which is the code RingsDB gives the same cards where it lists them.
+  productCodes: z
+    .array(z.object({ set: z.string().min(1), prefix: z.string().regex(/^\d{3}$/), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
+  // A name a booklet prints for an encounter set that the cards print otherwise (the Learn to Play's "Journey Down the Anduin").
+  encounterSetAliases: z
+    .array(z.object({ booklet: z.string().min(1), set: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
   // Cards the app leaves out of the player card pool (not deck-legal): every card of a pack, or one card by code.
   outOfScope: z
     .array(z.object({ pack: z.string().min(1).optional(), code: z.string().min(1).optional(), reason: z.string().min(1), source: z.string().min(1) }))
@@ -76,7 +84,6 @@ export function parseOverrides(raw: unknown): Overrides {
 export type BuildReport = {
   unknownKeywords: Record<string, number>;
   twinless: string[];
-  overridesUsed: string[];
 };
 
 const RULE_FIELDS = ["name", "text", "cost", "deck_limit", "type_code", "type_name", "sphere_code", "traits", "is_unique", "has_errata", "threat", "willpower", "attack", "defense", "health", "quest", "victory"] as const;
@@ -139,7 +146,13 @@ const ENCOUNTER_TYPES = new Set(["enemy", "location", "treachery", "objective"])
 // Hall of Beorn lists it as the card's encounter set.
 function campaignFacts(card: HobCard): { campaignKind: "boon" | "burden" | null; burdenSet: string | null } {
   const kind = card.CardSubType === "Boon" ? "boon" : card.CardSubType === "Burden" ? "burden" : null;
-  return { campaignKind: kind, burdenSet: kind === "burden" ? (card.EncounterInfo?.EncounterSet ?? null) : null };
+  return { campaignKind: kind, burdenSet: kind === "burden" ? setName(card.EncounterInfo?.EncounterSet) : null };
+}
+
+// Hall of Beorn names the encounter sets of the campaign editions "Spiders of Mirkwood (Campaign)". The suffix is not part
+// of the set's name.
+function setName(name: string | null | undefined): string | null {
+  return name == null ? null : name.replace(CAMPAIGN_SUFFIX, "");
 }
 
 // RingsDB types every boon and burden "treasure" and gives it the type name Campaign. The type bar prints the real
@@ -184,7 +197,7 @@ function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts
     isUnique: card.IsUnique,
     quantity: card.Quantity,
     easyQuantity: card.EncounterInfo?.EasyModeQuantity ?? null,
-    encounterSet: card.EncounterInfo?.EncounterSet ?? null,
+    encounterSet: setName(card.EncounterInfo?.EncounterSet),
     hasErrata: card.HasErrata,
     ...campaignFacts(card),
   };
@@ -287,14 +300,13 @@ function pairTwins(tfotr: readonly HobCard[], twins: readonly HobCard[]): Map<Ho
   return pairs;
 }
 
-function overrideFor(overrides: Overrides, report: BuildReport, probe: { code?: string; name: string; set?: string; number?: number }) {
+function overrideFor(overrides: Overrides, probe: { code?: string; name: string; set?: string; number?: number }) {
   const hit = overrides.cards.find(({ match }) =>
     (match.code === undefined || match.code === probe.code) &&
     (match.name === undefined || match.name === probe.name) &&
     (match.set === undefined || match.set === probe.set) &&
     (match.number === undefined || match.number === probe.number),
   );
-  if (hit) report.overridesUsed.push(`${probe.code ?? probe.name}: ${hit.reason}`);
   return hit?.set;
 }
 
@@ -304,14 +316,16 @@ function outOfScope(overrides: Overrides, card: Pick<Card, "code" | "printings">
 }
 
 export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[]; report: BuildReport } {
-  const report: BuildReport = { unknownKeywords: {}, twinless: [], overridesUsed: [] };
+  const report: BuildReport = { unknownKeywords: {}, twinless: [] };
 
+  const hobCode = productCodeOf(overrides);
   const hobByCode = new Map<string, HobCard[]>();
   const hobByTitle = new Map<string, HobCard[]>();
   for (const card of raw.hob) {
     hobByTitle.set(titleKey(card.Title), [...(hobByTitle.get(titleKey(card.Title)) ?? []), card]);
-    if (UNCODED_SETS.has(card.CardSet) || !card.RingsDbCardId) continue;
-    hobByCode.set(card.RingsDbCardId, [...(hobByCode.get(card.RingsDbCardId) ?? []), card]);
+    const code = hobCode(card);
+    if (UNCODED_SETS.has(card.CardSet) || !code) continue;
+    hobByCode.set(code, [...(hobByCode.get(code) ?? []), card]);
   }
 
   // RingsDB cards, merged across the packs that reprint them.
@@ -426,7 +440,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     let code = twin?.RingsDbCardId ?? "";
     let packOverride: string | undefined;
     if (!twin) {
-      const set = overrideFor(overrides, report, { name: source.Title, set: source.CardSet, number: source.Number });
+      const set = overrideFor(overrides, { name: source.Title, set: source.CardSet, number: source.Number });
       if (!set?.code) {
         report.twinless.push(`${source.Title} (#${source.Number})`);
         continue;
@@ -445,9 +459,11 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     byCode.set(code, merge(code, twin, twin));
   }
 
+  addProductCards(raw.hob, byCode, hobCode, merge);
+
   const cards: Card[] = [];
   for (const card of byCode.values()) {
-    const set = overrideFor(overrides, report, { code: card.code, name: card.name });
+    const set = overrideFor(overrides, { code: card.code, name: card.name });
     const withKeywords = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
     const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
     const named = set?.name ? { ...withBurden, name: set.name } : withBurden;

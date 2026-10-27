@@ -7,10 +7,10 @@ import { lineId, type Ledger } from "../printed/ledger.ts";
 import { isPoolCard } from "../printed/pool.ts";
 
 // The printed lines no effect record owns yet, for every card a game can hold: each deck-legal player card and every card
-// the six scenarios deal. A line is owned by a record that names it, by keywords the engine reads (a line of keywords
+// the built scenarios deal. A line is owned by a record that names it, by keywords the engine reads (a line of keywords
 // only), or by an inert mark in the box ledger. The list is src/effects/open-lines.ts, which the app reads
 // for the inactive mark; every card is meant to leave it (user decision, 2026-10-26).
-export function openLines(cards: readonly Card[], ledger: Ledger, campaign: CampaignData, scenarios: readonly ScenarioData[], effects: readonly Effect[]): string[] {
+export function openLines(cards: readonly Card[], ledger: Ledger, campaign: CampaignData | readonly CampaignData[], scenarios: readonly ScenarioData[], effects: readonly Effect[]): string[] {
   const owned = new Set(effects.flatMap((effect) => effect.lines));
   const wanted = new Set([...dealtCodes(campaign, scenarios), ...cards.filter(isPoolCard).map((card) => card.code)]);
   const open: string[] = [];

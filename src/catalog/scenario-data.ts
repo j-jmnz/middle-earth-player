@@ -5,7 +5,9 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // A scenario as data/scenarios/<id>.json stores it: which cards go to which pile, in Normal and Easy
 // counts. The sync adapters and the quest cards' Setup text both agree on it before the build writes it.
 // `burden` is the burden deck (Flight to the Ford): a zone beside the quest deck, not part of the encounter deck.
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden"] as const;
+// `attachedChosen` is a card the quest's Setup attaches to a hero the first player chooses (The Caves of Nibin-Dûm's Cave
+// Torch): out of the encounter deck, dealt by the Setup record, not by `setupInstructions`.
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z
@@ -36,7 +38,9 @@ export const scenarioDataSchema = z
     life: z.number().int().positive().optional(),
     // Table pieces the cards call for, read from their printed text by the build.
     widgets: z.strictObject({ hide: z.boolean(), secondActiveLocation: z.boolean(), perSeatStaging: z.boolean() }),
-    source: z.strictObject({ dragnNormal: z.string(), dragnEasy: z.string().nullable(), hobSlug: z.string() }),
+    // The DragnCards decks the Fellowship box is loaded from (null where the box has none: Hall of Beorn's counts and the printed
+    // Setup text place its cards), and the Hall of Beorn scenario file.
+    source: z.strictObject({ dragnNormal: z.string().nullable(), dragnEasy: z.string().nullable(), hobSlug: z.string() }),
   })
   .superRefine((data, context) => {
     const quest = data.cards.filter((card) => card.pile === "quest").map((card) => card.code);
@@ -78,12 +82,19 @@ export const campaignDataSchema = z.strictObject({
   scenarios: z.array(z.string().min(1)),
   // The campaign card of each scenario, by scenario id. Its Setup and Resolution lines are effect records.
   campaignCards: z.record(z.string(), z.string().min(1)),
-  // The page of the MEC109 booklet where a scenario's setup is printed, by scenario id. Only scenarios whose page is
-  // recorded in data/rules/index.json have one; the reader opens on it, otherwise on the saved last page.
+  // The booklet the campaign opens (src/screens/booklets/books.ts): the Fellowship's MEC109, the Learn to Play for Mirkwood
+  // Paths, The Dark of Mirkwood's rulebook for the two-scenario campaign.
+  bookletId: z.string().min(1),
+  // A saga campaign carries the Ring-bearer and the Fellowship-sphere rules (the Fellowship of the Ring only). The others
+  // are plain campaigns: no Ring-bearer, and Fellowship heroes are not allowed.
+  saga: z.boolean(),
+  // The page of the campaign's booklet where a scenario's setup is printed, by scenario id. Only scenarios whose
+  // `setup-<id>` span (data/rules/index.json) is in that booklet have one; the reader opens on it, otherwise on the saved
+  // last page.
   bookletPages: z.record(z.string(), z.number().int().positive()).optional(),
-  // Cards every scenario starts with, attached to the Ring-bearer. From the sources' player-1 play area.
+  // Cards every scenario starts with, attached to the Ring-bearer. From the sources' player-1 play area. Empty outside a saga.
   prelude: z.array(z.strictObject({ code: z.string().min(1) })),
-  // The two starter decks the booklet prints (data/starter-decks.json). The seed script reads them.
+  // The two starter decks the booklet prints (data/starter-decks.json). The seed script reads them. Empty outside the Fellowship.
   starterDecks: z.array(starterDeckSchema),
 });
 export type CampaignData = z.infer<typeof campaignDataSchema>;

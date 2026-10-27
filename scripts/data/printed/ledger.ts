@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { z } from "zod";
@@ -33,6 +33,7 @@ export const ledgerSchema = z.strictObject({
   conventions: z.array(z.string()),
   entries: z.array(ledgerEntrySchema),
 });
+// `campaign` names the ledger files it holds: one id for a single file, the ids joined by "+" for the merged ledger.
 export type Ledger = { campaign: string; entries: LedgerEntry[]; byKey: ReadonlyMap<string, LedgerEntry> };
 
 export const keyOf = (code: string, side: string): string => `${code}.${side}`;
@@ -53,8 +54,31 @@ export function parseLedger(raw: unknown): Ledger {
   return { campaign: parsed.campaign, entries: parsed.entries, byKey };
 }
 
-export function loadLedger(dataDir = DATA_DIR, campaign = "fellowship-of-the-ring"): Ledger {
-  return parseLedger(JSON.parse(readFileSync(path.join(dataDir, "printed", `${campaign}.json`), "utf8")) as unknown);
+// Reads every data/printed/*.json and merges them. A card side is read once: two files holding the same key fail, so the
+// campaigns that share cards (the Oath is in two) cannot disagree about what is printed on them.
+export function loadLedger(dataDir = DATA_DIR): Ledger {
+  const dir = path.join(dataDir, "printed");
+  const ledgers = readdirSync(dir)
+    .filter((name) => name.endsWith(".json"))
+    .sort()
+    .map((name) => ({ name, ledger: parseLedger(JSON.parse(readFileSync(path.join(dir, name), "utf8")) as unknown) }));
+  return mergeLedgers(ledgers);
+}
+
+export function mergeLedgers(ledgers: readonly { name: string; ledger: Ledger }[]): Ledger {
+  const byKey = new Map<string, LedgerEntry>();
+  const owner = new Map<string, string>();
+  const entries: LedgerEntry[] = [];
+  for (const { name, ledger } of ledgers) {
+    for (const entry of ledger.entries) {
+      const key = keyOf(entry.code, entry.side);
+      if (byKey.has(key)) throw new Error(`Ledger ${name} and ${owner.get(key) ?? "?"} both hold ${key}`);
+      byKey.set(key, entry);
+      owner.set(key, name);
+      entries.push(entry);
+    }
+  }
+  return { campaign: ledgers.map(({ ledger }) => ledger.campaign).join("+"), entries, byKey };
 }
 
 type Pinned = { path: string; url: string; sha256: string };

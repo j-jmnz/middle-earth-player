@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "3e73aa8d4c54f5b72ec3e45b16ddee1b65224991cf61e7b73ac5d5b259b39e86"
+        "value": "d5d7318b441ce756bad5c878b65e3c9b4933909bf7c86286e50c7fdcf216f3ed"
       },
-      "fetchedAt": "2026-10-24T10:19:07.732Z",
+      "fetchedAt": "2026-10-27T15:09:42.078Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -115,6 +115,36 @@
           "url": "https://hallofbeorn.com/Export/Scenarios",
           "sha256": "31ba1b37c59d16e4089c3711ab9fbedd101cb1c496b644e04a9bc43cbce10297",
           "bytes": 28335
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Passage-Through-Mirkwood-(Campaign).json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Passage-Through-Mirkwood-(Campaign)",
+          "sha256": "8ae48ad15957842a2badd0be0c8b2d293b532f966e8ffd52949d9a4bd93dfff7",
+          "bytes": 15538
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Journey-Along-the-Anduin-(Campaign).json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Journey-Along-the-Anduin-(Campaign)",
+          "sha256": "09a00776e251db944b8d2e08f1bdc83b024098cdeb798fe70e2a7c8ccf4c5162",
+          "bytes": 14219
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Escape-from-Dol-Guldur-(Campaign).json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Escape-from-Dol-Guldur-(Campaign)",
+          "sha256": "be5c801e3dcec5c9c1d3253740717c6c81d3a623f36a7e157cce8e3b47eadc3e",
+          "bytes": 14960
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Oath-(Campaign).json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Oath-(Campaign)",
+          "sha256": "5570f79003d4e13b74b1f45e9afed7b5e7e8c53b080defdf16e68c1df0f2d5b7",
+          "bytes": 10672
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Caves-of-Nibin-Dûm-(Campaign).json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Caves-of-Nibin-Dûm-(Campaign)",
+          "sha256": "a50e70456120ae5dc4f6a62e290df3359998e70ca1fe950e345a15e701ce498b",
+          "bytes": 14803
         },
         {
           "path": "raw/hallofbeorn/Scenarios/A-Shadow-of-the-Past.json",
@@ -817,9 +847,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "e648541d9f8a3044b06c2f3a897e90812814b35fad05d8c09d5a79a2403078ab"
+        "value": "7c114a2a21ccd410ed1fcb433729151e1cf37336a8463d6c1eb2cc96244768a6"
       },
-      "fetchedAt": "2026-10-26T12:50:42.027Z",
+      "fetchedAt": "2026-10-27T15:02:24.923Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -838,6 +868,12 @@
           "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC101.pdf",
           "sha256": "ef604fe7a639dfcb59e1b63538c77cb39bfbbda512ba0e9d2756ade92ef084ee",
           "bytes": 11650645
+        },
+        {
+          "path": "pdf/dark_of_mirkwood_rulebook_v2.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_rulebook_v2.pdf",
+          "sha256": "b0763922ba321588ba0b50885d82c28ddb3a8e7a1cfe77ba3395e0403f7d4b7a",
+          "bytes": 12791907
         },
         {
           "path": "pdf/lotr_faq_19.pdf",
@@ -996,9 +1032,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "9b173e786169e8bf52e944ef51adf9e8cce49b092b6bb91056ded12b078a6d10"
+        "value": "7ca71de8bae9fd7b0d2c1298e8ccfdea5de9d2f3f35ac18230523ab3181be083"
       },
-      "fetchedAt": "2026-10-26T00:18:05.710Z",
+      "fetchedAt": "2026-10-27T15:11:15.690Z",
       "files": [
         {
           "path": "scans/01001.A.jpg",
@@ -1073,6 +1109,12 @@
           "bytes": 159506
         },
         {
+          "path": "scans/01013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Guard-of-the-Citadel.jpg",
+          "sha256": "c0f967b416c721e1b84ce7268f7b11029bc588b14c188b73df9177b7b4bb4ce1",
+          "bytes": 139879
+        },
+        {
           "path": "scans/01014.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Faramir.jpg",
           "sha256": "f2828886b5066e11af9dd567c382535ed8b30bd0107ba42352c868cc9f01645b",
@@ -1089,6 +1131,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Snowbourn-Scout.jpg",
           "sha256": "e414e5915a88a52afeeb242d033d751038c1e6faccba352e3ec077ba1b31d396",
           "bytes": 150103
+        },
+        {
+          "path": "scans/01017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Silverlode-Archer.jpg",
+          "sha256": "f5169a9da1bf15f003db0d4574d77b8c78fcf44e8027d94d73db1fd46dd8a6f8",
+          "bytes": 146906
         },
         {
           "path": "scans/01018.A.jpg",
@@ -1161,6 +1209,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gondorian-Spearman.jpg",
           "sha256": "600acd234355992bf84bd615395cac91c02e8991a55eb12d5173f6df0141ae42",
           "bytes": 148057
+        },
+        {
+          "path": "scans/01030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Horseback-Archer.jpg",
+          "sha256": "db0adb82693cf63392fc636f1074cb7600d1d9933a2ee22f1405543edc4e1961",
+          "bytes": 145597
         },
         {
           "path": "scans/01031.A.jpg",
@@ -1419,6 +1473,474 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gandalf.jpg",
           "sha256": "f658e30508315ee2159e1ccd976a130b4e4f0038458fb50df418711ad0509c07",
           "bytes": 145176
+        },
+        {
+          "path": "scans/01074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/King-Spider.jpg",
+          "sha256": "c30625b4eaff667378c1157a68da645dbeb53ad87de4e4b351d3f0e0d921c101",
+          "bytes": 146157
+        },
+        {
+          "path": "scans/01075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Hummerhorns.jpg",
+          "sha256": "612cf3cfae49b7c1d9aa4e976614b2a0c05b5c58bff92d16c2d6fb99b8c9fe33",
+          "bytes": 146421
+        },
+        {
+          "path": "scans/01076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Ungoliant's-Spawn.jpg",
+          "sha256": "fcde536f575a3c838be6aef69f66bee5d89ab46a486a6c88f429651bdbdf5344",
+          "bytes": 146441
+        },
+        {
+          "path": "scans/01077.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Great-Forest-Web.jpg",
+          "sha256": "b8bb318ad879241787997b24b1a1c03ce7619e4207d3503078660b269e8fcd92",
+          "bytes": 146417
+        },
+        {
+          "path": "scans/01078.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Mountains-of-Mirkwood.jpg",
+          "sha256": "9d6e6aa030673c1d8f457e399fe9cf62ce35fda63fc0efcf51fb7660c808ad94",
+          "bytes": 145533
+        },
+        {
+          "path": "scans/01079.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Eyes-of-the-Forest.jpg",
+          "sha256": "8c60849a1c1b01f2286cff18c7be4b6c30217aa0626b85d0a2b7aefebd957b18",
+          "bytes": 138791
+        },
+        {
+          "path": "scans/01080.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Caught-in-a-Web.jpg",
+          "sha256": "c5c02a31e6bae136de77d6f435b448d5faa48d5ca15341c6d385773d8f1d428b",
+          "bytes": 155350
+        },
+        {
+          "path": "scans/01081.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Wolf-Rider.jpg",
+          "sha256": "9f7347c19c3c0ce21bc2a9295e14bc518401cbdcbfa6dd4a2213cb32b8708eb2",
+          "bytes": 147950
+        },
+        {
+          "path": "scans/01082.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Hill-Troll.jpg",
+          "sha256": "3c485b427cdc500e1bfbc6b0172348657448182c400df380c57b0e44b82f2880",
+          "bytes": 140777
+        },
+        {
+          "path": "scans/01083.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Goblin-Sniper.jpg",
+          "sha256": "bc7b2fe0348248c905549afa16784b7f994c8c52c739e59b63543181d13346b4",
+          "bytes": 154372
+        },
+        {
+          "path": "scans/01084.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Marsh-Adder.jpg",
+          "sha256": "e37bf2516053cb5f2d9b8d83902c57bea95a47d9dfa9ac9df5a4e60fa1ec87ca",
+          "bytes": 144102
+        },
+        {
+          "path": "scans/01085.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Wargs.jpg",
+          "sha256": "2caf683d8cdb2f8289133c408b0d0998e1b82d6672fb6eb6f2a2afcbe951508a",
+          "bytes": 146908
+        },
+        {
+          "path": "scans/01086.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Despair.jpg",
+          "sha256": "743fbce805f447c4c96faf3f37e9e30aea6bcba8c0916ba53689378cc43817d7",
+          "bytes": 139167
+        },
+        {
+          "path": "scans/01087.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/The-Brown-Lands.jpg",
+          "sha256": "0c7ac96724db2b1db590beabafb114d586498b6d15f1d18ee725834e147c3480",
+          "bytes": 139561
+        },
+        {
+          "path": "scans/01088.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/The-East-Bight.jpg",
+          "sha256": "0e10aecee08dd9d99e10bf3e6f7f700b45b5750710c92fffb564527dc83028e4",
+          "bytes": 137787
+        },
+        {
+          "path": "scans/01089.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Dol-Guldur-Orcs-Enemy.jpg",
+          "sha256": "c5fa6dd62169329164990b0889396578f8e0747ab38b9ff1a24fd6b5cdcaa2dd",
+          "bytes": 159255
+        },
+        {
+          "path": "scans/01090.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Chieftan-Ufthak.jpg",
+          "sha256": "27afa63605cb6303dadabf705c7596754e38154e8ec613bae95176d7e98b1818",
+          "bytes": 154438
+        },
+        {
+          "path": "scans/01091.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Dol-Guldur-Beastmaster.jpg",
+          "sha256": "6f35eb6d2d1e2336857e6675d5454a24fb4e3e3c46ceecd2df14d6e5477c8bd7",
+          "bytes": 811085
+        },
+        {
+          "path": "scans/01092.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Driven-by-Shadow.jpg",
+          "sha256": "ae62e9abe210bceab3d4c2347d639f6b52faf79b0a682f15b55366578dfcef23",
+          "bytes": 153649
+        },
+        {
+          "path": "scans/01093.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/The-Necromancer's-Reach.jpg",
+          "sha256": "42bbfd1c13410f64b4a2a603ee2074d0a071b4814826569f74e3e6531c97ac14",
+          "bytes": 145801
+        },
+        {
+          "path": "scans/01094.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Necromancer's-Pass.jpg",
+          "sha256": "18ce06e3c57ab77feac378d531e4ad0ffcdc410b359194e3978135c933d6ef4c",
+          "bytes": 157102
+        },
+        {
+          "path": "scans/01095.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Enchanted-Stream.jpg",
+          "sha256": "e549a766cd6c098a08a3128aeb04f8de9f56415aa92032771df3de3c6098e66d",
+          "bytes": 153810
+        },
+        {
+          "path": "scans/01096.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Forest-Spider.jpg",
+          "sha256": "94f0927c814c8d9548bf8d27a00b0eebaa0aeb3f89b1cf636a31bf479960a9ae",
+          "bytes": 149222
+        },
+        {
+          "path": "scans/01097.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/East-Bight-Patrol.jpg",
+          "sha256": "11e939cc09cdeb05c79bf877c520496a09423e33b50b0a396e332c291edd18ef",
+          "bytes": 150864
+        },
+        {
+          "path": "scans/01098.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Black-Forest-Bats.jpg",
+          "sha256": "0b86fb6efc47d907fc3b156288395f9003a86f3bd2ae17bcefaa5d8dc3c1e5bb",
+          "bytes": 152370
+        },
+        {
+          "path": "scans/01099.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Old-Forest-Road.jpg",
+          "sha256": "d3238e00cf38ef1c76eaf92a0071bb17ccca5cb4e41d35066fbe2ea96e3dbbd7",
+          "bytes": 149056
+        },
+        {
+          "path": "scans/01100.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Forest-Gate.jpg",
+          "sha256": "e4aab5581d4618c398caf965d17cfc3474bd92ea7fb9c4064e15877a1da0c4e3",
+          "bytes": 152076
+        },
+        {
+          "path": "scans/01101.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Dungeon-Jailor.jpg",
+          "sha256": "14cd7098fd8e034784833a5c4b4fa8b06e2efdfabacd31ae9c3808b0f14bd6d5",
+          "bytes": 154627
+        },
+        {
+          "path": "scans/01102.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Nazgûl-of-Dol-Guldur.jpg",
+          "sha256": "2c8bb148771b2ff1bdbd7215e7a755a95f12fd6175f1fae760174f0abc1c6d9e",
+          "bytes": 860444
+        },
+        {
+          "path": "scans/01103.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Cavern-Guardian.jpg",
+          "sha256": "bd802adaa455f2f407ba97a85aa0a4ccd2178a554e0a3f7f3e462f80acf26e06",
+          "bytes": 143406
+        },
+        {
+          "path": "scans/01104.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Under-the-Shadow.jpg",
+          "sha256": "7cc23cf79a6cbc42a5bf20cc30745a5721c9a9c22e70d47f13412caa8f0c790d",
+          "bytes": 142307
+        },
+        {
+          "path": "scans/01105.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Iron-Shackles.jpg",
+          "sha256": "1373425a2cdcea75893d588df9e7f2a4de039f065ca41113fa735c2306d8eed8",
+          "bytes": 143342
+        },
+        {
+          "path": "scans/01106.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Endless-Caverns.jpg",
+          "sha256": "3663d5a278edbc7cbe9d9c941646ebedd2b0be90e8d18f38374aa507b30e11a5",
+          "bytes": 133061
+        },
+        {
+          "path": "scans/01107.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Tower-Gate.jpg",
+          "sha256": "7401817797c80a57b7e37596970b2f65aaaf9e963be3c577877eb4585efcb25e",
+          "bytes": 152521
+        },
+        {
+          "path": "scans/01108.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gandalf's-Map.jpg",
+          "sha256": "4afe945f9f46cdfe2a5c29e17953a333148768e9470123a9fed849c7e621e467",
+          "bytes": 146169
+        },
+        {
+          "path": "scans/01109.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Dungeon-Torch.jpg",
+          "sha256": "9f974edabaa0ee1ce1feae3ebda1de9eb6da45b337012ffb1af1230d37ae00fe",
+          "bytes": 147489
+        },
+        {
+          "path": "scans/01110.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Shadow-Key.jpg",
+          "sha256": "6dac850931e13fcd1c88c7cff461488ef3d8c9113e3040b5976768791be313ad",
+          "bytes": 138402
+        },
+        {
+          "path": "scans/01111.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Misty-Mountain-Goblins.jpg",
+          "sha256": "abceb2de99de4cfa306715f70cfdf6fe5efbf0541d7c3bb535545bde9acbd9ef",
+          "bytes": 153457
+        },
+        {
+          "path": "scans/01112.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Massing-at-Night.jpg",
+          "sha256": "0f012ddc555506a7f270c4782212f8f1e233db0b01d6820bdf971bdb24da24ef",
+          "bytes": 153073
+        },
+        {
+          "path": "scans/01113.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Banks-of-the-Anduin.jpg",
+          "sha256": "3722e29a263aaa45b9d2d8bc1e0a147eb2e2116f78a6990c56208f20446b4a8c",
+          "bytes": 149502
+        },
+        {
+          "path": "scans/01114.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Gladden-Fields.jpg",
+          "sha256": "c171119898d79ac4cd31442ea01c312cea514a9f15d4b6dda62fb12a46a0c71e",
+          "bytes": 149024
+        },
+        {
+          "path": "scans/01115.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Eastern-Crows.jpg",
+          "sha256": "2e91e78a7a139c9277e97ed82762f3f5189774ae554cfd3873d36a587924f4b1",
+          "bytes": 154255
+        },
+        {
+          "path": "scans/01116.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Evil-Storm.jpg",
+          "sha256": "ff2e3667e5c7b3ce58d27f372a37110fc8f2667e69896a888c4e5d46ea4cf4a4",
+          "bytes": 135096
+        },
+        {
+          "path": "scans/01117.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Pursued-by-Shadow.jpg",
+          "sha256": "9bba8def0bee8db25f396265e7791d09639fbe3de9f5d9a250c71b5bcf05f2aa",
+          "bytes": 141132
+        },
+        {
+          "path": "scans/01118.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Treacherous-Fog.jpg",
+          "sha256": "c83dd3db1167d7e3894e1f595475dc7dab53548b800dfe30bd61606c0bb70d06",
+          "bytes": 143589
+        },
+        {
+          "path": "scans/01119.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Flies-and-Spiders-1A.jpg",
+          "sha256": "6abe1df3a0cbf1296d0d669c73017c628aae02d7e688b1c5e650782d949daa7f",
+          "bytes": 134602
+        },
+        {
+          "path": "scans/01119.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Flies-and-Spiders-1B.jpg",
+          "sha256": "dca035654323c9bd7e9fccf63431912713b5e741597d543b388dcd75259a85fa",
+          "bytes": 122916
+        },
+        {
+          "path": "scans/01120.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/A-Fork-in-the-Road-2A.jpg",
+          "sha256": "3e1eacca19f39529656e3fd0496113e35b44541b4e28831982ff936506bfc88b",
+          "bytes": 120470
+        },
+        {
+          "path": "scans/01120.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/A-Fork-in-the-Road-2B.jpg",
+          "sha256": "21d5c7588d4b078a6beb48b94d4ec0b8d7e116f0198b58659986add471d53cb4",
+          "bytes": 123571
+        },
+        {
+          "path": "scans/01121.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/A-Chosen-Path-Don't-Leave-the-Path-3A.jpg",
+          "sha256": "d57092596216821702b856f4390d880095765042f2027b058ce1b361318998f2",
+          "bytes": 134467
+        },
+        {
+          "path": "scans/01121.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/A-Chosen-Path-Don't-Leave-the-Path-3B.jpg",
+          "sha256": "25b4f2b992d12cd1ac0f8575106ca5d0560c8386120934196b6b994c31978af4",
+          "bytes": 144475
+        },
+        {
+          "path": "scans/01122.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/A-Chosen-Path-Beorn's-Path-3A.jpg",
+          "sha256": "b6879f94e7631c58278e3a3ba6e3cc482772964109f7735d4becf0ce826b8dd6",
+          "bytes": 134483
+        },
+        {
+          "path": "scans/01122.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/A-Chosen-Path-Beorn's-Path-3B.jpg",
+          "sha256": "344b2761927417d067336cdde0ea644a0117e7bb58eeb7f811715257461363e0",
+          "bytes": 144414
+        },
+        {
+          "path": "scans/01123.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/The-Necromancer's-Tower-1A.jpg",
+          "sha256": "5823b65def09eebb826a56ab5f2e468590d7dc3c193bdee567111920c33bfea1",
+          "bytes": 933957
+        },
+        {
+          "path": "scans/01123.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/The-Necromancer's-Tower-1B.jpg",
+          "sha256": "12dd35e60dec755f87ecc604f92c82699b918ca9358075d56a7e5552892e21ab",
+          "bytes": 139872
+        },
+        {
+          "path": "scans/01124.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Through-the-Caverns-2A.jpg",
+          "sha256": "08e0f619feb0ea52732c9e5e47d0683f166b1815deee94342f0edd4986a3c338",
+          "bytes": 110360
+        },
+        {
+          "path": "scans/01124.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Through-the-Caverns-2B.jpg",
+          "sha256": "925ff515dcffa01253054d666824cd832e72f36dde4defc2da0ef85a42f539a4",
+          "bytes": 124095
+        },
+        {
+          "path": "scans/01125.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Out-of-the-Dungeons-3A.jpg",
+          "sha256": "106ac86ba60a8a20166d465fa27d254d890f5ebefd6a0db4bd711230f02dcd71",
+          "bytes": 108803
+        },
+        {
+          "path": "scans/01125.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Out-of-the-Dungeons-3B.jpg",
+          "sha256": "4f5b3aa25909db142bdd39862258a8bbd5240deab57ccb3adaa54e5ba66ddcae",
+          "bytes": 121431
+        },
+        {
+          "path": "scans/01126.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/To-the-River-1A.jpg",
+          "sha256": "1a14b40e1a60fd236b97d7df60781055e113d06a868a0971e264ba90b788ef80",
+          "bytes": 135497
+        },
+        {
+          "path": "scans/01126.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/To-the-River-1B.jpg",
+          "sha256": "94e35de8c3e9082747a5aaaf1fddfb38638ced0b5f96c66b4b0bec9e44b9d1ef",
+          "bytes": 136802
+        },
+        {
+          "path": "scans/01127.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Anduin-Passage-2A.jpg",
+          "sha256": "81fbd357d8cdc152ee0e6efb21c4ecc92d230987443f67e214a306720ebc0785",
+          "bytes": 114869
+        },
+        {
+          "path": "scans/01127.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Anduin-Passage-2B.jpg",
+          "sha256": "9f027e1aaececc600d987e3aeb781fc675c8d9ece29edef77cec093ca46e569e",
+          "bytes": 119523
+        },
+        {
+          "path": "scans/01128.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Ambush-on-the-Shore-3A.jpg",
+          "sha256": "c2619eb76ef17ead7e6a173375ddd0ef99b1be1919173770dd1189ab99272f55",
+          "bytes": 131405
+        },
+        {
+          "path": "scans/01128.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Ambush-on-the-Shore-3B.jpg",
+          "sha256": "7ee2e953bf43e90b9c05bcbff0ca5d0243b6a4a3265dfc360e7dd9fa0056b879",
+          "bytes": 124312
+        },
+        {
+          "path": "scans/01129.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Passage-Through-Mirkwood-SetupA.jpg",
+          "sha256": "e05cc56e9ed34c59e0997b2eba8cb7c8addca25e4180cbe79f70dba561684773",
+          "bytes": 46753
+        },
+        {
+          "path": "scans/01129.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Passage-Through-Mirkwood-SetupB.jpg",
+          "sha256": "65660cc484f85e54e087608b348e3c7da474d059b911390975df43e409df60c6",
+          "bytes": 42603
+        },
+        {
+          "path": "scans/01130.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Journey-Along-the-Anduin-SetupA.jpg",
+          "sha256": "155b3dff2ce334c47cb1a8ddec3472f831216c31f3a44f77e3ea754f5f42f6b9",
+          "bytes": 52500
+        },
+        {
+          "path": "scans/01130.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Journey-Along-the-Anduin-SetupB.jpg",
+          "sha256": "f9fb655c0f4bff46158c32437ca717e6dab27fcf5c090081b058feb4e65cd0c5",
+          "bytes": 48140
+        },
+        {
+          "path": "scans/01131.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Escape-from-Dol-Guldur-SetupA.jpg",
+          "sha256": "ec04a6ef4ac99045822a1ba3943b40ba38c95b3a26149341cfeb78258cd587c8",
+          "bytes": 53758
+        },
+        {
+          "path": "scans/01131.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Escape-from-Dol-Guldur-SetupB.jpg",
+          "sha256": "4e96e7e8d0584d544f16cf536672403f2d339ef3375a4dda64ca1a88970d65d5",
+          "bytes": 47378
+        },
+        {
+          "path": "scans/01132.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Mendor's-Support.jpg",
+          "sha256": "ea377ff568de8fa6ba30929004466a3b31da16cc1e44e5334ed0aa41a005cc38",
+          "bytes": 44736
+        },
+        {
+          "path": "scans/01133.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Valor.jpg",
+          "sha256": "b88160fcc547615568865ce520096cbd5e556b49c1678658a4c2b81c04cac797",
+          "bytes": 47063
+        },
+        {
+          "path": "scans/01134.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Appointed-by-Fate.jpg",
+          "sha256": "791929c764dbb7056d7c6a7a8d559b2bb3910b4756af0c22ac45330a35b01ce2",
+          "bytes": 52631
+        },
+        {
+          "path": "scans/01135.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Mendor.jpg",
+          "sha256": "e00196fa096a17ae81b9359d5616c3e07d3e1e409ccc5dd6d09c18ed30869740",
+          "bytes": 50654
+        },
+        {
+          "path": "scans/01136.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Ungoliant's-Swarm.jpg",
+          "sha256": "ded77a6f95abc4f19a700cd12b9db2549e9cca3651e0de49ccfcad2b132d6c51",
+          "bytes": 55212
+        },
+        {
+          "path": "scans/01137.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Lingering-Venom.jpg",
+          "sha256": "a5e7bababb2d3e47ccd0b7d2697b2a44ca8a0d5338aac9ea41b99e83286a31a1",
+          "bytes": 52386
+        },
+        {
+          "path": "scans/01138.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Scarred.jpg",
+          "sha256": "0474fb62907e57f013c2002353729843953ab8a558cf5bc03c7a515077f97ee7",
+          "bytes": 47608
         },
         {
           "path": "scans/141001.A.jpg",
@@ -2601,6 +3123,366 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Mount-Gundabad/The-Shirefolk.jpg",
           "sha256": "d638d65ecae36e4035220e7376bb5c34c61ea320e800980af19df4d7203b7605",
           "bytes": 920724
+        },
+        {
+          "path": "scans/41001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/After-the-Raid-1A.jpg",
+          "sha256": "8362fad83e8bcb4436b8a8db6a04c1420fc4cc993d66b3b17b3125f8eb72b7ea",
+          "bytes": 1522548
+        },
+        {
+          "path": "scans/41001.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/After-the-Raid-1B.jpg",
+          "sha256": "872d990d09b5fd386c3672588989f5b362f8fbe40ca3ef052fcd707dd718b62b",
+          "bytes": 1531479
+        },
+        {
+          "path": "scans/41002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Mirkwood-Forest-2A.jpg",
+          "sha256": "ea3e2875e4bc769d71c95d163b6c2c306a209d454c84ba527f3b5ffeecdf703a",
+          "bytes": 1496156
+        },
+        {
+          "path": "scans/41002.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Mirkwood-Forest-2B.jpg",
+          "sha256": "202630795d899a31ddfabdfa003aff5583d568485b215e21fafdff03e5d19fa7",
+          "bytes": 1506586
+        },
+        {
+          "path": "scans/41003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Rearguard-3A.jpg",
+          "sha256": "62768978ad71b1f348ddbd6bf3e1c9af50bbad59b460893b05273a75b5c4f784",
+          "bytes": 1491417
+        },
+        {
+          "path": "scans/41003.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Rearguard-3B.jpg",
+          "sha256": "3e135b57a6ca0a82e75e65a789195fd292d290f390dd9fb4d57f044aa1bf1120",
+          "bytes": 1495698
+        },
+        {
+          "path": "scans/41004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Dark-of-Nibin-Dûm-1A.jpg",
+          "sha256": "4ef1b4d613f6e51e01d2defca6d4679c4552b2a839d1cbf9331647971dc8f664",
+          "bytes": 1489326
+        },
+        {
+          "path": "scans/41004.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Dark-of-Nibin-Dûm-1B.jpg",
+          "sha256": "260ea2a9dfb5940723c4b45c5aaa3e1052885f622949db460ed08078fb7cdf90",
+          "bytes": 1447917
+        },
+        {
+          "path": "scans/41005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Surprise-Attack-2A.jpg",
+          "sha256": "575c17bcf60639842caf6eb3ab9bff8812ac7df38880b4f07f942fde5944fa3f",
+          "bytes": 1517196
+        },
+        {
+          "path": "scans/41005.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Surprise-Attack-2B.jpg",
+          "sha256": "ed4e0685d95b3806954b510b7618c142a0e8def536df467a728b1822907fd49f",
+          "bytes": 1517984
+        },
+        {
+          "path": "scans/41006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Chasm-3A.jpg",
+          "sha256": "98fcc0a7e075bbd23679839314902f9f1f287b85ba5670fce77039045509941b",
+          "bytes": 1492921
+        },
+        {
+          "path": "scans/41006.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Chasm-3B.jpg",
+          "sha256": "7f24158e5d108e3f33a02cce622eb5f80d6002997706753cf080e4f256d2c44d",
+          "bytes": 1551010
+        },
+        {
+          "path": "scans/41007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Oathkeepers-4A.jpg",
+          "sha256": "399eb0c0b15b9e49d17e97280bdfb47d09ec77f6da791b9d80298332b1d3cdac",
+          "bytes": 1601697
+        },
+        {
+          "path": "scans/41007.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Oathkeepers-4B.jpg",
+          "sha256": "4482726f74e85e0423aa201d1032674172230f9a4f27a982c60a3917f2a370ed",
+          "bytes": 1478910
+        },
+        {
+          "path": "scans/41008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Spiders-of-Mirkwood.jpg",
+          "sha256": "5f601af2ca2aef7a6320b0f495df042730501ed07a47b4a03542603a5eab6270",
+          "bytes": 2231926
+        },
+        {
+          "path": "scans/41009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Great-Spider.jpg",
+          "sha256": "761818b31b624d41bc69cdc9056b03a94589db47da25c6496d1d1ce4db878675",
+          "bytes": 2369695
+        },
+        {
+          "path": "scans/41010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Eaves-of-Mirkwood.jpg",
+          "sha256": "9be4e670da98b31afd37cac7453b8c745ad5df8bc483180c56feb4b08dded514",
+          "bytes": 2159090
+        },
+        {
+          "path": "scans/41011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Tangled-Grove.jpg",
+          "sha256": "9e8ab7067d2370a2a764315f2971f0891a13d49e237dcd53b50584c6be1b19d3",
+          "bytes": 2232623
+        },
+        {
+          "path": "scans/41012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Forest-Gate.jpg",
+          "sha256": "74d1c04402c07f9458791df1ea219aa5e9ed42075e7310467412c2da6d8da7f4",
+          "bytes": 2224929
+        },
+        {
+          "path": "scans/41013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Spider-Den.jpg",
+          "sha256": "cf81889dd5ebdd6a8e8b9e33b8fc64e138596fda28456980c9fa097b72295a35",
+          "bytes": 2157342
+        },
+        {
+          "path": "scans/41014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Goblin-Trail.jpg",
+          "sha256": "cdbd624c1098a33a98476c24e442bc927fa47be909dec71dd621ec42f0a400bd",
+          "bytes": 2012123
+        },
+        {
+          "path": "scans/41015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Abandoned-Camp.jpg",
+          "sha256": "b2a031365fa5747c42d87003b794246745996415ad37a8ba30eb1232135d8363",
+          "bytes": 67226
+        },
+        {
+          "path": "scans/41016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Driven-by-Shadow.jpg",
+          "sha256": "2f0ab3f2e53796b81e7675be9b57724665f58803280a9b13b0405ad08c791b1e",
+          "bytes": 2328710
+        },
+        {
+          "path": "scans/41017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Surprising-Speed.jpg",
+          "sha256": "3789cbc768216d394753f60ccc25444cfd0bcc43233bf40762186c403c86ee41",
+          "bytes": 2318740
+        },
+        {
+          "path": "scans/41018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Caught-in-a-Web.jpg",
+          "sha256": "822006377257dc4e3eb84da3c0d2710a834595ed165f9074905de812c04522ae",
+          "bytes": 2291685
+        },
+        {
+          "path": "scans/41019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Goblin-Troop.jpg",
+          "sha256": "25464e1ac24df48b442783990aca8dbf7cb64747e5da37884a69471902868478",
+          "bytes": 2296755
+        },
+        {
+          "path": "scans/41020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Goblin-Sniper.jpg",
+          "sha256": "89987c27c872d33983ce15e62ebbb65444cf7e4c40df0aeedd05503129d692e1",
+          "bytes": 2281751
+        },
+        {
+          "path": "scans/41021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Goblin-Runners.jpg",
+          "sha256": "ec302d3831af8267286d9c434001a6b12642e903f74ce8a64aba5baf29796a33",
+          "bytes": 2228478
+        },
+        {
+          "path": "scans/41022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Goblintown-Scavengers.jpg",
+          "sha256": "bef349d3758140abd6d63ea8f73b054b016516b61dd94ea4bd0e0959d10c4a51",
+          "bytes": 2271605
+        },
+        {
+          "path": "scans/41023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Wild-Wargs.jpg",
+          "sha256": "55077879511f66c42df083b39096297ce59685e1808ae25d871aea06888d1a9f",
+          "bytes": 64949
+        },
+        {
+          "path": "scans/41024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Goblins-are-Upon-You.jpg",
+          "sha256": "ecb058cd6ecbdbfe7938bcdb7576ef244553ea81358475c26e24517ebc9a71d3",
+          "bytes": 2334037
+        },
+        {
+          "path": "scans/41025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Eyes-in-the-Dark.jpg",
+          "sha256": "d25b39cf73cec9801c306d1d8d46ef63f53532e2432b629503e77e84b80707aa",
+          "bytes": 1743364
+        },
+        {
+          "path": "scans/41026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Obsidian-Arrows.jpg",
+          "sha256": "924a0ea77bf720b92d2f466583253a91df1a893e0cf0ad7e0af0b34cde0f6e9e",
+          "bytes": 61829
+        },
+        {
+          "path": "scans/41027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Goblin-Chieftain.jpg",
+          "sha256": "de72d13c31fd5144626c03d227458a9a8d9a1d3972894ad2de9745480bd4bd40",
+          "bytes": 2280724
+        },
+        {
+          "path": "scans/41028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Cracked-Pillar.jpg",
+          "sha256": "afddd60ca733bde970584481a21d887cef212fa852077b897d2fb07391e859eb",
+          "bytes": 2277517
+        },
+        {
+          "path": "scans/41029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Cave-Torch.jpg",
+          "sha256": "e8f34abe524e1a894b80513641f0802e8da308e9c3b568f5bf8565c392d1704f",
+          "bytes": 2242846
+        },
+        {
+          "path": "scans/41030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Great-Cave-troll.jpg",
+          "sha256": "fde8f83d8531405ec712568d8b7244b9db8248bdffe82b6a8b39cb8801ac55d8",
+          "bytes": 2343655
+        },
+        {
+          "path": "scans/41031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Cavern-Warg.jpg",
+          "sha256": "72e180008a7ab427a98206ef22b302fa35fe9bbbfcb4ebdc2dfc3ef2dd3972eb",
+          "bytes": 2316200
+        },
+        {
+          "path": "scans/41032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Goblin-Tunnels.jpg",
+          "sha256": "0c8e6853f379c3c6c1f953901f7d934b54ad969d74e4376bc3262265afd56c5d",
+          "bytes": 2214319
+        },
+        {
+          "path": "scans/41033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Lightless-Passage.jpg",
+          "sha256": "f930ea35640b4ccff0254fc94fe45773b6a6b09c0e9c24790f7f676c7b5f4ce5",
+          "bytes": 2061722
+        },
+        {
+          "path": "scans/41034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Branching-Paths.jpg",
+          "sha256": "f74c440215e170751e1578af5d7123b30daa8d03f27b97af06ea6082b2432b32",
+          "bytes": 2151634
+        },
+        {
+          "path": "scans/41035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Collapsed-Mine.jpg",
+          "sha256": "1990025578315bf1df01ad2f728eb142299216143179a133b00eca46f842025d",
+          "bytes": 2209335
+        },
+        {
+          "path": "scans/41036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Goblin-Dungeon.jpg",
+          "sha256": "31f6cfb247c67ee829d2728c758b35c42183efa305d1c3c550d5bdd06d70399b",
+          "bytes": 2137098
+        },
+        {
+          "path": "scans/41037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Crumbling-Stairs.jpg",
+          "sha256": "41753caffaf019aea85707e6bc7b2d2c579e9955ce58f3092642f40cc950d777",
+          "bytes": 67110
+        },
+        {
+          "path": "scans/41038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Crumbling-Ruin.jpg",
+          "sha256": "8466ba3ed9ffa8363ed84bd514d0f7570e72efa3e4d7d6b8de9cd533ec1d8299",
+          "bytes": 2225411
+        },
+        {
+          "path": "scans/41039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Lost-in-the-Dark.jpg",
+          "sha256": "07385ebb4e8fe6fc527356a2bfe1724e3455fba96ae39b11e89b84f2f951d3a3",
+          "bytes": 2323028
+        },
+        {
+          "path": "scans/41040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Watchful-Eyes.jpg",
+          "sha256": "d0f1f6f5c4b56d5fc972f9438c0be8d38be773455e098f6b775479820bae967a",
+          "bytes": 2257532
+        },
+        {
+          "path": "scans/41041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Stalking-Goblin.jpg",
+          "sha256": "e8dc7653d832188d72007cb6bc0f3ba50ab040b15af37af74db83163f414653c",
+          "bytes": 168072
+        },
+        {
+          "path": "scans/41042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Shiny-Distraction.jpg",
+          "sha256": "b61c4ca2a3126465362245b825860de4535e0721b28ac67891b42d87858f9e3e",
+          "bytes": 157971
+        },
+        {
+          "path": "scans/41043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Guilty-Conscience.jpg",
+          "sha256": "ea6652790fc7398583566aca3d75b6749aef2f78d4ad3336f19e82a87852dc88",
+          "bytes": 66967
+        },
+        {
+          "path": "scans/41044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Fervor-of-Lore.jpg",
+          "sha256": "d62bed6adab017b43296ad617c350fc96e94e7bae10f413296d1018d154f5fa3",
+          "bytes": 68010
+        },
+        {
+          "path": "scans/41045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Might-of-Tactics.jpg",
+          "sha256": "5796caeadf509fd3547411b3d9c9714ffaf7d50edff9e705bf5aaf32a5f7d7cd",
+          "bytes": 66345
+        },
+        {
+          "path": "scans/41046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Power-of-Spirit.jpg",
+          "sha256": "377e810233072cd19658057b898d2237a8ebf1da7ba58f7537f71792e08a6055",
+          "bytes": 137990
+        },
+        {
+          "path": "scans/41047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Secret-of-Leadership.jpg",
+          "sha256": "36de0a576d528899c67b1ea90b7e3494290c125ea38ebed64a5f1f4ffc400c0d",
+          "bytes": 67699
+        },
+        {
+          "path": "scans/41048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/No-Time-to-Waste.jpg",
+          "sha256": "7471f56e3d8b639d546c220cab409d98fc38d0b7f59133c253b8aa7df98d0681",
+          "bytes": 140404
+        },
+        {
+          "path": "scans/41049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/Ranger-Sense.jpg",
+          "sha256": "13d48a6afab90c740dd14f0311a4d5531d223cf700a74fe93be9d94653d2060b",
+          "bytes": 66123
+        },
+        {
+          "path": "scans/41050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Oath-SetupA.jpg",
+          "sha256": "d2dd1ca2f0a05518f095078165d320cf699bd8e7c07c713ba1d5315a5cf8b58d",
+          "bytes": 61619
+        },
+        {
+          "path": "scans/41050.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Oath-SetupB.jpg",
+          "sha256": "9bf70add5499804d2c6c60d50edb36d12b06df9c9a1471fa03c4b1e5c4e31745",
+          "bytes": 54757
+        },
+        {
+          "path": "scans/41051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Caves-of-Nibin-Dûm-SetupA.jpg",
+          "sha256": "a7d251df0c9c74126667dc62401f617cd06fc7d183032d199723c8709a4dc658",
+          "bytes": 69510
+        },
+        {
+          "path": "scans/41051.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dark-of-Mirkwood/The-Caves-of-Nibin-Dûm-SetupB.jpg",
+          "sha256": "69a2559d14b4f66379170d58f8baf86367b6c091cdfe4ee5c2e6f479776ba064",
+          "bytes": 62080
         }
       ]
     }

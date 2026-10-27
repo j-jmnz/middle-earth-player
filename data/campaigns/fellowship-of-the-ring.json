@@ -395,5 +395,7 @@
     "the-ring-goes-south": 6,
     "journey-in-the-dark": 7,
     "breaking-of-the-fellowship": 8
-  }
+  },
+  "bookletId": "fellowship-of-the-ring",
+  "saga": true
 }

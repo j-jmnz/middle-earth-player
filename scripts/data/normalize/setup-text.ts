@@ -16,11 +16,31 @@ export type SetupClause =
   | { kind: "choose"; codes: string[]; who: string; attach: boolean }
   | { kind: "earned"; codes: string[] }
   | { kind: "waivePenalty" }
-  | { kind: "leftoverIntoFirstPlayerDeck" };
+  | { kind: "leftoverIntoFirstPlayerDeck" }
+  // Mirkwood Paths and The Dark of Mirkwood (docs/plans/mirkwood-paths.md, phase 27). Each is quoted from a ledger line.
+  // "Search the encounter deck for X and Y": finds the cards; the next clause says where they go.
+  | { kind: "search"; codes: string[] }
+  // "Search the encounter deck for the 3 objective cards, reveal and place them in the staging area."
+  | { kind: "searchObjectives"; count: number }
+  // "Each player reveals 1 card from the top of the encounter deck, and adds it to the staging area."
+  | { kind: "eachPlayerReveals"; count: number }
+  // "Attach 1 encounter card to each objective card."
+  | { kind: "attachEncounterToObjectives"; count: number }
+  // "Put Mendor into play."
+  | { kind: "putIntoPlay"; codes: string[] }
+  // "Attach X to a hero of the first player's choice." / "The first player attaches X to one of his heroes."
+  | { kind: "attachChosen"; codes: string[]; who: "firstPlayer" }
+  // "Each player chooses 1 Adaptation boon attachment and attaches it to one of their heroes."
+  | { kind: "eachPlayerChoosesBoon"; trait: string }
+  // "Add each copy of X in a player's hand to the Campaign Pool." / "... and add it to the Campaign Pool."
+  | { kind: "addToCampaignPool"; codes: string[] }
+  // "Each player adds 1 copy of X to their hand after drawing their starting hand (including taking a mulligan)."
+  | { kind: "addToHandAfterMulligan"; codes: string[]; count: number };
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
 
-export type NameIndex = { codesOf(sentence: string): string[]; aliases: ReadonlyMap<string, string> };
+// `without` is the sentence with every card name blanked out: what is left says whether the sentence is only a list of names.
+export type NameIndex = { codesOf(sentence: string): string[]; without(sentence: string): string; aliases: ReadonlyMap<string, string> };
 
 // Builds the name matcher from the cards a scenario can name. When two cards share a name (the burden Pursued by the
 // Enemy and the quest of the same name), the one in `prefer` wins.
@@ -35,6 +55,16 @@ export function nameIndex(cards: readonly Card[], prefer: ReadonlySet<string>): 
   return {
     aliases: new Map([...byName].map(([name, card]) => [name, card.code])),
     codesOf(sentence) {
+      return scan(sentence).map((hit) => hit.code);
+    },
+    without(sentence) {
+      let rest = sentence.toLowerCase();
+      for (const hit of [...scan(sentence)].sort((a, b) => b.at - a.at)) rest = `${rest.slice(0, hit.at)} ${rest.slice(hit.at + hit.length)}`;
+      return rest;
+    },
+  };
+  function scan(sentence: string): { at: number; code: string; length: number }[] {
+    {
       const lower = sentence.toLowerCase();
       const found: { at: number; code: string; length: number }[] = [];
       const taken: [number, number][] = [];
@@ -53,9 +83,9 @@ export function nameIndex(cards: readonly Card[], prefer: ReadonlySet<string>): 
           from = at + 1;
         }
       }
-      return found.sort((a, b) => a.at - b.at).map((hit) => hit.code);
-    },
-  };
+      return found.sort((a, b) => a.at - b.at);
+    }
+  }
 }
 
 function sentencesOf(text: string): string[] {
@@ -69,14 +99,52 @@ function sentencesOf(text: string): string[] {
 const WORD: Readonly<Record<string, number>> = { a: 1, an: 1, one: 1, two: 2, three: 3 };
 const amount = (word: string | undefined): number => (word === undefined ? 1 : (WORD[word.toLowerCase()] ?? Number(word)));
 
+// Only separators and the quantity words are left once the names are blanked: "1 copy of  and  copy of ", ",  , and ".
+const isNameList = (rest: string): boolean => rest.replace(/\b(?:and|an?|the|\d+|copy|copies|of)\b/g, " ").replace(/[\s,.]/g, "") === "";
+
 export function parseSetup(text: string, names: NameIndex, set: (name: string) => string | null = () => null): ParsedSetup {
   const clauses: SetupClause[] = [];
   const unread: string[] = [];
+  const searches: { sentence: string; codes: string[] }[] = [];
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    if ((match = /^Set (all copies of )?(.+?) aside,? out of play$/i.exec(sentence))) {
+    if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {
       clauses.push({ kind: "aside", codes: names.codesOf(match[2] ?? ""), allCopies: match[1] !== undefined });
+    } else if ((match = /^Search the encounter deck for (?:\d+ )?(?:cop(?:y|ies) of )?(.+?),? and add them to the staging area$/i.exec(sentence)) && /\bcopy of\b/i.test(sentence)) {
+      // "1 copy of the Forest Spider and 1 copy of the Old Forest Road": one copy of each, found and staged.
+      clauses.push({ kind: "stage", codes: names.codesOf(match[1] ?? ""), perPlayer: null, count: 1 });
+    } else if ((match = /^Search the encounter deck for the (\d+|an?|one) objective cards?, reveal and place them in the staging area$/i.exec(sentence))) {
+      clauses.push({ kind: "searchObjectives", count: amount(match[1]) });
+    } else if ((match = /^Search the encounter deck for (.+)$/i.exec(sentence)) && isNameList(names.without(match[1] ?? ""))) {
+      // A bare list of names ("1 copy of X and Y", "X, Y, and Z"); a longer sentence is unread.
+      searches.push({ sentence, codes: names.codesOf(match[1] ?? "") });
+      clauses.push({ kind: "search", codes: names.codesOf(match[1] ?? "") });
+    } else if ((match = /^Add (.+?) to the staging area and set (.+?) aside,? out of play$/i.exec(sentence))) {
+      clauses.push({ kind: "stage", codes: names.codesOf(match[1] ?? ""), perPlayer: null, count: 1 });
+      clauses.push({ kind: "aside", codes: names.codesOf(match[2] ?? ""), allCopies: false });
+    } else if ((match = /^(?:Also, )?place (.+?) face up but out of play, alongside the quest deck$/i.exec(sentence))) {
+      clauses.push({ kind: "aside", codes: names.codesOf(match[1] ?? ""), allCopies: false });
+    } else if ((match = /^(?:Then, )?shuffle the encounter deck, and attach (\d+|an?|one) encounter(?: cards?)? to each objective card$/i.exec(sentence))) {
+      clauses.push({ kind: "shuffleEncounterDeck" });
+      clauses.push({ kind: "attachEncounterToObjectives", count: amount(match[1]) });
+    } else if ((match = /^Each player reveals (\d+|an?|one) cards? from the top of the encounter deck, and adds it to the staging area$/i.exec(sentence))) {
+      clauses.push({ kind: "eachPlayerReveals", count: amount(match[1]) });
+    } else if ((match = /^Put (.+?) into play$/i.exec(sentence))) {
+      clauses.push({ kind: "putIntoPlay", codes: names.codesOf(match[1] ?? "") });
+    } else if ((match = /^Attach (.+?) to a hero of the first player's choice$/i.exec(sentence)) ?? (match = /^The first player attaches (.+?) to one of his heroes$/i.exec(sentence))) {
+      clauses.push({ kind: "attachChosen", codes: names.codesOf(match[1] ?? ""), who: "firstPlayer" });
+    } else if ((match = /^Each player chooses (?:1|one) ([A-Z][a-z]+) boon attachment and attaches it to one of their heroes$/.exec(sentence))) {
+      clauses.push({ kind: "eachPlayerChoosesBoon", trait: match[1] ?? "" });
+    } else if ((match = /^Shuffle (.+?) into the encounter deck and add it to the Campaign Pool$/i.exec(sentence))) {
+      clauses.push({ kind: "shuffleInto", codes: names.codesOf(match[1] ?? ""), into: "encounter deck", set: null });
+      clauses.push({ kind: "addToCampaignPool", codes: names.codesOf(match[1] ?? "") });
+    } else if ((match = /^Add (.+?) (?:and each attached [A-Z][a-z]+ )?to the Campaign Pool$/i.exec(sentence)) || (match = /^Add each copy of (.+?) in a player's hand to the Campaign Pool$/i.exec(sentence))) {
+      clauses.push({ kind: "addToCampaignPool", codes: names.codesOf(match[1] ?? "") });
+    } else if ((match = /^Each player adds (\d+|an?|one) cop(?:y|ies) of (.+?) to their hand after drawing their starting hand \(including taking a mulligan\)$/i.exec(sentence))) {
+      clauses.push({ kind: "addToHandAfterMulligan", codes: names.codesOf(match[2] ?? ""), count: amount(match[1]) });
+    } else if (/^(?:Then, )?shuffle the encounter deck$/i.test(sentence)) {
+      clauses.push({ kind: "shuffleEncounterDeck" });
     } else if ((match = /^Add (.+?) to the staging area and make (.+?) the active location$/i.exec(sentence))) {
       clauses.push({ kind: "stage", codes: names.codesOf(match[1] ?? ""), perPlayer: null, count: amount(/^(\d+|an?|one) /i.exec(match[1] ?? "")?.[1]) });
       clauses.push({ kind: "active", codes: names.codesOf(match[2] ?? "") });
@@ -115,5 +183,10 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
     } else unread.push(sentence);
   }
   void set;
+  // "Search the encounter deck for X" only finds a card: a later clause must place every card it finds, else the sentence is
+  // reported unread and the scenario stays unbuilt.
+  const placing = new Set<SetupClause["kind"]>(["stage", "aside", "active", "attachChosen", "attachRingBearer", "putIntoPlay", "shuffleInto", "choose", "addToCampaignPool"]);
+  const placed = new Set(clauses.flatMap((clause) => (placing.has(clause.kind) && "codes" in clause ? clause.codes : [])));
+  for (const search of searches) if (search.codes.length === 0 || search.codes.some((code) => !placed.has(code))) unread.push(search.sentence);
   return { clauses, unread };
 }

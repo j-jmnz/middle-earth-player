@@ -111,3 +111,45 @@ describe("parseKeywordTokens", () => {
     expect(parseKeywordTokens(["Peril. Toughness 1"]).keywords).toEqual({ peril: true, toughness: 1 });
   });
 });
+
+// The Revised Core Set and The Dark of Mirkwood (Mirkwood Paths, phase 27): their scenario, quest and campaign cards come from
+// Hall of Beorn alone, by CardSet. Hall of Beorn's encounter-set names end " (Campaign)", which the build drops.
+describe("Mirkwood Paths cards", () => {
+  const all = [...cards.values()];
+  const range = (from: number, to: number, pad = 5) => Array.from({ length: to - from + 1 }, (_, at) => String(from + at).padStart(pad, "0"));
+
+  it("holds every Revised Core Set encounter, quest, campaign, boon and burden card, 01074 to 01138, under the RevCore printing", () => {
+    for (const code of range(1074, 1138)) {
+      const card = cards.get(code);
+      expect(card, code).toBeDefined();
+      expect(card?.printings[0]?.pack, `${code} printing`).toBe("RevCore");
+    }
+    expect(cards.get("01121")?.name).toBe("A Chosen Path");
+    expect(cards.get("01122")?.name).toBe("A Chosen Path");
+    expect(cards.get("01129")?.type).toBe("campaign");
+    expect(cards.get("01135")?.typeName).toBe("Objective Ally");
+    expect(cards.get("01136")).toMatchObject({ campaignKind: "burden", burdenSet: "Passage Through Mirkwood", encounterSet: "Passage Through Mirkwood" });
+  });
+
+  it("codes The Dark of Mirkwood 410 and the collector number, as RingsDB does for its burdens and boons", () => {
+    for (const number of range(1, 51, 2)) {
+      const code = `410${number}`;
+      const card = cards.get(code);
+      expect(card, code).toBeDefined();
+      expect(card?.printings[0], code).toMatchObject({ pack: "TDoM", number: Number(number) });
+    }
+    expect(cards.get("41041")).toMatchObject({ name: "Stalking Goblin", campaignKind: "burden" });
+    expect(cards.get("41001")?.name).toBe("After the Raid");
+    expect(cards.get("41050")?.type).toBe("campaign");
+    // The Hunt for Gollum keeps its own 020NN codes: Hall of Beorn's 02004 is not The Dark of Mirkwood's The Dark of Nibin-Dûm.
+    expect(cards.get("02004")?.name).not.toBe("The Dark of Nibin-Dûm");
+  });
+
+  it("names encounter sets without the campaign-edition suffix, and builds no Nightmare set", () => {
+    expect(all.filter((card) => /\(Campaign\)/.test(`${card.encounterSet ?? ""}${card.burdenSet ?? ""}`)).map((card) => card.code)).toEqual([]);
+    const mirkwood = all.filter((card) => card.printings.some((printing) => printing.pack === "RevCore" || printing.pack === "TDoM"));
+    expect(mirkwood.filter((card) => /Nightmare/.test(card.encounterSet ?? "")).map((card) => card.code)).toEqual([]);
+    expect(cards.get("01074")?.encounterSet).toBe("Spiders of Mirkwood");
+    expect(cards.get("41008")?.encounterSet).toBe("The Oath");
+  });
+});

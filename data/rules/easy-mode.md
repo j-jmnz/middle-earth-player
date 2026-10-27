@@ -1,7 +1,7 @@
 # easy-mode
 
 sha256: 52fd5fde07ee01398f46399fa6afd6dd77f2b0987150756b4d0944fe288d1a9f
-columns: 768b8763c4d72423ce2bb261912e23fd6968ef25c560eb199a6103974c0daba2
+columns: e919ba1945407ec65a07a3c15f0467458e56b64602ee736c4e01ddd91cbdd0b9
 
 ## p1
 
@@ -92,7 +92,27 @@ Escape from Dol Guldur
 Shadows of
 Mirkwood
 The Hunt for Gollum
+2x The Old Ford
+1x Goblintown Scavengers
+3x Hunters From Mordor
+2x Old Wives' Tales
 
+Conflict at the Carrock
+2x Muck Adder
+2x River Langflood
+2x A Frightened Beast
+1x Sacked
+2x Roasted Slowly
+
+2
+
+### p2 c2
+
+s
+
+r
+
+A Journey to Rhosgobel
 3x Exhaustion
 3x Swarming Insects
 1x Festering Wounds
@@ -111,6 +131,31 @@ The Dead Marshes
 2x The Heart of the Marshes
 
 Return to Mirkwood
+
+Into
+
+1x
+3x
+
+Th
+
+1x
+1x
+
+Flig
+
+2x
+3x
+
+Dw
+
+Th
+
+2x
+2x
+1x
+2x
+
 2x The Spider's Ring
 1x Gollum's Anguish
 1x Gollum's Bite
@@ -118,8 +163,22 @@ Return to Mirkwood
 2x Mirkwood Bats
 3x Attercop, Attercop
 
+Roa
+
 Khazad-d m
+
+Th
+in t
+
 Deeps of Moria
+
+2x
+1x
+2x
+1x
+1x
+1x
+
 2x Great Cave-troll
 1x Orc Drummer
 2x Massing in the Deep
@@ -134,28 +193,10 @@ Misty Mountains
 1x Mountain Warg
 1x Turbulent Waters
 
-2x The Old Ford
-1x Goblintown Scavengers
-3x Hunters From Mordor
-2x Old Wives' Tales
-
 Goblins of the Deep
-
-Conflict at the Carrock
+3x Watchful Eyes
 
 Plundering Goblins
-
-2x Muck Adder
-2x River Langflood
-2x A Frightened Beast
-1x Sacked
-2x Roasted Slowly
-
-2
-
-A Journey to Rhosgobel
-
-3x Watchful Eyes
 1x Chieftain of the Pit
 2x Undisturbed Bones
 
@@ -164,54 +205,89 @@ Twists and Turns
 2x Zigil Mineshaft
 1x Lightless Passage
 
-Into the Pit
-1x Patrol Leader
-3x Signs of Conflict
+2x
+2x
+2x
 
-The Seventh Level
-1x Cave-troll
-1x Orc Horn Blower
+Th
 
-Flight from Moria
-2x Shadow of Fear
-3x A Foe Beyond
+3x
+1x
+1x
+1x
 
-Dwarrowdelf
-The Redhorn Gate
-2x Rocky Crags
-2x Freezing Cold
-1x Avalanche
-2x Mountain Troll
+Fou
 
-Road to Rivendell
-2x Sleeping Sentry
-2x Followed by Night
-2x Orc Ambush
+2x
+2x
+2x
 
-The Watcher
-in the Water
-2x Stagnant Creek
-1x Ill Purpose
-2x Wrapped!
-1x Grasping Tentacle
-1x Thrashing Tentacle
-1x Striking Tentacle
+Sha
 
-The Long Dark
-3x Foul Air
-1x Gathering Ground
-1x Vast and Intricate
-1x Goblin Warlord
+2x
+2x
+2x
 
-Foundations of Stone
-2x Lost and Alone
-2x Nameless Thing
-2x Elder Nameless Thing
+### p2 c3
 
-Shadow and Flame
-2x Fires in the Deep
-2x Counter-Spell
-2x Leaping Flame
+o the Pit
+
+x Patrol Leader
+x Signs of Conflict
+
+he Seventh Level
+
+x Cave-troll
+x Orc Horn Blower
+
+ght from Moria
+
+x Shadow of Fear
+x A Foe Beyond
+
+warrowdelf
+
+he Redhorn Gate
+
+x Rocky Crags
+x Freezing Cold
+x Avalanche
+x Mountain Troll
+
+ad to Rivendell
+
+x Sleeping Sentry
+x Followed by Night
+x Orc Ambush
+
+he Watcher
+the Water
+
+x Stagnant Creek
+x Ill Purpose
+x Wrapped!
+x Grasping Tentacle
+x Thrashing Tentacle
+x Striking Tentacle
+
+he Long Dark
+
+x Foul Air
+x Gathering Ground
+x Vast and Intricate
+x Goblin Warlord
+
+undations of Stone
+
+x Lost and Alone
+x Nameless Thing
+x Elder Nameless Thing
+
+adow and Flame
+
+x Fires in the Deep
+x Counter-Spell
+x Leaping Flame
 
 ## p3
 

@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 import { bytes, createLog, type Log } from "../../log.ts";
+import { BUILT_PRODUCTS } from "../campaign-defs.ts";
 import { combinedPin, fetchText, writeRaw, type SourceFile, type SourceRecord } from "./fetch.ts";
 
 const BASE = "https://hallofbeorn.com/Export";
-// Products whose scenarios the Fellowship campaign plays.
-const FELLOWSHIP_PRODUCTS = new Set(["The Black Riders", "The Road Darkens"]);
+// The products whose scenarios some built campaign plays (scripts/data/campaign-defs.ts).
 const TIMEOUT_MS = 120_000;
 
 const sideSchema = z.object({
@@ -90,8 +90,8 @@ export async function syncHallOfBeorn(log: Log = createLog("hallofbeorn")): Prom
   }
   const indexBody = await snapshot("Scenarios.json", "Scenarios", files, log);
   const index = checked(hobScenarioIndexSchema, indexBody, "Scenarios");
-  const wanted = index.filter((item) => FELLOWSHIP_PRODUCTS.has(item.Product));
-  log.info(`Scenarios: ${index.length} listed, ${wanted.length} from ${[...FELLOWSHIP_PRODUCTS].join(" and ")}`);
+  const wanted = index.filter((item) => BUILT_PRODUCTS.has(item.Product));
+  log.info(`Scenarios: ${index.length} listed, ${wanted.length} from ${[...BUILT_PRODUCTS].join(", ")}`);
   const tick = log.progress(wanted.length, "scenario");
   for (const entry of wanted) {
     const body = await snapshot(`Scenarios/${entry.Slug}.json`, `Scenarios/${entry.Slug}`, files, log);

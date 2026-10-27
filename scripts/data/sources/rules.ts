@@ -11,6 +11,9 @@ export const RULE_PDFS = [
   { doc: "mec109", file: "mec109_rulebook-compressed.pdf", url: `${FFG}/mec109_rulebook-compressed.pdf` },
   { doc: "learn-to-play", file: "mec101_learn_to_play_eng_v11-compressed.pdf", url: `${FFG}/mec101_learn_to_play_eng_v11-compressed.pdf` },
   { doc: "rr", file: "mec101_rules_reference.pdf", url: "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC101.pdf" },
+  // The Dark of Mirkwood's rulebook: its set lists and the campaign-mode page (Mirkwood Paths, the mini campaign). The same bytes (sha256 b0763922...) as FFG's older images-cdn URL, which answers
+  // Node's fetch 503; the asmodee host is the one the other FFG PDFs use.
+  { doc: "tdom", file: "dark_of_mirkwood_rulebook_v2.pdf", url: `${FFG}/dark_of_mirkwood_rulebook_v2.pdf` },
   { doc: "faq", file: "lotr_faq_19.pdf", url: `${FFG}/lotr_faq_19.pdf` },
   { doc: "campaign-log", file: "campaign-log.pdf", url: `${FFG}/campaign-log.pdf` },
   { doc: "easy-mode", file: "lotr_easy_mode.pdf", url: `${FFG}/lotr_easy_mode.pdf` },
