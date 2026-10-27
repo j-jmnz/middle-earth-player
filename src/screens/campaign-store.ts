@@ -1,6 +1,7 @@
 import { asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import type { PoolCard } from "../campaign/log";
 import { parseActive, parseLoadout, parseLog, parseSeatCount, newSave, type Save } from "../campaign/save";
 import { booklets, saves, type StoredJson } from "./user-schema";
 
@@ -101,9 +102,10 @@ export function deleteSave<TRun>(user: UserDb<TRun>, id: string): void {
 let created = 0;
 
 // A new playthrough. The seat count is chosen here and never changes.
-export function createSave<TRun>(user: UserDb<TRun>, campaignId: string, seatCount: 1 | 2, now: number = Date.now()): Save {
+// `carried` is the carry-over of a finished playthrough (carryOffers): its cards go on the new log's carryIn.
+export function createSave<TRun>(user: UserDb<TRun>, campaignId: string, seatCount: 1 | 2, now: number = Date.now(), carried: readonly PoolCard[] = []): Save {
   created += 1;
-  const save = newSave(`save-${now.toString(36)}${created > 1 ? `-${created}` : ""}`, campaignId, seatCount);
+  const save = newSave(`save-${now.toString(36)}${created > 1 ? `-${created}` : ""}`, campaignId, seatCount, carried);
   writeSave(user, save, now);
   return save;
 }

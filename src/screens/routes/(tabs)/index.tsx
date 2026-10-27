@@ -2,6 +2,8 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
 
+import { carryOffers } from "../../../campaign/carry-over";
+import type { PoolCard } from "../../../campaign/log";
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
 import { Panel, RingMark, Screen, ScreenScroll, ScreenTitle, Section, SecondaryButton, TextButton } from "../../chrome";
@@ -9,7 +11,7 @@ import type { ArtCard } from "../../art";
 import { deckFaces } from "../../deck-store";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf, scenarioNames } from "../../campaign-data";
-import { StartPanel } from "../../start-panel";
+import { StartPanel, type CarryChoice } from "../../start-panel";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { palette } from "../../palette.js";
@@ -62,7 +64,9 @@ export default function CampaignList() {
     };
   };
 
-  const faces = useMemo(() => deckFaces(catalog, saves.flatMap(partyCodes)), [catalog, saves]);
+  // The carry-over a new playthrough may take in: every finished playthrough, open or archived, that holds cards for the next campaign.
+  const offers = useMemo(() => carryOffers([...saves, ...archived], (id) => campaignOf(id)?.scenarios ?? null), [saves, archived]);
+  const faces = useMemo(() => deckFaces(catalog, [...saves.flatMap(partyCodes), ...offers.flatMap((offer) => offer.cards.map((card) => card.code))]), [catalog, saves, offers]);
   const partyOf = (save: Save): ArtCard[] => partyCodes(save).flatMap((code) => {
     const face = faces.get(code);
     return face ? [{ code, imagesrc: face.imagesrc }] : [];
@@ -96,8 +100,15 @@ export default function CampaignList() {
     router.push(pathHref(save.id));
   }
 
-  function start(campaignId: string, seats: Seats): void {
-    const save = createSave(user, campaignId, seats);
+  const carryChoices: CarryChoice[] = offers.map((offer) => ({
+    saveId: offer.saveId,
+    label: nameOf(offer.campaignId),
+    words: offer.cards.map((card) => faces.get(card.code)?.name ?? card.code).join(", "),
+    cards: offer.cards,
+  }));
+
+  function start(campaignId: string, seats: Seats, carried: readonly PoolCard[]): void {
+    const save = createSave(user, campaignId, seats, Date.now(), carried);
     refresh();
     setStarting(false);
     openPath(save);
@@ -219,7 +230,7 @@ export default function CampaignList() {
               ) : null}
               <View className="gap-3">
                 {startable.map((campaign, index) => (
-                  <StartPanel key={campaign.id} campaign={campaign} name={nameOf(campaign.id)} current={saves.length === 0 && index === 0} onStart={(seats) => start(campaign.id, seats)} />
+                  <StartPanel key={campaign.id} campaign={campaign} name={nameOf(campaign.id)} current={saves.length === 0 && index === 0} carry={carryChoices} onStart={(seats, carried) => start(campaign.id, seats, carried)} />
                 ))}
               </View>
             </View>

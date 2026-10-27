@@ -177,6 +177,23 @@ export type ResolutionLog = {
   earned: readonly Earned[];
   fallen: readonly string[];
   captives: readonly { seat: number; hero: string }[];
+  // Cards the Resolution hands to the NEXT campaign (the CarryOver verb): the campaign log keeps them for a new save to take in.
+  carryOver?: readonly Earned[];
+  // Facts the Resolution records for the campaign log in place of the paper log's notes: the hero taken prisoner, and counters on
+  // a campaign card by its code (a token count read at Resolution).
+  prisoner?: string | null;
+  counters?: Readonly<Record<string, number>>;
+};
+
+// The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes
+// them back from the won game). Absent in a standalone game and in a campaign whose log holds none.
+export type CampaignFacts = {
+  // The hero code the players named a prisoner (Journey Along the Anduin's Resolution).
+  prisoner: string | null;
+  // Once-per-campaign uses recorded in the log ("Record in the Campaign Log when used"), by the code of the card used.
+  usedOnce: readonly string[];
+  // Counters on a campaign card, by its code.
+  counters: Readonly<Record<string, number>>;
 };
 
 export type UndoLog = {
@@ -274,6 +291,11 @@ export type ScenarioState = {
   // The codes of the cards a player removed from the campaign pool during the game ("remove it from the campaign pool"); the
   // campaign log drops them when the scenario is won (campaign/log.ts).
   removedFromPool?: readonly string[];
+  // The campaign log's structured facts, when the scenario was started in Campaign Mode with any (CampaignFacts).
+  campaignFacts?: CampaignFacts;
+  // The cards each seat adds to its hand once every player has finished the mulligan (AddToHandAfterMulligan), by seat; dealt and
+  // dropped when the opening hands are final.
+  afterMulligan?: readonly (readonly string[])[];
   // Cost reductions waiting for the next matching card a seat plays (ReduceNextCost). They end with the phase or the round.
   discounts?: readonly Discount[];
   // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first

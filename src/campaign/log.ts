@@ -25,11 +25,22 @@ export type CampaignLog = {
   // The campaign total: the sum of the scenario scores. Lower is better.
   score: number;
   notes: string;
+  // The campaign's structured facts, in place of the notes the Mirkwood campaign cards ask for.
+  // The hero the players named the prisoner (a hero code), or null.
+  prisoner: string | null;
+  // Once-per-campaign uses ("Record in the Campaign Log when used"): the code of each card used, one entry per use.
+  usedOnce: readonly string[];
+  // Counters on a campaign card by its code, as the last won scenario left them.
+  counters: Readonly<Record<string, number>>;
+  // Cards the finished campaign hands to the next one (Resolution CarryOver). A new save takes them in at its first checklist.
+  carryOver: readonly PoolCard[];
+  // Cards a new save took in from a finished campaign's carryOver. Its first checklist (step 1) moves them into the pool.
+  carryIn: readonly PoolCard[];
 };
 
 export function emptyLog(seatCount: number): CampaignLog {
   const seats = Array.from({ length: seatCount }, () => [] as readonly string[]);
-  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "" };
+  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [] };
 }
 
 // The Ring-bearer may have moved to another seat with the first player token (mec109.multiplayer-the-one-ring).
@@ -76,15 +87,29 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   }
   const fallenHeroesBySeat = heroesBySeat.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]);
   const fallen = new Set(fallenHeroesBySeat.flat());
-  // A card the game removed from the campaign pool ("add it to the victory display and remove it from the campaign pool") is gone.
-  const pool: PoolCard[] = log.campaignPool.filter((card) => (card.attachedTo == null || !fallen.has(card.attachedTo)) && !state.removedFromPool?.includes(card.code));
+  // A card the game removed from the campaign pool ("add it to the victory display and remove it from the campaign pool") is gone:
+  // one pool entry for each time it was removed, since the pool can hold several copies of a code.
+  const removals = new Map<string, number>();
+  for (const code of state.removedFromPool ?? []) removals.set(code, (removals.get(code) ?? 0) + 1);
+  const pool: PoolCard[] = log.campaignPool.filter((card) => {
+    if (card.attachedTo != null && fallen.has(card.attachedTo)) return false;
+    const left = removals.get(card.code) ?? 0;
+    if (left === 0) return true;
+    removals.set(card.code, left - 1);
+    return false;
+  });
   for (const earned of result.earned) {
-    if (pool.some((card) => card.code === earned.code)) continue;
     const printed = printedOf(cards, earned.code);
     const attachedTo = earned.hero ?? (printed.keywords.permanent ? bearer : null);
+    // The same copy is not earned twice (code, seat and host); another player's copy of the code is another entry.
+    if (pool.some((card) => card.code === earned.code && card.seat === earned.seat && card.attachedTo === attachedTo)) continue;
     if (attachedTo != null && fallen.has(attachedTo)) continue;
     pool.push({ code: earned.code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo, seat: earned.seat });
   }
+  const carried: PoolCard[] = (result.carryOver ?? []).map((item) => {
+    const printed = printedOf(cards, item.code);
+    return { code: item.code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo: null, seat: item.seat };
+  });
   const scenario = scoreOf(state, cards);
   const scenarios = { ...log.scenarios, [scenarioId]: scenario };
   return {
@@ -98,5 +123,10 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     scenarios,
     score: Object.values(scenarios).reduce((sum, item) => sum + item.score, 0),
     notes: log.notes,
+    prisoner: result.prisoner !== undefined ? result.prisoner : (state.campaignFacts?.prisoner ?? log.prisoner),
+    usedOnce: [...new Set([...log.usedOnce, ...(state.campaignFacts?.usedOnce ?? [])])],
+    counters: { ...log.counters, ...(state.campaignFacts?.counters ?? {}), ...(result.counters ?? {}) },
+    carryOver: [...log.carryOver, ...carried],
+    carryIn: log.carryIn,
   };
 }

@@ -1,5 +1,6 @@
 import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
 import { burdenCodes, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import type { CampaignFacts } from "../rules/state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup.ts";
 
 // Campaign Mode, or the scenario played as a standalone adventure (mec109.campaign-mode: "players can still play the
@@ -21,6 +22,11 @@ export type StartInput = {
   effects?: readonly Effect[];
   // Cards the campaign pool shuffles into the encounter deck (Campaign Setup Checklist step 8).
   poolEncounterCards?: readonly string[];
+  // Pool cards that are put into play at the start of each scenario (Mendor): the checklist's step 8 left them out of the encounter
+  // deck, and each enters play under the first player after the campaign card's own Setup.
+  poolIntoPlay?: readonly string[];
+  // The campaign log's structured facts, handed to the engine (Campaign Mode only). Left out when the log holds none.
+  facts?: CampaignFacts;
   // Campaign when absent.
   mode?: PlayMode;
 };
@@ -32,6 +38,12 @@ export type StartInput = {
 // shuffle cards into the encounter deck (added to the deck here, before the shuffle). Its choices are made by the
 // campaign checklist (src/campaign/checklist.ts) before the scenario starts. The quest card's last Setup step is the
 // encounter deck shuffle, which the piles cannot express.
+const DEALT_VERBS: ReadonlySet<string> = new Set(["AttachToRingBearer", "AddToStaging", "SetAside", "PutObjectiveAllyIntoPlay"]);
+
+function hasFacts(facts: CampaignFacts): boolean {
+  return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0;
+}
+
 export function buildStart(input: StartInput): StartScenario {
   const effects = input.effects ?? [];
   const standalone = input.mode === "standalone";
@@ -43,7 +55,11 @@ export function buildStart(input: StartInput): StartScenario {
     definition = { ...withoutCard, resolution: [] };
   }
   const campaignSetup = standalone ? [] : recordInstructions(effects, input.scenario.campaignCard, "campaignSetup");
-  const dealt = campaignSetup.filter((instruction) => instruction.verb === "AttachToRingBearer" || instruction.verb === "AddToStaging");
+  // What the engine runs in Setup, in the campaign card's printed order: the Fellowship's two verbs and the Mirkwood ones (an
+  // objective ally put into play, a card set aside). AttachChosen, AddToHandAfterMulligan and AddToPool are dealt by the checklist.
+  const dealt = campaignSetup.filter((instruction) => DEALT_VERBS.has(instruction.verb));
+  const named = new Set(dealt.flatMap((instruction) => (instruction.verb === "PutObjectiveAllyIntoPlay" ? [instruction.code] : [])));
+  const poolInPlay = standalone ? [] : (input.poolIntoPlay ?? []).filter((code) => !named.has(code));
   const shuffledIn = campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoEncounterDeck" ? [instruction.code] : []));
   const burden = burdenCodes(input.scenario);
   return {
@@ -55,6 +71,7 @@ export function buildStart(input: StartInput): StartScenario {
       setup: [
         ...input.campaign.prelude.map((card) => ({ verb: "AttachToRingBearer" as const, code: card.code })),
         ...dealt,
+        ...poolInPlay.map((code) => ({ verb: "PutObjectiveAllyIntoPlay" as const, code })),
         ...setupInstructions(input.scenario, input.difficulty, input.seatCount),
         { verb: "ShuffleEncounterDeck" as const },
       ],
@@ -64,5 +81,6 @@ export function buildStart(input: StartInput): StartScenario {
     questDeck: input.scenario.stages,
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(input.difficulty ? { difficulty: input.difficulty } : {}),
+    ...(!standalone && input.facts && hasFacts(input.facts) ? { facts: input.facts } : {}),
   };
 }

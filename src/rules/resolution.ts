@@ -36,9 +36,15 @@ function stepOver(state: ScenarioState, log?: ResolutionLog): ScenarioState {
   return { ...state, resolutionAt: state.resolutionAt + 1, resolutionSeat: 0, ...(log ? { resolutionLog: log } : {}) };
 }
 
+// The pool holds several copies of one code ("each player earns 1 copy"): a copy is the same entry only when its code, its seat and
+// its hero are the same, so a card earned twice for nobody in particular is still earned once.
+export function earnedKey(item: Pick<Earned, "code" | "seat" | "hero">): string {
+  return `${item.code}\u0000${item.seat ?? ""}\u0000${item.hero ?? ""}`;
+}
+
 function earn(state: ScenarioState, entries: readonly Earned[]): ResolutionLog {
-  const have = new Set(state.resolutionLog.earned.map((item) => item.code));
-  return { ...state.resolutionLog, earned: [...state.resolutionLog.earned, ...entries.filter((item) => !have.has(item.code))] };
+  const have = new Set(state.resolutionLog.earned.map(earnedKey));
+  return { ...state.resolutionLog, earned: [...state.resolutionLog.earned, ...entries.filter((item) => !have.has(earnedKey(item)))] };
 }
 
 // Every burden in play or still in the encounter deck or discard pile: the cards the players could meet again.
@@ -60,9 +66,18 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       continue;
     }
     switch (instruction.verb) {
-      case "Earn":
-        next = stepOver(next, earn(next, instruction.codes.map((code) => ({ code, to: "pool" as const, seat: null, hero: null, step: next.resolutionAt }))));
+      case "Earn": {
+        const seats = instruction.eachPlayer ? livingSeats(next) : [null];
+        next = stepOver(next, earn(next, seats.flatMap((seat) => instruction.codes.map((code) => ({ code, to: "pool" as const, seat, hero: null, step: next.resolutionAt })))));
         break;
+      }
+      case "CarryOver": {
+        // The next campaign's cards, one copy each or one for each living player; no dedupe, the copies are the point.
+        const seats = instruction.eachPlayer ? livingSeats(next) : [null];
+        const carried = seats.flatMap((seat) => instruction.codes.map((code) => ({ code, to: "pool" as const, seat, hero: null, step: next.resolutionAt })));
+        next = stepOver(next, { ...next.resolutionLog, carryOver: [...(next.resolutionLog.carryOver ?? []), ...carried] });
+        break;
+      }
       case "EarnAllBurdens":
         next = stepOver(next, earn(next, burdensEverywhere(next, ctx).map((code) => ({ code, to: "pool" as const, seat: null, hero: null, step: next.resolutionAt }))));
         break;

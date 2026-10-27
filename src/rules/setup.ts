@@ -13,7 +13,7 @@ import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
 import { handSetup, searchSetup } from "./setup-search.ts";
-import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
+import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type CampaignFacts, type ScenarioState } from "./state.ts";
 import { placeCampaignCard } from "./families/burden-campaign.ts";
 import { cloneGame } from "./undo.ts";
 import { attachTo, moveCard, spawn } from "./zones.ts";
@@ -25,6 +25,9 @@ export type StartSeat = {
   // (`host` is the hero's code), and cards a campaign card adds to the seat's hand before the opening hand is drawn.
   attachments?: readonly { host: string; code: string }[];
   hand?: readonly string[];
+  // Cards a campaign card's Setup adds to the hand once the mulligan is over (AddToHandAfterMulligan): not drawn, not shuffled
+  // back by a mulligan, not counted in the opening hand.
+  afterMulligan?: readonly string[];
   // The 14 Item or Artifact attachments a Burglar's Turn player chose from their collection: their loot deck (families/sidequests-loot.ts).
   loot?: readonly string[];
 };
@@ -41,6 +44,8 @@ export type StartScenario = {
   burdenDeck?: readonly string[];
   // Easy adds one resource to each hero's resource pool in Setup step 2 (easy-mode.easy-mode). Normal when absent.
   difficulty?: Difficulty;
+  // The campaign log's structured facts (prisoner, once-per-campaign uses, counters), in Campaign Mode.
+  facts?: CampaignFacts;
 };
 
 export function startScenario(input: StartScenario, ctx: ReduceContext): ScenarioState {
@@ -63,6 +68,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = { ...state, burdenDeck: shuffled.ids, seedCursor: shuffled.cursor };
   }
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
+  if (input.facts) state = { ...state, campaignFacts: input.facts };
+  if (input.seats.some((seat) => (seat.afterMulligan?.length ?? 0) > 0)) state = { ...state, afterMulligan: input.seats.slice(0, input.seatCount).map((seat) => seat.afterMulligan ?? []) };
   for (let index = 0; index < input.seatCount; index += 1) {
     const seat = input.seats[index];
     if (!seat) throw new Error(`Missing seat ${index}`);
@@ -153,7 +160,7 @@ export function finishMulliganChoice(state: ScenarioState, took: boolean): Scena
   const nextSeat = livingSeats(state).find((index) => !passed.includes(index));
   if (nextSeat == null) {
     return {
-      ...withMode(state, "afterOpening"),
+      ...withMode(dealAfterMulligan(state), "afterOpening"),
       window: null,
       passed: [],
       mulliganSeats,
@@ -167,6 +174,18 @@ export function finishMulliganChoice(state: ScenarioState, took: boolean): Scena
     mulliganSeats,
     mulliganTaken: mulliganSeats.includes(nextSeat),
   };
+}
+
+// AddToHandAfterMulligan: once every seat has chosen, the cards a campaign card adds "after drawing the starting hand (including
+// taking a mulligan)" join each hand, and the list is dropped.
+function dealAfterMulligan(state: ScenarioState): ScenarioState {
+  if (!state.afterMulligan) return state;
+  let next = state;
+  state.afterMulligan.forEach((codes, seat) => {
+    for (const code of codes) next = spawn(next, code, { zone: "hand", seat }).state;
+  });
+  const { afterMulligan: _dealt, ...rest } = next;
+  return rest;
 }
 
 function shuffleZone(state: ScenarioState, zone: "encounter" | number): ScenarioState {

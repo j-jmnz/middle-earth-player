@@ -5,7 +5,7 @@
 - `cards.campaign_id` from `PACK_CAMPAIGN` (campaign-defs.ts, derived from PRODUCTS); a card printed in Core gets none; test in build-catalog.test.ts.
 - Screens: StartPanel per playable campaign (`start-fellowship` kept, others `start-<id>`, `seats-<id>-<n>`), Scenarios tab per box (`box-<id>`), standalone briefing takes campaign from the scenario's box, no FELLOWSHIP_ID fallbacks left in screens.
 
-## In progress (saga gating DONE: validateLoadout(…, saga), needsRingBearerSlot, SeatPicker saga prop, useBriefingDecks(saga), tests loadout.test.ts + mirkwood-briefing.test.ts)
+## In progress: setup verbs + log (code landed: family campaign, checklist, start, carry-over, log fields; TESTS for them still to write; ENGINE_VERSION bump pending)
 - Setup verbs.
 
 ## Next

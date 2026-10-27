@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { Difficulty } from "../catalog/scenario-data.ts";
 import type { PlayerIntent } from "../rules/intents.ts";
 
-import { emptyLog, type CampaignLog } from "./log.ts";
+import { emptyLog, type CampaignLog, type PoolCard } from "./log.ts";
 import type { ActiveScenario } from "./replay.ts";
 
 export const FELLOWSHIP_ID = "fellowship-of-the-ring";
@@ -31,6 +31,12 @@ export const campaignLogSchema = z.strictObject({
   scenarios: z.record(z.string(), z.strictObject({ rounds: z.number().int(), victoryPoints: z.number().int(), score: z.number().int() })),
   score: z.number().int(),
   notes: z.string(),
+  // The structured campaign facts (phase 28). A log saved before them reads with these defaults.
+  prisoner: z.string().nullable().default(null),
+  usedOnce: z.array(z.string()).default([]),
+  counters: z.record(z.string(), z.number().int()).default({}),
+  carryOver: z.array(poolCardSchema).default([]),
+  carryIn: z.array(poolCardSchema).default([]),
 });
 
 // The intents are checked by the reducer when they are replayed: one it does not know is refused, and the open
@@ -76,8 +82,10 @@ export type Save = {
   loadout: StoredLoadout | null;
 };
 
-export function newSave(id: string, campaignId: string, seatCount: 1 | 2): Save {
-  return { id, campaignId, seatCount, log: emptyLog(seatCount), active: null, loadout: null };
+// A new save starts on a blank log (the Dark of Mirkwood mini campaign included). `carried` is the carry-over of a finished save
+// (carry-over.ts): the cards its first checklist takes into the pool.
+export function newSave(id: string, campaignId: string, seatCount: 1 | 2, carried: readonly PoolCard[] = []): Save {
+  return { id, campaignId, seatCount, log: { ...emptyLog(seatCount), carryIn: carried }, active: null, loadout: null };
 }
 
 export function parseSeatCount(value: number): 1 | 2 {

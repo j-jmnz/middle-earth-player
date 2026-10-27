@@ -355,8 +355,9 @@ export const simpleVerbs = [
     leftover: z.enum(["firstPlayerDeck"]).optional(),
     ...when,
   }),
-  // Resolution: these cards are earned, with no choice.
-  z.strictObject({ verb: z.literal("Earn"), codes: z.array(z.string().min(1)).min(1), ...when }),
+  // Resolution: these cards are earned, with no choice. `eachPlayer`: one copy for each living player ("Each player earns 1 copy of
+  // the Mendor's Support boon", 01129:B:1), the pool holding several copies of the one code.
+  z.strictObject({ verb: z.literal("Earn"), codes: z.array(z.string().min(1)).min(1), eachPlayer: z.boolean().optional(), ...when }),
   // Resolution: every burden in play, in the encounter deck and in the encounter discard pile is earned.
   verb("EarnAllBurdens"),
   // Resolution: the hero this card is attached to joins the fallen heroes.

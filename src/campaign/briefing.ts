@@ -167,6 +167,8 @@ export function startFor(input: BriefingInput, seed: number): StartScenario {
     difficulty: input.difficulty,
     effects: world.effects,
     poolEncounterCards: plan.poolEncounterCards,
+    poolIntoPlay: plan.poolIntoPlay,
+    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters },
   });
 }
 

@@ -13,7 +13,7 @@ import type { CampaignLog, PoolCard } from "./log.ts";
 
 export type ChecklistStep = { n: number; rule: "rr.campaign-setup-checklist"; text: string; did: string[] };
 // The seat while the checklist fills it in; StartSeat is the read-only shape it hands to the start.
-type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[] };
+type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[] };
 
 export type Need = { seat: number; options: readonly string[] };
 
@@ -27,7 +27,7 @@ export type ChecklistInput = {
 };
 
 export type ChecklistPlan =
-  | { ok: true; steps: ChecklistStep[]; threatModifier: number; seats: StartSeat[]; poolEncounterCards: string[]; log: CampaignLog }
+  | { ok: true; steps: ChecklistStep[]; threatModifier: number; seats: StartSeat[]; poolEncounterCards: string[]; poolIntoPlay: string[]; log: CampaignLog }
   | { ok: false; errors: string[]; needs: Need | null };
 
 const TEXT: Readonly<Record<number, string>> = {
@@ -43,15 +43,57 @@ const TEXT: Readonly<Record<number, string>> = {
 
 type Choosing = Extract<Instruction, { verb: "ChooseCards" }>;
 
-// Step 6: the choices the campaign card's Setup opens, answered in order, one seat at a time. The cards they earn
-// join the pool, a hand or a hero.
-function campaignChoices(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], name: (code: string) => string): { did: string[]; errors: string[]; needs: Need | null } {
+function poolCard(printed: PrintedCard, code: string, attachedTo: string | null, seat: number | null): PoolCard {
+  return { code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo, seat };
+}
+
+// Step 6: the choices the campaign card's Setup opens, answered in order, one seat at a time, and the Setup instructions that
+// deal a card to a player: AttachChosen (the first player's choice of hero), AddToHandAfterMulligan and AddToPool. The cards a
+// choice earns join the pool, a hand or a hero.
+function campaignChoices(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): { did: string[]; errors: string[]; needs: Need | null } {
   const answers = [...(input.choices ?? [])];
   const did: string[] = [];
   const errors: string[] = [];
   let needs: Need | null = null;
   const order = seats.map((_, index) => index);
-  for (const instruction of campaignSetup.filter((item): item is Choosing => item.verb === "ChooseCards")) {
+  for (const instruction of campaignSetup) {
+    if (instruction.verb === "AttachChosen") {
+      // The first player chooses any hero at the table, their own or another player's.
+      const owners = seats.flatMap((seat, index) => seat.heroes.map((hero) => ({ hero, seat: index })));
+      const legal = owners.map((owner) => `${instruction.code}>${owner.hero}`);
+      const answer = answers.shift();
+      if (answer == null) {
+        needs ??= { seat: 0, options: legal };
+        continue;
+      }
+      if (!legal.includes(answer)) {
+        errors.push(`Seat 1: ${answer} is not one of ${legal.join(", ")}`);
+        continue;
+      }
+      const host = owners.find((owner) => `${instruction.code}>${owner.hero}` === answer);
+      if (host) seats[host.seat]?.attachments.push({ host: host.hero, code: instruction.code });
+      did.push(`The first player attaches ${name(instruction.code)} to ${name(host?.hero ?? "")}.`);
+      continue;
+    }
+    if (instruction.verb === "AddToHandAfterMulligan") {
+      seats.forEach((seat, index) => {
+        seat.afterMulligan.push(instruction.code);
+        did.push(`Seat ${index + 1} adds ${name(instruction.code)} to their hand after the mulligan.`);
+      });
+      continue;
+    }
+    if (instruction.verb === "AddToPool") {
+      const printed = printedOf(input.cards, instruction.code);
+      // Recorded for the next scenario: this game already has the card (shuffled in or in a hand), so steps 7 and 8 leave it be.
+      for (const seat of instruction.eachPlayer ? order : [null]) {
+        const added = poolCard(printed, instruction.code, null, seat);
+        pool.push(added);
+        fresh.add(added);
+      }
+      did.push(`${name(instruction.code)} joins the Campaign Pool${instruction.eachPlayer ? ` (a copy for each player)` : ""}.`);
+      continue;
+    }
+    if (instruction.verb !== "ChooseCards") continue;
     const taken: string[] = [];
     for (const seat of instruction.who === "firstPlayer" ? order.slice(0, 1) : order) {
       const remaining = instruction.codes.filter((code) => !taken.includes(code));
@@ -75,20 +117,24 @@ function campaignChoices(campaignSetup: readonly Instruction[], input: Checklist
       if (instruction.to === "hand") seats[seat]?.hand.push(code);
       // Only a Permanent card stays recorded on its hero (ltp.campaign-pool); another gift goes on the hero for this
       // scenario and is shuffled into a deck in later ones.
-      pool.push({ code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo: printed.keywords.permanent ? hero : null, seat });
+      pool.push(poolCard(printed, code, printed.keywords.permanent ? hero : null, seat));
       did.push(`Seat ${seat + 1} takes ${name(code)}${hero ? ` onto ${name(hero)}` : instruction.to === "hand" ? " into hand" : ""}.`);
     }
     if (instruction.leftover === "firstPlayerDeck") {
       // The players earned every one of these cards, so the unchosen ones join the pool too, as the first player's:
       // step 7 shuffles them into that deck.
       for (const code of instruction.codes.filter((item) => !taken.includes(item))) {
-        const printed = printedOf(input.cards, code);
-        pool.push({ code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo: null, seat: 0 });
+        pool.push(poolCard(printedOf(input.cards, code), code, null, 0));
         did.push(`${name(code)} was not chosen: it is shuffled into the first player's deck.`);
       }
     }
   }
   return { did, errors, needs };
+}
+
+// The pool card's own campaignSetup record puts it into play ("Put Mendor into play at the start of each scenario").
+function putsItselfIntoPlay(effects: readonly Effect[], code: string): boolean {
+  return recordInstructions(effects, code, "campaignSetup").some((instruction) => instruction.verb === "PutObjectiveAllyIntoPlay" && instruction.code === code);
 }
 
 export function checklist(input: ChecklistInput): ChecklistPlan {
@@ -102,8 +148,13 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const waived = campaignSetup.some((instruction) => instruction.verb === "WaiveThreatPenalty");
   const fallen = new Set(log.fallenHeroesBySeat.flat());
 
+  // The pool this checklist works on. A new save's first checklist takes in the cards a finished campaign carried over.
+  const pool: PoolCard[] = [...log.campaignPool, ...log.carryIn];
+  // Entries the campaign card's own Setup adds (AddToPool): recorded, but not dealt again by steps 7 and 8.
+  const fresh = new Set<PoolCard>();
+
   // 1 and 2: the heroes the players bring against the log, and the fallen list.
-  const did1: string[] = [];
+  const did1: string[] = log.carryIn.map((card) => `${name(card.code)} is carried over from the last campaign into the Campaign Pool.`);
   let changed = 0;
   const heroesBySeat = input.seats.map((seat, index) => {
     const logged = log.heroesBySeat[index] ?? [];
@@ -139,8 +190,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   note(3, changed === 0 ? ["No hero was changed."] : waived ? [`${changed} hero change(s) cost nothing: the campaign card waives the +1 penalty.`] : [`${changed} hero change(s) add ${changed} to the threat penalty.`]);
   note(4, [`Each player's starting threat is the combined threat cost of their heroes plus ${threatPenalty}.`]);
 
-  const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(heroesBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [] }));
-  const pool: PoolCard[] = [...log.campaignPool];
+  const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(heroesBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [], afterMulligan: [] }));
 
   // 5: Permanent boons and burdens go on their recorded hero.
   const did5: string[] = [];
@@ -157,12 +207,12 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   note(5, did5.length > 0 ? did5 : ["No Permanent card is in the pool."]);
 
   // The campaign card's own Setup choices come before the pool is shuffled in, so the cards they earn join the same decks.
-  const six = campaignChoices(campaignSetup, input, seats, pool, name);
+  const six = campaignChoices(campaignSetup, input, seats, pool, fresh, name);
   if (six.needs) return { ok: false, errors, needs: six.needs };
   errors.push(...six.errors);
   // A Permanent card already went on its hero in step 5 (it is not in a deck); the others with a Setup line are found
   // in the deck they are shuffled into (mec109.setup).
-  const withSetup = pool.filter((card) => card.attachedTo == null && input.effects.some((effect) => effect.cardCode === card.code && effect.timing === "setup"));
+  const withSetup = pool.filter((card) => card.attachedTo == null && !fresh.has(card) && input.effects.some((effect) => effect.cardCode === card.code && effect.timing === "setup"));
   const did6 = [...six.did, ...withSetup.map((card) => `${name(card.code)} has a Setup line: the Setup search finds it in its deck.`)];
   note(6, did6.length > 0 ? did6 : ["No boon or burden has a Setup keyword."]);
 
@@ -170,9 +220,16 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const did7: string[] = [];
   const did8: string[] = [];
   const poolEncounterCards: string[] = [];
+  const poolIntoPlay: string[] = [];
   for (const card of pool) {
-    if (card.attachedTo != null) continue;
+    if (card.attachedTo != null || fresh.has(card)) continue;
     if (seats.some((seat) => seat.hand?.includes(card.code) || seat.attachments.some((attached) => attached.code === card.code))) continue;
+    // A pool card that says "put into play at the start of each scenario" (Mendor) is dealt into play, so it skips step 8.
+    if (putsItselfIntoPlay(input.effects, card.code)) {
+      poolIntoPlay.push(card.code);
+      did8.push(`${name(card.code)} is put into play instead of being shuffled into the encounter deck.`);
+      continue;
+    }
     if (card.back === "player") {
       const seat = Math.min(card.seat ?? 0, seatCount - 1);
       seats[seat]?.deck.push(card.code);
@@ -192,6 +249,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     threatModifier: threatPenalty,
     seats,
     poolEncounterCards,
-    log: { ...log, heroesBySeat, threatPenalty, campaignPool: pool },
+    poolIntoPlay,
+    log: { ...log, heroesBySeat, threatPenalty, campaignPool: pool, carryIn: [] },
   };
 }
