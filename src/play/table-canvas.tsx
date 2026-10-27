@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useStore } from "zustand";
 
+import { NO_HIGHLIGHT } from "./peek.ts";
 import { PILE_WORDS, PILES, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { tableTokens as t } from "./tokens.ts";
@@ -82,8 +83,10 @@ function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight }: Row
   return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORDS[pile]} (${view.ids.length})${top}`} onTap={onTap} onPreview={onPreview} highlight={highlight} />;
 }
 
-export function TableCanvas({ store, width, height, nameOf, inactive, info, onTap, onPreview, highlight }: TableCanvasProps) {
-  const seat = useStore(store, (state) => shownSeat(state.game));
+export function TableCanvas({ store, width, height, nameOf, inactive, info, onTap, onPreview, highlight: marked }: TableCanvasProps) {
+  const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
+  // Peeking at the other seat: nothing is outlined or filled, and a tap only previews (use-table-choice.ts).
+  const highlight = useStore(store, (state) => state.viewedSeat != null) ? NO_HIGHLIGHT : marked;
   const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight };
   return (
     <ScrollView style={{ width, height, backgroundColor: t.felt }} contentContainerStyle={{ padding: 12 }}>

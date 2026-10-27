@@ -8,9 +8,7 @@ import { BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
-import { backStep } from "../play/back";
-import { cancelScrub, scrubOpen } from "../play/scrub-open";
-import { spotlightOpen } from "../play/spotlight-gate";
+import { backStep, playLayers, runBackStep } from "../play/back-steps";
 import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
 import type { LogNames } from "../play/log";
@@ -32,6 +30,8 @@ import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
+import { PEEK_ROOM } from "../play/peek-banner";
+import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
 import { locationReadout, ringWords, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
@@ -75,7 +75,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const threatOf = useMemo(() => threatSelector(), []);
   const threats = useStore(store, (state) => threatOf(state.game));
   const selected = useStore(store, (state) => state.selected);
-  const seat = shownSeat(game);
+  const peek = usePeek(store);
   const ctx = session.ctx;
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -95,8 +95,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // until a file lands. The codes are joined into one string so the effect runs when the set changes, not on every intent.
   const wanted = useMemo(() => {
     const next = [...resolutionCodes(game), ...(selected ? [game.cards[selected]?.code ?? ""] : [])];
-    return prefetchCodes(game, seat, next).join(",");
-  }, [game, seat, selected]);
+    return prefetchCodes(game, peek.shown, next).join(",");
+  }, [game, peek.shown, selected]);
   useEffect(() => {
     const jobs = wanted.split(",").flatMap((code) => {
       const imagesrc = session.facts.get(code)?.imagesrc;
@@ -116,8 +116,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
   // Read from the latest state: the canvas draws again when the cards, the effects in play or the attack change.
   const info = useCallback((cardId: string): SlotInfo => {
-    const now = store.getState().game;
-    return slotNumbers(now, ctx, cardId, shownSeat(now));
+    const { game: now, viewedSeat } = store.getState();
+    return slotNumbers(now, ctx, cardId, shownSeat(now, viewedSeat));
   }, [store, ctx]);
   const rail = useMemo(() => railFor(game), [game]);
   const carousel = useMemo(() => phaseCarousel(game, { stopsOn: settings.stopsOn, stops: settings.stops }, ruleTitle), [game, settings.stopsOn, settings.stops]);
@@ -167,14 +167,13 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       const step = backStep({
-        spotlightOpen: spotlightOpen(store.getState().spotlight), scrubOpen: scrubOpen(),
+        ...playLayers(store),
         menuOpen, moreOpen, linesOpen,
         previewOpen: preview != null, readingOpen: reading != null,
         overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen,
       });
-      if (step === "skipSpotlight") store.getState().endSpotlight("skipped");
-      else if (step === "cancelScrub") cancelScrub();
-      else if (step === "closeMenu") setMenuOpen(false);
+      if (runBackStep(step, store)) return true;
+      if (step === "closeMenu") setMenuOpen(false);
       else if (step === "closeMore" || step === "closeLines") closeMore();
       else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
       else if (step === "closeReading") setReading(null);
@@ -227,7 +226,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       <View className="flex-1" importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
         <TableTopBar
           threats={threats}
-          seat={seat}
+          acting={peek.acting}
+          viewed={peek.viewed}
           life={widgets.life}
           burdenDeck={widgets.burdenDeck}
           rail={rail}
@@ -238,7 +238,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           ringSeat={locations?.heldBy}
           ringWords={ringWords(locations, nameOf)}
           menuOpen={menuOpen}
-          onThreat={(threatSeat) => setReading({ kind: "threat", seat: threatSeat })}
+          onThreat={(threatSeat) => { choice.foldOutside(); setReading(peek.tap(threatSeat) ? null : { kind: "threat", seat: threatSeat }); }}
           onRail={() => setReading((now) => openReading(now, { kind: "carousel" }))}
           onMenu={() => setMenuOpen((open) => !open)}
         />
@@ -307,7 +307,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         onPreview={onPreview}
       />
       {/* Over the table and any open panel, centered on the screen under the top bar. */}
-      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6} width={screen.width} onBeat={choice.onBeat} /> : null}
+      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6 + (peek.words ? PEEK_ROOM : 0)} width={screen.width} onBeat={choice.onBeat} /> : null}
       {preview && previewed && shown ? (
         <CardPreview
           key={preview.id}

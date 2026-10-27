@@ -2,7 +2,7 @@
 // src/campaign/fixtures/a-knife-in-the-dark.json (A Knife in the Dark) for the Maestro flows. Run it again when
 // src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
 //
-//   node --experimental-strip-types scripts/e2e-fixtures.ts          # `lost`
+//   node --experimental-strip-types scripts/e2e-fixtures.ts          # `lost` and `duo`
 //   node --experimental-strip-types scripts/e2e-fixtures.ts --won    # also search for `won`, then write `knife-lost`
 //
 // `won` and `knife-lost` are open (docs/phases/STATUS.md): with the rules as the sources state them, the search has found no
@@ -13,6 +13,10 @@
 // games that got furthest until one is won; every intent is one the reducer listed or accepted, and the search is
 // deterministic. `lost`: Stealth and Steadfastness with the saga
 // Frodo, true solo, Normal, every intent up to the loss.
+//
+// `duo`: both starter decks, two-handed, Easy, parked on the first player's planning window of round 1 (the opening hands kept, the
+// first resource and the quest of nothing yet), for the flows that need two dials and a seat that is not acting (the peek,
+// `.maestro/seat-peek.yaml`). Nothing in it is a win or a loss: it is the auto-player's answers up to that window.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
@@ -211,6 +215,34 @@ function playLoss(): { seed: number; loadout: StoredLoadout; intents: PlayerInte
   return { seed, loadout, intents };
 }
 
+function playDuo(): { seed: number; loadout: StoredLoadout; intents: PlayerIntent[] } {
+  const loadout: StoredLoadout = {
+    scenarioId: scenario.id,
+    difficulty: "Easy",
+    seats: [
+      { deckId: "stealth-and-steadfastness", heroes: stealth.heroes, deck: stealth.deck },
+      { deckId: "wisdom-and-wizardry", heroes: wisdom.heroes, deck: wisdom.deck },
+    ],
+    ringBearer: FRODO,
+    choices: [],
+    acceptPenalty: false,
+  };
+  const seed = 1;
+  const { state: start, ctx } = opened(2, loadout, seed);
+  let state = start;
+  const intents: PlayerIntent[] = [];
+  for (let turn = 0; turn < 400 && !(state.mode === "planning" && state.activeSeat === 0 && state.round >= 1); turn += 1) {
+    const intent = nextIntent(state, ctx, { scout: "", prefer: "141035", protect: FRODO, play: true, act: true });
+    const result = reduce(state, intent, ctx);
+    if (!result.ok) throw new Error(`The policy sent a refused intent: ${result.reason}`);
+    state = result.state;
+    intents.push(intent);
+  }
+  if (!(state.mode === "planning" && state.activeSeat === 0)) throw new Error("The duo fixture never reached the first player's planning window");
+  say.info(`duo: seed ${seed}, ${intents.length} intents, round ${state.round}, ${state.phase}`);
+  return { seed, loadout, intents };
+}
+
 // The log the won game writes when its Resolution is answered with these cards, one choice at a time.
 const PAST_CHOICES = ["141078", "141077"];
 
@@ -291,9 +323,11 @@ void runScript("e2e-fixtures", () => {
   if (!searching) say.info("the won game is open: pass --won to search for it (about two hours with no result so far)");
   const lost = say.step("play scenario 1's loss", () => playLoss());
   const won = searching ? say.step("search scenario 1's won game", () => searchWin()) : null;
+  const duo = say.step("play scenario 1 to a two-handed planning window", () => playDuo());
   const out = {
     ...(won ? { won: { seatCount: 2, ...won } } : {}),
     lost: { seatCount: 1, ...lost },
+    duo: { seatCount: 2, ...duo },
   };
   const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "src", "campaign", "fixtures");
   const file = path.join(dir, "scenario-1.json");

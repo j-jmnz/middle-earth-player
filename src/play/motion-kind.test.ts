@@ -1,0 +1,50 @@
+import { describe, expect, it } from "vitest";
+
+import { motionKind, peekSide } from "./motion-kind.ts";
+
+// Which motion a new layout plays when the seat drawn changed (phase 26). The states are only compared by identity.
+const before = { name: "before" };
+const after = { name: "after" };
+
+describe("motionKind", () => {
+  it("is a peek when the same state is drawn from another seat, and when the peek ends", () => {
+    // Peeking at seat 1 while seat 0 acts, then back.
+    expect(motionKind(before, before, 0, 1, 0, 0)).toBe("peek");
+    expect(motionKind(before, before, 1, 0, 0, 0)).toBe("peek");
+  });
+
+  it("is the seat handoff when a new state turns the engine to another seat and the table follows it", () => {
+    expect(motionKind(before, after, 0, 1, 0, 1)).toBe("handoff");
+    expect(motionKind(before, after, 1, 0, 1, 0)).toBe("handoff");
+  });
+
+  it("is the state's own motions when a new state ends a peek: a pick, a peek, then Confirm on the dock", () => {
+    // Seat 1 was drawn while seat 0 acted; the dock sent an intent that left seat 0 acting. The card played from the hand must lift and land.
+    expect(motionKind(before, after, 1, 0, 0, 0)).toBe("ordinary");
+  });
+
+  it("is the state's own motions when the seat drawn did not change, whoever acts now", () => {
+    expect(motionKind(before, after, 0, 0, 0, 0)).toBe("ordinary");
+    expect(motionKind(before, before, 0, 0, 0, 0)).toBe("ordinary");
+    // Peeking at seat 1, the engine turns to seat 1: that hand is on screen already and must not slide up again.
+    expect(motionKind(before, after, 1, 1, 0, 1)).toBe("ordinary");
+    // A pass that moves the acting seat while the table stays on the seat it showed.
+    expect(motionKind(before, after, 0, 0, 0, 1)).toBe("ordinary");
+  });
+
+  it("calls a new state that draws a seat that is not the acting one a peek batched with it", () => {
+    expect(motionKind(before, after, 0, 1, 0, 0)).toBe("peek");
+  });
+
+  it("is not a peek in a solo game: the seat never changes", () => {
+    expect(motionKind(before, after, 0, 0, 0, 0)).toBe("ordinary");
+  });
+});
+
+describe("peekSide", () => {
+  it("comes in from the right to a higher seat and from the left to a lower one", () => {
+    expect(peekSide(0, 1)).toBe(1);
+    expect(peekSide(1, 0)).toBe(-1);
+    expect(peekSide(0, 3)).toBe(1);
+  });
+});
