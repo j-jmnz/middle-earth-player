@@ -142,3 +142,12 @@ Phase 24 is merged. Where the peek meets the combat spotlight:
 - Android Back: `backStep` (`src/play/back.ts`) now opens with `skipSpotlight` while a spotlight plays. "Back ends the peek before anything else" means right after that step: put `endPeek` second, not first.
 - The skip tap rides the hurry: the canvas pan's `onBegin` calls `finishMotions(progress, clear)` (which ends the spotlight) and sets `swallow` from `live` (`useSpotlight`), and `tap.onEnd`, `hold.onStart` and `pan.onStart` return early while it is set. The peek's swipe must check `swallow` the same way, so the touch that skips a spotlight does not also start a peek.
 - `tickImpact()` (`src/play/haptics.ts`) plays at a strike's hit stop. A peek is not a new state, plays no spotlight and no `tickImpact`. A spotlight replays the state from the shown (acting) seat's layout (`spotlight-plan.ts` reads the two layouts), and the peek resets on a new moment, so a spotlight never plays while peeking.
+
+## Handover from phase 25
+
+Phase 25 is merged. Where the peek meets the hand scrub:
+
+- The canvas's gestures no longer live in `table-canvas.native.tsx`: the drag pan, the tap, the 350 ms hold and the scrub are in `src/play/hand-gestures.native.ts`, composed as `Gesture.Race(drag, scrub, hold, tap)`. The scrub is a `Pan().activateAfterLongPress(250)` that fails at once (`onTouchesDown`, `manager.fail()`) for a press off the hand. Compose the peek's swipe there, beside them, not in the canvas file. A horizontal swipe from the hand before 250 ms already wins as the drag pan (from 6 pt), so decide where the peek's swipe starts and how it differs from a drag (`plans/board-ux.md`).
+- The drag pan's first `onBegin` still holds the hurry and the spotlight's skip: `finishMotions(progress, clear)` and the `swallow` copy from `live`. The scrub's `onStart` returns early on `swallow`, as `tap.onEnd`, `hold.onStart` and `pan.onStart` do. The peek's swipe does the same.
+- Android Back (`backStep`, `src/play/back.ts`) is now `skipSpotlight`, then `cancelScrub`, then the rest. Put `endPeek` third, after `cancelScrub`. A scrub's open flag and its cancel reach `table-view.tsx` through `src/play/scrub-open.ts`, not `back.ts`.
+- The scrub's 35% night is its own layer in `hand-scrub.native.tsx`. It is drawn right after the table's cards and before `TokenFx` and the combat marks, over the table and under the hand, and only while a scrub runs. A peek that swaps the shown seat while a scrub is open should cancel the scrub first, because the spread reads the shown seat's hand slots.
