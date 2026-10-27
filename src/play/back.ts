@@ -8,8 +8,6 @@
 //   5. the choice tray, which it folds;
 //   and only then it leaves the table. A folded tray stays a choice the engine is waiting for; leaving loses nothing because
 // every accepted intent is already saved.
-export { cancelScrub, scrubOpen } from "./scrub-open.ts";
-
 export type BackLayers = { spotlightOpen: boolean; scrubOpen: boolean; menuOpen: boolean; moreOpen: boolean; linesOpen: boolean; previewOpen: boolean; readingOpen: boolean; overlayOpen: boolean; panelOpen: boolean };
 
 export type BackStep = "skipSpotlight" | "cancelScrub" | "closeMenu" | "closeMore" | "closeLines" | "closePreview" | "closeReading" | "closeOverlay" | "foldPanel" | "leave";

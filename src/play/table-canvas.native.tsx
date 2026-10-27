@@ -173,12 +173,12 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           </Leaving>
         ))}
         {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
+        <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} piece={piece} />
         <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} ringOf={(code) => sphereRing(sphereOf(code))} stripOf={(slot) => stripText(slot, info(slot.id).questPoints)} contrast={contrast} />
         {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} /> : null}
         {layout.marks.map((mark) => (
           <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} />
         ))}
-        <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} piece={piece} />
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
             <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} />

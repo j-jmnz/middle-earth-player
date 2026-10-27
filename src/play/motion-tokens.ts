@@ -125,7 +125,7 @@ export const MOTION = {
   spotlight: tween(1500, "linear"),
   // The hand scrub (phase 25): the held hand rises (and grows and flattens) over `scrubRise` and spreads sideways over `scrubSpread`,
   // together; the card under the finger lifts over `scrubLift`; the hand settles back over `scrubFall`. The table's 35% night
-  // rides the rise. The 250 ms hold and the 8 pt slop that start it are gesture thresholds (hand-scrub.ts), not tokens.
+  // rides the rise. The 250 ms hold and the 6 pt slop that start it are gesture thresholds (hand-scrub.ts), not tokens.
   scrubRise: tween(220, "outCubic"),
   scrubSpread: tween(220, "outCubic"),
   scrubLift: tween(120, "outCubic"),

@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { cancelScrub, onScrubCancel, scrubMoved, scrubOpen, setScrubOpen } from "./scrub-open.ts";
+import { cancelScrub, onScrubCancel, scrubMoved, scrubOpen, scrubUnder, setScrubOpen } from "./scrub-open.ts";
 
 afterEach(() => {
   setScrubOpen(false);
   onScrubCancel(null);
+  scrubMoved(-1, false, true);
 });
 
 describe("the open scrub", () => {
@@ -44,5 +45,19 @@ describe("the card under the finger", () => {
     expect(scrubOpen()).toBe(false);
     // A new scrub on the same card ticks at its start.
     expect(scrubMoved(3, true)).toBe(true);
+  });
+});
+
+describe("Back during a scrub", () => {
+  it("is not undone by a move sent before it, and a real start opens the scrub again", () => {
+    expect(scrubMoved(2, true, true)).toBe(true);
+    cancelScrub();
+    expect(scrubOpen()).toBe(false);
+    expect(scrubMoved(3, true)).toBe(false);
+    expect(scrubOpen()).toBe(false);
+    expect(scrubUnder()).toBe(-1);
+    scrubMoved(-1, false);
+    expect(scrubMoved(1, true, true)).toBe(true);
+    expect(scrubOpen()).toBe(true);
   });
 });

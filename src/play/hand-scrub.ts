@@ -3,15 +3,15 @@
 // canvas animates between the hand layout.ts gives (the peeking, fanned strip) and the spread this works out, and the gesture's
 // worklets ask `cardAt`, `cancelled` and `pick` for the card under the finger on the UI thread. Nothing here sends an intent.
 //
-// The hold (250 ms) and the slop (8 pt) are gesture thresholds, not motion: they stay out of motionScale, as the dock's ARM_MS does.
-import { contains, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
+// The hold (250 ms) and the slop (6 pt) are gesture thresholds, not motion: they stay out of motionScale, as the dock's ARM_MS does.
+import { contains, hitSlot, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 
 /** How long a press on the hand is held still before the scrub starts, in ms. */
 export const SCRUB_HOLD_MS = 250;
 
 /** How far the finger may move in that time, in pt; a move before it is a drag, which plays a card as always. */
-export const SCRUB_SLOP = 8;
+export const SCRUB_SLOP = 6;
 
 // The risen hand keeps this far from the canvas's edges, and its cards this far apart when there is room.
 const EDGE = 8;
@@ -67,10 +67,10 @@ export function cardAt(spread: Spread, x: number): number {
   return best;
 }
 
-/** Whether the finger is above the top of the risen hand: the scrub is cancelled. */
+/** Whether the finger is more than 44 pt above the top of the risen hand (the lifted card stands above it): cancelled for good. */
 export function cancelled(spread: Spread, y: number): boolean {
   "worklet";
-  return y < spread.top;
+  return y < spread.top - MIN_TARGET;
 }
 
 /**
@@ -91,6 +91,14 @@ export function startsScrub(spread: Spread, slots: readonly CardSlot[], x: numbe
   const slot = hit >= 0 ? slots[hit] : undefined;
   if (slot) return slot.zone === "hand";
   return contains(spread.strip, x, y);
+}
+
+/** The card the scrub starts on: the hand card that was pressed, else (the strip between cards) the one nearest the finger. */
+export function startCard(spread: Spread, slots: readonly CardSlot[], x: number, y: number): number {
+  "worklet";
+  const slot = slots[hitSlot(slots, x, y)];
+  const pressed = slot && slot.zone === "hand" ? spread.ids.indexOf(slot.id) : -1;
+  return pressed >= 0 ? pressed : cardAt(spread, x);
 }
 
 /** The selection tick: when the scrub starts on a card and each time the card under the finger changes to another, nothing else. */

@@ -1,7 +1,7 @@
 // The hand scrub (phase 25): the risen, spread hand and the card under the finger (docs/design-system.md, Table, Gestures).
 import { describe, expect, it } from "vitest";
 
-import { cardAt, cancelled, handSlots, pick, spreadLayout, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
+import { cardAt, cancelled, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
 import { cardSize, handCardSize, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 
@@ -148,16 +148,18 @@ describe("cancelled and pick", () => {
   const spread: Spread = spreadLayout(layoutOf(5, canvas.width, canvas.height), canvas);
   const inside = spread.top + 20;
 
-  it("cancels above the top of the risen hand, and not at or below it", () => {
-    expect(cancelled(spread, spread.top - 1)).toBe(true);
+  it("cancels more than 44 pt above the top of the risen hand, and not at or below that line", () => {
+    expect(cancelled(spread, spread.top - MIN_TARGET - 1)).toBe(true);
     expect(cancelled(spread, 0)).toBe(true);
+    expect(cancelled(spread, spread.top - MIN_TARGET)).toBe(false);
+    expect(cancelled(spread, spread.top - 1)).toBe(false);
     expect(cancelled(spread, spread.top)).toBe(false);
     expect(cancelled(spread, canvas.height - 1)).toBe(false);
   });
 
   it("picks the card under the finger, and none above the hand", () => {
     expect(pick(spread, spread.centers[3] ?? 0, inside)).toBe(3);
-    expect(pick(spread, spread.centers[3] ?? 0, spread.top - 1)).toBe(-1);
+    expect(pick(spread, spread.centers[3] ?? 0, spread.top - MIN_TARGET - 1)).toBe(-1);
   });
 
   it("picks none off the ends of the hand, past half a slice", () => {
@@ -182,10 +184,31 @@ describe("startsScrub", () => {
   });
 });
 
+describe("startCard", () => {
+  it("starts on the pressed card even where the spread's nearest center is another", () => {
+    const canvas = CANVASES[0] as (typeof CANVASES)[number];
+    const layout = layoutOf(3, canvas.width, canvas.height);
+    const spread = spreadLayout(layout, canvas);
+    // A spread whose centers sit far from the fan: the nearest center is not the card under the finger.
+    const shifted: Spread = { ...spread, centers: spread.centers.map((center) => center + 300) };
+    const second = layout.slots[1] as CardSlot;
+    const x = second.x + second.w / 2;
+    const y = second.y + second.h - 4;
+    expect(cardAt(shifted, x)).not.toBe(1);
+    expect(startCard(shifted, layout.slots, x, y)).toBe(1);
+  });
+
+  it("falls back to the nearest center on the strip between cards", () => {
+    const canvas = CANVASES[0] as (typeof CANVASES)[number];
+    const spread = spreadLayout(layoutOf(3, canvas.width, canvas.height), canvas);
+    expect(startCard(spread, [], 100, 380)).toBe(cardAt(spread, 100));
+  });
+});
+
 describe("the hold and the selection tick", () => {
-  it("holds 250 ms within 8 pt", () => {
+  it("holds 250 ms within 6 pt", () => {
     expect(SCRUB_HOLD_MS).toBe(250);
-    expect(SCRUB_SLOP).toBe(8);
+    expect(SCRUB_SLOP).toBe(6);
   });
 
   it("ticks when the scrub starts on a card and when the card under the finger changes, and nowhere else", () => {

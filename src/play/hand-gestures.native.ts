@@ -13,7 +13,7 @@ import { cancelAnimation, useDerivedValue, useSharedValue, withTiming, type Shar
 import { scheduleOnRN } from "react-native-worklets";
 
 import { finishMotions } from "./card-motion.native.tsx";
-import { cancelled, cardAt, NO_SPREAD, pick, SCRUB_HOLD_MS, SCRUB_SLOP, spreadLayout, startsScrub, type Spread } from "./hand-scrub.ts";
+import { cancelled, NO_SPREAD, pick, SCRUB_HOLD_MS, SCRUB_SLOP, spreadLayout, startCard, startsScrub, type Spread } from "./hand-scrub.ts";
 import { tickArmed } from "./haptics.ts";
 import { hitDrop, hitSlot, type CardSlot, type DropRect, type TableLayout } from "./layout.ts";
 import { timing } from "./motion-run.ts";
@@ -66,6 +66,8 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   const scrubLift = useSharedValue(0);
   const index = useSharedValue(-1);
   const scrubbing = useSharedValue(false);
+  // A scrub started and JavaScript has not yet been told it closed.
+  const begun = useSharedValue(false);
 
   const spread = useMemo(() => spreadLayout(layout, canvas), [layout, canvas.width, canvas.height, canvas.bottom]); // eslint-disable-line react-hooks/exhaustive-deps -- the canvas is its three numbers.
   const draggableSet = useMemo(() => new Set(draggable), [draggable]);
@@ -104,8 +106,8 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   );
 
   // JavaScript hears of the scrub only when the card under the finger changes, to tick, and when it opens and closes (Android Back).
-  const onScrub = useCallback((next: number, open: boolean) => {
-    if (scrubMoved(next, open)) tickArmed();
+  const onScrub = useCallback((next: number, open: boolean, start = false) => {
+    if (scrubMoved(next, open, start)) tickArmed();
   }, []);
   useEffect(() => {
     onScrubCancel(settle);
@@ -212,7 +214,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         if (!touch || !startsScrub(spreadNow.get(), slots.get(), touch.x, touch.y, hitSlot(slots.get(), touch.x, touch.y))) manager.fail();
       })
       .onStart((event) => {
-        const first = cardAt(spreadNow.get(), event.x);
+        const first = startCard(spreadNow.get(), slots.get(), event.x, event.y);
         if (swallow.get() || first < 0) return;
         scrubbing.set(true);
         cancelAnimation(rise);
@@ -220,7 +222,8 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         rise.set(k === 0 ? 1 : withTiming(1, riseTiming));
         apart.set(k === 0 ? 1 : withTiming(1, apartTiming));
         lifting(first);
-        scheduleOnRN(onScrub, first, true);
+        begun.set(true);
+        scheduleOnRN(onScrub, first, true, true);
       })
       .onUpdate((event) => {
         if (!scrubbing.get()) return;
@@ -241,12 +244,17 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         const now = spreadNow.get();
         const id = success ? now.ids[pick(now, event.x, event.y)] : undefined;
         settle();
-        scheduleOnRN(onScrub, -1, false);
         if (id !== undefined) scheduleOnRN(onPreview, id);
+      })
+      // However the scrub ended (released, cancelled, or cut short by Back), JavaScript is told it closed, after any move still in flight.
+      .onFinalize(() => {
+        if (!begun.get()) return;
+        begun.set(false);
+        scheduleOnRN(onScrub, -1, false);
       });
 
     return Gesture.Race(pan, ...(scrubOn ? [scrub] : []), hold, tap);
-  }, [slots, lifts, drops, spreadNow, dragging, dx, dy, lift, rise, apart, index, scrubbing, k, liftTiming, returnTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, select, onDrop, onTap, onPreview, onScrub]);
+  }, [slots, lifts, drops, spreadNow, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, returnTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, select, onDrop, onTap, onPreview, onScrub]);
 
   const scrub: Scrub = useMemo(() => ({ rise, apart, lift: scrubLift, index, spread }), [rise, apart, scrubLift, index, spread]);
   return { gesture, liftTransform, scrub };
