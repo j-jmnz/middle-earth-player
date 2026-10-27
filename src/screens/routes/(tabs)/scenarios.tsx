@@ -11,6 +11,7 @@ import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { BOXES, scenarioName } from "../../campaign-data";
 import { BodyText, Chevron, Chip, Eyebrow, Label, Panel, Screen, ScreenScroll, ScreenTitle, Section, TextButton } from "../../chrome";
+import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt, SceneCard } from "../../art";
 import { palette } from "../../palette.js";
 import { goldPlate, panelSurface, raisedEdge, tileSurface } from "../../../play/surfaces";
@@ -30,7 +31,8 @@ export default function Scenarios() {
   const [archived, setArchived] = useState<StandaloneGame[]>([]);
   // Manage shows Archive and Delete on each game instead of opening it. It ends when the list loses focus.
   const [managing, setManaging] = useState(false);
-  const [showArchived, setShowArchived] = useState(false);
+  const folds = useFolds();
+  const fold = (id: string, defaultFolded = false) => ({ folded: folds.folded(id, defaultFolded), onFold: (next: boolean) => folds.setFolded(id, next, defaultFolded) });
   // The game whose delete is waiting on Delete for good.
   const [deleting, setDeleting] = useState<string | null>(null);
   const nameOf = scenarioName;
@@ -47,7 +49,6 @@ export default function Scenarios() {
     setGames(open);
     setArchived(away);
     if (open.length === 0) setManaging(false);
-    if (away.length === 0) setShowArchived(false);
     setDeleting(null);
   }, [user]);
 
@@ -207,7 +208,7 @@ export default function Scenarios() {
         <View className="mt-5 gap-6" testID="standalone-scenarios">
           {BOXES.map((box) => (
           <View key={box.id} testID={`box-${box.id}`}>
-          <Section title={box.name} />
+          <FoldSection id={`box-${box.id}`} title={box.name} count={box.scenarios.length} {...fold(`box-${box.id}`)}>
           <View className="gap-2.5">
             {box.scenarios.map((id, index) => {
               const playable = isPlayable(id);
@@ -249,6 +250,7 @@ export default function Scenarios() {
               );
             })}
           </View>
+          </FoldSection>
           </View>
           ))}
         </View>
@@ -258,21 +260,10 @@ export default function Scenarios() {
           {games.length === 0 ? <BodyText tone="muted">{archived.length === 0 ? "No game yet. Pick a scenario to deal one." : "No open game. Pick a scenario to deal one."}</BodyText> : null}
           {finished.map((game) => renderGame(game))}
           {archived.length > 0 ? (
-            <View className="gap-3" testID="archived-games">
-              <View className="-mx-3 flex-row">
-                <TextButton
-                  label={`${showArchived ? "Hide archived" : "Archived"} · ${archived.length}`}
-                  testID="archived-toggle"
-                  tone="muted"
-                  accessibilityLabel={`${showArchived ? "Hide" : "Show"} ${archived.length} archived ${archived.length === 1 ? "game" : "games"}`}
-                  onPress={() => {
-                    setShowArchived(!showArchived);
-                    setDeleting(null);
-                  }}
-                />
-              </View>
-              {showArchived
-                ? archived.map((game) => (
+            <View testID="archived-games">
+              <FoldSection id="archived-games" title="Archived" count={archived.length} testID="archived-toggle" {...fold("archived-games", true)}>
+                <View className="gap-3 pt-1">
+                  {archived.map((game) => (
                     <View key={game.id} testID={`archived-${game.id}`}>
                       <Panel unfilled>
                         <Text className="font-display text-title text-muted">{nameOf(game.scenarioId)}</Text>
@@ -280,8 +271,9 @@ export default function Scenarios() {
                         {actions(game, { label: "Restore", onPress: () => restore(game) })}
                       </Panel>
                     </View>
-                  ))
-                : null}
+                  ))}
+                </View>
+              </FoldSection>
             </View>
           ) : null}
         </View>

@@ -5,7 +5,8 @@ import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
 import { carryOffers } from "../../../campaign/carry-over";
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
-import { Panel, RingMark, Screen, ScreenScroll, ScreenTitle, Section, SecondaryButton, TextButton } from "../../chrome";
+import { Panel, RingMark, Screen, ScreenScroll, ScreenTitle, SecondaryButton, TextButton } from "../../chrome";
+import { FoldSection, useFolds } from "../../fold-section";
 import type { ArtCard } from "../../art";
 import { deckFaces } from "../../deck-store";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
@@ -37,9 +38,9 @@ export default function CampaignList() {
   // When each playthrough was last written: a finished one's date in the carry-over offers.
   const [saved, setSaved] = useState<ReadonlyMap<string, number>>(new Map());
   const [starting, setStarting] = useState(false);
+  const folds = useFolds();
   // Manage shows Archive and Delete on each open playthrough instead of opening it. It ends when the list loses focus.
   const [managing, setManaging] = useState(false);
-  const [showArchived, setShowArchived] = useState(false);
   // The save whose delete is waiting on Delete for good.
   const [deleting, setDeleting] = useState<string | null>(null);
   // New playthrough opens the Start block under the saves: the list scrolls to it, so its primary is on screen.
@@ -85,7 +86,6 @@ export default function CampaignList() {
     setArchived(away);
     setSaved(savedAt(user));
     if (open.length === 0) setManaging(false);
-    if (away.length === 0) setShowArchived(false);
     setDeleting(null);
   }, [user]);
 
@@ -148,11 +148,6 @@ export default function CampaignList() {
     setDeleting(null);
   }
 
-  function toggleArchived(): void {
-    setShowArchived(!showArchived);
-    setDeleting(null);
-  }
-
   const showStart = !managing && (saves.length === 0 || starting);
   const actions = (save: Save, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
     <KeepOrDelete
@@ -166,6 +161,37 @@ export default function CampaignList() {
       onKeep={() => setDeleting(null)}
     />
   );
+
+  const current = saves[0] ?? null;
+  const others = saves.slice(1);
+  const fold = (id: string, defaultFolded = false) => ({ folded: folds.folded(id, defaultFolded), onFold: (next: boolean) => folds.setFolded(id, next, defaultFolded) });
+  const startPanel = <StartPanel options={startable} current={saves.length === 0} carry={carryChoices} onStart={start} />;
+  // Manage shows Archive and Delete on a playthrough instead of opening it.
+  const managed = (save: Save, index: number) => (
+    <View key={save.id} testID={`save-${save.id}`}>
+      <Panel current={index === 0}>
+        <SaveSummary line={lineOf(save)} eyebrow={saves.length > 1 && index === 0} />
+        {actions(save, { label: "Archive", onPress: () => archive(save) })}
+      </Panel>
+    </View>
+  );
+  const continuing = (save: Save) => {
+    const line = lineOf(save);
+    return (
+      <ContinuePanel
+        key={save.id}
+        id={save.id}
+        line={line}
+        eyebrow={saves.length > 1}
+        primary={!showStart}
+        heroes={partyOf(save)}
+        party={partyWords(save)}
+        onNext={() => router.push(nextStepHref(save.id, line.next))}
+        onPath={() => openPath(save)}
+        onLog={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })}
+      />
+    );
+  };
 
   return (
     <Screen testID="campaign-list" scene="dusk">
@@ -185,42 +211,26 @@ export default function CampaignList() {
           ) : null}
         </View>
         <View className="gap-3">
-          {saves.map((save, index) => {
-            const eyebrow = saves.length > 1 && index === 0;
-            if (managing) {
-              return (
-                <View key={save.id} testID={`save-${save.id}`}>
-                  <Panel current={index === 0}>
-                    <SaveSummary line={lineOf(save)} eyebrow={eyebrow} />
-                    {actions(save, { label: "Archive", onPress: () => archive(save) })}
-                  </Panel>
-                </View>
-              );
-            }
-            if (index === 0) {
-              const line = lineOf(save);
-              return (
-                <ContinuePanel
-                  key={save.id}
-                  id={save.id}
-                  line={line}
-                  eyebrow={eyebrow}
-                  primary={!showStart}
-                  heroes={partyOf(save)}
-                  party={partyWords(save)}
-                  onNext={() => router.push(nextStepHref(save.id, line.next))}
-                  onPath={() => openPath(save)}
-                  onLog={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })}
-                />
-              );
-            }
-            return (
-              <View key={save.id} className={index === 1 ? "mt-2" : undefined}>
-                {index === 1 ? <Section title="Other journeys" /> : null}
-                <SaveRow id={save.id} line={lineOf(save)} lead={partyOf(save)[0] ?? null} onPress={() => openPath(save)} />
+          {current ? (
+            <FoldSection id="current" title="Current playthrough" count={1} {...fold("current")}>
+              <View className="pt-1">{managing ? managed(current, 0) : continuing(current)}</View>
+            </FoldSection>
+          ) : null}
+          {others.length > 0 ? (
+            <FoldSection id="others" title="Other journeys" count={others.length} {...fold("others")}>
+              <View className="gap-3 pt-1">
+                {others.map((save, index) =>
+                  managing ? (
+                    managed(save, index + 1)
+                  ) : (
+                    <View key={save.id}>
+                      <SaveRow id={save.id} line={lineOf(save)} lead={partyOf(save)[0] ?? null} onPress={() => openPath(save)} />
+                    </View>
+                  ),
+                )}
               </View>
-            );
-          })}
+            </FoldSection>
+          ) : null}
           {showStart ? (
             <View
               className={saves.length > 0 ? "mt-2" : undefined}
@@ -230,57 +240,67 @@ export default function CampaignList() {
               }}
             >
               {saves.length > 0 ? (
-                <Section title="New playthrough" right={<TextButton label="Cancel" testID="start-cancel" tone="muted" accessibilityLabel="Cancel the new playthrough" onPress={() => setStarting(false)} />} />
-              ) : null}
-              <StartPanel options={startable} current={saves.length === 0} carry={carryChoices} onStart={start} />
+                <FoldSection
+                  id="start"
+                  title="New playthrough"
+                  {...fold("start")}
+                  right={<TextButton label="Cancel" testID="start-cancel" tone="muted" accessibilityLabel="Cancel the new playthrough" onPress={() => setStarting(false)} />}
+                >
+                  {startPanel}
+                </FoldSection>
+              ) : (
+                startPanel
+              )}
             </View>
           ) : null}
           {!showStart && !managing ? (
-            <SecondaryButton label="New playthrough" testID="new-playthrough" tone="gold" compact onPress={() => setStarting(true)} />
+            <SecondaryButton
+              label="New playthrough"
+              testID="new-playthrough"
+              tone="gold"
+              compact
+              onPress={() => {
+                folds.setFolded("start", false);
+                setStarting(true);
+              }}
+            />
           ) : null}
           {archived.length > 0 ? (
-            <View className="gap-3" testID="archived-playthroughs">
-              <View className="-mx-3 flex-row">
-                <TextButton
-                  label={`Archived · ${archived.length}`}
-                  testID="archived-toggle"
-                  tone="muted"
-                  accessibilityLabel={`${archived.length} archived ${archived.length === 1 ? "playthrough" : "playthroughs"}`}
-                  expanded={showArchived}
-                  onPress={toggleArchived}
-                />
-              </View>
-              {showArchived
-                ? archived.map((save) => (
+            <View testID="archived-playthroughs">
+              <FoldSection id="archived" title="Archived" count={archived.length} testID="archived-toggle" {...fold("archived", true)}>
+                <View className="gap-3 pt-1">
+                  {archived.map((save) => (
                     <View key={save.id} testID={`archived-${save.id}`}>
                       <Panel unfilled>
                         <SaveSummary line={lineOf(save)} eyebrow={false} archived />
                         {actions(save, { label: "Restore", onPress: () => restore(save) })}
                       </Panel>
                     </View>
-                  ))
-                : null}
+                  ))}
+                </View>
+              </FoldSection>
             </View>
           ) : null}
           {locked.length > 0 ? (
             <View className="mt-2">
-              <Section title="Coming later" />
-              <View className="flex-row flex-wrap gap-3" testID="locked-campaigns">
-                {locked.map((tile) => (
-                  <View
-                    key={tile.id}
-                    testID={`locked-${tile.id}`}
-                    accessible
-                    accessibilityLabel={`${tile.name}, ${tile.caption}`}
-                    className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-card px-4 py-4"
-                    style={{ borderWidth: 1, borderStyle: "dashed", borderColor: palette.hairline }}
-                  >
-                    <RingMark size={14} state="locked" />
-                    <Text className="mt-2 font-display text-heading text-faint">{tile.name}</Text>
-                    <Text className="text-label text-faint">{tile.caption}</Text>
-                  </View>
-                ))}
-              </View>
+              <FoldSection id="coming" title="Coming later" count={locked.length} {...fold("coming")}>
+                <View className="flex-row flex-wrap gap-3 pt-1" testID="locked-campaigns">
+                  {locked.map((tile) => (
+                    <View
+                      key={tile.id}
+                      testID={`locked-${tile.id}`}
+                      accessible
+                      accessibilityLabel={`${tile.name}, ${tile.caption}`}
+                      className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-card px-4 py-4"
+                      style={{ borderWidth: 1, borderStyle: "dashed", borderColor: palette.hairline }}
+                    >
+                      <RingMark size={14} state="locked" />
+                      <Text className="mt-2 font-display text-heading text-faint">{tile.name}</Text>
+                      <Text className="text-label text-faint">{tile.caption}</Text>
+                    </View>
+                  ))}
+                </View>
+              </FoldSection>
             </View>
           ) : null}
         </View>

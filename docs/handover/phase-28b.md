@@ -5,8 +5,9 @@
 - `ActiveScenario.startedAt` (optional) so a campaign run knows when it was dealt.
 - brief.md updated (runs, sections key, History row, loss rule).
 
+- Fold control (`fold-section.tsx`, `fold-state.ts`, `section-store.ts`), both tabs folded, design-system.md updated for it.
+
 ## In progress / next
-- Fold control and `settings.sections`; collapse on both tabs.
 - History screen (`history`), history-open buttons, design-system.md.
 - Maestro: `.maestro/history.yaml`, `.maestro/sections-fold.yaml`.
 

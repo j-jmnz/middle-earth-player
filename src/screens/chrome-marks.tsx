@@ -10,8 +10,8 @@ import { goldSurface } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
 import type { MarkedSphere } from "./sphere-mark";
 
-/** A chevron drawn as views (no printed icon fits), pointing left for Back or right for a row that opens. */
-export function Chevron({ direction = "left", color = palette.bone, size = 10 }: { direction?: "left" | "right"; color?: string; size?: number }) {
+/** A chevron drawn as views (no printed icon fits), pointing left for Back, right for a row that opens, down for a fold that is open. */
+export function Chevron({ direction = "left", color = palette.bone, size = 10 }: { direction?: "left" | "right" | "down"; color?: string; size?: number }) {
   return (
     <View
       importantForAccessibility="no"
@@ -21,7 +21,10 @@ export function Chevron({ direction = "left", color = palette.bone, size = 10 }:
         borderLeftWidth: 2,
         borderBottomWidth: 2,
         borderColor: color,
-        transform: [{ translateX: direction === "left" ? size * 0.2 : -size * 0.2 }, { rotate: direction === "left" ? "45deg" : "-135deg" }],
+        transform:
+          direction === "down"
+            ? [{ translateY: -size * 0.2 }, { rotate: "-45deg" }]
+            : [{ translateX: direction === "left" ? size * 0.2 : -size * 0.2 }, { rotate: direction === "left" ? "45deg" : "-135deg" }],
       }}
     />
   );
