@@ -185,10 +185,22 @@ export function threatSelector(): (game: ScenarioState) => readonly SeatThreat[]
   };
 }
 
-/** The seat the table shows: the seat the engine is asking, so a two-handed game follows the decision. */
-export function shownSeat(game: ScenarioState): number {
+/**
+ * The seat the engine is asking, in range. It picks, pays and sends: the table's choices, the dock and the sheets are its, whichever
+ * seat the table draws. Nothing about a peek can change it, so the picking code calls this and never `shownSeat`.
+ */
+export function actingSeat(game: ScenarioState): number {
   const seat = game.activeSeat;
   return seat >= 0 && seat < game.seatCount ? seat : 0;
+}
+
+/**
+ * The seat the table draws: the seat the player is peeking at (`viewed`, a UI-only choice of the table store; peek.ts), else the
+ * acting seat, so a two-handed game follows the decision. A peek changes what is drawn and nothing else: whatever picks, pays or
+ * sends reads `actingSeat`.
+ */
+export function shownSeat(game: ScenarioState, viewed: number | null): number {
+  return viewed != null && viewed >= 0 && viewed < game.seatCount ? viewed : actingSeat(game);
 }
 
 /**

@@ -3,6 +3,7 @@
 // carry no commas.
 import { marked, tappable, type Choice } from "./table-choice.ts";
 import type { ScenarioState } from "./store.ts";
+import type { LayoutOptions } from "./layout.ts";
 import type { OptionMark, Sheet } from "./sheet-types.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
 
@@ -43,6 +44,13 @@ export function highlightOf(keys: HighlightKeys): TableHighlight {
     muted: new Set(ids(keys.muted)),
     beat: new Set(ids(keys.beat)),
   };
+}
+
+/** The fight picked and not confirmed yet, from the string that compares by value ("enemy:kind:id,id"; "" for none). */
+export function fightOf(key: string): LayoutOptions["preview"] {
+  if (key === "") return null;
+  const [enemyId = "", kind = "defense", ids = ""] = key.split(":");
+  return { enemyId, kind: kind as NonNullable<LayoutOptions["preview"]>["kind"], ids: ids.split(",") };
 }
 
 // The marks a sheet's options carry, by card id.

@@ -146,3 +146,32 @@ describe("Maestro fixtures", () => {
     if (resumed.ok) expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
   });
 });
+
+describe("duo (the peek's two-handed fixture, phase 26)", () => {
+  it("is a two-handed game of scenario 1 with one deck per seat, from an empty log", () => {
+    const found = fixture("duo");
+    expect(found.seatCount).toBe(2);
+    expect(found.loadout.seats.map((seat) => seat.deckId)).toEqual(["stealth-and-steadfastness", "wisdom-and-wizardry"]);
+    expect(found.loadout.scenarioId).toBe("a-shadow-of-the-past");
+    expect(found.past).toBeNull();
+    expect(found.log.completed).toEqual([]);
+  });
+
+  it("replays to the first player's planning window of round 1: two seats, neither eliminated, seat 0 acting, nothing won or lost", () => {
+    const world = worldFor("duo");
+    const resumed = resume(fixtureSave("duo", "s", CATALOG_VERSION), world, CATALOG_VERSION);
+    expect(resumed.ok).toBe(true);
+    if (!resumed.ok) return;
+    const state = resumed.state;
+    expect(state.seatCount).toBe(2);
+    expect(state.mode).toBe("planning");
+    expect(state.round).toBe(1);
+    expect(state.activeSeat).toBe(0);
+    expect(state.lost).toBe(false);
+    expect(state.seats.slice(0, 2).map((seat) => seat.eliminated)).toEqual([false, false]);
+    // The seat the peek shows holds cards of its own.
+    expect(state.seats[1]?.hand.length).toBeGreaterThan(0);
+    expect(state.seats[1]?.heroes.length).toBeGreaterThan(0);
+    expect(state.seats[0]?.hand).not.toEqual(state.seats[1]?.hand);
+  });
+});

@@ -5,6 +5,8 @@
 import { useEffect, useState } from "react";
 import { ScrollView, View, type LayoutChangeEvent } from "react-native";
 
+import { setDialsEdge } from "../play/bar-edge";
+import { seatDial } from "../play/peek";
 import type { Rail } from "../play/rail";
 import type { SeatThreat } from "../play/selectors";
 import { PhaseRail } from "../play/phase-rail";
@@ -20,8 +22,10 @@ const FADE_BAND = 4;
 
 export type TopBarProps = {
   threats: readonly SeatThreat[];
-  // The shown seat, whose label is gold in two-handed play.
-  seat: number;
+  // The seat the engine is asking, whose label is gold in two-handed play, and the seat peeked at (never the acting one) or null: that
+  // dial gets a bone ring and an eye mark. A dial that is not shown peeks when tapped (src/play/peek.ts).
+  acting: number;
+  viewed: number | null;
   life: number | null;
   burdenDeck: number | null;
   rail: Rail;
@@ -41,7 +45,7 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, seat, life, burdenDeck, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const [bar, setBar] = useState(0);
   const [dials, setDials] = useState(0);
   const onBar = (event: LayoutChangeEvent) => setBar(Math.round(event.nativeEvent.layout.width));
@@ -55,6 +59,9 @@ export function TableTopBar({ threats, seat, life, burdenDeck, rail, stopAhead, 
     return () => clearTimeout(timer);
   }, []);
   const zones = bar > 0 && (dials > 0 || waited) ? barZones(bar - 16, dials) : null;
+  // The tray's outside-tap layer over the bar stops where the dials end, so a dial tap reaches the dial (src/play/bar-edge.ts).
+  const edge = zones ? 8 + Math.min(dials, zones.left) : 0;
+  useEffect(() => setDialsEdge(edge), [edge]);
   return (
     <View testID="table-top-bar" className="flex-row items-center px-2" style={{ height: TOP_BAR }} onLayout={onBar}>
       <View testID="top-bar-left" style={{ width: zones?.left ?? "30%" }}>
@@ -69,19 +76,23 @@ export function TableTopBar({ threats, seat, life, burdenDeck, rail, stopAhead, 
           contentContainerStyle={{ alignItems: "center", paddingVertical: 10 }}
         >
           <View style={{ flexDirection: "row", flexShrink: 0 }} onLayout={onDials}>
-            {threats.map((threat) => (
-              <ThreatRing
-                key={threat.seat}
-                threat={threat}
-                label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
-                accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
-                active={threats.length > 1 && threat.seat === seat}
-                compact
-                ticks={ticks}
-                ring={ringSeat === threat.seat ? ringWords : null}
-                onPress={() => onThreat(threat.seat)}
-              />
-            ))}
+            {threats.map((threat) => {
+              const dial = seatDial(threats.length, acting, viewed, threat.seat);
+              return (
+                <ThreatRing
+                  key={threat.seat}
+                  threat={threat}
+                  label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
+                  accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
+                  role={dial.role}
+                  hint={dial.hint}
+                  compact
+                  ticks={ticks}
+                  ring={ringSeat === threat.seat ? ringWords : null}
+                  onPress={() => onThreat(threat.seat)}
+                />
+              );
+            })}
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
           </View>

@@ -7,9 +7,11 @@ import { BlurMask, Circle, Group, Line, RoundedRect, Text, vec } from "@shopify/
 import { RADIUS, withAlpha, type Fonts } from "./canvas-pieces.native.tsx";
 import { cardFrame, halo } from "./frame.ts";
 import type { CardSlot, Rect } from "./layout.ts";
+import { SHAPE } from "./motion-tokens.ts";
 import { tableTokens as t } from "./tokens.ts";
 
 const dim = withAlpha(t.night, 0.45);
+const peekVeil = withAlpha(t.night, SHAPE.peekVeil);
 const glow = withAlpha(t.gold, 0.9);
 
 /**
@@ -31,15 +33,17 @@ export function Glow({ slot, picked }: { slot: CardSlot; picked: boolean }) {
 /**
  * The marks in the card's shape, on its unturned rectangle, drawn in its turned group: a solid gold edge on a card a tap
  * does something with, a thicker one on a picked card, a night veil over a card the open pick does not ask about, and the
- * bone ring while the banner's current beat names the card.
+ * bone ring while the banner's current beat names the card. `veiled` is the hand of the seat being peeked at: a lighter, fixed
+ * night over every card of it (phase 26), under which nothing glows because nothing is marked.
  */
-export function CardMarks({ slot, tappable, picked, dimmed, beat }: { slot: CardSlot; tappable: boolean; picked: number; dimmed: boolean; beat: boolean }) {
+export function CardMarks({ slot, tappable, picked, dimmed, beat, veiled = false }: { slot: CardSlot; tappable: boolean; picked: number; dimmed: boolean; beat: boolean; veiled?: boolean }) {
   const { cx, cy, w, h } = cardFrame(slot);
   const x = cx - w / 2;
   const y = cy - h / 2;
   return (
     <Group>
       {dimmed ? <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={dim} /> : null}
+      {veiled && !dimmed ? <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={peekVeil} /> : null}
       {!dimmed && picked === 0 && tappable ? <RoundedRect x={x + 1.25} y={y + 1.25} width={w - 2.5} height={h - 2.5} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2.5} /> : null}
       {!dimmed && picked > 0 ? <RoundedRect x={x - 1} y={y - 1} width={w + 2} height={h + 2} r={RADIUS + 1} color={t.gold} style="stroke" strokeWidth={3} /> : null}
       {beat ? <RoundedRect x={x - 2} y={y - 2} width={w + 4} height={h + 4} r={RADIUS + 2} color={t.bone} style="stroke" strokeWidth={2} /> : null}

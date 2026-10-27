@@ -130,6 +130,11 @@ export const MOTION = {
   scrubSpread: tween(220, "outCubic"),
   scrubLift: tween(120, "outCubic"),
   scrubFall: tween(180, "inCubic"),
+  // The peek at the other seat (phase 26): the seat's zones (hand, play area, engaged enemies, deck and discard pile) slide out to
+  // one side over `peekLeave` while the other seat's slide in from the other side over `peekSlide`, together; going back is the
+  // same two in the opposite direction. The way in decelerates and the way out accelerates.
+  peekSlide: tween(250, "outCubic"),
+  peekLeave: tween(250, "inCubic"),
 } as const;
 
 /** The six beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
@@ -198,6 +203,9 @@ export const SHAPE = {
   scrubLiftScale: 1.25,
   scrubLiftRise: 0.35,
   scrubNight: 0.35,
+  // The peek: the seat's zones slide this share of the canvas's width, and the peeked hand carries a night veil of this opacity.
+  peekShift: 0.2,
+  peekVeil: 0.3,
 } as const;
 
 /** The curve of the dock's armed bar: it runs down the whole second-tap window, which is a timer and not a token. */

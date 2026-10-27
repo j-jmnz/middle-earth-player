@@ -14,13 +14,14 @@ import { tableSettings, toggleAlways } from "./table-settings.ts";
 import type { Moment } from "./outcome.ts";
 import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
-import { onTableFor, shownSeat } from "./selectors.ts";
+import { actingSeat, onTableFor } from "./selectors.ts";
 import { dropOutcome, targetFromKey } from "./selection.ts";
 import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
 import { dockExtras } from "./dock-extras.ts";
+import { usePeeking } from "./use-peek.ts";
 import { useStable } from "./use-stable.ts";
-import { highlightKeys, highlightOf, playedCard } from "./highlight-of.ts";
-import { tapRoute, trayOpen } from "./tray-logic.ts";
+import { fightOf, highlightKeys, highlightOf, playedCard } from "./highlight-of.ts";
+import { tapAction, tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
@@ -98,7 +99,8 @@ export function useTableChoice({
   const [folded, setFolded] = useState<string | null>(null);
   // The sheet the player asked to see listed on paper.
   const [listed, setListed] = useState<string | null>(null);
-  const seat = shownSeat(game);
+  // Everything here picks, pays or answers for the acting seat; a peek at the other seat (peek.ts) changes only what is drawn.
+  const acting = actingSeat(game);
   const settings = useStore(tableSettings, (state) => state.settings);
   // The outcome banner of the last moment worth showing, and the round's summary after it (table-hooks.ts).
   const { banner, bannerKey, beatKey, onBeat } = useBanner(store, ctx, names);
@@ -107,7 +109,9 @@ export function useTableChoice({
   const live = overlay && overlay.game === game ? overlay : null;
   const sheet = live?.sheet ?? base;
   const table: TapContext = useMemo(() => ({ game, ctx, legal, names }), [game, ctx, legal, names]);
-  const onTable = useMemo(() => onTableFor(game, seat), [game, seat]);
+  const onTable = useMemo(() => onTableFor(game, acting), [game, acting]);
+  // A moment that is not this one (a new sheet key) ends a peek; while it lasts a tap on a card only previews it.
+  const peeking = usePeeking(store, sheet.key);
   // On paper: when the player asked, when a screen reader is on (a card drawn only on the canvas is no control for it), or
   // when the choices are not cards drawn whole on the table. The action window itself stays on the table.
   const asked = (live?.panel ?? false) || listed === sheet.key || (reader && sheet.kind !== "window" && sheet.kind !== "outcome" && tappable(sheet).size > 0);
@@ -129,15 +133,11 @@ export function useTableChoice({
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)
   // does not draw the table again (docs/architecture.md, State). Card ids carry no commas.
-  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow } = highlightKeys({ game, seat, sheet, choice, panel, beatKey });
+  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow } = highlightKeys({ game, seat: acting, sheet, choice, panel, beatKey });
   const highlight = useMemo((): TableHighlight => highlightOf({ glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow }), [glow, pickedKey, share, dim, markKey, mutedKey, beatNow]);
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";
-  const fight = useMemo((): LayoutOptions["preview"] => {
-    if (fightKey === "") return null;
-    const [enemyId = "", kind = "defense", ids = ""] = fightKey.split(":");
-    return { enemyId, kind: kind as NonNullable<LayoutOptions["preview"]>["kind"], ids: ids.split(",") };
-  }, [fightKey]);
+  const fight = useMemo(() => fightOf(fightKey), [fightKey]);
   // The hand card being played rises whole above the bottom edge.
   const raised = live ? playedCard(live.sheet) : null;
   const baseHeader = headerOf(sheet, game);
@@ -229,12 +229,12 @@ export function useTableChoice({
   // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
   const onTap = useCallback(
     (cardId: string) => {
-      const route = tapRoute({ panelOpen, reader, cardId });
-      if (route === "fold") setFolded(sheet.key);
-      else if (route === "pile") onPile(cardId.slice(5));
-      else if (!pick(cardId) && game.cards[cardId]?.face !== "down") onPreview(cardId);
+      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: game.cards[cardId]?.face === "down" }, pick);
+      if (action === "fold") setFolded(sheet.key);
+      else if (action === "pile") onPile(cardId.slice(5));
+      else if (action === "preview") onPreview(cardId);
     },
-    [panelOpen, reader, sheet.key, pick, onPile, onPreview, game],
+    [panelOpen, reader, peeking, sheet.key, pick, onPile, onPreview, game],
   );
   const onTile = useCallback((id: string) => void pick(id), [pick]);
   const tapOnTable = useStable(onTap);

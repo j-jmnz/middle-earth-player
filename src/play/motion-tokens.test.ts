@@ -150,3 +150,24 @@ describe("the hand scrub's tokens (phase 25)", () => {
     expect(SHAPE.scrubNight).toBeLessThan(SHAPE.spotlightNight);
   });
 });
+
+describe("the peek's tokens (phase 26)", () => {
+  it("slide the seat's zones in over 250 ms with an ease-out cubic and out over 250 ms with an ease-in cubic", () => {
+    expect(MOTION.peekSlide).toEqual({ ms: 250, easing: "outCubic" });
+    expect(MOTION.peekLeave).toEqual({ ms: 250, easing: "inCubic" });
+    for (const token of [MOTION.peekSlide, MOTION.peekLeave]) expect(token.ms).toBeLessThanOrEqual(MAX_TOKEN_MS);
+  });
+
+  it("scale to 0.6 at Quick and to nothing under reduced motion", () => {
+    expect(ms(MOTION.peekSlide, motionScale("quick", false))).toBe(150);
+    expect(ms(MOTION.peekLeave, motionScale("quick", false))).toBe(150);
+    expect(ms(MOTION.peekSlide, motionScale("normal", true))).toBe(0);
+    expect(ms(MOTION.peekLeave, motionScale("quick", true))).toBe(0);
+  });
+
+  it("keep the peek's shapes: a fifth of the canvas's width, a 30% night veil on the hand (lighter than the scrub's 35%)", () => {
+    expect(SHAPE.peekShift).toBe(0.2);
+    expect(SHAPE.peekVeil).toBe(0.3);
+    expect(SHAPE.peekVeil).toBeLessThan(SHAPE.scrubNight);
+  });
+});

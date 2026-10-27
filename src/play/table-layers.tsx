@@ -2,12 +2,14 @@
 // pile, the log, the threat panel, the table settings; reading-panels.tsx) and the phase carousel, with the hit layers that close
 // them on a tap outside. The table view hands them the numbers; they send no intent. One reading layer at a time (reading.ts):
 // a new one replaces the last.
-//   - The tray folds on a tap on the canvas (use-table-choice.ts, onTap), on the top bar except its menu button, or on the empty
+//   - The tray folds on a tap on the canvas (use-table-choice.ts, onTap), on the top bar except its menu button and its dials, or on the empty
 //     part of the command column above the dock. That tap is swallowed.
 //   - A reading panel and the carousel have a scrim from the top bar's foot down: a tap anywhere else closes it and does nothing
 //     more. The top bar stays live, so a dial or the rail replaces the layer.
 //   - The carousel hangs over the canvas only, and the tray stays in the command column; neither covers the dock's armed line or buttons.
 //   - While the combat spotlight plays, its scrim (spotlight-scrim.tsx) is over the top bar and the dock, above all of these.
+//   - The peek banner (peek-banner.tsx) is the lowest of them, over the canvas only: the scrims and panels sit above it, and the spotlight's
+//     scrim (the bar and the dock column) never covers it.
 import { useEffect, useMemo } from "react";
 import { Pressable, Text } from "react-native";
 import { useStore } from "zustand";
@@ -16,18 +18,21 @@ import { ChoiceTray } from "./choice-tray.tsx";
 import type { Carousel } from "./carousel.ts";
 import { threatRows, threatVerdict } from "./foresight.ts";
 import { logLines, type LogNames } from "./log.ts";
+import { useDialsEdge } from "./bar-edge.ts";
+import { PEEK_TOP, PeekBanner } from "./peek-banner.tsx";
 import { PhaseCarousel } from "./phase-carousel.tsx";
 import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
 import { LogPanel, PileList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
 import { useScreenReader } from "./screen-reader.ts";
-import { PILE_WORDS, shownSeat } from "./selectors.ts";
+import { PILE_WORDS } from "./selectors.ts";
 import type { SheetNames } from "./sheet-types.ts";
 import { SpotlightScrim } from "./spotlight-scrim.tsx";
 import type { ReduceContext, TableStore } from "./store.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
+import { usePeek } from "./use-peek.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
 import { BAR_PAD, MENU_BUTTON } from "./top-bar-layout.ts";
 import { DENSE_BELOW } from "./dock-budget.ts";
@@ -81,7 +86,10 @@ export function TableLayers({
   const game = useStore(store, (state) => state.game);
   const roundSteps = useStore(store, (state) => state.roundSteps);
   const reader = useScreenReader();
-  const seat = shownSeat(game);
+  // The discard pile list is the shown seat's; the banner over the canvas says when that is not the acting seat's (peek.ts).
+  const peek = usePeek(store);
+  const dialsEdge = useDialsEdge();
+  const seat = peek.shown;
   const close = () => onReading(null);
   // A spotlight plays over the table, so a reading layer (the carousel, a panel) closes as one begins instead of hiding it.
   const spotlit = useSpotlightHold(store);
@@ -103,13 +111,14 @@ export function TableLayers({
   const lines = useMemo(() => (logging ? logLines(roundSteps, logNames) : []), [logging, roundSteps, logNames]);
   return (
     <>
+      {peek.words ? <PeekBanner words={peek.words} top={barBottom + PEEK_TOP} left={insets.left} width={canvas} onBack={peek.back} /> : null}
       {/* The phase title crosses the canvas center; taps pass through it. */}
       <PhaseSweep store={store} area={{ left: insets.left, top: barBottom, width: canvas, height: screen.height - barBottom }} />
-      {/* A tap outside the open tray, away from the canvas (which folds it itself): the top bar but its menu button, and the empty
-          part of the command column above the dock. A screen reader leaves the tray open. */}
+      {/* A tap outside the open tray, away from the canvas (which folds it itself): the top bar but its menu button and its dials (a dial
+          cannot pick: the table view folds the tray on its tap and then peeks), and the empty part of the command column above the dock. A screen reader leaves the tray open. */}
       {outsideLayers({ trayShown, reading: reading != null, reader }) ? (
         <>
-          <Pressable testID="tray-outside-bar" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: 0, left: 0, right: insets.right + MENU_ZONE, height: barBottom }} />
+          <Pressable testID="tray-outside-bar" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: 0, left: insets.left + dialsEdge, right: insets.right + MENU_ZONE, height: barBottom }} />
           <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: anchor - barBottom }} />
         </>
       ) : null}

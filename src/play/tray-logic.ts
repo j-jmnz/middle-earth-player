@@ -70,11 +70,27 @@ export function trayOpen(onPaper: boolean, foldedKey: string | null, sheetKey: s
 /**
  * Where a tap on the canvas (or a drop) goes while the choice is on paper: with the tray open it folds it and goes no further, so
  * it picks nothing, opens no pile and sends no intent; with a screen reader on (the tray is the default and every choice stays a
- * control) or no tray open it is routed as usual: a pile's list, or a pick for the open moment.
+ * control) or no tray open it is routed as usual: a pile's list, or a pick for the open moment. While the table peeks at the other
+ * seat a card is never picked: it only opens its preview (`peeking`).
  */
-export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: string }): "fold" | "pile" | "pick" {
+export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking?: boolean }): "fold" | "pile" | "preview" | "pick" {
   if (state.panelOpen && !state.reader) return "fold";
-  return state.cardId.startsWith("pile:") ? "pile" : "pick";
+  if (state.cardId.startsWith("pile:")) return "pile";
+  return state.peeking ? "preview" : "pick";
+}
+
+/**
+ * What a tap on the canvas does, from its route and, for a pick, whether the table took it (`pick` is the hook's: it picks, or opens
+ * the question the card leads to, and says whether it did). While the table peeks at the other seat a card is never picked: `pick` is
+ * not called and the card only opens its preview (a face-down card shows nothing).
+ */
+export type TapAction = "fold" | "pile" | "picked" | "preview" | "none";
+
+export function tapAction(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking: boolean; faceDown: boolean }, pick: (cardId: string) => boolean): TapAction {
+  const route = tapRoute(state);
+  if (route === "fold" || route === "pile") return route;
+  if (route === "pick" && pick(state.cardId)) return "picked";
+  return state.faceDown ? "none" : "preview";
 }
 
 /** The hit layers over the top bar and the command column that fold the open tray: only while it shows, and no reading layer or screen reader is up. */

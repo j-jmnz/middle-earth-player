@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { backStep, type BackLayers } from "./back.ts";
 
-const none: BackLayers = { spotlightOpen: false, scrubOpen: false, menuOpen: false, moreOpen: false, linesOpen: false, previewOpen: false, readingOpen: false, overlayOpen: false, panelOpen: false };
-const all: BackLayers = { spotlightOpen: false, scrubOpen: false, menuOpen: true, moreOpen: true, linesOpen: false, previewOpen: true, readingOpen: true, overlayOpen: true, panelOpen: true };
+const none: BackLayers = { spotlightOpen: false, scrubOpen: false, peekOpen: false, menuOpen: false, moreOpen: false, linesOpen: false, previewOpen: false, readingOpen: false, overlayOpen: false, panelOpen: false };
+const all: BackLayers = { spotlightOpen: false, scrubOpen: false, peekOpen: false, menuOpen: true, moreOpen: true, linesOpen: false, previewOpen: true, readingOpen: true, overlayOpen: true, panelOpen: true };
 
 describe("hardware Back on the table", () => {
   it("cancels an open hand scrub after skipping a spotlight and before any layer", () => {
@@ -11,6 +11,18 @@ describe("hardware Back on the table", () => {
     expect(backStep({ ...none, scrubOpen: true })).toBe("cancelScrub");
     expect(backStep({ ...all, scrubOpen: true, spotlightOpen: true })).toBe("skipSpotlight");
     expect(backStep({ ...all, scrubOpen: false })).toBe("closeMenu");
+  });
+
+  it("ends a peek at the other seat third: after a spotlight and a hand scrub, before every other layer", () => {
+    expect(backStep({ ...none, peekOpen: true })).toBe("endPeek");
+    expect(backStep({ ...all, peekOpen: true })).toBe("endPeek");
+    expect(backStep({ ...all, peekOpen: true, scrubOpen: true })).toBe("cancelScrub");
+    expect(backStep({ ...all, peekOpen: true, spotlightOpen: true })).toBe("skipSpotlight");
+    expect(backStep({ ...all, peekOpen: true, scrubOpen: true, spotlightOpen: true })).toBe("skipSpotlight");
+    // Ending the peek is one press: the next one peels the layers under it.
+    expect(backStep({ ...all, peekOpen: false })).toBe("closeMenu");
+    expect(backStep({ ...none, peekOpen: true, panelOpen: true, previewOpen: true })).toBe("endPeek");
+    expect(backStep({ ...none, panelOpen: true })).toBe("foldPanel");
   });
 
   it("skips a combat spotlight that is playing before it peels any layer, then goes on as before", () => {

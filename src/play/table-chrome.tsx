@@ -11,6 +11,7 @@ import type { IconName } from "./icon-map.ts";
 import type { LogMark } from "./log.ts";
 import { layoutAnim, springConfig, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
+import { dialName, type DialRole } from "./peek.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
 import { tableTokens as t, withAlphaHex } from "./tokens.ts";
@@ -39,7 +40,8 @@ export function ThreatRing({
   icon = "threat",
   compact = false,
   accessibilityName,
-  active = false,
+  role = null,
+  hint = null,
   elimination = true,
   ticks = [],
   ring = null,
@@ -52,19 +54,23 @@ export function ThreatRing({
   compact?: boolean;
   // What a screen reader says for a short label ("P1" reads "Player 1 threat").
   accessibilityName?: string;
-  // The seat the table shows in two-handed play: its label is gold.
-  active?: boolean;
+  // How the dial reads in two-handed play (peek.ts, `seatDial`). "acting", the seat the engine is asking: a gold label, and the dial pulses
+  // when the engine turns to it. "viewing", the seat the player is peeking at, which is not the acting one: a bone ring round the dial
+  // and a small eye mark. Both are in the screen reader's name. null: neither, and every dial of a solo game.
+  role?: DialRole;
+  // What a tap does when it is not the threat panel ("Shows Player 2's cards"); null keeps the panel's hint.
+  hint?: string | null;
   elimination?: boolean;
   // The engagement costs of the enemies in staging, marked on the meter (rr.engagement-check): those the threat has reached
   // engage at the checks.
   ticks?: readonly number[];
   // The seat that holds the Ring-bearer facedown: a small Ring mark beside its label, and these words in its accessibility label.
   ring?: string | null;
-  // A tap opens the threat panel (each enemy's cost against the threat).
+  // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} active={active} elimination={elimination} ticks={ticks} ring={ring} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
@@ -86,7 +92,8 @@ function ThreatDial({
   id,
   icon,
   name,
-  active,
+  role,
+  hint,
   elimination,
   ticks,
   ring,
@@ -97,7 +104,8 @@ function ThreatDial({
   id: string;
   icon: IconName | null;
   name: string;
-  active: boolean;
+  role: DialRole;
+  hint: string | null;
   elimination: boolean;
   ticks: readonly number[];
   ring: string | null;
@@ -119,6 +127,7 @@ function ThreatDial({
     if (speed > 0) scale.set(withSequence(withTiming(SHAPE.dialPop, timing(MOTION.dialPopRise, speed)), withSpring(1, springConfig(MOTION.dialPopSettle, speed))));
   }, [threat.threat, speed, scale]);
   // The seat that is asked turns active in two-handed play: its dial pulses once in a gold ring (1 to 1.12 and back).
+  const active = role === "acting";
   const wasActive = useRef(active);
   const pulse = useSharedValue(0);
   useEffect(() => {
@@ -140,7 +149,7 @@ function ThreatDial({
   const engaging = ticks.filter((cost) => cost <= threat.threat).length;
   const tickWords = ticks.length === 0 ? "" : ticks.length === 1 ? `, the enemy in staging ${engaging === 1 ? "engages" : "does not engage"} at this threat` : `, ${engaging} of the ${ticks.length} enemies in staging engage at this threat`;
   // The dial is one control with one name (the change badge's words included), so Android gives it one focus stop.
-  const dialWords = `${name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const dialWords = `${role ? `${dialName(name, role)},` : name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
       disabled={!onPress}
@@ -148,7 +157,7 @@ function ThreatDial({
       accessible
       accessibilityRole={onPress ? "button" : undefined}
       accessibilityLabel={dialWords}
-      accessibilityHint={onPress ? "Shows each enemy's engagement cost against your threat" : undefined}
+      accessibilityHint={onPress ? (hint ?? "Shows each enemy's engagement cost against your threat") : undefined}
       style={({ pressed }) => ({ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 4, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
     >
       <Animated.View style={pop}>
@@ -172,10 +181,17 @@ function ThreatDial({
           ) : null}
         </View>
         <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2, borderColor: t.gold }, ringStyle]} />
+        {/* Peeking at this seat: a bone ring just outside the dial and an eye on its corner, clear of the label and its Ring mark. */}
+        {role === "viewing" ? (
+          <>
+            <View testID={`${id}-viewing`} pointerEvents="none" style={{ position: "absolute", top: -2, left: -3, right: -3, bottom: -2, borderRadius: 999, borderWidth: 1.5, borderColor: t.bone }} />
+            <EyeMark testID={`${id}-eye`} />
+          </>
+        ) : null}
       </Animated.View>
       <View className="items-start gap-0.5">
         <View className="flex-row items-center gap-1">
-          <Text className={`text-label ${active ? "text-gold" : "text-muted"}`}>{label}</Text>
+          <Text className={`text-label ${role === "acting" ? "text-gold" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>
           {ring ? (
             <View testID={`${id}-ring`}>
               <GameIcon name="oneRing" size={12} tint="gold" />
@@ -196,6 +212,17 @@ function ThreatDial({
         ) : null}
       </View>
     </Pressable>
+  );
+}
+
+/** The mark of the seat being peeked at, drawn from views so it is crisp at any size: an almond outline with its pupil, on a night dot. */
+function EyeMark({ testID }: { testID: string }) {
+  return (
+    <View testID={testID} pointerEvents="none" style={{ position: "absolute", top: -2, right: -3, width: 16, height: 16, borderRadius: 8, backgroundColor: t.night, borderWidth: 1, borderColor: t.bone, alignItems: "center", justifyContent: "center" }}>
+      <View style={{ width: 11, height: 6.5, borderRadius: 6, borderWidth: 1.25, borderColor: t.bone, alignItems: "center", justifyContent: "center" }}>
+        <View style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: t.bone }} />
+      </View>
+    </View>
   );
 }
 
