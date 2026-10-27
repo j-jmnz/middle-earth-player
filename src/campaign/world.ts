@@ -48,9 +48,9 @@ export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effec
   return [...codes];
 }
 
-// The codes a log names: its heroes, its fallen heroes, and the cards of its pool.
+// The codes a log names: its heroes, its fallen heroes, the cards of its pool and the cards it takes in from another campaign.
 export function logCodes(log: CampaignLog): string[] {
-  return [...log.heroesBySeat.flat(), ...log.fallenHeroesBySeat.flat(), ...log.campaignPool.map((card) => card.code), ...log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : []))];
+  return [...log.heroesBySeat.flat(), ...log.fallenHeroesBySeat.flat(), ...log.campaignPool.map((card) => card.code), ...log.carryIn.map((card) => card.code), ...log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : []))];
 }
 
 export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], rows: readonly CatalogRow[]): World {
