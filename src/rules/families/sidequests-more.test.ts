@@ -116,7 +116,7 @@ describe("the Lórien gifts' Actions (142015 to 142018)", () => {
     const before = modifiedStat(wolf.state, wolf.state.cards[wolf.id]!, "attack", ctx.cards);
     const state = trigger(wolf.state, made.id, "142015:action:1", ctx);
     expect(state.victory).toContain(made.id);
-    expect(state.removedFromPool).toEqual(["142015"]);
+    expect(state.removedFromPool).toEqual([{ code: "142015", seat: 0 }]);
     expect(modifiedStat(state, state.cards[wolf.id]!, "attack", ctx.cards)).toBe(Math.max(0, before - 4));
   });
 
@@ -127,7 +127,7 @@ describe("the Lórien gifts' Actions (142015 to 142018)", () => {
     state = trigger(state, made.id, "142016:action:1", ctx);
     expect(state.seats.map((entry) => entry.threat)).toEqual([17, 17]);
     expect(state.seats.map((entry) => entry.hand.length)).toEqual([3, 3]);
-    expect(state.removedFromPool).toEqual(["142016"]);
+    expect(state.removedFromPool).toEqual([{ code: "142016", seat: 0 }]);
   });
 
   it("Lórien Rope: each location in the staging area gets -2 Threat until the end of the phase (142017:A:2)", () => {

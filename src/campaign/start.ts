@@ -1,6 +1,6 @@
 import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
 import { burdenCodes, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
-import type { CampaignFacts } from "../rules/state.ts";
+import type { CampaignFacts } from "../rules/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup.ts";
 
 // Campaign Mode, or the scenario played as a standalone adventure (mec109.campaign-mode: "players can still play the

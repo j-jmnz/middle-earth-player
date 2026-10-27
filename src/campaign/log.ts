@@ -1,6 +1,6 @@
 // Rules: ltp.campaign-log, rr.campaign-log, ltp.campaign-pool, rr.campaign-pool, ltp.fellowship-of-heroes
 // (data/rules/entries.json). The log is what a won scenario writes and the next scenario's checklist reads.
-import { resolutionResult } from "../rules/resolution.ts";
+import { holdsCopy, resolutionResult } from "../rules/resolution.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
@@ -8,7 +8,14 @@ import { scoreOf, type ScenarioScore } from "./score.ts";
 
 // A boon or burden the players have earned. `back` says which deck it joins; `attachedTo` is the hero (a code) a
 // Permanent card is stuck to, recorded in the Notes of the paper log.
-export type PoolCard = { code: string; back: "player" | "encounter"; burdenSet: string | null; attachedTo: string | null; seat: number | null };
+// `perPlayer` marks one copy of a code for each player ("each player earns 1 copy"): another seat's copy is another entry. Any other
+// entry is the one copy of its code. In a finished campaign's carry-over it stands for a copy for each player of the next save.
+export type PoolCard = { code: string; back: "player" | "encounter"; burdenSet: string | null; attachedTo: string | null; seat: number | null; perPlayer?: boolean };
+
+// The one place a pool entry is built from a card's printed side.
+export function poolCard(printed: PrintedCard, code: string, attachedTo: string | null, seat: number | null, perPlayer = false): PoolCard {
+  return { code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo, seat, ...(perPlayer ? { perPlayer } : {}) };
+}
 
 export type CampaignLog = {
   heroesBySeat: readonly (readonly string[])[];
@@ -28,7 +35,7 @@ export type CampaignLog = {
   // The campaign's structured facts, in place of the notes the Mirkwood campaign cards ask for.
   // The hero the players named the prisoner (a hero code), or null.
   prisoner: string | null;
-  // Once-per-campaign uses ("Record in the Campaign Log when used"): the code of each card used, one entry per use.
+  // Once-per-campaign uses ("Record in the Campaign Log when used"): the code of each card used, one entry per use (two players may each use the same code).
   usedOnce: readonly string[];
   // Counters on a campaign card by its code, as the last won scenario left them.
   counters: Readonly<Record<string, number>>;
@@ -88,28 +95,21 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   const fallenHeroesBySeat = heroesBySeat.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]);
   const fallen = new Set(fallenHeroesBySeat.flat());
   // A card the game removed from the campaign pool ("add it to the victory display and remove it from the campaign pool") is gone:
-  // one pool entry for each time it was removed, since the pool can hold several copies of a code.
-  const removals = new Map<string, number>();
-  for (const code of state.removedFromPool ?? []) removals.set(code, (removals.get(code) ?? 0) + 1);
-  const pool: PoolCard[] = log.campaignPool.filter((card) => {
-    if (card.attachedTo != null && fallen.has(card.attachedTo)) return false;
-    const left = removals.get(card.code) ?? 0;
-    if (left === 0) return true;
-    removals.set(card.code, left - 1);
-    return false;
-  });
+  // one pool entry for each removal, the player's own copy when the game says whose it was.
+  const pool: PoolCard[] = log.campaignPool.filter((card) => card.attachedTo == null || !fallen.has(card.attachedTo));
+  for (const removal of state.removedFromPool ?? []) {
+    const at = pool.findIndex((card) => card.code === removal.code && card.seat === removal.seat);
+    const any = at >= 0 ? at : pool.findIndex((card) => card.code === removal.code);
+    if (any >= 0) pool.splice(any, 1);
+  }
   for (const earned of result.earned) {
     const printed = printedOf(cards, earned.code);
     const attachedTo = earned.hero ?? (printed.keywords.permanent ? bearer : null);
-    // The same copy is not earned twice (code, seat and host); another player's copy of the code is another entry.
-    if (pool.some((card) => card.code === earned.code && card.seat === earned.seat && card.attachedTo === attachedTo)) continue;
+    if (holdsCopy(pool, { code: earned.code, seat: earned.seat, perPlayer: earned.perPlayer })) continue;
     if (attachedTo != null && fallen.has(attachedTo)) continue;
-    pool.push({ code: earned.code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo, seat: earned.seat });
+    pool.push(poolCard(printed, earned.code, attachedTo, earned.seat, earned.perPlayer));
   }
-  const carried: PoolCard[] = (result.carryOver ?? []).map((item) => {
-    const printed = printedOf(cards, item.code);
-    return { code: item.code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo: null, seat: item.seat };
-  });
+  const carried: PoolCard[] = (result.carryOver ?? []).map((item) => poolCard(printedOf(cards, item.code), item.code, null, item.seat, item.perPlayer));
   const scenario = scoreOf(state, cards);
   const scenarios = { ...log.scenarios, [scenarioId]: scenario };
   return {
@@ -123,8 +123,9 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     scenarios,
     score: Object.values(scenarios).reduce((sum, item) => sum + item.score, 0),
     notes: log.notes,
-    prisoner: result.prisoner !== undefined ? result.prisoner : (state.campaignFacts?.prisoner ?? log.prisoner),
-    usedOnce: [...new Set([...log.usedOnce, ...(state.campaignFacts?.usedOnce ?? [])])],
+    prisoner: result.prisoner !== undefined ? result.prisoner : state.campaignFacts ? state.campaignFacts.prisoner : log.prisoner,
+    // The game started from the log's uses and adds its own: its list is the whole record.
+    usedOnce: state.campaignFacts ? [...state.campaignFacts.usedOnce] : log.usedOnce,
     counters: { ...log.counters, ...(state.campaignFacts?.counters ?? {}), ...(result.counters ?? {}) },
     carryOver: [...log.carryOver, ...carried],
     carryIn: log.carryIn,

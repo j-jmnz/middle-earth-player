@@ -15,13 +15,13 @@ export const VERBS = [
   // Campaign Setup: the first player chooses a hero and the card is attached to it ("Attach Appointed by Fate to a hero of the first
   // player's choice", 01131:A:2). The checklist asks for the choice as `<code>><hero>`, like a ChooseCards to a hero, but the
   // card is not added to the Campaign Pool.
-  z.strictObject({ verb: z.literal("AttachChosen"), code, ...when }),
+  z.strictObject({ verb: z.literal("AttachChosen"), code }),
   // Campaign Setup: each player adds a copy of the card to their hand after drawing their starting hand, including a mulligan
   // ("adds a copy of X to their hand after drawing their starting hand", 41051:A:2). It joins the hand once every player has chosen.
-  z.strictObject({ verb: z.literal("AddToHandAfterMulligan"), code, ...when }),
+  z.strictObject({ verb: z.literal("AddToHandAfterMulligan"), code }),
   // Campaign Setup: the card joins the Campaign Pool (a copy for each player when `eachPlayer`). The log keeps it when the scenario
   // is won; a lost scenario writes nothing.
-  z.strictObject({ verb: z.literal("AddToPool"), code, eachPlayer: z.boolean().optional(), ...when }),
+  z.strictObject({ verb: z.literal("AddToPool"), code, eachPlayer: z.boolean().optional() }),
   // Resolution: these cards go to the NEXT campaign, not this one ("add Mendor to the Campaign Pool ... during your next campaign",
   // 01131:B:2). `eachPlayer`: one copy for each player ("Each player may include 1 copy of Mendor's Support", Ranger Sense). A new
   // save takes them in from a finished one (campaign/carry-over.ts).

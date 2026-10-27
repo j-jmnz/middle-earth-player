@@ -13,7 +13,8 @@ import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
 import { handSetup, searchSetup } from "./setup-search.ts";
-import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type CampaignFacts, type ScenarioState } from "./state.ts";
+import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
+import type { CampaignFacts } from "./campaign-state.ts";
 import { placeCampaignCard } from "./families/burden-campaign.ts";
 import { cloneGame } from "./undo.ts";
 import { attachTo, moveCard, spawn } from "./zones.ts";

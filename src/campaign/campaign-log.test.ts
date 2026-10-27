@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { openResolution, resolutionResult } from "../rules/resolution.ts";
+import { spawn } from "../rules/zones.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
@@ -21,13 +22,14 @@ const MENDOR = "01135";
 const SUPPORT = "01132";
 const SENSE = "41049";
 const HERO = "141001";
+const RING_DRAWS_THEM = "141079";
 
 let world: World;
 let cards: Map<string, PrintedCard>;
 
 beforeAll(async () => {
   world = await loadWorld();
-  cards = new Map([...world.cards, ...(await loadPrinted([MENDOR, SUPPORT, SENSE, "41044", "141002"]))]);
+  cards = new Map([...world.cards, ...(await loadPrinted([MENDOR, SUPPORT, SENSE, "41044", "141002", RING_DRAWS_THEM]))]);
   world = { ...world, cards };
 });
 
@@ -60,12 +62,28 @@ describe("the pool holds several copies of one code", () => {
     expect(copies(again, SUPPORT)).toHaveLength(2);
   });
 
-  it("removing a card from the pool removes one copy for each time it was removed", () => {
-    const pool: PoolCard[] = [0, 1].map((seat) => ({ code: SUPPORT, back: "player", burdenSet: null, attachedTo: null, seat }));
-    const state = won([], 2, (s) => ({ ...s, removedFromPool: [SUPPORT] }));
-    expect(copies(applyResolution({ ...emptyLog(2), campaignPool: pool }, SCENARIO, state, cards), SUPPORT)).toHaveLength(1);
-    const both = won([], 2, (s) => ({ ...s, removedFromPool: [SUPPORT, SUPPORT] }));
+  it("The Ring Draws Them chosen in scenario 1 and earned again by Flight to the Ford's EarnAllBurdens is one pool entry", () => {
+    // Scenario 1's ChooseCards writes the card with the choosing seat; the Ford's Resolution earns every burden still in the encounter deck or discard, for nobody.
+    const first = won([], 1, (s) => ({ ...s, resolutionLog: { ...s.resolutionLog, earned: [{ code: RING_DRAWS_THEM, to: "pool", seat: 0, hero: null, step: 0 }] } }));
+    const afterOne = applyResolution(emptyLog(1), SCENARIO, first, cards);
+    expect(copies(afterOne, RING_DRAWS_THEM)).toHaveLength(1);
+    const ford = won([{ verb: "EarnAllBurdens" }], 1, (s) => spawn(s, RING_DRAWS_THEM, { zone: "encounterDiscard" }).state);
+    expect(resolutionResult(ford)?.earned.map((item) => [item.code, item.seat])).toEqual([[RING_DRAWS_THEM, null]]);
+    const afterFord = applyResolution(afterOne, "flight-to-the-ford", { ...ford, scenarioId: "flight-to-the-ford" }, cards);
+    expect(copies(afterFord, RING_DRAWS_THEM)).toHaveLength(1);
+  });
+
+  it("removing a card from the pool removes one entry for each time it was removed, the named player's copy first", () => {
+    const pool: PoolCard[] = [0, 1].map((seat) => ({ code: SUPPORT, back: "player", burdenSet: null, attachedTo: null, seat, perPlayer: true }));
+    const mine = won([], 2, (s) => ({ ...s, removedFromPool: [{ code: SUPPORT, seat: 1 }] }));
+    expect(copies(applyResolution({ ...emptyLog(2), campaignPool: pool }, SCENARIO, mine, cards), SUPPORT).map((card) => card.seat)).toEqual([0]);
+    const both = won([], 2, (s) => ({ ...s, removedFromPool: [{ code: SUPPORT, seat: 0 }, { code: SUPPORT, seat: 1 }] }));
     expect(copies(applyResolution({ ...emptyLog(2), campaignPool: pool }, SCENARIO, both, cards), SUPPORT)).toHaveLength(0);
+  });
+
+  it("an eliminated player still gets a copy: eachPlayer counts every seat", () => {
+    const state = won([{ verb: "Earn", codes: [SUPPORT], eachPlayer: true }], 2, (s) => ({ ...s, seats: [s.seats[0], { ...s.seats[1], eliminated: true }] as unknown as ScenarioState["seats"] }));
+    expect(resolutionResult(state)?.earned.map((item) => item.seat)).toEqual([0, 1]);
   });
 });
 
@@ -101,7 +119,8 @@ describe("carry-over to the next campaign", () => {
 
   it("a Resolution writes carryOver cards, one copy or one for each player, and a loss writes nothing", () => {
     const log = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards);
-    expect(log.carryOver.map((card) => [card.code, card.seat])).toEqual([[MENDOR, null], [SUPPORT, 0], [SUPPORT, 1]]);
+    // One entry for a copy for each player: the next save's seats decide how many.
+    expect(log.carryOver.map((card) => [card.code, card.seat, card.perPlayer ?? false])).toEqual([[MENDOR, null, false], [SUPPORT, null, true]]);
     expect(log.campaignPool).toEqual([]);
     const lost = applyResolution(emptyLog(2), SCENARIO, { ...won(resolution, 2), lost: true }, cards);
     expect(lost.carryOver).toEqual([]);
@@ -114,13 +133,14 @@ describe("carry-over to the next campaign", () => {
     const other = { ...done, id: "other", campaignId: "another" };
     const offers = carryOffers([done, open, empty, other], scenariosOf);
     expect(offers.map((offer) => offer.saveId)).toEqual(["done"]);
-    expect(offers[0]?.cards).toHaveLength(3);
+    expect(offers[0]?.cards).toHaveLength(2);
   });
 
   it("a new save takes the cards in, and its first checklist moves them into the pool and clears carryIn", () => {
     const finished = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards);
     const fresh = newSave("next", "mirkwood-paths", 2, finished.carryOver);
     expect(fresh.log.carryIn).toHaveLength(3);
+    expect(fresh.log.carryIn.map((card) => card.seat)).toEqual([null, 0, 1]);
     expect(fresh.log.campaignPool).toEqual([]);
     const plan = checklist({ log: fresh.log, scenario: loadScenario("passage-through-mirkwood"), seats: [{ heroes: [HERO], deck: [] }, { heroes: ["141002"], deck: [] }], effects: EFFECTS, cards });
     if (!plan.ok) throw new Error(plan.errors.join(" "));
@@ -131,6 +151,15 @@ describe("carry-over to the next campaign", () => {
     expect(plan.seats.map((seat) => seat.deck.filter((code) => code === SUPPORT).length)).toEqual([1, 1]);
     // Mendor is encounter-backed: without a record that puts him into play he is shuffled into the encounter deck.
     expect(plan.poolEncounterCards).toEqual([MENDOR]);
+  });
+
+  it("a copy for each player follows the new save's seats: two seats to one gives one copy, one to two gives each a copy", () => {
+    const twoSeats = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards);
+    const solo = newSave("solo", "mirkwood-paths", 1, twoSeats.carryOver);
+    expect(solo.log.carryIn.filter((card) => card.code === SUPPORT).map((card) => card.seat)).toEqual([0]);
+    const oneSeat = applyResolution(emptyLog(1), SCENARIO, won(resolution, 1), cards);
+    const pair = newSave("pair", "mirkwood-paths", 2, oneSeat.carryOver);
+    expect(pair.log.carryIn.filter((card) => card.code === SUPPORT).map((card) => card.seat)).toEqual([0, 1]);
   });
 
   it("the Dark of Mirkwood mini campaign and a plain new save start on a blank log", () => {

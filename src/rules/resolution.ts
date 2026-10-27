@@ -6,7 +6,8 @@ import { holds } from "./conditions.ts";
 import type { LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
-import { inPlay, livingSeats, type Earned, type ResolutionLog, type ScenarioState } from "./state.ts";
+import type { Earned, ResolutionLog } from "./campaign-state.ts";
+import { inPlay, livingSeats, type ScenarioState } from "./state.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
 // one seat at a time, first player first; the rest settle on their own from the final state (Lust for the Ring
@@ -36,15 +37,23 @@ function stepOver(state: ScenarioState, log?: ResolutionLog): ScenarioState {
   return { ...state, resolutionAt: state.resolutionAt + 1, resolutionSeat: 0, ...(log ? { resolutionLog: log } : {}) };
 }
 
-// The pool holds several copies of one code ("each player earns 1 copy"): a copy is the same entry only when its code, its seat and
-// its hero are the same, so a card earned twice for nobody in particular is still earned once.
-export function earnedKey(item: Pick<Earned, "code" | "seat" | "hero">): string {
-  return `${item.code}\u0000${item.seat ?? ""}\u0000${item.hero ?? ""}`;
+// A copy of a code is one entry however often it is earned, whichever seat wrote it. Only "each player earns 1 copy" (perPlayer)
+// adds a copy for a seat that holds none: The Ring Draws Them chosen by seat 0 and then earned again from the encounter deck is
+// still one card.
+export function holdsCopy(entries: readonly Pick<Earned, "code" | "seat">[], item: Pick<Earned, "code" | "seat" | "perPlayer">): boolean {
+  return entries.some((have) => have.code === item.code && (!item.perPlayer || have.seat === item.seat));
 }
 
 function earn(state: ScenarioState, entries: readonly Earned[]): ResolutionLog {
-  const have = new Set(state.resolutionLog.earned.map(earnedKey));
-  return { ...state.resolutionLog, earned: [...state.resolutionLog.earned, ...entries.filter((item) => !have.has(earnedKey(item)))] };
+  const have = state.resolutionLog.earned;
+  return { ...state.resolutionLog, earned: [...have, ...entries.filter((item) => !holdsCopy(have, item))] };
+}
+
+// The entries one instruction hands out: one copy of each code, or one for each player at the table. An eliminated player is
+// still in the campaign, so every seat counts.
+function copiesOf(state: ScenarioState, codes: readonly string[], eachPlayer: boolean | undefined): Earned[] {
+  const seats = eachPlayer ? Array.from({ length: state.seatCount }, (_, seat) => seat) : [null];
+  return seats.flatMap((seat) => codes.map((code) => ({ code, to: "pool" as const, seat, hero: null, step: state.resolutionAt, ...(eachPlayer ? { perPlayer: true } : {}) })));
 }
 
 // Every burden in play or still in the encounter deck or discard pile: the cards the players could meet again.
@@ -66,15 +75,12 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       continue;
     }
     switch (instruction.verb) {
-      case "Earn": {
-        const seats = instruction.eachPlayer ? livingSeats(next) : [null];
-        next = stepOver(next, earn(next, seats.flatMap((seat) => instruction.codes.map((code) => ({ code, to: "pool" as const, seat, hero: null, step: next.resolutionAt })))));
+      case "Earn":
+        next = stepOver(next, earn(next, copiesOf(next, instruction.codes, instruction.eachPlayer)));
         break;
-      }
       case "CarryOver": {
-        // The next campaign's cards, one copy each or one for each living player; no dedupe, the copies are the point.
-        const seats = instruction.eachPlayer ? livingSeats(next) : [null];
-        const carried = seats.flatMap((seat) => instruction.codes.map((code) => ({ code, to: "pool" as const, seat, hero: null, step: next.resolutionAt })));
+        // The next campaign's cards, one copy each or one for each player (the new save's seats decide how many); no dedupe.
+        const carried = instruction.eachPlayer ? instruction.codes.map((code) => ({ code, to: "pool" as const, seat: null, hero: null, step: next.resolutionAt, perPlayer: true })) : copiesOf(next, instruction.codes, false);
         next = stepOver(next, { ...next.resolutionLog, carryOver: [...(next.resolutionLog.carryOver ?? []), ...carried] });
         break;
       }

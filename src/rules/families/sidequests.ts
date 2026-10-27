@@ -31,8 +31,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "TakeRevealedCard":
       return takeRevealed(state, instruction, focus);
     case "RemoveFromCampaignPool": {
-      const code = focus.sourceId ? state.cards[focus.sourceId]?.code : undefined;
-      return code ? { ...state, removedFromPool: [...(state.removedFromPool ?? []), code] } : state;
+      const card = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+      return card ? { ...state, removedFromPool: [...(state.removedFromPool ?? []), { code: card.code, seat: card.controller ?? card.owner ?? focus.seat }] } : state;
     }
     default:
       return null;

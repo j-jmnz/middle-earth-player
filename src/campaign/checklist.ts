@@ -5,7 +5,7 @@ import { recordInstructions, type ScenarioData } from "../catalog/scenario-data.
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { StartSeat } from "../rules/setup.ts";
 
-import type { CampaignLog, PoolCard } from "./log.ts";
+import { poolCard, type CampaignLog, type PoolCard } from "./log.ts";
 
 // The Campaign Setup Checklist as numbered steps. Each step names the rule it follows and says what it did, so the
 // briefing screen (phase 10) and a test can show the same eight lines. The answers to the campaign card's own Setup
@@ -42,93 +42,94 @@ const TEXT: Readonly<Record<number, string>> = {
 };
 
 
-function poolCard(printed: PrintedCard, code: string, attachedTo: string | null, seat: number | null): PoolCard {
-  return { code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo, seat };
+// What the campaign card's Setup does at step 6: the answers it takes, and what it did, asked and refused.
+type Dealing = { did: string[]; errors: string[]; needs: Need | null };
+// What a verb works on: the seats, the pool, the answers still unused and the names.
+type Table = { input: ChecklistInput; seats: Working[]; pool: PoolCard[]; fresh: Set<PoolCard>; answers: string[]; name: (code: string) => string; out: Dealing };
+
+// The next answer for `seat`, if it is one of `legal`. With none left the step needs one; a wrong one is an error.
+function takeAnswer(table: Table, legal: readonly string[], seat: number): string | null {
+  const answer = table.answers.shift();
+  if (answer == null) {
+    table.out.needs ??= { seat, options: legal };
+    return null;
+  }
+  if (!legal.includes(answer)) {
+    table.out.errors.push(`Seat ${seat + 1}: ${answer} is not one of ${legal.join(", ")}`);
+    return null;
+  }
+  return answer;
 }
 
-// Step 6: the choices the campaign card's Setup opens, answered in order, one seat at a time, and the Setup instructions that
-// deal a card to a player: AttachChosen (the first player's choice of hero), AddToHandAfterMulligan and AddToPool. The cards a
-// choice earns join the pool, a hand or a hero.
-function campaignChoices(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): { did: string[]; errors: string[]; needs: Need | null } {
-  const answers = [...(input.choices ?? [])];
-  const did: string[] = [];
-  const errors: string[] = [];
-  let needs: Need | null = null;
+// AttachChosen: the first player chooses any hero at the table, their own or another player's.
+function attachChosen(table: Table, instruction: Extract<Instruction, { verb: "AttachChosen" }>): void {
+  const owners = table.seats.flatMap((seat, index) => seat.heroes.map((hero) => ({ hero, seat: index })));
+  const answer = takeAnswer(table, owners.map((owner) => `${instruction.code}>${owner.hero}`), 0);
+  if (answer == null) return;
+  const host = owners.find((owner) => `${instruction.code}>${owner.hero}` === answer);
+  if (host) table.seats[host.seat]?.attachments.push({ host: host.hero, code: instruction.code });
+  table.out.did.push(`The first player attaches ${table.name(instruction.code)} to ${table.name(host?.hero ?? "")}.`);
+}
+
+function addToHandAfterMulligan(table: Table, instruction: Extract<Instruction, { verb: "AddToHandAfterMulligan" }>): void {
+  table.seats.forEach((seat, index) => {
+    seat.afterMulligan.push(instruction.code);
+    table.out.did.push(`Seat ${index + 1} adds ${table.name(instruction.code)} to their hand after the mulligan.`);
+  });
+}
+
+// AddToPool: recorded for the next scenario. This game already has the card (shuffled in or in a hand), so steps 7 and 8 leave it be.
+function addToPool(table: Table, instruction: Extract<Instruction, { verb: "AddToPool" }>): void {
+  const printed = printedOf(table.input.cards, instruction.code);
+  for (const seat of instruction.eachPlayer ? table.seats.map((_, index) => index) : [null]) {
+    const added = poolCard(printed, instruction.code, null, seat, instruction.eachPlayer === true);
+    table.pool.push(added);
+    table.fresh.add(added);
+  }
+  table.out.did.push(`${table.name(instruction.code)} joins the Campaign Pool${instruction.eachPlayer ? " (a copy for each player)" : ""}.`);
+}
+
+// ChooseCards: each seat in turn takes a card (the first player alone, or every player). The cards a choice earns join the pool, a
+// hand or a hero; only a Permanent card stays recorded on its hero (ltp.campaign-pool): another gift goes on the hero for this
+// scenario and is shuffled into a deck in later ones.
+function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "ChooseCards" }>): void {
+  const { seats, pool, name, input } = table;
   const order = seats.map((_, index) => index);
-  for (const instruction of campaignSetup) {
-    if (instruction.verb === "AttachChosen") {
-      // The first player chooses any hero at the table, their own or another player's.
-      const owners = seats.flatMap((seat, index) => seat.heroes.map((hero) => ({ hero, seat: index })));
-      const legal = owners.map((owner) => `${instruction.code}>${owner.hero}`);
-      const answer = answers.shift();
-      if (answer == null) {
-        needs ??= { seat: 0, options: legal };
-        continue;
-      }
-      if (!legal.includes(answer)) {
-        errors.push(`Seat 1: ${answer} is not one of ${legal.join(", ")}`);
-        continue;
-      }
-      const host = owners.find((owner) => `${instruction.code}>${owner.hero}` === answer);
-      if (host) seats[host.seat]?.attachments.push({ host: host.hero, code: instruction.code });
-      did.push(`The first player attaches ${name(instruction.code)} to ${name(host?.hero ?? "")}.`);
-      continue;
-    }
-    if (instruction.verb === "AddToHandAfterMulligan") {
-      seats.forEach((seat, index) => {
-        seat.afterMulligan.push(instruction.code);
-        did.push(`Seat ${index + 1} adds ${name(instruction.code)} to their hand after the mulligan.`);
-      });
-      continue;
-    }
-    if (instruction.verb === "AddToPool") {
-      const printed = printedOf(input.cards, instruction.code);
-      // Recorded for the next scenario: this game already has the card (shuffled in or in a hand), so steps 7 and 8 leave it be.
-      for (const seat of instruction.eachPlayer ? order : [null]) {
-        const added = poolCard(printed, instruction.code, null, seat);
-        pool.push(added);
-        fresh.add(added);
-      }
-      did.push(`${name(instruction.code)} joins the Campaign Pool${instruction.eachPlayer ? ` (a copy for each player)` : ""}.`);
-      continue;
-    }
-    if (instruction.verb !== "ChooseCards") continue;
-    const taken: string[] = [];
-    for (const seat of instruction.who === "firstPlayer" ? order.slice(0, 1) : order) {
-      const remaining = instruction.codes.filter((code) => !taken.includes(code));
-      const options = instruction.to === "hero" ? remaining.flatMap((code) => (seats[seat]?.heroes ?? []).map((hero) => `${code}>${hero}`)) : remaining;
-      const legal = instruction.optional ? [...options, "skip"] : options;
-      const answer = answers.shift();
-      if (answer == null) {
-        needs ??= { seat, options: legal };
-        continue;
-      }
-      if (!legal.includes(answer)) {
-        errors.push(`Seat ${seat + 1}: ${answer} is not one of ${legal.join(", ")}`);
-        continue;
-      }
-      if (answer === "skip") continue;
-      const [code = "", host] = answer.split(">");
-      taken.push(code);
-      const printed = printedOf(input.cards, code);
-      const hero = host ?? null;
-      if (instruction.to === "hero" && hero) seats[seat]?.attachments.push({ host: hero, code });
-      if (instruction.to === "hand") seats[seat]?.hand.push(code);
-      // Only a Permanent card stays recorded on its hero (ltp.campaign-pool); another gift goes on the hero for this
-      // scenario and is shuffled into a deck in later ones.
-      pool.push(poolCard(printed, code, printed.keywords.permanent ? hero : null, seat));
-      did.push(`Seat ${seat + 1} takes ${name(code)}${hero ? ` onto ${name(hero)}` : instruction.to === "hand" ? " into hand" : ""}.`);
-    }
-    if (instruction.leftover === "firstPlayerDeck") {
-      // The players earned every one of these cards, so the unchosen ones join the pool too, as the first player's:
-      // step 7 shuffles them into that deck.
-      for (const code of instruction.codes.filter((item) => !taken.includes(item))) {
-        pool.push(poolCard(printedOf(input.cards, code), code, null, 0));
-        did.push(`${name(code)} was not chosen: it is shuffled into the first player's deck.`);
-      }
+  const taken: string[] = [];
+  for (const seat of instruction.who === "firstPlayer" ? order.slice(0, 1) : order) {
+    const remaining = instruction.codes.filter((code) => !taken.includes(code));
+    const options = instruction.to === "hero" ? remaining.flatMap((code) => (seats[seat]?.heroes ?? []).map((hero) => `${code}>${hero}`)) : remaining;
+    const answer = takeAnswer(table, instruction.optional ? [...options, "skip"] : options, seat);
+    if (answer == null || answer === "skip") continue;
+    const [code = "", host] = answer.split(">");
+    taken.push(code);
+    const printed = printedOf(input.cards, code);
+    const hero = host ?? null;
+    if (instruction.to === "hero" && hero) seats[seat]?.attachments.push({ host: hero, code });
+    if (instruction.to === "hand") seats[seat]?.hand.push(code);
+    pool.push(poolCard(printed, code, printed.keywords.permanent ? hero : null, seat));
+    table.out.did.push(`Seat ${seat + 1} takes ${name(code)}${hero ? ` onto ${name(hero)}` : instruction.to === "hand" ? " into hand" : ""}.`);
+  }
+  if (instruction.leftover === "firstPlayerDeck") {
+    // The players earned every one of these cards, so the unchosen ones join the pool too, as the first player's: step 7 shuffles
+    // them into that deck.
+    for (const code of instruction.codes.filter((item) => !taken.includes(item))) {
+      pool.push(poolCard(printedOf(input.cards, code), code, null, 0));
+      table.out.did.push(`${name(code)} was not chosen: it is shuffled into the first player's deck.`);
     }
   }
-  return { did, errors, needs };
+}
+
+// Step 6: the campaign card's Setup instructions that deal a card to a player, in the order the card lists them.
+function campaignSetupSteps(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): Dealing {
+  const table: Table = { input, seats, pool, fresh, answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null } };
+  for (const instruction of campaignSetup) {
+    if (instruction.verb === "AttachChosen") attachChosen(table, instruction);
+    else if (instruction.verb === "AddToHandAfterMulligan") addToHandAfterMulligan(table, instruction);
+    else if (instruction.verb === "AddToPool") addToPool(table, instruction);
+    else if (instruction.verb === "ChooseCards") chooseCards(table, instruction);
+  }
+  return table.out;
 }
 
 // The pool card's own campaignSetup record puts it into play ("Put Mendor into play at the start of each scenario").
@@ -206,7 +207,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   note(5, did5.length > 0 ? did5 : ["No Permanent card is in the pool."]);
 
   // The campaign card's own Setup choices come before the pool is shuffled in, so the cards they earn join the same decks.
-  const six = campaignChoices(campaignSetup, input, seats, pool, fresh, name);
+  const six = campaignSetupSteps(campaignSetup, input, seats, pool, fresh, name);
   if (six.needs) return { ok: false, errors, needs: six.needs };
   errors.push(...six.errors);
   // A Permanent card already went on its hero in step 5 (it is not in a deck); the others with a Setup line are found
