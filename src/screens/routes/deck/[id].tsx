@@ -8,6 +8,7 @@ import {
   ActionBar,
   BodyText,
   Chip,
+  FloatingBarShade,
   Eyebrow,
   Label,
   ListRow,
@@ -151,6 +152,8 @@ export default function DeckEditor() {
   const preview = useListPreview();
   // The navigation Back, a swipe or Save as asked to finish while the deck has unsaved changes.
   const [leaving, setLeaving] = useState<(() => void) | null>(null);
+  // Past the heroes' paintings, a night bar shows behind Back so it never sits on a row.
+  const [past, setPast] = useState(false);
   const dirty = draftIsDirty(draft);
   const release = usePreventRemove(dirty, ({ repeat }) => setLeaving(() => repeat));
 
@@ -416,6 +419,11 @@ export default function DeckEditor() {
             viewabilityConfig={viewabilityConfig}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
+            scrollEventThrottle={64}
+            onScroll={(event) => {
+              const next = event.nativeEvent.contentOffset.y > BANNER_HEIGHT - 80;
+              if (next !== past) setPast(next);
+            }}
             ListHeaderComponent={header}
             renderItem={(info) => <View style={side}>{renderRow(info)}</View>}
           />
@@ -434,6 +442,7 @@ export default function DeckEditor() {
           </ActionBar>
         </View>
         {/* Back floats over the heroes' paintings and stays in reach as the list scrolls. */}
+        <FloatingBarShade shown={past} top={insets.top} />
         <View className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 + insets.left, paddingRight: 16 + insets.right }}>
           <NavBar overlay backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
         </View>

@@ -13,7 +13,7 @@ import { cards, packs } from "../catalog/schema";
 import type { Difficulty } from "../catalog/scenario-data";
 import { nightFade, panelSurface, topShade } from "../play/surfaces";
 import { Portrait, SceneArt } from "./art";
-import { ActionBar, BodyText, Chevron, Chip, Corners, Eyebrow, IconButton, Label, NavBar, Screen, Section, Segmented, SecondaryButton, TextButton } from "./chrome";
+import { ActionBar, BodyText, Chevron, Chip, Corners, Eyebrow, FloatingBarShade, IconButton, Label, NavBar, Screen, Section, Segmented, SecondaryButton, TextButton } from "./chrome";
 import { editSavedDeck } from "./deck-draft";
 import { deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "./deck-list";
 import { DeckListBar } from "./deck-list-bar";
@@ -130,9 +130,22 @@ export function BriefingScreen({
 }) {
   const insets = useSafeAreaInsets();
   const side = { paddingLeft: 24 + insets.left, paddingRight: 24 + insets.right };
+  // Past the scene, a night bar shows behind Back and Booklet so they never sit on the words that scroll under them.
+  const [past, setPast] = useState(false);
+  const threshold = BANNER_HEIGHT - 80;
   return (
     <Screen testID={testID} scene="vale" bleed>
-      <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingBottom: 24 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        className="min-h-0 flex-1"
+        contentContainerStyle={{ paddingBottom: 24 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={64}
+        onScroll={(event) => {
+          const next = event.nativeEvent.contentOffset.y > threshold;
+          if (next !== past) setPast(next);
+        }}
+      >
         <SceneArt scenarioId={scenarioId} height={BANNER_HEIGHT + insets.top}>
           <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(0.4) }} />
           <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.3, 1) }} />
@@ -147,6 +160,7 @@ export function BriefingScreen({
           <ActionBar testID="briefing-deal-bar">{bar}</ActionBar>
         </View>
       ) : null}
+      <FloatingBarShade shown={past} top={insets.top} />
       <View className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 + insets.left, paddingRight: 16 + insets.right }}>
         <NavBar overlay onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={<IconButton overlay icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} />} />
       </View>

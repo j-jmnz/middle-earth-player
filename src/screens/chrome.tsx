@@ -141,6 +141,15 @@ export function IconButton({
 }
 
 /**
+ * The night bar that appears behind a floating NavBar once the picture under it has scrolled away, so the round buttons never
+ * sit on words. It switches at one threshold, with no motion on the scroll path.
+ */
+export function FloatingBarShade({ shown, top }: { shown: boolean; top: number }) {
+  if (!shown) return null;
+  return <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: top + 60, backgroundColor: withAlphaHex(palette.night, 0.94), borderBottomWidth: 1, borderBottomColor: palette.hairline }} />;
+}
+
+/**
  * The top of a screen: a round Back on the left, an optional title (and a muted line under it) centred, and one optional
  * control on the right. Back goes to the screen below; its label names that screen to a screen reader ("Back to Decks").
  */

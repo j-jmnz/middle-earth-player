@@ -64,14 +64,17 @@ export function HeroTile({
             {/* Night rises from the foot, so the name reads on the painting; it grows past a third of the tile rather than lose the name. */}
             <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: height * 0.62, ...nightFade(0, 0.78) }} />
             <View pointerEvents="none" className="justify-end px-2 pb-2" style={{ position: "absolute", left: 0, right: 0, bottom: 0, minHeight: height / 3 }}>
-              {/* A dense tile (four to a row in the briefing) keeps the whole name on two lines and the sphere as its printed mark. */}
-              <View className="flex-row items-center gap-1">
-                {dense && mark ? <SphereMark sphere={mark} size={11} /> : null}
-                {dense && ringBearer ? <RingMark size={10} state="current" /> : null}
-                <Text className={`shrink font-display-bold ${dense ? "text-micro" : "text-heading"} ${ringBearer ? "text-goldHigh" : "text-bone"}`} numberOfLines={2}>
-                  {hero.name}
-                </Text>
-              </View>
+              {/* A dense tile (four to a row in the briefing) gives the name the tile's whole width on two lines, its marks on a
+                  line above it: the sphere's printed icon, and the Ring for the Ring-bearer. */}
+              {dense && (mark || ringBearer) ? (
+                <View className="mb-0.5 flex-row items-center gap-1">
+                  {mark ? <SphereMark sphere={mark} size={11} /> : null}
+                  {ringBearer ? <RingMark size={10} state="current" /> : null}
+                </View>
+              ) : null}
+              <Text className={`font-display-bold ${dense ? "text-micro" : "text-heading"} ${ringBearer ? "text-goldHigh" : "text-bone"}`} numberOfLines={2}>
+                {hero.name}
+              </Text>
               {dense ? null : (
                 <View className="mt-0.5 flex-row flex-wrap items-center gap-x-1">
                   {mark ? <SphereMark sphere={mark} /> : null}
