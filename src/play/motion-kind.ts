@@ -1,7 +1,7 @@
 // Which motion a new layout plays when the seat the canvas draws changed (phase 26): the peek's own slide, the seat handoff, or the
 // ordinary motions of the state. Pure, so a Vitest reads it; card-motion.native.tsx calls it once per new layout.
-//   peek: the same state seen from another seat (the player tapped a dial), or a peek that ends. The shown seat's zones slide out and the
-//     other's slide in (motion.ts, `peek`); nothing is dealt, no token pops and nothing lands.
+//   peek: the same state seen from another seat (the player tapped a dial), or a peek that ends. The table is redrawn at rest: no card
+//     moves, nothing is dealt, no token pops and nothing lands.
 //   handoff: the engine turned to another seat, and the table follows it (the new hand slides up, nothing is dealt).
 //   ordinary: the state's own motions (a draw, a played card's squash, a token pop, ghosts), diffed from the layout the acting seat had
 //     before. A peek that ends with a new state is this: the player confirmed something on the dock while looking at the other seat,
@@ -20,7 +20,7 @@ export function motionKind(prev: unknown, next: unknown, prevShown: number, next
   return prevActing !== nextActing ? "handoff" : "ordinary";
 }
 
-/** Which side the new seat comes in from: +1 for a higher seat (from the right), -1 for a lower one. */
-export function peekSide(prevShown: number, nextShown: number): 1 | -1 {
-  return nextShown > prevShown ? 1 : -1;
+/** Whether a layout of this kind moves its cards: a peek and its way back are drawn at rest (user request, 2026-10-27). */
+export function kindMoves(kind: MotionKind): boolean {
+  return kind !== "peek";
 }

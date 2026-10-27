@@ -19,7 +19,8 @@ export type MorePopover = {
   open: boolean;
   // The "i" popover (the full title and every line of the moment) is open. Only one of the two is ever open.
   lines: boolean;
-  // The screen y the open popover is level with (the More pill's foot, the "i" pill's top); null while closed.
+  // The screen y the open popover is level with (the More pill's foot, the "i" pill's top), kept after it closes so it leaves where
+  // it stood; null until one opens.
   foot: number | null;
   show: (foot: number) => void;
   showLines: (top: number) => void;
@@ -32,12 +33,16 @@ export type MorePopover = {
  */
 export function useMorePopover(count: number, key: string): MorePopover {
   const [at, setAt] = useState<{ foot: number; key: string; kind: "more" | "lines" } | null>(null);
+  // Where the last one opened. A closed popover still plays its leave there: dropping the place with `at` made the "i" popover jump to
+  // the top of the screen (and the More popover to its foot) while it faded out.
+  const [last, setLast] = useState<number | null>(null);
+  if (at && at.foot !== last) setLast(at.foot);
   if (at && ((at.kind === "more" && count === 0) || at.key !== key)) setAt(null);
   // `close` is stable, so an effect (Android Back) can depend on it.
   const close = useCallback(() => setAt(null), []);
   const show = useCallback((foot: number) => setAt({ foot, key, kind: "more" }), [key]);
   const showLines = useCallback((top: number) => setAt({ foot: top, key, kind: "lines" }), [key]);
-  return { open: at?.kind === "more" && count > 0, lines: at?.kind === "lines", foot: at?.foot ?? null, show, showLines, close };
+  return { open: at?.kind === "more" && count > 0, lines: at?.kind === "lines", foot: at?.foot ?? last, show, showLines, close };
 }
 
 // What the "i" popover holds: the full title, then the guide, the note and the refusals (dock-lines.ts).

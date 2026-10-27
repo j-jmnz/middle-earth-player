@@ -4,6 +4,7 @@ import { openReading, type Reading } from "./reading.ts";
 import type { MultiSheet, PickSheet, TriggerSheet } from "./sheet-types.ts";
 import type { Choice } from "./table-choice.ts";
 import { tableLayout } from "./layout.ts";
+import { TOP_BAR } from "./top-bar-layout.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
 import { outsideLayers, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
 
@@ -117,7 +118,7 @@ describe("the outside tap", () => {
 describe("where the tray sits", () => {
   const phone = (width: number, height: number, anchorTop: number, insetRight = 0) => {
     const commandWidth = Math.round(Math.min(280, Math.max(210, width * 0.3)));
-    return { commandWidth, box: trayBox({ commandWidth, insetRight, screenHeight: height, barBottom: 44, anchorTop }) };
+    return { commandWidth, box: trayBox({ commandWidth, insetRight, screenHeight: height, barBottom: TOP_BAR, anchorTop }) };
   };
 
   it("is the command column's width, at most 340", () => {
@@ -136,7 +137,7 @@ describe("where the tray sits", () => {
       for (const inset of [0, 47]) {
         const { box, commandWidth } = phone(width, height, 200, inset);
         const canvas = width - 2 * inset - commandWidth;
-        const layout = tableLayout(canvas, height - 44, views, piles, {});
+        const layout = tableLayout(canvas, height - TOP_BAR, views, piles, {});
         // The canvas ends where the command column begins; the tray starts there.
         const trayLeft = canvas + commandWidth - box.width;
         expect(trayLeft, `${width} inset ${inset}`).toBe(canvas);
@@ -152,7 +153,7 @@ describe("where the tray sits", () => {
   it("ends above the dock's block and rises no higher than the top bar", () => {
     const { box } = phone(844, 390, 210, 47);
     expect(390 - box.bottom).toBe(206);
-    expect(box.maxHeight + 44 + box.bottom).toBe(390);
+    expect(box.maxHeight + TOP_BAR + box.bottom).toBe(390);
     expect(box.right).toBe(47);
   });
 

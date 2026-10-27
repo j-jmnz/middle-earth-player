@@ -4,6 +4,9 @@
 // ("Round 99 · ENCOUNTER", the longest step name) at its type sizes plus its chrome. Pure, so a test reads it.
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 
+// The bar's height: the 40 pt dial with 6 pt above and below, so its pop (1.22) and the peek's bone ring stay on the screen and the
+// dials clear the canvas under them (user request, 2026-10-27; it was 44, which left the dial 2 pt from either edge).
+export const TOP_BAR = 52;
 export const MENU_BUTTON = 44;
 // The bar's side padding (px-2 in table-top-bar.tsx).
 export const BAR_PAD = 8;

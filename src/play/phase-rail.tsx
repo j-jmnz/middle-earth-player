@@ -168,10 +168,11 @@ export function PhaseRail({
               flexShrink: 1,
               alignItems: "center",
               borderWidth: 1,
-              borderRadius: 18,
+              borderRadius: 20,
               paddingHorizontal: 10,
-              paddingVertical: 1,
-              backgroundColor: withAlphaHex(t.night, 0.72),
+              paddingVertical: 3,
+              backgroundColor: withAlphaHex(t.night, 0.78),
+              boxShadow: `inset 0 1px 0 ${withAlphaHex(t.bone, 0.06)}, 0 2px 10px ${withAlphaHex(t.night, 0.45)}`,
             },
             edge,
           ]}
@@ -222,7 +223,7 @@ export function PhaseRail({
             </View>
           ) : null}
           <Animated.View key={rail.current} entering={step.in} exiting={step.out}>
-            <Text testID="rail-current" numberOfLines={1} className="text-label" style={{ color: t.bone, lineHeight: 16 }}>
+            <Text testID="rail-current" numberOfLines={1} className="text-label" style={{ color: withAlphaHex(t.bone, 0.85), lineHeight: 16 }}>
               {rail.current}
             </Text>
           </Animated.View>

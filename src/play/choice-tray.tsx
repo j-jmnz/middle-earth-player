@@ -1,6 +1,6 @@
 // The choice tray (docs/design-system.md, Table, Choice tray; phase 21): a choice whose options are not all whole cards on the
-// table opens a compact night tray over the command column's upper part. It shows the options and nothing else: a muted count
-// at its top, then one tile per row. The step, the readout, the refusal and the buttons are the dock's, once, under it
+// table opens a compact night tray over the command column's upper part, gold-edged so it stands apart from the dock. It shows the
+// options and nothing else: the count as a gold eyebrow at its top, then one tile per row. The step, the readout, the refusal and the buttons are the dock's, once, under it
 // (the tray's foot sits above them: tray-logic.ts, trayBox). A tile is picked like a card on the table (the same pick,
 // table-choice.ts); a long press on a card's tile shows it large. A tap outside folds the tray (use-table-choice.ts).
 import { Image } from "expo-image";
@@ -13,7 +13,7 @@ import type { PictureSource } from "./table-canvas-types.ts";
 import { shareFor, type Choice } from "./table-choice.ts";
 import { TrayFrame, useHeld, type TrayPlace } from "./tray-frame.tsx";
 import { trayCount, trayTiles, type TrayTile } from "./tray-logic.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 
 // A card's picture beside its tile: 32 by 44, or 28 by 38 on a short phone.
 const pictureSize = (dense: boolean) => (dense ? { width: 28, height: 38 } : { width: 32, height: 44 });
@@ -70,10 +70,15 @@ export function ChoiceTray({
   const marks = new Set(picked.ids);
   const refused = shown.kind === "pick" ? (shown.unavailable ?? []) : [];
   return (
-    <TrayFrame open={open} place={place} squareFoot testID="sheet">
-      <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="mb-1 text-center text-label text-muted" style={{ flexShrink: 0 }}>
-        {trayCount(shown, picked)}
-      </Text>
+    <TrayFrame open={open} place={place} squareFoot accent testID="sheet">
+      {/* The count is the tray's head: a gold eyebrow over a rule, so the choice reads as the thing to answer now. */}
+      <View style={{ flexShrink: 0, flexDirection: "row", alignItems: "center", gap: 8, marginTop: 2, marginBottom: dense ? 4 : 6 }}>
+        <View style={{ flex: 1, height: 1, backgroundColor: withAlphaHex(t.gold, 0.3) }} />
+        <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-gold" style={{ flexShrink: 1 }}>
+          {trayCount(shown, picked)}
+        </Text>
+        <View style={{ flex: 1, height: 1, backgroundColor: withAlphaHex(t.gold, 0.3) }} />
+      </View>
       <ScrollView style={{ flexShrink: 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
         {tiles.map((tile) => {
           const share = shareFor(shown, picked, tile.id);

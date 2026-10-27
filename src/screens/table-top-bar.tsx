@@ -1,4 +1,4 @@
-// The table's top bar, 44 pt, three zones and nothing else (docs/design-system.md, Table): the threat dials at the left (then
+// The table's top bar, 52 pt (TOP_BAR), three zones and nothing else (docs/design-system.md, Table): the threat dials at the left (then
 // Life and the Burden deck), the phase rail centered on the bar, and the menu button at the right. Back, Log, Rules, Booklet
 // and Table settings are in the menu (src/play/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.
@@ -13,12 +13,13 @@ import { PhaseRail } from "../play/phase-rail";
 import { ThreatRing } from "../play/table-chrome";
 import { MenuButton } from "../play/table-menu";
 import { tableTokens as t, withAlphaHex } from "../play/tokens";
-import { barZones, railWide } from "../play/top-bar-layout";
+import { barZones, railWide, TOP_BAR } from "../play/top-bar-layout";
 
-export const TOP_BAR = 44;
+export { TOP_BAR };
 // The scroll fade: this many bands of this width, rising to nearly the felt.
 const FADE_BANDS = 7;
 const FADE_BAND = 4;
+const DIAL_GAP = 10;
 
 export type TopBarProps = {
   threats: readonly SeatThreat[];
@@ -72,10 +73,11 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, rail, s
           horizontal
           scrollEnabled={zones?.scroll ?? false}
           showsHorizontalScrollIndicator={false}
-          style={{ height: 64, marginVertical: -10 }}
+          style={{ height: TOP_BAR + 20, marginVertical: -10 }}
           contentContainerStyle={{ alignItems: "center", paddingVertical: 10 }}
         >
-          <View style={{ flexDirection: "row", flexShrink: 0 }} onLayout={onDials}>
+          {/* A gap between the dials, so a seat's label (P1) never runs into the next seat's dial. */}
+          <View style={{ flexDirection: "row", flexShrink: 0, gap: DIAL_GAP }} onLayout={onDials}>
             {threats.map((threat) => {
               const dial = seatDial(threats.length, acting, viewed, threat.seat);
               return (
