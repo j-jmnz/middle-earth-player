@@ -19,8 +19,11 @@ describe("the armed line's room", () => {
     expect(lineCount("a".repeat(CHARS_PER_LINE * 2 + 1))).toBe(3);
   });
 
-  it("is two lines for the short words every dock has, and never more than the cap", () => {
-    expect(armedLines(["Tap again to pass", null, "The only choice now: one tap sends it"])).toBe(MIN_LINES);
+  it("is as many lines as the longest words, none when nothing can be said, and never more than the cap", () => {
+    expect(armedLines(["Tap again to pass", null, "The only choice now: one tap sends it"])).toBe(2);
+    expect(armedLines(["Tap again to pass", null])).toBe(1);
+    expect(armedLines(["Tap again to pass", null, "The only choice now: one tap sends it"], 40)).toBe(1);
+    expect(armedLines([null, null])).toBe(MIN_LINES);
     expect(armedLines(["x ".repeat(200)])).toBe(MAX_LINES);
   });
 

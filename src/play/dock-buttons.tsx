@@ -38,6 +38,7 @@ export function DockButtons({
   onMore,
   picked = null,
   dense = false,
+  chars,
   onButton,
 }: {
   dock: Dock;
@@ -50,6 +51,8 @@ export function DockButtons({
   picked?: string | null;
   // A short phone (under 400 pt tall): tighter rows, the armed line without its lead-in when that saves a line (dock-budget.ts).
   dense?: boolean;
+  // The characters a label line holds at the dock's measured width (dock-budget.ts, labelChars); the estimate when not measured.
+  chars?: number;
   onButton: (button: DockButton) => void;
 }) {
   const moreRef = useRef<ComponentRef<typeof View>>(null);
@@ -94,10 +97,10 @@ export function DockButtons({
   const bar = useAnimatedStyle(() => ({ width: `${Math.round(left.get() * 100)}%` }));
   const primary = dock.primary;
   const armedButton = [primary, ...dock.secondary].find((button) => button?.testID === armed) ?? null;
-  const said = (button: DockButton) => armedWords(button.armed ?? `Tap again: ${button.label}`, dense);
+  const said = (button: DockButton) => armedWords(button.armed ?? `Tap again: ${button.label}`, dense, chars);
   const line = armedButton ? said(armedButton) : (dock.why ?? (dock.single ? ONLY : null));
   // The room holds the longest thing this moment's buttons can say when armed, in full, so arming moves nothing (armed-room.ts).
-  const lines = armedLines([...[primary, ...dock.secondary].map((button) => (button?.arm ? said(button) : null)), dock.why, dock.single ? ONLY : null]);
+  const lines = armedLines([...[primary, ...dock.secondary].map((button) => (button?.arm ? said(button) : null)), dock.why, dock.single ? ONLY : null], chars);
   return (
     <View className={dense ? "gap-0" : "gap-0.5"}>
       {/* The armed line, always held: what the armed button's second tap does (a caution names the loss in full), or what the
@@ -127,17 +130,17 @@ export function DockButtons({
           onPress={() => press(primary)}
         />
       ) : null}
-      {/* The other answers are outlined pills on a row of their own; the reading aids are quieter pills on one row under it (short
-          words: Undo, Read), which wraps if a third shows. */}
+      {/* The other answers are slate plates in Cinzel capitals on a row of their own; the reading aids are faint plates with small
+          muted words on one row under it (Undo, Read), which wraps if a third shows. No plate draws an edge. */}
       {dock.secondary.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1.5">
           {dock.secondary.map((button) => (
-            <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="outline" tight={dense} tone={armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
+            <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="plate" tight={dense} tone={armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
           ))}
         </View>
       ) : null}
       {extras.length > 0 || more.length > 0 ? (
-        <View className="flex-row flex-wrap items-center justify-center gap-1.5">
+        <View className="flex-row flex-wrap items-center justify-center gap-1">
           {extras.map((item) => (
             <ChromeButton key={item.testID} label={item.label} testID={item.testID} variant="quiet" tight={dense} tone="bone" accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
           ))}

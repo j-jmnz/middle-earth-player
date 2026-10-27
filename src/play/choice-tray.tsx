@@ -1,6 +1,7 @@
 // The choice tray (docs/design-system.md, Table, Choice tray; phase 21): a choice whose options are not all whole cards on the
-// table opens a compact night tray over the command column's upper part, gold-edged so it stands apart from the dock. It shows the
-// options and nothing else: the count as a gold eyebrow at its top, then one tile per row. The step, the readout, the refusal and the buttons are the dock's, once, under it
+// table opens a compact night tray over the command column's upper part, standing on the dock as its upper part in the dock's own
+// fill, so the choice and its answers read as one panel. It shows the options and nothing else: the count as a gold eyebrow at its
+// top, then one tile per row. The step, the readout, the refusal and the buttons are the dock's, once, under it
 // (the tray's foot sits above them: tray-logic.ts, trayBox). A tile is picked like a card on the table (the same pick,
 // table-choice.ts); a long press on a card's tile shows it large. A tap outside folds the tray (use-table-choice.ts).
 import { Image } from "expo-image";
@@ -23,19 +24,21 @@ function DamagePill({ mark }: { mark: NonNullable<TrayTile["mark"]> }) {
   return (
     <View
       className="flex-row items-center rounded-chip px-2"
-      style={{ borderWidth: 1, borderColor: mark.danger ? t.threat : t.goldLine, backgroundColor: mark.danger ? t.threat : "transparent", minHeight: 24 }}
+      style={{ backgroundColor: mark.danger ? t.threat : withAlphaHex(t.bone, 0.08), minHeight: 24 }}
     >
       <IconValue name={mark.icon} value={String(mark.value)} word={mark.danger ? "Destroying damage" : "Damage"} tint="bone" size={14} textClass="font-display-bold text-label text-bone" />
     </View>
   );
 }
 
-// An option the rules refuse now: a dashed hairline outline with the reason in muted. Text, not a choice.
+// An option the rules refuse now: its name and the reason in faint, on no plate. Text, not a choice.
 function RefusedTile({ item, dense }: { item: Unavailable; dense: boolean }) {
   return (
-    <View testID={`sheet-unavailable-${item.id}`} accessible accessibilityLabel={`${item.label}. ${item.reason}`} className={`${dense ? "mb-1" : "mb-1.5"} rounded-tile px-3 py-1`} style={{ borderWidth: 1, borderStyle: "dashed", borderColor: t.hairline }}>
-      <Text className="text-body text-muted">{item.label}</Text>
-      <Text className="text-label text-muted">{item.reason}</Text>
+    <View testID={`sheet-unavailable-${item.id}`} accessible accessibilityLabel={`${item.label}. ${item.reason}`} className={`${dense ? "mb-1" : "mb-1.5"} px-2 py-0.5`}>
+      <Text className="text-label font-medium text-muted">
+        {item.label}
+        <Text className="text-faint">{` \u00b7 ${item.reason}`}</Text>
+      </Text>
     </View>
   );
 }
@@ -70,15 +73,11 @@ export function ChoiceTray({
   const marks = new Set(picked.ids);
   const refused = shown.kind === "pick" ? (shown.unavailable ?? []) : [];
   return (
-    <TrayFrame open={open} place={place} squareFoot accent testID="sheet">
-      {/* The count is the tray's head: a gold eyebrow over a rule, so the choice reads as the thing to answer now. */}
-      <View style={{ flexShrink: 0, flexDirection: "row", alignItems: "center", gap: 8, marginTop: 2, marginBottom: dense ? 4 : 6 }}>
-        <View style={{ flex: 1, height: 1, backgroundColor: withAlphaHex(t.gold, 0.3) }} />
-        <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-gold" style={{ flexShrink: 1 }}>
-          {trayCount(shown, picked)}
-        </Text>
-        <View style={{ flex: 1, height: 1, backgroundColor: withAlphaHex(t.gold, 0.3) }} />
-      </View>
+    <TrayFrame open={open} place={place} joined testID="sheet">
+      {/* The count is the tray's head: a gold eyebrow, where the dock's step stands when the tray is folded. */}
+      <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-gold" style={{ flexShrink: 0, marginBottom: dense ? 4 : 8 }}>
+        {trayCount(shown, picked)}
+      </Text>
       <ScrollView style={{ flexShrink: 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
         {tiles.map((tile) => {
           const share = shareFor(shown, picked, tile.id);

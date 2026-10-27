@@ -8,11 +8,11 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
-import { goldGlow, goldPlate, raisedEdge, slateSurface } from "./surfaces.ts";
+import { goldPlate, raisedEdge } from "./surfaces.ts";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { tableTokens as t, withAlphaHex } from "./tokens.ts";
 
 const SHEET_RADIUS = 28;
 
@@ -51,8 +51,9 @@ export function SheetFrame({ children, testID, maxHeight, paddingTop = 12, anima
 
 /**
  * A text button on night or paper: 44 pt target, the pressed fill in the same frame. `variant` "text" is a word alone (the
- * top bar, a panel's Close); "outline" is a slate plate lit from above with a goldLine edge (the dock's other answers: Pass,
- * Cancel, the alternative); "quiet" is the same plate with a hairline edge (the dock's Read the card, List, Actions).
+ * top bar, a panel's Close); "plate" is a lit plate (bone at 9% over the dock) with no drawn edge and its word in Cinzel capitals (the dock's other
+ * answers: Pass, Cancel, the alternative); "quiet" is a fainter plate (4%) with its word small in muted (the dock's reading aids: Undo,
+ * Read, List, Actions), so the three tiers of the dock read apart without an outline (user request, 2026-10-27).
  */
 export function ChromeButton({
   label,
@@ -69,7 +70,7 @@ export function ChromeButton({
   onPress: () => void;
   testID: string;
   tone?: "bone" | "gold" | "ink" | "muted";
-  variant?: "text" | "outline" | "quiet";
+  variant?: "text" | "plate" | "quiet";
   disabled?: boolean;
   // On a short phone's dock: a 36 pt pill in a 40 pt row, its 44 pt target kept by a 2 pt hit slop (docs/design-system.md, Table).
   tight?: boolean;
@@ -77,9 +78,9 @@ export function ChromeButton({
   accessibilityHint?: string;
 }) {
   const ink = tone === "ink";
-  const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "gold" ? t.gold : ink ? t.inkLabel : tone === "muted" ? t.muted : t.bone;
-  const edge = variant === "outline" ? (ink ? t.inkLabel : t.goldLine) : variant === "quiet" ? (ink ? t.inkLine : t.hairline) : null;
-  const rest = variant === "text" ? null : ink ? { backgroundColor: t.paper } : slateSurface();
+  const quiet = variant === "quiet";
+  const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "gold" ? t.gold : ink ? t.inkLabel : tone === "muted" || (quiet && tone === "bone") ? t.muted : t.bone;
+  const rest = variant === "text" ? null : ink ? { backgroundColor: t.paper } : { backgroundColor: withAlphaHex(t.bone, quiet ? 0.04 : 0.09) };
   return (
     <Pressable
       testID={testID}
@@ -95,16 +96,21 @@ export function ChromeButton({
     >
       {({ pressed }) => (
         <View
-          className={`items-center justify-center px-3 ${variant === "text" ? "min-h-11 rounded-tile" : tight ? "min-h-9 rounded-tile" : "min-h-10 rounded-tile"}`}
+          className={`items-center justify-center rounded-tile ${quiet ? "px-3" : "px-3.5"} ${variant === "text" ? "min-h-11" : tight ? "min-h-9" : "min-h-10"}`}
           style={{
             ...(pressed && !disabled ? { backgroundColor: ink ? t.paperPressed : t.pressed } : (rest ?? { backgroundColor: "transparent" })),
-            ...(edge ? { borderWidth: 1, borderColor: edge } : {}),
-            ...(variant !== "text" && !ink ? { boxShadow: raisedEdge } : {}),
+            ...(variant === "plate" && !ink ? { boxShadow: raisedEdge } : {}),
           }}
         >
-          <Text className="text-body font-medium" style={{ color }}>
-            {label}
-          </Text>
+          {variant === "plate" ? (
+            <Text className="font-display-bold uppercase" style={{ color, fontSize: 12, lineHeight: 16, letterSpacing: 1.2 }}>
+              {label}
+            </Text>
+          ) : (
+            <Text className={`${quiet ? "text-label" : "text-body"} font-medium`} style={{ color }}>
+              {label}
+            </Text>
+          )}
         </View>
       )}
     </Pressable>
@@ -133,7 +139,7 @@ export function ChromePrimary({
   testID: string;
   disabled?: boolean;
   surface?: "night" | "paper";
-  // In the table's dock: a 48 pt pill whose label keeps its size (no widest tracking) and wraps to two lines when long.
+  // In the table's dock: a 46 pt pill whose label keeps its size (no widest tracking) and wraps to two lines when long.
   compact?: boolean;
   // A 44 pt pill (not 48) on a short phone's dock.
   tight?: boolean;
@@ -154,14 +160,14 @@ export function ChromePrimary({
     >
       {({ pressed }) => (
         <View
-          className={`${compact ? (tight ? "min-h-11 px-3" : "min-h-12 px-3") : "min-h-14 px-5"} items-center justify-center rounded-button`}
-          style={{ ...primaryFill(paper, disabled, pressed), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}
+          className={`${compact ? (tight ? "min-h-11 px-3" : "px-3") : "min-h-14 px-5"} items-center justify-center rounded-button`}
+          style={{ ...(compact && !tight ? { minHeight: 46 } : {}), ...primaryFill(paper, disabled, pressed), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}
         >
           {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
           <Text
             numberOfLines={compact ? 2 : 1}
             className="text-center font-display-bold uppercase"
-            style={{ color, fontSize: compact ? 14 : 15, lineHeight: compact ? 19 : 20, letterSpacing: compact ? 1.4 : 2.4 }}
+            style={{ color, fontSize: compact ? 13 : 14, lineHeight: compact ? 18 : 19, letterSpacing: compact ? 1.4 : 2.2 }}
           >
             {label}
           </Text>
@@ -183,9 +189,9 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
   const ink = surface === "paper";
   const textClass = `font-display-bold ${size === "title" ? "text-title" : "text-body"} ${ink ? "text-ink" : "text-bone"}`;
   return (
-    <View testID={testID} className="flex-row flex-wrap items-center gap-3">
+    <View testID={testID} className="flex-row flex-wrap items-center gap-2.5">
       {stats.map((stat) => (
-        <IconValue key={stat.word} name={stat.icon} value={String(stat.value)} word={stat.word} tint={ink ? "ink" : "bone"} size={size === "title" ? 20 : 16} textClass={textClass} />
+        <IconValue key={stat.word} name={stat.icon} value={String(stat.value)} word={stat.word} tint={ink ? "ink" : "bone"} size={size === "title" ? 18 : 15} textClass={textClass} />
       ))}
     </View>
   );
@@ -193,8 +199,9 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
 
 /**
  * A choice tile, on paper (a pile's cards) or on night (the choice tray). `leading` is a card picture, `trailing` a pill (the
- * foreseen damage); `dense` puts everything on one line (the tray on a short phone). A picked night tile has the gold edge and
- * a gold check; a paper one a heavier ink edge. A long press (`onLongPress`) reads the card.
+ * foreseen damage); `dense` puts everything on one line (the tray on a short phone). A night tile has no drawn edge: at rest it
+ * is a lit plate, picked it is washed in gold with its name in goldHigh and a gold check (user request, 2026-10-27: fewer
+ * borders); a paper one has an inkLine edge, heavier ink when picked. A long press (`onLongPress`) reads the card.
  */
 export function Tile({
   label,
@@ -246,17 +253,15 @@ export function Tile({
         <View
           className={`${dense ? "mb-1 py-0.5" : night ? "mb-1.5 py-1" : "mb-2 py-2"} flex-row items-center gap-2 rounded-tile ${night ? "px-2" : "px-4"}`}
           style={{
-            minHeight: dense ? 44 : night ? 52 : 48,
-            borderWidth: selected ? 1.5 : 1,
-            borderColor: selected ? (night ? t.gold : t.ink) : night ? t.hairline : t.inkLine,
-            ...(pressed ? { backgroundColor: night ? t.pressed : t.paperPressed } : night ? slateSurface() : { backgroundColor: "transparent" }),
-            ...(selected && night ? { boxShadow: goldGlow } : {}),
+            minHeight: dense ? 44 : night ? 50 : 48,
+            ...(night ? {} : { borderWidth: selected ? 1.5 : 1, borderColor: selected ? t.ink : t.inkLine }),
+            ...(pressed ? { backgroundColor: night ? t.pressed : t.paperPressed } : night ? nightTile(selected) : { backgroundColor: "transparent" }),
           }}
         >
           {leading}
           <View className={`flex-1 ${dense ? "flex-row flex-wrap items-center gap-x-2 gap-y-0.5" : ""}`}>
             <View className={dense ? "" : "flex-row items-center justify-between gap-2"} style={dense ? { flexGrow: 1, flexShrink: 1, minWidth: 84 } : undefined}>
-              <Text numberOfLines={2} className={`shrink text-body ${night ? "text-bone" : "text-ink"} ${selected ? "font-semibold" : ""}`}>
+              <Text numberOfLines={2} className={`shrink text-body ${selected ? "font-semibold" : ""}`} style={{ color: night ? (selected ? t.goldHigh : t.bone) : t.ink }}>
                 {label}
               </Text>
               {night || dense ? null : numbers}
@@ -273,6 +278,11 @@ export function Tile({
       )}
     </Pressable>
   );
+}
+
+// A night tile's fill: a lit plate at rest, washed in gold when picked.
+function nightTile(selected: boolean) {
+  return selected ? { backgroundColor: withAlphaHex(t.gold, 0.16), boxShadow: `inset 0 0 0 1px ${withAlphaHex(t.gold, 0.35)}` } : { backgroundColor: withAlphaHex(t.bone, 0.06), boxShadow: raisedEdge };
 }
 
 /** One sentence under a disabled action saying what it waits for. */

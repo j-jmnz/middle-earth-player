@@ -139,7 +139,7 @@ export function PrimaryButton({
     disabled
       ? paper
         ? { borderWidth: 1, borderColor: palette.inkLine }
-        : { backgroundColor: palette.raised, borderWidth: 1, borderColor: palette.hairline }
+        : { backgroundColor: palette.raised }
       : paper
         ? { backgroundColor: palette.ink, opacity: pressed ? 0.85 : 1 }
         : goldPlate(pressed);
@@ -166,7 +166,7 @@ export function PrimaryButton({
 }
 
 /**
- * A plate for the actions beside the primary (Path, Log, Change, Add cards): slate lit from above, a hairline edge, engraved
+ * A plate for the actions beside the primary (Path, Log, Change, Add cards): slate lit from above with no drawn edge, engraved
  * capitals, an optional printed icon before the word. `tone` colours the word: gold for a link to read, danger for a loss.
  */
 export function SecondaryButton({
@@ -195,7 +195,7 @@ export function SecondaryButton({
       {({ pressed }) => (
         <View
           className="flex-row items-center justify-center gap-2 rounded-tile px-4"
-          style={{ minHeight: compact ? 44 : 52, ...slateSurface(pressed && !disabled), borderWidth: 1, borderColor: palette.hairline, boxShadow: raisedEdge }}
+          style={{ minHeight: compact ? 44 : 52, ...slateSurface(pressed && !disabled), boxShadow: raisedEdge }}
         >
           {icon ? <GameIcon name={icon} size={15} tint={tone === "gold" ? "gold" : tone === "danger" ? "danger" : "bone"} /> : null}
           <Text className="font-display-bold uppercase" style={{ fontSize: 13, lineHeight: 18, letterSpacing: 1.6, color }}>

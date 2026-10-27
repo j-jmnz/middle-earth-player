@@ -11,14 +11,13 @@ describe("table menu rows", () => {
     expect(rows.map((row) => row.opens)).toEqual([true, true, true, true, false]);
   });
 
-  it("names Leave for the path and for the scenarios, and says the game is saved", () => {
+  it("shows Leave the table with its door mark alone, and says where it goes and that the game is saved to a screen reader", () => {
     const leave = (backLabel: string, backAccessibilityLabel: string) => menuItems({ backLabel, backAccessibilityLabel }).find((row) => row.id === "leave");
-    const path = leave("Path", "Back to the path");
     const scenarios = leave("Scenarios", "Back to the scenarios");
-    expect(path?.detail).toBe("To the path");
-    expect(scenarios?.detail).toBe("To the scenarios");
-    expect(path?.note).toBe("The game is saved");
+    expect(scenarios?.label).toBe("Leave the table");
+    expect(scenarios?.glyph).toBe("leave");
     expect(scenarios?.accessibilityLabel).toContain("Back to the scenarios");
-    expect(menuItems({ backLabel: "Path", backAccessibilityLabel: "" }).filter((row) => row.id !== "leave").every((row) => row.detail == null && row.note == null)).toBe(true);
+    expect(scenarios?.accessibilityHint).toBe("The game is saved");
+    expect(menuItems({ backLabel: "Path", backAccessibilityLabel: "" }).filter((row) => row.id !== "leave").every((row) => row.glyph == null)).toBe(true);
   });
 });

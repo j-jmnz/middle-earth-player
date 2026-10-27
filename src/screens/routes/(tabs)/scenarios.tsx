@@ -14,7 +14,7 @@ import { campaignOf, scenarioNames } from "../../campaign-data";
 import { BodyText, Chevron, Chip, Eyebrow, Label, Panel, Screen, ScreenScroll, ScreenTitle, Section, TextButton } from "../../chrome";
 import { SceneArt, SceneCard } from "../../art";
 import { palette } from "../../palette.js";
-import { goldPlate, panelSurface, tileSurface } from "../../../play/surfaces";
+import { goldPlate, panelSurface, raisedEdge, tileSurface } from "../../../play/surfaces";
 import { withAlphaHex } from "../../../play/tokens";
 import { useDatabases } from "../../databases";
 import { KeepOrDelete } from "../../keep-or-delete";
@@ -226,7 +226,7 @@ export default function Scenarios() {
                   {({ pressed }) => (
                     <View
                       className="flex-row items-center gap-3.5 overflow-hidden rounded-card pr-4"
-                      style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.hairline }}
+                      style={{ ...panelSurface(pressed), boxShadow: raisedEdge }}
                     >
                       <View style={{ width: 92, height: 68 }}>
                         <SceneArt scenarioId={id} width={92} height={68}>

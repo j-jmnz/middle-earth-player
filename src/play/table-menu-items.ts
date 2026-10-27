@@ -14,19 +14,17 @@ export type MenuItem = {
   opens: boolean;
   testID: string;
   label: string;
-  // Beside the label, muted: where Leave goes.
-  detail?: string;
-  // A muted line under the label, inside the row.
-  note?: string;
   accessibilityLabel: string;
   accessibilityHint?: string;
   // The printed icon the game has for the row. None of the five has one.
   icon: IconName | null;
+  // A mark drawn as views when no printed icon fits: Leave the table's door.
+  glyph?: "leave";
 };
 
 /**
- * The menu's rows in order: what opens over the table (Log, Rules, Booklet, Table settings), then, apart at the foot, Leave the table,
- * named for the screen it goes to (user request, 2026-10-27: the menu redesigned).
+ * The menu's rows in order: what opens over the table (Log, Rules, Booklet, Table settings), then, apart at the foot, Leave the table
+ * with its door mark and no more words (user request, 2026-10-27); a screen reader still hears where it goes and that the game is saved.
  */
 export function menuItems(nav: MenuNav): readonly MenuItem[] {
   return [
@@ -38,11 +36,10 @@ export function menuItems(nav: MenuNav): readonly MenuItem[] {
       id: "leave",
       testID: "table-back",
       label: "Leave the table",
-      detail: `To the ${nav.backLabel.toLowerCase()}`,
-      note: "The game is saved",
       accessibilityLabel: `Leave the table. ${nav.backAccessibilityLabel}`,
       accessibilityHint: "The game is saved",
       icon: null,
+      glyph: "leave",
       opens: false,
     },
   ];

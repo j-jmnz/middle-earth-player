@@ -101,18 +101,20 @@ export function outsideLayers(a: { trayShown: boolean; reading: boolean; reader:
 export const TRAY_MAX = 340;
 // The shortest the tray is drawn, so a tall dock never leaves a tray that is not there.
 const MIN_HEIGHT = 72;
-const GAP = 4;
+// The command column's side padding (table-view.tsx, px-2): the dock stands this far inside it, and so does the tray.
+export const COLUMN_PAD = 8;
 
 export type TrayBox = { width: number; right: number; bottom: number; maxHeight: number };
 
 /**
- * Where the tray sits: the command column's width (at most TRAY_MAX) with its right edge at the column's, so it never reaches into
- * the canvas and covers neither encounter pile (the discard stands 8 pt from the canvas's edge: tray-logic.test.ts checks it against
- * the layout). Its foot is GAP above `anchorTop` (the screen y of the top of the dock's block of readout, armed line and buttons,
- * which it never covers), and it is as tall as the room between the top bar and that, never under MIN_HEIGHT.
+ * Where the tray sits: the dock's width (the command column less its padding, at most TRAY_MAX) with its right edge at the dock's,
+ * so it never reaches into the canvas and covers neither encounter pile (the discard stands 8 pt from the canvas's edge:
+ * tray-logic.test.ts checks it against the layout). Its foot is `anchorTop` (the screen y of the top of the dock's block of readout,
+ * armed line and buttons, which it never covers, and the dock's top while the tray is open: the tray stands on the dock), and it is
+ * as tall as the room between the top bar and that, never under MIN_HEIGHT.
  */
 export function trayBox(a: { commandWidth: number; insetRight: number; screenHeight: number; barBottom: number; anchorTop: number }): TrayBox {
-  const width = Math.min(TRAY_MAX, a.commandWidth);
-  const foot = Math.max(a.anchorTop - GAP, a.barBottom + MIN_HEIGHT);
-  return { width, right: a.insetRight, bottom: Math.round(a.screenHeight - foot), maxHeight: Math.round(foot - a.barBottom) };
+  const width = Math.min(TRAY_MAX, a.commandWidth - 2 * COLUMN_PAD);
+  const foot = Math.max(a.anchorTop, a.barBottom + MIN_HEIGHT);
+  return { width, right: a.insetRight + COLUMN_PAD, bottom: Math.round(a.screenHeight - foot), maxHeight: Math.round(foot - a.barBottom) };
 }

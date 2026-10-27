@@ -1,10 +1,10 @@
 export const palette: {
-  readonly night: "#07080B";
-  readonly dusk: "#0F1116";
-  readonly raised: "#14171D";
-  readonly raisedTop: "#1A1E26";
-  readonly pressed: "#1E222B";
-  readonly hairline: "#24272F";
+  readonly night: "#0B0A08";
+  readonly dusk: "#12110E";
+  readonly raised: "#1A1814";
+  readonly raisedTop: "#221F1A";
+  readonly pressed: "#2A2620";
+  readonly hairline: "#2C2923";
   readonly bone: "#EEE7D7";
   readonly muted: "#A39B8C";
   readonly faint: "#8A857C";

@@ -6,17 +6,18 @@
 // arithmetic; the dock measures the room and draws what this says.
 import { lineCount } from "./armed-room.ts";
 
-// Line heights of the type the words use (tailwind.config.js): the eyebrow step, the title (Cinzel at the heading size on a
-// 24 pt line), label type.
+// Line heights of the type the words use (tailwind.config.js): the eyebrow step, the title (Cinzel at the heading size on its
+// 20 pt line), label type.
 export const STEP_PX = 16;
-export const TITLE_PX = 24;
+export const TITLE_PX = 20;
 export const LABEL_PX = 18;
-// The dock's own border and padding around its two blocks: 1 + 6 top and 4 + 1 bottom, or 1 + 2 and 2 + 1 on a dense dock.
-export const DOCK_PAD_PX = 12;
-export const DOCK_PAD_DENSE_PX = 6;
-// The title, Cinzel SemiBold at 15 pt with the heading size's 0.3 pt tracking, is at most 0.61 em × 15 + 0.3 = 9.45 pt a
+// The dock's padding around its two blocks (it draws no border): 10 above the words, 8 under them and 8 under the buttons, or
+// 4, 2 and 4 on a dense dock (table-dock.tsx).
+export const DOCK_PAD_PX = 26;
+export const DOCK_PAD_DENSE_PX = 10;
+// The title, Cinzel SemiBold at 14 pt with the heading size's 0.3 pt tracking, is at most 0.61 em × 14 + 0.3 = 8.84 pt a
 // character; label type about LABEL_CHAR_PT.
-export const TITLE_CHAR_PT = 9.5;
+export const TITLE_CHAR_PT = 9;
 export const LABEL_CHAR_PT = 6.6;
 // The "i" pill's width and its gap beside a line or a title.
 export const PILL_PT = 30;
