@@ -2,10 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import { backStep, type BackLayers } from "./back.ts";
 
-const none: BackLayers = { spotlightOpen: false, menuOpen: false, moreOpen: false, linesOpen: false, previewOpen: false, readingOpen: false, overlayOpen: false, panelOpen: false };
-const all: BackLayers = { spotlightOpen: false, menuOpen: true, moreOpen: true, linesOpen: false, previewOpen: true, readingOpen: true, overlayOpen: true, panelOpen: true };
+const none: BackLayers = { spotlightOpen: false, scrubOpen: false, menuOpen: false, moreOpen: false, linesOpen: false, previewOpen: false, readingOpen: false, overlayOpen: false, panelOpen: false };
+const all: BackLayers = { spotlightOpen: false, scrubOpen: false, menuOpen: true, moreOpen: true, linesOpen: false, previewOpen: true, readingOpen: true, overlayOpen: true, panelOpen: true };
 
 describe("hardware Back on the table", () => {
+  it("cancels an open hand scrub after skipping a spotlight and before any layer", () => {
+    expect(backStep({ ...all, scrubOpen: true })).toBe("cancelScrub");
+    expect(backStep({ ...none, scrubOpen: true })).toBe("cancelScrub");
+    expect(backStep({ ...all, scrubOpen: true, spotlightOpen: true })).toBe("skipSpotlight");
+    expect(backStep({ ...all, scrubOpen: false })).toBe("closeMenu");
+  });
+
   it("skips a combat spotlight that is playing before it peels any layer, then goes on as before", () => {
     expect(backStep({ ...all, spotlightOpen: true })).toBe("skipSpotlight");
     expect(backStep({ ...none, spotlightOpen: true })).toBe("skipSpotlight");

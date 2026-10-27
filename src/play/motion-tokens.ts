@@ -123,6 +123,13 @@ export const MOTION = {
   spotlightDrawAgain: tween(125, "outCubic"),
   spotlightScrim: tween(100, "outCubic"),
   spotlight: tween(1500, "linear"),
+  // The hand scrub (phase 25): the held hand rises (and grows and flattens) over `scrubRise` and spreads sideways over `scrubSpread`,
+  // together; the card under the finger lifts over `scrubLift`; the hand settles back over `scrubFall`. The table's 35% night
+  // rides the rise. The 250 ms hold and the 6 pt slop that start it are gesture thresholds (hand-scrub.ts), not tokens.
+  scrubRise: tween(220, "outCubic"),
+  scrubSpread: tween(220, "outCubic"),
+  scrubLift: tween(120, "outCubic"),
+  scrubFall: tween(180, "inCubic"),
 } as const;
 
 /** The six beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
@@ -184,6 +191,13 @@ export const SHAPE = {
   spotlightFan: 3,
   spotlightShadow: 0.8,
   spotlightToken: 28,
+  // The hand scrub: the risen hand's cards grow to this scale (a hand too wide for a 44 pt slice of each at this scale gets a
+  // smaller one), the card under the finger grows to this much more and rises this share of its height, and the rest of the table
+  // dims to this night opacity.
+  scrubScale: 1.5,
+  scrubLiftScale: 1.25,
+  scrubLiftRise: 0.35,
+  scrubNight: 0.35,
 } as const;
 
 /** The curve of the dock's armed bar: it runs down the whole second-tap window, which is a timer and not a token. */

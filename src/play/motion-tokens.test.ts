@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ease, springStep } from "./motion-curves.ts";
-import { ARM_BAR_EASING, LONG_TOKENS, MAX_TOKEN_MS, MOTION, ms, motionScale, SPOTLIGHT_BEATS, springTune, timed, type EasingName, type Spring, type Tween } from "./motion-tokens.ts";
+import { ARM_BAR_EASING, LONG_TOKENS, MAX_TOKEN_MS, MOTION, ms, motionScale, SHAPE, SPOTLIGHT_BEATS, springTune, timed, type EasingName, type Spring, type Tween } from "./motion-tokens.ts";
 
 const entries = Object.entries(MOTION) as [string, Tween | Spring][];
 const springs = entries.filter((entry): entry is [string, Spring] => "zeta" in entry[1]);
@@ -125,5 +125,28 @@ describe("curves", () => {
       const tune = springTune(spring);
       expect(tune.damping / (2 * Math.sqrt(tune.stiffness * tune.mass)), name).toBeCloseTo(spring.zeta, 9);
     }
+  });
+});
+
+describe("the hand scrub's tokens (phase 25)", () => {
+  it("rise and spread in 220 ms with an ease-out cubic, the lift in 120 and the settle in 180", () => {
+    expect(MOTION.scrubRise).toEqual({ ms: 220, easing: "outCubic" });
+    expect(MOTION.scrubSpread).toEqual({ ms: 220, easing: "outCubic" });
+    expect(MOTION.scrubLift).toEqual({ ms: 120, easing: "outCubic" });
+    expect(MOTION.scrubFall).toEqual({ ms: 180, easing: "inCubic" });
+    for (const token of [MOTION.scrubRise, MOTION.scrubSpread, MOTION.scrubLift, MOTION.scrubFall]) expect(token.ms).toBeLessThanOrEqual(MAX_TOKEN_MS);
+  });
+
+  it("scale to 0.6 at Quick and to nothing under reduced motion", () => {
+    expect(ms(MOTION.scrubRise, motionScale("quick", false))).toBe(132);
+    expect(ms(MOTION.scrubSpread, motionScale("quick", false))).toBe(132);
+    expect(ms(MOTION.scrubRise, motionScale("normal", true))).toBe(0);
+  });
+
+  it("keep the scrub's shapes: the hand grows to 1.5, the lifted card 1.25 more, the rest of the table dims to 35% night", () => {
+    expect(SHAPE.scrubScale).toBe(1.5);
+    expect(SHAPE.scrubLiftScale).toBe(1.25);
+    expect(SHAPE.scrubNight).toBe(0.35);
+    expect(SHAPE.scrubNight).toBeLessThan(SHAPE.spotlightNight);
   });
 });

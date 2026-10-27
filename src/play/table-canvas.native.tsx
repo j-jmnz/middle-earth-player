@@ -7,25 +7,23 @@
 // in, and a card that left goes to its pile (motion.ts, run by card-motion.native.tsx). The motion runs on the UI thread, never
 // gates a rule, and snaps under reduced motion; a touch finishes it at once, and a new gesture cancels the lift in progress.
 import { Canvas, Circle, Group, RoundedRect, Text, useImage, vec, type SkFont } from "@shopify/react-native-skia";
-import { memo, useCallback, useEffect, useMemo } from "react";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { cancelAnimation, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
+import { memo, useCallback, useMemo } from "react";
+import { GestureDetector } from "react-native-gesture-handler";
 import { useStore } from "zustand";
 
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
-import { finishMotions, Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
+import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
 import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
-import { hitDrop, hitSlot, slotBounds, tableLayout, type CardSlot, type DropRect, type Rect } from "./layout.ts";
+import { HandScrub } from "./hand-scrub.native.tsx";
+import { useTableGestures } from "./hand-gestures.native.ts";
+import { slotBounds, tableLayout, type CardSlot, type Rect } from "./layout.ts";
 import { AT_REST } from "./motion.ts";
-import { timing } from "./motion-run.ts";
-import { MOTION } from "./motion-tokens.ts";
 import { shownSeat } from "./selectors.ts";
-import { dropRects } from "./selection.ts";
 import { Spotlight } from "./spotlight.native.tsx";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
+import { useScreenReader } from "./screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
 import { useTableImages } from "./table-images.native.ts";
@@ -65,12 +63,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
 
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
   const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat);
-  const { progress: hurryProgress, clear: hurryClear } = hurry;
   // The attacks the state resolved play on top of the table first (spotlight.native.tsx); the touch that skips them does nothing else.
   const spot = useSpotlight(store, layout, k);
   const { swallow, live } = spot;
-  const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);
-  const returnTiming = useMemo(() => timing(MOTION.dragReturn, k), [k]);
 
   const codes = useMemo(() => [...new Set([...[...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)].filter((slot) => !slot.faceDown && slot.code !== "").map((slot) => slot.code)])], [layout, moves]);
   const images = useTableImages(codes, picture, layout.card, pictureRevision);
@@ -85,112 +80,11 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const { fonts, spotFonts } = useTableFonts();
   const spotImages = useSpotlightImages(spot.plan, spot.playing, picture, pictureRevision, images);
 
-  // What the worklets read: the slots, which of them can be picked up, and the selected card's drop rectangles.
-  const slots = useSharedValue<readonly CardSlot[]>(layout.slots);
-  const lifts = useSharedValue<readonly boolean[]>([]);
-  const drops = useSharedValue<readonly DropRect[]>([]);
-  const dragging = useSharedValue(-1);
-  const dx = useSharedValue(0);
-  const dy = useSharedValue(0);
-  const lift = useSharedValue(1);
-
-  const draggableSet = useMemo(() => new Set(draggable), [draggable]);
-  useEffect(() => {
-    slots.set(layout.slots);
-    lifts.set(layout.slots.map((slot) => slot.kind === "card" && draggableSet.has(slot.id)));
-  }, [layout, draggableSet, slots, lifts]);
-  useEffect(() => {
-    drops.set(dropRects(layout, targets));
-  }, [layout, targets, drops]);
-
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
+  const reader = useScreenReader();
+  // The drag, the tap, the press and the hand scrub (hand-gestures.native.ts).
+  const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, scrubOn: !reader, select, onTap, onPreview, onDrop });
   const lifted = selected ? (layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null) : null;
-  const liftTransform = useDerivedValue(() => [{ translateX: dx.get() }, { translateY: dy.get() }, { scale: lift.get() }]);
-
-  // Built once per set of callbacks, not on every render. The worklets read the shared values, never React state.
-  const gesture = useMemo(() => {
-    const pan = Gesture.Pan()
-      .minDistance(6)
-      // A new touch cancels a return still in progress: the card snaps home.
-      .onBegin(() => {
-        cancelAnimation(dx);
-        cancelAnimation(dy);
-        cancelAnimation(lift);
-        finishMotions(hurryProgress, hurryClear);
-        swallow.set(live.get());
-        dx.set(0);
-        dy.set(0);
-        lift.set(1);
-        if (dragging.get() >= 0) scheduleOnRN(select, null);
-        dragging.set(-1);
-      })
-      // The drag starts once the finger has moved; a tap never lifts a card. The card is the one under the first touch.
-      .onStart((event) => {
-        const index = hitSlot(slots.get(), event.x - event.translationX, event.y - event.translationY);
-        const slot = slots.get()[index];
-        if (index < 0 || !slot || !lifts.get()[index] || swallow.get()) {
-          dragging.set(-1);
-          return;
-        }
-        dragging.set(index);
-        dx.set(event.translationX);
-        dy.set(event.translationY);
-        lift.set(k === 0 ? 1.08 : withTiming(1.08, liftTiming));
-        scheduleOnRN(select, slot.id);
-      })
-      .onUpdate((event) => {
-        if (dragging.get() < 0) return;
-        dx.set(event.translationX);
-        dy.set(event.translationY);
-      })
-      .onEnd((event) => {
-        const slot = slots.get()[dragging.get()];
-        if (dragging.get() < 0 || !slot) return;
-        const target = hitDrop(drops.get(), event.x, event.y);
-        lift.set(1);
-        if (target !== "") {
-          // The drop picks; the dock asks to confirm it. The card is drawn where the next state puts it.
-          scheduleOnRN(onDrop, slot.id, target);
-          dx.set(0);
-          dy.set(0);
-          dragging.set(-1);
-          return;
-        }
-        if (k === 0) {
-          dx.set(0);
-          dy.set(0);
-          dragging.set(-1);
-          scheduleOnRN(select, null);
-          return;
-        }
-        // Dropped on nothing: the card goes back, and nothing is asked.
-        dx.set(withTiming(0, returnTiming));
-        dy.set(
-          // Finished or cut short by a new touch, the lifted card is put down.
-          withTiming(0, returnTiming, () => {
-            dragging.set(-1);
-            scheduleOnRN(select, null);
-          }),
-        );
-      });
-
-    const tap = Gesture.Tap().onEnd((event) => {
-      const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
-      if (slot && !swallow.get()) scheduleOnRN(onTap, slot.id);
-    });
-
-    // Held still past the press delay, a face-up card opens large; a discard pile opens its list.
-    const hold = Gesture.LongPress()
-      .minDuration(350)
-      .onStart((event) => {
-        const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
-        if (!slot || swallow.get()) return;
-        if (slot.kind === "pile") scheduleOnRN(onTap, slot.id);
-        else if (!slot.faceDown) scheduleOnRN(onPreview, slot.id);
-      });
-
-    return Gesture.Race(pan, hold, tap);
-  }, [slots, lifts, drops, dragging, dx, dy, lift, k, liftTiming, returnTiming, hurryProgress, hurryClear, swallow, live, select, onDrop, onTap, onPreview]);
 
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
@@ -244,6 +138,11 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     );
   };
 
+  const piece = (slot: CardSlot) => (
+    <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? AT_REST} clock={clock} back={moves.motions.get(slot.id)?.flip ? drawBody({ ...slot, faceDown: true }, false) : undefined} frame={drawFrame(slot)} overlay={drawOverlay(slot)}>
+      {drawBody(slot, lifted?.id === slot.id && slot.kind === "card")}
+    </Moving>
+  );
   const attackerSlot = layout.attacker ? (layout.slots.find((slot) => slot.id === layout.attacker && slot.kind === "card") ?? null) : null;
   // The numbers on cards are read again when the effects in play, the threat or the delayed effects change.
   void modifiers;
@@ -273,11 +172,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
             {drawBody(ghost.slot, false)}
           </Leaving>
         ))}
-        {layout.slots.map((slot) => (
-          <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? AT_REST} clock={clock} back={moves.motions.get(slot.id)?.flip ? drawBody({ ...slot, faceDown: true }, false) : undefined} frame={drawFrame(slot)} overlay={drawOverlay(slot)}>
-            {drawBody(slot, lifted?.id === slot.id && slot.kind === "card")}
-          </Moving>
-        ))}
+        {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
+        <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} piece={piece} />
         <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} ringOf={(code) => sphereRing(sphereOf(code))} stripOf={(slot) => stripText(slot, info(slot.id).questPoints)} contrast={contrast} />
         {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} /> : null}
         {layout.marks.map((mark) => (
