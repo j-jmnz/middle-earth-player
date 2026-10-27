@@ -65,7 +65,7 @@ describe("top bar zones", () => {
     }
   });
 
-  it("shows the neighbor phases only on a wide screen with a rail that holds the widest pill and both", () => {
+  it("shows the neighbor phases inline only on a wide screen with a rail that holds the widest pill with both", () => {
     expect(RAIL_WIDE).toBeGreaterThan(RAIL_FLOOR);
     expect(RAIL_WIDE).toBeLessThanOrEqual(RAIL_MAX);
     expect(railWide(RAIL_WIDE, false)).toBe(true);

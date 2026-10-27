@@ -223,7 +223,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
 
   return (
     <Screen testID="table" scene="felt" inset={false}>
-      <View className="flex-1" importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }}>
+      {/* Never flattened: with "auto" alone this view is layout-only and the renderer drops it, so the menu or a popover turning
+          it to "no-hide-descendants" would add a native view and move the canvas into it, and the canvas would flash. */}
+      <View className="flex-1" collapsable={false} importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }}>
         <TableTopBar
           threats={threats}
           acting={peek.acting}
