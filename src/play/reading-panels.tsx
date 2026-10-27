@@ -174,7 +174,7 @@ function SpeedChoice({ value, onChange }: { value: Speed; onChange: (value: Spee
 }
 
 /**
- * The table's settings, a paper side panel from the menu's Table settings: Animation speed, Strong outlines, the First-game guide and the
+ * The table's settings, a paper side panel from the menu's Table settings: Animation speed, the Combat spotlight, Strong outlines, the First-game guide and the
  * Responses used every time. (The round's phases and the Stops switches are the carousel behind the rail, phase-carousel.tsx.)
  * Text and switches only; nothing here sends an intent.
  */
@@ -199,6 +199,7 @@ export function SettingsPanel({
       </View>
       <ScrollView className="mt-2" style={{ flexGrow: 0, flexShrink: 1 }}>
         <SpeedChoice value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} />
+        <PaperSwitch label="Combat spotlight" detail="An attack that deals or blocks damage plays large over a darkened table. A tap skips it." value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID="settings-spotlight" />
         <PaperSwitch label="Strong outlines" detail="Effect marks and token counts drawn with heavier outlines." value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID="settings-contrast" />
         <PaperSwitch label="First-game guide" detail="A line under the dock's title the first two times each step comes up." value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID="settings-guide" />
         {always.length > 0 ? <Text className="mt-2 text-label text-inkMuted">Responses used every time:</Text> : null}

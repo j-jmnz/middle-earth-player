@@ -8,7 +8,7 @@
 //     more. The top bar stays live, so a dial or the rail replaces the layer.
 //   - The carousel hangs over the canvas only, and the tray stays in the command column; neither covers the dock's armed line or buttons.
 //   - While the combat spotlight plays, its scrim (spotlight-scrim.tsx) is over the top bar and the dock, above all of these.
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Pressable, Text } from "react-native";
 import { useStore } from "zustand";
 
@@ -28,6 +28,7 @@ import type { ReduceContext, TableStore } from "./store.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
+import { useSpotlightHold } from "./use-spotlight.ts";
 import { BAR_PAD, MENU_BUTTON } from "./top-bar-layout.ts";
 import { DENSE_BELOW } from "./dock-budget.ts";
 import { outsideLayers, trayBox } from "./tray-logic.ts";
@@ -82,6 +83,12 @@ export function TableLayers({
   const reader = useScreenReader();
   const seat = shownSeat(game);
   const close = () => onReading(null);
+  // A spotlight plays over the table, so a reading layer (the carousel, a panel) closes as one begins instead of hiding it.
+  const spotlit = useSpotlightHold(store);
+  useEffect(() => {
+    if (spotlit) onReading(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when a spotlight begins.
+  }, [spotlit]);
   const anchor = anchorTop ?? Math.round(screen.height * 0.55);
   const canvas = screen.width - insets.left - insets.right - commandWidth;
   const box = trayBox({ commandWidth, insetRight: insets.right, screenHeight: screen.height, barBottom, anchorTop: anchor });

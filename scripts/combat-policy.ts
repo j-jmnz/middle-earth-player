@@ -13,7 +13,10 @@ import { RING_BEARER } from "./starter-game.ts";
 // The heroes with the most attack, kept back from the quest and from defense so the seat has someone to attack with.
 function strikers(state: ScenarioState, ctx: ReduceContext, keep: number): string[] {
   const heroes = state.seats[state.activeSeat]?.heroes ?? [];
-  const attack = (id: string) => modifiedStat(state, state.cards[id] ?? (null as never), "attack", ctx.cards);
+  const attack = (id: string) => {
+    const card = state.cards[id];
+    return card ? modifiedStat(state, card, "attack", ctx.cards) : 0;
+  };
   return [...heroes].filter((id) => state.cards[id]?.code !== RING_BEARER).sort((a, b) => attack(b) - attack(a)).slice(0, keep);
 }
 

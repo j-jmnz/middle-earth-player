@@ -1,5 +1,5 @@
-// The combat spotlight's stage, plan and gate (phase 24): where the cards stand, what is drawn for the attacks of a real state, and
-// when the table waits for the spotlight. The store opens a gate for each moment's attacks.
+// The combat spotlight's stage and plan (phase 24): where the cards stand and what is drawn for the attacks of a real state. The gate is
+// in spotlight-gate.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/fixture.ts";
@@ -11,10 +11,9 @@ import { clashesOf } from "./clash.ts";
 import { tableLayout, type TableLayout } from "./layout.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
 import { PILES, pileSelector, zoneSelector, type PileId, type PileView, type ZoneId } from "./selectors.ts";
-import { endGate, leaveGate, NO_SPOTLIGHT, openGate, scrimShows, spotlightHolds } from "./spotlight-gate.ts";
+import { spotlightSpan } from "./spotlight-beats.ts";
 import { buildPlan } from "./spotlight-plan.ts";
 import { burstPoint, flown, stageOf } from "./spotlight-stage.ts";
-import { createTableStore } from "./store.ts";
 
 const DECK = "stealth-and-steadfastness";
 let ctx: ReduceContext;
@@ -98,6 +97,10 @@ describe("the stage", () => {
             expect(rect.y).toBeGreaterThanOrEqual(0);
           }
           expect(stage.word.cy + 9).toBeLessThanOrEqual(canvas.height);
+          // The "2 of 3 · Tap to skip" line fits under the pills too, centered.
+          expect(stage.note.cy + 9).toBeLessThanOrEqual(canvas.height);
+          expect(stage.note.cy).toBeGreaterThan(stage.word.cy);
+          expect(stage.note.cx).toBe(canvas.width / 2);
         }
       }
     }
@@ -176,7 +179,49 @@ describe("the plan for a real state", () => {
     expect(plan.clashes[0]?.enemyAttack).toBe(false);
     expect(plan.clashes[0]?.attackers.map((spot) => spot.id)).toEqual(clashes[0]?.attackers);
     expect(plan.clashes[0]?.stage.attackers).toHaveLength(2);
-    expect(plan.clashes[0]?.shape).toEqual({ damage: clashes[0]?.damage, destroyed: true, shadow: false });
+    expect(plan.clashes[0]?.shape).toEqual({ damage: clashes[0]?.damage, destroyed: true, shadow: false, first: true, last: true });
+  });
+
+  it("counts two attacks on one target up in turn, ending on the state's own count", () => {
+    // Two consecutive attacks of a played game that hit the same card, joined as one state resolving both.
+    for (const seed of [1, 2, 3, 4, 5, 6, 8, 9, 10]) {
+      let state = expectOk(reduce(startScenario(starterStart(DECK, seed), ctx), { type: "Keep" }, ctx)).state;
+      const seen: { prev: ScenarioState; next: ScenarioState; steps: Reduced["steps"] }[] = [];
+      for (let turn = 0; turn < 900 && !state.lost; turn += 1) {
+        const found = playUntil(ctx, state, 1, (reduced) => reduced.steps.some((step) => step.kind === "strike"));
+        if (!found) break;
+        seen.push(found);
+        state = found.next;
+      }
+      for (const [index, first] of seen.entries()) {
+        const second = seen.slice(index + 1).find((later) => clashesOf(later.prev, later.next, later.steps)[0]?.target === clashesOf(first.prev, first.next, first.steps)[0]?.target && !clashesOf(later.prev, later.next, later.steps)[0]?.destroyed);
+        if (!second) continue;
+        const clashes = [...clashesOf(first.prev, first.next, first.steps), ...clashesOf(second.prev, second.next, second.steps)];
+        const target = clashes[0]?.target ?? "";
+        const before = layoutOf(first.prev);
+        const plan = buildPlan({ seq: 1, clashes, canvas: CANVAS, card: before.card, prev: first.prev, next: second.next, layouts: [before, layoutOf(second.next)] });
+        const [one, two] = plan.clashes;
+        const start = first.prev.cards[target]?.damage ?? 0;
+        expect([one?.before, one?.after]).toEqual([start, start + (clashes[0]?.damage ?? 0)]);
+        expect(two?.before).toBe(one?.after);
+        expect(two?.after).toBe((two?.before ?? 0) + (clashes[1]?.damage ?? 0));
+        // The last count is the state's own.
+        expect(two?.after).toBe(second.next.cards[target]?.damage);
+        return;
+      }
+    }
+    throw new Error("No two attacks on one target in those games");
+  });
+
+  it("marks the first attack as the one that dims and the last as the one that goes back", () => {
+    const reduced = attack(2, 1, () => true);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const before = layoutOf(reduced.prev);
+    const base = { canvas: CANVAS, card: before.card, prev: reduced.prev, next: reduced.next, layouts: [before, layoutOf(reduced.next)] };
+    expect(buildPlan({ seq: 1, clashes, ...base }).clashes[0]?.shape).toMatchObject({ first: true, last: true });
+    const three = buildPlan({ seq: 1, clashes: [...clashes, ...clashes, ...clashes], ...base });
+    expect(three.clashes.map((plan) => [plan.shape.first, plan.shape.last])).toEqual([[true, false], [false, false], [false, true]]);
+    expect(three.span).toBe(spotlightSpan(3));
   });
 
   it("runs several attacks one after another, and a card on neither table grows out of the middle", () => {
@@ -186,88 +231,8 @@ describe("the plan for a real state", () => {
     const bare: TableLayout = { ...empty, slots: [] };
     const plan = buildPlan({ seq: 1, clashes: [...clashes, ...clashes], canvas: CANVAS, card: empty.card, prev: reduced.prev, next: reduced.next, layouts: [bare] });
     expect(plan.clashes).toHaveLength(2);
-    expect(plan.span).toBe(2 * MOTION.spotlight.ms);
+    expect(plan.span).toBe(spotlightSpan(2));
     const from = plan.clashes[0]?.target.from;
     expect((from?.x ?? 0) + (from?.w ?? 0) / 2).toBeCloseTo(CANVAS.width / 2, 6);
-  });
-});
-
-describe("the gate", () => {
-  it("opens for a moment with attacks and not for one without", () => {
-    const reduced = attack(2, 1, () => true);
-    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
-    expect(openGate(4, clashes)).toEqual({ seq: 4, clashes, ended: null, leaving: false });
-    expect(openGate(5, [])).toMatchObject({ seq: 5, ended: "done", leaving: true });
-    expect(NO_SPOTLIGHT.ended).toBe("done");
-  });
-
-  it("holds the table while attacks play, on a canvas, at a scale above 0 only", () => {
-    const reduced = attack(2, 1, () => true);
-    const gate = openGate(1, clashesOf(reduced.prev, reduced.next, reduced.steps));
-    expect(spotlightHolds(gate, 1, true)).toBe(true);
-    expect(spotlightHolds(gate, 0.6, true)).toBe(true);
-    // Reduced motion plays none, and the web has no canvas to play it on: the banner carries the attack.
-    expect(spotlightHolds(gate, 0, true)).toBe(false);
-    expect(spotlightHolds(gate, 1, false)).toBe(false);
-    expect(spotlightHolds(NO_SPOTLIGHT, 1, true)).toBe(false);
-  });
-
-  it("ends once, by the run or by a tap, and only for its own moment", () => {
-    const reduced = attack(2, 1, () => true);
-    const gate = openGate(3, clashesOf(reduced.prev, reduced.next, reduced.steps));
-    expect(endGate(gate, "done", 2)).toBe(gate);
-    const skipped = endGate(gate, "skipped");
-    expect(skipped).toMatchObject({ ended: "skipped", leaving: true });
-    expect(spotlightHolds(skipped, 1, true)).toBe(false);
-    expect(endGate(skipped, "done")).toBe(skipped);
-  });
-
-  it("shows the scrim until the last attack begins to go back", () => {
-    const reduced = attack(2, 1, () => true);
-    const gate = openGate(1, clashesOf(reduced.prev, reduced.next, reduced.steps));
-    expect(scrimShows(gate, 1, true)).toBe(true);
-    const leaving = leaveGate(gate);
-    expect(leaving.leaving).toBe(true);
-    expect(spotlightHolds(leaving, 1, true)).toBe(true);
-    expect(scrimShows(leaving, 1, true)).toBe(false);
-    expect(leaveGate(gate, 9)).toBe(gate);
-  });
-});
-
-describe("the store's gate", () => {
-  it("opens it with the attacks of an accepted intent, and a tap ends it", () => {
-    const reduced = attack(2, 1, () => true);
-    const store = createTableStore({ ctx, game: reduced.prev });
-    expect(store.getState().spotlight.clashes).toEqual([]);
-    expect(store.getState().dispatch(reduced.intent)).toBe(true);
-    const gate = store.getState().spotlight;
-    expect(gate.clashes).toEqual(clashesOf(reduced.prev, reduced.next, reduced.steps));
-    expect(gate).toMatchObject({ seq: store.getState().moment?.seq, ended: null });
-    store.getState().leaveSpotlight();
-    expect(store.getState().spotlight.leaving).toBe(true);
-    store.getState().endSpotlight();
-    expect(store.getState().spotlight.ended).toBe("skipped");
-    // A run that finishes after a tap changes nothing.
-    store.getState().endSpotlight("done");
-    expect(store.getState().spotlight.ended).toBe("skipped");
-  });
-
-  it("leaves it alone for an intent with no steps, closes it for one with no attack, and ends it on Undo", () => {
-    const reduced = attack(2, 1, () => true);
-    const store = createTableStore({ ctx, game: reduced.prev });
-    store.getState().dispatch(reduced.intent);
-    const open = store.getState().spotlight;
-    expect(open.ended).toBeNull();
-    // Undo takes the attack back: nothing is replayed and the spotlight ends.
-    if (store.getState().history.length > 0) {
-      store.getState().undo();
-      expect(store.getState().spotlight.ended).not.toBeNull();
-    }
-    // Another intent that shows a banner and has no attack opens a gate that is already closed.
-    const quiet = playUntil(ctx, expectOk(reduce(startScenario(starterStart(DECK, 2), ctx), { type: "Keep" }, ctx)).state, 1, (found) => found.steps.length > 0 && !found.steps.some((step) => step.kind === "strike"));
-    if (!quiet) throw new Error("No quiet moment");
-    const second = createTableStore({ ctx, game: quiet.prev });
-    second.getState().dispatch(quiet.intent);
-    expect(second.getState().spotlight).toMatchObject({ clashes: [], ended: "done" });
   });
 });

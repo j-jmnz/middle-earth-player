@@ -59,11 +59,17 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
     const animate = k > 0 && sameSize;
     // The acting seat changed: its hand slides up into place, and nothing is dealt.
     const between = animate ? motionsBetween(track.layout, layout, zoneNow, { handoff: seat !== track.seat }) : motionsBetween(null, layout, zoneNow);
-    // A token pops once its card has arrived; a card off the table shows none. The damage a spotlight's attack placed pops in the
-    // spotlight, at the end of its burst, so the state's own pop leaves it out.
-    const owned = held ? new Set(store.getState().spotlight.clashes.map((clash) => clash.target)) : null;
+    // A token pops once its card has arrived; a card off the table shows none. The damage a spotlight's attacks placed pops in the
+    // spotlight, at the end of its burst, so the state's own pop leaves out that much of the change (archery or an effect's damage on
+    // the same card keeps its pop and its number).
+    const placed = new Map<string, number>();
+    if (held) for (const clash of store.getState().spotlight.clashes) placed.set(clash.target, (placed.get(clash.target) ?? 0) + clash.damage);
+    const deltas = tokenDeltas(track.counts, game).flatMap((delta) => {
+      const change = delta.change - (delta.token === "damage" ? (placed.get(delta.cardId) ?? 0) : 0);
+      return change === 0 ? [] : [{ ...delta, change }];
+    });
     const fx = animate
-      ? fxPlan(tokenDeltas(track.counts, game).filter((delta) => !(delta.token === "damage" && owned?.has(delta.cardId))), (cardId) => {
+      ? fxPlan(deltas, (cardId) => {
           const slot = layout.slots.find((candidate) => candidate.id === cardId && candidate.kind !== "pile");
           const motion = slot ? between.motions.get(slot.id) : undefined;
           return slot ? (motion && !still(motion) ? motionEnd(motion) : 0) : null;

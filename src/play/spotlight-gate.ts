@@ -42,3 +42,8 @@ export function spotlightHolds(gate: SpotlightGate, scale: number, canvas: boole
 export function scrimShows(gate: SpotlightGate, scale: number, canvas: boolean): boolean {
   return spotlightHolds(gate, scale, canvas) && !gate.leaving;
 }
+
+/** Whether a spotlight is open and not yet ended, whatever the scale: what Android Back skips before it peels a layer. */
+export function spotlightOpen(gate: SpotlightGate): boolean {
+  return gate.clashes.length > 0 && gate.ended == null;
+}

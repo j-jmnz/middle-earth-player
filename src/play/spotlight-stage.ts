@@ -34,6 +34,8 @@ export type Stage = {
   corner: { cx: number; cy: number };
   // The "+n" for the attackers past the fan, at the top of the first card.
   more: { cx: number; cy: number } | null;
+  // The line under the pills for two or more attacks ("2 of 3 · Tap to skip"), centered on the canvas.
+  note: { cx: number; cy: number };
 };
 
 /**
@@ -55,7 +57,7 @@ export function stageOf(canvas: { width: number; height: number }, card: { w: nu
   const sw = Math.round(w * SHAPE.spotlightShadow);
   const sh = Math.round(h * SHAPE.spotlightShadow);
   const total = wide(w);
-  const top = Math.max(EDGE, Math.round((canvas.height - (h + PILL_GAP + PILL_H + WORD_H)) / 2));
+  const top = Math.max(EDGE, Math.round((canvas.height - (h + PILL_GAP + PILL_H + 2 * WORD_H)) / 2));
   const left = Math.round((canvas.width - total) / 2);
   const fanLeft = left + (shadow ? sw + SHADOW_GAP : 0);
   const step = Math.round(w * FAN_STEP);
@@ -75,6 +77,7 @@ export function stageOf(canvas: { width: number; height: number }, card: { w: nu
     contact: { x: target.x, y: top + h / 2 },
     corner: { cx: target.x + w - radius - 2, cy: top + radius + 2 },
     more: attackers > shown ? { cx: fanLeft + 16, cy: top + 14 } : null,
+    note: { cx: canvas.width / 2, cy: pillY + PILL_H / 2 + WORD_H + WORD_H / 2 + 4 },
   };
 }
 

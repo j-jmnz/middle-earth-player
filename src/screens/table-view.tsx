@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
 import { backStep } from "../play/back";
+import { spotlightOpen } from "../play/spotlight-gate";
 import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
 import type { LogNames } from "../play/log";
@@ -153,9 +154,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [router, nav],
   );
   const onOutcome = useCallback(() => router.replace(nav.outcome), [router, nav]);
-  const onPile = useCallback((id: string) => {
-    if (id === "discard" || id === "encounterDiscard") setReading({ kind: "pile", pile: id });
-  }, []);
+  const onPile = useCallback((id: string) => (id === "discard" || id === "encounterDiscard" ? setReading({ kind: "pile", pile: id }) : undefined), []);
   const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
   const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
@@ -167,14 +166,15 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       const step = backStep({
-        menuOpen,
-        moreOpen, linesOpen,
+        spotlightOpen: spotlightOpen(store.getState().spotlight),
+        menuOpen, moreOpen, linesOpen,
         previewOpen: preview != null,
         readingOpen: reading != null,
         overlayOpen: choice.overlayOpen,
         panelOpen: choice.panelOpen,
       });
-      if (step === "closeMenu") setMenuOpen(false);
+      if (step === "skipSpotlight") store.getState().endSpotlight("skipped");
+      else if (step === "closeMenu") setMenuOpen(false);
       else if (step === "closeMore" || step === "closeLines") closeMore();
       else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
       else if (step === "closeReading") setReading(null);
@@ -184,7 +184,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav]);
+  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;

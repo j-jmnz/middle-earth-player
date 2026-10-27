@@ -27,7 +27,8 @@ export type ClashPlan = {
   shadow: SpotCard | null;
   stage: Stage;
   shape: ClashShape;
-  // The target's damage count before the attack and after it (the state's own numbers).
+  // The target's damage count before this attack and after it: the state's count before the intent, plus the damage of the
+  // attacks before this one on the same target (all the engine's numbers).
   before: number;
   after: number;
 };
@@ -78,8 +79,12 @@ export function buildPlan(input: PlanInput): SpotlightPlan {
     return known ? { id, code: known.code, ...placeOf(layouts, place, card, canvas) } : null;
   };
   const isEnemy = (id: string) => prev.staging.includes(id) || prev.seats.some((seat) => seat.engaged.includes(id));
-  const clashes: ClashPlan[] = [];
+  const entries: Omit<ClashPlan, "shape">[] = [];
+  // The damage each target took from the attacks before this one, so two attacks on one target count up in turn.
+  const taken = new Map<string, number>();
   for (const clash of input.clashes) {
+    const before = (prev.cards[clash.target]?.damage ?? 0) + (taken.get(clash.target) ?? 0);
+    taken.set(clash.target, (taken.get(clash.target) ?? 0) + clash.damage);
     const everyone = clash.attackers.flatMap((id) => spot(id) ?? []);
     const target = spot(clash.target);
     if (everyone.length === 0 || !target) continue;
@@ -87,9 +92,7 @@ export function buildPlan(input: PlanInput): SpotlightPlan {
     const enemy = clash.attackers[0] ?? "";
     const turned = clash.shadow ? spot(clash.shadow, layouts.some((layout) => layout.slots.some((slot) => slot.id === clash.shadow)) ? clash.shadow : enemy) : null;
     const shown = everyone.slice(0, SHAPE.spotlightFan);
-    const before = prev.cards[clash.target]?.damage ?? 0;
-    const after = next.cards[clash.target]?.damage ?? before + clash.damage;
-    clashes.push({
+    entries.push({
       clash,
       enemyAttack: isEnemy(enemy) && clash.attackers.length === 1,
       attackers: shown,
@@ -97,11 +100,11 @@ export function buildPlan(input: PlanInput): SpotlightPlan {
       target,
       shadow: turned,
       stage: stageOf(canvas, card, everyone.length, turned != null),
-      shape: { damage: clash.damage, destroyed: clash.destroyed, shadow: turned != null },
       before,
-      after,
+      after: before + clash.damage,
     });
   }
+  const clashes: ClashPlan[] = entries.map((entry, index) => ({ ...entry, shape: { damage: entry.clash.damage, destroyed: entry.clash.destroyed, shadow: entry.shadow != null, first: index === 0, last: index === entries.length - 1 } }));
   const codes = [...new Set(clashes.flatMap((plan) => [...plan.attackers, plan.target, ...(plan.shadow ? [plan.shadow] : [])].map((entry) => entry.code)))];
   return { seq: input.seq, clashes, codes, span: spotlightSpan(clashes.length), canvas };
 }

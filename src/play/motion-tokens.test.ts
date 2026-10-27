@@ -48,7 +48,7 @@ describe("the tokens", () => {
 
   it("make a spotlight of at most 1.6 s at Normal and 0.6 of it at Quick, each beat at most 500 ms", () => {
     for (const name of SPOTLIGHT_BEATS) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
-    for (const name of ["spotlightBurstStep", "spotlightBurstFly", "spotlightBounceRise", "spotlightBounceSettle", "spotlightFall"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
+    for (const name of ["spotlightBurstStep", "spotlightBurstFly", "spotlightBounceRise", "spotlightBounceSettle", "spotlightFall", "spotlightSwap", "spotlightDrawAgain", "spotlightScrim"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
     // The six beats, in order, are the run.
     expect(SPOTLIGHT_BEATS.reduce((sum, name) => sum + MOTION[name].ms, 0)).toBe(MOTION.spotlight.ms);
     expect(MOTION.spotlight.ms).toBeLessThanOrEqual(1600);
@@ -58,6 +58,9 @@ describe("the tokens", () => {
     expect(ms(MOTION.spotlight, motionScale("normal", true))).toBe(0);
     // The beats of the table's sequence: 250 dim, 250 draw back, 150 lunge, 80 hold, 370 impact, 400 return.
     expect(SPOTLIGHT_BEATS.map((name) => MOTION[name].ms)).toEqual([250, 250, 150, 80, 370, 400]);
+    // A later attack of the same state swaps in (150 ms) instead of dimming, and draws back in 125; the scrim over the bar and the dock takes 100.
+    expect([MOTION.spotlightSwap.ms, MOTION.spotlightDrawAgain.ms, MOTION.spotlightScrim.ms]).toEqual([150, 125, 100]);
+    expect(MOTION.spotlightSwap.ms + MOTION.spotlightDrawAgain.ms + MOTION.spotlightLunge.ms + MOTION.spotlightHold.ms + MOTION.spotlightImpact.ms).toBe(875);
     // The burst fits the impact: three tokens 90 ms apart, the last landing as the impact ends.
     expect(2 * MOTION.spotlightBurstStep.ms + MOTION.spotlightBurstFly.ms).toBe(MOTION.spotlightImpact.ms);
   });

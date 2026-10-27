@@ -32,6 +32,7 @@ import { useTableImages } from "./table-images.native.ts";
 import { TokenFx } from "./token-fx.native.tsx";
 import { tableTokens as t } from "./tokens.ts";
 import { useSpotlight } from "./use-spotlight.ts";
+import { useSpotlightImages } from "./use-spotlight-images.native.ts";
 
 // A faint word in an empty zone, so the player knows what the space is for.
 function ZoneWord({ rect, text, font }: { rect: Rect; text: string; font: SkFont }) {
@@ -65,12 +66,13 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
   const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat);
   const { progress: hurryProgress, clear: hurryClear } = hurry;
-  // The attacks the state resolved play on top of the table before its own motions (spotlight.native.tsx).
+  // The attacks the state resolved play on top of the table first (spotlight.native.tsx); the touch that skips them does nothing else.
   const spot = useSpotlight(store, layout, k);
+  const { swallow, live } = spot;
   const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);
   const returnTiming = useMemo(() => timing(MOTION.dragReturn, k), [k]);
 
-  const codes = useMemo(() => [...new Set([...[...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)].filter((slot) => !slot.faceDown && slot.code !== "").map((slot) => slot.code), ...(spot.plan?.codes ?? [])])], [layout, moves, spot.plan]);
+  const codes = useMemo(() => [...new Set([...[...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)].filter((slot) => !slot.faceDown && slot.code !== "").map((slot) => slot.code)])], [layout, moves]);
   const images = useTableImages(codes, picture, layout.card, pictureRevision);
   const tokens: TokenImages = {
     resource: useImage(ICON_FILES.resource),
@@ -80,7 +82,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     engagementCost: useImage(ICON_FILES.engagementCost),
   };
   const backs: BackImages = { player: useImage(CARD_BACK_FILES.player), encounter: useImage(CARD_BACK_FILES.encounter) };
-  const fonts = useTableFonts();
+  const { fonts, spotFonts } = useTableFonts();
+  const spotImages = useSpotlightImages(spot.plan, spot.playing, picture, pictureRevision, images);
 
   // What the worklets read: the slots, which of them can be picked up, and the selected card's drop rectangles.
   const slots = useSharedValue<readonly CardSlot[]>(layout.slots);
@@ -114,6 +117,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         cancelAnimation(dy);
         cancelAnimation(lift);
         finishMotions(hurryProgress, hurryClear);
+        swallow.set(live.get());
         dx.set(0);
         dy.set(0);
         lift.set(1);
@@ -124,7 +128,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
       .onStart((event) => {
         const index = hitSlot(slots.get(), event.x - event.translationX, event.y - event.translationY);
         const slot = slots.get()[index];
-        if (index < 0 || !slot || !lifts.get()[index]) {
+        if (index < 0 || !slot || !lifts.get()[index] || swallow.get()) {
           dragging.set(-1);
           return;
         }
@@ -172,7 +176,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
 
     const tap = Gesture.Tap().onEnd((event) => {
       const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
-      if (slot) scheduleOnRN(onTap, slot.id);
+      if (slot && !swallow.get()) scheduleOnRN(onTap, slot.id);
     });
 
     // Held still past the press delay, a face-up card opens large; a discard pile opens its list.
@@ -180,13 +184,13 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
       .minDuration(350)
       .onStart((event) => {
         const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
-        if (!slot) return;
+        if (!slot || swallow.get()) return;
         if (slot.kind === "pile") scheduleOnRN(onTap, slot.id);
         else if (!slot.faceDown) scheduleOnRN(onPreview, slot.id);
       });
 
     return Gesture.Race(pan, hold, tap);
-  }, [slots, lifts, drops, dragging, dx, dy, lift, k, liftTiming, returnTiming, hurryProgress, hurryClear, select, onDrop, onTap, onPreview]);
+  }, [slots, lifts, drops, dragging, dx, dy, lift, k, liftTiming, returnTiming, hurryProgress, hurryClear, swallow, live, select, onDrop, onTap, onPreview]);
 
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
@@ -285,7 +289,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
             <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2} />
           </Group>
         ) : null}
-        {spot.playing && spot.plan ? <Spotlight plan={spot.plan} progress={spot.progress} width={width} height={height} images={images} tokens={tokens} backs={backs} fonts={fonts} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} /> : null}
+        {spot.playing && spot.plan ? <Spotlight plan={spot.plan} progress={spot.progress} width={width} height={height} images={spotImages} tokens={tokens} backs={backs} fonts={fonts} spotFonts={spotFonts} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} /> : null}
       </Canvas>
     </GestureDetector>
   );

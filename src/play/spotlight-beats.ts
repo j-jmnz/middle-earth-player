@@ -4,7 +4,7 @@
 // move; spotlight-stage.ts says where the cards stand. `t` is ms since the attack's run began and `k` the motion scale (Quick 0.6),
 // so every length passes through the scale: a gate or a timer is not in here.
 //
-// One attack, at Normal (ms):
+// One attack, at Normal (ms), when it is the only one (or the first of several, then without the last row):
 //   0   dim      the table dims, the cards fly from their slots to the center, the pills fade in
 //   250 draw     the attacker draws back and tilts away; a turned shadow card flips face up beside the enemy
 //   500 lunge    the attacker moves to touch the target
@@ -12,6 +12,8 @@
 //   730 impact   the target shakes; the damage tokens fly to its corner and the count pops, or the defense bounces ("Blocked")
 //   1100 return  both go back to their slots and the table lights again; a destroyed target greys and drops instead
 //   1500
+// Several attacks in one state play under one night: the table is already dark, so the second and later attacks swap in over 150 ms
+// (no dim, no flight from the slots, a draw back of 125 ms), the one before them fades out in the same 150 ms, and only the last goes back.
 import { clamp01, ease, length, popScale } from "./motion-curves.ts";
 import { MOTION, SHAPE, type Tween } from "./motion-tokens.ts";
 import { tokenPopScale } from "./token-fx.ts";
@@ -23,57 +25,90 @@ function curve(token: Tween, x: number): number {
   return ease(token.easing ?? "linear", x);
 }
 
-/** The beats of one attack at a scale: each one's length and where it starts, in ms. `end` is the run's length. */
-export type Beats = { dim: number; draw: number; lunge: number; hold: number; impact: number; ret: number; drawAt: number; lungeAt: number; holdAt: number; impactAt: number; retAt: number; end: number };
+/** Where an attack stands among the attacks of its state: the first dims the table, the last goes back. */
+export type Place = { first: boolean; last: boolean };
 
-export function beatsAt(k: number): Beats {
+/**
+ * The beats of one attack at a scale: each one's length and where it starts, in ms. `dim` is the first attack's dim or a later one's
+ * swap, `ret` is 0 unless it is the last, `end` is the attack's own length, and `exit` is how long it fades out into the next attack.
+ */
+export type Beats = { dim: number; draw: number; lunge: number; hold: number; impact: number; ret: number; drawAt: number; lungeAt: number; holdAt: number; impactAt: number; retAt: number; end: number; exit: number };
+
+export function beatsAt(k: number, place: Place = { first: true, last: true }): Beats {
   "worklet";
-  const dim = length(MOTION.spotlightDim, k);
-  const draw = length(MOTION.spotlightDraw, k);
+  const dim = length(place.first ? MOTION.spotlightDim : MOTION.spotlightSwap, k);
+  const draw = length(place.first ? MOTION.spotlightDraw : MOTION.spotlightDrawAgain, k);
   const lunge = length(MOTION.spotlightLunge, k);
   const hold = length(MOTION.spotlightHold, k);
   const impact = length(MOTION.spotlightImpact, k);
-  const ret = length(MOTION.spotlightReturn, k);
+  const ret = place.last ? length(MOTION.spotlightReturn, k) : 0;
   const drawAt = dim;
   const lungeAt = drawAt + draw;
   const holdAt = lungeAt + lunge;
   const impactAt = holdAt + hold;
   const retAt = impactAt + impact;
-  return { dim, draw, lunge, hold, impact, ret, drawAt, lungeAt, holdAt, impactAt, retAt, end: retAt + ret };
+  return { dim, draw, lunge, hold, impact, ret, drawAt, lungeAt, holdAt, impactAt, retAt, end: retAt + ret, exit: place.last ? 0 : length(MOTION.spotlightSwap, k) };
 }
 
-/** How long `count` attacks run one after another, unscaled: the table dims once, and each attack is a whole run. */
+function placeOf(index: number, count: number): Place {
+  "worklet";
+  return { first: index === 0, last: index === count - 1 };
+}
+
+/** Where attack `index` of `count` begins, ms into the whole run at a scale: the lengths of the attacks before it. */
+export function runStart(index: number, count: number, k: number): number {
+  "worklet";
+  let at = 0;
+  for (let before = 0; before < index; before += 1) at += beatsAt(k, placeOf(before, count)).end;
+  return at;
+}
+
+/** How long `count` attacks run one after another at a scale, in ms: the first 1500 at Normal, each later one 875, the last going back. */
+export function spotlightRun(count: number, k: number): number {
+  return Math.ceil(runStart(count - 1, count, k) + beatsAt(k, placeOf(count - 1, count)).end);
+}
+
+/** The run of `count` attacks, unscaled. */
 export function spotlightSpan(count: number): number {
-  return count * MOTION.spotlight.ms;
+  return spotlightRun(count, 1);
+}
+
+/** Attack `index` of `count`: where it begins in the run and how long it stays drawn (its own length and the fade into the next one). */
+export function windowOf(index: number, count: number, k: number): { start: number; length: number } {
+  "worklet";
+  const beats = beatsAt(k, placeOf(index, count));
+  return { start: runStart(index, count, k), length: beats.end + beats.exit };
 }
 
 /** The ms, from the start of the whole run at a scale, at which the strike of attack `index` lands (its hit stop begins). */
-export function hitTime(index: number, k: number): number {
-  const beats = beatsAt(k);
-  return index * beats.end + beats.holdAt;
+export function hitTime(index: number, count: number, k: number): number {
+  return runStart(index, count, k) + beatsAt(k, placeOf(index, count)).holdAt;
 }
 
 /** The ms at which the last attack begins to go back, so the scrim over the bar and the dock can fade out with the canvas. */
 export function leaveTime(count: number, k: number): number {
-  const beats = beatsAt(k);
-  return (count - 1) * beats.end + beats.retAt;
+  return runStart(count - 1, count, k) + beatsAt(k, placeOf(count - 1, count)).retAt;
 }
 
-/** What one attack needs to know to be drawn: the damage placed, whether the target is destroyed, and a turned shadow card. */
-export type ClashShape = { damage: number; destroyed: boolean; shadow: boolean };
+/** What one attack needs to know to be drawn: the damage placed, whether the target is destroyed, a turned shadow card, and its place among the attacks. */
+export type ClashShape = { damage: number; destroyed: boolean; shadow: boolean; first: boolean; last: boolean };
 
 export type Frame = {
   // 0 at their slots, 1 at the center: the attackers (and the shadow card), and the target, which stays when it is destroyed.
   flyAttackers: number;
   flyTarget: number;
-  // The pills and the words under the cards.
+  // The pills and the words under the cards, and the whole attack's opacity (a later attack swaps in, an earlier one swaps out).
   pills: number;
+  fade: number;
   // The attacker's offset toward the target in pt (negative while it draws back), and its tilt in radians.
   strike: number;
   tilt: number;
-  // The target's offset in pt while it shakes, and how far a destroyed one has fallen (0..1); its veil, drop and opacity follow.
+  // The target's offset in pt while it shakes, how far a destroyed one has fallen (0..1) and drops, its night veil (0..1 of 50%)
+  // and its own opacity.
   shake: number;
   fall: number;
+  veil: number;
+  targetOpacity: number;
   // The shadow card's flip: 0 is the back, 1 the face.
   flip: number;
   // The defense pill's scale and the "Blocked" word's opacity.
@@ -91,7 +126,7 @@ export function burstGap(count: number, k: number): number {
   return Math.max(1, Math.min(length(MOTION.spotlightBurstStep, k), (length(MOTION.spotlightImpact, k) - length(MOTION.spotlightBurstFly, k)) / (count - 1)));
 }
 
-/** When the last damage token lands, ms into the run (the impact begins at `impactAt`); 0 when there is no damage. */
+/** When the last damage token lands, ms into the attack; 0 when there is no damage. */
 function landAt(damage: number, b: Beats, k: number): number {
   "worklet";
   return damage > 0 ? b.impactAt + (damage - 1) * burstGap(damage, k) + length(MOTION.spotlightBurstFly, k) : 0;
@@ -100,12 +135,14 @@ function landAt(damage: number, b: Beats, k: number): number {
 /** The pose of one attack's cards at `t`. Before 0 or past the run it is the rest: nothing flown out. */
 export function frameAt(shape: ClashShape, t: number, k: number): Frame {
   "worklet";
-  const b = beatsAt(k);
-  const inn = curve(MOTION.spotlightDim, t / b.dim);
-  const out = t < b.retAt ? 0 : curve(MOTION.spotlightReturn, (t - b.retAt) / b.ret);
-  const flyAttackers = t < b.retAt ? inn : 1 - out;
+  const b = beatsAt(k, shape);
+  const appear = curve(shape.first ? MOTION.spotlightDim : MOTION.spotlightSwap, t / b.dim);
+  const out = shape.last && t >= b.retAt ? curve(MOTION.spotlightReturn, (t - b.retAt) / b.ret) : 0;
+  // Only the first attack flies out from the slots; a later one is already in the middle of the dark table.
+  const flyAttackers = shape.last && t >= b.retAt ? 1 - out : shape.first ? appear : 1;
   const flyTarget = shape.destroyed && t >= b.retAt ? 1 : flyAttackers;
-  const pills = t < b.retAt ? inn : 1 - clamp01((t - b.retAt) / (b.ret / 2));
+  const pills = shape.last && t >= b.retAt ? 1 - clamp01((t - b.retAt) / (b.ret / 2)) : appear;
+  const fade = (shape.first ? 1 : appear) * (shape.last ? 1 : 1 - clamp01((t - b.retAt) / b.exit));
 
   // The attacker draws back and tilts away, lunges to touch the target, then goes home with the rest.
   let strike = 0;
@@ -117,15 +154,19 @@ export function frameAt(shape: ClashShape, t: number, k: number): Frame {
     strike = -SHAPE.spotlightDrawBack + (SHAPE.spotlightDrawBack + SHAPE.spotlightGap) * l;
     tilt = -TILT * (1 - l);
   } else if (t >= b.drawAt) {
-    const d = curve(MOTION.spotlightDraw, (t - b.drawAt) / b.draw);
+    const d = curve(shape.first ? MOTION.spotlightDraw : MOTION.spotlightDrawAgain, (t - b.drawAt) / b.draw);
     strike = -SHAPE.spotlightDrawBack * d;
     tilt = -TILT * d;
   }
 
-  // The target shakes through the impact, decaying over three swings.
+  // The target shakes through the impact, decaying over three swings; a defender that blocked it shakes less.
   const u = clamp01((t - b.impactAt) / b.impact);
-  const shake = t < b.impactAt ? 0 : SHAPE.spotlightShake * (1 - u) * Math.sin(2 * Math.PI * SHAPE.spotlightSwings * u);
+  const reach = SHAPE.spotlightShake * (shape.damage === 0 ? SHAPE.spotlightShakeBlocked : 1);
+  const shake = t < b.impactAt ? 0 : reach * (1 - u) * Math.sin(2 * Math.PI * SHAPE.spotlightSwings * u);
+  // A destroyed target greys under the night veil (full by 40% of its fall), then fades out over the rest of it.
   const fall = shape.destroyed && t >= b.retAt ? curve(MOTION.spotlightFall, (t - b.retAt) / length(MOTION.spotlightFall, k)) : 0;
+  const veil = SHAPE.spotlightVeil * clamp01(fall / SHAPE.spotlightVeilBy);
+  const targetOpacity = 1 - clamp01((fall - SHAPE.spotlightVeilBy) / (1 - SHAPE.spotlightVeilBy));
 
   const flip = shape.shadow ? clamp01((t - b.drawAt) / length(MOTION.cardFlip, k)) : 0;
   const hit = t - b.impactAt;
@@ -134,13 +175,13 @@ export function frameAt(shape: ClashShape, t: number, k: number): Frame {
   const word = blocked ? clamp01(hit / length(MOTION.spotlightBounceRise, k)) * pills : 0;
   const landed = shape.damage > 0 && t >= landAt(shape.damage, b, k);
   const pop = landed ? tokenPopScale(t - landAt(shape.damage, b, k), k) : 1;
-  return { flyAttackers, flyTarget, pills, strike, tilt, shake, fall, flip, bounce, word, landed, pop };
+  return { flyAttackers, flyTarget, pills, fade, strike, tilt, shake, fall, veil, targetOpacity, flip, bounce, word, landed, pop };
 }
 
 /** One damage token on its way from the point of contact to the target's corner: how far (0..1), and whether it is in the air. */
-export function burstAt(index: number, count: number, t: number, k: number): { u: number; flying: boolean } {
+export function burstAt(index: number, count: number, t: number, k: number, place: Place = { first: true, last: true }): { u: number; flying: boolean } {
   "worklet";
-  const b = beatsAt(k);
+  const b = beatsAt(k, place);
   const start = b.impactAt + index * burstGap(count, k);
   const fly = length(MOTION.spotlightBurstFly, k);
   const x = (t - start) / fly;
@@ -150,9 +191,9 @@ export function burstAt(index: number, count: number, t: number, k: number): { u
 /** The night over the table, 0..1 of its opacity, `t` ms into a run of `count` attacks: in over the first dim, out over the last return. */
 export function scrimAt(t: number, k: number, count: number): number {
   "worklet";
-  const b = beatsAt(k);
-  const last = (count - 1) * b.end + b.retAt;
-  if (t < b.dim) return curve(MOTION.spotlightDim, t / b.dim);
-  if (t >= last) return 1 - clamp01((t - last) / b.ret);
+  const first = beatsAt(k, placeOf(0, count));
+  if (t < first.dim) return curve(MOTION.spotlightDim, t / first.dim);
+  const last = runStart(count - 1, count, k) + beatsAt(k, placeOf(count - 1, count)).retAt;
+  if (t >= last) return 1 - clamp01((t - last) / length(MOTION.spotlightReturn, k));
   return 1;
 }

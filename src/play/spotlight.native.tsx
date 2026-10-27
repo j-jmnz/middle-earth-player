@@ -4,42 +4,38 @@
 // go back. The canvas holds the pictures; the plan (spotlight-plan.ts) says who stands where; the beats are arithmetic on one clock
 // (spotlight-beats.ts) that the UI thread evaluates, so the canvas draws only while it plays, with no idle loop and no timer.
 // Every number is the engine's: it reads the clash, never works one out. Colors are the table's tokens.
-import { Group, RoundedRect, useFont, type SkImage } from "@shopify/react-native-skia";
+import { Group, RoundedRect, type SkImage } from "@shopify/react-native-skia";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
 import type { BackImages, Fonts, TokenImages } from "./canvas-pieces.native.tsx";
 import type { IconName } from "./icon-map.ts";
 import { SHAPE } from "./motion-tokens.ts";
-import { beatsAt, frameAt, scrimAt, type Frame } from "./spotlight-beats.ts";
-import { BurstToken, Corner, FlyingCard, Pill, StageCard, Veil, Word } from "./spotlight-pieces.native.tsx";
+import { frameAt, scrimAt, spotlightRun, windowOf, type Frame } from "./spotlight-beats.ts";
+import { BurstToken, Chip, Corner, FlyingCard, Pill, StageCard, Veil, Word } from "./spotlight-pieces.native.tsx";
 import type { ClashPlan, SpotlightPlan } from "./spotlight-plan.ts";
+import type { SpotFonts } from "./table-fonts.native.ts";
 import { tableTokens as t } from "./tokens.ts";
-
-const MARCELLUS = require("../../assets/fonts/Marcellus-Regular.ttf") as number;
-const PILL_SIZE = 26;
-const COUNT_SIZE = 20;
-const WORD_SIZE = 15;
 
 type Common = {
   images: ReadonlyMap<string, SkImage>;
   tokens: TokenImages;
   backs: BackImages;
   fonts: Fonts;
+  spotFonts: SpotFonts;
   nameOf: (code: string) => string;
   sphereOf: (code: string) => IconName | null;
   k: number;
 };
 
-// One attack, `start` ms into the run: it draws only inside its own window, so the next one waits its turn.
-function ClashView({ plan, start, run, now, ...common }: Common & { plan: ClashPlan; start: number; run: number; now: SharedValue<number> }) {
+// Attack `index` of `total`, in its own window of the run: it draws only inside it, so the next one waits its turn (and swaps in as it leaves).
+function ClashView({ plan, index, total, now, ...common }: Common & { plan: ClashPlan; index: number; total: number; now: SharedValue<number> }) {
   const { k, images, tokens, backs, fonts, nameOf, sphereOf } = common;
-  const pill = useFont(MARCELLUS, PILL_SIZE);
-  const count = useFont(MARCELLUS, COUNT_SIZE);
-  const word = useFont(MARCELLUS, WORD_SIZE);
+  const { pill, count, word } = common.spotFonts;
   const { stage, shape, clash } = plan;
-  const local = useDerivedValue(() => now.get() - start);
+  const run = windowOf(index, total, k);
+  const local = useDerivedValue(() => now.get() - run.start);
   const frame = useDerivedValue((): Frame => frameAt(shape, local.get(), k));
-  const inWindow = useDerivedValue(() => (local.get() >= 0 && local.get() < run ? 1 : 0));
+  const inWindow = useDerivedValue(() => (local.get() >= 0 && local.get() < run.length ? frame.get().fade : 0));
   const picture = (spot: { code: string }) => images.get(spot.code) ?? null;
   const card = (spot: ClashPlan["target"], rect: ClashPlan["stage"]["target"], faceDown = false) => (
     <StageCard spot={spot} rect={rect} image={picture(spot)} name={nameOf(spot.code)} sphere={sphereOf(spot.code)} fonts={fonts} backs={backs} faceDown={faceDown} />
@@ -63,22 +59,23 @@ function ClashView({ plan, start, run, now, ...common }: Common & { plan: ClashP
         <Veil rect={stage.target} frame={frame} />
         {count ? <Corner stage={stage} before={plan.before} after={plan.after} image={tokens.damage} font={count} frame={frame} /> : null}
       </FlyingCard>
-      {plan.attackers.map((spot, index) => {
-        const rect = stage.attackers[index] ?? stage.target;
+      {plan.attackers.map((spot, at) => {
+        const rect = stage.attackers[at] ?? stage.target;
         return (
-          <FlyingCard key={spot.id} spot={spot} rect={rect} turn={stage.turns[index] ?? 0} role="attacker" frame={frame}>
+          <FlyingCard key={spot.id} spot={spot} rect={rect} turn={stage.turns[at] ?? 0} role="attacker" frame={frame}>
             {card(spot, rect)}
           </FlyingCard>
         );
       })}
-      {Array.from({ length: shape.damage }, (_, index) => (
-        <BurstToken key={index} stage={stage} index={index} count={shape.damage} now={local} k={k} image={tokens.damage} />
+      {Array.from({ length: shape.damage }, (_, n) => (
+        <BurstToken key={n} stage={stage} index={n} count={shape.damage} now={local} k={k} place={shape} image={tokens.damage} />
       ))}
       {pill ? <Pill at={stage.attackPill} icon="attack" color={attackColor} text={String(clash.attack)} font={pill} frame={frame} /> : null}
       {/* An undefended hero has no defense to show: the pill stands under a defender or an enemy only. */}
       {pill && !clash.undefended ? <Pill at={stage.targetPill} icon="defense" color={t.gold} text={String(clash.defense)} font={pill} frame={frame} bounce={blocked} /> : null}
       {word && blocked ? <Word at={stage.word} text="Blocked" font={word} opacity={wordOpacity} /> : null}
-      {word && stage.more ? <Word at={stage.more} text={`+${plan.more}`} font={word} opacity={moreOpacity} /> : null}
+      {word && stage.more ? <Chip at={stage.more} text={`+${plan.more}`} font={word} opacity={moreOpacity} /> : null}
+      {word && total > 1 ? <Word at={stage.note} text={`${index + 1} of ${total} · Tap to skip`} font={word} color={t.muted} opacity={moreOpacity} /> : null}
     </Group>
   );
 }
@@ -89,15 +86,14 @@ function ClashView({ plan, start, run, now, ...common }: Common & { plan: ClashP
  */
 export function Spotlight({ plan, progress, width, height, ...common }: Common & { plan: SpotlightPlan; progress: SharedValue<number>; width: number; height: number }) {
   const { k } = common;
-  const run = beatsAt(k).end;
-  const total = Math.max(1, Math.ceil(plan.span * k));
+  const total = Math.max(1, spotlightRun(plan.clashes.length, k));
   const now = useDerivedValue(() => progress.get() * total);
   const night = useDerivedValue(() => SHAPE.spotlightNight * scrimAt(now.get(), k, plan.clashes.length));
   return (
     <Group>
       <RoundedRect x={0} y={0} width={width} height={height} r={0} color={t.night} opacity={night} />
       {plan.clashes.map((clash, index) => (
-        <ClashView key={`${plan.seq}:${index}`} plan={clash} start={index * run} run={run} now={now} {...common} />
+        <ClashView key={`${plan.seq}:${index}`} plan={clash} index={index} total={plan.clashes.length} now={now} {...common} />
       ))}
     </Group>
   );

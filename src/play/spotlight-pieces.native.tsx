@@ -5,11 +5,11 @@ import { Circle, Group, Image, RoundedRect, Text, vec, type SkFont, type SkImage
 import type { ReactNode } from "react";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
-import { CanvasIcon, CardBody, Outlined, type BackImages, type Fonts } from "./canvas-pieces.native.tsx";
+import { CanvasIcon, CardBody, Outlined, RADIUS, type BackImages, type Fonts } from "./canvas-pieces.native.tsx";
 import type { IconName } from "./icon-map.ts";
 import type { Rect } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
-import { burstAt, type Frame } from "./spotlight-beats.ts";
+import { burstAt, type Frame, type Place } from "./spotlight-beats.ts";
 import type { SpotCard } from "./spotlight-plan.ts";
 import { burstPoint, flown, PILL_H, type Stage } from "./spotlight-stage.ts";
 import { tableTokens as t } from "./tokens.ts";
@@ -31,7 +31,7 @@ export function FlyingCard({ spot, rect, turn, role, frame, children }: { spot: 
     const flip = role === "shadow" ? Math.abs(Math.cos(Math.PI * f.flip)) : 1;
     return [{ translateX: p.tx + dx }, { translateY: p.ty + dy }, { rotate: p.turn + (role === "attacker" ? f.tilt : 0) }, { scale: p.scale }, { scaleX: flip }];
   });
-  const opacity = useDerivedValue(() => (role === "target" ? 1 - frame.get().fall : 1));
+  const opacity = useDerivedValue(() => (role === "target" ? frame.get().targetOpacity : 1));
   return (
     <Group transform={transform} origin={origin} opacity={opacity}>
       {children}
@@ -45,10 +45,10 @@ export function StageCard({ spot, rect, image, name, sphere, fonts, backs, faceD
   return <CardBody slot={slot} image={image} name={name} sphere={sphere} fonts={fonts} encounterBack={faceDown} backs={backs} />;
 }
 
-/** The night veil over a destroyed target, growing to 50% as it falls. */
+/** The night veil over a destroyed target, growing to 50% over the first 40% of its fall. */
 export function Veil({ rect, frame }: { rect: Rect; frame: SharedValue<Frame> }) {
-  const opacity = useDerivedValue(() => SHAPE.spotlightVeil * frame.get().fall);
-  return <RoundedRect x={rect.x} y={rect.y} width={rect.w} height={rect.h} r={6} color={t.night} opacity={opacity} />;
+  const opacity = useDerivedValue(() => frame.get().veil);
+  return <RoundedRect x={rect.x} y={rect.y} width={rect.w} height={rect.h} r={RADIUS} color={t.night} opacity={opacity} />;
 }
 
 /** A big pill under a group: the stat's icon and its number in Marcellus. The defense pill bounces when the attack is blocked. */
@@ -68,7 +68,20 @@ export function Pill({ at, icon, color, text, font, frame, bounce = false }: { a
   );
 }
 
-/** A small word under a pill ("Blocked", "+2" for attackers past the fan), centered at `at`. */
+/** A small night chip with a hairline, like the pills, with a word on it ("+2" for the attackers past the fan, over card art), centered at `at`. */
+export function Chip({ at, text, font, opacity }: { at: { cx: number; cy: number }; text: string; font: SkFont; opacity: SharedValue<number> }) {
+  const width = font.getTextWidth(text) + 16;
+  const height = font.getSize() + 8;
+  return (
+    <Group opacity={opacity}>
+      <RoundedRect x={at.cx - width / 2} y={at.cy - height / 2} width={width} height={height} r={height / 2} color={t.night} />
+      <RoundedRect x={at.cx - width / 2} y={at.cy - height / 2} width={width} height={height} r={height / 2} color={t.hairline} style="stroke" strokeWidth={1} />
+      <Text x={at.cx - font.getTextWidth(text) / 2} y={at.cy + font.getSize() * 0.35} text={text} font={font} color={t.bone} />
+    </Group>
+  );
+}
+
+/** A small word under a pill ("Blocked"), centered at `at`. */
 export function Word({ at, text, font, color = t.bone, opacity }: { at: { cx: number; cy: number }; text: string; font: SkFont; color?: string; opacity: SharedValue<number> | number }) {
   return <Text x={at.cx - font.getTextWidth(text) / 2} y={at.cy + font.getSize() * 0.35} text={text} font={font} color={color} opacity={opacity} />;
 }
@@ -98,9 +111,9 @@ export function Corner({ stage, before, after, image, font, frame }: { stage: St
 }
 
 /** One damage token on its way from the point of contact to the target's corner. */
-export function BurstToken({ stage, index, count, now, k, image }: { stage: Stage; index: number; count: number; now: SharedValue<number>; k: number; image: SkImage | null }) {
+export function BurstToken({ stage, index, count, now, k, place, image }: { stage: Stage; index: number; count: number; now: SharedValue<number>; k: number; place: Place; image: SkImage | null }) {
   const size = SHAPE.spotlightToken;
-  const flight = useDerivedValue(() => burstAt(index, count, now.get(), k));
+  const flight = useDerivedValue(() => burstAt(index, count, now.get(), k, place));
   const transform = useDerivedValue(() => {
     const p = burstPoint(stage, index, count, flight.get().u);
     return [{ translateX: p.x }, { translateY: p.y }, { scale: p.scale }];

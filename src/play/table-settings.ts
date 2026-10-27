@@ -25,12 +25,14 @@ export type TableSettings = {
   guideSeen: Readonly<Record<string, number>>;
   // Animation speed (motion-tokens.ts, motionScale): Normal, or Quick at 0.6 of every length. Reduced motion snaps either.
   animationSpeed: Speed;
+  // The combat spotlight (phase 24): when an attack deals or blocks damage the table plays it large. Off plays none, as reduced motion does.
+  spotlight: boolean;
 };
 
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal" };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -49,6 +51,7 @@ export function parseSettings(raw: unknown): TableSettings {
     guide: flag(value.guide, true),
     guideSeen: seen,
     animationSpeed: SPEEDS.find((speed) => speed === value.animationSpeed) ?? DEFAULT_SETTINGS.animationSpeed,
+    spotlight: flag(value.spotlight, true),
   };
 }
 

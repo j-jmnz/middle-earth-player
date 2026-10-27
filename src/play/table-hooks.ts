@@ -153,12 +153,17 @@ export function useAutoAnswer({
 // again when a combat spotlight on it ends or is skipped (the tap that skipped it must not send).
 const SETTLE_MS = 350;
 
-/** `settled()` is true once the moment on the dock (`momentKey`) has been there for SETTLE_MS, and the spotlight on it, if any, has ended for as long. */
+/**
+ * `settled()` is true once the moment on the dock (`momentKey`) has been there for SETTLE_MS, and the spotlight on it, if any, has ended
+ * for as long. While a spotlight is held it is false, so a tap that reaches the dock before the scrim does sends nothing.
+ */
 export function useSettle(store: TableStore, momentKey: string): () => boolean {
   const spotlit = useSpotlightHold(store);
+  const held = useRef(spotlit);
   const settledFrom = useRef(0);
   useEffect(() => {
+    held.current = spotlit;
     settledFrom.current = Date.now() + SETTLE_MS;
   }, [momentKey, spotlit]);
-  return useCallback(() => Date.now() >= settledFrom.current, []);
+  return useCallback(() => !held.current && Date.now() >= settledFrom.current, []);
 }

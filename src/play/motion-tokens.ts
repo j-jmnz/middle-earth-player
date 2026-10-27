@@ -116,10 +116,16 @@ export const MOTION = {
   spotlightBounceRise: tween(120, "outCubic"),
   spotlightBounceSettle: spring(250, 0.5),
   spotlightFall: tween(250, "outCubic"),
+  // Several attacks in one state: the table is already dark, so the second and later attacks come in over a swap (no dim, no
+  // flight from the slots) with a shorter draw back, and only the last goes back. The scrim over the bar and the dock fades in and,
+  // when a tap skips the spotlight, out over `spotlightScrim`.
+  spotlightSwap: tween(150, "outCubic"),
+  spotlightDrawAgain: tween(125, "outCubic"),
+  spotlightScrim: tween(100, "outCubic"),
   spotlight: tween(1500, "linear"),
 } as const;
 
-/** The six beats of one attack in order; their lengths add up to `MOTION.spotlight`. */
+/** The six beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
 export const SPOTLIGHT_BEATS = ["spotlightDim", "spotlightDraw", "spotlightLunge", "spotlightHold", "spotlightImpact", "spotlightReturn"] as const;
 
 /** The tokens that may pass 500 ms (a title sweep across the canvas, and the whole run of the combat spotlight, phase 24). */
@@ -167,6 +173,10 @@ export const SHAPE = {
   spotlightTilt: 4,
   spotlightShake: 5,
   spotlightSwings: 3,
+  // A blocked defender shakes this share as far as one that was hit.
+  spotlightShakeBlocked: 0.4,
+  // A destroyed target's veil is full by this share of its fall; it fades out over the rest.
+  spotlightVeilBy: 0.4,
   spotlightBounce: 1.25,
   spotlightDrop: 12,
   spotlightVeil: 0.5,
