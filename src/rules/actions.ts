@@ -3,7 +3,7 @@ import type { Effect } from "../catalog/boundary.ts";
 import { applyCancel, cancelIntents, cancelReason } from "./cancel.ts";
 import { holds } from "./conditions.ts";
 import { effectsOfCard } from "./families/misc-text.ts";
-import { effectCause } from "./cause.ts";
+import { effectCause, inCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -80,7 +80,8 @@ export function applyTrigger(
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);
   if (!effect || !state.window) return state;
   const seat = state.activeSeat;
-  const paid = payUsage(state, effect, intent.cardId, intent.payments ?? [], ctx, steps, seat);
+  // What the cost changes (threat raised to claim an objective, damage on the source) is the effect's doing.
+  const paid = inCause(steps, effectCause(effect), () => payUsage(state, effect, intent.cardId, intent.payments ?? [], ctx, steps, seat));
   return pushEffectFrame(
     { ...paid, window: null },
     {

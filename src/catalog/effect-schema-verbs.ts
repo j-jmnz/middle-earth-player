@@ -114,7 +114,8 @@ export const simpleVerbs = [
   z.strictObject({
     verb: z.literal("RaiseThreat"),
     amount: positiveAmountSchema.optional(),
-    who: z.enum(["actor", "firstPlayer", "otherPlayer", "eachSeat", "picked", "eventSeat"]).optional(),
+    // `hostController`: the controller of the card the source is attached to ("raise attached hero's controller's threat by 2", 01109:A:3).
+    who: z.enum(["actor", "firstPlayer", "otherPlayer", "eachSeat", "picked", "eventSeat", "hostController"]).optional(),
     perCommitted: z
       .strictObject({
         type: z.literal("hero"),

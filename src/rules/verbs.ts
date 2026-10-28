@@ -194,7 +194,10 @@ export function raiseFor(
   steps: EngineStep[],
 ): ScenarioState {
   const who = instruction.who;
-  const seats = who === "eachSeat" || who === "picked" || who === "eventSeat" ? seatsFor(state, who, focus.seat) : [seatFor(state, who, focus.seat)];
+  // The controller of the card the source is attached to (a claimed objective on a hero): nobody when it is attached to nothing.
+  const host = who === "hostController" && focus.sourceId ? state.cards[state.cards[focus.sourceId]?.host ?? ""] : undefined;
+  if (who === "hostController" && host?.controller == null) return state;
+  const seats = who === "hostController" ? [host?.controller ?? focus.seat] : who === "eachSeat" || who === "picked" || who === "eventSeat" ? seatsFor(state, who, focus.seat) : [seatFor(state, who, focus.seat)];
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   let next = state;
   for (const seat of seats) {

@@ -39,7 +39,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 01108 Gandalf's Map, 01109 Dungeon Torch, 01110 Shadow Key: guarded when revealed, claimed for 2 threat once free of encounters, then attached to a hero
   // with a Forced effect each (a claimed objective that is detached returns to the staging area, families/objectives.ts).
   ...objective("01108", "A:3", [{"id":"01108:constant:2","cardCode":"01108","lines":["01108:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotAttack","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"cannotDefend","amount":1,"until":"whileSourceInPlay","target":"host"}]}]),
-  ...objective("01109", "A:3", [{"id":"01109:forced:1","cardCode":"01109","lines":["01109:A:3"],"timing":"forced","trigger":"endOfRound","condition":ON_HERO,"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any","isHost":true}},{"verb":"RaiseThreat","amount":2,"who":"picked"}]}]),
+  ...objective("01109", "A:3", [{"id":"01109:forced:1","cardCode":"01109","lines":["01109:A:3"],"timing":"forced","trigger":"endOfRound","condition":ON_HERO,"instructions":[{"verb":"RaiseThreat","amount":2,"who":"hostController"}]}]),
   ...objective("01110", "A:3", [{"id":"01110:forced:1","cardCode":"01110","lines":["01110:A:3"],"timing":"forced","trigger":"endOfRound","condition":ON_HERO,"instructions":[{"verb":"DamageCard","amount":1,"target":"host"}]}]),
   // 01123 The Necromancer's Tower: Setup turns the Nazgûl faceup beside the quest deck and attaches an encounter card to each objective; When
   // Revealed takes a prisoner; the players play at most 1 ally a round and cannot advance without a claimed objective.
