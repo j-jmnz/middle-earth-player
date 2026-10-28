@@ -25,7 +25,7 @@ export function askReadyPayments(state: ScenarioState, ctx: ReduceContext, steps
   // The oldest card's question is asked first, so its frame is pushed last.
   for (const { card, price } of [...payers].reverse()) {
     const source = next.cards[price.sourceId];
-    const record = source ? effectsOf(ctx, source.code).find((effect) => JSON.stringify(effect.instructions).includes('"readyPayment"')) : undefined;
+    const record = source ? effectsOf(ctx, source.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "readyPayment")) : undefined;
     const choose: Instruction = {
       verb: "Choose",
       who: "actor",

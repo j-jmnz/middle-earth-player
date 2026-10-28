@@ -14,7 +14,7 @@ import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { runEncounterItem } from "./families/encounter-items.ts";
 import { chooseEach } from "./families/deck-each.ts";
 import { lookedDeckSeat } from "./families/deck-rules.ts";
-import { highestThreatSeats } from "./families/play-hooks.ts";
+import { attachHostChooser, highestThreatSeats } from "./families/play-hooks.ts";
 import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
@@ -441,11 +441,7 @@ function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Redu
     ids = found.slice(0, 1);
   } else if (picksOne(item.instruction)) {
     const distinct = distinctByCode(state, found);
-    const instruction = item.instruction;
-    const firstChooses = instruction.verb === "AttachSelf" && instruction.to.kind === "hero" && instruction.to.control === "any";
-    // The player with the highest threat chooses the host of a card that goes to his hero; a tie is the first player's to settle.
-    const highest = instruction.verb === "AttachSelf" && instruction.to.kind === "hero" && instruction.to.control === "highestThreat" ? highestThreatSeats(state) : [];
-    const chooser = firstChooses ? state.firstPlayer : highest.length === 1 ? (highest[0] ?? item.seat) : highest.length > 1 ? state.firstPlayer : item.seat;
+    const chooser = attachHostChooser(state, item.instruction, item.seat);
     if (distinct.length > 1) return askTarget(state, { ...item, seat: chooser }, distinct);
     ids = found.slice(0, 1);
   }

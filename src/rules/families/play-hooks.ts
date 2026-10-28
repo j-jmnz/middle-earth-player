@@ -3,7 +3,7 @@
 // The small reads the shared engine files make into the play family: which events a trigger hears, the threat a seat is
 // treated as having, and the events a doomed raise and a discard from play announce. Only state types and the event queue are
 // imported here, so the lowest engine files (zones.ts, keywords.ts, listen.ts) can call it.
-import type { Trigger } from "../../catalog/boundary.ts";
+import type { Instruction, Trigger } from "../../catalog/boundary.ts";
 
 import type { Cause } from "../cause.ts";
 import { queueEvent } from "../queue.ts";
@@ -31,6 +31,16 @@ export function highestThreatSeats(state: ScenarioState): number[] {
   const living = livingSeats(state);
   const top = Math.max(...living.map((seat) => seatThreat(state, seat)));
   return living.filter((seat) => seatThreat(state, seat) === top);
+}
+
+// The seat that chooses the host of an AttachSelf card that goes to a hero: the first player when it may go to any player's hero, the
+// player with the highest threat when the card says so (a tie is the first player's to settle), and otherwise the seat the effect runs for.
+export function attachHostChooser(state: ScenarioState, instruction: Instruction, itemSeat: number): number {
+  if (instruction.verb !== "AttachSelf" || instruction.to.kind !== "hero") return itemSeat;
+  if (instruction.to.control === "any") return state.firstPlayer;
+  if (instruction.to.control !== "highestThreat") return itemSeat;
+  const highest = highestThreatSeats(state);
+  return highest.length === 1 ? (highest[0] ?? itemSeat) : highest.length > 1 ? state.firstPlayer : itemSeat;
 }
 
 // A threat raise the doomed keyword caused is announced to "After a player raises his threat from the doomed keyword"
