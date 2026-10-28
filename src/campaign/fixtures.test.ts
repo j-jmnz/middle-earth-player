@@ -32,9 +32,9 @@ const campaign = loadCampaign();
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 
 function worldFor(name: FixtureName) {
-  const { loadout, log } = fixture(name);
+  const { loadout, log, campaignId } = fixture(name);
   const codes = [...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)];
-  return loadWorld(catalog, campaign, loadScenario(loadout.scenarioId), EFFECTS, codes);
+  return loadWorld(catalog, loadCampaign(campaignId), loadScenario(loadout.scenarioId), EFFECTS, codes);
 }
 
 describe("Maestro fixtures", () => {
@@ -144,6 +144,50 @@ describe("Maestro fixtures", () => {
     const resumed = resume(fixtureSave("lost", "s", CATALOG_VERSION), world, CATALOG_VERSION);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (resumed.ok) expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
+  });
+});
+
+describe("Passage Through Mirkwood (Mirkwood Paths part 1, phase 29)", () => {
+  it("are two-handed games of two decklists from an empty Mirkwood Paths log, with no Ring-bearer", () => {
+    for (const name of ["mirkwood-won", "mirkwood-lost"] as const) {
+      const found = fixture(name);
+      expect(found.campaignId, name).toBe("mirkwood-paths");
+      expect(found.seatCount, name).toBe(2);
+      expect(found.loadout.scenarioId, name).toBe("passage-through-mirkwood");
+      expect(found.loadout.ringBearer, name).toBeNull();
+      expect(found.log.completed, name).toEqual([]);
+      expect(fixtureSave(name, "s", CATALOG_VERSION).campaignId, name).toBe("mirkwood-paths");
+    }
+  });
+
+  it("mirkwood-won replays to a win with nothing to answer, and confirming it writes the Resolution and unlocks Journey Along the Anduin", () => {
+    const world = worldFor("mirkwood-won");
+    const save = fixtureSave("mirkwood-won", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.stageCleared && !resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    const view = resolutionView(resumed.state, world);
+    expect(view.kind).toBe("settled");
+    // Beorn's Path (stage 3B 01122), which the Maestro flow's sentence and log rows name.
+    expect(resumed.state.stagesReached).toEqual(["01120", "01122"]);
+    if (view.kind === "settled") expect(settledSentence(view, world, "Journey Along the Anduin")).toBe("Confirming records 2 copies of Mendor's Support and Ungoliant's Swarm in the campaign and unlocks Journey Along the Anduin.");
+    const after = finish(save, world, resumed.state);
+    expect(after.log.completed).toEqual(["passage-through-mirkwood"]);
+    expect(after.log.campaignPool.filter((card) => card.code === "01132")).toHaveLength(2);
+    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status).slice(0, 3)).toEqual(["completed", "current", "locked"]);
+  });
+
+  it("mirkwood-lost replays to a loss when Mendor leaves play, and finishing it leaves the log as it was", () => {
+    const world = worldFor("mirkwood-lost");
+    const save = fixtureSave("mirkwood-lost", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    expect(resumed.state.lossReason).toBe("Mendor left play");
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: "Mendor left play" });
+    const after = finish(save, world, resumed.state);
+    expect(after.log).toEqual(save.log);
+    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status)[0]).toBe("current");
   });
 });
 

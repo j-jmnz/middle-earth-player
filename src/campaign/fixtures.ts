@@ -8,8 +8,10 @@
 // the script is run again. `won`, and so `knife-lost`, are open (docs/phases/STATUS.md): no legal win of the two starter
 // decks has been found, so neither is committed, and a name whose fixture is absent is not offered (`hasFixture`). `duo` is a
 // two-handed game of scenario 1 parked on the first player's planning window of round 1, for the flows that need two dials and a seat
-// that is not acting (the peek, `.maestro/seat-peek.yaml`).
+// that is not acting (the peek, `.maestro/seat-peek.yaml`). `mirkwood-won` and `mirkwood-lost` are two-handed games of Passage Through
+// Mirkwood (Mirkwood Paths part 1) from an empty log, parked on the win and on the loss (scripts/e2e-mirkwood.ts); a fixture names its campaign.
 import knifeFixtures from "./fixtures/a-knife-in-the-dark.json";
+import mirkwoodFixtures from "./fixtures/passage-through-mirkwood.json";
 import fixtures from "./fixtures/scenario-1.json";
 
 import type { PlayerIntent } from "../rules/intents.ts";
@@ -18,14 +20,14 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { FELLOWSHIP_ID, parseLoadout, parseLog, parseSeatCount, type Save, type StoredLoadout } from "./save.ts";
 
-export type FixtureName = "won" | "lost" | "knife-lost" | "duo";
+export type FixtureName = "won" | "lost" | "knife-lost" | "duo" | "mirkwood-won" | "mirkwood-lost";
 
 // `past`: the scenario 1 fixture and the Resolution answers whose log this fixture starts from.
-export type Fixture = { seatCount: 1 | 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: FixtureName; choices: string[] } | null };
+export type Fixture = { campaignId: string; seatCount: 1 | 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: FixtureName; choices: string[] } | null };
 
-type StoredFixture = { seatCount: number; loadout: unknown; seed: number; intents: unknown[]; log?: unknown; past?: { fixture: string; choices: string[] } };
+type StoredFixture = { campaignId?: string; seatCount: number; loadout: unknown; seed: number; intents: unknown[]; log?: unknown; past?: { fixture: string; choices: string[] } };
 
-export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost", "duo"];
+export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost", "duo", "mirkwood-won", "mirkwood-lost"];
 
 export function isFixtureName(value: string): value is FixtureName {
   return (FIXTURE_NAMES as readonly string[]).includes(value);
@@ -34,6 +36,7 @@ export function isFixtureName(value: string): value is FixtureName {
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = {
   ...(fixtures as Partial<Record<"won" | "lost" | "duo", StoredFixture>>),
   ...(knifeFixtures as Partial<Record<"knife-lost", StoredFixture>>),
+  ...(mirkwoodFixtures as Partial<Record<"mirkwood-won" | "mirkwood-lost", StoredFixture>>),
 };
 
 // The fixture is committed. The e2e route opens only these.
@@ -50,7 +53,7 @@ export function fixture(name: FixtureName): Fixture {
   const past = stored.past && isFixtureName(stored.past.fixture) ? { fixture: stored.past.fixture, choices: [...stored.past.choices] } : null;
   // The intents are the reducer's own, written by the script from intents it accepted; the log is the one the scenario 1
   // fixture writes, which fixtures.test.ts checks by replaying that game.
-  return { seatCount, loadout, seed: stored.seed, intents: stored.intents as PlayerIntent[], log: stored.log == null ? emptyLog(seatCount) : parseLog(stored.log), past };
+  return { campaignId: stored.campaignId ?? FELLOWSHIP_ID, seatCount, loadout, seed: stored.seed, intents: stored.intents as PlayerIntent[], log: stored.log == null ? emptyLog(seatCount) : parseLog(stored.log), past };
 }
 
 /** A new save holding the fixture's open scenario, stamped with this build's engine version and catalog version. */
@@ -58,7 +61,7 @@ export function fixtureSave(name: FixtureName, id: string, dataHash: number): Sa
   const found = fixture(name);
   return {
     id,
-    campaignId: FELLOWSHIP_ID,
+    campaignId: found.campaignId,
     seatCount: found.seatCount,
     log: found.log,
     active: { engineVersion: ENGINE_VERSION, dataHash, seed: found.seed, intents: [...found.intents] },

@@ -18,6 +18,9 @@
 // first resource and the quest of nothing yet), for the flows that need two dials and a seat that is not acting (the peek,
 // `.maestro/seat-peek.yaml`). Nothing in it is a win or a loss: it is the auto-player's answers up to that window.
 //
+// `mirkwood-won` and `mirkwood-lost`: Passage Through Mirkwood (scripts/e2e-mirkwood.ts), written to
+// src/campaign/fixtures/passage-through-mirkwood.json.
+//
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
 // a core set hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
@@ -40,6 +43,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 
 import { nextIntent } from "./auto-player.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
+import { mirkwoodFixtures } from "./e2e-mirkwood.ts";
 import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -333,6 +337,12 @@ void runScript("e2e-fixtures", () => {
   const file = path.join(dir, "scenario-1.json");
   writeFileSync(file, `${JSON.stringify(out)}\n`);
   say.info(`wrote ${file} (${Object.keys(out).join(", ")})`);
+
+  // Passage Through Mirkwood (Mirkwood Paths part 1): a won and a lost game of real decklists, always written.
+  const mirkwood = say.step("play Passage Through Mirkwood's win and loss", () => mirkwoodFixtures());
+  const mirkwoodFile = path.join(dir, "passage-through-mirkwood.json");
+  writeFileSync(mirkwoodFile, `${JSON.stringify(mirkwood)}\n`);
+  say.info(`wrote ${mirkwoodFile}`);
 
   if (won) {
     const past = wonLog(won);

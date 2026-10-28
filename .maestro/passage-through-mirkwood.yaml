@@ -1,0 +1,79 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 29. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture
+# `mirkwood-won` is a real two-handed game of the Dwarves of Durin and Elves of Lórien lists, Easy, from an empty Mirkwood Paths log,
+# parked on its win through stage 3B "Beorn's Path" (src/campaign/fixtures/passage-through-mirkwood.json, scripts/e2e-mirkwood.ts).
+# 01129's Resolution asks nothing: each player earns a Mendor's Support, and Beorn's Path adds Ungoliant's Swarm. Confirming writes
+# the log and unlocks Journey Along the Anduin. Mirkwood Paths is not a saga: no life tracker, no burden deck on this table.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/mirkwood-won"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- assertNotVisible:
+    id: life
+- assertNotVisible:
+    id: burden-deck
+- assertVisible:
+    id: rail-current
+    text: "Victory"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 30000
+- assertVisible:
+    id: resolution-consequence
+    text: "Confirming records 2 copies of Mendor's Support and Ungoliant's Swarm in the campaign and unlocks Journey Along the Anduin\\."
+- tapOn:
+    id: resolution-confirm
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-passage-through-mirkwood-status
+    text: "Completed"
+- assertVisible:
+    id: node-journey-along-the-anduin-status
+    text: "Current"
+# Kill and relaunch: the scenario is on the log and Journey Along the Anduin is unlocked.
+- stopApp
+- launchApp
+- tapOn:
+    id: continue-path
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-journey-along-the-anduin-status
+    text: "Current"
+- tapOn:
+    id: table-menu
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertVisible:
+    id: log-scenario-passage-through-mirkwood
+    text: ".*rounds.*"
+- assertVisible:
+    id: log-boons
+    text: ".*Mendor's Support.*"
+- assertVisible:
+    id: log-burdens
+    text: ".*Ungoliant's Swarm.*"

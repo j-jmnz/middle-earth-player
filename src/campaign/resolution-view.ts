@@ -150,7 +150,12 @@ function cardWords(world: World, card: SettledCard): string {
 
 /** The sentence above the final Confirm: what the log will hold (a boon on its hero), and the scenario that unlocks. */
 export function settledSentence(view: Extract<ResolutionView, { kind: "settled" }>, world: World, next: string | null): string {
-  const earned = view.earned.map((card) => cardWords(world, card));
+  // Copies of one card are one phrase ("each player earns 1 copy of Mendor's Support": "2 copies of Mendor's Support").
+  const words = view.earned.map((card) => cardWords(world, card));
+  const earned = [...new Set(words)].map((text) => {
+    const copies = words.filter((other) => other === text).length;
+    return copies > 1 ? `${copies} copies of ${text}` : text;
+  });
   const records = earned.length > 0 ? `Confirming records ${earned.join(" and ")} in the campaign` : "Confirming records the win";
   return next ? `${records} and unlocks ${next}.` : `${records}.`;
 }
