@@ -1,6 +1,6 @@
 // A long press on a card: the card large over the dimmed screen, so its text reads at a glance without leaving the table
-// or the list. It grows in on a spring and shrinks back on close; reduced motion snaps both. A tap on the dimmed screen,
-// Close or Android Back closes it; Details opens the card screen.
+// or the list. It grows in on a spring and shrinks back on close; reduced motion snaps both. A tap on the dimmed screen or on
+// the card, Android Back or the VoiceOver escape gesture closes it (there is no Close button); Details opens the card screen.
 //
 // On a wide screen (the table, in landscape) the card stands at the left and a column at its right names it, says what
 // effects are on it now (+1 Attack from Dagger of Westernesse) and lists the cards attached to it and its shadow cards: a
@@ -136,26 +136,21 @@ export function CardPreview({
       <Picture card={shown} width={size.width} height={size.height} />
     </Animated.View>
   );
-  const buttons = (
-    <>
-      {onDetails ? (
-        <ChromeButton
-          label="Details"
-          testID="card-preview-details"
-          tone="gold"
-          accessibilityLabel={`Open ${shown.name}`}
-          onPress={() => {
-            onClose();
-            onDetails(shown.code);
-          }}
-        />
-      ) : null}
-      <ChromeButton label="Close" testID="card-preview-close" onPress={close} />
-    </>
-  );
+  const buttons = onDetails ? (
+    <ChromeButton
+      label="Details"
+      testID="card-preview-details"
+      tone="gold"
+      accessibilityLabel={`Open ${shown.name}`}
+      onPress={() => {
+        onClose();
+        onDetails(shown.code);
+      }}
+    />
+  ) : null;
 
   return (
-    <View testID="card-preview" accessibilityViewIsModal style={StyleSheet.absoluteFill}>
+    <View testID="card-preview" accessibilityViewIsModal onAccessibilityEscape={close} style={StyleSheet.absoluteFill}>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
       <Pressable
         testID="card-preview-scrim"
@@ -228,12 +223,12 @@ export function CardPreview({
                   </View>
                 ) : null}
               </ScrollView>
-              <View className="mt-2 flex-row gap-3">{buttons}</View>
+              {buttons ? <View className="mt-2 flex-row gap-3">{buttons}</View> : null}
             </Pressable>
           </Animated.View>
-        ) : (
+        ) : buttons ? (
           <Animated.View style={[{ flexDirection: "row", gap: 12 * s, marginTop: 16 * s }, buttonsStyle]}>{buttons}</Animated.View>
-        )}
+        ) : null}
       </Pressable>
     </View>
   );
