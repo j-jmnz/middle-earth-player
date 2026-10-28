@@ -26,6 +26,20 @@ export const VERBS = [
   // 01131:B:2). `eachPlayer`: one copy for each player ("Each player may include 1 copy of Mendor's Support", Ranger Sense). A new
   // save takes them in from a finished one (campaign/carry-over.ts).
   z.strictObject({ verb: z.literal("CarryOver"), codes: z.array(code).min(1), eachPlayer: z.boolean().optional(), ...when }),
+  // Campaign Setup: a copy of the card for each player is set aside, out of play ("Set each copy of Valor and Scarred aside, out of play",
+  // 01130:A:2). The players meet them later: AttachSetAside takes one copy from the set-aside cards each time.
+  z.strictObject({ verb: z.literal("SetAsideEachPlayer"), code, ...when }),
+  // The last picked hero gets a set-aside copy of the card attached to it ("each player attaches 1 set-aside copy of Valor to a hero they
+  // control, if able", 01130:A:3). With no set-aside copy left, or no hero picked, nothing happens. The `attached` event is announced.
+  z.strictObject({ verb: z.literal("AttachSetAside"), code, ...when }),
+  // Resolution: each copy of these cards attached to a hero in play joins the Campaign Pool attached to that hero ("Add each copy of
+  // Valor and Scarred in play to the Campaign Pool. Record the names of heroes with Valor and/or Scarred attached ... and attach them
+  // to those heroes when setting up each subsequent scenario", 01130:B:1). A hero that fell takes its copies out of the pool (campaign/log.ts).
+  z.strictObject({ verb: z.literal("EarnAttached"), codes: z.array(code).min(1), ...when }),
+  // Resolution: the hero in play with the most damage is the prisoner, chosen at random among those tied ("The hero with the most
+  // damage will be taken prisoner ... in case of a tie, randomly select among the heroes with the most damage. Record the name of the
+  // \"prisoner\" in the notes section of the Campaign Log", 01130:B:1). Written to the log's `prisoner` fact; the seed makes the pick.
+  z.strictObject({ verb: z.literal("NamePrisoner"), ...when }),
 ] as const;
 
 export const TRIGGERS = [] as const;

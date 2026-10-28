@@ -107,7 +107,7 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   for (const earned of result.earned) {
     const printed = printedOf(cards, earned.code);
     const attachedTo = earned.hero ?? (printed.keywords.permanent ? bearer : null);
-    if (holdsCopy(pool, { code: earned.code, seat: earned.seat, perPlayer: earned.perPlayer })) continue;
+    if (holdsCopy(pool, { code: earned.code, seat: earned.seat, perPlayer: earned.perPlayer, hero: earned.hero })) continue;
     if (attachedTo != null && fallen.has(attachedTo)) continue;
     pool.push(poolCard(printed, earned.code, attachedTo, earned.seat, earned.perPlayer));
   }

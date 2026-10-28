@@ -11,7 +11,7 @@ import { raiseThreat } from "./keywords.ts";
 import { queueEvent } from "./queue.ts";
 import { offerResponses, responseStep } from "./responses.ts";
 import { printedOf } from "./printed.ts";
-import { livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "./state.ts";
+import { flagged, livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "./state.ts";
 import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "./verbs.ts";
@@ -79,6 +79,9 @@ export function revealNow(state: ScenarioState, seat: number, ctx: ReduceContext
 }
 
 export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // "Skip the staging step of the quest phase for the remainder of the game" (01128:B:2): nothing is revealed and nothing hears the
+  // step begin or end; the quest resolves next.
+  if (state.revealCursor == null && flagged(state, "table", "skipStaging")) return withMode(state, "resolution");
   // The staging step begins: Forced effects "at the beginning of the staging step" (141051:A:2) resolve before the first
   // card is revealed (rr.step-3-3). The cursor is set first, so the step begins once.
   if (state.revealCursor == null) {

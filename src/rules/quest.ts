@@ -256,6 +256,8 @@ export function engageWith(state: ScenarioState, seat: number, enemyId: string, 
 }
 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {
+  // "Do not make engagement checks during the encounter phase" (01127:B:1): the table holds noEngagementChecks.
+  if (flagged(state, "table", "noEngagementChecks")) return [];
   // The threat the seat is treated as having (families/play-hooks.ts).
   const threat = seatThreat(state, seat);
   const found: { id: string; cost: number }[] = [];

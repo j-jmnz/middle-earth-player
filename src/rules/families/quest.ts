@@ -19,7 +19,7 @@ import { inPlay, livingSeats, updateCard } from "../state.ts";
 import { topFrame } from "../windows.ts";
 import { attachTo, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
-import { lowerCardThreat, makeActive, moveProgress } from "./quest-places.ts";
+import { lowerCardThreat, makeActive, moveProgress, removeProgressFromQuest } from "./quest-places.ts";
 import { raiseQuestThreat, resetThreat } from "./quest-threat.ts";
 import { advanceStage } from "../quest.ts";
 import { restricted } from "../restrictions.ts";
@@ -77,6 +77,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     // Read when the scenario's definition is built (BranchStage, rules/families/quest-branch.ts); nothing to do when it runs.
     case "BranchStage":
       return state;
+    case "RemoveProgressFromQuest":
+      return removeProgressFromQuest(state, instruction, focus, ctx, steps);
     default:
       return null;
   }

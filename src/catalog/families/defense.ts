@@ -64,6 +64,9 @@ export const VERBS = [
   // Turns the attacking enemy's shadow card face up. If it has no shadow effect, the attack is resolved against the enemy
   // `target` (the picked one by default) instead of the defenders: that enemy takes the damage, read against its Defense.
   z.strictObject({ verb: z.literal("RedirectAttack"), target: cardRefSchema.optional(), ...when }),
+  // Shadow effect of an enemy card ("Wolf Rider attacks the defending player", 01081:A:2): the source attacks the player the attack it
+  // was dealt to is made against, once that attack has ended, and goes to the top of the encounter deck after its own attack.
+  z.strictObject({ verb: z.literal("ShadowAttacks"), ...when }),
   // A stat change that holds only while the card (`target`) attacks the enemy `versus` ("+2 Attack while attacking that enemy").
   z.strictObject({
     verb: z.literal("ModifyStatVersus"),
@@ -94,6 +97,9 @@ export const TRIGGERS = [
   "shadowRaisedAttack",
   // About a card: it changed control.
   "changedControl",
+  // About a character an enemy's attack destroyed with its combat damage (the other card is the enemy): "After a character is destroyed by a
+  // Hill Troll" (01130:A:4). Raised only in a game where some card hears it.
+  "characterDestroyedByAttack",
 ] as const;
 
 export const FLAGS = [
@@ -116,4 +122,7 @@ export const FLAGS = [
   // `attackedFirst` (engine use) once those attacks are done.
   "attacksFirst",
   "attackedFirst",
+  // On an enemy: the combat damage its attack deals beyond the remaining hit points of the character it damages is assigned as an
+  // increase to its controller's threat (Hill Troll, 01082:A:1). The damage still goes on the character.
+  "excessToThreat",
 ] as const;

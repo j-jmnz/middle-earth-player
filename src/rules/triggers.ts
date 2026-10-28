@@ -8,6 +8,7 @@ import { isPlayerType, printedOf } from "./printed.ts";
 import { syncConstants } from "./constants.ts";
 import { pushDue } from "./delayed.ts";
 import { effectCause } from "./cause.ts";
+import { limitSpent, noteForcedUse } from "./usage.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -36,6 +37,8 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
       const owner = forcedActor(state, instance, event, ctx);
       const scope = { actor: owner, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.trigger === "damaged" && event.amount != null ? { dealt: event.amount } : {}), ...(event.explored ? { explored: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
+      // A Forced effect with a limit ("Limit once per game", 01130:A:4) does not fire once its uses are spent.
+      if (effect.limit && limitSpent(state, effect, instance.id, owner)) continue;
       found.push({ effect, instance });
     }
   }
@@ -51,6 +54,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
 function pushFound(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const { effect, instance } of [...found].reverse()) {
+    next = noteForcedUse(next, effect, instance.id, forcedActor(state, instance, event, ctx));
     next = pushEffectFrame(
       next,
       {

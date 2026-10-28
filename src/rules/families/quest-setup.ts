@@ -1,0 +1,29 @@
+// Rules: mec109.setup, rr.setup, rr.quest-cards-quest-deck, rr.reveal (data/rules/entries.json); ledger lines 01126:A:1, 01126:B:1.
+//
+// The first quest card's own text at the start of the game, once the piles have been dealt (setup.ts finishSetup). Its Setup is placed by
+// the scenario's piles (cards set aside or added to staging), except a Setup that reveals encounter cards: "Each player reveals 1 card
+// from the top of the encounter deck, and adds it to the staging area" (01126:A:1) is a record with a ForEachPlayer that holds a
+// RevealEncounter, run here in a frame of its own after the deck is shuffled. The stage then turns to its side B, and its When Revealed
+// effects resolve (01126:B:1, "Search the encounter deck for 1 Hill Troll (if one is not already in play)"), after the Setup's reveals.
+import type { Effect } from "../../catalog/boundary.ts";
+
+import { pushCardEffects } from "../effect-frames.ts";
+import type { EngineStep } from "../intents.ts";
+import type { ReduceContext } from "../interpret.ts";
+import type { ScenarioState } from "../state.ts";
+
+// A Setup record that reveals cards for each player: the one Setup the piles cannot place.
+function revealsPerPlayer(effect: Effect): boolean {
+  return effect.timing === "setup" && effect.instructions.some((instruction) => instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inner.verb === "RevealEncounter"));
+}
+
+export function questStageStart(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = state.questStage;
+  const code = id ? state.cards[id]?.code : undefined;
+  if (!id || !code) return state;
+  const own = ctx.effects.filter((effect) => effect.cardCode === code);
+  // The When Revealed effects go down first, so the Setup's reveals resolve before them.
+  let next = pushCardEffects(state, "whenRevealed", id, state.firstPlayer, false, own.filter((effect) => effect.timing === "whenRevealed"), ctx, steps);
+  next = pushCardEffects(next, "setup", id, state.firstPlayer, false, own.filter(revealsPerPlayer), ctx, steps);
+  return next;
+}

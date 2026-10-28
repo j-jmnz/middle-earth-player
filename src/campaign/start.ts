@@ -38,7 +38,7 @@ export type StartInput = {
 // shuffle cards into the encounter deck (added to the deck here, before the shuffle). Its choices are made by the
 // campaign checklist (src/campaign/checklist.ts) before the scenario starts. The quest card's last Setup step is the
 // encounter deck shuffle, which the piles cannot express.
-const DEALT_VERBS: ReadonlySet<string> = new Set(["AttachToRingBearer", "AddToStaging", "SetAside", "PutObjectiveAllyIntoPlay"]);
+const DEALT_VERBS: ReadonlySet<string> = new Set(["AttachToRingBearer", "AddToStaging", "SetAside", "PutObjectiveAllyIntoPlay", "SetAsideEachPlayer"]);
 
 function hasFacts(facts: CampaignFacts): boolean {
   return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0;

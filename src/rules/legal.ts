@@ -20,7 +20,7 @@ import { hasKeyword } from "./keywords.ts";
 import { attachmentTargets, discardPlayable, playReason, playWindowReason } from "./planning.ts";
 import { resolutionIntents, resolutionReason } from "./resolution.ts";
 import { optionalEnemies, stagingLocations } from "./quest.ts";
-import { defenseBlocked, travelBlocked, travelCostUnpayable } from "./restrictions.ts";
+import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable } from "./restrictions.ts";
 import { flagged, perilLock, type ScenarioState } from "./state.ts";
 import { attackRuleReason } from "./families/attack-targets.ts";
 import { sideQuestReason } from "./families/sidequests-quest.ts";
@@ -138,7 +138,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       return travelReason(state, intent, ctx);
     case "DeclineTravel":
       if (state.window?.kind !== "travel") return "That intent is not legal in this window";
-      return mustTravel(state) && freeSlot(state) && travelTargets(state, ctx).length > 0 ? "The players must travel to a location, if able" : null;
+      return mustTravelNow(state, ctx) && freeSlot(state) && travelTargets(state, ctx).length > 0 ? "The players must travel to a location, if able" : null;
     case "Engage":
       return engageReason(state, intent, ctx);
     case "DeclineEngage":
@@ -180,14 +180,22 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
 }
 
 function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {
-  return stagingLocations(state, ctx.cards).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+  const open = stagingLocations(state, ctx.cards).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+  // A location that says the players must travel to it (01088:A:1) is the only one they may travel to.
+  const forced = forcedTravel(state, ctx);
+  return forced.length > 0 ? open.filter((id) => forced.includes(id)) : open;
+}
+
+// The players may not decline to travel: a card says they must (mec109.stage-4) or a location says they must travel to it (01088:A:1).
+function mustTravelNow(state: ScenarioState, ctx: ReduceContext): boolean {
+  return mustTravel(state) || forcedTravel(state, ctx).length > 0;
 }
 
 function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   const intents: LegalIntent[] = [{ type: "DeclineTravel" }];
   if (freeSlot(state) && travelTargets(state, ctx).length > 0) {
     // "The players must travel to a location, if able" (mec109.stage-4): no declining while they can.
-    return mustTravel(state) ? [{ type: "Travel" }] : [{ type: "Travel" }, ...intents];
+    return mustTravelNow(state, ctx) ? [{ type: "Travel" }] : [{ type: "Travel" }, ...intents];
   }
   return intents;
 }
@@ -222,6 +230,7 @@ function travelReason(
   if (state.window?.kind !== "travel") return "That intent is not legal in this window";
   if (!freeSlot(state)) return "An active location is already in play";
   if (!stagingLocations(state, ctx.cards).includes(intent.locationId)) return "That location is not in staging";
+  if (forcedTravel(state, ctx).length > 0 && !forcedTravel(state, ctx).includes(intent.locationId)) return "The players must travel to the location that says so";
   if (travelBlocked(state, ctx, intent.locationId)) return "Players cannot travel to that location now";
   if (travelCostUnpayable(state, ctx, intent.locationId)) return "The players cannot pay that location's Travel cost";
   return null;

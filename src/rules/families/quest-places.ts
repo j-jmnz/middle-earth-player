@@ -82,3 +82,15 @@ export function lowerCardThreat(state: ScenarioState, instruction: Verb<"LowerCa
   const data = topFrame(lowered)?.data;
   return data?.kind === "effect" ? patchTop(lowered, { data: { ...data, x: before > 0 && after === 0 ? 1 : 0 } }) : lowered;
 }
+
+// Progress comes off the current quest card: `amount`, or all of it when the card holds fewer ("If there are fewer than 4 progress
+// tokens on the quest, remove all progress tokens from that quest", 01086:A:1). The step records it as a negative amount.
+export function removeProgressFromQuest(state: ScenarioState, instruction: Verb<"RemoveProgressFromQuest">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = state.questStage;
+  const stage = id ? state.cards[id] : undefined;
+  if (!id || !stage) return state;
+  const removed = Math.min(stage.progress, Math.max(0, resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx)));
+  if (removed <= 0) return state;
+  steps.push({ kind: "progress", targetId: id, amount: -removed, cause: currentCause(steps, UNATTRIBUTED) });
+  return updateCard(state, id, { progress: stage.progress - removed });
+}

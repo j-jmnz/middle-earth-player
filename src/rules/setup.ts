@@ -6,6 +6,7 @@ import { ruleCause } from "./cause.ts";
 import { threatCostCut } from "./families/costs-stats.ts";
 import type { EngineStep } from "./intents.ts";
 import { recordStartingThreat } from "./families/quest-threat.ts";
+import { questStageStart } from "./families/quest-setup.ts";
 import { placeContracts } from "./families/sidequests-contract.ts";
 import { setAsideEncounterCards } from "./families/sidequests-encounter.ts";
 import { pushPlayerSetup } from "./families/sidequests-setup.ts";
@@ -139,6 +140,8 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     if (next.failure || next.lost) return next;
   }
   if (next.questStage) next = updateCard(next, next.questStage, { face: "B" });
+  // The first quest card's own Setup that reveals cards, and its side B's When Revealed (families/quest-setup.ts).
+  next = questStageStart(next, ctx, steps);
   return withMode(next, "beginRound");
 }
 

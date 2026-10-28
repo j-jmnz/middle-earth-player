@@ -7,7 +7,7 @@ import { holdsNow } from "./verbs.ts";
 import type { EngineStep } from "./intents.ts";
 import { queueEvent } from "./queue.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
-import { defenseAsDefender, modifiedStat, placeDamage } from "./keywords.ts";
+import { defenseAsDefender, modifiedStat } from "./keywords.ts";
 import type { ScenarioState } from "./state.ts";
 import { expireModifiers, flagged, inPlay, updateCard } from "./state.ts";
 import { withFrame } from "./windows.ts";
@@ -16,8 +16,10 @@ import { effectCause, inCause, ruleCause } from "./cause.ts";
 import { offerResponses } from "./responses.ts";
 import { enemyAttackWindow } from "./step-window.ts";
 import { noteAttackDamage } from "./families/defense-damage.ts";
+import { combatDamage } from "./families/defense-excess.ts";
 import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "./families/defense-defenders.ts";
 import { holdAttack } from "./families/defense-listen.ts";
+import { startShadowAttack } from "./families/defense-shadow-attack.ts";
 import { announceShadowRaise, noteShadowStart } from "./families/defense-shadow.ts";
 import { charactersDestroyed } from "./families/burden-attack.ts";
 import { attackHere, attackKey, locationDamage } from "./families/south-watcher.ts";
@@ -29,9 +31,10 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
   return shadowId ? resolveShadowCard(state, shadowId, seat, ctx, steps) : state;
 }
 
-// A shadow effect that asks a player (Pick, Choose: "Discard a non-objective attachment you control", 141071:A:2).
+// A shadow effect that asks a player (Pick, Choose: "Discard a non-objective attachment you control", 141071:A:2), or repeats an
+// instruction ("Deal X shadow cards to this attacker", 01112:A:2), runs in a frame: only a frame expands a Repeat.
 function asks(effects: readonly Effect[]): boolean {
-  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose"));
+  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat"));
 }
 
 function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -195,7 +198,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     if (defender) steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.defenderId, attack: strength, defense, undefended: false, cause: ruleCause("rr.step-6-4-3") });
     // "This attack deals no damage" (a flag the enemy holds, families/misc.ts).
     const raw = defender && !flagged(next, enemy.id, "dealsNoDamage") ? Math.max(0, strength - defense) : 0;
-    const damaged = noteAttackDamage(next, defender ? placeDamage(next, attack.defenderId, raw, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")) : next, ctx);
+    const damaged = noteAttackDamage(next, defender ? combatDamage(next, attack.enemyId, attack.defenderId, raw, ctx, steps) : next, ctx);
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
   // A shadow effect sent the damage to an active location (families/south-watcher.ts).
@@ -205,7 +208,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   const strength = modifiedStat(next, enemy, "attack", ctx.cards);
   steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.heroId, attack: strength, defense: 0, undefended: true, cause: ruleCause("rr.step-6-4-3") });
-  const hit = noteAttackDamage(next, placeDamage(next, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")), ctx);
+  const hit = noteAttackDamage(next, combatDamage(next, attack.enemyId, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx, steps), ctx);
   return hit.lost ? hit : afterDamage(hit, ctx, steps);
 }
 
@@ -262,6 +265,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const announced = queueEvent(cleared, { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender });
   const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks };
   const after = attack.after ?? [];
+  // A shadow card that attacks the defending player (Wolf Rider) attacks now that this attack is over.
+  if (after.length === 0 && (attack.shadowAttackers?.length ?? 0) > 0) return startShadowAttack(ended, attack, ctx, steps) ?? ended;
   if (after.length === 0 || !attackHere(ended, attack.enemyId)) return ended;
   return pushEffectFrame(
     ended,

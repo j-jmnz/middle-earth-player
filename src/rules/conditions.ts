@@ -17,6 +17,7 @@ import { inPlay, livingSeats } from "./state.ts";
 import { combatStepIs } from "./families/defense-conditions.ts";
 import { faceUp, flagHeld } from "./families/sidequests-contract.ts";
 import { copyInVictory } from "./families/sidequests-pick.ts";
+import { shadowCards } from "./zones.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -243,6 +244,11 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
       return host != null && (host === state.activeLocation || host === state.secondActiveLocation);
     }
+    case "shadowBlank":
+      return shadowCards(scope.sourceId ? state.cards[scope.sourceId] : undefined).some((id) => {
+        const code = state.cards[id]?.code;
+        return code != null && !ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "shadow");
+      });
   }
 }
 

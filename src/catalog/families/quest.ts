@@ -57,6 +57,10 @@ export const VERBS = [
   // scenario definition copies it onto the stage (`stages[i].branch`) and advanceStage (rules/quest.ts) takes the branch, so running
   // it does nothing. A stage reached by a branch is the last one: defeating it wins the game.
   z.strictObject({ verb: z.literal("BranchStage"), codes: z.array(z.string().min(1)).min(2) }),
+  // Removes `amount` progress tokens from the current quest card, no more than it holds ("Remove 4 progress tokens from the current quest
+  // card. (If there are fewer than 4 progress tokens on the quest, remove all progress tokens from that quest.)", 01086:A:1; "remove 1
+  // progress token from the current quest", 01111:A:1). RemoveQuestProgress counts progress per player instead.
+  z.strictObject({ verb: z.literal("RemoveProgressFromQuest"), amount: positiveAmountSchema, ...when }),
 ] as const;
 
 export const TRIGGERS = [
@@ -105,4 +109,6 @@ export const FLAGS = [
   // On an enemy, for the modifier's seat only: it makes no engagement checks against that player; it cannot engage that player.
   "noChecksAgainst",
   "cannotEngageSeat",
+  // On "table": the staging step of the quest phase is skipped (01128:B:2, "for the remainder of the game" while the stage is current).
+  "skipStaging",
 ] as const;

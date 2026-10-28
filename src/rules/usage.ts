@@ -264,6 +264,24 @@ export function payUsage(
   return { ...next, uses: [...next.uses, use] };
 }
 
+// A Forced or triggered effect with a limit spends it when it resolves ("Limit once per game", 01130:A:4): the use is recorded as a
+// player's Response's is, and `limitSpent` keeps the effect from firing again (rules/triggers.ts).
+export function noteForcedUse(state: ScenarioState, effect: Effect, sourceId: string, seat: number): ScenarioState {
+  if (!effect.limit) return state;
+  const rule = LIMITS[effect.limit];
+  const attack = attackKey(state);
+  const use = {
+    effectId: effect.id,
+    sourceId,
+    round: state.round,
+    phase: state.phase,
+    ...(rule.eachPlayer || (rule.per === "game" && !rule.group) ? { seat } : {}),
+    ...(rule.per === "game" ? { game: true } : {}),
+    ...(rule.per === "attack" && attack ? { attack } : {}),
+  };
+  return { ...state, uses: [...state.uses, use] };
+}
+
 function spend(state: ScenarioState, payments: readonly Payment[]): ScenarioState {
   let next = state;
   for (const payment of payments) {

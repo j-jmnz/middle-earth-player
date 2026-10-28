@@ -31,6 +31,16 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
   return restricted(state, ctx, "travel").some((rule) => rule.sourceId === locationId);
 }
 
+// "When faced with the option to travel, the players must travel to The East Bight if there is no active location" (01088:A:1): the
+// locations in the staging area whose constant says travelOnly, while no location is active and the players can travel to them. They must
+// travel to one of these and may not decline or go elsewhere.
+export function forcedTravel(state: ScenarioState, ctx: ReduceContext): string[] {
+  if (state.activeLocation || state.secondActiveLocation) return [];
+  return restricted(state, ctx, "travelOnly")
+    .map((rule) => rule.sourceId)
+    .filter((id) => state.cards[id]?.zone === "staging" && !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+}
+
 // "If the players cannot pay the Travel cost, then they cannot travel to that location." (rr.travel). A Travel cost that
 // exhausts a named card can be paid only while a ready copy of that card is in play, and, when the line names who exhausts
 // it, under that player's control: Weathertop (141046:A:3) prints "The first player must exhaust The One Ring to travel

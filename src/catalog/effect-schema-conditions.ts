@@ -132,6 +132,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("combatStep"), is: z.enum(["beforeEnemyAttacks", "beforeAttacksResolve", "afterEnemyAttacks"]) }),
   // The source is attached to the active location ("While attached location is the active location").
   z.strictObject({ kind: z.literal("hostActive") }),
+  // The source enemy was dealt a shadow card and one of them has no shadow effect ("If Wargs is dealt a shadow card with no effect",
+  // 01085:A:1). A card that was dealt none is not blank.
+  z.strictObject({ kind: z.literal("shadowBlank") }),
   // The card is attacking in the player attack in progress (rr.step-6-8-4): read while a stat is read, for the stat's holder
   // (src/rules/families/attack-strike.ts); elsewhere for `card` (the source by default). `enemy`: the attacked enemy matches the filter
   // (from that card's controller's side: `engaged`, `stagingOnly`, then its predicates); `notEnemy`: it does not ("an enemy

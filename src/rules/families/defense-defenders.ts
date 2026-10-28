@@ -8,7 +8,7 @@ import { pushEffectFrame } from "../effect-frames.ts";
 import { ruleCause } from "../cause.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
-import { defenseAsDefender, modifiedStat, placeDamage } from "../keywords.ts";
+import { defenseAsDefender, modifiedStat } from "../keywords.ts";
 import { pickCandidates } from "../pick.ts";
 import { readyCard } from "../player-verbs.ts";
 import { isCharacterType, printedOf, type PrintedCard, type Sphere } from "../printed.ts";
@@ -17,6 +17,7 @@ import type { GameEvent, PendingAttack, ScenarioState } from "../state.ts";
 import { flagged, inPlay, livingSeats, updateCard } from "../state.ts";
 import { groupResources } from "./defense-conditions.ts";
 import { noteAttackDamage } from "./defense-damage.ts";
+import { combatDamage } from "./defense-excess.ts";
 import { listened, queueHeard } from "./defense-listen.ts";
 import type { AttackDefense, EndReady } from "./defense-types.ts";
 
@@ -125,7 +126,7 @@ export function specialStrike(state: ScenarioState, ctx: ReduceContext, steps: E
   if (redirect && inPlay(redirect.zone)) {
     const defense = modifiedStat(state, redirect, "defense", ctx.cards);
     steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: redirect.id, attack: strength, defense, undefended: false, cause: ruleCause("rr.step-6-4-3") });
-    return { state: placeDamage(state, redirect.id, Math.max(0, strength - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")), wait: false };
+    return { state: combatDamage(state, attack.enemyId, redirect.id, Math.max(0, strength - defense), ctx, steps), wait: false };
   }
   if (!attack.defense?.extra?.length) return null;
   const standing = standingDefenders(state, declaredDefenders(attack));
@@ -140,7 +141,7 @@ export function specialStrike(state: ScenarioState, ctx: ReduceContext, steps: E
   const pooled: ScenarioState = { ...state, pendingAttack: { ...attack, undefended: false } };
   const defense = pooledDefense(pooled, standing, ctx.cards);
   steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: chosen, attack: strength, defense, undefended: false, cause: ruleCause("rr.step-6-4-3") });
-  const damaged = placeDamage(pooled, chosen, Math.max(0, strength - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3"));
+  const damaged = combatDamage(pooled, attack.enemyId, chosen, Math.max(0, strength - defense), ctx, steps);
   return { state: noteAttackDamage(pooled, damaged, ctx), wait: false };
 }
 

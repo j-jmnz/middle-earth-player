@@ -135,6 +135,9 @@ export const pickSchema = z.strictObject({
   // to nothing, "If unattached"), a card with the Guarded keyword (a Guarded record), a card with progress tokens on it
   // (`false`: with none, "a location with no progress tokens on it").
   attached: z.boolean().optional(),
+  // A card the attachment with this code may be attached to now (its "Attach to" record and Limit per hero: a hero that holds a copy of a
+  // "Limit 1 per hero" attachment is not offered), for the campaign cards that attach set-aside copies (01130:A:3, 01130:A:4).
+  attachable: z.string().min(1).optional(),
   guarded: z.boolean().optional(),
   progress: z.boolean().optional(),
   // The attack family's filters (src/rules/families/attack-pick.ts). A card that prints this keyword, not one it gained ("a hero with the

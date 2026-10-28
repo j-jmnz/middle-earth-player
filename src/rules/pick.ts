@@ -141,6 +141,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.active && state.activeLocation !== id && state.secondActiveLocation !== id) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments-pick.ts).
   if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
+  if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx).includes(id)) return false;
   // The attack family's filters: printed keywords, the source's host, engaged with whom, a shared Trait, an attachment on the
   // event's card, printed hit points, the top of a discard pile (families/attack-pick.ts).
   if (!attackPickMatches(state, id, spec, at, ctx)) return false;

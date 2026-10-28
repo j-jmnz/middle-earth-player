@@ -207,10 +207,11 @@ export const simpleVerbs = [
   // engaged with any player and cannot attack that player until `until` (the end of the phase by default).
   z.strictObject({ verb: z.literal("BarAttack"), scope: z.enum(["own", "any"]).optional(), until: z.enum(["endOfPhase", "endOfRound"]).optional(), ...when }),
   // Constants: a rule the engine checks while the source is in play. `defend`: characters with willpower at most
-  // `maxWillpower` cannot defend the source's attacks (141068:A:3).
+  // `maxWillpower` cannot defend the source's attacks (141068:A:3). `travelOnly` (on a location in the staging area): while there is no
+  // active location the players must travel to it and nowhere else, if able (01088:A:1).
   z.strictObject({
     verb: z.literal("Restrict"),
-    what: z.enum(["advance", "travel", "attach", "heroLimit", "defend"]),
+    what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly"]),
     exceptTrait: z.string().min(1).optional(),
     maxWillpower: z.number().int().min(0).optional(),
     ...when,

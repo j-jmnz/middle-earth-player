@@ -206,6 +206,9 @@ export type PendingAttack = {
   fromStaging?: boolean;
   // A shadow effect says the undefended damage of this attack goes on an active location (142035:A:2).
   toLocation?: boolean;
+  // Shadow cards that are enemies and say "attacks the defending player" (Wolf Rider, 01081:A:2): each attacks once this attack has ended
+  // (families/defense-shadow-attack.ts).
+  shadowAttackers?: readonly string[];
   // Extra defenders, damage marks and the attack's end, kept by the defense family (src/rules/families/defense-types.ts).
   defense?: AttackDefense;
 };

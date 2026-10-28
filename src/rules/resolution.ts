@@ -7,6 +7,7 @@ import type { LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import type { Earned, ResolutionLog } from "./campaign-state.ts";
+import { shuffleIds } from "./seed.ts";
 import { inPlay, livingSeats, type ScenarioState } from "./state.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
@@ -40,7 +41,10 @@ function stepOver(state: ScenarioState, log?: ResolutionLog): ScenarioState {
 // A copy of a code is one entry however often it is earned, whichever seat wrote it. Only "each player earns 1 copy" (perPlayer)
 // adds a copy for a seat that holds none: The Ring Draws Them chosen by seat 0 and then earned again from the encounter deck is
 // still one card.
-export function holdsCopy(entries: readonly Pick<Earned, "code" | "seat">[], item: Pick<Earned, "code" | "seat" | "perPlayer">): boolean {
+// A per-player copy that names its hero (a card attached to a hero, EarnAttached) is one copy for each hero: a player whose two heroes
+// each carry a copy takes both into the pool. `have` is an earned entry (`hero`) or a pool entry (`attachedTo`).
+export function holdsCopy(entries: readonly (Pick<Earned, "code" | "seat"> & { hero?: string | null; attachedTo?: string | null })[], item: Pick<Earned, "code" | "seat" | "perPlayer"> & { hero?: string | null }): boolean {
+  if (item.perPlayer && item.hero != null) return entries.some((have) => have.code === item.code && (have.hero ?? have.attachedTo) === item.hero);
   return entries.some((have) => have.code === item.code && (!item.perPlayer || have.seat === item.seat));
 }
 
@@ -54,6 +58,27 @@ function earn(state: ScenarioState, entries: readonly Earned[]): ResolutionLog {
 function copiesOf(state: ScenarioState, codes: readonly string[], eachPlayer: boolean | undefined): Earned[] {
   const seats = eachPlayer ? Array.from({ length: state.seatCount }, (_, seat) => seat) : [null];
   return seats.flatMap((seat) => codes.map((code) => ({ code, to: "pool" as const, seat, hero: null, step: state.resolutionAt, ...(eachPlayer ? { perPlayer: true } : {}) })));
+}
+
+// Each copy of these cards attached to a hero in play, with that hero: one entry for each copy (EarnAttached). The hero's seat owns it.
+function attachedCopies(state: ScenarioState, codes: readonly string[], ctx: ReduceContext): Earned[] {
+  return Object.values(state.cards).flatMap((card) => {
+    const host = card.host ? state.cards[card.host] : undefined;
+    if (!codes.includes(card.code) || !inPlay(card.zone) || !host || host.zone !== "heroes" || host.controller == null) return [];
+    return printedOf(ctx.cards, host.code).type === "hero" ? [{ code: card.code, to: "pool" as const, seat: host.controller, hero: host.code, step: state.resolutionAt, perPlayer: true }] : [];
+  });
+}
+
+// The hero in play with the most damage; a tie is broken at random with the game's seed (01130:B:1). The cursor is the seed's place
+// afterwards. No hero in play names no prisoner.
+function prisonerOf(state: ScenarioState, ctx: ReduceContext): { hero: string | null; cursor: number } {
+  const heroes = livingSeats(state).flatMap((seat) => (state.seats[seat]?.heroes ?? []).flatMap((id) => (state.cards[id] && printedOf(ctx.cards, state.cards[id].code).type === "hero" ? [state.cards[id]] : [])));
+  const most = Math.max(-1, ...heroes.map((hero) => hero.damage));
+  const tied = heroes.filter((hero) => hero.damage === most).map((hero) => hero.code);
+  if (tied.length === 0) return { hero: null, cursor: state.seedCursor };
+  if (tied.length === 1) return { hero: tied[0] ?? null, cursor: state.seedCursor };
+  const rolled = shuffleIds(tied, state.seed, state.seedCursor);
+  return { hero: rolled.ids[0] ?? null, cursor: rolled.cursor };
 }
 
 // Every burden in play or still in the encounter deck or discard pile: the cards the players could meet again.
@@ -82,6 +107,14 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
         // The next campaign's cards, one copy each or one for each player (the new save's seats decide how many); no dedupe.
         const carried = instruction.eachPlayer ? instruction.codes.map((code) => ({ code, to: "pool" as const, seat: null, hero: null, step: next.resolutionAt, perPlayer: true })) : copiesOf(next, instruction.codes, false);
         next = stepOver(next, { ...next.resolutionLog, carryOver: [...(next.resolutionLog.carryOver ?? []), ...carried] });
+        break;
+      }
+      case "EarnAttached":
+        next = stepOver(next, earn(next, attachedCopies(next, instruction.codes, ctx)));
+        break;
+      case "NamePrisoner": {
+        const named = prisonerOf(next, ctx);
+        next = { ...stepOver(next, { ...next.resolutionLog, prisoner: named.hero }), seedCursor: named.cursor };
         break;
       }
       case "EarnAllBurdens":
