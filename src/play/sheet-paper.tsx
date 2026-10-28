@@ -2,7 +2,7 @@
 // sentence under a disabled action, and the parchment frame (docs/design-system.md, Table). The dock's buttons, which arm
 // before they send, are dock-buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number
 // the engine did not compute.
-import { useMemo, type ReactNode } from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { Pressable, Text, View, type DimensionValue } from "react-native";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -19,11 +19,35 @@ import { useTableTokens } from "./use-table-tokens.ts";
 const SHEET_RADIUS = 28;
 
 /**
+ * Which corners the parchment rounds: "top" for a sheet that rises from the bottom edge, "all" for one that floats centred on a wide
+ * screen (screens/sheet-modal.tsx). A SheetModal provides it, so a sheet inside takes it without being told.
+ */
+export type SheetCorners = "top" | "all";
+
+export const SheetCornersContext = createContext<SheetCorners>("top");
+
+/**
  * The parchment a sheet sits on, from the bottom edge: its fill, corners and bottom inset are plain styles from the tokens and
  * useSafeAreaInsets, not NativeWind classes (sheets that carried pb-safe in their classes lost their parchment on the phone).
  * (The table's choice tray and reading panels are tray-frame.tsx.)
  */
-export function SheetFrame({ children, testID, maxHeight, paddingTop = 12, animated = true }: { children: ReactNode; testID?: string; maxHeight?: DimensionValue; paddingTop?: number; animated?: boolean }) {
+export function SheetFrame({
+  children,
+  testID,
+  maxHeight,
+  paddingTop = 12,
+  animated = true,
+  corners,
+}: {
+  children: ReactNode;
+  testID?: string;
+  maxHeight?: DimensionValue;
+  paddingTop?: number;
+  animated?: boolean;
+  corners?: SheetCorners;
+}) {
+  const inherited = useContext(SheetCornersContext);
+  const round = corners ?? inherited;
   const insets = useSafeAreaInsets();
   const scale = useMotionScale();
   const t = useTableTokens();
@@ -33,6 +57,7 @@ export function SheetFrame({ children, testID, maxHeight, paddingTop = 12, anima
     backgroundColor: t.paper,
     borderTopLeftRadius: SHEET_RADIUS * s,
     borderTopRightRadius: SHEET_RADIUS * s,
+    ...(round === "all" ? { borderBottomLeftRadius: SHEET_RADIUS * s, borderBottomRightRadius: SHEET_RADIUS * s } : {}),
     paddingHorizontal: 24 * s,
     paddingTop: paddingTop * s,
     paddingBottom: Math.max(insets.bottom, 12 * s),

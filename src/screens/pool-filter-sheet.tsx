@@ -1,6 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import { useMemo, useState } from "react";
-import { Modal, Pressable, ScrollView, Switch, Text, useWindowDimensions, View } from "react-native";
+import { Pressable, ScrollView, Switch, Text, useWindowDimensions, View } from "react-native";
 
 import { traitTokens } from "../catalog/deck-save";
 import { GameIcon } from "../play/game-icon";
@@ -8,6 +8,7 @@ import type { IconName } from "../play/icon-map";
 import { useReduceMotion } from "../play/motion-run";
 import { PaperSheet, PrimaryButton, SphereMark, TextButton, markedSphere, sphereWord } from "./chrome";
 import { usePalette } from "./palette-hook";
+import { SheetModal } from "./sheet-modal";
 import {
   costOptions,
   filterSheetAnimation,
@@ -18,6 +19,7 @@ import {
   type PoolFilter,
 } from "./pool-filter";
 import { useUiScale } from "../play/ui-scale";
+import { useSizeClass } from "../play/use-size-class";
 
 type FilterRow = PoolCard & { typeName: string; sphereName: string | null };
 
@@ -42,8 +44,10 @@ export function PoolFilterSheet({
   onDismiss: () => void;
   onApply: () => void;
 }) {
-  const palette = usePalette();
   const { height } = useWindowDimensions();
+  const { size, s } = useSizeClass();
+  // A sheet floating centred outside compact leaves 280 pt for its title, buttons and margins, so it never passes the window.
+  const listHeight = size === "compact" ? height * 0.62 : Math.min(height * 0.62, height - 280 * s);
   const [chooser, setChooser] = useState<Chooser>(null);
   const reduceMotion = useReduceMotion();
   const spheres = useMemo(() => sphereChoices(rows), [rows]);
@@ -61,65 +65,58 @@ export function PoolFilterSheet({
   }
 
   return (
-    <Modal visible={open} transparent animationType={filterSheetAnimation(reduceMotion)} onRequestClose={dismiss}>
-      <View className="flex-1 justify-end">
-        <Pressable
-          accessibilityLabel="Close filter"
-          onPress={dismiss}
-          style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: palette.night, opacity: 0.72 }}
-        />
-        <PaperSheet step="Filter" title={chooserTitle(chooser)}>
-          {chooser === "pack" ? (
-            <OptionList
-              rows={packChooserRows(groups)}
-              listHeight={height * 0.62}
-              onBack={() => setChooser(null)}
-              onPick={(row) => {
-                onChange({ ...filter, pack: row.pack });
-                setChooser(null);
-              }}
-            />
-          ) : chooser === "trait" ? (
-            <OptionList
-              rows={traitChooserRows(traits)}
-              listHeight={height * 0.62}
-              onBack={() => setChooser(null)}
-              onPick={(row) => {
-                onChange({ ...filter, trait: row.key === "any" ? null : row.label });
-                setChooser(null);
-              }}
-            />
-          ) : (
-            <ScrollView style={{ maxHeight: height * 0.62 }} keyboardShouldPersistTaps="handled">
-              {chooser === null ? (
-                <FilterBody
-                  filter={filter}
-                  spheres={spheres}
-                  groups={groups}
-                  onChange={onChange}
-                  onChoose={setChooser}
-                />
-              ) : (
-                <CostChooser
-                  filter={filter}
-                  costs={costs}
-                  onChange={onChange}
-                  onBack={() => setChooser(null)}
-                />
-              )}
-            </ScrollView>
-          )}
-          {chooser === null ? (
-            <View className="mt-4">
-              <TextButton testID="pool-filter-close" label="Close" tone="ink" onPress={dismiss} />
-              <View className="mt-2">
-                <PrimaryButton testID="pool-apply" label="Apply" surface="paper" onPress={apply} />
-              </View>
+    <SheetModal visible={open} animationType={filterSheetAnimation(reduceMotion)} onRequestClose={dismiss} scrimLabel="Close filter">
+      <PaperSheet step="Filter" title={chooserTitle(chooser)}>
+        {chooser === "pack" ? (
+          <OptionList
+            rows={packChooserRows(groups)}
+            listHeight={listHeight}
+            onBack={() => setChooser(null)}
+            onPick={(row) => {
+              onChange({ ...filter, pack: row.pack });
+              setChooser(null);
+            }}
+          />
+        ) : chooser === "trait" ? (
+          <OptionList
+            rows={traitChooserRows(traits)}
+            listHeight={listHeight}
+            onBack={() => setChooser(null)}
+            onPick={(row) => {
+              onChange({ ...filter, trait: row.key === "any" ? null : row.label });
+              setChooser(null);
+            }}
+          />
+        ) : (
+          <ScrollView style={{ maxHeight: listHeight }} keyboardShouldPersistTaps="handled">
+            {chooser === null ? (
+              <FilterBody
+                filter={filter}
+                spheres={spheres}
+                groups={groups}
+                onChange={onChange}
+                onChoose={setChooser}
+              />
+            ) : (
+              <CostChooser
+                filter={filter}
+                costs={costs}
+                onChange={onChange}
+                onBack={() => setChooser(null)}
+              />
+            )}
+          </ScrollView>
+        )}
+        {chooser === null ? (
+          <View className="mt-4">
+            <TextButton testID="pool-filter-close" label="Close" tone="ink" onPress={dismiss} />
+            <View className="mt-2">
+              <PrimaryButton testID="pool-apply" label="Apply" surface="paper" onPress={apply} />
             </View>
-          ) : null}
-        </PaperSheet>
-      </View>
-    </Modal>
+          </View>
+        ) : null}
+      </PaperSheet>
+    </SheetModal>
   );
 }
 

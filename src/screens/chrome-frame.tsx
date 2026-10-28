@@ -1,6 +1,6 @@
 // The chrome's frame (docs/design-system.md, Components): the page and its scrolling body, the top bar, rows, panels, stat tiles,
 // the pinned action bar, the paper sheet and the outcome word. Re-exported by chrome.tsx.
-import type { ComponentRef, ReactNode, RefObject } from "react";
+import { useContext, type ComponentRef, type ReactNode, type RefObject } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -12,11 +12,13 @@ import { Eyebrow } from "./chrome-text";
 import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
-import { SheetFrame } from "../play/sheet-paper";
+import { SheetCornersContext, SheetFrame } from "../play/sheet-paper";
 import { nightFade, panelSurface, raisedEdgeOf, tileSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
+import { ACTION_GROUP, MEDIUM_ACTION_GROUP, capWidth } from "../play/size-class";
 import { touch, useUiScale } from "../play/ui-scale";
+import { useSizeClass } from "../play/use-size-class";
 
 /**
  * Night page with a scene backdrop. Content is inset 24 and starts under the status bar; in landscape (the card and booklet
@@ -50,17 +52,33 @@ export function Screen({
 
 /**
  * The scrolling body of a screen. It reaches 8 pt past the page inset on each side, with the same padding inside, so a framed
- * panel's corner ornaments (Corners) are not cut by the scroll edge.
+ * panel's corner ornaments (Corners) are not cut by the scroll edge. `max` caps and centres the content outside compact: a reading
+ * column (640) or a wide one (1040), at the scale (docs/design-system.md, Tablets); a phone is never capped.
  */
-export function ScreenScroll({ children, top = 0, bottom = 32, testID, scrollRef }: { children: ReactNode; top?: number; bottom?: number; testID?: string; scrollRef?: RefObject<ComponentRef<typeof ScrollView> | null> }) {
-  const s = useUiScale();
+export function ScreenScroll({
+  children,
+  top = 0,
+  bottom = 32,
+  testID,
+  scrollRef,
+  max,
+}: {
+  children: ReactNode;
+  top?: number;
+  bottom?: number;
+  testID?: string;
+  scrollRef?: RefObject<ComponentRef<typeof ScrollView> | null>;
+  max?: "readable" | "wide";
+}) {
+  const { size, s } = useSizeClass();
+  const cap = max ? capWidth(size, max, s) : null;
   return (
     <ScrollView
       ref={scrollRef}
       testID={testID}
       className="min-h-0 flex-1"
       style={{ marginHorizontal: -8 * s }}
-      contentContainerStyle={{ paddingHorizontal: 8 * s, paddingTop: top * s, paddingBottom: bottom * s }}
+      contentContainerStyle={{ paddingHorizontal: 8 * s, paddingTop: top * s, paddingBottom: bottom * s, ...(cap == null ? {} : { width: "100%", maxWidth: cap + 16 * s, alignSelf: "center" }) }}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
@@ -238,27 +256,32 @@ export function StatTile({ label, value, icon, iconTint = "bone", detail, childr
 
 /**
  * The bar pinned at the foot of a screen, in thumb reach: the screen's primary and what sits beside it. The content scrolls
- * under a night fade above it. `safe` keeps it above the home indicator on a screen with no tab bar.
+ * under a night fade above it. `safe` keeps it above the home indicator on a screen with no tab bar. The band stays full width;
+ * outside compact its buttons sit in a group: 480 centred in medium (narrower than the 640 reading column), 420 at the trailing edge in expanded, where the thumb is; the primary is the last child, so it is the rightmost.
+ * `align="fill"` keeps the buttons full width, for a bar inside a pane (docs/design-system.md, Tablets).
  */
-export function ActionBar({ children, safe = true, testID }: { children: ReactNode; safe?: boolean; testID?: string }) {
+export function ActionBar({ children, safe = true, testID, align = "auto" }: { children: ReactNode; safe?: boolean; testID?: string; align?: "auto" | "fill" }) {
   const palette = usePalette();
   const t = useTableTokens();
   const insets = useSafeAreaInsets();
-  const s = useUiScale();
+  const { size, s } = useSizeClass();
+  const group = align === "fill" || size === "compact" ? null : size === "medium" ? { width: "100%" as const, maxWidth: MEDIUM_ACTION_GROUP * s, alignSelf: "center" as const } : { width: "100%" as const, maxWidth: ACTION_GROUP * s, alignSelf: "flex-end" as const };
   return (
     <View testID={testID} collapsable={false} className="pt-3" style={{ paddingBottom: safe ? Math.max(insets.bottom, 12 * s) : 12 * s }}>
       <View pointerEvents="none" style={{ position: "absolute", left: -24 * s, right: -24 * s, top: -24 * s, height: 24 * s, ...nightFade(0, 1, undefined, t) }} />
       <View pointerEvents="none" style={{ position: "absolute", left: -24 * s, right: -24 * s, top: 0, bottom: 0, backgroundColor: palette.night }} />
-      {children}
+      {group ? <View style={group}>{children}</View> : children}
     </View>
   );
 }
 
 /** Parchment sheet over the rail or a list, on the table sheets' frame. Repeats the step in an eyebrow. */
 export function PaperSheet({ step, title, children }: { step: string; title: string; children: ReactNode }) {
+  // A sheet floating centred (SheetModal outside compact) is not pulled down from its top edge, so it has no grabber.
+  const floating = useContext(SheetCornersContext) === "all";
   return (
     <SheetFrame animated={false}>
-      <View className="mb-4 h-1 w-10 self-center rounded-pill bg-inkLine" />
+      {floating ? null : <View className="mb-4 h-1 w-10 self-center rounded-pill bg-inkLine" />}
       <View className="items-center">
         <Eyebrow tone="inkLabel">{step}</Eyebrow>
         <Text className="mt-1 text-center font-display text-title text-ink">{title}</Text>

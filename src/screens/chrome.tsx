@@ -3,6 +3,7 @@
 export * from "./chrome-buttons";
 export * from "./chrome-frame";
 export * from "./chrome-marks";
+export * from "./chrome-panes";
 export * from "./chrome-text";
 export * from "./tab-bar";
 export { markedSphere, sphereWord, type MarkedSphere } from "./sphere-mark";

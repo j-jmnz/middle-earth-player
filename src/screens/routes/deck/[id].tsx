@@ -1,7 +1,7 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams, usePreventRemove, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Modal, Pressable, Text, useWindowDimensions, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -46,9 +46,9 @@ import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { CardThumb, useCardPreview } from "../../images/picture";
 import { useListPreview } from "../../list-preview";
-import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "../../hero-tile";
+import { SheetModal } from "../../sheet-modal";
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
 import { goBack } from "../../go-back";
@@ -132,7 +132,6 @@ function EditorCardRow({
 }
 
 export default function DeckEditor() {
-  const palette = usePalette();
   const router = useRouter();
   const params = useLocalSearchParams<{ id: string }>();
   const id = routeCode(params.id);
@@ -361,34 +360,27 @@ export default function DeckEditor() {
           <NavBar overlay backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
         </View>
       </View>
-      <Modal visible={leaving !== null} transparent animationType="fade" onRequestClose={() => setLeaving(null)}>
-        <View className="flex-1 justify-end">
-          <Pressable
-            accessibilityLabel="Keep editing"
-            onPress={() => setLeaving(null)}
-            style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: palette.night, opacity: 0.72 }}
-          />
-          <PaperSheet step={draft.saved ? "Unsaved changes" : "Not saved yet"} title={draft.name.trim() || "New deck"}>
-            <Text className="text-body text-ink">
-              {[
-                draft.saved
-                  ? "Save your changes before you leave?"
-                  : `This deck has not been saved. Discard throws away its ${deckContentsPhrase(draft)}.`,
-                readiness.ready ? null : `It is not ready to play yet (${readiness.text.replace(/\.$/, "")}); you can save it and finish it later.`,
-              ]
-                .filter((line) => line)
-                .join(" ")}
-            </Text>
-            <View className="mt-5">
-              <PrimaryButton testID="leave-save" label="Save" surface="paper" onPress={() => finishLeaving("save")} />
-              <View className="mt-2 flex-row justify-center">
-                <TextButton testID="leave-discard" label={draft.saved ? "Discard changes" : "Discard deck"} tone="ink" onPress={() => finishLeaving("discard")} />
-                <TextButton testID="leave-keep" label="Keep editing" tone="ink" onPress={() => setLeaving(null)} />
-              </View>
+      <SheetModal visible={leaving !== null} onRequestClose={() => setLeaving(null)} scrimLabel="Keep editing">
+        <PaperSheet step={draft.saved ? "Unsaved changes" : "Not saved yet"} title={draft.name.trim() || "New deck"}>
+          <Text className="text-body text-ink">
+            {[
+              draft.saved
+                ? "Save your changes before you leave?"
+                : `This deck has not been saved. Discard throws away its ${deckContentsPhrase(draft)}.`,
+              readiness.ready ? null : `It is not ready to play yet (${readiness.text.replace(/\.$/, "")}); you can save it and finish it later.`,
+            ]
+              .filter((line) => line)
+              .join(" ")}
+          </Text>
+          <View className="mt-5">
+            <PrimaryButton testID="leave-save" label="Save" surface="paper" onPress={() => finishLeaving("save")} />
+            <View className="mt-2 flex-row justify-center">
+              <TextButton testID="leave-discard" label={draft.saved ? "Discard changes" : "Discard deck"} tone="ink" onPress={() => finishLeaving("discard")} />
+              <TextButton testID="leave-keep" label="Keep editing" tone="ink" onPress={() => setLeaving(null)} />
             </View>
-          </PaperSheet>
-        </View>
-      </Modal>
+          </View>
+        </PaperSheet>
+      </SheetModal>
       {preview.overlay}
     </Screen>
   );

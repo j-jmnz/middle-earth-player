@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import type { PoolCard } from "../campaign/log";
 import { FELLOWSHIP_ID } from "../campaign/save";
@@ -9,6 +9,7 @@ import { Label, Panel, PrimaryButton, RingMark } from "./chrome";
 import { usePalette } from "./palette-hook";
 import { seatWord } from "./seats";
 import { useUiScale } from "../play/ui-scale";
+import { useSizeClass } from "../play/use-size-class";
 
 type Seats = 1 | 2;
 
@@ -74,9 +75,8 @@ export function StartPanel({ options, current, carry, onStart }: { options: read
   // The playthrough whose carry-over this one takes in, or null for a fresh start.
   const [taking, setTaking] = useState<string | null>(null);
   // In landscape the phone is 390 pt tall: no scene band or heading, compact seat tiles, and the seats and Start in one row keep
-  // Start on the first screen.
-  const { width, height } = useWindowDimensions();
-  const landscape = width > height;
+  // Start on the first screen. A short window decides it, not the orientation: a tablet in landscape is tall enough for the portrait panel.
+  const { short: landscape } = useSizeClass();
   // Above Medium the landscape panel drops its band and heading and puts the seats and Start in one row (Medium and Small keep the
   // two-column landscape layout): at Large the primary otherwise wraps and starts under the tab bar.
   const compact = landscape && s > 1;
