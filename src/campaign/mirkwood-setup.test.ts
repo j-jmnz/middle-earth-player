@@ -159,7 +159,8 @@ describe("a pool card that says it is put into play at the start of each scenari
   }
 
   it("skips step 8: without the record Mendor would be shuffled into the encounter deck", () => {
-    const without = plan(EFFECTS, [mendorInPool]).result;
+    // The record Escape from Dol Guldur's phase adds for Mendor (01135:campaignSetup:1) is left out here.
+    const without = plan(EFFECTS.filter((effect) => effect.id !== "01135:campaignSetup:1"), [mendorInPool]).result;
     expect(without.poolEncounterCards).toEqual([MENDOR]);
     expect(without.poolIntoPlay).toEqual([]);
   });

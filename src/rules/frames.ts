@@ -120,7 +120,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       let next = moveCard(state, id, { zone: "staging" });
       next = updateCard(next, id, { face: "up", controller: seat });
       // A guard is attached to its objective as it is placed (rr.guarded); the objective may have left play since.
-      if (frame.data.guards && next.cards[frame.data.guards] && inPlay(next.cards[frame.data.guards]?.zone ?? "removed")) next = attachTo(next, id, frame.data.guards);
+      if (frame.data.guards && next.cards[frame.data.guards] && inPlay(next.cards[frame.data.guards]?.zone ?? "removed")) next = updateCard(attachTo(next, id, frame.data.guards), id, { guard: true });
       steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
       // The lasting effects that watch the reveals act on the card; one may discard it, ending its staging.

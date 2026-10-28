@@ -43,7 +43,7 @@ beforeAll(async () => {
   // Honour Guard answers damage dealt, so a game with it in hand holds a lethal wound for the Responses.
   for (const [code, card] of await loadPrinted(["10004"])) world.cards.set(code, card);
   const strong = await anduinWorld("strong");
-  const extra = await loadPrinted(["01132", "01136", "01137", "01135", "01129"]);
+  const extra = await loadPrinted(["01132", "01134", "01136", "01137", "01135", "01129"]);
   cards = new Map([...world.cards, ...strong.cards, ...extra]);
   ctx = { effects: EFFECTS, cards };
   const brittle = await anduinWorld("brittle");
@@ -262,9 +262,11 @@ describe("what a win writes", () => {
     expect(game.state.stageCleared).toBe(true);
     const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, cards);
     expect(log.campaignPool.length).toBeGreaterThan(0);
-    const plan = checklist({ log, scenario: loadScenario("escape-from-dol-guldur"), seats: log.heroesBySeat.map((heroes) => ({ heroes, deck: Array.from({ length: 30 }, () => "filler") })), effects: EFFECTS, cards });
+    // Escape from Dol Guldur's campaign card asks the first player where Appointed by Fate goes (01131:A:2).
+    const plan = checklist({ log, scenario: loadScenario("escape-from-dol-guldur"), seats: log.heroesBySeat.map((heroes) => ({ heroes, deck: Array.from({ length: 30 }, () => "filler") })), effects: EFFECTS, cards, choices: [`01134>${log.heroesBySeat[0]?.[0]}`] });
     if (!plan.ok) throw new Error(plan.errors.join("; "));
-    const onHeroes = plan.seats.flatMap((seat) => (seat.attachments ?? []).map((item) => `${item.code}@${item.host}`)).sort();
+    // Appointed by Fate (01134) is the campaign card's own attachment, not the pool's.
+    const onHeroes = plan.seats.flatMap((seat) => (seat.attachments ?? []).filter((item) => item.code !== "01134").map((item) => `${item.code}@${item.host}`)).sort();
     expect(onHeroes).toEqual(log.campaignPool.map((card) => `${card.code}@${card.attachedTo}`).sort());
     expect(log.prisoner).not.toBeNull();
   });

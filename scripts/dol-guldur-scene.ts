@@ -75,6 +75,8 @@ export type DolGuldurLayout = {
   claimed?: readonly string[];
   // The objectives are in the staging area, each guarded by the card named at the same index ("" for no guard).
   guarded?: readonly (readonly [string, string])[];
+  // Player attachments (cards of type attachment) on the first hero, in its controller's play area.
+  attachments?: readonly string[];
 };
 
 export function dolGuldurTable(world: DolGuldurWorld, layout: DolGuldurLayout = {}): { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string; seat1Hero: string | null } {
@@ -123,6 +125,10 @@ export function dolGuldurTable(world: DolGuldurWorld, layout: DolGuldurLayout = 
     state = attachTo(objective.state, objective.id, first.id);
     state = updateCard(state, objective.id, { controller: 0, claimed: true });
   }
+  for (const code of layout.attachments ?? []) {
+    const card = spawn(state, code, { zone: "play", seat: 0 });
+    state = attachTo(card.state, card.id, first.id);
+  }
   if (layout.campaign) {
     state = spawn(state, CAMPAIGN_CARD, { zone: "campaign" }).state;
     state = spawn(state, MENDOR, { zone: "play", seat: 0 }).state;
@@ -152,6 +158,13 @@ export function fight(
   const state = syncConstants(made.state, made.ctx);
   let run: Run = send(start(state), { type: "DeclineEngage" }, made.ctx);
   for (let guard = 0; guard < 60 && run.state.window?.kind !== "defense"; guard += 1) {
+    // Several enemies engaged: the first player chooses which attacks first (the one dealt the shadow card the test is about).
+    if (run.state.window?.kind === "chooseEnemy") {
+      const cards = run.state.cards;
+      const wanted = run.state.window.options.find((id) => cards[cards[id]?.shadowId ?? ""]?.code === shadow) ?? run.state.window.options[0] ?? "";
+      run = send(run, { type: "ChooseEnemy", enemyId: wanted }, made.ctx);
+      continue;
+    }
     const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage");
     if (!pass) break;
     run = send(run, pass as PlayerIntent, made.ctx);

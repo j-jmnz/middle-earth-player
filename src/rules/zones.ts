@@ -132,7 +132,7 @@ function unhost(state: ScenarioState, id: string): ScenarioState {
   const current = state.cards[id];
   if (!current?.host) return state;
   const host = state.cards[current.host];
-  let next = updateCard(state, id, { host: null });
+  let next = updateCard(state, id, current.guard ? { host: null, guard: undefined } : { host: null });
   if (!host) return next;
   next = updateCard(next, host.id, { attachments: host.attachments.filter((attachment) => attachment !== id) });
   return next;
@@ -208,7 +208,7 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
 // it is unlinked from the objective when it leaves play (defeated, explored, discarded).
 function guardLeaves(current: CardInstance, dest: Destination): boolean {
   const there = current.zone === "staging" || current.zone === "engaged" || current.zone === "activeLocation" || current.zone === "secondActiveLocation";
-  return there && !inPlay(dest.zone);
+  return current.guard === true && there && !inPlay(dest.zone);
 }
 
 // Stamps the order in which a card entered play, so Forced effects can resolve oldest first. A card enters play ready
@@ -253,9 +253,9 @@ export function attachTo(state: ScenarioState, id: string, hostId: string): Scen
   const card = state.cards[id];
   if (!host || !card) return state;
   // A card moves from the card it was attached to (an encounter card that guarded an objective, then attached itself to a hero).
-  const was = card.host != null && card.host !== hostId ? state.cards[card.host] : undefined;
+  const was = card.guard === true && card.host != null && card.host !== hostId ? state.cards[card.host] : undefined;
   const released = was ? updateCard(state, was.id, { attachments: was.attachments.filter((other) => other !== id) }) : state;
-  const linked = updateCard(released, id, { host: hostId });
+  const linked = updateCard(released, id, was ? { host: hostId, guard: undefined } : { host: hostId });
   return updateCard(linked, hostId, { attachments: append(host.attachments, id) });
 }
 

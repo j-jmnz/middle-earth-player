@@ -108,6 +108,9 @@ export type CardInstance = {
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled
   // (families/objectives.ts, 01108:A:2).
   claimed?: true;
+  // An encounter card attached to a guarded objective as its guard (rr.guarded): it is unlinked from the objective when it leaves play,
+  // or when it attaches itself to another card (families/objectives.ts).
+  guard?: true;
 };
 
 export type Seat = {

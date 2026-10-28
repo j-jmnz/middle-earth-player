@@ -152,7 +152,8 @@ describe("carry-over to the next campaign", () => {
     expect(fresh.log.carryIn).toHaveLength(3);
     expect(fresh.log.carryIn.map((card) => card.seat)).toEqual([null, 0, 1]);
     expect(fresh.log.campaignPool).toEqual([]);
-    const plan = checklist({ log: fresh.log, scenario: loadScenario("passage-through-mirkwood"), seats: [{ heroes: [HERO], deck: [] }, { heroes: ["141002"], deck: [] }], effects: EFFECTS, cards });
+    // The record Escape from Dol Guldur's phase adds for Mendor (01135:campaignSetup:1) is left out here.
+    const plan = checklist({ log: fresh.log, scenario: loadScenario("passage-through-mirkwood"), seats: [{ heroes: [HERO], deck: [] }, { heroes: ["141002"], deck: [] }], effects: EFFECTS.filter((effect) => effect.id !== "01135:campaignSetup:1"), cards });
     if (!plan.ok) throw new Error(plan.errors.join(" "));
     expect(plan.steps[0]?.did.join(" ")).toContain("carried over");
     expect(plan.log.campaignPool.map((card) => card.code).sort()).toEqual([MENDOR, SUPPORT, SUPPORT].sort());

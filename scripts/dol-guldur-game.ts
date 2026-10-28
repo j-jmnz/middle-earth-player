@@ -1,3 +1,5 @@
+import { checklist } from "../src/campaign/checklist.ts";
+import { emptyLog, type CampaignLog } from "../src/campaign/log.ts";
 import { buildStart } from "../src/campaign/start.ts";
 import type { LoadoutSeat } from "../src/campaign/loadout.ts";
 import { scenarioCards, type Difficulty } from "../src/catalog/scenario-data.ts";
@@ -35,25 +37,42 @@ const STRONG_STATS = { threat: 3, willpower: 20, attack: 12, defense: 6, health:
 const BRITTLE_STATS = { threat: 3, willpower: 20, attack: 12, defense: 0, health: 7 } as const;
 
 export async function dolGuldurWorld(decks: DolGuldurDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const codes = [...scenarioCards(dolGuldur).map((card) => card.code), ...dolGuldur.campaignPlaced, dolGuldur.campaignCard];
+  const codes = [...scenarioCards(dolGuldur).map((card) => card.code), ...dolGuldur.campaignPlaced, dolGuldur.campaignCard, "01133", "01138"];
   const cards = new Map(await loadPrinted([...new Set(codes)]));
   for (const code of STRONG_HEROES) {
     cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...(decks === "weak" ? WEAK_STATS : decks === "brittle" ? BRITTLE_STATS : STRONG_STATS) }));
   }
   cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
+  LOADED = cards;
   return { cards, ctx: { effects: EFFECTS, cards } };
 }
 
 // The prisoner the Campaign Log names (Journey Along the Anduin's Resolution), when the game has one: a hero of the first seat.
 export const LOGGED_PRISONER: CampaignFacts = { prisoner: "q2", usedOnce: [], counters: {} };
 
-export function dolGuldurStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts): StartScenario {
-  const start = buildStart({ campaign, scenario: dolGuldur, seatCount, seed, threatModifier: 0, seats: dolGuldurLoadout(seatCount), effects: EFFECTS, difficulty, ...(facts ? { facts } : {}) });
-  // Appointed by Fate goes on the first player's first hero (the checklist asks the first player; checklist.ts AttachChosen).
-  const seats = start.seats.map((seat, index) => (index === 0 ? { ...seat, attachments: [...(seat.attachments ?? []), { host: "q1", code: "01134" }] } : seat));
-  return { ...start, seats };
-}
+// The cards of the last world built: the checklist reads the pool cards' printed data.
+let LOADED: ReadonlyMap<string, PrintedCard> | null = null;
 
+// The scenario dealt through the Campaign Setup Checklist: the first player attaches Appointed by Fate (01131:A:2) to the first seat's first hero
+// (q1), and the pool a log carries (a log of Journey Along the Anduin's win) is dealt with it.
+export function dolGuldurStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount)): StartScenario {
+  if (!LOADED) throw new Error("Build the world first (dolGuldurWorld)");
+  const plan = checklist({ log, scenario: dolGuldur, seats: dolGuldurLoadout(seatCount), effects: EFFECTS, cards: LOADED, choices: ["01134>q1"] });
+  if (!plan.ok) throw new Error(plan.errors.join("; ") || "The campaign card asks for a choice");
+  return buildStart({
+    campaign,
+    scenario: dolGuldur,
+    seatCount,
+    seed,
+    threatModifier: plan.threatModifier,
+    seats: plan.seats,
+    effects: EFFECTS,
+    difficulty,
+    poolEncounterCards: plan.poolEncounterCards,
+    poolIntoPlay: plan.poolIntoPlay,
+    ...(facts ? { facts } : {}),
+  });
+}
 
 // The auto-player's answer (scripts/auto-player.ts), except where the auto-player alone always declines: in a player attack window
 // every ready character that can attack the first enemy it can reach attacks it together, and in the optional engagement step the
