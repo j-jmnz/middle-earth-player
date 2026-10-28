@@ -30,6 +30,10 @@ tags:
 - assertVisible:
     id: resolution-outcome
     text: "Defeat"
+# The Lost Resolution names why: the reason the reducer recorded (01129:A:3), above the consequence line.
+- assertVisible:
+    id: resolution-reason
+    text: "Mendor left play\\."
 - assertVisible: "The scenario was lost. Nothing is written to the log."
 - assertNotVisible:
     id: resolution-confirm

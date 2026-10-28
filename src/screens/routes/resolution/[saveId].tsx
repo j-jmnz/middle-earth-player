@@ -86,7 +86,12 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
         {back}
         <View className="flex-1 items-center justify-center">
           <OutcomeTitle won={false} scenario={scenario?.name ?? ""} testID="resolution-outcome" />
-          <BodyText tone="muted" className="mt-6 text-center" testID="resolution-consequence">
+          {view.reason ? (
+            <BodyText className="mt-6 text-center" testID="resolution-reason">
+              {/[.!?]$/.test(view.reason) ? view.reason : `${view.reason}.`}
+            </BodyText>
+          ) : null}
+          <BodyText tone="muted" className={view.reason ? "mt-2 text-center" : "mt-6 text-center"} testID="resolution-consequence">
             The scenario was lost. Nothing is written to the log.
           </BodyText>
         </View>

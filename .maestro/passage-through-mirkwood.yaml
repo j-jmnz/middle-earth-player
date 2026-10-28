@@ -35,7 +35,7 @@ tags:
     timeout: 30000
 - assertVisible:
     id: resolution-consequence
-    text: "Confirming records 2 copies of Mendor's Support and Ungoliant's Swarm in the campaign and unlocks Journey Along the Anduin\\."
+    text: "Confirming records 2 copies of Mendor's Support and the burden Ungoliant's Swarm in the campaign and unlocks Journey Along the Anduin\\."
 - tapOn:
     id: resolution-confirm
 - extendedWaitUntil:
