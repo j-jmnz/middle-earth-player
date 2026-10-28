@@ -145,8 +145,21 @@ export function playDolGuldur(seatCount: 1 | 2, seed: number, difficulty: Diffic
 // a loss writes nothing.
 export type DolGuldurGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: DolGuldurDecks; outcome: "won" | "lost"; facts?: CampaignFacts; lossReason?: string };
 
+const THREAT_LOST = "No seats remain";
+
 export const DOL_GULDUR_GOLDENS: readonly DolGuldurGolden[] = [
-  { name: "true solo, won", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, Easy, won", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "true solo, the Campaign Log's prisoner, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", facts: LOGGED_PRISONER },
+  { name: "true solo, Mendor lost, won", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, brittle heroes, won", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "won" },
+  { name: "two-handed, won", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, Easy, won", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "two-handed, the Campaign Log's prisoner, won", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", facts: LOGGED_PRISONER },
+  { name: "two-handed, brittle heroes, Mendor lost, won", seatCount: 2, seed: 11, difficulty: "Normal", decks: "brittle", outcome: "won" },
+  { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
+  { name: "two-handed, weak, lost on threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
+  { name: "two-handed, brittle heroes, lost", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: THREAT_LOST },
 ];
 
 export function playGolden(golden: DolGuldurGolden, ctx: ReduceContext): DolGuldurGame {
