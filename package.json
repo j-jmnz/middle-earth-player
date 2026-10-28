@@ -48,10 +48,10 @@
     "vitest": "^5.0.5"
   },
   "scripts": {
-    "start": "pnpm booklets:pack --optional && expo start",
-    "android": "pnpm booklets:pack && expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web",
+    "start": "pnpm catalog:build && pnpm booklets:pack --optional && expo start",
+    "android": "pnpm catalog:build && pnpm booklets:pack && expo run:android",
+    "ios": "pnpm catalog:build && expo run:ios",
+    "web": "pnpm catalog:build && expo start --web",
     "lint": "eslint .",
     "test": "vitest run",
     "catalog:build": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-catalog.ts",
