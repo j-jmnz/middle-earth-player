@@ -6,11 +6,11 @@
 // nothing animates while it scrolls.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import Animated, { useAnimatedStyle, useReducedMotion } from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { cardWidth, startIndex, STOP_AHEAD_WORDS, STOPS_TEXT, type Carousel } from "./carousel.ts";
 import { NightSwitch, PhaseCard, ROW } from "./carousel-cards.tsx";
-import { useOpenMotion } from "./motion-run.ts";
+import { useOpenMotion, useReduceMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { Chevron } from "./phase-rail.tsx";
 import type { TableSettings } from "./table-settings.ts";
@@ -129,7 +129,7 @@ function CarouselCards({
   settings: Pick<TableSettings, "stops" | "stopsOn">;
   onChange: (change: Partial<TableSettings>) => void;
 }) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReduceMotion();
   const s = useUiScale();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const placed = useRef(false);

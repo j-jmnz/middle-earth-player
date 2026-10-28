@@ -27,6 +27,7 @@ import { TableLayers } from "../play/table-layers";
 import { openReading, type Reading } from "../play/reading";
 import { phaseCarousel } from "../play/carousel";
 import { tableSettings } from "../play/table-settings";
+import { useKeepAwake } from "../play/use-keep-awake";
 import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
@@ -91,6 +92,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // The screen y of the top of the dock's buttons block, which the choice tray stays above.
   const [anchor, setAnchor] = useState<number | null>(null);
   const settings = useStore(tableSettings, (state) => state.settings);
+  useKeepAwake();
   const look = useMemo(() => ({ contrast: settings.highContrast }), [settings.highContrast]);
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);

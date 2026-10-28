@@ -6,9 +6,13 @@
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 
+import { tableSettings } from "./table-settings.ts";
+
 const android = Platform.OS === "android";
 
 function quietly(tick: () => Promise<void>): void {
+  // The Haptics switch (user request, 2026-10-28).
+  if (!tableSettings.getState().settings.haptics) return;
   try {
     tick().catch(() => undefined);
   } catch {

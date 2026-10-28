@@ -1,10 +1,11 @@
 import { FlashList } from "@shopify/flash-list";
-import { useEffect, useMemo, useState } from "react";
-import { AccessibilityInfo, Modal, Pressable, ScrollView, Switch, Text, useWindowDimensions, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Modal, Pressable, ScrollView, Switch, Text, useWindowDimensions, View } from "react-native";
 
 import { traitTokens } from "../catalog/deck-save";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
+import { useReduceMotion } from "../play/motion-run";
 import { PaperSheet, PrimaryButton, SphereMark, TextButton, markedSphere, sphereWord } from "./chrome";
 import { usePalette } from "./palette-hook";
 import {
@@ -44,22 +45,7 @@ export function PoolFilterSheet({
   const palette = usePalette();
   const { height } = useWindowDimensions();
   const [chooser, setChooser] = useState<Chooser>(null);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  useEffect(() => {
-    let current = true;
-    void AccessibilityInfo.isReduceMotionEnabled()
-      .then((enabled) => {
-        if (current) setReduceMotion(enabled);
-      })
-      .catch(() => undefined);
-    const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", (enabled) => {
-      setReduceMotion(enabled);
-    });
-    return () => {
-      current = false;
-      subscription.remove();
-    };
-  }, []);
+  const reduceMotion = useReduceMotion();
   const spheres = useMemo(() => sphereChoices(rows), [rows]);
   const traits = useMemo(() => traitChoices(rows), [rows]);
   const costs = useMemo(() => costOptions(rows), [rows]);

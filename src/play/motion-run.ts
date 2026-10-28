@@ -3,6 +3,7 @@
 // number: a length comes from a token and the scale (motionScale), and a scale of 0 (reduced motion) snaps.
 import { Easing, ReduceMotion, useReducedMotion, useSharedValue, withTiming, type EasingFunction, type SharedValue } from "react-native-reanimated";
 import { useEffect, useState } from "react";
+import { AccessibilityInfo } from "react-native";
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
@@ -39,18 +40,40 @@ export function springConfig(token: Spring, scale: number): { mass: number; stif
 // What a layout animation builder (FadeIn, SlideInDown, ...) offers: each call changes the builder and returns it.
 type Builder = { easing(curve: EasingFunction): unknown; reduceMotion(reduce: ReduceMotion): unknown };
 
-/** A layout animation (FadeIn, SlideInDown, ...) of a token's length and curve, snapping under the system's reduced motion. */
+/** A layout animation (FadeIn, SlideInDown, ...) of a token's length and curve, snapping under reduced motion (the system's, or the override). */
 export function layoutAnim<C extends new () => Builder>(base: C, token: Tween, scale: number): InstanceType<C> {
   const sized = timed(base as unknown as Timeable<InstanceType<C>>, token, scale);
   if (token.easing) sized.easing(easingOf(token.easing));
-  sized.reduceMotion(ReduceMotion.System);
+  // The Reduce motion override (user request, 2026-10-28) is read here, not from a hook: a scale of 0 rebuilds the builder anyway.
+  sized.reduceMotion(tableSettings.getState().settings.reduceMotion === "always" ? ReduceMotion.Always : ReduceMotion.System);
   return sized;
+}
+
+/** Reduced motion: the phone's setting, or the Reduce motion override set to Always (user request, 2026-10-28). */
+export function useReduceMotion(): boolean {
+  const always = useStore(tableSettings, (state) => state.settings.reduceMotion === "always");
+  // Reanimated reads the phone's value once; the first frame uses it, then the phone's setting is followed live.
+  const [system, setSystem] = useState(useReducedMotion());
+  useEffect(() => {
+    let current = true;
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then((enabled) => {
+        if (current) setSystem(enabled);
+      })
+      .catch(() => undefined);
+    const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", setSystem);
+    return () => {
+      current = false;
+      subscription.remove();
+    };
+  }, []);
+  return system || always;
 }
 
 /** The motion scale now: the Animation speed setting and reduced motion read together (1 Normal, 0.6 Quick, 0 reduced). */
 export function useMotionScale(): number {
   const speed = useStore(tableSettings, (state) => state.settings.animationSpeed);
-  const reduced = useReducedMotion();
+  const reduced = useReduceMotion();
   return motionScale(speed, reduced);
 }
 

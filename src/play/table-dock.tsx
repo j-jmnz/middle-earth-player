@@ -4,12 +4,12 @@
 // button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did.
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
-import Animated, { FadeInUp, FadeOut, useReducedMotion } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
 import { isDense, labelChars, PILL_PT, planWords, wordsWindow } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
-import { layoutAnim, useMotionScale } from "./motion-run.ts";
+import { layoutAnim, useMotionScale, useReduceMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { BEAT_MS, type Moment } from "./outcome.ts";
 import type { Readout } from "./readout.ts";
@@ -227,7 +227,7 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
   const scale = useMotionScale();
   const fade = useMemo(() => ({ enter: layoutAnim(FadeInUp, MOTION.bannerIn, scale), leave: layoutAnim(FadeOut, MOTION.bannerOut, scale) }), [scale]);
   // Resolve in beats: one line more every BEAT_MS, each ringing on the table the cards it names; reduced motion shows all.
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReduceMotion();
   const [shownLines, setShownLines] = useState(reduceMotion ? moment.lines.length : 1);
   useEffect(() => {
     if (shownLines >= moment.lines.length) return;
