@@ -178,6 +178,8 @@ export function runPlayerVerb(
       const card = state.cards[id];
       const seat = card?.owner ?? card?.controller;
       if (!card || seat == null) return state;
+      // "Discarded objective cards are returned to the staging area" (01103:A:2, families/objectives.ts).
+      if (card.claimed) return updateCard(moveCard(state, id, { zone: "staging" }), id, { face: "up" });
       const moved = moveCard(state, id, { zone: "discard", seat });
       // "After 1 or more cards are discarded from your hand", "After ~ is discarded from your deck".
       if (card.zone === "hand") return queueEvent(moved, { trigger: "discardedFromHand", seat, cardId: id });

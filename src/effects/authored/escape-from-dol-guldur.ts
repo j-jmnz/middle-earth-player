@@ -21,7 +21,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // a shadow effect dealt to it costs the engaged player a character.
   {"id":"01102:constant:1","cardCode":"01102","lines":["01102:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"01102:forced:1","cardCode":"01102","lines":["01102:A:2"],"timing":"forced","trigger":"prisonerRescued","subject":{"type":"hero","control":"any"},"instructions":[{"verb":"MoveEncounterCard","card":"self","to":"staging"}]},
-  {"id":"01102:forced:2","cardCode":"01102","lines":["01102:A:3"],"timing":"forced","trigger":"shadowEffectResolved","subject":"self","instructions":[{"verb":"Pick","pick":{"type":"character","control":"you"}},{"verb":"DiscardPicked"}]},
+  {"id":"01102:forced:2","cardCode":"01102","lines":["01102:A:3"],"timing":"forced","trigger":"shadowEffectResolved","subject":"self","instructions":[{"verb":"Pick","pick":{"type":"character","control":"you"}},{"verb":"Discard","target":{"kind":"picked"}}]},
   // 01103 Cavern Guardian (Doomed 1 is a keyword): the defending player discards an attachment he controls (all of them when undefended). A discarded
   // objective returns to the staging area (families/objectives.ts).
   {"id":"01103:shadow:1","cardCode":"01103","lines":["01103:A:2"],"timing":"shadow","instructions":[{"verb":"Pick","pick":{"type":"attachment","control":"you"},"when":NOT_UNDEFENDED},{"verb":"DiscardPicked","when":NOT_UNDEFENDED},{"verb":"Each","pick":{"type":"attachment","control":"you"},"instructions":[{"verb":"DiscardPicked"}],"when":{"kind":"undefended"}}]},

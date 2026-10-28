@@ -32,10 +32,11 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
   return shadowId ? resolveShadowCard(state, shadowId, seat, ctx, steps) : state;
 }
 
-// A shadow effect that asks a player (Pick, Choose: "Discard a non-objective attachment you control", 141071:A:2), or repeats an
-// instruction ("Deal X shadow cards to this attacker", 01112:A:2), runs in a frame: only a frame expands a Repeat.
+// A shadow effect that asks a player (Pick, Choose: "Discard a non-objective attachment you control", 141071:A:2), repeats an
+// instruction ("Deal X shadow cards to this attacker", 01112:A:2) or resolves another card's When Revealed effects ("Resolve the
+// \"When Revealed\" effect of Iron Shackles", 01105:A:2), runs in a frame: only a frame expands a Repeat or waits for the effects it pushes.
 function runsInFrame(effects: readonly Effect[]): boolean {
-  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat"));
+  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat" || instruction.verb === "ResolveWhenRevealed"));
 }
 
 function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

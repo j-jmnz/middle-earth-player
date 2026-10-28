@@ -250,8 +250,12 @@ export function moveCard(state: ScenarioState, id: string, dest: Destination, re
 // Links an attachment to its host. The card keeps its zone and controller.
 export function attachTo(state: ScenarioState, id: string, hostId: string): ScenarioState {
   const host = state.cards[hostId];
-  if (!host || !state.cards[id]) return state;
-  const linked = updateCard(state, id, { host: hostId });
+  const card = state.cards[id];
+  if (!host || !card) return state;
+  // A card moves from the card it was attached to (an encounter card that guarded an objective, then attached itself to a hero).
+  const was = card.host != null && card.host !== hostId ? state.cards[card.host] : undefined;
+  const released = was ? updateCard(state, was.id, { attachments: was.attachments.filter((other) => other !== id) }) : state;
+  const linked = updateCard(released, id, { host: hostId });
   return updateCard(linked, hostId, { attachments: append(host.attachments, id) });
 }
 
