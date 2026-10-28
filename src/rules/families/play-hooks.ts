@@ -37,7 +37,7 @@ export function highestThreatSeats(state: ScenarioState): number[] {
 // player with the highest threat when the card says so (a tie is the first player's to settle), and otherwise the seat the effect runs for.
 export function attachHostChooser(state: ScenarioState, instruction: Instruction, itemSeat: number): number {
   if (instruction.verb !== "AttachSelf" || instruction.to.kind !== "hero") return itemSeat;
-  if (instruction.to.control === "any") return state.firstPlayer;
+  if (instruction.to.control === "any" || instruction.to.control === "highestThreatCost") return state.firstPlayer;
   if (instruction.to.control !== "highestThreat") return itemSeat;
   const highest = highestThreatSeats(state);
   return highest.length === 1 ? (highest[0] ?? itemSeat) : highest.length > 1 ? state.firstPlayer : itemSeat;

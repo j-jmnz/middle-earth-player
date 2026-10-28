@@ -3,6 +3,7 @@ import { costOfKind } from "../catalog/costs.ts";
 
 import { holds } from "./conditions.ts";
 import { triggerHears } from "./families/play-hooks.ts";
+import { cancelWindowBarred } from "./families/encounter-cancel.ts";
 import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
 import { effectsOfCard } from "./families/misc-text.ts";
 import { playableFromDeck } from "./deck-play.ts";
@@ -62,7 +63,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
  * combo). With nothing usable now, no window opens.
  */
 export function offerResponses(state: ScenarioState, event: GameEvent, ctx: ReduceContext, steps: EngineStep[], also: readonly GameEvent[] = []): ScenarioState {
-  if (ctx.effects.length === 0) return state;
+  if (ctx.effects.length === 0 || cancelWindowBarred(state, event)) return state;
   const order = livingSeats(state);
   const seen = new Set<string>();
   const offers = [event, ...also]

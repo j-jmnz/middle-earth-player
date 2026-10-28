@@ -18,6 +18,7 @@ import { inPlay, updateCard } from "./state.ts";
 import { moveCard } from "./zones.ts";
 import { queueEvent } from "./queue.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
+import { campaignUsed, noteCampaignUse } from "./families/campaign-used.ts";
 
 // Costs and limits on an Action or a Response. A cost is paid when the effect is triggered, before
 // it resolves. A limit is spent by the use, whether or not the effect then does anything.
@@ -26,7 +27,7 @@ export function controllerSeat(state: ScenarioState, source: CardInstance): numb
   return source.controller ?? state.firstPlayer;
 }
 
-type LimitRule = { times: number; per: "phase" | "round" | "attack" | "game"; eachPlayer?: boolean; group?: boolean };
+type LimitRule = { times: number; per: "phase" | "round" | "attack" | "game"; eachPlayer?: boolean; group?: boolean; campaign?: boolean };
 
 const LIMITS: Readonly<Record<Limit, LimitRule>> = {
   oncePerPhase: { times: 1, per: "phase" },
@@ -38,6 +39,7 @@ const LIMITS: Readonly<Record<Limit, LimitRule>> = {
   fivePerPhase: { times: 5, per: "phase" },
   oncePerAttack: { times: 1, per: "attack" },
   oncePerGame: { times: 1, per: "game" },
+  oncePerCampaign: { times: 1, per: "game", campaign: true },
   oncePerGameGroup: { times: 1, per: "game", group: true },
   thricePerGameGroup: { times: 3, per: "game", group: true },
   oncePerRoundGroupEachPlayer: { times: 1, per: "round", eachPlayer: true, group: true },
@@ -56,6 +58,7 @@ function attackKey(state: ScenarioState): string | undefined {
 export function limitSpent(state: ScenarioState, effect: Effect, sourceId: string, seat: number): boolean {
   if (!effect.limit) return false;
   const rule = LIMITS[effect.limit];
+  if (rule.campaign && campaignUsed(state, sourceId)) return true;
   const attack = attackKey(state);
   const used = state.uses.filter(
     (use) =>
@@ -261,7 +264,7 @@ export function payUsage(
     ...(rule.per === "game" ? { game: true } : {}),
     ...(rule.per === "attack" && attack ? { attack } : {}),
   };
-  return { ...next, uses: [...next.uses, use] };
+  return noteCampaignUse({ ...next, uses: [...next.uses, use] }, effect, sourceId);
 }
 
 // A Forced or triggered effect with a limit spends it when it resolves ("Limit once per game", 01130:A:4): the use is recorded as a
@@ -279,7 +282,7 @@ export function noteForcedUse(state: ScenarioState, effect: Effect, sourceId: st
     ...(rule.per === "game" ? { game: true } : {}),
     ...(rule.per === "attack" && attack ? { attack } : {}),
   };
-  return { ...state, uses: [...state.uses, use] };
+  return noteCampaignUse({ ...state, uses: [...state.uses, use] }, effect, sourceId);
 }
 
 function spend(state: ScenarioState, payments: readonly Payment[]): ScenarioState {

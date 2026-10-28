@@ -19,6 +19,7 @@ import type { Focus } from "./index.ts";
 import { runEncounterItem } from "./encounter-items.ts";
 import { countTop, discardUntil, effectData, encounterCard, lookAtTop, moveEncounter, pushPicked, shuffleDiscardIn, travelThere } from "./encounter-moves.ts";
 import { answeredRaise } from "./encounter-reveal.ts";
+import { searchCollection } from "./encounter-collection.ts";
 
 const WATCH_STATS = { threatZero: "watchThreatZero", damage: "watchDamage", discard: "watchDiscard", readyHost: "watchReadyHost" } as const;
 
@@ -44,6 +45,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const seat = instruction.who === "eventSeat" ? (effectData(state)?.eventSeat ?? focus.seat) : focus.seat;
       return state.seats[seat]?.eliminated ? state : startReveal(state, seat, ctx, steps);
     }
+    case "SearchCollection":
+      return searchCollection(state, instruction, focus, ctx, steps);
     case "ShuffleEncounterDiscard":
       return shuffleDiscardIn(state);
     case "DiscardUntil":

@@ -20,6 +20,7 @@ import { copyInVictory } from "./families/sidequests-pick.ts";
 import { shadowCards } from "./zones.ts";
 import { freeOfEncounters } from "./families/objectives.ts";
 import { prisonerHero } from "./families/prisoner.ts";
+import { tokensOn } from "./families/campaign.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -99,6 +100,10 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return [...state.staging, state.activeLocation, state.secondActiveLocation].some(
         (id) => id != null && id !== scope.sourceId && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location",
       );
+    case "firstPlayer":
+      return scope.actor === state.firstPlayer;
+    case "tokens":
+      return tokensOn(state, condition.code) >= condition.min;
     case "heroesAll": {
       const heroes = state.seats[scope.actor]?.heroes ?? [];
       return heroes.length > 0 && heroes.every((id) => hasTrait(state, id, condition.trait, ctx));

@@ -38,7 +38,7 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     // hero before the decks are set (rr.campaign-setup-checklist, mec109.permanent), so the Setup search never finds it in a
     // deck and this record never places it a second time; it runs only for a copy that is in a deck at setup.
     id: "setup-attach-to-a-hero",
-    pattern: /^Setup: Attach to a hero\.$/,
+    pattern: /^Setup[:.] Attach to a hero\.$/,
     build: () => [{ timing: "setup", instructions: [{ verb: "AttachSelf", to: { kind: "hero" } }] }],
   },
   {

@@ -54,6 +54,11 @@ export const VERBS = [
   // Reveals the top card of the encounter deck for the actor, or for the player the answered event happened to
   // (`eventSeat`), in a staging of its own (rr.reveal, rr.staging): the effect goes on once that card is resolved.
   z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat"]).optional(), ...when }),
+  // Searches the encounter deck, then its discard pile, then the player's collection (in that order, "search the encounter deck, discard pile, and
+  // your collection for a Goblin Sniper", 41041:A:1) for a card with the printed title of `code`, and adds it to the staging area. The app tracks
+  // no collection (docs/brief.md): the collection holds every card the game knows, so a copy of `code` is made when neither the deck nor the pile
+  // has one. The deck is shuffled by a ShuffleEncounterDeck after it (the line says so).
+  z.strictObject({ verb: z.literal("SearchCollection"), code: z.string().min(1), to: z.literal("staging"), ...when }),
   // The encounter discard pile is shuffled into the encounter deck.
   z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), ...when }),
   // Discards cards from the top of the encounter deck until one of `type` is discarded, or the deck is empty (rr.effects).
@@ -127,4 +132,7 @@ export const FLAGS = [
   "watchReadyHost",
   // Held by the table until the end of the round: a location has been revealed by the encounter deck this round.
   "locationRevealed",
+  // Held by the table while the source is the active location: "encounter card effects cannot be canceled" (41010:A:1). No Response cancels a
+  // When Revealed or Shadow effect, and no paid cancel is offered against one (src/rules/families/encounter-cancel.ts).
+  "encounterUncancelable",
 ] as const;

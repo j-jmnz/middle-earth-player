@@ -11,6 +11,7 @@ import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { runEncounterItem } from "./families/encounter-items.ts";
+import { moveEncounter } from "./families/encounter-moves.ts";
 import { chooseEach } from "./families/deck-each.ts";
 import { lookedDeckSeat } from "./families/deck-rules.ts";
 import { attachHostChooser, highestThreatSeats } from "./families/play-hooks.ts";
@@ -339,9 +340,16 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
         !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) &&
         (code == null || !attachBlocked(state, ctx, id, code));
       if (instruction.to.kind === "hero") {
-        const seats = instruction.to.control === "any" ? livingSeats(state) : instruction.to.control === "highestThreat" ? highestThreatSeats(state) : [item.seat];
+        const everyone = instruction.to.control === "any" || instruction.to.control === "highestThreatCost";
+        const seats = everyone ? livingSeats(state) : instruction.to.control === "highestThreat" ? highestThreatSeats(state) : [item.seat];
         const except = instruction.to.exceptSphere;
-        return seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter(free).filter((id) => except == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").sphere !== except);
+        const heroes = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []);
+        // "The hero with the highest threat cost" (41043:A:2): the heroes in play whose printed threat cost is the greatest.
+        const top = instruction.to.control === "highestThreatCost" ? Math.max(...heroes.map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").threat ?? 0)) : null;
+        return heroes
+          .filter((id) => top == null || (printedOf(ctx.cards, state.cards[id]?.code ?? "").threat ?? 0) === top)
+          .filter(free)
+          .filter((id) => except == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").sphere !== except);
       }
       const trait = instruction.to.trait;
       return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])]
@@ -478,6 +486,12 @@ function applyTargeted(
     case "SearchMove": {
       let next = state;
       for (const id of instruction.each ? ids : ids.slice(0, 1)) {
+        // "Put it into play engaged with you" (41013:A:1): the searching player engages it as it enters play (rr.engaged), so Forced effects
+        // that hear an engagement hear this one.
+        if (instruction.to === "engaged") {
+          next = moveEncounter(next, id, "engaged", item.seat, ctx, steps);
+          continue;
+        }
         next = instruction.to === "staging" ? moveCard(next, id, { zone: "staging" }) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
         if (instruction.each) next = updateCard(next, id, { face: "up" });
       }

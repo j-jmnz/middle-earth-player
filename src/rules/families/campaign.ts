@@ -5,7 +5,7 @@ import type { ScenarioState } from "../state.ts";
 import { lastPicked } from "../player-verbs.ts";
 import { queueEvent } from "../queue.ts";
 import { attachTo, moveCard, spawn } from "../zones.ts";
-import { updateCard } from "../state.ts";
+import { inPlay, updateCard } from "../state.ts";
 import type { Focus } from "./index.ts";
 
 // The verbs src/catalog/families/campaign.ts adds. Only PutObjectiveAllyIntoPlay runs in the engine: it is a Setup instruction the
@@ -24,6 +24,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "AttachSetAside":
       return attachSetAside(state, instruction.code, lastPicked(state));
+    case "PlaceToken":
+      return placeToken(state, focus.sourceId, instruction.amount ?? 1);
+    case "RecordTokens":
     case "EarnAttached":
     case "NamePrisoner":
       // Resolution verbs: rules/resolution.ts runs them.
@@ -36,6 +39,17 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     default:
       return null;
   }
+}
+
+// PlaceToken (41050:A:3): the source card gains resource tokens.
+function placeToken(state: ScenarioState, sourceId: string | null, amount: number): ScenarioState {
+  const card = sourceId ? state.cards[sourceId] : undefined;
+  return card ? updateCard(state, card.id, { resources: card.resources + amount }) : state;
+}
+
+// The tokens on the card with this code in play: what a campaign card's Resolution reads (the `tokens` condition, RecordTokens).
+export function tokensOn(state: ScenarioState, code: string): number {
+  return Object.values(state.cards).filter((card) => card.code === code && inPlay(card.zone)).reduce((sum, card) => sum + card.resources, 0);
 }
 
 // The last picked hero takes a set-aside copy of the card: it comes into its controller's play area attached to the hero.

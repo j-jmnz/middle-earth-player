@@ -222,6 +222,9 @@ export const limitSchema = z.enum([
   "fivePerPhase",
   "oncePerAttack",
   "oncePerGame",
+  // Once per campaign: the use is recorded in the Campaign Log's `usedOnce` facts, by the card's code, so a later scenario's copy
+  // of the card cannot use it again ("Limit once per campaign. Record in Campaign Log when used.", 41044:A:3; rules/usage.ts).
+  "oncePerCampaign",
   "oncePerGameGroup",
   "thricePerGameGroup",
   // Once a round for each player, counting every copy of the card ("You cannot trigger this ability if you have already

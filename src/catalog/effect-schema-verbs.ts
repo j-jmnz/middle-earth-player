@@ -166,7 +166,8 @@ export const simpleVerbs = [
   z.strictObject({
     verb: z.literal("SearchMove"),
     ...searchSelector,
-    to: z.enum(["staging", "engagedFirstPlayer"]),
+    // `engaged`: into play engaged with the player who searches ("put it into play engaged with you", 41013:A:1, 41024:A:1).
+    to: z.enum(["staging", "engagedFirstPlayer", "engaged"]),
     each: z.boolean().optional(),
     // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
     // Great Warg Chief, if able", 142022:A:1).
@@ -187,8 +188,9 @@ export const simpleVerbs = [
       // A hero the revealing player controls, or (`control: "any"`, "Attach to a hero.") any player's hero, chosen by the
       // first player (rr.first-player), or (`highestThreat`, "The player with the highest threat level attaches this card to one of his
       // heroes", 01080:A:1) a hero of the player with the highest threat, who chooses it (the first player chooses among the heroes
-      // of the players tied for the highest).
-      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
+      // of the players tied for the highest), or (`highestThreatCost`, "Attach to the hero with the highest threat cost", 41043:A:2) the hero
+      // with the highest printed threat cost among every hero in play (the first player chooses among those tied).
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
     ]),
     ...when,

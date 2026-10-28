@@ -67,6 +67,11 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("subjectExplored") }),
   // Another player is still in the game.
   z.strictObject({ kind: z.literal("otherPlayer") }),
+  // The actor holds the first player token ("Each other player searches ...", 41003:A:1, is `not` this one; src/rules/conditions.ts).
+  z.strictObject({ kind: z.literal("firstPlayer") }),
+  // The card with this code, in play, holds at least `min` resource tokens ("If there are 6 or more resource tokens here", 41050:B:1): read at a
+  // campaign card's Resolution (campaign family, src/rules/families/campaign.ts).
+  z.strictObject({ kind: z.literal("tokens"), code: z.string().min(1), min: z.number().int().min(0) }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // The quest advanced to the stage with this code (`is`) or did not. Kept only by a quest that branches (BranchStage), read by the

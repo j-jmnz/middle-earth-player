@@ -46,6 +46,7 @@ import * as packTBS from "./TBS.ts";
 import * as packTCoU from "./TCoU.ts";
 import * as packTDF from "./TDF.ts";
 import * as packTDM from "./TDM.ts";
+import * as packTDoM from "./TDoM.ts";
 import * as packTDR from "./TDR.ts";
 import * as packTDT from "./TDT.ts";
 import * as packTFoN from "./TFoN.ts";
@@ -123,6 +124,7 @@ const PACKS: readonly { RECORDS: readonly Effect[]; REPLACES: readonly string[] 
   packTCoU,
   packTDF,
   packTDM,
+  packTDoM,
   packTDR,
   packTDT,
   packTFoN,

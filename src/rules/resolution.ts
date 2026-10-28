@@ -8,6 +8,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import type { Earned, ResolutionLog } from "./campaign-state.ts";
 import { shuffleIds } from "./seed.ts";
+import { tokensOn } from "./families/campaign.ts";
 import { inPlay, livingSeats, type ScenarioState } from "./state.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
@@ -121,6 +122,9 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
         next = stepOver(next, { ...next.resolutionLog, carryOver: [...(next.resolutionLog.carryOver ?? []), ...carried] });
         break;
       }
+      case "RecordTokens":
+        next = stepOver(next, { ...next.resolutionLog, counters: { ...(next.resolutionLog.counters ?? {}), [instruction.code]: tokensOn(next, instruction.code) } });
+        break;
       case "EarnAttached":
         next = stepOver(next, earn(next, attachedCopies(next, instruction.codes, ctx)));
         break;

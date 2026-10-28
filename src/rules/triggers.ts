@@ -10,6 +10,7 @@ import { pushDue } from "./delayed.ts";
 import { effectCause } from "./cause.ts";
 import { limitSpent, noteForcedUse } from "./usage.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
+import { offerResponses } from "./responses.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { CardInstance, Frame, GameEvent, ScenarioState } from "./state.ts";
@@ -124,6 +125,11 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
   if (ctx.effects.length === 0 && next.delayed.length === 0) return next;
   next = pushDue(next, ended, "endOfRound", steps);
   next = pushDue(next, ended, "endOfPhase", steps);
-  if (ended === "End of round") next = fireForced(next, { trigger: "endOfRound", seat: null, phase: ended }, ctx, steps);
+  if (ended === "End of round") {
+    // The Responses to the end of the round are offered once its Forced effects have resolved ("Response: At the end of each round, place 1
+    // resource token here", 41050:A:3): their frame goes under the Forced ones.
+    const event = { trigger: "endOfRound", seat: null, phase: ended } as const;
+    next = fireForced(offerResponses(next, event, ctx, steps), event, ctx, steps);
+  }
   return fireForced(next, { trigger: "endOfPhase", seat: null, phase: ended }, ctx, steps);
 }

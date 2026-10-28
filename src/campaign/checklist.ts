@@ -212,7 +212,8 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   errors.push(...six.errors);
   // A Permanent card already went on its hero in step 5 (it is not in a deck); the others with a Setup line are found
   // in the deck they are shuffled into (mec109.setup).
-  const withSetup = pool.filter((card) => card.attachedTo == null && !fresh.has(card) && input.effects.some((effect) => effect.cardCode === card.code && effect.timing === "setup"));
+  const dealt = (card: PoolCard): boolean => seats.some((seat) => seat.hand.includes(card.code) || seat.attachments.some((attached) => attached.code === card.code));
+  const withSetup = pool.filter((card) => card.attachedTo == null && !fresh.has(card) && !dealt(card) && input.effects.some((effect) => effect.cardCode === card.code && effect.timing === "setup"));
   const did6 = [...six.did, ...withSetup.map((card) => `${name(card.code)} has a Setup line: the Setup search finds it in its deck.`)];
   note(6, did6.length > 0 ? did6 : ["No boon or burden has a Setup keyword."]);
 

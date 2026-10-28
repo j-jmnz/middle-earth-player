@@ -40,6 +40,12 @@ export const VERBS = [
   // damage will be taken prisoner ... in case of a tie, randomly select among the heroes with the most damage. Record the name of the
   // \"prisoner\" in the notes section of the Campaign Log", 01130:B:1). Written to the log's `prisoner` fact; the seed makes the pick.
   z.strictObject({ verb: z.literal("NamePrisoner"), ...when }),
+  // Places `amount` resource tokens (1 by default) on the source card: the campaign card counts them ("Response: At the end of each round, place 1
+  // resource token here", 41050:A:3). It is no hero's resource pool, so nothing collects it and no `resourcesAdded` is announced.
+  z.strictObject({ verb: z.literal("PlaceToken"), amount: z.number().int().positive().optional(), ...when }),
+  // Resolution: the resource tokens on the campaign card with this code join the Campaign Log's counters under its code ("Record the number of tokens
+  // here", 41050:B:1); the `tokens` condition reads them in the same Resolution. Written to the log's `counters` fact (campaign/log.ts).
+  z.strictObject({ verb: z.literal("RecordTokens"), code, ...when }),
 ] as const;
 
 export const TRIGGERS = [] as const;

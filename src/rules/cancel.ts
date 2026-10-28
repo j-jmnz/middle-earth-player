@@ -3,6 +3,7 @@ import { holds } from "./conditions.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { noteSpent } from "./families/costs-pay.ts";
+import { encounterUncancelable } from "./families/encounter-cancel.ts";
 import { heroPays, validatePayments } from "./payments.ts";
 import type { CancelOffer, EffectData, Frame, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
@@ -26,7 +27,7 @@ export function canPayCancel(state: ScenarioState, offer: CancelOffer, ctx: Redu
 // Runs when an effect frame starts. Opens the cancel offer unless nothing can cancel the effect.
 export function beginEffect(state: ScenarioState, frame: Frame, data: EffectData, ctx: ReduceContext): ScenarioState {
   const scope = { actor: data.actor, sourceId: frame.cardId, returned: 0 };
-  const blocked = [data.blockCancel, data.cancel?.unless ?? null].some((condition) => condition != null && holds(state, condition, scope, ctx));
+  const blocked = [data.blockCancel, data.cancel?.unless ?? null].some((condition) => condition != null && holds(state, condition, scope, ctx)) || (data.cancel != null && encounterUncancelable(state));
   const started = patchTop(state, { step: 1, data: { ...data, uncancelable: blocked } });
   if (blocked || !data.cancel || !canPayCancel(started, data.cancel, ctx)) return started;
   const waiting = patchTop(started, { data: { ...data, uncancelable: false, wait: { kind: "cancel" } } });

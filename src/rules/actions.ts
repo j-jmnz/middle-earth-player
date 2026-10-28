@@ -35,7 +35,9 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   // An Action used from the hand ("put ~ into play from your hand", effect.fromHand) is used there; any other in play.
   if (effect?.fromHand ? instance.zone !== "hand" : instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached" && !shared) return undefined;
   // Only the card's controller uses its Action, unless any player may (Éowyn's once a round each, "Any player may trigger").
-  if (!effect || (instance.controller !== state.activeSeat && !shared && effect.limit !== "oncePerRoundEachPlayer" && !effect.anyPlayer)) return undefined;
+  // An encounter card attached to a hero belongs to no player: the hero's controller uses its Action (41043:A:2, Guilty Conscience).
+  const holder = instance.controller ?? (instance.zone === "attached" && instance.host ? (state.cards[instance.host]?.controller ?? null) : null);
+  if (!effect || (holder !== state.activeSeat && !shared && effect.limit !== "oncePerRoundEachPlayer" && !effect.anyPlayer)) return undefined;
   const scope = { actor: state.activeSeat, sourceId: cardId, returned: 0 };
   return !effect.condition || holds(state, effect.condition, scope, ctx) ? effect : undefined;
 }
