@@ -187,12 +187,18 @@ export function recordInstructions(effects: readonly Effect[], code: string, tim
   return effects.filter((effect) => effect.cardCode === code && effect.timing === timing).flatMap((effect) => effect.instructions);
 }
 
+// A quest card whose Forced effect names the stages its defeat proceeds to (BranchStage, 01120:B:1) carries them as its `branch`.
+function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[] } {
+  const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
+  return branch?.verb === "BranchStage" ? { code, branch: branch.codes } : { code };
+}
+
 export function scenarioDefinition(data: ScenarioData, _campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
   const burden = burdenCodes(data);
   return scenarioDefinitionSchema.parse({
     id: data.id,
     encounterSets: data.encounterSets.map((set) => ({ code: set.name, count: set.count })),
-    stages: data.stages.map((code) => ({ code })),
+    stages: data.stages.map((code) => stageOf(code, effects)),
     widgets: {
       hide: data.widgets.hide,
       lifeTracker: data.life != null,

@@ -230,7 +230,7 @@ export function pickCandidates(
   const playerEffect = !counting && (source == null || isPlayerType(printedOf(ctx.cards, source.code)));
   const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
   const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
-  return raw.filter((id) => {
+  const found = raw.filter((id) => {
     const instance = state.cards[id];
     if (!instance) return false;
     // Only an attachment a player may discard is offered for one (141071:A:2): a Permanent card on a hero is not.
@@ -240,6 +240,12 @@ export function pickCandidates(
     if (!counting && immuneToSource(state, id, sourceId, ctx)) return false;
     return matchesPick(state, id, spec, at, ctx);
   });
+  // "The hero you control with the most damage on it": of the cards that matched, those holding the most (every one, when tied).
+  if (spec.mostDamaged) {
+    const most = Math.max(0, ...found.map((id) => state.cards[id]?.damage ?? 0));
+    return found.filter((id) => (state.cards[id]?.damage ?? 0) === most);
+  }
+  return found;
 }
 
 // The cards attached to the source, to the source's host, to the active location, or to the defending character.

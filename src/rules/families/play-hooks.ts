@@ -8,7 +8,7 @@ import type { Trigger } from "../../catalog/boundary.ts";
 import type { Cause } from "../cause.ts";
 import { queueEvent } from "../queue.ts";
 import type { CardInstance, ScenarioState } from "../state.ts";
-import { modifierActive } from "../state.ts";
+import { livingSeats, modifierActive } from "../state.ts";
 
 // Whether an effect's trigger hears an event: its own trigger, or either half of "enters or leaves play" (Gwaihir, 22108:A:3).
 export function triggerHears(trigger: Trigger | undefined, heard: Trigger): boolean {
@@ -24,6 +24,13 @@ export function seatThreat(state: ScenarioState, seat: number): number {
     if (modifier.stat === "threatCeiling" && modifier.instanceId === `seat:${seat}` && modifierActive(state, modifier)) ceiling = Math.min(ceiling, modifier.amount);
   }
   return ceiling;
+}
+
+// The seats still in the game that share the highest threat (rr.threat-threat-dial, 01080:A:1: "the player with the highest threat level").
+export function highestThreatSeats(state: ScenarioState): number[] {
+  const living = livingSeats(state);
+  const top = Math.max(...living.map((seat) => seatThreat(state, seat)));
+  return living.filter((seat) => seatThreat(state, seat) === top);
 }
 
 // A threat raise the doomed keyword caused is announced to "After a player raises his threat from the doomed keyword"

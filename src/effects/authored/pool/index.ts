@@ -35,6 +35,7 @@ import * as packOHaUH from "./OHaUH.ts";
 import * as packOtD from "./OtD.ts";
 import * as packRAH from "./RAH.ts";
 import * as packRAR from "./RAR.ts";
+import * as packRevCore from "./RevCore.ts";
 import * as packRtM from "./RtM.ts";
 import * as packRtR from "./RtR.ts";
 import * as packSaF from "./SaF.ts";
@@ -111,6 +112,7 @@ const PACKS: readonly { RECORDS: readonly Effect[]; REPLACES: readonly string[] 
   packOtD,
   packRAH,
   packRAR,
+  packRevCore,
   packRtM,
   packRtR,
   packSaF,

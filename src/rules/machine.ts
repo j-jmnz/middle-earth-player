@@ -32,6 +32,7 @@ import { gameReads } from "./families/costs-pay.ts";
 import { playSweep } from "./families/play-sweep.ts";
 import { afterPaying } from "./families/deck-play.ts";
 import { doRefresh } from "./refresh.ts";
+import { askReadyPayments } from "./families/attachments-ready.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
 import { resolutionStep } from "./stage-reveal.ts";
@@ -220,7 +221,8 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "playerAttacks":
       return openPlayer(state, ctx);
     case "refresh":
-      return doRefresh(state, ctx, steps);
+      // A hero that does not ready unless its pool pays (01080:A:1) asks its controller first.
+      return askReadyPayments(state, ctx, steps) ?? doRefresh(state, ctx, steps);
     case "endRound":
       return stepWindow(state, ctx, "7.4") ?? withMode(state, "beginRound");
     default:

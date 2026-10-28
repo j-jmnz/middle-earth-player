@@ -87,4 +87,7 @@ export const FLAGS = [
   "alliesToHand",
   // Held by a seat: the next Doomed event it plays raises threat by this much less (ReduceNextDoomed).
   "doomedReduction",
+  // Held by the table while a card in play says so: no player draws a card ("While Enchanted Stream is the active location, players
+  // cannot draw cards", 01095:A:1). drawOne (rules/interpret.ts) reads it, so every draw is stopped, a resource phase draw included.
+  "cannotDraw",
 ] as const;

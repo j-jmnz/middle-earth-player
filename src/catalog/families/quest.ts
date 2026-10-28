@@ -30,6 +30,8 @@ export const VERBS = [
   // Deals `amount` damage to each card that matches `pick` (from the actor's side), or to each enemy engaged with the picked
   // player (`engagedWith: "picked"`). A player card's damage: immunity applies (02095:A:2, 08060:A:1, 12065:A:2).
   z.strictObject({ verb: z.literal("DamageEach"), amount: positiveAmountSchema, pick: pickSchema.optional(), engagedWith: z.literal("picked").optional(), ...when }),
+  // Exhausts each card that matches `pick`, from the actor's side ("Exhaust each damaged character you control", 01137:A:3). Nobody chooses.
+  z.strictObject({ verb: z.literal("ExhaustEach"), pick: pickSchema, ...when }),
   // Readies every character the actor controls, with this trait when one is named (22029:A:1).
   z.strictObject({ verb: z.literal("ReadyAll"), trait: z.string().min(1).optional(), ...when }),
   // The enemy (the picked card by default) does not make engagement checks against the actor (`checks`, 19009:A:2, 22061:A:1),
@@ -50,6 +52,11 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("AdvanceStage"), ...when }),
   // The source attachment moves to the card (the picked card by default) and passes to that card's controller (19010:A:4).
   z.strictObject({ verb: z.literal("ReattachSelf"), target: cardRefSchema.optional(), ...when }),
+  // On a quest card's Forced effect "When you defeat this stage, proceed to one of the 2 \"A Chosen Path\" stages, at random" (01120:B:1):
+  // the stage's defeat proceeds to one of `codes`, chosen with the scenario's seed, and the others are removed from the game. The
+  // scenario definition copies it onto the stage (`stages[i].branch`) and advanceStage (rules/quest.ts) takes the branch, so running
+  // it does nothing. A stage reached by a branch is the last one: defeating it wins the game.
+  z.strictObject({ verb: z.literal("BranchStage"), codes: z.array(z.string().min(1)).min(2) }),
 ] as const;
 
 export const TRIGGERS = [
@@ -69,6 +76,10 @@ export const TRIGGERS = [
   "optionallyEngaged",
   // About the seat: it reached its threat elimination level and a card in play would keep it in the game (10124:A:2).
   "wouldBeEliminated",
+  // About a quest card: it was defeated, a stage of the main quest (the event's subject, now out of play) or a side quest. A Response
+  // with a `subject` filter of any card hears it ("After a quest card is defeated", 01135:A:3); a Forced effect with `subject: "self"`
+  // is the card's own ("When you defeat this stage", 01120:B:1). The winning stage is not announced: the game is over.
+  "questCardDefeated",
 ] as const;
 
 export const FLAGS = [

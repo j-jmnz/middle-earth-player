@@ -116,6 +116,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       return state.pendingAttack != null && (state.pendingAttack.defenderId == null || state.pendingAttack.undefended === true);
     case "searchable":
       return searchable(state, condition, ctx).length > 0;
+    case "stageReached":
+      return (state.stagesReached ?? []).includes(condition.code) === condition.is;
     case "inPlay":
       return Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone)) === condition.is;
     case "versusHighEngagement": {

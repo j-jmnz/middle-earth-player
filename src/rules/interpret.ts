@@ -156,7 +156,7 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 }
 
 export function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {
-  if (state.seats[seat]?.eliminated) return state;
+  if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
   const id = state.seats[seat]?.deck[0];
   if (!id) return state;
   const next = moveCard(state, id, { zone: "hand", seat });

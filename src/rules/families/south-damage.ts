@@ -18,6 +18,7 @@ import { inPlay, livingSeats } from "../state.ts";
 import type { Focus } from "./index.ts";
 import { effectData } from "./encounter-moves.ts";
 import { queueFront } from "./play-refs.ts";
+import { queueEvent } from "../queue.ts";
 
 type Assign = Extract<Instruction, { verb: "AssignDamage" }>;
 
@@ -45,7 +46,10 @@ export function discardEach(state: ScenarioState, instruction: Extract<Instructi
   for (const id of pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx)) {
     const card = next.cards[id];
     const seat = card?.owner ?? card?.controller;
-    if (card && seat != null) next = moveCard(next, id, { zone: "discard", seat });
+    if (!card || seat == null) continue;
+    next = moveCard(next, id, { zone: "discard", seat });
+    // A card from a hand is "discarded from your hand" (01079:A:1, Eyes of the Forest, makes each player discard the events in his).
+    if (card.zone === "hand") next = queueEvent(next, { trigger: "discardedFromHand", seat, cardId: id });
   }
   return next;
 }

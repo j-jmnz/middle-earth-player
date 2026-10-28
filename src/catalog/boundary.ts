@@ -115,6 +115,8 @@ const encounterSetSchema = z.strictObject({
 
 const stageSchema = z.strictObject({
   code: z.string(),
+  // The stages defeating this one proceeds to, one of them at random, the rest removed from the game (BranchStage, 01120:B:1).
+  branch: z.array(z.string()).min(2).optional(),
 });
 
 const widgetsSchema = z.strictObject({

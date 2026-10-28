@@ -158,6 +158,9 @@ export const pickSchema = z.strictObject({
   playerCard: z.boolean().optional(),
   maxDefense: z.number().int().min(0).optional(),
   drawn: z.boolean().optional(),
+  // Of the cards that match every other filter, only those with the most damage on them (all of them when tied): "the hero you control
+  // with the most damage on it" (01137:A:2). Read by pickCandidates (src/rules/pick.ts).
+  mostDamaged: z.literal(true).optional(),
   // A card with at most this many attachments on it ("a Dale character without an attachment" is read after the attachment arrived: 1).
   maxAttachments: z.number().int().min(0).optional(),
   // Not a card with one of these titles ("a character in play (other than Bilbo Baggins)").

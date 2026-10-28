@@ -230,7 +230,10 @@ export type ScenarioState = {
   revealCursor: { seats: readonly number[]; index: number } | null;
   // True between the two passes that resolve the quest.
   questResolved: boolean;
-  stages: readonly { code: string }[];
+  stages: readonly { code: string; branch?: readonly string[] }[];
+  // The codes of the stages the quest advanced to, in order. Kept only by a quest that branches (BranchStage), for a Resolution that
+  // reads which branch was taken ("If stage 3B was Beorn's Path", 01129:B:1).
+  stagesReached?: readonly string[];
   setup: readonly Instruction[];
   widgets: ScenarioDefinition["widgets"];
   resolution: ScenarioDefinition["resolution"];

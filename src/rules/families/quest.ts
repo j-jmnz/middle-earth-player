@@ -11,7 +11,7 @@ import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { addModifier, placeDamage, playerCardEffectCanChoose } from "../keywords.ts";
 import { pickCandidates } from "../pick.ts";
-import { lastPicked, readyCard, seatOf } from "../player-verbs.ts";
+import { exhaustCard, lastPicked, readyCard, seatOf } from "../player-verbs.ts";
 import { isCharacterType, isPlayerType, printedOf } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import type { Modifier, QueueItem, ScenarioState } from "../state.ts";
@@ -40,6 +40,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return lowerCardThreat(state, instruction, focus, ctx);
     case "DamageEach":
       return damageEach(state, instruction, focus, ctx, steps);
+    case "ExhaustEach": {
+      let next = state;
+      for (const id of pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx)) next = exhaustCard(next, id);
+      return next;
+    }
     case "ReadyAll": {
       let next = state;
       for (const id of characters(state, focus.seat, ctx.cards)) if (!instruction.trait || hasTrait(state, id, instruction.trait, ctx)) next = readyCard(next, id);
@@ -69,6 +74,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return resetThreat(state, focus.seat, focus.sourceId, ctx, steps);
     case "ReattachSelf":
       return reattachSelf(state, instruction, focus);
+    // Read when the scenario's definition is built (BranchStage, rules/families/quest-branch.ts); nothing to do when it runs.
+    case "BranchStage":
+      return state;
     default:
       return null;
   }

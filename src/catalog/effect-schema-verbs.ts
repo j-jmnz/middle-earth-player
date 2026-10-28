@@ -184,8 +184,10 @@ export const simpleVerbs = [
     verb: z.literal("AttachSelf"),
     to: z.discriminatedUnion("kind", [
       // A hero the revealing player controls, or (`control: "any"`, "Attach to a hero.") any player's hero, chosen by the
-      // first player (rr.first-player).
-      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
+      // first player (rr.first-player), or (`highestThreat`, "The player with the highest threat level attaches this card to one of his
+      // heroes", 01080:A:1) a hero of the player with the highest threat, who chooses it (the first player chooses among the heroes
+      // of the players tied for the highest).
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
     ]),
     ...when,

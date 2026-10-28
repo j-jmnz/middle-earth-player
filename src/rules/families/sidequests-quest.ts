@@ -82,7 +82,9 @@ export function defeatSideQuest(state: ScenarioState, questId: string, ctx: Redu
   if (!quest) return state;
   let next = releaseAttachments(noteHostDefeated(state, questId), questId, ctx.cards, steps);
   next = updateCard(addToVictory(next, questId, ctx), questId, { progress: 0, committed: false });
-  return queueEvent(next, { trigger: "questDefeated", seat: quest.controller, cardId: questId, subject: questId });
+  next = queueEvent(next, { trigger: "questDefeated", seat: quest.controller, cardId: questId, subject: questId });
+  // Any quest card hears that a quest card was defeated ("After a quest card is defeated", 01135:A:3).
+  return ctx.effects.some((effect) => effect.trigger === "questCardDefeated") ? queueEvent(next, { trigger: "questCardDefeated", seat: null, subject: questId }) : next;
 }
 
 // What each side quest in a quest area will take as progress from the characters committed to it now.

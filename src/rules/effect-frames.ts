@@ -14,6 +14,7 @@ import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { runEncounterItem } from "./families/encounter-items.ts";
 import { chooseEach } from "./families/deck-each.ts";
 import { lookedDeckSeat } from "./families/deck-rules.ts";
+import { highestThreatSeats } from "./families/play-hooks.ts";
 import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
@@ -338,7 +339,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
         !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) &&
         (code == null || !attachBlocked(state, ctx, id, code));
       if (instruction.to.kind === "hero") {
-        const seats = instruction.to.control === "any" ? livingSeats(state) : [item.seat];
+        const seats = instruction.to.control === "any" ? livingSeats(state) : instruction.to.control === "highestThreat" ? highestThreatSeats(state) : [item.seat];
         const except = instruction.to.exceptSphere;
         return seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter(free).filter((id) => except == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").sphere !== except);
       }
@@ -442,7 +443,10 @@ function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Redu
     const distinct = distinctByCode(state, found);
     const instruction = item.instruction;
     const firstChooses = instruction.verb === "AttachSelf" && instruction.to.kind === "hero" && instruction.to.control === "any";
-    if (distinct.length > 1) return askTarget(state, firstChooses ? { ...item, seat: state.firstPlayer } : item, distinct);
+    // The player with the highest threat chooses the host of a card that goes to his hero; a tie is the first player's to settle.
+    const highest = instruction.verb === "AttachSelf" && instruction.to.kind === "hero" && instruction.to.control === "highestThreat" ? highestThreatSeats(state) : [];
+    const chooser = firstChooses ? state.firstPlayer : highest.length === 1 ? (highest[0] ?? item.seat) : highest.length > 1 ? state.firstPlayer : item.seat;
+    if (distinct.length > 1) return askTarget(state, { ...item, seat: chooser }, distinct);
     ids = found.slice(0, 1);
   }
   return applyTargeted(state, item, ids, frame.cardId, ctx, steps);

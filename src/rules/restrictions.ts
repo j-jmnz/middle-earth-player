@@ -4,8 +4,9 @@ import type { Instruction } from "../catalog/boundary.ts";
 import { constantInstructions } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
+import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
-import { flagged, heldAmount, inPlay, type ScenarioState } from "./state.ts";
+import { flagged, heldAmount, inPlay, livingSeats, type ScenarioState } from "./state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
 export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string; maxWillpower?: number };
@@ -35,7 +36,7 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
 // it, under that player's control: Weathertop (141046:A:3) prints "The first player must exhaust The One Ring to travel
 // here", so the Ring must be ready and controlled by the player who holds the first player token now (rr.first-player); in
 // two-handed play that is not the Ring-bearer's seat every round. A Hide test on a Travel line is not a cost the players
-// can fail to pay.
+// can fail to pay. A Travel cost of cards (discard 2 at random, each player exhausts a hero) needs the cards to pay it.
 export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   const code = state.cards[locationId]?.code;
   if (code == null) return false;
@@ -45,6 +46,16 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
     .some((instruction) => {
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
+      // "The first player must discard 2 cards at random from his hand to travel here" (01094:A:1): a hand of fewer cannot pay it.
+      if (instruction.verb === "DiscardRandomFromHand" && instruction.who === "firstPlayer" && typeof instruction.amount === "number") {
+        return (state.seats[state.firstPlayer]?.hand.length ?? 0) < instruction.amount;
+      }
+      // "Each player must exhaust 1 hero he controls to travel here" (01077:A:1): every player needs a card to choose.
+      if (instruction.verb === "ForEachPlayer") {
+        const cost = instruction.instructions.find((inner) => inner.verb === "Pick");
+        const exhausts = instruction.instructions.some((inner) => inner.verb === "Exhaust");
+        return cost?.verb === "Pick" && exhausts && livingSeats(state).some((seat) => pickCandidates(state, cost.pick, seat, [], null, ctx).length === 0);
+      }
       if (instruction.verb !== "Exhaust" || instruction.target?.kind !== "byCode") return false;
       const named = instruction.target.code;
       const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;

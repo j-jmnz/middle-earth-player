@@ -19,6 +19,7 @@ import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
 import { placeQuestingProgress } from "./families/defense-damage.ts";
 import { freeSlot, placeOnActive } from "./families/south-locations.ts";
+import { branchFrom, reached as reachedStage } from "./families/quest-branch.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -170,7 +171,10 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     const current = next.cards[currentId];
     if (!current) return { ...next, stageCleared: true };
     const index = next.stages.findIndex((stage) => stage.code === current.code);
-    const nextCode = index < 0 ? undefined : next.stages[index + 1]?.code;
+    // A quest that branches (BranchStage, 01120:B:1) chooses the next stage at random and ends at a stage it led to.
+    const branched = branchFrom(next, current.code);
+    if (branched) next = branched.state;
+    const nextCode = branched ? branched.code : index < 0 ? undefined : next.stages[index + 1]?.code;
     const nextId = nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     if (!nextId) return clearStage(next);
     // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards).
@@ -178,6 +182,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     next = moveCard(next, currentId, { zone: "setAside" });
     next = moveCard(next, nextId, { zone: "questStage" });
     next = updateCard(next, nextId, { face: "B" });
+    if (nextCode) next = reachedStage(next, nextCode);
     steps.push({ kind: "advance", cardId: nextId });
     const arrived = next.cards[nextId];
     const points = arrived ? questPointsOf(next, arrived, cards) : null;
