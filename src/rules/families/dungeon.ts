@@ -1,4 +1,4 @@
-// Rules: rr.engaged, rr.attachment-cards, rr.draw, rr.shadow-effects (data/rules/entries.json).
+// Rules: rr.engaged, rr.attachment-cards, rr.drawing-cards, rr.shadow-effects (data/rules/entries.json).
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import type { EngineStep } from "../intents.ts";
