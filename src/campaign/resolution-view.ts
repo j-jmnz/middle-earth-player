@@ -40,7 +40,15 @@ export type ResolutionView =
       decline: ResolutionDecline | null;
       to: "pool" | "hand" | "hero" | "captive";
     }
-  | { kind: "settled"; earned: readonly SettledCard[]; fallen: readonly string[]; captives: readonly string[]; prisoner?: string };
+  | {
+      kind: "settled";
+      earned: readonly SettledCard[];
+      fallen: readonly string[];
+      captives: readonly string[];
+      prisoner?: string;
+      // Cards the log keeps for the next campaign (01131:B:2), a copy for each player when `eachPlayer`.
+      carried?: readonly { code: string; eachPlayer: boolean }[];
+    };
 
 function nameOf(world: World, code: string): string {
   return world.cards.get(code)?.name ?? code;
@@ -56,6 +64,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),
       ...(settled.prisoner ? { prisoner: settled.prisoner } : {}),
+      ...(settled.carryOver && settled.carryOver.length > 0 ? { carried: settled.carryOver.map((item) => ({ code: item.code, eachPlayer: item.perPlayer === true })) } : {}),
     };
   }
   const window = state.window;
@@ -165,5 +174,10 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   const records = earned.length > 0 ? `Confirming records ${list} in the campaign` : "Confirming records the win";
   const sentence = next ? `${records} and unlocks ${next}.` : `${records}.`;
   // The hero a Resolution takes prisoner is written to the log too (01130:B:1): a sentence of its own, with the reason.
-  return view.prisoner ? `${sentence} ${nameOf(world, view.prisoner)}, the hero with the most damage, is taken prisoner.` : sentence;
+  const prisoner = view.prisoner ? `${sentence} ${nameOf(world, view.prisoner)}, the hero with the most damage, is taken prisoner.` : sentence;
+  // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.
+  if (!view.carried || view.carried.length === 0) return prisoner;
+  const names = view.carried.map((card) => (card.eachPlayer ? `a ${nameOf(world, card.code)} for each player` : nameOf(world, card.code)));
+  const carried = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : (names[0] ?? "");
+  return `${prisoner} ${carried} ${view.carried.length > 1 || view.carried[0]?.eachPlayer ? "are" : "is"} kept for your next campaign.`;
 }
