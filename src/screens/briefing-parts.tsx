@@ -12,7 +12,7 @@ import { cards, packs } from "../catalog/schema";
 import type { Difficulty } from "../catalog/scenario-data";
 import { SceneArt } from "./art";
 import { dealSentence, problemWords } from "./briefing-words";
-import { ActionBar, Chevron, Chip, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, TwoPane, useTitleShadow } from "./chrome";
+import { ActionBar, Chevron, Chip, Column, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, TwoPane, useTitleShadow } from "./chrome";
 import { BRIEFING_SCENE_RANGE } from "./briefing-layout";
 import { deckListSpheres, emptyDeckListFilter, filterDecks, type DeckListFilter } from "./deck-list";
 import { deckReadiness, type DeckReadiness } from "./deck-status";
@@ -182,7 +182,7 @@ export function BriefingScreen({
           end={
             <>
               <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingTop: insets.top + 8 * s, paddingBottom: 24 * s, paddingRight: trailing }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                {children}
+                <Column>{children}</Column>
               </ScrollView>
               {bar ? (
                 <View style={{ paddingRight: trailing }}>
