@@ -10,7 +10,10 @@
 // two-handed game of scenario 1 parked on the first player's planning window of round 1, for the flows that need two dials and a seat
 // that is not acting (the peek, `.maestro/seat-peek.yaml`). `mirkwood-won` and `mirkwood-lost` are two-handed games of Passage Through
 // Mirkwood (Mirkwood Paths part 1) from an empty log, parked on the win and on the loss (the e2e-mirkwood script); a fixture names its campaign.
+// `anduin-won` and `anduin-lost` are two-handed games of Journey Along the Anduin (part 2) from the log `mirkwood-won` writes when it is confirmed
+// (`past`), parked on the win and on the loss (the e2e-anduin script).
 import knifeFixtures from "./fixtures/a-knife-in-the-dark.json";
+import anduinFixtures from "./fixtures/journey-along-the-anduin.json";
 import mirkwoodFixtures from "./fixtures/passage-through-mirkwood.json";
 import fixtures from "./fixtures/scenario-1.json";
 
@@ -20,14 +23,14 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { FELLOWSHIP_ID, parseLoadout, parseLog, parseSeatCount, type Save, type StoredLoadout } from "./save.ts";
 
-export type FixtureName = "won" | "lost" | "knife-lost" | "duo" | "mirkwood-won" | "mirkwood-lost";
+export type FixtureName = "won" | "lost" | "knife-lost" | "duo" | "mirkwood-won" | "mirkwood-lost" | "anduin-won" | "anduin-lost";
 
 // `past`: the scenario 1 fixture and the Resolution answers whose log this fixture starts from.
 export type Fixture = { campaignId: string; seatCount: 1 | 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: FixtureName; choices: string[] } | null };
 
 type StoredFixture = { campaignId?: string; seatCount: number; loadout: unknown; seed: number; intents: unknown[]; log?: unknown; past?: { fixture: string; choices: string[] } };
 
-export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost", "duo", "mirkwood-won", "mirkwood-lost"];
+export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost", "duo", "mirkwood-won", "mirkwood-lost", "anduin-won", "anduin-lost"];
 
 export function isFixtureName(value: string): value is FixtureName {
   return (FIXTURE_NAMES as readonly string[]).includes(value);
@@ -37,6 +40,7 @@ const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = {
   ...(fixtures as Partial<Record<"won" | "lost" | "duo", StoredFixture>>),
   ...(knifeFixtures as Partial<Record<"knife-lost", StoredFixture>>),
   ...(mirkwoodFixtures as Partial<Record<"mirkwood-won" | "mirkwood-lost", StoredFixture>>),
+  ...(anduinFixtures as Partial<Record<"anduin-won" | "anduin-lost", StoredFixture>>),
 };
 
 // The fixture is committed. The e2e route opens only these.

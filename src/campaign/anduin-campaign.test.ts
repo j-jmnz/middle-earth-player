@@ -1,6 +1,8 @@
 // Rules: rr.campaign-setup-checklist, rr.campaign-cards, rr.campaign-pool, rr.campaign-log, rr.winning-the-game, rr.destroy, ltp.campaign-setup-checklist
 // (data/rules/entries.json). Journey Along the Anduin in a campaign: what Passage Through Mirkwood hands it, its campaign card (Mendor, Valor and
 // Scarred), what a win writes (the pool on its heroes, the prisoner) and unlocks, and what a loss leaves.
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Instruction } from "../catalog/boundary.ts";
@@ -21,9 +23,12 @@ import { ANDUIN_GOLDENS, anduinLoadout, anduinWorld, playGolden, type AnduinGame
 import { anduin, anduinTable, campaign, fight, loadAnduinWorld, MENDOR, type AnduinLayout, type AnduinWorld } from "../../scripts/anduin-scene.ts";
 import { MIRKWOOD_GOLDENS, mirkwoodWorld, playGolden as playPassage } from "../../scripts/mirkwood-game.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 import { first, send, start, type Run } from "../../scripts/past-scene.ts";
 
 import { checklist } from "./checklist.ts";
+import { resolutionView, settledSentence } from "./resolution-view.ts";
+import { loadWorld } from "./world.ts";
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { buildStart } from "./start.ts";
@@ -252,5 +257,23 @@ describe("what a win writes", () => {
     const onHeroes = plan.seats.flatMap((seat) => (seat.attachments ?? []).map((item) => `${item.code}@${item.host}`)).sort();
     expect(onHeroes).toEqual(log.campaignPool.map((card) => `${card.code}@${card.attachedTo}`).sort());
     expect(log.prisoner).not.toBeNull();
+  });
+
+  it("tells the player what confirming writes: each Valor and Scarred on its hero, the prisoner, and the scenario it unlocks (01130:B:1)", () => {
+    const game = games.get("two-handed, brittle heroes, won with a Valor and a Scarred")!;
+    const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
+    const base = loadWorld(catalog, campaign, anduin, EFFECTS, ["01133", "01138"]);
+    const named = { ...base, cards: new Map([...base.cards, ...cards]) };
+    const view = resolutionView(game.state, named);
+    expect(view.kind).toBe("settled");
+    if (view.kind !== "settled") return;
+    expect(view.prisoner).toBe(game.state.resolutionLog.prisoner);
+    const sentence = settledSentence(view, named, "Escape from Dol Guldur");
+    expect(sentence).toMatch(/^Confirming records Valor on \w+ and Scarred on \w+ in the campaign, names \w+ the prisoner and unlocks Escape from Dol Guldur\.$/);
+    // A game with nothing attached still names the prisoner.
+    const plain = games.get("true solo, won")!;
+    const bare = resolutionView(plain.state, named);
+    if (bare.kind !== "settled") throw new Error("not settled");
+    expect(settledSentence(bare, named, "Escape from Dol Guldur")).toMatch(/^Confirming records Valor on \w+ in the campaign, names \w+ the prisoner and unlocks Escape from Dol Guldur\.$/);
   });
 });

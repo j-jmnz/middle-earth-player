@@ -220,6 +220,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${instruction.who === "eachSeat" ? "players do" : "that player does"} not raise threat from questing unsuccessfully ${instruction.until === "endOfRound" ? "this round" : "this phase"}`;
     case "SkipQuestPhase":
       return "skip the quest phase this round";
+    case "RemoveProgressFromQuest":
+      return `remove ${amountWords(instruction.amount)} progress from the quest`;
     case "MoveProgress":
       return instruction.all ? "move all its progress" : `move ${amountWords(instruction.amount)} progress`;
     case "CommitToQuest":
@@ -257,6 +259,17 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return "ready each defending character that took no damage";
     case "ReadyAfterAttack":
       return instruction.who === "subject" ? "ready that card after the attack" : "ready each defending character that takes no damage after the attack";
+    case "ShadowAttacks":
+      return "attack the defending player once this attack has ended";
+    // The campaign family's verbs (src/catalog/families/campaign.ts) that a Journey Along the Anduin record holds.
+    case "SetAsideEachPlayer":
+      return `set aside a copy of ${names.code(instruction.code)} for each player`;
+    case "AttachSetAside":
+      return `attach a set-aside ${names.code(instruction.code)} to it`;
+    case "EarnAttached":
+      return `add each ${instruction.codes.map((code) => names.code(code)).join(" and ")} in play to the Campaign Pool, on its hero`;
+    case "NamePrisoner":
+      return "take the hero with the most damage prisoner";
     case "RedirectAttack":
       return "reveal the attacking enemy's shadow card";
     case "ModifyStatVersus":
@@ -355,6 +368,11 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Exhaust", prompt: `Choose ${one} to exhaust.` };
     case "Ready":
       return { verb: "Ready", prompt: `Choose ${one} to ready.` };
+    case "ReturnToHand":
+      return { verb: "Return", prompt: `Choose ${one} to return to its owner's hand.` };
+    // A set-aside boon or burden a campaign card attaches (01130:A:3, 01130:A:4): the hero that carries it.
+    case "AttachSetAside":
+      return { verb: "Attach", prompt: `Choose ${one} to carry ${names.code(next.code)}.` };
     case "ModifyStat": {
       const until = next.until === "endOfPhase" ? " until the end of the phase" : next.until === "endOfRound" ? " until the end of the round" : "";
       const down = typeof next.amount === "number" && next.amount < 0;

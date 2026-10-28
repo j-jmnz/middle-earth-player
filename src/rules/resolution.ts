@@ -60,12 +60,13 @@ function copiesOf(state: ScenarioState, codes: readonly string[], eachPlayer: bo
   return seats.flatMap((seat) => codes.map((code) => ({ code, to: "pool" as const, seat, hero: null, step: state.resolutionAt, ...(eachPlayer ? { perPlayer: true } : {}) })));
 }
 
-// Each copy of these cards attached to a hero in play, with that hero: one entry for each copy (EarnAttached). The hero's seat owns it.
+// Each copy of these cards attached to a hero in play, with that hero: one entry for each copy (EarnAttached), `to: "hero"` as a card the
+// players attach to a hero. The hero's seat owns it.
 function attachedCopies(state: ScenarioState, codes: readonly string[], ctx: ReduceContext): Earned[] {
   return Object.values(state.cards).flatMap((card) => {
     const host = card.host ? state.cards[card.host] : undefined;
     if (!codes.includes(card.code) || !inPlay(card.zone) || !host || host.zone !== "heroes" || host.controller == null) return [];
-    return printedOf(ctx.cards, host.code).type === "hero" ? [{ code: card.code, to: "pool" as const, seat: host.controller, hero: host.code, step: state.resolutionAt, perPlayer: true }] : [];
+    return printedOf(ctx.cards, host.code).type === "hero" ? [{ code: card.code, to: "hero" as const, seat: host.controller, hero: host.code, step: state.resolutionAt, perPlayer: true }] : [];
   });
 }
 

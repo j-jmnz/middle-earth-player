@@ -105,7 +105,8 @@ describe("Maestro fixtures", () => {
       const save = fixtureSave(name, "s", CATALOG_VERSION);
       expect(save.active?.engineVersion).toBe(ENGINE_VERSION);
       expect(save.active?.dataHash).toBe(CATALOG_VERSION);
-      expect(save.log.completed).toEqual([]);
+      // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes.
+      expect(save.log.completed).toEqual(name.startsWith("anduin-") ? ["passage-through-mirkwood"] : []);
     }
   });
 
@@ -188,6 +189,62 @@ describe("Passage Through Mirkwood (Mirkwood Paths part 1, phase 29)", () => {
     const after = finish(save, world, resumed.state);
     expect(after.log).toEqual(save.log);
     expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status)[0]).toBe("current");
+  });
+});
+
+describe("Journey Along the Anduin (Mirkwood Paths part 2, phase 30)", () => {
+  const ANDUIN_LOST = hasFixture("anduin-lost");
+  const ANDUIN_WON = hasFixture("anduin-won");
+
+  it.skipIf(!ANDUIN_LOST && !ANDUIN_WON)("start from the log Passage Through Mirkwood's won game writes, in a Mirkwood Paths save with no Ring-bearer", () => {
+    const past = fixture("mirkwood-won");
+    const world = worldFor("mirkwood-won");
+    const passageSave = fixtureSave("mirkwood-won", "s", CATALOG_VERSION);
+    const resumed = resume(passageSave, world, CATALOG_VERSION);
+    if (!resumed.ok) throw new Error(resumed.reason);
+    const written = finish(passageSave, world, resumed.state).log;
+    for (const name of ["anduin-won", "anduin-lost"] as const) {
+      if (!hasFixture(name)) continue;
+      const found = fixture(name);
+      expect(found.campaignId, name).toBe("mirkwood-paths");
+      expect(found.seatCount, name).toBe(2);
+      expect(found.loadout.scenarioId, name).toBe("journey-along-the-anduin");
+      expect(found.loadout.ringBearer, name).toBeNull();
+      expect(found.past?.fixture, name).toBe("mirkwood-won");
+      expect(found.log, name).toEqual(written);
+      expect(found.log.completed, name).toEqual(["passage-through-mirkwood"]);
+      expect(past.seatCount, name).toBe(2);
+    }
+  });
+
+  it.skipIf(!ANDUIN_LOST)("anduin-lost replays to a loss, and finishing it leaves the log as it was", () => {
+    const world = worldFor("anduin-lost");
+    const save = fixtureSave("anduin-lost", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
+    const after = finish(save, world, resumed.state);
+    expect(after.log).toEqual(save.log);
+    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status).slice(0, 3)).toEqual(["completed", "current", "locked"]);
+  });
+
+  it.skipIf(!ANDUIN_WON)("anduin-won replays to a win with nothing to answer, and confirming it writes the prisoner and unlocks Escape from Dol Guldur", () => {
+    const world = worldFor("anduin-won");
+    const save = fixtureSave("anduin-won", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.stageCleared && !resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    const view = resolutionView(resumed.state, world);
+    expect(view.kind).toBe("settled");
+    if (view.kind === "settled") {
+      expect(view.prisoner).toBeTruthy();
+      expect(settledSentence(view, world, "Escape from Dol Guldur")).toMatch(/names .+ the prisoner and unlocks Escape from Dol Guldur\.$/);
+    }
+    const after = finish(save, world, resumed.state);
+    expect(after.log.completed).toEqual(["passage-through-mirkwood", "journey-along-the-anduin"]);
+    expect(after.log.prisoner).toBe(view.kind === "settled" ? view.prisoner : null);
+    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status).slice(0, 3)).toEqual(["completed", "completed", "current"]);
   });
 });
 

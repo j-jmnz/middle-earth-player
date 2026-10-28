@@ -48,6 +48,7 @@ export default function Log() {
       if (card.attachedTo) codes.add(card.attachedTo);
     }
     for (const captive of save.log.captives) codes.add(captive.hero);
+    if (save.log.prisoner) codes.add(save.log.prisoner);
     if (codes.size === 0) return [];
     return catalog.select().from(cards).where(inArray(cards.code, [...codes])).all();
   }, [catalog, save]);
@@ -112,6 +113,8 @@ export default function Log() {
             value={log.captives.length === 0 ? "None" : log.captives.map((captive) => `${nameOf(captive.hero)}${save.seatCount > 1 ? ` (Player ${captive.seat + 1})` : ""}`).join("\n")}
             testID="log-captives"
           />
+          {/* The hero Journey Along the Anduin's Resolution took prisoner (01130:B:1), taken at the start of Escape from Dol Guldur. */}
+          {log.prisoner ? <Row label="Prisoner" value={nameOf(log.prisoner)} testID="log-prisoner" /> : null}
           <View className="border-b border-inkLine py-3">
             <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">Scenarios Completed</Text>
             {campaign.scenarios.map((id) => {

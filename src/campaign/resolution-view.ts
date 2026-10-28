@@ -40,7 +40,7 @@ export type ResolutionView =
       decline: ResolutionDecline | null;
       to: "pool" | "hand" | "hero" | "captive";
     }
-  | { kind: "settled"; earned: readonly SettledCard[]; fallen: readonly string[]; captives: readonly string[] };
+  | { kind: "settled"; earned: readonly SettledCard[]; fallen: readonly string[]; captives: readonly string[]; prisoner?: string };
 
 function nameOf(world: World, code: string): string {
   return world.cards.get(code)?.name ?? code;
@@ -55,6 +55,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
       earned: settled.earned.map((item) => ({ code: item.code, hero: item.to === "hero" ? item.hero : null, seat: item.seat })),
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),
+      ...(settled.prisoner ? { prisoner: settled.prisoner } : {}),
     };
   }
   const window = state.window;
@@ -160,5 +161,7 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
     return copies > 1 ? `${copies} copies of ${text}` : kind ? `the ${kind} ${text}` : text;
   });
   const records = earned.length > 0 ? `Confirming records ${earned.join(" and ")} in the campaign` : "Confirming records the win";
-  return next ? `${records} and unlocks ${next}.` : `${records}.`;
+  // The hero a Resolution takes prisoner is written to the log too (01130:B:1), with the scenario it matters in.
+  const prisoner = view.prisoner ? `, names ${nameOf(world, view.prisoner)} the prisoner` : "";
+  return next ? `${records}${prisoner} and unlocks ${next}.` : `${records}${prisoner}.`;
 }

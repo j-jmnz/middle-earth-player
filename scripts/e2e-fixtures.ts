@@ -19,7 +19,8 @@
 // `.maestro/seat-peek.yaml`). Nothing in it is a win or a loss: it is the auto-player's answers up to that window.
 //
 // `mirkwood-won` and `mirkwood-lost`: Passage Through Mirkwood (scripts/e2e-mirkwood.ts), written to
-// src/campaign/fixtures/passage-through-mirkwood.json.
+// src/campaign/fixtures/passage-through-mirkwood.json. `anduin-won` and `anduin-lost`: Journey Along the Anduin (scripts/e2e-anduin.ts), written to
+// src/campaign/fixtures/journey-along-the-anduin.json.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
@@ -43,6 +44,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 
 import { nextIntent } from "./auto-player.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
+import { anduinFixtures } from "./e2e-anduin.ts";
 import { mirkwoodFixtures } from "./e2e-mirkwood.ts";
 import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
@@ -343,6 +345,12 @@ void runScript("e2e-fixtures", () => {
   const mirkwoodFile = path.join(dir, "passage-through-mirkwood.json");
   writeFileSync(mirkwoodFile, `${JSON.stringify(mirkwood)}\n`);
   say.info(`wrote ${mirkwoodFile}`);
+
+  // Journey Along the Anduin (Mirkwood Paths part 2): from the log Passage Through Mirkwood's won game writes; a game not found is left out.
+  const anduin = say.step("play Journey Along the Anduin's win and loss", () => anduinFixtures(mirkwood["mirkwood-won"]));
+  const anduinFile = path.join(dir, "journey-along-the-anduin.json");
+  writeFileSync(anduinFile, `${JSON.stringify(anduin)}\n`);
+  say.info(`wrote ${anduinFile} (${Object.keys(anduin).join(", ")})`);
 
   if (won) {
     const past = wonLog(won);
