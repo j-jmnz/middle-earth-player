@@ -29,6 +29,16 @@ export type FightKind = "defense" | "undefended" | "attack";
 export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[]; fight: FightKind | null };
 export type ZoneView = { zone: ZoneId; seat: number; entries: readonly ZoneEntry[] };
 
+/** A card whose face the table hides: facedown, except the prisoner, whose owner knows the card and may still open it (01123:B:1). */
+export function hidesFace(card: Pick<CardInstance, "face" | "prisoner" | "zone" | "host"> | undefined): boolean {
+  return card?.face === "down" && !isPrisoner(card);
+}
+
+/** The hero that is the prisoner: facedown in the captive zone under no card (the cards held with it are not). */
+export function isPrisoner(card: Pick<CardInstance, "prisoner" | "zone" | "host">): boolean {
+  return card.prisoner === true && card.zone === "captive" && card.host == null;
+}
+
 const NONE: readonly string[] = [];
 const EMPTY: readonly CardInstance[] = [];
 

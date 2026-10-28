@@ -6,7 +6,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useStore } from "zustand";
 
 import { NO_HIGHLIGHT } from "./peek.ts";
-import { PILE_WORDS, PILES, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
+import { PILE_WORDS, PILES, hidesFace, isPrisoner, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { tableTokens as t } from "./tokens.ts";
 
@@ -64,8 +64,8 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, 
           <CardButton
             key={card.id}
             id={card.id}
-            faceDown={card.face === "down"}
-            label={card.prisoner === true ? "Prisoner, face down" : card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Not applied" : ""}${marksText(info, card.id, zone)}`}
+            faceDown={hidesFace(card)}
+            label={isPrisoner(card) ? `Prisoner: ${nameOf(card.code)}, face down` : card.prisoner === true ? "Face down, held with the prisoner" : card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Not applied" : ""}${marksText(info, card.id, zone)}`}
             onTap={onTap}
             onPreview={onPreview}
             highlight={highlight}
@@ -80,7 +80,9 @@ function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight }: Row
   const select = useMemo(() => pileSelector(pile, seat), [pile, seat]);
   const view = useStore(store, (state) => select(state.game));
   const top = view.top ? ` · ${nameOf(view.top.code)} on top` : "";
-  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORDS[pile]} (${view.ids.length})${top}`} onTap={onTap} onPreview={onPreview} highlight={highlight} />;
+  // An encounter card attached to the deck (Iron Shackles, 01105:A:1): the list says so, as the canvas draws a chain.
+  const held = (view.attached ?? []).length > 0 ? ` · ${(view.attached ?? []).map((card) => nameOf(card.code)).join(", ")} attached` : "";
+  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORDS[pile]} (${view.ids.length})${top}${held}`} onTap={onTap} onPreview={onPreview} highlight={highlight} />;
 }
 
 export function TableCanvas({ store, width, height, nameOf, inactive, info, onTap, onPreview, highlight: marked }: TableCanvasProps) {

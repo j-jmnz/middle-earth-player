@@ -40,13 +40,15 @@ export type TopBarProps = {
   // The seat holding the Ring-bearer facedown and what to say of it (a Ring mark on its dial), or null.
   ringSeat?: number | null;
   ringWords?: string | null;
+  // The mark that dial wears: the One Ring for the Ring-bearer, a hero for the prisoner.
+  ringMark?: "oneRing" | "hero";
   menuOpen: boolean;
   onThreat: (seat: number) => void;
   onRail: () => void;
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const [bar, setBar] = useState(0);
   const [dials, setDials] = useState(0);
   const onBar = (event: LayoutChangeEvent) => setBar(Math.round(event.nativeEvent.layout.width));
@@ -91,6 +93,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, rail, s
                   compact
                   ticks={ticks}
                   ring={ringSeat === threat.seat ? ringWords : null}
+                  ringMark={ringMark}
                   onPress={() => onThreat(threat.seat)}
                 />
               );

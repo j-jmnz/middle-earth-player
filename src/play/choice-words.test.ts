@@ -176,6 +176,12 @@ describe("the words of the Escape from Dol Guldur choices", () => {
     expect(prompts).toContain("Choose an attachment to discard.");
   });
 
+  it("a third Restricted attachment on a hero asks which one leaves, and says an objective returns to the staging area (rr.restricted)", () => {
+    const words = pickWords({ verb: "DiscardRestricted" }, undefined, { card: () => "Aragorn", code: (code) => code }, "h1", 2);
+    expect(words).toEqual({ verb: "Remove", prompt: "Aragorn can hold 2 Restricted attachments. Choose 1 to remove: an objective returns to the staging area, any other card is discarded." });
+    expect(pickWords({ verb: "DiscardRestricted" }, undefined, { card: () => "Aragorn", code: (code) => code }, "h1", 3).prompt).toContain("can hold 3 Restricted");
+  });
+
   it("every Choose names each branch in a sentence", () => {
     const made = dolGuldurTable(dolGuldurWorld);
     for (const effect of dolGuldur) {

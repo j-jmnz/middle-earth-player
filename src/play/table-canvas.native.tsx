@@ -13,7 +13,7 @@ import { useStore } from "zustand";
 
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
-import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, withAlpha, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { HandScrub } from "./hand-scrub.native.tsx";
@@ -137,6 +137,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           {slotInfo?.delayed ? <DelayedMark rect={rect} /> : null}
           <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code)) : null} contrast={contrast} />
           {slot.kind === "card" && !slot.faceDown && inactive(slot.code) ? <NotAppliedMark rect={rect} /> : null}
+          {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} /> : null}
         </Group>
         {slot.kind === "card" ? <PickRing rect={rect} picked={pickedCount(slot)} share={highlight.share} dimmed={veiled} fonts={fonts} /> : null}
         {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} /> : null}

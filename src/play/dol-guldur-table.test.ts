@@ -10,8 +10,10 @@ import { dolGuldurStart, dolGuldurWorld } from "../../scripts/dol-guldur-game.ts
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
 import { first } from "../../scripts/past-scene.ts";
 
-import { tableLayout } from "./layout.ts";
-import { PILES, TABLE_ZONES, pileSelector, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
+import { dungeonDetail } from "./dungeon-preview.ts";
+import { hitBounds, tableLayout } from "./layout.ts";
+import { heldDial, prisonerWords } from "./widgets.ts";
+import { PILES, TABLE_ZONES, hidesFace, pileSelector, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
 
 let scene: DolGuldurWorld;
 
@@ -39,6 +41,27 @@ describe("a guarded objective in the staging area", () => {
     expect(entries[0]?.attached).toEqual([]);
     const ids = entries.map((entry) => entry.card.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("lies over its objective, shifted by a step of its width, with a wider gap between pairs", () => {
+    const made = dolGuldurTable(scene, { guarded: [["01108", "f3"], ["01109", "f0"], ["01110", ""]] });
+    const layout = tableLayout(1100, 380, views(made.state), piles(made.state));
+    const at = (code: string) => layout.slots.find((slot) => made.state.cards[slot.id]?.code === code)!;
+    const [map, guard, torch, torchGuard, key] = [at("01108"), at("f3"), at("01109"), at("f0"), at("01110")];
+    expect(guard.x - map.x).toBeCloseTo(map.w * 0.72, 5);
+    expect(layout.slots.indexOf(guard)).toBeGreaterThan(layout.slots.indexOf(map));
+    // The next pair starts a gap and the pair's own extra gap after the guard.
+    expect(torch.x - (guard.x + guard.w)).toBeGreaterThan(6);
+    expect(torchGuard.x - torch.x).toBeCloseTo(torch.w * 0.72, 5);
+    expect(key.x).toBeGreaterThan(torchGuard.x + torchGuard.w);
+  });
+
+  it("is told apart in the card preview: guarded, or free of encounters and claimable", async () => {
+    const made = dolGuldurTable(scene, { guarded: [["01108", "f3"], ["01109", ""]] });
+    const name = (id: string) => made.ctx.cards.get(made.state.cards[id]?.code ?? "")?.name ?? id;
+    expect(dungeonDetail(made.state, made.ctx, first(made.state, "01108"), name)).toBe(`Guarded by ${name(first(made.state, "f3"))}`);
+    expect(dungeonDetail(made.state, made.ctx, first(made.state, "01109"), name)).toBe("Free of encounters: you can claim it");
+    expect(dungeonDetail(made.state, made.ctx, first(made.state, "f3"), name)).toBeNull();
   });
 
   it("is unchanged for a game with no guard", () => {
@@ -72,6 +95,20 @@ describe("the prisoner", () => {
     const layout = tableLayout(800, 380, views(state, owner), piles(state, owner));
     const slots = layout.slots.filter((slot) => slot.id === prisoner || slot.id === mine?.attached.find((card) => card.code === "01135")?.id);
     expect(slots.map((slot) => slot.faceDown)).toEqual([true, true]);
+    // Only the prisoner wears the held mark and may still be opened; Mendor under it stays hidden.
+    expect(slots.filter((slot) => slot.held === true).map((slot) => slot.id)).toEqual([prisoner]);
+    expect(hidesFace(state.cards[prisoner ?? ""])).toBe(false);
+    expect(hidesFace(mine?.attached.find((card) => card.code === "01135"))).toBe(true);
+  });
+
+  it("is named on its player's dial, on the preview and in the list", async () => {
+    const state = await started(2, 3);
+    const prisoner = state.cards[prisonerHero(state) ?? ""];
+    const name = (code: string) => (code === prisoner?.code ? "Aragorn" : code);
+    expect(heldDial(state, name)).toEqual({ seat: prisoner?.owner, words: "Aragorn is the prisoner, face down", mark: "hero" });
+    const { ctx } = await dolGuldurWorld();
+    expect(dungeonDetail(state, ctx, prisoner?.id ?? "", (id) => name(state.cards[id]?.code ?? id))).toBe("Aragorn is the prisoner, face down");
+    expect(prisonerWords("Aragorn")).toBe("Aragorn is the prisoner, face down");
   });
 
   it("is gone from the table once it is rescued", async () => {
@@ -85,7 +122,7 @@ describe("the prisoner", () => {
 });
 
 describe("Iron Shackles on a deck", () => {
-  it("is drawn under that player's deck", () => {
+  it("peeks out above that player's deck", () => {
     const made = dolGuldurTable(scene, { deckOf: ["filler", "filler"], staging: ["01105"] });
     const id = first(made.state, "01105");
     const attached = { ...made.state, staging: [], cards: { ...made.state.cards, [id]: { ...made.state.cards[id]!, zone: "attached" as const } }, seats: [{ ...made.state.seats[0], deckAttached: [id] }, made.state.seats[1]] as ScenarioState["seats"] };
@@ -97,7 +134,12 @@ describe("Iron Shackles on a deck", () => {
     const slot = layout.slots.find((item) => item.id === id);
     const deckSlot = layout.slots.find((item) => item.id === "pile:deck");
     expect(slot?.kind).toBe("attachment");
-    expect(slot && deckSlot && slot.y > deckSlot.y).toBe(true);
+    // It peeks out above the deck, where the "Deck" label under the deck cannot cover it, and the deck wears a chain.
+    expect(slot && deckSlot && slot.y < deckSlot.y).toBe(true);
+    expect(deckSlot?.chained).toBe(true);
+    expect(layout.slots.filter((item) => item.chained).map((item) => item.id)).toEqual(["pile:deck"]);
+    expect(hitBounds(deckSlot!).w).toBeGreaterThanOrEqual(44);
+    expect(hitBounds(deckSlot!).h).toBeGreaterThanOrEqual(44);
     // The shackles are listed before the deck, so the deck is drawn over them.
     expect(layout.slots.indexOf(slot!)).toBeLessThan(layout.slots.indexOf(deckSlot!));
   });

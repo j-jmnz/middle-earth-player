@@ -45,6 +45,7 @@ export function ThreatRing({
   elimination = true,
   ticks = [],
   ring = null,
+  ringMark = "oneRing",
   onPress,
 }: {
   threat: SeatThreat;
@@ -66,11 +67,13 @@ export function ThreatRing({
   ticks?: readonly number[];
   // The seat that holds the Ring-bearer facedown: a small Ring mark beside its label, and these words in its accessibility label.
   ring?: string | null;
+  // The mark beside the label when `ring` is set: the One Ring (the Ring-bearer facedown), a hero (the prisoner).
+  ringMark?: "oneRing" | "hero";
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
@@ -97,6 +100,7 @@ function ThreatDial({
   elimination,
   ticks,
   ring,
+  ringMark,
   onPress,
 }: {
   threat: SeatThreat;
@@ -109,6 +113,7 @@ function ThreatDial({
   elimination: boolean;
   ticks: readonly number[];
   ring: string | null;
+  ringMark: "oneRing" | "hero";
   onPress?: () => void;
 }) {
   const speed = useMotionScale();
@@ -194,7 +199,7 @@ function ThreatDial({
           <Text className={`text-label ${role === "acting" ? "text-gold" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>
           {ring ? (
             <View testID={`${id}-ring`}>
-              <GameIcon name="oneRing" size={12} tint="gold" />
+              <GameIcon name={ringMark} size={12} tint={ringMark === "oneRing" ? "gold" : "bone"} />
             </View>
           ) : null}
         </View>

@@ -5,6 +5,7 @@
 // legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a
 // number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../catalog/boundary.ts";
+import { restrictedLimit } from "../rules/attach.ts";
 import { rejectionReason } from "../rules/legal.ts";
 import { printedOf } from "../rules/printed.ts";
 import { hideWillpower } from "../rules/hide.ts";
@@ -238,7 +239,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       }
       // A Pick names what the card is for: a hero removed from the quest, an attachment discarded, an ally put into play,
       // an enemy placed under Weather Hills.
-      const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source) : { verb: "Choose", prompt: "Choose one." };
+      const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,

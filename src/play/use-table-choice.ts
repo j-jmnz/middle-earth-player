@@ -14,7 +14,7 @@ import { tableSettings, toggleAlways } from "./table-settings.ts";
 import type { Moment } from "./outcome.ts";
 import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
-import { actingSeat, onTableFor } from "./selectors.ts";
+import { hidesFace, actingSeat, onTableFor } from "./selectors.ts";
 import { dropOutcome, targetFromKey } from "./selection.ts";
 import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
 import { dockExtras } from "./dock-extras.ts";
@@ -229,7 +229,7 @@ export function useTableChoice({
   // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
   const onTap = useCallback(
     (cardId: string) => {
-      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: game.cards[cardId]?.face === "down" }, pick);
+      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]) }, pick);
       if (action === "fold") setFolded(sheet.key);
       else if (action === "pile") onPile(cardId.slice(5));
       else if (action === "preview") onPreview(cardId);

@@ -38,3 +38,20 @@ export function locationReadout(game: ScenarioState): LocationReadout | null {
 export function ringWords(readout: LocationReadout | null, nameOf: (code: string) => string): string | null {
   return readout?.heldUnder ? `The Ring-bearer is facedown under ${nameOf(readout.heldUnder)}` : null;
 }
+
+// The seat whose dial says it holds something facedown, what the dial says and which mark it wears: the Ring-bearer under the Watcher (a Ring
+// mark, mec109.stage-4), or the hero that is the prisoner of Escape from Dol Guldur (a hero mark, 01123:B:1). A hero is never both.
+export type HeldDial = { seat: number; words: string; mark: "oneRing" | "hero" };
+
+export function heldDial(game: ScenarioState, nameOf: (code: string) => string): HeldDial | null {
+  const ring = locationReadout(game);
+  const ringLine = ringWords(ring, nameOf);
+  if (ring?.heldBy != null && ringLine) return { seat: ring.heldBy, words: ringLine, mark: "oneRing" };
+  const prisoner = Object.values(game.cards).find((card) => card.zone === "captive" && card.prisoner === true && card.host == null && card.owner != null);
+  return prisoner && prisoner.owner != null ? { seat: prisoner.owner, words: prisonerWords(nameOf(prisoner.code)), mark: "hero" } : null;
+}
+
+/** What a prisoner's name says wherever it is shown: the dial, the preview, the list. */
+export function prisonerWords(name: string): string {
+  return `${name} is the prisoner, face down`;
+}

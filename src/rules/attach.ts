@@ -99,11 +99,16 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
   return Math.max(0, cost);
 }
 
+// How many Restricted attachments a character can hold: 2, and more when a card says it can have additional ones (rr.restricted).
+export function restrictedLimit(state: ScenarioState, hostId: string): number {
+  return 2 + Math.max(0, heldAmount(state, hostId, "extraRestricted"));
+}
+
 // A character cannot have more than 2 restricted attachments (more when a card says it can have additional ones). When one
 // too many arrives, its controller chooses one of the restricted attachments and it moves at once to its owner's discard
 // pile (rr.restricted).
 export function enforceRestricted(state: ScenarioState, hostId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (restrictedLoad(state, hostId, ctx) <= 2 + Math.max(0, heldAmount(state, hostId, "extraRestricted"))) return state;
+  if (restrictedLoad(state, hostId, ctx) <= restrictedLimit(state, hostId)) return state;
   const host = state.cards[hostId];
   const actor = host?.controller ?? state.activeSeat;
   return pushEffectFrame(

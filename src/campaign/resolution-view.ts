@@ -6,6 +6,7 @@
 // 141044:B:1 does), or, once every choice is answered, what confirming will write. The options are the ChooseResolution
 // intents the reducer lists; the screen sends the one the player picks and nothing else. A choice the card lets a seat pass
 // ("each player may choose") lists the reducer's `skip` as `decline`, a visible "No boon", not as one more tile.
+import { carryVerb, carryWords } from "./carry-words.ts";
 import { legalIntents, type ScenarioState } from "../rules/reduce.ts";
 import { answeredSeats, resolutionResult, SKIP } from "../rules/resolution.ts";
 
@@ -177,7 +178,6 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   const prisoner = view.prisoner ? `${sentence} ${nameOf(world, view.prisoner)}, the hero with the most damage, is taken prisoner.` : sentence;
   // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.
   if (!view.carried || view.carried.length === 0) return prisoner;
-  const names = view.carried.map((card) => (card.eachPlayer ? `a ${nameOf(world, card.code)} for each player` : nameOf(world, card.code)));
-  const carried = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : (names[0] ?? "");
-  return `${prisoner} ${carried} ${view.carried.length > 1 || view.carried[0]?.eachPlayer ? "are" : "is"} kept for your next campaign.`;
+  const kept = view.carried.map((card) => ({ code: card.code, perPlayer: card.eachPlayer }));
+  return `${prisoner} ${carryWords(kept, (code) => nameOf(world, code))} ${carryVerb(kept)} kept for your next campaign.`;
 }

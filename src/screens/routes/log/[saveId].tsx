@@ -115,8 +115,8 @@ export default function Log() {
             value={log.captives.length === 0 ? "None" : log.captives.map((captive) => `${nameOf(captive.hero)}${save.seatCount > 1 ? ` (Player ${captive.seat + 1})` : ""}`).join("\n")}
             testID="log-captives"
           />
-          {/* The hero Journey Along the Anduin's Resolution took prisoner (01130:B:1), taken at the start of Escape from Dol Guldur. */}
-          {log.prisoner ? <Row label="Prisoner" value={nameOf(log.prisoner)} testID="log-prisoner" /> : null}
+          {/* The hero Journey Along the Anduin's Resolution took prisoner (01130:B:1), taken at the start of Escape from Dol Guldur; the row goes once that scenario is completed (the hero is rescued or the scenario is over). */}
+          {log.prisoner && !log.completed.includes("escape-from-dol-guldur") ? <Row label="Prisoner" value={nameOf(log.prisoner)} testID="log-prisoner" /> : null}
           {/* The cards a Resolution keeps for the next campaign, not this one (Escape from Dol Guldur's Mendor, 01131:B:2). */}
           {log.carryOver.length > 0 ? <Row label="Next Campaign" value={carryWords(log.carryOver, nameOf)} testID="log-carry-over" /> : null}
           <View className="border-b border-inkLine py-3">

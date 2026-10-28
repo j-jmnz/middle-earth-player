@@ -11,6 +11,7 @@ import { useStore } from "zustand";
 import { backStep, playLayers, runBackStep } from "../play/back-steps";
 import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
+import { standInText } from "../play/dungeon-preview";
 import type { LogNames } from "../play/log";
 import { prefetchCodes, resolutionCodes } from "../play/prefetch";
 import { dockPills } from "../play/dock-extras";
@@ -33,7 +34,7 @@ import { previewCards } from "../play/table-preview";
 import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
-import { locationReadout, ringWords, widgetReadouts } from "../play/widgets";
+import { heldDial, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { Screen } from "./chrome";
@@ -155,7 +156,16 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [router, nav],
   );
   const onOutcome = useCallback(() => router.replace(nav.outcome), [router, nav]);
-  const onPile = useCallback((id: string) => (id === "discard" || id === "encounterDiscard" ? setReading({ kind: "pile", pile: id }) : undefined), []);
+  // A discard pile opens its list; a deck with an encounter card attached to it (Iron Shackles, 01105:A:1) opens that card, whose preview says what it does.
+  const onPile = useCallback(
+    (id: string) => {
+      if (id === "discard" || id === "encounterDiscard") return setReading({ kind: "pile", pile: id });
+      const { game: now, viewedSeat } = store.getState();
+      const shackles = id === "deck" ? now.seats[shownSeat(now, viewedSeat)]?.deckAttached?.[0] : undefined;
+      if (shackles) setPreview({ id: shackles, extra: [] });
+    },
+    [store],
+  );
   const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
   const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
@@ -199,7 +209,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   );
   const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
   const widgets = widgetReadouts(game);
-  const locations = locationReadout(game);
+  const held = heldDial(game, nameOf);
   const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
   const narrow = screen.width - insets.left - insets.right < 760;
   const previewed = preview
@@ -211,7 +221,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           name: nameOf(code),
           source: picture(code),
           landscape: session.world.cards.get(code)?.type === "quest",
-          text: session.facts.get(code)?.text ?? null,
+          text: session.facts.get(code)?.text ?? standInText(session.world.cards, code),
           notApplied: notApplied(code, session.world.cards.get(code)?.type, session.facts.get(code)?.text ?? null),
         }),
         names.card,
@@ -237,8 +247,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           carouselOpen={reading?.kind === "carousel"}
           narrow={narrow}
           ticks={ticks}
-          ringSeat={locations?.heldBy}
-          ringWords={ringWords(locations, nameOf)}
+          ringSeat={held?.seat}
+          ringWords={held?.words}
+          ringMark={held?.mark}
           menuOpen={menuOpen}
           onThreat={(threatSeat) => { choice.foldOutside(); setReading(peek.tap(threatSeat) ? null : { kind: "threat", seat: threatSeat }); }}
           onRail={() => setReading((now) => openReading(now, { kind: "carousel" }))}

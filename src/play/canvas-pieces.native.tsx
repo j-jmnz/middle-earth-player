@@ -81,6 +81,22 @@ export function NotAppliedMark({ rect }: { rect: Rect }) {
   );
 }
 
+/**
+ * The facedown prisoner's back (01123:B:1): a small hero mark on a night disc in the middle of it, upright whatever the card does. Not gold, which marks
+ * the one action, and not danger, which marks a refusal: bone, the colour of a card that is only held.
+ */
+export function HeldMark({ rect }: { rect: Rect }) {
+  const cx = rect.x + rect.w / 2;
+  const cy = rect.y + rect.h / 2;
+  return (
+    <Group>
+      <Circle cx={cx} cy={cy} r={12} color={t.night} />
+      <Circle cx={cx} cy={cy} r={11} color={t.bone} style="stroke" strokeWidth={1.25} />
+      <CanvasIcon name="hero" x={cx - 6} y={cy - 6} size={12} color={t.bone} />
+    </Group>
+  );
+}
+
 // A card back: the printed one, the One Ring for a player card and the Eye for an encounter card. While its file decodes,
 // the player's is raised night with the gold ring, the encounter deck's night with a threat-red ring.
 function Back({ x, y, w, h, encounter, backs }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages }) {
@@ -186,6 +202,13 @@ export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlo
       )}
       <RoundedRect x={x} y={y + h - 15} width={w} height={15} r={0} color={strip} />
       <Outlined x={x + w / 2} y={y + h - 3} text={String(slot.count)} font={fonts.numbers} />
+      {/* Iron Shackles is attached to this deck (01105:A:1): two linked rings at the strip's left end. */}
+      {slot.chained ? (
+        <Group>
+          <RoundedRect x={x + 3} y={y + h - 11} width={8} height={6} r={3} color={t.bone} style="stroke" strokeWidth={1.25} />
+          <RoundedRect x={x + 8} y={y + h - 11} width={8} height={6} r={3} color={t.bone} style="stroke" strokeWidth={1.25} />
+        </Group>
+      ) : null}
       {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h + 11} text={word} font={fonts.small} color={t.muted} /> : null}
     </Group>
   );

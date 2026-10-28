@@ -9,6 +9,7 @@ import type { CardInstance } from "../rules/state.ts";
 
 import { unturn } from "./frame.ts";
 import type { FightKind, PileId, PileView, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
+import { isPrisoner } from "./selectors.ts";
 
 export type Rect = { x: number; y: number; w: number; h: number };
 
@@ -34,6 +35,10 @@ export type CardSlot = Rect & {
   count: number;
   // Committed to the quest: drawn a step higher, with its willpower.
   committed: boolean;
+  // The facedown prisoner of Escape from Dol Guldur (01123:B:1): its back wears a small hero mark and a tap still opens its preview.
+  held?: true;
+  // A deck with an encounter card attached to it (Iron Shackles, 01105:A:1): a chain on its count strip.
+  chained?: true;
 };
 
 // The mark between an engaged enemy and the characters fighting it: a defense, the hero an undefended attack hits, or an
@@ -123,6 +128,7 @@ function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect: Rect, 
     tilt,
     count: 0,
     committed: card.committed,
+    ...(card.face === "down" && isPrisoner(card) ? { held: true as const } : {}),
   };
 }
 
@@ -163,13 +169,23 @@ function placeUnder(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: CardSlot[],
 }
 
 function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[]): void {
-  const xs = rowXs(entries.map((entry) => footprint(entry.card, size)), area.x, area.w);
-  entries.forEach((entry, index) => {
-    const rect = cardRect(entry.card, xs[index] ?? area.x, area.y, size);
-    placeUnder(entry, zone, rect, out, []);
-    // A committed character stands a step higher, sent toward the quest.
-    const lift = entry.card.committed ? -PEEK / 2 : 0;
-    out.push(slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }));
+  // A guard lies over the objective it guards, shifted by PAIR_STEP of its width, and the pair keeps a wider gap from its neighbours (rr.guarded).
+  const groups: ZoneEntry[][] = [];
+  for (const entry of entries) {
+    const last = groups[groups.length - 1];
+    if (zone === "staging" && entry.card.guard === true && last && last[0]?.card.id === entry.card.host) last.push(entry);
+    else groups.push([entry]);
+  }
+  const widths = groups.map((group) => footprint((group[0] as ZoneEntry).card, size) + (group.length - 1) * size.w * PAIR_STEP + (group.length > 1 ? GAP : 0));
+  const xs = rowXs(widths, area.x, area.w);
+  groups.forEach((group, groupAt) => {
+    group.forEach((entry, at) => {
+      const rect = cardRect(entry.card, (xs[groupAt] ?? area.x) + at * size.w * PAIR_STEP, area.y, size);
+      placeUnder(entry, zone, rect, out, []);
+      // A committed character stands a step higher, sent toward the quest.
+      const lift = entry.card.committed ? -PEEK / 2 : 0;
+      out.push(slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }));
+    });
   });
 }
 
@@ -230,7 +246,8 @@ function pileSlot(view: PileView, rect: Rect, deckTop: CardInstance | null | und
     committed: false,
   };
   // A deck whose top card can be played (Gandalf) is that card: it is picked up and played like a card in the hand.
-  return view.pile === "deck" && deckTop ? { ...base, id: deckTop.id, kind: "card" } : base;
+  const chained = view.pile === "deck" && (view.attached?.length ?? 0) > 0 ? { chained: true as const } : {};
+  return view.pile === "deck" && deckTop ? { ...base, ...chained, id: deckTop.id, kind: "card" } : { ...base, ...chained };
 }
 
 // The views with a picked, unconfirmed fight drawn as if it were declared: the characters leave the play area and stand
@@ -307,9 +324,10 @@ export function tableLayout(
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null);
   placeRow(views.play.entries, "play", play, card, slots);
   const pileRects: Record<PileId, Rect> = { deck, discard, encounterDeck, encounterDiscard };
-  // An encounter card attached to the deck (Iron Shackles) peeks out under it, drawn before the deck.
+  // An encounter card attached to the deck (Iron Shackles) peeks out above it, drawn before the deck, so the "Deck" label under the deck never
+  // covers it; a tap on the deck opens it (table-view.tsx).
   const held = piles.deck.attached ?? [];
-  held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y + (held.length - at) * PEEK, w: deck.w, h: deck.h })));
+  held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y - (held.length - at) * PEEK, w: deck.w, h: deck.h })));
   for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
 
   // The hand fans along the bottom edge, a slight turn from the middle out, overlapping when it is long. Each card keeps at

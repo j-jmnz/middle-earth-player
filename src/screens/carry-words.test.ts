@@ -9,8 +9,9 @@ const nameOf = (code: string) => names[code] ?? code;
 
 describe("carryWords", () => {
   it("collapses duplicates and says a copy for each player", () => {
-    expect(carryWords([card("m"), card("s", { perPlayer: true })], nameOf)).toBe("Mendor, Mendor's Support (each player)");
-    expect(carryWords([card("s", { seat: 0 }), card("s", { seat: 1 })], nameOf)).toBe("Mendor's Support ×2");
+    expect(carryWords([card("m"), card("s", { perPlayer: true })], nameOf)).toBe("Mendor and a Mendor's Support for each player");
+    expect(carryWords([card("s", { seat: 0 }), card("s", { seat: 1 })], nameOf)).toBe("2 copies of Mendor's Support");
+    expect(carryWords([card("m")], nameOf)).toBe("Mendor");
   });
 });
 

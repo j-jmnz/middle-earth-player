@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { syncConstants } from "../constants.ts";
 import type { EngineStep } from "../intents.ts";
 import { runInstruction } from "../interpret.ts";
-import { legalIntents } from "../legal.ts";
+import { legalIntents, rejectionReason } from "../legal.ts";
 import { settle } from "../machine.ts";
 import { pushCardEffects } from "../effect-frames.ts";
 import { modifiedStat } from "../keywords.ts";
@@ -181,6 +181,10 @@ describe("the group limit of allies (01123:B:2, 01124:B:2)", () => {
       const passed = send(start(played), { type: "Pass" }, ctx).state;
       expect(passed.activeSeat, stage).toBe(1);
       expect(playable(passed, ctx).filter((intent) => passed.cards[intent.cardId]?.code === "ally"), `${stage} seat 1`).toEqual([]);
+      // The refusal names the card that limits and the kind of card.
+      const second = played.seats[0].hand.find((id) => played.cards[id]?.code === "ally") ?? "";
+      const source = stage === "01123" ? "The Necromancer's Tower" : "Through the Caverns";
+      expect(rejectionReason(played, { type: "PlayCard", cardId: second, payments: [] }, ctx), stage).toBe(`${source}: the players play at most 1 ally card each round, and one was played this round.`);
       // The next round it may again.
       const later = { ...played, round: played.round + 1 };
       expect(playable(later, ctx).length, `${stage} later`).toBeGreaterThan(0);

@@ -333,7 +333,12 @@ export function branchThreat(choose: ChooseInstruction, optionId: string): numbe
 export type PickWords = { verb: string; prompt: string };
 
 /** What a Pick asks for, from the instruction that uses the picked card: the verb for the button and a prompt sentence. */
-export function pickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null): PickWords {
+export function pickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null, restricted = 2): PickWords {
+  // A hero holding one Restricted attachment too many (rr.restricted): which one leaves. A claimed objective goes back to the staging area.
+  if (pick.verb === "DiscardRestricted") {
+    const host = sourceId ? names.card(sourceId) : "The hero";
+    return { verb: "Remove", prompt: `${host} can hold ${restricted} Restricted attachments. Choose 1 to remove: an objective returns to the staging area, any other card is discarded.` };
+  }
   // Out-of-play copies in different zones (rr.in-play-and-out-of-play, rr.first-player): which one joins the encounter deck.
   if (pick.verb === "ShuffleOutOfPlayIntoEncounterDeck") {
     const name = names.code(pick.code);
