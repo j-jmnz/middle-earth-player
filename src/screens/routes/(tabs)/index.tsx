@@ -1,4 +1,4 @@
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
 
@@ -33,6 +33,8 @@ function partyCodes(save: Save): string[] {
 
 export default function CampaignList() {
   const router = useRouter();
+  // `start=1`: a finished campaign's path sends the player here with the start panel open, to take its carry-over in.
+  const { start: startParam } = useLocalSearchParams<{ start?: string }>();
   const { catalog, user } = useDatabases();
   const [saves, setSaves] = useState<Save[]>([]);
   const [archived, setArchived] = useState<Save[]>([]);
@@ -93,11 +95,16 @@ export default function CampaignList() {
   useFocusEffect(
     useCallback(() => {
       refresh();
+      if (startParam === "1") {
+        folds.setFolded("start", false);
+        setStarting(true);
+      }
       return () => {
         setManaging(false);
         setDeleting(null);
       };
-    }, [refresh]),
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- the folds hook returns a new object each render: only the param and the refresh matter
+    }, [refresh, startParam]),
   );
 
   function openPath(save: Save): void {

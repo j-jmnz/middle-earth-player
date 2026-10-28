@@ -56,6 +56,15 @@ tags:
 - assertVisible: ".*2 of 2 completed.*"
 - assertNotVisible:
     id: begin
+# Every scenario is won: the bar says so and names what waits for the next campaign (the Ranger Sense kept by 41051's Resolution).
+- assertVisible:
+    id: path-complete
+    text: "Campaign complete\\."
+- assertVisible:
+    id: path-carry
+    text: ".*Ranger Sense.* for your next campaign\\."
+- assertVisible:
+    id: path-new-campaign
 # Kill and relaunch: the campaign is complete on the log, with the Ranger Sense in the pool and the carry-over written.
 - stopApp
 - launchApp

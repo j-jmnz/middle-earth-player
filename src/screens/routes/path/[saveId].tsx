@@ -8,6 +8,7 @@ import { withAlphaHex } from "../../../play/tokens";
 import { SceneCard } from "../../art";
 import { ActionBar, BodyText, Chip, Eyebrow, IconButton, JourneyBar, Label, NavBar, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
 import { poolCardWords } from "../../log-facts";
+import { carryVerb, carryWords } from "../../../campaign/carry-words";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../campaign-data";
 import { cardNames } from "../../card-names";
 import { useDatabases } from "../../databases";
@@ -152,7 +153,7 @@ export default function CampaignPath() {
   const nodes = useMemo(() => (save && campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : []), [save, campaign]);
   const names = useMemo(() => {
     if (!save) return new Map<string, string>();
-    return cardNames(catalog, [...save.log.campaignPool.map((card) => card.code), ...save.log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...Object.values(save.log.earned).flat()]);
+    return cardNames(catalog, [...save.log.campaignPool.map((card) => card.code), ...save.log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...Object.values(save.log.earned).flat(), ...save.log.carryOver.map((card) => card.code)]);
   }, [catalog, save]);
 
   if (!loaded) return <Screen scene="ember" testID="campaign-path"><NavBar onBack={() => goBack(router, "/")} backTestID="path-back" /><BodyText tone="muted">Loading</BodyText></Screen>;
@@ -182,6 +183,11 @@ export default function CampaignPath() {
     : current
       ? { label: "Begin", testID: "begin", words: `Next: ${current.name}`, onPress: () => router.push(briefingHref(save.id, current.id)) }
       : null;
+
+  // Every scenario is won: the bar says so, and says what waits for the next campaign (the carry-over a Resolution kept, 41051:B:1).
+  const complete = nodes.length > 0 && done === nodes.length;
+  const kept = save.log.carryOver.map((card) => ({ code: card.code, perPlayer: card.perPlayer }));
+  const waiting = kept.length > 0 ? carryWords(kept, name) : null;
 
   return (
     <Screen scene="ember" testID="campaign-path">
@@ -234,6 +240,20 @@ export default function CampaignPath() {
         <ActionBar>
           <Label className="mb-2.5 text-center">{next.words}</Label>
           <PrimaryButton label={next.label} testID={next.testID} accessibilityLabel={`${next.label} ${next.words.replace(/^.*?: /, "")}`} onPress={next.onPress} />
+        </ActionBar>
+      ) : complete ? (
+        <ActionBar>
+          <Label testID="path-complete" className="mb-2.5 text-center">
+            Campaign complete.
+          </Label>
+          {waiting ? (
+            <>
+              <Text testID="path-carry" className="mb-2.5 text-center text-label text-bone">
+                {`${waiting.charAt(0).toUpperCase()}${waiting.slice(1)} ${carryVerb(kept) === "is" ? "waits" : "wait"} for your next campaign.`}
+              </Text>
+              <PrimaryButton label="Start a new campaign" testID="path-new-campaign" onPress={() => router.navigate({ pathname: "/", params: { start: "1" } })} />
+            </>
+          ) : null}
         </ActionBar>
       ) : null}
     </Screen>
