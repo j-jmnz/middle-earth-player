@@ -16,12 +16,14 @@ import { routeCode } from "../../route-code";
 import { useSave } from "../../use-save";
 import { GameIcon } from "../../../play/game-icon";
 import type { IconName } from "../../../play/icon-map";
+import { useUiScale } from "../../../play/ui-scale";
 
 function Row({ label, value, testID, icon }: { label: string; value: string; testID: string; icon?: IconName }) {
+  const s = useUiScale();
   return (
     <View className="border-b border-inkLine py-3">
       <View className="flex-row items-center gap-1">
-        {icon ? <GameIcon name={icon} size={12} tint="inkLabel" /> : null}
+        {icon ? <GameIcon name={icon} size={12 * s} tint="inkLabel" /> : null}
         <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
       </View>
       <Text testID={testID} className="mt-0.5 text-body text-ink">

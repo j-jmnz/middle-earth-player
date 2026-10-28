@@ -22,12 +22,14 @@ import { KeepOrDelete } from "../../keep-or-delete";
 import { gameCaption, statusWord, STANDALONE_DROPPED } from "../../standalone-words";
 import { seatWord } from "../../seats";
 import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandalone } from "../../standalone-store";
+import { useUiScale } from "../../../play/ui-scale";
 
 const DELETE_SENTENCE = "Delete this game? It is gone for good. Your decks stay.";
 
 export default function Scenarios() {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
   const router = useRouter();
   const { user } = useDatabases();
   const [games, setGames] = useState<StandaloneGame[]>([]);
@@ -145,7 +147,7 @@ export default function Scenarios() {
                 <Label>{gameCaption(game)}</Label>
                 {/* The look of the primary inside the card; the whole card is the one button. */}
                 <View className="mt-3 min-h-14 items-center justify-center rounded-button" style={goldPlate(pressed, t)}>
-                  <Text className="font-display-bold uppercase" style={{ fontSize: 15, lineHeight: 20, letterSpacing: 2.4, color: palette.onGold }}>
+                  <Text className="font-display-bold uppercase" style={{ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 2.4 * s, color: palette.onGold }}>
                     Resume
                   </Text>
                 </View>
@@ -232,8 +234,8 @@ export default function Scenarios() {
                       className="flex-row items-center gap-3.5 overflow-hidden rounded-card pr-4"
                       style={{ ...panelSurface(pressed, t), boxShadow: raisedEdgeOf(t) }}
                     >
-                      <View style={{ width: 92, height: 68 }}>
-                        <SceneArt scenarioId={id} width={92} height={68}>
+                      <View style={{ width: 92 * s, height: 68 * s }}>
+                        <SceneArt scenarioId={id} width={92 * s} height={68 * s}>
                           {/* A scenario not playable yet keeps its faint words at full strength; only its scene is veiled. */}
                           <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? "transparent" : withAlphaHex(palette.night, 0.6) }} />
                         </SceneArt>

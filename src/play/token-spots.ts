@@ -3,13 +3,14 @@
 import type { Rect } from "./layout.ts";
 import type { TokenKind } from "./token-deltas.ts";
 
-/** The token art's size in points. */
+/** The token art's size in points at Medium; the canvas draws it times the UI scale (ui-scale.ts). */
 export const TOKEN = 18;
 
-/** The center of a card's token of this kind; `rect` is the card on screen, so an exhausted card's tokens stay upright. */
-export function tokenSpot(rect: Rect, token: TokenKind): { cx: number; cy: number } {
+/** The center of a card's token of this kind at the UI scale `s`; `rect` is the card on screen, so an exhausted card's tokens stay upright. */
+export function tokenSpot(rect: Rect, token: TokenKind, s = 1): { cx: number; cy: number } {
   const { x, y, w, h } = rect;
-  if (token === "resources") return { cx: x + TOKEN / 2 + 1, cy: y + h - TOKEN / 2 - 1 };
-  if (token === "damage") return { cx: x + w - TOKEN / 2 - 1, cy: y + TOKEN / 2 + 1 };
-  return { cx: x + w - TOKEN / 2 - 1, cy: y + h - TOKEN / 2 - 1 };
+  const half = (TOKEN / 2 + 1) * s;
+  if (token === "resources") return { cx: x + half, cy: y + h - half };
+  if (token === "damage") return { cx: x + w - half, cy: y + half };
+  return { cx: x + w - half, cy: y + h - half };
 }

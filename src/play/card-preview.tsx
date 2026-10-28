@@ -20,6 +20,7 @@ import { MOTION } from "./motion-tokens.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
 import { ChromeButton } from "./sheet-paper.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 const SCRIM = 0.82;
@@ -81,6 +82,7 @@ export function CardPreview({
   const insets = useSafeAreaInsets();
   const scale = useMotionScale();
   const t = useTableTokens();
+  const s = useUiScale();
   const progress = useSharedValue(scale === 0 ? 1 : 0);
   const all = [card, ...related];
   const [at, setAt] = useState(0);
@@ -88,7 +90,7 @@ export function CardPreview({
   const wide = screen.width > screen.height;
   const roomW = screen.width - insets.left - insets.right;
   const roomH = screen.height - insets.top - insets.bottom;
-  const size = wide ? previewSideSize(roomW, roomH, shown.landscape ?? false) : previewSize(screen.width, roomH, shown.landscape ?? false);
+  const size = wide ? previewSideSize(roomW, roomH, shown.landscape ?? false, s) : previewSize(screen.width, roomH, shown.landscape ?? false, s);
 
   useEffect(() => {
     if (scale > 0) progress.set(withSpring(1, springConfig(MOTION.previewIn, scale)));
@@ -125,12 +127,12 @@ export function CardPreview({
   const scrimStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.get())) * SCRIM }));
   const cardStyle = useAnimatedStyle(() => {
     const p = progress.get();
-    return { opacity: Math.min(1, Math.max(0, p * 1.4)), transform: [{ translateY: (1 - p) * 28 }, { scale: 0.82 + 0.18 * p }] };
+    return { opacity: Math.min(1, Math.max(0, p * 1.4)), transform: [{ translateY: (1 - p) * 28 * s }, { scale: 0.82 + 0.18 * p }] };
   });
   const buttonsStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.get())) }));
 
   const frame = (
-    <Animated.View style={[{ width: size.width, height: size.height, borderRadius: 16, overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}>
+    <Animated.View style={[{ width: size.width, height: size.height, borderRadius: 16 * s, overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}>
       <Picture card={shown} width={size.width} height={size.height} />
     </Animated.View>
   );
@@ -159,11 +161,11 @@ export function CardPreview({
         testID="card-preview-scrim"
         accessibilityLabel="Close the preview"
         onPress={close}
-        style={[StyleSheet.absoluteFill, wide ? styles.row : styles.column, { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left + 16, paddingRight: insets.right + 16 }]}
+        style={[StyleSheet.absoluteFill, wide ? styles.row : styles.column, { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left + 16 * s, paddingRight: insets.right + 16 * s }]}
       >
         {frame}
         {wide ? (
-          <Animated.View style={[{ flex: 1, maxWidth: 360, marginLeft: 20, maxHeight: size.height }, buttonsStyle]}>
+          <Animated.View style={[{ flex: 1, maxWidth: 360 * s, marginLeft: 20 * s, maxHeight: size.height }, buttonsStyle]}>
             {/* The column is not a scrim: a tap here does not close the preview. */}
             <Pressable accessible={false} onPress={() => undefined} style={{ flexShrink: 1 }}>
               <Text testID="card-preview-name" accessibilityRole="header" className="font-display text-title text-bone">
@@ -208,10 +210,10 @@ export function CardPreview({
                         {({ pressed }) => (
                           <View
                             className="mt-1 flex-row items-center gap-2 rounded-tile px-2"
-                            style={{ minHeight: 44, backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent", borderWidth: 1, borderColor: index === at ? t.goldLine : t.hairline }}
+                            style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent", borderWidth: 1, borderColor: index === at ? t.goldLine : t.hairline }}
                           >
-                            <View style={{ width: 24, height: 34, borderRadius: 3, overflow: "hidden", backgroundColor: t.raised }}>
-                              {item.source ? <Image source={item.source} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24, height: 34 }} /> : null}
+                            <View style={{ width: 24 * s, height: 34 * s, borderRadius: 3 * s, overflow: "hidden", backgroundColor: t.raised }}>
+                              {item.source ? <Image source={item.source} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
                             </View>
                             <View className="shrink">
                               <Text numberOfLines={1} className="text-body text-bone">
@@ -230,7 +232,7 @@ export function CardPreview({
             </Pressable>
           </Animated.View>
         ) : (
-          <Animated.View style={[{ flexDirection: "row", gap: 12, marginTop: 16 }, buttonsStyle]}>{buttons}</Animated.View>
+          <Animated.View style={[{ flexDirection: "row", gap: 12 * s, marginTop: 16 * s }, buttonsStyle]}>{buttons}</Animated.View>
         )}
       </Pressable>
     </View>

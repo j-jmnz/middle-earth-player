@@ -1,5 +1,9 @@
 const { themeColors } = require("./src/screens/palette.js");
 
+// One rem is 14 points times the UI scale (the root layout sets NativeWind's rem), so type and radii written through this resize with
+// the setting and Medium draws the same points as before (user request, 2026-10-28). Write the Medium point value.
+const rem = (px) => `${px / 14}rem`;
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/screens/**/*.{js,jsx,ts,tsx}", "./src/play/**/*.{js,jsx,ts,tsx}"],
@@ -17,23 +21,26 @@ module.exports = {
         "display-bold": ["Cinzel-Bold", "Cinzel", "serif"],
       },
       fontSize: {
-        display: ["24px", { lineHeight: "30px", letterSpacing: "0.6px" }],
-        title: ["19px", { lineHeight: "24px", letterSpacing: "0.4px" }],
-        heading: ["14px", { lineHeight: "20px", letterSpacing: "0.3px" }],
-        body: ["15px", { lineHeight: "21px" }],
-        label: ["13px", { lineHeight: "18px" }],
-        eyebrow: ["11px", { lineHeight: "16px", letterSpacing: "2px" }],
-        micro: ["11px", { lineHeight: "14px", letterSpacing: "0.6px" }],
+        display: [rem(24), { lineHeight: rem(30), letterSpacing: rem(0.6) }],
+        title: [rem(19), { lineHeight: rem(24), letterSpacing: rem(0.4) }],
+        heading: [rem(14), { lineHeight: rem(20), letterSpacing: rem(0.3) }],
+        body: [rem(15), { lineHeight: rem(21) }],
+        label: [rem(13), { lineHeight: rem(18) }],
+        eyebrow: [rem(11), { lineHeight: rem(16), letterSpacing: rem(2) }],
+        micro: [rem(11), { lineHeight: rem(14), letterSpacing: rem(0.6) }],
       },
       borderRadius: {
-        chip: "8px",
-        tile: "12px",
-        button: "14px",
-        card: "16px",
-        hero: "20px",
-        sheet: "28px",
+        chip: rem(8),
+        tile: rem(12),
+        button: rem(14),
+        card: rem(16),
+        hero: rem(20),
+        sheet: rem(28),
         pill: "999px",
       },
+      // A hit floor that does not scale: 44 points at every size (user request, 2026-10-28). Use min-h-touch / min-w-touch, not min-h-11.
+      minHeight: { touch: "44px" },
+      minWidth: { touch: "44px" },
     },
   },
   plugins: [],

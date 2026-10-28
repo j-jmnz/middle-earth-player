@@ -35,13 +35,13 @@ import { TrayFrame, useHeld } from "./tray-frame.tsx";
 import { usePeek } from "./use-peek.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
 import { BAR_PAD, MENU_BUTTON } from "./top-bar-layout.ts";
-import { DENSE_BELOW } from "./dock-budget.ts";
+import { isDense } from "./dock-budget.ts";
 import { outsideLayers, trayBox } from "./tray-logic.ts";
 import { discardPlays } from "./table-choice.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import type { TableChoice } from "./use-table-choice.ts";
 
-// The menu button's zone at the top bar's right. A tap there is the menu's, never the tray's.
-const MENU_ZONE = MENU_BUTTON + BAR_PAD;
+// The menu button's zone at the top bar's right (at the UI scale, `menuZone`). A tap there is the menu's, never the tray's.
 const READING_MIN = 300;
 const EDGE = 8;
 
@@ -84,6 +84,9 @@ export function TableLayers({
   anchorTop: number | null;
   onPreview: (cardId: string) => void;
 }) {
+  // The UI scale (ui-scale.ts): the layers' sizes below are Medium's times it.
+  const s = useUiScale();
+  const menuZone = touch(s, MENU_BUTTON) + BAR_PAD * s;
   const game = useStore(store, (state) => state.game);
   const roundSteps = useStore(store, (state) => state.roundSteps);
   const reader = useScreenReader();
@@ -100,32 +103,32 @@ export function TableLayers({
   }, [spotlit]);
   const anchor = anchorTop ?? Math.round(screen.height * 0.55);
   const canvas = screen.width - insets.left - insets.right - commandWidth;
-  const box = trayBox({ commandWidth, insetRight: insets.right, screenHeight: screen.height, barBottom, anchorTop: anchor });
+  const box = trayBox({ commandWidth, insetRight: insets.right, screenHeight: screen.height, barBottom, anchorTop: anchor }, s);
   const trayShown = choice.panelOpen;
   // The panel layer (everything but the carousel).
   const panel = reading && reading.kind !== "carousel" ? reading : null;
   const held = useHeld(panel);
-  const width = Math.max(READING_MIN, box.width);
-  const foot = Math.max(insets.bottom, EDGE);
+  const width = Math.max(READING_MIN * s, box.width);
+  const foot = Math.max(insets.bottom, EDGE * s);
   const open = reading?.kind === "carousel";
   const logging = held?.kind === "log";
   const lines = useMemo(() => (logging ? logLines(roundSteps, logNames) : []), [logging, roundSteps, logNames]);
   return (
     <>
-      {peek.words ? <PeekBanner words={peek.words} top={barBottom + PEEK_TOP} left={insets.left} width={canvas} onBack={peek.back} /> : null}
+      {peek.words ? <PeekBanner words={peek.words} top={barBottom + PEEK_TOP * s} left={insets.left} width={canvas} onBack={peek.back} /> : null}
       {/* The phase title crosses the canvas center; taps pass through it. */}
       <PhaseSweep store={store} area={{ left: insets.left, top: barBottom, width: canvas, height: screen.height - barBottom }} />
       {/* A tap outside the open tray, away from the canvas (which folds it itself): the top bar but its menu button and its dials (a dial
           cannot pick: the table view folds the tray on its tap and then peeks), and the empty part of the command column above the dock. A screen reader leaves the tray open. */}
       {outsideLayers({ trayShown, reading: reading != null, reader }) ? (
         <>
-          <Pressable testID="tray-outside-bar" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: 0, left: insets.left + dialsEdge, right: insets.right + MENU_ZONE, height: barBottom }} />
+          <Pressable testID="tray-outside-bar" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: 0, left: insets.left + dialsEdge, right: insets.right + menuZone, height: barBottom }} />
           <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: anchor - barBottom }} />
         </>
       ) : null}
-      <ChoiceTray open={trayShown} place={box} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={screen.height < DENSE_BELOW} onTile={choice.onTile} onRead={onPreview} />
+      <ChoiceTray open={trayShown} place={box} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
-      <TrayFrame open={panel != null} surface="paper" testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE }}>
+      <TrayFrame open={panel != null} surface="paper" testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE * s }}>
         {held?.kind === "pile" ? (
           <PileList
             title={PILE_WORDS[held.pile]}
@@ -174,7 +177,7 @@ export function TableLayers({
         top={barBottom}
         left={insets.left}
         width={canvas}
-        height={Math.round(Math.min(340, (screen.height - barBottom) * 0.92))}
+        height={Math.round(Math.min(340 * s, (screen.height - barBottom) * 0.92))}
         onChange={(change) => tableSettings.getState().update(change)}
         onClose={close}
       />

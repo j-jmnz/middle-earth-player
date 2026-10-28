@@ -1,7 +1,8 @@
 // Where the combat spotlight's cards stand (docs/design-system.md, Table, Spotlight; phase 24). Pure geometry, like layout.ts:
 // the attacker (or a fan of up to three attackers, then "+n") at the left and the target at the right, side by side at the middle of the
 // canvas, enlarged to 42% of its height with a 24 pt gap, a pill under each, and a turned shadow card beside the enemy. The beats
-// that move them are in spotlight-beats.ts; the canvas draws them in spotlight.native.tsx.
+// that move them are in spotlight-beats.ts; the canvas draws them in spotlight.native.tsx. At a UI `scale` (ui-scale.ts) the stage is
+// worked out in logical points (the canvas and the card over the scale) and every length comes back times the scale.
 import type { Rect } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 
@@ -43,7 +44,31 @@ export type Stage = {
  * shows up to three; with a `shadow` card an enemy's attack makes room for it at the left. The whole group is centered, and
  * shrinks when the canvas is too narrow for it.
  */
-export function stageOf(canvas: { width: number; height: number }, card: { w: number; h: number }, attackers: number, shadow: boolean): Stage {
+export function stageOf(canvas: { width: number; height: number }, card: { w: number; h: number }, attackers: number, shadow: boolean, scale = 1): Stage {
+  const stage = stageIn({ width: canvas.width / scale, height: canvas.height / scale }, { w: card.w / scale, h: card.h / scale }, attackers, shadow);
+  return scale === 1 ? stage : scaledStage(stage, scale);
+}
+
+// The stage with every length times `s`; the turns are angles and stay.
+function scaledStage(stage: Stage, s: number): Stage {
+  const rect = (r: Rect): Rect => ({ x: r.x * s, y: r.y * s, w: r.w * s, h: r.h * s });
+  const at = (p: { cx: number; cy: number }) => ({ cx: p.cx * s, cy: p.cy * s });
+  return {
+    attackers: stage.attackers.map(rect),
+    turns: stage.turns,
+    target: rect(stage.target),
+    shadow: stage.shadow ? rect(stage.shadow) : null,
+    attackPill: at(stage.attackPill),
+    targetPill: at(stage.targetPill),
+    word: at(stage.word),
+    contact: { x: stage.contact.x * s, y: stage.contact.y * s },
+    corner: at(stage.corner),
+    more: stage.more ? at(stage.more) : null,
+    note: at(stage.note),
+  };
+}
+
+function stageIn(canvas: { width: number; height: number }, card: { w: number; h: number }, attackers: number, shadow: boolean): Stage {
   const aspect = card.w / card.h;
   const shown = Math.max(1, Math.min(attackers, SHAPE.spotlightFan));
   const room = canvas.width - 2 * EDGE;
@@ -93,13 +118,13 @@ export function flown(from: Rect, fromTurn: number, stage: Rect, stageTurn: numb
  * A damage token `u` (0..1) of the way from the point of contact to the target's corner: it rises on an arc, fans out by its place
  * in the burst, grows a little in flight and settles at the size of the token in the corner, fading into it at the end.
  */
-export function burstPoint(stage: Stage, index: number, count: number, u: number): { x: number; y: number; scale: number; opacity: number } {
+export function burstPoint(stage: Stage, index: number, count: number, u: number, scale = 1): { x: number; y: number; scale: number; opacity: number } {
   "worklet";
   const arc = Math.sin(Math.PI * u);
   const side = count > 1 ? (index / (count - 1)) * 2 - 1 : 0;
   return {
-    x: stage.contact.x + (stage.corner.cx - stage.contact.x) * u + side * 22 * arc,
-    y: stage.contact.y + (stage.corner.cy - stage.contact.y) * u - 26 * arc,
+    x: stage.contact.x + (stage.corner.cx - stage.contact.x) * u + side * 22 * scale * arc,
+    y: stage.contact.y + (stage.corner.cy - stage.contact.y) * u - 26 * scale * arc,
     scale: 0.6 + 0.4 * u + 0.25 * arc,
     opacity: u > 0.85 ? (1 - u) / 0.15 : 1,
   };

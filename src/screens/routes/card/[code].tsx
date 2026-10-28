@@ -25,6 +25,7 @@ import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
 import { goBack } from "../../go-back";
+import { useUiScale } from "../../../play/ui-scale";
 
 type FactsRow = {
   typeCode: string;
@@ -48,6 +49,7 @@ type FactsRow = {
 // as a row of tiles (icon and value, the word under them), and the text on a raised panel: one paragraph per ability, the
 // timing words bold, the icons inline, flavor italic and muted.
 function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | null }) {
+  const s = useUiScale();
   const sphereMark = sphereIcon(row.sphereCode);
   const type = typeIcon(row.typeCode);
   // Player cards always name a sphere (Neutral when the catalog has none); encounter cards print none.
@@ -67,18 +69,18 @@ function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | 
     <View>
       <View testID="card-kind" className="mt-2 flex-row flex-wrap items-center justify-center gap-x-3 gap-y-1">
         <View className="flex-row items-center gap-1.5">
-          {type ? <GameIcon name={type} size={16} tint="muted" /> : null}
+          {type ? <GameIcon name={type} size={16 * s} tint="muted" /> : null}
           <Text className="text-body text-muted">{row.typeName}</Text>
         </View>
         {sphere ? (
           <View className="flex-row items-center gap-1.5">
-            {sphereMark ? <GameIcon name={sphereMark} size={16} tint={SPHERE_TINT[row.sphereCode ?? ""] ?? "faint"} /> : null}
+            {sphereMark ? <GameIcon name={sphereMark} size={16 * s} tint={SPHERE_TINT[row.sphereCode ?? ""] ?? "faint"} /> : null}
             <Text className="text-body text-muted">{sphere}</Text>
           </View>
         ) : null}
         {row.isUnique ? (
           <View className="flex-row items-center gap-1.5">
-            <GameIcon name="unique" size={16} tint="gold" />
+            <GameIcon name="unique" size={16 * s} tint="gold" />
             <Text className="text-body text-muted">Unique</Text>
           </View>
         ) : null}
@@ -115,10 +117,11 @@ function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | 
 // A number with the game's icon beside it, the word under them. The word stays on screen and in the label.
 function Stat({ label, value, icon }: { label: string; value: string; icon: IconName }) {
   const t = useTableTokens();
+  const s = useUiScale();
   return (
     <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-20 items-center rounded-tile px-3 py-2" style={tileSurface(false, t)}>
       <View className="flex-row items-center gap-1.5">
-        <GameIcon name={icon} size={18} tint="bone" />
+        <GameIcon name={icon} size={18 * s} tint="bone" />
         <Text className="font-display-bold text-title text-bone">{value}</Text>
       </View>
       <Text className="mt-0.5 text-label text-muted">{label}</Text>
@@ -193,6 +196,7 @@ function Zoomable({ children, width, height }: { children: ReactNode; width: num
 export default function CardScreen() {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
   // The picture is the hero of this screen: centered, lifted off the night by a gold halo.
   const halo = useMemo(() => ({ shadowColor: palette.gold, shadowOpacity: 0.25, shadowRadius: 40, shadowOffset: { width: 0, height: 0 }, elevation: 12 }), [palette]);
   const router = useRouter();
@@ -237,7 +241,7 @@ export default function CardScreen() {
   });
   const remotePreview = !source && row?.imagesrc ? cardImageUrl(row.imagesrc) : null;
   const previewSource = source ?? (remotePreview ? { uri: remotePreview } : null);
-  const maxWidth = Math.max(0, Math.min(windowWidth - 96, 300));
+  const maxWidth = Math.max(0, Math.min(windowWidth - 96 * s, 300 * s));
   const pixels =
     resolved.kind === "file" || resolved.kind === "asset"
       ? imageLayoutSize(resolved.width, resolved.height, maxWidth)
@@ -256,8 +260,8 @@ export default function CardScreen() {
     <Screen scene="plain">
       {/* The card's own picture, blurred and darkened, as the light behind it: each card sets its own mood. Drawn once, behind. */}
       {previewSource ? (
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { height: 520 }]}>
-          <Image source={previewSource} contentFit="cover" blurRadius={28} accessible={false} style={{ width: "100%", height: 520, opacity: 0.45 }} />
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { height: 520 * s }]}>
+          <Image source={previewSource} contentFit="cover" blurRadius={28} accessible={false} style={{ width: "100%", height: 520 * s, opacity: 0.45 }} />
           <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.15, 1, undefined, t) }} />
         </View>
       ) : null}

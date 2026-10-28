@@ -9,6 +9,7 @@ import type { DockExtra } from "./dock-buttons.tsx";
 import { LinesPopover } from "./dock-lines-popover.tsx";
 import type { Unavailable } from "./sheet-types.ts";
 import { PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx";
+import { useUiScale } from "./ui-scale.ts";
 
 const WIDTH = 220;
 // The gap between the popover and the command column.
@@ -50,14 +51,15 @@ export type DockWords = { title: string; guide: string | null; note: string | nu
 
 export function MorePopoverView({ more, items, words, commandWidth, insetRight, onClose }: { more: MorePopover; items: readonly DockExtra[]; words: DockWords; commandWidth: number; insetRight: number; onClose: () => void }) {
   const screen = useWindowDimensions();
+  const s = useUiScale();
   const first = useRef<PressableRef>(null);
   const foot = more.foot ?? screen.height;
   return (
     <>
       <PopoverFrame
         open={more.open}
-        place={{ right: insetRight + commandWidth + GAP, bottom: Math.max(0, Math.round(screen.height - foot)) }}
-        width={WIDTH}
+        place={{ right: insetRight + commandWidth + GAP * s, bottom: Math.max(0, Math.round(screen.height - foot)) }}
+        width={WIDTH * s}
         origin="100% 100%"
         ids={{ layer: "dock-more-layer", scrim: "dock-more-scrim", popover: "dock-more-popover" }}
         closeLabel="Close the list"

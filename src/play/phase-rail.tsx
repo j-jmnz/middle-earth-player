@@ -12,6 +12,7 @@ import { layoutAnim, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { Rail } from "./rail.ts";
 import { withAlphaHex } from "./tokens.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { CHEVRON, NEIGHBOR_GAP } from "./top-bar-layout.ts";
 
@@ -19,6 +20,7 @@ import { CHEVRON, NEIGHBOR_GAP } from "./top-bar-layout.ts";
 /** A chevron drawn as two edges of a rotated square: no printed icon fits, and a glyph depends on the font. */
 export function Chevron({ direction, color }: { direction: "previous" | "next" | "up" | "down"; color?: string }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const turn = {
     next: "45deg",
     previous: "225deg",
@@ -28,8 +30,8 @@ export function Chevron({ direction, color }: { direction: "previous" | "next" |
   return (
     <View
       style={{
-        width: CHEVRON,
-        height: CHEVRON,
+        width: CHEVRON * s,
+        height: CHEVRON * s,
         alignItems: "center",
         justifyContent: "center",
       }}
@@ -37,10 +39,10 @@ export function Chevron({ direction, color }: { direction: "previous" | "next" |
     >
       <View
         style={{
-          width: 8,
-          height: 8,
-          borderTopWidth: 1.5,
-          borderRightWidth: 1.5,
+          width: 8 * s,
+          height: 8 * s,
+          borderTopWidth: 1.5 * s,
+          borderRightWidth: 1.5 * s,
           borderColor: color ?? t.muted,
           transform: [{ rotate: turn }],
         }}
@@ -50,7 +52,7 @@ export function Chevron({ direction, color }: { direction: "previous" | "next" |
 }
 
 // A neighbor phase's name, inline at the phase's side in muted label. Plain text: it neither slides nor fades.
-function Neighbor({ side, name }: { side: "previous" | "next"; name: string }) {
+function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; s: number }) {
   if (!name) return null;
   return (
     <Text
@@ -58,7 +60,7 @@ function Neighbor({ side, name }: { side: "previous" | "next"; name: string }) {
       numberOfLines={1}
       importantForAccessibility="no"
       className="text-label text-muted"
-      style={{ lineHeight: 20, [side === "previous" ? "marginRight" : "marginLeft"]: NEIGHBOR_GAP }}
+      style={{ lineHeight: 20 * s, [side === "previous" ? "marginRight" : "marginLeft"]: NEIGHBOR_GAP * s }}
     >
       {name}
     </Text>
@@ -88,6 +90,7 @@ export function PhaseRail({
 }) {
   const scale = useMotionScale();
   const t = useTableTokens();
+  const s = useUiScale();
   const step = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.railStep, scale), out: layoutAnim(FadeOut, MOTION.railStep, scale) }), [scale]);
   const flash = useSharedValue(0);
   const lastPhase = useRef(rail.phase);
@@ -120,7 +123,7 @@ export function PhaseRail({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: 44,
+        minHeight: touch(s, 44),
         borderRadius: 999,
         backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent",
       })}
@@ -133,9 +136,9 @@ export function PhaseRail({
               flexShrink: 1,
               alignItems: "center",
               borderWidth: 1,
-              borderRadius: 20,
-              paddingHorizontal: 10,
-              paddingVertical: 3,
+              borderRadius: 20 * s,
+              paddingHorizontal: 10 * s,
+              paddingVertical: 3 * s,
               backgroundColor: withAlphaHex(t.night, 0.78),
               boxShadow: `inset 0 1px 0 ${withAlphaHex(t.lit, 0.06)}, 0 2px 10px ${withAlphaHex(t.night, 0.45)}`,
             },
@@ -151,16 +154,16 @@ export function PhaseRail({
               }}
             >
               {round ? (
-                <Text testID="rail-round" numberOfLines={1} className="text-label text-muted" style={{ lineHeight: 20 }}>
+                <Text testID="rail-round" numberOfLines={1} className="text-label text-muted" style={{ lineHeight: 20 * s }}>
                   {round}
                 </Text>
               ) : null}
               {round && rail.phase ? (
-                <Text className="text-label text-muted" style={{ marginHorizontal: 4, lineHeight: 20 }}>
+                <Text className="text-label text-muted" style={{ marginHorizontal: 4 * s, lineHeight: 20 * s }}>
                   ·
                 </Text>
               ) : null}
-              {wide && rail.phase ? <Neighbor side="previous" name={rail.previousPhase} /> : null}
+              {wide && rail.phase ? <Neighbor side="previous" name={rail.previousPhase} s={s} /> : null}
               {rail.phase ? (
                 <Text
                   testID="rail-phase"
@@ -170,27 +173,27 @@ export function PhaseRail({
                   className="font-display-bold uppercase text-gold"
                   style={{
                     // 14 pt: top-bar-layout.ts counts the pill's floor from this size and Cinzel Bold's capitals.
-                    fontSize: 14,
-                    lineHeight: 20,
+                    fontSize: 14 * s,
+                    lineHeight: 20 * s,
                     textShadowColor: t.glow,
-                    textShadowRadius: 8,
+                    textShadowRadius: 8 * s,
                     textShadowOffset: { width: 0, height: 0 },
                   }}
                 >
                   {rail.phase}
                 </Text>
               ) : null}
-              {wide && rail.phase ? <Neighbor side="next" name={rail.nextPhase} /> : null}
+              {wide && rail.phase ? <Neighbor side="next" name={rail.nextPhase} s={s} /> : null}
               {/* The S stands at the end of the top line, in the room the floor keeps. */}
               {stopAhead ? (
-                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-gold" style={{ marginLeft: 4, lineHeight: 20 }}>
+                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-gold" style={{ marginLeft: 4 * s, lineHeight: 20 * s }}>
                   S
                 </Text>
               ) : null}
             </View>
           ) : null}
           <Animated.View key={rail.current} entering={step.in} exiting={step.out}>
-            <Text testID="rail-current" numberOfLines={1} className="text-label" style={{ color: withAlphaHex(t.bone, 0.85), lineHeight: 16 }}>
+            <Text testID="rail-current" numberOfLines={1} className="text-label" style={{ color: withAlphaHex(t.bone, 0.85), lineHeight: 16 * s }}>
               {rail.current}
             </Text>
           </Animated.View>

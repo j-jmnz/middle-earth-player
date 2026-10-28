@@ -8,6 +8,7 @@ import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
 import { goldSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
+import { useUiScale } from "../play/ui-scale";
 import { withAlphaHex } from "../play/tokens";
 import { palettes, type Palette } from "./palette.js";
 import type { MarkedSphere } from "./sphere-mark";
@@ -15,19 +16,21 @@ import type { MarkedSphere } from "./sphere-mark";
 /** A chevron drawn as views (no printed icon fits), pointing left for Back, right for a row that opens, down for a fold that is open. */
 export function Chevron({ direction = "left", color, size = 10 }: { direction?: "left" | "right" | "down"; color?: string; size?: number }) {
   const palette = usePalette();
+  const s = useUiScale();
+  const box = size * s;
   return (
     <View
       importantForAccessibility="no"
       style={{
-        width: size,
-        height: size,
+        width: box,
+        height: box,
         borderLeftWidth: 2,
         borderBottomWidth: 2,
         borderColor: color ?? palette.bone,
         transform:
           direction === "down"
-            ? [{ translateY: -size * 0.2 }, { rotate: "-45deg" }]
-            : [{ translateX: direction === "left" ? size * 0.2 : -size * 0.2 }, { rotate: direction === "left" ? "45deg" : "-135deg" }],
+            ? [{ translateY: -box * 0.2 }, { rotate: "-45deg" }]
+            : [{ translateX: direction === "left" ? box * 0.2 : -box * 0.2 }, { rotate: direction === "left" ? "45deg" : "-135deg" }],
       }}
     />
   );
@@ -36,16 +39,18 @@ export function Chevron({ direction = "left", color, size = 10 }: { direction?: 
 /** Four small gold diamonds on the corners of a framed thing: the current panel, the scenario to play, the fellowship chosen. */
 export function Corners() {
   const palette = usePalette();
+  const s = useUiScale();
+  const out = -4 * s;
   const at = [
-    { left: -4, top: -4 },
-    { right: -4, top: -4 },
-    { left: -4, bottom: -4 },
-    { right: -4, bottom: -4 },
+    { left: out, top: out },
+    { right: out, top: out },
+    { left: out, bottom: out },
+    { right: out, bottom: out },
   ];
   return (
     <>
       {at.map((place, index) => (
-        <View key={index} pointerEvents="none" importantForAccessibility="no" style={{ position: "absolute", width: 7, height: 7, backgroundColor: palette.gold, transform: [{ rotate: "45deg" }], ...place }} />
+        <View key={index} pointerEvents="none" importantForAccessibility="no" style={{ position: "absolute", width: 7 * s, height: 7 * s, backgroundColor: palette.gold, transform: [{ rotate: "45deg" }], ...place }} />
       ))}
     </>
   );
@@ -55,16 +60,18 @@ export function Corners() {
 export function RingMark({ size = 18, state = "current" }: { size?: number; state?: "current" | "done" | "locked" }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
+  const box = size * s;
   if (state === "done") {
-    return <View style={{ width: size, height: size, borderRadius: size / 2, ...goldSurface(false, t) }} />;
+    return <View style={{ width: box, height: box, borderRadius: box / 2, ...goldSurface(false, t) }} />;
   }
   return (
     <View
       style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        borderWidth: state === "locked" ? 1.5 : Math.max(2, size / 9),
+        width: box,
+        height: box,
+        borderRadius: box / 2,
+        borderWidth: state === "locked" ? 1.5 : Math.max(2, box / 9),
         borderColor: state === "locked" ? palette.hairline : palette.gold,
       }}
     />
@@ -73,10 +80,11 @@ export function RingMark({ size = 18, state = "current" }: { size?: number; stat
 
 /** A magnifying glass drawn as views (no printed icon fits), for a search field. */
 export function Magnifier({ color }: { color: string }) {
+  const s = useUiScale();
   return (
-    <View importantForAccessibility="no" style={{ width: 16, height: 16 }}>
-      <View style={{ position: "absolute", left: 0, top: 0, width: 12, height: 12, borderRadius: 6, borderWidth: 1.75, borderColor: color }} />
-      <View style={{ position: "absolute", left: 10, top: 11, width: 6, height: 1.75, borderRadius: 1, backgroundColor: color, transform: [{ rotate: "45deg" }] }} />
+    <View importantForAccessibility="no" style={{ width: 16 * s, height: 16 * s }}>
+      <View style={{ position: "absolute", left: 0, top: 0, width: 12 * s, height: 12 * s, borderRadius: 6 * s, borderWidth: 1.75, borderColor: color }} />
+      <View style={{ position: "absolute", left: 10 * s, top: 11 * s, width: 6 * s, height: 1.75, borderRadius: 1, backgroundColor: color, transform: [{ rotate: "45deg" }] }} />
     </View>
   );
 }
@@ -145,5 +153,6 @@ export function ProgressBar({ value, max, tone = "gold" }: { value: number; max:
 
 /** The sphere's printed icon beside the sphere word, tinted with the sphere token. Color is never the only signal. */
 export function SphereMark({ sphere, size = 14 }: { sphere: MarkedSphere; size?: number }) {
-  return <GameIcon name={sphere} size={size} tint={SPHERE_TINT[sphere] ?? "faint"} />;
+  const s = useUiScale();
+  return <GameIcon name={sphere} size={size * s} tint={SPHERE_TINT[sphere] ?? "faint"} />;
 }

@@ -7,8 +7,10 @@ import type { CarouselPhase, CarouselStep } from "./carousel.ts";
 import { toggleStop, type TableSettings } from "./table-settings.ts";
 import { goldSurface, panelSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
+// The 44 pt target; callers draw it through `touch(s, ROW)`.
 export const ROW = 44;
 
 // A switch on the night surface: its whole row is one 44 pt target, the label and detail heard with it.
@@ -31,6 +33,7 @@ export function NightSwitch({
   dim?: boolean;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   return (
     <Pressable
       accessibilityRole="switch"
@@ -39,11 +42,11 @@ export function NightSwitch({
       accessibilityState={{ checked: value }}
       onPress={() => onChange(!value)}
       style={({ pressed }) => ({
-        minHeight: ROW,
+        minHeight: touch(s, ROW),
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 12,
+        gap: 12 * s,
         backgroundColor: pressed ? t.pressed : "transparent",
         opacity: dim ? 0.75 : 1,
       })}
@@ -75,9 +78,10 @@ export function NightSwitch({
 // A small capsule beside the current phase's name: "Now" in gold.
 function NowChip() {
   const t = useTableTokens();
+  const s = useUiScale();
   return (
-    <View style={{ borderRadius: 999, borderWidth: 1, borderColor: t.gold, paddingHorizontal: 6, backgroundColor: withAlphaHex(t.gold, 0.14) }}>
-      <Text className="font-display-bold text-micro uppercase" style={{ color: t.gold, lineHeight: 15 }}>
+    <View style={{ borderRadius: 999, borderWidth: 1, borderColor: t.gold, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(t.gold, 0.14) }}>
+      <Text className="font-display-bold text-micro uppercase" style={{ color: t.gold, lineHeight: 15 * s }}>
         Now
       </Text>
     </View>
@@ -88,21 +92,22 @@ function NowChip() {
 // that runs on to the next step.
 function StepDot({ state, last }: { state: "past" | "current" | "next"; last: boolean }) {
   const t = useTableTokens();
+  const s = useUiScale();
   return (
-    <View style={{ width: 14, alignItems: "center" }}>
+    <View style={{ width: 14 * s, alignItems: "center" }}>
       <View
         style={{
-          marginTop: 5,
-          width: state === "current" ? 10 : 8,
-          height: state === "current" ? 10 : 8,
-          borderRadius: 5,
-          borderWidth: state === "next" ? 1.5 : 0,
+          marginTop: 5 * s,
+          width: (state === "current" ? 10 : 8) * s,
+          height: (state === "current" ? 10 : 8) * s,
+          borderRadius: 5 * s,
+          borderWidth: state === "next" ? 1.5 * s : 0,
           borderColor: t.muted,
           backgroundColor: state === "current" ? t.gold : state === "past" ? t.goldDeep : "transparent",
-          boxShadow: state === "current" ? `0 0 0 3px ${withAlphaHex(t.gold, 0.22)}` : undefined,
+          boxShadow: state === "current" ? `0 0 0 ${3 * s}px ${withAlphaHex(t.gold, 0.22)}` : undefined,
         }}
       />
-      {last ? null : <View style={{ flex: 1, width: 1, marginTop: 3, backgroundColor: t.hairline }} />}
+      {last ? null : <View style={{ flex: 1, width: 1, marginTop: 3 * s, backgroundColor: t.hairline }} />}
     </View>
   );
 }
@@ -125,22 +130,23 @@ function StepBlock({
   onLayoutY?: (y: number) => void;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const now = state === "current";
   return (
     <View
       testID={`carousel-step-${step.id}`}
       onLayout={onLayoutY ? (event) => onLayoutY(event.nativeEvent.layout.y) : undefined}
-      style={{ flexDirection: "row", gap: 8 }}
+      style={{ flexDirection: "row", gap: 8 * s }}
     >
       <StepDot state={state} last={last} />
       <View
         style={{
           flex: 1,
-          marginBottom: last ? 0 : 6,
-          borderRadius: 10,
-          paddingHorizontal: now ? 8 : 0,
-          paddingVertical: now ? 6 : 1,
-          marginLeft: now ? -4 : 0,
+          marginBottom: last ? 0 : 6 * s,
+          borderRadius: 10 * s,
+          paddingHorizontal: now ? 8 * s : 0,
+          paddingVertical: (now ? 6 : 1) * s,
+          marginLeft: now ? -4 * s : 0,
           backgroundColor: now ? withAlphaHex(t.gold, 0.08) : "transparent",
           borderWidth: now ? 1 : 0,
           borderColor: withAlphaHex(t.gold, 0.45),
@@ -188,6 +194,7 @@ export function PhaseCard({
   onChange: (change: Partial<TableSettings>) => void;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const past = phase.state === "past";
   const current = phase.state === "current";
   const nowAt = phase.steps.findIndex((step) => step.current);
@@ -198,7 +205,7 @@ export function PhaseCard({
       testID={`carousel-phase-${phase.id}`}
       style={{
         width,
-        borderRadius: 14,
+        borderRadius: 14 * s,
         borderWidth: 1,
         borderColor: current ? t.goldLine : t.hairline,
         ...(current ? panelSurface(false, t) : { backgroundColor: withAlphaHex(t.night, 0.35) }),
@@ -206,14 +213,14 @@ export function PhaseCard({
         overflow: "hidden",
       }}
     >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 8 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 * s, paddingHorizontal: 12 * s, paddingTop: 10 * s, paddingBottom: 8 * s }}>
         {/* The phase's place in the round, in a disc: worked gold now, a deep gold edge when done, a hairline to come. */}
         <View
           importantForAccessibility="no-hide-descendants"
           style={{
-            width: 22,
-            height: 22,
-            borderRadius: 11,
+            width: 22 * s,
+            height: 22 * s,
+            borderRadius: 11 * s,
             alignItems: "center",
             justifyContent: "center",
             borderWidth: current ? 0 : 1,
@@ -221,7 +228,7 @@ export function PhaseCard({
             ...(current ? goldSurface(false, t) : {}),
           }}
         >
-          <Text className="font-display-bold text-micro" style={{ color: current ? t.onGold : past ? t.gold : t.muted, lineHeight: 15 }}>
+          <Text className="font-display-bold text-micro" style={{ color: current ? t.onGold : past ? t.gold : t.muted, lineHeight: 15 * s }}>
             {String(number)}
           </Text>
         </View>
@@ -230,7 +237,7 @@ export function PhaseCard({
           accessibilityLabel={`${phase.name} phase${past ? ", done this round" : current ? ", now" : ""}`}
           numberOfLines={1}
           className="flex-1 font-display-bold text-body uppercase"
-          style={{ color: current ? t.gold : past ? t.muted : t.bone, lineHeight: 22, letterSpacing: 0.6 }}
+          style={{ color: current ? t.gold : past ? t.muted : t.bone, lineHeight: 22 * s, letterSpacing: 0.6 * s }}
         >
           {phase.name}
         </Text>
@@ -241,17 +248,17 @@ export function PhaseCard({
             testID={`carousel-done-${phase.id}`}
             accessibilityLabel="Done this round"
             accessible
-            style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            style={{ flexDirection: "row", alignItems: "center", gap: 5 * s }}
           >
-            <View style={{ width: 10, height: 10, borderRadius: 5, ...goldSurface(false, t) }} />
+            <View style={{ width: 10 * s, height: 10 * s, borderRadius: 5 * s, ...goldSurface(false, t) }} />
             <Text className="text-micro" style={{ color: t.muted }}>
               Done
             </Text>
           </View>
         ) : null}
       </View>
-      <View style={{ height: 1, marginHorizontal: 12, backgroundColor: current ? withAlphaHex(t.gold, 0.25) : t.hairline }} />
-      <ScrollView ref={scroll} nestedScrollEnabled showsVerticalScrollIndicator persistentScrollbar contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 10, paddingBottom: 12 }}>
+      <View style={{ height: 1, marginHorizontal: 12 * s, backgroundColor: current ? withAlphaHex(t.gold, 0.25) : t.hairline }} />
+      <ScrollView ref={scroll} nestedScrollEnabled showsVerticalScrollIndicator persistentScrollbar contentContainerStyle={{ paddingHorizontal: 12 * s, paddingTop: 10 * s, paddingBottom: 12 * s }}>
         {phase.steps.map((step, index) => (
           <StepBlock
             key={step.id}

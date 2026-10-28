@@ -19,6 +19,7 @@ import {
 } from "../../starter-decks";
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
+import { useUiScale } from "../../../play/ui-scale";
 
 type Row =
   | { kind: "deck"; key: string; deck: SavedDeck; starter: boolean }
@@ -104,6 +105,7 @@ function DeckActions({
 
 export default function Decks() {
   const router = useRouter();
+  const s = useUiScale();
   const seed = useSeedStatus();
   const seedReason = useSeedReason();
   const { catalog, user } = useDatabases();
@@ -243,7 +245,7 @@ export default function Decks() {
     if (view === "List") return <DeckRow {...summary}>{actions}</DeckRow>;
     return (
       <View className="pb-3">
-        <DeckCover {...summary} height={COVER_HEIGHT}>
+        <DeckCover {...summary} height={COVER_HEIGHT * s}>
           {actions}
         </DeckCover>
       </View>

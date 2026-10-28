@@ -11,6 +11,7 @@ import { timing, useMotionScale } from "./motion-run.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
 import { busyBetween, SETTLE_MS, sweepFrame, sweepName } from "./sweep.ts";
 import type { TableStore } from "./store.ts";
+import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 /** `area` is the canvas on the screen: the title crosses its center. */
@@ -20,6 +21,7 @@ export function PhaseSweep({ store, area }: { store: TableStore; area: { left: n
   const { phase, round } = game;
   const scale = useMotionScale();
   const t = useTableTokens();
+  const s = useUiScale();
   const before = useRef(store.getState().game);
   const [shown, setShown] = useState<string | null>(null);
   const progress = useSharedValue(0);
@@ -45,7 +47,7 @@ export function PhaseSweep({ store, area }: { store: TableStore; area: { left: n
     before.current = store.getState().game;
   });
   const style = useAnimatedStyle(() => {
-    const frame = sweepFrame(progress.get(), SHAPE.sweepSlide);
+    const frame = sweepFrame(progress.get(), SHAPE.sweepSlide * s);
     return { opacity: frame.opacity, transform: [{ translateX: frame.offset }] };
   });
   if (shown == null) return null;
@@ -53,7 +55,7 @@ export function PhaseSweep({ store, area }: { store: TableStore; area: { left: n
     <View testID="phase-sweep" pointerEvents="none" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden style={{ position: "absolute", ...area, alignItems: "center", justifyContent: "center" }}>
       {/* The text is a plain Text under the animated view: NativeWind styles Text, not Animated.Text. */}
       <Animated.View style={style}>
-        <Text className="font-display text-display text-bone" style={{ textShadowColor: t.night, textShadowRadius: 10, textShadowOffset: { width: 0, height: 2 }, letterSpacing: 4, textTransform: "uppercase" }}>
+        <Text className="font-display text-display text-bone" style={{ textShadowColor: t.night, textShadowRadius: 10 * s, textShadowOffset: { width: 0, height: 2 * s }, letterSpacing: 4 * s, textTransform: "uppercase" }}>
           {shown}
         </Text>
       </Animated.View>

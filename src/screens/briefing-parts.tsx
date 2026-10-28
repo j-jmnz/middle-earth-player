@@ -20,6 +20,7 @@ import { useDatabases } from "./databases";
 import type { HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed, type StarterSeed } from "./starter-decks";
+import { useUiScale } from "../play/ui-scale";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
 
@@ -126,15 +127,16 @@ export function BriefingScreen({
   bar?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
-  const side = { paddingLeft: 24 + insets.left, paddingRight: 24 + insets.right };
+  const s = useUiScale();
+  const side = { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right };
   // Past the scene, a night bar shows behind Back and Booklet so they never sit on the words that scroll under them.
   const [past, setPast] = useState(false);
-  const threshold = BANNER_HEIGHT - 80;
+  const threshold = (BANNER_HEIGHT - 80) * s;
   return (
     <Screen testID={testID} scene="vale" bleed>
       <ScrollView
         className="min-h-0 flex-1"
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 24 * s }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={64}
@@ -143,7 +145,7 @@ export function BriefingScreen({
           if (next !== past) setPast(next);
         }}
       >
-        <SceneArt scenarioId={scenarioId} height={BANNER_HEIGHT + insets.top} shade={0.4} fade={0.2}>
+        <SceneArt scenarioId={scenarioId} height={BANNER_HEIGHT * s + insets.top} shade={0.4} fade={0.2}>
           <View className="absolute bottom-0 left-0 right-0 pb-2" style={side}>
             {banner}
           </View>
@@ -156,7 +158,7 @@ export function BriefingScreen({
         </View>
       ) : null}
       <FloatingBarShade shown={past} top={insets.top} />
-      <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 + insets.left, paddingRight: 16 + insets.right }}>
+      <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 * s + insets.left, paddingRight: 16 * s + insets.right }}>
         <NavBar overlay onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={onBooklet ? <IconButton overlay icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
       </View>
     </Screen>

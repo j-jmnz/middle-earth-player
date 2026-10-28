@@ -9,6 +9,7 @@ import { NO_HIGHLIGHT } from "./peek.ts";
 import { PILE_WORDS, PILES, hidesFace, isPrisoner, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import type { TableTokens } from "./tokens.ts";
+import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 const ZONE_WORD: Record<ZoneId, string> = {
@@ -36,7 +37,7 @@ function CardButton({ id, label, faceDown, onTap, onPreview, highlight, t }: { i
       onPress={() => onTap(id)}
       onLongPress={faceDown ? undefined : () => onPreview(id)}
       delayLongPress={350}
-      className={`min-h-11 justify-center rounded-tile px-2 ${picked > 0 ? "bg-goldLine" : "bg-raised"} ${tappable ? "border border-gold" : ""}`}
+      className={`min-h-touch justify-center rounded-tile px-2 ${picked > 0 ? "bg-goldLine" : "bg-raised"} ${tappable ? "border border-gold" : ""}`}
       style={({ pressed }) => (pressed ? { backgroundColor: t.hairline } : undefined)}
     >
       <Text className={faceDown ? "text-label text-faint" : "text-label text-bone"}>{`${picked > 1 ? `${label} · ${picked}` : label}${marked}`}</Text>
@@ -89,12 +90,13 @@ function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight, t }: 
 
 export function TableCanvas({ store, width, height, nameOf, inactive, info, onTap, onPreview, highlight: marked }: TableCanvasProps) {
   const t = useTableTokens();
+  const s = useUiScale();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   // Peeking at the other seat: nothing is outlined or filled, and a tap only previews (use-table-choice.ts).
   const highlight = useStore(store, (state) => state.viewedSeat != null) ? NO_HIGHLIGHT : marked;
   const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight, t };
   return (
-    <ScrollView style={{ width, height, backgroundColor: t.felt }} contentContainerStyle={{ padding: 12 }}>
+    <ScrollView style={{ width, height, backgroundColor: t.felt }} contentContainerStyle={{ padding: 12 * s }}>
       {TABLE_ZONES.map((zone) => (
         <ZoneRow key={zone} zone={zone} {...rowProps} />
       ))}

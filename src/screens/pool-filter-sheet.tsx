@@ -16,6 +16,7 @@ import {
   type PoolCard,
   type PoolFilter,
 } from "./pool-filter";
+import { useUiScale } from "../play/ui-scale";
 
 type FilterRow = PoolCard & { typeName: string; sphereName: string | null };
 
@@ -154,7 +155,7 @@ function Chip({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      className="mb-2 mr-2 min-h-11 flex-row items-center gap-2 rounded-tile px-3"
+      className="mb-2 mr-2 min-h-touch flex-row items-center gap-2 rounded-tile px-3"
       style={selected ? { backgroundColor: palette.ink } : { borderWidth: 1, borderColor: palette.inkLine }}
     >
       {mark ? <SphereMark sphere={mark} /> : null}
@@ -164,6 +165,7 @@ function Chip({
 }
 
 function OptionRow({ label, detail, onPress, icon }: { label: string; detail: string; onPress: () => void; icon?: IconName }) {
+  const s = useUiScale();
   return (
     <Pressable
       accessibilityRole="button"
@@ -171,7 +173,7 @@ function OptionRow({ label, detail, onPress, icon }: { label: string; detail: st
       className="min-h-14 flex-row items-center justify-between border-b border-inkLine"
     >
       <View className="flex-row items-center gap-2">
-        {icon ? <GameIcon name={icon} size={16} tint="ink" /> : null}
+        {icon ? <GameIcon name={icon} size={16 * s} tint="ink" /> : null}
         <Text className="text-body text-ink">{label}</Text>
       </View>
       <Text className="ml-3 shrink text-label text-inkMuted" numberOfLines={1}>

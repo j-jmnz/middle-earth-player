@@ -41,4 +41,4 @@ config.server.enhanceMiddleware = (middleware, metroServer) => {
   };
 };
 
-module.exports = withNativeWind(config, { input: "./global.css" });
+module.exports = withNativeWind(config, { input: "./global.css", inlineRem: false });

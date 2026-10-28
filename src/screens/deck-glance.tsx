@@ -12,6 +12,7 @@ import { BodyText, Eyebrow, Label, ProgressBar, SphereMark, StatTile, ToggleChip
 import { costCurve, CURVE_LABELS, deckCardCount, DECK_MINIMUM, sphereSplit, type DeckFace } from "./deck-status";
 import type { HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
+import { touch, useUiScale } from "../play/ui-scale";
 
 export const BANNER_HEIGHT = 196;
 
@@ -53,6 +54,8 @@ export function DeckGlance({
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
+  const bannerHeight = BANNER_HEIGHT * s + top;
   const cardCount = deckCardCount(cards);
   const curve = costCurve(cards, faces);
   const curveTop = Math.max(1, ...curve.counts);
@@ -65,25 +68,25 @@ export function DeckGlance({
   return (
     <View>
       {banner ? (
-        <View style={{ height: BANNER_HEIGHT + top, flexDirection: "row", gap: 1, backgroundColor: palette.night }}>
+        <View style={{ height: bannerHeight, flexDirection: "row", gap: 1, backgroundColor: palette.night }}>
           {heroes.slice(0, 4).map((hero) => (
             <View key={hero.code} className="flex-1">
-              <CroppedArt card={hero} region={PAINTING} height={BANNER_HEIGHT + top} />
+              <CroppedArt card={hero} region={PAINTING} height={bannerHeight} />
             </View>
           ))}
           <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(0.35, t) }} />
           <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.3, 1, undefined, t) }} />
         </View>
       ) : (
-        <View style={{ height: top + 64 }} />
+        <View style={{ height: top + 64 * s }} />
       )}
-      <View style={{ ...side, marginTop: banner ? -64 : 0 }}>
+      <View style={{ ...side, marginTop: banner ? -64 * s : 0 }}>
         {/* Ready is the gold eyebrow; not ready is the rule in danger with its ring, as the deck list says it. */}
         {readiness.ready ? (
           <Eyebrow testID="deck-ready">{readiness.text}</Eyebrow>
         ) : (
           <View className="flex-row items-center gap-1.5">
-            <View style={{ width: 8, height: 8, borderRadius: 4, borderWidth: 1.5, borderColor: palette.danger }} />
+            <View style={{ width: 8 * s, height: 8 * s, borderRadius: 4 * s, borderWidth: 1.5, borderColor: palette.danger }} />
             <Text testID="deck-error" className="shrink text-label text-danger">{`Not ready to play: ${readiness.text}`}</Text>
           </View>
         )}
@@ -97,7 +100,7 @@ export function DeckGlance({
           selectTextOnFocus
           returnKeyType="done"
           className="mt-1 border-b border-hairline pb-1 font-display text-title text-bone"
-          style={{ minHeight: 44 }}
+          style={{ minHeight: touch(s, 44) }}
         />
         <View className="mt-3 flex-row gap-2">
           <StatTile label="Threat" value={threat == null ? "–" : String(threat)} icon="threat" iconTint="danger" />
@@ -129,7 +132,7 @@ export function DeckGlance({
           <View className="mt-2 h-14 flex-row items-end gap-1.5">
             {CURVE_LABELS.map((label, at) => (
               <View key={label} className="flex-1 items-center justify-end gap-1" style={{ height: "100%" }}>
-                <View className="w-full rounded-t" style={{ height: Math.max(2, Math.round((curve.counts[at] / curveTop) * 34)), backgroundColor: curve.counts[at] > 0 ? palette.goldDeep : palette.hairline }} />
+                <View className="w-full rounded-t" style={{ height: Math.max(2, Math.round((curve.counts[at] / curveTop) * 34 * s)), backgroundColor: curve.counts[at] > 0 ? palette.goldDeep : palette.hairline }} />
                 <Text className="text-micro text-faint">{label}</Text>
               </View>
             ))}

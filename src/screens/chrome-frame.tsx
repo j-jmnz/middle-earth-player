@@ -16,6 +16,7 @@ import { SheetFrame } from "../play/sheet-paper";
 import { nightFade, panelSurface, raisedEdgeOf, tileSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
+import { touch, useUiScale } from "../play/ui-scale";
 
 /**
  * Night page with a scene backdrop. Content is inset 24 and starts under the status bar; in landscape (the card and booklet
@@ -36,10 +37,11 @@ export function Screen({
   bleed?: boolean;
 }) {
   const insets = useSafeAreaInsets();
+  const s = useUiScale();
   return (
     <View testID={testID} collapsable={false} className="flex-1 bg-night">
       <Backdrop scene={scene} />
-      <View className={bleed ? "flex-1" : "flex-1 pt-safe"} style={inset && !bleed ? { paddingLeft: 24 + insets.left, paddingRight: 24 + insets.right } : undefined}>
+      <View className={bleed ? "flex-1" : "flex-1 pt-safe"} style={inset && !bleed ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right } : undefined}>
         {children}
       </View>
     </View>
@@ -51,13 +53,14 @@ export function Screen({
  * panel's corner ornaments (Corners) are not cut by the scroll edge.
  */
 export function ScreenScroll({ children, top = 0, bottom = 32, testID, scrollRef }: { children: ReactNode; top?: number; bottom?: number; testID?: string; scrollRef?: RefObject<ComponentRef<typeof ScrollView> | null> }) {
+  const s = useUiScale();
   return (
     <ScrollView
       ref={scrollRef}
       testID={testID}
       className="min-h-0 flex-1"
-      style={{ marginHorizontal: -8 }}
-      contentContainerStyle={{ paddingHorizontal: 8, paddingTop: top, paddingBottom: bottom }}
+      style={{ marginHorizontal: -8 * s }}
+      contentContainerStyle={{ paddingHorizontal: 8 * s, paddingTop: top * s, paddingBottom: bottom * s }}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
@@ -72,8 +75,9 @@ export function ScreenScroll({ children, top = 0, bottom = 32, testID, scrollRef
  */
 export function FloatingBarShade({ shown, top }: { shown: boolean; top: number }) {
   const palette = usePalette();
+  const s = useUiScale();
   if (!shown) return null;
-  return <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: top + 60, backgroundColor: withAlphaHex(palette.night, 0.94), borderBottomWidth: 1, borderBottomColor: palette.hairline }} />;
+  return <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: top + 60 * s, backgroundColor: withAlphaHex(palette.night, 0.94), borderBottomWidth: 1, borderBottomColor: palette.hairline }} />;
 }
 
 /**
@@ -98,6 +102,7 @@ export function NavBar({
   // Over a picture: the buttons take a night disc.
   overlay?: boolean;
 }) {
+  const s = useUiScale();
   return (
     // box-none: floating over a scrolling page, the bar takes only its buttons' touches, so the rows under its empty middle stay live.
     <View pointerEvents="box-none" className="min-h-14 flex-row items-center justify-between gap-3 py-1">
@@ -116,7 +121,7 @@ export function NavBar({
       ) : (
         <View className="flex-1" />
       )}
-      {right ?? <View style={{ width: 44 }} />}
+      {right ?? <View style={{ width: touch(s, 44) }} />}
     </View>
   );
 }
@@ -217,11 +222,12 @@ export function Panel({
 /** A number the player watches, on a small lit tile: its word above, its icon and value in engraved figures. */
 export function StatTile({ label, value, icon, iconTint = "bone", detail, children, testID }: { label: string; value: string; icon?: IconName; iconTint?: "bone" | "danger" | "gold"; detail?: string; children?: ReactNode; testID?: string }) {
   const t = useTableTokens();
+  const s = useUiScale();
   return (
     <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 rounded-tile px-3 py-2.5" style={tileSurface(false, t)}>
       <Text className="text-label text-muted">{label}</Text>
       <View className="flex-row items-center gap-1.5">
-        {icon ? <GameIcon name={icon} size={16} tint={iconTint} /> : null}
+        {icon ? <GameIcon name={icon} size={16 * s} tint={iconTint} /> : null}
         <Text className="font-display-bold text-title text-bone">{value}</Text>
         {detail ? <Text className="text-label text-muted">{detail}</Text> : null}
       </View>
@@ -238,10 +244,11 @@ export function ActionBar({ children, safe = true, testID }: { children: ReactNo
   const palette = usePalette();
   const t = useTableTokens();
   const insets = useSafeAreaInsets();
+  const s = useUiScale();
   return (
-    <View testID={testID} collapsable={false} className="pt-3" style={{ paddingBottom: safe ? Math.max(insets.bottom, 12) : 12 }}>
-      <View pointerEvents="none" style={{ position: "absolute", left: -24, right: -24, top: -24, height: 24, ...nightFade(0, 1, undefined, t) }} />
-      <View pointerEvents="none" style={{ position: "absolute", left: -24, right: -24, top: 0, bottom: 0, backgroundColor: palette.night }} />
+    <View testID={testID} collapsable={false} className="pt-3" style={{ paddingBottom: safe ? Math.max(insets.bottom, 12 * s) : 12 * s }}>
+      <View pointerEvents="none" style={{ position: "absolute", left: -24 * s, right: -24 * s, top: -24 * s, height: 24 * s, ...nightFade(0, 1, undefined, t) }} />
+      <View pointerEvents="none" style={{ position: "absolute", left: -24 * s, right: -24 * s, top: 0, bottom: 0, backgroundColor: palette.night }} />
       {children}
     </View>
   );
@@ -267,13 +274,14 @@ export function PaperSheet({ step, title, children }: { step: string; title: str
  */
 export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario: string; testID: string }) {
   const palette = usePalette();
+  const s = useUiScale();
   return (
     <>
       <Text
         testID={testID}
         accessibilityRole="header"
         className={`text-center font-display-bold ${won ? "text-goldHigh" : "text-danger"}`}
-        style={{ fontSize: 44, lineHeight: 52, letterSpacing: 4, textShadowColor: won ? palette.gold : withAlphaHex(palette.threat, 0.6), textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
+        style={{ fontSize: 44 * s, lineHeight: 52 * s, letterSpacing: 4 * s, textShadowColor: won ? palette.gold : withAlphaHex(palette.threat, 0.6), textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
       >
         {won ? "Victory" : "Defeat"}
       </Text>

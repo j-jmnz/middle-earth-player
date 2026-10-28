@@ -9,6 +9,7 @@ import { MOTION } from "./motion-tokens.ts";
 import { useOpenMotion } from "./motion-run.ts";
 import { raisedEdgeOf } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
+import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 const RISE = 16;
@@ -41,8 +42,9 @@ export function TrayFrame({
   children: ReactNode;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const { progress, leaving } = useOpenMotion(open, MOTION.trayEnter, MOTION.trayLeave);
-  const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE }] }));
+  const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE * s }] }));
   if (!open && !leaving) return null;
   const paper = surface === "paper";
   return (
@@ -60,11 +62,11 @@ export function TrayFrame({
           ...(place.maxHeight != null ? { maxHeight: place.maxHeight } : {}),
           backgroundColor: paper ? t.paper : t.raised,
           boxShadow: paper ? `0 10px 28px ${withAlphaHex(t.night, 0.6)}` : `${raisedEdgeOf(t)}, 0 -10px 24px -8px ${withAlphaHex(t.night, 0.6)}`,
-          borderRadius: RADIUS,
+          borderRadius: RADIUS * s,
           ...(joined ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}),
-          paddingHorizontal: 12,
-          paddingTop: 10,
-          paddingBottom: joined ? 4 : 8,
+          paddingHorizontal: 12 * s,
+          paddingTop: 10 * s,
+          paddingBottom: (joined ? 4 : 8) * s,
           overflow: "hidden",
         },
         motion,

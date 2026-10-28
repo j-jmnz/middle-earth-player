@@ -3,17 +3,19 @@
 import { Text, View } from "react-native";
 
 import { lossSentence, type NotApplied } from "./not-applied.ts";
+import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 export function NotAppliedView({ notApplied, tone = "night", testID = "card-not-applied" }: { notApplied: NotApplied; tone?: "night" | "paper"; testID?: string }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const paper = tone === "paper";
   return (
     <View testID={testID} accessible accessibilityLabel={`Not applied. ${lossSentence(notApplied.loss)} ${notApplied.lines.map((line) => line.text).join(" ")}`} className="gap-1.5">
       <Text className={`font-display-bold text-eyebrow uppercase ${paper ? "text-inkLabel" : "text-muted"}`}>Not applied</Text>
       <Text className={`text-label ${paper ? "text-inkMuted" : "text-muted"}`}>{lossSentence(notApplied.loss)}</Text>
       {notApplied.lines.map((line, index) => (
-        <View key={line.id ?? index} style={{ borderLeftWidth: 2, borderColor: paper ? t.inkLine : t.hairline, paddingLeft: 8 }}>
+        <View key={line.id ?? index} style={{ borderLeftWidth: 2 * s, borderColor: paper ? t.inkLine : t.hairline, paddingLeft: 8 * s }}>
           <Text className={`text-body ${paper ? "text-inkMuted" : "text-muted"}`}>{line.text}</Text>
         </View>
       ))}

@@ -3,6 +3,7 @@
 // space the dials leave over. The rail never truncates the pill: its floor is the widest pill, counted from the pill's own words
 // ("Round 99 · ENCOUNTER", the longest step name) at its type sizes plus its chrome. Pure, so a test reads it.
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
+import { touch } from "./ui-scale.ts";
 
 // The bar's height: the 40 pt dial with 6 pt above and below, so its pop (1.22) and the peek's bone ring stay on the screen and the
 // dials clear the canvas under them (user request, 2026-10-27; it was 44, which left the dial 2 pt from either edge).
@@ -81,19 +82,24 @@ export type BarZones = {
  * `bar` is the bar's width inside the side insets; `dials` the natural width of the dials (0 until measured). While the dials
  * fit, both sides are equal, so the rail is centered on the bar. When they are too wide for that (two seats with Life and the
  * Burden deck on a small phone), the left grows at the rail's expense, down to the rail's floor: the rail then sits off center.
- * If the dials still do not fit, the rail wins and the left zone scrolls.
+ * If the dials still do not fit, the rail wins and the left zone scrolls. At a UI `scale` the widths come in and go out in screen
+ * points, and the arithmetic is the Medium one in logical points.
  */
-export function barZones(bar: number, dials: number): BarZones {
-  const need = Math.max(MENU_BUTTON, Math.ceil(dials)) + GAP;
-  const rail = Math.max(RAIL_FLOOR, Math.min(RAIL_MAX, bar - 2 * need));
-  const even = Math.max(0, Math.floor((bar - rail) / 2));
-  if (even >= need) return { left: even, rail, right: even, scroll: false };
-  const right = MENU_BUTTON + GAP;
-  const left = Math.max(0, Math.min(need, bar - RAIL_FLOOR - right));
-  return { left, rail: Math.max(0, bar - left - right), right, scroll: Math.ceil(dials) > left };
+export function barZones(bar: number, dials: number, scale = 1): BarZones {
+  // The bar is worked out in logical points (the sizes above, at Medium) and drawn at `scale`; the menu button keeps its 44 pt floor.
+  const menu = touch(scale, MENU_BUTTON) / scale;
+  const room = bar / scale;
+  const natural = dials / scale;
+  const need = Math.max(menu, Math.ceil(natural)) + GAP;
+  const rail = Math.max(RAIL_FLOOR, Math.min(RAIL_MAX, room - 2 * need));
+  const even = Math.max(0, Math.floor((room - rail) / 2));
+  if (even >= need) return { left: even * scale, rail: rail * scale, right: even * scale, scroll: false };
+  const right = menu + GAP;
+  const left = Math.max(0, Math.min(need, room - RAIL_FLOOR - right));
+  return { left: left * scale, rail: Math.max(0, room - left - right) * scale, right: right * scale, scroll: Math.ceil(natural) > left };
 }
 
 /** The pill shows the neighbor phases only when it has room, and the phone is 760 pt or wider inside the insets. */
-export function railWide(rail: number, narrowScreen: boolean): boolean {
-  return !narrowScreen && rail >= RAIL_WIDE;
+export function railWide(rail: number, narrowScreen: boolean, scale = 1): boolean {
+  return !narrowScreen && rail / scale >= RAIL_WIDE;
 }

@@ -16,6 +16,7 @@ import { useCachedImage } from "../../images/store";
 import { goBack } from "../../go-back";
 import { useListPreview } from "../../list-preview";
 import type { PictureSource } from "../../../play/table-canvas-types";
+import { useUiScale } from "../../../play/ui-scale";
 
 type PackCard = {
   code: string;
@@ -36,6 +37,7 @@ function onViewableItemsChanged({ viewableItems }: { viewableItems: { item: Pack
 }
 
 function PackCardRow({ item, onPress, onPreview }: { item: PackCard; onPress: () => void; onPreview: (code: string, name: string, source: PictureSource | null) => void }) {
+  const s = useUiScale();
   const cached = useCachedImage(item.code);
   const { source } = shownCardImage({
     cached,
@@ -50,8 +52,8 @@ function PackCardRow({ item, onPress, onPreview }: { item: PackCard; onPress: ()
       label={item.name}
       detail={item.code}
       leading={
-        <View className="overflow-hidden rounded bg-raised" style={{ width: 32, height: 44 }}>
-          {preview ? <RowCardImage code={item.code} source={preview} /> : null}
+        <View className="overflow-hidden rounded bg-raised" style={{ width: 32 * s, height: 44 * s }}>
+          {preview ? <RowCardImage code={item.code} source={preview} width={32 * s} height={44 * s} /> : null}
         </View>
       }
       onPress={onPress}

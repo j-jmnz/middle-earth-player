@@ -11,6 +11,7 @@ import { CardThumbFrame, RowCardImage, useCardPreview } from "./images/picture";
 import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
 import { usePalette } from "./palette-hook";
+import { useUiScale } from "../play/ui-scale";
 import { poolDetail, type PoolCard } from "./pool-filter";
 
 export type PoolRowCard = PoolCard & {
@@ -51,6 +52,7 @@ export const PoolCardRow = memo(function PoolCardRow({
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
   const picture = useCardPreview(item.code, item.imagesrc);
+  const s = useUiScale();
   const card = { code: item.code, name: item.name, typeCode: item.typeCode, deckLimit: item.deckLimit };
   return (
     <ListRow
@@ -58,7 +60,7 @@ export const PoolCardRow = memo(function PoolCardRow({
       label={item.name}
       detail={loss ? `${poolDetail(item)} · ${loss}` : poolDetail(item)}
       detailIcons={<RowIcons sphere={item.sphereCode} />}
-      leading={<CardThumbFrame code={item.code} source={picture} width={thumb.width} height={thumb.height} />}
+      leading={<CardThumbFrame code={item.code} source={picture} width={thumb.width * s} height={thumb.height * s} />}
       onPress={() => onOpen(item.code)}
       onLongPress={() => onPreview(item.code, item.name, picture)}
       trailing={
@@ -107,11 +109,12 @@ export const PoolCardCell = memo(function PoolCardCell({
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
   const palette = usePalette();
+  const s = useUiScale();
   const picture = useCardPreview(item.code, item.imagesrc);
   const card = { code: item.code, name: item.name, typeCode: item.typeCode, deckLimit: item.deckLimit };
   const height = Math.round(width * CARD_RATIO);
   return (
-    <View style={{ width, marginLeft: offset, marginBottom: 14 }}>
+    <View style={{ width, marginLeft: offset, marginBottom: 14 * s }}>
       <Pressable
         testID={`card-${item.code}`}
         collapsable={false}

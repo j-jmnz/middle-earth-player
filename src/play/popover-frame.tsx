@@ -14,9 +14,11 @@ import { MOTION, ms } from "./motion-tokens.ts";
 import { Chevron } from "./phase-rail.tsx";
 import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 export type PressableRef = ComponentRef<typeof Pressable>;
+// Medium's sizes; the popover draws them times the UI scale (ui-scale.ts), its rows never under 44 pt.
 const ROW = 48;
 const FROM_SCALE = 0.96;
 // The frame's inner padding: rows sit this far inside its edge, so their pressed fill is a rounded plate of its own.
@@ -37,6 +39,8 @@ export type PopoverRowItem = {
 /** One 48 pt row of a popover: a rounded plate inside the frame's padding that fills when pressed. */
 export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; onPress: () => void; rowRef?: RefObject<PressableRef | null> }) {
   const t = useTableTokens();
+  const s = useUiScale();
+  const row = touch(s, ROW);
   return (
     <Pressable
       ref={rowRef}
@@ -46,22 +50,22 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
       accessibilityLabel={item.accessibilityLabel ?? item.label}
       accessibilityHint={item.accessibilityHint}
       onPress={onPress}
-      style={{ minHeight: ROW }}
+      style={{ minHeight: row }}
     >
       {({ pressed }) => (
         <View
           style={{
-            minHeight: ROW,
+            minHeight: row,
             flexDirection: "row",
             alignItems: "center",
-            gap: 10,
-            paddingHorizontal: 10,
-            borderRadius: 10,
+            gap: 10 * s,
+            paddingHorizontal: 10 * s,
+            borderRadius: 10 * s,
             backgroundColor: pressed ? t.pressed : "transparent",
           }}
         >
-          {item.icon ? <GameIcon name={item.icon} size={18} tint="bone" /> : null}
-          {item.glyph === "leave" ? <LeaveMark color={t.muted} /> : null}
+          {item.icon ? <GameIcon name={item.icon} size={18 * s} tint="bone" /> : null}
+          {item.glyph === "leave" ? <LeaveMark color={t.muted} s={s} /> : null}
           <Text className="flex-1 text-body font-medium" style={{ color: t.bone, minWidth: 0 }} numberOfLines={1}>
             {item.label}
           </Text>
@@ -73,12 +77,12 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
 }
 
 /** A door with an arrow leaving it, 18 pt, drawn as views (no printed icon fits): the frame open at its right, the arrow out through it. */
-function LeaveMark({ color }: { color: string }) {
+function LeaveMark({ color, s }: { color: string; s: number }) {
   return (
-    <View accessible={false} importantForAccessibility="no-hide-descendants" style={{ width: 18, height: 18 }}>
-      <View style={{ position: "absolute", left: 1, top: 2, width: 9, height: 14, borderWidth: 1.5, borderRightWidth: 0, borderColor: color, borderTopLeftRadius: 2, borderBottomLeftRadius: 2 }} />
-      <View style={{ position: "absolute", left: 6, top: 8.25, width: 10, height: 1.5, backgroundColor: color }} />
-      <View style={{ position: "absolute", left: 10, top: 6, width: 6, height: 6, borderTopWidth: 1.5, borderRightWidth: 1.5, borderColor: color, transform: [{ rotate: "45deg" }] }} />
+    <View accessible={false} importantForAccessibility="no-hide-descendants" style={{ width: 18 * s, height: 18 * s }}>
+      <View style={{ position: "absolute", left: 1 * s, top: 2 * s, width: 9 * s, height: 14 * s, borderWidth: 1.5 * s, borderRightWidth: 0, borderColor: color, borderTopLeftRadius: 2 * s, borderBottomLeftRadius: 2 * s }} />
+      <View style={{ position: "absolute", left: 6 * s, top: 8.25 * s, width: 10 * s, height: 1.5 * s, backgroundColor: color }} />
+      <View style={{ position: "absolute", left: 10 * s, top: 6 * s, width: 6 * s, height: 6 * s, borderTopWidth: 1.5 * s, borderRightWidth: 1.5 * s, borderColor: color, transform: [{ rotate: "45deg" }] }} />
     </View>
   );
 }
@@ -86,7 +90,8 @@ function LeaveMark({ color }: { color: string }) {
 /** A hairline between groups of rows. */
 export function PopoverDivider() {
   const t = useTableTokens();
-  return <View style={{ height: 1, marginVertical: 4, marginHorizontal: 10, backgroundColor: t.hairline }} />;
+  const s = useUiScale();
+  return <View style={{ height: 1, marginVertical: 4 * s, marginHorizontal: 10 * s, backgroundColor: t.hairline }} />;
 }
 
 /**
@@ -120,6 +125,7 @@ export function PopoverFrame({
   const fallback = useRef<PressableRef>(null);
   const first = focusRef ?? fallback;
   const t = useTableTokens();
+  const s = useUiScale();
   useEffect(() => {
     if (!open) return;
     const timer = setTimeout(() => {
@@ -151,8 +157,8 @@ export function PopoverFrame({
             position: "absolute",
             ...place,
             width,
-            padding: PAD,
-            borderRadius: 16, // rounded-card
+            padding: PAD * s,
+            borderRadius: 16 * s, // rounded-card
             ...tileSurface(false, t),
             boxShadow: `${raisedEdgeOf(t)}, 0 12px 32px ${withAlphaHex(t.night, 0.65)}, 0 2px 6px ${withAlphaHex(t.night, 0.4)}`,
             transformOrigin: origin,

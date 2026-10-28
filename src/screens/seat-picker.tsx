@@ -16,6 +16,7 @@ import { DeckListBar } from "./deck-list-bar";
 import { deckCountLine, notAppliedCards, notAppliedLine } from "./deck-status";
 import { DeckCover, DeckRow, EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
+import { useUiScale } from "../play/ui-scale";
 
 const COVER_HEIGHT = 112;
 const TOOL_HEIGHT = 128;
@@ -56,6 +57,7 @@ export function SeatPicker({
   nameOf: (code: string) => string;
 }) {
   const palette = usePalette();
+  const s = useUiScale();
   const t = useTableTokens();
   const router = useRouter();
   const view = useDeckListView();
@@ -137,7 +139,7 @@ export function SeatPicker({
                 </DeckRow>
               ) : (
                 <View key={deck.id} className="pb-3">
-                  <DeckCover {...summary} height={COVER_HEIGHT}>
+                  <DeckCover {...summary} height={COVER_HEIGHT * s}>
                     {open}
                   </DeckCover>
                 </View>
@@ -165,14 +167,14 @@ export function SeatPicker({
           </View>
           <View className="mt-3.5 flex-row gap-2">
             {heroes.map((code) => (
-              <HeroTile key={code} hero={faceOf(code)} height={TOOL_HEIGHT} dense ringBearer={!slot && carries(code)} />
+              <HeroTile key={code} hero={faceOf(code)} height={TOOL_HEIGHT * s} dense ringBearer={!slot && carries(code)} />
             ))}
             {slot ? (
               ringBearer ? (
-                <HeroTile hero={faceOf(ringBearer)} height={TOOL_HEIGHT} dense ringBearer onRemove={() => onRingBearer(null)} />
+                <HeroTile hero={faceOf(ringBearer)} height={TOOL_HEIGHT * s} dense ringBearer onRemove={() => onRingBearer(null)} />
               ) : (
                 <View testID="ringbearer-slot" className="flex-1">
-                  <EmptyHeroSlot height={TOOL_HEIGHT} label="Ring-bearer" />
+                  <EmptyHeroSlot height={TOOL_HEIGHT * s} label="Ring-bearer" />
                 </View>
               )
             ) : null}

@@ -7,7 +7,7 @@ import { AccessibilityInfo, Pressable, ScrollView, Text, useWindowDimensions, Vi
 import Animated, { FadeInUp, FadeOut, useReducedMotion } from "react-native-reanimated";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
-import { DENSE_BELOW, labelChars, PILL_PT, planWords, wordsWindow } from "./dock-budget.ts";
+import { isDense, labelChars, PILL_PT, planWords, wordsWindow } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
@@ -19,6 +19,7 @@ import type { Dock, DockButton } from "./table-choice.ts";
 import { LineMark } from "./table-chrome.tsx";
 import { panelSurface, raisedEdgeOf } from "./surfaces.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 /** The engine's numbers for the moment, large, and what they come to: on a sunk band in the dock (no drawn edge), ink on a paper panel. */
@@ -107,18 +108,20 @@ export function TableDock({
   onBlock?: (top: number) => void;
 }) {
   const t = useTableTokens();
+  // The UI scale (ui-scale.ts): the dock's padding and budget are Medium's sizes times it.
+  const s = useUiScale();
   const dockShadow = dockShadowOf(t);
   const block = useRef<ComponentRef<typeof View>>(null);
   const pillRef = useRef<ComponentRef<typeof View>>(null);
   const [room, setRoom] = useState({ column: 0, block: 0, text: 198 });
   const measure = () => block.current?.measureInWindow((_x, y) => onBlock?.(Math.round(y)));
   // The folded line is one line on a short phone (under DENSE_BELOW tall, as the choice tray's dense tiles) and two on a taller one.
-  const dense = useWindowDimensions().height < DENSE_BELOW;
-  const lines = dockLines({ guide, note, unavailable, chars: (dense ? 1 : 2) * labelChars(room.text - PILL_PT) });
+  const dense = isDense(useWindowDimensions().height, s);
+  const lines = dockLines({ guide, note, unavailable, chars: (dense ? 1 : 2) * labelChars(room.text - PILL_PT * s, s) });
   // The words' window (budget in dock-budget.ts): the title keeps the lines that fit under the step and the folded line, and the
   // rest of it waits behind the "i", which sits on the title row when the room cannot hold a folded line.
-  const space = room.column > 0 ? wordsWindow({ room: room.column, block: room.block, dense }) : Infinity;
-  const plan = planWords({ space, dense, title, textWidth: room.text, hasLine: lines.first != null, foldable: lines.foldable });
+  const space = room.column > 0 ? wordsWindow({ room: room.column, block: room.block, dense }, s) : Infinity;
+  const plan = planWords({ space, dense, title, textWidth: room.text, hasLine: lines.first != null, foldable: lines.foldable }, s);
   const pill = plan.pill ? (
     // The "i" pill (`dock-more`) opens the full title and every line; the More pill (`dock-more-actions`) folds the quiet
     // buttons. 24 pt with a 44 pt target that stays clear of the line's words (6 pt gap) and inside the dock's padding.
@@ -128,7 +131,7 @@ export function TableDock({
       collapsable={false}
       accessibilityRole="button"
       accessibilityLabel="More about this moment"
-      hitSlop={{ top: 10, bottom: 10, left: 6, right: 12 }}
+      hitSlop={{ top: touchSlop(s, 24 * s), bottom: touchSlop(s, 24 * s), left: 6 * s, right: 12 * s }}
       onPress={() => pillRef.current?.measureInWindow((_x, y) => onLines?.(Math.round(y)))}
     >
       <View className="h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(t.bone, 0.1) }}>
@@ -149,8 +152,8 @@ export function TableDock({
         style={{
           backgroundColor: t.raised,
           boxShadow: trayOpen ? dockShadow : `${raisedEdgeOf(t)}, ${dockShadow}`,
-          paddingTop: trayOpen ? 0 : dense ? DENSE_PAD : TOP_PAD,
-          paddingBottom: dense ? DENSE_PAD : FOOT_PAD,
+          paddingTop: trayOpen ? 0 : (dense ? DENSE_PAD : TOP_PAD) * s,
+          paddingBottom: (dense ? DENSE_PAD : FOOT_PAD) * s,
           ...(trayOpen ? { borderTopLeftRadius: 0, borderTopRightRadius: 0 } : {}),
           flexShrink: 1,
         }}
@@ -159,7 +162,7 @@ export function TableDock({
             readout, the armed line and every button are pinned to the dock's foot and never scroll away. */}
         {trayOpen ? null : (
           <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
-            <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: dense ? 2 : 8 }}>
+            <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: (dense ? 2 : 8) * s }}>
               <Text testID="sheet-step" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
                 {step}
               </Text>
@@ -189,7 +192,7 @@ export function TableDock({
             measure();
           }}
           className={dense ? "gap-0.5" : "gap-1"}
-          style={{ flexShrink: 0, paddingTop: trayOpen ? (dense ? DENSE_PAD : TOP_PAD) : 0 }}
+          style={{ flexShrink: 0, paddingTop: trayOpen ? (dense ? DENSE_PAD : TOP_PAD) * s : 0 }}
         >
           {readout ? <ReadoutView readout={readout} tight={dense} oneLine={readoutLine} /> : null}
           {refusal ? (
@@ -197,7 +200,7 @@ export function TableDock({
               {refusal}
             </Text>
           ) : null}
-          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} dense={dense} chars={labelChars(room.text)} onButton={onButton} />
+          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} dense={dense} chars={labelChars(room.text, s)} onButton={onButton} />
         </View>
       </View>
     </View>
@@ -213,6 +216,7 @@ const BANNER_WIDTH = 440;
  */
 export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; top: number; width: number; onBeat?: (cards: readonly string[]) => void }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const edge = moment.tone === "good" ? t.gold : moment.tone === "bad" ? t.threat : t.faint;
   const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
@@ -236,24 +240,24 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
     onBeat?.(beatKey === "" ? [] : beatKey.split(","));
     return () => onBeat?.([]);
   }, [beatKey, onBeat]);
-  const box = { minWidth: Math.min(260, width - 32), maxWidth: Math.min(BANNER_WIDTH, width - 32) };
+  const box = { minWidth: Math.min(260 * s, width - 32), maxWidth: Math.min(BANNER_WIDTH * s, width - 32) };
   return (
     <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="none" style={{ position: "absolute", top, left: 0, right: 0, alignItems: "center" }}>
       {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
       <View
         className="rounded-card"
-        style={{ ...box, ...panelSurface(false, t), opacity: 0.97, shadowColor: t.night, shadowOpacity: 0.9, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 10 }}
+        style={{ ...box, ...panelSurface(false, t), opacity: 0.97, shadowColor: t.night, shadowOpacity: 0.9, shadowRadius: 14 * s, shadowOffset: { width: 0, height: 4 * s }, elevation: 10 }}
       >
         <View testID="moment" accessible accessibilityLabel={label} className="overflow-hidden rounded-card" style={{ borderWidth: 1, borderColor: edge }}>
           {/* The tone, as a band along the top: gold for a success, threat red for a failure or an engagement. */}
-          <View style={{ height: 3, backgroundColor: edge }} />
+          <View style={{ height: 3 * s, backgroundColor: edge }} />
           <View className="items-center px-4 pb-2 pt-1.5">
-            <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 }}>
+            <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 * s }}>
               {moment.title}
             </Text>
             {moment.lines.slice(0, shownLines).map((line, index) => (
               <Animated.View key={index} entering={fade.enter} className="mt-0.5 flex-row items-center gap-2">
-                <LineMark mark={line.mark} tint="bone" size={14} />
+                <LineMark mark={line.mark} tint="bone" size={14 * s} />
                 <Text className="shrink text-label text-bone">{line.text}</Text>
               </Animated.View>
             ))}

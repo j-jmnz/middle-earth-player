@@ -16,6 +16,7 @@ import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useCardPreview } from "./images/picture";
 import { usePalette } from "./palette-hook";
+import { useUiScale } from "../play/ui-scale";
 
 export type ArtCard = { code: string; imagesrc: string | null };
 
@@ -78,9 +79,10 @@ export function CroppedArt({
   );
 }
 
-/** A hero's face in a gold ring. The name is the caller's to say; the portrait is not read. */
-export function Portrait({ card, size = 40, ring = true }: { card: ArtCard | null; size?: number; ring?: boolean }) {
+/** A hero's face in a gold ring. The name is the caller's to say; the portrait is not read. `size` is the Medium size; it is scaled here. */
+export function Portrait({ card, size: base = 40, ring = true }: { card: ArtCard | null; size?: number; ring?: boolean }) {
   const palette = usePalette();
+  const size = base * useUiScale();
   return (
     <View
       importantForAccessibility="no-hide-descendants"
@@ -98,13 +100,14 @@ export function Portrait({ card, size = 40, ring = true }: { card: ArtCard | nul
 }
 
 /** A row of overlapping portraits: a fellowship at a glance. */
-export function PortraitRow({ heroes, size = 40 }: { heroes: readonly ArtCard[]; size?: number }) {
+export function PortraitRow({ heroes, size: base = 40 }: { heroes: readonly ArtCard[]; size?: number }) {
   const palette = usePalette();
+  const size = base * useUiScale();
   return (
     <View className="flex-row" importantForAccessibility="no-hide-descendants">
       {heroes.map((hero, index) => (
         <View key={`${hero.code}:${index}`} style={{ marginLeft: index === 0 ? 0 : -size * 0.3, borderRadius: size / 2, borderWidth: 2, borderColor: palette.night }}>
-          <Portrait card={hero} size={size} />
+          <Portrait card={hero} size={base} />
         </View>
       ))}
     </View>
@@ -183,14 +186,15 @@ export function SceneCard({
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
   return (
     <View className={hero ? "rounded-hero" : "rounded-card"} style={{ ...panelSurface(pressed, t), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdgeOf(t) }}>
       <View className={`overflow-hidden ${hero ? "rounded-t-hero" : "rounded-t-card"}`}>
-        <SceneArt scenarioId={scenarioId} height={sceneHeight} shade={0.4} fade={0.4} fadeTo={palette.raised}>
+        <SceneArt scenarioId={scenarioId} height={sceneHeight * s} shade={0.4} fade={0.4} fadeTo={palette.raised}>
           {over}
         </SceneArt>
       </View>
-      <View style={{ marginTop: -pullUp }}>{children}</View>
+      <View style={{ marginTop: -pullUp * s }}>{children}</View>
       <Corners />
     </View>
   );

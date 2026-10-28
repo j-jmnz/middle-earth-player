@@ -45,6 +45,8 @@ import { scanAssets } from "./images/scan-map";
 import { cachedImage, useImageSnapshot } from "./images/store";
 import type { World } from "../campaign/world";
 import type { CardFacts } from "./open-game";
+import { commandWidth as commandWidthOf } from "./table-command";
+import { useUiScale } from "../play/ui-scale";
 
 function picture(code: string): PictureSource | null {
   const cached = cachedImage(code);
@@ -69,6 +71,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const screen = useWindowDimensions();
+  const s = useUiScale();
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   const images = useImageSnapshot();
   const game = useStore(store, (state) => state.game);
@@ -211,8 +214,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const widgets = widgetReadouts(game);
   const tokens = campaignTokens(game, ctx.effects, nameOf);
   const held = heldDial(game, nameOf);
-  const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
-  const narrow = screen.width - insets.left - insets.right < 760;
+  const commandWidth = commandWidthOf(screen.width, s);
+  const narrow = (screen.width - insets.left - insets.right) / s < 760;
   const previewed = preview
     ? previewCards(
         game,
@@ -281,7 +284,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               />
             ) : null}
           </View>
-          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8) }}>
+          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8 * s) }}>
             <TableDock
               step={choice.header.step}
               title={choice.header.title}
@@ -316,13 +319,13 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         logNames={logNames}
         screen={screen}
         insets={insets}
-        barBottom={insets.top + TOP_BAR}
+        barBottom={insets.top + TOP_BAR * s}
         commandWidth={commandWidth}
         anchorTop={anchor}
         onPreview={onPreview}
       />
       {/* Over the table and any open panel, centered on the screen under the top bar. */}
-      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + TOP_BAR + 6 + (peek.words ? PEEK_ROOM : 0)} width={screen.width} onBeat={choice.onBeat} /> : null}
+      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + (TOP_BAR + 6 + (peek.words ? PEEK_ROOM : 0)) * s} width={screen.width} onBeat={choice.onBeat} /> : null}
       {preview && previewed && shown ? (
         <CardPreview
           key={preview.id}
@@ -335,7 +338,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
-      <TableMenu open={menuOpen} nav={nav} top={insets.top + TOP_BAR} right={insets.right + 8} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
+      <TableMenu open={menuOpen} nav={nav} top={insets.top + TOP_BAR * s} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );

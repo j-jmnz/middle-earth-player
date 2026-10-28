@@ -19,6 +19,7 @@ import { gridCardWidth, gridOffset } from "./pool-grid";
 import { activeFilterCount, cycleGroups, emptyPoolFilter, filterPool, sortPool, type PoolFilter } from "./pool-filter";
 import { PoolFilterSheet, typeChoices } from "./pool-filter-sheet";
 import { ToastView } from "./toast-view";
+import { useUiScale } from "../play/ui-scale";
 
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
@@ -66,7 +67,7 @@ function TypeChips({
         accessibilityState={{ checked: applied }}
         accessibilityLabel="Applied only: cards whose text the app applies"
         onPress={() => onApplied(!applied)}
-        className="min-h-11 justify-center"
+        className="min-h-touch justify-center"
       >
         <View className="h-9 justify-center rounded-tile px-3" style={{ borderWidth: 1, borderColor: applied ? palette.gold : palette.hairline }}>
           <Text className={applied ? "text-label font-semibold text-gold" : "text-label text-muted"}>{applied ? "✓ Applied only" : "Applied only"}</Text>
@@ -107,7 +108,8 @@ export function CardPool({
   // The grid's cards share the list's measured width: three across to browse, two while adding so each card's stepper fits under it.
   const columns = adding ? 2 : 3;
   const [listWidth, setListWidth] = useState(0);
-  const cellWidth = gridCardWidth(listWidth, columns);
+  const scale = useUiScale();
+  const cellWidth = gridCardWidth(listWidth, columns, scale);
   // Sorted in memory: a printing's tag ("(MotK) Aragorn") files under the name.
   const [rows] = useState(() =>
     sortPool(
@@ -186,7 +188,7 @@ export function CardPool({
         <PoolCardCell
           item={item}
           width={cellWidth}
-          offset={gridOffset(index, columns)}
+          offset={gridOffset(index, columns, scale)}
           adding={adding}
           loss={loss}
           count={count}
@@ -197,7 +199,7 @@ export function CardPool({
         />
       );
     },
-    [grid, cellWidth, columns, adding, inactiveCodes, draft, lookup, openCard, previewCard],
+    [grid, cellWidth, columns, scale, adding, inactiveCodes, draft, lookup, openCard, previewCard],
   );
 
   function openSheet(): void {

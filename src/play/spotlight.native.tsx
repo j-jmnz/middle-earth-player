@@ -22,8 +22,9 @@ type Common = {
   backs: BackImages;
   fonts: Fonts;
   spotFonts: SpotFonts;
-  // The theme's tokens, from the canvas root.
+  // The theme's tokens, and the UI scale (ui-scale.ts), from the canvas root.
   t: TableTokens;
+  s: number;
   nameOf: (code: string) => string;
   sphereOf: (code: string) => IconName | null;
   k: number;
@@ -31,7 +32,7 @@ type Common = {
 
 // Attack `index` of `total`, in its own window of the run: it draws only inside it, so the next one waits its turn (and swaps in as it leaves).
 function ClashView({ plan, index, total, now, ...common }: Common & { plan: ClashPlan; index: number; total: number; now: SharedValue<number> }) {
-  const { k, images, tokens, backs, fonts, nameOf, sphereOf, t } = common;
+  const { k, images, tokens, backs, fonts, nameOf, sphereOf, t, s } = common;
   const { pill, count, word } = common.spotFonts;
   const { stage, shape, clash } = plan;
   const run = windowOf(index, total, k);
@@ -40,7 +41,7 @@ function ClashView({ plan, index, total, now, ...common }: Common & { plan: Clas
   const inWindow = useDerivedValue(() => (local.get() >= 0 && local.get() < run.length ? frame.get().fade : 0));
   const picture = (spot: { code: string }) => images.get(spot.code) ?? null;
   const card = (spot: ClashPlan["target"], rect: ClashPlan["stage"]["target"], faceDown = false) => (
-    <StageCard spot={spot} rect={rect} image={picture(spot)} name={nameOf(spot.code)} sphere={sphereOf(spot.code)} fonts={fonts} backs={backs} t={t} faceDown={faceDown} />
+    <StageCard spot={spot} rect={rect} image={picture(spot)} name={nameOf(spot.code)} sphere={sphereOf(spot.code)} fonts={fonts} backs={backs} t={t} s={s} faceDown={faceDown} />
   );
   const flipBack = useDerivedValue(() => (frame.get().flip < 0.5 ? 1 : 0));
   const flipFace = useDerivedValue(() => (frame.get().flip < 0.5 ? 0 : 1));
@@ -51,32 +52,32 @@ function ClashView({ plan, index, total, now, ...common }: Common & { plan: Clas
   return (
     <Group opacity={inWindow}>
       {plan.shadow && stage.shadow ? (
-        <FlyingCard spot={plan.shadow} rect={stage.shadow} turn={0} role="shadow" frame={frame}>
+        <FlyingCard spot={plan.shadow} rect={stage.shadow} turn={0} role="shadow" frame={frame} s={s}>
           <Group opacity={flipBack}>{card(plan.shadow, stage.shadow, true)}</Group>
           <Group opacity={flipFace}>{card(plan.shadow, stage.shadow)}</Group>
         </FlyingCard>
       ) : null}
-      <FlyingCard spot={plan.target} rect={stage.target} turn={0} role="target" frame={frame}>
+      <FlyingCard spot={plan.target} rect={stage.target} turn={0} role="target" frame={frame} s={s}>
         {card(plan.target, stage.target)}
-        <Veil rect={stage.target} frame={frame} t={t} />
-        {count ? <Corner stage={stage} before={plan.before} after={plan.after} image={tokens.damage} font={count} frame={frame} t={t} /> : null}
+        <Veil rect={stage.target} frame={frame} t={t} s={s} />
+        {count ? <Corner stage={stage} before={plan.before} after={plan.after} image={tokens.damage} font={count} frame={frame} t={t} s={s} /> : null}
       </FlyingCard>
       {plan.attackers.map((spot, at) => {
         const rect = stage.attackers[at] ?? stage.target;
         return (
-          <FlyingCard key={spot.id} spot={spot} rect={rect} turn={stage.turns[at] ?? 0} role="attacker" frame={frame}>
+          <FlyingCard key={spot.id} spot={spot} rect={rect} turn={stage.turns[at] ?? 0} role="attacker" frame={frame} s={s}>
             {card(spot, rect)}
           </FlyingCard>
         );
       })}
       {Array.from({ length: shape.damage }, (_, n) => (
-        <BurstToken key={n} stage={stage} index={n} count={shape.damage} now={local} k={k} place={shape} image={tokens.damage} t={t} />
+        <BurstToken key={n} stage={stage} index={n} count={shape.damage} now={local} k={k} place={shape} image={tokens.damage} t={t} s={s} />
       ))}
-      {pill ? <Pill at={stage.attackPill} icon="attack" color={attackColor} text={String(clash.attack)} font={pill} frame={frame} t={t} /> : null}
+      {pill ? <Pill at={stage.attackPill} icon="attack" color={attackColor} text={String(clash.attack)} font={pill} frame={frame} t={t} s={s} /> : null}
       {/* An undefended hero has no defense to show: the pill stands under a defender or an enemy only. */}
-      {pill && !clash.undefended ? <Pill at={stage.targetPill} icon="defense" color={t.gold} text={String(clash.defense)} font={pill} frame={frame} t={t} bounce={blocked} /> : null}
+      {pill && !clash.undefended ? <Pill at={stage.targetPill} icon="defense" color={t.gold} text={String(clash.defense)} font={pill} frame={frame} t={t} s={s} bounce={blocked} /> : null}
       {word && blocked ? <Word at={stage.word} text="Blocked" font={word} t={t} opacity={wordOpacity} /> : null}
-      {word && stage.more ? <Chip at={stage.more} text={`+${plan.more}`} font={word} t={t} opacity={moreOpacity} /> : null}
+      {word && stage.more ? <Chip at={stage.more} text={`+${plan.more}`} font={word} t={t} s={s} opacity={moreOpacity} /> : null}
       {word && total > 1 ? <Word at={stage.note} text={`${index + 1} of ${total} · Tap to skip`} font={word} t={t} color={t.muted} opacity={moreOpacity} /> : null}
     </Group>
   );

@@ -9,6 +9,7 @@ import { GameIcon } from "../play/game-icon";
 import { tileSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { GLOSSARY, searchGlossary } from "./rules-glossary";
+import { useUiScale } from "../play/ui-scale";
 
 // The books keep the testIDs they had on the campaign list; the others are `booklet-open-<id>`.
 const BOOK_TEST_IDS: Readonly<Record<string, string>> = { "fellowship-of-the-ring": "booklet-open", "learn-to-play": "booklet-open-learn-to-play" };
@@ -19,11 +20,12 @@ const BOOK_TEST_IDS: Readonly<Record<string, string>> = { "fellowship-of-the-rin
 // so the keyboard leaves room for results. Four covers share one row from a tablet's width, two a row below it.
 export function RulesView({ header, books, testID }: { header: ReactNode; books: boolean; testID: string }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const router = useRouter();
   const [search, setSearch] = useState("");
   const visible = useMemo(() => searchGlossary(GLOSSARY, search), [search]);
   const { width } = useWindowDimensions();
-  const cover = width >= 600 ? "min-w-[22%] flex-1" : "min-w-[45%] flex-1";
+  const cover = width / s >= 600 ? "min-w-[22%] flex-1" : "min-w-[45%] flex-1";
 
   return (
     <Screen testID={testID} scene="plain">
@@ -56,7 +58,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
                       >
                         {({ pressed }) => (
                           <View className="min-h-28 justify-between rounded-card p-4" style={tileSurface(pressed, t)}>
-                            <GameIcon name="lore" size={22} tint="gold" />
+                            <GameIcon name="lore" size={22 * s} tint="gold" />
                             <Text className="mt-3 font-display text-heading text-bone" numberOfLines={3}>
                               {book.name}
                             </Text>

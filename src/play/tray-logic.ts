@@ -111,10 +111,11 @@ export type TrayBox = { width: number; right: number; bottom: number; maxHeight:
  * so it never reaches into the canvas and covers neither encounter pile (the discard stands 8 pt from the canvas's edge:
  * tray-logic.test.ts checks it against the layout). Its foot is `anchorTop` (the screen y of the top of the dock's block of readout,
  * armed line and buttons, which it never covers, and the dock's top while the tray is open: the tray stands on the dock), and it is
- * as tall as the room between the top bar and that, never under MIN_HEIGHT.
+ * as tall as the room between the top bar and that, never under MIN_HEIGHT. `scale` is the UI scale.
  */
-export function trayBox(a: { commandWidth: number; insetRight: number; screenHeight: number; barBottom: number; anchorTop: number }): TrayBox {
-  const width = Math.min(TRAY_MAX, a.commandWidth - 2 * COLUMN_PAD);
-  const foot = Math.max(a.anchorTop, a.barBottom + MIN_HEIGHT);
-  return { width, right: a.insetRight + COLUMN_PAD, bottom: Math.round(a.screenHeight - foot), maxHeight: Math.round(foot - a.barBottom) };
+export function trayBox(a: { commandWidth: number; insetRight: number; screenHeight: number; barBottom: number; anchorTop: number }, scale = 1): TrayBox {
+  // The tray's own sizes are Medium's, drawn at the UI scale (ui-scale.ts); the insets and the anchors are screen points already.
+  const width = Math.min(TRAY_MAX * scale, a.commandWidth - 2 * COLUMN_PAD * scale);
+  const foot = Math.max(a.anchorTop, a.barBottom + MIN_HEIGHT * scale);
+  return { width, right: a.insetRight + COLUMN_PAD * scale, bottom: Math.round(a.screenHeight - foot), maxHeight: Math.round(foot - a.barBottom) };
 }

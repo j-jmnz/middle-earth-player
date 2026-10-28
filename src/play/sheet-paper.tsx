@@ -13,6 +13,7 @@ import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { touch, touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 const SHEET_RADIUS = 28;
@@ -26,14 +27,15 @@ export function SheetFrame({ children, testID, maxHeight, paddingTop = 12, anima
   const insets = useSafeAreaInsets();
   const scale = useMotionScale();
   const t = useTableTokens();
+  const s = useUiScale();
   const rise = useMemo(() => layoutAnim(SlideInDown, MOTION.sheetIn, scale), [scale]);
   const style = {
     backgroundColor: t.paper,
-    borderTopLeftRadius: SHEET_RADIUS,
-    borderTopRightRadius: SHEET_RADIUS,
-    paddingHorizontal: 24,
-    paddingTop,
-    paddingBottom: Math.max(insets.bottom, 12),
+    borderTopLeftRadius: SHEET_RADIUS * s,
+    borderTopRightRadius: SHEET_RADIUS * s,
+    paddingHorizontal: 24 * s,
+    paddingTop: paddingTop * s,
+    paddingBottom: Math.max(insets.bottom, 12 * s),
     ...(maxHeight != null ? { maxHeight } : {}),
   };
   return animated ? (
@@ -80,10 +82,14 @@ export function ChromeButton({
   accessibilityHint?: string;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const ink = tone === "ink";
   const quiet = variant === "quiet";
   const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "gold" ? t.gold : ink ? t.inkLabel : tone === "muted" || (quiet && tone === "bone") ? t.muted : t.bone;
   const rest = variant === "text" ? null : ink ? { backgroundColor: t.paper } : { backgroundColor: withAlphaHex(t.bone, quiet ? 0.04 : 0.09) };
+  // The row is 44 pt, or 40 on a short phone with a slop that makes up the 44; at a scale both follow it, and the target never drops under 44.
+  const row = tight ? 40 * s : touch(s, 44);
+  const slop = touchSlop(s, row);
   return (
     <Pressable
       testID={testID}
@@ -94,19 +100,19 @@ export function ChromeButton({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      hitSlop={tight ? { top: 2, bottom: 2 } : undefined}
-      style={{ minHeight: tight ? 40 : 44, minWidth: 44, justifyContent: "center", paddingVertical: variant === "text" ? 0 : 2 }}
+      hitSlop={tight ? { top: slop, bottom: slop } : undefined}
+      style={{ minHeight: row, minWidth: touch(s, 44), justifyContent: "center", paddingVertical: (variant === "text" ? 0 : 2) * s }}
     >
       {({ pressed }) => (
         <View
-          className={`items-center justify-center rounded-tile ${quiet ? "px-3" : "px-3.5"} ${variant === "text" ? "min-h-11" : tight ? "min-h-9" : "min-h-10"}`}
+          className={`items-center justify-center rounded-tile ${quiet ? "px-3" : "px-3.5"} ${variant === "text" ? "min-h-touch" : tight ? "min-h-9" : "min-h-10"}`}
           style={{
             ...(pressed && !disabled ? { backgroundColor: ink ? t.paperPressed : t.pressed } : (rest ?? { backgroundColor: "transparent" })),
             ...(variant === "plate" && !ink ? { boxShadow: raisedEdgeOf(t) } : {}),
           }}
         >
           {variant === "plate" ? (
-            <Text className="font-display-bold uppercase" style={{ color, fontSize: 12, lineHeight: 16, letterSpacing: 1.2 }}>
+            <Text className="font-display-bold uppercase" style={{ color, fontSize: 12 * s, lineHeight: 16 * s, letterSpacing: 1.2 * s }}>
               {label}
             </Text>
           ) : (
@@ -149,6 +155,7 @@ export function ChromePrimary({
   accessibilityHint?: string;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const paper = surface === "paper";
   const color = disabled ? (paper ? t.inkMuted : t.muted) : paper ? t.paper : t.onGold;
   return (
@@ -164,14 +171,14 @@ export function ChromePrimary({
     >
       {({ pressed }) => (
         <View
-          className={`${compact ? (tight ? "min-h-11 px-3" : "px-3") : "min-h-14 px-5"} items-center justify-center rounded-button`}
-          style={{ ...(compact && !tight ? { minHeight: 46 } : {}), ...primaryFill(paper, disabled, pressed, t), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}
+          className={`${compact ? (tight ? "min-h-touch px-3" : "px-3") : "min-h-14 px-5"} items-center justify-center rounded-button`}
+          style={{ ...(compact && !tight ? { minHeight: touch(s, 46) } : {}), ...primaryFill(paper, disabled, pressed, t), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}
         >
           {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
           <Text
             numberOfLines={compact ? 2 : 1}
             className="text-center font-display-bold uppercase"
-            style={{ color, fontSize: compact ? 13 : 14, lineHeight: compact ? 18 : 19, letterSpacing: compact ? 1.4 : 2.2 }}
+            style={{ color, fontSize: (compact ? 13 : 14) * s, lineHeight: (compact ? 18 : 19) * s, letterSpacing: (compact ? 1.4 : 2.2) * s }}
           >
             {label}
           </Text>
@@ -189,13 +196,14 @@ function primaryFill(paper: boolean, disabled: boolean, pressed: boolean, t: Tab
 
 /** The engine's numbers with the game's icons beside them. Each reads as "Willpower 2" to a screen reader. */
 export function Stats({ stats, testID, surface = "paper", size = "body" }: { stats: readonly SheetStat[]; testID?: string; surface?: "night" | "paper"; size?: "body" | "title" }) {
+  const s = useUiScale();
   if (stats.length === 0) return null;
   const ink = surface === "paper";
   const textClass = `font-display-bold ${size === "title" ? "text-title" : "text-body"} ${ink ? "text-ink" : "text-bone"}`;
   return (
     <View testID={testID} className="flex-row flex-wrap items-center gap-2.5">
       {stats.map((stat) => (
-        <IconValue key={stat.word} name={stat.icon} value={String(stat.value)} word={stat.word} tint={ink ? "ink" : "bone"} size={size === "title" ? 18 : 15} textClass={textClass} />
+        <IconValue key={stat.word} name={stat.icon} value={String(stat.value)} word={stat.word} tint={ink ? "ink" : "bone"} size={(size === "title" ? 18 : 15) * s} textClass={textClass} />
       ))}
     </View>
   );
@@ -236,6 +244,7 @@ export function Tile({
   said?: string;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const night = surface === "night";
   const numbers = stats.length > 0 || trailing != null ? (
     <View className="flex-row flex-wrap items-center gap-2">
@@ -258,14 +267,14 @@ export function Tile({
         <View
           className={`${dense ? "mb-1 py-0.5" : night ? "mb-1.5 py-1" : "mb-2 py-2"} flex-row items-center gap-2 rounded-tile ${night ? "px-2" : "px-4"}`}
           style={{
-            minHeight: dense ? 44 : night ? 50 : 48,
+            minHeight: touch(s, dense ? 44 : night ? 50 : 48),
             ...(night ? {} : { borderWidth: selected ? 1.5 : 1, borderColor: selected ? t.ink : t.inkLine }),
             ...(pressed ? { backgroundColor: night ? t.pressed : t.paperPressed } : night ? nightTile(selected, t) : { backgroundColor: "transparent" }),
           }}
         >
           {leading}
           <View className={`flex-1 ${dense ? "flex-row flex-wrap items-center gap-x-2 gap-y-0.5" : ""}`}>
-            <View className={dense ? "" : "flex-row items-center justify-between gap-2"} style={dense ? { flexGrow: 1, flexShrink: 1, minWidth: 84 } : undefined}>
+            <View className={dense ? "" : "flex-row items-center justify-between gap-2"} style={dense ? { flexGrow: 1, flexShrink: 1, minWidth: 84 * s } : undefined}>
               <Text numberOfLines={2} className={`shrink text-body ${selected ? "font-semibold" : ""}`} style={{ color: night ? (selected ? t.goldHigh : t.bone) : t.ink }}>
                 {label}
               </Text>
@@ -275,8 +284,8 @@ export function Tile({
             {night || dense ? <View className={dense ? "" : "mt-0.5"}>{numbers}</View> : null}
           </View>
           {selected && night ? (
-            <View accessible={false} importantForAccessibility="no" style={{ width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: t.gold }}>
-              <Text style={{ color: t.onGold, fontSize: 13, lineHeight: 16, fontWeight: "700" }}>{"\u2713"}</Text>
+            <View accessible={false} importantForAccessibility="no" style={{ width: 20 * s, height: 20 * s, borderRadius: 10 * s, alignItems: "center", justifyContent: "center", backgroundColor: t.gold }}>
+              <Text style={{ color: t.onGold, fontSize: 13 * s, lineHeight: 16 * s, fontWeight: "700" }}>{"\u2713"}</Text>
             </View>
           ) : null}
         </View>

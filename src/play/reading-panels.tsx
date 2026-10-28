@@ -9,6 +9,7 @@ import type { Speed } from "./motion-tokens.ts";
 import { ChromeButton, Tile } from "./sheet-paper.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import type { TableSettings } from "./table-settings.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 /**
@@ -134,6 +135,7 @@ export function ThreatPanel({
 // with its detail as the hint. The tracks hold 3:1 against paper (inkMuted off, ink on).
 function PaperSwitch({ label, detail, value, onChange, testID }: { label: string; detail?: string; value: boolean; onChange: (value: boolean) => void; testID: string }) {
   const t = useTableTokens();
+  const s = useUiScale();
   return (
     <Pressable
       testID={`${testID}-row`}
@@ -142,7 +144,7 @@ function PaperSwitch({ label, detail, value, onChange, testID }: { label: string
       accessibilityHint={detail}
       accessibilityState={{ checked: value }}
       onPress={() => onChange(!value)}
-      style={({ pressed }) => ({ minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingVertical: 4, backgroundColor: pressed ? t.paperPressed : "transparent" })}
+      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 * s, paddingVertical: 4 * s, backgroundColor: pressed ? t.paperPressed : "transparent" })}
     >
       <View className="shrink" importantForAccessibility="no-hide-descendants">
         <Text className="text-body text-ink">{label}</Text>
@@ -168,8 +170,9 @@ const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", quick: 
 // at the right, each a 44 pt target. The chosen one is ink with paper text. A screen reader hears a radio group of two.
 function SpeedChoice({ value, onChange }: { value: Speed; onChange: (value: Speed) => void }) {
   const t = useTableTokens();
+  const s = useUiScale();
   return (
-    <View testID="settings-speed" accessibilityRole="radiogroup" accessibilityLabel="Animation speed" style={{ minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingVertical: 4 }}>
+    <View testID="settings-speed" accessibilityRole="radiogroup" accessibilityLabel="Animation speed" style={{ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 * s, paddingVertical: 4 * s }}>
       <View className="shrink">
         <Text className="text-body text-ink">Animation speed</Text>
         <Text className="text-label text-inkMuted">Quick shortens every motion and skips the phase title.</Text>
@@ -185,7 +188,7 @@ function SpeedChoice({ value, onChange }: { value: Speed; onChange: (value: Spee
               accessibilityLabel={SPEED_WORDS[speed]}
               accessibilityState={{ checked: on }}
               onPress={() => onChange(speed)}
-              style={({ pressed }) => ({ minWidth: 60, minHeight: 44, paddingHorizontal: 8, alignItems: "center", justifyContent: "center", borderRadius: 999, borderWidth: 1, borderColor: on ? t.ink : t.inkMuted, backgroundColor: on ? t.ink : pressed ? t.paperPressed : "transparent" })}
+              style={({ pressed }) => ({ minWidth: 60 * s, minHeight: touch(s, 44), paddingHorizontal: 8 * s, alignItems: "center", justifyContent: "center", borderRadius: 999, borderWidth: 1, borderColor: on ? t.ink : t.inkMuted, backgroundColor: on ? t.ink : pressed ? t.paperPressed : "transparent" })}
             >
               <Text className="text-label" style={{ color: on ? t.paper : t.ink }}>
                 {SPEED_WORDS[speed]}

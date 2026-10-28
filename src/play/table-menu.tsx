@@ -7,6 +7,7 @@ import { Pressable, View } from "react-native";
 
 import { PopoverDivider, PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx";
 import { MENU_BUTTON } from "./top-bar-layout.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { menuItems, type MenuItemId, type MenuNav } from "./table-menu-items.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
@@ -15,6 +16,8 @@ const MENU_WIDTH = 240;
 /** The 44 pt button at the right of the top bar: three dots drawn as views (no printed icon fits). */
 export function MenuButton({ open, onPress }: { open: boolean; onPress: () => void }) {
   const t = useTableTokens();
+  const s = useUiScale();
+  const button = touch(s, MENU_BUTTON);
   return (
     <Pressable
       testID="table-menu"
@@ -23,14 +26,14 @@ export function MenuButton({ open, onPress }: { open: boolean; onPress: () => vo
       accessibilityLabel="Menu"
       accessibilityState={{ expanded: open }}
       onPress={onPress}
-      style={{ width: MENU_BUTTON, height: MENU_BUTTON, alignItems: "center", justifyContent: "center" }}
+      style={{ width: button, height: button, alignItems: "center", justifyContent: "center" }}
     >
       {({ pressed }) => (
         <View
-          style={{ width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", gap: 4, backgroundColor: pressed || open ? t.pressed : "transparent" }}
+          style={{ width: 40 * s, height: 40 * s, borderRadius: 20 * s, alignItems: "center", justifyContent: "center", gap: 4 * s, backgroundColor: pressed || open ? t.pressed : "transparent" }}
         >
           {[0, 1, 2].map((dot) => (
-            <View key={dot} style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: open ? t.gold : t.bone }} />
+            <View key={dot} style={{ width: 4 * s, height: 4 * s, borderRadius: 2 * s, backgroundColor: open ? t.gold : t.bone }} />
           ))}
         </View>
       )}
@@ -45,11 +48,12 @@ export function MenuButton({ open, onPress }: { open: boolean; onPress: () => vo
 export function TableMenu({ open, nav, top, right, onClose, onSelect }: { open: boolean; nav: MenuNav; top: number; right: number; onClose: () => void; onSelect: (id: MenuItemId) => void }) {
   // Focus moves to the first row when the menu opens, so a screen reader starts inside it.
   const first = useRef<PressableRef>(null);
+  const s = useUiScale();
   return (
     <PopoverFrame
       open={open}
       place={{ top, right }}
-      width={MENU_WIDTH}
+      width={MENU_WIDTH * s}
       origin="100% 0%"
       ids={{ layer: "table-menu-layer", scrim: "table-menu-scrim", popover: "table-menu-popover" }}
       closeLabel="Close the menu"

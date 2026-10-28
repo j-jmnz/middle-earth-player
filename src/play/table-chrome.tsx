@@ -15,6 +15,7 @@ import { dialName, type DialRole } from "./peek.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 // How long the change badge stays beside the dial; the banner and the log say it too.
@@ -74,17 +75,18 @@ export function ThreatRing({
   onPress?: () => void;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
   if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
-      <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2, borderColor: threat.eliminated ? t.hairline : t.gold }}>
+      <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2 * s, borderColor: threat.eliminated ? t.hairline : t.gold }}>
         <Text testID={`${id}-value`} className="font-display-bold text-title text-bone">
           {String(threat.threat)}
         </Text>
       </View>
       <View className="mt-0.5 flex-row items-center gap-1">
-        {icon ? <GameIcon name={icon} size={12} tint="muted" /> : null}
+        {icon ? <GameIcon name={icon} size={12 * s} tint="muted" /> : null}
         <Text className="text-label text-muted">{label}</Text>
       </View>
     </View>
@@ -120,6 +122,7 @@ function ThreatDial({
 }) {
   const speed = useMotionScale();
   const t = useTableTokens();
+  const s = useUiScale();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
   const level = elimination ? threatLevel(threat.threat) : "calm";
   const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? dialOf(t)[level] : { edge: t.gold, fill: t.night, meter: t.gold };
@@ -166,34 +169,34 @@ function ThreatDial({
       accessibilityRole={onPress ? "button" : undefined}
       accessibilityLabel={dialWords}
       accessibilityHint={onPress ? (hint ?? "Shows each enemy's engagement cost against your threat") : undefined}
-      style={({ pressed }) => ({ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 4, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
+      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
     >
       <Animated.View style={pop}>
         <View
           testID={id}
           className="h-10 flex-row items-center gap-1 overflow-hidden rounded-pill px-2.5 pb-1"
-          style={{ minWidth: 64, borderWidth: 2, borderColor: look.edge, backgroundColor: look.fill }}
+          style={{ minWidth: 64 * s, borderWidth: 2 * s, borderColor: look.edge, backgroundColor: look.fill }}
         >
-          {icon ? <GameIcon name={icon} size={18} tint={critical ? "onThreat" : "danger"} /> : null}
+          {icon ? <GameIcon name={icon} size={18 * s} tint={critical ? "onThreat" : "danger"} /> : null}
           <Text testID={`${id}-value`} className="font-display-bold text-title text-bone" style={critical ? { color: t.onThreat } : undefined}>
             {String(threat.threat)}
           </Text>
           {elimination && !threat.eliminated ? (
-            <View className="absolute overflow-hidden" style={{ left: 12, right: 12, bottom: 3, height: 3, borderRadius: 2, backgroundColor: withAlphaHex(critical ? t.onThreat : t.bone, 0.16) }}>
-              <View style={{ height: 3, width: `${Math.round(threatMeter(threat.threat) * 100)}%`, backgroundColor: look.meter }} />
+            <View className="absolute overflow-hidden" style={{ left: 12 * s, right: 12 * s, bottom: 3 * s, height: 3 * s, borderRadius: 2 * s, backgroundColor: withAlphaHex(critical ? t.onThreat : t.bone, 0.16) }}>
+              <View style={{ height: 3 * s, width: `${Math.round(threatMeter(threat.threat) * 100)}%`, backgroundColor: look.meter }} />
               {/* A tick at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}
               {ticks.map((cost, index) => (
-                <View key={`${cost}:${index}`} style={{ position: "absolute", left: `${Math.round(threatMeter(cost) * 100)}%`, top: 0, width: 2, height: 3, backgroundColor: cost <= threat.threat ? (critical ? t.onThreat : t.bone) : t.faint }} />
+                <View key={`${cost}:${index}`} style={{ position: "absolute", left: `${Math.round(threatMeter(cost) * 100)}%`, top: 0, width: 2 * s, height: 3 * s, backgroundColor: cost <= threat.threat ? (critical ? t.onThreat : t.bone) : t.faint }} />
               ))}
             </View>
           ) : null}
         </View>
-        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2, borderColor: t.gold }, ringStyle]} />
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2 * s, borderColor: t.gold }, ringStyle]} />
         {/* Peeking at this seat: a bone ring just outside the dial and an eye on its corner, clear of the label and its Ring mark. */}
         {role === "viewing" ? (
           <>
-            <View testID={`${id}-viewing`} pointerEvents="none" style={{ position: "absolute", top: -2, left: -3, right: -3, bottom: -2, borderRadius: 999, borderWidth: 1.5, borderColor: t.bone }} />
-            <EyeMark testID={`${id}-eye`} />
+            <View testID={`${id}-viewing`} pointerEvents="none" style={{ position: "absolute", top: -2 * s, left: -3 * s, right: -3 * s, bottom: -2 * s, borderRadius: 999, borderWidth: 1.5 * s, borderColor: t.bone }} />
+            <EyeMark testID={`${id}-eye`} s={s} />
           </>
         ) : null}
       </Animated.View>
@@ -202,7 +205,7 @@ function ThreatDial({
           <Text className={`text-label ${role === "acting" ? "text-gold" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>
           {ring ? (
             <View testID={`${id}-ring`}>
-              <GameIcon name={ringMark} size={12} tint={ringMark === "oneRing" ? "gold" : "bone"} />
+              <GameIcon name={ringMark} size={12 * s} tint={ringMark === "oneRing" ? "gold" : "bone"} />
             </View>
           ) : null}
         </View>
@@ -211,7 +214,7 @@ function ThreatDial({
             key={change?.at}
             entering={badge.in}
             exiting={badge.out}
-            style={{ borderRadius: 999, paddingHorizontal: 6, borderWidth: 1, borderColor: delta.lowered ? t.gold : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.gold : t.threat, 0.22) }}
+            style={{ borderRadius: 999, paddingHorizontal: 6 * s, borderWidth: 1, borderColor: delta.lowered ? t.gold : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.gold : t.threat, 0.22) }}
           >
             <Text testID={`${id}-delta`} className="font-display-bold text-label text-bone">
               {delta.text}
@@ -224,19 +227,22 @@ function ThreatDial({
 }
 
 /** The mark of the seat being peeked at, drawn from views so it is crisp at any size: an almond outline with its pupil, on a night dot. */
-function EyeMark({ testID }: { testID: string }) {
+function EyeMark({ testID, s }: { testID: string; s: number }) {
   const t = useTableTokens();
   return (
-    <View testID={testID} pointerEvents="none" style={{ position: "absolute", top: -2, right: -3, width: 16, height: 16, borderRadius: 8, backgroundColor: t.night, borderWidth: 1, borderColor: t.bone, alignItems: "center", justifyContent: "center" }}>
-      <View style={{ width: 11, height: 6.5, borderRadius: 6, borderWidth: 1.25, borderColor: t.bone, alignItems: "center", justifyContent: "center" }}>
-        <View style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: t.bone }} />
+    <View testID={testID} pointerEvents="none" style={{ position: "absolute", top: -2 * s, right: -3 * s, width: 16 * s, height: 16 * s, borderRadius: 8 * s, backgroundColor: t.night, borderWidth: 1, borderColor: t.bone, alignItems: "center", justifyContent: "center" }}>
+      <View style={{ width: 11 * s, height: 6.5 * s, borderRadius: 6 * s, borderWidth: 1.25 * s, borderColor: t.bone, alignItems: "center", justifyContent: "center" }}>
+        <View style={{ width: 3 * s, height: 3 * s, borderRadius: 2 * s, backgroundColor: t.bone }} />
       </View>
     </View>
   );
 }
 
 /** A log or banner line's mark: the game icon for threat, willpower and attack, the token art for damage, progress, resources. */
-export function LineMark({ mark, tint = "ink", size = 16 }: { mark: LogMark; tint?: "ink" | "bone"; size?: number }) {
+export function LineMark({ mark, tint = "ink", size }: { mark: LogMark; tint?: "ink" | "bone"; size?: number }) {
+  const s = useUiScale();
+  // The default is Medium's 16 times the UI scale; a caller that passes a size has scaled it.
+  if (size == null) size = 16 * s;
   if (!mark) return <View style={{ width: size }} />;
   if (mark === "threat" || mark === "willpower" || mark === "attack") return <GameIcon name={mark} size={size} tint={tint} />;
   return <GameIcon name={mark} size={size} />;

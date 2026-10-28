@@ -11,6 +11,7 @@ import type { IconName } from "../play/icon-map";
 import { goldPlate, goldSurface, raisedEdgeOf, slateSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
+import { touch, touchSlop, useUiScale } from "../play/ui-scale";
 
 /** The fill of a pressed button on night, and on paper, in the theme in force. */
 export function usePressedNight() {
@@ -50,7 +51,9 @@ export function IconButton({
   expanded?: boolean;
 }) {
   const palette = usePalette();
+  const s = useUiScale();
   const color = tone === "gold" ? palette.gold : palette.bone;
+  const box = touch(s, 44);
   return (
     <Pressable
       testID={testID}
@@ -59,14 +62,14 @@ export function IconButton({
       accessibilityLabel={label}
       {...(expanded == null ? {} : { accessibilityState: { expanded } })}
       onPress={onPress}
-      hitSlop={4}
+      hitSlop={4 * s}
     >
       {({ pressed }) => (
         <View
           style={{
-            width: 44,
-            height: 44,
-            borderRadius: 22,
+            width: box,
+            height: box,
+            borderRadius: box / 2,
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: pressed ? palette.pressed : overlay ? withAlphaHex(palette.night, 0.6) : withAlphaHex(palette.raised, 0.7),
@@ -74,7 +77,7 @@ export function IconButton({
             borderColor: overlay ? withAlphaHex(palette.bone, 0.16) : palette.hairline,
           }}
         >
-          {chevron ? <Chevron color={color} /> : icon ? <GameIcon name={icon} size={18} tint={tone === "gold" ? "gold" : "bone"} /> : <Text style={{ color, fontSize: 20, lineHeight: 22, fontWeight: "700" }}>{glyph}</Text>}
+          {chevron ? <Chevron color={color} /> : icon ? <GameIcon name={icon} size={18 * s} tint={tone === "gold" ? "gold" : "bone"} /> : <Text style={{ color, fontSize: 20 * s, lineHeight: 22 * s, fontWeight: "700" }}>{glyph}</Text>}
         </View>
       )}
     </Pressable>
@@ -113,7 +116,7 @@ export function TextButton({
       {...(selected == null && expanded == null ? {} : { accessibilityState: selected == null ? { expanded } : { selected } })}
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
-      className="min-h-11 items-center justify-center rounded-tile px-3"
+      className="min-h-touch items-center justify-center rounded-tile px-3"
       style={({ pressed }) => (pressed ? (tone === "ink" ? pressedPaper : pressedNight) : undefined)}
     >
       <Text className={`text-body font-medium ${color}`}>{label}</Text>
@@ -121,7 +124,7 @@ export function TextButton({
   );
 }
 
-const buttonLabel = { fontSize: 15, lineHeight: 20, letterSpacing: 2.4 };
+const buttonLabelOf = (s: number) => ({ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 2.4 * s });
 
 /**
  * The one filled action on a screen: worked gold with a lit top edge and a soft glow, engraved capitals. It sinks a little
@@ -144,6 +147,7 @@ export function PrimaryButton({
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
   const paper = surface === "paper";
   // The fill and the text colour are styles, not only classes: on the phone a class on a Pressable whose style is a function
   // can be dropped, which left a gold pill as dark text on night (user report, 2026-10-25). The pressed state comes from the
@@ -168,8 +172,8 @@ export function PrimaryButton({
       onPress={onPress}
     >
       {({ pressed }) => (
-        <View className="items-center justify-center rounded-button px-6" style={{ minHeight: 56, ...fill(pressed), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}>
-          <Text className="font-display-bold uppercase" style={{ ...buttonLabel, color }}>
+        <View className="items-center justify-center rounded-button px-6" style={{ minHeight: 56 * s, ...fill(pressed), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}>
+          <Text className="font-display-bold uppercase" style={{ ...buttonLabelOf(s), color }}>
             {label}
           </Text>
         </View>
@@ -204,16 +208,17 @@ export function SecondaryButton({
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
   const color = disabled ? palette.faint : tone === "gold" ? palette.gold : tone === "danger" ? palette.danger : palette.bone;
   return (
     <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress}>
       {({ pressed }) => (
         <View
           className="flex-row items-center justify-center gap-2 rounded-tile px-4"
-          style={{ minHeight: compact ? 44 : 52, ...slateSurface(pressed && !disabled, t), boxShadow: raisedEdgeOf(t) }}
+          style={{ minHeight: compact ? touch(s, 44) : 52 * s, ...slateSurface(pressed && !disabled, t), boxShadow: raisedEdgeOf(t) }}
         >
-          {icon ? <GameIcon name={icon} size={15} tint={tone === "gold" ? "gold" : tone === "danger" ? "danger" : "bone"} /> : null}
-          <Text className="font-display-bold uppercase" style={{ fontSize: 13, lineHeight: 18, letterSpacing: 1.6, color }}>
+          {icon ? <GameIcon name={icon} size={15 * s} tint={tone === "gold" ? "gold" : tone === "danger" ? "danger" : "bone"} /> : null}
+          <Text className="font-display-bold uppercase" style={{ fontSize: 13 * s, lineHeight: 18 * s, letterSpacing: 1.6 * s, color }}>
             {label}
           </Text>
         </View>
@@ -241,7 +246,7 @@ export function SearchField({
 }) {
   const palette = usePalette();
   return (
-    <View className="min-h-11 min-w-0 flex-1 flex-row items-center gap-2.5 rounded-tile px-3.5" style={{ backgroundColor: palette.night, borderWidth: 1, borderColor: palette.hairline }}>
+    <View className="min-h-touch min-w-0 flex-1 flex-row items-center gap-2.5 rounded-tile px-3.5" style={{ backgroundColor: palette.night, borderWidth: 1, borderColor: palette.hairline }}>
       {search ? <Magnifier color={palette.faint} /> : null}
       <TextInput
         testID={testID}
@@ -252,7 +257,7 @@ export function SearchField({
         autoCorrect={false}
         autoCapitalize="none"
         accessibilityLabel={accessibilityLabel}
-        className="min-h-11 min-w-0 flex-1 text-body text-bone"
+        className="min-h-touch min-w-0 flex-1 text-body text-bone"
       />
     </View>
   );
@@ -273,11 +278,14 @@ export function Segmented<T extends string>({
   testIDPrefix: string;
   // Fill the width, each word an equal share (Easy / Normal on the briefing).
   stretch?: boolean;
-  // A 36 pt track in label type, its 44 pt targets kept by a 6 pt hit slop: a view switch beside a count.
+  // A 36 pt track in label type, its 44 pt targets kept by a vertical hit slop: a view switch beside a count.
   compact?: boolean;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
+  // The compact button is 32 pt tall (min-h-8) times the scale; a vertical slop makes up a 44 pt target at every scale.
+  const slop = touchSlop(s, 32 * s);
   return (
     <View accessibilityRole="radiogroup" className={`flex-row rounded-tile ${compact ? "p-0.5" : "p-1"} ${stretch ? "" : "self-start"}`} style={{ backgroundColor: palette.night, borderWidth: 1, borderColor: palette.hairline }}>
       {options.map((option) => {
@@ -289,8 +297,8 @@ export function Segmented<T extends string>({
             accessibilityRole="radio"
             accessibilityState={{ selected }}
             onPress={() => onChange(option)}
-            hitSlop={compact ? { top: 6, bottom: 6 } : undefined}
-            className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : "min-h-11 px-4"} ${stretch ? "flex-1" : ""}`}
+            hitSlop={compact ? { top: slop, bottom: slop } : undefined}
+            className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : "min-h-touch px-4"} ${stretch ? "flex-1" : ""}`}
             style={selected ? { ...slateSurface(false, t), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdgeOf(t) } : { borderWidth: 1, borderColor: "transparent" }}
           >
             <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{option}</Text>
@@ -329,11 +337,11 @@ export function ToggleChip({
       {...(selected == null ? {} : { accessibilityState: { selected } })}
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
-      className="min-h-11 min-w-11 justify-center"
+      className="min-h-touch min-w-touch justify-center"
     >
       {({ pressed }) => (
         <View
-          className="h-9 min-w-11 flex-row items-center justify-center gap-1.5 rounded-tile px-3"
+          className="h-9 min-w-touch flex-row items-center justify-center gap-1.5 rounded-tile px-3"
           style={on ? { ...goldSurface(pressed, t), borderWidth: 1, borderColor: palette.goldDeep } : { backgroundColor: pressed ? palette.pressed : "transparent", borderWidth: 1, borderColor: palette.hairline }}
         >
           {leading}

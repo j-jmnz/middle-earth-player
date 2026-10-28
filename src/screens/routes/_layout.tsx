@@ -1,25 +1,31 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../../global.css";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Platform, StatusBar, View } from "react-native";
 import { Stack } from "expo-router";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
-import { colorScheme, vars } from "nativewind";
+import { colorScheme, rem, vars } from "nativewind";
 import { useStore } from "zustand";
 
 import { DatabaseBoundary, DatabaseError } from "../database-error";
 import { DatabaseProvider } from "../databases";
-import { bindTableSettings } from "../settings-store";
+import { bindTableSettings, readTableSettings } from "../settings-store";
 import { startImageDownloads } from "../images/queue";
 import { completeStarterInsert, insertStarterDecks } from "../starter-decks";
 import { openDatabases, type AppDatabases } from "../open-databases";
 import { palettes, themeVars } from "../palette.js";
 import { tableSettings, type ThemeOption } from "../../play/table-settings";
 import { ThemeContext, useResolvedTheme, type ThemeName } from "../../play/theme";
+import { REM_BASE, UiScaleContext, uiFactor } from "../../play/ui-scale";
 
 void SplashScreen.preventAutoHideAsync();
+
+// One rem is 14 points times the UI scale, and every spacing, size, type and radius class is written in rem (user request, 2026-10-28;
+// metro.config.js keeps rem from being inlined). Set here at import, with Medium, so the first frame is drawn at a known size before
+// the stored choice is read; the layout sets it again whenever the choice changes. On the web it sets the page's root font size.
+rem.set(REM_BASE * uiFactor("medium"));
 
 // Dark, Light or System (user request, 2026-10-28). NativeWind hears the choice; System hands the scheme back to the phone, so
 // useColorScheme (and the theme with it) keeps following the phone, where forcing the resolved name would pin it.
@@ -39,7 +45,14 @@ export default function RootLayout() {
   const themeSetting = useStore(tableSettings, (state) => state.settings.theme);
   const resolved = useResolvedTheme();
   const palette = palettes[resolved];
+  const scaleSetting = useStore(tableSettings, (state) => state.settings.uiScale);
+  const scale = uiFactor(scaleSetting);
   const themeStyle = useMemo(() => vars(themeVars(resolved)), [resolved]);
+
+  // Before paint, so a changed scale never shows a frame at the old size.
+  useLayoutEffect(() => {
+    rem.set(REM_BASE * scale);
+  }, [scale]);
 
   useEffect(() => {
     applyColorScheme(themeSetting, resolved);
@@ -60,6 +73,13 @@ export default function RootLayout() {
       try {
         const opened = await openDatabases();
         if (cancelled) return;
+        // The stored settings are read before the first screen mounts, so the first frame already has the chosen scale and theme.
+        // A row that cannot be read leaves the defaults; the binding below reads again and warns too.
+        try {
+          tableSettings.getState().hydrate(readTableSettings(opened.user));
+        } catch (error: unknown) {
+          console.warn(`Table settings did not load (${error instanceof Error ? error.message : "unknown error"}); the defaults are used`);
+        }
         setDatabases(opened);
       } catch (error: unknown) {
         if (cancelled) return;
@@ -128,6 +148,7 @@ export default function RootLayout() {
   // icons go light on Night and dark on Daylight.
   return (
     <ThemeContext.Provider value={resolved}>
+    <UiScaleContext.Provider value={scale}>
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.night }}>
       <StatusBar barStyle={resolved === "dark" ? "light-content" : "dark-content"} />
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
@@ -162,6 +183,7 @@ export default function RootLayout() {
         </View>
       </SafeAreaProvider>
     </GestureHandlerRootView>
+    </UiScaleContext.Provider>
     </ThemeContext.Provider>
   );
 }

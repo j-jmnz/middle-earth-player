@@ -65,7 +65,7 @@ export default function Rule() {
                 target ? (
                   <TextButton key={name} label={name} testID={`see-${target.id}`} tone="gold" onPress={() => router.push({ pathname: "/rule/[id]", params: { id: target.id } })} />
                 ) : (
-                  <View key={name} className="min-h-11 justify-center px-3">
+                  <View key={name} className="min-h-touch justify-center px-3">
                     <Label tone="faint">{name}</Label>
                   </View>
                 ),

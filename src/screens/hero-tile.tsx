@@ -10,6 +10,7 @@ import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
 import { usePalette } from "./palette-hook";
+import { useUiScale } from "../play/ui-scale";
 
 export type HeroFace = {
   code: string;
@@ -53,6 +54,7 @@ export function HeroTile({
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
   const preview = useCardPreview(hero.code, hero.imagesrc);
   const sphere = sphereWord(hero.sphereName);
   const mark = markedSphere(hero.sphereCode);
@@ -75,7 +77,7 @@ export function HeroTile({
                   {ringBearer ? <RingMark size={10} state="current" /> : null}
                 </View>
               ) : null}
-              <Text className={`font-display-bold ${dense ? "" : "text-heading"} ${ringBearer ? "text-goldHigh" : "text-bone"}`} style={dense ? { fontSize: 12, lineHeight: 15 } : undefined} numberOfLines={2}>
+              <Text className={`font-display-bold ${dense ? "" : "text-heading"} ${ringBearer ? "text-goldHigh" : "text-bone"}`} style={dense ? { fontSize: 12 * s, lineHeight: 15 * s } : undefined} numberOfLines={2}>
                 {hero.name}
               </Text>
               {dense ? null : (
@@ -126,11 +128,11 @@ export function HeroTile({
           accessibilityRole="button"
           accessibilityLabel={`Remove ${hero.name}`}
           onPress={onRemove}
-          className="absolute right-0 top-0 min-h-11 min-w-11 items-center justify-center"
+          className="absolute right-0 top-0 min-h-touch min-w-touch items-center justify-center"
         >
           {({ pressed }) => (
             <View className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: pressed ? palette.pressed : withAlphaHex(palette.night, 0.78), borderWidth: 1, borderColor: withAlphaHex(palette.bone, 0.18) }}>
-              <Text style={{ color: palette.bone, fontSize: 13, lineHeight: 15, fontWeight: "700" }}>{"\u2715"}</Text>
+              <Text style={{ color: palette.bone, fontSize: 13 * s, lineHeight: 15 * s, fontWeight: "700" }}>{"\u2715"}</Text>
             </View>
           )}
         </Pressable>
@@ -234,12 +236,13 @@ function heroNames(heroes: readonly HeroFace[]): string {
 
 function StatusLine({ testID, detail, status, note }: { testID: string; detail: string; status: DeckSummary["status"]; note?: string | null }) {
   const palette = usePalette();
+  const s = useUiScale();
   return (
     <View>
       <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
         <Text className="text-label text-muted">{detail}</Text>
         <View className="flex-row items-center gap-1.5">
-          <View style={{ width: 8, height: 8, borderRadius: 4, ...(status.ready ? { backgroundColor: palette.ok } : { borderWidth: 1.5, borderColor: palette.danger }) }} />
+          <View style={{ width: 8 * s, height: 8 * s, borderRadius: 4 * s, ...(status.ready ? { backgroundColor: palette.ok } : { borderWidth: 1.5, borderColor: palette.danger }) }} />
           <Text testID={`${testID}-status`} className={`text-label ${status.ready ? "text-ok" : "text-danger"}`}>
             {status.text}
           </Text>
@@ -262,6 +265,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
   const palette = usePalette();
   const t = useTableTokens();
   const pressedNight = usePressedNight();
+  const s = useUiScale();
   const { name, heroes, detail, status, note, height, testID, children, selected, disabled } = props;
   return (
     // A FlashList row: a solid fill and no shadow (docs/design-system.md, Performance); only the night fade lays the words on the pictures.
@@ -279,7 +283,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
               )}
               <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: height * 0.45, ...nightFade(0, 1, palette.raised, t) }} />
             </View>
-            <View className="px-4 pb-3.5" style={{ marginTop: -14 }}>
+            <View className="px-4 pb-3.5" style={{ marginTop: -14 * s }}>
               <View className="flex-row items-start justify-between gap-2">
                 <Text className={`shrink font-display text-title ${disabled ? "text-faint" : selected ? "text-goldHigh" : "text-bone"}`} numberOfLines={2}>
                   {name}
@@ -307,7 +311,9 @@ const rowThumb = { width: 30, height: 42 };
 export function DeckRow(props: DeckSummary) {
   const palette = usePalette();
   const pressedNight = usePressedNight();
+  const s = useUiScale();
   const { name, heroes, detail, status, note, testID, children, selected, disabled } = props;
+  const thumb = { width: rowThumb.width * s, height: rowThumb.height * s };
   return (
     <View className="border-b border-hairline">
       <Pressable
@@ -315,15 +321,15 @@ export function DeckRow(props: DeckSummary) {
         className="min-h-16 flex-row items-center gap-3 py-2"
         style={({ pressed }) => (pressed && !disabled ? pressedNight : undefined)}
       >
-        <View className="flex-row" style={{ width: rowThumb.width * 3 - 16, opacity: disabled ? 0.45 : 1 }}>
+        <View className="flex-row" style={{ width: thumb.width * 3 - 16 * s, opacity: disabled ? 0.45 : 1 }}>
           {heroes.length > 0 ? (
             heroes.slice(0, 3).map((hero, at) => (
-              <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 }} className="overflow-hidden rounded-sm border border-night">
-                <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={rowThumb.width} height={rowThumb.height} />
+              <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 * s }} className="overflow-hidden rounded-sm border border-night">
+                <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={thumb.width} height={thumb.height} />
               </View>
             ))
           ) : (
-            <View className="items-center justify-center rounded-sm bg-dusk" style={rowThumb}>
+            <View className="items-center justify-center rounded-sm bg-dusk" style={thumb}>
               <Text className="text-label text-faint">—</Text>
             </View>
           )}

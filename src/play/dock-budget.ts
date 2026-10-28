@@ -3,7 +3,8 @@
 // armed under it leaves it almost none, so the title is clamped to the lines that fit and the rest of it, with every folded line,
 // waits behind the "i" pill, which opens them in a popover (dock-more.tsx). Where the room cannot hold the step, one title line
 // and one label line, the folded line is dropped and the pill sits on the title row: a control is never half visible. Pure
-// arithmetic; the dock measures the room and draws what this says.
+// arithmetic; the dock measures the room and draws what this says. At a UI `scale` (ui-scale.ts) a measured length comes in as
+// screen points and goes out as screen points; the arithmetic is the Medium one, in logical points (the screen over the scale).
 import { lineCount } from "./armed-room.ts";
 
 // Line heights of the type the words use (tailwind.config.js): the eyebrow step, the title (Cinzel at the heading size on its
@@ -24,19 +25,24 @@ export const PILL_PT = 30;
 // A short phone's screen height under which the dock is dense; the choice tray's dense tiles use the same line.
 export const DENSE_BELOW = 400;
 
+/** Whether a screen `height` tall is a short phone's: the logical height, at the UI scale, is under DENSE_BELOW. */
+export function isDense(height: number, scale = 1): boolean {
+  return height / scale < DENSE_BELOW;
+}
+
 /** The height of the words' window: the dock's room (the column less its padding) less its measured pinned block. */
-export function wordsWindow(a: { room: number; block: number; dense?: boolean }): number {
-  return Math.max(0, a.room - (a.dense ? DOCK_PAD_DENSE_PX : DOCK_PAD_PX) - a.block);
+export function wordsWindow(a: { room: number; block: number; dense?: boolean }, scale = 1): number {
+  return Math.max(0, (a.room - a.block) / scale - (a.dense ? DOCK_PAD_DENSE_PX : DOCK_PAD_PX)) * scale;
 }
 
 /** How many lines a title takes in `width` points, at most two (the title is never more than two lines unfolded). */
-export function titleLinesOf(title: string, width: number): number {
-  return Math.min(2, lineCount(title, Math.max(8, Math.floor(width / TITLE_CHAR_PT))));
+export function titleLinesOf(title: string, width: number, scale = 1): number {
+  return Math.min(2, lineCount(title, Math.max(8, Math.floor(width / scale / TITLE_CHAR_PT))));
 }
 
 /** The characters a label-type line holds in `width` points. */
-export function labelChars(width: number): number {
-  return Math.max(12, Math.floor(width / LABEL_CHAR_PT));
+export function labelChars(width: number, scale = 1): number {
+  return Math.max(12, Math.floor(width / scale / LABEL_CHAR_PT));
 }
 
 export type WordsPlan = {
@@ -57,17 +63,20 @@ export type WordsPlan = {
  * than the step, one title line and one label line, the folded line goes and the pill moves to the title row, where the title is
  * counted against the width the pill leaves. `foldable` is `DockLines.foldable` (lines wait behind the pill).
  */
-export function planWords(a: { space: number; dense: boolean; title: string; textWidth: number; hasLine: boolean; foldable: boolean }): WordsPlan {
+export function planWords(a: { space: number; dense: boolean; title: string; textWidth: number; hasLine: boolean; foldable: boolean }, scale = 1): WordsPlan {
+  // The room and the width come in as screen points; the budget is counted in logical ones.
+  const space = a.space / scale;
+  const textWidth = a.textWidth / scale;
   if (!a.dense) {
-    const natural = titleLinesOf(a.title, a.textWidth);
+    const natural = titleLinesOf(a.title, textWidth);
     return { titleLines: natural, cut: false, showLine: a.hasLine, pill: a.foldable, pillOnTitle: !a.hasLine && a.foldable };
   }
-  const showLine = a.hasLine && a.space >= STEP_PX + TITLE_PX + LABEL_PX;
-  const room = a.space - STEP_PX - (showLine ? LABEL_PX : 0);
+  const showLine = a.hasLine && space >= STEP_PX + TITLE_PX + LABEL_PX;
+  const room = space - STEP_PX - (showLine ? LABEL_PX : 0);
   const fits = Math.max(1, Math.floor(room / TITLE_PX));
   const onTitle = !showLine;
   // The pill takes the title row's right end when it sits there; count against what it leaves.
-  const count = (pillThere: boolean) => titleLinesOf(a.title, a.textWidth - (pillThere ? PILL_PT : 0));
+  const count = (pillThere: boolean) => titleLinesOf(a.title, textWidth - (pillThere ? PILL_PT : 0));
   let natural = count(onTitle && (a.foldable || a.hasLine));
   if (onTitle && !(a.foldable || a.hasLine) && natural > fits) natural = count(true);
   const titleLines = Math.min(natural, fits);
@@ -83,8 +92,8 @@ const POPOVER_EDGE = 8;
 export const CLOSE_ROW = 48;
 
 /** The popover's width and its room under `top`: as wide as the canvas beside the command column allows, down to the screen's foot. */
-export function linesPlace(a: { screenWidth: number; screenHeight: number; commandWidth: number; insetLeft: number; insetRight: number; top: number }): { width: number; maxHeight: number } {
-  const canvas = a.screenWidth - a.insetLeft - a.insetRight - a.commandWidth - POPOVER_GAP - POPOVER_EDGE;
-  return { width: Math.max(180, Math.min(POPOVER_MAX_WIDTH, canvas)), maxHeight: Math.max(CLOSE_ROW + 40, a.screenHeight - a.top - POPOVER_EDGE) };
+export function linesPlace(a: { screenWidth: number; screenHeight: number; commandWidth: number; insetLeft: number; insetRight: number; top: number }, scale = 1): { width: number; maxHeight: number } {
+  const canvas = (a.screenWidth - a.insetLeft - a.insetRight - a.commandWidth) / scale - POPOVER_GAP - POPOVER_EDGE;
+  return { width: Math.max(180, Math.min(POPOVER_MAX_WIDTH, canvas)) * scale, maxHeight: Math.max(CLOSE_ROW + 40, (a.screenHeight - a.top) / scale - POPOVER_EDGE) * scale };
 }
 

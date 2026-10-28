@@ -10,6 +10,7 @@ import { dockLines } from "./dock-lines.ts";
 import type { DockWords } from "./dock-more.tsx";
 import { PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx";
 import type { TableTokens } from "./tokens.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 const GAP = 6;
@@ -18,16 +19,17 @@ const toneOf = (t: TableTokens) => ({ guide: t.bone, note: t.muted, unavailable:
 export function LinesPopover({ open, top, words, commandWidth, insetRight, onClose }: { open: boolean; top: number | null; words: DockWords; commandWidth: number; insetRight: number; onClose: () => void }) {
   const screen = useWindowDimensions();
   const t = useTableTokens();
+  const s = useUiScale();
   const close = useRef<PressableRef>(null);
   const at = top ?? 0;
-  const { width, maxHeight } = linesPlace({ screenWidth: screen.width, screenHeight: screen.height, commandWidth, insetLeft: 0, insetRight, top: at });
+  const { width, maxHeight } = linesPlace({ screenWidth: screen.width, screenHeight: screen.height, commandWidth, insetLeft: 0, insetRight, top: at }, s);
   const lines = dockLines({ guide: words.guide, note: words.note, unavailable: words.unavailable });
   const tones = toneOf(t);
   const all = lines.first ? [lines.first, ...lines.rest] : [];
   return (
     <PopoverFrame
       open={open}
-      place={{ right: insetRight + commandWidth + GAP, top: Math.max(0, at - 4) }}
+      place={{ right: insetRight + commandWidth + GAP * s, top: Math.max(0, at - 4 * s) }}
       width={width}
       origin="100% 0%"
       ids={{ layer: "dock-more-lines-layer", scrim: "dock-more-lines-scrim", popover: "dock-more-lines" }}
@@ -36,9 +38,9 @@ export function LinesPopover({ open, top, words, commandWidth, insetRight, onClo
       onClose={onClose}
     >
       <PopoverRow item={{ testID: "dock-more-lines-close", label: "✕ Close", accessibilityLabel: "Close the notes" }} rowRef={close} onPress={onClose} />
-      <ScrollView testID="dock-more-lines-scroll" style={{ maxHeight: maxHeight - CLOSE_ROW - 8 }} showsVerticalScrollIndicator={false}>
-        <View style={{ paddingHorizontal: 14, paddingBottom: 10, gap: 4 }}>
-          <Text testID="dock-more-lines-title" accessibilityRole="header" className="font-display text-heading" style={{ color: t.bone, lineHeight: 24 }}>
+      <ScrollView testID="dock-more-lines-scroll" style={{ maxHeight: maxHeight - touch(s, CLOSE_ROW) - 8 * s }} showsVerticalScrollIndicator={false}>
+        <View style={{ paddingHorizontal: 14 * s, paddingBottom: 10 * s, gap: 4 * s }}>
+          <Text testID="dock-more-lines-title" accessibilityRole="header" className="font-display text-heading" style={{ color: t.bone, lineHeight: 24 * s }}>
             {words.title}
           </Text>
           {all.map((line) => (

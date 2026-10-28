@@ -54,6 +54,8 @@ export type PlanInput = {
   next: ScenarioState;
   // The layouts before and after the state: a card flies from where it stood before, else where it stands now.
   layouts: readonly TableLayout[];
+  // The UI scale the table is laid out at (ui-scale.ts); the stage is Medium's sizes times it. Default 1.
+  scale?: number;
 };
 
 function cardOf(state: ScenarioState, other: ScenarioState, id: string): { code: string } | null {
@@ -99,7 +101,7 @@ export function buildPlan(input: PlanInput): SpotlightPlan {
       more: Math.max(0, everyone.length - shown.length),
       target,
       shadow: turned,
-      stage: stageOf(canvas, card, everyone.length, turned != null),
+      stage: stageOf(canvas, card, everyone.length, turned != null, input.scale ?? 1),
       before,
       after: before + clash.damage,
     });

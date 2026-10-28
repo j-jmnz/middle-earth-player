@@ -8,6 +8,7 @@ import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import { iconAspect, type IconName } from "../play/icon-map";
 import { withAlphaHex } from "../play/tokens";
+import { useUiScale } from "../play/ui-scale";
 
 type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
 
@@ -22,7 +23,8 @@ export function dockIcon(name: IconName) {
   const aspect = iconAspect(name);
   const size = Math.round(Math.min(DOCK_ICON, DOCK_ICON_WIDE / aspect));
   return function DockIcon({ focused }: { focused: boolean }) {
-    return <GameIcon name={name} size={size} tint={focused ? "goldHigh" : "faint"} />;
+    const s = useUiScale();
+    return <GameIcon name={name} size={Math.round(size * s)} tint={focused ? "goldHigh" : "faint"} />;
   };
 }
 
@@ -30,6 +32,7 @@ export function dockIcon(name: IconName) {
 export function AppTabBar({ state, descriptors, emitter, navigateToTab }: TabBarProps) {
   const palette = usePalette();
   const pressedNight = usePressedNight();
+  const s = useUiScale();
   return (
     <View accessibilityRole="tablist" className="flex-row border-t border-hairline bg-night pb-safe">
       {state.routes.map((route, index) => {
@@ -58,11 +61,11 @@ export function AppTabBar({ state, descriptors, emitter, navigateToTab }: TabBar
             style={({ pressed }) => (pressed ? pressedNight : undefined)}
           >
             {focused ? (
-              <View pointerEvents="none" style={{ position: "absolute", top: 0, width: 32, height: 2, borderRadius: 1, backgroundColor: palette.gold, boxShadow: `0 0 10px 1px ${withAlphaHex(palette.gold, 0.6)}` }} />
+              <View pointerEvents="none" style={{ position: "absolute", top: 0, width: 32 * s, height: 2, borderRadius: 1, backgroundColor: palette.gold, boxShadow: `0 0 10px 1px ${withAlphaHex(palette.gold, 0.6)}` }} />
             ) : null}
             {/* The icon in a fixed box, so each label sits on the same line; the label says the tab, the icon is not read. */}
-            <View className="mb-1 items-center justify-center" style={{ height: DOCK_ICON }} importantForAccessibility="no-hide-descendants">
-              {options.tabBarIcon?.({ focused, color: focused ? palette.goldHigh : palette.faint, size: DOCK_ICON })}
+            <View className="mb-1 items-center justify-center" style={{ height: DOCK_ICON * s }} importantForAccessibility="no-hide-descendants">
+              {options.tabBarIcon?.({ focused, color: focused ? palette.goldHigh : palette.faint, size: DOCK_ICON * s })}
             </View>
             <Text className={focused ? "text-micro font-semibold text-goldHigh" : "text-micro text-faint"} numberOfLines={1}>
               {label}

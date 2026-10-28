@@ -102,9 +102,9 @@ export const STOP_AHEAD_WORDS = "A stop is ahead";
 const CARD_MIN = 230;
 const CARD_MAX = 340;
 
-/** The card's width for a strip `width` wide: about 58% of it, so the neighbors show at the sides, clamped to 230..340. */
-export function cardWidth(width: number): number {
-  return Math.round(Math.min(CARD_MAX, Math.max(CARD_MIN, width * 0.58)));
+/** The card's width for a strip `width` wide: about 58% of it, so the neighbors show at the sides, clamped to 230..340 (at the UI `scale`, those bounds times it). */
+export function cardWidth(width: number, scale = 1): number {
+  return Math.round(Math.min(CARD_MAX * scale, Math.max(CARD_MIN * scale, width * 0.58)));
 }
 
 /** The index the strip starts on: the current phase; the first before Resource, the last after Refresh. */

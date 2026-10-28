@@ -16,6 +16,7 @@ import { TOKEN, tokenSpot } from "./token-spots.ts";
 import type { TableTokens } from "./tokens.ts";
 
 const CINZEL = require("../../assets/fonts/Cinzel-Bold.ttf") as number;
+// Medium's size of the floating number, in points; drawn times the UI scale.
 const FLOAT_SIZE = 13;
 
 const IMAGE_OF: Readonly<Record<TokenKind, keyof TokenImages>> = { resources: "resource", damage: "damage", progress: "progress" };
@@ -32,41 +33,43 @@ function useSince(clock: Clock, start: number): { get: () => number } {
   return useDerivedValue(() => (epoch.get() === at ? progress.get() * span - start * k : -1), [at, k, span, start]);
 }
 
-function Pop({ fx, slot, rect, clock, images, fonts, t, ring, contrast, strip }: { fx: Fx; slot: CardSlot; rect: Rect; clock: Clock; images: TokenImages; fonts: Fonts; t: TableTokens; ring: string | null; contrast: boolean; strip: string | null }) {
+function Pop({ fx, slot, rect, clock, images, fonts, t, s, ring, contrast, strip }: { fx: Fx; slot: CardSlot; rect: Rect; clock: Clock; images: TokenImages; fonts: Fonts; t: TableTokens; s: number; ring: string | null; contrast: boolean; strip: string | null }) {
   const since = useSince(clock, fx.start);
   const { k } = clock;
   const { token } = fx.delta;
   // A quest card or a location pops its strip's count; any other card pops the token itself.
-  const spot = strip ? { cx: rect.x + rect.w / 2, cy: rect.y + rect.h - 9 } : tokenSpot(rect, token);
+  const spot = strip ? { cx: rect.x + rect.w / 2, cy: rect.y + rect.h - 9 * s } : tokenSpot(rect, token, s);
+  const size = TOKEN * s;
   const transform = useDerivedValue(() => [{ scale: tokenPopScale(since.get(), k) }]);
   const opacity = useDerivedValue(() => (since.get() >= 0 && since.get() < POP_MS * k ? 1 : 0));
   const image = images[IMAGE_OF[token]];
   return (
     <Group transform={transform} origin={vec(spot.cx, spot.cy)} opacity={opacity}>
       {strip ? (
-        <Outlined x={spot.cx} y={rect.y + rect.h - 3} text={strip} font={fonts.numbers} t={t} />
+        <Outlined x={spot.cx} y={rect.y + rect.h - 3 * s} text={strip} font={fonts.numbers} t={t} s={s} />
       ) : (
         <Group>
-          {image ? <Image image={image as SkImage} x={spot.cx - TOKEN / 2} y={spot.cy - TOKEN / 2} width={TOKEN} height={TOKEN} fit="contain" /> : <Circle cx={spot.cx} cy={spot.cy} r={TOKEN / 2} color={fallbackOf(t)[token]} />}
-          {ring ? <Circle cx={spot.cx} cy={spot.cy} r={TOKEN / 2 + 0.5} color={ring} style="stroke" strokeWidth={1.75} /> : null}
-          <Outlined x={spot.cx} y={spot.cy + 4} text={String(countOf(slot, token))} font={contrast ? fonts.badge : fonts.numbers} t={t} heavy={contrast} />
+          {image ? <Image image={image as SkImage} x={spot.cx - size / 2} y={spot.cy - size / 2} width={size} height={size} fit="contain" /> : <Circle cx={spot.cx} cy={spot.cy} r={size / 2} color={fallbackOf(t)[token]} />}
+          {ring ? <Circle cx={spot.cx} cy={spot.cy} r={size / 2 + 0.5 * s} color={ring} style="stroke" strokeWidth={1.75 * s} /> : null}
+          <Outlined x={spot.cx} y={spot.cy + 4 * s} text={String(countOf(slot, token))} font={contrast ? fonts.badge : fonts.numbers} t={t} s={s} heavy={contrast} />
         </Group>
       )}
     </Group>
   );
 }
 
-function Float({ fx, rect, clock, font, t }: { fx: Fx; rect: Rect; clock: Clock; font: SkFont; t: TableTokens }) {
+function Float({ fx, rect, clock, font, t, s }: { fx: Fx; rect: Rect; clock: Clock; font: SkFont; t: TableTokens; s: number }) {
   const since = useSince(clock, fx.start);
   const { k } = clock;
   const words = floatWords(fx.delta);
-  const spot = tokenSpot(rect, fx.delta.token);
+  const spot = tokenSpot(rect, fx.delta.token, s);
   const frame = useDerivedValue(() => floatAt(since.get(), k));
-  const transform = useDerivedValue(() => [{ translateY: frame.get().dy }]);
+  // The number rises 20 pt at Medium; the rise is scaled with it.
+  const transform = useDerivedValue(() => [{ translateY: frame.get().dy * s }]);
   const opacity = useDerivedValue(() => (since.get() < 0 || since.get() > FLOAT_MS * k ? 0 : frame.get().opacity));
   return (
     <Group transform={transform} opacity={opacity}>
-      <Outlined x={spot.cx} y={spot.cy - TOKEN / 2} text={words.text} font={font} t={t} color={words.gain ? t.gold : t.danger} heavy />
+      <Outlined x={spot.cx} y={spot.cy - (TOKEN * s) / 2} text={words.text} font={font} t={t} s={s} color={words.gain ? t.gold : t.danger} heavy />
     </Group>
   );
 }
@@ -79,6 +82,7 @@ export function TokenFx({
   images,
   fonts,
   t,
+  s,
   ringOf,
   stripOf,
   contrast,
@@ -89,13 +93,15 @@ export function TokenFx({
   images: TokenImages;
   fonts: Fonts;
   t: TableTokens;
+  // The UI scale (ui-scale.ts), from the canvas root.
+  s: number;
   // The sphere colour a card's resource token is ringed with.
   ringOf: (code: string) => string | null;
   // The quest card or location's "progress / quest points" strip text, or null for a card without one.
   stripOf: (slot: CardSlot) => string | null;
   contrast: boolean;
 }) {
-  const font = useFont(CINZEL, FLOAT_SIZE);
+  const font = useFont(CINZEL, FLOAT_SIZE * s);
   if (fx.length === 0) return null;
   return (
     <Group>
@@ -107,8 +113,8 @@ export function TokenFx({
         const strip = item.delta.token === "progress" ? stripOf(slot) : null;
         return (
           <Group key={key}>
-            {popShows(countOf(slot, item.delta.token), strip != null) ? <Pop fx={item} slot={slot} rect={rect} clock={clock} images={images} fonts={fonts} t={t} ring={item.delta.token === "resources" ? ringOf(slot.code) : null} contrast={contrast} strip={strip} /> : null}
-            {font ? <Float fx={item} rect={rect} clock={clock} font={font} t={t} /> : null}
+            {popShows(countOf(slot, item.delta.token), strip != null) ? <Pop fx={item} slot={slot} rect={rect} clock={clock} images={images} fonts={fonts} t={t} s={s} ring={item.delta.token === "resources" ? ringOf(slot.code) : null} contrast={contrast} strip={strip} /> : null}
+            {font ? <Float fx={item} rect={rect} clock={clock} font={font} t={t} s={s} /> : null}
           </Group>
         );
       })}

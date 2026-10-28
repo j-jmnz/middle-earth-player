@@ -13,6 +13,8 @@ import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { wrapName } from "./wrap.ts";
 
+// Medium's sizes in points. Every piece draws them times `s`, the UI scale (ui-scale.ts, user request, 2026-10-28), which the canvas root
+// hands down as a prop beside the tokens `t`: a piece does not read the scale itself.
 export const RADIUS = 6;
 const LINE = 14;
 const BADGE_H = 15;
@@ -50,11 +52,11 @@ export function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: num
 }
 
 // A number that stays readable on any token art or picture: a night outline under a bone fill.
-export function Outlined({ x, y, text, font, t, color = t.bone, heavy = false }: { x: number; y: number; text: string; font: SkFont; t: TableTokens; color?: string; heavy?: boolean }) {
+export function Outlined({ x, y, text, font, t, s, color = t.bone, heavy = false }: { x: number; y: number; text: string; font: SkFont; t: TableTokens; s: number; color?: string; heavy?: boolean }) {
   const width = font.getTextWidth(text);
   return (
     <Group>
-      <Text x={x - width / 2} y={y} text={text} font={font} color={t.night} style="stroke" strokeWidth={heavy ? 4.5 : 3} />
+      <Text x={x - width / 2} y={y} text={text} font={font} color={t.night} style="stroke" strokeWidth={(heavy ? 4.5 : 3) * s} />
       <Text x={x - width / 2} y={y} text={text} font={font} color={color} />
     </Group>
   );
@@ -66,15 +68,15 @@ export function Outlined({ x, y, text, font, t, color = t.bone, heavy = false }:
  * and never a word on the canvas; the preview lists the lines (docs/plans/inactive-text.md). Not gold, which marks the one
  * action, and not danger, which marks a refusal.
  */
-export function NotAppliedMark({ rect, t }: { rect: Rect; t: TableTokens }) {
+export function NotAppliedMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number }) {
   // At the right edge, just under the damage token's corner; the delayed effect's clock goes under it.
-  const cx = rect.x + rect.w - 8;
-  const cy = rect.y + TOKEN + 3 + 6.5;
+  const cx = rect.x + rect.w - 8 * s;
+  const cy = rect.y + (TOKEN + 3 + 6.5) * s;
   return (
     <Group>
-      <Circle cx={cx} cy={cy} r={6.5} color={t.night} />
-      <Circle cx={cx} cy={cy} r={4.5} color={t.faint} style="stroke" strokeWidth={1.5} />
-      <Line p1={vec(cx - 3.2, cy + 3.2)} p2={vec(cx + 3.2, cy - 3.2)} color={t.faint} strokeWidth={1.5} />
+      <Circle cx={cx} cy={cy} r={6.5 * s} color={t.night} />
+      <Circle cx={cx} cy={cy} r={4.5 * s} color={t.faint} style="stroke" strokeWidth={1.5 * s} />
+      <Line p1={vec(cx - 3.2 * s, cy + 3.2 * s)} p2={vec(cx + 3.2 * s, cy - 3.2 * s)} color={t.faint} strokeWidth={1.5 * s} />
     </Group>
   );
 }
@@ -83,34 +85,35 @@ export function NotAppliedMark({ rect, t }: { rect: Rect; t: TableTokens }) {
  * The facedown prisoner's back (01123:B:1): a small hero mark on a night disc in the middle of it, upright whatever the card does. Not gold, which marks
  * the one action, and not danger, which marks a refusal: bone, the colour of a card that is only held.
  */
-export function HeldMark({ rect, t }: { rect: Rect; t: TableTokens }) {
+export function HeldMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number }) {
   const cx = rect.x + rect.w / 2;
   const cy = rect.y + rect.h / 2;
   return (
     <Group>
-      <Circle cx={cx} cy={cy} r={12} color={t.night} />
-      <Circle cx={cx} cy={cy} r={11} color={t.bone} style="stroke" strokeWidth={1.25} />
-      <CanvasIcon name="hero" x={cx - 6} y={cy - 6} size={12} color={t.bone} />
+      <Circle cx={cx} cy={cy} r={12 * s} color={t.night} />
+      <Circle cx={cx} cy={cy} r={11 * s} color={t.bone} style="stroke" strokeWidth={1.25 * s} />
+      <CanvasIcon name="hero" x={cx - 6 * s} y={cy - 6 * s} size={12 * s} color={t.bone} />
     </Group>
   );
 }
 
 // A card back: the printed one, the One Ring for a player card and the Eye for an encounter card. While its file decodes,
 // the player's is raised night with the gold ring, the encounter deck's night with a threat-red ring.
-function Back({ x, y, w, h, encounter, backs, t }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages; t: TableTokens }) {
+function Back({ x, y, w, h, encounter, backs, t, s }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages; t: TableTokens; s: number }) {
   const image = encounter ? backs.encounter : backs.player;
+  const radius = RADIUS * s;
   if (image) {
     return (
-      <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
+      <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
         <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
       </Group>
     );
   }
   return (
     <Group>
-      <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={encounter ? t.night : t.raised} />
-      <RoundedRect x={x + 2} y={y + 2} width={w - 4} height={h - 4} r={RADIUS - 2} color={encounter ? t.threat : t.goldLine} style="stroke" strokeWidth={1} />
-      <Circle cx={x + w / 2} cy={y + h / 2} r={Math.min(w, h) / 4} color={encounter ? t.threat : t.gold} style="stroke" strokeWidth={2} />
+      <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={encounter ? t.night : t.raised} />
+      <RoundedRect x={x + 2 * s} y={y + 2 * s} width={w - 4 * s} height={h - 4 * s} r={radius - 2 * s} color={encounter ? t.threat : t.goldLine} style="stroke" strokeWidth={1 * s} />
+      <Circle cx={x + w / 2} cy={y + h / 2} r={Math.min(w, h) / 4} color={encounter ? t.threat : t.gold} style="stroke" strokeWidth={2 * s} />
     </Group>
   );
 }
@@ -125,6 +128,7 @@ export function CardBody({
   encounterBack,
   backs,
   t,
+  s,
 }: {
   slot: CardSlot;
   image: SkImage | null;
@@ -134,26 +138,28 @@ export function CardBody({
   encounterBack: boolean;
   backs: BackImages;
   t: TableTokens;
+  s: number;
 }) {
   const { x, y, w, h } = slot;
+  const radius = RADIUS * s;
   return (
     <Group>
-      <RoundedRect x={x + 1} y={y + 2} width={w} height={h} r={RADIUS} color={shadowOf(t)} />
+      <RoundedRect x={x + 1 * s} y={y + 2 * s} width={w} height={h} r={radius} color={shadowOf(t)} />
       {slot.faceDown ? (
-        <Back x={x} y={y} w={w} h={h} encounter={encounterBack} backs={backs} t={t} />
+        <Back x={x} y={y} w={w} h={h} encounter={encounterBack} backs={backs} t={t} s={s} />
       ) : image ? (
-        <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
+        <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
         </Group>
       ) : (
         <Group>
-          <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={t.raised} />
-          <Group clip={{ x: x + 3, y: y + 3, width: w - 6, height: h - 6 }}>
-            {wrapName(name, w - 10, (text) => fonts.names.getTextWidth(text)).map((line, index) => (
-              <Text key={index} x={x + 5} y={y + 15 + index * LINE} text={line} font={fonts.names} color={t.bone} />
+          <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
+          <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: w - 6 * s, height: h - 6 * s }}>
+            {wrapName(name, w - 10 * s, (text) => fonts.names.getTextWidth(text)).map((line, index) => (
+              <Text key={index} x={x + 5 * s} y={y + (15 + index * LINE) * s} text={line} font={fonts.names} color={t.bone} />
             ))}
           </Group>
-          {sphere ? <CanvasIcon name={sphere} x={x + w - 16} y={y + h - 16} size={12} color={t[SPHERE_TINT[sphere] ?? "faint"]} /> : null}
+          {sphere ? <CanvasIcon name={sphere} x={x + w - 16 * s} y={y + h - 16 * s} size={12 * s} color={t[SPHERE_TINT[sphere] ?? "faint"]} /> : null}
         </Group>
       )}
     </Group>
@@ -163,17 +169,19 @@ export function CardBody({
 const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard" };
 
 /** A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. */
-export function Pile({ slot, image, name, fonts, label, backs, t }: { slot: CardSlot; image: SkImage | null; name: string; fonts: Fonts; label: boolean; backs: BackImages; t: TableTokens }) {
+export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: CardSlot; image: SkImage | null; name: string; fonts: Fonts; label: boolean; backs: BackImages; t: TableTokens; s: number }) {
   const { x, y, w, h } = slot;
+  const radius = RADIUS * s;
+  const strip = 15 * s;
   const encounter = slot.zone === "encounterDeck" || slot.zone === "encounterDiscard";
   const word = PILE_WORD[slot.zone] ?? "";
   if (slot.count === 0) {
     return (
       <Group>
-        <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={t.hairline} style="stroke" strokeWidth={1}>
-          <DashPathEffect intervals={[4, 4]} />
+        <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.hairline} style="stroke" strokeWidth={1 * s}>
+          <DashPathEffect intervals={[4 * s, 4 * s]} />
         </RoundedRect>
-        {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h / 2 + 4} text={word} font={fonts.small} color={t.faint} /> : null}
+        {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h / 2 + 4 * s} text={word} font={fonts.small} color={t.faint} /> : null}
       </Group>
     );
   }
@@ -181,35 +189,35 @@ export function Pile({ slot, image, name, fonts, label, backs, t }: { slot: Card
   return (
     <Group>
       {Array.from({ length: depth }, (_, index) => (
-        <RoundedRect key={index} x={x + (depth - index) * 1.5} y={y + (depth - index) * 1.5} width={w} height={h} r={RADIUS} color={encounter ? t.night : t.raised} />
+        <RoundedRect key={index} x={x + (depth - index) * 1.5 * s} y={y + (depth - index) * 1.5 * s} width={w} height={h} r={radius} color={encounter ? t.night : t.raised} />
       ))}
       {slot.faceDown ? (
-        <Back x={x} y={y} w={w} h={h} encounter={encounter} backs={backs} t={t} />
+        <Back x={x} y={y} w={w} h={h} encounter={encounter} backs={backs} t={t} s={s} />
       ) : image ? (
-        <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
+        <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
         </Group>
       ) : (
         // A face-up top whose file is missing shows its name, so a discard pile never looks like a deck.
         <Group>
-          <RoundedRect x={x} y={y} width={w} height={h} r={RADIUS} color={t.raised} />
-          <Group clip={{ x: x + 3, y: y + 3, width: w - 6, height: h - 21 }}>
-            {wrapName(name, w - 10, (text) => fonts.names.getTextWidth(text)).map((line, index) => (
-              <Text key={index} x={x + 5} y={y + 15 + index * LINE} text={line} font={fonts.names} color={t.bone} />
+          <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
+          <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: w - 6 * s, height: h - 21 * s }}>
+            {wrapName(name, w - 10 * s, (text) => fonts.names.getTextWidth(text)).map((line, index) => (
+              <Text key={index} x={x + 5 * s} y={y + (15 + index * LINE) * s} text={line} font={fonts.names} color={t.bone} />
             ))}
           </Group>
         </Group>
       )}
-      <RoundedRect x={x} y={y + h - 15} width={w} height={15} r={0} color={stripOf(t)} />
-      <Outlined x={x + w / 2} y={y + h - 3} text={String(slot.count)} font={fonts.numbers} t={t} />
+      <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
+      <Outlined x={x + w / 2} y={y + h - 3 * s} text={String(slot.count)} font={fonts.numbers} t={t} s={s} />
       {/* Iron Shackles is attached to this deck (01105:A:1): two linked rings at the strip's left end. */}
       {slot.chained ? (
         <Group>
-          <RoundedRect x={x + 3} y={y + h - 11} width={8} height={6} r={3} color={t.bone} style="stroke" strokeWidth={1.25} />
-          <RoundedRect x={x + 8} y={y + h - 11} width={8} height={6} r={3} color={t.bone} style="stroke" strokeWidth={1.25} />
+          <RoundedRect x={x + 3 * s} y={y + h - 11 * s} width={8 * s} height={6 * s} r={3 * s} color={t.bone} style="stroke" strokeWidth={1.25 * s} />
+          <RoundedRect x={x + 8 * s} y={y + h - 11 * s} width={8 * s} height={6 * s} r={3 * s} color={t.bone} style="stroke" strokeWidth={1.25 * s} />
         </Group>
       ) : null}
-      {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h + 11} text={word} font={fonts.small} color={t.muted} /> : null}
+      {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h + 11 * s} text={word} font={fonts.small} color={t.muted} /> : null}
     </Group>
   );
 }
@@ -218,23 +226,24 @@ export function Pile({ slot, image, name, fonts, label, backs, t }: { slot: Card
  * The token art on a card, each with its count: resources bottom left, damage top right, progress bottom right. `rect` is
  * the card's rectangle on screen, so the tokens of an exhausted card stay upright in its sideways footprint.
  */
-export function Tokens({ slot, rect, images, fonts, t, ring = null, contrast = false }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; t: TableTokens; ring?: string | null; contrast?: boolean }) {
+export function Tokens({ slot, rect, images, fonts, t, s, ring = null, contrast = false }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; t: TableTokens; s: number; ring?: string | null; contrast?: boolean }) {
+  const size = TOKEN * s;
   const items: { image: SkImage | null; value: number; cx: number; cy: number; fallback: string; ring: string | null }[] = [];
-  if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, ...tokenSpot(rect, "resources"), fallback: t.gold, ring });
-  if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, ...tokenSpot(rect, "damage"), fallback: t.threat, ring: null });
-  if (slot.progress > 0) items.push({ image: images.progress, value: slot.progress, ...tokenSpot(rect, "progress"), fallback: t.bone, ring: null });
+  if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, ...tokenSpot(rect, "resources", s), fallback: t.gold, ring });
+  if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, ...tokenSpot(rect, "damage", s), fallback: t.threat, ring: null });
+  if (slot.progress > 0) items.push({ image: images.progress, value: slot.progress, ...tokenSpot(rect, "progress", s), fallback: t.bone, ring: null });
   return (
     <Group>
       {items.map((item, index) => (
         <Group key={index}>
           {item.image ? (
-            <Image image={item.image} x={item.cx - TOKEN / 2} y={item.cy - TOKEN / 2} width={TOKEN} height={TOKEN} fit="contain" />
+            <Image image={item.image} x={item.cx - size / 2} y={item.cy - size / 2} width={size} height={size} fit="contain" />
           ) : (
-            <Circle cx={item.cx} cy={item.cy} r={TOKEN / 2} color={item.fallback} />
+            <Circle cx={item.cx} cy={item.cy} r={size / 2} color={item.fallback} />
           )}
           {/* A hero's resources pay for its own sphere: the token is ringed in that sphere's colour. */}
-          {item.ring ? <Circle cx={item.cx} cy={item.cy} r={TOKEN / 2 + 0.5} color={item.ring} style="stroke" strokeWidth={1.75} /> : null}
-          <Outlined x={item.cx} y={item.cy + 4} text={String(item.value)} font={contrast ? fonts.badge : fonts.numbers} t={t} heavy={contrast} />
+          {item.ring ? <Circle cx={item.cx} cy={item.cy} r={size / 2 + 0.5 * s} color={item.ring} style="stroke" strokeWidth={1.75 * s} /> : null}
+          <Outlined x={item.cx} y={item.cy + 4 * s} text={String(item.value)} font={contrast ? fonts.badge : fonts.numbers} t={t} s={s} heavy={contrast} />
         </Group>
       ))}
     </Group>
@@ -256,6 +265,7 @@ export function Badges({
   fonts,
   images,
   t,
+  s,
   contrast = false,
 }: {
   slot: CardSlot;
@@ -266,52 +276,55 @@ export function Badges({
   fonts: Fonts;
   images: TokenImages;
   t: TableTokens;
+  s: number;
   // Strong outlines (table-settings.ts): each pill gets a bone edge, so it reads on any picture.
   contrast?: boolean;
 }) {
   const { x, y, w, h } = rect;
+  const pill = BADGE_H * s;
+  const strip = 15 * s;
   // Rows that fit between the top edge and the resource token at the bottom left.
-  const room = Math.max(1, Math.floor((h - TOKEN - 6) / (BADGE_H + 2)));
+  const room = Math.max(1, Math.floor((h - TOKEN * s - 6 * s) / (pill + 2 * s)));
   const items = [...effects.stats.map((badge) => ({ kind: "stat" as const, badge })), ...effects.flags.map((flag) => ({ kind: "flag" as const, flag }))];
   const { shown: count, hidden } = badgeSplit(items.length, room);
   const shown = items.slice(0, count);
   const rows: ReactElement[] = shown.map((item, index) => {
-    const top = y + 3 + index * (BADGE_H + 2);
+    const top = y + 3 * s + index * (pill + 2 * s);
     if (item.kind === "flag") {
       return (
         <Group key={`f${item.flag.flag}`}>
-          <RoundedRect x={x + 2} y={top} width={BADGE_H + 4} height={BADGE_H} r={BADGE_H / 2} color={t.night} />
-          <BadgeIcon name={item.flag.icon} x={x + 5} y={top + 2} size={11} color={t.danger} images={images} />
-          <Line p1={vec(x + 4, top + 2)} p2={vec(x + BADGE_H + 2, top + BADGE_H - 2)} color={t.danger} strokeWidth={1.5} />
+          <RoundedRect x={x + 2 * s} y={top} width={pill + 4 * s} height={pill} r={pill / 2} color={t.night} />
+          <BadgeIcon name={item.flag.icon} x={x + 5 * s} y={top + 2 * s} size={11 * s} color={t.danger} images={images} />
+          <Line p1={vec(x + 4 * s, top + 2 * s)} p2={vec(x + pill + 2 * s, top + pill - 2 * s)} color={t.danger} strokeWidth={1.5 * s} />
         </Group>
       );
     }
     const { badge } = item;
     const up = badge.delta > 0;
     const text = `${up ? "+" : "-"}${Math.abs(badge.delta)}`;
-    const width = 15 + fonts.badge.getTextWidth(text) + 5;
+    const width = 15 * s + fonts.badge.getTextWidth(text) + 5 * s;
     return (
       <Group key={`s${badge.stat}`}>
-        <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={up ? t.gold : t.night} />
-        {up ? null : <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={t.danger} style="stroke" strokeWidth={1} />}
-        {contrast ? <RoundedRect x={x + 2} y={top} width={width} height={BADGE_H} r={BADGE_H / 2} color={up ? t.night : t.bone} style="stroke" strokeWidth={1.5} /> : null}
+        <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={up ? t.gold : t.night} />
+        {up ? null : <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.danger} style="stroke" strokeWidth={1 * s} />}
+        {contrast ? <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={up ? t.night : t.bone} style="stroke" strokeWidth={1.5 * s} /> : null}
         {/* An effect that ends with the phase, the round or the attack: a dashed edge says it will go (the preview says when). */}
         {badge.lasting ? (
-          <RoundedRect x={x + 1} y={top - 1} width={width + 2} height={BADGE_H + 2} r={BADGE_H / 2 + 1} color={up ? t.bone : t.danger} style="stroke" strokeWidth={1}>
-            <DashPathEffect intervals={[2, 2]} />
+          <RoundedRect x={x + 1 * s} y={top - 1 * s} width={width + 2 * s} height={pill + 2 * s} r={pill / 2 + 1 * s} color={up ? t.bone : t.danger} style="stroke" strokeWidth={1 * s}>
+            <DashPathEffect intervals={[2 * s, 2 * s]} />
           </RoundedRect>
         ) : null}
-        <BadgeIcon name={badge.icon} x={x + 5} y={top + 2} size={11} color={up ? t.onGold : t.danger} images={images} />
-        <Text x={x + 18} y={top + 11.5} text={text} font={fonts.badge} color={up ? t.onGold : t.danger} />
+        <BadgeIcon name={badge.icon} x={x + 5 * s} y={top + 2 * s} size={11 * s} color={up ? t.onGold : t.danger} images={images} />
+        <Text x={x + 18 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={up ? t.onGold : t.danger} />
       </Group>
     );
   });
   if (hidden > 0) {
-    const top = y + 3 + shown.length * (BADGE_H + 2);
+    const top = y + 3 * s + shown.length * (pill + 2 * s);
     rows.push(
       <Group key="more">
-        <RoundedRect x={x + 2} y={top} width={24} height={BADGE_H} r={BADGE_H / 2} color={t.night} />
-        <Text x={x + 6} y={top + 11.5} text={`+${hidden}`} font={fonts.badge} color={t.bone} />
+        <RoundedRect x={x + 2 * s} y={top} width={24 * s} height={pill} r={pill / 2} color={t.night} />
+        <Text x={x + 6 * s} y={top + 11.5 * s} text={`+${hidden}`} font={fonts.badge} color={t.bone} />
       </Group>,
     );
   }
@@ -320,15 +333,15 @@ export function Badges({
       {rows}
       {slot.committed && willpower != null ? (
         <Group>
-          <RoundedRect x={x + w / 2 - 16} y={y + h - BADGE_H - 3} width={32} height={BADGE_H} r={BADGE_H / 2} color={t.gold} />
-          <CanvasIcon name="willpower" x={x + w / 2 - 13} y={y + h - BADGE_H - 1} size={11} color={t.onGold} />
-          <Text x={x + w / 2 + 1} y={y + h - 6.5} text={String(willpower)} font={fonts.badge} color={t.onGold} />
+          <RoundedRect x={x + w / 2 - 16 * s} y={y + h - pill - 3 * s} width={32 * s} height={pill} r={pill / 2} color={t.gold} />
+          <CanvasIcon name="willpower" x={x + w / 2 - 13 * s} y={y + h - pill - 1 * s} size={11 * s} color={t.onGold} />
+          <Text x={x + w / 2 + 1 * s} y={y + h - 6.5 * s} text={String(willpower)} font={fonts.badge} color={t.onGold} />
         </Group>
       ) : null}
       {questPoints != null ? (
         <Group>
-          <RoundedRect x={x} y={y + h - 15} width={w} height={15} r={0} color={stripOf(t)} />
-          <Outlined x={x + w / 2} y={y + h - 3} text={`${slot.progress} / ${questPoints}`} font={fonts.numbers} t={t} />
+          <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
+          <Outlined x={x + w / 2} y={y + h - 3 * s} text={`${slot.progress} / ${questPoints}`} font={fonts.numbers} t={t} s={s} />
         </Group>
       ) : null}
     </Group>
@@ -340,58 +353,59 @@ export function Badges({
  * danger edge when `danger`, night with a hairline otherwise. `lift` raises it above the token row, clear of the resource
  * count a character may hold.
  */
-function FootPill({ rect, image, icon, value, danger, lift, fonts, t }: { rect: Rect; image: SkImage | null; icon: IconName; value: number; danger: boolean; lift: boolean; fonts: Fonts; t: TableTokens }) {
+function FootPill({ rect, image, icon, value, danger, lift, fonts, t, s }: { rect: Rect; image: SkImage | null; icon: IconName; value: number; danger: boolean; lift: boolean; fonts: Fonts; t: TableTokens; s: number }) {
   const { x, y, w, h } = rect;
   const text = String(value);
-  const width = TOKEN + fonts.badge.getTextWidth(text) + 8;
+  const token = TOKEN * s;
+  const width = token + fonts.badge.getTextWidth(text) + 8 * s;
   const left = x + (w - width) / 2;
-  const top = y + h - TOKEN - 4 - (lift ? TOKEN + 2 : 0);
+  const top = y + h - token - 4 * s - (lift ? token + 2 * s : 0);
   return (
     <Group>
-      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={danger ? t.threat : t.night} />
-      <RoundedRect x={left} y={top} width={width} height={TOKEN} r={TOKEN / 2} color={danger ? t.danger : t.hairline} style="stroke" strokeWidth={1} />
-      {image ? <Image image={image} x={left + 1} y={top + 1} width={TOKEN - 2} height={TOKEN - 2} fit="contain" /> : <CanvasIcon name={icon} x={left + 3} y={top + 3} size={TOKEN - 6} color={t.bone} />}
-      <Text x={left + TOKEN + 2} y={top + TOKEN - 5} text={text} font={fonts.badge} color={t.bone} />
+      <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={danger ? t.threat : t.night} />
+      <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={danger ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
+      {image ? <Image image={image} x={left + 1 * s} y={top + 1 * s} width={token - 2 * s} height={token - 2 * s} fit="contain" /> : <CanvasIcon name={icon} x={left + 3 * s} y={top + 3 * s} size={token - 6 * s} color={t.bone} />}
+      <Text x={left + token + 2 * s} y={top + token - 5 * s} text={text} font={fonts.badge} color={t.bone} />
     </Group>
   );
 }
 
 /** A number the open pick draws on a card it asks about: the damage a defender would take, before the shadow card. */
-export function OptionMarkView({ rect, mark, fonts, images, t }: { rect: Rect; mark: OptionMark; fonts: Fonts; images: TokenImages; t: TableTokens }) {
-  return <FootPill rect={rect} image={mark.icon === "damage" ? images.damage : null} icon={mark.icon} value={mark.value} danger={mark.danger} lift fonts={fonts} t={t} />;
+export function OptionMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect; mark: OptionMark; fonts: Fonts; images: TokenImages; t: TableTokens; s: number }) {
+  return <FootPill rect={rect} image={mark.icon === "damage" ? images.damage : null} icon={mark.icon} value={mark.value} danger={mark.danger} lift fonts={fonts} t={t} s={s} />;
 }
 
 /** An enemy's engagement cost in staging: threat red when the shown seat's threat engages it at the checks (rr.engagement-check). */
-export function EngagementMark({ rect, cost, engages, fonts, images, t }: { rect: Rect; cost: number; engages: boolean; fonts: Fonts; images: TokenImages; t: TableTokens }) {
-  return <FootPill rect={rect} image={images.engagementCost} icon="threat" value={cost} danger={engages} lift={false} fonts={fonts} t={t} />;
+export function EngagementMark({ rect, cost, engages, fonts, images, t, s }: { rect: Rect; cost: number; engages: boolean; fonts: Fonts; images: TokenImages; t: TableTokens; s: number }) {
+  return <FootPill rect={rect} image={images.engagementCost} icon="threat" value={cost} danger={engages} lift={false} fonts={fonts} t={t} s={s} />;
 }
 
 /**
  * A card a delayed effect will act on (Sneak Attack's return): a small clock at the right edge, under the damage token and
  * the not-applied mark, clear of the effect pills down the left edge. The preview says what.
  */
-export function DelayedMark({ rect, t }: { rect: Rect; t: TableTokens }) {
-  const cx = rect.x + rect.w - 8;
-  const cy = rect.y + TOKEN + 3 + 13 + 2 + 7;
+export function DelayedMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number }) {
+  const cx = rect.x + rect.w - 8 * s;
+  const cy = rect.y + (TOKEN + 3 + 13 + 2 + 7) * s;
   return (
     <Group>
-      <Circle cx={cx} cy={cy} r={7} color={t.night} />
-      <Circle cx={cx} cy={cy} r={7} color={t.gold} style="stroke" strokeWidth={1.5} />
-      <Line p1={vec(cx, cy)} p2={vec(cx, cy - 4)} color={t.gold} strokeWidth={1.5} />
-      <Line p1={vec(cx, cy)} p2={vec(cx + 3, cy)} color={t.gold} strokeWidth={1.5} />
+      <Circle cx={cx} cy={cy} r={7 * s} color={t.night} />
+      <Circle cx={cx} cy={cy} r={7 * s} color={t.gold} style="stroke" strokeWidth={1.5 * s} />
+      <Line p1={vec(cx, cy)} p2={vec(cx, cy - 4 * s)} color={t.gold} strokeWidth={1.5 * s} />
+      <Line p1={vec(cx, cy)} p2={vec(cx + 3 * s, cy)} color={t.gold} strokeWidth={1.5 * s} />
     </Group>
   );
 }
 
 /** The enemy whose attack is in progress: a threat-red edge and its attack icon at its side. */
-export function AttackerMark({ rect, t }: { rect: Rect; t: TableTokens }) {
+export function AttackerMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number }) {
   const { x, y, w, h } = rect;
   return (
     <Group>
-      <RoundedRect x={x - 1} y={y - 1} width={w + 2} height={h + 2} r={RADIUS + 1} color={t.threat} style="stroke" strokeWidth={3} />
-      <Circle cx={x + w} cy={y + h / 2} r={9} color={t.night} />
-      <Circle cx={x + w} cy={y + h / 2} r={9} color={t.threat} style="stroke" strokeWidth={1.5} />
-      <CanvasIcon name="attack" x={x + w - 6} y={y + h / 2 - 6} size={12} color={t.threat} />
+      <RoundedRect x={x - 1 * s} y={y - 1 * s} width={w + 2 * s} height={h + 2 * s} r={(RADIUS + 1) * s} color={t.threat} style="stroke" strokeWidth={3 * s} />
+      <Circle cx={x + w} cy={y + h / 2} r={9 * s} color={t.night} />
+      <Circle cx={x + w} cy={y + h / 2} r={9 * s} color={t.threat} style="stroke" strokeWidth={1.5 * s} />
+      <CanvasIcon name="attack" x={x + w - 6 * s} y={y + h / 2 - 6 * s} size={12 * s} color={t.threat} />
     </Group>
   );
 }
@@ -400,14 +414,14 @@ export function AttackerMark({ rect, t }: { rect: Rect; t: TableTokens }) {
  * The mark between an engaged enemy and the characters fighting it: a defense, an undefended hit, an attack. A fight picked
  * but not confirmed yet is drawn fainter.
  */
-export function CombatMarkView({ mark, t }: { mark: CombatMark; t: TableTokens }) {
+export function CombatMarkView({ mark, t, s }: { mark: CombatMark; t: TableTokens; s: number }) {
   const icon: IconName = mark.kind === "defense" ? "defense" : "attack";
   const color = mark.kind === "undefended" ? t.threat : t.gold;
   return (
     <Group opacity={mark.preview ? 0.7 : 1}>
-      <Circle cx={mark.x} cy={mark.y} r={8} color={t.night} />
-      <Circle cx={mark.x} cy={mark.y} r={8} color={color} style="stroke" strokeWidth={1.5} />
-      <CanvasIcon name={icon} x={mark.x - 5} y={mark.y - 5} size={10} color={color} />
+      <Circle cx={mark.x} cy={mark.y} r={8 * s} color={t.night} />
+      <Circle cx={mark.x} cy={mark.y} r={8 * s} color={color} style="stroke" strokeWidth={1.5 * s} />
+      <CanvasIcon name={icon} x={mark.x - 5 * s} y={mark.y - 5 * s} size={10 * s} color={color} />
     </Group>
   );
 }

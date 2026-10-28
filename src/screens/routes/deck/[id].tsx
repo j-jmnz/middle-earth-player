@@ -53,6 +53,7 @@ import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
 import { goBack } from "../../go-back";
 import type { PictureSource } from "../../../play/table-canvas-types";
+import { useUiScale } from "../../../play/ui-scale";
 
 type EditorCard = {
   code: string;
@@ -100,6 +101,7 @@ function EditorCardRow({
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
   const router = useRouter();
+  const s = useUiScale();
   const picture = useCardPreview(card.code, card.imagesrc);
   const mark = markedSphere(card.sphereCode);
   return (
@@ -111,7 +113,7 @@ function EditorCardRow({
       leading={
         <View className="flex-row items-center gap-2.5">
           <CostCoin cost={card.cost} />
-          <CardThumb code={card.code} imagesrc={card.imagesrc} width={thumb.width} height={thumb.height} />
+          <CardThumb code={card.code} imagesrc={card.imagesrc} width={thumb.width * s} height={thumb.height * s} />
         </View>
       }
       onPress={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })}
@@ -136,6 +138,7 @@ export default function DeckEditor() {
   const id = routeCode(params.id);
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const s = useUiScale();
   const draft = useDeckDraft();
   const list = useRef<FlashListRef<EditorRow>>(null);
   const { catalog, user } = useDatabases();
@@ -188,8 +191,8 @@ export default function DeckEditor() {
   const threat = startingThreat(draft.heroes, faces);
   const heroes: HeroFace[] = draft.heroes.map((code) => heroFace(faces, code));
   const emptySlots = Math.max(0, 3 - heroes.length);
-  const baseTile = Math.max(120, Math.min(Math.round(height / 4), 200));
-  const tileHeight = heroes.length > 3 ? Math.max(96, Math.round(baseTile * 0.6)) : baseTile;
+  const baseTile = Math.max(120 * s, Math.min(Math.round(height / 4), 200 * s));
+  const tileHeight = heroes.length > 3 ? Math.max(96 * s, Math.round(baseTile * 0.6)) : baseTile;
 
   // The pool, adding to this deck, on one type: an empty hero slot opens it on heroes, a subsection's Add on its type.
   function addOfType(type: string): void {
@@ -225,7 +228,7 @@ export default function DeckEditor() {
   const heroStrip = (
       <View className={heroes.length > 3 ? "mt-1 flex-row flex-wrap justify-between" : "mt-1 flex-row gap-2"}>
         {heroes.map((hero) => (
-          <View key={hero.code} style={heroes.length > 3 ? { width: "48%", height: tileHeight, marginBottom: 8 } : { flex: 1 }}>
+          <View key={hero.code} style={heroes.length > 3 ? { width: "48%", height: tileHeight, marginBottom: 8 * s } : { flex: 1 }}>
             <HeroTile
               hero={hero}
               height={tileHeight}
@@ -246,10 +249,10 @@ export default function DeckEditor() {
 
   // The headings the jump chips lead to, with the row each starts at.
   const jumps: Jump[] = rows.flatMap((row, index) => (row.kind === "type" ? [{ key: row.key, title: row.title, count: row.type === "hero" ? heroes.length : row.count, index }] : []));
-  const side = { paddingLeft: 24 + insets.left, paddingRight: 24 + insets.right };
+  const side = { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right };
   // FlashList v2 adds viewOffset to the row's offset (FlatList subtracts it): a negative one leaves the heading below the status bar
   // and the floating Back.
-  const jumpTo = (jump: Jump) => list.current?.scrollToIndex({ index: jump.index, animated: true, viewOffset: -(insets.top + 56 + 8) });
+  const jumpTo = (jump: Jump) => list.current?.scrollToIndex({ index: jump.index, animated: true, viewOffset: -(insets.top + (56 + 8) * s) });
 
   const header = (
     <DeckGlance
@@ -277,7 +280,7 @@ export default function DeckEditor() {
       // Heroes add through their empty slots, so only the card subsections carry Add.
       const heroSection = item.type === "hero";
       return (
-        <View accessibilityRole="header" className="min-h-11 flex-row items-center justify-between pt-5">
+        <View accessibilityRole="header" className="min-h-touch flex-row items-center justify-between pt-5">
           <View className="flex-row items-center gap-2.5">
             <Eyebrow tone="moon">{item.title}</Eyebrow>
             <Chip testID={`deck-section-count-${item.type}`} label={heroSection ? `${item.count} of 3` : String(item.count)} />
@@ -324,7 +327,7 @@ export default function DeckEditor() {
             keyExtractor={(item) => item.key}
             getItemType={(item) => item.kind}
             style={{ flex: 1 }}
-            contentContainerStyle={{ paddingBottom: 24 }}
+            contentContainerStyle={{ paddingBottom: 24 * s }}
             extraData={draft}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
@@ -332,7 +335,7 @@ export default function DeckEditor() {
             keyboardDismissMode="on-drag"
             scrollEventThrottle={64}
             onScroll={(event) => {
-              const next = event.nativeEvent.contentOffset.y > BANNER_HEIGHT - 80;
+              const next = event.nativeEvent.contentOffset.y > (BANNER_HEIGHT - 80) * s;
               if (next !== past) setPast(next);
             }}
             ListHeaderComponent={header}
@@ -354,7 +357,7 @@ export default function DeckEditor() {
         </View>
         {/* Back floats over the heroes' paintings and stays in reach as the list scrolls. */}
         <FloatingBarShade shown={past} top={insets.top} />
-        <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 + insets.left, paddingRight: 16 + insets.right }}>
+        <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 * s + insets.left, paddingRight: 16 * s + insets.right }}>
           <NavBar overlay backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
         </View>
       </View>

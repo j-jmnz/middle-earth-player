@@ -6,6 +6,7 @@
 // The hold (250 ms) and the slop (6 pt) are gesture thresholds, not motion: they stay out of motionScale, as the dock's ARM_MS does.
 import { contains, hitSlot, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
+import { touch } from "./ui-scale.ts";
 
 /** How long a press on the hand is held still before the scrub starts, in ms. */
 export const SCRUB_HOLD_MS = 250;
@@ -13,16 +14,19 @@ export const SCRUB_HOLD_MS = 250;
 /** How far the finger may move in that time, in pt; a move before it is a drag, which plays a card as always. */
 export const SCRUB_SLOP = 6;
 
-// The risen hand keeps this far from the canvas's edges, and its cards this far apart when there is room.
+// The risen hand keeps this far from the canvas's edges, and its cards this far apart when there is room. These are Medium's sizes;
+// the layout's UI scale (layout.scale) multiplies them.
 const EDGE = 8;
 const GAP = 6;
 
 /**
  * The risen, spread hand. `slots` are the rectangles the cards reach (already at the scrub's scale, untilted and unlifted), one per
  * card in hand order; `centers` their x centers; `top` the y of the risen hand's top edge, above which the scrub cancels; `left` and
- * `right` its extent; `strip` the normal hand's rectangle, where a press can start a scrub.
+ * `right` its extent; `strip` the normal hand's rectangle, where a press can start a scrub; `reach` the slice of each card a finger is
+ * guaranteed and the distance above the hand where it cancels (44 pt, more at Large), carried here so the worklets read it from the
+ * spread rather than a module constant. Absent means 44.
  */
-export type Spread = { ids: readonly string[]; slots: readonly Rect[]; centers: readonly number[]; scale: number; top: number; left: number; right: number; strip: Rect };
+export type Spread = { ids: readonly string[]; slots: readonly Rect[]; centers: readonly number[]; scale: number; top: number; left: number; right: number; strip: Rect; reach?: number };
 
 export const NO_SPREAD: Spread = { ids: [], slots: [], centers: [], scale: 1, top: 0, left: 0, right: 0, strip: { x: 0, y: 0, w: 0, h: 0 } };
 
@@ -41,15 +45,19 @@ export function spreadLayout(layout: TableLayout, canvas: { width: number; heigh
   const first = cards[0];
   if (!first) return { ...NO_SPREAD, strip: layout.zones.hand };
   const count = cards.length;
-  const room = canvas.width - 2 * EDGE;
-  const scale = Math.min(SHAPE.scrubScale, (room - (count - 1) * MIN_TARGET) / first.w);
+  const ui = layout.scale ?? 1;
+  const edge = EDGE * ui;
+  const gap = GAP * ui;
+  const reach = touch(ui, MIN_TARGET);
+  const room = canvas.width - 2 * edge;
+  const scale = Math.min(SHAPE.scrubScale, (room - (count - 1) * reach) / first.w);
   const w = first.w * scale;
   const h = first.h * scale;
-  const step = count > 1 ? Math.min(w + GAP, (room - w) / (count - 1)) : 0;
+  const step = count > 1 ? Math.min(w + gap, (room - w) / (count - 1)) : 0;
   const x0 = (canvas.width - ((count - 1) * step + w)) / 2;
-  const y = canvas.height - canvas.bottom - h - GAP;
+  const y = canvas.height - canvas.bottom - h - gap;
   const slots = cards.map((_, index) => ({ x: x0 + index * step, y, w, h }));
-  return { ids: cards.map((card) => card.id), slots, centers: slots.map((slot) => slot.x + slot.w / 2), scale, top: y, left: x0, right: x0 + (count - 1) * step + w, strip: layout.zones.hand };
+  return { ids: cards.map((card) => card.id), slots, centers: slots.map((slot) => slot.x + slot.w / 2), scale, top: y, left: x0, right: x0 + (count - 1) * step + w, strip: layout.zones.hand, reach };
 }
 
 /** The index of the card whose center is nearest `x`, or -1 for an empty hand. */
@@ -70,7 +78,7 @@ export function cardAt(spread: Spread, x: number): number {
 /** Whether the finger is more than 44 pt above the top of the risen hand (the lifted card stands above it): cancelled for good. */
 export function cancelled(spread: Spread, y: number): boolean {
   "worklet";
-  return y < spread.top - MIN_TARGET;
+  return y < spread.top - (spread.reach ?? MIN_TARGET);
 }
 
 /**
@@ -79,7 +87,7 @@ export function cancelled(spread: Spread, y: number): boolean {
  */
 export function pick(spread: Spread, x: number, y: number): number {
   "worklet";
-  const margin = MIN_TARGET / 2;
+  const margin = (spread.reach ?? MIN_TARGET) / 2;
   if (spread.ids.length === 0 || cancelled(spread, y) || x < spread.left - margin || x > spread.right + margin) return -1;
   return cardAt(spread, x);
 }

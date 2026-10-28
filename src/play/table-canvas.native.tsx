@@ -32,14 +32,17 @@ import { TokenFx } from "./token-fx.native.tsx";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { useSpotlight } from "./use-spotlight.ts";
 import { useSpotlightImages } from "./use-spotlight-images.native.ts";
+import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 // A faint word in an empty zone, so the player knows what the space is for.
-function ZoneWord({ rect, text, font, t }: { rect: Rect; text: string; font: SkFont; t: TableTokens }) {
-  return <Text x={rect.x + 6} y={rect.y + 16} text={text} font={font} color={t.faint} />;
+function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: SkFont; t: TableTokens; s: number }) {
+  return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
 function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight: marked, raised, fight, bottomInset, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+  // The UI scale, read once here and handed down with the tokens: to the layout, the fonts, every piece and the spotlight (user request, 2026-10-28).
+  const s = useUiScale();
   const contrast = look?.contrast ?? false;
   // The theme's tokens, read once here and handed to every piece the canvas draws (user request, 2026-10-28).
   const t = useTableTokens();
@@ -66,8 +69,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // The top of the deck is a card when the rules let it be played from there (Gandalf, 142002).
   const deckTop = deckTopId && draggable.includes(deckTopId) ? deckTopCard : null;
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s }),
+    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s],
   );
 
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
@@ -86,7 +89,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     engagementCost: useImage(ICON_FILES.engagementCost),
   };
   const backs: BackImages = { player: useImage(CARD_BACK_FILES.player), encounter: useImage(CARD_BACK_FILES.encounter) };
-  const { fonts, spotFonts } = useTableFonts();
+  const { fonts, spotFonts } = useTableFonts(s);
   const spotImages = useSpotlightImages(spot.plan, spot.playing, picture, pictureRevision, images);
 
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
@@ -108,11 +111,11 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     const image = images.get(slot.code) ?? null;
     // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
     if (slot.kind === "pile" || slot.zone === "deck") {
-      const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.code)} fonts={fonts} label backs={backs} t={t} />;
+      const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.code)} fonts={fonts} label backs={backs} t={t} s={s} />;
       // A discard pile holding a card the seat may play from it (Elven-light) glows; its list plays the card.
       return slot.kind === "pile" && isTappable(slot) ? (
         <Group>
-          <Glow slot={slot} picked={false} t={t} />
+          <Glow slot={slot} picked={false} t={t} s={s} />
           {pile}
         </Group>
       ) : (
@@ -124,8 +127,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     const glows = slot.kind === "card" && (picked || isTappable(slot));
     return (
       <Group opacity={dim ? 0.35 : 1}>
-        {glows ? <Glow slot={slot} picked={picked} t={t} /> : null}
-        <CardBody slot={slot} image={image} name={nameOf(slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} encounterBack={encounterBack} backs={backs} t={t} />
+        {glows ? <Glow slot={slot} picked={picked} t={t} s={s} /> : null}
+        <CardBody slot={slot} image={image} name={nameOf(slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} encounterBack={encounterBack} backs={backs} t={t} s={s} />
       </Group>
     );
   };
@@ -133,7 +136,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const drawFrame = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const card = slot.kind === "card";
-    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={highlight.beat.has(slot.id)} t={t} veiled={peeking && card && slot.zone === "hand"} />;
+    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={highlight.beat.has(slot.id)} t={t} s={s} veiled={peeking && card && slot.zone === "hand"} />;
   };
   const drawOverlay = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
@@ -146,15 +149,15 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     return (
       <Group>
         <Group opacity={veiled ? 0.55 : 1}>
-          {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} images={tokens} t={t} contrast={contrast} /> : null}
-          {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} t={t} /> : null}
-          {slotInfo?.delayed ? <DelayedMark rect={rect} t={t} /> : null}
-          <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code), t) : null} contrast={contrast} />
-          {slot.kind === "card" && !slot.faceDown && inactive(slot.code) ? <NotAppliedMark rect={rect} t={t} /> : null}
-          {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} t={t} /> : null}
+          {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
+          {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
+          {slotInfo?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
+          <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code), t) : null} contrast={contrast} />
+          {slot.kind === "card" && !slot.faceDown && inactive(slot.code) ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}
+          {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} t={t} s={s} /> : null}
         </Group>
-        {slot.kind === "card" ? <PickRing rect={rect} picked={pickedCount(slot)} share={highlight.share} dimmed={veiled} fonts={fonts} t={t} /> : null}
-        {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} t={t} /> : null}
+        {slot.kind === "card" ? <PickRing rect={rect} picked={pickedCount(slot)} share={highlight.share} dimmed={veiled} fonts={fonts} t={t} s={s} /> : null}
+        {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} t={t} s={s} /> : null}
       </Group>
     );
   };
@@ -181,12 +184,12 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         <RoundedRect x={0} y={0} width={width} height={height} r={0} color={t.felt} />
         <Circle cx={width / 2} cy={height * 0.45} r={Math.max(width, height) * 0.55} color={t.feltLight} opacity={0.55} />
         {/* The engagement area is a band of its own, between staging and the player's cards. */}
-        <RoundedRect x={layout.zones.engaged.x - 4} y={layout.zones.engaged.y - 3} width={layout.zones.engaged.w + 8} height={layout.zones.engaged.h + 6} r={RADIUS * 2} color={withAlphaHex(t.threat, 0.07)} />
+        <RoundedRect x={layout.zones.engaged.x - 4 * s} y={layout.zones.engaged.y - 3 * s} width={layout.zones.engaged.w + 8 * s} height={layout.zones.engaged.h + 6 * s} r={RADIUS * s * 2} color={withAlphaHex(t.threat, 0.07)} />
         {emptyWords.map(([rect, text]) => (
-          <ZoneWord key={text} rect={rect} text={text} font={fonts.small} t={t} />
+          <ZoneWord key={text} rect={rect} text={text} font={fonts.small} t={t} s={s} />
         ))}
         {targetZones.map((rect, index) => (
-          <RoundedRect key={`z${index}`} x={rect.x - 4} y={rect.y - 4} width={rect.w + 8} height={rect.h + 8} r={RADIUS * 2} color={t.gold} style="stroke" strokeWidth={1.5} />
+          <RoundedRect key={`z${index}`} x={rect.x - 4 * s} y={rect.y - 4 * s} width={rect.w + 8 * s} height={rect.h + 8 * s} r={RADIUS * s * 2} color={t.gold} style="stroke" strokeWidth={1.5 * s} />
         ))}
         {moves.ghosts.map((ghost) => (
           <Leaving key={`ghost:${ghost.slot.id}:${moves.at}`} ghost={ghost} clock={clock}>
@@ -195,18 +198,18 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         ))}
         {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
         <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} t={t} piece={piece} />
-        <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(slot.id).questPoints)} contrast={contrast} />
-        {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} t={t} /> : null}
+        <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(slot.id).questPoints)} contrast={contrast} />
+        {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} t={t} s={s} /> : null}
         {layout.marks.map((mark) => (
-          <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} t={t} />
+          <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} t={t} s={s} />
         ))}
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} />
-            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS} color={t.gold} style="stroke" strokeWidth={2} />
+            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
+            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS * s} color={t.gold} style="stroke" strokeWidth={2 * s} />
           </Group>
         ) : null}
-        {spot.playing && spot.plan ? <Spotlight plan={spot.plan} progress={spot.progress} width={width} height={height} images={spotImages} tokens={tokens} backs={backs} fonts={fonts} spotFonts={spotFonts} t={t} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} /> : null}
+        {spot.playing && spot.plan ? <Spotlight plan={spot.plan} progress={spot.progress} width={width} height={height} images={spotImages} tokens={tokens} backs={backs} fonts={fonts} spotFonts={spotFonts} t={t} s={s} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} /> : null}
       </Canvas>
     </GestureDetector>
   );

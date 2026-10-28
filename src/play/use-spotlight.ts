@@ -65,7 +65,7 @@ export function useSpotlight(store: TableStore, layout: TableLayout, k: number):
     if (gate.seq !== track.seq) {
       // A new moment's attacks fly from where the cards stood before the state, else from where they stand now.
       if (sameSize && spotlightHolds(gate, gateScale, CANVAS) && shown?.kind === "sent" && shown.seq === gate.seq) {
-        plan = buildPlan({ seq: gate.seq, clashes: gate.clashes, canvas: { width: layout.width, height: layout.height }, card: layout.card, prev: shown.before, next: shown.after, layouts: [track.layout, layout] });
+        plan = buildPlan({ seq: gate.seq, clashes: gate.clashes, canvas: { width: layout.width, height: layout.height }, card: layout.card, prev: shown.before, next: shown.after, layouts: [track.layout, layout], scale: layout.scale ?? 1 });
       }
     } else if (sameSize) plan = track.plan;
     setTrack({ layout, seq: gate.seq, plan });

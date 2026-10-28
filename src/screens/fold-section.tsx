@@ -89,7 +89,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, de
           onFold(!folded);
           AccessibilityInfo.announceForAccessibility(`${title} ${folded ? "unfolded" : "folded"}`);
         }}
-        className="min-h-11 flex-1 justify-center rounded-tile"
+        className="min-h-touch flex-1 justify-center rounded-tile"
         style={({ pressed }) => (pressed ? { backgroundColor: palette.pressed } : undefined)}
       >
         <View className="flex-row items-center gap-3">

@@ -15,6 +15,7 @@ import { armBarEasing, useMotionScale } from "./motion-run.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
 import { primaryReady, type Dock, type DockButton } from "./table-choice.ts";
+import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 // How long an armed button waits for its second tap; longer while a screen reader is on. That is a timer, not a motion token: the bar
@@ -56,6 +57,7 @@ export function DockButtons({
   onButton: (button: DockButton) => void;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const moreRef = useRef<ComponentRef<typeof View>>(null);
   const [armed, setArmed] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -106,8 +108,8 @@ export function DockButtons({
     <View className={dense ? "gap-0" : "gap-0.5"}>
       {/* The armed line, always held: what the armed button's second tap does (a caution names the loss in full), or what the
           primary waits for; the bar that runs down has its own 4 pt under the text. Arming moves nothing. */}
-      <View style={{ height: armedRoom(lines, dense) }}>
-        <View style={{ height: lines * LINE_PX, justifyContent: "flex-end" }}>
+      <View style={{ height: armedRoom(lines, dense, s) }}>
+        <View style={{ height: lines * LINE_PX * s, justifyContent: "flex-end" }}>
           {line ? (
             <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} accessibilityLabel={armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : undefined} className={`text-center text-label ${armedButton ? "text-gold" : "text-muted"}`}>
               {line}
@@ -115,8 +117,8 @@ export function DockButtons({
           ) : null}
         </View>
         {armedButton ? (
-          <View pointerEvents="none" style={{ height: dense ? BAR_DENSE_PX : BAR_PX, justifyContent: "center", alignItems: "center" }}>
-            <Animated.View style={[{ height: 2, backgroundColor: t.gold }, bar]} />
+          <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "center", alignItems: "center" }}>
+            <Animated.View style={[{ height: 2 * s, backgroundColor: t.gold }, bar]} />
           </View>
         ) : null}
       </View>

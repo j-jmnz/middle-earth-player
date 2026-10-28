@@ -19,6 +19,7 @@ import { briefingHref, tableHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
 import { goBack } from "../../go-back";
 import { droppedSentence, useSave } from "../../use-save";
+import { useUiScale } from "../../../play/ui-scale";
 
 const STATUS_WORD = { completed: "Completed", current: "Current", locked: "Locked" } as const;
 const RAIL = 44;
@@ -31,22 +32,23 @@ type Next = { label: string; testID: string; words: string; onPress: () => void 
 // with its number for one still locked.
 function Medallion({ node }: { node: PathNode }) {
   const palette = usePalette();
+  const s = useUiScale();
   if (node.status === "completed") {
     return (
-      <View className="items-center justify-center" style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: palette.gold, borderWidth: 3, borderColor: palette.night }}>
-        <Text style={{ color: palette.onGold, fontSize: 13, fontWeight: "800" }}>{"✓"}</Text>
+      <View className="items-center justify-center" style={{ width: 30 * s, height: 30 * s, borderRadius: 15 * s, backgroundColor: palette.gold, borderWidth: 3, borderColor: palette.night }}>
+        <Text style={{ color: palette.onGold, fontSize: 13 * s, fontWeight: "800" }}>{"✓"}</Text>
       </View>
     );
   }
   if (node.status === "current") {
     return (
-      <View className="items-center justify-center" style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: palette.night, borderWidth: 2, borderColor: palette.gold, boxShadow: `0 0 16px ${withAlphaHex(palette.gold, 0.6)}` }}>
+      <View className="items-center justify-center" style={{ width: 38 * s, height: 38 * s, borderRadius: 19 * s, backgroundColor: palette.night, borderWidth: 2, borderColor: palette.gold, boxShadow: `0 0 16px ${withAlphaHex(palette.gold, 0.6)}` }}>
         <Text className="font-display-bold text-body text-goldHigh">{String(node.number)}</Text>
       </View>
     );
   }
   return (
-    <View className="items-center justify-center" style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: palette.raised, borderWidth: 1, borderColor: palette.hairline }}>
+    <View className="items-center justify-center" style={{ width: 30 * s, height: 30 * s, borderRadius: 15 * s, backgroundColor: palette.raised, borderWidth: 1, borderColor: palette.hairline }}>
       <Text className="font-display-bold text-label text-faint">{String(node.number)}</Text>
     </View>
   );
@@ -75,14 +77,15 @@ function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
   const said = `${node.name}, ${STATUS_WORD[node.status]}${rewards.length > 0 ? `, ${rewards.join(", ")}` : ""}`;
   const stages = scenarioOf(node.id)?.stages.length ?? null;
   return (
     <View testID={`node-${node.id}`} className="flex-row">
-      <View style={{ width: RAIL }} className="items-center" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+      <View style={{ width: RAIL * s }} className="items-center" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
         {/* One segment of the trail per stop: gold up to the current stop, night past it. */}
-        <View style={{ position: "absolute", top: index === 0 ? 20 : 0, bottom: index === count - 1 ? "50%" : 0, width: 2, backgroundColor: reached ? palette.gold : palette.hairline }} />
-        <View style={{ marginTop: node.status === "current" ? 18 : 12 }}>
+        <View style={{ position: "absolute", top: index === 0 ? 20 * s : 0, bottom: index === count - 1 ? "50%" : 0, width: 2, backgroundColor: reached ? palette.gold : palette.hairline }} />
+        <View style={{ marginTop: (node.status === "current" ? 18 : 12) * s }}>
           <Medallion node={node} />
         </View>
       </View>

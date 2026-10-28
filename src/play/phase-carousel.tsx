@@ -16,6 +16,7 @@ import { Chevron } from "./phase-rail.tsx";
 import type { TableSettings } from "./table-settings.ts";
 import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 // The strip drops in by this much (translateY -12 to 0 with a fade).
@@ -28,15 +29,16 @@ const INSET = 8;
 // come. The one the strip rests on stands taller, so the track says both where the game is and which card is being read.
 function RoundTrack({ phases, index }: { phases: Carousel["phases"]; index: number }) {
   const t = useTableTokens();
+  const s = useUiScale();
   return (
-    <View importantForAccessibility="no-hide-descendants" style={{ flexDirection: "row", alignItems: "center", gap: 3, height: 6, marginTop: 4 }}>
+    <View importantForAccessibility="no-hide-descendants" style={{ flexDirection: "row", alignItems: "center", gap: 3 * s, height: 6 * s, marginTop: 4 * s }}>
       {phases.map((phase, at) => (
         <View
           key={phase.id}
           style={{
             flex: 1,
-            height: at === index ? 5 : 3,
-            borderRadius: 3,
+            height: (at === index ? 5 : 3) * s,
+            borderRadius: 3 * s,
             backgroundColor: phase.state === "current" ? t.gold : phase.state === "past" ? t.goldDeep : t.hairline,
           }}
         />
@@ -61,6 +63,8 @@ function CarouselHead({
   onGo: (to: number) => void;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
+  const row = touch(s, ROW);
   const last = carousel.phases.length - 1;
   const arrow = (step: -1 | 1) => {
     const off = index + step < 0 || index + step > last;
@@ -72,7 +76,7 @@ function CarouselHead({
         accessibilityState={{ disabled: off }}
         disabled={off}
         onPress={() => onGo(index + step)}
-        style={({ pressed }) => ({ width: ROW, height: ROW, borderRadius: ROW / 2, alignItems: "center", justifyContent: "center", opacity: off ? 0.25 : 1, backgroundColor: pressed ? t.pressed : "transparent" })}
+        style={({ pressed }) => ({ width: row, height: row, borderRadius: row / 2, alignItems: "center", justifyContent: "center", opacity: off ? 0.25 : 1, backgroundColor: pressed ? t.pressed : "transparent" })}
       >
         <Chevron direction={step < 0 ? "previous" : "next"} color={t.bone} />
       </Pressable>
@@ -81,10 +85,10 @@ function CarouselHead({
   const shown = carousel.phases[index];
   const where = carousel.round > 0 ? `Round ${carousel.round}` : "Before the round";
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 4, paddingTop: 4, gap: 4 }}>
+    <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 4 * s, paddingTop: 4 * s, gap: 4 * s }}>
       {arrow(-1)}
       <View style={{ flex: 1, minWidth: 0 }} accessible accessibilityLabel={shown ? `${where}. Phase ${index + 1} of ${carousel.phases.length}, ${shown.name}` : where}>
-        <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
+        <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 * s }}>
           <Text numberOfLines={1} className="font-display-bold text-micro uppercase" style={{ color: t.muted }}>
             {where}
           </Text>
@@ -95,9 +99,9 @@ function CarouselHead({
         <RoundTrack phases={carousel.phases} index={index} />
       </View>
       {carousel.stopAhead ? (
-        <View testID="carousel-stop-ahead" accessible accessibilityLabel={STOP_AHEAD_WORDS} style={{ flexDirection: "row", alignItems: "center", gap: 6, marginLeft: 8 }}>
-          <View style={{ width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: t.gold, alignItems: "center", justifyContent: "center" }}>
-            <Text className="font-display-bold text-micro text-gold" style={{ lineHeight: 14 }}>
+        <View testID="carousel-stop-ahead" accessible accessibilityLabel={STOP_AHEAD_WORDS} style={{ flexDirection: "row", alignItems: "center", gap: 6 * s, marginLeft: 8 * s }}>
+          <View style={{ width: 18 * s, height: 18 * s, borderRadius: 9 * s, borderWidth: 1, borderColor: t.gold, alignItems: "center", justifyContent: "center" }}>
+            <Text className="font-display-bold text-micro text-gold" style={{ lineHeight: 14 * s }}>
               S
             </Text>
           </View>
@@ -106,7 +110,7 @@ function CarouselHead({
           </Text>
         </View>
       ) : null}
-      <View style={{ marginLeft: 8, paddingLeft: 12, borderLeftWidth: 1, borderLeftColor: t.hairline }}>
+      <View style={{ marginLeft: 8 * s, paddingLeft: 12 * s, borderLeftWidth: 1, borderLeftColor: t.hairline }}>
         <NightSwitch label="Stops" hint={STOPS_TEXT} value={settings.stopsOn} onChange={(stopsOn) => onChange({ stopsOn })} testID="carousel-stops" />
       </View>
       {arrow(1)}
@@ -126,10 +130,11 @@ function CarouselCards({
   onChange: (change: Partial<TableSettings>) => void;
 }) {
   const reduceMotion = useReducedMotion();
+  const s = useUiScale();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const placed = useRef(false);
-  const card = cardWidth(width);
-  const interval = card + GAP;
+  const card = cardWidth(width, s);
+  const interval = card + GAP * s;
   const last = carousel.phases.length - 1;
   // Where the strip opens: fixed at mount, so a re-render never moves it.
   const [start] = useState(() => startIndex(carousel));
@@ -168,8 +173,8 @@ function CarouselCards({
           scroll.current?.scrollTo({ x: start * interval, y: 0, animated: false });
         }}
         onMomentumScrollEnd={(event) => choose(Math.max(0, Math.min(last, Math.round(event.nativeEvent.contentOffset.x / interval))))}
-        style={{ marginTop: 6 }}
-        contentContainerStyle={{ paddingHorizontal: Math.max(0, (width - card) / 2), paddingBottom: INSET, gap: GAP }}
+        style={{ marginTop: 6 * s }}
+        contentContainerStyle={{ paddingHorizontal: Math.max(0, (width - card) / 2), paddingBottom: INSET * s, gap: GAP * s }}
       >
         {carousel.phases.map((phase, at) => (
           <PhaseCard key={phase.id} phase={phase} number={at + 1} width={card} focused={at === index} settings={settings} onChange={onChange} />
@@ -206,13 +211,14 @@ export function PhaseCarousel({
   onClose: () => void;
 }) {
   const t = useTableTokens();
+  const s = useUiScale();
   const { progress, leaving } = useOpenMotion(open, MOTION.carouselEnter, MOTION.carouselLeave);
   const motion = useAnimatedStyle(() => ({
     opacity: progress.get(),
-    transform: [{ translateY: (progress.get() - 1) * DROP }],
+    transform: [{ translateY: (progress.get() - 1) * DROP * s }],
   }));
   if (!open && !leaving) return null;
-  const inner = width - 2 * INSET;
+  const inner = width - 2 * INSET * s;
   return (
     <View style={{ position: "absolute", top, left: 0, right: 0, bottom: 0 }} pointerEvents={open ? "auto" : "none"}>
       <Pressable
@@ -228,11 +234,11 @@ export function PhaseCarousel({
         style={[
           {
             position: "absolute",
-            top: INSET / 2,
-            left: left + INSET,
+            top: (INSET * s) / 2,
+            left: left + INSET * s,
             width: inner,
-            height: height - INSET / 2,
-            borderRadius: 18,
+            height: height - (INSET * s) / 2,
+            borderRadius: 18 * s,
             ...tileSurface(false, t),
             boxShadow: `${raisedEdgeOf(t)}, 0 10px 28px ${withAlphaHex(t.night, 0.6)}`,
             overflow: "hidden",

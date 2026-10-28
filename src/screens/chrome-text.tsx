@@ -21,7 +21,7 @@ export function Eyebrow({ children, tone = "gold", testID }: { children: string;
 export function Section({ title, right, testID, className }: { title: string; right?: ReactNode; testID?: string; className?: string }) {
   const palette = usePalette();
   return (
-    <View testID={testID} className={`min-h-11 flex-row items-center gap-3${className ? ` ${className}` : ""}`}>
+    <View testID={testID} className={`min-h-touch flex-row items-center gap-3${className ? ` ${className}` : ""}`}>
       <Text accessibilityRole="header" className="font-display-bold text-eyebrow uppercase text-moon">
         {title}
       </Text>
