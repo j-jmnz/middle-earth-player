@@ -5,6 +5,7 @@
 import type { CardInstance, ScenarioState } from "../rules/state.ts";
 import { shadowCards } from "../rules/zones.ts";
 import { captiveUnder } from "../rules/families/south-captive.ts";
+import { prisonersOfSeat } from "../rules/families/prisoner.ts";
 import { declaredDefenders } from "../rules/families/defense-defenders.ts";
 
 export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActiveLocation" | "engaged" | "play" | "hand";
@@ -81,7 +82,7 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number): readon
         return card != null && card.host == null && !fighting.has(id);
       });
       // The hero this seat's player holds as the prisoner is still in play: facedown beside the seat's cards, with Mendor under it.
-      return [...here, ...prisonersOf(game, seat)];
+      return [...here, ...prisonersOfSeat(game, seat)];
     }
     case "hand":
       return owner?.hand ?? NONE;
@@ -102,11 +103,6 @@ function stagingOrder(game: ScenarioState): readonly string[] {
   // A guard whose objective left the staging area is a card of its own again.
   for (const id of game.staging) if (!ordered.includes(id)) ordered.push(id);
   return ordered;
-}
-
-// The facedown hero (a prisoner, 01123:B:1) that belongs to this seat's player: no list of the seat holds it while it is held.
-function prisonersOf(game: ScenarioState, seat: number): readonly string[] {
-  return Object.values(game.cards).filter((card) => card.zone === "captive" && card.prisoner === true && card.host == null && card.owner === seat).map((card) => card.id);
 }
 
 function sameCards(previous: readonly CardInstance[], next: readonly CardInstance[]): boolean {

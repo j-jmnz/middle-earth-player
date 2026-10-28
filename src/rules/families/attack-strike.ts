@@ -6,7 +6,7 @@ import type { Condition } from "../../catalog/boundary.ts";
 
 import { effectCause, ruleCause, type Cause } from "../cause.ts";
 import type { EngineStep } from "../intents.ts";
-import { drawOne, type ReduceContext } from "../interpret.ts";
+import { drawMany, type ReduceContext } from "../interpret.ts";
 import { modifiedStat, placeDamage, placedAmount } from "../keywords.ts";
 import { effectsOf, subjectMatches } from "../listen.ts";
 import { printedOf } from "../printed.ts";
@@ -93,7 +93,7 @@ export function struck(
   }
   for (const modifier of next.modifiers.filter((entry) => entry.stat === "drawOnAttackDestroy" && entry.instanceId === `seat:${seat}`)) {
     const cause = sourceCause(next, modifier.sourceId, ctx);
-    for (let count = 0; count < modifier.amount; count += 1) next = drawOne(next, seat, steps, cause);
+    next = drawMany(next, seat, modifier.amount, steps, cause);
   }
   return next;
 }

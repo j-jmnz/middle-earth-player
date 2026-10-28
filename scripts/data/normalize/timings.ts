@@ -32,8 +32,7 @@ export function timingLabels(text: string | null, keywordsOnly: (line: string) =
 // The timings a record may have when it implements this printed line. A labelled line ("Forced: ...") is that
 // timing, and so is any label quoted inside it (a condition attachment's parenthetical). A line with no label
 // is a constant ability, or an effect that triggers on a condition, or text that rides on the card's own timing.
-// `campaignSetup`: an objective ally that "the first player gains control of" is put into play by the campaign pool (Mendor, 01135:A:2).
-const UNLABELLED = ["constant", "triggered", "forced", "whenRevealed", "questResolution", "setup", "resolution", "campaignSetup"];
+const UNLABELLED = ["constant", "triggered", "forced", "whenRevealed", "questResolution", "setup", "resolution"];
 
 export function lineTimings(line: string): Set<string> {
   const allowed = new Set<string>();
@@ -49,6 +48,8 @@ export function lineTimings(line: string): Set<string> {
   if (/Counts as an? (?:\w+ )?attachment/.test(line)) allowed.add("constant");
   // An unlabelled line that calls itself an action is one ("Any player may trigger this action", Ceorl 12058:A:1).
   if (/trigger this action/i.test(line)) allowed.add("action");
+  // An objective ally that "The first player gains control of" it is put into play by the campaign pool at the start of a scenario (Mendor, 01135:A:2).
+  if (/^The first player gains control of /.test(line.trim())) allowed.add("campaignSetup");
   if (!lead) for (const timing of UNLABELLED) allowed.add(timing);
   return allowed;
 }

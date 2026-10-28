@@ -7,7 +7,7 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../interpret.ts";
-import type { ScenarioState } from "../state.ts";
+import type { CardInstance, ScenarioState } from "../state.ts";
 import { inPlay, updateCard } from "../state.ts";
 import { attachTo, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
@@ -29,16 +29,18 @@ export function captureRingBearer(state: ScenarioState, instruction: Extract<Ins
 
 // The hero and each card attached to it go facedown into the captive zone, under the card `hostId` (the Watcher) or under no card
 // (`prisoner`: the prisoner of Escape from Dol Guldur, families/prisoner.ts, whose cards are also flagged as the prisoner's and whose
-// hero remembers the seat it came from). Every token on them is discarded.
-export function captureHero(state: ScenarioState, heroId: string, hostId: string | null, prisoner = false): ScenarioState {
+// hero remembers the seat it came from). Every token on them is discarded. `attachmentsDown`: the attached cards are turned facedown too (the
+// Ring-bearer's always are; the prisoner's only when the campaign card says so, 01131:A:3).
+export function captureHero(state: ScenarioState, heroId: string, hostId: string | null, prisoner = false, attachmentsDown = true): ScenarioState {
   const seat = state.cards[heroId]?.controller ?? null;
   const attachments = [...(state.cards[heroId]?.attachments ?? [])];
-  let next = updateCard(moveCard(state, heroId, { zone: "captive", hostId }), heroId, { damage: 0, resources: 0, progress: 0, ...(prisoner ? { prisoner: true as const, ...(seat != null ? { owner: seat } : {}) } : {}) });
+  const slot = prisoner && seat != null ? (state.seats[seat]?.heroes.indexOf(heroId) ?? -1) : -1;
+  let next = updateCard(moveCard(state, heroId, { zone: "captive", hostId }), heroId, { damage: 0, resources: 0, progress: 0, ...(prisoner ? { prisoner: true as const, ...(seat != null ? { owner: seat } : {}), ...(slot >= 0 ? { heroSlot: slot } : {}) } : {}) });
   for (const id of attachments) {
     // A card a player played keeps its owner, so the release knows to give it to the first player (a Condition an encounter card
     // attached has no controller and no owner).
     const controller = next.cards[id]?.controller;
-    const moved = updateCard(moveCard(next, id, { zone: "attached" }), id, { damage: 0, resources: 0, progress: 0, face: "down", ...(controller != null ? { owner: controller } : {}), ...(prisoner ? { prisoner: true as const } : {}) });
+    const moved = updateCard(moveCard(next, id, { zone: "attached" }), id, { damage: 0, resources: 0, progress: 0, face: attachmentsDown ? "down" : "up", ...(controller != null ? { owner: controller } : {}), ...(prisoner ? { prisoner: true as const } : {}) });
     next = attachTo(moved, id, heroId);
   }
   return next;
@@ -51,14 +53,21 @@ export function releaseRingBearer(state: ScenarioState, instruction: Extract<Ins
   const hostId = focus.sourceId;
   const heroId = hostId ? captiveUnder(state, hostId) : null;
   if (!heroId) return state;
-  const seat = state.firstPlayer;
+  return releaseHero(state, heroId, state.firstPlayer, { exhausted: true, damage: instruction.damage, face: "up" });
+}
+
+// The hero comes back among the heroes of `seat` with `patch`, and the cards attached to it come back faceup with `attachmentPatch`: a card a player
+// played goes to the play area of `seat` (of its own owner when `toOwner`); a card nobody owns stays controlled by nobody. Shared by the Ring-bearer's
+// release and the prisoner's rescue (families/prisoner.ts).
+export function releaseHero(state: ScenarioState, heroId: string, seat: number, patch: Partial<CardInstance>, attachmentPatch: Partial<CardInstance> = {}, toOwner = false): ScenarioState {
   const attachments = [...(state.cards[heroId]?.attachments ?? [])];
-  let next = updateCard(moveCard(state, heroId, { zone: "heroes", seat }), heroId, { exhausted: true, damage: instruction.damage, face: "up" });
+  let next = updateCard(moveCard(state, heroId, { zone: "heroes", seat }), heroId, patch);
   for (const id of attachments) {
     const card = next.cards[id];
     if (!card) continue;
-    const placed = card.owner == null ? next : moveCard(next, id, { zone: "play", seat });
-    next = attachTo(updateCard(placed, id, { face: "up" }), id, heroId);
+    const to = toOwner ? card.owner : seat;
+    const placed = card.owner == null || to == null ? next : moveCard(next, id, { zone: "play", seat: to });
+    next = attachTo(updateCard(placed, id, { face: "up", ...attachmentPatch }), id, heroId);
   }
   return next;
 }

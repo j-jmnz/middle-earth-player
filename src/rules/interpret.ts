@@ -21,7 +21,7 @@ import { raiseFor, runExtraVerb } from "./verbs.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 import { shadowFace } from "./families/defense-shadow.ts";
-import { drawCards, shackled } from "./families/dungeon-deck.ts";
+import { drawCards } from "./families/dungeon-deck.ts";
 
 export type ReduceContext = {
   effects: readonly Effect[];
@@ -157,15 +157,13 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 }
 
 // A draw of `count` cards: one draw action, which Iron Shackles on the deck replaces as a whole (families/dungeon-deck.ts).
+// An eliminated player and a table that "cannot draw" draw nothing, so nothing is replaced either.
 export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause): ScenarioState {
+  if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
   return drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback));
 }
 
-export function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {
-  if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
-  // Iron Shackles on the deck (01105:A:1): this draw is replaced by discarding it.
-  const replaced = shackled(state, seat);
-  if (replaced) return replaced;
+function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {
   const id = state.seats[seat]?.deck[0];
   if (!id) return state;
   const next = moveCard(state, id, { zone: "hand", seat });

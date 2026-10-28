@@ -16,7 +16,7 @@ import { prisonerHero } from "./prisoner.ts";
 import type { ScenarioState } from "../state.ts";
 import { dolGuldurTable, loadDolGuldurWorld, MENDOR, type DolGuldurLayout, type DolGuldurWorld } from "../../../scripts/dol-guldur-scene.ts";
 import { dolGuldurWorld, dolGuldurStart, LOGGED_PRISONER, STRONG_HEROES } from "../../../scripts/dol-guldur-game.ts";
-import { first, send, start, type Run } from "../../../scripts/past-scene.ts";
+import { send, start, type Run } from "../../../scripts/past-scene.ts";
 import { causeProblems } from "../../../scripts/cause-check.ts";
 
 let world: DolGuldurWorld;
@@ -92,8 +92,8 @@ describe("the campaign card's Forced effect (01131:A:3)", () => {
         expect(textBlank(state, mendor?.id ?? "")).toBe(true);
         const campaignCard = byCode(state, "01131")[0];
         expect(campaignCard?.face).toBe("B");
-        // The hero the log named is out of the heroes, every other hero is where it was.
-        expect(state.seats.flatMap((seat) => seat.heroes).map((id) => state.cards[id]?.code).sort()).toEqual(STRONG_HEROES.slice(0, seatCount * 3).filter((code) => code !== "q2").sort());
+        // The hero the log named is out of the heroes, every other hero is where it was (the one chosen at random came back to its own place).
+        expect(state.seats.flatMap((seat) => seat.heroes).map((id) => state.cards[id]?.code)).toEqual(STRONG_HEROES.slice(0, seatCount * 3).filter((code) => code !== "q2"));
       }
     }
   });
@@ -197,8 +197,3 @@ describe("the rescue (01124:B:1) and the cards that hear it (01102:A:2, 01131:B:
     expect(freed?.prisoner).toBeUndefined();
   });
 });
-
-void first;
-void send;
-void start;
-void legalIntents;

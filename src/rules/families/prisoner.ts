@@ -11,15 +11,22 @@ import type { ReduceContext } from "../interpret.ts";
 import { printedOf } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import type { ScenarioState } from "../state.ts";
-import { livingSeats, updateCard } from "../state.ts";
+import { livingSeats, updateCard, withSeat } from "../state.ts";
 import { shuffleIds } from "../seed.ts";
-import { attachTo, moveCard } from "../zones.ts";
+import { moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
-import { captureHero } from "./south-captive.ts";
+import { captureHero, releaseHero } from "./south-captive.ts";
+
+const CAMPAIGN_CARD = "01131";
 
 // The hero that is the prisoner now: facedown in the captive zone under no card. Mendor, captured with it, is held under the hero.
 export function prisonerHero(state: ScenarioState): string | null {
   return Object.values(state.cards).find((card) => card.zone === "captive" && card.prisoner === true && card.host == null)?.id ?? null;
+}
+
+// The facedown hero that belongs to this seat's player: no list of the seat holds it while it is held (the table draws it among the seat's cards).
+export function prisonersOfSeat(state: ScenarioState, seat: number): string[] {
+  return Object.values(state.cards).filter((card) => card.zone === "captive" && card.prisoner === true && card.host == null && card.owner === seat).map((card) => card.id);
 }
 
 export function run(state: ScenarioState, instruction: Instruction, _focus: Focus, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState | null {
@@ -39,6 +46,12 @@ export function run(state: ScenarioState, instruction: Instruction, _focus: Focu
   }
 }
 
+// "Each card attached to that hero is turned facedown" is the campaign card's Forced effect (01131:A:3): only a game with it placed turns the
+// prisoner's attachments facedown. The stage's own line (01123:B:1) turns the hero alone.
+function campaignTurnsDown(state: ScenarioState): boolean {
+  return Object.values(state.cards).some((card) => card.code === CAMPAIGN_CARD && card.zone === "campaign");
+}
+
 // The heroes of every living seat, in seat order.
 function heroesOf(state: ScenarioState, ctx: ReduceContext): string[] {
   return livingSeats(state).flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => state.cards[id] != null && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "hero");
@@ -54,7 +67,7 @@ function takePrisoner(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   if (!chosen) return state;
   const next = { ...state, seedCursor: rolled.cursor };
   const seat = next.cards[chosen]?.controller ?? null;
-  return queueEvent(captureHero(next, chosen, null, true), { trigger: "prisonerTaken", seat, cardId: chosen, subject: chosen });
+  return queueEvent(captureHero(next, chosen, null, true, campaignTurnsDown(next)), { trigger: "prisonerTaken", seat, cardId: chosen, subject: chosen });
 }
 
 // SelectLoggedPrisoner: the Campaign Log's prisoner takes the place of the one just selected.
@@ -64,7 +77,8 @@ function selectLogged(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   if (!current || !named || state.cards[current]?.code === named) return state;
   const logged = heroesOf(state, ctx).find((id) => state.cards[id]?.code === named);
   if (!logged) return state;
-  return captureHero(unholdPrisoner(state, 0), logged, null, true);
+  const released = unholdPrisoner(state, 0);
+  return captureHero(released, logged, null, true, campaignTurnsDown(released));
 }
 
 // CaptureWithPrisoner: the card in play with this code is placed facedown next to the prisoner (held under it): in play, controlled by
@@ -91,16 +105,16 @@ function unholdPrisoner(state: ScenarioState, damage: number): ScenarioState {
   const hero = heroId ? state.cards[heroId] : undefined;
   if (!heroId || !hero) return state;
   const seat = hero.owner ?? state.firstPlayer;
-  const attachments = [...hero.attachments];
-  let next = updateCard(moveCard(state, heroId, { zone: "heroes", seat }), heroId, { damage, face: "up", prisoner: undefined, owner: undefined });
-  for (const id of attachments) {
-    const card = next.cards[id];
-    if (!card) continue;
-    const owner = card.owner;
-    const placed = owner == null ? next : moveCard(next, id, { zone: "play", seat: owner });
-    next = attachTo(updateCard(placed, id, { face: "up", prisoner: undefined, owner: undefined }), id, heroId);
-  }
-  return next;
+  const released = releaseHero(state, heroId, seat, { damage, face: "up", prisoner: undefined, owner: undefined, heroSlot: undefined }, { prisoner: undefined, owner: undefined }, true);
+  return hero.heroSlot == null ? released : backInPlace(released, seat, heroId, hero.heroSlot);
+}
+
+// The hero returns to the place it held among its seat's heroes (releasing appends it).
+function backInPlace(state: ScenarioState, seat: number, heroId: string, slot: number): ScenarioState {
+  const current = state.seats[seat];
+  if (!current) return state;
+  const others = current.heroes.filter((id) => id !== heroId);
+  return withSeat(state, seat, { ...current, heroes: [...others.slice(0, slot), heroId, ...others.slice(slot)] });
 }
 
 // FreeCaptive: the card captured with the prisoner returns faceup to the first player's play area with `damage` damage on it.

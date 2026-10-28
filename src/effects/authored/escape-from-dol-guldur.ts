@@ -57,10 +57,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"01125:constant:1","cardCode":"01125","lines":["01125:B:2"],"timing":"constant","condition":{"kind":"inPlay","code":"01102","is":true},"instructions":[{"verb":"Restrict","what":"advance"}]},
   // 01131 Escape from Dol Guldur (campaign card). Setup: Mendor enters play and Appointed by Fate goes on a hero of the first player's choice.
   // Forced: the prisoner is the hero the Campaign Log names, Mendor is captured with it and the card is flipped. Response (side B): the first
-  // claimed objective frees Mendor with 1 damage. Resolution: a Mendor still in play and a Mendor's Support for each player go to the next campaign.
+  // claimed objective (the only one claimed) frees Mendor with 1 damage. Resolution: a Mendor still in play and a Mendor's Support for each player go to the next campaign.
   {"id":"01131:campaignSetup:1","cardCode":"01131","lines":["01131:A:2"],"timing":"campaignSetup","instructions":[{"verb":"PutObjectiveAllyIntoPlay","code":"01135"},{"verb":"AttachChosen","code":"01134"}]},
   {"id":"01131:forced:1","cardCode":"01131","lines":["01131:A:3"],"timing":"forced","trigger":"prisonerTaken","subject":{"type":"hero","control":"any"},"condition":{"kind":"faceUp","side":"A"},"instructions":[{"verb":"SelectLoggedPrisoner"},{"verb":"CaptureWithPrisoner","code":"01135"},{"verb":"FlipCard"}]},
-  {"id":"01131:response:1","cardCode":"01131","lines":["01131:B:1"],"timing":"response","trigger":"claimed","subject":{"type":"objective","control":"any"},"limit":"oncePerGame","condition":{"kind":"faceUp","side":"B"},"instructions":[{"verb":"FreeCaptive","code":"01135","damage":1}]},
+  {"id":"01131:response:1","cardCode":"01131","lines":["01131:B:1"],"timing":"response","trigger":"claimed","subject":{"type":"objective","control":"any"},"limit":"oncePerGame","condition":{"kind":"all","conditions":[{"kind":"faceUp","side":"B"},{"kind":"count","pick":CLAIMED,"max":1}]},"instructions":[{"verb":"FreeCaptive","code":"01135","damage":1}]},
   {"id":"01131:resolution:1","cardCode":"01131","lines":["01131:B:2"],"timing":"resolution","instructions":[{"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}},{"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]},
 ];
 

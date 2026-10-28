@@ -12,7 +12,7 @@ import { destroyCard } from "../keywords.ts";
 import { reduce, startScenario } from "../reduce.ts";
 import { expectOk } from "../fixture.ts";
 import type { ScenarioState } from "../state.ts";
-import { CAMPAIGN_CARD, dolGuldurTable, loadDolGuldurWorld, OBJECTIVES, type DolGuldurLayout, type DolGuldurWorld } from "../../../scripts/dol-guldur-scene.ts";
+import { dolGuldurTable, loadDolGuldurWorld, OBJECTIVES, type DolGuldurLayout, type DolGuldurWorld } from "../../../scripts/dol-guldur-scene.ts";
 import { dolGuldurStart, dolGuldurWorld } from "../../../scripts/dol-guldur-game.ts";
 import { codesOf, first, send, start, type Run } from "../../../scripts/past-scene.ts";
 import { causeProblems } from "../../../scripts/cause-check.ts";
@@ -219,6 +219,5 @@ describe("Dungeon Jailor (01101:A:1)", () => {
     const deckCodes = codesOf(run.state, run.state.encounterDeck);
     expect(deckCodes.filter((code) => OBJECTIVES.includes(code as (typeof OBJECTIVES)[number])).length).toBe(1);
     expect(causeProblems(run.steps)).toEqual([]);
-    void CAMPAIGN_CARD;
   });
 });

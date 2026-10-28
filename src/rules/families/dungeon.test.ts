@@ -6,16 +6,16 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { syncConstants } from "../constants.ts";
 import type { EngineStep } from "../intents.ts";
 import { runInstruction } from "../interpret.ts";
-import { legalIntents, legalTargets } from "../legal.ts";
+import { legalIntents } from "../legal.ts";
 import { settle } from "../machine.ts";
 import { pushCardEffects } from "../effect-frames.ts";
 import { modifiedStat } from "../keywords.ts";
 import { stagingThreat } from "../quest.ts";
 import { fireForced } from "../triggers.ts";
 import { ORC_GUARD_CODE, printedOf } from "../printed.ts";
-import type { ScenarioState } from "../state.ts";
+import { updateCard, withSeat, type ScenarioState } from "../state.ts";
 import { dolGuldurTable, fight, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../../scripts/dol-guldur-scene.ts";
-import { codesOf, first, send, start, type Run } from "../../../scripts/past-scene.ts";
+import { first, send, start, type Run } from "../../../scripts/past-scene.ts";
 import { causeProblems } from "../../../scripts/cause-check.ts";
 
 let world: DolGuldurWorld;
@@ -113,6 +113,17 @@ describe("Iron Shackles (01105:A:1, 01105:A:2)", () => {
     expect(state.staging).not.toContain(id);
   });
 
+  it("is not discarded by a draw that does not happen (an eliminated seat draws nothing)", () => {
+    const made = make({ deckOf: ["ally", "filler"], staging: ["01105"] });
+    const id = first(made.state, "01105");
+    const effects = made.ctx.effects.filter((effect) => effect.cardCode === "01105" && effect.timing === "whenRevealed");
+    const attached = settle({ ...pushCardEffects(made.state, "whenRevealed", id, 0, false, effects, made.ctx, []), window: null }, made.ctx, []);
+    const out = withSeat(attached, 0, { ...attached.seats[0], eliminated: true });
+    const drawn = runInstruction(out, { verb: "Draw", amount: 1 }, { seat: 0, sourceId: null }, made.ctx, []);
+    expect(drawn.seats[0].deckAttached).toEqual([id]);
+    expect(drawn.cards[id]?.zone).toBe("attached");
+  });
+
   it("replaces the next draw from that deck, whatever its number of cards, by discarding it; the draw after is made", () => {
     for (const amount of [1, 2]) {
       const made = make({ deckOf: ["ally", "filler", "filler"], staging: ["01105"] });
@@ -190,10 +201,12 @@ describe("the group limit of allies (01123:B:2, 01124:B:2)", () => {
 describe("TurnFaceUp (01123:A:1)", () => {
   it("turns the set-aside Nazgûl faceup, still out of play", () => {
     const { state, ctx } = make({ setAside: ["01102"] });
-    const turned = runInstruction(state, { verb: "TurnFaceUp", code: "01102" }, { seat: 0, sourceId: state.questStage }, ctx, []);
-    expect(turned.cards[first(turned, "01102")]?.face).toBe("up");
-    expect(turned.cards[first(turned, "01102")]?.zone).toBe("setAside");
-    expect(state.cards[first(state, "01102")]?.face).toBe("up");
+    const id = first(state, "01102");
+    const down = updateCard(state, id, { face: "down" });
+    expect(down.cards[id]?.face).toBe("down");
+    const turned = runInstruction(down, { verb: "TurnFaceUp", code: "01102" }, { seat: 0, sourceId: down.questStage }, ctx, []);
+    expect(turned.cards[id]?.face).toBe("up");
+    expect(turned.cards[id]?.zone).toBe("setAside");
   });
 });
 
@@ -224,7 +237,5 @@ describe("a shadow effect dealt to the Nazgûl (01102:A:3)", () => {
     expect([blank.hero, blank.hero2].filter((id) => blank.run.state.cards[id]?.zone === "discard")).toEqual([]);
     const other = fight(world, "01089", "grunt", {}, { undefended: true });
     expect([other.hero, other.hero2].filter((id) => other.run.state.cards[id]?.zone === "discard")).toEqual([]);
-    void legalTargets;
-    void codesOf;
   });
 });

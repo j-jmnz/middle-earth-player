@@ -105,6 +105,8 @@ export type CardInstance = {
   // A card held facedown as part of a prisoner (the hero, the cards attached to it, Mendor captured with it): it is blank and unusable
   // until it is rescued (families/prisoner.ts, 01123:B:1).
   prisoner?: true;
+  // The place the prisoner hero had among its seat's heroes, so a rescued (or swapped back) hero returns where it was (families/prisoner.ts).
+  heroSlot?: number;
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled
   // (families/objectives.ts, 01108:A:2).
   claimed?: true;

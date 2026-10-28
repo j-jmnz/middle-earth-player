@@ -20,7 +20,7 @@ export function attachToDeck(state: ScenarioState, focus: Focus): ScenarioState 
 }
 
 // The draw of `count` cards: replaced as a whole by discarding the oldest Iron Shackles on the seat's deck, if any (a draw of nothing is
-// not a draw). Otherwise `drawOne` draws them one after the other.
+// not a draw). Otherwise `drawOne` draws them one after the other (the caller has checked that the seat can draw).
 export function drawCards(state: ScenarioState, seat: number, count: number, drawOne: (state: ScenarioState) => ScenarioState): ScenarioState {
   if (count <= 0) return state;
   const replaced = shackled(state, seat);

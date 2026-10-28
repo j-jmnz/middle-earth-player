@@ -1,6 +1,6 @@
 // The vocabulary the prisoner of Escape from Dol Guldur adds to effect records: a hero taken prisoner (facedown with the cards
 // attached to it, unusable), Mendor captured with it, and the rescue. The Ring-bearer facedown under the Watcher (south family) uses the
-// same captive zone. Simple verbs, triggers and triggers; effect-schema-verbs.ts and effect-schema.ts compose
+// same captive zone. Simple verbs and triggers; effect-schema-verbs.ts and effect-schema.ts compose
 // them. src/rules/families/prisoner*.ts runs them.
 import { z } from "zod";
 
