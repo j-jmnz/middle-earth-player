@@ -59,6 +59,7 @@ export async function loadCavesWorld(): Promise<CavesWorld> {
   cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
   cards.set("cancel", definePrinted({ code: "cancel", name: "cancel", type: "event", sphere: "neutral", cost: 0 }));
   cards.set("ally", definePrinted({ code: "ally", name: "ally", type: "ally", sphere: "neutral", cost: 0, willpower: 1, attack: 1, defense: 1, health: 2 }));
+  cards.set("costly", definePrinted({ code: "costly", name: "costly", type: "event", sphere: "neutral", cost: 6 }));
   cards.set("blade", definePrinted({ code: "blade", name: "blade", type: "attachment", sphere: "neutral", cost: 0 }));
   return { definition, cards };
 }
