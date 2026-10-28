@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { previewSideSize, previewSize } from "./preview-size.ts";
+import { inspectSize, previewSideSize, previewSize } from "./preview-size.ts";
 
 describe("the long-press preview", () => {
   it("fills a phone's width with a portrait card and leaves room for the buttons", () => {
@@ -27,5 +27,28 @@ describe("the long-press preview", () => {
     expect(size.width).toBeLessThan(844 * 0.55);
     expect(size.width / size.height).toBeCloseTo(0.705, 2);
     expect(previewSideSize(844, 390, true).width).toBeGreaterThan(previewSideSize(844, 390, true).height);
+  });
+});
+
+describe("the Card screen's picture", () => {
+  it("is sized by the pane's height and keeps the card's shape", () => {
+    const size = inspectSize(600, 500);
+    expect(size.height).toBe(468);
+    expect(size.width / size.height).toBeCloseTo(0.705, 2);
+  });
+
+  it("is capped at 420 points wide on a roomy pane", () => {
+    expect(inspectSize(700, 900).width).toBe(420);
+  });
+
+  it("is bounded by a narrow pane's width", () => {
+    expect(inspectSize(300, 900).width).toBe(268);
+  });
+
+  it("scales the room and the card together", () => {
+    const base = inspectSize(700, 900);
+    const large = inspectSize(700 * 1.15, 900 * 1.15, 1.15);
+    expect(large.width).toBe(Math.round(base.width * 1.15));
+    expect(large.height).toBe(Math.round(base.height * 1.15));
   });
 });

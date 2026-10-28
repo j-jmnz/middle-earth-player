@@ -32,3 +32,17 @@ export function previewSideSize(width: number, height: number, landscape: boolea
   const h = Math.min(roomH, roomW / CARD_ASPECT, 620);
   return { width: Math.round(h * CARD_ASPECT * scale), height: Math.round(h * scale) };
 }
+
+// The most a card is drawn on the Card screen's picture pane, in logical points wide.
+const INSPECT_MAX = 420;
+
+/**
+ * The card on the Card screen's picture pane (a tablet, docs/design-system.md, Tablets): as large as the pane allows, sized by its
+ * height, with 16 points of room around it, and no wider than 420. The pane is in screen points; the card comes back in screen points.
+ */
+export function inspectSize(paneWidth: number, paneHeight: number, scale = 1): { width: number; height: number } {
+  const roomW = Math.max(120, paneWidth / scale - 32);
+  const roomH = Math.max(160, paneHeight / scale - 32);
+  const w = Math.min(roomW, roomH * CARD_ASPECT, INSPECT_MAX);
+  return { width: Math.round(w * scale), height: Math.round((w / CARD_ASPECT) * scale) };
+}
