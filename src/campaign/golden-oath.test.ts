@@ -96,7 +96,7 @@ describe("golden: a whole game of The Oath", () => {
       expect(mini.scenarios[1]).toBe("the-caves-of-nibin-dum");
       // Once-per-campaign uses are in the log: the Adaptations used in the game, and the Fervor of Lore already recorded stays recorded.
       expect(log.usedOnce).toEqual(state.campaignFacts?.usedOnce ?? []);
-      if (golden.facts) expect(log.usedOnce).toEqual(expect.arrayContaining(golden.facts.usedOnce));
+      if (golden.facts) expect(log.usedOnce).toEqual(expect.arrayContaining([...golden.facts.usedOnce]));
       // The Adaptations and Stalking Goblin joined the pool; Guilty Conscience too with 6 tokens.
       const pool = log.campaignPool.map((card) => card.code);
       expect(pool).toEqual(expect.arrayContaining(["41041"]));

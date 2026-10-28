@@ -21,7 +21,8 @@
 // `mirkwood-won` and `mirkwood-lost`: Passage Through Mirkwood (scripts/e2e-mirkwood.ts), written to
 // src/campaign/fixtures/passage-through-mirkwood.json. `anduin-won` and `anduin-lost`: Journey Along the Anduin (scripts/e2e-anduin.ts), written to
 // src/campaign/fixtures/journey-along-the-anduin.json. `dol-guldur-won` and `dol-guldur-lost`: Escape from Dol Guldur (scripts/e2e-dol-guldur.ts), written to
-// src/campaign/fixtures/escape-from-dol-guldur.json.
+// src/campaign/fixtures/escape-from-dol-guldur.json. `oath-won` and `oath-lost`: The Oath on a blank The Dark of Mirkwood log (scripts/e2e-oath.ts), written to
+// src/campaign/fixtures/the-oath.json.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
@@ -48,6 +49,7 @@ import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 import { anduinFixtures } from "./e2e-anduin.ts";
 import { dolGuldurFixtures } from "./e2e-dol-guldur.ts";
 import { mirkwoodFixtures } from "./e2e-mirkwood.ts";
+import { oathFixtures } from "./e2e-oath.ts";
 import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -359,6 +361,12 @@ void runScript("e2e-fixtures", () => {
   const dolGuldurFile = path.join(dir, "escape-from-dol-guldur.json");
   writeFileSync(dolGuldurFile, `${JSON.stringify(dolGuldur)}\n`);
   say.info(`wrote ${dolGuldurFile} (${Object.keys(dolGuldur).join(", ")})`);
+
+  // The Oath (The Dark of Mirkwood part 1): from the blank log a new mini campaign starts on, so both games are real saves and always written.
+  const oath = say.step("play The Oath's win and loss", () => oathFixtures());
+  const oathFile = path.join(dir, "the-oath.json");
+  writeFileSync(oathFile, `${JSON.stringify(oath)}\n`);
+  say.info(`wrote ${oathFile} (${Object.keys(oath).join(", ")})`);
 
   if (won) {
     const past = wonLog(won);

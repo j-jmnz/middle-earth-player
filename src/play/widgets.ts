@@ -1,6 +1,7 @@
 // The numbers of the table pieces a scenario's script declares (docs/brief.md, Table): the Ring-bearer's life and the burden
 // deck's count. A piece shows only when the scenario's definition declares it (`widgets`) and the game holds it, so a game of
 // A Shadow of the Past or A Knife in the Dark shows neither. The engine wrote both numbers; nothing here changes one.
+import type { Effect } from "../catalog/boundary.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
 
 export type WidgetReadouts = {
@@ -54,4 +55,17 @@ export function heldDial(game: ScenarioState, nameOf: (code: string) => string):
 /** What a prisoner's name says wherever it is shown: the dial, the preview, the list. */
 export function prisonerWords(name: string): string {
   return `${name} is the prisoner, face down`;
+}
+
+export type TokenReadout = { name: string; tokens: number };
+
+/**
+ * The resource tokens on the campaign card, when it is in the game and one of its records places them (The Oath, 41050:A:3: "place 1 resource token
+ * here" at the end of each round, read at its Resolution); null for a game whose campaign card has none. The engine wrote the number; nothing here
+ * changes it.
+ */
+export function campaignTokens(game: ScenarioState, effects: readonly Effect[], nameOf: (code: string) => string): TokenReadout | null {
+  const card = Object.values(game.cards).find((entry) => entry.zone === "campaign");
+  if (!card || !effects.some((effect) => effect.cardCode === card.code && effect.instructions.some((instruction) => instruction.verb === "PlaceToken"))) return null;
+  return { name: nameOf(card.code), tokens: card.resources };
 }

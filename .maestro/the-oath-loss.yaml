@@ -1,0 +1,70 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 32. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture `oath-lost` is a real
+# two-handed game of The Oath from the blank log of a new The Dark of Mirkwood playthrough, parked on its loss: no seat remains. A loss has no reward
+# screen and writes nothing: The Oath stays current, The Caves of Nibin-Dûm stays locked, and no Adaptation use or token count reaches the log (the game
+# used some). The path screen has no table-menu: the log is opened from `log-open`.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/oath-lost"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- assertNotVisible:
+    id: life
+- assertNotVisible:
+    id: burden-deck
+- assertVisible:
+    id: rail-current
+    text: "Defeat"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 15000
+- assertVisible:
+    id: resolution-outcome
+    text: "Defeat"
+# The Lost Resolution names why: the reason the reducer recorded above the consequence line.
+- assertVisible:
+    id: resolution-reason
+    text: ".+"
+- assertVisible: "The scenario was lost. Nothing is written to the log."
+- assertNotVisible:
+    id: resolution-confirm
+- tapOn:
+    id: resolution-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+# The log is unchanged: The Oath still current, The Caves of Nibin-Dûm locked, no once-per-campaign use and no token count written.
+- assertVisible:
+    id: node-the-oath-status
+    text: "Current"
+- assertVisible:
+    id: node-the-caves-of-nibin-dum-status
+    text: "Locked"
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertNotVisible:
+    id: log-used-once
+- assertNotVisible:
+    id: log-counter-41050
+- assertVisible:
+    id: log-scenario-the-oath
+    text: ".*Not completed.*"

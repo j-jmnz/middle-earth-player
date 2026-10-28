@@ -55,7 +55,7 @@ describe("The Oath in Mirkwood Paths and The Dark of Mirkwood", () => {
     expect(campaign.scenarios.slice(3)).toEqual(["the-oath", "the-caves-of-nibin-dum"]);
     expect(mini.scenarios).toEqual(["the-oath", "the-caves-of-nibin-dum"]);
     expect(oath.campaignCard).toBe("41050");
-    expect(oath.campaignPlaced.sort()).toEqual(["41041", "41043", "41044", "41045", "41046", "41047"]);
+    expect([...oath.campaignPlaced].sort()).toEqual(["41041", "41043", "41044", "41045", "41046", "41047"]);
   });
 
   it("receives Escape from Dol Guldur's pool through the Campaign Setup Checklist in Mirkwood Paths: the boons on their heroes, the earned cards in the decks", () => {
@@ -113,12 +113,12 @@ describe("The Oath's Setup at the Campaign Setup Checklist (41050:A:2)", () => {
     const none = checklist({ log, scenario: oath, seats: oathLoadout(2), effects: EFFECTS, cards });
     expect(none).toMatchObject({ ok: false, needs: { seat: 0 } });
     if (none.ok || none.needs == null) return;
-    expect(none.needs.options.sort()).toEqual(ADAPTATIONS.flatMap((code) => ["q1", "q2", "q3"].map((hero) => `${code}>${hero}`)).sort());
+    expect([...none.needs.options].sort()).toEqual(ADAPTATIONS.flatMap((code) => ["q1", "q2", "q3"].map((hero) => `${code}>${hero}`)).sort());
     const one = checklist({ log, scenario: oath, seats: oathLoadout(2), effects: EFFECTS, cards, choices: ["41047>q2"] });
     expect(one).toMatchObject({ ok: false, needs: { seat: 1 } });
     if (one.ok || one.needs == null) return;
     // The second seat chooses among its own heroes and the Adaptations left.
-    expect(one.needs.options.sort()).toEqual(["41044", "41045", "41046"].flatMap((code) => ["q4", "q5", "q6"].map((hero) => `${code}>${hero}`)).sort());
+    expect([...one.needs.options].sort()).toEqual(["41044", "41045", "41046"].flatMap((code) => ["q4", "q5", "q6"].map((hero) => `${code}>${hero}`)).sort());
     const both = checklist({ log, scenario: oath, seats: oathLoadout(2), effects: EFFECTS, cards, choices: ["41047>q2", "41044>q6"] });
     if (!both.ok) throw new Error(both.errors.join("; "));
     expect(both.seats[0]?.attachments).toEqual([{ host: "q2", code: "41047" }]);

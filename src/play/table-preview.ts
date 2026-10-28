@@ -5,6 +5,7 @@ import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { questPointsOf } from "../rules/quest.ts";
 
 import { dungeonDetail } from "./dungeon-preview.ts";
+import { oathDetail } from "./oath-preview.ts";
 import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
 import { questObjective } from "./objective.ts";
@@ -52,7 +53,7 @@ export function previewCards(
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];
     const note = id === cardId ? whyNotPlayable(game, ctx, id, cardName) : null;
     const described = describe(card.code);
-    const detail = dungeonDetail(game, ctx, id, cardName);
+    const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id, cardName);
     return [{ code: card.code, ...described, ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), effects, ...(role ? { role } : {}), ...(note ? { note } : {}) }];
   });
   return { cards, start: Math.max(0, ids.indexOf(cardId)) };

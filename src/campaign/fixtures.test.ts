@@ -13,6 +13,7 @@ import { cards as cardRows } from "../catalog/schema.ts";
 import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
 
 import { briefing } from "./briefing.ts";
+import { emptyLog } from "./log.ts";
 import { fixture, fixtureSave, FIXTURE_NAMES, hasFixture, type FixtureName } from "./fixtures.ts";
 import { campaignPath } from "./path.ts";
 import { choiceSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
@@ -262,6 +263,55 @@ describe("Escape from Dol Guldur (Mirkwood Paths part 3, phase 31)", () => {
     const after = finish(save, world, resumed.state);
     expect(after.log).toEqual(save.log);
     expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status).slice(0, 4)).toEqual(["completed", "completed", "current", "locked"]);
+  });
+});
+
+describe("The Oath (The Dark of Mirkwood part 1, phase 32)", () => {
+  it("are two-handed games of two decklists from the blank log a new The Dark of Mirkwood playthrough starts on, each seat's Adaptation chosen", () => {
+    for (const name of ["oath-won", "oath-lost"] as const) {
+      const found = fixture(name);
+      expect(found.campaignId, name).toBe("the-dark-of-mirkwood");
+      expect(found.seatCount, name).toBe(2);
+      expect(found.loadout.scenarioId, name).toBe("the-oath");
+      expect(found.loadout.ringBearer, name).toBeNull();
+      expect(found.log, name).toEqual(emptyLog(2));
+      expect(found.past, name).toBeNull();
+      expect(found.loadout.choices.map((choice) => choice.split(">")[0]), name).toEqual(["41044", "41045"]);
+    }
+  });
+
+  it("oath-won replays to a win with nothing to answer, and confirming it writes the tokens, the used Adaptation and the pool, and unlocks The Caves of Nibin-Dûm", () => {
+    const world = worldFor("oath-won");
+    const save = fixtureSave("oath-won", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.stageCleared && !resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    const view = resolutionView(resumed.state, world);
+    expect(view.kind).toBe("settled");
+    const tokens = resumed.state.resolutionLog.counters?.["41050"] ?? -1;
+    expect(tokens).toBeGreaterThanOrEqual(0);
+    const after = finish(save, world, resumed.state);
+    expect(after.log.completed).toEqual(["the-oath"]);
+    expect(after.log.counters).toEqual({ "41050": tokens });
+    expect(after.log.usedOnce.length).toBeGreaterThan(0);
+    // The Adaptations the seats chose and Stalking Goblin are in the pool; Guilty Conscience with 6 or more tokens.
+    const pool = after.log.campaignPool.map((card) => card.code);
+    expect(pool).toEqual(expect.arrayContaining(["41044", "41045", "41041"]));
+    expect(pool.includes("41043")).toBe(tokens >= 6);
+    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status)).toEqual(["completed", "current"]);
+  });
+
+  it("oath-lost replays to a loss, and finishing it writes nothing", () => {
+    const world = worldFor("oath-lost");
+    const save = fixtureSave("oath-lost", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
+    const after = finish(save, world, resumed.state);
+    expect(after.log).toEqual(save.log);
+    expect(after.log.usedOnce).toEqual([]);
+    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status)).toEqual(["current", "locked"]);
   });
 });
 

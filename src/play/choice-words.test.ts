@@ -4,6 +4,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../catalog/boundary.ts";
+import { AUTHORED_EFFECTS as OATH_EFFECTS } from "../effects/authored/the-oath.ts";
+import { RECORDS as TDOM_RECORDS } from "../effects/authored/pool/TDoM.ts";
 import { AUTHORED_EFFECTS as DOL_GULDUR_EFFECTS } from "../effects/authored/escape-from-dol-guldur.ts";
 import { AUTHORED_EFFECTS as ANDUIN_EFFECTS } from "../effects/authored/journey-along-the-anduin.ts";
 import { AUTHORED_EFFECTS } from "../effects/authored/passage-through-mirkwood.ts";
@@ -14,17 +16,20 @@ import { HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../.
 import { first } from "../../scripts/past-scene.ts";
 import { anduinTable, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
+import { loadOathWorld, oathTable, type OathWorld } from "../../scripts/oath-scene.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";
 
 let world: MirkwoodWorld;
 let anduinWorld: AnduinWorld;
 let dolGuldurWorld: DolGuldurWorld;
+let oathWorld: OathWorld;
 
 beforeAll(async () => {
   world = await loadMirkwoodWorld();
   anduinWorld = await loadAnduinWorld();
   dolGuldurWorld = await loadDolGuldurWorld();
+  oathWorld = await loadOathWorld();
 });
 
 const names: ChoiceNames = { card: (id) => id, code: (code) => world.cards.get(code)?.name ?? code };
@@ -208,5 +213,75 @@ describe("the words of the Escape from Dol Guldur choices", () => {
     expect(say({ verb: "TurnFaceUp", code: "01102" })).toBe("Turn Nazgûl of Dol Guldur faceup, still out of play");
     expect(say({ verb: "RaiseStagingThreat", amount: { players: true }, until: "endOfPhase" })).toBe("Raise the total Threat in the staging area by X until the end of the phase");
     expect(say({ verb: "LimitPlays", cardType: "ally", max: 1 })).toBe("The players play at most 1 ally card each round");
+  });
+});
+
+// Every record of The Oath (src/effects/authored/the-oath.ts) and its boons and burdens (pool/TDoM.ts).
+const oath: readonly Effect[] = [...OATH_EFFECTS, ...TDOM_RECORDS];
+
+describe("the words of The Oath choices", () => {
+  const oathNames: ChoiceNames = { card: (id) => id, code: (code) => oathWorld.cards.get(code)?.name ?? code };
+
+  // The instructions that ask a player for a card, besides Pick: the sheet words them with pickWords (src/play/sheets.ts).
+  const ASKING = new Set(["Pick", "SearchMove", "AttachSelf", "ReturnToStaging", "DiscardFromHand"]);
+
+  it("every instruction that asks a player says what the card is for, in a sentence of its own", () => {
+    const prompts: string[] = [];
+    for (const effect of oath) {
+      walk(effect.instructions, (instruction, next) => {
+        if (!ASKING.has(instruction.verb)) return;
+        // Only a ReturnToStaging that lets the player choose an engaged enemy asks (the attacker goes back without a question). A choice with a single
+        // possible answer is taken without asking; the words are still written.
+        if (instruction.verb === "ReturnToStaging" && instruction.target.kind !== "engagedEnemies") return;
+        const words = pickWords(instruction, next, oathNames, effect.cardCode);
+        expect(words.prompt, effect.id).toMatch(/^[A-Z].*\.$/);
+        expect(words.prompt, effect.id).not.toMatch(/^Choose an? \w+\.$/);
+        expect(words.prompt, effect.id).not.toBe("Choose one.");
+        expect(words.verb, effect.id).not.toBe("Choose");
+        prompts.push(words.prompt);
+      });
+    }
+    // Forest and Goblin searches, the Spider Den's Spider, the hero that carries Guilty Conscience, the cards the Fervor of Lore discards, the character
+    // an exhaust, a damage, a discard and a heal fall on, the location that takes progress, the ally Abandoned Camp puts into play.
+    expect(prompts).toContain("Choose a Forest location from the encounter deck or discard pile to add to the staging area.");
+    expect(prompts).toContain("Choose a Goblin enemy from the encounter deck or discard pile to add to the staging area.");
+    expect(prompts).toContain("Choose a Spider enemy from the encounter deck or discard pile to put into play engaged with you.");
+    expect(prompts).toContain("Choose a hero to carry 41043.");
+    expect(prompts).toContain("Choose 3 cards to discard from your hand, one at a time.");
+    expect(prompts).toContain("Choose an enemy engaged with you to return to the staging area.");
+    expect(prompts).toContain("Choose a hero to heal all damage from.");
+    expect(prompts).toContain("Choose a location to place 3 progress on.");
+    expect(prompts).toContain("Choose an ally to put into play.");
+    expect(prompts).toContain("Choose a character to exhaust.");
+    expect(prompts).toContain("Choose a hero to ready.");
+  });
+
+  it("every Choose names each branch in a sentence (Eyes in the Dark)", () => {
+    const made = oathTable(oathWorld);
+    let branches = 0;
+    for (const effect of oath) {
+      walk(effect.instructions, (instruction) => {
+        if (instruction.verb !== "Choose") return;
+        for (const option of instruction.options) {
+          branches += 1;
+          const words = branchWords(instruction, option.id, made.state, oathNames, effect.cardCode);
+          expect(words, `${effect.id} ${option.id}`).toMatch(/^[A-Z].+/);
+          expect(words, `${effect.id} ${option.id}`).not.toBe(option.id);
+        }
+      });
+    }
+    expect(branches).toBe(2);
+  });
+
+  it("the new verbs read as sentences when a record offers them in a choice", () => {
+    const made = oathTable(oathWorld);
+    type Branch = Extract<Instruction, { verb: "Choose" }>["options"][number]["instructions"][number];
+    const say = (instruction: Branch): string => branchWords({ verb: "Choose", who: "actor", options: [{ id: "x", instructions: [instruction] }] }, "x", made.state, oathNames, null);
+    expect(say({ verb: "SearchCollection", code: "41020", to: "staging" })).toBe("Search the encounter deck, the discard pile and your collection for Goblin Sniper and add it to the staging area");
+    expect(say({ verb: "RaiseThreat", amount: { count: { type: "character", control: "you", committed: true } }, who: "actor" })).toBe("Raise your threat by 1 for each questing character you control");
+    expect(say({ verb: "PlaceToken", amount: 1 })).toBe("Place 1 resource token on this card");
+    expect(say({ verb: "RecordTokens", code: "41050" })).toBe("Record the resource tokens on The Oath in the Campaign Log");
+    expect(say({ verb: "SearchMove", trait: "Spider", type: "enemy", to: "engaged" })).toBe("Put a Spider enemy into play engaged with you");
+    expect(say({ verb: "SearchMove", trait: "Forest", type: "location", to: "staging" })).toBe("Add a Forest location from the encounter deck or discard pile to the staging area");
   });
 });

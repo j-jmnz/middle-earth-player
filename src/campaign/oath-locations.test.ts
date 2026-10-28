@@ -10,7 +10,7 @@ import { modifiedStat } from "../rules/keywords.ts";
 import { legalIntents, legalTargets } from "../rules/legal.ts";
 import { settle } from "../rules/machine.ts";
 import type { PlayerIntent, ReduceContext } from "../rules/reduce.ts";
-import { flagged, updateCard, type ScenarioState } from "../rules/state.ts";
+import { flagged, type ScenarioState } from "../rules/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, loadOathWorld, oathTable, settleChoices, travelTo, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
 import { first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";

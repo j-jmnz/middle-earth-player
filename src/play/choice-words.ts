@@ -14,6 +14,7 @@ import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden-words.
 import { miscPickWords, miscWords } from "./misc-words.ts";
 import { playPickWords, playWords } from "./play-words.ts";
 import { dungeonWords } from "./dungeon-words.ts";
+import { oathPickWords, oathWords } from "./oath-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -85,6 +86,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
         const except = instruction.perCommitted.exceptSphere ? ` other than ${capital(instruction.perCommitted.exceptSphere)}` : "";
         return `each player raises threat by 1 for each ${instruction.perCommitted.type}${except} committed to the quest`;
       }
+      // "Raise your threat by 1 for each questing character you control" (41025:A:2).
+      if (typeof instruction.amount === "object" && instruction.amount.count?.committed === true && instruction.amount.count.type === "character") return "raise your threat by 1 for each questing character you control";
       const amount = amountWords(instruction.amount);
       if (instruction.who === "firstPlayer") return `the first player raises threat by ${amount}`;
       if (instruction.who === "eachSeat") return `each player raises threat by ${amount}`;
@@ -193,10 +196,11 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return instruction.target.kind === "engagedEnemies" ? `return an engaged ${instruction.target.trait ?? ""} enemy to the staging area`.replace("  ", " ") : "return it to the staging area";
     case "ReadyHero":
       return "ready a hero";
-    case "SearchMove":
-      return instruction.to === "staging"
-        ? `add ${article(`${instruction.trait ?? ""} enemy`.trim())} from the encounter deck or discard pile to the staging area`
-        : `put ${article(`${instruction.trait ?? ""} enemy`.trim())} into play engaged with the first player`;
+    case "SearchMove": {
+      const kind = article(`${instruction.trait ?? ""} ${instruction.type ?? "enemy"}`.trim());
+      if (instruction.to === "staging") return `add ${kind} from the encounter deck or discard pile to the staging area`;
+      return `put ${kind} into play engaged with ${instruction.to === "engaged" ? "you" : "the first player"}`;
+    }
     case "Pick": {
       // A card out of play is named by its printed type when the pick asks for one ("choose an ally" from the deck).
       const noun = instruction.pick.type === "card" && instruction.pick.cardType && instruction.pick.cardType !== "player-side-quest" ? instruction.pick.cardType : (PICK_NOUNS[instruction.pick.type] ?? "card");
@@ -279,7 +283,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return oathWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
@@ -353,7 +357,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (play) return play;
   const burden = burdenPickWords(pick, next);
   if (burden) return burden;
-  if (pick.verb !== "Pick") return encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
+  if (pick.verb !== "Pick") return oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = PICK_NOUNS[pick.pick.type] ?? "card";
   const one = article(noun);
   switch (next?.verb) {
@@ -396,6 +400,13 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     }
     case "DamageCard":
       return { verb: "Assign", prompt: `Choose ${one} to take ${amountWords(next.amount)} damage.` };
+    // The Oath's Adaptations (41044:A:3, 41046:A:3) and Abandoned Camp (41015:A:1): the hero healed, the location that takes progress, the ally put into play.
+    case "Heal":
+      return { verb: "Heal", prompt: `Choose ${one} to heal${next.all ? " all damage from" : ""}.` };
+    case "PlaceProgressOn":
+      return { verb: "Place", prompt: `Choose ${one} to place ${amountWords(next.amount)} progress on.` };
+    case "PutIntoPlay":
+      return { verb: "Put into play", prompt: `Choose ${pick.pick.cardType && pick.pick.cardType !== "player-side-quest" ? article(pick.pick.cardType) : one} to put into play.` };
     default:
       return { verb: "Choose", prompt: `Choose ${one}.` };
   }

@@ -34,7 +34,7 @@ import { previewCards } from "../play/table-preview";
 import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
-import { heldDial, widgetReadouts } from "../play/widgets";
+import { campaignTokens, heldDial, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { Screen } from "./chrome";
@@ -209,6 +209,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   );
   const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
   const widgets = widgetReadouts(game);
+  const tokens = campaignTokens(game, ctx.effects, nameOf);
   const held = heldDial(game, nameOf);
   const commandWidth = Math.round(Math.min(280, Math.max(210, screen.width * 0.3)));
   const narrow = screen.width - insets.left - insets.right < 760;
@@ -242,6 +243,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           viewed={peek.viewed}
           life={widgets.life}
           burdenDeck={widgets.burdenDeck}
+          tokens={tokens}
           rail={rail}
           stopAhead={carousel.stopAhead}
           carouselOpen={reading?.kind === "carousel"}

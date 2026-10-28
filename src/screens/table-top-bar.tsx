@@ -29,6 +29,8 @@ export type TopBarProps = {
   viewed: number | null;
   life: number | null;
   burdenDeck: number | null;
+  // The resource tokens on the campaign card (The Oath, 41050:A:3) and the card's name, or null when its scenario has none.
+  tokens?: { name: string; tokens: number } | null;
   rail: Rail;
   // Stops are on and one of the player's stops lies ahead in this phase: a gold S by the next phase.
   stopAhead: boolean;
@@ -48,7 +50,7 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const [bar, setBar] = useState(0);
   const [dials, setDials] = useState(0);
   const onBar = (event: LayoutChangeEvent) => setBar(Math.round(event.nativeEvent.layout.width));
@@ -99,6 +101,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, rail, s
               );
             })}
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
+            {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon={null} elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
           </View>
         </ScrollView>
