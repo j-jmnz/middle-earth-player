@@ -1,68 +1,13 @@
-import { spawnSync } from "node:child_process";
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import Database from "better-sqlite3";
 
 import { isRingsdbImagePath, sniffImage } from "../src/screens/images/policy.ts";
-import { bytes, createLog, runScript } from "./log.ts";
-
-const log = createLog("pack-scans");
-
-const SIDE_SUFFIXES = ["-1a", "-1b", "-2a", "-2b", "-3a", "-3b", "-setupa", "-setupb"] as const;
-const A_SIDES = ["-1a", "-2a", "-3a", "-setupa"] as const;
-const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png"]);
-
-export function normalizeScanKey(value: string): string {
-  const base = value.replace(/\.[^.]+$/, "");
-  return base
-    .toLowerCase()
-    .replace(/['’ʻʼ]/g, "-")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .replace(/-+/g, "-");
-}
-
-export type ShelfCandidate = {
-  path: string;
-};
-
-export function matchShelfScan(cardName: string, files: readonly ShelfCandidate[]): string | null {
-  const cardKey = normalizeScanKey(cardName);
-  if (cardKey.length === 0) return null;
-  let exact: string | null = null;
-  const sides = new Map<string, string>();
-  for (const file of files) {
-    if (isSkippedShelfPath(file.path)) continue;
-    const key = normalizeScanKey(path.basename(file.path));
-    if (key === cardKey) {
-      exact = file.path;
-      continue;
-    }
-    for (const suffix of SIDE_SUFFIXES) {
-      if (key === `${cardKey}${suffix}`) sides.set(suffix, file.path);
-    }
-  }
-  if (exact) return exact;
-  for (const suffix of A_SIDES) {
-    const match = sides.get(suffix);
-    if (match) return match;
-  }
-  return null;
-}
-
-export function shelfFetchArgs(): readonly string[] {
-  return ["--experimental-strip-types", "scripts/fetch-sources.ts"];
-}
+import { DATA_DIR, SCAN_CACHE_DIR } from "./data/paths.ts";
+import { fetchBytes, sha256, type SourceFile, type SourceRecord } from "./data/sources/fetch.ts";
+import { bytes, runScript, type Log } from "./log.ts";
 
 export type PackedScan = {
   code: string;
@@ -72,89 +17,77 @@ export type PackedScan = {
 };
 
 export type PackScansOptions = {
-  root: string;
   fixturesDir: string;
   catalogDb: string;
-  readingDir: string;
+  sourcesPath: string;
+  scanCacheDir: string;
   scansDir: string;
   mapPath: string;
-  fetchShelf?: () => void;
+  fetch?: (url: string) => Promise<Uint8Array>;
 };
 
-export function packScans(options: PackScansOptions): PackedScan[] {
+/**
+ * Bundles side A of every scenario card RingsDB has no picture for. Each file is a `scans` file of data/sources.json:
+ * the `.cache/scans` copy is used when its hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has
+ * no cache). Bytes that do not match the pin fail the build: run `pnpm data:sync scans` to move the pin.
+ */
+export async function packScans(options: PackScansOptions, log: Log): Promise<PackedScan[]> {
   const codes = fixtureCodes(options.fixturesDir);
   log.info(`${codes.length} card codes in the scenario fixtures`);
+  const { sources } = JSON.parse(readFileSync(options.sourcesPath, "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
+  const pins = new Map<string, SourceFile>();
+  for (const file of sources.scans?.files ?? []) {
+    const match = /^scans\/(.+)\.A\.(jpg|png)$/.exec(file.path);
+    if (match?.[1]) pins.set(match[1], file);
+  }
+  const fetchScan = options.fetch ?? ((url: string) => fetchBytes(url, 60_000, log));
   const database = new Database(options.catalogDb, { readonly: true });
   try {
     mkdirSync(options.scansDir, { recursive: true });
+    mkdirSync(options.scanCacheDir, { recursive: true });
     const packed: PackedScan[] = [];
-    const missing: { code: string; name: string }[] = [];
+    let fetched = 0;
     for (const code of codes) {
       const card = database.prepare("select name, imagesrc from cards where code = ?").get(code) as
         | { name: string; imagesrc: string | null }
         | undefined;
       if (!card) throw new Error(`Fixture code ${code} is not in the catalog`);
-      // The catalog gives a card RingsDB lacks the URL of its scan; only a RingsDB path is left to download.
+      // A RingsDB picture is downloaded on the phone; only a card RingsDB lacks is bundled.
       if (card.imagesrc && isRingsdbImagePath(card.imagesrc)) {
         log.debug(`${code} ${card.name}: RingsDB has a picture, not bundled`);
         continue;
       }
-      const match = matchShelfScan(card.name, listReadingFiles(options.readingDir));
-      if (!match) {
-        missing.push({ code, name: card.name });
-        continue;
+      const pin = pins.get(code);
+      if (!pin) throw new Error(`${code} (${card.name}) has no pinned side A scan in ${options.sourcesPath}. Run pnpm data:sync scans.`);
+      const cached = path.join(options.scanCacheDir, path.basename(pin.path));
+      let body: Uint8Array;
+      if (existsSync(cached) && sha256(readFileSync(cached)) === pin.sha256) {
+        body = new Uint8Array(readFileSync(cached));
+      } else {
+        log.debug(`${code}: ${pin.path} not in the cache at its pin, fetching ${pin.url}`);
+        body = await fetchScan(pin.url);
+        const hash = sha256(body);
+        if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data:sync scans and check the change.`);
+        writeFileSync(cached, body);
+        fetched += 1;
       }
-      packed.push(copyScan(code, match, options.scansDir));
-    }
-    if (missing.length > 0) {
-      log.info(`${missing.length} card${missing.length === 1 ? "" : "s"} not on the shelf yet (${missing.map((card) => card.code).join(", ")}): fetching the scenario shelf`);
-      const fetchShelf = options.fetchShelf ?? (() => fetchScenarioShelf(options.root));
-      fetchShelf();
-      const files = listReadingFiles(options.readingDir);
-      for (const card of missing) {
-        const match = matchShelfScan(card.name, files);
-        if (!match) throw new Error(`No shelf file for ${card.code} (${card.name}) under ${options.readingDir} (${files.length} files) and no imagesrc`);
-        packed.push(copyScan(card.code, match, options.scansDir));
-      }
+      packed.push(writeScan(code, body, cached, options.scansDir));
     }
     writeScanMap(options.mapPath, packed);
-    const total = packed.reduce((sum, scan) => sum + statSync(path.join(options.scansDir, scan.filename)).size, 0);
-    log.info(`bundled ${packed.length} scan${packed.length === 1 ? "" : "s"} (${bytes(total)}) into ${path.relative(options.root, options.scansDir) || options.scansDir}; map ${path.relative(options.root, options.mapPath) || options.mapPath}`);
+    const total = packed.reduce((sum, scan) => sum + (pins.get(scan.code)?.bytes ?? 0), 0);
+    log.info(`bundled ${packed.length} scan${packed.length === 1 ? "" : "s"} (${bytes(total)}, ${fetched} fetched) into ${options.scansDir}; map ${options.mapPath}`);
     return packed;
   } finally {
     database.close();
   }
 }
 
-function copyScan(code: string, source: string, scansDir: string): PackedScan {
-  const bytes = new Uint8Array(readFileSync(source));
-  const media = sniffImage(bytes);
-  if (!media) throw new Error(`Shelf file for ${code} is not a JPEG or PNG`);
+function writeScan(code: string, body: Uint8Array, cached: string, scansDir: string): PackedScan {
+  const media = sniffImage(body);
+  if (!media) throw new Error(`Scan for ${code} is not a JPEG or PNG`);
   const filename = `${code}.${media.extension}`;
-  copyFileSync(source, path.join(scansDir, filename));
-  log.debug(`${code}: ${path.basename(source)} -> ${filename} (${media.width}x${media.height})`);
+  copyFileSync(cached, path.join(scansDir, filename));
   return { code, filename, width: media.width, height: media.height };
-}
-
-function listReadingFiles(readingDir: string): ShelfCandidate[] {
-  if (!existsSync(readingDir)) return [];
-  const found: ShelfCandidate[] = [];
-  const walk = (dir: string): void => {
-    for (const name of readdirSync(dir)) {
-      if (name.toLowerCase() === "ringsdb") continue;
-      const full = path.join(dir, name);
-      if (statSync(full).isDirectory()) walk(full);
-      else found.push({ path: full });
-    }
-  };
-  walk(readingDir);
-  return found;
-}
-
-function isSkippedShelfPath(filePath: string): boolean {
-  if (path.extname(filePath).toLowerCase() === ".pdf") return true;
-  if (!IMAGE_EXTENSIONS.has(path.extname(filePath).toLowerCase())) return true;
-  return filePath.split(/[\\/]/).some((part) => part.toLowerCase() === "ringsdb");
 }
 
 function fixtureCodes(fixturesDir: string): string[] {
@@ -208,15 +141,6 @@ function writeScanMap(mapPath: string, packed: readonly PackedScan[]): void {
   );
 }
 
-function fetchScenarioShelf(root: string): void {
-  const script = path.join(root, "scripts/fetch-sources.ts");
-  if (!existsSync(script)) {
-    throw new Error("scripts/fetch-sources.ts is not available to fetch the scenario shelf");
-  }
-  const result = spawnSync(process.execPath, [...shelfFetchArgs()], { cwd: root, stdio: "inherit" });
-  if (result.status !== 0) throw new Error("Scenario shelf fetch failed");
-}
-
 function repoRoot(): string {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 }
@@ -228,15 +152,18 @@ function isDirectRun(): boolean {
 }
 
 if (isDirectRun()) {
-  void runScript("pack-scans", () => {
+  void runScript("pack-scans", async (log) => {
     const root = repoRoot();
-    packScans({
-      root,
-      fixturesDir: path.join(root, "data", "scenarios"),
-      catalogDb: path.join(root, "assets/catalog.db"),
-      readingDir: path.join(root, ".cache/sources/reading"),
-      scansDir: path.join(root, "assets/scans"),
-      mapPath: path.join(root, "src/screens/images/scan-map.ts"),
-    });
+    await packScans(
+      {
+        fixturesDir: path.join(DATA_DIR, "scenarios"),
+        catalogDb: path.join(root, "assets/catalog.db"),
+        sourcesPath: path.join(DATA_DIR, "sources.json"),
+        scanCacheDir: SCAN_CACHE_DIR,
+        scansDir: path.join(root, "assets/scans"),
+        mapPath: path.join(root, "src/screens/images/scan-map.ts"),
+      },
+      log,
+    );
   });
 }

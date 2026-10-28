@@ -37,6 +37,7 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm effects:open` | Rewrites `src/effects/open-lines.ts`, the printed lines no record owns. |
 | `node --experimental-strip-types scripts/card-smoke.ts <codes>` | Plays a seeded game with the cards' records and reports any throw, refusal or stall. |
 | `pnpm booklets:pack` | Copies the pinned booklet PDFs into `.cache/booklets/` for Metro. |
+| `pnpm scans:pack` | Copies the pinned scans of the scenario cards RingsDB has no picture for into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a scan missing from `.cache/scans/`. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `node --experimental-strip-types scripts/e2e-fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. |
 
@@ -86,6 +87,14 @@ The app uses `expo-dev-client`, so it runs as a development build of `com.middle
 That compiles the app, installs it over USB, and serves JavaScript from Metro. Later edits reload in the installed app. Rebuild when a native module changes. `android/` and `ios/` stay gitignored.
 
 When Android Studio is unwelcome, the `development` profile in `eas.json` builds the same app as a cloud APK. The daily loop is the local install above.
+
+### iPad or iPhone
+
+1. Install Xcode, then `brew install cocoapods`. In Xcode → Settings → Accounts, add your Apple ID.
+2. Connect the device by cable, trust the Mac, and turn on Settings → Privacy & Security → Developer Mode.
+3. `pnpm ios -- --device`
+
+`pnpm ios` packs the booklets and the encounter and quest scans (`pnpm scans:pack`, about 100 MB, fetched once into `.cache/scans/`) before it builds. Player-card pictures come from RingsDB on the device as they are first shown. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
 
 ### Maestro
 

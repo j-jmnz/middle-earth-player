@@ -5,9 +5,12 @@ import path from "node:path";
 import Database from "better-sqlite3";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { matchShelfScan, packScans, shelfFetchArgs } from "./pack-scans.ts";
+import { sha256 } from "./data/sources/fetch.ts";
+import { createLog } from "./log.ts";
+import { packScans } from "./pack-scans.ts";
 
 const roots: string[] = [];
+const log = createLog("pack-scans");
 
 afterEach(() => {
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
@@ -27,97 +30,78 @@ function jpeg(height: number): Buffer {
   ]);
 }
 
-function stage(): { root: string; fixtures: string; reading: string; scans: string; map: string; catalog: string } {
+const BAG_END_URL = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Riders/Bag-End.jpg";
+const THREE_URL = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Riders/Three-is-Company-1A.jpg";
+
+function stage() {
   const root = mkdtempSync(path.join(tmpdir(), "pack-scans-"));
   roots.push(root);
   const fixtures = path.join(root, "fixtures");
-  const reading = path.join(root, "reading");
-  const scans = path.join(root, "scans");
-  const ringsdb = path.join(reading, "ringsdb");
-  for (const dir of [fixtures, path.join(root, "sources", "ringsdb")]) {
-    mkdirSync(dir, { recursive: true });
-  }
-  mkdirSync(ringsdb, { recursive: true });
-  writeFileSync(
-    path.join(fixtures, "scenario.json"),
-    JSON.stringify({
-      cards: [
-        { code: "141031" },
-        { code: "141001" },
-        { code: "141022" },
-      ],
-    }),
-  );
+  const cache = path.join(root, "cache");
+  mkdirSync(fixtures, { recursive: true });
+  mkdirSync(cache, { recursive: true });
+  writeFileSync(path.join(fixtures, "scenario.json"), JSON.stringify({ cards: [{ code: "141031" }, { code: "141001" }, { code: "141022" }] }));
   const catalog = path.join(root, "catalog.db");
   const database = new Database(catalog);
   database.exec("create table cards (code text primary key, name text not null, imagesrc text)");
   const insert = database.prepare("insert into cards (code, name, imagesrc) values (?, ?, ?)");
   insert.run("141031", "Bag End", null);
   insert.run("141001", "Frodo Baggins", "/bundles/cards/141001.png");
-  insert.run("141022", "Three is Company", "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Riders/Three-is-Company-1A.jpg");
+  insert.run("141022", "Three is Company", THREE_URL);
   database.close();
-  writeFileSync(path.join(reading, "Bag-End.jpg"), jpeg(600));
-  writeFileSync(path.join(ringsdb, "Bag-End.jpg"), jpeg(100));
-  writeFileSync(path.join(root, "sources", "ringsdb", "141001.jpg"), jpeg(100));
-  writeFileSync(path.join(reading, "Bag-End.pdf"), "%PDF-1.1");
-  writeFileSync(path.join(reading, "rules.pdf"), "%PDF-1.1");
-  writeFileSync(path.join(reading, "Three-is-Company-1A.jpg"), jpeg(560));
-  writeFileSync(path.join(reading, "Three-is-Company-1B.jpg"), jpeg(560));
-  writeFileSync(path.join(reading, "Frodo-Baggins.jpg"), jpeg(600));
-  return { root, fixtures, reading, scans, map: path.join(root, "scan-map.ts"), catalog };
+  const pin = (code: string, url: string, body: Buffer) => ({ path: `scans/${code}.A.jpg`, url, sha256: sha256(body), bytes: body.length });
+  const sources = path.join(root, "sources.json");
+  writeFileSync(
+    sources,
+    JSON.stringify({
+      sources: {
+        scans: {
+          files: [
+            pin("141031", BAG_END_URL, jpeg(600)),
+            { ...pin("141031", BAG_END_URL, jpeg(600)), path: "scans/141031.B.jpg" },
+            pin("141022", THREE_URL, jpeg(560)),
+            pin("141001", "https://example.invalid/frodo.jpg", jpeg(600)),
+          ],
+        },
+      },
+    }),
+  );
+  writeFileSync(path.join(cache, "141031.A.jpg"), jpeg(600));
+  writeFileSync(path.join(cache, "141022.A.jpg"), jpeg(100));
+  return {
+    cache,
+    options: { fixturesDir: fixtures, catalogDb: catalog, sourcesPath: sources, scanCacheDir: cache, scansDir: path.join(root, "scans"), mapPath: path.join(root, "scan-map.ts") },
+  };
 }
 
 describe("pack scans", () => {
-  it("copies a code with no RingsDB path (null or a scan URL), skips a RingsDB path, and skips RingsDB previews and PDFs", () => {
+  it("bundles side A of each card with no RingsDB path, from the cache at its pin or else from the pinned URL", async () => {
     const staged = stage();
-    const packed = packScans({
-      root: staged.root,
-      fixturesDir: staged.fixtures,
-      catalogDb: staged.catalog,
-      readingDir: staged.reading,
-      scansDir: staged.scans,
-      mapPath: staged.map,
-      fetchShelf: () => {
-        throw new Error("shelf fetch should not run when the files are present");
+    const fetched: string[] = [];
+    const packed = await packScans(
+      {
+        ...staged.options,
+        fetch: (url) => {
+          fetched.push(url);
+          return Promise.resolve(new Uint8Array(jpeg(560)));
+        },
       },
-    });
-    const names = readdirSync(staged.scans).sort();
-    expect(names).toEqual(["141022.jpg", "141031.jpg"]);
-    expect(packed.map((entry) => entry.code).sort()).toEqual(["141022", "141031"]);
+      log,
+    );
+    expect(fetched).toEqual([THREE_URL]);
+    expect(readdirSync(staged.options.scansDir).sort()).toEqual(["141022.jpg", "141031.jpg"]);
     expect(packed.find((entry) => entry.code === "141031")).toMatchObject({ width: 423, height: 600 });
-    expect(readFileSync(path.join(staged.scans, "141031.jpg"))).toEqual(jpeg(600));
-    const map = readFileSync(staged.map, "utf8");
-    expect(map).toContain("141031");
+    expect(readFileSync(path.join(staged.cache, "141022.A.jpg"))).toEqual(jpeg(560));
+    const map = readFileSync(staged.options.mapPath, "utf8");
+    expect(map).toContain('"141031": { moduleId: require("../../../assets/scans/141031.jpg")');
     expect(map).toContain("141022");
     expect(map).not.toContain("141001");
-    expect(map).not.toContain(".pdf");
-    expect(map).not.toContain("ringsdb");
-    expect(
-      matchShelfScan("Three is Company", [
-        { path: path.join(staged.reading, "Three-is-Company-1B.jpg") },
-        { path: path.join(staged.reading, "Three-is-Company-1A.jpg") },
-      ]),
-    ).toContain("Three-is-Company-1A.jpg");
   });
 
-  it("fetches the shelf once when a shipped code has no file, without RingsDB image flags", () => {
+  it("fails when the fetched bytes do not match the pin", async () => {
     const staged = stage();
-    rmSync(path.join(staged.reading, "Bag-End.jpg"));
-    let fetches = 0;
-    packScans({
-      root: staged.root,
-      fixturesDir: staged.fixtures,
-      catalogDb: staged.catalog,
-      readingDir: staged.reading,
-      scansDir: staged.scans,
-      mapPath: staged.map,
-      fetchShelf: () => {
-        fetches += 1;
-        writeFileSync(path.join(staged.reading, "Bag-End.jpg"), jpeg(600));
-      },
-    });
-    expect(fetches).toBe(1);
-    expect(readdirSync(staged.scans)).toContain("141031.jpg");
-    expect(shelfFetchArgs()).not.toContain("--all-ringsdb-images");
+    await expect(packScans({ ...staged.options, fetch: () => Promise.resolve(new Uint8Array(jpeg(300))) }, log)).rejects.toThrow(
+      /pinned .*pnpm data:sync scans/,
+    );
   });
 });
