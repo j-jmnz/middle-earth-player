@@ -94,6 +94,8 @@ When Android Studio is unwelcome, the `development` profile in `eas.json` builds
 2. Connect the device by cable, trust the Mac, and turn on Settings → Privacy & Security → Developer Mode.
 3. `pnpm ios -- --device`
 
+`plugins/with-script-sandboxing-off.js` turns off Xcode's User Script Sandboxing in the generated project: React Native's bundle phase writes `ip.txt` into the app undeclared, and the sandbox fails the build with "Operation not permitted". An `ios/` generated before the plugin keeps the old setting until `npx expo prebuild --clean --platform ios`.
+
 `pnpm ios` packs the booklets and the encounter and quest scans (`pnpm scans:pack`, about 100 MB, fetched once into `.cache/scans/`) before it builds. Player-card pictures come from RingsDB on the device as they are first shown. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
 
 ### Maestro

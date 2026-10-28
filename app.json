@@ -52,7 +52,8 @@
         }
       ],
       "expo-sqlite",
-      "expo-image"
+      "expo-image",
+      "./plugins/with-script-sandboxing-off.js"
     ],
     "experiments": {
       "typedRoutes": true,
