@@ -17,7 +17,7 @@ import { sidequestsPickMatches } from "./families/sidequests-pick.ts";
 import { lookedPool } from "./families/deck-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
-import { cardTypeOf, isPlayerType, printedOf } from "./printed.ts";
+import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "./printed.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { heldAmount, inPlay, livingSeats } from "./state.ts";
@@ -108,8 +108,10 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.type !== "card" && spec.type !== "player") {
     // A card among a player's heroes is a hero: an ally that gained the hero card type sits there (heroType, families/play-sweep.ts).
     // An ally attached to another card (Wild Stallion) is an attachment while it is.
-    const type = printed.type === "ally" && instance.host != null && instance.zone !== "heroes" ? "attachment" : cardTypeOf(instance, printed);
-    const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
+    const base = printed.type === "ally" && instance.host != null && instance.zone !== "heroes" ? "attachment" : cardTypeOf(instance, printed);
+    // An objective ally with printed combat stats (Mendor, 01135) a player controls is an ally in play (isAllyLike), and still an objective card.
+    const type = base === "objective" && instance.zone === "play" && instance.host == null && isAllyLike(printed) ? "ally" : base;
+    const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
     if (!typed) return false;
   }
   if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
