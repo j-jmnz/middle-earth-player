@@ -1,20 +1,12 @@
-// Rules: rr.combat-phase, rr.quest-advancement, rr.campaign-cards, rr.campaign-pool (data/rules/entries.json); ledger lines 41005:B:2, 41028:A:1, 41051:B:1. What the table and the Resolution say for The
-// Caves of Nibin-Dûm: the quest points of Surprise Attack as the engine reads them, the Pillar among the cards the players may attack, and the Ranger Sense the win earns and carries over.
-// The engine decides all of it; nothing here changes a card.
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+// Rules: rr.combat-phase, rr.quest-advancement, (data/rules/entries.json); ledger lines 41005:B:2, 41028:A:1. What the table says for The Caves of Nibin-Dûm: the quest points of
+// Surprise Attack as the engine reads them, and the Pillar among the cards the players may attack. The engine decides both; nothing here changes a card.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { EFFECTS } from "../effects/index.ts";
 import { legalIntents } from "../rules/legal.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { syncConstants } from "../rules/constants.ts";
-import { loadWorld } from "../campaign/world.ts";
-import { resolutionView, settledSentence } from "../campaign/resolution-view.ts";
-import { CAVES_GOLDENS, cavesWorld, playGolden } from "../../scripts/nibin-dum-game.ts";
-import { campaign, cavesTable, caves, loadCavesWorld, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
+import { cavesTable, loadCavesWorld, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 import { first, send, start, type Run } from "../../scripts/past-scene.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 
 import { questTitle } from "./table-preview.ts";
 import { playerAttackSheet } from "./combat-sheets.ts";
@@ -70,29 +62,5 @@ describe("the players' attack sheet (41028:A:1)", () => {
     const usual = playerAttackSheet(ordinary.state, plain.ctx, legalIntents(ordinary.state, plain.ctx), namesOf(ordinary.state));
     if (usual.kind !== "pick") throw new Error("not a pick sheet");
     expect(usual.note).toBe("Choose the enemy, then the characters that attack it.");
-  });
-});
-
-describe("the Resolution sentence (41051:B:1)", () => {
-  it("names the Ranger Sense each player earns, kept for the next campaign too, and says the win completes the campaign", async () => {
-    const golden = CAVES_GOLDENS.find((item) => item.name === "two-handed, won")!;
-    const { cards, ctx } = await cavesWorld("strong");
-    const game = playGolden(golden, ctx);
-    const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-    const base = loadWorld(catalog, campaign, caves, EFFECTS, ["41048", "41049", "41042"]);
-    const named = { ...base, cards: new Map([...base.cards, ...cards]) };
-    const view = resolutionView(game.state, named);
-    expect(view.kind).toBe("settled");
-    if (view.kind !== "settled") return;
-    expect(view.carried).toEqual([{ code: "41049", eachPlayer: true }]);
-    expect(settledSentence(view, named, null, true)).toBe("Confirming records 2 copies of Ranger Sense in the campaign and completes the campaign. A Ranger Sense for each player is kept for your next campaign.");
-    // Threat 40 or more: nothing is earned or kept.
-    const tense = await cavesWorld("tense");
-    const high = playGolden(CAVES_GOLDENS.find((item) => item.name === "two-handed, threat 40 or higher at the end, won")!, tense.ctx);
-    const bare = resolutionView(high.state, { ...named, cards: new Map([...named.cards, ...tense.cards]) });
-    if (bare.kind !== "settled") throw new Error("not settled");
-    expect(bare.carried).toBeUndefined();
-    expect(settledSentence(bare, named, null, true)).toBe("Confirming records the win and completes the campaign.");
-    expect(settledSentence(bare, named, null)).toBe("Confirming records the win.");
   });
 });

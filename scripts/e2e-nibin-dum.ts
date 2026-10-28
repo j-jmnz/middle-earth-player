@@ -27,14 +27,14 @@ const say = createLog("e2e-nibin-dum");
 
 export type NibinDumFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: string; choices: string[] } };
 
-const campaign = loadCampaign("the-dark-of-mirkwood");
+export const campaign = loadCampaign("the-dark-of-mirkwood");
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 const CHIEFTAIN = "41027";
 const PILLAR = "41028";
 
 // The auto-player's answer, with what the scenario asks of the players: a hero stays home to attack and one defends; the Pillar is worn down in the combat phase
 // (stage 3), the Goblin Chieftain is engaged and killed once the stage holds 8 progress, and it is kept from taking progress off the quest until then.
-function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>): PlayerIntent {
+export function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>): PlayerIntent {
   if (state.window?.kind === "choose" && state.window.options.includes("staging") && state.window.options.includes("progress")) {
     const progress = state.cards[state.questStage ?? ""]?.progress ?? 0;
     return { type: "Choose", optionId: progress - 4 >= 8 ? "progress" : "staging" };
@@ -89,7 +89,7 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
   return nextIntent(state, ctx, { scout: "", prefer: PILLAR, protect: "", play: true, act: true }, memory);
 }
 
-function play(log: CampaignLog, loadout: StoredLoadout, seed: number): { intents: PlayerIntent[]; state: ScenarioState } {
+export function play(log: CampaignLog, loadout: StoredLoadout, seed: number): { intents: PlayerIntent[]; state: ScenarioState } {
   const scenario = loadScenario("the-caves-of-nibin-dum");
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log), "41048", "41049", "41042"]);
   const dealt = deal({ ...newSave("fixture", campaign.id, 2), log }, world, loadout, seed, CATALOG_VERSION);

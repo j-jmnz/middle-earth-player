@@ -106,8 +106,8 @@ describe("Maestro fixtures", () => {
       const save = fixtureSave(name, "s", CATALOG_VERSION);
       expect(save.active?.engineVersion).toBe(ENGINE_VERSION);
       expect(save.active?.dataHash).toBe(CATALOG_VERSION);
-      // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes.
-      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : []);
+      // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes, the Caves of Nibin-Dûm ones from The Oath's.
+      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : []);
     }
   });
 
@@ -315,6 +315,56 @@ describe("The Oath (The Dark of Mirkwood part 1, phase 32)", () => {
     expect(after.log).toEqual(save.log);
     expect(after.log.usedOnce).toEqual([]);
     expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status)).toEqual(["current", "locked"]);
+  });
+});
+
+describe("The Caves of Nibin-Dûm (The Dark of Mirkwood part 2, phase 33)", () => {
+  const WON = hasFixture("nibin-dum-won");
+
+  it("start from the log a real oath-won game writes when it is confirmed, in a The Dark of Mirkwood save, each seat's cards from the pool", () => {
+    const oathSave = fixtureSave("oath-won", "s", CATALOG_VERSION);
+    const resumed = resume(oathSave, worldFor("oath-won"), CATALOG_VERSION);
+    if (!resumed.ok) throw new Error(resumed.reason);
+    const written = finish(oathSave, worldFor("oath-won"), resumed.state).log;
+    for (const name of ["nibin-dum-won", "nibin-dum-lost"] as const) {
+      if (!hasFixture(name)) continue;
+      const found = fixture(name);
+      expect(found.campaignId, name).toBe("the-dark-of-mirkwood");
+      expect(found.seatCount, name).toBe(2);
+      expect(found.loadout.scenarioId, name).toBe("the-caves-of-nibin-dum");
+      expect(found.loadout.ringBearer, name).toBeNull();
+      expect(found.log, name).toEqual(written);
+      expect(found.log.completed, name).toEqual(["the-oath"]);
+      expect(found.past?.fixture, name).toBe("oath-won");
+    }
+  });
+
+  it("nibin-dum-lost replays to a loss, and finishing it writes nothing: The Caves of Nibin-Dûm stays current and nothing is carried over", () => {
+    const world = worldFor("nibin-dum-lost");
+    const save = fixtureSave("nibin-dum-lost", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
+    const after = finish(save, world, resumed.state);
+    expect(after.log).toEqual(save.log);
+    expect(after.log.carryOver).toEqual([]);
+    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status)).toEqual(["completed", "current"]);
+  });
+
+  it.skipIf(!WON)("nibin-dum-won replays to a win with nothing to answer, and confirming it completes the campaign and writes the Ranger Sense carry-over", () => {
+    const world = worldFor("nibin-dum-won");
+    const save = fixtureSave("nibin-dum-won", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.stageCleared && !resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    const view = resolutionView(resumed.state, world);
+    expect(view.kind).toBe("settled");
+    const after = finish(save, world, resumed.state);
+    expect(after.log.completed).toEqual(["the-oath", "the-caves-of-nibin-dum"]);
+    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status)).toEqual(["completed", "completed"]);
+    const highest = Math.max(...resumed.state.seats.slice(0, resumed.state.seatCount).map((seat) => seat.threat));
+    expect(after.log.carryOver.map((card) => card.code)).toEqual(highest < 40 ? ["41049"] : []);
   });
 });
 
