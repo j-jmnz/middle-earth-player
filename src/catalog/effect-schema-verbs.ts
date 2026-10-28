@@ -172,6 +172,9 @@ export const simpleVerbs = [
     // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
     // Great Warg Chief, if able", 142022:A:1).
     require: z.string().min(1).optional(),
+    // The card found must have a title no card an earlier search of this effect found has: "each player searches for a different location" (41004:B:1,
+    // 41005:A:1). The titles are the cards' printed names; cards that share one are the same choice.
+    different: z.boolean().optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("ReturnToStaging"), target: targetSchema, ...when }),

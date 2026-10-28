@@ -345,7 +345,12 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     case "SearchReveal": {
       const found = searchable(state, instruction, ctx);
       const required = instruction.verb === "SearchMove" && instruction.require ? searchable(state, { code: instruction.require }, ctx) : [];
-      return required.length > 0 ? required : found;
+      if (required.length > 0) return required;
+      if (instruction.verb !== "SearchMove" || !instruction.different) return found;
+      // A different title: not one an earlier search of this effect has found (the frame's picked cards, kept by applyTargeted).
+      const data = topFrame(state)?.data;
+      const taken = new Set((data?.kind === "effect" ? (data.picked ?? []) : []).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
+      return found.filter((id) => !taken.has(printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
     }
     case "ShuffleIntoDeck":
       return searchable(state, instruction, ctx, ["encounterDiscard"]);
@@ -480,7 +485,10 @@ function applyTargeted(
         next = instruction.to === "staging" ? moveCard(next, id, { zone: "staging" }) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
         if (instruction.each) next = updateCard(next, id, { face: "up" });
       }
-      return next;
+      // A `different` search tells the next one which titles are taken.
+      const data = topFrame(next)?.data;
+      const moved = instruction.each ? ids : ids.slice(0, 1);
+      return instruction.different && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
     }
     case "SearchReveal":
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first) : state;

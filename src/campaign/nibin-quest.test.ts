@@ -63,6 +63,15 @@ describe("The Dark of Nibin-Dûm, stage 1 (41004:A:1, 41004:B:1)", () => {
     expect(new Set(staged).size).toBe(2);
     expect(staged.every((code) => ["41032", "41033", "41034"].includes(code))).toBe(true);
   });
+
+  it("makes the second search a different title: two Lightless Passages are one choice, and a lone title is found once (41004:B:1)", () => {
+    const made = make({ seats: 2, deck: ["f0", "41033", "41033", "41034"], staging: [] });
+    const current = answered(settle(questStageStart({ ...made.state, window: null }, made.ctx, []), made.ctx, []), made.ctx);
+    expect(codesIn(current, "staging").sort()).toEqual(["41033", "41034"]);
+    const twins = make({ seats: 2, deck: ["f0", "41033", "41033"], staging: [] });
+    const lone = answered(settle(questStageStart({ ...twins.state, window: null }, twins.ctx, []), twins.ctx, []), twins.ctx);
+    expect(codesIn(lone, "staging")).toEqual(["41033"]);
+  });
 });
 
 describe("Surprise Attack, stage 2 (41005:A:1, 41005:B:1, 41005:B:2)", () => {
@@ -75,6 +84,15 @@ describe("Surprise Attack, stage 2 (41005:A:1, 41005:B:1, 41005:B:2)", () => {
     expect(staged).toContain("41027");
     // Two enemies besides the Chieftain, one for each player.
     expect(staged.filter((code) => code === "41030" || code === "41031")).toHaveLength(2);
+  });
+
+  it("makes each player's enemy a different one: two Great Cave-trolls or two Cavern Wargs cannot both be found (41005:A:1)", () => {
+    const made = make({ seats: 2, stage: "41004", progress: 0, setAside: ["41027"], deck: ["41030", "41030", "41031"], discard: ["41031"] });
+    const staged = codesIn(answered(progress(made.state, 8, made.ctx), made.ctx), "staging");
+    expect(staged.filter((code) => code === "41030")).toHaveLength(1);
+    expect(staged.filter((code) => code === "41031")).toHaveLength(1);
+    const twins = make({ seats: 2, stage: "41004", progress: 0, setAside: ["41027"], deck: ["41030", "41030"], discard: ["41030"] });
+    expect(codesIn(answered(progress(twins.state, 8, twins.ctx), twins.ctx), "staging").filter((code) => code === "41030")).toHaveLength(1);
   });
 
   it("treats each enemy's engagement cost as 0 in the encounter phase only", () => {
