@@ -4,7 +4,7 @@
 import { eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
-import { campaignRunId, runOf, standaloneRunId, type RunRecord } from "../campaign/runs";
+import { campaignRunId, dealtHeroes, runOf, standaloneRunId, type RunRecord } from "../campaign/runs";
 import type { Save } from "../campaign/save";
 import type { StandaloneGame } from "../campaign/standalone";
 import type { World } from "../campaign/world";
@@ -16,11 +16,6 @@ import { standaloneGames } from "./user-schema";
 
 type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
-// The heroes as dealt, the Ring-bearer with the first seat's.
-function dealtHeroes(seats: readonly { heroes: readonly string[] }[], ringBearer: string | null): string[][] {
-  return seats.map((seat, index) => [...seat.heroes, ...(index === 0 && ringBearer && !seat.heroes.includes(ringBearer) ? [ringBearer] : [])]);
-}
-
 /**
  * Writes the run of a campaign scenario that ended. `before` is the save as the scenario left it (its open scenario and its
  * loadout are what the run reads), `after` the save `finish` returned: a win's reward is what its log newly earned, and a scenario
@@ -31,7 +26,7 @@ export function recordCampaignRun<TRun>(user: UserDb<TRun>, before: Save, after:
   if (!active || !loadout) return null;
   const fresh = !before.log.completed.includes(state.scenarioId) && after.log.completed.includes(state.scenarioId);
   const run = runOf({
-    id: campaignRunId(before.id, state.scenarioId, active.seed),
+    id: campaignRunId(before.id, state.scenarioId, active.seed, active.startedAt),
     kind: "campaign",
     refId: before.id,
     campaignId: before.campaignId,

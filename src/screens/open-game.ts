@@ -40,6 +40,6 @@ export function replayForTable<TRun>(catalog: Db<TRun>, world: World, resume: (o
  * The table store of a replayed game. `persist` gets each intent the reducer accepts and writes it at once; `takeBack`
  * drops the last one when Undo goes back over it.
  */
-export function committingStore(game: ReplayedGame, persist: (intent: PlayerIntent) => void, takeBack: () => void): TableStore {
+export function committingStore(game: ReplayedGame, persist: (intent: PlayerIntent, game: ScenarioState) => void, takeBack: () => void): TableStore {
   return createTableStore({ ctx: game.ctx, game: game.game, roundSteps: game.roundSteps, history: game.history, onCommit: persist, onUndo: takeBack });
 }

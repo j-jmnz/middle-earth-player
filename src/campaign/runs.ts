@@ -28,7 +28,7 @@ export type RunRecord = {
   // The engine's lossReason on a loss ("Threat reached 50", a quest card's loss line).
   lossCause: string | null;
   seatCount: 1 | 2;
-  // Each seat's heroes as dealt (campaign: as logged, for a back-filled run).
+  // Each seat's heroes as dealt. A back-filled campaign win lists the log's current fellowship (the log keeps no earlier one).
   heroes: string[][];
   rounds: number | null;
   // Each seat's final threat.
@@ -45,8 +45,19 @@ export type RunRecord = {
   backfilled: boolean;
 };
 
-export function campaignRunId(saveId: string, scenarioId: string, seed: number): string {
-  return `campaign:${saveId}:${scenarioId}:${seed}`;
+// The seed alone repeats (the e2e saves all deal seed 1), so the deal time joins the id when the open scenario has one.
+export function campaignRunId(saveId: string, scenarioId: string, seed: number, startedAt?: number | null): string {
+  return `campaign:${saveId}:${scenarioId}:${seed}${startedAt == null ? "" : `:${startedAt}`}`;
+}
+
+// A back-filled win has no seed: one row per scenario on a save's log.
+export function backfilledCampaignRunId(saveId: string, scenarioId: string): string {
+  return `campaign:${saveId}:${scenarioId}`;
+}
+
+// The heroes as dealt, the Ring-bearer with the first seat's.
+export function dealtHeroes(seats: readonly { heroes: readonly string[] }[], ringBearer: string | null): string[][] {
+  return seats.map((seat, index) => [...seat.heroes, ...(index === 0 && ringBearer && !seat.heroes.includes(ringBearer) ? [ringBearer] : [])]);
 }
 
 export function standaloneRunId(gameId: string): string {
@@ -109,7 +120,7 @@ export function backfillRuns(saves: readonly KnownSave[], games: readonly KnownG
     for (const scenarioId of save.log.completed) {
       const score = save.log.scenarios[scenarioId];
       out.push({
-        id: `campaign:${save.id}:${scenarioId}`,
+        id: backfilledCampaignRunId(save.id, scenarioId),
         kind: "campaign",
         refId: save.id,
         campaignId: save.campaignId,
@@ -118,7 +129,8 @@ export function backfillRuns(saves: readonly KnownSave[], games: readonly KnownG
         result: "won",
         lossCause: null,
         seatCount: save.seatCount,
-        heroes: save.log.heroesBySeat.map((seat) => [...seat]),
+        // The log keeps the fellowship as it stands now, so a back-filled win lists that, not the heroes dealt for it.
+        heroes: dealtHeroes(save.log.heroesBySeat.map((heroes) => ({ heroes })), null),
         rounds: score?.rounds ?? null,
         threats: null,
         victoryPoints: score?.victoryPoints ?? null,

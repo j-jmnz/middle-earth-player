@@ -13,6 +13,7 @@ import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
 import { goBack } from "../../../go-back";
 import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
+import { recordUnclosedRun } from "../../../table-session";
 import { dealSeed } from "../../../e2e";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
 import { SeatPicker } from "../../../seat-picker";
@@ -114,6 +115,8 @@ export default function Briefing() {
         setDealError(dealt.briefing.problems.map((problem) => problem.message).join(" "));
         return;
       }
+      // The open scenario this deal drops may be over (lost or won, not yet closed): it keeps its run.
+      if (save.active) recordUnclosedRun(catalog, user, save.id);
       writeSave(user, dealt.save);
       router.replace({ pathname: "/table/[saveId]", params: { saveId: save.id } });
     } catch (error: unknown) {

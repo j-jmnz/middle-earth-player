@@ -3,7 +3,7 @@
 // writes the log. A choice the card lets a seat pass has a visible decline ("No boon") under Confirm, a radio in the same
 // group as the tiles. Lost: Defeat and nothing written (docs/design-system.md, Resolution).
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useStore } from "zustand";
 
@@ -59,6 +59,12 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const [chosen, setChosen] = useState<string | null>(null);
   const view = useMemo(() => resolutionView(game, session.world), [game, session]);
   const scenario = scenarioOf(game.scenarioId);
+  // A loss is a run the moment it is reached (the table wrote it already; a game lost before this build is written here). The
+  // run id is fixed, so a second write changes nothing, and leaving by Path loses nothing.
+  const lost = view.kind === "lost";
+  useEffect(() => {
+    if (lost) recordCampaignRun(user, opened.save(), opened.save(), session.world, game);
+  }, [lost, user, opened, session, game]);
   const toPath = () => router.replace({ pathname: "/path/[saveId]", params: { saveId } });
   // Back is a labelled control, never a gesture alone. Each choice is already saved, so leaving loses nothing; the
   // resolution waits on the path (Resume).

@@ -5,7 +5,7 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { useEffect, useMemo } from "react";
 
 import type { Save } from "../campaign/save";
-import { drop, record, resume, staleReason, unrecord } from "../campaign/session";
+import { drop, finish, isWon, record, resume, staleReason, unrecord } from "../campaign/session";
 import { logCodes, loadWorld } from "../campaign/world";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
@@ -15,6 +15,7 @@ import { campaignOf, scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
 import { readSaveChecked, writeSave } from "./campaign-store";
 import { committingStore, replayForTable, type ReplayedGame } from "./open-game";
+import { recordCampaignRun } from "./run-writers";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
@@ -72,9 +73,12 @@ export function sessionStore<TRun>(session: Extract<TableSession, { ok: true }>,
   let saved: Save = session.save;
   const store = committingStore(
     session,
-    (intent) => {
+    (intent, game) => {
       saved = record(saved, intent);
       writeSave(user, saved);
+      // A lost game can no longer be undone, and its run id is fixed: write the run now, so closing the Resolution any way (or never)
+      // still leaves it. A win waits for its Resolution choices (the reward).
+      if (game.lost) recordCampaignRun(user, saved, finish(saved, session.world, game), session.world, game);
     },
     () => {
       saved = unrecord(saved);
@@ -82,4 +86,21 @@ export function sessionStore<TRun>(session: Extract<TableSession, { ok: true }>,
     },
   );
   return { store, save: () => saved };
+}
+
+/**
+ * Writes the run of an open scenario that is over but was never closed, before the save drops or deletes it (a new deal, a
+ * deleted playthrough). A win's reward is chosen at the Resolution, so it is left out. A scenario still going, one that
+ * cannot be replayed (another engine version) and one that is not open write nothing.
+ */
+export function recordUnclosedRun<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): void {
+  try {
+    const session = openTable(catalog, user, saveId);
+    if (!session.ok) return;
+    const state = session.game;
+    if (!state.lost && !isWon(state)) return;
+    recordCampaignRun(user, session.save, session.save, session.world, state);
+  } catch {
+    // The run is a record, not a step: a scenario that will not replay must not stop the deal or the delete.
+  }
 }

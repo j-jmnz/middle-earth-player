@@ -15,6 +15,7 @@ import { carrySource, carryWords } from "../../carry-words";
 import { StartPanel, type CarryChoice, type StartOption } from "../../start-panel";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave, savedAt } from "../../campaign-store";
 import { useDatabases } from "../../databases";
+import { recordUnclosedRun } from "../../table-session";
 import { palette } from "../../palette.js";
 import { KeepOrDelete } from "../../keep-or-delete";
 import { ContinuePanel, DELETE_SENTENCE, SaveRow, SaveSummary, describe, type SaveLine } from "../../save-panels";
@@ -137,6 +138,7 @@ export default function CampaignList() {
   }
 
   function remove(save: Save): void {
+    if (save.active) recordUnclosedRun(catalog, user, save.id);
     deleteSave(user, save.id);
     refresh();
     AccessibilityInfo.announceForAccessibility(`Deleted ${describe(lineOf(save))}`);

@@ -77,14 +77,11 @@ function knownGames<TRun>(user: UserDb<TRun>): KnownGame[] {
  */
 export function backfillRunTable<TRun>(user: UserDb<TRun>, boxOf: (scenarioId: string) => string | null): number {
   if (user.select({ key: settings.key }).from(settings).where(eq(settings.key, BACKFILL_KEY)).get()) return 0;
-  const have = new Set(listRuns(user).map((run) => `${run.kind}:${run.refId}:${run.scenarioId}:${run.result}`));
-  let written = 0;
-  for (const run of backfillRuns(knownSaves(user), knownGames(user), boxOf)) {
-    // A campaign win can only be there already if it was written live; a standalone game has one run.
-    if (have.has(`${run.kind}:${run.refId}:${run.scenarioId}:${run.result}`)) continue;
-    writeRun(user, run);
-    written += 1;
-  }
-  user.insert(settings).values({ key: BACKFILL_KEY, value: true }).onConflictDoNothing().run();
-  return written;
+  const before = user.select({ id: runs.id }).from(runs).all().length;
+  // The ids are fixed, so a row already there is left alone (writeRun); the rows and the mark go in together.
+  user.transaction((tx) => {
+    for (const run of backfillRuns(knownSaves(tx), knownGames(tx), boxOf)) writeRun(tx, run);
+    tx.insert(settings).values({ key: BACKFILL_KEY, value: true }).onConflictDoNothing().run();
+  });
+  return user.select({ id: runs.id }).from(runs).all().length - before;
 }

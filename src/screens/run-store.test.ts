@@ -100,12 +100,13 @@ describe("run store", () => {
     expect(rows[3]).toMatchObject({ result: "lost", lossCause: "All heroes died", rounds: 2, startedAt: 300, score: null, heroes: [["141002", "141003"]] });
   });
 
-  it("back-fill leaves a win already written live alone", () => {
+  it("back-fill keeps its fixed id: a row with it stays, and a live row of another attempt does not hide the log's win", () => {
     const user = openUser();
     const save = { ...newSave("save-a", "fellowship-of-the-ring", 1), log: { ...emptyLog(1), completed: ["a-shadow-of-the-past"], scenarios: { "a-shadow-of-the-past": { rounds: 5, victoryPoints: 2, score: 40 } } } };
     writeSave(user, save, 100);
     writeRun(user, run({ result: "won", lossCause: null, score: 40, refId: "save-a" }));
-    expect(backfillRunTable(user, boxOf)).toBe(0);
-    expect(listRuns(user)).toHaveLength(1);
+    expect(backfillRunTable(user, boxOf)).toBe(1);
+    expect(listRuns(user)).toHaveLength(2);
+    expect(listRuns(user)[1]?.id).toBe("campaign:save-a:a-shadow-of-the-past");
   });
 });
