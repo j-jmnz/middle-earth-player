@@ -209,7 +209,7 @@ export default function Scenarios() {
         <View className="mt-5 gap-6" testID="standalone-scenarios">
           {BOXES.map((box) => (
           <View key={box.id} testID={`box-${box.id}`}>
-          <FoldSection id={`box-${box.id}`} title={box.name} count={box.scenarios.length} {...fold(`box-${box.id}`)}>
+          <FoldSection id={`box-${box.id}`} title={box.name} count={box.scenarios.length} unit="scenario" {...fold(`box-${box.id}`)}>
           <View className="gap-2.5">
             {box.scenarios.map((id, index) => {
               const playable = isPlayable(id);
@@ -262,7 +262,19 @@ export default function Scenarios() {
           {finished.map((game) => renderGame(game))}
           {archived.length > 0 ? (
             <View testID="archived-games">
-              <FoldSection id="archived-games" title="Archived" count={archived.length} testID="archived-toggle" {...fold("archived-games", true)}>
+              <FoldSection
+                id="archived-games"
+                title="Archived"
+                count={archived.length}
+                unit="game"
+                testID="archived-toggle"
+                folded={folds.folded("archived-games", true)}
+                onFold={(next) => {
+                  folds.setFolded("archived-games", next, true);
+                  // A folded list keeps no pending delete confirm.
+                  if (next) setDeleting(null);
+                }}
+              >
                 <View className="gap-3 pt-1">
                   {archived.map((game) => (
                     <View key={game.id} testID={`archived-${game.id}`}>

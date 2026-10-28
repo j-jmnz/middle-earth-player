@@ -47,3 +47,23 @@ export function groupRuns(runs: readonly RunRecord[]): RunGroup[] {
   for (const run of sorted) groups.set(run.refId, [...(groups.get(run.refId) ?? []), run]);
   return [...groups].map(([refId, list]) => ({ refId, runs: list }));
 }
+
+export type HistoryItem = { type: "group"; id: string; group: RunGroup; folded: boolean } | { type: "run"; id: string; run: RunRecord };
+
+/**
+ * The flat list a FlashList draws: a header item for each playthrough and, unless it is folded, one item for each of its runs. A
+ * folded group emits no run items, so a long history mounts only what is open. `idOf` names a group's fold.
+ */
+export function historyItems(groups: readonly RunGroup[], folded: (groupId: string) => boolean, idOf: (refId: string) => string): HistoryItem[] {
+  return groups.flatMap((group): HistoryItem[] => {
+    const id = idOf(group.refId);
+    const isFolded = folded(id);
+    return [{ type: "group", id, group, folded: isFolded }, ...(isFolded ? [] : group.runs.map((run): HistoryItem => ({ type: "run", id: run.id, run })))];
+  });
+}
+
+/** The earliest time any of a playthrough's runs knows, or null (a back-filled win has none). */
+export function startedOf(runs: readonly RunRecord[]): number | null {
+  const times = runs.flatMap((run) => [run.startedAt, run.endedAt]).filter((time) => time != null);
+  return times.length > 0 ? Math.min(...times) : null;
+}

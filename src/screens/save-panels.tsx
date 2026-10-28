@@ -31,6 +31,11 @@ export function SaveSummary({ line, eyebrow, archived = false }: { line: SaveLin
   );
 }
 
+/** "Next: A Knife in the Dark", "On the table: ...", or "Every scenario is won": the next step in one phrase (a row, a folded header). */
+export function nextSummary(next: NextStep): string {
+  return next.kind === "finished" ? "Every scenario is won" : `${next.kind === "resume" ? "On the table" : "Next"}: ${next.node.name}`;
+}
+
 // The sentence of the next step (the scenario on the table, the one to play next, or none left), its lead-in, and the button.
 function nextWords(next: NextStep): { lead: string; name: string; label: string } {
   if (next.kind === "resume") return { lead: "On the table: ", name: next.node.name, label: "Resume" };
@@ -140,7 +145,7 @@ export function ContinuePanel({
 
 /** Another open playthrough: one row that opens its path, with the fellowship's first face, what is next and the journey. */
 export function SaveRow({ id, line, lead, onPress }: { id: string; line: SaveLine; lead: ArtCard | null; onPress: () => void }) {
-  const next = line.next.kind === "finished" ? "Every scenario is won" : `${line.next.kind === "resume" ? "On the table" : "Next"}: ${line.next.node.name}`;
+  const next = nextSummary(line.next);
   return (
     <Pressable testID={`save-${id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={`Open ${describe(line)}`} onPress={onPress}>
       {({ pressed }) => (

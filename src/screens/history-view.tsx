@@ -1,21 +1,23 @@
 // History (phase 28b): every finished run, campaign or standalone. A switch picks the kind, filters narrow it by campaign or
-// box and by result, newest first; campaign runs group under their playthrough in a foldable header. A run opens its
+// box and by result, newest first; campaign runs group under their playthrough in a foldable header (a FlashList of header and run items; a folded group emits no rows). A run opens its
 // playthrough's log or, for a standalone game, its outcome while the game exists; the run of a deleted playthrough or game
 // says so and does not open. Nothing here edits or deletes a run.
+import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import type { RunKind, RunRecord, RunResult } from "../campaign/runs";
-import { tileSurface } from "../play/surfaces";
-import { BodyText, Chip, Label, NavBar, Screen, ScreenScroll, Segmented, ToggleChip } from "./chrome";
+import { BodyText, Chevron, Chip, Label, NavBar, Screen, Segmented, ToggleChip } from "./chrome";
 import { BOXES, campaignOf, scenarioName } from "./campaign-data";
+import { listArchivedSaves, listSaves } from "./campaign-store";
 import { deckFaces } from "./deck-store";
 import { useDatabases } from "./databases";
-import { FoldSection, useFolds } from "./fold-section";
+import { FoldHeader } from "./fold-section";
 import { goBack } from "./go-back";
-import { filterRuns, groupRuns, scopesOf, type RunFilter } from "./history-list";
-import { courseWords, deletedWords, emptyWords, plural, resultWords, runDate, runLabel, scoreWords, seatsWords } from "./history-words";
+import { filterRuns, groupRuns, historyItems, scopesOf, startedOf, type HistoryItem, type RunFilter } from "./history-list";
+import { courseWords, deletedWords, emptyWords, playthroughWords, plural, runDate, runLabel, scoreWords, seatsWords } from "./history-words";
+import { palette } from "./palette.js";
 import { existingRefs, listRuns } from "./run-store";
 import { seatWord } from "./seats";
 
@@ -24,39 +26,51 @@ type KindWord = (typeof KINDS)[number];
 
 const scopeName = (kind: RunKind, scope: string): string => (kind === "campaign" ? (campaignOf(scope)?.name ?? scope) : (BOXES.find((box) => box.id === scope)?.name ?? scope));
 
-function RunRow({ run, deleted, nameOf, onPress }: { run: RunRecord; deleted: boolean; nameOf: (code: string) => string; onPress: (() => void) | null }) {
+type Playthroughs = { current: string | null; progress: ReadonlyMap<string, { done: number; total: number }> };
+
+// A FlashList row: one pressable on a solid fill, no light and no shadow (docs/design-system.md, Performance).
+function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; deleted: boolean; showBox: boolean; nameOf: (code: string) => string; onPress: (() => void) | null }) {
   const scenario = scenarioName(run.scenarioId);
   const date = runDate(run);
   const course = courseWords(run);
   const score = scoreWords(run, nameOf);
-  const box = BOXES.find((item) => item.id === run.box)?.name ?? run.box;
+  const box = showBox ? (BOXES.find((item) => item.id === run.box)?.name ?? run.box) : null;
   return (
-    <Pressable testID={`run-${run.id}`} collapsable={false} accessibilityRole={onPress ? "button" : "text"} accessibilityLabel={runLabel(run, scenario, nameOf, deleted)} disabled={onPress == null} onPress={onPress ?? undefined}>
-      {({ pressed }) => (
-        <View className="min-h-14 rounded-card px-4 py-3.5" style={tileSurface(pressed)}>
-          <View className="flex-row items-start justify-between gap-2">
+    <View className="pb-3">
+      <Pressable testID={`run-${run.id}`} collapsable={false} accessibilityRole={onPress ? "button" : "text"} accessibilityLabel={runLabel(run, scenario, nameOf, deleted)} disabled={onPress == null} onPress={onPress ?? undefined}>
+        {({ pressed }) => (
+          <View className="min-h-14 flex-row items-center rounded-card px-4 py-3.5" style={{ backgroundColor: pressed ? palette.pressed : palette.raised, borderWidth: 1, borderColor: palette.hairline }}>
             <View className="flex-1">
-              <Text className="font-display text-heading text-bone">{scenario}</Text>
-              <Label>{[box, date].filter((part) => part != null).join(" · ")}</Label>
+              <View className="flex-row items-start justify-between gap-2">
+                <View className="flex-1">
+                  <Text className="font-display text-heading text-bone">{scenario}</Text>
+                  {box || date ? <Label>{[box, date].filter((part) => part != null).join(" · ")}</Label> : null}
+                </View>
+                <Chip label={run.result === "won" ? "Won" : "Lost"} tone={run.result === "won" ? "gold" : "danger"} />
+              </View>
+              {run.result === "lost" && run.lossCause ? (
+                <Text className="mt-1 text-label text-danger" testID={`run-${run.id}-cause`}>
+                  {run.lossCause}
+                </Text>
+              ) : null}
+              <Text className="mt-2 text-label text-muted">{seatsWords(run, nameOf)}</Text>
+              {course ? <Text className="text-label text-muted">{course}</Text> : null}
+              {score ? <Text className="mt-1 text-label font-semibold text-goldHigh">{score}</Text> : null}
+              {deleted ? (
+                <Text className="mt-1 text-label text-faint" testID={`run-${run.id}-deleted`}>
+                  {deletedWords(run.kind)}
+                </Text>
+              ) : null}
             </View>
-            <Chip label={run.result === "won" ? "Won" : "Lost"} tone={run.result === "won" ? "gold" : "danger"} />
+            {onPress ? (
+              <View className="ml-2 w-6 items-center">
+                <Chevron direction="right" color={palette.faint} size={8} />
+              </View>
+            ) : null}
           </View>
-          {run.result === "lost" && run.lossCause ? (
-            <Text className="mt-1 text-label text-danger" testID={`run-${run.id}-cause`}>
-              {resultWords(run).replace(/^Lost · /, "")}
-            </Text>
-          ) : null}
-          <Text className="mt-2 text-label text-muted">{seatsWords(run, nameOf)}</Text>
-          {course ? <Text className="text-label text-muted">{course}</Text> : null}
-          {score ? <Text className="mt-1 text-label font-semibold text-goldHigh">{score}</Text> : null}
-          {deleted ? (
-            <Text className="mt-1 text-label text-faint" testID={`run-${run.id}-deleted`}>
-              {deletedWords(run.kind)}
-            </Text>
-          ) : null}
-        </View>
-      )}
-    </Pressable>
+        )}
+      </Pressable>
+    </View>
   );
 }
 
@@ -64,36 +78,50 @@ function RunRow({ run, deleted, nameOf, onPress }: { run: RunRecord; deleted: bo
 export function HistoryView({ initial }: { initial: RunKind }) {
   const router = useRouter();
   const { catalog, user } = useDatabases();
-  const folds = useFolds();
+  // Which playthrough groups are folded: for this viewing only (a gone playthrough would leave its id in `settings` for good).
+  const [foldedGroups, setFoldedGroups] = useState<ReadonlySet<string>>(new Set());
   const [kindWord, setKindWord] = useState<KindWord>(initial === "standalone" ? "Standalone" : "Campaign");
   const kind: RunKind = kindWord === "Standalone" ? "standalone" : "campaign";
   const [filter, setFilter] = useState<RunFilter>({ scope: null, result: null });
   const [runs, setRuns] = useState<RunRecord[]>([]);
   const [refs, setRefs] = useState<ReturnType<typeof existingRefs>>({ saves: new Set(), archived: new Set(), games: new Set() });
+  const [playthroughs, setPlaythroughs] = useState<Playthroughs>({ current: null, progress: new Map() });
 
   useFocusEffect(
     useCallback(() => {
       setRuns(listRuns(user));
       setRefs(existingRefs(user));
+      const open = listSaves(user);
+      setPlaythroughs({
+        current: open[0]?.id ?? null,
+        progress: new Map([...open, ...listArchivedSaves(user)].map((save) => [save.id, { done: save.log.completed.length, total: campaignOf(save.campaignId)?.scenarios.length ?? 0 }])),
+      });
     }, [user]),
   );
 
   const faces = useMemo(() => deckFaces(catalog, runs.flatMap((run) => [...run.heroes.flat(), ...(run.reward ?? [])])), [catalog, runs]);
-  const nameOf = (code: string) => faces.get(code)?.name ?? code;
-  const shown = filterRuns(runs, kind, filter);
-  const scopes = scopesOf(runs, kind);
+  const nameOf = useCallback((code: string) => faces.get(code)?.name ?? code, [faces]);
+  const shown = useMemo(() => filterRuns(runs, kind, filter), [runs, kind, filter]);
+  const scopes = useMemo(() => scopesOf(runs, kind), [runs, kind]);
   const filtered = filter.scope != null || filter.result != null;
+  const groupId = (refId: string) => `history-${refId}`;
+  const items = useMemo<HistoryItem[]>(
+    () => (kind === "standalone" ? shown.map((run): HistoryItem => ({ type: "run", id: run.id, run })) : historyItems(groupRuns(shown), (id) => foldedGroups.has(id), groupId)),
+    [kind, shown, foldedGroups],
+  );
 
   const exists = (run: RunRecord) => (run.kind === "campaign" ? refs.saves.has(run.refId) : refs.games.has(run.refId));
   const open = (run: RunRecord) => (): void => {
     if (run.kind === "campaign") router.push({ pathname: "/log/[saveId]", params: { saveId: run.refId } });
     else router.push({ pathname: "/standalone/outcome/[gameId]", params: { gameId: run.refId } });
   };
-  const row = (run: RunRecord) => (
-    <View key={run.id}>
-      <RunRow run={run} deleted={!exists(run)} nameOf={nameOf} onPress={exists(run) ? open(run) : null} />
-    </View>
-  );
+  const toggleGroup = (id: string, folded: boolean) =>
+    setFoldedGroups((current) => {
+      const next = new Set(current);
+      if (folded) next.add(id);
+      else next.delete(id);
+      return next;
+    });
 
   const chooseKind = (next: KindWord) => {
     setKindWord(next);
@@ -101,58 +129,79 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     setFilter((current) => ({ ...current, scope: null }));
   };
 
+  const renderItem = ({ item }: { item: HistoryItem }) => {
+    if (item.type === "run") {
+      const { run } = item;
+      // The box line says something only when it is not the campaign the group already names.
+      return <RunRow run={run} deleted={!exists(run)} showBox={run.kind === "standalone" || run.box !== run.campaignId} nameOf={nameOf} onPress={exists(run) ? open(run) : null} />;
+    }
+    const first = item.group.runs[0];
+    if (!first) return null;
+    const { refId } = item.group;
+    const gone = !refs.saves.has(refId);
+    const archived = refs.archived.has(refId);
+    const title = [campaignOf(first.campaignId ?? "")?.name ?? first.campaignId ?? "", playthroughWords(seatWord(first.seatCount), startedOf(item.group.runs), gone ? null : (playthroughs.progress.get(refId) ?? null))].filter((part) => part !== "").join(" · ");
+    const badge = gone ? "Deleted" : archived ? "Archived" : playthroughs.current === refId ? "Current" : undefined;
+    return (
+      <View className="pb-3 pt-1">
+        <FoldHeader id={item.id} title={title} {...(badge ? { badge } : {})} count={item.group.runs.length} unit="run" solid folded={item.folded} onFold={(next) => toggleGroup(item.id, next)} />
+      </View>
+    );
+  };
+
+  const listHead = (
+    <View className="pb-2">
+      <Segmented options={KINDS} value={kindWord} onChange={chooseKind} testIDPrefix="history" />
+      <View className="mt-3 gap-1" testID="history-filters">
+        {scopes.length > 1 ? (
+          <View className="flex-row flex-wrap gap-x-2" accessibilityRole="radiogroup" accessibilityLabel={kind === "campaign" ? "Filter by campaign" : "Filter by box"}>
+            <ToggleChip label={kind === "campaign" ? "All campaigns" : "All boxes"} selected={filter.scope == null} testID="history-scope-all" onPress={() => setFilter({ ...filter, scope: null })} />
+            {scopes.map((scope) => (
+              <ToggleChip key={scope} label={scopeName(kind, scope)} selected={filter.scope === scope} testID={`history-scope-${scope}`} onPress={() => setFilter({ ...filter, scope })} />
+            ))}
+          </View>
+        ) : null}
+        <View className="flex-row flex-wrap gap-x-2" accessibilityRole="radiogroup" accessibilityLabel="Filter by result">
+          {([null, "won", "lost"] as const).map((result: RunResult | null) => (
+            <ToggleChip
+              key={result ?? "all"}
+              label={result == null ? "All results" : result === "won" ? "Won" : "Lost"}
+              selected={filter.result === result}
+              testID={`history-result-${result ?? "all"}`}
+              onPress={() => setFilter({ ...filter, result })}
+            />
+          ))}
+        </View>
+      </View>
+      {shown.length > 0 ? (
+        <Label className="mt-2" testID="history-count">
+          {plural(shown.length, "run")}
+        </Label>
+      ) : null}
+    </View>
+  );
+
   return (
     <Screen testID="history" scene="plain">
       <NavBar onBack={() => goBack(router, kind === "campaign" ? "/" : "/scenarios")} backTestID="history-back" title="History" />
-      <ScreenScroll>
-        <Segmented options={KINDS} value={kindWord} onChange={chooseKind} testIDPrefix="history" />
-        <View className="mt-3 gap-1" testID="history-filters">
-          {scopes.length > 1 ? (
-            <View className="flex-row flex-wrap gap-x-2" accessibilityLabel={kind === "campaign" ? "Campaign" : "Box"}>
-              <ToggleChip label="All" selected={filter.scope == null} testID="history-scope-all" accessibilityLabel={kind === "campaign" ? "All campaigns" : "All boxes"} onPress={() => setFilter({ ...filter, scope: null })} />
-              {scopes.map((scope) => (
-                <ToggleChip key={scope} label={scopeName(kind, scope)} selected={filter.scope === scope} testID={`history-scope-${scope}`} onPress={() => setFilter({ ...filter, scope })} />
-              ))}
-            </View>
-          ) : null}
-          <View className="flex-row flex-wrap gap-x-2" accessibilityLabel="Result">
-            {([null, "won", "lost"] as const).map((result: RunResult | null) => (
-              <ToggleChip
-                key={result ?? "all"}
-                label={result == null ? "All results" : result === "won" ? "Won" : "Lost"}
-                selected={filter.result === result}
-                testID={`history-result-${result ?? "all"}`}
-                onPress={() => setFilter({ ...filter, result })}
-              />
-            ))}
-          </View>
-        </View>
-        {shown.length === 0 ? (
-          <BodyText tone="muted" className="mt-4" testID="history-empty">
-            {emptyWords(kind, filtered && runs.some((run) => run.kind === kind))}
-          </BodyText>
-        ) : (
-          <Label className="mt-2" testID="history-count">
-            {plural(shown.length, "run")}
-          </Label>
-        )}
-        <View className="mt-2 gap-3" testID="history-list">
-          {kind === "standalone"
-            ? shown.map(row)
-            : groupRuns(shown).map((group) => {
-                const first = group.runs[0];
-                if (!first) return null;
-                const gone = !refs.saves.has(group.refId);
-                const title = [campaignOf(first.campaignId ?? "")?.name ?? first.campaignId ?? "", seatWord(first.seatCount), gone ? "deleted" : refs.archived.has(group.refId) ? "archived" : null].filter((part) => part != null).join(" · ");
-                const id = `history-${group.refId}`;
-                return (
-                  <FoldSection key={group.refId} id={id} title={title} count={group.runs.length} folded={folds.folded(id)} onFold={(next) => folds.setFolded(id, next)}>
-                    <View className="gap-3 pt-1">{group.runs.map(row)}</View>
-                  </FoldSection>
-                );
-              })}
-        </View>
-      </ScreenScroll>
+      <View className="min-h-0 flex-1" testID="history-list">
+        <FlashList
+          data={items}
+          extraData={{ refs, playthroughs, nameOf }}
+          keyExtractor={(item) => (item.type === "group" ? item.id : `run-${item.id}`)}
+          getItemType={(item) => (item.type === "group" ? "group" : "run")}
+          style={{ flex: 1 }}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={listHead}
+          ListFooterComponent={<View className="pb-safe" />}
+          ListEmptyComponent={
+            <BodyText tone="muted" className="mt-2" testID="history-empty">
+              {emptyWords(kind, filtered && runs.some((run) => run.kind === kind))}
+            </BodyText>
+          }
+          renderItem={renderItem}
+        />
+      </View>
     </Screen>
   );
 }

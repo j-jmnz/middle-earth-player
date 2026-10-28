@@ -31,13 +31,13 @@ export function courseWords(run: RunRecord): string | null {
   return parts.length > 0 ? parts.join(" · ") : null;
 }
 
-/** "Score 41 · 2 victory points · Mendor, Mendor's Support": a win's score and, in a campaign, what it earned. */
+/** "Score 41 · 2 victory points · Reward: Mendor, Mendor's Support": a win's score and, in a campaign, what it earned. */
 export function scoreWords(run: RunRecord, nameOf: (code: string) => string): string | null {
   if (run.result !== "won") return null;
   const parts = [
     run.score == null ? null : `Score ${run.score}`,
     run.victoryPoints == null ? null : plural(run.victoryPoints, "victory point"),
-    run.reward && run.reward.length > 0 ? run.reward.map(nameOf).join(", ") : null,
+    run.reward && run.reward.length > 0 ? `Reward: ${run.reward.map(nameOf).join(", ")}` : null,
   ].filter((part) => part != null);
   return parts.length > 0 ? parts.join(" · ") : null;
 }
@@ -55,4 +55,13 @@ export function deletedWords(kind: RunRecord["kind"]): string {
 export function emptyWords(kind: RunRecord["kind"], filtered: boolean): string {
   if (filtered) return "No runs match these filters.";
   return kind === "campaign" ? "No campaign run yet. A scenario you win or lose in a playthrough is listed here." : "No standalone run yet. A game you win or lose is listed here.";
+}
+
+/**
+ * What tells two playthroughs of one campaign apart in History: "Two-handed · started 24 Oct · 3 of 6 completed" (the wording of the
+ * start panel's carry-over row). The start is the earliest time any of its runs knows; progress only while the playthrough exists.
+ */
+export function playthroughWords(seats: string, startedAt: number | null, progress: { done: number; total: number } | null): string {
+  const date = startedAt == null ? null : new Date(startedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  return [seats, date ? `started ${date}` : null, progress && progress.total > 0 ? `${progress.done} of ${progress.total} completed` : null].filter((part) => part != null).join(" · ");
 }

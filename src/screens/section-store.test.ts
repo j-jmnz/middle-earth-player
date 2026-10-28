@@ -53,5 +53,6 @@ describe("fold state", () => {
     expect(foldWords("Archived", true, 3)).toBe("Archived, 3, folded");
     expect(foldWords("Other journeys", false, 2)).toBe("Other journeys, 2");
     expect(foldWords("Games", false, null)).toBe("Games");
+    expect(foldWords("Archived", true, "3 playthroughs")).toBe("Archived, 3 playthroughs, folded");
   });
 });

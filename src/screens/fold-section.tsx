@@ -6,9 +6,10 @@ import { useCallback, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, Text, View } from "react-native";
 
 import { withAlphaHex } from "../play/tokens";
-import { Chevron } from "./chrome-marks";
+import { Chevron, Chip } from "./chrome-marks";
 import { useDatabases } from "./databases";
 import { foldWords, isFolded, type Sections } from "./fold-state";
+import { plural } from "./history-words";
 import { palette } from "./palette.js";
 import { readSections, writeSection } from "./section-store";
 
@@ -35,57 +36,72 @@ export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => b
  * A foldable section. The header's testID is `section-<id>` (`testID` overrides it: the archived lists keep `archived-toggle`) and
  * the body's is `section-<id>-body`. `right` is one optional control at the header's end while the section is open.
  */
-export function FoldSection({
-  id,
-  title,
-  folded,
-  onFold,
-  count,
-  testID,
-  right,
-  children,
-}: {
+export function FoldSection({ children, id, ...header }: FoldHeaderProps & { children: ReactNode }) {
+  const { folded } = header;
+  return (
+    <View>
+      <FoldHeader id={id} {...header} />
+      <View testID={`section-${id}-body`} style={folded ? { display: "none" } : undefined} accessibilityElementsHidden={folded} importantForAccessibility={folded ? "no-hide-descendants" : "auto"}>
+        {children}
+      </View>
+    </View>
+  );
+}
+
+export type FoldHeaderProps = {
   id: string;
   title: string;
   folded: boolean;
   onFold: (folded: boolean) => void;
-  // What the section holds, shown beside the title while folded.
+  // What the section holds, said beside the title while folded ("3 scenarios" with a unit, else the bare number).
   count?: number;
+  unit?: string;
+  // Replaces the count while folded: what the viewer would otherwise lose sight of ("Next: A Knife in the Dark").
+  summary?: string;
+  // A word in a chip after the title (Archived, Deleted): the state is a word, not only a colour.
+  badge?: string;
   testID?: string;
   right?: ReactNode;
-  children: ReactNode;
-}) {
-  const shown = count ?? null;
+  // A row of a FlashList draws no gradient (docs/design-system.md, Performance): the rule is a solid hairline.
+  solid?: boolean;
+};
+
+/** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
+export function FoldHeader({ id, title, folded, onFold, count, unit, summary, badge, testID, right, solid = false }: FoldHeaderProps) {
+  const counted = count == null ? null : unit ? plural(count, unit) : String(count);
+  const note = folded ? (summary ?? counted) : counted;
   return (
-    <View>
-      <View className="flex-row items-center">
-        <Pressable
-          testID={testID ?? `section-${id}`}
-          collapsable={false}
-          accessibilityRole="button"
-          accessibilityState={{ expanded: !folded }}
-          accessibilityLabel={foldWords(title, folded, shown)}
-          onPress={() => {
-            onFold(!folded);
-            AccessibilityInfo.announceForAccessibility(`${title} ${folded ? "unfolded" : "folded"}`);
-          }}
-          className="min-h-11 flex-1 flex-row items-center gap-3 rounded-tile"
-          style={({ pressed }) => (pressed ? { backgroundColor: palette.pressed } : undefined)}
-        >
-          <View className="w-3 items-center">
-            <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
-          </View>
-          <Text accessibilityRole="header" className="font-display-bold text-eyebrow uppercase text-moon">
-            {title}
+    // The heading is the row, so screen-reader heading navigation lands on it and the button stays inside.
+    <View accessibilityRole="header" className="flex-row items-center">
+      <Pressable
+        testID={testID ?? `section-${id}`}
+        collapsable={false}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: !folded }}
+        accessibilityLabel={foldWords(badge ? `${title}, ${badge}` : title, folded, note)}
+        onPress={() => {
+          onFold(!folded);
+          AccessibilityInfo.announceForAccessibility(`${title} ${folded ? "unfolded" : "folded"}`);
+        }}
+        className="min-h-11 flex-1 flex-row items-center gap-3 rounded-tile"
+        style={({ pressed }) => (pressed ? { backgroundColor: palette.pressed } : undefined)}
+      >
+        <View className="w-3 items-center">
+          <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
+        </View>
+        <Text className="shrink font-display-bold text-eyebrow uppercase text-moon">{title}</Text>
+        {badge ? <Chip label={badge} tone="faint" /> : null}
+        <View
+          className="h-px min-w-3 flex-1"
+          style={solid ? { backgroundColor: palette.hairline } : { backgroundImage: `linear-gradient(90deg, ${palette.hairline}, ${withAlphaHex(palette.hairline, 0)})`, backgroundColor: "transparent" }}
+        />
+        {folded && note != null ? (
+          <Text className="max-w-[55%] pr-1 text-label text-muted" numberOfLines={1}>
+            {note}
           </Text>
-          <View className="h-px flex-1" style={{ backgroundImage: `linear-gradient(90deg, ${palette.hairline}, ${withAlphaHex(palette.hairline, 0)})`, backgroundColor: "transparent" }} />
-          {folded && shown != null ? <Text className="pr-1 text-label text-muted">{String(shown)}</Text> : null}
-        </Pressable>
-        {folded ? null : right}
-      </View>
-      <View testID={`section-${id}-body`} style={folded ? { display: "none" } : undefined} accessibilityElementsHidden={folded} importantForAccessibility={folded ? "no-hide-descendants" : "auto"}>
-        {children}
-      </View>
+        ) : null}
+      </Pressable>
+      {folded ? null : right}
     </View>
   );
 }

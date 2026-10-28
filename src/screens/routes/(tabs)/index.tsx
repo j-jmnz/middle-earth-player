@@ -18,7 +18,7 @@ import { useDatabases } from "../../databases";
 import { recordUnclosedRun } from "../../table-session";
 import { palette } from "../../palette.js";
 import { KeepOrDelete } from "../../keep-or-delete";
-import { ContinuePanel, DELETE_SENTENCE, SaveRow, SaveSummary, describe, type SaveLine } from "../../save-panels";
+import { ContinuePanel, DELETE_SENTENCE, SaveRow, SaveSummary, describe, nextSummary, type SaveLine } from "../../save-panels";
 import { nextStepHref, pathHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
 
@@ -167,6 +167,17 @@ export default function CampaignList() {
   const current = saves[0] ?? null;
   const others = saves.slice(1);
   const fold = (id: string, defaultFolded = false) => ({ folded: folds.folded(id, defaultFolded), onFold: (next: boolean) => folds.setFolded(id, next, defaultFolded) });
+  // Folding the archived list closes a delete confirm inside it: a folded list must not keep a pending delete.
+  const foldArchived = (id: string) => {
+    const base = fold(id, true);
+    return {
+      ...base,
+      onFold: (next: boolean) => {
+        base.onFold(next);
+        if (next) setDeleting(null);
+      },
+    };
+  };
   const startPanel = <StartPanel options={startable} current={saves.length === 0} carry={carryChoices} onStart={start} />;
   // Manage shows Archive and Delete on a playthrough instead of opening it.
   const managed = (save: Save, index: number) => (
@@ -215,12 +226,13 @@ export default function CampaignList() {
         </View>
         <View className="gap-3">
           {current ? (
-            <FoldSection id="current" title="Current playthrough" count={1} {...fold("current")}>
+            // Folded, the header says the next step: the Continue card's primary button is hidden with it.
+            <FoldSection id="current" title="Current playthrough" count={1} unit="playthrough" summary={nextSummary(lineOf(current).next)} {...fold("current")}>
               <View className="pt-1">{managing ? managed(current, 0) : continuing(current)}</View>
             </FoldSection>
           ) : null}
           {others.length > 0 ? (
-            <FoldSection id="others" title="Other journeys" count={others.length} {...fold("others")}>
+            <FoldSection id="others" title="Other journeys" count={others.length} unit="journey" {...fold("others")}>
               <View className="gap-3 pt-1">
                 {others.map((save, index) =>
                   managing ? (
@@ -270,7 +282,7 @@ export default function CampaignList() {
           ) : null}
           {archived.length > 0 ? (
             <View testID="archived-playthroughs">
-              <FoldSection id="archived" title="Archived" count={archived.length} testID="archived-toggle" {...fold("archived", true)}>
+              <FoldSection id="archived" title="Archived" count={archived.length} unit="playthrough" testID="archived-toggle" {...foldArchived("archived")}>
                 <View className="gap-3 pt-1">
                   {archived.map((save) => (
                     <View key={save.id} testID={`archived-${save.id}`}>
@@ -286,7 +298,7 @@ export default function CampaignList() {
           ) : null}
           {locked.length > 0 ? (
             <View className="mt-2">
-              <FoldSection id="coming" title="Coming later" count={locked.length} {...fold("coming")}>
+              <FoldSection id="coming" title="Coming later" count={locked.length} unit="campaign" {...fold("coming")}>
                 <View className="flex-row flex-wrap gap-3 pt-1" testID="locked-campaigns">
                   {locked.map((tile) => (
                     <View

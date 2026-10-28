@@ -2,8 +2,8 @@
 import { describe, expect, it } from "vitest";
 
 import type { RunRecord } from "../campaign/runs";
-import { filterRuns, groupRuns, newestFirst, scopesOf } from "./history-list";
-import { courseWords, emptyWords, resultWords, runDate, scoreWords, seatsWords } from "./history-words";
+import { filterRuns, groupRuns, historyItems, newestFirst, scopesOf, startedOf } from "./history-list";
+import { courseWords, emptyWords, playthroughWords, resultWords, runDate, scoreWords, seatsWords } from "./history-words";
 
 function run(id: string, overrides: Partial<RunRecord> = {}): RunRecord {
   return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["141002"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: 100, engineVersion: 6, backfilled: false, ...overrides };
@@ -42,6 +42,31 @@ describe("history list", () => {
   });
 });
 
+describe("history items", () => {
+  const groups = groupRuns([run("a", { endedAt: 100 }), run("b", { endedAt: 300 }), run("c", { endedAt: 200, refId: "save-b" })]);
+  const idOf = (refId: string) => `history-${refId}`;
+
+  it("flattens each playthrough into a header and its runs", () => {
+    const items = historyItems(groups, () => false, idOf);
+    expect(items.map((item) => `${item.type}:${item.id}`)).toEqual(["group:history-save-a", "run:b", "run:a", "group:history-save-b", "run:c"]);
+  });
+
+  it("a folded group emits its header and no runs", () => {
+    const items = historyItems(groups, (id) => id === "history-save-a", idOf);
+    expect(items.map((item) => `${item.type}:${item.id}`)).toEqual(["group:history-save-a", "group:history-save-b", "run:c"]);
+  });
+
+  it("starts a playthrough at the earliest time a run knows", () => {
+    expect(startedOf([run("a", { startedAt: 50, endedAt: 100 }), run("b", { startedAt: null, endedAt: 30 })])).toBe(30);
+    expect(startedOf([run("a", { startedAt: null, endedAt: null })])).toBeNull();
+  });
+
+  it("tells two playthroughs apart by seats, start and progress", () => {
+    expect(playthroughWords("True solo", null, { done: 3, total: 6 })).toBe("True solo · 3 of 6 completed");
+    expect(playthroughWords("Two-handed", Date.UTC(2026, 9, 24, 12), null)).toBe("Two-handed · started 24 Oct");
+  });
+});
+
 describe("history words", () => {
   it("says the result with its cause, and leaves out what the store did not know", () => {
     expect(resultWords(run("x"))).toBe("Won");
@@ -55,7 +80,7 @@ describe("history words", () => {
 
   it("says the score and the reward of a win, nothing for a loss", () => {
     const name = (code: string) => `N${code}`;
-    expect(scoreWords(run("x", { score: 41, victoryPoints: 2, reward: ["1", "2"] }), name)).toBe("Score 41 · 2 victory points · N1, N2");
+    expect(scoreWords(run("x", { score: 41, victoryPoints: 2, reward: ["1", "2"] }), name)).toBe("Score 41 · 2 victory points · Reward: N1, N2");
     expect(scoreWords(run("x", { result: "lost" }), name)).toBeNull();
     expect(seatsWords(run("x", { seatCount: 2, heroes: [["1"], ["2", "3"]] }), name)).toBe("Two-handed · N1 / N2, N3");
   });

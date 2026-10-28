@@ -20,6 +20,6 @@ export function withFolded(sections: Sections, id: string, folded: boolean, defa
 }
 
 /** What a folded header says about its count to a screen reader and in words ("3 hidden"). */
-export function foldWords(title: string, folded: boolean, count: number | null): string {
+export function foldWords(title: string, folded: boolean, count: number | string | null): string {
   return `${title}${count == null ? "" : `, ${count}`}${folded ? ", folded" : ""}`;
 }
