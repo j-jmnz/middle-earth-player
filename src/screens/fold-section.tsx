@@ -56,8 +56,10 @@ export type FoldHeaderProps = {
   // What the section holds, said beside the title while folded ("3 scenarios" with a unit, else the bare number).
   count?: number;
   unit?: string;
-  // Replaces the count while folded: what the viewer would otherwise lose sight of ("Next: A Knife in the Dark").
+  // Replaces the count while folded, on a second line: what the viewer would otherwise lose sight of ("Next: A Knife in the Dark").
   summary?: string;
+  // A second line under the title, always: what tells two sections with one title apart.
+  detail?: string;
   // A word in a chip after the title (Archived, Deleted): the state is a word, not only a colour.
   badge?: string;
   testID?: string;
@@ -67,9 +69,12 @@ export type FoldHeaderProps = {
 };
 
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
-export function FoldHeader({ id, title, folded, onFold, count, unit, summary, badge, testID, right, solid = false }: FoldHeaderProps) {
+export function FoldHeader({ id, title, folded, onFold, count, unit, summary, detail, badge, testID, right, solid = false }: FoldHeaderProps) {
   const counted = count == null ? null : unit ? plural(count, unit) : String(count);
-  const note = folded ? (summary ?? counted) : counted;
+  const second = folded && summary ? summary : (detail ?? null);
+  // The count says what is inside while folded, unless the summary says it better.
+  const note = folded && !summary ? counted : null;
+  const spoken = folded ? (summary ?? counted) : counted;
   return (
     // The heading is the row, so screen-reader heading navigation lands on it and the button stays inside.
     <View accessibilityRole="header" className="flex-row items-center">
@@ -78,28 +83,27 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, ba
         collapsable={false}
         accessibilityRole="button"
         accessibilityState={{ expanded: !folded }}
-        accessibilityLabel={foldWords(badge ? `${title}, ${badge}` : title, folded, note)}
+        accessibilityLabel={foldWords([title, detail, badge].filter((part) => part != null).join(", "), folded, spoken)}
         onPress={() => {
           onFold(!folded);
           AccessibilityInfo.announceForAccessibility(`${title} ${folded ? "unfolded" : "folded"}`);
         }}
-        className="min-h-11 flex-1 flex-row items-center gap-3 rounded-tile"
+        className="min-h-11 flex-1 justify-center rounded-tile"
         style={({ pressed }) => (pressed ? { backgroundColor: palette.pressed } : undefined)}
       >
-        <View className="w-3 items-center">
-          <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
+        <View className="flex-row items-center gap-3">
+          <View className="w-3 items-center">
+            <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
+          </View>
+          <Text className="shrink font-display-bold text-eyebrow uppercase text-moon">{title}</Text>
+          {badge ? <Chip label={badge} tone="faint" /> : null}
+          <View
+            className="h-px min-w-3 flex-1"
+            style={solid ? { backgroundColor: palette.hairline } : { backgroundImage: `linear-gradient(90deg, ${palette.hairline}, ${withAlphaHex(palette.hairline, 0)})`, backgroundColor: "transparent" }}
+          />
+          {note != null ? <Text className="pr-1 text-label text-muted">{note}</Text> : null}
         </View>
-        <Text className="shrink font-display-bold text-eyebrow uppercase text-moon">{title}</Text>
-        {badge ? <Chip label={badge} tone="faint" /> : null}
-        <View
-          className="h-px min-w-3 flex-1"
-          style={solid ? { backgroundColor: palette.hairline } : { backgroundImage: `linear-gradient(90deg, ${palette.hairline}, ${withAlphaHex(palette.hairline, 0)})`, backgroundColor: "transparent" }}
-        />
-        {folded && note != null ? (
-          <Text className="max-w-[55%] pr-1 text-label text-muted" numberOfLines={1}>
-            {note}
-          </Text>
-        ) : null}
+        {second ? <Text className="pb-1.5 pl-6 text-label text-muted">{second}</Text> : null}
       </Pressable>
       {folded ? null : right}
     </View>

@@ -140,11 +140,12 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     const { refId } = item.group;
     const gone = !refs.saves.has(refId);
     const archived = refs.archived.has(refId);
-    const title = [campaignOf(first.campaignId ?? "")?.name ?? first.campaignId ?? "", playthroughWords(seatWord(first.seatCount), startedOf(item.group.runs), gone ? null : (playthroughs.progress.get(refId) ?? null))].filter((part) => part !== "").join(" · ");
+    const title = campaignOf(first.campaignId ?? "")?.name ?? first.campaignId ?? "";
+    const detail = playthroughWords(seatWord(first.seatCount), startedOf(item.group.runs), gone ? null : (playthroughs.progress.get(refId) ?? null));
     const badge = gone ? "Deleted" : archived ? "Archived" : playthroughs.current === refId ? "Current" : undefined;
     return (
       <View className="pb-3 pt-1">
-        <FoldHeader id={item.id} title={title} {...(badge ? { badge } : {})} count={item.group.runs.length} unit="run" solid folded={item.folded} onFold={(next) => toggleGroup(item.id, next)} />
+        <FoldHeader id={item.id} title={title} detail={detail} {...(badge ? { badge } : {})} count={item.group.runs.length} unit="run" solid folded={item.folded} onFold={(next) => toggleGroup(item.id, next)} />
       </View>
     );
   };
