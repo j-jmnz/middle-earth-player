@@ -11,7 +11,7 @@ import { useStore } from "zustand";
 import { gameReport } from "../../../campaign/report";
 import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
-import { ActionBar, BodyText, Corners, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton } from "../../chrome";
+import { ActionBar, BodyText, Corners, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton, TwoPane } from "../../chrome";
 import { tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { withAlphaHex } from "../../../play/tokens";
@@ -26,6 +26,7 @@ import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../table-session";
 import { useUiScale } from "../../../play/ui-scale";
+import { useSizeClass } from "../../../play/use-size-class";
 
 function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; selected: boolean; imagesrc: string | null; onPress: () => void }) {
   const palette = usePalette();
@@ -61,6 +62,7 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
 
 function Resolution({ session, opened, saveId }: { session: Extract<TableSession, { ok: true }>; opened: SessionStore; saveId: string }) {
   const router = useRouter();
+  const { size } = useSizeClass();
   const { user } = useDatabases();
   const game = useStore(opened.store, (state) => state.game);
   const refusal = useStore(opened.store, (state) => state.refusal);
@@ -93,7 +95,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
     return (
       <Screen testID="resolution" scene="plain">
         {back}
-        <ScreenScroll top={32} bottom={24}>
+        <ScreenScroll top={32} bottom={24} max="readable">
           <OutcomeTitle won={false} scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
           {view.reason ? (
             <BodyText className="mt-6 text-center" testID="resolution-reason">
@@ -136,45 +138,75 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const declined = view.kind === "choosing" && view.decline != null && chosen === view.decline.optionId;
   const answer = picked?.optionId ?? (declined && view.kind === "choosing" ? (view.decline?.optionId ?? null) : null);
 
+  // While choosing, the outcome word sits higher so a row of tiles shows whole above the bar.
+  const titleBlock = (
+    <View className={view.kind === "choosing" ? "mt-4" : "mt-16"}>
+      <OutcomeTitle won scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
+    </View>
+  );
+  const choiceBlock =
+    view.kind === "choosing" ? (
+      <View className="mt-8">
+        <View testID="resolution-group">
+          <Section title={view.eyebrow} />
+        </View>
+        {view.seatLabel ? (
+          <BodyText tone="muted" className="mt-1 text-center" testID="resolution-seat">
+            {view.seatLabel}
+          </BodyText>
+        ) : null}
+        {/* Two-handed, the choices the seats before this one confirmed. */}
+        {view.answered.map((answer) => (
+          <BodyText key={answer.seat} tone="muted" className="text-center" testID={`resolution-answered-${answer.seat}`}>
+            {`Player ${answer.seat + 1}: ${answer.words}`}
+          </BodyText>
+        ))}
+        <View className="mt-4 flex-row flex-wrap gap-3">
+          {view.tiles.map((tile) => (
+            <Tile key={tile.optionId} tile={tile} selected={tile.optionId === chosen} imagesrc={tile.code ? (session.facts.get(tile.code)?.imagesrc ?? null) : null} onPress={() => setChosen(tile.optionId)} />
+          ))}
+        </View>
+      </View>
+    ) : null;
+  // Expanded and choosing: the title and the tiles at the left, the report in a pane at the right. Once settled, a readable column.
+  const split = size === "expanded" && view.kind === "choosing";
+
   return (
     <Screen testID="resolution" scene="victory">
       {back}
       {/* While choosing, the tiles and the decline under Confirm are one radio group. */}
       <View className="min-h-0 flex-1" {...(view.kind === "choosing" ? { accessibilityRole: "radiogroup" as const } : {})}>
-        <ScreenScroll top={16} bottom={24}>
-          {/* While choosing, the outcome word sits higher so a row of tiles shows whole above the bar. */}
-          <View className={view.kind === "choosing" ? "mt-4" : "mt-16"}>
-            <OutcomeTitle won scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
-          </View>
-          {view.kind === "choosing" ? (
-            <View className="mt-8">
-              <View testID="resolution-group">
-                <Section title={view.eyebrow} />
+        {split ? (
+          <TwoPane
+            kind="supporting"
+            side="end"
+            start={
+              <ScreenScroll top={16} bottom={24}>
+                {titleBlock}
+                {choiceBlock}
+              </ScreenScroll>
+            }
+            end={
+              <ScreenScroll top={16} bottom={24}>
+                {report ? (
+                  <View className="mt-4">
+                    <GameReportView report={report} />
+                  </View>
+                ) : null}
+              </ScreenScroll>
+            }
+          />
+        ) : (
+          <ScreenScroll top={16} bottom={24} max="readable">
+            {titleBlock}
+            {choiceBlock}
+            {report ? (
+              <View className="mt-8">
+                <GameReportView report={report} />
               </View>
-              {view.seatLabel ? (
-                <BodyText tone="muted" className="mt-1 text-center" testID="resolution-seat">
-                  {view.seatLabel}
-                </BodyText>
-              ) : null}
-              {/* Two-handed, the choices the seats before this one confirmed. */}
-              {view.answered.map((answer) => (
-                <BodyText key={answer.seat} tone="muted" className="text-center" testID={`resolution-answered-${answer.seat}`}>
-                  {`Player ${answer.seat + 1}: ${answer.words}`}
-                </BodyText>
-              ))}
-              <View className="mt-4 flex-row flex-wrap gap-3">
-                {view.tiles.map((tile) => (
-                  <Tile key={tile.optionId} tile={tile} selected={tile.optionId === chosen} imagesrc={tile.code ? (session.facts.get(tile.code)?.imagesrc ?? null) : null} onPress={() => setChosen(tile.optionId)} />
-                ))}
-              </View>
-            </View>
-          ) : null}
-          {report ? (
-            <View className="mt-8">
-              <GameReportView report={report} />
-            </View>
-          ) : null}
-        </ScreenScroll>
+            ) : null}
+          </ScreenScroll>
+        )}
         <ActionBar>
           {refusal ? (
             <BodyText tone="danger" className="mb-2">

@@ -8,7 +8,8 @@ import { View } from "react-native";
 
 import { gameReport } from "../../../../campaign/report";
 import { finishStandalone } from "../../../../campaign/standalone";
-import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, StatTile, TextButton } from "../../../chrome";
+import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, StatTile, TextButton, TwoPane } from "../../../chrome";
+import { useSizeClass } from "../../../../play/use-size-class";
 import { GameReportView } from "../../../game-report";
 import { scenarioName } from "../../../campaign-data";
 import { useDatabases } from "../../../databases";
@@ -21,6 +22,7 @@ import { writeStandalone } from "../../../standalone-store";
 
 export default function StandaloneOutcome() {
   const router = useRouter();
+  const { size } = useSizeClass();
   const params = useLocalSearchParams<{ gameId: string }>();
   const gameId = routeCode(params.gameId);
   const { user } = useDatabases();
@@ -64,36 +66,60 @@ export default function StandaloneOutcome() {
     router.replace({ pathname: "/standalone/briefing/[scenarioId]", params: { scenarioId: finished.scenarioId, from: finished.id } });
   };
 
+  const titleBlock = <OutcomeTitle won={won} scenario={scenarioName(finished.scenarioId)} testID="outcome-title" />;
+  const linesBlock =
+    result.outcome === "won" ? (
+      // The score as the numbers the player watches: score, completed rounds, victory points (ltp.scoring).
+      <View className="mt-10" testID="outcome-lines">
+        <View className="flex-row gap-2">
+          <StatTile label="Score" value={String(result.score.score)} />
+          <StatTile label="Rounds" value={String(result.score.rounds)} />
+          <StatTile label="Victory points" value={String(result.score.victoryPoints)} />
+        </View>
+        <Label className="mt-2 text-center">Lower is better.</Label>
+      </View>
+    ) : (
+      <View className="mt-6 gap-1" testID="outcome-lines">
+        {outcomeLines(result).map((line) => (
+          <BodyText key={line} tone="muted" className="text-center">
+            {line}
+          </BodyText>
+        ))}
+      </View>
+    );
+
   return (
     <Screen testID="standalone-outcome" scene={won ? "victory" : "plain"}>
       {back}
-      <ScreenScroll top={won ? 64 : 32} bottom={24}>
-        <OutcomeTitle won={won} scenario={scenarioName(finished.scenarioId)} testID="outcome-title" />
-        {result.outcome === "won" ? (
-          // The score as the numbers the player watches: score, completed rounds, victory points (ltp.scoring).
-          <View className="mt-10" testID="outcome-lines">
-            <View className="flex-row gap-2">
-              <StatTile label="Score" value={String(result.score.score)} />
-              <StatTile label="Rounds" value={String(result.score.rounds)} />
-              <StatTile label="Victory points" value={String(result.score.victoryPoints)} />
+      {/* Expanded, with the game's details at hand: the title and the numbers at the left, the report in a pane at the right.
+          Otherwise (a reopened game keeps only its result; or a phone, or a medium window) one readable column. */}
+      {size === "expanded" && report ? (
+        <TwoPane
+          kind="supporting"
+          side="end"
+          start={
+            <ScreenScroll top={won ? 64 : 32} bottom={24}>
+              {titleBlock}
+              {linesBlock}
+            </ScreenScroll>
+          }
+          end={
+            <ScreenScroll top={won ? 64 : 32} bottom={24}>
+              <GameReportView report={report} tiles={won} />
+            </ScreenScroll>
+          }
+        />
+      ) : (
+        <ScreenScroll top={won ? 64 : 32} bottom={24} max="readable">
+          {titleBlock}
+          {linesBlock}
+          {report ? (
+            <View className="mt-8">
+              <GameReportView report={report} tiles={won} />
             </View>
-            <Label className="mt-2 text-center">Lower is better.</Label>
-          </View>
-        ) : (
-          <View className="mt-6 gap-1" testID="outcome-lines">
-            {outcomeLines(result).map((line) => (
-              <BodyText key={line} tone="muted" className="text-center">
-                {line}
-              </BodyText>
-            ))}
-          </View>
-        )}
-        {report ? (
-          <View className="mt-8">
-            <GameReportView report={report} tiles={won} />
-          </View>
-        ) : null}
-      </ScreenScroll>
+          ) : null}
+        </ScreenScroll>
+      )}
       <ActionBar>
         <Label tone="muted" className="mb-3 text-center" testID="outcome-consequence">
           A standalone game writes nothing to a campaign.

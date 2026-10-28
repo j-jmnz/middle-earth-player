@@ -7,7 +7,7 @@ import { tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { withAlphaHex } from "../../../play/tokens";
 import { SceneCard } from "../../art";
-import { ActionBar, BodyText, Chip, Eyebrow, IconButton, JourneyBar, Label, NavBar, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
+import { ActionBar, BodyText, Chip, Eyebrow, IconButton, JourneyBar, Label, NavBar, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton, TwoPane } from "../../chrome";
 import { poolCardWords } from "../../log-facts";
 import { carryVerb, carryWords } from "../../../campaign/carry-words";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../campaign-data";
@@ -20,7 +20,10 @@ import { seatWord } from "../../seats";
 import { goBack } from "../../go-back";
 import { droppedSentence, useSave } from "../../use-save";
 import { useUiScale } from "../../../play/ui-scale";
+import { useSizeClass } from "../../../play/use-size-class";
 
+// The right pane's width range (Medium's points) in an expanded window: the journey bar, the pool and the next move.
+const PATH_SIDE_RANGE = { min: 320, max: 380 } as const;
 const STATUS_WORD = { completed: "Completed", current: "Current", locked: "Locked" } as const;
 const RAIL = 44;
 
@@ -150,6 +153,7 @@ function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
 
 export default function CampaignPath() {
   const t = useTableTokens();
+  const { size } = useSizeClass();
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string }>();
   const saveId = routeCode(params.saveId);
@@ -197,73 +201,118 @@ export default function CampaignPath() {
   const kept = save.log.carryOver.map((card) => ({ code: card.code, perPlayer: card.perPlayer }));
   const waiting = kept.length > 0 ? carryWords(kept, name) : null;
 
+  const navBar = (
+    <NavBar
+      onBack={() => goBack(router, "/")}
+      backTestID="path-back"
+      backLabel="Campaigns"
+      title={campaign.name}
+      subtitle={`${seatWord(save.seatCount)} · ${done} of ${nodes.length} completed`}
+      right={<IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId, nodes[currentIndex]?.id) })} />}
+    />
+  );
+  const journey = <JourneyBar total={nodes.length} done={done} current={currentIndex >= 0} />;
+  const noticeRow = notice ? (
+    <View className="mb-3">
+      <BodyText tone="muted" testID="path-notice">
+        {notice}
+      </BodyText>
+    </View>
+  ) : null;
+  const trail = (
+    <View className="pt-1">
+      {nodes.map((node, index) => (
+        <Node
+          key={node.id}
+          node={node}
+          index={index}
+          count={nodes.length}
+          reached={index < reachedUpTo}
+          rewards={node.reward.map(name)}
+          rounds={save.log.scenarios[node.id]?.rounds ?? null}
+          begin={open && open.id !== node.id && node.status === "current" ? { hint: "A scenario is open. Dealing this one drops it.", onPress: () => router.push(briefingHref(save.id, node.id)) } : null}
+          onOpen={node.status === "completed" ? () => router.push(briefingHref(save.id, node.id)) : null}
+        />
+      ))}
+    </View>
+  );
+  const poolTile = (
+    <View className="flex-1 rounded-tile px-3.5 py-2.5" style={tileSurface(false, t)}>
+      <Eyebrow tone="moon">Pool</Eyebrow>
+      <Text testID="pool" className="mt-0.5 text-label text-bone">
+        {poolText}
+      </Text>
+    </View>
+  );
+  const logButton = <SecondaryButton label="Log" icon="lore" testID="log-open" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />;
+  // The next move, pinned at the foot (the screen's, or the right pane's when expanded).
+  const nextBar = (align: "auto" | "fill") =>
+    next ? (
+      <ActionBar align={align}>
+        <Label className="mb-2.5 text-center">{next.words}</Label>
+        <PrimaryButton label={next.label} testID={next.testID} accessibilityLabel={`${next.label} ${next.words.replace(/^.*?: /, "")}`} onPress={next.onPress} />
+      </ActionBar>
+    ) : complete ? (
+      <ActionBar align={align}>
+        <Label testID="path-complete" className="mb-2.5 text-center">
+          Campaign complete.
+        </Label>
+        {waiting ? (
+          <>
+            <Text testID="path-carry" className="mb-2.5 text-center text-label text-bone">
+              {`${waiting.charAt(0).toUpperCase()}${waiting.slice(1)} ${carryVerb(kept) === "is" ? "waits" : "wait"} for your next campaign.`}
+            </Text>
+            <PrimaryButton label="Start a new campaign" testID="path-new-campaign" onPress={() => router.navigate({ pathname: "/", params: { start: "1" } })} />
+          </>
+        ) : null}
+      </ActionBar>
+    ) : null;
+
+  // Expanded: the trail at the left (a reading width, kept to the left), and at the right the journey bar, the pool, the log and the
+  // next move pinned at the pane's foot (docs/design-system.md, Path).
+  if (size === "expanded") {
+    return (
+      <Screen scene="ember" testID="campaign-path">
+        {navBar}
+        <TwoPane
+          kind="supporting"
+          side="end"
+          range={PATH_SIDE_RANGE}
+          start={
+            <ScreenScroll bottom={16} max="readable" align="start">
+              {noticeRow}
+              {trail}
+            </ScreenScroll>
+          }
+          end={
+            <>
+              <ScreenScroll bottom={16} top={4}>
+                <View className="pb-3 pt-1">{journey}</View>
+                <View className="flex-row">{poolTile}</View>
+                <View className="mt-2.5 flex-row">{logButton}</View>
+              </ScreenScroll>
+              {nextBar("fill")}
+            </>
+          }
+        />
+      </Screen>
+    );
+  }
+
   return (
     <Screen scene="ember" testID="campaign-path">
-      <NavBar
-        onBack={() => goBack(router, "/")}
-        backTestID="path-back"
-        backLabel="Campaigns"
-        title={campaign.name}
-        subtitle={`${seatWord(save.seatCount)} · ${done} of ${nodes.length} completed`}
-        right={<IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId, nodes[currentIndex]?.id) })} />}
-      />
-      <View className="pb-3 pt-1">
-        <JourneyBar total={nodes.length} done={done} current={currentIndex >= 0} />
-      </View>
-      <ScreenScroll bottom={16}>
-        {notice ? (
-          <View className="mb-3">
-            <BodyText tone="muted" testID="path-notice">
-              {notice}
-            </BodyText>
-          </View>
-        ) : null}
-        <View className="pt-1">
-          {nodes.map((node, index) => (
-            <Node
-              key={node.id}
-              node={node}
-              index={index}
-              count={nodes.length}
-              reached={index < reachedUpTo}
-              rewards={node.reward.map(name)}
-              rounds={save.log.scenarios[node.id]?.rounds ?? null}
-              begin={open && open.id !== node.id && node.status === "current" ? { hint: "A scenario is open. Dealing this one drops it.", onPress: () => router.push(briefingHref(save.id, node.id)) } : null}
-              onOpen={node.status === "completed" ? () => router.push(briefingHref(save.id, node.id)) : null}
-            />
-          ))}
-        </View>
+      {navBar}
+      <View className="pb-3 pt-1">{journey}</View>
+      <ScreenScroll bottom={16} max="readable">
+        {noticeRow}
+        {trail}
         {/* What the campaign has earned so far, and the log, at the end of the trail. */}
         <View className="mt-2 flex-row items-center gap-2.5">
-          <View className="flex-1 rounded-tile px-3.5 py-2.5" style={tileSurface(false, t)}>
-            <Eyebrow tone="moon">Pool</Eyebrow>
-            <Text testID="pool" className="mt-0.5 text-label text-bone">
-              {poolText}
-            </Text>
-          </View>
-          <SecondaryButton label="Log" icon="lore" testID="log-open" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
+          {poolTile}
+          {logButton}
         </View>
       </ScreenScroll>
-      {next ? (
-        <ActionBar>
-          <Label className="mb-2.5 text-center">{next.words}</Label>
-          <PrimaryButton label={next.label} testID={next.testID} accessibilityLabel={`${next.label} ${next.words.replace(/^.*?: /, "")}`} onPress={next.onPress} />
-        </ActionBar>
-      ) : complete ? (
-        <ActionBar>
-          <Label testID="path-complete" className="mb-2.5 text-center">
-            Campaign complete.
-          </Label>
-          {waiting ? (
-            <>
-              <Text testID="path-carry" className="mb-2.5 text-center text-label text-bone">
-                {`${waiting.charAt(0).toUpperCase()}${waiting.slice(1)} ${carryVerb(kept) === "is" ? "waits" : "wait"} for your next campaign.`}
-              </Text>
-              <PrimaryButton label="Start a new campaign" testID="path-new-campaign" onPress={() => router.navigate({ pathname: "/", params: { start: "1" } })} />
-            </>
-          ) : null}
-        </ActionBar>
-      ) : null}
+      {nextBar("auto")}
     </Screen>
   );
 }
