@@ -12,18 +12,19 @@ const index = campaignIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_D
 
 describe("data/campaigns/index.json", () => {
   it("lists the built campaigns playable and the later campaigns locked, with the scenario counts Hall of Beorn lists", () => {
-    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths"]);
+    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood"]);
     expect(index.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarioCount).toBe(loadCampaign().scenarios.length);
     // The campaigns built from the Revised Core Set and The Dark of Mirkwood are listed and stay locked until one of their
-    // scenarios is in PLAYABLE_SCENARIOS (Mirkwood Paths since phase 29); the two later sagas have no scenario files at all.
+    // scenarios is in PLAYABLE_SCENARIOS (Mirkwood Paths since phase 29, The Dark of Mirkwood since phase 32: both hold The Oath); the two later sagas
+    // have no scenario files at all.
     const locked = index.filter((entry) => !entry.playable);
-    expect(locked.map((entry) => entry.name)).toEqual(["The Dark of Mirkwood", "The Two Towers", "The Return of the King"]);
+    expect(locked.map((entry) => entry.name)).toEqual(["The Two Towers", "The Return of the King"]);
     expect(locked.filter((entry) => ["The Two Towers", "The Return of the King"].includes(entry.name)).every((entry) => entry.scenarioCount === 6)).toBe(true);
   });
 
   it("lists the Mirkwood campaigns with their scenario counts", () => {
     expect(index.find((entry) => entry.id === "mirkwood-paths")).toMatchObject({ scenarioCount: 5, playable: true });
-    expect(index.find((entry) => entry.id === "the-dark-of-mirkwood")).toMatchObject({ scenarioCount: 2, playable: false });
+    expect(index.find((entry) => entry.id === "the-dark-of-mirkwood")).toMatchObject({ scenarioCount: 2, playable: true });
     expect(loadCampaign("mirkwood-paths").scenarios).toHaveLength(5);
     expect(loadCampaign("the-dark-of-mirkwood").scenarios).toHaveLength(2);
   });

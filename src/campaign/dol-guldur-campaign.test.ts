@@ -16,6 +16,7 @@ import { DOL_GULDUR_GOLDENS, dolGuldurLoadout, dolGuldurStart, dolGuldurWorld, p
 import { campaign, dolGuldur } from "../../scripts/dol-guldur-scene.ts";
 import { loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { loadPrinted } from "../../scripts/test-catalog.ts";
 
 import { carryOffers } from "./carry-over.ts";
 import { checklist } from "./checklist.ts";
@@ -29,6 +30,7 @@ import { loadWorld } from "./world.ts";
 let cards: Map<string, PrintedCard>;
 let ctx: ReduceContext;
 let anduinLog: CampaignLog;
+let oathCards: Map<string, PrintedCard>;
 const worlds = new Map<string, { cards: Map<string, PrintedCard>; ctx: ReduceContext }>();
 
 beforeAll(async () => {
@@ -42,6 +44,7 @@ beforeAll(async () => {
   // Journey Along the Anduin's win on top of Passage Through Mirkwood's: the pool on its heroes, the prisoner named.
   anduinLog = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, game.state.scenarioId, game.state, new Map([...brittle.cards, ...cards]));
   await dolGuldurWorld("strong");
+  oathCards = new Map(await loadPrinted(["41041", "41044", "41045"]));
 }, 120_000);
 
 describe("Escape from Dol Guldur in a campaign", () => {
@@ -136,7 +139,8 @@ describe("what a win writes (01131:B:2)", () => {
     expect(passage.definition.setup.filter((instruction) => instruction.verb === "PutObjectiveAllyIntoPlay")).toHaveLength(1);
     for (const seat of [0, 1]) expect(plan.seats[seat]?.deck.filter((code) => code === "01132"), `seat ${seat}`).toHaveLength(1);
     // The pool's Mendor is put into play by his own record (01135:campaignSetup:1) in a scenario whose campaign card does not name him.
-    const later = checklist({ log: fresh.log, scenario: loadScenario("the-oath"), seats: dolGuldurLoadout(2), effects: EFFECTS, cards });
+    // The Oath's campaign card asks each seat for an Adaptation (41050:A:2): the answers and the cards they name are inputs of this check, not what it asserts.
+    const later = checklist({ log: fresh.log, scenario: loadScenario("the-oath"), seats: dolGuldurLoadout(2), effects: EFFECTS, cards: new Map([...cards, ...oathCards]), choices: ["41044>q1", "41045>q4"] });
     if (!later.ok) throw new Error(later.errors.join("; "));
     expect(later.poolIntoPlay).toEqual(["01135"]);
     expect(later.poolEncounterCards).toEqual([]);

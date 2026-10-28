@@ -89,7 +89,7 @@ describe("built catalog", () => {
       }
       expect(missing).toEqual([]);
       expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("mirkwood-paths")).toMatchObject({ name: "Mirkwood Paths", scenario_count: 5, playable: 1 });
-      expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("the-dark-of-mirkwood")).toMatchObject({ name: "The Dark of Mirkwood", scenario_count: 2, playable: 0 });
+      expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("the-dark-of-mirkwood")).toMatchObject({ name: "The Dark of Mirkwood", scenario_count: 2, playable: 1 });
       expect(database.prepare("select imagesrc from cards where code = ?").get("141031")?.imagesrc).toBe(
         "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bag-End.jpg",
       );

@@ -29,7 +29,7 @@ let cards: Map<string, PrintedCard>;
 
 beforeAll(async () => {
   world = await loadWorld();
-  cards = new Map([...world.cards, ...(await loadPrinted([MENDOR, SUPPORT, SENSE, "41044", "141002", RING_DRAWS_THEM]))]);
+  cards = new Map([...world.cards, ...(await loadPrinted([MENDOR, SUPPORT, SENSE, "41041", "41044", "141002", RING_DRAWS_THEM]))]);
   world = { ...world, cards };
 });
 
@@ -183,9 +183,10 @@ describe("carry-over to the next campaign", () => {
   it("an unfinished campaign's carryOver stays on its own log: part 4 of Mirkwood Paths continues the same log", () => {
     const part3 = applyResolution(emptyLog(1), SCENARIO, won(resolution, 1), cards);
     // Nothing moves it into the pool while the campaign goes on: only a new save's carryIn does.
-    const plan = checklist({ log: part3, scenario: loadScenario("the-oath"), seats: [{ heroes: [HERO, "141002"], deck: [] }], effects: EFFECTS, cards });
+    const plan = checklist({ log: part3, scenario: loadScenario("the-oath"), seats: [{ heroes: [HERO, "141002"], deck: [] }], effects: EFFECTS, cards, choices: [`41044>${HERO}`] });
     if (!plan.ok) throw new Error(plan.errors.join(" "));
-    expect(plan.log.campaignPool).toEqual([]);
+    // The pool holds only what The Oath's own Setup added (the Adaptation the seat chose, Stalking Goblin), not the carry-over.
+    expect(plan.log.campaignPool.map((card) => card.code).sort()).toEqual(["41041", "41044"]);
     expect(plan.log.carryOver).toHaveLength(2);
   });
 });

@@ -1,4 +1,4 @@
-// Rules: rr.quest-advancement, rr.winning-the-game, rr.search, rr.victory-display, rr.first-player (data/rules/entries.json). The three quest cards of The
+// Rules: rr.quest-advancement, rr.winning-the-game, rr.search, rr.discard-pile-and-victory-display, rr.first-player (data/rules/entries.json). The three quest cards of The
 // Oath (41001, 41002, 41003) on a table of plain-number heroes (scripts/oath-scene.ts): their Setup, When Revealed and what keeps a stage from advancing.
 import { beforeAll, describe, expect, it } from "vitest";
 

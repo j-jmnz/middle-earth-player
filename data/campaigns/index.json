@@ -15,7 +15,7 @@
     "id": "the-dark-of-mirkwood",
     "name": "The Dark of Mirkwood",
     "scenarioCount": 2,
-    "playable": false
+    "playable": true
   },
   {
     "id": "the-two-towers",
