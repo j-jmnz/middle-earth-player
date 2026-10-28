@@ -9,6 +9,8 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
+      "supportsTablet": true,
+      "requireFullScreen": true,
       "bundleIdentifier": "com.middleearth.lcg"
     },
     "android": {

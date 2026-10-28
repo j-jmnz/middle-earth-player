@@ -38,7 +38,7 @@ import { useTableChoice } from "../play/use-table-choice";
 import { campaignTokens, heldDial, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
-import { Screen } from "./chrome";
+import { BodyText, NavBar, Screen } from "./chrome";
 import { TableTopBar, TOP_BAR } from "./table-top-bar";
 import { goBack } from "./go-back";
 import { enqueueImageDownloads } from "./images/queue";
@@ -236,6 +236,19 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       )
     : null;
   const shown = previewed?.cards[previewed.start];
+
+  // The stack locks the table to landscape, but iPadOS can still give the app a portrait window (a resizable window, Split
+  // View). The table is not laid out for one, so it asks to be turned.
+  if (screen.height > screen.width) {
+    return (
+      <Screen testID="table-portrait" scene="felt">
+        <NavBar onBack={() => goBack(router, nav.back)} backTestID="table-back" backLabel={nav.backLabel} />
+        <View className="flex-1 items-center justify-center px-6">
+          <BodyText tone="muted">Turn the screen to landscape to play. The game is saved.</BodyText>
+        </View>
+      </Screen>
+    );
+  }
 
   return (
     <Screen testID="table" scene="felt" inset={false}>
