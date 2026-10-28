@@ -22,7 +22,8 @@
 // src/campaign/fixtures/passage-through-mirkwood.json. `anduin-won` and `anduin-lost`: Journey Along the Anduin (scripts/e2e-anduin.ts), written to
 // src/campaign/fixtures/journey-along-the-anduin.json. `dol-guldur-won` and `dol-guldur-lost`: Escape from Dol Guldur (scripts/e2e-dol-guldur.ts), written to
 // src/campaign/fixtures/escape-from-dol-guldur.json. `oath-won` and `oath-lost`: The Oath on a blank The Dark of Mirkwood log (scripts/e2e-oath.ts), written to
-// src/campaign/fixtures/the-oath.json.
+// src/campaign/fixtures/the-oath.json. `nibin-dum-won` and `nibin-dum-lost`: The Caves of Nibin-Dûm from the log a real `oath-won` writes (scripts/e2e-nibin-dum.ts), written to
+// src/campaign/fixtures/the-caves-of-nibin-dum.json.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
@@ -49,6 +50,7 @@ import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 import { anduinFixtures } from "./e2e-anduin.ts";
 import { dolGuldurFixtures } from "./e2e-dol-guldur.ts";
 import { mirkwoodFixtures } from "./e2e-mirkwood.ts";
+import { nibinDumFixtures } from "./e2e-nibin-dum.ts";
 import { oathFixtures } from "./e2e-oath.ts";
 import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
@@ -367,6 +369,12 @@ void runScript("e2e-fixtures", () => {
   const oathFile = path.join(dir, "the-oath.json");
   writeFileSync(oathFile, `${JSON.stringify(oath)}\n`);
   say.info(`wrote ${oathFile} (${Object.keys(oath).join(", ")})`);
+
+  // The Caves of Nibin-Dûm (The Dark of Mirkwood part 2): from the log a real `oath-won` writes, so nothing is written while that win is missing.
+  const nibinDum = say.step("play The Caves of Nibin-Dûm's win and loss", () => nibinDumFixtures(oath["oath-won"]));
+  const nibinDumFile = path.join(dir, "the-caves-of-nibin-dum.json");
+  writeFileSync(nibinDumFile, `${JSON.stringify(nibinDum)}\n`);
+  say.info(`wrote ${nibinDumFile} (${Object.keys(nibinDum).join(", ")})`);
 
   if (won) {
     const past = wonLog(won);

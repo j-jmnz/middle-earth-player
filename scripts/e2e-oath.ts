@@ -8,10 +8,12 @@
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
-import { contextOf, deal, resume } from "../src/campaign/session.ts";
-import { newSave, type StoredLoadout } from "../src/campaign/save.ts";
+import { type CampaignLog } from "../src/campaign/log.ts";
+import { contextOf, deal, finish, resume } from "../src/campaign/session.ts";
+import { newSave, type Save, type StoredLoadout } from "../src/campaign/save.ts";
 import { loadWorld } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
+import { ENGINE_VERSION } from "../src/rules/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
 import { characters, legalAttackEnemies } from "../src/rules/combat.ts";
 import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
@@ -25,6 +27,19 @@ import { temporaryCatalog } from "./temp-catalog.ts";
 const say = createLog("e2e-oath");
 const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
 const ADAPTATIONS = ["41044", "41045"] as const;
+
+// The log The Oath's won game writes: replay the fixture and confirm it (6 or more tokens earn Guilty Conscience; the Adaptations and Stalking Goblin join the pool).
+export function oathWonLog(won: OathFixture): CampaignLog {
+  const scenario = loadScenario("the-oath");
+  const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
+  const codes = [...won.loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...ADAPTATIONS];
+  const world = loadWorld(catalog, loadCampaign(won.campaignId), scenario, EFFECTS, codes);
+  const save: Save = { ...newSave("fixture", won.campaignId, 2), loadout: won.loadout, active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: won.seed, intents: [...won.intents] } };
+  const resumed = resume(save, world, CATALOG_VERSION);
+  if (!resumed.ok) throw new Error(resumed.reason);
+  if (!resumed.state.stageCleared || resumed.state.lost) throw new Error("The oath-won fixture does not replay to a win");
+  return finish(save, world, resumed.state).log;
+}
 
 export type OathFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[] };
 

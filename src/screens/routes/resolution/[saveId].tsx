@@ -115,6 +115,8 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const at = campaign?.scenarios.indexOf(game.scenarioId) ?? -1;
   const nextId = at >= 0 ? campaign?.scenarios[at + 1] : undefined;
   const nextName = !done && nextId ? scenarioName(nextId) : null;
+  // The last scenario of the campaign: the win completes it.
+  const completes = !done && at >= 0 && nextId == null;
   const picked = view.kind === "choosing" ? (view.tiles.find((tile) => tile.optionId === chosen) ?? null) : null;
   const declined = view.kind === "choosing" && view.decline != null && chosen === view.decline.optionId;
   const answer = picked?.optionId ?? (declined && view.kind === "choosing" ? (view.decline?.optionId ?? null) : null);
@@ -190,7 +192,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
           ) : (
             <>
               <Label tone="muted" className="mb-3 text-center" testID="resolution-consequence">
-                {done ? "You have won this scenario before. Nothing is granted a second time." : settledSentence(view, session.world, nextName)}
+                {done ? "You have won this scenario before. Nothing is granted a second time." : settledSentence(view, session.world, nextName, completes)}
               </Label>
               <PrimaryButton
                 label="Confirm"

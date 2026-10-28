@@ -15,6 +15,7 @@ import { miscPickWords, miscWords } from "./misc-words.ts";
 import { playPickWords, playWords } from "./play-words.ts";
 import { dungeonWords } from "./dungeon-words.ts";
 import { oathPickWords, oathWords } from "./oath-words.ts";
+import { cavesFlagWords, cavesPickWords, cavesWords } from "./caves-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -116,6 +117,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
         const until = instruction.until === "endOfPhase" ? " until the end of the phase" : instruction.until === "endOfRound" ? " until the end of the round" : "";
         return `${refWords(instruction.target === "picked" || instruction.target == null ? undefined : instruction.target)} gains a ${capital(icon)} icon${until}`;
       }
+      const flag = cavesFlagWords(instruction);
+      if (flag) return flag;
       const stat = STAT_WORDS[instruction.stat] ?? instruction.stat;
       const amount = typeof instruction.amount === "number" ? (instruction.amount >= 0 ? `+${instruction.amount}` : `${instruction.amount}`) : "+X";
       const until = instruction.until === "endOfPhase" ? " until the end of the phase" : instruction.until === "endOfRound" ? " until the end of the round" : "";
@@ -285,7 +288,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return oathWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return oathWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
@@ -359,7 +362,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (play) return play;
   const burden = burdenPickWords(pick, next);
   if (burden) return burden;
-  if (pick.verb !== "Pick") return oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
+  if (pick.verb !== "Pick") return oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;
   const one = article(noun);
   switch (next?.verb) {
@@ -405,8 +408,11 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     // The Oath's Adaptations (41044:A:3, 41046:A:3) and Abandoned Camp (41015:A:1): the hero healed, the location that takes progress, the ally put into play.
     case "Heal":
       return { verb: "Heal", prompt: `Choose ${one} to heal${next.all ? " all damage from" : ""}.` };
-    case "PlaceProgressOn":
-      return { verb: "Place", prompt: `Choose ${one} to place ${amountWords(next.amount)} progress on.` };
+    case "PlaceProgressOn": {
+      // The Cave Torch's "Dark location" (41029:A:2): the trait the pick asks for.
+      const kind = pick.pick.trait ? `${pick.pick.trait} ${noun}` : noun;
+      return { verb: "Place", prompt: `Choose ${article(kind)} to place ${amountWords(next.amount)} progress on.` };
+    }
     case "PutIntoPlay":
       return { verb: "Put into play", prompt: `Choose ${pick.pick.cardType && pick.pick.cardType !== "player-side-quest" ? article(pick.pick.cardType) : one} to put into play.` };
     default:

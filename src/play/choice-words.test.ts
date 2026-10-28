@@ -10,6 +10,7 @@ import { AUTHORED_EFFECTS as DOL_GULDUR_EFFECTS } from "../effects/authored/esca
 import { AUTHORED_EFFECTS as ANDUIN_EFFECTS } from "../effects/authored/journey-along-the-anduin.ts";
 import { AUTHORED_EFFECTS } from "../effects/authored/passage-through-mirkwood.ts";
 import { RECORDS as POOL_RECORDS } from "../effects/authored/pool/RevCore.ts";
+import { alternativeActions } from "../rules/families/deck-play.ts";
 import { readyPaymentChoice } from "../rules/families/attachments-ready.ts";
 import { attachTo, spawn } from "../rules/zones.ts";
 import { HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
@@ -17,6 +18,8 @@ import { first } from "../../scripts/past-scene.ts";
 import { anduinTable, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
 import { loadOathWorld, oathTable, type OathWorld } from "../../scripts/oath-scene.ts";
+import { AUTHORED_EFFECTS as CAVES_EFFECTS } from "../effects/authored/the-caves-of-nibin-dum.ts";
+import { cavesTable, loadCavesWorld, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";
 
@@ -288,5 +291,84 @@ describe("the words of The Oath choices", () => {
     expect(say({ verb: "PlaceToken", amount: 1 })).toBe("Place 1 resource token on this card");
     expect(say({ verb: "SearchMove", trait: "Spider", type: "enemy", to: "engaged" })).toBe("Put a Spider enemy into play engaged with you");
     expect(say({ verb: "SearchMove", trait: "Forest", type: "location", to: "staging" })).toBe("Add a Forest location from the encounter deck or discard pile to the staging area");
+  });
+});
+
+// Every record of The Caves of Nibin-Dûm (src/effects/authored/the-caves-of-nibin-dum.ts) and its boons and burden (pool/TDoM.ts: 41042, 41048, 41049).
+const caves: readonly Effect[] = [...CAVES_EFFECTS, ...TDOM_RECORDS.filter((effect) => ["41042", "41048", "41049"].includes(effect.cardCode))];
+
+describe("the words of The Caves of Nibin-Dûm choices", () => {
+  let cavesWorld: CavesWorld;
+  beforeAll(async () => {
+    cavesWorld = await loadCavesWorld();
+  });
+  const cavesNames = (): ChoiceNames => ({ card: (id) => id, code: (code) => cavesWorld.cards.get(code)?.name ?? code });
+  const ASKING = new Set(["Pick", "SearchMove", "AttachSelf", "ReturnToStaging", "DiscardFromHand", "PickEncounter", "ChooseX"]);
+
+  it("every instruction that asks a player says what the card is for, in a sentence of its own", () => {
+    const prompts: string[] = [];
+    for (const effect of caves) {
+      walk(effect.instructions, (instruction, next) => {
+        if (!ASKING.has(instruction.verb)) return;
+        // Only a ReturnToStaging that lets the player choose an engaged enemy asks.
+        if (instruction.verb === "ReturnToStaging" && instruction.target.kind !== "engagedEnemies") return;
+        const words = pickWords(instruction, next, cavesNames(), effect.cardCode);
+        expect(words.prompt, effect.id).toMatch(/^[A-Z].*\.$/);
+        expect(words.prompt, effect.id).not.toMatch(/^Choose an? \w+\.$/);
+        expect(words.prompt, effect.id).not.toBe("Choose one.");
+        expect(words.verb, effect.id).not.toBe("Choose");
+        prompts.push(words.prompt);
+      });
+    }
+    expect(prompts).toContain("Choose a hero to carry Cave Torch.");
+    expect(prompts).toContain("Choose a location from the encounter deck or discard pile to add to the staging area.");
+    expect(prompts).toContain("Choose an enemy from the encounter deck or discard pile to add to the staging area.");
+    expect(prompts).toContain("Choose X, from 1 to 3.");
+    expect(prompts).toContain("Choose a Dark location to place X progress on.");
+    expect(prompts).toContain("Choose an ally to put into play.");
+    expect(prompts).toContain("Choose a character to exhaust.");
+    expect(prompts).toContain("Choose the card to reveal: the other cards you looked at go to the bottom of the encounter deck.");
+    expect(prompts).toContain("Choose a card to put into your hand.");
+  });
+
+  it("every Choose names each branch in a sentence", () => {
+    const made = cavesTable(cavesWorld);
+    const seen: Record<string, string> = {};
+    for (const effect of caves) {
+      walk(effect.instructions, (instruction) => {
+        if (instruction.verb !== "Choose") return;
+        for (const option of instruction.options) {
+          const words = branchWords(instruction, option.id, made.state, cavesNames(), effect.cardCode);
+          expect(words, `${effect.id} ${option.id}`).toMatch(/^[A-Z].+/);
+          expect(words, `${effect.id} ${option.id}`).not.toBe(option.id);
+          seen[`${effect.id} ${option.id}`] = words;
+        }
+      });
+    }
+    expect(seen["41027:forced:1 progress"]).toBe("Remove X progress from the quest");
+    expect(seen["41027:forced:1 staging"]).toBe("Return it to the staging area");
+    expect(seen["41039:whenRevealed:1 exhaust"]).toBe("Exhaust Cave Torch");
+    expect(seen["41039:whenRevealed:1 noProgress"]).toBe("No progress can be placed on the quest until the end of the phase");
+    expect(seen["41042:whenRevealed:1 add"]).toBe("Each hero you control gains 1 resource, then raise your threat by 5");
+    expect(seen["41042:whenRevealed:1 decline"]).toBe("Do nothing");
+    expect(seen["41025:whenRevealed:1 discard"]).toBeUndefined();
+  });
+
+  it("names the two Actions of \"No Time to Waste!\" and Ranger Sense when the player chooses one (41048:A:1, 41049:A:1)", () => {
+    const made = cavesTable(cavesWorld);
+    const sayAll = (code: string) => {
+      const running = caves.filter((effect) => effect.cardCode === code && effect.timing === "action");
+      const choice = alternativeActions(running);
+      if (choice?.[0]?.verb !== "Choose") throw new Error(`${code} does not offer a choice of Actions`);
+      return running.map((effect) => branchWords(choice[0] as Extract<Instruction, { verb: "Choose" }>, effect.id, made.state, cavesNames(), null));
+    };
+    expect(sayAll("41048")).toEqual([
+      "Remove this card from the Campaign Pool, then remove this card from the game, then each player lowers threat by 3, then reveal an encounter card",
+      "Draw 1 card",
+    ]);
+    expect(sayAll("41049")).toEqual([
+      "Remove this card from the Campaign Pool, then remove this card from the game, then look at the top 4 cards of your deck, then choose a card, then put it into your hand",
+      "Draw 1 card",
+    ]);
   });
 });

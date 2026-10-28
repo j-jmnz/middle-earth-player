@@ -181,7 +181,8 @@ export function playerAttackSheet(game: ScenarioState, ctx: ReduceContext, legal
     key: `playerAttack:${game.round}:${[...enemies].join(",")}`,
     step: "Combat",
     title: "Attack an enemy",
-    note: "Choose the enemy, then the characters that attack it.",
+    // A location in the staging area a card lets the first player attack as if engaged (Cracked Pillar, 41028:A:1) is among the options.
+    note: [...enemies].some((id) => ctx.cards.get(game.cards[id]?.code ?? "")?.type === "location") ? "Choose the enemy or location, then the characters that attack it." : "Choose the enemy, then the characters that attack it.",
     verb: "Attack",
     options: [...enemies].map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "defense"), next: attackersSheet(game, ctx, names, id) })),
     primary: null,

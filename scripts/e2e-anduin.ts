@@ -115,7 +115,8 @@ function play(log: CampaignLog, loadout: StoredLoadout, seed: number): { intents
 // player who changes heroes takes the threat penalty, step 3).
 const REPLACEMENT: Readonly<Record<string, string>> = { leadership: "01001", tactics: "01004", spirit: "01007", lore: "01010" };
 
-export function replaced(loadout: StoredLoadout, log: CampaignLog): StoredLoadout {
+// `after`: the scenario the heroes fell in, for the line that says who replaces whom.
+export function replaced(loadout: StoredLoadout, log: CampaignLog, after = "Passage Through Mirkwood"): StoredLoadout {
   const fallen = log.fallenHeroesBySeat.flat();
   const spheres = new Map(catalog.select().from(cardRows).where(inArray(cardRows.code, fallen)).all().map((row) => [row.code, row.sphereCode]));
   const taken = new Set(loadout.seats.flatMap((seat) => seat.heroes));
@@ -126,7 +127,7 @@ export function replaced(loadout: StoredLoadout, log: CampaignLog): StoredLoadou
       const sphere = spheres.get(code) ?? "neutral";
       const candidate = [REPLACEMENT[sphere] ?? "01001", "01002", "01005", "01008", "01011"].find((hero) => !taken.has(hero)) ?? "01001";
       taken.add(candidate);
-      say.info(`${code} fell in Passage Through Mirkwood: seat ${index + 1} starts ${candidate} in its place`);
+      say.info(`${code} fell in ${after}: seat ${index + 1} starts ${candidate} in its place`);
       return candidate;
     }),
   }));

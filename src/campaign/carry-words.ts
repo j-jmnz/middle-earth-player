@@ -16,7 +16,7 @@ export function carryWords(cards: readonly Carried[], nameOf: (code: string) => 
   return parts.length > 1 ? `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}` : (parts[0] ?? "");
 }
 
-/** "is" for one card, "are" for several or for a copy for each player. */
+/** "is" for one card or a copy of one card for each player ("A Ranger Sense for each player is kept"), "are" for several cards or several copies of one. */
 export function carryVerb(cards: readonly Carried[]): "is" | "are" {
-  return cards.length > 1 || cards[0]?.perPlayer === true ? "are" : "is";
+  return cards.length > 1 ? "are" : "is";
 }

@@ -162,8 +162,9 @@ function cardWords(world: World, card: SettledCard): string {
   return card.hero ? `${nameOf(world, card.code)} on ${nameOf(world, card.hero)}` : nameOf(world, card.code);
 }
 
-/** The sentence above the final Confirm: what the log will hold (a boon on its hero), and the scenario that unlocks. */
-export function settledSentence(view: Extract<ResolutionView, { kind: "settled" }>, world: World, next: string | null): string {
+/** The sentence above the final Confirm: what the log will hold (a boon on its hero), and the scenario that unlocks, or that the campaign is complete
+ * (`completes`: the scenario is the last of its campaign, The Caves of Nibin-Dûm for both Mirkwood campaigns). */
+export function settledSentence(view: Extract<ResolutionView, { kind: "settled" }>, world: World, next: string | null, completes = false): string {
   // A card on its hero already reads as a boon. When every card goes to the pool, a single card says what it is ("the burden Ungoliant's Swarm").
   const kinded = view.earned.every((card) => card.hero == null);
   const words = view.earned.map((card) => cardWords(world, card));
@@ -176,7 +177,7 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   // "A and B", "A, B and C": an "and" only before the last.
   const list = earned.length > 1 ? `${earned.slice(0, -1).join(", ")} and ${earned.at(-1)}` : (earned[0] ?? "");
   const records = earned.length > 0 ? `Confirming records ${list} in the campaign` : "Confirming records the win";
-  const unlocked = next ? `${records} and unlocks ${next}.` : `${records}.`;
+  const unlocked = next ? `${records} and unlocks ${next}.` : completes ? `${records} and completes the campaign.` : `${records}.`;
   // A once-per-campaign Action used in this game or an earlier scenario is written to the log (41044:A:3).
   const names = (view.used ?? []).map((code) => nameOf(world, code));
   const sentence = names.length > 0 ? `${unlocked} ${names.join(", ")} ${names.length === 1 ? "is" : "are"} recorded as used this campaign.` : unlocked;
@@ -185,5 +186,6 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.
   if (!view.carried || view.carried.length === 0) return prisoner;
   const kept = view.carried.map((card) => ({ code: card.code, perPlayer: card.eachPlayer }));
-  return `${prisoner} ${carryWords(kept, (code) => nameOf(world, code))} ${carryVerb(kept)} kept for your next campaign.`;
+  const carried = carryWords(kept, (code) => nameOf(world, code));
+  return `${prisoner} ${carried.charAt(0).toUpperCase()}${carried.slice(1)} ${carryVerb(kept)} kept for your next campaign.`;
 }

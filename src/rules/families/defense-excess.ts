@@ -21,7 +21,8 @@ import { damageGoesTo } from "./defense-damage.ts";
 // for each point of damage dealt by this attack", 41035:A:2): the damage placed on `targetId` by the steps logged since `from`.
 function noteLanded(state: ScenarioState, targetId: string, steps: readonly EngineStep[], from: number): ScenarioState {
   const attack = state.pendingAttack;
-  if (!attack?.after?.length) return state;
+  // Only an attack whose after-instructions read the damage it dealt keeps the number: every other attack's state is as it was.
+  if (!attack?.after?.some((instruction) => JSON.stringify(instruction).includes('"dealt":true'))) return state;
   const landed = steps.slice(from).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId && step.amount > 0 ? sum + step.amount : sum), 0);
   return landed > 0 ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, landed: (attack.defense?.landed ?? 0) + landed } } } : state;
 }
