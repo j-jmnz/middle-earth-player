@@ -5,10 +5,11 @@
 import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 
 import type { LogLine } from "./log.ts";
-import type { Speed } from "./motion-tokens.ts";
+import { SPEEDS } from "./motion-tokens.ts";
 import { ChromeButton, Tile } from "./sheet-paper.tsx";
 import { LineMark } from "./table-chrome.tsx";
-import type { TableSettings } from "./table-settings.ts";
+import { CONTRAST_LINE, GUIDE_LINE, HAPTICS_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, THEME_WORDS } from "./settings-words.ts";
+import { THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "./table-settings.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
@@ -159,39 +160,41 @@ function PaperSwitch({ label, detail, value, onChange, testID }: { label: string
         trackColor={{ false: t.inkMuted, true: t.ink }}
         thumbColor={t.paper}
         ios_backgroundColor={t.inkMuted}
+        // react-native-web draws the on thumb from activeThumbColor (teal by default); the RN types do not list it.
+        {...({ activeThumbColor: t.paper } as object)}
       />
     </Pressable>
   );
 }
 
-const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", quick: "Quick" };
-
-// Animation speed: one row at least 44 pt tall, as the switches are: the label and what it does at the left, the two choices as pills
-// at the right, each a 44 pt target. The chosen one is ink with paper text. A screen reader hears a radio group of two.
-function SpeedChoice({ value, onChange }: { value: Speed; onChange: (value: Speed) => void }) {
+// A choice among a few words (Animation speed, UI scale, Theme): one row at least 44 pt tall, as the switches are: the label and what it
+// does at the left, the choices as pills at the right (narrower when there are three). Each pill is a 44 pt target, the chosen one ink with
+// paper text, and a screen reader hears a radio group. Pills are `${testID}-${option}`.
+function PaperChoice<T extends string>({ label, detail, options, words, value, onChange, testID }: { label: string; detail?: string; options: readonly T[]; words: Readonly<Record<T, string>>; value: T; onChange: (value: T) => void; testID: string }) {
   const t = useTableTokens();
   const s = useUiScale();
+  const narrow = options.length > 2;
   return (
-    <View testID="settings-speed" accessibilityRole="radiogroup" accessibilityLabel="Animation speed" style={{ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 * s, paddingVertical: 4 * s }}>
+    <View testID={testID} accessibilityRole="radiogroup" accessibilityLabel={label} style={{ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 * s, paddingVertical: 4 * s }}>
       <View className="shrink">
-        <Text className="text-body text-ink">Animation speed</Text>
-        <Text className="text-label text-inkMuted">Quick shortens every motion and skips the phase title.</Text>
+        <Text className="text-body text-ink">{label}</Text>
+        {detail ? <Text className="text-label text-inkMuted">{detail}</Text> : null}
       </View>
       <View className="flex-row gap-1.5">
-        {(["normal", "quick"] as const).map((speed) => {
-          const on = value === speed;
+        {options.map((option) => {
+          const on = value === option;
           return (
             <Pressable
-              key={speed}
-              testID={`settings-speed-${speed}`}
+              key={option}
+              testID={`${testID}-${option}`}
               accessibilityRole="radio"
-              accessibilityLabel={SPEED_WORDS[speed]}
+              accessibilityLabel={words[option]}
               accessibilityState={{ checked: on }}
-              onPress={() => onChange(speed)}
-              style={({ pressed }) => ({ minWidth: 60 * s, minHeight: touch(s, 44), paddingHorizontal: 8 * s, alignItems: "center", justifyContent: "center", borderRadius: 999, borderWidth: 1, borderColor: on ? t.ink : t.inkMuted, backgroundColor: on ? t.ink : pressed ? t.paperPressed : "transparent" })}
+              onPress={() => onChange(option)}
+              style={({ pressed }) => ({ minWidth: (narrow ? 50 : 60) * s, minHeight: touch(s, 44), paddingHorizontal: (narrow ? 6 : 8) * s, alignItems: "center", justifyContent: "center", borderRadius: 999, borderWidth: 1, borderColor: on ? t.ink : t.inkMuted, backgroundColor: on ? t.ink : pressed ? t.paperPressed : "transparent" })}
             >
               <Text className="text-label" style={{ color: on ? t.paper : t.ink }}>
-                {SPEED_WORDS[speed]}
+                {words[option]}
               </Text>
             </Pressable>
           );
@@ -202,7 +205,7 @@ function SpeedChoice({ value, onChange }: { value: Speed; onChange: (value: Spee
 }
 
 /**
- * The table's settings, a paper side panel from the menu's Table settings: Animation speed, the Combat spotlight, Strong outlines, the First-game guide and the
+ * The table's settings, a paper side panel from the menu's Table settings: Animation speed, the Combat spotlight, Haptics, Strong outlines, UI scale, Theme, the First-game guide and the
  * Responses used every time. (The round's phases and the Stops switches are the carousel behind the rail, phase-carousel.tsx.)
  * Text and switches only; nothing here sends an intent.
  */
@@ -225,11 +228,14 @@ export function SettingsPanel({
           Table settings
         </Text>
       </View>
-      <ScrollView className="mt-2" style={{ flexGrow: 0, flexShrink: 1 }}>
-        <SpeedChoice value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} />
-        <PaperSwitch label="Combat spotlight" detail="An attack that deals or blocks damage plays large over a darkened table. A tap skips it." value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID="settings-spotlight" />
-        <PaperSwitch label="Strong outlines" detail="Effect marks and token counts drawn with heavier outlines." value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID="settings-contrast" />
-        <PaperSwitch label="First-game guide" detail="A line under the dock's title the first two times each step comes up." value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID="settings-guide" />
+      <ScrollView className="mt-2" style={{ flexGrow: 0, flexShrink: 1 }} showsVerticalScrollIndicator persistentScrollbar>
+        <PaperChoice label="Animation speed" detail={SPEED_LINE} options={SPEEDS} words={SPEED_WORDS} value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} testID="settings-speed" />
+        <PaperSwitch label="Combat spotlight" detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID="settings-spotlight" />
+        <PaperSwitch label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID="settings-haptics" />
+        <PaperSwitch label="Strong outlines" detail={CONTRAST_LINE} value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID="settings-contrast" />
+        <PaperChoice label="UI scale" options={UI_SCALE_OPTIONS} words={SCALE_WORDS} value={settings.uiScale} onChange={(uiScale) => onChange({ uiScale })} testID="settings-scale" />
+        <PaperChoice label="Theme" options={THEME_OPTIONS} words={THEME_WORDS} value={settings.theme} onChange={(theme) => onChange({ theme })} testID="settings-theme" />
+        <PaperSwitch label="First-game guide" detail={GUIDE_LINE} value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID="settings-guide" />
         {always.length > 0 ? <Text className="mt-2 text-label text-inkMuted">Responses used every time:</Text> : null}
         {always.map((item) => (
           <ChromeButton key={item.effectId} label={item.label} testID={`settings-always-${item.effectId}`} tone="ink" onPress={() => onChange({ alwaysUse: settings.alwaysUse.filter((id) => id !== item.effectId) })} />

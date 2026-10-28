@@ -1,79 +1,18 @@
 // The cards of the phase carousel (phase-carousel.tsx): one per phase, numbered in the round, with its steps on a timeline, what the
 // player decides there and the action windows as Stop switches. Reading and the player's Stops settings only; nothing here sends an intent.
 import { useRef, type ComponentRef } from "react";
-import { Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import type { CarouselPhase, CarouselStep } from "./carousel.ts";
 import { toggleStop, type TableSettings } from "./table-settings.ts";
+import { SettingSwitch } from "./setting-switch.tsx";
 import { goldSurface, panelSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
-import { touch, useUiScale } from "./ui-scale.ts";
+import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 // The 44 pt target; callers draw it through `touch(s, ROW)`.
 export const ROW = 44;
-
-// A switch on the night surface: its whole row is one 44 pt target, the label and detail heard with it.
-export function NightSwitch({
-  label,
-  detail,
-  hint,
-  value,
-  onChange,
-  testID,
-  dim = false,
-}: {
-  label: string;
-  detail?: string;
-  // What a screen reader adds to the label; the detail when none.
-  hint?: string;
-  value: boolean;
-  onChange: (next: boolean) => void;
-  testID: string;
-  dim?: boolean;
-}) {
-  const t = useTableTokens();
-  const s = useUiScale();
-  return (
-    <Pressable
-      accessibilityRole="switch"
-      accessibilityLabel={label}
-      accessibilityHint={hint ?? detail}
-      accessibilityState={{ checked: value }}
-      onPress={() => onChange(!value)}
-      style={({ pressed }) => ({
-        minHeight: touch(s, ROW),
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 12 * s,
-        backgroundColor: pressed ? t.pressed : "transparent",
-        opacity: dim ? 0.75 : 1,
-      })}
-    >
-      <View className="shrink" importantForAccessibility="no-hide-descendants">
-        <Text className="text-label font-medium" style={{ color: t.bone }}>
-          {label}
-        </Text>
-        {detail ? (
-          <Text className="text-label" style={{ color: t.muted }}>
-            {detail}
-          </Text>
-        ) : null}
-      </View>
-      <Switch
-        testID={testID}
-        accessible={false}
-        importantForAccessibility="no"
-        value={value}
-        onValueChange={onChange}
-        trackColor={{ false: t.hairline, true: t.goldLine }}
-        thumbColor={value ? t.gold : t.muted}
-        ios_backgroundColor={t.hairline}
-      />
-    </Pressable>
-  );
-}
 
 // A small capsule beside the current phase's name: "Now" in gold.
 function NowChip() {
@@ -159,7 +98,7 @@ function StepBlock({
           {step.decision}
         </Text>
         {step.windows.map((window) => (
-          <NightSwitch
+          <SettingSwitch
             key={window.id}
             label={`Stop: ${window.title}`}
             detail={window.note}

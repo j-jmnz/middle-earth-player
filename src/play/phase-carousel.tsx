@@ -9,7 +9,8 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { cardWidth, startIndex, STOP_AHEAD_WORDS, STOPS_TEXT, type Carousel } from "./carousel.ts";
-import { NightSwitch, PhaseCard, ROW } from "./carousel-cards.tsx";
+import { PhaseCard, ROW } from "./carousel-cards.tsx";
+import { SettingSwitch } from "./setting-switch.tsx";
 import { useOpenMotion, useReduceMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { Chevron } from "./phase-rail.tsx";
@@ -111,7 +112,7 @@ function CarouselHead({
         </View>
       ) : null}
       <View style={{ marginLeft: 8 * s, paddingLeft: 12 * s, borderLeftWidth: 1, borderLeftColor: t.hairline }}>
-        <NightSwitch label="Stops" hint={STOPS_TEXT} value={settings.stopsOn} onChange={(stopsOn) => onChange({ stopsOn })} testID="carousel-stops" />
+        <SettingSwitch label="Stops" hint={STOPS_TEXT} value={settings.stopsOn} onChange={(stopsOn) => onChange({ stopsOn })} testID="carousel-stops" />
       </View>
       {arrow(1)}
     </View>

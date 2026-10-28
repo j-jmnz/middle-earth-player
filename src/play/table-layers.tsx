@@ -24,6 +24,7 @@ import { PhaseCarousel } from "./phase-carousel.tsx";
 import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
 import { LogPanel, PileList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
+import { alwaysRows } from "./settings-words.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { PILE_WORDS } from "./selectors.ts";
 import type { SheetNames } from "./sheet-types.ts";
@@ -154,10 +155,7 @@ export function TableLayers({
         {held?.kind === "settings" ? (
           <SettingsPanel
             settings={settings}
-            always={settings.alwaysUse.map((effectId) => {
-              const code = ctx.effects.find((effect) => effect.id === effectId)?.cardCode;
-              return { effectId, label: `Ask again: ${code ? nameOf(code) : effectId}` };
-            })}
+            always={alwaysRows(settings.alwaysUse, ctx.effects, nameOf, "Ask again: ")}
             onChange={(change) => tableSettings.getState().update(change)}
             onClose={close}
           />

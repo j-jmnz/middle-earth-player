@@ -89,6 +89,26 @@ export function Magnifier({ color }: { color: string }) {
   );
 }
 
+/**
+ * A gear drawn as views (the game icon font has none), for the Settings tab: a ring with eight teeth around it, open in the middle,
+ * so it takes the dock's fill in either theme. `color` is the tab's tint.
+ */
+export function GearMark({ color, size = 22 }: { color: string; size?: number }) {
+  const s = useUiScale();
+  const box = size * s;
+  const ring = box * 0.58;
+  const tooth = box * 0.17;
+  const length = box * 0.24;
+  return (
+    <View importantForAccessibility="no" style={{ width: box, height: box, alignItems: "center", justifyContent: "center" }}>
+      {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+        <View key={angle} style={{ position: "absolute", width: tooth, height: length, borderRadius: 1, backgroundColor: color, transform: [{ rotate: `${angle}deg` }, { translateY: -(ring / 2 + length * 0.1) }] }} />
+      ))}
+      <View style={{ position: "absolute", width: ring, height: ring, borderRadius: ring / 2, borderWidth: box * 0.14, borderColor: color }} />
+    </View>
+  );
+}
+
 const chipTonesOf = (palette: Palette) => ({
   neutral: { fill: withAlphaHex(palette.bone, 0.06), edge: withAlphaHex(palette.bone, 0.1), text: palette.bone },
   gold: { fill: withAlphaHex(palette.gold, 0.14), edge: withAlphaHex(palette.gold, 0.38), text: palette.goldHigh },

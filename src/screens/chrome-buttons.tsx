@@ -13,6 +13,9 @@ import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 import { touch, touchSlop, useUiScale } from "../play/ui-scale";
 
+// The night switch row the phase carousel's Stops and the Settings screen share (src/play cannot import screens, so it lives there).
+export { SettingSwitch } from "../play/setting-switch";
+
 /** The fill of a pressed button on night, and on paper, in the theme in force. */
 export function usePressedNight() {
   const palette = usePalette();
@@ -271,6 +274,7 @@ export function Segmented<T extends string>({
   testIDPrefix,
   stretch = false,
   compact = false,
+  words,
 }: {
   options: readonly T[];
   value: T;
@@ -280,6 +284,8 @@ export function Segmented<T extends string>({
   stretch?: boolean;
   // A 36 pt track in label type, its 44 pt targets kept by a vertical hit slop: a view switch beside a count.
   compact?: boolean;
+  // What each option says when its stored word is not the word to read ("system" says "Follow system"); the test id keeps the option.
+  words?: Partial<Record<T, string>>;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
@@ -301,7 +307,7 @@ export function Segmented<T extends string>({
             className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : "min-h-touch px-4"} ${stretch ? "flex-1" : ""}`}
             style={selected ? { ...slateSurface(false, t), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdgeOf(t) } : { borderWidth: 1, borderColor: "transparent" }}
           >
-            <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{option}</Text>
+            <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>
           </Pressable>
         );
       })}

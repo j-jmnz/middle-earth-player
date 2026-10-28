@@ -1,6 +1,6 @@
 // The dock of the tabs (docs/design-system.md, Components, AppTabBar). Re-exported by chrome.tsx.
-import type { ComponentProps } from "react";
-import { Pressable, Text, View } from "react-native";
+import type { ComponentProps, ReactElement } from "react";
+import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import type { Tabs } from "expo-router";
 
 import { usePressedNight } from "./chrome-buttons";
@@ -28,11 +28,25 @@ export function dockIcon(name: IconName) {
   };
 }
 
-/** The dock: five printed icons over their words on night. The current tab is lit: a gold bar glowing over a gold icon and word. */
+/** The `tabBarIcon` of a tab whose mark the icon font lacks and the chrome draws (the Settings gear): the same tint as a dock icon. */
+export function drawnIcon(Mark: (props: { color: string; size?: number }) => ReactElement) {
+  return function DrawnIcon({ focused }: { focused: boolean }) {
+    const palette = usePalette();
+    return <Mark color={focused ? palette.goldHigh : palette.faint} size={DOCK_ICON} />;
+  };
+}
+
+/** The dock: six tabs, printed icons (a drawn gear for Settings) over their words on night. The current tab is lit: a gold bar glowing over a gold icon and word. */
 export function AppTabBar({ state, descriptors, emitter, navigateToTab }: TabBarProps) {
   const palette = usePalette();
   const pressedNight = usePressedNight();
   const s = useUiScale();
+  // The icons and the bar grow with the scale but the words stay at Medium's size, so six labels fit across at Large (micro: 11 / 14 / 0.6).
+  // On a narrow phone (a tab under 70 pt) "Campaigns" in semibold gets a point less and tighter letters, so it reads whole.
+  const { width } = useWindowDimensions();
+  const tight = width / state.routes.length < 70;
+  const label = Math.min(s, 1);
+  const labelSize = { fontSize: (tight ? 10 : 11) * label, lineHeight: 14 * label, letterSpacing: (tight ? 0.2 : 0.6) * label };
   return (
     <View accessibilityRole="tablist" className="flex-row border-t border-hairline bg-night pb-safe">
       {state.routes.map((route, index) => {
@@ -67,7 +81,7 @@ export function AppTabBar({ state, descriptors, emitter, navigateToTab }: TabBar
             <View className="mb-1 items-center justify-center" style={{ height: DOCK_ICON * s }} importantForAccessibility="no-hide-descendants">
               {options.tabBarIcon?.({ focused, color: focused ? palette.goldHigh : palette.faint, size: DOCK_ICON * s })}
             </View>
-            <Text className={focused ? "text-micro font-semibold text-goldHigh" : "text-micro text-faint"} numberOfLines={1}>
+            <Text className={focused ? "font-semibold text-goldHigh" : "text-faint"} style={labelSize} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
               {label}
             </Text>
           </Pressable>
