@@ -31,6 +31,7 @@ import type { SheetNames } from "./sheet-types.ts";
 import { SpotlightScrim } from "./spotlight-scrim.tsx";
 import type { ReduceContext, TableStore } from "./store.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
+import { settingsPanelWidth } from "./settings-panel-width.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
 import { usePeek } from "./use-peek.ts";
@@ -64,6 +65,7 @@ export function TableLayers({
   commandWidth,
   anchorTop,
   onPreview,
+  onAllSettings,
 }: {
   store: TableStore;
   ctx: ReduceContext;
@@ -84,6 +86,8 @@ export function TableLayers({
   // The screen y of the top of the dock's block of readout, armed line and buttons, or null until it is measured.
   anchorTop: number | null;
   onPreview: (cardId: string) => void;
+  // The settings panel's All settings: leave the table for the Settings tab (the game is saved), as the menu's Rules does.
+  onAllSettings: () => void;
 }) {
   // The UI scale (ui-scale.ts): the layers' sizes below are Medium's times it.
   const s = useUiScale();
@@ -109,7 +113,9 @@ export function TableLayers({
   // The panel layer (everything but the carousel).
   const panel = reading && reading.kind !== "carousel" ? reading : null;
   const held = useHeld(panel);
-  const width = Math.max(READING_MIN * s, box.width);
+  const settingsOpen = held?.kind === "settings";
+  // The settings panel is wider than the other panels, so its three-word switches fit (settings-panel-width.ts).
+  const width = settingsOpen ? settingsPanelWidth(canvas, s, screen.width - insets.left - insets.right - 2 * EDGE * s) : Math.max(READING_MIN * s, box.width);
   const foot = Math.max(insets.bottom, EDGE * s);
   const open = reading?.kind === "carousel";
   const logging = held?.kind === "log";
@@ -129,7 +135,7 @@ export function TableLayers({
       ) : null}
       <ChoiceTray open={trayShown} place={box} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
-      <TrayFrame open={panel != null} surface="paper" testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE * s }}>
+      <TrayFrame open={panel != null} surface={settingsOpen ? "night" : "paper"} testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE * s }}>
         {held?.kind === "pile" ? (
           <PileList
             title={PILE_WORDS[held.pile]}
@@ -155,14 +161,15 @@ export function TableLayers({
         {held?.kind === "settings" ? (
           <SettingsPanel
             settings={settings}
-            always={alwaysRows(settings.alwaysUse, ctx.effects, nameOf, "Ask again: ")}
+            always={alwaysRows(settings.alwaysUse, ctx.effects, nameOf)}
             onChange={(change) => tableSettings.getState().update(change)}
+            onAllSettings={onAllSettings}
             onClose={close}
           />
         ) : null}
         {/* A choice is still open under the panel: say so, and the dock's armed button is untouched by closing it. */}
         {trayShown && panel ? (
-          <Text testID="choice-waiting" className="pt-1 text-center text-label text-inkMuted">
+          <Text testID="choice-waiting" className={`pt-1 text-center text-label ${settingsOpen ? "text-muted" : "text-inkMuted"}`}>
             Choice waiting
           </Text>
         ) : null}

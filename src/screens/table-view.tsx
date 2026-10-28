@@ -338,6 +338,11 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         commandWidth={commandWidth}
         anchorTop={anchor}
         onPreview={onPreview}
+        onAllSettings={() => {
+          // The panel closes first, so it is not still open when the player comes back.
+          setReading(null);
+          router.push({ pathname: "/settings", params: { from: "table" } });
+        }}
       />
       {/* Over the table and any open panel, centered on the screen under the top bar. */}
       {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + (TOP_BAR + 6 + (peek.words ? PEEK_ROOM : 0)) * s} width={screen.width} onBeat={choice.onBeat} /> : null}

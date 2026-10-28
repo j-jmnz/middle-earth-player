@@ -1,9 +1,10 @@
 // The chrome's words (docs/design-system.md, Type): eyebrows, section headings, the screen title, body and label text.
 // Re-exported by chrome.tsx.
 import { useMemo, type ReactNode } from "react";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 
 import { usePalette } from "./palette-hook";
+import { SectionHeading } from "../play/section-heading";
 import { withAlphaHex } from "../play/tokens";
 
 const eyebrowTone = { gold: "text-gold", moon: "text-moon", muted: "text-muted", inkLabel: "text-inkLabel" } as const;
@@ -17,18 +18,9 @@ export function Eyebrow({ children, tone = "gold", testID }: { children: string;
   );
 }
 
-/** A section's heading: a moonlit eyebrow and a rule that fades out to its right, with one optional control at the end. */
+/** A section's heading: a moonlit eyebrow and a rule that fades out to its right, with one optional control at the end (src/play/section-heading.tsx). */
 export function Section({ title, right, testID, className }: { title: string; right?: ReactNode; testID?: string; className?: string }) {
-  const palette = usePalette();
-  return (
-    <View testID={testID} className={`min-h-touch flex-row items-center gap-3${className ? ` ${className}` : ""}`}>
-      <Text accessibilityRole="header" className="font-display-bold text-eyebrow uppercase text-moon">
-        {title}
-      </Text>
-      <View className="h-px flex-1" style={{ backgroundImage: `linear-gradient(90deg, ${palette.hairline}, ${withAlphaHex(palette.hairline, 0)})`, backgroundColor: "transparent" }} />
-      {right}
-    </View>
-  );
+  return <SectionHeading title={title} right={right} testID={testID} className={className} />;
 }
 
 /** The soft night under a title, so it reads over a backdrop or a picture (the theme's own page color). */

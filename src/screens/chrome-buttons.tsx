@@ -11,10 +11,12 @@ import type { IconName } from "../play/icon-map";
 import { goldPlate, goldSurface, raisedEdgeOf, slateSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
-import { touch, touchSlop, useUiScale } from "../play/ui-scale";
+import { touch, useUiScale } from "../play/ui-scale";
 
 // The night switch row the phase carousel's Stops and the Settings screen share (src/play cannot import screens, so it lives there).
 export { SettingSwitch } from "../play/setting-switch";
+// The segmented switch is shared the same way (src/play/segmented.tsx).
+export { Segmented } from "../play/segmented";
 
 /** The fill of a pressed button on night, and on paper, in the theme in force. */
 export function usePressedNight() {
@@ -262,55 +264,6 @@ export function SearchField({
         accessibilityLabel={accessibilityLabel}
         className="min-h-touch min-w-0 flex-1 text-body text-bone"
       />
-    </View>
-  );
-}
-
-/** Two or three mutually exclusive words in a sunk night track. Selected is a slate plate in a gold edge, semibold. */
-export function Segmented<T extends string>({
-  options,
-  value,
-  onChange,
-  testIDPrefix,
-  stretch = false,
-  compact = false,
-  words,
-}: {
-  options: readonly T[];
-  value: T;
-  onChange: (next: T) => void;
-  testIDPrefix: string;
-  // Fill the width, each word an equal share (Easy / Normal on the briefing).
-  stretch?: boolean;
-  // A 36 pt track in label type, its 44 pt targets kept by a vertical hit slop: a view switch beside a count.
-  compact?: boolean;
-  // What each option says when its stored word is not the word to read ("system" says "Follow system"); the test id keeps the option.
-  words?: Partial<Record<T, string>>;
-}) {
-  const palette = usePalette();
-  const t = useTableTokens();
-  const s = useUiScale();
-  // The compact button is 32 pt tall (min-h-8) times the scale; a vertical slop makes up a 44 pt target at every scale.
-  const slop = touchSlop(s, 32 * s);
-  return (
-    <View accessibilityRole="radiogroup" className={`flex-row rounded-tile ${compact ? "p-0.5" : "p-1"} ${stretch ? "" : "self-start"}`} style={{ backgroundColor: palette.night, borderWidth: 1, borderColor: palette.hairline }}>
-      {options.map((option) => {
-        const selected = option === value;
-        return (
-          <Pressable
-            key={option}
-            testID={`${testIDPrefix}-${option.toLowerCase()}`}
-            accessibilityRole="radio"
-            accessibilityState={{ selected }}
-            onPress={() => onChange(option)}
-            hitSlop={compact ? { top: slop, bottom: slop } : undefined}
-            className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : "min-h-touch px-4"} ${stretch ? "flex-1" : ""}`}
-            style={selected ? { ...slateSurface(false, t), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdgeOf(t) } : { borderWidth: 1, borderColor: "transparent" }}
-          >
-            <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>
-          </Pressable>
-        );
-      })}
     </View>
   );
 }

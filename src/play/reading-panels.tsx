@@ -1,16 +1,15 @@
 // The reading panels (docs/design-system.md, Table, Panels; phase 21): a discard pile's cards, this round's log, the threat
 // panel from a dial and the table settings from the menu. They open in one place, the same tray frame (tray-frame.tsx), one at a
 // time: a new one replaces the last (reading.ts). Each has a labeled Close and closes on a tap outside. They stay on paper:
-// they are what gets read and recorded. Text, switches and tiles that show a card large; nothing here sends an intent.
-import { Pressable, ScrollView, Switch, Text, View } from "react-native";
+// they are what gets read and recorded. The settings panel is the exception, on night like the Settings tab. Text, switches and
+// tiles that show a card large; nothing here sends an intent.
+import { ScrollView, Text, View } from "react-native";
 
 import type { LogLine } from "./log.ts";
-import { SPEEDS } from "./motion-tokens.ts";
 import { ChromeButton, Tile } from "./sheet-paper.tsx";
 import { LineMark } from "./table-chrome.tsx";
-import { CONTRAST_LINE, GUIDE_LINE, HAPTICS_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, THEME_WORDS } from "./settings-words.ts";
-import { THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "./table-settings.ts";
-import { touch, useUiScale } from "./ui-scale.ts";
+import { SettingsRows, SettingTextButton } from "./setting-rows.tsx";
+import type { TableSettings } from "./table-settings.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 /**
@@ -132,117 +131,38 @@ export function ThreatPanel({
   );
 }
 
-// A labelled switch on paper: the whole row, at least 44 pt tall, is the control, and a screen reader hears it as a switch
-// with its detail as the hint. The tracks hold 3:1 against paper (inkMuted off, ink on).
-function PaperSwitch({ label, detail, value, onChange, testID }: { label: string; detail?: string; value: boolean; onChange: (value: boolean) => void; testID: string }) {
-  const t = useTableTokens();
-  const s = useUiScale();
-  return (
-    <Pressable
-      testID={`${testID}-row`}
-      accessibilityRole="switch"
-      accessibilityLabel={label}
-      accessibilityHint={detail}
-      accessibilityState={{ checked: value }}
-      onPress={() => onChange(!value)}
-      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 * s, paddingVertical: 4 * s, backgroundColor: pressed ? t.paperPressed : "transparent" })}
-    >
-      <View className="shrink" importantForAccessibility="no-hide-descendants">
-        <Text className="text-body text-ink">{label}</Text>
-        {detail ? <Text className="text-label text-inkMuted">{detail}</Text> : null}
-      </View>
-      <Switch
-        testID={testID}
-        accessible={false}
-        importantForAccessibility="no"
-        value={value}
-        onValueChange={onChange}
-        trackColor={{ false: t.inkMuted, true: t.ink }}
-        thumbColor={t.paper}
-        ios_backgroundColor={t.inkMuted}
-        // react-native-web draws the on thumb from activeThumbColor (teal by default); the RN types do not list it.
-        {...({ activeThumbColor: t.paper } as object)}
-      />
-    </Pressable>
-  );
-}
-
-// A choice among a few words (Animation speed, UI scale, Theme): one row at least 44 pt tall, as the switches are: the label and what it
-// does at the left, the choices as pills at the right (narrower when there are three). Each pill is a 44 pt target, the chosen one ink with
-// paper text, and a screen reader hears a radio group. Pills are `${testID}-${option}`.
-function PaperChoice<T extends string>({ label, detail, options, words, value, onChange, testID }: { label: string; detail?: string; options: readonly T[]; words: Readonly<Record<T, string>>; value: T; onChange: (value: T) => void; testID: string }) {
-  const t = useTableTokens();
-  const s = useUiScale();
-  const narrow = options.length > 2;
-  return (
-    <View testID={testID} accessibilityRole="radiogroup" accessibilityLabel={label} style={{ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 * s, paddingVertical: 4 * s }}>
-      <View className="shrink">
-        <Text className="text-body text-ink">{label}</Text>
-        {detail ? <Text className="text-label text-inkMuted">{detail}</Text> : null}
-      </View>
-      <View className="flex-row gap-1.5">
-        {options.map((option) => {
-          const on = value === option;
-          return (
-            <Pressable
-              key={option}
-              testID={`${testID}-${option}`}
-              accessibilityRole="radio"
-              accessibilityLabel={words[option]}
-              accessibilityState={{ checked: on }}
-              onPress={() => onChange(option)}
-              style={({ pressed }) => ({ minWidth: (narrow ? 50 : 60) * s, minHeight: touch(s, 44), paddingHorizontal: (narrow ? 6 : 8) * s, alignItems: "center", justifyContent: "center", borderRadius: 999, borderWidth: 1, borderColor: on ? t.ink : t.inkMuted, backgroundColor: on ? t.ink : pressed ? t.paperPressed : "transparent" })}
-            >
-              <Text className="text-label" style={{ color: on ? t.paper : t.ink }}>
-                {words[option]}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    </View>
-  );
-}
-
 /**
- * The table's settings, a paper side panel from the menu's Table settings: Animation speed, the Combat spotlight, Haptics, Strong outlines, UI scale, Theme, the First-game guide and the
- * Responses used every time. (The round's phases and the Stops switches are the carousel behind the rail, phase-carousel.tsx.)
- * Text and switches only; nothing here sends an intent.
+ * The table's settings, a night side panel from the menu's Table settings (user request, 2026-10-28): the Settings tab's own grouped rows
+ * (setting-rows.tsx) under a left-aligned title, minus Stops on, which the rail's carousel carries. At the foot, All settings opens the
+ * Settings tab (the game is saved) and Close closes the panel. Text and switches only; nothing here sends an intent.
  */
 export function SettingsPanel({
   settings,
   always,
   onChange,
+  onAllSettings,
   onClose,
 }: {
   settings: TableSettings;
   // The free Responses set to Always, by name: tap to have the table ask again.
   always: readonly { effectId: string; label: string }[];
   onChange: (change: Partial<TableSettings>) => void;
+  onAllSettings: () => void;
   onClose: () => void;
 }) {
   return (
     <View testID="settings-panel" collapsable={false} style={{ flexShrink: 1 }}>
-      <View className="items-center">
-        <Text accessibilityRole="header" className="font-display text-title text-ink">
-          Table settings
-        </Text>
-      </View>
-      <ScrollView className="mt-2" style={{ flexGrow: 0, flexShrink: 1 }} showsVerticalScrollIndicator persistentScrollbar>
-        <PaperChoice label="Animation speed" detail={SPEED_LINE} options={SPEEDS} words={SPEED_WORDS} value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} testID="settings-speed" />
-        <PaperSwitch label="Combat spotlight" detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID="settings-spotlight" />
-        <PaperSwitch label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID="settings-haptics" />
-        <PaperSwitch label="Strong outlines" detail={CONTRAST_LINE} value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID="settings-contrast" />
-        <PaperChoice label="UI scale" options={UI_SCALE_OPTIONS} words={SCALE_WORDS} value={settings.uiScale} onChange={(uiScale) => onChange({ uiScale })} testID="settings-scale" />
-        <PaperChoice label="Theme" options={THEME_OPTIONS} words={THEME_WORDS} value={settings.theme} onChange={(theme) => onChange({ theme })} testID="settings-theme" />
-        <PaperSwitch label="First-game guide" detail={GUIDE_LINE} value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID="settings-guide" />
-        {always.length > 0 ? <Text className="mt-2 text-label text-inkMuted">Responses used every time:</Text> : null}
-        {always.map((item) => (
-          <ChromeButton key={item.effectId} label={item.label} testID={`settings-always-${item.effectId}`} tone="ink" onPress={() => onChange({ alwaysUse: settings.alwaysUse.filter((id) => id !== item.effectId) })} />
-        ))}
+      <Text accessibilityRole="header" className="font-display text-title text-bone">
+        Table settings
+      </Text>
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} showsVerticalScrollIndicator persistentScrollbar>
+        <SettingsRows settings={settings} onChange={onChange} always={always} testPrefix="settings" first />
       </ScrollView>
-      <View className="items-center pt-2">
-        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="settings-close" tone="ink" onPress={onClose} />
+      <View className="flex-row items-center justify-between pt-2">
+        <View className="-ml-3">
+          <SettingTextButton label="All settings" accessibilityLabel="All settings. Opens the Settings tab and leaves the table" testID="settings-all" onPress={onAllSettings} />
+        </View>
+        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="settings-close" tone="bone" onPress={onClose} />
       </View>
     </View>
   );
