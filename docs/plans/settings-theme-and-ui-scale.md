@@ -1,6 +1,6 @@
 # Settings tab, UI scale, and Dark/Light theme
 
-User request, 2026-10-28. Status: planned, not started. Progress is recorded in `docs/phases/STATUS.md`.
+User request, 2026-10-28. Status: built; phone checks open. Progress is recorded in `docs/phases/STATUS.md`.
 
 ## Order of work
 

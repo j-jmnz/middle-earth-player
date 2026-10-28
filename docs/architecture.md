@@ -23,6 +23,7 @@ Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm i
 | Files and list images | `expo-file-system`, `expo-image` | image cache, lists, inspect, booklets |
 | Screen state | Zustand | subscribers of reducer output |
 | Haptics | `expo-haptics` (user request, 2026-10-25) | the table's dock: arm, send, undo, refusal; a card landing; a combat spotlight's strike |
+| Keep awake | `expo-keep-awake` (user request, 2026-10-28), the one new dependency of the settings work | the table, while Keep screen awake is on (`src/play/use-keep-awake.ts`) |
 | Backup exclusion | local Expo module `modules/image-backup-exclusion` | the image directory (`src/screens/images/queue.native.ts`) |
 | Local PDF reader | `modules/booklet-pdf`, a local Expo module: PDFKit on iOS, `PdfRenderer` on Android | `src/screens/booklets` |
 | Booklet import | `expo-document-picker`; bundled books through `expo-asset` | `src/screens/booklets` |
@@ -127,7 +128,7 @@ Three kinds of state, three owners.
 | Campaign log, pool, path | `src/campaign`, applied by the same commit | `user.db` `saves` |
 | A standalone game and its result | `src/rules` reducer, ended by `src/campaign/standalone.ts` | `user.db` `standalone_games`, each intent written when it commits |
 | Decks, image index, booklets, applied catalog version | screen writers | `user.db` |
-| The table's settings (stops, Responses always used, strong outlines, the first-game guide) | `src/play/table-settings.ts`, a vanilla Zustand store the table reads; `src/screens/settings-store.ts` hydrates it and writes each change | `user.db` `settings`, key `table` |
+| The app's settings (theme, UI scale, haptics, Reduce motion, keep awake, animation speed, spotlight, stops, Responses always used, strong outlines, the first-game guide; user request, 2026-10-28) | `src/play/table-settings.ts`, a vanilla Zustand store the table and the screens read; `src/play/ui-scale.ts` (the three factors, the 44 pt `touch` floor, `UiScaleContext`) and `src/play/theme.ts` (`resolveTheme`, `ThemeContext`); `src/screens/settings-store.ts` hydrates the store and writes each change. `routes/_layout.tsx` resolves the theme and the scale once, sets NativeWind's rem (14 × the factor) and the theme's color variables, and provides both contexts, so a list row pays one context read and no store selector | `user.db` `settings`, key `table` |
 | Card rows, effect rows, scenario definitions baked at build time | catalog build | `catalog.db`, replaced only by a version bump |
 | Finger position, card lift, in-progress sheet motion | Reanimated shared values on the UI thread | nowhere |
 | Which slice a screen draws | Zustand | memory, rehydrated from SQLite on launch |
