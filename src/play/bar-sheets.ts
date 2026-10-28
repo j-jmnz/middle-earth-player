@@ -1,6 +1,8 @@
 // The sheets of an ordinary action window (the window itself, the quest commit, the Actions list) and those a tap on a card
 // opens (playing it, paying for it, using its Action), and the intents a multi-choice or distribute sheet sends for what the
 // player picked. The reducer still checks every intent.
+import { legalAttackEnemies } from "../rules/combat.ts";
+import { sideQuestIds } from "../rules/families/sidequests-quest.ts";
 import { printedOf } from "../rules/printed.ts";
 import { stagingThreat } from "../rules/quest.ts";
 import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
@@ -59,17 +61,26 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
   const triggers = triggerOptions(game, ctx, legal, names);
   const commit = game.mode === "questCommit" && legal.some((intent) => intent.type === "Commit") ? commitSheet(game, ctx, names) : null;
   const usable = plays.length > 0 || triggers.length > 0;
+  // A card played from the discard pile is not on the table: the note says where it is.
+  const fromPile = plays.filter((id) => game.cards[id]?.zone === "discard");
+  // In combat with no enemy any of the seat's characters could attack (none engaged: Éowyn's +9 would buy nothing), the window says so.
+  const noFight = game.phase === "Combat" && !canFight(game, ctx) ? "No enemy can be attacked this phase." : null;
+  const pileNote = fromPile.length > 0 ? `Tap your discard pile to play ${[...new Set(fromPile.map((id) => names.card(id)))].join(" or ")} from it.` : null;
   // The eyebrow is the phase; the title says what the window is for.
   const base = { kind: "window" as const, key: `window:${game.round}:${game.mode}:${game.activeSeat}:${game.stepWindows.length}`, step: game.phase, commit, plays, triggers };
   if (commit) {
     // Once a character is committed, passing ends the commit rather than sending no one.
     const some = Object.values(game.cards).some((card) => card.committed && card.controller === game.activeSeat);
+    // A player side quest in a quest area takes characters committed to it instead (families/sidequests-quest.ts).
+    const sideQuests = sideQuestIds(game).map((id) => ({ id, label: names.card(id) }));
+    const toSide = sideQuests.length > 0 ? ` Or send them to ${sideQuests.map((quest) => quest.label).join(" or ")}: its willpower goes on it as progress.` : "";
     return some
-      ? { ...base, title: "Commit to the quest", note: "Tap more characters to quest, or end the commit.", pass: "Done", passNote: "Done ends the commit.", armed: "Tap again: no one else quests" }
+      ? { ...base, sideQuests, title: "Commit to the quest", note: `Tap more characters to quest, or end the commit.${toSide}`, pass: "Done", passNote: "Done ends the commit.", armed: "Tap again: no one else quests" }
       : {
           ...base,
+          sideQuests,
           title: "Commit to the quest",
-          note: "Tap characters to quest. They exhaust, so they cannot defend or attack this round.",
+          note: `Tap characters to quest. They exhaust, so they cannot defend or attack this round.${toSide}`,
           pass: "Commit no one",
           passNote: "Pass sends no one.",
           // The quest is never skipped (rr.step-3-3): staging still reveals and its threat still counts against no willpower.
@@ -80,7 +91,7 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
     return {
       ...base,
       title: "Play allies and attachments",
-      note: usable ? "Tap a glowing card to play it, or drag it." : "Nothing in your hand can be played now.",
+      note: [usable ? "Tap a glowing card to play it, or drag it." : "Nothing in your hand can be played now.", pileNote].filter((part) => part != null).join(" "),
       pass: "Pass",
       passNote: "Pass ends your planning.",
       armed: "Tap again: planning ends",
@@ -91,11 +102,17 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
   return {
     ...base,
     title: point?.title ?? "Action window",
-    note: [point?.note, usable ? "Tap a glowing card to use it." : null].filter((part) => part != null).join(" ") || null,
+    note: [point?.note, noFight, usable ? "Tap a glowing card to use it." : null, pileNote].filter((part) => part != null).join(" ") || null,
     pass: "Pass",
     passNote: game.seatCount > 1 ? "The game moves on once both players pass." : "Pass moves the game on.",
     armed: "Tap again to pass",
   };
+}
+
+// Some character of the acting seat could attack an enemy this combat phase, exhausted or not (it may be readied first).
+function canFight(game: ScenarioState, ctx: ReduceContext): boolean {
+  const seat = game.activeSeat;
+  return [...(game.seats[seat]?.heroes ?? []), ...(game.seats[seat]?.play ?? [])].some((id) => legalAttackEnemies(game, seat, id, ctx.cards, true).length > 0);
 }
 
 /**

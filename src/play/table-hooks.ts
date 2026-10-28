@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "zustand";
 
+import { stageText } from "./objective.ts";
 import { BEAT_MS, intentWords, momentOf, roundSummary, takenBack, type Moment } from "./outcome.ts";
 import { guideLine } from "./reference.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
@@ -38,13 +39,18 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     },
     [store, ctx, names],
   );
+  // How a quest stage is won or held, in its printed lines (objective.ts).
+  const stage = useCallback(
+    (cardId: string) => stageText(ctx, store.getState().game.cards[cardId]?.code ?? "", names.line),
+    [store, ctx, names],
+  );
   // After it, the state it made. Read once per moment.
   const said = useMemo((): Moment | null => {
     if (!shown) return null;
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
-    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow }));
-    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow });
-  }, [shown, names, shadow]);
+    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage }));
+    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow, stage });
+  }, [shown, names, shadow, stage]);
   // The round summary, once the round's own moment has had its say (outcome.ts, roundSummary).
   const summary = useMemo((): Moment | null => {
     if (shown?.kind !== "sent" || !shown.ended) return null;

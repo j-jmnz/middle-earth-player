@@ -2,13 +2,12 @@
 // each with the effects on it now, opened on the card that was pressed. Pure: the screen hands over how a code is pictured.
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
-import { questPointsOf } from "../rules/quest.ts";
 
 import { dungeonDetail } from "./dungeon-preview.ts";
 import { oathDetail } from "./oath-preview.ts";
 import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
-import { questObjective } from "./objective.ts";
+import { questObjective, stagePoints } from "./objective.ts";
 import { inspectTargets } from "./selectors.ts";
 import { whyNotPlayable } from "./why.ts";
 
@@ -24,7 +23,7 @@ export type Describe = (code: string) => Omit<PreviewCard, "code" | "effects" | 
 export function questTitle(game: ScenarioState, ctx: ReduceContext, cardId: string, name: string, line: (id: string) => string | null): Pick<PreviewCard, "title" | "detail"> | null {
   const stage = game.questStage === cardId ? game.cards[cardId] : undefined;
   if (!stage) return null;
-  const points = questPointsOf(game, stage, ctx.cards);
+  const points = stagePoints(game, stage, ctx);
   if (points != null) return { title: `${name} · ${stage.progress} / ${points}` };
   const objective = questObjective(game, ctx, line);
   return { title: name, detail: objective ? `To win: ${objective}` : "No quest points" };

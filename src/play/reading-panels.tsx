@@ -11,8 +11,25 @@ import { LineMark } from "./table-chrome.tsx";
 import type { TableSettings } from "./table-settings.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
-/** A discard pile's cards, the one on top first. A tap shows a card large; nothing here changes the game. */
-export function PileList({ title, cards, onRead, onClose }: { title: string; cards: readonly { id: string; label: string }[]; onRead: (cardId: string) => void; onClose: () => void }) {
+/**
+ * A discard pile's cards, the one on top first. A tap shows a card large. A card the open window lets the seat play from the
+ * pile (Elven-light) says so, and a tap on it opens its play, as a tap on a hand card does; a long press still shows it large.
+ */
+export function PileList({
+  title,
+  cards,
+  playable = [],
+  onRead,
+  onPlay,
+  onClose,
+}: {
+  title: string;
+  cards: readonly { id: string; label: string }[];
+  playable?: readonly string[];
+  onRead: (cardId: string) => void;
+  onPlay?: (cardId: string) => void;
+  onClose: () => void;
+}) {
   return (
     <View testID="pile-list" collapsable={false} style={{ flexShrink: 1 }}>
       <Text className="text-center font-display-bold text-eyebrow uppercase text-inkLabel">{`${cards.length} ${cards.length === 1 ? "card" : "cards"}`}</Text>
@@ -21,9 +38,13 @@ export function PileList({ title, cards, onRead, onClose }: { title: string; car
       </Text>
       <ScrollView className="mt-3" style={{ flexShrink: 1 }}>
         {cards.length === 0 ? <Text className="text-center text-body text-inkMuted">The pile is empty.</Text> : null}
-        {cards.map((card) => (
-          <Tile key={card.id} label={card.label} selected={false} testID={`pile-card-${card.id}`} onPress={() => onRead(card.id)} />
-        ))}
+        {cards.map((card) =>
+          playable.includes(card.id) && onPlay ? (
+            <Tile key={card.id} label={card.label} detail="Can be played from here now. Tap to play it." selected testID={`pile-card-${card.id}`} onPress={() => onPlay(card.id)} onLongPress={() => onRead(card.id)} />
+          ) : (
+            <Tile key={card.id} label={card.label} selected={false} testID={`pile-card-${card.id}`} onPress={() => onRead(card.id)} />
+          ),
+        )}
       </ScrollView>
       <View className="items-center pt-1">
         <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="pile-list-close" tone="ink" onPress={onClose} />

@@ -98,6 +98,12 @@ export function onlyAnswer(sheet: Sheet, legal: readonly LegalIntent[]): Choice 
 // What the table needs to open the sheets a tap leads to.
 export type TapContext = { game: ScenarioState; ctx: ReduceContext; legal: readonly LegalIntent[]; names: SheetNames };
 
+/** The cards of the seat's discard pile the open window lets it play (Elven-light, 10145:A:1): its pile glows and its list plays them. */
+export function discardPlays(game: ScenarioState, seat: number, sheet: Sheet): readonly string[] {
+  if (sheet.kind !== "window") return [];
+  return sheet.plays.filter((id) => game.cards[id]?.zone === "discard" && game.cards[id]?.controller === seat);
+}
+
 /** The cards a tap does something with while this sheet is open: they glow on the table. */
 export function tappable(sheet: Sheet): ReadonlySet<string> {
   switch (sheet.kind) {
@@ -339,6 +345,10 @@ export function dockFor(
       const count = choice.ids.length;
       if (sheet.commit && count > 0) {
         primary = { label: `Commit ${count}`, action: { kind: "intent", intent: { type: "Commit", cardIds: [...choice.ids] } }, arm: false, testID: "table-commit" };
+        // The same characters to a player side quest instead of the current quest.
+        for (const quest of sheet.sideQuests ?? []) {
+          secondary.push({ label: `To ${quest.label}`, action: { kind: "intent", intent: { type: "Commit", cardIds: [...choice.ids], sideQuestId: quest.id } }, arm: false, testID: `table-commit-side-${quest.id}` });
+        }
       } else {
         // Nothing picked: Pass is the filled button. In the commit window it sends no one on the quest.
         primary = PASS(sheet.pass, "table-pass", sheet.armed);
