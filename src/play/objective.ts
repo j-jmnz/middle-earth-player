@@ -6,7 +6,19 @@
 import type { Instruction } from "../catalog/boundary.ts";
 import { questPointsOf } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { inPlay } from "../rules/state.ts";
+import { inPlay, type CardInstance } from "../rules/state.ts";
+
+/**
+ * The quest points progress fills on this quest stage, or null when progress never defeats it: it prints none, or has 0 and its
+ * own record says it cannot be advanced, so it is won some other way ("Don't Leave the Path!", 01121:B:2, cannot be advanced: the players win by defeating Ungoliant's Spawn).
+ * Progress may still be placed on it; the table does not count it against a target.
+ */
+export function stagePoints(game: ScenarioState, stage: CardInstance, ctx: ReduceContext): number | null {
+  const points = questPointsOf(game, stage, ctx.cards);
+  // A stage that prints 0 and grows (Surprise Attack, 41005:B:2, 4 for each enemy) still fills with progress.
+  const barred = ctx.effects.some((effect) => effect.cardCode === stage.code && effect.timing === "constant" && effect.condition == null && effect.instructions.some((instruction) => instruction.verb === "Restrict" && instruction.what === "advance"));
+  return points === 0 && barred ? null : points;
+}
 
 function wins(instructions: readonly Instruction[]): boolean {
   return instructions.some((instruction) => instruction.verb === "WinGame" || ("options" in instruction && Array.isArray(instruction.options) && instruction.options.some((option: { instructions?: readonly Instruction[] }) => wins(option.instructions ?? []))));
@@ -15,7 +27,7 @@ function wins(instructions: readonly Instruction[]): boolean {
 /** The printed line that says how the stage is won, or null when the stage fills with progress (or nothing says). */
 export function questObjective(game: ScenarioState, ctx: ReduceContext, line: (id: string) => string | null): string | null {
   const stage = game.questStage ? game.cards[game.questStage] : undefined;
-  if (!stage || questPointsOf(game, stage, ctx.cards) != null) return null;
+  if (!stage || stagePoints(game, stage, ctx) != null) return null;
   const codes = new Set([stage.code, ...Object.values(game.cards).filter((card) => card.face !== "down" && (inPlay(card.zone) || card.zone === "staging")).map((card) => card.code)]);
   for (const effect of ctx.effects) {
     if (!codes.has(effect.cardCode) || !wins(effect.instructions)) continue;

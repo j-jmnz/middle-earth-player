@@ -21,8 +21,9 @@ const MOST = 5;
 // The banner shows its lines one beat at a time (resolve in beats): this long between two lines.
 export const BEAT_MS = 650;
 
-// `shadow` gives the printed shadow line of a card, or null when it has no shadow effect.
-type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null };
+// `shadow` gives the printed shadow line of a card, or null when it has no shadow effect; `stage` the printed lines of a quest
+// stage that say how it is won or held (not its When Revealed effects), or null.
+type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null };
 
 function seatWord(state: ScenarioState, seat: number): string {
   return state.seatCount > 1 ? `Player ${seat + 1} threat` : "Threat";
@@ -71,10 +72,19 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       case "progress":
         line(step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : `${step.amount} progress on ${names.card(step.targetId)}`, "progress");
         return;
-      case "advance":
+      case "advance": {
         if (!current) open(1, "The quest advances", "good");
         line(`The quest advances to ${names.card(step.cardId)}`);
+        // A stage a branch led to ("proceed to one of the 2 A Chosen Path stages, at random", 01120:B:1): the stages share a
+        // name, so the banner says the pick was the shuffle's and what the stage asks of the players.
+        const code = after.cards[step.cardId]?.code;
+        if (code != null && after.stages.some((stage) => stage.branch?.includes(code))) {
+          line("The path was chosen at random");
+          const text = names.stage?.(step.cardId);
+          if (text) line(text, null, [step.cardId]);
+        }
         return;
+      }
       case "strike": {
         const enemy = names.card(step.enemyId);
         const target = names.card(step.targetId);

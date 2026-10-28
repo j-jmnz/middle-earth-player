@@ -91,8 +91,10 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number): readon
         const card = game.cards[id];
         return card != null && card.host == null && !fighting.has(id);
       });
+      // The seat's player side quest stands first in its row: its quest area (families/sidequests-play.ts).
+      const quest = owner.questStage && game.cards[owner.questStage] ? [owner.questStage] : [];
       // The hero this seat's player holds as the prisoner is still in play: facedown beside the seat's cards, with Mendor under it.
-      return [...here, ...prisonersOfSeat(game, seat)];
+      return [...quest, ...here, ...prisonersOfSeat(game, seat)];
     }
     case "hand":
       return owner?.hand ?? NONE;

@@ -38,13 +38,24 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     },
     [store, ctx, names],
   );
+  // A quest stage's printed lines but its When Revealed ones: how it is won or held ("The players must find and defeat
+  // Ungoliant's Spawn to win this game", 01121:B:2).
+  const stage = useCallback(
+    (cardId: string) => {
+      const code = store.getState().game.cards[cardId]?.code;
+      const ids = [...new Set(ctx.effects.filter((effect) => effect.cardCode === code && effect.timing !== "whenRevealed").flatMap((effect) => effect.lines))].sort();
+      const text = ids.flatMap((id) => names.line(id) ?? []).join(" ");
+      return text === "" ? null : text;
+    },
+    [store, ctx, names],
+  );
   // After it, the state it made. Read once per moment.
   const said = useMemo((): Moment | null => {
     if (!shown) return null;
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
-    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow }));
-    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow });
-  }, [shown, names, shadow]);
+    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage }));
+    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow, stage });
+  }, [shown, names, shadow, stage]);
   // The round summary, once the round's own moment has had its say (outcome.ts, roundSummary).
   const summary = useMemo((): Moment | null => {
     if (shown?.kind !== "sent" || !shown.ended) return null;

@@ -37,6 +37,7 @@ import { useSpotlightHold } from "./use-spotlight.ts";
 import { BAR_PAD, MENU_BUTTON } from "./top-bar-layout.ts";
 import { DENSE_BELOW } from "./dock-budget.ts";
 import { outsideLayers, trayBox } from "./tray-logic.ts";
+import { discardPlays } from "./table-choice.ts";
 import type { TableChoice } from "./use-table-choice.ts";
 
 // The menu button's zone at the top bar's right. A tap there is the menu's, never the tray's.
@@ -129,7 +130,12 @@ export function TableLayers({
           <PileList
             title={PILE_WORDS[held.pile]}
             cards={[...(held.pile === "discard" ? (game.seats[seat]?.discard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
+            playable={held.pile === "discard" && !peek.words ? discardPlays(game, seat, choice.sheet) : []}
             onRead={onPreview}
+            onPlay={(cardId) => {
+              close();
+              choice.onTile(cardId);
+            }}
             onClose={close}
           />
         ) : null}

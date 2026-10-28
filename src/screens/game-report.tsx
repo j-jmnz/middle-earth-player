@@ -1,0 +1,64 @@
+// The details under Victory or Defeat (src/campaign/report.ts): when the scenario ended, the quest stage it reached, each
+// player's threat and heroes, the victory display, and for a win the parts of its score. Text on raised panels; it sends nothing.
+import { Text, View } from "react-native";
+
+import type { GameReport } from "../campaign/report";
+import { BodyText, Label, Panel, Section } from "./chrome";
+
+function Row({ label, value, tone = "bone", testID }: { label: string; value: string; tone?: "bone" | "muted" | "danger"; testID?: string }) {
+  return (
+    <View testID={testID} accessible accessibilityLabel={`${label}, ${value}`} className="min-h-7 flex-row items-center justify-between gap-3">
+      <Text className="shrink text-body text-bone">{label}</Text>
+      <Text className={`text-body ${tone === "danger" ? "text-danger" : tone === "muted" ? "text-muted" : "text-bone"}`}>{value}</Text>
+    </View>
+  );
+}
+
+export function GameReportView({ report, testID = "game-report" }: { report: GameReport; testID?: string }) {
+  const score = report.score;
+  return (
+    <View testID={testID} className="gap-4">
+      <View className="items-center gap-1">
+        <BodyText tone="muted" className="text-center" testID={`${testID}-ended`}>
+          {report.ended}
+        </BodyText>
+        {report.stage ? (
+          <BodyText className="text-center" testID={`${testID}-stage`}>
+            {report.stage.detail ? `${report.stage.title} · ${report.stage.detail}` : report.stage.title}
+          </BodyText>
+        ) : null}
+      </View>
+      {score ? (
+        <View>
+          <Section title="Score" />
+          <Panel>
+            {score.map((line, index) => (
+              <Row key={line.label} label={line.label} value={line.value} tone={index === score.length - 1 ? "bone" : "muted"} testID={`${testID}-score-${index}`} />
+            ))}
+            <Label className="mt-1">Lower is better.</Label>
+          </Panel>
+        </View>
+      ) : null}
+      {report.seats.map((seat, at) => (
+        <View key={seat.label}>
+          <Section title={seat.label} right={<Label>{seat.threat}</Label>} />
+          <Panel>
+            {seat.heroes.map((hero) => (
+              <Row key={`${at}:${hero.name}`} label={hero.name} value={hero.words} tone={hero.destroyed ? "danger" : "muted"} testID={`${testID}-hero-${at}-${hero.name}`} />
+            ))}
+          </Panel>
+        </View>
+      ))}
+      {report.victory.length > 0 ? (
+        <View>
+          <Section title="Victory display" />
+          <Panel>
+            <BodyText tone="muted" testID={`${testID}-victory`}>
+              {report.victory.join(" · ")}
+            </BodyText>
+          </Panel>
+        </View>
+      ) : null}
+    </View>
+  );
+}

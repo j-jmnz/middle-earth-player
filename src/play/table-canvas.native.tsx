@@ -104,7 +104,18 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const drawBody = (slot: CardSlot, dim: boolean) => {
     const image = images.get(slot.code) ?? null;
     // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
-    if (slot.kind === "pile" || slot.zone === "deck") return <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.code)} fonts={fonts} label backs={backs} />;
+    if (slot.kind === "pile" || slot.zone === "deck") {
+      const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.code)} fonts={fonts} label backs={backs} />;
+      // A discard pile holding a card the seat may play from it (Elven-light) glows; its list plays the card.
+      return slot.kind === "pile" && isTappable(slot) ? (
+        <Group>
+          <Glow slot={slot} picked={false} />
+          {pile}
+        </Group>
+      ) : (
+        pile
+      );
+    }
     const encounterBack = slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck";
     const picked = pickedCount(slot) > 0;
     const glows = slot.kind === "card" && (picked || isTappable(slot));

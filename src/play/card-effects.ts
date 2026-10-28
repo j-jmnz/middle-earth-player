@@ -12,6 +12,7 @@ import { flagged, inPlay, modifierActive, type ScenarioState } from "../rules/st
 
 import { engagesAt } from "./foresight.ts";
 import type { IconName } from "./icon-map.ts";
+import { stagePoints } from "./objective.ts";
 
 export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "threat" | "questPoints" | "engagementCost";
 
@@ -183,13 +184,14 @@ export function delayedLines(game: ScenarioState, cardId: string, cardName: (id:
 export function slotNumbers(game: ScenarioState, ctx: ReduceContext, cardId: string, seat = 0): SlotNumbers {
   const card = game.cards[cardId];
   const effects = cardEffects(game, ctx, cardId);
-  const questing = card != null && (card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation");
+  const questing = card != null && (card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest");
   const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
   const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
   return {
     effects,
     willpower: card?.committed ? modifiedStat(game, card, "willpower", ctx.cards) : null,
-    questPoints: questing ? questPointsOf(game, card, ctx.cards) : null,
+    // A stage that progress never defeats has no strip (objective.ts): "25 / 0" would read as a stage that should be won.
+    questPoints: questing ? (card.zone === "questStage" ? stagePoints(game, card, ctx) : questPointsOf(game, card, ctx.cards)) : null,
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
   };

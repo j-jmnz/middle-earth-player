@@ -1,12 +1,14 @@
 // The end of a scenario. Won: the choices the campaign card's Resolution records open, one group (and, when the card says
 // each player chooses, one seat, starting with the first player) at a time; each choice is sent to the reducer, and Confirm
 // writes the log. A choice the card lets a seat pass has a visible decline ("No boon") under Confirm, a radio in the same
-// group as the tiles. Lost: Defeat and nothing written (docs/design-system.md, Resolution).
+// group as the tiles. Lost: Defeat and nothing written (docs/design-system.md, Resolution). Under either, the scenario's details
+// (game-report.tsx).
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useStore } from "zustand";
 
+import { gameReport } from "../../../campaign/report";
 import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
 import { ActionBar, BodyText, Corners, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton } from "../../chrome";
@@ -18,6 +20,7 @@ import { recordCampaignRun } from "../../run-writers";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { CardThumb } from "../../images/picture";
+import { GameReportView } from "../../game-report";
 import { palette } from "../../palette.js";
 import { routeCode } from "../../route-code";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../table-session";
@@ -58,6 +61,8 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const refusal = useStore(opened.store, (state) => state.refusal);
   const [chosen, setChosen] = useState<string | null>(null);
   const view = useMemo(() => resolutionView(game, session.world), [game, session]);
+  // The scenario's details under Victory or Defeat: when it ended, the stage reached, the heroes, the score's parts.
+  const report = useMemo(() => (view.kind === "playing" ? null : gameReport(game, session.world.cards)), [view.kind, game, session]);
   // A loss is a run the moment it is reached (the table wrote it already; a game lost before this build is written here). The
   // run id is fixed, so a second write changes nothing, and leaving by Path loses nothing.
   const lost = view.kind === "lost";
@@ -83,7 +88,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
     return (
       <Screen testID="resolution" scene="plain">
         {back}
-        <View className="flex-1 items-center justify-center">
+        <ScreenScroll top={32} bottom={24}>
           <OutcomeTitle won={false} scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
           {view.reason ? (
             <BodyText className="mt-6 text-center" testID="resolution-reason">
@@ -93,7 +98,12 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
           <BodyText tone="muted" className={view.reason ? "mt-2 text-center" : "mt-6 text-center"} testID="resolution-consequence">
             The scenario was lost. Nothing is written to the log.
           </BodyText>
-        </View>
+          {report ? (
+            <View className="mt-8">
+              <GameReportView report={report} />
+            </View>
+          ) : null}
+        </ScreenScroll>
         <ActionBar>
           <SecondaryButton label="Back to path" testID="resolution-back" onPress={close} />
         </ActionBar>
@@ -152,6 +162,11 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                   <Tile key={tile.optionId} tile={tile} selected={tile.optionId === chosen} imagesrc={tile.code ? (session.facts.get(tile.code)?.imagesrc ?? null) : null} onPress={() => setChosen(tile.optionId)} />
                 ))}
               </View>
+            </View>
+          ) : null}
+          {report ? (
+            <View className="mt-8">
+              <GameReportView report={report} />
             </View>
           ) : null}
         </ScreenScroll>

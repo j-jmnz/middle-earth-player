@@ -15,21 +15,32 @@ export function completedRounds(state: ScenarioState): number {
   return Math.max(0, state.round - 1);
 }
 
-export function scoreOf(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioScore {
-  let total = 0;
+// The parts the score adds up (ltp.scoring): the players' final threat (50 for an eliminated player), the threat cost of each
+// destroyed hero (every hero of an eliminated player), the damage on the surviving heroes, the completed rounds and the
+// victory points.
+export type ScoreParts = { threat: number; destroyed: number; damage: number; rounds: number; victoryPoints: number };
+
+export function scoreParts(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScoreParts {
+  let threat = 0;
+  let destroyed = 0;
+  let damage = 0;
   for (const seat of state.seats.slice(0, state.seatCount)) {
-    total += seat.eliminated ? 50 : seat.threat;
+    threat += seat.eliminated ? 50 : seat.threat;
     for (const id of seat.discard) {
       const instance = state.cards[id];
-      if (instance && printedOf(cards, instance.code).type === "hero") total += printedOf(cards, instance.code).threat ?? 0;
+      if (instance && printedOf(cards, instance.code).type === "hero") destroyed += printedOf(cards, instance.code).threat ?? 0;
     }
     if (seat.eliminated) {
-      for (const id of seat.heroes) total += printedOf(cards, state.cards[id]?.code ?? "").threat ?? 0;
+      for (const id of seat.heroes) destroyed += printedOf(cards, state.cards[id]?.code ?? "").threat ?? 0;
     } else {
-      for (const id of seat.heroes) total += state.cards[id]?.damage ?? 0;
+      for (const id of seat.heroes) damage += state.cards[id]?.damage ?? 0;
     }
   }
   const victoryPoints = state.victory.reduce((sum, id) => sum + (printedOf(cards, state.cards[id]?.code ?? "").victory ?? 0), 0);
-  const rounds = completedRounds(state);
-  return { rounds, victoryPoints, score: total + 10 * rounds - victoryPoints };
+  return { threat, destroyed, damage, rounds: completedRounds(state), victoryPoints };
+}
+
+export function scoreOf(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioScore {
+  const parts = scoreParts(state, cards);
+  return { rounds: parts.rounds, victoryPoints: parts.victoryPoints, score: parts.threat + parts.destroyed + parts.damage + 10 * parts.rounds - parts.victoryPoints };
 }

@@ -1,7 +1,7 @@
 // What the canvas draws for the open moment, as strings that compare by value (so a change elsewhere in the game does not draw
 // the table again; docs/architecture.md, State) and the TableHighlight they build. Split out of use-table-choice.ts. Card ids
 // carry no commas.
-import { marked, tappable, type Choice } from "./table-choice.ts";
+import { discardPlays, marked, tappable, type Choice } from "./table-choice.ts";
 import type { ScenarioState } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
 import type { OptionMark, Sheet } from "./sheet-types.ts";
@@ -10,7 +10,8 @@ import type { TableHighlight } from "./table-canvas-types.ts";
 export type HighlightKeys = { glow: string; picked: string; share: TableHighlight["share"]; dim: boolean; marks: string; muted: string; beat: string };
 
 export function highlightKeys({ game, seat, sheet, choice, panel, beatKey }: { game: ScenarioState; seat: number; sheet: Sheet; choice: Choice; panel: boolean; beatKey: string }): HighlightKeys {
-  const glow = panel ? "" : [...tappable(sheet)].join(",");
+  // A card the seat may play from its discard pile is not drawn on the table: the pile glows, and its list plays it.
+  const glow = panel ? "" : [...tappable(sheet), ...(discardPlays(game, seat, sheet).length > 0 ? ["pile:discard"] : [])].join(",");
   // In planning, the hand cards that cannot be played now are dimmed, so the player sees which can (a tap says why not).
   const muted = !panel && sheet.kind === "window" && game.mode === "planning" ? (game.seats[seat]?.hand ?? []).filter((id) => !sheet.plays.includes(id)).join(",") : "";
   const marks = (panel ? [] : optionMarksOf(sheet)).map(([id, mark]) => `${id}=${mark.icon}:${mark.value}:${mark.danger ? 1 : 0}`).join(",");
