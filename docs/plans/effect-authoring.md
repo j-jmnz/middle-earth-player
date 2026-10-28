@@ -246,4 +246,11 @@ two.
   no flip that turns a hero into an enemy and back. The line stays open and its text shows as inactive. It needs the enemy
   side's data from a source or an override, then a hero-to-enemy `FlipCard`.
 
+- **Engine gap: `usage.ts` does not announce an exhausted cost.** A Forced or Response effect that listens for "after this card
+  exhausts" does not hear a card that was exhausted as the cost of an Action (`src/rules/usage.ts` pays the cost without an
+  `exhausted` event). Changing that would move The Ring Goes South's golden, so Cave Torch (41029:A:2) and Cavern Warg
+  (41031:A:1) exhaust as the first instruction of the record, where `Exhaust` announces the event and the Torch's Forced effect
+  (41029:A:3) hears it. A new card whose Forced effect listens for an exhaust does the same; the gap closes only with an
+  `ENGINE_VERSION` bump and the goldens it moves.
+
 When you leave any other line open, report it with the mechanic it needs, and write records for the card's other lines.

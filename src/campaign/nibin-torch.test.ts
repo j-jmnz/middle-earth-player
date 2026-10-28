@@ -6,7 +6,9 @@ import { syncConstants } from "../rules/constants.ts";
 import { legalAttackEnemies } from "../rules/combat.ts";
 import { legalIntents, legalTargets } from "../rules/legal.ts";
 import type { PlayerIntent } from "../rules/reduce.ts";
-import { modifiedStat } from "../rules/keywords.ts";
+import { ruleCause } from "../rules/cause.ts";
+import { runInstruction } from "../rules/interpret.ts";
+import { modifiedStat, placeDamage } from "../rules/keywords.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, travelTo, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
@@ -87,6 +89,19 @@ describe("Lightless Passage (41033:A:1, 41033:A:2)", () => {
     const enemy = hit.run.state.cards[first(hit.run.state, "grunt")];
     expect(enemy?.damage).toBe(0);
     expect(hit.run.state.modifiers.some((modifier) => modifier.stat === "combatDamageCanceled")).toBe(false);
+  });
+
+  it("places no combat damage on an enemy that holds the Shadow's flag, and still places other damage (41033:A:2)", () => {
+    // The fight above never lands damage on the attacker (a Shadow card's effect ends with the attack), so the flag is read directly.
+    const made = make({ engaged: [{ code: "grunt", seat: 0 }] });
+    const id = first(made.state, "grunt");
+    const flagged = runInstruction(made.state, { verb: "ModifyStat", stat: "combatDamageCanceled", amount: 1, until: "endOfAttack", target: "self" }, { seat: 0, sourceId: id }, made.ctx, []);
+    expect(flagged.modifiers.some((modifier) => modifier.stat === "combatDamageCanceled" && modifier.instanceId === id)).toBe(true);
+    const steps: never[] = [];
+    expect(placeDamage(flagged, id, 3, made.ctx.cards, steps, "combat", ruleCause("rr.step-6-4-3")).cards[id]?.damage).toBe(0);
+    expect(steps).toEqual([]);
+    expect(placeDamage(flagged, id, 3, made.ctx.cards, [], "framework", ruleCause("rr.damage")).cards[id]?.damage).toBe(3);
+    expect(placeDamage(made.state, id, 3, made.ctx.cards, [], "combat", ruleCause("rr.step-6-4-3")).cards[id]?.damage).toBe(3);
   });
 });
 
