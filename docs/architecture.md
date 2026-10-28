@@ -264,7 +264,7 @@ On the fetch recorded in the brief, 1,039 official rows had an `imagesrc`. About
 
 ## Screens
 
-Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaigns, Scenarios, Decks, Cards and Rules (user request, 2026-10-25).
+Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaigns, Scenarios, Decks, Cards, Rules and Settings (user requests, 2026-10-25 and 2026-10-28); in an expanded window (840 points and wider, by size class, not device) the dock is a rail down the left edge with the same tabs.
 
 | Route | Reads | Writes |
 | --- | --- | --- |
@@ -290,7 +290,7 @@ The Rules tab, the path, the briefing, the log, and the table each open the book
 
 NativeWind 4.2.7 styles the chrome. Tokens and screen specs live in [design-system.md](design-system.md). The table does not use NativeWind for cards. Tap targets are at least 44 points. The phase rail, the choice buttons, and the booklet close control sit in thumb reach. Reduced motion snaps the same transitions. A new gesture cancels the animation in progress.
 
-The table is played in landscape only: the root `Stack` sets `orientation` to portrait for every route and to landscape for `table/[saveId]` and `standalone/table/[gameId]` (react-native-screens, no orientation package); `app.json` allows both so the stack option decides. On iPad, `app.json` sets `supportsTablet` and `requireFullScreen` (iPadOS honors an orientation lock only for a full-screen app); if iPadOS still hands the table a portrait window, `table-view.tsx` shows a sentence asking to turn the screen, with Back, instead of the table. The card, booklet, glossary and rule routes follow the phone, so opening them from the table does not turn it.
+The table is played in landscape only; the other routes follow the screen. The root `Stack` sets `orientation` to `useIsTablet() ? "all" : "portrait"` (`src/screens/routes/_layout.tsx`; a tablet is a screen whose shorter side is 600 points or more) and to landscape for `table/[saveId]` and `standalone/table/[gameId]` (react-native-screens, no orientation package). A tablet rotates every route but the table. A phone stays portrait but for the table and the card, booklet, glossary and rule routes, which are `"all"` on phones and tablets alike, so a phone's landscape table is not turned back to read a card. `app.json` leaves `orientation` at `default`, so the stack option decides. On iPad, `app.json` sets `supportsTablet` and `requireFullScreen` (iPadOS honors an orientation lock only for a full-screen app). Two platform notes: Android 16 (targetSdk 36) ignores orientation locks on screens 600 dp and wider, and iPadOS 26 deprecates `requireFullScreen`. Either can hand the table a portrait window, so `table-view.tsx` shows a sentence asking to turn the screen, with Back, instead of the table; that guard covers both, and no Android `appCategory` plugin is added.
 
 The phase rail, threat, life, the dock, the panels and the preview are React Native text and buttons with stable testIDs. Card pictures stay on the Skia canvas. A tap on a table card picks it for the open moment and sends an intent only when the moment has one answer; a long press shows it large with its attachments and the effects on it, and Details there opens the card route. The picture stays on the canvas. The inspect screen is the React Native view. Those ids are how Maestro finds a control. A card drawn only on the canvas is not a view Maestro can address.
 

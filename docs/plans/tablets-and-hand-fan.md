@@ -1,6 +1,6 @@
 # Tablet landscape, fanned hand scrub, no preview Close, table settings panel
 
-User request, 2026-10-28. Status: planned. Progress is recorded in `docs/phases/STATUS.md`.
+User request, 2026-10-28. Status: implemented, 2026-10-28. Progress is recorded in `docs/phases/STATUS.md`.
 
 ## Context
 The user asked for five changes:

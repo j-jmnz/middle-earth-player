@@ -244,7 +244,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       <Screen testID="table-portrait" scene="felt">
         <NavBar onBack={() => goBack(router, nav.back)} backTestID="table-back" backLabel={nav.backLabel} />
         <View className="flex-1 items-center justify-center px-6">
-          <BodyText tone="muted">Turn the screen to landscape to play. The game is saved.</BodyText>
+          <BodyText tone="muted">Make this window wider, or turn the screen to landscape, to play. The game is saved.</BodyText>
         </View>
       </Screen>
     );

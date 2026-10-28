@@ -19,6 +19,7 @@ import { palettes, themeVars } from "../palette.js";
 import { tableSettings, type ThemeOption } from "../../play/table-settings";
 import { ThemeContext, useResolvedTheme, type ThemeName } from "../../play/theme";
 import { REM_BASE, UiScaleContext, uiFactor } from "../../play/ui-scale";
+import { useIsTablet } from "../../play/use-size-class";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -48,6 +49,7 @@ export default function RootLayout() {
   const scaleSetting = useStore(tableSettings, (state) => state.settings.uiScale);
   const scale = uiFactor(scaleSetting);
   const themeStyle = useMemo(() => vars(themeVars(resolved)), [resolved]);
+  const tablet = useIsTablet();
 
   // Before paint, so a changed scale never shows a frame at the old size.
   useLayoutEffect(() => {
@@ -158,13 +160,14 @@ export default function RootLayout() {
           ) : databases ? (
             <DatabaseBoundary>
               <DatabaseProvider databases={databases}>
-                {/* Portrait everywhere but the table, which is played in landscape only. The card, booklet, glossary and rule screens
-                    open from both, so they follow the phone and the table does not turn the phone back to read a card. */}
+                {/* A tablet (shorter side 600 points or more) turns every route but the table, which is landscape only. A phone is portrait
+                    except on the table and on the card, booklet, glossary and rule screens, which are "all" on phones and tablets alike,
+                    so a phone's landscape table is not turned back to read a card. */}
                 <Stack
                   screenOptions={{
                     headerShown: false,
                     contentStyle: { backgroundColor: palette.night },
-                    orientation: "portrait",
+                    orientation: tablet ? "all" : "portrait",
                   }}
                 >
                   {/* The table hides the status bar for room, and turns off the edge swipe back: a drag from the hand's edge
@@ -173,7 +176,7 @@ export default function RootLayout() {
                   <Stack.Screen name="standalone/table/[gameId]" options={{ orientation: "landscape", statusBarHidden: true, gestureEnabled: false }} />
                   <Stack.Screen name="card/[code]" options={{ orientation: "all" }} />
                   <Stack.Screen name="booklet/[id]" options={{ orientation: "all" }} />
-                  {/* The table's Rules opens the glossary, so it and a rule turn with the phone too. */}
+                  {/* The table's Rules opens the glossary, so it and a rule are "all" too. */}
                   <Stack.Screen name="glossary" options={{ orientation: "all" }} />
                   <Stack.Screen name="rule/[id]" options={{ orientation: "all" }} />
                 </Stack>
