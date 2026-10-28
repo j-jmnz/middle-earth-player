@@ -13,6 +13,7 @@ import { withAlphaHex } from "../play/tokens";
 import { usePalette } from "./palette-hook";
 import { useUiScale } from "../play/ui-scale";
 import { poolDetail, type PoolCard } from "./pool-filter";
+import { CARD_RATIO } from "./pool-grid";
 
 export type PoolRowCard = PoolCard & {
   typeName: string;
@@ -79,8 +80,6 @@ export const PoolCardRow = memo(function PoolCardRow({
     />
   );
 });
-
-const CARD_RATIO = 600 / 429;
 
 // One card in the grid: its picture (the name and type on night while the file is missing), its name under it in label type, the
 // count the deck holds (gold) and, while adding, − and + under it. A tap opens the card, a long press shows it large, as a row does.

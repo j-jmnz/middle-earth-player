@@ -8,7 +8,7 @@ import { editSavedDeck, startNewDeck } from "../../deck-draft";
 import { copyDeckName, deckCountLine, deckReadiness, newDeckName, notAppliedLine } from "../../deck-status";
 import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, type SavedDeck } from "../../deck-store";
 import { useDatabases } from "../../databases";
-import { deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck-list";
+import { COVER_GAP, deckListLayout, deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck-list";
 import { DeckListBar } from "../../deck-list-bar";
 import { DeckCover, DeckRow, heroFace, type HeroFace } from "../../hero-tile";
 import {
@@ -20,6 +20,7 @@ import {
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
 import { useUiScale } from "../../../play/ui-scale";
+import { useSizeClass } from "../../../play/use-size-class";
 
 type Row =
   | { kind: "deck"; key: string; deck: SavedDeck; starter: boolean }
@@ -106,6 +107,7 @@ function DeckActions({
 export default function Decks() {
   const router = useRouter();
   const s = useUiScale();
+  const { size } = useSizeClass();
   const seed = useSeedStatus();
   const seedReason = useSeedReason();
   const { catalog, user } = useDatabases();
@@ -115,6 +117,9 @@ export default function Decks() {
   const [asking, setAsking] = useState<Asking>(null);
   const [filter, setFilter] = useState<DeckListFilter>(emptyDeckListFilter);
   const view = useDeckListView();
+  // The Cards view is a grid of covers where the list is wide, the List view a reading column (deckListLayout).
+  const [listWidth, setListWidth] = useState(0);
+  const { columns, inset } = deckListLayout(listWidth, size, view, s);
 
   const refresh = useCallback(() => {
     setSaved(seed === "pending" ? [] : listDecks(user));
@@ -182,7 +187,7 @@ export default function Decks() {
     AccessibilityInfo.announceForAccessibility(action === "delete" ? "Delete this deck? Tap Delete for good to confirm." : "Reset this deck? Tap Reset to confirm.");
   }
 
-  function renderRow({ item }: { item: Row }) {
+  function renderBody(item: Row) {
     if (item.kind === "empty") {
       return (
         <BodyText testID="decks-empty" tone="muted" className="mt-4">
@@ -244,12 +249,18 @@ export default function Decks() {
     ) : null;
     if (view === "List") return <DeckRow {...summary}>{actions}</DeckRow>;
     return (
-      <View className="pb-3">
+      <View className="pb-3" style={columns > 1 ? { paddingHorizontal: (COVER_GAP / 2) * s } : undefined}>
         <DeckCover {...summary} height={COVER_HEIGHT * s}>
           {actions}
         </DeckCover>
       </View>
     );
+  }
+
+  // A full-width line sits level with the covers' outer edges: the grid's negative margin is cancelled by the covers' own padding.
+  function renderRow({ item }: { item: Row }) {
+    const body = renderBody(item);
+    return item.kind !== "deck" && columns > 1 ? <View style={{ paddingHorizontal: (COVER_GAP / 2) * s }}>{body}</View> : body;
   }
 
   const filters =
@@ -293,9 +304,23 @@ export default function Decks() {
           Loading
         </BodyText>
       ) : (
-        <View className="min-h-0 flex-1">
+        <View
+          className="min-h-0 flex-1"
+          onLayout={(event) => {
+            const next = Math.floor(event.nativeEvent.layout.width);
+            setListWidth((current) => (current === next ? current : next));
+          }}
+        >
+          {/* Outside compact it mounts once the width is measured, so the columns are known before the first cover draws; a new column count remounts it. */}
+          {listWidth > 0 || size === "compact" ? (
           <FlashList
+            key={`${view}:${columns}`}
             data={rows}
+            numColumns={columns}
+            // The empty, no-match and missing-starters lines take the whole row, not one cover's share of it.
+            overrideItemLayout={(layout, item) => {
+              layout.span = item.kind === "deck" ? 1 : columns;
+            }}
             keyExtractor={(item) => item.key}
             getItemType={(item) => `${item.kind}:${view}`}
             renderItem={renderRow}
@@ -304,8 +329,10 @@ export default function Decks() {
             keyboardDismissMode="on-drag"
             ListHeaderComponent={<View className="h-3" />}
             ListFooterComponent={<View className="h-6" />}
-            style={{ flex: 1 }}
+            style={{ flex: 1, ...(columns > 1 ? { marginHorizontal: -(COVER_GAP / 2) * s } : {}) }}
+            contentContainerStyle={inset > 0 ? { paddingHorizontal: inset } : undefined}
           />
+          ) : null}
         </View>
       )}
       <ToastView />

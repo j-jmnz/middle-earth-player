@@ -15,18 +15,16 @@ import { notAppliedCodes, notAppliedWords } from "../play/not-applied";
 import { usePalette } from "./palette-hook";
 import { addingView, browseView } from "./pool-view";
 import { PoolCardCell, PoolCardRow, type PoolRowCard } from "./pool-cards";
-import { gridCardWidth, gridOffset } from "./pool-grid";
+import { LIST_ROW_HEIGHT, gridCardWidth, gridOffset, poolCellHeight, poolColumns, recyclePool } from "./pool-grid";
 import { activeFilterCount, cycleGroups, emptyPoolFilter, filterPool, sortPool, type PoolFilter } from "./pool-filter";
 import { PoolFilterSheet, typeChoices } from "./pool-filter-sheet";
 import { ToastView } from "./toast-view";
+import { gutter } from "../play/size-class";
 import { useUiScale } from "../play/ui-scale";
+import { useSizeClass } from "../play/use-size-class";
 
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
-// FlashList keeps every cell it has ever mounted in its recycle pool unless told otherwise. A screen of three-across cards is about
-// twenty cells, so this keeps a screen's worth for reuse and unmounts the rest as they scroll off.
-const RECYCLE_POOL = 24;
-
 function poolKey(item: PoolRowCard): string {
   return item.code;
 }
@@ -105,11 +103,20 @@ export function CardPool({
   const addingTo = addingView.useValue();
   const viewSetting = adding ? addingView : browseView;
   const view = adding ? addingTo : browsing;
-  // The grid's cards share the list's measured width: three across to browse, two while adding so each card's stepper fits under it.
-  const columns = adding ? 2 : 3;
+  // The grid's cards share the list's measured width: three across to browse, two while adding so each card's stepper fits under it
+  // (a phone's exact counts), and more where a tablet's list has the room (pool-grid.ts).
   const [listWidth, setListWidth] = useState(0);
+  const [listHeight, setListHeight] = useState(0);
   const scale = useUiScale();
+  const { size } = useSizeClass();
+  const columns = poolColumns(listWidth, adding, scale);
   const cellWidth = gridCardWidth(listWidth, columns, scale);
+  // FlashList keeps every cell it has ever mounted in its recycle pool unless told otherwise: a screen's worth (and two rows each
+  // way) for reuse, and the rest unmounted as they scroll off. A phone's grid is about twenty cells, so it keeps the 24 it always had.
+  const grid = view === "Grid";
+  // The list view's rows are a reading column outside compact; the grid fills the width.
+  const inset = grid ? 0 : gutter(listWidth, size, "readable", scale);
+  const recycle = grid ? recyclePool(columns, listHeight, poolCellHeight(cellWidth, adding, scale)) : recyclePool(1, listHeight, LIST_ROW_HEIGHT * scale);
   // Sorted in memory: a printing's tag ("(MotK) Aragorn") files under the name.
   const [rows] = useState(() =>
     sortPool(
@@ -173,7 +180,6 @@ export function CardPool({
   const filters = activeFilterCount(applied);
   const openCard = useCallback((code: string) => router.push({ pathname: "/card/[code]", params: { code } }), [router]);
   const previewCard = preview.open;
-  const grid = view === "Grid";
   // One function while nothing it reads changes, so FlashList and the memoized cards skip the cards a render did not touch.
   const renderItem = useCallback(
     ({ item, index }: { item: PoolRowCard | undefined; index: number }) => {
@@ -247,17 +253,20 @@ export function CardPool({
           onLayout={(event) => {
             const next = Math.floor(event.nativeEvent.layout.width);
             setListWidth((current) => (current === next ? current : next));
+            const nextHeight = Math.floor(event.nativeEvent.layout.height);
+            setListHeight((current) => (current === nextHeight ? current : nextHeight));
           }}
         >
           {/* Mounted once the width is measured, never before: a grid cell drawn at no width is no height, and FlashList then lays
               out every card of the pool as on screen and mounts all of them (852 at once), which it never gives back. */}
           {cellWidth > 0 ? (
             <FlashList
-              key={view}
+              key={`${view}:${grid ? columns : 1}`}
               data={visible}
               keyExtractor={poolKey}
               numColumns={grid ? columns : 1}
               style={{ flex: 1 }}
+              contentContainerStyle={inset > 0 ? { paddingHorizontal: inset } : undefined}
               extraData={draft}
               keyboardShouldPersistTaps="handled"
               onViewableItemsChanged={onViewableItemsChanged}
@@ -269,7 +278,7 @@ export function CardPool({
                 </BodyText>
               }
               renderItem={renderItem}
-              maxItemsInRecyclePool={RECYCLE_POOL}
+              maxItemsInRecyclePool={recycle}
             />
           ) : null}
         </View>

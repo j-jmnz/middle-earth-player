@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { deckListFiltered, deckListSpheres, emptyDeckListFilter, filterDecks, getDeckListView, setDeckListView } from "./deck-list.ts";
+import { deckListFiltered, deckListSpheres, emptyDeckListFilter, filterDecks, deckListLayout, getDeckListView, setDeckListView } from "./deck-list.ts";
 
 const heroes = new Map([
   ["sam", { name: "Sam Gamgee", sphereCode: "leadership", sphereName: "Leadership" }],
@@ -46,5 +46,25 @@ describe("deck list view", () => {
     expect(getDeckListView()).toBe("Cards");
     setDeckListView("List");
     expect(getDeckListView()).toBe("List");
+  });
+});
+
+describe("deckListLayout", () => {
+  it("is one full-width column of covers on a phone, at any scale", () => {
+    expect(deckListLayout(342, "compact", "Cards")).toEqual({ columns: 1, inset: 0 });
+    expect(deckListLayout(900, "compact", "Cards", 0.9)).toEqual({ columns: 1, inset: 0 });
+    expect(deckListLayout(342, "compact", "List")).toEqual({ columns: 1, inset: 0 });
+  });
+
+  it("is a grid of covers in a wider window", () => {
+    expect(deckListLayout(690, "medium", "Cards").columns).toBe(2);
+    expect(deckListLayout(1000, "expanded", "Cards").columns).toBe(3);
+    // At Large the same window holds fewer, since a cover keeps its share of the screen.
+    expect(deckListLayout(690, "medium", "Cards", 1.15).columns).toBe(1);
+  });
+
+  it("centres the list view's rows in a reading column", () => {
+    expect(deckListLayout(1000, "expanded", "List")).toEqual({ columns: 1, inset: 180 });
+    expect(deckListLayout(690, "medium", "List").inset).toBe(25);
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { GRID_GAP, gridCardWidth, gridOffset, poolColumns, recyclePool } from "./pool-grid.ts";
+import { GRID_GAP, gridCardWidth, gridOffset, poolCellHeight, poolColumns, recyclePool } from "./pool-grid.ts";
 
 describe("pool grid", () => {
   it("lays the cards inside FlashList's equal columns, with equal gaps and none past the edge", () => {
@@ -65,5 +65,29 @@ describe("pool grid", () => {
     expect(recyclePool(2, 700, 300)).toBe(24);
     expect(recyclePool(9, 800, 150)).toBe(9 * (6 + 2));
     expect(recyclePool(3, 700, 0)).toBe(24);
+  });
+});
+
+describe("poolCellHeight", () => {
+  it("is the picture, the name and the gap, plus the stepper while adding", () => {
+    expect(poolCellHeight(100, false)).toBe(Math.round(100 * (600 / 429)) + 38);
+    expect(poolCellHeight(100, true)).toBe(poolCellHeight(100, false) + 50);
+    expect(poolCellHeight(100, false, 1.15)).toBeCloseTo(Math.round(100 * (600 / 429)) + 38 * 1.15);
+  });
+});
+
+describe("the recycle pool on a phone", () => {
+  it("stays at the 24 a phone has always had", () => {
+    for (const listWidth of [312, 342, 392]) {
+      const columns = poolColumns(listWidth, false);
+      const cell = poolCellHeight(gridCardWidth(listWidth, columns), false);
+      expect(recyclePool(columns, 560, cell)).toBe(24);
+    }
+  });
+
+  it("grows with the cells in view on a wide grid", () => {
+    const columns = poolColumns(1000, false);
+    expect(columns).toBeGreaterThan(3);
+    expect(recyclePool(columns, 700, poolCellHeight(gridCardWidth(1000, columns), false))).toBeGreaterThan(24);
   });
 });

@@ -37,3 +37,19 @@ export function recyclePool(columns: number, listHeight: number, cellHeight: num
   const rows = cellHeight > 0 ? Math.ceil(listHeight / cellHeight) : 0;
   return Math.max(RECYCLE_FLOOR, columns * (rows + 2));
 }
+
+// A card picture's height over its width (a printed card, 429 by 600).
+export const CARD_RATIO = 600 / 429;
+
+// A list row's height, in Medium's points: sizes the recycle pool when the pool shows rows rather than a grid.
+export const LIST_ROW_HEIGHT = 56;
+
+/**
+ * A grid cell's height for a card `width` wide, in screen points at the UI scale `s`: the picture, the name under it and the gap to
+ * the next row, and while adding the stepper under the name. Close enough to size FlashList's recycle pool (`recyclePool`); the cells
+ * themselves lay out from their own content.
+ */
+export function poolCellHeight(width: number, adding: boolean, s = 1): number {
+  const picture = Math.round(width * CARD_RATIO);
+  return picture + (14 + 4 + 20) * s + (adding ? (6 + 44) * s : 0);
+}

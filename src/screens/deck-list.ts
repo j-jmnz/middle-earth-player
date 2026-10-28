@@ -1,3 +1,4 @@
+import { columnsFor, gutter, type SizeClass } from "../play/size-class";
 import { sessionSetting } from "./session-setting.ts";
 
 // The deck list's filter and view. Filtering runs in memory on the decks the list already read.
@@ -63,3 +64,17 @@ const deckListView = sessionSetting<DeckListView>("Cards");
 export const setDeckListView = deckListView.set;
 export const getDeckListView = deckListView.get;
 export const useDeckListView = deckListView.useValue;
+
+/** The gap between two covers in the Cards view's grid, in Medium's points. */
+export const COVER_GAP = 12;
+const COVER_TARGET = 300;
+
+/**
+ * How the deck list lays out in a list `width` wide (screen points, UI scale `s`): the Cards view is a grid of covers about 300 wide
+ * (one column in compact, so a phone is as it was), the List view a reading column centred by `inset` on each side
+ * (docs/design-system.md, Decks; Tablets). The rows that are not decks span every column.
+ */
+export function deckListLayout(width: number, size: SizeClass, view: DeckListView, s = 1): { columns: number; inset: number } {
+  if (view === "List") return { columns: 1, inset: gutter(width, size, "readable", s) };
+  return { columns: size === "compact" ? 1 : columnsFor(width, COVER_TARGET, COVER_GAP, s, 1), inset: 0 };
+}
