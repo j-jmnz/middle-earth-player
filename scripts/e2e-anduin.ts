@@ -34,7 +34,7 @@ const campaign = loadCampaign("mirkwood-paths");
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 
 // The log Passage Through Mirkwood's won game writes: replay the fixture and confirm it.
-function passageLog(won: MirkwoodFixture): CampaignLog {
+export function passageLog(won: MirkwoodFixture): CampaignLog {
   const scenario = loadScenario("passage-through-mirkwood");
   const codes = won.loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]);
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, codes);
@@ -103,7 +103,7 @@ function play(log: CampaignLog, loadout: StoredLoadout, seed: number): { intents
 // player who changes heroes takes the threat penalty, step 3).
 const REPLACEMENT: Readonly<Record<string, string>> = { leadership: "01001", tactics: "01004", spirit: "01007", lore: "01010" };
 
-function replaced(loadout: StoredLoadout, log: CampaignLog): StoredLoadout {
+export function replaced(loadout: StoredLoadout, log: CampaignLog): StoredLoadout {
   const fallen = log.fallenHeroesBySeat.flat();
   const spheres = new Map(catalog.select().from(cardRows).where(inArray(cardRows.code, fallen)).all().map((row) => [row.code, row.sphereCode]));
   const taken = new Set(loadout.seats.flatMap((seat) => seat.heroes));
