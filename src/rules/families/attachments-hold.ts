@@ -53,12 +53,14 @@ export function releaseGuarded(state: ScenarioState, id: string): ScenarioState 
 
 // A card whose printed text box is blank (rr.blank): its own records do not apply while it holds the flag.
 export function textBlank(state: ScenarioState, id: string): boolean {
-  return flagged(state, id, "blankText");
+  return flagged(state, id, "blankText") || state.cards[id]?.prisoner === true;
 }
 
 // The total Threat in the staging area less the table's lessStagingThreat modifiers ("reduce the total Threat in the staging
 // area by X"), not below 0.
 export function withStagingThreat(state: ScenarioState, total: number): number {
   const less = heldAmount(state, "table", "lessStagingThreat");
-  return less === 0 ? total : Math.max(0, total - less);
+  // "Raise the total Threat in the staging area by X" (moreStagingThreat, families/dungeon.ts).
+  const more = heldAmount(state, "table", "moreStagingThreat");
+  return less === 0 && more === 0 ? total : Math.max(0, total + more - less);
 }

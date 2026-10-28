@@ -1,8 +1,8 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
 // Records for the Revised Core Set boons and burdens whose lines no template reads (data/cards/RevCore.json): the Passage Through
-// Mirkwood cards 01132 to 01137 and the Journey Along the Anduin ones, Valor and Scarred (01133, 01138; the Escape from Dol Guldur ones are
-// written with their scenario).
+// Mirkwood cards 01132 to 01137 and the Journey Along the Anduin ones, Valor and Scarred (01133, 01138), and the Escape from Dol Guldur ones, Appointed by Fate (01134) and the Mendor put into play at
+// each scenario's start (01135).
 // An id here that a template also produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
   // 01132 Mendor's Support (boon). "Only one copy ... each round" is the play restriction every other copy shares (19086:constant:1).
@@ -19,6 +19,11 @@ export const RECORDS: readonly Effect[] = [
   // 01137 Lingering Venom (burden treachery): each player chooses between exhausting every damaged character and 2 damage on the most damaged hero.
   {"id":"01137:whenRevealed:1","cardCode":"01137","lines":["01137:A:2"],"timing":"whenRevealed","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"Choose","who":"actor","options":[{"id":"exhaust","instructions":[{"verb":"ExhaustEach","pick":{"type":"character","control":"you","damaged":true}}]},{"id":"damage","instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you","mostDamaged":true}},{"verb":"DamageCard","amount":2,"target":"picked"}]}]}]}]},
   {"id":"01137:shadow:1","cardCode":"01137","lines":["01137:A:3"],"timing":"shadow","instructions":[{"verb":"ExhaustEach","pick":{"type":"character","control":"you","damaged":true}}]},
+  // 01134 Appointed by Fate (boon, attached to a hero of the first player's choice by 01131's Setup): its hero collects 1 additional resource.
+  {"id":"01134:constant:1","cardCode":"01134","lines":["01134:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"extraResource","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  // 01135 Mendor, carried over from 01131's Resolution ("put Mendor into play at the start of each scenario during your next campaign"): a Mendor
+  // in the Campaign Pool is put into play under the first player, who gains control of him (A:2); checklist step 8 skips it (campaign/checklist.ts).
+  {"id":"01135:campaignSetup:1","cardCode":"01135","lines":["01135:A:2"],"timing":"campaignSetup","instructions":[{"verb":"PutObjectiveAllyIntoPlay","code":"01135"}]},
   // 01133 Valor (boon, attached to a hero by 01130's Response): Permanent, Limit 1 per hero. When its hero is declared as an attacker it may exhaust
   // Valor to heal 1 damage from the hero and deal 1 damage to the enemy it attacks.
   {"id":"01133:constant:1","cardCode":"01133","lines":["01133:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"},"limitPerHost":true}]},

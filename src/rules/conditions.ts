@@ -18,6 +18,8 @@ import { combatStepIs } from "./families/defense-conditions.ts";
 import { faceUp, flagHeld } from "./families/sidequests-contract.ts";
 import { copyInVictory } from "./families/sidequests-pick.ts";
 import { shadowCards } from "./zones.ts";
+import { freeOfEncounters } from "./families/objectives.ts";
+import { prisonerHero } from "./families/prisoner.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -80,6 +82,11 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
     }
     case "sourceIn":
       return sourceIn(state, scope.sourceId, condition.zone);
+    // The objectives and prisoner families (families/objectives.ts, families/prisoner.ts).
+    case "freeOfEncounters":
+      return freeOfEncounters(state, scope.sourceId);
+    case "prisoner":
+      return (prisonerHero(state) != null) === condition.is;
     case "inVictory":
       return state.victory.some((id) => state.cards[id]?.code === condition.code) === condition.is;
     case "faceUp":

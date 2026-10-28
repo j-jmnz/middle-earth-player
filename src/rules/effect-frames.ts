@@ -490,6 +490,8 @@ function applyTargeted(
       return first ? shuffleIntoEncounterDeck(state, first) : state;
     case "DiscardRestricted": {
       const owner = first ? state.cards[first]?.controller : null;
+      // A claimed objective that is discarded returns to the staging area (families/objectives.ts).
+      if (first && state.cards[first]?.claimed) return updateCard(moveCard(state, first, { zone: "staging" }), first, { face: "up" });
       return first && owner != null ? moveCard(state, first, { zone: "discard", seat: owner }) : state;
     }
     case "ReadyHero":

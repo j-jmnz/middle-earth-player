@@ -1,0 +1,30 @@
+// Rules: rr.engaged, rr.attachment-cards, rr.draw, rr.shadow-effects (data/rules/entries.json).
+import type { Instruction } from "../../catalog/boundary.ts";
+
+import type { EngineStep } from "../intents.ts";
+import type { ReduceContext } from "../interpret.ts";
+import type { ScenarioState } from "../state.ts";
+import { updateCard } from "../state.ts";
+import type { Focus } from "./index.ts";
+import { attachToDeck } from "./dungeon-deck.ts";
+import { placeOrcGuard } from "./dungeon-guard.ts";
+
+// The verbs src/catalog/families/dungeon.ts adds, for Escape from Dol Guldur: the Orc Guard, Iron Shackles, the limit on allies. Null
+// when the verb is not one of them. LimitPlays is a constant the engine reads when a card is played (dungeon-limit.ts): run alone
+// it does nothing.
+export function run(state: ScenarioState, instruction: Instruction, focus: Focus, _ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
+  switch (instruction.verb) {
+    case "PlaceOrcGuard":
+      return placeOrcGuard(state, focus.seat, steps);
+    case "AttachToDeck":
+      return attachToDeck(state, focus);
+    case "TurnFaceUp": {
+      const id = state.setAside.find((cardId) => state.cards[cardId]?.code === instruction.code);
+      return id ? updateCard(state, id, { face: "up" }) : state;
+    }
+    case "LimitPlays":
+      return state;
+    default:
+      return null;
+  }
+}

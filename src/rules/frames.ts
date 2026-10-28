@@ -11,11 +11,11 @@ import { raiseThreat } from "./keywords.ts";
 import { queueEvent } from "./queue.ts";
 import { offerResponses, responseStep } from "./responses.ts";
 import { printedOf } from "./printed.ts";
-import { flagged, livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "./state.ts";
+import { flagged, inPlay, livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "./state.ts";
 import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "./verbs.ts";
-import { moveCard } from "./zones.ts";
+import { attachTo, moveCard } from "./zones.ts";
 import { announceEntered, noteEncounterThreat, revealsAllowed, watchReveal } from "./families/encounter-reveal.ts";
 import { discardsAfterReveal } from "./families/sidequests-encounter.ts";
 
@@ -49,6 +49,8 @@ export function startReveal(
   ctx: ReduceContext,
   steps: EngineStep[],
   cardId?: string,
+  // The objective the card guards (families/objectives.ts).
+  guards?: string,
 ): ScenarioState {
   const ready = cardId ? state : resetEncounterDeck(state, steps);
   const id = cardId ?? ready.encounterDeck[0];
@@ -56,7 +58,7 @@ export function startReveal(
   if (!id || !instance) return ready;
   const peril = printedOf(ctx.cards, instance.code).keywords.peril;
   const fromDeck = cardId == null ? { fromDeck: true } : {};
-  return pushFrame(ready, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false, ...fromDeck } }, steps);
+  return pushFrame(ready, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false, ...fromDeck, ...(guards ? { guards } : {}) } }, steps);
 }
 
 // A reveal started by an effect instruction. It cannot wait for a player, so a Hide test or any other
@@ -117,6 +119,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     case 0: {
       let next = moveCard(state, id, { zone: "staging" });
       next = updateCard(next, id, { face: "up", controller: seat });
+      // A guard is attached to its objective as it is placed (rr.guarded); the objective may have left play since.
+      if (frame.data.guards && next.cards[frame.data.guards] && inPlay(next.cards[frame.data.guards]?.zone ?? "removed")) next = attachTo(next, id, frame.data.guards);
       steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
       // The lasting effects that watch the reveals act on the card; one may discard it, ending its staging.
@@ -179,7 +183,7 @@ function revealAnother(state: ScenarioState, frame: Frame, ctx: ReduceContext, s
       : shuffleEncounterDeck(updateCard(moveCard(popped, id, { zone: "encounterDeck" }), id, { face: "down", controller: null }))
     : popped;
   if (returned.seats[frame.seat]?.eliminated) return returned;
-  return startReveal(returned, frame.seat, ctx, steps);
+  return startReveal(returned, frame.seat, ctx, steps, undefined, frame.data.kind === "reveal" ? frame.data.guards : undefined);
 }
 
 function runRevealed(

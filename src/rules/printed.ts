@@ -124,8 +124,15 @@ export function definePrinted(
   };
 }
 
+// The code of the "Orc Guard" a deck card becomes in Escape from Dol Guldur (01107:A:1, 01125:B:1): not a printed card but a stand-in the
+// engine creates, "an enemy with 1 hit point, 1 Attack and 1 Defense" (families/dungeon-guard.ts). Every card map knows it.
+export const ORC_GUARD_CODE = "orc-guard";
+const BUILT_IN: ReadonlyMap<string, PrintedCard> = new Map([
+  [ORC_GUARD_CODE, definePrinted({ code: ORC_GUARD_CODE, name: "Orc Guard", type: "enemy", threat: 0, engagementCost: 0, attack: 1, defense: 1, health: 1 })],
+]);
+
 export function printedOf(cards: ReadonlyMap<string, PrintedCard>, code: string): PrintedCard {
-  const card = cards.get(code);
+  const card = cards.get(code) ?? BUILT_IN.get(code);
   if (!card) throw new Error(`Missing printed card ${code}`);
   return card;
 }

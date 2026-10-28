@@ -274,6 +274,8 @@ export function defeatedDestination(
   if ((printed.type === "enemy" || printed.type === "location") && printed.victory != null) {
     return { zone: "victory" };
   }
+  // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives.ts).
+  if (instance.claimed) return { zone: "staging" };
   if (!fromEncounterDeck(printed) && instance.controller != null) {
     return { zone: "discard", seat: instance.owner ?? instance.controller };
   }

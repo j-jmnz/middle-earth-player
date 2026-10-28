@@ -72,6 +72,11 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The quest advanced to the stage with this code (`is`) or did not. Kept only by a quest that branches (BranchStage), read by the
   // Resolution of 01129 ("If stage 3B was Beorn's Path"): src/rules/conditions.ts, state.stagesReached.
   z.strictObject({ kind: z.literal("stageReached"), code: z.string().min(1), is: z.boolean() }),
+  // The source objective has no encounter card attached to it: it is "free of encounters" (rr.guarded; 01108:A:2). Read for a Guarded
+  // objective in the staging area.
+  z.strictObject({ kind: z.literal("freeOfEncounters") }),
+  // A hero is the "prisoner" now, facedown, until it is rescued (`is`), or none is (01124:B:3; src/rules/families/prisoner.ts).
+  z.strictObject({ kind: z.literal("prisoner"), is: z.boolean() }),
   // A card with this code is attached to a hero (`is`) or is not.
   z.strictObject({ kind: z.literal("attachedToHero"), code: z.string().min(1), is: z.boolean() }),
   // Read while a stat is read, not when a constant effect is synced. `defending`: the holder is the declared defender

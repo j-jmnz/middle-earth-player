@@ -4,7 +4,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../cause.ts";
 import type { EngineStep } from "../intents.ts";
-import { drawOne, type ReduceContext } from "../interpret.ts";
+import { drawMany, type ReduceContext } from "../interpret.ts";
 import { placeDamage } from "../keywords.ts";
 import { printedOf } from "../printed.ts";
 import { shuffleEncounterDeck } from "../verbs.ts";
@@ -25,7 +25,7 @@ function drawEach(state: ScenarioState, instruction: Verb<"DrawEach">, focus: Fo
   const seats = livingSeats(state);
   const from = Math.max(0, seats.indexOf(state.firstPlayer));
   let next = state;
-  for (const seat of [...seats.slice(from), ...seats.slice(0, from)]) for (let draw = 0; draw < count; draw += 1) next = drawOne(next, seat, steps, UNATTRIBUTED);
+  for (const seat of [...seats.slice(from), ...seats.slice(0, from)]) next = drawMany(next, seat, count, steps, UNATTRIBUTED);
   return next;
 }
 

@@ -3,6 +3,7 @@
 import type { Effect } from "../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
+import { playLimited } from "./families/dungeon-limit.ts";
 import { effectCause, ruleCause } from "./cause.ts";
 import { deckPlayHero, markDeckPlay, playableFromDeck } from "./deck-play.ts";
 import { holds } from "./conditions.ts";
@@ -213,6 +214,8 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   if (uniqueBlocked(state, printed, ctx.cards)) return "A second copy of that unique card cannot enter play";
   // "You cannot play non-unique allies" (a contract, families/sidequests-contract.ts).
   if (playBlocked(state, cardId, state.activeSeat, ctx)) return "A card in play forbids that card to be played";
+  // "The players, as a group, cannot play more than 1 ally card each round" (families/dungeon-limit.ts).
+  if (playLimited(state, cardId, ctx)) return "The players have played as many of those cards as a card in play lets them this round";
   if (!hasResourceMatch(state, state.activeSeat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
   // A player side quest needs a free quest area (families/sidequests-play.ts).
   const area = printed.type === "player-side-quest" ? sideQuestPlayReason(state, state.activeSeat) : null;

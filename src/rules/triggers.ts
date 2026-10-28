@@ -25,6 +25,12 @@ function forcedActor(state: ScenarioState, instance: CardInstance, event: GameEv
   return player ? (instance.controller ?? state.firstPlayer) : (event.seat ?? state.firstPlayer);
 }
 
+// A card set aside faceup next to the quest deck hears that the prisoner was rescued: its ability says it works from out of play
+// ("move Nazgûl of Dol Guldur into the staging area", 01102:A:2; rr.in-play-and-out-of-play).
+function hearsFromSetAside(instance: CardInstance, event: GameEvent): boolean {
+  return event.trigger === "prisonerRescued" && instance.zone === "setAside";
+}
+
 function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, timing: "forced" | "triggered"): Found[] {
   const found: Found[] = [];
   for (const instance of Object.values(state.cards)) {
@@ -33,7 +39,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
     const leftItself = event.trigger === "leftPlay" && event.cardId === instance.id;
     for (const effect of effectsOfCard(state, ctx, instance)) {
       if (effect.timing !== timing || !hears(state, effect, instance, event, ctx)) continue;
-      if (!inPlay(instance.zone) && !leftItself && !hearsFromAnywhere(effect, instance, event)) continue;
+      if (!inPlay(instance.zone) && !leftItself && !hearsFromAnywhere(effect, instance, event) && !hearsFromSetAside(instance, event)) continue;
       const owner = forcedActor(state, instance, event, ctx);
       const scope = { actor: owner, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.trigger === "damaged" && event.amount != null ? { dealt: event.amount } : {}), ...(event.explored ? { explored: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;

@@ -85,6 +85,11 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   } else if (spec.type === "location") {
     if (!spec.active) raw.push(...stagingLocations(state, ctx.cards));
     if (!spec.stagingOnly) raw.push(...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
+  } else if (spec.type === "objective") {
+    // The objectives in the staging area (any player's filter sees them) and, unless it asks for the staging area only, the ones a
+    // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
+    if (spec.control !== "you") raw.push(...state.staging);
+    if (!spec.stagingOnly) raw.push(...Object.values(state.cards).filter((card) => card.claimed === true && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
   } else if (spec.type === "card" && spec.stagingOnly) {
     raw.push(...state.staging);
   } else if (spec.type === "card") {

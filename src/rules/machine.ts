@@ -23,7 +23,7 @@ import { advanceFrame, stagingStep } from "./frames.ts";
 import { commitHide, pruneRoundRecords } from "./hide.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import { queueEvent } from "./queue.ts";
-import { drawOne, gainSeatResources, type ReduceContext } from "./interpret.ts";
+import { drawMany, gainSeatResources, type ReduceContext } from "./interpret.ts";
 import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
@@ -244,7 +244,7 @@ function grant(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): S
     // A card that lets its player draw additional cards in the resource phase holds an extraDraw on the seat.
     const draws = 1 + heldStat(next, seat, "extraDraw", NO_COUNTS);
     const before = new Set(next.seats[seat]?.hand ?? []);
-    for (let draw = 0; draw < draws; draw += 1) next = drawOne(next, seat, steps, ruleCause("rr.step-1-3"));
+    next = drawMany(next, seat, draws, steps, ruleCause("rr.step-1-3"));
     drawn[seat] = (next.seats[seat]?.hand ?? []).filter((id) => !before.has(id));
   }
   // The draw step is done: Forced effects hear it ("After drawing cards at the beginning of the resource phase", misc family),

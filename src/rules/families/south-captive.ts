@@ -24,13 +24,21 @@ export function captureRingBearer(state: ScenarioState, instruction: Extract<Ins
   const heroId = ringBearerId(state, ctx);
   const hostId = Object.values(state.cards).find((card) => card.code === instruction.under && inPlay(card.zone))?.id;
   if (!heroId || !hostId || !state.cards[hostId]) return state;
+  return captureHero(state, heroId, hostId);
+}
+
+// The hero and each card attached to it go facedown into the captive zone, under the card `hostId` (the Watcher) or under no card
+// (`prisoner`: the prisoner of Escape from Dol Guldur, families/prisoner.ts, whose cards are also flagged as the prisoner's and whose
+// hero remembers the seat it came from). Every token on them is discarded.
+export function captureHero(state: ScenarioState, heroId: string, hostId: string | null, prisoner = false): ScenarioState {
+  const seat = state.cards[heroId]?.controller ?? null;
   const attachments = [...(state.cards[heroId]?.attachments ?? [])];
-  let next = updateCard(moveCard(state, heroId, { zone: "captive", hostId }), heroId, { damage: 0, resources: 0, progress: 0 });
+  let next = updateCard(moveCard(state, heroId, { zone: "captive", hostId }), heroId, { damage: 0, resources: 0, progress: 0, ...(prisoner ? { prisoner: true as const, ...(seat != null ? { owner: seat } : {}) } : {}) });
   for (const id of attachments) {
     // A card a player played keeps its owner, so the release knows to give it to the first player (a Condition an encounter card
     // attached has no controller and no owner).
     const controller = next.cards[id]?.controller;
-    const moved = updateCard(moveCard(next, id, { zone: "attached" }), id, { damage: 0, resources: 0, progress: 0, face: "down", ...(controller != null ? { owner: controller } : {}) });
+    const moved = updateCard(moveCard(next, id, { zone: "attached" }), id, { damage: 0, resources: 0, progress: 0, face: "down", ...(controller != null ? { owner: controller } : {}), ...(prisoner ? { prisoner: true as const } : {}) });
     next = attachTo(moved, id, heroId);
   }
   return next;

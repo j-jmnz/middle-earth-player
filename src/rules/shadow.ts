@@ -21,6 +21,7 @@ import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from 
 import { holdAttack } from "./families/defense-listen.ts";
 import { startShadowAttack } from "./families/defense-shadow-attack.ts";
 import { announceShadowRaise, noteShadowStart } from "./families/defense-shadow.ts";
+import { announceShadowResolved } from "./families/dungeon-shadow.ts";
 import { announceDestroyed, charactersDestroyed } from "./families/burden-attack.ts";
 import { attackHere, attackKey, locationDamage } from "./families/south-watcher.ts";
 
@@ -178,8 +179,8 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   // 6.4.2: the shadow effects are resolved; an action window comes before combat damage. "When a shadow card increases an
   // enemy's Attack" is answered before it too.
   if (next.pendingAttack && !next.pendingAttack.shadowsDone) {
-    next = announceShadowRaise({ ...next, pendingAttack: { ...next.pendingAttack, shadowsDone: true } }, ctx);
-    const between = enemyAttackWindow(next, ctx, "damage") ?? holdAttack(next, ctx, "damage", ["shadowRaisedAttack"]);
+    next = announceShadowRaise(announceShadowResolved({ ...next, pendingAttack: { ...next.pendingAttack, shadowsDone: true } }, ctx), ctx);
+    const between = enemyAttackWindow(next, ctx, "damage") ?? holdAttack(next, ctx, "damage", ["shadowRaisedAttack", "shadowEffectResolved"]);
     if (between) return between;
   }
   const attack = next.pendingAttack;

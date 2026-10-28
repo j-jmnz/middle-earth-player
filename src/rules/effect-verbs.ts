@@ -4,7 +4,7 @@ import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
 import { runQuestResolution } from "./explore.ts";
 import type { EngineStep } from "./intents.ts";
-import { drawOne, type ReduceContext } from "./interpret.ts";
+import { drawMany, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "./keywords.ts";
 import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
@@ -45,9 +45,7 @@ export function drawVerb(
   const trait = instruction.perHero;
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, seat, topFrame(state)?.cardId ?? null), ctx);
   const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * amount;
-  let next = state;
-  for (let draw = 0; draw < count; draw += 1) next = drawOne(next, target, steps, UNATTRIBUTED);
-  return next;
+  return drawMany(state, target, count, steps, UNATTRIBUTED);
 }
 
 // The cards a player may pick for the verb.

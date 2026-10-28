@@ -11,8 +11,11 @@ import * as misc from "./misc.ts";
 import * as burden from "./burden.ts";
 import * as south from "./south.ts";
 import * as campaign from "./campaign.ts";
+import * as objectives from "./objectives.ts";
+import * as prisoner from "./prisoner.ts";
+import * as dungeon from "./dungeon.ts";
 
 // Each mechanic family's verbs, triggers and flags, in one list each (docs/plans/effect-authoring.md).
-export const FAMILY_VERBS = [...attack.VERBS, ...defense.VERBS, ...encounter.VERBS, ...quest.VERBS, ...play.VERBS, ...costs.VERBS, ...deck.VERBS, ...attachments.VERBS, ...sidequests.VERBS, ...misc.VERBS, ...burden.VERBS, ...south.VERBS, ...campaign.VERBS] as const;
-export const FAMILY_TRIGGERS = [...attack.TRIGGERS, ...defense.TRIGGERS, ...encounter.TRIGGERS, ...quest.TRIGGERS, ...play.TRIGGERS, ...costs.TRIGGERS, ...deck.TRIGGERS, ...attachments.TRIGGERS, ...sidequests.TRIGGERS, ...misc.TRIGGERS, ...burden.TRIGGERS, ...south.TRIGGERS, ...campaign.TRIGGERS] as const;
-export const FAMILY_FLAGS = [...attack.FLAGS, ...defense.FLAGS, ...encounter.FLAGS, ...quest.FLAGS, ...play.FLAGS, ...costs.FLAGS, ...deck.FLAGS, ...attachments.FLAGS, ...sidequests.FLAGS, ...misc.FLAGS, ...burden.FLAGS, ...south.FLAGS, ...campaign.FLAGS] as const;
+export const FAMILY_VERBS = [...attack.VERBS, ...defense.VERBS, ...encounter.VERBS, ...quest.VERBS, ...play.VERBS, ...costs.VERBS, ...deck.VERBS, ...attachments.VERBS, ...sidequests.VERBS, ...misc.VERBS, ...burden.VERBS, ...south.VERBS, ...campaign.VERBS, ...objectives.VERBS, ...prisoner.VERBS, ...dungeon.VERBS] as const;
+export const FAMILY_TRIGGERS = [...attack.TRIGGERS, ...defense.TRIGGERS, ...encounter.TRIGGERS, ...quest.TRIGGERS, ...play.TRIGGERS, ...costs.TRIGGERS, ...deck.TRIGGERS, ...attachments.TRIGGERS, ...sidequests.TRIGGERS, ...misc.TRIGGERS, ...burden.TRIGGERS, ...south.TRIGGERS, ...campaign.TRIGGERS, ...objectives.TRIGGERS, ...prisoner.TRIGGERS, ...dungeon.TRIGGERS] as const;
+export const FAMILY_FLAGS = [...attack.FLAGS, ...defense.FLAGS, ...encounter.FLAGS, ...quest.FLAGS, ...play.FLAGS, ...costs.FLAGS, ...deck.FLAGS, ...attachments.FLAGS, ...sidequests.FLAGS, ...misc.FLAGS, ...burden.FLAGS, ...south.FLAGS, ...campaign.FLAGS, ...objectives.FLAGS, ...prisoner.FLAGS, ...dungeon.FLAGS] as const;

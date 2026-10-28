@@ -18,7 +18,8 @@ export function leaveWith(state: ScenarioState, card: CardInstance, released: re
     const attachment = next.cards[id];
     if (!attachment || attachment.host !== card.id) continue;
     const owner = attachment.owner ?? attachment.controller;
-    next = moveCard(next, id, owner != null ? { zone: "discard", seat: owner } : { zone: "encounterDiscard" });
+    // A claimed objective returns to the staging area (families/objectives.ts).
+    next = moveCard(next, id, attachment.claimed ? { zone: "staging" } : owner != null ? { zone: "discard", seat: owner } : { zone: "encounterDiscard" });
     gone.push(id);
   }
   // Facedown player cards under a player card (an encounter card under one, like Saruman's, has its own rule).

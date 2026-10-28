@@ -12,9 +12,17 @@ import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import type { ScenarioState } from "../state.ts";
 
-// A Setup record that reveals cards for each player: the one Setup the piles cannot place.
+// A Setup record that reveals cards for each player, or attaches an encounter card to each objective (01123:A:1, GuardObjective): the
+// Setup the piles cannot place.
 function revealsPerPlayer(effect: Effect): boolean {
-  return effect.timing === "setup" && effect.instructions.some((instruction) => instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inner.verb === "RevealEncounter"));
+  return (
+    effect.timing === "setup" &&
+    effect.instructions.some(
+      (instruction) =>
+        (instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inner.verb === "RevealEncounter")) ||
+        (instruction.verb === "Each" && instruction.instructions.some((inner) => inner.verb === "GuardObjective")),
+    )
+  );
 }
 
 export function questStageStart(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

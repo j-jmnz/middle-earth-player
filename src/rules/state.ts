@@ -102,6 +102,12 @@ export type CardInstance = {
   collection?: string;
   // On an attachment: the id of the hero card from the collection attached to it, whose game text and resource icon its host has.
   lends?: string;
+  // A card held facedown as part of a prisoner (the hero, the cards attached to it, Mendor captured with it): it is blank and unusable
+  // until it is rescued (families/prisoner.ts, 01123:B:1).
+  prisoner?: true;
+  // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled
+  // (families/objectives.ts, 01108:A:2).
+  claimed?: true;
 };
 
 export type Seat = {
@@ -115,6 +121,8 @@ export type Seat = {
   staging: readonly string[];
   questStage: string | null;
   eliminated: boolean;
+  // Encounter cards attached to the top of this seat's deck, oldest first (Iron Shackles, 01105:A:1; families/dungeon.ts). Absent when none.
+  deckAttached?: readonly string[];
 };
 
 export type Phase =

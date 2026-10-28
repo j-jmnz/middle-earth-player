@@ -131,7 +131,8 @@ export type FrameData =
   | { kind: "none" }
   // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
   // effects of the card just revealed (Frodo Baggins). `discard`: and the card is discarded, not shuffled back (The Master Ring).
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean; discard?: boolean }
+  // `guards`: the card is revealed as the guard of this objective (rr.guarded): it is attached to it as it is placed in the staging area.
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean; discard?: boolean; guards?: string }
   | HideData
   | EffectData;
 

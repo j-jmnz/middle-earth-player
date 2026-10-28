@@ -2,6 +2,8 @@
 import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
 import { queueEvent } from "./queue.ts";
 import { leaveWith } from "./families/play-zones.ts";
+import { releaseOrcGuard } from "./families/dungeon-guard.ts";
+import { ORC_GUARD_CODE } from "./printed.ts";
 import { inPlay, updateCard, withSeat } from "./state.ts";
 
 export type Destination =
@@ -13,7 +15,8 @@ export type Destination =
   | { zone: "attached" }
   | { zone: "campaign" }
   | { zone: "under"; locationId: string }
-  | { zone: "captive"; hostId: string };
+  // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
+  | { zone: "captive"; hostId: string | null };
 
 type SeatList = "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "staging";
 
@@ -171,7 +174,8 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
     return updateCard(linked, id, { zone: "shadow", host: dest.enemyId, controller: null });
   }
   const zone = dest.zone;
-  const stamped = updateCard(state, id, { zone, controller: zone === "staging" ? current.controller : null });
+  // A claimed objective (families/objectives.ts) that returns to the staging area is controlled by nobody again.
+  const stamped = updateCard(state, id, { zone, controller: zone === "staging" && !current.claimed ? current.controller : null, ...(current.claimed ? { claimed: undefined } : {}) });
   switch (zone) {
     case "staging":
       return { ...stamped, staging: append(stamped.staging, id) };
@@ -200,6 +204,13 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   }
 }
 
+// An encounter card attached to a guarded objective (rr.guarded) stays in the staging area, engaged or active while it is dealt with;
+// it is unlinked from the objective when it leaves play (defeated, explored, discarded).
+function guardLeaves(current: CardInstance, dest: Destination): boolean {
+  const there = current.zone === "staging" || current.zone === "engaged" || current.zone === "activeLocation" || current.zone === "secondActiveLocation";
+  return there && !inPlay(dest.zone);
+}
+
 // Stamps the order in which a card entered play, so Forced effects can resolve oldest first. A card enters play ready
 // (rr.ready) and carries no tokens from an earlier time in play: an ally destroyed with 3 damage comes back with none.
 function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioState {
@@ -215,10 +226,12 @@ export function moveCard(state: ScenarioState, id: string, dest: Destination, re
   if (!current) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
-  if (leavingPlay && current.host) next = unhost(next, id);
+  if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
   let moved = stampEntry(attach(next, id, dest), id, current.zone);
   // Its attachments leave play with it, however it left (rr.attachment-cards, families/play-zones.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
+  // An Orc Guard that leaves play takes the deck card it is made of to its owner's discard pile and leaves the game (families/dungeon-guard.ts).
+  if (current.code === ORC_GUARD_CODE && inPlay(current.zone) && !inPlay(dest.zone)) moved = releaseOrcGuard(moved, id);
   // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
