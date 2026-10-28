@@ -4,9 +4,9 @@
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 /** The muted line under a card's name in its preview, or null: an Adaptation whose once-per-campaign Action is spent (in this game or an earlier scenario). */
-export function oathDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
+export function oathDetail(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
   const card = game.cards[cardId];
   if (!card) return null;
   const limited = ctx.effects.some((effect) => effect.cardCode === card.code && effect.limit === "oncePerCampaign");
-  return limited && (game.campaignFacts?.usedOnce ?? []).includes(card.code) ? `${name(cardId)}: its Action is used for this campaign` : null;
+  return limited && (game.campaignFacts?.usedOnce ?? []).includes(card.code) ? "Its Action is used for this campaign." : null;
 }

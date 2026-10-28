@@ -17,6 +17,7 @@ import { topFrame } from "../rules/windows.ts";
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
 import { threatRows } from "./foresight.ts";
+import { tokenOutcome } from "./oath-words.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
 import { DEFENDERS_FRAME } from "../rules/families/defense-defenders.ts";
@@ -93,10 +94,12 @@ function answeredCard(event: GameEvent, offers: readonly ResponseOffer[], listed
 
 // A response window's sentence, naming the Responses of this occurrence that wait for a cost another one may pay
 // (rr.triggering-condition: Aragorn's ready waits for Théodred's resource).
-function responseNote(game: ScenarioState, names: SheetNames, offers: readonly { cardId: string; effectId: string; seat: number }[], listed: readonly TriggerOption[]): string {
+function responseNote(game: ScenarioState, names: SheetNames, offers: readonly { cardId: string; effectId: string; seat: number }[], listed: readonly TriggerOption[], ctx: ReduceContext, event: GameEvent | null): string {
   const seat = game.window?.kind === "response" ? game.window.seat : game.activeSeat;
   const waiting = offers.filter((offer) => offer.seat === seat && !listed.some((item) => item.cardId === offer.cardId && item.effectId === offer.effectId));
-  const base = "A Response may be used now, or passed.";
+  // At the end of the round, a card that counts tokens says what the count leads to (41050:B:1).
+  const leads = event?.trigger === "endOfRound" ? offers.flatMap((offer) => tokenOutcome(ctx, game.cards[offer.cardId]?.code ?? "")).slice(0, 1) : [];
+  const base = ["A Response may be used now, or passed.", ...leads].join(" ");
   if (waiting.length === 0) return base;
   return `${base} Waiting for its cost, and offered once it can be paid: ${waiting.map((offer) => names.card(offer.cardId)).join(", ")}. Passing gives it up too.`;
 }
@@ -131,14 +134,16 @@ export function isStepWindow(game: ScenarioState): boolean {
 // win has nothing to choose, and the outcome screen shows the score.
 export function wonSheet(game: ScenarioState): Sheet {
   const rewards = game.resolution.length > 0;
+  // A Resolution that asks nothing (The Oath's: the tokens and the burden they earn) has no rewards to choose: the screen after it only shows what is recorded.
+  const asks = game.resolution.some((instruction) => instruction.verb === "ChooseCards" || instruction.verb === "NameCaptives");
   return {
     kind: "outcome",
     key: "won",
     result: "won",
     step: rewards ? "Resolution" : "Scenario",
     title: "Victory",
-    note: rewards ? "The scenario is won. Choose the rewards the campaign card offers." : "The scenario is won.",
-    action: rewards ? "Choose rewards" : "See the score",
+    note: rewards ? (asks ? "The scenario is won. Choose the rewards the campaign card offers." : "The scenario is won. The campaign card's Resolution is next.") : "The scenario is won.",
+    action: rewards ? (asks ? "Choose rewards" : "See the Resolution") : "See the score",
   };
 }
 
@@ -261,16 +266,20 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     case "response": {
       const options = triggerOptions(game, ctx, legal, names);
       const data = frame?.data;
-      const about = data?.kind === "responses" ? answeredCard(data.event, data.offers, options) : (frame?.cardId ?? null);
+      const endOfRound = data?.kind === "responses" && data.event.trigger === "endOfRound";
+      // The end of the round has no card it is about: the one card whose Response is offered names the sheet (The Oath's tokens).
+      const sole = endOfRound && options.length > 0 && options.every((item) => item.cardId === options[0]?.cardId) ? (options[0]?.cardId ?? null) : null;
+      const about = sole ?? (data?.kind === "responses" ? answeredCard(data.event, data.offers, options) : (frame?.cardId ?? null));
       const cancel = window.kind === "cancelOffer";
       return {
         kind: "trigger",
         key: `${window.kind}:${frame?.id ?? ""}:${options.length}`,
-        step: step(game),
+        // The end of the round has no framework step of its own to name: the Response window says when it is.
+        step: endOfRound ? "End of round" : step(game),
         title: about ? names.card(about) : cancel ? "Cancel" : "Response",
         sourceId: about,
         timing: cancel ? "Cancel" : "Response",
-        note: cancel ? "The first player may pay to cancel this effect before it resolves." : responseNote(game, names, data?.kind === "responses" ? data.offers : [], options),
+        note: cancel ? "The first player may pay to cancel this effect before it resolves." : responseNote(game, names, data?.kind === "responses" ? data.offers : [], options, ctx, data?.kind === "responses" ? data.event : null),
         hide: null,
         options,
         pass: "Pass",

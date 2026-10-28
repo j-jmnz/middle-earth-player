@@ -11,6 +11,7 @@ import type { StartScenario } from "../rules/setup.ts";
 import { checklist, type ChecklistPlan, type ChecklistStep, type Need } from "./checklist.ts";
 import { validateLoadout, type LoadoutSeat } from "./loadout.ts";
 import type { CampaignLog } from "./log.ts";
+import { printedScenarioName } from "./printed-name.ts";
 import { buildStart, type PlayMode } from "./start.ts";
 import type { World } from "./world.ts";
 
@@ -203,7 +204,7 @@ export function scenarioFacts(world: World, difficulty: Difficulty, mode: PlayMo
   if (mode === "campaign" && recordInstructions(world.effects, scenario.campaignCard, "campaignSetup").some((instruction) => instruction.verb === "WaiveThreatPenalty")) rules.push("No hero-change penalty");
   return {
     number: scenario.number,
-    name: scenario.name,
+    name: printedScenarioName(scenario.name),
     stages: scenario.stages.map((code) => (world.cards.has(code) ? printedOf(world.cards, code).name : code)),
     sets,
     deckSize: encounter.reduce((sum, card) => sum + countOf(card), 0),

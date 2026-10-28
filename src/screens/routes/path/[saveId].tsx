@@ -7,6 +7,7 @@ import { tileSurface } from "../../../play/surfaces";
 import { withAlphaHex } from "../../../play/tokens";
 import { SceneCard } from "../../art";
 import { ActionBar, BodyText, Chip, Eyebrow, IconButton, JourneyBar, Label, NavBar, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
+import { poolCardWords } from "../../log-facts";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../campaign-data";
 import { cardNames } from "../../card-names";
 import { useDatabases } from "../../databases";
@@ -173,7 +174,7 @@ export default function CampaignPath() {
   const poolText =
     save.log.campaignPool.length === 0
       ? "Nothing earned yet."
-      : save.log.campaignPool.map((card) => (card.attachedTo ? `${name(card.code)} on ${name(card.attachedTo)}` : name(card.code))).join(", ");
+      : save.log.campaignPool.map((card) => poolCardWords(card, save.log.usedOnce, name)).join(", ");
 
   const current = currentIndex >= 0 ? nodes[currentIndex] : null;
   const next: Next | null = open

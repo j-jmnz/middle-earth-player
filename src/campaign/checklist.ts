@@ -224,7 +224,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const poolIntoPlay: string[] = [];
   for (const card of pool) {
     if (card.attachedTo != null || fresh.has(card)) continue;
-    if (seats.some((seat) => seat.hand?.includes(card.code) || seat.attachments.some((attached) => attached.code === card.code))) continue;
+    if (dealt(card)) continue;
     // A pool card that says "put into play at the start of each scenario" (Mendor) is dealt into play, so it skips step 8.
     if (putsItselfIntoPlay(input.effects, card.code)) {
       poolIntoPlay.push(card.code);

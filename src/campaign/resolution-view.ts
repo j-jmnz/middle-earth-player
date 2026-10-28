@@ -47,6 +47,8 @@ export type ResolutionView =
       fallen: readonly string[];
       captives: readonly string[];
       prisoner?: string;
+      // The cards whose once-per-campaign Action was used, written to the log's "Used this campaign" (41044:A:3).
+      used?: readonly string[];
       // Cards the log keeps for the next campaign (01131:B:2), a copy for each player when `eachPlayer`.
       carried?: readonly { code: string; eachPlayer: boolean }[];
     };
@@ -65,6 +67,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),
       ...(settled.prisoner ? { prisoner: settled.prisoner } : {}),
+      ...((state.campaignFacts?.usedOnce.length ?? 0) > 0 ? { used: [...new Set(state.campaignFacts?.usedOnce ?? [])] } : {}),
       ...(settled.carryOver && settled.carryOver.length > 0 ? { carried: settled.carryOver.map((item) => ({ code: item.code, eachPlayer: item.perPlayer === true })) } : {}),
     };
   }
@@ -173,7 +176,10 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   // "A and B", "A, B and C": an "and" only before the last.
   const list = earned.length > 1 ? `${earned.slice(0, -1).join(", ")} and ${earned.at(-1)}` : (earned[0] ?? "");
   const records = earned.length > 0 ? `Confirming records ${list} in the campaign` : "Confirming records the win";
-  const sentence = next ? `${records} and unlocks ${next}.` : `${records}.`;
+  const unlocked = next ? `${records} and unlocks ${next}.` : `${records}.`;
+  // A once-per-campaign Action used in this game or an earlier scenario is written to the log (41044:A:3).
+  const names = (view.used ?? []).map((code) => nameOf(world, code));
+  const sentence = names.length > 0 ? `${unlocked} ${names.join(", ")} ${names.length === 1 ? "is" : "are"} recorded as used this campaign.` : unlocked;
   // The hero a Resolution takes prisoner is written to the log too (01130:B:1): a sentence of its own, with the reason.
   const prisoner = view.prisoner ? `${sentence} ${nameOf(world, view.prisoner)}, the hero with the most damage, is taken prisoner.` : sentence;
   // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.

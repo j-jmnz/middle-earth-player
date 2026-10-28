@@ -239,6 +239,7 @@ export function DealBar({
   difficulty,
   dropsOpen = false,
   dealable,
+  waiting = null,
   onDeal,
   children,
 }: {
@@ -247,6 +248,8 @@ export function DealBar({
   difficulty: Difficulty;
   dropsOpen?: boolean;
   dealable: boolean;
+  // What the disabled Deal waits for (a choice the campaign card asks above), in a sentence of its own.
+  waiting?: string | null;
   onDeal: () => void;
   children?: ReactNode;
 }) {
@@ -264,7 +267,7 @@ export function DealBar({
       ) : null}
       {children}
       <Label tone="muted" testID="briefing-deal-note" className="text-center">
-        {dealSentence(difficulty, dropsOpen)}
+        {waiting ?? dealSentence(difficulty, dropsOpen)}
       </Label>
       <PrimaryButton label="Deal" testID="deal" disabled={!dealable} onPress={onDeal} />
     </View>

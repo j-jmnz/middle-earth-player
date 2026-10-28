@@ -77,9 +77,9 @@ describe("golden: a whole game of The Oath", () => {
       expect(state.window).toBeNull();
       expect(state.cards[state.questStage ?? ""]?.code).toBe("41003");
       expect(Object.values(state.cards).filter((card) => card.zone === "victory").map((card) => card.code)).toContain("41014");
-      // The tokens on the campaign card are read at Resolution: 6 or more earn Guilty Conscience, and the count is recorded for the log.
+      // The tokens on the campaign card are read at Resolution: 6 or more earn Guilty Conscience, and the card prints no line that records the count.
       const tokens = tokensOf(game);
-      expect(state.resolutionLog.counters).toEqual({ "41050": tokens });
+      expect(state.resolutionLog.counters).toBeUndefined();
       expect(state.resolutionLog.earned.map((item) => item.code), golden.name).toEqual(tokens >= 6 ? ["41043"] : []);
       if (golden.tokens === "skip") expect(tokens, golden.name).toBe(0);
       if (golden.name.includes("6 tokens placed")) expect(tokens, golden.name).toBeGreaterThanOrEqual(6);

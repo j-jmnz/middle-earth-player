@@ -88,6 +88,11 @@ export type BuildReport = {
 
 const RULE_FIELDS = ["name", "text", "cost", "deck_limit", "type_code", "type_name", "sphere_code", "traits", "is_unique", "has_errata", "threat", "willpower", "attack", "defense", "health", "quest", "victory"] as const;
 
+// The listed keys of `source` that hold a value (a missing key stays out, so a spread never overwrites a card's field with undefined).
+function pickDefined<K extends string>(source: Partial<Record<K, number>> | undefined, keys: readonly K[]): Partial<Record<K, number>> {
+  return Object.fromEntries(keys.flatMap((key) => (source?.[key] != null ? [[key, source[key]]] : []))) as Partial<Record<K, number>>;
+}
+
 function comparePacks(left: RingsDbPack, right: RingsDbPack): number {
   if (left.cycle_position !== right.cycle_position) return left.cycle_position - right.cycle_position;
   if (left.position !== right.position) return left.position - right.position;
@@ -468,7 +473,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
     const named = set?.name ? { ...withBurden, name: set.name } : withBurden;
     // A printed Threat or engagement cost a source leaves out (a burden enemy: Hall of Beorn files its Threat icon as Willpower).
-    const stated = set?.threat != null || set?.engagementCost != null ? { ...named, ...(set.threat != null ? { threat: set.threat } : {}), ...(set.engagementCost != null ? { engagementCost: set.engagementCost } : {}) } : named;
+    const stated = { ...named, ...pickDefined(set, ["threat", "engagementCost"]) };
     const next = outOfScope(overrides, stated) ? { ...stated, deckLegal: false } : stated;
     cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }

@@ -14,7 +14,7 @@ import { runEncounterItem } from "./families/encounter-items.ts";
 import { moveEncounter } from "./families/encounter-moves.ts";
 import { chooseEach } from "./families/deck-each.ts";
 import { lookedDeckSeat } from "./families/deck-rules.ts";
-import { attachHostChooser, highestThreatSeats } from "./families/play-hooks.ts";
+import { attachHeroHosts, attachHostChooser } from "./families/play-hooks.ts";
 import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
@@ -336,25 +336,10 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     }
     case "AttachSelf": {
       const code = sourceId ? state.cards[sourceId]?.code : undefined;
-      const free = (id: string): boolean =>
-        !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) &&
-        (code == null || !attachBlocked(state, ctx, id, code));
-      if (instruction.to.kind === "hero") {
-        const everyone = instruction.to.control === "any" || instruction.to.control === "highestThreatCost";
-        const seats = everyone ? livingSeats(state) : instruction.to.control === "highestThreat" ? highestThreatSeats(state) : [item.seat];
-        const except = instruction.to.exceptSphere;
-        const heroes = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []);
-        // "The hero with the highest threat cost" (41043:A:2): the heroes in play whose printed threat cost is the greatest.
-        const top = instruction.to.control === "highestThreatCost" ? Math.max(...heroes.map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").threat ?? 0)) : null;
-        return heroes
-          .filter((id) => top == null || (printedOf(ctx.cards, state.cards[id]?.code ?? "").threat ?? 0) === top)
-          .filter(free)
-          .filter((id) => except == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").sphere !== except);
-      }
+      const free = (id: string): boolean => !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) && (code == null || !attachBlocked(state, ctx, id, code));
+      if (instruction.to.kind === "hero") return attachHeroHosts(state, instruction.to, item.seat, ctx.cards).filter(free);
       const trait = instruction.to.trait;
-      return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])]
-        .filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx))
-        .filter(free);
+      return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])].filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx) && free(id));
     }
     case "SearchMove":
     case "SearchReveal": {

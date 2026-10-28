@@ -2,13 +2,14 @@
 // Oath's locations on a table of plain-number heroes (scripts/oath-scene.ts): Travel costs, Responses, the Quest Action of Spider Den and The Eaves of Mirkwood.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Instruction } from "../catalog/boundary.ts";
+import type { Effect, Instruction } from "../catalog/boundary.ts";
 import { syncConstants } from "../rules/constants.ts";
 import { pushEffectFrame } from "../rules/effect-frames.ts";
 import type { EngineStep } from "../rules/intents.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import { legalIntents, legalTargets } from "../rules/legal.ts";
 import { settle } from "../rules/machine.ts";
+import { offerResponses } from "../rules/responses.ts";
 import type { PlayerIntent, ReduceContext } from "../rules/reduce.ts";
 import { flagged, type ScenarioState } from "../rules/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
@@ -50,6 +51,39 @@ describe("The Eaves of Mirkwood (41010:A:1)", () => {
     // The effect resolved: Obsidian Arrows dealt its 2 damage.
     const settled = settleChoices(stopped, barred.ctx);
     expect(Object.values(settled.state.cards).filter((card) => card.zone === "heroes").reduce((sum, card) => sum + card.damage, 0)).toBe(2);
+  });
+});
+
+describe("The Eaves of Mirkwood bars only the cancels (41010:A:1, rr.cancel)", () => {
+  // "blade" hears the Shadow window with a Response that only raises Defense (Round Shield, 19118:response:1) and one that cancels the effect.
+  const shield: Effect = { id: "blade:response:1", cardCode: "blade", lines: ["blade:A:1"], timing: "response", trigger: "shadowPending", cost: { kind: "exhaustSelf" }, instructions: [{ verb: "ModifyStat", stat: "defense", amount: 2, until: "endOfAttack", target: "host" }] };
+  const cancels: Effect = { id: "blade:response:2", cardCode: "blade", lines: ["blade:A:2"], timing: "response", trigger: "shadowPending", instructions: [{ verb: "CancelEffect" }] };
+  const offeredIn = (layout: OathLayout, trigger: "shadowPending" | "whenRevealedPending") => {
+    const made = make({ ...layout, attachments: ["blade"] });
+    const ctx = { ...made.ctx, effects: [...made.ctx.effects, shield, cancels, { ...cancels, id: "blade:response:3", trigger: "whenRevealedPending" as const }] };
+    const opened = offerResponses(made.state, { trigger, seat: 0 }, ctx, []);
+    const top = opened.stack[opened.stack.length - 1];
+    return top?.data.kind === "responses" ? top.data.offers.map((offer) => offer.effectId).sort() : [];
+  };
+
+  it("offers a Response that does not cancel and not one that does, in the Shadow window", () => {
+    expect(offeredIn({}, "shadowPending")).toEqual(["blade:response:1", "blade:response:2"]);
+    expect(offeredIn({ active: "41010" }, "shadowPending")).toEqual(["blade:response:1"]);
+  });
+
+  it("opens no When Revealed window for a cancel alone, and keeps it for the rest", () => {
+    expect(offeredIn({}, "whenRevealedPending")).toEqual(["blade:response:3"]);
+    expect(offeredIn({ active: "41010" }, "whenRevealedPending")).toEqual([]);
+  });
+
+  it("does not offer the paid cancel of an encounter card's own effect (141077:A:2), and does when The Eaves of Mirkwood is not active", () => {
+    const paid = (layout: OathLayout) => {
+      const made = make({ ...layout, resources: 1 });
+      const pushed = pushEffectFrame(made.state, { frame: "ResolveEffect", sourceId: first(made.state, "41011"), actor: 0, peril: false, effectId: "test", instructions: [], cancel: { amount: 1, sphere: null, unless: null }, blockCancel: null }, []);
+      return settle({ ...pushed, window: null }, made.ctx, []).window?.kind;
+    };
+    expect(paid({ staging: ["41011"] })).toBe("cancelOffer");
+    expect(paid({ staging: ["41011"], active: "41010" })).not.toBe("cancelOffer");
   });
 });
 

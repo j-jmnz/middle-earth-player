@@ -73,6 +73,33 @@ describe("Mirkwood Forest, stage 2B (41002:B:1, 41002:B:2)", () => {
   });
 });
 
+describe("Goblin Trail's progress and stage 3's When Revealed (41014:A:2, rr.quest-advancement, rr.triggering-condition)", () => {
+  it("does not clear stage 3 while Goblin Troop is set aside: the new stage is revealed before the Trail's Response puts progress on it", () => {
+    // The Trail (6 quest points) is the active location: 6 progress explore it, 12 more fill stage 2, and the Trail's 6 progress go on the stage reached.
+    const made = make({ stage: "41002", active: "41014", setAside: ["41019"] });
+    const trail = first(made.state, "41014");
+    expect(trail).toBeDefined();
+    const offered = progress(made.state, 18, made.ctx);
+    expect(offered.window?.kind).toBe("response");
+    expect(codesIn(offered, "staging")).toContain("41019");
+    // The Response is optional: the player places the 6 progress.
+    const advanced = settle({ ...expectOk(reduce(offered, { type: "Trigger", cardId: trail, effectId: "41014:response:1" }, made.ctx)).state, window: null }, made.ctx, []);
+    expect(stageOf(advanced)).toBe("41003");
+    expect(advanced.stageCleared).toBe(false);
+    expect(advanced.cards[advanced.questStage ?? ""]?.progress).toBe(6);
+    // The Rearguard's When Revealed brought Goblin Troop into play before the 6 progress were placed.
+    expect(codesIn(advanced, "staging")).toContain("41019");
+    expect(codesIn(advanced, "victory")).toContain("41014");
+  });
+
+  it("keeps the order for an explored location that puts no progress on the quest", () => {
+    const made = make({ stage: "41002", active: "place", victory: ["41014"], setAside: ["41019"] });
+    const advanced = progress(made.state, 14, made.ctx);
+    expect(stageOf(advanced)).toBe("41003");
+    expect(codesIn(advanced, "staging")).toContain("41019");
+  });
+});
+
 describe("The Rearguard, stage 3 (41003:A:1, 41003:B:1)", () => {
   it("has the first player add the set-aside Goblin Troop and each other player search for a Goblin enemy", () => {
     const made = make({ seats: 2, stage: "41002", victory: ["41014"], setAside: ["41019"], deck: ["f0", "41020", "41023"] });

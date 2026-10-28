@@ -1,5 +1,9 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
+import { AUTHORED_EFFECTS as ANDUIN } from "./journey-along-the-anduin.ts";
+import { AUTHORED_EFFECTS as PASSAGE } from "./passage-through-mirkwood.ts";
+import { reprint } from "./reprint.ts";
+
 // Records for The Oath (Mirkwood Paths part 4 and The Dark of Mirkwood part 1, campaign card 41050): the encounter cards no template reads,
 // the three quest cards and the campaign card. The boons and burdens it deals or earns (the Adaptations 41044 to 41047, Stalking Goblin 41041,
 // Guilty Conscience 41043) are in pool/TDoM.ts. Every line is read from the scan ledger (data/printed/mirkwood-paths.json).
@@ -13,6 +17,9 @@ const STAGING_ENEMIES = {"type":"enemy","control":"any","stagingOnly":true} as c
 // The treachery being revealed waits in the staging area while it resolves (rules/frames.ts): "the staging area" here is the other cards.
 const STAGING = {"type":"card","control":"any","stagingOnly":true,"other":true} as const;
 const GOBLIN_ENEMY = {"type":"enemy","control":"any","trait":"Goblin"} as const;
+
+// The records of the Passage and Anduin cards this scenario prints again (the ledger lines are identical, reprint.test.ts).
+const TWINS: readonly Effect[] = [...PASSAGE, ...ANDUIN];
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 41001 After the Raid: the piles place The Eaves of Mirkwood in the staging area and set Goblin Troop aside; this record describes them (as 01119:setup:1).
@@ -36,7 +43,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"41011:constant:1","cardCode":"41011","lines":["41011:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"threat","amount":{"count":STAGING_LOCATIONS},"until":"whileSourceInPlay"}]},
   {"id":"41011:travel:1","cardCode":"41011","lines":["41011:A:2"],"timing":"travel","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"DiscardRandomFromHand","amount":1}]}]},
   // 41012 Forest Gate: the first player may draw 2 cards after the players travel here (as 01100:response:1).
-  {"id":"41012:response:1","cardCode":"41012","lines":["41012:A:1"],"timing":"response","trigger":"traveled","instructions":[{"verb":"Draw","amount":2,"who":"firstPlayer"}]},
+  ...reprint(TWINS, "01100", "41012"),
   // 41013 Spider Den: any player may use this Quest Action to bring a Spider from the deck or discard pile into play engaged with him and discard Spider Den.
   {"id":"41013:action:1","cardCode":"41013","lines":["41013:A:1"],"timing":"action","anyPlayer":true,"condition":{"kind":"all","conditions":[{"kind":"phase","is":"Quest"},{"kind":"searchable","trait":"Spider"}]},"instructions":[{"verb":"SearchMove","trait":"Spider","type":"enemy","to":"engaged"},{"verb":"Discard","target":{"kind":"self"}}]},
   // 41014 Goblin Trail: a card is revealed to travel here (as 01078:travel:1); explored, it puts 6 progress on the current quest.
@@ -47,22 +54,19 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"41015:response:1","cardCode":"41015","lines":["41015:A:1"],"timing":"response","trigger":"traveled","instructions":[{"verb":"DiscardFromDeck","amount":1},{"verb":"Pick","pick":{"type":"card","control":"you","from":"discard","looked":true,"cardType":"ally"}},{"verb":"PutIntoPlay","card":"picked","who":"actor"}]},
   {"id":"41015:travel:1","cardCode":"41015","lines":["41015:A:2"],"timing":"travel","instructions":[{"verb":"MoveEncounterCard","card":"deckTop","to":"discard"},{"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"}}}]},
   // 41016 Driven by Shadow: every enemy and location in the staging area gets +1 Threat; surge when there is no card there (as 01092).
-  {"id":"41016:whenRevealed:1","cardCode":"41016","lines":["41016:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"threat","amount":1,"until":"endOfPhase","holders":STAGING_ENEMIES},{"verb":"ModifyStat","stat":"threat","amount":1,"until":"endOfPhase","holders":STAGING_LOCATIONS},{"verb":"GainSurge","when":{"kind":"count","pick":STAGING,"max":0}}]},
-  {"id":"41016:shadow:1","cardCode":"41016","lines":["41016:A:2"],"timing":"shadow","instructions":[{"verb":"Pick","pick":{"type":"attachment","control":"any","attachedTo":"defender"},"when":NOT_UNDEFENDED},{"verb":"DiscardPicked","when":NOT_UNDEFENDED},{"verb":"Each","pick":{"type":"attachment","control":"you"},"instructions":[{"verb":"DiscardPicked"}],"when":{"kind":"undefended"}}]},
+  ...reprint(TWINS, "01092", "41016"),
   // 41017 Surprising Speed: each player returns an engaged enemy to the staging area; with none returned it gains surge and doomed 1. The Shadow
   // adds Attack and returns the attacker to the staging area after the attack.
   {"id":"41017:whenRevealed:1","cardCode":"41017","lines":["41017:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"ReturnToStaging","target":{"kind":"engagedEnemies","who":"actor","pick":"choose"}}]},{"verb":"GainSurge","when":{"kind":"noneReturned"}},{"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]},
   {"id":"41017:shadow:1","cardCode":"41017","lines":["41017:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"},{"verb":"AfterAttack","instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]}]},
   // 41018 Caught in a Web: as 01080 (the highest threat player attaches it; its hero does not ready unless the pool pays 2).
-  {"id":"41018:whenRevealed:1","cardCode":"41018","lines":["41018:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AttachSelf","to":{"kind":"hero","control":"highestThreat"}}]},
-  {"id":"41018:constant:1","cardCode":"41018","lines":["41018:A:1"],"timing":"constant","instructions":[{"verb":"CountsAs","cardType":"attachment","trait":"Condition"},{"verb":"ModifyStat","stat":"doesNotReady","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"readyPayment","amount":2,"until":"whileSourceInPlay","target":"host"}]},
+  ...reprint(TWINS, "01080", "41018"),
   // 41019 Goblin Troop: no attachments; while engaged it gives each other Goblin enemy engaged with the same player +1 Attack and +1 Defense; the Shadow adds 2 Attack.
   {"id":"41019:constant:1","cardCode":"41019","lines":["41019:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"41019:constant:2","cardCode":"41019","lines":["41019:A:2"],"timing":"constant","condition":{"kind":"sourceIn","zone":"engaged"},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","holders":{"type":"enemy","control":"any","engaged":"you","trait":"Goblin","other":true}},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","holders":{"type":"enemy","control":"any","engaged":"you","trait":"Goblin","other":true}}]},
   {"id":"41019:shadow:1","cardCode":"41019","lines":["41019:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"}]},
   // 41020 Goblin Sniper: as 01083 (cannot be optionally engaged while another enemy is in the staging area; damages a character of each player if it is still there after combat).
-  {"id":"41020:constant:1","cardCode":"41020","lines":["41020:A:1"],"timing":"constant","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Encounter"},{"kind":"sourceIn","zone":"staging"},{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"other":true},"min":1}]},"instructions":[{"verb":"ModifyStat","stat":"cannotBeOptionallyEngaged","amount":1,"until":"whileSourceInPlay","target":"self"}]},
-  {"id":"41020:forced:1","cardCode":"41020","lines":["41020:A:2"],"timing":"forced","trigger":"endOfPhase","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Combat"},{"kind":"sourceIn","zone":"staging"}]},"instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"Pick","pick":{"type":"character","control":"you"}},{"verb":"DamageCard","amount":1,"target":"picked"}]}]},
+  ...reprint(TWINS, "01083", "41020"),
   // 41021 Goblin Runners (Surge): the Shadow makes the attacker attack again once this attack is over, with a new shadow card (as 141073:shadow:1).
   {"id":"41021:shadow:1","cardCode":"41021","lines":["41021:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"ImmediateAttack"}]}]},
   // 41022 Goblintown Scavengers: each player's top card is discarded and its printed cost adds to this enemy's Threat until the end of the phase.
@@ -84,7 +88,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // optional). Resolution: the tokens are recorded, and 6 or more earn Guilty Conscience.
   {"id":"41050:campaignSetup:1","cardCode":"41050","lines":["41050:A:2"],"timing":"campaignSetup","instructions":[{"verb":"ChooseCards","codes":["41044","41045","41046","41047"],"who":"eachSeat","to":"hero"},{"verb":"ShuffleIntoEncounterDeck","code":"41041"},{"verb":"AddToPool","code":"41041"}]},
   {"id":"41050:response:1","cardCode":"41050","lines":["41050:A:3"],"timing":"response","trigger":"endOfRound","instructions":[{"verb":"PlaceToken","amount":1}]},
-  {"id":"41050:resolution:1","cardCode":"41050","lines":["41050:B:1"],"timing":"resolution","instructions":[{"verb":"RecordTokens","code":"41050"},{"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]},
+  {"id":"41050:resolution:1","cardCode":"41050","lines":["41050:B:1"],"timing":"resolution","instructions":[{"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]},
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

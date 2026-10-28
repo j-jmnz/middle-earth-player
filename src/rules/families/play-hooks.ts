@@ -6,6 +6,7 @@
 import type { Instruction, Trigger } from "../../catalog/boundary.ts";
 
 import type { Cause } from "../cause.ts";
+import { printedOf, type PrintedCard } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import type { CardInstance, ScenarioState } from "../state.ts";
 import { livingSeats, modifierActive } from "../state.ts";
@@ -31,6 +32,17 @@ export function highestThreatSeats(state: ScenarioState): number[] {
   const living = livingSeats(state);
   const top = Math.max(...living.map((seat) => seatThreat(state, seat)));
   return living.filter((seat) => seatThreat(state, seat) === top);
+}
+
+// The heroes an AttachSelf card to a hero may go to, before the ones that already hold a copy are left out: those of the seats the card names
+// ("the hero with the highest threat cost", 41043:A:2: the printed threat cost is the greatest among every player's heroes, a tie keeps each).
+export function attachHeroHosts(state: ScenarioState, to: Extract<Instruction, { verb: "AttachSelf" }>["to"], itemSeat: number, cards: ReadonlyMap<string, PrintedCard>): string[] {
+  if (to.kind !== "hero") return [];
+  const seats = to.control === "any" || to.control === "highestThreatCost" ? livingSeats(state) : to.control === "highestThreat" ? highestThreatSeats(state) : [itemSeat];
+  const printed = (id: string): PrintedCard => printedOf(cards, state.cards[id]?.code ?? "");
+  const heroes = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []);
+  const top = to.control === "highestThreatCost" ? Math.max(...heroes.map((id) => printed(id).threat ?? 0)) : null;
+  return heroes.filter((id) => (top == null || (printed(id).threat ?? 0) === top) && (to.exceptSphere == null || printed(id).sphere !== to.exceptSphere));
 }
 
 // The seat that chooses the host of an AttachSelf card that goes to a hero: the first player when it may go to any player's hero, the

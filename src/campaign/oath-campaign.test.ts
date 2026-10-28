@@ -20,6 +20,8 @@ import { campaign, loadOathWorld, oathTable, type OathWorld } from "../../script
 import { first, send, start } from "../../scripts/past-scene.ts";
 
 import { checklist } from "./checklist.ts";
+import { resolutionView, settledSentence } from "./resolution-view.ts";
+import type { World } from "./world.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { newSave } from "./save.ts";
@@ -218,18 +220,30 @@ describe("The Oath, the campaign card (41050:A:3, 41050:B:1)", () => {
     return { result: resolutionResult(done), state: done };
   }
 
-  it("records the tokens as a counter in the log, and earns Guilty Conscience with 6 or more (41050:B:1)", () => {
+  it("earns Guilty Conscience with 6 or more tokens, and records no counter (41050:B:1 prints none)", () => {
     for (const [n, earned] of [[0, false], [5, false], [6, true], [9, true]] as const) {
       const { result } = resolved(n);
-      expect(result?.counters, `${n} tokens`).toEqual({ "41050": n });
+      expect(result?.counters, `${n} tokens`).toBeUndefined();
       expect(result?.earned.map((item) => item.code), `${n} tokens`).toEqual(earned ? ["41043"] : []);
     }
   });
 
-  it("writes the counter and Guilty Conscience to the Campaign Log, and a burden goes to the pool backed by the encounter deck", () => {
+  it("says in its Resolution sentence which Adaptations it records as used this campaign, and the burden the tokens earn (41044:A:3, 41050:B:1)", () => {
+    const { state } = resolved(7);
+    const used = { ...state, campaignFacts: { prisoner: null, usedOnce: ["41044", "41044"], counters: {} } };
+    const world = { cards: scene.cards } as unknown as World;
+    const view = resolutionView(used, world);
+    if (view.kind !== "settled") throw new Error(`expected a settled Resolution, got ${view.kind}`);
+    expect(view.used).toEqual(["41044"]);
+    expect(settledSentence(view, world, "The Caves of Nibin-Dûm")).toBe("Confirming records the burden Guilty Conscience in the campaign and unlocks The Caves of Nibin-Dûm. The Fervor of Lore is recorded as used this campaign.");
+    const unused = resolutionView(state, world);
+    expect(unused.kind === "settled" ? settledSentence(unused, world, "The Caves of Nibin-Dûm") : "").toBe("Confirming records the burden Guilty Conscience in the campaign and unlocks The Caves of Nibin-Dûm.");
+  });
+
+  it("writes Guilty Conscience to the Campaign Log, and a burden goes to the pool backed by the encounter deck", () => {
     const { state } = resolved(7);
     const log = applyResolution(emptyLog(1), "the-oath", state, scene.cards);
-    expect(log.counters).toEqual({ "41050": 7 });
+    expect(log.counters).toEqual({});
     expect(log.campaignPool.map((card) => card.code)).toEqual(["41043"]);
     expect(log.campaignPool[0]?.back).toBe("encounter");
     expect(log.completed).toEqual(["the-oath"]);

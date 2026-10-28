@@ -280,7 +280,7 @@ describe("The Oath (The Dark of Mirkwood part 1, phase 32)", () => {
     }
   });
 
-  it("oath-won replays to a win with nothing to answer, and confirming it writes the tokens, the used Adaptation and the pool, and unlocks The Caves of Nibin-Dûm", () => {
+  it("oath-won replays to a win with nothing to answer, and confirming it writes the used Adaptation and the pool, and unlocks The Caves of Nibin-Dûm", () => {
     const world = worldFor("oath-won");
     const save = fixtureSave("oath-won", "s", CATALOG_VERSION);
     const resumed = resume(save, world, CATALOG_VERSION);
@@ -288,11 +288,11 @@ describe("The Oath (The Dark of Mirkwood part 1, phase 32)", () => {
     if (!resumed.ok) return;
     const view = resolutionView(resumed.state, world);
     expect(view.kind).toBe("settled");
-    const tokens = resumed.state.resolutionLog.counters?.["41050"] ?? -1;
+    const tokens = Object.values(resumed.state.cards).find((card) => card.code === "41050")?.resources ?? -1;
     expect(tokens).toBeGreaterThanOrEqual(0);
     const after = finish(save, world, resumed.state);
     expect(after.log.completed).toEqual(["the-oath"]);
-    expect(after.log.counters).toEqual({ "41050": tokens });
+    expect(after.log.counters).toEqual({});
     expect(after.log.usedOnce.length).toBeGreaterThan(0);
     // The Adaptations the seats chose and Stalking Goblin are in the pool; Guilty Conscience with 6 or more tokens.
     const pool = after.log.campaignPool.map((card) => card.code);

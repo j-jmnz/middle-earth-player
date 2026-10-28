@@ -12,7 +12,7 @@ import { finish } from "../../../campaign/session";
 import { ActionBar, BodyText, Corners, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton } from "../../chrome";
 import { tileSurface } from "../../../play/surfaces";
 import { withAlphaHex } from "../../../play/tokens";
-import { campaignOf, scenarioOf } from "../../campaign-data";
+import { campaignOf, scenarioName } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
 import { recordCampaignRun } from "../../run-writers";
 import { useDatabases } from "../../databases";
@@ -58,7 +58,6 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const refusal = useStore(opened.store, (state) => state.refusal);
   const [chosen, setChosen] = useState<string | null>(null);
   const view = useMemo(() => resolutionView(game, session.world), [game, session]);
-  const scenario = scenarioOf(game.scenarioId);
   // A loss is a run the moment it is reached (the table wrote it already; a game lost before this build is written here). The
   // run id is fixed, so a second write changes nothing, and leaving by Path loses nothing.
   const lost = view.kind === "lost";
@@ -85,7 +84,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
       <Screen testID="resolution" scene="plain">
         {back}
         <View className="flex-1 items-center justify-center">
-          <OutcomeTitle won={false} scenario={scenario?.name ?? ""} testID="resolution-outcome" />
+          <OutcomeTitle won={false} scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
           {view.reason ? (
             <BodyText className="mt-6 text-center" testID="resolution-reason">
               {/[.!?]$/.test(view.reason) ? view.reason : `${view.reason}.`}
@@ -115,7 +114,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const done = opened.save().log.completed.includes(game.scenarioId);
   const at = campaign?.scenarios.indexOf(game.scenarioId) ?? -1;
   const nextId = at >= 0 ? campaign?.scenarios[at + 1] : undefined;
-  const nextName = !done && nextId ? (scenarioOf(nextId)?.name ?? null) : null;
+  const nextName = !done && nextId ? scenarioName(nextId) : null;
   const picked = view.kind === "choosing" ? (view.tiles.find((tile) => tile.optionId === chosen) ?? null) : null;
   const declined = view.kind === "choosing" && view.decline != null && chosen === view.decline.optionId;
   const answer = picked?.optionId ?? (declined && view.kind === "choosing" ? (view.decline?.optionId ?? null) : null);
@@ -128,7 +127,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
         <ScreenScroll top={16} bottom={24}>
           {/* While choosing, the outcome word sits higher so a row of tiles shows whole above the bar. */}
           <View className={view.kind === "choosing" ? "mt-4" : "mt-16"}>
-            <OutcomeTitle won scenario={scenario?.name ?? ""} testID="resolution-outcome" />
+            <OutcomeTitle won scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
           </View>
           {view.kind === "choosing" ? (
             <View className="mt-8">

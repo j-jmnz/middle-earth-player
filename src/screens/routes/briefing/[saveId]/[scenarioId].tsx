@@ -1,3 +1,4 @@
+import { inArray } from "drizzle-orm";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
@@ -6,6 +7,7 @@ import { briefing, scenarioFacts, type BriefingInput, type BriefingSeat } from "
 import { deal } from "../../../../campaign/session";
 import { logCodes, loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
+import { cards } from "../../../../catalog/schema";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
 import { BodyText, Label, Section, TextButton } from "../../../chrome";
@@ -15,6 +17,7 @@ import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
 import { recordUnclosedRun } from "../../../table-session";
 import { dealSeed } from "../../../e2e";
+import { actionLine, needWords } from "../../../briefing-words";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
 import { SeatPicker } from "../../../seat-picker";
 import { routeCode } from "../../../route-code";
@@ -62,6 +65,12 @@ export default function Briefing() {
   );
   const result = useMemo(() => (input ? briefing(input) : null), [input]);
   const facts = useMemo(() => (world ? scenarioFacts(world, difficulty) : null), [world, difficulty]);
+  // The printed text of the cards a campaign choice offers, for the Action line under each option.
+  const offered = useMemo(() => (result?.needs ? result.needs.options.flatMap((option) => (option === "skip" ? [] : [option.split(">")[0] ?? ""])) : []), [result]);
+  const printedText = useMemo<Record<string, string | null>>(
+    () => (offered.length === 0 ? {} : Object.fromEntries(catalog.select({ code: cards.code, text: cards.text }).from(cards).where(inArray(cards.code, offered)).all().map((row) => [row.code, row.text]))),
+    [catalog, offered],
+  );
 
   const frame = {
     testID: "briefing",
@@ -90,6 +99,7 @@ export default function Briefing() {
   }
 
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
+  const asked = result.needs ? needWords(result.needs.seat, result.needs.options, (code) => world.cards.get(code)?.traits ?? []) : null;
   const completed = save.log.completed.includes(scenario.id);
   const fallen = save.log.fallenHeroesBySeat.flat();
 
@@ -131,7 +141,7 @@ export default function Briefing() {
       {...frame}
       banner={<ScenarioBanner facts={facts} eyebrow={`Scenario ${facts.number} · ${campaign.name}`} />}
       bar={
-        <DealBar problems={result.problems} dealError={dealError} difficulty={difficulty} dropsOpen={save.loadout != null} dealable={result.dealable} onDeal={onDeal}>
+        <DealBar problems={result.problems} dealError={dealError} difficulty={difficulty} dropsOpen={save.loadout != null} dealable={result.dealable} waiting={asked?.waiting ?? null} onDeal={onDeal}>
           {result.penaltyAdded > 0 && !accepted ? (
             <View className="items-start">
               <TextButton label={`Accept +${result.penaltyAdded} threat for the campaign`} testID="accept-penalty" tone="gold" onPress={() => setAccepted(true)} />
@@ -170,11 +180,27 @@ export default function Briefing() {
       {result.needs ? (
         <View testID="briefing-choice" className="mt-5">
           <Section title={`Seat ${result.needs.seat + 1} chooses`} />
+          {asked?.intro ? (
+            <Label tone="muted" testID="briefing-choice-intro">
+              {asked.intro}
+            </Label>
+          ) : null}
           {choices.length > 0 ? <TextButton label="Undo last choice" testID="choice-undo" onPress={() => setChoices((current) => current.slice(0, -1))} /> : null}
           {result.needs.options.map((option) => {
             const [code = "", host] = option.split(">");
             const label = option === "skip" ? "Skip" : host ? `${nameOf(code)} on ${nameOf(host)}` : nameOf(code);
-            return <TextButton key={option} label={label} testID={`choice-${option}`} onPress={() => setChoices((current) => [...current, option])} />;
+            // The card's Action line, so the choice is made knowing what the boon does.
+            const action = option === "skip" ? null : actionLine(printedText[code]);
+            return (
+              <View key={option}>
+                <TextButton label={label} testID={`choice-${option}`} onPress={() => setChoices((current) => [...current, option])} />
+                {action ? (
+                  <Label tone="muted" testID={`choice-${option}-action`}>
+                    {action}
+                  </Label>
+                ) : null}
+              </View>
+            );
           })}
         </View>
       ) : null}

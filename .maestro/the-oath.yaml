@@ -79,10 +79,7 @@ tags:
 - assertVisible:
     id: log-burdens
     text: ".*Stalking Goblin.*"
-# The Adaptation used once is recorded (41044:A:3), and the tokens counted on the campaign card (41050:B:1).
+# The Adaptation used once is recorded (41044:A:3).
 - assertVisible:
     id: log-used-once
     text: ".*The Fervor of Lore.*"
-- assertVisible:
-    id: log-counter-41050
-    text: "\\d+"

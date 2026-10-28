@@ -63,8 +63,6 @@ tags:
     timeout: 15000
 - assertNotVisible:
     id: log-used-once
-- assertNotVisible:
-    id: log-counter-41050
 - assertVisible:
     id: log-scenario-the-oath
     text: ".*Not completed.*"

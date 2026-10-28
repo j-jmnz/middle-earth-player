@@ -8,7 +8,7 @@ import { View } from "react-native";
 
 import { finishStandalone } from "../../../../campaign/standalone";
 import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, StatTile, TextButton } from "../../../chrome";
-import { scenarioOf } from "../../../campaign-data";
+import { scenarioName } from "../../../campaign-data";
 import { useDatabases } from "../../../databases";
 import { goBack } from "../../../go-back";
 import { routeCode } from "../../../route-code";
@@ -45,7 +45,6 @@ export default function StandaloneOutcome() {
   }
 
   const result = finished.result;
-  const scenario = scenarioOf(finished.scenarioId);
   if (!result) {
     return (
       <Screen testID="standalone-outcome" scene="plain">
@@ -65,7 +64,7 @@ export default function StandaloneOutcome() {
     <Screen testID="standalone-outcome" scene={won ? "victory" : "plain"}>
       {back}
       <View className={won ? "flex-1 pt-16" : "flex-1 justify-center"}>
-        <OutcomeTitle won={won} scenario={scenario?.name ?? ""} testID="outcome-title" />
+        <OutcomeTitle won={won} scenario={scenarioName(finished.scenarioId)} testID="outcome-title" />
         {result.outcome === "won" ? (
           // The score as the numbers the player watches: score, completed rounds, victory points (ltp.scoring).
           <View className="mt-10" testID="outcome-lines">

@@ -8,7 +8,7 @@ import { inArray } from "drizzle-orm";
 import { BodyText, Eyebrow, IconButton, NavBar, PrimaryButton, Screen } from "../../chrome";
 import { bookletParams, campaignOf, scenarioNames } from "../../campaign-data";
 import { carryWords } from "../../carry-words";
-import { counterRows, usedOnceWords } from "../../log-facts";
+import { poolCardWords, usedOnceWords } from "../../log-facts";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { palette } from "../../palette.js";
@@ -53,7 +53,6 @@ export default function Log() {
     if (save.log.prisoner) codes.add(save.log.prisoner);
     for (const card of save.log.carryOver) codes.add(card.code);
     for (const code of save.log.usedOnce) codes.add(code);
-    for (const code of Object.keys(save.log.counters)) codes.add(code);
     if (codes.size === 0) return [];
     return catalog.select().from(cards).where(inArray(cards.code, [...codes])).all();
   }, [catalog, save]);
@@ -87,7 +86,7 @@ export default function Log() {
     const picked = log.campaignPool.filter((card) => printed.get(card.code)?.campaignKind === kind);
     // A boon stuck to a hero names that hero, and in two-handed play the seat that took it (141044:B:1).
     const seatOf = (card: (typeof picked)[number]) => (save.seatCount > 1 && card.attachedTo && card.seat != null ? `Player ${card.seat + 1}: ` : "");
-    return picked.length === 0 ? "None" : picked.map((card) => `${seatOf(card)}${card.attachedTo ? `${nameOf(card.code)} on ${nameOf(card.attachedTo)}` : nameOf(card.code)}`).join("\n");
+    return picked.length === 0 ? "None" : picked.map((card) => `${seatOf(card)}${poolCardWords(card, log.usedOnce, nameOf)}`).join("\n");
   };
   const names = scenarioNames(campaign);
   const notes = edited ?? log.notes;
@@ -120,9 +119,8 @@ export default function Log() {
           />
           {/* The hero Journey Along the Anduin's Resolution took prisoner (01130:B:1), taken at the start of Escape from Dol Guldur; the row goes once that scenario is completed (the hero is rescued or the scenario is over). */}
           {log.prisoner && !log.completed.includes("escape-from-dol-guldur") ? <Row label="Prisoner" value={nameOf(log.prisoner)} testID="log-prisoner" /> : null}
-          {/* Once-per-campaign uses ("Record in Campaign Log when used", the Adaptations of The Oath, 41044:A:3 to 41047:A:3) and the resource tokens a campaign card held when its scenario was won (41050:B:1). */}
-          {log.usedOnce.length > 0 ? <Row label="Used Once" value={usedOnceWords(log.usedOnce, nameOf)} testID="log-used-once" /> : null}
-          {counterRows(log.counters, nameOf).map((row) => <Row key={row.code} label={row.label} value={row.value} testID={`log-counter-${row.code}`} />)}
+          {/* Once-per-campaign uses ("Record in Campaign Log when used", the Adaptations of The Oath, 41044:A:3 to 41047:A:3). */}
+          {log.usedOnce.length > 0 ? <Row label="Used this campaign" value={usedOnceWords(log.usedOnce, nameOf)} testID="log-used-once" /> : null}
           {/* The cards a Resolution keeps for the next campaign, not this one (Escape from Dol Guldur's Mendor, 01131:B:2). */}
           {log.carryOver.length > 0 ? <Row label="Next Campaign" value={carryWords(log.carryOver, nameOf)} testID="log-carry-over" /> : null}
           <View className="border-b border-inkLine py-3">

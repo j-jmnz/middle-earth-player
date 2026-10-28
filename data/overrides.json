@@ -116,8 +116,19 @@
         "threat": 2,
         "engagementCost": 10
       },
-      "reason": "Hall of Beorn gives the burden enemy Stalking Goblin no Threat and no engagement cost, and files its Threat icon (2) as Willpower. The scan prints Threat 2 and engagement cost 10 (the number at the top of the card), Attack 2, Defense 2 and 2 hit points, so the engagement check can engage it and it counts in the staging area. Ungoliant's Swarm (01136) has the same gap and is left as phase 29 shipped it.",
+      "reason": "Hall of Beorn gives the burden enemy Stalking Goblin no Threat and no engagement cost, and files its Threat icon (2) as Willpower. The scan prints Threat 2 and engagement cost 10 (the number at the top of the card), Attack 2, Defense 2 and 2 hit points, so the engagement check can engage it and it counts in the staging area. Ungoliant's Swarm (01136) has the same gap and its own override.",
       "source": "scan 41041.A, data/printed/mirkwood-paths.json"
+    },
+    {
+      "match": {
+        "code": "01136"
+      },
+      "set": {
+        "threat": 3,
+        "engagementCost": 33
+      },
+      "reason": "Hall of Beorn gives the burden enemy Ungoliant's Swarm no Threat and no engagement cost, and files its Threat icon (3) as Willpower. The scan prints engagement cost 33 (the number at the top of the card), Threat 3, Attack 2, Defense 2 and 5 hit points, so the engagement check can engage it and it counts in the staging area.",
+      "source": "scan 01136.A, data/printed/mirkwood-paths.json"
     }
   ],
   "scenarioPiles": [

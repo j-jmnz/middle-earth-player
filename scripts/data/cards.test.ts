@@ -131,6 +131,7 @@ describe("Mirkwood Paths cards", () => {
     expect(cards.get("01136")).toMatchObject({ campaignKind: "burden", burdenSet: "Passage Through Mirkwood", encounterSet: "Passage Through Mirkwood" });
     // Stalking Goblin's printed Threat 2 and engagement cost 10 (the scan; Hall of Beorn has neither) come from an override.
     expect(cards.get("41041")).toMatchObject({ campaignKind: "burden", type: "enemy", threat: 2, engagementCost: 10, attack: 2, defense: 2, health: 2 });
+    expect(cards.get("01136")).toMatchObject({ campaignKind: "burden", type: "enemy", threat: 3, engagementCost: 33, attack: 2, defense: 2, health: 5 });
   });
 
   it("codes The Dark of Mirkwood 410 and the collector number, as RingsDB does for its burdens and boons", () => {

@@ -78,11 +78,15 @@ export function StartPanel({ options, current, carry, onStart }: { options: read
   const taken = carry.find((choice) => choice.saveId === taking) ?? null;
   const seatId = (count: Seats) => (isFellowship(data.id) ? `seats-${count}` : `seats-${data.id}-${count}`);
   const count = `${data.scenarios.length} scenarios`;
-  const top = (
+  const title = (
     <>
-        <Text className="font-display text-title text-bone">{name}</Text>
-        <Label>{count}</Label>
-        {options.length > 1 ? (
+      <Text className="font-display text-title text-bone">{name}</Text>
+      <Label>{count}</Label>
+    </>
+  );
+  // In landscape the chooser spans the whole panel, so each of three tiles is wide enough for a campaign's name on one line.
+  const chooser =
+    options.length > 1 ? (
           <View className={landscape ? "mt-3 flex-row gap-2" : "mt-4 gap-2"} accessibilityRole="radiogroup" accessibilityLabel="Campaign" testID="campaign-choice">
             {options.map((option) => {
               const selected = option.data.id === data.id;
@@ -101,9 +105,7 @@ export function StartPanel({ options, current, carry, onStart }: { options: read
               );
             })}
           </View>
-        ) : null}
-    </>
-  );
+    ) : null;
   const bottom = (
     <>
         <View className={landscape ? "flex-row gap-3" : "mt-4 flex-row gap-3"} accessibilityRole="radiogroup" accessibilityLabel={`Players for ${name}`}>
@@ -151,13 +153,17 @@ export function StartPanel({ options, current, carry, onStart }: { options: read
       </View>
       <View className="px-5 pb-5" style={{ marginTop: landscape ? -24 : -36 }}>
         {landscape ? (
-          <View className="flex-row gap-5">
-            <View className="flex-1">{top}</View>
-            <View className="flex-1 justify-end">{bottom}</View>
-          </View>
+          <>
+            {chooser}
+            <View className="mt-2 flex-row gap-5">
+              <View className="flex-1">{title}</View>
+              <View className="flex-1 justify-end">{bottom}</View>
+            </View>
+          </>
         ) : (
           <>
-            {top}
+            {title}
+            {chooser}
             {bottom}
           </>
         )}

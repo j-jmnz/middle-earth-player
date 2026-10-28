@@ -26,7 +26,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attachSetAside(state, instruction.code, lastPicked(state));
     case "PlaceToken":
       return placeToken(state, focus.sourceId, instruction.amount ?? 1);
-    case "RecordTokens":
     case "EarnAttached":
     case "NamePrisoner":
       // Resolution verbs: rules/resolution.ts runs them.
@@ -47,7 +46,7 @@ function placeToken(state: ScenarioState, sourceId: string | null, amount: numbe
   return card ? updateCard(state, card.id, { resources: card.resources + amount }) : state;
 }
 
-// The tokens on the card with this code in play: what a campaign card's Resolution reads (the `tokens` condition, RecordTokens).
+// The tokens on the card with this code in play: what a campaign card's Resolution reads (the `tokens` condition).
 export function tokensOn(state: ScenarioState, code: string): number {
   return Object.values(state.cards).filter((card) => card.code === code && inPlay(card.zone)).reduce((sum, card) => sum + card.resources, 0);
 }

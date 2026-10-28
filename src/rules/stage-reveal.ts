@@ -36,12 +36,20 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
 }
 
 // After progress was placed on the quest (from `steps[before]` on): each stage the quest advanced to has its When Revealed
-// effects pushed as frames, and a location the progress explored has its Responses offered first.
+// effects pushed as frames, and a location the progress explored has its Responses offered first (those that put progress on the quest, under the
+// stage's frames).
 export function afterProgress(state: ScenarioState, before: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   const advanced = steps.slice(before).flatMap((step) => (step.kind === "advance" ? [step.cardId] : []));
   // A location the progress explored has left play. Responses to that are offered before the stage's own effects.
   const explored = steps.slice(before).flatMap((step) => (step.kind === "destroy" && isLocation(next, step.targetId, ctx) ? [step.targetId] : []));
+  // Goblin Trail (41014:A:2) puts progress on the current quest: its Response waits for the new stage's When Revealed (below), so the
+  // progress lands on a stage that is revealed (rr.quest-advancement: advancing is immediate; rr.triggering-condition).
+  const early = explored.filter((cardId) => advanced.length > 0 && progressesQuest(next, cardId, ctx));
+  for (const cardId of [...early].reverse()) {
+    next = runQuestResolution(next, cardId, ctx, steps);
+    next = announceLeftPlay(next, cardId, ctx, steps, true);
+  }
   // The first stage reached resolves first, so it is pushed last.
   for (const cardId of [...advanced].reverse()) {
     const code = next.cards[cardId]?.code;
@@ -55,7 +63,7 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
       if (defeated) next = queueEvent(next, { trigger: "questCardDefeated", seat: null, subject: defeated });
     }
   }
-  for (const cardId of [...explored].reverse()) {
+  for (const cardId of [...explored.filter((id) => !early.includes(id))].reverse()) {
     next = runQuestResolution(next, cardId, ctx, steps);
     next = announceLeftPlay(next, cardId, ctx, steps, true);
   }
@@ -67,6 +75,12 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
 export function announceLeftPlay(state: ScenarioState, cardId: string, ctx: ReduceContext, steps: EngineStep[], explored = false): ScenarioState {
   const event = { trigger: "leftPlay", seat: null, cardId, ...(explored ? { explored: true } : {}) } as const;
   return fireForced(offerResponses(state, event, ctx, steps), event, ctx, steps);
+}
+
+// Whether the location's Response to leaving play puts progress on the quest (a record's instruction says so).
+function progressesQuest(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const code = state.cards[id]?.code;
+  return ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "response" && effect.trigger === "leftPlay" && effect.instructions.some((instruction) => instruction.verb === "ProgressQuest"));
 }
 
 function isLocation(state: ScenarioState, id: string, ctx: ReduceContext): boolean {

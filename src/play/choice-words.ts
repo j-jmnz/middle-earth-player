@@ -203,7 +203,9 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     }
     case "Pick": {
       // A card out of play is named by its printed type when the pick asks for one ("choose an ally" from the deck).
-      const noun = instruction.pick.type === "card" && instruction.pick.cardType && instruction.pick.cardType !== "player-side-quest" ? instruction.pick.cardType : (PICK_NOUNS[instruction.pick.type] ?? "card");
+      const kind = instruction.pick.type === "card" && instruction.pick.cardType && instruction.pick.cardType !== "player-side-quest" ? instruction.pick.cardType : (PICK_NOUNS[instruction.pick.type] ?? "card");
+      // "A questing character" (41025:A:2): the pick is of the characters committed to the quest.
+      const noun = instruction.pick.committed === true ? `questing ${kind}` : kind;
       return instruction.pick.mostDamaged ? `choose the ${noun} with the most damage on it` : `choose ${article(noun)}`;
     }
     case "RemoveFromQuest":
@@ -358,7 +360,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   const burden = burdenPickWords(pick, next);
   if (burden) return burden;
   if (pick.verb !== "Pick") return oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
-  const noun = PICK_NOUNS[pick.pick.type] ?? "card";
+  const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;
   const one = article(noun);
   switch (next?.verb) {
     case "RemoveFromQuest":

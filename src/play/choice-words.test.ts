@@ -253,6 +253,7 @@ describe("the words of The Oath choices", () => {
     expect(prompts).toContain("Choose a location to place 3 progress on.");
     expect(prompts).toContain("Choose an ally to put into play.");
     expect(prompts).toContain("Choose a character to exhaust.");
+    expect(prompts).toContain("Choose a questing character to discard.");
     expect(prompts).toContain("Choose a hero to ready.");
   });
 
@@ -271,6 +272,10 @@ describe("the words of The Oath choices", () => {
       });
     }
     expect(branches).toBe(2);
+    const eyes = oath.find((effect) => effect.id === "41025:whenRevealed:1");
+    const choose = eyes?.instructions[0]?.verb === "ForEachPlayer" ? eyes.instructions[0].instructions[0] : undefined;
+    if (choose?.verb !== "Choose") throw new Error("41025:whenRevealed:1 does not open with each player's Choose");
+    expect(branchWords(choose, "discard", made.state, oathNames, "41025")).toBe("Choose a questing character, then discard it");
   });
 
   it("the new verbs read as sentences when a record offers them in a choice", () => {
@@ -280,7 +285,6 @@ describe("the words of The Oath choices", () => {
     expect(say({ verb: "SearchCollection", code: "41020", to: "staging" })).toBe("Search the encounter deck, the discard pile and your collection for Goblin Sniper and add it to the staging area");
     expect(say({ verb: "RaiseThreat", amount: { count: { type: "character", control: "you", committed: true } }, who: "actor" })).toBe("Raise your threat by 1 for each questing character you control");
     expect(say({ verb: "PlaceToken", amount: 1 })).toBe("Place 1 resource token on this card");
-    expect(say({ verb: "RecordTokens", code: "41050" })).toBe("Record the resource tokens on The Oath in the Campaign Log");
     expect(say({ verb: "SearchMove", trait: "Spider", type: "enemy", to: "engaged" })).toBe("Put a Spider enemy into play engaged with you");
     expect(say({ verb: "SearchMove", trait: "Forest", type: "location", to: "staging" })).toBe("Add a Forest location from the encounter deck or discard pile to the staging area");
   });

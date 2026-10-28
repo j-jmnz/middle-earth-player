@@ -22,3 +22,21 @@ export function problemWords(problem: Problem): string {
 export function dealSentence(difficulty: Difficulty, dropsOpen: boolean): string {
   return `${difficulty} difficulty. ${dropsOpen ? "A scenario is already open. Dealing again drops it." : "Dealing starts the scenario."}`;
 }
+
+/** The Action line of a card's printed text ("Action: Choose and discard 3 cards ..."), or null when it has none. */
+export function actionLine(text: string | null | undefined): string | null {
+  return text?.split("\n").find((line) => line.startsWith("Action:")) ?? null;
+}
+
+/**
+ * What a campaign card's Setup choice says at the briefing: the sentence under "Seat N chooses" and the line the Deal bar gives while the choice
+ * is unanswered. The Oath's choice (41050:A:2) is of Adaptation boons, which join the Campaign Pool; any other choice is a card.
+ */
+export function needWords(seat: number, options: readonly string[], traitsOf: (code: string) => readonly string[]): { intro: string | null; waiting: string } {
+  const codes = options.filter((option) => option !== "skip").map((option) => option.split(">")[0] ?? "");
+  const adaptation = codes.length > 0 && codes.every((code) => traitsOf(code).includes("Adaptation"));
+  return {
+    intro: adaptation ? "Choose 1 Adaptation boon and the hero who carries it. It joins your Campaign Pool." : null,
+    waiting: `Choose ${adaptation ? "an Adaptation" : "a card"} for seat ${seat + 1} above.`,
+  };
+}

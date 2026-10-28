@@ -3,7 +3,7 @@ import { costOfKind } from "../catalog/costs.ts";
 
 import { holds } from "./conditions.ts";
 import { triggerHears } from "./families/play-hooks.ts";
-import { cancelWindowBarred } from "./families/encounter-cancel.ts";
+import { cancelBarred } from "./families/encounter-cancel.ts";
 import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
 import { effectsOfCard } from "./families/misc-text.ts";
 import { playableFromDeck } from "./deck-play.ts";
@@ -63,11 +63,12 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
  * combo). With nothing usable now, no window opens.
  */
 export function offerResponses(state: ScenarioState, event: GameEvent, ctx: ReduceContext, steps: EngineStep[], also: readonly GameEvent[] = []): ScenarioState {
-  if (ctx.effects.length === 0 || cancelWindowBarred(state, event)) return state;
+  if (ctx.effects.length === 0) return state;
   const order = livingSeats(state);
   const seen = new Set<string>();
   const offers = [event, ...also]
     .flatMap((each) => collect(state, each, ctx))
+    .filter((offer) => !barred(state, offer, ctx))
     .filter((offer) => {
       // Each event of the occurrence is its own triggering condition: a card that hears two of them is offered twice.
       const key = `${offer.cardId}|${offer.effectId}|${offer.seat}|${offer.event ? (aboutCard(offer.event) ?? "") : ""}`;
@@ -83,6 +84,12 @@ export function offerResponses(state: ScenarioState, event: GameEvent, ctx: Redu
     { frame: "response", cardId: event.cardId ?? null, seat: first.seat, peril: false, data: { kind: "responses", event, offers } },
     steps,
   );
+}
+
+// An offer whose effect cancels an encounter card's effect while The Eaves of Mirkwood bars it (families/encounter-cancel.ts).
+function barred(state: ScenarioState, offer: ResponseOffer, ctx: ReduceContext): boolean {
+  const effect = ctx.effects.find((entry) => entry.id === offer.effectId);
+  return effect != null && offer.event != null && cancelBarred(state, offer.event, effect);
 }
 
 // The offers a seat can use now: those whose cost it can pay at this point of the window.

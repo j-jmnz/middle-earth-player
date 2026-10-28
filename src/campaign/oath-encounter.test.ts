@@ -4,12 +4,13 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/constants.ts";
-import { legalTargets } from "../rules/legal.ts";
+import { legalIntents, legalTargets } from "../rules/legal.ts";
 import { modifiedStat } from "../rules/keywords.ts";
+import type { PlayerIntent } from "../rules/reduce.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
-import { codesIn, engageStaged, fight, loadOathWorld, oathTable, resolveReveal, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
-import { first } from "../../scripts/past-scene.ts";
+import { codesIn, engageStaged, fight, loadOathWorld, oathTable, resolveReveal, settleChoices, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
+import { first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";
 
 let world: OathWorld;
 
@@ -114,6 +115,59 @@ describe("Goblin Sniper (41020)", () => {
     expect(legalTargets(alone.state, { type: "Engage" }, alone.ctx)).toEqual([first(alone.state, "41020")]);
     const crowded = make({ staging: ["41020", "f3"], phase: "Encounter" });
     expect(legalTargets(crowded.state, { type: "Engage" }, crowded.ctx)).toEqual([first(crowded.state, "f3")]);
+  });
+
+  it("deals each player 1 damage on a character he controls at the end of the combat phase while it is in the staging area (41020:A:2)", () => {
+    for (const seats of [1, 2] as const) {
+      const made = make({ seats, staging: ["41020"], phase: "Encounter" });
+      let run: Run = send(start(made.state), { type: "DeclineEngage" }, made.ctx);
+      for (let guard = 0; guard < 80 && run.state.phase !== "End of round" && !run.state.lost; guard += 1) {
+        const window = run.state.window;
+        if (window?.kind === "choose") run = send(run, { type: "Choose", optionId: window.options[0] ?? "" }, made.ctx);
+        else {
+          const intent = legalIntents(run.state, made.ctx).find((item) => item.type === "Pass" || item.type === "DeclineAttack" || item.type === "DeclineEngage");
+          if (!intent) break;
+          run = send(run, intent as PlayerIntent, made.ctx);
+        }
+      }
+      expect(damageOn(run.state), `${seats} seats`).toBe(seats);
+      expect(causeProblems(run.steps)).toEqual([]);
+    }
+  });
+
+  it("deals nothing at the end of the combat phase when it is engaged (41020:A:2)", () => {
+    const made = make({ engaged: [{ code: "41020", seat: 0 }], phase: "Combat" });
+    let run: Run = start(made.state);
+    for (let guard = 0; guard < 40 && run.state.phase !== "Refresh" && !run.state.lost; guard += 1) {
+      if (run.state.window?.kind === "defense") run = send(run, { type: "DeclareDefender", defenderId: made.hero }, made.ctx);
+      else {
+        const intent = legalIntents(run.state, made.ctx).find((item) => item.type === "Pass" || item.type === "DeclineAttack");
+        if (!intent) break;
+        run = send(run, intent as PlayerIntent, made.ctx);
+      }
+    }
+    expect(damageOn(run.state)).toBe(0);
+  });
+});
+
+describe("Goblins are Upon You! (41024:A:1)", () => {
+  it("has each player's Goblin enemy enter engaged with him, and no Response can cancel it", () => {
+    const made = make({ seats: 2, deck: ["41024", "gob", "gob", "f0"], hand: ["cancel"] });
+    const revealing = reveal(made.state, made.ctx, 2);
+    const cancel = first(revealing.state, "cancel");
+    expect(legalIntents(revealing.state, made.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === cancel)).toBe(false);
+    const done = settleChoices(revealing, made.ctx);
+    const engagedBy = (seat: number) => (done.state.seats[seat]?.engaged ?? []).map((id) => done.state.cards[id]?.code);
+    expect(engagedBy(0)).toEqual(["gob"]);
+    expect(engagedBy(1)).toEqual(["gob"]);
+    expect(causeProblems(done.steps)).toEqual([]);
+  });
+
+  it("is an ordinary effect when revealed apart from the table: the same hand offers its cancel to another treachery", () => {
+    const made = make({ seats: 1, deck: ["41026", "f0"], hand: ["cancel"] });
+    const revealing = reveal(made.state, made.ctx, 1);
+    const cancel = first(revealing.state, "cancel");
+    expect(legalIntents(revealing.state, made.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === cancel)).toBe(true);
   });
 });
 
