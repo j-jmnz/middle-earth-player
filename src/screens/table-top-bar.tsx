@@ -12,7 +12,8 @@ import type { SeatThreat } from "../play/selectors";
 import { PhaseRail } from "../play/phase-rail";
 import { ThreatRing } from "../play/table-chrome";
 import { MenuButton } from "../play/table-menu";
-import { tableTokens as t, withAlphaHex } from "../play/tokens";
+import { useTableTokens } from "../play/use-table-tokens";
+import { withAlphaHex } from "../play/tokens";
 import { barZones, railWide, TOP_BAR } from "../play/top-bar-layout";
 
 export { TOP_BAR };
@@ -51,6 +52,7 @@ export type TopBarProps = {
 };
 
 export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+  const t = useTableTokens();
   const [bar, setBar] = useState(0);
   const [dials, setDials] = useState(0);
   const onBar = (event: LayoutChangeEvent) => setBar(Math.round(event.nativeEvent.layout.width));

@@ -3,12 +3,13 @@ import { Pressable, Text, View } from "react-native";
 
 import { CroppedArt } from "./art";
 import { PAINTING } from "./art-crop";
-import { Chevron, markedSphere, pressedNight, RingMark, sphereWord, SphereMark } from "./chrome";
+import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "./chrome";
 import { CardThumb, useCardPreview } from "./images/picture";
 import { nightFade } from "../play/surfaces";
+import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 
 export type HeroFace = {
   code: string;
@@ -50,6 +51,8 @@ export function HeroTile({
   // The hero carries the One Ring: a gold edge and the Ring mark in the corner.
   ringBearer?: boolean;
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const preview = useCardPreview(hero.code, hero.imagesrc);
   const sphere = sphereWord(hero.sphereName);
   const mark = markedSphere(hero.sphereCode);
@@ -62,7 +65,7 @@ export function HeroTile({
         {bare ? null : (
           <>
             {/* Night rises from the foot, so the name reads on the painting; it grows past a third of the tile rather than lose the name. */}
-            <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: height * 0.62, ...nightFade(0, 0.78) }} />
+            <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: height * 0.62, ...nightFade(0, 0.78, undefined, t) }} />
             <View pointerEvents="none" className="justify-end px-2 pb-2" style={{ position: "absolute", left: 0, right: 0, bottom: 0, minHeight: height / 3 }}>
               {/* A dense tile (four to a row in the briefing) gives the name the tile's whole width on two lines, its marks on a
                   line above it: the sphere's printed icon, and the Ring for the Ring-bearer. */}
@@ -148,6 +151,8 @@ export function EmptyHeroSlot({
   onPress?: () => void;
   testID?: string;
 }) {
+  const palette = usePalette();
+  const pressedNight = usePressedNight();
   const frame = { height, borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: palette.goldLine, backgroundColor: withAlphaHex(palette.gold, 0.04) };
   if (onPress) {
     return (
@@ -228,6 +233,7 @@ function heroNames(heroes: readonly HeroFace[]): string {
 }
 
 function StatusLine({ testID, detail, status, note }: { testID: string; detail: string; status: DeckSummary["status"]; note?: string | null }) {
+  const palette = usePalette();
   return (
     <View>
       <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
@@ -253,6 +259,9 @@ function StatusLine({ testID, detail, status, note }: { testID: string; detail: 
  * with the deck's name, its heroes, the counts and whether it is ready to play.
  */
 export function DeckCover(props: DeckSummary & { height: number }) {
+  const palette = usePalette();
+  const t = useTableTokens();
+  const pressedNight = usePressedNight();
   const { name, heroes, detail, status, note, height, testID, children, selected, disabled } = props;
   return (
     // A FlashList row: a solid fill and no shadow (docs/design-system.md, Performance); only the night fade lays the words on the pictures.
@@ -268,7 +277,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
                   <Text className="text-label text-faint">No heroes yet</Text>
                 </View>
               )}
-              <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: height * 0.45, ...nightFade(0, 1, palette.raised) }} />
+              <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: height * 0.45, ...nightFade(0, 1, palette.raised, t) }} />
             </View>
             <View className="px-4 pb-3.5" style={{ marginTop: -14 }}>
               <View className="flex-row items-start justify-between gap-2">
@@ -296,6 +305,8 @@ const rowThumb = { width: 30, height: 42 };
 
 /** A saved deck in the deck list's List view: the heroes as small pictures, the name, the counts and the readiness. */
 export function DeckRow(props: DeckSummary) {
+  const palette = usePalette();
+  const pressedNight = usePressedNight();
   const { name, heroes, detail, status, note, testID, children, selected, disabled } = props;
   return (
     <View className="border-b border-hairline">

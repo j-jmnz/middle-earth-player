@@ -9,6 +9,7 @@ import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanima
 import { cards } from "../../../catalog/schema";
 import { BodyText, Chip, Eyebrow, NavBar, Panel, Screen, ScreenScroll, ScreenTitle, sphereWord } from "../../chrome";
 import { nightFade, tileSurface } from "../../../play/surfaces";
+import { useTableTokens } from "../../../play/use-table-tokens";
 import { CardTextView } from "../../../play/card-text-view";
 import { traitLine } from "../../../play/card-text";
 import { GameIcon } from "../../../play/game-icon";
@@ -19,7 +20,7 @@ import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { cardImageUrl, imageLayoutSize, shownCardImage } from "../../images/policy";
 import { InspectCardImage } from "../../images/picture";
-import { palette } from "../../palette.js";
+import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
@@ -113,8 +114,9 @@ function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | 
 
 // A number with the game's icon beside it, the word under them. The word stays on screen and in the label.
 function Stat({ label, value, icon }: { label: string; value: string; icon: IconName }) {
+  const t = useTableTokens();
   return (
-    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-20 items-center rounded-tile px-3 py-2" style={tileSurface()}>
+    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-20 items-center rounded-tile px-3 py-2" style={tileSurface(false, t)}>
       <View className="flex-row items-center gap-1.5">
         <GameIcon name={icon} size={18} tint="bone" />
         <Text className="font-display-bold text-title text-bone">{value}</Text>
@@ -188,16 +190,11 @@ function Zoomable({ children, width, height }: { children: ReactNode; width: num
   );
 }
 
-// The picture is the hero of this screen: centered, lifted off the night by a gold halo.
-const halo = {
-  shadowColor: palette.gold,
-  shadowOpacity: 0.25,
-  shadowRadius: 40,
-  shadowOffset: { width: 0, height: 0 },
-  elevation: 12,
-};
-
 export default function CardScreen() {
+  const palette = usePalette();
+  const t = useTableTokens();
+  // The picture is the hero of this screen: centered, lifted off the night by a gold halo.
+  const halo = useMemo(() => ({ shadowColor: palette.gold, shadowOpacity: 0.25, shadowRadius: 40, shadowOffset: { width: 0, height: 0 }, elevation: 12 }), [palette]);
   const router = useRouter();
   const params = useLocalSearchParams<{ code: string }>();
   const code = routeCode(params.code);
@@ -261,7 +258,7 @@ export default function CardScreen() {
       {previewSource ? (
         <View pointerEvents="none" style={[StyleSheet.absoluteFill, { height: 520 }]}>
           <Image source={previewSource} contentFit="cover" blurRadius={28} accessible={false} style={{ width: "100%", height: 520, opacity: 0.45 }} />
-          <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.15, 1) }} />
+          <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.15, 1, undefined, t) }} />
         </View>
       ) : null}
       <NavBar

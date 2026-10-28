@@ -10,7 +10,7 @@ import { Chevron, Chip } from "./chrome-marks";
 import { useDatabases } from "./databases";
 import { foldWords, isFolded, type Sections } from "./fold-state";
 import { plural } from "./history-words";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { readSections, writeSection } from "./section-store";
 
 /** The screen's fold state: `folded` reads a section (its default when the viewer never changed it), `setFolded` changes and stores it. */
@@ -70,6 +70,7 @@ export type FoldHeaderProps = {
 
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
 export function FoldHeader({ id, title, folded, onFold, count, unit, summary, detail, badge, testID, right, solid = false }: FoldHeaderProps) {
+  const palette = usePalette();
   const counted = count == null ? null : unit ? plural(count, unit) : String(count);
   const second = folded && summary ? summary : (detail ?? null);
   // The count says what is inside while folded, unless the summary says it better.

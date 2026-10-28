@@ -3,8 +3,8 @@ import type { ComponentProps } from "react";
 import { Pressable, Text, View } from "react-native";
 import type { Tabs } from "expo-router";
 
-import { pressedNight } from "./chrome-buttons";
-import { palette } from "./palette.js";
+import { usePressedNight } from "./chrome-buttons";
+import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import { iconAspect, type IconName } from "../play/icon-map";
 import { withAlphaHex } from "../play/tokens";
@@ -28,6 +28,8 @@ export function dockIcon(name: IconName) {
 
 /** The dock: five printed icons over their words on night. The current tab is lit: a gold bar glowing over a gold icon and word. */
 export function AppTabBar({ state, descriptors, emitter, navigateToTab }: TabBarProps) {
+  const palette = usePalette();
+  const pressedNight = usePressedNight();
   return (
     <View accessibilityRole="tablist" className="flex-row border-t border-hairline bg-night pb-safe">
       {state.routes.map((route, index) => {

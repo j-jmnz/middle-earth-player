@@ -20,7 +20,7 @@ import { MOTION } from "./motion-tokens.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
 import { ChromeButton } from "./sheet-paper.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 const SCRIM = 0.82;
 
@@ -80,6 +80,7 @@ export function CardPreview({
   const screen = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const scale = useMotionScale();
+  const t = useTableTokens();
   const progress = useSharedValue(scale === 0 ? 1 : 0);
   const all = [card, ...related];
   const [at, setAt] = useState(0);

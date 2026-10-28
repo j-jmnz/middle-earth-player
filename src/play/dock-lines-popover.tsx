@@ -9,17 +9,20 @@ import { CLOSE_ROW, linesPlace } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
 import type { DockWords } from "./dock-more.tsx";
 import { PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx";
-import { tableTokens as t } from "./tokens.ts";
+import type { TableTokens } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 const GAP = 6;
-const TONE = { guide: t.bone, note: t.muted, unavailable: t.faint } as const;
+const toneOf = (t: TableTokens) => ({ guide: t.bone, note: t.muted, unavailable: t.faint }) as const;
 
 export function LinesPopover({ open, top, words, commandWidth, insetRight, onClose }: { open: boolean; top: number | null; words: DockWords; commandWidth: number; insetRight: number; onClose: () => void }) {
   const screen = useWindowDimensions();
+  const t = useTableTokens();
   const close = useRef<PressableRef>(null);
   const at = top ?? 0;
   const { width, maxHeight } = linesPlace({ screenWidth: screen.width, screenHeight: screen.height, commandWidth, insetLeft: 0, insetRight, top: at });
   const lines = dockLines({ guide: words.guide, note: words.note, unavailable: words.unavailable });
+  const tones = toneOf(t);
   const all = lines.first ? [lines.first, ...lines.rest] : [];
   return (
     <PopoverFrame
@@ -39,7 +42,7 @@ export function LinesPopover({ open, top, words, commandWidth, insetRight, onClo
             {words.title}
           </Text>
           {all.map((line) => (
-            <Text key={line.testID} testID={`${line.testID}-full`} className="text-label" style={{ color: TONE[line.kind] }}>
+            <Text key={line.testID} testID={`${line.testID}-full`} className="text-label" style={{ color: tones[line.kind] }}>
               {line.text}
             </Text>
           ))}

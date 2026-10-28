@@ -14,17 +14,18 @@ import { MOTION, SHAPE } from "./motion-tokens.ts";
 import { dialName, type DialRole } from "./peek.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
-import { tableTokens as t, withAlphaHex } from "./tokens.ts";
+import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
 
 // The dial's edge and fill at each level (threat-level.ts): threat red, tinted near elimination, solid when critical.
-const DIAL: Record<ThreatLevel, { edge: string; fill: string; meter: string }> = {
+const dialOf = (t: TableTokens): Record<ThreatLevel, { edge: string; fill: string; meter: string }> => ({
   calm: { edge: t.threat, fill: t.night, meter: t.threat },
   near: { edge: t.danger, fill: withAlphaHex(t.threat, 0.35), meter: t.danger },
-  critical: { edge: t.danger, fill: t.threat, meter: t.bone },
-};
+  critical: { edge: t.threatEdge, fill: t.threat, meter: t.onThreat },
+});
 
 /**
  * The threat dial of the top bar (`compact`): the threat icon and the number large in Cinzel Bold on a threat-red pill, with a
@@ -72,6 +73,7 @@ export function ThreatRing({
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
+  const t = useTableTokens();
   const id = testID ?? `threat-${threat.seat}`;
   if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
   return (
@@ -117,9 +119,10 @@ function ThreatDial({
   onPress?: () => void;
 }) {
   const speed = useMotionScale();
+  const t = useTableTokens();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
   const level = elimination ? threatLevel(threat.threat) : "calm";
-  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? DIAL[level] : { edge: t.gold, fill: t.night, meter: t.gold };
+  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? dialOf(t)[level] : { edge: t.gold, fill: t.night, meter: t.gold };
   // The change since the number last moved, shown beside the dial for DELTA_MS. A new change replaces it.
   const seen = useRef(threat.threat);
   const [change, setChange] = useState<{ before: number; after: number; at: number } | null>(null);
@@ -171,16 +174,16 @@ function ThreatDial({
           className="h-10 flex-row items-center gap-1 overflow-hidden rounded-pill px-2.5 pb-1"
           style={{ minWidth: 64, borderWidth: 2, borderColor: look.edge, backgroundColor: look.fill }}
         >
-          {icon ? <GameIcon name={icon} size={18} tint={critical ? "bone" : "danger"} /> : null}
-          <Text testID={`${id}-value`} className="font-display-bold text-title text-bone">
+          {icon ? <GameIcon name={icon} size={18} tint={critical ? "onThreat" : "danger"} /> : null}
+          <Text testID={`${id}-value`} className="font-display-bold text-title text-bone" style={critical ? { color: t.onThreat } : undefined}>
             {String(threat.threat)}
           </Text>
           {elimination && !threat.eliminated ? (
-            <View className="absolute overflow-hidden" style={{ left: 12, right: 12, bottom: 3, height: 3, borderRadius: 2, backgroundColor: withAlphaHex(t.bone, 0.16) }}>
+            <View className="absolute overflow-hidden" style={{ left: 12, right: 12, bottom: 3, height: 3, borderRadius: 2, backgroundColor: withAlphaHex(critical ? t.onThreat : t.bone, 0.16) }}>
               <View style={{ height: 3, width: `${Math.round(threatMeter(threat.threat) * 100)}%`, backgroundColor: look.meter }} />
               {/* A tick at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}
               {ticks.map((cost, index) => (
-                <View key={`${cost}:${index}`} style={{ position: "absolute", left: `${Math.round(threatMeter(cost) * 100)}%`, top: 0, width: 2, height: 3, backgroundColor: cost <= threat.threat ? t.bone : t.faint }} />
+                <View key={`${cost}:${index}`} style={{ position: "absolute", left: `${Math.round(threatMeter(cost) * 100)}%`, top: 0, width: 2, height: 3, backgroundColor: cost <= threat.threat ? (critical ? t.onThreat : t.bone) : t.faint }} />
               ))}
             </View>
           ) : null}
@@ -222,6 +225,7 @@ function ThreatDial({
 
 /** The mark of the seat being peeked at, drawn from views so it is crisp at any size: an almond outline with its pupil, on a night dot. */
 function EyeMark({ testID }: { testID: string }) {
+  const t = useTableTokens();
   return (
     <View testID={testID} pointerEvents="none" style={{ position: "absolute", top: -2, right: -3, width: 16, height: 16, borderRadius: 8, backgroundColor: t.night, borderWidth: 1, borderColor: t.bone, alignItems: "center", justifyContent: "center" }}>
       <View style={{ width: 11, height: 6.5, borderRadius: 6, borderWidth: 1.25, borderColor: t.bone, alignItems: "center", justifyContent: "center" }}>

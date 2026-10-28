@@ -46,7 +46,7 @@ import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { CardThumb, useCardPreview } from "../../images/picture";
 import { useListPreview } from "../../list-preview";
-import { palette } from "../../palette.js";
+import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "../../hero-tile";
 import { showToast } from "../../toast";
@@ -130,6 +130,7 @@ function EditorCardRow({
 }
 
 export default function DeckEditor() {
+  const palette = usePalette();
   const router = useRouter();
   const params = useLocalSearchParams<{ id: string }>();
   const id = routeCode(params.id);

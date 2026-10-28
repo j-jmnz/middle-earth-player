@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 
 import { campaignPath, openNode, type PathNode } from "../../../campaign/path";
 import { tileSurface } from "../../../play/surfaces";
+import { useTableTokens } from "../../../play/use-table-tokens";
 import { withAlphaHex } from "../../../play/tokens";
 import { SceneCard } from "../../art";
 import { ActionBar, BodyText, Chip, Eyebrow, IconButton, JourneyBar, Label, NavBar, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
@@ -12,7 +13,7 @@ import { carryVerb, carryWords } from "../../../campaign/carry-words";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../campaign-data";
 import { cardNames } from "../../card-names";
 import { useDatabases } from "../../databases";
-import { palette } from "../../palette.js";
+import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { briefingHref, tableHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
@@ -29,6 +30,7 @@ type Next = { label: string; testID: string; words: string; onPress: () => void 
 // The medallion on the trail: a gold disc with a check for a won scenario, a lit gold ring for the one to play, a night disc
 // with its number for one still locked.
 function Medallion({ node }: { node: PathNode }) {
+  const palette = usePalette();
   if (node.status === "completed") {
     return (
       <View className="items-center justify-center" style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: palette.gold, borderWidth: 3, borderColor: palette.night }}>
@@ -71,6 +73,8 @@ function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
   begin: { hint: string; onPress: () => void } | null;
   onOpen: (() => void) | null;
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const said = `${node.name}, ${STATUS_WORD[node.status]}${rewards.length > 0 ? `, ${rewards.join(", ")}` : ""}`;
   const stages = scenarioOf(node.id)?.stages.length ?? null;
   return (
@@ -109,7 +113,7 @@ function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
             ) : null}
           </SceneCard>
         ) : node.status === "completed" ? (
-          <View className="rounded-card px-4 py-3" style={tileSurface()}>
+          <View className="rounded-card px-4 py-3" style={tileSurface(false, t)}>
             <View accessible accessibilityLabel={said}>
               <View className="flex-row items-start justify-between gap-2">
                 <Text className="flex-1 font-display text-heading text-bone">{node.name}</Text>
@@ -142,6 +146,7 @@ function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
 }
 
 export default function CampaignPath() {
+  const t = useTableTokens();
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string }>();
   const saveId = routeCode(params.saveId);
@@ -227,7 +232,7 @@ export default function CampaignPath() {
         </View>
         {/* What the campaign has earned so far, and the log, at the end of the trail. */}
         <View className="mt-2 flex-row items-center gap-2.5">
-          <View className="flex-1 rounded-tile px-3.5 py-2.5" style={tileSurface()}>
+          <View className="flex-1 rounded-tile px-3.5 py-2.5" style={tileSurface(false, t)}>
             <Eyebrow tone="moon">Pool</Eyebrow>
             <Text testID="pool" className="mt-0.5 text-label text-bone">
               {poolText}

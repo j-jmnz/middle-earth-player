@@ -2,8 +2,9 @@ import { Canvas, Circle, LinearGradient, Path, RadialGradient, Rect, Skia, vec }
 import { useMemo } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 
-import { palette } from "./palette.js";
-import { scenes, type Ridge, type SceneName } from "./backdrop-scenes";
+import { useTheme } from "../play/theme";
+import { scenesByTheme, type Ridge, type SceneName } from "./backdrop-scenes";
+import { usePalette } from "./palette-hook";
 
 function ridgePath(ridge: Ridge, width: number, height: number) {
   const floor = ridge.bottom * height;
@@ -16,7 +17,8 @@ function ridgePath(ridge: Ridge, width: number, height: number) {
 /** One static Skia canvas behind the screen. Drawn once per size. Never inside a list row. */
 export function Backdrop({ scene }: { scene: SceneName }) {
   const { width, height } = useWindowDimensions();
-  const s = scenes[scene];
+  const s = scenesByTheme[useTheme()][scene];
+  const palette = usePalette();
   const ridges = useMemo(
     () => s.ridges.map((ridge) => ({ ridge, path: ridgePath(ridge, width, height) })),
     [s, width, height],

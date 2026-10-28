@@ -14,13 +14,15 @@ import type { PictureSource } from "./table-canvas-types.ts";
 import { shareFor, type Choice } from "./table-choice.ts";
 import { TrayFrame, useHeld, type TrayPlace } from "./tray-frame.tsx";
 import { trayCount, trayTiles, type TrayTile } from "./tray-logic.ts";
-import { tableTokens as t, withAlphaHex } from "./tokens.ts";
+import { withAlphaHex } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 // A card's picture beside its tile: 32 by 44, or 28 by 38 on a short phone.
 const pictureSize = (dense: boolean) => (dense ? { width: 28, height: 38 } : { width: 32, height: 44 });
 
 // The foreseen damage of a defender, as a pill; threat red when the card would be destroyed.
 function DamagePill({ mark }: { mark: NonNullable<TrayTile["mark"]> }) {
+  const t = useTableTokens();
   return (
     <View
       className="flex-row items-center rounded-chip px-2"

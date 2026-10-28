@@ -6,7 +6,8 @@ import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 import type { CarouselPhase, CarouselStep } from "./carousel.ts";
 import { toggleStop, type TableSettings } from "./table-settings.ts";
 import { goldSurface, panelSurface } from "./surfaces.ts";
-import { tableTokens as t, withAlphaHex } from "./tokens.ts";
+import { withAlphaHex } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 export const ROW = 44;
 
@@ -29,6 +30,7 @@ export function NightSwitch({
   testID: string;
   dim?: boolean;
 }) {
+  const t = useTableTokens();
   return (
     <Pressable
       accessibilityRole="switch"
@@ -72,6 +74,7 @@ export function NightSwitch({
 
 // A small capsule beside the current phase's name: "Now" in gold.
 function NowChip() {
+  const t = useTableTokens();
   return (
     <View style={{ borderRadius: 999, borderWidth: 1, borderColor: t.gold, paddingHorizontal: 6, backgroundColor: withAlphaHex(t.gold, 0.14) }}>
       <Text className="font-display-bold text-micro uppercase" style={{ color: t.gold, lineHeight: 15 }}>
@@ -84,6 +87,7 @@ function NowChip() {
 // The step's place on the card's timeline: a dot (gold and ringed now, deep gold when done, an outline to come) on a hairline
 // that runs on to the next step.
 function StepDot({ state, last }: { state: "past" | "current" | "next"; last: boolean }) {
+  const t = useTableTokens();
   return (
     <View style={{ width: 14, alignItems: "center" }}>
       <View
@@ -120,6 +124,7 @@ function StepBlock({
   // Called with the step's top inside its card: the current step's, so the card can open on it.
   onLayoutY?: (y: number) => void;
 }) {
+  const t = useTableTokens();
   const now = state === "current";
   return (
     <View
@@ -182,6 +187,7 @@ export function PhaseCard({
   settings: Pick<TableSettings, "stops">;
   onChange: (change: Partial<TableSettings>) => void;
 }) {
+  const t = useTableTokens();
   const past = phase.state === "past";
   const current = phase.state === "current";
   const nowAt = phase.steps.findIndex((step) => step.current);
@@ -195,7 +201,7 @@ export function PhaseCard({
         borderRadius: 14,
         borderWidth: 1,
         borderColor: current ? t.goldLine : t.hairline,
-        ...(current ? panelSurface() : { backgroundColor: withAlphaHex(t.night, 0.35) }),
+        ...(current ? panelSurface(false, t) : { backgroundColor: withAlphaHex(t.night, 0.35) }),
         opacity: focused ? 1 : 0.55,
         overflow: "hidden",
       }}
@@ -212,7 +218,7 @@ export function PhaseCard({
             justifyContent: "center",
             borderWidth: current ? 0 : 1,
             borderColor: past ? t.goldDeep : t.hairline,
-            ...(current ? goldSurface() : {}),
+            ...(current ? goldSurface(false, t) : {}),
           }}
         >
           <Text className="font-display-bold text-micro" style={{ color: current ? t.onGold : past ? t.gold : t.muted, lineHeight: 15 }}>
@@ -237,7 +243,7 @@ export function PhaseCard({
             accessible
             style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
           >
-            <View style={{ width: 10, height: 10, borderRadius: 5, ...goldSurface() }} />
+            <View style={{ width: 10, height: 10, borderRadius: 5, ...goldSurface(false, t) }} />
             <Text className="text-micro" style={{ color: t.muted }}>
               Done
             </Text>

@@ -6,7 +6,7 @@ import { FELLOWSHIP_ID } from "../campaign/save";
 import type { CampaignData } from "../catalog/scenario-data";
 import { SceneArt } from "./art";
 import { Label, Panel, PrimaryButton, RingMark } from "./chrome";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { seatWord } from "./seats";
 
 type Seats = 1 | 2;
@@ -18,6 +18,7 @@ const isFellowship = (id: string): boolean => id === FELLOWSHIP_ID;
 // One choice of a group the player picks one from: a gold edge when chosen, the raised surface when not (never the gold plate,
 // which is the button's). `min-h-14` keeps the 44 pt target; the words wrap.
 function RadioTile({ selected, testID, label, onPress, className, children }: { selected: boolean; testID: string; label: string; onPress: () => void; className: string; children: ReactNode }) {
+  const palette = usePalette();
   return (
     <Pressable
       testID={testID}
@@ -64,6 +65,7 @@ export type StartOption = { data: CampaignData; name: string };
  * keeps its state when one is hidden.
  */
 export function StartPanel({ options, current, carry, onStart }: { options: readonly StartOption[]; current: boolean; carry: readonly CarryChoice[]; onStart: (campaignId: string, seats: Seats, carried: CarryChoice | null) => void }) {
+  const palette = usePalette();
   const [campaignId, setCampaignId] = useState<string | null>(null);
   const [seats, setSeats] = useState<Seats>(1);
   // The playthrough whose carry-over this one takes in, or null for a fresh start.

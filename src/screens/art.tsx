@@ -7,14 +7,15 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { View } from "react-native";
 
 import { cards } from "../catalog/schema";
-import { nightFade, raisedEdge, panelSurface, topShade } from "../play/surfaces";
+import { nightFade, raisedEdgeOf, panelSurface, topShade } from "../play/surfaces";
+import { useTableTokens } from "../play/use-table-tokens";
 import { cropFrame, FACE, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, type Region } from "./art-crop";
 import { Corners } from "./chrome-marks";
 import { scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useCardPreview } from "./images/picture";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 
 export type ArtCard = { code: string; imagesrc: string | null };
 
@@ -40,6 +41,7 @@ export function CroppedArt({
   // Laid over the picture: a fade, a name, a mark.
   children?: ReactNode;
 }) {
+  const palette = usePalette();
   const [measured, setMeasured] = useState(0);
   const boxWidth = width ?? measured;
   const source = useCardPreview(card?.code ?? "", card?.imagesrc ?? null);
@@ -78,6 +80,7 @@ export function CroppedArt({
 
 /** A hero's face in a gold ring. The name is the caller's to say; the portrait is not read. */
 export function Portrait({ card, size = 40, ring = true }: { card: ArtCard | null; size?: number; ring?: boolean }) {
+  const palette = usePalette();
   return (
     <View
       importantForAccessibility="no-hide-descendants"
@@ -96,6 +99,7 @@ export function Portrait({ card, size = 40, ring = true }: { card: ArtCard | nul
 
 /** A row of overlapping portraits: a fellowship at a glance. */
 export function PortraitRow({ heroes, size = 40 }: { heroes: readonly ArtCard[]; size?: number }) {
+  const palette = usePalette();
   return (
     <View className="flex-row" importantForAccessibility="no-hide-descendants">
       {heroes.map((hero, index) => (
@@ -130,7 +134,7 @@ export function SceneArt({
   radius = 0,
   shade,
   fade,
-  fadeTo = palette.night,
+  fadeTo,
   children,
 }: {
   scenarioId: string | null | undefined;
@@ -143,10 +147,11 @@ export function SceneArt({
   children?: ReactNode;
 }) {
   const card = useSceneCard(scenarioId);
+  const t = useTableTokens();
   return (
     <CroppedArt card={card} region={SCENE} aspect={QUEST_CARD_ASPECT} height={height} width={width} radius={radius}>
-      {shade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(shade) }} /> : null}
-      {fade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(fade, 1, fadeTo) }} /> : null}
+      {shade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(shade, t) }} /> : null}
+      {fade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(fade, 1, fadeTo, t) }} /> : null}
       {children}
     </CroppedArt>
   );
@@ -176,8 +181,10 @@ export function SceneCard({
   over?: ReactNode;
   children: ReactNode;
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   return (
-    <View className={hero ? "rounded-hero" : "rounded-card"} style={{ ...panelSurface(pressed), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdge }}>
+    <View className={hero ? "rounded-hero" : "rounded-card"} style={{ ...panelSurface(pressed, t), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdgeOf(t) }}>
       <View className={`overflow-hidden ${hero ? "rounded-t-hero" : "rounded-t-card"}`}>
         <SceneArt scenarioId={scenarioId} height={sceneHeight} shade={0.4} fade={0.4} fadeTo={palette.raised}>
           {over}

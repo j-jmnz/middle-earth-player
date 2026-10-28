@@ -6,14 +6,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Backdrop } from "./backdrop";
 import type { SceneName } from "./backdrop-scenes";
-import { IconButton, pressedNight } from "./chrome-buttons";
+import { IconButton, usePressedNight } from "./chrome-buttons";
 import { Chevron, Corners } from "./chrome-marks";
 import { Eyebrow } from "./chrome-text";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
 import { SheetFrame } from "../play/sheet-paper";
-import { nightFade, panelSurface, raisedEdge, tileSurface } from "../play/surfaces";
+import { nightFade, panelSurface, raisedEdgeOf, tileSurface } from "../play/surfaces";
+import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 
 /**
@@ -70,6 +71,7 @@ export function ScreenScroll({ children, top = 0, bottom = 32, testID, scrollRef
  * sit on words. It switches at one threshold, with no motion on the scroll path.
  */
 export function FloatingBarShade({ shown, top }: { shown: boolean; top: number }) {
+  const palette = usePalette();
   if (!shown) return null;
   return <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: top + 60, backgroundColor: withAlphaHex(palette.night, 0.94), borderBottomWidth: 1, borderBottomColor: palette.hairline }} />;
 }
@@ -141,6 +143,8 @@ export function ListRow({
   leading?: ReactNode;
   trailing?: ReactNode;
 }) {
+  const palette = usePalette();
+  const pressedNight = usePressedNight();
   return (
     <Pressable
       testID={testID}
@@ -191,15 +195,17 @@ export function Panel({
   // False for a panel whose content runs to its edges (a picture on top).
   padded?: boolean;
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   return (
     <View
       className={`rounded-card ${padded ? "p-5" : ""}${className ? ` ${className}` : ""}`}
       style={{
-        ...(unfilled ? { backgroundColor: "transparent" } : panelSurface(pressed)),
+        ...(unfilled ? { backgroundColor: "transparent" } : panelSurface(pressed, t)),
         borderWidth: 1,
         // A filled panel draws no edge (its fill and lit top set it off); one put away keeps the hairline, its only outline.
         borderColor: current ? palette.goldLine : unfilled ? palette.hairline : "transparent",
-        ...(unfilled ? {} : { boxShadow: raisedEdge }),
+        ...(unfilled ? {} : { boxShadow: raisedEdgeOf(t) }),
       }}
     >
       {children}
@@ -210,8 +216,9 @@ export function Panel({
 
 /** A number the player watches, on a small lit tile: its word above, its icon and value in engraved figures. */
 export function StatTile({ label, value, icon, iconTint = "bone", detail, children, testID }: { label: string; value: string; icon?: IconName; iconTint?: "bone" | "danger" | "gold"; detail?: string; children?: ReactNode; testID?: string }) {
+  const t = useTableTokens();
   return (
-    <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 rounded-tile px-3 py-2.5" style={tileSurface()}>
+    <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 rounded-tile px-3 py-2.5" style={tileSurface(false, t)}>
       <Text className="text-label text-muted">{label}</Text>
       <View className="flex-row items-center gap-1.5">
         {icon ? <GameIcon name={icon} size={16} tint={iconTint} /> : null}
@@ -228,10 +235,12 @@ export function StatTile({ label, value, icon, iconTint = "bone", detail, childr
  * under a night fade above it. `safe` keeps it above the home indicator on a screen with no tab bar.
  */
 export function ActionBar({ children, safe = true, testID }: { children: ReactNode; safe?: boolean; testID?: string }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const insets = useSafeAreaInsets();
   return (
     <View testID={testID} collapsable={false} className="pt-3" style={{ paddingBottom: safe ? Math.max(insets.bottom, 12) : 12 }}>
-      <View pointerEvents="none" style={{ position: "absolute", left: -24, right: -24, top: -24, height: 24, ...nightFade(0, 1) }} />
+      <View pointerEvents="none" style={{ position: "absolute", left: -24, right: -24, top: -24, height: 24, ...nightFade(0, 1, undefined, t) }} />
       <View pointerEvents="none" style={{ position: "absolute", left: -24, right: -24, top: 0, bottom: 0, backgroundColor: palette.night }} />
       {children}
     </View>
@@ -257,6 +266,7 @@ export function PaperSheet({ step, title, children }: { step: string; title: str
  * Resolution and the standalone outcome both say it this way.
  */
 export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario: string; testID: string }) {
+  const palette = usePalette();
   return (
     <>
       <Text

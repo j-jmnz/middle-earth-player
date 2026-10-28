@@ -17,12 +17,14 @@ import { Stats } from "./sheet-paper.tsx";
 import type { Unavailable } from "./sheet-types.ts";
 import type { Dock, DockButton } from "./table-choice.ts";
 import { LineMark } from "./table-chrome.tsx";
-import { panelSurface, raisedEdge } from "./surfaces.ts";
-import { tableTokens as t, withAlphaHex } from "./tokens.ts";
+import { panelSurface, raisedEdgeOf } from "./surfaces.ts";
+import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 /** The engine's numbers for the moment, large, and what they come to: on a sunk band in the dock (no drawn edge), ink on a paper panel. */
 // `oneLine`: the result is one line (the choice tray is open over the dock on a short phone); its words stay in the label.
 export function ReadoutView({ readout, surface = "night", tight = false, oneLine = false }: { readout: Readout; surface?: "night" | "paper"; tight?: boolean; oneLine?: boolean }) {
+  const t = useTableTokens();
   const paper = surface === "paper";
   return (
     <View
@@ -52,7 +54,7 @@ const TOP_PAD = 10;
 const FOOT_PAD = 8;
 const DENSE_PAD = 4;
 // The shadow that lifts the dock (and the tray standing on it) off the felt.
-export const DOCK_SHADOW = `0 8px 24px ${withAlphaHex(t.night, 0.55)}`;
+const dockShadowOf = (t: TableTokens) => `0 8px 24px ${withAlphaHex(t.night, 0.55)}`;
 
 // The tone of a line of words under the title: the guide and the note muted, under the bone title; what the rules refuse faint.
 export const lineTone = (kind: "guide" | "note" | "unavailable") => (kind === "unavailable" ? "text-faint" : "text-muted");
@@ -104,6 +106,8 @@ export function TableDock({
   // foot stays above it.
   onBlock?: (top: number) => void;
 }) {
+  const t = useTableTokens();
+  const dockShadow = dockShadowOf(t);
   const block = useRef<ComponentRef<typeof View>>(null);
   const pillRef = useRef<ComponentRef<typeof View>>(null);
   const [room, setRoom] = useState({ column: 0, block: 0, text: 198 });
@@ -144,7 +148,7 @@ export function TableDock({
         className="rounded-card px-3"
         style={{
           backgroundColor: t.raised,
-          boxShadow: trayOpen ? DOCK_SHADOW : `${raisedEdge}, ${DOCK_SHADOW}`,
+          boxShadow: trayOpen ? dockShadow : `${raisedEdgeOf(t)}, ${dockShadow}`,
           paddingTop: trayOpen ? 0 : dense ? DENSE_PAD : TOP_PAD,
           paddingBottom: dense ? DENSE_PAD : FOOT_PAD,
           ...(trayOpen ? { borderTopLeftRadius: 0, borderTopRightRadius: 0 } : {}),
@@ -208,6 +212,7 @@ const BANNER_WIDTH = 440;
  * the cards under it; the log keeps every step. The caller keys it on the moment, so each one enters and is announced.
  */
 export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; top: number; width: number; onBeat?: (cards: readonly string[]) => void }) {
+  const t = useTableTokens();
   const edge = moment.tone === "good" ? t.gold : moment.tone === "bad" ? t.threat : t.faint;
   const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
@@ -237,7 +242,7 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
       {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
       <View
         className="rounded-card"
-        style={{ ...box, ...panelSurface(), opacity: 0.97, shadowColor: t.night, shadowOpacity: 0.9, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 10 }}
+        style={{ ...box, ...panelSurface(false, t), opacity: 0.97, shadowColor: t.night, shadowOpacity: 0.9, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 10 }}
       >
         <View testID="moment" accessible accessibilityLabel={label} className="overflow-hidden rounded-card" style={{ borderWidth: 1, borderColor: edge }}>
           {/* The tone, as a band along the top: gold for a success, threat red for a failure or an engagement. */}

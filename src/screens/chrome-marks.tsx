@@ -3,15 +3,18 @@
 import type { ReactNode } from "react";
 import { Text, View } from "react-native";
 
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
 import { goldSurface } from "../play/surfaces";
+import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
+import { palettes, type Palette } from "./palette.js";
 import type { MarkedSphere } from "./sphere-mark";
 
 /** A chevron drawn as views (no printed icon fits), pointing left for Back, right for a row that opens, down for a fold that is open. */
-export function Chevron({ direction = "left", color = palette.bone, size = 10 }: { direction?: "left" | "right" | "down"; color?: string; size?: number }) {
+export function Chevron({ direction = "left", color, size = 10 }: { direction?: "left" | "right" | "down"; color?: string; size?: number }) {
+  const palette = usePalette();
   return (
     <View
       importantForAccessibility="no"
@@ -20,7 +23,7 @@ export function Chevron({ direction = "left", color = palette.bone, size = 10 }:
         height: size,
         borderLeftWidth: 2,
         borderBottomWidth: 2,
-        borderColor: color,
+        borderColor: color ?? palette.bone,
         transform:
           direction === "down"
             ? [{ translateY: -size * 0.2 }, { rotate: "-45deg" }]
@@ -32,6 +35,7 @@ export function Chevron({ direction = "left", color = palette.bone, size = 10 }:
 
 /** Four small gold diamonds on the corners of a framed thing: the current panel, the scenario to play, the fellowship chosen. */
 export function Corners() {
+  const palette = usePalette();
   const at = [
     { left: -4, top: -4 },
     { right: -4, top: -4 },
@@ -49,8 +53,10 @@ export function Corners() {
 
 /** The Ring. Current node, app mark, completion. Never decorative filler. */
 export function RingMark({ size = 18, state = "current" }: { size?: number; state?: "current" | "done" | "locked" }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   if (state === "done") {
-    return <View style={{ width: size, height: size, borderRadius: size / 2, ...goldSurface() }} />;
+    return <View style={{ width: size, height: size, borderRadius: size / 2, ...goldSurface(false, t) }} />;
   }
   return (
     <View
@@ -75,17 +81,21 @@ export function Magnifier({ color }: { color: string }) {
   );
 }
 
-const chipTone = {
+const chipTonesOf = (palette: Palette) => ({
   neutral: { fill: withAlphaHex(palette.bone, 0.06), edge: withAlphaHex(palette.bone, 0.1), text: palette.bone },
   gold: { fill: withAlphaHex(palette.gold, 0.14), edge: withAlphaHex(palette.gold, 0.38), text: palette.goldHigh },
   danger: { fill: withAlphaHex(palette.threat, 0.16), edge: withAlphaHex(palette.threat, 0.45), text: palette.danger },
   ok: { fill: withAlphaHex(palette.ok, 0.12), edge: withAlphaHex(palette.ok, 0.35), text: palette.ok },
   faint: { fill: "transparent", edge: palette.hairline, text: palette.faint },
-} as const;
+});
+// Built once per theme, not per Chip.
+const chipTones = { dark: chipTonesOf(palettes.dark), light: chipTonesOf(palettes.light) };
+const chipTonesFor = (palette: Palette) => (palette === palettes.light ? chipTones.light : chipTones.dark);
 
 /** A small tag: a status, a reward, a rule. Words always, a mark beside them at most; colour is never the only signal. */
-export function Chip({ label, tone = "neutral", leading, testID, onArt = false }: { label: string; tone?: keyof typeof chipTone; leading?: ReactNode; testID?: string; onArt?: boolean }) {
-  const look = chipTone[tone];
+export function Chip({ label, tone = "neutral", leading, testID, onArt = false }: { label: string; tone?: keyof typeof chipTones.dark; leading?: ReactNode; testID?: string; onArt?: boolean }) {
+  const palette = usePalette();
+  const look = chipTonesFor(palette)[tone];
   // Over a picture the tag sits on night first, so its words read over a bright sky.
   return (
     <View className="h-7 flex-row items-center gap-1.5 rounded-chip px-2.5" style={{ backgroundColor: onArt ? withAlphaHex(palette.night, 0.72) : look.fill, borderWidth: 1, borderColor: look.edge }}>
@@ -99,6 +109,7 @@ export function Chip({ label, tone = "neutral", leading, testID, onArt = false }
 
 /** A journey of steps as one segmented bar: gold for the steps done, a lit gold for the current one, night for the rest. */
 export function JourneyBar({ total, done, current = done < total, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
+  const palette = usePalette();
   return (
     <View testID={testID} className="flex-row gap-1" importantForAccessibility="no-hide-descendants">
       {Array.from({ length: total }, (_, index) => {
@@ -123,6 +134,7 @@ export function JourneyBar({ total, done, current = done < total, testID }: { to
 
 /** A count against a goal as a thin bar (47 of 50 cards). The words beside it say the numbers. */
 export function ProgressBar({ value, max, tone = "gold" }: { value: number; max: number; tone?: "gold" | "danger" }) {
+  const palette = usePalette();
   const share = max <= 0 ? 0 : Math.max(0, Math.min(1, value / max));
   return (
     <View className="h-1 overflow-hidden rounded-pill" style={{ backgroundColor: palette.hairline }} importantForAccessibility="no-hide-descendants">

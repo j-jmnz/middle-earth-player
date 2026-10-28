@@ -1,13 +1,14 @@
 import { Tabs } from "expo-router";
 
 import { AppTabBar, dockIcon } from "../../chrome";
-import { palette } from "../../palette.js";
+import { usePalette } from "../../palette-hook";
 
 // The dock: the campaigns to play, a scenario played on its own, the decks to play them with, every card, and the rules to
 // look up between turns. Each tab carries one of the game's printed icons (RingsDB font): the One Ring for the saga, the
 // crossed axes for a single battle, a hero for the decks built around them, the unique star for the card pool, and the
 // Lore book for the rules.
 export default function TabLayout() {
+  const palette = usePalette();
   return (
     <Tabs
       tabBar={(props) => <AppTabBar {...props} />}

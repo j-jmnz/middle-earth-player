@@ -2,18 +2,26 @@
 // plates, filter chips, the segmented switch and the search field. Every fill and text colour of a button is a style, not only a
 // class. Re-exported by chrome.tsx.
 import { Pressable, Text, TextInput, View } from "react-native";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import { Chevron, Magnifier } from "./chrome-marks";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
-import { goldPlate, goldSurface, raisedEdge, slateSurface } from "../play/surfaces";
+import { goldPlate, goldSurface, raisedEdgeOf, slateSurface } from "../play/surfaces";
+import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 
-export const pressedNight = { backgroundColor: palette.pressed };
+/** The fill of a pressed button on night, and on paper, in the theme in force. */
+export function usePressedNight() {
+  const palette = usePalette();
+  return useMemo(() => ({ backgroundColor: palette.pressed }), [palette]);
+}
 
-export const pressedPaper = { backgroundColor: palette.paperPressed };
+export function usePressedPaper() {
+  const palette = usePalette();
+  return useMemo(() => ({ backgroundColor: palette.paperPressed }), [palette]);
+}
 
 /**
  * A round 44 pt button holding one mark: a chevron, a printed game icon or a glyph. It always carries a label, which a screen
@@ -41,6 +49,7 @@ export function IconButton({
   // Set for a button that shows and hides something (Manage): a screen reader hears whether it is open.
   expanded?: boolean;
 }) {
+  const palette = usePalette();
   const color = tone === "gold" ? palette.gold : palette.bone;
   return (
     <Pressable
@@ -93,6 +102,8 @@ export function TextButton({
   // Set for a button that shows and hides a group (Archived · n): a screen reader hears whether it is open.
   expanded?: boolean;
 }) {
+  const pressedNight = usePressedNight();
+  const pressedPaper = usePressedPaper();
   const color = tone === "gold" ? "text-gold" : tone === "ink" ? "text-inkLabel" : tone === "danger" ? "text-danger" : tone === "muted" ? "text-muted" : "text-bone";
   return (
     <Pressable
@@ -131,6 +142,8 @@ export function PrimaryButton({
   surface?: "night" | "paper";
   accessibilityLabel?: string;
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const paper = surface === "paper";
   // The fill and the text colour are styles, not only classes: on the phone a class on a Pressable whose style is a function
   // can be dropped, which left a gold pill as dark text on night (user report, 2026-10-25). The pressed state comes from the
@@ -142,7 +155,7 @@ export function PrimaryButton({
         : { backgroundColor: palette.raised }
       : paper
         ? { backgroundColor: palette.ink, opacity: pressed ? 0.85 : 1 }
-        : goldPlate(pressed);
+        : goldPlate(pressed, t);
   const color = disabled ? (paper ? palette.inkMuted : palette.faint) : paper ? palette.paper : palette.onGold;
   return (
     <Pressable
@@ -189,13 +202,15 @@ export function SecondaryButton({
   accessibilityLabel?: string;
   disabled?: boolean;
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const color = disabled ? palette.faint : tone === "gold" ? palette.gold : tone === "danger" ? palette.danger : palette.bone;
   return (
     <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress}>
       {({ pressed }) => (
         <View
           className="flex-row items-center justify-center gap-2 rounded-tile px-4"
-          style={{ minHeight: compact ? 44 : 52, ...slateSurface(pressed && !disabled), boxShadow: raisedEdge }}
+          style={{ minHeight: compact ? 44 : 52, ...slateSurface(pressed && !disabled, t), boxShadow: raisedEdgeOf(t) }}
         >
           {icon ? <GameIcon name={icon} size={15} tint={tone === "gold" ? "gold" : tone === "danger" ? "danger" : "bone"} /> : null}
           <Text className="font-display-bold uppercase" style={{ fontSize: 13, lineHeight: 18, letterSpacing: 1.6, color }}>
@@ -224,6 +239,7 @@ export function SearchField({
   // False for a field that takes a value rather than searching (a RingsDB link): no magnifier.
   search?: boolean;
 }) {
+  const palette = usePalette();
   return (
     <View className="min-h-11 min-w-0 flex-1 flex-row items-center gap-2.5 rounded-tile px-3.5" style={{ backgroundColor: palette.night, borderWidth: 1, borderColor: palette.hairline }}>
       {search ? <Magnifier color={palette.faint} /> : null}
@@ -260,6 +276,8 @@ export function Segmented<T extends string>({
   // A 36 pt track in label type, its 44 pt targets kept by a 6 pt hit slop: a view switch beside a count.
   compact?: boolean;
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   return (
     <View accessibilityRole="radiogroup" className={`flex-row rounded-tile ${compact ? "p-0.5" : "p-1"} ${stretch ? "" : "self-start"}`} style={{ backgroundColor: palette.night, borderWidth: 1, borderColor: palette.hairline }}>
       {options.map((option) => {
@@ -273,7 +291,7 @@ export function Segmented<T extends string>({
             onPress={() => onChange(option)}
             hitSlop={compact ? { top: 6, bottom: 6 } : undefined}
             className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : "min-h-11 px-4"} ${stretch ? "flex-1" : ""}`}
-            style={selected ? { ...slateSurface(), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdge } : { borderWidth: 1, borderColor: "transparent" }}
+            style={selected ? { ...slateSurface(false, t), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdgeOf(t) } : { borderWidth: 1, borderColor: "transparent" }}
           >
             <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{option}</Text>
           </Pressable>
@@ -300,6 +318,8 @@ export function ToggleChip({
   leading?: ReactNode;
   accessibilityLabel?: string;
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const on = selected === true;
   return (
     <Pressable
@@ -314,7 +334,7 @@ export function ToggleChip({
       {({ pressed }) => (
         <View
           className="h-9 min-w-11 flex-row items-center justify-center gap-1.5 rounded-tile px-3"
-          style={on ? { ...goldSurface(pressed), borderWidth: 1, borderColor: palette.goldDeep } : { backgroundColor: pressed ? palette.pressed : "transparent", borderWidth: 1, borderColor: palette.hairline }}
+          style={on ? { ...goldSurface(pressed, t), borderWidth: 1, borderColor: palette.goldDeep } : { backgroundColor: pressed ? palette.pressed : "transparent", borderWidth: 1, borderColor: palette.hairline }}
         >
           {leading}
           <Text className={`text-label ${on ? "font-semibold" : ""}`} style={{ color: on ? palette.onGold : palette.muted }}>

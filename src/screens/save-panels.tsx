@@ -2,9 +2,10 @@ import { Pressable, Text, View } from "react-native";
 
 import type { NextStep } from "../campaign/path";
 import { tileSurface } from "../play/surfaces";
+import { useTableTokens } from "../play/use-table-tokens";
 import { PortraitRow, SceneCard, type ArtCard } from "./art";
 import { Chevron, Chip, Eyebrow, JourneyBar, Label, PrimaryButton, SecondaryButton } from "./chrome";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 
 // The campaign list's panels for one playthrough: its summary and the Continue card on top. Manage and Archived put
 // KeepOrDelete (keep-or-delete.tsx) under the summary.
@@ -145,11 +146,13 @@ export function ContinuePanel({
 
 /** Another open playthrough: one row that opens its path, with the fellowship's first face, what is next and the journey. */
 export function SaveRow({ id, line, lead, onPress }: { id: string; line: SaveLine; lead: ArtCard | null; onPress: () => void }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const next = nextSummary(line.next);
   return (
     <Pressable testID={`save-${id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={`Open ${describe(line)}`} onPress={onPress}>
       {({ pressed }) => (
-        <View className="flex-row items-center gap-3.5 rounded-card px-4 py-3.5" style={tileSurface(pressed)}>
+        <View className="flex-row items-center gap-3.5 rounded-card px-4 py-3.5" style={tileSurface(pressed, t)}>
           {lead ? <PortraitRow heroes={[lead]} size={44} /> : null}
           <View className="flex-1">
             <Text className="font-display text-heading text-bone" numberOfLines={1}>

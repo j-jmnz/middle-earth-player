@@ -8,7 +8,7 @@ import { SPHERE_TINT } from "./icon-map.ts";
 import type { CardSlot, LayoutViews, PileViews } from "./layout.ts";
 import { PILES, TABLE_ZONES, pileSelector, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { tableTokens, type TableTokens } from "./tokens.ts";
 
 export function useViews(store: TableCanvasProps["store"], seat: number): { views: LayoutViews; piles: PileViews } {
   const zones = useMemo(() => Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat)])) as Record<ZoneId, ReturnType<typeof zoneSelector>>, [seat]);
@@ -30,8 +30,9 @@ export function useViews(store: TableCanvasProps["store"], seat: number): { view
   );
 }
 
-// The sphere colour a hero's resource token is ringed with: its resources pay for cards of that sphere (rr.resource-match).
-export function sphereRing(sphere: string | null): string | null {
+// The sphere colour a hero's resource token is ringed with: its resources pay for cards of that sphere (rr.resource-match). The sphere
+// colours are the same in every theme; the tokens are a parameter so the lookup stays the theme's.
+export function sphereRing(sphere: string | null, t: TableTokens = tableTokens): string | null {
   const tint = sphere ? SPHERE_TINT[sphere] : undefined;
   return tint && tint !== "faint" ? t[tint] : null;
 }

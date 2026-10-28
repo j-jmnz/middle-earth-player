@@ -4,13 +4,14 @@
 import { Text, TextInput, View } from "react-native";
 
 import { nightFade, tileSurface, topShade } from "../play/surfaces";
+import { useTableTokens } from "../play/use-table-tokens";
 import { SPHERE_TINT } from "../play/icon-map";
 import { CroppedArt } from "./art";
 import { PAINTING } from "./art-crop";
 import { BodyText, Eyebrow, Label, ProgressBar, SphereMark, StatTile, ToggleChip, markedSphere, sphereWord } from "./chrome";
 import { costCurve, CURVE_LABELS, deckCardCount, DECK_MINIMUM, sphereSplit, type DeckFace } from "./deck-status";
 import type { HeroFace } from "./hero-tile";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 
 export const BANNER_HEIGHT = 196;
 
@@ -50,6 +51,8 @@ export function DeckGlance({
   top: number;
   side: { paddingLeft: number; paddingRight: number };
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const cardCount = deckCardCount(cards);
   const curve = costCurve(cards, faces);
   const curveTop = Math.max(1, ...curve.counts);
@@ -68,8 +71,8 @@ export function DeckGlance({
               <CroppedArt card={hero} region={PAINTING} height={BANNER_HEIGHT + top} />
             </View>
           ))}
-          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(0.35) }} />
-          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.3, 1) }} />
+          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(0.35, t) }} />
+          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.3, 1, undefined, t) }} />
         </View>
       ) : (
         <View style={{ height: top + 64 }} />
@@ -103,7 +106,7 @@ export function DeckGlance({
               <ProgressBar value={cardCount} max={DECK_MINIMUM} />
             </View>
           </StatTile>
-          <View className="flex-1 rounded-tile px-3 py-2.5" style={tileSurface()} accessible accessibilityLabel={`Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
+          <View className="flex-1 rounded-tile px-3 py-2.5" style={tileSurface(false, t)} accessible accessibilityLabel={`Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
             <Text className="text-label text-muted">Spheres</Text>
             <View className="mt-1 h-5 flex-row items-center gap-1.5">
               {heroSpheres.map((mark) => (
@@ -118,7 +121,7 @@ export function DeckGlance({
           </View>
         </View>
         {/* The cost curve: the copies at each cost, so the deck's shape reads before its rows. */}
-        <View className="mt-2 rounded-tile px-3.5 py-2.5" style={tileSurface()} accessible accessibilityLabel={`Cost curve: ${CURVE_LABELS.map((label, at) => `${curve.counts[at]} at cost ${label}`).join(", ")}${curve.average != null ? `, average ${curve.average}` : ""}`}>
+        <View className="mt-2 rounded-tile px-3.5 py-2.5" style={tileSurface(false, t)} accessible accessibilityLabel={`Cost curve: ${CURVE_LABELS.map((label, at) => `${curve.counts[at]} at cost ${label}`).join(", ")}${curve.average != null ? `, average ${curve.average}` : ""}`}>
           <View className="flex-row justify-between">
             <Text className="text-label text-muted">Cost curve</Text>
             {curve.average != null ? <Text className="text-label text-muted">{`average ${curve.average}`}</Text> : null}
@@ -163,6 +166,7 @@ export function DeckGlance({
 
 /** The printed cost on a dark coin, at the head of a card row: solid, as everything inside a list row is. */
 export function CostCoin({ cost }: { cost: string | null }) {
+  const palette = usePalette();
   return (
     <View accessible={false} importantForAccessibility="no" className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: palette.raised, borderWidth: 1, borderColor: palette.hairline }}>
       <Text className="font-display-bold text-label text-bone">{cost ?? "–"}</Text>

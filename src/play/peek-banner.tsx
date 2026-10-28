@@ -12,7 +12,7 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { PeekWords } from "./peek.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 const PILL = 36;
 /** The gap between the top bar and the pill. */
@@ -23,6 +23,7 @@ const SCALE = 1.3;
 
 export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWords; top: number; left: number; width: number; onBack: () => void }) {
   const scale = useMotionScale();
+  const t = useTableTokens();
   const fade = useMemo(() => ({ enter: layoutAnim(FadeIn, MOTION.bannerIn, scale), leave: layoutAnim(FadeOut, MOTION.bannerOut, scale) }), [scale]);
   // Android reads a live region on a view that has just mounted unreliably: announce on both platforms.
   useEffect(() => {

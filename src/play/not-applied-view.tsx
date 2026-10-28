@@ -3,9 +3,10 @@
 import { Text, View } from "react-native";
 
 import { lossSentence, type NotApplied } from "./not-applied.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 export function NotAppliedView({ notApplied, tone = "night", testID = "card-not-applied" }: { notApplied: NotApplied; tone?: "night" | "paper"; testID?: string }) {
+  const t = useTableTokens();
   const paper = tone === "paper";
   return (
     <View testID={testID} accessible accessibilityLabel={`Not applied. ${lossSentence(notApplied.loss)} ${notApplied.lines.map((line) => line.text).join(" ")}`} className="gap-1.5">

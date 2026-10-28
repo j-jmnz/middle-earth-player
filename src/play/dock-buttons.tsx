@@ -15,7 +15,7 @@ import { armBarEasing, useMotionScale } from "./motion-run.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
 import { primaryReady, type Dock, type DockButton } from "./table-choice.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 // How long an armed button waits for its second tap; longer while a screen reader is on. That is a timer, not a motion token: the bar
 // only shows it running out, on the linear curve of motion-tokens.ts, and does not run under reduced motion (the line says it).
@@ -55,6 +55,7 @@ export function DockButtons({
   chars?: number;
   onButton: (button: DockButton) => void;
 }) {
+  const t = useTableTokens();
   const moreRef = useRef<ComponentRef<typeof View>>(null);
   const [armed, setArmed] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);

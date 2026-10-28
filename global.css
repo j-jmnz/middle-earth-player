@@ -14,6 +14,47 @@
   font-display: swap;
 }
 
+/* Dark, the default: the same channels as palettes.dark (src/screens/palette.js; global-css.test.ts compares them), so the static web
+   export paints in Night before it hydrates. The root layout sets the active theme's variables on its own View from there. */
 :root {
   color-scheme: dark;
+  --night: 11 10 8;
+  --dusk: 18 17 14;
+  --raised: 26 24 20;
+  --raisedTop: 34 31 26;
+  --pressed: 42 38 32;
+  --hairline: 44 41 35;
+  --bone: 238 231 215;
+  --muted: 163 155 140;
+  --faint: 138 133 124;
+  --danger: 232 145 123;
+  --gold: 217 182 108;
+  --goldHigh: 243 218 154;
+  --goldDeep: 169 129 63;
+  --goldLine: 94 76 44;
+  --onGold: 26 19 9;
+  --moon: 157 176 204;
+  --ok: 143 191 122;
+  --paper: 242 235 219;
+  --paperPressed: 229 219 196;
+  --paperEdge: 214 201 171;
+  --ink: 34 30 23;
+  --inkMuted: 110 98 80;
+  --inkLabel: 122 92 34;
+  --inkLine: 207 195 166;
+  --felt: 18 22 19;
+  --feltLight: 31 38 32;
+  --threat: 200 67 47;
+  --onThreat: 238 231 215;
+  --threatEdge: 232 145 123;
+  --glow: 217 182 108;
+  --treachery: 58 34 28;
+  --quest: 143 135 126;
+  --location: 122 88 64;
+  --objective: 166 132 72;
+  --leadership: 176 96 152;
+  --tactics: 224 56 72;
+  --lore: 98 176 42;
+  --spirit: 84 168 192;
+  --fellowship: 201 169 97;
 }

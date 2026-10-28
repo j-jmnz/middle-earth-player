@@ -16,7 +16,7 @@ import { StartPanel, type CarryChoice, type StartOption } from "../../start-pane
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave, savedAt } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { recordUnclosedRun } from "../../table-session";
-import { palette } from "../../palette.js";
+import { usePalette } from "../../palette-hook";
 import { KeepOrDelete } from "../../keep-or-delete";
 import { ContinuePanel, DELETE_SENTENCE, SaveRow, SaveSummary, describe, nextSummary, type SaveLine } from "../../save-panels";
 import { nextStepHref, pathHref } from "../../scenario-links";
@@ -32,6 +32,7 @@ function partyCodes(save: Save): string[] {
 }
 
 export default function CampaignList() {
+  const palette = usePalette();
   const router = useRouter();
   // `start=1`: a finished campaign's path sends the player here with the start panel open, to take its carry-over in.
   const { start: startParam } = useLocalSearchParams<{ start?: string }>();

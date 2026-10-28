@@ -11,12 +11,14 @@ import { STOP_AHEAD_WORDS } from "./carousel.ts";
 import { layoutAnim, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { Rail } from "./rail.ts";
-import { tableTokens as t, withAlphaHex } from "./tokens.ts";
+import { withAlphaHex } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 import { CHEVRON, NEIGHBOR_GAP } from "./top-bar-layout.ts";
 
 
 /** A chevron drawn as two edges of a rotated square: no printed icon fits, and a glyph depends on the font. */
-export function Chevron({ direction, color = t.muted }: { direction: "previous" | "next" | "up" | "down"; color?: string }) {
+export function Chevron({ direction, color }: { direction: "previous" | "next" | "up" | "down"; color?: string }) {
+  const t = useTableTokens();
   const turn = {
     next: "45deg",
     previous: "225deg",
@@ -39,7 +41,7 @@ export function Chevron({ direction, color = t.muted }: { direction: "previous" 
           height: 8,
           borderTopWidth: 1.5,
           borderRightWidth: 1.5,
-          borderColor: color,
+          borderColor: color ?? t.muted,
           transform: [{ rotate: turn }],
         }}
       />
@@ -85,6 +87,7 @@ export function PhaseRail({
   onPress?: () => void;
 }) {
   const scale = useMotionScale();
+  const t = useTableTokens();
   const step = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.railStep, scale), out: layoutAnim(FadeOut, MOTION.railStep, scale) }), [scale]);
   const flash = useSharedValue(0);
   const lastPhase = useRef(rail.phase);
@@ -93,8 +96,11 @@ export function PhaseRail({
     lastPhase.current = rail.phase;
     if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing(MOTION.railFlashOut, scale))));
   }, [rail.phase, scale, flash]);
+  // The colors go into the worklet as strings, so a theme change draws the edge again.
+  const gold = t.gold;
+  const goldLine = t.goldLine;
   const edge = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(flash.get(), [0, 1], [open ? t.gold : t.goldLine, t.gold]),
+    borderColor: interpolateColor(flash.get(), [0, 1], [open ? gold : goldLine, gold]),
   }));
   const round = rail.round > 0 ? (shortRound ? `R${rail.round}` : `Round ${rail.round}`) : "";
   const label = [rail.round > 0 ? `Round ${rail.round}` : "", rail.phase, rail.current, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(". ");
@@ -131,7 +137,7 @@ export function PhaseRail({
               paddingHorizontal: 10,
               paddingVertical: 3,
               backgroundColor: withAlphaHex(t.night, 0.78),
-              boxShadow: `inset 0 1px 0 ${withAlphaHex(t.bone, 0.06)}, 0 2px 10px ${withAlphaHex(t.night, 0.45)}`,
+              boxShadow: `inset 0 1px 0 ${withAlphaHex(t.lit, 0.06)}, 0 2px 10px ${withAlphaHex(t.night, 0.45)}`,
             },
             edge,
           ]}
@@ -166,7 +172,7 @@ export function PhaseRail({
                     // 14 pt: top-bar-layout.ts counts the pill's floor from this size and Cinzel Bold's capitals.
                     fontSize: 14,
                     lineHeight: 20,
-                    textShadowColor: t.gold,
+                    textShadowColor: t.glow,
                     textShadowRadius: 8,
                     textShadowOffset: { width: 0, height: 0 },
                   }}

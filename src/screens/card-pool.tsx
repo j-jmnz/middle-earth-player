@@ -12,7 +12,7 @@ import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useListPreview } from "./list-preview";
 import { notAppliedCodes, notAppliedWords } from "../play/not-applied";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { addingView, browseView } from "./pool-view";
 import { PoolCardCell, PoolCardRow, type PoolRowCard } from "./pool-cards";
 import { gridCardWidth, gridOffset } from "./pool-grid";
@@ -55,6 +55,7 @@ function TypeChips({
   applied: boolean;
   onApplied: (next: boolean) => void;
 }) {
+  const palette = usePalette();
   const options = [{ code: null, name: "All" }, ...types];
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-1 grow-0" contentContainerClassName="gap-1.5 px-6">

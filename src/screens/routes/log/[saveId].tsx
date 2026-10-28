@@ -11,7 +11,7 @@ import { carryWords } from "../../carry-words";
 import { poolCardWords, usedOnceWords } from "../../log-facts";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
-import { palette } from "../../palette.js";
+import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { useSave } from "../../use-save";
 import { GameIcon } from "../../../play/game-icon";
@@ -32,6 +32,7 @@ function Row({ label, value, testID, icon }: { label: string; value: string; tes
 }
 
 export default function Log() {
+  const palette = usePalette();
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string }>();
   const saveId = routeCode(params.saveId);

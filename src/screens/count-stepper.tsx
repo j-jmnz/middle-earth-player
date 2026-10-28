@@ -1,8 +1,8 @@
 import { Pressable, Text, View } from "react-native";
 
 import { copyCapRule } from "../catalog/deck-save";
-import { pressedNight } from "./chrome";
-import { palette } from "./palette.js";
+import { usePressedNight } from "./chrome";
+import { usePalette } from "./palette-hook";
 
 /** Whether one more copy would break the copy limit (rr.deckbuilding). */
 export function stepperFull(count: number, deckLimit: number | null): boolean {
@@ -31,6 +31,8 @@ export function CountStepper({
   minus?: boolean;
   ids?: { dec: string; count: string; inc: string };
 }) {
+  const palette = usePalette();
+  const pressedNight = usePressedNight();
   return (
     <View className="flex-row items-center rounded-tile" style={{ backgroundColor: palette.night, borderWidth: 1, borderColor: palette.hairline }}>
       {minus ? (

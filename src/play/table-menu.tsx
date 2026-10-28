@@ -8,12 +8,13 @@ import { Pressable, View } from "react-native";
 import { PopoverDivider, PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx";
 import { MENU_BUTTON } from "./top-bar-layout.ts";
 import { menuItems, type MenuItemId, type MenuNav } from "./table-menu-items.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 const MENU_WIDTH = 240;
 
 /** The 44 pt button at the right of the top bar: three dots drawn as views (no printed icon fits). */
 export function MenuButton({ open, onPress }: { open: boolean; onPress: () => void }) {
+  const t = useTableTokens();
   return (
     <Pressable
       testID="table-menu"

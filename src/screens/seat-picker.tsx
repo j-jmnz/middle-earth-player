@@ -6,6 +6,7 @@ import { Pressable, Text, View } from "react-native";
 
 import { notAppliedWords } from "../play/not-applied";
 import { panelSurface, tileSurface } from "../play/surfaces";
+import { useTableTokens } from "../play/use-table-tokens";
 import { Portrait } from "./art";
 import type { BriefingDecks } from "./briefing-parts";
 import { BodyText, Corners, Label, Section, SecondaryButton, TextButton } from "./chrome";
@@ -14,7 +15,7 @@ import { emptyDeckListFilter, useDeckListView } from "./deck-list";
 import { DeckListBar } from "./deck-list-bar";
 import { deckCountLine, notAppliedCards, notAppliedLine } from "./deck-status";
 import { DeckCover, DeckRow, EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "./hero-tile";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 
 const COVER_HEIGHT = 112;
 const TOOL_HEIGHT = 128;
@@ -54,6 +55,8 @@ export function SeatPicker({
   onRingBearer: (code: string | null) => void;
   nameOf: (code: string) => string;
 }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const router = useRouter();
   const view = useDeckListView();
   const [changing, setChanging] = useState(false);
@@ -153,7 +156,7 @@ export function SeatPicker({
           </View>
         </View>
       ) : (
-        <View testID={`briefing-party-${index}`} className="rounded-card p-4" style={{ ...panelSurface(), borderWidth: 1, borderColor: palette.goldLine }}>
+        <View testID={`briefing-party-${index}`} className="rounded-card p-4" style={{ ...panelSurface(false, t), borderWidth: 1, borderColor: palette.goldLine }}>
           {/* The name gets the card's whole width (a long one never breaks inside a word); Change sits beside the counts, under it. */}
           <Text className="font-display text-title text-bone">{pickedDeck.name}</Text>
           <View className="mt-1 flex-row items-center justify-between gap-3">
@@ -202,7 +205,7 @@ export function SeatPicker({
                 onPress={() => onRingBearer(candidate.code)}
               >
                 {({ pressed }) => (
-                  <View className="min-h-14 flex-row items-center gap-3 rounded-tile px-3 py-2" style={tileSurface(pressed)}>
+                  <View className="min-h-14 flex-row items-center gap-3 rounded-tile px-3 py-2" style={tileSurface(pressed, t)}>
                     <Portrait card={faceOf(candidate.code)} size={36} />
                     <View className="flex-1">
                       <Text className="font-display text-heading text-bone">{candidate.name}</Text>

@@ -8,11 +8,12 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
-import { goldPlate, raisedEdge } from "./surfaces.ts";
+import { goldPlate, raisedEdgeOf } from "./surfaces.ts";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
-import { tableTokens as t, withAlphaHex } from "./tokens.ts";
+import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 const SHEET_RADIUS = 28;
 
@@ -24,6 +25,7 @@ const SHEET_RADIUS = 28;
 export function SheetFrame({ children, testID, maxHeight, paddingTop = 12, animated = true }: { children: ReactNode; testID?: string; maxHeight?: DimensionValue; paddingTop?: number; animated?: boolean }) {
   const insets = useSafeAreaInsets();
   const scale = useMotionScale();
+  const t = useTableTokens();
   const rise = useMemo(() => layoutAnim(SlideInDown, MOTION.sheetIn, scale), [scale]);
   const style = {
     backgroundColor: t.paper,
@@ -77,6 +79,7 @@ export function ChromeButton({
   accessibilityLabel?: string;
   accessibilityHint?: string;
 }) {
+  const t = useTableTokens();
   const ink = tone === "ink";
   const quiet = variant === "quiet";
   const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "gold" ? t.gold : ink ? t.inkLabel : tone === "muted" || (quiet && tone === "bone") ? t.muted : t.bone;
@@ -99,7 +102,7 @@ export function ChromeButton({
           className={`items-center justify-center rounded-tile ${quiet ? "px-3" : "px-3.5"} ${variant === "text" ? "min-h-11" : tight ? "min-h-9" : "min-h-10"}`}
           style={{
             ...(pressed && !disabled ? { backgroundColor: ink ? t.paperPressed : t.pressed } : (rest ?? { backgroundColor: "transparent" })),
-            ...(variant === "plate" && !ink ? { boxShadow: raisedEdge } : {}),
+            ...(variant === "plate" && !ink ? { boxShadow: raisedEdgeOf(t) } : {}),
           }}
         >
           {variant === "plate" ? (
@@ -145,6 +148,7 @@ export function ChromePrimary({
   tight?: boolean;
   accessibilityHint?: string;
 }) {
+  const t = useTableTokens();
   const paper = surface === "paper";
   const color = disabled ? (paper ? t.inkMuted : t.muted) : paper ? t.paper : t.onGold;
   return (
@@ -161,7 +165,7 @@ export function ChromePrimary({
       {({ pressed }) => (
         <View
           className={`${compact ? (tight ? "min-h-11 px-3" : "px-3") : "min-h-14 px-5"} items-center justify-center rounded-button`}
-          style={{ ...(compact && !tight ? { minHeight: 46 } : {}), ...primaryFill(paper, disabled, pressed), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}
+          style={{ ...(compact && !tight ? { minHeight: 46 } : {}), ...primaryFill(paper, disabled, pressed, t), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}
         >
           {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
           <Text
@@ -177,10 +181,10 @@ export function ChromePrimary({
   );
 }
 
-function primaryFill(paper: boolean, disabled: boolean, pressed: boolean) {
+function primaryFill(paper: boolean, disabled: boolean, pressed: boolean, t: TableTokens) {
   if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: paper ? t.inkLine : t.goldLine };
   if (paper) return { backgroundColor: t.ink, opacity: pressed ? 0.85 : 1 };
-  return goldPlate(pressed);
+  return goldPlate(pressed, t);
 }
 
 /** The engine's numbers with the game's icons beside them. Each reads as "Willpower 2" to a screen reader. */
@@ -231,6 +235,7 @@ export function Tile({
   // More for a screen reader to say (the foreseen damage).
   said?: string;
 }) {
+  const t = useTableTokens();
   const night = surface === "night";
   const numbers = stats.length > 0 || trailing != null ? (
     <View className="flex-row flex-wrap items-center gap-2">
@@ -255,7 +260,7 @@ export function Tile({
           style={{
             minHeight: dense ? 44 : night ? 50 : 48,
             ...(night ? {} : { borderWidth: selected ? 1.5 : 1, borderColor: selected ? t.ink : t.inkLine }),
-            ...(pressed ? { backgroundColor: night ? t.pressed : t.paperPressed } : night ? nightTile(selected) : { backgroundColor: "transparent" }),
+            ...(pressed ? { backgroundColor: night ? t.pressed : t.paperPressed } : night ? nightTile(selected, t) : { backgroundColor: "transparent" }),
           }}
         >
           {leading}
@@ -281,8 +286,8 @@ export function Tile({
 }
 
 // A night tile's fill: a lit plate at rest, washed in gold when picked.
-function nightTile(selected: boolean) {
-  return selected ? { backgroundColor: withAlphaHex(t.gold, 0.16), boxShadow: `inset 0 0 0 1px ${withAlphaHex(t.gold, 0.35)}` } : { backgroundColor: withAlphaHex(t.bone, 0.06), boxShadow: raisedEdge };
+function nightTile(selected: boolean, t: TableTokens) {
+  return selected ? { backgroundColor: withAlphaHex(t.gold, 0.16), boxShadow: `inset 0 0 0 1px ${withAlphaHex(t.gold, 0.35)}` } : { backgroundColor: withAlphaHex(t.bone, 0.06), boxShadow: raisedEdgeOf(t) };
 }
 
 /** One sentence under a disabled action saying what it waits for. */

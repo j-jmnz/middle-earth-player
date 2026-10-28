@@ -1,12 +1,13 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../../global.css";
 
-import { useEffect, useRef, useState } from "react";
-import { Appearance, Platform } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Platform, StatusBar, View } from "react-native";
 import { Stack } from "expo-router";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
-import { colorScheme } from "nativewind";
+import { colorScheme, vars } from "nativewind";
+import { useStore } from "zustand";
 
 import { DatabaseBoundary, DatabaseError } from "../database-error";
 import { DatabaseProvider } from "../databases";
@@ -14,13 +15,16 @@ import { bindTableSettings } from "../settings-store";
 import { startImageDownloads } from "../images/queue";
 import { completeStarterInsert, insertStarterDecks } from "../starter-decks";
 import { openDatabases, type AppDatabases } from "../open-databases";
-import { palette } from "../palette.js";
+import { palettes, themeVars } from "../palette.js";
+import { tableSettings, type ThemeOption } from "../../play/table-settings";
+import { ThemeContext, useResolvedTheme, type ThemeName } from "../../play/theme";
 
 void SplashScreen.preventAutoHideAsync();
 
-// One theme. Both OS schemes map onto Night.
-function applyColorScheme() {
-  colorScheme.set("dark");
+// Dark, Light or System (user request, 2026-10-28). NativeWind hears the choice; System hands the scheme back to the phone, so
+// useColorScheme (and the theme with it) keeps following the phone, where forcing the resolved name would pin it.
+function applyColorScheme(setting: ThemeOption, resolved: ThemeName) {
+  colorScheme.set(setting === "system" ? "system" : resolved);
 }
 
 function reportSplashHideFailure(error: unknown): void {
@@ -32,14 +36,22 @@ export default function RootLayout() {
   const [databases, setDatabases] = useState<AppDatabases | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const splashHidden = useRef(false);
+  const themeSetting = useStore(tableSettings, (state) => state.settings.theme);
+  const resolved = useResolvedTheme();
+  const palette = palettes[resolved];
+  const themeStyle = useMemo(() => vars(themeVars(resolved)), [resolved]);
 
   useEffect(() => {
-    applyColorScheme();
-    const subscription = Appearance.addChangeListener(() => {
-      applyColorScheme();
-    });
-    return () => subscription.remove();
-  }, []);
+    applyColorScheme(themeSetting, resolved);
+  }, [themeSetting, resolved]);
+
+  // Web only: the variables and the color scheme on <html>, so a Modal's portal, form controls and scrollbars follow the theme.
+  useEffect(() => {
+    if (Platform.OS !== "web" || typeof document === "undefined") return;
+    const root = document.documentElement;
+    for (const [name, value] of Object.entries(themeVars(resolved))) root.style.setProperty(name, value);
+    root.style.colorScheme = resolved;
+  }, [resolved]);
 
   useEffect(() => {
     let cancelled = false;
@@ -110,37 +122,46 @@ export default function RootLayout() {
 
   // NativeWind fills pt-safe and pb-safe from a SafeAreaProvider rendered here. Expo Router's own provider
   // is compiled without NativeWind's JSX, so on a phone every inset would read 0 without this one.
+  // On a phone the View under the providers sets the active theme's color variables for every class below it, a Modal's content
+  // included, because variables travel by context there and not by the view tree. On the web a Modal is portaled into document.body,
+  // outside that View, so the effect above writes the same variables (and the color scheme) onto the page's root. The status bar's
+  // icons go light on Night and dark on Daylight.
   return (
+    <ThemeContext.Provider value={resolved}>
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.night }}>
+      <StatusBar barStyle={resolved === "dark" ? "light-content" : "dark-content"} />
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        {failure ? (
-          <DatabaseError message={failure} />
-        ) : databases ? (
-          <DatabaseBoundary>
-            <DatabaseProvider databases={databases}>
-              {/* Portrait everywhere but the table, which is played in landscape only. The card, booklet, glossary and rule screens
-                  open from both, so they follow the phone and the table does not turn the phone back to read a card. */}
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: palette.night },
-                  orientation: "portrait",
-                }}
-              >
-                {/* The table hides the status bar for room, and turns off the edge swipe back: a drag from the hand's edge
-                    must not leave the table. ‹ Path (‹ Scenarios for a standalone game) leaves it. */}
-                <Stack.Screen name="table/[saveId]" options={{ orientation: "landscape", statusBarHidden: true, gestureEnabled: false }} />
-                <Stack.Screen name="standalone/table/[gameId]" options={{ orientation: "landscape", statusBarHidden: true, gestureEnabled: false }} />
-                <Stack.Screen name="card/[code]" options={{ orientation: "all" }} />
-                <Stack.Screen name="booklet/[id]" options={{ orientation: "all" }} />
-                {/* The table's Rules opens the glossary, so it and a rule turn with the phone too. */}
-                <Stack.Screen name="glossary" options={{ orientation: "all" }} />
-                <Stack.Screen name="rule/[id]" options={{ orientation: "all" }} />
-              </Stack>
-            </DatabaseProvider>
-          </DatabaseBoundary>
-        ) : null}
+        <View className="flex-1" style={themeStyle}>
+          {failure ? (
+            <DatabaseError message={failure} />
+          ) : databases ? (
+            <DatabaseBoundary>
+              <DatabaseProvider databases={databases}>
+                {/* Portrait everywhere but the table, which is played in landscape only. The card, booklet, glossary and rule screens
+                    open from both, so they follow the phone and the table does not turn the phone back to read a card. */}
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    contentStyle: { backgroundColor: palette.night },
+                    orientation: "portrait",
+                  }}
+                >
+                  {/* The table hides the status bar for room, and turns off the edge swipe back: a drag from the hand's edge
+                      must not leave the table. ‹ Path (‹ Scenarios for a standalone game) leaves it. */}
+                  <Stack.Screen name="table/[saveId]" options={{ orientation: "landscape", statusBarHidden: true, gestureEnabled: false }} />
+                  <Stack.Screen name="standalone/table/[gameId]" options={{ orientation: "landscape", statusBarHidden: true, gestureEnabled: false }} />
+                  <Stack.Screen name="card/[code]" options={{ orientation: "all" }} />
+                  <Stack.Screen name="booklet/[id]" options={{ orientation: "all" }} />
+                  {/* The table's Rules opens the glossary, so it and a rule turn with the phone too. */}
+                  <Stack.Screen name="glossary" options={{ orientation: "all" }} />
+                  <Stack.Screen name="rule/[id]" options={{ orientation: "all" }} />
+                </Stack>
+              </DatabaseProvider>
+            </DatabaseBoundary>
+          ) : null}
+        </View>
       </SafeAreaProvider>
     </GestureHandlerRootView>
+    </ThemeContext.Provider>
   );
 }

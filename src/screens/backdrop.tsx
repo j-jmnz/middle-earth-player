@@ -1,7 +1,8 @@
 import { StyleSheet, View } from "react-native";
 
-import { palette } from "./palette.js";
-import { scenes, type SceneName } from "./backdrop-scenes";
+import { useTheme } from "../play/theme";
+import { scenesByTheme, type SceneName } from "./backdrop-scenes";
+import { usePalette } from "./palette-hook";
 
 // Web dev loop. Skia web needs CanvasKit, so the browser draws the same scene with CSS.
 // react-native-web forwards these CSS properties to the DOM.
@@ -12,7 +13,8 @@ function stopsCss(stops: readonly (readonly [number, string])[]): string {
 }
 
 export function Backdrop({ scene }: { scene: SceneName }) {
-  const s = scenes[scene];
+  const s = scenesByTheme[useTheme()][scene];
+  const palette = usePalette();
   const layers = s.glows.map(
     (g) =>
       `radial-gradient(${Math.round(g.r * 100)}vw ${Math.round(g.r * 100)}vw at ${Math.round(g.cx * 100)}% ${Math.round(g.cy * 100)}%, rgba(${g.rgb},${g.alpha}), rgba(${g.rgb},0))`,

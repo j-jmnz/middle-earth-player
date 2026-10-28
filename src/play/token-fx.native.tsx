@@ -13,13 +13,14 @@ import { slotBounds, type CardSlot, type Rect, type TableLayout } from "./layout
 import { floatWords, type TokenKind } from "./token-deltas.ts";
 import { FLOAT_MS, floatAt, POP_MS, popShows, tokenPopScale, type Fx } from "./token-fx.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
-import { tableTokens as t } from "./tokens.ts";
+import type { TableTokens } from "./tokens.ts";
 
 const CINZEL = require("../../assets/fonts/Cinzel-Bold.ttf") as number;
 const FLOAT_SIZE = 13;
 
 const IMAGE_OF: Readonly<Record<TokenKind, keyof TokenImages>> = { resources: "resource", damage: "damage", progress: "progress" };
-const FALLBACK: Readonly<Record<TokenKind, string>> = { resources: t.gold, damage: t.threat, progress: t.bone };
+// The disc drawn while a token's art decodes.
+const fallbackOf = (t: TableTokens): Readonly<Record<TokenKind, string>> => ({ resources: t.gold, damage: t.threat, progress: t.bone });
 
 function countOf(slot: CardSlot, token: TokenKind): number {
   return token === "resources" ? slot.resources : token === "damage" ? slot.damage : slot.progress;
@@ -31,7 +32,7 @@ function useSince(clock: Clock, start: number): { get: () => number } {
   return useDerivedValue(() => (epoch.get() === at ? progress.get() * span - start * k : -1), [at, k, span, start]);
 }
 
-function Pop({ fx, slot, rect, clock, images, fonts, ring, contrast, strip }: { fx: Fx; slot: CardSlot; rect: Rect; clock: Clock; images: TokenImages; fonts: Fonts; ring: string | null; contrast: boolean; strip: string | null }) {
+function Pop({ fx, slot, rect, clock, images, fonts, t, ring, contrast, strip }: { fx: Fx; slot: CardSlot; rect: Rect; clock: Clock; images: TokenImages; fonts: Fonts; t: TableTokens; ring: string | null; contrast: boolean; strip: string | null }) {
   const since = useSince(clock, fx.start);
   const { k } = clock;
   const { token } = fx.delta;
@@ -43,19 +44,19 @@ function Pop({ fx, slot, rect, clock, images, fonts, ring, contrast, strip }: { 
   return (
     <Group transform={transform} origin={vec(spot.cx, spot.cy)} opacity={opacity}>
       {strip ? (
-        <Outlined x={spot.cx} y={rect.y + rect.h - 3} text={strip} font={fonts.numbers} />
+        <Outlined x={spot.cx} y={rect.y + rect.h - 3} text={strip} font={fonts.numbers} t={t} />
       ) : (
         <Group>
-          {image ? <Image image={image as SkImage} x={spot.cx - TOKEN / 2} y={spot.cy - TOKEN / 2} width={TOKEN} height={TOKEN} fit="contain" /> : <Circle cx={spot.cx} cy={spot.cy} r={TOKEN / 2} color={FALLBACK[token]} />}
+          {image ? <Image image={image as SkImage} x={spot.cx - TOKEN / 2} y={spot.cy - TOKEN / 2} width={TOKEN} height={TOKEN} fit="contain" /> : <Circle cx={spot.cx} cy={spot.cy} r={TOKEN / 2} color={fallbackOf(t)[token]} />}
           {ring ? <Circle cx={spot.cx} cy={spot.cy} r={TOKEN / 2 + 0.5} color={ring} style="stroke" strokeWidth={1.75} /> : null}
-          <Outlined x={spot.cx} y={spot.cy + 4} text={String(countOf(slot, token))} font={contrast ? fonts.badge : fonts.numbers} heavy={contrast} />
+          <Outlined x={spot.cx} y={spot.cy + 4} text={String(countOf(slot, token))} font={contrast ? fonts.badge : fonts.numbers} t={t} heavy={contrast} />
         </Group>
       )}
     </Group>
   );
 }
 
-function Float({ fx, rect, clock, font }: { fx: Fx; rect: Rect; clock: Clock; font: SkFont }) {
+function Float({ fx, rect, clock, font, t }: { fx: Fx; rect: Rect; clock: Clock; font: SkFont; t: TableTokens }) {
   const since = useSince(clock, fx.start);
   const { k } = clock;
   const words = floatWords(fx.delta);
@@ -65,7 +66,7 @@ function Float({ fx, rect, clock, font }: { fx: Fx; rect: Rect; clock: Clock; fo
   const opacity = useDerivedValue(() => (since.get() < 0 || since.get() > FLOAT_MS * k ? 0 : frame.get().opacity));
   return (
     <Group transform={transform} opacity={opacity}>
-      <Outlined x={spot.cx} y={spot.cy - TOKEN / 2} text={words.text} font={font} color={words.gain ? t.gold : t.danger} heavy />
+      <Outlined x={spot.cx} y={spot.cy - TOKEN / 2} text={words.text} font={font} t={t} color={words.gain ? t.gold : t.danger} heavy />
     </Group>
   );
 }
@@ -77,6 +78,7 @@ export function TokenFx({
   clock,
   images,
   fonts,
+  t,
   ringOf,
   stripOf,
   contrast,
@@ -86,6 +88,7 @@ export function TokenFx({
   clock: Clock;
   images: TokenImages;
   fonts: Fonts;
+  t: TableTokens;
   // The sphere colour a card's resource token is ringed with.
   ringOf: (code: string) => string | null;
   // The quest card or location's "progress / quest points" strip text, or null for a card without one.
@@ -104,8 +107,8 @@ export function TokenFx({
         const strip = item.delta.token === "progress" ? stripOf(slot) : null;
         return (
           <Group key={key}>
-            {popShows(countOf(slot, item.delta.token), strip != null) ? <Pop fx={item} slot={slot} rect={rect} clock={clock} images={images} fonts={fonts} ring={item.delta.token === "resources" ? ringOf(slot.code) : null} contrast={contrast} strip={strip} /> : null}
-            {font ? <Float fx={item} rect={rect} clock={clock} font={font} /> : null}
+            {popShows(countOf(slot, item.delta.token), strip != null) ? <Pop fx={item} slot={slot} rect={rect} clock={clock} images={images} fonts={fonts} t={t} ring={item.delta.token === "resources" ? ringOf(slot.code) : null} contrast={contrast} strip={strip} /> : null}
+            {font ? <Float fx={item} rect={rect} clock={clock} font={font} t={t} /> : null}
           </Group>
         );
       })}

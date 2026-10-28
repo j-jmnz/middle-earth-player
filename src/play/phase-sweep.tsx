@@ -11,7 +11,7 @@ import { timing, useMotionScale } from "./motion-run.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
 import { busyBetween, SETTLE_MS, sweepFrame, sweepName } from "./sweep.ts";
 import type { TableStore } from "./store.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 /** `area` is the canvas on the screen: the title crosses its center. */
 export function PhaseSweep({ store, area }: { store: TableStore; area: { left: number; top: number; width: number; height: number } }) {
@@ -19,6 +19,7 @@ export function PhaseSweep({ store, area }: { store: TableStore; area: { left: n
   const game = useStore(store, (state) => state.game);
   const { phase, round } = game;
   const scale = useMotionScale();
+  const t = useTableTokens();
   const before = useRef(store.getState().game);
   const [shown, setShown] = useState<string | null>(null);
   const progress = useSharedValue(0);

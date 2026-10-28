@@ -13,7 +13,8 @@ import { scheduleOnRN } from "react-native-worklets";
 import { timing, useMotionScale } from "./motion-run.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
 import type { TableStore } from "./store.ts";
-import { tableTokens as t, withAlphaHex } from "./tokens.ts";
+import { withAlphaHex } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 import { useScrim } from "./use-spotlight.ts";
 
 type Box = { top?: number; bottom?: number; left?: number; right?: number; width?: number; height?: number };
@@ -40,6 +41,7 @@ function ScrimView({
   commandWidth: number;
 }) {
   const scale = useMotionScale();
+  const t = useTableTokens();
   const opacity = useSharedValue(0);
   // Mounted while it shows and until its fade out has run.
   const [lingers, setLingers] = useState(false);

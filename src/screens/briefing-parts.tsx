@@ -12,13 +12,13 @@ import { cards, packs } from "../catalog/schema";
 import type { Difficulty } from "../catalog/scenario-data";
 import { SceneArt } from "./art";
 import { dealSentence, problemWords } from "./briefing-words";
-import { ActionBar, Chevron, Chip, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, titleShadow } from "./chrome";
+import { ActionBar, Chevron, Chip, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, useTitleShadow } from "./chrome";
 import { deckListSpheres, emptyDeckListFilter, filterDecks, type DeckListFilter } from "./deck-list";
 import { deckReadiness, type DeckReadiness } from "./deck-status";
 import { deckFaces, listDecks, notAppliedIn } from "./deck-store";
 import { useDatabases } from "./databases";
 import type { HeroFace } from "./hero-tile";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed, type StarterSeed } from "./starter-decks";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
@@ -165,6 +165,8 @@ export function BriefingScreen({
 
 /** Over the scene: the scenario's number, its name and its stages in order. */
 export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebrow: string }) {
+  const palette = usePalette();
+  const titleShadow = useTitleShadow();
   return (
     <>
       {/* Every word over the scene carries the title's night shadow: a long name pushes the eyebrow up into the bright sky. */}

@@ -6,7 +6,7 @@ import { traitTokens } from "../catalog/deck-save";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
 import { PaperSheet, PrimaryButton, SphereMark, TextButton, markedSphere, sphereWord } from "./chrome";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import {
   costOptions,
   filterSheetAnimation,
@@ -40,6 +40,7 @@ export function PoolFilterSheet({
   onDismiss: () => void;
   onApply: () => void;
 }) {
+  const palette = usePalette();
   const { height } = useWindowDimensions();
   const [chooser, setChooser] = useState<Chooser>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -146,6 +147,7 @@ function Chip({
   onPress: () => void;
   sphere?: string;
 }) {
+  const palette = usePalette();
   const mark = sphere ? markedSphere(sphere) : null;
   return (
     <Pressable
@@ -199,6 +201,7 @@ function FilterBody({
   onChange: (next: PoolFilter) => void;
   onChoose: (chooser: "pack" | "trait" | "cost") => void;
 }) {
+  const palette = usePalette();
   return (
     <View>
       <Text className="mb-2 text-label text-inkLabel">Sphere</Text>

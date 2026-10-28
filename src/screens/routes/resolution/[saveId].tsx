@@ -11,6 +11,7 @@ import { consequenceSentence, resolutionView, settledSentence, type ResolutionTi
 import { finish } from "../../../campaign/session";
 import { ActionBar, BodyText, Corners, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton } from "../../chrome";
 import { tileSurface } from "../../../play/surfaces";
+import { useTableTokens } from "../../../play/use-table-tokens";
 import { withAlphaHex } from "../../../play/tokens";
 import { campaignOf, scenarioName } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
@@ -18,11 +19,13 @@ import { recordCampaignRun } from "../../run-writers";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { CardThumb } from "../../images/picture";
-import { palette } from "../../palette.js";
+import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../table-session";
 
 function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; selected: boolean; imagesrc: string | null; onPress: () => void }) {
+  const palette = usePalette();
+  const t = useTableTokens();
   const label = tile.hero ? `${tile.name} on ${tile.hero}` : tile.name;
   return (
     <Pressable
@@ -39,7 +42,7 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       {({ pressed }) => (
         <View
           className="min-h-14 items-center rounded-card p-3"
-          style={{ ...tileSurface(pressed), ...(selected ? { borderWidth: 1.5, borderColor: palette.gold, boxShadow: `0 0 18px ${withAlphaHex(palette.gold, 0.28)}` } : {}) }}
+          style={{ ...tileSurface(pressed, t), ...(selected ? { borderWidth: 1.5, borderColor: palette.gold, boxShadow: `0 0 18px ${withAlphaHex(palette.gold, 0.28)}` } : {}) }}
         >
           {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={72} height={100} /> : null}
           <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-goldHigh" : "text-bone"}`}>{label}</Text>

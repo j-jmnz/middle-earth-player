@@ -10,7 +10,7 @@ import { addDraftCard, announceDraftChange, takeDraftCard, type TitleLookup } fr
 import { CardThumbFrame, RowCardImage, useCardPreview } from "./images/picture";
 import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { poolDetail, type PoolCard } from "./pool-filter";
 
 export type PoolRowCard = PoolCard & {
@@ -106,6 +106,7 @@ export const PoolCardCell = memo(function PoolCardCell({
   onOpen: (code: string) => void;
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
+  const palette = usePalette();
   const picture = useCardPreview(item.code, item.imagesrc);
   const card = { code: item.code, name: item.name, typeCode: item.typeCode, deckLimit: item.deckLimit };
   const height = Math.round(width * CARD_RATIO);

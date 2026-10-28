@@ -13,8 +13,9 @@ import { BOXES, scenarioName } from "../../campaign-data";
 import { BodyText, Chevron, Chip, Eyebrow, Label, Panel, Screen, ScreenScroll, ScreenTitle, Section, TextButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt, SceneCard } from "../../art";
-import { palette } from "../../palette.js";
-import { goldPlate, panelSurface, raisedEdge, tileSurface } from "../../../play/surfaces";
+import { usePalette } from "../../palette-hook";
+import { goldPlate, panelSurface, raisedEdgeOf, tileSurface } from "../../../play/surfaces";
+import { useTableTokens } from "../../../play/use-table-tokens";
 import { withAlphaHex } from "../../../play/tokens";
 import { useDatabases } from "../../databases";
 import { KeepOrDelete } from "../../keep-or-delete";
@@ -25,6 +26,8 @@ import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStanda
 const DELETE_SENTENCE = "Delete this game? It is gone for good. Your decks stay.";
 
 export default function Scenarios() {
+  const palette = usePalette();
+  const t = useTableTokens();
   const router = useRouter();
   const { user } = useDatabases();
   const [games, setGames] = useState<StandaloneGame[]>([]);
@@ -141,7 +144,7 @@ export default function Scenarios() {
                 <Text className="mt-1 font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
                 <Label>{gameCaption(game)}</Label>
                 {/* The look of the primary inside the card; the whole card is the one button. */}
-                <View className="mt-3 min-h-14 items-center justify-center rounded-button" style={goldPlate(pressed)}>
+                <View className="mt-3 min-h-14 items-center justify-center rounded-button" style={goldPlate(pressed, t)}>
                   <Text className="font-display-bold uppercase" style={{ fontSize: 15, lineHeight: 20, letterSpacing: 2.4, color: palette.onGold }}>
                     Resume
                   </Text>
@@ -156,7 +159,7 @@ export default function Scenarios() {
     return (
       <Pressable key={game.id} testID={`game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} disabled={action == null} onPress={() => open(game)}>
         {({ pressed }) => (
-          <View className="rounded-card px-4 py-3.5" style={tileSurface(pressed)}>
+          <View className="rounded-card px-4 py-3.5" style={tileSurface(pressed, t)}>
             <View className="flex-row items-start justify-between gap-2">
               <View className="flex-1">
                 <Text className="font-display text-heading text-bone">{nameOf(game.scenarioId)}</Text>
@@ -227,7 +230,7 @@ export default function Scenarios() {
                   {({ pressed }) => (
                     <View
                       className="flex-row items-center gap-3.5 overflow-hidden rounded-card pr-4"
-                      style={{ ...panelSurface(pressed), boxShadow: raisedEdge }}
+                      style={{ ...panelSurface(pressed, t), boxShadow: raisedEdgeOf(t) }}
                     >
                       <View style={{ width: 92, height: 68 }}>
                         <SceneArt scenarioId={id} width={92} height={68}>

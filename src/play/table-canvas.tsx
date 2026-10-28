@@ -8,7 +8,8 @@ import { useStore } from "zustand";
 import { NO_HIGHLIGHT } from "./peek.ts";
 import { PILE_WORDS, PILES, hidesFace, isPrisoner, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
-import { tableTokens as t } from "./tokens.ts";
+import type { TableTokens } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 const ZONE_WORD: Record<ZoneId, string> = {
   questStage: "Quest",
@@ -20,9 +21,9 @@ const ZONE_WORD: Record<ZoneId, string> = {
   hand: "Hand",
 };
 
-type RowProps = Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "info" | "onTap" | "onPreview" | "highlight"> & { seat: number };
+type RowProps = Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "info" | "onTap" | "onPreview" | "highlight"> & { seat: number; t: TableTokens };
 
-function CardButton({ id, label, faceDown, onTap, onPreview, highlight }: { id: string; label: string; faceDown: boolean } & Pick<TableCanvasProps, "onTap" | "onPreview" | "highlight">) {
+function CardButton({ id, label, faceDown, onTap, onPreview, highlight, t }: { id: string; label: string; faceDown: boolean; t: TableTokens } & Pick<TableCanvasProps, "onTap" | "onPreview" | "highlight">) {
   const picked = highlight.picked.get(id) ?? 0;
   const tappable = highlight.tappable.has(id);
   // The number the open pick draws on the card (the damage a defender would take).
@@ -52,7 +53,7 @@ function marksText(info: TableCanvasProps["info"], cardId: string, zone: ZoneId)
   return `${engagement}${slot.delayed ? " · an effect comes later" : ""}`;
 }
 
-function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, highlight }: RowProps & { zone: ZoneId }) {
+function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, highlight, t }: RowProps & { zone: ZoneId }) {
   const select = useMemo(() => zoneSelector(zone, seat), [zone, seat]);
   const view = useStore(store, (state) => select(state.game));
   if (view.entries.length === 0) return null;
@@ -69,6 +70,7 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, 
             onTap={onTap}
             onPreview={onPreview}
             highlight={highlight}
+            t={t}
           />
         ))}
       </View>
@@ -76,20 +78,21 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, 
   );
 }
 
-function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight }: RowProps & { pile: PileId }) {
+function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight, t }: RowProps & { pile: PileId }) {
   const select = useMemo(() => pileSelector(pile, seat), [pile, seat]);
   const view = useStore(store, (state) => select(state.game));
   const top = view.top ? ` · ${nameOf(view.top.code)} on top` : "";
   // An encounter card attached to the deck (Iron Shackles, 01105:A:1): the list says so, as the canvas draws a chain.
   const held = (view.attached ?? []).length > 0 ? ` · ${(view.attached ?? []).map((card) => nameOf(card.code)).join(", ")} attached` : "";
-  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORDS[pile]} (${view.ids.length})${top}${held}`} onTap={onTap} onPreview={onPreview} highlight={highlight} />;
+  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORDS[pile]} (${view.ids.length})${top}${held}`} onTap={onTap} onPreview={onPreview} highlight={highlight} t={t} />;
 }
 
 export function TableCanvas({ store, width, height, nameOf, inactive, info, onTap, onPreview, highlight: marked }: TableCanvasProps) {
+  const t = useTableTokens();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   // Peeking at the other seat: nothing is outlined or filled, and a tap only previews (use-table-choice.ts).
   const highlight = useStore(store, (state) => state.viewedSeat != null) ? NO_HIGHLIGHT : marked;
-  const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight };
+  const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight, t };
   return (
     <ScrollView style={{ width, height, backgroundColor: t.felt }} contentContainerStyle={{ padding: 12 }}>
       {TABLE_ZONES.map((zone) => (

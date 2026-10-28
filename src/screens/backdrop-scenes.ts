@@ -1,6 +1,6 @@
 /**
  * Backdrop scene art. Coordinates are fractions of the screen (x of width, y of height).
- * These stops are the only hex values outside palette.js. Screens pick a scene by name.
+ * These stops are the only hex values outside palette.js. Screens pick a scene by name, and the theme picks its Dark or Light art.
  */
 export type SceneName = "dusk" | "ember" | "vale" | "plain" | "victory" | "felt";
 
@@ -114,3 +114,98 @@ export const scenes: Record<SceneName, Scene> = {
     vignette: 0,
   },
 };
+
+// The same six scenes by daylight (user request, 2026-10-28): dawn over the mountains, lamplight in a morning room, the vale at noon.
+// Each fades into the Light page color (the palette's night) so the screen's own fill and the scene meet without a seam, and the
+// vignette is a warm shade at the corners rather than night.
+const day = "#E8DFCA";
+
+export const lightScenes: Record<SceneName, Scene> = {
+  // Dawn: a pale sky over far mountains, the sun low on the right and a warm haze on the left.
+  dusk: {
+    base: {
+      kind: "linear",
+      stops: [
+        [0, "#D3DCE6"],
+        [0.32, "#E1E1D8"],
+        [0.6, day],
+        [1, day],
+      ],
+    },
+    glows: [
+      { cx: 0.82, cy: 0.06, r: 0.75, rgb: "255,238,196", alpha: 0.55 },
+      { cx: 0.08, cy: 0.62, r: 0.7, rgb: "217,150,90", alpha: 0.12 },
+    ],
+    ridges: [
+      {
+        points: [[0, 0.33], [0.12, 0.3], [0.22, 0.318], [0.34, 0.262], [0.46, 0.305], [0.58, 0.276], [0.7, 0.3], [0.82, 0.25], [0.92, 0.29], [1, 0.276]],
+        bottom: 0.5,
+        from: "#B9C1CA",
+        to: day,
+        opacity: 0.7,
+      },
+    ],
+    vignette: 0.14,
+  },
+  // Lamplight in a morning room: warm on the left, a cool window low right.
+  ember: {
+    base: { kind: "linear", stops: [[0, "#EDE4CF"], [1, day]] },
+    glows: [
+      { cx: 0.3, cy: 0.34, r: 0.8, rgb: "232,196,120", alpha: 0.3 },
+      { cx: 0.8, cy: 0.8, r: 0.9, rgb: "150,170,200", alpha: 0.22 },
+    ],
+    ridges: [],
+    vignette: 0.12,
+  },
+  // The vale at noon.
+  vale: {
+    base: {
+      kind: "linear",
+      stops: [
+        [0, "#C7D7CC"],
+        [0.16, "#B7CBA6"],
+        [0.25, "#CAD8B5"],
+        [0.4, day],
+        [1, day],
+      ],
+    },
+    glows: [{ cx: 0.7, cy: 0.16, r: 0.45, rgb: "255,230,160", alpha: 0.55 }],
+    ridges: [
+      {
+        points: [[0, 0.268], [0.18, 0.241], [0.34, 0.264], [0.5, 0.232], [0.66, 0.259], [0.82, 0.227], [1, 0.255]],
+        bottom: 0.41,
+        from: "#A6BC98",
+        to: day,
+        opacity: 1,
+      },
+    ],
+    vignette: 0.12,
+  },
+  // Quiet parchment, one cool light top-left.
+  plain: {
+    base: { kind: "linear", stops: [[0, "#EFE8D6"], [1, day]] },
+    glows: [
+      { cx: 0.2, cy: 0, r: 0.9, rgb: "150,170,205", alpha: 0.22 },
+      { cx: 0.9, cy: 0.95, r: 0.6, rgb: "217,150,90", alpha: 0.08 },
+    ],
+    ridges: [],
+    vignette: 0.1,
+  },
+  // The Ring in morning light.
+  victory: {
+    base: { kind: "linear", stops: [[0, "#F2E6C8"], [0.55, "#EBE2CC"], [1, day]] },
+    glows: [{ cx: 0.5, cy: 0.22, r: 0.6, rgb: "245,205,120", alpha: 0.5 }],
+    ridges: [],
+    ring: { cx: 0.5, cy: 0.225, r: 0.28 },
+    vignette: 0.16,
+  },
+  // Table chrome around the Skia canvas: linen.
+  felt: {
+    base: { kind: "radial", cx: 0.5, cy: 0.46, r: 0.9, stops: [[0, "#E9E1CE"], [0.6, "#DDD4BF"], [1, "#CEC4AB"]] },
+    glows: [{ cx: 0.5, cy: 0.12, r: 0.6, rgb: "217,184,108", alpha: 0.18 }],
+    ridges: [],
+    vignette: 0,
+  },
+};
+
+export const scenesByTheme = { dark: scenes, light: lightScenes } as const;

@@ -9,7 +9,7 @@ import type { Speed } from "./motion-tokens.ts";
 import { ChromeButton, Tile } from "./sheet-paper.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import type { TableSettings } from "./table-settings.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 /** A discard pile's cards, the one on top first. A tap shows a card large; nothing here changes the game. */
 export function PileList({ title, cards, onRead, onClose }: { title: string; cards: readonly { id: string; label: string }[]; onRead: (cardId: string) => void; onClose: () => void }) {
@@ -34,6 +34,7 @@ export function PileList({ title, cards, onRead, onClose }: { title: string; car
 
 /** This round's engine steps and their causes, on paper. Text only: it is how a player checks a number against its source. */
 export function LogPanel({ round, lines, onClose }: { round: number; lines: readonly LogLine[]; onClose: () => void }) {
+  const t = useTableTokens();
   return (
     <View testID="log-sheet" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center">
@@ -75,6 +76,7 @@ export function ThreatPanel({
   rows: readonly { id: string; name: string; cost: number; verdict: { word: string; engages: boolean } }[];
   onClose: () => void;
 }) {
+  const t = useTableTokens();
   return (
     <View testID="threat-panel" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center">
@@ -110,6 +112,7 @@ export function ThreatPanel({
 // A labelled switch on paper: the whole row, at least 44 pt tall, is the control, and a screen reader hears it as a switch
 // with its detail as the hint. The tracks hold 3:1 against paper (inkMuted off, ink on).
 function PaperSwitch({ label, detail, value, onChange, testID }: { label: string; detail?: string; value: boolean; onChange: (value: boolean) => void; testID: string }) {
+  const t = useTableTokens();
   return (
     <Pressable
       testID={`${testID}-row`}
@@ -143,6 +146,7 @@ const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", quick: 
 // Animation speed: one row at least 44 pt tall, as the switches are: the label and what it does at the left, the two choices as pills
 // at the right, each a 44 pt target. The chosen one is ink with paper text. A screen reader hears a radio group of two.
 function SpeedChoice({ value, onChange }: { value: Speed; onChange: (value: Speed) => void }) {
+  const t = useTableTokens();
   return (
     <View testID="settings-speed" accessibilityRole="radiogroup" accessibilityLabel="Animation speed" style={{ minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingVertical: 4 }}>
       <View className="shrink">

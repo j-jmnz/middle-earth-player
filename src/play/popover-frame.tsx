@@ -12,8 +12,9 @@ import type { IconName } from "./icon-map.ts";
 import { useOpenMotion } from "./motion-run.ts";
 import { MOTION, ms } from "./motion-tokens.ts";
 import { Chevron } from "./phase-rail.tsx";
-import { raisedEdge, tileSurface } from "./surfaces.ts";
-import { tableTokens as t, withAlphaHex } from "./tokens.ts";
+import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
+import { withAlphaHex } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 export type PressableRef = ComponentRef<typeof Pressable>;
 const ROW = 48;
@@ -35,6 +36,7 @@ export type PopoverRowItem = {
 
 /** One 48 pt row of a popover: a rounded plate inside the frame's padding that fills when pressed. */
 export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; onPress: () => void; rowRef?: RefObject<PressableRef | null> }) {
+  const t = useTableTokens();
   return (
     <Pressable
       ref={rowRef}
@@ -83,6 +85,7 @@ function LeaveMark({ color }: { color: string }) {
 
 /** A hairline between groups of rows. */
 export function PopoverDivider() {
+  const t = useTableTokens();
   return <View style={{ height: 1, marginVertical: 4, marginHorizontal: 10, backgroundColor: t.hairline }} />;
 }
 
@@ -116,6 +119,7 @@ export function PopoverFrame({
 
   const fallback = useRef<PressableRef>(null);
   const first = focusRef ?? fallback;
+  const t = useTableTokens();
   useEffect(() => {
     if (!open) return;
     const timer = setTimeout(() => {
@@ -149,8 +153,8 @@ export function PopoverFrame({
             width,
             padding: PAD,
             borderRadius: 16, // rounded-card
-            ...tileSurface(),
-            boxShadow: `${raisedEdge}, 0 12px 32px ${withAlphaHex(t.night, 0.65)}, 0 2px 6px ${withAlphaHex(t.night, 0.4)}`,
+            ...tileSurface(false, t),
+            boxShadow: `${raisedEdgeOf(t)}, 0 12px 32px ${withAlphaHex(t.night, 0.65)}, 0 2px 6px ${withAlphaHex(t.night, 0.4)}`,
             transformOrigin: origin,
           },
           style,

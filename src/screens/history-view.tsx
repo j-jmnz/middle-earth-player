@@ -17,7 +17,7 @@ import { FoldHeader } from "./fold-section";
 import { goBack } from "./go-back";
 import { filterRuns, groupRuns, historyItems, scopesOf, startedOf, type HistoryItem, type RunFilter } from "./history-list";
 import { courseWords, deletedWords, emptyWords, playthroughWords, plural, runDate, runLabel, scoreWords, seatsWords } from "./history-words";
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { existingRefs, listRuns } from "./run-store";
 import { seatWord } from "./seats";
 
@@ -30,6 +30,7 @@ type Playthroughs = { current: string | null; progress: ReadonlyMap<string, { do
 
 // A FlashList row: one pressable on a solid fill, no light and no shadow (docs/design-system.md, Performance).
 function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; deleted: boolean; showBox: boolean; nameOf: (code: string) => string; onPress: (() => void) | null }) {
+  const palette = usePalette();
   const scenario = scenarioName(run.scenarioId);
   const date = runDate(run);
   const course = courseWords(run);

@@ -1,9 +1,9 @@
 // The chrome's words (docs/design-system.md, Type): eyebrows, section headings, the screen title, body and label text.
 // Re-exported by chrome.tsx.
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { Text, View } from "react-native";
 
-import { palette } from "./palette.js";
+import { usePalette } from "./palette-hook";
 import { withAlphaHex } from "../play/tokens";
 
 const eyebrowTone = { gold: "text-gold", moon: "text-moon", muted: "text-muted", inkLabel: "text-inkLabel" } as const;
@@ -19,6 +19,7 @@ export function Eyebrow({ children, tone = "gold", testID }: { children: string;
 
 /** A section's heading: a moonlit eyebrow and a rule that fades out to its right, with one optional control at the end. */
 export function Section({ title, right, testID, className }: { title: string; right?: ReactNode; testID?: string; className?: string }) {
+  const palette = usePalette();
   return (
     <View testID={testID} className={`min-h-11 flex-row items-center gap-3${className ? ` ${className}` : ""}`}>
       <Text accessibilityRole="header" className="font-display-bold text-eyebrow uppercase text-moon">
@@ -30,10 +31,14 @@ export function Section({ title, right, testID, className }: { title: string; ri
   );
 }
 
-/** The soft night under a title, so it reads over a backdrop or a picture. */
-export const titleShadow = { textShadowColor: withAlphaHex(palette.night, 0.85), textShadowRadius: 12, textShadowOffset: { width: 0, height: 2 } };
+/** The soft night under a title, so it reads over a backdrop or a picture (the theme's own page color). */
+export function useTitleShadow() {
+  const palette = usePalette();
+  return useMemo(() => ({ textShadowColor: withAlphaHex(palette.night, 0.85), textShadowRadius: 12, textShadowOffset: { width: 0, height: 2 } }), [palette]);
+}
 
 export function ScreenTitle({ children, size = "display" }: { children: string; size?: "display" | "title" }) {
+  const titleShadow = useTitleShadow();
   return (
     <Text accessibilityRole="header" className={`font-display text-bone ${size === "display" ? "text-display" : "text-title"}`} style={titleShadow}>
       {children}

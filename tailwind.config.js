@@ -1,4 +1,4 @@
-const { palette } = require("./src/screens/palette.js");
+const { themeColors } = require("./src/screens/palette.js");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -8,7 +8,8 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
-      colors: palette,
+      // Every color reads a CSS variable the root layout sets per theme (themeVars), so a class paints Dark and Light alike.
+      colors: themeColors(),
       fontFamily: {
         // Embedded at build time by the expo-font config plugin (app.json). No runtime load. Cinzel's lower case is small capitals,
         // so a name reads as engraved capitals: titles and names in SemiBold, buttons, tags and the numbers the player watches in Bold.

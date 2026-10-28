@@ -9,7 +9,7 @@ import { BookletPdf } from "../../booklets/reader-view";
 import { bookletUri, hasBundledBooklet, importBooklet, installBundledBooklet } from "../../booklets/store";
 import { readBooklet, writeLastPage, type BookletRow } from "../../campaign-store";
 import { useDatabases } from "../../databases";
-import { palette } from "../../palette.js";
+import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 
 // Full-screen reader for one stored PDF. It opens from the campaign list, the path, the briefing and the log, and Close
@@ -23,6 +23,7 @@ function CloseBar({ onClose }: { onClose: () => void }) {
 }
 
 export default function Booklet() {
+  const palette = usePalette();
   const router = useRouter();
   const params = useLocalSearchParams<{ id: string; page?: string }>();
   const id = routeCode(params.id);

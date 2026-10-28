@@ -10,20 +10,18 @@ import { ICONS } from "./icons/generated.ts";
 import type { CardSlot, CombatMark, Rect } from "./layout.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
-import { tableTokens as t } from "./tokens.ts";
+import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { wrapName } from "./wrap.ts";
 
 export const RADIUS = 6;
 const LINE = 14;
 const BADGE_H = 15;
 
+// Every piece draws with the tokens of the theme in force, handed down from the canvas root as `t` (user request, 2026-10-28); a piece
+// does not read the theme itself.
 // Translucent night, from the token, so the palette drift test covers the canvas's veils too.
-export function withAlpha(hex: string, alpha: number): string {
-  const value = Number.parseInt(hex.slice(1), 16);
-  return `rgba(${(value >> 16) & 255},${(value >> 8) & 255},${value & 255},${alpha})`;
-}
-const shadowColor = withAlpha(t.night, 0.5);
-const strip = withAlpha(t.night, 0.72);
+const shadowOf = (t: TableTokens) => withAlphaHex(t.night, 0.5);
+const stripOf = (t: TableTokens) => withAlphaHex(t.night, 0.72);
 
 export type Fonts = { names: SkFont; numbers: SkFont; small: SkFont; badge: SkFont };
 export type TokenImages = { resource: SkImage | null; damage: SkImage | null; progress: SkImage | null; questPoints: SkImage | null; engagementCost: SkImage | null };
@@ -52,7 +50,7 @@ export function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: num
 }
 
 // A number that stays readable on any token art or picture: a night outline under a bone fill.
-export function Outlined({ x, y, text, font, color = t.bone, heavy = false }: { x: number; y: number; text: string; font: SkFont; color?: string; heavy?: boolean }) {
+export function Outlined({ x, y, text, font, t, color = t.bone, heavy = false }: { x: number; y: number; text: string; font: SkFont; t: TableTokens; color?: string; heavy?: boolean }) {
   const width = font.getTextWidth(text);
   return (
     <Group>
@@ -68,7 +66,7 @@ export function Outlined({ x, y, text, font, color = t.bone, heavy = false }: { 
  * and never a word on the canvas; the preview lists the lines (docs/plans/inactive-text.md). Not gold, which marks the one
  * action, and not danger, which marks a refusal.
  */
-export function NotAppliedMark({ rect }: { rect: Rect }) {
+export function NotAppliedMark({ rect, t }: { rect: Rect; t: TableTokens }) {
   // At the right edge, just under the damage token's corner; the delayed effect's clock goes under it.
   const cx = rect.x + rect.w - 8;
   const cy = rect.y + TOKEN + 3 + 6.5;
@@ -85,7 +83,7 @@ export function NotAppliedMark({ rect }: { rect: Rect }) {
  * The facedown prisoner's back (01123:B:1): a small hero mark on a night disc in the middle of it, upright whatever the card does. Not gold, which marks
  * the one action, and not danger, which marks a refusal: bone, the colour of a card that is only held.
  */
-export function HeldMark({ rect }: { rect: Rect }) {
+export function HeldMark({ rect, t }: { rect: Rect; t: TableTokens }) {
   const cx = rect.x + rect.w / 2;
   const cy = rect.y + rect.h / 2;
   return (
@@ -99,7 +97,7 @@ export function HeldMark({ rect }: { rect: Rect }) {
 
 // A card back: the printed one, the One Ring for a player card and the Eye for an encounter card. While its file decodes,
 // the player's is raised night with the gold ring, the encounter deck's night with a threat-red ring.
-function Back({ x, y, w, h, encounter, backs }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages }) {
+function Back({ x, y, w, h, encounter, backs, t }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages; t: TableTokens }) {
   const image = encounter ? backs.encounter : backs.player;
   if (image) {
     return (
@@ -126,6 +124,7 @@ export function CardBody({
   fonts,
   encounterBack,
   backs,
+  t,
 }: {
   slot: CardSlot;
   image: SkImage | null;
@@ -134,13 +133,14 @@ export function CardBody({
   fonts: Fonts;
   encounterBack: boolean;
   backs: BackImages;
+  t: TableTokens;
 }) {
   const { x, y, w, h } = slot;
   return (
     <Group>
-      <RoundedRect x={x + 1} y={y + 2} width={w} height={h} r={RADIUS} color={shadowColor} />
+      <RoundedRect x={x + 1} y={y + 2} width={w} height={h} r={RADIUS} color={shadowOf(t)} />
       {slot.faceDown ? (
-        <Back x={x} y={y} w={w} h={h} encounter={encounterBack} backs={backs} />
+        <Back x={x} y={y} w={w} h={h} encounter={encounterBack} backs={backs} t={t} />
       ) : image ? (
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
@@ -163,7 +163,7 @@ export function CardBody({
 const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard" };
 
 /** A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. */
-export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlot; image: SkImage | null; name: string; fonts: Fonts; label: boolean; backs: BackImages }) {
+export function Pile({ slot, image, name, fonts, label, backs, t }: { slot: CardSlot; image: SkImage | null; name: string; fonts: Fonts; label: boolean; backs: BackImages; t: TableTokens }) {
   const { x, y, w, h } = slot;
   const encounter = slot.zone === "encounterDeck" || slot.zone === "encounterDiscard";
   const word = PILE_WORD[slot.zone] ?? "";
@@ -184,7 +184,7 @@ export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlo
         <RoundedRect key={index} x={x + (depth - index) * 1.5} y={y + (depth - index) * 1.5} width={w} height={h} r={RADIUS} color={encounter ? t.night : t.raised} />
       ))}
       {slot.faceDown ? (
-        <Back x={x} y={y} w={w} h={h} encounter={encounter} backs={backs} />
+        <Back x={x} y={y} w={w} h={h} encounter={encounter} backs={backs} t={t} />
       ) : image ? (
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: RADIUS, ry: RADIUS }}>
           <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
@@ -200,8 +200,8 @@ export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlo
           </Group>
         </Group>
       )}
-      <RoundedRect x={x} y={y + h - 15} width={w} height={15} r={0} color={strip} />
-      <Outlined x={x + w / 2} y={y + h - 3} text={String(slot.count)} font={fonts.numbers} />
+      <RoundedRect x={x} y={y + h - 15} width={w} height={15} r={0} color={stripOf(t)} />
+      <Outlined x={x + w / 2} y={y + h - 3} text={String(slot.count)} font={fonts.numbers} t={t} />
       {/* Iron Shackles is attached to this deck (01105:A:1): two linked rings at the strip's left end. */}
       {slot.chained ? (
         <Group>
@@ -218,7 +218,7 @@ export function Pile({ slot, image, name, fonts, label, backs }: { slot: CardSlo
  * The token art on a card, each with its count: resources bottom left, damage top right, progress bottom right. `rect` is
  * the card's rectangle on screen, so the tokens of an exhausted card stay upright in its sideways footprint.
  */
-export function Tokens({ slot, rect, images, fonts, ring = null, contrast = false }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; ring?: string | null; contrast?: boolean }) {
+export function Tokens({ slot, rect, images, fonts, t, ring = null, contrast = false }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; t: TableTokens; ring?: string | null; contrast?: boolean }) {
   const items: { image: SkImage | null; value: number; cx: number; cy: number; fallback: string; ring: string | null }[] = [];
   if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, ...tokenSpot(rect, "resources"), fallback: t.gold, ring });
   if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, ...tokenSpot(rect, "damage"), fallback: t.threat, ring: null });
@@ -234,7 +234,7 @@ export function Tokens({ slot, rect, images, fonts, ring = null, contrast = fals
           )}
           {/* A hero's resources pay for its own sphere: the token is ringed in that sphere's colour. */}
           {item.ring ? <Circle cx={item.cx} cy={item.cy} r={TOKEN / 2 + 0.5} color={item.ring} style="stroke" strokeWidth={1.75} /> : null}
-          <Outlined x={item.cx} y={item.cy + 4} text={String(item.value)} font={contrast ? fonts.badge : fonts.numbers} heavy={contrast} />
+          <Outlined x={item.cx} y={item.cy + 4} text={String(item.value)} font={contrast ? fonts.badge : fonts.numbers} t={t} heavy={contrast} />
         </Group>
       ))}
     </Group>
@@ -255,6 +255,7 @@ export function Badges({
   questPoints,
   fonts,
   images,
+  t,
   contrast = false,
 }: {
   slot: CardSlot;
@@ -264,6 +265,7 @@ export function Badges({
   questPoints: number | null;
   fonts: Fonts;
   images: TokenImages;
+  t: TableTokens;
   // Strong outlines (table-settings.ts): each pill gets a bone edge, so it reads on any picture.
   contrast?: boolean;
 }) {
@@ -325,8 +327,8 @@ export function Badges({
       ) : null}
       {questPoints != null ? (
         <Group>
-          <RoundedRect x={x} y={y + h - 15} width={w} height={15} r={0} color={strip} />
-          <Outlined x={x + w / 2} y={y + h - 3} text={`${slot.progress} / ${questPoints}`} font={fonts.numbers} />
+          <RoundedRect x={x} y={y + h - 15} width={w} height={15} r={0} color={stripOf(t)} />
+          <Outlined x={x + w / 2} y={y + h - 3} text={`${slot.progress} / ${questPoints}`} font={fonts.numbers} t={t} />
         </Group>
       ) : null}
     </Group>
@@ -338,7 +340,7 @@ export function Badges({
  * danger edge when `danger`, night with a hairline otherwise. `lift` raises it above the token row, clear of the resource
  * count a character may hold.
  */
-function FootPill({ rect, image, icon, value, danger, lift, fonts }: { rect: Rect; image: SkImage | null; icon: IconName; value: number; danger: boolean; lift: boolean; fonts: Fonts }) {
+function FootPill({ rect, image, icon, value, danger, lift, fonts, t }: { rect: Rect; image: SkImage | null; icon: IconName; value: number; danger: boolean; lift: boolean; fonts: Fonts; t: TableTokens }) {
   const { x, y, w, h } = rect;
   const text = String(value);
   const width = TOKEN + fonts.badge.getTextWidth(text) + 8;
@@ -355,20 +357,20 @@ function FootPill({ rect, image, icon, value, danger, lift, fonts }: { rect: Rec
 }
 
 /** A number the open pick draws on a card it asks about: the damage a defender would take, before the shadow card. */
-export function OptionMarkView({ rect, mark, fonts, images }: { rect: Rect; mark: OptionMark; fonts: Fonts; images: TokenImages }) {
-  return <FootPill rect={rect} image={mark.icon === "damage" ? images.damage : null} icon={mark.icon} value={mark.value} danger={mark.danger} lift fonts={fonts} />;
+export function OptionMarkView({ rect, mark, fonts, images, t }: { rect: Rect; mark: OptionMark; fonts: Fonts; images: TokenImages; t: TableTokens }) {
+  return <FootPill rect={rect} image={mark.icon === "damage" ? images.damage : null} icon={mark.icon} value={mark.value} danger={mark.danger} lift fonts={fonts} t={t} />;
 }
 
 /** An enemy's engagement cost in staging: threat red when the shown seat's threat engages it at the checks (rr.engagement-check). */
-export function EngagementMark({ rect, cost, engages, fonts, images }: { rect: Rect; cost: number; engages: boolean; fonts: Fonts; images: TokenImages }) {
-  return <FootPill rect={rect} image={images.engagementCost} icon="threat" value={cost} danger={engages} lift={false} fonts={fonts} />;
+export function EngagementMark({ rect, cost, engages, fonts, images, t }: { rect: Rect; cost: number; engages: boolean; fonts: Fonts; images: TokenImages; t: TableTokens }) {
+  return <FootPill rect={rect} image={images.engagementCost} icon="threat" value={cost} danger={engages} lift={false} fonts={fonts} t={t} />;
 }
 
 /**
  * A card a delayed effect will act on (Sneak Attack's return): a small clock at the right edge, under the damage token and
  * the not-applied mark, clear of the effect pills down the left edge. The preview says what.
  */
-export function DelayedMark({ rect }: { rect: Rect }) {
+export function DelayedMark({ rect, t }: { rect: Rect; t: TableTokens }) {
   const cx = rect.x + rect.w - 8;
   const cy = rect.y + TOKEN + 3 + 13 + 2 + 7;
   return (
@@ -382,7 +384,7 @@ export function DelayedMark({ rect }: { rect: Rect }) {
 }
 
 /** The enemy whose attack is in progress: a threat-red edge and its attack icon at its side. */
-export function AttackerMark({ rect }: { rect: Rect }) {
+export function AttackerMark({ rect, t }: { rect: Rect; t: TableTokens }) {
   const { x, y, w, h } = rect;
   return (
     <Group>
@@ -398,7 +400,7 @@ export function AttackerMark({ rect }: { rect: Rect }) {
  * The mark between an engaged enemy and the characters fighting it: a defense, an undefended hit, an attack. A fight picked
  * but not confirmed yet is drawn fainter.
  */
-export function CombatMarkView({ mark }: { mark: CombatMark }) {
+export function CombatMarkView({ mark, t }: { mark: CombatMark; t: TableTokens }) {
   const icon: IconName = mark.kind === "defense" ? "defense" : "attack";
   const color = mark.kind === "undefended" ? t.threat : t.gold;
   return (

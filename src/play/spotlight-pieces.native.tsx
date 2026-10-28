@@ -12,7 +12,7 @@ import { SHAPE } from "./motion-tokens.ts";
 import { burstAt, type Frame, type Place } from "./spotlight-beats.ts";
 import type { SpotCard } from "./spotlight-plan.ts";
 import { burstPoint, flown, PILL_H, type Stage } from "./spotlight-stage.ts";
-import { tableTokens as t } from "./tokens.ts";
+import type { TableTokens } from "./tokens.ts";
 
 /** Which of an attack's cards this is: it decides how the frame moves it. */
 export type Role = "attacker" | "target" | "shadow";
@@ -40,19 +40,19 @@ export function FlyingCard({ spot, rect, turn, role, frame, children }: { spot: 
 }
 
 /** A picture of a card on the stage at `rect`: the card as the table draws it, nothing on it (no tokens, no pills). */
-export function StageCard({ spot, rect, image, name, sphere, fonts, backs, faceDown = false }: { spot: SpotCard; rect: Rect; image: SkImage | null; name: string; sphere: IconName | null; fonts: Fonts; backs: BackImages; faceDown?: boolean }) {
+export function StageCard({ spot, rect, image, name, sphere, fonts, backs, t, faceDown = false }: { spot: SpotCard; rect: Rect; image: SkImage | null; name: string; sphere: IconName | null; fonts: Fonts; backs: BackImages; t: TableTokens; faceDown?: boolean }) {
   const slot = { ...rect, id: spot.id, code: spot.code, zone: "play" as const, kind: "card" as const, exhausted: false, faceDown, landscape: false, resources: 0, damage: 0, progress: 0, tilt: 0, count: 0, committed: false };
-  return <CardBody slot={slot} image={image} name={name} sphere={sphere} fonts={fonts} encounterBack={faceDown} backs={backs} />;
+  return <CardBody slot={slot} image={image} name={name} sphere={sphere} fonts={fonts} encounterBack={faceDown} backs={backs} t={t} />;
 }
 
 /** The night veil over a destroyed target, growing to 50% over the first 40% of its fall. */
-export function Veil({ rect, frame }: { rect: Rect; frame: SharedValue<Frame> }) {
+export function Veil({ rect, frame, t }: { rect: Rect; frame: SharedValue<Frame>; t: TableTokens }) {
   const opacity = useDerivedValue(() => frame.get().veil);
   return <RoundedRect x={rect.x} y={rect.y} width={rect.w} height={rect.h} r={RADIUS} color={t.night} opacity={opacity} />;
 }
 
 /** A big pill under a group: the stat's icon and its number in Cinzel Bold. The defense pill bounces when the attack is blocked. */
-export function Pill({ at, icon, color, text, font, frame, bounce = false }: { at: { cx: number; cy: number }; icon: IconName; color: string; text: string; font: SkFont; frame: SharedValue<Frame>; bounce?: boolean }) {
+export function Pill({ at, icon, color, text, font, frame, t, bounce = false }: { at: { cx: number; cy: number }; icon: IconName; color: string; text: string; font: SkFont; frame: SharedValue<Frame>; t: TableTokens; bounce?: boolean }) {
   const width = 12 + 20 + 6 + font.getTextWidth(text) + 12;
   const left = at.cx - width / 2;
   const top = at.cy - PILL_H / 2;
@@ -69,7 +69,7 @@ export function Pill({ at, icon, color, text, font, frame, bounce = false }: { a
 }
 
 /** A small night chip with a hairline, like the pills, with a word on it ("+2" for the attackers past the fan, over card art), centered at `at`. */
-export function Chip({ at, text, font, opacity }: { at: { cx: number; cy: number }; text: string; font: SkFont; opacity: SharedValue<number> }) {
+export function Chip({ at, text, font, opacity, t }: { at: { cx: number; cy: number }; text: string; font: SkFont; opacity: SharedValue<number>; t: TableTokens }) {
   const width = font.getTextWidth(text) + 16;
   const height = font.getSize() + 8;
   return (
@@ -82,7 +82,7 @@ export function Chip({ at, text, font, opacity }: { at: { cx: number; cy: number
 }
 
 /** A small word under a pill ("Blocked"), centered at `at`. */
-export function Word({ at, text, font, color = t.bone, opacity }: { at: { cx: number; cy: number }; text: string; font: SkFont; color?: string; opacity: SharedValue<number> | number }) {
+export function Word({ at, text, font, t, color = t.bone, opacity }: { at: { cx: number; cy: number }; text: string; font: SkFont; t: TableTokens; color?: string; opacity: SharedValue<number> | number }) {
   return <Text x={at.cx - font.getTextWidth(text) / 2} y={at.cy + font.getSize() * 0.35} text={text} font={font} color={color} opacity={opacity} />;
 }
 
@@ -90,7 +90,7 @@ export function Word({ at, text, font, color = t.bone, opacity }: { at: { cx: nu
  * The damage token in the target's corner with its count: the count before the attack until the last token lands, then the new count,
  * popping as the table's tokens do (token-fx.ts). It is drawn in the target's own group, so it shakes and falls with it.
  */
-export function Corner({ stage, before, after, image, font, frame }: { stage: Stage; before: number; after: number; image: SkImage | null; font: SkFont; frame: SharedValue<Frame> }) {
+export function Corner({ stage, before, after, image, font, frame, t }: { stage: Stage; before: number; after: number; image: SkImage | null; font: SkFont; frame: SharedValue<Frame>; t: TableTokens }) {
   const { cx, cy } = stage.corner;
   const size = SHAPE.spotlightToken;
   const pop = useDerivedValue(() => [{ scale: frame.get().pop }]);
@@ -101,17 +101,17 @@ export function Corner({ stage, before, after, image, font, frame }: { stage: St
     <Group transform={pop} origin={vec(cx, cy)} opacity={shown}>
       {image ? <Image image={image} x={cx - size / 2} y={cy - size / 2} width={size} height={size} fit="contain" /> : <Circle cx={cx} cy={cy} r={size / 2} color={t.threat} />}
       <Group opacity={old}>
-        <Outlined x={cx} y={cy + font.getSize() * 0.35} text={String(before)} font={font} />
+        <Outlined x={cx} y={cy + font.getSize() * 0.35} text={String(before)} font={font} t={t} />
       </Group>
       <Group opacity={now}>
-        <Outlined x={cx} y={cy + font.getSize() * 0.35} text={String(after)} font={font} />
+        <Outlined x={cx} y={cy + font.getSize() * 0.35} text={String(after)} font={font} t={t} />
       </Group>
     </Group>
   );
 }
 
 /** One damage token on its way from the point of contact to the target's corner. */
-export function BurstToken({ stage, index, count, now, k, place, image }: { stage: Stage; index: number; count: number; now: SharedValue<number>; k: number; place: Place; image: SkImage | null }) {
+export function BurstToken({ stage, index, count, now, k, place, image, t }: { stage: Stage; index: number; count: number; now: SharedValue<number>; k: number; place: Place; image: SkImage | null; t: TableTokens }) {
   const size = SHAPE.spotlightToken;
   const flight = useDerivedValue(() => burstAt(index, count, now.get(), k, place));
   const transform = useDerivedValue(() => {

@@ -1,3 +1,5 @@
+export type ThemeName = "dark" | "light";
+
 export const palette: {
   readonly night: "#0B0A08";
   readonly dusk: "#12110E";
@@ -26,6 +28,9 @@ export const palette: {
   readonly felt: "#121613";
   readonly feltLight: "#1F2620";
   readonly threat: "#C8432F";
+  readonly onThreat: "#EEE7D7";
+  readonly threatEdge: "#E8917B";
+  readonly glow: "#D9B66C";
   readonly treachery: "#3A221C";
   readonly quest: "#8F877E";
   readonly location: "#7A5840";
@@ -36,3 +41,11 @@ export const palette: {
   readonly spirit: "#54A8C0";
   readonly fellowship: "#C9A961";
 };
+
+/** Every token as a plain string, so the Daylight palette and the Dark one share one type. */
+export type Palette = { readonly [Token in keyof typeof palette]: string };
+export const palettes: { readonly dark: Palette; readonly light: Palette };
+/** One theme's CSS variables, { "--night": "11 10 8", ... }. */
+export function themeVars(name: ThemeName): Record<string, string>;
+/** Tailwind colors for every token: `rgb(var(--token) / <alpha-value>)`. */
+export function themeColors(): Record<keyof Palette, string>;

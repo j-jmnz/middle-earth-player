@@ -7,15 +7,17 @@ import { Text, View } from "react-native";
 import { iconAspect, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
 import { ICON_FILES } from "./icons/files.generated.ts";
-import { tableTokens, type TableToken } from "./tokens.ts";
+import type { TableToken } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 export function GameIcon({ name, size = 16, tint, label }: { name: IconName; size?: number; tint?: TableToken; label?: string }) {
+  const t = useTableTokens();
   const vector = ICONS[name].kind === "vector";
   return (
     <Image
       source={ICON_FILES[name]}
       contentFit="contain"
-      tintColor={vector && tint ? tableTokens[tint] : undefined}
+      tintColor={vector && tint ? t[tint] : undefined}
       accessible={label != null}
       accessibilityLabel={label}
       style={{ width: Math.round(size * iconAspect(name)), height: size }}

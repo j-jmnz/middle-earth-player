@@ -14,8 +14,9 @@ import { useOpenMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { Chevron } from "./phase-rail.tsx";
 import type { TableSettings } from "./table-settings.ts";
-import { raisedEdge, tileSurface } from "./surfaces.ts";
-import { tableTokens as t, withAlphaHex } from "./tokens.ts";
+import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
+import { withAlphaHex } from "./tokens.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
 
 // The strip drops in by this much (translateY -12 to 0 with a fade).
 const DROP = 12;
@@ -26,6 +27,7 @@ const INSET = 8;
 // The round as seven segments under the head's words: deep gold for the phases done, gold for the game's, a hairline for those to
 // come. The one the strip rests on stands taller, so the track says both where the game is and which card is being read.
 function RoundTrack({ phases, index }: { phases: Carousel["phases"]; index: number }) {
+  const t = useTableTokens();
   return (
     <View importantForAccessibility="no-hide-descendants" style={{ flexDirection: "row", alignItems: "center", gap: 3, height: 6, marginTop: 4 }}>
       {phases.map((phase, at) => (
@@ -58,6 +60,7 @@ function CarouselHead({
   onChange: (change: Partial<TableSettings>) => void;
   onGo: (to: number) => void;
 }) {
+  const t = useTableTokens();
   const last = carousel.phases.length - 1;
   const arrow = (step: -1 | 1) => {
     const off = index + step < 0 || index + step > last;
@@ -202,6 +205,7 @@ export function PhaseCarousel({
   onChange: (change: Partial<TableSettings>) => void;
   onClose: () => void;
 }) {
+  const t = useTableTokens();
   const { progress, leaving } = useOpenMotion(open, MOTION.carouselEnter, MOTION.carouselLeave);
   const motion = useAnimatedStyle(() => ({
     opacity: progress.get(),
@@ -229,8 +233,8 @@ export function PhaseCarousel({
             width: inner,
             height: height - INSET / 2,
             borderRadius: 18,
-            ...tileSurface(),
-            boxShadow: `${raisedEdge}, 0 10px 28px ${withAlphaHex(t.night, 0.6)}`,
+            ...tileSurface(false, t),
+            boxShadow: `${raisedEdgeOf(t)}, 0 10px 28px ${withAlphaHex(t.night, 0.6)}`,
             overflow: "hidden",
           },
           motion,
