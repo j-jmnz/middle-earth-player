@@ -11,6 +11,7 @@ import { countMatching, pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats } from "./state.ts";
+import { stageNumber } from "./families/caves-progress.ts";
 import { topFrame } from "./windows.ts";
 
 // Who an amount is read for: the actor (the "you" of the card), the source, and what the running effect knows.
@@ -95,6 +96,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   else if (amount.count) value = countMatching(state, amount.count, scope.actor, scope.sourceId, ctx);
   else if (amount.stat) value = statOf(state, amount.ofNamed ? namedInPlay(state, amount.ofNamed, ctx) : refCard(state, amount.of ?? "self", scope), amount.stat, amount.printed === true, ctx);
   else if (amount.x) value = scope.x ?? 0;
+  else if (amount.stage) value = stageNumber(state);
   else if (amount.players) value = livingSeats(state).length;
   else if (amount.threat) {
     const threat = seatThreat(state, scope.actor);

@@ -173,6 +173,14 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The answered damaged event placed the source's `nth` damage token: it holds at least that many now and held fewer before ("After
   // placing the 6th damage here", 142024:A:3).
   z.strictObject({ kind: z.literal("damageReached"), nth: z.number().int().positive() }),
+  // The current quest card holds at least `min` progress tokens ("While there are at least 8 progress tokens on this stage", 41007:B:1).
+  z.strictObject({ kind: z.literal("stageProgress"), min: z.number().int().positive() }),
+  // The running effect's X is at least the remaining hit points of the picked card (its hit points less its damage): "If the printed cost of the
+  // discarded card is equal to or higher than the remaining hit points of the exhausted character" (41038:A:1). False with no picked card.
+  z.strictObject({ kind: z.literal("xReachesRemaining") }),
+  // The highest threat among the players still in the game is at most `max`: a campaign card's Resolution reads "the final threat of the player with the highest
+  // threat: if it is under 40" (41051:B:1; an eliminated player has no dial).
+  z.strictObject({ kind: z.literal("highestThreat"), max: z.number().int().min(0) }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [

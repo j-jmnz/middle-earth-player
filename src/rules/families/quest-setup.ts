@@ -12,15 +12,16 @@ import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import type { ScenarioState } from "../state.ts";
 
-// A Setup record that reveals cards for each player, or attaches an encounter card to each objective (01123:A:1, GuardObjective): the
-// Setup the piles cannot place.
+// A Setup record that reveals cards for each player, or attaches an encounter card to each objective (01123:A:1, GuardObjective), or has the
+// first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch): the Setup the piles cannot place.
 function revealsPerPlayer(effect: Effect): boolean {
   return (
     effect.timing === "setup" &&
     effect.instructions.some(
       (instruction) =>
         (instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inner.verb === "RevealEncounter")) ||
-        (instruction.verb === "Each" && instruction.instructions.some((inner) => inner.verb === "GuardObjective")),
+        (instruction.verb === "Each" && instruction.instructions.some((inner) => inner.verb === "GuardObjective")) ||
+        instruction.verb === "AttachSetAside",
     )
   );
 }

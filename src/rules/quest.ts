@@ -19,6 +19,7 @@ import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
 import { placeQuestingProgress } from "./families/defense-damage.ts";
 import { freeSlot, placeOnActive } from "./families/south-locations.ts";
+import { noteQuestPlaced, questRoom } from "./families/caves-progress.ts";
 import { branchFrom, reached as reachedStage } from "./families/quest-branch.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -136,10 +137,12 @@ export function placeQuestProgress(
   if (remaining > 0 && next.questStage && !next.stageCleared) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];
-    if (stage) {
+    // A card in play may limit the progress the quest card takes this round, or stop it (families/caves-progress.ts).
+    remaining = Math.min(remaining, questRoom(next));
+    if (stage && remaining > 0) {
       const points = questPointsOf(next, stage, cards);
       if (points == null) {
-        next = updateCard(next, stageId, { progress: stage.progress + remaining });
+        next = noteQuestPlaced(updateCard(next, stageId, { progress: stage.progress + remaining }), remaining);
         steps.push({ kind: "progress", targetId: stageId, amount: remaining, cause: ruleCause("rr.step-3-4") });
       } else {
         // A quest that can advance takes what it needs: the rest does not carry over to the next stage
@@ -147,7 +150,7 @@ export function placeQuestProgress(
         const advancing = canAdvance(next);
         const placed = advancing ? Math.min(remaining, Math.max(0, points - stage.progress)) : remaining;
         if (placed > 0) {
-          next = updateCard(next, stageId, { progress: stage.progress + placed });
+          next = noteQuestPlaced(updateCard(next, stageId, { progress: stage.progress + placed }), placed);
           steps.push({ kind: "progress", targetId: stageId, amount: placed, cause: ruleCause("rr.step-3-4") });
         }
         const updated = next.cards[stageId];
@@ -161,7 +164,7 @@ export function placeQuestProgress(
 }
 
 // The next stage arrives with no progress on it (rr.quest-advancement), side B up. A stage that prints no quest points
-// (141024, 141027) is won some other way, so the quest stops there. One with 0 quest points would be met at once.
+// (141024, 141027) is won some other way, so the quest stops there. One with 0 quest points is checked when it next takes progress.
 export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
   let next = state;
   const guard = next.stages.length + 1;
@@ -186,7 +189,9 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     steps.push({ kind: "advance", cardId: nextId });
     const arrived = next.cards[nextId];
     const points = arrived ? questPointsOf(next, arrived, cards) : null;
-    if (points == null || (arrived?.progress ?? 0) < points || !canAdvance(next)) return next;
+    // A stage that arrives with 0 quest points (Surprise Attack, 41005:B:2, prints 0 and adds 4 for each enemy in play) is not met at once: its When Revealed
+    // effects have not resolved yet, and the check comes with the next progress it takes (advanceReady, placeQuestProgress).
+    if (points == null || points === 0 || (arrived?.progress ?? 0) < points || !canAdvance(next)) return next;
   }
   return { ...next, stageCleared: true };
 }

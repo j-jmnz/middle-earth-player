@@ -217,7 +217,8 @@ describe("the words of the Escape from Dol Guldur choices", () => {
 });
 
 // Every record of The Oath (src/effects/authored/the-oath.ts) and its boons and burdens (pool/TDoM.ts).
-const oath: readonly Effect[] = [...OATH_EFFECTS, ...TDOM_RECORDS];
+// The pool records of The Oath's own boons and burdens (The Caves of Nibin-Dûm's 41042, 41048 and 41049 are read by that scenario's section below).
+const oath: readonly Effect[] = [...OATH_EFFECTS, ...TDOM_RECORDS.filter((effect) => !["41042", "41048", "41049"].includes(effect.cardCode))];
 
 describe("the words of The Oath choices", () => {
   const oathNames: ChoiceNames = { card: (id) => id, code: (code) => oathWorld.cards.get(code)?.name ?? code };

@@ -236,6 +236,17 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       const damage = scope.sourceId ? (state.cards[scope.sourceId]?.damage ?? 0) : 0;
       return damage >= condition.nth && damage - (scope.dealt ?? 0) < condition.nth;
     }
+    case "stageProgress": {
+      const stage = state.questStage ? state.cards[state.questStage] : undefined;
+      return stage != null && stage.progress >= condition.min;
+    }
+    case "xReachesRemaining": {
+      const picked = scope.picked?.at(-1);
+      const card = picked ? state.cards[picked] : undefined;
+      return card != null && (scope.x ?? 0) >= modifiedStat(state, card, "hitPoints", ctx.cards) - card.damage;
+    }
+    case "highestThreat":
+      return Math.max(0, ...livingSeats(state).map((seat) => seatThreat(state, seat))) <= condition.max;
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":

@@ -12,6 +12,7 @@ import type { PrintedCard } from "../rules/printed.ts";
 import { reduce, startScenario, type PlayerIntent, type ReduceContext } from "../rules/reduce.ts";
 import { openResolution, resolutionResult } from "../rules/resolution.ts";
 import type { ScenarioState } from "../rules/state.ts";
+import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { ANDUIN_GOLDENS, anduinWorld, playGolden as playAnduin } from "../../scripts/anduin-game.ts";
 import { DOL_GULDUR_GOLDENS, dolGuldurWorld, playGolden as playDolGuldur } from "../../scripts/dol-guldur-game.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
@@ -45,7 +46,9 @@ beforeAll(async () => {
   const afterAnduin = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, anduin.state.scenarioId, anduin.state, new Map([...brittle.cards, ...dol.cards]));
   const escape = playDolGuldur(DOL_GULDUR_GOLDENS.find((item) => item.name === "two-handed, won")!, dol.ctx);
   escapeLog = applyResolution(afterAnduin, escape.state.scenarioId, escape.state, dol.cards);
-  cards = new Map([...brittle.cards, ...dol.cards, ...world.cards]);
+  // The Caves of Nibin-Dûm, dealt below as the later scenario, hands each seat a "No Time to Waste!" and shuffles Shiny Distraction in.
+  const caves = new Map(await loadPrinted(["41042", "41048", "41049"]));
+  cards = new Map([...brittle.cards, ...dol.cards, ...world.cards, ...caves]);
   ctx = { effects: EFFECTS, cards };
   await oathWorld("strong");
 }, 120_000);

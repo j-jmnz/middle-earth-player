@@ -61,6 +61,8 @@ export function modifiedStat(
 ): number {
   // "Use their Willpower instead of Defense" (06038).
   if (stat === "defense" && defenseFromWillpower(state, instance.id)) return modifiedStat(state, instance, "willpower", cards, against);
+  // "During the encounter phase, treat each enemy's engagement cost as if it were 0" (41005:B:1).
+  if (stat === "engagementCost" && state.phase === "Encounter" && flagged(state, "table", "engagementCostZero")) return 0;
   const printed = printedOf(cards, instance.code);
   let total = printedStat(printed, stat);
   let set: number | null = null;
@@ -196,7 +198,10 @@ export function placeDamage(
   // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
   if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
   // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.
-  if (flagged(state, id, "cannotTakeDamage") || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
+  // "Cannot take damage" is lost by Goblin Chieftain while the stage says so (41007:B:1); combat damage dealt to an attacking enemy is canceled
+  // by Lightless Passage's Shadow (41033:A:2).
+  if ((flagged(state, id, "cannotTakeDamage") && !flagged(state, id, "losesNoDamage")) || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
+  if (source === "combat" && flagged(state, id, "combatDamageCanceled")) return state;
   const dealt = placedAmount(printed, amount);
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });

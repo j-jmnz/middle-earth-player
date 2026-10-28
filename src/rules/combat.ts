@@ -212,6 +212,11 @@ export function canAttack(
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
   // only when a card lets the character attack it (families/attack-targets.ts).
   const open = flagged(state, enemyId, "attackableByAny");
+  // A location in the staging area the first player may attack in the combat phase as if it were engaged with him (Cracked Pillar, 41028:A:1).
+  if (enemy.zone === "staging" && flagged(state, enemyId, "attackableAsEngaged")) {
+    if (flagged(state, attackerId, "cannotAttack") || state.phase !== "Combat" || seat !== state.firstPlayer) return false;
+    return attacker.controller === seat || printed.keywords.ranged || flagged(state, attackerId, "ranged");
+  }
   if (enemy.zone !== "engaged" && !(open && enemy.zone === "staging")) return stagingAttackable(state, seat, attackerId, enemyId, cards);
   // The declaring seat's own characters attack its own enemies. A ranged character may attack an enemy engaged with
   // another player, and may join an attack another player declares (rr.ranged, rr.step-6-8-1).

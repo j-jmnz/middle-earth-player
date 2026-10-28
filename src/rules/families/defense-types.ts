@@ -28,6 +28,8 @@ export type AttackDefense = {
   announced?: true;
   // Readies waiting for the end of the attack.
   readies?: readonly EndReady[];
+  // The damage the attack has dealt to characters, noted while a shadow effect waits to read it after the attack (families/defense-excess.ts).
+  landed?: number;
   // The attacking enemy's Attack when its shadow cards began to resolve, to tell whether one increased it.
   attackBefore?: number;
 };

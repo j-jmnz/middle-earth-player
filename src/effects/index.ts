@@ -5,6 +5,7 @@ import { AUTHORED_EFFECTS as BOX_AUTHORED, AUTHORED_REPLACES as BOX_REPLACES } f
 import { AUTHORED_EFFECTS as FORD_AUTHORED, AUTHORED_REPLACES as FORD_REPLACES } from "./authored/flight-to-the-ford.ts";
 import { AUTHORED_EFFECTS as ANDUIN_AUTHORED, AUTHORED_REPLACES as ANDUIN_REPLACES } from "./authored/journey-along-the-anduin.ts";
 import { AUTHORED_EFFECTS as PASSAGE_AUTHORED, AUTHORED_REPLACES as PASSAGE_REPLACES } from "./authored/passage-through-mirkwood.ts";
+import { AUTHORED_EFFECTS as CAVES_AUTHORED, AUTHORED_REPLACES as CAVES_REPLACES } from "./authored/the-caves-of-nibin-dum.ts";
 import { AUTHORED_EFFECTS as OATH_AUTHORED, AUTHORED_REPLACES as OATH_REPLACES } from "./authored/the-oath.ts";
 import { AUTHORED_EFFECTS as SOUTH_AUTHORED, AUTHORED_REPLACES as SOUTH_REPLACES } from "./authored/the-ring-goes-south.ts";
 import { FAMILY_AUTHORED_EFFECTS, FAMILY_AUTHORED_REPLACES } from "./authored/families/index.ts";
@@ -24,7 +25,7 @@ export function mergeEffects(generated: readonly Effect[], authored: readonly Ef
 // The records of each box (scenario cards and both starter lists: the Fellowship's, the Revised Core Set's and The Dark of Mirkwood's) and the rest of the player pool's, one file per pack or
 // per mechanic family.
 export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...POOL_GENERATED_EFFECTS];
-export const AUTHORED_EFFECTS: readonly Effect[] = [...BOX_AUTHORED, ...FORD_AUTHORED, ...SOUTH_AUTHORED, ...PASSAGE_AUTHORED, ...ANDUIN_AUTHORED, ...DOL_GULDUR_AUTHORED, ...OATH_AUTHORED, ...POOL_AUTHORED_EFFECTS, ...FAMILY_AUTHORED_EFFECTS];
-export const AUTHORED_REPLACES: readonly string[] = [...BOX_REPLACES, ...FORD_REPLACES, ...SOUTH_REPLACES, ...PASSAGE_REPLACES, ...ANDUIN_REPLACES, ...DOL_GULDUR_REPLACES, ...OATH_REPLACES, ...POOL_AUTHORED_REPLACES, ...FAMILY_AUTHORED_REPLACES];
+export const AUTHORED_EFFECTS: readonly Effect[] = [...BOX_AUTHORED, ...FORD_AUTHORED, ...SOUTH_AUTHORED, ...PASSAGE_AUTHORED, ...ANDUIN_AUTHORED, ...DOL_GULDUR_AUTHORED, ...OATH_AUTHORED, ...CAVES_AUTHORED, ...POOL_AUTHORED_EFFECTS, ...FAMILY_AUTHORED_EFFECTS];
+export const AUTHORED_REPLACES: readonly string[] = [...BOX_REPLACES, ...FORD_REPLACES, ...SOUTH_REPLACES, ...PASSAGE_REPLACES, ...ANDUIN_REPLACES, ...DOL_GULDUR_REPLACES, ...OATH_REPLACES, ...CAVES_REPLACES, ...POOL_AUTHORED_REPLACES, ...FAMILY_AUTHORED_REPLACES];
 
 export const EFFECTS: readonly Effect[] = mergeEffects(GENERATED_EFFECTS, AUTHORED_EFFECTS);

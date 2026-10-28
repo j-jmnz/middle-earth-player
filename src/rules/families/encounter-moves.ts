@@ -55,7 +55,7 @@ export function encounterCard(state: ScenarioState, card: MoveInstruction["card"
 }
 
 // A card that leaves play loses what it had in play: its attachments are discarded (rr.attachment-cards) and its tokens go.
-function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[id];
   if (!card || !inPlay(card.zone)) return state;
   return updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false });

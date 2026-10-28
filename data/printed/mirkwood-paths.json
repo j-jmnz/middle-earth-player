@@ -2312,7 +2312,12 @@
         "Quest Action: Remove \"No Time to Waste!\" from the game and from the Campaign Pool to reduce each player's threat by 3. Reveal the top card of the encounter deck.",
         "Quest Action: Draw 1 card."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Lead-in to the two Actions below it: choosing one is playing the card for that Action, and each Action is its own record (41048:A:2 and 41048:A:3)."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -2331,7 +2336,12 @@
         "Action: Remove Ranger Sense from the game and from the Campaign Pool to look at the top 4 cards of your deck. Add 1 to your hand and put the rest back in any order.",
         "Action: Draw 1 card."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Lead-in to the two Actions below it: choosing one is playing the card for that Action, and each Action is its own record (41049:A:2 and 41049:A:3)."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,

@@ -24,6 +24,8 @@ export const amountExprSchema = z.strictObject({
   printed: z.boolean().optional(),
   // The X the event was played for, or the X an earlier instruction fixed (the discarded card's cost).
   x: z.literal(true).optional(),
+  // The stage number of the current quest card: its place in the quest deck, counting from 1 ("X is the stage number of the quest", 41027:A:1).
+  stage: z.literal(true).optional(),
   // The number of players in the game.
   players: z.literal(true).optional(),
   // The actor's threat, and its tens digit (17084:A:1).

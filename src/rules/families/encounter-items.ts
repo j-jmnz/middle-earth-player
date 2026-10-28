@@ -41,7 +41,7 @@ function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] 
 }
 
 // The cards a LookAtTop showed that are still on top of the encounter deck, top first.
-function lookedOnTop(state: ScenarioState): string[] {
+export function lookedOnTop(state: ScenarioState): string[] {
   const looked = effectData(state)?.looked ?? [];
   const found: string[] = [];
   for (const id of state.encounterDeck) {

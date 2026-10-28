@@ -72,6 +72,8 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
         const exhausts = instruction.instructions.some((inner) => inner.verb === "Exhaust");
         return cost?.verb === "Pick" && exhausts && livingSeats(state).some((seat) => pickCandidates(state, cost.pick, seat, [], locationId, ctx).length === 0);
       }
+      // "Remove 4 damage from Cracked Pillar to travel here" (41028:A:2): the location must hold that much damage.
+      if (instruction.verb === "Heal" && instruction.target === "self" && typeof instruction.amount === "number") return (state.cards[locationId]?.damage ?? 0) < instruction.amount;
       if (instruction.verb !== "Exhaust" || instruction.target?.kind !== "byCode") return false;
       const named = instruction.target.code;
       const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;

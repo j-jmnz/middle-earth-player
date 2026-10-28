@@ -60,6 +60,8 @@ export function controlledRingBearer(state: ScenarioState, cards: Cards): string
 export function progressRoom(state: ScenarioState, id: string, cards: Cards): number {
   const location = state.cards[id];
   if (!location) return 0;
+  // "Progress cannot be placed on Cracked Pillar while it is in the staging area" (41006:B:2, 41037:A:1).
+  if (flagged(state, id, "noProgressPlaced")) return 0;
   const points = questPointsOf(state, location, cards);
   let room = points == null ? Number.MAX_SAFE_INTEGER : Math.max(0, points - location.progress);
   const cap = heldAmount(state, id, "progressCap");

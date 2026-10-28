@@ -285,6 +285,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       cancel: null,
       blockCancel: null,
       ...(destroyed > 0 ? { x: destroyed } : {}),
+      ...(attack.defense?.landed ? { dealt: attack.defense.landed } : {}),
       ...(attack.afterCause ? { cause: attack.afterCause } : {}),
     },
     steps,
