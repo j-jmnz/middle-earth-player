@@ -76,6 +76,13 @@ describe("Goblin Chieftain (41027:A:2, 41027:A:3)", () => {
       expect(chieftain?.zone, answer).toBe(zone);
     }
   });
+
+  it("does not offer the progress branch while the quest holds none: the Chieftain returns to the staging area (41027:A:3, rr.effects)", () => {
+    // An effect with no potential to change the game state cannot be selected, so the only option left is the staging area.
+    const hit = fight(world, "f0", "41027", { stage: "41005", progress: 0 }, { answer: () => ({ type: "Choose", optionId: "progress" }) });
+    expect(questProgress(hit.run.state)).toBe(0);
+    expect(hit.run.state.cards[first(hit.run.state, "41027")]?.zone).toBe("staging");
+  });
 });
 
 describe("Goblin Tunnels (41032:A:1, 41032:A:2)", () => {

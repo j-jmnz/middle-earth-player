@@ -245,8 +245,9 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
       const card = picked ? state.cards[picked] : undefined;
       return card != null && (scope.x ?? 0) >= modifiedStat(state, card, "hitPoints", ctx.cards) - card.damage;
     }
+    // Every seat of the game counts, and an eliminated player's threat is raised to 50 (rr.scoring).
     case "highestThreat":
-      return Math.max(0, ...livingSeats(state).map((seat) => seatThreat(state, seat))) <= condition.max;
+      return Math.max(0, ...state.seats.slice(0, state.seatCount).map((seat, index) => (seat.eliminated ? 50 : seatThreat(state, index)))) <= condition.max;
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":

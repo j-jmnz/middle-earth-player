@@ -126,7 +126,7 @@ describe("what a win writes (41051:B:1)", () => {
     expect(bare.campaignPool.map((card) => card.code)).not.toContain("41049");
   });
 
-  it("reads the highest final threat of the players still in the game: 39 earns, 40 does not, an eliminated player's dial is not read", () => {
+  it("reads the highest final threat of the players still in the game: 39 earns, 40 does not, an eliminated player counts as 50 (rr.scoring)", () => {
     const at = (threats: readonly [number, number], eliminated = false) => {
       const made = cavesTable(scene, { seats: 2, threat: threats });
       const state = eliminated ? withSeat(made.state, 1, { ...made.state.seats[1]!, eliminated: true }) : made.state;
@@ -135,7 +135,8 @@ describe("what a win writes (41051:B:1)", () => {
     expect(at([30, 39])).toBe(true);
     expect(at([30, 40])).toBe(false);
     expect(at([40, 30])).toBe(false);
-    expect(at([20, 50], true)).toBe(true);
+    // An eliminated player's threat raises to 50 (rr.scoring).
+    expect(at([20, 50], true)).toBe(false);
   });
 
   it("is taken in by a new save of any campaign once the campaign is finished: a Ranger Sense is shuffled into each player's deck", () => {
