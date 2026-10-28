@@ -195,7 +195,7 @@ export default function Briefing() {
               <View key={option}>
                 <TextButton label={label} testID={`choice-${option}`} onPress={() => setChoices((current) => [...current, option])} />
                 {action ? (
-                  <Label tone="muted" testID={`choice-${option}-action`}>
+                  <Label tone="muted" className="mb-1 text-center" testID={`choice-${option}-action`}>
                     {action}
                   </Label>
                 ) : null}
