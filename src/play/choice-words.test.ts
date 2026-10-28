@@ -4,6 +4,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../catalog/boundary.ts";
+import { AUTHORED_EFFECTS as DOL_GULDUR_EFFECTS } from "../effects/authored/escape-from-dol-guldur.ts";
 import { AUTHORED_EFFECTS as ANDUIN_EFFECTS } from "../effects/authored/journey-along-the-anduin.ts";
 import { AUTHORED_EFFECTS } from "../effects/authored/passage-through-mirkwood.ts";
 import { RECORDS as POOL_RECORDS } from "../effects/authored/pool/RevCore.ts";
@@ -12,15 +13,18 @@ import { attachTo, spawn } from "../rules/zones.ts";
 import { HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
 import { first } from "../../scripts/past-scene.ts";
 import { anduinTable, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
+import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";
 
 let world: MirkwoodWorld;
 let anduinWorld: AnduinWorld;
+let dolGuldurWorld: DolGuldurWorld;
 
 beforeAll(async () => {
   world = await loadMirkwoodWorld();
   anduinWorld = await loadAnduinWorld();
+  dolGuldurWorld = await loadDolGuldurWorld();
 });
 
 const names: ChoiceNames = { card: (id) => id, code: (code) => world.cards.get(code)?.name ?? code };
@@ -144,5 +148,59 @@ describe("the words of the Journey Along the Anduin choices", () => {
     expect(say({ verb: "AttachSetAside", code: "01138" })).toBe("Attach a set-aside Scarred to it");
     expect(say({ verb: "EarnAttached", codes: ["01133", "01138"] })).toBe("Add each Valor and Scarred in play to the Campaign Pool, on its hero");
     expect(say({ verb: "NamePrisoner" })).toBe("Take the hero with the most damage prisoner");
+  });
+});
+
+// Every record of Escape from Dol Guldur (src/effects/authored/escape-from-dol-guldur.ts), Appointed by Fate and Mendor's pool record (pool/RevCore.ts).
+const dolGuldur: readonly Effect[] = [...DOL_GULDUR_EFFECTS, ...POOL_RECORDS.filter((effect) => effect.cardCode === "01134" || effect.cardCode === "01135")];
+
+describe("the words of the Escape from Dol Guldur choices", () => {
+  const dolNames: ChoiceNames = { card: (id) => id, code: (code) => dolGuldurWorld.cards.get(code)?.name ?? code };
+
+  it("every Pick that asks a player says what the card is for", () => {
+    const prompts: string[] = [];
+    for (const effect of dolGuldur) {
+      walk(effect.instructions, (instruction, next) => {
+        if (instruction.verb !== "Pick") return;
+        const words = pickWords(instruction, next, dolNames, effect.cardCode);
+        expect(words.prompt, effect.id).toMatch(/\.$/);
+        expect(words.prompt, effect.id).not.toMatch(/^Choose an? \w+\.$/);
+        expect(words.verb, effect.id).not.toBe("Choose");
+        prompts.push(words.prompt);
+      });
+    }
+    // The Dungeon Jailor's objective, the hero that claims each objective (named by the objective card), the Nazgûl's character, Cavern Guardian's attachment.
+    expect(prompts).toContain("Choose an unclaimed objective to shuffle into the encounter deck.");
+    expect(prompts.filter((prompt) => prompt === "Choose a hero to carry 01108." || prompt === "Choose a hero to carry 01109." || prompt === "Choose a hero to carry 01110.")).toHaveLength(3);
+    expect(prompts).toContain("Choose a character to discard.");
+    expect(prompts).toContain("Choose an attachment to discard.");
+  });
+
+  it("every Choose names each branch in a sentence", () => {
+    const made = dolGuldurTable(dolGuldurWorld);
+    for (const effect of dolGuldur) {
+      walk(effect.instructions, (instruction) => {
+        if (instruction.verb !== "Choose") return;
+        for (const option of instruction.options) expect(branchWords(instruction, option.id, made.state, dolNames, effect.cardCode), `${effect.id} ${option.id}`).toMatch(/^[A-Z].+/);
+      });
+    }
+  });
+
+  it("the new verbs read as sentences when a record offers them in a choice", () => {
+    const made = dolGuldurTable(dolGuldurWorld);
+    type Branch = Extract<Instruction, { verb: "Choose" }>["options"][number]["instructions"][number];
+    const say = (instruction: Branch): string => branchWords({ verb: "Choose", who: "actor", options: [{ id: "x", instructions: [instruction] }] }, "x", made.state, dolNames, null);
+    expect(say({ verb: "GuardObjective" })).toBe("Reveal the next encounter card that is not an objective and attach it to the objective");
+    expect(say({ verb: "ClaimObjective" })).toBe("Claim this objective and attach it to the chosen hero");
+    expect(say({ verb: "TakePrisoner" })).toBe("Turn a hero chosen at random facedown: it is the prisoner");
+    expect(say({ verb: "SelectLoggedPrisoner" })).toBe("The prisoner the Campaign Log names is the prisoner instead");
+    expect(say({ verb: "CaptureWithPrisoner", code: "01135" })).toBe("Capture Mendor facedown with the prisoner");
+    expect(say({ verb: "RescuePrisoner", damage: 1 })).toBe("Rescue the prisoner: it comes back faceup with 1 damage on it");
+    expect(say({ verb: "FreeCaptive", code: "01135", damage: 1 })).toBe("Free Mendor faceup with 1 damage on him");
+    expect(say({ verb: "PlaceOrcGuard" })).toBe("Turn the top card of your deck into an Orc Guard engaged with you");
+    expect(say({ verb: "AttachToDeck", who: "firstPlayer" })).toBe("Attach it to the top of the first player's deck");
+    expect(say({ verb: "TurnFaceUp", code: "01102" })).toBe("Turn Nazgûl of Dol Guldur faceup, still out of play");
+    expect(say({ verb: "RaiseStagingThreat", amount: { players: true }, until: "endOfPhase" })).toBe("Raise the total Threat in the staging area by X until the end of the phase");
+    expect(say({ verb: "LimitPlays", cardType: "ally", max: 1 })).toBe("The players play at most 1 ally card each round");
   });
 });

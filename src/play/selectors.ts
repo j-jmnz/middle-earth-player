@@ -64,7 +64,7 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number): readon
     case "questStage":
       return game.questStage ? [game.questStage] : NONE;
     case "staging":
-      return game.staging;
+      return stagingOrder(game);
     case "activeLocation":
       return game.activeLocation ? [game.activeLocation] : NONE;
     case "secondActiveLocation":
@@ -76,14 +76,37 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number): readon
       // An attachment is in its controller's play list and on its host; the table draws it on the host only. A character in
       // the attack in progress is drawn beside the enemy it fights, in the engagement area.
       const fighting = fightingIds(game, seat);
-      return [...owner.heroes, ...owner.play].filter((id) => {
+      const here = [...owner.heroes, ...owner.play].filter((id) => {
         const card = game.cards[id];
         return card != null && card.host == null && !fighting.has(id);
       });
+      // The hero this seat's player holds as the prisoner is still in play: facedown beside the seat's cards, with Mendor under it.
+      return [...here, ...prisonersOf(game, seat)];
     }
     case "hand":
       return owner?.hand ?? NONE;
   }
+}
+
+// The staging area's cards in the order the table draws them: each guarded objective is followed by the encounter cards attached to it
+// (rr.guarded), so a guard stands beside the objective it guards.
+function stagingOrder(game: ScenarioState): readonly string[] {
+  if (!game.staging.some((id) => game.cards[id]?.guard === true)) return game.staging;
+  const ordered: string[] = [];
+  for (const id of game.staging) {
+    const card = game.cards[id];
+    if (!card || card.guard === true) continue;
+    ordered.push(id);
+    for (const attached of card.attachments) if (game.cards[attached]?.guard === true && game.staging.includes(attached)) ordered.push(attached);
+  }
+  // A guard whose objective left the staging area is a card of its own again.
+  for (const id of game.staging) if (!ordered.includes(id)) ordered.push(id);
+  return ordered;
+}
+
+// The facedown hero (a prisoner, 01123:B:1) that belongs to this seat's player: no list of the seat holds it while it is held.
+function prisonersOf(game: ScenarioState, seat: number): readonly string[] {
+  return Object.values(game.cards).filter((card) => card.zone === "captive" && card.prisoner === true && card.host == null && card.owner === seat).map((card) => card.id);
 }
 
 function sameCards(previous: readonly CardInstance[], next: readonly CardInstance[]): boolean {
@@ -118,8 +141,10 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     if (!card) continue;
     // An engaged enemy's shadow cards travel with it, so turning one up changes this zone's view.
     // The Ring-bearer facedown under the Watcher in the Water is drawn under it, in play and facedown (mec109.stage-4).
-    const captive = card.zone === "staging" ? captiveUnder(game, id) : null;
-    const attached = cardsOf(game, [...card.attachments, ...shadowCards(card), ...(captive ? [captive] : [])]);
+    // Mendor, captured with the prisoner, is drawn under it (01131:A:3). An encounter card guarding an objective is a card of the staging area
+    // beside it, not a card drawn under it.
+    const captive = card.zone === "staging" || card.zone === "captive" ? captiveUnder(game, id) : null;
+    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...(captive ? [captive] : [])]);
     const pair = pairs.get(id);
     entries.push({ card, attached, paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null });
   }
@@ -142,7 +167,8 @@ export function zoneSelector(zone: ZoneId, seat: number): (game: ScenarioState) 
 }
 
 // A pile: how many cards it holds and, for a discard pile, the card on top (the last one put there).
-export type PileView = { pile: PileId; seat: number; ids: readonly string[]; top: CardInstance | null };
+// A deck also carries the encounter cards attached to it (Iron Shackles, 01105:A:1), drawn under it.
+export type PileView = { pile: PileId; seat: number; ids: readonly string[]; top: CardInstance | null; attached?: readonly CardInstance[] };
 
 function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
   switch (pile) {
@@ -165,8 +191,9 @@ export function pileSelector(pile: PileId, seat: number): (game: ScenarioState) 
     const faceUp = pile === "discard" || pile === "encounterDiscard";
     const last = ids[ids.length - 1];
     const top = faceUp && last ? (game.cards[last] ?? null) : null;
-    if (previous && previous.ids === ids && previous.top === top) return previous;
-    previous = { pile, seat, ids, top };
+    const attached = pile === "deck" ? cardsOf(game, game.seats[seat]?.deckAttached ?? NONE) : EMPTY;
+    if (previous && previous.ids === ids && previous.top === top && sameCards(previous.attached ?? EMPTY, attached)) return previous;
+    previous = { pile, seat, ids, top, attached };
     return previous;
   };
 }

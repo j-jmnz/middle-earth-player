@@ -65,7 +65,7 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, 
             key={card.id}
             id={card.id}
             faceDown={card.face === "down"}
-            label={card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Not applied" : ""}${marksText(info, card.id, zone)}`}
+            label={card.prisoner === true ? "Prisoner, face down" : card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Not applied" : ""}${marksText(info, card.id, zone)}`}
             onTap={onTap}
             onPreview={onPreview}
             highlight={highlight}

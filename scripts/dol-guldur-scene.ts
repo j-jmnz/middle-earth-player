@@ -114,7 +114,7 @@ export function dolGuldurTable(world: DolGuldurWorld, layout: DolGuldurLayout = 
     state = spawned.state;
     if (guard !== "") {
       const card = spawn(state, guard, { zone: "staging" });
-      state = attachTo(card.state, card.id, spawned.id);
+      state = updateCard(attachTo(card.state, card.id, spawned.id), card.id, { guard: true });
     }
   }
   for (const code of layout.setAside ?? []) state = spawn(state, code, { zone: "setAside" }).state;

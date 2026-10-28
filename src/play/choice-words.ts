@@ -13,6 +13,7 @@ import { southWords } from "./south-words.ts";
 import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden-words.ts";
 import { miscPickWords, miscWords } from "./misc-words.ts";
 import { playPickWords, playWords } from "./play-words.ts";
+import { dungeonWords } from "./dungeon-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -24,7 +25,7 @@ export type ChoiceNames = {
 type ChooseInstruction = Extract<Instruction, { verb: "Choose" }>;
 type PickInstruction = Extract<Instruction, { verb: "Pick" }>;
 
-const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player" };
+const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };
 const PLURALS: Readonly<Record<string, string>> = { hero: "heroes", ally: "allies", enemy: "enemies" };
 
 function article(noun: string): string {
@@ -278,7 +279,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
@@ -372,6 +373,14 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Ready", prompt: `Choose ${one} to ready.` };
     case "ReturnToHand":
       return { verb: "Return", prompt: `Choose ${one} to return to its owner's hand.` };
+    // The objectives and dungeon families (Escape from Dol Guldur): the objective the Dungeon Jailor shuffles back (01101:A:1), the hero that
+    // claims an objective (01108:A:2), the character the Nazgûl makes a player discard (01102:A:3).
+    case "MoveEncounterCard":
+      return next.to === "shuffle" ? { verb: "Shuffle in", prompt: `Choose ${pick.pick.type === "objective" ? "an unclaimed objective" : one} to shuffle into the encounter deck.` } : { verb: "Choose", prompt: `Choose ${one}.` };
+    case "ClaimObjective":
+      return { verb: "Claim", prompt: `Choose ${one} to carry ${sourceId ? names.card(sourceId) : "the objective"}.` };
+    case "Discard":
+      return { verb: "Discard", prompt: `Choose ${one} to discard.` };
     // A set-aside boon or burden a campaign card attaches (01130:A:3, 01130:A:4): the hero that carries it.
     case "AttachSetAside":
       return { verb: "Attach", prompt: `Choose ${one} to carry ${names.code(next.code)}.` };

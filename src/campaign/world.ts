@@ -7,7 +7,7 @@ import type { Effect } from "../catalog/boundary.ts";
 import type { DeckSaveCard } from "../catalog/deck-save.ts";
 import { cards } from "../catalog/schema.ts";
 import { recordInstructions, scenarioCards, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
-import type { PrintedCard } from "../rules/printed.ts";
+import { ORC_GUARD_CODE, printedOf, type PrintedCard } from "../rules/printed.ts";
 
 import type { CampaignLog } from "./log.ts";
 
@@ -64,6 +64,8 @@ export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effect
   // The campaign card is dealt as an engine card only for the scenario being played, and only when it has an ability that works
   // while the scenario is played (141056:A:2), which the engine places beside the quest deck (families/burden-campaign.ts).
   for (const row of rows) if (row.code === scenario.campaignCard && row.typeCode === "campaign") printed.set(row.code, printedFromRow(row));
+  // The Orc Guard a deck card becomes (01107:A:1) is no card of the catalog: the engine makes it, and the table names it.
+  printed.set(ORC_GUARD_CODE, printedOf(printed, ORC_GUARD_CODE));
   return { campaign, scenario, effects, cards: printed, sets, deckFacts };
 }
 

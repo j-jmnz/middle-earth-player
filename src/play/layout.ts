@@ -307,6 +307,9 @@ export function tableLayout(
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null);
   placeRow(views.play.entries, "play", play, card, slots);
   const pileRects: Record<PileId, Rect> = { deck, discard, encounterDeck, encounterDiscard };
+  // An encounter card attached to the deck (Iron Shackles) peeks out under it, drawn before the deck.
+  const held = piles.deck.attached ?? [];
+  held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y + (held.length - at) * PEEK, w: deck.w, h: deck.h })));
   for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
 
   // The hand fans along the bottom edge, a slight turn from the middle out, overlapping when it is long. Each card keeps at
