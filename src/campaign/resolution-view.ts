@@ -6,7 +6,7 @@
 // 141044:B:1 does), or, once every choice is answered, what confirming will write. The options are the ChooseResolution
 // intents the reducer lists; the screen sends the one the player picks and nothing else. A choice the card lets a seat pass
 // ("each player may choose") lists the reducer's `skip` as `decline`, a visible "No boon", not as one more tile.
-import { carryVerb, carryWords } from "./carry-words.ts";
+import { andList, carryVerb, carryWords } from "./carry-words.ts";
 import { legalIntents, type ScenarioState } from "../rules/reduce.ts";
 import { answeredSeats, resolutionResult, SKIP } from "../rules/resolution.ts";
 
@@ -163,8 +163,8 @@ function cardWords(world: World, card: SettledCard): string {
 }
 
 /** The sentence above the final Confirm: what the log will hold (a boon on its hero), and the scenario that unlocks, or that the campaign is complete
- * (`completes`: the scenario is the last of its campaign, The Caves of Nibin-Dûm for both Mirkwood campaigns). */
-export function settledSentence(view: Extract<ResolutionView, { kind: "settled" }>, world: World, next: string | null, completes = false): string {
+ * (`completes` is the campaign's name when the scenario is the last of its campaign, The Caves of Nibin-Dûm for both Mirkwood campaigns). */
+export function settledSentence(view: Extract<ResolutionView, { kind: "settled" }>, world: World, next: string | null, completes: string | null = null): string {
   // A card on its hero already reads as a boon. When every card goes to the pool, a single card says what it is ("the burden Ungoliant's Swarm").
   const kinded = view.earned.every((card) => card.hero == null);
   const words = view.earned.map((card) => cardWords(world, card));
@@ -174,13 +174,12 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
     const kind = kinded ? world.cards.get(view.earned[words.indexOf(text)]?.code ?? "")?.campaignKind : null;
     return copies > 1 ? `${copies} copies of ${text}` : kind ? `the ${kind} ${text}` : text;
   });
-  // "A and B", "A, B and C": an "and" only before the last.
-  const list = earned.length > 1 ? `${earned.slice(0, -1).join(", ")} and ${earned.at(-1)}` : (earned[0] ?? "");
+  const list = andList(earned);
   const records = earned.length > 0 ? `Confirming records ${list} in the campaign` : "Confirming records the win";
-  const unlocked = next ? `${records} and unlocks ${next}.` : completes ? `${records} and completes the campaign.` : `${records}.`;
+  const unlocked = next ? `${records} and unlocks ${next}.` : completes ? `${records} and completes ${completes}.` : `${records}.`;
   // A once-per-campaign Action used in this game or an earlier scenario is written to the log (41044:A:3).
   const names = (view.used ?? []).map((code) => nameOf(world, code));
-  const sentence = names.length > 0 ? `${unlocked} ${names.join(", ")} ${names.length === 1 ? "is" : "are"} recorded as used this campaign.` : unlocked;
+  const sentence = names.length > 0 ? `${unlocked} ${andList(names)} ${names.length === 1 ? "is" : "are"} recorded as used this campaign.` : unlocked;
   // The hero a Resolution takes prisoner is written to the log too (01130:B:1): a sentence of its own, with the reason.
   const prisoner = view.prisoner ? `${sentence} ${nameOf(world, view.prisoner)}, the hero with the most damage, is taken prisoner.` : sentence;
   // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.

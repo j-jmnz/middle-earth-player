@@ -239,6 +239,11 @@ describe("The Oath, the campaign card (41050:A:3, 41050:B:1)", () => {
     if (view.kind !== "settled") throw new Error(`expected a settled Resolution, got ${view.kind}`);
     expect(view.used).toEqual(["41044"]);
     expect(settledSentence(view, world, "The Caves of Nibin-Dûm")).toBe("Confirming records the burden Guilty Conscience in the campaign and unlocks The Caves of Nibin-Dûm. The Fervor of Lore is recorded as used this campaign.");
+    // Two used Adaptations are joined with an "and" before the last.
+    const both = resolutionView({ ...state, campaignFacts: { prisoner: null, usedOnce: ["41044", "41045"], counters: {} } }, world);
+    if (both.kind !== "settled") throw new Error(`expected a settled Resolution, got ${both.kind}`);
+    const [first, second] = ["41044", "41045"].map((code) => scene.cards.get(code)?.name);
+    expect(settledSentence(both, world, "The Caves of Nibin-Dûm")).toContain(` ${first} and ${second} are recorded as used this campaign.`);
     const unused = resolutionView(state, world);
     expect(unused.kind === "settled" ? settledSentence(unused, world, "The Caves of Nibin-Dûm") : "").toBe("Confirming records the burden Guilty Conscience in the campaign and unlocks The Caves of Nibin-Dûm.");
   });

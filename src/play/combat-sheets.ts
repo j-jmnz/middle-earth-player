@@ -176,13 +176,14 @@ export function playerAttackSheet(game: ScenarioState, ctx: ReduceContext, legal
   for (const id of [...(game.seats[seat]?.heroes ?? []), ...(game.seats[seat]?.play ?? [])]) {
     for (const enemyId of legalTargets(game, { type: "DeclareAttackers", cardId: id }, ctx)) enemies.add(enemyId);
   }
+  // A location in the staging area a card lets the first player attack as if engaged (Cracked Pillar, 41028:A:1) is among the options.
+  const location = [...enemies].some((id) => ctx.cards.get(game.cards[id]?.code ?? "")?.type === "location");
   return {
     kind: "pick",
     key: `playerAttack:${game.round}:${[...enemies].join(",")}`,
     step: "Combat",
-    title: "Attack an enemy",
-    // A location in the staging area a card lets the first player attack as if engaged (Cracked Pillar, 41028:A:1) is among the options.
-    note: [...enemies].some((id) => ctx.cards.get(game.cards[id]?.code ?? "")?.type === "location") ? "Choose the enemy or location, then the characters that attack it." : "Choose the enemy, then the characters that attack it.",
+    title: location ? "Attack an enemy or location" : "Attack an enemy",
+    note: location ? "Choose the enemy or location, then the characters that attack it." : "Choose the enemy, then the characters that attack it.",
     verb: "Attack",
     options: [...enemies].map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "defense"), next: attackersSheet(game, ctx, names, id) })),
     primary: null,

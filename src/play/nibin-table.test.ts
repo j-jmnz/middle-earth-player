@@ -54,6 +54,7 @@ describe("the players' attack sheet (41028:A:1)", () => {
     const pillar = first(run.state, "41028");
     expect(sheet.options.map((option) => option.id)).toContain(pillar);
     expect(sheet.note).toBe("Choose the enemy or location, then the characters that attack it.");
+    expect(sheet.title).toBe("Attack an enemy or location");
     expect(sheet.options.find((option) => option.id === pillar)?.stats).toEqual([{ icon: "defense", value: 2, word: expect.any(String) }]);
     // With only enemies to attack the sentence is the usual one.
     const plain = cavesTable(world, { engaged: [{ code: "grunt", seat: 0 }], phase: "Combat" });

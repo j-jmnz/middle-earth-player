@@ -116,7 +116,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const nextId = at >= 0 ? campaign?.scenarios[at + 1] : undefined;
   const nextName = !done && nextId ? scenarioName(nextId) : null;
   // The last scenario of the campaign: the win completes it.
-  const completes = !done && at >= 0 && nextId == null;
+  const completes = !done && at >= 0 && nextId == null ? (campaign?.name ?? null) : null;
   const picked = view.kind === "choosing" ? (view.tiles.find((tile) => tile.optionId === chosen) ?? null) : null;
   const declined = view.kind === "choosing" && view.decline != null && chosen === view.decline.optionId;
   const answer = picked?.optionId ?? (declined && view.kind === "choosing" ? (view.decline?.optionId ?? null) : null);

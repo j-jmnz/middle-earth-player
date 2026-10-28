@@ -24,14 +24,14 @@ describe("the Resolution sentence (41051:B:1)", () => {
     expect(view.kind).toBe("settled");
     if (view.kind !== "settled") return;
     expect(view.carried).toEqual([{ code: "41049", eachPlayer: true }]);
-    expect(settledSentence(view, named, null, true)).toBe("Confirming records 2 copies of Ranger Sense in the campaign and completes the campaign. A Ranger Sense for each player is kept for your next campaign.");
+    expect(settledSentence(view, named, null, "The Dark of Mirkwood")).toBe("Confirming records 2 copies of Ranger Sense in the campaign and completes The Dark of Mirkwood. A Ranger Sense for each player is kept for your next campaign.");
     // Threat 40 or more: nothing is earned or kept.
     const tense = await cavesWorld("tense");
     const high = playGolden(CAVES_GOLDENS.find((item) => item.name === "two-handed, threat 40 or higher at the end, won")!, tense.ctx);
     const bare = resolutionView(high.state, { ...named, cards: new Map([...named.cards, ...tense.cards]) });
     if (bare.kind !== "settled") throw new Error("not settled");
     expect(bare.carried).toBeUndefined();
-    expect(settledSentence(bare, named, null, true)).toBe("Confirming records the win and completes the campaign.");
+    expect(settledSentence(bare, named, null, "Mirkwood Paths")).toBe("Confirming records the win and completes Mirkwood Paths.");
     expect(settledSentence(bare, named, null)).toBe("Confirming records the win.");
   });
 });

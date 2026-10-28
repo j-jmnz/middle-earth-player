@@ -13,6 +13,11 @@ export function carryWords(cards: readonly Carried[], nameOf: (code: string) => 
     else rows.set(key, { code: card.code, count: 1, perPlayer: card.perPlayer === true });
   }
   const parts = [...rows.values()].map((row) => (row.perPlayer ? `a ${nameOf(row.code)} for each player` : row.count > 1 ? `${row.count} copies of ${nameOf(row.code)}` : nameOf(row.code)));
+  return andList(parts);
+}
+
+/** "A", "A and B", "A, B and C": an "and" only before the last. */
+export function andList(parts: readonly string[]): string {
   return parts.length > 1 ? `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}` : (parts[0] ?? "");
 }
 

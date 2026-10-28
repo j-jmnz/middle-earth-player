@@ -336,6 +336,14 @@ describe("the words of The Caves of Nibin-Dûm choices", () => {
     expect(prompts).toContain("Choose a card to put into your hand.");
   });
 
+  it("says a hero is chosen to attach Watchful Eyes to, not to carry it (41040:A:1)", () => {
+    const record = CAVES_EFFECTS.find((effect) => effect.id === "41040:whenRevealed:1")?.instructions[0];
+    if (!record) throw new Error("no Watchful Eyes record");
+    const named: ChoiceNames = { card: (id) => (id === "eyes" ? "Watchful Eyes" : id), code: cavesNames().code };
+    expect(pickWords(record, undefined, named, "eyes").prompt).toBe("Choose a hero to attach Watchful Eyes to.");
+    expect(pickWords(record, undefined, named, "other").prompt).toBe("Choose a hero to carry other.");
+  });
+
   it("every Choose names each branch in a sentence", () => {
     const made = cavesTable(cavesWorld);
     const seen: Record<string, string> = {};

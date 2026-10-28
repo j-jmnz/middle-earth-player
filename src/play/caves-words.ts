@@ -83,3 +83,8 @@ export function cavesXChoice(choose: Extract<Instruction, { verb: "Choose" }>, q
     },
   };
 }
+
+/** Watchful Eyes (41040:A:1) is a treachery that attaches itself to a hero as it is revealed: the hero it is attached to, not one that "carries" a boon or a burden. Null for any other card. */
+export function cavesAttachWords(asked: Instruction, sourceName: string | null): { verb: string; prompt: string } | null {
+  return asked.verb === "AttachSelf" && asked.to.kind === "hero" && sourceName === "Watchful Eyes" ? { verb: "Attach", prompt: `Choose a hero to attach ${sourceName} to.` } : null;
+}

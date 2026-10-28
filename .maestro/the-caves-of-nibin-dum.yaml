@@ -40,7 +40,7 @@ tags:
     timeout: 30000
 - assertVisible:
     id: resolution-consequence
-    text: "Confirming records .*Ranger Sense.* and completes the campaign\\. A Ranger Sense for each player is kept for your next campaign\\."
+    text: "Confirming records .*Ranger Sense.* and completes The Dark of Mirkwood\\. A Ranger Sense for each player is kept for your next campaign\\."
 - tapOn:
     id: resolution-confirm
 - extendedWaitUntil:
