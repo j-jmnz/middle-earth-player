@@ -63,8 +63,9 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       // "Each player must exhaust 1 hero he controls to travel here" (01077:A:1): every player needs a card to choose.
       // "Each player must discard 1 random card from his hand to travel here" (41011:A:2): every player needs the cards.
       const discards = instruction.verb === "ForEachPlayer" ? instruction.instructions.find((inner) => inner.verb === "DiscardRandomFromHand") : undefined;
-      if (instruction.verb === "ForEachPlayer" && discards?.verb === "DiscardRandomFromHand" && typeof (discards.amount ?? 1) === "number") {
-        return livingSeats(state).some((seat) => (state.seats[seat]?.hand.length ?? 0) < ((discards.amount as number | undefined) ?? 1));
+      if (discards?.verb === "DiscardRandomFromHand") {
+        const amount = discards.amount ?? 1;
+        return typeof amount === "number" && livingSeats(state).some((seat) => (state.seats[seat]?.hand.length ?? 0) < amount);
       }
       if (instruction.verb === "ForEachPlayer") {
         const cost = instruction.instructions.find((inner) => inner.verb === "Pick");
