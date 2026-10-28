@@ -75,7 +75,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attachAsMount(state, focus, ctx, steps);
     case "LoseGame": {
       if (state.lost) return state;
-      const name = focus.sourceId && state.cards[focus.sourceId] ? printedOf(ctx.cards, state.cards[focus.sourceId]?.code ?? "").name : "A card";
+      // The card that left play is the event's subject when another card's record says so (the campaign card's "If Mendor leaves play",
+      // 01129:A:3); a card that says it of itself names itself.
+      const leaver = refCard(state, "subject", frameScope(state, focus.seat, focus.sourceId)) ?? focus.sourceId;
+      const name = leaver && state.cards[leaver] ? printedOf(ctx.cards, state.cards[leaver]?.code ?? "").name : "A card";
       return { ...state, lost: true, lossReason: `${name} left play`, window: null };
     }
     case "DiscardCanceled": {

@@ -1,4 +1,4 @@
-// Rules: rr.travel, rr.active-location, rr.explored, rr.search, rr.draw, rr.refresh-phase, rr.step-7-3, rr.first-player (data/rules/entries.json).
+// Rules: rr.travel, rr.active-location, rr.explored, rr.search, rr.drawing-cards, rr.refresh-phase, rr.step-7-3, rr.first-player (data/rules/entries.json).
 // The Passage Through Mirkwood locations and Caught in a Web (01080).
 import { beforeAll, describe, expect, it } from "vitest";
 

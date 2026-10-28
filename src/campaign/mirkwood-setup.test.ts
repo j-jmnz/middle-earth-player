@@ -182,8 +182,9 @@ describe("a pool card that says it is put into play at the start of each scenari
   });
 
   it("does not put Mendor in twice when the campaign card's own Setup also puts him into play", () => {
+    // The campaign card's own Setup record is this test's synthetic one (01129's real one is left out so it is not run twice).
     const effects = [
-      ...EFFECTS,
+      ...EFFECTS.filter((effect) => effect.cardCode !== CAMPAIGN_CARD),
       record("campaignSetup", MENDOR, [{ verb: "PutObjectiveAllyIntoPlay", code: MENDOR }]),
       record("campaignSetup", CAMPAIGN_CARD, [{ verb: "PutObjectiveAllyIntoPlay", code: MENDOR }]),
     ];

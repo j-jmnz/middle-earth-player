@@ -1,4 +1,4 @@
-// Rules: rr.step-6-4-2, rr.shadow-effects, rr.undefended, rr.exhaust, rr.discard, rr.engaged (data/rules/entries.json).
+// Rules: rr.step-6-4-2, rr.shadow-effects, ltp.undefended-attack, rr.exhausted, rr.discard-pile-and-victory-display, rr.engaged (data/rules/entries.json).
 // The Shadow lines of the Passage Through Mirkwood encounter cards, played through a real attack (scripts/mirkwood-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 

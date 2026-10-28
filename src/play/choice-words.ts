@@ -199,7 +199,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     case "Pick": {
       // A card out of play is named by its printed type when the pick asks for one ("choose an ally" from the deck).
       const noun = instruction.pick.type === "card" && instruction.pick.cardType && instruction.pick.cardType !== "player-side-quest" ? instruction.pick.cardType : (PICK_NOUNS[instruction.pick.type] ?? "card");
-      return `choose ${article(noun)}`;
+      return instruction.pick.mostDamaged ? `choose the ${noun} with the most damage on it` : `choose ${article(noun)}`;
     }
     case "RemoveFromQuest":
       return "remove it from the quest";
@@ -214,6 +214,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     // The quest family's verbs (src/catalog/families/quest.ts).
     case "DamageEach":
       return instruction.engagedWith === "picked" ? `deal ${amountWords(instruction.amount)} damage to each enemy engaged with that player` : `deal ${amountWords(instruction.amount)} damage to each matching ${PICK_NOUNS[instruction.pick?.type ?? "enemy"] ?? "card"}`;
+    case "ExhaustEach":
+      return `exhaust each ${instruction.pick.damaged ? "damaged " : ""}${PICK_NOUNS[instruction.pick.type] ?? "card"} you control`;
     case "WaiveQuestThreat":
       return `${instruction.who === "eachSeat" ? "players do" : "that player does"} not raise threat from questing unsuccessfully ${instruction.until === "endOfRound" ? "this round" : "this phase"}`;
     case "SkipQuestPhase":

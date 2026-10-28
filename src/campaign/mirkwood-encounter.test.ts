@@ -1,4 +1,4 @@
-// Rules: rr.step-3-3, rr.travel, rr.search, rr.first-player, rr.exhaust, rr.step-6-4-2, rr.shadow-effects, rr.step-7-3 (data/rules/entries.json).
+// Rules: rr.step-3-3, rr.travel, rr.search, rr.first-player, rr.exhausted, rr.step-6-4-2, rr.shadow-effects, rr.step-7-3 (data/rules/entries.json).
 // The Passage Through Mirkwood encounter cards: each line of the ledger (data/printed/mirkwood-paths.json) has a record, and these tests
 // run them on a table of plain-number heroes (scripts/mirkwood-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";

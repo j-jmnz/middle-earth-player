@@ -147,7 +147,7 @@ describe("standalone briefing", () => {
   });
 
   it("refuses a scenario whose dealt cards are not all automated", () => {
-    expect(PLAYABLE_SCENARIOS).toEqual([PAST, KNIFE, FORD, SOUTH]);
+    expect(PLAYABLE_SCENARIOS).toEqual([PAST, KNIFE, FORD, SOUTH, "passage-through-mirkwood"]);
     const world = loadWorld(catalog, campaign, loadScenario("journey-in-the-dark"), EFFECTS, [FRODO, SAM, MERRY, PIPPIN, ...deck]);
     const result = standaloneBriefing({ world, seatCount: 1, seats: loadoutOf().seats, ringBearer: FRODO, difficulty: "Normal" });
     expect(result.dealable).toBe(false);
