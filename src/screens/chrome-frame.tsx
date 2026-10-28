@@ -62,6 +62,7 @@ export function ScreenScroll({
   testID,
   scrollRef,
   max,
+  align = "center",
 }: {
   children: ReactNode;
   top?: number;
@@ -69,6 +70,8 @@ export function ScreenScroll({
   testID?: string;
   scrollRef?: RefObject<ComponentRef<typeof ScrollView> | null>;
   max?: "readable" | "wide";
+  // Where a capped column sits: centred (the default), or at the start of a pane the trail should stay at the edge of.
+  align?: "center" | "start";
 }) {
   const { size, s } = useSizeClass();
   const cap = max ? capWidth(size, max, s) : null;
@@ -78,7 +81,7 @@ export function ScreenScroll({
       testID={testID}
       className="min-h-0 flex-1"
       style={{ marginHorizontal: -8 * s }}
-      contentContainerStyle={{ paddingHorizontal: 8 * s, paddingTop: top * s, paddingBottom: bottom * s, ...(cap == null ? {} : { width: "100%", maxWidth: cap + 16 * s, alignSelf: "center" }) }}
+      contentContainerStyle={{ paddingHorizontal: 8 * s, paddingTop: top * s, paddingBottom: bottom * s, ...(cap == null ? {} : { width: "100%", maxWidth: cap + 16 * s, alignSelf: align === "start" ? "flex-start" : "center" }) }}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
@@ -144,7 +147,11 @@ export function NavBar({
   );
 }
 
-/** Flat row on a hairline. Text, at most one small picture, a pressed fill. No shadow, no gradient. */
+/**
+ * Flat row on a hairline. Text, at most one small picture, a pressed fill. No shadow, no gradient. In a list-detail pane `selected`
+ * (true or false; undefined outside one) marks the row whose detail is open: the pressed fill and a 2 pt gold bar at the leading
+ * edge. A row in such a list is indented either way, so the text does not move when it is picked.
+ */
 export function ListRow({
   label,
   detail,
@@ -154,6 +161,7 @@ export function ListRow({
   leading,
   trailing,
   detailIcons,
+  selected,
 }: {
   label: string;
   detail?: string;
@@ -165,23 +173,27 @@ export function ListRow({
   testID: string;
   leading?: ReactNode;
   trailing?: ReactNode;
+  selected?: boolean;
 }) {
   const palette = usePalette();
   const pressedNight = usePressedNight();
+  const s = useUiScale();
   return (
     <Pressable
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
+      accessibilityState={selected == null ? undefined : { selected }}
       onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={350}
       className="min-h-14 flex-row items-center border-b border-hairline py-2"
-      style={({ pressed }) => (pressed ? pressedNight : undefined)}
+      style={({ pressed }) => [selected == null ? null : { paddingLeft: 12 * s }, pressed || selected ? pressedNight : null]}
     >
+      {selected ? <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2 * s, backgroundColor: palette.gold }} /> : null}
       {leading ? <View className="mr-3">{leading}</View> : null}
       <View className="flex-1">
-        <Text className="text-body text-bone">{label}</Text>
+        <Text className={`text-body ${selected ? "text-goldHigh" : "text-bone"}`}>{label}</Text>
         {detail ? (
           <View className="mt-0.5 flex-row items-center gap-1.5">
             {detailIcons}
