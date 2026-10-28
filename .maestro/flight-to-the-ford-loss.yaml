@@ -66,8 +66,6 @@ tags:
     id: node-the-ring-goes-south-status
     text: "Locked"
 - tapOn:
-    id: table-menu
-- tapOn:
     id: log-open
 - extendedWaitUntil:
     visible:

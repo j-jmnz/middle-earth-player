@@ -59,8 +59,6 @@ tags:
     id: node-the-ring-goes-south-status
     text: "Current"
 - tapOn:
-    id: table-menu
-- tapOn:
     id: log-open
 - extendedWaitUntil:
     visible:

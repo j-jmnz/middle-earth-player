@@ -76,8 +76,6 @@ appId: com.middleearth.lcg
     id: node-a-knife-in-the-dark-status
     text: "Current"
 - tapOn:
-    id: table-menu
-- tapOn:
     id: log-open
 - extendedWaitUntil:
     visible:

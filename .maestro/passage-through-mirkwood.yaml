@@ -61,8 +61,6 @@ tags:
     id: node-journey-along-the-anduin-status
     text: "Current"
 - tapOn:
-    id: table-menu
-- tapOn:
     id: log-open
 - extendedWaitUntil:
     visible:
