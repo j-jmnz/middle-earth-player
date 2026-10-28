@@ -1,13 +1,15 @@
 import { eq } from "drizzle-orm";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useMemo, type ReactNode } from "react";
-import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
 import { cards } from "../../../catalog/schema";
-import { BodyText, Chip, Eyebrow, NavBar, Panel, Screen, ScreenScroll, ScreenTitle, sphereWord } from "../../chrome";
+import { BodyText, Chip, Eyebrow, NavBar, Panel, Screen, ScreenScroll, ScreenTitle, TwoPane, sphereWord } from "../../chrome";
+import { pictureMaxWidth, type PicturePane } from "../../card-picture";
 import { nightFade, tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { CardTextView } from "../../../play/card-text-view";
@@ -26,6 +28,7 @@ import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
 import { goBack } from "../../go-back";
 import { useUiScale } from "../../../play/ui-scale";
+import { useSizeClass } from "../../../play/use-size-class";
 
 type FactsRow = {
   typeCode: string;
@@ -203,7 +206,10 @@ export default function CardScreen() {
   const params = useLocalSearchParams<{ code: string }>();
   const code = routeCode(params.code);
   const { catalog } = useDatabases();
-  const { width: windowWidth } = useWindowDimensions();
+  const { size, width: windowWidth } = useSizeClass();
+  const insets = useSafeAreaInsets();
+  // Expanded: the picture has a pane of its own, measured, and is sized by its height.
+  const [pane, setPane] = useState<PicturePane | null>(null);
   const row = useMemo(() => {
     if (!code) return undefined;
     return catalog
@@ -241,13 +247,11 @@ export default function CardScreen() {
   });
   const remotePreview = !source && row?.imagesrc ? cardImageUrl(row.imagesrc) : null;
   const previewSource = source ?? (remotePreview ? { uri: remotePreview } : null);
-  const maxWidth = Math.max(0, Math.min(windowWidth - 96 * s, 300 * s));
-  const pixels =
-    resolved.kind === "file" || resolved.kind === "asset"
-      ? imageLayoutSize(resolved.width, resolved.height, maxWidth)
-      : remotePreview
-        ? imageLayoutSize(423, 600, maxWidth)
-        : null;
+  const intrinsic =
+    resolved.kind === "file" || resolved.kind === "asset" ? { width: resolved.width, height: resolved.height } : remotePreview ? { width: 423, height: 600 } : null;
+  // A quest card is printed sideways.
+  const maxWidth = pictureMaxWidth(size, windowWidth, s, pane, intrinsic != null && intrinsic.height < intrinsic.width);
+  const pixels = intrinsic && maxWidth != null ? imageLayoutSize(intrinsic.width, intrinsic.height, maxWidth) : null;
 
   useEffect(() => {
     if (!code || !row?.imagesrc) return;
@@ -255,6 +259,42 @@ export default function CardScreen() {
   }, [code, row?.imagesrc]);
 
   if (!code) throw new Error("Missing route code");
+
+  const picture =
+    previewSource && pixels ? (
+      <View className="self-center rounded-card" style={[{ width: pixels.width, height: pixels.height }, halo]}>
+        <View className="overflow-hidden rounded-card" style={{ width: pixels.width, height: pixels.height }}>
+          <Zoomable width={pixels.width} height={pixels.height}>
+            <InspectCardImage code={code} source={previewSource} width={pixels.width} height={pixels.height} />
+          </Zoomable>
+        </View>
+      </View>
+    ) : null;
+  const details = (
+    <>
+      <View className="items-center">
+        {row ? (
+          <ScreenTitle size="title">{row.name ?? row.code}</ScreenTitle>
+        ) : (
+          <>
+            <ScreenTitle>Card</ScreenTitle>
+            <BodyText className="mt-6 text-center">{`Card ${code} is not in the catalog.`}</BodyText>
+          </>
+        )}
+      </View>
+      {row ? <CardFacts row={row} unapplied={notApplied(row.code, row.typeCode, row.errata ?? row.text)} /> : null}
+      {row?.errata ? (
+        <View className="mt-6">
+          <Panel current>
+            <Eyebrow>Errata</Eyebrow>
+            <View className="mt-2">
+              <CardTextView text={row.errata} />
+            </View>
+          </Panel>
+        </View>
+      ) : null}
+    </>
+  );
 
   return (
     <Screen scene="plain">
@@ -270,39 +310,41 @@ export default function CardScreen() {
         onBack={() => goBack(router, "/cards")}
         right={row?.name ? <Chip label={row.code} tone="faint" /> : undefined}
       />
-      <ScreenScroll top={16}>
-        {previewSource && pixels ? (
-          <View className="self-center rounded-card" style={[{ width: pixels.width, height: pixels.height }, halo]}>
-            <View className="overflow-hidden rounded-card" style={{ width: pixels.width, height: pixels.height }}>
-              <Zoomable width={pixels.width} height={pixels.height}>
-                <InspectCardImage code={code} source={previewSource} width={pixels.width} height={pixels.height} />
-              </Zoomable>
+      {size === "expanded" && row && previewSource ? (
+        <TwoPane
+          kind="supporting"
+          side="end"
+          range={{ min: 360, max: 560 }}
+          testID="card-panes"
+          start={
+            <View
+              testID="card-picture-pane"
+              className="min-h-0 flex-1 items-center justify-center"
+              style={{ paddingBottom: insets.bottom }}
+              onLayout={(event: LayoutChangeEvent) => {
+                const { width, height: outer } = event.nativeEvent.layout;
+                const height = outer - insets.bottom;
+                setPane((current) => (current && current.width === width && current.height === height ? current : { width, height }));
+              }}
+            >
+              {picture}
             </View>
-          </View>
-        ) : null}
-        <View className="mt-6 items-center">
-          {row ? (
-            <ScreenTitle size="title">{row.name ?? row.code}</ScreenTitle>
-          ) : (
-            <>
-              <ScreenTitle>Card</ScreenTitle>
-              <BodyText className="mt-6 text-center">{`Card ${code} is not in the catalog.`}</BodyText>
-            </>
-          )}
-        </View>
-        {row ? <CardFacts row={row} unapplied={notApplied(row.code, row.typeCode, row.errata ?? row.text)} /> : null}
-        {row?.errata ? (
-          <View className="mt-6">
-            <Panel current>
-              <Eyebrow>Errata</Eyebrow>
-              <View className="mt-2">
-                <CardTextView text={row.errata} />
-              </View>
-            </Panel>
-          </View>
-        ) : null}
-        <View className="pb-safe" />
-      </ScreenScroll>
+          }
+          end={
+            <ScreenScroll top={0}>
+              {details}
+              <View className="pb-safe" />
+            </ScreenScroll>
+          }
+        />
+      ) : (
+        <ScreenScroll top={16} max="readable">
+          {picture}
+          <View className="mt-6" />
+          {details}
+          <View className="pb-safe" />
+        </ScreenScroll>
+      )}
     </Screen>
   );
 }
