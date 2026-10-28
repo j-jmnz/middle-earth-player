@@ -14,16 +14,16 @@ import { effectCause, ruleCause } from "../cause.ts";
 import { isCharacterType, printedOf } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
 import { flagged, inPlay } from "../state.ts";
+import { readsAmount } from "../amounts.ts";
 import { removeQuestProgress } from "./caves-progress.ts";
 import { damageGoesTo } from "./defense-damage.ts";
 
 // The damage this attack has dealt so far, kept on the attack only while a shadow effect waits to read it after the attack ("Raise your threat by 1
-// for each point of damage dealt by this attack", 41035:A:2): the damage placed on `targetId` by the steps logged since `from`.
-function noteLanded(state: ScenarioState, targetId: string, steps: readonly EngineStep[], from: number): ScenarioState {
+// for each point of damage dealt by this attack", 41035:A:2): `landed` is the damage placed on the defender, read from the steps once by `combatDamage`.
+function noteLanded(state: ScenarioState, landed: number): ScenarioState {
   const attack = state.pendingAttack;
   // Only an attack whose after-instructions read the damage it dealt keeps the number: every other attack's state is as it was.
-  if (!attack?.after?.some((instruction) => JSON.stringify(instruction).includes('"dealt":true'))) return state;
-  const landed = steps.slice(from).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId && step.amount > 0 ? sum + step.amount : sum), 0);
+  if (!attack?.after || !readsAmount(attack.after, "dealt")) return state;
   return landed > 0 ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, landed: (attack.defense?.landed ?? 0) + landed } } } : state;
 }
 
@@ -41,16 +41,17 @@ export function combatDamage(
   cause = ruleCause("rr.step-6-4-3"),
 ): ScenarioState {
   const logged = steps.length;
-  const placed = noteLanded(placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause), damageGoesTo(state, assigned), steps, logged);
+  const targetId = damageGoesTo(state, assigned);
+  const damaged = placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause);
+  const landed = steps.slice(logged).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId && step.amount > 0 ? sum + step.amount : sum), 0);
+  const placed = noteLanded(damaged, landed);
   const toThreat = flagged(state, enemyId, "excessToThreat");
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
   if (!toThreat && !toQuest) return placed;
   const enemy = state.cards[enemyId];
-  const targetId = damageGoesTo(state, assigned);
   const target = state.cards[targetId];
   if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return placed;
   if (!isCharacterType(printedOf(ctx.cards, target.code))) return placed;
-  const landed = steps.slice(logged).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId ? sum + step.amount : sum), 0);
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
   if (excess <= 0) return placed;

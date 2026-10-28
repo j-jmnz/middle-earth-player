@@ -1,6 +1,6 @@
 // The numbers an effect record asks the engine to read: "X is the number of enemies engaged with you", "for each Hobbit hero
 // you control", "equal to that enemy's printed Threat". A player never supplies one (brief, Effects).
-import type { Amount, CardRef } from "../catalog/boundary.ts";
+import type { Amount, CardRef, Instruction } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
@@ -87,6 +87,18 @@ function statOf(state: ScenarioState, id: string | null, stat: NonNullable<Exclu
       if (printed) return (stat === "hitPoints" ? card.health : card[stat]) ?? 0;
       return modifiedStat(state, instance, stat, ctx.cards);
   }
+}
+
+// Whether any instruction, at any depth, holds an amount that reads `key` ("the damage dealt by this attack" is `{"dealt": true}`): a record's amounts are
+// plain data, so the walk looks at the keys of every object under the instructions, never at text.
+export function readsAmount(instructions: readonly Instruction[], key: keyof Exclude<Amount, number>): boolean {
+  const walk = (node: unknown): boolean => {
+    if (Array.isArray(node)) return node.some(walk);
+    if (node === null || typeof node !== "object") return false;
+    const record = node as Record<string, unknown>;
+    return record[key] === true || Object.values(record).some(walk);
+  };
+  return walk(instructions);
 }
 
 export function resolveAmount(state: ScenarioState, amount: Amount, scope: AmountScope, ctx: ReduceContext): number {
