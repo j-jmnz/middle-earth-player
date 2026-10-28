@@ -59,8 +59,12 @@ tags:
 # Kill and relaunch: the campaign is complete on the log, with the Ranger Sense in the pool and the carry-over written.
 - stopApp
 - launchApp
+# A finished save has no Path button: its one button, `continue`, reads "Open path" (src/screens/save-panels.tsx).
+- assertVisible:
+    id: continue-next
+    text: "Every scenario is won"
 - tapOn:
-    id: continue-path
+    id: continue
 - extendedWaitUntil:
     visible:
       id: campaign-path

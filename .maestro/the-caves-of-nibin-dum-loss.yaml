@@ -3,9 +3,9 @@ tags:
   - scenario
 ---
 # Phase 33. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture `nibin-dum-lost` is a real
-# two-handed game of The Caves of Nibin-Dûm from the log a real `oath-won` writes, parked on its loss: no seat remains. A loss has no reward screen and writes nothing:
-# The Caves of Nibin-Dûm stays current, the campaign is not complete, no Ranger Sense is earned or carried over, and a "No Time to Waste!" the game played stays in the
-# pool. The path screen has no table-menu: the log is opened from `log-open`.
+# two-handed game of The Caves of Nibin-Dûm from the log a real `oath-won` writes, parked on its loss (the first seed the auto-player loses; the reducer records the reason,
+# which the Resolution screen shows). A loss has no reward screen and writes nothing: The Caves of Nibin-Dûm stays current, the campaign is not complete, no Ranger Sense is
+# earned or carried over, and the Campaign Pool is as The Oath left it (the loss neither adds nor removes a card). The path screen has no table-menu: the log is opened from `log-open`.
 - launchApp:
     clearState: true
 - openLink: "middleearthlcg://e2e/nibin-dum-lost"

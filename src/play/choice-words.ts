@@ -15,7 +15,8 @@ import { miscPickWords, miscWords } from "./misc-words.ts";
 import { playPickWords, playWords } from "./play-words.ts";
 import { dungeonWords } from "./dungeon-words.ts";
 import { oathPickWords, oathWords } from "./oath-words.ts";
-import { cavesFlagWords, cavesPickWords, cavesWords } from "./caves-words.ts";
+import { stageNumber } from "../rules/families/caves-progress.ts";
+import { cavesFlagWords, cavesLeavesWords, cavesPickWords, cavesWords } from "./caves-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -324,7 +325,14 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
     const control = picks[0]?.pick.control === "you" ? " you control" : "";
     return `Remove ${removals === 1 ? article(noun) : `${removals} ${PLURALS[noun] ?? `${noun}s`}`}${control} from the quest`;
   }
-  const words = option.instructions.map((instruction) => instructionWords(instruction, game, names, sourceId)).filter((text): text is string => text != null);
+  // "Remove X progress" where X is the stage number (41027:A:3): the sheet says the number the table holds now.
+  const stage = stageNumber(game);
+  const resolved = option.instructions.map((instruction): Instruction =>
+    instruction.verb === "RemoveProgressFromQuest" && typeof instruction.amount === "object" && instruction.amount.stage === true && stage > 0 ? { ...instruction, amount: stage } : instruction,
+  );
+  const leaves = cavesLeavesWords(option.instructions, (instruction) => instructionWords(instruction, game, names, sourceId));
+  if (leaves) return leaves;
+  const words = resolved.map((instruction) => instructionWords(instruction, game, names, sourceId)).filter((text): text is string => text != null);
   return words.length > 0 ? capital(words.join(", then ")) : capital(optionId);
 }
 

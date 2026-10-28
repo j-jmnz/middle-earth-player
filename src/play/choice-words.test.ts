@@ -10,18 +10,23 @@ import { AUTHORED_EFFECTS as DOL_GULDUR_EFFECTS } from "../effects/authored/esca
 import { AUTHORED_EFFECTS as ANDUIN_EFFECTS } from "../effects/authored/journey-along-the-anduin.ts";
 import { AUTHORED_EFFECTS } from "../effects/authored/passage-through-mirkwood.ts";
 import { RECORDS as POOL_RECORDS } from "../effects/authored/pool/RevCore.ts";
+import { stageNumber } from "../rules/families/caves-progress.ts";
 import { alternativeActions } from "../rules/families/deck-play.ts";
 import { readyPaymentChoice } from "../rules/families/attachments-ready.ts";
 import { attachTo, spawn } from "../rules/zones.ts";
 import { HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
-import { first } from "../../scripts/past-scene.ts";
 import { anduinTable, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
 import { loadOathWorld, oathTable, type OathWorld } from "../../scripts/oath-scene.ts";
 import { AUTHORED_EFFECTS as CAVES_EFFECTS } from "../effects/authored/the-caves-of-nibin-dum.ts";
 import { cavesTable, loadCavesWorld, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 
+import { legalIntents } from "../rules/legal.ts";
+import { first, send, start } from "../../scripts/past-scene.ts";
+
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";
+import type { SheetNames } from "./sheet-types.ts";
+import { sheetFor } from "./sheets.ts";
 
 let world: MirkwoodWorld;
 let anduinWorld: AnduinWorld;
@@ -345,7 +350,11 @@ describe("the words of The Caves of Nibin-Dûm choices", () => {
         }
       });
     }
-    expect(seen["41027:forced:1 progress"]).toBe("Remove X progress from the quest");
+    expect(seen["41027:forced:1 progress"]).toBe(`Remove ${stageNumber(made.state)} progress from the quest`);
+    const stage2 = cavesTable(cavesWorld, { stage: "41005" });
+    const chieftain = CAVES_EFFECTS.find((effect) => effect.id === "41027:forced:1")?.instructions[0];
+    if (chieftain?.verb !== "Choose") throw new Error("the Chieftain's record is not a choice");
+    expect(branchWords(chieftain, "progress", stage2.state, cavesNames(), "41027")).toBe("Remove 2 progress from the quest");
     expect(seen["41027:forced:1 staging"]).toBe("Return it to the staging area");
     expect(seen["41039:whenRevealed:1 exhaust"]).toBe("Exhaust Cave Torch");
     expect(seen["41039:whenRevealed:1 noProgress"]).toBe("No progress can be placed on the quest until the end of the phase");
@@ -363,12 +372,26 @@ describe("the words of The Caves of Nibin-Dûm choices", () => {
       return running.map((effect) => branchWords(choice[0] as Extract<Instruction, { verb: "Choose" }>, effect.id, made.state, cavesNames(), null));
     };
     expect(sayAll("41048")).toEqual([
-      "Remove this card from the Campaign Pool, then remove this card from the game, then each player lowers threat by 3, then reveal an encounter card",
+      "Each player lowers threat by 3 and an encounter card is revealed. This card leaves the game and the Campaign Pool.",
       "Draw 1 card",
     ]);
     expect(sayAll("41049")).toEqual([
-      "Remove this card from the Campaign Pool, then remove this card from the game, then look at the top 4 cards of your deck, then choose a card, then put it into your hand",
+      "Look at the top 4 cards of your deck and put 1 into your hand. This card leaves the game and the Campaign Pool.",
       "Draw 1 card",
     ]);
+  });
+
+  it("shows the Cave Torch's X as the progress it places, with the caves prompt as the note (41029:A:2)", () => {
+    const made = cavesTable(cavesWorld, { attachments: ["41029"], staging: ["41032"] });
+    const offer = legalIntents(made.state, made.ctx).find((intent) => intent.type === "Trigger" && made.state.cards[intent.cardId]?.code === "41029");
+    if (offer?.type !== "Trigger") throw new Error("the Cave Torch is not offered");
+    const run = send(start(made.state), offer, made.ctx);
+    const names: SheetNames = { card: (id) => cavesWorld.cards.get(run.state.cards[id]?.code ?? "")?.name ?? id, line: () => null };
+    const sheet = sheetFor(run.state, made.ctx, legalIntents(run.state, made.ctx), names);
+    if (sheet?.kind !== "pick") throw new Error(`the Torch's X is not a pick sheet: ${sheet?.kind}`);
+    expect(sheet.note).toContain("Choose how much progress to place on a Dark location.");
+    expect(sheet.note).not.toContain("Choose one.");
+    expect(sheet.options.map((option) => option.label)).toEqual(["Place 1 progress", "Place 2 progress", "Place 3 progress"]);
+    expect(first(run.state, "41029")).toBeDefined();
   });
 });

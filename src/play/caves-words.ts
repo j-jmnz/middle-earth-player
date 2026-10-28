@@ -40,3 +40,46 @@ export function cavesWords(instruction: Instruction, nameOf: (code: string) => s
       return null;
   }
 }
+
+/** The two Actions of "No Time to Waste!" (41048:A:2) and Ranger Sense (41049:A:2) put the card out of the game first: said benefit first, with one trailing clause for that cost
+ * ("Each player lowers threat by 3 and an encounter card is revealed. This card leaves the game and the Campaign Pool."). Null when the branch does not start that way. */
+export function cavesLeavesWords(instructions: readonly Instruction[], say: (instruction: Instruction) => string | null): string | null {
+  const [pool, game, ...rest] = instructions;
+  if (pool?.verb !== "RemoveFromCampaignPool" || game?.verb !== "RemoveSourceFromGame" || rest.length === 0) return null;
+  const parts = rest.flatMap((instruction): string[] => {
+    switch (instruction.verb) {
+      case "LowerThreat":
+        return instruction.who === "eachSeat" && typeof instruction.amount === "number" ? [`each player lowers threat by ${instruction.amount}`] : [say(instruction) ?? ""];
+      case "RevealEncounter":
+        return ["an encounter card is revealed"];
+      case "LookAtTop":
+        return typeof instruction.count === "number" && instruction.deck === "own" ? [`look at the top ${instruction.count} cards of your deck`] : [say(instruction) ?? ""];
+      // The card looked at is the one that goes to the hand; the rest go back on top.
+      case "Pick":
+      case "ArrangeTop":
+        return [];
+      case "MovePicked":
+        return instruction.to === "hand" ? ["put 1 into your hand"] : [say(instruction) ?? ""];
+      default:
+        return [say(instruction) ?? ""];
+    }
+  });
+  if (parts.length === 0 || parts.some((part) => part === "")) return null;
+  const benefit = parts.join(" and ");
+  return `${benefit.charAt(0).toUpperCase()}${benefit.slice(1)}. This card leaves the game and the Campaign Pool.`;
+}
+
+/** The Cave Torch's X (41029:A:2, "place up to 3 progress on a Dark location"): the Choose ChooseX opens holds only SetX options, and the Pick and PlaceProgressOn that
+ * read X wait in the queue. The sheet then asks for the progress, not for "X": null when the choice is anything else. */
+export function cavesXChoice(choose: Extract<Instruction, { verb: "Choose" }>, queue: readonly Instruction[]): { note: string; label: (optionId: string) => string } | null {
+  if (!choose.options.every((option) => option.instructions.length === 1 && option.instructions[0]?.verb === "SetX")) return null;
+  const [pick, place] = queue;
+  if (pick?.verb !== "Pick" || place?.verb !== "PlaceProgressOn" || typeof place.amount !== "object" || place.amount.x !== true) return null;
+  return {
+    note: "Choose how much progress to place on a Dark location.",
+    label: (optionId) => {
+      const set = choose.options.find((option) => option.id === optionId)?.instructions[0];
+      return set?.verb === "SetX" ? `Place ${set.value} progress` : optionId;
+    },
+  };
+}

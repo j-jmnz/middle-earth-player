@@ -15,6 +15,7 @@ import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
+import { cavesXChoice } from "./caves-words.ts";
 import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
 import { threatRows } from "./foresight.ts";
 import { tokenOutcome } from "./oath-words.ts";
@@ -229,16 +230,18 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       // Either of two instructions (141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2): each option is a branch in words.
       if (wait?.kind === "branch" && wait.item.instruction.verb === "Choose") {
         const choose = wait.item.instruction;
+        // The Cave Torch's X: the options place 1 to 3 progress (41029:A:2).
+        const torch = cavesXChoice(choose, (data?.queue ?? []).map((item) => item.instruction));
         return {
           ...base,
-          note: [`Choose one.${who}`, line].filter((part) => part != null).join(" "),
+          note: [`${torch?.note ?? "Choose one."}${who}`, line].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
           options: window.options.map((id): PickOption => {
             // A branch that raises or lowers threat carries the threat icon with the record's amount.
             const threat = branchThreat(choose, id);
             const stats: SheetStat[] = threat == null ? [] : [{ icon: "threat", value: threat, word: "Threat" }];
-            return { id, label: branchWords(choose, id, game, words, source), code: null, ...(stats.length > 0 ? { stats } : {}), intent: { type: "Choose", optionId: id } };
+            return { id, label: torch ? torch.label(id) : branchWords(choose, id, game, words, source), code: null, ...(stats.length > 0 ? { stats } : {}), intent: { type: "Choose", optionId: id } };
           }),
         };
       }
