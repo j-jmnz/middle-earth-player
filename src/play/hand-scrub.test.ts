@@ -1,14 +1,14 @@
 // The hand scrub (phase 25): the risen, spread hand and the card under the finger (docs/design-system.md, Table, Gestures).
 import { describe, expect, it } from "vitest";
 
-import { cardAt, cancelled, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
+import { cardAt, cancelled, fanTilts, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
 import { cardSize, handCardSize, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 
 const none: Rect = { x: 0, y: 0, w: 0, h: 0 };
 
 // A layout with only a hand of `count` cards, laid out the way layout.ts does (its sizes; the fan's slight drop and tilt).
-function layoutOf(count: number, width: number, height: number, bottom = 0): TableLayout {
+function layoutOf(count: number, width: number, height: number, bottom = 0, scale = 1): TableLayout {
   const card = cardSize(width, height);
   const size = handCardSize(card, width - 16, count);
   const handY = height - bottom - Math.max(52, Math.round(card.h * 0.56));
@@ -35,6 +35,7 @@ function layoutOf(count: number, width: number, height: number, bottom = 0): Tab
   return {
     width,
     height,
+    scale,
     card,
     zones: { questStage: none, staging: none, activeLocation: none, secondActiveLocation: none, engaged: none, play: none, hand },
     piles: { deck: none, discard: none, encounterDeck: none, encounterDiscard: none },
@@ -48,13 +49,15 @@ const CANVASES = [
   { width: 844, height: 390, bottom: 0 },
   { width: 667, height: 375, bottom: 21 },
   { width: 560, height: 320, bottom: 0 },
+  // Large UI (the layout's scale 1.3): the margins, gaps and slices all grow.
+  { width: 1000, height: 500, bottom: 0, scale: 1.3 },
 ];
 
 describe("spreadLayout", () => {
   it("spreads one, five and nine cards inside the canvas width", () => {
     for (const canvas of CANVASES) {
       for (const count of [1, 5, 9]) {
-        const spread = spreadLayout(layoutOf(count, canvas.width, canvas.height, canvas.bottom), canvas);
+        const spread = spreadLayout(layoutOf(count, canvas.width, canvas.height, canvas.bottom, canvas.scale), canvas);
         expect(spread.slots).toHaveLength(count);
         for (const slot of spread.slots) {
           expect(slot.x).toBeGreaterThanOrEqual(0);
@@ -77,13 +80,13 @@ describe("spreadLayout", () => {
     expect(spread.slots[0]?.w).toBeCloseTo((layout.slots[0]?.w ?? 0) * SHAPE.scrubScale, 9);
     expect((spread.left + spread.right) / 2).toBeCloseTo(canvas.width / 2, 9);
     expect(spread.ids).toEqual(["h0", "h1", "h2"]);
-    expect(spread.top).toBe(spread.slots[0]?.y);
+    expect(spread.top).toBe(Math.min(...spread.slots.map((slot) => slot.y)));
   });
 
   it("keeps at least a 44 pt slice of every card", () => {
     for (const canvas of CANVASES) {
       for (const count of [2, 3, 5, 7, 9, 12]) {
-        const spread = spreadLayout(layoutOf(count, canvas.width, canvas.height, canvas.bottom), canvas);
+        const spread = spreadLayout(layoutOf(count, canvas.width, canvas.height, canvas.bottom, canvas.scale), canvas);
         for (let index = 0; index < count - 1; index += 1) {
           const step = (spread.slots[index + 1]?.x ?? 0) - (spread.slots[index]?.x ?? 0);
           expect(step, `${count} cards on ${canvas.width}`).toBeGreaterThanOrEqual(MIN_TARGET - 1e-9);
@@ -102,6 +105,57 @@ describe("spreadLayout", () => {
     expect(steps[0]).toBeLessThan(long.slots[0]?.w ?? 0);
     const short = spreadLayout(layoutOf(2, canvas.width, canvas.height), canvas);
     expect((short.slots[1]?.x ?? 0) - (short.slots[0]?.x ?? 0)).toBeGreaterThan(short.slots[0]?.w ?? 0);
+  });
+
+  it("keeps consecutive centers at least a slice apart with the fan, 44 pt and 44 x the layout scale at Large", () => {
+    for (const canvas of CANVASES) {
+      const reach = MIN_TARGET * (canvas.scale ?? 1);
+      for (const count of [2, 5, 9, 12]) {
+        const spread = spreadLayout(layoutOf(count, canvas.width, canvas.height, canvas.bottom, canvas.scale), canvas);
+        spread.centers.slice(1).forEach((center, index) => expect(center - (spread.centers[index] ?? 0), `${count} cards on ${canvas.width}`).toBeGreaterThanOrEqual(Math.min(reach, MIN_TARGET) - 1e-9));
+      }
+    }
+  });
+
+  it("fans the risen hand: symmetric tilts that sum to 0, the middle card highest, at most FAN_MAX in all", () => {
+    for (const canvas of CANVASES) {
+      for (const count of [2, 3, 4, 5, 7, 9, 12]) {
+        const spread = spreadLayout(layoutOf(count, canvas.width, canvas.height, canvas.bottom, canvas.scale), canvas);
+        const tilts = spread.slots.map((slot) => slot.tilt);
+        expect(tilts.reduce((sum, tilt) => sum + tilt, 0)).toBeCloseTo(0, 9);
+        tilts.forEach((tilt, index) => expect(tilt).toBeCloseTo(-(tilts[count - 1 - index] ?? 0), 9));
+        for (let index = 1; index < count; index += 1) expect(tilts[index] ?? 0).toBeGreaterThan(tilts[index - 1] ?? 0);
+        expect((tilts[count - 1] ?? 0) - (tilts[0] ?? 0)).toBeLessThanOrEqual(SHAPE.fanMax + 1e-9);
+        const ys = spread.slots.map((slot) => slot.y);
+        const highest = Math.min(...ys);
+        expect(spread.top).toBe(highest);
+        // The middle is the highest, and the cards drop symmetrically toward the ends.
+        expect(ys[Math.floor((count - 1) / 2)]).toBeCloseTo(highest, 9);
+        ys.forEach((y, index) => expect(y).toBeCloseTo(ys[count - 1 - index] ?? 0, 9));
+      }
+    }
+    expect(fanTilts(1)).toEqual([0]);
+    expect(fanTilts(3)[2]).toBeCloseTo(SHAPE.fanStep, 9);
+    expect((fanTilts(20)[19] ?? 0) - (fanTilts(20)[0] ?? 0)).toBeCloseTo(SHAPE.fanMax, 9);
+  });
+
+  it("keeps every turned card inside the canvas", () => {
+    for (const canvas of CANVASES) {
+      for (const count of [1, 2, 3, 5, 7, 9, 12]) {
+        const spread = spreadLayout(layoutOf(count, canvas.width, canvas.height, canvas.bottom, canvas.scale), canvas);
+        for (const slot of spread.slots) {
+          const halfW = (slot.w / 2) * Math.cos(slot.tilt) + (slot.h / 2) * Math.sin(Math.abs(slot.tilt));
+          const halfH = (slot.h / 2) * Math.cos(slot.tilt) + (slot.w / 2) * Math.sin(Math.abs(slot.tilt));
+          const cx = slot.x + slot.w / 2;
+          const cy = slot.y + slot.h / 2;
+          const at = `${count} cards on ${canvas.width}`;
+          expect(cx - halfW, at).toBeGreaterThanOrEqual(-1e-9);
+          expect(cx + halfW, at).toBeLessThanOrEqual(canvas.width + 1e-9);
+          expect(cy - halfH, at).toBeGreaterThanOrEqual(-1e-9);
+          expect(cy + halfH, at).toBeLessThanOrEqual(canvas.height - canvas.bottom + 1e-9);
+        }
+      }
+    }
   });
 
   it("is empty for an empty hand", () => {
@@ -206,8 +260,8 @@ describe("startCard", () => {
 });
 
 describe("the hold and the selection tick", () => {
-  it("holds 250 ms within 6 pt", () => {
-    expect(SCRUB_HOLD_MS).toBe(250);
+  it("holds 150 ms within 6 pt", () => {
+    expect(SCRUB_HOLD_MS).toBe(150);
     expect(SCRUB_SLOP).toBe(6);
   });
 

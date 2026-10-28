@@ -122,9 +122,9 @@ export const MOTION = {
   spotlightDrawAgain: tween(125, "outCubic"),
   spotlightScrim: tween(100, "outCubic"),
   spotlight: tween(1500, "linear"),
-  // The hand scrub (phase 25): the held hand rises (and grows and flattens) over `scrubRise` and spreads sideways over `scrubSpread`,
+  // The hand scrub (phase 25): the held hand rises (and grows and turns its fan) over `scrubRise` and spreads sideways over `scrubSpread`,
   // together; the card under the finger lifts over `scrubLift`; the hand settles back over `scrubFall`. The table's 35% night
-  // rides the rise. The 250 ms hold and the 6 pt slop that start it are gesture thresholds (hand-scrub.ts), not tokens.
+  // rides the rise. The 150 ms hold and the 6 pt slop that start it are gesture thresholds (hand-scrub.ts), not tokens.
   scrubRise: tween(220, "outCubic"),
   scrubSpread: tween(220, "outCubic"),
   scrubLift: tween(120, "outCubic"),
@@ -197,6 +197,11 @@ export const SHAPE = {
   scrubLiftScale: 1.25,
   scrubLiftRise: 0.35,
   scrubNight: 0.35,
+  // The risen hand is fanned like a held hand (user request, 2026-10-28): the cards turn this many radians apart, but the whole
+  // fan spans at most `fanMax` radians (about 26 degrees); the arc they sit on has a radius of this many card heights.
+  fanStep: 0.07,
+  fanMax: 0.45,
+  fanRadius: 3,
   // The peek: the peeked hand carries a night veil of this opacity.
   peekVeil: 0.3,
 } as const;

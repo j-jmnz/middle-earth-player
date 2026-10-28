@@ -1,6 +1,6 @@
 // The table canvas's gestures (docs/design-system.md, Table, Gestures; phase 25), moved out of table-canvas.native.tsx with the hand
 // scrub. They race: a drag (a pan from 6 pt) plays a card, a tap picks, a long press (350 ms) previews a card on the table, and a
-// pan that activates after a 250 ms hold on the hand scrubs through it. A move before the 250 ms is a drag, so the drag-to-play path
+// pan that activates after a 150 ms hold on the hand scrubs through it. A move before the 150 ms is a drag, so the drag-to-play path
 // is never delayed; the scrub is a gesture of its own that fails at once for a press that is not on the hand. All of it runs on the
 // UI thread: the finger is read there, the canvas draws from the shared values, and only a change of the card under the finger
 // (for the selection tick, and the preview at the release) crosses to JavaScript.
@@ -192,7 +192,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
     });
 
     // Held still past the press delay, a face-up card on the table opens large; a discard pile opens its list. On the hand the
-    // scrub gets there first (250 ms), and its release opens the same preview.
+    // scrub gets there first (150 ms), and its release opens the same preview.
     const hold = Gesture.LongPress()
       .minDuration(350)
       .onStart((event) => {
@@ -202,7 +202,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         else if (!slot.faceDown || slot.held) scheduleOnRN(onPreview, slot.id);
       });
 
-    // A press on the hand held still for 250 ms (a move of more than the slop before it fails this and is a drag) raises and
+    // A press on the hand held still for 150 ms (a move of more than the slop before it fails this and is a drag) raises and
     // spreads the hand; the finger then slides along it. A press anywhere else fails here at once, so the 350 ms press and the tap
     // are untouched. A scrub never starts for the touch that skipped a spotlight.
     const scrub = Gesture.Pan()
