@@ -149,6 +149,27 @@ export default function Briefing() {
           ) : null}
         </DealBar>
       }
+      aside={
+        <>
+          {changeLines.length > 0 ? (
+            <View testID="briefing-checklist" className="mt-5 gap-1">
+              <Section title="Before the deal" />
+              {changeLines.map((item) => (
+                <Label key={item.key} tone="muted">
+                  {item.line}
+                </Label>
+              ))}
+            </View>
+          ) : null}
+          {result.penaltyWaived ? (
+            <Label tone="muted" className="mt-2">
+              The campaign card waives the hero-change penalty.
+            </Label>
+          ) : null}
+
+          <EncounterDetails facts={facts} />
+        </>
+      }
     >
       {completed ? (
         <BodyText tone="muted" className="mt-3" testID="briefing-replay">
@@ -205,23 +226,6 @@ export default function Briefing() {
         </View>
       ) : null}
 
-      {changeLines.length > 0 ? (
-        <View testID="briefing-checklist" className="mt-5 gap-1">
-          <Section title="Before the deal" />
-          {changeLines.map((item) => (
-            <Label key={item.key} tone="muted">
-              {item.line}
-            </Label>
-          ))}
-        </View>
-      ) : null}
-      {result.penaltyWaived ? (
-        <Label tone="muted" className="mt-2">
-          The campaign card waives the hero-change penalty.
-        </Label>
-      ) : null}
-
-      <EncounterDetails facts={facts} />
     </BriefingScreen>
   );
 }

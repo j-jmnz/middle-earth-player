@@ -4,7 +4,7 @@
 import { and, eq, like } from "drizzle-orm";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { Problem, ScenarioFacts } from "../campaign/briefing";
@@ -12,7 +12,8 @@ import { cards, packs } from "../catalog/schema";
 import type { Difficulty } from "../catalog/scenario-data";
 import { SceneArt } from "./art";
 import { dealSentence, problemWords } from "./briefing-words";
-import { ActionBar, Chevron, Chip, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, useTitleShadow } from "./chrome";
+import { ActionBar, Chevron, Chip, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, TwoPane, useTitleShadow } from "./chrome";
+import { BRIEFING_SCENE_RANGE } from "./briefing-layout";
 import { deckListSpheres, emptyDeckListFilter, filterDecks, type DeckListFilter } from "./deck-list";
 import { deckReadiness, type DeckReadiness } from "./deck-status";
 import { deckFaces, listDecks, notAppliedIn } from "./deck-store";
@@ -20,7 +21,8 @@ import { useDatabases } from "./databases";
 import type { HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed, type StarterSeed } from "./starter-decks";
-import { useUiScale } from "../play/ui-scale";
+import { capWidth } from "../play/size-class";
+import { useSizeClass } from "../play/use-size-class";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
 
@@ -113,6 +115,7 @@ export function BriefingScreen({
   onBooklet,
   banner,
   children,
+  aside,
   bar,
 }: {
   testID: string;
@@ -124,33 +127,94 @@ export function BriefingScreen({
   // The words over the scene (ScenarioBanner); null while the scenario is loading or missing.
   banner: ReactNode;
   children: ReactNode;
+  // The reference matter (Before the deal, the encounter): after the content in compact and medium, under the scene when expanded.
+  aside?: ReactNode;
   bar?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
-  const s = useUiScale();
+  const { size, s } = useSizeClass();
   const side = { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right };
-  // Past the scene, a night bar shows behind Back and Booklet so they never sit on the words that scroll under them.
-  const [past, setPast] = useState(false);
+  // Past the scene, a night bar shows behind Back and Booklet so they never sit on the words that scroll under them. The shade
+  // belongs to the layout whose scroll set it: a window crossing 840 pt remounts the scroll, so the other layout starts clear.
+  const expanded = size === "expanded";
+  const [shade, setShade] = useState({ expanded, past: false });
+  const past = shade.expanded === expanded && shade.past;
   const threshold = (BANNER_HEIGHT - 80) * s;
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const next = event.nativeEvent.contentOffset.y > threshold;
+    if (next !== past) setShade({ expanded, past: next });
+  };
+  // Medium keeps the phone's order in a reading column under the full-width scene.
+  const cap = capWidth(size, "readable", s);
+  const column = cap == null || expanded ? undefined : ({ width: "100%", maxWidth: cap, alignSelf: "center" } as const);
+  const scene = (
+    <SceneArt scenarioId={scenarioId} height={BANNER_HEIGHT * s + insets.top} shade={0.4} fade={0.2}>
+      <View className="absolute bottom-0 left-0 right-0 pb-2" style={expanded ? { ...side, paddingRight: 24 * s } : side}>
+        {column ? <View style={column}>{banner}</View> : banner}
+      </View>
+    </SceneArt>
+  );
+  const navBar = (
+    <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 * s + insets.left, paddingRight: expanded ? 16 * s : 16 * s + insets.right }}>
+      <NavBar overlay onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={onBooklet ? <IconButton overlay icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
+    </View>
+  );
+
+  // Expanded: the scene, Back, Booklet and the aside are the pane at the left (the shade and the buttons scoped to it); the choices
+  // and the Deal bar are the pane at the right, the bar pinned at its foot.
+  if (expanded) {
+    const trailing = 24 * s + insets.right;
+    return (
+      <Screen testID={testID} scene="vale" bleed>
+        <TwoPane
+          kind="supporting"
+          range={BRIEFING_SCENE_RANGE}
+          start={
+            <>
+              <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingBottom: 24 * s }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEventThrottle={64} onScroll={onScroll}>
+                {scene}
+                {aside ? <View style={{ paddingLeft: side.paddingLeft, paddingRight: 24 * s }}>{aside}</View> : null}
+              </ScrollView>
+              <FloatingBarShade shown={past} top={insets.top} />
+              {navBar}
+            </>
+          }
+          end={
+            <>
+              <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingTop: insets.top + 8 * s, paddingBottom: 24 * s, paddingRight: trailing }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                {children}
+              </ScrollView>
+              {bar ? (
+                <View style={{ paddingRight: trailing }}>
+                  <ActionBar testID="briefing-deal-bar" align="fill">
+                    {bar}
+                  </ActionBar>
+                </View>
+              ) : null}
+            </>
+          }
+        />
+      </Screen>
+    );
+  }
+
   return (
     <Screen testID={testID} scene="vale" bleed>
-      <ScrollView
-        className="min-h-0 flex-1"
-        contentContainerStyle={{ paddingBottom: 24 * s }}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={64}
-        onScroll={(event) => {
-          const next = event.nativeEvent.contentOffset.y > threshold;
-          if (next !== past) setPast(next);
-        }}
-      >
-        <SceneArt scenarioId={scenarioId} height={BANNER_HEIGHT * s + insets.top} shade={0.4} fade={0.2}>
-          <View className="absolute bottom-0 left-0 right-0 pb-2" style={side}>
-            {banner}
-          </View>
-        </SceneArt>
-        <View style={side}>{children}</View>
+      <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingBottom: 24 * s }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEventThrottle={64} onScroll={onScroll}>
+        {scene}
+        <View style={side}>
+          {column ? (
+            <View style={column}>
+              {children}
+              {aside}
+            </View>
+          ) : (
+            <>
+              {children}
+              {aside}
+            </>
+          )}
+        </View>
       </ScrollView>
       {bar ? (
         <View style={side}>
@@ -158,9 +222,7 @@ export function BriefingScreen({
         </View>
       ) : null}
       <FloatingBarShade shown={past} top={insets.top} />
-      <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 * s + insets.left, paddingRight: 16 * s + insets.right }}>
-        <NavBar overlay onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={onBooklet ? <IconButton overlay icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
-      </View>
+      {navBar}
     </Screen>
   );
 }

@@ -2,7 +2,7 @@
 // framed party card with the Ring-bearer slot. Shared by the campaign briefing and the standalone briefing.
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, type LayoutChangeEvent } from "react-native";
 
 import { notAppliedWords } from "../play/not-applied";
 import { panelSurface, tileSurface } from "../play/surfaces";
@@ -16,7 +16,9 @@ import { DeckListBar } from "./deck-list-bar";
 import { deckCountLine, notAppliedCards, notAppliedLine } from "./deck-status";
 import { DeckCover, DeckRow, EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
+import { COVER_GAP, coverColumns, coverWidth } from "./briefing-layout";
 import { useUiScale } from "../play/ui-scale";
+import { useSizeClass } from "../play/use-size-class";
 
 const COVER_HEIGHT = 112;
 const TOOL_HEIGHT = 128;
@@ -62,10 +64,14 @@ export function SeatPicker({
   const router = useRouter();
   const view = useDeckListView();
   const [changing, setChanging] = useState(false);
+  // Expanded, the deck list is in the briefing's right pane: from 600 pt wide the covers go two to a row (briefing-layout.ts).
+  const { size } = useSizeClass();
+  const [listWidth, setListWidth] = useState(0);
   const { savedDecks, seeded, seedReason, candidates, faces, readiness, filter, setFilter, spheres, shown, inactive, typeOf } = briefingDecks;
   const kept = savedDecks.find((deck) => deck.id === picked);
   const pickedDeck = kept ?? null;
   const listed = kept && !shown.includes(kept) ? [kept, ...shown] : shown;
+  const wide = size === "expanded" && view !== "List" && listed.length > 0 && listWidth > 0 && coverColumns(listWidth, s) === 2;
   const faceOf = (code: string): HeroFace => heroFace(faces, code, nameOf(code));
   const heroNames = (codes: readonly string[]) => codes.map(nameOf).join(", ");
   const slot = index === 0 && needsRingBearer;
@@ -102,7 +108,11 @@ export function SeatPicker({
         <View>
           <Label>{pickedDeck ? "Pick another deck for this seat." : "Choose the deck this seat plays."}</Label>
           <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={savedDecks.length} testIDPrefix={`briefing-decks-${index}`} />
-          <View className="mt-3">
+          <View
+            className={wide ? "mt-3 flex-row flex-wrap" : "mt-3"}
+            style={wide ? { columnGap: COVER_GAP * s } : undefined}
+            onLayout={size === "expanded" ? (event: LayoutChangeEvent) => setListWidth(event.nativeEvent.layout.width) : undefined}
+          >
             {listed.map((deck) => {
               const fell = deck.heroes.filter((code) => fallen.includes(code));
               const ready = readiness.get(deck.id) ?? { ready: false, text: "Not read yet" };
@@ -138,7 +148,7 @@ export function SeatPicker({
                   {open}
                 </DeckRow>
               ) : (
-                <View key={deck.id} className="pb-3">
+                <View key={deck.id} className="pb-3" style={wide ? { width: coverWidth(listWidth, 2, s) } : undefined}>
                   <DeckCover {...summary} height={COVER_HEIGHT * s}>
                     {open}
                   </DeckCover>

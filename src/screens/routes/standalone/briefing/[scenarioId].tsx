@@ -112,6 +112,7 @@ export default function StandaloneBriefing() {
       {...frame}
       banner={<ScenarioBanner facts={facts} eyebrow={`Standalone · Scenario ${facts.number}`} />}
       bar={<DealBar problems={result.problems} dealError={dealError} difficulty={difficulty} dealable={result.dealable} onDeal={onDeal} />}
+      aside={<EncounterDetails facts={facts} />}
     >
       <Section title="Players" className="mt-4" />
       <Segmented options={SEAT_WORDS} value={seatWord(seatCount)} onChange={(next) => setSeatCount(seatCountOf(next))} testIDPrefix="seats" stretch />
@@ -136,7 +137,6 @@ export default function StandaloneBriefing() {
           nameOf={nameOf}
         />
       ))}
-      <EncounterDetails facts={facts} />
     </BriefingScreen>
   );
 }
