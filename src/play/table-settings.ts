@@ -1,6 +1,7 @@
-// The table's settings (docs/plans/table-experience.md): where the table stops to ask in a step's action window, the free
-// Responses the player always uses, the readability options and the first-game guide. App-wide, kept in user.db by the
-// screens (src/screens/settings-store.ts); a vanilla Zustand store here so src/play reads them without importing screens.
+// The app's settings (docs/plans/table-experience.md, docs/plans/settings-theme-and-ui-scale.md): the theme and the UI scale,
+// haptics and reduced motion, keeping the screen awake, where the table stops to ask in a step's action window, the free
+// Responses the player always uses, the readability options and the first-game guide. Kept in user.db by the screens
+// (src/screens/settings-store.ts); a vanilla Zustand store here so src/play reads them without importing screens.
 // A setting is the player's own standing answer, chosen on purpose: that is the confirmation an auto-pass or an auto-use
 // stands on (brief, Screens, Table: no single tap sends an intent).
 import { createStore } from "zustand/vanilla";
@@ -27,12 +28,29 @@ export type TableSettings = {
   animationSpeed: Speed;
   // The combat spotlight (phase 24): when an attack deals or blocks damage the table plays it large. Off plays none, as reduced motion does.
   spotlight: boolean;
+  // How large the whole UI draws: Small, Medium or Large (ui-scale.ts holds the factors).
+  uiScale: UiScaleOption;
+  // A buzz on the table's key moments. Off plays none.
+  haptics: boolean;
+  // Reduced motion: follow the phone's setting, or always snap whatever the phone says.
+  reduceMotion: ReduceMotionOption;
+  // Keep the screen from sleeping while a table is open.
+  keepAwake: boolean;
+  // The colors: Dark, Light, or whichever the phone is set to.
+  theme: ThemeOption;
 };
+
+export const UI_SCALE_OPTIONS = ["small", "medium", "large"] as const;
+export type UiScaleOption = (typeof UI_SCALE_OPTIONS)[number];
+export const REDUCE_MOTION_OPTIONS = ["system", "always"] as const;
+export type ReduceMotionOption = (typeof REDUCE_MOTION_OPTIONS)[number];
+export const THEME_OPTIONS = ["dark", "light", "system"] as const;
+export type ThemeOption = (typeof THEME_OPTIONS)[number];
 
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark" };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -52,7 +70,17 @@ export function parseSettings(raw: unknown): TableSettings {
     guideSeen: seen,
     animationSpeed: SPEEDS.find((speed) => speed === value.animationSpeed) ?? DEFAULT_SETTINGS.animationSpeed,
     spotlight: flag(value.spotlight, true),
+    uiScale: UI_SCALE_OPTIONS.find((option) => option === value.uiScale) ?? DEFAULT_SETTINGS.uiScale,
+    haptics: flag(value.haptics, DEFAULT_SETTINGS.haptics),
+    reduceMotion: REDUCE_MOTION_OPTIONS.find((option) => option === value.reduceMotion) ?? DEFAULT_SETTINGS.reduceMotion,
+    keepAwake: flag(value.keepAwake, DEFAULT_SETTINGS.keepAwake),
+    theme: THEME_OPTIONS.find((option) => option === value.theme) ?? DEFAULT_SETTINGS.theme,
   };
+}
+
+/** Every setting back to its default, except the guide's count: the guide switches back on, but steps already seen twice do not replay. */
+export function restoreDefaults(settings: TableSettings): TableSettings {
+  return { ...DEFAULT_SETTINGS, guideSeen: settings.guideSeen };
 }
 
 export type SettingsState = { settings: TableSettings; update: (change: Partial<TableSettings>) => void; hydrate: (settings: TableSettings) => void };

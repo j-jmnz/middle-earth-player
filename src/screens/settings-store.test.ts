@@ -5,7 +5,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { afterEach, describe, expect, it } from "vitest";
 
 import migrations from "../../drizzle/migrations";
-import { DEFAULT_SETTINGS, tableSettings } from "../play/table-settings";
+import { DEFAULT_SETTINGS, parseSettings, restoreDefaults, tableSettings } from "../play/table-settings";
 import { bindTableSettings, readTableSettings } from "./settings-store.ts";
 
 function openUser() {
@@ -42,5 +42,39 @@ describe("table settings in user.db", () => {
     tableSettings.getState().update({ stopsOn: true });
     expect(readTableSettings(user).stopsOn).toBe(true);
     stop();
+  });
+
+  it("gives an old row that lacks the new keys their defaults", () => {
+    const { sqlite, user } = openUser();
+    sqlite.exec(`INSERT INTO settings (key, value) VALUES ('table', '{"guide":false,"animationSpeed":"quick","spotlight":false}')`);
+    const stop = bindTableSettings(user, () => {});
+    expect(tableSettings.getState().settings).toEqual({ ...DEFAULT_SETTINGS, guide: false, animationSpeed: "quick", spotlight: false });
+    stop();
+  });
+
+  it("round-trips the uiScale, haptics, reduceMotion, keepAwake and theme keys", () => {
+    const { user } = openUser();
+    const stop = bindTableSettings(user, () => {});
+    tableSettings.getState().update({ uiScale: "large", haptics: false, reduceMotion: "always", keepAwake: false, theme: "system" });
+    expect(readTableSettings(user)).toMatchObject({ uiScale: "large", haptics: false, reduceMotion: "always", keepAwake: false, theme: "system" });
+    stop();
+  });
+});
+
+describe("parseSettings", () => {
+  it("replaces a wrong type or an unknown option with the default", () => {
+    expect(parseSettings({ uiScale: "huge", haptics: "yes", reduceMotion: 1, keepAwake: null, theme: "sepia" })).toEqual(DEFAULT_SETTINGS);
+    expect(parseSettings({ uiScale: 2, haptics: 0, reduceMotion: "never", keepAwake: "no", theme: true })).toEqual(DEFAULT_SETTINGS);
+  });
+
+  it("keeps a valid value for each new key", () => {
+    expect(parseSettings({ uiScale: "small", haptics: false, reduceMotion: "always", keepAwake: false, theme: "light" })).toMatchObject({ uiScale: "small", haptics: false, reduceMotion: "always", keepAwake: false, theme: "light" });
+  });
+});
+
+describe("restoreDefaults", () => {
+  it("returns the defaults and keeps what the guide has explained", () => {
+    const changed = { ...DEFAULT_SETTINGS, uiScale: "large" as const, theme: "light" as const, stopsOn: true, guide: false, guideSeen: { "3.3": 2 } };
+    expect(restoreDefaults(changed)).toEqual({ ...DEFAULT_SETTINGS, guideSeen: { "3.3": 2 } });
   });
 });
