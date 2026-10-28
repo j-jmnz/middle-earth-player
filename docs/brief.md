@@ -146,7 +146,7 @@ type Save = {
 // The open scenario is not stored as a table. Loading rebuilds the start from the log and the decks, then replays
 // the intents through the reducer (src/campaign/replay.ts).
 type ActiveScenario = {
-  engineVersion: number;         // ENGINE_VERSION in src/rules/version.ts (9 today)
+  engineVersion: number;         // ENGINE_VERSION in src/rules/version.ts (10 today)
   dataHash: number;              // the catalog version the intents were played against
   seed: number;
   intents: PlayerIntent[];       // every intent sent, Keep included, in order

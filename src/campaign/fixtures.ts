@@ -9,7 +9,7 @@
 // decks has been found, so neither is committed, and a name whose fixture is absent is not offered (`hasFixture`). `duo` is a
 // two-handed game of scenario 1 parked on the first player's planning window of round 1, for the flows that need two dials and a seat
 // that is not acting (the peek, `.maestro/seat-peek.yaml`). `mirkwood-won` and `mirkwood-lost` are two-handed games of Passage Through
-// Mirkwood (Mirkwood Paths part 1) from an empty log, parked on the win and on the loss (scripts/e2e-mirkwood.ts); a fixture names its campaign.
+// Mirkwood (Mirkwood Paths part 1) from an empty log, parked on the win and on the loss (the e2e-mirkwood script); a fixture names its campaign.
 import knifeFixtures from "./fixtures/a-knife-in-the-dark.json";
 import mirkwoodFixtures from "./fixtures/passage-through-mirkwood.json";
 import fixtures from "./fixtures/scenario-1.json";
