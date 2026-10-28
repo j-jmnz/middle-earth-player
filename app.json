@@ -11,6 +11,9 @@
       "icon": "./assets/expo.icon",
       "supportsTablet": true,
       "requireFullScreen": true,
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": true
+      },
       "bundleIdentifier": "com.middleearth.lcg"
     },
     "android": {

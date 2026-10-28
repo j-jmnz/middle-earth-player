@@ -150,7 +150,9 @@ export default function RootLayout() {
     <ThemeContext.Provider value={resolved}>
     <UiScaleContext.Provider value={scale}>
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.night }}>
-      <StatusBar barStyle={resolved === "dark" ? "light-content" : "dark-content"} />
+      {/* iOS sets the status bar per screen (statusBarStyle below): the table hides it, which needs view-controller-based
+          status bar appearance (app.json), and that turns this module into a no-op there. */}
+      {Platform.OS === "ios" ? null : <StatusBar barStyle={resolved === "dark" ? "light-content" : "dark-content"} />}
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <View className="flex-1" style={themeStyle}>
           {failure ? (
@@ -165,6 +167,7 @@ export default function RootLayout() {
                     headerShown: false,
                     contentStyle: { backgroundColor: palette.night },
                     orientation: "portrait",
+                    statusBarStyle: Platform.OS === "ios" ? (resolved === "dark" ? "light" : "dark") : undefined,
                   }}
                 >
                   {/* The table hides the status bar for room, and turns off the edge swipe back: a drag from the hand's edge
