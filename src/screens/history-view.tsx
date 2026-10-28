@@ -15,6 +15,7 @@ import { deckFaces } from "./deck-store";
 import { useDatabases } from "./databases";
 import { FoldHeader } from "./fold-section";
 import { goBack } from "./go-back";
+import { useListGutter } from "./list-gutter";
 import { filterRuns, groupRuns, historyItems, scopesOf, startedOf, type HistoryItem, type RunFilter } from "./history-list";
 import { courseWords, deletedWords, emptyWords, playthroughWords, plural, runDate, runLabel, scoreWords, seatsWords } from "./history-words";
 import { usePalette } from "./palette-hook";
@@ -78,6 +79,7 @@ function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; de
 /** The History screen for one starting kind (the tab that opened it). */
 export function HistoryView({ initial }: { initial: RunKind }) {
   const router = useRouter();
+  const list = useListGutter();
   const { catalog, user } = useDatabases();
   // Which playthrough groups are folded: for this viewing only (a gone playthrough would leave its id in `settings` for good).
   const [foldedGroups, setFoldedGroups] = useState<ReadonlySet<string>>(new Set());
@@ -186,13 +188,14 @@ export function HistoryView({ initial }: { initial: RunKind }) {
   return (
     <Screen testID="history" scene="plain">
       <NavBar onBack={() => goBack(router, kind === "campaign" ? "/" : "/scenarios")} backTestID="history-back" title="History" />
-      <View className="min-h-0 flex-1" testID="history-list">
+      <View className="min-h-0 flex-1" testID="history-list" onLayout={list.onLayout}>
         <FlashList
           data={items}
           extraData={{ refs, playthroughs, nameOf }}
           keyExtractor={(item) => (item.type === "group" ? item.id : `run-${item.id}`)}
           getItemType={(item) => (item.type === "group" ? "group" : "run")}
           style={{ flex: 1 }}
+          contentContainerStyle={list.contentContainerStyle}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={listHead}
           ListFooterComponent={<View className="pb-safe" />}

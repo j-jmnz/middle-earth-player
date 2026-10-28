@@ -10,7 +10,7 @@ import { isPlayable } from "../../../campaign/playable";
 import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { BOXES, scenarioName } from "../../campaign-data";
-import { BodyText, Chevron, Chip, Eyebrow, Label, Panel, Screen, ScreenScroll, ScreenTitle, Section, TextButton } from "../../chrome";
+import { BodyText, Column, Chevron, Chip, Eyebrow, Label, Panel, Screen, ScreenScroll, ScreenTitle, Section, TextButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt, SceneCard } from "../../art";
 import { usePalette } from "../../palette-hook";
@@ -22,7 +22,11 @@ import { KeepOrDelete } from "../../keep-or-delete";
 import { gameCaption, statusWord, STANDALONE_DROPPED } from "../../standalone-words";
 import { seatWord } from "../../seats";
 import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandalone } from "../../standalone-store";
+import { useSplitColumns } from "../../use-split-columns";
 import { useUiScale } from "../../../play/ui-scale";
+
+// The right column of the two-column Scenarios (docs/design-system.md, Tablets).
+const SIDE_RANGE = { min: 360, max: 440 };
 
 const DELETE_SENTENCE = "Delete this game? It is gone for good. Your decks stay.";
 
@@ -30,6 +34,8 @@ export default function Scenarios() {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
+  const columns = useSplitColumns(SIDE_RANGE);
+  const { size } = columns;
   const router = useRouter();
   const { user } = useDatabases();
   const [games, setGames] = useState<StandaloneGame[]>([]);
@@ -180,10 +186,104 @@ export default function Scenarios() {
       </Pressable>
     );
   }
+  // Expanded: the boxes on the left, the games on the right (docs/design-system.md, Tablets); otherwise one column, as on a phone.
+  const split = size === "expanded" ? columns.side : null;
+  const twoColumns = split != null;
+  const playingBlock = playing.length > 0 ? (
+    <View className={twoColumns ? "gap-3" : "mt-5 gap-3"} testID="standalone-playing">
+      {playing.map((game, index) => renderGame(game, index === 0))}
+    </View>
+  ) : null;
+  const boxesBlock = (
+    <View className={twoColumns ? "gap-6" : "mt-5 gap-6"} testID="standalone-scenarios">
+      {BOXES.map((box) => (
+      <View key={box.id} testID={`box-${box.id}`}>
+      <FoldSection id={`box-${box.id}`} title={box.name} count={box.scenarios.length} unit="scenario" {...fold(`box-${box.id}`)}>
+      <View className="gap-2.5">
+        {box.scenarios.map((id, index) => {
+          const playable = isPlayable(id);
+          return (
+            <Pressable
+              key={id}
+              testID={`standalone-${id}`}
+              collapsable={false}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !playable }}
+              accessibilityLabel={playable ? `Play ${nameOf(id)}` : `${nameOf(id)}, not playable yet`}
+              disabled={!playable}
+              onPress={() => brief(id)}
+            >
+              {({ pressed }) => (
+                <View
+                  className="flex-row items-center gap-3.5 overflow-hidden rounded-card pr-4"
+                  style={{ ...panelSurface(pressed, t), boxShadow: raisedEdgeOf(t) }}
+                >
+                  <View style={{ width: 92 * s, height: 68 * s }}>
+                    <SceneArt scenarioId={id} width={92 * s} height={68 * s}>
+                      {/* A scenario not playable yet keeps its faint words at full strength; only its scene is veiled. */}
+                      <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? "transparent" : withAlphaHex(palette.night, 0.6) }} />
+                    </SceneArt>
+                    <View className="absolute bottom-1.5 left-1.5 h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(palette.night, 0.8), borderWidth: 1, borderColor: playable ? palette.goldLine : palette.hairline }}>
+                      <Text className={`font-display-bold text-micro ${playable ? "text-gold" : "text-faint"}`}>{String(index + 1)}</Text>
+                    </View>
+                  </View>
+                  <View className="flex-1 py-2">
+                    <Text className={`font-display text-heading ${playable ? "text-bone" : "text-faint"}`} numberOfLines={2}>
+                      {nameOf(id)}
+                    </Text>
+                    {playable ? null : <Text className="text-label text-faint">Not playable yet</Text>}
+                  </View>
+                  {playable ? <Chevron direction="right" color={palette.faint} size={8} /> : null}
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+      </FoldSection>
+      </View>
+      ))}
+    </View>
+  );
+  const gamesBlock = (
+    <View className={twoColumns ? "gap-3" : "mt-6 gap-3"} testID="standalone-games">
+      <Section title="Games" />
+      {games.length === 0 ? <BodyText tone="muted">{archived.length === 0 ? "No game yet. Pick a scenario to deal one." : "No open game. Pick a scenario to deal one."}</BodyText> : null}
+      {finished.map((game) => renderGame(game))}
+      {archived.length > 0 ? (
+        <View testID="archived-games">
+          <FoldSection
+            id="archived-games"
+            title="Archived"
+            count={archived.length}
+            unit="game"
+            testID="archived-toggle"
+            folded={folds.folded("archived-games", true)}
+            onFold={(next) => {
+              folds.setFolded("archived-games", next, true);
+              // A folded list keeps no pending delete confirm.
+              if (next) setDeleting(null);
+            }}
+          >
+            <View className="gap-3 pt-1">
+              {archived.map((game) => (
+                <View key={game.id} testID={`archived-${game.id}`}>
+                  <Panel unfilled>
+                    <Text className="font-display text-title text-muted">{nameOf(game.scenarioId)}</Text>
+                    <Label>{gameCaption(game)}</Label>
+                    {actions(game, { label: "Restore", onPress: () => restore(game) })}
+                  </Panel>
+                </View>
+              ))}
+            </View>
+          </FoldSection>
+        </View>
+      ) : null}
+    </View>
+  );
 
-  return (
-    <Screen testID="scenarios" scene="dusk">
-      <ScreenScroll>
+  const page = (
+    <>
         <View className="flex-row items-start justify-between pt-4">
           <View className="flex-1">
             <ScreenTitle>Scenarios</ScreenTitle>
@@ -205,96 +305,30 @@ export default function Scenarios() {
           </View>
         </View>
 
-        {playing.length > 0 ? (
-          <View className="mt-5 gap-3" testID="standalone-playing">
-            {playing.map((game, index) => renderGame(game, index === 0))}
-          </View>
-        ) : null}
-
-        <View className="mt-5 gap-6" testID="standalone-scenarios">
-          {BOXES.map((box) => (
-          <View key={box.id} testID={`box-${box.id}`}>
-          <FoldSection id={`box-${box.id}`} title={box.name} count={box.scenarios.length} unit="scenario" {...fold(`box-${box.id}`)}>
-          <View className="gap-2.5">
-            {box.scenarios.map((id, index) => {
-              const playable = isPlayable(id);
-              return (
-                <Pressable
-                  key={id}
-                  testID={`standalone-${id}`}
-                  collapsable={false}
-                  accessibilityRole="button"
-                  accessibilityState={{ disabled: !playable }}
-                  accessibilityLabel={playable ? `Play ${nameOf(id)}` : `${nameOf(id)}, not playable yet`}
-                  disabled={!playable}
-                  onPress={() => brief(id)}
-                >
-                  {({ pressed }) => (
-                    <View
-                      className="flex-row items-center gap-3.5 overflow-hidden rounded-card pr-4"
-                      style={{ ...panelSurface(pressed, t), boxShadow: raisedEdgeOf(t) }}
-                    >
-                      <View style={{ width: 92 * s, height: 68 * s }}>
-                        <SceneArt scenarioId={id} width={92 * s} height={68 * s}>
-                          {/* A scenario not playable yet keeps its faint words at full strength; only its scene is veiled. */}
-                          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? "transparent" : withAlphaHex(palette.night, 0.6) }} />
-                        </SceneArt>
-                        <View className="absolute bottom-1.5 left-1.5 h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(palette.night, 0.8), borderWidth: 1, borderColor: playable ? palette.goldLine : palette.hairline }}>
-                          <Text className={`font-display-bold text-micro ${playable ? "text-gold" : "text-faint"}`}>{String(index + 1)}</Text>
-                        </View>
-                      </View>
-                      <View className="flex-1 py-2">
-                        <Text className={`font-display text-heading ${playable ? "text-bone" : "text-faint"}`} numberOfLines={2}>
-                          {nameOf(id)}
-                        </Text>
-                        {playable ? null : <Text className="text-label text-faint">Not playable yet</Text>}
-                      </View>
-                      {playable ? <Chevron direction="right" color={palette.faint} size={8} /> : null}
-                    </View>
-                  )}
-                </Pressable>
-              );
-            })}
-          </View>
-          </FoldSection>
-          </View>
-          ))}
-        </View>
-
-        <View className="mt-6 gap-3" testID="standalone-games">
-          <Section title="Games" />
-          {games.length === 0 ? <BodyText tone="muted">{archived.length === 0 ? "No game yet. Pick a scenario to deal one." : "No open game. Pick a scenario to deal one."}</BodyText> : null}
-          {finished.map((game) => renderGame(game))}
-          {archived.length > 0 ? (
-            <View testID="archived-games">
-              <FoldSection
-                id="archived-games"
-                title="Archived"
-                count={archived.length}
-                unit="game"
-                testID="archived-toggle"
-                folded={folds.folded("archived-games", true)}
-                onFold={(next) => {
-                  folds.setFolded("archived-games", next, true);
-                  // A folded list keeps no pending delete confirm.
-                  if (next) setDeleting(null);
-                }}
-              >
-                <View className="gap-3 pt-1">
-                  {archived.map((game) => (
-                    <View key={game.id} testID={`archived-${game.id}`}>
-                      <Panel unfilled>
-                        <Text className="font-display text-title text-muted">{nameOf(game.scenarioId)}</Text>
-                        <Label>{gameCaption(game)}</Label>
-                        {actions(game, { label: "Restore", onPress: () => restore(game) })}
-                      </Panel>
-                    </View>
-                  ))}
-                </View>
-              </FoldSection>
+        {twoColumns ? (
+          <View className="mt-5 flex-row items-start" style={{ gap: split.gap }} testID="scenarios-columns">
+            <View className="min-w-0 flex-1">{boxesBlock}</View>
+            <View className="gap-6" style={{ width: split.side }}>
+              {playingBlock}
+              {gamesBlock}
             </View>
-          ) : null}
-        </View>
+          </View>
+        ) : (
+          <>
+            {playingBlock}
+            {boxesBlock}
+            {gamesBlock}
+          </>
+        )}
+    </>
+  );
+
+  return (
+    <Screen testID="scenarios" scene="dusk">
+      {/* An expanded window scrolls in a wide column; the measurer (outside the columns) decides whether it splits, else one readable column. */}
+      <ScreenScroll max={size === "expanded" ? "wide" : "readable"}>
+        {size === "expanded" ? <View style={{ height: 0 }} onLayout={columns.measure} /> : null}
+        {size === "expanded" && !twoColumns ? <Column>{page}</Column> : page}
       </ScreenScroll>
     </Screen>
   );

@@ -11,6 +11,7 @@ import { readBooklet, writeLastPage, type BookletRow } from "../../campaign-stor
 import { useDatabases } from "../../databases";
 import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
+import { useSizeClass } from "../../../play/use-size-class";
 
 // Full-screen reader for one stored PDF. It opens from the campaign list, the path, the briefing and the log, and Close
 // returns to the screen that opened it. The engine never reads the file, and a missing file blocks nothing.
@@ -24,6 +25,9 @@ function CloseBar({ onClose }: { onClose: () => void }) {
 
 export default function Booklet() {
   const palette = usePalette();
+  const { size, s } = useSizeClass();
+  // The empty and installing states sit in a 480 pt column outside compact; the PDF stays full bleed.
+  const column = size === "compact" ? undefined : { width: "100%" as const, maxWidth: 480 * s, alignSelf: "center" as const };
   const router = useRouter();
   const params = useLocalSearchParams<{ id: string; page?: string }>();
   const id = routeCode(params.id);
@@ -99,7 +103,7 @@ export default function Booklet() {
   if (installing) {
     return (
       <Screen testID="booklet" scene="plain">
-        <View testID="booklet-installing" className="flex-1 items-center justify-center gap-4 px-2">
+        <View testID="booklet-installing" className="flex-1 items-center justify-center gap-4 px-2" style={column}>
           <RingMark size={28} state="current" />
           <BodyText tone="muted" className="text-center">
             {`Opening ${bookletName(id)}`}
@@ -127,7 +131,7 @@ export default function Booklet() {
 
   return (
     <Screen testID="booklet" scene="plain">
-      <View testID="booklet-empty" className="flex-1 items-center justify-center gap-4 px-2">
+      <View testID="booklet-empty" className="flex-1 items-center justify-center gap-4 px-2" style={column}>
         <View className="h-32 w-24 items-center justify-center rounded-tile" style={{ borderWidth: 1.5, borderStyle: "dashed", borderColor: palette.gold }}>
           <RingMark size={28} state="current" />
         </View>

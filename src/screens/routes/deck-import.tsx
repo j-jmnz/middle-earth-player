@@ -29,7 +29,9 @@ import {
 import { useDatabases } from "../databases";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
 import { notAppliedCodes } from "../../play/not-applied";
+import { useUiScale } from "../../play/ui-scale";
 import { goBack } from "../go-back";
+import { useListGutter } from "../list-gutter";
 import { showToast } from "../toast";
 
 const FETCH_FAILURE = "RingsDB did not respond.";
@@ -59,6 +61,9 @@ async function droppedName(code: string): Promise<string> {
 
 export default function DeckImportScreen() {
   const router = useRouter();
+  const list = useListGutter("readable", 0);
+  const scale = useUiScale();
+  const pad = list.inset > 0 ? { paddingHorizontal: Math.max(list.inset, 24 * scale) } : undefined;
   const { catalog, user } = useDatabases();
   const pool = useMemo(() => {
     const rows = catalog
@@ -162,7 +167,7 @@ export default function DeckImportScreen() {
 
   // The screen is not inset, so a pinned group heading spans the width as a bar; every row pads itself.
   const form = (
-    <View className="px-6 pb-2">
+    <View className="px-6 pb-2" style={pad}>
       <View className="pt-6">
         <ScreenTitle>Import</ScreenTitle>
       </View>
@@ -189,14 +194,14 @@ export default function DeckImportScreen() {
   function renderRow({ item }: { item: PrebuiltRow }) {
     if (item.kind === "group") {
       return (
-        <View accessibilityRole="header" className="border-b border-hairline bg-night px-6 pb-2 pt-6">
+        <View accessibilityRole="header" className="border-b border-hairline bg-night px-6 pb-2 pt-6" style={pad}>
           <Eyebrow tone="moon">{item.title}</Eyebrow>
         </View>
       );
     }
     const deck = item.deck;
     return (
-      <View className="px-6">
+      <View className="px-6" style={pad}>
         <ListRow
           testID={`deck-prebuilt-${deck.id}`}
           label={deck.name}
@@ -213,18 +218,20 @@ export default function DeckImportScreen() {
       <View className="px-6">
         <NavBar backLabel="Decks" backTestID="deck-import-back" onBack={() => goBack(router, "/decks")} />
       </View>
-      <FlashList
-        data={PREBUILT_ROWS}
-        keyExtractor={(item) => (item.kind === "group" ? `group-${item.title}` : item.deck.id)}
-        getItemType={(item) => item.kind}
-        renderItem={renderRow}
-        stickyHeaderIndices={STICKY}
-        ListHeaderComponent={form}
-        ListFooterComponent={<View className="pb-safe" />}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        style={{ flex: 1 }}
-      />
+      <View className="min-h-0 flex-1" onLayout={list.onLayout}>
+        <FlashList
+          data={PREBUILT_ROWS}
+          keyExtractor={(item) => (item.kind === "group" ? `group-${item.title}` : item.deck.id)}
+          getItemType={(item) => item.kind}
+          renderItem={renderRow}
+          stickyHeaderIndices={STICKY}
+          ListHeaderComponent={form}
+          ListFooterComponent={<View className="pb-safe" />}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          style={{ flex: 1 }}
+        />
+      </View>
     </Screen>
   );
 }

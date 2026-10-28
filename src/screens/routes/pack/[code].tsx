@@ -5,7 +5,8 @@ import { useMemo } from "react";
 import { View } from "react-native";
 
 import { cards, packs } from "../../../catalog/schema";
-import { BodyText, ListRow, NavBar, Screen, ScreenTitle } from "../../chrome";
+import { BodyText, Column, ListRow, NavBar, Screen, ScreenTitle } from "../../chrome";
+import { useListGutter } from "../../list-gutter";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { cardImageUrl, shownCardImage } from "../../images/policy";
@@ -64,6 +65,7 @@ function PackCardRow({ item, onPress, onPreview }: { item: PackCard; onPress: ()
 
 export default function PackCards() {
   const router = useRouter();
+  const list = useListGutter();
   const params = useLocalSearchParams<{ code: string }>();
   const code = routeCode(params.code);
   const { catalog } = useDatabases();
@@ -91,21 +93,28 @@ export default function PackCards() {
   return (
     <Screen>
       <NavBar backTestID="pack-back" backLabel="Packs" onBack={() => goBack(router, "/packs")} />
-      <View className="pt-2">
-        <ScreenTitle size="title">{pack?.name ?? "Pack"}</ScreenTitle>
-      </View>
+      <Column>
+        <View className="pt-2">
+          <ScreenTitle size="title">{pack?.name ?? "Pack"}</ScreenTitle>
+        </View>
+      </Column>
       {!pack ? (
-        <BodyText className="mt-6">{`Pack ${code} is not in the catalog.`}</BodyText>
+        <Column>
+          <BodyText className="mt-6">{`Pack ${code} is not in the catalog.`}</BodyText>
+        </Column>
       ) : rows.length === 0 ? (
-        <BodyText tone="muted" className="mt-6">
-          This pack has no cards.
-        </BodyText>
+        <Column>
+          <BodyText tone="muted" className="mt-6">
+            This pack has no cards.
+          </BodyText>
+        </Column>
       ) : (
-        <View className="mt-4 flex-1">
+        <View className="mt-4 flex-1" onLayout={list.onLayout}>
           <FlashList
             data={rows}
             keyExtractor={(item) => item.code}
             style={{ flex: 1 }}
+            contentContainerStyle={list.contentContainerStyle}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
             ListFooterComponent={<View className="pb-safe" />}

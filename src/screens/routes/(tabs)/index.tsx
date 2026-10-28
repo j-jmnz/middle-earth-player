@@ -5,7 +5,7 @@ import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
 import { carryOffers } from "../../../campaign/carry-over";
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
-import { Panel, RingMark, Screen, ScreenScroll, ScreenTitle, SecondaryButton, TextButton } from "../../chrome";
+import { Column, Panel, RingMark, Screen, ScreenScroll, ScreenTitle, SecondaryButton, TextButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import type { ArtCard } from "../../art";
 import { deckFaces } from "../../deck-store";
@@ -21,8 +21,12 @@ import { KeepOrDelete } from "../../keep-or-delete";
 import { ContinuePanel, DELETE_SENTENCE, SaveRow, SaveSummary, describe, nextSummary, type SaveLine } from "../../save-panels";
 import { nextStepHref, pathHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
+import { useSplitColumns } from "../../use-split-columns";
 
 type Seats = 1 | 2;
+
+// The right column of the two-column Campaigns (docs/design-system.md, Tablets).
+const SIDE_RANGE = { min: 360, max: 440 };
 
 // The fellowship a playthrough plays: the heroes the campaign log records, else the heroes the last loadout dealt.
 function partyCodes(save: Save): string[] {
@@ -33,6 +37,8 @@ function partyCodes(save: Save): string[] {
 
 export default function CampaignList() {
   const palette = usePalette();
+  const columns = useSplitColumns(SIDE_RANGE);
+  const { size } = columns;
   const router = useRouter();
   // `start=1`: a finished campaign's path sends the player here with the start panel open, to take its carry-over in.
   const { start: startParam } = useLocalSearchParams<{ start?: string }>();
@@ -214,9 +220,111 @@ export default function CampaignList() {
     );
   };
 
-  return (
-    <Screen testID="campaign-list" scene="dusk">
-      <ScreenScroll scrollRef={scroll}>
+  const currentBlock = current ? (
+    // Folded, the header says the next step: the Continue card's primary button is hidden with it.
+    <FoldSection id="current" title="Current playthrough" count={1} unit="playthrough" summary={nextSummary(lineOf(current).next)} {...fold("current")}>
+      <View className="pt-1">{managing ? managed(current, 0) : continuing(current)}</View>
+    </FoldSection>
+  ) : null;
+  const othersBlock =
+    others.length > 0 ? (
+      <FoldSection id="others" title="Other journeys" count={others.length} unit="journey" {...fold("others")}>
+        <View className="gap-3 pt-1">
+          {others.map((save, index) =>
+            managing ? (
+              managed(save, index + 1)
+            ) : (
+              <View key={save.id}>
+                <SaveRow id={save.id} line={lineOf(save)} lead={partyOf(save)[0] ?? null} onPress={() => openPath(save)} />
+              </View>
+            ),
+          )}
+        </View>
+      </FoldSection>
+    ) : null;
+  // Two columns when the window is expanded and there is something to continue (the start panel alone takes a readable column).
+  // With Manage on, nothing to start and nothing archived or locked, the right column would be empty: one readable column then.
+  const rightColumn = !(managing && archived.length === 0 && locked.length === 0);
+  const split = size === "expanded" && saves.length > 0 && rightColumn ? columns.side : null;
+  const twoColumns = split != null;
+  const startBlock = showStart ? (
+    <View
+      className={saves.length > 0 && !twoColumns ? "mt-2" : undefined}
+      onLayout={(event) => {
+        startAt.current = event.nativeEvent.layout.y;
+        // In two columns the start panel already heads the right column: nothing to scroll to.
+        if (starting && !twoColumns) scroll.current?.scrollTo({ y: Math.max(0, startAt.current - 8), animated: true });
+      }}
+    >
+      {saves.length > 0 ? (
+        <FoldSection
+          id="start"
+          title="New playthrough"
+          {...fold("start")}
+          right={<TextButton label="Cancel" testID="start-cancel" tone="muted" accessibilityLabel="Cancel the new playthrough" onPress={() => setStarting(false)} />}
+        >
+          {startPanel}
+        </FoldSection>
+      ) : (
+        startPanel
+      )}
+    </View>
+  ) : null;
+  const newButton =
+    !showStart && !managing ? (
+      <SecondaryButton
+        label="New playthrough"
+        testID="new-playthrough"
+        tone="gold"
+        compact
+        onPress={() => {
+          folds.setFolded("start", false);
+          setStarting(true);
+        }}
+      />
+    ) : null;
+  const archivedBlock =
+    archived.length > 0 ? (
+      <View testID="archived-playthroughs">
+        <FoldSection id="archived" title="Archived" count={archived.length} unit="playthrough" testID="archived-toggle" {...foldArchived("archived")}>
+          <View className="gap-3 pt-1">
+            {archived.map((save) => (
+              <View key={save.id} testID={`archived-${save.id}`}>
+                <Panel unfilled>
+                  <SaveSummary line={lineOf(save)} eyebrow={false} archived />
+                  {actions(save, { label: "Restore", onPress: () => restore(save) })}
+                </Panel>
+              </View>
+            ))}
+          </View>
+        </FoldSection>
+      </View>
+    ) : null;
+  const lockedBlock =
+    locked.length > 0 ? (
+      <View className={twoColumns ? undefined : "mt-2"}>
+        <FoldSection id="coming" title="Coming later" count={locked.length} unit="campaign" {...fold("coming")}>
+          <View className="flex-row flex-wrap gap-3 pt-1" testID="locked-campaigns">
+            {locked.map((tile) => (
+              <View
+                key={tile.id}
+                testID={`locked-${tile.id}`}
+                accessible
+                accessibilityLabel={`${tile.name}, ${tile.caption}`}
+                className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-card px-4 py-4"
+                style={{ borderWidth: 1, borderStyle: "dashed", borderColor: palette.hairline }}
+              >
+                <RingMark size={14} state="locked" />
+                <Text className="mt-2 font-display text-heading text-faint">{tile.name}</Text>
+                <Text className="text-label text-faint">{tile.caption}</Text>
+              </View>
+            ))}
+          </View>
+        </FoldSection>
+      </View>
+    ) : null;
+  const page = (
+    <>
         <View className="flex-row items-center justify-between pb-3 pt-4">
           <ScreenTitle>Campaigns</ScreenTitle>
           <View className="-mr-3 flex-row">
@@ -232,101 +340,43 @@ export default function CampaignList() {
             ) : null}
           </View>
         </View>
-        <View className="gap-3">
-          {current ? (
-            // Folded, the header says the next step: the Continue card's primary button is hidden with it.
-            <FoldSection id="current" title="Current playthrough" count={1} unit="playthrough" summary={nextSummary(lineOf(current).next)} {...fold("current")}>
-              <View className="pt-1">{managing ? managed(current, 0) : continuing(current)}</View>
-            </FoldSection>
-          ) : null}
-          {others.length > 0 ? (
-            <FoldSection id="others" title="Other journeys" count={others.length} unit="journey" {...fold("others")}>
-              <View className="gap-3 pt-1">
-                {others.map((save, index) =>
-                  managing ? (
-                    managed(save, index + 1)
-                  ) : (
-                    <View key={save.id}>
-                      <SaveRow id={save.id} line={lineOf(save)} lead={partyOf(save)[0] ?? null} onPress={() => openPath(save)} />
-                    </View>
-                  ),
-                )}
-              </View>
-            </FoldSection>
-          ) : null}
-          {showStart ? (
-            <View
-              className={saves.length > 0 ? "mt-2" : undefined}
-              onLayout={(event) => {
-                startAt.current = event.nativeEvent.layout.y;
-                if (starting) scroll.current?.scrollTo({ y: Math.max(0, startAt.current - 8), animated: true });
-              }}
-            >
-              {saves.length > 0 ? (
-                <FoldSection
-                  id="start"
-                  title="New playthrough"
-                  {...fold("start")}
-                  right={<TextButton label="Cancel" testID="start-cancel" tone="muted" accessibilityLabel="Cancel the new playthrough" onPress={() => setStarting(false)} />}
-                >
-                  {startPanel}
-                </FoldSection>
-              ) : (
-                startPanel
-              )}
+        {twoColumns ? (
+          // The journeys on the left, what starts or stores them on the right (docs/design-system.md, Tablets).
+          <View
+            className="flex-row items-start"
+            style={{ gap: split.gap }}
+            testID="campaign-columns"
+          >
+            <View className="min-w-0 flex-1 gap-3">
+              {currentBlock}
+              {othersBlock}
             </View>
-          ) : null}
-          {!showStart && !managing ? (
-            <SecondaryButton
-              label="New playthrough"
-              testID="new-playthrough"
-              tone="gold"
-              compact
-              onPress={() => {
-                folds.setFolded("start", false);
-                setStarting(true);
-              }}
-            />
-          ) : null}
-          {archived.length > 0 ? (
-            <View testID="archived-playthroughs">
-              <FoldSection id="archived" title="Archived" count={archived.length} unit="playthrough" testID="archived-toggle" {...foldArchived("archived")}>
-                <View className="gap-3 pt-1">
-                  {archived.map((save) => (
-                    <View key={save.id} testID={`archived-${save.id}`}>
-                      <Panel unfilled>
-                        <SaveSummary line={lineOf(save)} eyebrow={false} archived />
-                        {actions(save, { label: "Restore", onPress: () => restore(save) })}
-                      </Panel>
-                    </View>
-                  ))}
-                </View>
-              </FoldSection>
+            <View className="gap-3" style={{ width: split.side }}>
+              {startBlock}
+              {newButton}
+              {archivedBlock}
+              {lockedBlock}
             </View>
-          ) : null}
-          {locked.length > 0 ? (
-            <View className="mt-2">
-              <FoldSection id="coming" title="Coming later" count={locked.length} unit="campaign" {...fold("coming")}>
-                <View className="flex-row flex-wrap gap-3 pt-1" testID="locked-campaigns">
-                  {locked.map((tile) => (
-                    <View
-                      key={tile.id}
-                      testID={`locked-${tile.id}`}
-                      accessible
-                      accessibilityLabel={`${tile.name}, ${tile.caption}`}
-                      className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-card px-4 py-4"
-                      style={{ borderWidth: 1, borderStyle: "dashed", borderColor: palette.hairline }}
-                    >
-                      <RingMark size={14} state="locked" />
-                      <Text className="mt-2 font-display text-heading text-faint">{tile.name}</Text>
-                      <Text className="text-label text-faint">{tile.caption}</Text>
-                    </View>
-                  ))}
-                </View>
-              </FoldSection>
-            </View>
-          ) : null}
-        </View>
+          </View>
+        ) : (
+          <View className="gap-3">
+            {currentBlock}
+            {othersBlock}
+            {startBlock}
+            {newButton}
+            {archivedBlock}
+            {lockedBlock}
+          </View>
+        )}
+    </>
+  );
+
+  return (
+    <Screen testID="campaign-list" scene="dusk">
+      {/* An expanded window scrolls in a wide column; the measurer (outside the columns) decides whether it splits, else one readable column. */}
+      <ScreenScroll scrollRef={scroll} max={size === "expanded" ? "wide" : "readable"}>
+        {size === "expanded" ? <View style={{ height: 0 }} onLayout={columns.measure} /> : null}
+        {size === "expanded" && !twoColumns ? <Column>{page}</Column> : page}
       </ScreenScroll>
     </Screen>
   );

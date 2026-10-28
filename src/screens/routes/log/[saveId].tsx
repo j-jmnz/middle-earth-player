@@ -5,7 +5,7 @@ import { ScrollView, Text, TextInput, View } from "react-native";
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { cards } from "../../../catalog/schema";
 import { inArray } from "drizzle-orm";
-import { BodyText, Eyebrow, IconButton, NavBar, PrimaryButton, Screen } from "../../chrome";
+import { BodyText, Column, Eyebrow, IconButton, NavBar, PrimaryButton, Screen } from "../../chrome";
 import { bookletParams, campaignOf, scenarioNames } from "../../campaign-data";
 import { carryWords } from "../../carry-words";
 import { poolCardWords, usedOnceWords } from "../../log-facts";
@@ -98,6 +98,7 @@ export default function Log() {
     <Screen testID="log" scene="plain">
       {back}
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-safe" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
+        <Column>
         <View className="mt-2 rounded-card bg-paper px-5 py-5" style={{ borderWidth: 1, borderColor: palette.paperEdge }}>
           <View className="items-center">
             <Eyebrow tone="inkLabel">{campaign.name}</Eyebrow>
@@ -163,6 +164,7 @@ export default function Log() {
             />
           </View>
         ) : null}
+        </Column>
       </ScrollView>
     </Screen>
   );
