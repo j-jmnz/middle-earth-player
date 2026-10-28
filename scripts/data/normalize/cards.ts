@@ -36,7 +36,7 @@ const overridesSchema = z.object({
   cards: z.array(
     z.object({
       match: z.object({ code: z.string().optional(), name: z.string().optional(), set: z.string().optional(), number: z.number().optional() }),
-      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), name: z.string().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
+      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), name: z.string().optional(), threat: z.number().int().optional(), engagementCost: z.number().int().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
       reason: z.string().min(1),
       source: z.string().min(1),
     }),
@@ -467,7 +467,9 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const withKeywords = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
     const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
     const named = set?.name ? { ...withBurden, name: set.name } : withBurden;
-    const next = outOfScope(overrides, named) ? { ...named, deckLegal: false } : named;
+    // A printed Threat or engagement cost a source leaves out (a burden enemy: Hall of Beorn files its Threat icon as Willpower).
+    const stated = set?.threat != null || set?.engagementCost != null ? { ...named, ...(set.threat != null ? { threat: set.threat } : {}), ...(set.engagementCost != null ? { engagementCost: set.engagementCost } : {}) } : named;
+    const next = outOfScope(overrides, stated) ? { ...stated, deckLegal: false } : stated;
     cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));

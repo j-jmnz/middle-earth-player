@@ -107,6 +107,17 @@
       },
       "reason": "Hall of Beorn spells it 'Striken Dumb' (its own image path 403s; the corrected 'Stricken-Dumb.jpg' resolves). The card is Stricken Dumb.",
       "source": "scan 141064.A (Stricken-Dumb.jpg)"
+    },
+    {
+      "match": {
+        "code": "41041"
+      },
+      "set": {
+        "threat": 2,
+        "engagementCost": 10
+      },
+      "reason": "Hall of Beorn gives the burden enemy Stalking Goblin no Threat and no engagement cost, and files its Threat icon (2) as Willpower. The scan prints Threat 2 and engagement cost 10 (the number at the top of the card), Attack 2, Defense 2 and 2 hit points, so the engagement check can engage it and it counts in the staging area. Ungoliant's Swarm (01136) has the same gap and is left as phase 29 shipped it.",
+      "source": "scan 41041.A, data/printed/mirkwood-paths.json"
     }
   ],
   "scenarioPiles": [

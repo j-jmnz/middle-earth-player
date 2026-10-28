@@ -104,7 +104,7 @@ function play(seed: number): { loadout: StoredLoadout; intents: PlayerIntent[]; 
 }
 
 function firstSeed(wanted: (state: ScenarioState) => boolean, label: string): OathFixture | null {
-  const limit = Number(process.env.OATH_SEEDS ?? 80);
+  const limit = Number(process.env.OATH_SEEDS ?? 200);
   for (let seed = 1; seed <= limit; seed += 1) {
     const game = play(seed);
     say.debug(`seed ${seed}: ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "stalled"}`);
