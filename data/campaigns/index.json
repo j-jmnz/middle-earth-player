@@ -9,7 +9,7 @@
     "id": "mirkwood-paths",
     "name": "Mirkwood Paths",
     "scenarioCount": 5,
-    "playable": false
+    "playable": true
   },
   {
     "id": "the-dark-of-mirkwood",

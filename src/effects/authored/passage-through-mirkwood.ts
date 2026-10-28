@@ -5,7 +5,8 @@ import type { Effect } from "../../catalog/boundary.ts";
 // Rules: rr.step-3-3, rr.travel, rr.search, rr.first-player, rr.quest-advancement, rr.campaign-cards (data/rules/entries.json).
 const READY_CHARACTER = {"type":"character","control":"you","state":"ready"} as const;
 const NOT_UNDEFENDED = {"kind":"not","condition":{"kind":"undefended"}} as const;
-const STAGING = {"type":"card","control":"any","stagingOnly":true} as const;
+// The treachery being revealed waits in the staging area while it resolves (rules/frames.ts): "the staging area" here is the other cards.
+const STAGING = {"type":"card","control":"any","stagingOnly":true,"other":true} as const;
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 01074 King Spider: every player exhausts a character; as a Shadow card the defending player exhausts one (two when undefended).
