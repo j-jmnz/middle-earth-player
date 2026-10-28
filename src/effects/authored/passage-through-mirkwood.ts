@@ -7,6 +7,9 @@ const READY_CHARACTER = {"type":"character","control":"you","state":"ready"} as 
 const NOT_UNDEFENDED = {"kind":"not","condition":{"kind":"undefended"}} as const;
 // The treachery being revealed waits in the staging area while it resolves (rules/frames.ts): "the staging area" here is the other cards.
 const STAGING = {"type":"card","control":"any","stagingOnly":true,"other":true} as const;
+// The cards that take Driven by Shadow's +1 Threat: the enemies and locations in the staging area (01092:A:1), not the other cards there.
+const STAGING_ENEMIES = {"type":"enemy","control":"any","stagingOnly":true} as const;
+const STAGING_LOCATIONS = {"type":"location","control":"any","stagingOnly":true} as const;
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 01074 King Spider: every player exhausts a character; as a Shadow card the defending player exhausts one (two when undefended).
@@ -38,7 +41,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 01091 Dol Guldur Beastmaster
   {"id":"01091:forced:1","cardCode":"01091","lines":["01091:A:1"],"timing":"forced","trigger":"attacks","instructions":[{"verb":"DealShadow","additional":true}]},
   // 01092 Driven by Shadow: every enemy and location in the staging area gets +1 Threat; surge when there is none.
-  {"id":"01092:whenRevealed:1","cardCode":"01092","lines":["01092:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"threat","amount":1,"until":"endOfPhase","holders":STAGING},{"verb":"GainSurge","when":{"kind":"count","pick":STAGING,"max":0}}]},
+  {"id":"01092:whenRevealed:1","cardCode":"01092","lines":["01092:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"threat","amount":1,"until":"endOfPhase","holders":STAGING_ENEMIES},{"verb":"ModifyStat","stat":"threat","amount":1,"until":"endOfPhase","holders":STAGING_LOCATIONS},{"verb":"GainSurge","when":{"kind":"count","pick":STAGING,"max":0}}]},
   {"id":"01092:shadow:1","cardCode":"01092","lines":["01092:A:2"],"timing":"shadow","instructions":[{"verb":"Pick","pick":{"type":"attachment","control":"any","attachedTo":"defender"},"when":NOT_UNDEFENDED},{"verb":"DiscardPicked","when":NOT_UNDEFENDED},{"verb":"Each","pick":{"type":"attachment","control":"you"},"instructions":[{"verb":"DiscardPicked"}],"when":{"kind":"undefended"}}]},
   // 01093 The Necromancer's Reach
   {"id":"01093:whenRevealed:1","cardCode":"01093","lines":["01093:A:1"],"timing":"whenRevealed","instructions":[{"verb":"DamageEach","amount":1,"pick":{"type":"character","control":"any","state":"exhausted"}}]},

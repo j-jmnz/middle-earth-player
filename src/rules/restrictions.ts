@@ -54,7 +54,7 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       if (instruction.verb === "ForEachPlayer") {
         const cost = instruction.instructions.find((inner) => inner.verb === "Pick");
         const exhausts = instruction.instructions.some((inner) => inner.verb === "Exhaust");
-        return cost?.verb === "Pick" && exhausts && livingSeats(state).some((seat) => pickCandidates(state, cost.pick, seat, [], null, ctx).length === 0);
+        return cost?.verb === "Pick" && exhausts && livingSeats(state).some((seat) => pickCandidates(state, cost.pick, seat, [], locationId, ctx).length === 0);
       }
       if (instruction.verb !== "Exhaust" || instruction.target?.kind !== "byCode") return false;
       const named = instruction.target.code;
