@@ -6,7 +6,7 @@ import { legalIntents } from "../src/rules/legal.ts";
 import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../src/rules/reduce.ts";
 import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
-import { attachTo, spawn } from "../src/rules/zones.ts";
+import { spawn } from "../src/rules/zones.ts";
 
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 import { send, start, type Run } from "./past-scene.ts";
