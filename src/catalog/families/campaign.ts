@@ -3,7 +3,6 @@
 // them. src/campaign/start.ts and checklist.ts deal the Setup ones; src/rules/families/campaign.ts and resolution.ts run the rest.
 import { z } from "zod";
 
-import { cardRefSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
 const code = z.string().min(1);
@@ -20,10 +19,6 @@ export const VERBS = [
   // Campaign Setup: each player adds a copy of the card to their hand after drawing their starting hand, including a mulligan
   // ("adds a copy of X to their hand after drawing their starting hand", 41051:A:2). It joins the hand once every player has chosen.
   z.strictObject({ verb: z.literal("AddToHandAfterMulligan"), code }),
-  // The card (the source by default) is removed from the game, whatever kind of card it is: it goes to no pile ("If Mendor leaves play,
-  // remove him from the game", 01135:A:4). A player card is removed with MoveCard (deck family); this is for an encounter or objective
-  // card.
-  z.strictObject({ verb: z.literal("RemoveFromGame"), card: cardRefSchema.optional(), ...when }),
   // Campaign Setup: the card joins the Campaign Pool (a copy for each player when `eachPlayer`). The log keeps it when the scenario
   // is won; a lost scenario writes nothing.
   z.strictObject({ verb: z.literal("AddToPool"), code, eachPlayer: z.boolean().optional() }),

@@ -48,6 +48,7 @@ const DESTINATIONS: Readonly<Record<Extract<EncounterVerb, { verb: "MoveEncounte
   engaged: "put %s into play engaged with you",
   activeLocation: "make %s the active location",
   victory: "add %s to the victory display",
+  removed: "remove %s from the game",
 };
 
 function cardWords(card: Extract<EncounterVerb, { verb: "MoveEncounterCard" }>["card"]): string {

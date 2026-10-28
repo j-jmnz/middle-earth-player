@@ -1,10 +1,8 @@
-// Rules: rr.campaign-cards, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json). RemoveFromGame is the
-// 01135:A:4 line ("remove him from the game").
+// Rules: rr.campaign-cards, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json).
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import type { ScenarioState } from "../state.ts";
-import { frameScope, refCard } from "../amounts.ts";
-import { moveCard, spawn } from "../zones.ts";
+import { spawn } from "../zones.ts";
 import type { Focus } from "./index.ts";
 
 // The verbs src/catalog/families/campaign.ts adds. Only PutObjectiveAllyIntoPlay runs in the engine: it is a Setup instruction the
@@ -15,10 +13,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PutObjectiveAllyIntoPlay":
       // Under the first player, ready (no Hide test, no reveal).
       return spawn(state, instruction.code, { zone: "play", seat: focus.seat }).state;
-    case "RemoveFromGame": {
-      const id = refCard(state, instruction.card ?? "self", frameScope(state, focus.seat, focus.sourceId));
-      return id && state.cards[id] ? moveCard(state, id, { zone: "removed" }) : state;
-    }
     case "AttachChosen":
     case "AddToHandAfterMulligan":
     case "AddToPool":

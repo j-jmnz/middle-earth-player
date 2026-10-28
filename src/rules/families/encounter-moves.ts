@@ -97,6 +97,9 @@ export function moveEncounter(
       return updateCard(moveCard(leavePlay(next, id, ctx, steps), id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
     case "victory":
       return updateCard(moveCard(leavePlay(next, id, ctx, steps), id, { zone: "victory" }), id, { face: "up", controller: null });
+    // Removed from the game: it goes to no pile ("If Mendor leaves play, remove him from the game", 01135:A:4).
+    case "removed":
+      return moveCard(leavePlay(next, id, ctx, steps), id, { zone: "removed" });
     case "staging": {
       const staged = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: "up", controller: null });
       if (wasInPlay) return staged;

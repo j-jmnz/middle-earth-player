@@ -46,7 +46,7 @@ export const VERBS = [
   z.strictObject({
     verb: z.literal("MoveEncounterCard"),
     card: z.union([cardRefSchema, z.enum(["previous", "deckTop", "discardTop"])]).optional(),
-    to: z.enum(["deckTop", "deckBottom", "shuffle", "discard", "staging", "engaged", "activeLocation", "victory"]),
+    to: z.enum(["deckTop", "deckBottom", "shuffle", "discard", "staging", "engaged", "activeLocation", "victory", "removed"]),
     ...when,
   }),
   // Sets the effect's X to how many of the top `top` cards of the encounter deck are of `type` (`not`: are not).

@@ -10,6 +10,18 @@ import { effectsOf } from "../listen.ts";
 import type { ScenarioState } from "../state.ts";
 import { flagged, inPlay, modifierActive } from "../state.ts";
 
+// The question each paying card asks: pay its price from the host's pool and ready the host, or leave it exhausted.
+export function readyPaymentChoice(amount: number): Instruction {
+  return {
+    verb: "Choose",
+    who: "actor",
+    options: [
+      { id: "pay", instructions: [{ verb: "DiscardResources", amount, target: "host" }, { verb: "Ready", target: "host" }] },
+      { id: "skip", instructions: [] },
+    ],
+  };
+}
+
 // Before the refresh phase readies the cards (machine.ts): the controller of each exhausted card that does not ready unless
 // resources are paid (`readyPayment`, the amount) and holds that many may pay them, once this phase (`readyAsked` marks that the
 // players were asked). A card that pays readies now; one that does not stays exhausted, as `doesNotReady` says. Null with nobody to ask.
@@ -26,14 +38,7 @@ export function askReadyPayments(state: ScenarioState, ctx: ReduceContext, steps
   for (const { card, price } of [...payers].reverse()) {
     const source = next.cards[price.sourceId];
     const record = source ? effectsOf(ctx, source.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "readyPayment")) : undefined;
-    const choose: Instruction = {
-      verb: "Choose",
-      who: "actor",
-      options: [
-        { id: "pay", instructions: [{ verb: "DiscardResources", amount: price.amount, target: "host" }, { verb: "Ready", target: "host" }] },
-        { id: "skip", instructions: [] },
-      ],
-    };
+    const choose = readyPaymentChoice(price.amount);
     next = pushEffectFrame(
       next,
       {

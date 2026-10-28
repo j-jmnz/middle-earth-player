@@ -267,10 +267,27 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
   }
 }
 
+// Caught in a Web's refresh choice (01080:A:1, "unless you pay 2 resources from that hero's pool"): the card's own verb "pay", and what skipping
+// costs, with the host named. The pay option discards resources from the host and readies it; the other option is empty.
+function readyPaymentWords(choose: ChooseInstruction, option: ChooseInstruction["options"][number], game: ScenarioState, names: ChoiceNames, sourceId: string | null): string | null {
+  const host = sourceId ? game.cards[sourceId]?.host : null;
+  if (!host) return null;
+  const isPay = (entry: ChooseInstruction["options"][number]): Extract<Instruction, { verb: "DiscardResources" }> | null => {
+    const [spend, ready, ...rest] = entry.instructions;
+    return spend?.verb === "DiscardResources" && spend.target === "host" && ready?.verb === "Ready" && ready.target === "host" && rest.length === 0 ? spend : null;
+  };
+  const name = names.card(host);
+  const pay = isPay(option);
+  if (pay) return `Pay ${amountWords(pay.amount)} resource${amountWords(pay.amount) === "1" ? "" : "s"} from ${name}'s pool and ready ${name}`;
+  return option.instructions.length === 0 && choose.options.some((entry) => isPay(entry)) ? `Leave ${name} exhausted this round` : null;
+}
+
 /** A branch of a Choose instruction in words: "Remove 2 progress from the quest", "Remove 2 heroes you control from the quest". */
 export function branchWords(choose: ChooseInstruction, optionId: string, game: ScenarioState, names: ChoiceNames, sourceId: string | null): string {
   const option = choose.options.find((entry) => entry.id === optionId);
   if (!option) return capital(optionId);
+  const refresh = readyPaymentWords(choose, option, game, names, sourceId);
+  if (refresh) return refresh;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = burdenBranchWords(option.instructions);
   if (whole) return whole;
@@ -334,6 +351,17 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Assign", prompt: "Choose the defender that takes all the damage of this attack." };
     case "SpendFromPool":
       return { verb: "Spend", prompt: `Choose ${one} to spend a resource from.` };
+    case "Exhaust":
+      return { verb: "Exhaust", prompt: `Choose ${one} to exhaust.` };
+    case "Ready":
+      return { verb: "Ready", prompt: `Choose ${one} to ready.` };
+    case "ModifyStat": {
+      const until = next.until === "endOfPhase" ? " until the end of the phase" : next.until === "endOfRound" ? " until the end of the round" : "";
+      const down = typeof next.amount === "number" && next.amount < 0;
+      return { verb: down ? "Weaken" : "Boost", prompt: `Choose ${one} to ${down ? "weaken" : "boost"}${until}.` };
+    }
+    case "DamageCard":
+      return { verb: "Assign", prompt: `Choose ${one} to take ${amountWords(next.amount)} damage.` };
     default:
       return { verb: "Choose", prompt: `Choose ${one}.` };
   }
