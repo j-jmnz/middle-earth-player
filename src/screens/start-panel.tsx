@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useWindowDimensions } from "react-native";
 
 import type { PoolCard } from "../campaign/log";
 import { FELLOWSHIP_ID } from "../campaign/save";
@@ -34,10 +34,10 @@ function RadioTile({ selected, testID, label, onPress, className, children }: { 
   );
 }
 
-function SeatTile({ seats, name, selected, testID, onPress }: { seats: Seats; name: string; selected: boolean; testID: string; onPress: () => void }) {
+function SeatTile({ seats, name, selected, testID, onPress, compact = false }: { seats: Seats; name: string; selected: boolean; testID: string; onPress: () => void; compact?: boolean }) {
   const label = seatWord(seats);
   return (
-    <RadioTile selected={selected} testID={testID} label={`${label}, ${name}`} onPress={onPress} className="min-h-14 flex-1 items-center justify-center gap-2 rounded-tile px-3 py-3">
+    <RadioTile selected={selected} testID={testID} label={`${label}, ${name}`} onPress={onPress} className={compact ? "min-h-11 flex-1 flex-row items-center justify-center gap-3 rounded-tile px-3 py-2" : "min-h-14 flex-1 items-center justify-center gap-2 rounded-tile px-3 py-3"}>
       <View className="flex-row">
         <RingMark size={18} state={selected ? "current" : "locked"} />
         {seats === 2 ? (
@@ -68,22 +68,22 @@ export function StartPanel({ options, current, carry, onStart }: { options: read
   const [seats, setSeats] = useState<Seats>(1);
   // The playthrough whose carry-over this one takes in, or null for a fresh start.
   const [taking, setTaking] = useState<string | null>(null);
+  // In landscape the phone is 390 pt tall: a shorter scene, the campaign and its choices in two columns and compact seat tiles keep
+  // Start on the first screen.
+  const { width, height } = useWindowDimensions();
+  const landscape = width > height;
   const chosen = options.find((option) => option.data.id === campaignId) ?? options[0];
   if (!chosen) return null;
   const { data, name } = chosen;
   const taken = carry.find((choice) => choice.saveId === taking) ?? null;
   const seatId = (count: Seats) => (isFellowship(data.id) ? `seats-${count}` : `seats-${data.id}-${count}`);
   const count = `${data.scenarios.length} scenarios`;
-  return (
-    <Panel current={current} padded={false}>
-      <View className="overflow-hidden rounded-t-card">
-        <SceneArt scenarioId={data.scenarios[0]} height={132} fade={0.3} fadeTo={palette.raised} />
-      </View>
-      <View className="px-5 pb-5" style={{ marginTop: -36 }}>
+  const top = (
+    <>
         <Text className="font-display text-title text-bone">{name}</Text>
         <Label>{count}</Label>
         {options.length > 1 ? (
-          <View className="mt-4 gap-2" accessibilityRole="radiogroup" accessibilityLabel="Campaign" testID="campaign-choice">
+          <View className={landscape ? "mt-3 flex-row gap-2" : "mt-4 gap-2"} accessibilityRole="radiogroup" accessibilityLabel="Campaign" testID="campaign-choice">
             {options.map((option) => {
               const selected = option.data.id === data.id;
               return (
@@ -93,7 +93,7 @@ export function StartPanel({ options, current, carry, onStart }: { options: read
                   testID={`campaign-choice-${option.data.id}`}
                   label={`${option.name}, ${option.data.scenarios.length} scenarios`}
                   onPress={() => setCampaignId(option.data.id)}
-                  className="min-h-14 justify-center rounded-tile px-4 py-3"
+                  className={landscape ? "min-h-14 flex-1 justify-center rounded-tile px-4 py-2" : "min-h-14 justify-center rounded-tile px-4 py-3"}
                 >
                   <Text className={selected ? "text-body font-semibold text-bone" : "text-body text-muted"}>{option.name}</Text>
                   <Text className="text-label text-faint">{`${option.data.scenarios.length} scenarios`}</Text>
@@ -102,9 +102,13 @@ export function StartPanel({ options, current, carry, onStart }: { options: read
             })}
           </View>
         ) : null}
-        <View className="mt-4 flex-row gap-3" accessibilityRole="radiogroup" accessibilityLabel={`Players for ${name}`}>
-          <SeatTile seats={1} name={name} testID={seatId(1)} selected={seats === 1} onPress={() => setSeats(1)} />
-          <SeatTile seats={2} name={name} testID={seatId(2)} selected={seats === 2} onPress={() => setSeats(2)} />
+    </>
+  );
+  const bottom = (
+    <>
+        <View className={landscape ? "flex-row gap-3" : "mt-4 flex-row gap-3"} accessibilityRole="radiogroup" accessibilityLabel={`Players for ${name}`}>
+          <SeatTile compact={landscape} seats={1} name={name} testID={seatId(1)} selected={seats === 1} onPress={() => setSeats(1)} />
+          <SeatTile compact={landscape} seats={2} name={name} testID={seatId(2)} selected={seats === 2} onPress={() => setSeats(2)} />
         </View>
         <Label className="mt-2">Chosen once for this campaign</Label>
         {carry.length > 0 ? (
@@ -135,9 +139,29 @@ export function StartPanel({ options, current, carry, onStart }: { options: read
             </View>
           </View>
         ) : null}
-        <View className="mt-4">
+        <View className={landscape ? "mt-3" : "mt-4"}>
           <PrimaryButton label={`Start ${name}`} testID={isFellowship(data.id) ? "start-fellowship" : `start-${data.id}`} onPress={() => onStart(data.id, seats, taken)} />
         </View>
+    </>
+  );
+  return (
+    <Panel current={current} padded={false}>
+      <View className="overflow-hidden rounded-t-card">
+        <SceneArt scenarioId={data.scenarios[0]} height={landscape ? 48 : 132} fade={0.3} fadeTo={palette.raised} />
+      </View>
+      <View className="px-5 pb-5" style={{ marginTop: landscape ? -24 : -36 }}>
+        {landscape ? (
+          <View className="flex-row gap-5">
+            <View className="flex-1">{top}</View>
+            <View className="flex-1 justify-end">{bottom}</View>
+          </View>
+        ) : (
+          <>
+            {top}
+            {bottom}
+          </>
+        )}
+
       </View>
     </Panel>
   );
