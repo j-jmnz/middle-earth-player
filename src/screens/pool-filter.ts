@@ -47,6 +47,21 @@ export const emptyPoolFilter: PoolFilter = {
   activeText: false,
 };
 
+/**
+ * What a request from outside the pool (the deck editor's Add) leaves: the type it names (null is All), no search text, and the
+ * "Applied only" switch off, so nothing hides the cards it asked to see. The sheet's other fields stay as the builder set them.
+ */
+export function applyTypeRequest(filter: PoolFilter, type: string | null): { filter: PoolFilter; search: string } {
+  return { filter: { ...filter, typeCode: type, activeText: false }, search: "" };
+}
+
+/** The sentence a screen reader hears when a request changes the type: "Showing heroes", or "Showing all cards". */
+export function typeRequestWords(types: readonly { code: string; name: string }[], type: string | null): string {
+  if (type == null) return "Showing all cards";
+  const name = types.find((entry) => entry.code === type)?.name ?? type;
+  return `Showing ${name.toLowerCase()} cards`;
+}
+
 export function cycleGroups(packs: readonly PoolPack[]): CycleGroup[] {
   const byCycle = new Map<number, PoolPack[]>();
   for (const pack of packs) {

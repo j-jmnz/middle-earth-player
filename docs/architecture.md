@@ -279,7 +279,7 @@ Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaign
 | Table | game slice (a Zustand store of the reducer result, rebuilt by replaying the save once on open), image cache, `EFFECTS` from `src/effects` | each accepted intent, appended to `saves.activeScenario` |
 | Resolution | the campaign card's Resolution options the reducer lists, one group and one seat at a time | each chosen `ChooseResolution` intent, then the log on Confirm; a loss drops the open scenario and writes no log field |
 | Card | one cached file, catalog text | nothing |
-| Card pool | card rows loaded when the screen opens, then filtered in memory; `image_files`. One view (`src/screens/card-pool.tsx`) is the Cards tab and the deck editor's `/pool?adding=1` | the open deck draft, when adding |
+| Card pool | card rows loaded when the screen opens, then filtered in memory; `image_files`. One view (`src/screens/card-pool.tsx`: `CardPoolBody`, and `CardPool` around it) is the Cards tab, the deck editor's `/pool?adding=1` and, in an expanded window, the pane beside the deck | the open deck draft, when adding |
 | Deck list | catalog, `decks` | `decks` (duplicate, delete, reset a starter) |
 | Packs | `packs`; a pack's cards | nothing |
 | Rules | `data/rules/entries.json`, parsed by `src/catalog/rule-entry.ts` (the one rule-span type the build, the table's causes and the glossary share), through `src/screens/rules-glossary.ts`: the Rules Reference, Learn to Play, FAQ, Easy Mode and MEC109 rule spans, searched in memory (`src/screens/rules-view.tsx`, also the `/glossary` route the table opens); the two books open the booklet route | nothing |

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   activeFilterCount,
+  applyTypeRequest,
   costOptions,
   cycleGroups,
   emptyPoolFilter,
@@ -11,6 +12,7 @@ import {
   packChooserRows,
   shownCost,
   traitChooserRows,
+  typeRequestWords,
   type PoolCard,
   type PoolPack,
 } from "./pool-filter.ts";
@@ -114,6 +116,23 @@ describe("filter choosers", () => {
   it("opens the filter sheet with no animation when reduced motion is on", () => {
     expect(filterSheetAnimation(true)).toBe("none");
     expect(filterSheetAnimation(false)).toBe("fade");
+  });
+});
+
+describe("applyTypeRequest", () => {
+  it("applies the type, clears the search and the Applied only switch, and keeps the sheet's fields", () => {
+    const start = { ...emptyPoolFilter, typeCode: "ally", activeText: true, unique: true };
+    expect(applyTypeRequest(start, "hero")).toEqual({ filter: { ...emptyPoolFilter, typeCode: "hero", unique: true }, search: "" });
+  });
+
+  it("treats null as All", () => {
+    expect(applyTypeRequest({ ...emptyPoolFilter, typeCode: "hero" }, null).filter.typeCode).toBeNull();
+  });
+
+  it("says the type", () => {
+    const types = [{ code: "hero", name: "Hero" }];
+    expect(typeRequestWords(types, "hero")).toBe("Showing hero cards");
+    expect(typeRequestWords(types, null)).toBe("Showing all cards");
   });
 });
 

@@ -1,8 +1,8 @@
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { eq } from "drizzle-orm";
 import { useRouter } from "expo-router";
-import { useCallback, useDeferredValue, useMemo, useState, type ReactNode } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode } from "react";
+import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
 
 import { cards, packs } from "../catalog/schema";
 import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, SecondaryButton, ToggleChip } from "./chrome";
@@ -16,10 +16,11 @@ import { usePalette } from "./palette-hook";
 import { addingView, browseView } from "./pool-view";
 import { PoolCardCell, PoolCardRow, type PoolRowCard } from "./pool-cards";
 import { LIST_ROW_HEIGHT, gridCardWidth, gridOffset, poolCellHeight, poolColumns, recyclePool } from "./pool-grid";
-import { activeFilterCount, cycleGroups, emptyPoolFilter, filterPool, sortPool, type PoolFilter } from "./pool-filter";
+import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filterPool, sortPool, typeRequestWords, type PoolFilter } from "./pool-filter";
 import { PoolFilterSheet, typeChoices } from "./pool-filter-sheet";
 import { ToastView } from "./toast-view";
 import { gutter } from "../play/size-class";
+import type { PictureSource } from "../play/table-canvas-types";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
 
@@ -46,6 +47,7 @@ function TypeChips({
   onChange,
   applied,
   onApplied,
+  request,
 }: {
   types: { code: string; name: string }[];
   value: string | null;
@@ -53,11 +55,20 @@ function TypeChips({
   // "Applied only": the cards whose every printed line the app applies (the filter's Active text, as a chip). Off by default.
   applied: boolean;
   onApplied: (next: boolean) => void;
+  // A request from outside the pool: the row scrolls to the chip it chose.
+  request: PoolTypeRequest | null;
 }) {
   const palette = usePalette();
+  const row = useRef<ComponentRef<typeof ScrollView>>(null);
+  const chipX = useRef(new Map<string, number>());
+  useEffect(() => {
+    if (!request) return;
+    const x = chipX.current.get(request.type ?? "all");
+    if (x != null) row.current?.scrollTo({ x: Math.max(0, x - 24), animated: true });
+  }, [request]);
   const options = [{ code: null, name: "All" }, ...types];
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-1 grow-0" contentContainerClassName="gap-1.5 px-6">
+    <ScrollView ref={row} horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-1 grow-0" contentContainerClassName="gap-1.5 px-6">
       {/* A switch, not a type: an outlined plate with a check when on, and a hairline after it before the type chips. */}
       <Pressable
         testID="pool-applied-only"
@@ -73,31 +84,44 @@ function TypeChips({
       </Pressable>
       <View className="my-3 w-px bg-hairline" />
       {options.map((option) => (
-        <ToggleChip key={option.code ?? "all"} testID={`pool-type-${option.code ?? "all"}`} label={option.name} selected={value === option.code} onPress={() => onChange(option.code)} />
+        <ToggleChip
+          key={option.code ?? "all"}
+          testID={`pool-type-${option.code ?? "all"}`}
+          label={option.name}
+          selected={value === option.code}
+          onPress={() => onChange(option.code)}
+          onLayout={(event) => chipX.current.set(option.code ?? "all", event.nativeEvent.layout.x)}
+        />
       ))}
     </ScrollView>
   );
 }
 
+// A request for the pool to show one type (null: all of them), made from outside it: the deck editor's Add on a subsection or an
+// empty hero slot, when the pool is already on screen beside it and there is no route to push. Each request is a new object, so
+// asking for the same type again applies it again after the builder has changed the chips.
+export type PoolTypeRequest = { type: string | null };
+
 // The deck-legal player pool, searched and filtered in memory, as a grid of the card pictures or a list of rows. The Cards tab
-// browses it; the deck editor opens it with `adding` to put cards in the open draft: each card then has − and +, every change is
-// said in a toast with Undo, and a bar shows the deck's count against 50 beside Done. `header` is the screen's top: the tab's
-// title, or the editor's NavBar naming the deck. `startType` opens it on one type (an empty hero slot opens it on heroes).
-export function CardPool({
+// browses it; the deck editor opens it with `adding` to put cards in the open draft: each card then has − and +. The body is the
+// search, the type chips, the grid or list and the filter sheet, with no Screen, bar, toast or preview of its own: `CardPool` below
+// wraps it for its own route, and the deck editor in an expanded window sets it beside the deck, both on the one draft store, so a +
+// shows on the other side at once. `startType` opens it on one type (an empty hero slot opens it on heroes); `onPreview` is the
+// screen's long-press preview.
+export function CardPoolBody({
   adding,
-  header,
   startType = null,
-  onDone,
+  typeRequest = null,
+  onPreview,
 }: {
   adding: boolean;
-  header: ReactNode;
   startType?: string | null;
-  onDone?: () => void;
+  typeRequest?: PoolTypeRequest | null;
+  onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
   const draft = useDeckDraft();
   const { catalog } = useDatabases();
   const router = useRouter();
-  const preview = useListPreview();
   // Both views are read on every render (a hook is never chosen at run time); the mode picks which one shows and which one changes.
   const browsing = browseView.useValue();
   const addingTo = addingView.useValue();
@@ -165,6 +189,17 @@ export function CardPool({
   // The field shows each keystroke at once; the list catches up when React has time, so typing never waits on the grid.
   const query = useDeferredValue(search);
   const [applied, setApplied] = useState<PoolFilter>(() => ({ ...emptyPoolFilter, typeCode: startType }));
+  // The editor's Add asks for a type: the chips follow it (state adjusted while rendering, once per request).
+  // A request also clears the search and the Applied only switch, so nothing hides what it asked to see (applyTypeRequest).
+  const [seenRequest, setSeenRequest] = useState(typeRequest);
+  if (typeRequest !== seenRequest) {
+    setSeenRequest(typeRequest);
+    if (typeRequest) {
+      const next = applyTypeRequest(applied, typeRequest.type);
+      setApplied(next.filter);
+      setSearch(next.search);
+    }
+  }
   const [draftFilter, setDraftFilter] = useState<PoolFilter>(applied);
   const [open, setOpen] = useState(false);
   const visible = useMemo(
@@ -172,6 +207,12 @@ export function CardPool({
     [rows, query, applied, groups, inactiveCodes],
   );
   const types = useMemo(() => typeChoices(rows), [rows]);
+  const list = useRef<FlashListRef<PoolRowCard>>(null);
+  useEffect(() => {
+    if (!typeRequest) return;
+    list.current?.scrollToOffset({ offset: 0, animated: false });
+    AccessibilityInfo.announceForAccessibility(typeRequestWords(types, typeRequest.type));
+  }, [typeRequest, types]);
   // Other printings of a title share its copy limit: the deck's codes are named from the loaded rows.
   const lookup = useMemo<TitleLookup>(() => {
     const byCode = new Map(rows.map((row) => [row.code, row]));
@@ -179,7 +220,7 @@ export function CardPool({
   }, [rows]);
   const filters = activeFilterCount(applied);
   const openCard = useCallback((code: string) => router.push({ pathname: "/card/[code]", params: { code } }), [router]);
-  const previewCard = preview.open;
+  const previewCard = onPreview;
   // One function while nothing it reads changes, so FlashList and the memoized cards skip the cards a render did not touch.
   const renderItem = useCallback(
     ({ item, index }: { item: PoolRowCard | undefined; index: number }) => {
@@ -223,65 +264,91 @@ export function CardPool({
   }
 
   return (
+    <View className="min-h-0 flex-1">
+      <View className="mt-3 flex-row items-center gap-2">
+        <SearchField testID="pool-search" value={search} onChangeText={setSearch} placeholder="Search cards" accessibilityLabel="Search cards" />
+        <SecondaryButton
+          testID="pool-filter"
+          label={filters > 0 ? `Filter · ${filters}` : "Filter"}
+          tone={filters > 0 ? "gold" : "bone"}
+          compact
+          accessibilityLabel={filters > 0 ? `Filter, ${filters} on` : "Filter"}
+          onPress={openSheet}
+        />
+      </View>
+      <TypeChips
+        types={types}
+        value={applied.typeCode}
+        onChange={(typeCode) => setApplied({ ...applied, typeCode })}
+        applied={applied.activeText}
+        onApplied={(activeText) => setApplied({ ...applied, activeText })}
+        request={typeRequest}
+      />
+      <View className="mt-1 flex-row items-center justify-between">
+        <Text testID="pool-shown" className="text-label text-muted">{`${visible.length} ${visible.length === 1 ? "card" : "cards"}`}</Text>
+        <Segmented options={["Grid", "List"] as const} value={view} onChange={viewSetting.set} testIDPrefix="pool-view" compact />
+      </View>
+      <View
+        className="mt-2 min-h-0 flex-1"
+        onLayout={(event) => {
+          const next = Math.floor(event.nativeEvent.layout.width);
+          setListWidth((current) => (current === next ? current : next));
+          const nextHeight = Math.floor(event.nativeEvent.layout.height);
+          setListHeight((current) => (current === nextHeight ? current : nextHeight));
+        }}
+      >
+        {/* Mounted once the width is measured, never before: a grid cell drawn at no width is no height, and FlashList then lays
+            out every card of the pool as on screen and mounts all of them (852 at once), which it never gives back. */}
+        {cellWidth > 0 ? (
+          <FlashList
+            ref={list}
+            key={`${view}:${grid ? columns : 1}`}
+            data={visible}
+            keyExtractor={poolKey}
+            numColumns={grid ? columns : 1}
+            style={{ flex: 1 }}
+            contentContainerStyle={inset > 0 ? { paddingHorizontal: inset } : undefined}
+            extraData={draft}
+            keyboardShouldPersistTaps="handled"
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={viewabilityConfig}
+            ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} />}
+            ListEmptyComponent={
+              <BodyText testID="pool-empty" tone="muted" className="mt-6">
+                No cards match.
+              </BodyText>
+            }
+            renderItem={renderItem}
+            maxItemsInRecyclePool={recycle}
+          />
+        ) : null}
+      </View>
+      <PoolFilterSheet open={open} rows={rows} groups={groups} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />
+    </View>
+  );
+}
+
+// The pool on its own route: the Cards tab, or the pool the deck editor pushes on a phone. `header` is the screen's top: the tab's
+// title, or the editor's NavBar naming the deck. Adding, a bar shows the deck's count against 50 beside Done, and every change is
+// said in a toast with Undo.
+export function CardPool({
+  adding,
+  header,
+  startType = null,
+  onDone,
+}: {
+  adding: boolean;
+  header: ReactNode;
+  startType?: string | null;
+  onDone?: () => void;
+}) {
+  const draft = useDeckDraft();
+  const preview = useListPreview();
+  return (
     <Screen scene="plain">
       <View className="min-h-0 flex-1">
         {header}
-        <View className="mt-3 flex-row items-center gap-2">
-          <SearchField testID="pool-search" value={search} onChangeText={setSearch} placeholder="Search cards" accessibilityLabel="Search cards" />
-          <SecondaryButton
-            testID="pool-filter"
-            label={filters > 0 ? `Filter · ${filters}` : "Filter"}
-            tone={filters > 0 ? "gold" : "bone"}
-            compact
-            accessibilityLabel={filters > 0 ? `Filter, ${filters} on` : "Filter"}
-            onPress={openSheet}
-          />
-        </View>
-        <TypeChips
-          types={types}
-          value={applied.typeCode}
-          onChange={(typeCode) => setApplied({ ...applied, typeCode })}
-          applied={applied.activeText}
-          onApplied={(activeText) => setApplied({ ...applied, activeText })}
-        />
-        <View className="mt-1 flex-row items-center justify-between">
-          <Text testID="pool-shown" className="text-label text-muted">{`${visible.length} ${visible.length === 1 ? "card" : "cards"}`}</Text>
-          <Segmented options={["Grid", "List"] as const} value={view} onChange={viewSetting.set} testIDPrefix="pool-view" compact />
-        </View>
-        <View
-          className="mt-2 min-h-0 flex-1"
-          onLayout={(event) => {
-            const next = Math.floor(event.nativeEvent.layout.width);
-            setListWidth((current) => (current === next ? current : next));
-            const nextHeight = Math.floor(event.nativeEvent.layout.height);
-            setListHeight((current) => (current === nextHeight ? current : nextHeight));
-          }}
-        >
-          {/* Mounted once the width is measured, never before: a grid cell drawn at no width is no height, and FlashList then lays
-              out every card of the pool as on screen and mounts all of them (852 at once), which it never gives back. */}
-          {cellWidth > 0 ? (
-            <FlashList
-              key={`${view}:${grid ? columns : 1}`}
-              data={visible}
-              keyExtractor={poolKey}
-              numColumns={grid ? columns : 1}
-              style={{ flex: 1 }}
-              contentContainerStyle={inset > 0 ? { paddingHorizontal: inset } : undefined}
-              extraData={draft}
-              keyboardShouldPersistTaps="handled"
-              onViewableItemsChanged={onViewableItemsChanged}
-              viewabilityConfig={viewabilityConfig}
-              ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} />}
-              ListEmptyComponent={
-                <BodyText testID="pool-empty" tone="muted" className="mt-6">
-                  No cards match.
-                </BodyText>
-              }
-              renderItem={renderItem}
-              maxItemsInRecyclePool={recycle}
-            />
-          ) : null}
-        </View>
+        <CardPoolBody adding={adding} startType={startType} onPreview={preview.open} />
         <ToastView />
         {adding ? (
           <ActionBar testID="pool-deck-bar">
@@ -302,7 +369,6 @@ export function CardPool({
           </ActionBar>
         ) : null}
       </View>
-      <PoolFilterSheet open={open} rows={rows} groups={groups} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />
       {preview.overlay}
     </Screen>
   );

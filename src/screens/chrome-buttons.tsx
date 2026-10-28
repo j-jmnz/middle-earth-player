@@ -1,7 +1,7 @@
 // The chrome's controls (docs/design-system.md, Components): the round icon button, text buttons, the primary and secondary
 // plates, filter chips, the segmented switch and the search field. Every fill and text colour of a button is a style, not only a
 // class. Re-exported by chrome.tsx.
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View, type LayoutChangeEvent } from "react-native";
 import { useMemo, type ReactNode } from "react";
 
 import { Chevron, Magnifier } from "./chrome-marks";
@@ -276,6 +276,7 @@ export function ToggleChip({
   testID,
   leading,
   accessibilityLabel,
+  onLayout,
 }: {
   label: string;
   // Left out for a chip that goes somewhere rather than switching (the deck editor's jump chips): no on or off state is said.
@@ -284,6 +285,8 @@ export function ToggleChip({
   testID: string;
   leading?: ReactNode;
   accessibilityLabel?: string;
+  // A row that scrolls to a chip reads where it sits.
+  onLayout?: (event: LayoutChangeEvent) => void;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
@@ -296,6 +299,7 @@ export function ToggleChip({
       {...(selected == null ? {} : { accessibilityState: { selected } })}
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
+      onLayout={onLayout}
       className="min-h-touch min-w-touch justify-center"
     >
       {({ pressed }) => (
