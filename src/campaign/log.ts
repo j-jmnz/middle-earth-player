@@ -1,6 +1,6 @@
 // Rules: ltp.campaign-log, rr.campaign-log, ltp.campaign-pool, rr.campaign-pool, ltp.fellowship-of-heroes
 // (data/rules/entries.json). The log is what a won scenario writes and the next scenario's checklist reads.
-import { holdsCopy, resolutionResult } from "../rules/resolution.ts";
+import { heldCopy, holdsCopy, resolutionResult } from "../rules/resolution.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
@@ -107,7 +107,7 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   for (const earned of result.earned) {
     const printed = printedOf(cards, earned.code);
     const attachedTo = earned.hero ?? (printed.keywords.permanent ? bearer : null);
-    if (holdsCopy(pool, { code: earned.code, seat: earned.seat, perPlayer: earned.perPlayer, hero: earned.hero })) continue;
+    if (holdsCopy(pool.map(heldCopy), { code: earned.code, seat: earned.seat, perPlayer: earned.perPlayer, hero: earned.hero })) continue;
     if (attachedTo != null && fallen.has(attachedTo)) continue;
     pool.push(poolCard(printed, earned.code, attachedTo, earned.seat, earned.perPlayer));
   }

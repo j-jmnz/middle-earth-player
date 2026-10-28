@@ -3,7 +3,7 @@ import { ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { raiseThreat } from "./keywords.ts";
-import { gameReads } from "./families/costs-pay.ts";
+import { gameReads } from "./game-reads.ts";
 import { queueEvent } from "./queue.ts";
 import { fireForced } from "./triggers.ts";
 import { flagged, livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";

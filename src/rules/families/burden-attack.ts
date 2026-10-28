@@ -12,9 +12,12 @@ import type { ReduceContext } from "../interpret.ts";
 import { printedOf } from "../printed.ts";
 import type { PendingAttack, QueueItem, ScenarioState } from "../state.ts";
 import { livingSeats } from "../state.ts";
+import { queueEvent } from "../queue.ts";
 import { patchTop } from "../windows.ts";
 import type { Focus } from "./index.ts";
 import { declaredDefenders } from "./defense-defenders.ts";
+import { damageGoesTo } from "./defense-damage.ts";
+import { gameReads } from "../game-reads.ts";
 import { dealAttackShadow } from "./defense-listen.ts";
 import { effectData } from "./encounter-moves.ts";
 
@@ -48,14 +51,26 @@ export function immediateAttackEach(state: ScenarioState, instruction: Each, foc
   return patchTop(state, { data: { ...data, queue: [...queued, ...data.queue] } });
 }
 
-// The characters an attack destroyed, once it is over: its defenders and the hero an undefended attack landed on that are in the
-// discard pile with as much damage as they have hit points ("If this attack destroys a character", 141065:A:2, 141066:A:2).
-export function charactersDestroyed(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): number {
-  const hit = new Set([...declaredDefenders(attack), ...(attack.heroId ? [attack.heroId] : [])]);
+// The characters an attack destroyed, once it is over: its defenders and the hero an undefended attack landed on (or the character their
+// damage was redirected to) that are in the discard pile with as much damage as they have hit points ("If this attack destroys a
+// character", 141065:A:2, 141066:A:2; "After a character is destroyed by a Hill Troll", 01130:A:4).
+export function destroyedByAttack(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): string[] {
+  const hit = new Set([...declaredDefenders(attack), ...(attack.heroId ? [attack.heroId] : [])].flatMap((id) => [id, damageGoesTo(state, id)]));
   return [...hit].filter((id) => {
     const card = state.cards[id];
     if (!card || card.zone !== "discard") return false;
     const health = printedOf(ctx.cards, card.code).health;
     return health != null && card.damage >= health;
-  }).length;
+  });
+}
+
+export function charactersDestroyed(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): number {
+  return destroyedByAttack(state, attack, ctx).length;
+}
+
+// Queues `characterDestroyedByAttack` for each character the attack destroyed, when some card in the game hears it (so no other game
+// queues the event). Called as the attack ends, where the damage has been answered and a held lethal wound has become a destruction.
+export function announceDestroyed(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): ScenarioState {
+  if (!gameReads(state, ctx, '"trigger":"characterDestroyedByAttack"')) return state;
+  return destroyedByAttack(state, attack, ctx).reduce((next, id) => queueEvent(next, { trigger: "characterDestroyedByAttack", seat: state.cards[id]?.controller ?? attack.seat, subject: id, other: attack.enemyId }), state);
 }

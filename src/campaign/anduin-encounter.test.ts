@@ -52,7 +52,7 @@ describe("enemies", () => {
     const undefended = fight(world, "f0", "01082", { damage: [["ah1", 4]] }, { undefended: true });
     expect(undefended.run.state.cards[undefended.hero]?.zone).toBe("discard");
     expect(undefended.run.state.seats[0].threat).toBe(32);
-    // A defended attack (Attack 6 against Defense 2): 4 damage on a hero with 5 hit points left... 2 left, so 2 points of excess.
+    // A defended attack (Attack 6 against Defense 2): 4 damage on a hero with 2 hit points left, so 2 points of excess.
     const defended = fight(world, "f0", "01082", { damage: [["ah1", 4]] });
     expect(defended.run.state.cards[defended.hero]?.zone).toBe("discard");
     expect(defended.run.state.seats[0].threat).toBe(30);
@@ -60,6 +60,15 @@ describe("enemies", () => {
     // Damage that does not exceed the hit points raises nothing, and an enemy without the line sends nothing to threat.
     expect(fight(world, "f0", "01082", {}, { undefended: true }).run.state.seats[0].threat).toBe(28);
     expect(fight(world, "f0", "brute", { damage: [["ah1", 4]] }, { undefended: true }).run.state.seats[0].threat).toBe(28);
+  });
+
+  it("Misty Mountain Goblins remove 1 progress from the quest after they attack, defended or not (01111:A:1)", () => {
+    const quest = (made: ReturnType<typeof fight>) => made.run.state.cards[made.run.state.questStage ?? ""]?.progress;
+    expect(quest(fight(world, "f0", "01111", { progress: 5 }))).toBe(4);
+    expect(quest(fight(world, "f0", "01111", { progress: 5 }, { undefended: true }))).toBe(4);
+    // Another enemy's attack takes none off, and the quest stops at 0.
+    expect(quest(fight(world, "f0", "grunt", { progress: 5 }))).toBe(5);
+    expect(quest(fight(world, "f0", "01111", { progress: 0 }))).toBe(0);
   });
 
   it("Goblin Sniper cannot be optionally engaged in the encounter phase while another enemy is in the staging area (01083:A:1)", () => {

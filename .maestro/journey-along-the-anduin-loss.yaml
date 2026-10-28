@@ -68,4 +68,4 @@ tags:
     id: log-prisoner
 - assertVisible:
     id: log-scenario-journey-along-the-anduin
-    text: "Not completed"
+    text: ".*Not completed.*"

@@ -2,8 +2,9 @@
 // The Shadow lines of the Journey Along the Anduin encounter cards, played through a real attack (scripts/anduin-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
+import type { Run } from "../../scripts/past-scene.ts";
 import { legalIntents } from "../rules/legal.ts";
-import type { PlayerIntent } from "../rules/reduce.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { fight, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
 import { codesOf, first, send } from "../../scripts/past-scene.ts";
@@ -15,7 +16,7 @@ beforeAll(async () => {
 });
 
 describe("Shadow effects", () => {
-  it("Wolf Rider attacks the defending player once the attack it was dealt to has ended, is dealt a shadow card of its own, and returns to the top of the encounter deck (01081:A:2)", () => {
+  it("Wolf Rider attacks the defending player once the attack it was dealt to has ended, and is dealt a shadow card of its own (01081:A:2)", () => {
     const { run, ctx, hero } = fight(world, "01081", "grunt", { deck: ["01081", "f0", "f0", "f0", "f0"] }, { undefended: true });
     // The grunt's attack is over (1 damage on the first hero); Wolf Rider (Attack 2) now attacks the same player, engaged with them.
     const rider = first(run.state, "01081");
@@ -26,14 +27,74 @@ describe("Shadow effects", () => {
     // It was dealt its own shadow card, and the defending player may declare a defender.
     expect(run.state.cards[rider]?.shadowId).not.toBeNull();
     expect(legalIntents(run.state, ctx).map((intent) => intent.type)).toEqual(["DeclareDefender", "Undefended"]);
+  });
+
+  // "After combat, return Wolf Rider to the top of the encounter deck": it stays engaged until the end of the combat phase.
+  function afterRiderAttack(): { state: ScenarioState; ctx: ReduceContext; rider: string; hero: string; hero2: string; seen: ScenarioState[] } {
+    const { run, ctx, hero, hero2 } = fight(world, "01081", "grunt", { deck: ["01081", "f0", "f0", "f0", "f0"] }, { undefended: true });
+    const rider = first(run.state, "01081");
     let after = send(run, { type: "DeclareDefender", defenderId: hero } as PlayerIntent, ctx);
     for (let guard = 0; guard < 20 && after.state.pendingAttack != null; guard += 1) after = send(after, { type: "Pass" }, ctx);
-    // Defended by a hero with Defense 2 against Attack 2: no damage; the card is on top of the encounter deck, face down.
-    expect(after.state.cards[hero]?.damage).toBe(1);
-    expect(after.state.cards[rider]?.zone).toBe("encounterDeck");
-    expect(after.state.encounterDeck[0]).toBe(rider);
-    expect(after.state.cards[rider]?.face).toBe("down");
-    expect(causeProblems(after.steps)).toEqual([]);
+    return { state: after.state, ctx, rider, hero, hero2, seen: [after.state] };
+  }
+
+  it("Wolf Rider stays engaged after its attack until the end of the combat phase, then returns to the top of the encounter deck (01081:A:2)", () => {
+    const { state, ctx, rider, hero } = afterRiderAttack();
+    // Defended by a hero with Defense 2 against Attack 2: no damage. It has attacked this phase and is still engaged.
+    expect(state.cards[hero]?.damage).toBe(1);
+    expect(state.phase).toBe("Combat");
+    expect(state.cards[rider]?.zone).toBe("engaged");
+    expect(state.resolvedAttacks).toContain(rider);
+    let run: Run = { state, steps: [] };
+    for (let guard = 0; guard < 40 && run.state.phase === "Combat"; guard += 1) {
+      expect(run.state.pendingAttack?.enemyId, "it does not attack again").not.toBe(rider);
+      const decline = legalIntents(run.state, ctx).find((intent) => intent.type === "DeclineAttack" || intent.type === "Pass");
+      if (!decline) break;
+      run = send(run, decline as PlayerIntent, ctx);
+    }
+    expect(run.state.phase).not.toBe("Combat");
+    expect(run.state.cards[rider]?.zone).toBe("encounterDeck");
+    expect(run.state.encounterDeck[0]).toBe(rider);
+    expect(run.state.cards[rider]?.face).toBe("down");
+    expect(causeProblems(run.steps)).toEqual([]);
+  });
+
+  it("Wolf Rider the players defeat before the combat phase ends goes to the encounter discard pile, not the deck (01081:A:2)", () => {
+    const { state, ctx, rider, hero2 } = afterRiderAttack();
+    let run: Run = { state, steps: [] };
+    // The players attack it (the defending hero is exhausted; Attack 2 against its Defense) until it is destroyed or the combat phase ends.
+    const attack = legalIntents(run.state, ctx).find((intent) => intent.type === "DeclareAttackers");
+    expect(attack, "the players may attack the engaged Wolf Rider").toBeDefined();
+    run = send(run, { type: "DeclareAttackers", enemyId: rider, attackerIds: [hero2] } as PlayerIntent, ctx);
+    for (let guard = 0; guard < 40 && run.state.phase === "Combat"; guard += 1) {
+      const next = legalIntents(run.state, ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack");
+      if (!next) break;
+      run = send(run, next as PlayerIntent, ctx);
+    }
+    expect(run.state.cards[rider]?.zone).toBe("encounterDiscard");
+    expect(run.state.encounterDeck[0]).not.toBe(rider);
+  });
+
+  it("two Wolf Riders dealt to one attack attack one after the other, each returning to the deck at the end of the combat phase (01081:A:2, 01112:A:2)", () => {
+    // Two-handed, Massing at Night deals the grunt two more shadow cards: both are Wolf Riders.
+    const { run, ctx, hero, hero2 } = fight(world, "01112", "grunt", { seats: 2, deck: ["01112", "01081", "01081", "f0", "f0", "f0", "f0"] }, { undefended: true });
+    const riders = Object.values(run.state.cards).filter((card) => card.code === "01081").map((card) => card.id);
+    expect(riders).toHaveLength(2);
+    const attackers: string[] = [];
+    let now = run;
+    for (let guard = 0; guard < 80 && now.state.phase === "Combat"; guard += 1) {
+      const attacker = now.state.pendingAttack?.enemyId;
+      if (attacker && riders.includes(attacker) && attackers.at(-1) !== attacker) attackers.push(attacker);
+      const legal = legalIntents(now.state, ctx);
+      const next: PlayerIntent | undefined = legal.some((intent) => intent.type === "Undefended")
+        ? { type: "Undefended", heroId: attackers.length > 1 ? hero2 : hero }
+        : (legal.find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack") as PlayerIntent | undefined);
+      if (!next) break;
+      now = send(now, next, ctx);
+    }
+    expect(attackers.sort()).toEqual([...riders].sort());
+    for (const rider of riders) expect(now.state.cards[rider]?.zone).toBe("encounterDeck");
+    expect(now.state.encounterDeck.slice(0, 2).sort()).toEqual([...riders].sort());
   });
 
   it("Wargs gives the attacking enemy +1 Attack, +2 when undefended (01085:A:2)", () => {

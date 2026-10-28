@@ -39,7 +39,7 @@ tags:
 # The sentence names the prisoner (the hero with the most damage), and what is attached to which hero; no choice is asked.
 - assertVisible:
     id: resolution-consequence
-    text: "Confirming records .* names .* the prisoner and unlocks Escape from Dol Guldur\\."
+    text: "Confirming records .* and unlocks Escape from Dol Guldur\\. .*, the hero with the most damage, is taken prisoner\\."
 - tapOn:
     id: resolution-confirm
 - extendedWaitUntil:

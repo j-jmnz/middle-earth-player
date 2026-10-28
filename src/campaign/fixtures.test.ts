@@ -239,7 +239,7 @@ describe("Journey Along the Anduin (Mirkwood Paths part 2, phase 30)", () => {
     expect(view.kind).toBe("settled");
     if (view.kind === "settled") {
       expect(view.prisoner).toBeTruthy();
-      expect(settledSentence(view, world, "Escape from Dol Guldur")).toMatch(/names .+ the prisoner and unlocks Escape from Dol Guldur\.$/);
+      expect(settledSentence(view, world, "Escape from Dol Guldur")).toMatch(/ and unlocks Escape from Dol Guldur\. .+, the hero with the most damage, is taken prisoner\.$/);
     }
     const after = finish(save, world, resumed.state);
     expect(after.log.completed).toEqual(["passage-through-mirkwood", "journey-along-the-anduin"]);

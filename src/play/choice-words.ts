@@ -261,6 +261,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return instruction.who === "subject" ? "ready that card after the attack" : "ready each defending character that takes no damage after the attack";
     case "ShadowAttacks":
       return "attack the defending player once this attack has ended";
+    case "StartShadowAttack":
+      return "attack the defending player";
     // The campaign family's verbs (src/catalog/families/campaign.ts) that a Journey Along the Anduin record holds.
     case "SetAsideEachPlayer":
       return `set aside a copy of ${names.code(instruction.code)} for each player`;

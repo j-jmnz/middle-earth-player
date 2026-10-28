@@ -40,6 +40,8 @@ const games = new Map<string, AnduinGame>();
 
 beforeAll(async () => {
   world = await loadAnduinWorld();
+  // Honour Guard answers damage dealt, so a game with it in hand holds a lethal wound for the Responses.
+  for (const [code, card] of await loadPrinted(["10004"])) world.cards.set(code, card);
   const strong = await anduinWorld("strong");
   const extra = await loadPrinted(["01132", "01136", "01137", "01135", "01129"]);
   cards = new Map([...world.cards, ...strong.cards, ...extra]);
@@ -121,9 +123,7 @@ describe("the campaign card's lines", () => {
     // Seat 0 chose among its two heroes (the first option), seat 1 has one hero.
     expect(attached(run.state, "01133")).toEqual(["ah1", "ah3"]);
     expect(run.state.cards[first(run.state, "01133")]?.zone).toBe("play");
-    // A second Troll: the hero with a Valor is not offered again (Limit 1 per hero), so seat 0's other hero gets the next copy.
-    const again = frame({ ...run.state, cards: { ...run.state.cards } }, [KILL_TROLLS], made.ctx);
-    expect(attached(again.state, "01133")).toEqual(["ah1", "ah3"]);
+    // Two Trolls for one player: the hero who has a Valor is not offered again (Limit 1 per hero), so the second copy goes to the other hero.
     const second = make({ engaged: [{ code: "01082", seat: 0 }, { code: "01082", seat: 0 }], setAside: ["01133"] });
     const hero = first(second.state, "ah1");
     const withValor = spawn(second.state, "01133", { zone: "play", seat: 0 });
@@ -152,6 +152,16 @@ describe("the campaign card's lines", () => {
     const other = fight(world, "f0", "brute", { campaign: true, damage: [["ah1", 4]], setAside: ["01138"] }, { undefended: true });
     expect(other.run.state.cards[other.hero]?.zone).toBe("discard");
     expect(attached(other.run.state, "01138")).toEqual([]);
+  });
+
+  it("brings the Scarred when a card that answers damage is in hand, so the lethal damage is held and the hero is destroyed after the Responses (01130:A:4)", () => {
+    // Honour Guard (10004) answers damage dealt: the engine holds the lethal damage, then destroys the hero at the end of the attack.
+    const held = fight(world, "f0", "01082", { campaign: true, seats: 2, damage: [["ah1", 4]], setAside: ["01138", "01138"], hand: ["10004"] }, { undefended: true });
+    expect(held.run.state.cards[held.hero]?.zone).toBe("discard");
+    expect(attached(held.run.state, "01138")).toEqual(["ah2", "ah3"]);
+    // The same attack with nothing in hand that answers damage brings the same cards.
+    const plain = fight(world, "f0", "01082", { campaign: true, seats: 2, damage: [["ah1", 4]], setAside: ["01138", "01138"] }, { undefended: true });
+    expect(attached(plain.run.state, "01138")).toEqual(attached(held.run.state, "01138"));
   });
 
   it("has Scarred raise its controller's threat by 1 when a character they control is destroyed (01138:A:2), and Valor heal its hero and hurt the enemy it attacks (01133:A:2)", () => {
@@ -269,11 +279,11 @@ describe("what a win writes", () => {
     if (view.kind !== "settled") return;
     expect(view.prisoner).toBe(game.state.resolutionLog.prisoner);
     const sentence = settledSentence(view, named, "Escape from Dol Guldur");
-    expect(sentence).toMatch(/^Confirming records Valor on \w+ and Scarred on \w+ in the campaign, names \w+ the prisoner and unlocks Escape from Dol Guldur\.$/);
+    expect(sentence).toMatch(/^Confirming records Valor on \w+ and Scarred on \w+ in the campaign and unlocks Escape from Dol Guldur\. \w+, the hero with the most damage, is taken prisoner\.$/);
     // A game with nothing attached still names the prisoner.
     const plain = games.get("true solo, won")!;
     const bare = resolutionView(plain.state, named);
     if (bare.kind !== "settled") throw new Error("not settled");
-    expect(settledSentence(bare, named, "Escape from Dol Guldur")).toMatch(/^Confirming records Valor on \w+ in the campaign, names \w+ the prisoner and unlocks Escape from Dol Guldur\.$/);
+    expect(settledSentence(bare, named, "Escape from Dol Guldur")).toMatch(/^Confirming records Valor on \w+ in the campaign and unlocks Escape from Dol Guldur\. \w+, the hero with the most damage, is taken prisoner\.$/);
   });
 });

@@ -21,7 +21,7 @@ import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from 
 import { holdAttack } from "./families/defense-listen.ts";
 import { startShadowAttack } from "./families/defense-shadow-attack.ts";
 import { announceShadowRaise, noteShadowStart } from "./families/defense-shadow.ts";
-import { charactersDestroyed } from "./families/burden-attack.ts";
+import { announceDestroyed, charactersDestroyed } from "./families/burden-attack.ts";
 import { attackHere, attackKey, locationDamage } from "./families/south-watcher.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
@@ -33,7 +33,7 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
 
 // A shadow effect that asks a player (Pick, Choose: "Discard a non-objective attachment you control", 141071:A:2), or repeats an
 // instruction ("Deal X shadow cards to this attacker", 01112:A:2), runs in a frame: only a frame expands a Repeat.
-function asks(effects: readonly Effect[]): boolean {
+function runsInFrame(effects: readonly Effect[]): boolean {
   return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat"));
 }
 
@@ -43,7 +43,7 @@ function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number,
   const turned = updateCard(state, shadowId, { face: "up" });
   const effects = ctx.effects.filter((effect) => effect.cardCode === shadow.code && effect.timing === "shadow");
   // An effect that waits for a player runs in a frame settle advances; the attack goes on when it pops (afterShadowFrame).
-  if (asks(effects) && turned.pendingAttack) {
+  if (runsInFrame(effects) && turned.pendingAttack) {
     const framed = pushEffectFrame(
       // The defense window is over: the defender is declared.
       { ...turned, window: null, pendingAttack: { ...turned.pendingAttack, shadowFrame: shadowId } },
@@ -262,12 +262,15 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const cleared = attack.immediate && done.phase !== "Combat" ? discardShadowOf(done, attack.enemyId) : done;
   // "After an attack in which ~ defends resolves", "After a non-unique enemy attacks you": the attack is over.
   const defender = attack.defenderId && !attack.undefended ? { other: attack.defenderId } : {};
-  const announced = queueEvent(cleared, { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender });
+  const announced = queueEvent(announceDestroyed(cleared, attack, ctx), { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender });
   const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks };
+  // A shadow card that attacks the defending player (Wolf Rider) attacks once this attack's own "after" instructions have run, and the
+  // shadow cards that follow it once its attack has ended (startShadowAttack carries the rest of the list onto its attack).
   const after = attack.after ?? [];
-  // A shadow card that attacks the defending player (Wolf Rider) attacks now that this attack is over.
-  if (after.length === 0 && (attack.shadowAttackers?.length ?? 0) > 0) return startShadowAttack(ended, attack, ctx, steps) ?? ended;
-  if (after.length === 0 || !attackHere(ended, attack.enemyId)) return ended;
+  const waiting = attack.shadowAttackers ?? [];
+  if (after.length === 0 && waiting.length > 0) return startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended;
+  if (after.length === 0) return ended;
+  if (!attackHere(ended, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
   return pushEffectFrame(
     ended,
     {
@@ -276,7 +279,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       actor: attack.seat,
       peril: false,
       effectId: `${attack.enemyId}:afterAttack`,
-      instructions: after,
+      instructions: waiting.length > 0 ? [...after, { verb: "StartShadowAttack", attackers: [...waiting] }] : after,
       cancel: null,
       blockCancel: null,
       ...(destroyed > 0 ? { x: destroyed } : {}),

@@ -7,7 +7,7 @@ import type { GameEvent } from "../frame-types.ts";
 import type { ReduceContext } from "../interpret.ts";
 import type { ScenarioState } from "../state.ts";
 import { heldAmount } from "../state.ts";
-import { gameReads } from "./costs-pay.ts";
+import { gameReads } from "../game-reads.ts";
 
 // Whether some card in the game hears this trigger: the attack family's own events are queued only then (attackDamaged,
 // attackDestroyedEngaged, attacked).

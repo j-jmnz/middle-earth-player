@@ -82,7 +82,9 @@ function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNam
 export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): Sheet {
   const numbers = attackNumbers(game, ctx);
   const title = numbers ? `${names.card(numbers.enemyId)} attacks` : "An enemy attacks";
-  const note = numbers ? `Attack ${numbers.attack}.` : "";
+  // An attack a shadow card makes says where it comes from, as a pick says its card's line (sheets.ts).
+  const source = numbers && game.pendingAttack?.shadowAttack ? ` ${names.card(numbers.enemyId)}'s shadow effect: it attacks you now, and goes back to the top of the encounter deck after combat.` : "";
+  const note = numbers ? `Attack ${numbers.attack}.${source}` : "";
   const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
   const undefended = undefendedSheet(game, ctx, names, title, note);
   // Leave undefended with one hero to take it: the armed line says when that hero falls and the game with it.

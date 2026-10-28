@@ -16,7 +16,7 @@ import { patchTop, topFrame } from "../windows.ts";
 import { redirectDamage } from "./defense-damage.ts";
 import { addDefender, addEndReady, assignAttackDamage, cancelAttack, readyUnharmed } from "./defense-defenders.ts";
 import { dealShadowTo, discardShadowOf, lookAtShadow, redirectAttack } from "./defense-shadow.ts";
-import { shadowAttacks } from "./defense-shadow-attack.ts";
+import { shadowAttacks, startShadowAttack } from "./defense-shadow-attack.ts";
 import type { Focus } from "./index.ts";
 
 function ref(state: ScenarioState, card: CardRef, focus: Focus): string {
@@ -89,6 +89,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return lookAtShadow(state, ref(state, instruction.target ?? "picked", focus), focus.seat, instruction.markEffect === true, ctx);
     case "ShadowAttacks":
       return shadowAttacks(state, focus.sourceId);
+    case "StartShadowAttack":
+      return startShadowAttack(state, focus.seat, instruction.attackers, ctx, steps) ?? state;
     case "StrikeBack":
       return strikeBack(state, instruction, focus, ctx, steps);
     case "AddDefender":

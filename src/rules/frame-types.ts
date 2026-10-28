@@ -175,6 +175,8 @@ export type PendingAttack = {
   seat: number;
   // An attack an effect started. It does not use up the enemy's attack for the phase.
   immediate?: boolean;
+  // The attack is a shadow card's own (Wolf Rider, 01081:A:2), made once the attack it was dealt to ended.
+  shadowAttack?: boolean;
   defenderId?: string;
   // The hero an undefended attack lands on.
   heroId?: string;

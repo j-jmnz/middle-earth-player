@@ -27,7 +27,8 @@ import { queueEvent } from "../queue.ts";
 import type { ScenarioState } from "../state.ts";
 import { livingSeats } from "../state.ts";
 import { patchTop, topFrame } from "../windows.ts";
-import { allyPools, cannotPay, cardRules, distinctRule, gameReads, noteSpent, payerOk } from "./costs-pay.ts";
+import { gameReads } from "../game-reads.ts";
+import { allyPools, cannotPay, cardRules, distinctRule, noteSpent, payerOk } from "./costs-pay.ts";
 
 type PlayIntent = Extract<PlayerIntent, { type: "PlayCard" }>;
 type PlayFromHand = Extract<Instruction, { verb: "PlayFromHand" }>;

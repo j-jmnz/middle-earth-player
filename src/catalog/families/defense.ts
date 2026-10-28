@@ -65,8 +65,11 @@ export const VERBS = [
   // `target` (the picked one by default) instead of the defenders: that enemy takes the damage, read against its Defense.
   z.strictObject({ verb: z.literal("RedirectAttack"), target: cardRefSchema.optional(), ...when }),
   // Shadow effect of an enemy card ("Wolf Rider attacks the defending player", 01081:A:2): the source attacks the player the attack it
-  // was dealt to is made against, once that attack has ended, and goes to the top of the encounter deck after its own attack.
+  // was dealt to is made against, once that attack has ended, and goes to the top of the encounter deck at the end of the combat phase.
   z.strictObject({ verb: z.literal("ShadowAttacks"), ...when }),
+  // Engine use: the first of these shadow cards attacks the defending player, once the instructions before it have run (the "after" of
+  // the attack the shadow cards were dealt to, src/rules/shadow.ts finishAttack).
+  z.strictObject({ verb: z.literal("StartShadowAttack"), attackers: z.array(z.string().min(1)).min(1), ...when }),
   // A stat change that holds only while the card (`target`) attacks the enemy `versus` ("+2 Attack while attacking that enemy").
   z.strictObject({
     verb: z.literal("ModifyStatVersus"),

@@ -160,8 +160,10 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
     const kind = kinded ? world.cards.get(view.earned[words.indexOf(text)]?.code ?? "")?.campaignKind : null;
     return copies > 1 ? `${copies} copies of ${text}` : kind ? `the ${kind} ${text}` : text;
   });
-  const records = earned.length > 0 ? `Confirming records ${earned.join(" and ")} in the campaign` : "Confirming records the win";
-  // The hero a Resolution takes prisoner is written to the log too (01130:B:1), with the scenario it matters in.
-  const prisoner = view.prisoner ? `, names ${nameOf(world, view.prisoner)} the prisoner` : "";
-  return next ? `${records}${prisoner} and unlocks ${next}.` : `${records}${prisoner}.`;
+  // "A and B", "A, B and C": an "and" only before the last.
+  const list = earned.length > 1 ? `${earned.slice(0, -1).join(", ")} and ${earned.at(-1)}` : (earned[0] ?? "");
+  const records = earned.length > 0 ? `Confirming records ${list} in the campaign` : "Confirming records the win";
+  const sentence = next ? `${records} and unlocks ${next}.` : `${records}.`;
+  // The hero a Resolution takes prisoner is written to the log too (01130:B:1): a sentence of its own, with the reason.
+  return view.prisoner ? `${sentence} ${nameOf(world, view.prisoner)}, the hero with the most damage, is taken prisoner.` : sentence;
 }

@@ -230,7 +230,8 @@ function travelReason(
   if (state.window?.kind !== "travel") return "That intent is not legal in this window";
   if (!freeSlot(state)) return "An active location is already in play";
   if (!stagingLocations(state, ctx.cards).includes(intent.locationId)) return "That location is not in staging";
-  if (forcedTravel(state, ctx).length > 0 && !forcedTravel(state, ctx).includes(intent.locationId)) return "The players must travel to the location that says so";
+  const forced = forcedTravel(state, ctx);
+  if (forced.length > 0 && !forced.includes(intent.locationId)) return "The players must travel to the location that says so";
   if (travelBlocked(state, ctx, intent.locationId)) return "Players cannot travel to that location now";
   if (travelCostUnpayable(state, ctx, intent.locationId)) return "The players cannot pay that location's Travel cost";
   return null;

@@ -28,7 +28,7 @@ import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
 import { afterPlay } from "./families/costs-play.ts";
-import { gameReads } from "./families/costs-pay.ts";
+import { gameReads } from "./game-reads.ts";
 import { playSweep } from "./families/play-sweep.ts";
 import { afterPaying } from "./families/deck-play.ts";
 import { doRefresh } from "./refresh.ts";

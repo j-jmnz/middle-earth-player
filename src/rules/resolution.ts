@@ -42,15 +42,22 @@ function stepOver(state: ScenarioState, log?: ResolutionLog): ScenarioState {
 // adds a copy for a seat that holds none: The Ring Draws Them chosen by seat 0 and then earned again from the encounter deck is
 // still one card.
 // A per-player copy that names its hero (a card attached to a hero, EarnAttached) is one copy for each hero: a player whose two heroes
-// each carry a copy takes both into the pool. `have` is an earned entry (`hero`) or a pool entry (`attachedTo`).
-export function holdsCopy(entries: readonly (Pick<Earned, "code" | "seat"> & { hero?: string | null; attachedTo?: string | null })[], item: Pick<Earned, "code" | "seat" | "perPlayer"> & { hero?: string | null }): boolean {
-  if (item.perPlayer && item.hero != null) return entries.some((have) => have.code === item.code && (have.hero ?? have.attachedTo) === item.hero);
-  return entries.some((have) => have.code === item.code && (!item.perPlayer || have.seat === item.seat));
+// each carry a copy takes both into the pool. A held copy is read as `{ code, seat, hero }` (`hero`: the hero it is on, or null), so an
+// earned entry and a pool entry go through one shape; `heldCopy` makes it.
+export type HeldCopy = { code: string; seat: number | null; hero: string | null };
+
+export function heldCopy(entry: { code: string; seat: number | null; hero?: string | null; attachedTo?: string | null }): HeldCopy {
+  return { code: entry.code, seat: entry.seat, hero: entry.hero ?? entry.attachedTo ?? null };
+}
+
+export function holdsCopy(held: readonly HeldCopy[], item: Pick<Earned, "code" | "seat" | "perPlayer"> & { hero?: string | null }): boolean {
+  if (item.perPlayer && item.hero != null) return held.some((have) => have.code === item.code && have.hero === item.hero);
+  return held.some((have) => have.code === item.code && (!item.perPlayer || have.seat === item.seat));
 }
 
 function earn(state: ScenarioState, entries: readonly Earned[]): ResolutionLog {
   const have = state.resolutionLog.earned;
-  return { ...state.resolutionLog, earned: [...have, ...entries.filter((item) => !holdsCopy(have, item))] };
+  return { ...state.resolutionLog, earned: [...have, ...entries.filter((item) => !holdsCopy(have.map(heldCopy), item))] };
 }
 
 // The entries one instruction hands out: one copy of each code, or one for each player at the table. An eliminated player is
@@ -73,7 +80,11 @@ function attachedCopies(state: ScenarioState, codes: readonly string[], ctx: Red
 // The hero in play with the most damage; a tie is broken at random with the game's seed (01130:B:1). The cursor is the seed's place
 // afterwards. No hero in play names no prisoner.
 function prisonerOf(state: ScenarioState, ctx: ReduceContext): { hero: string | null; cursor: number } {
-  const heroes = livingSeats(state).flatMap((seat) => (state.seats[seat]?.heroes ?? []).flatMap((id) => (state.cards[id] && printedOf(ctx.cards, state.cards[id].code).type === "hero" ? [state.cards[id]] : [])));
+  const heroIds = livingSeats(state).flatMap((seat) => state.seats[seat]?.heroes ?? []);
+  const heroes = heroIds.flatMap((id) => {
+    const card = state.cards[id];
+    return card && printedOf(ctx.cards, card.code).type === "hero" ? [card] : [];
+  });
   const most = Math.max(-1, ...heroes.map((hero) => hero.damage));
   const tied = heroes.filter((hero) => hero.damage === most).map((hero) => hero.code);
   if (tied.length === 0) return { hero: null, cursor: state.seedCursor };
