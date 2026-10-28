@@ -25,7 +25,9 @@ export function travelNow(state: ScenarioState, locationId: string, ctx: ReduceC
   // The travel opportunity is taken; the Travel phase ends after the window that follows it (rr.framework-steps, 4.2).
   const moved = traveled.mode === "travel" ? markReached(traveled, "traveled") : traveled;
   const offered = offerResponses(moved, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
-  return fireForced(offered, { trigger: "becameActive", seat: null, cardId: locationId }, ctx, steps);
+  // A Forced effect "After travelling to ~" (01107:A:1) resolves before the Responses, as every Forced effect does (rr.forced).
+  const forced = fireForced(offered, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
+  return fireForced(forced, { trigger: "becameActive", seat: null, cardId: locationId }, ctx, steps);
 }
 
 // The Travel intent. A location with a Travel effect makes the first player resolve it first, in a

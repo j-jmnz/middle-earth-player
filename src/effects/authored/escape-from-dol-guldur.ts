@@ -27,7 +27,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"01103:shadow:1","cardCode":"01103","lines":["01103:A:2"],"timing":"shadow","instructions":[{"verb":"Pick","pick":{"type":"attachment","control":"you"},"when":NOT_UNDEFENDED},{"verb":"DiscardPicked","when":NOT_UNDEFENDED},{"verb":"Each","pick":{"type":"attachment","control":"you"},"instructions":[{"verb":"DiscardPicked"}],"when":{"kind":"undefended"}}]},
   // 01104 Under the Shadow: the staging area's total Threat is higher by the number of players until the end of the phase; as a Shadow card the
   // defending player raises his threat by the number of enemies he is engaged with.
-  {"id":"01104:whenRevealed:1","cardCode":"01104","lines":["01104:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"moreStagingThreat","amount":{"players":true},"until":"endOfPhase","target":"table"}]},
+  {"id":"01104:whenRevealed:1","cardCode":"01104","lines":["01104:A:1"],"timing":"whenRevealed","instructions":[{"verb":"RaiseStagingThreat","amount":{"players":true},"until":"endOfPhase"}]},
   {"id":"01104:shadow:1","cardCode":"01104","lines":["01104:A:2"],"timing":"shadow","instructions":[{"verb":"RaiseThreat","amount":{"count":{"type":"enemy","control":"any","engaged":"you"}},"who":"actor"}]},
   // 01105 Iron Shackles: attached to the top of the first player's deck (the next draw from it discards Iron Shackles instead, families/dungeon-deck.ts);
   // as a Shadow card its When Revealed effect resolves.
@@ -59,8 +59,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // Forced: the prisoner is the hero the Campaign Log names, Mendor is captured with it and the card is flipped. Response (side B): the first
   // claimed objective frees Mendor with 1 damage. Resolution: a Mendor still in play and a Mendor's Support for each player go to the next campaign.
   {"id":"01131:campaignSetup:1","cardCode":"01131","lines":["01131:A:2"],"timing":"campaignSetup","instructions":[{"verb":"PutObjectiveAllyIntoPlay","code":"01135"},{"verb":"AttachChosen","code":"01134"}]},
-  {"id":"01131:forced:1","cardCode":"01131","lines":["01131:A:3"],"timing":"forced","trigger":"prisonerTaken","condition":{"kind":"faceUp","side":"A"},"instructions":[{"verb":"SelectLoggedPrisoner"},{"verb":"CaptureWithPrisoner","code":"01135"},{"verb":"FlipCard"}]},
-  {"id":"01131:response:1","cardCode":"01131","lines":["01131:B:1"],"timing":"response","trigger":"claimed","limit":"oncePerGame","condition":{"kind":"faceUp","side":"B"},"instructions":[{"verb":"FreeCaptive","code":"01135","damage":1}]},
+  {"id":"01131:forced:1","cardCode":"01131","lines":["01131:A:3"],"timing":"forced","trigger":"prisonerTaken","subject":{"type":"hero","control":"any"},"condition":{"kind":"faceUp","side":"A"},"instructions":[{"verb":"SelectLoggedPrisoner"},{"verb":"CaptureWithPrisoner","code":"01135"},{"verb":"FlipCard"}]},
+  {"id":"01131:response:1","cardCode":"01131","lines":["01131:B:1"],"timing":"response","trigger":"claimed","subject":{"type":"objective","control":"any"},"limit":"oncePerGame","condition":{"kind":"faceUp","side":"B"},"instructions":[{"verb":"FreeCaptive","code":"01135","damage":1}]},
   {"id":"01131:resolution:1","cardCode":"01131","lines":["01131:B:2"],"timing":"resolution","instructions":[{"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}},{"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]},
 ];
 

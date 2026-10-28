@@ -4,6 +4,7 @@
 // effect-schema-stats.ts compose them. src/rules/families/dungeon*.ts runs them.
 import { z } from "zod";
 
+import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
 export const VERBS = [
@@ -15,6 +16,9 @@ export const VERBS = [
   // 01105:A:1: the source encounter card (a treachery being revealed) is attached to the top of the first player's deck, in play,
   // controlled by nobody. The next draw from that deck is replaced by discarding it (Iron Shackles' own text, a constant of the card).
   z.strictObject({ verb: z.literal("AttachToDeck"), who: z.literal("firstPlayer"), ...when }),
+  // 01104:A:1, "Until the end of the phase, raise the total Threat in the staging area by X": the table holds the raise (moreStagingThreat) until
+  // `until`. It adds to the Threat of the cards in the staging area, so it counts in the quest phase and for the engagement checks of the phase.
+  z.strictObject({ verb: z.literal("RaiseStagingThreat"), amount: positiveAmountSchema, until: z.enum(["endOfPhase", "endOfRound"]), ...when }),
   // Setup (01123:A:1, "place the Nazgûl of Dol Guldur face up but out of play, alongside the quest deck"): the set-aside card with this code is
   // turned faceup, still out of play.
   z.strictObject({ verb: z.literal("TurnFaceUp"), code: z.string().min(1), ...when }),
@@ -30,7 +34,7 @@ export const TRIGGERS = [
 ] as const;
 
 export const FLAGS = [
-  // Held by the table: the total Threat in the staging area is raised by this much (01104:A:1, "raise the total Threat in the staging area
-  // by X"). It adds to the Threat of the cards there; lessStagingThreat (attachments family) takes away from the total.
+  // Held by the table: the total Threat in the staging area is raised by this much (RaiseStagingThreat, 01104:A:1). It adds to the Threat of
+  // the cards there; lessStagingThreat (attachments family) takes away from the total.
   "moreStagingThreat",
 ] as const;

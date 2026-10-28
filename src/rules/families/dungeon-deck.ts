@@ -13,7 +13,8 @@ export function attachToDeck(state: ScenarioState, focus: Focus): ScenarioState 
   const id = focus.sourceId;
   const seat = state.seats[state.firstPlayer];
   if (!id || !state.cards[id] || !seat) return state;
-  const moved = updateCard(moveCard(state, id, { zone: "attached" }), id, { face: "up" });
+  // A shadow card that is attached leaves the enemy it was dealt to: it has no host.
+  const moved = updateCard(moveCard(state, id, { zone: "attached" }), id, { face: "up", host: null });
   return withSeat(moved, state.firstPlayer, { ...seat, deckAttached: [...(seat.deckAttached ?? []), id] });
 }
 
