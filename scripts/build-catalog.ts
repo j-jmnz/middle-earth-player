@@ -10,6 +10,7 @@ import type { Card } from "../src/catalog/card-facts.ts";
 import { campaignIndexSchema } from "../src/catalog/scenario-data.ts";
 import { campaigns, cards, catalogTables, meta, packs } from "../src/catalog/schema.ts";
 import { contentVersion, writeCatalogVersion } from "./catalog-version.ts";
+import { catalogStamp } from "../src/catalog/version.ts";
 import { bytes, createLog, runScript } from "./log.ts";
 import { PACK_CAMPAIGN } from "./data/campaign-defs.ts";
 import { loadCards } from "./data/load-cards.ts";
@@ -224,6 +225,7 @@ function insertRows(db: SqliteDatabase, table: SQLiteTable, rows: Row[]): void {
 function writeDatabase(
   filePath: string,
   built: { campaigns: Row[]; packs: Row[]; cards: Row[]; meta: Row[] },
+  version: number,
 ): void {
   mkdirSync(path.dirname(filePath), { recursive: true });
   const db = new Database(filePath);
@@ -240,6 +242,7 @@ function writeDatabase(
       insertRows(db, meta, built.meta);
     });
     insertAll();
+    db.pragma(`user_version = ${catalogStamp(version)}`);
   } finally {
     db.close();
   }
@@ -304,7 +307,7 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
       packs: packRows,
       cards: cardRows,
       meta: metaRows,
-    });
+    }, version);
     mkdirSync(path.dirname(dbPath), { recursive: true });
     renameSync(temporaryPath, dbPath);
     log.info(`wrote ${shown(dbPath)} (${bytes(statSync(dbPath).size)}): ${packRows.length} packs, ${cardRows.length} cards, ${campaignRows.length} campaigns, ${metaRows.length} meta rows`);

@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import type { Card } from "../src/catalog/card-facts.ts";
 import { buildCatalog, pictureOf, type BuildCatalogOptions } from "./build-catalog.ts";
+import { catalogStamp } from "../src/catalog/version.ts";
 
 const databases: DatabaseSync[] = [];
 
@@ -140,6 +141,8 @@ describe("buildCatalog", () => {
     expect(database.prepare("select available from packs where code = ?").get("A")?.available).toBe(1);
     expect(database.prepare("select code from packs where code = ?").get("E")).toBeUndefined();
     expect(database.prepare("select fetched_at from meta where pack_code = ?").get("A")?.fetched_at).toBe("2026-10-24");
+    // The file carries its own version, so a phone can tell a stale catalog.db from the one its code expects.
+    expect(database.prepare("pragma user_version").get()?.user_version).toBe(catalogStamp(first.version));
 
     expect(buildCatalog(options(dirs)).version).toBe(first.version);
   });

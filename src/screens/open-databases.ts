@@ -1,8 +1,8 @@
 import { drizzle, type ExpoSQLiteDatabase } from "drizzle-orm/expo-sqlite";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
-import { importDatabaseFromAssetAsync, openDatabaseAsync } from "expo-sqlite";
+import { importDatabaseFromAssetAsync, openDatabaseAsync, type SQLiteDatabase } from "expo-sqlite";
 
-import { CATALOG_VERSION, shouldReplaceCatalog } from "../catalog/version";
+import { CATALOG_VERSION, catalogFileIsCurrent, shouldReplaceCatalog } from "../catalog/version";
 import migrations from "../../drizzle/migrations";
 import { writeAppliedCatalogVersion } from "./applied-catalog-version";
 import { boxOf } from "./campaign-data";
@@ -20,6 +20,16 @@ export type AppDatabases = {
   catalog: ExpoSQLiteDatabase;
   user: ExpoSQLiteDatabase;
 };
+
+async function openCatalog(forceOverwrite: boolean): Promise<SQLiteDatabase> {
+  await importDatabaseFromAssetAsync("catalog.db", { assetId: catalogAssetModuleId(), forceOverwrite });
+  return openDatabaseAsync("catalog.db");
+}
+
+async function stampOf(db: SQLiteDatabase): Promise<number | null> {
+  const row = await db.getFirstAsync<{ user_version: number }>("PRAGMA user_version");
+  return row?.user_version ?? null;
+}
 
 let opening: Promise<AppDatabases> | null = null;
 
@@ -46,15 +56,21 @@ async function openDatabasesOnce(): Promise<AppDatabases> {
   const applied = stored?.appliedCatalogVersion ?? null;
   const replaceCatalog = shouldReplaceCatalog(CATALOG_VERSION, applied);
 
-  await importDatabaseFromAssetAsync("catalog.db", {
-    assetId: catalogAssetModuleId(),
-    forceOverwrite: replaceCatalog,
-  });
-
-  const catalogSqlite = await openDatabaseAsync("catalog.db");
+  let catalogSqlite = await openCatalog(replaceCatalog);
+  let replaced = replaceCatalog;
+  // The applied version in user.db names what the code expected, not what the file holds: a build that shipped a stale
+  // catalog.db recorded the right number over the wrong rows. The file's own stamp settles it (version.ts).
+  if (!catalogFileIsCurrent(await stampOf(catalogSqlite), CATALOG_VERSION)) {
+    await catalogSqlite.closeAsync();
+    catalogSqlite = await openCatalog(true);
+    replaced = true;
+    if (!catalogFileIsCurrent(await stampOf(catalogSqlite), CATALOG_VERSION)) {
+      console.warn("The bundled catalog.db does not match this build's CATALOG_VERSION: run pnpm catalog:build and rebuild");
+    }
+  }
   await catalogSqlite.execAsync("PRAGMA query_only = ON");
 
-  if (replaceCatalog) {
+  if (replaced) {
     writeAppliedCatalogVersion((statement) => {
       userSqlite.execSync(statement);
     }, CATALOG_VERSION);
