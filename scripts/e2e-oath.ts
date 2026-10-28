@@ -1,10 +1,10 @@
 // The Maestro fixtures of The Oath (The Dark of Mirkwood part 1), written into src/campaign/fixtures/the-oath.json by scripts/e2e-fixtures.ts: two real
-// games of saved decklists (the Dwarves of Durin and Elves of Lórien lists of data/decks/prebuilt.json), two-handed, Easy, from the blank log a new
+// games of saved decklists (the Defenders of Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, from the blank log a new
 // `the-dark-of-mirkwood` playthrough starts on (tdom.mini-campaign), so each is a real save. Each seat chose an Adaptation at the Campaign Setup
 // Checklist (the first seat's first hero carries The Fervor of Lore, the second seat's The Might of Tactics). Played by the auto-player, every intent one the
 // reducer listed.
 // `oath-won`: the first seed that wins and has used an Adaptation (so the Campaign Log shows what is used once), parked on the win (41050's Resolution asks
-// nothing: the tokens on the campaign card are recorded, and 6 or more earn Guilty Conscience). `oath-lost`: the first seed that loses, parked on the loss.
+// nothing: 6 or more tokens on the campaign card earn Guilty Conscience). `oath-lost`: the first seed that loses, parked on the loss.
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
@@ -23,7 +23,7 @@ import { createLog } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
 const say = createLog("e2e-oath");
-const DECKS = ["dwarves-of-durin", "elves-of-lorien"] as const;
+const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
 const ADAPTATIONS = ["41044", "41045"] as const;
 
 export type OathFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[] };

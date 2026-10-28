@@ -8,14 +8,10 @@ import { reprint } from "./reprint.ts";
 // the three quest cards and the campaign card. The boons and burdens it deals or earns (the Adaptations 41044 to 41047, Stalking Goblin 41041,
 // Guilty Conscience 41043) are in pool/TDoM.ts. Every line is read from the scan ledger (data/printed/mirkwood-paths.json).
 // Rules: rr.step-3-3, rr.search, rr.travel, rr.engaged, rr.cancel, rr.first-player, rr.campaign-cards, rr.limits (data/rules/entries.json).
-const NOT_UNDEFENDED = {"kind":"not","condition":{"kind":"undefended"}} as const;
 const READY_CHARACTER = {"type":"character","control":"you","state":"ready"} as const;
 const EXHAUSTED_CHARACTER = {"type":"character","control":"you","state":"exhausted"} as const;
 const QUESTING_CHARACTER = {"type":"character","control":"you","committed":true} as const;
 const STAGING_LOCATIONS = {"type":"location","control":"any","stagingOnly":true} as const;
-const STAGING_ENEMIES = {"type":"enemy","control":"any","stagingOnly":true} as const;
-// The treachery being revealed waits in the staging area while it resolves (rules/frames.ts): "the staging area" here is the other cards.
-const STAGING = {"type":"card","control":"any","stagingOnly":true,"other":true} as const;
 const GOBLIN_ENEMY = {"type":"enemy","control":"any","trait":"Goblin"} as const;
 
 // The records of the Passage and Anduin cards this scenario prints again (the ledger lines are identical, reprint.test.ts).

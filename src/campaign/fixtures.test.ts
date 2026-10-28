@@ -288,6 +288,9 @@ describe("The Oath (The Dark of Mirkwood part 1, phase 32)", () => {
     if (!resumed.ok) return;
     const view = resolutionView(resumed.state, world);
     expect(view.kind).toBe("settled");
+    // Goblin Troop was brought into play (stage 3's When Revealed) and defeated: it is not set aside (rr.quest-advancement).
+    expect(Object.values(resumed.state.cards).filter((card) => card.code === "41019").map((card) => card.zone)).not.toContain("setAside");
+    if (view.kind === "settled") expect(settledSentence(view, world, "The Caves of Nibin-Dûm")).toMatch(/^Confirming records .* and unlocks The Caves of Nibin-Dûm\. .* recorded as used this campaign\./);
     const tokens = Object.values(resumed.state.cards).find((card) => card.code === "41050")?.resources ?? -1;
     expect(tokens).toBeGreaterThanOrEqual(0);
     const after = finish(save, world, resumed.state);

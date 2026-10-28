@@ -3,9 +3,9 @@ tags:
   - scenario
 ---
 # Phase 32. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture `oath-won` is a real
-# two-handed game of The Oath (the Dwarves of Durin and Elves of Lórien lists, each seat with an Adaptation) from the blank log a new The Dark of Mirkwood
-# playthrough starts on (tdom.mini-campaign), parked on its win. 41050's Resolution asks nothing: the tokens on the campaign card are recorded and 6 or
-# more earn Guilty Conscience. Confirming writes the log and unlocks The Caves of Nibin-Dûm. The same win in Mirkwood Paths (part 4, from Escape from Dol
+# two-handed game of The Oath (the Defenders of Gondor and Swords of the Noldor lists, each seat with an Adaptation) from the blank log a new The Dark of Mirkwood
+# playthrough starts on (tdom.mini-campaign), parked on its win. 41050's Resolution asks nothing: 6 or more tokens on the campaign card earn Guilty
+# Conscience. Confirming writes the log and unlocks The Caves of Nibin-Dûm. The same win in Mirkwood Paths (part 4, from Escape from Dol
 # Guldur's log) unlocks the same scenario there: that is checked in Node (src/campaign/golden-oath.test.ts) and stays open on the phone until a real
 # `dol-guldur-won` fixture exists (it needs `anduin-won`, docs/phases/STATUS.md). The path screen has no table-menu: the log is opened from `log-open`.
 - launchApp:
