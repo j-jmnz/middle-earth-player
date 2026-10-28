@@ -1,5 +1,4 @@
 import type { Condition, Effect, Instruction } from "../catalog/boundary.ts";
-
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { beginEffect } from "./cancel.ts";
 import { effectCause, inCause, type Cause } from "./cause.ts";
@@ -23,6 +22,7 @@ import { livingSeats, updateCard, withSeat } from "./state.ts";
 import { offerResponses } from "./responses.ts";
 import { holdsNow, seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
+import { discardRestricted } from "./families/objectives-claimed.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { chooseAmount } from "./families/defense.ts";
 import { dealAttackShadow } from "./families/defense-listen.ts";
@@ -488,12 +488,8 @@ function applyTargeted(
     case "ShuffleIntoDeck":
     case "ShuffleOutOfPlayIntoEncounterDeck":
       return first ? shuffleIntoEncounterDeck(state, first) : state;
-    case "DiscardRestricted": {
-      const owner = first ? state.cards[first]?.controller : null;
-      // A claimed objective that is discarded returns to the staging area (families/objectives.ts).
-      if (first && state.cards[first]?.claimed) return updateCard(moveCard(state, first, { zone: "staging" }), first, { face: "up" });
-      return first && owner != null ? moveCard(state, first, { zone: "discard", seat: owner }) : state;
-    }
+    case "DiscardRestricted":
+      return first ? discardRestricted(state, first) : state;
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":

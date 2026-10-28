@@ -45,6 +45,18 @@ export function passageLog(won: MirkwoodFixture): CampaignLog {
   return finish(save, world, resumed.state).log;
 }
 
+// The log Journey Along the Anduin's won game writes: replay the fixture and confirm it (the prisoner is the one its Resolution names).
+export function anduinWonLog(won: AnduinFixture): CampaignLog {
+  const scenario = loadScenario("journey-along-the-anduin");
+  const codes = [...won.loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(won.log)];
+  const world = loadWorld(catalog, campaign, scenario, EFFECTS, codes);
+  const save: Save = { ...newSave("fixture", campaign.id, 2), log: won.log, loadout: won.loadout, active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: won.seed, intents: [...won.intents] } };
+  const resumed = resume(save, world, CATALOG_VERSION);
+  if (!resumed.ok) throw new Error(resumed.reason);
+  if (!resumed.state.stageCleared || resumed.state.lost) throw new Error("The anduin-won fixture does not replay to a win");
+  return finish(save, world, resumed.state).log;
+}
+
 // The auto-player's answer, except that Mendor ("if Mendor leaves play, the players lose the game", 01130:A:5) is never chosen when another card can be: not as
 // a defender, and not as the ally Pursued by Shadow sends back to its owner's hand (a player never would).
 function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>): PlayerIntent {

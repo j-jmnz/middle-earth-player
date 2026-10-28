@@ -1,4 +1,5 @@
 // Rules: rr.exhausted, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.damage, rr.explored, rr.cancel, rr.shadow-effects, rr.restricted, rr.initiating-abilities-playing-cards (data/rules/entries.json).
+import { sendAway } from "./families/objectives-claimed.ts";
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
@@ -178,8 +179,8 @@ export function runPlayerVerb(
       const card = state.cards[id];
       const seat = card?.owner ?? card?.controller;
       if (!card || seat == null) return state;
-      // "Discarded objective cards are returned to the staging area" (01103:A:2, families/objectives.ts).
-      if (card.claimed) return updateCard(moveCard(state, id, { zone: "staging" }), id, { face: "up" });
+      // "Discarded objective cards are returned to the staging area" (01103:A:2, families/objectives-claimed.ts).
+      if (card.claimed) return sendAway(state, id, { zone: "discard", seat });
       const moved = moveCard(state, id, { zone: "discard", seat });
       // "After 1 or more cards are discarded from your hand", "After ~ is discarded from your deck".
       if (card.zone === "hand") return queueEvent(moved, { trigger: "discardedFromHand", seat, cardId: id });

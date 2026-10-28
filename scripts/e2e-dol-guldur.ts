@@ -1,8 +1,8 @@
 // The Maestro fixtures of Escape from Dol Guldur (Mirkwood Paths part 3), written into src/campaign/fixtures/escape-from-dol-guldur.json by
 // scripts/e2e-fixtures.ts: two real games of saved decklists (the Dwarves of Durin and Elves of Lórien lists of data/decks/prebuilt.json), two-handed,
-// Easy, from the log Passage Through Mirkwood's won game writes (scripts/e2e-mirkwood.ts) with Journey Along the Anduin completed on top of it: the
-// win of Journey Along the Anduin is open (no fixture, docs/phases/STATUS.md), so its Resolution is written by hand here, naming the first seat's
-// first hero the prisoner (01130:B:1); no Valor or Scarred is on any hero. Played by the auto-player, every intent one the reducer listed.
+// Easy, from the log the `anduin-won` game writes when it is confirmed (scripts/e2e-anduin.ts): its prisoner, its pool. That win is open (no fixture,
+// docs/phases/STATUS.md), and nothing here builds a log by hand, so no fixture of this scenario is written until `anduin-won` exists. Played by the auto-player,
+// every intent one the reducer listed.
 // `dol-guldur-won`: the first seed that wins, parked on the win (01131's Resolution asks nothing: Mendor, if he is still in play, and each
 // player's Mendor's Support are kept for the next campaign). `dol-guldur-lost`: the first seed that loses, parked on the loss.
 import Database from "better-sqlite3";
@@ -19,8 +19,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 
 import { nextIntent } from "./auto-player.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
-import { passageLog, replaced } from "./e2e-anduin.ts";
-import type { MirkwoodFixture } from "./e2e-mirkwood.ts";
+import { anduinWonLog, replaced, type AnduinFixture } from "./e2e-anduin.ts";
 import { createLog } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -31,20 +30,14 @@ export type DolGuldurFixture = { campaignId: string; seatCount: 2; loadout: Stor
 const campaign = loadCampaign("mirkwood-paths");
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 
-// Passage Through Mirkwood's log with Journey Along the Anduin completed by hand: the first seat's first hero is the prisoner.
-function anduinLog(passage: MirkwoodFixture): { log: CampaignLog; loadout: StoredLoadout } {
-  const written = passageLog(passage);
-  const swapped = replaced({ ...passage.loadout, scenarioId: "escape-from-dol-guldur" }, written);
-  const prisoner = swapped.seats[0]?.heroes[0] ?? null;
-  // The first player attaches Appointed by Fate (01131:A:2) to the second hero of the first seat; the prisoner is the first.
-  const loadout: StoredLoadout = { ...swapped, choices: [`01134>${swapped.seats[0]?.heroes[1] ?? prisoner}`] };
-  const log: CampaignLog = {
-    ...written,
-    heroesBySeat: loadout.seats.map((seat) => [...seat.heroes]),
-    completed: [...written.completed, "journey-along-the-anduin"],
-    prisoner,
-  };
-  return { log, loadout };
+// The log a real win of Journey Along the Anduin writes (`anduin-won`, replayed and confirmed): its prisoner is the one 01130:B:1 names. The first
+// player attaches Appointed by Fate (01131:A:2) to a hero that is not the prisoner.
+function anduinLog(anduin: AnduinFixture): { log: CampaignLog; loadout: StoredLoadout } {
+  const log = anduinWonLog(anduin);
+  const swapped = replaced({ ...anduin.loadout, scenarioId: "escape-from-dol-guldur" }, log);
+  const heroes = swapped.seats.flatMap((seat) => seat.heroes);
+  const bearer = heroes.find((code) => code !== log.prisoner) ?? heroes[0];
+  return { log, loadout: { ...swapped, choices: [`01134>${bearer}`] } };
 }
 
 // The auto-player's answer, with what the scenario asks of the players: a hero stays home to attack and one defends, Dungeon Torch is claimed last,
@@ -110,11 +103,15 @@ function play(log: CampaignLog, loadout: StoredLoadout, seed: number): { intents
   return { intents, state };
 }
 
-// A fixture whose game is not found is left out (a name whose fixture is absent is not offered, `hasFixture`).
-export function dolGuldurFixtures(passage: MirkwoodFixture): Partial<Record<"dol-guldur-won" | "dol-guldur-lost", DolGuldurFixture>> {
-  const { log, loadout } = anduinLog(passage);
-  // The log is Passage's with Anduin completed by hand: its `past` is the Passage fixture it is built on.
-  const past = { fixture: "mirkwood-won", choices: [] as string[] };
+// A fixture whose game is not found is left out (a name whose fixture is absent is not offered, `hasFixture`). With no `anduin-won` fixture there is no
+// honest log for this scenario to start from (docs/phases/phase-13-flight-to-the-ford.md: a fixture is a real save), so none is written.
+export function dolGuldurFixtures(anduin: AnduinFixture | undefined): Partial<Record<"dol-guldur-won" | "dol-guldur-lost", DolGuldurFixture>> {
+  if (!anduin) {
+    say.warn("no anduin-won fixture: Escape from Dol Guldur's fixtures are open until Journey Along the Anduin has a won game");
+    return {};
+  }
+  const { log, loadout } = anduinLog(anduin);
+  const past = { fixture: "anduin-won", choices: [] as string[] };
   const first = (wanted: (state: ScenarioState) => boolean, label: string): DolGuldurFixture | null => {
     for (let seed = 1; seed <= Number(process.env.DOL_GULDUR_SEEDS ?? 60); seed += 1) {
       const game = play(log, loadout, seed);

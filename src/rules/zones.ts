@@ -128,7 +128,7 @@ export function shadowCards(instance: CardInstance | undefined): string[] {
   return [...(instance.shadowId ? [instance.shadowId] : []), ...(instance.extraShadowIds ?? [])];
 }
 
-function unhost(state: ScenarioState, id: string): ScenarioState {
+export function unhost(state: ScenarioState, id: string): ScenarioState {
   const current = state.cards[id];
   if (!current?.host) return state;
   const host = state.cards[current.host];

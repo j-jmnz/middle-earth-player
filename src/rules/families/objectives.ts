@@ -17,7 +17,7 @@ import { lastPicked } from "../player-verbs.ts";
 import { printedOf } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import type { ScenarioState } from "../state.ts";
-import { updateCard } from "../state.ts";
+import { inPlay, updateCard } from "../state.ts";
 import { resetEncounterDeck } from "../verbs.ts";
 import { attachTo, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
@@ -25,7 +25,8 @@ import type { Focus } from "./index.ts";
 // An objective in the staging area with no encounter card attached to it is free of encounters, so it can be claimed (rr.guarded).
 export function freeOfEncounters(state: ScenarioState, sourceId: string | null): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
-  return source != null && !source.attachments.some((id) => state.cards[id] != null);
+  // Only an encounter card still hosted by the objective and in play guards it (Iron Shackles sent to a deck is not).
+  return source != null && !source.attachments.some((id) => state.cards[id]?.host === source.id && inPlay(state.cards[id]?.zone ?? "removed"));
 }
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {

@@ -354,8 +354,8 @@ void runScript("e2e-fixtures", () => {
   writeFileSync(anduinFile, `${JSON.stringify(anduin)}\n`);
   say.info(`wrote ${anduinFile} (${Object.keys(anduin).join(", ")})`);
 
-  // Escape from Dol Guldur (Mirkwood Paths part 3): from Passage's log with Anduin completed by hand; a game not found is left out.
-  const dolGuldur = say.step("play Escape from Dol Guldur's win and loss", () => dolGuldurFixtures(mirkwood["mirkwood-won"]));
+  // Escape from Dol Guldur (Mirkwood Paths part 3): from the log a real `anduin-won` writes, so nothing is written while that win is open.
+  const dolGuldur = say.step("play Escape from Dol Guldur's win and loss", () => dolGuldurFixtures(anduin["anduin-won"]));
   const dolGuldurFile = path.join(dir, "escape-from-dol-guldur.json");
   writeFileSync(dolGuldurFile, `${JSON.stringify(dolGuldur)}\n`);
   say.info(`wrote ${dolGuldurFile} (${Object.keys(dolGuldur).join(", ")})`);

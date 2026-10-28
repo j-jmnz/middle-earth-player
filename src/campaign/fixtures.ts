@@ -12,7 +12,7 @@
 // Mirkwood (Mirkwood Paths part 1) from an empty log, parked on the win and on the loss (the e2e-mirkwood script); a fixture names its campaign.
 // `anduin-won` and `anduin-lost` are two-handed games of Journey Along the Anduin (part 2) from the log `mirkwood-won` writes when it is confirmed
 // (`past`), parked on the win and on the loss (the e2e-anduin script). `dol-guldur-won` and `dol-guldur-lost` are two-handed games of Escape from
-// Dol Guldur (part 3) from that log with Journey Along the Anduin completed by hand (the e2e-dol-guldur script); the win is open.
+// Dol Guldur (part 3) from the log a real `anduin-won` writes (the e2e-dol-guldur script); both are open until `anduin-won` exists.
 import knifeFixtures from "./fixtures/a-knife-in-the-dark.json";
 import dolGuldurFixtures from "./fixtures/escape-from-dol-guldur.json";
 import anduinFixtures from "./fixtures/journey-along-the-anduin.json";

@@ -9,6 +9,7 @@ import { cardTypeOf, fromEncounterDeck, isCharacterType, printedOf, type Printed
 import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
+import { claimedDestination } from "./families/objectives-claimed.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
@@ -274,13 +275,14 @@ export function defeatedDestination(
   if ((printed.type === "enemy" || printed.type === "location") && printed.victory != null) {
     return { zone: "victory" };
   }
-  // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives.ts).
-  if (instance.claimed) return { zone: "staging" };
-  if (!fromEncounterDeck(printed) && instance.controller != null) {
-    return { zone: "discard", seat: instance.owner ?? instance.controller };
-  }
-  if (printed.type === "quest") return { zone: "setAside" };
-  return { zone: "encounterDiscard" };
+  // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives-claimed.ts).
+  const usual: Destination =
+    !fromEncounterDeck(printed) && instance.controller != null
+      ? { zone: "discard", seat: instance.owner ?? instance.controller }
+      : printed.type === "quest"
+        ? { zone: "setAside" }
+        : { zone: "encounterDiscard" };
+  return claimedDestination(instance, usual);
 }
 
 // Each card attached to a card that leaves play is discarded at the same time (rr.attachment-cards), to the discard pile of

@@ -5,7 +5,7 @@
 // the seat's `deckAttached` list; nothing else knows it is there.
 import type { ScenarioState } from "../state.ts";
 import { updateCard, withSeat } from "../state.ts";
-import { moveCard } from "../zones.ts";
+import { moveCard, unhost } from "../zones.ts";
 import type { Focus } from "./index.ts";
 
 // AttachToDeck: the source card goes onto the first player's deck.
@@ -13,8 +13,9 @@ export function attachToDeck(state: ScenarioState, focus: Focus): ScenarioState 
   const id = focus.sourceId;
   const seat = state.seats[state.firstPlayer];
   if (!id || !state.cards[id] || !seat) return state;
-  // A shadow card that is attached leaves the enemy it was dealt to: it has no host.
-  const moved = updateCard(moveCard(state, id, { zone: "attached" }), id, { face: "up", host: null });
+  // A shadow card or a guard that is attached leaves the card it was dealt to or guarded: it has no host, and that card forgets it
+  // (a guarded objective with Iron Shackles gone to the deck is free of encounters, rr.guarded).
+  const moved = updateCard(unhost(moveCard(state, id, { zone: "attached" }), id), id, { face: "up", host: null });
   return withSeat(moved, state.firstPlayer, { ...seat, deckAttached: [...(seat.deckAttached ?? []), id] });
 }
 

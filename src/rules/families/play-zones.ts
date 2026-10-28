@@ -5,6 +5,7 @@
 import { queueEvent } from "../queue.ts";
 import type { CardInstance, ScenarioState } from "../state.ts";
 import { updateCard } from "../state.ts";
+import { sendAway } from "./objectives-claimed.ts";
 import { cardsUnder, moveCard } from "../zones.ts";
 
 // `card` is the card as it was before it left play; `released` are the attachments destroyCard already discarded. Each card
@@ -18,8 +19,8 @@ export function leaveWith(state: ScenarioState, card: CardInstance, released: re
     const attachment = next.cards[id];
     if (!attachment || attachment.host !== card.id) continue;
     const owner = attachment.owner ?? attachment.controller;
-    // A claimed objective returns to the staging area (families/objectives.ts).
-    next = moveCard(next, id, attachment.claimed ? { zone: "staging" } : owner != null ? { zone: "discard", seat: owner } : { zone: "encounterDiscard" });
+    // A claimed objective returns to the staging area (families/objectives-claimed.ts).
+    next = sendAway(next, id, owner != null ? { zone: "discard", seat: owner } : { zone: "encounterDiscard" });
     gone.push(id);
   }
   // Facedown player cards under a player card (an encounter card under one, like Saruman's, has its own rule).

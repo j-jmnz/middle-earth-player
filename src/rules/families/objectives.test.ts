@@ -7,6 +7,7 @@ import type { EngineStep } from "../intents.ts";
 import { legalIntents, legalTargets } from "../legal.ts";
 import { settle } from "../machine.ts";
 import { pushCardEffects } from "../effect-frames.ts";
+import { freeOfEncounters } from "./objectives.ts";
 import { destroyCard } from "../keywords.ts";
 import { reduce, startScenario } from "../reduce.ts";
 import { expectOk } from "../fixture.ts";
@@ -52,6 +53,17 @@ describe("Guarded (rr.guarded, 01108:A:1, 01123:A:1)", () => {
     expect(codesOf(run.state, run.state.encounterDeck)).toEqual(["01109", "f0"]);
     expect(state.cards[map]?.attachments).toEqual([]);
     expect(causeProblems(run.steps)).toEqual([]);
+  });
+
+  it("leaves the objective free and claimable when its guard is Iron Shackles, which goes to a deck (01105:A:1)", () => {
+    const { run, ctx } = resolveRevealed({ staging: ["01108"], deck: ["01105", "f0"], phase: "Quest" }, "01108");
+    const map = first(run.state, "01108");
+    const shackles = first(run.state, "01105");
+    expect(run.state.cards[shackles]?.zone).toBe("attached");
+    expect(run.state.cards[shackles]?.host).toBeNull();
+    expect(run.state.cards[map]?.attachments).toEqual([]);
+    expect(freeOfEncounters(run.state, map)).toBe(true);
+    expect(legalIntents(run.state, ctx).some((intent) => intent.type === "Trigger" && intent.cardId === map && intent.effectId === "01108:action:1")).toBe(true);
   });
 
   it("gives a treachery no attachment: it resolves as it is revealed and goes to the discard pile (ltp.guarded)", () => {
