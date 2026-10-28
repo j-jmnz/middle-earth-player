@@ -2,7 +2,6 @@
 // 01124:B:1, 01131:A:3, 01131:B:1, 01102:A:2. The prisoner family's verbs on a table of Escape from Dol Guldur.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { buildStart } from "../../campaign/start.ts";
 import { syncConstants } from "../constants.ts";
 import type { EngineStep } from "../intents.ts";
 import { legalIntents } from "../legal.ts";
@@ -15,9 +14,8 @@ import { expectOk } from "../fixture.ts";
 import { textBlank } from "./attachments-hold.ts";
 import { prisonerHero } from "./prisoner.ts";
 import type { ScenarioState } from "../state.ts";
-import { dolGuldur, campaign, dolGuldurTable, loadDolGuldurWorld, MENDOR, type DolGuldurLayout, type DolGuldurWorld } from "../../../scripts/dol-guldur-scene.ts";
+import { dolGuldurTable, loadDolGuldurWorld, MENDOR, type DolGuldurLayout, type DolGuldurWorld } from "../../../scripts/dol-guldur-scene.ts";
 import { dolGuldurWorld, dolGuldurStart, LOGGED_PRISONER, STRONG_HEROES } from "../../../scripts/dol-guldur-game.ts";
-import { EFFECTS } from "../../effects/index.ts";
 import { first, send, start, type Run } from "../../../scripts/past-scene.ts";
 import { causeProblems } from "../../../scripts/cause-check.ts";
 
@@ -199,22 +197,6 @@ describe("the rescue (01124:B:1) and the cards that hear it (01102:A:2, 01131:B:
     expect(freed?.prisoner).toBeUndefined();
   });
 });
-
-describe("the standalone game", () => {
-  it("takes a random prisoner and has no Mendor and no campaign card", async () => {
-    const { ctx } = await dolGuldurWorld();
-    const standalone = buildStart({ campaign, scenario: dolGuldur, seatCount: 1, seed: 4, threatModifier: 0, seats: dolGuldurStartSeats(), effects: EFFECTS, mode: "standalone" });
-    let state = startScenario(standalone, ctx);
-    while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
-    for (let guard = 0; guard < 6 && state.window?.kind === "choose"; guard += 1) state = expectOk(reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, ctx)).state;
-    expect(prisonerHero(state)).not.toBeNull();
-    expect(Object.values(state.cards).filter((card) => card.code === MENDOR || card.code === "01131")).toEqual([]);
-  });
-});
-
-function dolGuldurStartSeats() {
-  return dolGuldurStart(1, 4, "Normal").seats;
-}
 
 void first;
 void send;

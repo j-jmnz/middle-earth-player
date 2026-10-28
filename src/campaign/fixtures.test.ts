@@ -106,7 +106,7 @@ describe("Maestro fixtures", () => {
       expect(save.active?.engineVersion).toBe(ENGINE_VERSION);
       expect(save.active?.dataHash).toBe(CATALOG_VERSION);
       // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes.
-      expect(save.log.completed).toEqual(name.startsWith("anduin-") ? ["passage-through-mirkwood"] : []);
+      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : []);
     }
   });
 
@@ -245,6 +245,23 @@ describe("Journey Along the Anduin (Mirkwood Paths part 2, phase 30)", () => {
     expect(after.log.completed).toEqual(["passage-through-mirkwood", "journey-along-the-anduin"]);
     expect(after.log.prisoner).toBe(view.kind === "settled" ? view.prisoner : null);
     expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status).slice(0, 3)).toEqual(["completed", "completed", "current"]);
+  });
+});
+
+describe("Escape from Dol Guldur (Mirkwood Paths part 3, phase 31)", () => {
+  const LOST = hasFixture("dol-guldur-lost");
+
+  it.skipIf(!LOST)("dol-guldur-lost replays to a loss, and finishing it writes nothing", () => {
+    const world = worldFor("dol-guldur-lost");
+    const save = fixtureSave("dol-guldur-lost", "s", CATALOG_VERSION);
+    expect(save.log.prisoner).toBeTruthy();
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
+    const after = finish(save, world, resumed.state);
+    expect(after.log).toEqual(save.log);
+    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status).slice(0, 4)).toEqual(["completed", "completed", "current", "locked"]);
   });
 });
 

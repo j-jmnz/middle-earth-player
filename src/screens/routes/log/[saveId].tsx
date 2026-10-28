@@ -7,6 +7,7 @@ import { cards } from "../../../catalog/schema";
 import { inArray } from "drizzle-orm";
 import { BodyText, Eyebrow, IconButton, NavBar, PrimaryButton, Screen } from "../../chrome";
 import { bookletParams, campaignOf, scenarioNames } from "../../campaign-data";
+import { carryWords } from "../../carry-words";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { palette } from "../../palette.js";
@@ -49,6 +50,7 @@ export default function Log() {
     }
     for (const captive of save.log.captives) codes.add(captive.hero);
     if (save.log.prisoner) codes.add(save.log.prisoner);
+    for (const card of save.log.carryOver) codes.add(card.code);
     if (codes.size === 0) return [];
     return catalog.select().from(cards).where(inArray(cards.code, [...codes])).all();
   }, [catalog, save]);
@@ -115,6 +117,8 @@ export default function Log() {
           />
           {/* The hero Journey Along the Anduin's Resolution took prisoner (01130:B:1), taken at the start of Escape from Dol Guldur. */}
           {log.prisoner ? <Row label="Prisoner" value={nameOf(log.prisoner)} testID="log-prisoner" /> : null}
+          {/* The cards a Resolution keeps for the next campaign, not this one (Escape from Dol Guldur's Mendor, 01131:B:2). */}
+          {log.carryOver.length > 0 ? <Row label="Next Campaign" value={carryWords(log.carryOver, nameOf)} testID="log-carry-over" /> : null}
           <View className="border-b border-inkLine py-3">
             <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">Scenarios Completed</Text>
             {campaign.scenarios.map((id) => {

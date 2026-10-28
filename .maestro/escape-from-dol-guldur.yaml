@@ -1,0 +1,75 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 31. Written in a cloud session: it has not run, and its fixture is OPEN: no win of the two decklists was found by the auto-player (200 seeds,
+# Easy, `scripts/e2e-dol-guldur.ts`), so `dol-guldur-won` is not committed and the e2e route does not offer it. Once a win is found
+# (`scripts/e2e-fixtures.ts` writes it), this flow runs as written. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture
+# `dol-guldur-won` is a real two-handed game of Escape from Dol Guldur, parked on its win. 01131's Resolution asks nothing: Mendor, if he is still in
+# play, and each player's Mendor's Support are kept for the next campaign. Confirming writes the log and unlocks The Oath. The path screen has no
+# table-menu: the log is opened from `log-open`.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/dol-guldur-won"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- assertNotVisible:
+    id: life
+- assertNotVisible:
+    id: burden-deck
+- assertVisible:
+    id: rail-current
+    text: "Victory"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 30000
+- assertVisible:
+    id: resolution-consequence
+    text: "Confirming records the win and unlocks The Oath\\..*"
+- tapOn:
+    id: resolution-confirm
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-escape-from-dol-guldur-status
+    text: "Completed"
+- assertVisible:
+    id: node-the-oath-status
+    text: "Current"
+# Kill and relaunch: the scenario is on the log with its carry-over and The Oath is unlocked.
+- stopApp
+- launchApp
+- tapOn:
+    id: continue-path
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-the-oath-status
+    text: "Current"
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertVisible:
+    id: log-scenario-escape-from-dol-guldur
+    text: ".*rounds.*"
+- assertVisible:
+    id: log-carry-over
+    text: ".*Mendor.*"

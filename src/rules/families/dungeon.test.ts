@@ -98,13 +98,6 @@ describe("PlaceOrcGuard (01107:A:1, 01125:B:1)", () => {
 });
 
 describe("Iron Shackles (01105:A:1, 01105:A:2)", () => {
-  function shackled(layout: DolGuldurLayout = {}) {
-    const made = make({ deckOf: ["ally", "filler", "filler"], ...layout });
-    const spawned = settle(made.state, made.ctx, []);
-    const id = first(spawned, "01105");
-    return { ...made, state: spawned, id };
-  }
-
   it("is attached to the top of the first player's deck when revealed, in play and controlled by nobody", () => {
     const made = make({ seats: 2, deckOf: ["ally", "filler"], staging: ["01105"] });
     const id = first(made.state, "01105");
