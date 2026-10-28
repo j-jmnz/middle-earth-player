@@ -12,6 +12,8 @@ import { pushCardEffects } from "../rules/effect-frames.ts";
 import type { EngineStep } from "../rules/intents.ts";
 import { settle } from "../rules/machine.ts";
 import { spawn } from "../rules/zones.ts";
+import { pickCandidates } from "../rules/pick.ts";
+import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { HERO, HERO2, loadMirkwoodWorld, mirkwoodTable, type MirkwoodLayout, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
 import { codesOf, first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";
@@ -124,6 +126,81 @@ describe("treacheries when revealed", () => {
     expect(crowded.state.staging).toHaveLength(2);
     const emptyRun = reveal(make({ deck: ["01092", "f3", "f3"] }).state, busy.ctx);
     expect(emptyRun.state.staging).toHaveLength(1);
+  });
+});
+
+// The options of every choose window a reveal opens, and the run once each is answered (`answer` picks from the options; the first by default).
+function offered(made: ReturnType<typeof make>, code: string, answer: (options: readonly string[]) => string) {
+  const windows: (readonly string[])[] = [];
+  const run = resolveReveal(made.state, made.ctx, code, (state) => {
+    const options = state.window?.kind === "choose" ? state.window.options : [];
+    windows.push(options);
+    return answer(options);
+  });
+  return { windows, run };
+}
+
+describe("Lingering Venom when revealed (01137:A:2: either exhaust each damaged character you control, or deal 2 damage to the hero you control with the most damage on it)", () => {
+  const damageOption = (options: readonly string[]) => (options.includes("damage") ? "damage" : (options[0] ?? ""));
+
+  it("offers only the hero with the most damage, and deals the 2 damage to it", () => {
+    const made = make({ damage: [["mh1", 2], ["mh2", 1]] });
+    const { windows, run } = offered(made, "01137", damageOption);
+    const [mine, other] = [first(made.state, HERO), first(made.state, HERO2)];
+    // One candidate is taken without a window; the other hero is never offered.
+    expect(windows.flat()).not.toContain(other);
+    expect(run.state.cards[mine]?.damage).toBe(4);
+    expect(run.state.cards[other]?.damage).toBe(1);
+  });
+
+  it("offers every hero tied for the most damage", () => {
+    const made = make({ damage: [["mh1", 2], ["mh2", 2]] });
+    const { windows, run } = offered(made, "01137", (options) => (options.includes("damage") ? "damage" : (options[1] ?? "")));
+    const [mine, other] = [first(made.state, HERO), first(made.state, HERO2)];
+    expect(windows.some((options) => options.includes(mine) && options.includes(other))).toBe(true);
+    expect(run.state.cards[other]?.damage).toBe(4);
+    expect(run.state.cards[mine]?.damage).toBe(2);
+  });
+
+  it("offers every hero when none has damage", () => {
+    const made = make();
+    const { windows } = offered(made, "01137", damageOption);
+    const [mine, other] = [first(made.state, HERO), first(made.state, HERO2)];
+    expect(windows.some((options) => options.includes(mine) && options.includes(other))).toBe(true);
+  });
+
+  it("the exhaust option exhausts each damaged character the player controls, allies included, and no other", () => {
+    const made = make({ allies: ["ally", "ally"], damage: [["mh1", 1], ["ally", 1]] });
+    const { run } = offered(made, "01137", (options) => (options.includes("exhaust") ? "exhaust" : (options[0] ?? "")));
+    const allies = Object.entries(run.state.cards).filter(([, card]) => card.code === "ally" && card.zone === "play");
+    expect(run.state.cards[first(made.state, HERO)]?.exhausted).toBe(true);
+    expect(run.state.cards[first(made.state, HERO2)]?.exhausted).toBe(false);
+    expect(allies.map(([, card]) => card.exhausted).sort()).toEqual([false, true]);
+    for (const [, card] of allies) expect(card.damage > 0).toBe(card.exhausted);
+    expect(Object.values(run.state.cards).filter((card) => card.zone === "heroes" || card.zone === "play").every((card) => card.damage === 0 || card.exhausted)).toBe(true);
+  });
+});
+
+describe("Ungoliant's Swarm engaged (01136:A:1: that player must choose and exhaust 2 characters they control)", () => {
+  it("exhausts 2 ready characters of the engaged player", () => {
+    const made = make({ staging: ["01136"], phase: "Encounter", allies: ["ally"] });
+    const run = engageStaged(made.state, made.ctx, "01136");
+    const characters = Object.values(run.state.cards).filter((card) => (card.zone === "heroes" || card.zone === "play") && card.controller === 0 && (card.code === "ally" || card.code.startsWith("mh")));
+    expect(characters.filter((card) => card.exhausted)).toHaveLength(2);
+  });
+});
+
+// An engine decision with no pinned rules span: a controlled objective ally with printed combat stats (Mendor, 01135; Gildor Inglorion, 141077)
+// is an ally in play for a character pick and an ally pick, whatever the card type printed on it.
+describe("an objective ally with combat stats a player controls", () => {
+  it("is matched by a character pick and an ally pick (Gildor Inglorion, 141077)", async () => {
+    for (const [code, printed] of await loadPrinted(["141077"])) world.cards.set(code, printed);
+    const made = make();
+    const gildor = spawn(made.state, "141077", { zone: "play", seat: 0 });
+    const offer = (type: "character" | "ally" | "hero") => pickCandidates(gildor.state, { type, control: "you" }, 0, [], null, made.ctx);
+    expect(offer("character")).toContain(gildor.id);
+    expect(offer("ally")).toContain(gildor.id);
+    expect(offer("hero")).not.toContain(gildor.id);
   });
 });
 
