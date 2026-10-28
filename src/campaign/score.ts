@@ -40,7 +40,11 @@ export function scoreParts(state: ScenarioState, cards: ReadonlyMap<string, Prin
   return { threat, destroyed, damage, rounds: completedRounds(state), victoryPoints };
 }
 
+export function scoreTotal(parts: ScoreParts): number {
+  return parts.threat + parts.destroyed + parts.damage + 10 * parts.rounds - parts.victoryPoints;
+}
+
 export function scoreOf(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioScore {
   const parts = scoreParts(state, cards);
-  return { rounds: parts.rounds, victoryPoints: parts.victoryPoints, score: parts.threat + parts.destroyed + parts.damage + 10 * parts.rounds - parts.victoryPoints };
+  return { rounds: parts.rounds, victoryPoints: parts.victoryPoints, score: scoreTotal(parts) };
 }

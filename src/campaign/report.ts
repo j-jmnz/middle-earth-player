@@ -5,7 +5,7 @@
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
-import { scoreParts } from "./score.ts";
+import { scoreParts, scoreTotal } from "./score.ts";
 
 export type ReportHero = { name: string; words: string; destroyed: boolean };
 export type ReportSeat = { label: string; threat: string; heroes: readonly ReportHero[] };
@@ -89,7 +89,7 @@ function seatLines(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>
 
 function scoreLines(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ReportLine[] {
   const parts = scoreParts(state, cards);
-  const total = parts.threat + parts.destroyed + parts.damage + 10 * parts.rounds - parts.victoryPoints;
+  const total = scoreTotal(parts);
   return [
     { label: state.seatCount > 1 ? "Final threat of each player" : "Final threat", value: `+${parts.threat}` },
     { label: "Threat cost of destroyed heroes", value: `+${parts.destroyed}` },

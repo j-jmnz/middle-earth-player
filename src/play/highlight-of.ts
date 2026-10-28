@@ -10,8 +10,10 @@ import type { TableHighlight } from "./table-canvas-types.ts";
 export type HighlightKeys = { glow: string; picked: string; share: TableHighlight["share"]; dim: boolean; marks: string; muted: string; beat: string };
 
 export function highlightKeys({ game, seat, sheet, choice, panel, beatKey }: { game: ScenarioState; seat: number; sheet: Sheet; choice: Choice; panel: boolean; beatKey: string }): HighlightKeys {
-  // A card the seat may play from its discard pile is not drawn on the table: the pile glows, and its list plays it.
-  const glow = panel ? "" : [...tappable(sheet), ...(discardPlays(game, seat, sheet).length > 0 ? ["pile:discard"] : [])].join(",");
+  // A card the seat may play from its discard pile is not drawn on the table: the pile glows, and its list plays it. While the
+  // table peeks at the other seat's pile nothing glows (the canvas draws NO_HIGHLIGHT, peek.ts).
+  const pile = discardPlays(game, seat, sheet).length > 0 ? ["pile:discard"] : [];
+  const glow = panel ? "" : [...tappable(sheet), ...pile].join(",");
   // In planning, the hand cards that cannot be played now are dimmed, so the player sees which can (a tap says why not).
   const muted = !panel && sheet.kind === "window" && game.mode === "planning" ? (game.seats[seat]?.hand ?? []).filter((id) => !sheet.plays.includes(id)).join(",") : "";
   const marks = (panel ? [] : optionMarksOf(sheet)).map(([id, mark]) => `${id}=${mark.icon}:${mark.value}:${mark.danger ? 1 : 0}`).join(",");

@@ -63,8 +63,8 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
   const usable = plays.length > 0 || triggers.length > 0;
   // A card played from the discard pile is not on the table: the note says where it is.
   const fromPile = plays.filter((id) => game.cards[id]?.zone === "discard");
-  // In combat with no enemy any of the seat's characters could attack (none engaged, Éowyn's +9 bought for nothing), the window says so.
-  const noFight = game.phase === "Combat" && !canFight(game, ctx) ? "No enemy is engaged with you, so you cannot attack this phase." : null;
+  // In combat with no enemy any of the seat's characters could attack (none engaged: Éowyn's +9 would buy nothing), the window says so.
+  const noFight = game.phase === "Combat" && !canFight(game, ctx) ? "No enemy can be attacked this phase." : null;
   const pileNote = fromPile.length > 0 ? `Tap your discard pile to play ${[...new Set(fromPile.map((id) => names.card(id)))].join(" or ")} from it.` : null;
   // The eyebrow is the phase; the title says what the window is for.
   const base = { kind: "window" as const, key: `window:${game.round}:${game.mode}:${game.activeSeat}:${game.stepWindows.length}`, step: game.phase, commit, plays, triggers };

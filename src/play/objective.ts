@@ -5,19 +5,26 @@
 // line is the card's printed text from the ledger, never booklet prose.
 import type { Instruction } from "../catalog/boundary.ts";
 import { questPointsOf } from "../rules/quest.ts";
+import { restricted } from "../rules/restrictions.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { inPlay, type CardInstance } from "../rules/state.ts";
 
 /**
- * The quest points progress fills on this quest stage, or null when progress never defeats it: it prints none, or has 0 and its
- * own record says it cannot be advanced, so it is won some other way ("Don't Leave the Path!", 01121:B:2, cannot be advanced: the players win by defeating Ungoliant's Spawn).
+ * The quest points progress fills on this quest stage, or null when progress never defeats it: it prints none, or has 0 and the
+ * stage cannot be advanced now, so it is won some other way ("Don't Leave the Path!", 01121:B:2, cannot be advanced: the players win by defeating Ungoliant's Spawn).
  * Progress may still be placed on it; the table does not count it against a target.
  */
 export function stagePoints(game: ScenarioState, stage: CardInstance, ctx: ReduceContext): number | null {
   const points = questPointsOf(game, stage, ctx.cards);
-  // A stage that prints 0 and grows (Surprise Attack, 41005:B:2, 4 for each enemy) still fills with progress.
-  const barred = ctx.effects.some((effect) => effect.cardCode === stage.code && effect.timing === "constant" && effect.condition == null && effect.instructions.some((instruction) => instruction.verb === "Restrict" && instruction.what === "advance"));
-  return points === 0 && barred ? null : points;
+  // A stage at 0 that may still advance (Surprise Attack, 41005:B:2, 4 for each enemy) still fills with progress.
+  return points === 0 && restricted(game, ctx, "advance").length > 0 ? null : points;
+}
+
+/** A quest stage's printed lines but its When Revealed ones: how it is won or held ("The players must find and defeat Ungoliant's Spawn to win this game", 01121:B:2), or null. */
+export function stageText(ctx: ReduceContext, code: string, line: (id: string) => string | null): string | null {
+  const ids = [...new Set(ctx.effects.filter((effect) => effect.cardCode === code && effect.timing !== "whenRevealed").flatMap((effect) => effect.lines))].sort();
+  const text = ids.flatMap((id) => line(id) ?? []).join(" ");
+  return text === "" ? null : text;
 }
 
 function wins(instructions: readonly Instruction[]): boolean {

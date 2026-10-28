@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "zustand";
 
+import { stageText } from "./objective.ts";
 import { BEAT_MS, intentWords, momentOf, roundSummary, takenBack, type Moment } from "./outcome.ts";
 import { guideLine } from "./reference.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
@@ -38,15 +39,9 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     },
     [store, ctx, names],
   );
-  // A quest stage's printed lines but its When Revealed ones: how it is won or held ("The players must find and defeat
-  // Ungoliant's Spawn to win this game", 01121:B:2).
+  // How a quest stage is won or held, in its printed lines (objective.ts).
   const stage = useCallback(
-    (cardId: string) => {
-      const code = store.getState().game.cards[cardId]?.code;
-      const ids = [...new Set(ctx.effects.filter((effect) => effect.cardCode === code && effect.timing !== "whenRevealed").flatMap((effect) => effect.lines))].sort();
-      const text = ids.flatMap((id) => names.line(id) ?? []).join(" ");
-      return text === "" ? null : text;
-    },
+    (cardId: string) => stageText(ctx, store.getState().game.cards[cardId]?.code ?? "", names.line),
     [store, ctx, names],
   );
   // After it, the state it made. Read once per moment.

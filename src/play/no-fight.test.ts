@@ -10,7 +10,7 @@ import { legalIntents } from "../rules/reduce.ts";
 import { windowSheet } from "./bar-sheets.ts";
 
 const names = { card: (id: string) => id, line: () => null };
-const NO_FIGHT = "No enemy is engaged with you, so you cannot attack this phase.";
+const NO_FIGHT = "No enemy can be attacked this phase.";
 const EOWYN = FOTW.filter((effect) => effect.cardCode === "145002");
 
 describe("a combat window with nothing to attack", () => {

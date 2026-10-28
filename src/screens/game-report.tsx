@@ -14,8 +14,9 @@ function Row({ label, value, tone = "bone", testID }: { label: string; value: st
   );
 }
 
-export function GameReportView({ report, testID = "game-report" }: { report: GameReport; testID?: string }) {
-  const score = report.score;
+// `tiles`: the screen already shows the score, rounds and victory points as tiles, so the panel lists only what the score adds up.
+export function GameReportView({ report, tiles = false, testID = "game-report" }: { report: GameReport; tiles?: boolean; testID?: string }) {
+  const score = tiles ? report.score?.slice(0, -1) : report.score;
   return (
     <View testID={testID} className="gap-4">
       <View className="items-center gap-1">
@@ -30,12 +31,12 @@ export function GameReportView({ report, testID = "game-report" }: { report: Gam
       </View>
       {score ? (
         <View>
-          <Section title="Score" />
+          <Section title={tiles ? "How the score adds up" : "Score"} />
           <Panel>
             {score.map((line, index) => (
-              <Row key={line.label} label={line.label} value={line.value} tone={index === score.length - 1 ? "bone" : "muted"} testID={`${testID}-score-${index}`} />
+              <Row key={line.label} label={line.label} value={line.value} tone={!tiles && index === score.length - 1 ? "bone" : "muted"} testID={`${testID}-score-${index}`} />
             ))}
-            <Label className="mt-1">Lower is better.</Label>
+            {tiles ? null : <Label className="mt-1">Lower is better.</Label>}
           </Panel>
         </View>
       ) : null}

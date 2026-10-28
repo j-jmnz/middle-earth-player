@@ -48,3 +48,4 @@ describe("playing Elven-light from the discard pile", () => {
     expect(discardPlays(inHand, 0, sheet)).toEqual([]);
   });
 });
+

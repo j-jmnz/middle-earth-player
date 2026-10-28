@@ -90,7 +90,7 @@ export default function StandaloneOutcome() {
         )}
         {report ? (
           <View className="mt-8">
-            <GameReportView report={report} />
+            <GameReportView report={report} tiles={won} />
           </View>
         ) : null}
       </ScreenScroll>

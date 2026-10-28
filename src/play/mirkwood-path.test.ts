@@ -11,7 +11,7 @@ import { loadMirkwoodWorld, mirkwoodTable, SPAWN, type MirkwoodWorld } from "../
 
 import { slotNumbers } from "./card-effects.ts";
 import { ledgerLine } from "./ledger.ts";
-import { questObjective } from "./objective.ts";
+import { questObjective, stageText } from "./objective.ts";
 import { momentOf } from "./outcome.ts";
 import { questTitle } from "./table-preview.ts";
 
@@ -21,9 +21,6 @@ beforeAll(async () => {
   world = await loadMirkwoodWorld();
 });
 
-const stageText = (ctx: { effects: readonly { cardCode: string; timing: string; lines: readonly string[] }[] }, code: string) =>
-  [...new Set(ctx.effects.filter((effect) => effect.cardCode === code && effect.timing !== "whenRevealed").flatMap((effect) => effect.lines))].sort().flatMap((id) => ledgerLine(id) ?? []).join(" ");
-
 describe("stage 3 of Passage Through Mirkwood on the table", () => {
   it("names the path the shuffle chose and what the stage asks, in the banner", () => {
     for (let seed = 1; seed <= 6; seed += 1) {
@@ -32,7 +29,7 @@ describe("stage 3 of Passage Through Mirkwood on the table", () => {
       const after = settle({ ...runInstruction(state, { verb: "PlaceQuestProgress", perPlayer: 1 }, { seat: 0, sourceId: hero }, ctx, steps), window: null }, ctx, steps);
       const stageId = after.questStage ?? "";
       const code = after.cards[stageId]?.code ?? "";
-      const moment = momentOf(state, after, steps, { card: (id) => after.cards[id]?.code ?? id, stage: (id) => stageText(ctx, after.cards[id]?.code ?? "") });
+      const moment = momentOf(state, after, steps, { card: (id) => after.cards[id]?.code ?? id, stage: (id) => stageText(ctx, after.cards[id]?.code ?? "", ledgerLine) });
       const lines = moment?.lines.map((line) => line.text) ?? [];
       expect(lines).toContain(`The quest advances to ${code}`);
       expect(lines).toContain("The path was chosen at random");
