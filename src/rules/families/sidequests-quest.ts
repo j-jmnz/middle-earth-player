@@ -13,6 +13,7 @@ import { printedOf } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
 import { updateCard } from "../state.ts";
 import { noteHostDefeated } from "./attachments-hold.ts";
+import { questCardDefeatedHeard } from "./quest-branch.ts";
 import { addToVictory } from "./sidequests-victory.ts";
 
 // The side quests in the players' quest areas, in seat order.
@@ -84,7 +85,7 @@ export function defeatSideQuest(state: ScenarioState, questId: string, ctx: Redu
   next = updateCard(addToVictory(next, questId, ctx), questId, { progress: 0, committed: false });
   next = queueEvent(next, { trigger: "questDefeated", seat: quest.controller, cardId: questId, subject: questId });
   // Any quest card hears that a quest card was defeated ("After a quest card is defeated", 01135:A:3).
-  return ctx.effects.some((effect) => effect.trigger === "questCardDefeated") ? queueEvent(next, { trigger: "questCardDefeated", seat: null, subject: questId }) : next;
+  return questCardDefeatedHeard(next, ctx) ? queueEvent(next, { trigger: "questCardDefeated", seat: null, subject: questId }) : next;
 }
 
 // What each side quest in a quest area will take as progress from the characters committed to it now.

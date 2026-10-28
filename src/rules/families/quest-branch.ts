@@ -1,8 +1,10 @@
 // Rules: rr.quest-cards-quest-deck, rr.quest-advancement (data/rules/entries.json); the branch is the printed Forced effect of 01120:B:1
 // ("proceed to one of the 2 \"A Chosen Path\" stages, at random").
+import type { ReduceContext } from "../interpret.ts";
 import { shuffleIds } from "../seed.ts";
 import type { ScenarioState } from "../state.ts";
 import { moveCard } from "../zones.ts";
+import { gameReads } from "./costs-pay.ts";
 
 // What advancing past the stage `code` does when the quest branches: the stage a branch leads to is the last one (its defeat wins the
 // game), and a stage that names a branch proceeds to one of its codes at random, the other copies leaving the game. `next` is the
@@ -40,4 +42,10 @@ export function defeatedBefore(state: ScenarioState, newId: string): string | un
   const at = state.stages.findIndex((stage) => stage.code === code);
   const before = source?.code ?? state.stages[at - 1]?.code;
   return before == null ? undefined : Object.values(state.cards).find((card) => card.code === before)?.id;
+}
+
+// Whether a card in the game hears "After a quest card is defeated" (Mendor, 01135:A:3; "When you defeat this stage", 01120:B:1). The event
+// is queued only in a game that has such a card, so every other game's state stays as it was.
+export function questCardDefeatedHeard(state: ScenarioState, ctx: ReduceContext): boolean {
+  return gameReads(state, ctx, '"trigger":"questCardDefeated"');
 }

@@ -9,7 +9,7 @@ import { resolveSideQuests, sideQuestTotals } from "./families/sidequests-quest.
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { resolveQuest } from "./quest.ts";
-import { defeatedBefore } from "./families/quest-branch.ts";
+import { defeatedBefore, questCardDefeatedHeard } from "./families/quest-branch.ts";
 import { queueEvent } from "./queue.ts";
 import { offerResponses } from "./responses.ts";
 import { restricted } from "./restrictions.ts";
@@ -49,7 +49,7 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
     next = pushCardEffects(next, "whenRevealed", cardId, next.firstPlayer, false, effects, ctx, steps);
   }
   // "After a quest card is defeated" (Mendor, 01135:A:3) and "When you defeat this stage" (01120:B:1) hear each stage the quest left.
-  if (ctx.effects.some((effect) => effect.trigger === "questCardDefeated")) {
+  if (questCardDefeatedHeard(next, ctx)) {
     for (const cardId of advanced) {
       const defeated = defeatedBefore(next, cardId);
       if (defeated) next = queueEvent(next, { trigger: "questCardDefeated", seat: null, subject: defeated });
