@@ -47,7 +47,7 @@ export function Pool({ cx, cy, cardH, dark, t }: { cx: number; cy: number; cardH
   );
 }
 
-/** The attacker's rim glow, building over the charge and gone at the strike: three gradient strokes around the card, brightest at its foot. */
+/** The attacker's rim glow, building over the charge, held through the strike and let go over the flash after the impact: three gradient strokes around the card, brightest at its foot. */
 export function RimGlow({ rect, color, frame, s }: { rect: Rect; color: string; frame: SharedValue<Frame>; s: number }) {
   const opacity = useDerivedValue(() => frame.get().charge);
   const r = cardCorner(rect.w, rect.h);

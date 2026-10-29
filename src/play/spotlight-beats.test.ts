@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { MOTION, SPOTLIGHT_AGAIN, SPOTLIGHT_BEATS } from "./motion-tokens.ts";
 import { beatsAt, burstAt, burstGap, darkAt, frameAt, hitTime, leaveTime, punchAt, runStart, spotlightRun, spotlightSpan, trailAt, windowOf, type ClashShape } from "./spotlight-beats.ts";
-import { cameraPush, FX, flashAt, numberAt, ringAt, shakeAt, stampLook, traumaAt, traumaStart } from "./spotlight-fx.ts";
+import { cameraPush, FX, flashAt, numberAt, ringAt, shakeAt, stampLook, traumaAt, traumaStart, WOBBLE_HZ } from "./spotlight-fx.ts";
 import { SPOT } from "./spotlight-shape.ts";
 import { strikeOffset, stageOf } from "./spotlight-stage.ts";
 
@@ -83,11 +83,11 @@ describe("the beats of one attack", () => {
 describe("a frame", () => {
   it("starts with nothing flown out and ends with everything back in its slot and the dark lifted", () => {
     const start = frameAt(HIT, 0, 1);
-    expect([start.flyAttackers, start.flyTarget, start.dark, start.badgeA, start.back, start.strike, Math.abs(start.tilt), start.punch]).toEqual([0, 0, 0, 0, 0, 0, 0, 1]);
+    expect([start.flyAttackers, start.flyTarget, darkAt(0, 1, 1), start.badgeA, start.back, start.strike, Math.abs(start.tilt), punchAt(0, 1, 1)]).toEqual([0, 0, 0, 0, 0, 0, 0, 1]);
     const end = frameAt(HIT, 2200, 1);
-    expect([end.flyAttackers, end.flyTarget, end.dark, end.badgeA, end.back, end.strike, end.punch]).toEqual([0, 0, 0, 0, 0, 0, 1]);
+    expect([end.flyAttackers, end.flyTarget, darkAt(2200, 1, 1), end.badgeA, end.back, end.strike, punchAt(2200, 1, 1)]).toEqual([0, 0, 0, 0, 0, 0, 1]);
     const there = frameAt(HIT, 350, 1);
-    expect([there.flyAttackers, there.flyTarget, there.dark]).toEqual([1, 1, 1]);
+    expect([there.flyAttackers, there.flyTarget, darkAt(350, 1, 1)]).toEqual([1, 1, 1]);
   });
 
   it("overshoots the center a little as the cards arrive, and settles on it", () => {
@@ -129,13 +129,12 @@ describe("a frame", () => {
   });
 
   it("pushes the camera in from 1 to 1.06 over the charge, holds it, and lets go over the return", () => {
-    expect(frameAt(HIT, 650, 1).punch).toBe(1);
-    expect(frameAt(HIT, 1000, 1).punch).toBeCloseTo(FX.push, 9);
-    expect(frameAt(HIT, 1500, 1).punch).toBeCloseTo(FX.push, 9);
-    expect(frameAt(HIT, 1950, 1).punch).toBeCloseTo(1 + (FX.push - 1) / 2, 6);
-    expect(frameAt(HIT, 2200, 1).punch).toBe(1);
-    // A later attack finds the camera already in.
-    expect(frameAt({ ...HIT, first: false, last: false }, 0, 1).punch).toBeCloseTo(FX.push, 9);
+    // The camera belongs to the run (punchAt): the one source the stage and the HUD read.
+    expect(punchAt(650, 1, 1)).toBe(1);
+    expect(punchAt(1000, 1, 1)).toBeCloseTo(FX.push, 9);
+    expect(punchAt(1500, 1, 1)).toBeCloseTo(FX.push, 9);
+    expect(punchAt(1950, 1, 1)).toBeCloseTo(1 + (FX.push - 1) / 2, 6);
+    expect(punchAt(2200, 1, 1)).toBe(1);
     expect(punchAt(0, 1, 1)).toBe(1);
     expect(punchAt(1000, 1, 2)).toBeCloseTo(FX.push, 9);
     expect(punchAt(1700 + 1700, 1, 2)).toBe(1);
@@ -161,12 +160,56 @@ describe("a frame", () => {
     const base = frameAt(HIT, 1120, 1);
     for (const t of [1130, 1170, 1219]) {
       const held = frameAt(HIT, t, 1);
-      for (const key of ["flyAttackers", "flyTarget", "back", "strike", "tilt", "recoil", "knock", "tint", "charge", "punch", "badgeA", "badgeD", "shakeX", "shakeY", "shakeTurn", "dissolve"] as const) expect(held[key], `${key} at ${t}`).toBe(base[key]);
+      for (const key of ["flyAttackers", "flyTarget", "back", "strike", "tilt", "recoil", "knock", "tint", "charge", "badgeA", "badgeD", "shakeX", "shakeY", "shakeTurn", "dissolve"] as const) expect(held[key], `${key} at ${t}`).toBe(base[key]);
       expect(held.sparkT).toBe(-1);
       expect(held.ring.alpha).toBe(0);
       expect(held.number.alpha).toBe(0);
       expect(held.flash).toBeGreaterThan(0);
+      // The embers and the charge's embers stand still with the rest.
+      expect(held.emberT).toBe(base.emberT);
+      expect(held.convergeT).toBe(base.convergeT);
     }
+    // They carry on from where they stood, without the stop.
+    expect(frameAt(HIT, 1220, 1).emberT).toBe(1120);
+    expect(frameAt(HIT, 1220, 1).convergeT).toBe(1120 - 650);
+    expect(frameAt(HIT, 1320, 1).emberT).toBe(1220);
+    expect(frameAt(HIT, 1320, 1).convergeT).toBe(1220 - 650);
+    expect(frameAt(HIT, 1100, 1).emberT).toBe(1100);
+    // At Quick the clocks are still in unscaled ms: 0.6 · 1120 ms of run, held for the 60 ms stop, is 1120 unscaled.
+    expect(frameAt(HIT, 0.6 * 1220, 0.6).emberT).toBeCloseTo(1120, 6);
+    expect(frameAt(HIT, 0.6 * 1130, 0.6).emberT).toBeCloseTo(1120, 6);
+  });
+
+  it("holds a kill for 160 ms at the hit, the extra 60 coming out of the impact, so a kill still ends with the run", () => {
+    const hit = beatsAt(1, HIT);
+    const kill = beatsAt(1, KILL);
+    expect([hit.stop, hit.impact]).toEqual([100, 480]);
+    expect([kill.stop, kill.impact]).toEqual([160, 420]);
+    // The strike lands (and the haptic ticks) at the same moment, and the return and the end are where they were.
+    expect([kill.stopAt, kill.impactAt, kill.retAt, kill.end]).toEqual([1120, 1280, 1700, 2200]);
+    expect([hit.stopAt, hit.retAt, hit.end]).toEqual([kill.stopAt, kill.retAt, kill.end]);
+    expect(hitTime(0, 1, 1)).toBe(kill.stopAt);
+    // A lone kill is 2200 ms and a later one 1200 ms, like the rest.
+    expect(kill.stop + kill.impact).toBe(hit.stop + hit.impact);
+    expect(spotlightRun(1, 1)).toBe(2200);
+    const again = beatsAt(1, { first: false, last: false, destroyed: true });
+    expect(again.end).toBe(1200);
+    expect([again.stop, again.impact]).toEqual([160, 420 - 0]);
+    // Quick scales both the same.
+    const quick = beatsAt(0.6, KILL);
+    expect(quick.stop).toBeCloseTo(0.6 * 160, 9);
+    expect(quick.end).toBeCloseTo(0.6 * 2200, 6);
+    // The stop holds the picture for the whole 160 ms, and the impact begins after it; the tokens still land inside the shorter impact.
+    const base = frameAt(KILL, 1120, 1);
+    for (const t of [1150, 1200, 1279]) {
+      const held = frameAt(KILL, t, 1);
+      expect(held.sparkT).toBe(-1);
+      expect(held.strike).toBe(base.strike);
+      expect(held.emberT).toBe(base.emberT);
+    }
+    expect(frameAt(KILL, 1280, 1).sparkT).toBe(0);
+    expect(burstAt(2, 3, 1280 + 2 * 90 + 220, 1, { first: true, last: true, destroyed: true }).u).toBe(1);
+    expect(burstGap(3, 1, true) * 2 + 220).toBeLessThanOrEqual(420);
   });
 
   it("flashes once per attack, warm white at a peak of 0.7, from the first frame of the stop", () => {
@@ -198,7 +241,9 @@ describe("a frame", () => {
     const f = (t: number) => frameAt(KILL, t, 1);
     expect([f(0).emberT, f(500).emberT]).toEqual([0, 500]);
     expect([f(649).convergeT, f(650).convergeT, f(750).convergeT]).toEqual([-1, 0, 100]);
-    expect([f(1219).sparkT, f(1220).sparkT, f(1320).sparkT]).toEqual([-1, 0, 100]);
+    // The sparks start at the impact: 1220 ms, or 1280 on a kill (its stop is 60 ms longer).
+    expect([f(1279).sparkT, f(1280).sparkT, f(1380).sparkT]).toEqual([-1, 0, 100]);
+    expect([frameAt(HIT, 1219, 1).sparkT, frameAt(HIT, 1220, 1).sparkT, frameAt(HIT, 1320, 1).sparkT]).toEqual([-1, 0, 100]);
     expect([f(1699).ashT, f(1700).ashT, f(1800).ashT]).toEqual([-1, 0, 100]);
     expect(frameAt(HIT, 1800, 1).ashT).toBe(-1);
   });
@@ -220,7 +265,7 @@ describe("the trauma shake", () => {
       let was = Infinity;
       let longest = 0;
       for (const hit of range(500)) {
-        const frame = frameAt(shape, 1220 + hit, 1, 5);
+        const frame = frameAt(shape, beatsAt(1, shape).impactAt + hit, 1, 5);
         const trauma = traumaAt(start, hit / MOTION.spotlightShake.ms);
         expect(trauma).toBeLessThanOrEqual(was);
         was = trauma;
@@ -233,19 +278,25 @@ describe("the trauma shake", () => {
       expect(was).toBe(0);
       // It is spent once the trauma is: start × 420 ms.
       expect(longest).toBeLessThanOrEqual(Math.ceil(start * MOTION.spotlightShake.ms));
-      expect(Math.abs(frameAt(shape, 1220 + 420, 1, 5).shakeX)).toBe(0);
+      expect(Math.abs(frameAt(shape, beatsAt(1, shape).impactAt + 420, 1, 5).shakeX)).toBe(0);
     }
     expect(FX.shakeMax).toBe(9);
     expect(FX.shakeTurn).toBeCloseTo(1.2 * RAD, 9);
   });
 
+  it("wobbles slowly enough that no sine aliases at 60 fps: the fastest at Quick is under 25 Hz", () => {
+    const quick = 1 / 0.6;
+    for (const { base, spread } of Object.values(WOBBLE_HZ)) expect((base + spread) * quick).toBeLessThan(25);
+    expect(Math.max(...Object.values(WOBBLE_HZ).map(({ base, spread }) => base + spread)) * quick).toBeLessThan(25);
+  });
+
   it("shakes harder for a kill than for a block, wobbles about zero, and differs by seed", () => {
-    const reach = (shape: ClashShape) => Math.max(...range(420).map((hit) => Math.abs(frameAt(shape, 1220 + hit, 1, 5).shakeX)));
+    const reach = (shape: ClashShape) => Math.max(...range(420).map((hit) => Math.abs(frameAt(shape, beatsAt(1, shape).impactAt + hit, 1, 5).shakeX)));
     expect(reach(KILL)).toBeGreaterThan(reach(BLOCKED));
     expect(reach(KILL)).toBeGreaterThan(2);
-    const wave = range(420, 3).map((hit) => frameAt(KILL, 1220 + hit, 1, 5).shakeX);
+    const wave = range(420, 3).map((hit) => frameAt(KILL, beatsAt(1, KILL).impactAt + hit, 1, 5).shakeX);
     expect(wave.some((value) => value > 0) && wave.some((value) => value < 0)).toBe(true);
-    expect(wave).not.toEqual(range(420, 3).map((hit) => frameAt(KILL, 1220 + hit, 1, 6).shakeX));
+    expect(wave).not.toEqual(range(420, 3).map((hit) => frameAt(KILL, beatsAt(1, KILL).impactAt + hit, 1, 6).shakeX));
     expect(shakeAt(1, 0, 1, 5)).toEqual({ x: 0, y: 0, turn: 0 });
   });
 });
@@ -397,12 +448,13 @@ describe("several attacks in one state", () => {
 
   it("fly out and enter only for the first, and go back only for the last", () => {
     expect(frameAt(first, 0, 1).flyAttackers).toBe(0);
-    expect(frameAt(first, 1700, 1)).toMatchObject({ flyAttackers: 1, flyTarget: 1, dark: 1 });
+    expect(frameAt(first, 1700, 1)).toMatchObject({ flyAttackers: 1, flyTarget: 1 });
+    expect(darkAt(1700, 1, 2)).toBe(1);
     // Past its end the first one is still in the middle, fading out into the next.
     expect(frameAt(first, 1700 + 200, 1).fade).toBe(0);
     expect(frameAt(first, 1700 + 100, 1).fade).toBeCloseTo(0.5, 6);
     // A later one is in the middle from its first moment, fading in over the swap.
-    expect(frameAt(middle, 0, 1)).toMatchObject({ flyAttackers: 1, flyTarget: 1, fade: 0, dark: 1 });
+    expect(frameAt(middle, 0, 1)).toMatchObject({ flyAttackers: 1, flyTarget: 1, fade: 0 });
     expect(frameAt(middle, 200, 1).fade).toBe(1);
     expect(frameAt(middle, 1200, 1).flyAttackers).toBe(1);
     expect(frameAt(last, 1200 + 250, 1).flyAttackers).toBeLessThan(1);

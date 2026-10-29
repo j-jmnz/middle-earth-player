@@ -7,7 +7,7 @@
 // the dark theme's tokens: the stage is dark on the Light theme too.
 import { Canvas, useImage } from "@shopify/react-native-skia";
 import { StyleSheet } from "react-native";
-import { useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { useStore } from "zustand";
 
 import { sphereIcon } from "./icon-map.ts";
@@ -21,7 +21,8 @@ import { tableTokensByTheme } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useSpotlightImages } from "./use-spotlight-images.native.ts";
 
-export function SpotlightLayer({ handoff, picture, pictureRevision, nameOf, sphereOf }: SpotlightLayerProps) {
+// Memoized: the table renders on every move, and the layer reads its plan and clock from the handoff store, not from props.
+export const SpotlightLayer = memo(function SpotlightLayer({ handoff, picture, pictureRevision, nameOf, sphereOf }: SpotlightLayerProps) {
   const s = useUiScale();
   const plan = useStore(handoff, (state) => state.plan);
   const progress = useStore(handoff, (state) => state.progress);
@@ -29,16 +30,19 @@ export function SpotlightLayer({ handoff, picture, pictureRevision, nameOf, sphe
   const playing = useStore(handoff, (state) => state.playing);
   const tableImages = useStore(handoff, (state) => state.tableImages);
   const damage = useImage(ICON_FILES.damage);
-  const backs = { player: useImage(CARD_BACK_FILES.player), encounter: useImage(CARD_BACK_FILES.encounter) };
+  const player = useImage(CARD_BACK_FILES.player);
+  const encounter = useImage(CARD_BACK_FILES.encounter);
+  const backs = useMemo(() => ({ player, encounter }), [player, encounter]);
   const fonts = useTableFonts(s);
   const spotFonts = useSpotFonts(s);
   const texture = useSpriteTexture();
   const burn = useMemo(() => burnEffect(), []);
   const images = useSpotlightImages(plan, playing, picture, pictureRevision, tableImages);
+  const iconOf = useCallback((code: string) => sphereIcon(sphereOf(code)), [sphereOf]);
   if (!playing || !plan || !progress) return null;
   return (
     <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
-      <Spotlight plan={plan} progress={progress} images={images} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} burn={burn} t={tableTokensByTheme.dark} s={s} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} />
+      <Spotlight plan={plan} progress={progress} images={images} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} burn={burn} t={tableTokensByTheme.dark} s={s} nameOf={nameOf} sphereOf={iconOf} k={k} />
     </Canvas>
   );
-}
+});

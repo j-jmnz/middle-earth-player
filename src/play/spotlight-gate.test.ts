@@ -8,7 +8,7 @@ import { playUntil, type Reduced } from "../../scripts/combat-policy.ts";
 import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
 import { clashesOf } from "./clash.ts";
-import { endGate, leaveGate, NO_SPOTLIGHT, openGate, scrimShows, spotlightHolds, spotlightOpen } from "./spotlight-gate.ts";
+import { endGate, leaveGate, NO_SPOTLIGHT, openGate, spotlightHolds, spotlightOpen } from "./spotlight-gate.ts";
 import { createTableStore } from "./store.ts";
 
 const DECK = "stealth-and-steadfastness";
@@ -65,14 +65,12 @@ describe("the gate", () => {
     expect(spotlightOpen(openGate(2, []))).toBe(false);
   });
 
-  it("shows the scrim until the last attack begins to go back", () => {
+  it("marks the gate as leaving once the last attack begins to go back", () => {
     const reduced = attack(2, 1, () => true);
     const gate = openGate(1, clashesOf(reduced.prev, reduced.next, reduced.steps));
-    expect(scrimShows(gate, 1, true)).toBe(true);
     const leaving = leaveGate(gate);
     expect(leaving.leaving).toBe(true);
     expect(spotlightHolds(leaving, 1, true)).toBe(true);
-    expect(scrimShows(leaving, 1, true)).toBe(false);
     expect(leaveGate(gate, 9)).toBe(gate);
   });
 });

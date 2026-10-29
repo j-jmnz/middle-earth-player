@@ -2,7 +2,7 @@
 // one buffer of sprites (spotlight-particles.ts, PARTICLE_DRAW): the glow (embers, then the charge's converging embers), the streaks
 // (sparks, or the silver deflection of a block) and the ash. `spriteAt` works one slot's transform and color out from a time alone, so the
 // UI thread fills the buffers (useRSXformBuffer, useColorBuffer) from the frame; a slot with nothing alive has alpha 0. Pure and worklet-safe.
-import { PARTICLE_COUNT, particleAt, type Anchor, type ParticleKind } from "./spotlight-particles.ts";
+import { PARTICLE_COUNT, particleAt, particleEnd, type Anchor, type ParticleKind } from "./spotlight-particles.ts";
 
 /** The sprite texture: a soft dot on the left, a streak (bright head at the right) on the right, each a `CELL` square. */
 export const CELL = 64;
@@ -32,13 +32,24 @@ export function rgbOf(hex: string): [number, number, number] {
 /** What the emitters are: the anchors (screen points), whether the attack was blocked, the plan's seed, the burn's length, and the rim color of the charge. */
 export type Emitters = { seed: number; burnMs: number; blocked: boolean; ember: Anchor; converge: Anchor; hit: Anchor; ash: Anchor; rim: Rgb };
 
-/** The effect clocks of a frame (ms since each began at Normal speed, -1 before). */
-export type Times = { emberT: number; convergeT: number; sparkT: number; ashT: number };
+/**
+ * The effect clocks of a frame (ms since each began at Normal speed, -1 before) and the dark's ramp (0..1, the run's `darkAt`): the glow
+ * draw fades with the dark, so the embers go out with it as the cards go back and do not pop off when the layer unmounts.
+ */
+export type Times = { emberT: number; convergeT: number; sparkT: number; ashT: number; dark: number };
 
 /** One Atlas slot: the RSXform (`scos`, `ssin`, `tx`, `ty`) and the color's red, green, blue and alpha. */
 export type Slot = { scos: number; ssin: number; tx: number; ty: number; r: number; g: number; b: number; a: number };
 
 const NONE: Slot = { scos: 0, ssin: 0, tx: 0, ty: 0, r: 0, g: 0, b: 0, a: 0 };
+
+/** Whether anything in a draw can show at these clocks: a draw that cannot is left empty without working a sprite out. */
+export function drawLive(draw: number, times: Times, e: Emitters): boolean {
+  "worklet";
+  if (draw === 0) return (times.emberT >= 0 || times.convergeT >= 0) && times.dark > 0;
+  if (draw === 1) return times.sparkT >= 0 && times.sparkT < particleEnd(e.blocked ? "deflect" : "spark", e.burnMs);
+  return times.ashT >= 0 && times.ashT < particleEnd("ash", e.burnMs);
+}
 
 /** Slot `i` of draw `draw` (0 glow, 1 streaks, 2 ash) at the given clocks. */
 export function spriteAt(draw: number, i: number, times: Times, e: Emitters): Slot {
@@ -75,5 +86,7 @@ export function spriteAt(draw: number, i: number, times: Times, e: Emitters): Sl
   const scos = scale * Math.cos(turn);
   const ssin = scale * Math.sin(turn);
   const half = CELL / 2;
-  return { scos, ssin, tx: p.x - (scos * half - ssin * half), ty: p.y - (ssin * half + scos * half), r: rgb[0], g: rgb[1], b: rgb[2], a: p.alpha };
+  // The glow draw (embers) fades with the dark.
+  const a = draw === 0 ? p.alpha * times.dark : p.alpha;
+  return { scos, ssin, tx: p.x - (scos * half - ssin * half), ty: p.y - (ssin * half + scos * half), r: rgb[0], g: rgb[1], b: rgb[2], a };
 }

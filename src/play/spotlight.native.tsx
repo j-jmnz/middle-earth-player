@@ -4,7 +4,7 @@
 // and strikes with afterimages, the stage freezes for the hit stop and then shakes, flashes and sparks, and both go back (a destroyed
 // target burns away instead). The plan (spotlight-plan.ts) says who stands where; the beats are arithmetic on one clock
 // (spotlight-beats.ts) that the UI thread evaluates, so nothing draws or redraws unless it plays. The stage is the group that shakes and
-// pushes in; the words and numbers (spotlight-hud.native.tsx) stand outside it. Every number is the engine's: it reads the clash,
+// pushes in; the words and numbers (spotlight-hud.native.tsx) push in with it about the same pivot but do not shake. Every number is the engine's: it reads the clash,
 // never works one out. The layer always draws with the dark theme's tokens.
 import { Group, vec, type SkImage, type SkRuntimeEffect } from "@shopify/react-native-skia";
 import { useMemo } from "react";
@@ -14,13 +14,14 @@ import type { BackImages, Fonts } from "./canvas-pieces.native.tsx";
 import type { IconName } from "./icon-map.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { rgbOf, type Emitters } from "./spotlight-atlas.ts";
-import { darkAt, frameAt, spotlightRun, windowOf, type Frame } from "./spotlight-beats.ts";
+import { darkAt, frameAt, punchAt, spotlightRun, windowOf, type Frame } from "./spotlight-beats.ts";
 import { BurnLayer } from "./spotlight-burn.native.tsx";
 import { Backdrop, Flash, Glint, Pool, RimGlow, Ring } from "./spotlight-fx.native.tsx";
 import { Chip, DamageNumber, Medallion, Note, Stamp } from "./spotlight-hud.native.tsx";
 import { Particles } from "./spotlight-particles.native.tsx";
-import { BurstToken, Corner, FlyingCard, StageCard, Trail, Veil } from "./spotlight-pieces.native.tsx";
+import { BurstToken, Corner, FlyingCard, StageCard, Tint, Trail, Veil } from "./spotlight-pieces.native.tsx";
 import type { ClashPlan, SpotlightPlan } from "./spotlight-plan.ts";
+import { SPOT } from "./spotlight-shape.ts";
 import type { SpotFonts } from "./table-fonts.native.ts";
 import type { TableTokens } from "./tokens.ts";
 
@@ -46,21 +47,27 @@ type Common = {
 };
 
 // Attack `index` of `total`, in its own window of the run: it draws only inside it, so the next one waits its turn (and swaps in as it leaves).
-function ClashView({ plan, index, total, now, ...common }: Common & { plan: ClashPlan; index: number; total: number; now: SharedValue<number>; area: SpotlightPlan["area"] }) {
+function ClashView({ plan, index, total, now, dark, punch, ...common }: Common & { plan: ClashPlan; index: number; total: number; now: SharedValue<number>; dark: SharedValue<number>; punch: SharedValue<number>; area: SpotlightPlan["area"] }) {
   const { k, images, damage, backs, fonts, nameOf, sphereOf, t, s, texture, burn, area } = common;
   const { pill, count, word, number, stamp, note } = common.spotFonts;
   const { stage, shape, clash } = plan;
   const run = windowOf(index, total, k);
   const local = useDerivedValue(() => now.get() - run.start);
-  const frame = useDerivedValue((): Frame => frameAt(shape, local.get(), k, plan.seed));
+  // Outside its window an attack is at rest: one frame, built once, so a hidden attack works nothing out (its particles included).
+  const rest = useMemo(() => frameAt(shape, -1, k, plan.seed), [shape, k, plan.seed]);
+  const frame = useDerivedValue((): Frame => {
+    const at = local.get();
+    return at >= 0 && at < run.length ? frameAt(shape, at, k, plan.seed) : rest;
+  });
   const inWindow = useDerivedValue(() => (local.get() >= 0 && local.get() < run.length ? frame.get().fade : 0));
-  // The stage shakes (Eiserloh's trauma, in logical points) and pushes in about the middle of the screen; the HUD stands outside it.
-  const pivot = { x: area.width / 2, y: area.height / 2 };
+  // The camera pushes in (the run's `punchAt`) about the point the backdrop is lit around, and the stage shakes (Eiserloh's trauma, in
+  // logical points) in it. The HUD takes the same push about the same pivot but not the shake, so the medallions stay on the card feet.
+  const pivot = vec(area.width / 2, area.height * SPOT.centerY);
   const motion = useDerivedValue(() => {
     const f = frame.get();
-    return [{ translateX: f.shakeX * s }, { translateY: f.shakeY * s }, { rotate: f.shakeTurn }, { scale: f.punch }];
+    return [{ translateX: f.shakeX * s }, { translateY: f.shakeY * s }, { rotate: f.shakeTurn }, { scale: punch.get() }];
   });
-  const noteOpacity = useDerivedValue(() => Math.min(1, frame.get().dark));
+  const camera = useDerivedValue(() => [{ scale: punch.get() }]);
   const moreOpacity = useDerivedValue(() => Math.min(1, frame.get().badgeA));
   const blocked = shape.damage === 0;
   const rim = plan.enemyAttack ? t.threat : t.accent;
@@ -87,6 +94,7 @@ function ClashView({ plan, index, total, now, ...common }: Common & { plan: Clas
   const targetBody = (
     <>
       {card(plan.target, stage.target)}
+      {blocked ? null : <Tint rect={stage.target} frame={frame} t={t} />}
       {shape.destroyed && !burns ? <Veil rect={stage.target} frame={frame} t={t} /> : null}
       {count ? <Corner stage={stage} before={plan.before} after={plan.after} image={damage} font={count} frame={frame} t={t} s={s} /> : null}
     </>
@@ -95,7 +103,7 @@ function ClashView({ plan, index, total, now, ...common }: Common & { plan: Clas
   const hit = centre(stage.target);
   return (
     <Group opacity={inWindow}>
-      <Group transform={motion} origin={vec(pivot.x, pivot.y)}>
+      <Group transform={motion} origin={pivot}>
         {plan.shadow && stage.shadow ? (
           <FlyingCard spot={plan.shadow} rect={stage.shadow} turn={0} role="shadow" stage={stage} frame={frame} s={s}>
             <Group opacity={flipBack}>{card(plan.shadow, stage.shadow, true)}</Group>
@@ -107,7 +115,7 @@ function ClashView({ plan, index, total, now, ...common }: Common & { plan: Clas
         ) : null}
         <FlyingCard spot={plan.target} rect={stage.target} turn={0} role="target" stage={stage} frame={frame} fades={shape.destroyed && !burns} s={s}>
           {shape.destroyed && burn ? (
-            <BurnLayer source={burn} rect={stage.target} pivot={pivot} seed={plan.seed} frame={frame}>
+            <BurnLayer source={burn} rect={stage.target} seed={plan.seed} frame={frame}>
               {targetBody}
             </BurnLayer>
           ) : (
@@ -126,20 +134,22 @@ function ClashView({ plan, index, total, now, ...common }: Common & { plan: Clas
             </FlyingCard>
           );
         })}
-        <Particles texture={texture} frame={frame} emitters={emitters} />
+        <Particles texture={texture} frame={frame} dark={dark} emitters={emitters} />
         {Array.from({ length: shape.damage }, (_, n) => (
           <BurstToken key={n} stage={stage} index={n} count={shape.damage} now={local} k={k} place={shape} image={damage} t={t} s={s} />
         ))}
         <Ring x={stage.contact.x} y={stage.contact.y} cardH={stage.cardH} frame={frame} s={s} />
         <Flash cx={hit.cx} cy={hit.cy} cardH={stage.cardH} frame={frame} />
       </Group>
-      {pill ? <Medallion at={stage.badgeA} radius={stage.radius} icon="attack" color={rim} text={String(clash.attack)} font={pill} frame={frame} badge="badgeA" t={t} s={s} /> : null}
-      {/* An undefended hero has no defense to show: the medallion stands under a defender or an enemy only. */}
-      {pill && !clash.undefended ? <Medallion at={stage.badgeD} radius={stage.radius} icon="defense" color={t.accent} text={String(clash.defense)} font={pill} frame={frame} badge="badgeD" t={t} s={s} /> : null}
-      {number && !blocked ? <DamageNumber at={stage.number} text={String(shape.damage)} font={number} destroyed={shape.destroyed} frame={frame} cardH={stage.cardH} t={t} s={s} /> : null}
-      {stamp && (blocked || shape.destroyed) ? <Stamp at={stage.stamp} text={blocked ? "Blocked" : "Destroyed"} font={stamp} color={blocked ? t.accent : t.threat} frame={frame} t={t} s={s} /> : null}
-      {word && stage.more ? <Chip at={stage.more} text={`+${plan.more}`} font={word} t={t} s={s} opacity={moreOpacity} /> : null}
-      {note ? <Note at={stage.note} text={total > 1 ? `${index + 1} of ${total} · Tap to skip` : "Tap to skip"} font={note} t={t} s={s} opacity={noteOpacity} /> : null}
+      <Group transform={camera} origin={pivot}>
+        {pill ? <Medallion at={stage.badgeA} radius={stage.radius} icon="attack" color={rim} text={String(clash.attack)} font={pill} frame={frame} badge="badgeA" t={t} s={s} /> : null}
+        {/* An undefended hero has no defense to show: the medallion stands under a defender or an enemy only. */}
+        {pill && !clash.undefended ? <Medallion at={stage.badgeD} radius={stage.radius} icon="defense" color={t.accent} text={String(clash.defense)} font={pill} frame={frame} badge="badgeD" t={t} s={s} /> : null}
+        {number && !blocked ? <DamageNumber at={stage.number} text={String(shape.damage)} font={number} destroyed={shape.destroyed} frame={frame} cardH={stage.cardH} t={t} s={s} /> : null}
+        {stamp && (blocked || shape.destroyed) ? <Stamp at={stage.stamp} text={blocked ? "Blocked" : "Destroyed"} font={stamp} color={blocked ? t.accent : t.threat} frame={frame} t={t} s={s} /> : null}
+        {word && stage.more ? <Chip at={stage.more} text={`+${plan.more}`} font={word} t={t} s={s} opacity={moreOpacity} /> : null}
+      </Group>
+      {note ? <Note at={stage.note} text={total > 1 ? `${index + 1} of ${total} · Tap to skip` : "Tap to skip"} font={note} t={t} s={s} opacity={dark} /> : null}
     </Group>
   );
 }
@@ -154,13 +164,14 @@ export function Spotlight({ plan, progress, ...common }: Common & { plan: Spotli
   const total = Math.max(1, spotlightRun(plan.clashes.length, k));
   const now = useDerivedValue(() => progress.get() * total);
   const dark = useDerivedValue(() => darkAt(now.get(), k, plan.clashes.length));
+  const punch = useDerivedValue(() => punchAt(now.get(), k, plan.clashes.length));
   const first = plan.clashes[0]?.stage;
   return (
     <Group>
       <Backdrop width={width} height={height} dark={dark} t={t} />
       {first ? <Pool cx={width / 2} cy={first.target.y + first.target.h / 2} cardH={first.cardH} dark={dark} t={t} /> : null}
       {plan.clashes.map((clash, index) => (
-        <ClashView key={`${plan.seq}:${index}`} plan={clash} index={index} total={plan.clashes.length} now={now} area={plan.area} {...common} />
+        <ClashView key={`${plan.seq}:${index}`} plan={clash} index={index} total={plan.clashes.length} now={now} dark={dark} punch={punch} area={plan.area} {...common} />
       ))}
     </Group>
   );

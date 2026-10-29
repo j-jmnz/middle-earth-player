@@ -134,6 +134,14 @@ export const MOTION = {
   spotlightFlip: tween(300, "outCubic"),
   spotlightGlint: tween(260, "linear"),
   spotlightTrailStep: tween(16, null),
+  // A kill holds longer at the hit (a boss stop): this replaces `spotlightStop` for it and the extra is taken from `spotlightImpact`,
+  // so the return and the run keep their times.
+  spotlightStopKill: tween(160, null),
+  // The particles' lives at Normal speed (spotlight-particles.ts): the slowest ember's loop, the slowest converging ember's flight and
+  // the slowest ash's rise; each sprite lives a seeded share of its token.
+  spotlightEmber: tween(2000, "linear"),
+  spotlightConverge: tween(500, "linear"),
+  spotlightAsh: tween(1100, "linear"),
   spotlight: tween(2200, "linear"),
   // The hand scrub (phase 25): the held hand rises (and grows and turns its fan) over `scrubRise` and spreads sideways over `scrubSpread`,
   // together; the card under the finger lifts over `scrubLift`; the hand settles back over `scrubFall`. The table's 35% night
@@ -151,8 +159,8 @@ export const SPOTLIGHT_BEATS = ["spotlightEnter", "spotlightRead", "spotlightCha
 export const SPOTLIGHT_AGAIN_BEATS = ["spotlightSwap", "spotlightReadAgain", "spotlightChargeAgain", "spotlightLunge", "spotlightStop", "spotlightImpact"] as const;
 export const SPOTLIGHT_AGAIN = 1200;
 
-/** The tokens that may pass 500 ms (a title sweep across the canvas, and the whole run of the combat spotlight, phase 24). */
-export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight"];
+/** The tokens that may pass 500 ms (a title sweep across the canvas, the whole run of the combat spotlight, phase 24, and the lives of its embers and ash). */
+export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight", "spotlightEmber", "spotlightAsh"];
 
 /** The longest a token runs, apart from LONG_TOKENS. */
 export const MAX_TOKEN_MS = 500;

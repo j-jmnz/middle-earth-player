@@ -11,7 +11,7 @@ import type { Frame } from "./spotlight-beats.ts";
 import { stampLook } from "./spotlight-fx.ts";
 import { SPOT } from "./spotlight-shape.ts";
 import type { Stage } from "./spotlight-stage.ts";
-import type { TableTokens } from "./tokens.ts";
+import { withAlphaHex, type TableTokens } from "./tokens.ts";
 
 /** A stat medallion straddling a card's foot: a night disc with a ring, the stat's game icon over its number in Marcellus SC. It pops in; the defense one bounces on a block. */
 export function Medallion({ at, radius, icon, color, text, font, frame, badge, t, s }: { at: { cx: number; cy: number }; radius: number; icon: IconName; color: string; text: string; font: SkFont; frame: SharedValue<Frame>; badge: "badgeA" | "badgeD"; t: TableTokens; s: number }) {
@@ -39,12 +39,18 @@ export function DamageNumber({ at, text, font, destroyed, frame, cardH, t, s }: 
   );
 }
 
-/** A stamp ("Blocked" in silver, "Destroyed" in threat red): it lands from 1.35 down to 1, turned, on a dark outline. */
+/**
+ * A stamp ("Blocked" in the accent color, "Destroyed" in threat red): it lands from 1.35 down to 1, turned, on a dark outline and on a
+ * night plate (75%) turned with it, so it reads over the card's pale text box.
+ */
 export function Stamp({ at, text, font, color, frame, t, s }: { at: { cx: number; cy: number; turn: number }; text: string; font: SkFont; color: string; frame: SharedValue<Frame>; t: TableTokens; s: number }) {
   const opacity = useDerivedValue(() => stampLook(frame.get().stamp).alpha);
   const transform = useDerivedValue(() => [{ rotate: at.turn }, { scale: stampLook(frame.get().stamp).scale }]);
+  const width = font.getTextWidth(text) + font.getSize() * 0.7;
+  const height = font.getSize() * 1.3;
   return (
     <Group transform={transform} origin={vec(at.cx, at.cy)} opacity={opacity}>
+      <RoundedRect x={at.cx - width / 2} y={at.cy - height / 2} width={width} height={height} r={height * 0.25} color={withAlphaHex(t.night, 0.75)} />
       <Outlined x={at.cx} y={at.cy + font.getSize() * 0.35} text={text} font={font} t={t} s={s} color={color} heavy />
     </Group>
   );

@@ -1,11 +1,15 @@
 // The burn of a destroyed target (docs/plans/combat-spotlight-redesign.md, §4): the field, the shader built from the same constants,
 // and the ash born in the order the front passes. The shader is compiled and run by CanvasKit (Skia's own SkSL), which the app uses on the web.
 import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
+import type { CanvasKit } from "canvaskit-wasm";
 import { describe, expect, it } from "vitest";
 
 import { ashOrder, BURN, BURN_SKSL, burnField, burnFront, burnSeed, burnThreshold } from "./spotlight-burn.ts";
+import { MOTION } from "./motion-tokens.ts";
 import { ashBirth, ashCell, PARTICLE_COUNT } from "./spotlight-particles.ts";
 
+const BURN_MS = MOTION.spotlightBurn.ms;
 const range = (to: number, step = 1) => Array.from({ length: Math.floor(to / step) + 1 }, (_, index) => index * step);
 
 describe("the burn field", () => {
@@ -55,11 +59,11 @@ describe("the ash", () => {
       const order = ashOrder(cells, seed);
       expect(order).toHaveLength(PARTICLE_COUNT.ash);
       expect([...order].sort((a, b) => a - b)).toEqual(range(PARTICLE_COUNT.ash - 1));
-      const births = order.map((i) => ashBirth(i, seed, 450));
+      const births = order.map((i) => ashBirth(i, seed, BURN_MS));
       expect(births).toEqual([...births].sort((a, b) => a - b));
       // A sprite whose cell burns first is born first.
       expect(births[0]).toBeLessThan(births[births.length - 1] ?? 0);
-      expect(Math.max(...births)).toBeLessThanOrEqual(450);
+      expect(Math.max(...births)).toBeLessThanOrEqual(BURN_MS);
     }
   });
 
@@ -69,7 +73,7 @@ describe("the ash", () => {
       const cell = ashCell(i, seed);
       const field = burnField(cell.u, cell.v, seed);
       // The dissolve at the sprite's birth (inQuad over the burn) puts the threshold at its field value.
-      const d = (ashBirth(i, seed, 450) / 450) ** 2;
+      const d = (ashBirth(i, seed, BURN_MS) / BURN_MS) ** 2;
       expect(burnThreshold(d)).toBeCloseTo(Math.min(field, 1 + BURN.rim), 9);
     }
   });
@@ -88,16 +92,20 @@ describe("the shader", () => {
   // Skia's own compiler (CanvasKit, in the app's dependencies for the web) compiles the SkSL and runs it on a raster surface, so the shader
   // that the phone compiles is the one tested, and its burn matches the TypeScript field the ash is born from.
   it("compiles in Skia and burns the pixels the TypeScript field says it burns", async () => {
-    const load = createRequire(import.meta.url)("canvaskit-wasm") as (options: { locateFile: (file: string) => string }) => Promise<any>;
-    const kit = await load({ locateFile: (file) => new URL(`../../node_modules/canvaskit-wasm/bin/${file}`, import.meta.url).pathname });
+    // CanvasKit as Skia resolves it, so the version tested is the one the app ships.
+    const fromSkia = createRequire(createRequire(import.meta.url).resolve("@shopify/react-native-skia/package.json"));
+    const wasmDir = join(dirname(fromSkia.resolve("canvaskit-wasm/package.json")), "bin");
+    const load = fromSkia("canvaskit-wasm") as (options: { locateFile: (file: string) => string }) => Promise<CanvasKit>;
+    const kit = await load({ locateFile: (file) => join(wasmDir, file) });
     const errors: string[] = [];
     const effect = kit.RuntimeEffect.Make(BURN_SKSL, (message: string) => errors.push(message));
     expect(errors).toEqual([]);
-    expect(effect).not.toBeNull();
+    if (!effect) throw new Error("the burn shader did not compile in CanvasKit");
     const size = 64;
     const seed = burnSeed(4601);
     for (const threshold of [0.3, 0.45, 0.6]) {
       const surface = kit.MakeSurface(size, size);
+      if (!surface) throw new Error("CanvasKit made no raster surface");
       const canvas = surface.getCanvas();
       const white = kit.Shader.MakeColor(kit.Color4f(1, 1, 1, 1), kit.ColorSpace.SRGB);
       const shader = effect.makeShaderWithChildren([0, 0, size, size, threshold, seed], [white]);

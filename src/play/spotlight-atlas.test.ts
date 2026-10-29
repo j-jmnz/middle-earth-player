@@ -1,7 +1,7 @@
 // The Atlas layout of the combat spotlight's particles (spotlight-atlas.ts): three draws, every slot at its sprite's place.
 import { describe, expect, it } from "vitest";
 
-import { ATLAS_CELL, ATLAS_SLOTS, CELL, rgbOf, spriteAt, type Emitters, type Times } from "./spotlight-atlas.ts";
+import { ATLAS_CELL, ATLAS_SLOTS, CELL, drawLive, rgbOf, spriteAt, type Emitters, type Times } from "./spotlight-atlas.ts";
 import { ATLAS_DRAWS, PARTICLE_COUNT, PARTICLE_DRAW, particleAt } from "./spotlight-particles.ts";
 
 const E: Emitters = {
@@ -14,7 +14,7 @@ const E: Emitters = {
   ash: { x: 520, y: 180, size: 234, w: 168 },
   rim: [0.83, 0.33, 0.22],
 };
-const OFF: Times = { emberT: -1, convergeT: -1, sparkT: -1, ashT: -1 };
+const OFF: Times = { emberT: -1, convergeT: -1, sparkT: -1, ashT: -1, dark: 1 };
 
 describe("the atlas draws", () => {
   it("are the draws the particles allow, each as large as its kinds need", () => {
@@ -33,7 +33,7 @@ describe("spriteAt", () => {
   });
 
   it("puts the center of the sprite's cell at the particle's point, whatever its turn", () => {
-    const times: Times = { emberT: 1500, convergeT: 200, sparkT: 120, ashT: 300 };
+    const times: Times = { emberT: 1500, convergeT: 200, sparkT: 120, ashT: 300, dark: 1 };
     const kinds = ["ember", "converge"] as const;
     let seen = 0;
     for (let draw = 0; draw < ATLAS_DRAWS; draw += 1) {
@@ -45,7 +45,7 @@ describe("spriteAt", () => {
         const x = slot.scos * half - slot.ssin * half + slot.tx;
         const y = slot.ssin * half + slot.scos * half + slot.ty;
         const embers = PARTICLE_COUNT.ember;
-        const p = draw === 0 ? (i < embers ? particleAt(kinds[0], i, times.emberT, E.seed, E.ember) : particleAt(kinds[1], i - embers, times.convergeT, E.seed, E.converge)) : draw === 1 ? particleAt("spark", i, times.sparkT, E.seed, E.hit) : particleAt("ash", i, times.ashT, E.seed, E.ash, E.burnMs);
+        const p = draw === 0 ? (i < embers ? particleAt(kinds[0], i, times.emberT, E.seed, E.ember, E.burnMs) : particleAt(kinds[1], i - embers, times.convergeT, E.seed, E.converge, E.burnMs)) : draw === 1 ? particleAt("spark", i, times.sparkT, E.seed, E.hit, E.burnMs) : particleAt("ash", i, times.ashT, E.seed, E.ash, E.burnMs);
         expect(x).toBeCloseTo(p.x, 6);
         expect(y).toBeCloseTo(p.y, 6);
         expect(slot.a).toBeCloseTo(p.alpha, 12);
@@ -62,8 +62,35 @@ describe("spriteAt", () => {
     expect(sparks.r).toBeGreaterThan(sparks.b);
   });
 
+  it("fades the embers with the dark and leaves the sparks and the ash alone", () => {
+    const times: Times = { emberT: 1500, convergeT: 200, sparkT: 120, ashT: 300, dark: 1 };
+    const half: Times = { ...times, dark: 0.5 };
+    let seen = 0;
+    for (let i = 0; i < (ATLAS_SLOTS[0] ?? 0); i += 1) {
+      const full = spriteAt(0, i, times, E);
+      if (full.a === 0) continue;
+      seen += 1;
+      expect(spriteAt(0, i, half, E).a).toBeCloseTo(full.a * 0.5, 12);
+      expect(spriteAt(0, i, { ...times, dark: 0 }, E).a).toBe(0);
+    }
+    expect(seen).toBeGreaterThan(10);
+    for (const draw of [1, 2]) for (let i = 0; i < (ATLAS_SLOTS[draw] ?? 0); i += 1) expect(spriteAt(draw, i, half, E).a).toBe(spriteAt(draw, i, times, E).a);
+  });
+
+  it("is live only while a draw can show something", () => {
+    expect([0, 1, 2].map((draw) => drawLive(draw, OFF, E))).toEqual([false, false, false]);
+    expect(drawLive(0, { ...OFF, emberT: 0 }, E)).toBe(true);
+    expect(drawLive(0, { ...OFF, emberT: 0, dark: 0 }, E)).toBe(false);
+    expect(drawLive(1, { ...OFF, sparkT: 100 }, E)).toBe(true);
+    expect(drawLive(1, { ...OFF, sparkT: 100000 }, E)).toBe(false);
+    expect(drawLive(2, { ...OFF, ashT: 100 }, E)).toBe(true);
+    expect(drawLive(2, { ...OFF, ashT: 5000 }, E)).toBe(false);
+    // Where a draw is not live every one of its slots is empty.
+    for (const [draw, times] of [[1, { ...OFF, sparkT: 100000 }], [2, { ...OFF, ashT: 5000 }], [0, { ...OFF, dark: 0, emberT: 900 }]] as const) for (let i = 0; i < (ATLAS_SLOTS[draw] ?? 0); i += 1) expect(spriteAt(draw, i, times, E).a).toBe(0);
+  });
+
   it("is deterministic for a seed", () => {
-    const times: Times = { emberT: 900, convergeT: 100, sparkT: 60, ashT: 200 };
+    const times: Times = { emberT: 900, convergeT: 100, sparkT: 60, ashT: 200, dark: 1 };
     expect(spriteAt(0, 5, times, E)).toEqual(spriteAt(0, 5, times, E));
     expect(spriteAt(0, 5, times, E)).not.toEqual(spriteAt(0, 5, times, { ...E, seed: 42 }));
   });

@@ -68,11 +68,18 @@ export function traumaAt(start: number, u: number): number {
   return Math.max(0, start - Math.max(0, u));
 }
 
+/**
+ * The wobble's two sines: each one's frequency is `base` plus up to `spread` Hz, seeded, at Normal speed. Quick plays the same picture
+ * 1/0.6 times faster, so the fastest sine there is (base + spread) / 0.6 Hz, which stays under 25 Hz: well below a 60 Hz frame
+ * rate's Nyquist, so the shake never aliases into a stutter.
+ */
+export const WOBBLE_HZ = { first: { base: 5, spread: 3 }, second: { base: 9, spread: 4 } } as const;
+
 // A smooth seeded wobble in [-1, 1]: two sines of seeded frequency and phase, `sec` seconds in, for one axis.
 function wobble(sec: number, seed: number, axis: number): number {
   "worklet";
-  const first = 2 * Math.PI * (14 + 6 * hash(axis * 4 + 1, seed)) * sec + 2 * Math.PI * hash(axis * 4 + 2, seed);
-  const second = 2 * Math.PI * (23 + 9 * hash(axis * 4 + 3, seed)) * sec + 2 * Math.PI * hash(axis * 4 + 4, seed);
+  const first = 2 * Math.PI * (WOBBLE_HZ.first.base + WOBBLE_HZ.first.spread * hash(axis * 4 + 1, seed)) * sec + 2 * Math.PI * hash(axis * 4 + 2, seed);
+  const second = 2 * Math.PI * (WOBBLE_HZ.second.base + WOBBLE_HZ.second.spread * hash(axis * 4 + 3, seed)) * sec + 2 * Math.PI * hash(axis * 4 + 4, seed);
   return (Math.sin(first) + 0.5 * Math.sin(second)) / 1.5;
 }
 

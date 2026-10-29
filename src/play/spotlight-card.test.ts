@@ -1,7 +1,7 @@
 // The poses of the combat spotlight's cards (spotlight-card.ts).
 import { describe, expect, it } from "vitest";
 
-import { burnRect, cardTransform, CARD, flightArc, flipTurn, trailTransform } from "./spotlight-card.ts";
+import { cardTransform, CARD, flightArc, flipTurn, trailTransform } from "./spotlight-card.ts";
 import { frameAt, type ClashShape } from "./spotlight-beats.ts";
 import { stageOf, strikeOffset, type StageArea } from "./spotlight-stage.ts";
 
@@ -71,17 +71,5 @@ describe("an afterimage", () => {
     const list = trailTransform(stage, 0.1, { back: 0.5, strike: 0.2, tilt: -0.03 });
     expect(get(list, "translateX")).toBeCloseTo(strikeOffset(stage, { back: 0.5, strike: 0.2, recoil: 0 }), 9);
     expect(get(list, "rotate")).toBeCloseTo(0.07, 9);
-  });
-});
-
-describe("the burn rectangle", () => {
-  it("is the stage rectangle through the punch-in about the pivot, in pixels", () => {
-    const rect = { x: 500, y: 100, w: 168, h: 234 };
-    expect(burnRect(rect, { x: 422, y: 195 }, 1, 2)).toEqual([1000, 200, 336, 468]);
-    const [x, y, w, h] = burnRect(rect, { x: 422, y: 195 }, 1.06, 3);
-    expect(x).toBeCloseTo((422 + 78 * 1.06) * 3, 9);
-    expect(y).toBeCloseTo((195 - 95 * 1.06) * 3, 9);
-    expect(w).toBeCloseTo(168 * 1.06 * 3, 9);
-    expect(h).toBeCloseTo(234 * 1.06 * 3, 9);
   });
 });

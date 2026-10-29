@@ -15,7 +15,7 @@ export const SPOT = {
   // The turned shadow card: this share of a card, bottom-aligned, this far (pt) left of the fan.
   shadow: 0.72,
   shadowGap: 20,
-  // The group keeps this much (pt) beyond the safe insets at each side.
+  // The group keeps this much (pt) beyond the safe insets in all: 32 across the width, not at each side.
   margin: 32,
   // The stat medallions' radius (pt), straddling each card's foot.
   medal: 26,
@@ -44,6 +44,6 @@ export const SPOT = {
   numberPeak: 1.4,
   // The number floats up this share of a card's height while it shows.
   numberRise: 0.08,
-  // The most the backdrop darkens the screen (the layer draws it, always dark, in the dark theme).
+  // The most the backdrop darkens the screen (the layer draws it, always dark, with the Dark theme's tokens, on either theme).
   dark: 0.88,
 } as const;

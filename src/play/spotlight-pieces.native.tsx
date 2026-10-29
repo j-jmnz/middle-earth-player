@@ -39,6 +39,12 @@ export function StageCard({ spot, rect, image, name, sphere, fonts, backs, t, s,
   return <CardBody slot={slot} image={image} name={name} sphere={sphere} fonts={fonts} encounterBack={faceDown} backs={backs} t={t} s={s} />;
 }
 
+/** The threat-red tint over a target that took damage, at 0.35 of the frame's `tint` (1 at the impact, falling to 0): a tint, not a flash. */
+export function Tint({ rect, frame, t }: { rect: Rect; frame: SharedValue<Frame>; t: TableTokens }) {
+  const opacity = useDerivedValue(() => 0.35 * frame.get().tint);
+  return <RoundedRect x={rect.x} y={rect.y} width={rect.w} height={rect.h} r={cardCorner(rect.w, rect.h)} color={t.threat} opacity={opacity} />;
+}
+
 /** The night veil over a destroyed target, growing to 50% as it burns (the fallback when the burn shader does not compile). */
 export function Veil({ rect, frame, t }: { rect: Rect; frame: SharedValue<Frame>; t: TableTokens }) {
   const opacity = useDerivedValue(() => 0.5 * frame.get().dissolve);

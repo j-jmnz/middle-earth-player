@@ -4,13 +4,11 @@
 // (spotlight-pieces.native.tsx, FlyingCard and Veil).
 import { Group, Paint, RuntimeShader, Skia, type SkRuntimeEffect } from "@shopify/react-native-skia";
 import type { ReactNode } from "react";
-import { PixelRatio } from "react-native";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
 import type { Rect } from "./layout.ts";
 import type { Frame } from "./spotlight-beats.ts";
 import { BURN, BURN_SKSL, burnSeed, burnThreshold } from "./spotlight-burn.ts";
-import { burnRect } from "./spotlight-card.ts";
 
 let effect: SkRuntimeEffect | null | undefined;
 
@@ -24,16 +22,16 @@ export function burnEffect(): SkRuntimeEffect | null {
 const UNTOUCHED = -(1 + 2 * BURN.rim);
 
 /**
- * The target's layer with the burn on it. `rect` is the target's rectangle on the stage (screen points), `pivot` the camera's pivot
- * (the screen's center) and `seed` the plan's seed. The shader reads pixels, so the rectangle goes in through the camera's punch-in
- * and the screen's pixel density (spotlight-card.ts, burnRect).
+ * The target's layer with the burn on it. `rect` is the target's rectangle on the stage (screen points) and `seed` the plan's seed. A
+ * runtime shader used as an image filter works in the filter's local coordinates and follows the canvas transform (Skia's
+ * ImageFilterFactory.MakeRuntimeShader), and this layer sits inside the flying card and the shake and punch group, so the rectangle
+ * is the stage's own: no camera or pixel-density arithmetic.
  */
-export function BurnLayer({ source, rect, pivot, seed, frame, children }: { source: SkRuntimeEffect; rect: Rect; pivot: { x: number; y: number }; seed: number; frame: SharedValue<Frame>; children: ReactNode }) {
-  const density = PixelRatio.get();
+export function BurnLayer({ source, rect, seed, frame, children }: { source: SkRuntimeEffect; rect: Rect; seed: number; frame: SharedValue<Frame>; children: ReactNode }) {
   const shaderSeed = burnSeed(seed);
   const uniforms = useDerivedValue(() => {
     const f = frame.get();
-    return { rect: burnRect(rect, pivot, f.punch, density), threshold: f.dissolve > 0 ? burnThreshold(f.dissolve) : UNTOUCHED, seed: shaderSeed };
+    return { rect: [rect.x, rect.y, rect.w, rect.h], threshold: f.dissolve > 0 ? burnThreshold(f.dissolve) : UNTOUCHED, seed: shaderSeed };
   });
   return (
     <Group

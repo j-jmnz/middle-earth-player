@@ -3,6 +3,7 @@
 // evaluates a whole emitter from one clock and a Vitest reads it. Positions are screen points; every length is a share of `at.size`
 // (the height of the card the effect belongs to), so the effect scales with the stage. `t` is ms since the emitter began, at
 // Normal speed (the beats hand it over unscaled, so Quick plays the same picture faster).
+import { MOTION } from "./motion-tokens.ts";
 import { burnField, burnFront } from "./spotlight-burn.ts";
 
 export type ParticleKind = "ember" | "converge" | "spark" | "deflect" | "ash";
@@ -15,8 +16,22 @@ export const PARTICLE_BUDGET = 90;
 export const PARTICLE_DRAW: Readonly<Record<ParticleKind, number>> = { ember: 0, converge: 0, spark: 1, deflect: 1, ash: 2 };
 export const ATLAS_DRAWS = 3;
 
-/** How long each kind's sprite lives, ms at Normal, at most (the slowest sprite). */
-export const PARTICLE_LIFE: Readonly<Record<ParticleKind, number>> = { ember: 2000, converge: 520, spark: 450, deflect: 450, ash: 1100 };
+// How long sprites live, as shares of the tokens that say so (motion-tokens.ts): an ember is born within the first 0.4 of its loop and
+// lives 0.6 to 1 of it; a converging ember is born within the first 0.24 of its flight and lives 0.64 to 1 of it; a spark lives 2/3 to
+// 14/15 of the sparks' token and a deflection 11/15 to 1 of it; an ash lives 7/11 to 1 of the ash token.
+const EMBER = { born: 0.4, life: 0.6, spread: 0.4 };
+const CONVERGE = { born: 0.24, life: 0.64, spread: 0.36 };
+const ASH_LIFE = { life: 7 / 11, spread: 4 / 11 };
+const SPARK_LIFE = { spark: 2 / 3, deflect: 11 / 15, spread: 4 / 15 };
+
+/** The ms (at Normal) after which no sprite of a kind shows, for an ash burn of `burnMs`; infinite for embers, which loop the whole attack. */
+export function particleEnd(kind: ParticleKind, burnMs: number): number {
+  "worklet";
+  if (kind === "ember") return Infinity;
+  if (kind === "converge") return MOTION.spotlightConverge.ms * (1 + CONVERGE.born);
+  if (kind === "ash") return burnMs + MOTION.spotlightAsh.ms;
+  return MOTION.spotlightSparks.ms;
+}
 
 /** Where an effect is: its anchor point, the length it scales with, and its direction in radians (sparks and deflection; 0 points right). `w` is the width of the card the ash rises from. */
 export type Anchor = { x: number; y: number; size: number; dir?: number; w?: number };
@@ -62,14 +77,15 @@ export function ashBirth(i: number, seed: number, burnMs: number): number {
  * `spark` flies out from the point with drag and gravity, its streak turned along its velocity; `deflect` is a cone of the same
  * back along `at.dir`; `ash` rises from the card cell the burn front has just passed. Alpha is 0 before the sprite is born and after it dies.
  */
-export function particleAt(kind: ParticleKind, i: number, t: number, seed: number, at: Anchor, burnMs = 450): Particle {
+export function particleAt(kind: ParticleKind, i: number, t: number, seed: number, at: Anchor, burnMs: number): Particle {
   "worklet";
   if (t < 0 || i < 0 || i >= PARTICLE_COUNT[kind]) return NONE;
   const size = at.size;
   const dir = at.dir ?? 0;
   if (kind === "ember") {
-    const born = rnd(i, 0, seed) * 800;
-    const life = 1200 + 800 * rnd(i, 1, seed);
+    const loop = MOTION.spotlightEmber.ms;
+    const born = rnd(i, 0, seed) * EMBER.born * loop;
+    const life = (EMBER.life + EMBER.spread * rnd(i, 1, seed)) * loop;
     if (t < born) return NONE;
     const age = ((t - born) % life) / life;
     const x0 = (rnd(i, 2, seed) - 0.5) * 1.6 * size;
@@ -78,8 +94,9 @@ export function particleAt(kind: ParticleKind, i: number, t: number, seed: numbe
     return { x: at.x + x0 + sway, y: at.y + y0 - age * 0.55 * size, turn: 0, scale: 0.35 + 0.35 * rnd(i, 5, seed), alpha: 0.85 * Math.sin(Math.PI * age) };
   }
   if (kind === "converge") {
-    const born = rnd(i, 0, seed) * 120;
-    const life = 320 + 200 * rnd(i, 1, seed);
+    const flight = MOTION.spotlightConverge.ms;
+    const born = rnd(i, 0, seed) * CONVERGE.born * flight;
+    const life = (CONVERGE.life + CONVERGE.spread * rnd(i, 1, seed)) * flight;
     const age = (t - born) / life;
     if (age < 0 || age >= 1) return NONE;
     const angle = TAU * rnd(i, 2, seed);
@@ -89,7 +106,7 @@ export function particleAt(kind: ParticleKind, i: number, t: number, seed: numbe
   }
   if (kind === "ash") {
     const born = ashBirth(i, seed, burnMs);
-    const life = 700 + 400 * rnd(i, 2, seed);
+    const life = (ASH_LIFE.life + ASH_LIFE.spread * rnd(i, 2, seed)) * MOTION.spotlightAsh.ms;
     const age = (t - born) / life;
     if (age < 0 || age >= 1) return NONE;
     const cell = ashCell(i, seed);
@@ -98,7 +115,7 @@ export function particleAt(kind: ParticleKind, i: number, t: number, seed: numbe
   }
   // spark and deflect: a burst from the point with drag and a little gravity, in closed form.
   const deflect = kind === "deflect";
-  const life = (deflect ? 330 : 300) + 120 * rnd(i, 0, seed);
+  const life = ((deflect ? SPARK_LIFE.deflect : SPARK_LIFE.spark) + SPARK_LIFE.spread * rnd(i, 0, seed)) * MOTION.spotlightSparks.ms;
   const age = t / life;
   if (age >= 1) return NONE;
   const spread = deflect ? 0.65 : Math.PI * 0.9;
@@ -116,7 +133,7 @@ export function particleAt(kind: ParticleKind, i: number, t: number, seed: numbe
 }
 
 /** How many sprites of a kind show (alpha above 0) at `t`. */
-export function visibleCount(kind: ParticleKind, t: number, seed: number, at: Anchor, burnMs = 450): number {
+export function visibleCount(kind: ParticleKind, t: number, seed: number, at: Anchor, burnMs: number): number {
   let shown = 0;
   for (let i = 0; i < PARTICLE_COUNT[kind]; i += 1) if (particleAt(kind, i, t, seed, at, burnMs).alpha > 0) shown += 1;
   return shown;

@@ -1,6 +1,5 @@
 // How a card of the combat spotlight is posed on the stage (docs/plans/combat-spotlight-redesign.md, §5), as arithmetic on a frame
-// (spotlight-beats.ts): the transform of a flying card with its arc and its perspective flip, of an afterimage, and the rectangle the
-// burn shader sees. Pure and worklet-safe (in Node the "worklet" directive is an unused string); the native pieces
+// (spotlight-beats.ts): the transform of a flying card with its arc and its perspective flip, and of an afterimage. Pure and worklet-safe (in Node the "worklet" directive is an unused string); the native pieces
 // (spotlight-pieces.native.tsx) hand the result to a Skia group. Lengths come back in screen points: the stage is already times the UI scale.
 import type { Transforms3d } from "@shopify/react-native-skia";
 
@@ -47,13 +46,4 @@ export function cardTransform(role: Role, from: Rect, fromTurn: number, rect: Re
 export function trailTransform(stage: Stage, turn: number, then: { back: number; strike: number; tilt: number }): Transforms3d {
   "worklet";
   return [{ translateX: strikeOffset(stage, { back: then.back, strike: then.strike, recoil: 0 }) }, { rotate: turn + then.tilt }];
-}
-
-/**
- * The target card's rectangle as the burn shader reads it (x, y, width, height in the layer's pixels): the stage rectangle taken
- * through the camera's punch-in about `pivot` and then the screen's pixel density.
- */
-export function burnRect(rect: Rect, pivot: { x: number; y: number }, punch: number, density: number): [number, number, number, number] {
-  "worklet";
-  return [(pivot.x + (rect.x - pivot.x) * punch) * density, (pivot.y + (rect.y - pivot.y) * punch) * density, rect.w * punch * density, rect.h * punch * density];
 }
