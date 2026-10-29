@@ -25,7 +25,7 @@ const DIAL_GAP = 10;
 
 export type TopBarProps = {
   threats: readonly SeatThreat[];
-  // The seat the engine is asking, whose label is gold in two-handed play, and the seat peeked at (never the acting one) or null: that
+  // The seat the engine is asking, whose label is accent in two-handed play, and the seat peeked at (never the acting one) or null: that
   // dial gets a bone ring and an eye mark. A dial that is not shown peeks when tapped (src/play/peek.ts).
   acting: number;
   viewed: number | null;
@@ -34,7 +34,7 @@ export type TopBarProps = {
   // The resource tokens on the campaign card (The Oath, 41050:A:3) and the card's name, or null when its scenario has none.
   tokens?: { name: string; tokens: number } | null;
   rail: Rail;
-  // Stops are on and one of the player's stops lies ahead in this phase: a gold S by the next phase.
+  // Stops are on and one of the player's stops lies ahead in this phase: an accent S by the next phase.
   stopAhead: boolean;
   // The phase carousel is open.
   carouselOpen: boolean;

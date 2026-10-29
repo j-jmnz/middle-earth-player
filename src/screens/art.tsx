@@ -79,7 +79,7 @@ export function CroppedArt({
   );
 }
 
-/** A hero's face in a gold ring. The name is the caller's to say; the portrait is not read. `size` is the Medium size; it is scaled here. */
+/** A hero's face in an accent ring. The name is the caller's to say; the portrait is not read. `size` is the Medium size; it is scaled here. */
 export function Portrait({ card, size: base = 40, ring = true }: { card: ArtCard | null; size?: number; ring?: boolean }) {
   const palette = usePalette();
   const size = base * useUiScale();
@@ -91,7 +91,7 @@ export function Portrait({ card, size: base = 40, ring = true }: { card: ArtCard
         height: size,
         borderRadius: size / 2,
         overflow: "hidden",
-        ...(ring ? { borderWidth: 1.5, borderColor: palette.gold } : { borderWidth: 1, borderColor: palette.hairline }),
+        ...(ring ? { borderWidth: 1.5, borderColor: palette.accent } : { borderWidth: 1, borderColor: palette.hairline }),
       }}
     >
       <CroppedArt card={card} region={FACE} width={size - (ring ? 3 : 2)} height={size - (ring ? 3 : 2)} />
@@ -162,7 +162,7 @@ export function SceneArt({
 
 /**
  * A framed card that opens on a scenario's scene (the Continue card, the scenario to play on the path, a game in progress): the
- * goldLine edge and the gold corners, the scene on top with `over` laid on it (chips), and `children` pulled up over the scene's
+ * accentLine edge and the accent corners, the scene on top with `over` laid on it (chips), and `children` pulled up over the scene's
  * fade so the words start in its night.
  */
 export function SceneCard({
@@ -188,7 +188,7 @@ export function SceneCard({
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View className={hero ? "rounded-hero" : "rounded-card"} style={{ ...panelSurface(pressed, t), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdgeOf(t) }}>
+    <View className={hero ? "rounded-hero" : "rounded-card"} style={{ ...panelSurface(pressed, t), borderWidth: 1, borderColor: palette.accentLine, boxShadow: raisedEdgeOf(t) }}>
       <View className={`overflow-hidden ${hero ? "rounded-t-hero" : "rounded-t-card"}`}>
         <SceneArt scenarioId={scenarioId} height={sceneHeight * s} shade={0.4} fade={0.4} fadeTo={palette.raised}>
           {over}

@@ -17,7 +17,7 @@ export type SpotCard = { id: string; code: string; from: Rect; turn: number };
 
 export type ClashPlan = {
   clash: Clash;
-  // An enemy attacks (its attack icon is threat red) or the players do (gold).
+  // An enemy attacks (its attack icon is threat red) or the players do (accent).
   enemyAttack: boolean;
   // The attackers in the fan, and how many more there are than it shows.
   attackers: SpotCard[];

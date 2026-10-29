@@ -8,7 +8,7 @@ import { Chevron, Magnifier } from "./chrome-marks";
 import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
-import { goldPlate, goldSurface, raisedEdgeOf, slateSurface } from "../play/surfaces";
+import { accentPlate, accentSurface, raisedEdgeOf, slateSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 import { touch, useUiScale } from "../play/ui-scale";
@@ -51,13 +51,13 @@ export function IconButton({
   glyph?: string;
   chevron?: boolean;
   overlay?: boolean;
-  tone?: "bone" | "gold";
+  tone?: "bone" | "accent";
   // Set for a button that shows and hides something (Manage): a screen reader hears whether it is open.
   expanded?: boolean;
 }) {
   const palette = usePalette();
   const s = useUiScale();
-  const color = tone === "gold" ? palette.gold : palette.bone;
+  const color = tone === "accent" ? palette.accent : palette.bone;
   const box = touch(s, 44);
   return (
     <Pressable
@@ -82,7 +82,7 @@ export function IconButton({
             borderColor: overlay ? withAlphaHex(palette.bone, 0.16) : palette.hairline,
           }}
         >
-          {chevron ? <Chevron color={color} /> : icon ? <GameIcon name={icon} size={18 * s} tint={tone === "gold" ? "gold" : "bone"} /> : <Text style={{ color, fontSize: 20 * s, lineHeight: 22 * s, fontWeight: "700" }}>{glyph}</Text>}
+          {chevron ? <Chevron color={color} /> : icon ? <GameIcon name={icon} size={18 * s} tint={tone === "accent" ? "accent" : "bone"} /> : <Text style={{ color, fontSize: 20 * s, lineHeight: 22 * s, fontWeight: "700" }}>{glyph}</Text>}
         </View>
       )}
     </Pressable>
@@ -102,7 +102,7 @@ export function TextButton({
   onPress: () => void;
   testID: string;
   // Danger is for an action that cannot be undone (Delete a playthrough).
-  tone?: "bone" | "gold" | "ink" | "danger" | "muted";
+  tone?: "bone" | "accent" | "ink" | "danger" | "muted";
   // What a screen reader says when the visible word is not enough alone ("Booklet" opens the campaign book).
   accessibilityLabel?: string;
   // Set for a text option in a radio group (the No boon decline): the button is a radio with this selected state.
@@ -112,7 +112,7 @@ export function TextButton({
 }) {
   const pressedNight = usePressedNight();
   const pressedPaper = usePressedPaper();
-  const color = tone === "gold" ? "text-gold" : tone === "ink" ? "text-inkLabel" : tone === "danger" ? "text-danger" : tone === "muted" ? "text-muted" : "text-bone";
+  const color = tone === "accent" ? "text-accent" : tone === "ink" ? "text-inkLabel" : tone === "danger" ? "text-danger" : tone === "muted" ? "text-muted" : "text-bone";
   return (
     <Pressable
       testID={testID}
@@ -132,7 +132,7 @@ export function TextButton({
 const buttonLabelOf = (s: number) => ({ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 2.4 * s });
 
 /**
- * The one filled action on a screen: worked gold with a lit top edge and a soft glow, engraved capitals. It sinks a little
+ * The one filled action on a screen: worked accent with a lit top edge and a soft glow, engraved capitals. It sinks a little
  * when pressed. On paper it is an ink plate. Disabled is a flat night plate with faint words; the sentence above it says why.
  */
 export function PrimaryButton({
@@ -155,7 +155,7 @@ export function PrimaryButton({
   const s = useUiScale();
   const paper = surface === "paper";
   // The fill and the text colour are styles, not only classes: on the phone a class on a Pressable whose style is a function
-  // can be dropped, which left a gold pill as dark text on night (user report, 2026-10-25). The pressed state comes from the
+  // can be dropped, which left an accent pill as dark text on night (user report, 2026-10-25). The pressed state comes from the
   // Pressable's children.
   const fill = (pressed: boolean) =>
     disabled
@@ -164,8 +164,8 @@ export function PrimaryButton({
         : { backgroundColor: palette.raised }
       : paper
         ? { backgroundColor: palette.ink, opacity: pressed ? 0.85 : 1 }
-        : goldPlate(pressed, t);
-  const color = disabled ? (paper ? palette.inkMuted : palette.faint) : paper ? palette.paper : palette.onGold;
+        : accentPlate(pressed, t);
+  const color = disabled ? (paper ? palette.inkMuted : palette.faint) : paper ? palette.paper : palette.onAccent;
   return (
     <Pressable
       testID={testID}
@@ -189,7 +189,7 @@ export function PrimaryButton({
 
 /**
  * A plate for the actions beside the primary (Path, Log, Change, Add cards): slate lit from above with no drawn edge, engraved
- * capitals, an optional printed icon before the word. `tone` colours the word: gold for a link to read, danger for a loss.
+ * capitals, an optional printed icon before the word. `tone` colours the word: accent for a link to read, danger for a loss.
  */
 export function SecondaryButton({
   label,
@@ -205,7 +205,7 @@ export function SecondaryButton({
   onPress: () => void;
   testID: string;
   icon?: IconName;
-  tone?: "bone" | "gold" | "danger";
+  tone?: "bone" | "accent" | "danger";
   // 44 pt, not 52: a plate in a card's head or a row.
   compact?: boolean;
   accessibilityLabel?: string;
@@ -214,7 +214,7 @@ export function SecondaryButton({
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const color = disabled ? palette.faint : tone === "gold" ? palette.gold : tone === "danger" ? palette.danger : palette.bone;
+  const color = disabled ? palette.faint : tone === "accent" ? palette.accent : tone === "danger" ? palette.danger : palette.bone;
   return (
     <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress}>
       {({ pressed }) => (
@@ -222,7 +222,7 @@ export function SecondaryButton({
           className="flex-row items-center justify-center gap-2 rounded-tile px-4"
           style={{ minHeight: compact ? touch(s, 44) : 52 * s, ...slateSurface(pressed && !disabled, t), boxShadow: raisedEdgeOf(t) }}
         >
-          {icon ? <GameIcon name={icon} size={15 * s} tint={tone === "gold" ? "gold" : tone === "danger" ? "danger" : "bone"} /> : null}
+          {icon ? <GameIcon name={icon} size={15 * s} tint={tone === "accent" ? "accent" : tone === "danger" ? "danger" : "bone"} /> : null}
           <Text className="font-display-bold uppercase" style={{ fontSize: 13 * s, lineHeight: 18 * s, letterSpacing: 1.6 * s, color }}>
             {label}
           </Text>
@@ -268,7 +268,7 @@ export function SearchField({
   );
 }
 
-/** A filter that is on or off (All, Ready, a sphere, a card type): gold plate when on, a hairline outline when off. 44 pt target. */
+/** A filter that is on or off (All, Ready, a sphere, a card type): accent plate when on, a hairline outline when off. 44 pt target. */
 export function ToggleChip({
   label,
   selected,
@@ -305,10 +305,10 @@ export function ToggleChip({
       {({ pressed }) => (
         <View
           className="h-9 min-w-touch flex-row items-center justify-center gap-1.5 rounded-tile px-3"
-          style={on ? { ...goldSurface(pressed, t), borderWidth: 1, borderColor: palette.goldDeep } : { backgroundColor: pressed ? palette.pressed : "transparent", borderWidth: 1, borderColor: palette.hairline }}
+          style={on ? { ...accentSurface(pressed, t), borderWidth: 1, borderColor: palette.accentDeep } : { backgroundColor: pressed ? palette.pressed : "transparent", borderWidth: 1, borderColor: palette.hairline }}
         >
           {leading}
-          <Text className={`text-label ${on ? "font-semibold" : ""}`} style={{ color: on ? palette.onGold : palette.muted }}>
+          <Text className={`text-label ${on ? "font-semibold" : ""}`} style={{ color: on ? palette.onAccent : palette.muted }}>
             {label}
           </Text>
         </View>

@@ -11,11 +11,11 @@ export const palette: {
   readonly muted: "#A39B8C";
   readonly faint: "#8A857C";
   readonly danger: "#E8917B";
-  readonly gold: "#D9B66C";
-  readonly goldHigh: "#F3DA9A";
-  readonly goldDeep: "#A9813F";
-  readonly goldLine: "#5E4C2C";
-  readonly onGold: "#1A1309";
+  readonly accent: "#D9B66C";
+  readonly accentHigh: "#F3DA9A";
+  readonly accentDeep: "#A9813F";
+  readonly accentLine: "#5E4C2C";
+  readonly onAccent: "#1A1309";
   readonly moon: "#9DB0CC";
   readonly ok: "#8FBF7A";
   readonly paper: "#F2EBDB";

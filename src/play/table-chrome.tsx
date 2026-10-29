@@ -31,7 +31,7 @@ const dialOf = (t: TableTokens): Record<ThreatLevel, { edge: string; fill: strin
 /**
  * The threat dial of the top bar (`compact`): the threat icon and the number large in Cinzel Bold on a threat-red pill, with a
  * meter along its foot that fills toward 50, the elimination level, and its label beside it. It warms near elimination,
- * pops when the number changes, and shows the change ("−6" in gold when it fell, "+2" in threat red when it rose) for three
+ * pops when the number changes, and shows the change ("−6" in accent when it fell, "+2" in threat red when it rose) for three
  * seconds; reduced motion keeps it still. `elimination` false (Life) drops the meter and the levels. Elsewhere, a ring with
  * its label under it. The reducer is the only writer of the number.
  */
@@ -57,7 +57,7 @@ export function ThreatRing({
   compact?: boolean;
   // What a screen reader says for a short label ("P1" reads "Player 1 threat").
   accessibilityName?: string;
-  // How the dial reads in two-handed play (peek.ts, `seatDial`). "acting", the seat the engine is asking: a gold label, and the dial pulses
+  // How the dial reads in two-handed play (peek.ts, `seatDial`). "acting", the seat the engine is asking: an accent label, and the dial pulses
   // when the engine turns to it. "viewing", the seat the player is peeking at, which is not the acting one: a bone ring round the dial
   // and a small eye mark. Both are in the screen reader's name. null: neither, and every dial of a solo game.
   role?: DialRole;
@@ -80,7 +80,7 @@ export function ThreatRing({
   if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
-      <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2 * s, borderColor: threat.eliminated ? t.hairline : t.gold }}>
+      <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2 * s, borderColor: threat.eliminated ? t.hairline : t.accent }}>
         <Text testID={`${id}-value`} className="font-display-bold text-title text-bone">
           {String(threat.threat)}
         </Text>
@@ -125,7 +125,7 @@ function ThreatDial({
   const s = useUiScale();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
   const level = elimination ? threatLevel(threat.threat) : "calm";
-  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? dialOf(t)[level] : { edge: t.gold, fill: t.night, meter: t.gold };
+  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? dialOf(t)[level] : { edge: t.accent, fill: t.night, meter: t.accent };
   // The change since the number last moved, shown beside the dial for DELTA_MS. A new change replaces it.
   const seen = useRef(threat.threat);
   const [change, setChange] = useState<{ before: number; after: number; at: number } | null>(null);
@@ -137,7 +137,7 @@ function ThreatDial({
     setChange({ before, after: threat.threat, at: Date.now() });
     if (speed > 0) scale.set(withSequence(withTiming(SHAPE.dialPop, timing(MOTION.dialPopRise, speed)), withSpring(1, springConfig(MOTION.dialPopSettle, speed))));
   }, [threat.threat, speed, scale]);
-  // The seat that is asked turns active in two-handed play: its dial pulses once in a gold ring (1 to 1.12 and back).
+  // The seat that is asked turns active in two-handed play: its dial pulses once in an accent ring (1 to 1.12 and back).
   const active = role === "acting";
   const wasActive = useRef(active);
   const pulse = useSharedValue(0);
@@ -191,7 +191,7 @@ function ThreatDial({
             </View>
           ) : null}
         </View>
-        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2 * s, borderColor: t.gold }, ringStyle]} />
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2 * s, borderColor: t.accent }, ringStyle]} />
         {/* Peeking at this seat: a bone ring just outside the dial and an eye on its corner, clear of the label and its Ring mark. */}
         {role === "viewing" ? (
           <>
@@ -202,10 +202,10 @@ function ThreatDial({
       </Animated.View>
       <View className="items-start gap-0.5">
         <View className="flex-row items-center gap-1">
-          <Text className={`text-label ${role === "acting" ? "text-gold" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>
+          <Text className={`text-label ${role === "acting" ? "text-accent" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>
           {ring ? (
             <View testID={`${id}-ring`}>
-              <GameIcon name={ringMark} size={12 * s} tint={ringMark === "oneRing" ? "gold" : "bone"} />
+              <GameIcon name={ringMark} size={12 * s} tint={ringMark === "oneRing" ? "accent" : "bone"} />
             </View>
           ) : null}
         </View>
@@ -214,7 +214,7 @@ function ThreatDial({
             key={change?.at}
             entering={badge.in}
             exiting={badge.out}
-            style={{ borderRadius: 999, paddingHorizontal: 6 * s, borderWidth: 1, borderColor: delta.lowered ? t.gold : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.gold : t.threat, 0.22) }}
+            style={{ borderRadius: 999, paddingHorizontal: 6 * s, borderWidth: 1, borderColor: delta.lowered ? t.accent : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.accent : t.threat, 0.22) }}
           >
             <Text testID={`${id}-delta`} className="font-display-bold text-label text-bone">
               {delta.text}

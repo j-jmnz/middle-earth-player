@@ -7,10 +7,10 @@ import { usePalette } from "./palette-hook";
 import { SectionHeading } from "../play/section-heading";
 import { withAlphaHex } from "../play/tokens";
 
-const eyebrowTone = { gold: "text-gold", moon: "text-moon", muted: "text-muted", inkLabel: "text-inkLabel" } as const;
+const eyebrowTone = { accent: "text-accent", moon: "text-moon", muted: "text-muted", inkLabel: "text-inkLabel" } as const;
 
-/** One short tag above a title, in engraved capitals: gold above the thing to act on, moon for a section. */
-export function Eyebrow({ children, tone = "gold", testID }: { children: string; tone?: keyof typeof eyebrowTone; testID?: string }) {
+/** One short tag above a title, in engraved capitals: accent above the thing to act on, moon for a section. */
+export function Eyebrow({ children, tone = "accent", testID }: { children: string; tone?: keyof typeof eyebrowTone; testID?: string }) {
   return (
     <Text testID={testID} className={`font-display-bold text-eyebrow uppercase ${eyebrowTone[tone]}`}>
       {children}

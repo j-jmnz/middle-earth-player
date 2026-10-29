@@ -83,13 +83,13 @@ function CardFacts({ row, unapplied }: { row: FactsRow; unapplied: NotApplied | 
         ) : null}
         {row.isUnique ? (
           <View className="flex-row items-center gap-1.5">
-            <GameIcon name="unique" size={16 * s} tint="gold" />
+            <GameIcon name="unique" size={16 * s} tint="accent" />
             <Text className="text-body text-muted">Unique</Text>
           </View>
         ) : null}
       </View>
       {traits ? (
-        <Text testID="card-traits" className="mt-2 text-center text-body font-semibold italic text-gold">
+        <Text testID="card-traits" className="mt-2 text-center text-body font-semibold italic text-accent">
           {traits}
         </Text>
       ) : null}
@@ -200,8 +200,8 @@ export default function CardScreen() {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  // The picture is the hero of this screen: centered, lifted off the night by a gold halo.
-  const halo = useMemo(() => ({ shadowColor: palette.gold, shadowOpacity: 0.25, shadowRadius: 40, shadowOffset: { width: 0, height: 0 }, elevation: 12 }), [palette]);
+  // The picture is the hero of this screen: centered, lifted off the night by an accent halo.
+  const halo = useMemo(() => ({ shadowColor: palette.accent, shadowOpacity: 0.25, shadowRadius: 40, shadowOffset: { width: 0, height: 0 }, elevation: 12 }), [palette]);
   const router = useRouter();
   const params = useLocalSearchParams<{ code: string }>();
   const code = routeCode(params.code);

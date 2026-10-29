@@ -275,7 +275,7 @@ export default function CampaignList() {
       <SecondaryButton
         label="New playthrough"
         testID="new-playthrough"
-        tone="gold"
+        tone="accent"
         compact
         onPress={() => {
           folds.setFolded("start", false);

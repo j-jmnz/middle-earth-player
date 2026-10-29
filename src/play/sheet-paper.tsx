@@ -8,7 +8,7 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
-import { goldPlate, raisedEdgeOf } from "./surfaces.ts";
+import { accentPlate, raisedEdgeOf } from "./surfaces.ts";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
@@ -75,7 +75,7 @@ export function SheetFrame({
 }
 
 // Every fill and text colour of a button is a style object from the tokens, never only a class: on the phone NativeWind can
-// drop a class from a Pressable whose style is a function, and the dock's gold pill was left as dark text on night (user
+// drop a class from a Pressable whose style is a function, and the dock's accent pill was left as dark text on night (user
 // report, 2026-10-25). The pressed state comes from the Pressable's children function, so no style function is needed.
 
 /**
@@ -98,7 +98,7 @@ export function ChromeButton({
   label: string;
   onPress: () => void;
   testID: string;
-  tone?: "bone" | "gold" | "ink" | "muted";
+  tone?: "bone" | "accent" | "ink" | "muted";
   variant?: "text" | "plate" | "quiet";
   disabled?: boolean;
   // On a short phone's dock: a 36 pt pill in a 40 pt row, its 44 pt target kept by a 2 pt hit slop (docs/design-system.md, Table).
@@ -110,7 +110,7 @@ export function ChromeButton({
   const s = useUiScale();
   const ink = tone === "ink";
   const quiet = variant === "quiet";
-  const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "gold" ? t.gold : ink ? t.inkLabel : tone === "muted" || (quiet && tone === "bone") ? t.muted : t.bone;
+  const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "accent" ? t.accent : ink ? t.inkLabel : tone === "muted" || (quiet && tone === "bone") ? t.muted : t.bone;
   const rest = variant === "text" ? null : ink ? { backgroundColor: t.paper } : { backgroundColor: withAlphaHex(t.bone, quiet ? 0.04 : 0.09) };
   // The row is 44 pt, or 40 on a short phone with a slop that makes up the 44; at a scale both follow it, and the target never drops under 44.
   const row = tight ? 40 * s : touch(s, 44);
@@ -152,9 +152,9 @@ export function ChromeButton({
 }
 
 /**
- * The one filled action: worked gold on night with a lit top edge and a soft gold glow, an ink plate on paper; it sinks a
+ * The one filled action: worked accent on night with a lit top edge and a soft accent glow, an ink plate on paper; it sinks a
  * little when pressed. Disabled, it is a dashed outline
- * (a goldLine edge with muted text on night, inkLine with inkMuted on paper) that still reads as the button it will be and
+ * (an accentLine edge with muted text on night, inkLine with inkMuted on paper) that still reads as the button it will be and
  * not as one of the solid-edged answers beside it (docs/design-system.md). A disabled action has a sentence near it saying
  * why.
  */
@@ -182,7 +182,7 @@ export function ChromePrimary({
   const t = useTableTokens();
   const s = useUiScale();
   const paper = surface === "paper";
-  const color = disabled ? (paper ? t.inkMuted : t.muted) : paper ? t.paper : t.onGold;
+  const color = disabled ? (paper ? t.inkMuted : t.muted) : paper ? t.paper : t.onAccent;
   return (
     <Pressable
       testID={testID}
@@ -214,9 +214,9 @@ export function ChromePrimary({
 }
 
 function primaryFill(paper: boolean, disabled: boolean, pressed: boolean, t: TableTokens) {
-  if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: paper ? t.inkLine : t.goldLine };
+  if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: paper ? t.inkLine : t.accentLine };
   if (paper) return { backgroundColor: t.ink, opacity: pressed ? 0.85 : 1 };
-  return goldPlate(pressed, t);
+  return accentPlate(pressed, t);
 }
 
 /** The engine's numbers with the game's icons beside them. Each reads as "Willpower 2" to a screen reader. */
@@ -237,7 +237,7 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
 /**
  * A choice tile, on paper (a pile's cards) or on night (the choice tray). `leading` is a card picture, `trailing` a pill (the
  * foreseen damage); `dense` puts everything on one line (the tray on a short phone). A night tile has no drawn edge: at rest it
- * is a lit plate, picked it is washed in gold with its name in goldHigh and a gold check (user request, 2026-10-27: fewer
+ * is a lit plate, picked it is washed in accent with its name in accentHigh and an accent check (user request, 2026-10-27: fewer
  * borders); a paper one has an inkLine edge, heavier ink when picked. A long press (`onLongPress`) reads the card.
  */
 export function Tile({
@@ -300,7 +300,7 @@ export function Tile({
           {leading}
           <View className={`flex-1 ${dense ? "flex-row flex-wrap items-center gap-x-2 gap-y-0.5" : ""}`}>
             <View className={dense ? "" : "flex-row items-center justify-between gap-2"} style={dense ? { flexGrow: 1, flexShrink: 1, minWidth: 84 * s } : undefined}>
-              <Text numberOfLines={2} className={`shrink text-body ${selected ? "font-semibold" : ""}`} style={{ color: night ? (selected ? t.goldHigh : t.bone) : t.ink }}>
+              <Text numberOfLines={2} className={`shrink text-body ${selected ? "font-semibold" : ""}`} style={{ color: night ? (selected ? t.accentHigh : t.bone) : t.ink }}>
                 {label}
               </Text>
               {night || dense ? null : numbers}
@@ -309,8 +309,8 @@ export function Tile({
             {night || dense ? <View className={dense ? "" : "mt-0.5"}>{numbers}</View> : null}
           </View>
           {selected && night ? (
-            <View accessible={false} importantForAccessibility="no" style={{ width: 20 * s, height: 20 * s, borderRadius: 10 * s, alignItems: "center", justifyContent: "center", backgroundColor: t.gold }}>
-              <Text style={{ color: t.onGold, fontSize: 13 * s, lineHeight: 16 * s, fontWeight: "700" }}>{"\u2713"}</Text>
+            <View accessible={false} importantForAccessibility="no" style={{ width: 20 * s, height: 20 * s, borderRadius: 10 * s, alignItems: "center", justifyContent: "center", backgroundColor: t.accent }}>
+              <Text style={{ color: t.onAccent, fontSize: 13 * s, lineHeight: 16 * s, fontWeight: "700" }}>{"\u2713"}</Text>
             </View>
           ) : null}
         </View>
@@ -319,9 +319,9 @@ export function Tile({
   );
 }
 
-// A night tile's fill: a lit plate at rest, washed in gold when picked.
+// A night tile's fill: a lit plate at rest, washed in accent when picked.
 function nightTile(selected: boolean, t: TableTokens) {
-  return selected ? { backgroundColor: withAlphaHex(t.gold, 0.16), boxShadow: `inset 0 0 0 1px ${withAlphaHex(t.gold, 0.35)}` } : { backgroundColor: withAlphaHex(t.bone, 0.06), boxShadow: raisedEdgeOf(t) };
+  return selected ? { backgroundColor: withAlphaHex(t.accent, 0.16), boxShadow: `inset 0 0 0 1px ${withAlphaHex(t.accent, 0.35)}` } : { backgroundColor: withAlphaHex(t.bone, 0.06), boxShadow: raisedEdgeOf(t) };
 }
 
 /** One sentence under a disabled action saying what it waits for. */

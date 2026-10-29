@@ -140,7 +140,7 @@ export function CardPreview({
     <ChromeButton
       label="Details"
       testID="card-preview-details"
-      tone="gold"
+      tone="accent"
       accessibilityLabel={`Open ${shown.name}`}
       onPress={() => {
         onClose();
@@ -171,7 +171,7 @@ export function CardPreview({
               <ScrollView style={{ flexShrink: 1 }} className="mt-2">
                 {shown.note ? (
                   <View testID="card-preview-why" className="mb-2">
-                    <Text className="font-display-bold text-eyebrow uppercase text-gold">Not playable now</Text>
+                    <Text className="font-display-bold text-eyebrow uppercase text-accent">Not playable now</Text>
                     <Text className="mt-1 text-body text-bone">{shown.note}</Text>
                   </View>
                 ) : null}
@@ -182,7 +182,7 @@ export function CardPreview({
                 ) : null}
                 {(shown.effects ?? []).length > 0 ? (
                   <View testID="card-preview-effects" className="mb-2">
-                    <Text className="font-display-bold text-eyebrow uppercase text-gold">Effects on it</Text>
+                    <Text className="font-display-bold text-eyebrow uppercase text-accent">Effects on it</Text>
                     {(shown.effects ?? []).map((line) => (
                       <Text key={line} className="mt-1 text-label text-bone">
                         {line}
@@ -192,7 +192,7 @@ export function CardPreview({
                 ) : null}
                 {all.length > 1 ? (
                   <View testID="card-preview-attached">
-                    <Text className="font-display-bold text-eyebrow uppercase text-gold">{at === 0 ? "With it" : "The card and what is with it"}</Text>
+                    <Text className="font-display-bold text-eyebrow uppercase text-accent">{at === 0 ? "With it" : "The card and what is with it"}</Text>
                     {all.map((item, index) => (
                       <Pressable
                         key={`${item.code}:${index}`}
@@ -205,7 +205,7 @@ export function CardPreview({
                         {({ pressed }) => (
                           <View
                             className="mt-1 flex-row items-center gap-2 rounded-tile px-2"
-                            style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent", borderWidth: 1, borderColor: index === at ? t.goldLine : t.hairline }}
+                            style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent", borderWidth: 1, borderColor: index === at ? t.accentLine : t.hairline }}
                           >
                             <View style={{ width: 24 * s, height: 34 * s, borderRadius: 3 * s, overflow: "hidden", backgroundColor: t.raised }}>
                               {item.source ? <Image source={item.source} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}

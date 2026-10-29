@@ -31,22 +31,22 @@ const RAIL = 44;
 // flows know: `begin` for the current scenario, `resume-<id>` for an open replay of a won one.
 type Next = { label: string; testID: string; words: string; onPress: () => void };
 
-// The medallion on the trail: a gold disc with a check for a won scenario, a lit gold ring for the one to play, a night disc
+// The medallion on the trail: an accent disc with a check for a won scenario, a lit accent ring for the one to play, a night disc
 // with its number for one still locked.
 function Medallion({ node }: { node: PathNode }) {
   const palette = usePalette();
   const s = useUiScale();
   if (node.status === "completed") {
     return (
-      <View className="items-center justify-center" style={{ width: 30 * s, height: 30 * s, borderRadius: 15 * s, backgroundColor: palette.gold, borderWidth: 3, borderColor: palette.night }}>
-        <Text style={{ color: palette.onGold, fontSize: 13 * s, fontWeight: "800" }}>{"✓"}</Text>
+      <View className="items-center justify-center" style={{ width: 30 * s, height: 30 * s, borderRadius: 15 * s, backgroundColor: palette.accent, borderWidth: 3, borderColor: palette.night }}>
+        <Text style={{ color: palette.onAccent, fontSize: 13 * s, fontWeight: "800" }}>{"✓"}</Text>
       </View>
     );
   }
   if (node.status === "current") {
     return (
-      <View className="items-center justify-center" style={{ width: 38 * s, height: 38 * s, borderRadius: 19 * s, backgroundColor: palette.night, borderWidth: 2, borderColor: palette.gold, boxShadow: `0 0 16px ${withAlphaHex(palette.gold, 0.6)}` }}>
-        <Text className="font-display-bold text-body text-goldHigh">{String(node.number)}</Text>
+      <View className="items-center justify-center" style={{ width: 38 * s, height: 38 * s, borderRadius: 19 * s, backgroundColor: palette.night, borderWidth: 2, borderColor: palette.accent, boxShadow: `0 0 16px ${withAlphaHex(palette.accent, 0.6)}` }}>
+        <Text className="font-display-bold text-body text-accentHigh">{String(node.number)}</Text>
       </View>
     );
   }
@@ -58,7 +58,7 @@ function Medallion({ node }: { node: PathNode }) {
 }
 
 function StatusChip({ node, onArt = false }: { node: PathNode; onArt?: boolean }) {
-  return <Chip testID={`node-${node.id}-status`} label={STATUS_WORD[node.status]} tone={node.status === "completed" ? "ok" : node.status === "current" ? "gold" : "faint"} onArt={onArt} />;
+  return <Chip testID={`node-${node.id}-status`} label={STATUS_WORD[node.status]} tone={node.status === "completed" ? "ok" : node.status === "current" ? "accent" : "faint"} onArt={onArt} />;
 }
 
 /**
@@ -70,7 +70,7 @@ function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
   node: PathNode;
   index: number;
   count: number;
-  // Whether the trail is gold up to this stop.
+  // Whether the trail is accent up to this stop.
   reached: boolean;
   rewards: readonly string[];
   rounds: number | null;
@@ -86,8 +86,8 @@ function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
   return (
     <View testID={`node-${node.id}`} className="flex-row">
       <View style={{ width: RAIL * s }} className="items-center" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
-        {/* One segment of the trail per stop: gold up to the current stop, night past it. */}
-        <View style={{ position: "absolute", top: index === 0 ? 20 * s : 0, bottom: index === count - 1 ? "50%" : 0, width: 2, backgroundColor: reached ? palette.gold : palette.hairline }} />
+        {/* One segment of the trail per stop: accent up to the current stop, night past it. */}
+        <View style={{ position: "absolute", top: index === 0 ? 20 * s : 0, bottom: index === count - 1 ? "50%" : 0, width: 2, backgroundColor: reached ? palette.accent : palette.hairline }} />
         <View style={{ marginTop: (node.status === "current" ? 18 : 12) * s }}>
           <Medallion node={node} />
         </View>
@@ -111,7 +111,7 @@ function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
             </View>
             {begin ? (
               <View className="px-4 pb-4">
-                <SecondaryButton label="Begin" testID="begin" tone="gold" onPress={begin.onPress} />
+                <SecondaryButton label="Begin" testID="begin" tone="accent" onPress={begin.onPress} />
                 <Text testID={`hint-${node.id}`} className="mt-1.5 text-label text-muted">
                   {begin.hint}
                 </Text>
@@ -136,7 +136,7 @@ function Node({ node, index, count, reached, rewards, rounds, begin, onOpen }: {
             </View>
             {onOpen ? (
               <View className="-mx-3 mt-1 flex-row">
-                <TextButton label="Replay" testID={`replay-${node.id}`} tone="gold" accessibilityLabel={`Replay ${node.name}`} onPress={onOpen} />
+                <TextButton label="Replay" testID={`replay-${node.id}`} tone="accent" accessibilityLabel={`Replay ${node.name}`} onPress={onOpen} />
               </View>
             ) : null}
           </View>

@@ -36,7 +36,7 @@ function BookCovers({ cover }: { cover: string }) {
         >
           {({ pressed }) => (
             <View className="min-h-28 justify-between rounded-card p-4" style={tileSurface(pressed, t)}>
-              <GameIcon name="lore" size={22 * s} tint="gold" />
+              <GameIcon name="lore" size={22 * s} tint="accent" />
               <Text className="mt-3 font-display text-heading text-bone" numberOfLines={3}>
                 {book.name}
               </Text>

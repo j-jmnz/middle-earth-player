@@ -132,7 +132,7 @@ export default function Booklet() {
   return (
     <Screen testID="booklet" scene="plain">
       <View testID="booklet-empty" className="flex-1 items-center justify-center gap-4 px-2" style={column}>
-        <View className="h-32 w-24 items-center justify-center rounded-tile" style={{ borderWidth: 1.5, borderStyle: "dashed", borderColor: palette.gold }}>
+        <View className="h-32 w-24 items-center justify-center rounded-tile" style={{ borderWidth: 1.5, borderStyle: "dashed", borderColor: palette.accent }}>
           <RingMark size={28} state="current" />
         </View>
         <Text accessibilityRole="header" testID="booklet-name" className="text-center font-display text-title text-bone">

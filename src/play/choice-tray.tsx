@@ -1,6 +1,6 @@
 // The choice tray (docs/design-system.md, Table, Choice tray; phase 21): a choice whose options are not all whole cards on the
 // table opens a compact night tray over the command column's upper part, standing on the dock as its upper part in the dock's own
-// fill, so the choice and its answers read as one panel. It shows the options and nothing else: the count as a gold eyebrow at its
+// fill, so the choice and its answers read as one panel. It shows the options and nothing else: the count as an accent eyebrow at its
 // top, then one tile per row. The step, the readout, the refusal and the buttons are the dock's, once, under it
 // (the tray's foot sits above them: tray-logic.ts, trayBox). A tile is picked like a card on the table (the same pick,
 // table-choice.ts); a long press on a card's tile shows it large. A tap outside folds the tray (use-table-choice.ts).
@@ -79,8 +79,8 @@ export function ChoiceTray({
   const refused = shown.kind === "pick" ? (shown.unavailable ?? []) : [];
   return (
     <TrayFrame open={open} place={place} joined testID="sheet">
-      {/* The count is the tray's head: a gold eyebrow, where the dock's step stands when the tray is folded. */}
-      <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-gold" style={{ flexShrink: 0, marginBottom: (dense ? 4 : 8) * s }}>
+      {/* The count is the tray's head: an accent eyebrow, where the dock's step stands when the tray is folded. */}
+      <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-accent" style={{ flexShrink: 0, marginBottom: (dense ? 4 : 8) * s }}>
         {trayCount(shown, picked)}
       </Text>
       <ScrollView style={{ flexShrink: 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>

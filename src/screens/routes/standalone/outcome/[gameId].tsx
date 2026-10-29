@@ -126,7 +126,7 @@ export default function StandaloneOutcome() {
         </Label>
         <PrimaryButton label="Done" testID="outcome-done" onPress={done} />
         <View className="mt-1 items-center">
-          <TextButton label="Play again" testID="outcome-again" tone="gold" onPress={again} />
+          <TextButton label="Play again" testID="outcome-again" tone="accent" onPress={again} />
         </View>
       </ActionBar>
     </Screen>

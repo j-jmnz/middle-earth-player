@@ -17,7 +17,7 @@ type Seats = 1 | 2;
 // is `seats-<id>-<n>` and `start-<id>`. `campaign-choice-<id>` is a tile of the chooser.
 const isFellowship = (id: string): boolean => id === FELLOWSHIP_ID;
 
-// One choice of a group the player picks one from: a gold edge when chosen, the raised surface when not (never the gold plate,
+// One choice of a group the player picks one from: an accent edge when chosen, the raised surface when not (never the accent plate,
 // which is the button's). `min-h-14` keeps the 44 pt target; the words wrap.
 function RadioTile({ selected, testID, label, onPress, className, children }: { selected: boolean; testID: string; label: string; onPress: () => void; className: string; children: ReactNode }) {
   const palette = usePalette();
@@ -30,7 +30,7 @@ function RadioTile({ selected, testID, label, onPress, className, children }: { 
       accessibilityState={{ selected, checked: selected }}
       onPress={onPress}
       className={className}
-      style={{ backgroundColor: selected ? palette.pressed : palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline }}
+      style={{ backgroundColor: selected ? palette.pressed : palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.accent : palette.hairline }}
     >
       {children}
     </Pressable>

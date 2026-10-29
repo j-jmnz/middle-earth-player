@@ -305,7 +305,7 @@ export default function DeckEditor() {
               <TextButton
                 testID={`deck-add-${item.type}`}
                 label="Add"
-                tone="gold"
+                tone="accent"
                 accessibilityLabel={`Add ${TYPE_NOUN[item.type]}`}
                 onPress={() => addOfType(item.type)}
               />
@@ -374,7 +374,7 @@ export default function DeckEditor() {
               </View>
             </View>
           ) : (
-            <SecondaryButton testID="deck-add" label="Add cards" tone="gold" onPress={() => addOfType(null)} />
+            <SecondaryButton testID="deck-add" label="Add cards" tone="accent" onPress={() => addOfType(null)} />
           )}
         </View>
         <View className="flex-1">

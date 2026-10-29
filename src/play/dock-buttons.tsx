@@ -111,14 +111,14 @@ export function DockButtons({
       <View style={{ height: armedRoom(lines, dense, s) }}>
         <View style={{ height: lines * LINE_PX * s, justifyContent: "flex-end" }}>
           {line ? (
-            <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} accessibilityLabel={armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : undefined} className={`text-center text-label ${armedButton ? "text-gold" : "text-muted"}`}>
+            <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} accessibilityLabel={armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : undefined} className={`text-center text-label ${armedButton ? "text-accent" : "text-muted"}`}>
               {line}
             </Text>
           ) : null}
         </View>
         {armedButton ? (
           <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "center", alignItems: "center" }}>
-            <Animated.View style={[{ height: 2 * s, backgroundColor: t.gold }, bar]} />
+            <Animated.View style={[{ height: 2 * s, backgroundColor: t.accent }, bar]} />
           </View>
         ) : null}
       </View>
@@ -138,7 +138,7 @@ export function DockButtons({
       {dock.secondary.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1.5">
           {dock.secondary.map((button) => (
-            <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="plate" tight={dense} tone={armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
+            <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="plate" tight={dense} tone={armed === button.testID ? "accent" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
           ))}
         </View>
       ) : null}

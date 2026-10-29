@@ -21,13 +21,13 @@ const DOCK_ICON = 22;
 
 const DOCK_ICON_WIDE = 30;
 
-/** The `tabBarIcon` of a dock tab: one of the game's printed icons, gold on the current tab and faint on the others. */
+/** The `tabBarIcon` of a dock tab: one of the game's printed icons, accent on the current tab and faint on the others. */
 export function dockIcon(name: IconName) {
   const aspect = iconAspect(name);
   const size = Math.round(Math.min(DOCK_ICON, DOCK_ICON_WIDE / aspect));
   return function DockIcon({ focused }: { focused: boolean }) {
     const s = useUiScale();
-    return <GameIcon name={name} size={Math.round(size * s)} tint={focused ? "goldHigh" : "faint"} />;
+    return <GameIcon name={name} size={Math.round(size * s)} tint={focused ? "accentHigh" : "faint"} />;
   };
 }
 
@@ -35,7 +35,7 @@ export function dockIcon(name: IconName) {
 export function drawnIcon(Mark: (props: { color: string; size?: number }) => ReactElement) {
   return function DrawnIcon({ focused }: { focused: boolean }) {
     const palette = usePalette();
-    return <Mark color={focused ? palette.goldHigh : palette.faint} size={DOCK_ICON} />;
+    return <Mark color={focused ? palette.accentHigh : palette.faint} size={DOCK_ICON} />;
   };
 }
 
@@ -74,7 +74,7 @@ export function AppTabBar(props: TabBarProps) {
   return rail ? <RailTabBar {...props} /> : <DockTabBar {...props} />;
 }
 
-/** The dock: six tabs, printed icons (a drawn gear for Settings) over their words on night. The current tab is lit: a gold bar glowing over a gold icon and word. */
+/** The dock: six tabs, printed icons (a drawn gear for Settings) over their words on night. The current tab is lit: an accent bar glowing over an accent icon and word. */
 function DockTabBar(props: TabBarProps) {
   const { state } = props;
   const palette = usePalette();
@@ -97,13 +97,13 @@ function DockTabBar(props: TabBarProps) {
             style={({ pressed }) => (pressed ? pressedNight : undefined)}
           >
             {focused ? (
-              <View pointerEvents="none" style={{ position: "absolute", top: 0, width: 32 * s, height: 2, borderRadius: 1, backgroundColor: palette.gold, boxShadow: `0 0 10px 1px ${withAlphaHex(palette.gold, 0.6)}` }} />
+              <View pointerEvents="none" style={{ position: "absolute", top: 0, width: 32 * s, height: 2, borderRadius: 1, backgroundColor: palette.accent, boxShadow: `0 0 10px 1px ${withAlphaHex(palette.accent, 0.6)}` }} />
             ) : null}
             {/* The icon in a fixed box, so each label sits on the same line; the label says the tab, the icon is not read. */}
             <View className="mb-1 items-center justify-center" style={{ height: DOCK_ICON * s }} importantForAccessibility="no-hide-descendants">
-              {options.tabBarIcon?.({ focused, color: focused ? palette.goldHigh : palette.faint, size: DOCK_ICON * s })}
+              {options.tabBarIcon?.({ focused, color: focused ? palette.accentHigh : palette.faint, size: DOCK_ICON * s })}
             </View>
-            <Text className={focused ? "font-semibold text-goldHigh" : "text-faint"} style={labelSize} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+            <Text className={focused ? "font-semibold text-accentHigh" : "text-faint"} style={labelSize} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
               {word}
             </Text>
           </Pressable>
@@ -116,7 +116,7 @@ function DockTabBar(props: TabBarProps) {
 /**
  * The rail: 88 pt wide plus the left safe inset, on night with a hairline right edge. Each item is at least 64 pt tall, its icon over
  * its 12 pt word; Settings sits at the foot. The items scroll when the window is too short for them. The current item has a 2 pt
- * gold bar glowing along its leading edge and a faint gold wash behind it, over a goldHigh icon and word.
+ * accent bar glowing along its leading edge and a faint accent wash behind it, over an accentHigh icon and word.
  */
 function RailTabBar(props: TabBarProps) {
   const { state } = props;
@@ -139,15 +139,15 @@ function RailTabBar(props: TabBarProps) {
               key={route.key}
               {...button}
               className={`min-h-16 items-center justify-center px-1 py-2 ${route.name === "settings" ? "mt-auto" : ""}`}
-              style={({ pressed }) => (pressed ? pressedNight : focused ? { backgroundColor: withAlphaHex(palette.gold, 0.11) } : undefined)}
+              style={({ pressed }) => (pressed ? pressedNight : focused ? { backgroundColor: withAlphaHex(palette.accent, 0.11) } : undefined)}
             >
               {focused ? (
-                <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2, borderRadius: 1, backgroundColor: palette.gold, boxShadow: `0 0 10px 1px ${withAlphaHex(palette.gold, 0.6)}` }} />
+                <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2, borderRadius: 1, backgroundColor: palette.accent, boxShadow: `0 0 10px 1px ${withAlphaHex(palette.accent, 0.6)}` }} />
               ) : null}
               <View className="mb-1 items-center justify-center" style={{ height: DOCK_ICON * s }} importantForAccessibility="no-hide-descendants">
-                {options.tabBarIcon?.({ focused, color: focused ? palette.goldHigh : palette.faint, size: DOCK_ICON * s })}
+                {options.tabBarIcon?.({ focused, color: focused ? palette.accentHigh : palette.faint, size: DOCK_ICON * s })}
               </View>
-              <Text className={focused ? "font-semibold text-goldHigh" : "text-faint"} style={labelSize} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.9}>
+              <Text className={focused ? "font-semibold text-accentHigh" : "text-faint"} style={labelSize} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.9}>
                 {word}
               </Text>
             </Pressable>

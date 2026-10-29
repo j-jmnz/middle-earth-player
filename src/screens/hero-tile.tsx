@@ -49,7 +49,7 @@ export function HeroTile({
   bare?: boolean;
   // What the app leaves out of this hero's text ("Ability not applied"), under its sphere; null when it applies all of it.
   loss?: string | null;
-  // The hero carries the One Ring: a gold edge and the Ring mark in the corner.
+  // The hero carries the One Ring: an accent edge and the Ring mark in the corner.
   ringBearer?: boolean;
 }) {
   const palette = usePalette();
@@ -61,7 +61,7 @@ export function HeroTile({
   return (
     <View
       className={`flex-1 overflow-hidden ${flush ? "" : "rounded-tile"}`}
-      style={{ height, ...(flush ? {} : { borderWidth: ringBearer ? 1.5 : 1, borderColor: ringBearer ? palette.gold : withAlphaHex(palette.bone, 0.08) }) }}
+      style={{ height, ...(flush ? {} : { borderWidth: ringBearer ? 1.5 : 1, borderColor: ringBearer ? palette.accent : withAlphaHex(palette.bone, 0.08) }) }}
     >
       <CroppedArt card={hero} region={PAINTING} height={height}>
         {bare ? null : (
@@ -77,7 +77,7 @@ export function HeroTile({
                   {ringBearer ? <RingMark size={10} state="current" /> : null}
                 </View>
               ) : null}
-              <Text className={`font-display-bold ${dense ? "" : "text-heading"} ${ringBearer ? "text-goldHigh" : "text-bone"}`} style={dense ? { fontSize: 12 * s, lineHeight: 15 * s } : undefined} numberOfLines={2}>
+              <Text className={`font-display-bold ${dense ? "" : "text-heading"} ${ringBearer ? "text-accentHigh" : "text-bone"}`} style={dense ? { fontSize: 12 * s, lineHeight: 15 * s } : undefined} numberOfLines={2}>
                 {hero.name}
               </Text>
               {dense ? null : (
@@ -87,7 +87,7 @@ export function HeroTile({
                     {sphere}
                   </Text>
                   {hero.sphereCode === "fellowship" ? (
-                    <Text testID={`saga-only-${hero.code}`} className="text-label text-gold" numberOfLines={1}>
+                    <Text testID={`saga-only-${hero.code}`} className="text-label text-accent" numberOfLines={1}>
                       Saga only
                     </Text>
                   ) : null}
@@ -155,7 +155,7 @@ export function EmptyHeroSlot({
 }) {
   const palette = usePalette();
   const pressedNight = usePressedNight();
-  const frame = { height, borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: palette.goldLine, backgroundColor: withAlphaHex(palette.gold, 0.04) };
+  const frame = { height, borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: palette.accentLine, backgroundColor: withAlphaHex(palette.accent, 0.04) };
   if (onPress) {
     return (
       <Pressable
@@ -169,8 +169,8 @@ export function EmptyHeroSlot({
       >
         {({ pressed }) => (
           <View className="flex-1 items-center justify-center" style={pressed ? pressedNight : undefined}>
-            <Text className="font-display-bold text-title text-gold">+</Text>
-            <Text className="font-display-bold text-label text-gold">{`Add ${label.toLowerCase()}`}</Text>
+            <Text className="font-display-bold text-title text-accent">+</Text>
+            <Text className="font-display-bold text-label text-accent">{`Add ${label.toLowerCase()}`}</Text>
           </View>
         )}
       </Pressable>
@@ -179,7 +179,7 @@ export function EmptyHeroSlot({
   return (
     <View testID={testID} className="w-full items-center justify-center gap-2 rounded-tile px-1" style={frame}>
       <RingMark size={18} state="current" />
-      <Text className="text-center font-display-bold text-label text-gold">{label}</Text>
+      <Text className="text-center font-display-bold text-label text-accent">{label}</Text>
     </View>
   );
 }
@@ -197,7 +197,7 @@ type DeckSummary = {
   testID: string;
   // The row of actions under the deck while the list is managed, or Open in Decks in the briefing.
   children?: ReactNode;
-  // Set in the briefing's picker: the deck is a radio, gold-edged with the word Selected when picked, dimmed when it
+  // Set in the briefing's picker: the deck is a radio, accent-edged with the word Selected when picked, dimmed when it
   // cannot be picked (the status line says why).
   selected?: boolean;
   disabled?: boolean;
@@ -225,7 +225,7 @@ function SelectedMark({ selected }: { selected: boolean | undefined }) {
   return (
     <View className="flex-row items-center gap-1.5">
       <RingMark size={14} state={selected ? "done" : "locked"} />
-      {selected ? <Text className="text-label font-semibold text-goldHigh">Selected</Text> : null}
+      {selected ? <Text className="text-label font-semibold text-accentHigh">Selected</Text> : null}
     </View>
   );
 }
@@ -269,7 +269,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
   const { name, heroes, detail, status, note, height, testID, children, selected, disabled } = props;
   return (
     // A FlashList row: a solid fill and no shadow (docs/design-system.md, Performance); only the night fade lays the words on the pictures.
-    <View className="overflow-hidden rounded-card" style={{ backgroundColor: palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.gold : palette.hairline }}>
+    <View className="overflow-hidden rounded-card" style={{ backgroundColor: palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.accent : palette.hairline }}>
       <Pressable {...pressProps(props)}>
         {({ pressed }) => (
           <View style={pressed && !disabled ? pressedNight : undefined}>
@@ -285,7 +285,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
             </View>
             <View className="px-4 pb-3.5" style={{ marginTop: -14 * s }}>
               <View className="flex-row items-start justify-between gap-2">
-                <Text className={`shrink font-display text-title ${disabled ? "text-faint" : selected ? "text-goldHigh" : "text-bone"}`} numberOfLines={2}>
+                <Text className={`shrink font-display text-title ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} numberOfLines={2}>
                   {name}
                 </Text>
                 <View className="pt-1.5">
@@ -335,7 +335,7 @@ export function DeckRow(props: DeckSummary) {
           )}
         </View>
         <View className="flex-1">
-          <Text className={`font-display text-heading ${disabled ? "text-faint" : selected ? "text-goldHigh" : "text-bone"}`} numberOfLines={1}>
+          <Text className={`font-display text-heading ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} numberOfLines={1}>
             {name}
           </Text>
           <StatusLine testID={testID} detail={detail} status={status} note={note} />

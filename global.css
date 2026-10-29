@@ -34,11 +34,11 @@ html {
   --muted: 163 155 140;
   --faint: 138 133 124;
   --danger: 232 145 123;
-  --gold: 217 182 108;
-  --goldHigh: 243 218 154;
-  --goldDeep: 169 129 63;
-  --goldLine: 94 76 44;
-  --onGold: 26 19 9;
+  --accent: 217 182 108;
+  --accentHigh: 243 218 154;
+  --accentDeep: 169 129 63;
+  --accentLine: 94 76 44;
+  --onAccent: 26 19 9;
   --moon: 157 176 204;
   --ok: 143 191 122;
   --paper: 242 235 219;

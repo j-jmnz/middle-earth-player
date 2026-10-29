@@ -82,7 +82,7 @@ export const PoolCardRow = memo(function PoolCardRow({
 });
 
 // One card in the grid: its picture (the name and type on night while the file is missing), its name under it in label type, the
-// count the deck holds (gold) and, while adding, − and + under it. A tap opens the card, a long press shows it large, as a row does.
+// count the deck holds (accent) and, while adding, − and + under it. A tap opens the card, a long press shows it large, as a row does.
 // `offset` is how far it sits into its column (gridOffset).
 export const PoolCardCell = memo(function PoolCardCell({
   item,
@@ -125,7 +125,7 @@ export const PoolCardCell = memo(function PoolCardCell({
         delayLongPress={350}
       >
         {({ pressed }) => (
-          <View className="rounded-chip" style={{ width, height, overflow: "hidden", opacity: pressed ? 0.75 : 1, borderWidth: adding && count > 0 ? 1.5 : 1, borderColor: adding && count > 0 ? palette.gold : withAlphaHex(palette.bone, 0.08), backgroundColor: palette.raised }}>
+          <View className="rounded-chip" style={{ width, height, overflow: "hidden", opacity: pressed ? 0.75 : 1, borderWidth: adding && count > 0 ? 1.5 : 1, borderColor: adding && count > 0 ? palette.accent : withAlphaHex(palette.bone, 0.08), backgroundColor: palette.raised }}>
             {picture ? (
               <RowCardImage code={item.code} source={picture} width={width - 2} height={height - 2} />
             ) : (
@@ -155,8 +155,8 @@ export const PoolCardCell = memo(function PoolCardCell({
         {item.name}
       </Text>
       {adding && count > 0 ? (
-        <View pointerEvents="none" className="absolute right-1 top-1 h-6 min-w-6 items-center justify-center rounded-pill px-1.5" style={{ backgroundColor: palette.gold, borderWidth: 2, borderColor: palette.night }}>
-          <Text className="font-display-bold text-label text-onGold">{String(count)}</Text>
+        <View pointerEvents="none" className="absolute right-1 top-1 h-6 min-w-6 items-center justify-center rounded-pill px-1.5" style={{ backgroundColor: palette.accent, borderWidth: 2, borderColor: palette.night }}>
+          <Text className="font-display-bold text-label text-onAccent">{String(count)}</Text>
         </View>
       ) : null}
       {adding ? (

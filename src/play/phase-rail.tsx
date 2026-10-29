@@ -1,4 +1,4 @@
-// The phase rail in the top bar's middle (docs/design-system.md, Table; phase 20): a pill holding the round, the phase in gold
+// The phase rail in the top bar's middle (docs/design-system.md, Table; phase 20): a pill holding the round, the phase in accent
 // Cinzel capitals and the step, with the previous and next phase inline at the phase's sides when there is room. A tap opens the
 // phase carousel (phase-carousel.tsx); the rail itself sends no intent. A phase change flashes the pill's edge, a step change
 // cross-fades the step (MOTION.railFlash, railStep); both snap under reduced motion and never gate a rule. The neighbor names do not
@@ -70,7 +70,7 @@ function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; 
 /**
  * The rail: round, phase and step in a pill, "Round 3 · QUEST" over "Staging". `wide` puts the previous and next phase inline at
  * the phase's sides, "Round 3 · Planning QUEST Travel"; `shortRound` (a phone under 760 pt inside the insets) says "R3" for the
- * round. `stopAhead` puts a gold S at the end of the pill's top line. The pill's goldLine edge says it is a button. A tap calls
+ * round. `stopAhead` puts an accent S at the end of the pill's top line. The pill's accentLine edge says it is a button. A tap calls
  * `onPress` (the carousel opens or closes).
  */
 export function PhaseRail({
@@ -100,10 +100,10 @@ export function PhaseRail({
     if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing(MOTION.railFlashOut, scale))));
   }, [rail.phase, scale, flash]);
   // The colors go into the worklet as strings, so a theme change draws the edge again.
-  const gold = t.gold;
-  const goldLine = t.goldLine;
+  const accent = t.accent;
+  const accentLine = t.accentLine;
   const edge = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(flash.get(), [0, 1], [open ? gold : goldLine, gold]),
+    borderColor: interpolateColor(flash.get(), [0, 1], [open ? accent : accentLine, accent]),
   }));
   const round = rail.round > 0 ? (shortRound ? `R${rail.round}` : `Round ${rail.round}`) : "";
   const label = [rail.round > 0 ? `Round ${rail.round}` : "", rail.phase, rail.current, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(". ");
@@ -170,7 +170,7 @@ export function PhaseRail({
                   numberOfLines={1}
                   adjustsFontSizeToFit
                   minimumFontScale={0.85}
-                  className="font-display-bold uppercase text-gold"
+                  className="font-display-bold uppercase text-accent"
                   style={{
                     // 14 pt: top-bar-layout.ts counts the pill's floor from this size and Cinzel Bold's capitals.
                     fontSize: 14 * s,
@@ -186,7 +186,7 @@ export function PhaseRail({
               {wide && rail.phase ? <Neighbor side="next" name={rail.nextPhase} s={s} /> : null}
               {/* The S stands at the end of the top line, in the room the floor keeps. */}
               {stopAhead ? (
-                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-gold" style={{ marginLeft: 4 * s, lineHeight: 20 * s }}>
+                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-accent" style={{ marginLeft: 4 * s, lineHeight: 20 * s }}>
                   S
                 </Text>
               ) : null}

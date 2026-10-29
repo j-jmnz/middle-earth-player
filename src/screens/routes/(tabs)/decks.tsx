@@ -94,7 +94,7 @@ function DeckActions({
   }
   return (
     <View className="flex-row">
-      <TextButton label="Duplicate" testID={`deck-duplicate-${deck.id}`} tone="gold" accessibilityLabel={`Duplicate ${deck.name}`} onPress={onDuplicate} />
+      <TextButton label="Duplicate" testID={`deck-duplicate-${deck.id}`} tone="accent" accessibilityLabel={`Duplicate ${deck.name}`} onPress={onDuplicate} />
       {starter ? (
         <TextButton label="Reset" testID={`deck-reset-${deck.id}`} accessibilityLabel={`Reset ${deck.name} to the printed list`} onPress={() => onAsk("reset")} />
       ) : (
@@ -202,7 +202,7 @@ export default function Decks() {
             No decks match.
           </BodyText>
           <View className="-mx-3">
-            <TextButton testID="decks-clear-filter" label="Clear filter" tone="gold" onPress={() => setFilter(emptyDeckListFilter)} />
+            <TextButton testID="decks-clear-filter" label="Clear filter" tone="accent" onPress={() => setFilter(emptyDeckListFilter)} />
           </View>
         </View>
       );
@@ -287,7 +287,7 @@ export default function Decks() {
               />
             ) : null}
             <View className="ml-1">
-              <IconButton testID="deck-new" glyph="+" tone="gold" label="New deck" onPress={newDeck} />
+              <IconButton testID="deck-new" glyph="+" tone="accent" label="New deck" onPress={newDeck} />
             </View>
           </View>
         ) : null}

@@ -81,7 +81,7 @@ export function DeckGlance({
         <View style={{ height: top + 64 * s }} />
       )}
       <View style={{ ...side, marginTop: banner ? -64 * s : 0 }}>
-        {/* Ready is the gold eyebrow; not ready is the rule in danger with its ring, as the deck list says it. */}
+        {/* Ready is the accent eyebrow; not ready is the rule in danger with its ring, as the deck list says it. */}
         {readiness.ready ? (
           <Eyebrow testID="deck-ready">{readiness.text}</Eyebrow>
         ) : (
@@ -132,7 +132,7 @@ export function DeckGlance({
           <View className="mt-2 h-14 flex-row items-end gap-1.5">
             {CURVE_LABELS.map((label, at) => (
               <View key={label} className="flex-1 items-center justify-end gap-1" style={{ height: "100%" }}>
-                <View className="w-full rounded-t" style={{ height: Math.max(2, Math.round((curve.counts[at] / curveTop) * 34 * s)), backgroundColor: curve.counts[at] > 0 ? palette.goldDeep : palette.hairline }} />
+                <View className="w-full rounded-t" style={{ height: Math.max(2, Math.round((curve.counts[at] / curveTop) * 34 * s)), backgroundColor: curve.counts[at] > 0 ? palette.accentDeep : palette.hairline }} />
                 <Text className="text-micro text-faint">{label}</Text>
               </View>
             ))}

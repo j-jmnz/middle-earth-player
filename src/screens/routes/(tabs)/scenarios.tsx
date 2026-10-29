@@ -14,7 +14,7 @@ import { BodyText, Column, Chevron, Chip, Eyebrow, Label, Panel, Screen, ScreenS
 import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt, SceneCard } from "../../art";
 import { usePalette } from "../../palette-hook";
-import { goldPlate, panelSurface, raisedEdgeOf, tileSurface } from "../../../play/surfaces";
+import { accentPlate, panelSurface, raisedEdgeOf, tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { withAlphaHex } from "../../../play/tokens";
 import { useDatabases } from "../../databases";
@@ -141,7 +141,7 @@ export default function Scenarios() {
     }
     const action = status === "playing" ? "Resume" : game.loadout ? "Play again" : null;
     const spoken = action ? `${action} ${label(game)}` : label(game);
-    // The latest game in progress is the framed card with the one gold Resume; an older one is a row (below) with Resume in gold text.
+    // The latest game in progress is the framed card with the one accent Resume; an older one is a row (below) with Resume in accent text.
     if (status === "playing" && framed) {
       return (
         <Pressable key={game.id} testID={`game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} onPress={() => open(game)}>
@@ -152,8 +152,8 @@ export default function Scenarios() {
                 <Text className="mt-1 font-display text-title text-bone">{nameOf(game.scenarioId)}</Text>
                 <Label>{gameCaption(game)}</Label>
                 {/* The look of the primary inside the card; the whole card is the one button. */}
-                <View className="mt-3 min-h-14 items-center justify-center rounded-button" style={goldPlate(pressed, t)}>
-                  <Text className="font-display-bold uppercase" style={{ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 2.4 * s, color: palette.onGold }}>
+                <View className="mt-3 min-h-14 items-center justify-center rounded-button" style={accentPlate(pressed, t)}>
+                  <Text className="font-display-bold uppercase" style={{ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 2.4 * s, color: palette.onAccent }}>
                     Resume
                   </Text>
                 </View>
@@ -163,7 +163,7 @@ export default function Scenarios() {
         </Pressable>
       );
     }
-    const tone = status === "won" ? "gold" : status === "lost" ? "danger" : status === "playing" ? "ok" : "faint";
+    const tone = status === "won" ? "accent" : status === "lost" ? "danger" : status === "playing" ? "ok" : "faint";
     return (
       <Pressable key={game.id} testID={`game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} disabled={action == null} onPress={() => open(game)}>
         {({ pressed }) => (
@@ -180,7 +180,7 @@ export default function Scenarios() {
                 {STANDALONE_DROPPED}
               </Label>
             ) : null}
-            {action ? <Text className="mt-2 font-display-bold text-label text-gold">{action}</Text> : null}
+            {action ? <Text className="mt-2 font-display-bold text-label text-accent">{action}</Text> : null}
           </View>
         )}
       </Pressable>
@@ -223,8 +223,8 @@ export default function Scenarios() {
                       {/* A scenario not playable yet keeps its faint words at full strength; only its scene is veiled. */}
                       <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? "transparent" : withAlphaHex(palette.night, 0.6) }} />
                     </SceneArt>
-                    <View className="absolute bottom-1.5 left-1.5 h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(palette.night, 0.8), borderWidth: 1, borderColor: playable ? palette.goldLine : palette.hairline }}>
-                      <Text className={`font-display-bold text-micro ${playable ? "text-gold" : "text-faint"}`}>{String(index + 1)}</Text>
+                    <View className="absolute bottom-1.5 left-1.5 h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(palette.night, 0.8), borderWidth: 1, borderColor: playable ? palette.accentLine : palette.hairline }}>
+                      <Text className={`font-display-bold text-micro ${playable ? "text-accent" : "text-faint"}`}>{String(index + 1)}</Text>
                     </View>
                   </View>
                   <View className="flex-1 py-2">

@@ -210,7 +210,7 @@ function FilterBody({
         <Switch
           value={filter.unique}
           onValueChange={(unique) => onChange({ ...filter, unique })}
-          trackColor={{ false: palette.hairline, true: palette.gold }}
+          trackColor={{ false: palette.hairline, true: palette.accent }}
           ios_backgroundColor={palette.hairline}
         />
       </View>
@@ -219,7 +219,7 @@ function FilterBody({
         <Switch
           value={filter.activeText}
           onValueChange={(activeText) => onChange({ ...filter, activeText })}
-          trackColor={{ false: palette.hairline, true: palette.gold }}
+          trackColor={{ false: palette.hairline, true: palette.accent }}
           ios_backgroundColor={palette.hairline}
         />
       </View>

@@ -78,8 +78,8 @@ function TypeChips({
         onPress={() => onApplied(!applied)}
         className="min-h-touch justify-center"
       >
-        <View className="h-9 justify-center rounded-tile px-3" style={{ borderWidth: 1, borderColor: applied ? palette.gold : palette.hairline }}>
-          <Text className={applied ? "text-label font-semibold text-gold" : "text-label text-muted"}>{applied ? "✓ Applied only" : "Applied only"}</Text>
+        <View className="h-9 justify-center rounded-tile px-3" style={{ borderWidth: 1, borderColor: applied ? palette.accent : palette.hairline }}>
+          <Text className={applied ? "text-label font-semibold text-accent" : "text-label text-muted"}>{applied ? "✓ Applied only" : "Applied only"}</Text>
         </View>
       </Pressable>
       <View className="my-3 w-px bg-hairline" />
@@ -270,7 +270,7 @@ export function CardPoolBody({
         <SecondaryButton
           testID="pool-filter"
           label={filters > 0 ? `Filter · ${filters}` : "Filter"}
-          tone={filters > 0 ? "gold" : "bone"}
+          tone={filters > 0 ? "accent" : "bone"}
           compact
           accessibilityLabel={filters > 0 ? `Filter, ${filters} on` : "Filter"}
           onPress={openSheet}

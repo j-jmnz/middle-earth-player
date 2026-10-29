@@ -57,7 +57,7 @@ export function ToastView() {
         <View
           testID="toast"
           accessibilityLiveRegion="polite"
-          className={`min-h-14 flex-row items-center rounded-tile border bg-pressed pl-4 ${toast.tone === "danger" ? "border-danger" : "border-goldLine"}`}
+          className={`min-h-14 flex-row items-center rounded-tile border bg-pressed pl-4 ${toast.tone === "danger" ? "border-danger" : "border-accentLine"}`}
         >
           <Text testID="toast-text" className={`flex-1 py-3 text-body ${toast.tone === "danger" ? "text-danger" : "text-bone"}`}>
             {toast.text}
@@ -66,7 +66,7 @@ export function ToastView() {
             <TextButton
               testID="toast-undo"
               label="Undo"
-              tone="gold"
+              tone="accent"
               accessibilityLabel={`Undo: ${toast.text}`}
               onPress={() => {
                 undo();

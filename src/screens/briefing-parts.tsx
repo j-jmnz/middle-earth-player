@@ -234,7 +234,7 @@ export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebr
   return (
     <>
       {/* Every word over the scene carries the title's night shadow: a long name pushes the eyebrow up into the bright sky. */}
-      <Text className="font-display-bold text-eyebrow uppercase text-gold" style={titleShadow}>
+      <Text className="font-display-bold text-eyebrow uppercase text-accent" style={titleShadow}>
         {eyebrow}
       </Text>
       <Text accessibilityRole="header" testID="briefing-title" className="mt-1 font-display text-display text-bone" style={titleShadow}>
@@ -244,8 +244,8 @@ export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebr
         {facts.stages.map((stage, index) => (
           <View key={`${stage}:${index}`} className="flex-row items-center gap-2">
             {index > 0 ? <Chevron direction="right" color={palette.faint} size={6} /> : null}
-            <View className="h-5 w-5 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: palette.goldLine }}>
-              <Text className="font-display-bold text-micro text-gold">{String(index + 1)}</Text>
+            <View className="h-5 w-5 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: palette.accentLine }}>
+              <Text className="font-display-bold text-micro text-accent">{String(index + 1)}</Text>
             </View>
             <Text className="text-label text-bone" style={titleShadow}>
               {stage}

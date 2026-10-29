@@ -22,17 +22,17 @@ const PAIRS: readonly (readonly [text: Token, ground: Token])[] = [
   ["bone", "night"], ["bone", "raised"], ["bone", "raisedTop"],
   ["muted", "night"], ["muted", "raised"], ["muted", "raisedTop"],
   ["faint", "night"], ["faint", "raised"], ["faint", "raisedTop"],
-  ["gold", "night"], ["gold", "raised"], ["goldHigh", "night"],
-  ["onGold", "gold"], ["onGold", "goldHigh"],
+  ["accent", "night"], ["accent", "raised"], ["accentHigh", "night"],
+  ["onAccent", "accent"], ["onAccent", "accentHigh"],
   ["danger", "night"], ["danger", "raised"], ["danger", "raisedTop"], ["danger", "pressed"],
-  ["faint", "pressed"], ["moon", "pressed"], ["gold", "pressed"],
+  ["faint", "pressed"], ["moon", "pressed"], ["accent", "pressed"],
   ["moon", "night"], ["ok", "night"],
   ["ink", "paper"], ["inkMuted", "paper"],
   ["onThreat", "threat"],
 ];
 
-// Graphics and large marks need 3:1 (WCAG 1.4.11): the dashed slots, path segments and frames drawn in goldLine.
-const GRAPHIC_PAIRS: readonly (readonly [Token, Token])[] = [["goldLine", "night"], ["goldLine", "raised"]];
+// Graphics and large marks need 3:1 (WCAG 1.4.11): the dashed slots, path segments and frames drawn in accentLine.
+const GRAPHIC_PAIRS: readonly (readonly [Token, Token])[] = [["accentLine", "night"], ["accentLine", "raised"]];
 
 // Dark's faint is 4.48:1 on raisedTop and 4.10:1 on pressed, under 4.5. Dark does not change (user request, 2026-10-28), so those two pairs
 // are held at their real values (rounded down) and named here (so is onThreat on threat, 3.96:1, large bold numerals); the Daylight palette meets 4.5 on every pair.
@@ -51,7 +51,7 @@ describe("palette contrast", () => {
     });
   }
 
-  // goldLine is a Light-only floor: Dark's dim line is a quiet rule by design and does not change.
+  // accentLine is a Light-only floor: Dark's dim line is a quiet rule by design and does not change.
   describe("light graphics", () => {
     for (const [mark, ground] of GRAPHIC_PAIRS) {
       it(`${mark} on ${ground} is at least 3:1`, () => {

@@ -47,7 +47,7 @@ function nextWords(next: NextStep): { lead: string; name: string; label: string 
 const ART_HEIGHT = 196;
 
 /**
- * The playthrough written last, on top of the list, framed in gold: the next scenario's scene, its name, the fellowship that
+ * The playthrough written last, on top of the list, framed in accent: the next scenario's scene, its name, the fellowship that
  * plays it, the journey so far, and the one tap that does it. Resume goes straight to the table, Begin to the briefing, and a
  * finished campaign to its path. Path and Log sit under it. While the Start block is open it holds the screen's one primary,
  * so the next step is a plate here instead.
@@ -88,7 +88,7 @@ export function ContinuePanel({
         over={
           <View className="absolute left-4 right-4 top-3 flex-row items-center justify-between">
             <Chip label={line.seats} onArt />
-            {number ? <Chip tone="gold" onArt label={`Scenario ${number} of ${line.total}`} /> : <Chip tone="gold" onArt label="Completed" />}
+            {number ? <Chip tone="accent" onArt label={`Scenario ${number} of ${line.total}`} /> : <Chip tone="accent" onArt label="Completed" />}
           </View>
         }
       >
@@ -126,7 +126,7 @@ export function ContinuePanel({
           <View className="mt-2.5 flex-row gap-2.5">
             {!primary ? (
               <View className="flex-1">
-                <SecondaryButton label={label} testID="continue" tone="gold" compact accessibilityLabel={spoken} onPress={onNext} />
+                <SecondaryButton label={label} testID="continue" tone="accent" compact accessibilityLabel={spoken} onPress={onNext} />
               </View>
             ) : null}
             {line.next.kind !== "finished" ? (

@@ -33,7 +33,7 @@ export function MenuButton({ open, onPress }: { open: boolean; onPress: () => vo
           style={{ width: 40 * s, height: 40 * s, borderRadius: 20 * s, alignItems: "center", justifyContent: "center", gap: 4 * s, backgroundColor: pressed || open ? t.pressed : "transparent" }}
         >
           {[0, 1, 2].map((dot) => (
-            <View key={dot} style={{ width: 4 * s, height: 4 * s, borderRadius: 2 * s, backgroundColor: open ? t.gold : t.bone }} />
+            <View key={dot} style={{ width: 4 * s, height: 4 * s, borderRadius: 2 * s, backgroundColor: open ? t.accent : t.bone }} />
           ))}
         </View>
       )}

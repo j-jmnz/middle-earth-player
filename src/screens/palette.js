@@ -20,12 +20,12 @@ const dark = {
   faint: "#8A857C",
   danger: "#E8917B",
   // Gold: the Ring. The one primary action, the current step, what is selected.
-  gold: "#D9B66C",
-  goldHigh: "#F3DA9A",
-  goldDeep: "#A9813F",
-  goldLine: "#5E4C2C",
-  onGold: "#1A1309",
-  // Moonlight: section headings and quiet information, so gold stays for the one thing to do
+  accent: "#D9B66C",
+  accentHigh: "#F3DA9A",
+  accentDeep: "#A9813F",
+  accentLine: "#5E4C2C",
+  onAccent: "#1A1309",
+  // Moonlight: section headings and quiet information, so accent stays for the one thing to do
   moon: "#9DB0CC",
   // A deck or a loadout that is ready to play
   ok: "#8FBF7A",
@@ -57,8 +57,8 @@ const dark = {
   fellowship: "#C9A961",
 };
 
-// Daylight: warm parchment surfaces, dark ink for text, a deepened gold so gold text keeps 4.5:1 on them (contrast.test.ts). Gold is also
-// the fill of the one primary action, and dark text cannot sit on a gold dark enough to read on parchment, so onGold turns cream here:
+// Daylight: warm parchment surfaces, dark ink for text, a deepened accent so accent text keeps 4.5:1 on them (contrast.test.ts). Gold is also
+// the fill of the one primary action, and dark text cannot sit on an accent dark enough to read on parchment, so onAccent turns cream here:
 // the button is worked bronze with cream words. Paper, ink, encounter, sphere and threat colors are the same in both.
 const light = {
   // Night surfaces: the page, a panel's base and its lit top edge, the pressed fill, the rules between rows
@@ -74,12 +74,12 @@ const light = {
   faint: "#655A47",
   danger: "#9C3521",
   // Gold: the Ring. The one primary action, the current step, what is selected.
-  gold: "#6F5114",
-  goldHigh: "#7C5B17",
-  goldDeep: "#54400F",
-  goldLine: "#8F7637",
-  onGold: "#FBF5E4",
-  // Moonlight: section headings and quiet information, so gold stays for the one thing to do
+  accent: "#6F5114",
+  accentHigh: "#7C5B17",
+  accentDeep: "#54400F",
+  accentLine: "#8F7637",
+  onAccent: "#FBF5E4",
+  // Moonlight: section headings and quiet information, so accent stays for the one thing to do
   moon: "#3F5A82",
   // A deck or a loadout that is ready to play
   ok: "#3E6B2C",

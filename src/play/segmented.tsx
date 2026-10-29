@@ -6,7 +6,7 @@ import { raisedEdgeOf, slateSurface } from "./surfaces.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
-/** Two or three mutually exclusive words in a sunk night track. Selected is a slate plate in a gold edge, semibold. */
+/** Two or three mutually exclusive words in a sunk night track. Selected is a slate plate in an accent edge, semibold. */
 export function Segmented<T extends string>({
   options,
   value,
@@ -47,7 +47,7 @@ export function Segmented<T extends string>({
             onPress={() => onChange(option)}
             hitSlop={compact ? { top: slop, bottom: slop } : undefined}
             className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : "min-h-touch px-4"} ${stretch ? "flex-1" : ""}`}
-            style={selected ? { ...slateSurface(false, t), borderWidth: 1, borderColor: t.goldLine, boxShadow: raisedEdgeOf(t) } : { borderWidth: 1, borderColor: "transparent" }}
+            style={selected ? { ...slateSurface(false, t), borderWidth: 1, borderColor: t.accentLine, boxShadow: raisedEdgeOf(t) } : { borderWidth: 1, borderColor: "transparent" }}
           >
             <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>
           </Pressable>

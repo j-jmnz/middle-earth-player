@@ -48,7 +48,7 @@ function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; de
                   <Text className="font-display text-heading text-bone">{scenario}</Text>
                   {box || date ? <Label>{[box, date].filter((part) => part != null).join(" · ")}</Label> : null}
                 </View>
-                <Chip label={run.result === "won" ? "Won" : "Lost"} tone={run.result === "won" ? "gold" : "danger"} />
+                <Chip label={run.result === "won" ? "Won" : "Lost"} tone={run.result === "won" ? "accent" : "danger"} />
               </View>
               {run.result === "lost" && run.lossCause ? (
                 <Text className="mt-1 text-label text-danger" testID={`run-${run.id}-cause`}>
@@ -57,7 +57,7 @@ function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; de
               ) : null}
               <Text className="mt-2 text-label text-muted">{seatsWords(run, nameOf)}</Text>
               {course ? <Text className="text-label text-muted">{course}</Text> : null}
-              {score ? <Text className="mt-1 text-label font-semibold text-goldHigh">{score}</Text> : null}
+              {score ? <Text className="mt-1 text-label font-semibold text-accentHigh">{score}</Text> : null}
               {deleted ? (
                 <Text className="mt-1 text-label text-faint" testID={`run-${run.id}-deleted`}>
                   {deletedWords(run.kind)}

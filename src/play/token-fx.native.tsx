@@ -1,5 +1,5 @@
 // The token pop and the floating number (docs/design-system.md, Table, Motion; phase 23): when a damage, resource or progress count
-// changes, its token pops (1 to 1.4 and back on a spring) and a number rises 20 pt from it and fades ("+2" in gold for a gain,
+// changes, its token pops (1 to 1.4 and back on a spring) and a number rises 20 pt from it and fades ("+2" in accent for a gain,
 // "-1" in danger red for damage or a loss, Cinzel Bold 13 pt with a night outline). Progress placed on a quest card or a location
 // pops its strip's count the same way. The numbers are the reducer's (token-deltas.ts); this only draws them, from the clock of
 // card-motion.native.tsx, on a layer over the cards. The pop is a copy of the token drawn over the real one, shown only while it
@@ -21,7 +21,7 @@ const FLOAT_SIZE = 13;
 
 const IMAGE_OF: Readonly<Record<TokenKind, keyof TokenImages>> = { resources: "resource", damage: "damage", progress: "progress" };
 // The disc drawn while a token's art decodes.
-const fallbackOf = (t: TableTokens): Readonly<Record<TokenKind, string>> => ({ resources: t.gold, damage: t.threat, progress: t.bone });
+const fallbackOf = (t: TableTokens): Readonly<Record<TokenKind, string>> => ({ resources: t.accent, damage: t.threat, progress: t.bone });
 
 function countOf(slot: CardSlot, token: TokenKind): number {
   return token === "resources" ? slot.resources : token === "damage" ? slot.damage : slot.progress;
@@ -69,7 +69,7 @@ function Float({ fx, rect, clock, font, t, s }: { fx: Fx; rect: Rect; clock: Clo
   const opacity = useDerivedValue(() => (since.get() < 0 || since.get() > FLOAT_MS * k ? 0 : frame.get().opacity));
   return (
     <Group transform={transform} opacity={opacity}>
-      <Outlined x={spot.cx} y={spot.cy - (TOKEN * s) / 2} text={words.text} font={font} t={t} s={s} color={words.gain ? t.gold : t.danger} heavy />
+      <Outlined x={spot.cx} y={spot.cy - (TOKEN * s) / 2} text={words.text} font={font} t={t} s={s} color={words.gain ? t.accent : t.danger} heavy />
     </Group>
   );
 }

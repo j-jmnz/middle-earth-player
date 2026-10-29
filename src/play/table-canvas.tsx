@@ -37,7 +37,7 @@ function CardButton({ id, label, faceDown, onTap, onPreview, highlight, t }: { i
       onPress={() => onTap(id)}
       onLongPress={faceDown ? undefined : () => onPreview(id)}
       delayLongPress={350}
-      className={`min-h-touch justify-center rounded-tile px-2 ${picked > 0 ? "bg-goldLine" : "bg-raised"} ${tappable ? "border border-gold" : ""}`}
+      className={`min-h-touch justify-center rounded-tile px-2 ${picked > 0 ? "bg-accentLine" : "bg-raised"} ${tappable ? "border border-accent" : ""}`}
       style={({ pressed }) => (pressed ? { backgroundColor: t.hairline } : undefined)}
     >
       <Text className={faceDown ? "text-label text-faint" : "text-label text-bone"}>{`${picked > 1 ? `${label} · ${picked}` : label}${marked}`}</Text>

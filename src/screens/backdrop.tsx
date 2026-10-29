@@ -53,7 +53,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
             transform: [{ translateY: "-50%" }],
             borderRadius: 9999,
             borderWidth: 3,
-            borderColor: palette.gold,
+            borderColor: palette.accent,
           }}
         />
       ) : null}

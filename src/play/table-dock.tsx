@@ -163,7 +163,7 @@ export function TableDock({
         {trayOpen ? null : (
           <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
             <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: (dense ? 2 : 8) * s }}>
-              <Text testID="sheet-step" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-gold" style={{ flexShrink: 0 }}>
+              <Text testID="sheet-step" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-accent" style={{ flexShrink: 0 }}>
                 {step}
               </Text>
               <View className="flex-row items-start gap-1.5">
@@ -217,7 +217,7 @@ const BANNER_WIDTH = 440;
 export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; top: number; width: number; onBeat?: (cards: readonly string[]) => void }) {
   const t = useTableTokens();
   const s = useUiScale();
-  const edge = moment.tone === "good" ? t.gold : moment.tone === "bad" ? t.threat : t.faint;
+  const edge = moment.tone === "good" ? t.accent : moment.tone === "bad" ? t.threat : t.faint;
   const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
   useEffect(() => {
@@ -249,7 +249,7 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
         style={{ ...box, ...panelSurface(false, t), opacity: 0.97, shadowColor: t.night, shadowOpacity: 0.9, shadowRadius: 14 * s, shadowOffset: { width: 0, height: 4 * s }, elevation: 10 }}
       >
         <View testID="moment" accessible accessibilityLabel={label} className="overflow-hidden rounded-card" style={{ borderWidth: 1, borderColor: edge }}>
-          {/* The tone, as a band along the top: gold for a success, threat red for a failure or an engagement. */}
+          {/* The tone, as a band along the top: accent for a success, threat red for a failure or an engagement. */}
           <View style={{ height: 3 * s, backgroundColor: edge }} />
           <View className="items-center px-4 pb-2 pt-1.5">
             <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 * s }}>

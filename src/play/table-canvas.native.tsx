@@ -132,7 +132,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
       </Group>
     );
   };
-  // What is drawn in the card's shape, inside its turned group: the gold edge, the picked edge, the veil, the beat ring.
+  // What is drawn in the card's shape, inside its turned group: the accent edge, the picked edge, the veil, the beat ring.
   const drawFrame = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const card = slot.kind === "card";
@@ -189,7 +189,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           <ZoneWord key={text} rect={rect} text={text} font={fonts.small} t={t} s={s} />
         ))}
         {targetZones.map((rect, index) => (
-          <RoundedRect key={`z${index}`} x={rect.x - 4 * s} y={rect.y - 4 * s} width={rect.w + 8 * s} height={rect.h + 8 * s} r={RADIUS * s * 2} color={t.gold} style="stroke" strokeWidth={1.5 * s} />
+          <RoundedRect key={`z${index}`} x={rect.x - 4 * s} y={rect.y - 4 * s} width={rect.w + 8 * s} height={rect.h + 8 * s} r={RADIUS * s * 2} color={t.accent} style="stroke" strokeWidth={1.5 * s} />
         ))}
         {moves.ghosts.map((ghost) => (
           <Leaving key={`ghost:${ghost.slot.id}:${moves.at}`} ghost={ghost} clock={clock}>
@@ -206,7 +206,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
             <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
-            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS * s} color={t.gold} style="stroke" strokeWidth={2 * s} />
+            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS * s} color={t.accent} style="stroke" strokeWidth={2 * s} />
           </Group>
         ) : null}
         {spot.playing && spot.plan ? <Spotlight plan={spot.plan} progress={spot.progress} width={width} height={height} images={spotImages} tokens={tokens} backs={backs} fonts={fonts} spotFonts={spotFonts} t={t} s={s} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} /> : null}

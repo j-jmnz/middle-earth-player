@@ -134,7 +134,7 @@ export function SeatPicker({
                     <TextButton
                       label="Open in Decks"
                       testID={`deck-open-${index}-${deck.id}`}
-                      tone="gold"
+                      tone="accent"
                       accessibilityLabel={`Open ${deck.name} in Decks to finish it`}
                       onPress={() => {
                         editSavedDeck(deck);
@@ -161,14 +161,14 @@ export function SeatPicker({
                   No decks match.
                 </BodyText>
                 <View className="-mx-3">
-                  <TextButton testID={`briefing-clear-filter-${index}`} label="Clear filter" tone="gold" onPress={() => setFilter(emptyDeckListFilter)} />
+                  <TextButton testID={`briefing-clear-filter-${index}`} label="Clear filter" tone="accent" onPress={() => setFilter(emptyDeckListFilter)} />
                 </View>
               </View>
             ) : null}
           </View>
         </View>
       ) : (
-        <View testID={`briefing-party-${index}`} className="rounded-card p-4" style={{ ...panelSurface(false, t), borderWidth: 1, borderColor: palette.goldLine }}>
+        <View testID={`briefing-party-${index}`} className="rounded-card p-4" style={{ ...panelSurface(false, t), borderWidth: 1, borderColor: palette.accentLine }}>
           {/* The name gets the card's whole width (a long one never breaks inside a word); Change sits beside the counts, under it. */}
           <Text className="font-display text-title text-bone">{pickedDeck.name}</Text>
           <View className="mt-1 flex-row items-center justify-between gap-3">
@@ -223,7 +223,7 @@ export function SeatPicker({
                       <Text className="font-display text-heading text-bone">{candidate.name}</Text>
                       {candidate.packName ? <Text className="text-label text-muted">{candidate.packName}</Text> : null}
                     </View>
-                    <Text className="font-display-bold text-label text-gold">Choose</Text>
+                    <Text className="font-display-bold text-label text-accent">Choose</Text>
                   </View>
                 )}
               </Pressable>

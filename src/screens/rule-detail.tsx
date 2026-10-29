@@ -25,7 +25,7 @@ export function RuleBody({ entry, onSeeAlso }: { entry: GlossaryEntry; onSeeAlso
               label={`Open in book · page ${book.page}`}
               icon="lore"
               testID="rule-open-book"
-              tone="gold"
+              tone="accent"
               compact
               accessibilityLabel={`Open ${book.name} at page ${book.page}`}
               onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: book.id, page: String(book.page) } })}
@@ -42,7 +42,7 @@ export function RuleBody({ entry, onSeeAlso }: { entry: GlossaryEntry; onSeeAlso
           <View className="-mx-3 flex-row flex-wrap items-center">
             {links.map(({ name, entry: target }) =>
               target ? (
-                <TextButton key={name} label={name} testID={`see-${target.id}`} tone="gold" onPress={() => onSeeAlso(target.id)} />
+                <TextButton key={name} label={name} testID={`see-${target.id}`} tone="accent" onPress={() => onSeeAlso(target.id)} />
               ) : (
                 <View key={name} className="min-h-touch justify-center px-3">
                   <Label tone="faint">{name}</Label>

@@ -149,7 +149,7 @@ export function NavBar({
 
 /**
  * Flat row on a hairline. Text, at most one small picture, a pressed fill. No shadow, no gradient. In a list-detail pane `selected`
- * (true or false; undefined outside one) marks the row whose detail is open: the pressed fill and a 2 pt gold bar at the leading
+ * (true or false; undefined outside one) marks the row whose detail is open: the pressed fill and a 2 pt accent bar at the leading
  * edge. A row in such a list is indented either way, so the text does not move when it is picked.
  */
 export function ListRow({
@@ -190,10 +190,10 @@ export function ListRow({
       className="min-h-14 flex-row items-center border-b border-hairline py-2"
       style={({ pressed }) => [selected == null ? null : { paddingLeft: 12 * s }, pressed || selected ? pressedNight : null]}
     >
-      {selected ? <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2 * s, backgroundColor: palette.gold }} /> : null}
+      {selected ? <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2 * s, backgroundColor: palette.accent }} /> : null}
       {leading ? <View className="mr-3">{leading}</View> : null}
       <View className="flex-1">
-        <Text className={`text-body ${selected ? "text-goldHigh" : "text-bone"}`}>{label}</Text>
+        <Text className={`text-body ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
         {detail ? (
           <View className="mt-0.5 flex-row items-center gap-1.5">
             {detailIcons}
@@ -211,7 +211,7 @@ export function ListRow({
 }
 
 /**
- * Raised panel, lit from its top edge. `current` gets the gold frame (a goldLine edge and gold corners): the one thing the player
+ * Raised panel, lit from its top edge. `current` gets the accent frame (an accentLine edge and accent corners): the one thing the player
  * should look at. `pressed` is the pressed fill. `unfilled` is a hairline outline with no fill, for a thing put away.
  */
 export function Panel({
@@ -239,7 +239,7 @@ export function Panel({
         ...(unfilled ? { backgroundColor: "transparent" } : panelSurface(pressed, t)),
         borderWidth: 1,
         // A filled panel draws no edge (its fill and lit top set it off); one put away keeps the hairline, its only outline.
-        borderColor: current ? palette.goldLine : unfilled ? palette.hairline : "transparent",
+        borderColor: current ? palette.accentLine : unfilled ? palette.hairline : "transparent",
         ...(unfilled ? {} : { boxShadow: raisedEdgeOf(t) }),
       }}
     >
@@ -250,7 +250,7 @@ export function Panel({
 }
 
 /** A number the player watches, on a small lit tile: its word above, its icon and value in engraved figures. */
-export function StatTile({ label, value, icon, iconTint = "bone", detail, children, testID }: { label: string; value: string; icon?: IconName; iconTint?: "bone" | "danger" | "gold"; detail?: string; children?: ReactNode; testID?: string }) {
+export function StatTile({ label, value, icon, iconTint = "bone", detail, children, testID }: { label: string; value: string; icon?: IconName; iconTint?: "bone" | "danger" | "accent"; detail?: string; children?: ReactNode; testID?: string }) {
   const t = useTableTokens();
   const s = useUiScale();
   return (
@@ -304,7 +304,7 @@ export function PaperSheet({ step, title, children }: { step: string; title: str
 }
 
 /**
- * Victory or Defeat: the outcome word in Cinzel Bold 44 pt with its glow (gold, or threat red), and the scenario's name under it.
+ * Victory or Defeat: the outcome word in Cinzel Bold 44 pt with its glow (accent, or threat red), and the scenario's name under it.
  * Resolution and the standalone outcome both say it this way.
  */
 export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario: string; testID: string }) {
@@ -315,8 +315,8 @@ export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario
       <Text
         testID={testID}
         accessibilityRole="header"
-        className={`text-center font-display-bold ${won ? "text-goldHigh" : "text-danger"}`}
-        style={{ fontSize: 44 * s, lineHeight: 52 * s, letterSpacing: 4 * s, textShadowColor: won ? palette.gold : withAlphaHex(palette.threat, 0.6), textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
+        className={`text-center font-display-bold ${won ? "text-accentHigh" : "text-danger"}`}
+        style={{ fontSize: 44 * s, lineHeight: 52 * s, letterSpacing: 4 * s, textShadowColor: won ? palette.accent : withAlphaHex(palette.threat, 0.6), textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
       >
         {won ? "Victory" : "Defeat"}
       </Text>

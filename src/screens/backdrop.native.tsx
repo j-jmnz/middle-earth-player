@@ -79,7 +79,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
             r={s.ring.r * width}
             style="stroke"
             strokeWidth={3}
-            color={palette.gold}
+            color={palette.accent}
           />
         ) : null}
       </Canvas>

@@ -48,11 +48,11 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       {({ pressed }) => (
         <View
           className="min-h-14 items-center rounded-card p-3"
-          style={{ ...tileSurface(pressed, t), ...(selected ? { borderWidth: 1.5, borderColor: palette.gold, boxShadow: `0 0 18px ${withAlphaHex(palette.gold, 0.28)}` } : {}) }}
+          style={{ ...tileSurface(pressed, t), ...(selected ? { borderWidth: 1.5, borderColor: palette.accent, boxShadow: `0 0 18px ${withAlphaHex(palette.accent, 0.28)}` } : {}) }}
         >
           {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={72 * s} height={100 * s} /> : null}
-          <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-goldHigh" : "text-bone"}`}>{label}</Text>
-          {selected ? <Text className="mt-0.5 text-label font-semibold text-goldHigh">Selected</Text> : null}
+          <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
+          {selected ? <Text className="mt-0.5 text-label font-semibold text-accentHigh">Selected</Text> : null}
           {selected ? <Corners /> : null}
         </View>
       )}
@@ -237,7 +237,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                     accessibilityLabel={declined ? `${view.decline.label}, selected` : view.decline.label}
                     onPress={() => setChosen(view.decline?.optionId ?? null)}
                   />
-                  {declined ? <Text className="text-label font-semibold text-goldHigh">Selected</Text> : null}
+                  {declined ? <Text className="text-label font-semibold text-accentHigh">Selected</Text> : null}
                 </View>
               ) : null}
             </>

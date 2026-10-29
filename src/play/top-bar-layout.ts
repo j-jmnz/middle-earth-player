@@ -22,7 +22,7 @@ export const RAIL_MAX = 460;
 // - "Round 99" and the step are label size (13 pt) in the system font, which averages under 0.55 em a character; 0.55 leaves a
 //   margin;
 // - neither counts shrinking (PhaseRail may shrink the phase to 85%), which is more margin, nor the glow;
-// - the pill adds its 2 x 1 pt edge and 2 x 10 pt padding, and its top line keeps the room of the gold S that marks a stop ahead
+// - the pill adds its 2 x 1 pt edge and 2 x 10 pt padding, and its top line keeps the room of the accent S that marks a stop ahead
 //   (STOP_MARK, counted whether or not it shows).
 const PHASE_SIZE = 14;
 const CAP_EM = 0.78;
@@ -31,7 +31,7 @@ const LABEL_EM = 0.55;
 const PILL_CHROME = 22;
 // The dot between "Round 3" and the phase, with its margins.
 const DOT = 14;
-// A chevron drawn as views (phase-rail.tsx), and the gold S that marks a stop ahead at the end of the pill's top line.
+// A chevron drawn as views (phase-rail.tsx), and the accent S that marks a stop ahead at the end of the pill's top line.
 export const CHEVRON = 14;
 export const STOP_MARK = 14;
 /** The gap on each side of the phase between it and a neighbor phase's name, inline in the pill's top line (rail wide). */

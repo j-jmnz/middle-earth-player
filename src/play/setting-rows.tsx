@@ -40,7 +40,7 @@ export function SettingGroup({ title, testID, first = false, children }: { title
   );
 }
 
-/** A gold text button on night: body type, 44 pt, a pressed fill. The screens-side twin is `TextButton` (chrome-buttons.tsx), which this look matches; the caller keeps it left with `-mx-3 items-start`. */
+/** An accent text button on night: body type, 44 pt, a pressed fill. The screens-side twin is `TextButton` (chrome-buttons.tsx), which this look matches; the caller keeps it left with `-mx-3 items-start`. */
 export function SettingTextButton({ label, accessibilityLabel, onPress, testID }: { label: string; accessibilityLabel?: string; onPress: () => void; testID: string }) {
   const t = useTableTokens();
   return (
@@ -53,7 +53,7 @@ export function SettingTextButton({ label, accessibilityLabel, onPress, testID }
       className="min-h-touch items-center justify-center rounded-tile px-3"
       style={({ pressed }) => (pressed ? { backgroundColor: t.pressed } : undefined)}
     >
-      <Text className="text-body font-medium text-gold">{label}</Text>
+      <Text className="text-body font-medium text-accent">{label}</Text>
     </Pressable>
   );
 }

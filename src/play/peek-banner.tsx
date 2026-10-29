@@ -1,5 +1,5 @@
 // The banner over the canvas while the player peeks at the other seat (docs/design-system.md, Table, Peeking; phase 26): a raised night
-// pill across the top of the canvas that says whose area this is and who is acting, with a gold text button back to the acting seat.
+// pill across the top of the canvas that says whose area this is and who is acting, with an accent text button back to the acting seat.
 // It sits on the canvas side, under the top bar and clear of the dock column, so the combat spotlight's scrim (over those two) never
 // covers it. It is 36 pt tall and takes no touch of its own: only `peek-back` does (a 36 pt button with 4 pt of slop above and below,
 // a 44 pt target), so the cards under the rest of the pill stay tappable and it hides as little of the staging row as it can. Both
@@ -53,7 +53,7 @@ export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWor
             className="h-9 shrink-0 items-center justify-center rounded-pill px-3"
             style={({ pressed }) => (pressed ? { backgroundColor: t.pressed } : undefined)}
           >
-            <Text numberOfLines={1} maxFontSizeMultiplier={SCALE} className="text-label font-medium text-gold">
+            <Text numberOfLines={1} maxFontSizeMultiplier={SCALE} className="text-label font-medium text-accent">
               {words.back}
             </Text>
           </Pressable>

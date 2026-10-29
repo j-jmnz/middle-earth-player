@@ -11,7 +11,7 @@ export function stepperFull(count: number, deckLimit: number | null): boolean {
 
 /**
  * − count + for one card in a deck, on the deck editor and the card pool. + on a card that cannot take another copy looks
- * spent and, tapped, says why. The count is gold while the deck holds the card.
+ * spent and, tapped, says why. The count is accent while the deck holds the card.
  */
 export function CountStepper({
   code,
@@ -52,7 +52,7 @@ export function CountStepper({
         <Text
           testID={ids.count}
           accessibilityLabel={`${count} in the deck`}
-          className={`min-w-6 text-center font-display-bold text-body ${count > 0 ? "text-goldHigh" : "text-faint"}`}
+          className={`min-w-6 text-center font-display-bold text-body ${count > 0 ? "text-accentHigh" : "text-faint"}`}
         >
           {String(count)}
         </Text>

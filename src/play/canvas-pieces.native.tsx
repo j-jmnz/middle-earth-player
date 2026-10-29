@@ -65,7 +65,7 @@ export function Outlined({ x, y, text, font, t, s, color = t.bone, heavy = false
 /**
  * A card with printed text the app does not apply (src/catalog/active-text.ts): a small faint mark at its right edge, upright
  * like the tokens, on a corner no token, effect pill or other mark uses: a ring struck through. Never a band over the picture
- * and never a word on the canvas; the preview lists the lines (docs/plans/inactive-text.md). Not gold, which marks the one
+ * and never a word on the canvas; the preview lists the lines (docs/plans/inactive-text.md). Not accent, which marks the one
  * action, and not danger, which marks a refusal.
  */
 export function NotAppliedMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number }) {
@@ -82,7 +82,7 @@ export function NotAppliedMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: 
 }
 
 /**
- * The facedown prisoner's back (01123:B:1): a small hero mark on a night disc in the middle of it, upright whatever the card does. Not gold, which marks
+ * The facedown prisoner's back (01123:B:1): a small hero mark on a night disc in the middle of it, upright whatever the card does. Not accent, which marks
  * the one action, and not danger, which marks a refusal: bone, the colour of a card that is only held.
  */
 export function HeldMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number }) {
@@ -98,7 +98,7 @@ export function HeldMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number
 }
 
 // A card back: the printed one, the One Ring for a player card and the Eye for an encounter card. While its file decodes,
-// the player's is raised night with the gold ring, the encounter deck's night with a threat-red ring.
+// the player's is raised night with the accent ring, the encounter deck's night with a threat-red ring.
 function Back({ x, y, w, h, encounter, backs, t, s }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages; t: TableTokens; s: number }) {
   const image = encounter ? backs.encounter : backs.player;
   const radius = RADIUS * s;
@@ -112,8 +112,8 @@ function Back({ x, y, w, h, encounter, backs, t, s }: { x: number; y: number; w:
   return (
     <Group>
       <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={encounter ? t.night : t.raised} />
-      <RoundedRect x={x + 2 * s} y={y + 2 * s} width={w - 4 * s} height={h - 4 * s} r={radius - 2 * s} color={encounter ? t.threat : t.goldLine} style="stroke" strokeWidth={1 * s} />
-      <Circle cx={x + w / 2} cy={y + h / 2} r={Math.min(w, h) / 4} color={encounter ? t.threat : t.gold} style="stroke" strokeWidth={2 * s} />
+      <RoundedRect x={x + 2 * s} y={y + 2 * s} width={w - 4 * s} height={h - 4 * s} r={radius - 2 * s} color={encounter ? t.threat : t.accentLine} style="stroke" strokeWidth={1 * s} />
+      <Circle cx={x + w / 2} cy={y + h / 2} r={Math.min(w, h) / 4} color={encounter ? t.threat : t.accent} style="stroke" strokeWidth={2 * s} />
     </Group>
   );
 }
@@ -229,7 +229,7 @@ export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: C
 export function Tokens({ slot, rect, images, fonts, t, s, ring = null, contrast = false }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; t: TableTokens; s: number; ring?: string | null; contrast?: boolean }) {
   const size = TOKEN * s;
   const items: { image: SkImage | null; value: number; cx: number; cy: number; fallback: string; ring: string | null }[] = [];
-  if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, ...tokenSpot(rect, "resources", s), fallback: t.gold, ring });
+  if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, ...tokenSpot(rect, "resources", s), fallback: t.accent, ring });
   if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, ...tokenSpot(rect, "damage", s), fallback: t.threat, ring: null });
   if (slot.progress > 0) items.push({ image: images.progress, value: slot.progress, ...tokenSpot(rect, "progress", s), fallback: t.bone, ring: null });
   return (
@@ -252,7 +252,7 @@ export function Tokens({ slot, rect, images, fonts, t, s, ring = null, contrast 
 
 /**
  * The effects on a card, stacked down its left edge under the top: each changed number as its icon and the change ("+2"),
- * a gold pill when raised and a night pill with danger text when lowered; each "cannot" as its icon struck through; "+n" when
+ * an accent pill when raised and a night pill with danger text when lowered; each "cannot" as its icon struck through; "+n" when
  * more do not fit. A committed character shows its willpower at the foot, a quest stage or location its progress. `rect` is
  * upright on screen, so an exhausted card's numbers read the right way.
  */
@@ -305,7 +305,7 @@ export function Badges({
     const width = 15 * s + fonts.badge.getTextWidth(text) + 5 * s;
     return (
       <Group key={`s${badge.stat}`}>
-        <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={up ? t.gold : t.night} />
+        <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={up ? t.accent : t.night} />
         {up ? null : <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.danger} style="stroke" strokeWidth={1 * s} />}
         {contrast ? <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={up ? t.night : t.bone} style="stroke" strokeWidth={1.5 * s} /> : null}
         {/* An effect that ends with the phase, the round or the attack: a dashed edge says it will go (the preview says when). */}
@@ -314,8 +314,8 @@ export function Badges({
             <DashPathEffect intervals={[2 * s, 2 * s]} />
           </RoundedRect>
         ) : null}
-        <BadgeIcon name={badge.icon} x={x + 5 * s} y={top + 2 * s} size={11 * s} color={up ? t.onGold : t.danger} images={images} />
-        <Text x={x + 18 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={up ? t.onGold : t.danger} />
+        <BadgeIcon name={badge.icon} x={x + 5 * s} y={top + 2 * s} size={11 * s} color={up ? t.onAccent : t.danger} images={images} />
+        <Text x={x + 18 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={up ? t.onAccent : t.danger} />
       </Group>
     );
   });
@@ -333,9 +333,9 @@ export function Badges({
       {rows}
       {slot.committed && willpower != null ? (
         <Group>
-          <RoundedRect x={x + w / 2 - 16 * s} y={y + h - pill - 3 * s} width={32 * s} height={pill} r={pill / 2} color={t.gold} />
-          <CanvasIcon name="willpower" x={x + w / 2 - 13 * s} y={y + h - pill - 1 * s} size={11 * s} color={t.onGold} />
-          <Text x={x + w / 2 + 1 * s} y={y + h - 6.5 * s} text={String(willpower)} font={fonts.badge} color={t.onGold} />
+          <RoundedRect x={x + w / 2 - 16 * s} y={y + h - pill - 3 * s} width={32 * s} height={pill} r={pill / 2} color={t.accent} />
+          <CanvasIcon name="willpower" x={x + w / 2 - 13 * s} y={y + h - pill - 1 * s} size={11 * s} color={t.onAccent} />
+          <Text x={x + w / 2 + 1 * s} y={y + h - 6.5 * s} text={String(willpower)} font={fonts.badge} color={t.onAccent} />
         </Group>
       ) : null}
       {questPoints != null ? (
@@ -390,9 +390,9 @@ export function DelayedMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: num
   return (
     <Group>
       <Circle cx={cx} cy={cy} r={7 * s} color={t.night} />
-      <Circle cx={cx} cy={cy} r={7 * s} color={t.gold} style="stroke" strokeWidth={1.5 * s} />
-      <Line p1={vec(cx, cy)} p2={vec(cx, cy - 4 * s)} color={t.gold} strokeWidth={1.5 * s} />
-      <Line p1={vec(cx, cy)} p2={vec(cx + 3 * s, cy)} color={t.gold} strokeWidth={1.5 * s} />
+      <Circle cx={cx} cy={cy} r={7 * s} color={t.accent} style="stroke" strokeWidth={1.5 * s} />
+      <Line p1={vec(cx, cy)} p2={vec(cx, cy - 4 * s)} color={t.accent} strokeWidth={1.5 * s} />
+      <Line p1={vec(cx, cy)} p2={vec(cx + 3 * s, cy)} color={t.accent} strokeWidth={1.5 * s} />
     </Group>
   );
 }
@@ -416,7 +416,7 @@ export function AttackerMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: nu
  */
 export function CombatMarkView({ mark, t, s }: { mark: CombatMark; t: TableTokens; s: number }) {
   const icon: IconName = mark.kind === "defense" ? "defense" : "attack";
-  const color = mark.kind === "undefended" ? t.threat : t.gold;
+  const color = mark.kind === "undefended" ? t.threat : t.accent;
   return (
     <Group opacity={mark.preview ? 0.7 : 1}>
       <Circle cx={mark.x} cy={mark.y} r={8 * s} color={t.night} />

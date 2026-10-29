@@ -10,7 +10,7 @@ import { useTableTokens } from "./use-table-tokens.ts";
 const ROW = 44;
 
 // A switch on the night surface: its whole row is one 44 pt target, the label and detail heard with it. The track is hairline when
-// off and the gold line when on.
+// off and the accent line when on.
 export function SettingSwitch({
   label,
   detail,
@@ -70,11 +70,11 @@ export function SettingSwitch({
         importantForAccessibility="no"
         value={value}
         onValueChange={onChange}
-        trackColor={{ false: off, true: t.goldLine }}
-        thumbColor={value ? t.gold : t.muted}
+        trackColor={{ false: off, true: t.accentLine }}
+        thumbColor={value ? t.accent : t.muted}
         ios_backgroundColor={off}
         // react-native-web draws the on thumb from activeThumbColor (teal by default); the RN types do not list it.
-        {...({ activeThumbColor: t.gold } as object)}
+        {...({ activeThumbColor: t.accent } as object)}
       />
     </Pressable>
   );

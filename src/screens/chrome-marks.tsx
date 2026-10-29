@@ -1,4 +1,4 @@
-// The chrome's marks and status (docs/design-system.md, Components): chevrons, the gold corners of a framed card, the Ring, tags,
+// The chrome's marks and status (docs/design-system.md, Components): chevrons, the accent corners of a framed card, the Ring, tags,
 // journey and progress bars, the sphere mark. Views and text only; re-exported by chrome.tsx.
 import type { ReactNode } from "react";
 import { Text, View } from "react-native";
@@ -6,7 +6,7 @@ import { Text, View } from "react-native";
 import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
-import { goldSurface } from "../play/surfaces";
+import { accentSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { useUiScale } from "../play/ui-scale";
 import { withAlphaHex } from "../play/tokens";
@@ -36,7 +36,7 @@ export function Chevron({ direction = "left", color, size = 10 }: { direction?: 
   );
 }
 
-/** Four small gold diamonds on the corners of a framed thing: the current panel, the scenario to play, the fellowship chosen. */
+/** Four small accent diamonds on the corners of a framed thing: the current panel, the scenario to play, the fellowship chosen. */
 export function Corners() {
   const palette = usePalette();
   const s = useUiScale();
@@ -50,7 +50,7 @@ export function Corners() {
   return (
     <>
       {at.map((place, index) => (
-        <View key={index} pointerEvents="none" importantForAccessibility="no" style={{ position: "absolute", width: 7 * s, height: 7 * s, backgroundColor: palette.gold, transform: [{ rotate: "45deg" }], ...place }} />
+        <View key={index} pointerEvents="none" importantForAccessibility="no" style={{ position: "absolute", width: 7 * s, height: 7 * s, backgroundColor: palette.accent, transform: [{ rotate: "45deg" }], ...place }} />
       ))}
     </>
   );
@@ -63,7 +63,7 @@ export function RingMark({ size = 18, state = "current" }: { size?: number; stat
   const s = useUiScale();
   const box = size * s;
   if (state === "done") {
-    return <View style={{ width: box, height: box, borderRadius: box / 2, ...goldSurface(false, t) }} />;
+    return <View style={{ width: box, height: box, borderRadius: box / 2, ...accentSurface(false, t) }} />;
   }
   return (
     <View
@@ -72,7 +72,7 @@ export function RingMark({ size = 18, state = "current" }: { size?: number; stat
         height: box,
         borderRadius: box / 2,
         borderWidth: state === "locked" ? 1.5 : Math.max(2, box / 9),
-        borderColor: state === "locked" ? palette.hairline : palette.gold,
+        borderColor: state === "locked" ? palette.hairline : palette.accent,
       }}
     />
   );
@@ -111,7 +111,7 @@ export function GearMark({ color, size = 22 }: { color: string; size?: number })
 
 const chipTonesOf = (palette: Palette) => ({
   neutral: { fill: withAlphaHex(palette.bone, 0.06), edge: withAlphaHex(palette.bone, 0.1), text: palette.bone },
-  gold: { fill: withAlphaHex(palette.gold, 0.14), edge: withAlphaHex(palette.gold, 0.38), text: palette.goldHigh },
+  accent: { fill: withAlphaHex(palette.accent, 0.14), edge: withAlphaHex(palette.accent, 0.38), text: palette.accentHigh },
   danger: { fill: withAlphaHex(palette.threat, 0.16), edge: withAlphaHex(palette.threat, 0.45), text: palette.danger },
   ok: { fill: withAlphaHex(palette.ok, 0.12), edge: withAlphaHex(palette.ok, 0.35), text: palette.ok },
   faint: { fill: "transparent", edge: palette.hairline, text: palette.faint },
@@ -135,7 +135,7 @@ export function Chip({ label, tone = "neutral", leading, testID, onArt = false }
   );
 }
 
-/** A journey of steps as one segmented bar: gold for the steps done, a lit gold for the current one, night for the rest. */
+/** A journey of steps as one segmented bar: accent for the steps done, a lit accent for the current one, night for the rest. */
 export function JourneyBar({ total, done, current = done < total, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
   const palette = usePalette();
   return (
@@ -148,9 +148,9 @@ export function JourneyBar({ total, done, current = done < total, testID }: { to
             className="h-1 flex-1 rounded-pill"
             style={
               state === "done"
-                ? { backgroundColor: palette.gold }
+                ? { backgroundColor: palette.accent }
                 : state === "current"
-                  ? { backgroundColor: palette.goldHigh, boxShadow: `0 0 8px ${withAlphaHex(palette.gold, 0.7)}` }
+                  ? { backgroundColor: palette.accentHigh, boxShadow: `0 0 8px ${withAlphaHex(palette.accent, 0.7)}` }
                   : { backgroundColor: palette.hairline }
             }
           />
@@ -161,12 +161,12 @@ export function JourneyBar({ total, done, current = done < total, testID }: { to
 }
 
 /** A count against a goal as a thin bar (47 of 50 cards). The words beside it say the numbers. */
-export function ProgressBar({ value, max, tone = "gold" }: { value: number; max: number; tone?: "gold" | "danger" }) {
+export function ProgressBar({ value, max, tone = "accent" }: { value: number; max: number; tone?: "accent" | "danger" }) {
   const palette = usePalette();
   const share = max <= 0 ? 0 : Math.max(0, Math.min(1, value / max));
   return (
     <View className="h-1 overflow-hidden rounded-pill" style={{ backgroundColor: palette.hairline }} importantForAccessibility="no-hide-descendants">
-      <View className="h-1 rounded-pill" style={{ width: `${Math.round(share * 100)}%`, backgroundColor: tone === "gold" ? palette.gold : palette.danger }} />
+      <View className="h-1 rounded-pill" style={{ width: `${Math.round(share * 100)}%`, backgroundColor: tone === "accent" ? palette.accent : palette.danger }} />
     </View>
   );
 }
