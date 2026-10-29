@@ -65,7 +65,8 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   let fetched = 0;
   let total = 0;
   const tick = log.progress(cards.length, "picture");
-  // A few at a time: each is a fetch or a render on a machine without the cache, then a decode and an encode.
+  // Many at a time: on a machine without the cache each card is a fetch that mostly waits on the server (4 at once ran
+  // about 10 pictures a second, 16 about 35). sharp decodes and encodes on its own thread pool.
   let next = 0;
   const worker = async () => {
     while (next < cards.length) {
@@ -99,7 +100,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   return packed;
 }
 
-const PACK_CONCURRENCY = 4;
+const PACK_CONCURRENCY = 16;
 
 function sideAPins(record: SourceRecord | undefined, kind: string, cacheDir: string): Map<string, Pin> {
   const pins = new Map<string, Pin>();
