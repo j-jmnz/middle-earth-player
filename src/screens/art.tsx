@@ -5,14 +5,14 @@
 import { Image } from "expo-image";
 import { eq } from "drizzle-orm";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { View } from "react-native";
+import { View, type ViewStyle } from "react-native";
 
 import { cards } from "../catalog/schema";
 import { nightFade, panelSurface, topShade } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
-import { FogVeil } from "./backdrop";
-import { heroVeils } from "./backdrop-scenes";
+import { FogVeil, LightVeil } from "./backdrop";
+import { heroVeil, rgbOf } from "./backdrop-scenes";
 import { cropFrame, FACE, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, type Region } from "./art-crop";
 import { scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
@@ -229,29 +229,49 @@ export function useArtGround(): { ground: string; blend: { mixBlendMode?: "multi
 
 /**
  * A scenario's scene as the art layer of a page (the Campaigns hub): drawn large and dimmed behind the hero words, faded out at its
- * edges by an elliptical shade, shaded at its top, veiled in fog under the title (`heroVeils`) and taken down to the ground towards
- * its foot, so the words and panels under it sit in the fog. It does
- * not scroll and takes no touches. `left` places it (centred on the page by default); `right`, when given, is where it stops (in its
+ * top and its foot to the ground with its middle left clear, and veiled under the title by the theme's air (`heroVeil`: Dark's fog,
+ * Light's morning light), so the words and panels under it sit in it. It does not scroll and takes no touches. `left` places it (centred on the page by default); `right`, when given, is where it stops (in its
  * parent's points), fading to the ground over its last 64 pt, so it stays behind its own column.
  */
 export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId: string | null | undefined; width: number; height: number; left?: number; right?: number }) {
   const { ground, blend } = useArtGround();
+  const palette = usePalette();
   const theme = useTheme();
   const s = useUiScale();
   const shown = right == null ? width : Math.max(0, Math.min(width, right - (left ?? 0)));
+  const fill = { position: "absolute", left: 0, right: 0, top: 0, bottom: 0 } as const;
+  const box: ViewStyle = { position: "absolute", top: 0, width: shown, height, overflow: "hidden", ...(left == null ? { alignSelf: "center" } : { left }) };
+  const edge = (color: string) =>
+    shown < width ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 64 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(color, 0)}, ${color})` }} /> : null;
   return (
-    <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", top: 0, width: shown, height, overflow: "hidden", ...blend, ...(left == null ? { alignSelf: "center" } : { left }) }}>
-      <View style={{ width, height }}>
-        <SceneArt scenarioId={scenarioId} width={width} height={height} />
-        <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `radial-gradient(52% 64% at 50% 34%, ${withAlphaHex(ground, 0)} 40%, ${ground} 100%)` }} />
-        {/* The top falls to the ground under the status bar and the head, so the title row reads over a bright sky. */}
-        <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0.78)} 0%, ${withAlphaHex(ground, 0)} 26%)` }} />
-        <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 40%, ${withAlphaHex(ground, 0.75)} 70%, ${ground} 88%)` }} />
-        {/* The fog under the hero title, over the picture, then the ground: the title sits in the fog and the fog fades to black. */}
-        <FogVeil layers={heroVeils[theme]} width={width} height={height} />
-        <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 68%, ${ground} 92%)` }} />
+    <>
+      {/* The picture in three bands (user request, 2026-10-29): the top falls to the ground under the status bar and the head, the
+          middle is the picture alone with nothing over it, and from under the title down it falls to the ground. */}
+      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ ...box, ...blend }}>
+        <View style={{ width, height }}>
+          <SceneArt scenarioId={scenarioId} width={width} height={height} />
+          <View style={{ ...fill, backgroundImage: `linear-gradient(180deg, ${ground} 0%, ${withAlphaHex(ground, 0.85)} 9%, ${withAlphaHex(ground, 0)} 28%)` }} />
+          <View style={{ ...fill, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 57%, ${withAlphaHex(ground, 0.55)} 76%, ${ground} 100%)` }} />
+        </View>
+        {edge(ground)}
       </View>
-      {shown < width ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 64 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(ground, 0)}, ${ground})` }} /> : null}
-    </View>
+      {/* The theme's air over the picture, a layer of its own so Light's multiply stays on the picture and its light can brighten. */}
+      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={box}>
+        {theme === "dark" ? (
+          <>
+            {/* Dark: a bank of fog under the title, falling to the ground at the foot so no edge meets the page below. */}
+            <FogVeil layers={heroVeil.dark} width={width} height={height} />
+            <View style={{ position: "absolute", left: 0, top: 0, width, height, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(palette.night, 0)} 84%, ${palette.night} 100%)` }} />
+            {edge(palette.night)}
+          </>
+        ) : (
+          <>
+            {/* Light: the morning glow and its beams over the picture, and a warm glow behind the title. */}
+            <LightVeil light={heroVeil.light} width={width} height={height} />
+            <View style={{ position: "absolute", left: 0, top: 0, width, height, backgroundImage: `linear-gradient(180deg, rgba(${rgbOf(heroVeil.light.rgb)},0) 42%, rgba(${rgbOf(heroVeil.light.rgb)},0.45) 62%, rgba(${rgbOf(heroVeil.light.rgb)},0) 90%)` }} />
+          </>
+        )}
+      </View>
+    </>
   );
 }

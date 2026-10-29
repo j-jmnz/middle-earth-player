@@ -401,7 +401,8 @@ export default function CampaignList() {
   ) : null;
 
   return (
-    <Screen testID="campaign-list" scene="moon" art={art}>
+    // Over its scene the page takes the hero backdrop, whose fog stays below the picture (HeroArt draws its own over it).
+    <Screen testID="campaign-list" scene={art ? "hero" : "moon"} art={art}>
       {/* An expanded window scrolls in a wide column; the measurer (outside the columns) decides whether it splits, else one readable column. */}
       <ScreenScroll scrollRef={scroll} max={size === "expanded" ? "wide" : "readable"}>
         {size === "expanded" ? <View style={{ height: 0 }} onLayout={columns.measure} /> : null}

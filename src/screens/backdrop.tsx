@@ -1,11 +1,11 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { useTheme } from "../play/theme";
-import { fogMatrix, gritTexture, scenesByTheme, type BackdropPart, type FogLayer, type FogTexture, type SceneName } from "./backdrop-scenes";
+import { fogMatrix, gritTexture, rgbOf, scenesByTheme, type FogLayer, type FogTexture, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
 
 // Web dev loop. Skia web needs CanvasKit, so the browser draws the same scene with CSS: each fog texture is an SVG feTurbulence tile
-// (stitched, so it repeats without a seam) drawn as a repeating background, faded out by a CSS mask. react-native-web forwards these
-// CSS properties to the DOM.
+// (stitched, so it repeats without a seam) drawn as a repeating background, faded out by a CSS mask; the morning light is gradients,
+// each beam a clipped gradient inside a blurred box. react-native-web forwards these CSS properties to the DOM.
 type WebStyle = Record<string, string | number>;
 
 const tiles = new Map<FogTexture, string>();
@@ -28,20 +28,61 @@ function tileUrl(texture: FogTexture): string {
 
 const pct = (value: number) => `${Math.round(value * 100)}%`;
 
-/** One fog layer as CSS: its tile repeated, faded out by its elliptical mask (fractions of the box it fills). */
+/** One fog layer as CSS: its tile repeated (moved by its offset), faded out by its elliptical mask (fractions of the box it fills). */
 function fogStyle(layer: FogLayer): WebStyle {
   const mask = layer.mask ? `radial-gradient(${pct(layer.mask.rx)} ${pct(layer.mask.ry)} at ${pct(layer.mask.cx)} ${pct(layer.mask.cy)}, #000 10%, rgba(0,0,0,0) 85%)` : undefined;
+  const [dx, dy] = layer.texture.offset ?? [0, 0];
   return {
     backgroundImage: tileUrl(layer.texture),
     backgroundSize: `${layer.texture.tile[0]}px ${layer.texture.tile[1]}px`,
     backgroundRepeat: "repeat",
+    backgroundPosition: `${dx}px ${dy}px`,
     opacity: layer.opacity,
     ...(layer.blend ? { mixBlendMode: layer.blend } : {}),
     ...(mask ? { maskImage: mask, WebkitMaskImage: mask } : {}),
   };
 }
 
-export function Backdrop({ scene, part = "all" }: { scene: SceneName; part?: BackdropPart }) {
+/** The morning light: the sun's glow, and each beam a gradient clipped to its shape inside a blurred box, all screened. */
+function Light({ light, width }: { light: SceneLight; width: number }) {
+  const rgb = rgbOf(light.rgb);
+  const { sun } = light;
+  // The glow is a circle whose radius is a share of the box's width, as on the native canvas.
+  const glow: WebStyle = {
+    backgroundImage: `radial-gradient(circle ${Math.round(sun.r * width)}px at ${pct(sun.cx)} ${pct(sun.cy)}, rgba(${rgb},0.95) 0%, rgba(${rgb},0.35) 50%, rgba(${rgb},0) 100%)`,
+    mixBlendMode: "screen",
+  };
+  return (
+    <>
+      <View style={[StyleSheet.absoluteFill, glow as object]} />
+      <View style={[StyleSheet.absoluteFill, { filter: `blur(${light.blur}px)`, mixBlendMode: "screen" } as object]}>
+        {light.beams.map((beam, index) => {
+          const ys = beam.points.map(([, y]) => y);
+          const top = Math.min(...ys);
+          const bottom = Math.max(...ys);
+          const style: WebStyle = {
+            clipPath: `polygon(${beam.points.map(([x, y]) => `${pct(x)} ${pct(y)}`).join(", ")})`,
+            backgroundImage: `linear-gradient(180deg, rgba(${rgb},0.9) ${pct(top)}, rgba(${rgb},0.35) ${pct(top + (bottom - top) * 0.7)}, rgba(${rgb},0) ${pct(bottom)})`,
+            opacity: beam.opacity,
+          };
+          return <View key={index} style={[StyleSheet.absoluteFill, style as object]} />;
+        })}
+      </View>
+    </>
+  );
+}
+
+/** A colour multiplied into the ground inside an ellipse (Light's rust where the enemy is). */
+function washStyle(wash: Wash): WebStyle {
+  const rgb = rgbOf(wash.rgb);
+  return {
+    backgroundImage: `radial-gradient(${pct(wash.rx)} ${pct(wash.ry)} at ${pct(wash.cx)} ${pct(wash.cy)}, rgba(${rgb},${wash.alpha}) 10%, rgba(${rgb},0) 85%)`,
+    mixBlendMode: "multiply",
+  };
+}
+
+export function Backdrop({ scene }: { scene: SceneName }) {
+  const { width } = useWindowDimensions();
   const s = scenesByTheme[useTheme()][scene];
   const { ground, vignette, grit } = s;
   const groundStyle: WebStyle =
@@ -50,23 +91,19 @@ export function Backdrop({ scene, part = "all" }: { scene: SceneName; part?: Bac
       : { backgroundImage: `radial-gradient(${pct(ground.rx)} ${pct(ground.ry)} at ${pct(ground.cx)} ${pct(ground.cy)}, ${ground.stops.map(([at, color]) => `${color} ${pct(at)}`).join(", ")})` };
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, { overflow: "hidden" }]}>
-      {part === "air" ? null : <View style={[StyleSheet.absoluteFill, groundStyle as object]} />}
-      {part === "ground"
-        ? null
-        : s.fog.map((layer, index) => (
-            <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer) as object]} />
-          ))}
-      {part === "ground" ? null : (
-        <>
-          <View style={[StyleSheet.absoluteFill, { backgroundImage: `radial-gradient(120% 100% at 50% 45%, rgba(${vignette.rgb},0) ${pct(vignette.from)}, rgba(${vignette.rgb},${vignette.alpha}) 100%)` } as object]} />
-          <View
-            style={[
-              StyleSheet.absoluteFill,
-              { backgroundImage: tileUrl(gritTexture), backgroundSize: `${gritTexture.tile[0]}px ${gritTexture.tile[1]}px`, opacity: grit.opacity, mixBlendMode: grit.blend } as object,
-            ]}
-          />
-        </>
-      )}
+      <View style={[StyleSheet.absoluteFill, groundStyle as object]} />
+      {s.wash ? <View style={[StyleSheet.absoluteFill, washStyle(s.wash) as object]} /> : null}
+      {s.fog.map((layer, index) => (
+        <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer) as object]} />
+      ))}
+      {s.light ? <Light light={s.light} width={width} /> : null}
+      <View style={[StyleSheet.absoluteFill, { backgroundImage: `radial-gradient(120% 100% at 50% 45%, rgba(${vignette.rgb},0) ${pct(vignette.from)}, rgba(${vignette.rgb},${vignette.alpha}) 100%)` } as object]} />
+      <View
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundImage: tileUrl(gritTexture), backgroundSize: `${gritTexture.tile[0]}px ${gritTexture.tile[1]}px`, opacity: grit.opacity, mixBlendMode: grit.blend } as object,
+        ]}
+      />
     </View>
   );
 }
@@ -78,6 +115,15 @@ export function FogVeil({ layers, width, height }: { layers: readonly FogLayer[]
       {layers.map((layer, index) => (
         <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer) as object]} />
       ))}
+    </View>
+  );
+}
+
+/** The morning light in a box of its own, over a picture (HeroArt, Light). */
+export function LightVeil({ light, width, height }: { light: SceneLight; width: number; height: number }) {
+  return (
+    <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height, overflow: "hidden" }}>
+      <Light light={light} width={width} />
     </View>
   );
 }
