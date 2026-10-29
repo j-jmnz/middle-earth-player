@@ -18,6 +18,7 @@ import { routeCode } from "../../route-code";
 import { briefingHref, tableHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
 import { goBack } from "../../go-back";
+import { useBottomInset } from "../../use-bottom-inset";
 import { droppedSentence, useSave } from "../../use-save";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
@@ -78,6 +79,8 @@ export default function CampaignPath() {
   const [roadWidth, setRoadWidth] = useState(0);
   const palette = usePalette();
   const s = useUiScale();
+  // The landscape column has no ActionBar: its scrolls keep the bottom inset clear at their end (use-bottom-inset.ts).
+  const bottomInset = useBottomInset();
 
   const campaign = save ? campaignOf(save.campaignId) : null;
   const nodes = useMemo(() => (save && campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : []), [save, campaign]);
@@ -246,13 +249,13 @@ export default function CampaignPath() {
       <Screen scene="path" testID="campaign-path">
         {navBar}
         <View className="min-h-0 flex-1 flex-row" style={{ gap: 32 * s }}>
-          <ScreenScroll bottom={24}>
+          <ScreenScroll bottom={24 + bottomInset / s}>
             {noticeRow}
             {roadView}
             {poolLine}
           </ScreenScroll>
           <View style={{ width: PATH_SIDE * s }}>
-            <ScreenScroll bottom={24}>
+            <ScreenScroll bottom={24 + bottomInset / s}>
               {won.length > 0 ? (
                 <View style={{ gap: 8 * s }} className="mb-4">
                   <Eyebrow>Completed</Eyebrow>

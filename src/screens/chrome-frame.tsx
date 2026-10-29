@@ -5,6 +5,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Backdrop } from "./backdrop";
+import { useBottomInset } from "./use-bottom-inset";
 import type { SceneName } from "./backdrop-scenes";
 import { IconButton } from "./chrome-buttons";
 import { Chevron } from "./chrome-marks";
@@ -304,10 +305,12 @@ export function ActionBar({ children, safe = true, testID, align = "auto" }: { c
   const t = useTableTokens();
   const { size, s } = useSizeClass();
   const group = align === "fill" || size === "compact" ? null : size === "medium" ? { width: "100%" as const, maxWidth: MEDIUM_ACTION_GROUP * s, alignSelf: "center" as const } : { width: "100%" as const, maxWidth: ACTION_GROUP * s, alignSelf: "flex-end" as const };
-  // The bottom inset is measured by the native view itself, not read from the provider: back from the landscape table, the
-  // provider's insets can still be the landscape ones (no bottom inset) and the bar would sit under the phone's own buttons.
+  // The bottom inset is measured by the native view itself and, as well, never less than the portrait one seen before
+  // (bottom-inset.ts): back from the landscape table, the provider's insets can still be the landscape ones (no bottom inset) and
+  // the bar would sit under the phone's own buttons.
+  const bottom = useBottomInset();
   return (
-    <SafeAreaView testID={testID} collapsable={false} edges={safe ? { bottom: "maximum" } : []} style={{ paddingTop: 10.5 * s, paddingBottom: 12 * s }}>
+    <SafeAreaView testID={testID} collapsable={false} edges={safe ? { bottom: "maximum" } : []} style={{ paddingTop: 10.5 * s, paddingBottom: safe ? Math.max(bottom, 12 * s) : 12 * s }}>
       <View pointerEvents="none" style={{ position: "absolute", left: -24 * s, right: -24 * s, top: -24 * s, height: 24 * s, ...nightFade(0, 1, undefined, t) }} />
       <View pointerEvents="none" style={{ position: "absolute", left: -24 * s, right: -24 * s, top: 0, bottom: 0, backgroundColor: palette.night }} />
       {group ? <View style={group}>{children}</View> : children}
