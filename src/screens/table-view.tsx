@@ -20,6 +20,9 @@ import { railFor } from "../play/rail";
 import { shownSeat, threatSelector } from "../play/selectors";
 import type { SheetNames } from "../play/sheet-types";
 import type { ReduceContext, TableStore } from "../play/store";
+import { createHandoff } from "../play/spotlight-handoff";
+import { SpotlightLayer } from "../play/spotlight-layer";
+import type { StageArea } from "../play/spotlight-stage";
 import { TableCanvas } from "../play/table-canvas";
 import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
 import { MomentBanner } from "../play/moment-banner";
@@ -76,7 +79,10 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const insets = useSafeAreaInsets();
   const screen = useWindowDimensions();
   const s = useUiScale();
-  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+  // The canvas wrapper's size, and its left edge in the row (the quest scale's width, when it shows).
+  const [size, setSize] = useState<{ width: number; height: number; x: number } | null>(null);
+  // The plan and clock the table canvas hands the combat spotlight's full-screen layer, created once (spotlight-handoff.ts).
+  const [handoff] = useState(createHandoff);
   const images = useImageSnapshot();
   const game = useStore(store, (state) => state.game);
   const refusal = useStore(store, (state) => state.refusal);
@@ -207,8 +213,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav]);
 
   const onLayout = (event: LayoutChangeEvent) => {
-    const { width, height } = event.nativeEvent.layout;
-    setSize((current) => (current && current.width === width && current.height === height ? current : { width, height }));
+    const { width, height, x } = event.nativeEvent.layout;
+    setSize((current) => (current && current.width === width && current.height === height && current.x === x ? current : { width, height, x }));
   };
 
   // The staging enemies' engagement costs, marked on each dial's meter (the same for every seat; each dial reads its own).
@@ -223,6 +229,14 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const tokens = campaignTokens(game, ctx.effects, nameOf);
   const held = heldDial(game, nameOf);
   const commandWidth = commandWidthOf(screen.width, s);
+  // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
+  // the quest scale) and the safe insets (spotlight-stage.ts).
+  const barBottom = insets.top + TOP_BAR * s;
+  const canvasX = size?.x ?? 0;
+  const stageArea = useMemo<StageArea>(
+    () => ({ width: screen.width, height: screen.height, origin: { x: insets.left + canvasX, y: barBottom }, safe: { top: insets.top, right: insets.right, bottom: insets.bottom, left: insets.left } }),
+    [screen.width, screen.height, insets.left, insets.top, insets.right, insets.bottom, canvasX, barBottom],
+  );
   const narrow = (screen.width - insets.left - insets.right) / s < 760;
   const previewed = preview
     ? previewCards(
@@ -305,6 +319,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 raised={choice.raised}
                 fight={choice.fight}
                 bottomInset={insets.bottom}
+                stageArea={stageArea}
+                handoff={handoff}
                 look={look}
                 onTap={choice.onTap}
                 onPreview={onPreview}
@@ -347,7 +363,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         logNames={logNames}
         screen={screen}
         insets={insets}
-        barBottom={insets.top + TOP_BAR * s}
+        barBottom={barBottom}
         commandWidth={commandWidth}
         anchorTop={anchor}
         onPreview={onPreview}
@@ -357,6 +373,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           router.push({ pathname: "/settings", params: { from: "table" } });
         }}
       />
+      {/* The combat spotlight: a full-screen canvas over the table, the bar and the dock, mounted only while it plays and deaf to touches
+          (the table canvas and the scrim in TableLayers catch the skip). The banner, the preview and the menu stay above it. */}
+      <SpotlightLayer handoff={handoff} picture={picture} pictureRevision={images.revision} nameOf={nameOf} sphereOf={sphereOf} />
       {/* Over the top bar, the table and any open panel, centered over the canvas at the screen's top edge (user request,
           2026-10-29), so it never covers the command column's tray. While the table peeks it hangs under the peek pill, so
           Back to Player 1 stays in reach. */}

@@ -30,6 +30,6 @@ function ScrimView({ catches, onSkip, insets, barBottom, commandWidth }: { catch
 
 /** The skip catcher of the table: present while the store's spotlight gate is open; a press ends the gate. */
 export function SpotlightScrim({ store, insets, barBottom, commandWidth }: { store: TableStore; insets: { left: number; right: number }; barBottom: number; commandWidth: number }) {
-  const { catches } = useScrim(store);
+  const catches = useScrim(store);
   return <ScrimView catches={catches} onSkip={() => store.getState().endSpotlight("skipped")} insets={insets} barBottom={barBottom} commandWidth={commandWidth} />;
 }

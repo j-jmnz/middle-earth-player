@@ -1,40 +1,31 @@
-// The pieces of the combat spotlight's layer (spotlight.native.tsx; docs/design-system.md, Table, Spotlight): a card flying between its
-// slot and the stage, the pill under a group, the damage token in the target's corner and a token in flight. Each reads the frame of
-// its attack (spotlight-beats.ts) through a derived value, so the UI thread moves it and the canvas draws again only while it plays.
-// Each takes `s`, the UI scale (ui-scale.ts), from the canvas root; the sizes below are Medium's and the pieces draw them times `s`.
-import { Circle, Group, Image, RoundedRect, Text, vec, type SkFont, type SkImage } from "@shopify/react-native-skia";
+// The cards of the combat spotlight's layer (spotlight.native.tsx; docs/design-system.md, Table, Spotlight): a card flying between its
+// slot and the stage with an arc, the shadow card's perspective flip, the afterimages of the lunge, the damage token in the target's
+// corner and a token in flight. Each reads the frame of its attack (spotlight-beats.ts) through a derived value, so the UI thread moves
+// it and the canvas draws again only while it plays. The stage is in screen points already times the UI scale (spotlight-stage.ts).
+import { Circle, Group, Image, RoundedRect, vec, type SkFont, type SkImage } from "@shopify/react-native-skia";
 import type { ReactNode } from "react";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
 import { cardCorner } from "./card-corner.ts";
-import { CanvasIcon, CardBody, Outlined, type BackImages, type Fonts } from "./canvas-pieces.native.tsx";
+import { CardBody, Outlined, type BackImages, type Fonts } from "./canvas-pieces.native.tsx";
 import type { IconName } from "./icon-map.ts";
 import type { Rect } from "./layout.ts";
-import { burstAt, type Frame, type Place } from "./spotlight-beats.ts";
+import { burstAt, TRAIL, trailAt, type ClashShape, type Frame, type Place } from "./spotlight-beats.ts";
+import { CARD, cardTransform, trailTransform, type Role } from "./spotlight-card.ts";
 import type { SpotCard } from "./spotlight-plan.ts";
-import { burstPoint, flown, strikeOffset, type Stage } from "./spotlight-stage.ts";
+import { burstPoint, type Stage } from "./spotlight-stage.ts";
 import type { TableTokens } from "./tokens.ts";
 
-// The height of the medallion pill (pt, Medium's).
-const PILL_H = 34;
-
-/** Which of an attack's cards this is: it decides how the frame moves it. */
-export type Role = "attacker" | "target" | "shadow";
-
 /**
- * A card between its slot and the stage: it flies out, the attacker draws back and lunges, the target shakes and falls, and a
- * shadow card turns over. `rect` is where it stands on the stage and `turn` its fan turn; `children` draw it there.
+ * A card between its slot and the stage: it arcs out, the attacker draws back, lunges and is thrown back if blocked, the target is
+ * knocked back, and a shadow card turns over in perspective. `rect` is where it stands on the stage and `turn` its fan turn;
+ * `children` draw it there. A burning target fades and drops here only when no burn shader runs (`fades`).
  */
-export function FlyingCard({ spot, rect, turn, role, stage, frame, children }: { spot: SpotCard; rect: Rect; turn: number; role: Role; stage: Stage; frame: SharedValue<Frame>; children: ReactNode }) {
+export function FlyingCard({ spot, rect, turn, role, stage, frame, fades = false, s, children }: { spot: SpotCard; rect: Rect; turn: number; role: Role; stage: Stage; frame: SharedValue<Frame>; fades?: boolean; s: number; children: ReactNode }) {
   const origin = vec(rect.x + rect.w / 2, rect.y + rect.h / 2);
-  const transform = useDerivedValue(() => {
-    const f = frame.get();
-    const p = flown(spot.from, spot.turn, rect, turn, role === "target" ? f.flyTarget : f.flyAttackers);
-    const dx = role === "attacker" ? strikeOffset(stage, f) : role === "target" ? f.knock * stage.knock : 0;
-    const flip = role === "shadow" ? Math.abs(Math.cos(f.flipAngle)) : 1;
-    return [{ translateX: p.tx + dx }, { translateY: p.ty }, { rotate: p.turn + (role === "attacker" ? f.tilt : 0) }, { scale: p.scale }, { scaleX: flip }];
-  });
-  const opacity = useDerivedValue(() => (role === "target" ? 1 - frame.get().dissolve : 1));
+  const fall = fades ? CARD.fall * s : 0;
+  const transform = useDerivedValue(() => cardTransform(role, spot.from, spot.turn, rect, turn, stage, frame.get(), fall));
+  const opacity = useDerivedValue(() => (fades ? 1 - frame.get().dissolve : 1));
   return (
     <Group transform={transform} origin={origin} opacity={opacity}>
       {children}
@@ -49,50 +40,42 @@ export function StageCard({ spot, rect, image, name, sphere, fonts, backs, t, s,
 }
 
 /** The night veil over a destroyed target, growing to 50% as it burns (the fallback when the burn shader does not compile). */
-export function Veil({ rect, frame, t, s }: { rect: Rect; frame: SharedValue<Frame>; t: TableTokens; s: number }) {
+export function Veil({ rect, frame, t }: { rect: Rect; frame: SharedValue<Frame>; t: TableTokens }) {
   const opacity = useDerivedValue(() => 0.5 * frame.get().dissolve);
   return <RoundedRect x={rect.x} y={rect.y} width={rect.w} height={rect.h} r={cardCorner(rect.w, rect.h)} color={t.night} opacity={opacity} />;
 }
 
-/** A big pill under a group: the stat's icon and its number in Cinzel Bold. The defense pill bounces when the attack is blocked. */
-export function Pill({ at, icon, color, text, font, frame, t, s, badge }: { at: { cx: number; cy: number }; icon: IconName; color: string; text: string; font: SkFont; frame: SharedValue<Frame>; t: TableTokens; s: number; badge: "badgeA" | "badgeD" }) {
-  const height = PILL_H * s;
-  const width = (12 + 20 + 6 + 12) * s + font.getTextWidth(text);
-  const left = at.cx - width / 2;
-  const top = at.cy - height / 2;
-  const opacity = useDerivedValue(() => Math.min(1, frame.get()[badge]));
-  const transform = useDerivedValue(() => [{ scale: frame.get()[badge] }]);
+/**
+ * The afterimages of the front attacker during the lunge: `TRAIL` copies, copy `j` posed where the same clock read it `j` trail
+ * steps ago (spotlight-beats.ts, trailAt), each fainter than the one before; they show only during the lunge.
+ */
+export function Trail({ rect, turn, stage, shape, now, k, children }: { rect: Rect; turn: number; stage: Stage; shape: ClashShape; now: SharedValue<number>; k: number; children: ReactNode }) {
+  const origin = vec(rect.x + rect.w / 2, rect.y + rect.h / 2);
   return (
-    <Group transform={transform} origin={vec(at.cx, at.cy)} opacity={opacity}>
-      <RoundedRect x={left} y={top} width={width} height={height} r={height / 2} color={t.night} />
-      <RoundedRect x={left} y={top} width={width} height={height} r={height / 2} color={color} style="stroke" strokeWidth={1.5 * s} />
-      <CanvasIcon name={icon} x={left + 12 * s} y={at.cy - 10 * s} size={20 * s} color={color} />
-      <Text x={left + (12 + 20 + 6) * s} y={at.cy + font.getSize() * 0.35} text={text} font={font} color={t.bone} />
-    </Group>
+    <>
+      {Array.from({ length: TRAIL }, (_, at) => (
+        <TrailCopy key={at} j={at + 1} origin={origin} turn={turn} stage={stage} shape={shape} now={now} k={k}>
+          {children}
+        </TrailCopy>
+      ))}
+    </>
   );
 }
 
-/** A small night chip with a hairline, like the pills, with a word on it ("+2" for the attackers past the fan, over card art), centered at `at`. */
-export function Chip({ at, text, font, opacity, t, s }: { at: { cx: number; cy: number }; text: string; font: SkFont; opacity: SharedValue<number>; t: TableTokens; s: number }) {
-  const width = font.getTextWidth(text) + 16 * s;
-  const height = font.getSize() + 8 * s;
+function TrailCopy({ j, origin, turn, stage, shape, now, k, children }: { j: number; origin: { x: number; y: number }; turn: number; stage: Stage; shape: ClashShape; now: SharedValue<number>; k: number; children: ReactNode }) {
+  const then = useDerivedValue(() => trailAt(shape, now.get(), k, j));
+  const transform = useDerivedValue(() => trailTransform(stage, turn, then.get()));
+  const opacity = useDerivedValue(() => then.get().alpha);
   return (
-    <Group opacity={opacity}>
-      <RoundedRect x={at.cx - width / 2} y={at.cy - height / 2} width={width} height={height} r={height / 2} color={t.night} />
-      <RoundedRect x={at.cx - width / 2} y={at.cy - height / 2} width={width} height={height} r={height / 2} color={t.hairline} style="stroke" strokeWidth={1 * s} />
-      <Text x={at.cx - font.getTextWidth(text) / 2} y={at.cy + font.getSize() * 0.35} text={text} font={font} color={t.bone} />
+    <Group transform={transform} origin={origin} opacity={opacity}>
+      {children}
     </Group>
   );
-}
-
-/** A small word under a pill ("Blocked"), centered at `at`. */
-export function Word({ at, text, font, t, color = t.bone, opacity }: { at: { cx: number; cy: number }; text: string; font: SkFont; t: TableTokens; color?: string; opacity: SharedValue<number> | number }) {
-  return <Text x={at.cx - font.getTextWidth(text) / 2} y={at.cy + font.getSize() * 0.35} text={text} font={font} color={color} opacity={opacity} />;
 }
 
 /**
  * The damage token in the target's corner with its count: the count before the attack until the last token lands, then the new count,
- * popping as the table's tokens do (token-fx.ts). It is drawn in the target's own group, so it shakes and falls with it.
+ * popping as the table's tokens do (token-fx.ts). It is drawn in the target's own group, so it shakes and burns with it.
  */
 export function Corner({ stage, before, after, image, font, frame, t, s }: { stage: Stage; before: number; after: number; image: SkImage | null; font: SkFont; frame: SharedValue<Frame>; t: TableTokens; s: number }) {
   const { cx, cy } = stage.corner;

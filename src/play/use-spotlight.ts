@@ -12,7 +12,7 @@ import { tickImpact } from "./haptics.ts";
 import type { TableLayout } from "./layout.ts";
 import { easingOf, useMotionScale } from "./motion-run.ts";
 import { hitTime, leaveTime, spotlightRun } from "./spotlight-beats.ts";
-import { scrimShows, spotlightHolds } from "./spotlight-gate.ts";
+import { spotlightHolds } from "./spotlight-gate.ts";
 import { buildPlan, type SpotlightPlan } from "./spotlight-plan.ts";
 import { sameArea, type StageArea } from "./spotlight-stage.ts";
 import { useScreenReader } from "./screen-reader.ts";
@@ -39,11 +39,10 @@ export function useSpotlightHold(store: TableStore): boolean {
   return spotlightHolds(gate, useSpotlightScale(), CANVAS);
 }
 
-/** The scrim over the top bar and the dock: `shows` while the spotlight plays and its last attack has not begun to go back, `catches` while it is held at all. */
-export function useScrim(store: TableStore): { shows: boolean; catches: boolean } {
+/** Whether the skip catcher over the top bar and the dock takes touches: while the spotlight is held at all. */
+export function useScrim(store: TableStore): boolean {
   const gate = useStore(store, (state) => state.spotlight);
-  const scale = useSpotlightScale();
-  return { shows: scrimShows(gate, scale, CANVAS), catches: spotlightHolds(gate, scale, CANVAS) };
+  return spotlightHolds(gate, useSpotlightScale(), CANVAS);
 }
 
 type Track = { layout: TableLayout; area: StageArea; seq: number; plan: SpotlightPlan | null };
