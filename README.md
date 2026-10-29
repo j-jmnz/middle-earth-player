@@ -117,7 +117,7 @@ pnpm catalog:build
 pnpm scans:pack
 ```
 
-The first `scans:pack` downloads every pinned card picture at full size (about 1.2 GB, into `.cache/`), checks each sha256, and writes the 1,300 pictures scaled to 1200 px (343 MB) into `assets/scans`. Later runs read the cache and take about 80 seconds. `pnpm ios` and `pnpm android` run both steps themselves; running them first only gets the download out of the way. No `pnpm data:sync` is needed: `data/sources.json` pins every picture. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
+The first `scans:pack` downloads every pinned card picture at full size (about 5 GB, into `.cache/`; JvZijp's Drive files are about 4 MB each), checks each sha256, and writes the 1,300 pictures scaled to 1200 px (272 MB) into `assets/scans`. Later runs read the cache and take about two minutes. `pnpm ios` and `pnpm android` run both steps themselves; running them first only gets the download out of the way. No `pnpm data:sync` is needed: `data/sources.json` pins every picture. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
 
 #### 4. iPhone or iPad
 
@@ -149,7 +149,7 @@ When Android Studio is unwelcome, the `development` profile in `eas.json` builds
 - Check the offline build: airplane mode, close the app, reopen it. Every card's picture shows.
 - Rebuild with the same command after a change. The pictures come from the cache.
 - For the daily loop, drop `--configuration Release` and `--variant release`: the development build reloads edits from Metro, and rebuilds only when a native module changes. A phone that cannot reach Metro over the network (a VPN, an isolated Wi-Fi) runs `pnpm android:usb --device` instead. pnpm passes a `--` on to Expo, which then ignores the flags after it, so write the flags without one.
-- `android/` and `ios/` stay gitignored. Keep about 5 GB free for `.cache/` and the native builds.
+- `android/` and `ios/` stay gitignored. Keep about 10 GB free for `.cache/` and the native builds.
 
 ### Maestro
 

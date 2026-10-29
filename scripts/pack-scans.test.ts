@@ -43,7 +43,7 @@ function stage() {
   mkdirSync(cache, { recursive: true });
   const catalog = path.join(root, "catalog.db");
   const database = new Database(catalog);
-  database.exec("create table cards (code text primary key, name text not null, imagesrc text)");
+  database.exec("create table cards (code text primary key, name text not null, imagesrc text, type_code text not null default 'ally')");
   const insert = database.prepare("insert into cards (code, name, imagesrc) values (?, ?, ?)");
   insert.run("141031", "Bag End", null);
   insert.run("141001", "Frodo Baggins", "/bundles/cards/141001.png");
@@ -195,5 +195,24 @@ describe("pack scans", () => {
     const shrunk = await sharp(Buffer.from(await shrinkToMaxSide(large))).metadata();
     expect([shrunk.width, shrunk.height]).toEqual([846, MAX_SIDE]);
     expect(await shrinkToMaxSide(small)).toBe(small);
+  });
+
+  it("lays an upright quest picture down, each kind its own way, and re-encodes a PNG", async () => {
+    // A picture whose left half is dark: turned clockwise, the dark half is the top.
+    const upright = new Uint8Array(
+      await sharp({ create: { width: 700, height: 1000, channels: 3, background: "#ffffff" } })
+        .composite([{ input: { create: { width: 350, height: 1000, channels: 3, background: "#000000" } }, left: 0, top: 0 }])
+        .png()
+        .toBuffer(),
+    );
+    const darkTop = async (body: Uint8Array) => {
+      const { data, info } = await sharp(Buffer.from(body)).greyscale().raw().toBuffer({ resolveWithObject: true });
+      expect([info.width, info.height]).toEqual([1000, 700]);
+      return (data[10 * info.width + 500] ?? 255) < 128;
+    };
+    expect(await darkTop(await shrinkToMaxSide(upright, "quest"))).toBe(true);
+    expect(await darkTop(await shrinkToMaxSide(upright, "player-side-quest"))).toBe(false);
+    const png = await shrinkToMaxSide(upright, "ally");
+    expect(await sharp(Buffer.from(png)).metadata()).toMatchObject({ format: "jpeg", width: 700, height: 1000 });
   });
 });

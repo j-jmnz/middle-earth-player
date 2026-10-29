@@ -14,6 +14,7 @@ import { bytes, runScript, type Log } from "./log.ts";
 // A bundled picture is at most this many pixels on its long side: about twice the 600 of a Hall of Beorn scan, which is
 // sharp on a phone's inspect screen. The 600 DPI pictures are about 2100.
 export const MAX_SIDE = 1200;
+const KEEP_BYTES = 400_000;
 
 export type PackedScan = {
   code: string;
@@ -32,7 +33,7 @@ export type PackScansOptions = {
   mapPath: string;
   fetch?: (url: string) => Promise<Uint8Array>;
   render?: (pdfFile: string, page: number) => Uint8Array;
-  shrink?: (body: Uint8Array) => Promise<Uint8Array>;
+  shrink?: (body: Uint8Array, typeCode: string) => Promise<Uint8Array>;
 };
 
 type Pin = SourceFile & { cacheDir: string };
@@ -53,9 +54,9 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytes(url, 120_000, log)), pdfPins, notes };
   const shrink = options.shrink ?? shrinkToMaxSide;
   const database = new Database(options.catalogDb, { readonly: true });
-  let cards: { code: string; name: string }[];
+  let cards: { code: string; name: string; type_code: string }[];
   try {
-    cards = database.prepare("select code, name from cards order by code").all() as { code: string; name: string }[];
+    cards = database.prepare("select code, name, type_code from cards order by code").all() as { code: string; name: string; type_code: string }[];
   } finally {
     database.close();
   }
@@ -87,7 +88,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
         tick(`${card.code} has no picture`);
         continue;
       }
-      const shown = await shrink(body);
+      const shown = await shrink(body, card.type_code);
       total += shown.byteLength;
       packed.push(writeScan(card.code, shown, options.scansDir));
       tick(`${card.code} ${bytes(shown.byteLength)}`);
@@ -173,12 +174,21 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
   return { body, fetched: true };
 }
 
-// Scales a picture down to MAX_SIDE on its long side as a JPEG. A picture already within it is kept byte for byte.
-export async function shrinkToMaxSide(body: Uint8Array): Promise<Uint8Array> {
+// A quest card and a side quest are printed sideways, and the app shows them so. JvZijp files them upright, a quest turned
+// one way and a side quest the other: the clockwise turn that lays each back down, checked against cardgame.tools'
+// landscape scans (31 quests, 10 player side quests).
+const UPRIGHT_TURN: Readonly<Record<string, number>> = { quest: 90, "player-side-quest": 270, "encounter-side-quest": 270 };
+
+// Scales a picture down to MAX_SIDE on its long side as a JPEG, laying an upright quest picture down first. A JPEG already
+// within MAX_SIDE, the right way round and at most KEEP_BYTES is kept byte for byte; a PNG, or a JPEG saved at a far higher
+// quality than the bundle needs (JvZijp's campaign pages run to 1.2 MB), is encoded again.
+export async function shrinkToMaxSide(body: Uint8Array, typeCode = ""): Promise<Uint8Array> {
   const media = sniffImage(body);
   if (!media) throw new Error("Picture is not a JPEG or PNG");
-  if (Math.max(media.width, media.height) <= MAX_SIDE) return body;
-  return new Uint8Array(await sharp(body).resize({ width: MAX_SIDE, height: MAX_SIDE, fit: "inside" }).jpeg({ quality: 85, mozjpeg: true }).toBuffer());
+  const turn = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  if (turn === 0 && media.extension === "jpg" && Math.max(media.width, media.height) <= MAX_SIDE && body.byteLength <= KEEP_BYTES) return body;
+  const image = turn === 0 ? sharp(body) : sharp(body).rotate(turn);
+  return new Uint8Array(await image.resize({ width: MAX_SIDE, height: MAX_SIDE, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 85, mozjpeg: true }).toBuffer());
 }
 
 function writeScan(code: string, body: Uint8Array, scansDir: string): PackedScan {

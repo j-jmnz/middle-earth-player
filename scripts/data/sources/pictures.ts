@@ -12,11 +12,16 @@ import { PDF_CACHE_DIR, PICTURE_CACHE_DIR, RAW_DIR } from "../paths.ts";
 import { MEC109_CHANGED, scanTargets, type ScanSide } from "../printed/scope.ts";
 import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
+import { driveFileUrl, JVZIJP_FOLDER, JVZIJP_SITE, jvzijpFile, jvzijpPictures, listDriveTree } from "./jvzijp.ts";
+import { lettersOf } from "./names.ts";
 import { extensionOf, widthOf } from "./scans.ts";
+
+export { lettersOf };
 
 // The pictures the app bundles, every card's, so it needs no network (user decisions, 2026-10-29). The `scans` source stays
 // what the printed-text ledger was read from; a picture is only shown. Each side of the scan scope and side A of every other
-// card gets one, pinned by sha256:
+// card gets one, pinned by sha256, from the first of these that has it:
+// - JvZijp's enhanced proxies on Google Drive, the user's first choice (jvzijp.ts);
 // - FFG's print-and-play PDFs of the campaign, boon and burden cards, the only digital originals (InDesign, vector text over
 //   300 ppi art), rendered at 600 DPI;
 // - else the 600 DPI scan lotr.cardgame.tools hosts (u/LepcisMagna's, about 1480×2100), found through its card database;
@@ -26,7 +31,7 @@ import { extensionOf, widthOf } from "./scans.ts";
 export const CARDGAME_TOOLS_DB = "https://lotr.cardgame.tools/lotr_lcg.db";
 export const CARDGAME_TOOLS_IMAGES = "https://images.cardgame.tools/lotr/";
 
-const CORE_CAMPAIGN_PDF = "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf";
+export const CORE_CAMPAIGN_PDF = "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf";
 const DARK_OF_MIRKWOOD_PDF = "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf";
 export const PDF_DPI = 600;
 
@@ -88,15 +93,6 @@ export function productsOfPacks(packs: readonly { code: string; name: string }[]
   }
   for (const [pack, product] of Object.entries(PRODUCT_OF_PACK)) out.set(pack, product);
   return out;
-}
-
-// Letters only, without accents: "Nibin-Dûm" and "Nibin-DÛm", "Gandalf's" and "Gandalfs" read the same.
-export function lettersOf(text: string): string {
-  return text
-    .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z]/g, "");
 }
 
 type CardgameToolsRow = { slug: string; front: string; back: string | null };
@@ -166,6 +162,8 @@ async function fetchInto(url: string, file: string, log: Log): Promise<SourceFil
   return { path: "", url, sha256: sha256(body), bytes: body.byteLength, file };
 }
 
+const SYNC_CONCURRENCY = 8;
+
 export async function syncPictures(log: Log = createLog("pictures")): Promise<SourceRecord> {
   mkdirSync(PICTURE_CACHE_DIR, { recursive: true });
   const files: SourceFile[] = [];
@@ -175,6 +173,12 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
   const packs = JSON.parse(readFileSync(path.join(RAW_DIR, "ringsdb", "packs.json"), "utf8")) as { code: string; name: string }[];
   const productOfPack = productsOfPacks(packs, products);
   log.info(`cardgame.tools lists ${rows.size} printed cards`);
+  const drive = await listDriveTree(JVZIJP_FOLDER, log);
+  const listing = `${JSON.stringify(drive, null, 1)}\n`;
+  writeFileSync(path.join(PICTURE_CACHE_DIR, "jvzijp.json"), listing);
+  files.push({ path: "pictures/jvzijp.json", url: JVZIJP_SITE, sha256: sha256(listing), bytes: Buffer.byteLength(listing) });
+  const jvzijp = jvzijpPictures(drive, packs);
+  log.info(`JvZijp's Drive holds ${drive.length} files, ${jvzijp.length} of them card pictures`);
   const pdfs = new Map<string, string>();
   for (const url of new Set(PDF_PAGES.map((entry) => entry.pdf))) {
     const pdf = await fetchInto(url, path.join(PDF_CACHE_DIR, path.basename(new URL(url).pathname)), log);
@@ -187,43 +191,66 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
   const targets = [...scoped, ...[...cards.keys()].filter((code) => !scopedCodes.has(code)).map((code) => ({ code, side: "A" as const, scoped: false }))];
   const tick = log.progress(targets.length, "picture");
   const kept: string[] = [];
-  for (const target of targets) {
+  const from = { jvzijp: 0, pdf: 0, cardgameTools: 0, other: 0 };
+  const one = async (target: (typeof targets)[number]) => {
     const key = `${target.code}.${target.side}`;
     const card = cards.get(target.code);
     if (!card) throw new Error(`${key} is not in data/cards`);
-    const name = card.name;
     const page = PDF_PAGES.find((entry) => entry.code === target.code && entry.side === target.side);
-    let picture: { url: string; body: Uint8Array } | null = null;
-    if (page) {
-      const pdfFile = pdfs.get(page.pdf) ?? "";
-      const text = lettersOf(pageText(pdfFile, page.page));
-      const expected = target.side === "A" ? lettersOf(name) : "resolution";
-      if (!text.includes(expected)) throw new Error(`${key}: page ${page.page} of ${page.pdf} does not name "${target.side === "A" ? name : "Resolution"}"`);
-      picture = { url: pdfPageUrl(page.pdf, page.page), body: renderPdfPage(pdfFile, page.page) };
-    } else if (!MEC109_CHANGED.includes(target.code)) {
+    // Each source in order of preference, as a fetch or a render. The cards MEC109 rewords have no picture of that printing.
+    const sources: { from: keyof typeof from; url: string; load: () => Promise<Uint8Array> }[] = [];
+    if (!MEC109_CHANGED.includes(target.code)) {
+      const drivePicture = jvzijpFile(jvzijp, card, target.side, page ? (page.pdf === CORE_CAMPAIGN_PDF ? page.page : -1) : null);
+      if (drivePicture) {
+        const url = driveFileUrl(drivePicture.id);
+        sources.push({ from: "jvzijp", url, load: () => fetchBytes(url, 120_000, log) });
+      }
+      if (page) {
+        const pdfFile = pdfs.get(page.pdf) ?? "";
+        sources.push({
+          from: "pdf",
+          url: pdfPageUrl(page.pdf, page.page),
+          load: () => {
+            const text = lettersOf(pageText(pdfFile, page.page));
+            const expected = target.side === "A" ? lettersOf(card.name) : "resolution";
+            if (!text.includes(expected)) throw new Error(`page ${page.page} of ${page.pdf} does not name "${target.side === "A" ? card.name : "Resolution"}"`);
+            return Promise.resolve(renderPdfPage(pdfFile, page.page));
+          },
+        });
+      }
       const file = cardgameToolsFile(rows, productOfPack, card, target.side);
-      const urls = [...(file ? [`${CARDGAME_TOOLS_IMAGES}${file}`] : []), ...(target.scoped ? [] : fallbackUrls(card))];
-      for (const url of urls) {
-        try {
-          const body = await fetchBytes(url, 120_000, log);
-          if (extensionOf(body) === null) throw new Error("not a JPEG or PNG");
-          picture = { url, body };
-          break;
-        } catch (error) {
-          log.warn(`${key}: ${error instanceof Error ? error.message : String(error)}${target.scoped ? "; the scan stays its picture" : ""}`);
-        }
+      if (file) sources.push({ from: "cardgameTools", url: `${CARDGAME_TOOLS_IMAGES}${file}`, load: () => fetchBytes(`${CARDGAME_TOOLS_IMAGES}${file}`, 120_000, log) });
+      if (!target.scoped) for (const url of fallbackUrls(card)) sources.push({ from: "other", url, load: () => fetchBytes(url, 120_000, log) });
+    }
+    for (const source of sources) {
+      try {
+        const body = await source.load();
+        // Drive answers a quota or sign-in page as HTML: that is not a picture.
+        if (extensionOf(body) === null) throw new Error("not a JPEG or PNG");
+        const extension = extensionOf(body) ?? "jpg";
+        writeFileSync(path.join(PICTURE_CACHE_DIR, `${key}.${extension}`), body);
+        files.push({ path: `pictures/${key}.${extension}`, url: source.url, sha256: sha256(body), bytes: body.byteLength });
+        from[source.from] += 1;
+        tick(`${key} ${widthOf(body)} px, ${bytes(body.byteLength)}`);
+        return;
+      } catch (error) {
+        log.warn(`${key}: ${source.url}: ${error instanceof Error ? error.message : String(error)}; trying the next source`);
       }
     }
-    if (!picture) {
-      kept.push(key);
-      tick(`${key} ${target.scoped ? "keeps its scan" : "has no picture"}`);
-      continue;
-    }
-    const extension = extensionOf(picture.body) ?? "jpg";
-    writeFileSync(path.join(PICTURE_CACHE_DIR, `${key}.${extension}`), picture.body);
-    files.push({ path: `pictures/${key}.${extension}`, url: picture.url, sha256: sha256(picture.body), bytes: picture.body.byteLength });
-    tick(`${key} ${widthOf(picture.body)} px, ${bytes(picture.body.byteLength)}`);
-  }
-  if (kept.length > 0) log.info(`${kept.length} side${kept.length === 1 ? "" : "s"} have no picture (a scanned one keeps its scan): ${kept.join(", ")}`);
-  return { id: "pictures", site: "https://lotr.cardgame.tools", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
+    kept.push(key);
+    tick(`${key} ${target.scoped ? "keeps its scan" : "has no picture"}`);
+  };
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: SYNC_CONCURRENCY }, async () => {
+      while (next < targets.length) {
+        const target = targets[next++];
+        if (target) await one(target);
+      }
+    }),
+  );
+  log.info(`pictures from JvZijp ${from.jvzijp}, FFG's PDFs ${from.pdf}, cardgame.tools ${from.cardgameTools}, RingsDB or Hall of Beorn ${from.other}`);
+  if (kept.length > 0) log.info(`${kept.length} side${kept.length === 1 ? "" : "s"} have no picture (a scanned one keeps its scan): ${kept.sort().join(", ")}`);
+  files.sort((left, right) => left.path.localeCompare(right.path));
+  return { id: "pictures", site: JVZIJP_SITE, pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
 }
