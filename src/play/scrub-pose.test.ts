@@ -67,6 +67,31 @@ describe("scrubPose", () => {
     expect([magnify(0, 1.4), magnify(1, 1.4), magnify(2, 1.4), magnify(3, 1.4), magnify(-1, 1.4)]).toEqual([1.4, SHAPE.scrubNear, SHAPE.scrubNearer, 1, 1]);
   });
 
+  it("falls off smoothly as the finger slides: 1.15 within a card, 1.05 at two, none past about 2.2", () => {
+    let before = Infinity;
+    for (let d = 0.5; d <= 3; d += 0.05) {
+      const grow = magnify(d, SHAPE.scrubLiftScale);
+      expect(grow).toBeLessThanOrEqual(before + 1e-12);
+      before = grow;
+    }
+    expect(magnify(0.7, SHAPE.scrubLiftScale)).toBeCloseTo(SHAPE.scrubNear, 9);
+    expect(magnify(2, SHAPE.scrubLiftScale)).toBeCloseTo(SHAPE.scrubNearer, 9);
+    expect(magnify(2.3, SHAPE.scrubLiftScale)).toBe(1);
+    // Never past the lifted card's own grow.
+    expect(magnify(1, 1.1)).toBe(1.1);
+  });
+
+  it("settles the card the finger left from its lift over the drop clock, down to its neighbour's grow", () => {
+    const clock = { rise: 1, apart: 1, lift: 1 };
+    const lifted = scrubPose(slot, target, clock, 0, room);
+    const neighbour = scrubPose(slot, target, clock, 1, room);
+    expect(scrubPose(slot, target, clock, 1, room, 1).scale).toBeCloseTo(lifted.scale, 9);
+    expect(scrubPose(slot, target, clock, 1, room, 0)).toEqual(neighbour);
+    const half = scrubPose(slot, target, clock, 1, room, 0.5).scale;
+    expect(half).toBeLessThan(lifted.scale);
+    expect(half).toBeGreaterThan(neighbour.scale);
+  });
+
   it("keeps a grown end card inside the room, and its foot under the top edge's reach", () => {
     const edge = { ...target, x: 2 };
     const pose = scrubPose(slot, edge, { rise: 1, apart: 1, lift: 1 }, 0, room);

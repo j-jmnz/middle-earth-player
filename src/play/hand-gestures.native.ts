@@ -21,8 +21,11 @@ import { MOTION } from "./motion-tokens.ts";
 import { onScrubCancel, scrubMoved, setScrubOpen } from "./scrub-open.ts";
 import { dropRects, type DropTarget } from "./selection.ts";
 
-/** What the canvas draws the scrub from: the clocks (0 to 1), the card under the finger (-1 for none) and the spread it reads. */
-export type Scrub = { rise: SharedValue<number>; apart: SharedValue<number>; lift: SharedValue<number>; index: SharedValue<number>; spread: Spread };
+/**
+ * What the canvas draws the scrub from: the clocks (0 to 1), the card under the finger (-1 for none), the finger's x (for the
+ * neighbours' falloff), the card the finger left and its settling clock (1 to 0), and the spread it reads.
+ */
+export type Scrub = { rise: SharedValue<number>; apart: SharedValue<number>; lift: SharedValue<number>; index: SharedValue<number>; finger: SharedValue<number>; left: SharedValue<number>; drop: SharedValue<number>; spread: Spread };
 
 type Args = {
   layout: TableLayout;
@@ -65,6 +68,9 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   const apart = useSharedValue(0);
   const scrubLift = useSharedValue(0);
   const index = useSharedValue(-1);
+  const finger = useSharedValue(0);
+  const left = useSharedValue(-1);
+  const drop = useSharedValue(0);
   const scrubbing = useSharedValue(false);
   // A scrub started and JavaScript has not yet been told it closed.
   const begun = useSharedValue(false);
@@ -89,20 +95,28 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
     index.set(-1);
     cancelAnimation(scrubLift);
     scrubLift.set(0);
+    cancelAnimation(drop);
+    drop.set(0);
+    left.set(-1);
     rise.set(k === 0 ? 0 : withTiming(0, fallTiming));
     apart.set(k === 0 ? 0 : withTiming(0, fallTiming));
-  }, [scrubbing, index, scrubLift, rise, apart, k, fallTiming]);
+  }, [scrubbing, index, scrubLift, drop, left, rise, apart, k, fallTiming]);
 
-  // The card under the finger lifts over the lift token (at once under reduced motion); the one it left drops.
+  // The card under the finger lifts over the lift token (at once under reduced motion); the one it left settles back over the same.
   const lifting = useCallback(
     (next: number) => {
       "worklet";
+      const before = index.get();
       index.set(next);
+      cancelAnimation(drop);
+      left.set(before);
+      drop.set(before >= 0 && k !== 0 ? scrubLift.get() : 0);
+      if (before >= 0 && k !== 0) drop.set(withTiming(0, scrubLiftTiming));
       cancelAnimation(scrubLift);
       scrubLift.set(0);
       if (next >= 0) scrubLift.set(k === 0 ? 1 : withTiming(1, scrubLiftTiming));
     },
-    [index, scrubLift, k, scrubLiftTiming],
+    [index, left, drop, scrubLift, k, scrubLiftTiming],
   );
 
   // JavaScript hears of the scrub only when the card under the finger changes, to tick, and when it opens and closes (Android Back).
@@ -217,6 +231,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         const first = startCard(spreadNow.get(), slots.get(), event.x, event.y);
         if (swallow.get() || first < 0) return;
         scrubbing.set(true);
+        finger.set(event.x);
         cancelAnimation(rise);
         cancelAnimation(apart);
         rise.set(k === 0 ? 1 : withTiming(1, riseTiming));
@@ -234,6 +249,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
           scheduleOnRN(onScrub, -1, false);
           return;
         }
+        finger.set(event.x);
         const next = pick(now, event.x, event.y);
         if (next === index.get()) return;
         lifting(next);
@@ -254,8 +270,8 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
       });
 
     return Gesture.Race(pan, ...(scrubOn ? [scrub] : []), hold, tap);
-  }, [slots, lifts, drops, spreadNow, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, returnTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, select, onDrop, onTap, onPreview, onScrub]);
+  }, [slots, lifts, drops, spreadNow, dragging, dx, dy, lift, rise, apart, index, finger, scrubbing, begun, k, liftTiming, returnTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, select, onDrop, onTap, onPreview, onScrub]);
 
-  const scrub: Scrub = useMemo(() => ({ rise, apart, lift: scrubLift, index, spread }), [rise, apart, scrubLift, index, spread]);
+  const scrub: Scrub = useMemo(() => ({ rise, apart, lift: scrubLift, index, finger, left, drop, spread }), [rise, apart, scrubLift, index, finger, left, drop, spread]);
   return { gesture, liftTransform, scrub };
 }

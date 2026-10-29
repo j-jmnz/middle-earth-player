@@ -7,6 +7,7 @@ import type { CardInstance } from "../rules/state.ts";
 
 import { cardSize, handCardSize, hitBounds, MIN_TARGET, PLAY_FLOOR, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "./selectors.ts";
+import { HAND_TUCK } from "./play-area.ts";
 import { ACROSS, DOWN, SLACK, shareOut, wrapRows } from "./table-spacing.ts";
 import { touch, UI_SCALES } from "./ui-scale.ts";
 
@@ -112,9 +113,9 @@ describe("the table's layout at a UI scale", () => {
     for (const scale of SCALES) {
       const { views: v, piles } = views(3);
       const layout = tableLayout(2000, 1200, v, piles, { scale });
-      // A canvas far larger than any phone: the card is at its cap (96 at Medium), and every gap has grown to its own cap: the quest
+      // A canvas far larger than any phone: the card is at its cap (120 at Medium), and every gap has grown to its own cap: the quest
       // card stands one gutter and a quarter card in, staging one gutter and 0.15 of a card down.
-      expect(layout.card.w).toBe(Math.floor(96 * scale));
+      expect(layout.card.w).toBe(Math.floor(120 * scale));
       expect(layout.zones.questStage.x).toBeCloseTo(8 * scale + ACROSS.edge.cap * layout.card.w, 9);
       expect(layout.zones.staging.y).toBeCloseTo(8 * scale + DOWN.top.cap * layout.card.h, 9);
     }
@@ -232,6 +233,17 @@ describe("the table's spacing (user request, 2026-10-29)", () => {
     }
   });
 
+  it("raises the hand into ground no gap can take, up to its whole card, and leaves a phone's hand where it was", () => {
+    const { views: v, piles } = views(8);
+    const tall = tableLayout(980, 920, v, piles);
+    const rest = 920 - Math.round(tall.card.h * 0.56);
+    expect(tall.zones.hand.y).toBeLessThan(rest);
+    expect(tall.zones.hand.y).toBeGreaterThanOrEqual(920 - tall.card.h - 1e-9);
+    // The gap above the hand still reaches its cap.
+    expect(tall.zones.hand.y - (tall.zones.play.y + tall.zones.play.h)).toBeGreaterThanOrEqual(DOWN.playHand.cap * tall.card.h);
+    expect(tableLayout(591, 338, v, piles).zones.hand.y).toBe(286);
+  });
+
   it("shares room by share, stops each gap at its cap and hands its overflow on", () => {
     expect(shareOut(10, [{ share: 1, cap: 100 }, { share: 3, cap: 100 }]).extra).toEqual([2.5, 7.5]);
     const capped = shareOut(100, [{ share: 1, cap: 10 }, { share: 1, cap: 100 }]);
@@ -268,8 +280,9 @@ describe("the play area wraps (user request, 2026-10-29)", () => {
             const box = slotBounds(slot);
             expect(box.x, `${where} ${slot.id}`).toBeGreaterThanOrEqual(0);
             expect(box.x + box.w, `${where} ${slot.id}`).toBeLessThanOrEqual(canvas.width + 0.5);
-            // The play area never covers the hand's strip.
-            expect(box.y + box.h, `${where} ${slot.id}`).toBeLessThanOrEqual(layout.zones.hand.y + 1e-6);
+            // The play area never covers the hand's strip: two stacked rows tuck at most HAND_TUCK under its top, which the hand is
+            // drawn over.
+            expect(box.y + box.h, `${where} ${slot.id}`).toBeLessThanOrEqual(layout.zones.hand.y + HAND_TUCK * scale + 1e-6);
             // The drop target for playing a card covers every row (a committed card stands a half peek above it).
             expect(within({ ...layout.zones.play, y: layout.zones.play.y - 5 * scale, h: layout.zones.play.h + 5 * scale }, box), `${where} ${slot.id}`).toBe(true);
           }
@@ -299,7 +312,8 @@ describe("the play area wraps (user request, 2026-10-29)", () => {
   it("shrinks the play area's cards so they fit without overlapping, down to the floor, on one row or two", () => {
     for (const [canvas, scale, play, rows] of [
       [{ width: 640, height: 400 }, 1, 9, 1],
-      [{ width: 760, height: 520 }, UI_SCALES.small, 10, 2],
+      [{ width: 760, height: 520 }, UI_SCALES.small, 8, 1],
+      [{ width: 760, height: 700 }, 1, 12, 2],
     ] as const) {
       const { views: v, piles } = views(8, { engaged: 5, play });
       const layout = tableLayout(canvas.width, canvas.height, v, piles, { scale });
@@ -313,38 +327,62 @@ describe("the play area wraps (user request, 2026-10-29)", () => {
     }
   });
 
-  it("on a phone, keeps the table's card for a slight squeeze and squeezes one row under the floor, the band unchanged", () => {
-    for (const play of [9, 10, 12]) {
-      const { views: v, piles } = views(8, { engaged: 5, play });
-      const layout = tableLayout(591, 338, v, piles);
-      const cards = playCards(layout);
-      // Nine overlap by under a fifth of a card; ten and twelve do not fit even at the floor. Either way: one row of the table's card.
-      for (const slot of cards) expect(slot.w, `${play}`).toBe(layout.card.w);
-      expect(new Set(cards.filter((slot) => !slot.committed).map((slot) => slot.y)).size, `${play}`).toBe(1);
-      expect(layout.zones.play.h).toBe(layout.card.h + 20);
+  it("on a phone, keeps the table's card for a slight squeeze, and stacks two rows that keep 44 pt targets where one would not", () => {
+    // Nine overlap by under a fifth of a card: one row of the table's card.
+    const nine = playCards(tableLayout(591, 338, views(8, { engaged: 5, play: 9 }).views, views(8).piles));
+    expect(new Set(nine.filter((slot) => !slot.committed).map((slot) => slot.y)).size).toBe(1);
+    expect(nine[0]?.w).toBe(54);
+    for (const scale of [UI_SCALES.small, UI_SCALES.medium]) {
+      for (const play of [10, 12]) {
+        const { views: v, piles } = views(8, { engaged: 5, play });
+        const layout = tableLayout(591, 338, v, piles, { scale });
+        const cards = playCards(layout);
+        const target = touch(scale, MIN_TARGET);
+        const where = `${scale} ${play}`;
+        const rows = [...new Set(cards.filter((slot) => !slot.committed).map((slot) => slot.y))].sort((a, b) => a - b);
+        // One row where it squeezes no step under a target; else the back row shows a 44 pt band above the front row.
+        expect(rows.length, where).toBeLessThanOrEqual(2);
+        if (rows.length === 2) expect((rows[1] ?? 0) - (rows[0] ?? 0), where).toBeCloseTo(target, 9);
+        if (scale === 1 && play === 12) expect(rows, where).toHaveLength(2);
+        expect(cards[0]?.w ?? 0, where).toBeGreaterThanOrEqual(target);
+        for (const y of rows) {
+          const row = cards.filter((slot) => slot.y === y || slot.y === y - 5 * scale).sort((a, b) => a.x - b.x);
+          for (let at = 1; at < row.length; at += 1) {
+            const step = slotBounds(row[at] as CardSlot).x - slotBounds(row[at - 1] as CardSlot).x;
+            expect(step, `${where} row ${y}`).toBeGreaterThanOrEqual(target - 1e-6);
+          }
+        }
+        // The rest of the table has not moved.
+        expect(layout.zones.engaged.y, where).toBeCloseTo(8 * scale + layout.card.h + 6 * scale, 9);
+      }
     }
+    // At Large a stacked card would be under its 50.6 pt target: one row, squeezed, as before.
+    const large = playCards(tableLayout(591, 338, views(8, { engaged: 5, play: 12 }).views, views(8).piles, { scale: UI_SCALES.large }));
+    expect(new Set(large.filter((slot) => !slot.committed).map((slot) => slot.y)).size).toBe(1);
   });
 
   it("keeps staging and the engagement area still when the play area wraps into the ground above the hand", () => {
     let wrapped = 0;
     for (const scale of SCALES) {
-      for (const canvas of TABLETS) {
-        const ready = views(8, { engaged: 5, play: 5 });
-        const tired = views(8, { engaged: 5, play: 5 });
-        // Three characters exhaust (they lie sideways), which can wrap the row.
-        const exhausted = { ...tired.views, play: { ...tired.views.play, entries: tired.views.play.entries.map((e, i) => (i < 3 ? { ...e, card: { ...e.card, exhausted: true } } : e)) } };
-        const before = tableLayout(canvas.width, canvas.height, ready.views, ready.piles, { scale });
-        const after = tableLayout(canvas.width, canvas.height, exhausted, tired.piles, { scale });
-        const ground = before.zones.hand.y - 6 * scale - (before.zones.play.y + before.zones.play.h);
-        if (after.zones.play.h === before.zones.play.h || after.zones.play.h - before.zones.play.h > ground) continue;
-        wrapped += 1;
-        const where = `${scale} ${canvas.width}x${canvas.height}`;
-        expect(after.zones.staging.y, where).toBeCloseTo(before.zones.staging.y, 9);
-        expect(after.zones.engaged.y, where).toBeCloseTo(before.zones.engaged.y, 9);
-        expect(after.zones.play.y, where).toBeCloseTo(before.zones.play.y, 9);
+      for (const canvas of [...TABLETS, { width: 1150, height: 950 }]) {
+        for (const count of [5, 6, 7, 8]) {
+          const ready = views(8, { engaged: 5, play: count });
+          // Three characters exhaust (they lie sideways), which can wrap the row.
+          const exhausted = { ...ready.views, play: { ...ready.views.play, entries: ready.views.play.entries.map((e, i) => (i < 3 ? { ...e, card: { ...e.card, exhausted: true } } : e)) } };
+          const before = tableLayout(canvas.width, canvas.height, ready.views, ready.piles, { scale });
+          const after = tableLayout(canvas.width, canvas.height, exhausted, ready.piles, { scale });
+          // The room under the play area down to a gap above the hand at rest (the hand rises into ground no row needs).
+          const rest = canvas.height - Math.max(touch(scale, MIN_TARGET) + 8 * scale, Math.round(before.card.h * 0.56));
+          const ground = rest - 6 * scale - (before.zones.play.y + before.zones.play.h) - DOWN.playHand.cap * before.card.h;
+          if (after.zones.play.h === before.zones.play.h || after.zones.play.h - before.zones.play.h > ground) continue;
+          wrapped += 1;
+          const where = `${scale} ${canvas.width}x${canvas.height} ${count}`;
+          expect(after.zones.staging.y, where).toBeCloseTo(before.zones.staging.y, 9);
+          expect(after.zones.engaged.y, where).toBeCloseTo(before.zones.engaged.y, 9);
+          expect(after.zones.play.y, where).toBeCloseTo(before.zones.play.y, 9);
+        }
       }
     }
-    // The 12.9" tablet has the ground for it.
     expect(wrapped).toBeGreaterThan(0);
   });
 
@@ -352,7 +390,7 @@ describe("the play area wraps (user request, 2026-10-29)", () => {
     for (const scale of SCALES) {
       const { views: v, piles } = views(8);
       const layout = tableLayout(707, 338, v, piles, { scale });
-      expect(layout.card.w).toBeLessThan(Math.floor(96 * scale));
+      expect(layout.card.w).toBeLessThan(Math.floor(120 * scale));
       expect(layout.zones.questStage.x).toBeCloseTo(8 * scale, 9);
       expect(layout.zones.staging.x).toBeCloseTo(8 * scale + Math.round(layout.card.w * 1.5) + 8 * scale, 9);
     }

@@ -75,10 +75,10 @@ describe("a full table's pictures", () => {
     return [...Array.from({ length: 8 }, (_, i) => slot(`h${i}`, `H${i}`, "hand", hand.w, hand.h)), ...Array.from({ length: 32 }, (_, i) => slot(`t${i}`, `T${i}`, "play", card.w, card.h))];
   }
 
-  it("weigh under 24 MB on a 3x phone and a 2x tablet at Large", () => {
+  it("weigh under 16 MB on a 3x phone and under 36 MB on a 2x 12.9-inch tablet at Large (its card at the 120 pt cap, 138 pt)", () => {
     const phone = pictureBytes(pictureBoxes(table({ w: 54, h: 76 }, { w: 54, h: 76 })), SCAN, 3);
-    const tablet = pictureBytes(pictureBoxes(table({ w: 110, h: 154 }, { w: 110, h: 154 })), SCAN, 2);
-    expect(phone / 2 ** 20).toBeLessThan(24);
-    expect(tablet / 2 ** 20).toBeLessThan(24);
+    const tablet = pictureBytes(pictureBoxes(table({ w: 138, h: 193 }, { w: 138, h: 193 })), SCAN, 2);
+    expect(phone / 2 ** 20).toBeLessThan(16);
+    expect(tablet / 2 ** 20).toBeLessThan(36);
   });
 });

@@ -1,7 +1,7 @@
 // The hand scrub (phase 25): the risen, spread hand and the card under the finger (docs/design-system.md, Table, Gestures).
 import { describe, expect, it } from "vitest";
 
-import { cardAt, cancelled, fanTilts, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
+import { cardAt, cancelled, fanTilts, fingerDistance, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
 import { cardSize, handCardSize, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 import { scrubPose } from "./scrub-pose.ts";
@@ -233,6 +233,18 @@ describe("cardAt", () => {
     const mid = ((spread.centers[1] ?? 0) + (spread.centers[2] ?? 0)) / 2;
     expect(cardAt(spread, mid - 0.5)).toBe(1);
     expect(cardAt(spread, mid + 0.5)).toBe(2);
+  });
+});
+
+describe("fingerDistance", () => {
+  it("is 0 at a card's center and one per step between centers, smoothly in between", () => {
+    const canvas = CANVASES[0] as (typeof CANVASES)[number];
+    const spread = spreadLayout(layoutOf(5, canvas.width, canvas.height), canvas);
+    const step = (spread.centers[1] ?? 0) - (spread.centers[0] ?? 0);
+    expect(fingerDistance(spread, 2, spread.centers[2] ?? 0)).toBe(0);
+    expect(fingerDistance(spread, 3, spread.centers[2] ?? 0)).toBeCloseTo(1, 9);
+    expect(fingerDistance(spread, 4, (spread.centers[2] ?? 0) + step / 2)).toBeCloseTo(1.5, 9);
+    expect(fingerDistance(spread, 9, 0)).toBe(-1);
   });
 });
 

@@ -11,7 +11,7 @@ import { unturn } from "./frame.ts";
 import type { FightKind, PileId, PileView, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
 import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, placeUnder, rowXs, slotOf, type Metrics } from "./layout-slots.ts";
 import { placePlay, playPlan } from "./play-area.ts";
-import { acrossGaps, downGaps } from "./table-spacing.ts";
+import { acrossGaps, DOWN, downGaps, SLACK } from "./table-spacing.ts";
 import { touch } from "./ui-scale.ts";
 
 export { MIN_TARGET } from "./layout-slots.ts";
@@ -102,7 +102,7 @@ const PAIR_STEP = 0.72;
 // Room for the mark between an enemy and the characters fighting it.
 const MARK = 16;
 // The card's widest and narrowest, and the fan's drop per card from the middle.
-const CARD_MAX = 96;
+const CARD_MAX = 120;
 const CARD_MIN = 34;
 const FAN_DROP = 2;
 
@@ -249,16 +249,20 @@ export function tableLayout(
   // face-down shadow cards peeks out two steps under it.
   const engagedH = card.h + peek * Math.max(1, deepestUnder(views.engaged.entries));
   const oneRow = card.h + 2 * peek;
-  const handY = height - bottom - Math.max(m.handMin, Math.round(card.h * HAND_SHOW));
+  const shown = Math.max(m.handMin, Math.round(card.h * HAND_SHOW));
+  const restY = height - bottom - shown;
   // The room under the play area's one row, down to a gap above the hand: the play area's extra rows take it first, and the gaps
   // share what is left (table-spacing.ts).
-  const spare = handY - gap - (gutter + card.h + gap + engagedH + gap + oneRow);
+  const spare = restY - gap - (gutter + card.h + gap + engagedH + gap + oneRow);
   const plan = playPlan(views.play.entries, centerW, card, oneRow, oneRow + Math.max(0, spare), m);
   const grow = downGaps(spare, card.h, scale, plan.h - oneRow);
   const stagingY = gutter + grow.top;
   const engagedY = stagingY + card.h + gap + grow.stagingEngaged;
   const playY = engagedY + engagedH + gap + grow.engagedPlay;
   const playH = plan.h;
+  // Ground no gap can take (a tall tablet) raises the hand, up to its whole card: a tablet player reads the hand without the scrub.
+  const ground = grow.playHand - DOWN.playHand.cap * card.h - SLACK * scale;
+  const handY = restY - Math.min(Math.max(0, ground), Math.max(0, card.h - shown));
 
   // The encounter deck and its discard pile at the right end of staging.
   const encounterW = 2 * pile.w + gap;

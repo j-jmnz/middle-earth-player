@@ -15,32 +15,40 @@ export type ScrubPose = { dx: number; dy: number; scale: number; rot: number };
 /** The room a grown card stays in (the canvas less its edge), and the lifted card's grow there (hand-scrub.ts, `spreadLayout`). */
 export type ScrubRoom = { left: number; right: number; top: number; lift: number };
 
-/** How much a card `distance` places from the one under the finger grows: `lift` for that card, then the falloff; 1 for none (-1). */
+// How far the falloff reaches past the next card: `scrubNear` within one card of the finger, falling on a smooth curve through
+// `scrubNearer` two cards away to nothing about 2.2 cards away.
+const FALLOFF = 1 / Math.sqrt(1 - (SHAPE.scrubNearer - 1) / (SHAPE.scrubNear - 1));
+
+/**
+ * How much a card grows at `distance` from the finger, in cards (a fraction while the finger slides between two centers): `lift` for
+ * the lifted copy (0), then a smooth falloff, `scrubNear` within one card and `scrubNearer` at two; 1 for none (-1).
+ */
 export function magnify(distance: number, lift: number): number {
   "worklet";
   if (distance === 0) return lift;
+  if (distance < 0) return 1;
+  const near = distance <= 1 ? 1 : Math.max(0, 1 - ((distance - 1) / FALLOFF) ** 2);
   // A neighbour never grows past the lifted card's own grow (a short canvas holds that one down).
-  if (distance === 1) return Math.min(SHAPE.scrubNear, lift);
-  if (distance === 2) return Math.min(SHAPE.scrubNearer, lift);
-  return 1;
+  return Math.min(1 + (SHAPE.scrubNear - 1) * near, lift);
 }
 
 /**
  * The pose of one hand card. `slot` is where the layout puts it (with its fan `tilt`), `target` where the spread puts it (with its
- * fan `tilt`); `distance` how many places it is from the card under the finger (0 for the lifted copy, -1 when there is none). A
- * grown card grows from its foot, so it never reaches under the canvas, and is held inside `room`.
+ * fan `tilt`); `distance` how far it is from the finger in cards (0 for the lifted copy, -1 when there is none). `drop` (1 to 0) is
+ * the card the finger just left settling back from its lift. A grown card grows from its foot, so it never reaches under the canvas,
+ * and is held inside `room`.
  */
-export function scrubPose(slot: Rect & { tilt: number }, target: Rect & { tilt: number }, clock: ScrubClock, distance: number, room: ScrubRoom): ScrubPose {
+export function scrubPose(slot: Rect & { tilt: number }, target: Rect & { tilt: number }, clock: ScrubClock, distance: number, room: ScrubRoom, drop = 0): ScrubPose {
   "worklet";
   const lifted = distance === 0;
-  const lift = lifted ? clock.lift * clock.rise : 0;
-  // The lifted card grows on the lift's clock; its neighbours with the hand's rise, and they change with the card under the finger
-  // at once, as the card it left drops at once.
-  const full = magnify(distance, room.lift);
-  const grow = 1 + (full - 1) * (lifted ? lift : distance > 0 ? clock.rise : 0);
+  // The lifted card grows on the lift's clock, and the card it left settles over the same length; the neighbours grow with the
+  // hand's rise, by how near the finger is.
+  const lift = (lifted ? clock.lift : drop) * clock.rise;
+  const up = 1 + (room.lift - 1) * lift;
+  const grow = lifted ? up : Math.max(up, 1 + (magnify(distance, room.lift) - 1) * clock.rise);
   const scale = (1 + (target.w / slot.w - 1) * clock.rise) * grow;
   // The lifted card's foot rises, but never so far that the top edge cuts it.
-  const rise = lifted ? Math.min(target.h * SHAPE.scrubLiftRise, Math.max(0, target.y + target.h - target.h * full - room.top)) * lift : 0;
+  const rise = Math.min(target.h * SHAPE.scrubLiftRise, Math.max(0, target.y + target.h - target.h * room.lift - room.top)) * lift;
   const dx = (target.x + target.w / 2 - (slot.x + slot.w / 2)) * clock.apart;
   const rot = (target.tilt * (1 - lift) - slot.tilt) * clock.rise;
   // Held inside the room: an end card grown past the edge (its turned corners too) is moved in.
