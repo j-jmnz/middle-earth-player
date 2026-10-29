@@ -1,15 +1,16 @@
-// The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, whether it is ready, the
+// The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, the
 // deck at a glance (the sphere donut and count, the cost curve, the counts by type), its notes and the jump chips to its headings.
 import { View } from "react-native";
 
-import { panelSurface } from "../play/surfaces";
+import { dropShadowOf, panelSurface } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
 import { SPHERE_TINT } from "../play/icon-map";
-import { BodyText, Eyebrow, Label, ToggleChip, sphereWord, useTitleShadow } from "./chrome";
+import { BodyText, Label, sphereWord, useTitleShadow } from "./chrome";
 import { CardThumb } from "./images/picture";
 import { ArcRing } from "../play/arc-ring";
 import { costCurve, CURVE_LABELS, deckCardCount, DECK_MINIMUM, sphereSplit, type DeckFace } from "./deck-status";
+import { JumpChips, type Jump } from "./deck-grid";
 import type { HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
 import { touch, useUiScale } from "../play/ui-scale";
@@ -17,8 +18,6 @@ import { Text, TextInput } from "../play/text";
 
 // How far the head's top runs before the deck's own words: Back's row over the fan. The editor watches the scroll past it.
 export const BANNER_HEIGHT = 196;
-
-export type Jump = { key: string; title: string; count: number; index: number };
 
 // A hero card in the fan, at Medium's size: 112 × 156 on a phone, 150 × 209 on a tablet.
 const FAN_CARD = { width: 112, height: 156 };
@@ -31,6 +30,7 @@ const FAN_CARD_WIDE = { width: 150, height: 209 };
  */
 export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: boolean }) {
   const palette = usePalette();
+  const t = useTableTokens();
   const s = useUiScale();
   const card = wide ? FAN_CARD_WIDE : FAN_CARD;
   const w = card.width * s;
@@ -57,7 +57,7 @@ export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: b
               overflow: "hidden",
               backgroundColor: palette.raised,
               zIndex: centre ? 2 : 1,
-              boxShadow: `0 18px 30px ${withAlphaHex(palette.night, 0.9)}`,
+              boxShadow: dropShadowOf(t, 18, 30, 0.9),
               transform: [{ translateX: offset * w * spread }, { translateY: centre ? -8 * s : 6 * s }, { rotate: `${offset * 9}deg` }],
             }}
           >
@@ -134,8 +134,8 @@ export function DeckAnalytics({ cards, faces, ready }: { cards: readonly { code:
 
 /**
  * The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, its heroes and starting
- * threat, whether it is ready, the analytics panel, the notes, and the jump chips to its headings. A view of the draft; the editor owns
- * the state.
+ * threat, the analytics panel, the notes, and the jump chips to its headings. Whether it is ready is said once, beside Save. A view of
+ * the draft; the editor owns the state.
  */
 export function DeckGlance({
   heroes,
@@ -143,7 +143,7 @@ export function DeckGlance({
   faces,
   name,
   onName,
-  readiness,
+  ready,
   threat,
   countLine,
   notApplied,
@@ -160,7 +160,7 @@ export function DeckGlance({
   faces: ReadonlyMap<string, Pick<DeckFace, "cost" | "sphereCode" | "sphereName" | "typeCode">>;
   name: string;
   onName: (next: string) => void;
-  readiness: { ready: boolean; text: string };
+  ready: boolean;
   threat: number | null;
   countLine: string;
   notApplied: string | null;
@@ -195,18 +195,9 @@ export function DeckGlance({
           style={{ minHeight: touch(s, 44), fontSize: 26 * s, lineHeight: 32 * s, ...shadow }}
         />
         {heroLine ? <Text className="text-center text-label text-muted">{heroLine}</Text> : null}
-        <View className="mt-2 items-center">
-          {/* Ready is the green word; not ready says what is missing in red. */}
-          {readiness.ready ? (
-            <Eyebrow testID="deck-ready" tone="moon">
-              {readiness.text}
-            </Eyebrow>
-          ) : (
-            <Text testID="deck-error" className="text-center text-label text-danger">{`Not ready to play: ${readiness.text}`}</Text>
-          )}
-        </View>
-        <View className="mt-3">
-          <DeckAnalytics cards={cards} faces={faces} ready={readiness.ready} />
+        {/* A tablet in portrait keeps the panel to a reading width, so its bars and words stay in proportion. */}
+        <View className="mt-3" style={{ width: "100%", maxWidth: 560 * s, alignSelf: "center" }}>
+          <DeckAnalytics cards={cards} faces={faces} ready={ready} />
         </View>
         <Label testID="deck-count" className="mt-3">
           {countLine}
@@ -228,9 +219,7 @@ export function DeckGlance({
         ) : null}
         {/* Jump to a heading: the deck stays one list (every card reachable by scrolling), and these shorten the trip. */}
         <View className="mt-2 flex-row flex-wrap gap-x-1.5">
-          {jumps.map((jump) => (
-            <ToggleChip key={jump.key} testID={`deck-jump-${jump.key}`} label={`${jump.title} ${jump.count}`} accessibilityLabel={`Go to ${jump.title}, ${jump.count}`} onPress={() => onJump(jump)} />
-          ))}
+          <JumpChips jumps={jumps} onJump={onJump} />
         </View>
       </View>
     </View>

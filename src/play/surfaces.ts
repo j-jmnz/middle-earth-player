@@ -20,6 +20,9 @@ const shade = (t: TableTokens, alpha: number) => withAlphaHex(t.shade, alpha);
 /** The 1 pt lit top edge of a raised surface, drawn as an inset shadow so it costs no extra view. */
 export const raisedEdgeOf = (t: TableTokens = dark) => (isLight(t) ? "inset 0 1px 0 #FFFFFF" : `inset 0 1px 0 ${withAlphaHex(t.accentHigh, 0.16)}`);
 
+/** A drop shadow `y` down and `blur` soft under a card, a coin or a stepper: black at `alpha` on Dark, the warm shade at a third of it on Light. */
+export const dropShadowOf = (t: TableTokens, y: number, blur: number, alpha: number) => `0 ${y}px ${blur}px ${shade(t, isLight(t) ? alpha / 3 : alpha)}`;
+
 /** The depth under a floating panel: the lit edge, a hard 1 pt foot, a long soft shadow, and on Dark a faint green haze. */
 export function panelDepthOf(t: TableTokens = dark): string {
   if (isLight(t)) return `${raisedEdgeOf(t)}, 0 1px 0 ${shade(t, 0.15)}, 0 22px 44px ${shade(t, 0.3)}`;

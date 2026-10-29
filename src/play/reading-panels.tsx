@@ -161,7 +161,7 @@ export function SettingsPanel({
       </ScrollView>
       <View className="flex-row items-center justify-between pt-2">
         <View className="-ml-3">
-          <SettingTextButton label="All settings" accessibilityLabel="All settings. Opens the Settings tab and leaves the table" testID="settings-all" onPress={onAllSettings} />
+          <SettingTextButton label="All settings" accessibilityLabel="All settings. Opens Settings and leaves the table" testID="settings-all" onPress={onAllSettings} />
         </View>
         <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="settings-close" tone="bone" onPress={onClose} />
       </View>

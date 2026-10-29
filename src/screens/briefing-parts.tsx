@@ -22,6 +22,7 @@ import type { HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed, type StarterSeed } from "./starter-decks";
 import { capWidth } from "../play/size-class";
+import { useTheme } from "../play/theme";
 import { useSizeClass } from "../play/use-size-class";
 import { Text } from "../play/text";
 
@@ -232,12 +233,14 @@ export function BriefingScreen({
 export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebrow: string }) {
   const palette = usePalette();
   const titleShadow = useTitleShadow();
+  const light = useTheme() === "light";
   const { size, s } = useSizeClass();
   const big = size === "compact" ? 36 : 56;
   return (
     <>
       {/* Every word over the scene carries the title's shadow: a long name pushes the overline up into the bright sky. */}
-      <Text className="font-bold text-eyebrow uppercase text-moon" style={titleShadow}>
+      {/* Light's moon is too faint over a picture: the overline there is ink. */}
+      <Text className={`font-bold text-eyebrow uppercase ${light ? "text-bone" : "text-moon"}`} style={titleShadow}>
         {eyebrow}
       </Text>
       <Text accessibilityRole="header" testID="briefing-title" className="mt-1 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.12 * s, ...titleShadow }}>
@@ -246,8 +249,9 @@ export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebr
       <View testID="briefing-stages" accessible accessibilityLabel={`Stages: ${facts.stages.join(", ")}`} className="mt-3 flex-row flex-wrap items-center gap-x-1.5 gap-y-1.5">
         {facts.stages.map((stage, index) => (
           <View key={`${stage}:${index}`} className="flex-row items-center gap-1.5">
-            {index > 0 ? <Chevron direction="right" color={palette.faint} size={6} /> : null}
+            {/* The chevron trails its chip, so a wrapped line never opens on one. */}
             <Chip label={`${index + 1} ${stage}`} onArt />
+            {index < facts.stages.length - 1 ? <Chevron direction="right" color={palette.faint} size={6} /> : null}
           </View>
         ))}
       </View>

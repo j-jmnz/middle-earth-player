@@ -62,7 +62,7 @@ export function SaveHero({ line, party }: { line: SaveLine; party: string | null
   const big = size === "compact" ? 42 : size === "medium" ? 62 : 64;
   return (
     <View>
-      <Eyebrow rule>{number ? `${line.name} · ${number} of ${line.total}` : `${line.name} · ${state}`}</Eyebrow>
+      <Eyebrow rule onArt>{number ? `${line.name} · ${number} of ${line.total}` : `${line.name} · ${state}`}</Eyebrow>
       <Text
         testID="continue-next"
         accessibilityRole="header"

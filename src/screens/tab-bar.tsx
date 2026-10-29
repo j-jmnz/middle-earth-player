@@ -87,13 +87,9 @@ function useUnreadyDeck(at: number): boolean {
   useEffect(() => {
     let cancelled = false;
     const frame = requestAnimationFrame(() => {
-      try {
-        const decks = listDecks(user);
-        const faces = deckFaces(catalog, decks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)]));
-        if (!cancelled) setUnready(decks.some((deck) => !deckReadiness(deck, faces).ready));
-      } catch {
-        if (!cancelled) setUnready(false);
-      }
+      const decks = listDecks(user);
+      const faces = deckFaces(catalog, decks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)]));
+      if (!cancelled) setUnready(decks.some((deck) => !deckReadiness(deck, faces).ready));
     });
     return () => {
       cancelled = true;
@@ -237,7 +233,7 @@ function RailTabBar(props: TabBarProps) {
           return item(route.key, focused, options.tabBarIcon?.({ focused, color: focused ? palette.bone : palette.faint, size: RAIL_ICON * s }) as ReactElement | undefined, word, button, route.name === "decks" && unready && !focused);
         })}
         <View className="mt-auto">
-          {item("settings", false, <GearMark color={palette.faint} size={RAIL_ICON} />, "Settings", {
+          {item("settings", false, <GearMark color={palette.faint} size={RAIL_ICON * s} />, "Settings", {
             testID: "settings-open",
             collapsable: false,
             accessibilityRole: "button",

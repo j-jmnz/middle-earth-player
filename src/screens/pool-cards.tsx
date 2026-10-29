@@ -9,7 +9,7 @@ import { CountStepper } from "./count-stepper";
 import { addDraftCard, announceDraftChange, takeDraftCard, type TitleLookup } from "./deck-draft";
 import { CardThumbFrame, RowCardImage, useCardPreview } from "./images/picture";
 import type { PictureSource } from "../play/table-canvas-types";
-import { selectedRingOf } from "../play/surfaces";
+import { dropShadowOf, selectedRingOf } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
 import { usePalette } from "./palette-hook";
@@ -165,7 +165,7 @@ export const PoolCardCell = memo(function PoolCardCell({
         {item.name}
       </Text>
       {adding && count > 0 ? (
-        <View pointerEvents="none" className="absolute h-6 min-w-6 items-center justify-center rounded-pill px-1.5" style={{ right: -6 * s, top: -6 * s, backgroundColor: palette.night, boxShadow: `0 0 0 1.5px ${palette.accentHigh}, 0 2px 6px ${withAlphaHex(palette.night, 0.9)}` }}>
+        <View pointerEvents="none" className="absolute h-6 min-w-6 items-center justify-center rounded-pill px-1.5" style={{ right: -6 * s, top: -6 * s, backgroundColor: palette.night, boxShadow: `0 0 0 1.5px ${palette.accentHigh}, ${dropShadowOf(t, 2, 6, 0.9)}` }}>
           <Text className="font-display text-label text-bone">{String(count)}</Text>
         </View>
       ) : null}

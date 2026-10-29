@@ -203,11 +203,11 @@ export default function CampaignList() {
       },
     };
   };
-  const startPanel = <StartPanel options={startable} current={saves.length === 0} carry={carryChoices} onStart={start} />;
+  const startPanel = <StartPanel options={startable} carry={carryChoices} onStart={start} />;
   // Manage shows Archive and Delete on a playthrough instead of opening it.
   const managed = (save: Save, index: number) => (
     <View key={save.id} testID={`save-${save.id}`}>
-      <Panel current={index === 0}>
+      <Panel>
         <SaveSummary line={lineOf(save)} eyebrow={saves.length > 1 && index === 0} />
         {actions(save, { label: "Archive", onPress: () => archive(save) })}
       </Panel>
@@ -247,12 +247,12 @@ export default function CampaignList() {
     others.length > 0 ? (
       <View testID="other-journeys" style={{ gap: 10 * s }}>
         <Eyebrow>Other journeys</Eyebrow>
-        <View className={grid ? "flex-row flex-wrap" : undefined} style={{ gap: 8 * s }}>
+        <View className={grid ? "flex-row flex-wrap" : undefined} style={grid ? { rowGap: 8 * s, marginHorizontal: -4 * s } : { gap: 8 * s }}>
           {others.map((save, index) =>
             managing ? (
               managed(save, index + 1)
             ) : (
-              <View key={save.id} style={grid ? { flexBasis: "48%", flexGrow: 1 } : undefined}>
+              <View key={save.id} style={grid ? { width: "50%", paddingHorizontal: 4 * s } : undefined}>
                 <SaveRow id={save.id} line={lineOf(save)} lead={partyOf(save)[0] ?? null} onPress={() => openPath(save)} />
               </View>
             ),
@@ -387,7 +387,7 @@ export default function CampaignList() {
     size === "expanded" && twoColumns ? (
       <HeroArt scenarioId={sceneId} width={900 * s} height={760 * s} left={-90 * s} />
     ) : (
-      <HeroArt scenarioId={sceneId} width={Math.max(520 * s, width * s + 120 * s)} height={(size === "compact" ? 540 : 820) * s} />
+      <HeroArt scenarioId={sceneId} width={Math.max(520 * s, width + 120 * s)} height={(size === "compact" ? 540 : 820) * s} />
     )
   ) : null;
 

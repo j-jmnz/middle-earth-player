@@ -3,7 +3,9 @@ import { Pressable, View } from "react-native";
 import { copyCapRule } from "../catalog/deck-save";
 import { usePressedNight } from "./chrome";
 import { usePalette } from "./palette-hook";
+import { dropShadowOf } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
+import { useTableTokens } from "../play/use-table-tokens";
 import { Text } from "../play/text";
 
 /** Whether one more copy would break the copy limit (rr.deckbuilding). */
@@ -34,9 +36,10 @@ export function CountStepper({
   ids?: { dec: string; count: string; inc: string };
 }) {
   const palette = usePalette();
+  const t = useTableTokens();
   const pressedNight = usePressedNight();
   return (
-    <View className="flex-row items-center rounded-tile" style={{ backgroundColor: withAlphaHex(palette.night, 0.92), boxShadow: `0 6px 14px ${withAlphaHex(palette.night, 0.85)}` }}>
+    <View className="flex-row items-center rounded-tile" style={{ backgroundColor: withAlphaHex(palette.night, 0.92), boxShadow: dropShadowOf(t, 6, 14, 0.85) }}>
       {minus ? (
         <Pressable
           testID={ids.dec}

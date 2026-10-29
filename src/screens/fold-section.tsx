@@ -5,7 +5,7 @@
 import { useCallback, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 
-import { withAlphaHex } from "../play/tokens";
+import { SectionRule, sectionTitleStyle } from "../play/section-heading";
 import { useUiScale } from "../play/ui-scale";
 import { Chevron, Chip } from "./chrome-marks";
 import { useDatabases } from "./databases";
@@ -99,14 +99,11 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, de
           <View className="w-3 items-center">
             <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
           </View>
-          <Text className="shrink font-display text-moon" style={{ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 1 * s }}>
+          <Text className="shrink font-display text-moon" style={sectionTitleStyle(s)}>
             {title}
           </Text>
           {badge ? <Chip label={badge} tone="faint" /> : null}
-          <View
-            className="h-px min-w-3 flex-1"
-            style={solid ? { backgroundColor: withAlphaHex(palette.moon, 0.3) } : { backgroundImage: `linear-gradient(90deg, ${withAlphaHex(palette.moon, 0.45)}, ${withAlphaHex(palette.moon, 0)})`, backgroundColor: "transparent" }}
-          />
+          <SectionRule solid={solid} />
           {note != null ? <Text className="pr-1 text-label text-muted">{note}</Text> : null}
         </View>
         {second ? <Text className="pb-1.5 pl-6 text-label text-muted">{second}</Text> : null}

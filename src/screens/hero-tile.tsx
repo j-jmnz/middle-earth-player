@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
 import { CroppedArt } from "./art";
-import { PAINTING } from "./art-crop";
+import { COVER, PAINTING } from "./art-crop";
 import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "./chrome";
 import { CardThumb, useCardPreview } from "./images/picture";
-import { nightFade, rowSurface, selectedRingOf } from "../play/surfaces";
+import { dropShadowOf, nightFade, rowSurface, selectedRingOf } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
@@ -65,11 +65,18 @@ export function HeroTile({
   return (
     <View
       className={`flex-1 overflow-hidden ${flush ? "" : "rounded-tile"}`}
-      style={{ height, ...(flush ? {} : { boxShadow: ringBearer ? selectedRingOf(t, 1.5) : `0 8px 18px ${withAlphaHex(t.shade, t.depth === "light" ? 0.2 : 0.8)}` }) }}
+      style={{ height, ...(flush ? {} : { boxShadow: ringBearer ? selectedRingOf(t, 1.5) : dropShadowOf(t, 8, 18, 0.8) }) }}
     >
       {card != null ? (
         <View>
           <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={card} height={height} />
+          {hero.sphereCode === "fellowship" ? (
+            <View className="absolute left-1 rounded px-1.5 py-0.5" style={{ top: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+              <Text testID={`saga-only-${hero.code}`} className="text-micro font-semibold text-accentHigh" numberOfLines={1}>
+                Saga only
+              </Text>
+            </View>
+          ) : null}
           {loss ? (
             <View className="absolute left-1 right-1 rounded px-1 py-0.5" style={{ bottom: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
               <Text testID={`hero-loss-${hero.code}`} className="text-center text-micro text-muted" numberOfLines={1}>
@@ -79,7 +86,7 @@ export function HeroTile({
           ) : null}
         </View>
       ) : (
-      <CroppedArt card={hero} region={PAINTING} height={height}>
+      <CroppedArt card={hero} region={bare ? COVER : PAINTING} height={height}>
         {bare ? null : (
           <>
             {/* Night rises from the foot, so the name reads on the painting; it grows past a third of the tile rather than lose the name. */}
@@ -148,7 +155,7 @@ export function HeroTile({
           className="absolute right-0 top-0 min-h-touch min-w-touch items-center justify-center"
         >
           {({ pressed }) => (
-            <View className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: pressed ? palette.pressed : withAlphaHex(palette.night, 0.78), boxShadow: `0 4px 10px ${withAlphaHex(palette.night, 0.8)}` }}>
+            <View className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: pressed ? palette.pressed : withAlphaHex(palette.night, 0.78), boxShadow: dropShadowOf(t, 4, 10, 0.8) }}>
               <Text style={{ color: palette.bone, fontSize: 13 * s, lineHeight: 15 * s, fontWeight: "700" }}>{"\u2715"}</Text>
             </View>
           )}
@@ -252,18 +259,11 @@ function heroNames(heroes: readonly HeroFace[]): string {
 }
 
 function StatusLine({ testID, detail, status, note }: { testID: string; detail: string; status: DeckSummary["status"]; note?: string | null }) {
-  const palette = usePalette();
-  const s = useUiScale();
   return (
     <View>
       <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
         <Text className="text-label text-muted">{detail}</Text>
-        <View className="flex-row items-center gap-1.5">
-          <View style={{ width: 8 * s, height: 8 * s, borderRadius: 4 * s, ...(status.ready ? { backgroundColor: palette.ok } : { borderWidth: 1.5, borderColor: palette.danger }) }} />
-          <Text testID={`${testID}-status`} className={`text-label ${status.ready ? "text-ok" : "text-danger"}`}>
-            {status.text}
-          </Text>
-        </View>
+        <Readiness testID={`${testID}-status`} status={status} />
       </View>
       {note ? (
         <Text testID={`${testID}-not-applied`} className="mt-0.5 text-label text-muted">
@@ -313,7 +313,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
                 <Text className="min-w-0 shrink text-label text-muted" numberOfLines={1}>
                   {heroNames(heroes)}
                 </Text>
-                <Readiness testID={testID} status={status} />
+                <Readiness testID={`${testID}-status`} status={status} />
               </View>
               <Text className="text-label text-faint">{detail}</Text>
               {note ? (
@@ -330,15 +330,15 @@ export function DeckCover(props: DeckSummary & { height: number }) {
   );
 }
 
-/** Ready to play, with a green dot, or what the deck still needs, with a red one. */
-function Readiness({ testID, status }: { testID: string; status: DeckSummary["status"] }) {
+/** Ready to play, with a green dot, or what the deck still needs, with a red one. `testID` names the words. */
+export function Readiness({ testID, status, lines = 1 }: { testID: string; status: DeckSummary["status"]; lines?: number }) {
   const palette = usePalette();
   const s = useUiScale();
   const color = status.ready ? palette.ok : palette.danger;
   return (
-    <View className="flex-row items-center gap-1.5">
+    <View className="shrink flex-row items-center gap-1.5">
       <View style={{ width: 7 * s, height: 7 * s, borderRadius: 3.5 * s, backgroundColor: color, boxShadow: `0 0 6px ${withAlphaHex(color, 0.7)}` }} />
-      <Text testID={`${testID}-status`} className="text-label" style={{ color }} numberOfLines={1}>
+      <Text testID={testID} className="shrink text-label" style={{ color }} numberOfLines={lines}>
         {status.text}
       </Text>
     </View>
@@ -356,31 +356,32 @@ export function DeckRow(props: DeckSummary) {
   const thumb = { width: rowThumb.width * s, height: rowThumb.height * s };
   return (
     <View className="mb-1.5 overflow-hidden rounded-tile" style={selected ? { boxShadow: selectedRingOf(t) } : undefined}>
-      <Pressable
-        {...pressProps(props)}
-        className="min-h-16 flex-row items-center gap-3 px-3 py-2"
-        style={({ pressed }) => rowSurface(pressed && !disabled, t)}
-      >
-        <View className="flex-row" style={{ width: thumb.width * 3 - 16 * s, opacity: disabled ? 0.45 : 1 }}>
-          {heroes.length > 0 ? (
-            heroes.slice(0, 3).map((hero, at) => (
-              <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 * s, borderRadius: 3, overflow: "hidden", boxShadow: `0 2px 6px ${withAlphaHex(palette.night, 0.8)}` }}>
-                <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={thumb.width} height={thumb.height} />
-              </View>
-            ))
-          ) : (
-            <View className="items-center justify-center rounded-sm bg-dusk" style={thumb}>
-              <Text className="text-label text-faint">—</Text>
+      {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+      <Pressable {...pressProps(props)}>
+        {({ pressed }) => (
+          <View className="min-h-16 flex-row items-center gap-3 px-3 py-2" style={rowSurface(pressed && !disabled, t)}>
+            <View className="flex-row" style={{ width: thumb.width * 3 - 16 * s, opacity: disabled ? 0.45 : 1 }}>
+              {heroes.length > 0 ? (
+                heroes.slice(0, 3).map((hero, at) => (
+                  <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 * s, borderRadius: 3, overflow: "hidden", boxShadow: dropShadowOf(t, 2, 6, 0.8) }}>
+                    <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={thumb.width} height={thumb.height} />
+                  </View>
+                ))
+              ) : (
+                <View className="items-center justify-center rounded-sm bg-dusk" style={thumb}>
+                  <Text className="text-label text-faint">—</Text>
+                </View>
+              )}
             </View>
-          )}
-        </View>
-        <View className="flex-1">
-          <Text className={`font-display text-heading ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} numberOfLines={1}>
-            {name}
-          </Text>
-          <StatusLine testID={testID} detail={detail} status={status} note={note} />
-        </View>
-        {selected === undefined ? <Chevron direction="right" color={palette.faint} size={8} /> : <SelectedMark selected={selected} />}
+            <View className="flex-1">
+              <Text className={`font-display text-heading ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} numberOfLines={1}>
+                {name}
+              </Text>
+              <StatusLine testID={testID} detail={detail} status={status} note={note} />
+            </View>
+            {selected === undefined ? <Chevron direction="right" color={palette.faint} size={8} /> : <SelectedMark selected={selected} />}
+          </View>
+        )}
       </Pressable>
       {children}
     </View>

@@ -14,7 +14,7 @@ import { BodyText, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Pan
 import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt } from "../../art";
 import { usePalette } from "../../palette-hook";
-import { rowSurface, tileSurface } from "../../../play/surfaces";
+import { dropShadowOf, rowSurface, tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { withAlphaHex } from "../../../play/tokens";
 import { useDatabases } from "../../databases";
@@ -204,7 +204,7 @@ export default function Scenarios() {
   };
   // The number in a small diamond on a scenario's art.
   const badge = (number: number, playable: boolean) => (
-    <View className="items-center justify-center" style={{ width: 24 * s, height: 24 * s, transform: [{ rotate: "45deg" }], backgroundColor: withAlphaHex(palette.night, 0.82), boxShadow: `0 2px 6px ${withAlphaHex(palette.night, 0.8)}` }}>
+    <View className="items-center justify-center" style={{ width: 24 * s, height: 24 * s, transform: [{ rotate: "45deg" }], backgroundColor: t.depth === "light" ? palette.raisedTop : withAlphaHex(palette.night, 0.82), boxShadow: dropShadowOf(t, 2, 6, 0.8) }}>
       <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: playable ? palette.accentHigh : palette.faint, transform: [{ rotate: "-45deg" }] }}>
         {String(number)}
       </Text>
@@ -217,7 +217,8 @@ export default function Scenarios() {
       {BOXES.map((box) => (
       <View key={box.id} testID={`box-${box.id}`}>
       <FoldSection id={`box-${box.id}`} title={box.name} count={box.scenarios.length} unit="scenario" {...fold(`box-${box.id}`)}>
-      <View className={posters ? "flex-row flex-wrap" : undefined} style={{ gap: (posters ? 12 : 8) * s }}>
+      {/* Posters keep one width on every row (a short last row does not stretch): each cell is a column's share, the gutter its padding. */}
+      <View className={posters ? "flex-row flex-wrap" : undefined} style={posters ? { rowGap: 12 * s, marginHorizontal: -6 * s } : { gap: 8 * s }}>
         {box.scenarios.map((id, index) => {
           const playable = isPlayable(id);
           const { line, tone } = playable ? standing(id) : { line: "Not playable yet", tone: palette.faint };
@@ -231,7 +232,7 @@ export default function Scenarios() {
               accessibilityLabel={playable ? `Play ${nameOf(id)}` : `${nameOf(id)}, not playable yet`}
               disabled={!playable}
               onPress={() => brief(id)}
-              style={posters ? { width: `${100 / posters - 2}%`, flexGrow: 1 } : undefined}
+              style={posters ? { width: `${100 / posters}%`, paddingHorizontal: 6 * s } : undefined}
             >
               {({ pressed }) =>
                 posters ? (

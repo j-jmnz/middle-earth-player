@@ -8,7 +8,9 @@ import { SceneArt } from "./art";
 import { Label, Panel, PrimaryButton, RingMark } from "./chrome";
 import { usePalette } from "./palette-hook";
 import { seatWord } from "./seats";
+import { rowSurface, selectedRingOf, selectedWash } from "../play/surfaces";
 import { useUiScale } from "../play/ui-scale";
+import { useTableTokens } from "../play/use-table-tokens";
 import { useSizeClass } from "../play/use-size-class";
 import { Text } from "../play/text";
 
@@ -18,10 +20,10 @@ type Seats = 1 | 2;
 // is `seats-<id>-<n>` and `start-<id>`. `campaign-choice-<id>` is a tile of the chooser.
 const isFellowship = (id: string): boolean => id === FELLOWSHIP_ID;
 
-// One choice of a group the player picks one from: an accent edge when chosen, the raised surface when not (never the accent plate,
-// which is the button's). `min-h-14` keeps the 44 pt target; the words wrap.
+// One choice of a group the player picks one from: the silver ring and wash when chosen, a row's surface when not (never the accent
+// plate, which is the button's). `min-h-14` keeps the 44 pt target; the words wrap.
 function RadioTile({ selected, testID, label, onPress, className, children }: { selected: boolean; testID: string; label: string; onPress: () => void; className: string; children: ReactNode }) {
-  const palette = usePalette();
+  const t = useTableTokens();
   return (
     <Pressable
       testID={testID}
@@ -30,10 +32,14 @@ function RadioTile({ selected, testID, label, onPress, className, children }: { 
       accessibilityLabel={label}
       accessibilityState={{ selected, checked: selected }}
       onPress={onPress}
-      className={className}
-      style={{ backgroundColor: selected ? palette.pressed : palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.accent : palette.hairline }}
+      className={className.includes("flex-1") ? "flex-1" : undefined}
     >
-      {children}
+      {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+      {({ pressed }) => (
+        <View className={className} style={selected ? { ...rowSurface(false, t), ...selectedWash(t), boxShadow: selectedRingOf(t, 1.5) } : rowSurface(pressed, t)}>
+          {children}
+        </View>
+      )}
     </Pressable>
   );
 }
@@ -68,7 +74,7 @@ export type StartOption = { data: CampaignData; name: string };
  * playthrough when there is one to take in (Fresh start is the default), then Start. Every section stays mounted, so the panel
  * keeps its state when one is hidden.
  */
-export function StartPanel({ options, current, carry, onStart }: { options: readonly StartOption[]; current: boolean; carry: readonly CarryChoice[]; onStart: (campaignId: string, seats: Seats, carried: CarryChoice | null) => void }) {
+export function StartPanel({ options, carry, onStart }: { options: readonly StartOption[]; carry: readonly CarryChoice[]; onStart: (campaignId: string, seats: Seats, carried: CarryChoice | null) => void }) {
   const palette = usePalette();
   const s = useUiScale();
   const [campaignId, setCampaignId] = useState<string | null>(null);
@@ -156,7 +162,7 @@ export function StartPanel({ options, current, carry, onStart }: { options: read
   const start = <PrimaryButton label={`Start ${name}`} testID={isFellowship(data.id) ? "start-fellowship" : `start-${data.id}`} onPress={() => onStart(data.id, seats, taken)} />;
   const startPlate = <View className={landscape ? "mt-3" : "mt-4"}>{start}</View>;
   return (
-    <Panel current={current} padded={false}>
+    <Panel padded={false}>
       {compact ? (
         // No scene band and no heading: the selected chip already names the campaign and counts its scenarios, and the primary's
         // whole plate must clear the tab bar on a 390 pt tall screen. Seats and Start share one row.

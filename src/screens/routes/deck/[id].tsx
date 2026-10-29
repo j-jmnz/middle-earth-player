@@ -1,72 +1,31 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams, usePreventRemove, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ActionBar, Chip, FloatingBarShade, NavBar, PaperSheet, PrimaryButton, Screen, SecondaryButton, TextButton, ToggleChip, TwoPane } from "../../chrome";
+import { ActionBar, Chip, FloatingBarShade, NavBar, PaperSheet, PrimaryButton, Screen, SecondaryButton, TextButton, TwoPane } from "../../chrome";
 import { CardPoolBody, type PoolTypeRequest } from "../../card-pool";
-import { BANNER_HEIGHT, DeckGlance, type Jump } from "../../deck-glance";
-import { announceDraftChange, changeDraftCount, discardDraftChanges, draftAddRefused, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, startNewDeck, useDeckDraft, type TitleLookup } from "../../deck-draft";
-import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, notAppliedLine, savedDeckName, startingThreat, type DeckSectionRow } from "../../deck-status";
+import { BANNER_HEIGHT, DeckGlance } from "../../deck-glance";
+import { DeckCardCell, DeckSectionHeader, gridRows, JumpChips, TYPE_NOUN, type EditorCard, type EditorRow, type Jump } from "../../deck-grid";
+import { announceDraftChange, discardDraftChanges, draftAddRefused, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, startNewDeck, useDeckDraft, type TitleLookup } from "../../deck-draft";
+import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, notAppliedLine, savedDeckName, startingThreat } from "../../deck-status";
 import { deckFaces, isStarterDeck, listDecks, notAppliedIn, readDeck, writeDeck } from "../../deck-store";
 import { notAppliedWords } from "../../../play/not-applied";
 import { STARTER_NOTE } from "../../starter-decks";
-import { CountStepper } from "../../count-stepper";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
-import { CardThumb, useCardPreview } from "../../images/picture";
 import { useListPreview } from "../../list-preview";
 import { routeCode } from "../../route-code";
-import { EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "../../hero-tile";
+import { EmptyHeroSlot, HeroTile, heroFace, Readiness, type HeroFace } from "../../hero-tile";
 import { SheetModal } from "../../sheet-modal";
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
 import { goBack } from "../../go-back";
-import type { PictureSource } from "../../../play/table-canvas-types";
 import { MEDIUM_ACTION_GROUP } from "../../../play/size-class";
-import { withAlphaHex } from "../../../play/tokens";
-import { usePalette } from "../../palette-hook";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
 import { Text } from "../../../play/text";
-
-type EditorCard = {
-  code: string;
-  count: number;
-  cost: string | null;
-  name: string;
-  typeCode: string | null;
-  imagesrc: string | null;
-  deckLimit: number | null;
-  sphereCode: string | null;
-  sphereName: string | null;
-};
-
-// The editor's list: Heroes first (its heading, then the hero cards and empty slots), then the card subsections, their cards laid
-// out as rows of a grid (`cols` to a row).
-type EditorRow = Exclude<DeckSectionRow<EditorCard>, { kind: "card" }> | { kind: "heroes"; key: string } | { kind: "grid"; key: string; cards: EditorCard[] };
-
-/** The section rows with each run of cards cut into grid rows of `cols`. */
-function gridRows(rows: readonly DeckSectionRow<EditorCard>[], cols: number): EditorRow[] {
-  const out: EditorRow[] = [];
-  let run: EditorCard[] = [];
-  const flush = () => {
-    for (let at = 0; at < run.length; at += cols) out.push({ kind: "grid", key: `grid-${run[at]!.code}`, cards: run.slice(at, at + cols) });
-    run = [];
-  };
-  for (const row of rows) {
-    if (row.kind === "card") run.push(row.card);
-    else {
-      flush();
-      out.push(row);
-    }
-  }
-  flush();
-  return out;
-}
-
-const TYPE_NOUN: Readonly<Record<string, string>> = { hero: "heroes", ally: "allies", attachment: "attachments", event: "events" };
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
 // The deck's head in an expanded window, in Medium's points (docs/design-system.md, Deck builder); its cards take the rest.
@@ -80,82 +39,6 @@ function onViewableItemsChanged({ viewableItems }: { viewableItems: { item: Edit
     for (const card of item.cards) if (card.imagesrc) jobs.push({ code: card.code, imagesrc: card.imagesrc });
   }
   if (jobs.length > 0) enqueueImageDownloads(jobs);
-}
-
-/**
- * One card of the deck in the grid: its picture, a second card peeking out behind it when the deck holds more than one copy, and the
- * − count + stepper overlapping its foot. A tap opens the card, a long press shows it large.
- */
-function DeckCardCell({
-  card,
-  width,
-  full,
-  lookup,
-  onPreview,
-  loss = null,
-}: {
-  card: EditorCard;
-  width: number;
-  // What the app does not apply of this card ("Ability not applied"), or null.
-  loss?: string | null;
-  // Whether + would be refused: the title (any printing) is at its copy limit.
-  full: boolean;
-  lookup: TitleLookup;
-  onPreview: (code: string, name: string, source: PictureSource | null) => void;
-}) {
-  const router = useRouter();
-  const palette = usePalette();
-  const s = useUiScale();
-  const picture = useCardPreview(card.code, card.imagesrc);
-  const height = Math.round(width * 1.4);
-  return (
-    <View style={{ width, marginBottom: 30 * s }}>
-      {card.count > 1 ? <View pointerEvents="none" style={{ position: "absolute", left: 4 * s, top: 4 * s, width, height, borderRadius: 4, backgroundColor: palette.raised, boxShadow: `0 4px 10px ${withAlphaHex(palette.night, 0.8)}` }} /> : null}
-      <Pressable
-        testID={`deck-card-${card.code}`}
-        collapsable={false}
-        accessibilityRole="button"
-        accessibilityLabel={`${card.name}, ${card.count} in the deck${loss ? `, ${loss}` : ""}`}
-        accessibilityHint="Opens the card. Hold to show it large"
-        onPress={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })}
-        onLongPress={() => onPreview(card.code, card.name, picture)}
-        delayLongPress={350}
-      >
-        {({ pressed }) => (
-          <View style={{ width, height, borderRadius: 4, overflow: "hidden", opacity: pressed ? 0.8 : 1, backgroundColor: palette.raised, boxShadow: `0 8px 18px ${withAlphaHex(palette.night, 0.85)}` }}>
-            <CardThumb code={card.code} imagesrc={card.imagesrc} width={width} height={height} />
-            {loss ? (
-              <View className="absolute left-1 right-1 rounded px-1 py-0.5" style={{ top: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
-                <Text className="text-center text-micro text-muted" numberOfLines={1}>
-                  {loss}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-        )}
-      </Pressable>
-      <View className="absolute left-0 right-0 items-center" style={{ top: height - 22 * s }}>
-        <CountStepper
-          code={card.code}
-          name={card.name}
-          count={card.count}
-          full={full}
-          onChange={(delta) => announceDraftChange(changeDraftCount(card.code, card.name, card.deckLimit, delta, lookup))}
-        />
-      </View>
-    </View>
-  );
-}
-
-/** The chips that jump the cards pane to a heading, with how many cards it holds. */
-function JumpChips({ jumps, onJump }: { jumps: readonly Jump[]; onJump: (jump: Jump) => void }) {
-  return (
-    <>
-      {jumps.map((jump) => (
-        <ToggleChip key={jump.key} testID={`deck-jump-${jump.key}`} label={`${jump.title} ${jump.count}`} accessibilityLabel={`Go to ${jump.title}, ${jump.count}`} onPress={() => onJump(jump)} />
-      ))}
-    </>
-  );
 }
 
 export default function DeckEditor() {
@@ -177,7 +60,6 @@ export default function DeckEditor() {
   // Landscape: the cards pane's measured width, and whether it shows the pool (Add cards) instead of the deck's cards.
   const [gridWidth, setGridWidth] = useState(0);
   const [adding, setAdding] = useState(false);
-  const palette = usePalette();
   const dirty = draftIsDirty(draft);
   const release = usePreventRemove(dirty, ({ repeat }) => setLeaving(() => repeat));
 
@@ -264,7 +146,7 @@ export default function DeckEditor() {
 
   // The grid's cells share the list's width: the screen's on a phone and in portrait, the cards pane's beside the deck in landscape.
   const cellGap = (size === "compact" ? 10 : 14) * s;
-  const listWidth = expanded ? gridWidth : windowWidth * s - (24 * s + insets.left) - (24 * s + insets.right) - 2 * (size === "medium" ? 8 * s : 0);
+  const listWidth = expanded ? gridWidth : windowWidth - (24 * s + insets.left) - (24 * s + insets.right) - 2 * (size === "medium" ? 8 * s : 0);
   const cellWidth = Math.max(60, Math.floor((listWidth - cellGap * (cols - 1)) / cols));
 
   // The hero cards at the head of the list, each with its remove ×, and an empty slot for each hero still to add.
@@ -309,7 +191,7 @@ export default function DeckEditor() {
       faces={faces}
       name={draft.name}
       onName={setDeckName}
-      readiness={readiness}
+      ready={readiness.ready}
       threat={threat}
       countLine={deckCountLine(draft)}
       notApplied={notApplied}
@@ -325,34 +207,7 @@ export default function DeckEditor() {
 
   function renderRow({ item }: { item: EditorRow }) {
     if (item.kind === "heroes") return heroStrip;
-    if (item.kind === "type") {
-      // Heroes add through their empty slots, so only the card subsections carry Add.
-      const heroSection = item.type === "hero";
-      return (
-        <View accessibilityRole="header" className="min-h-touch flex-row items-center justify-between pb-1 pt-5">
-          <View className="min-w-0 flex-1 flex-row items-center gap-2.5">
-            <Text className="font-display text-moon" style={{ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 1 * s }}>
-              {item.title}
-            </Text>
-            <View className="h-px flex-1" style={{ backgroundImage: `linear-gradient(90deg, ${withAlphaHex(palette.moon, 0.45)}, ${withAlphaHex(palette.moon, 0)})` }} />
-            <Text testID={`deck-section-count-${item.type}`} className="text-label text-faint">
-              {heroSection ? `${item.count} of 3` : String(item.count)}
-            </Text>
-          </View>
-          {!heroSection && TYPE_NOUN[item.type] ? (
-            <View className="-mr-3">
-              <TextButton
-                testID={`deck-add-${item.type}`}
-                label="Add"
-                tone="accent"
-                accessibilityLabel={`Add ${TYPE_NOUN[item.type]}`}
-                onPress={() => addOfType(item.type)}
-              />
-            </View>
-          ) : null}
-        </View>
-      );
-    }
+    if (item.kind === "type") return <DeckSectionHeader type={item.type} title={item.title} count={item.count} onAdd={addOfType} />;
     if (item.kind === "empty") {
       return (
         <Text testID={`deck-empty-${item.type}`} className="pb-3 text-label text-faint">
@@ -402,15 +257,8 @@ export default function DeckEditor() {
       renderItem={(info) => <View style={pad}>{renderRow(info)}</View>}
     />
   );
-  // Whether the deck is ready, in words, beside Save: the foot of the deck on every size.
-  const status = (
-    <View className="flex-row items-center gap-2">
-      <View style={{ width: 8 * s, height: 8 * s, borderRadius: 4 * s, backgroundColor: readiness.ready ? palette.ok : palette.danger, boxShadow: `0 0 8px ${withAlphaHex(readiness.ready ? palette.ok : palette.danger, 0.7)}` }} />
-      <Text testID="deck-foot-status" className="shrink text-label" style={{ color: readiness.ready ? palette.ok : palette.danger }} numberOfLines={2}>
-        {readiness.ready ? "Ready to play" : readiness.text}
-      </Text>
-    </View>
-  );
+  // Whether the deck is ready, in words, beside Save: said once, at the foot of the deck on every size.
+  const status = <Readiness testID={readiness.ready ? "deck-ready" : "deck-error"} status={readiness} lines={2} />;
   // The bar: Add cards (opens the pool) on a phone and in portrait, whether the deck is ready, and Save deck, the one primary.
   const actionBar = (align: "auto" | "fill") => (
     <ActionBar align={align}>
@@ -467,7 +315,7 @@ export default function DeckEditor() {
                 <View className="min-w-0 flex-1 flex-row flex-wrap" style={{ columnGap: 6 * s }}>
                   {adding ? null : <JumpChips jumps={jumps} onJump={jumpTo} />}
                 </View>
-                <SecondaryButton testID="deck-add" label={adding ? "Done" : "+ Add cards"} compact onPress={() => setAdding(!adding)} />
+                <SecondaryButton testID="deck-add" label={adding ? "Done" : "+ Add cards"} compact onPress={() => (adding ? setAdding(false) : addOfType(null))} />
               </View>
               <View
                 className="mt-2 min-h-0 flex-1"
@@ -476,7 +324,7 @@ export default function DeckEditor() {
                   setGridWidth((current) => (current === next ? current : next));
                 }}
               >
-                {adding ? <CardPoolBody adding typeRequest={typeRequest} onPreview={preview.open} /> : gridWidth > 0 ? deckList(false, { paddingLeft: 0, paddingRight: 0 }) : null}
+                {adding ? <CardPoolBody adding startType={typeRequest?.type ?? null} typeRequest={typeRequest} onPreview={preview.open} /> : gridWidth > 0 ? deckList(false, { paddingLeft: 0, paddingRight: 0 }) : null}
               </View>
             </View>
           }

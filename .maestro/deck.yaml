@@ -247,7 +247,8 @@ appId: com.middleearth.lcg
     id: deck-stealth-and-steadfastness
 - assertVisible:
     id: saga-only-141001
-- assertVisible: "Frodo Baggins"
+# The editor's hero cards are pictures: the name is in each one's accessibility label ("Frodo Baggins, Fellowship").
+- assertVisible: "Frodo Baggins, .*"
 - scrollUntilVisible:
     element:
       id: deck-card-01073
@@ -255,6 +256,6 @@ appId: com.middleearth.lcg
     timeout: 40000
     speed: 40
     visibilityPercentage: 100
-- assertVisible: "Gandalf"
+- assertVisible: "Gandalf, .*"
 - assertVisible:
     id: deck-card-01073

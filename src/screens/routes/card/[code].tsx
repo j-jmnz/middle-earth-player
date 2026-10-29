@@ -12,6 +12,7 @@ import { pictureMaxWidth, type PicturePane } from "../../card-picture";
 import { nightFade } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { routeCode } from "../../route-code";
+import { useArtGround } from "../../art";
 import { goBack } from "../../go-back";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
@@ -67,6 +68,7 @@ function Zoomable({ children, width, height }: { children: ReactNode; width: num
 
 export default function CardScreen() {
   const t = useTableTokens();
+  const art = useArtGround();
   const s = useUiScale();
   const router = useRouter();
   const params = useLocalSearchParams<{ code: string }>();
@@ -100,14 +102,19 @@ export default function CardScreen() {
   );
 
   return (
-    <Screen scene="calm">
-      {/* The card's own picture, blurred and darkened, as the light behind it: each card sets its own mood. Drawn once, behind. */}
-      {previewSource ? (
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { height: 560 * s }]}>
-          <Image source={previewSource} contentFit="cover" blurRadius={30} accessible={false} style={{ width: "100%", height: 560 * s, opacity: 0.4 }} />
-          <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.1, 1, undefined, t) }} />
-        </View>
-      ) : null}
+    <Screen
+      scene="calm"
+      art={
+        // The card's own picture, blurred and darkened, as the light behind it: each card sets its own mood. Drawn once, on the
+        // scene's art layer, where Light can multiply it onto the ground.
+        previewSource ? (
+          <View pointerEvents="none" style={[StyleSheet.absoluteFill, { height: 560 * s, ...art.blend }]}>
+            <Image source={previewSource} contentFit="cover" blurRadius={30} accessible={false} style={{ width: "100%", height: 560 * s, opacity: 0.4 }} />
+            <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.1, 1, art.ground, t) }} />
+          </View>
+        ) : undefined
+      }
+    >
       <NavBar
         backTestID="back"
         onBack={() => goBack(router, "/cards")}

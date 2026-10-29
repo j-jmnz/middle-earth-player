@@ -17,6 +17,7 @@ import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useCardPreview } from "./images/picture";
 import { usePalette } from "./palette-hook";
+import { useTheme } from "../play/theme";
 import { useUiScale } from "../play/ui-scale";
 
 export type ArtCard = { code: string; imagesrc: string | null };
@@ -215,15 +216,24 @@ export function SceneCard({
 }
 
 /**
+ * How a picture behind a page meets the ground, which is a gradient, not one colour. Dark fades it to night (the ground is near enough
+ * night everywhere). Light multiplies the picture onto the ground and fades it to white, which multiplies to nothing, so it ends on the
+ * ground itself and leaves no band where it stops.
+ */
+export function useArtGround(): { ground: string; blend: { mixBlendMode?: "multiply" } } {
+  const palette = usePalette();
+  return useTheme() === "light" ? { ground: "#FFFFFF", blend: { mixBlendMode: "multiply" } } : { ground: palette.night, blend: {} };
+}
+
+/**
  * A scenario's scene as the art layer of a page (the Campaigns hub): drawn large and dimmed behind the hero words, faded out at its
  * edges by an elliptical shade and taken down to the ground towards its foot, so the words and panels under it sit in the fog. It does
  * not scroll and takes no touches. `left` places it (centred on the page by default).
  */
 export function HeroArt({ scenarioId, width, height, left }: { scenarioId: string | null | undefined; width: number; height: number; left?: number }) {
-  const palette = usePalette();
-  const ground = palette.night;
+  const { ground, blend } = useArtGround();
   return (
-    <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", top: 0, width, height, ...(left == null ? { alignSelf: "center" } : { left }) }}>
+    <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", top: 0, width, height, ...blend, ...(left == null ? { alignSelf: "center" } : { left }) }}>
       <SceneArt scenarioId={scenarioId} width={width} height={height} />
       <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `radial-gradient(52% 64% at 50% 34%, ${withAlphaHex(ground, 0)} 40%, ${ground} 100%)` }} />
       <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 40%, ${withAlphaHex(ground, 0.75)} 70%, ${ground} 88%)` }} />

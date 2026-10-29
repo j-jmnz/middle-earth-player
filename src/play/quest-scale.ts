@@ -8,18 +8,20 @@ import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 import type { Readout } from "./readout.ts";
 
-export type QuestScale = { threat: number; willpower: number; delta: number };
+// `live` is whether the comparison means anything now: only in the Quest phase, where characters are committed and the quest resolves.
+// Outside it the scale rests, dimmed, with no numbers: a Planning "−3 Short" before anyone could commit would be a false alarm.
+export type QuestScale = { threat: number; willpower: number; delta: number; live: boolean };
 
 /** The scale now: the quest readout's numbers when the dock shows one, else the engine's staging threat and committed willpower. */
 export function questScaleOf(game: ScenarioState, ctx: ReduceContext, readout: Readout | null): QuestScale {
   if (readout?.kind === "quest") {
     const willpower = readout.stats.find((stat) => stat.icon === "willpower")?.value ?? 0;
     const threat = readout.stats.find((stat) => stat.icon === "threat")?.value ?? 0;
-    return { threat, willpower, delta: willpower - threat };
+    return { threat, willpower, delta: willpower - threat, live: true };
   }
   const threat = stagingThreat(game, ctx.cards);
   const willpower = committedWillpower(game, ctx.cards);
-  return { threat, willpower, delta: willpower - threat };
+  return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest" };
 }
 
 /** The marker between the dials: "+2" Ahead, "−1" Short, or Even, and the words a screen reader hears. */

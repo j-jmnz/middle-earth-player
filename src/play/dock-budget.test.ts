@@ -59,7 +59,7 @@ describe("the dense dock's words window", () => {
   });
 
   it("counts a title on the title row against the width the pill leaves", () => {
-    const title = "Choose a defender";
+    const title = "Pick a defender";
     expect(titleLinesOf(title, 168)).toBe(1);
     expect(titleLinesOf(title, 168 - PILL_PT)).toBe(2);
     const plan = planWords({ space: STEP_PX + TITLE_PX + LABEL_PX - 1, dense: true, title, textWidth: 168, hasLine: true, foldable: true });

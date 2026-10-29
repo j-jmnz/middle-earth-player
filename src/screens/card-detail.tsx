@@ -22,8 +22,8 @@ import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT, sphereIcon, typeIcon, type IconName } from "../play/icon-map";
 import { notApplied, type NotApplied } from "../play/not-applied";
 import { NotAppliedView } from "../play/not-applied-view";
-import { rowSurface, tileSurface } from "../play/surfaces";
-import { withAlphaHex } from "../play/tokens";
+import { dropShadowOf, rowSurface, tileSurface } from "../play/surfaces";
+import { withAlphaHex, type TableTokens } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
 import { useUiScale } from "../play/ui-scale";
 import { Text } from "../play/text";
@@ -102,10 +102,10 @@ export function useCardPicture(code: string | null, imagesrc: string | null) {
 }
 
 /** The glow a card's picture stands in: its sphere's colour, else the accent, over a deep shadow. */
-export function cardGlowOf(sphereCode: string | null, palette: ReturnType<typeof usePalette>): string {
+export function cardGlowOf(sphereCode: string | null, palette: ReturnType<typeof usePalette>, t: TableTokens): string {
   const tint = SPHERE_TINT[sphereCode ?? ""];
   const color = tint && tint !== "faint" ? palette[tint] : palette.accent;
-  return `0 30px 60px ${withAlphaHex(palette.night, 0.95)}, 0 0 60px ${withAlphaHex(color, 0.35)}`;
+  return `${dropShadowOf(t, 30, 60, 0.95)}, 0 0 60px ${withAlphaHex(color, 0.35)}`;
 }
 
 /** The picture at `width`, rounded and lit by its sphere's glow. `children` wraps the image (the card screen's pinch zoom). */
@@ -117,10 +117,11 @@ export function CardPicture({ row, preview, intrinsic, width, wrap }: {
   wrap?: (image: React.ReactNode, size: { width: number; height: number }) => React.ReactNode;
 }) {
   const palette = usePalette();
+  const t = useTableTokens();
   const size = imageLayoutSize(intrinsic.width, intrinsic.height, width);
   const image = <InspectCardImage code={row.code} source={preview} width={size.width} height={size.height} />;
   return (
-    <View className="self-center" style={{ width: size.width, height: size.height, borderRadius: 10, boxShadow: cardGlowOf(row.sphereCode, palette) }}>
+    <View className="self-center" style={{ width: size.width, height: size.height, borderRadius: 10, boxShadow: cardGlowOf(row.sphereCode, palette, t) }}>
       <View style={{ width: size.width, height: size.height, borderRadius: 10, overflow: "hidden" }}>{wrap ? wrap(image, size) : image}</View>
     </View>
   );
@@ -248,15 +249,13 @@ export function DeckUse({ code }: { code: string }) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const names = useMemo(() => {
-    try {
-      return listDecks(user)
+  const names = useMemo(
+    () =>
+      listDecks(user)
         .filter((deck) => deck.heroes.includes(code) || deck.cards.some((card) => card.code === code))
-        .map((deck) => deck.name);
-    } catch {
-      return [];
-    }
-  }, [user, code]);
+        .map((deck) => deck.name),
+    [user, code],
+  );
   if (names.length === 0) return null;
   return (
     <Pressable testID="card-decks" accessibilityRole="button" accessibilityLabel={`In ${names.length} ${names.length === 1 ? "deck" : "decks"}: ${names.join(", ")}`} onPress={() => router.navigate("/decks")}>

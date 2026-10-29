@@ -144,7 +144,8 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
       <View className="mt-4 flex-row gap-2" testID="resolution-tiles">
         <StatTile label="Score" value={String(scoreTotal(parts))} />
         <StatTile label="Rounds" value={String(parts.rounds)} />
-        <StatTile label="Final threat" value={String(parts.threat)} tone="danger" />
+        {/* Two-handed, the score counts both seats' threat: the tile says so, rather than show a threat past 50. */}
+        <StatTile label={game.seatCount > 1 ? "Threat, both" : "Final threat"} value={String(parts.threat)} tone="danger" />
       </View>
       <Label className="mt-2 text-center">Lower score is better.</Label>
     </View>

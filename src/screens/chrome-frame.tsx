@@ -13,7 +13,7 @@ import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
 import { SheetCornersContext, SheetFrame } from "../play/sheet-paper";
-import { nightFade, panelSurface, rowSurface, selectedWash, tileSurface } from "../play/surfaces";
+import { dropShadowOf, nightFade, panelSurface, rowSurface, selectedWash, tileSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 import { ACTION_GROUP, MEDIUM_ACTION_GROUP, capWidth } from "../play/size-class";
@@ -101,9 +101,10 @@ export function ScreenScroll({
  */
 export function FloatingBarShade({ shown, top }: { shown: boolean; top: number }) {
   const palette = usePalette();
+  const t = useTableTokens();
   const s = useUiScale();
   if (!shown) return null;
-  return <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: top + 60 * s, backgroundColor: withAlphaHex(palette.night, 0.94), boxShadow: `0 12px 24px ${withAlphaHex(palette.night, 0.9)}` }} />;
+  return <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: top + 60 * s, backgroundColor: withAlphaHex(palette.night, 0.94), boxShadow: dropShadowOf(t, 12, 24, 0.9) }} />;
 }
 
 /**
@@ -193,23 +194,27 @@ export function ListRow({
       onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={350}
-      className="mb-1.5 min-h-14 flex-row items-center rounded-tile py-2"
-      style={({ pressed }) => [{ paddingLeft: 14 * s, paddingRight: 10 * s }, selected ? selectedWash(t) : rowSurface(pressed, t)]}
+      className="mb-1.5"
     >
-      {selected ? <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3 * s, backgroundColor: palette.accentHigh }} /> : null}
-      {leading ? <View className="mr-3">{leading}</View> : null}
-      <View className="flex-1">
-        <Text className={`font-display text-heading ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
-        {detail ? (
-          <View className="mt-0.5 flex-row items-center gap-1.5">
-            {detailIcons}
-            <Text className="shrink text-label text-muted">{detail}</Text>
+      {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+      {({ pressed }) => (
+        <View className="min-h-14 flex-row items-center overflow-hidden rounded-tile py-2" style={{ paddingLeft: 14 * s, paddingRight: 10 * s, ...(selected ? selectedWash(t) : rowSurface(pressed, t)) }}>
+          {selected ? <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3 * s, backgroundColor: palette.accentHigh }} /> : null}
+          {leading ? <View className="mr-3">{leading}</View> : null}
+          <View className="flex-1">
+            <Text className={`font-display text-heading ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
+            {detail ? (
+              <View className="mt-0.5 flex-row items-center gap-1.5">
+                {detailIcons}
+                <Text className="shrink text-label text-muted">{detail}</Text>
+              </View>
+            ) : null}
           </View>
-        ) : null}
-      </View>
-      {trailing ?? (
-        <View className="w-6 items-center">
-          <Chevron direction="right" color={palette.faint} size={8} />
+          {trailing ?? (
+            <View className="w-6 items-center">
+              <Chevron direction="right" color={palette.faint} size={8} />
+            </View>
+          )}
         </View>
       )}
     </Pressable>
@@ -217,20 +222,17 @@ export function ListRow({
 }
 
 /**
- * A floating panel: lit along its top edge and lifted by its shadow, with no drawn edge. `current` (the Continue card, the scenario to
- * play) is kept for its callers and draws the same: Carved Stone rings only what is selected. `pressed` is the pressed fill. `unfilled` is a thing put away: no fill and no shadow, its
- * contents dimmed by the caller.
+ * A floating panel: lit along its top edge and lifted by its shadow, with no drawn edge (Carved Stone rings only what is selected).
+ * `pressed` is the pressed fill. `unfilled` is a thing put away: no fill and no shadow, its contents dimmed by the caller.
  */
 export function Panel({
   children,
-  current = false,
   pressed = false,
   unfilled = false,
   className,
   padded = true,
 }: {
   children: ReactNode;
-  current?: boolean;
   pressed?: boolean;
   unfilled?: boolean;
   className?: string;

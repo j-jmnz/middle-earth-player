@@ -138,15 +138,21 @@ export default function CampaignPath() {
   ) : null;
   const scores = new Map(nodes.flatMap((node) => (node.score != null ? [[node.id, String(node.score)] as const] : [])));
   const replay = (node: PathNode) => () => router.push(briefingHref(save.id, node.id));
-  // A won stop opens its summary with Replay; the scenario to play opens its briefing; a locked one does nothing.
+  // A won stop opens its summary with Replay; the scenario to play resumes its table when it is the one open, else opens its briefing;
+  // a locked one does nothing.
   const onStop = (node: PathNode) =>
-    node.status === "completed" ? () => setPicked(picked === node.id ? null : node.id) : node.status === "current" ? () => router.push(briefingHref(save.id, node.id)) : undefined;
+    node.status === "completed"
+      ? () => setPicked(picked === node.id ? null : node.id)
+      : node.status === "current"
+        ? () => router.push(open?.id === node.id ? tableHref(save.id) : briefingHref(save.id, node.id))
+        : undefined;
   const wide = size !== "compact";
   const stopSize = size === "compact" ? 72 : size === "medium" ? 110 : 96;
   const currentSize = size === "compact" ? 104 : size === "medium" ? 160 : 140;
   const road = roadWidth > 0 ? roadLayout(nodes, roadWidth, stopSize * s, currentSize * s, LABEL * s, size === "expanded") : null;
   const roadView = (
-    <View onLayout={(event) => setRoadWidth(Math.round(event.nativeEvent.layout.width))} style={{ paddingTop: 12 * s }}>
+    // The current stop's glow reaches 40 pt past its ring: the road starts low enough that the scroll's edge never cuts it.
+    <View onLayout={(event) => setRoadWidth(Math.round(event.nativeEvent.layout.width))} style={{ paddingTop: 40 * s }}>
       {road ? <Road stops={road.stops} height={road.height} width={roadWidth} label={LABEL * s} onStop={onStop} scores={scores} /> : null}
     </View>
   );
@@ -163,6 +169,16 @@ export default function CampaignPath() {
       <SecondaryButton label="Log" testID="log-open" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
     </View>
   );
+  // A replay is open while the campaign's next scenario waits: Begin that one too, with what dealing it costs.
+  const beginAnother =
+    open && current && open.id !== current.id ? (
+      <View>
+        <SecondaryButton label={`Begin ${current.name}`} testID="begin" compact onPress={() => router.push(briefingHref(save.id, current.id))} />
+        <Text testID={`hint-${current.id}`} className="mt-1.5 text-label text-muted">
+          A scenario is open. Dealing this one drops it.
+        </Text>
+      </View>
+    ) : null;
   const pickedNode = picked ? (nodes.find((node) => node.id === picked && node.status === "completed") ?? null) : null;
   const stagesOf = (id: string) => (scenarioOf(id)?.stages ?? []).map((code) => names.get(code) ?? stageNames.get(code) ?? code);
   // The panel at the foot: a won stop's summary while one is picked, else the next move, else the campaign's end.
@@ -177,7 +193,6 @@ export default function CampaignPath() {
     if (next) {
       const node = open ?? current;
       const stages = node ? scenarioOf(node.id)?.stages.length ?? null : null;
-      const beginOther = open && current && open.id !== current.id;
       return (
         <Panel>
           <View className={horizontal ? "flex-row items-center" : undefined} style={{ gap: 16 * s }}>
@@ -195,14 +210,7 @@ export default function CampaignPath() {
                   <PrimaryButton label={next.label} testID={next.testID} accessibilityLabel={`${next.label} ${next.words.replace(/^.*?: /, "")}`} onPress={next.onPress} />
                 </View>
               </View>
-              {beginOther && current ? (
-                <View>
-                  <SecondaryButton label={`Begin ${current.name}`} testID="begin" compact onPress={() => router.push(briefingHref(save.id, current.id))} />
-                  <Text testID={`hint-${current.id}`} className="mt-1.5 text-label text-muted">
-                    A scenario is open. Dealing this one drops it.
-                  </Text>
-                </View>
-              ) : null}
+              {beginAnother}
             </View>
           </View>
         </Panel>
@@ -268,6 +276,7 @@ export default function CampaignPath() {
                         <PrimaryButton label={next.label} testID={next.testID} accessibilityLabel={`${next.label} ${next.words.replace(/^.*?: /, "")}`} onPress={next.onPress} />
                       </View>
                     </View>
+                    {beginAnother}
                   </View>
                 </Panel>
               ) : (
@@ -288,7 +297,8 @@ export default function CampaignPath() {
         {roadView}
         {poolLine}
       </ScreenScroll>
-      <ActionBar>{footPanel(size === "medium")}</ActionBar>
+      {/* A tablet in portrait lays the panel across the page (its scene, the name, Log and Begin in a row), not in the bar's 480 group. */}
+      <ActionBar align={size === "medium" ? "fill" : "auto"}>{footPanel(size === "medium")}</ActionBar>
     </Screen>
   );
 }
