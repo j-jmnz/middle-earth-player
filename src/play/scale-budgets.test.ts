@@ -71,10 +71,14 @@ describe("scale 1 is unchanged and 1.15 is proportional", () => {
     expect(Math.abs(q.width - p.width * L)).toBeLessThanOrEqual(1);
     expect(cardWidth(500, 1)).toBe(cardWidth(500));
     expect(cardWidth(500 * L, L)).toBeCloseTo(cardWidth(500) * L, -1);
-    const stage = stageOf({ width: 600, height: 330 }, { w: 50, h: 70 }, 2, true);
-    const big = stageOf({ width: 600 * L, height: 330 * L }, { w: 50 * L, h: 70 * L }, 2, true, L);
+    const area = (k: number) => ({ width: 800 * k, height: 360 * k, origin: { x: 40 * k, y: 50 * k }, safe: { top: 10 * k, right: 40 * k, bottom: 20 * k, left: 40 * k } });
+    const stage = stageOf(area(1), { w: 50, h: 70 }, 2, true);
+    const big = stageOf(area(L), { w: 50 * L, h: 70 * L }, 2, true, L);
     expect(big.target.w).toBeCloseTo(stage.target.w * L, 6);
     expect(big.target.x).toBeCloseTo(stage.target.x * L, 6);
     expect(big.contact.y).toBeCloseTo(stage.contact.y * L, 6);
+    expect(big.gap).toBeCloseTo(stage.gap * L, 6);
+    expect(big.note.cy).toBeCloseTo(stage.note.cy * L, 6);
+    expect(big.radius).toBeCloseTo(stage.radius * L, 6);
   });
 });

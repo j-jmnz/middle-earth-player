@@ -100,28 +100,41 @@ export const MOTION = {
   threatBadgeOut: tween(400, null),
   toastIn: tween(160, null),
   toastOut: tween(120, null),
-  // The combat spotlight (phase 24), one attack: the table dims and the cards fly to the center (dim), the attacker draws back
-  // (draw), lunges (lunge), everything holds at the hit (hold), the target shakes while the damage tokens fly or the defense
-  // bounces (impact, with burstStep and burstFly inside it), and both go back (return). A destroyed target greys and drops (fall)
-  // as the attacker returns; a turned shadow card flips with `cardFlip`. The six beats add up to `spotlight`.
-  spotlightDim: tween(250, "outCubic"),
-  spotlightDraw: tween(250, "outCubic"),
-  spotlightLunge: tween(150, "inCubic"),
-  spotlightHold: tween(80, null),
-  spotlightImpact: tween(370, "linear"),
-  spotlightReturn: tween(400, "inCubic"),
+  // The combat spotlight, one attack (docs/plans/combat-spotlight-redesign.md): the dark comes in and the cards arc to the center
+  // (enter), the medallions pop and a shadow card flips (read), the attacker draws back and glows (charge), strikes (lunge),
+  // everything holds at the hit (stop), the target takes it (impact, with burstStep and burstFly inside it) and both go back
+  // (return). A destroyed target burns inside the return (burn). The seven beats add up to `spotlight`.
+  spotlightEnter: tween(350, "outCubic"),
+  spotlightRead: tween(300, "outCubic"),
+  spotlightCharge: tween(350, "outQuad"),
+  spotlightLunge: tween(120, "inCubic"),
+  spotlightStop: tween(100, null),
+  spotlightImpact: tween(480, "linear"),
+  spotlightReturn: tween(500, "inCubic"),
+  spotlightBurn: tween(450, "inQuad"),
+  // Several attacks in one state: the dark is already in, so the second and later attacks come in over a swap (no flight from the
+  // slots) with a shorter read and charge, and only the last goes back. Swap, readAgain, chargeAgain, lunge, stop and impact add
+  // up to `SPOTLIGHT_AGAIN`.
+  spotlightSwap: tween(200, "outCubic"),
+  spotlightReadAgain: tween(100, "outCubic"),
+  spotlightChargeAgain: tween(200, "outQuad"),
+  // Inside the impact: the flash and the shockwave ring, the sparks and the trauma shake, the damage number's rise and settle, the
+  // damage tokens' step and flight, the stamp and the attacker's recoil, the shadow card's flip and glint, and the gap between
+  // the afterimages of the lunge.
+  spotlightFlash: tween(160, "outQuad"),
+  spotlightRing: tween(360, "outCubic"),
+  spotlightSparks: tween(450, "outCubic"),
+  spotlightShake: tween(420, "linear"),
+  spotlightNumberRise: tween(140, "outCubic"),
+  spotlightNumberSettle: spring(260, 0.5),
   spotlightBurstStep: tween(90, null),
-  spotlightBurstFly: tween(190, "outCubic"),
-  spotlightBounceRise: tween(120, "outCubic"),
-  spotlightBounceSettle: spring(250, 0.5),
-  spotlightFall: tween(250, "outCubic"),
-  // Several attacks in one state: the table is already dark, so the second and later attacks come in over a swap (no dim, no
-  // flight from the slots) with a shorter draw back, and only the last goes back. The scrim over the bar and the dock fades in and,
-  // when a tap skips the spotlight, out over `spotlightScrim`.
-  spotlightSwap: tween(150, "outCubic"),
-  spotlightDrawAgain: tween(125, "outCubic"),
-  spotlightScrim: tween(100, "outCubic"),
-  spotlight: tween(1500, "linear"),
+  spotlightBurstFly: tween(220, "outCubic"),
+  spotlightStamp: tween(160, "outCubic"),
+  spotlightRecoil: spring(320, 0.5),
+  spotlightFlip: tween(300, "outCubic"),
+  spotlightGlint: tween(260, "linear"),
+  spotlightTrailStep: tween(16, null),
+  spotlight: tween(2200, "linear"),
   // The hand scrub (phase 25): the held hand rises (and grows and turns its fan) over `scrubRise` and spreads sideways over `scrubSpread`,
   // together; the card under the finger lifts over `scrubLift`; the hand settles back over `scrubFall`. The table's 35% night
   // rides the rise. The 150 ms hold and the 6 pt slop that start it are gesture thresholds (hand-scrub.ts), not tokens.
@@ -131,8 +144,12 @@ export const MOTION = {
   scrubFall: tween(180, "inCubic"),
 } as const;
 
-/** The six beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
-export const SPOTLIGHT_BEATS = ["spotlightDim", "spotlightDraw", "spotlightLunge", "spotlightHold", "spotlightImpact", "spotlightReturn"] as const;
+/** The seven beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
+export const SPOTLIGHT_BEATS = ["spotlightEnter", "spotlightRead", "spotlightCharge", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightReturn"] as const;
+
+/** The beats of an attack that follows another in the same state, which add up to `SPOTLIGHT_AGAIN` (ms, unscaled): it swaps in, and does not go back unless it is the last. */
+export const SPOTLIGHT_AGAIN_BEATS = ["spotlightSwap", "spotlightReadAgain", "spotlightChargeAgain", "spotlightLunge", "spotlightStop", "spotlightImpact"] as const;
+export const SPOTLIGHT_AGAIN = 1200;
 
 /** The tokens that may pass 500 ms (a title sweep across the canvas, and the whole run of the combat spotlight, phase 24). */
 export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight"];
@@ -168,28 +185,6 @@ export const SHAPE = {
   dialPop: 1.22,
   // Drawn cards leave one after another, at most this many places apart.
   maxStagger: 5,
-  // The combat spotlight: the cards stand at this share of the canvas's height with this gap (pt) between them; the attacker
-  // draws back this far (pt) and tilts this many degrees away; the target shakes this far (pt) in this many swings; a blocked
-  // attack bounces its defense to this scale; a destroyed target drops this far (pt) under a night veil of this opacity; the
-  // table dims to this night opacity; up to this many attackers stand as a fan; a turned shadow card stands at this scale; the
-  // damage token art flies at this size (pt).
-  spotlightHeight: 0.42,
-  spotlightGap: 24,
-  spotlightDrawBack: 10,
-  spotlightTilt: 4,
-  spotlightShake: 5,
-  spotlightSwings: 3,
-  // A blocked defender shakes this share as far as one that was hit.
-  spotlightShakeBlocked: 0.4,
-  // A destroyed target's veil is full by this share of its fall; it fades out over the rest.
-  spotlightVeilBy: 0.4,
-  spotlightBounce: 1.25,
-  spotlightDrop: 12,
-  spotlightVeil: 0.5,
-  spotlightNight: 0.65,
-  spotlightFan: 3,
-  spotlightShadow: 0.8,
-  spotlightToken: 28,
   // The hand scrub: the risen hand's cards grow to this scale (a hand too wide for a 44 pt slice of each at this scale gets a
   // smaller one), the card under the finger grows to this much more from its foot and its foot rises this share of its height
   // (less where the canvas's top edge would cut it), and the rest of the table dims to this night opacity. Its neighbours keep

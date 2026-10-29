@@ -1,6 +1,7 @@
 import type { SlotNumbers } from "./card-effects.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import type { LayoutOptions } from "./layout.ts";
+import type { StageArea } from "./spotlight-stage.ts";
 import type { TableStore } from "./store.ts";
 
 export type PictureSource = { uri: string } | number;
@@ -49,6 +50,9 @@ export type TableCanvasProps = {
   fight: LayoutOptions["preview"];
   // The bottom safe-area inset the hand stays above.
   bottomInset: number;
+  // The screen the combat spotlight fills (spotlight-stage.ts): its size, where this canvas's corner is on it and the safe insets.
+  // Without it the stage fills the canvas itself.
+  stageArea?: StageArea;
   // Readability (table-settings.ts): larger cards, and effect marks and token counts with strong outlines.
   look?: { contrast: boolean };
   // A tap on a card, or on a pile ("pile:discard"). The screen decides what it does; a tap never sends an intent.

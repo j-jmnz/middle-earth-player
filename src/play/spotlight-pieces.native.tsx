@@ -10,11 +10,13 @@ import { cardCorner } from "./card-corner.ts";
 import { CanvasIcon, CardBody, Outlined, type BackImages, type Fonts } from "./canvas-pieces.native.tsx";
 import type { IconName } from "./icon-map.ts";
 import type { Rect } from "./layout.ts";
-import { SHAPE } from "./motion-tokens.ts";
 import { burstAt, type Frame, type Place } from "./spotlight-beats.ts";
 import type { SpotCard } from "./spotlight-plan.ts";
-import { burstPoint, flown, PILL_H, type Stage } from "./spotlight-stage.ts";
+import { burstPoint, flown, strikeOffset, type Stage } from "./spotlight-stage.ts";
 import type { TableTokens } from "./tokens.ts";
+
+// The height of the medallion pill (pt, Medium's).
+const PILL_H = 34;
 
 /** Which of an attack's cards this is: it decides how the frame moves it. */
 export type Role = "attacker" | "target" | "shadow";
@@ -23,17 +25,16 @@ export type Role = "attacker" | "target" | "shadow";
  * A card between its slot and the stage: it flies out, the attacker draws back and lunges, the target shakes and falls, and a
  * shadow card turns over. `rect` is where it stands on the stage and `turn` its fan turn; `children` draw it there.
  */
-export function FlyingCard({ spot, rect, turn, role, frame, s, children }: { spot: SpotCard; rect: Rect; turn: number; role: Role; frame: SharedValue<Frame>; s: number; children: ReactNode }) {
+export function FlyingCard({ spot, rect, turn, role, stage, frame, children }: { spot: SpotCard; rect: Rect; turn: number; role: Role; stage: Stage; frame: SharedValue<Frame>; children: ReactNode }) {
   const origin = vec(rect.x + rect.w / 2, rect.y + rect.h / 2);
   const transform = useDerivedValue(() => {
     const f = frame.get();
     const p = flown(spot.from, spot.turn, rect, turn, role === "target" ? f.flyTarget : f.flyAttackers);
-    const dx = (role === "attacker" ? f.strike : role === "target" ? f.shake : 0) * s;
-    const dy = role === "target" ? SHAPE.spotlightDrop * s * f.fall : 0;
-    const flip = role === "shadow" ? Math.abs(Math.cos(Math.PI * f.flip)) : 1;
-    return [{ translateX: p.tx + dx }, { translateY: p.ty + dy }, { rotate: p.turn + (role === "attacker" ? f.tilt : 0) }, { scale: p.scale }, { scaleX: flip }];
+    const dx = role === "attacker" ? strikeOffset(stage, f) : role === "target" ? f.knock * stage.knock : 0;
+    const flip = role === "shadow" ? Math.abs(Math.cos(f.flipAngle)) : 1;
+    return [{ translateX: p.tx + dx }, { translateY: p.ty }, { rotate: p.turn + (role === "attacker" ? f.tilt : 0) }, { scale: p.scale }, { scaleX: flip }];
   });
-  const opacity = useDerivedValue(() => (role === "target" ? frame.get().targetOpacity : 1));
+  const opacity = useDerivedValue(() => (role === "target" ? 1 - frame.get().dissolve : 1));
   return (
     <Group transform={transform} origin={origin} opacity={opacity}>
       {children}
@@ -47,20 +48,20 @@ export function StageCard({ spot, rect, image, name, sphere, fonts, backs, t, s,
   return <CardBody slot={slot} image={image} name={name} sphere={sphere} fonts={fonts} encounterBack={faceDown} backs={backs} t={t} s={s} />;
 }
 
-/** The night veil over a destroyed target, growing to 50% over the first 40% of its fall. */
+/** The night veil over a destroyed target, growing to 50% as it burns (the fallback when the burn shader does not compile). */
 export function Veil({ rect, frame, t, s }: { rect: Rect; frame: SharedValue<Frame>; t: TableTokens; s: number }) {
-  const opacity = useDerivedValue(() => frame.get().veil);
+  const opacity = useDerivedValue(() => 0.5 * frame.get().dissolve);
   return <RoundedRect x={rect.x} y={rect.y} width={rect.w} height={rect.h} r={cardCorner(rect.w, rect.h)} color={t.night} opacity={opacity} />;
 }
 
 /** A big pill under a group: the stat's icon and its number in Cinzel Bold. The defense pill bounces when the attack is blocked. */
-export function Pill({ at, icon, color, text, font, frame, t, s, bounce = false }: { at: { cx: number; cy: number }; icon: IconName; color: string; text: string; font: SkFont; frame: SharedValue<Frame>; t: TableTokens; s: number; bounce?: boolean }) {
+export function Pill({ at, icon, color, text, font, frame, t, s, badge }: { at: { cx: number; cy: number }; icon: IconName; color: string; text: string; font: SkFont; frame: SharedValue<Frame>; t: TableTokens; s: number; badge: "badgeA" | "badgeD" }) {
   const height = PILL_H * s;
   const width = (12 + 20 + 6 + 12) * s + font.getTextWidth(text);
   const left = at.cx - width / 2;
   const top = at.cy - height / 2;
-  const opacity = useDerivedValue(() => frame.get().pills);
-  const transform = useDerivedValue(() => [{ scale: bounce ? frame.get().bounce : 1 }]);
+  const opacity = useDerivedValue(() => Math.min(1, frame.get()[badge]));
+  const transform = useDerivedValue(() => [{ scale: frame.get()[badge] }]);
   return (
     <Group transform={transform} origin={vec(at.cx, at.cy)} opacity={opacity}>
       <RoundedRect x={left} y={top} width={width} height={height} r={height / 2} color={t.night} />
@@ -95,7 +96,7 @@ export function Word({ at, text, font, t, color = t.bone, opacity }: { at: { cx:
  */
 export function Corner({ stage, before, after, image, font, frame, t, s }: { stage: Stage; before: number; after: number; image: SkImage | null; font: SkFont; frame: SharedValue<Frame>; t: TableTokens; s: number }) {
   const { cx, cy } = stage.corner;
-  const size = SHAPE.spotlightToken * s;
+  const size = stage.token;
   const pop = useDerivedValue(() => [{ scale: frame.get().pop }]);
   const old = useDerivedValue(() => (frame.get().landed ? 0 : 1));
   const now = useDerivedValue(() => (frame.get().landed ? 1 : 0));
@@ -115,7 +116,7 @@ export function Corner({ stage, before, after, image, font, frame, t, s }: { sta
 
 /** One damage token on its way from the point of contact to the target's corner. */
 export function BurstToken({ stage, index, count, now, k, place, image, t, s }: { stage: Stage; index: number; count: number; now: SharedValue<number>; k: number; place: Place; image: SkImage | null; t: TableTokens; s: number }) {
-  const size = SHAPE.spotlightToken * s;
+  const size = stage.token;
   const flight = useDerivedValue(() => burstAt(index, count, now.get(), k, place));
   const transform = useDerivedValue(() => {
     const p = burstPoint(stage, index, count, flight.get().u, s);

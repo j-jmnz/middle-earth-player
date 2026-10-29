@@ -1,51 +1,65 @@
-// Where the combat spotlight's cards stand (docs/design-system.md, Table, Spotlight; phase 24). Pure geometry, like layout.ts:
-// the attacker (or a fan of up to three attackers, then "+n") at the left and the target at the right, side by side at the middle of the
-// canvas, enlarged to 42% of its height with a 24 pt gap, a pill under each, and a turned shadow card beside the enemy. The beats
-// that move them are in spotlight-beats.ts; the canvas draws them in spotlight.native.tsx. At a UI `scale` (ui-scale.ts) the stage is
-// worked out in logical points (the canvas and the card over the scale) and every length comes back times the scale.
+// Where the combat spotlight's cards stand (docs/plans/combat-spotlight-redesign.md, §2; docs/design-system.md, Table, Spotlight). Pure
+// geometry, like layout.ts, for the whole screen: the attacker (or a fan of up to three attackers, then "+n") at the left and the
+// target at the right, centered on the screen at 60% of its height (at most 340 pt), a medallion straddling each card's foot, a
+// turned shadow card beside the enemy, and a note chip above the bottom safe inset. The beats that move them are in
+// spotlight-beats.ts. At a UI `scale` (ui-scale.ts) the stage is worked out in logical points (the area and the card over the
+// scale) and every length comes back times the scale.
 import type { Rect } from "./layout.ts";
-import { SHAPE } from "./motion-tokens.ts";
+import { SPOT } from "./spotlight-shape.ts";
 
-// The pills under the cards.
-export const PILL_H = 34;
-const PILL_GAP = 8;
-// The word "Blocked" under the target's pill.
-const WORD_H = 18;
-// A fan card is this share of a card to the right of the one before it, and turns this many degrees from its neighbor.
-const FAN_STEP = 0.36;
-const FAN_TURN = (5 * Math.PI) / 180;
-// Room between a shadow card and the enemy: wider than the draw back, so the attacker never touches it.
-const SHADOW_GAP = 16;
-// The canvas keeps this much at each side.
-const EDGE = 8;
+export type Insets = { top: number; right: number; bottom: number; left: number };
+
+/**
+ * The area the stage fills: the screen's size, where the table canvas's top-left corner is on it (the layout's slots are in canvas
+ * points, so `origin` carries them onto the screen), and the safe insets. The stage is in screen points.
+ */
+export type StageArea = { width: number; height: number; origin: { x: number; y: number }; safe: Insets };
+
+/** Whether two areas are the same size, place and insets. */
+export function sameArea(a: StageArea, b: StageArea): boolean {
+  return a.width === b.width && a.height === b.height && a.origin.x === b.origin.x && a.origin.y === b.origin.y && a.safe.top === b.safe.top && a.safe.right === b.safe.right && a.safe.bottom === b.safe.bottom && a.safe.left === b.safe.left;
+}
 
 export type Stage = {
   // The attackers left to right (the front one last, nearest the target), and each one's turn in radians.
   attackers: Rect[];
   turns: number[];
   target: Rect;
-  // The turned shadow card, at 80%, to the left of the enemy; null when the attack turned none.
+  // The turned shadow card, at 72% and bottom-aligned, to the left of the fan; null when the attack turned none.
   shadow: Rect | null;
-  // The centers of the pill under the attackers, the pill under the target, and the word under it.
-  attackPill: { cx: number; cy: number };
-  targetPill: { cx: number; cy: number };
-  word: { cx: number; cy: number };
-  // Where the attacker meets the target, and the target's damage corner: the damage tokens fly from one to the other.
+  // The centers of the attack medallion (under the attackers), the defense medallion (under the target), and the medallions' radius.
+  badgeA: { cx: number; cy: number };
+  badgeD: { cx: number; cy: number };
+  radius: number;
+  // Where the attacker meets the target, and the target's damage corner: the damage tokens fly from one to the other. `token` is their size.
   contact: { x: number; y: number };
   corner: { cx: number; cy: number };
+  token: number;
+  // The damage number at the target's center, and the stamp ("Blocked", "Destroyed") below it with its turn in radians.
+  number: { cx: number; cy: number };
+  stamp: { cx: number; cy: number; turn: number };
   // The "+n" for the attackers past the fan, at the top of the first card.
   more: { cx: number; cy: number } | null;
-  // The line under the pills for two or more attacks ("2 of 3 · Tap to skip"), centered on the canvas.
-  note: { cx: number; cy: number };
+  // The note chip ("2 of 3 · Tap to skip", "Tap to skip"), centered on the screen: its center and its height.
+  note: { cx: number; cy: number; h: number };
+  // The card height, the gap between the fan and the target, how far the attacker draws back, how far it is knocked back when it is
+  // blocked and the target when it is hit (all pt); the attackers' lunge reaches the target after `gap`.
+  cardH: number;
+  gap: number;
+  drawBack: number;
+  recoil: number;
+  knock: number;
 };
 
 /**
- * The stage on a canvas of this size. `card` is the table's card size (its aspect is kept). With `attackers` characters the fan
- * shows up to three; with a `shadow` card an enemy's attack makes room for it at the left. The whole group is centered, and
- * shrinks when the canvas is too narrow for it.
+ * The stage on an area of this size. `card` is the table's card size (its aspect is kept). With `attackers` characters the fan
+ * shows up to three; with a `shadow` card an enemy's attack makes room for it at the left. The whole group is centered on the
+ * screen, and shrinks when the screen is too narrow for it or a medallion would touch the note chip.
  */
-export function stageOf(canvas: { width: number; height: number }, card: { w: number; h: number }, attackers: number, shadow: boolean, scale = 1): Stage {
-  const stage = stageIn({ width: canvas.width / scale, height: canvas.height / scale }, { w: card.w / scale, h: card.h / scale }, attackers, shadow);
+export function stageOf(area: StageArea, card: { w: number; h: number }, attackers: number, shadow: boolean, scale = 1): Stage {
+  const safe = area.safe;
+  const logical: StageArea = { width: area.width / scale, height: area.height / scale, origin: area.origin, safe: { top: safe.top / scale, right: safe.right / scale, bottom: safe.bottom / scale, left: safe.left / scale } };
+  const stage = stageIn(logical, card.w / card.h, attackers, shadow);
   return scale === 1 ? stage : scaledStage(stage, scale);
 }
 
@@ -58,51 +72,76 @@ function scaledStage(stage: Stage, s: number): Stage {
     turns: stage.turns,
     target: rect(stage.target),
     shadow: stage.shadow ? rect(stage.shadow) : null,
-    attackPill: at(stage.attackPill),
-    targetPill: at(stage.targetPill),
-    word: at(stage.word),
+    badgeA: at(stage.badgeA),
+    badgeD: at(stage.badgeD),
+    radius: stage.radius * s,
     contact: { x: stage.contact.x * s, y: stage.contact.y * s },
     corner: at(stage.corner),
+    token: stage.token * s,
+    number: at(stage.number),
+    stamp: { ...at(stage.stamp), turn: stage.stamp.turn },
     more: stage.more ? at(stage.more) : null,
-    note: at(stage.note),
+    note: { ...at(stage.note), h: stage.note.h * s },
+    cardH: stage.cardH * s,
+    gap: stage.gap * s,
+    drawBack: stage.drawBack * s,
+    recoil: stage.recoil * s,
+    knock: stage.knock * s,
   };
 }
 
-function stageIn(canvas: { width: number; height: number }, card: { w: number; h: number }, attackers: number, shadow: boolean): Stage {
-  const aspect = card.w / card.h;
-  const shown = Math.max(1, Math.min(attackers, SHAPE.spotlightFan));
-  const room = canvas.width - 2 * EDGE;
-  const wide = (w: number) => (shadow ? w * SHAPE.spotlightShadow + SHADOW_GAP : 0) + w * (1 + FAN_STEP * (shown - 1)) + SHAPE.spotlightGap + w;
-  let h = Math.round(SHAPE.spotlightHeight * canvas.height);
-  let w = Math.round(h * aspect);
+function stageIn(area: StageArea, aspect: number, attackers: number, shadow: boolean): Stage {
+  const { width, height, safe } = area;
+  const shown = Math.max(1, Math.min(attackers, SPOT.fan));
+  // The group is centered on the screen, so it keeps the larger inset at both sides.
+  const room = width - 2 * Math.max(safe.left, safe.right) - SPOT.margin;
+  const gapOf = (w: number) => Math.max(SPOT.gapMin, Math.round(SPOT.gapShare * w));
+  const wide = (w: number) => (shadow ? Math.round(w * SPOT.shadow) + SPOT.shadowGap : 0) + w * (1 + SPOT.fanStep * (shown - 1)) + gapOf(w) + w;
+  // The note chip sits above the bottom safe inset, and no medallion may reach it.
+  const noteH = SPOT.noteHeight;
+  const noteCy = height - safe.bottom - SPOT.noteRoom - noteH / 2;
+  const centerY = Math.round(SPOT.centerY * height);
+  const tallest = Math.floor(2 * (noteCy - noteH / 2 - SPOT.noteClear - SPOT.medal - centerY));
+  let h = Math.max(1, Math.min(Math.round(SPOT.height * height), SPOT.maxHeight, tallest));
+  let w = Math.max(1, Math.round(h * aspect));
   if (wide(w) > room) {
-    w = Math.floor(w * (room / wide(w)));
+    for (let guard = 0; wide(w) > room && w > 8 && guard < 64; guard += 1) w = Math.min(w - 1, Math.floor((w * room) / wide(w)));
     h = Math.round(w / aspect);
   }
-  const sw = Math.round(w * SHAPE.spotlightShadow);
-  const sh = Math.round(h * SHAPE.spotlightShadow);
+  const sw = Math.round(w * SPOT.shadow);
+  const sh = Math.round(h * SPOT.shadow);
+  const gap = gapOf(w);
   const total = wide(w);
-  const top = Math.max(EDGE, Math.round((canvas.height - (h + PILL_GAP + PILL_H + 2 * WORD_H)) / 2));
-  const left = Math.round((canvas.width - total) / 2);
-  const fanLeft = left + (shadow ? sw + SHADOW_GAP : 0);
-  const step = Math.round(w * FAN_STEP);
+  const top = centerY - Math.round(h / 2);
+  const left = Math.round((width - total) / 2);
+  const fanLeft = left + (shadow ? sw + SPOT.shadowGap : 0);
+  const step = Math.round(w * SPOT.fanStep);
+  const turn = (SPOT.fanTurn * Math.PI) / 180;
   const attackerRects = Array.from({ length: shown }, (_, index) => ({ x: fanLeft + index * step, y: top, w, h }));
   const front = attackerRects[shown - 1] ?? { x: fanLeft, y: top, w, h };
-  const target = { x: front.x + w + SHAPE.spotlightGap, y: top, w, h };
-  const radius = SHAPE.spotlightToken / 2;
-  const pillY = top + h + PILL_GAP + PILL_H / 2;
+  const target = { x: front.x + w + gap, y: top, w, h };
+  const token = Math.round(SPOT.token * h);
+  const foot = top + h;
   return {
     attackers: attackerRects,
-    turns: attackerRects.map((_, index) => (index - (shown - 1) / 2) * FAN_TURN),
+    turns: attackerRects.map((_, index) => (index - (shown - 1) / 2) * turn),
     target,
     shadow: shadow ? { x: left, y: top + (h - sh), w: sw, h: sh } : null,
-    attackPill: { cx: fanLeft + (w * (1 + FAN_STEP * (shown - 1))) / 2, cy: pillY },
-    targetPill: { cx: target.x + w / 2, cy: pillY },
-    word: { cx: target.x + w / 2, cy: pillY + PILL_H / 2 + WORD_H / 2 + 2 },
+    badgeA: { cx: fanLeft + (w * (1 + SPOT.fanStep * (shown - 1))) / 2, cy: foot },
+    badgeD: { cx: target.x + w / 2, cy: foot },
+    radius: SPOT.medal,
     contact: { x: target.x, y: top + h / 2 },
-    corner: { cx: target.x + w - radius - 2, cy: top + radius + 2 },
-    more: attackers > shown ? { cx: fanLeft + 16, cy: top + 14 } : null,
-    note: { cx: canvas.width / 2, cy: pillY + PILL_H / 2 + WORD_H + WORD_H / 2 + 4 },
+    corner: { cx: target.x + w - token / 2 - SPOT.tokenInset, cy: top + token / 2 + SPOT.tokenInset },
+    token,
+    number: { cx: target.x + w / 2, cy: top + h / 2 },
+    stamp: { cx: target.x + w / 2, cy: top + Math.round(h * 0.72), turn: (SPOT.stampTurn * Math.PI) / 180 },
+    more: attackers > shown ? { cx: fanLeft + 22, cy: top + 20 } : null,
+    note: { cx: width / 2, cy: noteCy, h: noteH },
+    cardH: h,
+    gap,
+    drawBack: Math.round(SPOT.drawBack * h),
+    recoil: Math.round(SPOT.recoil * h),
+    knock: Math.round(SPOT.knock * h),
   };
 }
 
@@ -128,4 +167,10 @@ export function burstPoint(stage: Stage, index: number, count: number, u: number
     scale: 0.6 + 0.4 * u + 0.25 * arc,
     opacity: u > 0.85 ? (1 - u) / 0.15 : 1,
   };
+}
+
+/** How far the attacker stands from its place in the fan, in points (negative is away from the target), from a frame's `back`, `strike` and `recoil`. */
+export function strikeOffset(stage: Stage, pose: { back: number; strike: number; recoil: number }): number {
+  "worklet";
+  return -stage.drawBack * pose.back + (stage.gap + stage.drawBack) * pose.strike - stage.recoil * pose.recoil;
 }

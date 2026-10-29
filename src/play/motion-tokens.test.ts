@@ -2,7 +2,8 @@
 import { describe, expect, it } from "vitest";
 
 import { ease, springStep } from "./motion-curves.ts";
-import { ARM_BAR_EASING, LONG_TOKENS, MAX_TOKEN_MS, MOTION, ms, motionScale, SHAPE, SPOTLIGHT_BEATS, springTune, timed, type EasingName, type Spring, type Tween } from "./motion-tokens.ts";
+import { SPOT } from "./spotlight-shape.ts";
+import { ARM_BAR_EASING, LONG_TOKENS, MAX_TOKEN_MS, MOTION, ms, motionScale, SHAPE, SPOTLIGHT_AGAIN, SPOTLIGHT_AGAIN_BEATS, SPOTLIGHT_BEATS, springTune, timed, type EasingName, type Spring, type Tween } from "./motion-tokens.ts";
 
 const entries = Object.entries(MOTION) as [string, Tween | Spring][];
 const springs = entries.filter((entry): entry is [string, Spring] => "zeta" in entry[1]);
@@ -46,23 +47,38 @@ describe("the tokens", () => {
     expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "sweep"]);
   });
 
-  it("make a spotlight of at most 1.6 s at Normal and 0.6 of it at Quick, each beat at most 500 ms", () => {
+  it("make a spotlight of 2200 ms at Normal and 1320 at Quick, each beat at most 500 ms", () => {
     for (const name of SPOTLIGHT_BEATS) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
-    for (const name of ["spotlightBurstStep", "spotlightBurstFly", "spotlightBounceRise", "spotlightBounceSettle", "spotlightFall", "spotlightSwap", "spotlightDrawAgain", "spotlightScrim"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
-    // The six beats, in order, are the run.
+    // The seven beats, in order, are the run.
     expect(SPOTLIGHT_BEATS.reduce((sum, name) => sum + MOTION[name].ms, 0)).toBe(MOTION.spotlight.ms);
-    expect(MOTION.spotlight.ms).toBeLessThanOrEqual(1600);
-    expect(ms(MOTION.spotlight, motionScale("normal", false))).toBeLessThanOrEqual(1600);
-    expect(ms(MOTION.spotlight, motionScale("quick", false))).toBe(900);
+    expect(MOTION.spotlight.ms).toBe(2200);
+    expect(ms(MOTION.spotlight, motionScale("normal", false))).toBe(2200);
+    expect(ms(MOTION.spotlight, motionScale("quick", false))).toBe(1320);
     // Reduced motion plays none.
     expect(ms(MOTION.spotlight, motionScale("normal", true))).toBe(0);
-    // The beats of the table's sequence: 250 dim, 250 draw back, 150 lunge, 80 hold, 370 impact, 400 return.
-    expect(SPOTLIGHT_BEATS.map((name) => MOTION[name].ms)).toEqual([250, 250, 150, 80, 370, 400]);
-    // A later attack of the same state swaps in (150 ms) instead of dimming, and draws back in 125; the scrim over the bar and the dock takes 100.
-    expect([MOTION.spotlightSwap.ms, MOTION.spotlightDrawAgain.ms, MOTION.spotlightScrim.ms]).toEqual([150, 125, 100]);
-    expect(MOTION.spotlightSwap.ms + MOTION.spotlightDrawAgain.ms + MOTION.spotlightLunge.ms + MOTION.spotlightHold.ms + MOTION.spotlightImpact.ms).toBe(875);
-    // The burst fits the impact: three tokens 90 ms apart, the last landing as the impact ends.
-    expect(2 * MOTION.spotlightBurstStep.ms + MOTION.spotlightBurstFly.ms).toBe(MOTION.spotlightImpact.ms);
+    expect(SPOTLIGHT_BEATS.map((name) => MOTION[name].ms)).toEqual([350, 300, 350, 120, 100, 480, 500]);
+    // A later attack of the same state swaps in (200 ms) instead of entering, reads in 100 and charges in 200: 1200 ms in all.
+    expect(SPOTLIGHT_AGAIN_BEATS.reduce((sum, name) => sum + MOTION[name].ms, 0)).toBe(SPOTLIGHT_AGAIN);
+    expect(SPOTLIGHT_AGAIN).toBe(1200);
+    expect([MOTION.spotlightSwap.ms, MOTION.spotlightReadAgain.ms, MOTION.spotlightChargeAgain.ms]).toEqual([200, 100, 200]);
+    // The burn runs inside the return.
+    expect(MOTION.spotlightBurn).toEqual({ ms: 450, easing: "inQuad" });
+    expect(MOTION.spotlightBurn.ms).toBeLessThanOrEqual(MOTION.spotlightReturn.ms);
+    // The sub-tokens, none past 500 ms.
+    for (const name of ["spotlightFlash", "spotlightRing", "spotlightSparks", "spotlightShake", "spotlightNumberRise", "spotlightNumberSettle", "spotlightBurstStep", "spotlightBurstFly", "spotlightStamp", "spotlightRecoil", "spotlightFlip", "spotlightGlint", "spotlightTrailStep"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
+    expect([MOTION.spotlightFlash.ms, MOTION.spotlightRing.ms, MOTION.spotlightSparks.ms, MOTION.spotlightShake.ms]).toEqual([160, 360, 450, 420]);
+    expect(MOTION.spotlightNumberRise.ms).toBe(140);
+    expect(MOTION.spotlightNumberSettle).toEqual({ ms: 260, zeta: 0.5 });
+    expect(MOTION.spotlightRecoil).toEqual({ ms: 320, zeta: 0.5 });
+    expect([MOTION.spotlightStamp.ms, MOTION.spotlightFlip.ms, MOTION.spotlightGlint.ms, MOTION.spotlightTrailStep.ms]).toEqual([160, 300, 260, 16]);
+    // The effects that play in the impact fit inside it: three tokens 90 ms apart, the last landing as the burst ends; the shake and the sparks run on.
+    expect(2 * MOTION.spotlightBurstStep.ms + MOTION.spotlightBurstFly.ms).toBeLessThanOrEqual(MOTION.spotlightImpact.ms);
+    expect(MOTION.spotlightFlash.ms).toBeLessThan(MOTION.spotlightImpact.ms);
+    expect(MOTION.spotlightShake.ms).toBeLessThanOrEqual(MOTION.spotlightImpact.ms);
+  });
+
+  it("have dropped the tokens the redesign replaced", () => {
+    for (const name of ["spotlightDim", "spotlightDraw", "spotlightHold", "spotlightDrawAgain", "spotlightFall", "spotlightScrim", "spotlightBounceRise", "spotlightBounceSettle"]) expect(name in MOTION, name).toBe(false);
   });
 
   it("keep the values the earlier phases named", () => {
@@ -147,7 +163,7 @@ describe("the hand scrub's tokens (phase 25)", () => {
     expect(SHAPE.scrubLiftScale).toBe(1.55);
     expect(SHAPE.scrubLiftRise).toBe(0.25);
     expect(SHAPE.scrubNight).toBe(0.35);
-    expect(SHAPE.scrubNight).toBeLessThan(SHAPE.spotlightNight);
+    expect(SHAPE.scrubNight).toBeLessThan(SPOT.dark);
   });
 });
 

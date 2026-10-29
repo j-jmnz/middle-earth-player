@@ -24,6 +24,7 @@ import { AT_REST } from "./motion.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "./peek.ts";
 import { actingSeat, shownSeat } from "./selectors.ts";
 import { Spotlight } from "./spotlight.native.tsx";
+import type { StageArea } from "./spotlight-stage.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
@@ -42,7 +43,7 @@ function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: 
   return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight: marked, raised, fight, bottomInset, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight: marked, raised, fight, bottomInset, stageArea, look, onTap, onPreview, onDrop }: TableCanvasProps) {
   // The UI scale, read once here and handed down with the tokens: to the layout, the fonts, every piece and the spotlight (user request, 2026-10-28).
   const s = useUiScale();
   const contrast = look?.contrast ?? false;
@@ -78,7 +79,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
   const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat, acting);
   // The attacks the state resolved play on top of the table first (spotlight.native.tsx); the touch that skips them does nothing else.
-  const spot = useSpotlight(store, layout, k);
+  const area = useMemo<StageArea>(() => stageArea ?? { width, height, origin: { x: 0, y: 0 }, safe: { top: 0, right: 0, bottom: bottomInset, left: 0 } }, [stageArea, width, height, bottomInset]);
+  const spot = useSpotlight(store, layout, area, k);
   const { swallow, live } = spot;
 
   // Each face-up code at the largest size it is drawn: a hand card at the scrub's lifted size (table-pictures.ts).
