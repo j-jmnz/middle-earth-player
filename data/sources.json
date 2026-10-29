@@ -249,6 +249,2429 @@
         }
       ]
     },
+    "pictures": {
+      "id": "pictures",
+      "site": "https://lotr.cardgame.tools",
+      "pin": {
+        "kind": "sha256",
+        "value": "9e1ccaefdb49019c10ffde2fa3a9787abbe835e55edb8b387e2c93805e235034"
+      },
+      "fetchedAt": "2026-10-29T09:55:59.309Z",
+      "files": [
+        {
+          "path": "pictures/lotr_lcg.db",
+          "url": "https://lotr.cardgame.tools/lotr_lcg.db",
+          "sha256": "d985549738776a7186af5005b7a6087f178bc96fea8a61c56e3bdfb075bdc96a",
+          "bytes": 7065600
+        },
+        {
+          "path": "pdf/core_set_campaign_cards.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf",
+          "sha256": "569866d6814700f6b6e80ceb7c027263f2c3d513afbfac07c9af01c1ac9ae231",
+          "bytes": 16239508
+        },
+        {
+          "path": "pdf/dark_of_mirkwood_campaign_cards.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf",
+          "sha256": "99aa149fa83b37a532ecf68b176e5ee5cfc19e35ea2aa7305e35af72c4b9642b",
+          "bytes": 25263489
+        },
+        {
+          "path": "pictures/01001.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-1-front-Hero-Aragorn-Leadership.jpg",
+          "sha256": "d260782925fdc703fc0364f48444df814317c8b6ef1ec5f7648758da9a2897d4",
+          "bytes": 887771
+        },
+        {
+          "path": "pictures/01002.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-2-front-Hero-Theodred-Leadership.jpg",
+          "sha256": "b45251e844a8ab5826f5a3aa06696bf514a1d0865b83ee36325baf942b12ec60",
+          "bytes": 846431
+        },
+        {
+          "path": "pictures/01003.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-3-front-Hero-Gloin-Leadership.jpg",
+          "sha256": "bf99c6ae9a0c55efc528abc7323598cb60f63fa20ccd5b9b9b36deda9d076b1c",
+          "bytes": 917967
+        },
+        {
+          "path": "pictures/01004.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-4-front-Hero-Gimli-Tactics.jpg",
+          "sha256": "1ff33afdfee18ac827fb6ef96472248c6cb53060e30fbc40c898fe0f32791588",
+          "bytes": 838018
+        },
+        {
+          "path": "pictures/01005.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-5-front-Hero-Legolas-Tactics.jpg",
+          "sha256": "7048e7285894dba260a73fc38af8c808cc7b12dda3d381d443a04c90ff892826",
+          "bytes": 835981
+        },
+        {
+          "path": "pictures/01006.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-6-front-Hero-Thalin-Tactics.jpg",
+          "sha256": "b70351e8c81ac794f55893e083ad5a3c39f2352e89e8e4903e0bddafa69844a5",
+          "bytes": 928305
+        },
+        {
+          "path": "pictures/01007.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-7-front-Hero-Eowyn-Spirit.jpg",
+          "sha256": "5e2275f08d63a1ea4241258440a6cbf8310218f4c4e68d746bdf8166e77cd617",
+          "bytes": 833418
+        },
+        {
+          "path": "pictures/01008.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-8-front-Hero-Eleanor-Spirit.jpg",
+          "sha256": "414a7575b046161ada968ecec76a1570a147a5a767975f2e041f32ec3358cd07",
+          "bytes": 791711
+        },
+        {
+          "path": "pictures/01009.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-9-front-Hero-Dunhere-Spirit.jpg",
+          "sha256": "f8d0e98e1111c98ae062cc16048155d65dae049cad41d9a79c9c0918e54f6b2d",
+          "bytes": 838005
+        },
+        {
+          "path": "pictures/01010.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-10-front-Hero-Denethor-Lore.jpg",
+          "sha256": "26774205f3b17515d7a3649e5c957f650e8f4840d1cabfc93ed26e0552668950",
+          "bytes": 801753
+        },
+        {
+          "path": "pictures/01011.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-11-front-Hero-Glorfindel-Lore.jpg",
+          "sha256": "764d3f51cd979165cc1fff4d1973b100e51af85103047a28ea98a8e5529b1565",
+          "bytes": 833927
+        },
+        {
+          "path": "pictures/01012.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-12-front-Hero-Beravor-Lore.jpg",
+          "sha256": "b3f274bf428c851a1d610d677149308c9431395dba35133dcd1f68d24d890f52",
+          "bytes": 825891
+        },
+        {
+          "path": "pictures/01013.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-13-front-Ally-Guard_of_the_Citadel-Leadership.jpg",
+          "sha256": "2af4a1e7b73c98186eacbbf5e2802813dd41bade6fea825369048a9fbb6fee0d",
+          "bytes": 832950
+        },
+        {
+          "path": "pictures/01014.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-14-front-Ally-Faramir-Leadership.jpg",
+          "sha256": "65fb63a6a22910f8624cc70a351a179afd5cb2597c46429d9daa6feb17fae1f8",
+          "bytes": 939714
+        },
+        {
+          "path": "pictures/01015.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-15-front-Ally-Son_of_Arnor-Leadership.jpg",
+          "sha256": "98118420eda79e2698e64a86ce393f5d45787545d8c3b8b2b7965bd2235f180e",
+          "bytes": 912229
+        },
+        {
+          "path": "pictures/01016.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-16-front-Ally-Snowbourn_Scout-Leadership.jpg",
+          "sha256": "027f3f3be82e0860a7547e826aee4ae821d427979c05db9efd174b637bf60b6f",
+          "bytes": 892543
+        },
+        {
+          "path": "pictures/01017.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-17-front-Ally-Silverlode_Archer-Leadership.jpg",
+          "sha256": "10806abe8b22bea4cd0d4d2401e28ff4a02cdf5abd92e9407d70c8d585ae0a4b",
+          "bytes": 905183
+        },
+        {
+          "path": "pictures/01018.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-18-front-Ally-Longbeard_Orc_Slayer-Leadership.jpg",
+          "sha256": "06dc4446767acc49f134efda012002f60cb0ac1771d200a497dc3357f8384497",
+          "bytes": 818246
+        },
+        {
+          "path": "pictures/01019.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-19-front-Ally-Brok_Ironfist-Leadership.jpg",
+          "sha256": "4e25edcf3f5308de88a88d12519aaaf84b5fbec718308f0e922b518f0301fce7",
+          "bytes": 903705
+        },
+        {
+          "path": "pictures/01020.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-20-front-Event-Ever_Vigilant-Leadership.jpg",
+          "sha256": "0b45523ac891965feeaa15d2826c5c01c17d9d2c69f0f35d4ec01960fd3f8270",
+          "bytes": 880604
+        },
+        {
+          "path": "pictures/01021.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-21-front-Event-Common_Cause-Leadership.jpg",
+          "sha256": "50fd98e7649dccfe3b5f3aae4c3c64a67e073ec87a49ecf4019bde5d48e0349e",
+          "bytes": 871438
+        },
+        {
+          "path": "pictures/01022.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-22-front-Event-For_Gondor-Leadership.jpg",
+          "sha256": "9569a0111af00a89af7b7d94018fb1f0721dbc605dff85187e177322f6f36d93",
+          "bytes": 824553
+        },
+        {
+          "path": "pictures/01023.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-23-front-Event-Sneak_Attack-Leadership.jpg",
+          "sha256": "17259696fd503d0c03df143547ec1dffbe07b9e7db7e8ccb61ebe10179ed8615",
+          "bytes": 842176
+        },
+        {
+          "path": "pictures/01024.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-24-front-Event-Valiant_Sacrifice-Leadership.jpg",
+          "sha256": "6b735085462b10356f8af17ff6d2ce1ab3e5dc2b61259812fff2d2c30fc3c33c",
+          "bytes": 855192
+        },
+        {
+          "path": "pictures/01025.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-25-front-Event-Grim_Resolve-Leadership.jpg",
+          "sha256": "9402932fd2674c2ee2c01a3e25f330a3d4ff16366e7f42c99bda45b802955ea1",
+          "bytes": 787257
+        },
+        {
+          "path": "pictures/01026.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-26-front-Attachment-Steward_of_Gondor-Leadership.jpg",
+          "sha256": "0031cacbe8ba004240f1d128f0c9c99318928eee208a022557de798f33ab6363",
+          "bytes": 924441
+        },
+        {
+          "path": "pictures/01027.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-27-front-Attachment-Celebrians_Stone-Leadership.jpg",
+          "sha256": "e9e602e9ae736e05d0e5299af99dbc3d3a81a990264f910b64f3844628fec177",
+          "bytes": 1059244
+        },
+        {
+          "path": "pictures/01028.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-28-front-Ally-Veteran_Axehand-Tactics.jpg",
+          "sha256": "f725149963ed46fef47936d06782d4e75b69372d29e49566e736bd3692e8ef78",
+          "bytes": 854145
+        },
+        {
+          "path": "pictures/01029.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-29-front-Ally-Gondorian_Spearman-Tactics.jpg",
+          "sha256": "5c41f8546a9cf6c8c379603e4370326440d2c7f1681a399c744dea069140bb37",
+          "bytes": 844941
+        },
+        {
+          "path": "pictures/01030.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-30-front-Ally-Horseback_Archer-Tactics.jpg",
+          "sha256": "adfde764c444737f66770b6fc048a0ebe7fded2c30fb4d26f9d1e0f980c161a2",
+          "bytes": 842109
+        },
+        {
+          "path": "pictures/01031.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-31-front-Ally-Beorn-Tactics.jpg",
+          "sha256": "b365768e75310689d56def603423874017e48fc6c963b21384d652636211fc7b",
+          "bytes": 825608
+        },
+        {
+          "path": "pictures/01032.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-32-front-Event-Blade_Mastery-Tactics.jpg",
+          "sha256": "9615890420b2f8fab85c4b5b6e94bab8d49790cd661bc2b9b5783e36ad4b59bf",
+          "bytes": 835242
+        },
+        {
+          "path": "pictures/01033.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-33-front-Event-Rain_of_Arrows-Tactics.jpg",
+          "sha256": "59f038b2969ca62ca960f5e66bce6986e0aaf247e3b7f118143e531bdfc74856",
+          "bytes": 875615
+        },
+        {
+          "path": "pictures/01034.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-34-front-Event-Feint-Tactics.jpg",
+          "sha256": "c40ae6082d9a50e50d3a5200ac5b594e2b49a0c54994a416c50ca31c39ea3a13",
+          "bytes": 1020376
+        },
+        {
+          "path": "pictures/01035.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-35-front-Event-Quick_Strike-Tactics.jpg",
+          "sha256": "eb77f610a7e282d67494f6b5910f4ef89cadcf975f923858b809ecd2163a5021",
+          "bytes": 851082
+        },
+        {
+          "path": "pictures/01036.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-36-front-Event-Thicket_of_Spears-Tactics.jpg",
+          "sha256": "e4c1caf13e8e839f3f3ab14ec06a5d1d0d620ed0ef6a249302a4edb27c3e89ca",
+          "bytes": 914594
+        },
+        {
+          "path": "pictures/01037.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-37-front-Event-Swift_Strike-Tactics.jpg",
+          "sha256": "ffe354d592a5b617d995701b2b4dd4f8b99ff471e3e596a463c313acaf57e12e",
+          "bytes": 876682
+        },
+        {
+          "path": "pictures/01038.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-38-front-Event-Stand_Together-Tactics.jpg",
+          "sha256": "e3fbb206617244125da30c6944f8d9362329bee4008260069638b70df7afa413",
+          "bytes": 818966
+        },
+        {
+          "path": "pictures/01039.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-39-front-Attachment-Blade_of_Gondolin-Tactics.jpg",
+          "sha256": "90dd3b7107d98e54879c6df2a13c1d5b2a60d1cf18688db5b900759f9f8258fc",
+          "bytes": 872354
+        },
+        {
+          "path": "pictures/01040.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-40-front-Attachment-Citadel_Plate-Tactics.jpg",
+          "sha256": "f8278627439dbb7f86df2bc6925a340ecd7e994022da43a6b801cf9f9d0dd5bc",
+          "bytes": 830392
+        },
+        {
+          "path": "pictures/01041.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-41-front-Attachment-Dwarven_Axe-Tactics.jpg",
+          "sha256": "9d3e5feb3088ba7eeef45482a8a4c4cf6d50ad8ff500024fba676e5e18ca0fef",
+          "bytes": 838100
+        },
+        {
+          "path": "pictures/01042.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-42-front-Attachment-Horn_of_Gondor-Tactics.jpg",
+          "sha256": "eafd187baa3adc4704b2371b3c58af32ae14735d230851624d41f8303e609927",
+          "bytes": 801314
+        },
+        {
+          "path": "pictures/01043.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-43-front-Ally-Wandering_Took-Spirit.jpg",
+          "sha256": "f110645024ebf8d060a5aa7c56d7f1a10d58c04bd000f724eb60d0fba230dd08",
+          "bytes": 787525
+        },
+        {
+          "path": "pictures/01044.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-44-front-Ally-Lorien_Guide-Spirit.jpg",
+          "sha256": "310ce57b39b3a8396d88b86ce30a7e721dffc10992279947536dfac24f5ec711",
+          "bytes": 956687
+        },
+        {
+          "path": "pictures/01045.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-45-front-Ally-Northern_Tracker-Spirit.jpg",
+          "sha256": "4ff0b287277bd0669509a2e04e1a47155aca6c7bb5b53438c5ec4ec271edc453",
+          "bytes": 883713
+        },
+        {
+          "path": "pictures/01046.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-46-front-Event-The_Galadhrims_Greeting-Spirit.jpg",
+          "sha256": "76e6d340ef5c4e37ddd26485177a37c1c64abf5efe3d86b94a1a2ea67291921f",
+          "bytes": 791380
+        },
+        {
+          "path": "pictures/01047.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-47-front-Event-Strength_of_Will-Spirit.jpg",
+          "sha256": "e5ab7642e65eb9603cf18f3e59c49e72accf7d05a14672d1fe9f149f15df44af",
+          "bytes": 880406
+        },
+        {
+          "path": "pictures/01048.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-48-front-Event-Hasty_Stroke-Spirit.jpg",
+          "sha256": "3977c517cfa957c0ef3df92221f7c53d89f956cd2ccb39ef384f46579fc3bf1d",
+          "bytes": 799856
+        },
+        {
+          "path": "pictures/01049.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-49-front-Event-Will_of_the_West-Spirit.jpg",
+          "sha256": "827ac11f088a9f2c412ba5f29b4a9a03fd067c7f081fe601b1af3260676db5fe",
+          "bytes": 990980
+        },
+        {
+          "path": "pictures/01050.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-50-front-Event-A_Test_of_Will-Spirit.jpg",
+          "sha256": "58e45e27294f2674d6c9f7cae93b8997cff75e3a9d9ddb3e4ff84d627e6e1f56",
+          "bytes": 937865
+        },
+        {
+          "path": "pictures/01051.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-51-front-Event-Stand_and_Fight-Spirit.jpg",
+          "sha256": "4d2bdd2d81c3d8bff1d9cb9c935f6c36af7529f59b127b76740d8c41bf680bdf",
+          "bytes": 964260
+        },
+        {
+          "path": "pictures/01052.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-52-front-Event-A_Light_in_the_Dark-Spirit.jpg",
+          "sha256": "1b5c4fb8f46341e39bdf5700209d6f703149acadc5c2c9509738958a12a72860",
+          "bytes": 760141
+        },
+        {
+          "path": "pictures/01053.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-53-front-Event-Dwarven_Tomb-Spirit.jpg",
+          "sha256": "40e163b58d158460dfd9fe500ed9ddc07a39dec05069a38a64305577bed1732e",
+          "bytes": 819013
+        },
+        {
+          "path": "pictures/01054.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-54-front-Event-Fortune_or_Fate-Spirit.jpg",
+          "sha256": "0cc3faba838bddccaed519367702f159b4d56b6b0566b7f15b89e486ffe3ed6f",
+          "bytes": 971668
+        },
+        {
+          "path": "pictures/01055.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-55-front-Attachment-The_Favor_of_the_Lady-Spirit.jpg",
+          "sha256": "f8aaaec5070d843d2955221ebc37234710a791547b1c98f9a44d9498a91dae1c",
+          "bytes": 836832
+        },
+        {
+          "path": "pictures/01056.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-56-front-Attachment-Power_in_the_Earth-Spirit.jpg",
+          "sha256": "30645c41be8058ecfd11586acfc653fcf15f4f935a97d80c29f44658f1c52d69",
+          "bytes": 917613
+        },
+        {
+          "path": "pictures/01057.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-57-front-Attachment-Unexpected_Courage-Spirit.jpg",
+          "sha256": "f1ff7a88c1079ef3104147111e4c886a7181a75f52d261db55a1648a1df094b4",
+          "bytes": 837472
+        },
+        {
+          "path": "pictures/01058.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-58-front-Ally-Daughter_of_the_Nimrodel-Lore.jpg",
+          "sha256": "f0d456aab73e9e3937b441029ae2d996a4d741256e32b3af6434312172763d88",
+          "bytes": 966498
+        },
+        {
+          "path": "pictures/01059.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-59-front-Ally-Erebor_Hammersmith-Lore.jpg",
+          "sha256": "ff00f816243be9868d90bdbdd9aa3b67a8e3bb336f496946f3fdae4554957fee",
+          "bytes": 876619
+        },
+        {
+          "path": "pictures/01060.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-60-front-Ally-Henamarth_Riversong-Lore.jpg",
+          "sha256": "c98d6fd3ffbe746178b390eb6488de3a6cd6a08c482d8654da932c7250a93e0c",
+          "bytes": 905812
+        },
+        {
+          "path": "pictures/01061.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-61-front-Ally-Miner_of_the_Iron_Hills-Lore.jpg",
+          "sha256": "57a02ed05e3501b177b75fcb83dfc2b219bfcf07de0f55cd281c3494ba1c1a73",
+          "bytes": 856772
+        },
+        {
+          "path": "pictures/01062.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-62-front-Ally-Gleowine-Lore.jpg",
+          "sha256": "4c42b069d11bb41f6a09061f050692e8d79a4c441c70d55a3004e965b13cc477",
+          "bytes": 892850
+        },
+        {
+          "path": "pictures/01063.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-63-front-Event-Lore_of_Imladris-Lore.jpg",
+          "sha256": "38b5b950670675752fdd370ea3f1b5bc5990485ed3a29e9314ffc48421f9e62e",
+          "bytes": 806779
+        },
+        {
+          "path": "pictures/01064.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-64-front-Event-Loriens_Wealth-Lore.jpg",
+          "sha256": "f1fa3b6010e5e662354fc3f822a1e4d2757fc914ad90ee25d5230487032c0bfe",
+          "bytes": 770943
+        },
+        {
+          "path": "pictures/01065.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-65-front-Event-Radagasts_Cunning-Lore.jpg",
+          "sha256": "76a6c70b8dc752c6e6f7b7ed34193683893efafcd2f5a792c0679ceb3aa72f9f",
+          "bytes": 901499
+        },
+        {
+          "path": "pictures/01066.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-66-front-Event-Secret_Paths-Lore.jpg",
+          "sha256": "b01d48dde44e4e89dfdfde8409afdfd9d30c2223ba06c9e7405dbf7ff8f8b306",
+          "bytes": 773540
+        },
+        {
+          "path": "pictures/01067.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-67-front-Event-Gandalfs_Search-Lore.jpg",
+          "sha256": "2d9db6fb9b68b13a08c239270f53764a8dd166547770d0900797f157ff7ced45",
+          "bytes": 810129
+        },
+        {
+          "path": "pictures/01068.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-68-front-Event-Beorns_Hospitality-Lore.jpg",
+          "sha256": "22f91a49ab2b380f73b4e2cd7b90a9c943fb526f1804224b3729d1c319ec4da7",
+          "bytes": 820429
+        },
+        {
+          "path": "pictures/01069.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-69-front-Attachment-Forest_Snare-Lore.jpg",
+          "sha256": "a0dba85e1089e0c28c573a56b545aee71c9ad9bcbf3c67f660d994ad530c3501",
+          "bytes": 898626
+        },
+        {
+          "path": "pictures/01070.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-70-front-Attachment-Protector_of_Lorien-Lore.jpg",
+          "sha256": "b712a8f50d728603e64db8778b7408830d46fc48afc4aa6895144e79e52c9069",
+          "bytes": 824250
+        },
+        {
+          "path": "pictures/01071.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-71-front-Attachment-Dark_Knowledge-Lore.jpg",
+          "sha256": "3ce2594bed9b6f94a1a6149bac33ea6e6075953a03ad937b429be4cfd7df9eb7",
+          "bytes": 885507
+        },
+        {
+          "path": "pictures/01072.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-72-front-Attachment-Self_Preservation-Lore.jpg",
+          "sha256": "e27e5f0821d9f911534b1484adb0c33de76b242e4ad5f6a9555f63715bdfe3a1",
+          "bytes": 918699
+        },
+        {
+          "path": "pictures/01073.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-73-front-Ally-Gandalf-Neutral.jpg",
+          "sha256": "a1287b1f6440137c86aee7b7e25d659220a2329a5d20824c4965aada06e14451",
+          "bytes": 892168
+        },
+        {
+          "path": "pictures/01074.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-74-front-Enemy-King_Spider-Spiders_of_Mirkwood.jpg",
+          "sha256": "18bf381f9186a00ba1c1ca1e3697f11e4746006bcc53a62d42bc1f123cf2cc3b",
+          "bytes": 915367
+        },
+        {
+          "path": "pictures/01075.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-75-front-Enemy-Hummerhorns-Spiders_of_Mirkwood.jpg",
+          "sha256": "056354e420ff4e9a8be3a1a60674a8037e91910af203f5ef436192f1e3cdbae6",
+          "bytes": 959778
+        },
+        {
+          "path": "pictures/01076.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-76-front-Enemy-Ungoliants_Spawn-Spiders_of_Mirkwood.jpg",
+          "sha256": "817f43c1dc0a9ed1b3eb9deda96944e652294d639f04e1fa4b4975851d90dd0e",
+          "bytes": 986494
+        },
+        {
+          "path": "pictures/01077.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-77-front-Location-Great_Forest_Web-Spiders_of_Mirkwood.jpg",
+          "sha256": "4f1d4a0d53bbfe1320ab48f18936bb05c85aff8ae599478e3ff3193025562047",
+          "bytes": 923751
+        },
+        {
+          "path": "pictures/01078.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-78-front-Location-Mountains_of_Mirkwood-Spiders_of_Mirkwood.jpg",
+          "sha256": "a3e665f1b0f15081ad30393927c1cf68adfbe1e74253dead2deb007b24218ae6",
+          "bytes": 857201
+        },
+        {
+          "path": "pictures/01079.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-79-front-Treachery-Eyes_of_the_Forest-Spiders_of_Mirkwood.jpg",
+          "sha256": "23491f15d103448e89763449f8f6b0da4525ba26f728ec7e56abddd058456517",
+          "bytes": 820562
+        },
+        {
+          "path": "pictures/01080.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-80-front-Treachery-Caught_in_a_Web-Spiders_of_Mirkwood.jpg",
+          "sha256": "c26e7a3457690ea3d67719c7afca3c940fe157fbb0af40adcfa2b001bd6fd903",
+          "bytes": 920331
+        },
+        {
+          "path": "pictures/01081.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-81-front-Enemy-Wolf_Rider-Wilderlands.jpg",
+          "sha256": "788450ee0caf160556394fcdc53fe6d536c6d03cb6808af85dc698343e696b24",
+          "bytes": 849009
+        },
+        {
+          "path": "pictures/01082.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-82-front-Enemy-Hill_Troll-Wilderlands.jpg",
+          "sha256": "43914ec9bc0dcfd590b2da285f76d67524e73cfa8f4b52ebbc375364a2aaba45",
+          "bytes": 807508
+        },
+        {
+          "path": "pictures/01083.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-83-front-Enemy-Goblin_Sniper-Wilderlands.jpg",
+          "sha256": "49e9f1c198a1331ac79477f777ffc6dda357e53e85229e900397ac6e03aedb8f",
+          "bytes": 880220
+        },
+        {
+          "path": "pictures/01084.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-84-front-Enemy-Marsh_Adder-Wilderlands.jpg",
+          "sha256": "5e9816199db8c2b6584400a5aa6e6e17e162ba00be275c01e3bd07e922c79714",
+          "bytes": 921101
+        },
+        {
+          "path": "pictures/01085.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-85-front-Enemy-Wargs-Wilderlands.jpg",
+          "sha256": "bd57c0cc8223a0ff85db6fcd59be09f000abafa04cfcba72fb5039bcd171c1d4",
+          "bytes": 927459
+        },
+        {
+          "path": "pictures/01086.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-86-front-Treachery-Despair-Wilderlands.jpg",
+          "sha256": "1931ac56fcfa284e32080b70da1f2c73f0af2c0077738ce0de84a9d7088bf8cf",
+          "bytes": 856701
+        },
+        {
+          "path": "pictures/01087.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-87-front-Location-The_Brown_Lands-Wilderlands.jpg",
+          "sha256": "02fa16141578bd6dd204dc4bb9de138638f3ae812c1a74d547d9e56cd5ee7695",
+          "bytes": 901634
+        },
+        {
+          "path": "pictures/01088.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-88-front-Location-The_East_Bight-Wilderlands.jpg",
+          "sha256": "a09dbed04089d9d85fed38bbe18d4fe1820189fcd7a0a63517cb8d1477126fb8",
+          "bytes": 938364
+        },
+        {
+          "path": "pictures/01089.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-89-front-Enemy-Dol_Guldur_Orcs-Dol_Guldur_Orcs.jpg",
+          "sha256": "27f33ca0ded366471da8638b9d5ac5b832d2479de0ab6e7ebbe88d171d32bf2c",
+          "bytes": 861481
+        },
+        {
+          "path": "pictures/01090.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-90-front-Enemy-Chieftan_Ufthak-Dol_Guldur_Orcs.jpg",
+          "sha256": "0288e63c7612965e63072ef4ed0d0cbbdb7234bd3132c16b8deec694d3f132c1",
+          "bytes": 883660
+        },
+        {
+          "path": "pictures/01091.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-91-front-Enemy-Dol_Guldur_Beastmaster-Dol_Guldur_Orcs.jpg",
+          "sha256": "6f35eb6d2d1e2336857e6675d5454a24fb4e3e3c46ceecd2df14d6e5477c8bd7",
+          "bytes": 811085
+        },
+        {
+          "path": "pictures/01092.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-92-front-Treachery-Driven_by_Shadow-Dol_Guldur_Orcs.jpg",
+          "sha256": "4418878167ea7f7fec6a8a30f50b6b8a3609450367320bbb05218e8a2eedf9e4",
+          "bytes": 943697
+        },
+        {
+          "path": "pictures/01093.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-93-front-Treachery-The_Necromancers_Reach-Dol_Guldur_Orcs.jpg",
+          "sha256": "2b7dc3eae05ba5445555f3ffc3eba61bfa97d749791c73abf7cf496c304a15ac",
+          "bytes": 930348
+        },
+        {
+          "path": "pictures/01094.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-94-front-Location-Necromancers_Pass-Dol_Guldur_Orcs.jpg",
+          "sha256": "03c7badb74235c935544672db081f5c40e6698804232a68749225620dd3668ae",
+          "bytes": 930562
+        },
+        {
+          "path": "pictures/01095.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-95-front-Location-Enchanted_Stream-Dol_Guldur_Orcs.jpg",
+          "sha256": "916c6f5251e1ce4988bc63a02ed5f1e7527fd097e47d73bcc62a4cb91fdcae34",
+          "bytes": 915515
+        },
+        {
+          "path": "pictures/01096.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-96-front-Enemy-Forest_Spider-Passage_Through_Mirkwood.jpg",
+          "sha256": "1443637f7eb9778bb34cb0866a0625937f5113cc79457a30d949a28b60c82c41",
+          "bytes": 860271
+        },
+        {
+          "path": "pictures/01097.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-97-front-Enemy-East_Bight_Patrol-Passage_Through_Mirkwood.jpg",
+          "sha256": "ac020914394f9dcbb44cc2c27c95f75e8eebe2595c79fae4822bb54c17cbf525",
+          "bytes": 994928
+        },
+        {
+          "path": "pictures/01098.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-98-front-Enemy-Black_Forest_Bats-Passage_Through_Mirkwood.jpg",
+          "sha256": "66741275eb1afe052a0d50d58171b649db2b5f95a399d202780f4cd94beb4230",
+          "bytes": 818186
+        },
+        {
+          "path": "pictures/01099.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-99-front-Location-Old_Forest_Road-Passage_Through_Mirkwood.jpg",
+          "sha256": "3442eb29ad38c8a5f2962fc64e50de30f4a4d1909a3e320d9b926c6326628e13",
+          "bytes": 891689
+        },
+        {
+          "path": "pictures/01100.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-100-front-Location-Forest_Gate-Passage_Through_Mirkwood.jpg",
+          "sha256": "a77468a07662d696aee046f9a1a1e35edfac994809041f29ad21327e93e1db0a",
+          "bytes": 865656
+        },
+        {
+          "path": "pictures/01101.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-101-front-Enemy-Dungeon_Jailor-Escape_from_Dol_Guldur.jpg",
+          "sha256": "e35a428b9832cdde4fdb9683622cc3a83f0694218e5e4b3d0fb841f54f49e5ea",
+          "bytes": 847980
+        },
+        {
+          "path": "pictures/01102.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-102-front-Enemy-Nazgul_of_Dol_Guldur-Escape_from_Dol_Guldur.jpg",
+          "sha256": "2c8bb148771b2ff1bdbd7215e7a755a95f12fd6175f1fae760174f0abc1c6d9e",
+          "bytes": 860444
+        },
+        {
+          "path": "pictures/01103.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-103-front-Enemy-Cavern_Guardian-Escape_from_Dol_Guldur.jpg",
+          "sha256": "b3574ea6b2cf789f8f654ab8fe2cb63322a2f0a34864ada45e033ce79a4b7134",
+          "bytes": 966348
+        },
+        {
+          "path": "pictures/01104.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-104-front-Treachery-Under_the_Shadow-Escape_from_Dol_Guldur.jpg",
+          "sha256": "b501f1810c0380fd7f49a3b9982d68050a5fba2d77f1b508d55c98988c165053",
+          "bytes": 915472
+        },
+        {
+          "path": "pictures/01105.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-105-front-Treachery-Iron_Shackles-Escape_from_Dol_Guldur.jpg",
+          "sha256": "492b1ba0a45aeb6549b2fcca88a71e1f468cb03dae78eb407a9c67472ec8f7d6",
+          "bytes": 809820
+        },
+        {
+          "path": "pictures/01106.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-106-front-Location-Endless_Caverns-Escape_from_Dol_Guldur.jpg",
+          "sha256": "10955d7a3fce738d3d79a909ba33d5a5e2b6d84500042d3006ff56949309fba5",
+          "bytes": 820633
+        },
+        {
+          "path": "pictures/01107.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-107-front-Location-Tower_Gate-Escape_from_Dol_Guldur.jpg",
+          "sha256": "985148d8da9248b14ce00514582478711656c81ec2caf6e7da6c8cf11b334ed4",
+          "bytes": 905193
+        },
+        {
+          "path": "pictures/01108.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-108-front-Objective-Gandalfs_Map-Escape_from_Dol_Guldur.jpg",
+          "sha256": "ce37adc78c5eff7b3f2ba1bc21bd7e4fade5b13e4f0b34d7b9dc80910f419a31",
+          "bytes": 928534
+        },
+        {
+          "path": "pictures/01109.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-109-front-Objective-Dungeon_Torch-Escape_from_Dol_Guldur.jpg",
+          "sha256": "8c4f615286360c279997ad512cd45c97fc12d078232301f1d905b72b8435bf26",
+          "bytes": 954762
+        },
+        {
+          "path": "pictures/01110.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-110-front-Objective-Shadow_Key-Escape_from_Dol_Guldur.jpg",
+          "sha256": "b49437a461b73ed97005267c030985835964e6e29eb6689bb10802c8b53c5573",
+          "bytes": 877813
+        },
+        {
+          "path": "pictures/01111.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-111-front-Enemy-Misty_Mountain_Goblins-Journey_Along_the_Anduin.jpg",
+          "sha256": "38265684760c8687868bb8cb0adfc7b5affe773893eccf2fcd63134dbaa2c791",
+          "bytes": 903014
+        },
+        {
+          "path": "pictures/01112.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-112-front-Treachery-Massing_at_Night-Journey_Along_the_Anduin.jpg",
+          "sha256": "8ef5430c654b0482b98abfe3b3975f73c843632c284d4bc76b68c2c9367dc480",
+          "bytes": 1010681
+        },
+        {
+          "path": "pictures/01113.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-113-front-Location-Banks_of_the_Anduin-Journey_Along_the_Anduin.jpg",
+          "sha256": "3d899d91cc87c35c8ce9c5b6738518bde293ff0ef44a051b5d3c21d31c55843e",
+          "bytes": 880991
+        },
+        {
+          "path": "pictures/01114.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-114-front-Location-Gladden_Fields-Journey_Along_the_Anduin.jpg",
+          "sha256": "3a3cb8987b98da13dd088d639b0909072138d91d1d9b02640baa220138c24608",
+          "bytes": 882931
+        },
+        {
+          "path": "pictures/01115.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-115-front-Enemy-Eastern_Crows-Saurons_Reach.jpg",
+          "sha256": "f86d8046a363c16890a0e89ebbff06c268c7cb4d94a79f09864b12e154ca235f",
+          "bytes": 1021681
+        },
+        {
+          "path": "pictures/01116.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-116-front-Treachery-Evil_Storm-Saurons_Reach.jpg",
+          "sha256": "c92b2377a58c5842b63124d69bb38a93143b80d0c9897a34c74554587db26650",
+          "bytes": 856397
+        },
+        {
+          "path": "pictures/01117.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-117-front-Treachery-Pursued_by_Shadow-Saurons_Reach.jpg",
+          "sha256": "b695ea419ce9ddf71a85febfef8aaf25459cc82dd73f63916e19c65060426821",
+          "bytes": 942135
+        },
+        {
+          "path": "pictures/01118.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-118-front-Treachery-Treacherous_Fog-Saurons_Reach.jpg",
+          "sha256": "9c1ba5c3dea6fdde9c091befe83aa60079f0ddcaac6878cd0dc9edeebc11fa9a",
+          "bytes": 876398
+        },
+        {
+          "path": "pictures/01119.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-119-front-Quest-Flies_and_Spiders-Flies_and_Spiders-A-Passage_Through_Mirkwood.jpg",
+          "sha256": "23dc1eac7a12bdefc820ec513bbd571699bcfa8bbbec84ad76882f8f231046d6",
+          "bytes": 1013925
+        },
+        {
+          "path": "pictures/01119.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-119-back-Quest-Flies_and_Spiders-Flies_and_Spiders-A-Passage_Through_Mirkwood.jpg",
+          "sha256": "9010aece9d9271412a10af6724423473471eaacb9b1e8ee803213e50012cda73",
+          "bytes": 919448
+        },
+        {
+          "path": "pictures/01120.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-120-front-Quest-A_Fork_in_the_Road-A_Fork_in_the_Road-A-Passage_Through_Mirkwood.jpg",
+          "sha256": "d23d5c88583721694b4d314f89df789105ebd905fbe938e49f64e9e9ecd88c36",
+          "bytes": 1022918
+        },
+        {
+          "path": "pictures/01120.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-120-back-Quest-A_Fork_in_the_Road-A_Fork_in_the_Road-A-Passage_Through_Mirkwood.jpg",
+          "sha256": "a23658a18f47bf7dd2c0dfd0a97da01dc4f335b76eb67ea00e44ec26d6ac3950",
+          "bytes": 935385
+        },
+        {
+          "path": "pictures/01121.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-121-front-Quest-A_Chosen_Path-Dont_Leave_the_Path-A-Passage_Through_Mirkwood.jpg",
+          "sha256": "2bab70c688314cd5e11ecc800633dce01f6017090302c9f6301ee1584be2b233",
+          "bytes": 1000955
+        },
+        {
+          "path": "pictures/01121.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-121-back-Quest-A_Chosen_Path-Dont_Leave_the_Path-A-Passage_Through_Mirkwood.jpg",
+          "sha256": "cc698a958d838a802b493ceac6feb64e273be3ee99a1fad03cf3e249cf4ced5d",
+          "bytes": 1000088
+        },
+        {
+          "path": "pictures/01122.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-122-front-Quest-A_Chosen_Path-Beorns_Path-A-Passage_Through_Mirkwood.jpg",
+          "sha256": "2bab70c688314cd5e11ecc800633dce01f6017090302c9f6301ee1584be2b233",
+          "bytes": 1000955
+        },
+        {
+          "path": "pictures/01122.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-122-back-Quest-A_Chosen_Path-Beorns_Path-A-Passage_Through_Mirkwood.jpg",
+          "sha256": "062d62b53a9d2339f09d3681f9277e2ccf87c05af06c7c30a355ed27a93521ab",
+          "bytes": 926655
+        },
+        {
+          "path": "pictures/01123.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-123-front-Quest-The_Necromancers_Tower-A-Escape_from_Dol_Guldur.jpg",
+          "sha256": "5823b65def09eebb826a56ab5f2e468590d7dc3c193bdee567111920c33bfea1",
+          "bytes": 933957
+        },
+        {
+          "path": "pictures/01123.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-123-back-Quest-The_Necromancers_Tower-A-Escape_from_Dol_Guldur.jpg",
+          "sha256": "879a33bac495e3755a9fb071169663e097eaccb36751469afbc5a71645a262a7",
+          "bytes": 908328
+        },
+        {
+          "path": "pictures/01124.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-124-front-Quest-Through_the_Caverns-A-Escape_from_Dol_Guldur.jpg",
+          "sha256": "aa9f24583d8d8a177938e3f3c601d4100a028434d846a55f8d0cd6f2623e34ab",
+          "bytes": 983843
+        },
+        {
+          "path": "pictures/01124.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-124-back-Quest-Through_the_Caverns-A-Escape_from_Dol_Guldur.jpg",
+          "sha256": "502f3c3a0a07e47364549e6409b3bbce5f412d43a3056f7a3e1d642e3578811e",
+          "bytes": 939609
+        },
+        {
+          "path": "pictures/01125.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-125-front-Quest-Out_of_the_Dungeons-A-Escape_from_Dol_Guldur.jpg",
+          "sha256": "375fc6ec66095ddab1322c0e150c9af6432417e9534869cae2a46fa28ba6eeab",
+          "bytes": 906813
+        },
+        {
+          "path": "pictures/01125.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-125-back-Quest-Out_of_the_Dungeons-A-Escape_from_Dol_Guldur.jpg",
+          "sha256": "9582abb8240edbe6c6cdca2ecd2804946589b6f695c25de8b7bcfb93d7dff199",
+          "bytes": 995661
+        },
+        {
+          "path": "pictures/01126.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-126-front-Quest-To_the_River-A-Journey_Along_the_Anduin.jpg",
+          "sha256": "37234496c77962528215df2313b2aa574ff493ee56ac27aa258a17c016f53c23",
+          "bytes": 1080115
+        },
+        {
+          "path": "pictures/01126.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-126-back-Quest-To_the_River-A-Journey_Along_the_Anduin.jpg",
+          "sha256": "fa828733f255dc8adad5705ee5253faeeb82b6740cfc1ee209535c3554e2a427",
+          "bytes": 1050859
+        },
+        {
+          "path": "pictures/01127.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-127-front-Quest-Anduin_Passage-A-Journey_Along_the_Anduin.jpg",
+          "sha256": "f9ca981d84e023d84f77f3fe3292a1a0bfbd397c4b60ea4dbc2080ba914ec940",
+          "bytes": 1010413
+        },
+        {
+          "path": "pictures/01127.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-127-back-Quest-Anduin_Passage-A-Journey_Along_the_Anduin.jpg",
+          "sha256": "477ed3fcb9de61ad8b3fa18a9a0e1f24b23cb7aa617e10100313976b7d0ede14",
+          "bytes": 1046138
+        },
+        {
+          "path": "pictures/01128.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-128-front-Quest-Ambush_on_the_Shore-A-Journey_Along_the_Anduin.jpg",
+          "sha256": "d2bfa00ea237399b42d166e03af27d5c4da3b8fe66282835cb13533df17c6f4c",
+          "bytes": 933911
+        },
+        {
+          "path": "pictures/01128.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC01-128-back-Quest-Ambush_on_the_Shore-A-Journey_Along_the_Anduin.jpg",
+          "sha256": "8ddbfb06b745103b33f7faf1c5e6914224ecd79983bfc3bad3f4cc8ecd231a4f",
+          "bytes": 923869
+        },
+        {
+          "path": "pictures/01129.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=1",
+          "sha256": "29f5469ffaf21568fd02ce649147d6c6a53c07209e2e6789000169eae1eb404a",
+          "bytes": 601218
+        },
+        {
+          "path": "pictures/01129.B.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=2",
+          "sha256": "bc8e421fdfdb3511e019b381cdc9334e2a50430dc9e5615f974be3d2ec3f3f26",
+          "bytes": 475284
+        },
+        {
+          "path": "pictures/01130.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=3",
+          "sha256": "da9bbdf137d891775bfb40522ea0df8e37dff5e14ecb6f0803a662e81239bb58",
+          "bytes": 677898
+        },
+        {
+          "path": "pictures/01130.B.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=4",
+          "sha256": "8d6ac40243655d0b3504533a24a623bbdb0fdfc19f692b16f3997e007a0a6068",
+          "bytes": 574229
+        },
+        {
+          "path": "pictures/01131.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=5",
+          "sha256": "848606a3e61cd1af1a972968e7e098d2664ff5f91a6795b74724bdb5e2c5477c",
+          "bytes": 698256
+        },
+        {
+          "path": "pictures/01131.B.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=6",
+          "sha256": "a6f0dc411fabb77f421ece71d39c369a3f77a01e99426074459759199006042f",
+          "bytes": 569008
+        },
+        {
+          "path": "pictures/01132.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=7",
+          "sha256": "a8c8852aac8f033d8034a4b28b662effee9b3c2badc7e434c306719fa1ea8952",
+          "bytes": 723218
+        },
+        {
+          "path": "pictures/01133.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=15",
+          "sha256": "4a079b24581dd08795c86e23e96cd19b7bee98272d2eeec37b77310808216d1f",
+          "bytes": 725719
+        },
+        {
+          "path": "pictures/01134.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=23",
+          "sha256": "125a6e1bfbd4011b2271c39c845bb523596bba1a0d0bdbddf6fde295a22049eb",
+          "bytes": 855488
+        },
+        {
+          "path": "pictures/01135.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=25",
+          "sha256": "bc45122550093d1acfb685cd0fffe8b2be4f51e71b9e15ec321aa0099ad25d98",
+          "bytes": 682211
+        },
+        {
+          "path": "pictures/01136.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=27",
+          "sha256": "44e4d6912d62090c77537d84e5e80f828fa8264f68fb79ed195df26351a0c1a0",
+          "bytes": 887339
+        },
+        {
+          "path": "pictures/01137.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=29",
+          "sha256": "d6c1d76db909631a86a09edb36225a387bea86d14faee27f5783db9fa6c7c7a2",
+          "bytes": 813875
+        },
+        {
+          "path": "pictures/01138.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=31",
+          "sha256": "ac8e1f9d6f7dcb0792b58564e9c5e055c4d75da9158f0a8b7194e87812f556b0",
+          "bytes": 775558
+        },
+        {
+          "path": "pictures/141001.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-1-front-Hero-Frodo_Baggins-Fellowship-The_Black_Riders.jpg",
+          "sha256": "fcdda95cb0eafaff2ef55f0bf384f0bdfd3c894bec2db8b09b458f4c5643a206",
+          "bytes": 795281
+        },
+        {
+          "path": "pictures/141002.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-2-front-Hero-Sam_Gamgee-Leadership.jpg",
+          "sha256": "eb92c91e4affd0fe6402492c8274e6d58ac02a85aca006ed1d59c7f39e86d0b6",
+          "bytes": 806014
+        },
+        {
+          "path": "pictures/141003.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-3-front-Hero-Merry-Tactics.jpg",
+          "sha256": "211d00cf6d90d84363676535eb79c276dd09ef229faff0872e4d822da5016ae1",
+          "bytes": 790228
+        },
+        {
+          "path": "pictures/141004.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-4-front-Hero-Pippin-Lore.jpg",
+          "sha256": "4d6995feadf2f5a57d4c07e228ed6e814c561929e53076e4acf40a4178be3c88",
+          "bytes": 799552
+        },
+        {
+          "path": "pictures/141006.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-6-front-Ally-Bill_the_Pony-Leadership.jpg",
+          "sha256": "1323fb54bb0ff558db05d4b62a4b7cbb2cc1c019e4774c74a4a206ff5aa1efc7",
+          "bytes": 865849
+        },
+        {
+          "path": "pictures/141009.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-9-front-Event-Halfling_Determination-Tactics.jpg",
+          "sha256": "ca211cf62df75bd53329c10b399136816e2c8cb6eb18d914d827193302474556",
+          "bytes": 770465
+        },
+        {
+          "path": "pictures/141012.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-12-front-Event-Frodos_Intuition-Fellowship.jpg",
+          "sha256": "1e13dee268e0f29874ca471c44066dd4d80a77865a03ce01c5192cada0d47029",
+          "bytes": 838648
+        },
+        {
+          "path": "pictures/141013.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-13-front-Attachment-Hobbit_Cloak-Leadership.jpg",
+          "sha256": "6b6610f5f3b7e55ed079b4036ac1b2ed42d2f6578245d10a3de021cc8fe54eea",
+          "bytes": 785608
+        },
+        {
+          "path": "pictures/141014.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-14-front-Attachment-Dagger_of_Westernesse-Tactics.jpg",
+          "sha256": "1dadea959e4f870d98a0461c9dc9c5bcfc360552343accee661321d9a07af970",
+          "bytes": 844173
+        },
+        {
+          "path": "pictures/141016.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-16-front-Attachment-Elf_stone-Lore.jpg",
+          "sha256": "e4c86cc6d62cdbe6f4afa292956f38b9a1cf55840277b9df8ea61e586c7cbefa",
+          "bytes": 787324
+        },
+        {
+          "path": "pictures/141017.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-17-front-Attachment-Boon-Mr_Underhill-Neutral.jpg",
+          "sha256": "6280897723fe94d3d1818a8cd759b6c8237fa1cb81f342b0ef701bebee7b4087",
+          "bytes": 843034
+        },
+        {
+          "path": "pictures/141018.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-18-front-Attachment-Boon-Tireless_Ranger-Neutral.jpg",
+          "sha256": "84cc5cfcd000ea000c1b05ee8f449bef162cee4165d6ab9c4fc620cd59e8dff6",
+          "bytes": 914462
+        },
+        {
+          "path": "pictures/141019.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-19-front-Attachment-Boon-Skilled_Healer-Neutral.jpg",
+          "sha256": "ed5a8b10bf6e87c5e0f0bdbc2608283a4f4e85d519cd806220b236df7e705a7a",
+          "bytes": 849294
+        },
+        {
+          "path": "pictures/141020.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-20-front-Attachment-Boon-Valiant_Warrior-Neutral.jpg",
+          "sha256": "7125e59c316d1fcf91c8c1030d6a2422f2a4559157e011aceb220e6570c34099",
+          "bytes": 892363
+        },
+        {
+          "path": "pictures/141021.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-21-front-Attachment-Boon-Noble_Hero-Neutral.jpg",
+          "sha256": "ebabeb457fbec97a524ddff3052888e0f04cbfac41dcc88e43252d497016ab8c",
+          "bytes": 823959
+        },
+        {
+          "path": "pictures/141022.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-22-front-Quest-Three_is_Company-A-A_Shadow_of_the_Past.jpg",
+          "sha256": "036689e7aebc6d151cce889678e42c1a586e82d6072390c54b3a3b77700edc8b",
+          "bytes": 940050
+        },
+        {
+          "path": "pictures/141022.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-22-back-Quest-Three_is_Company-A-A_Shadow_of_the_Past.jpg",
+          "sha256": "0e7a847ed5d7f856ada876e83977d973d9f7d296e1af300a830af4f9c16d1c1f",
+          "bytes": 888765
+        },
+        {
+          "path": "pictures/141023.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-23-front-Quest-A_Shortcut_to_Mushrooms-A-A_Shadow_of_the_Past.jpg",
+          "sha256": "315f31730c4c42ad81b9a3b63e474fa1f67760949be2554e5244832744fcbda5",
+          "bytes": 967125
+        },
+        {
+          "path": "pictures/141023.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-23-back-Quest-A_Shortcut_to_Mushrooms-A-A_Shadow_of_the_Past.jpg",
+          "sha256": "9b8ea8c5ed60851897e2985b7bdd4ca6b49da6c95b552ec1be343eb8105e0851",
+          "bytes": 853468
+        },
+        {
+          "path": "pictures/141024.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-24-front-Quest-Escape_to_Buckland-A-A_Shadow_of_the_Past.jpg",
+          "sha256": "5cf2d04d2712b6fcbe57d41824d9d5b56056222adfd939782544e913a98e16af",
+          "bytes": 909802
+        },
+        {
+          "path": "pictures/141024.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-24-back-Quest-Escape_to_Buckland-A-A_Shadow_of_the_Past.jpg",
+          "sha256": "f267184bdf68505776784123ebdb8ccd0e2a92d3aa006d7235bae12f17a6ee06",
+          "bytes": 834903
+        },
+        {
+          "path": "pictures/141025.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-25-front-Quest-Trouble_in_Bree-A-A_Knife_in_the_Dark.jpg",
+          "sha256": "4a14dbbd9ae43ff8f27278e38589e1f94212cab4e723eb3a2e0bdc1923597017",
+          "bytes": 890546
+        },
+        {
+          "path": "pictures/141025.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-25-back-Quest-Trouble_in_Bree-A-A_Knife_in_the_Dark.jpg",
+          "sha256": "bb5335e58f21af06b1a1279e1f309da18434133543085de14ea54451ec45172d",
+          "bytes": 883394
+        },
+        {
+          "path": "pictures/141026.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-26-front-Quest-Into_the_Wild-A-A_Knife_in_the_Dark.jpg",
+          "sha256": "e082189d66eac20fcafdaeb0182d6218f19b33ee3a2fa7b95d274ebf96f81cc4",
+          "bytes": 882401
+        },
+        {
+          "path": "pictures/141026.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-26-back-Quest-Into_the_Wild-A-A_Knife_in_the_Dark.jpg",
+          "sha256": "c898f6f207577f34b303bebd7385af2f9d0e9e359c20199a9b80e436e7e789dd",
+          "bytes": 856115
+        },
+        {
+          "path": "pictures/141027.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-27-front-Quest-The_Ringwraiths_Attack-A-A_Knife_in_the_Dark.jpg",
+          "sha256": "d3a2a14cddbc425d572d6e4fb20bb5fb8f7abac4c0e0bb3444cb5ea8e1258b60",
+          "bytes": 895600
+        },
+        {
+          "path": "pictures/141027.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-27-back-Quest-The_Ringwraiths_Attack-A-A_Knife_in_the_Dark.jpg",
+          "sha256": "ae46dd4b6e0f72caf52158d085c1aad3fc4ea838d8ccb9b359f6b1d9ef4e16d2",
+          "bytes": 872584
+        },
+        {
+          "path": "pictures/141028.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-28-front-Quest-Pursued_by_the_Enemy-A-Flight_to_the_Ford.jpg",
+          "sha256": "2f828a99b0ac9457497d6def86eafae9ac26077613fa6168b417dc6beb2da5a4",
+          "bytes": 890175
+        },
+        {
+          "path": "pictures/141028.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-28-back-Quest-Pursued_by_the_Enemy-A-Flight_to_the_Ford.jpg",
+          "sha256": "a3a1fd2278db79994e66e8b9c9211c3209dbdd4b38d544001a8e6fc6a663c3cf",
+          "bytes": 929422
+        },
+        {
+          "path": "pictures/141029.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-29-front-Quest-Race_To_Rivendell-A-Flight_to_the_Ford.jpg",
+          "sha256": "b3b66294bf7f9a987f091b551f65afe1ba6b812dd7be69b0791702ed511cf256",
+          "bytes": 956781
+        },
+        {
+          "path": "pictures/141029.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-29-back-Quest-Race_To_Rivendell-A-Flight_to_the_Ford.jpg",
+          "sha256": "272a34266b053db95c0516c50a7f8a27abaeff3660b90b2d4e02916a72b7e1c4",
+          "bytes": 864985
+        },
+        {
+          "path": "pictures/141030.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-30-front-Campaign-A_Shadow_of_the_Past-The_Lord_of_the_Rings_Part_1-A-A_Shadow_of_the_Past.jpg",
+          "sha256": "c782e216e67f181822f70c0475fd74cbcc269667627c5cf4ea0563bf1f852127",
+          "bytes": 955203
+        },
+        {
+          "path": "pictures/141030.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-30-back-Campaign-A_Shadow_of_the_Past-The_Lord_of_the_Rings_Part_1-A-A_Shadow_of_the_Past.jpg",
+          "sha256": "95f4a3098a0d496a78baa5c58f5e429e5f2698a0d4038b155ae9c391d428e363",
+          "bytes": 931690
+        },
+        {
+          "path": "pictures/141031.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-31-front-Location-Bag_End-A_Shadow_of_the_Past.jpg",
+          "sha256": "dbcdf8d1b05f4f410ec77f154237c55a8ec15848b5aae0878681945792e9fe74",
+          "bytes": 927770
+        },
+        {
+          "path": "pictures/141032.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-32-front-Location-Woody_End-A_Shadow_of_the_Past.jpg",
+          "sha256": "16c6359dac348a24b193e7fe41432a571c8acf8ffbe3d668f6433a7eec2be67a",
+          "bytes": 909426
+        },
+        {
+          "path": "pictures/141033.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-33-front-Location-Stock_Brook-A_Shadow_of_the_Past.jpg",
+          "sha256": "0958dd9f07f815a211b2aab4fb8313c0d471f5c37eec8af83e5b7dea5c7b481a",
+          "bytes": 801830
+        },
+        {
+          "path": "pictures/141034.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-34-front-Location-Bamfurlong-A_Shadow_of_the_Past.jpg",
+          "sha256": "098af684c4138079986bd13281ef110e233b7f7eda934eff41aaa96d61280e30",
+          "bytes": 928080
+        },
+        {
+          "path": "pictures/141035.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-35-front-Location-Bucklebury_Ferry-A_Shadow_of_the_Past.jpg",
+          "sha256": "ce7e2ac0c9ad91511c66f0182cdc9e8c76196f75f8376448ff4bc2e22261f339",
+          "bytes": 813006
+        },
+        {
+          "path": "pictures/141036.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-36-front-Location-Green_Hill_Country-A_Shadow_of_the_Past.jpg",
+          "sha256": "2766c817ec612d3c6ce5a31229a362a7e6b0541d209709dc4b3ae6a14be9748a",
+          "bytes": 843945
+        },
+        {
+          "path": "pictures/141037.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-37-front-Location-Stock_Road-A_Shadow_of_the_Past.jpg",
+          "sha256": "3bf270c76694a41a924f20de62ccd7afea2bd8c4f2f8a28840b325a86a1f6447",
+          "bytes": 908647
+        },
+        {
+          "path": "pictures/141038.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-38-front-Location-The_Marish-A_Shadow_of_the_Past.jpg",
+          "sha256": "2a32116574bfd261e15138a293ff2bff56ddbcbf469d84355a06e94b1a4351a0",
+          "bytes": 853832
+        },
+        {
+          "path": "pictures/141039.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-39-front-Enemy-Black_Rider-A_Shadow_of_the_Past.jpg",
+          "sha256": "b8c5011d7a3ec5f164526f94bd88503f18591e8761723823a9e52ff203ce0e2f",
+          "bytes": 762559
+        },
+        {
+          "path": "pictures/141040.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-40-front-Enemy-Evil_Crow-A_Shadow_of_the_Past.jpg",
+          "sha256": "cfb27611809ac4acdb798673cba5bd8cd28aff4a9441601f57af4a438f1d4e28",
+          "bytes": 810138
+        },
+        {
+          "path": "pictures/141041.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-41-front-Treachery-Crawling_Towards_Him-A_Shadow_of_the_Past.jpg",
+          "sha256": "3cf7979b02a77331b2b0f71af6bfc228635944c4bc630500dfedc530d6c92b3f",
+          "bytes": 852038
+        },
+        {
+          "path": "pictures/141042.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-42-front-Treachery-Hunting_For_The_Ring-A_Shadow_of_the_Past.jpg",
+          "sha256": "3a7dab3db2e31b26303c4830cd7c53a4b4b0f5941caceb507622252c2a9ea898",
+          "bytes": 892030
+        },
+        {
+          "path": "pictures/141043.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-43-front-Treachery-Have_You_Seen_Baggins-A_Shadow_of_the_Past.jpg",
+          "sha256": "064aabd3340022e3d9608a8932aec3a7244d3ffb5eab8e83f10c08b92fb84575",
+          "bytes": 806742
+        },
+        {
+          "path": "pictures/141044.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-44-front-Campaign-A_Knife_in_the_Dark-The_Lord_of_the_Rings_Part_2-A-A_Knife_in_the_Dark.jpg",
+          "sha256": "2b7941a93b47691f2b8080ef63bff050e4f1b9bb6c1d187eea56212dce9169a5",
+          "bytes": 856006
+        },
+        {
+          "path": "pictures/141044.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-44-back-Campaign-A_Knife_in_the_Dark-The_Lord_of_the_Rings_Part_2-A-A_Knife_in_the_Dark.jpg",
+          "sha256": "49a92d8fbfa283cd0875c93de115da86d30565c9d3533a5671d041fa88c34077",
+          "bytes": 889789
+        },
+        {
+          "path": "pictures/141045.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-45-front-Location-The_Prancing_Pony-A_Knife_in_the_Dark.jpg",
+          "sha256": "d391a2c1d4bc4f431e84aebdb556f0465b99c85678406e4e989f7ee3bc72da04",
+          "bytes": 840239
+        },
+        {
+          "path": "pictures/141046.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-46-front-Location-Weathertop-A_Knife_in_the_Dark.jpg",
+          "sha256": "6a3de7a22c86e9d1664e470948d38b7a6c647ae1642a5644ecfba655904bc9ba",
+          "bytes": 853614
+        },
+        {
+          "path": "pictures/141047.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-47-front-Location-Chetwood-A_Knife_in_the_Dark.jpg",
+          "sha256": "8926ced59cb2502a02576b0ff83dd328be8fea372096a6440bba1c23281d604e",
+          "bytes": 897017
+        },
+        {
+          "path": "pictures/141048.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-48-front-Location-Midgewater-A_Knife_in_the_Dark.jpg",
+          "sha256": "3ccc434f4fa71d1517e72175cc5af4916bde53a88d56d5a67350b58bad83acf3",
+          "bytes": 828345
+        },
+        {
+          "path": "pictures/141049.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-49-front-Location-Weather_Hills-A_Knife_in_the_Dark.jpg",
+          "sha256": "d1343f9c6f7fe08e2d735b0c2e429507d9c44cb423ff408b872e9e792fd3bfe5",
+          "bytes": 840590
+        },
+        {
+          "path": "pictures/141050.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-50-front-Enemy-Rider_of_Mordor-A_Knife_in_the_Dark.jpg",
+          "sha256": "d052d5af834e1051a81e089b6e524f87944524ff1114bb9e9cd5fa4cf0c5d3a8",
+          "bytes": 818827
+        },
+        {
+          "path": "pictures/141051.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-51-front-Enemy-Bill_Ferny-A_Knife_in_the_Dark.jpg",
+          "sha256": "c1f886addd37645f696ffdc89fbefb1379eb63e5dc63e03eaa0da483ca4ac3c4",
+          "bytes": 875306
+        },
+        {
+          "path": "pictures/141052.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-52-front-Enemy-Shady_Bree_Lander-A_Knife_in_the_Dark.jpg",
+          "sha256": "e4212d8548a78db706170358bb05bb2626d1253970db2a21af4228972124d8e5",
+          "bytes": 718849
+        },
+        {
+          "path": "pictures/141053.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-53-front-Enemy-Squint_Eyed_Southerner-A_Knife_in_the_Dark.jpg",
+          "sha256": "c8be17e90932e9e3c64c1879470480a5c387dcbc3325487a4e86667cc659739e",
+          "bytes": 813518
+        },
+        {
+          "path": "pictures/141054.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-54-front-Treachery-Unwanted_Attention-A_Knife_in_the_Dark.jpg",
+          "sha256": "7c2b0f5601a947112388cbb5444c1a396b4d3dd474c051dc019ee9e8082ef1bd",
+          "bytes": 822609
+        },
+        {
+          "path": "pictures/141055.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-55-front-Treachery-Black_Breath-A_Knife_in_the_Dark.jpg",
+          "sha256": "90dc74e3aad1f8d3efbfb68a2f950fe6c5afb4d3a2947f27b11ce55938d484d8",
+          "bytes": 912958
+        },
+        {
+          "path": "pictures/141056.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-56-front-Campaign-Flight_to_the_Ford-The_Lord_of_the_Rings_Part_3-A-Flight_to_the_Ford.jpg",
+          "sha256": "57f53893eb8540ac75f8f22db749e2f2397a5b0f59c1b60489d302abccc1f6ca",
+          "bytes": 873576
+        },
+        {
+          "path": "pictures/141056.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-56-back-Campaign-Flight_to_the_Ford-The_Lord_of_the_Rings_Part_3-A-Flight_to_the_Ford.jpg",
+          "sha256": "511760f97e3c9393aef5123376d6649963b3725d8634dd30001d612c9d55802d",
+          "bytes": 868884
+        },
+        {
+          "path": "pictures/141057.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-57-front-Objective-An_Evil_Wound-Flight_to_the_Ford.jpg",
+          "sha256": "b6c115a49efd1f344b86793bfce441aaa561ba2621e9ce3810c7cbde8e9959f1",
+          "bytes": 853821
+        },
+        {
+          "path": "pictures/141058.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-58-front-Location-The_Last_Bridge-Flight_to_the_Ford.jpg",
+          "sha256": "b341e6c149226869b3f6bfb6dcb77f2ff856cb2473cfcfa91d167ea5da470a4f",
+          "bytes": 813458
+        },
+        {
+          "path": "pictures/141059.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-59-front-Location-Ford_of_Bruinen-Flight_to_the_Ford.jpg",
+          "sha256": "cfa89ff81b78af7dea7bbeda0c6a202f9c55407510d083064fd35099b514b27d",
+          "bytes": 832319
+        },
+        {
+          "path": "pictures/141060.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-60-front-Location-The_Trolls_Camp-Flight_to_the_Ford.jpg",
+          "sha256": "566035129e952ebe61ac5deb2b7d2b92b1857f2056d46094ea9e91d39bf11f4a",
+          "bytes": 827394
+        },
+        {
+          "path": "pictures/141061.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-61-front-Location-Ettenmoors-Flight_to_the_Ford.jpg",
+          "sha256": "5f12fdfe7458877c5db21688f597e18162ecd23c0fbe24bfc1f78276e3a50ebe",
+          "bytes": 893489
+        },
+        {
+          "path": "pictures/141062.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-62-front-Location-The_Old_Road-Flight_to_the_Ford.jpg",
+          "sha256": "edc887925766abc09253db29e9d1af8da0c30363544009ca0308755eaebfed8c",
+          "bytes": 923996
+        },
+        {
+          "path": "pictures/141063.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-63-front-Enemy-Fell_Rider-Flight_to_the_Ford.jpg",
+          "sha256": "b37c081f88d9714504266e59a1445d3d246c336060fa6945fee485a9713d3071",
+          "bytes": 879587
+        },
+        {
+          "path": "pictures/141064.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-64-front-Treachery-Stricken_Dumb-Flight_to_the_Ford.jpg",
+          "sha256": "606a10fd4ebb52eb3af13d5b70675e1b82e1ba9bb56cb10b710a730b3d497c1d",
+          "bytes": 811866
+        },
+        {
+          "path": "pictures/141065.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-65-front-Treachery-The_Enemy_is_Upon_Us-Flight_to_the_Ford.jpg",
+          "sha256": "19114d02b23163939d09e8b7b64932dfe3c44a59f0f6825be551bff5fe71f6fc",
+          "bytes": 859471
+        },
+        {
+          "path": "pictures/141066.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-66-front-Treachery-Pain_Assailed_Him-Flight_to_the_Ford.jpg",
+          "sha256": "9dd4c60588ece0da5f52567420536365c3934e4fee16a04b26f48ccaf330092d",
+          "bytes": 939337
+        },
+        {
+          "path": "pictures/141067.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-67-front-Treachery-The_Nine_are_Abroad-Flight_to_the_Ford.jpg",
+          "sha256": "a88e869f7cf1344b7c927f41fa0a3749d338119986745cc7196d011b8f2d2048",
+          "bytes": 915733
+        },
+        {
+          "path": "pictures/141068.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-68-front-Enemy-The_Witch_king-The_Nazgul.jpg",
+          "sha256": "97b5f93063b4c3acbe73f1af8f109d2635e3eef261b5123ee16f649e8f0e465c",
+          "bytes": 762826
+        },
+        {
+          "path": "pictures/141069.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-69-front-Enemy-Ringwraith-The_Nazgul.jpg",
+          "sha256": "5a2bf0724025f64e339469f72a1ce21e7e1d184ca4ea6f51bdc9f452df3f88f4",
+          "bytes": 771800
+        },
+        {
+          "path": "pictures/141070.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-70-front-Treachery-Pale_Blade-The_Nazgul.jpg",
+          "sha256": "1f08f33106780759d502cf7742372a13d9f8a2ea3c186b00d7f3dfb7f9ec2f2e",
+          "bytes": 833362
+        },
+        {
+          "path": "pictures/141071.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-71-front-Treachery-Power_In_Their_Terror-The_Nazgul.jpg",
+          "sha256": "27e19dee4ee80f33d48039c6d2c7011ef5c10465bb72fd305c15e2a073d78252",
+          "bytes": 782507
+        },
+        {
+          "path": "pictures/141072.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-72-front-Location-Pathless_Country-Hunted.jpg",
+          "sha256": "716f7d4a7e9a61aeec02fbf6b7896f0f0033001232db9403ffc5d7bd87cc825b",
+          "bytes": 910523
+        },
+        {
+          "path": "pictures/141073.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-73-front-Treachery-Piercing_Cry-Hunted.jpg",
+          "sha256": "638d35462d0c82d3926baf31fd9b3d03581a9247198c5c5d75c49300e2b08a9d",
+          "bytes": 795156
+        },
+        {
+          "path": "pictures/141074.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-74-front-Treachery-Black_Steed-The_Black_Riders.jpg",
+          "sha256": "c64a66b07d401cc522464604bafd402ed662edf352025997751db086fc88fc74",
+          "bytes": 896453
+        },
+        {
+          "path": "pictures/141075.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-75-front-Treachery-Rode_Like_a_Gale-The_Black_Riders.jpg",
+          "sha256": "4131bbe57fe4aee259ce7d3ca26108c333644d53f2dbc7b758c67d17cc890746",
+          "bytes": 721537
+        },
+        {
+          "path": "pictures/141076.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-76-front-Treachery-Lure_of_the_Ring-The_Ring.jpg",
+          "sha256": "00fa252e505d5a33cc234883d67c5752bb1db52679d5e855d90bd3039b14d913",
+          "bytes": 791618
+        },
+        {
+          "path": "pictures/141077.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-77-front-ObjectiveAlly-Boon-Gildor_Inglorion-A_Shadow_of_the_Past.jpg",
+          "sha256": "b95776ec6ea8204b446ca0e000204a119c2e6b33e22bbb5358f93e41626e2afd",
+          "bytes": 841647
+        },
+        {
+          "path": "pictures/141079.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-79-front-Treachery-Burden-The_Ring_Draws_Them-A_Shadow_of_the_Past.jpg",
+          "sha256": "6833700679f8524d5a41c86451957d299d044f2c9fe53533132998fae9a4b7aa",
+          "bytes": 788206
+        },
+        {
+          "path": "pictures/141085.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC32-85-front-Objective-The_One_Ring.jpg",
+          "sha256": "536f8b110ca465943aeccabdc0331380da811a092c31bb316f48f22c0deebcfb",
+          "bytes": 770654
+        },
+        {
+          "path": "pictures/142001.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-1-front-Hero-Frodo_Baggins-Fellowship-The_Road_Darkens.jpg",
+          "sha256": "bec24d96d6d9d383415fe7c0edb4d5d05b42508d48aab6498e0aab497a6b62a1",
+          "bytes": 866030
+        },
+        {
+          "path": "pictures/142002.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-2-front-Hero-Gandalf-Neutral.jpg",
+          "sha256": "50d890b3de40d699913fc06c7b8181f6e6fbc4599bd22cafc267146b96d05357",
+          "bytes": 917320
+        },
+        {
+          "path": "pictures/142003.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-3-front-Ally-Galadriel-Leadership.jpg",
+          "sha256": "f16dda5bfc6c74239da9e436b8d2e521ac5a93a5c9037edaae39a0a863c6a61a",
+          "bytes": 843693
+        },
+        {
+          "path": "pictures/142004.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-4-front-Ally-Boromir-Tactics.jpg",
+          "sha256": "8ea890bf596008d82a40374c271733a8ace7902a0e1e92169b3717ba2239ab38",
+          "bytes": 833213
+        },
+        {
+          "path": "pictures/142006.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-6-front-Ally-Bilbo_Baggins-Spirit.jpg",
+          "sha256": "b51422e797d027c0d5d48af97698fc2f2de942e34319bfa388a88b9a649d4fa9",
+          "bytes": 902003
+        },
+        {
+          "path": "pictures/142007.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-7-front-Event-Flame_of_Anor-Neutral.jpg",
+          "sha256": "4169320ab7c7190af90d54eb330023a055745d8450bed1200c9628ec1d516cff",
+          "bytes": 777687
+        },
+        {
+          "path": "pictures/142008.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-8-front-Attachment-Gandalfs_Staff-Neutral.jpg",
+          "sha256": "23f3be907e72d48a0981f12761462c026550eabbfaf2b21aea5a29e742c7d38a",
+          "bytes": 831810
+        },
+        {
+          "path": "pictures/142009.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-9-front-Attachment-Wizard_Pipe-Neutral.jpg",
+          "sha256": "c795276b24a4aa534c3a86f3a56043b5306204419e55c1ac6277635187c95905",
+          "bytes": 830329
+        },
+        {
+          "path": "pictures/142010.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-10-front-Attachment-Fellowship_of_the_Ring-Fellowship.jpg",
+          "sha256": "71556551d0267422ddc2327963d474ca0151719ee7ea22ced3313cf48a03b6f3",
+          "bytes": 1011312
+        },
+        {
+          "path": "pictures/142011.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-11-front-Attachment-Boon-Sting-Neutral.jpg",
+          "sha256": "95d6a208c012b3c99648693caf4a7176249c557265501eb51c9cfb14c2545fe6",
+          "bytes": 887899
+        },
+        {
+          "path": "pictures/142012.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-12-front-Attachment-Boon-Mithril_Shirt-Neutral.jpg",
+          "sha256": "2d5ac4be7003f40c25ff917f21227548c664268583b74c459ce2b2bed1a06855",
+          "bytes": 847347
+        },
+        {
+          "path": "pictures/142013.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-13-front-Attachment-Boon-Glamdring-Neutral.jpg",
+          "sha256": "50e7d9e39ac64eecb260a64e6cb9b832cbb1084fa9706d2217de3ba9447cdc40",
+          "bytes": 908302
+        },
+        {
+          "path": "pictures/142014.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-14-front-Attachment-Boon-Anduril-Neutral.jpg",
+          "sha256": "4c466fb2bb0799da7f3071da125decb3e9feafdd0927a4eea66a8dc3b0720cfb",
+          "bytes": 870746
+        },
+        {
+          "path": "pictures/142016.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-16-front-Attachment-Boon-Three_Golden_Hairs-Neutral.jpg",
+          "sha256": "64487a70891cdff32af08b8502ecd6d17eec36439d3a17d2cd8cf7ca7291202e",
+          "bytes": 848151
+        },
+        {
+          "path": "pictures/142017.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-17-front-Attachment-Boon-Lorien_Rope-Neutral.jpg",
+          "sha256": "8f0d1838abdc65a9ca3e0b13c1dbe252d81ef5b7f3893cc3a79a3e20db0b74f4",
+          "bytes": 959164
+        },
+        {
+          "path": "pictures/142018.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-18-front-Attachment-Boon-Leaf_wrapped_Lembas-Neutral.jpg",
+          "sha256": "d126d6367f00c8c656761fd2454b01243815fe45a176844d9b8bc5b164c488ce",
+          "bytes": 859300
+        },
+        {
+          "path": "pictures/142019.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-19-front-Campaign-The_Ring_Goes_South-The_Lord_of_the_Rings_Part_4-A-The_Ring_Goes_South.jpg",
+          "sha256": "4cd7db2b0d292c40e4f6e7ee0d83312c8f1fbf2b488eceddeba8c22e57a6d389",
+          "bytes": 970086
+        },
+        {
+          "path": "pictures/142019.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-19-back-Campaign-The_Ring_Goes_South-The_Lord_of_the_Rings_Part_4-A-The_Ring_Goes_South.jpg",
+          "sha256": "089bd1efe858f6263c2d094b63cc22cc99f1c2760f12e992701435d8e64a1a19",
+          "bytes": 957995
+        },
+        {
+          "path": "pictures/142020.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-20-front-Quest-The_Council_of_Elrond-A-The_Ring_Goes_South.jpg",
+          "sha256": "9a608a70e8f71b2ee584230206ff056174b90f5a7e4c0499ba7cf35c98375325",
+          "bytes": 987014
+        },
+        {
+          "path": "pictures/142020.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-20-back-Quest-The_Council_of_Elrond-A-The_Ring_Goes_South.jpg",
+          "sha256": "e04b1570cf3fd2eebcc01f4214e5961a860e0639375b3e1dbac5afde32d30779",
+          "bytes": 907691
+        },
+        {
+          "path": "pictures/142021.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-21-front-Quest-The_Nine_Walkers-A-The_Ring_Goes_South.jpg",
+          "sha256": "9381473aa7b2716f05bf33486bd00d8b2f0dd27de460634e7760f63fedff80bb",
+          "bytes": 985449
+        },
+        {
+          "path": "pictures/142021.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-21-back-Quest-The_Nine_Walkers-A-The_Ring_Goes_South.jpg",
+          "sha256": "f9c57cc84007d433cf5fa10b19f7d18f10157107a2c3473553c3fb395b1ea37d",
+          "bytes": 884723
+        },
+        {
+          "path": "pictures/142022.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-22-front-Quest-The_Hunt_is_Up-A-The_Ring_Goes_South.jpg",
+          "sha256": "57cea8e548845fe0df747cb8985047fcb6f7ce031ea58c67b625aad508ae4c35",
+          "bytes": 939537
+        },
+        {
+          "path": "pictures/142022.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-22-back-Quest-The_Hunt_is_Up-A-The_Ring_Goes_South.jpg",
+          "sha256": "ed73bb9758e7b2e0afc6dfc1c28a0d384c1a6b46dcde17e6d2674ed308f91fc1",
+          "bytes": 897230
+        },
+        {
+          "path": "pictures/142023.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-23-front-Quest-The_Gates_of_Moria-A-The_Ring_Goes_South.jpg",
+          "sha256": "3a72f0c98b4df4ba37d309e36d44efc5f4d18cf43fb5c57739c5cfbf4ab86bd2",
+          "bytes": 881022
+        },
+        {
+          "path": "pictures/142023.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-23-back-Quest-The_Gates_of_Moria-A-The_Ring_Goes_South.jpg",
+          "sha256": "54c548131507517c0dbf43bc7ed4383199b2af4e0007bcb8c11e6d2ae861e357",
+          "bytes": 895936
+        },
+        {
+          "path": "pictures/142024.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-24-front-Enemy-Watcher_in_the_Water-The_Ring_Goes_South.jpg",
+          "sha256": "eac0733477bb897967c2c587bbe56ac11317c7a25f7ef1ccd761d27bb2c3a5fc",
+          "bytes": 949820
+        },
+        {
+          "path": "pictures/142025.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-25-front-Enemy-Great_Warg_Chief-The_Ring_Goes_South.jpg",
+          "sha256": "ccaa0af4cbcda39c4d6f43374998605e01878ae40c3b242f55eeb56abc971453",
+          "bytes": 795862
+        },
+        {
+          "path": "pictures/142026.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-26-front-Enemy-Hound_of_Sauron-The_Ring_Goes_South.jpg",
+          "sha256": "34e94b1c5e403b5436ab04b1cdbc0501d4cc249f8a89affc5bed2d1b9f4ebd1a",
+          "bytes": 866457
+        },
+        {
+          "path": "pictures/142027.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-27-front-Enemy-Howling_Warg-The_Ring_Goes_South.jpg",
+          "sha256": "02abf87f62566d5acd007fe336ecfa6ddda3a2179c933905edf14a9a819082a1",
+          "bytes": 804073
+        },
+        {
+          "path": "pictures/142028.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-28-front-Enemy-Crebain_from_Dunland-The_Ring_Goes_South.jpg",
+          "sha256": "47f2f8d8ec04a06dd679307939272e574934813a0e27b6d4be827b453bd0dc90",
+          "bytes": 822882
+        },
+        {
+          "path": "pictures/142029.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-29-front-Location-Redhorn_Pass-The_Ring_Goes_South.jpg",
+          "sha256": "9a079b148de6ea85253e750da299d9c0e074dad5497c0fad7cd1203a08bdd585",
+          "bytes": 969914
+        },
+        {
+          "path": "pictures/142030.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-30-front-Location-Doors_of_Durin-The_Ring_Goes_South.jpg",
+          "sha256": "342efa288bcea0768136aae068540a8f86d7bd06e38b5a38e2c26cf647c30556",
+          "bytes": 851484
+        },
+        {
+          "path": "pictures/142031.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-31-front-Location-Tree_crowned_Hill-The_Ring_Goes_South.jpg",
+          "sha256": "2f4e56375fbefc59a1dec78b1d34c87058d95aa7e0b382fc2b7ef287ec1c7458",
+          "bytes": 913544
+        },
+        {
+          "path": "pictures/142032.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-32-front-Location-Hills_of_Hollin-The_Ring_Goes_South.jpg",
+          "sha256": "fde640bc56f9406d557e6db5696bb5fc50e12057b5c4f2900a74f09484a63c03",
+          "bytes": 833577
+        },
+        {
+          "path": "pictures/142033.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-33-front-Location-Redhorn_Foothills-The_Ring_Goes_South.jpg",
+          "sha256": "b7f68474bbb22bf1f8bbdeed3379797bbda6c07695faba720fe40c3290c5520d",
+          "bytes": 901339
+        },
+        {
+          "path": "pictures/142034.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-34-front-Location-Eregion-The_Ring_Goes_South.jpg",
+          "sha256": "8fe576a0464e51ad795c6268332ea4947e7d8f731565ac0d5cc301b38dded0e3",
+          "bytes": 959254
+        },
+        {
+          "path": "pictures/142035.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-35-front-Treachery-Regiments_of_Crows-The_Ring_Goes_South.jpg",
+          "sha256": "b32e4c00e958f71fd7e412b85ab220d15174b93f5b9af88a53c908ac0a6ee9ac",
+          "bytes": 860134
+        },
+        {
+          "path": "pictures/142036.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-36-front-Treachery-Snowdrifts-The_Ring_Goes_South.jpg",
+          "sha256": "7766723e03dce1b10f848776fff0e0f375aee2371af18abb64a320481ed9769e",
+          "bytes": 915033
+        },
+        {
+          "path": "pictures/142037.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-37-front-Treachery-Bitter_Cold-The_Ring_Goes_South.jpg",
+          "sha256": "fa20dbf9c07cadf3e93444bf9c3ae34850286a2230e7f918566be9a568caa99e",
+          "bytes": 875890
+        },
+        {
+          "path": "pictures/142038.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-38-front-Treachery-Storm_of_Howls-The_Ring_Goes_South.jpg",
+          "sha256": "fff230f2853c62b9189ea38b6365bd9988524926cd2350efaa3c884d2c8c2ea5",
+          "bytes": 864535
+        },
+        {
+          "path": "pictures/142039.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-39-front-Campaign-Journey_in_the_Dark-The_Lord_of_the_Rings_Part_5-A-Journey_in_the_Dark.jpg",
+          "sha256": "ffae851bf60db31552261fdf8f0e8bfe602d6f61773bff238751517379be14d4",
+          "bytes": 979366
+        },
+        {
+          "path": "pictures/142039.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-39-back-Campaign-Journey_in_the_Dark-The_Lord_of_the_Rings_Part_5-A-Journey_in_the_Dark.jpg",
+          "sha256": "048007f196ec37aa1e774f7e38573c8de93a6c5639e8bdd269135a7888f0457f",
+          "bytes": 1028614
+        },
+        {
+          "path": "pictures/142040.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-40-front-Quest-The_Long_Dark_of_Moria-A-Journey_in_the_Dark.jpg",
+          "sha256": "5eb4bec7e6779b28eb157be3afff672d9a5746c9c4e3491573ef7c1a60c7a8c2",
+          "bytes": 898797
+        },
+        {
+          "path": "pictures/142040.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-40-back-Quest-The_Long_Dark_of_Moria-A-Journey_in_the_Dark.jpg",
+          "sha256": "cb1bf474368aa76be938a8e8eec028b3884105a8ae499b9d725cccbf2cfc7bbb",
+          "bytes": 910098
+        },
+        {
+          "path": "pictures/142041.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-41-front-Quest-Drums_in_the_Deep-A-Journey_in_the_Dark.jpg",
+          "sha256": "dc1c55ec7b45ed666430b518e7944c8695de3dc126e6fcc249866f24870fbbe8",
+          "bytes": 923151
+        },
+        {
+          "path": "pictures/142041.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-41-back-Quest-Drums_in_the_Deep-A-Journey_in_the_Dark.jpg",
+          "sha256": "c3dae537ef1b2e98edf241b6b5cf08bae51d0ef39c24d81e8ee20bfbecea67ac",
+          "bytes": 985402
+        },
+        {
+          "path": "pictures/142042.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-42-front-Quest-The_Bridge_of_Khazad_dum-A-Journey_in_the_Dark.jpg",
+          "sha256": "4bde78b289779cf536e5407d5124194e61e56b6fea433b836d93c00ae5e3676c",
+          "bytes": 945791
+        },
+        {
+          "path": "pictures/142042.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-42-back-Quest-The_Bridge_of_Khazad_dum-A-Journey_in_the_Dark.jpg",
+          "sha256": "99f2f40f498574f5d99b9c2a77cc904d515b37b7ca2e39e05ac7244d03c3c8c0",
+          "bytes": 925118
+        },
+        {
+          "path": "pictures/142043.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-43-front-Objective-Doom_Doom_Doom-Journey_in_the_Dark.jpg",
+          "sha256": "948f5ee5cd2022836164857aaddcbf46fb1a652cd0dfe4d1cef7e5b10f9d3036",
+          "bytes": 865031
+        },
+        {
+          "path": "pictures/142044.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-44-front-Enemy-The_Balrog-Journey_in_the_Dark.jpg",
+          "sha256": "37e361dc5a66ebfee84d2ddc9a97736d072c7f4866d13db47227b17cb7cf05bf",
+          "bytes": 861273
+        },
+        {
+          "path": "pictures/142045.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-45-front-Enemy-Orc_chieftain-Journey_in_the_Dark.jpg",
+          "sha256": "38eeabd44ff6d5941535a5c4d8fb099d06e2e81540e0a949ec96e433af79e71f",
+          "bytes": 815983
+        },
+        {
+          "path": "pictures/142046.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-46-front-Enemy-Great_Cave_troll-Journey_in_the_Dark.jpg",
+          "sha256": "a21a15cf48f3a6c48198e2701a293952368e22ed67cbeb35beb1fc5285b3fdc1",
+          "bytes": 819458
+        },
+        {
+          "path": "pictures/142047.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-47-front-Enemy-Uruk_from_Mordor-Journey_in_the_Dark.jpg",
+          "sha256": "5ed9347024a72466cfd7ef50d968f943cd1eb4835075d60de739feb4a17910ba",
+          "bytes": 895596
+        },
+        {
+          "path": "pictures/142048.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-48-front-Enemy-Moria_Orc-Journey_in_the_Dark.jpg",
+          "sha256": "002e50452af9f5cf2a7b92151b61e4b4c0c9bf18bf2eb16833c7cbaad434092f",
+          "bytes": 825490
+        },
+        {
+          "path": "pictures/142049.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-49-front-Enemy-Moria_Archer-Journey_in_the_Dark.jpg",
+          "sha256": "a282ba51e7583045bf12006eb447ef65a270c2814d90bf44d935dba25e458fdb",
+          "bytes": 813932
+        },
+        {
+          "path": "pictures/142050.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-50-front-Location-The_Great_Bridge-Journey_in_the_Dark.jpg",
+          "sha256": "aca94d8ecdf06511778e633b2731aabc7eb7c502f56eeda333aa15d8025efa48",
+          "bytes": 791696
+        },
+        {
+          "path": "pictures/142051.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-51-front-Location-Chamber_of_Mazarbul-Journey_in_the_Dark.jpg",
+          "sha256": "68921197d724c381e20e2c358e9599c365ef89d70185fe35647bbfe03920d711",
+          "bytes": 945656
+        },
+        {
+          "path": "pictures/142052.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-52-front-Location-Mines_of_Moria-Journey_in_the_Dark.jpg",
+          "sha256": "09b4861aac5e2601e8982bb75b324e126ab7756fcca8e50d2337e60382ac3b19",
+          "bytes": 868745
+        },
+        {
+          "path": "pictures/142053.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-53-front-Location-Many_pillared_Hall-Journey_in_the_Dark.jpg",
+          "sha256": "5898310009814b5f1ffa465a617acbcf95c8288bce3aa30f842f81e6d88f4fad",
+          "bytes": 843778
+        },
+        {
+          "path": "pictures/142054.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-54-front-Location-Darkened_Stairway-Journey_in_the_Dark.jpg",
+          "sha256": "e81e0859e46e909ae9df88d78861396a577a073ad391062b6121c5f72ef433d9",
+          "bytes": 884909
+        },
+        {
+          "path": "pictures/142055.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-55-front-Location-Ancient_Guardroom-Journey_in_the_Dark.jpg",
+          "sha256": "61e8728485d9acd2564567972a734d0c524ee681719ea6f1530dd4f6f7b9d07f",
+          "bytes": 880396
+        },
+        {
+          "path": "pictures/142056.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-56-front-Treachery-They_Are_Coming-Journey_in_the_Dark.jpg",
+          "sha256": "aa0152e7b9a866fba3dfdeb6294ed1dca863fab5f5af679ff5c780a4f5e81adc",
+          "bytes": 856432
+        },
+        {
+          "path": "pictures/142057.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-57-front-Treachery-We_Cannot_Get_Out-Journey_in_the_Dark.jpg",
+          "sha256": "048bafa2c11de5b9f740371c14367a11dc945b644debc2e569692942d553b915",
+          "bytes": 858739
+        },
+        {
+          "path": "pictures/142058.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-58-front-Treachery-Deep_Fissure-Journey_in_the_Dark.jpg",
+          "sha256": "f6ee22847343bff75d80c205c638359c56450684bc38ec3cfdcd20c6a44874e5",
+          "bytes": 846135
+        },
+        {
+          "path": "pictures/142059.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-59-front-Treachery-Fool_of_a_Took-Journey_in_the_Dark.jpg",
+          "sha256": "1a49ee81219dbab66ba3f57411ce3e898ac07156a0729033f5cc6ec6859afc94",
+          "bytes": 856207
+        },
+        {
+          "path": "pictures/142060.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-60-front-Campaign-Breaking_of_the_Fellowship-The_Lord_of_the_Rings_Part_6-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "596e8ddec2a0d56b84430cd7108a18d9af8a87be25c24ad97e17d87559b8a61a",
+          "bytes": 871988
+        },
+        {
+          "path": "pictures/142060.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-60-back-Campaign-Breaking_of_the_Fellowship-The_Lord_of_the_Rings_Part_6-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "05a6825ccb94edae174498484abdf148465b7dc850d6e6b8eff3949c8029a9da",
+          "bytes": 874359
+        },
+        {
+          "path": "pictures/142061.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-61-front-Quest-The_Great_River-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "40942f404940f82f0c6dc3f0a37a43af8cdcb0e5ee3ab42c525742dc9ecfe4cb",
+          "bytes": 899566
+        },
+        {
+          "path": "pictures/142061.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-61-back-Quest-The_Great_River-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "c6c03d5d2c11c2c77c70980448e5ec3244636c1295b1689f1d4ae0051190a805",
+          "bytes": 964387
+        },
+        {
+          "path": "pictures/142062.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-62-front-Quest-The_Company_Divided-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "470d9ae102c931219da4d8e60d45ab2bb46597b974b95fa24f5a02e1e1540cd6",
+          "bytes": 971543
+        },
+        {
+          "path": "pictures/142062.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-62-back-Quest-The_Company_Divided-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "75459f2568e5f59ffe2ce5d2b75b9cad647a4aa0a9c4ffdc453758dd9e5ad549",
+          "bytes": 927279
+        },
+        {
+          "path": "pictures/142063.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-63-front-Quest-Searching_the_Woods-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "ae1cc58b10f65d50d752b7c53f4b6d6bd60ee61ad7d9f869c3c218041f7e151d",
+          "bytes": 879331
+        },
+        {
+          "path": "pictures/142063.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-63-back-Quest-Searching_the_Woods-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "2ebe4f30065f420666b22f75f8689f9c381e1bdefa7b6031767f2f859c747d61",
+          "bytes": 919415
+        },
+        {
+          "path": "pictures/142064.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-64-front-Quest-Guard_the_Hobbits-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "ee3c03b90c93415f4aab7a8946c7b0369be2f4fe73cff09128578ce1f5f4abb0",
+          "bytes": 951967
+        },
+        {
+          "path": "pictures/142064.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-64-back-Quest-Guard_the_Hobbits-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "5c93504a272bd9f7e0ec741232c3f8d9684f2573c66986a946f18e00b9b2773f",
+          "bytes": 1026047
+        },
+        {
+          "path": "pictures/142065.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-65-front-Quest-The_Seat_of_Amon_Hen-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "1245af9a282eb71a9f544d8ad647afb04751080e8aac6e92a28a3887a21c95ae",
+          "bytes": 872735
+        },
+        {
+          "path": "pictures/142065.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-65-back-Quest-The_Seat_of_Amon_Hen-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "c3f641894250354e6e87bd120621bc60e61a951b303fe474d2e59f2dcdc2cb11",
+          "bytes": 1003990
+        },
+        {
+          "path": "pictures/142066.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-66-front-Quest-Orc_Hunting-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "7f46635a3919fef2f23bea7985be8590db5a28f4ac5489aecb6060c508de1087",
+          "bytes": 889071
+        },
+        {
+          "path": "pictures/142066.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-66-back-Quest-Orc_Hunting-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "4debcd92535d070a4656f4d254fe646cc2d1bf487913cb9afa156eae00e51941",
+          "bytes": 855307
+        },
+        {
+          "path": "pictures/142067.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-67-front-Quest-The_Ring_bearer_Sets_Out-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "1eb69ff91cc970fef0a5900cd3a0591ee469f5a6ebcbd8a75aac6b2997d4e8e1",
+          "bytes": 941094
+        },
+        {
+          "path": "pictures/142067.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-67-back-Quest-The_Ring_bearer_Sets_Out-A-Breaking_of_the_Fellowship.jpg",
+          "sha256": "e25b00623c4e937cf584469af147d4be45637a741e253c0cccd3463eb86928fd",
+          "bytes": 840809
+        },
+        {
+          "path": "pictures/142068.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-68-front-Objective-Frodos_Choice-Breaking_of_the_Fellowship.jpg",
+          "sha256": "9581a178a82b75839ae171fd17e4f015dd30b3a91778b13a97365ec73ed2af1f",
+          "bytes": 899698
+        },
+        {
+          "path": "pictures/142069.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-69-front-Enemy-Uruk_hai_Captain-Breaking_of_the_Fellowship.jpg",
+          "sha256": "a999cde2a1f2f76b2823723f6502497ed1b32b0221557460a74b94eab0bacd95",
+          "bytes": 853108
+        },
+        {
+          "path": "pictures/142070.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-70-front-Enemy-Uruk_hai_Archer-Breaking_of_the_Fellowship.jpg",
+          "sha256": "9cf1ec53da42da153133893f89716ba3e4a020753b88a23fca8714c4585103d0",
+          "bytes": 804507
+        },
+        {
+          "path": "pictures/142071.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-71-front-Enemy-Uruk_hai_Tracker-Breaking_of_the_Fellowship.jpg",
+          "sha256": "4778cf8d5eee7063c430071402bb4b2deb8e72c9e6fd121863aa9f6ceedeee57",
+          "bytes": 849404
+        },
+        {
+          "path": "pictures/142072.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-72-front-Enemy-Uruk_hai_Hunter-Breaking_of_the_Fellowship.jpg",
+          "sha256": "25e10649dfdef00d4c6b1bef417da27ac65f4efea4b9d5c98451aeb77429402d",
+          "bytes": 938442
+        },
+        {
+          "path": "pictures/142073.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-73-front-Location-Parth_Galen-Breaking_of_the_Fellowship.jpg",
+          "sha256": "068b3ef6be0366d76f0b00a7eaf79ca7783fa242ece16291d1d4cfe637d5c744",
+          "bytes": 835944
+        },
+        {
+          "path": "pictures/142074.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-74-front-Location-Seat_of_Seeing-Breaking_of_the_Fellowship.jpg",
+          "sha256": "bbb1b97858150691d1d20f38069ef417444ba57ad8560b27d9a61007b8e6ec47",
+          "bytes": 873830
+        },
+        {
+          "path": "pictures/142075.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-75-front-Location-The_Argonath-Breaking_of_the_Fellowship.jpg",
+          "sha256": "903c25ecf99eae1b8e8f4827d4d16fd6078f2b2f4111cf06e4a4e15121315170",
+          "bytes": 843456
+        },
+        {
+          "path": "pictures/142076.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-76-front-Location-Sarn_Gebir-Breaking_of_the_Fellowship.jpg",
+          "sha256": "88089599d75b7b8be8ed805bd2461b2c1e48ff5cd6d1860f13491945e2e2ddb3",
+          "bytes": 835523
+        },
+        {
+          "path": "pictures/142077.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-77-front-Location-River_Anduin-Breaking_of_the_Fellowship.jpg",
+          "sha256": "6b3f70b77bfe4385f633761a6111973344f32d8d888f0c7e29953cfbaa7779ab",
+          "bytes": 854652
+        },
+        {
+          "path": "pictures/142078.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-78-front-Location-Wooded_Shoreline-Breaking_of_the_Fellowship.jpg",
+          "sha256": "1d40294274612f4620ce39522cbd14f0dfca1d8658706638aeaab4e8479f9590",
+          "bytes": 841989
+        },
+        {
+          "path": "pictures/142079.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-79-front-Location-Slopes_of_Amon_Hen-Breaking_of_the_Fellowship.jpg",
+          "sha256": "567728834dfd45123b228d98f233127ee670db32726e6ea94164100b762efc8b",
+          "bytes": 830701
+        },
+        {
+          "path": "pictures/142080.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-80-front-Treachery-Growing_Threat-Breaking_of_the_Fellowship.jpg",
+          "sha256": "228d0ee4d12e226353709d63dda19b3bff583394e8fc2e1b0de2444cb601da64",
+          "bytes": 832039
+        },
+        {
+          "path": "pictures/142081.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-81-front-Treachery-Orcs_of_the_White_Hand-Breaking_of_the_Fellowship.jpg",
+          "sha256": "8a9714087b78b26ee01ba7911f517a08ca181dd1e106e1252a4875f50f8faffd",
+          "bytes": 917937
+        },
+        {
+          "path": "pictures/142082.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-82-front-Treachery-Black_Feathered_Arrows-Breaking_of_the_Fellowship.jpg",
+          "sha256": "62548908a49db0ebdf1712777693cffe861870c291a6a9a099032c4acc4b148e",
+          "bytes": 840293
+        },
+        {
+          "path": "pictures/142083.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-83-front-Treachery-Fallen_Into_Evil-Breaking_of_the_Fellowship.jpg",
+          "sha256": "ac2d1ab1611f713102cd7c2486ca5accfe096227e73ff6d44b18d73aec6566e2",
+          "bytes": 846556
+        },
+        {
+          "path": "pictures/142084.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-84-front-Treachery-Burden-Lust_for_the_Ring-The_Ring_Goes_South.jpg",
+          "sha256": "3b3ab01720ef9b7d1baa671e20f6928eae5e2aa86575c849848d67849234b86b",
+          "bytes": 798749
+        },
+        {
+          "path": "pictures/142087.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-87-front-Objective-Burden-Overcome_by_Grief-Journey_in_the_Dark.jpg",
+          "sha256": "706216f02ea837743768a720101e68c589936ca269a1f19d766501589468c45c",
+          "bytes": 835846
+        },
+        {
+          "path": "pictures/142088.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-88-front-Objective-Burden-Grievous_Wound-Journey_in_the_Dark.jpg",
+          "sha256": "9ad060b4e3592a5a7861c0986c1dc3cc71661847d9923b9df4c822be714db281",
+          "bytes": 810725
+        },
+        {
+          "path": "pictures/142089.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-89-front-Treachery-Burden-Followed_by_Night-Breaking_of_the_Fellowship.jpg",
+          "sha256": "8545396a7b45aae3a37e29bfda515ca667f0d40007c8dfe271839ff1deed814b",
+          "bytes": 868219
+        },
+        {
+          "path": "pictures/142090.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC34-90-front-Treachery-Burden-Ill_Fate-Breaking_of_the_Fellowship.jpg",
+          "sha256": "dc583fa6d6f32fd7ae93030d3c2317218949eb82711a77ba3fd06b214dccdd1a",
+          "bytes": 812034
+        },
+        {
+          "path": "pictures/19121.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-121-front-Event-The_Shirefolk-Neutral.jpg",
+          "sha256": "d638d65ecae36e4035220e7376bb5c34c61ea320e800980af19df4d7203b7605",
+          "bytes": 920724
+        },
+        {
+          "path": "pictures/41001.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-1-front-Quest-After_the_Raid-A-The_Oath_Campaign.jpg",
+          "sha256": "46812c7b663241b12872c2a362f44653922f8b1f96cfa07ff5292f5265b13184",
+          "bytes": 3492389
+        },
+        {
+          "path": "pictures/41001.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-1-back-Quest-After_the_Raid-A-The_Oath_Campaign.jpg",
+          "sha256": "a1c0aa1c3a6b4fdb80f58e2e381ba1e10e9c127ef36b87236ee0c3cb2482d824",
+          "bytes": 3204244
+        },
+        {
+          "path": "pictures/41002.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-2-front-Quest-Mirkwood_Forest-A-The_Oath_Campaign.jpg",
+          "sha256": "26a99d7fc5a70fc9a520ce07f22106d7bdf20eaf92a92628baed526a345373dc",
+          "bytes": 3760143
+        },
+        {
+          "path": "pictures/41002.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-2-back-Quest-Mirkwood_Forest-A-The_Oath_Campaign.jpg",
+          "sha256": "28a805491383e1716226c055a1f19f784f2a733b3564144723d2cfad8ff01d9f",
+          "bytes": 3161925
+        },
+        {
+          "path": "pictures/41003.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-3-front-Quest-The_Rearguard-A-The_Oath_Campaign.jpg",
+          "sha256": "4e7535e99c7880f06c1a9d7a5febda0a325ef0393ed4e06fe49700a3b7a61e77",
+          "bytes": 3925821
+        },
+        {
+          "path": "pictures/41003.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-3-back-Quest-The_Rearguard-A-The_Oath_Campaign.jpg",
+          "sha256": "0bb15548f0597926e6723109dcb7203628e039f6f47affcacebe54495e44a570",
+          "bytes": 3654536
+        },
+        {
+          "path": "pictures/41004.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-4-front-Quest-The_Dark_of_Nibin_Dum-A-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "535c7022d9d81c7c6d399335db41ecb9482c365768937375fba03a9a20f47a2d",
+          "bytes": 3939616
+        },
+        {
+          "path": "pictures/41004.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-4-back-Quest-The_Dark_of_Nibin_Dum-A-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "67bc03b1cf1138763ad8628387618fd35f9c6533c7982efdcfbec05b046e6025",
+          "bytes": 3558254
+        },
+        {
+          "path": "pictures/41005.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-5-front-Quest-Surprise_Attack-A-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "14977c45e739df5d5e4b48adc661cd63adaa03e7a7a6b5d3443ef66012095cb8",
+          "bytes": 3344505
+        },
+        {
+          "path": "pictures/41005.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-5-back-Quest-Surprise_Attack-A-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "464b545dd17917cf572d31e3825a7765cf19e794a2ed777353231cc48536d42c",
+          "bytes": 3219664
+        },
+        {
+          "path": "pictures/41006.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-6-front-Quest-The_Chasm-A-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "54f091f8f6c00aa688196523d45bec4eaafbaaef204af03d9f29075f0202ab9b",
+          "bytes": 3650094
+        },
+        {
+          "path": "pictures/41006.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-6-back-Quest-The_Chasm-A-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "e570d8cfb3329a86dd89d9c1c566f98fcaf29f60389cee83a19becb4ec667270",
+          "bytes": 3810471
+        },
+        {
+          "path": "pictures/41007.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-7-front-Quest-Oathkeepers-A-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "60b2830f978d44e8dcb770d5e8175baaf9047815026ae526b8d8583a8df89f9c",
+          "bytes": 3712953
+        },
+        {
+          "path": "pictures/41007.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-7-back-Quest-Oathkeepers-A-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "177016cd3e37ce48194e6f64961a0b86cdecbd6c77db110baac0e3f41e6f6f74",
+          "bytes": 3142771
+        },
+        {
+          "path": "pictures/41008.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-8-front-Enemy-Spiders_of_Mirkwood-The_Oath_Campaign.jpg",
+          "sha256": "63a148bd8b7a8f0644d3300433a1bc5eab185b9ae5282a8b7fa4276b12aaaff6",
+          "bytes": 3311062
+        },
+        {
+          "path": "pictures/41009.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-9-front-Enemy-Great_Spider-The_Oath_Campaign.jpg",
+          "sha256": "884b4f59ee77606b7fad2f0836c4735a6b92df8e65667574b352e1d348fb5026",
+          "bytes": 3294615
+        },
+        {
+          "path": "pictures/41010.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-10-front-Location-The_Eaves_of_Mirkwood-The_Oath_Campaign.jpg",
+          "sha256": "71ef1494b0f540499bfa8020729284eea26fcfc04201e297a90d7baf0d18b77a",
+          "bytes": 3519761
+        },
+        {
+          "path": "pictures/41011.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-11-front-Location-Tangled_Grove-The_Oath_Campaign.jpg",
+          "sha256": "790231e7c143a562926e6924a42e583d73e40e48fb8c33247ea42543f61b0fc2",
+          "bytes": 4073639
+        },
+        {
+          "path": "pictures/41012.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-12-front-Location-Forest_Gate-The_Oath_Campaign.jpg",
+          "sha256": "5a7f54571c9d013e69b093dd09e4ea1a280d0c88f846fed61871126cb826818b",
+          "bytes": 4154575
+        },
+        {
+          "path": "pictures/41013.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-13-front-Location-Spider_Den-The_Oath_Campaign.jpg",
+          "sha256": "2f8d4b867d092b51ff0457b4ab441dc2aa28c101b95df27b76c35b740f2523c1",
+          "bytes": 3606291
+        },
+        {
+          "path": "pictures/41014.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-14-front-Location-Goblin_Trail-The_Oath_Campaign.jpg",
+          "sha256": "9553116e18ef58f29dcc2d9c0516515d874b5c6b78e54e676f41dbf4059e65f8",
+          "bytes": 3932511
+        },
+        {
+          "path": "pictures/41015.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-15-front-Location-Abandoned_Camp-The_Oath_Campaign.jpg",
+          "sha256": "ccee22594a86de580c70e261b870afa27b54635c8f1a1f216d186d8f3dbc4eca",
+          "bytes": 3791330
+        },
+        {
+          "path": "pictures/41016.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-16-front-Treachery-Driven_by_Shadow-The_Oath_Campaign.jpg",
+          "sha256": "f197759e7c06fafa4da2bd4604cf33599fa31315b3bf2487ea95384cea246ea8",
+          "bytes": 3609843
+        },
+        {
+          "path": "pictures/41017.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-17-front-Treachery-Surprising_Speed-The_Oath_Campaign.jpg",
+          "sha256": "1139d150dc622eace00c4b4dabdbc712b9e27b972e71e2727a8d222fec039b53",
+          "bytes": 3189346
+        },
+        {
+          "path": "pictures/41018.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-18-front-Treachery-Caught_in_a_Web-The_Oath_Campaign.jpg",
+          "sha256": "01be2beeb4e07d63dce99b45f9833526abbe6e8403a0da007680bbe32c31aac2",
+          "bytes": 3629494
+        },
+        {
+          "path": "pictures/41019.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-19-front-Enemy-Goblin_Troop-The_Goblins_Campaign.jpg",
+          "sha256": "29bdc2a83bc257c5b1fb60f1a6a4ca4008f863d852efb8a73c1a0f448e732405",
+          "bytes": 3524323
+        },
+        {
+          "path": "pictures/41020.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-20-front-Enemy-Goblin_Sniper-The_Goblins_Campaign.jpg",
+          "sha256": "cf95c0e0760629be171f5e648c0d0f99be8e9ad66e74c39da77f7c842386c5c3",
+          "bytes": 3186026
+        },
+        {
+          "path": "pictures/41021.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-21-front-Enemy-Goblin_Runners-The_Goblins_Campaign.jpg",
+          "sha256": "9b4f386a5513bdb5ad4eab9bbd9636add801a1d89f623e86f54bf188d29f4bf1",
+          "bytes": 3014106
+        },
+        {
+          "path": "pictures/41022.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-22-front-Enemy-Goblintown_Scavengers-The_Goblins_Campaign.jpg",
+          "sha256": "6b4e84831a33a6b382a676bbfbf5f66be17242e4ba243a176ed87714ad0054a9",
+          "bytes": 3125615
+        },
+        {
+          "path": "pictures/41023.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-23-front-Enemy-Wild_Wargs-The_Goblins_Campaign.jpg",
+          "sha256": "ae9a2da02c197ccaaa6e96cf7e87d254e2b747953309c11532234f7289d7631a",
+          "bytes": 2845075
+        },
+        {
+          "path": "pictures/41024.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-24-front-Treachery-Goblins_are_Upon_You-The_Goblins_Campaign.jpg",
+          "sha256": "ffb77c667196671996ffc97ee11c850c9d4805c56eee0af6d445df79ecd9fda3",
+          "bytes": 3598689
+        },
+        {
+          "path": "pictures/41025.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-25-front-Treachery-Eyes_in_the_Dark-The_Goblins_Campaign.jpg",
+          "sha256": "d1b3d83a8d048d0eee21e5da7b4c30b4333231c6b94abc33d0f637e150842565",
+          "bytes": 2386711
+        },
+        {
+          "path": "pictures/41026.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-26-front-Treachery-Obsidian_Arrows-The_Goblins_Campaign.jpg",
+          "sha256": "7a70c65861a5dd9b3cfde9222892d56ea7007f75ecb2c584197b23290081a894",
+          "bytes": 3626969
+        },
+        {
+          "path": "pictures/41027.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-27-front-Enemy-Goblin_Chieftain-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "17d65b16f804147c4863654fd7b38f50b3e0761c0a240b7f4c7fd75ec9510c57",
+          "bytes": 3143782
+        },
+        {
+          "path": "pictures/41028.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-28-front-Location-Cracked_Pillar-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "3fd6f732b0985c8a50a5f06fbc7aebec35ec855dd14d804ce0b41603d4dd6ff5",
+          "bytes": 3617433
+        },
+        {
+          "path": "pictures/41029.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-29-front-Objective-Cave_Torch-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "9c204a3d5c234ae49f375d34208422ba8929adb35a82efd56b0c2eb955f7064f",
+          "bytes": 2761931
+        },
+        {
+          "path": "pictures/41030.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-30-front-Enemy-Great_Cave_troll-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "ad1c60737b328ec77d708dbf917662bd913a7b125c03a8f072c3b058b4e30ccc",
+          "bytes": 3390696
+        },
+        {
+          "path": "pictures/41031.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-31-front-Enemy-Cavern_Warg-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "ff764b4a6460a9abfef62f2263f35bd3fe62a2015c7bd26ee335fa33aff79f30",
+          "bytes": 3286950
+        },
+        {
+          "path": "pictures/41032.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-32-front-Location-Goblin_Tunnels-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "59f7a5367ba210b155f93adde12ef15d5942552cf905b338c9fa90eb84593b1b",
+          "bytes": 3176230
+        },
+        {
+          "path": "pictures/41033.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-33-front-Location-Lightless_Passage-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "e2c04a15d46ba8d194f2827215042226284c9facde97c3c8fa6a2c3435155e28",
+          "bytes": 3147217
+        },
+        {
+          "path": "pictures/41034.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-34-front-Location-Branching_Paths-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "168bc2752b4cf627b25a3bac7641fc7a46742c17530ddb9970936ba12c63c060",
+          "bytes": 3443208
+        },
+        {
+          "path": "pictures/41035.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-35-front-Location-Collapsed_Mine-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "005b4f5b121bf0a98427b6ba46736457d49086d8163821fcdfbf6e6d4b1bc2ae",
+          "bytes": 3280077
+        },
+        {
+          "path": "pictures/41036.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-36-front-Location-Goblin_Dungeon-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "7a9d2ad7805cc95c2e0eb9f5e77f4191a0a1c2a2e3745f9021990827e7d38bf2",
+          "bytes": 3294552
+        },
+        {
+          "path": "pictures/41037.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-37-front-Location-Crumbling_Stairs-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "c42d3b5fe08c23b53dbd10ae31ce6b8f36f1ba5af80a00513b813b8c5cad2d4f",
+          "bytes": 3558010
+        },
+        {
+          "path": "pictures/41038.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-38-front-Treachery-Crumbling_Ruin-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "bef2f4c0cde7c72b89ace4721a9f86b381ed32447f16068262ebe0b2e31e64d9",
+          "bytes": 3139179
+        },
+        {
+          "path": "pictures/41039.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-39-front-Treachery-Lost_in_the_Dark-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "e8e5edc23f3b1e29fb578b6d79652f58230d10ff2174f5a69e1a11baf1fee4e9",
+          "bytes": 3330497
+        },
+        {
+          "path": "pictures/41040.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC102-40-front-Treachery-Watchful_Eyes-The_Caves_of_Nibin_Dum_Campaign.jpg",
+          "sha256": "a61a48f117517f4e53ea9800d8b11307b936eb6bb727bad6d6abea75b2108801",
+          "bytes": 2984826
+        },
+        {
+          "path": "pictures/41041.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=29",
+          "sha256": "4cbf06bf04815f0623970e048aa02677d8075376b53a1aebb988fd2e6e595641",
+          "bytes": 1055622
+        },
+        {
+          "path": "pictures/41042.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=31",
+          "sha256": "3a0da27384598298f01504e379de536633ad9fd2c8e82e3cbef0acd430a910de",
+          "bytes": 930635
+        },
+        {
+          "path": "pictures/41043.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=33",
+          "sha256": "27e53452c517100ee0da5d6efe17aac7f48c3dfa2c5dce5f22d6aabb29bb1b90",
+          "bytes": 926455
+        },
+        {
+          "path": "pictures/41044.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=5",
+          "sha256": "69dea836717cdba9c0b2fa41350c2a4544bc2bceda2a7de89549d3c8f2a15ca5",
+          "bytes": 876490
+        },
+        {
+          "path": "pictures/41045.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=7",
+          "sha256": "7fd877d9737d2dd685f302a863034d835d8aec64a6229a2a693454b0a226a273",
+          "bytes": 878556
+        },
+        {
+          "path": "pictures/41046.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=9",
+          "sha256": "048ebbd37a44c2640b9bc25dade400cc3541cacab5b07a461ebcb343759ec775",
+          "bytes": 829868
+        },
+        {
+          "path": "pictures/41047.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=11",
+          "sha256": "ba4c26d7f9c4cd0849ed528d79bbf7493de8f01349dab917cd6204c5e743418c",
+          "bytes": 823902
+        },
+        {
+          "path": "pictures/41048.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=13",
+          "sha256": "b73451fa942d8840e426286500fc4d71ade2671980d4508ed316e457af685e06",
+          "bytes": 836128
+        },
+        {
+          "path": "pictures/41049.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=21",
+          "sha256": "6f689f7dfd8c539ecce529af39529cd42141be1cd1d1a568b1121b337e2eaf50",
+          "bytes": 822266
+        },
+        {
+          "path": "pictures/41050.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=1",
+          "sha256": "4935d369870cd4447b7d58146b5c8ef556c1584a3c98b3afdb59f6c117e9ba65",
+          "bytes": 587745
+        },
+        {
+          "path": "pictures/41050.B.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=2",
+          "sha256": "3ab8eb0cf4267156f0075597f50054a75f1067f95d55e2f9890cf19ef16dc43e",
+          "bytes": 435871
+        },
+        {
+          "path": "pictures/41051.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=3",
+          "sha256": "fa147434c720213379f7755dd40d43ab9434cbab42be6e7cb8b9f4c9fd2259d1",
+          "bytes": 754083
+        },
+        {
+          "path": "pictures/41051.B.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_campaign_cards.pdf#page=4",
+          "sha256": "934df83f9d264ba689643ecf70221789d510d0334bcd7ac2fcdd4f2c76625f58",
+          "bytes": 576074
+        }
+      ]
+    },
     "ringsdb": {
       "id": "ringsdb",
       "site": "https://ringsdb.com",

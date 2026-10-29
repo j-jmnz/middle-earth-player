@@ -215,7 +215,7 @@ Where: the dock (one icon per tab, user request 2026-10-25), the card screen (ty
 
 ## Card art
 
-The cached RingsDB picture is the illustration of a player card everywhere it appears; a quest card's scan (Hall of Beorn, bundled on release builds) is the picture of a scenario. Every crop is a region of the printed layout, the same on every card of its kind (`src/screens/art-crop.ts`, `cropFrame`, tested): the picture is drawn at the size that makes the region cover the box, centred on the region, never leaving a gap at an edge.
+The cached RingsDB picture is the illustration of a player card everywhere it appears; a quest card's picture (the 600 dpi scan, bundled on release builds) is the picture of a scenario. Every crop is a region of the printed layout, the same on every card of its kind (`src/screens/art-crop.ts`, `cropFrame`, tested): the picture is drawn at the size that makes the region cover the box, centred on the region, never leaving a gap at an edge.
 
 | Region | Of | Use |
 | --- | --- | --- |

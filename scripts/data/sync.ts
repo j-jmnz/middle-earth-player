@@ -8,12 +8,13 @@ import { syncDragnCards } from "./sources/dragncards.ts";
 import { recordChanges, type SourceRecord } from "./sources/fetch.ts";
 import { syncHallOfBeorn } from "./sources/hallofbeorn.ts";
 import { syncIcons } from "./sources/icons.ts";
+import { syncPictures } from "./sources/pictures.ts";
 import { syncRingsDb } from "./sources/ringsdb.ts";
 import { syncRules } from "./sources/rules.ts";
 import { syncScans } from "./sources/scans.ts";
 
 // The only network command. Refreshes data/raw and .cache/pdf, then records every pin in data/sources.json.
-// Usage: node --experimental-strip-types scripts/data/sync.ts [ringsdb|hallofbeorn|dragncards|rules|scans|icons]... [--verbose]
+// Usage: node --experimental-strip-types scripts/data/sync.ts [ringsdb|hallofbeorn|dragncards|rules|scans|pictures|icons]... [--verbose]
 // --verbose logs every request with its status, size and time.
 const ADAPTERS: Record<string, (log: Log) => Promise<SourceRecord>> = {
   ringsdb: syncRingsDb,
@@ -21,6 +22,7 @@ const ADAPTERS: Record<string, (log: Log) => Promise<SourceRecord>> = {
   dragncards: syncDragnCards,
   rules: syncRules,
   scans: syncScans,
+  pictures: syncPictures,
   icons: syncIcons,
 };
 
@@ -40,10 +42,10 @@ void runScript("data:sync", async (log) => {
   const unknown = wanted.filter((id) => !ADAPTERS[id]);
   if (unknown.length > 0) throw new Error(`Unknown source ${unknown.join(", ")}. Sources: ${Object.keys(ADAPTERS).join(", ")}`);
   const ids = wanted.length > 0 ? wanted : Object.keys(ADAPTERS);
-  // scans reads data/cards, so it runs after a build; a bare `data:sync` leaves it to the explicit command.
+  // scans and pictures read data/cards, so they run after a build; a bare `data:sync` leaves them to the explicit command.
   if (wanted.length === 0) {
-    ids.splice(ids.indexOf("scans"), 1);
-    log.info("scans is skipped without naming it (it reads data/cards: run pnpm data:build, then pnpm data:sync scans)");
+    for (const id of ["scans", "pictures"]) ids.splice(ids.indexOf(id), 1);
+    log.info("scans and pictures are skipped without naming them (they read data/cards: run pnpm data:build, then pnpm data:sync scans pictures)");
   }
   log.info(`sources: ${ids.join(", ")}`);
   const file = path.join(DATA_DIR, "sources.json");
