@@ -8,7 +8,7 @@ import { useTableTokens } from "../play/use-table-tokens";
 import { SPHERE_TINT } from "../play/icon-map";
 import { BodyText, Eyebrow, Label, ToggleChip, sphereWord, useTitleShadow } from "./chrome";
 import { CardThumb } from "./images/picture";
-import { SphereDonut } from "./sphere-donut";
+import { ArcRing } from "../play/arc-ring";
 import { costCurve, CURVE_LABELS, deckCardCount, DECK_MINIMUM, sphereSplit, type DeckFace } from "./deck-status";
 import type { HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
@@ -93,11 +93,11 @@ export function DeckAnalytics({ cards, faces, ready }: { cards: readonly { code:
   return (
     <View className="flex-row items-center rounded-card" style={{ ...panelSurface(false, t), padding: 14 * s, gap: 14 * s }}>
       <View accessible accessibilityLabel={`${cardCount} of ${DECK_MINIMUM} cards. Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
-        <SphereDonut size={64 * s} parts={parts} track={withAlphaHex(palette.bone, 0.08)}>
+        <ArcRing size={64 * s} parts={parts} track={withAlphaHex(palette.bone, 0.08)}>
           <Text testID="deck-card-count" className="font-display" style={{ fontSize: 22 * s, lineHeight: 26 * s, color: ready ? palette.ok : palette.bone }}>
             {String(cardCount)}
           </Text>
-        </SphereDonut>
+        </ArcRing>
       </View>
       <View className="min-w-0 flex-1">
         <View

@@ -154,7 +154,7 @@ function OptionRow({ label, detail, onPress, icon }: { label: string; detail: st
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      className="min-h-14 flex-row items-center justify-between border-b border-inkLine"
+      className="min-h-14 flex-row items-center justify-between border-b border-inkLine/25"
     >
       <View className="flex-row items-center gap-2">
         {icon ? <GameIcon name={icon} size={16 * s} tint="ink" /> : null}
@@ -206,7 +206,7 @@ function FilterBody({
       <OptionRow label="Pack or cycle" detail={packDetail(filter, groups)} onPress={() => onChoose("pack")} />
       <OptionRow label="Trait" detail={filter.trait ?? "Any"} onPress={() => onChoose("trait")} />
       <OptionRow label="Cost" icon="cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
-      <View className="min-h-14 flex-row items-center justify-between border-b border-inkLine">
+      <View className="min-h-14 flex-row items-center justify-between border-b border-inkLine/25">
         <Text className="text-body text-ink">Unique</Text>
         <Switch
           value={filter.unique}

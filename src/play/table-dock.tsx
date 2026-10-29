@@ -17,7 +17,7 @@ import { Stats } from "./sheet-paper.tsx";
 import type { Unavailable } from "./sheet-types.ts";
 import type { Dock, DockButton } from "./table-choice.ts";
 import { LineMark } from "./table-chrome.tsx";
-import { panelSurface, raisedEdgeOf } from "./surfaces.ts";
+import { panelSurface } from "./surfaces.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -55,8 +55,8 @@ export function ReadoutView({ readout, surface = "night", tight = false, oneLine
 const TOP_PAD = 10;
 const FOOT_PAD = 8;
 const DENSE_PAD = 4;
-// The shadow that lifts the dock (and the tray standing on it) off the felt.
-const dockShadowOf = (t: TableTokens) => `0 8px 24px ${withAlphaHex(t.night, 0.55)}`;
+// The shadow that lifts the dock (and the tray standing on it) off the table while the tray stands on it; at rest it is a floating panel.
+const dockShadowOf = (t: TableTokens) => `0 8px 24px ${withAlphaHex(t.shade, t.depth === "light" ? 0.25 : 0.85)}`;
 
 // The tone of a line of words under the title: the guide and the note muted, under the bone title; what the rules refuse faint.
 export const lineTone = (kind: "guide" | "note" | "unavailable") => (kind === "unavailable" ? "text-faint" : "text-muted");
@@ -145,14 +145,14 @@ export function TableDock({
   const readoutLine = dense && trayOpen;
   return (
     <View style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
-      {/* One flat panel with no drawn edge, lifted off the felt by its shadow. While the choice tray is open the tray stands on it
+      {/* One floating panel with no drawn edge, lifted off the table by its shadow and lit along its top. While the choice tray is open the tray stands on it
           as its upper part (tray-frame.tsx): the words are not drawn and the dock's top corners are square, so the two read as one. */}
       <View
         testID="dock"
         className="rounded-card px-3"
         style={{
-          backgroundColor: t.raised,
-          boxShadow: trayOpen ? dockShadow : `${raisedEdgeOf(t)}, ${dockShadow}`,
+          ...panelSurface(false, t),
+          boxShadow: trayOpen ? dockShadow : panelSurface(false, t).boxShadow,
           paddingTop: trayOpen ? 0 : (dense ? DENSE_PAD : TOP_PAD) * s,
           paddingBottom: (dense ? DENSE_PAD : FOOT_PAD) * s,
           ...(trayOpen ? { borderTopLeftRadius: 0, borderTopRightRadius: 0 } : {}),
@@ -164,7 +164,7 @@ export function TableDock({
         {trayOpen ? null : (
           <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
             <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: (dense ? 2 : 8) * s }}>
-              <Text testID="sheet-step" numberOfLines={1} className="font-display text-eyebrow uppercase text-accent" style={{ flexShrink: 0 }}>
+              <Text testID="sheet-step" numberOfLines={1} className="font-bold text-eyebrow uppercase text-accent" style={{ flexShrink: 0 }}>
                 {step}
               </Text>
               <View className="flex-row items-start gap-1.5">
@@ -218,7 +218,8 @@ const BANNER_WIDTH = 440;
 export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; top: number; width: number; onBeat?: (cards: readonly string[]) => void }) {
   const t = useTableTokens();
   const s = useUiScale();
-  const edge = moment.tone === "good" ? t.accent : moment.tone === "bad" ? t.threat : t.faint;
+  const edge = moment.tone === "good" ? t.accentHigh : moment.tone === "bad" ? t.threat : t.faint;
+  const bad = moment.tone === "bad" && t.depth !== "light";
   const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
   useEffect(() => {
@@ -247,11 +248,16 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
       {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
       <View
         className="rounded-card"
-        style={{ ...box, ...panelSurface(false, t), opacity: 0.97, shadowColor: t.night, shadowOpacity: 0.9, shadowRadius: 14 * s, shadowOffset: { width: 0, height: 4 * s }, elevation: 10 }}
+        style={{
+          ...box,
+          ...panelSurface(false, t),
+          // A failure or an attack is a dark red panel (docs/design-system.md, Table: the combat banner).
+          ...(bad ? { backgroundColor: "rgba(28,16,15,0.95)", backgroundImage: "linear-gradient(180deg, rgba(40,20,18,0.94), rgba(14,12,13,0.96))" } : {}),
+        }}
       >
-        <View testID="moment" accessible accessibilityLabel={label} className="overflow-hidden rounded-card" style={{ borderWidth: 1, borderColor: edge }}>
-          {/* The tone, as a band along the top: accent for a success, threat red for a failure or an engagement. */}
-          <View style={{ height: 3 * s, backgroundColor: edge }} />
+        <View testID="moment" accessible accessibilityLabel={label} className="overflow-hidden rounded-card">
+          {/* The tone, as a 3 pt band along the top: silver for a success, threat red for a failure or an engagement. */}
+          <View style={{ height: 3 * s, backgroundColor: edge, ...(moment.tone === "bad" ? {} : { opacity: 0.8 }) }} />
           <View className="items-center px-4 pb-2 pt-1.5">
             <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 * s }}>
               {moment.title}

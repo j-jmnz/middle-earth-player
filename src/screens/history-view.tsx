@@ -21,7 +21,9 @@ import { courseWords, deletedWords, emptyWords, playthroughWords, plural, runDat
 import { usePalette } from "./palette-hook";
 import { existingRefs, listRuns } from "./run-store";
 import { seatWord } from "./seats";
+import { rowSurface } from "../play/surfaces";
 import { Text } from "../play/text";
+import { useTableTokens } from "../play/use-table-tokens";
 
 const KINDS = ["Campaign", "Standalone"] as const;
 type KindWord = (typeof KINDS)[number];
@@ -33,6 +35,7 @@ type Playthroughs = { current: string | null; progress: ReadonlyMap<string, { do
 // A FlashList row: one pressable on a solid fill, no light and no shadow (docs/design-system.md, Performance).
 function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; deleted: boolean; showBox: boolean; nameOf: (code: string) => string; onPress: (() => void) | null }) {
   const palette = usePalette();
+  const t = useTableTokens();
   const scenario = scenarioName(run.scenarioId);
   const date = runDate(run);
   const course = courseWords(run);
@@ -42,7 +45,7 @@ function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; de
     <View className="pb-3">
       <Pressable testID={`run-${run.id}`} collapsable={false} accessibilityRole={onPress ? "button" : "text"} accessibilityLabel={runLabel(run, scenario, nameOf, deleted)} disabled={onPress == null} onPress={onPress ?? undefined}>
         {({ pressed }) => (
-          <View className="min-h-14 flex-row items-center rounded-card px-4 py-3.5" style={{ backgroundColor: pressed ? palette.pressed : palette.raised, borderWidth: 1, borderColor: palette.hairline }}>
+          <View className="min-h-14 flex-row items-center rounded-card px-4 py-3.5" style={rowSurface(pressed, t)}>
             <View className="flex-1">
               <View className="flex-row items-start justify-between gap-2">
                 <View className="flex-1">

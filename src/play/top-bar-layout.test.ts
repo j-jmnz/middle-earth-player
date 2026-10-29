@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
-import { barZones, MENU_BUTTON, phaseWidth, pillWidth, RAIL_FLOOR, RAIL_MAX, RAIL_WIDE, railWide, stepWidth } from "./top-bar-layout.ts";
+import { barZones, MENU_BUTTON, phaseWidth, pillWidth, RAIL_FLOOR, RAIL_MAX, RAIL_WIDE, railWide, stepWidth, TICK, TICK_GAP } from "./top-bar-layout.ts";
 
 // Phase 19's floor, from the longest step name alone: the two-seat bar must not get worse than it was.
 const PHASE_19_FLOOR = 232;
@@ -21,12 +21,12 @@ describe("top bar zones", () => {
     const phases = [...ROUND_PHASES, "Beginning", "End"];
     for (const word of [...Object.values(STEP_WORDS), "Victory", "Defeat"]) {
       expect(RAIL_FLOOR).toBeGreaterThanOrEqual(stepWidth(word));
-      // Every pill the rail can show: "Round 99 · PHASE" over the step.
+      // Every rail it can show: the phase over the ticks over "Round 99 · step".
       for (const phase of phases) expect(RAIL_FLOOR).toBeGreaterThanOrEqual(pillWidth("Round 99", phase, word));
     }
-    // The floor is the pill's own words: "Round 99 · ENCOUNTER" is wider than the longest step name.
-    expect(RAIL_FLOOR).toBe(phaseWidth("Encounter"));
-    expect(RAIL_FLOOR).toBeGreaterThan(stepWidth("Optional engagement"));
+    // The floor holds the widest phase and the seven ticks under it.
+    expect(RAIL_FLOOR).toBeGreaterThanOrEqual(phaseWidth("Encounter"));
+    expect(RAIL_FLOOR).toBeGreaterThanOrEqual(7 * TICK + 6 * TICK_GAP);
     expect(RAIL_FLOOR).toBeLessThanOrEqual(PHASE_19_FLOOR);
     for (const [bar, dials] of [[800, 0], [800, 460], [620, 460], [500, 900]] as const) expect(barZones(bar, dials).rail).toBeGreaterThanOrEqual(Math.min(RAIL_FLOOR, bar - MENU_BUTTON));
   });

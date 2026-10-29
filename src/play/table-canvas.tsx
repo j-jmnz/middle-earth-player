@@ -97,7 +97,7 @@ export function TableCanvas({ store, width, height, nameOf, inactive, info, onTa
   const highlight = useStore(store, (state) => state.viewedSeat != null) ? NO_HIGHLIGHT : marked;
   const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight, t };
   return (
-    <ScrollView style={{ width, height, backgroundColor: t.felt }} contentContainerStyle={{ padding: 12 * s }}>
+    <ScrollView style={{ width, height }} contentContainerStyle={{ padding: 12 * s }}>
       {TABLE_ZONES.map((zone) => (
         <ZoneRow key={zone} zone={zone} {...rowProps} />
       ))}

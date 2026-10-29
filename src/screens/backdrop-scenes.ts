@@ -43,9 +43,9 @@ export type Scene = {
 const GROUND = "#030405";
 
 // Dark: Ringwraiths. Cold moonlight, pale wisps, and a deep red ember where the enemy is.
-const moonFog: FogTexture = { freq: [0.0034, 0.0034], octaves: 4, seed: 7, rgb: [104, 142, 150], gain: 1.9, bias: -0.58, tile: [900, 900] };
+const moonFog: FogTexture = { freq: [0.0034, 0.0034], octaves: 4, seed: 7, rgb: [96, 134, 144], gain: 1.7, bias: -0.62, tile: [900, 900] };
 const wispFog: FogTexture = { freq: [0.0016, 0.011], octaves: 3, seed: 3, rgb: [196, 212, 214], gain: 1.7, bias: -0.66, tile: [1200, 800] };
-const emberFog: FogTexture = { freq: [0.0038, 0.0045], octaves: 4, seed: 11, rgb: [150, 38, 22], gain: 2.1, bias: -0.6, tile: [1000, 700] };
+const emberFog: FogTexture = { freq: [0.0038, 0.0045], octaves: 4, seed: 11, rgb: [150, 38, 22], gain: 2.0, bias: -0.62, tile: [1000, 700] };
 export const gritTexture: FogTexture = { freq: [0.85, 0.85], octaves: 2, seed: 2, rgb: [128, 128, 128], gain: 0, bias: 1, tile: [260, 260] };
 
 // Light: Rivendell. Golden autumn mist, a sage slate multiplied in, and a pale rust ember.

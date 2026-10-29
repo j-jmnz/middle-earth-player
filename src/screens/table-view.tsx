@@ -35,6 +35,8 @@ import { previewCards } from "../play/table-preview";
 import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
+import { questScaleOf } from "../play/quest-scale";
+import { QuestScaleView } from "../play/quest-scale-view";
 import { campaignTokens, heldDial, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
@@ -175,6 +177,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
   const pills = dockPills(choice.extras);
+  const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
+  // A tablet's table (a window 600 pt tall or more, in logical points) has room for the larger dials.
+  const tabletTable = screen.height / s >= 600;
   const more = useMorePopover(pills.more.length, choice.resetKey);
   const { open: moreOpen, lines: linesOpen, close: closeMore } = more;
 
@@ -276,6 +281,10 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           onMenu={() => setMenuOpen((open) => !open)}
         />
         <View className="min-h-0 flex-1 flex-row">
+          {/* The quest scale at the left edge: the threat in staging against the willpower committed, live as characters commit. */}
+          <View style={{ paddingBottom: Math.max(insets.bottom, 10 * s), paddingTop: 4 * s }}>
+            <QuestScaleView scale={scale} wide={tabletTable} />
+          </View>
           <View className="min-h-0 flex-1" onLayout={onLayout}>
             {size ? (
               <TableCanvas
