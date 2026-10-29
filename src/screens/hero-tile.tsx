@@ -37,6 +37,7 @@ export function HeroTile({
   bare = false,
   loss = null,
   ringBearer = false,
+  card,
 }: {
   hero: HeroFace;
   height: number;
@@ -52,6 +53,8 @@ export function HeroTile({
   loss?: string | null;
   // The hero carries the One Ring: an accent edge and the Ring mark in the corner.
   ringBearer?: boolean;
+  // The whole card at this width instead of its painting with a name band: the deck editor's hero cards.
+  card?: number;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
@@ -64,6 +67,18 @@ export function HeroTile({
       className={`flex-1 overflow-hidden ${flush ? "" : "rounded-tile"}`}
       style={{ height, ...(flush ? {} : { boxShadow: ringBearer ? selectedRingOf(t, 1.5) : `0 8px 18px ${withAlphaHex(t.shade, t.depth === "light" ? 0.2 : 0.8)}` }) }}
     >
+      {card != null ? (
+        <View>
+          <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={card} height={height} />
+          {loss ? (
+            <View className="absolute left-1 right-1 rounded px-1 py-0.5" style={{ bottom: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+              <Text testID={`hero-loss-${hero.code}`} className="text-center text-micro text-muted" numberOfLines={1}>
+                {loss}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      ) : (
       <CroppedArt card={hero} region={PAINTING} height={height}>
         {bare ? null : (
           <>
@@ -108,6 +123,7 @@ export function HeroTile({
           </>
         )}
       </CroppedArt>
+      )}
       {onPress ? (
         <Pressable
           testID={`hero-${hero.code}`}
