@@ -1,5 +1,7 @@
 # Phase 24 — Combat spotlight
 
+> **Superseded by the 2026-10-29 redesign (`docs/plans/combat-spotlight-redesign.md`).** A user request replaced this phase's look and timing: the spotlight is a full-screen, always-dark layer, a lone attack runs 2200 ms, not 1500, and a destroyed target burns. The gate, skip, Back, banner-wait and engine numbers below still hold. `docs/design-system.md`, Table, Spotlight, is the current description; the sequence and numbers below are history.
+
 Depends on: phase 23
 Blocks: nothing
 Can run beside: phases 14, 15, 16, 25 and 26
