@@ -116,12 +116,15 @@ export function TextButton({
   accessibilityLabel,
   selected,
   expanded,
+  icon,
 }: {
   label: string;
   onPress: () => void;
   testID: string;
   // Danger is for an action that cannot be undone (Delete a playthrough).
   tone?: "bone" | "accent" | "ink" | "danger" | "muted";
+  // A printed icon before the word, in the word's colour (Full path, Campaign log, New playthrough on Campaigns).
+  icon?: IconName;
   // What a screen reader says when the visible word is not enough alone ("Booklet" opens the campaign book).
   accessibilityLabel?: string;
   // Set for a text option in a radio group (the No boon decline): the button is a radio with this selected state.
@@ -131,7 +134,9 @@ export function TextButton({
 }) {
   const pressedNight = usePressedNight();
   const pressedPaper = usePressedPaper();
+  const s = useUiScale();
   const color = tone === "accent" ? "text-accent" : tone === "ink" ? "text-inkLabel" : tone === "danger" ? "text-danger" : tone === "muted" ? "text-muted" : "text-bone";
+  const word = <Text className={`text-body font-medium ${color}`}>{label}</Text>;
   return (
     <Pressable
       testID={testID}
@@ -143,7 +148,14 @@ export function TextButton({
       className="min-h-touch items-center justify-center rounded-tile px-3"
       style={({ pressed }) => (pressed ? (tone === "ink" ? pressedPaper : pressedNight) : undefined)}
     >
-      <Text className={`text-body font-medium ${color}`}>{label}</Text>
+      {icon ? (
+        <View className="flex-row items-center gap-2">
+          <GameIcon name={icon} size={16 * s} tint={tone === "ink" ? "inkLabel" : tone} />
+          {word}
+        </View>
+      ) : (
+        word
+      )}
     </Pressable>
   );
 }
@@ -215,7 +227,7 @@ export function PrimaryButton({
 /**
  * A plate for the actions beside the primary (Path, Log, Change, Add cards): slate lit from above with a short shadow and no drawn
  * edge, its word in Marcellus SC in the accent, an optional printed icon before it. `icon` alone (no label shown) makes the 54 pt
- * square icon plate of the Continue panel. `tone` colours the word: danger for a loss.
+ * square icon plate. `tone` colours the word: danger for a loss.
  */
 export function SecondaryButton({
   label,
