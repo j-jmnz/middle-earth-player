@@ -1,9 +1,9 @@
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import { AccessibilityInfo, View } from "react-native";
+import { AccessibilityInfo, Pressable, View } from "react-native";
 
-import { BodyText, IconButton, Screen, ScreenTitle, TextButton } from "../../chrome";
+import { BodyText, HubHeader, PillButton, Screen, TextButton } from "../../chrome";
 import { editSavedDeck, startNewDeck } from "../../deck-draft";
 import { copyDeckName, deckCountLine, deckReadiness, newDeckName, notAppliedLine } from "../../deck-status";
 import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, type SavedDeck } from "../../deck-store";
@@ -19,7 +19,10 @@ import {
 } from "../../starter-decks";
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
-import { useUiScale } from "../../../play/ui-scale";
+import { accentPlate } from "../../../play/surfaces";
+import { Text } from "../../../play/text";
+import { touch, useUiScale } from "../../../play/ui-scale";
+import { useTableTokens } from "../../../play/use-table-tokens";
 import { useSizeClass } from "../../../play/use-size-class";
 
 type Row =
@@ -28,7 +31,8 @@ type Row =
   | { kind: "no-match"; key: string }
   | { kind: "starter-missing"; key: string };
 
-const COVER_HEIGHT = 128;
+// The heroes' paintings on a cover: 118 pt on a phone, 200 in a tablet's three columns, 220 in its two.
+const coverHeight = (size: "compact" | "medium" | "expanded") => (size === "compact" ? 118 : size === "medium" ? 220 : 200);
 
 function useSeedStatus(): StarterSeed {
   return useSyncExternalStore(subscribeStarterSeed, starterSeedStatus, () => "pending");
@@ -101,6 +105,22 @@ function DeckActions({
         <TextButton label="Delete" testID={`deck-delete-${deck.id}`} tone="danger" accessibilityLabel={`Delete ${deck.name}`} onPress={() => onAsk("delete")} />
       )}
     </View>
+  );
+}
+
+/** New deck: a 44 pt square of the primary's silver with a + on it. */
+function NewDeckButton({ onPress }: { onPress: () => void }) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const box = touch(s, 44);
+  return (
+    <Pressable testID="deck-new" collapsable={false} accessibilityRole="button" accessibilityLabel="New deck" onPress={onPress}>
+      {({ pressed }) => (
+        <View className="items-center justify-center rounded-button" style={{ width: box, height: box, ...accentPlate(pressed, t), transform: [{ translateY: pressed ? 1 : 0 }] }}>
+          <Text style={{ color: t.onAccent, fontSize: 24 * s, lineHeight: 26 * s, fontWeight: "600" }}>+</Text>
+        </View>
+      )}
+    </Pressable>
   );
 }
 
@@ -250,7 +270,7 @@ export default function Decks() {
     if (view === "List") return <DeckRow {...summary}>{actions}</DeckRow>;
     return (
       <View className="pb-3" style={columns > 1 ? { paddingHorizontal: (COVER_GAP / 2) * s } : undefined}>
-        <DeckCover {...summary} height={COVER_HEIGHT * s}>
+        <DeckCover {...summary} height={coverHeight(size) * s}>
           {actions}
         </DeckCover>
       </View>
@@ -266,19 +286,17 @@ export default function Decks() {
   const filters =
     saved.length > 0 ? <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={saved.length} /> : null;
 
-  // The title with the list's own actions beside it: Import, Manage and New deck (+), so the decks start high on the screen.
+  // The title with the list's own actions beside it: Import, Manage and New deck (+, a small primary), so the decks start high.
   const header = (
-    <View className="pt-4">
-      <View className="flex-row items-center justify-between">
-        <ScreenTitle>Decks</ScreenTitle>
+    <View>
+      <HubHeader title="Decks">
         {seed !== "pending" ? (
-          <View className="-mr-1 flex-row items-center">
+          <>
             <TextButton testID="deck-import" label="Import" tone="muted" accessibilityLabel="Import a deck" onPress={() => router.push("/deck-import")} />
             {saved.length > 0 ? (
-              <TextButton
+              <PillButton
                 testID="decks-manage"
                 label={managing ? "Done" : "Manage"}
-                tone="muted"
                 accessibilityLabel={managing ? "Done managing decks" : "Manage decks"}
                 onPress={() => {
                   setManaging(!managing);
@@ -286,12 +304,10 @@ export default function Decks() {
                 }}
               />
             ) : null}
-            <View className="ml-1">
-              <IconButton testID="deck-new" glyph="+" tone="accent" label="New deck" onPress={newDeck} />
-            </View>
-          </View>
+            <NewDeckButton onPress={newDeck} />
+          </>
         ) : null}
-      </View>
+      </HubHeader>
       {filters}
     </View>
   );

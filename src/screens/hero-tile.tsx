@@ -5,7 +5,7 @@ import { CroppedArt } from "./art";
 import { PAINTING } from "./art-crop";
 import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "./chrome";
 import { CardThumb, useCardPreview } from "./images/picture";
-import { nightFade } from "../play/surfaces";
+import { nightFade, rowSurface, selectedRingOf } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
@@ -62,7 +62,7 @@ export function HeroTile({
   return (
     <View
       className={`flex-1 overflow-hidden ${flush ? "" : "rounded-tile"}`}
-      style={{ height, ...(flush ? {} : { borderWidth: ringBearer ? 1.5 : 1, borderColor: ringBearer ? palette.accent : withAlphaHex(palette.bone, 0.08) }) }}
+      style={{ height, ...(flush ? {} : { boxShadow: ringBearer ? selectedRingOf(t, 1.5) : `0 8px 18px ${withAlphaHex(t.shade, t.depth === "light" ? 0.2 : 0.8)}` }) }}
     >
       <CroppedArt card={hero} region={PAINTING} height={height}>
         {bare ? null : (
@@ -132,7 +132,7 @@ export function HeroTile({
           className="absolute right-0 top-0 min-h-touch min-w-touch items-center justify-center"
         >
           {({ pressed }) => (
-            <View className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: pressed ? palette.pressed : withAlphaHex(palette.night, 0.78), borderWidth: 1, borderColor: withAlphaHex(palette.bone, 0.18) }}>
+            <View className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: pressed ? palette.pressed : withAlphaHex(palette.night, 0.78), boxShadow: `0 4px 10px ${withAlphaHex(palette.night, 0.8)}` }}>
               <Text style={{ color: palette.bone, fontSize: 13 * s, lineHeight: 15 * s, fontWeight: "700" }}>{"\u2715"}</Text>
             </View>
           )}
@@ -156,7 +156,7 @@ export function EmptyHeroSlot({
 }) {
   const palette = usePalette();
   const pressedNight = usePressedNight();
-  const frame = { height, borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: palette.accentLine, backgroundColor: withAlphaHex(palette.accent, 0.04) };
+  const frame = { height, borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: withAlphaHex(palette.accentLine, 0.7), backgroundColor: withAlphaHex(palette.night, 0.45) };
   if (onPress) {
     return (
       <Pressable
@@ -259,21 +259,21 @@ function StatusLine({ testID, detail, status, note }: { testID: string; detail: 
 }
 
 /**
- * A saved deck in the deck list's Cards view: the hero pictures side by side with no words on them, then a solid strip
- * with the deck's name, its heroes, the counts and whether it is ready to play.
+ * A saved deck in the deck list's Cards view: its three heroes' paintings side by side, split by 1 pt of the ground and fading into
+ * the cover's foot, then the deck's name, and a line with the heroes on the left and whether it is ready on the right. The selected
+ * deck (the briefing's picker) carries the silver ring. A FlashList row: a solid fill and no shadow (docs/design-system.md, Performance).
  */
 export function DeckCover(props: DeckSummary & { height: number }) {
   const palette = usePalette();
   const t = useTableTokens();
-  const pressedNight = usePressedNight();
   const s = useUiScale();
   const { name, heroes, detail, status, note, height, testID, children, selected, disabled } = props;
+  const foot = t.depth === "light" ? palette.raised : palette.dusk;
   return (
-    // A FlashList row: a solid fill and no shadow (docs/design-system.md, Performance); only the night fade lays the words on the pictures.
-    <View className="overflow-hidden rounded-card" style={{ backgroundColor: palette.raised, borderWidth: selected ? 1.5 : 1, borderColor: selected ? palette.accent : palette.hairline }}>
+    <View className="overflow-hidden rounded-card" style={{ backgroundColor: foot, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}>
       <Pressable {...pressProps(props)}>
         {({ pressed }) => (
-          <View style={pressed && !disabled ? pressedNight : undefined}>
+          <View style={pressed && !disabled ? rowSurface(true, t) : undefined}>
             <View className="flex-row" style={{ height, opacity: disabled ? 0.45 : 1, gap: 1, backgroundColor: palette.night }}>
               {heroes.length > 0 ? (
                 heroes.map((hero) => <HeroTile key={hero.code} hero={hero} height={height} flush bare />)
@@ -282,26 +282,49 @@ export function DeckCover(props: DeckSummary & { height: number }) {
                   <Text className="text-label text-faint">No heroes yet</Text>
                 </View>
               )}
-              <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: height * 0.45, ...nightFade(0, 1, palette.raised, t) }} />
+              <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: height * 0.5, ...nightFade(0, 1, foot, t) }} />
             </View>
-            <View className="px-4 pb-3.5" style={{ marginTop: -14 * s }}>
+            <View className="px-3 pb-3" style={{ marginTop: -18 * s }}>
               <View className="flex-row items-start justify-between gap-2">
-                <Text className={`shrink font-display text-title ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} numberOfLines={2}>
+                <Text className={`shrink font-display ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} style={{ fontSize: 20 * s, lineHeight: 25 * s }} numberOfLines={2}>
                   {name}
                 </Text>
                 <View className="pt-1.5">
                   <SelectedMark selected={selected} />
                 </View>
               </View>
-              <Text className="text-label text-bone" numberOfLines={1}>
-                {heroNames(heroes)}
-              </Text>
-              <StatusLine testID={testID} detail={detail} status={status} note={note} />
+              <View className="mt-0.5 flex-row items-center justify-between gap-2">
+                <Text className="min-w-0 shrink text-label text-muted" numberOfLines={1}>
+                  {heroNames(heroes)}
+                </Text>
+                <Readiness testID={testID} status={status} />
+              </View>
+              <Text className="text-label text-faint">{detail}</Text>
+              {note ? (
+                <Text testID={`${testID}-not-applied`} className="mt-0.5 text-label text-muted">
+                  {note}
+                </Text>
+              ) : null}
             </View>
           </View>
         )}
       </Pressable>
-      {children ? <View className="border-t border-hairline px-1">{children}</View> : null}
+      {children ? <View className="px-1" style={{ backgroundColor: withAlphaHex(palette.night, 0.3) }}>{children}</View> : null}
+    </View>
+  );
+}
+
+/** Ready to play, with a green dot, or what the deck still needs, with a red one. */
+function Readiness({ testID, status }: { testID: string; status: DeckSummary["status"] }) {
+  const palette = usePalette();
+  const s = useUiScale();
+  const color = status.ready ? palette.ok : palette.danger;
+  return (
+    <View className="flex-row items-center gap-1.5">
+      <View style={{ width: 7 * s, height: 7 * s, borderRadius: 3.5 * s, backgroundColor: color, boxShadow: `0 0 6px ${withAlphaHex(color, 0.7)}` }} />
+      <Text testID={`${testID}-status`} className="text-label" style={{ color }} numberOfLines={1}>
+        {status.text}
+      </Text>
     </View>
   );
 }
@@ -311,21 +334,21 @@ const rowThumb = { width: 30, height: 42 };
 /** A saved deck in the deck list's List view: the heroes as small pictures, the name, the counts and the readiness. */
 export function DeckRow(props: DeckSummary) {
   const palette = usePalette();
-  const pressedNight = usePressedNight();
+  const t = useTableTokens();
   const s = useUiScale();
   const { name, heroes, detail, status, note, testID, children, selected, disabled } = props;
   const thumb = { width: rowThumb.width * s, height: rowThumb.height * s };
   return (
-    <View className="border-b border-hairline">
+    <View className="mb-1.5 overflow-hidden rounded-tile" style={selected ? { boxShadow: selectedRingOf(t) } : undefined}>
       <Pressable
         {...pressProps(props)}
-        className="min-h-16 flex-row items-center gap-3 py-2"
-        style={({ pressed }) => (pressed && !disabled ? pressedNight : undefined)}
+        className="min-h-16 flex-row items-center gap-3 px-3 py-2"
+        style={({ pressed }) => rowSurface(pressed && !disabled, t)}
       >
         <View className="flex-row" style={{ width: thumb.width * 3 - 16 * s, opacity: disabled ? 0.45 : 1 }}>
           {heroes.length > 0 ? (
             heroes.slice(0, 3).map((hero, at) => (
-              <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 * s }} className="overflow-hidden rounded-sm border border-night">
+              <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 * s, borderRadius: 3, overflow: "hidden", boxShadow: `0 2px 6px ${withAlphaHex(palette.night, 0.8)}` }}>
                 <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={thumb.width} height={thumb.height} />
               </View>
             ))

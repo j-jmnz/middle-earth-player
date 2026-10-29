@@ -1,7 +1,7 @@
 // The tabs (docs/design-system.md, Navigation): a dock at the foot of a phone and a tablet in portrait, a rail down the left edge of an
 // expanded window. Five hubs: Campaigns, Scenarios, Decks, Cards, Rules. Settings is a pushed screen, opened by the gear at the top
 // right of each hub (`GearButton`) or, beside the rail, by the rail's own Settings at its foot. Re-exported by chrome.tsx.
-import { useMemo, type ComponentProps, type ReactElement, type ReactNode } from "react";
+import { useEffect, useState, type ComponentProps, type ReactElement, type ReactNode } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, type Tabs } from "expo-router";
@@ -78,21 +78,29 @@ function tabItem(props: TabBarProps, route: TabBarProps["state"]["routes"][numbe
 }
 
 /**
- * Whether a saved deck is not ready to play: the dot on the Decks tab. Read again whenever the current tab changes, so a deck saved or
- * fixed in the editor shows on the way back.
+ * Whether a saved deck is not ready to play: the dot on the Decks tab. Read after the frame whenever the current tab changes, so a deck
+ * saved or fixed in the editor shows on the way back, and the tab bar never holds up the first paint of a hub.
  */
 function useUnreadyDeck(at: number): boolean {
   const { catalog, user } = useDatabases();
-  return useMemo(() => {
-    void at;
-    try {
-      const decks = listDecks(user);
-      const faces = deckFaces(catalog, decks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)]));
-      return decks.some((deck) => !deckReadiness(deck, faces).ready);
-    } catch {
-      return false;
-    }
+  const [unready, setUnready] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    const frame = requestAnimationFrame(() => {
+      try {
+        const decks = listDecks(user);
+        const faces = deckFaces(catalog, decks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)]));
+        if (!cancelled) setUnready(decks.some((deck) => !deckReadiness(deck, faces).ready));
+      } catch {
+        if (!cancelled) setUnready(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
   }, [catalog, user, at]);
+  return unready;
 }
 
 /**

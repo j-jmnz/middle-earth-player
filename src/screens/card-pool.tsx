@@ -5,7 +5,7 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, ty
 import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
 import { cards, packs } from "../catalog/schema";
-import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, SecondaryButton, ToggleChip } from "./chrome";
+import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, ToggleChip, sphereWord } from "./chrome";
 import { draftAddRefused, draftCopyCount, useDeckDraft, type TitleLookup } from "./deck-draft";
 import { deckCardCount, deckCountLine, DECK_MINIMUM } from "./deck-status";
 import { useDatabases } from "./databases";
@@ -20,8 +20,13 @@ import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filt
 import { PoolFilterSheet, typeChoices } from "./pool-filter-sheet";
 import { ToastView } from "./toast-view";
 import { gutter } from "../play/size-class";
+import { GameIcon } from "../play/game-icon";
+import { SPHERE_TINT } from "../play/icon-map";
+import { rowSurface, segmentSurface, slateSurface } from "../play/surfaces";
+import { withAlphaHex } from "../play/tokens";
+import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
-import { useUiScale } from "../play/ui-scale";
+import { touch, useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
 import { Text } from "../play/text";
 
@@ -60,6 +65,7 @@ function TypeChips({
   request: PoolTypeRequest | null;
 }) {
   const palette = usePalette();
+  const t = useTableTokens();
   const row = useRef<ComponentRef<typeof ScrollView>>(null);
   const chipX = useRef(new Map<string, number>());
   useEffect(() => {
@@ -79,11 +85,11 @@ function TypeChips({
         onPress={() => onApplied(!applied)}
         className="min-h-touch justify-center"
       >
-        <View className="h-9 justify-center rounded-tile px-3" style={{ borderWidth: 1, borderColor: applied ? palette.accent : palette.hairline }}>
+        <View className="h-9 justify-center rounded-tile px-3" style={applied ? { ...segmentSurface(t), boxShadow: `inset 0 -2px 0 ${palette.accentHigh}` } : rowSurface(false, t)}>
           <Text className={applied ? "text-label font-semibold text-accent" : "text-label text-muted"}>{applied ? "✓ Applied only" : "Applied only"}</Text>
         </View>
       </Pressable>
-      <View className="my-3 w-px bg-hairline" />
+      <View className="my-3 w-px" style={{ backgroundColor: withAlphaHex(palette.bone, 0.12) }} />
       {options.map((option) => (
         <ToggleChip
           key={option.code ?? "all"}
@@ -95,6 +101,47 @@ function TypeChips({
         />
       ))}
     </ScrollView>
+  );
+}
+
+// The five sphere toggles under the search: a 44 pt plate each, the sphere's printed icon in its colour with a glow and a bar along
+// the plate's foot when on, grey when off. A second tap turns a sphere off again.
+const SPHERES = ["leadership", "tactics", "spirit", "lore", "neutral"] as const;
+
+function SphereToggles({ value, onChange }: { value: string | null; onChange: (next: string | null) => void }) {
+  const palette = usePalette();
+  const t = useTableTokens();
+  const s = useUiScale();
+  const box = touch(s, 44);
+  return (
+    <View className="mt-2 flex-row" style={{ gap: 6 * s }} accessibilityRole="radiogroup" accessibilityLabel="Sphere">
+      {SPHERES.map((sphere) => {
+        const on = value === sphere;
+        const tint = SPHERE_TINT[sphere] ?? "faint";
+        const color = palette[tint];
+        return (
+          <Pressable
+            key={sphere}
+            testID={`pool-sphere-${sphere}`}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: on, checked: on }}
+            accessibilityLabel={sphereWord(sphere)}
+            onPress={() => onChange(on ? null : sphere)}
+          >
+            {({ pressed }) => (
+              <View
+                className="items-center justify-center rounded-tile"
+                style={{ width: box, height: box, ...(on ? { ...segmentSurface(t), boxShadow: `inset 0 -2px 0 ${color}, 0 0 14px ${withAlphaHex(color, 0.35)}` } : rowSurface(pressed, t)) }}
+              >
+                <View style={on ? { filter: `drop-shadow(0 0 5px ${withAlphaHex(color, 0.8)})` } : undefined}>
+                  <GameIcon name={sphere} size={20 * s} tint={on ? tint : "faint"} />
+                </View>
+              </View>
+            )}
+          </Pressable>
+        );
+      })}
+    </View>
   );
 }
 
@@ -114,11 +161,17 @@ export function CardPoolBody({
   startType = null,
   typeRequest = null,
   onPreview,
+  onOpen,
+  selected = null,
 }: {
   adding: boolean;
   startType?: string | null;
   typeRequest?: PoolTypeRequest | null;
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
+  // A tap on a card; the card screen is pushed without it. The Cards hub on a tablet in landscape fills its detail pane instead.
+  onOpen?: (code: string) => void;
+  // The card whose detail is open beside the pool: its cell carries the silver ring.
+  selected?: string | null;
 }) {
   const draft = useDeckDraft();
   const { catalog } = useDatabases();
@@ -220,7 +273,7 @@ export function CardPoolBody({
     return (code) => byCode.get(code);
   }, [rows]);
   const filters = activeFilterCount(applied);
-  const openCard = useCallback((code: string) => router.push({ pathname: "/card/[code]", params: { code } }), [router]);
+  const openCard = useCallback((code: string) => (onOpen ? onOpen(code) : router.push({ pathname: "/card/[code]", params: { code } })), [router, onOpen]);
   const previewCard = onPreview;
   // One function while nothing it reads changes, so FlashList and the memoized cards skip the cards a render did not touch.
   const renderItem = useCallback(
@@ -244,10 +297,11 @@ export function CardPoolBody({
           lookup={lookup}
           onOpen={openCard}
           onPreview={previewCard}
+          selected={selected === item.code}
         />
       );
     },
-    [grid, cellWidth, columns, scale, adding, inactiveCodes, draft, lookup, openCard, previewCard],
+    [grid, cellWidth, columns, scale, adding, inactiveCodes, draft, lookup, openCard, previewCard, selected],
   );
 
   function openSheet(): void {
@@ -268,15 +322,9 @@ export function CardPoolBody({
     <View className="min-h-0 flex-1">
       <View className="mt-3 flex-row items-center gap-2">
         <SearchField testID="pool-search" value={search} onChangeText={setSearch} placeholder="Search cards" accessibilityLabel="Search cards" />
-        <SecondaryButton
-          testID="pool-filter"
-          label={filters > 0 ? `Filter · ${filters}` : "Filter"}
-          tone={filters > 0 ? "accent" : "bone"}
-          compact
-          accessibilityLabel={filters > 0 ? `Filter, ${filters} on` : "Filter"}
-          onPress={openSheet}
-        />
+        <FilterButton count={filters} onPress={openSheet} />
       </View>
+      <SphereToggles value={applied.sphere} onChange={(sphere) => setApplied({ ...applied, sphere })} />
       <TypeChips
         types={types}
         value={applied.typeCode}
@@ -309,7 +357,7 @@ export function CardPoolBody({
             numColumns={grid ? columns : 1}
             style={{ flex: 1 }}
             contentContainerStyle={inset > 0 ? { paddingHorizontal: inset } : undefined}
-            extraData={draft}
+            extraData={{ draft, selected }}
             keyboardShouldPersistTaps="handled"
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
@@ -326,6 +374,31 @@ export function CardPoolBody({
       </View>
       <PoolFilterSheet open={open} rows={rows} groups={groups} filter={draftFilter} onChange={setDraftFilter} onDismiss={dismiss} onApply={apply} />
     </View>
+  );
+}
+
+/** Filter, with a round count of the filters on beside the word. */
+function FilterButton({ count, onPress }: { count: number; onPress: () => void }) {
+  const palette = usePalette();
+  const t = useTableTokens();
+  const s = useUiScale();
+  return (
+    <Pressable testID="pool-filter" collapsable={false} accessibilityRole="button" accessibilityLabel={count > 0 ? `Filter, ${count} on` : "Filter"} onPress={onPress}>
+      {({ pressed }) => (
+        <View className="flex-row items-center rounded-tile px-3.5" style={{ minHeight: touch(s, 44), gap: 8 * s, ...slateSurface(pressed, t) }}>
+          <Text className="text-body" style={{ color: palette.muted }}>
+            Filter
+          </Text>
+          {count > 0 ? (
+            <View className="items-center justify-center rounded-pill" style={{ minWidth: 20 * s, height: 20 * s, paddingHorizontal: 5 * s, backgroundColor: palette.accent }}>
+              <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: palette.onAccent }}>
+                {String(count)}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      )}
+    </Pressable>
   );
 }
 

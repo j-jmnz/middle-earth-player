@@ -6,6 +6,7 @@ import { useCallback, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 
 import { withAlphaHex } from "../play/tokens";
+import { useUiScale } from "../play/ui-scale";
 import { Chevron, Chip } from "./chrome-marks";
 import { useDatabases } from "./databases";
 import { foldWords, isFolded, type Sections } from "./fold-state";
@@ -72,6 +73,7 @@ export type FoldHeaderProps = {
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
 export function FoldHeader({ id, title, folded, onFold, count, unit, summary, detail, badge, testID, right, solid = false }: FoldHeaderProps) {
   const palette = usePalette();
+  const s = useUiScale();
   const counted = count == null ? null : unit ? plural(count, unit) : String(count);
   const second = folded && summary ? summary : (detail ?? null);
   // The count says what is inside while folded, unless the summary says it better.
@@ -97,11 +99,13 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, de
           <View className="w-3 items-center">
             <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
           </View>
-          <Text className="shrink font-display text-eyebrow uppercase text-moon">{title}</Text>
+          <Text className="shrink font-display text-moon" style={{ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 1 * s }}>
+            {title}
+          </Text>
           {badge ? <Chip label={badge} tone="faint" /> : null}
           <View
             className="h-px min-w-3 flex-1"
-            style={solid ? { backgroundColor: palette.hairline } : { backgroundImage: `linear-gradient(90deg, ${palette.hairline}, ${withAlphaHex(palette.hairline, 0)})`, backgroundColor: "transparent" }}
+            style={solid ? { backgroundColor: withAlphaHex(palette.moon, 0.3) } : { backgroundImage: `linear-gradient(90deg, ${withAlphaHex(palette.moon, 0.45)}, ${withAlphaHex(palette.moon, 0)})`, backgroundColor: "transparent" }}
           />
           {note != null ? <Text className="pr-1 text-label text-muted">{note}</Text> : null}
         </View>

@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 import { pictureMaxWidth } from "./card-picture";
 
 describe("pictureMaxWidth", () => {
-  it("keeps the phone's 300 wide, 96 in from the window", () => {
-    expect(pictureMaxWidth("compact", 390, 1, null, false)).toBe(294);
-    expect(pictureMaxWidth("compact", 430, 1, null, false)).toBe(300);
-    expect(pictureMaxWidth("compact", 430, 1.15, null, false)).toBeCloseTo(319.6);
+  it("keeps the phone's 236 wide, 96 in from the window", () => {
+    expect(pictureMaxWidth("compact", 390, 1, null, false)).toBe(236);
+    expect(pictureMaxWidth("compact", 320, 1, null, false)).toBe(224);
+    expect(pictureMaxWidth("compact", 430, 1.15, null, false)).toBeCloseTo(271.4);
   });
 
   it("raises the cap to 360 in the medium column", () => {
