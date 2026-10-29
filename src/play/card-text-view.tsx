@@ -25,7 +25,8 @@ function Run({ run, icon }: { run: TextRun; icon: TableToken }) {
   return <Text className={`${weight} ${style}`.trim() || undefined}>{run.text}</Text>;
 }
 
-export function CardTextView({ text, tone = "night", testID }: { text: string | null | undefined; tone?: keyof typeof TONES; testID?: string }) {
+// `reading` sets the text larger, 18 on 28, for a rule read in a tablet's reading pane.
+export function CardTextView({ text, tone = "night", testID, reading = false }: { text: string | null | undefined; tone?: keyof typeof TONES; testID?: string; reading?: boolean }) {
   const s = useUiScale();
   const paragraphs = cardTextParagraphs(text);
   if (paragraphs.length === 0) return null;
@@ -33,7 +34,11 @@ export function CardTextView({ text, tone = "night", testID }: { text: string | 
   return (
     <View testID={testID} className="gap-3">
       {paragraphs.map((paragraph, index) => (
-        <Text key={index} className={paragraph.flavor ? `text-center text-body italic ${colors.flavor}` : `text-body ${colors.text}`} style={{ lineHeight: 25 * s }}>
+        <Text
+          key={index}
+          className={paragraph.flavor ? `text-center text-body italic ${colors.flavor}` : `text-body ${colors.text}`}
+          style={reading ? { fontSize: 18 * s, lineHeight: 28 * s } : { lineHeight: 23 * s }}
+        >
           {paragraph.runs.map((run, at) => (
             <Run key={at} run={run} icon={colors.icon} />
           ))}

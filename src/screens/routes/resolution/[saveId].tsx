@@ -11,7 +11,8 @@ import { useStore } from "zustand";
 import { gameReport } from "../../../campaign/report";
 import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
-import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton, TwoPane } from "../../chrome";
+import { scoreParts, scoreTotal } from "../../../campaign/score";
+import { ActionBar, BodyText, Label, StatTile, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton, TwoPane } from "../../chrome";
 import { selectedRingOf, tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { campaignOf, scenarioName } from "../../campaign-data";
@@ -90,9 +91,9 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
 
   if (view.kind === "lost") {
     return (
-      <Screen testID="resolution" scene="calm">
+      <Screen testID="resolution" scene="ember">
         {back}
-        <ScreenScroll top={32} bottom={24} max="readable">
+        <ScreenScroll top={16} bottom={24} max="readable">
           <OutcomeTitle won={false} scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
           {view.reason ? (
             <BodyText className="mt-6 text-center" testID="resolution-reason">
@@ -135,10 +136,17 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const declined = view.kind === "choosing" && view.decline != null && chosen === view.decline.optionId;
   const answer = picked?.optionId ?? (declined && view.kind === "choosing" ? (view.decline?.optionId ?? null) : null);
 
-  // While choosing, the outcome word sits higher so a row of tiles shows whole above the bar.
+  // The numbers the player watches: the score, the rounds and the final threat, in red. Lower is better.
+  const parts = scoreParts(game, session.world.cards);
   const titleBlock = (
-    <View className={view.kind === "choosing" ? "mt-4" : "mt-16"}>
+    <View className={view.kind === "choosing" ? "mt-2" : "mt-8"}>
       <OutcomeTitle won scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
+      <View className="mt-4 flex-row gap-2" testID="resolution-tiles">
+        <StatTile label="Score" value={String(scoreTotal(parts))} />
+        <StatTile label="Rounds" value={String(parts.rounds)} />
+        <StatTile label="Final threat" value={String(parts.threat)} tone="danger" />
+      </View>
+      <Label className="mt-2 text-center">Lower score is better.</Label>
     </View>
   );
   const choiceBlock =

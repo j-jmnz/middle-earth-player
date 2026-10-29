@@ -35,7 +35,7 @@ const DIFFICULTY_NOTES: Readonly<Record<Difficulty, string>> = {
   Normal: "Normal: the full encounter deck, and no starting resources.",
 };
 
-const BANNER_HEIGHT = 280;
+const BANNER_HEIGHT = 330;
 
 /** A saved deck's cards, one code per copy. */
 export function expand(deck: SavedDeck | undefined): string[] {
@@ -149,7 +149,7 @@ export function BriefingScreen({
   const cap = capWidth(size, "readable", s);
   const column = cap == null || expanded ? undefined : ({ width: "100%", maxWidth: cap, alignSelf: "center" } as const);
   const scene = (
-    <SceneArt scenarioId={scenarioId} height={BANNER_HEIGHT * s + insets.top} shade={0.4} fade={0.2}>
+    <SceneArt scenarioId={scenarioId} height={(expanded ? 560 : BANNER_HEIGHT) * s + insets.top} shade={0.4} fade={0.25}>
       <View className="absolute bottom-0 left-0 right-0 pb-2" style={expanded ? { ...side, paddingRight: 24 * s } : side}>
         {column ? <View style={column}>{banner}</View> : banner}
       </View>
@@ -228,29 +228,26 @@ export function BriefingScreen({
   );
 }
 
-/** Over the scene: the scenario's number, its name and its stages in order. */
+/** Over the scene: an overline with the scenario's number and its campaign, its name large, and its stages in order as chips. */
 export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebrow: string }) {
   const palette = usePalette();
   const titleShadow = useTitleShadow();
+  const { size, s } = useSizeClass();
+  const big = size === "compact" ? 36 : 56;
   return (
     <>
-      {/* Every word over the scene carries the title's night shadow: a long name pushes the eyebrow up into the bright sky. */}
-      <Text className="font-display text-eyebrow uppercase text-accent" style={titleShadow}>
+      {/* Every word over the scene carries the title's shadow: a long name pushes the overline up into the bright sky. */}
+      <Text className="font-bold text-eyebrow uppercase text-moon" style={titleShadow}>
         {eyebrow}
       </Text>
-      <Text accessibilityRole="header" testID="briefing-title" className="mt-1 font-display text-display text-bone" style={titleShadow}>
+      <Text accessibilityRole="header" testID="briefing-title" className="mt-1 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.12 * s, ...titleShadow }}>
         {facts.name}
       </Text>
-      <View testID="briefing-stages" accessible accessibilityLabel={`Stages: ${facts.stages.join(", ")}`} className="mt-3 flex-row flex-wrap items-center gap-x-2 gap-y-1.5">
+      <View testID="briefing-stages" accessible accessibilityLabel={`Stages: ${facts.stages.join(", ")}`} className="mt-3 flex-row flex-wrap items-center gap-x-1.5 gap-y-1.5">
         {facts.stages.map((stage, index) => (
-          <View key={`${stage}:${index}`} className="flex-row items-center gap-2">
+          <View key={`${stage}:${index}`} className="flex-row items-center gap-1.5">
             {index > 0 ? <Chevron direction="right" color={palette.faint} size={6} /> : null}
-            <View className="h-5 w-5 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: palette.accentLine }}>
-              <Text className="font-display text-micro text-accent">{String(index + 1)}</Text>
-            </View>
-            <Text className="text-label text-bone" style={titleShadow}>
-              {stage}
-            </Text>
+            <Chip label={`${index + 1} ${stage}`} onArt />
           </View>
         ))}
       </View>

@@ -70,7 +70,7 @@ export default function StandaloneOutcome() {
   const linesBlock =
     result.outcome === "won" ? (
       // The score as the numbers the player watches: score, completed rounds, victory points (ltp.scoring).
-      <View className="mt-10" testID="outcome-lines">
+      <View className="mt-4" testID="outcome-lines">
         <View className="flex-row gap-2">
           <StatTile label="Score" value={String(result.score.score)} />
           <StatTile label="Rounds" value={String(result.score.rounds)} />
@@ -98,19 +98,19 @@ export default function StandaloneOutcome() {
           kind="supporting"
           side="end"
           start={
-            <ScreenScroll top={won ? 64 : 32} bottom={24}>
+            <ScreenScroll top={16} bottom={24}>
               {titleBlock}
               {linesBlock}
             </ScreenScroll>
           }
           end={
-            <ScreenScroll top={won ? 64 : 32} bottom={24}>
+            <ScreenScroll top={16} bottom={24}>
               <GameReportView report={report} tiles={won} />
             </ScreenScroll>
           }
         />
       ) : (
-        <ScreenScroll top={won ? 64 : 32} bottom={24} max="readable">
+        <ScreenScroll top={16} bottom={24} max="readable">
           {titleBlock}
           {linesBlock}
           {report ? (

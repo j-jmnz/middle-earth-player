@@ -329,17 +329,38 @@ export function PaperSheet({ step, title, children }: { step: string; title: str
 }
 
 /**
- * Victory or Defeat: the outcome word in Marcellus SC 50 pt, tracked wide, with its glow (silver, or threat red), and the scenario's
- * name under it. Resolution and the standalone outcome both say it this way.
+ * Victory or Defeat: the outcome word in Marcellus SC 50 pt (72 on a tablet), tracked wide, inside a glowing ring with the One Ring
+ * faint in it, and the scenario's name under it. Silver for a win, threat red for a loss. Resolution and the standalone outcome both
+ * say it this way.
  */
 export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario: string; testID: string }) {
   const palette = usePalette();
   const t = useTableTokens();
   const { size, s } = useSizeClass();
   const big = size === "compact" ? 50 : 72;
+  const ring = (size === "compact" ? 240 : 330) * s;
   const light = t.depth === "light";
+  const tone = won ? (light ? palette.accent : palette.glow) : palette.threat;
   return (
-    <>
+    <View className="items-center justify-center" style={{ height: ring }}>
+      <View
+        pointerEvents="none"
+        importantForAccessibility="no-hide-descendants"
+        style={{
+          position: "absolute",
+          width: ring,
+          height: ring,
+          borderRadius: ring / 2,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(tone, 0.12)} 0%, ${withAlphaHex(tone, 0.02)} 70%, ${withAlphaHex(tone, 0)} 100%)`,
+          boxShadow: `inset 0 0 0 1.5px ${withAlphaHex(tone, 0.55)}, 0 0 40px ${withAlphaHex(tone, 0.3)}, inset 0 0 30px ${withAlphaHex(tone, 0.2)}`,
+        }}
+      >
+        <View style={{ opacity: 0.12 }}>
+          <GameIcon name="oneRing" size={ring * 0.62} tint={won ? "bone" : "danger"} />
+        </View>
+      </View>
       <Text
         testID={testID}
         accessibilityRole="header"
@@ -354,6 +375,6 @@ export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario
         {won ? "Victory" : "Defeat"}
       </Text>
       <Text className="mt-1 text-center font-display text-heading text-muted">{scenario}</Text>
-    </>
+    </View>
   );
 }
