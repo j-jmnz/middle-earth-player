@@ -281,10 +281,13 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           onMenu={() => setMenuOpen((open) => !open)}
         />
         <View className="min-h-0 flex-1 flex-row">
-          {/* The quest scale at the left edge: the threat in staging against the willpower committed, live as characters commit. */}
-          <View style={{ paddingBottom: Math.max(insets.bottom, 10 * s), paddingTop: 4 * s }}>
-            <QuestScaleView scale={scale} wide={tabletTable} />
-          </View>
+          {/* The quest scale at the left edge, in the Quest phase only (user request, 2026-10-29): the threat in staging against the
+              willpower committed, live as characters commit. Outside it the canvas takes its room. */}
+          {scale.live ? (
+            <View style={{ paddingBottom: Math.max(insets.bottom, 10 * s), paddingTop: 4 * s }}>
+              <QuestScaleView scale={scale} wide={tabletTable} />
+            </View>
+          ) : null}
           <View className="min-h-0 flex-1" onLayout={onLayout}>
             {size ? (
               <TableCanvas
