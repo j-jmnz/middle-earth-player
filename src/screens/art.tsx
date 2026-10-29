@@ -220,13 +220,31 @@ export function SceneCard({
 }
 
 /**
- * How a picture behind a page meets the ground, which is a gradient, not one colour. Dark fades it to night (the ground is near enough
- * night everywhere). Light multiplies the picture onto the ground and fades it to white, which multiplies to nothing, so it ends on the
- * ground itself and leaves no band where it stops.
+ * How a picture behind a page meets the ground, which is fog and light, not one colour. Dark screens the picture onto the ground and
+ * fades it to black, which screens to nothing; Light multiplies it onto the ground and fades it to white, which multiplies to nothing.
+ * Either way it ends on the ground itself, fog and all, and leaves no band where it stops (user report, 2026-10-30: a fade to night
+ * met the fog under it in a line).
  */
-export function useArtGround(): { ground: string; blend: { mixBlendMode?: "multiply" } } {
-  const palette = usePalette();
-  return useTheme() === "light" ? { ground: "#FFFFFF", blend: { mixBlendMode: "multiply" } } : { ground: palette.night, blend: {} };
+export function useArtGround(): { ground: string; blend: { mixBlendMode: "multiply" | "screen" } } {
+  return useTheme() === "light" ? { ground: "#FFFFFF", blend: { mixBlendMode: "multiply" } } : { ground: "#000000", blend: { mixBlendMode: "screen" } };
+}
+
+/**
+ * A scenario's scene at the head of a page (the briefing), met to the ground (useArtGround) at its foot and, with `edge`, at its right
+ * so it sits in the fog of the pane beside it. `children` are laid over it unblended (the banner's words).
+ */
+export function GroundedScene({ scenarioId, height, shade, fade, edge = false, children }: { scenarioId: string | null | undefined; height: number; shade?: number; fade: number; edge?: boolean; children?: ReactNode }) {
+  const { ground, blend } = useArtGround();
+  const s = useUiScale();
+  return (
+    <View style={{ height }}>
+      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...blend }}>
+        <SceneArt scenarioId={scenarioId} height={height} shade={shade} fade={fade} fadeTo={ground} />
+        {edge ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 96 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(ground, 0)}, ${ground})` }} /> : null}
+      </View>
+      {children}
+    </View>
+  );
 }
 
 /**
@@ -258,14 +276,14 @@ export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId
         {edge(ground)}
       </View>
       {/* The theme's air over the picture, a layer of its own so Light's multiply stays on the picture and its light can brighten. */}
-      {/* Light screens its veil onto the page, so the light brightens on a phone's canvas as on the web. */}
-      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={theme === "dark" ? box : { ...box, mixBlendMode: "screen" }}>
+      {/* Both screen their veil onto the page, so the fog and the light brighten on a phone's canvas as on the web, and black hides them. */}
+      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ ...box, mixBlendMode: "screen" }}>
         {theme === "dark" ? (
           <>
-            {/* Dark: a bank of fog under the title, falling to the ground at the foot so no edge meets the page below. */}
+            {/* Dark: a bank of fog under the title, falling to black at the foot and the edge so it ends in the page's own fog. */}
             <FogVeil layers={heroVeil.dark} width={width} height={height} />
-            <View style={{ position: "absolute", left: 0, top: 0, width, height, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(palette.night, 0)} 84%, ${palette.night} 100%)` }} />
-            {edge(palette.night)}
+            <View style={{ position: "absolute", left: 0, top: 0, width, height, backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0) 84%, #000000 100%)` }} />
+            {edge("#000000")}
           </>
         ) : (
           <>
