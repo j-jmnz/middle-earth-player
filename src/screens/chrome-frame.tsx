@@ -22,7 +22,7 @@ import { useSizeClass } from "../play/use-size-class";
 import { Text } from "../play/text";
 
 /**
- * The page: the ground and its fog (the scene), an optional art layer, then the content, inset 24 and starting under the status bar; in landscape (the card and booklet
+ * The page: the ground, an optional art layer, the fog over both (the scene), then the content, inset 24 and starting under the status bar; in landscape (the card and booklet
  * screens can turn with the phone) it is inset past the side safe areas too. `bleed` drops both, for a screen that opens on a
  * picture running under the status bar (the briefing, the deck editor): it insets its own words.
  */
@@ -39,15 +39,23 @@ export function Screen({
   scene?: SceneName;
   inset?: boolean;
   bleed?: boolean;
-  // The art layer between the fog and the content (HeroArt): a scene behind the hero words, under the status bar.
+  // The art layer between the ground and the fog (HeroArt): a scene behind the hero words, under the status bar.
   art?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
   const s = useUiScale();
   return (
     <View testID={testID} collapsable={false} className="flex-1 overflow-hidden bg-night">
-      <Backdrop scene={scene} />
-      {art}
+      {/* An art layer sits between the ground and the air, so the scene's fog drifts over the picture too. */}
+      {art ? (
+        <>
+          <Backdrop scene={scene} part="ground" />
+          {art}
+          <Backdrop scene={scene} part="air" />
+        </>
+      ) : (
+        <Backdrop scene={scene} />
+      )}
       <View className={bleed ? "flex-1" : "flex-1 pt-safe"} style={inset && !bleed ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right } : undefined}>
         {children}
       </View>

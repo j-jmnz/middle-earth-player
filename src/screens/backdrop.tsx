@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 
 import { useTheme } from "../play/theme";
-import { fogMatrix, gritTexture, scenesByTheme, type FogTexture, type SceneName } from "./backdrop-scenes";
+import { fogMatrix, gritTexture, scenesByTheme, type BackdropPart, type FogLayer, type FogTexture, type SceneName } from "./backdrop-scenes";
 
 // Web dev loop. Skia web needs CanvasKit, so the browser draws the same scene with CSS: each fog texture is an SVG feTurbulence tile
 // (stitched, so it repeats without a seam) drawn as a repeating background, faded out by a CSS mask. react-native-web forwards these
@@ -28,7 +28,20 @@ function tileUrl(texture: FogTexture): string {
 
 const pct = (value: number) => `${Math.round(value * 100)}%`;
 
-export function Backdrop({ scene }: { scene: SceneName }) {
+/** One fog layer as CSS: its tile repeated, faded out by its elliptical mask (fractions of the box it fills). */
+function fogStyle(layer: FogLayer): WebStyle {
+  const mask = layer.mask ? `radial-gradient(${pct(layer.mask.rx)} ${pct(layer.mask.ry)} at ${pct(layer.mask.cx)} ${pct(layer.mask.cy)}, #000 10%, rgba(0,0,0,0) 85%)` : undefined;
+  return {
+    backgroundImage: tileUrl(layer.texture),
+    backgroundSize: `${layer.texture.tile[0]}px ${layer.texture.tile[1]}px`,
+    backgroundRepeat: "repeat",
+    opacity: layer.opacity,
+    ...(layer.blend ? { mixBlendMode: layer.blend } : {}),
+    ...(mask ? { maskImage: mask, WebkitMaskImage: mask } : {}),
+  };
+}
+
+export function Backdrop({ scene, part = "all" }: { scene: SceneName; part?: BackdropPart }) {
   const s = scenesByTheme[useTheme()][scene];
   const { ground, vignette, grit } = s;
   const groundStyle: WebStyle =
@@ -37,26 +50,34 @@ export function Backdrop({ scene }: { scene: SceneName }) {
       : { backgroundImage: `radial-gradient(${pct(ground.rx)} ${pct(ground.ry)} at ${pct(ground.cx)} ${pct(ground.cy)}, ${ground.stops.map(([at, color]) => `${color} ${pct(at)}`).join(", ")})` };
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, { overflow: "hidden" }]}>
-      <View style={[StyleSheet.absoluteFill, groundStyle as object]} />
-      {s.fog.map((layer, index) => {
-        const mask = layer.mask ? `radial-gradient(${pct(layer.mask.rx)} ${pct(layer.mask.ry)} at ${pct(layer.mask.cx)} ${pct(layer.mask.cy)}, #000 10%, rgba(0,0,0,0) 85%)` : undefined;
-        const style: WebStyle = {
-          backgroundImage: tileUrl(layer.texture),
-          backgroundSize: `${layer.texture.tile[0]}px ${layer.texture.tile[1]}px`,
-          backgroundRepeat: "repeat",
-          opacity: layer.opacity,
-          ...(layer.blend ? { mixBlendMode: layer.blend } : {}),
-          ...(mask ? { maskImage: mask, WebkitMaskImage: mask } : {}),
-        };
-        return <View key={index} style={[StyleSheet.absoluteFill, style as object]} />;
-      })}
-      <View style={[StyleSheet.absoluteFill, { backgroundImage: `radial-gradient(120% 100% at 50% 45%, rgba(${vignette.rgb},0) ${pct(vignette.from)}, rgba(${vignette.rgb},${vignette.alpha}) 100%)` } as object]} />
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundImage: tileUrl(gritTexture), backgroundSize: `${gritTexture.tile[0]}px ${gritTexture.tile[1]}px`, opacity: grit.opacity, mixBlendMode: grit.blend } as object,
-        ]}
-      />
+      {part === "air" ? null : <View style={[StyleSheet.absoluteFill, groundStyle as object]} />}
+      {part === "ground"
+        ? null
+        : s.fog.map((layer, index) => (
+            <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer) as object]} />
+          ))}
+      {part === "ground" ? null : (
+        <>
+          <View style={[StyleSheet.absoluteFill, { backgroundImage: `radial-gradient(120% 100% at 50% 45%, rgba(${vignette.rgb},0) ${pct(vignette.from)}, rgba(${vignette.rgb},${vignette.alpha}) 100%)` } as object]} />
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundImage: tileUrl(gritTexture), backgroundSize: `${gritTexture.tile[0]}px ${gritTexture.tile[1]}px`, opacity: grit.opacity, mixBlendMode: grit.blend } as object,
+            ]}
+          />
+        </>
+      )}
+    </View>
+  );
+}
+
+/** Fog layers in a box of their own, over a picture (HeroArt), as the native canvas draws them. */
+export function FogVeil({ layers, width, height }: { layers: readonly FogLayer[]; width: number; height: number }) {
+  return (
+    <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
+      {layers.map((layer, index) => (
+        <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer) as object]} />
+      ))}
     </View>
   );
 }

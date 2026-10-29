@@ -23,6 +23,15 @@ export const raisedEdgeOf = (t: TableTokens = dark) => (isLight(t) ? "inset 0 1p
 /** A drop shadow `y` down and `blur` soft under a card, a coin or a stepper: black at `alpha` on Dark, the warm shade at a third of it on Light. */
 export const dropShadowOf = (t: TableTokens, y: number, blur: number, alpha: number) => `0 ${y}px ${blur}px ${shade(t, isLight(t) ? alpha / 3 : alpha)}`;
 
+/**
+ * The depth of a picture lapping over the one before it (the Campaigns fellowship): a hard dark edge along its left side and a soft
+ * shadow cast leftward onto the picture under it, with the drop under both.
+ */
+export function lapShadowOf(t: TableTokens = dark): string {
+  const light = isLight(t);
+  return `-2px 0 0 ${shade(t, light ? 0.45 : 1)}, -12px 0 18px ${shade(t, light ? 0.4 : 1)}, -4px 0 6px ${shade(t, light ? 0.35 : 0.9)}, ${dropShadowOf(t, 10, 22, 0.8)}`;
+}
+
 /** The depth under a floating panel: the lit edge, a hard 1 pt foot, a long soft shadow, and on Dark a faint green haze. */
 export function panelDepthOf(t: TableTokens = dark): string {
   if (isLight(t)) return `${raisedEdgeOf(t)}, 0 1px 0 ${shade(t, 0.15)}, 0 22px 44px ${shade(t, 0.3)}`;

@@ -3,12 +3,14 @@ import { Pressable, View } from "react-native";
 import type { NextStep, PathNode } from "../campaign/path";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
-import { rowSurface } from "../play/surfaces";
+import { dropShadowOf, lapShadowOf, rowSurface } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
 import { Portrait, type ArtCard } from "./art";
+import { COVER } from "./art-crop";
+import { HeroTile, type HeroFace } from "./hero-tile";
 import { Chevron, Eyebrow, JourneyBar, Label, PrimaryButton, SecondaryButton, useTitleShadow } from "./chrome";
 import { usePalette } from "./palette-hook";
 import { Text } from "../play/text";
@@ -55,16 +57,23 @@ function nextWords(next: NextStep): { name: string; label: string; state: string
   return { name: "Every scenario is won", label: "Open path", state: "Completed" };
 }
 
+// How far a fellowship painting laps over the one before it.
+const OVERLAP = 10;
+
 /**
  * The words over the current playthrough's scene: an overline with a short rule (Campaign and the seats), the campaign's name large,
- * and the fellowship's faces in their sphere rings with their names. Hero titles carry a dark shadow on Dark.
+ * and the fellowship as their paintings (`HeroTile`: the card's painting with its name and sphere, no ring), three to a row, each
+ * lapping a little over the right edge of the one before it and shadowing it. Hero titles carry a dark shadow on Dark.
  */
-export function SaveHero({ line, heroes }: { line: SaveLine; heroes: readonly PartyHero[] }) {
-  const palette = usePalette();
+export function SaveHero({ line, heroes }: { line: SaveLine; heroes: readonly HeroFace[] }) {
+  const t = useTableTokens();
   const { size, s } = useSizeClass();
   const shadow = useTitleShadow();
   const big = size === "compact" ? 38 : 60;
-  const names = heroes.map((hero) => hero.name).join(", ");
+  // Two seats' six heroes take two shorter, denser rows, so the road still starts on the first screen.
+  const two = heroes.length > 3;
+  const tile = (size === "compact" ? (two ? 92 : 140) : two ? 130 : 180) * s;
+  const rows = Array.from({ length: Math.ceil(heroes.length / 3) }, (_, row) => heroes.slice(row * 3, row * 3 + 3));
   return (
     <View>
       <Eyebrow rule onArt>{`Campaign · ${line.seats}`}</Eyebrow>
@@ -72,17 +81,24 @@ export function SaveHero({ line, heroes }: { line: SaveLine; heroes: readonly Pa
         {line.name}
       </Text>
       {heroes.length > 0 ? (
-        <View className="mt-3 flex-row items-center" style={{ gap: 12 * s }} accessible accessibilityLabel={`Fellowship: ${names}`}>
-          <View className="flex-row">
-            {heroes.map((hero, index) => (
-              <View key={`${hero.card.code}:${index}`} style={{ marginLeft: index === 0 ? 0 : -8 * s, borderRadius: 999, borderWidth: 2, borderColor: palette.night }}>
-                <Portrait card={hero.card} size={40} tint={hero.tint} />
-              </View>
-            ))}
-          </View>
-          <Text className="min-w-0 flex-1 text-body text-muted" numberOfLines={2}>
-            {names}
-          </Text>
+        <View className="mt-4" style={{ gap: 14 * s }} accessible accessibilityLabel={`Fellowship: ${heroes.map((hero) => hero.name).join(", ")}`}>
+          {rows.map((row, index) => (
+            <View key={index} className="flex-row">
+              {/* Each painting laps a little over the right edge of the one before it, so no hero's name (on its left) is covered, and
+                  casts a shadow on it, so the row reads as cards laid one on another. */}
+              {row.map((hero, at) => (
+                <View key={`${hero.code}:${at}`} className="flex-1 flex-row rounded-tile" style={{ marginLeft: at === 0 ? 0 : -OVERLAP * s, boxShadow: at === 0 ? dropShadowOf(t, 10, 22, 0.8) : lapShadowOf(t) }}>
+                  <HeroTile hero={hero} height={tile} crop={COVER} dense={two} />
+                  {/* The lapping edge is lit, the way a panel's top is, so the stack reads apart over two dark paintings. */}
+                  {at === 0 ? null : <View pointerEvents="none" className="absolute bottom-0 left-0 top-0 rounded-l-tile" style={{ width: 1.5 * s, backgroundColor: withAlphaHex(t.lit, 0.55) }} />}
+                </View>
+              ))}
+              {/* A short row keeps its tiles a third wide. */}
+              {Array.from({ length: 3 - row.length }, (_, gap) => (
+                <View key={`gap${gap}`} className="flex-1" style={{ marginLeft: -OVERLAP * s }} />
+              ))}
+            </View>
+          ))}
         </View>
       ) : null}
     </View>

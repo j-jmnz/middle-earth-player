@@ -2,7 +2,7 @@ import { Canvas, ColorMatrix, FractalNoise, Group, Mask, Paint, RadialGradient, 
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { useTheme } from "../play/theme";
-import { fogMatrix, gritTexture, scenesByTheme, type FogLayer, type FogTexture, type SceneName } from "./backdrop-scenes";
+import { fogMatrix, gritTexture, scenesByTheme, type BackdropPart, type FogLayer, type FogTexture, type SceneName } from "./backdrop-scenes";
 
 /** An ellipse as a radial gradient: a circle of radius rx × width, squashed to ry × height about its centre. */
 function Ellipse({ cx, cy, rx, ry, positions, colors }: { cx: number; cy: number; rx: number; ry: number; positions: number[]; colors: string[] }) {
@@ -44,16 +44,18 @@ function Fog({ layer, width, height }: { layer: FogLayer; width: number; height:
 
 /**
  * One static Skia canvas behind the screen, drawn once per size and never inside a list row (docs/design-system.md, Backdrops): the
- * ground, the fog layers each faded at its edges, the vignette falling to the ground, and the grit over all of it.
+ * ground, the fog layers each faded at its edges, the vignette falling to the ground, and the grit over all of it. A screen with an
+ * art layer draws it in two parts, the ground under the art and the air (fog, vignette, grit) over it, so the picture sits in the
+ * same fog as the rest of the page and its foot leaves no edge.
  */
-export function Backdrop({ scene }: { scene: SceneName }) {
+export function Backdrop({ scene, part = "all" }: { scene: SceneName; part?: BackdropPart }) {
   const { width, height } = useWindowDimensions();
   const s = scenesByTheme[useTheme()][scene];
   const { ground, vignette, grit } = s;
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <Canvas style={StyleSheet.absoluteFill}>
-        {ground.kind === "solid" ? (
+        {part === "air" ? null : ground.kind === "solid" ? (
           <Rect x={0} y={0} width={width} height={height} color={ground.color} />
         ) : (
           <Rect x={0} y={0} width={width} height={height}>
@@ -67,16 +69,31 @@ export function Backdrop({ scene }: { scene: SceneName }) {
             />
           </Rect>
         )}
-        {s.fog.map((layer, index) => (
-          <Fog key={index} layer={layer} width={width} height={height} />
-        ))}
-        <Rect x={0} y={0} width={width} height={height}>
-          <Ellipse cx={width / 2} cy={height * 0.45} rx={width * 1.2} ry={height} positions={[vignette.from, 1]} colors={[`rgba(${vignette.rgb},0)`, `rgba(${vignette.rgb},${vignette.alpha})`]} />
-        </Rect>
-        <Group layer={<Paint opacity={grit.opacity} blendMode={grit.blend} />}>
-          <Noise texture={gritTexture} width={width} height={height} />
-        </Group>
+        {part === "ground" ? null : (
+          <>
+            {s.fog.map((layer, index) => (
+              <Fog key={index} layer={layer} width={width} height={height} />
+            ))}
+            <Rect x={0} y={0} width={width} height={height}>
+              <Ellipse cx={width / 2} cy={height * 0.45} rx={width * 1.2} ry={height} positions={[vignette.from, 1]} colors={[`rgba(${vignette.rgb},0)`, `rgba(${vignette.rgb},${vignette.alpha})`]} />
+            </Rect>
+            <Group layer={<Paint opacity={grit.opacity} blendMode={grit.blend} />}>
+              <Noise texture={gritTexture} width={width} height={height} />
+            </Group>
+          </>
+        )}
       </Canvas>
     </View>
+  );
+}
+
+/** Fog layers in a box of their own, over a picture (HeroArt): one more static canvas, drawn once per size, its masks in the box's fractions. */
+export function FogVeil({ layers, width, height }: { layers: readonly FogLayer[]; width: number; height: number }) {
+  return (
+    <Canvas pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
+      {layers.map((layer, index) => (
+        <Fog key={index} layer={layer} width={width} height={height} />
+      ))}
+    </Canvas>
   );
 }

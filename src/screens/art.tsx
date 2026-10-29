@@ -11,6 +11,8 @@ import { cards } from "../catalog/schema";
 import { nightFade, panelSurface, topShade } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
+import { FogVeil } from "./backdrop";
+import { heroVeils } from "./backdrop-scenes";
 import { cropFrame, FACE, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, type Region } from "./art-crop";
 import { scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
@@ -227,12 +229,14 @@ export function useArtGround(): { ground: string; blend: { mixBlendMode?: "multi
 
 /**
  * A scenario's scene as the art layer of a page (the Campaigns hub): drawn large and dimmed behind the hero words, faded out at its
- * edges by an elliptical shade and taken down to the ground towards its foot, so the words and panels under it sit in the fog. It does
+ * edges by an elliptical shade, shaded at its top, veiled in fog under the title (`heroVeils`) and taken down to the ground towards
+ * its foot, so the words and panels under it sit in the fog. It does
  * not scroll and takes no touches. `left` places it (centred on the page by default); `right`, when given, is where it stops (in its
  * parent's points), fading to the ground over its last 64 pt, so it stays behind its own column.
  */
 export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId: string | null | undefined; width: number; height: number; left?: number; right?: number }) {
   const { ground, blend } = useArtGround();
+  const theme = useTheme();
   const s = useUiScale();
   const shown = right == null ? width : Math.max(0, Math.min(width, right - (left ?? 0)));
   return (
@@ -240,7 +244,12 @@ export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId
       <View style={{ width, height }}>
         <SceneArt scenarioId={scenarioId} width={width} height={height} />
         <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `radial-gradient(52% 64% at 50% 34%, ${withAlphaHex(ground, 0)} 40%, ${ground} 100%)` }} />
+        {/* The top falls to the ground under the status bar and the head, so the title row reads over a bright sky. */}
+        <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0.78)} 0%, ${withAlphaHex(ground, 0)} 26%)` }} />
         <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 40%, ${withAlphaHex(ground, 0.75)} 70%, ${ground} 88%)` }} />
+        {/* The fog under the hero title, over the picture, then the ground: the title sits in the fog and the fog fades to black. */}
+        <FogVeil layers={heroVeils[theme]} width={width} height={height} />
+        <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 68%, ${ground} 92%)` }} />
       </View>
       {shown < width ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 64 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(ground, 0)}, ${ground})` }} /> : null}
     </View>

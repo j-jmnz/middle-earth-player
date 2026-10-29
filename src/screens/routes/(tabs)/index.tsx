@@ -8,6 +8,7 @@ import type { Save } from "../../../campaign/save";
 import { Column, Eyebrow, HubHeader, Panel, PillButton, RingMark, Screen, ScreenScroll, TextButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { HeroArt } from "../../art";
+import { heroFace } from "../../hero-tile";
 import { deckFaces } from "../../deck-store";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf, scenarioNames } from "../../campaign-data";
@@ -92,6 +93,8 @@ export default function CampaignList() {
   // The carry-over a new playthrough may take in: every finished playthrough, open or archived, that holds cards for the next campaign.
   const offers = useMemo(() => carryOffers([...saves, ...archived], (id) => campaignOf(id)?.scenarios ?? null), [saves, archived]);
   const faces = useMemo(() => deckFaces(catalog, [...saves.flatMap(partyCodes), ...offers.flatMap((offer) => offer.cards.map((card) => card.code))]), [catalog, saves, offers]);
+  // The fellowship as the hero words show it: each hero's painting, name and sphere.
+  const fellowshipOf = (save: Save) => partyCodes(save).map((code) => heroFace(faces, code));
   const partyOf = (save: Save): PartyHero[] => partyCodes(save).flatMap((code) => {
     const face = faces.get(code);
     if (!face) return [];
@@ -236,7 +239,7 @@ export default function CampaignList() {
         managed(current, 0)
       ) : (
         <View testID="current-playthrough" style={{ gap: 18 * s }}>
-          <SaveHero line={lineOf(current)} heroes={partyOf(current)} />
+          <SaveHero line={lineOf(current)} heroes={fellowshipOf(current)} />
           <View style={wide ? { maxWidth: 620 * s } : undefined}>{continuing(current)}</View>
         </View>
       )

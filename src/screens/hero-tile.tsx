@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
 import { CroppedArt } from "./art";
-import { COVER, PAINTING } from "./art-crop";
+import { COVER, PAINTING, type Region } from "./art-crop";
 import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "./chrome";
 import { CardThumb, useCardPreview } from "./images/picture";
 import { dropShadowOf, nightFade, rowSurface, selectedRingOf } from "../play/surfaces";
@@ -38,6 +38,7 @@ export function HeroTile({
   loss = null,
   ringBearer = false,
   card,
+  crop,
 }: {
   hero: HeroFace;
   height: number;
@@ -55,6 +56,9 @@ export function HeroTile({
   ringBearer?: boolean;
   // The whole card at this width instead of its painting with a name band: the deck editor's hero cards.
   card?: number;
+  // The region of the picture the tile fills, when not the default (the painting; the cover for a bare tile): a tile taller than
+  // it is wide takes the cover, which leaves out the card's frame (the Campaigns fellowship).
+  crop?: Region;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
@@ -86,7 +90,7 @@ export function HeroTile({
           ) : null}
         </View>
       ) : (
-      <CroppedArt card={hero} region={bare ? COVER : PAINTING} height={height}>
+      <CroppedArt card={hero} region={crop ?? (bare ? COVER : PAINTING)} height={height}>
         {bare ? null : (
           <>
             {/* Night rises from the foot, so the name reads on the painting; it grows past a third of the tile rather than lose the name. */}
