@@ -37,13 +37,10 @@ const THREE_URL = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/T
 function stage() {
   const root = mkdtempSync(path.join(tmpdir(), "pack-scans-"));
   roots.push(root);
-  const fixtures = path.join(root, "fixtures");
   const cache = path.join(root, "cache");
   const pictures = path.join(root, "pictures");
   const pdfs = path.join(root, "pdf");
-  mkdirSync(fixtures, { recursive: true });
   mkdirSync(cache, { recursive: true });
-  writeFileSync(path.join(fixtures, "scenario.json"), JSON.stringify({ cards: [{ code: "141031" }, { code: "141001" }, { code: "141022" }] }));
   const catalog = path.join(root, "catalog.db");
   const database = new Database(catalog);
   database.exec("create table cards (code text primary key, name text not null, imagesrc text)");
@@ -52,6 +49,7 @@ function stage() {
   insert.run("141001", "Frodo Baggins", "/bundles/cards/141001.png");
   insert.run("141022", "Three is Company", THREE_URL);
   insert.run("01134", "Appointed by Fate", "/bundles/cards/01134.png");
+  insert.run("99999", "Unpinned", null);
   database.close();
   const pin = (code: string, url: string, body: Buffer) => ({ path: `scans/${code}.A.jpg`, url, sha256: sha256(body), bytes: body.length });
   const sources = path.join(root, "sources.json");
@@ -72,13 +70,13 @@ function stage() {
   );
   writeFileSync(path.join(cache, "141031.A.jpg"), jpeg(600));
   writeFileSync(path.join(cache, "141022.A.jpg"), jpeg(100));
+  writeFileSync(path.join(cache, "141001.A.jpg"), jpeg(600));
   return {
     cache,
     pictures,
     sources,
     pin,
     options: {
-      fixturesDir: fixtures,
       catalogDb: catalog,
       sourcesPath: sources,
       scanCacheDir: cache,
@@ -92,7 +90,7 @@ function stage() {
 }
 
 describe("pack scans", () => {
-  it("bundles side A of each card with no RingsDB path, from the cache at its pin or else from the pinned URL", async () => {
+  it("bundles side A of every catalog card with a pin, from the cache at its pin or else from the pinned URL", async () => {
     const staged = stage();
     const fetched: string[] = [];
     const packed = await packScans(
@@ -106,13 +104,14 @@ describe("pack scans", () => {
       log,
     );
     expect(fetched).toEqual([THREE_URL]);
-    expect(readdirSync(staged.options.scansDir).sort()).toEqual(["141022.jpg", "141031.jpg"]);
+    expect(readdirSync(staged.options.scansDir).sort()).toEqual(["141001.jpg", "141022.jpg", "141031.jpg"]);
     expect(packed.find((entry) => entry.code === "141031")).toMatchObject({ width: 423, height: 600 });
     expect(readFileSync(path.join(staged.cache, "141022.A.jpg"))).toEqual(jpeg(560));
     const map = readFileSync(staged.options.mapPath, "utf8");
     expect(map).toContain('"141031": { moduleId: require("../../../assets/scans/141031.jpg")');
     expect(map).toContain("141022");
-    expect(map).not.toContain("141001");
+    expect(map).toContain("141001");
+    expect(map).not.toContain("99999");
   });
 
   it("fails when the fetched bytes do not match the pin", async () => {
@@ -122,7 +121,7 @@ describe("pack scans", () => {
     );
   });
 
-  it("bundles a card's picture in place of its scan, and a page of FFG's PDFs rendered from the pinned PDF", async () => {
+  it("bundles a card's picture in place of its scan, and renders a page of FFG's PDFs from the pinned PDF", async () => {
     const staged = stage();
     const pdf = Buffer.from("%PDF-1.7 campaign cards");
     const pdfUrl = "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf";
@@ -153,11 +152,11 @@ describe("pack scans", () => {
       },
       log,
     );
-    expect(fetched).toEqual([pdfUrl, THREE_URL, pictureUrl]);
+    expect(fetched.sort()).toEqual([pdfUrl, pictureUrl, THREE_URL].sort());
     expect(rendered).toEqual([23]);
-    // Appointed by Fate has a RingsDB picture, but FFG's page is bundled in its place.
     expect(packed.map((entry) => [entry.code, entry.height])).toEqual([
       ["01134", 2097],
+      ["141001", 600],
       ["141022", 560],
       ["141031", 2100],
     ]);

@@ -30,14 +30,14 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm lint` | Checks import boundaries. |
 | `pnpm exec tsc --noEmit` | Type-checks. |
 | `pnpm data:check` | Rebuilds `data/` into a temporary directory and fails on any difference. |
-| `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|icons]` | Refreshes the raw sources. It is the only command that uses the network. `scans` runs only when named, after `data:build`. |
+| `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes the raw sources. It is the only command that uses the network. `scans` and `pictures` run only when named, after `data:build`. |
 | `pnpm data:build` | Builds cards, scenarios, rules, generated effect records and the game icons from `data/raw`, offline and deterministic. |
 | `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards`, and `rules` in memory. |
 | `pnpm effects:draft <scenario \| starter deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line no effect record owns. |
 | `pnpm effects:open` | Rewrites `src/effects/open-lines.ts`, the printed lines no record owns. |
 | `node --experimental-strip-types scripts/card-smoke.ts <codes>` | Plays a seeded game with the cards' records and reports any throw, refusal or stall. |
 | `pnpm booklets:pack` | Copies the pinned booklet PDFs into `.cache/booklets/` for Metro. |
-| `pnpm scans:pack` | Copies the pinned scans of the scenario cards RingsDB has no picture for into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a scan missing from `.cache/scans/`. |
+| `pnpm scans:pack` | Writes every card's pinned picture, scaled to 1200 px on the long side, into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a picture missing from `.cache/pictures/` or `.cache/scans/`. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `node --experimental-strip-types scripts/e2e-fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. |
 
@@ -45,7 +45,7 @@ The scripts log to stderr through `scripts/log.ts`: each line has the time since
 
 CI (`.github/workflows/test.yml`) runs `data:check`, `lint`, `tsc`, and `test` on every push and pull request. [CLAUDE.md](CLAUDE.md) has the data commands in more detail.
 
-Do not commit `catalog.db`, card scans, or PDFs. The catalog is generated from `data/` and shipped inside the binary. The two booklet PDFs ship in the binary too. `pnpm booklets:pack` copies the pinned PDFs and a map that requires them into `.cache/booklets/`, and Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules`, `pnpm android` and the EAS `eas-build-post-install` hook run it. A development-client APK takes its JavaScript and assets from your local Metro, so pack on the machine that runs `pnpm start`; the books show after a Metro restart (`--clear` if it cached the stub).
+Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is generated from `data/` and shipped inside the binary. The two booklet PDFs and every card's picture ship in the binary too (`pnpm scans:pack`, run by `pnpm ios`, `pnpm android` and `eas-build-post-install`; the same Metro rule below applies to it). `pnpm booklets:pack` copies the pinned PDFs and a map that requires them into `.cache/booklets/`, and Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules`, `pnpm android` and the EAS `eas-build-post-install` hook run it. A development-client APK takes its JavaScript and assets from your local Metro, so pack on the machine that runs `pnpm start`; the books show after a Metro restart (`--clear` if it cached the stub).
 
 ## Documents
 
@@ -68,7 +68,7 @@ The phone is the product. The Mac browser is the fast loop for screens.
 
 `pnpm catalog:build` once, then `pnpm web` opens the app in Chrome through Metro. Narrow the window to a phone width. Use it for the campaign list, the path, the briefing, the log, and the deck builder.
 
-These checks stay on a physical phone: pool fling, table drag, kill-and-relaunch, and airplane mode. SQLite in the browser is browser storage. Image files and the booklet reader stay on the phone. The Skia table has no drag sign-off in Chrome.
+These checks stay on a physical phone: pool fling, table drag, kill-and-relaunch, and airplane mode. SQLite in the browser is browser storage. The bundled card pictures and the booklet reader are on the phone only. The Skia table has no drag sign-off in Chrome.
 
 ### Codespaces
 
@@ -96,7 +96,7 @@ When Android Studio is unwelcome, the `development` profile in `eas.json` builds
 
 `plugins/with-script-sandboxing-off.js` turns off Xcode's User Script Sandboxing in the generated project: React Native's bundle phase writes `ip.txt` into the app undeclared, and the sandbox fails the build with "Operation not permitted". An `ios/` generated before the plugin keeps the old setting until `npx expo prebuild --clean --platform ios`.
 
-`pnpm ios` packs the booklets and the encounter and quest scans (`pnpm scans:pack`, about 100 MB, fetched once into `.cache/scans/`) before it builds. Player-card pictures come from RingsDB on the device as they are first shown. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
+`pnpm ios` and `pnpm android` pack the booklets and every card's picture (`pnpm scans:pack`; the full-size files, about 950 MB, are fetched once into `.cache/pictures/`) before they build. The app needs no network. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
 
 ### Maestro
 

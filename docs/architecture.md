@@ -20,7 +20,7 @@ Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm i
 | Device database | `expo-sqlite` opens the same catalog tables, read-only | screens, opened at the root |
 | User schema | `expo-sqlite`, migrations in `drizzle/` | screens |
 | Catalog boundary | Zod | `src/catalog` |
-| Files and list images | `expo-file-system`, `expo-image` | image cache, lists, inspect, booklets |
+| Files and list images | `expo-file-system`, `expo-image` | bundled pictures, lists, inspect, booklets |
 | Screen state | Zustand | subscribers of reducer output |
 | Haptics | `expo-haptics` (user request, 2026-10-25) | the table's dock: arm, send, undo, refusal; a card landing; a combat spotlight's strike |
 | Keep awake | `expo-keep-awake` (user request, 2026-10-28), the one new dependency of the settings work | the table, while Keep screen awake is on (`src/play/use-keep-awake.ts`) |
@@ -37,7 +37,7 @@ The catalog is one `drizzle-orm/sqlite-core` schema. The script opens it with `b
 
 Reanimated is the only animation library. Do not add TanStack Query, Redux, a Phoenix client, a server framework, MUI, Emotion, or styled-components.
 
-Android ships an APK or AAB. iOS ships an IPA. A physical iPhone needs Apple signing. The binary contains the Expo shell, native modules, `catalog.db`, the booklet PDFs that `pnpm booklets:pack` packs into `.cache/booklets/` (not committed; `metro.config.js` bundles its map in place of the stub `src/screens/booklets/bundled-map.ts`) and the card pictures that `scripts/pack-scans.ts` writes into `assets/scans`, scaled to at most 1200 px on the long side (with the map `src/screens/images/scan-map.ts`, empty in git): each card's pinned `pictures` file, else its scan. `eas-build-post-install` runs the catalog build and both packers. Image files stay in the document directory. A bundled booklet is copied into the document directory on first open, and the reader reads only that copy.
+Android ships an APK or AAB. iOS ships an IPA. A physical iPhone needs Apple signing. The binary contains the Expo shell, native modules, `catalog.db`, the booklet PDFs that `pnpm booklets:pack` packs into `.cache/booklets/` (not committed; `metro.config.js` bundles its map in place of the stub `src/screens/booklets/bundled-map.ts`) and every card's picture, which `scripts/pack-scans.ts` writes into `assets/scans` scaled to at most 1200 px on the long side (with the map `src/screens/images/scan-map.ts`, empty in git): each card's pinned `pictures` file, else its scan. `pnpm ios` and `pnpm android` pack too. `eas-build-post-install` runs the catalog build and both packers. Image files stay in the document directory. A bundled booklet is copied into the document directory on first open, and the reader reads only that copy.
 
 ## Processes
 
@@ -68,10 +68,10 @@ flowchart LR
 
 Three groups of Node entry points exist, and none of them runs on the phone.
 
-- `pnpm data:sync` is the only command that uses the network. It refreshes `data/raw/` (the game icon sources under `data/raw/icons` included), `.cache/pdf/`, `.cache/scans/` and `.cache/pictures/` (the sharper pictures the release bundles, `scripts/data/sources/pictures.ts`) and records every pin in `data/sources.json`. Card text comes from the printed-text ledger `data/printed/`, read from the scans; rule text from the curated spans in `data/rules/index.json`. `pnpm data:build` turns the raw snapshots into `data/cards`, `data/scenarios`, `data/campaigns`, `data/decks` (the pre-built player decks, read by the import screen), `data/rules`, `src/effects/generated`, and the game icons and printed card backs (`assets/icons`, `src/play/icons`), offline and deterministically. `pnpm data:check` rebuilds into a temporary directory and fails on any difference.
+- `pnpm data:sync` is the only command that uses the network. It refreshes `data/raw/` (the game icon sources under `data/raw/icons` included), `.cache/pdf/`, `.cache/scans/` and `.cache/pictures/` (every card's picture the app bundles, `scripts/data/sources/pictures.ts`) and records every pin in `data/sources.json`. Card text comes from the printed-text ledger `data/printed/`, read from the scans; rule text from the curated spans in `data/rules/index.json`. `pnpm data:build` turns the raw snapshots into `data/cards`, `data/scenarios`, `data/campaigns`, `data/decks` (the pre-built player decks, read by the import screen), `data/rules`, `src/effects/generated`, and the game icons and printed card backs (`assets/icons`, `src/play/icons`), offline and deterministically. `pnpm data:check` rebuilds into a temporary directory and fails on any difference.
 - `scripts/build-catalog.ts` (`pnpm catalog:build`) reads `data/` offline. It writes `assets/catalog.db` and the `CATALOG_VERSION` constant. `scripts/pack-booklets.ts` and `scripts/pack-scans.ts` bundle the booklets and card scans. EAS Build runs all three after install.
 - Developer tools read `data/` and the engine: `pnpm data:query`, `pnpm effects:draft`, `pnpm effects:open`, `scripts/e2e-fixtures.ts`, `scripts/card-smoke.ts`, `scripts/combat-policy.ts` (the policy the combat tests play whole starter games with, which attacks; the auto-player never does), and the auto-player and scene scripts the golden games use.
-- The Expo app runs on the device. It reads the bundled catalog, reads and writes `user.db`, and calls the reducer in process. After the images for a session are cached, airplane mode is a supported state.
+- The Expo app runs on the device. It reads the bundled catalog, reads and writes `user.db`, and calls the reducer in process. It needs no network: the catalog, the booklets and every card's picture are in the binary.
 
 A second human who must not see hidden cards, or several clients sharing one live table, would need a host. This product has neither. A future copy of `user.db` rows onto another device would still not run the round.
 
@@ -254,13 +254,9 @@ Two files, two handles, both reachable from screens.
 
 ## Images
 
-RingsDB `imagesrc` is the asset. Quest and encounter cards have none, so `pnpm catalog:build` writes the full URL of the card's scan into their `imagesrc`: the front the printed ledger was read from, else the Hall of Beorn front from `imageUrls`. The download queue accepts a RingsDB path and those two scan hosts, and nothing else. The build sniffs magic bytes because the URL often ends in `.png` while the body is a JPEG. About 430×600 is the native size of a normal card. The inspect screen may decode the cached file at that size.
+Every card's picture is bundled (brief, Card images): `scanAssets` in `src/screens/images/scan-map.ts` maps a code to its asset and size, and a bundled picture wins over a downloaded file (`resolveCardImage`). The catalog still carries `imagesrc`: RingsDB's path, or for a quest or encounter card the full URL of its scan (the front the printed ledger was read from, else the Hall of Beorn front from `imageUrls`). The phone's download queue uses it only for a card a build did not bundle (a build run without `pnpm scans:pack`), and the web build shows that remote file directly; the queue accepts a RingsDB path and the two scan hosts, and nothing else. It downloads with `File.createDownloadTask` from `expo-file-system` into the document directory, which `modules/image-backup-exclusion` excludes from backup, and sniffs magic bytes because a URL ending in `.png` often holds a JPEG.
 
-Download with `File.createDownloadTask` from `expo-file-system`. The legacy `FileSystem.createDownloadResumable` throws. Persist `DownloadPauseState` so a kill mid-file can resume. Cap concurrency and retry a 503. Keep the bytes in the document directory so iOS cannot purge them under the airplane-mode exit. A cache-directory file would not survive that exit. `expo-file-system` does not expose backup exclusion, so the local module `modules/image-backup-exclusion` sets `isExcludedFromBackup` on the image directory and does nothing else. About 420 MB of player-card art, plus quest and encounter art, must not enter an iCloud backup. Booklet files are not part of that directory.
-
-`expo-image` decodes list rows and the inspect screen, at the size on screen for a row. The table is one Skia canvas. Skia decodes the same cached file at the card's on-screen size and releases images that leave the table. Nothing decodes the whole cache. Prefetch covers the hand, every face-up card on the table, and the next screen: a quest stage or a hero never passes through the hand or staging, so the table asks for it where it lies. Startup does not wait on a download, and text is enough while a file is missing.
-
-On the fetch recorded in the brief, 1,039 official rows had an `imagesrc`. About 420 MB of that is the player-card subset. Quest and encounter images are further files in the same cache, downloaded when a scenario needs them.
+`expo-image` decodes list rows at the size on screen and the inspect screen at up to the bundled 1200 px. The table is one Skia canvas. Skia decodes a picture, draws it at the card's on-screen size, keeps that copy and releases the full decode; images that leave the table are released. Nothing decodes every picture, and startup does not wait on one.
 
 ## Screens
 
@@ -276,9 +272,9 @@ Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaign
 | Campaign path | save, pool | nothing until a scenario ends |
 | Log | save | notes |
 | Briefing | save, deck, catalog, scenario definition | the loadout, then the opening `ScenarioState` from the reducer |
-| Table | game slice (a Zustand store of the reducer result, rebuilt by replaying the save once on open), image cache, `EFFECTS` from `src/effects` | each accepted intent, appended to `saves.activeScenario` |
+| Table | game slice (a Zustand store of the reducer result, rebuilt by replaying the save once on open), card pictures, `EFFECTS` from `src/effects` | each accepted intent, appended to `saves.activeScenario` |
 | Resolution | the campaign card's Resolution options the reducer lists, one group and one seat at a time | each chosen `ChooseResolution` intent, then the log on Confirm; a loss drops the open scenario and writes no log field |
-| Card | one cached file, catalog text | nothing |
+| Card | its bundled picture, catalog text | nothing |
 | Card pool | card rows loaded when the screen opens, then filtered in memory; `image_files`. One view (`src/screens/card-pool.tsx`: `CardPoolBody`, and `CardPool` around it) is the Cards tab, the deck editor's `/pool?adding=1` and, in an expanded window, the pane beside the deck | the open deck draft, when adding |
 | Deck list | catalog, `decks` | `decks` (duplicate, delete, reset a starter) |
 | Packs | `packs`; a pack's cards | nothing |

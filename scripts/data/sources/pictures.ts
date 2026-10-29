@@ -6,18 +6,22 @@ import path from "node:path";
 import Database from "better-sqlite3";
 
 import { loadCards } from "../load-cards.ts";
-import { PDF_CACHE_DIR, PICTURE_CACHE_DIR } from "../paths.ts";
+import { RINGSDB_ORIGIN } from "../../../src/screens/images/policy.ts";
+import type { Card } from "../../../src/catalog/card-facts.ts";
+import { PDF_CACHE_DIR, PICTURE_CACHE_DIR, RAW_DIR } from "../paths.ts";
 import { MEC109_CHANGED, scanTargets, type ScanSide } from "../printed/scope.ts";
 import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
 import { extensionOf, widthOf } from "./scans.ts";
 
-// The pictures the app bundles in place of the 429×600 scans (user request, 2026-10-29). The `scans` source stays what the
-// printed-text ledger was read from; a picture is only shown. Each side of the scan scope gets one, pinned by sha256:
+// The pictures the app bundles, every card's, so it needs no network (user decisions, 2026-10-29). The `scans` source stays
+// what the printed-text ledger was read from; a picture is only shown. Each side of the scan scope and side A of every other
+// card gets one, pinned by sha256:
 // - FFG's print-and-play PDFs of the campaign, boon and burden cards, the only digital originals (InDesign, vector text over
 //   300 ppi art), rendered at 600 DPI;
 // - else the 600 DPI scan lotr.cardgame.tools hosts (u/LepcisMagna's, about 1480×2100), found through its card database;
-// - else none, and the app keeps the scan.
+// - else, for a card outside the scan scope, the RingsDB picture, then the Hall of Beorn or DragnCards one;
+// - else none: a card of the scan scope keeps its scan.
 
 export const CARDGAME_TOOLS_DB = "https://lotr.cardgame.tools/lotr_lcg.db";
 export const CARDGAME_TOOLS_IMAGES = "https://images.cardgame.tools/lotr/";
@@ -66,22 +70,24 @@ export const PDF_PAGES: readonly { code: string; side: ScanSide; pdf: string; pa
   ].map(([code, page]) => ({ code: String(code), side: "A" as const, pdf: DARK_OF_MIRKWOOD_PDF, page: Number(page) })),
 ];
 
-// cardgame.tools files a card by product and number. The scope's codes are RingsDB codes whose last three digits are the
-// number in the product their prefix names: the Revised Core Set, The Dark of Mirkwood, The Black Riders, The Road Darkens,
-// Mount Gundabad. The Fellowship box (MEC109) has no pictures of its own there: it reuses The Black Riders' and The Road
-// Darkens' scans, so the cards whose MEC109 wording differs keep their scan.
-const PRODUCT_OF_PREFIX: readonly (readonly [string, string])[] = [
-  ["141", "MEC32"],
-  ["142", "MEC34"],
-  ["41", "MEC102"],
-  ["01", "MEC101"],
-  ["19", "MEC70"],
-];
+// cardgame.tools files a card by product and number; a printing names its RingsDB pack and number. A pack is the product of
+// the same name, except these, which cardgame.tools names differently or RingsDB does not list. The Fellowship box (MEC109)
+// has no pictures of its own there: it reuses The Black Riders' and The Road Darkens' scans, so the cards whose MEC109
+// wording differs keep their scan. Messenger of the King Allies is not on cardgame.tools.
+const PRODUCT_OF_PACK: Readonly<Record<string, string>> = { OHaUH: "MEC16", OtD: "MEC24", TFotR: "MEC109" };
 
-export function productOf(code: string): { product: string; number: string } | null {
-  if (!/^\d{5,6}$/.test(code)) return null;
-  const entry = PRODUCT_OF_PREFIX.find(([prefix]) => code.length === prefix.length + 3 && code.startsWith(prefix));
-  return entry ? { product: entry[1], number: String(Number(code.slice(-3))) } : null;
+export type Product = { code: string; name: string; type: string };
+
+// A Nightmare deck carries the name of the pack it is for ("The Black Riders"); the pack is the product of the other type.
+export function productsOfPacks(packs: readonly { code: string; name: string }[], products: readonly Product[]): Map<string, string> {
+  const byName = new Map(products.filter((product) => product.type !== "Nightmare_Expansion").map((product) => [lettersOf(product.name), product.code]));
+  const out = new Map<string, string>();
+  for (const pack of packs) {
+    const product = byName.get(lettersOf(pack.name));
+    if (product) out.set(pack.code, product);
+  }
+  for (const [pack, product] of Object.entries(PRODUCT_OF_PACK)) out.set(pack, product);
+  return out;
 }
 
 // Letters only, without accents: "Nibin-Dûm" and "Nibin-DÛm", "Gandalf's" and "Gandalfs" read the same.
@@ -93,22 +99,34 @@ export function lettersOf(text: string): string {
     .replace(/[^a-z]/g, "");
 }
 
-// The image file of one side on cardgame.tools, when its slug names the card.
+type CardgameToolsRow = { slug: string; front: string; back: string | null };
+
+// The image file of one side on cardgame.tools: the first printing whose product row's slug names the card.
 export function cardgameToolsFile(
-  rows: ReadonlyMap<string, { slug: string; front: string; back: string | null }>,
-  code: string,
+  rows: ReadonlyMap<string, CardgameToolsRow>,
+  productOfPack: ReadonlyMap<string, string>,
+  card: Pick<Card, "name" | "printings">,
   side: ScanSide,
-  name: string,
 ): string | null {
-  const at = productOf(code);
-  const row = at ? rows.get(`${at.product} ${at.number}`) : undefined;
-  if (!row || !lettersOf(row.slug).includes(lettersOf(name))) return null;
-  return side === "A" ? row.front : row.back;
+  for (const printing of card.printings) {
+    const product = productOfPack.get(printing.pack);
+    const row = product && printing.number != null ? rows.get(`${product} ${printing.number}`) : undefined;
+    if (!row || !lettersOf(row.slug).includes(lettersOf(card.name))) continue;
+    return side === "A" ? row.front : row.back;
+  }
+  return null;
 }
 
-function cardgameToolsRows(file: string): Map<string, { slug: string; front: string; back: string | null }> {
+// A card outside the scan scope that cardgame.tools lacks: its RingsDB picture, then its Hall of Beorn or DragnCards one.
+export function fallbackUrls(card: Pick<Card, "imagesrc" | "printings">): string[] {
+  const others = card.printings.flatMap((printing) => printing.imageUrls ?? []);
+  return [...(card.imagesrc ? [`${RINGSDB_ORIGIN}${card.imagesrc}`] : []), ...others.filter((url) => !url.includes("dragncards")), ...others.filter((url) => url.includes("dragncards"))];
+}
+
+function cardgameTools(file: string): { rows: Map<string, CardgameToolsRow>; products: Product[] } {
   const database = new Database(file, { readonly: true });
   try {
+    const products = database.prepare("select Code as code, Name as name, Type as type from products").all() as Product[];
     const rows = database.prepare("select ProductCode, Number, CardSlug, FrontImageUrl, BackImageUrl from productCards").all() as {
       ProductCode: string;
       Number: string;
@@ -116,7 +134,7 @@ function cardgameToolsRows(file: string): Map<string, { slug: string; front: str
       FrontImageUrl: string;
       BackImageUrl: string | null;
     }[];
-    return new Map(rows.map((row) => [`${row.ProductCode} ${row.Number}`, { slug: row.CardSlug, front: row.FrontImageUrl, back: row.BackImageUrl }]));
+    return { rows: new Map(rows.map((row) => [`${row.ProductCode} ${row.Number}`, { slug: row.CardSlug, front: row.FrontImageUrl, back: row.BackImageUrl }])), products };
   } finally {
     database.close();
   }
@@ -153,7 +171,9 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
   const files: SourceFile[] = [];
   const db = await fetchInto(CARDGAME_TOOLS_DB, path.join(PICTURE_CACHE_DIR, "lotr_lcg.db"), log);
   files.push({ path: "pictures/lotr_lcg.db", url: db.url, sha256: db.sha256, bytes: db.bytes });
-  const rows = cardgameToolsRows(db.file);
+  const { rows, products } = cardgameTools(db.file);
+  const packs = JSON.parse(readFileSync(path.join(RAW_DIR, "ringsdb", "packs.json"), "utf8")) as { code: string; name: string }[];
+  const productOfPack = productsOfPacks(packs, products);
   log.info(`cardgame.tools lists ${rows.size} printed cards`);
   const pdfs = new Map<string, string>();
   for (const url of new Set(PDF_PAGES.map((entry) => entry.pdf))) {
@@ -161,13 +181,17 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
     files.push({ path: pdfPath(url), url, sha256: pdf.sha256, bytes: pdf.bytes });
     pdfs.set(url, pdf.file);
   }
-  const names = new Map(loadCards().map((card) => [card.code, card.name]));
-  const targets = scanTargets();
+  const cards = new Map(loadCards().map((card) => [card.code, card]));
+  const scoped = scanTargets().map((target) => ({ code: target.code, side: target.side, scoped: true }));
+  const scopedCodes = new Set(scoped.map((target) => target.code));
+  const targets = [...scoped, ...[...cards.keys()].filter((code) => !scopedCodes.has(code)).map((code) => ({ code, side: "A" as const, scoped: false }))];
   const tick = log.progress(targets.length, "picture");
   const kept: string[] = [];
   for (const target of targets) {
     const key = `${target.code}.${target.side}`;
-    const name = names.get(target.code) ?? "";
+    const card = cards.get(target.code);
+    if (!card) throw new Error(`${key} is not in data/cards`);
+    const name = card.name;
     const page = PDF_PAGES.find((entry) => entry.code === target.code && entry.side === target.side);
     let picture: { url: string; body: Uint8Array } | null = null;
     if (page) {
@@ -177,21 +201,22 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
       if (!text.includes(expected)) throw new Error(`${key}: page ${page.page} of ${page.pdf} does not name "${target.side === "A" ? name : "Resolution"}"`);
       picture = { url: pdfPageUrl(page.pdf, page.page), body: renderPdfPage(pdfFile, page.page) };
     } else if (!MEC109_CHANGED.includes(target.code)) {
-      const file = cardgameToolsFile(rows, target.code, target.side, name);
-      if (file) {
-        const url = `${CARDGAME_TOOLS_IMAGES}${file}`;
+      const file = cardgameToolsFile(rows, productOfPack, card, target.side);
+      const urls = [...(file ? [`${CARDGAME_TOOLS_IMAGES}${file}`] : []), ...(target.scoped ? [] : fallbackUrls(card))];
+      for (const url of urls) {
         try {
           const body = await fetchBytes(url, 120_000, log);
           if (extensionOf(body) === null) throw new Error("not a JPEG or PNG");
           picture = { url, body };
+          break;
         } catch (error) {
-          log.warn(`${key}: ${error instanceof Error ? error.message : String(error)}; the scan stays its picture`);
+          log.warn(`${key}: ${error instanceof Error ? error.message : String(error)}${target.scoped ? "; the scan stays its picture" : ""}`);
         }
       }
     }
     if (!picture) {
       kept.push(key);
-      tick(`${key} keeps its scan`);
+      tick(`${key} ${target.scoped ? "keeps its scan" : "has no picture"}`);
       continue;
     }
     const extension = extensionOf(picture.body) ?? "jpg";
@@ -199,6 +224,6 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
     files.push({ path: `pictures/${key}.${extension}`, url: picture.url, sha256: sha256(picture.body), bytes: picture.body.byteLength });
     tick(`${key} ${widthOf(picture.body)} px, ${bytes(picture.body.byteLength)}`);
   }
-  if (kept.length > 0) log.info(`${kept.length} side${kept.length === 1 ? "" : "s"} keep their scan: ${kept.join(", ")}`);
+  if (kept.length > 0) log.info(`${kept.length} side${kept.length === 1 ? "" : "s"} have no picture (a scanned one keeps its scan): ${kept.join(", ")}`);
   return { id: "pictures", site: "https://lotr.cardgame.tools", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
 }

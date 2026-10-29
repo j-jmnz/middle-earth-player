@@ -1,11 +1,11 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import Database from "better-sqlite3";
 import sharp from "sharp";
 
-import { isRingsdbImagePath, sniffImage } from "../src/screens/images/policy.ts";
+import { sniffImage } from "../src/screens/images/policy.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "./data/paths.ts";
 import { fetchBytes, sha256, type SourceFile, type SourceRecord } from "./data/sources/fetch.ts";
 import { renderPdfPage } from "./data/sources/pictures.ts";
@@ -23,7 +23,6 @@ export type PackedScan = {
 };
 
 export type PackScansOptions = {
-  fixturesDir: string;
   catalogDb: string;
   sourcesPath: string;
   scanCacheDir: string;
@@ -39,66 +38,68 @@ export type PackScansOptions = {
 type Pin = SourceFile & { cacheDir: string };
 
 /**
- * Bundles side A of every scenario card RingsDB has no picture for, and of every card whose picture is a page of FFG's
- * print-and-play PDFs. The file is the card's `pictures` file of data/sources.json when it has one, else its `scans` file:
- * the cached copy is used when its hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache),
- * and a PDF page is rendered from the pinned PDF. Bytes that do not match the pin fail the build: run
- * `pnpm data:sync scans pictures` to move the pins. A picture larger than MAX_SIDE is scaled down to it.
+ * Bundles side A of every card in the catalog, so the app needs no network (user decision, 2026-10-29). The file is the
+ * card's `pictures` file of data/sources.json when it has one, else its `scans` file: the cached copy is used when its
+ * hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache), and a PDF page is rendered from
+ * the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data:sync scans pictures` to move the pins.
+ * A picture larger than MAX_SIDE is scaled down to it. A card with neither is drawn as its text.
  */
 export async function packScans(options: PackScansOptions, log: Log): Promise<PackedScan[]> {
   const { sources } = JSON.parse(readFileSync(options.sourcesPath, "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
   const scanPins = sideAPins(sources.scans, "scans", options.scanCacheDir);
   const picturePins = sideAPins(sources.pictures, "pictures", options.pictureCacheDir);
   const pdfPins = new Map((sources.pictures?.files ?? []).filter((file) => file.path.startsWith("pdf/")).map((file) => [file.url, file]));
-  const fromPdf = [...picturePins.values()].filter((pin) => pageOf(pin.url) !== null).map((pin) => codeOf(pin.path));
-  const codes = [...new Set([...fixtureCodes(options.fixturesDir), ...fromPdf])].sort();
-  log.info(`${codes.length} card codes: the scenario fixtures and ${fromPdf.length} pages of FFG's PDFs`);
-  const fetchScan = options.fetch ?? ((url: string) => fetchBytes(url, 120_000, log));
+  const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytes(url, 120_000, log)), pdfPins };
   const shrink = options.shrink ?? shrinkToMaxSide;
   const database = new Database(options.catalogDb, { readonly: true });
+  let cards: { code: string; name: string }[];
   try {
-    mkdirSync(options.scansDir, { recursive: true });
-    const packed: PackedScan[] = [];
-    let fetched = 0;
-    let total = 0;
-    for (const code of codes) {
-      const card = database.prepare("select name, imagesrc from cards where code = ?").get(code) as
-        | { name: string; imagesrc: string | null }
-        | undefined;
-      if (!card) throw new Error(`Card code ${code} is not in the catalog`);
-      const picture = picturePins.get(code);
-      // A RingsDB picture is downloaded on the phone; only a card RingsDB lacks, or one FFG's PDFs draw, is bundled.
-      if (card.imagesrc && isRingsdbImagePath(card.imagesrc) && !fromPdf.includes(code)) {
-        log.debug(`${code} ${card.name}: RingsDB has a picture, not bundled`);
-        continue;
-      }
-      const scan = scanPins.get(code);
-      if (!picture && !scan) throw new Error(`${code} (${card.name}) has no pinned side A scan in ${options.sourcesPath}. Run pnpm data:sync scans.`);
-      let body: Uint8Array | null = null;
-      if (picture) {
-        const loaded = await loadPin(picture, { ...options, fetchScan, pdfPins }, log);
-        if (loaded) {
-          body = loaded.body;
-          if (loaded.fetched) fetched += 1;
-        }
-      }
-      if (!body && scan) {
-        const loaded = await loadPin(scan, { ...options, fetchScan, pdfPins }, log);
-        body = loaded?.body ?? null;
-        if (loaded?.fetched) fetched += 1;
-      }
-      if (!body) throw new Error(`${code} (${card.name}): no picture or scan could be loaded`);
-      const shown = await shrink(body);
-      total += shown.byteLength;
-      packed.push(writeScan(code, shown, options.scansDir));
-    }
-    writeScanMap(options.mapPath, packed);
-    log.info(`bundled ${packed.length} picture${packed.length === 1 ? "" : "s"} (${bytes(total)}, ${fetched} fetched) into ${options.scansDir}; map ${options.mapPath}`);
-    return packed;
+    cards = database.prepare("select code, name from cards order by code").all() as { code: string; name: string }[];
   } finally {
     database.close();
   }
+  log.info(`${cards.length} cards in the catalog`);
+  mkdirSync(options.scansDir, { recursive: true });
+  const packed: PackedScan[] = [];
+  const missing: string[] = [];
+  let fetched = 0;
+  let total = 0;
+  const tick = log.progress(cards.length, "picture");
+  // A few at a time: each is a fetch or a render on a machine without the cache, then a decode and an encode.
+  let next = 0;
+  const worker = async () => {
+    while (next < cards.length) {
+      const card = cards[next++];
+      if (!card) break;
+      const picture = picturePins.get(card.code);
+      const scan = scanPins.get(card.code);
+      let body: Uint8Array | null = null;
+      for (const pin of [picture, scan]) {
+        if (!pin || body) continue;
+        const loaded = await loadPin(pin, context, log);
+        if (loaded?.fetched) fetched += 1;
+        body = loaded?.body ?? null;
+      }
+      if (!body) {
+        missing.push(`${card.code} ${card.name}`);
+        tick(`${card.code} has no picture`);
+        continue;
+      }
+      const shown = await shrink(body);
+      total += shown.byteLength;
+      packed.push(writeScan(card.code, shown, options.scansDir));
+      tick(`${card.code} ${bytes(shown.byteLength)}`);
+    }
+  };
+  await Promise.all(Array.from({ length: PACK_CONCURRENCY }, worker));
+  packed.sort((left, right) => left.code.localeCompare(right.code));
+  writeScanMap(options.mapPath, packed);
+  if (missing.length > 0) log.warn(`${missing.length} card${missing.length === 1 ? "" : "s"} have no pinned picture or scan and show as text: ${missing.join(", ")}`);
+  log.info(`bundled ${packed.length} picture${packed.length === 1 ? "" : "s"} (${bytes(total)}, ${fetched} fetched) into ${options.scansDir}; map ${options.mapPath}`);
+  return packed;
 }
+
+const PACK_CONCURRENCY = 4;
 
 function sideAPins(record: SourceRecord | undefined, kind: string, cacheDir: string): Map<string, Pin> {
   const pins = new Map<string, Pin>();
@@ -171,43 +172,6 @@ function writeScan(code: string, body: Uint8Array, scansDir: string): PackedScan
   return { code, filename, width: media.width, height: media.height };
 }
 
-function fixtureCodes(fixturesDir: string): string[] {
-  const codes = new Set<string>();
-  for (const name of readdirSync(fixturesDir)) {
-    if (!name.endsWith(".json")) continue;
-    const parsed: unknown = JSON.parse(readFileSync(path.join(fixturesDir, name), "utf8"));
-    collectFixtureCodes(parsed, codes);
-  }
-  return [...codes].sort();
-}
-
-function collectFixtureCodes(value: unknown, codes: Set<string>): void {
-  if (typeof value !== "object" || value === null) return;
-  const fixture = value as { stages?: unknown; sets?: unknown; cards?: unknown };
-  addCodeList(fixture.stages, codes);
-  addCardList(fixture.cards, codes);
-  if (!Array.isArray(fixture.sets)) return;
-  for (const set of fixture.sets) {
-    if (typeof set !== "object" || set === null || !("cards" in set)) continue;
-    addCardList(set.cards, codes);
-  }
-}
-
-function addCodeList(value: unknown, codes: Set<string>): void {
-  if (!Array.isArray(value)) return;
-  for (const code of value) {
-    if (typeof code === "string" && code.length > 0) codes.add(code);
-  }
-}
-
-function addCardList(value: unknown, codes: Set<string>): void {
-  if (!Array.isArray(value)) return;
-  for (const card of value) {
-    if (typeof card !== "object" || card === null || !("code" in card)) continue;
-    if (typeof card.code === "string" && card.code.length > 0) codes.add(card.code);
-  }
-}
-
 function writeScanMap(mapPath: string, packed: readonly PackedScan[]): void {
   const lines = [...packed]
     .sort((left, right) => left.code.localeCompare(right.code))
@@ -237,7 +201,6 @@ if (isDirectRun()) {
     const root = repoRoot();
     await packScans(
       {
-        fixturesDir: path.join(DATA_DIR, "scenarios"),
         catalogDb: path.join(root, "assets/catalog.db"),
         sourcesPath: path.join(DATA_DIR, "sources.json"),
         scanCacheDir: SCAN_CACHE_DIR,
