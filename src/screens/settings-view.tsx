@@ -1,4 +1,4 @@
-// The Settings tab (docs/plans/settings-theme-and-ui-scale.md; user request, 2026-10-28): the app's settings on one page, grouped
+// The Settings screen (docs/plans/settings-theme-and-ui-scale.md; user request, 2026-10-28): the app's settings on one page, grouped
 // by topic, no sub-menus. Every change applies at once and is saved by bindTableSettings; the page itself reflows when the scale
 // or the theme changes, which is the feedback. Restore defaults asks twice, in place, as Delete does (keep-or-delete.tsx).
 import Constants from "expo-constants";
@@ -7,7 +7,8 @@ import { ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useStore } from "zustand";
 
-import { BodyText, Column, Label, NavBar, Screen, ScreenScroll, ScreenTitle, TextButton } from "./chrome";
+import { BodyText, Column, IconButton, Label, Screen, ScreenScroll, ScreenTitle, TextButton } from "./chrome";
+import { goBack } from "./go-back";
 import { cardNames } from "./card-names";
 import { useDatabases } from "./databases";
 import { CATALOG_VERSION } from "../catalog/version";
@@ -21,8 +22,8 @@ import { useSplitColumns } from "./use-split-columns";
 type Change = Parameters<ReturnType<typeof tableSettings.getState>["update"]>[0];
 const change = (next: Change) => tableSettings.getState().update(next);
 
-// `fromTable` is set when the table's All settings opened the page (route param `from=table`): the page then carries a Back to the table,
-// since the table is landscape-only and the tab bar's own way back is not there. The tab, opened from the dock, has none.
+// A pushed screen with Back beside its title (docs/design-system.md, Navigation): to the hub whose gear opened it, or, when `fromTable` is
+// set (route param `from=table`, the table's All settings), to the table.
 export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
   const s = useUiScale();
   const { size, equal, measure } = useSplitColumns(null);
@@ -76,9 +77,9 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
   );
   return (
     <Screen scene="calm" testID="app-settings">
-      {fromTable ? <NavBar onBack={() => router.back()} backTestID="app-settings-back" backLabel="the table" /> : null}
       <Column max={equal ? "wide" : "readable"}>
-        <View className={fromTable ? "pt-1" : "pt-4"}>
+        <View className="flex-row items-center gap-3 pb-1 pt-2">
+          <IconButton chevron testID="app-settings-back" label={fromTable ? "Back to the table" : "Back"} onPress={() => goBack(router, "/")} />
           <ScreenTitle>Settings</ScreenTitle>
         </View>
       </Column>

@@ -19,10 +19,10 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-a-knife-in-the-dark-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible:
     id: node-flight-to-the-ford-status
-    text: "Current"
+    text: "Next"
 - assertVisible:
     id: node-the-ring-goes-south-status
     text: "Locked"

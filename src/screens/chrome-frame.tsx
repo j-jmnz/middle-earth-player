@@ -6,14 +6,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Backdrop } from "./backdrop";
 import type { SceneName } from "./backdrop-scenes";
-import { IconButton, usePressedNight } from "./chrome-buttons";
-import { Chevron, Corners } from "./chrome-marks";
+import { IconButton } from "./chrome-buttons";
+import { Chevron } from "./chrome-marks";
 import { Eyebrow } from "./chrome-text";
 import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
 import { SheetCornersContext, SheetFrame } from "../play/sheet-paper";
-import { nightFade, panelSurface, raisedEdgeOf, tileSurface } from "../play/surfaces";
+import { nightFade, panelSurface, rowSurface, selectedWash, tileSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 import { ACTION_GROUP, MEDIUM_ACTION_GROUP, capWidth } from "../play/size-class";
@@ -22,7 +22,7 @@ import { useSizeClass } from "../play/use-size-class";
 import { Text } from "../play/text";
 
 /**
- * Night page with a scene backdrop. Content is inset 24 and starts under the status bar; in landscape (the card and booklet
+ * The page: the ground and its fog (the scene), an optional art layer, then the content, inset 24 and starting under the status bar; in landscape (the card and booklet
  * screens can turn with the phone) it is inset past the side safe areas too. `bleed` drops both, for a screen that opens on a
  * picture running under the status bar (the briefing, the deck editor): it insets its own words.
  */
@@ -32,18 +32,22 @@ export function Screen({
   scene = "calm",
   inset = true,
   bleed = false,
+  art,
 }: {
   children: ReactNode;
   testID?: string;
   scene?: SceneName;
   inset?: boolean;
   bleed?: boolean;
+  // The art layer between the fog and the content (HeroArt): a scene behind the hero words, under the status bar.
+  art?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
   const s = useUiScale();
   return (
-    <View testID={testID} collapsable={false} className="flex-1 bg-night">
+    <View testID={testID} collapsable={false} className="flex-1 overflow-hidden bg-night">
       <Backdrop scene={scene} />
+      {art}
       <View className={bleed ? "flex-1" : "flex-1 pt-safe"} style={inset && !bleed ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right } : undefined}>
         {children}
       </View>
@@ -52,8 +56,8 @@ export function Screen({
 }
 
 /**
- * The scrolling body of a screen. It reaches 8 pt past the page inset on each side, with the same padding inside, so a framed
- * panel's corner ornaments (Corners) are not cut by the scroll edge. `max` caps and centres the content outside compact: a reading
+ * The scrolling body of a screen. It reaches 8 pt past the page inset on each side, with the same padding inside, so a floating
+ * panel's shadow and a selected ring are not cut by the scroll edge. `max` caps and centres the content outside compact: a reading
  * column (640) or a wide one (1040), at the scale (docs/design-system.md, Tablets); a phone is never capped.
  */
 export function ScreenScroll({
@@ -92,19 +96,19 @@ export function ScreenScroll({
 }
 
 /**
- * The night bar that appears behind a floating NavBar once the picture under it has scrolled away, so the round buttons never
+ * The dark band that appears behind a floating NavBar once the picture under it has scrolled away, so the round buttons never
  * sit on words. It switches at one threshold, with no motion on the scroll path.
  */
 export function FloatingBarShade({ shown, top }: { shown: boolean; top: number }) {
   const palette = usePalette();
   const s = useUiScale();
   if (!shown) return null;
-  return <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: top + 60 * s, backgroundColor: withAlphaHex(palette.night, 0.94), borderBottomWidth: 1, borderBottomColor: palette.hairline }} />;
+  return <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: top + 60 * s, backgroundColor: withAlphaHex(palette.night, 0.94), boxShadow: `0 12px 24px ${withAlphaHex(palette.night, 0.9)}` }} />;
 }
 
 /**
- * The top of a screen: a round Back on the left, an optional title (and a muted line under it) centred, and one optional
- * control on the right. Back goes to the screen below; its label names that screen to a screen reader ("Back to Decks").
+ * The top of a screen: a round glass Back on the left, an optional title in Marcellus SC (and a muted line under it) centred, and
+ * one optional control on the right (the book, the gear). Back goes to the screen below; its label names that screen to a screen reader ("Back to Decks").
  */
 export function NavBar({
   onBack,
@@ -131,7 +135,7 @@ export function NavBar({
       <IconButton chevron overlay={overlay} testID={backTestID} label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`} onPress={onBack} />
       {title ? (
         <View className="flex-1 items-center">
-          <Text accessibilityRole="header" numberOfLines={1} className="font-display text-heading text-bone">
+          <Text accessibilityRole="header" numberOfLines={1} className="font-display text-title text-bone">
             {title}
           </Text>
           {subtitle ? (
@@ -149,9 +153,10 @@ export function NavBar({
 }
 
 /**
- * Flat row on a hairline. Text, at most one small picture, a pressed fill. No shadow, no gradient. In a list-detail pane `selected`
- * (true or false; undefined outside one) marks the row whose detail is open: the pressed fill and a 2 pt accent bar at the leading
- * edge. A row in such a list is indented either way, so the text does not move when it is picked.
+ * A row on a dark wash with no edge: rows are told apart by the space between them (6 pt), not by rules. Text, at most one small
+ * picture, a title in Marcellus SC, a pressed fill, a drawn chevron. No shadow and no gradient, so a FlashList can hold it. In a
+ * list-detail pane `selected` (true or false; undefined outside one) marks the row whose detail is open: the selected wash and a 3 pt
+ * accent bar at the leading edge.
  */
 export function ListRow({
   label,
@@ -177,7 +182,7 @@ export function ListRow({
   selected?: boolean;
 }) {
   const palette = usePalette();
-  const pressedNight = usePressedNight();
+  const t = useTableTokens();
   const s = useUiScale();
   return (
     <Pressable
@@ -188,13 +193,13 @@ export function ListRow({
       onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={350}
-      className="min-h-14 flex-row items-center border-b border-hairline py-2"
-      style={({ pressed }) => [selected == null ? null : { paddingLeft: 12 * s }, pressed || selected ? pressedNight : null]}
+      className="mb-1.5 min-h-14 flex-row items-center rounded-tile py-2"
+      style={({ pressed }) => [{ paddingLeft: 14 * s, paddingRight: 10 * s }, selected ? selectedWash(t) : rowSurface(pressed, t)]}
     >
-      {selected ? <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2 * s, backgroundColor: palette.accent }} /> : null}
+      {selected ? <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3 * s, backgroundColor: palette.accentHigh }} /> : null}
       {leading ? <View className="mr-3">{leading}</View> : null}
       <View className="flex-1">
-        <Text className={`text-body ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
+        <Text className={`font-display text-heading ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
         {detail ? (
           <View className="mt-0.5 flex-row items-center gap-1.5">
             {detailIcons}
@@ -212,8 +217,9 @@ export function ListRow({
 }
 
 /**
- * Raised panel, lit from its top edge. `current` gets the accent frame (an accentLine edge and accent corners): the one thing the player
- * should look at. `pressed` is the pressed fill. `unfilled` is a hairline outline with no fill, for a thing put away.
+ * A floating panel: lit along its top edge and lifted by its shadow, with no drawn edge. `current` (the Continue card, the scenario to
+ * play) is kept for its callers and draws the same: Carved Stone rings only what is selected. `pressed` is the pressed fill. `unfilled` is a thing put away: no fill and no shadow, its
+ * contents dimmed by the caller.
  */
 export function Panel({
   children,
@@ -231,35 +237,53 @@ export function Panel({
   // False for a panel whose content runs to its edges (a picture on top).
   padded?: boolean;
 }) {
-  const palette = usePalette();
   const t = useTableTokens();
+  const look = panelSurface(pressed, t);
   return (
     <View
-      className={`rounded-card ${padded ? "p-5" : ""}${className ? ` ${className}` : ""}`}
-      style={{
-        ...(unfilled ? { backgroundColor: "transparent" } : panelSurface(pressed, t)),
-        borderWidth: 1,
-        // A filled panel draws no edge (its fill and lit top set it off); one put away keeps the hairline, its only outline.
-        borderColor: current ? palette.accentLine : unfilled ? palette.hairline : "transparent",
-        ...(unfilled ? {} : { boxShadow: raisedEdgeOf(t) }),
-      }}
+      className={`rounded-card ${padded ? "p-4" : "overflow-hidden"}${className ? ` ${className}` : ""}`}
+      style={unfilled ? { backgroundColor: withAlphaHex(t.raised, 0.35) } : look}
     >
       {children}
-      {current ? <Corners /> : null}
     </View>
   );
 }
 
-/** A number the player watches, on a small lit tile: its word above, its icon and value in engraved figures. */
-export function StatTile({ label, value, icon, iconTint = "bone", detail, children, testID }: { label: string; value: string; icon?: IconName; iconTint?: "bone" | "danger" | "accent"; detail?: string; children?: ReactNode; testID?: string }) {
+/**
+ * A number the player watches, on a small lit tile: its word in small capitals above, its icon and value in Marcellus SC under it.
+ * `tone` colours the value (danger for the final threat).
+ */
+export function StatTile({
+  label,
+  value,
+  icon,
+  iconTint = "bone",
+  detail,
+  children,
+  testID,
+  tone = "bone",
+}: {
+  label: string;
+  value: string;
+  icon?: IconName;
+  iconTint?: "bone" | "danger" | "accent";
+  detail?: string;
+  children?: ReactNode;
+  testID?: string;
+  tone?: "bone" | "danger";
+}) {
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 rounded-tile px-3 py-2.5" style={tileSurface(false, t)}>
-      <Text className="text-label text-muted">{label}</Text>
+    <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 items-center rounded-tile px-2 py-2.5" style={tileSurface(false, t)}>
+      <Text className="font-bold uppercase text-faint" style={{ fontSize: 10 * s, lineHeight: 13 * s, letterSpacing: 1.4 * s }} numberOfLines={1}>
+        {label}
+      </Text>
       <View className="flex-row items-center gap-1.5">
         {icon ? <GameIcon name={icon} size={16 * s} tint={iconTint} /> : null}
-        <Text className="font-display text-title text-bone">{value}</Text>
+        <Text className={`font-display ${tone === "danger" ? "text-danger" : "text-bone"}`} style={{ fontSize: 26 * s, lineHeight: 32 * s }}>
+          {value}
+        </Text>
         {detail ? <Text className="text-label text-muted">{detail}</Text> : null}
       </View>
       {children}
@@ -269,7 +293,7 @@ export function StatTile({ label, value, icon, iconTint = "bone", detail, childr
 
 /**
  * The bar pinned at the foot of a screen, in thumb reach: the screen's primary and what sits beside it. The content scrolls
- * under a night fade above it. `safe` keeps it above the home indicator on a screen with no tab bar. The band stays full width;
+ * under a fade to the ground above it. `safe` keeps it above the home indicator on a screen with no tab bar. The band stays full width;
  * outside compact its buttons sit in a group: 480 centred in medium (narrower than the 640 reading column), 420 at the trailing edge in expanded, where the thumb is; the primary is the last child, so it is the rightmost.
  * `align="fill"` keeps the buttons full width, for a bar inside a pane (docs/design-system.md, Tablets).
  */
@@ -305,23 +329,31 @@ export function PaperSheet({ step, title, children }: { step: string; title: str
 }
 
 /**
- * Victory or Defeat: the outcome word in Cinzel Bold 44 pt with its glow (accent, or threat red), and the scenario's name under it.
- * Resolution and the standalone outcome both say it this way.
+ * Victory or Defeat: the outcome word in Marcellus SC 50 pt, tracked wide, with its glow (silver, or threat red), and the scenario's
+ * name under it. Resolution and the standalone outcome both say it this way.
  */
 export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario: string; testID: string }) {
   const palette = usePalette();
-  const s = useUiScale();
+  const t = useTableTokens();
+  const { size, s } = useSizeClass();
+  const big = size === "compact" ? 50 : 72;
+  const light = t.depth === "light";
   return (
     <>
       <Text
         testID={testID}
         accessibilityRole="header"
         className={`text-center font-display ${won ? "text-accentHigh" : "text-danger"}`}
-        style={{ fontSize: 44 * s, lineHeight: 52 * s, letterSpacing: 4 * s, textShadowColor: won ? palette.accent : withAlphaHex(palette.threat, 0.6), textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
+        style={{
+          fontSize: big * s,
+          lineHeight: big * 1.2 * s,
+          letterSpacing: (big >= 72 ? 8 : 6) * s,
+          ...(light ? {} : { textShadowColor: won ? withAlphaHex(palette.glow, 0.7) : withAlphaHex(palette.threat, 0.7), textShadowRadius: 24, textShadowOffset: { width: 0, height: 0 } }),
+        }}
       >
         {won ? "Victory" : "Defeat"}
       </Text>
-      <Text className={`mt-1 text-center font-display text-heading ${won ? "text-bone" : "text-muted"}`}>{scenario}</Text>
+      <Text className="mt-1 text-center font-display text-heading text-muted">{scenario}</Text>
     </>
   );
 }

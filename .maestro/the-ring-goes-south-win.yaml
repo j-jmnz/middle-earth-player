@@ -40,10 +40,10 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-the-ring-goes-south-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible:
     id: node-journey-in-the-dark-status
-    text: "Current"
+    text: "Next"
 # Kill and relaunch: the scenario is on the log and Journey in the Dark is unlocked.
 - stopApp
 - launchApp
@@ -55,7 +55,7 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-journey-in-the-dark-status
-    text: "Current"
+    text: "Next"
 - tapOn:
     id: log-open
 - extendedWaitUntil:

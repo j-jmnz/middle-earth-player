@@ -11,10 +11,9 @@ import { useStore } from "zustand";
 import { gameReport } from "../../../campaign/report";
 import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
-import { ActionBar, BodyText, Corners, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton, TwoPane } from "../../chrome";
-import { tileSurface } from "../../../play/surfaces";
+import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton, TwoPane } from "../../chrome";
+import { selectedRingOf, tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
-import { withAlphaHex } from "../../../play/tokens";
 import { campaignOf, scenarioName } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
 import { recordCampaignRun } from "../../run-writers";
@@ -22,7 +21,6 @@ import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { CardThumb } from "../../images/picture";
 import { GameReportView } from "../../game-report";
-import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../table-session";
 import { useUiScale } from "../../../play/ui-scale";
@@ -30,7 +28,6 @@ import { useSizeClass } from "../../../play/use-size-class";
 import { Text } from "../../../play/text";
 
 function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; selected: boolean; imagesrc: string | null; onPress: () => void }) {
-  const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
   const label = tile.hero ? `${tile.name} on ${tile.hero}` : tile.name;
@@ -49,12 +46,11 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       {({ pressed }) => (
         <View
           className="min-h-14 items-center rounded-card p-3"
-          style={{ ...tileSurface(pressed, t), ...(selected ? { borderWidth: 1.5, borderColor: palette.accent, boxShadow: `0 0 18px ${withAlphaHex(palette.accent, 0.28)}` } : {}) }}
+          style={{ ...tileSurface(pressed, t), ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}
         >
           {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={72 * s} height={100 * s} /> : null}
           <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
           {selected ? <Text className="mt-0.5 text-label font-semibold text-accentHigh">Selected</Text> : null}
-          {selected ? <Corners /> : null}
         </View>
       )}
     </Pressable>

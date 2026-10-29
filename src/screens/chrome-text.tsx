@@ -1,21 +1,34 @@
 // The chrome's words (docs/design-system.md, Type): eyebrows, section headings, the screen title, body and label text.
 // Re-exported by chrome.tsx.
 import { useMemo, type ReactNode } from "react";
+import { View } from "react-native";
 
 
 import { usePalette } from "./palette-hook";
+import { palettes } from "./palette.js";
 import { SectionHeading } from "../play/section-heading";
 import { withAlphaHex } from "../play/tokens";
 import { Text } from "../play/text";
 
 const eyebrowTone = { accent: "text-accent", moon: "text-moon", muted: "text-muted", inkLabel: "text-inkLabel" } as const;
 
-/** One short tag above a title, in engraved capitals: accent above the thing to act on, moon for a section. */
-export function Eyebrow({ children, tone = "accent", testID }: { children: string; tone?: keyof typeof eyebrowTone; testID?: string }) {
-  return (
-    <Text testID={testID} className={`font-display text-eyebrow uppercase ${eyebrowTone[tone]}`}>
+/**
+ * An overline: one short tag above a title in bold Barlow capitals, tracked wide (Fellowship of the Ring · 2 of 6, In progress ·
+ * Round 4). Moon by default; accent above the thing to act on. `rule` draws the short line before it that the hero text opens with.
+ */
+export function Eyebrow({ children, tone = "moon", testID, rule = false }: { children: string; tone?: keyof typeof eyebrowTone; testID?: string; rule?: boolean }) {
+  const palette = usePalette();
+  const text = (
+    <Text testID={testID} className={`font-bold text-eyebrow uppercase ${eyebrowTone[tone]}`}>
       {children}
     </Text>
+  );
+  if (!rule) return text;
+  return (
+    <View className="flex-row items-center gap-2.5">
+      <View style={{ width: 22, height: 1, backgroundColor: palette.moon }} />
+      {text}
+    </View>
   );
 }
 
@@ -24,10 +37,10 @@ export function Section({ title, right, testID, className }: { title: string; ri
   return <SectionHeading title={title} right={right} testID={testID} className={className} />;
 }
 
-/** The soft night under a title, so it reads over a backdrop or a picture (the theme's own page color). */
+/** The dark shadow under a title, so it reads over the fog or a picture. Light uses no text shadows. */
 export function useTitleShadow() {
   const palette = usePalette();
-  return useMemo(() => ({ textShadowColor: withAlphaHex(palette.night, 0.85), textShadowRadius: 12, textShadowOffset: { width: 0, height: 2 } }), [palette]);
+  return useMemo(() => (palette.night === palettes.light.night ? {} : { textShadowColor: withAlphaHex(palette.night, 0.95), textShadowRadius: 10, textShadowOffset: { width: 0, height: 2 } }), [palette]);
 }
 
 export function ScreenTitle({ children, size = "display" }: { children: string; size?: "display" | "title" }) {

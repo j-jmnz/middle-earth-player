@@ -45,10 +45,10 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-escape-from-dol-guldur-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible:
     id: node-the-oath-status
-    text: "Current"
+    text: "Next"
 # Kill and relaunch: the scenario is on the log with its carry-over and The Oath is unlocked.
 - stopApp
 - launchApp
@@ -60,7 +60,7 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-the-oath-status
-    text: "Current"
+    text: "Next"
 - tapOn:
     id: log-open
 - extendedWaitUntil:

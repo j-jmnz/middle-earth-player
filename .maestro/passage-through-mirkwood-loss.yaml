@@ -46,7 +46,7 @@ tags:
 # The log is unchanged: Passage Through Mirkwood still current, Journey Along the Anduin locked.
 - assertVisible:
     id: node-passage-through-mirkwood-status
-    text: "Current"
+    text: "Next"
 - assertVisible:
     id: node-journey-along-the-anduin-status
     text: "Locked"

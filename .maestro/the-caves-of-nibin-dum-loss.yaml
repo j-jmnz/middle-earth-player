@@ -51,10 +51,10 @@ tags:
 # The log is unchanged: The Oath done, The Caves of Nibin-Dûm still current, nothing carried over.
 - assertVisible:
     id: node-the-oath-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible:
     id: node-the-caves-of-nibin-dum-status
-    text: "Current"
+    text: "Next"
 - assertVisible: ".*1 of 2 completed.*"
 - tapOn:
     id: log-open

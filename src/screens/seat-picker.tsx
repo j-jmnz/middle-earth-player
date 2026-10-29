@@ -9,7 +9,7 @@ import { panelSurface, tileSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { Portrait } from "./art";
 import type { BriefingDecks } from "./briefing-parts";
-import { BodyText, Corners, Label, Section, SecondaryButton, TextButton } from "./chrome";
+import { BodyText, Label, Section, SecondaryButton, TextButton } from "./chrome";
 import { editSavedDeck } from "./deck-draft";
 import { emptyDeckListFilter, useDeckListView } from "./deck-list";
 import { DeckListBar } from "./deck-list-bar";
@@ -201,7 +201,6 @@ export function SeatPicker({
               </Label>
             </View>
           ) : null}
-          <Corners />
         </View>
       )}
       {pickedDeck && !choosing && slot && !ringBearer ? (

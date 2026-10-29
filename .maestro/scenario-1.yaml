@@ -74,7 +74,7 @@ appId: com.middleearth.lcg
     timeout: 15000
 - assertVisible:
     id: node-a-knife-in-the-dark-status
-    text: "Current"
+    text: "Next"
 - tapOn:
     id: log-open
 - extendedWaitUntil:

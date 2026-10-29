@@ -1,11 +1,11 @@
 appId: com.middleearth.lcg
 ---
-# Settings and UI scale (user request, 2026-10-28). Written in a cloud session: it has not run. The Settings tab applies a change at
+# Settings and UI scale (user request, 2026-10-28). Written in a cloud session: it has not run. Settings (the gear) applies a change at
 # once and keeps it in user.db, so Large is still chosen after the app is closed and opened again. The flow ends by restoring defaults.
 - launchApp:
     clearState: true
 - tapOn:
-    id: settings-tab
+    id: settings-open
 - assertVisible:
     id: app-settings
 - assertVisible:
@@ -20,7 +20,7 @@ appId: com.middleearth.lcg
 - stopApp
 - launchApp
 - tapOn:
-    id: settings-tab
+    id: settings-open
 - assertVisible:
     id: app-settings
 - assertVisible:
