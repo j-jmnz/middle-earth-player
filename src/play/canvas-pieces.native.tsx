@@ -4,6 +4,7 @@
 import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Path, RoundedRect, Text, type SamplingOptions, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 import type { ReactElement } from "react";
 
+import { cardCorner } from "./card-corner.ts";
 import { badgeSplit, type CardEffects } from "./card-effects.ts";
 import { SPHERE_TINT, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
@@ -14,7 +15,8 @@ import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { wrapName } from "./wrap.ts";
 
 // Medium's sizes in points. Every piece draws them times `s`, the UI scale (ui-scale.ts, user request, 2026-10-28), which the canvas root
-// hands down as a prop beside the tokens `t`: a piece does not read the scale itself.
+// hands down as a prop beside the tokens `t`: a piece does not read the scale itself. A card's corner is the card screen's share of its
+// shorter side (`cardCorner`, user request, 2026-10-29); `RADIUS` is left for the shapes that are not cards (a drop zone's outline).
 export const RADIUS = 6;
 const LINE = 14;
 const BADGE_H = 15;
@@ -104,7 +106,7 @@ export function HeldMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number
 // the player's is raised night with the accent ring, the encounter deck's night with a threat-red ring.
 function Back({ x, y, w, h, encounter, backs, t, s }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages; t: TableTokens; s: number }) {
   const image = encounter ? backs.encounter : backs.player;
-  const radius = RADIUS * s;
+  const radius = cardCorner(w, h);
   if (image) {
     return (
       <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
@@ -115,7 +117,7 @@ function Back({ x, y, w, h, encounter, backs, t, s }: { x: number; y: number; w:
   return (
     <Group>
       <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={encounter ? t.night : t.raised} />
-      <RoundedRect x={x + 2 * s} y={y + 2 * s} width={w - 4 * s} height={h - 4 * s} r={radius - 2 * s} color={encounter ? t.threat : t.accentLine} style="stroke" strokeWidth={1 * s} />
+      <RoundedRect x={x + 2 * s} y={y + 2 * s} width={w - 4 * s} height={h - 4 * s} r={Math.max(0, radius - 2 * s)} color={encounter ? t.threat : t.accentLine} style="stroke" strokeWidth={1 * s} />
       <Circle cx={x + w / 2} cy={y + h / 2} r={Math.min(w, h) / 4} color={encounter ? t.threat : t.accent} style="stroke" strokeWidth={2 * s} />
     </Group>
   );
@@ -144,7 +146,7 @@ export function CardBody({
   s: number;
 }) {
   const { x, y, w, h } = slot;
-  const radius = RADIUS * s;
+  const radius = cardCorner(w, h);
   return (
     <Group>
       <RoundedRect x={x + 1 * s} y={y + 2 * s} width={w} height={h} r={radius} color={shadowOf(t)} />
@@ -174,7 +176,7 @@ const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Di
 /** A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. */
 export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: CardSlot; image: SkImage | null; name: string; fonts: Fonts; label: boolean; backs: BackImages; t: TableTokens; s: number }) {
   const { x, y, w, h } = slot;
-  const radius = RADIUS * s;
+  const radius = cardCorner(w, h);
   const strip = 15 * s;
   const encounter = slot.zone === "encounterDeck" || slot.zone === "encounterDiscard";
   const word = PILE_WORD[slot.zone] ?? "";
@@ -405,7 +407,7 @@ export function AttackerMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: nu
   const { x, y, w, h } = rect;
   return (
     <Group>
-      <RoundedRect x={x - 1 * s} y={y - 1 * s} width={w + 2 * s} height={h + 2 * s} r={(RADIUS + 1) * s} color={t.threat} style="stroke" strokeWidth={3 * s} />
+      <RoundedRect x={x - 1 * s} y={y - 1 * s} width={w + 2 * s} height={h + 2 * s} r={cardCorner(w, h) + 1 * s} color={t.threat} style="stroke" strokeWidth={3 * s} />
       <Circle cx={x + w} cy={y + h / 2} r={9 * s} color={t.night} />
       <Circle cx={x + w} cy={y + h / 2} r={9 * s} color={t.threat} style="stroke" strokeWidth={1.5 * s} />
       <CanvasIcon name="attack" x={x + w - 6 * s} y={y + h / 2 - 6 * s} size={12 * s} color={t.threat} />

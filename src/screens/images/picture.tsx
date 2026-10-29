@@ -2,6 +2,7 @@ import { Image, type ImageContentPosition } from "expo-image";
 import { useMemo } from "react";
 import { View } from "react-native";
 
+import { cardCorner } from "../../play/card-corner";
 import { CardImage } from "../../play/card-image";
 
 import { cardImageUrl, shownCardImage } from "./policy";
@@ -106,7 +107,7 @@ export function CardThumbFrame({
   height: number;
 }) {
   return (
-    <View className="overflow-hidden rounded bg-raised" style={{ width, height }}>
+    <View className="overflow-hidden bg-raised" style={{ width, height, borderRadius: cardCorner(width, height) }}>
       {source ? <RowCardImage code={code} source={source} width={width} height={height} /> : null}
     </View>
   );

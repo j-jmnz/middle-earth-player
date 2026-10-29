@@ -16,6 +16,7 @@ import { InspectCardImage } from "./images/picture";
 import { scanAssets } from "./images/scan-map";
 import { useCachedImage } from "./images/store";
 import { usePalette } from "./palette-hook";
+import { cardCorner } from "../play/card-corner";
 import { CardTextView } from "../play/card-text-view";
 import { traitLine } from "../play/card-text";
 import { GameIcon } from "../play/game-icon";
@@ -120,9 +121,11 @@ export function CardPicture({ row, preview, intrinsic, width, wrap }: {
   const t = useTableTokens();
   const size = imageLayoutSize(intrinsic.width, intrinsic.height, width);
   const image = <InspectCardImage code={row.code} source={preview} width={size.width} height={size.height} />;
+  // The card screen's corner, the one every card picture shares (10 pt at its 236 pt phone width).
+  const corner = cardCorner(size.width, size.height);
   return (
-    <View className="self-center" style={{ width: size.width, height: size.height, borderRadius: 10, boxShadow: cardGlowOf(row.sphereCode, palette, t) }}>
-      <View style={{ width: size.width, height: size.height, borderRadius: 10, overflow: "hidden" }}>{wrap ? wrap(image, size) : image}</View>
+    <View className="self-center" style={{ width: size.width, height: size.height, borderRadius: corner, boxShadow: cardGlowOf(row.sphereCode, palette, t) }}>
+      <View style={{ width: size.width, height: size.height, borderRadius: corner, overflow: "hidden" }}>{wrap ? wrap(image, size) : image}</View>
     </View>
   );
 }

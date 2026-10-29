@@ -19,8 +19,9 @@ export type ScrubRoom = { left: number; right: number; top: number; lift: number
 export function magnify(distance: number, lift: number): number {
   "worklet";
   if (distance === 0) return lift;
-  if (distance === 1) return SHAPE.scrubNear;
-  if (distance === 2) return SHAPE.scrubNearer;
+  // A neighbour never grows past the lifted card's own grow (a short canvas holds that one down).
+  if (distance === 1) return Math.min(SHAPE.scrubNear, lift);
+  if (distance === 2) return Math.min(SHAPE.scrubNearer, lift);
   return 1;
 }
 

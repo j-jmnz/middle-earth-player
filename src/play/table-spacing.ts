@@ -54,12 +54,27 @@ export const ACROSS = {
   column: { share: 0.5, cap: 0.4 },
 } as const;
 
-/** The growth of each gap down the canvas, for `spare` points under the play area and a card `cardH` tall, at a UI scale. */
-export function downGaps(spare: number, cardH: number, scale: number): { top: number; stagingEngaged: number; engagedPlay: number; playHand: number } {
+/**
+ * The growth of each gap down the canvas, for `spare` points under the play area's one row and a card `cardH` tall, at a UI scale.
+ * `rows` is the height the play area's extra rows take: it comes from the bottom first (the ground above the hand, then the gap
+ * above the hand, then the one above the play area, then the upper ones), so staging and the engagement area stay where they were
+ * while there is ground (user request, 2026-10-29: a card exhausting into a second row must not move the table).
+ */
+export function downGaps(spare: number, cardH: number, scale: number, rows = 0): { top: number; stagingEngaged: number; engagedPlay: number; playHand: number } {
   const order = [DOWN.top, DOWN.stagingEngaged, DOWN.engagedPlay, DOWN.playHand];
   const { extra } = shareOut(spare - SLACK * scale, order.map((claim) => ({ share: claim.share, cap: claim.cap * cardH })));
-  const [top = 0, stagingEngaged = 0, engagedPlay = 0, playHand = 0] = extra;
-  return { top, stagingEngaged, engagedPlay, playHand };
+  const gaps = extra.map((gap) => gap);
+  // What lies under the play area's one row less its gaps above: the gap above the hand, the ground and the slack.
+  let short = rows - (spare - (gaps[0] ?? 0) - (gaps[1] ?? 0) - (gaps[2] ?? 0));
+  gaps[3] = 0;
+  for (const at of [2, 1, 0]) {
+    if (short <= 0) break;
+    const take = Math.min(short, gaps[at] ?? 0);
+    gaps[at] = (gaps[at] ?? 0) - take;
+    short -= take;
+  }
+  const [top = 0, stagingEngaged = 0, engagedPlay = 0] = gaps;
+  return { top, stagingEngaged, engagedPlay, playHand: Math.max(0, spare - rows - top - stagingEngaged - engagedPlay) };
 }
 
 /** The growth of the left edge, the gap beside the left column and the right edge, for `spare` points across and a card `cardW` wide. */

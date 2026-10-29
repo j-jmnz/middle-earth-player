@@ -23,7 +23,8 @@ function Posed({ slot, at, scrub, top, hidden, children }: { slot: CardSlot; at:
   const { cx, cy } = cardFrame(slot);
   const transform = useDerivedValue(() => {
     if (!target) return [];
-    // How far this card is from the one under the finger, on the UI thread: the lifted copy is 0, its neighbours grow a little.
+    // How far this card is from the one under the finger, on the UI thread: the lifted copy is 0, its neighbours grow a little. For
+    // the frame or two before JavaScript's `under` catches up, the card at the new index lifts in its own place.
     const under = scrub.index.get();
     const distance = top ? 0 : under >= 0 ? Math.abs(at - under) : -1;
     const pose = scrubPose(slot, target, { rise: scrub.rise.get(), apart: scrub.apart.get(), lift: scrub.lift.get() }, distance, room);

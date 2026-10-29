@@ -11,6 +11,7 @@ import { memo, useCallback, useMemo } from "react";
 import { GestureDetector } from "react-native-gesture-handler";
 import { useStore } from "zustand";
 
+import { cardCorner } from "./card-corner.ts";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
 import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
@@ -215,7 +216,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
             <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
-            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS * s} color={t.accent} style="stroke" strokeWidth={2 * s} />
+            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={cardCorner(lifted.w, lifted.h)} color={t.accent} style="stroke" strokeWidth={2 * s} />
           </Group>
         ) : null}
         {spot.playing && spot.plan ? <Spotlight plan={spot.plan} progress={spot.progress} width={width} height={height} images={spotImages} tokens={tokens} backs={backs} fonts={fonts} spotFonts={spotFonts} t={t} s={s} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} /> : null}

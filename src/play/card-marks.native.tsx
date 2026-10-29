@@ -4,7 +4,8 @@
 // tokens (docs/design-system.md, Table).
 import { BlurMask, Circle, Group, Line, RoundedRect, Text, vec } from "@shopify/react-native-skia";
 
-import { RADIUS, type Fonts } from "./canvas-pieces.native.tsx";
+import { type Fonts } from "./canvas-pieces.native.tsx";
+import { cardCorner } from "./card-corner.ts";
 import { cardFrame, halo } from "./frame.ts";
 import type { CardSlot, Rect } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
@@ -21,7 +22,7 @@ export function Glow({ slot, picked, t, s }: { slot: CardSlot; picked: boolean; 
   const halos = halo(picked);
   const inset = halos.inset * s;
   return (
-    <RoundedRect x={cx - w / 2 + inset} y={cy - h / 2 + inset} width={w - 2 * inset} height={h - 2 * inset} r={Math.max(0, RADIUS * s - inset)} color={withAlphaHex(t.accent, 0.9)}>
+    <RoundedRect x={cx - w / 2 + inset} y={cy - h / 2 + inset} width={w - 2 * inset} height={h - 2 * inset} r={Math.max(0, cardCorner(w, h) - inset)} color={withAlphaHex(t.accent, 0.9)}>
       <BlurMask blur={halos.sigma * s} style="normal" />
     </RoundedRect>
   );
@@ -37,7 +38,7 @@ export function CardMarks({ slot, tappable, picked, dimmed, beat, t, s, veiled =
   const { cx, cy, w, h } = cardFrame(slot);
   const x = cx - w / 2;
   const y = cy - h / 2;
-  const r = RADIUS * s;
+  const r = cardCorner(w, h);
   return (
     <Group>
       {dimmed ? <RoundedRect x={x} y={y} width={w} height={h} r={r} color={withAlphaHex(t.night, 0.45)} /> : null}

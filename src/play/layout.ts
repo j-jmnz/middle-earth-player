@@ -9,9 +9,13 @@ import type { CardInstance } from "../rules/state.ts";
 
 import { unturn } from "./frame.ts";
 import type { FightKind, PileId, PileView, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
-import { isPrisoner } from "./selectors.ts";
-import { acrossGaps, downGaps, wrapRows } from "./table-spacing.ts";
+import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, placeUnder, rowXs, slotOf, type Metrics } from "./layout-slots.ts";
+import { placePlay, playPlan } from "./play-area.ts";
+import { acrossGaps, downGaps } from "./table-spacing.ts";
 import { touch } from "./ui-scale.ts";
+
+export { MIN_TARGET } from "./layout-slots.ts";
+export { PLAY_FLOOR } from "./play-area.ts";
 
 export type Rect = { x: number; y: number; w: number; h: number };
 
@@ -85,7 +89,6 @@ export type LayoutOptions = {
 const GUTTER = 8;
 const GAP = 6;
 export const PEEK = 10;
-const ASPECT = 1.4;
 // How much of a hand card shows above the bottom edge: a share of the card, and never less than a 44 pt target plus the
 // fan's drop at the ends (at a UI scale the target is `touch`, and the drop is scaled).
 export const HAND_SHOW = 0.56;
@@ -102,12 +105,7 @@ const MARK = 16;
 const CARD_MAX = 96;
 const CARD_MIN = 34;
 const FAN_DROP = 2;
-// The play area's cards shrink to this share of the table's card at the least so their rows fit (never under a 44 pt target);
-// under it they squeeze into one row as the other rows do.
-export const PLAY_FLOOR = 0.7;
 
-// The sizes the layout works in, at one UI scale.
-type Metrics = { scale: number; gutter: number; gap: number; peek: number; handMin: number; mark: number };
 function metricsOf(scale: number): Metrics {
   return { scale, gutter: GUTTER * scale, gap: GAP * scale, peek: PEEK * scale, handMin: touch(scale, MIN_TARGET) + (HAND_MIN - MIN_TARGET) * scale, mark: MARK * scale };
 }
@@ -125,69 +123,12 @@ export function cardSize(width: number, height: number, scale = 1): { w: number;
   return { w, h: Math.round(w * ASPECT) };
 }
 
-export const MIN_TARGET = 44;
 
 /** The size of a hand card: the table's card, narrowed so `count` cards overlap by no more than leaves a 44 pt strip of each (more at Large, `touch`). */
 export function handCardSize(card: { w: number; h: number }, width: number, count: number, scale = 1): { w: number; h: number } {
   if (count <= 1) return card;
   const w = Math.max(Math.round(36 * scale), Math.min(card.w, Math.floor(width - touch(scale, MIN_TARGET) * (count - 1))));
   return w === card.w ? card : { w, h: Math.round(w * ASPECT) };
-}
-
-function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect: Rect, landscape = false, tilt = 0): CardSlot {
-  return {
-    ...rect,
-    id: card.id,
-    code: card.code,
-    zone,
-    kind,
-    exhausted: card.exhausted,
-    faceDown: card.face === "down",
-    landscape,
-    resources: card.resources,
-    damage: card.damage,
-    progress: card.progress,
-    tilt,
-    count: 0,
-    committed: card.committed,
-    ...(card.face === "down" && isPrisoner(card) ? { held: true as const } : {}),
-  };
-}
-
-// The width a card takes in a row: an exhausted card is turned sideways.
-function footprint(card: CardInstance, size: { w: number; h: number }): number {
-  return card.exhausted ? size.h : size.w;
-}
-
-// Left edges for items of these widths across a row from `x` to `x + width`: spaced by one gap, squeezed (overlapping) when
-// they do not fit.
-function rowXs(widths: readonly number[], x: number, width: number, gap: number): number[] {
-  if (widths.length === 0) return [];
-  const natural = widths.reduce((sum, w) => sum + w, 0) + gap * (widths.length - 1);
-  const squeeze = widths.length > 1 && natural > width ? (natural - width) / (widths.length - 1) : 0;
-  const xs: number[] = [];
-  let at = x;
-  for (const w of widths) {
-    xs.push(at);
-    at += w + gap - squeeze;
-  }
-  return xs;
-}
-
-// A card at the left edge `x` of its footprint: an exhausted card is drawn centered in its sideways footprint.
-function cardRect(card: CardInstance, x: number, y: number, size: { w: number; h: number }): Rect {
-  const offset = card.exhausted ? (size.h - size.w) / 2 : 0;
-  return { x: x + offset, y, w: size.w, h: size.h };
-}
-
-// Attachments and face-down shadow cards peek out from under the host, the most recent lowest.
-function placeUnder(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: CardSlot[], faceUpShadows: CardInstance[], peek: number): void {
-  const under = entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down"));
-  under.forEach((attached, at) => {
-    const kind: SlotKind = attached.zone === "shadow" ? "shadow" : "attachment";
-    out.push(slotOf(attached, zone, kind, { x: rect.x, y: rect.y + (under.length - at) * peek, w: rect.w, h: rect.h }));
-  });
-  faceUpShadows.push(...entry.attached.filter((attached) => attached.zone === "shadow" && attached.face !== "down"));
 }
 
 function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics): void {
@@ -209,63 +150,6 @@ function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size:
       out.push(slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }));
     });
   });
-}
-
-// The most cards peeking out under one card of these entries: attachments and face-down shadow cards.
-function deepestUnder(entries: readonly ZoneEntry[]): number {
-  return Math.max(0, ...entries.map((entry) => entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down")).length));
-}
-
-// The play area's rows, each card at `size`: a row takes cards left to right a gap apart and wraps when the next would not fit.
-function playRows(entries: readonly ZoneEntry[], size: { w: number; h: number }, width: number, m: Metrics): ZoneEntry[][] {
-  return wrapRows(entries.map((entry) => footprint(entry.card, size)), width, m.gap).map((row) => row.map((at) => entries[at] as ZoneEntry));
-}
-
-// How deep a play row is: its card and the attachments peeking out under it.
-function rowDepth(row: readonly ZoneEntry[], size: { w: number; h: number }, m: Metrics): number {
-  return size.h + m.peek * deepestUnder(row);
-}
-
-function rowsHeight(rows: readonly (readonly ZoneEntry[])[], size: { w: number; h: number }, m: Metrics): number {
-  return rows.reduce((sum, row) => sum + rowDepth(row, size, m), 0) + m.gap * Math.max(0, rows.length - 1);
-}
-
-/** The play area's cards: their size, their rows and how tall the band they fill is. */
-type PlayPlan = { size: { w: number; h: number }; rows: readonly (readonly ZoneEntry[])[]; h: number };
-
-/**
- * The play area in a band `band` tall (its own row's room plus the spare under it): the table's card in as many rows as it needs
- * when they fit; else the largest smaller card, down to PLAY_FLOOR of it and a 44 pt target, whose rows fit; else one row of the
- * table's card, squeezed, as before.
- */
-function playPlan(entries: readonly ZoneEntry[], width: number, card: { w: number; h: number }, oneRow: number, band: number, m: Metrics): PlayPlan {
-  const squeezed: PlayPlan = { size: card, rows: [entries], h: oneRow };
-  const full = playRows(entries, card, width, m);
-  if (full.length <= 1) return squeezed;
-  if (rowsHeight(full, card, m) <= band) return { size: card, rows: full, h: Math.max(oneRow, rowsHeight(full, card, m)) };
-  const floor = Math.max(Math.round(card.w * PLAY_FLOOR), touch(m.scale, MIN_TARGET));
-  for (let w = card.w - 1; w >= floor; w -= 1) {
-    const size = { w, h: Math.round(w * ASPECT) };
-    const rows = playRows(entries, size, width, m);
-    if (rowsHeight(rows, size, m) <= band) return { size, rows, h: Math.max(oneRow, rowsHeight(rows, size, m)) };
-  }
-  return squeezed;
-}
-
-// The play area, row under row; a row that does not fit (the squeezed fallback) overlaps its cards as staging does.
-function placePlay(plan: PlayPlan, area: Rect, out: CardSlot[], m: Metrics): void {
-  let y = area.y;
-  for (const row of plan.rows) {
-    const xs = rowXs(row.map((entry) => footprint(entry.card, plan.size)), area.x, area.w, m.gap);
-    row.forEach((entry, at) => {
-      const rect = cardRect(entry.card, xs[at] ?? area.x, y, plan.size);
-      placeUnder(entry, "play", rect, out, [], m.peek);
-      // A committed character stands a step higher, sent toward the quest.
-      const lift = entry.card.committed ? -m.peek / 2 : 0;
-      out.push(slotOf(entry.card, "play", "card", { ...rect, y: rect.y + lift }));
-    });
-    y += rowDepth(row, plan.size, m) + m.gap;
-  }
 }
 
 // The engagement area: each enemy, its resolved shadow cards beside it, then the characters fighting it.
@@ -352,7 +236,8 @@ export function tableLayout(
   const card = cardSize(width, height - bottom, scale);
   // Across: a canvas wider than a table of capped cards needs widens its edges and the gap beside the left column, within caps;
   // the rest widens the rows. A phone's card is not at its cap, so nothing moves.
-  const across = acrossGaps(width - (3 * gutter + 5 * gap + (6 + LEFT) * CARD_MAX * scale), card.w);
+  const capped = card.w >= Math.floor(CARD_MAX * scale);
+  const across = acrossGaps(capped ? width - (3 * gutter + 5 * gap + (6 + LEFT) * card.w) : 0, card.w);
   const leftX = gutter + across.left;
   const rightGutter = gutter + across.right;
   const leftW = Math.round(card.w * LEFT);
@@ -369,7 +254,7 @@ export function tableLayout(
   // share what is left (table-spacing.ts).
   const spare = handY - gap - (gutter + card.h + gap + engagedH + gap + oneRow);
   const plan = playPlan(views.play.entries, centerW, card, oneRow, oneRow + Math.max(0, spare), m);
-  const grow = downGaps(spare - (plan.h - oneRow), card.h, scale);
+  const grow = downGaps(spare, card.h, scale, plan.h - oneRow);
   const stagingY = gutter + grow.top;
   const engagedY = stagingY + card.h + gap + grow.stagingEngaged;
   const playY = engagedY + engagedH + gap + grow.engagedPlay;

@@ -8,7 +8,7 @@ import type { CardInstance } from "../rules/state.ts";
 import { cardSize, handCardSize, hitBounds, MIN_TARGET, PLAY_FLOOR, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "./selectors.ts";
 import { ACROSS, DOWN, SLACK, shareOut, wrapRows } from "./table-spacing.ts";
-import { UI_SCALES } from "./ui-scale.ts";
+import { touch, UI_SCALES } from "./ui-scale.ts";
 
 const card = (id: string, zone: CardInstance["zone"], extra: Partial<CardInstance> = {}): CardInstance => ({
   id,
@@ -296,31 +296,65 @@ describe("the play area wraps (user request, 2026-10-29)", () => {
     }
   });
 
-  it("on a phone, shrinks the play area's cards so they fit without overlapping, down to the floor, and squeezes one row under it", () => {
-    for (const scale of SCALES) {
-      const { views: v, piles } = views(8, { engaged: 5, play: 9 });
-      const layout = tableLayout(591, 338, v, piles, { scale });
+  it("shrinks the play area's cards so they fit without overlapping, down to the floor, on one row or two", () => {
+    for (const [canvas, scale, play, rows] of [
+      [{ width: 640, height: 400 }, 1, 9, 1],
+      [{ width: 760, height: 520 }, UI_SCALES.small, 10, 2],
+    ] as const) {
+      const { views: v, piles } = views(8, { engaged: 5, play });
+      const layout = tableLayout(canvas.width, canvas.height, v, piles, { scale });
       const cards = playCards(layout);
-      const floor = Math.max(Math.round(layout.card.w * PLAY_FLOOR), MIN_TARGET);
+      const where = `${canvas.width}x${canvas.height} ${scale}`;
       const w = cards[0]?.w ?? 0;
-      const where = `${scale}`;
-      if (w < layout.card.w) {
-        // Smaller cards, no smaller than the floor, side by side.
-        expect(w, where).toBeGreaterThanOrEqual(floor);
-        cards.forEach((a, i) => cards.slice(i + 1).forEach((b) => expect(overlaps(slotBounds(a), slotBounds(b)), `${where} ${a.id} ${b.id}`).toBe(false)));
-      }
-      // The play area keeps the phone's band: the rest of the table has not moved.
-      expect(layout.zones.play.h).toBeCloseTo(layout.card.h + 20 * scale, 9);
+      expect(w, where).toBeLessThan(layout.card.w);
+      expect(w, where).toBeGreaterThanOrEqual(Math.max(Math.round(layout.card.w * PLAY_FLOOR), touch(scale, MIN_TARGET)));
+      expect(new Set(cards.filter((slot) => !slot.committed).map((slot) => slot.y)).size, where).toBe(rows);
+      cards.forEach((a, i) => cards.slice(i + 1).forEach((b) => expect(overlaps(slotBounds(a), slotBounds(b)), `${where} ${a.id} ${b.id}`).toBe(false)));
     }
-    // Ten allies at Medium do not fit even at the floor: one row of the table's card, squeezed, as before.
-    const { views: v, piles } = views(8, { engaged: 5, play: 10 });
-    const layout = tableLayout(591, 338, v, piles);
-    const cards = playCards(layout);
-    for (const slot of cards) expect(slot.w).toBe(layout.card.w);
-    expect(new Set(cards.filter((slot) => !slot.committed).map((slot) => slot.y)).size).toBe(1);
-    // Nine at Medium shrink to one row of smaller cards.
-    const nine = playCards(tableLayout(591, 338, views(8, { engaged: 5, play: 9 }).views, piles));
-    expect(nine[0]?.w).toBeLessThan(54);
-    expect(nine[0]?.w).toBeGreaterThanOrEqual(MIN_TARGET);
+  });
+
+  it("on a phone, keeps the table's card for a slight squeeze and squeezes one row under the floor, the band unchanged", () => {
+    for (const play of [9, 10, 12]) {
+      const { views: v, piles } = views(8, { engaged: 5, play });
+      const layout = tableLayout(591, 338, v, piles);
+      const cards = playCards(layout);
+      // Nine overlap by under a fifth of a card; ten and twelve do not fit even at the floor. Either way: one row of the table's card.
+      for (const slot of cards) expect(slot.w, `${play}`).toBe(layout.card.w);
+      expect(new Set(cards.filter((slot) => !slot.committed).map((slot) => slot.y)).size, `${play}`).toBe(1);
+      expect(layout.zones.play.h).toBe(layout.card.h + 20);
+    }
+  });
+
+  it("keeps staging and the engagement area still when the play area wraps into the ground above the hand", () => {
+    let wrapped = 0;
+    for (const scale of SCALES) {
+      for (const canvas of TABLETS) {
+        const ready = views(8, { engaged: 5, play: 5 });
+        const tired = views(8, { engaged: 5, play: 5 });
+        // Three characters exhaust (they lie sideways), which can wrap the row.
+        const exhausted = { ...tired.views, play: { ...tired.views.play, entries: tired.views.play.entries.map((e, i) => (i < 3 ? { ...e, card: { ...e.card, exhausted: true } } : e)) } };
+        const before = tableLayout(canvas.width, canvas.height, ready.views, ready.piles, { scale });
+        const after = tableLayout(canvas.width, canvas.height, exhausted, tired.piles, { scale });
+        const ground = before.zones.hand.y - 6 * scale - (before.zones.play.y + before.zones.play.h);
+        if (after.zones.play.h === before.zones.play.h || after.zones.play.h - before.zones.play.h > ground) continue;
+        wrapped += 1;
+        const where = `${scale} ${canvas.width}x${canvas.height}`;
+        expect(after.zones.staging.y, where).toBeCloseTo(before.zones.staging.y, 9);
+        expect(after.zones.engaged.y, where).toBeCloseTo(before.zones.engaged.y, 9);
+        expect(after.zones.play.y, where).toBeCloseTo(before.zones.play.y, 9);
+      }
+    }
+    // The 12.9" tablet has the ground for it.
+    expect(wrapped).toBeGreaterThan(0);
+  });
+
+  it("leaves a wide, short phone's table as it was: its card is not at its cap, so its edges do not grow", () => {
+    for (const scale of SCALES) {
+      const { views: v, piles } = views(8);
+      const layout = tableLayout(707, 338, v, piles, { scale });
+      expect(layout.card.w).toBeLessThan(Math.floor(96 * scale));
+      expect(layout.zones.questStage.x).toBeCloseTo(8 * scale, 9);
+      expect(layout.zones.staging.x).toBeCloseTo(8 * scale + Math.round(layout.card.w * 1.5) + 8 * scale, 9);
+    }
   });
 });

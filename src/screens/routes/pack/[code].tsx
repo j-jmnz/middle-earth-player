@@ -10,6 +10,7 @@ import { useListGutter } from "../../list-gutter";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { cardImageUrl, shownCardImage } from "../../images/policy";
+import { cardCorner } from "../../../play/card-corner";
 import { RowCardImage } from "../../images/picture";
 import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
@@ -53,7 +54,7 @@ function PackCardRow({ item, onPress, onPreview }: { item: PackCard; onPress: ()
       label={item.name}
       detail={item.code}
       leading={
-        <View className="overflow-hidden rounded bg-raised" style={{ width: 32 * s, height: 44 * s }}>
+        <View className="overflow-hidden bg-raised" style={{ width: 32 * s, height: 44 * s, borderRadius: cardCorner(32 * s, 44 * s) }}>
           {preview ? <RowCardImage code={item.code} source={preview} width={32 * s} height={44 * s} /> : null}
         </View>
       }

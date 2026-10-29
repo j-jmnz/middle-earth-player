@@ -1,7 +1,7 @@
 // A whole card's picture in a box, its corners rounded like the card screen's (card-corner.ts). The picture keeps its own shape
 // (contained, as before), and the rounding is clipped to the picture itself rather than the box, so a picture whose shape differs from
 // the box (a sideways quest card, a scan with a different trim) still shows rounded corners. Until the file has loaded the box is the
-// picture's guess.
+// picture's guess and the picture is contained in it, never cropped.
 import { Image, type ImageLoadEventData, type ImageSource } from "expo-image";
 import { useState } from "react";
 import { View } from "react-native";
@@ -31,7 +31,7 @@ export function CardImage({ source, recyclingKey, width, height, accessibilityLa
       <View style={{ position: "absolute", left: fit.x, top: fit.y, width: fit.w, height: fit.h, borderRadius: cardCorner(fit.w, fit.h), overflow: "hidden" }}>
         <Image
           recyclingKey={recyclingKey}
-          contentFit="cover"
+          contentFit={shape ? "cover" : "contain"}
           cachePolicy={cachePolicy}
           accessible={accessibilityLabel != null}
           accessibilityLabel={accessibilityLabel}

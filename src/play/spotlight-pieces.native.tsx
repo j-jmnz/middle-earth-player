@@ -6,7 +6,8 @@ import { Circle, Group, Image, RoundedRect, Text, vec, type SkFont, type SkImage
 import type { ReactNode } from "react";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
-import { CanvasIcon, CardBody, Outlined, RADIUS, type BackImages, type Fonts } from "./canvas-pieces.native.tsx";
+import { cardCorner } from "./card-corner.ts";
+import { CanvasIcon, CardBody, Outlined, type BackImages, type Fonts } from "./canvas-pieces.native.tsx";
 import type { IconName } from "./icon-map.ts";
 import type { Rect } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
@@ -49,7 +50,7 @@ export function StageCard({ spot, rect, image, name, sphere, fonts, backs, t, s,
 /** The night veil over a destroyed target, growing to 50% over the first 40% of its fall. */
 export function Veil({ rect, frame, t, s }: { rect: Rect; frame: SharedValue<Frame>; t: TableTokens; s: number }) {
   const opacity = useDerivedValue(() => frame.get().veil);
-  return <RoundedRect x={rect.x} y={rect.y} width={rect.w} height={rect.h} r={RADIUS * s} color={t.night} opacity={opacity} />;
+  return <RoundedRect x={rect.x} y={rect.y} width={rect.w} height={rect.h} r={cardCorner(rect.w, rect.h)} color={t.night} opacity={opacity} />;
 }
 
 /** A big pill under a group: the stat's icon and its number in Cinzel Bold. The defense pill bounces when the attack is blocked. */

@@ -73,7 +73,9 @@ export function spreadLayout(layout: TableLayout, canvas: { width: number; heigh
   const cornerOverhang = (scale: number) => (first.h * scale * Math.sin(widest)) / 2 - (first.w * scale * (1 - Math.cos(widest))) / 2;
   // The scale needs the room and the room needs the scale: `fit` once for a flat row's scale, whose overhang sets the margin, and
   // again for the room that leaves. The second scale is never larger, so its corners fit in the margin the first one set aside.
-  const fit = (room: number) => Math.min(SHAPE.scrubScale, (room - (count - 1) * reach) / first.w);
+  // A hand too long for a 44 pt slice of every card even at its own size keeps its own size and a thinner, even slice: the nearest
+  // center still picks, and the lifted copy shows which card it is.
+  const fit = (room: number) => Math.max(1, Math.min(SHAPE.scrubScale, (room - (count - 1) * reach) / first.w));
   const room = canvas.width - 2 * Math.max(edge, cornerOverhang(fit(canvas.width - 2 * edge)));
   const scale = fit(room);
   const w = first.w * scale;

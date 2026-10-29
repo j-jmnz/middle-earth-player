@@ -32,7 +32,12 @@ function redraw(image: SkImage, w: number, h: number): SkImage {
 function atSize(full: SkImage, box: Box): SkImage {
   const target = coverPixels({ w: full.width(), h: full.height() }, box, PixelRatio.get());
   let image = full;
-  while (image.width() >= 2 * target.w && image.height() >= 2 * target.h) image = redraw(image, Math.round(image.width() / 2), Math.round(image.height() / 2));
+  while (image.width() >= 2 * target.w && image.height() >= 2 * target.h) {
+    const half = redraw(image, Math.round(image.width() / 2), Math.round(image.height() / 2));
+    // No surface (memory pressure): keep what there is rather than try again.
+    if (half === image) return image;
+    image = half;
+  }
   return image.width() === target.w && image.height() === target.h ? image : redraw(image, target.w, target.h);
 }
 
@@ -62,7 +67,15 @@ export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: 
   const loading = useRef(new Map<string, Box>());
   const wantedNow = useRef<ReadonlyMap<string, Box>>(new Map());
   const [images, setImages] = useState<ReadonlyMap<string, SkImage>>(() => new Map());
+  // Copies replaced or released, disposed only once the map without them is drawn: until then the canvas may still draw them.
+  const retired = useRef<SkImage[]>([]);
   const key = keyOf(boxes);
+
+  useEffect(() => {
+    const done = retired.current;
+    retired.current = [];
+    for (const image of done) image.dispose();
+  }, [images]);
 
   useEffect(() => {
     wantedNow.current = boxes;
@@ -70,7 +83,7 @@ export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: 
     let changed = false;
     for (const [code, copy] of held.current) {
       if (boxes.has(code)) continue;
-      copy.image.dispose();
+      retired.current.push(copy.image);
       held.current.delete(code);
       changed = true;
     }
@@ -91,7 +104,8 @@ export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: 
           image.dispose();
           return;
         }
-        held.current.get(code)?.image.dispose();
+        const old = held.current.get(code)?.image;
+        if (old) retired.current.push(old);
         held.current.set(code, { image, box });
         publish();
       });
@@ -106,6 +120,8 @@ export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: 
       wantedNow.current = new Map();
       for (const copy of owned.values()) copy.image.dispose();
       owned.clear();
+      for (const image of retired.current) image.dispose();
+      retired.current = [];
     };
   }, []);
 
