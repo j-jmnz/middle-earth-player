@@ -55,11 +55,19 @@ export function trayCount(sheet: Sheet, choice: Choice): string {
     case "pick":
       return `${wordOf(sheet.verb)} · ${choice.ids.length > 0 ? `1 of ${sheet.options.length} picked` : `pick 1 of ${sheet.options.length}`}`;
     case "trigger":
-      return choice.ids.length > 0 ? "1 picked" : `Pick one of ${sheet.options.length}`;
+      return `${sheet.timing} · ${choice.ids.length > 0 ? `1 of ${sheet.options.length} picked` : `pick 1 of ${sheet.options.length}`}`;
     case "window":
     case "outcome":
       return "";
   }
+}
+
+/**
+ * A Response the player may use opens listed on paper, beside the dock's Pass, even when its cards are on the table (user
+ * request, 2026-10-29): the player sees what can answer without looking for a glow.
+ */
+export function listsResponses(sheet: Sheet, windowKind: string | null | undefined): boolean {
+  return sheet.kind === "trigger" && windowKind === "response" && sheet.options.length > 0;
 }
 
 /** The tray is open when the choice is on paper and its sheet is not the one the player folded. */
@@ -71,10 +79,11 @@ export function trayOpen(onPaper: boolean, foldedKey: string | null, sheetKey: s
  * Where a tap on the canvas (or a drop) goes while the choice is on paper: with the tray open it folds it and goes no further, so
  * it picks nothing, opens no pile and sends no intent; with a screen reader on (the tray is the default and every choice stays a
  * control) or no tray open it is routed as usual: a pile's list, or a pick for the open moment. While the table peeks at the other
- * seat a card is never picked: it only opens its preview (`peeking`).
+ * seat a card is never picked: it only opens its preview (`peeking`). A card the open tray lists because it answers a
+ * Response window (`answers`, listsResponses) is picked from the table too, so its glow still works with the tray open.
  */
-export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking?: boolean }): "fold" | "pile" | "preview" | "pick" {
-  if (state.panelOpen && !state.reader) return "fold";
+export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking?: boolean; answers?: boolean }): "fold" | "pile" | "preview" | "pick" {
+  if (state.panelOpen && !state.reader && !(state.answers && !state.peeking)) return "fold";
   if (state.cardId.startsWith("pile:")) return "pile";
   return state.peeking ? "preview" : "pick";
 }
@@ -86,7 +95,7 @@ export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: s
  */
 export type TapAction = "fold" | "pile" | "picked" | "preview" | "none";
 
-export function tapAction(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking: boolean; faceDown: boolean }, pick: (cardId: string) => boolean): TapAction {
+export function tapAction(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking: boolean; faceDown: boolean; answers?: boolean }, pick: (cardId: string) => boolean): TapAction {
   const route = tapRoute(state);
   if (route === "fold" || route === "pile") return route;
   if (route === "pick" && pick(state.cardId)) return "picked";

@@ -1,22 +1,17 @@
 // The dock beside the table, in reach of the right thumb: what the engine is asking (the step, the moment, a sentence), the
 // engine's numbers for it (willpower against threat, attack against defense), what the player has picked on the table, and
 // the buttons that confirm it (docs/design-system.md, Table). Picking happens on the table; nothing here is sent until a
-// button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did.
-import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, useWindowDimensions, View } from "react-native";
-import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
+// button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did (moment-banner.tsx).
+import { useRef, useState, type ComponentRef } from "react";
+import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
 import { isDense, labelChars, PILL_PT, planWords, wordsWindow } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
-import { layoutAnim, useMotionScale, useReduceMotion } from "./motion-run.ts";
-import { MOTION } from "./motion-tokens.ts";
-import { BEAT_MS, type Moment } from "./outcome.ts";
 import type { Readout } from "./readout.ts";
 import { Stats } from "./sheet-paper.tsx";
 import type { Unavailable } from "./sheet-types.ts";
 import type { Dock, DockButton } from "./table-choice.ts";
-import { LineMark } from "./table-chrome.tsx";
 import { panelSurface } from "./surfaces.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
@@ -205,72 +200,5 @@ export function TableDock({
         </View>
       </View>
     </View>
-  );
-}
-
-const BANNER_WIDTH = 440;
-
-/**
- * What the last intent did, centered at the top of the screen for a few seconds, over the table and any open panel. `top` is
- * where it hangs (under the top bar); `width` is the screen's, so it never runs off a narrow phone. Taps go through it to
- * the cards under it; the log keeps every step. The caller keys it on the moment, so each one enters and is announced.
- */
-export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; top: number; width: number; onBeat?: (cards: readonly string[]) => void }) {
-  const t = useTableTokens();
-  const s = useUiScale();
-  const edge = moment.tone === "good" ? t.accentHigh : moment.tone === "bad" ? t.threat : t.faint;
-  const bad = moment.tone === "bad" && t.depth !== "light";
-  const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
-  // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
-  useEffect(() => {
-    AccessibilityInfo.announceForAccessibility(label);
-  }, [label]);
-  // The fades: the banner and each line come in and the banner goes out over MOTION.bannerIn and bannerOut.
-  const scale = useMotionScale();
-  const fade = useMemo(() => ({ enter: layoutAnim(FadeInUp, MOTION.bannerIn, scale), leave: layoutAnim(FadeOut, MOTION.bannerOut, scale) }), [scale]);
-  // Resolve in beats: one line more every BEAT_MS, each ringing on the table the cards it names; reduced motion shows all.
-  const reduceMotion = useReduceMotion();
-  const [shownLines, setShownLines] = useState(reduceMotion ? moment.lines.length : 1);
-  useEffect(() => {
-    if (shownLines >= moment.lines.length) return;
-    const timer = setTimeout(() => setShownLines((count) => count + 1), BEAT_MS);
-    return () => clearTimeout(timer);
-  }, [shownLines, moment.lines.length]);
-  const beatCards = moment.lines[Math.max(0, shownLines - 1)]?.cards ?? [];
-  const beatKey = beatCards.join(",");
-  useEffect(() => {
-    onBeat?.(beatKey === "" ? [] : beatKey.split(","));
-    return () => onBeat?.([]);
-  }, [beatKey, onBeat]);
-  const box = { minWidth: Math.min(260 * s, width - 32), maxWidth: Math.min(BANNER_WIDTH * s, width - 32) };
-  return (
-    <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="none" style={{ position: "absolute", top, left: 0, right: 0, alignItems: "center" }}>
-      {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
-      <View
-        className="rounded-card"
-        style={{
-          ...box,
-          ...panelSurface(false, t),
-          // A failure or an attack is a dark red panel (docs/design-system.md, Table: the combat banner).
-          ...(bad ? { backgroundColor: "rgba(28,16,15,0.95)", backgroundImage: "linear-gradient(180deg, rgba(40,20,18,0.94), rgba(14,12,13,0.96))" } : {}),
-        }}
-      >
-        <View testID="moment" accessible accessibilityLabel={label} className="overflow-hidden rounded-card">
-          {/* The tone, as a 3 pt band along the top: silver for a success, threat red for a failure or an engagement. */}
-          <View style={{ height: 3 * s, backgroundColor: edge, ...(moment.tone === "bad" ? {} : { opacity: 0.8 }) }} />
-          <View className="items-center px-4 pb-2 pt-1.5">
-            <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 * s }}>
-              {moment.title}
-            </Text>
-            {moment.lines.slice(0, shownLines).map((line, index) => (
-              <Animated.View key={index} entering={fade.enter} className="mt-0.5 flex-row items-center gap-2">
-                <LineMark mark={line.mark} tint="bone" size={14 * s} />
-                <Text className="shrink text-label text-bone">{line.text}</Text>
-              </Animated.View>
-            ))}
-          </View>
-        </View>
-      </View>
-    </Animated.View>
   );
 }
