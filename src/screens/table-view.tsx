@@ -22,7 +22,8 @@ import type { SheetNames } from "../play/sheet-types";
 import type { ReduceContext, TableStore } from "../play/store";
 import { TableCanvas } from "../play/table-canvas";
 import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
-import { MomentBanner, TableDock } from "../play/table-dock";
+import { MomentBanner } from "../play/moment-banner";
+import { TableDock } from "../play/table-dock";
 import { TableLayers } from "../play/table-layers";
 import { openReading, type Reading } from "../play/reading";
 import { phaseCarousel } from "../play/carousel";
@@ -32,6 +33,7 @@ import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
+import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
 import { questScaleOf } from "../play/quest-scale";
@@ -355,8 +357,20 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           router.push({ pathname: "/settings", params: { from: "table" } });
         }}
       />
-      {/* Over the top bar, the table and any open panel, centered at the screen's top edge (user request, 2026-10-29). */}
-      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + 4 * s} width={screen.width} onBeat={choice.onBeat} onDismiss={choice.dismissBanner} /> : null}
+      {/* Over the top bar, the table and any open panel, centered over the canvas at the screen's top edge (user request,
+          2026-10-29), so it never covers the command column's tray. While the table peeks it hangs under the peek pill, so
+          Back to Player 1 stays in reach. */}
+      {choice.banner ? (
+        <MomentBanner
+          key={choice.bannerKey}
+          moment={choice.banner}
+          top={peek.words ? insets.top + (TOP_BAR + PEEK_ROOM) * s : insets.top + 4 * s}
+          left={insets.left}
+          right={insets.right + commandWidth}
+          onBeat={choice.onBeat}
+          onDismiss={choice.dismissBanner}
+        />
+      ) : null}
       {preview && previewed && shown ? (
         <CardPreview
           key={preview.id}

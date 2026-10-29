@@ -164,8 +164,9 @@ export function CardPreview({
         {frame}
         {wide ? (
           <Animated.View style={[{ flex: 1, maxWidth: 360 * s, marginLeft: 20 * s, maxHeight: size.height }, buttonsStyle]}>
-            {/* A tap here closes the preview too: only Details and the rows of what is with the card do something else (user request, 2026-10-29). */}
-            <Pressable accessible={false} onPress={close} style={{ flexShrink: 1 }}>
+            {/* Not a control of its own: a tap here reaches the scrim and closes the preview too; only Details and the rows of what is
+                with the card do something else (user request, 2026-10-29). */}
+            <View style={{ flexShrink: 1 }}>
               <Text testID="card-preview-name" accessibilityRole="header" className="font-display text-title text-bone">
                 {shown.title ?? shown.name}
               </Text>
@@ -227,7 +228,7 @@ export function CardPreview({
                 ) : null}
               </ScrollView>
               {buttons ? <View className="mt-2 flex-row gap-3">{buttons}</View> : null}
-            </Pressable>
+            </View>
           </Animated.View>
         ) : buttons ? (
           <Animated.View style={[{ flexDirection: "row", gap: 12 * s, marginTop: 16 * s }, buttonsStyle]}>{buttons}</Animated.View>

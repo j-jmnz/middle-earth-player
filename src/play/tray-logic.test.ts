@@ -94,6 +94,15 @@ describe("a Response window", () => {
     expect(listsResponses({ ...trigger, options: [] }, "response")).toBe(false);
     expect(listsResponses(pick, "response")).toBe(false);
   });
+  it("lets a tap on a listed Response's card pick it with the tray open, and folds for any other tap", () => {
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: "c1", answers: true })).toBe("pick");
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: "c2", answers: false })).toBe("fold");
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: "c1", answers: true, peeking: true })).toBe("fold");
+  });
+  it("leads the count with the Response's timing", () => {
+    expect(trayCount(trigger, { key: "t", ids: [], shares: [] })).toBe("Response · pick 1 of 1");
+    expect(trayCount(trigger, { key: "t", ids: ["c1|e1"], shares: [] })).toBe("Response · 1 of 1 picked");
+  });
 });
 
 describe("the outside tap", () => {

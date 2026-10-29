@@ -117,7 +117,8 @@ export function useTableChoice({
   // On paper: when the player asked, when a screen reader is on (a card drawn only on the canvas is no control for it), or
   // when the choices are not cards drawn whole on the table. The action window itself stays on the table.
   // A Response the player may use opens listed, beside the dock's Pass (user request, 2026-10-29).
-  const asked = (live?.panel ?? false) || listed === sheet.key || listsResponses(sheet, game.window?.kind) || (reader && sheet.kind !== "window" && sheet.kind !== "outcome" && tappable(sheet).size > 0);
+  const responses = listsResponses(sheet, game.window?.kind);
+  const asked = (live?.panel ?? false) || listed === sheet.key || responses || (reader && sheet.kind !== "window" && sheet.kind !== "outcome" && tappable(sheet).size > 0);
   const panel = asked || !onTheTable(sheet, onTable);
   const panelOpen = trayOpen(panel, folded, sheet.key);
   const passLegal = legal.some((intent) => intent.type === "Pass");
@@ -136,7 +137,7 @@ export function useTableChoice({
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)
   // does not draw the table again (docs/architecture.md, State). Card ids carry no commas.
-  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow } = highlightKeys({ game, seat: acting, sheet, choice, panel, beatKey });
+  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow } = highlightKeys({ game, seat: acting, sheet, choice, panel: panel && !(responses && onTheTable(sheet, onTable)), beatKey });
   const highlight = useMemo((): TableHighlight => highlightOf({ glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow }), [glow, pickedKey, share, dim, markKey, mutedKey, beatNow]);
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";
@@ -232,12 +233,14 @@ export function useTableChoice({
   // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
   const onTap = useCallback(
     (cardId: string) => {
-      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]) }, pick);
+      // A Response listed only so it shows beside Pass still glows on the table, and a tap on its card picks it.
+      const answers = responses && tappable(sheet).has(cardId);
+      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]), answers }, pick);
       if (action === "fold") setFolded(sheet.key);
       else if (action === "pile") onPile(cardId.slice(5));
       else if (action === "preview") onPreview(cardId);
     },
-    [panelOpen, reader, peeking, sheet.key, pick, onPile, onPreview, game],
+    [panelOpen, reader, peeking, sheet, responses, pick, onPile, onPreview, game],
   );
   const onTile = useCallback((id: string) => void pick(id), [pick]);
   const tapOnTable = useStable(onTap);
