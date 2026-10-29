@@ -3,7 +3,7 @@
 // pill. Opening it changes nothing in the dock. It has an accessible "✕ Close" row, closes on a tap outside and on Android Back
 // (back.ts), and scrolls only past the room it has (`maxHeight`), which holds a guide, a note and two refusals.
 import { useRef } from "react";
-import { ScrollView, Text, useWindowDimensions, View } from "react-native";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 
 import { CLOSE_ROW, linesPlace } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
@@ -12,6 +12,7 @@ import { PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx
 import type { TableTokens } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 const GAP = 6;
 const toneOf = (t: TableTokens) => ({ guide: t.bone, note: t.muted, unavailable: t.faint }) as const;

@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { campaignPath, openNode, type PathNode } from "../../../campaign/path";
 import { tileSurface } from "../../../play/surfaces";
@@ -21,6 +21,7 @@ import { goBack } from "../../go-back";
 import { droppedSentence, useSave } from "../../use-save";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
+import { Text } from "../../../play/text";
 
 // The right pane's width range (Medium's points) in an expanded window: the journey bar, the pool and the next move.
 const PATH_SIDE_RANGE = { min: 320, max: 380 } as const;
@@ -46,13 +47,13 @@ function Medallion({ node }: { node: PathNode }) {
   if (node.status === "current") {
     return (
       <View className="items-center justify-center" style={{ width: 38 * s, height: 38 * s, borderRadius: 19 * s, backgroundColor: palette.night, borderWidth: 2, borderColor: palette.accent, boxShadow: `0 0 16px ${withAlphaHex(palette.accent, 0.6)}` }}>
-        <Text className="font-display-bold text-body text-accentHigh">{String(node.number)}</Text>
+        <Text className="font-display text-body text-accentHigh">{String(node.number)}</Text>
       </View>
     );
   }
   return (
     <View className="items-center justify-center" style={{ width: 30 * s, height: 30 * s, borderRadius: 15 * s, backgroundColor: palette.raised, borderWidth: 1, borderColor: palette.hairline }}>
-      <Text className="font-display-bold text-label text-faint">{String(node.number)}</Text>
+      <Text className="font-display text-label text-faint">{String(node.number)}</Text>
     </View>
   );
 }
@@ -168,10 +169,10 @@ export default function CampaignPath() {
     return cardNames(catalog, [...save.log.campaignPool.map((card) => card.code), ...save.log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...Object.values(save.log.earned).flat(), ...save.log.carryOver.map((card) => card.code)]);
   }, [catalog, save]);
 
-  if (!loaded) return <Screen scene="ember" testID="campaign-path"><NavBar onBack={() => goBack(router, "/")} backTestID="path-back" /><BodyText tone="muted">Loading</BodyText></Screen>;
+  if (!loaded) return <Screen scene="path" testID="campaign-path"><NavBar onBack={() => goBack(router, "/")} backTestID="path-back" /><BodyText tone="muted">Loading</BodyText></Screen>;
   if (!save || !campaign) {
     return (
-      <Screen scene="ember" testID="campaign-path">
+      <Screen scene="path" testID="campaign-path">
         <NavBar onBack={() => goBack(router, "/")} backTestID="path-back" />
         <BodyText tone="danger">That playthrough is not on this phone.</BodyText>
       </Screen>
@@ -272,7 +273,7 @@ export default function CampaignPath() {
   // next move pinned at the pane's foot (docs/design-system.md, Path).
   if (size === "expanded") {
     return (
-      <Screen scene="ember" testID="campaign-path">
+      <Screen scene="path" testID="campaign-path">
         {navBar}
         <TwoPane
           kind="supporting"
@@ -300,7 +301,7 @@ export default function CampaignPath() {
   }
 
   return (
-    <Screen scene="ember" testID="campaign-path">
+    <Screen scene="path" testID="campaign-path">
       {navBar}
       <View className="pb-3 pt-1">{journey}</View>
       <ScreenScroll bottom={16} max="readable">

@@ -2,7 +2,7 @@
 // by name. A tap picks, as on the canvas, and a long press previews; the cards the open moment lets the player tap are
 // outlined, the picked ones filled. The phone draws the canvas in table-canvas.native.tsx.
 import { useMemo } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";
 
 import { NO_HIGHLIGHT } from "./peek.ts";
@@ -11,6 +11,7 @@ import type { TableCanvasProps } from "./table-canvas-types.ts";
 import type { TableTokens } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 const ZONE_WORD: Record<ZoneId, string> = {
   questStage: "Quest",

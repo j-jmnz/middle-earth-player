@@ -1,12 +1,13 @@
 import { useFocusEffect, useIsFocused } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AccessibilityInfo, Text, View } from "react-native";
+import { AccessibilityInfo, View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
 import { layoutAnim, useMotionScale } from "../play/motion-run";
 import { MOTION } from "../play/motion-tokens";
 import { TextButton } from "./chrome";
 import { dismissToast, leaveToastScreen, toastDuration, useToast } from "./toast";
+import { Text } from "../play/text";
 
 function useScreenReader(): boolean {
   const [enabled, setEnabled] = useState(false);

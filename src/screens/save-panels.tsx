@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import type { NextStep } from "../campaign/path";
 import { tileSurface } from "../play/surfaces";
@@ -6,6 +6,7 @@ import { useTableTokens } from "../play/use-table-tokens";
 import { PortraitRow, SceneCard, type ArtCard } from "./art";
 import { Chevron, Chip, Eyebrow, JourneyBar, Label, PrimaryButton, SecondaryButton } from "./chrome";
 import { usePalette } from "./palette-hook";
+import { Text } from "../play/text";
 
 // The campaign list's panels for one playthrough: its summary and the Continue card on top. Manage and Archived put
 // KeepOrDelete (keep-or-delete.tsx) under the summary.

@@ -5,7 +5,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import type { RunKind, RunRecord, RunResult } from "../campaign/runs";
 import { BodyText, Chevron, Chip, Label, NavBar, Screen, Segmented, ToggleChip } from "./chrome";
@@ -21,6 +21,7 @@ import { courseWords, deletedWords, emptyWords, playthroughWords, plural, runDat
 import { usePalette } from "./palette-hook";
 import { existingRefs, listRuns } from "./run-store";
 import { seatWord } from "./seats";
+import { Text } from "../play/text";
 
 const KINDS = ["Campaign", "Standalone"] as const;
 type KindWord = (typeof KINDS)[number];
@@ -186,7 +187,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
   );
 
   return (
-    <Screen testID="history" scene="plain">
+    <Screen testID="history" scene="calm">
       <NavBar onBack={() => goBack(router, kind === "campaign" ? "/" : "/scenarios")} backTestID="history-back" title="History" />
       <View className="min-h-0 flex-1" testID="history-list" onLayout={list.onLayout}>
         <FlashList

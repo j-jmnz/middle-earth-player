@@ -3,7 +3,7 @@
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 
 import { GameIcon } from "./game-icon.tsx";
@@ -17,6 +17,7 @@ import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLev
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
@@ -81,7 +82,7 @@ export function ThreatRing({
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2 * s, borderColor: threat.eliminated ? t.hairline : t.accent }}>
-        <Text testID={`${id}-value`} className="font-display-bold text-title text-bone">
+        <Text testID={`${id}-value`} className="font-display text-title text-bone">
           {String(threat.threat)}
         </Text>
       </View>
@@ -178,7 +179,7 @@ function ThreatDial({
           style={{ minWidth: 64 * s, borderWidth: 2 * s, borderColor: look.edge, backgroundColor: look.fill }}
         >
           {icon ? <GameIcon name={icon} size={18 * s} tint={critical ? "onThreat" : "danger"} /> : null}
-          <Text testID={`${id}-value`} className="font-display-bold text-title text-bone" style={critical ? { color: t.onThreat } : undefined}>
+          <Text testID={`${id}-value`} className="font-display text-title text-bone" style={critical ? { color: t.onThreat } : undefined}>
             {String(threat.threat)}
           </Text>
           {elimination && !threat.eliminated ? (
@@ -216,7 +217,7 @@ function ThreatDial({
             exiting={badge.out}
             style={{ borderRadius: 999, paddingHorizontal: 6 * s, borderWidth: 1, borderColor: delta.lowered ? t.accent : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.accent : t.threat, 0.22) }}
           >
-            <Text testID={`${id}-delta`} className="font-display-bold text-label text-bone">
+            <Text testID={`${id}-delta`} className="font-display text-label text-bone">
               {delta.text}
             </Text>
           </Animated.View>

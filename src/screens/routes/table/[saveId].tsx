@@ -25,7 +25,7 @@ export default function TableScreen() {
         ? "The scenario in progress was dropped because the rules or the card data changed. Your log and decks are kept."
         : "No scenario is open.";
     return (
-      <Screen testID="table" scene="plain">
+      <Screen testID="table" scene="calm">
         <NavBar onBack={() => goBack(router, saveId ? { pathname: "/path/[saveId]", params: { saveId } } : "/")} backTestID="table-back" backLabel="Path" />
         <BodyText tone="muted" testID="table-closed">
           {sentence}

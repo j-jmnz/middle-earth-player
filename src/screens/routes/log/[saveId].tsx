@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { cards } from "../../../catalog/schema";
@@ -17,6 +17,7 @@ import { useSave } from "../../use-save";
 import { GameIcon } from "../../../play/game-icon";
 import type { IconName } from "../../../play/icon-map";
 import { useUiScale } from "../../../play/ui-scale";
+import { Text, TextInput } from "../../../play/text";
 
 function Row({ label, value, testID, icon }: { label: string; value: string; testID: string; icon?: IconName }) {
   const s = useUiScale();
@@ -24,7 +25,7 @@ function Row({ label, value, testID, icon }: { label: string; value: string; tes
     <View className="border-b border-inkLine py-3">
       <View className="flex-row items-center gap-1">
         {icon ? <GameIcon name={icon} size={12 * s} tint="inkLabel" /> : null}
-        <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
+        <Text className="font-display text-eyebrow uppercase text-inkLabel">{label}</Text>
       </View>
       <Text testID={testID} className="mt-0.5 text-body text-ink">
         {value}
@@ -71,11 +72,11 @@ export default function Log() {
     setEdited(null);
   }
   const back = <NavBar onBack={() => { saveNotes(); goBack(router, save ? { pathname: "/path/[saveId]", params: { saveId: save.id } } : "/"); }} backTestID="log-back" backLabel="Path" right={save ? <IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId) })} /> : undefined} />;
-  if (!loaded) return <Screen testID="log" scene="plain">{back}<BodyText tone="muted">Loading</BodyText></Screen>;
+  if (!loaded) return <Screen testID="log" scene="ember">{back}<BodyText tone="muted">Loading</BodyText></Screen>;
   const campaign = save ? campaignOf(save.campaignId) : null;
   if (!save || !campaign) {
     return (
-      <Screen testID="log" scene="plain">
+      <Screen testID="log" scene="ember">
         {back}
         <BodyText tone="danger">That playthrough is not on this phone.</BodyText>
       </Screen>
@@ -95,7 +96,7 @@ export default function Log() {
   const notes = edited ?? log.notes;
 
   return (
-    <Screen testID="log" scene="plain">
+    <Screen testID="log" scene="ember">
       {back}
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-safe" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
         <Column>
@@ -128,20 +129,20 @@ export default function Log() {
           {/* The cards a Resolution keeps for the next campaign, not this one (Escape from Dol Guldur's Mendor, 01131:B:2). */}
           {log.carryOver.length > 0 ? <Row label="Next Campaign" value={carryWords(log.carryOver, nameOf)} testID="log-carry-over" /> : null}
           <View className="border-b border-inkLine py-3">
-            <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">Scenarios Completed</Text>
+            <Text className="font-display text-eyebrow uppercase text-inkLabel">Scenarios Completed</Text>
             {campaign.scenarios.map((id) => {
               const score = log.scenarios[id];
               return (
                 <View key={id} testID={`log-scenario-${id}`} className="mt-1 flex-row items-baseline justify-between">
                   <Text className={score ? "flex-1 text-body text-ink" : "flex-1 text-body text-inkMuted"}>{names[id] ?? id}</Text>
-                  <Text className={score ? "font-display-bold text-label text-ink" : "text-label text-inkMuted"}>{score ? `${score.rounds} rounds · ${score.score}` : "Not completed"}</Text>
+                  <Text className={score ? "font-display text-label text-ink" : "text-label text-inkMuted"}>{score ? `${score.rounds} rounds · ${score.score}` : "Not completed"}</Text>
                 </View>
               );
             })}
           </View>
           <Row label="Campaign Total" value={String(log.score)} testID="log-score" />
           <View className="py-3">
-            <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">Notes</Text>
+            <Text className="font-display text-eyebrow uppercase text-inkLabel">Notes</Text>
             <TextInput
               testID="log-notes"
               multiline

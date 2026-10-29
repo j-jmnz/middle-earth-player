@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
+import { StyleSheet, View, type LayoutChangeEvent } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
@@ -29,6 +29,7 @@ import { useCachedImage } from "../../images/store";
 import { goBack } from "../../go-back";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
+import { Text } from "../../../play/text";
 
 type FactsRow = {
   typeCode: string;
@@ -125,7 +126,7 @@ function Stat({ label, value, icon }: { label: string; value: string; icon: Icon
     <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-20 items-center rounded-tile px-3 py-2" style={tileSurface(false, t)}>
       <View className="flex-row items-center gap-1.5">
         <GameIcon name={icon} size={18 * s} tint="bone" />
-        <Text className="font-display-bold text-title text-bone">{value}</Text>
+        <Text className="font-display text-title text-bone">{value}</Text>
       </View>
       <Text className="mt-0.5 text-label text-muted">{label}</Text>
     </View>
@@ -297,7 +298,7 @@ export default function CardScreen() {
   );
 
   return (
-    <Screen scene="plain">
+    <Screen scene="calm">
       {/* The card's own picture, blurred and darkened, as the light behind it: each card sets its own mood. Drawn once, behind. */}
       {previewSource ? (
         <View pointerEvents="none" style={[StyleSheet.absoluteFill, { height: 520 * s }]}>

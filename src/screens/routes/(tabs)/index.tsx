@@ -1,6 +1,6 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState, type ComponentRef } from "react";
-import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
+import { AccessibilityInfo, ScrollView, View } from "react-native";
 
 import { carryOffers } from "../../../campaign/carry-over";
 import { campaignPath, nextStep } from "../../../campaign/path";
@@ -22,6 +22,7 @@ import { ContinuePanel, DELETE_SENTENCE, SaveRow, SaveSummary, describe, nextSum
 import { nextStepHref, pathHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
 import { useSplitColumns } from "../../use-split-columns";
+import { Text } from "../../../play/text";
 
 type Seats = 1 | 2;
 
@@ -372,7 +373,7 @@ export default function CampaignList() {
   );
 
   return (
-    <Screen testID="campaign-list" scene="dusk">
+    <Screen testID="campaign-list" scene="moon">
       {/* An expanded window scrolls in a wide column; the measurer (outside the columns) decides whether it splits, else one readable column. */}
       <ScreenScroll scrollRef={scroll} max={size === "expanded" ? "wide" : "readable"}>
         {size === "expanded" ? <View style={{ height: 0 }} onLayout={columns.measure} /> : null}

@@ -1,7 +1,7 @@
 // The chrome's controls (docs/design-system.md, Components): the round icon button, text buttons, the primary and secondary
 // plates, filter chips, the segmented switch and the search field. Every fill and text colour of a button is a style, not only a
 // class. Re-exported by chrome.tsx.
-import { Pressable, Text, TextInput, View, type LayoutChangeEvent } from "react-native";
+import { Pressable, View, type LayoutChangeEvent } from "react-native";
 import { useMemo, type ReactNode } from "react";
 
 import { Chevron, Magnifier } from "./chrome-marks";
@@ -12,6 +12,7 @@ import { accentPlate, accentSurface, raisedEdgeOf, slateSurface } from "../play/
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 import { touch, useUiScale } from "../play/ui-scale";
+import { Text, TextInput } from "../play/text";
 
 // The night switch row the phase carousel's Stops and the Settings screen share (src/play cannot import screens, so it lives there).
 export { SettingSwitch } from "../play/setting-switch";
@@ -178,7 +179,7 @@ export function PrimaryButton({
     >
       {({ pressed }) => (
         <View className="items-center justify-center rounded-button px-6" style={{ minHeight: 56 * s, ...fill(pressed), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}>
-          <Text className="font-display-bold uppercase" style={{ ...buttonLabelOf(s), color }}>
+          <Text className="font-display uppercase" style={{ ...buttonLabelOf(s), color }}>
             {label}
           </Text>
         </View>
@@ -223,7 +224,7 @@ export function SecondaryButton({
           style={{ minHeight: compact ? touch(s, 44) : 52 * s, ...slateSurface(pressed && !disabled, t), boxShadow: raisedEdgeOf(t) }}
         >
           {icon ? <GameIcon name={icon} size={15 * s} tint={tone === "accent" ? "accent" : tone === "danger" ? "danger" : "bone"} /> : null}
-          <Text className="font-display-bold uppercase" style={{ fontSize: 13 * s, lineHeight: 18 * s, letterSpacing: 1.6 * s, color }}>
+          <Text className="font-display uppercase" style={{ fontSize: 13 * s, lineHeight: 18 * s, letterSpacing: 1.6 * s, color }}>
             {label}
           </Text>
         </View>

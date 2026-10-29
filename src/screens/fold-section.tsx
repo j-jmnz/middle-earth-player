@@ -3,7 +3,7 @@
 // expanded and an announcement on each toggle. The body stays mounted and is hidden, so what it holds keeps its state; there is
 // no animation (docs/design-system.md, Motion: a fold is a state change, not a motion).
 import { useCallback, useState, type ReactNode } from "react";
-import { AccessibilityInfo, Pressable, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, View } from "react-native";
 
 import { withAlphaHex } from "../play/tokens";
 import { Chevron, Chip } from "./chrome-marks";
@@ -12,6 +12,7 @@ import { foldWords, isFolded, type Sections } from "./fold-state";
 import { plural } from "./history-words";
 import { usePalette } from "./palette-hook";
 import { readSections, writeSection } from "./section-store";
+import { Text } from "../play/text";
 
 /** The screen's fold state: `folded` reads a section (its default when the viewer never changed it), `setFolded` changes and stores it. */
 export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => boolean; setFolded: (id: string, folded: boolean, defaultFolded?: boolean) => void } {
@@ -96,7 +97,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, de
           <View className="w-3 items-center">
             <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
           </View>
-          <Text className="shrink font-display-bold text-eyebrow uppercase text-moon">{title}</Text>
+          <Text className="shrink font-display text-eyebrow uppercase text-moon">{title}</Text>
           {badge ? <Chip label={badge} tone="faint" /> : null}
           <View
             className="h-px min-w-3 flex-1"

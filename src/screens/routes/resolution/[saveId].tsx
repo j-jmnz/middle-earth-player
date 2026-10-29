@@ -5,7 +5,7 @@
 // (game-report.tsx).
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useStore } from "zustand";
 
 import { gameReport } from "../../../campaign/report";
@@ -27,6 +27,7 @@ import { routeCode } from "../../route-code";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../table-session";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
+import { Text } from "../../../play/text";
 
 function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; selected: boolean; imagesrc: string | null; onPress: () => void }) {
   const palette = usePalette();
@@ -93,7 +94,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
 
   if (view.kind === "lost") {
     return (
-      <Screen testID="resolution" scene="plain">
+      <Screen testID="resolution" scene="calm">
         {back}
         <ScreenScroll top={32} bottom={24} max="readable">
           <OutcomeTitle won={false} scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
@@ -120,7 +121,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
 
   if (view.kind === "playing") {
     return (
-      <Screen testID="resolution" scene="plain">
+      <Screen testID="resolution" scene="calm">
         <NavBar onBack={() => goBack(router, { pathname: "/table/[saveId]", params: { saveId } })} backTestID="resolution-table" backLabel="Table" />
         <BodyText tone="muted">The scenario is not over yet.</BodyText>
       </Screen>
@@ -268,7 +269,7 @@ export default function ResolutionScreen() {
   const opened = useMemo(() => (session?.ok ? sessionStore(session, user) : null), [session, user]);
   if (!saveId || !session?.ok || !opened) {
     return (
-      <Screen testID="resolution" scene="plain">
+      <Screen testID="resolution" scene="calm">
         <NavBar onBack={() => goBack(router, saveId ? { pathname: "/path/[saveId]", params: { saveId } } : "/")} backTestID="resolution-path" backLabel="Path" />
         <BodyText tone="muted" testID="resolution-closed">
           No scenario is open.

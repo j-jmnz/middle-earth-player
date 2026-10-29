@@ -1,18 +1,19 @@
 // The chrome's words (docs/design-system.md, Type): eyebrows, section headings, the screen title, body and label text.
 // Re-exported by chrome.tsx.
 import { useMemo, type ReactNode } from "react";
-import { Text } from "react-native";
+
 
 import { usePalette } from "./palette-hook";
 import { SectionHeading } from "../play/section-heading";
 import { withAlphaHex } from "../play/tokens";
+import { Text } from "../play/text";
 
 const eyebrowTone = { accent: "text-accent", moon: "text-moon", muted: "text-muted", inkLabel: "text-inkLabel" } as const;
 
 /** One short tag above a title, in engraved capitals: accent above the thing to act on, moon for a section. */
 export function Eyebrow({ children, tone = "accent", testID }: { children: string; tone?: keyof typeof eyebrowTone; testID?: string }) {
   return (
-    <Text testID={testID} className={`font-display-bold text-eyebrow uppercase ${eyebrowTone[tone]}`}>
+    <Text testID={testID} className={`font-display text-eyebrow uppercase ${eyebrowTone[tone]}`}>
       {children}
     </Text>
   );

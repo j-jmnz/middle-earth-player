@@ -3,7 +3,7 @@
 // the buttons that confirm it (docs/design-system.md, Table). Picking happens on the table; nothing here is sent until a
 // button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did.
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
+import { AccessibilityInfo, Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
@@ -21,6 +21,7 @@ import { panelSurface, raisedEdgeOf } from "./surfaces.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 /** The engine's numbers for the moment, large, and what they come to: on a sunk band in the dock (no drawn edge), ink on a paper panel. */
 // `oneLine`: the result is one line (the choice tray is open over the dock on a short phone); its words stay in the label.
@@ -163,7 +164,7 @@ export function TableDock({
         {trayOpen ? null : (
           <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
             <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: (dense ? 2 : 8) * s }}>
-              <Text testID="sheet-step" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-accent" style={{ flexShrink: 0 }}>
+              <Text testID="sheet-step" numberOfLines={1} className="font-display text-eyebrow uppercase text-accent" style={{ flexShrink: 0 }}>
                 {step}
               </Text>
               <View className="flex-row items-start gap-1.5">

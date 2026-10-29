@@ -214,7 +214,7 @@ export default function DeckImportScreen() {
   }
 
   return (
-    <Screen scene="plain" inset={false}>
+    <Screen scene="calm" inset={false}>
       <View className="px-6">
         <NavBar backLabel="Decks" backTestID="deck-import-back" onBack={() => goBack(router, "/decks")} />
       </View>

@@ -4,7 +4,7 @@
 // cross-fades the step (MOTION.railFlash, railStep); both snap under reduced motion and never gate a rule. The neighbor names do not
 // move: they change in place.
 import { useEffect, useMemo, useRef } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeOut, interpolateColor, LayoutAnimationConfig, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { STOP_AHEAD_WORDS } from "./carousel.ts";
@@ -15,6 +15,7 @@ import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { CHEVRON, NEIGHBOR_GAP } from "./top-bar-layout.ts";
+import { Text } from "./text.tsx";
 
 
 /** A chevron drawn as two edges of a rotated square: no printed icon fits, and a glyph depends on the font. */
@@ -170,7 +171,7 @@ export function PhaseRail({
                   numberOfLines={1}
                   adjustsFontSizeToFit
                   minimumFontScale={0.85}
-                  className="font-display-bold uppercase text-accent"
+                  className="font-display uppercase text-accent"
                   style={{
                     // 14 pt: top-bar-layout.ts counts the pill's floor from this size and Cinzel Bold's capitals.
                     fontSize: 14 * s,
@@ -186,7 +187,7 @@ export function PhaseRail({
               {wide && rail.phase ? <Neighbor side="next" name={rail.nextPhase} s={s} /> : null}
               {/* The S stands at the end of the top line, in the room the floor keeps. */}
               {stopAhead ? (
-                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-accent" style={{ marginLeft: 4 * s, lineHeight: 20 * s }}>
+                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display text-label text-accent" style={{ marginLeft: 4 * s, lineHeight: 20 * s }}>
                   S
                 </Text>
               ) : null}

@@ -2,7 +2,7 @@
 // it. Taps pass through it (pointerEvents none), it never gates a rule, and it is skipped under Quick, under reduced motion and
 // when the table passes the whole phase for the player (sweep.ts).
 import { useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
@@ -13,6 +13,7 @@ import { busyBetween, SETTLE_MS, sweepFrame, sweepName } from "./sweep.ts";
 import type { TableStore } from "./store.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 /** `area` is the canvas on the screen: the title crosses its center. */
 export function PhaseSweep({ store, area }: { store: TableStore; area: { left: number; top: number; width: number; height: number } }) {

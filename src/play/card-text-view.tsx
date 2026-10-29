@@ -1,12 +1,13 @@
 // A card's printed text in React Native: one paragraph per line, the timing words bold, the stat and sphere icons inline in
 // place of their bracket words, flavor text italic and muted (card-text.ts parses the catalog's markup).
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { cardTextParagraphs, type TextRun } from "./card-text.ts";
 import { GameIcon } from "./game-icon.tsx";
 import { SPHERE_TINT } from "./icon-map.ts";
 import type { TableToken } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
+import { Text } from "./text.tsx";
 
 const TONES = {
   night: { text: "text-bone", flavor: "text-muted", icon: "bone" },

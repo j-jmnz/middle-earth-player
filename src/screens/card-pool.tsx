@@ -2,7 +2,7 @@ import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { eq } from "drizzle-orm";
 import { useRouter } from "expo-router";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
 import { cards, packs } from "../catalog/schema";
 import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, SecondaryButton, ToggleChip } from "./chrome";
@@ -23,6 +23,7 @@ import { gutter } from "../play/size-class";
 import type { PictureSource } from "../play/table-canvas-types";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
@@ -345,7 +346,7 @@ export function CardPool({
   const draft = useDeckDraft();
   const preview = useListPreview();
   return (
-    <Screen scene="plain">
+    <Screen scene="calm">
       <View className="min-h-0 flex-1">
         {header}
         <CardPoolBody adding={adding} startType={startType} onPreview={preview.open} />

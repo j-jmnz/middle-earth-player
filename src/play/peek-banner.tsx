@@ -6,7 +6,7 @@
 // words are one line, at most 1.3 times the system font scale, so the pill never grows past the room the table keeps for it. It fades
 // in and out over the banner tokens and snaps under reduced motion. It holds no state and sends nothing.
 import { useEffect, useMemo } from "react";
-import { AccessibilityInfo, Pressable, StyleSheet, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
@@ -14,6 +14,7 @@ import { MOTION } from "./motion-tokens.ts";
 import type { PeekWords } from "./peek.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // Medium's sizes; the banner draws them times the UI scale (ui-scale.ts), and callers scale PEEK_TOP and PEEK_ROOM.
 const PILL = 36;

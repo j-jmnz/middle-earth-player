@@ -1,7 +1,8 @@
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { SearchField, Segmented, SphereMark, ToggleChip, markedSphere, sphereWord } from "./chrome";
 import { deckListFiltered, setDeckListView, useDeckListView, type DeckListFilter, type DeckListStatus } from "./deck-list";
+import { Text } from "../play/text";
 
 // The deck list's search, Cards / List switch and filter chips, shared by the Decks tab and the briefing's deck picker.
 

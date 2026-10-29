@@ -1,10 +1,11 @@
 // The segmented switch (docs/design-system.md, Components): two or three words in a sunk night track. It lives in src/play, in the table
 // tokens, because the table's settings panel uses it too and src/play cannot import src/screens; chrome-buttons.tsx re-exports it.
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { raisedEdgeOf, slateSurface } from "./surfaces.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 /** Two or three mutually exclusive words in a sunk night track. Selected is a slate plate in an accent edge, semibold. */
 export function Segmented<T extends string>({

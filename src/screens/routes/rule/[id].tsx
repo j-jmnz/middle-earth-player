@@ -17,7 +17,7 @@ export default function Rule() {
 
   if (!entry) {
     return (
-      <Screen scene="plain" testID="rule">
+      <Screen scene="calm" testID="rule">
         {back}
         <View className="pt-2">
           <ScreenTitle size="title">Rule</ScreenTitle>
@@ -28,7 +28,7 @@ export default function Rule() {
   }
 
   return (
-    <Screen scene="plain" testID="rule">
+    <Screen scene="calm" testID="rule">
       {back}
       <ScreenScroll top={8} max="readable">
         <RuleBody entry={entry} onSeeAlso={(target) => router.push({ pathname: "/rule/[id]", params: { id: target } })} />

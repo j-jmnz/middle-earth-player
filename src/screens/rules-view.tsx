@@ -1,7 +1,7 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
 import { BodyText, Chip, ListRow, Screen, SearchField, Section, TwoPane } from "./chrome";
 import { BOOKLETS } from "./booklets/books";
@@ -13,6 +13,7 @@ import { GLOSSARY, glossaryEntry, searchGlossary } from "./rules-glossary";
 import { capWidth } from "../play/size-class";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 // The books keep the testIDs they had on the campaign list; the others are `booklet-open-<id>`.
 const BOOK_TEST_IDS: Readonly<Record<string, string>> = { "fellowship-of-the-ring": "booklet-open", "learn-to-play": "booklet-open-learn-to-play" };
@@ -122,7 +123,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
 
   if (expanded) {
     return (
-      <Screen testID={testID} scene="plain">
+      <Screen testID={testID} scene="calm">
         {header}
         <TwoPane
           kind="list-detail"
@@ -159,7 +160,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
   // Medium sits the search and the list in a reading column under a full-width header; compact is the phone's list, unwrapped.
   const cap = capWidth(size, "readable", s);
   return (
-    <Screen testID={testID} scene="plain">
+    <Screen testID={testID} scene="calm">
       {header}
       {cap == null ? (
         <>

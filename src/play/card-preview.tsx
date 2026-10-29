@@ -7,7 +7,7 @@
 // tap on one shows that card in its place.
 import { Image } from "expo-image";
 import { useCallback, useEffect, useState } from "react";
-import { BackHandler, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { BackHandler, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
@@ -22,6 +22,7 @@ import { ChromeButton } from "./sheet-paper.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 const SCRIM = 0.82;
 
@@ -171,7 +172,7 @@ export function CardPreview({
               <ScrollView style={{ flexShrink: 1 }} className="mt-2">
                 {shown.note ? (
                   <View testID="card-preview-why" className="mb-2">
-                    <Text className="font-display-bold text-eyebrow uppercase text-accent">Not playable now</Text>
+                    <Text className="font-display text-eyebrow uppercase text-accent">Not playable now</Text>
                     <Text className="mt-1 text-body text-bone">{shown.note}</Text>
                   </View>
                 ) : null}
@@ -182,7 +183,7 @@ export function CardPreview({
                 ) : null}
                 {(shown.effects ?? []).length > 0 ? (
                   <View testID="card-preview-effects" className="mb-2">
-                    <Text className="font-display-bold text-eyebrow uppercase text-accent">Effects on it</Text>
+                    <Text className="font-display text-eyebrow uppercase text-accent">Effects on it</Text>
                     {(shown.effects ?? []).map((line) => (
                       <Text key={line} className="mt-1 text-label text-bone">
                         {line}
@@ -192,7 +193,7 @@ export function CardPreview({
                 ) : null}
                 {all.length > 1 ? (
                   <View testID="card-preview-attached">
-                    <Text className="font-display-bold text-eyebrow uppercase text-accent">{at === 0 ? "With it" : "The card and what is with it"}</Text>
+                    <Text className="font-display text-eyebrow uppercase text-accent">{at === 0 ? "With it" : "The card and what is with it"}</Text>
                     {all.map((item, index) => (
                       <Pressable
                         key={`${item.code}:${index}`}

@@ -11,7 +11,7 @@
 //   - The peek banner (peek-banner.tsx) is the lowest of them, over the canvas only: the scrims and panels sit above it, and the spotlight's
 //     scrim (the bar and the dock column) never covers it.
 import { useEffect, useMemo } from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 import { useStore } from "zustand";
 
 import { ChoiceTray } from "./choice-tray.tsx";
@@ -42,6 +42,7 @@ import { outsideLayers, trayBox } from "./tray-logic.ts";
 import { discardPlays } from "./table-choice.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import type { TableChoice } from "./use-table-choice.ts";
+import { Text } from "./text.tsx";
 
 // The menu button's zone at the top bar's right (at the UI scale, `menuZone`). A tap there is the menu's, never the tray's.
 const READING_MIN = 300;

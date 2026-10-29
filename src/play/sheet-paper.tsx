@@ -3,7 +3,7 @@
 // before they send, are dock-buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number
 // the engine did not compute.
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { Pressable, Text, View, type DimensionValue } from "react-native";
+import { Pressable, View, type DimensionValue } from "react-native";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -15,6 +15,7 @@ import type { SheetStat } from "./sheet-types.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { touch, touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 const SHEET_RADIUS = 28;
 
@@ -137,7 +138,7 @@ export function ChromeButton({
           }}
         >
           {variant === "plate" ? (
-            <Text className="font-display-bold uppercase" style={{ color, fontSize: 12 * s, lineHeight: 16 * s, letterSpacing: 1.2 * s }}>
+            <Text className="font-display uppercase" style={{ color, fontSize: 12 * s, lineHeight: 16 * s, letterSpacing: 1.2 * s }}>
               {label}
             </Text>
           ) : (
@@ -202,7 +203,7 @@ export function ChromePrimary({
           {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
           <Text
             numberOfLines={compact ? 2 : 1}
-            className="text-center font-display-bold uppercase"
+            className="text-center font-display uppercase"
             style={{ color, fontSize: (compact ? 13 : 14) * s, lineHeight: (compact ? 18 : 19) * s, letterSpacing: (compact ? 1.4 : 2.2) * s }}
           >
             {label}
@@ -224,7 +225,7 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
   const s = useUiScale();
   if (stats.length === 0) return null;
   const ink = surface === "paper";
-  const textClass = `font-display-bold ${size === "title" ? "text-title" : "text-body"} ${ink ? "text-ink" : "text-bone"}`;
+  const textClass = `font-display ${size === "title" ? "text-title" : "text-body"} ${ink ? "text-ink" : "text-bone"}`;
   return (
     <View testID={testID} className="flex-row flex-wrap items-center gap-2.5">
       {stats.map((stat) => (

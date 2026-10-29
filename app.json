@@ -16,7 +16,7 @@
     "android": {
       "package": "com.middleearth.lcg",
       "adaptiveIcon": {
-        "backgroundColor": "#F2EBDB",
+        "backgroundColor": "#E6DCC6",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -42,7 +42,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F2EBDB",
+          "backgroundColor": "#E6DCC6",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
@@ -50,7 +50,29 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/fonts/Cinzel-SemiBold.ttf", "./assets/fonts/Cinzel-Bold.ttf"]
+          "ios": {
+            "fonts": [
+              "./assets/fonts/MarcellusSC-Regular.ttf",
+              "./assets/fonts/BarlowSemiCondensed-Regular.ttf",
+              "./assets/fonts/BarlowSemiCondensed-SemiBold.ttf",
+              "./assets/fonts/BarlowSemiCondensed-Bold.ttf",
+              "./assets/fonts/BarlowSemiCondensed-Italic.ttf"
+            ]
+          },
+          "android": {
+            "fonts": [
+              "./assets/fonts/MarcellusSC-Regular.ttf",
+              {
+                "fontFamily": "Barlow Semi Condensed",
+                "fontDefinitions": [
+                  { "path": "./assets/fonts/BarlowSemiCondensed-Regular.ttf", "weight": 400 },
+                  { "path": "./assets/fonts/BarlowSemiCondensed-SemiBold.ttf", "weight": 600 },
+                  { "path": "./assets/fonts/BarlowSemiCondensed-Bold.ttf", "weight": 700 },
+                  { "path": "./assets/fonts/BarlowSemiCondensed-Italic.ttf", "weight": 400, "style": "italic" }
+                ]
+              }
+            ]
+          }
         }
       ],
       "expo-sqlite",

@@ -1,6 +1,6 @@
 // The dock of the tabs (docs/design-system.md, Components, AppTabBar). Re-exported by chrome.tsx.
 import type { ComponentProps, ReactElement } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Tabs } from "expo-router";
 
@@ -12,6 +12,7 @@ import { withAlphaHex } from "../play/tokens";
 import { RAIL } from "../play/size-class";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
 

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import type { PoolCard } from "../campaign/log";
 import { FELLOWSHIP_ID } from "../campaign/save";
@@ -10,6 +10,7 @@ import { usePalette } from "./palette-hook";
 import { seatWord } from "./seats";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 type Seats = 1 | 2;
 

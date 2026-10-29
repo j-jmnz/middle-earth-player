@@ -2,7 +2,7 @@
 // framed party card with the Ring-bearer slot. Shared by the campaign briefing and the standalone briefing.
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View, type LayoutChangeEvent } from "react-native";
+import { Pressable, View, type LayoutChangeEvent } from "react-native";
 
 import { notAppliedWords } from "../play/not-applied";
 import { panelSurface, tileSurface } from "../play/surfaces";
@@ -19,6 +19,7 @@ import { usePalette } from "./palette-hook";
 import { COVER_GAP, coverColumns, coverWidth } from "./briefing-layout";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 const COVER_HEIGHT = 112;
 const TOOL_HEIGHT = 128;
@@ -223,7 +224,7 @@ export function SeatPicker({
                       <Text className="font-display text-heading text-bone">{candidate.name}</Text>
                       {candidate.packName ? <Text className="text-label text-muted">{candidate.packName}</Text> : null}
                     </View>
-                    <Text className="font-display-bold text-label text-accent">Choose</Text>
+                    <Text className="font-display text-label text-accent">Choose</Text>
                   </View>
                 )}
               </Pressable>

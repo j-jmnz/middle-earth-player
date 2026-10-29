@@ -1,7 +1,7 @@
 // The deck editor's head (docs/design-system.md, Deck editor): the heroes' paintings under the deck's name, whether it is ready, and
 // the deck at a glance (starting threat, the count against 50, the spheres, the cost curve), then its notes and the jump chips to
 // its headings. A view of the draft; the editor owns the state.
-import { Text, TextInput, View } from "react-native";
+import { View } from "react-native";
 
 import { nightFade, tileSurface, topShade } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
@@ -13,6 +13,7 @@ import { costCurve, CURVE_LABELS, deckCardCount, DECK_MINIMUM, sphereSplit, type
 import type { HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
 import { touch, useUiScale } from "../play/ui-scale";
+import { Text, TextInput } from "../play/text";
 
 export const BANNER_HEIGHT = 196;
 
@@ -172,7 +173,7 @@ export function CostCoin({ cost }: { cost: string | null }) {
   const palette = usePalette();
   return (
     <View accessible={false} importantForAccessibility="no" className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: palette.raised, borderWidth: 1, borderColor: palette.hairline }}>
-      <Text className="font-display-bold text-label text-bone">{cost ?? "–"}</Text>
+      <Text className="font-display text-label text-bone">{cost ?? "–"}</Text>
     </View>
   );
 }

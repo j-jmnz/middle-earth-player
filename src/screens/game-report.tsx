@@ -1,9 +1,10 @@
 // The details under Victory or Defeat (src/campaign/report.ts): when the scenario ended, the quest stage it reached, each
 // player's threat and heroes, the victory display, and for a win the parts of its score. Text on raised panels; it sends nothing.
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import type { GameReport } from "../campaign/report";
 import { BodyText, Label, Panel, Section } from "./chrome";
+import { Text } from "../play/text";
 
 function Row({ label, value, tone = "bone", testID }: { label: string; value: string; tone?: "bone" | "muted" | "danger"; testID?: string }) {
   return (

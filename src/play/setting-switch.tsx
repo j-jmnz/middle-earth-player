@@ -1,10 +1,11 @@
 // The one switch row on the night surface (docs/design-system.md, Components; user request, 2026-10-28): the phase carousel's Stops and the
 // Settings screen's rows are this same row, so the two do not drift apart. src/screens re-exports it through chrome-buttons.tsx.
-import { Pressable, Switch, Text, View } from "react-native";
+import { Pressable, Switch, View } from "react-native";
 
 import { useTheme } from "./theme.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // The 44 pt target; drawn through `touch(s, ROW)`.
 const ROW = 44;

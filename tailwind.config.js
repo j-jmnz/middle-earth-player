@@ -15,27 +15,30 @@ module.exports = {
       // Every color reads a CSS variable the root layout sets per theme (themeVars), so a class paints Dark and Light alike.
       colors: themeColors(),
       fontFamily: {
-        // Embedded at build time by the expo-font config plugin (app.json). No runtime load. Cinzel's lower case is small capitals,
-        // so a name reads as engraved capitals: titles and names in SemiBold, buttons, tags and the numbers the player watches in Bold.
-        display: ["Cinzel-SemiBold", "Cinzel", "serif"],
-        "display-bold": ["Cinzel-Bold", "Cinzel", "serif"],
+        // Embedded at build time by the expo-font config plugin (app.json). No runtime load. Carved Stone (docs/design-system.md, Type):
+        // Marcellus SC for names, titles, buttons and the numbers the player watches; Barlow Semi Condensed for everything read in a
+        // sentence. `Text` (src/play/text.tsx) gives every text the body face unless it asks for the display one. Marcellus SC has one
+        // weight, so it is named by its file; Barlow is one family with 400, 600, 700 and italic, so a weight class picks its file.
+        display: ["MarcellusSC-Regular", "Marcellus SC", "serif"],
+        body: ["Barlow Semi Condensed", "sans-serif"],
       },
       fontSize: {
-        display: [rem(24), { lineHeight: rem(30), letterSpacing: rem(0.6) }],
+        display: [rem(24), { lineHeight: rem(30), letterSpacing: rem(0.5) }],
         title: [rem(19), { lineHeight: rem(24), letterSpacing: rem(0.4) }],
-        heading: [rem(14), { lineHeight: rem(20), letterSpacing: rem(0.3) }],
-        body: [rem(15), { lineHeight: rem(21) }],
-        label: [rem(13), { lineHeight: rem(18) }],
-        eyebrow: [rem(11), { lineHeight: rem(16), letterSpacing: rem(2) }],
-        micro: [rem(11), { lineHeight: rem(14), letterSpacing: rem(0.6) }],
+        heading: [rem(17), { lineHeight: rem(22), letterSpacing: rem(0.2) }],
+        body: [rem(15), { lineHeight: rem(20) }],
+        label: [rem(13), { lineHeight: rem(17) }],
+        eyebrow: [rem(11), { lineHeight: rem(16), letterSpacing: rem(2.6) }],
+        micro: [rem(11), { lineHeight: rem(14), letterSpacing: rem(0.4) }],
       },
+      // Carved Stone is cut square (docs/design-system.md, Spacing): panels, plates and fields at 3 or less, a card at 4, a sheet at 6.
       borderRadius: {
-        chip: rem(8),
-        tile: rem(12),
-        button: rem(14),
-        card: rem(16),
-        hero: rem(20),
-        sheet: rem(28),
+        chip: rem(3),
+        tile: rem(3),
+        button: rem(2),
+        card: rem(4),
+        hero: rem(3),
+        sheet: rem(6),
         pill: "999px",
       },
       // A hit floor that does not scale: 44 points at every size (user request, 2026-10-28). Use min-h-touch / min-w-touch, not min-h-11.

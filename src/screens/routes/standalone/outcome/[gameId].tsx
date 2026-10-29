@@ -41,7 +41,7 @@ export default function StandaloneOutcome() {
 
   if (!gameId || !finished || (!session?.ok && !finished.result)) {
     return (
-      <Screen testID="standalone-outcome" scene="plain">
+      <Screen testID="standalone-outcome" scene="calm">
         {back}
         <BodyText tone="muted" testID="outcome-closed">
           This game is not open.
@@ -53,7 +53,7 @@ export default function StandaloneOutcome() {
   const result = finished.result;
   if (!result) {
     return (
-      <Screen testID="standalone-outcome" scene="plain">
+      <Screen testID="standalone-outcome" scene="calm">
         <NavBar onBack={() => goBack(router, { pathname: "/standalone/table/[gameId]", params: { gameId } })} backTestID="outcome-table" backLabel="Table" />
         <BodyText tone="muted">The game is not over yet.</BodyText>
       </Screen>
@@ -89,7 +89,7 @@ export default function StandaloneOutcome() {
     );
 
   return (
-    <Screen testID="standalone-outcome" scene={won ? "victory" : "plain"}>
+    <Screen testID="standalone-outcome" scene={won ? "victory" : "ember"}>
       {back}
       {/* Expanded, with the game's details at hand: the title and the numbers at the left, the report in a pane at the right.
           Otherwise (a reopened game keeps only its result; or a phone, or a medium window) one readable column. */}

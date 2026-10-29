@@ -1,7 +1,7 @@
 // The chrome's marks and status (docs/design-system.md, Components): chevrons, the accent corners of a framed card, the Ring, tags,
 // journey and progress bars, the sphere mark. Views and text only; re-exported by chrome.tsx.
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
@@ -12,6 +12,7 @@ import { useUiScale } from "../play/ui-scale";
 import { withAlphaHex } from "../play/tokens";
 import { palettes, type Palette } from "./palette.js";
 import type { MarkedSphere } from "./sphere-mark";
+import { Text } from "../play/text";
 
 /** A chevron drawn as views (no printed icon fits), pointing left for Back, right for a row that opens, down for a fold that is open. */
 export function Chevron({ direction = "left", color, size = 10 }: { direction?: "left" | "right" | "down"; color?: string; size?: number }) {

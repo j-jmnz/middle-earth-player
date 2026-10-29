@@ -3,7 +3,7 @@
 // time: a new one replaces the last (reading.ts). Each has a labeled Close and closes on a tap outside. They stay on paper:
 // they are what gets read and recorded. The settings panel is the exception, on night like the Settings tab. Text, switches and
 // tiles that show a card large; nothing here sends an intent.
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import type { LogLine } from "./log.ts";
 import { ChromeButton, Tile } from "./sheet-paper.tsx";
@@ -11,6 +11,7 @@ import { LineMark } from "./table-chrome.tsx";
 import { SettingsRows, SettingTextButton } from "./setting-rows.tsx";
 import type { TableSettings } from "./table-settings.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 /**
  * A discard pile's cards, the one on top first. A tap shows a card large. A card the open window lets the seat play from the
@@ -33,7 +34,7 @@ export function PileList({
 }) {
   return (
     <View testID="pile-list" collapsable={false} style={{ flexShrink: 1 }}>
-      <Text className="text-center font-display-bold text-eyebrow uppercase text-inkLabel">{`${cards.length} ${cards.length === 1 ? "card" : "cards"}`}</Text>
+      <Text className="text-center font-display text-eyebrow uppercase text-inkLabel">{`${cards.length} ${cards.length === 1 ? "card" : "cards"}`}</Text>
       <Text accessibilityRole="header" className="mt-1 text-center font-display text-title text-ink">
         {title}
       </Text>
@@ -60,7 +61,7 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
   return (
     <View testID="log-sheet" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center">
-        <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">Log</Text>
+        <Text className="font-display text-eyebrow uppercase text-inkLabel">Log</Text>
         <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">{`Round ${round}`}</Text>
       </View>
       <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>
@@ -102,7 +103,7 @@ export function ThreatPanel({
   return (
     <View testID="threat-panel" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center">
-        <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">{seatLabel}</Text>
+        <Text className="font-display text-eyebrow uppercase text-inkLabel">{seatLabel}</Text>
         <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">{`Threat ${threat} of 50`}</Text>
       </View>
       <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>
@@ -119,7 +120,7 @@ export function ThreatPanel({
             style={{ borderColor: t.inkLine, borderLeftWidth: 3, borderLeftColor: row.verdict.engages ? t.threat : "transparent" }}
           >
             <Text className="shrink text-body text-ink">{row.name}</Text>
-            <Text className={`font-display-bold text-body ${row.verdict.engages ? "text-ink" : "text-inkMuted"}`}>{`${row.cost} · ${row.verdict.word}`}</Text>
+            <Text className={`font-display text-body ${row.verdict.engages ? "text-ink" : "text-inkMuted"}`}>{`${row.cost} · ${row.verdict.word}`}</Text>
           </View>
         ))}
         <Text className="mt-2 text-label text-inkMuted">The refresh phase raises your threat by 1 at the end of the round; a failed quest raises it by what it falls short.</Text>

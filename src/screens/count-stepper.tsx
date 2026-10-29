@@ -1,8 +1,9 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { copyCapRule } from "../catalog/deck-save";
 import { usePressedNight } from "./chrome";
 import { usePalette } from "./palette-hook";
+import { Text } from "../play/text";
 
 /** Whether one more copy would break the copy limit (rr.deckbuilding). */
 export function stepperFull(count: number, deckLimit: number | null): boolean {
@@ -52,7 +53,7 @@ export function CountStepper({
         <Text
           testID={ids.count}
           accessibilityLabel={`${count} in the deck`}
-          className={`min-w-6 text-center font-display-bold text-body ${count > 0 ? "text-accentHigh" : "text-faint"}`}
+          className={`min-w-6 text-center font-display text-body ${count > 0 ? "text-accentHigh" : "text-faint"}`}
         >
           {String(count)}
         </Text>

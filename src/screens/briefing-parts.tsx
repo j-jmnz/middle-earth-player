@@ -4,7 +4,7 @@
 import { and, eq, like } from "drizzle-orm";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
-import { ScrollView, Text, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
+import { ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { Problem, ScenarioFacts } from "../campaign/briefing";
@@ -23,6 +23,7 @@ import { usePalette } from "./palette-hook";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed, type StarterSeed } from "./starter-decks";
 import { capWidth } from "../play/size-class";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
 
@@ -165,7 +166,7 @@ export function BriefingScreen({
   if (expanded) {
     const trailing = 24 * s + insets.right;
     return (
-      <Screen testID={testID} scene="vale" bleed>
+      <Screen testID={testID} scene="moon" bleed>
         <TwoPane
           kind="supporting"
           range={BRIEFING_SCENE_RANGE}
@@ -199,7 +200,7 @@ export function BriefingScreen({
   }
 
   return (
-    <Screen testID={testID} scene="vale" bleed>
+    <Screen testID={testID} scene="moon" bleed>
       <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingBottom: 24 * s }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEventThrottle={64} onScroll={onScroll}>
         {scene}
         <View style={side}>
@@ -234,7 +235,7 @@ export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebr
   return (
     <>
       {/* Every word over the scene carries the title's night shadow: a long name pushes the eyebrow up into the bright sky. */}
-      <Text className="font-display-bold text-eyebrow uppercase text-accent" style={titleShadow}>
+      <Text className="font-display text-eyebrow uppercase text-accent" style={titleShadow}>
         {eyebrow}
       </Text>
       <Text accessibilityRole="header" testID="briefing-title" className="mt-1 font-display text-display text-bone" style={titleShadow}>
@@ -245,7 +246,7 @@ export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebr
           <View key={`${stage}:${index}`} className="flex-row items-center gap-2">
             {index > 0 ? <Chevron direction="right" color={palette.faint} size={6} /> : null}
             <View className="h-5 w-5 items-center justify-center rounded-pill" style={{ borderWidth: 1, borderColor: palette.accentLine }}>
-              <Text className="font-display-bold text-micro text-accent">{String(index + 1)}</Text>
+              <Text className="font-display text-micro text-accent">{String(index + 1)}</Text>
             </View>
             <Text className="text-label text-bone" style={titleShadow}>
               {stage}
@@ -280,7 +281,7 @@ export function EncounterDetails({ facts }: { facts: ScenarioFacts }) {
         {facts.sets.map((set) => (
           <View key={set.name} className="flex-row items-center justify-between">
             <Text className="text-body text-bone">{set.name}</Text>
-            <Text className="font-display-bold text-body text-muted">{String(set.count)}</Text>
+            <Text className="font-display text-body text-muted">{String(set.count)}</Text>
           </View>
         ))}
       </View>

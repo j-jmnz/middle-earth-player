@@ -4,7 +4,7 @@
 // confirm. Reads the scenario files and user.db only; it does not scan `cards`.
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { AccessibilityInfo, Pressable, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, View } from "react-native";
 
 import { isPlayable } from "../../../campaign/playable";
 import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
@@ -24,6 +24,7 @@ import { seatWord } from "../../seats";
 import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandalone } from "../../standalone-store";
 import { useSplitColumns } from "../../use-split-columns";
 import { useUiScale } from "../../../play/ui-scale";
+import { Text } from "../../../play/text";
 
 // The right column of the two-column Scenarios (docs/design-system.md, Tablets).
 const SIDE_RANGE = { min: 360, max: 440 };
@@ -153,7 +154,7 @@ export default function Scenarios() {
                 <Label>{gameCaption(game)}</Label>
                 {/* The look of the primary inside the card; the whole card is the one button. */}
                 <View className="mt-3 min-h-14 items-center justify-center rounded-button" style={accentPlate(pressed, t)}>
-                  <Text className="font-display-bold uppercase" style={{ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 2.4 * s, color: palette.onAccent }}>
+                  <Text className="font-display uppercase" style={{ fontSize: 15 * s, lineHeight: 20 * s, letterSpacing: 2.4 * s, color: palette.onAccent }}>
                     Resume
                   </Text>
                 </View>
@@ -180,7 +181,7 @@ export default function Scenarios() {
                 {STANDALONE_DROPPED}
               </Label>
             ) : null}
-            {action ? <Text className="mt-2 font-display-bold text-label text-accent">{action}</Text> : null}
+            {action ? <Text className="mt-2 font-display text-label text-accent">{action}</Text> : null}
           </View>
         )}
       </Pressable>
@@ -224,7 +225,7 @@ export default function Scenarios() {
                       <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? "transparent" : withAlphaHex(palette.night, 0.6) }} />
                     </SceneArt>
                     <View className="absolute bottom-1.5 left-1.5 h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(palette.night, 0.8), borderWidth: 1, borderColor: playable ? palette.accentLine : palette.hairline }}>
-                      <Text className={`font-display-bold text-micro ${playable ? "text-accent" : "text-faint"}`}>{String(index + 1)}</Text>
+                      <Text className={`font-display text-micro ${playable ? "text-accent" : "text-faint"}`}>{String(index + 1)}</Text>
                     </View>
                   </View>
                   <View className="flex-1 py-2">
@@ -324,7 +325,7 @@ export default function Scenarios() {
   );
 
   return (
-    <Screen testID="scenarios" scene="dusk">
+    <Screen testID="scenarios" scene="moon">
       {/* An expanded window scrolls in a wide column; the measurer (outside the columns) decides whether it splits, else one readable column. */}
       <ScreenScroll max={size === "expanded" ? "wide" : "readable"}>
         {size === "expanded" ? <View style={{ height: 0 }} onLayout={columns.measure} /> : null}

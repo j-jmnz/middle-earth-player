@@ -4,7 +4,7 @@
 // Modal: a Modal takes over the orientation lock and the status bar. The table menu (table-menu.tsx) and the dock's More
 // popover (dock-more.tsx) both draw in it; Android Back closes either first (back.ts).
 import { useEffect, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
-import { AccessibilityInfo, findNodeHandle, Pressable, StyleSheet, Text, View } from "react-native";
+import { AccessibilityInfo, findNodeHandle, Pressable, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { GameIcon } from "./game-icon.tsx";
@@ -16,6 +16,7 @@ import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 export type PressableRef = ComponentRef<typeof Pressable>;
 // Medium's sizes; the popover draws them times the UI scale (ui-scale.ts), its rows never under 44 pt.

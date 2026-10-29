@@ -5,7 +5,7 @@
 // no intent. It drops in on open and leaves on close (MOTION.carouselEnter, MOTION.carouselLeave), snaps under reduced motion, and
 // nothing animates while it scrolls.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { cardWidth, startIndex, STOP_AHEAD_WORDS, STOPS_TEXT, type Carousel } from "./carousel.ts";
@@ -19,6 +19,7 @@ import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // The strip drops in by this much (translateY -12 to 0 with a fade).
 const DROP = 12;
@@ -90,7 +91,7 @@ function CarouselHead({
       {arrow(-1)}
       <View style={{ flex: 1, minWidth: 0 }} accessible accessibilityLabel={shown ? `${where}. Phase ${index + 1} of ${carousel.phases.length}, ${shown.name}` : where}>
         <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 * s }}>
-          <Text numberOfLines={1} className="font-display-bold text-micro uppercase" style={{ color: t.muted }}>
+          <Text numberOfLines={1} className="font-display text-micro uppercase" style={{ color: t.muted }}>
             {where}
           </Text>
           <Text numberOfLines={1} className="text-micro" style={{ color: t.faint }}>
@@ -102,7 +103,7 @@ function CarouselHead({
       {carousel.stopAhead ? (
         <View testID="carousel-stop-ahead" accessible accessibilityLabel={STOP_AHEAD_WORDS} style={{ flexDirection: "row", alignItems: "center", gap: 6 * s, marginLeft: 8 * s }}>
           <View style={{ width: 18 * s, height: 18 * s, borderRadius: 9 * s, borderWidth: 1, borderColor: t.accent, alignItems: "center", justifyContent: "center" }}>
-            <Text className="font-display-bold text-micro text-accent" style={{ lineHeight: 14 * s }}>
+            <Text className="font-display text-micro text-accent" style={{ lineHeight: 14 * s }}>
               S
             </Text>
           </View>

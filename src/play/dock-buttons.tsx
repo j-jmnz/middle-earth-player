@@ -5,7 +5,7 @@
 // it back. Arming changes no button's size, so the second tap lands where the first did. The parent keys this component on
 // the moment and the pick, so nothing stays armed into the next one.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import { AccessibilityInfo, Text, View } from "react-native";
+import { AccessibilityInfo, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { armedLines, armedRoom, armedWords, BAR_DENSE_PX, BAR_PX, LINE_PX } from "./armed-room.ts";
@@ -17,6 +17,7 @@ import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
 import { primaryReady, type Dock, type DockButton } from "./table-choice.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // How long an armed button waits for its second tap; longer while a screen reader is on. That is a timer, not a motion token: the bar
 // only shows it running out, on the linear curve of motion-tokens.ts, and does not run under reduced motion (the line says it).

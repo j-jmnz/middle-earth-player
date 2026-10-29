@@ -241,7 +241,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // View). The table is not laid out for one, so it asks to be turned.
   if (screen.height > screen.width) {
     return (
-      <Screen testID="table-portrait" scene="felt">
+      <Screen testID="table-portrait" scene="table">
         <NavBar onBack={() => goBack(router, nav.back)} backTestID="table-back" backLabel={nav.backLabel} />
         <View className="flex-1 items-center justify-center px-6">
           <BodyText tone="muted">Make this window wider, or turn the screen to landscape, to play. The game is saved.</BodyText>
@@ -251,7 +251,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   }
 
   return (
-    <Screen testID="table" scene="felt" inset={false}>
+    <Screen testID="table" scene="table" inset={false}>
       {/* Never flattened: with "auto" alone this view is layout-only and the renderer drops it, so the menu or a popover turning
           it to "no-hide-descendants" would add a native view and move the canvas into it, and the canvas would flash. */}
       <View className="flex-1" collapsable={false} importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }}>

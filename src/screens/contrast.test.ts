@@ -27,16 +27,17 @@ const PAIRS: readonly (readonly [text: Token, ground: Token])[] = [
   ["danger", "night"], ["danger", "raised"], ["danger", "raisedTop"], ["danger", "pressed"],
   ["faint", "pressed"], ["moon", "pressed"], ["accent", "pressed"],
   ["moon", "night"], ["ok", "night"],
-  ["ink", "paper"], ["inkMuted", "paper"],
+  ["ink", "paper"], ["inkMuted", "paper"], ["inkLabel", "paper"],
   ["onThreat", "threat"],
 ];
 
 // Graphics and large marks need 3:1 (WCAG 1.4.11): the dashed slots, path segments and frames drawn in accentLine.
 const GRAPHIC_PAIRS: readonly (readonly [Token, Token])[] = [["accentLine", "night"], ["accentLine", "raised"]];
 
-// Dark's faint is 4.48:1 on raisedTop and 4.10:1 on pressed, under 4.5. Dark does not change (user request, 2026-10-28), so those two pairs
-// are held at their real values (rounded down) and named here (so is onThreat on threat, 3.96:1, large bold numerals); the Daylight palette meets 4.5 on every pair.
-const DARK_EXCEPTIONS: Readonly<Record<string, number>> = { "faint on raisedTop": 4.4, "faint on pressed": 4.1, "onThreat on threat": 3.9 };
+// Two Dark pairs are under 4.5 and held at their real values (rounded down): faint on pressed, 4.35:1 (faint sits on the pressed fill
+// only for the moment of a press), and onThreat on threat, 3.10:1, the handoff's #FBD9CC on #D35537, used only for the large dial
+// numerals, which need 3:1. Rivendell meets 4.5 on every pair.
+const DARK_EXCEPTIONS: Readonly<Record<string, number>> = { "faint on pressed": 4.3, "onThreat on threat": 3.1 };
 
 describe("palette contrast", () => {
   for (const theme of ["dark", "light"] as const) {
@@ -51,12 +52,13 @@ describe("palette contrast", () => {
     });
   }
 
-  // accentLine is a Light-only floor: Dark's dim line is a quiet rule by design and does not change.
-  describe("light graphics", () => {
-    for (const [mark, ground] of GRAPHIC_PAIRS) {
-      it(`${mark} on ${ground} is at least 3:1`, () => {
-        expect(contrast(palettes.light[mark], palettes.light[ground])).toBeGreaterThanOrEqual(3);
-      });
-    }
-  });
+  for (const theme of ["dark", "light"] as const) {
+    describe(`${theme} graphics`, () => {
+      for (const [mark, ground] of GRAPHIC_PAIRS) {
+        it(`${mark} on ${ground} is at least 3:1`, () => {
+          expect(contrast(palettes[theme][mark], palettes[theme][ground])).toBeGreaterThanOrEqual(3);
+        });
+      }
+    });
+  }
 });

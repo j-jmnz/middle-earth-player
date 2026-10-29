@@ -297,7 +297,7 @@ export default function Decks() {
   );
 
   return (
-    <Screen testID="decks" scene="plain">
+    <Screen testID="decks" scene="calm">
       {header}
       {seed === "pending" ? (
         <BodyText tone="muted" className="mt-6">

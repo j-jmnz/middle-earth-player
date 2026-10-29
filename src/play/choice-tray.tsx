@@ -5,7 +5,7 @@
 // (the tray's foot sits above them: tray-logic.ts, trayBox). A tile is picked like a card on the table (the same pick,
 // table-choice.ts); a long press on a card's tile shows it large. A tap outside folds the tray (use-table-choice.ts).
 import { Image } from "expo-image";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { IconValue } from "./game-icon.tsx";
 import { Tile } from "./sheet-paper.tsx";
@@ -17,6 +17,7 @@ import { trayCount, trayTiles, type TrayTile } from "./tray-logic.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // A card's picture beside its tile: 32 by 44, or 28 by 38 on a short phone, times the UI scale.
 const pictureSize = (dense: boolean, s: number) => (dense ? { width: 28 * s, height: 38 * s } : { width: 32 * s, height: 44 * s });
@@ -30,7 +31,7 @@ function DamagePill({ mark }: { mark: NonNullable<TrayTile["mark"]> }) {
       className="flex-row items-center rounded-chip px-2"
       style={{ backgroundColor: mark.danger ? t.threat : withAlphaHex(t.bone, 0.08), minHeight: 24 * s }}
     >
-      <IconValue name={mark.icon} value={String(mark.value)} word={mark.danger ? "Destroying damage" : "Damage"} tint="bone" size={14 * s} textClass="font-display-bold text-label text-bone" />
+      <IconValue name={mark.icon} value={String(mark.value)} word={mark.danger ? "Destroying damage" : "Damage"} tint="bone" size={14 * s} textClass="font-display text-label text-bone" />
     </View>
   );
 }
@@ -80,7 +81,7 @@ export function ChoiceTray({
   return (
     <TrayFrame open={open} place={place} joined testID="sheet">
       {/* The count is the tray's head: an accent eyebrow, where the dock's step stands when the tray is folded. */}
-      <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="font-display-bold text-eyebrow uppercase text-accent" style={{ flexShrink: 0, marginBottom: (dense ? 4 : 8) * s }}>
+      <Text testID="sheet-count" accessibilityRole="header" numberOfLines={1} className="font-display text-eyebrow uppercase text-accent" style={{ flexShrink: 0, marginBottom: (dense ? 4 : 8) * s }}>
         {trayCount(shown, picked)}
       </Text>
       <ScrollView style={{ flexShrink: 1 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>

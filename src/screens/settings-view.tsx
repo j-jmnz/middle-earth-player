@@ -75,7 +75,7 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
     </SettingGroup>
   );
   return (
-    <Screen scene="plain" testID="app-settings">
+    <Screen scene="calm" testID="app-settings">
       {fromTable ? <NavBar onBack={() => router.back()} backTestID="app-settings-back" backLabel="the table" /> : null}
       <Column max={equal ? "wide" : "readable"}>
         <View className={fromTable ? "pt-1" : "pt-4"}>

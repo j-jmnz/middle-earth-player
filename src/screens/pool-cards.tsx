@@ -2,7 +2,7 @@
 // a deck each has the stepper. card-pool.tsx lays them out. Both are memoized: the pool re-renders on every keystroke and every
 // change to the draft, and only the cards whose count or limit changed draw again.
 import { memo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { ListRow, SphereMark, markedSphere } from "./chrome";
 import { CountStepper } from "./count-stepper";
@@ -14,6 +14,7 @@ import { usePalette } from "./palette-hook";
 import { useUiScale } from "../play/ui-scale";
 import { poolDetail, type PoolCard } from "./pool-filter";
 import { CARD_RATIO } from "./pool-grid";
+import { Text } from "../play/text";
 
 export type PoolRowCard = PoolCard & {
   typeName: string;
@@ -156,7 +157,7 @@ export const PoolCardCell = memo(function PoolCardCell({
       </Text>
       {adding && count > 0 ? (
         <View pointerEvents="none" className="absolute right-1 top-1 h-6 min-w-6 items-center justify-center rounded-pill px-1.5" style={{ backgroundColor: palette.accent, borderWidth: 2, borderColor: palette.night }}>
-          <Text className="font-display-bold text-label text-onAccent">{String(count)}</Text>
+          <Text className="font-display text-label text-onAccent">{String(count)}</Text>
         </View>
       ) : null}
       {adding ? (

@@ -1,7 +1,7 @@
 // The chrome's frame (docs/design-system.md, Components): the page and its scrolling body, the top bar, rows, panels, stat tiles,
 // the pinned action bar, the paper sheet and the outcome word. Re-exported by chrome.tsx.
 import { useContext, type ComponentRef, type ReactNode, type RefObject } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Backdrop } from "./backdrop";
@@ -19,6 +19,7 @@ import { withAlphaHex } from "../play/tokens";
 import { ACTION_GROUP, MEDIUM_ACTION_GROUP, capWidth } from "../play/size-class";
 import { touch, useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 /**
  * Night page with a scene backdrop. Content is inset 24 and starts under the status bar; in landscape (the card and booklet
@@ -28,7 +29,7 @@ import { useSizeClass } from "../play/use-size-class";
 export function Screen({
   children,
   testID,
-  scene = "plain",
+  scene = "calm",
   inset = true,
   bleed = false,
 }: {
@@ -258,7 +259,7 @@ export function StatTile({ label, value, icon, iconTint = "bone", detail, childr
       <Text className="text-label text-muted">{label}</Text>
       <View className="flex-row items-center gap-1.5">
         {icon ? <GameIcon name={icon} size={16 * s} tint={iconTint} /> : null}
-        <Text className="font-display-bold text-title text-bone">{value}</Text>
+        <Text className="font-display text-title text-bone">{value}</Text>
         {detail ? <Text className="text-label text-muted">{detail}</Text> : null}
       </View>
       {children}
@@ -315,7 +316,7 @@ export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario
       <Text
         testID={testID}
         accessibilityRole="header"
-        className={`text-center font-display-bold ${won ? "text-accentHigh" : "text-danger"}`}
+        className={`text-center font-display ${won ? "text-accentHigh" : "text-danger"}`}
         style={{ fontSize: 44 * s, lineHeight: 52 * s, letterSpacing: 4 * s, textShadowColor: won ? palette.accent : withAlphaHex(palette.threat, 0.6), textShadowRadius: 18, textShadowOffset: { width: 0, height: 0 } }}
       >
         {won ? "Victory" : "Defeat"}

@@ -15,7 +15,7 @@ import { FLOAT_MS, floatAt, POP_MS, popShows, tokenPopScale, type Fx } from "./t
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import type { TableTokens } from "./tokens.ts";
 
-const CINZEL = require("../../assets/fonts/Cinzel-Bold.ttf") as number;
+const MARCELLUS = require("../../assets/fonts/MarcellusSC-Regular.ttf") as number;
 // Medium's size of the floating number, in points; drawn times the UI scale.
 const FLOAT_SIZE = 13;
 
@@ -101,7 +101,7 @@ export function TokenFx({
   stripOf: (slot: CardSlot) => string | null;
   contrast: boolean;
 }) {
-  const font = useFont(CINZEL, FLOAT_SIZE * s);
+  const font = useFont(MARCELLUS, FLOAT_SIZE * s);
   if (fx.length === 0) return null;
   return (
     <Group>

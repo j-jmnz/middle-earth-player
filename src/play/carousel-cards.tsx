@@ -1,7 +1,7 @@
 // The cards of the phase carousel (phase-carousel.tsx): one per phase, numbered in the round, with its steps on a timeline, what the
 // player decides there and the action windows as Stop switches. Reading and the player's Stops settings only; nothing here sends an intent.
 import { useRef, type ComponentRef } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import type { CarouselPhase, CarouselStep } from "./carousel.ts";
 import { toggleStop, type TableSettings } from "./table-settings.ts";
@@ -10,6 +10,7 @@ import { accentSurface, panelSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // The 44 pt target; callers draw it through `touch(s, ROW)`.
 export const ROW = 44;
@@ -20,7 +21,7 @@ function NowChip() {
   const s = useUiScale();
   return (
     <View style={{ borderRadius: 999, borderWidth: 1, borderColor: t.accent, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(t.accent, 0.14) }}>
-      <Text className="font-display-bold text-micro uppercase" style={{ color: t.accent, lineHeight: 15 * s }}>
+      <Text className="font-display text-micro uppercase" style={{ color: t.accent, lineHeight: 15 * s }}>
         Now
       </Text>
     </View>
@@ -167,7 +168,7 @@ export function PhaseCard({
             ...(current ? accentSurface(false, t) : {}),
           }}
         >
-          <Text className="font-display-bold text-micro" style={{ color: current ? t.onAccent : past ? t.accent : t.muted, lineHeight: 15 * s }}>
+          <Text className="font-display text-micro" style={{ color: current ? t.onAccent : past ? t.accent : t.muted, lineHeight: 15 * s }}>
             {String(number)}
           </Text>
         </View>
@@ -175,7 +176,7 @@ export function PhaseCard({
           accessibilityRole="header"
           accessibilityLabel={`${phase.name} phase${past ? ", done this round" : current ? ", now" : ""}`}
           numberOfLines={1}
-          className="flex-1 font-display-bold text-body uppercase"
+          className="flex-1 font-display text-body uppercase"
           style={{ color: current ? t.accent : past ? t.muted : t.bone, lineHeight: 22 * s, letterSpacing: 0.6 * s }}
         >
           {phase.name}

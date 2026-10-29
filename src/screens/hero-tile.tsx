@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { CroppedArt } from "./art";
 import { PAINTING } from "./art-crop";
@@ -11,6 +11,7 @@ import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
 import { usePalette } from "./palette-hook";
 import { useUiScale } from "../play/ui-scale";
+import { Text } from "../play/text";
 
 export type HeroFace = {
   code: string;
@@ -77,7 +78,7 @@ export function HeroTile({
                   {ringBearer ? <RingMark size={10} state="current" /> : null}
                 </View>
               ) : null}
-              <Text className={`font-display-bold ${dense ? "" : "text-heading"} ${ringBearer ? "text-accentHigh" : "text-bone"}`} style={dense ? { fontSize: 12 * s, lineHeight: 15 * s } : undefined} numberOfLines={2}>
+              <Text className={`font-display ${dense ? "" : "text-heading"} ${ringBearer ? "text-accentHigh" : "text-bone"}`} style={dense ? { fontSize: 12 * s, lineHeight: 15 * s } : undefined} numberOfLines={2}>
                 {hero.name}
               </Text>
               {dense ? null : (
@@ -169,8 +170,8 @@ export function EmptyHeroSlot({
       >
         {({ pressed }) => (
           <View className="flex-1 items-center justify-center" style={pressed ? pressedNight : undefined}>
-            <Text className="font-display-bold text-title text-accent">+</Text>
-            <Text className="font-display-bold text-label text-accent">{`Add ${label.toLowerCase()}`}</Text>
+            <Text className="font-display text-title text-accent">+</Text>
+            <Text className="font-display text-label text-accent">{`Add ${label.toLowerCase()}`}</Text>
           </View>
         )}
       </Pressable>
@@ -179,7 +180,7 @@ export function EmptyHeroSlot({
   return (
     <View testID={testID} className="w-full items-center justify-center gap-2 rounded-tile px-1" style={frame}>
       <RingMark size={18} state="current" />
-      <Text className="text-center font-display-bold text-label text-accent">{label}</Text>
+      <Text className="text-center font-display text-label text-accent">{label}</Text>
     </View>
   );
 }

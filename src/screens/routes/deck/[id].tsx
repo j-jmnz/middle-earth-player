@@ -1,7 +1,7 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams, usePreventRemove, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -59,6 +59,7 @@ import type { PictureSource } from "../../../play/table-canvas-types";
 import { MEDIUM_ACTION_GROUP, READABLE } from "../../../play/size-class";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
+import { Text } from "../../../play/text";
 
 type EditorCard = {
   code: string;
@@ -394,7 +395,7 @@ export default function DeckEditor() {
   );
 
   return (
-    <Screen testID="deck-editor" scene="plain" bleed>
+    <Screen testID="deck-editor" scene="calm" bleed>
       {expanded ? (
         // List-detail: the deck at the left, the pool beside it on the same draft (docs/design-system.md, Deck editor).
         <TwoPane
