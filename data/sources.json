@@ -254,9 +254,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "e1411b9f555e1c278ed28cc5aec282dc67cecfa7bdc71bd26cd92bcce57c67c0"
+        "value": "94aad8fea467c7c3b102d0306a5bf9939c20f4767786ab56a69e2a46882dcb16"
       },
-      "fetchedAt": "2026-10-29T12:11:12.845Z",
+      "fetchedAt": "2026-10-29T12:39:49.942Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -1099,40 +1099,40 @@
           "bytes": 3284488
         },
         {
-          "path": "pictures/01129.A.png",
-          "url": "https://drive.usercontent.google.com/download?id=1rm95bc1gvRFCkgjZNFOpupQgJBWiLmxc&export=download&confirm=t",
-          "sha256": "50b785c5d556a8c5b71eb5a61649609ce147dbfc8468ba5f1134db10076be79e",
-          "bytes": 1412129
+          "path": "pictures/01129.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=1",
+          "sha256": "29f5469ffaf21568fd02ce649147d6c6a53c07209e2e6789000169eae1eb404a",
+          "bytes": 601218
         },
         {
-          "path": "pictures/01129.B.png",
-          "url": "https://drive.usercontent.google.com/download?id=1rdMsUE6p7I7gX-fmOe7mrYEV0q16d82Q&export=download&confirm=t",
-          "sha256": "f3f8c7edbb4332642e4d065f5ae215aab6f31e2b1fe445cd51b5cce7d163354c",
-          "bytes": 1053872
+          "path": "pictures/01129.B.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=2",
+          "sha256": "bc8e421fdfdb3511e019b381cdc9334e2a50430dc9e5615f974be3d2ec3f3f26",
+          "bytes": 475284
         },
         {
-          "path": "pictures/01130.A.png",
-          "url": "https://drive.usercontent.google.com/download?id=1rBNelzfk1N6m17t_q_0YKGfMa2YG7Pcy&export=download&confirm=t",
-          "sha256": "aca96bfc1580a91a04cbb7c5b020506c786aba69b2e2825aa45aecc8edab8b56",
-          "bytes": 1497718
+          "path": "pictures/01130.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=3",
+          "sha256": "da9bbdf137d891775bfb40522ea0df8e37dff5e14ecb6f0803a662e81239bb58",
+          "bytes": 677898
         },
         {
-          "path": "pictures/01130.B.png",
-          "url": "https://drive.usercontent.google.com/download?id=1r9LkNAEAauNWNxgW3k9bcwR24NIYo6BW&export=download&confirm=t",
-          "sha256": "7096aff7ad357538aec06a2c5bec3274e8f8672fa5ef4c30e8c3e9e227ae5af0",
-          "bytes": 1136895
+          "path": "pictures/01130.B.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=4",
+          "sha256": "8d6ac40243655d0b3504533a24a623bbdb0fdfc19f692b16f3997e007a0a6068",
+          "bytes": 574229
         },
         {
-          "path": "pictures/01131.A.png",
-          "url": "https://drive.usercontent.google.com/download?id=1qi9qGY-qLHhiR5lREEbX-tNuVMKbysq2&export=download&confirm=t",
-          "sha256": "81d2590803cca9a41299f698ebf56d16e1f2a3e681ac75c2d5db76cd7418b1df",
-          "bytes": 1494133
+          "path": "pictures/01131.A.jpg",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=5",
+          "sha256": "848606a3e61cd1af1a972968e7e098d2664ff5f91a6795b74724bdb5e2c5477c",
+          "bytes": 698256
         },
         {
           "path": "pictures/01131.B.jpg",
-          "url": "https://drive.usercontent.google.com/download?id=1rudbwEEWZOlqzlLCFmQ-eeZnyflqp-uf&export=download&confirm=t",
-          "sha256": "b67c886909f36945b274fd10e655029672e263042a0ea575616c1f8380468f4e",
-          "bytes": 786094
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=6",
+          "sha256": "a6f0dc411fabb77f421ece71d39c369a3f77a01e99426074459759199006042f",
+          "bytes": 569008
         },
         {
           "path": "pictures/01132.A.jpg",
@@ -1142,39 +1142,39 @@
         },
         {
           "path": "pictures/01133.A.jpg",
-          "url": "https://drive.usercontent.google.com/download?id=1reK4roMywvvzwGojCGVJZyAOPYdxOeiz&export=download&confirm=t",
-          "sha256": "a9d1b69230ea89d28811f63a6bbcf3e546a3b6a64467762d61511dcfb1fe9147",
-          "bytes": 1149270
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=15",
+          "sha256": "4a079b24581dd08795c86e23e96cd19b7bee98272d2eeec37b77310808216d1f",
+          "bytes": 725719
         },
         {
           "path": "pictures/01134.A.jpg",
-          "url": "https://drive.usercontent.google.com/download?id=1rXfdVpBYUWOfwFa4RjpVeyu9mX00ZhwU&export=download&confirm=t",
-          "sha256": "b0e6f99b80fc51919cf7b644f5014d03b5fd4c829829695e8194b278e8c86ac1",
-          "bytes": 1270957
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=23",
+          "sha256": "125a6e1bfbd4011b2271c39c845bb523596bba1a0d0bdbddf6fde295a22049eb",
+          "bytes": 855488
         },
         {
           "path": "pictures/01135.A.jpg",
-          "url": "https://drive.usercontent.google.com/download?id=1rTgLvbtEdNbllgKZMMU8CdERP0qJxPHc&export=download&confirm=t",
-          "sha256": "77c6bfba7f881ee286d6d7a1312961a36117087a438068d89df09921d459d199",
-          "bytes": 1016550
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=25",
+          "sha256": "bc45122550093d1acfb685cd0fffe8b2be4f51e71b9e15ec321aa0099ad25d98",
+          "bytes": 682211
         },
         {
           "path": "pictures/01136.A.jpg",
-          "url": "https://drive.usercontent.google.com/download?id=1rODlS-19B2WkHXPKFFxON9nHFSSEihjL&export=download&confirm=t",
-          "sha256": "242724e0edd77d1ba846fee745393678203448a281828d5d745318f9ee985cf7",
-          "bytes": 1415432
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=27",
+          "sha256": "44e4d6912d62090c77537d84e5e80f828fa8264f68fb79ed195df26351a0c1a0",
+          "bytes": 887339
         },
         {
           "path": "pictures/01137.A.jpg",
-          "url": "https://drive.usercontent.google.com/download?id=1rKL7tT-cJnnJuY9xckZ_aXSfQeq3Hr6Q&export=download&confirm=t",
-          "sha256": "b462ff65ab9b2945cfa828624f0bc63d313c0512e7ec1736ac9640bf29554157",
-          "bytes": 1333690
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=29",
+          "sha256": "d6c1d76db909631a86a09edb36225a387bea86d14faee27f5783db9fa6c7c7a2",
+          "bytes": 813875
         },
         {
           "path": "pictures/01138.A.jpg",
-          "url": "https://drive.usercontent.google.com/download?id=1rAwuMwpCdbhxNX-uanULvhAscGuPRgUw&export=download&confirm=t",
-          "sha256": "95bc921fcadde97d4bfc35efd2e76653949b15d30e4deec71efb0a0647d2c94a",
-          "bytes": 1301110
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf#page=31",
+          "sha256": "ac8e1f9d6f7dcb0792b58564e9c5e055c4d75da9158f0a8b7194e87812f556b0",
+          "bytes": 775558
         },
         {
           "path": "pictures/02001.A.jpg",

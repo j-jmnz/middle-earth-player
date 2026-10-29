@@ -21,7 +21,7 @@ export { lettersOf };
 // The pictures the app bundles, every card's, so it needs no network (user decisions, 2026-10-29). The `scans` source stays
 // what the printed-text ledger was read from; a picture is only shown. Each side of the scan scope and side A of every other
 // card gets one, pinned by sha256, from the first of these that has it:
-// - JvZijp's enhanced proxies on Google Drive, the user's first choice (jvzijp.ts);
+// - JvZijp's enhanced proxies on Google Drive, the user's first choice (jvzijp.ts), except for a page of FFG's PDFs;
 // - FFG's print-and-play PDFs of the campaign, boon and burden cards, the only digital originals (InDesign, vector text over
 //   300 ppi art), rendered at 600 DPI;
 // - else the 600 DPI scan lotr.cardgame.tools hosts (u/LepcisMagna's, about 1480×2100), found through its card database;
@@ -221,6 +221,9 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
       const file = cardgameToolsFile(rows, productOfPack, card, target.side);
       if (file) sources.push({ from: "cardgameTools", url: `${CARDGAME_TOOLS_IMAGES}${file}`, load: () => fetchBytes(`${CARDGAME_TOOLS_IMAGES}${file}`, 120_000, log) });
       if (!target.scoped) for (const url of fallbackUrls(card)) sources.push({ from: "other", url, load: () => fetchBytes(url, 120_000, log) });
+      // A page of FFG's PDFs comes before JvZijp's copy of it, a smaller render of the same page (816×1110 against 1477×2097;
+      // user decision, 2026-10-29). JvZijp's stays next in line.
+      if (page) sources.sort((left, right) => Number(right.from === "pdf") - Number(left.from === "pdf"));
     }
     for (const source of sources) {
       try {
