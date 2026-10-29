@@ -9,3 +9,12 @@ export function bottomInset(now: number, portrait: boolean, seen: number): { ins
   const next = Math.max(seen, now);
   return { inset: next, seen: next };
 }
+
+/**
+ * How far a pinned bar's bottom edge runs past the app's root view (both in window points), or 0. The campaign path's screen was laid
+ * out taller than the window on a phone (user report and screenshot, 2026-10-29: its foot ran past the screen's bottom edge, which
+ * the web build does not do); the bar adds this to its bottom padding so its buttons stay in view whatever makes the screen taller.
+ */
+export function overrun(barBottom: number, rootBottom: number): number {
+  return Math.max(0, Math.round(barBottom - rootBottom));
+}
