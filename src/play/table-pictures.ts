@@ -10,14 +10,15 @@ export type Box = { w: number; h: number };
 /** The most the hand scrub grows a hand card: the risen hand's scale times the lifted card's. */
 export const HAND_PICTURE_SCALE = SHAPE.scrubScale * SHAPE.scrubLiftScale;
 
-/** The box (in points) each face-up code on the table is drawn in at its largest. */
+/** The box (in points) each face-up picture on the table is drawn in at its largest, by picture key (picture-key.ts). */
 export function pictureBoxes(slots: readonly CardSlot[]): Map<string, Box> {
   const boxes = new Map<string, Box>();
   for (const slot of slots) {
     if (slot.faceDown || slot.code === "") continue;
     const grow = slot.zone === "hand" ? HAND_PICTURE_SCALE : 1;
-    const held = boxes.get(slot.code);
-    boxes.set(slot.code, { w: Math.max(held?.w ?? 0, slot.w * grow), h: Math.max(held?.h ?? 0, slot.h * grow) });
+    const key = slot.picture ?? slot.code;
+    const held = boxes.get(key);
+    boxes.set(key, { w: Math.max(held?.w ?? 0, slot.w * grow), h: Math.max(held?.h ?? 0, slot.h * grow) });
   }
   return boxes;
 }

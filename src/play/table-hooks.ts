@@ -23,7 +23,7 @@ const MOMENT_MS = 4500;
  * `onBeat` as it reaches each line. While the combat spotlight plays the moment's attacks the banner waits: its beats and its
  * hold start when the spotlight ends or is skipped, so they do not race it.
  */
-export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNames): { banner: Moment | null; bannerKey: string; beatKey: string; onBeat: (cards: readonly string[]) => void } {
+export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNames): { banner: Moment | null; bannerKey: string; beatKey: string; onBeat: (cards: readonly string[]) => void; dismiss: () => void } {
   const shown = useStore(store, (state) => state.shown);
   const spotlit = useSpotlightHold(store);
   const [closedMoment, setClosedMoment] = useState(0);
@@ -71,12 +71,19 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     return () => clearTimeout(timer);
   }, [shown, summaryOpen]);
   const onBeat = useCallback((cards: readonly string[]) => setBeatKey(cards.join(",")), []);
+  // A swipe closes what the banner shows now: the moment (its round summary then follows) or the summary.
+  const seq = shown?.seq ?? 0;
+  const dismiss = useCallback(() => {
+    if (momentOpen) setClosedMoment(seq);
+    else if (summaryOpen) setClosedSummary(seq);
+  }, [momentOpen, summaryOpen, seq]);
   return {
     banner: momentOpen ? said : summaryOpen ? summary : null,
     // The moment's number and whether the banner shows it or the round summary: a new one enters the banner afresh.
     bannerKey: `${shown?.seq ?? 0}:${momentOpen ? "moment" : "summary"}`,
     beatKey,
     onBeat,
+    dismiss,
   };
 }
 
@@ -115,6 +122,7 @@ export function useAutoAnswer({
   settings,
   moment,
   opened,
+  hold = false,
 }: {
   store: TableStore;
   ctx: ReduceContext;
@@ -125,13 +133,16 @@ export function useAutoAnswer({
   moment: TableMoment | null;
   // A sheet the player opened from the table is up: the table answers nothing under it.
   opened: boolean;
+  // A screen over the table holds the moment (the quest advance screen, use-quest-advance.ts): the table answers nothing until it
+  // closes, and then answers the moment as it would have.
+  hold?: boolean;
 }): () => void {
   const running = useRef(false);
   // The cards usable where the player was last asked: a new one makes a window ask again.
   const seen = useRef<Set<string>>(new Set());
-  const autoKey = `${sheet.key}:${moment?.seq ?? 0}:${game.window?.kind ?? ""}`;
+  const autoKey = `${sheet.key}:${moment?.seq ?? 0}:${game.window?.kind ?? ""}:${hold ? "held" : ""}`;
   useEffect(() => {
-    if (opened) return;
+    if (opened || hold) return;
     // The moment Undo went back to asks, even where the table would answer it; the next choice the player sends lifts that.
     const held = moment?.kind === "undone";
     if (held) running.current = false;

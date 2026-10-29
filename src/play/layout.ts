@@ -26,6 +26,8 @@ export type SlotZone = ZoneId | PileId;
 export type CardSlot = Rect & {
   id: string;
   code: string;
+  // The picture drawn for it (picture-key.ts): `<code>.B` on a card turned to its B side. Its code when absent.
+  picture?: string;
   zone: SlotZone;
   kind: SlotKind;
   exhausted: boolean;

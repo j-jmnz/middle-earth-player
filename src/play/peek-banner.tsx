@@ -20,7 +20,7 @@ import { Text } from "./text.tsx";
 const PILL = 36;
 /** The gap between the top bar and the pill. */
 export const PEEK_TOP = 2;
-/** The room the banner takes under the top bar (its gap, the pill and a gap below), which the table's own outcome banner moves down by. */
+/** The room the banner takes under the top bar (its gap, the pill and a gap below): the table's own outcome banner hangs under it while it shows. */
 export const PEEK_ROOM = PEEK_TOP + PILL + 4;
 const SCALE = 1.3;
 

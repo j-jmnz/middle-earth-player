@@ -1,4 +1,4 @@
-// Rules: rr.quest-cards-quest-deck, rr.winning-the-game (data/rules/entries.json). The quest card's preview carries what the
+// Rules: rr.quest-cards-quest-deck, rr.winning-the-game, rr.quest-advancement, faq.progress-without-advancing (data/rules/entries.json). The quest card's preview carries what the
 // removed quest band said (phase 22): the stage's name and its progress over its quest points as the title line, or how a stage
 // with no quest points is won.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -25,7 +25,14 @@ describe("the quest card's preview title", () => {
     expect(first?.title).toMatch(/^Flight · 0 \/ \d+$/);
     const moved = updateCard(table.state, stage, { progress: 3 });
     expect(questTitle(moved, table.ctx, stage, "Flight", ledgerLine)?.title).toMatch(/^Flight · 3 \/ \d+$/);
-    expect(first?.detail).toBeUndefined();
+    // Bag End is not in the victory display yet: the stage says what holds it back (141022:B:2), so progress past its quest
+    // points reads as the rule (faq.progress-without-advancing).
+    expect(first?.detail).toBe("Cannot advance yet: The players cannot advance unless Bag End is in the victory display.");
+  });
+
+  it("says nothing holds a stage that nothing holds back", () => {
+    const table = buildTable(base, { stage: "141023" });
+    expect(questTitle(table.state, table.ctx, table.state.questStage!, "Stage", ledgerLine)?.detail).toBeUndefined();
   });
 
   it("names the stage alone with the printed way to win it when it has no quest points", () => {

@@ -6,7 +6,7 @@ import type { Choice } from "./table-choice.ts";
 import { tableLayout } from "./layout.ts";
 import { TOP_BAR } from "./top-bar-layout.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
-import { COLUMN_PAD, outsideLayers, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
+import { COLUMN_PAD, listsResponses, outsideLayers, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
 
 // The choice tray (docs/design-system.md, Table; phase 21): its tiles, its count, what a tap outside it does, and where it sits
 // against the command column and the dock. No rule is implemented here.
@@ -72,6 +72,36 @@ describe("tray tiles and count", () => {
     expect(trayCount(multi, choice("commit", ["a", "b"]))).toBe("Commit · 2 of 4 picked");
     expect(trayCount(pick, choice("defense:1", []))).toBe("Defend · pick 1 of 3");
     expect(trayCount(pick, choice("defense:1", ["a"]))).toBe("Defend · 1 of 3 picked");
+  });
+});
+
+describe("a Response window", () => {
+  const trigger = {
+    kind: "trigger",
+    key: "t",
+    step: "Response",
+    title: "Respond",
+    sourceId: null,
+    timing: "Response",
+    note: null,
+    hide: null,
+    pass: "Pass",
+    options: [{ id: "c1|e1", label: "Gandalf", code: "01073", effectId: "e1", cardId: "c1", timing: "Response", text: "Draw 3 cards.", pay: null }],
+  } satisfies TriggerSheet;
+  it("opens listed whenever a Response can be used, and not for another window or an empty one", () => {
+    expect(listsResponses(trigger, "response")).toBe(true);
+    expect(listsResponses(trigger, "action")).toBe(false);
+    expect(listsResponses({ ...trigger, options: [] }, "response")).toBe(false);
+    expect(listsResponses(pick, "response")).toBe(false);
+  });
+  it("lets a tap on a listed Response's card pick it with the tray open, and folds for any other tap", () => {
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: "c1", answers: true })).toBe("pick");
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: "c2", answers: false })).toBe("fold");
+    expect(tapRoute({ panelOpen: true, reader: false, cardId: "c1", answers: true, peeking: true })).toBe("fold");
+  });
+  it("leads the count with the Response's timing", () => {
+    expect(trayCount(trigger, { key: "t", ids: [], shares: [] })).toBe("Response · pick 1 of 1");
+    expect(trayCount(trigger, { key: "t", ids: ["c1|e1"], shares: [] })).toBe("Response · 1 of 1 picked");
   });
 });
 

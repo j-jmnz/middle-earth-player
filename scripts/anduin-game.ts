@@ -116,7 +116,7 @@ export const ANDUIN_GOLDENS: readonly AnduinGolden[] = [
   { name: "true solo, brittle heroes, won after a hero was lost", seatCount: 1, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "won" },
   { name: "two-handed, won", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, Easy, won", seatCount: 2, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "two-handed, brittle heroes, won with a Valor and a Scarred", seatCount: 2, seed: 3, difficulty: "Normal", decks: "brittle", outcome: "won" },
+  { name: "two-handed, brittle heroes, won with a Valor and a Scarred", seatCount: 2, seed: 20, difficulty: "Normal", decks: "brittle", outcome: "won" },
   { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
   { name: "two-handed, weak, lost on threat", seatCount: 2, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
   { name: "two-handed, brittle heroes, lost when Mendor leaves play", seatCount: 2, seed: 4, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: MENDOR_LOST },

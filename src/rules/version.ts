@@ -4,4 +4,6 @@
 // which can add a candidate to a choice of a replayed Fellowship game.
 // 11 (phase 32 review): a location whose Response puts progress on the quest (Goblin Trail, 41014:A:2) is answered after the stage its progress
 // advanced reveals, and The Eaves of Mirkwood bars only the Responses that cancel: both can move a replayed game of The Oath.
-export const ENGINE_VERSION = 11;
+// 12: a full quest stage that was held back advances as soon as nothing holds it (To the River... once no Hill Troll is in play),
+// not at the next quest resolution (stage-reveal.ts, advanceFreed): a replayed game can reach the next stage sooner.
+export const ENGINE_VERSION = 12;

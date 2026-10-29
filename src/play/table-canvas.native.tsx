@@ -7,7 +7,7 @@
 // in, and a card that left goes to its pile (motion.ts, run by card-motion.native.tsx). The motion runs on the UI thread, never
 // gates a rule, and snaps under reduced motion; a touch finishes it at once, and a new gesture cancels the lift in progress.
 import { Canvas, Group, RadialGradient, Rect as SkRect, RoundedRect, Text, useImage, vec, type SkFont } from "@shopify/react-native-skia";
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useLayoutEffect, useMemo } from "react";
 import { GestureDetector } from "react-native-gesture-handler";
 import { useStore } from "zustand";
 
@@ -23,7 +23,6 @@ import { slotBounds, tableLayout, type CardSlot, type Rect } from "./layout.ts";
 import { AT_REST } from "./motion.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "./peek.ts";
 import { actingSeat, shownSeat } from "./selectors.ts";
-import { Spotlight } from "./spotlight.native.tsx";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
@@ -33,7 +32,6 @@ import { pictureBoxes } from "./table-pictures.ts";
 import { TokenFx } from "./token-fx.native.tsx";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { useSpotlight } from "./use-spotlight.ts";
-import { useSpotlightImages } from "./use-spotlight-images.native.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
@@ -42,7 +40,7 @@ function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: 
   return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight: marked, raised, fight, bottomInset, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight: marked, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
   // The UI scale, read once here and handed down with the tokens: to the layout, the fonts, every piece and the spotlight (user request, 2026-10-28).
   const s = useUiScale();
   const contrast = look?.contrast ?? false;
@@ -77,8 +75,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
 
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
   const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat, acting);
-  // The attacks the state resolved play on top of the table first (spotlight.native.tsx); the touch that skips them does nothing else.
-  const spot = useSpotlight(store, layout, k);
+  // The attacks the state resolved are planned and clocked here, and drawn by the full-screen layer over the whole table
+  // (spotlight-layer.native.tsx); the touch that skips them does nothing else.
+  const spot = useSpotlight(store, layout, stageArea, k);
   const { swallow, live } = spot;
 
   // Each face-up code at the largest size it is drawn: a hand card at the scrub's lifted size (table-pictures.ts).
@@ -92,8 +91,14 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     engagementCost: useImage(ICON_FILES.engagementCost),
   };
   const backs: BackImages = { player: useImage(CARD_BACK_FILES.player), encounter: useImage(CARD_BACK_FILES.encounter) };
-  const { fonts, spotFonts } = useTableFonts(s);
-  const spotImages = useSpotlightImages(spot.plan, spot.playing, picture, pictureRevision, images);
+  const fonts = useTableFonts(s);
+  // The plan, the clock and the table's decodes go to the layer when the plan, whether it plays or the motion scale changes; only the
+  // layer listens, so this canvas does not render again for it. The decodes are a fallback until the layer's own are ready.
+  const { plan, progress, playing } = spot;
+  useLayoutEffect(() => {
+    handoff.setState({ plan, progress, k, playing, tableImages: images });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the table's decodes move often and are read when the plan does.
+  }, [handoff, plan, playing, k]);
 
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
   const reader = useScreenReader();
@@ -111,7 +116,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // The card itself (it turns when exhausted), with the glow of the open moment under it, and what is drawn upright on it:
   // tokens, effects, the open moment's marks.
   const drawBody = (slot: CardSlot, dim: boolean) => {
-    const image = images.get(slot.code) ?? null;
+    const image = images.get(slot.picture ?? slot.code) ?? null;
     // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
     if (slot.kind === "pile" || slot.zone === "deck") {
       const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.code)} fonts={fonts} label backs={backs} t={t} s={s} />;
@@ -215,11 +220,10 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         ))}
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
+            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.picture ?? lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
             <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={cardCorner(lifted.w, lifted.h)} color={t.accent} style="stroke" strokeWidth={2 * s} />
           </Group>
         ) : null}
-        {spot.playing && spot.plan ? <Spotlight plan={spot.plan} progress={spot.progress} width={width} height={height} images={spotImages} tokens={tokens} backs={backs} fonts={fonts} spotFonts={spotFonts} t={t} s={s} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} /> : null}
       </Canvas>
     </GestureDetector>
   );

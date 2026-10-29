@@ -20,9 +20,13 @@ import { railFor } from "../play/rail";
 import { shownSeat, threatSelector } from "../play/selectors";
 import type { SheetNames } from "../play/sheet-types";
 import type { ReduceContext, TableStore } from "../play/store";
+import { createHandoff } from "../play/spotlight-handoff";
+import { SpotlightLayer } from "../play/spotlight-layer";
+import type { StageArea } from "../play/spotlight-stage";
 import { TableCanvas } from "../play/table-canvas";
 import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
-import { MomentBanner, TableDock } from "../play/table-dock";
+import { MomentBanner } from "../play/moment-banner";
+import { TableDock } from "../play/table-dock";
 import { TableLayers } from "../play/table-layers";
 import { openReading, type Reading } from "../play/reading";
 import { phaseCarousel } from "../play/carousel";
@@ -32,13 +36,17 @@ import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
+import { pictureCode, pictureKey } from "../play/picture-key";
+import { advanceWords } from "../play/quest-advance";
+import { QuestAdvanceView } from "../play/quest-advance-view";
+import { useQuestAdvance } from "../play/use-quest-advance";
 import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
 import { questScaleOf } from "../play/quest-scale";
 import { QuestScaleView } from "../play/quest-scale-view";
 import { campaignTokens, heldDial, widgetReadouts } from "../play/widgets";
-import { ledgerLine, ruleTitle } from "../play/ledger";
+import { ledgerLine, ruleTitle, sideText } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { BodyText, NavBar, Screen } from "./chrome";
 import { TableTopBar, TOP_BAR } from "./table-top-bar";
@@ -51,10 +59,11 @@ import type { CardFacts } from "./open-game";
 import { commandWidth as commandWidthOf } from "./table-command";
 import { useUiScale } from "../play/ui-scale";
 
-function picture(code: string): PictureSource | null {
-  const bundled = scanAssets[code];
+// By picture key (src/play/picture-key.ts): side B where it is bundled, else the card's side A picture.
+function picture(key: string): PictureSource | null {
+  const bundled = scanAssets[key] ?? scanAssets[pictureCode(key)];
   if (bundled) return bundled.moduleId;
-  const cached = cachedImage(code);
+  const cached = cachedImage(pictureCode(key));
   return cached ? { uri: cached.uri } : null;
 }
 
@@ -75,7 +84,10 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const insets = useSafeAreaInsets();
   const screen = useWindowDimensions();
   const s = useUiScale();
-  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+  // The canvas wrapper's size, and its left edge in the row (the quest scale's width, when it shows).
+  const [size, setSize] = useState<{ width: number; height: number; x: number } | null>(null);
+  // The plan and clock the table canvas hands the combat spotlight's full-screen layer, created once (spotlight-handoff.ts).
+  const [handoff] = useState(createHandoff);
   const images = useImageSnapshot();
   const game = useStore(store, (state) => state.game);
   const refusal = useStore(store, (state) => state.refusal);
@@ -174,7 +186,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [store],
   );
   const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
-  const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
+  // The stage the quest just advanced to, shown large until Progress (src/play/quest-advance.ts); the table answers nothing meanwhile.
+  const advance = useQuestAdvance(store);
+  const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome, hold: advance.held });
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
   const pills = dockPills(choice.extras);
   const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
@@ -186,6 +200,11 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      // The quest advance screen is on top: Back is its Progress, and does nothing while the stage asks.
+      if (advance.shown) {
+        if (!advance.asks) advance.close();
+        return true;
+      }
       const step = backStep({
         ...playLayers(store),
         menuOpen, moreOpen, linesOpen,
@@ -203,11 +222,11 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav]);
+  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav, advance]);
 
   const onLayout = (event: LayoutChangeEvent) => {
-    const { width, height } = event.nativeEvent.layout;
-    setSize((current) => (current && current.width === width && current.height === height ? current : { width, height }));
+    const { width, height, x } = event.nativeEvent.layout;
+    setSize((current) => (current && current.width === width && current.height === height && current.x === x ? current : { width, height, x }));
   };
 
   // The staging enemies' engagement costs, marked on each dial's meter (the same for every seat; each dial reads its own).
@@ -222,19 +241,31 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const tokens = campaignTokens(game, ctx.effects, nameOf);
   const held = heldDial(game, nameOf);
   const commandWidth = commandWidthOf(screen.width, s);
+  // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
+  // the quest scale) and the safe insets (spotlight-stage.ts).
+  const barBottom = insets.top + TOP_BAR * s;
+  const canvasX = size?.x ?? 0;
+  const stageArea = useMemo<StageArea>(
+    () => ({ width: screen.width, height: screen.height, origin: { x: insets.left + canvasX, y: barBottom }, safe: { top: insets.top, right: insets.right, bottom: insets.bottom, left: insets.left } }),
+    [screen.width, screen.height, insets.left, insets.top, insets.right, insets.bottom, canvasX, barBottom],
+  );
   const narrow = (screen.width - insets.left - insets.right) / s < 760;
+  // How a card code is shown large, by picture key (src/play/picture-key.ts): the preview's cards and the advanced stage.
+  const describe = (code: string, key = code) => ({
+    name: nameOf(code),
+    source: picture(key),
+    landscape: session.world.cards.get(code)?.type === "quest",
+    // A revealed quest stage reads its B side.
+    text: (key !== code ? sideText(code, "B") : null) ?? session.facts.get(code)?.text ?? standInText(session.world.cards, code),
+    notApplied: notApplied(code, session.world.cards.get(code)?.type, session.facts.get(code)?.text ?? null),
+  });
+  const advancedCard = advance.shown ? game.cards[advance.shown.stageId] : undefined;
   const previewed = preview
     ? previewCards(
         game,
         ctx,
         preview.id,
-        (code) => ({
-          name: nameOf(code),
-          source: picture(code),
-          landscape: session.world.cards.get(code)?.type === "quest",
-          text: session.facts.get(code)?.text ?? standInText(session.world.cards, code),
-          notApplied: notApplied(code, session.world.cards.get(code)?.type, session.facts.get(code)?.text ?? null),
-        }),
+        describe,
         names.card,
         preview.extra,
         ledgerLine,
@@ -304,6 +335,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 raised={choice.raised}
                 fight={choice.fight}
                 bottomInset={insets.bottom}
+                stageArea={stageArea}
+                handoff={handoff}
                 look={look}
                 onTap={choice.onTap}
                 onPreview={onPreview}
@@ -346,7 +379,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         logNames={logNames}
         screen={screen}
         insets={insets}
-        barBottom={insets.top + TOP_BAR * s}
+        barBottom={barBottom}
         commandWidth={commandWidth}
         anchorTop={anchor}
         onPreview={onPreview}
@@ -356,8 +389,23 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           router.push({ pathname: "/settings", params: { from: "table" } });
         }}
       />
-      {/* Over the table and any open panel, centered on the screen under the top bar. */}
-      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + (TOP_BAR + 6 + (peek.words ? PEEK_ROOM : 0)) * s} width={screen.width} onBeat={choice.onBeat} /> : null}
+      {/* The combat spotlight: a full-screen canvas over the table, the bar and the dock, mounted only while it plays and deaf to touches
+          (the table canvas and the scrim in TableLayers catch the skip). The banner, the preview and the menu stay above it. */}
+      <SpotlightLayer handoff={handoff} picture={picture} pictureRevision={images.revision} nameOf={nameOf} sphereOf={sphereOf} />
+      {/* Over the top bar, the table and any open panel, centered over the canvas at the screen's top edge (user request,
+          2026-10-29), so it never covers the command column's tray. While the table peeks it hangs under the peek pill, so
+          Back to Player 1 stays in reach. */}
+      {choice.banner ? (
+        <MomentBanner
+          key={choice.bannerKey}
+          moment={choice.banner}
+          top={peek.words ? insets.top + (TOP_BAR + PEEK_ROOM) * s : insets.top + 4 * s}
+          left={insets.left}
+          right={insets.right + commandWidth}
+          onBeat={choice.onBeat}
+          onDismiss={choice.dismissBanner}
+        />
+      ) : null}
       {preview && previewed && shown ? (
         <CardPreview
           key={preview.id}
@@ -367,6 +415,17 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           ownsBack={false}
           closeRef={previewClose}
           onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })}
+        />
+      ) : null}
+      {advance.shown && advancedCard ? (
+        <QuestAdvanceView
+          key={advance.shown.seq}
+          card={{ code: advancedCard.code, ...describe(advancedCard.code, pictureKey(advancedCard)) }}
+          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine)}
+          asks={advance.asks}
+          choice={choice}
+          picture={picture}
+          onProgress={advance.close}
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}

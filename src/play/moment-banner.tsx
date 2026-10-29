@@ -1,0 +1,153 @@
+// The outcome banner over the table (docs/design-system.md, Table, Banner): what the last intent did, in beats, for a few
+// seconds. A tap or a swipe sends it away (user request, 2026-10-29); the log keeps every step.
+import { useEffect, useMemo, useState } from "react";
+import { AccessibilityInfo, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, { FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
+
+import { layoutAnim, timing, useMotionScale, useReduceMotion } from "./motion-run.ts";
+import { MOTION } from "./motion-tokens.ts";
+import { BEAT_MS, type Moment } from "./outcome.ts";
+import { LineMark } from "./table-chrome.tsx";
+import { panelSurface, raisedEdgeOf } from "./surfaces.ts";
+import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { useUiScale } from "./ui-scale.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
+
+const BANNER_WIDTH = 440;
+// A swipe this far sideways or up, or a flick, sends the banner away. Medium's sizes, drawn at the UI scale.
+const SWIPE_SIDEWAYS = 56;
+const SWIPE_UP = 34;
+const FLICK = 600;
+
+/**
+ * The banner's fill (user request, 2026-10-29): dark and slightly see-through on Dark, a dark red for a failure or an attack
+ * (docs/design-system.md, Table: the combat banner), with the lit top edge and a 1 pt edge in the tone. Light keeps its lit
+ * panel, a little see-through.
+ */
+function bannerFill(t: TableTokens, tone: Moment["tone"], edge: string) {
+  const border = { borderWidth: 1, borderColor: withAlphaHex(edge, 0.45) };
+  if (t.depth === "light") return { ...border, backgroundColor: withAlphaHex(t.raisedTop, 0.9), boxShadow: panelSurface(false, t).boxShadow };
+  return { ...border, backgroundColor: tone === "bad" ? "rgba(26,10,9,0.9)" : withAlphaHex(t.night, 0.9), boxShadow: `${raisedEdgeOf(t)}, 0 10px 28px ${withAlphaHex(t.shade, 0.7)}` };
+}
+
+/**
+ * What the last intent did, centered at the top edge of the room it is given (`left` to `right`, the canvas's columns: it
+ * never covers the command column and its tray) for a few seconds, over the top bar, the table and any open panel. `top` is
+ * where it hangs. A tap, or a swipe sideways or up, dismisses it (`onDismiss`). The caller keys it on the moment, so each one
+ * enters and is announced.
+ */
+export function MomentBanner({
+  moment,
+  top,
+  left,
+  right,
+  onBeat,
+  onDismiss,
+}: {
+  moment: Moment;
+  top: number;
+  left: number;
+  right: number;
+  onBeat?: (cards: readonly string[]) => void;
+  onDismiss: () => void;
+}) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const edge = moment.tone === "good" ? t.accentHigh : moment.tone === "bad" ? t.threat : t.faint;
+  const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
+  // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
+  useEffect(() => {
+    AccessibilityInfo.announceForAccessibility(label);
+  }, [label]);
+  // The fades: the banner and each line come in and the banner goes out over MOTION.bannerIn and bannerOut.
+  const scale = useMotionScale();
+  const fade = useMemo(() => ({ enter: layoutAnim(FadeInDown, MOTION.bannerIn, scale), leave: layoutAnim(FadeOut, MOTION.bannerOut, scale) }), [scale]);
+  // The swipe: the banner follows the finger, and past the distance (or on a flick) slides off and is dismissed; short of it, it
+  // springs back. A downward drag only stretches a little, since down is not a way out. A tap dismisses it where it stands.
+  const dx = useSharedValue(0);
+  const dy = useSharedValue(0);
+  const gesture = useMemo(() => {
+    const tap = Gesture.Tap().onEnd((_event, success) => {
+      if (success) scheduleOnRN(onDismiss);
+    });
+    const pan = Gesture.Pan()
+      .activeOffsetX([-10, 10])
+      .activeOffsetY([-10, 10])
+      .onUpdate((event) => {
+        dx.set(event.translationX);
+        dy.set(Math.min(event.translationY, 8 * s));
+      })
+      .onEnd((event) => {
+        const sideways = Math.abs(event.translationX) > SWIPE_SIDEWAYS * s || Math.abs(event.velocityX) > FLICK * s;
+        const up = event.translationY < -SWIPE_UP * s || event.velocityY < -FLICK * s;
+        if (!sideways && !up) {
+          dx.set(withSpring(0));
+          dy.set(withSpring(0));
+          return;
+        }
+        const done = (finished?: boolean) => {
+          "worklet";
+          if (finished) scheduleOnRN(onDismiss);
+        };
+        // Up wins when the drag went mostly up.
+        if (sideways && !(up && Math.abs(event.translationY) > Math.abs(event.translationX))) dx.set(withTiming(Math.sign(event.translationX || event.velocityX) * (BANNER_WIDTH + 200) * s, timing(MOTION.bannerOut, scale), done));
+        else dy.set(withTiming(-(top + 200 * s), timing(MOTION.bannerOut, scale), done));
+      });
+    return Gesture.Race(pan, tap);
+  }, [dx, dy, s, top, scale, onDismiss]);
+  const swipeStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: dx.get() }, { translateY: dy.get() }],
+    opacity: 1 - Math.min(0.6, Math.abs(dx.get()) / (BANNER_WIDTH * s)),
+  }));
+  // Resolve in beats: one line more every BEAT_MS, each ringing on the table the cards it names; reduced motion shows all.
+  const reduceMotion = useReduceMotion();
+  const [shownLines, setShownLines] = useState(reduceMotion ? moment.lines.length : 1);
+  useEffect(() => {
+    if (shownLines >= moment.lines.length) return;
+    const timer = setTimeout(() => setShownLines((count) => count + 1), BEAT_MS);
+    return () => clearTimeout(timer);
+  }, [shownLines, moment.lines.length]);
+  const beatCards = moment.lines[Math.max(0, shownLines - 1)]?.cards ?? [];
+  const beatKey = beatCards.join(",");
+  useEffect(() => {
+    onBeat?.(beatKey === "" ? [] : beatKey.split(","));
+    return () => onBeat?.([]);
+  }, [beatKey, onBeat]);
+  return (
+    <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" style={{ position: "absolute", top, left, right, alignItems: "center", paddingHorizontal: 16 }}>
+      <GestureDetector gesture={gesture}>
+        {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
+        <Animated.View className="rounded-card" style={[{ minWidth: 260 * s, maxWidth: BANNER_WIDTH * s, ...bannerFill(t, moment.tone, edge) }, swipeStyle]}>
+          <View
+            testID="moment"
+            accessible
+            accessibilityLabel={label}
+            accessibilityActions={[{ name: "escape", label: "Dismiss" }]}
+            onAccessibilityAction={(event) => {
+              if (event.nativeEvent.actionName === "escape") onDismiss();
+            }}
+            onAccessibilityEscape={onDismiss}
+            className="overflow-hidden rounded-card"
+          >
+            {/* The tone, as a 3 pt band along the top: silver for a success, threat red for a failure or an engagement. */}
+            <View style={{ height: 3 * s, backgroundColor: edge, ...(moment.tone === "bad" ? {} : { opacity: 0.8 }) }} />
+            <View className="items-center px-4 pb-2 pt-1.5">
+              <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 * s }}>
+                {moment.title}
+              </Text>
+              {moment.lines.slice(0, shownLines).map((line, index) => (
+                <Animated.View key={index} entering={fade.enter} className="mt-0.5 flex-row items-center gap-2">
+                  <LineMark mark={line.mark} tint="bone" size={14 * s} />
+                  <Text className="shrink text-label text-bone">{line.text}</Text>
+                </Animated.View>
+              ))}
+            </View>
+          </View>
+        </Animated.View>
+      </GestureDetector>
+    </Animated.View>
+  );
+}

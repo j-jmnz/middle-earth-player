@@ -7,13 +7,14 @@ import { dungeonDetail } from "./dungeon-preview.ts";
 import { oathDetail } from "./oath-preview.ts";
 import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
-import { questObjective, stagePoints } from "./objective.ts";
+import { advanceHold, questObjective, stagePoints } from "./objective.ts";
+import { pictureKey } from "./picture-key.ts";
 import { inspectTargets } from "./selectors.ts";
 import { whyNotPlayable } from "./why.ts";
 
-// A card code as the preview draws it: its name, its picture (or null), whether it is printed sideways, its text, and the
-// lines of it the app does not apply.
-export type Describe = (code: string) => Omit<PreviewCard, "code" | "effects" | "role" | "note" | "title" | "detail">;
+// A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
+// stage), whether it is printed sideways, its text, and the lines of it the app does not apply.
+export type Describe = (code: string, picture?: string) => Omit<PreviewCard, "code" | "effects" | "role" | "note" | "title" | "detail">;
 
 /**
  * The quest stage's title line in its preview: its name and its progress over its quest points ("Flight to the Ford · 2 / 8"). A
@@ -24,7 +25,9 @@ export function questTitle(game: ScenarioState, ctx: ReduceContext, cardId: stri
   const stage = game.questStage === cardId ? game.cards[cardId] : undefined;
   if (!stage) return null;
   const points = stagePoints(game, stage, ctx);
-  if (points != null) return { title: `${name} · ${stage.progress} / ${points}` };
+  // A stage held back says what holds it, so progress past its quest points reads as the rule and not a fault (13 / 8).
+  const hold = points != null ? advanceHold(game, ctx, line) : null;
+  if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(hold ? { detail: `Cannot advance yet: ${hold}` } : {}) };
   const objective = questObjective(game, ctx, line);
   return { title: name, detail: objective ? `To win: ${objective}` : "No quest points" };
 }
@@ -51,7 +54,7 @@ export function previewCards(
     // does not glow.
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];
     const note = id === cardId ? whyNotPlayable(game, ctx, id, cardName) : null;
-    const described = describe(card.code);
+    const described = describe(card.code, pictureKey(card));
     const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id);
     return [{ code: card.code, ...described, ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), effects, ...(role ? { role } : {}), ...(note ? { note } : {}) }];
   });

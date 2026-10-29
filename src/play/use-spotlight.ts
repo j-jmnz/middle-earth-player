@@ -12,8 +12,9 @@ import { tickImpact } from "./haptics.ts";
 import type { TableLayout } from "./layout.ts";
 import { easingOf, useMotionScale } from "./motion-run.ts";
 import { hitTime, leaveTime, spotlightRun } from "./spotlight-beats.ts";
-import { scrimShows, spotlightHolds } from "./spotlight-gate.ts";
+import { spotlightHolds } from "./spotlight-gate.ts";
 import { buildPlan, type SpotlightPlan } from "./spotlight-plan.ts";
+import { sameArea, type StageArea } from "./spotlight-stage.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import type { TableStore } from "./store.ts";
 import { tableSettings } from "./table-settings.ts";
@@ -38,37 +39,36 @@ export function useSpotlightHold(store: TableStore): boolean {
   return spotlightHolds(gate, useSpotlightScale(), CANVAS);
 }
 
-/** The scrim over the top bar and the dock: `shows` while the spotlight plays and its last attack has not begun to go back, `catches` while it is held at all. */
-export function useScrim(store: TableStore): { shows: boolean; catches: boolean } {
+/** Whether the skip catcher over the top bar and the dock takes touches: while the spotlight is held at all. */
+export function useScrim(store: TableStore): boolean {
   const gate = useStore(store, (state) => state.spotlight);
-  const scale = useSpotlightScale();
-  return { shows: scrimShows(gate, scale, CANVAS), catches: spotlightHolds(gate, scale, CANVAS) };
+  return spotlightHolds(gate, useSpotlightScale(), CANVAS);
 }
 
-type Track = { layout: TableLayout; seq: number; plan: SpotlightPlan | null };
+type Track = { layout: TableLayout; area: StageArea; seq: number; plan: SpotlightPlan | null };
 
 /**
  * The spotlight of the canvas: the plan for a new moment's attacks, worked out once during the render that brings its layout (the
  * same pattern as useCardMotion), and the clock that runs it. `progress` runs 0 to 1 over the plan's span at the motion scale, on the
  * UI thread. The gate ends when the clock does ("done"); a tap, a new canvas size, Undo or a moment that replaces it ends it early
- * ("skipped") and the clock is set to the end. With the scale at 0, or a plan it cannot draw, the gate is ended at once, so nothing
+ * ("skipped") and the clock is set to the end. `area` is the screen the stage fills (spotlight-stage.ts); a new one ends a spotlight like a new canvas size. With the scale at 0, or a plan it cannot draw, the gate is ended at once, so nothing
  * waits for a spotlight that does not play.
  */
-export function useSpotlight(store: TableStore, layout: TableLayout, k: number): { plan: SpotlightPlan | null; progress: SharedValue<number>; playing: boolean; live: SharedValue<boolean>; swallow: SharedValue<boolean> } {
+export function useSpotlight(store: TableStore, layout: TableLayout, area: StageArea, k: number): { plan: SpotlightPlan | null; progress: SharedValue<number>; playing: boolean; live: SharedValue<boolean>; swallow: SharedValue<boolean> } {
   const gate = useStore(store, (state) => state.spotlight);
   const gateScale = useSpotlightScale();
-  const [track, setTrack] = useState<Track>(() => ({ layout, seq: gate.seq, plan: null }));
-  if (track.layout !== layout) {
-    const sameSize = track.layout.width === layout.width && track.layout.height === layout.height;
+  const [track, setTrack] = useState<Track>(() => ({ layout, area, seq: gate.seq, plan: null }));
+  if (track.layout !== layout || !sameArea(track.area, area)) {
+    const sameSize = track.layout.width === layout.width && track.layout.height === layout.height && sameArea(track.area, area);
     const shown = store.getState().shown;
     let plan: SpotlightPlan | null = null;
     if (gate.seq !== track.seq) {
       // A new moment's attacks fly from where the cards stood before the state, else from where they stand now.
       if (sameSize && spotlightHolds(gate, gateScale, CANVAS) && shown?.kind === "sent" && shown.seq === gate.seq) {
-        plan = buildPlan({ seq: gate.seq, clashes: gate.clashes, canvas: { width: layout.width, height: layout.height }, card: layout.card, prev: shown.before, next: shown.after, layouts: [track.layout, layout], scale: layout.scale ?? 1 });
+        plan = buildPlan({ seq: gate.seq, clashes: gate.clashes, canvas: { width: layout.width, height: layout.height }, area, card: layout.card, prev: shown.before, next: shown.after, layouts: [track.layout, layout], scale: layout.scale ?? 1 });
       }
     } else if (sameSize) plan = track.plan;
-    setTrack({ layout, seq: gate.seq, plan });
+    setTrack({ layout, area, seq: gate.seq, plan });
   }
   const { plan } = track;
   const playing = plan != null && plan.seq === gate.seq && gate.ended == null;

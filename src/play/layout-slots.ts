@@ -4,6 +4,7 @@ import type { CardInstance } from "../rules/state.ts";
 
 import type { CardSlot, Rect, SlotKind, SlotZone } from "./layout.ts";
 import type { ZoneEntry, ZoneId } from "./selectors.ts";
+import { pictureKey } from "./picture-key.ts";
 import { isPrisoner } from "./selectors.ts";
 
 export const ASPECT = 1.4;
@@ -18,6 +19,7 @@ export function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect:
     ...rect,
     id: card.id,
     code: card.code,
+    ...(card.face === "B" ? { picture: pictureKey(card) } : {}),
     zone,
     kind,
     exhausted: card.exhausted,
