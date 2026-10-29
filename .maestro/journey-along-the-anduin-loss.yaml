@@ -51,10 +51,10 @@ tags:
 # The log is unchanged: Passage Through Mirkwood completed, Journey Along the Anduin still current, Escape from Dol Guldur locked, no prisoner.
 - assertVisible:
     id: node-passage-through-mirkwood-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible:
     id: node-journey-along-the-anduin-status
-    text: "Current"
+    text: "Next"
 - assertVisible:
     id: node-escape-from-dol-guldur-status
     text: "Locked"

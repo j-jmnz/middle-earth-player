@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { cards } from "../../../catalog/schema";
@@ -16,15 +16,25 @@ import { routeCode } from "../../route-code";
 import { useSave } from "../../use-save";
 import { GameIcon } from "../../../play/game-icon";
 import type { IconName } from "../../../play/icon-map";
+import { parchmentSurface } from "../../../play/surfaces";
+import { withAlphaHex } from "../../../play/tokens";
+import { useTableTokens } from "../../../play/use-table-tokens";
 import { useUiScale } from "../../../play/ui-scale";
+import { useSizeClass } from "../../../play/use-size-class";
+import { seatWord } from "../../seats";
+import { Text, TextInput } from "../../../play/text";
+
+// A rule between the log's rows: a faint line of the ink, as on the printed sheet.
+const RULE = 0.28;
 
 function Row({ label, value, testID, icon }: { label: string; value: string; testID: string; icon?: IconName }) {
   const s = useUiScale();
+  const palette = usePalette();
   return (
-    <View className="border-b border-inkLine py-3">
+    <View className="py-2.5" style={{ borderBottomWidth: 1, borderBottomColor: withAlphaHex(palette.inkLine, RULE) }}>
       <View className="flex-row items-center gap-1">
         {icon ? <GameIcon name={icon} size={12 * s} tint="inkLabel" /> : null}
-        <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
+        <Text className="font-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
       </View>
       <Text testID={testID} className="mt-0.5 text-body text-ink">
         {value}
@@ -35,6 +45,8 @@ function Row({ label, value, testID, icon }: { label: string; value: string; tes
 
 export default function Log() {
   const palette = usePalette();
+  const t = useTableTokens();
+  const { size, s } = useSizeClass();
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string }>();
   const saveId = routeCode(params.saveId);
@@ -71,11 +83,11 @@ export default function Log() {
     setEdited(null);
   }
   const back = <NavBar onBack={() => { saveNotes(); goBack(router, save ? { pathname: "/path/[saveId]", params: { saveId: save.id } } : "/"); }} backTestID="log-back" backLabel="Path" right={save ? <IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId) })} /> : undefined} />;
-  if (!loaded) return <Screen testID="log" scene="plain">{back}<BodyText tone="muted">Loading</BodyText></Screen>;
+  if (!loaded) return <Screen testID="log" scene="ember">{back}<BodyText tone="muted">Loading</BodyText></Screen>;
   const campaign = save ? campaignOf(save.campaignId) : null;
   if (!save || !campaign) {
     return (
-      <Screen testID="log" scene="plain">
+      <Screen testID="log" scene="ember">
         {back}
         <BodyText tone="danger">That playthrough is not on this phone.</BodyText>
       </Screen>
@@ -95,14 +107,15 @@ export default function Log() {
   const notes = edited ?? log.notes;
 
   return (
-    <Screen testID="log" scene="plain">
+    <Screen testID="log" scene="ember">
       {back}
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-safe" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
         <Column>
-        <View className="mt-2 rounded-card bg-paper px-5 py-5" style={{ borderWidth: 1, borderColor: palette.paperEdge }}>
-          <View className="items-center">
-            <Eyebrow tone="inkLabel">{campaign.name}</Eyebrow>
-            <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">
+        {/* Weathered parchment on the ember fog (docs/design-system.md, Campaign log): the same sheet on both themes. */}
+        <View className="mb-6 mt-2 rounded-chip px-5 py-5" style={parchmentSurface(t)}>
+          <View>
+            <Eyebrow tone="inkLabel">{`${campaign.name} · ${seatWord(save.seatCount)}`}</Eyebrow>
+            <Text accessibilityRole="header" className="mt-1 font-display text-ink" style={{ fontSize: (size === "compact" ? 30 : 38) * s, lineHeight: (size === "compact" ? 36 : 46) * s }}>
               Campaign Log
             </Text>
           </View>
@@ -127,21 +140,23 @@ export default function Log() {
           {log.usedOnce.length > 0 ? <Row label="Used this campaign" value={usedOnceWords(log.usedOnce, nameOf)} testID="log-used-once" /> : null}
           {/* The cards a Resolution keeps for the next campaign, not this one (Escape from Dol Guldur's Mendor, 01131:B:2). */}
           {log.carryOver.length > 0 ? <Row label="Next Campaign" value={carryWords(log.carryOver, nameOf)} testID="log-carry-over" /> : null}
-          <View className="border-b border-inkLine py-3">
-            <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">Scenarios Completed</Text>
+          <View className="py-2.5" style={{ borderBottomWidth: 1, borderBottomColor: withAlphaHex(palette.inkLine, RULE) }}>
+            <Text className="font-bold text-eyebrow uppercase text-inkLabel">Scenarios Completed</Text>
             {campaign.scenarios.map((id) => {
               const score = log.scenarios[id];
               return (
-                <View key={id} testID={`log-scenario-${id}`} className="mt-1 flex-row items-baseline justify-between">
-                  <Text className={score ? "flex-1 text-body text-ink" : "flex-1 text-body text-inkMuted"}>{names[id] ?? id}</Text>
-                  <Text className={score ? "font-display-bold text-label text-ink" : "text-label text-inkMuted"}>{score ? `${score.rounds} rounds · ${score.score}` : "Not completed"}</Text>
+                <View key={id} testID={`log-scenario-${id}`} className="mt-1 flex-row items-baseline gap-1.5">
+                  <Text className={score ? "text-body text-ink" : "text-body text-inkMuted"}>{names[id] ?? id}</Text>
+                  {/* Dotted leaders to the score, as a printed log ruled by hand. */}
+                  <View className="min-w-3 flex-1" style={{ borderBottomWidth: 1.5, borderStyle: "dotted", borderColor: withAlphaHex(palette.inkLine, 0.4), marginBottom: 4 * s }} />
+                  <Text className={score ? "font-display text-label text-ink" : "text-label text-inkMuted"}>{score ? `${score.rounds} rounds · ${score.score}` : "Not completed"}</Text>
                 </View>
               );
             })}
           </View>
           <Row label="Campaign Total" value={String(log.score)} testID="log-score" />
           <View className="py-3">
-            <Text className="font-display-bold text-eyebrow uppercase text-inkLabel">Notes</Text>
+            <Text className="font-bold text-eyebrow uppercase text-inkLabel">Notes</Text>
             <TextInput
               testID="log-notes"
               multiline

@@ -10,6 +10,8 @@ export type Region = { x: number; y: number; w: number; h: number };
 export const FACE: Region = { x: 0.47, y: 0.04, w: 0.3, h: 0.215 };
 /** The painting of a player card: right of the stat column, above the name banner. */
 export const PAINTING: Region = { x: 0.2, y: 0.03, w: 0.78, h: 0.55 };
+/** The heart of the painting, clear of the stat column and the gold border: a deck cover's slice, often wider than it is tall. */
+export const COVER: Region = { x: 0.3, y: 0.06, w: 0.62, h: 0.45 };
 /** The scene of a quest card: under its two title banners, above its text box and clear of the encounter-set badge. */
 export const SCENE: Region = { x: 0.02, y: 0.21, w: 0.8, h: 0.36 };
 

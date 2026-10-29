@@ -48,10 +48,10 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-the-oath-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible:
     id: node-the-caves-of-nibin-dum-status
-    text: "Current"
+    text: "Next"
 # Kill and relaunch: the scenario is on the log with the Adaptations, Stalking Goblin and the facts, and The Caves of Nibin-Dûm is unlocked.
 - stopApp
 - launchApp
@@ -63,7 +63,7 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-the-caves-of-nibin-dum-status
-    text: "Current"
+    text: "Next"
 - tapOn:
     id: log-open
 - extendedWaitUntil:

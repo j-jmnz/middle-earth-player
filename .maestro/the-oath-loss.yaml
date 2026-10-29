@@ -51,7 +51,7 @@ tags:
 # The log is unchanged: The Oath still current, The Caves of Nibin-Dûm locked, no once-per-campaign use and no token count written.
 - assertVisible:
     id: node-the-oath-status
-    text: "Current"
+    text: "Next"
 - assertVisible:
     id: node-the-caves-of-nibin-dum-status
     text: "Locked"

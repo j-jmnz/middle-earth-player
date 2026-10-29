@@ -5,7 +5,7 @@
 // no intent. It drops in on open and leaves on close (MOTION.carouselEnter, MOTION.carouselLeave), snaps under reduced motion, and
 // nothing animates while it scrolls.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { cardWidth, startIndex, STOP_AHEAD_WORDS, STOPS_TEXT, type Carousel } from "./carousel.ts";
@@ -19,6 +19,7 @@ import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // The strip drops in by this much (translateY -12 to 0 with a fade).
 const DROP = 12;
@@ -26,7 +27,7 @@ const GAP = 10;
 // The strip floats this far inside the canvas and under the top bar, a lit panel of its own rather than a slab hung off the bar.
 const INSET = 8;
 
-// The round as seven segments under the head's words: deep gold for the phases done, gold for the game's, a hairline for those to
+// The round as seven segments under the head's words: deep accent for the phases done, accent for the game's, a hairline for those to
 // come. The one the strip rests on stands taller, so the track says both where the game is and which card is being read.
 function RoundTrack({ phases, index }: { phases: Carousel["phases"]; index: number }) {
   const t = useTableTokens();
@@ -40,7 +41,7 @@ function RoundTrack({ phases, index }: { phases: Carousel["phases"]; index: numb
             flex: 1,
             height: (at === index ? 5 : 3) * s,
             borderRadius: 3 * s,
-            backgroundColor: phase.state === "current" ? t.gold : phase.state === "past" ? t.goldDeep : t.hairline,
+            backgroundColor: phase.state === "current" ? t.accent : phase.state === "past" ? t.accentDeep : t.hairline,
           }}
         />
       ))}
@@ -49,7 +50,7 @@ function RoundTrack({ phases, index }: { phases: Carousel["phases"]; index: numb
 }
 
 // The head: Earlier and Later chevrons (44 pt, one at each side, clear of the cards' text) around the round and the card being read
-// over the round's track, the gold S's meaning while a stop is ahead, and the master Stops switch.
+// over the round's track, the accent S's meaning while a stop is ahead, and the master Stops switch.
 function CarouselHead({
   carousel,
   settings,
@@ -90,7 +91,7 @@ function CarouselHead({
       {arrow(-1)}
       <View style={{ flex: 1, minWidth: 0 }} accessible accessibilityLabel={shown ? `${where}. Phase ${index + 1} of ${carousel.phases.length}, ${shown.name}` : where}>
         <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 * s }}>
-          <Text numberOfLines={1} className="font-display-bold text-micro uppercase" style={{ color: t.muted }}>
+          <Text numberOfLines={1} className="font-display text-micro uppercase" style={{ color: t.muted }}>
             {where}
           </Text>
           <Text numberOfLines={1} className="text-micro" style={{ color: t.faint }}>
@@ -101,8 +102,8 @@ function CarouselHead({
       </View>
       {carousel.stopAhead ? (
         <View testID="carousel-stop-ahead" accessible accessibilityLabel={STOP_AHEAD_WORDS} style={{ flexDirection: "row", alignItems: "center", gap: 6 * s, marginLeft: 8 * s }}>
-          <View style={{ width: 18 * s, height: 18 * s, borderRadius: 9 * s, borderWidth: 1, borderColor: t.gold, alignItems: "center", justifyContent: "center" }}>
-            <Text className="font-display-bold text-micro text-gold" style={{ lineHeight: 14 * s }}>
+          <View style={{ width: 18 * s, height: 18 * s, borderRadius: 9 * s, borderWidth: 1, borderColor: t.accent, alignItems: "center", justifyContent: "center" }}>
+            <Text className="font-display text-micro text-accent" style={{ lineHeight: 14 * s }}>
               S
             </Text>
           </View>

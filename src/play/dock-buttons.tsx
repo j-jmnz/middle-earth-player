@@ -5,7 +5,7 @@
 // it back. Arming changes no button's size, so the second tap lands where the first did. The parent keys this component on
 // the moment and the pick, so nothing stays armed into the next one.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import { AccessibilityInfo, Text, View } from "react-native";
+import { AccessibilityInfo, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { armedLines, armedRoom, armedWords, BAR_DENSE_PX, BAR_PX, LINE_PX } from "./armed-room.ts";
@@ -17,6 +17,7 @@ import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
 import { primaryReady, type Dock, type DockButton } from "./table-choice.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // How long an armed button waits for its second tap; longer while a screen reader is on. That is a timer, not a motion token: the bar
 // only shows it running out, on the linear curve of motion-tokens.ts, and does not run under reduced motion (the line says it).
@@ -111,14 +112,14 @@ export function DockButtons({
       <View style={{ height: armedRoom(lines, dense, s) }}>
         <View style={{ height: lines * LINE_PX * s, justifyContent: "flex-end" }}>
           {line ? (
-            <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} accessibilityLabel={armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : undefined} className={`text-center text-label ${armedButton ? "text-gold" : "text-muted"}`}>
+            <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} accessibilityLabel={armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : undefined} className={`text-center text-label ${armedButton ? "text-accent" : "text-muted"}`}>
               {line}
             </Text>
           ) : null}
         </View>
         {armedButton ? (
           <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "center", alignItems: "center" }}>
-            <Animated.View style={[{ height: 2 * s, backgroundColor: t.gold }, bar]} />
+            <Animated.View style={[{ height: 2 * s, backgroundColor: t.accent }, bar]} />
           </View>
         ) : null}
       </View>
@@ -138,7 +139,7 @@ export function DockButtons({
       {dock.secondary.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1.5">
           {dock.secondary.map((button) => (
-            <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="plate" tight={dense} tone={armed === button.testID ? "gold" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
+            <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="plate" tight={dense} tone={armed === button.testID ? "accent" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
           ))}
         </View>
       ) : null}

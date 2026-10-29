@@ -2,13 +2,14 @@
 // one-colour vector is tinted with a design-system token; the token-art PNGs keep their printed colours. An icon always
 // sits beside its word or carries an accessibility label, so Maestro's text assertions still read the word.
 import { Image } from "expo-image";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { iconAspect, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
 import { ICON_FILES } from "./icons/files.generated.ts";
 import type { TableToken } from "./tokens.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 export function GameIcon({ name, size = 16, tint, label }: { name: IconName; size?: number; tint?: TableToken; label?: string }) {
   const t = useTableTokens();

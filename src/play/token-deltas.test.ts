@@ -40,7 +40,7 @@ describe("tokenDeltas", () => {
 });
 
 describe("floatWords", () => {
-  it("is gold +n for a gain and threat-red -n for damage or a loss", () => {
+  it("is accent +n for a gain and threat-red -n for damage or a loss", () => {
     expect(floatWords({ token: "resources", change: 2 })).toEqual({ text: "+2", gain: true });
     expect(floatWords({ token: "resources", change: -1 })).toEqual({ text: "−1", gain: false });
     expect(floatWords({ token: "damage", change: 2 })).toEqual({ text: "−2", gain: false });

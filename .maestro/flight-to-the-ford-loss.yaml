@@ -47,7 +47,7 @@ tags:
 # The log is unchanged: Flight to the Ford still current, The Ring Goes South locked.
 - assertVisible:
     id: node-flight-to-the-ford-status
-    text: "Current"
+    text: "Next"
 - assertVisible:
     id: node-the-ring-goes-south-status
     text: "Locked"
@@ -61,7 +61,7 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-flight-to-the-ford-status
-    text: "Current"
+    text: "Next"
 - assertVisible:
     id: node-the-ring-goes-south-status
     text: "Locked"

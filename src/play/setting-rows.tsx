@@ -1,7 +1,7 @@
 // The settings rows the Settings tab (src/screens/settings-view.tsx) and the table's settings panel (reading-panels.tsx) share (docs/design-system.md,
 // Components and Settings; user request, 2026-10-28): the grouped sections with their choices and switches, so the two cannot drift apart.
 // They live in src/play because src/play cannot import src/screens. `testPrefix` is `app-settings` on the tab and `settings` on the panel.
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import type { ReactNode } from "react";
 
 import { Segmented } from "./segmented.tsx";
@@ -12,6 +12,7 @@ import { REDUCE_MOTION_OPTIONS, THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSetti
 import { SectionHeading } from "./section-heading.tsx";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 export type SettingGroupId = "display" | "motion" | "table";
 
@@ -40,7 +41,7 @@ export function SettingGroup({ title, testID, first = false, children }: { title
   );
 }
 
-/** A gold text button on night: body type, 44 pt, a pressed fill. The screens-side twin is `TextButton` (chrome-buttons.tsx), which this look matches; the caller keeps it left with `-mx-3 items-start`. */
+/** An accent text button on night: body type, 44 pt, a pressed fill. The screens-side twin is `TextButton` (chrome-buttons.tsx), which this look matches; the caller keeps it left with `-mx-3 items-start`. */
 export function SettingTextButton({ label, accessibilityLabel, onPress, testID }: { label: string; accessibilityLabel?: string; onPress: () => void; testID: string }) {
   const t = useTableTokens();
   return (
@@ -53,7 +54,7 @@ export function SettingTextButton({ label, accessibilityLabel, onPress, testID }
       className="min-h-touch items-center justify-center rounded-tile px-3"
       style={({ pressed }) => (pressed ? { backgroundColor: t.pressed } : undefined)}
     >
-      <Text className="text-body font-medium text-gold">{label}</Text>
+      <Text className="text-body font-medium text-accent">{label}</Text>
     </Pressable>
   );
 }

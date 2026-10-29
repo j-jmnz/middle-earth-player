@@ -96,7 +96,7 @@ function stopAhead(game: ScenarioState, phase: CarouselPhase | undefined, stops:
 
 /** The Stops setting in words (the screen reader's hint on the master switch). */
 export const STOPS_TEXT = "Pass the action windows that are not stops, unless a card usable there is new. Planning, the commit, Responses and every choice still ask.";
-/** The words for the gold S: a stop of the player's lies ahead in this phase. */
+/** The words for the accent S: a stop of the player's lies ahead in this phase. */
 export const STOP_AHEAD_WORDS = "A stop is ahead";
 
 const CARD_MIN = 230;

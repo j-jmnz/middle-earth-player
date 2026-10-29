@@ -3,9 +3,11 @@
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 
+// Split by platform (Skia on a phone, CSS on the web), so imported without its extension.
+import { ArcRing } from "./arc-ring";
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import type { LogMark } from "./log.ts";
@@ -17,21 +19,24 @@ import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLev
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
+// The dial's diameter at Medium: a ring of threat red round a dark disc (docs/design-system.md, Table).
+const DIAL = 46;
 
 // The dial's edge and fill at each level (threat-level.ts): threat red, tinted near elimination, solid when critical.
 const dialOf = (t: TableTokens): Record<ThreatLevel, { edge: string; fill: string; meter: string }> => ({
   calm: { edge: t.threat, fill: t.night, meter: t.threat },
-  near: { edge: t.danger, fill: withAlphaHex(t.threat, 0.35), meter: t.danger },
+  near: { edge: t.danger, fill: t.night, meter: t.danger },
   critical: { edge: t.threatEdge, fill: t.threat, meter: t.onThreat },
 });
 
 /**
- * The threat dial of the top bar (`compact`): the threat icon and the number large in Cinzel Bold on a threat-red pill, with a
- * meter along its foot that fills toward 50, the elimination level, and its label beside it. It warms near elimination,
- * pops when the number changes, and shows the change ("−6" in gold when it fell, "+2" in threat red when it rose) for three
+ * The threat dial of the top bar (`compact`): a round dial, the number in Marcellus SC over the word THREAT on a dark disc, ringed by
+ * an arc of threat red that fills toward 50, the elimination level, with a tick at each staging enemy's engagement cost. It warms near elimination,
+ * pops when the number changes, and shows the change ("−6" in accent when it fell, "+2" in threat red when it rose) for three
  * seconds; reduced motion keeps it still. `elimination` false (Life) drops the meter and the levels. Elsewhere, a ring with
  * its label under it. The reducer is the only writer of the number.
  */
@@ -57,7 +62,7 @@ export function ThreatRing({
   compact?: boolean;
   // What a screen reader says for a short label ("P1" reads "Player 1 threat").
   accessibilityName?: string;
-  // How the dial reads in two-handed play (peek.ts, `seatDial`). "acting", the seat the engine is asking: a gold label, and the dial pulses
+  // How the dial reads in two-handed play (peek.ts, `seatDial`). "acting", the seat the engine is asking: an accent label, and the dial pulses
   // when the engine turns to it. "viewing", the seat the player is peeking at, which is not the acting one: a bone ring round the dial
   // and a small eye mark. Both are in the screen reader's name. null: neither, and every dial of a solo game.
   role?: DialRole;
@@ -80,8 +85,8 @@ export function ThreatRing({
   if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
-      <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2 * s, borderColor: threat.eliminated ? t.hairline : t.gold }}>
-        <Text testID={`${id}-value`} className="font-display-bold text-title text-bone">
+      <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2 * s, borderColor: threat.eliminated ? t.hairline : t.accent }}>
+        <Text testID={`${id}-value`} className="font-display text-title text-bone">
           {String(threat.threat)}
         </Text>
       </View>
@@ -125,7 +130,7 @@ function ThreatDial({
   const s = useUiScale();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
   const level = elimination ? threatLevel(threat.threat) : "calm";
-  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? dialOf(t)[level] : { edge: t.gold, fill: t.night, meter: t.gold };
+  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? dialOf(t)[level] : { edge: t.accent, fill: t.night, meter: t.accent };
   // The change since the number last moved, shown beside the dial for DELTA_MS. A new change replaces it.
   const seen = useRef(threat.threat);
   const [change, setChange] = useState<{ before: number; after: number; at: number } | null>(null);
@@ -137,7 +142,7 @@ function ThreatDial({
     setChange({ before, after: threat.threat, at: Date.now() });
     if (speed > 0) scale.set(withSequence(withTiming(SHAPE.dialPop, timing(MOTION.dialPopRise, speed)), withSpring(1, springConfig(MOTION.dialPopSettle, speed))));
   }, [threat.threat, speed, scale]);
-  // The seat that is asked turns active in two-handed play: its dial pulses once in a gold ring (1 to 1.12 and back).
+  // The seat that is asked turns active in two-handed play: its dial pulses once in an accent ring (1 to 1.12 and back).
   const active = role === "acting";
   const wasActive = useRef(active);
   const pulse = useSharedValue(0);
@@ -172,26 +177,47 @@ function ThreatDial({
       style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
     >
       <Animated.View style={pop}>
-        <View
-          testID={id}
-          className="h-10 flex-row items-center gap-1 overflow-hidden rounded-pill px-2.5 pb-1"
-          style={{ minWidth: 64 * s, borderWidth: 2 * s, borderColor: look.edge, backgroundColor: look.fill }}
-        >
-          {icon ? <GameIcon name={icon} size={18 * s} tint={critical ? "onThreat" : "danger"} /> : null}
-          <Text testID={`${id}-value`} className="font-display-bold text-title text-bone" style={critical ? { color: t.onThreat } : undefined}>
-            {String(threat.threat)}
-          </Text>
-          {elimination && !threat.eliminated ? (
-            <View className="absolute overflow-hidden" style={{ left: 12 * s, right: 12 * s, bottom: 3 * s, height: 3 * s, borderRadius: 2 * s, backgroundColor: withAlphaHex(critical ? t.onThreat : t.bone, 0.16) }}>
-              <View style={{ height: 3 * s, width: `${Math.round(threatMeter(threat.threat) * 100)}%`, backgroundColor: look.meter }} />
-              {/* A tick at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}
-              {ticks.map((cost, index) => (
-                <View key={`${cost}:${index}`} style={{ position: "absolute", left: `${Math.round(threatMeter(cost) * 100)}%`, top: 0, width: 2 * s, height: 3 * s, backgroundColor: cost <= threat.threat ? (critical ? t.onThreat : t.bone) : t.faint }} />
-              ))}
+        <View testID={id} style={{ width: DIAL * s, height: DIAL * s, borderRadius: (DIAL / 2) * s, boxShadow: threat.eliminated ? undefined : `0 0 22px ${withAlphaHex(t.threat, critical ? 0.6 : 0.4)}` }}>
+          {/* The threat's share of 50, the elimination level, as an arc round the dial (rr.threat-elimination-level). */}
+          <ArcRing size={DIAL * s} stroke={4 * s} parts={elimination && !threat.eliminated ? [{ key: "threat", share: threatMeter(threat.threat), color: look.meter }] : []} track={withAlphaHex(t.threat, 0.16)}>
+            <View
+              className="items-center justify-center"
+              style={{
+                width: (DIAL - 8) * s,
+                height: (DIAL - 8) * s,
+                borderRadius: ((DIAL - 8) / 2) * s,
+                backgroundColor: look.fill,
+                backgroundImage: critical ? undefined : `radial-gradient(circle, ${withAlphaHex(t.threat, 0.28)}, ${withAlphaHex(t.night, 0.92)})`,
+              }}
+            >
+              <Text testID={`${id}-value`} className="font-display" style={{ fontSize: 18 * s, lineHeight: 20 * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
+                {String(threat.threat)}
+              </Text>
+              {icon === "threat" ? (
+                <Text className="font-bold uppercase" style={{ fontSize: 7 * s, lineHeight: 8 * s, letterSpacing: 0.8 * s, color: critical ? t.onThreat : t.danger }}>
+                  Threat
+                </Text>
+              ) : icon ? (
+                <GameIcon name={icon} size={9 * s} tint="danger" />
+              ) : null}
             </View>
-          ) : null}
+          </ArcRing>
+          {/* A tick on the ring at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}
+          {elimination && !threat.eliminated
+            ? ticks.map((cost, index) => {
+                const angle = threatMeter(cost) * 2 * Math.PI - Math.PI / 2;
+                const r = (DIAL / 2 - 2) * s;
+                return (
+                  <View
+                    key={`${cost}:${index}`}
+                    pointerEvents="none"
+                    style={{ position: "absolute", left: (DIAL / 2) * s + r * Math.cos(angle) - 1.5 * s, top: (DIAL / 2) * s + r * Math.sin(angle) - 1.5 * s, width: 3 * s, height: 3 * s, borderRadius: 1.5 * s, backgroundColor: cost <= threat.threat ? t.bone : t.faint }}
+                  />
+                );
+              })
+            : null}
         </View>
-        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2 * s, borderColor: t.gold }, ringStyle]} />
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2 * s, borderColor: t.accent }, ringStyle]} />
         {/* Peeking at this seat: a bone ring just outside the dial and an eye on its corner, clear of the label and its Ring mark. */}
         {role === "viewing" ? (
           <>
@@ -202,10 +228,11 @@ function ThreatDial({
       </Animated.View>
       <View className="items-start gap-0.5">
         <View className="flex-row items-center gap-1">
-          <Text className={`text-label ${role === "acting" ? "text-gold" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>
+          {/* The dial says THREAT itself; a seat's label (P1) and Life or Burden stand beside theirs. */}
+          {label === "Threat" && icon === "threat" ? null : <Text className={`text-label ${role === "acting" ? "text-accent" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>}
           {ring ? (
             <View testID={`${id}-ring`}>
-              <GameIcon name={ringMark} size={12 * s} tint={ringMark === "oneRing" ? "gold" : "bone"} />
+              <GameIcon name={ringMark} size={12 * s} tint={ringMark === "oneRing" ? "accent" : "bone"} />
             </View>
           ) : null}
         </View>
@@ -214,9 +241,9 @@ function ThreatDial({
             key={change?.at}
             entering={badge.in}
             exiting={badge.out}
-            style={{ borderRadius: 999, paddingHorizontal: 6 * s, borderWidth: 1, borderColor: delta.lowered ? t.gold : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.gold : t.threat, 0.22) }}
+            style={{ borderRadius: 999, paddingHorizontal: 6 * s, borderWidth: 1, borderColor: delta.lowered ? t.accent : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.accent : t.threat, 0.22) }}
           >
-            <Text testID={`${id}-delta`} className="font-display-bold text-label text-bone">
+            <Text testID={`${id}-delta`} className="font-display text-label text-bone">
               {delta.text}
             </Text>
           </Animated.View>

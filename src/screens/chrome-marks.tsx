@@ -1,17 +1,18 @@
-// The chrome's marks and status (docs/design-system.md, Components): chevrons, the gold corners of a framed card, the Ring, tags,
-// journey and progress bars, the sphere mark. Views and text only; re-exported by chrome.tsx.
+// The chrome's marks and status (docs/design-system.md, Components): chevrons, the Ring, the gear, tags, the journey track and the
+// progress bar, the sphere mark. Views and text only; re-exported by chrome.tsx.
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
-import { goldSurface } from "../play/surfaces";
+import { accentSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { useUiScale } from "../play/ui-scale";
 import { withAlphaHex } from "../play/tokens";
 import { palettes, type Palette } from "./palette.js";
 import type { MarkedSphere } from "./sphere-mark";
+import { Text } from "../play/text";
 
 /** A chevron drawn as views (no printed icon fits), pointing left for Back, right for a row that opens, down for a fold that is open. */
 export function Chevron({ direction = "left", color, size = 10 }: { direction?: "left" | "right" | "down"; color?: string; size?: number }) {
@@ -24,35 +25,15 @@ export function Chevron({ direction = "left", color, size = 10 }: { direction?: 
       style={{
         width: box,
         height: box,
-        borderLeftWidth: 2,
-        borderBottomWidth: 2,
-        borderColor: color ?? palette.bone,
+        borderLeftWidth: 2.5,
+        borderBottomWidth: 2.5,
+        borderColor: color ?? palette.accent,
         transform:
           direction === "down"
             ? [{ translateY: -box * 0.2 }, { rotate: "-45deg" }]
             : [{ translateX: direction === "left" ? box * 0.2 : -box * 0.2 }, { rotate: direction === "left" ? "45deg" : "-135deg" }],
       }}
     />
-  );
-}
-
-/** Four small gold diamonds on the corners of a framed thing: the current panel, the scenario to play, the fellowship chosen. */
-export function Corners() {
-  const palette = usePalette();
-  const s = useUiScale();
-  const out = -4 * s;
-  const at = [
-    { left: out, top: out },
-    { right: out, top: out },
-    { left: out, bottom: out },
-    { right: out, bottom: out },
-  ];
-  return (
-    <>
-      {at.map((place, index) => (
-        <View key={index} pointerEvents="none" importantForAccessibility="no" style={{ position: "absolute", width: 7 * s, height: 7 * s, backgroundColor: palette.gold, transform: [{ rotate: "45deg" }], ...place }} />
-      ))}
-    </>
   );
 }
 
@@ -63,7 +44,7 @@ export function RingMark({ size = 18, state = "current" }: { size?: number; stat
   const s = useUiScale();
   const box = size * s;
   if (state === "done") {
-    return <View style={{ width: box, height: box, borderRadius: box / 2, ...goldSurface(false, t) }} />;
+    return <View style={{ width: box, height: box, borderRadius: box / 2, ...accentSurface(false, t) }} />;
   }
   return (
     <View
@@ -72,7 +53,7 @@ export function RingMark({ size = 18, state = "current" }: { size?: number; stat
         height: box,
         borderRadius: box / 2,
         borderWidth: state === "locked" ? 1.5 : Math.max(2, box / 9),
-        borderColor: state === "locked" ? palette.hairline : palette.gold,
+        borderColor: state === "locked" ? palette.hairline : palette.accent,
       }}
     />
   );
@@ -110,63 +91,75 @@ export function GearMark({ color, size = 22 }: { color: string; size?: number })
 }
 
 const chipTonesOf = (palette: Palette) => ({
-  neutral: { fill: withAlphaHex(palette.bone, 0.06), edge: withAlphaHex(palette.bone, 0.1), text: palette.bone },
-  gold: { fill: withAlphaHex(palette.gold, 0.14), edge: withAlphaHex(palette.gold, 0.38), text: palette.goldHigh },
-  danger: { fill: withAlphaHex(palette.threat, 0.16), edge: withAlphaHex(palette.threat, 0.45), text: palette.danger },
-  ok: { fill: withAlphaHex(palette.ok, 0.12), edge: withAlphaHex(palette.ok, 0.35), text: palette.ok },
-  faint: { fill: "transparent", edge: palette.hairline, text: palette.faint },
+  neutral: { fill: withAlphaHex(palette.bone, 0.07), text: palette.muted },
+  accent: { fill: withAlphaHex(palette.accent, 0.14), text: palette.accentHigh },
+  danger: { fill: withAlphaHex(palette.threat, 0.18), text: palette.danger },
+  ok: { fill: withAlphaHex(palette.ok, 0.14), text: palette.ok },
+  faint: { fill: withAlphaHex(palette.bone, 0.03), text: palette.faint },
 });
 // Built once per theme, not per Chip.
 const chipTones = { dark: chipTonesOf(palettes.dark), light: chipTonesOf(palettes.light) };
 const chipTonesFor = (palette: Palette) => (palette === palettes.light ? chipTones.light : chipTones.dark);
 
-/** A small tag: a status, a reward, a rule. Words always, a mark beside them at most; colour is never the only signal. */
+/** A small tag: a status, a reward, a rule, a stage. A tinted wash with no edge, words always; colour is never the only signal. */
 export function Chip({ label, tone = "neutral", leading, testID, onArt = false }: { label: string; tone?: keyof typeof chipTones.dark; leading?: ReactNode; testID?: string; onArt?: boolean }) {
   const palette = usePalette();
   const look = chipTonesFor(palette)[tone];
-  // Over a picture the tag sits on night first, so its words read over a bright sky.
+  // Over a picture the tag sits on the ground first, so its words read over a bright sky.
   return (
-    <View className="h-7 flex-row items-center gap-1.5 rounded-chip px-2.5" style={{ backgroundColor: onArt ? withAlphaHex(palette.night, 0.72) : look.fill, borderWidth: 1, borderColor: look.edge }}>
+    <View className="h-6 flex-row items-center gap-1.5 rounded-chip px-2" style={{ backgroundColor: onArt ? withAlphaHex(palette.night, 0.72) : look.fill }}>
       {leading}
-      <Text testID={testID} numberOfLines={1} className="text-label font-semibold" style={{ color: look.text }}>
+      <Text testID={testID} numberOfLines={1} className="text-label" style={{ color: look.text }}>
         {label}
       </Text>
     </View>
   );
 }
 
-/** A journey of steps as one segmented bar: gold for the steps done, a lit gold for the current one, night for the rest. */
+/**
+ * A journey of steps as a track (the Continue panel): a filled diamond for each step done joined by a solid line, the current step as
+ * a larger outlined diamond with a glow, then a dashed line for what remains. The words beside it say the numbers.
+ */
 export function JourneyBar({ total, done, current = done < total, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
   const palette = usePalette();
+  const s = useUiScale();
+  const diamond = (size: number, filled: boolean, glow: boolean) => (
+    <View
+      style={{
+        width: size * s,
+        height: size * s,
+        transform: [{ rotate: "45deg" }],
+        backgroundColor: filled ? palette.accent : palette.night,
+        borderWidth: filled ? 0 : 2,
+        borderColor: palette.accentHigh,
+        ...(glow ? { boxShadow: `0 0 10px ${withAlphaHex(palette.glow, 0.6)}` } : {}),
+      }}
+    />
+  );
+  const line = (solid: boolean, key: string) => (
+    <View key={key} className="flex-1" style={solid ? { height: 2, backgroundColor: palette.accent } : { height: 0, borderTopWidth: 2, borderStyle: "dashed", borderColor: palette.hairline }} />
+  );
+  const steps: ReactNode[] = [];
+  for (let index = 0; index < total; index++) {
+    const state = index < done ? "done" : index === done && current ? "current" : "locked";
+    if (state === "done") steps.push(<View key={`d${index}`}>{diamond(9, true, false)}</View>);
+    if (state === "current") steps.push(<View key={`c${index}`}>{diamond(12, false, true)}</View>);
+    if (index < total - 1) steps.push(line(index + 1 <= done, `l${index}`));
+  }
   return (
-    <View testID={testID} className="flex-row gap-1" importantForAccessibility="no-hide-descendants">
-      {Array.from({ length: total }, (_, index) => {
-        const state = index < done ? "done" : index === done && current ? "current" : "locked";
-        return (
-          <View
-            key={index}
-            className="h-1 flex-1 rounded-pill"
-            style={
-              state === "done"
-                ? { backgroundColor: palette.gold }
-                : state === "current"
-                  ? { backgroundColor: palette.goldHigh, boxShadow: `0 0 8px ${withAlphaHex(palette.gold, 0.7)}` }
-                  : { backgroundColor: palette.hairline }
-            }
-          />
-        );
-      })}
+    <View testID={testID} className="min-h-4 flex-row items-center gap-1" importantForAccessibility="no-hide-descendants">
+      {steps}
     </View>
   );
 }
 
 /** A count against a goal as a thin bar (47 of 50 cards). The words beside it say the numbers. */
-export function ProgressBar({ value, max, tone = "gold" }: { value: number; max: number; tone?: "gold" | "danger" }) {
+export function ProgressBar({ value, max, tone = "accent" }: { value: number; max: number; tone?: "accent" | "danger" }) {
   const palette = usePalette();
   const share = max <= 0 ? 0 : Math.max(0, Math.min(1, value / max));
   return (
-    <View className="h-1 overflow-hidden rounded-pill" style={{ backgroundColor: palette.hairline }} importantForAccessibility="no-hide-descendants">
-      <View className="h-1 rounded-pill" style={{ width: `${Math.round(share * 100)}%`, backgroundColor: tone === "gold" ? palette.gold : palette.danger }} />
+    <View className="overflow-hidden rounded-pill" style={{ height: 3, backgroundColor: withAlphaHex(palette.bone, 0.08) }} importantForAccessibility="no-hide-descendants">
+      <View className="rounded-pill" style={{ height: 3, width: `${Math.round(share * 100)}%`, backgroundColor: tone === "accent" ? palette.accent : palette.danger }} />
     </View>
   );
 }

@@ -14,7 +14,7 @@ export const BAR_PX = 4;
 // On a short phone's dock (under 400 pt tall) the bar's reserve is 2 pt: the bar itself is 2.
 export const BAR_DENSE_PX = 2;
 // The words a sheet's armed line leads with; a dense dock drops them from a consequence clause when that saves a line (`armedWords`):
-// the line is gold and a bar runs down under the button, so it is plainly the second tap, and a screen reader hears the full line.
+// the line is accent and a bar runs down under the button, so it is plainly the second tap, and a screen reader hears the full line.
 export const LEAD = "Tap again: ";
 
 /** How many lines a greedy word wrap of `text` takes at `chars` characters a line. */

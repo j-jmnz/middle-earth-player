@@ -1,7 +1,8 @@
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { SearchField, Segmented, SphereMark, ToggleChip, markedSphere, sphereWord } from "./chrome";
 import { deckListFiltered, setDeckListView, useDeckListView, type DeckListFilter, type DeckListStatus } from "./deck-list";
+import { Text } from "../play/text";
 
 // The deck list's search, Cards / List switch and filter chips, shared by the Decks tab and the briefing's deck picker.
 
@@ -12,7 +13,7 @@ const STATUSES: { key: DeckListStatus; label: string }[] = [
   { key: "unready", label: "Not ready" },
 ];
 
-// A filter chip: a hairline outline, the gold plate when on. A sphere chip carries the sphere's icon.
+// A filter chip: a hairline outline, the accent plate when on. A sphere chip carries the sphere's icon.
 function FilterChip({ label, selected, onPress, sphere, testID }: { label: string; selected: boolean; onPress: () => void; sphere?: string; testID: string }) {
   const mark = sphere ? markedSphere(sphere) : null;
   return <ToggleChip testID={testID} label={label} selected={selected} onPress={onPress} leading={mark ? <SphereMark sphere={mark} size={12} /> : null} />;

@@ -37,7 +37,7 @@ export function KeepOrDelete({
   }
   return (
     <View className="-mx-3 mt-2 flex-row">
-      <TextButton label={keep.label} testID={`${keep.label.toLowerCase()}-${id}`} tone="gold" accessibilityLabel={`${keep.label} ${described}`} onPress={keep.onPress} />
+      <TextButton label={keep.label} testID={`${keep.label.toLowerCase()}-${id}`} tone="accent" accessibilityLabel={`${keep.label} ${described}`} onPress={keep.onPress} />
       <TextButton label="Delete" testID={`delete-${id}`} tone="danger" accessibilityLabel={`Delete ${described}`} onPress={onAskDelete} />
     </View>
   );

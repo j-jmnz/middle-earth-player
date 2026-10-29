@@ -147,7 +147,7 @@ export default function RootLayout() {
   // On a phone the View under the providers sets the active theme's color variables for every class below it, a Modal's content
   // included, because variables travel by context there and not by the view tree. On the web a Modal is portaled into document.body,
   // outside that View, so the effect above writes the same variables (and the color scheme) onto the page's root. The status bar's
-  // icons go light on Night and dark on Daylight.
+  // icons go light on Dark and dark on Light.
   return (
     <ThemeContext.Provider value={resolved}>
     <UiScaleContext.Provider value={scale}>

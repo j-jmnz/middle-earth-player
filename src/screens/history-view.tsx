@@ -5,7 +5,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import type { RunKind, RunRecord, RunResult } from "../campaign/runs";
 import { BodyText, Chevron, Chip, Label, NavBar, Screen, Segmented, ToggleChip } from "./chrome";
@@ -21,6 +21,9 @@ import { courseWords, deletedWords, emptyWords, playthroughWords, plural, runDat
 import { usePalette } from "./palette-hook";
 import { existingRefs, listRuns } from "./run-store";
 import { seatWord } from "./seats";
+import { rowSurface } from "../play/surfaces";
+import { Text } from "../play/text";
+import { useTableTokens } from "../play/use-table-tokens";
 
 const KINDS = ["Campaign", "Standalone"] as const;
 type KindWord = (typeof KINDS)[number];
@@ -32,6 +35,7 @@ type Playthroughs = { current: string | null; progress: ReadonlyMap<string, { do
 // A FlashList row: one pressable on a solid fill, no light and no shadow (docs/design-system.md, Performance).
 function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; deleted: boolean; showBox: boolean; nameOf: (code: string) => string; onPress: (() => void) | null }) {
   const palette = usePalette();
+  const t = useTableTokens();
   const scenario = scenarioName(run.scenarioId);
   const date = runDate(run);
   const course = courseWords(run);
@@ -41,14 +45,14 @@ function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; de
     <View className="pb-3">
       <Pressable testID={`run-${run.id}`} collapsable={false} accessibilityRole={onPress ? "button" : "text"} accessibilityLabel={runLabel(run, scenario, nameOf, deleted)} disabled={onPress == null} onPress={onPress ?? undefined}>
         {({ pressed }) => (
-          <View className="min-h-14 flex-row items-center rounded-card px-4 py-3.5" style={{ backgroundColor: pressed ? palette.pressed : palette.raised, borderWidth: 1, borderColor: palette.hairline }}>
+          <View className="min-h-14 flex-row items-center rounded-card px-4 py-3.5" style={rowSurface(pressed, t)}>
             <View className="flex-1">
               <View className="flex-row items-start justify-between gap-2">
                 <View className="flex-1">
                   <Text className="font-display text-heading text-bone">{scenario}</Text>
                   {box || date ? <Label>{[box, date].filter((part) => part != null).join(" · ")}</Label> : null}
                 </View>
-                <Chip label={run.result === "won" ? "Won" : "Lost"} tone={run.result === "won" ? "gold" : "danger"} />
+                <Chip label={run.result === "won" ? "Won" : "Lost"} tone={run.result === "won" ? "accent" : "danger"} />
               </View>
               {run.result === "lost" && run.lossCause ? (
                 <Text className="mt-1 text-label text-danger" testID={`run-${run.id}-cause`}>
@@ -57,7 +61,7 @@ function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; de
               ) : null}
               <Text className="mt-2 text-label text-muted">{seatsWords(run, nameOf)}</Text>
               {course ? <Text className="text-label text-muted">{course}</Text> : null}
-              {score ? <Text className="mt-1 text-label font-semibold text-goldHigh">{score}</Text> : null}
+              {score ? <Text className="mt-1 text-label font-semibold text-accentHigh">{score}</Text> : null}
               {deleted ? (
                 <Text className="mt-1 text-label text-faint" testID={`run-${run.id}-deleted`}>
                   {deletedWords(run.kind)}
@@ -186,7 +190,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
   );
 
   return (
-    <Screen testID="history" scene="plain">
+    <Screen testID="history" scene="calm">
       <NavBar onBack={() => goBack(router, kind === "campaign" ? "/" : "/scenarios")} backTestID="history-back" title="History" />
       <View className="min-h-0 flex-1" testID="history-list" onLayout={list.onLayout}>
         <FlashList

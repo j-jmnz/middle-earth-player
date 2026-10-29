@@ -28,7 +28,7 @@ export function dialTap(game: ScenarioState, viewed: number | null, tapped: numb
 export type DialRole = "acting" | "viewing" | null;
 
 /**
- * How a dial reads in two-handed play: the acting seat's is "acting" (its label stays gold), the seat peeked at is "viewing" (a bone
+ * How a dial reads in two-handed play: the acting seat's is "acting" (its label stays accent), the seat peeked at is "viewing" (a bone
  * ring and an eye mark), any other none. A dial that is not shown says what a tap does ("Shows Player 2's cards"); the shown one,
  * and a solo dial, keep their own hint (null).
  */

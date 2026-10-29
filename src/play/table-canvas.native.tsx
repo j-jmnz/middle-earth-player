@@ -6,7 +6,7 @@
 // When the state changes, each card moves from where it was to where it is now, a new card comes in from its deck or grows
 // in, and a card that left goes to its pile (motion.ts, run by card-motion.native.tsx). The motion runs on the UI thread, never
 // gates a rule, and snaps under reduced motion; a touch finishes it at once, and a new gesture cancels the lift in progress.
-import { Canvas, Circle, Group, RoundedRect, Text, useImage, vec, type SkFont } from "@shopify/react-native-skia";
+import { Canvas, Group, RadialGradient, Rect as SkRect, RoundedRect, Text, useImage, vec, type SkFont } from "@shopify/react-native-skia";
 import { memo, useCallback, useMemo } from "react";
 import { GestureDetector } from "react-native-gesture-handler";
 import { useStore } from "zustand";
@@ -132,7 +132,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
       </Group>
     );
   };
-  // What is drawn in the card's shape, inside its turned group: the gold edge, the picked edge, the veil, the beat ring.
+  // What is drawn in the card's shape, inside its turned group: the accent edge, the picked edge, the veil, the beat ring.
   const drawFrame = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const card = slot.kind === "card";
@@ -181,15 +181,22 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   return (
     <GestureDetector gesture={gesture}>
       <Canvas style={{ width, height }}>
-        <RoundedRect x={0} y={0} width={width} height={height} r={0} color={t.felt} />
-        <Circle cx={width / 2} cy={height * 0.45} r={Math.max(width, height) * 0.55} color={t.feltLight} opacity={0.55} />
-        {/* The engagement area is a band of its own, between staging and the player's cards. */}
-        <RoundedRect x={layout.zones.engaged.x - 4 * s} y={layout.zones.engaged.y - 3 * s} width={layout.zones.engaged.w + 8 * s} height={layout.zones.engaged.h + 6 * s} r={RADIUS * s * 2} color={withAlphaHex(t.threat, 0.07)} />
+        {/* No felt and no zone boxes: the screen's fog (ember over the encounter, moonlight over the fellowship) shows through, and
+            the engagement area is told apart by a red haze toward its left, where the enemies stand. */}
+        <SkRect x={layout.zones.engaged.x - 12 * s} y={layout.zones.engaged.y - 10 * s} width={layout.zones.engaged.w + 24 * s} height={layout.zones.engaged.h + 20 * s}>
+          <RadialGradient
+            c={vec(layout.zones.engaged.x + layout.zones.engaged.w * 0.18, layout.zones.engaged.y + layout.zones.engaged.h / 2)}
+            r={Math.max(layout.zones.engaged.w * 0.5, 1)}
+            origin={vec(layout.zones.engaged.x + layout.zones.engaged.w * 0.18, layout.zones.engaged.y + layout.zones.engaged.h / 2)}
+            transform={[{ scaleY: Math.min(1, (layout.zones.engaged.h * 0.6) / Math.max(layout.zones.engaged.w * 0.5, 1)) }]}
+            colors={[withAlphaHex(t.threat, t.depth === "light" ? 0.18 : 0.3), withAlphaHex(t.threat, 0)]}
+          />
+        </SkRect>
         {emptyWords.map(([rect, text]) => (
           <ZoneWord key={text} rect={rect} text={text} font={fonts.small} t={t} s={s} />
         ))}
         {targetZones.map((rect, index) => (
-          <RoundedRect key={`z${index}`} x={rect.x - 4 * s} y={rect.y - 4 * s} width={rect.w + 8 * s} height={rect.h + 8 * s} r={RADIUS * s * 2} color={t.gold} style="stroke" strokeWidth={1.5 * s} />
+          <RoundedRect key={`z${index}`} x={rect.x - 4 * s} y={rect.y - 4 * s} width={rect.w + 8 * s} height={rect.h + 8 * s} r={RADIUS * s * 2} color={t.accent} style="stroke" strokeWidth={1.5 * s} />
         ))}
         {moves.ghosts.map((ghost) => (
           <Leaving key={`ghost:${ghost.slot.id}:${moves.at}`} ghost={ghost} clock={clock}>
@@ -206,7 +213,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
             <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
-            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS * s} color={t.gold} style="stroke" strokeWidth={2 * s} />
+            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={RADIUS * s} color={t.accent} style="stroke" strokeWidth={2 * s} />
           </Group>
         ) : null}
         {spot.playing && spot.plan ? <Spotlight plan={spot.plan} progress={spot.progress} width={width} height={height} images={spotImages} tokens={tokens} backs={backs} fonts={fonts} spotFonts={spotFonts} t={t} s={s} nameOf={nameOf} sphereOf={(code) => sphereIcon(sphereOf(code))} k={k} /> : null}

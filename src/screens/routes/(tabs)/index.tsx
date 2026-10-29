@@ -1,13 +1,13 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState, type ComponentRef } from "react";
-import { AccessibilityInfo, ScrollView, Text, View } from "react-native";
+import { AccessibilityInfo, ScrollView, View } from "react-native";
 
 import { carryOffers } from "../../../campaign/carry-over";
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
-import { Column, Panel, RingMark, Screen, ScreenScroll, ScreenTitle, SecondaryButton, TextButton } from "../../chrome";
+import { Column, Eyebrow, HubHeader, Panel, PillButton, RingMark, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
-import type { ArtCard } from "../../art";
+import { HeroArt } from "../../art";
 import { deckFaces } from "../../deck-store";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf, scenarioNames } from "../../campaign-data";
@@ -18,10 +18,16 @@ import { useDatabases } from "../../databases";
 import { recordUnclosedRun } from "../../table-session";
 import { usePalette } from "../../palette-hook";
 import { KeepOrDelete } from "../../keep-or-delete";
-import { ContinuePanel, DELETE_SENTENCE, SaveRow, SaveSummary, describe, nextSummary, type SaveLine } from "../../save-panels";
+import { ContinuePanel, DELETE_SENTENCE, SaveHero, SaveRow, SaveSummary, describe, type PartyHero, type SaveLine } from "../../save-panels";
 import { nextStepHref, pathHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
 import { useSplitColumns } from "../../use-split-columns";
+import { SPHERE_TINT } from "../../../play/icon-map";
+import { rowSurface } from "../../../play/surfaces";
+import { useTableTokens } from "../../../play/use-table-tokens";
+import { useUiScale } from "../../../play/ui-scale";
+import { useSizeClass } from "../../../play/use-size-class";
+import { Text } from "../../../play/text";
 
 type Seats = 1 | 2;
 
@@ -37,6 +43,9 @@ function partyCodes(save: Save): string[] {
 
 export default function CampaignList() {
   const palette = usePalette();
+  const t = useTableTokens();
+  const s = useUiScale();
+  const { width } = useSizeClass();
   const columns = useSplitColumns(SIDE_RANGE);
   const { size } = columns;
   const router = useRouter();
@@ -80,9 +89,11 @@ export default function CampaignList() {
   // The carry-over a new playthrough may take in: every finished playthrough, open or archived, that holds cards for the next campaign.
   const offers = useMemo(() => carryOffers([...saves, ...archived], (id) => campaignOf(id)?.scenarios ?? null), [saves, archived]);
   const faces = useMemo(() => deckFaces(catalog, [...saves.flatMap(partyCodes), ...offers.flatMap((offer) => offer.cards.map((card) => card.code))]), [catalog, saves, offers]);
-  const partyOf = (save: Save): ArtCard[] => partyCodes(save).flatMap((code) => {
+  const partyOf = (save: Save): PartyHero[] => partyCodes(save).flatMap((code) => {
     const face = faces.get(code);
-    return face ? [{ code, imagesrc: face.imagesrc }] : [];
+    if (!face) return [];
+    const tint = SPHERE_TINT[face.sphereCode ?? ""];
+    return [{ card: { code, imagesrc: face.imagesrc }, name: face.name, tint: tint && tint !== "faint" ? palette[tint] : undefined }];
   });
   const partyWords = (save: Save): string | null => {
     const names = partyCodes(save).map((code) => faces.get(code)?.name ?? code);
@@ -192,27 +203,26 @@ export default function CampaignList() {
       },
     };
   };
-  const startPanel = <StartPanel options={startable} current={saves.length === 0} carry={carryChoices} onStart={start} />;
+  const startPanel = <StartPanel options={startable} carry={carryChoices} onStart={start} />;
   // Manage shows Archive and Delete on a playthrough instead of opening it.
   const managed = (save: Save, index: number) => (
     <View key={save.id} testID={`save-${save.id}`}>
-      <Panel current={index === 0}>
+      <Panel>
         <SaveSummary line={lineOf(save)} eyebrow={saves.length > 1 && index === 0} />
         {actions(save, { label: "Archive", onPress: () => archive(save) })}
       </Panel>
     </View>
   );
-  const continuing = (save: Save) => {
+  const continuing = (save: Save, wide: boolean) => {
     const line = lineOf(save);
     return (
       <ContinuePanel
         key={save.id}
         id={save.id}
         line={line}
-        eyebrow={saves.length > 1}
         primary={!showStart}
         heroes={partyOf(save)}
-        party={partyWords(save)}
+        wide={wide}
         onNext={() => router.push(nextStepHref(save.id, line.next))}
         onPath={() => openPath(save)}
         onLog={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })}
@@ -220,27 +230,35 @@ export default function CampaignList() {
     );
   };
 
-  const currentBlock = current ? (
-    // Folded, the header says the next step: the Continue card's primary button is hidden with it.
-    <FoldSection id="current" title="Current playthrough" count={1} unit="playthrough" summary={nextSummary(lineOf(current).next)} {...fold("current")}>
-      <View className="pt-1">{managing ? managed(current, 0) : continuing(current)}</View>
-    </FoldSection>
-  ) : null;
-  const othersBlock =
+  // The current playthrough opens the page: its next scenario's name over the scene (HeroArt), and the Continue panel under it.
+  // Managing, it is a summary with Archive and Delete instead.
+  const currentBlock = (wide: boolean) =>
+    current ? (
+      managing ? (
+        managed(current, 0)
+      ) : (
+        <View testID="current-playthrough" style={{ gap: 18 * s }}>
+          <SaveHero line={lineOf(current)} party={partyWords(current)} />
+          <View style={wide ? { maxWidth: 620 * s } : undefined}>{continuing(current, wide)}</View>
+        </View>
+      )
+    ) : null;
+  const othersBlock = (grid: boolean) =>
     others.length > 0 ? (
-      <FoldSection id="others" title="Other journeys" count={others.length} unit="journey" {...fold("others")}>
-        <View className="gap-3 pt-1">
+      <View testID="other-journeys" style={{ gap: 10 * s }}>
+        <Eyebrow>Other journeys</Eyebrow>
+        <View className={grid ? "flex-row flex-wrap" : undefined} style={grid ? { rowGap: 8 * s, marginHorizontal: -4 * s } : { gap: 8 * s }}>
           {others.map((save, index) =>
             managing ? (
               managed(save, index + 1)
             ) : (
-              <View key={save.id}>
+              <View key={save.id} style={grid ? { width: "50%", paddingHorizontal: 4 * s } : undefined}>
                 <SaveRow id={save.id} line={lineOf(save)} lead={partyOf(save)[0] ?? null} onPress={() => openPath(save)} />
               </View>
             ),
           )}
         </View>
-      </FoldSection>
+      </View>
     ) : null;
   // Two columns when the window is expanded and there is something to continue (the start panel alone takes a readable column).
   // With Manage on, nothing to start and nothing archived or locked, the right column would be empty: one readable column then.
@@ -275,7 +293,7 @@ export default function CampaignList() {
       <SecondaryButton
         label="New playthrough"
         testID="new-playthrough"
-        tone="gold"
+        tone="accent"
         compact
         onPress={() => {
           folds.setFolded("start", false);
@@ -312,7 +330,7 @@ export default function CampaignList() {
                 accessible
                 accessibilityLabel={`${tile.name}, ${tile.caption}`}
                 className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-card px-4 py-4"
-                style={{ borderWidth: 1, borderStyle: "dashed", borderColor: palette.hairline }}
+                style={{ ...rowSurface(false, t), opacity: 0.78 }}
               >
                 <RingMark size={14} state="locked" />
                 <Text className="mt-2 font-display text-heading text-faint">{tile.name}</Text>
@@ -323,56 +341,58 @@ export default function CampaignList() {
         </FoldSection>
       </View>
     ) : null;
+  // The hero words sit low over the scene: the scene's art fills the top of the page and they start where it begins to fade.
+  const heroDrop = current && !managing ? (size === "compact" ? 170 : 330) * s : 0;
+  const header = (
+    <HubHeader title="Campaigns">
+      <PillButton label="History" testID="history-open" accessibilityLabel="History of finished scenarios" onPress={() => router.push({ pathname: "/history", params: { kind: "campaign" } })} />
+      {saves.length > 0 ? (
+        <PillButton label={managing ? "Done" : "Manage"} testID="manage-playthroughs" accessibilityLabel={managing ? "Done managing playthroughs" : "Manage playthroughs"} onPress={toggleManage} />
+      ) : null}
+    </HubHeader>
+  );
   const page = (
     <>
-        <View className="flex-row items-center justify-between pb-3 pt-4">
-          <ScreenTitle>Campaigns</ScreenTitle>
-          <View className="-mr-3 flex-row">
-            <TextButton label="History" testID="history-open" tone="muted" accessibilityLabel="History of finished scenarios" onPress={() => router.push({ pathname: "/history", params: { kind: "campaign" } })} />
-            {saves.length > 0 ? (
-              <TextButton
-                label={managing ? "Done" : "Manage"}
-                testID="manage-playthroughs"
-                tone="muted"
-                accessibilityLabel={managing ? "Done managing playthroughs" : "Manage playthroughs"}
-                onPress={toggleManage}
-              />
-            ) : null}
+      {header}
+      {twoColumns ? (
+        // The journey on the left over its scene, what else there is on the right (docs/design-system.md, Campaigns, tablet landscape).
+        <View className="flex-row items-start" style={{ gap: split.gap }} testID="campaign-columns">
+          <View className="min-w-0 flex-1" style={{ paddingTop: heroDrop }}>
+            {currentBlock(true)}
           </View>
-        </View>
-        {twoColumns ? (
-          // The journeys on the left, what starts or stores them on the right (docs/design-system.md, Tablets).
-          <View
-            className="flex-row items-start"
-            style={{ gap: split.gap }}
-            testID="campaign-columns"
-          >
-            <View className="min-w-0 flex-1 gap-3">
-              {currentBlock}
-              {othersBlock}
-            </View>
-            <View className="gap-3" style={{ width: split.side }}>
-              {startBlock}
-              {newButton}
-              {archivedBlock}
-              {lockedBlock}
-            </View>
-          </View>
-        ) : (
-          <View className="gap-3">
-            {currentBlock}
-            {othersBlock}
+          <View style={{ width: split.side, gap: 16 * s, paddingTop: 24 * s }}>
+            {othersBlock(false)}
             {startBlock}
             {newButton}
             {archivedBlock}
             {lockedBlock}
           </View>
-        )}
+        </View>
+      ) : (
+        <View style={{ gap: 18 * s, paddingTop: heroDrop }}>
+          {currentBlock(false)}
+          {othersBlock(size === "medium")}
+          {startBlock}
+          {newButton}
+          {archivedBlock}
+          {lockedBlock}
+        </View>
+      )}
     </>
   );
 
+  // The scene of the next scenario: wider than a phone and centred on it; on a tablet in landscape, behind the journey's column.
+  const sceneId = current && !managing && lineOf(current).next.kind !== "finished" ? (lineOf(current).next as { node: { id: string } }).node.id : null;
+  const art = current && !managing ? (
+    size === "expanded" && twoColumns ? (
+      <HeroArt scenarioId={sceneId} width={900 * s} height={760 * s} left={-90 * s} />
+    ) : (
+      <HeroArt scenarioId={sceneId} width={Math.max(520 * s, width + 120 * s)} height={(size === "compact" ? 540 : 820) * s} />
+    )
+  ) : null;
+
   return (
-    <Screen testID="campaign-list" scene="dusk">
+    <Screen testID="campaign-list" scene="moon" art={art}>
       {/* An expanded window scrolls in a wide column; the measurer (outside the columns) decides whether it splits, else one readable column. */}
       <ScreenScroll scrollRef={scroll} max={size === "expanded" ? "wide" : "readable"}>
         {size === "expanded" ? <View style={{ height: 0 }} onLayout={columns.measure} /> : null}

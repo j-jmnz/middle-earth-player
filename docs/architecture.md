@@ -260,7 +260,7 @@ Every card's picture is bundled (brief, Card images): `scanAssets` in `src/scree
 
 ## Screens
 
-Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaigns, Scenarios, Decks, Cards, Rules and Settings (user requests, 2026-10-25 and 2026-10-28); in an expanded window (840 points and wider, by size class, not device) the dock is a rail down the left edge with the same tabs.
+Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaigns, Scenarios, Decks, Cards and Rules (user requests, 2026-10-25 and 2026-10-28; Settings left the dock for a pushed route, `routes/settings.tsx`, opened by the gear at the top right of each hub, in the Carved Stone redesign, 2026-10-29); in an expanded window (840 points and wider, by size class, not device) the dock is a rail down the left edge with the same tabs and Settings at its foot.
 
 | Route | Reads | Writes |
 | --- | --- | --- |

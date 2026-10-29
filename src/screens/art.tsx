@@ -1,24 +1,29 @@
 // Card art on the screens (docs/design-system.md, Card art): a region of a card picture filling a box, a hero's round portrait,
-// and a scenario's scene from its first quest card. Each falls back to a lit night surface while its file is missing, so a
-// screen never waits on a picture and never shows a hole.
+// and a scenario's scene from its first quest card. Each falls back to a dark surface while its file is missing, so a screen never
+// waits on a picture and never shows a hole. Scene art is drawn desaturated and darkened (`ART_FILTER`), so it sits in the fog.
+
 import { Image } from "expo-image";
 import { eq } from "drizzle-orm";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { View } from "react-native";
 
 import { cards } from "../catalog/schema";
-import { nightFade, raisedEdgeOf, panelSurface, topShade } from "../play/surfaces";
+import { nightFade, panelSurface, topShade } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
+import { withAlphaHex } from "../play/tokens";
 import { cropFrame, FACE, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, type Region } from "./art-crop";
-import { Corners } from "./chrome-marks";
 import { scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useCardPreview } from "./images/picture";
 import { usePalette } from "./palette-hook";
+import { useTheme } from "../play/theme";
 import { useUiScale } from "../play/ui-scale";
 
 export type ArtCard = { code: string; imagesrc: string | null };
+
+/** How Carved Stone dims a scene behind words: less colour, a little more contrast, darker. Not drawn inside a list row. */
+export const ART_FILTER = "saturate(0.62) contrast(1.12) brightness(0.8)";
 
 /**
  * One region of a card picture covering a box. `width` and `height` fix the box; without a width the box fills its parent and
@@ -31,6 +36,7 @@ export function CroppedArt({
   width,
   height,
   radius = 0,
+  dim = false,
   children,
 }: {
   card: ArtCard | null;
@@ -39,6 +45,8 @@ export function CroppedArt({
   width?: number;
   height: number;
   radius?: number;
+  // Desaturate and darken the picture (ART_FILTER): a scene behind words. Never inside a list row.
+  dim?: boolean;
   // Laid over the picture: a fade, a name, a mark.
   children?: ReactNode;
 }) {
@@ -66,23 +74,29 @@ export function CroppedArt({
       style={{ width: width ?? "100%", height, overflow: "hidden", borderRadius: radius, backgroundColor: palette.raised }}
     >
       {card && source && crop ? (
-        <Image
-          recyclingKey={card.code}
-          source={source}
-          contentFit="fill"
-          accessible={false}
-          style={{ position: "absolute", width: crop.width, height: crop.height, left: crop.left, top: crop.top }}
-        />
+        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...(dim ? { filter: ART_FILTER } : {}) }}>
+          <Image
+            recyclingKey={card.code}
+            source={source}
+            contentFit="fill"
+            accessible={false}
+            style={{ position: "absolute", width: crop.width, height: crop.height, left: crop.left, top: crop.top }}
+          />
+        </View>
       ) : null}
       {children}
     </View>
   );
 }
 
-/** A hero's face in a gold ring. The name is the caller's to say; the portrait is not read. `size` is the Medium size; it is scaled here. */
-export function Portrait({ card, size: base = 40, ring = true }: { card: ArtCard | null; size?: number; ring?: boolean }) {
+/**
+ * A hero's face in a ring: the hero's sphere colour (`tint`) with a glow of it, or the accent. The name is the caller's to say; the
+ * portrait is not read. `size` is the Medium size; it is scaled here. `glow` is off inside a list row (Performance).
+ */
+export function Portrait({ card, size: base = 40, ring = true, tint, glow = true }: { card: ArtCard | null; size?: number; ring?: boolean; tint?: string; glow?: boolean }) {
   const palette = usePalette();
   const size = base * useUiScale();
+  const color = tint ?? palette.accent;
   return (
     <View
       importantForAccessibility="no-hide-descendants"
@@ -91,7 +105,7 @@ export function Portrait({ card, size: base = 40, ring = true }: { card: ArtCard
         height: size,
         borderRadius: size / 2,
         overflow: "hidden",
-        ...(ring ? { borderWidth: 1.5, borderColor: palette.gold } : { borderWidth: 1, borderColor: palette.hairline }),
+        ...(ring ? { borderWidth: 1.5, borderColor: color, ...(glow && tint ? { boxShadow: `0 0 10px ${withAlphaHex(tint, 0.55)}` } : {}) } : { borderWidth: 1, borderColor: palette.hairline }),
       }}
     >
       <CroppedArt card={card} region={FACE} width={size - (ring ? 3 : 2)} height={size - (ring ? 3 : 2)} />
@@ -138,6 +152,7 @@ export function SceneArt({
   shade,
   fade,
   fadeTo,
+  vivid = false,
   children,
 }: {
   scenarioId: string | null | undefined;
@@ -147,12 +162,14 @@ export function SceneArt({
   shade?: number;
   fade?: number;
   fadeTo?: string;
+  // Keep the scene's full colour: a small thumb in a list row, where no filter is drawn (Performance).
+  vivid?: boolean;
   children?: ReactNode;
 }) {
   const card = useSceneCard(scenarioId);
   const t = useTableTokens();
   return (
-    <CroppedArt card={card} region={SCENE} aspect={QUEST_CARD_ASPECT} height={height} width={width} radius={radius}>
+    <CroppedArt card={card} region={SCENE} aspect={QUEST_CARD_ASPECT} height={height} width={width} radius={radius} dim={!vivid}>
       {shade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(shade, t) }} /> : null}
       {fade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(fade, 1, fadeTo, t) }} /> : null}
       {children}
@@ -161,9 +178,8 @@ export function SceneArt({
 }
 
 /**
- * A framed card that opens on a scenario's scene (the Continue card, the scenario to play on the path, a game in progress): the
- * goldLine edge and the gold corners, the scene on top with `over` laid on it (chips), and `children` pulled up over the scene's
- * fade so the words start in its night.
+ * A floating panel that opens on a scenario's scene (the scenario to play on the path, a game in progress): the scene, dimmed, on top
+ * with `over` laid on it (chips), and `children` pulled up over the scene's fade so the words start in its dark.
  */
 export function SceneCard({
   scenarioId,
@@ -188,14 +204,39 @@ export function SceneCard({
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View className={hero ? "rounded-hero" : "rounded-card"} style={{ ...panelSurface(pressed, t), borderWidth: 1, borderColor: palette.goldLine, boxShadow: raisedEdgeOf(t) }}>
+    <View className={hero ? "rounded-hero" : "rounded-card"} style={panelSurface(pressed, t)}>
       <View className={`overflow-hidden ${hero ? "rounded-t-hero" : "rounded-t-card"}`}>
-        <SceneArt scenarioId={scenarioId} height={sceneHeight * s} shade={0.4} fade={0.4} fadeTo={palette.raised}>
+        <SceneArt scenarioId={scenarioId} height={sceneHeight * s} shade={0.4} fade={0.35} fadeTo={palette.dusk}>
           {over}
         </SceneArt>
       </View>
       <View style={{ marginTop: -pullUp * s }}>{children}</View>
-      <Corners />
+    </View>
+  );
+}
+
+/**
+ * How a picture behind a page meets the ground, which is a gradient, not one colour. Dark fades it to night (the ground is near enough
+ * night everywhere). Light multiplies the picture onto the ground and fades it to white, which multiplies to nothing, so it ends on the
+ * ground itself and leaves no band where it stops.
+ */
+export function useArtGround(): { ground: string; blend: { mixBlendMode?: "multiply" } } {
+  const palette = usePalette();
+  return useTheme() === "light" ? { ground: "#FFFFFF", blend: { mixBlendMode: "multiply" } } : { ground: palette.night, blend: {} };
+}
+
+/**
+ * A scenario's scene as the art layer of a page (the Campaigns hub): drawn large and dimmed behind the hero words, faded out at its
+ * edges by an elliptical shade and taken down to the ground towards its foot, so the words and panels under it sit in the fog. It does
+ * not scroll and takes no touches. `left` places it (centred on the page by default).
+ */
+export function HeroArt({ scenarioId, width, height, left }: { scenarioId: string | null | undefined; width: number; height: number; left?: number }) {
+  const { ground, blend } = useArtGround();
+  return (
+    <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", top: 0, width, height, ...blend, ...(left == null ? { alignSelf: "center" } : { left }) }}>
+      <SceneArt scenarioId={scenarioId} width={width} height={height} />
+      <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `radial-gradient(52% 64% at 50% 34%, ${withAlphaHex(ground, 0)} 40%, ${ground} 100%)` }} />
+      <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 40%, ${withAlphaHex(ground, 0.75)} 70%, ${ground} 88%)` }} />
     </View>
   );
 }

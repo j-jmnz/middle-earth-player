@@ -11,24 +11,29 @@ appId: com.middleearth.lcg
     timeout: 15000
 - tapOn:
     id: path-back
+# The current playthrough is the page's hero and does not fold; Coming later does.
+- scrollUntilVisible:
+    element:
+      id: section-coming
+    direction: DOWN
 - assertVisible:
-    id: section-current
-- assertVisible:
-    id: section-current-body
+    id: section-coming-body
 - tapOn:
-    id: section-current
+    id: section-coming
 - assertNotVisible:
-    id: section-current-body
+    id: section-coming-body
 - launchApp
-- assertVisible:
-    id: section-current
+- scrollUntilVisible:
+    element:
+      id: section-coming
+    direction: DOWN
 - assertNotVisible:
-    id: section-current-body
+    id: section-coming-body
 # Open it again, so the next run starts the same.
 - tapOn:
-    id: section-current
+    id: section-coming
 - assertVisible:
-    id: section-current-body
+    id: section-coming-body
 # Scenarios: fold a box and relaunch.
 - tapOn:
     id: scenarios-tab

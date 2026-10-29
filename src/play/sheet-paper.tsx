@@ -3,20 +3,21 @@
 // before they send, are dock-buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number
 // the engine did not compute.
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { Pressable, Text, View, type DimensionValue } from "react-native";
+import { Pressable, View, type DimensionValue } from "react-native";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
-import { goldPlate, raisedEdgeOf } from "./surfaces.ts";
+import { accentPlate, parchmentSurface, raisedEdgeOf, selectedWash, slateSurface } from "./surfaces.ts";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { touch, touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
-const SHEET_RADIUS = 28;
+const SHEET_RADIUS = 6;
 
 /**
  * Which corners the parchment rounds: "top" for a sheet that rises from the bottom edge, "all" for one that floats centred on a wide
@@ -27,7 +28,7 @@ export type SheetCorners = "top" | "all";
 export const SheetCornersContext = createContext<SheetCorners>("top");
 
 /**
- * The parchment a sheet sits on, from the bottom edge: its fill, corners and bottom inset are plain styles from the tokens and
+ * The weathered parchment a sheet sits on, from the bottom edge: its fill, corners and bottom inset are plain styles from the tokens and
  * useSafeAreaInsets, not NativeWind classes (sheets that carried pb-safe in their classes lost their parchment on the phone).
  * (The table's choice tray and reading panels are tray-frame.tsx.)
  */
@@ -54,7 +55,7 @@ export function SheetFrame({
   const s = useUiScale();
   const rise = useMemo(() => layoutAnim(SlideInDown, MOTION.sheetIn, scale), [scale]);
   const style = {
-    backgroundColor: t.paper,
+    ...parchmentSurface(t),
     borderTopLeftRadius: SHEET_RADIUS * s,
     borderTopRightRadius: SHEET_RADIUS * s,
     ...(round === "all" ? { borderBottomLeftRadius: SHEET_RADIUS * s, borderBottomRightRadius: SHEET_RADIUS * s } : {}),
@@ -75,12 +76,12 @@ export function SheetFrame({
 }
 
 // Every fill and text colour of a button is a style object from the tokens, never only a class: on the phone NativeWind can
-// drop a class from a Pressable whose style is a function, and the dock's gold pill was left as dark text on night (user
+// drop a class from a Pressable whose style is a function, and the dock's accent pill was left as dark text on night (user
 // report, 2026-10-25). The pressed state comes from the Pressable's children function, so no style function is needed.
 
 /**
  * A text button on night or paper: 44 pt target, the pressed fill in the same frame. `variant` "text" is a word alone (the
- * top bar, a panel's Close); "plate" is a lit plate (bone at 9% over the dock) with no drawn edge and its word in Cinzel capitals (the dock's other
+ * top bar, a panel's Close); "plate" is the slate secondary plate with its word in Marcellus SC in the accent (the dock's other
  * answers: Pass, Cancel, the alternative); "quiet" is a fainter plate (4%) with its word small in muted (the dock's reading aids: Undo,
  * Read, List, Actions), so the three tiers of the dock read apart without an outline (user request, 2026-10-27).
  */
@@ -98,7 +99,7 @@ export function ChromeButton({
   label: string;
   onPress: () => void;
   testID: string;
-  tone?: "bone" | "gold" | "ink" | "muted";
+  tone?: "bone" | "accent" | "ink" | "muted";
   variant?: "text" | "plate" | "quiet";
   disabled?: boolean;
   // On a short phone's dock: a 36 pt pill in a 40 pt row, its 44 pt target kept by a 2 pt hit slop (docs/design-system.md, Table).
@@ -110,8 +111,8 @@ export function ChromeButton({
   const s = useUiScale();
   const ink = tone === "ink";
   const quiet = variant === "quiet";
-  const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "gold" ? t.gold : ink ? t.inkLabel : tone === "muted" || (quiet && tone === "bone") ? t.muted : t.bone;
-  const rest = variant === "text" ? null : ink ? { backgroundColor: t.paper } : { backgroundColor: withAlphaHex(t.bone, quiet ? 0.04 : 0.09) };
+  const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "accent" ? t.accent : ink ? t.inkLabel : tone === "muted" || (quiet && tone === "bone") ? t.muted : t.bone;
+  const rest = variant === "text" ? null : ink ? { backgroundColor: t.paper } : quiet ? { backgroundColor: withAlphaHex(t.bone, 0.04) } : slateSurface(false, t);
   // The row is 44 pt, or 40 on a short phone with a slop that makes up the 44; at a scale both follow it, and the target never drops under 44.
   const row = tight ? 40 * s : touch(s, 44);
   const slop = touchSlop(s, row);
@@ -133,11 +134,10 @@ export function ChromeButton({
           className={`items-center justify-center rounded-tile ${quiet ? "px-3" : "px-3.5"} ${variant === "text" ? "min-h-touch" : tight ? "min-h-9" : "min-h-10"}`}
           style={{
             ...(pressed && !disabled ? { backgroundColor: ink ? t.paperPressed : t.pressed } : (rest ?? { backgroundColor: "transparent" })),
-            ...(variant === "plate" && !ink ? { boxShadow: raisedEdgeOf(t) } : {}),
           }}
         >
           {variant === "plate" ? (
-            <Text className="font-display-bold uppercase" style={{ color, fontSize: 12 * s, lineHeight: 16 * s, letterSpacing: 1.2 * s }}>
+            <Text className="font-display" style={{ color: disabled ? color : tone === "bone" ? t.accent : color, fontSize: 15 * s, lineHeight: 19 * s, letterSpacing: 0.8 * s }}>
               {label}
             </Text>
           ) : (
@@ -152,9 +152,9 @@ export function ChromeButton({
 }
 
 /**
- * The one filled action: worked gold on night with a lit top edge and a soft gold glow, an ink plate on paper; it sinks a
- * little when pressed. Disabled, it is a dashed outline
- * (a goldLine edge with muted text on night, inkLine with inkMuted on paper) that still reads as the button it will be and
+ * The one filled action: the wraith-light primary on night with a lit top edge and a glow, an ink plate on paper; a press darkens it
+ * and sinks it 1 pt. Disabled, it is a dashed outline
+ * (an accentLine edge with muted text on night, inkLine with inkMuted on paper) that still reads as the button it will be and
  * not as one of the solid-edged answers beside it (docs/design-system.md). A disabled action has a sentence near it saying
  * why.
  */
@@ -182,7 +182,7 @@ export function ChromePrimary({
   const t = useTableTokens();
   const s = useUiScale();
   const paper = surface === "paper";
-  const color = disabled ? (paper ? t.inkMuted : t.muted) : paper ? t.paper : t.onGold;
+  const color = disabled ? (paper ? t.inkMuted : t.muted) : paper ? t.paper : t.onAccent;
   return (
     <Pressable
       testID={testID}
@@ -197,13 +197,13 @@ export function ChromePrimary({
       {({ pressed }) => (
         <View
           className={`${compact ? (tight ? "min-h-touch px-3" : "px-3") : "min-h-14 px-5"} items-center justify-center rounded-button`}
-          style={{ ...(compact && !tight ? { minHeight: touch(s, 46) } : {}), ...primaryFill(paper, disabled, pressed, t), transform: [{ scale: pressed && !disabled ? 0.98 : 1 }] }}
+          style={{ ...(compact && !tight ? { minHeight: touch(s, 46) } : {}), ...primaryFill(paper, disabled, pressed, t), transform: [{ translateY: pressed && !disabled ? 1 : 0 }] }}
         >
           {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
           <Text
             numberOfLines={compact ? 2 : 1}
-            className="text-center font-display-bold uppercase"
-            style={{ color, fontSize: (compact ? 13 : 14) * s, lineHeight: (compact ? 18 : 19) * s, letterSpacing: (compact ? 1.4 : 2.2) * s }}
+            className="text-center font-display"
+            style={{ color, fontSize: (compact ? 17 : 20) * s, lineHeight: (compact ? 21 : 25) * s, letterSpacing: (compact ? 1.4 : 2.5) * s }}
           >
             {label}
           </Text>
@@ -214,9 +214,9 @@ export function ChromePrimary({
 }
 
 function primaryFill(paper: boolean, disabled: boolean, pressed: boolean, t: TableTokens) {
-  if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: paper ? t.inkLine : t.goldLine };
+  if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: paper ? t.inkLine : t.accentLine };
   if (paper) return { backgroundColor: t.ink, opacity: pressed ? 0.85 : 1 };
-  return goldPlate(pressed, t);
+  return accentPlate(pressed, t);
 }
 
 /** The engine's numbers with the game's icons beside them. Each reads as "Willpower 2" to a screen reader. */
@@ -224,7 +224,7 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
   const s = useUiScale();
   if (stats.length === 0) return null;
   const ink = surface === "paper";
-  const textClass = `font-display-bold ${size === "title" ? "text-title" : "text-body"} ${ink ? "text-ink" : "text-bone"}`;
+  const textClass = `font-display ${size === "title" ? "text-title" : "text-body"} ${ink ? "text-ink" : "text-bone"}`;
   return (
     <View testID={testID} className="flex-row flex-wrap items-center gap-2.5">
       {stats.map((stat) => (
@@ -237,7 +237,7 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
 /**
  * A choice tile, on paper (a pile's cards) or on night (the choice tray). `leading` is a card picture, `trailing` a pill (the
  * foreseen damage); `dense` puts everything on one line (the tray on a short phone). A night tile has no drawn edge: at rest it
- * is a lit plate, picked it is washed in gold with its name in goldHigh and a gold check (user request, 2026-10-27: fewer
+ * is a lit plate, picked it is washed in accent with its name in accentHigh and an accent check (user request, 2026-10-27: fewer
  * borders); a paper one has an inkLine edge, heavier ink when picked. A long press (`onLongPress`) reads the card.
  */
 export function Tile({
@@ -300,7 +300,7 @@ export function Tile({
           {leading}
           <View className={`flex-1 ${dense ? "flex-row flex-wrap items-center gap-x-2 gap-y-0.5" : ""}`}>
             <View className={dense ? "" : "flex-row items-center justify-between gap-2"} style={dense ? { flexGrow: 1, flexShrink: 1, minWidth: 84 * s } : undefined}>
-              <Text numberOfLines={2} className={`shrink text-body ${selected ? "font-semibold" : ""}`} style={{ color: night ? (selected ? t.goldHigh : t.bone) : t.ink }}>
+              <Text numberOfLines={2} className={`shrink text-body ${selected ? "font-semibold" : ""}`} style={{ color: night ? (selected ? t.accentHigh : t.bone) : t.ink }}>
                 {label}
               </Text>
               {night || dense ? null : numbers}
@@ -309,8 +309,8 @@ export function Tile({
             {night || dense ? <View className={dense ? "" : "mt-0.5"}>{numbers}</View> : null}
           </View>
           {selected && night ? (
-            <View accessible={false} importantForAccessibility="no" style={{ width: 20 * s, height: 20 * s, borderRadius: 10 * s, alignItems: "center", justifyContent: "center", backgroundColor: t.gold }}>
-              <Text style={{ color: t.onGold, fontSize: 13 * s, lineHeight: 16 * s, fontWeight: "700" }}>{"\u2713"}</Text>
+            <View accessible={false} importantForAccessibility="no" style={{ width: 20 * s, height: 20 * s, borderRadius: 10 * s, alignItems: "center", justifyContent: "center", backgroundColor: t.accent }}>
+              <Text style={{ color: t.onAccent, fontSize: 13 * s, lineHeight: 16 * s, fontWeight: "700" }}>{"\u2713"}</Text>
             </View>
           ) : null}
         </View>
@@ -319,9 +319,9 @@ export function Tile({
   );
 }
 
-// A night tile's fill: a lit plate at rest, washed in gold when picked.
+// A night tile's fill: a dark wash at rest, the selected wash with an accent bar at its leading edge when picked.
 function nightTile(selected: boolean, t: TableTokens) {
-  return selected ? { backgroundColor: withAlphaHex(t.gold, 0.16), boxShadow: `inset 0 0 0 1px ${withAlphaHex(t.gold, 0.35)}` } : { backgroundColor: withAlphaHex(t.bone, 0.06), boxShadow: raisedEdgeOf(t) };
+  return selected ? { ...selectedWash(t), boxShadow: `inset 3px 0 0 ${t.accentHigh}` } : { backgroundColor: withAlphaHex(t.bone, 0.05), boxShadow: raisedEdgeOf(t) };
 }
 
 /** One sentence under a disabled action saying what it waits for. */

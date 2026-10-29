@@ -2,15 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Web dev loop only. Native embeds assets/fonts/Cinzel-SemiBold.ttf and Cinzel-Bold.ttf at build time. */
+/* Web dev loop only. Native embeds assets/fonts/MarcellusSC-Regular.ttf and the four Barlow Semi Condensed files at build time
+   (app.json): Marcellus SC by its file name, Barlow as one family whose weight and style pick the file. */
 @font-face {
-  font-family: "Cinzel-SemiBold";
-  src: url("/fonts/Cinzel-SemiBold.ttf") format("truetype");
+  font-family: "MarcellusSC-Regular";
+  src: url("/fonts/MarcellusSC-Regular.ttf") format("truetype");
   font-display: swap;
 }
 @font-face {
-  font-family: "Cinzel-Bold";
-  src: url("/fonts/Cinzel-Bold.ttf") format("truetype");
+  font-family: "Barlow Semi Condensed";
+  src: url("/fonts/BarlowSemiCondensed-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Barlow Semi Condensed";
+  src: url("/fonts/BarlowSemiCondensed-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Barlow Semi Condensed";
+  src: url("/fonts/BarlowSemiCondensed-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Barlow Semi Condensed";
+  src: url("/fonts/BarlowSemiCondensed-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
   font-display: swap;
 }
 
@@ -18,45 +42,46 @@
    export lays out at Medium before it hydrates. */
 html {
   font-size: 14px;
+  font-family: "Barlow Semi Condensed", sans-serif;
 }
 
 /* Dark, the default: the same channels as palettes.dark (src/screens/palette.js; global-css.test.ts compares them), so the static web
    export paints in Night before it hydrates. The root layout sets the active theme's variables on its own View from there. */
 :root {
   color-scheme: dark;
-  --night: 11 10 8;
-  --dusk: 18 17 14;
-  --raised: 26 24 20;
-  --raisedTop: 34 31 26;
-  --pressed: 42 38 32;
-  --hairline: 44 41 35;
-  --bone: 238 231 215;
-  --muted: 163 155 140;
-  --faint: 138 133 124;
+  --night: 3 4 5;
+  --dusk: 12 14 17;
+  --raised: 17 20 23;
+  --raisedTop: 30 35 40;
+  --pressed: 42 48 54;
+  --hairline: 42 48 54;
+  --bone: 238 242 236;
+  --muted: 166 173 181;
+  --faint: 141 148 155;
   --danger: 232 145 123;
-  --gold: 217 182 108;
-  --goldHigh: 243 218 154;
-  --goldDeep: 169 129 63;
-  --goldLine: 94 76 44;
-  --onGold: 26 19 9;
-  --moon: 157 176 204;
+  --accent: 196 211 192;
+  --accentHigh: 216 230 210;
+  --accentDeep: 108 127 105;
+  --accentLine: 90 110 92;
+  --onAccent: 12 16 20;
+  --moon: 143 168 148;
   --ok: 143 191 122;
-  --paper: 242 235 219;
-  --paperPressed: 229 219 196;
-  --paperEdge: 214 201 171;
+  --paper: 230 220 198;
+  --paperPressed: 210 196 166;
+  --paperEdge: 168 151 122;
   --ink: 34 30 23;
-  --inkMuted: 110 98 80;
-  --inkLabel: 122 92 34;
-  --inkLine: 207 195 166;
-  --felt: 18 22 19;
-  --feltLight: 31 38 32;
-  --threat: 200 67 47;
-  --onThreat: 238 231 215;
-  --threatEdge: 232 145 123;
-  --glow: 217 182 108;
+  --inkMuted: 92 79 61;
+  --inkLabel: 107 78 28;
+  --inkLine: 74 58 36;
+  --felt: 3 4 5;
+  --feltLight: 12 15 18;
+  --threat: 211 85 55;
+  --onThreat: 251 217 204;
+  --threatEdge: 122 34 20;
+  --glow: 190 214 186;
   --treachery: 58 34 28;
-  --quest: 143 135 126;
-  --location: 122 88 64;
+  --quest: 77 84 91;
+  --location: 77 58 45;
   --objective: 166 132 72;
   --leadership: 176 96 152;
   --tactics: 224 56 72;

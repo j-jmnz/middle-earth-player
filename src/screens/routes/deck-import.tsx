@@ -6,26 +6,11 @@ import { View } from "react-native";
 
 import { formatDeckRefusal } from "../../catalog/deck-save";
 import { cards } from "../../catalog/schema";
-import { BodyText, Eyebrow, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchField, Section, SphereMark, markedSphere, type MarkedSphere } from "../chrome";
+import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchField, Section, SphereMark, markedSphere, type MarkedSphere } from "../chrome";
 import { editSavedDeck, startNewDeck } from "../deck-draft";
 import { savedDeckName } from "../deck-status";
 import { listDecks, readDeck, writeDeck } from "../deck-store";
-import {
-  buildDecklist,
-  cardUrl,
-  decklistUrl,
-  droppedSentence,
-  parseDecklistRef,
-  prebuiltBody,
-  prebuiltDecks,
-  prebuiltNotApplied,
-  withNotApplied,
-  prebuiltDetail,
-  prebuiltRows,
-  readDecklistBody,
-  type BuiltDecklist,
-  type PrebuiltRow,
-} from "../deck-import";
+import { buildDecklist, cardUrl, decklistUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltDecks, prebuiltNotApplied, withNotApplied, prebuiltDetail, prebuiltRows, readDecklistBody, type BuiltDecklist, type PrebuiltRow } from "../deck-import";
 import { useDatabases } from "../databases";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
 import { notAppliedCodes } from "../../play/not-applied";
@@ -194,8 +179,8 @@ export default function DeckImportScreen() {
   function renderRow({ item }: { item: PrebuiltRow }) {
     if (item.kind === "group") {
       return (
-        <View accessibilityRole="header" className="border-b border-hairline bg-night px-6 pb-2 pt-6" style={pad}>
-          <Eyebrow tone="moon">{item.title}</Eyebrow>
+        <View accessibilityRole="header" className="px-6 pb-1 pt-4" style={pad}>
+          <Section title={item.title} />
         </View>
       );
     }
@@ -214,7 +199,7 @@ export default function DeckImportScreen() {
   }
 
   return (
-    <Screen scene="plain" inset={false}>
+    <Screen scene="calm" inset={false}>
       <View className="px-6">
         <NavBar backLabel="Decks" backTestID="deck-import-back" onBack={() => goBack(router, "/decks")} />
       </View>

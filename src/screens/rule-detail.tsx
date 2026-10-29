@@ -4,54 +4,88 @@ import { useRouter } from "expo-router";
 import { View } from "react-native";
 
 import { CardTextView } from "../play/card-text-view";
-import { Eyebrow, Label, Panel, ScreenTitle, SecondaryButton, TextButton } from "./chrome";
+import { panelSurface } from "../play/surfaces";
+import { Text } from "../play/text";
+import { useTableTokens } from "../play/use-table-tokens";
+import { useUiScale } from "../play/ui-scale";
+import { Eyebrow, Label, Panel, ScreenTitle, SecondaryButton, ToggleChip } from "./chrome";
 import { GLOSSARY, bookPage, paragraphs, seeAlso, type GlossaryEntry } from "./rules-glossary";
 
-export function RuleBody({ entry, onSeeAlso }: { entry: GlossaryEntry; onSeeAlso: (id: string) => void }) {
+/**
+ * One rule: where it is printed, its title, Open in book when the app carries the book, its text, and See also as chips. `reading`
+ * sets it as the reading pane beside the list on a tablet: one floating panel, the title at 38, the text at 18/28 in a 560 column.
+ */
+export function RuleBody({ entry, onSeeAlso, reading = false }: { entry: GlossaryEntry; onSeeAlso: (id: string) => void; reading?: boolean }) {
   const router = useRouter();
+  const t = useTableTokens();
+  const s = useUiScale();
   const body = paragraphs(entry).filter((paragraph) => !paragraph.startsWith("See also:"));
   const links = seeAlso(entry, GLOSSARY);
   const book = bookPage(entry);
 
+  const title = reading ? (
+    <Text accessibilityRole="header" className="font-display text-bone" style={{ fontSize: 38 * s, lineHeight: 44 * s }}>
+      {entry.title}
+    </Text>
+  ) : (
+    <ScreenTitle size="title">{entry.title}</ScreenTitle>
+  );
+  // A rule from a book the app carries opens the reader on its page; Close comes back here.
+  const openBook = book ? (
+    <View className="mt-2 flex-row">
+      <SecondaryButton
+        label={`Open in book · page ${book.page}`}
+        icon="lore"
+        testID="rule-open-book"
+        compact
+        accessibilityLabel={`Open ${book.name} at page ${book.page}`}
+        onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: book.id, page: String(book.page) } })}
+      />
+    </View>
+  ) : null;
+  const text = <CardTextView text={body.join("\n")} testID="rule-text" reading={reading} />;
+  const seeAlsoRow =
+    links.length > 0 ? (
+      <View testID="rule-see-also">
+        <Eyebrow>See also</Eyebrow>
+        <View className="mt-1 flex-row flex-wrap items-center gap-x-1.5">
+          {links.map(({ name, entry: target }) =>
+            target ? (
+              <ToggleChip key={name} label={name} testID={`see-${target.id}`} onPress={() => onSeeAlso(target.id)} />
+            ) : (
+              <View key={name} className="min-h-touch justify-center px-3">
+                <Label tone="faint">{name}</Label>
+              </View>
+            ),
+          )}
+        </View>
+      </View>
+    ) : null;
+
+  if (reading) {
+    return (
+      <View className="pb-safe">
+        <View className="gap-5 rounded-card" style={{ ...panelSurface(false, t), padding: 40 * s }}>
+          <View className="gap-1">
+            <Eyebrow>{entry.source}</Eyebrow>
+            {title}
+            {openBook}
+          </View>
+          <View style={{ maxWidth: 560 * s }}>{text}</View>
+          {seeAlsoRow}
+        </View>
+      </View>
+    );
+  }
   return (
     <View className="gap-4 pb-safe">
       <View className="gap-1">
         <Eyebrow>{entry.source}</Eyebrow>
-        <ScreenTitle size="title">{entry.title}</ScreenTitle>
-        {/* A rule from a book the app carries opens the reader on its page; Close comes back here. */}
-        {book ? (
-          <View className="mt-2 flex-row">
-            <SecondaryButton
-              label={`Open in book · page ${book.page}`}
-              icon="lore"
-              testID="rule-open-book"
-              tone="gold"
-              compact
-              accessibilityLabel={`Open ${book.name} at page ${book.page}`}
-              onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: book.id, page: String(book.page) } })}
-            />
-          </View>
-        ) : null}
+        {title}
+        {openBook}
       </View>
-      <Panel>
-        <CardTextView text={body.join("\n")} testID="rule-text" />
-      </Panel>
-      {links.length > 0 ? (
-        <View testID="rule-see-also">
-          <Eyebrow tone="moon">See also</Eyebrow>
-          <View className="-mx-3 flex-row flex-wrap items-center">
-            {links.map(({ name, entry: target }) =>
-              target ? (
-                <TextButton key={name} label={name} testID={`see-${target.id}`} tone="gold" onPress={() => onSeeAlso(target.id)} />
-              ) : (
-                <View key={name} className="min-h-touch justify-center px-3">
-                  <Label tone="faint">{name}</Label>
-                </View>
-              ),
-            )}
-          </View>
-        </View>
-      ) : null}
+      <Panel>{text}</Panel>
+      {seeAlsoRow}
     </View>
   );
 }

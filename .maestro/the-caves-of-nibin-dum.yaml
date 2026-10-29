@@ -49,10 +49,10 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-the-oath-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible:
     id: node-the-caves-of-nibin-dum-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible: ".*2 of 2 completed.*"
 - assertNotVisible:
     id: begin

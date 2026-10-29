@@ -171,7 +171,7 @@ describe("the plan for a real state", () => {
     expect(plan.codes).toContain(shadow?.code);
   });
 
-  it("stands the players' attackers in the fan, in the gold of the players' attack", () => {
+  it("stands the players' attackers in the fan, in the accent of the players' attack", () => {
     const reduced = attack(115, 2, (found) => found.steps.some((step) => step.kind === "strike" && step.side === "player"));
     const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
     const before = layoutOf(reduced.prev);

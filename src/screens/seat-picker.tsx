@@ -2,23 +2,23 @@
 // framed party card with the Ring-bearer slot. Shared by the campaign briefing and the standalone briefing.
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View, type LayoutChangeEvent } from "react-native";
+import { Pressable, View, type LayoutChangeEvent } from "react-native";
 
 import { notAppliedWords } from "../play/not-applied";
-import { panelSurface, tileSurface } from "../play/surfaces";
+import { panelSurface, rowSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { Portrait } from "./art";
 import type { BriefingDecks } from "./briefing-parts";
-import { BodyText, Corners, Label, Section, SecondaryButton, TextButton } from "./chrome";
+import { BodyText, Label, Section, SecondaryButton, TextButton } from "./chrome";
 import { editSavedDeck } from "./deck-draft";
 import { emptyDeckListFilter, useDeckListView } from "./deck-list";
 import { DeckListBar } from "./deck-list-bar";
 import { deckCountLine, notAppliedCards, notAppliedLine } from "./deck-status";
 import { DeckCover, DeckRow, EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "./hero-tile";
-import { usePalette } from "./palette-hook";
 import { COVER_GAP, coverColumns, coverWidth } from "./briefing-layout";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 const COVER_HEIGHT = 112;
 const TOOL_HEIGHT = 128;
@@ -58,7 +58,6 @@ export function SeatPicker({
   onRingBearer: (code: string | null) => void;
   nameOf: (code: string) => string;
 }) {
-  const palette = usePalette();
   const s = useUiScale();
   const t = useTableTokens();
   const router = useRouter();
@@ -134,7 +133,7 @@ export function SeatPicker({
                     <TextButton
                       label="Open in Decks"
                       testID={`deck-open-${index}-${deck.id}`}
-                      tone="gold"
+                      tone="accent"
                       accessibilityLabel={`Open ${deck.name} in Decks to finish it`}
                       onPress={() => {
                         editSavedDeck(deck);
@@ -161,14 +160,14 @@ export function SeatPicker({
                   No decks match.
                 </BodyText>
                 <View className="-mx-3">
-                  <TextButton testID={`briefing-clear-filter-${index}`} label="Clear filter" tone="gold" onPress={() => setFilter(emptyDeckListFilter)} />
+                  <TextButton testID={`briefing-clear-filter-${index}`} label="Clear filter" tone="accent" onPress={() => setFilter(emptyDeckListFilter)} />
                 </View>
               </View>
             ) : null}
           </View>
         </View>
       ) : (
-        <View testID={`briefing-party-${index}`} className="rounded-card p-4" style={{ ...panelSurface(false, t), borderWidth: 1, borderColor: palette.goldLine }}>
+        <View testID={`briefing-party-${index}`} className="rounded-card p-4" style={panelSurface(false, t)}>
           {/* The name gets the card's whole width (a long one never breaks inside a word); Change sits beside the counts, under it. */}
           <Text className="font-display text-title text-bone">{pickedDeck.name}</Text>
           <View className="mt-1 flex-row items-center justify-between gap-3">
@@ -200,7 +199,6 @@ export function SeatPicker({
               </Label>
             </View>
           ) : null}
-          <Corners />
         </View>
       )}
       {pickedDeck && !choosing && slot && !ringBearer ? (
@@ -217,13 +215,13 @@ export function SeatPicker({
                 onPress={() => onRingBearer(candidate.code)}
               >
                 {({ pressed }) => (
-                  <View className="min-h-14 flex-row items-center gap-3 rounded-tile px-3 py-2" style={tileSurface(pressed, t)}>
+                  <View className="min-h-14 flex-row items-center gap-3 rounded-tile px-3 py-2" style={rowSurface(pressed, t)}>
                     <Portrait card={faceOf(candidate.code)} size={36} />
                     <View className="flex-1">
                       <Text className="font-display text-heading text-bone">{candidate.name}</Text>
                       {candidate.packName ? <Text className="text-label text-muted">{candidate.packName}</Text> : null}
                     </View>
-                    <Text className="font-display-bold text-label text-gold">Choose</Text>
+                    <Text className="font-display text-label text-accent">Choose</Text>
                   </View>
                 )}
               </Pressable>

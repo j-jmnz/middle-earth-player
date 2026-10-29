@@ -1,20 +1,21 @@
-// The phase rail in the top bar's middle (docs/design-system.md, Table; phase 20): a pill holding the round, the phase in gold
-// Cinzel capitals and the step, with the previous and next phase inline at the phase's sides when there is room. A tap opens the
+// The phase rail in the top bar's middle (docs/design-system.md, Table; phase 20): the phase in Marcellus SC over the round's seven
+// phases as ticks over the round and the step, with the previous and next phase inline at the phase's sides when there is room. A tap opens the
 // phase carousel (phase-carousel.tsx); the rail itself sends no intent. A phase change flashes the pill's edge, a step change
 // cross-fades the step (MOTION.railFlash, railStep); both snap under reduced motion and never gate a rule. The neighbor names do not
 // move: they change in place.
 import { useEffect, useMemo, useRef } from "react";
-import { Pressable, Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut, interpolateColor, LayoutAnimationConfig, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
+import { Pressable, View } from "react-native";
+import Animated, { FadeIn, FadeOut, LayoutAnimationConfig, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { STOP_AHEAD_WORDS } from "./carousel.ts";
 import { layoutAnim, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
-import type { Rail } from "./rail.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
-import { CHEVRON, NEIGHBOR_GAP } from "./top-bar-layout.ts";
+import { ROUND_PHASES, type Rail } from "./rail.ts";
+import { CHEVRON, NEIGHBOR_GAP, TICK, TICK_GAP } from "./top-bar-layout.ts";
+import { Text } from "./text.tsx";
 
 
 /** A chevron drawn as two edges of a rotated square: no printed icon fits, and a glyph depends on the font. */
@@ -59,7 +60,7 @@ function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; 
       testID={`rail-${side}`}
       numberOfLines={1}
       importantForAccessibility="no"
-      className="text-label text-muted"
+      className="text-micro text-faint"
       style={{ lineHeight: 20 * s, [side === "previous" ? "marginRight" : "marginLeft"]: NEIGHBOR_GAP * s }}
     >
       {name}
@@ -68,10 +69,11 @@ function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; 
 }
 
 /**
- * The rail: round, phase and step in a pill, "Round 3 · QUEST" over "Staging". `wide` puts the previous and next phase inline at
- * the phase's sides, "Round 3 · Planning QUEST Travel"; `shortRound` (a phone under 760 pt inside the insets) says "R3" for the
- * round. `stopAhead` puts a gold S at the end of the pill's top line. The pill's goldLine edge says it is a button. A tap calls
- * `onPress` (the carousel opens or closes).
+ * The rail (docs/design-system.md, Table): the phase in Marcellus SC, tracked wide with a silver glow; under it the round's seven
+ * phases as ticks, the past ones dim green, the current one lit and glowing, the ones to come dark; and "Round 3 · Staging" under
+ * those. `wide` puts the previous and next phase inline at the phase's sides; `shortRound` (a phone under 760 pt inside the insets)
+ * says "R3" for the round. `stopAhead` puts an accent S after the phase. No pill and no edge: a tap anywhere on it calls `onPress`
+ * (the carousel opens or closes), and a phase change flashes the phase's glow.
  */
 export function PhaseRail({
   rail,
@@ -99,13 +101,9 @@ export function PhaseRail({
     lastPhase.current = rail.phase;
     if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing(MOTION.railFlashOut, scale))));
   }, [rail.phase, scale, flash]);
-  // The colors go into the worklet as strings, so a theme change draws the edge again.
-  const gold = t.gold;
-  const goldLine = t.goldLine;
-  const edge = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(flash.get(), [0, 1], [open ? gold : goldLine, gold]),
-  }));
+  const glow = useAnimatedStyle(() => ({ opacity: 0.55 + 0.45 * flash.get() }));
   const round = rail.round > 0 ? (shortRound ? `R${rail.round}` : `Round ${rail.round}`) : "";
+  const at = ROUND_PHASES.findIndex((phase) => phase.toLowerCase() === rail.phase.toLowerCase());
   const label = [rail.round > 0 ? `Round ${rail.round}` : "", rail.phase, rail.current, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(". ");
   return (
     <Pressable
@@ -120,84 +118,78 @@ export function PhaseRail({
       style={({ pressed }) => ({
         minWidth: 0,
         flex: 1,
-        flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         minHeight: touch(s, 44),
-        borderRadius: 999,
-        backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent",
+        borderRadius: 10 * s,
+        backgroundColor: pressed || open ? withAlphaHex(t.bone, 0.08) : "transparent",
       })}
     >
       {/* What is on the table when it opens appears; it does not slide or fade in. */}
       <LayoutAnimationConfig skipEntering>
-        <Animated.View
-          style={[
-            {
-              flexShrink: 1,
-              alignItems: "center",
-              borderWidth: 1,
-              borderRadius: 20 * s,
-              paddingHorizontal: 10 * s,
-              paddingVertical: 3 * s,
-              backgroundColor: withAlphaHex(t.night, 0.78),
-              boxShadow: `inset 0 1px 0 ${withAlphaHex(t.lit, 0.06)}, 0 2px 10px ${withAlphaHex(t.night, 0.45)}`,
-            },
-            edge,
-          ]}
-        >
-          {rail.phase || round ? (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                flexShrink: 1,
-              }}
-            >
-              {round ? (
-                <Text testID="rail-round" numberOfLines={1} className="text-label text-muted" style={{ lineHeight: 20 * s }}>
-                  {round}
-                </Text>
-              ) : null}
-              {round && rail.phase ? (
-                <Text className="text-label text-muted" style={{ marginHorizontal: 4 * s, lineHeight: 20 * s }}>
-                  ·
-                </Text>
-              ) : null}
-              {wide && rail.phase ? <Neighbor side="previous" name={rail.previousPhase} s={s} /> : null}
-              {rail.phase ? (
-                <Text
-                  testID="rail-phase"
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.85}
-                  className="font-display-bold uppercase text-gold"
-                  style={{
-                    // 14 pt: top-bar-layout.ts counts the pill's floor from this size and Cinzel Bold's capitals.
-                    fontSize: 14 * s,
-                    lineHeight: 20 * s,
-                    textShadowColor: t.glow,
-                    textShadowRadius: 8 * s,
-                    textShadowOffset: { width: 0, height: 0 },
-                  }}
-                >
-                  {rail.phase}
-                </Text>
-              ) : null}
-              {wide && rail.phase ? <Neighbor side="next" name={rail.nextPhase} s={s} /> : null}
-              {/* The S stands at the end of the top line, in the room the floor keeps. */}
-              {stopAhead ? (
-                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display-bold text-label text-gold" style={{ marginLeft: 4 * s, lineHeight: 20 * s }}>
-                  S
-                </Text>
-              ) : null}
+        <View style={{ flexDirection: "row", alignItems: "center", flexShrink: 1 }}>
+          {wide && rail.phase ? <Neighbor side="previous" name={rail.previousPhase} s={s} /> : null}
+          {rail.phase ? (
+            <View>
+              <Animated.View pointerEvents="none" style={[{ position: "absolute", left: -8 * s, right: -8 * s, top: 2 * s, bottom: 2 * s, borderRadius: 12 * s, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(t.glow, 0.22)}, ${withAlphaHex(t.glow, 0)})` }, glow]} />
+              <Text
+                testID="rail-phase"
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.85}
+                className="font-display"
+                style={{
+                  // 17 pt tracked 4: top-bar-layout.ts counts the rail's floor from this size and Marcellus SC's letters.
+                  fontSize: 17 * s,
+                  lineHeight: 21 * s,
+                  letterSpacing: 4 * s,
+                  color: t.bone,
+                  ...(t.depth === "light" ? {} : { textShadowColor: withAlphaHex(t.glow, 0.8), textShadowRadius: 10 * s, textShadowOffset: { width: 0, height: 0 } }),
+                }}
+              >
+                {rail.phase}
+              </Text>
             </View>
           ) : null}
+          {wide && rail.phase ? <Neighbor side="next" name={rail.nextPhase} s={s} /> : null}
+          {/* The S stands after the phase, in the room the floor keeps. */}
+          {stopAhead ? (
+            <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display text-label text-accent" style={{ marginLeft: 4 * s, lineHeight: 20 * s }}>
+              S
+            </Text>
+          ) : null}
+        </View>
+        {/* The round's seven phases: past, current, to come. */}
+        <View testID="rail-ticks" importantForAccessibility="no-hide-descendants" style={{ flexDirection: "row", gap: TICK_GAP * s, marginTop: 3 * s }}>
+          {ROUND_PHASES.map((phase, index) => {
+            const past = at >= 0 ? index < at : rail.phase === "End";
+            const current = index === at;
+            return (
+              <View
+                key={phase}
+                style={{
+                  width: TICK * s,
+                  height: 3 * s,
+                  borderRadius: 1.5 * s,
+                  backgroundColor: current ? t.accentHigh : past ? t.accentLine : withAlphaHex(t.bone, 0.12),
+                  ...(current ? { boxShadow: `0 0 8px ${withAlphaHex(t.glow, 0.8)}` } : {}),
+                }}
+              />
+            );
+          })}
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 2 * s }}>
+          {round ? (
+            <Text testID="rail-round" numberOfLines={1} className="text-micro" style={{ color: t.faint, lineHeight: 14 * s }}>
+              {`${round}${rail.current ? " · " : ""}`}
+            </Text>
+          ) : null}
           <Animated.View key={rail.current} entering={step.in} exiting={step.out}>
-            <Text testID="rail-current" numberOfLines={1} className="text-label" style={{ color: withAlphaHex(t.bone, 0.85), lineHeight: 16 * s }}>
+            <Text testID="rail-current" numberOfLines={1} className="text-micro" style={{ color: t.muted, lineHeight: 14 * s }}>
               {rail.current}
             </Text>
           </Animated.View>
-        </Animated.View>
+        </View>
       </LayoutAnimationConfig>
     </Pressable>
   );

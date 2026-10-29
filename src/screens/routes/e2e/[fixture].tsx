@@ -34,7 +34,7 @@ export default function E2eFixture() {
   }, [allowed, saveId, name, user, router]);
 
   return (
-    <Screen testID="e2e-fixture" scene="plain">
+    <Screen testID="e2e-fixture" scene="calm">
       <NavBar onBack={() => goBack(router, "/")} backTestID="e2e-back" />
       <BodyText tone="muted">{allowed ? "Opening the fixture" : known ? "This link works only in the e2e-test build." : "No fixture is committed under this name."}</BodyText>
     </Screen>

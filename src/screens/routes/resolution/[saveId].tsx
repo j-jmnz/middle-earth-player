@@ -5,16 +5,16 @@
 // (game-report.tsx).
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useStore } from "zustand";
 
 import { gameReport } from "../../../campaign/report";
 import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
-import { ActionBar, BodyText, Corners, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton, TwoPane } from "../../chrome";
-import { tileSurface } from "../../../play/surfaces";
+import { scoreParts, scoreTotal } from "../../../campaign/score";
+import { ActionBar, BodyText, Label, StatTile, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton, TwoPane } from "../../chrome";
+import { selectedRingOf, tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
-import { withAlphaHex } from "../../../play/tokens";
 import { campaignOf, scenarioName } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
 import { recordCampaignRun } from "../../run-writers";
@@ -22,14 +22,13 @@ import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { CardThumb } from "../../images/picture";
 import { GameReportView } from "../../game-report";
-import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../table-session";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
+import { Text } from "../../../play/text";
 
 function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; selected: boolean; imagesrc: string | null; onPress: () => void }) {
-  const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
   const label = tile.hero ? `${tile.name} on ${tile.hero}` : tile.name;
@@ -48,12 +47,11 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       {({ pressed }) => (
         <View
           className="min-h-14 items-center rounded-card p-3"
-          style={{ ...tileSurface(pressed, t), ...(selected ? { borderWidth: 1.5, borderColor: palette.gold, boxShadow: `0 0 18px ${withAlphaHex(palette.gold, 0.28)}` } : {}) }}
+          style={{ ...tileSurface(pressed, t), ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}
         >
           {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={72 * s} height={100 * s} /> : null}
-          <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-goldHigh" : "text-bone"}`}>{label}</Text>
-          {selected ? <Text className="mt-0.5 text-label font-semibold text-goldHigh">Selected</Text> : null}
-          {selected ? <Corners /> : null}
+          <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
+          {selected ? <Text className="mt-0.5 text-label font-semibold text-accentHigh">Selected</Text> : null}
         </View>
       )}
     </Pressable>
@@ -93,9 +91,9 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
 
   if (view.kind === "lost") {
     return (
-      <Screen testID="resolution" scene="plain">
+      <Screen testID="resolution" scene="ember">
         {back}
-        <ScreenScroll top={32} bottom={24} max="readable">
+        <ScreenScroll top={16} bottom={24} max="readable">
           <OutcomeTitle won={false} scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
           {view.reason ? (
             <BodyText className="mt-6 text-center" testID="resolution-reason">
@@ -120,7 +118,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
 
   if (view.kind === "playing") {
     return (
-      <Screen testID="resolution" scene="plain">
+      <Screen testID="resolution" scene="calm">
         <NavBar onBack={() => goBack(router, { pathname: "/table/[saveId]", params: { saveId } })} backTestID="resolution-table" backLabel="Table" />
         <BodyText tone="muted">The scenario is not over yet.</BodyText>
       </Screen>
@@ -138,10 +136,18 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const declined = view.kind === "choosing" && view.decline != null && chosen === view.decline.optionId;
   const answer = picked?.optionId ?? (declined && view.kind === "choosing" ? (view.decline?.optionId ?? null) : null);
 
-  // While choosing, the outcome word sits higher so a row of tiles shows whole above the bar.
+  // The numbers the player watches: the score, the rounds and the final threat, in red. Lower is better.
+  const parts = scoreParts(game, session.world.cards);
   const titleBlock = (
-    <View className={view.kind === "choosing" ? "mt-4" : "mt-16"}>
+    <View className={view.kind === "choosing" ? "mt-2" : "mt-8"}>
       <OutcomeTitle won scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
+      <View className="mt-4 flex-row gap-2" testID="resolution-tiles">
+        <StatTile label="Score" value={String(scoreTotal(parts))} />
+        <StatTile label="Rounds" value={String(parts.rounds)} />
+        {/* Two-handed, the score counts both seats' threat: the tile says so, rather than show a threat past 50. */}
+        <StatTile label={game.seatCount > 1 ? "Threat, both" : "Final threat"} value={String(parts.threat)} tone="danger" />
+      </View>
+      <Label className="mt-2 text-center">Lower score is better.</Label>
     </View>
   );
   const choiceBlock =
@@ -237,7 +243,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                     accessibilityLabel={declined ? `${view.decline.label}, selected` : view.decline.label}
                     onPress={() => setChosen(view.decline?.optionId ?? null)}
                   />
-                  {declined ? <Text className="text-label font-semibold text-goldHigh">Selected</Text> : null}
+                  {declined ? <Text className="text-label font-semibold text-accentHigh">Selected</Text> : null}
                 </View>
               ) : null}
             </>
@@ -268,7 +274,7 @@ export default function ResolutionScreen() {
   const opened = useMemo(() => (session?.ok ? sessionStore(session, user) : null), [session, user]);
   if (!saveId || !session?.ok || !opened) {
     return (
-      <Screen testID="resolution" scene="plain">
+      <Screen testID="resolution" scene="calm">
         <NavBar onBack={() => goBack(router, saveId ? { pathname: "/path/[saveId]", params: { saveId } } : "/")} backTestID="resolution-path" backLabel="Path" />
         <BodyText tone="muted" testID="resolution-closed">
           No scenario is open.

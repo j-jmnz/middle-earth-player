@@ -44,10 +44,10 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-passage-through-mirkwood-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible:
     id: node-journey-along-the-anduin-status
-    text: "Current"
+    text: "Next"
 # Kill and relaunch: the scenario is on the log and Journey Along the Anduin is unlocked.
 - stopApp
 - launchApp
@@ -59,7 +59,7 @@ tags:
     timeout: 15000
 - assertVisible:
     id: node-journey-along-the-anduin-status
-    text: "Current"
+    text: "Next"
 - tapOn:
     id: log-open
 - extendedWaitUntil:

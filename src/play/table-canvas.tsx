@@ -2,7 +2,7 @@
 // by name. A tap picks, as on the canvas, and a long press previews; the cards the open moment lets the player tap are
 // outlined, the picked ones filled. The phone draws the canvas in table-canvas.native.tsx.
 import { useMemo } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";
 
 import { NO_HIGHLIGHT } from "./peek.ts";
@@ -11,6 +11,7 @@ import type { TableCanvasProps } from "./table-canvas-types.ts";
 import type { TableTokens } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 const ZONE_WORD: Record<ZoneId, string> = {
   questStage: "Quest",
@@ -37,7 +38,7 @@ function CardButton({ id, label, faceDown, onTap, onPreview, highlight, t }: { i
       onPress={() => onTap(id)}
       onLongPress={faceDown ? undefined : () => onPreview(id)}
       delayLongPress={350}
-      className={`min-h-touch justify-center rounded-tile px-2 ${picked > 0 ? "bg-goldLine" : "bg-raised"} ${tappable ? "border border-gold" : ""}`}
+      className={`min-h-touch justify-center rounded-tile px-2 ${picked > 0 ? "bg-accentLine" : "bg-raised"} ${tappable ? "border border-accent" : ""}`}
       style={({ pressed }) => (pressed ? { backgroundColor: t.hairline } : undefined)}
     >
       <Text className={faceDown ? "text-label text-faint" : "text-label text-bone"}>{`${picked > 1 ? `${label} · ${picked}` : label}${marked}`}</Text>
@@ -96,7 +97,7 @@ export function TableCanvas({ store, width, height, nameOf, inactive, info, onTa
   const highlight = useStore(store, (state) => state.viewedSeat != null) ? NO_HIGHLIGHT : marked;
   const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight, t };
   return (
-    <ScrollView style={{ width, height, backgroundColor: t.felt }} contentContainerStyle={{ padding: 12 * s }}>
+    <ScrollView style={{ width, height }} contentContainerStyle={{ padding: 12 * s }}>
       {TABLE_ZONES.map((zone) => (
         <ZoneRow key={zone} zone={zone} {...rowProps} />
       ))}

@@ -1,7 +1,7 @@
 import { bookletPdfAvailable, bookletPdfUnavailableReason } from "booklet-pdf";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { BodyText, PrimaryButton, RingMark, Screen, TextButton } from "../../chrome";
 import { bookletName, isBookletId, startPage } from "../../booklets/books";
@@ -12,6 +12,7 @@ import { useDatabases } from "../../databases";
 import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { useSizeClass } from "../../../play/use-size-class";
+import { Text } from "../../../play/text";
 
 // Full-screen reader for one stored PDF. It opens from the campaign list, the path, the briefing and the log, and Close
 // returns to the screen that opened it. The engine never reads the file, and a missing file blocks nothing.
@@ -63,7 +64,7 @@ export default function Booklet() {
 
   if (!id || !known) {
     return (
-      <Screen testID="booklet" scene="plain">
+      <Screen testID="booklet" scene="calm">
         <View className="flex-1 justify-center gap-3">
           <BodyText tone="danger">That booklet is not one this app knows.</BodyText>
         </View>
@@ -78,7 +79,7 @@ export default function Booklet() {
   if (row && uri && BookletPdf) {
     const first = startPage(Number.isFinite(scenarioPage) && scenarioPage >= 1 ? scenarioPage : null, row.lastPage, row.pageCount);
     return (
-      <Screen testID="booklet" scene="plain" inset={false}>
+      <Screen testID="booklet" scene="calm" inset={false}>
         <View testID="booklet-reader" className="min-h-0 flex-1" collapsable={false}>
           <BookletPdf
             testID="booklet-pdf"
@@ -102,7 +103,7 @@ export default function Booklet() {
 
   if (installing) {
     return (
-      <Screen testID="booklet" scene="plain">
+      <Screen testID="booklet" scene="calm">
         <View testID="booklet-installing" className="flex-1 items-center justify-center gap-4 px-2" style={column}>
           <RingMark size={28} state="current" />
           <BodyText tone="muted" className="text-center">
@@ -130,9 +131,9 @@ export default function Booklet() {
   }
 
   return (
-    <Screen testID="booklet" scene="plain">
+    <Screen testID="booklet" scene="calm">
       <View testID="booklet-empty" className="flex-1 items-center justify-center gap-4 px-2" style={column}>
-        <View className="h-32 w-24 items-center justify-center rounded-tile" style={{ borderWidth: 1.5, borderStyle: "dashed", borderColor: palette.gold }}>
+        <View className="h-32 w-24 items-center justify-center rounded-tile" style={{ borderWidth: 1.5, borderStyle: "dashed", borderColor: palette.accent }}>
           <RingMark size={28} state="current" />
         </View>
         <Text accessibilityRole="header" testID="booklet-name" className="text-center font-display text-title text-bone">

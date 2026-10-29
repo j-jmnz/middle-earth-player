@@ -1,19 +1,7 @@
-import { View } from "react-native";
-
-import { ScreenTitle } from "../../chrome";
+import { HubHeader } from "../../chrome";
 import { RulesView } from "../../rules-view";
 
-// The rules a player reaches for mid-game: the two books in the reader, and every rule span searchable by name.
+// The rules a player reaches for mid-game: the books in the reader, and every rule span searchable by name.
 export default function Rules() {
-  return (
-    <RulesView
-      testID="rules"
-      books
-      header={
-        <View className="pt-4">
-          <ScreenTitle>Rules</ScreenTitle>
-        </View>
-      }
-    />
-  );
+  return <RulesView testID="rules" books header={<HubHeader title="Rules" />} />;
 }

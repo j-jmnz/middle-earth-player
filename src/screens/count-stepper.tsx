@@ -1,8 +1,12 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { copyCapRule } from "../catalog/deck-save";
 import { usePressedNight } from "./chrome";
 import { usePalette } from "./palette-hook";
+import { dropShadowOf } from "../play/surfaces";
+import { withAlphaHex } from "../play/tokens";
+import { useTableTokens } from "../play/use-table-tokens";
+import { Text } from "../play/text";
 
 /** Whether one more copy would break the copy limit (rr.deckbuilding). */
 export function stepperFull(count: number, deckLimit: number | null): boolean {
@@ -11,7 +15,7 @@ export function stepperFull(count: number, deckLimit: number | null): boolean {
 
 /**
  * − count + for one card in a deck, on the deck editor and the card pool. + on a card that cannot take another copy looks
- * spent and, tapped, says why. The count is gold while the deck holds the card.
+ * spent and, tapped, says why. The count is accent while the deck holds the card.
  */
 export function CountStepper({
   code,
@@ -32,9 +36,10 @@ export function CountStepper({
   ids?: { dec: string; count: string; inc: string };
 }) {
   const palette = usePalette();
+  const t = useTableTokens();
   const pressedNight = usePressedNight();
   return (
-    <View className="flex-row items-center rounded-tile" style={{ backgroundColor: palette.night, borderWidth: 1, borderColor: palette.hairline }}>
+    <View className="flex-row items-center rounded-tile" style={{ backgroundColor: withAlphaHex(palette.night, 0.92), boxShadow: dropShadowOf(t, 6, 14, 0.85) }}>
       {minus ? (
         <Pressable
           testID={ids.dec}
@@ -52,7 +57,7 @@ export function CountStepper({
         <Text
           testID={ids.count}
           accessibilityLabel={`${count} in the deck`}
-          className={`min-w-6 text-center font-display-bold text-body ${count > 0 ? "text-goldHigh" : "text-faint"}`}
+          className={`min-w-6 text-center font-display text-body ${count > 0 ? "text-accentHigh" : "text-faint"}`}
         >
           {String(count)}
         </Text>

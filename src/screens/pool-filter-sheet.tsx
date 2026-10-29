@@ -1,6 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Switch, Text, useWindowDimensions, View } from "react-native";
+import { Pressable, ScrollView, Switch, useWindowDimensions, View } from "react-native";
 
 import { traitTokens } from "../catalog/deck-save";
 import { GameIcon } from "../play/game-icon";
@@ -20,6 +20,7 @@ import {
 } from "./pool-filter";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 type FilterRow = PoolCard & { typeName: string; sphereName: string | null };
 
@@ -153,7 +154,7 @@ function OptionRow({ label, detail, onPress, icon }: { label: string; detail: st
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      className="min-h-14 flex-row items-center justify-between border-b border-inkLine"
+      className="min-h-14 flex-row items-center justify-between border-b border-inkLine/25"
     >
       <View className="flex-row items-center gap-2">
         {icon ? <GameIcon name={icon} size={16 * s} tint="ink" /> : null}
@@ -205,12 +206,12 @@ function FilterBody({
       <OptionRow label="Pack or cycle" detail={packDetail(filter, groups)} onPress={() => onChoose("pack")} />
       <OptionRow label="Trait" detail={filter.trait ?? "Any"} onPress={() => onChoose("trait")} />
       <OptionRow label="Cost" icon="cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
-      <View className="min-h-14 flex-row items-center justify-between border-b border-inkLine">
+      <View className="min-h-14 flex-row items-center justify-between border-b border-inkLine/25">
         <Text className="text-body text-ink">Unique</Text>
         <Switch
           value={filter.unique}
           onValueChange={(unique) => onChange({ ...filter, unique })}
-          trackColor={{ false: palette.hairline, true: palette.gold }}
+          trackColor={{ false: palette.hairline, true: palette.accent }}
           ios_backgroundColor={palette.hairline}
         />
       </View>
@@ -219,7 +220,7 @@ function FilterBody({
         <Switch
           value={filter.activeText}
           onValueChange={(activeText) => onChange({ ...filter, activeText })}
-          trackColor={{ false: palette.hairline, true: palette.gold }}
+          trackColor={{ false: palette.hairline, true: palette.accent }}
           ios_backgroundColor={palette.hairline}
         />
       </View>

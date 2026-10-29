@@ -1,12 +1,12 @@
 // The banner over the canvas while the player peeks at the other seat (docs/design-system.md, Table, Peeking; phase 26): a raised night
-// pill across the top of the canvas that says whose area this is and who is acting, with a gold text button back to the acting seat.
+// pill across the top of the canvas that says whose area this is and who is acting, with an accent text button back to the acting seat.
 // It sits on the canvas side, under the top bar and clear of the dock column, so the combat spotlight's scrim (over those two) never
 // covers it. It is 36 pt tall and takes no touch of its own: only `peek-back` does (a 36 pt button with 4 pt of slop above and below,
 // a 44 pt target), so the cards under the rest of the pill stay tappable and it hides as little of the staging row as it can. Both
 // words are one line, at most 1.3 times the system font scale, so the pill never grows past the room the table keeps for it. It fades
 // in and out over the banner tokens and snaps under reduced motion. It holds no state and sends nothing.
 import { useEffect, useMemo } from "react";
-import { AccessibilityInfo, Pressable, StyleSheet, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
@@ -14,6 +14,7 @@ import { MOTION } from "./motion-tokens.ts";
 import type { PeekWords } from "./peek.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // Medium's sizes; the banner draws them times the UI scale (ui-scale.ts), and callers scale PEEK_TOP and PEEK_ROOM.
 const PILL = 36;
@@ -53,7 +54,7 @@ export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWor
             className="h-9 shrink-0 items-center justify-center rounded-pill px-3"
             style={({ pressed }) => (pressed ? { backgroundColor: t.pressed } : undefined)}
           >
-            <Text numberOfLines={1} maxFontSizeMultiplier={SCALE} className="text-label font-medium text-gold">
+            <Text numberOfLines={1} maxFontSizeMultiplier={SCALE} className="text-label font-medium text-accent">
               {words.back}
             </Text>
           </Pressable>

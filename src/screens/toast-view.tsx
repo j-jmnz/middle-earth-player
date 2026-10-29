@@ -1,12 +1,13 @@
 import { useFocusEffect, useIsFocused } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AccessibilityInfo, Text, View } from "react-native";
+import { AccessibilityInfo, View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
 import { layoutAnim, useMotionScale } from "../play/motion-run";
 import { MOTION } from "../play/motion-tokens";
 import { TextButton } from "./chrome";
 import { dismissToast, leaveToastScreen, toastDuration, useToast } from "./toast";
+import { Text } from "../play/text";
 
 function useScreenReader(): boolean {
   const [enabled, setEnabled] = useState(false);
@@ -57,7 +58,7 @@ export function ToastView() {
         <View
           testID="toast"
           accessibilityLiveRegion="polite"
-          className={`min-h-14 flex-row items-center rounded-tile border bg-pressed pl-4 ${toast.tone === "danger" ? "border-danger" : "border-goldLine"}`}
+          className={`min-h-14 flex-row items-center rounded-tile border bg-pressed pl-4 ${toast.tone === "danger" ? "border-danger" : "border-accentLine"}`}
         >
           <Text testID="toast-text" className={`flex-1 py-3 text-body ${toast.tone === "danger" ? "text-danger" : "text-bone"}`}>
             {toast.text}
@@ -66,7 +67,7 @@ export function ToastView() {
             <TextButton
               testID="toast-undo"
               label="Undo"
-              tone="gold"
+              tone="accent"
               accessibilityLabel={`Undo: ${toast.text}`}
               onPress={() => {
                 undo();

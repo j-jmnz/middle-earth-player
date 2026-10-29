@@ -144,7 +144,7 @@ export default function Briefing() {
         <DealBar problems={result.problems} dealError={dealError} difficulty={difficulty} dropsOpen={save.loadout != null} dealable={result.dealable} waiting={asked?.waiting ?? null} onDeal={onDeal}>
           {result.penaltyAdded > 0 && !accepted ? (
             <View className="items-start">
-              <TextButton label={`Accept +${result.penaltyAdded} threat for the campaign`} testID="accept-penalty" tone="gold" onPress={() => setAccepted(true)} />
+              <TextButton label={`Accept +${result.penaltyAdded} threat for the campaign`} testID="accept-penalty" tone="accent" onPress={() => setAccepted(true)} />
             </View>
           ) : null}
         </DealBar>

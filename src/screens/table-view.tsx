@@ -35,6 +35,8 @@ import { previewCards } from "../play/table-preview";
 import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
+import { questScaleOf } from "../play/quest-scale";
+import { QuestScaleView } from "../play/quest-scale-view";
 import { campaignTokens, heldDial, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
@@ -175,6 +177,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
   const pills = dockPills(choice.extras);
+  const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
+  // A tablet's table (a window 600 pt tall or more, in logical points) has room for the larger dials.
+  const tabletTable = screen.height / s >= 600;
   const more = useMorePopover(pills.more.length, choice.resetKey);
   const { open: moreOpen, lines: linesOpen, close: closeMore } = more;
 
@@ -241,7 +246,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // View). The table is not laid out for one, so it asks to be turned.
   if (screen.height > screen.width) {
     return (
-      <Screen testID="table-portrait" scene="felt">
+      <Screen testID="table-portrait" scene="table">
         <NavBar onBack={() => goBack(router, nav.back)} backTestID="table-back" backLabel={nav.backLabel} />
         <View className="flex-1 items-center justify-center px-6">
           <BodyText tone="muted">Make this window wider, or turn the screen to landscape, to play. The game is saved.</BodyText>
@@ -251,7 +256,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   }
 
   return (
-    <Screen testID="table" scene="felt" inset={false}>
+    <Screen testID="table" scene="table" inset={false}>
       {/* Never flattened: with "auto" alone this view is layout-only and the renderer drops it, so the menu or a popover turning
           it to "no-hide-descendants" would add a native view and move the canvas into it, and the canvas would flash. */}
       <View className="flex-1" collapsable={false} importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }}>
@@ -276,6 +281,10 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           onMenu={() => setMenuOpen((open) => !open)}
         />
         <View className="min-h-0 flex-1 flex-row">
+          {/* The quest scale at the left edge: the threat in staging against the willpower committed, live as characters commit. */}
+          <View style={{ paddingBottom: Math.max(insets.bottom, 10 * s), paddingTop: 4 * s }}>
+            <QuestScaleView scale={scale} wide={tabletTable} />
+          </View>
           <View className="min-h-0 flex-1" onLayout={onLayout}>
             {size ? (
               <TableCanvas

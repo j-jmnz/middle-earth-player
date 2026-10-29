@@ -23,7 +23,7 @@ export default function StandaloneTableScreen() {
   if (!gameId || !session || !session.ok || !store) {
     const sentence = session?.ok === false && session.reason === "dropped" ? STANDALONE_DROPPED : "This game is not open.";
     return (
-      <Screen testID="table" scene="plain">
+      <Screen testID="table" scene="calm">
         <NavBar onBack={() => goBack(router, "/scenarios")} backTestID="table-back" backLabel="Scenarios" />
         <BodyText tone="muted" testID="table-closed">
           {sentence}

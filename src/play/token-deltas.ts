@@ -1,6 +1,6 @@
 // What changed in the counts on cards between two states, for the token pops and the floating numbers (phase 23). Pure. The
 // numbers are the reducer's: this only subtracts them. The UI never works out a number of its own.
-// The words of a change ("+2" in gold, "-1" in threat red) are here too, so the canvas draws a string it was handed.
+// The words of a change ("+2" in accent, "-1" in threat red) are here too, so the canvas draws a string it was handed.
 
 /** A token a card carries a count of. */
 export type TokenKind = "damage" | "resources" | "progress";
@@ -27,7 +27,7 @@ export function tokenDeltas(prev: Counted, next: Counted): readonly TokenDelta[]
   return out;
 }
 
-/** The floating number of a change: "+2" in gold for a gain, "−1" in threat red for damage taken or a loss. Healing is a gain. */
+/** The floating number of a change: "+2" in accent for a gain, "−1" in threat red for damage taken or a loss. Healing is a gain. */
 export function floatWords(delta: Pick<TokenDelta, "token" | "change">): { text: string; gain: boolean } {
   // More damage is a loss; every other count rising is a gain.
   const gain = delta.token === "damage" ? delta.change < 0 : delta.change > 0;

@@ -52,10 +52,10 @@ tags:
 # The log is unchanged: Journey Along the Anduin completed, Escape from Dol Guldur still current, The Oath locked, nothing carried over.
 - assertVisible:
     id: node-journey-along-the-anduin-status
-    text: "Completed"
+    text: "Won.*"
 - assertVisible:
     id: node-escape-from-dol-guldur-status
-    text: "Current"
+    text: "Next"
 - assertVisible:
     id: node-the-oath-status
     text: "Locked"

@@ -1,33 +1,34 @@
 // The cards of the phase carousel (phase-carousel.tsx): one per phase, numbered in the round, with its steps on a timeline, what the
 // player decides there and the action windows as Stop switches. Reading and the player's Stops settings only; nothing here sends an intent.
 import { useRef, type ComponentRef } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import type { CarouselPhase, CarouselStep } from "./carousel.ts";
 import { toggleStop, type TableSettings } from "./table-settings.ts";
 import { SettingSwitch } from "./setting-switch.tsx";
-import { goldSurface, panelSurface } from "./surfaces.ts";
+import { accentSurface, panelSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
 
 // The 44 pt target; callers draw it through `touch(s, ROW)`.
 export const ROW = 44;
 
-// A small capsule beside the current phase's name: "Now" in gold.
+// A small capsule beside the current phase's name: "Now" in accent.
 function NowChip() {
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View style={{ borderRadius: 999, borderWidth: 1, borderColor: t.gold, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(t.gold, 0.14) }}>
-      <Text className="font-display-bold text-micro uppercase" style={{ color: t.gold, lineHeight: 15 * s }}>
+    <View style={{ borderRadius: 999, borderWidth: 1, borderColor: t.accent, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(t.accent, 0.14) }}>
+      <Text className="font-display text-micro uppercase" style={{ color: t.accent, lineHeight: 15 * s }}>
         Now
       </Text>
     </View>
   );
 }
 
-// The step's place on the card's timeline: a dot (gold and ringed now, deep gold when done, an outline to come) on a hairline
+// The step's place on the card's timeline: a dot (accent and ringed now, deep accent when done, an outline to come) on a hairline
 // that runs on to the next step.
 function StepDot({ state, last }: { state: "past" | "current" | "next"; last: boolean }) {
   const t = useTableTokens();
@@ -42,8 +43,8 @@ function StepDot({ state, last }: { state: "past" | "current" | "next"; last: bo
           borderRadius: 5 * s,
           borderWidth: state === "next" ? 1.5 * s : 0,
           borderColor: t.muted,
-          backgroundColor: state === "current" ? t.gold : state === "past" ? t.goldDeep : "transparent",
-          boxShadow: state === "current" ? `0 0 0 ${3 * s}px ${withAlphaHex(t.gold, 0.22)}` : undefined,
+          backgroundColor: state === "current" ? t.accent : state === "past" ? t.accentDeep : "transparent",
+          boxShadow: state === "current" ? `0 0 0 ${3 * s}px ${withAlphaHex(t.accent, 0.22)}` : undefined,
         }}
       />
       {last ? null : <View style={{ flex: 1, width: 1, marginTop: 3 * s, backgroundColor: t.hairline }} />}
@@ -86,12 +87,12 @@ function StepBlock({
           paddingHorizontal: now ? 8 * s : 0,
           paddingVertical: (now ? 6 : 1) * s,
           marginLeft: now ? -4 * s : 0,
-          backgroundColor: now ? withAlphaHex(t.gold, 0.08) : "transparent",
+          backgroundColor: now ? withAlphaHex(t.accent, 0.08) : "transparent",
           borderWidth: now ? 1 : 0,
-          borderColor: withAlphaHex(t.gold, 0.45),
+          borderColor: withAlphaHex(t.accent, 0.45),
         }}
       >
-        <Text accessibilityLabel={now ? `${step.words}, now` : undefined} className="text-label font-semibold" style={{ color: state === "past" ? t.muted : now ? t.goldHigh : t.bone }}>
+        <Text accessibilityLabel={now ? `${step.words}, now` : undefined} className="text-label font-semibold" style={{ color: state === "past" ? t.muted : now ? t.accentHigh : t.bone }}>
           {step.words}
         </Text>
         <Text className="text-label" style={{ color: t.muted }}>
@@ -114,7 +115,7 @@ function StepBlock({
 }
 
 /**
- * One phase: its number and name (gold with a Now chip when current, muted with a gold done disc when past), then its steps on a
+ * One phase: its number and name (accent with a Now chip when current, muted with an accent done disc when past), then its steps on a
  * timeline. `focused` is the card the strip rests on; the others step back so the one being read stands out.
  */
 export function PhaseCard({
@@ -146,14 +147,14 @@ export function PhaseCard({
         width,
         borderRadius: 14 * s,
         borderWidth: 1,
-        borderColor: current ? t.goldLine : t.hairline,
+        borderColor: current ? t.accentLine : t.hairline,
         ...(current ? panelSurface(false, t) : { backgroundColor: withAlphaHex(t.night, 0.35) }),
         opacity: focused ? 1 : 0.55,
         overflow: "hidden",
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 * s, paddingHorizontal: 12 * s, paddingTop: 10 * s, paddingBottom: 8 * s }}>
-        {/* The phase's place in the round, in a disc: worked gold now, a deep gold edge when done, a hairline to come. */}
+        {/* The phase's place in the round, in a disc: worked accent now, a deep accent edge when done, a hairline to come. */}
         <View
           importantForAccessibility="no-hide-descendants"
           style={{
@@ -163,11 +164,11 @@ export function PhaseCard({
             alignItems: "center",
             justifyContent: "center",
             borderWidth: current ? 0 : 1,
-            borderColor: past ? t.goldDeep : t.hairline,
-            ...(current ? goldSurface(false, t) : {}),
+            borderColor: past ? t.accentDeep : t.hairline,
+            ...(current ? accentSurface(false, t) : {}),
           }}
         >
-          <Text className="font-display-bold text-micro" style={{ color: current ? t.onGold : past ? t.gold : t.muted, lineHeight: 15 * s }}>
+          <Text className="font-display text-micro" style={{ color: current ? t.onAccent : past ? t.accent : t.muted, lineHeight: 15 * s }}>
             {String(number)}
           </Text>
         </View>
@@ -175,13 +176,13 @@ export function PhaseCard({
           accessibilityRole="header"
           accessibilityLabel={`${phase.name} phase${past ? ", done this round" : current ? ", now" : ""}`}
           numberOfLines={1}
-          className="flex-1 font-display-bold text-body uppercase"
-          style={{ color: current ? t.gold : past ? t.muted : t.bone, lineHeight: 22 * s, letterSpacing: 0.6 * s }}
+          className="flex-1 font-display text-body uppercase"
+          style={{ color: current ? t.accent : past ? t.muted : t.bone, lineHeight: 22 * s, letterSpacing: 0.6 * s }}
         >
           {phase.name}
         </Text>
         {current ? <NowChip /> : null}
-        {/* RingMark's done state (src/screens/chrome-marks.tsx; src/play cannot import it): a disc of worked gold. */}
+        {/* RingMark's done state (src/screens/chrome-marks.tsx; src/play cannot import it): a disc of worked accent. */}
         {past ? (
           <View
             testID={`carousel-done-${phase.id}`}
@@ -189,14 +190,14 @@ export function PhaseCard({
             accessible
             style={{ flexDirection: "row", alignItems: "center", gap: 5 * s }}
           >
-            <View style={{ width: 10 * s, height: 10 * s, borderRadius: 5 * s, ...goldSurface(false, t) }} />
+            <View style={{ width: 10 * s, height: 10 * s, borderRadius: 5 * s, ...accentSurface(false, t) }} />
             <Text className="text-micro" style={{ color: t.muted }}>
               Done
             </Text>
           </View>
         ) : null}
       </View>
-      <View style={{ height: 1, marginHorizontal: 12 * s, backgroundColor: current ? withAlphaHex(t.gold, 0.25) : t.hairline }} />
+      <View style={{ height: 1, marginHorizontal: 12 * s, backgroundColor: current ? withAlphaHex(t.accent, 0.25) : t.hairline }} />
       <ScrollView ref={scroll} nestedScrollEnabled showsVerticalScrollIndicator persistentScrollbar contentContainerStyle={{ paddingHorizontal: 12 * s, paddingTop: 10 * s, paddingBottom: 12 * s }}>
         {phase.steps.map((step, index) => (
           <StepBlock

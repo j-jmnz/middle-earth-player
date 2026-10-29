@@ -47,7 +47,7 @@ function ClashView({ plan, index, total, now, ...common }: Common & { plan: Clas
   const flipFace = useDerivedValue(() => (frame.get().flip < 0.5 ? 0 : 1));
   const wordOpacity = useDerivedValue(() => frame.get().word);
   const moreOpacity = useDerivedValue(() => frame.get().pills);
-  const attackColor = plan.enemyAttack ? t.threat : t.gold;
+  const attackColor = plan.enemyAttack ? t.threat : t.accent;
   const blocked = shape.damage === 0;
   return (
     <Group opacity={inWindow}>
@@ -75,7 +75,7 @@ function ClashView({ plan, index, total, now, ...common }: Common & { plan: Clas
       ))}
       {pill ? <Pill at={stage.attackPill} icon="attack" color={attackColor} text={String(clash.attack)} font={pill} frame={frame} t={t} s={s} /> : null}
       {/* An undefended hero has no defense to show: the pill stands under a defender or an enemy only. */}
-      {pill && !clash.undefended ? <Pill at={stage.targetPill} icon="defense" color={t.gold} text={String(clash.defense)} font={pill} frame={frame} t={t} s={s} bounce={blocked} /> : null}
+      {pill && !clash.undefended ? <Pill at={stage.targetPill} icon="defense" color={t.accent} text={String(clash.defense)} font={pill} frame={frame} t={t} s={s} bounce={blocked} /> : null}
       {word && blocked ? <Word at={stage.word} text="Blocked" font={word} t={t} opacity={wordOpacity} /> : null}
       {word && stage.more ? <Chip at={stage.more} text={`+${plan.more}`} font={word} t={t} s={s} opacity={moreOpacity} /> : null}
       {word && total > 1 ? <Word at={stage.note} text={`${index + 1} of ${total} · Tap to skip`} font={word} t={t} color={t.muted} opacity={moreOpacity} /> : null}

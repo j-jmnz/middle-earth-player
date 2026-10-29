@@ -1,41 +1,53 @@
-// The dock of the tabs (docs/design-system.md, Components, AppTabBar). Re-exported by chrome.tsx.
-import type { ComponentProps, ReactElement } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+// The tabs (docs/design-system.md, Navigation): a dock at the foot of a phone and a tablet in portrait, a rail down the left edge of an
+// expanded window. Five hubs: Campaigns, Scenarios, Decks, Cards, Rules. Settings is a pushed screen, opened by the gear at the top
+// right of each hub (`GearButton`) or, beside the rail, by the rail's own Settings at its foot. Re-exported by chrome.tsx.
+import { useEffect, useState, type ComponentProps, type ReactElement, type ReactNode } from "react";
+import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import type { Tabs } from "expo-router";
+import { useRouter, type Tabs } from "expo-router";
 
-import { usePressedNight } from "./chrome-buttons";
+import { GearMark } from "./chrome-marks";
+import { IconButton } from "./chrome-buttons";
+import { useTitleShadow } from "./chrome-text";
+import { useDatabases } from "./databases";
+import { deckReadiness } from "./deck-status";
+import { deckFaces, listDecks } from "./deck-store";
 import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import { iconAspect, type IconName } from "../play/icon-map";
+import { raisedEdgeOf } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
+import { useTableTokens } from "../play/use-table-tokens";
 import { RAIL } from "../play/size-class";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
 
-// A dock icon is 22 pt tall, and a wide one (the One Ring) may run to 30 pt across, so each carries about the same weight
-// and the labels sit on one line.
-const DOCK_ICON = 22;
+// A dock icon is 24 pt tall (26 in the rail), and a wide one (the One Ring) may run to 32 pt across, so each carries about the same
+// weight and the labels sit on one line.
+const DOCK_ICON = 24;
+const RAIL_ICON = 26;
+const ICON_WIDE = 32;
 
-const DOCK_ICON_WIDE = 30;
+// The dock's height above the home indicator, and the indicator's own room when the platform reports none (the handoff's 92 pt dock
+// is 68 over a 24 pt inset).
+const DOCK_HEIGHT = 68;
+const DOCK_FOOT = 12;
 
-/** The `tabBarIcon` of a dock tab: one of the game's printed icons, gold on the current tab and faint on the others. */
+/** The `tabBarIcon` of a tab: one of the game's printed icons, lit with a soft glow on the current tab and faint on the others. */
 export function dockIcon(name: IconName) {
-  const aspect = iconAspect(name);
-  const size = Math.round(Math.min(DOCK_ICON, DOCK_ICON_WIDE / aspect));
-  return function DockIcon({ focused }: { focused: boolean }) {
+  return function DockIcon({ focused, size }: { focused: boolean; size?: number }) {
     const s = useUiScale();
-    return <GameIcon name={name} size={Math.round(size * s)} tint={focused ? "goldHigh" : "faint"} />;
-  };
-}
-
-/** The `tabBarIcon` of a tab whose mark the icon font lacks and the chrome draws (the Settings gear): the same tint as a dock icon. */
-export function drawnIcon(Mark: (props: { color: string; size?: number }) => ReactElement) {
-  return function DrawnIcon({ focused }: { focused: boolean }) {
     const palette = usePalette();
-    return <Mark color={focused ? palette.goldHigh : palette.faint} size={DOCK_ICON} />;
+    const box = size ?? DOCK_ICON * s;
+    const drawn = Math.round(Math.min(box, (ICON_WIDE * s) / iconAspect(name)));
+    return (
+      <View style={focused ? { filter: `drop-shadow(0 0 6px ${withAlphaHex(palette.glow, 0.7)})` } : undefined}>
+        <GameIcon name={name} size={drawn} tint={focused ? "bone" : "faint"} />
+      </View>
+    );
   };
 }
 
@@ -66,46 +78,98 @@ function tabItem(props: TabBarProps, route: TabBarProps["state"]["routes"][numbe
 }
 
 /**
+ * Whether a saved deck is not ready to play: the dot on the Decks tab. Read after the frame whenever the current tab changes, so a deck
+ * saved or fixed in the editor shows on the way back, and the tab bar never holds up the first paint of a hub.
+ */
+function useUnreadyDeck(at: number): boolean {
+  const { catalog, user } = useDatabases();
+  const [unready, setUnready] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    const frame = requestAnimationFrame(() => {
+      const decks = listDecks(user);
+      const faces = deckFaces(catalog, decks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)]));
+      if (!cancelled) setUnready(decks.some((deck) => !deckReadiness(deck, faces).ready));
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
+  }, [catalog, user, at]);
+  return unready;
+}
+
+/**
  * The tabs: a dock at the foot of the screen, or in an expanded window (a tablet in landscape) a rail down the left edge
- * (docs/design-system.md, Tablets). The tabs/_layout.tsx puts the bar where this draws it. Same tabs, testIDs and `tablist` role.
+ * (docs/design-system.md, Navigation). The tabs/_layout.tsx puts the bar where this draws it. Same tabs, testIDs and `tablist` role.
  */
 export function AppTabBar(props: TabBarProps) {
   const { rail } = useSizeClass();
   return rail ? <RailTabBar {...props} /> : <DockTabBar {...props} />;
 }
 
-/** The dock: six tabs, printed icons (a drawn gear for Settings) over their words on night. The current tab is lit: a gold bar glowing over a gold icon and word. */
+/** The red dot of a tab that needs a look (a deck not ready), at the top right of its icon. */
+function Badge({ right }: { right: string }) {
+  const palette = usePalette();
+  return <View pointerEvents="none" style={{ position: "absolute", top: 10, right: right as `${number}%`, width: 7, height: 7, borderRadius: 3.5, backgroundColor: palette.threat, boxShadow: `0 0 6px ${palette.threat}` }} />;
+}
+
+/**
+ * The dock: five equal tabs, each a printed icon over its word in Marcellus SC, on a dark band that rises out of the page. The current
+ * tab is lit: a short accent bar glowing across the top of its slot, a soft wash under it, its icon and word in bone.
+ */
 function DockTabBar(props: TabBarProps) {
   const { state } = props;
   const palette = usePalette();
-  const pressedNight = usePressedNight();
-  const { width, s } = useSizeClass();
-  // The icons and the bar grow with the scale but the words stay at Medium's size, so six labels fit across at Large (micro: 11 / 14 / 0.6).
-  // On a narrow phone (a tab under 70 pt) "Campaigns" in semibold gets a point less and tighter letters, so it reads whole.
-  const tight = width / state.routes.length < 70;
+  const insets = useSafeAreaInsets();
+  const s = useUiScale();
+  const unready = useUnreadyDeck(state.index);
+  // The words stay at Medium's size at Large, so five fit across a narrow phone.
   const labelScale = Math.min(s, 1);
-  const labelSize = { fontSize: (tight ? 10 : 11) * labelScale, lineHeight: 14 * labelScale, letterSpacing: (tight ? 0.2 : 0.6) * labelScale };
+  const t = useTableTokens();
+  const light = t.depth === "light";
   return (
-    <View accessibilityRole="tablist" className="flex-row border-t border-hairline bg-night pb-safe">
+    <View
+      accessibilityRole="tablist"
+      className="flex-row"
+      style={{
+        minHeight: DOCK_HEIGHT * s + Math.max(insets.bottom, DOCK_FOOT),
+        paddingBottom: Math.max(insets.bottom, DOCK_FOOT),
+        paddingHorizontal: 6,
+        backgroundColor: palette.night,
+        backgroundImage: `linear-gradient(180deg, ${withAlphaHex(light ? palette.raisedTop : palette.raised, 0.94)}, ${light ? palette.raised : palette.night})`,
+        boxShadow: light ? `${raisedEdgeOf(t)}, 0 -12px 30px ${withAlphaHex(t.shade, 0.18)}` : `inset 0 1px 0 ${withAlphaHex(palette.accentHigh, 0.12)}, 0 -18px 40px ${withAlphaHex(t.shade, 0.9)}`,
+      }}
+    >
       {state.routes.map((route, index) => {
         const { focused, options, word, button } = tabItem(props, route, index);
         return (
-          <Pressable
-            key={route.key}
-            {...button}
-            className="min-h-14 flex-1 items-center justify-center pb-1 pt-2.5"
-            style={({ pressed }) => (pressed ? pressedNight : undefined)}
-          >
-            {focused ? (
-              <View pointerEvents="none" style={{ position: "absolute", top: 0, width: 32 * s, height: 2, borderRadius: 1, backgroundColor: palette.gold, boxShadow: `0 0 10px 1px ${withAlphaHex(palette.gold, 0.6)}` }} />
-            ) : null}
-            {/* The icon in a fixed box, so each label sits on the same line; the label says the tab, the icon is not read. */}
-            <View className="mb-1 items-center justify-center" style={{ height: DOCK_ICON * s }} importantForAccessibility="no-hide-descendants">
-              {options.tabBarIcon?.({ focused, color: focused ? palette.goldHigh : palette.faint, size: DOCK_ICON * s })}
-            </View>
-            <Text className={focused ? "font-semibold text-goldHigh" : "text-faint"} style={labelSize} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
-              {word}
-            </Text>
+          <Pressable key={route.key} {...button} className="flex-1 items-center justify-center" style={{ minHeight: DOCK_HEIGHT * s, gap: 5 * s }}>
+            {({ pressed }) => (
+              <>
+                {focused ? (
+                  <>
+                    <View pointerEvents="none" style={{ position: "absolute", top: 2, left: "8%", right: "8%", bottom: 4, backgroundImage: `radial-gradient(60% 70% at 50% 0%, ${withAlphaHex(palette.glow, 0.16)}, ${withAlphaHex(palette.glow, 0)})` }} />
+                    <View pointerEvents="none" style={{ position: "absolute", top: 0, left: "22%", right: "22%", height: 2, backgroundColor: palette.accentHigh, boxShadow: `0 0 12px 2px ${withAlphaHex(palette.glow, 0.85)}` }} />
+                  </>
+                ) : null}
+                {pressed ? <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: withAlphaHex(palette.pressed, 0.5) }} /> : null}
+                {/* The icon in a fixed box, so each label sits on the same line; the label says the tab, the icon is not read. */}
+                <View className="items-center justify-center" style={{ height: DOCK_ICON * s }} importantForAccessibility="no-hide-descendants">
+                  {options.tabBarIcon?.({ focused, color: focused ? palette.bone : palette.faint, size: DOCK_ICON * s })}
+                </View>
+                <Text
+                  className="font-display"
+                  style={{ fontSize: 12 * labelScale, lineHeight: 15 * labelScale, letterSpacing: 0.4 * labelScale, color: focused ? palette.bone : palette.faint }}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.8}
+                >
+                  {word}
+                </Text>
+                {route.name === "decks" && unready && !focused ? <Badge right="24%" /> : null}
+              </>
+            )}
           </Pressable>
         );
       })}
@@ -114,46 +178,102 @@ function DockTabBar(props: TabBarProps) {
 }
 
 /**
- * The rail: 88 pt wide plus the left safe inset, on night with a hairline right edge. Each item is at least 64 pt tall, its icon over
- * its 12 pt word; Settings sits at the foot. The items scroll when the window is too short for them. The current item has a 2 pt
- * gold bar glowing along its leading edge and a faint gold wash behind it, over a goldHigh icon and word.
+ * The rail: 88 pt wide plus the left safe inset, a dark band falling off to its right. Each item is 72 pt tall, its icon over its 12 pt
+ * word; Settings sits at the foot and pushes the Settings screen. The items scroll when the window is too short for them. The current
+ * item has a 2 pt accent bar along its leading edge and a wash fading to the right.
  */
 function RailTabBar(props: TabBarProps) {
   const { state } = props;
   const palette = usePalette();
-  const pressedNight = usePressedNight();
+  const router = useRouter();
   const s = useUiScale();
   const insets = useSafeAreaInsets();
+  const unready = useUnreadyDeck(state.index);
   const labelScale = Math.min(s, 1);
-  const labelSize = { fontSize: 12 * labelScale, lineHeight: 15 * labelScale, letterSpacing: 0.5 * labelScale };
+  const label = (focused: boolean) => ({ fontSize: 12 * labelScale, lineHeight: 15 * labelScale, letterSpacing: 0.4 * labelScale, color: focused ? palette.bone : palette.faint });
+  const t = useTableTokens();
+  const light = t.depth === "light";
+  const item = (key: string, focused: boolean, icon: ReactElement | undefined, word: string, button: object, badge = false) => (
+    <Pressable key={key} {...button} className="items-center justify-center" style={{ minHeight: 72 * s, gap: 6 * s }}>
+      {({ pressed }) => (
+        <>
+          {focused ? (
+            <>
+              <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(palette.glow, 0.12)}, ${withAlphaHex(palette.glow, 0)})` }} />
+              <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2, backgroundColor: palette.accentHigh, boxShadow: `0 0 12px 2px ${withAlphaHex(palette.glow, 0.6)}` }} />
+            </>
+          ) : null}
+          {pressed ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.pressed, 0.5) }} /> : null}
+          <View className="items-center justify-center" style={{ height: RAIL_ICON * s }} importantForAccessibility="no-hide-descendants">
+            {icon}
+          </View>
+          <Text className="font-display" style={label(focused)} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
+            {word}
+          </Text>
+          {badge ? <Badge right="26%" /> : null}
+        </>
+      )}
+    </Pressable>
+  );
   return (
     <View
       accessibilityRole="tablist"
-      style={{ width: RAIL * s + insets.left, paddingLeft: insets.left, backgroundColor: palette.night, borderRightWidth: 1, borderRightColor: palette.hairline }}
+      style={{
+        width: RAIL * s + insets.left,
+        paddingLeft: insets.left,
+        backgroundColor: palette.night,
+        backgroundImage: `linear-gradient(90deg, ${withAlphaHex(light ? palette.raised : palette.night, 0.96)}, ${withAlphaHex(light ? palette.raisedTop : palette.dusk, 0.88)})`,
+        boxShadow: `18px 0 40px ${withAlphaHex(t.shade, light ? 0.18 : 0.8)}`,
+        zIndex: 1,
+      }}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingTop: Math.max(insets.top, 12 * s), paddingBottom: Math.max(insets.bottom, 12 * s) }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingTop: Math.max(insets.top, 36 * s), paddingBottom: Math.max(insets.bottom, 24 * s) }} showsVerticalScrollIndicator={false}>
         {state.routes.map((route, index) => {
           const { focused, options, word, button } = tabItem(props, route, index);
-          return (
-            <Pressable
-              key={route.key}
-              {...button}
-              className={`min-h-16 items-center justify-center px-1 py-2 ${route.name === "settings" ? "mt-auto" : ""}`}
-              style={({ pressed }) => (pressed ? pressedNight : focused ? { backgroundColor: withAlphaHex(palette.gold, 0.11) } : undefined)}
-            >
-              {focused ? (
-                <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2, borderRadius: 1, backgroundColor: palette.gold, boxShadow: `0 0 10px 1px ${withAlphaHex(palette.gold, 0.6)}` }} />
-              ) : null}
-              <View className="mb-1 items-center justify-center" style={{ height: DOCK_ICON * s }} importantForAccessibility="no-hide-descendants">
-                {options.tabBarIcon?.({ focused, color: focused ? palette.goldHigh : palette.faint, size: DOCK_ICON * s })}
-              </View>
-              <Text className={focused ? "font-semibold text-goldHigh" : "text-faint"} style={labelSize} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.9}>
-                {word}
-              </Text>
-            </Pressable>
-          );
+          return item(route.key, focused, options.tabBarIcon?.({ focused, color: focused ? palette.bone : palette.faint, size: RAIL_ICON * s }) as ReactElement | undefined, word, button, route.name === "decks" && unready && !focused);
         })}
+        <View className="mt-auto">
+          {item("settings", false, <GearMark color={palette.faint} size={RAIL_ICON * s} />, "Settings", {
+            testID: "settings-open",
+            collapsable: false,
+            accessibilityRole: "button",
+            accessibilityLabel: "Settings",
+            onPress: () => router.push("/settings"),
+          })}
+        </View>
       </ScrollView>
+    </View>
+  );
+}
+
+/** The round gear at the top right of a hub: it pushes Settings. Beside the rail it is not drawn, since the rail holds Settings. */
+export function GearButton() {
+  const router = useRouter();
+  const { rail } = useSizeClass();
+  if (rail) return null;
+  return <IconButton label="Settings" testID="settings-open" mark={GearMark} onPress={() => router.push("/settings")} />;
+}
+
+/**
+ * The head of a hub: its title in Marcellus SC (24 pt on a phone, 30 on a tablet) on the left, the hub's own controls and the gear on
+ * the right, and an optional line under the title.
+ */
+export function HubHeader({ title, subtitle, children }: { title: string; subtitle?: string; children?: ReactNode }) {
+  const { size, s } = useSizeClass();
+  const shadow = useTitleShadow();
+  const big = size === "compact" ? 24 : 30;
+  return (
+    <View className="pb-3 pt-2">
+      <View className="flex-row items-center justify-between gap-2" style={{ minHeight: 48 * s }}>
+        <Text accessibilityRole="header" numberOfLines={1} className="min-w-0 shrink font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.25 * s, letterSpacing: 0.5 * s, ...shadow }}>
+          {title}
+        </Text>
+        <View className="flex-row items-center" style={{ gap: 8 * s }}>
+          {children}
+          <GearButton />
+        </View>
+      </View>
+      {subtitle ? <Text className="text-label text-muted">{subtitle}</Text> : null}
     </View>
   );
 }

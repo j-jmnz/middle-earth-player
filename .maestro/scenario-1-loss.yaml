@@ -46,7 +46,7 @@ appId: com.middleearth.lcg
 # The log is unchanged: scenario 1 is still current, scenario 2 locked, nothing earned.
 - assertVisible:
     id: node-a-shadow-of-the-past-status
-    text: "Current"
+    text: "Next"
 - assertVisible:
     id: node-a-knife-in-the-dark-status
     text: "Locked"

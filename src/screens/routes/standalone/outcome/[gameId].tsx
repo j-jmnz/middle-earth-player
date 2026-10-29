@@ -41,7 +41,7 @@ export default function StandaloneOutcome() {
 
   if (!gameId || !finished || (!session?.ok && !finished.result)) {
     return (
-      <Screen testID="standalone-outcome" scene="plain">
+      <Screen testID="standalone-outcome" scene="calm">
         {back}
         <BodyText tone="muted" testID="outcome-closed">
           This game is not open.
@@ -53,7 +53,7 @@ export default function StandaloneOutcome() {
   const result = finished.result;
   if (!result) {
     return (
-      <Screen testID="standalone-outcome" scene="plain">
+      <Screen testID="standalone-outcome" scene="calm">
         <NavBar onBack={() => goBack(router, { pathname: "/standalone/table/[gameId]", params: { gameId } })} backTestID="outcome-table" backLabel="Table" />
         <BodyText tone="muted">The game is not over yet.</BodyText>
       </Screen>
@@ -70,7 +70,7 @@ export default function StandaloneOutcome() {
   const linesBlock =
     result.outcome === "won" ? (
       // The score as the numbers the player watches: score, completed rounds, victory points (ltp.scoring).
-      <View className="mt-10" testID="outcome-lines">
+      <View className="mt-4" testID="outcome-lines">
         <View className="flex-row gap-2">
           <StatTile label="Score" value={String(result.score.score)} />
           <StatTile label="Rounds" value={String(result.score.rounds)} />
@@ -89,7 +89,7 @@ export default function StandaloneOutcome() {
     );
 
   return (
-    <Screen testID="standalone-outcome" scene={won ? "victory" : "plain"}>
+    <Screen testID="standalone-outcome" scene={won ? "victory" : "ember"}>
       {back}
       {/* Expanded, with the game's details at hand: the title and the numbers at the left, the report in a pane at the right.
           Otherwise (a reopened game keeps only its result; or a phone, or a medium window) one readable column. */}
@@ -98,19 +98,19 @@ export default function StandaloneOutcome() {
           kind="supporting"
           side="end"
           start={
-            <ScreenScroll top={won ? 64 : 32} bottom={24}>
+            <ScreenScroll top={16} bottom={24}>
               {titleBlock}
               {linesBlock}
             </ScreenScroll>
           }
           end={
-            <ScreenScroll top={won ? 64 : 32} bottom={24}>
+            <ScreenScroll top={16} bottom={24}>
               <GameReportView report={report} tiles={won} />
             </ScreenScroll>
           }
         />
       ) : (
-        <ScreenScroll top={won ? 64 : 32} bottom={24} max="readable">
+        <ScreenScroll top={16} bottom={24} max="readable">
           {titleBlock}
           {linesBlock}
           {report ? (
@@ -126,7 +126,7 @@ export default function StandaloneOutcome() {
         </Label>
         <PrimaryButton label="Done" testID="outcome-done" onPress={done} />
         <View className="mt-1 items-center">
-          <TextButton label="Play again" testID="outcome-again" tone="gold" onPress={again} />
+          <TextButton label="Play again" testID="outcome-again" tone="accent" onPress={again} />
         </View>
       </ActionBar>
     </Screen>

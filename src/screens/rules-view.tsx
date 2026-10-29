@@ -1,24 +1,37 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
-import { BodyText, Chip, ListRow, Screen, SearchField, Section, TwoPane } from "./chrome";
+import { BodyText, ListRow, Screen, SearchField, Section, TwoPane } from "./chrome";
 import { BOOKLETS } from "./booklets/books";
 import { GameIcon } from "../play/game-icon";
 import { tileSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
+import { withAlphaHex } from "../play/tokens";
+import { SceneArt } from "./art";
+import { usePalette } from "./palette-hook";
 import { RuleBody } from "./rule-detail";
 import { GLOSSARY, glossaryEntry, searchGlossary } from "./rules-glossary";
 import { capWidth } from "../play/size-class";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
+import { Text } from "../play/text";
 
 // The books keep the testIDs they had on the campaign list; the others are `booklet-open-<id>`.
 const BOOK_TEST_IDS: Readonly<Record<string, string>> = { "fellowship-of-the-ring": "booklet-open", "learn-to-play": "booklet-open-learn-to-play" };
 
-// The books as lit covers: two to a row at phone width (and in the expanded right pane), four to a row in a medium window.
+// The scene each book's tile opens on: the first scenario it prints. The Rules Reference has none and shows the fog.
+const BOOK_SCENE: Readonly<Record<string, string>> = {
+  "fellowship-of-the-ring": "a-shadow-of-the-past",
+  "learn-to-play": "passage-through-mirkwood",
+  "the-dark-of-mirkwood": "the-oath",
+};
+
+// The books as tiles 150 pt tall: the scene of the book dimmed under its name, the Lore book glowing in the corner. Two to a row at
+// phone width (and in the expanded right pane), four to a row in a medium window.
 function BookCovers({ cover }: { cover: string }) {
+  const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
   const router = useRouter();
@@ -35,11 +48,16 @@ function BookCovers({ cover }: { cover: string }) {
           className={cover}
         >
           {({ pressed }) => (
-            <View className="min-h-28 justify-between rounded-card p-4" style={tileSurface(pressed, t)}>
-              <GameIcon name="lore" size={22 * s} tint="gold" />
-              <Text className="mt-3 font-display text-heading text-bone" numberOfLines={3}>
-                {book.name}
-              </Text>
+            <View className="overflow-hidden rounded-card" style={{ height: 150 * s, ...tileSurface(pressed, t) }}>
+              {BOOK_SCENE[book.id] ? <SceneArt scenarioId={BOOK_SCENE[book.id]} height={150 * s} fade={0.25} fadeTo={palette.dusk} /> : null}
+              <View className="absolute bottom-0 left-0 right-0 top-0 justify-between p-3">
+                <View style={{ filter: `drop-shadow(0 0 6px ${withAlphaHex(palette.glow, 0.7)})` }}>
+                  <GameIcon name="lore" size={22 * s} tint="accent" />
+                </View>
+                <Text className="font-display text-heading text-bone" numberOfLines={3}>
+                  {book.name}
+                </Text>
+              </View>
             </View>
           )}
         </Pressable>
@@ -75,7 +93,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
   }, [picked, expanded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const searchRow = (
-    <View className="mt-3 flex-row">
+    <View className="mt-1 flex-row">
       <SearchField testID="rules-search" value={search} onChangeText={setSearch} placeholder="Search the rules" accessibilityLabel="Search the rules" />
     </View>
   );
@@ -98,7 +116,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
                 <BookCovers cover={cover} />
               </View>
             ) : null}
-            <Section title="Glossary" className="mt-4" right={<Chip tone="faint" label={`${visible.length}`} />} />
+            <Section title="Glossary" className="mt-4" right={<Text className="text-label text-faint">{`${visible.length}`}</Text>} />
           </View>
         }
         ListFooterComponent={<View className="pb-safe" />}
@@ -122,7 +140,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
 
   if (expanded) {
     return (
-      <Screen testID={testID} scene="plain">
+      <Screen testID={testID} scene="calm">
         {header}
         <TwoPane
           kind="list-detail"
@@ -134,10 +152,10 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
           }
           end={
             <ScrollView key={picked ?? "none"} testID="rules-detail" className="min-h-0 flex-1" contentContainerStyle={{ paddingTop: 16 * s }} showsVerticalScrollIndicator={false}>
-              {/* The text keeps a reading column's width, at the pane's start edge beside the list. */}
+              {/* The text keeps a reading column's width, at the pane's start edge beside the list, on a floating panel. */}
               <View style={{ width: "100%", maxWidth: capWidth(size, "readable", s) ?? undefined }}>
                 {entry ? (
-                  <RuleBody entry={entry} onSeeAlso={setPicked} />
+                  <RuleBody entry={entry} onSeeAlso={setPicked} reading />
                 ) : books ? (
                   <View testID="rules-books">
                     <Section title="Books" />
@@ -159,7 +177,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
   // Medium sits the search and the list in a reading column under a full-width header; compact is the phone's list, unwrapped.
   const cap = capWidth(size, "readable", s);
   return (
-    <Screen testID={testID} scene="plain">
+    <Screen testID={testID} scene="calm">
       {header}
       {cap == null ? (
         <>

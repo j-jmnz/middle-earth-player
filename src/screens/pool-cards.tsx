@@ -2,18 +2,21 @@
 // a deck each has the stepper. card-pool.tsx lays them out. Both are memoized: the pool re-renders on every keystroke and every
 // change to the draft, and only the cards whose count or limit changed draw again.
 import { memo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { ListRow, SphereMark, markedSphere } from "./chrome";
 import { CountStepper } from "./count-stepper";
 import { addDraftCard, announceDraftChange, takeDraftCard, type TitleLookup } from "./deck-draft";
 import { CardThumbFrame, RowCardImage, useCardPreview } from "./images/picture";
 import type { PictureSource } from "../play/table-canvas-types";
+import { dropShadowOf, selectedRingOf } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
+import { useTableTokens } from "../play/use-table-tokens";
 import { usePalette } from "./palette-hook";
 import { useUiScale } from "../play/ui-scale";
 import { poolDetail, type PoolCard } from "./pool-filter";
 import { CARD_RATIO } from "./pool-grid";
+import { Text } from "../play/text";
 
 export type PoolRowCard = PoolCard & {
   typeName: string;
@@ -82,7 +85,7 @@ export const PoolCardRow = memo(function PoolCardRow({
 });
 
 // One card in the grid: its picture (the name and type on night while the file is missing), its name under it in label type, the
-// count the deck holds (gold) and, while adding, − and + under it. A tap opens the card, a long press shows it large, as a row does.
+// count the deck holds (accent) and, while adding, − and + under it. A tap opens the card, a long press shows it large, as a row does.
 // `offset` is how far it sits into its column (gridOffset).
 export const PoolCardCell = memo(function PoolCardCell({
   item,
@@ -95,10 +98,13 @@ export const PoolCardCell = memo(function PoolCardCell({
   onOpen,
   onPreview,
   loss = null,
+  selected = false,
 }: {
   item: PoolRowCard;
   width: number;
   offset: number;
+  // The card whose detail is open beside the grid (the Cards hub on a tablet in landscape): the silver ring.
+  selected?: boolean;
   adding: boolean;
   loss?: string | null;
   count: number;
@@ -108,6 +114,7 @@ export const PoolCardCell = memo(function PoolCardCell({
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
 }) {
   const palette = usePalette();
+  const t = useTableTokens();
   const s = useUiScale();
   const picture = useCardPreview(item.code, item.imagesrc);
   const card = { code: item.code, name: item.name, typeCode: item.typeCode, deckLimit: item.deckLimit };
@@ -125,9 +132,12 @@ export const PoolCardCell = memo(function PoolCardCell({
         delayLongPress={350}
       >
         {({ pressed }) => (
-          <View className="rounded-chip" style={{ width, height, overflow: "hidden", opacity: pressed ? 0.75 : 1, borderWidth: adding && count > 0 ? 1.5 : 1, borderColor: adding && count > 0 ? palette.gold : withAlphaHex(palette.bone, 0.08), backgroundColor: palette.raised }}>
+          <View
+            className="rounded-card"
+            style={{ width, height, overflow: "hidden", opacity: pressed ? 0.75 : 1, backgroundColor: palette.raised, ...(selected ? { boxShadow: selectedRingOf(t) } : adding && count > 0 ? { boxShadow: `0 0 0 1.5px ${palette.accent}` } : {}) }}
+          >
             {picture ? (
-              <RowCardImage code={item.code} source={picture} width={width - 2} height={height - 2} />
+              <RowCardImage code={item.code} source={picture} width={width} height={height} />
             ) : (
               <View className="flex-1 justify-between p-2">
                 <Text className="font-display text-label text-bone" numberOfLines={4}>
@@ -151,12 +161,12 @@ export const PoolCardCell = memo(function PoolCardCell({
           </View>
         )}
       </Pressable>
-      <Text className="mt-1 text-label text-bone" numberOfLines={1}>
+      <Text className={`mt-1 text-label ${selected ? "text-accentHigh" : "text-muted"}`} numberOfLines={1}>
         {item.name}
       </Text>
       {adding && count > 0 ? (
-        <View pointerEvents="none" className="absolute right-1 top-1 h-6 min-w-6 items-center justify-center rounded-pill px-1.5" style={{ backgroundColor: palette.gold, borderWidth: 2, borderColor: palette.night }}>
-          <Text className="font-display-bold text-label text-onGold">{String(count)}</Text>
+        <View pointerEvents="none" className="absolute h-6 min-w-6 items-center justify-center rounded-pill px-1.5" style={{ right: -6 * s, top: -6 * s, backgroundColor: palette.night, boxShadow: `0 0 0 1.5px ${palette.accentHigh}, ${dropShadowOf(t, 2, 6, 0.9)}` }}>
+          <Text className="font-display text-label text-bone">{String(count)}</Text>
         </View>
       ) : null}
       {adding ? (

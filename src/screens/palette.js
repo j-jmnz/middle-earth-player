@@ -1,53 +1,53 @@
 /**
- * Chrome colors for the Lamplight theme (Dark, the default) and its Daylight twin (user request, 2026-10-28). See docs/design-system.md.
- * app.json splash and adaptive-icon backgrounds must match `paper`.
- * Backdrop gradient stops are scene art and live only in backdrop-scenes.ts; the gradients of a surface or a button are
- * built from these tokens in surfaces.ts.
+ * Chrome colors for Carved Stone (docs/design-system.md): Ringwraiths, the Dark default, and its Light twin Rivendell (user request,
+ * 2026-10-29, the Carved Stone handoff). app.json splash and adaptive-icon backgrounds must match `paper`.
+ * Backdrop fog and grit are scene art and live only in backdrop-scenes.ts; the gradients of a surface or a button are built from these
+ * tokens in surfaces.ts.
  * Both palettes have the same keys, and a key is a role, not a hue: `night` is the page and `bone` is the main text in either one.
  * `palette` is Dark, for the code that runs at build time; the screens read the active one through usePalette (palette-hook.ts).
  */
 const dark = {
-  // Night surfaces: the page, a panel's base and its lit top edge, the pressed fill, the rules between rows
-  night: "#0B0A08",
-  dusk: "#12110E",
-  raised: "#1A1814",
-  raisedTop: "#221F1A",
-  pressed: "#2A2620",
-  hairline: "#2C2923",
-  // Text on night
-  bone: "#EEE7D7",
-  muted: "#A39B8C",
-  faint: "#8A857C",
+  // The ground and the floating surfaces: the page, a panel's foot, its base and its lit top, the pressed fill, the dashed rules
+  night: "#030405",
+  dusk: "#0C0E11",
+  raised: "#111417",
+  raisedTop: "#1E2328",
+  pressed: "#2A3036",
+  hairline: "#2A3036",
+  // Text on the ground; faint is the floor for words on fog
+  bone: "#EEF2EC",
+  muted: "#A6ADB5",
+  faint: "#8D949B",
   danger: "#E8917B",
-  // Gold: the Ring. The one primary action, the current step, what is selected.
-  gold: "#D9B66C",
-  goldHigh: "#F3DA9A",
-  goldDeep: "#A9813F",
-  goldLine: "#5E4C2C",
-  onGold: "#1A1309",
-  // Moonlight: section headings and quiet information, so gold stays for the one thing to do
-  moon: "#9DB0CC",
-  // A deck or a loadout that is ready to play
+  // Wraith-light: the one primary action, the current step, what is selected
+  accent: "#C4D3C0",
+  accentHigh: "#D8E6D2",
+  accentDeep: "#6C7F69",
+  accentLine: "#5A6E5C",
+  onAccent: "#0C1014",
+  // A section's name, so the accent stays for the one thing to do
+  moon: "#8FA894",
+  // A deck or a loadout that is ready to play, a won scenario
   ok: "#8FBF7A",
   // Parchment: splash, log, choice sheets
-  paper: "#F2EBDB",
-  paperPressed: "#E5DBC4",
-  paperEdge: "#D6C9AB",
+  paper: "#E6DCC6",
+  paperPressed: "#D2C4A6",
+  paperEdge: "#A8977A",
   ink: "#221E17",
-  inkMuted: "#6E6250",
-  inkLabel: "#7A5C22",
-  inkLine: "#CFC3A6",
-  // Table felt (Skia clear color and vignette)
-  felt: "#121613",
-  feltLight: "#1F2620",
-  // Encounter marks
-  threat: "#C8432F",
-  onThreat: "#EEE7D7",
-  threatEdge: "#E8917B",
-  glow: "#D9B66C",
+  inkMuted: "#5C4F3D",
+  inkLabel: "#6B4E1C",
+  inkLine: "#4A3A24",
+  // The table's ground (Skia clear color) and its lit middle
+  felt: "#030405",
+  feltLight: "#0C0F12",
+  // The enemy: threat red as a fill, its deep foot, the text on it
+  threat: "#D35537",
+  onThreat: "#FBD9CC",
+  threatEdge: "#7A2214",
+  glow: "#BED6BA",
   treachery: "#3A221C",
-  quest: "#8F877E",
-  location: "#7A5840",
+  quest: "#4D545B",
+  location: "#4D3A2D",
   objective: "#A68448",
   // Sphere pips, sampled from the printed icons
   leadership: "#B06098",
@@ -57,58 +57,48 @@ const dark = {
   fellowship: "#C9A961",
 };
 
-// Daylight: warm parchment surfaces, dark ink for text, a deepened gold so gold text keeps 4.5:1 on them (contrast.test.ts). Gold is also
-// the fill of the one primary action, and dark text cannot sit on a gold dark enough to read on parchment, so onGold turns cream here:
-// the button is worked bronze with cream words. Paper, ink, encounter, sphere and threat colors are the same in both.
+// Rivendell: warm stone and parchment surfaces, dark ink for text, elven green for the accent with cream words on it, amber section
+// names, and the spheres darkened so a mark keeps its contrast on the light ground. Paper and ink are the same in both.
 const light = {
-  // Night surfaces: the page, a panel's base and its lit top edge, the pressed fill, the rules between rows
-  night: "#E8DFCA",
-  dusk: "#EEE6D3",
-  raised: "#F5EFE0",
-  raisedTop: "#FAF6EA",
-  pressed: "#DDD2BB",
-  hairline: "#CFC3A6",
-  // Text on night
-  bone: "#221E17",
-  muted: "#554B3B",
-  faint: "#655A47",
-  danger: "#9C3521",
-  // Gold: the Ring. The one primary action, the current step, what is selected.
-  gold: "#6F5114",
-  goldHigh: "#7C5B17",
-  goldDeep: "#54400F",
-  goldLine: "#8F7637",
-  onGold: "#FBF5E4",
-  // Moonlight: section headings and quiet information, so gold stays for the one thing to do
-  moon: "#3F5A82",
-  // A deck or a loadout that is ready to play
-  ok: "#3E6B2C",
-  // Parchment: splash, log, choice sheets
-  paper: "#F2EBDB",
-  paperPressed: "#E5DBC4",
-  paperEdge: "#D6C9AB",
+  night: "#E4DCCB",
+  dusk: "#EBE3D0",
+  raised: "#F2ECDE",
+  raisedTop: "#FDFAF2",
+  pressed: "#DED4BF",
+  hairline: "#CFC3A8",
+  bone: "#1A1D17",
+  muted: "#46473B",
+  faint: "#5E5D52",
+  danger: "#9A3220",
+  accent: "#3E5A48",
+  accentHigh: "#2C4636",
+  accentDeep: "#18271F",
+  accentLine: "#637A69",
+  onAccent: "#F7F1E3",
+  moon: "#725219",
+  ok: "#3B6B2C",
+  paper: "#E6DCC6",
+  paperPressed: "#D2C4A6",
+  paperEdge: "#A8977A",
   ink: "#221E17",
-  inkMuted: "#6E6250",
-  inkLabel: "#7A5C22",
-  inkLine: "#CFC3A6",
-  // Table felt (Skia clear color and vignette)
-  felt: "#DDD4BF",
-  feltLight: "#E9E1CE",
-  // Encounter marks
-  threat: "#C8432F",
-  onThreat: "#FFF9E8",
-  threatEdge: "#7A2616",
-  glow: "#FBF5E4",
+  inkMuted: "#5C4F3D",
+  inkLabel: "#6B4E1C",
+  inkLine: "#4A3A24",
+  felt: "#E4DCCB",
+  feltLight: "#F2EBDC",
+  threat: "#B8432C",
+  onThreat: "#FFF4EC",
+  threatEdge: "#8F2A17",
+  glow: "#FFFFFF",
   treachery: "#3A221C",
-  quest: "#8F877E",
-  location: "#7A5840",
+  quest: "#4D545B",
+  location: "#4D3A2D",
   objective: "#A68448",
-  // Sphere pips, sampled from the printed icons
-  leadership: "#B06098",
-  tactics: "#E03848",
-  lore: "#62B02A",
-  spirit: "#54A8C0",
-  fellowship: "#C9A961",
+  leadership: "#9A4A82",
+  tactics: "#B82A38",
+  lore: "#4A8A1C",
+  spirit: "#2F7F96",
+  fellowship: "#8F7434",
 };
 
 const palettes = { dark, light };

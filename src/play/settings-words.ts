@@ -21,7 +21,7 @@ export const AWAKE_LINE = "The screen does not sleep while a table is open.";
 export const NONE_YET = "None yet";
 
 export const CREDITS =
-  "Card data comes from RingsDB, Hall of Beorn and DragnCards. The type is Cinzel, under the SIL Open Font License. This is a fan-made, unofficial app, not made, endorsed or sponsored by Fantasy Flight Games or Asmodee.";
+  "Card data comes from RingsDB, Hall of Beorn and DragnCards. The type is Marcellus SC and Barlow Semi Condensed, under the SIL Open Font License. This is a fan-made, unofficial app, not made, endorsed or sponsored by Fantasy Flight Games or Asmodee.";
 
 export type AlwaysRow = { effectId: string; label: string };
 
