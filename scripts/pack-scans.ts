@@ -33,7 +33,7 @@ export type PackScansOptions = {
   mapPath: string;
   fetch?: (url: string) => Promise<Uint8Array>;
   render?: (pdfFile: string, page: number) => Uint8Array;
-  shrink?: (body: Uint8Array, typeCode: string) => Promise<Uint8Array>;
+  shrink?: (body: Uint8Array, typeCode: string, side: "A" | "B") => Promise<Uint8Array>;
 };
 
 type Pin = SourceFile & { cacheDir: string };
@@ -99,7 +99,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
         tick(`${key} has no picture`);
         continue;
       }
-      const shown = await shrink(body, card.type_code);
+      const shown = await shrink(body, card.type_code, key.endsWith(".B") ? "B" : "A");
       total += shown.byteLength;
       packed.push(writeScan(key, shown, options.scansDir));
       tick(`${key} ${bytes(shown.byteLength)}`);
@@ -189,16 +189,18 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
 
 // A quest card and a side quest are printed sideways, and the app shows them so. JvZijp files them upright, a quest turned
 // one way and a side quest the other: the clockwise turn that lays each back down, checked against cardgame.tools'
-// landscape scans (31 quests, 10 player side quests).
+// landscape scans (31 quests, 10 player side quests). A quest's side B is filed the other way up from its side A (the text of
+// "141022 - 1B" runs bottom to top), so it takes the opposite turn.
 const UPRIGHT_TURN: Readonly<Record<string, number>> = { quest: 90, "player-side-quest": 270, "encounter-side-quest": 270 };
 
 // Scales a picture down to MAX_SIDE on its long side as a JPEG, laying an upright quest picture down first. A JPEG already
 // within MAX_SIDE, the right way round and at most KEEP_BYTES is kept byte for byte; a PNG, or a JPEG saved at a far higher
 // quality than the bundle needs (JvZijp's campaign pages run to 1.2 MB), is encoded again.
-export async function shrinkToMaxSide(body: Uint8Array, typeCode = ""): Promise<Uint8Array> {
+export async function shrinkToMaxSide(body: Uint8Array, typeCode = "", side: "A" | "B" = "A"): Promise<Uint8Array> {
   const media = sniffImage(body);
   if (!media) throw new Error("Picture is not a JPEG or PNG");
-  const turn = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  const sideA = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  const turn = side === "B" && sideA !== 0 ? (sideA + 180) % 360 : sideA;
   if (turn === 0 && media.extension === "jpg" && Math.max(media.width, media.height) <= MAX_SIDE && body.byteLength <= KEEP_BYTES) return body;
   const image = turn === 0 ? sharp(body) : sharp(body).rotate(turn);
   return new Uint8Array(await image.resize({ width: MAX_SIDE, height: MAX_SIDE, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 85, mozjpeg: true }).toBuffer());

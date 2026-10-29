@@ -5,6 +5,7 @@ import { Image } from "expo-image";
 import { View } from "react-native";
 
 import { iconAspect, type IconName } from "./icon-map.ts";
+import { cachePolicyFor } from "./image-cache.ts";
 import { ICONS } from "./icons/generated.ts";
 import { ICON_FILES } from "./icons/files.generated.ts";
 import type { TableToken } from "./tokens.ts";
@@ -17,6 +18,7 @@ export function GameIcon({ name, size = 16, tint, label }: { name: IconName; siz
   return (
     <Image
       source={ICON_FILES[name]}
+      cachePolicy={cachePolicyFor(ICON_FILES[name])}
       contentFit="contain"
       tintColor={vector && tint ? t[tint] : undefined}
       accessible={label != null}

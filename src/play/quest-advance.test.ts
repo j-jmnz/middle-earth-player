@@ -13,7 +13,7 @@ import type { ScenarioState } from "../rules/state.ts";
 import { cavesTable, loadCavesWorld, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 
 import { ledgerLine } from "./ledger.ts";
-import { advancedTo, advanceWords, closeLatch, nextLatch, NO_ADVANCE, openAdvance, stageAsks } from "./quest-advance.ts";
+import { advancedTo, advanceWords, closeLatch, nextLatch, NO_ADVANCE, openAdvance, openingLatch, stageAsks } from "./quest-advance.ts";
 import type { TableMoment } from "./store.ts";
 
 let world: CavesWorld;
@@ -67,6 +67,7 @@ describe("the quest advance screen", () => {
     expect(words.eyebrow).toBe("The quest advances · stage 1 of 4");
     expect(words.title).toBe("Stage 1B · The Dark of Nibin-Dûm");
     expect(words.detail).toBe("8 quest points to complete it");
+    expect(advanceWords(made.state, made.ctx, made.state.questStage ?? "", "The Dark of Nibin-Dûm", ledgerLine, true).eyebrow).toBe("The quest · stage 1 of 4");
   });
 });
 
@@ -83,6 +84,20 @@ describe("the quest advance screen's latch", () => {
     const closed = closeLatch(held);
     expect(openAdvance(nextLatch(closed, reached, game), game)).toBeNull();
     expect(openAdvance(nextLatch(closed, { seq: 5, stageId }, game), game)).toEqual({ seq: 5, stageId });
+  });
+
+  it("opens the table on the stage in play until Progress, and a later advance opens it again", () => {
+    const made = make({ seats: 1, stage: "41004", progress: 0, setAside: ["41027"], deck: ["41030", "41031"], discard: ["41031"] });
+    const game = made.state;
+    const stageId = game.questStage ?? "";
+    const opening = openingLatch(game);
+    expect(openAdvance(opening, game)).toEqual({ seq: 0, stageId });
+    expect(nextLatch(opening, null, game)).toBe(opening);
+    const closed = closeLatch(opening);
+    expect(openAdvance(closed, game)).toBeNull();
+    expect(openAdvance(nextLatch(closed, { seq: 1, stageId }, game), game)).toEqual({ seq: 1, stageId });
+    // A game that is over opens on the table.
+    expect(openAdvance(openingLatch({ ...game, lost: true }), game)).toBeNull();
   });
 
   it("goes back to the table by itself once the stage's question is answered (41005:A:1)", () => {

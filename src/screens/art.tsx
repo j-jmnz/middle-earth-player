@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { View } from "react-native";
 
 import { cards } from "../catalog/schema";
+import { cachePolicyFor } from "../play/image-cache";
 import { nightFade, panelSurface, topShade } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
@@ -78,6 +79,7 @@ export function CroppedArt({
           <Image
             recyclingKey={card.code}
             source={source}
+            cachePolicy={cachePolicyFor(source)}
             contentFit="fill"
             accessible={false}
             style={{ position: "absolute", width: crop.width, height: crop.height, left: crop.left, top: crop.top }}

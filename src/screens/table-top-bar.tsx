@@ -1,9 +1,9 @@
 // The table's top bar, 52 pt (TOP_BAR), three zones and nothing else (docs/design-system.md, Table): the threat dials at the left (then
-// Life and the Burden deck), the phase rail centered on the bar, and the menu button at the right. Back, Log, Rules, Booklet
+// Life and the Burden deck), the phase rail centered on the screen, and the menu button at the right. Back, Log, Rules, Booklet
 // and Table settings are in the menu (src/play/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.
 import { useEffect, useState } from "react";
-import { ScrollView, View, type LayoutChangeEvent } from "react-native";
+import { ScrollView, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 
 import { setDialsEdge } from "../play/bar-edge";
 import { seatDial } from "../play/peek";
@@ -55,9 +55,11 @@ export type TopBarProps = {
 export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
-  const [bar, setBar] = useState(0);
+  const screen = useWindowDimensions();
+  // The bar's width and its left edge on the screen: the table lays it out from the screen's left edge, after the left inset.
+  const [bar, setBar] = useState({ width: 0, x: 0 });
   const [dials, setDials] = useState(0);
-  const onBar = (event: LayoutChangeEvent) => setBar(Math.round(event.nativeEvent.layout.width));
+  const onBar = (event: LayoutChangeEvent) => setBar({ width: Math.round(event.nativeEvent.layout.width), x: Math.round(event.nativeEvent.layout.x) });
   const onDials = (event: LayoutChangeEvent) => setDials(Math.round(event.nativeEvent.layout.width));
   // The zones need the bar and the dials measured. Until both are, the rail is held invisible rather than drawn at a guess, so it
   // never jumps when the table opens.
@@ -67,7 +69,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
     const timer = setTimeout(() => setWaited(true), 400);
     return () => clearTimeout(timer);
   }, []);
-  const zones = bar > 0 && (dials > 0 || waited) ? barZones(bar - 16 * s, dials, s) : null;
+  // The zones are worked out inside the bar's side padding (px-2), so the screen's middle is counted from there.
+  const zones = bar.width > 0 && (dials > 0 || waited) ? barZones(bar.width - 16 * s, dials, s, screen.width / 2 - bar.x - 8 * s) : null;
   // The tray's outside-tap layer over the bar stops where the dials end, so a dial tap reaches the dial (src/play/bar-edge.ts).
   const edge = zones ? 8 * s + Math.min(dials, zones.left) : 0;
   useEffect(() => setDialsEdge(edge), [edge]);

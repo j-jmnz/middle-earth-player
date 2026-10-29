@@ -217,6 +217,8 @@ describe("pack scans", () => {
     };
     expect(await darkTop(await shrinkToMaxSide(upright, "quest"))).toBe(true);
     expect(await darkTop(await shrinkToMaxSide(upright, "player-side-quest"))).toBe(false);
+    // A quest's side B is filed the other way up.
+    expect(await darkTop(await shrinkToMaxSide(upright, "quest", "B"))).toBe(false);
     const png = await shrinkToMaxSide(upright, "ally");
     expect(await sharp(Buffer.from(png)).metadata()).toMatchObject({ format: "jpeg", width: 700, height: 1000 });
   });

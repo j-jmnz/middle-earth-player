@@ -4,6 +4,7 @@ import { View } from "react-native";
 
 import { cardCorner } from "../../play/card-corner";
 import { CardImage } from "../../play/card-image";
+import { cachePolicyFor } from "../../play/image-cache";
 
 import { cardImageUrl, shownCardImage } from "./policy";
 import { scanAssets } from "./scan-map";
@@ -54,7 +55,7 @@ export function InspectCardImage({
   width: number;
   height: number;
 }) {
-  return <Image recyclingKey={code} contentFit="contain" source={source} style={{ width, height }} />;
+  return <Image recyclingKey={code} contentFit="contain" cachePolicy={cachePolicyFor(source)} source={source} style={{ width, height }} />;
 }
 
 export function CoverCardImage({
@@ -74,6 +75,7 @@ export function CoverCardImage({
       contentFit="cover"
       contentPosition={focusTop}
       accessible={false}
+      cachePolicy={cachePolicyFor(source)}
       source={source}
       style={{ width, height }}
     />

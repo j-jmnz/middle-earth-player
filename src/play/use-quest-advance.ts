@@ -1,10 +1,11 @@
 // When the quest advance screen is up (quest-advance.ts): from the intent that advanced the quest until the player taps Progress, or,
 // when the new stage asked a question as it was revealed, until that question is answered. Read during the render the moment arrives
 // in, so the table's own answers (use-table-choice.ts, useAutoAnswer) already hold on that render. A combat spotlight plays first.
+// The table opens on it too, at the stage in play (openingLatch).
 import { useCallback, useState } from "react";
 import { useStore } from "zustand";
 
-import { advancedTo, closeLatch, nextLatch, NO_ADVANCE, openAdvance, stageAsks, type QuestAdvance } from "./quest-advance.ts";
+import { advancedTo, closeLatch, nextLatch, openAdvance, openingLatch, stageAsks, type QuestAdvance } from "./quest-advance.ts";
 import type { TableStore } from "./store.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
 
@@ -22,7 +23,7 @@ export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   const moment = useStore(store, (state) => state.moment);
   const game = useStore(store, (state) => state.game);
   const spotlit = useSpotlightHold(store);
-  const [latch, setLatch] = useState(NO_ADVANCE);
+  const [latch, setLatch] = useState(() => openingLatch(game));
   // Set during render (the derived-state pattern): React renders again before it commits, so no effect sees the old latch.
   const next = nextLatch(latch, advancedTo(moment, game), game);
   if (next !== latch) setLatch(next);

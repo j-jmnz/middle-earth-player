@@ -19,6 +19,10 @@ appId: com.middleearth.lcg
     visible:
       id: table
     timeout: 30000
+# The table opens on the quest stage in play (quest-advance.ts, openingLatch); a game that is over opens on the table.
+- tapOn:
+    id: quest-advance-progress
+    optional: true
 - assertVisible:
     id: rail
 # Only Flight to the Ford declares a life tracker and a burden deck (flight-to-the-ford.yaml asserts both there).

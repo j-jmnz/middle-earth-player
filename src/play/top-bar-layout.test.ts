@@ -7,12 +7,26 @@ import { barZones, MENU_BUTTON, phaseWidth, pillWidth, RAIL_FLOOR, RAIL_MAX, RAI
 const PHASE_19_FLOOR = 232;
 
 describe("top bar zones", () => {
-  it("puts the rail as far from the last dial as from the menu button while the dials fit", () => {
-    for (const [bar, dials] of [[800, 120], [800, 200], [620, 100], [1000, 0], [1200, 46]] as const) {
-      const { left, rail, right, scroll } = barZones(bar, dials);
+  it("centers the rail on the screen, clear of the dials and the menu button, while they leave it room", () => {
+    // `center`: the screen's middle on the bar, off the bar's own middle by a left inset larger than the right.
+    for (const [bar, dials, center] of [[800, 120, 400], [800, 200, 380], [620, 100, 310], [1000, 0, 500], [1200, 46, 576]] as const) {
+      const { left, rail, right, scroll } = barZones(bar, dials, 1, center);
+      expect(Math.abs(left + rail / 2 - center)).toBeLessThanOrEqual(0.5);
+      expect(left).toBeGreaterThanOrEqual(dials);
+      expect(right).toBeGreaterThanOrEqual(MENU_BUTTON);
+      expect(rail).toBeGreaterThanOrEqual(RAIL_FLOOR);
+      expect(rail).toBeLessThanOrEqual(RAIL_MAX);
+      expect(scroll).toBe(false);
+      expect(Math.abs(bar - left - rail - right)).toBeLessThan(1);
+    }
+  });
+
+  it("puts the rail as far from the last dial as from the menu button when the dials leave no room for it on the screen's middle", () => {
+    for (const [bar, dials] of [[620, 260], [700, 330]] as const) {
+      const { left, rail, right, scroll } = barZones(bar, dials, 1, bar / 2);
+      expect(left + rail / 2).toBeGreaterThan(bar / 2);
       expect(Math.abs(left - dials - (right - MENU_BUTTON))).toBeLessThanOrEqual(1);
       expect(scroll).toBe(false);
-      expect(left + rail + right).toBeLessThanOrEqual(bar);
       expect(bar - left - rail - right).toBeLessThan(2);
     }
   });

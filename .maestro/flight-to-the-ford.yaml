@@ -32,6 +32,10 @@ tags:
     visible:
       id: table
     timeout: 30000
+# The table opens on the quest stage in play (quest-advance.ts, openingLatch); a game that is over opens on the table.
+- tapOn:
+    id: quest-advance-progress
+    optional: true
 # The Setup line: the burden deck of five cards and the Ring-bearer's life at 15.
 - assertVisible:
     id: life
@@ -58,6 +62,10 @@ tags:
     visible:
       id: table
     timeout: 30000
+# The table opens on the quest stage in play (quest-advance.ts, openingLatch); a game that is over opens on the table.
+- tapOn:
+    id: quest-advance-progress
+    optional: true
 - assertVisible:
     id: life-value
     text: "15"

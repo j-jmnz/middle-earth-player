@@ -37,7 +37,7 @@ import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { pictureCode, pictureKey } from "../play/picture-key";
-import { advanceWords } from "../play/quest-advance";
+import { advanceWords, isOpening } from "../play/quest-advance";
 import { QuestAdvanceView } from "../play/quest-advance-view";
 import { useQuestAdvance } from "../play/use-quest-advance";
 import { PEEK_ROOM } from "../play/peek-banner";
@@ -392,16 +392,16 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       {/* The combat spotlight: a full-screen canvas over the table, the bar and the dock, mounted only while it plays and deaf to touches
           (the table canvas and the scrim in TableLayers catch the skip). The banner, the preview and the menu stay above it. */}
       <SpotlightLayer handoff={handoff} picture={picture} pictureRevision={images.revision} nameOf={nameOf} sphereOf={sphereOf} />
-      {/* Over the top bar, the table and any open panel, centered over the canvas at the screen's top edge (user request,
-          2026-10-29), so it never covers the command column's tray. While the table peeks it hangs under the peek pill, so
+      {/* Over the top bar, the table and any open panel, centered on the screen at its top edge (user request, 2026-10-29), and
+          narrowed so it never covers the command column's tray (banner-span.ts). While the table peeks it hangs under the peek pill, so
           Back to Player 1 stays in reach. */}
       {choice.banner ? (
         <MomentBanner
           key={choice.bannerKey}
           moment={choice.banner}
           top={peek.words ? insets.top + (TOP_BAR + PEEK_ROOM) * s : insets.top + 4 * s}
-          left={insets.left}
-          right={insets.right + commandWidth}
+          leftClear={insets.left}
+          rightClear={insets.right + commandWidth}
           onBeat={choice.onBeat}
           onDismiss={choice.dismissBanner}
         />
@@ -421,7 +421,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         <QuestAdvanceView
           key={advance.shown.seq}
           card={{ code: advancedCard.code, ...describe(advancedCard.code, pictureKey(advancedCard)) }}
-          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine)}
+          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine, isOpening(advance.shown))}
           asks={advance.asks}
           choice={choice}
           picture={picture}

@@ -26,6 +26,10 @@ tags:
     visible:
       id: table
     timeout: 30000
+# The table opens on the quest stage in play (quest-advance.ts, openingLatch); a game that is over opens on the table.
+- tapOn:
+    id: quest-advance-progress
+    optional: true
 # Two dials; no peek yet.
 - assertVisible:
     id: threat-0

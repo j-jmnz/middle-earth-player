@@ -15,6 +15,7 @@ import { scheduleOnRN } from "react-native-worklets";
 
 import { CardImage } from "./card-image.tsx";
 import { CardTextView } from "./card-text-view.tsx";
+import { cachePolicyFor } from "./image-cache.ts";
 import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "./motion-run.ts";
@@ -213,7 +214,7 @@ export function CardPreview({
                             style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent", borderWidth: 1, borderColor: index === at ? t.accentLine : t.hairline }}
                           >
                             <View style={{ width: 24 * s, height: 34 * s, borderRadius: 3 * s, overflow: "hidden", backgroundColor: t.raised }}>
-                              {item.source ? <Image source={item.source} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
+                              {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
                             </View>
                             <View className="shrink">
                               <Text numberOfLines={1} className="text-body text-bone">

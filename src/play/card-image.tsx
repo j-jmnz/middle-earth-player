@@ -7,6 +7,7 @@ import { useState } from "react";
 import { View } from "react-native";
 
 import { cardCorner, containIn } from "./card-corner.ts";
+import { cachePolicyFor, type CachePolicy } from "./image-cache.ts";
 
 type Props = {
   source: ImageSource | number | string;
@@ -14,7 +15,7 @@ type Props = {
   width: number;
   height: number;
   accessibilityLabel?: string;
-  cachePolicy?: "memory-disk" | "disk" | "memory" | "none";
+  cachePolicy?: CachePolicy;
 };
 
 export function CardImage({ source, recyclingKey, width, height, accessibilityLabel, cachePolicy }: Props) {
@@ -32,7 +33,7 @@ export function CardImage({ source, recyclingKey, width, height, accessibilityLa
         <Image
           recyclingKey={recyclingKey}
           contentFit={shape ? "cover" : "contain"}
-          cachePolicy={cachePolicy}
+          cachePolicy={cachePolicyFor(source, cachePolicy)}
           accessible={accessibilityLabel != null}
           accessibilityLabel={accessibilityLabel}
           source={source}

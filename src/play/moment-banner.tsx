@@ -1,11 +1,12 @@
 // The outcome banner over the table (docs/design-system.md, Table, Banner): what the last intent did, in beats, for a few
 // seconds. A tap or a swipe sends it away (user request, 2026-10-29); the log keeps every step.
 import { useEffect, useMemo, useState } from "react";
-import { AccessibilityInfo, View } from "react-native";
+import { AccessibilityInfo, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
+import { bannerSpan } from "./banner-span.ts";
 import { layoutAnim, timing, useMotionScale, useReduceMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { BEAT_MS, type Moment } from "./outcome.ts";
@@ -17,6 +18,9 @@ import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
 const BANNER_WIDTH = 440;
+const BANNER_MIN = 260;
+// The room it keeps from each side of its band.
+const SIDE = 16;
 // A swipe this far sideways or up, or a flick, sends the banner away. Medium's sizes, drawn at the UI scale.
 const SWIPE_SIDEWAYS = 56;
 const SWIPE_UP = 34;
@@ -34,28 +38,32 @@ function bannerFill(t: TableTokens, tone: Moment["tone"], edge: string) {
 }
 
 /**
- * What the last intent did, centered at the top edge of the room it is given (`left` to `right`, the canvas's columns: it
- * never covers the command column and its tray) for a few seconds, over the top bar, the table and any open panel. `top` is
+ * What the last intent did, centered on the screen at its top edge for a few seconds, clear of `leftClear` and `rightClear` (the
+ * left inset; the right inset and the command column with its tray), narrower than its 260 pt floor when the middle leaves less
+ * room (banner-span.ts), over the top bar, the table and any open panel. `top` is
  * where it hangs. A tap, or a swipe sideways or up, dismisses it (`onDismiss`). The caller keys it on the moment, so each one
  * enters and is announced.
  */
 export function MomentBanner({
   moment,
   top,
-  left,
-  right,
+  leftClear,
+  rightClear,
   onBeat,
   onDismiss,
 }: {
   moment: Moment;
   top: number;
-  left: number;
-  right: number;
+  leftClear: number;
+  rightClear: number;
   onBeat?: (cards: readonly string[]) => void;
   onDismiss: () => void;
 }) {
   const t = useTableTokens();
   const s = useUiScale();
+  const screen = useWindowDimensions();
+  const { left, right } = bannerSpan(screen.width, BANNER_WIDTH * s + 2 * SIDE, leftClear, rightClear);
+  const room = Math.max(0, screen.width - left - right - 2 * SIDE);
   const edge = moment.tone === "good" ? t.accentHigh : moment.tone === "bad" ? t.threat : t.faint;
   const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
@@ -117,10 +125,10 @@ export function MomentBanner({
     return () => onBeat?.([]);
   }, [beatKey, onBeat]);
   return (
-    <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" style={{ position: "absolute", top, left, right, alignItems: "center", paddingHorizontal: 16 }}>
+    <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" style={{ position: "absolute", top, left, right, alignItems: "center", paddingHorizontal: SIDE }}>
       <GestureDetector gesture={gesture}>
         {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
-        <Animated.View className="rounded-card" style={[{ minWidth: 260 * s, maxWidth: BANNER_WIDTH * s, ...bannerFill(t, moment.tone, edge) }, swipeStyle]}>
+        <Animated.View className="rounded-card" style={[{ minWidth: Math.min(BANNER_MIN * s, room), maxWidth: room, ...bannerFill(t, moment.tone, edge) }, swipeStyle]}>
           <View
             testID="moment"
             accessible

@@ -1,5 +1,5 @@
-// The top bar's three zones (docs/design-system.md, Table): the dials at the left, the phase rail centered between the dials and
-// the menu (as far from the last dial as from the menu button, user request, 2026-10-29), one menu button at the right. The rail never truncates its words: its floor is the widest it can be, counted from its own words
+// The top bar's three zones (docs/design-system.md, Table): the dials at the left, the phase rail centered on the screen (user request,
+// 2026-10-29; it sat between the dials and the menu before, right of the middle), one menu button at the right. The rail never truncates its words: its floor is the widest it can be, counted from its own words
 // (the phase, "Round 99 · Optional engagement") at their type sizes and its seven ticks. Pure, so a test reads it.
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 import { touch } from "./ui-scale.ts";
@@ -84,19 +84,28 @@ export type BarZones = {
 };
 
 /**
- * `bar` is the bar's width inside the side insets; `dials` the natural width of the dials (0 until measured). While the dials
- * fit, the room between the dials and the menu button is shared evenly on both sides of the rail, so the rail is as far from the
- * last dial as from the menu. When they are too wide for the rail's floor (two seats with Life and the Burden deck on a small
- * phone), the rail wins and the left zone scrolls. At a UI `scale` the widths come in and go out in screen points, and the
- * arithmetic is the Medium one in logical points.
+ * `bar` is the bar's width inside the side insets; `dials` the natural width of the dials (0 until measured); `center` where the
+ * screen's middle falls on the bar, from its left edge (the bar's own middle when not given). The rail is centered there, as wide as
+ * it can be without reaching the dials or the menu button, even when that is narrower than sharing the room evenly would make it
+ * (wide dials can then cost the rail its neighbor phases, railWide: being on the middle comes first). When the dials leave less than
+ * the rail's floor on their side for that, the room
+ * between the dials and the menu button is shared evenly on both sides of the rail; when they are too wide even for that (two seats
+ * with Life and the Burden deck on a small phone), the rail wins and the left zone scrolls. At a UI `scale` the widths come in and go
+ * out in screen points, and the arithmetic is the Medium one in logical points.
  */
-export function barZones(bar: number, dials: number, scale = 1): BarZones {
+export function barZones(bar: number, dials: number, scale = 1, center = bar / 2): BarZones {
   // The bar is worked out in logical points (the sizes above, at Medium) and drawn at `scale`; the menu button keeps its 44 pt floor.
   const menu = touch(scale, MENU_BUTTON) / scale;
   const room = bar / scale;
   const natural = dials / scale;
   const need = Math.ceil(natural) + GAP;
   const right = menu + GAP;
+  const middle = center / scale;
+  const half = Math.min(RAIL_MAX / 2, middle - natural - GAP, room - right - middle);
+  if (2 * half >= RAIL_FLOOR) {
+    const left = middle - half;
+    return { left: left * scale, rail: 2 * half * scale, right: (room - left - 2 * half) * scale, scroll: false };
+  }
   const free = room - natural - GAP - right;
   if (free >= RAIL_FLOOR) {
     const rail = Math.min(RAIL_MAX, free);
