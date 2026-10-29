@@ -39,7 +39,9 @@ export type PackScansOptions = {
 type Pin = SourceFile & { cacheDir: string };
 
 /**
- * Bundles side A of every card in the catalog, so the app needs no network (user decision, 2026-10-29). The file is the
+ * Bundles side A of every card in the catalog, and side B of each card pinned with one (a quest stage, a campaign card), so the
+ * app needs no network (user decision, 2026-10-29) and a quest stage on its B side shows that side. Side B is written as
+ * `<code>.B` and keyed so in the map (src/play/picture-key.ts). The file is the
  * card's `pictures` file of data/sources.json when it has one, else its `scans` file: the cached copy is used when its
  * hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache), and a PDF page is rendered from
  * the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data:sync scans pictures` to move the pins.
@@ -47,8 +49,8 @@ type Pin = SourceFile & { cacheDir: string };
  */
 export async function packScans(options: PackScansOptions, log: Log): Promise<PackedScan[]> {
   const { sources } = JSON.parse(readFileSync(options.sourcesPath, "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
-  const scanPins = sideAPins(sources.scans, "scans", options.scanCacheDir);
-  const picturePins = sideAPins(sources.pictures, "pictures", options.pictureCacheDir);
+  const scanPins = sidePins(sources.scans, "scans", options.scanCacheDir);
+  const picturePins = sidePins(sources.pictures, "pictures", options.pictureCacheDir);
   const pdfPins = new Map((sources.pictures?.files ?? []).filter((file) => file.path.startsWith("pdf/")).map((file) => [file.url, file]));
   const notes: RenderNotes = { noPdftoppm: [], rehashed: [] };
   const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytes(url, 120_000, log)), pdfPins, notes };
@@ -61,21 +63,30 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
     database.close();
   }
   log.info(`${cards.length} cards in the catalog`);
+  // Side A of every card, and side B of a card with a pin for it; a card with no side B pin has none to show.
+  const jobs = cards.flatMap((card) => {
+    const back = `${card.code}.B`;
+    return [
+      { key: card.code, card },
+      ...(picturePins.has(back) || scanPins.has(back) ? [{ key: back, card }] : []),
+    ];
+  });
   mkdirSync(options.scansDir, { recursive: true });
   const packed: PackedScan[] = [];
   const missing: string[] = [];
   let fetched = 0;
   let total = 0;
-  const tick = log.progress(cards.length, "picture");
+  const tick = log.progress(jobs.length, "picture");
   // Many at a time: on a machine without the cache each card is a fetch that mostly waits on the server (4 at once ran
   // about 10 pictures a second, 16 about 35). sharp decodes and encodes on its own thread pool.
   let next = 0;
   const worker = async () => {
-    while (next < cards.length) {
-      const card = cards[next++];
-      if (!card) break;
-      const picture = picturePins.get(card.code);
-      const scan = scanPins.get(card.code);
+    while (next < jobs.length) {
+      const job = jobs[next++];
+      if (!job) break;
+      const { key, card } = job;
+      const picture = picturePins.get(key);
+      const scan = scanPins.get(key);
       let body: Uint8Array | null = null;
       for (const pin of [picture, scan]) {
         if (!pin || body) continue;
@@ -84,14 +95,14 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
         body = loaded?.body ?? null;
       }
       if (!body) {
-        missing.push(`${card.code} ${card.name}`);
-        tick(`${card.code} has no picture`);
+        missing.push(`${key} ${card.name}`);
+        tick(`${key} has no picture`);
         continue;
       }
       const shown = await shrink(body, card.type_code);
       total += shown.byteLength;
-      packed.push(writeScan(card.code, shown, options.scansDir));
-      tick(`${card.code} ${bytes(shown.byteLength)}`);
+      packed.push(writeScan(key, shown, options.scansDir));
+      tick(`${key} ${bytes(shown.byteLength)}`);
     }
   };
   await Promise.all(Array.from({ length: PACK_CONCURRENCY }, worker));
@@ -114,10 +125,12 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
 
 const PACK_CONCURRENCY = 16;
 
-function sideAPins(record: SourceRecord | undefined, kind: string, cacheDir: string): Map<string, Pin> {
+// The pins of each side by its map key: the code for side A, `<code>.B` for side B.
+function sidePins(record: SourceRecord | undefined, kind: string, cacheDir: string): Map<string, Pin> {
   const pins = new Map<string, Pin>();
   for (const file of record?.files ?? []) {
-    if (new RegExp(`^${kind}/.+\\.A\\.(jpg|png)$`).test(file.path)) pins.set(codeOf(file.path), { ...file, cacheDir });
+    const side = new RegExp(`^${kind}/.+\\.([AB])\\.(jpg|png)$`).exec(file.path)?.[1];
+    if (side) pins.set(side === "A" ? codeOf(file.path) : `${codeOf(file.path)}.B`, { ...file, cacheDir });
   }
   return pins;
 }
@@ -191,6 +204,7 @@ export async function shrinkToMaxSide(body: Uint8Array, typeCode = ""): Promise<
   return new Uint8Array(await image.resize({ width: MAX_SIDE, height: MAX_SIDE, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 85, mozjpeg: true }).toBuffer());
 }
 
+// `code` is the map key: a card's code for side A, `<code>.B` for side B.
 function writeScan(code: string, body: Uint8Array, scansDir: string): PackedScan {
   const media = sniffImage(body);
   if (!media) throw new Error(`Scan for ${code} is not a JPEG or PNG`);

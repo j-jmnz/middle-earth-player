@@ -27,6 +27,21 @@ export function branchFrom(state: ScenarioState, currentCode: string): { state: 
   return { state: next, code: chosen };
 }
 
+// The quest stage's place in the quest: the stages a branch chooses between share one place (01120:B:1, "one of the 2 A Chosen
+// Path stages"), so Passage Through Mirkwood has 3.
+export function stagePlace(state: ScenarioState, code: string): { at: number; of: number } | null {
+  const places: string[][] = [];
+  const seen = new Set<string>();
+  for (const stage of state.stages) {
+    if (seen.has(stage.code)) continue;
+    const sharing = state.stages.find((other) => other.branch?.includes(stage.code))?.branch ?? [stage.code];
+    for (const sibling of sharing) seen.add(sibling);
+    places.push([...sharing]);
+  }
+  const at = places.findIndex((place) => place.includes(code));
+  return at < 0 ? null : { at: at + 1, of: places.length };
+}
+
 // A quest that branches remembers the stages it reached, for the Resolution (condition `stageReached`).
 export function reached(state: ScenarioState, code: string): ScenarioState {
   if (!state.stages.some((stage) => stage.branch)) return state;

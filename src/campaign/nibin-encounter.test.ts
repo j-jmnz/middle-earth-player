@@ -44,14 +44,15 @@ describe("Great Cave-troll (41030:A:1, 41030:A:2)", () => {
 
   it("removes 1 progress from the current quest for each point of excess combat damage (41030:A:2)", () => {
     // Attack 6 against a defender with Defense 2 deals 4; a hero with 6 hit points and 3 damage has 3 left: 1 point is excess.
-    const hit = fight(world, "f0", "41030", { stage: "41005", progress: 5, damage: [["dh1", 3]] });
+    // A second enemy in the staging area keeps Surprise Attack at 8 quest points (4 for each enemy, 41005:B:2), so 5 progress does not complete it.
+    const hit = fight(world, "f0", "41030", { stage: "41005", progress: 5, staging: ["f0"], damage: [["dh1", 3]] });
     expect(hit.run.state.cards[hit.hero]?.damage).toBe(7);
     expect(questProgress(hit.run.state)).toBe(4);
     expect(causeProblems(hit.run.steps)).toEqual([]);
   });
 
   it("removes nothing when the damage does not exceed the hit points left, or when the quest holds none (41030:A:2)", () => {
-    const whole = fight(world, "f0", "41030", { stage: "41005", progress: 5 });
+    const whole = fight(world, "f0", "41030", { stage: "41005", progress: 5, staging: ["f0"] });
     expect(whole.run.state.cards[whole.hero]?.damage).toBe(4);
     expect(questProgress(whole.run.state)).toBe(5);
     const empty = fight(world, "f0", "41030", { stage: "41005", progress: 0, damage: [["dh1", 3]] });
@@ -70,7 +71,8 @@ describe("Goblin Chieftain (41027:A:2, 41027:A:3)", () => {
   it("has the first player choose after it attacks: remove X progress from the quest, or return it to the staging area (41027:A:3)", () => {
     // On stage 2 X is 2: the Chieftain attacks with Attack 2 against a defender with Defense 2.
     for (const [answer, progressLeft, zone] of [["progress", 3, "engaged"], ["staging", 5, "staging"]] as const) {
-      const hit = fight(world, "f0", "41027", { stage: "41005", progress: 5 }, { answer: () => ({ type: "Choose", optionId: answer }) });
+      // A second enemy keeps Surprise Attack at 8 quest points (41005:B:2), so 5 progress does not complete it.
+      const hit = fight(world, "f0", "41027", { stage: "41005", progress: 5, staging: ["f0"] }, { answer: () => ({ type: "Choose", optionId: answer }) });
       const chieftain = hit.run.state.cards[first(hit.run.state, "41027")];
       expect(questProgress(hit.run.state), answer).toBe(progressLeft);
       expect(chieftain?.zone, answer).toBe(zone);

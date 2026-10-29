@@ -116,7 +116,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // The card itself (it turns when exhausted), with the glow of the open moment under it, and what is drawn upright on it:
   // tokens, effects, the open moment's marks.
   const drawBody = (slot: CardSlot, dim: boolean) => {
-    const image = images.get(slot.code) ?? null;
+    const image = images.get(slot.picture ?? slot.code) ?? null;
     // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
     if (slot.kind === "pile" || slot.zone === "deck") {
       const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.code)} fonts={fonts} label backs={backs} t={t} s={s} />;
@@ -220,7 +220,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         ))}
         {lifted ? (
           <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
+            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.picture ?? lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
             <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={cardCorner(lifted.w, lifted.h)} color={t.accent} style="stroke" strokeWidth={2 * s} />
           </Group>
         ) : null}

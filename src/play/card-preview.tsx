@@ -50,7 +50,8 @@ export type PreviewCard = {
   notApplied?: NotApplied | null;
 };
 
-function Picture({ card, width, height }: { card: PreviewCard; width: number; height: number }) {
+// The card's picture, or (while it is not on the phone) its name and text on paper. The quest advance screen draws its stage with it.
+export function PreviewPicture({ card, width, height }: { card: PreviewCard; width: number; height: number }) {
   return card.source ? (
     <CardImage source={card.source} recyclingKey={card.code} accessibilityLabel={card.name} width={width} height={height} />
   ) : (
@@ -136,7 +137,7 @@ export function CardPreview({
 
   const frame = (
     <Animated.View style={[{ width: size.width, height: size.height, borderRadius: shown.source ? 0 : 16 * s, overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}>
-      <Picture card={shown} width={size.width} height={size.height} />
+      <PreviewPicture card={shown} width={size.width} height={size.height} />
     </Animated.View>
   );
   const buttons = onDetails ? (

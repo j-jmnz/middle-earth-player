@@ -8,7 +8,7 @@ import { askQuestProgress } from "./families/attachments-quest.ts";
 import { resolveSideQuests, sideQuestTotals } from "./families/sidequests-quest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
-import { resolveQuest } from "./quest.ts";
+import { advanceStage, questPointsOf, resolveQuest } from "./quest.ts";
 import { defeatedBefore, questCardDefeatedHeard } from "./families/quest-branch.ts";
 import { queueEvent } from "./queue.ts";
 import { offerResponses } from "./responses.ts";
@@ -68,6 +68,22 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
     next = announceLeftPlay(next, cardId, ctx, steps, true);
   }
   return next;
+}
+
+// A stage that holds its quest points in progress but was held back advances as soon as nothing holds it any more
+// (rr.quest-advancement: "immediately"; faq.progress-without-advancing lets it take more meanwhile): To the River... once no
+// Hill Troll is in play (01126:B:2), The Necromancer's Tower once the players have an objective (01123:B:3). The rules engine
+// asks between two steps of the round, with no window open, no effect resolving and no attack under way. A stage with no
+// progress is left for the progress it next takes (a stage at 0 quest points, advanceStage).
+export function advanceFreed(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  if (state.window || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || state.stageCleared || state.lost) return state;
+  const stage = state.questStage ? state.cards[state.questStage] : undefined;
+  if (!stage || stage.progress === 0) return state;
+  const points = questPointsOf(state, stage, ctx.cards);
+  const canAdvance = (current: ScenarioState) => restricted(current, ctx, "advance").length === 0;
+  if (points == null || stage.progress < points || !canAdvance(state)) return state;
+  const before = steps.length;
+  return afterProgress(advanceStage(state, ctx.cards, steps, canAdvance), before, ctx, steps);
 }
 
 // A card left play: Responses are offered once its Forced effects have resolved, so their frame goes under the Forced ones

@@ -36,13 +36,17 @@ import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
+import { pictureCode, pictureKey } from "../play/picture-key";
+import { advanceWords } from "../play/quest-advance";
+import { QuestAdvanceView } from "../play/quest-advance-view";
+import { useQuestAdvance } from "../play/use-quest-advance";
 import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
 import { questScaleOf } from "../play/quest-scale";
 import { QuestScaleView } from "../play/quest-scale-view";
 import { campaignTokens, heldDial, widgetReadouts } from "../play/widgets";
-import { ledgerLine, ruleTitle } from "../play/ledger";
+import { ledgerLine, ruleTitle, sideText } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { BodyText, NavBar, Screen } from "./chrome";
 import { TableTopBar, TOP_BAR } from "./table-top-bar";
@@ -55,10 +59,11 @@ import type { CardFacts } from "./open-game";
 import { commandWidth as commandWidthOf } from "./table-command";
 import { useUiScale } from "../play/ui-scale";
 
-function picture(code: string): PictureSource | null {
-  const bundled = scanAssets[code];
+// By picture key (src/play/picture-key.ts): side B where it is bundled, else the card's side A picture.
+function picture(key: string): PictureSource | null {
+  const bundled = scanAssets[key] ?? scanAssets[pictureCode(key)];
   if (bundled) return bundled.moduleId;
-  const cached = cachedImage(code);
+  const cached = cachedImage(pictureCode(key));
   return cached ? { uri: cached.uri } : null;
 }
 
@@ -181,7 +186,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [store],
   );
   const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
-  const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome });
+  // The stage the quest just advanced to, shown large until Progress (src/play/quest-advance.ts); the table answers nothing meanwhile.
+  const advance = useQuestAdvance(store);
+  const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome, hold: advance.held });
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
   const pills = dockPills(choice.extras);
   const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
@@ -193,6 +200,11 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      // The quest advance screen is on top: Back is its Progress, and does nothing while the stage asks.
+      if (advance.shown) {
+        if (!advance.asks) advance.close();
+        return true;
+      }
       const step = backStep({
         ...playLayers(store),
         menuOpen, moreOpen, linesOpen,
@@ -210,7 +222,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav]);
+  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav, advance]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height, x } = event.nativeEvent.layout;
@@ -238,18 +250,22 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [screen.width, screen.height, insets.left, insets.top, insets.right, insets.bottom, canvasX, barBottom],
   );
   const narrow = (screen.width - insets.left - insets.right) / s < 760;
+  // How a card code is shown large, by picture key (src/play/picture-key.ts): the preview's cards and the advanced stage.
+  const describe = (code: string, key = code) => ({
+    name: nameOf(code),
+    source: picture(key),
+    landscape: session.world.cards.get(code)?.type === "quest",
+    // A revealed quest stage reads its B side.
+    text: (key !== code ? sideText(code, "B") : null) ?? session.facts.get(code)?.text ?? standInText(session.world.cards, code),
+    notApplied: notApplied(code, session.world.cards.get(code)?.type, session.facts.get(code)?.text ?? null),
+  });
+  const advancedCard = advance.shown ? game.cards[advance.shown.stageId] : undefined;
   const previewed = preview
     ? previewCards(
         game,
         ctx,
         preview.id,
-        (code) => ({
-          name: nameOf(code),
-          source: picture(code),
-          landscape: session.world.cards.get(code)?.type === "quest",
-          text: session.facts.get(code)?.text ?? standInText(session.world.cards, code),
-          notApplied: notApplied(code, session.world.cards.get(code)?.type, session.facts.get(code)?.text ?? null),
-        }),
+        describe,
         names.card,
         preview.extra,
         ledgerLine,
@@ -399,6 +415,17 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           ownsBack={false}
           closeRef={previewClose}
           onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })}
+        />
+      ) : null}
+      {advance.shown && advancedCard ? (
+        <QuestAdvanceView
+          key={advance.shown.seq}
+          card={{ code: advancedCard.code, ...describe(advancedCard.code, pictureKey(advancedCard)) }}
+          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine)}
+          asks={advance.asks}
+          choice={choice}
+          picture={picture}
+          onProgress={advance.close}
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}

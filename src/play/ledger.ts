@@ -24,3 +24,14 @@ export function ruleTitle(id: string): string | null {
   if (!titles) titles = new Map(parseRuleEntries(rules).map((entry) => [entry.id, entry.title]));
   return titles.get(id) ?? null;
 }
+
+/** A card side's printed lines from the ledger, one to a line (a revealed quest stage's B side), or null when the ledger has none. */
+export function sideText(code: string, side: "A" | "B"): string | null {
+  const found: string[] = [];
+  for (let at = 1; ; at += 1) {
+    const line = ledgerLine(`${code}:${side}:${at}`);
+    if (line == null) break;
+    found.push(line);
+  }
+  return found.length > 0 ? found.join("\n") : null;
+}

@@ -122,6 +122,7 @@ export function useAutoAnswer({
   settings,
   moment,
   opened,
+  hold = false,
 }: {
   store: TableStore;
   ctx: ReduceContext;
@@ -132,13 +133,16 @@ export function useAutoAnswer({
   moment: TableMoment | null;
   // A sheet the player opened from the table is up: the table answers nothing under it.
   opened: boolean;
+  // A screen over the table holds the moment (the quest advance screen, use-quest-advance.ts): the table answers nothing until it
+  // closes, and then answers the moment as it would have.
+  hold?: boolean;
 }): () => void {
   const running = useRef(false);
   // The cards usable where the player was last asked: a new one makes a window ask again.
   const seen = useRef<Set<string>>(new Set());
-  const autoKey = `${sheet.key}:${moment?.seq ?? 0}:${game.window?.kind ?? ""}`;
+  const autoKey = `${sheet.key}:${moment?.seq ?? 0}:${game.window?.kind ?? ""}:${hold ? "held" : ""}`;
   useEffect(() => {
-    if (opened) return;
+    if (opened || hold) return;
     // The moment Undo went back to asks, even where the table would answer it; the next choice the player sends lifts that.
     const held = moment?.kind === "undone";
     if (held) running.current = false;

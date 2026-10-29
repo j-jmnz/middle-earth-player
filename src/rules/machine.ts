@@ -35,7 +35,7 @@ import { doRefresh } from "./refresh.ts";
 import { askReadyPayments } from "./families/attachments-ready.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent } from "./travel.ts";
-import { resolutionStep } from "./stage-reveal.ts";
+import { advanceFreed, resolutionStep } from "./stage-reveal.ts";
 import { pushDue } from "./delayed.ts";
 import { crossBoundary } from "./triggers.ts";
 import { constantWin, heldStat, NO_COUNTS } from "./constants.ts";
@@ -92,6 +92,12 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
       continue;
     }
     if (current.lost || current.stageCleared || current.failure || current.window) return current;
+    // A full stage held back advances once nothing holds it (stage-reveal.ts).
+    const freed = advanceFreed(current, ctx, steps);
+    if (freed !== current) {
+      current = freed;
+      continue;
+    }
     const crossed = crossBoundary(current, ctx, steps);
     const next = handoffEliminated(crossed !== current ? crossed : automatic(current, ctx, steps));
     if (next === current) return current;
