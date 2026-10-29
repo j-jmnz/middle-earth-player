@@ -142,9 +142,11 @@ describe("the hand scrub's tokens (phase 25)", () => {
     expect(ms(MOTION.scrubRise, motionScale("normal", true))).toBe(0);
   });
 
-  it("keep the scrub's shapes: the hand grows to 1.5, the lifted card 1.25 more, the rest of the table dims to 35% night", () => {
+  it("keep the scrub's shapes: the hand grows to 1.5, the lifted card 1.55 more and its neighbours 1.15 and 1.05, the rest of the table dims to 35% night", () => {
     expect(SHAPE.scrubScale).toBe(1.5);
-    expect(SHAPE.scrubLiftScale).toBe(1.25);
+    expect(SHAPE.scrubLiftScale).toBe(1.55);
+    expect(SHAPE.scrubLiftRise).toBe(0.25);
+    expect([SHAPE.scrubNear, SHAPE.scrubNearer]).toEqual([1.15, 1.05]);
     expect(SHAPE.scrubNight).toBe(0.35);
     expect(SHAPE.scrubNight).toBeLessThan(SHAPE.spotlightNight);
   });

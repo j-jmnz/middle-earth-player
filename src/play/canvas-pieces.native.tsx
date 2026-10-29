@@ -1,7 +1,7 @@
 // The pieces the table canvas draws: a card (its picture, or its name while the file is missing, or its printed back), a pile, the
 // token art on a card, the effects on it, the marks of the open moment, and the mark between an enemy and the characters
 // fighting it. Each is a Skia group at a slot's rectangle; table-canvas.native.tsx places and moves them.
-import { Circle, DashPathEffect, Group, Image, Line, Path, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
+import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Path, RoundedRect, Text, type SamplingOptions, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 import type { ReactElement } from "react";
 
 import { badgeSplit, type CardEffects } from "./card-effects.ts";
@@ -18,6 +18,9 @@ import { wrapName } from "./wrap.ts";
 export const RADIUS = 6;
 const LINE = 14;
 const BADGE_H = 15;
+// A card picture is drawn at sizes other than its copy's (a hand card at rest is smaller than the scrub's lifted copy; a card moving
+// grows and shrinks): linear filtering between mipmap levels, so it neither aliases when smaller nor blocks when larger.
+export const PICTURE_SAMPLING: SamplingOptions = { filter: FilterMode.Linear, mipmap: MipmapMode.Linear };
 
 // Every piece draws with the tokens of the theme in force, handed down from the canvas root as `t` (user request, 2026-10-28); a piece
 // does not read the theme itself.
@@ -105,7 +108,7 @@ function Back({ x, y, w, h, encounter, backs, t, s }: { x: number; y: number; w:
   if (image) {
     return (
       <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
-        <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
+        <Image image={image} x={x} y={y} width={w} height={h} fit="cover" sampling={PICTURE_SAMPLING} />
       </Group>
     );
   }
@@ -149,7 +152,7 @@ export function CardBody({
         <Back x={x} y={y} w={w} h={h} encounter={encounterBack} backs={backs} t={t} s={s} />
       ) : image ? (
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
-          <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
+          <Image image={image} x={x} y={y} width={w} height={h} fit="cover" sampling={PICTURE_SAMPLING} />
         </Group>
       ) : (
         <Group>
@@ -195,7 +198,7 @@ export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: C
         <Back x={x} y={y} w={w} h={h} encounter={encounter} backs={backs} t={t} s={s} />
       ) : image ? (
         <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
-          <Image image={image} x={x} y={y} width={w} height={h} fit="cover" />
+          <Image image={image} x={x} y={y} width={w} height={h} fit="cover" sampling={PICTURE_SAMPLING} />
         </Group>
       ) : (
         // A face-up top whose file is missing shows its name, so a discard pile never looks like a deck.

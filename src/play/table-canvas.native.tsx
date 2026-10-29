@@ -28,6 +28,7 @@ import { useScreenReader } from "./screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
 import { useTableImages } from "./table-images.native.ts";
+import { pictureBoxes } from "./table-pictures.ts";
 import { TokenFx } from "./token-fx.native.tsx";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { useSpotlight } from "./use-spotlight.ts";
@@ -79,8 +80,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const spot = useSpotlight(store, layout, k);
   const { swallow, live } = spot;
 
-  const codes = useMemo(() => [...new Set([...[...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)].filter((slot) => !slot.faceDown && slot.code !== "").map((slot) => slot.code)])], [layout, moves]);
-  const images = useTableImages(codes, picture, layout.card, pictureRevision);
+  // Each face-up code at the largest size it is drawn: a hand card at the scrub's lifted size (table-pictures.ts).
+  const boxes = useMemo(() => pictureBoxes([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)]), [layout, moves]);
+  const images = useTableImages(boxes, picture, pictureRevision);
   const tokens: TokenImages = {
     resource: useImage(ICON_FILES.resource),
     damage: useImage(ICON_FILES.damage),

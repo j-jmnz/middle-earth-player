@@ -7,6 +7,7 @@
 // does.
 import { contains, hitSlot, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
+import type { ScrubRoom } from "./scrub-pose.ts";
 import { touch } from "./ui-scale.ts";
 
 /** How long a press on the hand is held still before the scrub starts, in ms. */
@@ -28,11 +29,12 @@ export type SpreadSlot = Rect & { tilt: number };
  * `tilt`), one per card in hand order; `centers` their x centers; `top` the y of the risen hand's top edge (the fan's highest card,
  * the middle one), above which the scrub cancels; `left` and `right` its extent; `strip` the normal hand's rectangle, where a press can start a scrub; `reach` the slice of each card a finger is
  * guaranteed and the distance above the hand where it cancels (44 pt, more at Large), carried here so the worklets read it from the
- * spread rather than a module constant. Absent means 44.
+ * spread rather than a module constant. Absent means 44. `room` is where a grown card stays (the canvas less its edge) and the lifted
+ * card's grow, `SHAPE.scrubLiftScale` unless the canvas is too small for it.
  */
-export type Spread = { ids: readonly string[]; slots: readonly SpreadSlot[]; centers: readonly number[]; scale: number; top: number; left: number; right: number; strip: Rect; reach?: number };
+export type Spread = { ids: readonly string[]; slots: readonly SpreadSlot[]; centers: readonly number[]; scale: number; top: number; left: number; right: number; strip: Rect; reach?: number; room: ScrubRoom };
 
-export const NO_SPREAD: Spread = { ids: [], slots: [], centers: [], scale: 1, top: 0, left: 0, right: 0, strip: { x: 0, y: 0, w: 0, h: 0 } };
+export const NO_SPREAD: Spread = { ids: [], slots: [], centers: [], scale: 1, top: 0, left: 0, right: 0, strip: { x: 0, y: 0, w: 0, h: 0 }, room: { left: 0, right: 0, top: 0, lift: 1 } };
 
 /** The hand's slots in order. */
 export function handSlots(layout: TableLayout): CardSlot[] {
@@ -86,7 +88,20 @@ export function spreadLayout(layout: TableLayout, canvas: { width: number; heigh
   const centerY = canvas.height - canvas.bottom - gap - reachDown;
   const slots = fan.map(({ tilt, drop }, index) => ({ x: x0 + index * step, y: centerY + drop - h / 2, w, h, tilt }));
   const top = Math.min(...slots.map((slot) => slot.y));
-  return { ids: cards.map((card) => card.id), slots, centers: slots.map((slot) => slot.x + slot.w / 2), scale, top, left: x0, right: x0 + (count - 1) * step + w, strip: layout.zones.hand, reach };
+  // The lifted card grows from its foot: at most as tall as the room above the highest card's foot, and as wide as the canvas.
+  const lift = Math.max(1, Math.min(SHAPE.scrubLiftScale, (top + h - edge) / h, (canvas.width - 2 * edge) / w));
+  return {
+    ids: cards.map((card) => card.id),
+    slots,
+    centers: slots.map((slot) => slot.x + slot.w / 2),
+    scale,
+    top,
+    left: x0,
+    right: x0 + (count - 1) * step + w,
+    strip: layout.zones.hand,
+    reach,
+    room: { left: edge, right: canvas.width - edge, top: edge, lift },
+  };
 }
 
 /** The index of the card whose center is nearest `x`, or -1 for an empty hand. */

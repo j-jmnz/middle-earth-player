@@ -19,12 +19,16 @@ import type { TableTokens } from "./tokens.ts";
 // One hand card posed by the scrub; `top` is the one lifted copy of the card under the finger.
 function Posed({ slot, at, scrub, top, hidden, children }: { slot: CardSlot; at: number; scrub: Scrub; top: boolean; hidden: boolean; children: ReactNode }) {
   const target = scrub.spread.slots[at];
+  const room = scrub.spread.room;
   const { cx, cy } = cardFrame(slot);
   const transform = useDerivedValue(() => {
     if (!target) return [];
-    const pose = scrubPose(slot, target, { rise: scrub.rise.get(), apart: scrub.apart.get(), lift: scrub.lift.get() }, top);
+    // How far this card is from the one under the finger, on the UI thread: the lifted copy is 0, its neighbours grow a little.
+    const under = scrub.index.get();
+    const distance = top ? 0 : under >= 0 ? Math.abs(at - under) : -1;
+    const pose = scrubPose(slot, target, { rise: scrub.rise.get(), apart: scrub.apart.get(), lift: scrub.lift.get() }, distance, room);
     return [{ translateX: pose.dx }, { translateY: pose.dy }, { scale: pose.scale }, { rotate: pose.rot }];
-  }, [slot, target, top]);
+  }, [slot, target, top, at, room]);
   return (
     <Group transform={transform} origin={vec(cx, cy)} opacity={hidden ? 0 : 1}>
       {children}

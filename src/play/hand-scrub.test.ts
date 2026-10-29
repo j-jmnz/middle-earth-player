@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import { cardAt, cancelled, fanTilts, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
 import { cardSize, handCardSize, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
+import { scrubPose } from "./scrub-pose.ts";
+import { UI_SCALES } from "./ui-scale.ts";
 
 const none: Rect = { x: 0, y: 0, w: 0, h: 0 };
 
@@ -153,6 +155,43 @@ describe("spreadLayout", () => {
           expect(cx + halfW, at).toBeLessThanOrEqual(canvas.width + 1e-9);
           expect(cy - halfH, at).toBeGreaterThanOrEqual(-1e-9);
           expect(cy + halfH, at).toBeLessThanOrEqual(canvas.height - canvas.bottom + 1e-9);
+        }
+      }
+    }
+  });
+
+  it("keeps the lifted card and its grown neighbours inside the canvas at every hand size, at Small and Large", () => {
+    for (const scale of [UI_SCALES.small, UI_SCALES.large]) {
+      // (A hand of 12 on a canvas narrower than these cannot keep 44 pt of each card at any scale: layout.test.ts.)
+      for (const canvas of [...CANVASES, { width: 591, height: 338, bottom: 0 }]) {
+        for (let count = 1; count <= 12; count += 1) {
+          const layout = layoutOf(count, canvas.width, canvas.height, canvas.bottom, scale);
+          const spread = spreadLayout(layout, canvas);
+          for (let under = 0; under < count; under += 1) {
+            for (let at = Math.max(0, under - 2); at <= Math.min(count - 1, under + 2); at += 1) {
+              const slot = layout.slots[at] as CardSlot;
+              const target = spread.slots[at] as (typeof spread.slots)[number];
+              const pose = scrubPose(slot, target, { rise: 1, apart: 1, lift: 1 }, Math.abs(at - under), spread.room);
+              const w = slot.w * pose.scale;
+              const h = slot.h * pose.scale;
+              const cx = slot.x + slot.w / 2 + pose.dx;
+              const cy = slot.y + slot.h / 2 + pose.dy;
+              // Turned by what is left of the fan's tilt (none for the lifted card).
+              const turn = Math.abs(slot.tilt + pose.rot);
+              const halfW = (w / 2) * Math.cos(turn) + (h / 2) * Math.sin(turn);
+              const halfH = (h / 2) * Math.cos(turn) + (w / 2) * Math.sin(turn);
+              const where = `${scale} ${canvas.width}x${canvas.height} ${count} cards, ${under} lifted, card ${at}`;
+              expect(cx - halfW, where).toBeGreaterThanOrEqual(-1e-6);
+              expect(cx + halfW, where).toBeLessThanOrEqual(canvas.width + 1e-6);
+              expect(cy - halfH, where).toBeGreaterThanOrEqual(-1e-6);
+              expect(cy + halfH, where).toBeLessThanOrEqual(canvas.height - canvas.bottom + 1e-6);
+            }
+          }
+          // The cancel line is the risen hand's top less a slice, whatever the lifted card's grow: a finger on the risen hand
+          // never cancels.
+          expect(cancelled(spread, spread.top)).toBe(false);
+          expect(cancelled(spread, spread.top - (spread.reach ?? MIN_TARGET) - 1)).toBe(true);
+          expect(spread.room.lift).toBeLessThanOrEqual(SHAPE.scrubLiftScale);
         }
       }
     }

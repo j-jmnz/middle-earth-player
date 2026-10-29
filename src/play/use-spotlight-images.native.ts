@@ -8,12 +8,11 @@ import type { SpotlightPlan } from "./spotlight-plan.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { useTableImages } from "./table-images.native.ts";
 
-const NONE: readonly string[] = [];
-const SIZE = { w: 1, h: 1 };
-
 export function useSpotlightImages(plan: SpotlightPlan | null, playing: boolean, picture: (code: string) => PictureSource | null, revision: number, table: ReadonlyMap<string, SkImage>): ReadonlyMap<string, SkImage> {
   const target = plan?.clashes[0]?.stage.target;
-  const size = useMemo(() => (target ? { w: target.w, h: target.h } : SIZE), [target?.w, target?.h]); // eslint-disable-line react-hooks/exhaustive-deps -- the size, not the rectangle
-  const big = useTableImages(playing && plan ? plan.codes : NONE, picture, size, revision);
+  const codes = playing && plan ? plan.codes : null;
+  // Every code of the plan at the stage's size, none while nothing plays.
+  const boxes = useMemo(() => new Map((codes && target ? codes : []).map((code) => [code, { w: target?.w ?? 1, h: target?.h ?? 1 }])), [codes, target?.w, target?.h]); // eslint-disable-line react-hooks/exhaustive-deps -- the size, not the rectangle
+  const big = useTableImages(boxes, picture, revision);
   return useMemo(() => (big.size === 0 ? table : new Map([...table, ...big])), [table, big]);
 }
