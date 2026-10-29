@@ -30,14 +30,14 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm lint` | Checks import boundaries. |
 | `pnpm exec tsc --noEmit` | Type-checks. |
 | `pnpm data:check` | Rebuilds `data/` into a temporary directory and fails on any difference. |
-| `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|icons]` | Refreshes the raw sources. It is the only command that uses the network. `scans` runs only when named, after `data:build`. |
+| `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes the raw sources. It is the only command that uses the network. `scans` and `pictures` run only when named, after `data:build`. |
 | `pnpm data:build` | Builds cards, scenarios, rules, generated effect records and the game icons from `data/raw`, offline and deterministic. |
 | `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards`, and `rules` in memory. |
 | `pnpm effects:draft <scenario \| starter deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line no effect record owns. |
 | `pnpm effects:open` | Rewrites `src/effects/open-lines.ts`, the printed lines no record owns. |
 | `node --experimental-strip-types scripts/card-smoke.ts <codes>` | Plays a seeded game with the cards' records and reports any throw, refusal or stall. |
 | `pnpm booklets:pack` | Copies the pinned booklet PDFs into `.cache/booklets/` for Metro. |
-| `pnpm scans:pack` | Copies the pinned scans of the scenario cards RingsDB has no picture for into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a scan missing from `.cache/scans/`. |
+| `pnpm scans:pack` | Writes every card's pinned picture, scaled to 1200 px on the long side, into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a picture missing from `.cache/pictures/` or `.cache/scans/`. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `node --experimental-strip-types scripts/e2e-fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. |
 
@@ -45,7 +45,7 @@ The scripts log to stderr through `scripts/log.ts`: each line has the time since
 
 CI (`.github/workflows/test.yml`) runs `data:check`, `lint`, `tsc`, and `test` on every push and pull request. [CLAUDE.md](CLAUDE.md) has the data commands in more detail.
 
-Do not commit `catalog.db`, card scans, or PDFs. The catalog is generated from `data/` and shipped inside the binary. The two booklet PDFs ship in the binary too. `pnpm booklets:pack` copies the pinned PDFs and a map that requires them into `.cache/booklets/`, and Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules`, `pnpm android` and the EAS `eas-build-post-install` hook run it. A development-client APK takes its JavaScript and assets from your local Metro, so pack on the machine that runs `pnpm start`; the books show after a Metro restart (`--clear` if it cached the stub).
+Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is generated from `data/` and shipped inside the binary. The two booklet PDFs and every card's picture ship in the binary too (`pnpm scans:pack`, run by `pnpm ios`, `pnpm android` and `eas-build-post-install`; the same Metro rule below applies to it). `pnpm booklets:pack` copies the pinned PDFs and a map that requires them into `.cache/booklets/`, and Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules`, `pnpm android` and the EAS `eas-build-post-install` hook run it. A development-client APK takes its JavaScript and assets from your local Metro, so pack on the machine that runs `pnpm start`; the books show after a Metro restart (`--clear` if it cached the stub).
 
 ## Documents
 
@@ -68,7 +68,7 @@ The phone is the product. The Mac browser is the fast loop for screens.
 
 `pnpm catalog:build` once, then `pnpm web` opens the app in Chrome through Metro. Narrow the window to a phone width. Use it for the campaign list, the path, the briefing, the log, and the deck builder.
 
-These checks stay on a physical phone: pool fling, table drag, kill-and-relaunch, and airplane mode. SQLite in the browser is browser storage. Image files and the booklet reader stay on the phone. The Skia table has no drag sign-off in Chrome.
+These checks stay on a physical phone: pool fling, table drag, kill-and-relaunch, and airplane mode. SQLite in the browser is browser storage. The bundled card pictures and the booklet reader are on the phone only. The Skia table has no drag sign-off in Chrome.
 
 ### Codespaces
 
@@ -76,27 +76,80 @@ From an iPad or any browser, open the repo on GitHub, then Code → Codespaces �
 
 `pnpm web` serves the app on port 8081. Open the forwarded address from the Ports tab in Safari. The same browser limits apply as on the Mac.
 
-### Android phone
+### Phone builds from scratch (Mac)
 
-The app uses `expo-dev-client`, so it runs as a development build of `com.middleearth.lcg`:
+iOS needs macOS; Android builds on the same Mac. The app is `com.middleearth.lcg` and uses `expo-dev-client`.
 
-1. Install Android Studio with Android SDK Platform 36. On the phone, enable USB debugging.
-2. `pnpm catalog:build`
-3. `pnpm android -- --device`
+A development build loads its JavaScript and its card pictures from Metro on the Mac, so it works only while the phone can reach the Mac. A release build carries the code, the catalog, the booklets and every card's picture, and needs no network. Install a release build to play; use a development build to work on screens.
 
-That compiles the app, installs it over USB, and serves JavaScript from Metro. Later edits reload in the installed app. Rebuild when a native module changes. `android/` and `ios/` stay gitignored.
+#### 1. Tools, once
 
-When Android Studio is unwelcome, the `development` profile in `eas.json` builds the same app as a cloud APK. The daily loop is the local install above.
+```bash
+brew install node@22 poppler watchman cocoapods
+corepack enable    # pnpm 10.34.1, pinned in package.json
+```
 
-### iPad or iPhone
+`poppler` provides `pdftoppm`, which renders the campaign, boon and burden cards from FFG's PDFs. Without it those 26 card sides fall back to their scans, with a warning.
 
-1. Install Xcode, then `brew install cocoapods`. In Xcode → Settings → Accounts, add your Apple ID.
-2. Connect the device by cable, trust the Mac, and turn on Settings → Privacy & Security → Developer Mode.
-3. `pnpm ios -- --device`
+- iOS: install Xcode from the App Store and open it once to accept the licence. In Xcode → Settings → Accounts, add your Apple ID.
+- Android: install Android Studio and, in its SDK Manager, Android SDK Platform 36. Add to `~/.zshrc`:
+
+```bash
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH="$ANDROID_HOME/platform-tools:$PATH"
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+```
+
+#### 2. The repo
+
+```bash
+git clone https://github.com/j-jmnz/middle-earth-lcg.git
+cd middle-earth-lcg
+pnpm install
+```
+
+"Ignored build scripts: sharp" is harmless: sharp uses its prebuilt binary.
+
+#### 3. Catalog and pictures
+
+```bash
+pnpm catalog:build
+pnpm scans:pack
+```
+
+The first `scans:pack` downloads every pinned card picture at full size (about 5 GB, into `.cache/`; JvZijp's Drive files are about 4 MB each), checks each sha256, and writes the 1,300 pictures scaled to 1200 px (272 MB) into `assets/scans`. Later runs read the cache and take about two minutes. `pnpm ios` and `pnpm android` run both steps themselves; running them first only gets the download out of the way. No `pnpm data:sync` is needed: `data/sources.json` pins every picture. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
+
+#### 4. iPhone or iPad
+
+1. Connect the device by cable and trust the Mac. Turn on Settings → Privacy & Security → Developer Mode (the device restarts).
+2. Release build:
+
+```bash
+pnpm ios --device --configuration Release
+```
+
+Pick the device when asked, and your Apple ID as the signing team. The first build generates `ios/` and runs CocoaPods. With a free Apple ID the installed app stops opening after 7 days; run the same command again to reinstall it (saves stay). A paid developer account avoids that.
 
 `plugins/with-script-sandboxing-off.js` turns off Xcode's User Script Sandboxing in the generated project: React Native's bundle phase writes `ip.txt` into the app undeclared, and the sandbox fails the build with "Operation not permitted". An `ios/` generated before the plugin keeps the old setting until `npx expo prebuild --clean --platform ios`.
 
-`pnpm ios` packs the booklets and the encounter and quest scans (`pnpm scans:pack`, about 100 MB, fetched once into `.cache/scans/`) before it builds. Player-card pictures come from RingsDB on the device as they are first shown. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
+#### 5. Android phone
+
+1. On the phone, tap Settings → About phone → Build number seven times, then turn on Developer options → USB debugging.
+2. Connect it by cable and allow the Mac. `adb devices` lists it.
+3. Release build (signed with the debug key):
+
+```bash
+pnpm android --device --variant release
+```
+
+When Android Studio is unwelcome, the `development` profile in `eas.json` builds a development APK in the cloud.
+
+#### Afterwards
+
+- Check the offline build: airplane mode, close the app, reopen it. Every card's picture shows.
+- Rebuild with the same command after a change. The pictures come from the cache.
+- For the daily loop, drop `--configuration Release` and `--variant release`: the development build reloads edits from Metro, and rebuilds only when a native module changes. A phone that cannot reach Metro over the network (a VPN, an isolated Wi-Fi) runs `pnpm android:usb --device` instead. pnpm passes a `--` on to Expo, which then ignores the flags after it, so write the flags without one.
+- `android/` and `ios/` stay gitignored. Keep about 10 GB free for `.cache/` and the native builds.
 
 ### Maestro
 

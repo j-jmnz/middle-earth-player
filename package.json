@@ -44,13 +44,14 @@
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import-x": "^4.17.1",
     "jsonc-parser": "^3.3.1",
+    "sharp": "0.34.3",
     "tailwindcss": "3.4.17",
     "typescript": "~6.0.3",
     "vitest": "^5.0.5"
   },
   "scripts": {
     "start": "pnpm catalog:build && pnpm booklets:pack --optional && expo start",
-    "android": "pnpm catalog:build && pnpm booklets:pack && expo run:android",
+    "android": "pnpm catalog:build && pnpm booklets:pack && pnpm scans:pack && expo run:android",
     "android:usb": "adb reverse tcp:8081 tcp:8081 && REACT_NATIVE_PACKAGER_HOSTNAME=localhost pnpm android",
     "ios": "pnpm catalog:build && pnpm booklets:pack && pnpm scans:pack && expo run:ios",
     "web": "pnpm catalog:build && expo start --web",

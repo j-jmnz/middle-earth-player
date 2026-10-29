@@ -249,10 +249,11 @@ export function resolveCardImage(input: {
   imagesrc: string | null;
   bundled: { moduleId: number; width: number; height: number } | null;
 }): ResolvedCardImage {
+  // The release build's bundled picture wins over a file downloaded before the build bundled one: it is the larger picture.
+  if (input.bundled) return { kind: "asset", ...input.bundled, download: false };
   if (input.cached) {
     return { kind: "file", ...input.cached, download: false };
   }
-  if (input.bundled) return { kind: "asset", ...input.bundled, download: false };
   if (input.imagesrc == null || cardImageUrl(input.imagesrc) == null) return { kind: "text", download: false };
   return { kind: "text", download: true };
 }

@@ -56,7 +56,7 @@ Do not do any of these.
 | Effects are records, not parsed English | A template writes a record only when it matches a whole sentence; an agent drafts the rest from a bundle. A partial parse would mistime Forced and Response. A sentence with no effect record is inactive. It is not handed to the player to resolve. |
 | Campaign-dealt cards are fully automated before the scenario is playable | Quests, encounters, boons, burdens, and The One Ring have no inactive-text path. |
 | Every card is automated (user decision, 2026-10-26) | Every deck-legal player card and every card the six scenarios deal gets effect records for all its printed lines. The phase order and the box-first scope no longer gate this work. The Messenger of the King cards (the `(MotK)` hero versions of allies and the Messenger of the King contract) are left out of the card pool (user decision, 2026-10-26; `outOfScope` in `data/overrides.json`). Until a card's last line has a record, printed cost and combat numbers, plus implemented keywords, still work, the open line is listed in `src/effects/open-lines.ts` (the burn-down list), and the player sees it marked "Not applied". An event with no record cannot be played (`rr.triggered-ability`). |
-| Card images are the RingsDB previews, and the DragnCards or Hall of Beorn scan where RingsDB has none | About 430×600, one file per code, cached on the phone. Encounter and quest art has no RingsDB file; `data/cards` lists its other URLs in each printing's `imageUrls`. A 300 dpi scan is not publicly hosted, so it is not the asset. The files stay out of the APK. |
+| Every card's picture is bundled in the app | No network at runtime (user decision, 2026-10-29). The pictures are the 600 dpi scans and FFG's campaign-card PDFs, scaled to 1200 px on the long side; see Card images. |
 | Feel outranks the next feature | Drag, scroll, and taps stay smooth on a phone. A correct rule that stalls the frame does not ship. |
 | Identifiers are RingsDB codes (`141001`), never DragnCards UUIDs | That is the public catalog. |
 | Errata wins | When RingsDB sets `has_errata`, store and display the errata text. |
@@ -94,15 +94,15 @@ A server is the right shape for a second human who must not see hidden cards, or
 
 ## Performance and feel
 
-This applies to the table, the card pool, the deck editor, the campaign path, the briefing, the log, and the image cache. A later scenario does not start while the current screen hitches. Do not leave smoothness for a polish pass.
+This applies to the table, the card pool, the deck editor, the campaign path, the briefing, the log, and the card pictures. A later scenario does not start while the current screen hitches. Do not leave smoothness for a polish pass.
 
 The new architecture stays on. Reanimated is the only animation library. `react-native-worklets` is its peer. A drag, a card lift, and a sheet run on the UI thread. A finger moving across the table does not cross into JavaScript to reposition a card. The reducer runs when the gesture ends or a choice is committed, not on every movement sample. `legalIntents` is computed when the window changes, not per pixel. It does not build the cross product of every card and every target up front. The table computes targets for the card the player selected.
 
-The table is one Skia canvas. It is not a React Native view per card. Skia decodes cached files. It does not call `makeImageFromView`. A Zustand subscriber reads the slice it draws. Reducer updates keep the same object references for zones that did not change. A threat change does not re-render the hand, the pool, or the log. Skia images that leave the table are released.
+The table is one Skia canvas. It is not a React Native view per card. Skia decodes the bundled pictures. It does not call `makeImageFromView`. A Zustand subscriber reads the slice it draws. Reducer updates keep the same object references for zones that did not change. A threat change does not re-render the hand, the pool, or the log. Skia images that leave the table are released.
 
-Lists virtualize. The pool loads card rows when that screen opens, then filters in memory. Painting every row is not. The campaign list reads campaigns and saves. It does not scan `cards`. `expo-image` decodes a list card and the inspect screen. The inspect screen may decode the cached file at its native size, about 430×600. The table is one Skia canvas and decodes with Skia. Nothing decodes the whole cache. Prefetch the hand, every face-up card on the table (the quest stage, the locations, staging, the engaged enemies, the play areas and their attachments), and the screen the player is about to open. On the fetch date recorded below, 1,039 official rows had an `imagesrc`. About 420 MB of that is the player-card subset. Quest and encounter images are further files in the same cache. Do not prefetch the whole cache at startup, and do not make the first paint wait on a download.
+Lists virtualize. The pool loads card rows when that screen opens, then filters in memory. Painting every row is not. The campaign list reads campaigns and saves. It does not scan `cards`. `expo-image` decodes a list card at its row size and the inspect screen at up to the bundled size, 1200 px on the long side. The table is one Skia canvas and decodes with Skia. Nothing decodes every picture. Do not make the first paint wait on a picture.
 
-The first screen paints from local SQLite. Startup does not scan the image directory or count the catalog before it draws. Image downloads stay off the interaction path.
+The first screen paints from local SQLite. Startup does not count the catalog or the pictures before it draws.
 
 A tap shows a pressed state in the same frame. Phase changes and sheets animate, and the animation does not gate the rule. If the engine has already resolved, the motion shows the result. A new gesture cancels the animation in progress. When the OS asks for reduced motion, the same transitions snap.
 
@@ -698,15 +698,20 @@ Snapshot the card codes a scenario actually dealt into the save at scenario star
 
 ## Card images
 
-The asset is the file RingsDB already hosts at `imagesrc`. On 23 Oct 2026 that was a JPEG of about 430×600 for a normal card. Frodo `141001` was 423×600 and 148338 bytes. Aragorn `01001` was 429×600 and 150904 bytes. Hall of Beorn served the same Frodo bytes. Do not upscale these, and do not hunt a 300 dpi master. Sniff the magic bytes, because the URL ends in `.png`.
+The app needs no network: every card's picture is bundled in the binary (user decisions, 2026-10-29). `pnpm data:sync pictures` pins one picture per card (`.cache/pictures`, source `pictures` in `data/sources.json`; `scripts/data/sources/pictures.ts`), from the first source that has it, in the user's order of preference (2026-10-29):
 
-`GET /api/public/cards/` that day returned 1,107 official rows after dropping pack names that start with `ALeP`. 1,039 of them had an `imagesrc`. A content-length pass got 1,014 of those files, summing to 416.5 MB. The other 25 answered 503. Filling those from the median of their type puts the official player-card image set at about 420 MB. The median file was 152 KB. Allies, attachments, events, and heroes sit near 150 KB. Treasure rows sit near 550 KB and are why the mean is higher. Quest and encounter images are not in that 420 MB. They use the same kind of file and the same cache, and they are extra storage once their URLs are known.
+1. JvZijp's enhanced proxies on Google Drive (`scripts/data/sources/jvzijp.ts`): u/LepcisMagna's 600 dpi scans cleaned up, about 1568×2140, with the art carried into a print bleed and a rebuilt "Fan made" footer, so a picture is slightly taller than a trimmed card. The sync crawls the folder tree (pinned as `pictures/jvzijp.json`) and matches a file to a printing by pack folder, number and title, typos allowed; a card with errata takes its "(errata)" file. The set has no Dark of Mirkwood, no Messenger of the King allies, no MEC109 printing and none of the campaign expansions' own cards.
+2. FFG's print-and-play PDFs of the Revised Core Set's and The Dark of Mirkwood's campaign, boon and burden cards (01129–01138, 41041–41051), the only digital originals (InDesign, vector text), rendered at 600 dpi by `pdftoppm`.
+3. The 600 dpi scan lotr.cardgame.tools hosts (u/LepcisMagna's, about 1480×2100), found through its card database by each printing's pack and number. Its Nightmare decks share their packs' names and are skipped.
+4. For a card none of those has (the Messenger of the King allies, a few campaign cards): its RingsDB picture, then its Hall of Beorn or DragnCards one, about 430×600. A card of the scan scope keeps its scan instead.
 
-Download with `File.createDownloadTask` from `expo-file-system` into the document directory. Persist `DownloadPauseState` so a kill mid-file can resume. Cap concurrency and retry a 503. `user.db` `image_files` stores code, path, width, height, byte size, media type, and sha256. SQLite does not store the bytes. A catalog update deletes a file only when that code's hash changed. One local function sets `isExcludedFromBackup` on the image directory and does nothing else. About 420 MB of player-card art, plus quest and encounter art, must not enter an iCloud backup. Do not commit the files.
+No source has a picture of MEC109's own printing (JvZijp and cardgame.tools reuse The Black Riders' and The Road Darkens'), so the nine cards MEC109 rewords (`MEC109_CHANGED`) keep their scan.
 
-Keep the files out of the APK. A JPEG does not shrink inside the zip, so packing the player-card set in would add about 420 MB and put the package near half a gigabyte. The APK is the Expo binary, Skia, and `catalog.db`. `catalog.db` is a few megabytes. The native shell has not been built. A release APK for one ABI, with Expo and Skia, is expected around 50–80 MB. Treat that range as an estimate until a build exists.
+The `scans` source stays what the printed-text ledger was read from; a picture is only shown. `scripts/pack-scans.ts` writes side A of every catalog card into `assets/scans`, scaled to at most 1200 px on its long side (`sharp`), with the map `src/screens/images/scan-map.ts`. JvZijp files quest cards and side quests upright; the pack lays them down as printed (a quest turned clockwise, a side quest the other way). On 29 Oct 2026 that was 1,300 of the catalog's 1,331 cards, 272 MB, which the binary carries; the other 31 are Ered Mithrin Campaign Expansion cards (12166–12204) that no source pictures, drawn as text. The pins hold the full-size files (about 5 GB); an EAS machine without the cache fetches them and checks each sha256. Do not commit the pictures.
 
-The inspect screen shows the cached file and can zoom it. The table decodes the same file at the card's on-screen size. There is no second image and no image server. Text is enough to play while a file is still downloading. After the cache is on disk, airplane mode still shows it.
+A bundled picture wins over a downloaded file. The phone's download queue (`File.createDownloadTask` into the document directory, excluded from backup) remains for a build run without `pnpm scans:pack`; it skips every bundled card. The web build has no bundle and shows the remote file. A card with no picture is drawn as its text.
+
+The inspect screen shows the bundled picture and can zoom it. The table decodes it at the card's on-screen size and releases the full decode. Sniff the magic bytes of any source file, because a URL ending in `.png` often holds a JPEG.
 
 ## Persistence and shipping
 
@@ -726,7 +731,7 @@ EAS Build produces the Android and iOS binaries from the same asset. Android can
 
 Development gotcha: the copy from the asset into the app sandbox runs once per database name. After changing `assets/catalog.db` during development, bump `CATALOG_VERSION` or delete the app's storage. Do not leave `forceOverwrite` unconditionally true.
 
-The phone plays with no network once a card's image is cached. Text is enough while a download is still pending.
+The phone plays with no network: the catalog, the booklets and every card's picture are in the binary.
 
 ## Screens
 
@@ -771,9 +776,9 @@ Do these in order. Do not start the Skia table before step 3 is green. Do not st
 
 Its own change, after step 1, before the table. Not polish on the catalog script.
 
-- Download `https://ringsdb.com` + `imagesrc` for official cards with `File.createDownloadTask` into the document directory. Exclude that directory from backup. Do not pack the files into the APK.
-- Record width, height, byte size, and the real media type.
-- Exit: airplane mode, kill, relaunch. A card opened from the pool still shows its cached file. The APK itself does not contain that file.
+- Bundle every card's pinned picture with `scripts/pack-scans.ts` (Card images).
+- Record width and height in the map, so a screen lays a picture out before it decodes.
+- Exit: airplane mode on a fresh install, kill, relaunch. A card opened from the pool shows its picture.
 
 ### 2. Deck builder
 
@@ -836,7 +841,7 @@ Work down the build order. Stop at the end of a step whose exit check is green. 
 - Do not implement the Skia table, the image library, or scenarios 2–6 in the same change as the catalog script. The image library is a required data set, not a later polish pass.
 - The app is not a DragnCards client. DragnCards data is a source and its automation snippets are reference for effect drafts. Where it seems to solve a rule, encode the booklet's rule and cite the rule id.
 - Do not add a backend because the engine is authoritative. Authority means the reducer is the only writer. It does not mean the reducer moves to a server.
-- Ship the RingsDB image as the card art, and the DragnCards or Hall of Beorn scan where RingsDB has none. Do not block the build on a 300 dpi scan, and do not put the image bytes in the APK.
+- Bundle every card's pinned picture, scaled down. Do not make the app depend on a network fetch for a picture.
 - Do not defer frame rate. If the pool or the drag hitches, stop and fix it before the next scenario. Do not add a second animation library, a view per card, or a startup task that blocks the first paint.
 
 ## Definition of done for the proof of concept
@@ -850,12 +855,13 @@ All of these are true on a phone in airplane mode, after a kill and relaunch:
 - A player card from outside that set can be in the deck. Printed numbers and implemented keywords resolve. Its unique text is visibly inactive, and the player has no control that applies it.
 - Damage, resources, threat, and progress on the finished table match the engine. No control on the phone types those numbers.
 - `user.db` still has the deck and the log after a catalog version bump.
-- A cached RingsDB image still opens after a kill and relaunch in airplane mode. The APK does not contain the image bytes.
-- On a physical phone, flinging the official pool and dragging a card on the table stay smooth. Reduced motion snaps instead of springing. The first screen appears from local data without waiting on an image download.
+- Every card's picture opens after a kill and relaunch in airplane mode, on an install that never had a network.
+- On a physical phone, flinging the official pool and dragging a card on the table stay smooth. Reduced motion snaps instead of springing. The first screen appears from local data without waiting on a picture.
 
 ## Sources checked while deciding
 
 - MEC109 rulebook, FFG 2022, `mec109_rulebook-compressed.pdf`. Component counts, the six scenarios and their difficulties, the encounter-set lines (including Flight to the Ford using The Black Riders and The Nazgûl, not The Ring), saga setup, The One Ring, Hide tests and the order versus When Revealed, the burden deck, the life tracker, stage-4 active locations and uncontrolled facedown Ring-bearer, separate staging from stage 2B, the starter lists, the Gandalf-to-Elrond note, and the campaign log labels. The log footer grants photocopying for personal use.
-- RingsDB public API, including `GET /api/public/packs/` and `GET /api/public/cards/` (1,107 official rows, 1,039 with `imagesrc`, about 420 MB of image files). RingsDB's own notice: texts are copyrighted by Fantasy Flight Games. `GET /api/public/scenarios/` returned 404. Frodo's `imagesrc`, and the matching Hall of Beorn JPEG, were 423×600 and 148338 bytes.
+- RingsDB public API, including `GET /api/public/packs/` and `GET /api/public/cards/` (1,107 official rows, 1,039 with `imagesrc`; the Messenger of the King allies' pictures still come from there). RingsDB's own notice: texts are copyrighted by Fantasy Flight Games. `GET /api/public/scenarios/` returned 404. Frodo's `imagesrc`, and the matching Hall of Beorn JPEG, were 423×600 and 148338 bytes.
+- lotr.cardgame.tools: its card database (`lotr_lcg.db`) and the 600 dpi scans it hosts; FFG's campaign-card PDFs on `cdn.svc.asmodee.net`.
 - Hall of Beorn page `A-Shadow-of-the-Past` for stage titles and the resolution choice between Gandalf's Delay and The Ring Draws Them, then Gildor Inglorion and Mr. Underhill. Those setup lines still have to be checked on the quest card.
 - expo-sqlite `SQLiteProvider` `assetSource` and `forceOverwrite`. `.db` is a Metro asset extension. EAS Build is the Android and iOS package step.

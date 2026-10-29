@@ -218,6 +218,14 @@ describe("image policy", () => {
     expect(cached.download).toBe(false);
     expect(displaySource(cached)).toEqual({ uri: "file:///images/141001.jpg" });
 
+    // A file downloaded before the release bundled a larger picture gives way to the bundled one.
+    const both = resolveCardImage({
+      cached: { uri: "file:///images/01134.jpg", width: 300, height: 428 },
+      imagesrc: "/bundles/cards/01134.png",
+      bundled: { moduleId: 9, width: 846, height: 1200 },
+    });
+    expect(displaySource(both)).toBe(9);
+
     const pending = resolveCardImage({
       cached: null,
       imagesrc: "/bundles/cards/141001.png",

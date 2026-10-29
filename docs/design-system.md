@@ -202,7 +202,7 @@ Tinting: a one-colour vector takes a token (bone, muted, faint or the accent on 
 
 ## Card art
 
-The cached RingsDB picture is the illustration of a player card everywhere it appears; a quest card's scan is the picture of a scenario. Every crop is a region of the printed layout (`art-crop.ts`, `cropFrame`, tested).
+A player card's bundled picture is its illustration everywhere it appears; a quest card's bundled picture is the picture of a scenario. Every crop is a region of the printed layout, the same on every card of its kind (`src/screens/art-crop.ts`, `cropFrame`, tested): the picture is drawn at the size that makes the region cover the box, centred on the region, never leaving a gap at an edge.
 
 | Region | Of | Use |
 | --- | --- | --- |

@@ -52,10 +52,10 @@ import { commandWidth as commandWidthOf } from "./table-command";
 import { useUiScale } from "../play/ui-scale";
 
 function picture(code: string): PictureSource | null {
-  const cached = cachedImage(code);
-  if (cached) return { uri: cached.uri };
   const bundled = scanAssets[code];
-  return bundled ? bundled.moduleId : null;
+  if (bundled) return bundled.moduleId;
+  const cached = cachedImage(code);
+  return cached ? { uri: cached.uri } : null;
 }
 
 /** Where the table's chrome leads: back to the screen the game belongs to, the outcome screen, and the booklet. */
