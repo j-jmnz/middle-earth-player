@@ -5,8 +5,9 @@ import { describe, expect, it } from "vitest";
 
 import type { CardInstance } from "../rules/state.ts";
 
-import { cardSize, handCardSize, hitBounds, MIN_TARGET, slotBounds, tableLayout, type LayoutViews, type PileViews } from "./layout.ts";
+import { cardSize, handCardSize, hitBounds, MIN_TARGET, PLAY_FLOOR, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "./selectors.ts";
+import { ACROSS, DOWN, SLACK, shareOut, wrapRows } from "./table-spacing.ts";
 import { UI_SCALES } from "./ui-scale.ts";
 
 const card = (id: string, zone: CardInstance["zone"], extra: Partial<CardInstance> = {}): CardInstance => ({
@@ -32,7 +33,7 @@ const ids = (prefix: string, count: number) => Array.from({ length: count }, (_,
 
 // A busy table: a quest stage, a location, five in staging, two enemies engaged (one with a character beside it and a shadow card under
 // it), five allies and heroes in play (one exhausted), and a hand of `hand` cards.
-function views(hand: number): { views: LayoutViews; piles: PileViews } {
+function views(hand: number, crowd?: { engaged: number; play: number }): { views: LayoutViews; piles: PileViews } {
   const zones: Record<ZoneId, readonly ZoneEntry[]> = {
     questStage: [entry(card("q", "questStage"))],
     staging: ids("s", 5).map((id) => entry(card(id, "staging"))),
@@ -40,9 +41,10 @@ function views(hand: number): { views: LayoutViews; piles: PileViews } {
     secondActiveLocation: [],
     engaged: [
       entry(card("e0", "engaged"), { attached: [card("sh", "shadow", { face: "down" })], paired: [card("p0", "play")], fight: "defense" }),
-      entry(card("e1", "engaged")),
+      ...ids("e", crowd?.engaged ?? 2).slice(1).map((id) => entry(card(id, "engaged"))),
     ],
-    play: ids("p", 5).map((id, i) => entry(card(id, "play", { exhausted: i === 1, committed: i === 2 }))),
+    // One ally carries an attachment, so its row is a peek deeper.
+    play: ids("p", crowd?.play ?? 5).map((id, i) => entry(card(id, "play", { exhausted: i === 1, committed: i === 2 }), i === 3 ? { attached: [card(`a${id}`, "play")] } : {})),
     hand: ids("h", hand).map((id) => entry(card(id, "hand"))),
   };
   const built = Object.fromEntries(TABLE_ZONES.map((zone) => [zone, { zone, seat: 0, entries: zones[zone] } satisfies ZoneView])) as unknown as LayoutViews;
@@ -51,11 +53,17 @@ function views(hand: number): { views: LayoutViews; piles: PileViews } {
 }
 
 // The canvas the table view leaves at 844x390 and 667x375 (the command column beside it, the 52 pt bar over it), and a small one.
-const CANVASES = [
+const PHONES = [
   { width: 591, height: 338 },
   { width: 457, height: 323 },
   { width: 400, height: 300 },
 ];
+// About what a tablet and a 12.9" tablet leave in landscape (docs/handover measurements, estimates until measured on a device).
+const TABLETS = [
+  { width: 760, height: 700 },
+  { width: 980, height: 920 },
+];
+const CANVASES = [...PHONES, ...TABLETS];
 const SCALES = [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large];
 
 describe("the table's layout at a UI scale", () => {
@@ -104,10 +112,11 @@ describe("the table's layout at a UI scale", () => {
     for (const scale of SCALES) {
       const { views: v, piles } = views(3);
       const layout = tableLayout(2000, 1200, v, piles, { scale });
-      // A canvas far larger than any phone: the card is at its cap (96 at Medium), the quest card stands one gutter in.
+      // A canvas far larger than any phone: the card is at its cap (96 at Medium), and every gap has grown to its own cap: the quest
+      // card stands one gutter and a quarter card in, staging one gutter and 0.15 of a card down.
       expect(layout.card.w).toBe(Math.floor(96 * scale));
-      expect(layout.zones.questStage.x).toBeCloseTo(8 * scale, 9);
-      expect(layout.zones.staging.y).toBeCloseTo(8 * scale, 9);
+      expect(layout.zones.questStage.x).toBeCloseTo(8 * scale + ACROSS.edge.cap * layout.card.w, 9);
+      expect(layout.zones.staging.y).toBeCloseTo(8 * scale + DOWN.top.cap * layout.card.h, 9);
     }
   });
 
@@ -155,5 +164,163 @@ describe("the table's layout at a UI scale", () => {
         expect(box.h, slot.id).toBeGreaterThanOrEqual(Math.min(MIN_TARGET, slot.h));
       }
     }
+  });
+});
+
+// Where each row starts at its minimum gaps: the table as it was before the spacing was shared out.
+function tight(layout: ReturnType<typeof tableLayout>, scale: number): { staging: number; engaged: number; play: number; quest: number } {
+  const staging = 8 * scale;
+  const engaged = staging + layout.card.h + 6 * scale;
+  return { staging, engaged, play: engaged + layout.zones.engaged.h + 6 * scale, quest: 8 * scale };
+}
+
+const playCards = (layout: ReturnType<typeof tableLayout>): CardSlot[] => layout.slots.filter((slot) => slot.zone === "play" && slot.kind === "card");
+const overlaps = (a: Rect, b: Rect) => a.x < b.x + b.w - 1e-6 && b.x < a.x + a.w - 1e-6 && a.y < b.y + b.h - 1e-6 && b.y < a.y + a.h - 1e-6;
+const within = (outer: Rect, inner: Rect) => inner.x >= outer.x - 1e-6 && inner.x + inner.w <= outer.x + outer.w + 1e-6 && inner.y >= outer.y - 1e-6 && inner.y + inner.h <= outer.y + outer.h + 1e-6;
+
+describe("the table's spacing (user request, 2026-10-29)", () => {
+  it("leaves a phone's table as it was: the rows at their minimum gaps, at every scale", () => {
+    for (const scale of SCALES) {
+      for (const canvas of PHONES) {
+        const { views: v, piles } = views(8);
+        const layout = tableLayout(canvas.width, canvas.height, v, piles, { scale });
+        const at = tight(layout, scale);
+        const where = `${scale} ${canvas.width}x${canvas.height}`;
+        expect(layout.zones.staging.y, where).toBeCloseTo(at.staging, 9);
+        expect(layout.zones.engaged.y, where).toBeCloseTo(at.engaged, 9);
+        expect(layout.zones.play.y, where).toBeCloseTo(at.play, 9);
+        expect(layout.zones.questStage.x, where).toBeCloseTo(at.quest, 9);
+        expect(layout.zones.play.h, where).toBeCloseTo(layout.card.h + 20 * scale, 9);
+      }
+    }
+  });
+
+  it("pins the phone's table at Medium", () => {
+    const { views: v, piles } = views(8);
+    const layout = tableLayout(591, 338, v, piles);
+    expect(layout.card).toEqual({ w: 54, h: 76 });
+    expect(layout.zones).toEqual({
+      questStage: { x: 8, y: 17, w: 81, h: 58 },
+      staging: { x: 97, y: 8, w: 400, h: 76 },
+      activeLocation: { x: 22, y: 90, w: 54, h: 76 },
+      secondActiveLocation: { x: 8, y: 90, w: 0, h: 0 },
+      engaged: { x: 97, y: 90, w: 486, h: 86 },
+      play: { x: 97, y: 182, w: 486, h: 96 },
+      hand: { x: 8, y: 286, w: 575, h: 52 },
+    });
+  });
+
+  it("grows a tablet's gaps, each under its cap", () => {
+    for (const scale of SCALES) {
+      for (const canvas of TABLETS) {
+        const { views: v, piles } = views(8);
+        const layout = tableLayout(canvas.width, canvas.height, v, piles, { scale });
+        const at = tight(layout, scale);
+        const where = `${scale} ${canvas.width}x${canvas.height}`;
+        const top = layout.zones.staging.y - at.staging;
+        const stagingEngaged = layout.zones.engaged.y - layout.zones.staging.y - layout.card.h - 6 * scale;
+        const engagedPlay = layout.zones.play.y - layout.zones.engaged.y - layout.zones.engaged.h - 6 * scale;
+        for (const [gap, claim] of [[top, DOWN.top], [stagingEngaged, DOWN.stagingEngaged], [engagedPlay, DOWN.engagedPlay]] as const) {
+          expect(gap, where).toBeGreaterThan(0);
+          expect(gap, where).toBeLessThanOrEqual(claim.cap * layout.card.h + 1e-9);
+        }
+        // The two gaps around the play area take the larger shares.
+        expect(engagedPlay, where).toBeGreaterThanOrEqual(stagingEngaged);
+        // The play area still stands a gap above the hand.
+        expect(layout.zones.play.y + layout.zones.play.h, where).toBeLessThanOrEqual(layout.zones.hand.y - 6 * scale + 1e-9);
+      }
+    }
+  });
+
+  it("shares room by share, stops each gap at its cap and hands its overflow on", () => {
+    expect(shareOut(10, [{ share: 1, cap: 100 }, { share: 3, cap: 100 }]).extra).toEqual([2.5, 7.5]);
+    const capped = shareOut(100, [{ share: 1, cap: 10 }, { share: 1, cap: 100 }]);
+    expect(capped.extra[0]).toBeCloseTo(10, 9);
+    expect(capped.extra[1]).toBeCloseTo(90, 9);
+    expect(shareOut(100, [{ share: 1, cap: 10 }, { share: 1, cap: 20 }])).toEqual({ extra: [10, 20], left: 70 });
+    expect(shareOut(-5, [{ share: 1, cap: 10 }]).extra).toEqual([0]);
+    // Slack under SLACK is not shared at all.
+    expect(SLACK).toBeGreaterThan(0);
+  });
+
+  it("wraps items into rows that fit, one item at least", () => {
+    expect(wrapRows([50, 50, 50], 110, 6)).toEqual([[0, 1], [2]]);
+    expect(wrapRows([50, 50, 50], 162, 6)).toEqual([[0, 1, 2]]);
+    expect(wrapRows([200, 50], 100, 6)).toEqual([[0], [1]]);
+    expect(wrapRows([], 100, 6)).toEqual([]);
+  });
+});
+
+describe("the play area wraps (user request, 2026-10-29)", () => {
+  // A crowded table: five enemies engaged, ten (and twelve) allies in play, eight cards in hand.
+  const CROWDS = [10, 12];
+
+  it("keeps every card on a crowded table inside the canvas, the play area above the hand and inside its zone", () => {
+    for (const scale of SCALES) {
+      for (const canvas of CANVASES) {
+        for (const play of CROWDS) {
+          const { views: v, piles } = views(8, { engaged: 5, play });
+          const layout = tableLayout(canvas.width, canvas.height, v, piles, { scale });
+          const where = `${scale} ${canvas.width}x${canvas.height} ${play} allies`;
+          const cards = layout.slots.filter((slot) => slot.zone === "play");
+          expect(playCards(layout), where).toHaveLength(play);
+          for (const slot of cards) {
+            const box = slotBounds(slot);
+            expect(box.x, `${where} ${slot.id}`).toBeGreaterThanOrEqual(0);
+            expect(box.x + box.w, `${where} ${slot.id}`).toBeLessThanOrEqual(canvas.width + 0.5);
+            // The play area never covers the hand's strip.
+            expect(box.y + box.h, `${where} ${slot.id}`).toBeLessThanOrEqual(layout.zones.hand.y + 1e-6);
+            // The drop target for playing a card covers every row (a committed card stands a half peek above it).
+            expect(within({ ...layout.zones.play, y: layout.zones.play.y - 5 * scale, h: layout.zones.play.h + 5 * scale }, box), `${where} ${slot.id}`).toBe(true);
+          }
+        }
+      }
+    }
+  });
+
+  it("wraps a tablet's ten allies onto two rows of the table's card, none over another", () => {
+    for (const scale of SCALES) {
+      for (const canvas of TABLETS) {
+        const { views: v, piles } = views(8, { engaged: 5, play: 10 });
+        const layout = tableLayout(canvas.width, canvas.height, v, piles, { scale });
+        const cards = playCards(layout);
+        const where = `${scale} ${canvas.width}x${canvas.height}`;
+        expect(new Set(cards.filter((slot) => !slot.committed).map((slot) => slot.y)).size, where).toBeGreaterThan(1);
+        for (const slot of cards) expect(slot.w, where).toBe(layout.card.w);
+        cards.forEach((a, i) => cards.slice(i + 1).forEach((b) => expect(overlaps(slotBounds(a), slotBounds(b)), `${where} ${a.id} ${b.id}`).toBe(false)));
+        // An attachment peeks out under its host only.
+        const attachment = layout.slots.find((slot) => slot.zone === "play" && slot.kind === "attachment");
+        const host = cards.find((slot) => slot.id === "p3");
+        expect(attachment?.x).toBe(host?.x);
+      }
+    }
+  });
+
+  it("on a phone, shrinks the play area's cards so they fit without overlapping, down to the floor, and squeezes one row under it", () => {
+    for (const scale of SCALES) {
+      const { views: v, piles } = views(8, { engaged: 5, play: 9 });
+      const layout = tableLayout(591, 338, v, piles, { scale });
+      const cards = playCards(layout);
+      const floor = Math.max(Math.round(layout.card.w * PLAY_FLOOR), MIN_TARGET);
+      const w = cards[0]?.w ?? 0;
+      const where = `${scale}`;
+      if (w < layout.card.w) {
+        // Smaller cards, no smaller than the floor, side by side.
+        expect(w, where).toBeGreaterThanOrEqual(floor);
+        cards.forEach((a, i) => cards.slice(i + 1).forEach((b) => expect(overlaps(slotBounds(a), slotBounds(b)), `${where} ${a.id} ${b.id}`).toBe(false)));
+      }
+      // The play area keeps the phone's band: the rest of the table has not moved.
+      expect(layout.zones.play.h).toBeCloseTo(layout.card.h + 20 * scale, 9);
+    }
+    // Ten allies at Medium do not fit even at the floor: one row of the table's card, squeezed, as before.
+    const { views: v, piles } = views(8, { engaged: 5, play: 10 });
+    const layout = tableLayout(591, 338, v, piles);
+    const cards = playCards(layout);
+    for (const slot of cards) expect(slot.w).toBe(layout.card.w);
+    expect(new Set(cards.filter((slot) => !slot.committed).map((slot) => slot.y)).size).toBe(1);
+    // Nine at Medium shrink to one row of smaller cards.
+    const nine = playCards(tableLayout(591, 338, views(8, { engaged: 5, play: 9 }).views, piles));
+    expect(nine[0]?.w).toBeLessThan(54);
+    expect(nine[0]?.w).toBeGreaterThanOrEqual(MIN_TARGET);
   });
 });

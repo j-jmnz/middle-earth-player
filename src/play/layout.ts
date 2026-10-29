@@ -10,6 +10,7 @@ import type { CardInstance } from "../rules/state.ts";
 import { unturn } from "./frame.ts";
 import type { FightKind, PileId, PileView, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
 import { isPrisoner } from "./selectors.ts";
+import { acrossGaps, downGaps, wrapRows } from "./table-spacing.ts";
 import { touch } from "./ui-scale.ts";
 
 export type Rect = { x: number; y: number; w: number; h: number };
@@ -101,6 +102,9 @@ const MARK = 16;
 const CARD_MAX = 96;
 const CARD_MIN = 34;
 const FAN_DROP = 2;
+// The play area's cards shrink to this share of the table's card at the least so their rows fit (never under a 44 pt target);
+// under it they squeeze into one row as the other rows do.
+export const PLAY_FLOOR = 0.7;
 
 // The sizes the layout works in, at one UI scale.
 type Metrics = { scale: number; gutter: number; gap: number; peek: number; handMin: number; mark: number };
@@ -212,6 +216,58 @@ function deepestUnder(entries: readonly ZoneEntry[]): number {
   return Math.max(0, ...entries.map((entry) => entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down")).length));
 }
 
+// The play area's rows, each card at `size`: a row takes cards left to right a gap apart and wraps when the next would not fit.
+function playRows(entries: readonly ZoneEntry[], size: { w: number; h: number }, width: number, m: Metrics): ZoneEntry[][] {
+  return wrapRows(entries.map((entry) => footprint(entry.card, size)), width, m.gap).map((row) => row.map((at) => entries[at] as ZoneEntry));
+}
+
+// How deep a play row is: its card and the attachments peeking out under it.
+function rowDepth(row: readonly ZoneEntry[], size: { w: number; h: number }, m: Metrics): number {
+  return size.h + m.peek * deepestUnder(row);
+}
+
+function rowsHeight(rows: readonly (readonly ZoneEntry[])[], size: { w: number; h: number }, m: Metrics): number {
+  return rows.reduce((sum, row) => sum + rowDepth(row, size, m), 0) + m.gap * Math.max(0, rows.length - 1);
+}
+
+/** The play area's cards: their size, their rows and how tall the band they fill is. */
+type PlayPlan = { size: { w: number; h: number }; rows: readonly (readonly ZoneEntry[])[]; h: number };
+
+/**
+ * The play area in a band `band` tall (its own row's room plus the spare under it): the table's card in as many rows as it needs
+ * when they fit; else the largest smaller card, down to PLAY_FLOOR of it and a 44 pt target, whose rows fit; else one row of the
+ * table's card, squeezed, as before.
+ */
+function playPlan(entries: readonly ZoneEntry[], width: number, card: { w: number; h: number }, oneRow: number, band: number, m: Metrics): PlayPlan {
+  const squeezed: PlayPlan = { size: card, rows: [entries], h: oneRow };
+  const full = playRows(entries, card, width, m);
+  if (full.length <= 1) return squeezed;
+  if (rowsHeight(full, card, m) <= band) return { size: card, rows: full, h: Math.max(oneRow, rowsHeight(full, card, m)) };
+  const floor = Math.max(Math.round(card.w * PLAY_FLOOR), touch(m.scale, MIN_TARGET));
+  for (let w = card.w - 1; w >= floor; w -= 1) {
+    const size = { w, h: Math.round(w * ASPECT) };
+    const rows = playRows(entries, size, width, m);
+    if (rowsHeight(rows, size, m) <= band) return { size, rows, h: Math.max(oneRow, rowsHeight(rows, size, m)) };
+  }
+  return squeezed;
+}
+
+// The play area, row under row; a row that does not fit (the squeezed fallback) overlaps its cards as staging does.
+function placePlay(plan: PlayPlan, area: Rect, out: CardSlot[], m: Metrics): void {
+  let y = area.y;
+  for (const row of plan.rows) {
+    const xs = rowXs(row.map((entry) => footprint(entry.card, plan.size)), area.x, area.w, m.gap);
+    row.forEach((entry, at) => {
+      const rect = cardRect(entry.card, xs[at] ?? area.x, y, plan.size);
+      placeUnder(entry, "play", rect, out, [], m.peek);
+      // A committed character stands a step higher, sent toward the quest.
+      const lift = entry.card.committed ? -m.peek / 2 : 0;
+      out.push(slotOf(entry.card, "play", "card", { ...rect, y: rect.y + lift }));
+    });
+    y += rowDepth(row, plan.size, m) + m.gap;
+  }
+}
+
 // The engagement area: each enemy, its resolved shadow cards beside it, then the characters fighting it.
 function groupWidth(entry: ZoneEntry, size: { w: number; h: number }, m: Metrics): number {
   const shadowsUp = entry.attached.filter((card) => card.zone === "shadow" && card.face !== "down").length;
@@ -294,38 +350,49 @@ export function tableLayout(
   const m = metricsOf(scale);
   const { gutter, gap, peek } = m;
   const card = cardSize(width, height - bottom, scale);
+  // Across: a canvas wider than a table of capped cards needs widens its edges and the gap beside the left column, within caps;
+  // the rest widens the rows. A phone's card is not at its cap, so nothing moves.
+  const across = acrossGaps(width - (3 * gutter + 5 * gap + (6 + LEFT) * CARD_MAX * scale), card.w);
+  const leftX = gutter + across.left;
+  const rightGutter = gutter + across.right;
   const leftW = Math.round(card.w * LEFT);
   const pile = { w: Math.floor((leftW - gap) / 2), h: Math.round(Math.floor((leftW - gap) / 2) * ASPECT) };
-  const centerX = gutter + leftW + gutter;
-  const centerW = width - gutter - centerX;
+  const centerX = leftX + leftW + gutter + across.column;
+  const centerW = width - rightGutter - centerX;
 
-  // Rows, top to bottom.
-  const stagingY = gutter;
-  const engagedY = stagingY + card.h + gap;
-  // The band is as deep as its deepest stack: an enemy with two face-down shadow cards peeks out two steps under it.
+  // Rows, top to bottom, laid out at their minimum gaps first. The band is as deep as its deepest stack: an enemy with two
+  // face-down shadow cards peeks out two steps under it.
   const engagedH = card.h + peek * Math.max(1, deepestUnder(views.engaged.entries));
-  const playY = engagedY + engagedH + gap;
-  const playH = card.h + 2 * peek;
+  const oneRow = card.h + 2 * peek;
   const handY = height - bottom - Math.max(m.handMin, Math.round(card.h * HAND_SHOW));
+  // The room under the play area's one row, down to a gap above the hand: the play area's extra rows take it first, and the gaps
+  // share what is left (table-spacing.ts).
+  const spare = handY - gap - (gutter + card.h + gap + engagedH + gap + oneRow);
+  const plan = playPlan(views.play.entries, centerW, card, oneRow, oneRow + Math.max(0, spare), m);
+  const grow = downGaps(spare - (plan.h - oneRow), card.h, scale);
+  const stagingY = gutter + grow.top;
+  const engagedY = stagingY + card.h + gap + grow.stagingEngaged;
+  const playY = engagedY + engagedH + gap + grow.engagedPlay;
+  const playH = plan.h;
 
   // The encounter deck and its discard pile at the right end of staging.
   const encounterW = 2 * pile.w + gap;
   const staging: Rect = { x: centerX, y: stagingY, w: Math.max(card.w, centerW - encounterW - gap), h: card.h };
   const pileY = stagingY + Math.round((card.h - pile.h) / 2);
-  const encounterDeck: Rect = { x: width - gutter - encounterW, y: pileY, w: pile.w, h: pile.h };
+  const encounterDeck: Rect = { x: width - rightGutter - encounterW, y: pileY, w: pile.w, h: pile.h };
   const encounterDiscard: Rect = { x: encounterDeck.x + pile.w + gap, y: pileY, w: pile.w, h: pile.h };
 
   // The left column: the quest card (sideways) level with staging, the active location level with the engagement area, the
   // player's deck and discard pile level with the play area.
   const questW = leftW;
   const questH = Math.round(questW / ASPECT);
-  const questStage: Rect = { x: gutter, y: stagingY + Math.max(0, Math.round((card.h - questH) / 2)), w: questW, h: questH };
+  const questStage: Rect = { x: leftX, y: stagingY + Math.max(0, Math.round((card.h - questH) / 2)), w: questW, h: questH };
   const hasSecond = views.secondActiveLocation.entries.length > 0;
   const location = hasSecond ? { w: Math.floor((leftW - gap) / 2), h: Math.round(Math.floor((leftW - gap) / 2) * ASPECT) } : card;
-  const activeLocation: Rect = { x: gutter + (hasSecond ? 0 : Math.round((leftW - card.w) / 2)), y: engagedY, w: location.w, h: location.h };
-  const secondActiveLocation: Rect = hasSecond ? { x: gutter + location.w + gap, y: engagedY, w: location.w, h: location.h } : { x: gutter, y: engagedY, w: 0, h: 0 };
-  const deck: Rect = { x: gutter, y: playY + Math.round((card.h - pile.h) / 2), w: pile.w, h: pile.h };
-  const discard: Rect = { x: gutter + pile.w + gap, y: deck.y, w: pile.w, h: pile.h };
+  const activeLocation: Rect = { x: leftX + (hasSecond ? 0 : Math.round((leftW - card.w) / 2)), y: engagedY, w: location.w, h: location.h };
+  const secondActiveLocation: Rect = hasSecond ? { x: leftX + location.w + gap, y: engagedY, w: location.w, h: location.h } : { x: leftX, y: engagedY, w: 0, h: 0 };
+  const deck: Rect = { x: leftX, y: playY + Math.round((card.h - pile.h) / 2), w: pile.w, h: pile.h };
+  const discard: Rect = { x: leftX + pile.w + gap, y: deck.y, w: pile.w, h: pile.h };
 
   const engaged: Rect = { x: centerX, y: engagedY, w: centerW, h: engagedH };
   const play: Rect = { x: centerX, y: playY, w: centerW, h: playH };
@@ -343,7 +410,7 @@ export function tableLayout(
   }
   placeRow(views.staging.entries, "staging", staging, card, slots, m);
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m);
-  placeRow(views.play.entries, "play", play, card, slots, m);
+  placePlay(plan, play, slots, m);
   const pileRects: Record<PileId, Rect> = { deck, discard, encounterDeck, encounterDiscard };
   // An encounter card attached to the deck (Iron Shackles) peeks out above it, drawn before the deck, so the "Deck" label under the deck never
   // covers it; a tap on the deck opens it (table-view.tsx).
