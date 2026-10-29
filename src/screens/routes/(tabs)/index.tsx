@@ -5,7 +5,7 @@ import { AccessibilityInfo, ScrollView, View } from "react-native";
 import { carryOffers } from "../../../campaign/carry-over";
 import { campaignPath, nextStep } from "../../../campaign/path";
 import type { Save } from "../../../campaign/save";
-import { Column, Eyebrow, HubHeader, Panel, PillButton, RingMark, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
+import { Column, Eyebrow, HubHeader, Panel, PillButton, RingMark, Screen, ScreenScroll, TextButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { HeroArt } from "../../art";
 import { deckFaces } from "../../deck-store";
@@ -84,6 +84,8 @@ export default function CampaignList() {
       done: path.filter((node) => node.status === "completed").length,
       total: campaign?.scenarios.length ?? 0,
       next: nextStep(path, save.loadout?.scenarioId),
+      path,
+      score: save.log.score,
     };
   };
 
@@ -96,10 +98,6 @@ export default function CampaignList() {
     const tint = SPHERE_TINT[face.sphereCode ?? ""];
     return [{ card: { code, imagesrc: face.imagesrc }, name: face.name, tint: tint && tint !== "faint" ? palette[tint] : undefined }];
   });
-  const partyWords = (save: Save): string | null => {
-    const names = partyCodes(save).map((code) => faces.get(code)?.name ?? code);
-    return names.length > 0 ? names.join(", ") : null;
-  };
 
   const refresh = useCallback(() => {
     const open = listSaves(user);
@@ -214,7 +212,7 @@ export default function CampaignList() {
       </Panel>
     </View>
   );
-  const continuing = (save: Save, wide: boolean) => {
+  const continuing = (save: Save) => {
     const line = lineOf(save);
     return (
       <ContinuePanel
@@ -222,8 +220,6 @@ export default function CampaignList() {
         id={save.id}
         line={line}
         primary={!showStart}
-        heroes={partyOf(save)}
-        wide={wide}
         onNext={() => router.push(nextStepHref(save.id, line.next))}
         onPath={() => openPath(save)}
         onLog={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })}
@@ -231,7 +227,8 @@ export default function CampaignList() {
     );
   };
 
-  // The current playthrough opens the page: its next scenario's name over the scene (HeroArt), and the Continue panel under it.
+  // The current playthrough opens the page: its campaign and fellowship over the next scenario's scene (HeroArt), and the Continue
+  // panel (the road) under them.
   // Managing, it is a summary with Archive and Delete instead.
   const currentBlock = (wide: boolean) =>
     current ? (
@@ -239,8 +236,8 @@ export default function CampaignList() {
         managed(current, 0)
       ) : (
         <View testID="current-playthrough" style={{ gap: 18 * s }}>
-          <SaveHero line={lineOf(current)} party={partyWords(current)} />
-          <View style={wide ? { maxWidth: 620 * s } : undefined}>{continuing(current, wide)}</View>
+          <SaveHero line={lineOf(current)} heroes={partyOf(current)} />
+          <View style={wide ? { maxWidth: 620 * s } : undefined}>{continuing(current)}</View>
         </View>
       )
     ) : null;
@@ -291,16 +288,19 @@ export default function CampaignList() {
   ) : null;
   const newButton =
     !showStart && !managing ? (
-      <SecondaryButton
-        label="New playthrough"
-        testID="new-playthrough"
-        tone="accent"
-        compact
-        onPress={() => {
-          folds.setFolded("start", false);
-          setStarting(true);
-        }}
-      />
+      // A quiet word, not a plate: the road's primary is the one filled thing on the page.
+      <View className="items-start">
+        <TextButton
+          label="+ New playthrough"
+          testID="new-playthrough"
+          tone="accent"
+          accessibilityLabel="New playthrough"
+          onPress={() => {
+            folds.setFolded("start", false);
+            setStarting(true);
+          }}
+        />
+      </View>
     ) : null;
   const archivedBlock =
     archived.length > 0 ? (

@@ -117,8 +117,9 @@ export function Chip({ label, tone = "neutral", leading, testID, onArt = false }
 }
 
 /**
- * A journey of steps as a track (the Continue panel): a filled diamond for each step done joined by a solid line, the current step as
- * a larger outlined diamond with a glow, then a dashed line for what remains. The words beside it say the numbers.
+ * A journey of steps as a track (a playthrough being managed or archived): a filled diamond for each step done joined by a solid line,
+ * the current step as a larger outlined diamond with a glow, then a small dark diamond for each step that remains, on a dashed line.
+ * The words beside it say the numbers.
  */
 export function JourneyBar({ total, done, current = done < total, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
   const palette = usePalette();
@@ -129,9 +130,9 @@ export function JourneyBar({ total, done, current = done < total, testID }: { to
         width: size * s,
         height: size * s,
         transform: [{ rotate: "45deg" }],
-        backgroundColor: filled ? palette.accent : palette.night,
-        borderWidth: filled ? 0 : 2,
-        borderColor: palette.accentHigh,
+        backgroundColor: filled ? palette.accent : glow ? palette.night : palette.raised,
+        borderWidth: filled ? 0 : glow ? 2 : 1.5,
+        borderColor: glow ? palette.accentHigh : withAlphaHex(palette.faint, 0.7),
         ...(glow ? { boxShadow: `0 0 10px ${withAlphaHex(palette.glow, 0.6)}` } : {}),
       }}
     />
@@ -144,6 +145,7 @@ export function JourneyBar({ total, done, current = done < total, testID }: { to
     const state = index < done ? "done" : index === done && current ? "current" : "locked";
     if (state === "done") steps.push(<View key={`d${index}`}>{diamond(9, true, false)}</View>);
     if (state === "current") steps.push(<View key={`c${index}`}>{diamond(12, false, true)}</View>);
+    if (state === "locked") steps.push(<View key={`k${index}`}>{diamond(8, false, false)}</View>);
     if (index < total - 1) steps.push(line(index + 1 <= done, `l${index}`));
   }
   return (

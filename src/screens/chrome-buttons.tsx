@@ -215,7 +215,7 @@ export function PrimaryButton({
 /**
  * A plate for the actions beside the primary (Path, Log, Change, Add cards): slate lit from above with a short shadow and no drawn
  * edge, its word in Marcellus SC in the accent, an optional printed icon before it. `icon` alone (no label shown) makes the 54 pt
- * square icon plate of the Continue panel. `tone` colours the word: danger for a loss.
+ * square icon plate. `tone` colours the word: danger for a loss.
  */
 export function SecondaryButton({
   label,

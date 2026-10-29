@@ -264,6 +264,14 @@ User request: "every screen in this app should follow this design, and they shou
   - Tablet landscape Campaigns: the Continue panel sits under the hero words, not anchored to the column's foot as the mock has it, and the right column offers New playthrough as a button rather than the mock's Start a campaign tile with art.
 - **Not built:** the card screen's "Add to a deck" button (the handoff's mock); "In N decks" opens Decks instead.
 
+## Campaigns road, 2026-10-29 (user request)
+
+User request: redesign the ongoing playthrough on Campaigns ("too many containers and borders ... keep the atmospheric tone"); option C of the mockups was picked.
+
+- **Built:** the hero words name the campaign and the fellowship's faces; the Continue panel (`save-panels.tsx`) is the campaign's road on the ground with no panel round it: won scenarios with their score, the one to play lit with Begin or Resume, the rest faint, Full path and Campaign log as words at its foot; New playthrough is a text button. `JourneyBar` (Manage and Archived) draws a stop for every scenario left. The testIDs the flows read are kept: `continue`, `continue-path`, `continue-log`, and `continue-next`, which is now the lit row's header with the spoken label "On the table: …" or "Next: …" (or the text "Every scenario is won").
+- **Checked:** `pnpm test`, `pnpm lint`, `tsc` green offline; a web shot (Playwright on `expo start --web`, not committed) at 390×844 in Dark with a new Mirkwood Paths save.
+- **Open** (cloud session): the phone check; `seat-peek.yaml` and `scenario-1-loss.yaml` assert `continue-next` by text, which now has to match its accessibility label, so both flows need a run; Light and a tablet were not looked at.
+
 ## Table layout redesign, 2026-10-29 (user request)
 
 User request: "if there's space available, create more space between the players hand engaged section and staging, render a better quality of the cards on the table, increase the grow effect when sliding the players hand carousel, make the players played cards wrap when there are too many on one row, spacing should be dynamic all around" (the handover `docs/handover/table-layout.md`, deleted with this work), and "add the rounded edge look like the card details page to every card render in the app". Every value and decision is in `docs/design-system.md`, Table — landscape (Spacing and the play area's rows, Pictures on the table, the scrub's tokens) and Spacing, radius, border.
