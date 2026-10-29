@@ -78,6 +78,10 @@ export function MomentBanner({
   const dx = useSharedValue(0);
   const dy = useSharedValue(0);
   const gesture = useMemo(() => {
+    // Worked out here, on the JS thread: the pan's callbacks run on the UI thread, where calling a plain function (timing) closes the
+    // app (user report, 2026-10-29: a swipe closed it, a tap did not).
+    const out = timing(MOTION.bannerOut, scale);
+    const width = BANNER_WIDTH * s;
     const tap = Gesture.Tap().onEnd((_event, success) => {
       if (success) scheduleOnRN(onDismiss);
     });
@@ -101,8 +105,8 @@ export function MomentBanner({
           if (finished) scheduleOnRN(onDismiss);
         };
         // Up wins when the drag went mostly up.
-        if (sideways && !(up && Math.abs(event.translationY) > Math.abs(event.translationX))) dx.set(withTiming(Math.sign(event.translationX || event.velocityX) * (BANNER_WIDTH + 200) * s, timing(MOTION.bannerOut, scale), done));
-        else dy.set(withTiming(-(top + 200 * s), timing(MOTION.bannerOut, scale), done));
+        if (sideways && !(up && Math.abs(event.translationY) > Math.abs(event.translationX))) dx.set(withTiming(Math.sign(event.translationX || event.velocityX) * (width + 200 * s), out, done));
+        else dy.set(withTiming(-(top + 200 * s), out, done));
       });
     return Gesture.Race(pan, tap);
   }, [dx, dy, s, top, scale, onDismiss]);

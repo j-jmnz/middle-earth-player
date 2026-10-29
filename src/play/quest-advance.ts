@@ -60,6 +60,17 @@ export function advanceWords(
 }
 
 /**
+ * The button that goes back to the table, by what the screen shows (user request, 2026-10-29: not Progress where nothing can
+ * progress): the table's opening on a new game (round 1 or before) begins it, the opening on a resumed game and an advance to a
+ * stage that is held back continue it, and an advance the stage can be played on is Progress.
+ */
+export function advanceButton(game: ScenarioState, ctx: ReduceContext, advance: QuestAdvance, line: (id: string) => string | null): { label: string; hint: string } {
+  if (isOpening(advance)) return game.round <= 1 ? { label: "Begin", hint: "Begins the game at the table" } : { label: "Continue", hint: "Back to the table" };
+  if (advanceHold(game, ctx, line)) return { label: "Continue", hint: "Back to the table" };
+  return { label: "Progress", hint: "Back to the table" };
+}
+
+/**
  * Which advance the screen holds: `latched` is the last advance seen, `done` the seq of the last one the player went back to the table
  * from, and `asked` the seq of the one whose stage asked a question.
  */

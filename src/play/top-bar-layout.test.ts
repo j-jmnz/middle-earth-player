@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 import { barZones, MENU_BUTTON, phaseWidth, pillWidth, RAIL_FLOOR, RAIL_MAX, RAIL_WIDE, railWide, stepWidth, TICK, TICK_GAP } from "./top-bar-layout.ts";
 
-// Phase 19's floor, from the longest step name alone: the two-seat bar must not get worse than it was.
+// Phase 19's floor, from the longest step name alone: the rail must not grow past it.
 const PHASE_19_FLOOR = 232;
 
 describe("top bar zones", () => {
@@ -21,14 +21,21 @@ describe("top bar zones", () => {
     }
   });
 
-  it("puts the rail as far from the last dial as from the menu button when the dials leave no room for it on the screen's middle", () => {
-    for (const [bar, dials] of [[620, 260], [700, 330]] as const) {
+  it("keeps the rail on the screen's middle at its floor and scrolls the dials when they leave it less room", () => {
+    for (const [bar, dials] of [[620, 260], [700, 330], [734, 426]] as const) {
       const { left, rail, right, scroll } = barZones(bar, dials, 1, bar / 2);
-      expect(left + rail / 2).toBeGreaterThan(bar / 2);
-      expect(Math.abs(left - dials - (right - MENU_BUTTON))).toBeLessThanOrEqual(1);
-      expect(scroll).toBe(false);
-      expect(bar - left - rail - right).toBeLessThan(2);
+      expect(Math.abs(left + rail / 2 - bar / 2)).toBeLessThanOrEqual(0.5);
+      expect(rail).toBe(RAIL_FLOOR);
+      expect(scroll).toBe(true);
+      expect(Math.abs(bar - left - rail - right)).toBeLessThan(1);
     }
+  });
+
+  it("leaves the middle only when the menu side cannot hold half the rail's floor", () => {
+    const bar = 320;
+    const zones = barZones(bar, 0, 1, bar - MENU_BUTTON - 20);
+    expect(zones.left + zones.rail / 2).toBeLessThan(bar - MENU_BUTTON - 20);
+    expect(zones.rail).toBeGreaterThanOrEqual(Math.min(RAIL_FLOOR, bar - MENU_BUTTON));
   });
 
   it("floors the rail at the widest pill, so no step name and no phase is cut", () => {
@@ -45,13 +52,13 @@ describe("top bar zones", () => {
     for (const [bar, dials] of [[800, 0], [800, 460], [620, 460], [500, 900]] as const) expect(barZones(bar, dials).rail).toBeGreaterThanOrEqual(Math.min(RAIL_FLOOR, bar - MENU_BUTTON));
   });
 
-  it("keeps the menu button's room and gives the left what the dials need, down to the rail's floor", () => {
+  it("keeps the menu button's room, and the rail on the middle when the dials are wide", () => {
     expect(barZones(800, 0).right).toBeGreaterThanOrEqual(MENU_BUTTON);
     const wide = barZones(800, 400);
-    expect(wide.left).toBeGreaterThan(wide.right);
+    expect(wide.left + wide.rail / 2).toBe(400);
     expect(wide.left + wide.rail + wide.right).toBe(800);
-    expect(wide.rail).toBeGreaterThanOrEqual(RAIL_FLOOR);
-    expect(wide.scroll).toBe(false);
+    expect(wide.rail).toBe(RAIL_FLOOR);
+    expect(wide.scroll).toBe(true);
   });
 
   it("lets the rail win and the left scroll when the dials are wider than the bar less the floor and the menu", () => {
@@ -62,21 +69,6 @@ describe("top bar zones", () => {
     expect(zones.scroll).toBe(true);
     expect(zones.left + zones.rail + zones.right).toBe(bar);
     expect(zones.left).toBeLessThan(dials);
-  });
-
-  it("is no worse than phase 19 with two seats, Life and Burden (dials about 426 pt)", () => {
-    // 844 x 390 and 667 x 375 with 47 pt insets: the bar inside the insets and the bar's own 16 pt padding.
-    for (const width of [844, 667]) {
-      const bar = width - 94 - 16;
-      const now = barZones(bar, 426);
-      const before = (() => {
-        const right = MENU_BUTTON + 8;
-        const left = Math.max(0, Math.min(426 + 8, bar - PHASE_19_FLOOR - right));
-        return { left, rail: bar - left - right, scroll: 426 > left };
-      })();
-      expect(now.left).toBeGreaterThanOrEqual(before.left);
-      expect(now.scroll && !before.scroll).toBe(false);
-    }
   });
 
   it("shows the neighbor phases inline only on a wide screen with a rail that holds the widest pill with both", () => {

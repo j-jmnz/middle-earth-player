@@ -14,7 +14,7 @@ import { ThreatRing } from "../play/table-chrome";
 import { MenuButton } from "../play/table-menu";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
-import { barZones, railWide, TOP_BAR } from "../play/top-bar-layout";
+import { BAR_PAD, barZones, railWide, TOP_BAR } from "../play/top-bar-layout";
 import { useUiScale } from "../play/ui-scale";
 
 export { TOP_BAR };
@@ -69,10 +69,10 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
     const timer = setTimeout(() => setWaited(true), 400);
     return () => clearTimeout(timer);
   }, []);
-  // The zones are worked out inside the bar's side padding (px-2), so the screen's middle is counted from there.
-  const zones = bar.width > 0 && (dials > 0 || waited) ? barZones(bar.width - 16 * s, dials, s, screen.width / 2 - bar.x - 8 * s) : null;
+  // The zones are worked out inside the bar's side padding (px-2, 8 pt at every scale), so the screen's middle is counted from there.
+  const zones = bar.width > 0 && (dials > 0 || waited) ? barZones(bar.width - 2 * BAR_PAD, dials, s, screen.width / 2 - bar.x - BAR_PAD) : null;
   // The tray's outside-tap layer over the bar stops where the dials end, so a dial tap reaches the dial (src/play/bar-edge.ts).
-  const edge = zones ? 8 * s + Math.min(dials, zones.left) : 0;
+  const edge = zones ? BAR_PAD + Math.min(dials, zones.left) : 0;
   useEffect(() => setDialsEdge(edge), [edge]);
   return (
     <View testID="table-top-bar" className="flex-row items-center px-2" style={{ height: TOP_BAR * s }} onLayout={onBar}>

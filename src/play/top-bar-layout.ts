@@ -7,6 +7,10 @@ import { touch } from "./ui-scale.ts";
 // The bar's height: the 46 pt threat dial with 3 pt above and below; its pop (1.22) and the peek's bone ring may reach past the bar
 // over the canvas's own top gutter. The rail's three lines (phase, ticks, round and step) fit in it.
 export const TOP_BAR = 52;
+// The room above the bar when the screen gives none (the table hides the status bar, so the top inset is 0 in landscape): the dial
+// stands 3 pt under the bar's top edge and its pop (1.22) reaches 5 pt above the dial, off the screen and into a phone's rounded
+// corner (user report, 2026-10-29).
+export const BAR_TOP = 8;
 export const MENU_BUTTON = 44;
 // The bar's side padding (px-2 in table-top-bar.tsx).
 export const BAR_PAD = 8;
@@ -23,7 +27,7 @@ export const RAIL_MAX = 460;
 //   a margin;
 // - neither counts shrinking (PhaseRail may shrink the phase to 85%), which is more margin, nor the glow;
 // - the rail adds 4 pt each side, and the phase line keeps the room of the accent S that marks a stop ahead (STOP_MARK, counted
-//   whether or not it shows).
+//   whether or not it shows) on both sides of the phase, so the phase stays on the rail's middle (user request, 2026-10-29).
 const PHASE_SIZE = 17;
 const PHASE_EM = 0.62;
 const PHASE_TRACK = 4;
@@ -51,7 +55,7 @@ const ROUND_WORDS = "Round 99";
 const PILL_PHASES = [...ROUND_PHASES, "Beginning", "End"];
 
 const labelWidth = (word: string) => Math.ceil(word.length * LABEL_EM * LABEL_SIZE);
-const phaseLine = (word: string) => Math.ceil(word.length * (PHASE_EM * PHASE_SIZE + PHASE_TRACK)) + STOP_MARK;
+const phaseLine = (word: string) => Math.ceil(word.length * (PHASE_EM * PHASE_SIZE + PHASE_TRACK)) + 2 * STOP_MARK;
 
 /** The width the rail needs for the phase over the ticks over "Round 3 · step": the widest of its three lines, plus its chrome. */
 export function pillWidth(round: string, phase: string, step: string): number {
@@ -85,13 +89,13 @@ export type BarZones = {
 
 /**
  * `bar` is the bar's width inside the side insets; `dials` the natural width of the dials (0 until measured); `center` where the
- * screen's middle falls on the bar, from its left edge (the bar's own middle when not given). The rail is centered there, as wide as
- * it can be without reaching the dials or the menu button, even when that is narrower than sharing the room evenly would make it
- * (wide dials can then cost the rail its neighbor phases, railWide: being on the middle comes first). When the dials leave less than
- * the rail's floor on their side for that, the room
- * between the dials and the menu button is shared evenly on both sides of the rail; when they are too wide even for that (two seats
- * with Life and the Burden deck on a small phone), the rail wins and the left zone scrolls. At a UI `scale` the widths come in and go
- * out in screen points, and the arithmetic is the Medium one in logical points.
+ * screen's middle falls on the bar, from its left edge (the bar's own middle when not given). The rail stands on the screen's middle
+ * (user request, 2026-10-29, asked three times): as wide as it can be clear of the dials and the menu button, never under its floor.
+ * When the dials need more room than that leaves them (two seats with Life and the Burden deck on a phone), the left zone scrolls
+ * rather than the rail moving off the middle. Only when the menu side cannot hold half the floor does the rail leave the middle: the
+ * room between the dials and the menu button is shared on both sides of it, and when even that is too little, the rail wins and the
+ * left zone scrolls. At a UI `scale` the widths come in and go out in screen points, and the arithmetic is the Medium one in
+ * logical points.
  */
 export function barZones(bar: number, dials: number, scale = 1, center = bar / 2): BarZones {
   // The bar is worked out in logical points (the sizes above, at Medium) and drawn at `scale`; the menu button keeps its 44 pt floor.
@@ -101,10 +105,11 @@ export function barZones(bar: number, dials: number, scale = 1, center = bar / 2
   const need = Math.ceil(natural) + GAP;
   const right = menu + GAP;
   const middle = center / scale;
-  const half = Math.min(RAIL_MAX / 2, middle - natural - GAP, room - right - middle);
-  if (2 * half >= RAIL_FLOOR) {
+  const menuHalf = room - right - middle;
+  if (Math.min(menuHalf, middle) >= RAIL_FLOOR / 2) {
+    const half = Math.min(RAIL_MAX / 2, menuHalf, Math.max(middle - need, RAIL_FLOOR / 2));
     const left = middle - half;
-    return { left: left * scale, rail: 2 * half * scale, right: (room - left - 2 * half) * scale, scroll: false };
+    return { left: left * scale, rail: 2 * half * scale, right: (room - left - 2 * half) * scale, scroll: need > left };
   }
   const free = room - natural - GAP - right;
   if (free >= RAIL_FLOOR) {

@@ -4,7 +4,7 @@
 // cross-fades the step (MOTION.railFlash, railStep); both snap under reduced motion and never gate a rule. The neighbor names do not
 // move: they change in place.
 import { useEffect, useMemo, useRef } from "react";
-import { Pressable, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LayoutAnimationConfig, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { STOP_AHEAD_WORDS } from "./carousel.ts";
@@ -14,7 +14,7 @@ import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { ROUND_PHASES, type Rail } from "./rail.ts";
-import { CHEVRON, NEIGHBOR_GAP, TICK, TICK_GAP } from "./top-bar-layout.ts";
+import { CHEVRON, NEIGHBOR_GAP, STOP_MARK, TICK, TICK_GAP } from "./top-bar-layout.ts";
 import { Text } from "./text.tsx";
 
 
@@ -127,10 +127,17 @@ export function PhaseRail({
     >
       {/* What is on the table when it opens appears; it does not slide or fade in. */}
       <LayoutAnimationConfig skipEntering>
-        <View style={{ flexDirection: "row", alignItems: "center", flexShrink: 1 }}>
-          {wide && rail.phase ? <Neighbor side="previous" name={rail.previousPhase} s={s} /> : null}
+        {/* The phase stands on the rail's middle (user request, 2026-10-29): the neighbor phases sit in equal slots at its sides, and the
+            S keeps its room on both sides of it. */}
+        <View style={{ alignSelf: "stretch", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+          {wide && rail.phase ? (
+            <View style={{ flex: 1, alignItems: "flex-end" }}>
+              <Neighbor side="previous" name={rail.previousPhase} s={s} />
+            </View>
+          ) : null}
           {rail.phase ? (
-            <View>
+            // iOS tracks after the last letter too; Android splits the tracking round each letter.
+            <View style={{ paddingLeft: (STOP_MARK + (Platform.OS === "ios" ? 4 : 0)) * s, paddingRight: STOP_MARK * s }}>
               <Animated.View pointerEvents="none" style={[{ position: "absolute", left: -8 * s, right: -8 * s, top: 2 * s, bottom: 2 * s, borderRadius: 12 * s, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(t.glow, 0.22)}, ${withAlphaHex(t.glow, 0)})` }, glow]} />
               <Text
                 testID="rail-phase"
@@ -149,14 +156,18 @@ export function PhaseRail({
               >
                 {rail.phase}
               </Text>
+              {/* The S stands after the phase, in the room the floor keeps. */}
+              {stopAhead ? (
+                <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display text-label text-accent" style={{ position: "absolute", right: 0, width: (STOP_MARK - 4) * s, lineHeight: 21 * s }}>
+                  S
+                </Text>
+              ) : null}
             </View>
           ) : null}
-          {wide && rail.phase ? <Neighbor side="next" name={rail.nextPhase} s={s} /> : null}
-          {/* The S stands after the phase, in the room the floor keeps. */}
-          {stopAhead ? (
-            <Text testID="rail-stop-ahead" accessibilityLabel={STOP_AHEAD_WORDS} className="font-display text-label text-accent" style={{ marginLeft: 4 * s, lineHeight: 20 * s }}>
-              S
-            </Text>
+          {wide && rail.phase ? (
+            <View style={{ flex: 1, alignItems: "flex-start" }}>
+              <Neighbor side="next" name={rail.nextPhase} s={s} />
+            </View>
           ) : null}
         </View>
         {/* The round's seven phases: past, current, to come. */}

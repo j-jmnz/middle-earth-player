@@ -49,7 +49,8 @@ export function Screen({
     <View testID={testID} collapsable={false} className="flex-1 overflow-hidden bg-night">
       <Backdrop scene={scene} />
       {art}
-      <View className={bleed ? "flex-1" : "flex-1 pt-safe"} style={inset && !bleed ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right } : undefined}>
+      {/* The top inset is a style, not NativeWind's pt-safe: one source of insets for the whole screen. */}
+      <View className="flex-1" style={bleed ? undefined : { paddingTop: insets.top, ...(inset ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right } : {}) }}>
         {children}
       </View>
     </View>

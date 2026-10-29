@@ -27,6 +27,7 @@ const SCRIM = 0.9;
 export function QuestAdvanceView({
   card,
   words,
+  button,
   asks,
   choice,
   picture,
@@ -34,6 +35,8 @@ export function QuestAdvanceView({
 }: {
   card: PreviewCard;
   words: { eyebrow: string; title: string; detail: string | null };
+  // The button back to the table (advanceButton): Begin, Continue or Progress.
+  button: { label: string; hint: string };
   // The stage's When Revealed is asking: its question stands in place of Progress.
   asks: boolean;
   choice: TableChoice;
@@ -115,7 +118,7 @@ export function QuestAdvanceView({
             </View>
           ) : (
             <View className="mt-4">
-              <ChromePrimary label="Progress" testID="quest-advance-progress" accessibilityHint="Back to the table" onPress={onProgress} />
+              <ChromePrimary label={button.label} testID="quest-advance-progress" accessibilityHint={button.hint} onPress={onProgress} />
             </View>
           )}
         </View>

@@ -37,7 +37,7 @@ import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { pictureCode, pictureKey } from "../play/picture-key";
-import { advanceWords, isOpening } from "../play/quest-advance";
+import { advanceButton, advanceWords, isOpening } from "../play/quest-advance";
 import { QuestAdvanceView } from "../play/quest-advance-view";
 import { useQuestAdvance } from "../play/use-quest-advance";
 import { PEEK_ROOM } from "../play/peek-banner";
@@ -50,6 +50,7 @@ import { ledgerLine, ruleTitle, sideText } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { BodyText, NavBar, Screen } from "./chrome";
 import { TableTopBar, TOP_BAR } from "./table-top-bar";
+import { BAR_TOP } from "../play/top-bar-layout";
 import { goBack } from "./go-back";
 import { enqueueImageDownloads } from "./images/queue";
 import { scanAssets } from "./images/scan-map";
@@ -243,7 +244,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const commandWidth = commandWidthOf(screen.width, s);
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
   // the quest scale) and the safe insets (spotlight-stage.ts).
-  const barBottom = insets.top + TOP_BAR * s;
+  // The bar's top: under the top inset, and never at the screen's very edge (BAR_TOP).
+  const barTop = Math.max(insets.top, BAR_TOP * s);
+  const barBottom = barTop + TOP_BAR * s;
   const canvasX = size?.x ?? 0;
   const stageArea = useMemo<StageArea>(
     () => ({ width: screen.width, height: screen.height, origin: { x: insets.left + canvasX, y: barBottom }, safe: { top: insets.top, right: insets.right, bottom: insets.bottom, left: insets.left } }),
@@ -290,7 +293,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     <Screen testID="table" scene="table" inset={false}>
       {/* Never flattened: with "auto" alone this view is layout-only and the renderer drops it, so the menu or a popover turning
           it to "no-hide-descendants" would add a native view and move the canvas into it, and the canvas would flash. */}
-      <View className="flex-1" collapsable={false} importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }}>
+      <View className="flex-1" collapsable={false} importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingTop: barTop, paddingLeft: insets.left, paddingRight: insets.right }}>
         <TableTopBar
           threats={threats}
           acting={peek.acting}
@@ -399,7 +402,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         <MomentBanner
           key={choice.bannerKey}
           moment={choice.banner}
-          top={peek.words ? insets.top + (TOP_BAR + PEEK_ROOM) * s : insets.top + 4 * s}
+          top={peek.words ? barTop + (TOP_BAR + PEEK_ROOM) * s : insets.top + 4 * s}
           leftClear={insets.left}
           rightClear={insets.right + commandWidth}
           onBeat={choice.onBeat}
@@ -422,6 +425,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           key={advance.shown.seq}
           card={{ code: advancedCard.code, ...describe(advancedCard.code, pictureKey(advancedCard)) }}
           words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine, isOpening(advance.shown))}
+          button={advanceButton(game, ctx, advance.shown, ledgerLine)}
           asks={advance.asks}
           choice={choice}
           picture={picture}
@@ -429,7 +433,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
-      <TableMenu open={menuOpen} nav={nav} top={insets.top + TOP_BAR * s} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
+      <TableMenu open={menuOpen} nav={nav} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );
