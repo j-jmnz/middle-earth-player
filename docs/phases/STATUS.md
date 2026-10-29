@@ -312,6 +312,7 @@ User request: "bigger cards in the middle of the screen; modern, smooth and impa
   - The Skia canvas stacking over the table canvas as a TextureView on Android (not opaque), with the bar and the dock under it, and the banner, preview and menu above it.
   - Tap to skip mid-run on the canvas, on the bar and on the dock, and the stage's fit on a narrow phone with a notch and on a tablet.
   - The Maestro flows that play an attack (none was written or run for this change).
+  - The handover for these points, with where to look and what to change if one fails: `docs/handover/combat-spotlight-open.md`.
 
 ## Quest stages: side B, advancing once freed, the advance screen, 2026-10-29 (user request)
 
