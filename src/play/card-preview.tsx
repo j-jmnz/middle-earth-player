@@ -12,6 +12,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } fr
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
 
+import { CardImage } from "./card-image.tsx";
 import { CardTextView } from "./card-text-view.tsx";
 import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
@@ -50,7 +51,7 @@ export type PreviewCard = {
 
 function Picture({ card, width, height }: { card: PreviewCard; width: number; height: number }) {
   return card.source ? (
-    <Image source={card.source} recyclingKey={card.code} contentFit="contain" accessibilityLabel={card.name} style={{ width, height }} />
+    <CardImage source={card.source} recyclingKey={card.code} accessibilityLabel={card.name} width={width} height={height} />
   ) : (
     <ScrollView className="flex-1 px-5 py-6">
       <Text accessibilityRole="header" className="mb-4 text-center font-display text-title text-ink">
@@ -133,7 +134,7 @@ export function CardPreview({
   const buttonsStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.get())) }));
 
   const frame = (
-    <Animated.View style={[{ width: size.width, height: size.height, borderRadius: 16 * s, overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}>
+    <Animated.View style={[{ width: size.width, height: size.height, borderRadius: shown.source ? 0 : 16 * s, overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}>
       <Picture card={shown} width={size.width} height={size.height} />
     </Animated.View>
   );

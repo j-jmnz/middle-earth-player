@@ -2,6 +2,8 @@ import { Image, type ImageContentPosition } from "expo-image";
 import { useMemo } from "react";
 import { View } from "react-native";
 
+import { CardImage } from "../../play/card-image";
+
 import { cardImageUrl, shownCardImage } from "./policy";
 import { scanAssets } from "./scan-map";
 import { useCachedImage } from "./store";
@@ -35,17 +37,9 @@ export function RowCardImage({
   width?: number;
   height?: number;
 }) {
-  // Kept decoded in memory as well: a list scrolled back shows its pictures again without reading and decoding the files.
-  return (
-    <Image
-      recyclingKey={code}
-      contentFit="contain"
-      cachePolicy="memory-disk"
-      accessible={false}
-      source={source}
-      style={{ width, height }}
-    />
-  );
+  // Kept decoded in memory as well: a list scrolled back shows its pictures again without reading and decoding the files. Its corners
+  // are rounded like the card screen's picture, on the picture itself.
+  return <CardImage recyclingKey={code} cachePolicy="memory-disk" source={source} width={width} height={height} />;
 }
 
 export function InspectCardImage({

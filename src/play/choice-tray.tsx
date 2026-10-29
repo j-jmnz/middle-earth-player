@@ -4,9 +4,9 @@
 // top, then one tile per row. The step, the readout, the refusal and the buttons are the dock's, once, under it
 // (the tray's foot sits above them: tray-logic.ts, trayBox). A tile is picked like a card on the table (the same pick,
 // table-choice.ts); a long press on a card's tile shows it large. A tap outside folds the tray (use-table-choice.ts).
-import { Image } from "expo-image";
 import { ScrollView, View } from "react-native";
 
+import { CardImage } from "./card-image.tsx";
 import { IconValue } from "./game-icon.tsx";
 import { Tile } from "./sheet-paper.tsx";
 import type { Sheet, Unavailable } from "./sheet-types.ts";
@@ -20,7 +20,8 @@ import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
 // A card's picture beside its tile: 32 by 44, or 28 by 38 on a short phone, times the UI scale.
-const pictureSize = (dense: boolean, s: number) => (dense ? { width: 28 * s, height: 38 * s } : { width: 32 * s, height: 44 * s });
+// Its corners are rounded like the card screen's picture (card-image.tsx).
+const cardBox = (dense: boolean, s: number) => (dense ? { width: 28 * s, height: 38 * s } : { width: 32 * s, height: 44 * s });
 
 // The foreseen damage of a defender, as a pill; threat red when the card would be destroyed.
 function DamagePill({ mark }: { mark: NonNullable<TrayTile["mark"]> }) {
@@ -100,7 +101,7 @@ export function ChoiceTray({
               stats={tile.stats}
               selected={shown.kind === "distribute" ? share > 0 : marks.has(tile.id)}
               testID={shown.kind === "trigger" ? `sheet-trigger-${tile.id.split("|")[0] ?? tile.id}` : `sheet-option-${tile.id}`}
-              leading={tile.code && source ? <Image source={source} recyclingKey={`${tile.code}:tray`} contentFit="contain" accessible={false} style={pictureSize(dense, s)} /> : null}
+              leading={tile.code && source ? <CardImage source={source} recyclingKey={`${tile.code}:tray`} {...cardBox(dense, s)} /> : null}
               trailing={mark ? <DamagePill mark={mark} /> : null}
               said={mark ? `${mark.danger ? "destroyed" : "damage"} ${mark.value}` : ""}
               onPress={() => onTile(tile.id)}
