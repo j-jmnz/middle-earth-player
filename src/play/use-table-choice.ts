@@ -78,6 +78,7 @@ export function useTableChoice({
   onPreview,
   onPile,
   onOutcome,
+  hold = false,
 }: {
   store: TableStore;
   ctx: ReduceContext;
@@ -88,6 +89,8 @@ export function useTableChoice({
   onPile: (pile: string) => void;
   // The scenario is over and the player goes to its resolution.
   onOutcome: () => void;
+  // A screen over the table holds the moment (the quest advance screen): the table answers nothing for the player meanwhile.
+  hold?: boolean;
 }): TableChoice {
   const game = useStore(store, (state) => state.game);
   const legal = useStore(store, (state) => state.legal);
@@ -162,7 +165,7 @@ export function useTableChoice({
     [store, reset],
   );
   // The table answers for the player where the player's settings say so (stops.ts); Pass to stop starts a run.
-  const startRun = useAutoAnswer({ store, ctx, game, sheet, legal, settings, moment, opened: live != null });
+  const startRun = useAutoAnswer({ store, ctx, game, sheet, legal, settings, moment, opened: live != null, hold });
 
   // A pick being made is put back first; otherwise the last intent is taken back.
   const picking = held != null && held.key === sheet.key && (held.ids.length > 0 || held.shares.length > 0);

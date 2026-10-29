@@ -88,10 +88,28 @@ describe("the start of the game", () => {
     for (let guard = 0; guard < 8 && run.state.mode !== "travel" && run.state.phase === "Quest"; guard += 1) run = send(run, { type: "Pass" }, made.ctx);
     expect(run.state.cards[stage]?.zone).toBe("questStage");
     expect(run.state.cards[stage]?.progress).toBeGreaterThanOrEqual(8);
-    // The Troll leaves play: the full stage advances at once the next time progress is placed on it.
+    // Nothing more is placed while the Troll is in play, and the round goes on with the stage full.
+    expect(restricted(run.state, made.ctx, "advance")).toHaveLength(1);
+    // The Troll leaves play: the full stage advances at once, at the engine's next step, with no more progress
+    // (rr.quest-advancement, stage-reveal.ts advanceFreed).
     const troll = first(run.state, "01082");
     const gone = syncConstants(moveCard(run.state, troll, { zone: "encounterDiscard" }), made.ctx);
     expect(restricted(gone, made.ctx, "advance")).toHaveLength(0);
+    const steps: EngineStep[] = [];
+    const freed = settle({ ...gone, window: null }, made.ctx, steps);
+    const next = freed.questStage ? freed.cards[freed.questStage] : undefined;
+    expect(next?.code).toBe("01127");
+    expect(next?.face).toBe("B");
+    expect(next?.progress).toBe(0);
+    expect(steps.some((step) => step.kind === "advance")).toBe(true);
+  });
+
+  it("leaves a full stage held while a Hill Troll is still in play (01126:B:2, faq.progress-without-advancing)", () => {
+    const made = make({ staging: ["01082", "f0"], progress: 9 });
+    const stage = made.state.questStage ?? "";
+    const held = settle({ ...made.state, window: null }, made.ctx, []);
+    expect(held.questStage).toBe(stage);
+    expect(held.cards[stage]?.progress).toBe(9);
   });
 });
 

@@ -69,6 +69,7 @@ function stage() {
     }),
   );
   writeFileSync(path.join(cache, "141031.A.jpg"), jpeg(600));
+  writeFileSync(path.join(cache, "141031.B.jpg"), jpeg(600));
   writeFileSync(path.join(cache, "141022.A.jpg"), jpeg(100));
   writeFileSync(path.join(cache, "141001.A.jpg"), jpeg(600));
   return {
@@ -90,7 +91,7 @@ function stage() {
 }
 
 describe("pack scans", () => {
-  it("bundles side A of every catalog card with a pin, from the cache at its pin or else from the pinned URL", async () => {
+  it("bundles side A of every catalog card with a pin and side B where one is pinned, from the cache at its pin or else from the pinned URL", async () => {
     const staged = stage();
     const fetched: string[] = [];
     const packed = await packScans(
@@ -104,11 +105,14 @@ describe("pack scans", () => {
       log,
     );
     expect(fetched).toEqual([THREE_URL]);
-    expect(readdirSync(staged.options.scansDir).sort()).toEqual(["141001.jpg", "141022.jpg", "141031.jpg"]);
+    expect(readdirSync(staged.options.scansDir).sort()).toEqual(["141001.jpg", "141022.jpg", "141031.B.jpg", "141031.jpg"]);
     expect(packed.find((entry) => entry.code === "141031")).toMatchObject({ width: 423, height: 600 });
     expect(readFileSync(path.join(staged.cache, "141022.A.jpg"))).toEqual(jpeg(560));
     const map = readFileSync(staged.options.mapPath, "utf8");
     expect(map).toContain('"141031": { moduleId: require("../../../assets/scans/141031.jpg")');
+    // Side B is keyed `<code>.B` (src/play/picture-key.ts); a card with no side B pin has no such key.
+    expect(map).toContain('"141031.B": { moduleId: require("../../../assets/scans/141031.B.jpg")');
+    expect(map).not.toContain("141022.B");
     expect(map).toContain("141022");
     expect(map).toContain("141001");
     expect(map).not.toContain("99999");
@@ -159,6 +163,7 @@ describe("pack scans", () => {
       ["141001", 600],
       ["141022", 560],
       ["141031", 2100],
+      ["141031.B", 600],
     ]);
     expect(readFileSync(path.join(staged.pictures, "01134.A.jpg"))).toEqual(jpeg(2097));
   });

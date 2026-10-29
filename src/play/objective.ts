@@ -1,4 +1,4 @@
-// Rules: rr.quest-cards-quest-deck, rr.winning-the-game (data/rules/entries.json).
+// Rules: rr.quest-cards-quest-deck, rr.winning-the-game, rr.quest-advancement, faq.progress-without-advancing (data/rules/entries.json).
 //
 // How the current quest stage is won when it has no quest points to fill: the printed line of the record that wins the game,
 // on the stage or on a card in play or in staging (The Ringwraiths Attack, 141027:B:1; Bucklebury Ferry, 141035:A:4). The
@@ -18,6 +18,21 @@ export function stagePoints(game: ScenarioState, stage: CardInstance, ctx: Reduc
   const points = questPointsOf(game, stage, ctx.cards);
   // A stage at 0 that may still advance (Surprise Attack, 41005:B:2, 4 for each enemy) still fills with progress.
   return points === 0 && restricted(game, ctx, "advance").length > 0 ? null : points;
+}
+
+/**
+ * The printed line that holds the quest stage back while a card says the players cannot advance ("Players cannot defeat this stage
+ * while any Hill Troll cards are in play", 01126:B:2), or null when nothing holds it. Progress still goes on it past its quest points
+ * meanwhile (faq.progress-without-advancing), and it advances once nothing holds it (rr.quest-advancement).
+ */
+export function advanceHold(game: ScenarioState, ctx: ReduceContext, line: (id: string) => string | null): string | null {
+  for (const rule of restricted(game, ctx, "advance")) {
+    const code = game.cards[rule.sourceId]?.code;
+    const effect = ctx.effects.find((item) => item.cardCode === code && item.timing === "constant" && item.instructions.some((instruction) => instruction.verb === "Restrict" && instruction.what === "advance"));
+    const text = effect?.lines[0] ? line(effect.lines[0]) : null;
+    if (text) return text;
+  }
+  return null;
 }
 
 /** A quest stage's printed lines but its When Revealed ones: how it is won or held ("The players must find and defeat Ungoliant's Spawn to win this game", 01121:B:2), or null. */

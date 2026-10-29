@@ -2,6 +2,7 @@
 //
 // What the end of a scenario shows beyond Victory or Defeat, read from the final game state: when it ended, how far the quest
 // got, each player's threat and heroes, the victory display, and for a win the parts of the score. Pure, so a test reads it.
+import { stagePlace } from "../rules/families/quest-branch.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
@@ -34,21 +35,6 @@ const PHASE_WORDS: Readonly<Record<string, string>> = {
 
 function plural(count: number, word: string): string {
   return `${count} ${word}${count === 1 ? "" : "s"}`;
-}
-
-// The quest stage's place in the quest: the stages a branch chooses between share one place (01120:B:1, "one of the 2 A Chosen
-// Path stages"), so Passage Through Mirkwood has 3.
-function stagePlace(state: ScenarioState, code: string): { at: number; of: number } | null {
-  const places: string[][] = [];
-  const seen = new Set<string>();
-  for (const stage of state.stages) {
-    if (seen.has(stage.code)) continue;
-    const sharing = state.stages.find((other) => other.branch?.includes(stage.code))?.branch ?? [stage.code];
-    for (const sibling of sharing) seen.add(sibling);
-    places.push([...sharing]);
-  }
-  const at = places.findIndex((place) => place.includes(code));
-  return at < 0 ? null : { at: at + 1, of: places.length };
 }
 
 function stageLine(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): GameReport["stage"] {
