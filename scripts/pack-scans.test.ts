@@ -163,6 +163,32 @@ describe("pack scans", () => {
     expect(readFileSync(path.join(staged.pictures, "01134.A.jpg"))).toEqual(jpeg(2097));
   });
 
+  it("bundles the scan of a PDF page when pdftoppm is missing, and keeps going", async () => {
+    const staged = stage();
+    const pdf = Buffer.from("%PDF-1.7 campaign cards");
+    const pdfUrl = "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/core_set_campaign_cards.pdf";
+    const sources = JSON.parse(readFileSync(staged.sources, "utf8")) as { sources: Record<string, { files: unknown[] }> };
+    sources.sources.pictures = {
+      files: [
+        { path: "pdf/core_set_campaign_cards.pdf", url: pdfUrl, sha256: sha256(pdf), bytes: pdf.length },
+        { ...staged.pin("141031", `${pdfUrl}#page=1`, jpeg(2097)), path: "pictures/141031.A.jpg" },
+      ],
+    };
+    writeFileSync(staged.sources, JSON.stringify(sources));
+    const packed = await packScans(
+      {
+        ...staged.options,
+        fetch: (url) => Promise.resolve(new Uint8Array(url === pdfUrl ? pdf : jpeg(560))),
+        render: () => {
+          throw Object.assign(new Error("spawnSync pdftoppm ENOENT"), { code: "ENOENT" });
+        },
+      },
+      log,
+    );
+    // Bag End's page could not be rendered: its scan is bundled instead.
+    expect(packed.find((entry) => entry.code === "141031")).toMatchObject({ height: 600 });
+  });
+
   it("scales a picture down to the bundle's size and keeps a small one byte for byte", async () => {
     const large = new Uint8Array(await sharp({ create: { width: 1480, height: 2100, channels: 3, background: "#406080" } }).jpeg().toBuffer());
     const small = new Uint8Array(jpeg(600));

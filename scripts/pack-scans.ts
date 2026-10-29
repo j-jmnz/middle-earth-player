@@ -49,7 +49,8 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   const scanPins = sideAPins(sources.scans, "scans", options.scanCacheDir);
   const picturePins = sideAPins(sources.pictures, "pictures", options.pictureCacheDir);
   const pdfPins = new Map((sources.pictures?.files ?? []).filter((file) => file.path.startsWith("pdf/")).map((file) => [file.url, file]));
-  const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytes(url, 120_000, log)), pdfPins };
+  const notes: RenderNotes = { noPdftoppm: [], rehashed: [] };
+  const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytes(url, 120_000, log)), pdfPins, notes };
   const shrink = options.shrink ?? shrinkToMaxSide;
   const database = new Database(options.catalogDb, { readonly: true });
   let cards: { code: string; name: string }[];
@@ -95,7 +96,17 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   await Promise.all(Array.from({ length: PACK_CONCURRENCY }, worker));
   packed.sort((left, right) => left.code.localeCompare(right.code));
   writeScanMap(options.mapPath, packed);
-  if (missing.length > 0) log.warn(`${missing.length} card${missing.length === 1 ? "" : "s"} have no pinned picture or scan and show as text: ${missing.join(", ")}`);
+  if (notes.noPdftoppm.length > 0) {
+    log.warn(
+      `pdftoppm is not installed, so ${notes.noPdftoppm.length} cards drawn from FFG's PDFs use their older scans (${notes.noPdftoppm.sort().join(", ")}). Install poppler (macOS: brew install poppler; Debian or Ubuntu: apt install poppler-utils) and run pnpm scans:pack again.`,
+    );
+  }
+  if (notes.rehashed.length > 0) log.info(`${notes.rehashed.length} PDF pages rendered with a different poppler version than their pins; the fresh renders are bundled`);
+  // No source has a picture of these (docs/brief.md, Card images); --verbose names them.
+  if (missing.length > 0) {
+    log.info(`${missing.length} card${missing.length === 1 ? "" : "s"} have no pinned picture or scan and show as text`);
+    log.debug(missing.join(", "));
+  }
   log.info(`bundled ${packed.length} picture${packed.length === 1 ? "" : "s"} (${bytes(total)}, ${fetched} fetched) into ${options.scansDir}; map ${options.mapPath}`);
   return packed;
 }
@@ -118,7 +129,11 @@ function pageOf(url: string): { pdf: string; page: number } | null {
   return match?.[1] && match[2] ? { pdf: match[1], page: Number(match[2]) } : null;
 }
 
-type LoadContext = PackScansOptions & { fetchScan: (url: string) => Promise<Uint8Array>; pdfPins: ReadonlyMap<string, SourceFile> };
+// What a pack noted about PDF pages, reported once at the end: pages with no pdftoppm to render them, and renders that hash
+// differently from their pin.
+type RenderNotes = { noPdftoppm: string[]; rehashed: string[] };
+
+type LoadContext = PackScansOptions & { fetchScan: (url: string) => Promise<Uint8Array>; pdfPins: ReadonlyMap<string, SourceFile>; notes: RenderNotes };
 
 // The pinned bytes: the cache at the pin, else the URL, else the PDF page rendered again. A rendered page that hashes
 // differently (another poppler) is used with a warning; a page that cannot be rendered (no pdftoppm) returns null.
@@ -140,10 +155,11 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
     try {
       body = (context.render ?? renderPdfPage)(pdfFile, page.page);
     } catch (error) {
-      log.warn(`${pin.path}: page ${page.page} of ${path.basename(pdfFile)} could not be rendered (${error instanceof Error ? error.message : String(error)}); bundling the scan`);
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") context.notes.noPdftoppm.push(codeOf(pin.path));
+      else log.warn(`${pin.path}: page ${page.page} of ${path.basename(pdfFile)} could not be rendered (${error instanceof Error ? error.message : String(error)}); bundling the scan`);
       return null;
     }
-    if (sha256(body) !== pin.sha256) log.warn(`${pin.path}: the rendered page hashes differently from its pin (another poppler version); bundling the fresh render`);
+    if (sha256(body) !== pin.sha256) context.notes.rehashed.push(codeOf(pin.path));
     mkdirSync(pin.cacheDir, { recursive: true });
     writeFileSync(cached, body);
     return { body, fetched: true };

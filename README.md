@@ -125,7 +125,7 @@ The first `scans:pack` downloads every pinned card picture at full size (about 1
 2. Release build:
 
 ```bash
-pnpm ios -- --device --configuration Release
+pnpm ios --device --configuration Release
 ```
 
 Pick the device when asked, and your Apple ID as the signing team. The first build generates `ios/` and runs CocoaPods. With a free Apple ID the installed app stops opening after 7 days; run the same command again to reinstall it (saves stay). A paid developer account avoids that.
@@ -139,7 +139,7 @@ Pick the device when asked, and your Apple ID as the signing team. The first bui
 3. Release build (signed with the debug key):
 
 ```bash
-pnpm android -- --device --variant release
+pnpm android --device --variant release
 ```
 
 When Android Studio is unwelcome, the `development` profile in `eas.json` builds a development APK in the cloud.
@@ -148,7 +148,7 @@ When Android Studio is unwelcome, the `development` profile in `eas.json` builds
 
 - Check the offline build: airplane mode, close the app, reopen it. Every card's picture shows.
 - Rebuild with the same command after a change. The pictures come from the cache.
-- For the daily loop, drop `--configuration Release` and `--variant release`: the development build reloads edits from Metro, and rebuilds only when a native module changes. A phone that cannot reach Metro over the network (a VPN, an isolated Wi-Fi) runs `pnpm android:usb -- --device` instead.
+- For the daily loop, drop `--configuration Release` and `--variant release`: the development build reloads edits from Metro, and rebuilds only when a native module changes. A phone that cannot reach Metro over the network (a VPN, an isolated Wi-Fi) runs `pnpm android:usb --device` instead. pnpm passes a `--` on to Expo, which then ignores the flags after it, so write the flags without one.
 - `android/` and `ios/` stay gitignored. Keep about 5 GB free for `.cache/` and the native builds.
 
 ### Maestro
