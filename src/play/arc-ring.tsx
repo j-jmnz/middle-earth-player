@@ -3,18 +3,18 @@
 import type { ReactNode } from "react";
 import { View } from "react-native";
 
-export type ArcPart = { key: string; share: number; color: string };
+import { arcSpans, type ArcPart } from "./arc-spans.ts";
+
+export type { ArcPart };
 
 export function ArcRing({ size, parts, track, stroke: given, gap = 2, children }: { size: number; parts: readonly ArcPart[]; track: string; stroke?: number; gap?: number; children?: ReactNode }) {
   const stroke = given ?? Math.max(5, size * 0.12);
-  let at = 0;
+  // The web's arcs meet without the gap the Skia ones leave between them.
   void gap;
-  const stops = parts.map((part) => {
-    const from = at;
-    at += part.share * 100;
-    return `${part.color} ${from}% ${at}%`;
-  });
-  const fill = stops.length > 0 ? `conic-gradient(${[...stops, `${track} ${at}% 100%`].join(", ")})` : `conic-gradient(${track} 0 100%)`;
+  const spans = arcSpans(parts);
+  const end = (spans[spans.length - 1]?.to ?? 0) * 100;
+  const stops = spans.map((span) => `${span.color} ${span.from * 100}% ${span.to * 100}%`);
+  const fill = `conic-gradient(${[...stops, `${track} ${end}% 100%`].join(", ")})`;
   const inner = size / 2 - stroke;
   const mask = `radial-gradient(circle, transparent ${inner}px, #000 ${inner + 0.5}px)`;
   return (
