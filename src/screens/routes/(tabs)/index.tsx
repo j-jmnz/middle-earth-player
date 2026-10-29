@@ -53,6 +53,7 @@ export default function CampaignList() {
   const { start: startParam } = useLocalSearchParams<{ start?: string }>();
   const { catalog, user } = useDatabases();
   const [saves, setSaves] = useState<Save[]>([]);
+  const [pageWidth, setPageWidth] = useState(0);
   const [archived, setArchived] = useState<Save[]>([]);
   // When each playthrough was last written: a finished one's date in the carry-over offers.
   const [saved, setSaved] = useState<ReadonlyMap<string, number>>(new Map());
@@ -383,9 +384,14 @@ export default function CampaignList() {
 
   // The scene of the next scenario: wider than a phone and centred on it; on a tablet in landscape, behind the journey's column.
   const sceneId = current && !managing && lineOf(current).next.kind !== "finished" ? (lineOf(current).next as { node: { id: string } }).node.id : null;
+  // In two columns the scene stops at the journey column's right edge, so it never runs under the right column. The scroll's content
+  // is centred in the page, so that edge is the page's middle less half the content's width, plus the journey column's width.
   const art = current && !managing ? (
     size === "expanded" && twoColumns ? (
-      <HeroArt scenarioId={sceneId} width={900 * s} height={760 * s} left={-90 * s} />
+      <>
+        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: 0 }} onLayout={(event) => setPageWidth(event.nativeEvent.layout.width)} />
+        {pageWidth > 0 ? <HeroArt scenarioId={sceneId} width={900 * s} height={760 * s} left={-90 * s} right={pageWidth / 2 - columns.width / 2 + split.main} /> : null}
+      </>
     ) : (
       <HeroArt scenarioId={sceneId} width={Math.max(520 * s, width + 120 * s)} height={(size === "compact" ? 540 : 820) * s} />
     )

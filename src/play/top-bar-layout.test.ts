@@ -7,10 +7,10 @@ import { barZones, MENU_BUTTON, phaseWidth, pillWidth, RAIL_FLOOR, RAIL_MAX, RAI
 const PHASE_19_FLOOR = 232;
 
 describe("top bar zones", () => {
-  it("gives both sides the same width while the dials fit, so the rail is centered on the bar", () => {
-    for (const [bar, dials] of [[800, 120], [800, 200], [620, 100], [1000, 0]] as const) {
+  it("puts the rail as far from the last dial as from the menu button while the dials fit", () => {
+    for (const [bar, dials] of [[800, 120], [800, 200], [620, 100], [1000, 0], [1200, 46]] as const) {
       const { left, rail, right, scroll } = barZones(bar, dials);
-      expect(left).toBe(right);
+      expect(Math.abs(left - dials - (right - MENU_BUTTON))).toBeLessThanOrEqual(1);
       expect(scroll).toBe(false);
       expect(left + rail + right).toBeLessThanOrEqual(bar);
       expect(bar - left - rail - right).toBeLessThan(2);

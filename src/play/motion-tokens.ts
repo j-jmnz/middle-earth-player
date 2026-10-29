@@ -192,14 +192,11 @@ export const SHAPE = {
   spotlightToken: 28,
   // The hand scrub: the risen hand's cards grow to this scale (a hand too wide for a 44 pt slice of each at this scale gets a
   // smaller one), the card under the finger grows to this much more from its foot and its foot rises this share of its height
-  // (less where the canvas's top edge would cut it), and the rest of the table dims to this night opacity. Its neighbours grow a
-  // little from their feet too, the next one on each side to `scrubNear` and the one after to `scrubNearer`, as a dock magnifies
-  // (user request, 2026-10-29: a bigger grow while sliding).
+  // (less where the canvas's top edge would cut it), and the rest of the table dims to this night opacity. Its neighbours keep
+  // their size (user request, 2026-10-29: no wave).
   scrubScale: 1.5,
   scrubLiftScale: 1.55,
   scrubLiftRise: 0.25,
-  scrubNear: 1.15,
-  scrubNearer: 1.05,
   scrubNight: 0.35,
   // The risen hand is fanned like a held hand (user request, 2026-10-28): the cards turn this many radians apart, but the whole
   // fan spans at most `fanMax` radians (about 26 degrees); the arc they sit on has a radius of this many card heights.

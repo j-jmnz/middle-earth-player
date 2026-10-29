@@ -146,7 +146,6 @@ describe("the hand scrub's tokens (phase 25)", () => {
     expect(SHAPE.scrubScale).toBe(1.5);
     expect(SHAPE.scrubLiftScale).toBe(1.55);
     expect(SHAPE.scrubLiftRise).toBe(0.25);
-    expect([SHAPE.scrubNear, SHAPE.scrubNearer]).toEqual([1.15, 1.05]);
     expect(SHAPE.scrubNight).toBe(0.35);
     expect(SHAPE.scrubNight).toBeLessThan(SHAPE.spotlightNight);
   });

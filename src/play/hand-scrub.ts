@@ -121,18 +121,6 @@ export function cardAt(spread: Spread, x: number): number {
   return best;
 }
 
-/**
- * How far card `at` is from the finger at `x`, in cards: the distance to its center over the spacing between centers, so it changes
- * smoothly as the finger slides. -1 for a card the spread does not hold.
- */
-export function fingerDistance(spread: Spread, at: number, x: number): number {
-  "worklet";
-  const center = spread.centers[at];
-  if (center === undefined) return -1;
-  const step = spread.centers.length > 1 ? (spread.centers[1] ?? 0) - (spread.centers[0] ?? 0) : (spread.slots[0]?.w ?? 1);
-  return Math.abs(x - center) / Math.max(1, step);
-}
-
 /** Whether the finger is more than 44 pt above the top of the risen hand (the lifted card stands above it): cancelled for good. */
 export function cancelled(spread: Spread, y: number): boolean {
   "worklet";

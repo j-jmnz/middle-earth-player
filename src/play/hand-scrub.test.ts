@@ -1,7 +1,7 @@
 // The hand scrub (phase 25): the risen, spread hand and the card under the finger (docs/design-system.md, Table, Gestures).
 import { describe, expect, it } from "vitest";
 
-import { cardAt, cancelled, fanTilts, fingerDistance, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
+import { cardAt, cancelled, fanTilts, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
 import { cardSize, handCardSize, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 import { scrubPose } from "./scrub-pose.ts";
@@ -160,7 +160,7 @@ describe("spreadLayout", () => {
     }
   });
 
-  it("keeps the lifted card and its grown neighbours inside the canvas at every hand size, at Small and Large", () => {
+  it("keeps the lifted card and its neighbours inside the canvas at every hand size, at Small and Large", () => {
     for (const scale of [UI_SCALES.small, UI_SCALES.large]) {
       // (A hand of 12 on a canvas narrower than these cannot keep 44 pt of each card at any scale: layout.test.ts.)
       for (const canvas of [...CANVASES, { width: 591, height: 338, bottom: 0 }]) {
@@ -171,7 +171,7 @@ describe("spreadLayout", () => {
             for (let at = Math.max(0, under - 2); at <= Math.min(count - 1, under + 2); at += 1) {
               const slot = layout.slots[at] as CardSlot;
               const target = spread.slots[at] as (typeof spread.slots)[number];
-              const pose = scrubPose(slot, target, { rise: 1, apart: 1, lift: 1 }, Math.abs(at - under), spread.room);
+              const pose = scrubPose(slot, target, { rise: 1, apart: 1, lift: 1 }, at === under, spread.room);
               const w = slot.w * pose.scale;
               const h = slot.h * pose.scale;
               const cx = slot.x + slot.w / 2 + pose.dx;
@@ -233,18 +233,6 @@ describe("cardAt", () => {
     const mid = ((spread.centers[1] ?? 0) + (spread.centers[2] ?? 0)) / 2;
     expect(cardAt(spread, mid - 0.5)).toBe(1);
     expect(cardAt(spread, mid + 0.5)).toBe(2);
-  });
-});
-
-describe("fingerDistance", () => {
-  it("is 0 at a card's center and one per step between centers, smoothly in between", () => {
-    const canvas = CANVASES[0] as (typeof CANVASES)[number];
-    const spread = spreadLayout(layoutOf(5, canvas.width, canvas.height), canvas);
-    const step = (spread.centers[1] ?? 0) - (spread.centers[0] ?? 0);
-    expect(fingerDistance(spread, 2, spread.centers[2] ?? 0)).toBe(0);
-    expect(fingerDistance(spread, 3, spread.centers[2] ?? 0)).toBeCloseTo(1, 9);
-    expect(fingerDistance(spread, 4, (spread.centers[2] ?? 0) + step / 2)).toBeCloseTo(1.5, 9);
-    expect(fingerDistance(spread, 9, 0)).toBe(-1);
   });
 });
 

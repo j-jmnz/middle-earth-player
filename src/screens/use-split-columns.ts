@@ -9,6 +9,8 @@ import { equalSplit, sideSplit } from "./split-columns";
 export function useSplitColumns(range: { min: number; max: number } | null): {
   size: ReturnType<typeof useSizeClass>["size"];
   s: number;
+  // The measured width of the scroll's content (0 until measured).
+  width: number;
   measure: (event: LayoutChangeEvent) => void;
   side: ReturnType<typeof sideSplit>;
   equal: ReturnType<typeof equalSplit>;
@@ -19,6 +21,7 @@ export function useSplitColumns(range: { min: number; max: number } | null): {
   return {
     size,
     s,
+    width,
     measure: (event) => setWidth(event.nativeEvent.layout.width),
     side: expanded && range ? sideSplit(width, s, range) : null,
     equal: expanded ? equalSplit(width, s) : null,

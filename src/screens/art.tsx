@@ -228,15 +228,21 @@ export function useArtGround(): { ground: string; blend: { mixBlendMode?: "multi
 /**
  * A scenario's scene as the art layer of a page (the Campaigns hub): drawn large and dimmed behind the hero words, faded out at its
  * edges by an elliptical shade and taken down to the ground towards its foot, so the words and panels under it sit in the fog. It does
- * not scroll and takes no touches. `left` places it (centred on the page by default).
+ * not scroll and takes no touches. `left` places it (centred on the page by default); `right`, when given, is where it stops (in its
+ * parent's points), fading to the ground over its last 64 pt, so it stays behind its own column.
  */
-export function HeroArt({ scenarioId, width, height, left }: { scenarioId: string | null | undefined; width: number; height: number; left?: number }) {
+export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId: string | null | undefined; width: number; height: number; left?: number; right?: number }) {
   const { ground, blend } = useArtGround();
+  const s = useUiScale();
+  const shown = right == null ? width : Math.max(0, Math.min(width, right - (left ?? 0)));
   return (
-    <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", top: 0, width, height, ...blend, ...(left == null ? { alignSelf: "center" } : { left }) }}>
-      <SceneArt scenarioId={scenarioId} width={width} height={height} />
-      <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `radial-gradient(52% 64% at 50% 34%, ${withAlphaHex(ground, 0)} 40%, ${ground} 100%)` }} />
-      <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 40%, ${withAlphaHex(ground, 0.75)} 70%, ${ground} 88%)` }} />
+    <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", top: 0, width: shown, height, overflow: "hidden", ...blend, ...(left == null ? { alignSelf: "center" } : { left }) }}>
+      <View style={{ width, height }}>
+        <SceneArt scenarioId={scenarioId} width={width} height={height} />
+        <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `radial-gradient(52% 64% at 50% 34%, ${withAlphaHex(ground, 0)} 40%, ${ground} 100%)` }} />
+        <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 40%, ${withAlphaHex(ground, 0.75)} 70%, ${ground} 88%)` }} />
+      </View>
+      {shown < width ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 64 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(ground, 0)}, ${ground})` }} /> : null}
     </View>
   );
 }

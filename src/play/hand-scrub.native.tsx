@@ -10,7 +10,6 @@ import { useDerivedValue } from "react-native-reanimated";
 
 import { cardFrame } from "./frame.ts";
 import type { Scrub } from "./hand-gestures.native.ts";
-import { fingerDistance } from "./hand-scrub.ts";
 import type { CardSlot } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 import { scrubUnder, subscribeScrub } from "./scrub-open.ts";
@@ -24,13 +23,12 @@ function Posed({ slot, at, scrub, top, hidden, children }: { slot: CardSlot; at:
   const { cx, cy } = cardFrame(slot);
   const transform = useDerivedValue(() => {
     if (!target) return [];
-    // How far this card is from the finger, on the UI thread: the lifted copy is 0, the others by the finger's x, so the neighbours'
-    // grow follows the slide. For the frame or two before JavaScript's `under` catches up, the card at the new index lifts in its own
-    // place. The card the finger left settles back on the drop clock.
+    // For the frame or two before JavaScript's `under` catches up, the card at the new index lifts in its own place. The card the
+    // finger left settles back on the drop clock.
     const under = scrub.index.get();
-    const distance = top || at === under ? 0 : under >= 0 ? fingerDistance(scrub.spread, at, scrub.finger.get()) : -1;
+    const lifted = top || at === under;
     const drop = !top && at !== under && at === scrub.left.get() ? scrub.drop.get() : 0;
-    const pose = scrubPose(slot, target, { rise: scrub.rise.get(), apart: scrub.apart.get(), lift: scrub.lift.get() }, distance, room, drop);
+    const pose = scrubPose(slot, target, { rise: scrub.rise.get(), apart: scrub.apart.get(), lift: scrub.lift.get() }, lifted, room, drop);
     return [{ translateX: pose.dx }, { translateY: pose.dy }, { scale: pose.scale }, { rotate: pose.rot }];
   }, [slot, target, top, at, room]);
   return (
