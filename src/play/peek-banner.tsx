@@ -16,12 +16,10 @@ import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
-// Medium's sizes; the banner draws them times the UI scale (ui-scale.ts), and callers scale PEEK_TOP and PEEK_ROOM.
+// Medium's sizes; the banner draws them times the UI scale (ui-scale.ts), and callers scale PEEK_TOP.
 const PILL = 36;
 /** The gap between the top bar and the pill. */
 export const PEEK_TOP = 2;
-/** The room the banner takes under the top bar (its gap, the pill and a gap below), which the table's own outcome banner moves down by. */
-export const PEEK_ROOM = PEEK_TOP + PILL + 4;
 const SCALE = 1.3;
 
 export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWords; top: number; left: number; width: number; onBack: () => void }) {

@@ -4,12 +4,14 @@
 // button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did.
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, useWindowDimensions, View } from "react-native";
-import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, { FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
 import { isDense, labelChars, PILL_PT, planWords, wordsWindow } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
-import { layoutAnim, useMotionScale, useReduceMotion } from "./motion-run.ts";
+import { layoutAnim, timing, useMotionScale, useReduceMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { BEAT_MS, type Moment } from "./outcome.ts";
 import type { Readout } from "./readout.ts";
@@ -209,13 +211,29 @@ export function TableDock({
 }
 
 const BANNER_WIDTH = 440;
+// A swipe this far sideways or up, or a flick, sends the banner away (user request, 2026-10-29).
+const SWIPE_AWAY = 56;
+const FLICK = 600;
 
 /**
- * What the last intent did, centered at the top of the screen for a few seconds, over the table and any open panel. `top` is
- * where it hangs (under the top bar); `width` is the screen's, so it never runs off a narrow phone. Taps go through it to
- * the cards under it; the log keeps every step. The caller keys it on the moment, so each one enters and is announced.
+ * What the last intent did, centered at the top edge of the screen for a few seconds, over the top bar, the table and any
+ * open panel (user request, 2026-10-29). `top` is where it hangs; `width` is the screen's, so it never runs off a narrow
+ * phone. A swipe sideways or up dismisses it (`onDismiss`); the log keeps every step. The caller keys it on the moment, so
+ * each one enters and is announced.
  */
-export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; top: number; width: number; onBeat?: (cards: readonly string[]) => void }) {
+export function MomentBanner({
+  moment,
+  top,
+  width,
+  onBeat,
+  onDismiss,
+}: {
+  moment: Moment;
+  top: number;
+  width: number;
+  onBeat?: (cards: readonly string[]) => void;
+  onDismiss: () => void;
+}) {
   const t = useTableTokens();
   const s = useUiScale();
   const edge = moment.tone === "good" ? t.accentHigh : moment.tone === "bad" ? t.threat : t.faint;
@@ -227,7 +245,41 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
   }, [label]);
   // The fades: the banner and each line come in and the banner goes out over MOTION.bannerIn and bannerOut.
   const scale = useMotionScale();
-  const fade = useMemo(() => ({ enter: layoutAnim(FadeInUp, MOTION.bannerIn, scale), leave: layoutAnim(FadeOut, MOTION.bannerOut, scale) }), [scale]);
+  const fade = useMemo(() => ({ enter: layoutAnim(FadeInDown, MOTION.bannerIn, scale), leave: layoutAnim(FadeOut, MOTION.bannerOut, scale) }), [scale]);
+  // The swipe: the banner follows the finger, and past SWIPE_AWAY (or on a flick) slides off and is dismissed; short of it, it
+  // springs back. A downward drag only stretches a little, since down is not a way out.
+  const dx = useSharedValue(0);
+  const dy = useSharedValue(0);
+  const swipe = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetX([-10, 10])
+        .activeOffsetY([-10, 10])
+        .onUpdate((event) => {
+          dx.set(event.translationX);
+          dy.set(Math.min(event.translationY, 8 * s));
+        })
+        .onEnd((event) => {
+          const sideways = Math.abs(event.translationX) > SWIPE_AWAY * s || Math.abs(event.velocityX) > FLICK;
+          const up = event.translationY < -SWIPE_AWAY * 0.6 * s || event.velocityY < -FLICK;
+          if (!sideways && !up) {
+            dx.set(withSpring(0));
+            dy.set(withSpring(0));
+            return;
+          }
+          const done = (finished?: boolean) => {
+            "worklet";
+            if (finished) scheduleOnRN(onDismiss);
+          };
+          if (sideways) dx.set(withTiming(Math.sign(event.translationX || event.velocityX) * width, timing(MOTION.bannerOut, scale), done));
+          else dy.set(withTiming(-(top + 200 * s), timing(MOTION.bannerOut, scale), done));
+        }),
+    [dx, dy, s, width, top, scale, onDismiss],
+  );
+  const swipeStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: dx.get() }, { translateY: dy.get() }],
+    opacity: 1 - Math.min(0.6, Math.abs(dx.get()) / Math.max(1, width)),
+  }));
   // Resolve in beats: one line more every BEAT_MS, each ringing on the table the cards it names; reduced motion shows all.
   const reduceMotion = useReduceMotion();
   const [shownLines, setShownLines] = useState(reduceMotion ? moment.lines.length : 1);
@@ -243,34 +295,42 @@ export function MomentBanner({ moment, top, width, onBeat }: { moment: Moment; t
     return () => onBeat?.([]);
   }, [beatKey, onBeat]);
   const box = { minWidth: Math.min(260 * s, width - 32), maxWidth: Math.min(BANNER_WIDTH * s, width - 32) };
+  // A dark, slightly see-through panel (user request, 2026-10-29): night, or a dark red for a failure or an attack
+  // (docs/design-system.md, Table: the combat banner). Light keeps its lit panel, a little more see-through.
+  const fill = t.depth === "light" ? { backgroundColor: withAlphaHex(t.raisedTop, 0.86), boxShadow: panelSurface(false, t).boxShadow } : { backgroundColor: bad ? "rgba(26,10,9,0.84)" : withAlphaHex(t.night, 0.84), boxShadow: `0 10px 28px ${withAlphaHex(t.shade, 0.7)}` };
   return (
-    <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="none" style={{ position: "absolute", top, left: 0, right: 0, alignItems: "center" }}>
-      {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
-      <View
-        className="rounded-card"
-        style={{
-          ...box,
-          ...panelSurface(false, t),
-          // A failure or an attack is a dark red panel (docs/design-system.md, Table: the combat banner).
-          ...(bad ? { backgroundColor: "rgba(28,16,15,0.95)", backgroundImage: "linear-gradient(180deg, rgba(40,20,18,0.94), rgba(14,12,13,0.96))" } : {}),
-        }}
-      >
-        <View testID="moment" accessible accessibilityLabel={label} className="overflow-hidden rounded-card">
-          {/* The tone, as a 3 pt band along the top: silver for a success, threat red for a failure or an engagement. */}
-          <View style={{ height: 3 * s, backgroundColor: edge, ...(moment.tone === "bad" ? {} : { opacity: 0.8 }) }} />
-          <View className="items-center px-4 pb-2 pt-1.5">
-            <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 * s }}>
-              {moment.title}
-            </Text>
-            {moment.lines.slice(0, shownLines).map((line, index) => (
-              <Animated.View key={index} entering={fade.enter} className="mt-0.5 flex-row items-center gap-2">
-                <LineMark mark={line.mark} tint="bone" size={14 * s} />
-                <Text className="shrink text-label text-bone">{line.text}</Text>
-              </Animated.View>
-            ))}
+    <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" style={{ position: "absolute", top, left: 0, right: 0, alignItems: "center" }}>
+      <GestureDetector gesture={swipe}>
+        {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
+        <Animated.View className="rounded-card" style={[{ ...box, ...fill }, swipeStyle]}>
+          <View
+            testID="moment"
+            accessible
+            accessibilityLabel={label}
+            accessibilityHint="Swipe to dismiss"
+            accessibilityActions={[{ name: "escape", label: "Dismiss" }]}
+            onAccessibilityAction={(event) => {
+              if (event.nativeEvent.actionName === "escape") onDismiss();
+            }}
+            onAccessibilityEscape={onDismiss}
+            className="overflow-hidden rounded-card"
+          >
+            {/* The tone, as a 3 pt band along the top: silver for a success, threat red for a failure or an engagement. */}
+            <View style={{ height: 3 * s, backgroundColor: edge, ...(moment.tone === "bad" ? {} : { opacity: 0.8 }) }} />
+            <View className="items-center px-4 pb-2 pt-1.5">
+              <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 * s }}>
+                {moment.title}
+              </Text>
+              {moment.lines.slice(0, shownLines).map((line, index) => (
+                <Animated.View key={index} entering={fade.enter} className="mt-0.5 flex-row items-center gap-2">
+                  <LineMark mark={line.mark} tint="bone" size={14 * s} />
+                  <Text className="shrink text-label text-bone">{line.text}</Text>
+                </Animated.View>
+              ))}
+            </View>
           </View>
-        </View>
-      </View>
+        </Animated.View>
+      </GestureDetector>
     </Animated.View>
   );
 }

@@ -32,7 +32,6 @@ import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
 import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
-import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
 import { questScaleOf } from "../play/quest-scale";
@@ -356,8 +355,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           router.push({ pathname: "/settings", params: { from: "table" } });
         }}
       />
-      {/* Over the table and any open panel, centered on the screen under the top bar. */}
-      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + (TOP_BAR + 6 + (peek.words ? PEEK_ROOM : 0)) * s} width={screen.width} onBeat={choice.onBeat} /> : null}
+      {/* Over the top bar, the table and any open panel, centered at the screen's top edge (user request, 2026-10-29). */}
+      {choice.banner ? <MomentBanner key={choice.bannerKey} moment={choice.banner} top={insets.top + 4 * s} width={screen.width} onBeat={choice.onBeat} onDismiss={choice.dismissBanner} /> : null}
       {preview && previewed && shown ? (
         <CardPreview
           key={preview.id}

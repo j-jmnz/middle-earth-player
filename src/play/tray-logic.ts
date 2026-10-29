@@ -62,6 +62,14 @@ export function trayCount(sheet: Sheet, choice: Choice): string {
   }
 }
 
+/**
+ * A Response the player may use opens listed on paper, beside the dock's Pass, even when its cards are on the table (user
+ * request, 2026-10-29): the player sees what can answer without looking for a glow.
+ */
+export function listsResponses(sheet: Sheet, windowKind: string | null | undefined): boolean {
+  return sheet.kind === "trigger" && windowKind === "response" && sheet.options.length > 0;
+}
+
 /** The tray is open when the choice is on paper and its sheet is not the one the player folded. */
 export function trayOpen(onPaper: boolean, foldedKey: string | null, sheetKey: string): boolean {
   return onPaper && foldedKey !== sheetKey;

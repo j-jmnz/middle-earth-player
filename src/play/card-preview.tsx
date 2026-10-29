@@ -1,6 +1,7 @@
 // A long press on a card: the card large over the dimmed screen, so its text reads at a glance without leaving the table
-// or the list. It grows in on a spring and shrinks back on close; reduced motion snaps both. A tap on the dimmed screen or on
-// the card, Android Back or the VoiceOver escape gesture closes it (there is no Close button); Details opens the card screen.
+// or the list. It grows in on a spring and shrinks back on close; reduced motion snaps both. A tap anywhere but Details and the
+// rows of what is with the card, Android Back or the VoiceOver escape gesture closes it (there is no Close button); Details
+// opens the card screen.
 //
 // On a wide screen (the table, in landscape) the card stands at the left and a column at its right names it, says what
 // effects are on it now (+1 Attack from Dagger of Westernesse) and lists the cards attached to it and its shadow cards: a
@@ -163,8 +164,8 @@ export function CardPreview({
         {frame}
         {wide ? (
           <Animated.View style={[{ flex: 1, maxWidth: 360 * s, marginLeft: 20 * s, maxHeight: size.height }, buttonsStyle]}>
-            {/* The column is not a scrim: a tap here does not close the preview. */}
-            <Pressable accessible={false} onPress={() => undefined} style={{ flexShrink: 1 }}>
+            {/* A tap here closes the preview too: only Details and the rows of what is with the card do something else (user request, 2026-10-29). */}
+            <Pressable accessible={false} onPress={close} style={{ flexShrink: 1 }}>
               <Text testID="card-preview-name" accessibilityRole="header" className="font-display text-title text-bone">
                 {shown.title ?? shown.name}
               </Text>
