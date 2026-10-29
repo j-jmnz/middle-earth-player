@@ -72,7 +72,7 @@ These are not defects; raise them with the user only if the device look supports
 
 ## Prompt for the device session
 
-Paste into a Claude Code session on a machine with a phone attached (not a cloud session):
+The full prompt is `docs/handover/combat-spotlight-device-prompt.md`. The short form, for a session on a machine with a phone attached (not a cloud session):
 
 ```text
 Work through docs/handover/combat-spotlight-open.md on a device. Read it, CLAUDE.md and .cursor/rules/authority.mdc first. Play each case it lists on Android and iOS, at Normal and Quick, in Dark and Light, and go through open points 1 to 10 in order. Do not reopen the plan's settled decisions. For each point, record what was seen and on which phone in docs/phases/STATUS.md (section "Combat spotlight redesign, 2026-10-29 (user request)"), moving it out of Open only when seen. Fix what fails with the smallest change the point names; durations live only in MOTION, every number on screen comes from the engine, src/play never imports src/screens. Ask before dropping or weakening any effect. pnpm test, pnpm lint, tsc --noEmit and pnpm data:check stay green; commit and push on a new branch, and do not open a pull request unless asked.
