@@ -184,7 +184,7 @@ export const lightScenes: Record<SceneName, Scene> = {
         { points: [[1, 0.15], [1, 0.33], [0.88, 1], [0.83, 1]], opacity: 0.26 },
       ],
     },
-    wash: { cx: 0.45, cy: 0, rx: 0.9, ry: 0.45, rgb: RUST, alpha: 0.38 },
+    wash: { cx: 0.45, cy: 0, rx: 0.9, ry: 0.45, rgb: RUST, alpha: 0.5 },
   }),
 };
 
@@ -197,8 +197,7 @@ export const scenesByTheme = { dark: scenes, light: lightScenes } as const;
 export const heroVeil = {
   dark: banks(MOON, 1, { cx: 0.5, cy: 0.74, rx: 1.1, ry: 0.42 }),
   light: {
-    sun: { cx: 0.95, cy: 0.02, r: 0.75 },
-    rgb: SUNLIGHT,
+    ...morning,
     blur: 9,
     beams: [
       { points: [[0.77, 0], [0.87, 0], [0.31, 0.7], [0.16, 0.7]], opacity: 0.4 },

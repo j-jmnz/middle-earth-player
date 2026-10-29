@@ -39,6 +39,7 @@ export function HeroTile({
   ringBearer = false,
   card,
   crop,
+  shadow,
 }: {
   hero: HeroFace;
   height: number;
@@ -59,6 +60,8 @@ export function HeroTile({
   // The region of the picture the tile fills, when not the default (the painting; the cover for a bare tile): a tile taller than
   // it is wide takes the cover, which leaves out the card's frame (the Campaigns fellowship).
   crop?: Region;
+  // The tile's depth in place of its own drop: the Campaigns fellowship's lap shadow, cast onto the painting before it.
+  shadow?: string;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
@@ -69,7 +72,7 @@ export function HeroTile({
   return (
     <View
       className={`flex-1 overflow-hidden ${flush ? "" : "rounded-tile"}`}
-      style={{ height, ...(flush ? {} : { boxShadow: ringBearer ? selectedRingOf(t, 1.5) : dropShadowOf(t, 8, 18, 0.8) }) }}
+      style={{ height, ...(flush ? {} : { boxShadow: ringBearer ? selectedRingOf(t, 1.5) : (shadow ?? dropShadowOf(t, 8, 18, 0.8)) }) }}
     >
       {card != null ? (
         <View>

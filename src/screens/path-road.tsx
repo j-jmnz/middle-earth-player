@@ -6,6 +6,7 @@ import { Pressable, View } from "react-native";
 
 import type { PathNode } from "../campaign/path";
 import { SceneArt } from "./art";
+import { useAheadLine } from "./chrome";
 import { usePalette } from "./palette-hook";
 import { withAlphaHex } from "../play/tokens";
 import { useUiScale } from "../play/ui-scale";
@@ -41,6 +42,7 @@ export function roadLayout(nodes: readonly PathNode[], width: number, stop: numb
 /** A straight segment from one centre to another: solid and lit when the road has been walked, dashed otherwise. */
 function Segment({ from, to, walked }: { from: RoadStop; to: RoadStop; walked: boolean }) {
   const palette = usePalette();
+  const ahead = useAheadLine();
   const dx = to.x - from.x;
   const dy = to.y - from.y;
   const length = Math.hypot(dx, dy);
@@ -56,7 +58,7 @@ function Segment({ from, to, walked }: { from: RoadStop; to: RoadStop; walked: b
         height: 0,
         borderTopWidth: 2,
         borderStyle: walked ? "solid" : "dashed",
-        borderColor: walked ? palette.accent : palette.hairline,
+        borderColor: walked ? palette.accent : ahead,
         transform: [{ rotate: `${angle}deg` }],
         ...(walked ? { boxShadow: `0 0 8px ${withAlphaHex(palette.glow, 0.55)}` } : {}),
       }}

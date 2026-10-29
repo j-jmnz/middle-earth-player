@@ -46,7 +46,7 @@ export default function CampaignList() {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const { width } = useSizeClass();
+  const { width, height } = useSizeClass();
   const columns = useSplitColumns(SIDE_RANGE);
   const { size } = columns;
   const router = useRouter();
@@ -86,15 +86,17 @@ export default function CampaignList() {
       total: campaign?.scenarios.length ?? 0,
       next: nextStep(path, save.loadout?.scenarioId),
       path,
-      score: save.log.score,
     };
   };
 
   // The carry-over a new playthrough may take in: every finished playthrough, open or archived, that holds cards for the next campaign.
   const offers = useMemo(() => carryOffers([...saves, ...archived], (id) => campaignOf(id)?.scenarios ?? null), [saves, archived]);
   const faces = useMemo(() => deckFaces(catalog, [...saves.flatMap(partyCodes), ...offers.flatMap((offer) => offer.cards.map((card) => card.code))]), [catalog, saves, offers]);
-  // The fellowship as the hero words show it: each hero's painting, name and sphere.
-  const fellowshipOf = (save: Save) => partyCodes(save).map((code) => heroFace(faces, code));
+  // The fellowship as the hero words show it, seat by seat: each hero's painting, name and sphere.
+  const fellowshipOf = (save: Save) => {
+    const seats = save.log.heroesBySeat.flat().length > 0 ? save.log.heroesBySeat : (save.loadout?.seats.map((seat) => seat.heroes) ?? []);
+    return seats.map((seat) => seat.map((code) => heroFace(faces, code)));
+  };
   const partyOf = (save: Save): PartyHero[] => partyCodes(save).flatMap((code) => {
     const face = faces.get(code);
     if (!face) return [];
@@ -239,7 +241,7 @@ export default function CampaignList() {
         managed(current, 0)
       ) : (
         <View testID="current-playthrough" style={{ gap: 18 * s }}>
-          <SaveHero line={lineOf(current)} heroes={fellowshipOf(current)} />
+          <SaveHero line={lineOf(current)} seats={fellowshipOf(current)} />
           <View style={wide ? { maxWidth: 620 * s } : undefined}>{continuing(current)}</View>
         </View>
       )
@@ -291,8 +293,8 @@ export default function CampaignList() {
   ) : null;
   const newButton =
     !showStart && !managing ? (
-      // A quiet word, not a plate: the road's primary is the one filled thing on the page.
-      <View className="items-start">
+      // A quiet word, not a plate: the road's primary is the one filled thing on the page. It starts where the road's names do.
+      <View className="items-start" style={{ paddingLeft: (20 + 14 - 12) * s }}>
         <TextButton
           label="+ New playthrough"
           testID="new-playthrough"
@@ -345,8 +347,11 @@ export default function CampaignList() {
         </FoldSection>
       </View>
     ) : null;
-  // The hero words sit low over the scene: the scene's art fills the top of the page and they start where it begins to fade.
-  const heroDrop = current && !managing ? (size === "compact" ? 170 : 330) * s : 0;
+  // The hero words sit low over the scene: the scene's art fills the top of the page and they start where it begins to fade. A short
+  // or scaled window (its height in points over the UI scale) drops them less, so the road's primary stays on the first screen.
+  const tall = height / s;
+  const clamp = (value: number, low: number, high: number) => Math.min(high, Math.max(low, value));
+  const heroDrop = current && !managing ? (size === "compact" ? clamp(tall - 700, 60, 170) : clamp(tall * 0.2, 96, 330)) * s : 0;
   const header = (
     <HubHeader title="Campaigns">
       <PillButton label="History" testID="history-open" accessibilityLabel="History of finished scenarios" onPress={() => router.push({ pathname: "/history", params: { kind: "campaign" } })} />

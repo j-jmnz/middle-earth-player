@@ -256,7 +256,8 @@ export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId
         {edge(ground)}
       </View>
       {/* The theme's air over the picture, a layer of its own so Light's multiply stays on the picture and its light can brighten. */}
-      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={box}>
+      {/* Light screens its veil onto the page, so the light brightens on a phone's canvas as on the web. */}
+      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={theme === "dark" ? box : { ...box, mixBlendMode: "screen" }}>
         {theme === "dark" ? (
           <>
             {/* Dark: a bank of fog under the title, falling to the ground at the foot so no edge meets the page below. */}
@@ -269,6 +270,8 @@ export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId
             {/* Light: the morning glow and its beams over the picture, and a warm glow behind the title. */}
             <LightVeil light={heroVeil.light} width={width} height={height} />
             <View style={{ position: "absolute", left: 0, top: 0, width, height, backgroundImage: `linear-gradient(180deg, rgba(${rgbOf(heroVeil.light.rgb)},0) 42%, rgba(${rgbOf(heroVeil.light.rgb)},0.45) 62%, rgba(${rgbOf(heroVeil.light.rgb)},0) 90%)` }} />
+            {/* On a screened layer only dark hides light: the beams fade out at a two-column edge into Light's darkest ink. */}
+            {edge(palette.bone)}
           </>
         )}
       </View>

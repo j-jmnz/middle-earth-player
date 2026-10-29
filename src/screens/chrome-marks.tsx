@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { View } from "react-native";
 
 import { usePalette } from "./palette-hook";
+import { useTheme } from "../play/theme";
 import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
 import { accentSurface } from "../play/surfaces";
@@ -116,6 +117,30 @@ export function Chip({ label, tone = "neutral", leading, testID, onArt = false }
   );
 }
 
+/** The dashed line of a journey ahead: hairline on Dark; on Light the hairline is too pale on its ground for a graphic, so accentLine (3:1). */
+export function useAheadLine(): string {
+  const palette = usePalette();
+  return useTheme() === "light" ? palette.accentLine : palette.hairline;
+}
+
+/** A step's diamond on a journey (the track here, the Campaigns road): filled when done, outlined with a glow for the current one, small and dark ahead. */
+export function StepDiamond({ state, size }: { state: "done" | "current" | "ahead"; size: number }) {
+  const palette = usePalette();
+  const s = useUiScale();
+  return (
+    <View
+      style={{
+        width: size * s,
+        height: size * s,
+        transform: [{ rotate: "45deg" }],
+        backgroundColor: state === "done" ? palette.accent : state === "current" ? palette.night : palette.raised,
+        ...(state === "done" ? {} : { borderWidth: state === "current" ? 2 : 1.5, borderColor: state === "current" ? palette.accentHigh : withAlphaHex(palette.faint, 0.7) }),
+        ...(state === "current" ? { boxShadow: `0 0 12px ${withAlphaHex(palette.glow, 0.65)}` } : {}),
+      }}
+    />
+  );
+}
+
 /**
  * A journey of steps as a track (a playthrough being managed or archived): a filled diamond for each step done joined by a solid line,
  * the current step as a larger outlined diamond with a glow, then a small dark diamond for each step that remains, on a dashed line.
@@ -123,29 +148,16 @@ export function Chip({ label, tone = "neutral", leading, testID, onArt = false }
  */
 export function JourneyBar({ total, done, current = done < total, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
   const palette = usePalette();
-  const s = useUiScale();
-  const diamond = (size: number, filled: boolean, glow: boolean) => (
-    <View
-      style={{
-        width: size * s,
-        height: size * s,
-        transform: [{ rotate: "45deg" }],
-        backgroundColor: filled ? palette.accent : glow ? palette.night : palette.raised,
-        borderWidth: filled ? 0 : glow ? 2 : 1.5,
-        borderColor: glow ? palette.accentHigh : withAlphaHex(palette.faint, 0.7),
-        ...(glow ? { boxShadow: `0 0 10px ${withAlphaHex(palette.glow, 0.6)}` } : {}),
-      }}
-    />
-  );
+  const ahead = useAheadLine();
   const line = (solid: boolean, key: string) => (
-    <View key={key} className="flex-1" style={solid ? { height: 2, backgroundColor: palette.accent } : { height: 0, borderTopWidth: 2, borderStyle: "dashed", borderColor: palette.hairline }} />
+    <View key={key} className="flex-1" style={solid ? { height: 2, backgroundColor: palette.accent } : { height: 0, borderTopWidth: 2, borderStyle: "dashed", borderColor: ahead }} />
   );
   const steps: ReactNode[] = [];
   for (let index = 0; index < total; index++) {
     const state = index < done ? "done" : index === done && current ? "current" : "locked";
-    if (state === "done") steps.push(<View key={`d${index}`}>{diamond(9, true, false)}</View>);
-    if (state === "current") steps.push(<View key={`c${index}`}>{diamond(12, false, true)}</View>);
-    if (state === "locked") steps.push(<View key={`k${index}`}>{diamond(8, false, false)}</View>);
+    if (state === "done") steps.push(<StepDiamond key={`d${index}`} state="done" size={9} />);
+    if (state === "current") steps.push(<StepDiamond key={`c${index}`} state="current" size={12} />);
+    if (state === "locked") steps.push(<StepDiamond key={`k${index}`} state="ahead" size={8} />);
     if (index < total - 1) steps.push(line(index + 1 <= done, `l${index}`));
   }
   return (
