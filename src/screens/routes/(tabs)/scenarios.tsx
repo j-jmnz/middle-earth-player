@@ -10,7 +10,7 @@ import { isPlayable } from "../../../campaign/playable";
 import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { BOXES, scenarioName, scenarioOf } from "../../campaign-data";
-import { BodyText, Column, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Panel, PillButton, PrimaryButton, Screen, ScreenScroll, Section } from "../../chrome";
+import { BodyText, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Panel, PillButton, PrimaryButton, Screen, ScreenScroll, Section } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt } from "../../art";
 import { usePalette } from "../../palette-hook";
@@ -22,12 +22,9 @@ import { KeepOrDelete } from "../../keep-or-delete";
 import { gameCaption, statusWord, STANDALONE_DROPPED } from "../../standalone-words";
 import { seatWord } from "../../seats";
 import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandalone } from "../../standalone-store";
-import { useSplitColumns } from "../../use-split-columns";
+import { useSizeClass } from "../../../play/use-size-class";
 import { useUiScale } from "../../../play/ui-scale";
 import { Text } from "../../../play/text";
-
-// The right column of the two-column Scenarios (docs/design-system.md, Tablets).
-const SIDE_RANGE = { min: 360, max: 440 };
 
 const DELETE_SENTENCE = "Delete this game? It is gone for good. Your decks stay.";
 
@@ -36,8 +33,7 @@ export default function Scenarios() {
   const t = useTableTokens();
   const s = useUiScale();
   const titleShadow = useTitleShadow();
-  const columns = useSplitColumns(SIDE_RANGE);
-  const { size } = columns;
+  const { size } = useSizeClass();
   const router = useRouter();
   const { user } = useDatabases();
   const [games, setGames] = useState<StandaloneGame[]>([]);
@@ -191,11 +187,9 @@ export default function Scenarios() {
     );
   }
   // Expanded: the boxes on the left, the games on the right (docs/design-system.md, Tablets); otherwise one column, as on a phone.
-  const split = size === "expanded" ? columns.side : null;
-  const twoColumns = split != null;
   const wide = size !== "compact";
   const playingBlock = playing.length > 0 ? (
-    <View className={twoColumns ? "gap-3" : "mt-5 gap-3"} testID="standalone-playing">
+    <View className="mt-3 gap-3" testID="standalone-playing">
       {playing.map((game, index) => renderGame(game, index === 0))}
     </View>
   ) : null;
@@ -219,7 +213,7 @@ export default function Scenarios() {
   // A tablet shows each box as poster tiles: six across in landscape, three in portrait. A phone lists them as 64 pt rows.
   const posters = wide ? (size === "expanded" ? 6 : 3) : 0;
   const boxesBlock = (
-    <View className={twoColumns ? "gap-6" : "mt-5 gap-6"} testID="standalone-scenarios">
+    <View className="mt-5 gap-6" testID="standalone-scenarios">
       {BOXES.map((box) => (
       <View key={box.id} testID={`box-${box.id}`}>
       <FoldSection id={`box-${box.id}`} title={box.name} count={box.scenarios.length} unit="scenario" {...fold(`box-${box.id}`)}>
@@ -248,11 +242,11 @@ export default function Scenarios() {
                         {badge(index + 1, playable)}
                       </View>
                       <View className="absolute bottom-0 left-0 right-0" style={{ padding: 12 * s }}>
-                        <Text className={`font-display text-heading ${playable ? "text-bone" : "text-faint"}`} numberOfLines={2}>
+                        <Text className={`font-display text-heading ${playable ? "text-bone" : "text-faint"}`} numberOfLines={3}>
                           {nameOf(id)}
                         </Text>
                         {line ? (
-                          <Text className="text-label" style={{ color: tone }} numberOfLines={1}>
+                          <Text className="text-label" style={{ color: tone }} numberOfLines={2}>
                             {line}
                           </Text>
                         ) : null}
@@ -294,7 +288,7 @@ export default function Scenarios() {
     </View>
   );
   const gamesBlock = (
-    <View className={twoColumns ? "gap-3" : "mt-6 gap-3"} testID="standalone-games">
+    <View className="mt-6 gap-3" testID="standalone-games">
       <Section title="Games" />
       {games.length === 0 ? <BodyText tone="muted">{archived.length === 0 ? "No game yet. Pick a scenario to deal one." : "No open game. Pick a scenario to deal one."}</BodyText> : null}
       {finished.map((game) => renderGame(game))}
@@ -346,33 +340,17 @@ export default function Scenarios() {
           ) : null}
         </HubHeader>
 
-        {twoColumns ? (
-          <>
-            {playingBlock}
-            <View className="mt-5 flex-row items-start" style={{ gap: split.gap }} testID="scenarios-columns">
-              <View className="min-w-0 flex-1">{boxesBlock}</View>
-              <View className="gap-6" style={{ width: split.side }}>
-                {gamesBlock}
-              </View>
-            </View>
-          </>
-        ) : (
-          <>
-            {playingBlock}
-            {boxesBlock}
-            {gamesBlock}
-          </>
-        )}
+        {/* One column on every size: a tablet's box rows become poster tiles across the whole width, the games under them. */}
+        {playingBlock}
+        {boxesBlock}
+        {gamesBlock}
     </>
   );
 
   return (
     <Screen testID="scenarios" scene="moon">
-      {/* An expanded window scrolls in a wide column; the measurer (outside the columns) decides whether it splits, else one readable column. */}
-      <ScreenScroll max={size === "expanded" ? "wide" : "readable"}>
-        {size === "expanded" ? <View style={{ height: 0 }} onLayout={columns.measure} /> : null}
-        {size === "expanded" && !twoColumns ? <Column>{page}</Column> : page}
-      </ScreenScroll>
+      {/* An expanded window scrolls in a wide column, a medium one in a readable column. */}
+      <ScreenScroll max={size === "expanded" ? "wide" : "readable"}>{page}</ScreenScroll>
     </Screen>
   );
 }

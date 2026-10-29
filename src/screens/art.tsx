@@ -225,7 +225,7 @@ export function HeroArt({ scenarioId, width, height, left }: { scenarioId: strin
   return (
     <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", top: 0, width, height, ...(left == null ? { alignSelf: "center" } : { left }) }}>
       <SceneArt scenarioId={scenarioId} width={width} height={height} />
-      <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `radial-gradient(75% 62% at 50% 34%, ${withAlphaHex(ground, 0)} 38%, ${ground} 100%)` }} />
+      <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `radial-gradient(52% 64% at 50% 34%, ${withAlphaHex(ground, 0)} 40%, ${ground} 100%)` }} />
       <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 40%, ${withAlphaHex(ground, 0.75)} 70%, ${ground} 88%)` }} />
     </View>
   );
