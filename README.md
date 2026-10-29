@@ -76,27 +76,80 @@ From an iPad or any browser, open the repo on GitHub, then Code → Codespaces �
 
 `pnpm web` serves the app on port 8081. Open the forwarded address from the Ports tab in Safari. The same browser limits apply as on the Mac.
 
-### Android phone
+### Phone builds from scratch (Mac)
 
-The app uses `expo-dev-client`, so it runs as a development build of `com.middleearth.lcg`:
+iOS needs macOS; Android builds on the same Mac. The app is `com.middleearth.lcg` and uses `expo-dev-client`.
 
-1. Install Android Studio with Android SDK Platform 36. On the phone, enable USB debugging.
-2. `pnpm catalog:build`
-3. `pnpm android -- --device`
+A development build loads its JavaScript and its card pictures from Metro on the Mac, so it works only while the phone can reach the Mac. A release build carries the code, the catalog, the booklets and every card's picture, and needs no network. Install a release build to play; use a development build to work on screens.
 
-That compiles the app, installs it over USB, and serves JavaScript from Metro. Later edits reload in the installed app. Rebuild when a native module changes. `android/` and `ios/` stay gitignored.
+#### 1. Tools, once
 
-When Android Studio is unwelcome, the `development` profile in `eas.json` builds the same app as a cloud APK. The daily loop is the local install above.
+```bash
+brew install node@22 poppler watchman cocoapods
+corepack enable    # pnpm 10.34.1, pinned in package.json
+```
 
-### iPad or iPhone
+`poppler` provides `pdftoppm`, which renders the campaign, boon and burden cards from FFG's PDFs. Without it those 26 card sides fall back to their scans, with a warning.
 
-1. Install Xcode, then `brew install cocoapods`. In Xcode → Settings → Accounts, add your Apple ID.
-2. Connect the device by cable, trust the Mac, and turn on Settings → Privacy & Security → Developer Mode.
-3. `pnpm ios -- --device`
+- iOS: install Xcode from the App Store and open it once to accept the licence. In Xcode → Settings → Accounts, add your Apple ID.
+- Android: install Android Studio and, in its SDK Manager, Android SDK Platform 36. Add to `~/.zshrc`:
+
+```bash
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH="$ANDROID_HOME/platform-tools:$PATH"
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+```
+
+#### 2. The repo
+
+```bash
+git clone https://github.com/j-jmnz/middle-earth-lcg.git
+cd middle-earth-lcg
+pnpm install
+```
+
+"Ignored build scripts: sharp" is harmless: sharp uses its prebuilt binary.
+
+#### 3. Catalog and pictures
+
+```bash
+pnpm catalog:build
+pnpm scans:pack
+```
+
+The first `scans:pack` downloads every pinned card picture at full size (about 1.2 GB, into `.cache/`), checks each sha256, and writes the 1,300 pictures scaled to 1200 px (343 MB) into `assets/scans`. Later runs read the cache and take about 80 seconds. `pnpm ios` and `pnpm android` run both steps themselves; running them first only gets the download out of the way. No `pnpm data:sync` is needed: `data/sources.json` pins every picture. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
+
+#### 4. iPhone or iPad
+
+1. Connect the device by cable and trust the Mac. Turn on Settings → Privacy & Security → Developer Mode (the device restarts).
+2. Release build:
+
+```bash
+pnpm ios -- --device --configuration Release
+```
+
+Pick the device when asked, and your Apple ID as the signing team. The first build generates `ios/` and runs CocoaPods. With a free Apple ID the installed app stops opening after 7 days; run the same command again to reinstall it (saves stay). A paid developer account avoids that.
 
 `plugins/with-script-sandboxing-off.js` turns off Xcode's User Script Sandboxing in the generated project: React Native's bundle phase writes `ip.txt` into the app undeclared, and the sandbox fails the build with "Operation not permitted". An `ios/` generated before the plugin keeps the old setting until `npx expo prebuild --clean --platform ios`.
 
-`pnpm ios` and `pnpm android` pack the booklets and every card's picture (`pnpm scans:pack`; the full-size files, about 950 MB, are fetched once into `.cache/pictures/`) before they build. The app needs no network. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
+#### 5. Android phone
+
+1. On the phone, tap Settings → About phone → Build number seven times, then turn on Developer options → USB debugging.
+2. Connect it by cable and allow the Mac. `adb devices` lists it.
+3. Release build (signed with the debug key):
+
+```bash
+pnpm android -- --device --variant release
+```
+
+When Android Studio is unwelcome, the `development` profile in `eas.json` builds a development APK in the cloud.
+
+#### Afterwards
+
+- Check the offline build: airplane mode, close the app, reopen it. Every card's picture shows.
+- Rebuild with the same command after a change. The pictures come from the cache.
+- For the daily loop, drop `--configuration Release` and `--variant release`: the development build reloads edits from Metro, and rebuilds only when a native module changes. A phone that cannot reach Metro over the network (a VPN, an isolated Wi-Fi) runs `pnpm android:usb -- --device` instead.
+- `android/` and `ios/` stay gitignored. Keep about 5 GB free for `.cache/` and the native builds.
 
 ### Maestro
 
