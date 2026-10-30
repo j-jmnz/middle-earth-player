@@ -4,7 +4,7 @@ import { AccessibilityInfo, ScrollView, View } from "react-native";
 
 import { carryOffers } from "../../../campaign/carry-over";
 import { campaignPath, nextStep } from "../../../campaign/path";
-import { Column, Eyebrow, HubHeader, Panel, PillButton, RingMark, Screen, ScreenScroll, TextButton } from "../../chrome";
+import { Column, Eyebrow, HubHeader, Panel, PillButton, Screen, ScreenScroll, TextButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { HeroArt } from "../../art";
 import { heroFace } from "../../hero-tile";
@@ -18,16 +18,14 @@ import { useDatabases } from "../../databases";
 import { recordUnclosedRun } from "../../table-session";
 import { usePalette } from "../../palette-hook";
 import { KeepOrDelete } from "../../keep-or-delete";
-import { ContinuePanel, DELETE_SENTENCE, SaveHero, SaveRow, SaveSummary, describe, type PartyHero, type SaveLine } from "../../save-panels";
+import { ContinuePanel, DELETE_SENTENCE, SaveSummary, describe, nextSummary, type SaveLine } from "../../save-panels";
+import { LockedTiles, RunHero, RunRow, type PartyHero } from "../../hub-parts";
 import { nextStepHref, pathHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
 import { useSplitColumns } from "../../use-split-columns";
 import { SPHERE_TINT } from "../../../play/icon-map";
-import { rowSurface } from "../../../play/surfaces";
-import { useTableTokens } from "../../../play/use-table-tokens";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
-import { Text } from "../../../play/text";
 
 type Seats = 1 | 2;
 
@@ -43,7 +41,6 @@ function partyCodes(save: ListedSave): string[] {
 
 export default function CampaignList() {
   const palette = usePalette();
-  const t = useTableTokens();
   const s = useUiScale();
   const { width, height } = useSizeClass();
   const columns = useSplitColumns(SIDE_RANGE);
@@ -241,11 +238,24 @@ export default function CampaignList() {
         managed(current, 0)
       ) : (
         <View testID="current-playthrough" style={{ gap: 18 * s }}>
-          <SaveHero line={lineOf(current)} seats={fellowshipOf(current)} />
+          <RunHero overline={lineOf(current).seats} title={lineOf(current).name} seats={fellowshipOf(current)} testID="continue-campaign" />
           <View style={wide ? { maxWidth: 620 * s } : undefined}>{continuing(current)}</View>
         </View>
       )
     ) : null;
+  const journeyRow = (save: ListedSave) => {
+    const line = lineOf(save);
+    return (
+      <RunRow
+        testID={`save-${save.id}`}
+        title={line.name}
+        line={`${line.seats} \u00b7 ${nextSummary(line.next)}`}
+        lead={partyOf(save)[0] ?? null}
+        accessibilityLabel={`Open ${describe(line)}`}
+        onPress={() => openPath(save)}
+      />
+    );
+  };
   const othersBlock = (grid: boolean) =>
     others.length > 0 ? (
       <View testID="other-journeys" style={{ gap: 10 * s }}>
@@ -256,7 +266,7 @@ export default function CampaignList() {
               managed(save, index + 1)
             ) : (
               <View key={save.id} style={grid ? { width: "50%", paddingHorizontal: 4 * s } : undefined}>
-                <SaveRow id={save.id} line={lineOf(save)} lead={partyOf(save)[0] ?? null} onPress={() => openPath(save)} />
+                {journeyRow(save)}
               </View>
             ),
           )}
@@ -328,22 +338,7 @@ export default function CampaignList() {
     locked.length > 0 ? (
       <View className={twoColumns ? undefined : "mt-2"}>
         <FoldSection id="coming" title="Coming later" count={locked.length} unit="campaign" {...fold("coming")}>
-          <View className="flex-row flex-wrap gap-3 pt-1" testID="locked-campaigns">
-            {locked.map((tile) => (
-              <View
-                key={tile.id}
-                testID={`locked-${tile.id}`}
-                accessible
-                accessibilityLabel={`${tile.name}, ${tile.caption}`}
-                className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-item px-4 py-4"
-                style={{ ...rowSurface(false, t), opacity: 0.78 }}
-              >
-                <RingMark size={14} state="locked" />
-                <Text className="mt-2 font-display text-heading text-faint">{tile.name}</Text>
-                <Text className="text-label text-faint">{tile.caption}</Text>
-              </View>
-            ))}
-          </View>
+          <LockedTiles tiles={locked} testID="locked-campaigns" />
         </FoldSection>
       </View>
     ) : null;

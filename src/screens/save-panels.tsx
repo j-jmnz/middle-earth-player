@@ -1,31 +1,21 @@
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 
 import type { NextStep, PathNode } from "../campaign/path";
-import { dropShadowOf, lapShadowOf, rowSurface } from "../play/surfaces";
-import { withAlphaHex } from "../play/tokens";
-import { useTheme } from "../play/theme";
-import { useTableTokens } from "../play/use-table-tokens";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
-import { Portrait, type ArtCard } from "./art";
-import { COVER } from "./art-crop";
-import { HeroTile, type HeroFace } from "./hero-tile";
 import { campaignRoad, type RoadState, type Walk } from "./campaign-road";
-import { Chevron, Eyebrow, JourneyBar, Label, PrimaryButton, SecondaryButton, StepDiamond, TextButton, useAheadLine, useTitleShadow } from "./chrome";
+import { Eyebrow, JourneyBar, Label, PrimaryButton, SecondaryButton, StepDiamond, TextButton, useAheadLine } from "./chrome";
 import { usePalette } from "./palette-hook";
 import { Text } from "../play/text";
 
-// The campaign list's pieces for one playthrough (docs/design-system.md, Campaigns): the hero words over the current scenario's scene,
-// the Continue panel (the campaign's road) under them, and a row for each other journey. Manage and Archived put KeepOrDelete
-// (keep-or-delete.tsx) under the summary.
+// The campaign list's pieces for one playthrough (docs/design-system.md, Campaigns): the Continue panel (the campaign's road) and the
+// summary Manage and Archived put KeepOrDelete (keep-or-delete.tsx) under. The hero over the current scene and the row for each
+// other journey are in hub-parts.tsx.
 
 // One save as the list words it: campaign, seats and progress. Two playthroughs of one campaign differ only here, so every
 // control on a save names it with this line.
 // `path` is the campaign's scenarios as the path screen reads them.
 export type SaveLine = { name: string; seats: string; done: number; total: number; next: NextStep; path: readonly PathNode[] };
-
-/** A hero of the fellowship as the panels show it: the face, the name, and the sphere colour of its ring (none for a neutral hero). */
-export type PartyHero = { card: ArtCard; name: string; tint?: string };
 
 export function describe(line: SaveLine): string {
   return `${line.name}, ${line.seats}, ${line.done} of ${line.total} completed`;
@@ -55,71 +45,6 @@ function nextWords(next: NextStep): { name: string; label: string; state: string
   if (next.kind === "resume") return { name: next.node.name, label: "Resume", state: "On the table" };
   if (next.kind === "begin") return { name: next.node.name, label: "Begin", state: "Next" };
   return { name: "Every scenario is won", label: "Open path", state: "Completed" };
-}
-
-// How far a fellowship painting laps over the one before it.
-const OVERLAP = 10;
-
-/**
- * The words over the current playthrough's scene: an overline with a short rule (Campaign and the seats), the campaign's name large,
- * and the fellowship as their paintings (`HeroTile`: the card's painting with its name and sphere, no ring), one row per seat, each
- * lapping a little over the right edge of the one before it and shadowing it. Hero titles carry a dark shadow on Dark; on Light the
- * words sit in a soft glow of the ground, so the overline reads over a dark scene.
- */
-export function SaveHero({ line, seats }: { line: SaveLine; seats: readonly (readonly HeroFace[])[] }) {
-  const t = useTableTokens();
-  const palette = usePalette();
-  const theme = useTheme();
-  const { size, s, short } = useSizeClass();
-  const shadow = useTitleShadow();
-  const big = size === "compact" ? 38 : 60;
-  const rows = seats.filter((seat) => seat.length > 0);
-  // Two seats take two shorter, denser rows; a tight window (Large scale, a short phone) shorter tiles still, so the road's primary
-  // stays on the first screen.
-  const two = rows.length > 1;
-  const tight = short || s > 1;
-  const tile = (size === "compact" ? (two ? (tight ? 80 : 92) : tight ? 112 : 140) : two ? 130 : 180) * s;
-  const slots = Math.max(3, ...rows.map((row) => row.length));
-  const names = (row: readonly HeroFace[]) => row.map((hero) => hero.name).join(", ");
-  const spoken = two ? rows.map((row, seat) => `Player ${seat + 1}: ${names(row)}`).join("; ") : names(rows[0] ?? []);
-  return (
-    <View>
-      <View>
-        {/* The glow is centred and reaches nothing at its box's edges, which stay inside the scroll's 8 pt bleed, so it has no edge. */}
-        {theme === "light" ? (
-          <View
-            pointerEvents="none"
-            style={{ position: "absolute", left: -8 * s, right: -8 * s, top: -28 * s, bottom: -24 * s, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(palette.night, 0.78)} 0%, ${withAlphaHex(palette.night, 0.5)} 55%, ${withAlphaHex(palette.night, 0)} 100%)` }}
-          />
-        ) : null}
-        <Eyebrow rule onArt>{line.seats}</Eyebrow>
-        <Text testID="continue-campaign" accessibilityRole="header" className="mt-2 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.06 * s, ...shadow }}>
-          {line.name}
-        </Text>
-      </View>
-      {rows.length > 0 ? (
-        <View className="mt-4" style={{ gap: 14 * s }} accessible accessibilityLabel={`Fellowship: ${spoken}`}>
-          {rows.map((row, index) => (
-            <View key={index} className="flex-row">
-              {/* Each painting laps a little over the right edge of the one before it, so no hero's name (on its left) is covered, and
-                  casts a shadow on it, so the row reads as cards laid one on another. */}
-              {row.map((hero, at) => (
-                <View key={`${hero.code}:${at}`} className="flex-1 flex-row" style={{ marginLeft: at === 0 ? 0 : -OVERLAP * s }}>
-                  <HeroTile hero={hero} height={tile} crop={COVER} dense={two} shadow={at === 0 ? dropShadowOf(t, 10, 22, 0.8) : lapShadowOf(t)} />
-                  {/* The lapping edge is lit, the way a panel's top is, so the stack reads apart over two dark paintings. */}
-                  {at === 0 ? null : <View pointerEvents="none" className="absolute bottom-0 left-0 top-0 rounded-l-item" style={{ width: 1.5 * s, backgroundColor: withAlphaHex(t.lit, 0.55) }} />}
-                </View>
-              ))}
-              {/* A short row keeps its tiles the width of a full one. */}
-              {Array.from({ length: slots - row.length }, (_, gap) => (
-                <View key={`gap${gap}`} className="flex-1" style={{ marginLeft: -OVERLAP * s }} />
-              ))}
-            </View>
-          ))}
-        </View>
-      ) : null}
-    </View>
-  );
 }
 
 /** The road's line between two scenarios: solid where it has been walked, dashed ahead, nothing past either end. */
@@ -218,30 +143,6 @@ export function ContinuePanel({ id, line, primary, onNext, onPath, onLog }: { id
         <TextButton label="Campaign log" icon="contract" tone="accent" testID="continue-log" accessibilityLabel={`Log of ${describe(line)}`} onPress={onLog} />
       </View>
     </View>
-  );
-}
-
-/** Another open playthrough: one 62 pt row that opens its path, with the fellowship's first face, its name and what is next. */
-export function SaveRow({ id, line, lead, onPress }: { id: string; line: SaveLine; lead: PartyHero | null; onPress: () => void }) {
-  const palette = usePalette();
-  const t = useTableTokens();
-  const { s } = useSizeClass();
-  const next = nextSummary(line.next);
-  return (
-    <Pressable testID={`save-${id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={`Open ${describe(line)}`} onPress={onPress}>
-      {({ pressed }) => (
-        <View className="flex-row items-center gap-3 rounded-item px-3" style={{ minHeight: 62 * s, ...rowSurface(pressed, t) }}>
-          {lead ? <Portrait card={lead.card} size={36} tint={lead.tint} glow={false} /> : null}
-          <View className="min-w-0 flex-1">
-            <Text className="font-display text-heading text-bone" numberOfLines={1}>
-              {line.name}
-            </Text>
-            <Text className="text-label text-muted" numberOfLines={1}>{`${line.seats} · ${next}`}</Text>
-          </View>
-          <Chevron direction="right" color={palette.faint} size={8} />
-        </View>
-      )}
-    </Pressable>
   );
 }
 

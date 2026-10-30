@@ -144,10 +144,10 @@ Read the sections your task touches.
   - 168–206 Components (~1.7K) ← 8
   - 207–220 Icons (~390) ← 6
   - 221–240 Card art (~780) ← 2
-  - 241–255 Tablets (~490) ← 14
-  - 256–406 Screens (~9.7K)
+  - 241–255 Tablets (~490) ← 16
+  - 256–406 Screens (~9.7K) ← 1
     - 260–263 Splash (~30)
-    - 264–279 Campaigns (campaign list) (~1.7K) ← 3
+    - 264–279 Campaigns (campaign list) (~1.7K) ← 5
     - 280–287 Scenarios (~480)
     - 288–293 History (~640)
     - 294–309 Briefing (~1.1K) ← 3
@@ -238,6 +238,18 @@ Read when a task names the plan.
   - 147–208 Patterns (~1.4K)
   - 209–233 Mechanic families: engine and records together (~600) ← 1
   - 234–257 Not expressible yet: leave open, report (~510)
+- `docs/plans/hub-layout.md` — Hub layout: one layout for Campaigns and Scenarios, History as the library (~5.2K tok)
+  - 7–28 Settled decisions (user instruction, 2026-10-30) (~360)
+  - 29–162 Tasks, in order (~3.2K)
+    - 33–54 1. Shared hub parts (~500)
+    - 55–79 2. Campaigns hub (`(tabs)/index.tsx`) (~440)
+    - 80–95 3. Campaign setup screen (new `routes/campaign/[campaignId].tsx`) (~390)
+    - 96–115 4. Scenarios hub (`(tabs)/scenarios.tsx`) (~470)
+    - 116–146 5. History becomes the library (`history-view.tsx`, `history-list.ts`, `history-words.ts`) (~620)
+    - 147–162 6. Docs, flows, tests (~730)
+  - 163–204 Notes for the implementer (~1.1K)
+  - 205–214 Out of scope (~80)
+  - 215–229 Exit (~230)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.0K tok)
   - 3–19 Context (~370)
   - 20–83 Facts found during exploration (~1.2K)
@@ -283,5 +295,5 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/play`: design-system-table.md, Spotlight (12); architecture.md, State (6); design-system-table.md, Command column (6); design-system-table.md, Motion (6); architecture.md, Images (5); design-system-table.md, Gestures (4); design-system.md, Components (4); brief.md, Table screen (3); design-system-table.md, Reading panels (3); design-system.md, Tablets (3); design-system.md, Type (3); plans/done/settings-theme-and-ui-scale.md, UI scale engine (3); design-system-table.md, Choice tray (2); design-system-table.md, Spacing and the play area's rows (2); design-system.md, Icons (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Cards (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Top bar (1); design-system-table.md, Two taps (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); design-system.md, Table — landscape (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1)
 - `src/rules`: architecture.md, State (1); brief.md, The engine plays the game (1)
-- `src/screens`: design-system.md, Tablets (9); design-system.md, Components (4); design-system.md, Performance (4); design-system.md, Briefing (3); design-system.md, Campaigns (campaign list) (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Backdrops (2); design-system.md, Campaign path (2); design-system.md, Card (2); design-system.md, Card art (2); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); design-system.md, Campaign log (1); design-system.md, Decks (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Type (1)
+- `src/screens`: design-system.md, Tablets (10); design-system.md, Campaigns (campaign list) (5); design-system.md, Components (4); design-system.md, Performance (4); design-system.md, Briefing (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Backdrops (2); design-system.md, Campaign path (2); design-system.md, Card (2); design-system.md, Card art (2); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); design-system.md, Campaign log (1); design-system.md, Decks (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Type (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

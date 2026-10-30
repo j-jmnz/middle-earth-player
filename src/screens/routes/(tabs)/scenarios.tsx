@@ -10,14 +10,14 @@ import { isPlayable } from "../../../campaign/playable";
 import { droppedIfStale, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { BOXES, scenarioName, scenarioOf } from "../../campaign-data";
-import { BodyText, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Panel, PillButton, PrimaryFace, Screen, ScreenScroll, Section } from "../../chrome";
+import { BodyText, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Panel, PillButton, PrimaryFace, Screen, ScreenScroll, Section } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt } from "../../art";
+import { CatalogGrid, CatalogTile } from "../../hub-parts";
 import { usePalette } from "../../palette-hook";
 import { ITEM_RADIUS } from "../../../play/radius";
-import { dropShadowOf, rowSurface, tileSurface } from "../../../play/surfaces";
+import { tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
-import { withAlphaHex } from "../../../play/tokens";
 import { useDatabases } from "../../databases";
 import { KeepOrDelete } from "../../keep-or-delete";
 import { gameCaption, statusWord, STANDALONE_DROPPED } from "../../standalone-words";
@@ -208,14 +208,6 @@ export default function Scenarios() {
     const stages = scenarioOf(id)?.stages.length ?? 0;
     return { line: stages > 0 ? `${stages} quest ${stages === 1 ? "stage" : "stages"}` : "", tone: palette.faint };
   };
-  // The number in a small diamond on a scenario's art.
-  const badge = (number: number, playable: boolean) => (
-    <View className="items-center justify-center" style={{ width: 24 * s, height: 24 * s, transform: [{ rotate: "45deg" }], backgroundColor: t.depth === "light" ? palette.raisedTop : withAlphaHex(palette.night, 0.82), boxShadow: dropShadowOf(t, 2, 6, 0.8) }}>
-      <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: playable ? palette.accentHigh : palette.faint, transform: [{ rotate: "-45deg" }] }}>
-        {String(number)}
-      </Text>
-    </View>
-  );
   // A tablet shows each box as poster tiles: six across in landscape, three in portrait. A phone lists them as 64 pt rows.
   const posters = wide ? (size === "expanded" ? 6 : 3) : 0;
   const boxesBlock = (
@@ -223,72 +215,27 @@ export default function Scenarios() {
       {BOXES.map((box) => (
       <View key={box.id} testID={`box-${box.id}`}>
       <FoldSection id={`box-${box.id}`} title={box.name} count={box.scenarios.length} unit="scenario" {...fold(`box-${box.id}`)}>
-      {/* Posters keep one width on every row (a short last row does not stretch): each cell is a column's share, the gutter its padding. */}
-      <View className={posters ? "flex-row flex-wrap" : undefined} style={posters ? { rowGap: 12 * s, marginHorizontal: -6 * s } : { gap: 8 * s }}>
+      <CatalogGrid posters={posters}>
         {box.scenarios.map((id, index) => {
           const playable = isPlayable(id);
           const { line, tone } = playable ? standing(id) : { line: "Not playable yet", tone: palette.faint };
           return (
-            <Pressable
+            <CatalogTile
               key={id}
               testID={`standalone-${id}`}
-              collapsable={false}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: !playable }}
+              sceneId={id}
+              number={index + 1}
+              name={nameOf(id)}
+              line={line}
+              tone={tone}
               accessibilityLabel={playable ? `Play ${nameOf(id)}` : `${nameOf(id)}, not playable yet`}
+              posters={posters}
               disabled={!playable}
               onPress={() => brief(id)}
-              style={posters ? { width: `${100 / posters}%`, paddingHorizontal: 6 * s } : undefined}
-            >
-              {({ pressed }) =>
-                posters ? (
-                  <View className="overflow-hidden rounded-item" style={{ ...tileSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
-                    <SceneArt scenarioId={id} height={(size === "expanded" ? 270 : 300) * s} fade={0.55} fadeTo={palette.dusk}>
-                      {playable ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, 0.55) }} />}
-                      <View className="absolute" style={{ left: 12 * s, top: 12 * s }}>
-                        {badge(index + 1, playable)}
-                      </View>
-                      <View className="absolute bottom-0 left-0 right-0" style={{ padding: 12 * s }}>
-                        <Text className={`font-display text-heading ${playable ? "text-bone" : "text-faint"}`} numberOfLines={3}>
-                          {nameOf(id)}
-                        </Text>
-                        {line ? (
-                          <Text className="text-label" style={{ color: tone }} numberOfLines={2}>
-                            {line}
-                          </Text>
-                        ) : null}
-                      </View>
-                    </SceneArt>
-                  </View>
-                ) : (
-                  <View className="flex-row items-center gap-3.5 overflow-hidden rounded-item pr-3" style={{ ...rowSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
-                    <View style={{ width: 86 * s, height: 64 * s }}>
-                      <SceneArt scenarioId={id} width={86 * s} height={64 * s} vivid>
-                        {/* A scenario not playable yet keeps its faint words at full strength; only its scene is veiled. */}
-                        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? withAlphaHex(palette.night, 0.15) : withAlphaHex(palette.night, 0.62) }} />
-                      </SceneArt>
-                      <View className="absolute" style={{ left: 6 * s, bottom: 6 * s }}>
-                        {badge(index + 1, playable)}
-                      </View>
-                    </View>
-                    <View className="min-w-0 flex-1 py-2">
-                      <Text className={`font-display text-heading ${playable ? "text-bone" : "text-faint"}`} numberOfLines={2}>
-                        {nameOf(id)}
-                      </Text>
-                      {line ? (
-                        <Text className="text-label" style={{ color: tone }} numberOfLines={1}>
-                          {line}
-                        </Text>
-                      ) : null}
-                    </View>
-                    {playable ? <Chevron direction="right" color={palette.faint} size={8} /> : null}
-                  </View>
-                )
-              }
-            </Pressable>
+            />
           );
         })}
-      </View>
+      </CatalogGrid>
       </FoldSection>
       </View>
       ))}
